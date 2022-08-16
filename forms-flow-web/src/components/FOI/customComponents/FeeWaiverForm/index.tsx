@@ -10,14 +10,12 @@ import AccordionDetails from '@mui/material/AccordionDetails';
 import Typography from '@mui/material/Typography';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import Box from '@mui/material/Box';
-import { errorToast, isMinistryLogin } from "../../../../helper/FOI/helper";
+import { errorToast, isMinistryLogin, formatDate, addBusinessDays } from "../../../../helper/FOI/helper";
 import type { params, FeeWaiverFormData } from './types';
-import foiFees from '../../../../constants/FOI/foiFees.json';
 import { fetchCFRForm, saveCFRForm } from "../../../../apiManager/services/FOI/foiCFRFormServices";
 import _ from 'lodash';
 import { toast } from "react-toastify";
 import { StateEnum } from '../../../../constants/FOI/statusEnum';
-import { returnToQueue } from '../../../FOI/FOIRequest/BottomButtonGroup/utils';
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
@@ -25,11 +23,12 @@ import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import CloseIcon from '@material-ui/icons/Close';
 import IconButton from '@material-ui/core/IconButton';
-import { formatDate, addBusinessDays } from "../../../../helper/FOI/helper";
-import FileUpload from "../../customComponents/FileUpload";import {
+import FileUpload from "../../customComponents/FileUpload";
+import {
   MimeTypeList,
   MaxFileSizeInMB,
 } from "../../../../constants/FOI/enum";
+import {isValidationError} from "./util";
 
 export const FeeWaiverForm = ({
   requestDescription,
@@ -52,17 +51,17 @@ export const FeeWaiverForm = ({
     {
       value: 'iao',
       label: 'In Progress IAO',
-      disabled: false,
+      disabled: isMinistry,
     },
     {
       value: 'review',
       label: 'Ministry Review',
-      disabled: false
+      disabled: isMinistry
     },
     {
       value: 'decision',
       label: 'Ministry Decision',
-      disabled: isMinistry,
+      disabled: !isMinistry,
     },
     {
        value: 'completed',
@@ -80,8 +79,6 @@ export const FeeWaiverForm = ({
     }
   }, [ministryId]);
 
-
-  const initialState: any = useSelector((state: any) => state.foiRequests.foiRequestFeeWaiverForm);
 
   const blankForm: FeeWaiverFormData = {
     status: "iao",
@@ -126,12 +123,36 @@ export const FeeWaiverForm = ({
     }
   };
 
-  const [feeWaiverData, setFeeWaiverData] = React.useState(blankForm);
+  
+  const [feeWaiverData, setFeeWaiverData] = useState(blankForm);
+  const [initialFormData, setInitialFormData] = React.useState(blankForm);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [modalMessage, setModalMessage] = useState(<></>);
+  const [dirty, setDirty] = React.useState(false);
+  const markFormDirty = () => setDirty(true);
+  const initialState: any = useSelector((state: any) => state.foiRequests.foiRequestFeeWaiverForm);
 
+  React.useEffect(() => {
+    console.log("initialState",initialState);
+    if(initialState && Object.entries(initialState).length > 0){
+        setInitialFormData(initialState);
+        setFeeWaiverData(initialState);
+    }
+  }, [initialState]);
+  
   const handleStatusChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const name : string = e.target.name;
     const value : string = e.target.value;
     setFeeWaiverData(values => ({...values, [name]: value}));
+    if (e.target.value === 'review') {
+        setModalMessage(<>Are you sure you want to change the status to Ministry Review? 
+        The Fee Waiver form will be locked for editing and only the Ministry coordinator can change it back?</>);
+        setModalOpen(true);
+    } else if (e.target.value === 'decision') {
+        setModalMessage(<>Are you sure you wish to save the Fee Waiver Form? 
+        Once you save this amount and approve the form the total will update for IAO and the applicant?</>);
+        setModalOpen(true);
+    }
   };
 
   const handleFormDataChanges = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -149,9 +170,6 @@ export const FeeWaiverForm = ({
     const name: string = e.target.name;
     const value: string = e.target.value;
 
-    console.log("name",name);
-    console.log("value",JSON.parse(value));
-
     const formData = feeWaiverData?.formdata;
     const inabilityDetails = formData?.inabilitydetails;
     const newInabilityDetails = {...inabilityDetails, [name]: name === 'hasproof' ? JSON.parse(value) : value};
@@ -165,8 +183,7 @@ export const FeeWaiverForm = ({
   const handlePublicInterestDetailsChanges = (e: React.ChangeEvent<HTMLInputElement>) => {
     const name: string = e.target.name;
     const value: string = e.target.value;
-    console.log("name",name);
-    console.log("value",value);
+    
     const formData = feeWaiverData?.formdata;
     const publicinterestdetails = formData?.publicinterestdetails;
     const newPublicInterestDetails = {...publicinterestdetails, [name]: (name !== 'description' && name !== 'analysis' && name !== 'other') ?
@@ -239,61 +256,38 @@ export const FeeWaiverForm = ({
     setFeeWaiverData(newFeeWaiverData);
    }
 
-  //const [initialFormData, setInitialFormData] = React.useState(blankForm);
-
+  
 
   const [newFiles, setNewFiles] = useState([]);
   const [attachment, setAttachment] = useState({});
 
-  React.useEffect(() => {
-    //setInitialFormData(initialState);
-    console.log("initialState",initialState);
-    if(initialState && Object.entries(initialState).length > 0){
-        setFeeWaiverData(initialState);
-    }
-  }, [initialState]);
-
 
   const save = () => {
+    var callback = (_res: string) => {
+        setFeeWaiverData(feeWaiverData);
+        toast.success("Fee Waiver Form has been saved successfully.", {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: true,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+        });
+      };
+  }; 
 
-  };
 
-  const [modalOpen, setModalOpen] = useState(false);
-  const [modalMessage, setModalMessage] = useState(<></>);
   const handleSave = () => {
     setModalOpen(false);
     save();
   };
   const handleClose = () => {
-    //setFeeWaiverData(values => ({...values, formStatus: initialFormData.formStatus}));
+    setFeeWaiverData(values => ({...values, status: initialFormData.status}));
     setModalOpen(false);
   };
 
 
-
-   const isValidationError = () => {
-        if(!(!!feeWaiverData?.formdata.requesteddate) || !(!!feeWaiverData?.formdata?.summary) || newFiles.length > 0 ||
-            (!feeWaiverData?.formdata.inability && !feeWaiverData?.formdata.publicinterest) || 
-                !(!!feeWaiverData?.formdata?.recordsdescription) || 
-                (feeWaiverData?.formdata.inability && (typeof feeWaiverData?.formdata?.inabilitydetails.hasproof != "boolean"  || 
-                            feeWaiverData?.formdata?.inabilitydetails.hasproof === true && !(!!feeWaiverData?.formdata?.inabilitydetails.description)))||
-                (feeWaiverData?.formdata.publicinterest && (typeof feeWaiverData?.formdata?.publicinterestdetails.debate != "boolean" ||
-                typeof feeWaiverData?.formdata.publicinterestdetails.environment != "boolean" || typeof feeWaiverData?.formdata.publicinterestdetails.disclosing != "boolean" ||
-                typeof feeWaiverData?.formdata.publicinterestdetails.understanding != "boolean" || typeof feeWaiverData?.formdata.publicinterestdetails.newpolicy != "boolean" ||
-                typeof feeWaiverData?.formdata.publicinterestdetails.financing != "boolean" || (!(!!feeWaiverData?.formdata.publicinterestdetails.analysis) || 
-                feeWaiverData?.formdata.publicinterestdetails.analysis === 'partial' && !(!!feeWaiverData?.formdata.publicinterestdetails.description)))) ||
-                typeof feeWaiverData?.formdata.narrow != "boolean" || typeof feeWaiverData?.formdata.exceed != "boolean" || typeof feeWaiverData?.formdata.timelines != "boolean" ||
-                typeof feeWaiverData?.formdata.previous != "boolean" ||
-                !(!!feeWaiverData?.formdata.recommendation.waive) || !(!!feeWaiverData?.formdata.recommendation.summary)
-                )
-            return true;
-        return false;
-   }
-
-   const [dirty, setDirty] = React.useState(false);
-   const markFormDirty = () => setDirty(true);
-
-   console.log("@@",!!feeWaiverData?.formdata?.inabilitydetails.hasproof);
   return (
     <div className="foi-review-container">
     <Box
@@ -321,6 +315,7 @@ export const FeeWaiverForm = ({
             value={feeWaiverData?.status}
             onChange={handleStatusChange}
             variant="outlined"
+            disabled={(feeWaiverData?.status === 'review' && !isMinistry) || feeWaiverData?.status === 'completed'}
             fullWidth
             required
           >
@@ -336,6 +331,8 @@ export const FeeWaiverForm = ({
           </TextField>
         </div>
       </div>
+      {/* <form> */}
+    <fieldset disabled={isMinistry || feeWaiverData?.status === 'review' || feeWaiverData?.status === 'completed'}>
       <div className='request-accordian'>
         <Accordion defaultExpanded={true}>
           <AccordionSummary className="accordionSummary" expandIcon={<ExpandMoreIcon />} id="applicantDetails-header">
@@ -1203,9 +1200,8 @@ export const FeeWaiverForm = ({
                   variant="outlined"
                   InputLabelProps={{ shrink: true, }}
                   onChange={handleRecommendationChanges}
-                  required={feeWaiverData?.formdata?.recommendation.waive === 'partial' || feeWaiverData?.formdata?.recommendation.waive === 'yes'}
-                  error={(feeWaiverData?.formdata?.recommendation.waive === 'partial' || feeWaiverData?.formdata?.recommendation.waive === 'yes')
-                   && !(!!feeWaiverData?.formdata?.recommendation.summary)}
+                  required={!!feeWaiverData?.formdata?.recommendation.waive}
+                  error={(!!feeWaiverData?.formdata?.recommendation.waive && !(!!feeWaiverData?.formdata?.recommendation.summary))}
                   fullWidth
                 />
               </div>
@@ -1234,6 +1230,7 @@ export const FeeWaiverForm = ({
                         e.target.value = parseFloat(e.target.value).toFixed(2);
                     }}
                     fullWidth
+                    disabled={cfrTotalAmountDue<=0 || feeWaiverData?.formdata?.recommendation.waive === 'no'|| feeWaiverData?.formdata?.recommendation.waive === 'yes'}
                     />
                 </div>
                 <div className="col-lg-6 foi-details-col">
@@ -1257,6 +1254,7 @@ export const FeeWaiverForm = ({
                         variant="outlined"
                         fullWidth
                         required
+                        disabled={ cfrTotalAmountDue<=0 || feeWaiverData?.formdata?.recommendation.waive === 'no'|| feeWaiverData?.formdata?.recommendation.waive === 'yes'}
                     >
                     </TextField>
                 </div>
@@ -1264,6 +1262,7 @@ export const FeeWaiverForm = ({
           </AccordionDetails>
         </Accordion>
       </div>
+      </fieldset>
       <div className='request-accordian'>
         <Accordion defaultExpanded={true}>
           <AccordionSummary className="accordionSummary" expandIcon={<ExpandMoreIcon />} id="applicantDetails-header">
@@ -1312,9 +1311,10 @@ export const FeeWaiverForm = ({
                     value={feeWaiverData?.formdata?.decision.amount}
                     onChange={handleAmountWaivedChanges}
                     onBlur={(e) => {
-                        e.target.value = parseFloat(e.target.value).toFixed(2);
+                        e.target.value = parseInt(e.target.value).toFixed(1);
                     }}
                     fullWidth
+                    disabled={cfrTotalAmountDue<=0}
                     />
                 </div>
                 <div className="col-lg-6 foi-details-col">
@@ -1345,6 +1345,7 @@ export const FeeWaiverForm = ({
           </AccordionDetails>
         </Accordion>
       </div>
+      
       {/* </form> */}
 
       <div className="col-lg-4 buttonContainer">
@@ -1353,7 +1354,7 @@ export const FeeWaiverForm = ({
           className="btn saveButton"
           onClick={save}
           color="primary"
-          disabled={isValidationError() || !dirty}
+          disabled={isValidationError(feeWaiverData, newFiles) || !dirty}
         >
           Save
         </button>
