@@ -202,7 +202,7 @@ export default function AttachmentModal({ modalFor, openModal, handleModal, mult
           maxWidth={'md'}
           fullWidth={true}
         >
-          <DialogTitle disableTypography id="state-change-dialog-title">
+          <DialogTitle disableTypography id="state-change-dialog-title" className="add-attachment-modal-title">
               <h2 className="state-change-header">{message.title}</h2>
               <IconButton aria-label= "close" onClick={handleClose}>
                 <CloseIcon />
