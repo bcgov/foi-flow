@@ -115,6 +115,7 @@ execution.setVariable("status",obj.status);
 execution.setVariable("defaultMinistryAssignedGroup",obj.assignedministrygroup);
 execution.setVariable("minTaskName", obj.id+" Ministry Coordinator");
 execution.setVariable("ministryRequestID",obj.ministryRequestID);
+execution.setVariable("axisRequestId",obj.axisRequestId);
 if (obj.status == 'Closed') {
 mintaskIdName = obj.id+"_ministrytaskId";
 execution.getProcessEngineServices().getTaskService().complete(execution.getVariable(mintaskIdName));
@@ -128,7 +129,7 @@ var feeflow = execution.getVariable("feeflow");
 if (obj.status != 'On Hold' &amp;&amp; feeflow == 'ONGOING') {
 execution.setVariable("feeflow","NA");
 execution.setVariable("paymentstatus","CANCELLED");
-execution.getProcessEngineServices().getRuntimeService().createMessageCorrelation("foi-manage-payment").setVariable("paymentstatus","CANCELLED").setVariable("status",obj.status).correlateWithResult();
+execution.getProcessEngineServices().getRuntimeService().createMessageCorrelation("foi-manage-payment").setVariable("paymentstatus","CANCELLED").setVariable("status",obj.status).setVariable("axisRequestId",execution.getVariable("axisRequestId")).setVariable("foiRequestID",execution.getVariable("foiRequestID")).setVariable("ministryRequestID",execution.getVariable("ministryRequestID")).correlateWithResult();
 }</camunda:script>
           </camunda:executionListener>
         </bpmn:extensionElements>

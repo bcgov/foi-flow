@@ -325,6 +325,7 @@ execution.setVariable("saveDataPayload", JSON.stringify(saveDataPayload));</camu
     <bpmn:sequenceFlow id="Flow_1mb5bs3" sourceRef="Gateway_1771ld6" targetRef="Event_05bv4ti" />
     <bpmn:exclusiveGateway id="Gateway_1rpwru8">
       <bpmn:incoming>Flow_1qzjx1y</bpmn:incoming>
+      <bpmn:incoming>Flow_1hx03q1</bpmn:incoming>
       <bpmn:outgoing>Flow_02gzt5c</bpmn:outgoing>
       <bpmn:outgoing>Flow_00aq624</bpmn:outgoing>
       <bpmn:outgoing>Flow_0o3fy5y</bpmn:outgoing>
@@ -392,13 +393,13 @@ var date2 = new Date(date_on);
 var diffTime = Math.abs(date2 - date1);
 var diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24)); 
 execution.setVariable("elapsed_days", diffDays);
-if (diffDays &gt; 0) {
+if (diffDays == 0) {
 execution.setVariable("paymentstatus", "EXPIRED");
 }</camunda:script>
         </camunda:executionListener>
       </bpmn:extensionElements>
     </bpmn:sequenceFlow>
-    <bpmn:sequenceFlow id="Flow_1hx03q1" name="&#62;20 Days" sourceRef="Gateway_0xwy934" targetRef="Activity_1mkqp7n">
+    <bpmn:sequenceFlow id="Flow_1hx03q1" name="&#62;20 Days" sourceRef="Gateway_0xwy934" targetRef="Gateway_1rpwru8">
       <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${paymentstatus == "EXPIRED"}</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
     <bpmn:sequenceFlow id="Flow_19al5dp" sourceRef="Gateway_1771ld6" targetRef="Event_1xghd1q" />
@@ -427,7 +428,6 @@ execution.setVariable("paymentstatus", "EXPIRED");
         </camunda:executionListener>
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_0hryqd5</bpmn:incoming>
-      <bpmn:incoming>Flow_1hx03q1</bpmn:incoming>
       <bpmn:outgoing>Flow_1qzjx1y</bpmn:outgoing>
     </bpmn:task>
     <bpmn:serviceTask id="Activity_0jc83dv" name="Get Token">
@@ -577,10 +577,10 @@ connector.getVariable("statusCode");</camunda:script>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_1hx03q1_di" bpmnElement="Flow_1hx03q1">
         <di:waypoint x="495" y="1020" />
-        <di:waypoint x="550" y="1020" />
-        <di:waypoint x="550" y="950" />
+        <di:waypoint x="670" y="1020" />
+        <di:waypoint x="670" y="935" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="499" y="1002" width="47" height="14" />
+          <dc:Bounds x="559" y="1002" width="47" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_03lwez1_di" bpmnElement="Flow_03lwez1">
