@@ -66,6 +66,7 @@ class paymentevent:
     def __defaultuserid(self):
         return "Online Payment"    
 
+
     def gettoday(self):
         now_pst = maya.parse(maya.now()).datetime(to_timezone='America/Vancouver', naive=False)
         return now_pst.strftime('%m/%d/%Y') 
@@ -74,3 +75,4 @@ class paymentevent:
 class PaymentEventType(Enum):
     paid = "PAID"    
     expired = "EXPIRED"
+
