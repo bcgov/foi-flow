@@ -181,7 +181,7 @@ const FileUpload = ({
             <ClickableChip
               id={`${tag.name}Tag`}
               key={`${tag.name}-tag`}
-              label={tag.display}
+              label={tag.display.toUpperCase()}
               color="primary"
               size="small"
               onClick={()=>{handleTagChange(tag.name)}}
@@ -194,7 +194,7 @@ const FileUpload = ({
               <ClickableChip
                 id={`${tag.name}Tag`}
                 key={`${tag.name}-tag`}
-                label={tag.display}
+                label={tag.display.toUpperCase()}
                 color="primary"
                 size="small"
                 onClick={()=>{handleTagChange(tag.name)}}
