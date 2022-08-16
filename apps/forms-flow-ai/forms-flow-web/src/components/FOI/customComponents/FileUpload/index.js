@@ -169,28 +169,12 @@ const FileUpload = ({
     }
 
     const getCategoriesForTaging = () => {
-      return AttachmentCategories.categorys.filter(category => category.type.includes("tag"));
-    };
-
-    let tagList = [];
-    if(modalFor === 'add') {
-      const tags = getCategoriesForTaging();
-      for(let tag of tags) {
-        if(!isMinistryCoordinator) {
-          tagList.push(
-            <ClickableChip
-              id={`${tag.name}Tag`}
-              key={`${tag.name}-tag`}
-              label={tag.display.toUpperCase()}
-              color="primary"
-              size="small"
-              onClick={()=>{handleTagChange(tag.name)}}
-              clicked={tagValue == tag.name}
-            />
-          );
-        } else {
-          if(tag.name !== "applicant") {
-            tagList.push(
+      const _tags = AttachmentCategories.categorys.filter(category => category.type.includes("tag"));
+      let _tagList = [];
+      if(modalFor === 'add') {
+        for(let tag of _tags) {
+          if(!isMinistryCoordinator) {
+            _tagList.push(
               <ClickableChip
                 id={`${tag.name}Tag`}
                 key={`${tag.name}-tag`}
@@ -201,11 +185,28 @@ const FileUpload = ({
                 clicked={tagValue == tag.name}
               />
             );
+          } else {
+            if(tag.name !== "applicant") {
+              _tagList.push(
+                <ClickableChip
+                  id={`${tag.name}Tag`}
+                  key={`${tag.name}-tag`}
+                  label={tag.display.toUpperCase()}
+                  color="primary"
+                  size="small"
+                  onClick={()=>{handleTagChange(tag.name)}}
+                  clicked={tagValue == tag.name}
+                />
+              );
+            }
           }
         }
       }
-    }
 
+      return _tagList;
+    };
+
+    let tagList = getCategoriesForTaging();
 
   return (
     <>
