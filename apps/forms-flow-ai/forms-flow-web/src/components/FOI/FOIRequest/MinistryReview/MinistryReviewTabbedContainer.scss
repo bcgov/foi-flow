@@ -6,13 +6,10 @@
   display: inline-flex;  
   padding-top: 65px;
   position: relative;
-  overflow-y: scroll;
 
   margin-left: 10%;
   margin-right: 10%;
-  margin-bottom: 5%;
 
-  height: 90%;
 }
 
 
@@ -32,8 +29,14 @@
 
 @media screen and (max-height: 655px) {
   .foileftpanelstatus {
-    padding-top: 0px !important;
+    padding-top: 5% !important;
     padding-bottom:0px !important;
+  }
+
+  .remaining-days-alert {
+    font-size: 12px;
+    font-weight: bolder;
+    padding-bottom: 0.5rem;
   }
 }
 
@@ -83,7 +86,7 @@
 
   .foitabheadercollection {
     width: fit-content;
-    height: calc(100% - 96px - 67px);
+    height: auto;
     border-radius: 0px 30px 30px 0px!important;
     margin-bottom: auto;
     padding-bottom: 2%;
@@ -174,10 +177,10 @@
 
   .foileftpanelstatus
   {
-    position: absolute;
+    position: relative;
     bottom: 0;
     padding-bottom: 20%;
-    padding-top: 30%;
+    padding-top: 10%;
     padding-left: 10%;
     color: white;
     font-size: 15px;
@@ -224,7 +227,8 @@
 /* Style the tab */
 .tab {
   overflow: hidden;
- 
+  height: 35%;
+ position: relative;
 }
 
 /* Style the buttons inside the tab */
