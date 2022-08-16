@@ -7,6 +7,10 @@ import { countOccurrences,
   allowedFileSize, 
   convertNestedObjectToArray, 
   convertBytesToMB } from "./util";
+import {
+  ClickableChip  
+} from "../../Dashboard/utils";
+import Stack from "@mui/material/Stack";
 import "./FileUpload.scss"
 import clsx from "clsx"
 
@@ -20,6 +24,10 @@ const FileUpload = ({
     attachment,
     customFormat = {},
     existingDocuments = [],
+    modalFor,
+    handleTagChange,
+    tagValue,
+    isMinistryCoordinator
 }) => {
     const fileInputField = useRef(null);
     const [files, setFiles] = useState({ ...existingDocuments });    
@@ -119,7 +127,7 @@ const FileUpload = ({
         }
         setFiles(updatedFilesDetails[0]);
         callUpdateFilesCb(updatedFilesDetails[0]);
-    }
+      }
     }
    
     const handleNewFileUpload = (e) => {
@@ -160,6 +168,102 @@ const FileUpload = ({
     }
   return (
     <>
+      {modalFor === 'add' && (<div>
+        <div className="tagtitle">
+          <span>Please select a tag for attachment(s):</span>
+        </div>
+        <section
+          className={clsx("file-upload-container", {
+            [customFormat.container]: !!customFormat.container,
+          })}
+        >
+          <div className="taglist">
+            <Stack direction="row" sx={{ overflowX: "hidden" }} spacing={1}>
+              <ClickableChip
+                  id="generalTag"
+                  key={`general-tag`}
+                  label={"General"}
+                  color="primary"
+                  size="small"
+                  onClick={()=>{handleTagChange('general')}}
+                  clicked={tagValue == 'general'}
+              />
+              {!isMinistryCoordinator && (<ClickableChip
+                  id="applicantTag"
+                  key={`applicant-tag`}
+                  label={"Applicant"}
+                  color="primary"
+                  size="small"
+                  onClick={()=>{handleTagChange('applicant')}}
+                  clicked={tagValue == 'applicant'}
+              />)}
+              <ClickableChip
+                  id="CFRTag"
+                  key={`cfr-tag`}
+                  label={"CFR"}
+                  color="primary"
+                  size="small"
+                  onClick={()=>{handleTagChange('cfr')}}
+                  clicked={tagValue == 'cfr'}
+              />
+              <ClickableChip
+                  id="RecordsReviewTag"
+                  key={`recordsreview-tag`}
+                  label={"Records Review"}
+                  color="primary"
+                  size="small"
+                  onClick={()=>{handleTagChange('recordsreview')}}
+                  clicked={tagValue == 'recordsreview'}
+              />
+              <ClickableChip
+                  id="FeesTag"
+                  key={`fees-tag`}
+                  label={"Fees"}
+                  color="primary"
+                  size="small"
+                  onClick={()=>{handleTagChange('fees')}}
+                  clicked={tagValue == 'fees'}
+              />
+              <ClickableChip
+                  id="ResponseTag"
+                  key={`response-tag`}
+                  label={"Response"}
+                  color="primary"
+                  size="small"
+                  onClick={()=>{handleTagChange('response')}}
+                  clicked={tagValue == 'response'}
+              />
+              <ClickableChip
+                  id="HarmsTag"
+                  key={`harms-tag`}
+                  label={"Harms"}
+                  color="primary"
+                  size="small"
+                  onClick={()=>{handleTagChange('harms')}}
+                  clicked={tagValue == 'harms'}
+              />
+              <ClickableChip
+                  id="OIPCTag"
+                  key={`oipc-tag`}
+                  label={"OIPC"}
+                  color="primary"
+                  size="small"
+                  onClick={()=>{handleTagChange('oipc')}}
+                  clicked={tagValue == 'oipc'}
+              />
+              <ClickableChip
+                  id="ExtensionsTag"
+                  key={`extensions-tag`}
+                  label={"Extensions"}
+                  color="primary"
+                  size="small"
+                  onClick={()=>{handleTagChange('extensions')}}
+                  clicked={tagValue == 'extensions'}
+              />
+            </Stack>
+          </div>
+        </section>
+      </div>)}
       <section
         className={clsx("file-upload-container", {
           [customFormat.container]: !!customFormat.container,
@@ -201,9 +305,8 @@ const FileUpload = ({
             <button className="btn-add-files" type="button" onClick={handleUploadBtnClick}>              
                   Add Files
             </button>  : null}
+          </div>
         </div>
-        </div>
-        
       </section>
       <ul className="error-message-ul">
         {errorMessage

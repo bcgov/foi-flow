@@ -87,81 +87,97 @@ const AttachmentCategories = Object.freeze({
       name: "general",
       display: "General",
       bgcolor: "#003366",
+      type: ["tag"],
     },
     {
       name: "personal",
       display: "Personal",
       bgcolor: "#FAA915",
+      type: ["personal"],
     },
     {
       name: "extension - denied",
       display: "Extension - Denied",
       bgcolor: "#F03E22",
+      type: ["extension"],
     },
     {
       name: "extension - approved",
       display: "Extension - Approved",
       bgcolor: "#136C14",
+      type: ["extension"],
     },
     {
       name: "cfr-review",
       display: "CFR > Review",
       bgcolor: "#04596C",
+      type: ["transition"],
     },
     {
       name: "cfr-feeassessed",
       display: "CFR > Fee Estimate",
       bgcolor: "#721121",
+      type: ["transition"],
     },
     {
       name: "signoff-response",
       display: "Sign Off > Response",
       bgcolor: "#020A80",
+      type: ["transition"],
     },
     {
       name: "harms-review",
       display: "Harms > Review",
       bgcolor: "#04596C",
+      type: ["transition"],
     },
-    {
+    { // transition: Fee estimate -> On hold --- tag: Add Attachment Modal
       name: "applicant",
       display: "Applicant",
       bgcolor: "#F99F16",
+      type: ["transition", "tag"],
     },
     {
       name: "cfr",
       display: "CFR",
       bgcolor: "#D0017A",
+      type: ["tag"],
     },
     {
       name: "recordsreview",
       display: "Records Review",
       bgcolor: "#04596C",
+      type: ["tag"],
     },
     {
       name: "fees",
       display: "Fees",
       bgcolor: "#721121",
+      type: ["tag"],
     },
     {
       name: "response",
       display: "Response",
       bgcolor: "#020A80",
+      type: ["tag"],
     },
     {
       name: "harms",
       display: "Harms",
       bgcolor: "#832AB7",
+      type: ["tag"],
     },
     {
       name: "oipc",
       display: "OIPC",
       bgcolor: "#595959",
+      type: ["tag"],
     },
     {
       name: "extensions",
       display: "Extensions",
       bgcolor: "#1A1A1A",
+      type: ["tag"],
     },
   ]
 });

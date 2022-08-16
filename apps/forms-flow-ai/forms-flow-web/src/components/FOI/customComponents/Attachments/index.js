@@ -155,7 +155,8 @@ export const AttachmentSection = ({
           if (!err) {
             res.map((header, index) => {
               const _file = files.find(file => file.filename === header.filename);
-              const documentDetails = {documentpath: header.filepath, filename: header.filename, category: 'general'};
+              const _fileInfo = fileInfoList.find(fileInfo => fileInfo.filename === header.filename);
+              const documentDetails = {documentpath: header.filepath, filename: header.filename, category: _fileInfo.filestatustransition};
               _documents.push(documentDetails);
               setDocuments(_documents);
               saveFilesinS3(header, _file, dispatch, (_err, _res) => {
@@ -392,6 +393,7 @@ export const AttachmentSection = ({
             attachment={updateAttachment}
             attachmentsArray={attachmentsArray}
             handleRename={handleRename}
+            isMinistryCoordinator={isMinistryCoordinator}
           />
         </>
       )}
