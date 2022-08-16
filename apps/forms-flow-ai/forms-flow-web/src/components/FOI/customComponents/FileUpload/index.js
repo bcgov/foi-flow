@@ -165,62 +165,60 @@ const FileUpload = ({
     
     const showDragandDrop = () => {
       if (Object.entries(files).length === 0)
-        return "Drag and drop request letter(s) or"
+        return "Drag and drop attachments, or"
     }
 
     const getCategoriesForTaging = () => {
-      return AttachmentCategories.categorys.filter(category => category.type.includes("tag"));
-    };
-    const tags = getCategoriesForTaging();
-    let tagList = [];
-    for(let tag of tags) {
-      if(!isMinistryCoordinator) {
-        tagList.push(
-          <ClickableChip
-            id={`${tag.name}Tag`}
-            key={`${tag.name}-tag`}
-            label={tag.display}
-            color="primary"
-            size="small"
-            onClick={()=>{handleTagChange(tag.name)}}
-            clicked={tagValue == tag.name}
-          />
-        );
-      } else {
-        if(tag.name !== "applicant") {
-          tagList.push(
-            <ClickableChip
-              id={`${tag.name}Tag`}
-              key={`${tag.name}-tag`}
-              label={tag.display}
-              color="primary"
-              size="small"
-              onClick={()=>{handleTagChange(tag.name)}}
-              clicked={tagValue == tag.name}
-            />
-          );
+      const _tags = AttachmentCategories.categorys.filter(category => category.type.includes("tag"));
+      let _tagList = [];
+      if(modalFor === 'add') {
+        for(let tag of _tags) {
+          if(!isMinistryCoordinator) {
+            _tagList.push(
+              <ClickableChip
+                id={`${tag.name}Tag`}
+                key={`${tag.name}-tag`}
+                label={tag.display.toUpperCase()}
+                color="primary"
+                size="small"
+                onClick={()=>{handleTagChange(tag.name)}}
+                clicked={tagValue == tag.name}
+              />
+            );
+          } else {
+            if(tag.name !== "applicant") {
+              _tagList.push(
+                <ClickableChip
+                  id={`${tag.name}Tag`}
+                  key={`${tag.name}-tag`}
+                  label={tag.display.toUpperCase()}
+                  color="primary"
+                  size="small"
+                  onClick={()=>{handleTagChange(tag.name)}}
+                  clicked={tagValue == tag.name}
+                />
+              );
+            }
+          }
         }
       }
-    }
 
+      return _tagList;
+    };
+
+    let tagList = getCategoriesForTaging();
 
   return (
     <>
       {modalFor === 'add' && (<div>
         <div className="tagtitle">
-          <span>Please select a tag for attachment(s):</span>
+          <span>Select one tag that correspondences to the document you are uploading</span>
         </div>
-        <section
-          className={clsx("file-upload-container", {
-            [customFormat.container]: !!customFormat.container,
-          })}
-        >
-          <div className="taglist">
-            <Stack direction="row" sx={{ overflowX: "hidden" }} spacing={1}>
-              {tagList}
-            </Stack>
-          </div>
-        </section>
+        <div className="taglist">
+          <Stack direction="row" sx={{ overflowX: "hidden" }} spacing={1}>
+            {tagList}
+          </Stack>
+        </div>
       </div>)}
       <section
         className={clsx("file-upload-container", {
@@ -266,6 +264,9 @@ const FileUpload = ({
           </div>
         </div>
       </section>
+      {modalFor === 'add' && (<div className="tag-message-container">
+        <p>When uploading more than one attachment, all attachments will have the save selected tag.</p>
+      </div>)}
       <ul className="error-message-ul">
         {errorMessage
           ? errorMessage.map((error) => (
