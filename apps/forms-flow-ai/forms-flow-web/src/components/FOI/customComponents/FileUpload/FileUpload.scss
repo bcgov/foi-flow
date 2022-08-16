@@ -123,10 +123,18 @@
 .ol-display-none {
   list-style-type: none;
 }
+
 .taglist {
-  padding-top: 5px;
-  padding-bottom: 15px;
+  margin: 15px 9% 25px 9%;
 }
 .tagtitle {
-  padding-left: 9%;
+  margin-left: 9%;
+}
+.tag-message-container {
+  margin: 5px 0px 0px 9%;
+  display: block;
+  p {
+    line-height: 1rem;
+    font-size: 12px;
+  }
 }
