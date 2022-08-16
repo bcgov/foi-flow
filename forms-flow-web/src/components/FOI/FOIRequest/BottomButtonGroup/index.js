@@ -315,6 +315,9 @@ const BottomButtonGroup = React.memo(
             );
   
             saveRequestObject.requeststatusid = status.id;
+            if (currentSelectedStatus === StateEnum.onhold.name && !saveRequestObject.onholdTransitionDate) {
+              saveRequestObject.paymentExpiryDate = dueDateCalculation(new Date(), 20);
+            }
             break;
         }
       }

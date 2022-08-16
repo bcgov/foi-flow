@@ -30,6 +30,7 @@ class paymentservice:
         payment.ministryrequestid = ministryrequestid
         payment.ministryrequestversion = ministryversion
         payment.paymenturl = data['paymenturl']
+        payment.paymentexpirydate = data['paymentexpirydate']
         payment.version = 1
         payment.createdby = 'System'
         _payment = FOIRequestPayment.getpayment(requestid, ministryrequestid)
