@@ -26,6 +26,10 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 import CloseIcon from '@material-ui/icons/Close';
 import IconButton from '@material-ui/core/IconButton';
 import { formatDate, addBusinessDays } from "../../../../helper/FOI/helper";
+import FileUpload from "../../customComponents/FileUpload";import {
+  MimeTypeList,
+  MaxFileSizeInMB,
+} from "../../../../constants/FOI/enum";
 
 export const FeeWaiverForm = ({
   requestDescription,
@@ -75,52 +79,55 @@ export const FeeWaiverForm = ({
       );
     }
   }, [ministryId]);
-  
+
 
   const initialState: any = useSelector((state: any) => state.foiRequests.foiRequestFeeWaiverForm);
 
   const blankForm: FeeWaiverFormData = {
     status: "iao",
-    formdata: {    
-        requesteddate: "",
-        receiveddate: "",
-        summary: "",
-        recordsdescription: "",
-        inability: false,
-        publicinterest: false,
-        inabilitydetails: {
-            hasproof: false,
-            description: ""
-        },
-        publicinterestdetails: {
-            debate: false,
-            environment: false,
-            disclosing: false,
-            understanding: false,
-            newpolicy: false,
-            financing: false,
-            other: "",
-            analysis: "partial", //partial yes or no
-            description: ""
+    formdata: {
+      requesteddate: "",
+      receiveddate: "",
+      summary: "",
+      recordsdescription: "",
+      inability: false,
+      publicinterest: false,
+      inabilitydetails: {
+          hasproof: false,
+          description: ""
+      },
+      publicinterestdetails: {
+          debate: false,
+          environment: false,
+          disclosing: false,
+          understanding: false,
+          newpolicy: false,
+          financing: false,
+          other: "",
+          analysis: "partial", //partial yes or no
+          description: ""
 
-        },
-        disseminate: false,
-        abletodisseminate: false,
-        narrow: false,
-        exceed: false,
-        timelines: false,
-        previous: false,
-        description: "",
-        recommendation: {
-            waive: "partial", //partial yes or no
-            summary: "",
-            amount: 0
-        }
+      },
+      disseminate: false,
+      abletodisseminate: false,
+      narrow: false,
+      exceed: false,
+      timelines: false,
+      previous: false,
+      description: "",
+      recommendation: {
+        waive: "partial", //partial yes or no
+        summary: "",
+        amount: 0
+      },
+      decision: {
+        amount: 0
+      }
     }
   };
 
   const [feeWaiverData, setFeeWaiverData] = React.useState(blankForm);
-  
+
   const handleStatusChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const name : string = e.target.name;
     const value : string = e.target.value;
@@ -130,7 +137,7 @@ export const FeeWaiverForm = ({
   const handleFormDataChanges = (e: React.ChangeEvent<HTMLInputElement>) => {
     const name: string = e.target.name;
     const value: string = e.target.value;
-    
+
     const formData = feeWaiverData?.formdata;
     const newFormData = {...formData, [name]: (name === 'requesteddate' || name === 'receiveddate' || name === 'summary'||
                                             name === 'recordsdescription' || name === 'description' ) ? value : JSON.parse(value)};
@@ -162,7 +169,7 @@ export const FeeWaiverForm = ({
     console.log("value",value);
     const formData = feeWaiverData?.formdata;
     const publicinterestdetails = formData?.publicinterestdetails;
-    const newPublicInterestDetails = {...publicinterestdetails, [name]: (name !== 'description' && name !== 'analysis' && name !== 'other') ? 
+    const newPublicInterestDetails = {...publicinterestdetails, [name]: (name !== 'description' && name !== 'analysis' && name !== 'other') ?
                                         JSON.parse(value) :value};
     const newFormData = {...formData, ["publicinterestdetails"]: newPublicInterestDetails};
     let newFeeWaiverData : FeeWaiverFormData = {...feeWaiverData, ["formdata"]: newFormData};
@@ -178,13 +185,29 @@ export const FeeWaiverForm = ({
     console.log("value",value);
     const formData = feeWaiverData?.formdata;
     const recommendation = formData?.recommendation;
-    const newRecommendation = {...recommendation, [name]: name === 'waive' ? JSON.parse(value) : name === 'amount'? Number(value): value};
+    const newRecommendation = {...recommendation, [name]: value};
     const newFormData = {...formData, ["recommendation"]: newRecommendation};
     let newFeeWaiverData : FeeWaiverFormData = {...feeWaiverData, ["formdata"]: newFormData};
     console.log("newFeeWaiverData",newFeeWaiverData);
     setFeeWaiverData(newFeeWaiverData);
   };
-  
+
+  const handleAmountWaivedChanges = (e: any) => {
+    const name : string = e.target.name;
+    const value : number = Math.floor((+e.target.value) * 100) / 100;
+    if (value <= cfrTotalAmountDue) {
+      setFeeWaiverData({
+        ...feeWaiverData,
+        formdata: {
+          ...feeWaiverData.formdata,
+          [name]: {
+            ...(feeWaiverData.formdata[name as keyof FeeWaiverFormData['formdata']] as Object),
+            amount: value}
+        }
+      })
+    }
+  }
+
 
   const handleFeeWaiverTypeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const name: string = e.target.name;
@@ -214,10 +237,13 @@ export const FeeWaiverForm = ({
     const updatedFormData = {...newFormData, [name]: value};
     let newFeeWaiverData : FeeWaiverFormData = {...feeWaiverData, ["formdata"]: updatedFormData};
     setFeeWaiverData(newFeeWaiverData);
-   }  
+   }
 
   //const [initialFormData, setInitialFormData] = React.useState(blankForm);
 
+
+  const [newFiles, setNewFiles] = useState([]);
+  const [attachment, setAttachment] = useState({});
 
   React.useEffect(() => {
     //setInitialFormData(initialState);
@@ -229,7 +255,7 @@ export const FeeWaiverForm = ({
 
   const save = () => {
 
-  }; 
+  };
 
   const [modalOpen, setModalOpen] = useState(false);
   const [modalMessage, setModalMessage] = useState(<></>);
@@ -242,11 +268,11 @@ export const FeeWaiverForm = ({
     setModalOpen(false);
   };
 
- 
+
 
    const isValidationError = () => {
         if(!(!!feeWaiverData?.formdata.requesteddate) || !(!!feeWaiverData?.formdata?.summary) ||
-            (!feeWaiverData?.formdata.inability && !feeWaiverData?.formdata.publicinterest) || 
+            (!feeWaiverData?.formdata.inability && !feeWaiverData?.formdata.publicinterest) ||
                 !(!!feeWaiverData?.formdata?.recordsdescription))
             return true;
         return false;
@@ -310,15 +336,15 @@ export const FeeWaiverForm = ({
                     id="requesteddate"
                     name="requesteddate"
                     label="Fee Waiver Requested"
-                    type="date" 
-                    value={feeWaiverData?.formdata.requesteddate || ''} 
+                    type="date"
+                    value={feeWaiverData?.formdata.requesteddate || ''}
                     onChange={handleRequestedDateChange}
                     inputProps={{ "aria-labelledby": "requesteddate-label"}}
                     InputLabelProps={{
                     shrink: true,
                     }}
                     InputProps={{inputProps: { max: formatDate(new Date())} }}
-                    variant="outlined" 
+                    variant="outlined"
                     required
                     error={feeWaiverData?.formdata.requesteddate === undefined || feeWaiverData?.formdata.requesteddate === ""}
                     fullWidth
@@ -329,14 +355,14 @@ export const FeeWaiverForm = ({
                     id="receiveddate"
                     name="receiveddate"
                     label="Fee Waiver Received"
-                    type="date" 
-                    value={feeWaiverData?.formdata.receiveddate || ''} 
+                    type="date"
+                    value={feeWaiverData?.formdata.receiveddate || ''}
                     inputProps={{ "aria-labelledby": "receiveddate-label"}}
                     InputLabelProps={{
                     shrink: true,
                     }}
                     //InputProps={{inputProps: { min: feeWaiverReceived, max: formatDate(new Date())} }}
-                    variant="outlined" 
+                    variant="outlined"
                     required
                     error={feeWaiverData?.formdata.receiveddate === undefined || feeWaiverData?.formdata.receiveddate === ""}
                     fullWidth
@@ -405,7 +431,7 @@ export const FeeWaiverForm = ({
             </div>
             <div className="row foi-details-row labelText textPadding">
                 <div className="col-lg-4">
-                    <label className='check-item checkboxStyle'>                  
+                    <label className='check-item checkboxStyle'>
                         <input
                         id="inability"
                         name="inability"
@@ -416,10 +442,10 @@ export const FeeWaiverForm = ({
                         />
                         <span className="checkmark"></span>
                         INABILITY TO PAY
-                    </label>  
+                    </label>
                 </div>
                 <div className="col-lg-4">
-                    <label className='check-item checkboxStyle'>                  
+                    <label className='check-item checkboxStyle'>
                         <input
                         id="publicinterest"
                         name="publicinterest"
@@ -430,8 +456,8 @@ export const FeeWaiverForm = ({
                         />
                         <span className="checkmark"></span>
                         PUBLIC INTEREST
-                    </label> 
-                </div> 
+                    </label>
+                </div>
             </div>
              <div className="row foi-details-row">
                 <div className="col-lg-12 foi-details-col">
@@ -453,8 +479,8 @@ export const FeeWaiverForm = ({
                 </div>
                 <div className="col-lg-12 foi-details-col">
                     <div className="contentStyle"><i>
-                    If provided by public body and relevant to the consideration of form 
-                    (ie: volume, document types, content and/or format) 
+                    If provided by public body and relevant to the consideration of form
+                    (ie: volume, document types, content and/or format)
                     </i>
                     </div>
                 </div>
@@ -474,7 +500,7 @@ export const FeeWaiverForm = ({
                     (e.g.: bank statement, pay stub or tax return)?
                 </div>
                 <div className="col-lg-2">
-                    <label className='check-item checkboxStyle'>                  
+                    <label className='check-item checkboxStyle'>
                         <input
                         name="hasproof"
                         type="radio"
@@ -485,10 +511,10 @@ export const FeeWaiverForm = ({
                         />
                         <span className="checkmark"></span>
                         YES
-                    </label>  
+                    </label>
                 </div>
                 <div className="col-lg-2">
-                    <label className='check-item checkboxStyle'>                  
+                    <label className='check-item checkboxStyle'>
                         <input
                         name="hasproof"
                         type="radio"
@@ -499,8 +525,8 @@ export const FeeWaiverForm = ({
                         />
                         <span className="checkmark"></span>
                         NO
-                    </label> 
-                </div> 
+                    </label>
+                </div>
             </div>
             <div className="row foi-details-row">
               <div className="col-lg-12 foi-details-col">
@@ -515,7 +541,7 @@ export const FeeWaiverForm = ({
                   InputLabelProps={{ shrink: true, }}
                   onChange={handleInabilityDetailsChanges}
                   required={feeWaiverData?.formdata.inabilitydetails.hasproof}
-                  error={feeWaiverData?.formdata.inabilitydetails.hasproof && 
+                  error={feeWaiverData?.formdata.inabilitydetails.hasproof &&
                     !(!!feeWaiverData?.formdata?.inabilitydetails.description) }
                   fullWidth
                 />
@@ -535,7 +561,7 @@ export const FeeWaiverForm = ({
                     Has the subject of the records been a matter of recent public debate?*
                 </div>
                 <div className="col-lg-2">
-                    <label className='check-item checkboxStyle'>                  
+                    <label className='check-item checkboxStyle'>
                         <input
                         id="debate"
                         name='debate'
@@ -547,10 +573,10 @@ export const FeeWaiverForm = ({
                         />
                         <span className="checkmark"></span>
                         YES
-                    </label>  
+                    </label>
                 </div>
                 <div className="col-lg-2">
-                    <label className='check-item checkboxStyle'>                  
+                    <label className='check-item checkboxStyle'>
                         <input
                         id="debate"
                         name='debate'
@@ -562,16 +588,16 @@ export const FeeWaiverForm = ({
                         />
                         <span className="checkmark"></span>
                         NO
-                    </label> 
-                </div> 
+                    </label>
+                </div>
             </div>
             <div className="row foi-details-row labelText">
                 <div className="col-lg-8 labelBold">
-                Does the subject matter of the records relate directly to the environment, 
-                public health, or safety?* 
+                Does the subject matter of the records relate directly to the environment,
+                public health, or safety?*
                 </div>
                 <div className="col-lg-2">
-                    <label className='check-item checkboxStyle'>                  
+                    <label className='check-item checkboxStyle'>
                         <input
                         id="environment"
                         name='environment'
@@ -582,10 +608,10 @@ export const FeeWaiverForm = ({
                         />
                         <span className="checkmark"></span>
                         YES
-                    </label>  
+                    </label>
                 </div>
                 <div className="col-lg-2">
-                    <label className='check-item checkboxStyle'>                  
+                    <label className='check-item checkboxStyle'>
                         <input
                         id="environment"
                         name='environment'
@@ -596,8 +622,8 @@ export const FeeWaiverForm = ({
                         />
                         <span className="checkmark"></span>
                         NO
-                    </label> 
-                </div> 
+                    </label>
+                </div>
             </div>
             <div className="row foi-details-row labelText">
                 <div className="col-lg-8 labelBold">
@@ -606,10 +632,10 @@ export const FeeWaiverForm = ({
             </div>
             <div className="row foi-details-row labelText">
                 <div className="col-lg-8 foi-details-col">
-                Disclosing an environmental concern or a public health or safety concern?  
+                Disclosing an environmental concern or a public health or safety concern?
                 </div>
                 <div className="col-lg-2">
-                    <label className='check-item checkboxStyle'>                  
+                    <label className='check-item checkboxStyle'>
                         <input
                         id="disclosing"
                         name="disclosing"
@@ -621,10 +647,10 @@ export const FeeWaiverForm = ({
                         />
                         <span className="checkmark"></span>
                         YES
-                    </label>  
+                    </label>
                 </div>
                 <div className="col-lg-2">
-                    <label className='check-item checkboxStyle'>                  
+                    <label className='check-item checkboxStyle'>
                         <input
                         id="disclosing"
                         name="disclosing"
@@ -636,16 +662,16 @@ export const FeeWaiverForm = ({
                         />
                         <span className="checkmark"></span>
                         NO
-                    </label> 
-                </div> 
+                    </label>
+                </div>
             </div>
             <div className="row foi-details-row labelText">
                 <div className="col-lg-8 foi-details-col">
                 Contributing to the development or public understanding of, or debate on, an
-                important environmental or public health or safety issue? 
+                important environmental or public health or safety issue?
                 </div>
                 <div className="col-lg-2">
-                    <label className='check-item checkboxStyle'>                  
+                    <label className='check-item checkboxStyle'>
                         <input
                         id="understanding"
                         name='understanding'
@@ -657,10 +683,10 @@ export const FeeWaiverForm = ({
                         />
                         <span className="checkmark"></span>
                         YES
-                    </label>  
+                    </label>
                 </div>
                 <div className="col-lg-2">
-                    <label className='check-item checkboxStyle'>                  
+                    <label className='check-item checkboxStyle'>
                         <input
                         id="understanding"
                         name='understanding'
@@ -672,8 +698,8 @@ export const FeeWaiverForm = ({
                         />
                         <span className="checkmark"></span>
                         NO
-                    </label> 
-                </div> 
+                    </label>
+                </div>
             </div>
             <div className="row foi-details-row labelText">
                 <div className="col-lg-8 foi-details-col">
@@ -681,7 +707,7 @@ export const FeeWaiverForm = ({
                 or service?
                 </div>
                 <div className="col-lg-2">
-                    <label className='check-item checkboxStyle'>                  
+                    <label className='check-item checkboxStyle'>
                         <input
                         id="newpolicy"
                         name='newpolicy'
@@ -693,10 +719,10 @@ export const FeeWaiverForm = ({
                         />
                         <span className="checkmark"></span>
                         YES
-                    </label>  
+                    </label>
                 </div>
                 <div className="col-lg-2">
-                    <label className='check-item checkboxStyle'>                  
+                    <label className='check-item checkboxStyle'>
                         <input
                         id="newpolicy"
                         name='newpolicy'
@@ -708,15 +734,15 @@ export const FeeWaiverForm = ({
                         />
                         <span className="checkmark"></span>
                         NO
-                    </label> 
-                </div> 
+                    </label>
+                </div>
             </div>
             <div className="row foi-details-row labelText">
                 <div className="col-lg-8 labelBold textPadding">
                     Do the records show how the public body is allocating financial or other resources? *
                 </div>
                 <div className="col-lg-2">
-                    <label className='check-item checkboxStyle'>                  
+                    <label className='check-item checkboxStyle'>
                         <input
                         id="financing"
                         name='financing'
@@ -728,10 +754,10 @@ export const FeeWaiverForm = ({
                         />
                         <span className="checkmark"></span>
                         YES
-                    </label>  
+                    </label>
                 </div>
                 <div className="col-lg-2">
-                    <label className='check-item checkboxStyle'>                  
+                    <label className='check-item checkboxStyle'>
                         <input
                         id="financing"
                         name='financing'
@@ -743,8 +769,8 @@ export const FeeWaiverForm = ({
                         />
                         <span className="checkmark"></span>
                         NO
-                    </label> 
-                </div> 
+                    </label>
+                </div>
             </div>
             <div className="row foi-details-row">
               <div className="col-lg-12 textPadding">
@@ -764,11 +790,11 @@ export const FeeWaiverForm = ({
             </div>
             <div className="row foi-details-row labelText">
                 <div className="col-lg-6 labelBold textPadding">
-                Based on the analysis above, do the requested records relate to a matter 
-                of public interest? *  
+                Based on the analysis above, do the requested records relate to a matter
+                of public interest? *
                 </div>
                 <div className="col-lg-2">
-                    <label className='check-item checkboxStyle'>                  
+                    <label className='check-item checkboxStyle'>
                         <input
                         id="analysis"
                         name="analysis"
@@ -780,10 +806,10 @@ export const FeeWaiverForm = ({
                         />
                         <span className="checkmark"></span>
                         PARTIALLY
-                    </label>  
+                    </label>
                 </div>
                 <div className="col-lg-2">
-                    <label className='check-item checkboxStyle'>                  
+                    <label className='check-item checkboxStyle'>
                         <input
                         id="analysis"
                         name="analysis"
@@ -795,10 +821,10 @@ export const FeeWaiverForm = ({
                         />
                         <span className="checkmark"></span>
                         YES
-                    </label>  
+                    </label>
                 </div>
                 <div className="col-lg-2">
-                    <label className='check-item checkboxStyle'>                  
+                    <label className='check-item checkboxStyle'>
                         <input
                         id="analysis"
                         name="analysis"
@@ -810,8 +836,8 @@ export const FeeWaiverForm = ({
                         />
                         <span className="checkmark"></span>
                         NO
-                    </label> 
-                </div> 
+                    </label>
+                </div>
             </div>
             <div className="row foi-details-row">
               <div className="col-lg-12 foi-details-col">
@@ -828,7 +854,7 @@ export const FeeWaiverForm = ({
                   required={feeWaiverData?.formdata?.publicinterestdetails.analysis === 'partial' ||
                   feeWaiverData?.formdata?.publicinterestdetails.analysis === 'yes'}
                   error={feeWaiverData?.formdata?.publicinterestdetails.analysis === 'partial' ||
-                        feeWaiverData?.formdata?.publicinterestdetails.analysis === 'yes' && 
+                        feeWaiverData?.formdata?.publicinterestdetails.analysis === 'yes' &&
                         !(!!feeWaiverData?.formdata?.publicinterestdetails.description)}
                   fullWidth
                 />
@@ -845,12 +871,12 @@ export const FeeWaiverForm = ({
           <AccordionDetails className='labelBold'>
             <div className="row foi-details-row labelText">
                 <div className="col-lg-8 labelBold">
-                    Is the applicant's primary purpose for requesting records to disseminate information 
+                    Is the applicant's primary purpose for requesting records to disseminate information
                     in a way that could reasonably be expected to benefit the public rather than serving
-                    a private interest? 
+                    a private interest?
                 </div>
                 <div className="col-lg-2">
-                    <label className='check-item checkboxStyle'>                  
+                    <label className='check-item checkboxStyle'>
                         <input
                         id="disseminate"
                         name="disseminate"
@@ -862,10 +888,10 @@ export const FeeWaiverForm = ({
                         />
                         <span className="checkmark"></span>
                         YES
-                    </label>  
+                    </label>
                 </div>
                 <div className="col-lg-2">
-                    <label className='check-item checkboxStyle'>                  
+                    <label className='check-item checkboxStyle'>
                         <input
                         id="disseminate"
                         name="disseminate"
@@ -877,15 +903,15 @@ export const FeeWaiverForm = ({
                         />
                         <span className="checkmark"></span>
                         NO
-                    </label> 
-                </div> 
+                    </label>
+                </div>
             </div>
             <div className="row foi-details-row labelText">
                 <div className="col-lg-8 foi-details-col">
-                    Is the applicant able to disseminate the information to the public? 
+                    Is the applicant able to disseminate the information to the public?
                 </div>
                 <div className="col-lg-2">
-                    <label className='check-item checkboxStyle'>                  
+                    <label className='check-item checkboxStyle'>
                         <input
                         id="abletodisseminate"
                         name='abletodisseminate'
@@ -897,10 +923,10 @@ export const FeeWaiverForm = ({
                         />
                         <span className="checkmark"></span>
                         YES
-                    </label>  
+                    </label>
                 </div>
                 <div className="col-lg-2">
-                    <label className='check-item checkboxStyle'>                  
+                    <label className='check-item checkboxStyle'>
                         <input
                         id="abletodisseminate"
                         name='abletodisseminate'
@@ -912,8 +938,8 @@ export const FeeWaiverForm = ({
                         />
                         <span className="checkmark"></span>
                         NO
-                    </label> 
-                </div> 
+                    </label>
+                </div>
             </div>
           </AccordionDetails>
         </Accordion>
@@ -926,15 +952,15 @@ export const FeeWaiverForm = ({
           <AccordionDetails>
             <div className="row foi-details-row labelText">
                 <div className="col-lg-12 labelBold">
-                    Is there any other reason it is fair to excuse payment?  Factors to consider include: *  
+                    Is there any other reason it is fair to excuse payment?  Factors to consider include: *
                 </div>
             </div>
             <div className="row foi-details-row labelText">
                 <div className="col-lg-8 foi-details-col">
-                    Was the applicant willing to narrow the request for records to reduce the fee?    
+                    Was the applicant willing to narrow the request for records to reduce the fee?
                 </div>
                 <div className="col-lg-2">
-                    <label className='check-item checkboxStyle'>                  
+                    <label className='check-item checkboxStyle'>
                         <input
                         id="narrow"
                         name='narrow'
@@ -946,10 +972,10 @@ export const FeeWaiverForm = ({
                         />
                         <span className="checkmark"></span>
                         YES
-                    </label>  
+                    </label>
                 </div>
                 <div className="col-lg-2">
-                    <label className='check-item checkboxStyle'>                  
+                    <label className='check-item checkboxStyle'>
                         <input
                         id="narrow"
                         name='narrow'
@@ -961,16 +987,16 @@ export const FeeWaiverForm = ({
                         />
                         <span className="checkmark"></span>
                         NO
-                    </label> 
-                </div> 
+                    </label>
+                </div>
             </div>
             <div className="row foi-details-row labelText">
                 <div className="col-lg-8 foi-details-col">
                     Do the costs of processing the applicant's FOI request exceed the fee estimate considerably
-                    and, if so, is it reasonable to require the public body to bear some or all of those costs? 
+                    and, if so, is it reasonable to require the public body to bear some or all of those costs?
                 </div>
                 <div className="col-lg-2">
-                    <label className='check-item checkboxStyle'>                  
+                    <label className='check-item checkboxStyle'>
                         <input
                         id="exceed"
                         name='exceed'
@@ -982,10 +1008,10 @@ export const FeeWaiverForm = ({
                         />
                         <span className="checkmark"></span>
                         YES
-                    </label>  
+                    </label>
                 </div>
                 <div className="col-lg-2">
-                    <label className='check-item checkboxStyle'>                  
+                    <label className='check-item checkboxStyle'>
                         <input
                         id="exceed"
                         name='exceed'
@@ -997,15 +1023,15 @@ export const FeeWaiverForm = ({
                         />
                         <span className="checkmark"></span>
                         NO
-                    </label> 
-                </div> 
+                    </label>
+                </div>
             </div>
             <div className="row foi-details-row labelText">
                 <div className="col-lg-8 foi-details-col">
-                    Have statutory timelines on the FOI file been met to date?     
+                    Have statutory timelines on the FOI file been met to date?
                 </div>
                 <div className="col-lg-2">
-                    <label className='check-item checkboxStyle'>                  
+                    <label className='check-item checkboxStyle'>
                         <input
                         id="timelines"
                         name='timelines'
@@ -1017,10 +1043,10 @@ export const FeeWaiverForm = ({
                         />
                         <span className="checkmark"></span>
                         YES
-                    </label>  
+                    </label>
                 </div>
                 <div className="col-lg-2">
-                    <label className='check-item checkboxStyle'>                  
+                    <label className='check-item checkboxStyle'>
                         <input
                         id="timelines"
                         name='timelines'
@@ -1032,8 +1058,8 @@ export const FeeWaiverForm = ({
                         />
                         <span className="checkmark"></span>
                         NO
-                    </label> 
-                </div> 
+                    </label>
+                </div>
             </div>
             <div className="row foi-details-row labelText textPadding">
                 <div className="col-lg-8 foi-details-col">
@@ -1041,7 +1067,7 @@ export const FeeWaiverForm = ({
                     or should not be subject to a fee?
                 </div>
                 <div className="col-lg-2">
-                    <label className='check-item checkboxStyle'>                  
+                    <label className='check-item checkboxStyle'>
                         <input
                         id="previous"
                         name="previous"
@@ -1053,10 +1079,10 @@ export const FeeWaiverForm = ({
                         />
                         <span className="checkmark"></span>
                         YES
-                    </label>  
+                    </label>
                 </div>
                 <div className="col-lg-2">
-                    <label className='check-item checkboxStyle'>                  
+                    <label className='check-item checkboxStyle'>
                         <input
                         id="previous"
                         name="previous"
@@ -1068,8 +1094,8 @@ export const FeeWaiverForm = ({
                         />
                         <span className="checkmark"></span>
                         NO
-                    </label> 
-                </div> 
+                    </label>
+                </div>
             </div>
             <div className="row foi-details-row">
               <div className="col-lg-12 foi-details-col">
@@ -1085,7 +1111,7 @@ export const FeeWaiverForm = ({
                   onChange={handleFormDataChanges}
                   required={feeWaiverData?.formdata?.narrow || feeWaiverData?.formdata?.exceed || feeWaiverData?.formdata?.timelines ||
                             feeWaiverData?.formdata?.previous}
-                  error={(feeWaiverData?.formdata?.previous || feeWaiverData?.formdata?.narrow || feeWaiverData?.formdata?.exceed || 
+                  error={(feeWaiverData?.formdata?.previous || feeWaiverData?.formdata?.narrow || feeWaiverData?.formdata?.exceed ||
                         feeWaiverData?.formdata?.timelines) && !(!!feeWaiverData?.formdata?.description)}
                   fullWidth
                 />
@@ -1102,12 +1128,12 @@ export const FeeWaiverForm = ({
           <AccordionDetails>
             <div className="row foi-details-row labelText">
                 <div className="col-lg-8 labelBold">
-                    Select with Overall IAO Recommendations:*  
+                    Select with Overall IAO Recommendations:*
                 </div>
             </div>
             <div className="row foi-details-row labelText textPadding">
                 <div className="col-lg-12">
-                    <label className='check-item checkboxStyle'>                  
+                    <label className='check-item checkboxStyle'>
                         <input
                         id="waive"
                         name='waive'
@@ -1119,10 +1145,10 @@ export const FeeWaiverForm = ({
                         />
                         <span className="checkmark"></span>
                         Waive Fee in Part
-                    </label>  
+                    </label>
                 </div>
                 <div className="col-lg-12">
-                    <label className='check-item checkboxStyle'>                  
+                    <label className='check-item checkboxStyle'>
                         <input
                         id="waive"
                         name='waive'
@@ -1134,10 +1160,10 @@ export const FeeWaiverForm = ({
                         />
                         <span className="checkmark"></span>
                         Waive Fee in Full
-                    </label> 
-                </div> 
+                    </label>
+                </div>
                 <div className="col-lg-12">
-                    <label className='check-item checkboxStyle'>                  
+                    <label className='check-item checkboxStyle'>
                         <input
                         id="waive"
                         name='waive'
@@ -1149,8 +1175,8 @@ export const FeeWaiverForm = ({
                         />
                         <span className="checkmark"></span>
                         Do Not Waive Fee
-                    </label> 
-                </div> 
+                    </label>
+                </div>
             </div>
             <div className="row foi-details-row textPadding">
               <div className="col-lg-12 foi-details-col">
@@ -1174,12 +1200,12 @@ export const FeeWaiverForm = ({
             <div className="row foi-details-row">
                 <div className="col-lg-6 foi-details-col">
                     <TextField
-                    id="amounttobewaived"
+                    id="amounttobewaivedrecommendation"
                     label="Amount to be waived"
                     inputProps={{
                         "aria-labelledby": "amounttobewaived-label",
                         step: 0.01,
-                        //max: formData.amountDue,
+                        max: cfrTotalAmountDue,
                         min: 0
                     }}
                     InputProps={{
@@ -1187,10 +1213,10 @@ export const FeeWaiverForm = ({
                     }}
                     InputLabelProps={{ shrink: true }}
                     variant="outlined"
-                    name="amounttobewaived"
+                    name="recommendation"
                     type="number"
                     value={feeWaiverData?.formdata?.recommendation.amount}
-                    onChange={handleRecommendationChanges}
+                    onChange={handleAmountWaivedChanges}
                     onBlur={(e) => {
                         e.target.value = parseFloat(e.target.value).toFixed(2);
                     }}
@@ -1199,13 +1225,103 @@ export const FeeWaiverForm = ({
                 </div>
                 <div className="col-lg-6 foi-details-col">
                     <TextField
-                        id="valueofamount"
+                        id="valueofamountrecommendation"
                         label={"Value of amount"}
-                        inputProps={{ "aria-labelledby": "valueofamount-label"}}
+                        inputProps={{
+                          "aria-labelledby": "valueofamount-label",
+                          step: 1,
+                          max: 100,
+                          min: 0
+                        }}
+                        InputProps={{
+                            endAdornment: <InputAdornment position="end">%</InputAdornment>
+                        }}
                         InputLabelProps={{ shrink: true }}
-                        select
                         name="valueofamount"
-                        value={feeWaiverData?.formdata?.recommendation.amount}
+                        type="number"
+                        onChange={(e) => handleAmountWaivedChanges({target: {name: 'recommendation', value: ((parseFloat(e.target.value) / 100) * cfrTotalAmountDue).toFixed(2)}})}
+                        value={Math.round((feeWaiverData?.formdata?.recommendation.amount / cfrTotalAmountDue) * 100)}
+                        variant="outlined"
+                        fullWidth
+                        required
+                    >
+                    </TextField>
+                </div>
+            </div>
+          </AccordionDetails>
+        </Accordion>
+      </div>
+      <div className='request-accordian'>
+        <Accordion defaultExpanded={true}>
+          <AccordionSummary className="accordionSummary" expandIcon={<ExpandMoreIcon />} id="applicantDetails-header">
+            <Typography className="heading">PUBLIC BODY DECISION</Typography>
+          </AccordionSummary>
+          <AccordionDetails>
+            <div className="row foi-details-row labelText">
+                <div className="col-lg-8 labelBold">
+                    Signature <em>Upload Image or Signed Form</em>*
+                </div>
+            </div>
+            <div className="row foi-details-row">
+              <div className="col-lg-12 foi-details-col">
+                <div className="feeWaiverFileUpload">
+                  <FileUpload
+                    attchmentFileNameList={[]}
+                    multipleFiles={false}
+                    mimeTypes={MimeTypeList.extensionAttachment}
+                    maxFileSize={MaxFileSizeInMB.extensionAttachment}
+                    totalFileSize={MaxFileSizeInMB.totalFileSize}
+                    updateFilesCb={setNewFiles}
+                    attachment={attachment}
+                    existingDocuments={[]}
+                  />
+                </div>
+              </div>
+            </div>
+            <div className="row foi-details-row">
+                <div className="col-lg-6 foi-details-col">
+                    <TextField
+                    id="amounttobewaiveddecision"
+                    label="Amount to be waived"
+                    inputProps={{
+                        "aria-labelledby": "amounttobewaived-label",
+                        step: 0.01,
+                        max: cfrTotalAmountDue,
+                        min: 0
+                    }}
+                    InputProps={{
+                        startAdornment: <InputAdornment position="start">$</InputAdornment>
+                    }}
+                    InputLabelProps={{ shrink: true }}
+                    variant="outlined"
+                    name="decision"
+                    type="number"
+                    value={feeWaiverData?.formdata?.decision.amount}
+                    onChange={handleAmountWaivedChanges}
+                    onBlur={(e) => {
+                        e.target.value = parseFloat(e.target.value).toFixed(2);
+                    }}
+                    fullWidth
+                    />
+                </div>
+                <div className="col-lg-6 foi-details-col">
+                    <TextField
+                        id="valueofamountdecision"
+                        label={"Value of amount"}
+                        inputProps={{
+                          "aria-labelledby": "valueofamount-label",
+                          step: 1,
+                          max: 100,
+                          min: 0
+                        }}
+                        InputProps={{
+                            endAdornment: <InputAdornment position="end">%</InputAdornment>
+                        }}
+                        InputLabelProps={{ shrink: true }}
+                        name="valueofamount"
+                        type="number"
+                        onChange={(e) => handleAmountWaivedChanges({target: {name: 'decision', value: ((parseFloat(e.target.value) / 100) * cfrTotalAmountDue).toFixed(2)}})}
+                        value={Math.round((feeWaiverData?.formdata?.decision.amount / cfrTotalAmountDue) * 100)}
                         variant="outlined"
                         fullWidth
                         required
@@ -1217,14 +1333,14 @@ export const FeeWaiverForm = ({
         </Accordion>
       </div>
       {/* </form> */}
-      
+
       <div className="col-lg-4 buttonContainer">
         <button
           type="button"
           className="btn saveButton"
           onClick={save}
           color="primary"
-          disabled={isValidationError() || !dirty}
+          disabled={isValidationError() || !dirty || newFiles.length <= 1}
         >
           Save
         </button>

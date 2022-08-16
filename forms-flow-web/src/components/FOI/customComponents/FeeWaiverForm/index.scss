@@ -27,3 +27,12 @@
 .textPadding {
     padding-bottom: 16px;
 }
+
+.file-upload-container {
+    width: 102%;
+    .file-upload-preview {
+        width: 100%;
+        margin-right: -15px;
+        margin-left: 0;
+    }
+}

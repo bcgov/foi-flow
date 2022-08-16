@@ -35,6 +35,9 @@ export type FeeWaiverFormData = {
             summary: string,
             amount: number
         }
+        decision: {
+            amount: number
+        }
     }
 }
 
