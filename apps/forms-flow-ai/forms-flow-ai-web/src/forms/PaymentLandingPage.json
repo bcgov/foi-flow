@@ -265,13 +265,13 @@
                "labelMargin":"",
                "customClass":"",
                "modalEdit":false,
-               "defaultValue":"https://request-management-api-002-dev.apps.silver.devops.gov.bc.ca",
+               "defaultValue":"",
                "persistent":true,
                "protected":false,
                "dbIndex":false,
                "encrypted":false,
                "redrawOn":"",
-               "customDefaultValue":"",
+               "customDefaultValue":"value = localStorage.getItem(\"foiApiUrl\")",
                "calculateValue":"",
                "calculateServer":false,
                "key":"apiUrl",
@@ -340,7 +340,7 @@
                   
                ],
                "inputType":"hidden",
-               "id":"efsrsb"
+               "id":"egzwvn"
             },
             {
                "label":"Foi Request Id",
