@@ -9,7 +9,7 @@ import email
 MAIL_SERVER_IMAP = os.getenv('EMAIL_SERVER_IMAP')
 MAIL_SRV_USERID = os.getenv('EMAIL_SRUSERID')
 MAIL_SRV_PASSWORD = os.getenv('EMAIL_SRPWD')
-MAIL_DELIVERY_FAILURE_TXT = "Delivery Status Notification"
+
 class inboxservice:
     
     """ FOI Email Inbox Service
@@ -19,16 +19,16 @@ class inboxservice:
     """
 
     def get_failure_deliverystatus_as_eml(self, subject, email):    
-        message = self._get_deliverystatus_by_text(MAIL_DELIVERY_FAILURE_TXT, subject, email)
+        message = self._get_deliverystatus_by_text(subject, email)
         if message is not None:
             return {"success" : False, "message": "Unable to send", "content": message["content"].obj.__bytes__(), "reason": message["reason"]}
         return {"success" : True, "message": "Sent successfully", "content": None,  "reason": None}
     
-    def _get_deliverystatus_by_text(self, subject, msgkey, text):
+    def _get_deliverystatus_by_text(self, msgkey, text):
         try:
             mailbox = MailBox(MAIL_SERVER_IMAP)
             mailbox.login(MAIL_SRV_USERID, MAIL_SRV_PASSWORD)
-            messages = mailbox.fetch(criteria=AND(subject=subject, text=text), reverse = True) 
+            messages = mailbox.fetch(criteria=AND(text=text), reverse = True) 
             for message in messages:
                 email_message = email.message_from_bytes(message.obj.__bytes__()).as_string()
                 if text in email_message and msgkey in email_message:
@@ -49,10 +49,8 @@ class inboxservice:
     def __getreason(self, code):
         if code == "541":
             return "Message rejected by the recipient address"
-        elif code == "550 5.1.1":
+        elif str(code).startswith("550"):
             return "The email account that you tried to reach does not exist. Please try double-checking the recipient's email address for typos or unnecessary spaces"
-        elif code == "550":
-            return "Requested command failed because the user’s mailbox was unavailable, or the receiving server rejected the message because it was likely spam"
         elif code == "551":    
             return "Intended recipient mailbox isn't available on the receiving server"
         elif code == "552":
