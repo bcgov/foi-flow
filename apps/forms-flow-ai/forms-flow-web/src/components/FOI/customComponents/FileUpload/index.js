@@ -7,8 +7,13 @@ import { countOccurrences,
   allowedFileSize, 
   convertNestedObjectToArray, 
   convertBytesToMB } from "./util";
-import "./FileUpload.scss"
-import clsx from "clsx"
+import {
+  ClickableChip  
+} from "../../Dashboard/utils";
+import Stack from "@mui/material/Stack";
+import "./FileUpload.scss";
+import clsx from "clsx";
+import { AttachmentCategories } from '../../../../constants/FOI/statusEnum';
 
 const FileUpload = ({
     multipleFiles,
@@ -20,6 +25,10 @@ const FileUpload = ({
     attachment,
     customFormat = {},
     existingDocuments = [],
+    modalFor,
+    handleTagChange,
+    tagValue,
+    isMinistryCoordinator
 }) => {
     const fileInputField = useRef(null);
     const [files, setFiles] = useState({ ...existingDocuments });    
@@ -119,7 +128,7 @@ const FileUpload = ({
         }
         setFiles(updatedFilesDetails[0]);
         callUpdateFilesCb(updatedFilesDetails[0]);
-    }
+      }
     }
    
     const handleNewFileUpload = (e) => {
@@ -132,7 +141,7 @@ const FileUpload = ({
       const newFiles = e.dataTransfer.files;
       const totalNoOfFiles = Object.entries(files).length + newFiles.length; 
       validateFiles(newFiles, totalNoOfFiles);
-  }
+    }
     const removeFile = (fileName) => {
         const _file = files[fileName];
         const sizeInMB = (_file.size / (1024*1024)).toFixed(2);
@@ -158,8 +167,61 @@ const FileUpload = ({
       if (Object.entries(files).length === 0)
         return "Drag and drop request letter(s) or"
     }
+
+    const getCategoriesForTaging = () => {
+      return AttachmentCategories.categorys.filter(category => category.type.includes("tag"));
+    };
+    const tags = getCategoriesForTaging();
+    let tagList = [];
+    for(let tag of tags) {
+      if(!isMinistryCoordinator) {
+        tagList.push(
+          <ClickableChip
+            id={`${tag.name}Tag`}
+            key={`${tag.name}-tag`}
+            label={tag.display}
+            color="primary"
+            size="small"
+            onClick={()=>{handleTagChange(tag.name)}}
+            clicked={tagValue == tag.name}
+          />
+        );
+      } else {
+        if(tag.name !== "applicant") {
+          tagList.push(
+            <ClickableChip
+              id={`${tag.name}Tag`}
+              key={`${tag.name}-tag`}
+              label={tag.display}
+              color="primary"
+              size="small"
+              onClick={()=>{handleTagChange(tag.name)}}
+              clicked={tagValue == tag.name}
+            />
+          );
+        }
+      }
+    }
+
+
   return (
     <>
+      {modalFor === 'add' && (<div>
+        <div className="tagtitle">
+          <span>Please select a tag for attachment(s):</span>
+        </div>
+        <section
+          className={clsx("file-upload-container", {
+            [customFormat.container]: !!customFormat.container,
+          })}
+        >
+          <div className="taglist">
+            <Stack direction="row" sx={{ overflowX: "hidden" }} spacing={1}>
+              {tagList}
+            </Stack>
+          </div>
+        </section>
+      </div>)}
       <section
         className={clsx("file-upload-container", {
           [customFormat.container]: !!customFormat.container,
@@ -201,9 +263,8 @@ const FileUpload = ({
             <button className="btn-add-files" type="button" onClick={handleUploadBtnClick}>              
                   Add Files
             </button>  : null}
+          </div>
         </div>
-        </div>
-        
       </section>
       <ul className="error-message-ul">
         {errorMessage
