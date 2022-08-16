@@ -11,8 +11,9 @@ import {
   ClickableChip  
 } from "../../Dashboard/utils";
 import Stack from "@mui/material/Stack";
-import "./FileUpload.scss"
-import clsx from "clsx"
+import "./FileUpload.scss";
+import clsx from "clsx";
+import { AttachmentCategories } from '../../../../constants/FOI/statusEnum';
 
 const FileUpload = ({
     multipleFiles,
@@ -140,7 +141,7 @@ const FileUpload = ({
       const newFiles = e.dataTransfer.files;
       const totalNoOfFiles = Object.entries(files).length + newFiles.length; 
       validateFiles(newFiles, totalNoOfFiles);
-  }
+    }
     const removeFile = (fileName) => {
         const _file = files[fileName];
         const sizeInMB = (_file.size / (1024*1024)).toFixed(2);
@@ -166,6 +167,43 @@ const FileUpload = ({
       if (Object.entries(files).length === 0)
         return "Drag and drop request letter(s) or"
     }
+
+    const getCategoriesForTaging = () => {
+      return AttachmentCategories.categorys.filter(category => category.type.includes("tag"));
+    };
+    const tags = getCategoriesForTaging();
+    let tagList = [];
+    for(let tag of tags) {
+      if(!isMinistryCoordinator) {
+        tagList.push(
+          <ClickableChip
+            id={`${tag.name}Tag`}
+            key={`${tag.name}-tag`}
+            label={tag.display}
+            color="primary"
+            size="small"
+            onClick={()=>{handleTagChange(tag.name)}}
+            clicked={tagValue == tag.name}
+          />
+        );
+      } else {
+        if(tag.name !== "applicant") {
+          tagList.push(
+            <ClickableChip
+              id={`${tag.name}Tag`}
+              key={`${tag.name}-tag`}
+              label={tag.display}
+              color="primary"
+              size="small"
+              onClick={()=>{handleTagChange(tag.name)}}
+              clicked={tagValue == tag.name}
+            />
+          );
+        }
+      }
+    }
+
+
   return (
     <>
       {modalFor === 'add' && (<div>
@@ -179,87 +217,7 @@ const FileUpload = ({
         >
           <div className="taglist">
             <Stack direction="row" sx={{ overflowX: "hidden" }} spacing={1}>
-              <ClickableChip
-                  id="generalTag"
-                  key={`general-tag`}
-                  label={"General"}
-                  color="primary"
-                  size="small"
-                  onClick={()=>{handleTagChange('general')}}
-                  clicked={tagValue == 'general'}
-              />
-              {!isMinistryCoordinator && (<ClickableChip
-                  id="applicantTag"
-                  key={`applicant-tag`}
-                  label={"Applicant"}
-                  color="primary"
-                  size="small"
-                  onClick={()=>{handleTagChange('applicant')}}
-                  clicked={tagValue == 'applicant'}
-              />)}
-              <ClickableChip
-                  id="CFRTag"
-                  key={`cfr-tag`}
-                  label={"CFR"}
-                  color="primary"
-                  size="small"
-                  onClick={()=>{handleTagChange('cfr')}}
-                  clicked={tagValue == 'cfr'}
-              />
-              <ClickableChip
-                  id="RecordsReviewTag"
-                  key={`recordsreview-tag`}
-                  label={"Records Review"}
-                  color="primary"
-                  size="small"
-                  onClick={()=>{handleTagChange('recordsreview')}}
-                  clicked={tagValue == 'recordsreview'}
-              />
-              <ClickableChip
-                  id="FeesTag"
-                  key={`fees-tag`}
-                  label={"Fees"}
-                  color="primary"
-                  size="small"
-                  onClick={()=>{handleTagChange('fees')}}
-                  clicked={tagValue == 'fees'}
-              />
-              <ClickableChip
-                  id="ResponseTag"
-                  key={`response-tag`}
-                  label={"Response"}
-                  color="primary"
-                  size="small"
-                  onClick={()=>{handleTagChange('response')}}
-                  clicked={tagValue == 'response'}
-              />
-              <ClickableChip
-                  id="HarmsTag"
-                  key={`harms-tag`}
-                  label={"Harms"}
-                  color="primary"
-                  size="small"
-                  onClick={()=>{handleTagChange('harms')}}
-                  clicked={tagValue == 'harms'}
-              />
-              <ClickableChip
-                  id="OIPCTag"
-                  key={`oipc-tag`}
-                  label={"OIPC"}
-                  color="primary"
-                  size="small"
-                  onClick={()=>{handleTagChange('oipc')}}
-                  clicked={tagValue == 'oipc'}
-              />
-              <ClickableChip
-                  id="ExtensionsTag"
-                  key={`extensions-tag`}
-                  label={"Extensions"}
-                  color="primary"
-                  size="small"
-                  onClick={()=>{handleTagChange('extensions')}}
-                  clicked={tagValue == 'extensions'}
-              />
+              {tagList}
             </Stack>
           </div>
         </section>
