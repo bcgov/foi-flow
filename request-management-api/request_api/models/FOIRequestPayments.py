@@ -24,7 +24,6 @@ class FOIRequestPayment(db.Model):
     createdby = db.Column(db.String(120), unique=False, nullable=True)
     updated_at = db.Column(db.DateTime, nullable=True)
     updatedby = db.Column(db.String(120), unique=False, nullable=True)
-    paymentexpirydate = db.Column(db.DateTime, nullable=True)
 
     @classmethod
     def savepayment(cls, newpayment)->DefaultMethodResult:                

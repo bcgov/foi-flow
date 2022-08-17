@@ -98,7 +98,18 @@ class FOIMinistryRequestDocument(db.Model):
             if row["isactive"] == True:
                 documents.append({"foiministrydocumentid": row["foiministrydocumentid"], "filename": row["filename"], "documentpath": row["documentpath"], "category": row["category"], "created_at": row["created_at"].strftime('%Y-%m-%d %H:%M:%S.%f'), "createdby": row["createdby"]})
         return documents  
+
+    @classmethod
+    def deActivateMinistryDocumentsVersion(cls, foiministrydocumentid, currentversion, userid)->DefaultMethodResult:
+        db.session.query(FOIMinistryRequestDocument).filter(FOIMinistryRequestDocument.foiministrydocumentid == foiministrydocumentid, FOIMinistryRequestDocument.version != currentversion).update({"isactive": False, "updated_at": datetime.now(),"updatedby": userid}, synchronize_session=False)
+        db.session.commit()
+        return DefaultMethodResult(True,'Ministry Document Updated',foiministrydocumentid)
     
+    @classmethod
+    def deActivateMinistryDocumentsVersionByMinistry(cls, ministryid, ministryversion, userid)->DefaultMethodResult:
+        db.session.query(FOIMinistryRequestDocument).filter(FOIMinistryRequestDocument.foiministryrequest_id == ministryid, FOIMinistryRequestDocument.foiministryrequestversion_id != ministryversion).update({"isactive": False, "updated_at": datetime.now(),"updatedby": userid}, synchronize_session=False)
+        db.session.commit()
+        return DefaultMethodResult(True,'Documents Updated for the ministry',ministryid) 
     
 class FOIMinistryRequestDocumentSchema(ma.Schema):
     class Meta:
