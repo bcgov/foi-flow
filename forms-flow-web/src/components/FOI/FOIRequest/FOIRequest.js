@@ -1032,11 +1032,9 @@ const FOIRequest = React.memo(({ userDetail }) => {
               fromDate={recordsSearchFromDate}     
               toDate={recordsSearchToDate}  
               requestNumber={requestNumber}
-              requestState={requestState}
               userDetail={userDetail}
               ministryId={ministryId}
               requestId={requestId}
-              setCFRUnsaved={setCFRUnsaved}
             />
           </div>)}
           <div

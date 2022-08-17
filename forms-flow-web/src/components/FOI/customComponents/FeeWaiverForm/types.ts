@@ -7,11 +7,11 @@ export type FeeWaiverFormData = {
         recordsdescription: string,
         inability: boolean,
         publicinterest: boolean,
-        inabilitydetails: {
+        inabilitydetails?: {
             hasproof: any,
             description: string
         },
-        publicinterestdetails: {
+        publicinterestdetails?: {
             debate: any,
             environment: any,
             disclosing: any,
@@ -34,8 +34,8 @@ export type FeeWaiverFormData = {
             waive: string, //partial yes or no
             summary: string,
             amount: number
-        }
-        decision: {
+        },
+        decision?: {
             amount: number
         }
     }

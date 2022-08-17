@@ -248,3 +248,10 @@ export const setResumeDefaultSorting = (data) => (dispatch) => {
         payload: data,
     });
 };
+
+export const setRequestFeeWaiverForm = (data) => dispatch => {
+    dispatch({
+        type:FOI_ACTION_CONSTANTS.FOI_REQUEST_FEE_WAIVER_FORM,
+        payload:data
+    })
+}
