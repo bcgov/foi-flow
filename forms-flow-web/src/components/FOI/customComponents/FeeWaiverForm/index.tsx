@@ -113,7 +113,7 @@ export const FeeWaiverForm = ({
       previous: undefined,
       description: "",
       recommendation: {
-          waive: "", //partial yes or no
+          waive: "partial", //partial yes or no
           summary: "",
           amount: 0
       },
@@ -287,6 +287,27 @@ export const FeeWaiverForm = ({
     setModalOpen(false);
   };
 
+  const validateField = (fieldName: string) => {
+    switch(fieldName){
+        case 'recordsdescription':
+            return (feeWaiverData?.formdata.publicinterest || feeWaiverData?.formdata.inability &&
+                !(!!feeWaiverData?.formdata?.recordsdescription))
+        case 'inabilityDetailsDescription':
+            return (feeWaiverData?.formdata.inabilitydetails.hasproof &&
+                !(!!feeWaiverData?.formdata?.inabilitydetails.description))
+        case 'publicInterestDescription':
+            return (feeWaiverData?.formdata?.publicinterestdetails.analysis === 'partial' ||
+                feeWaiverData?.formdata?.publicinterestdetails.analysis === 'yes' &&
+                !(!!feeWaiverData?.formdata?.publicinterestdetails.description))
+        case 'description':
+            return ((feeWaiverData?.formdata?.previous || feeWaiverData?.formdata?.narrow || feeWaiverData?.formdata?.exceed ||
+                feeWaiverData?.formdata?.timelines) && !(!!feeWaiverData?.formdata?.description))
+        default:{
+            return false;
+        }
+    }
+  }
+
 
   return (
     <div className="foi-review-container">
@@ -296,8 +317,8 @@ export const FeeWaiverForm = ({
         '& .MuiTextField-root': { m: 1 },
       }}
       autoComplete="off"
-      onChange={markFormDirty}
-    ><div className="foi-request-form">
+      onChange={markFormDirty}>
+    <div className="foi-request-form">
     <div style={{marginTop: 20}}></div>
     <div className="container foi-review-request-container cfrform-container">
       <div className="foi-request-review-header-row1">
@@ -331,7 +352,6 @@ export const FeeWaiverForm = ({
           </TextField>
         </div>
       </div>
-      {/* <form> */}
     <fieldset disabled={isMinistry || feeWaiverData?.status === 'review' || feeWaiverData?.status === 'completed'}>
       <div className='request-accordian'>
         <Accordion defaultExpanded={true}>
@@ -355,7 +375,7 @@ export const FeeWaiverForm = ({
                     InputProps={{inputProps: { max: formatDate(new Date())} }}
                     variant="outlined"
                     required
-                    error={feeWaiverData?.formdata.requesteddate === undefined || feeWaiverData?.formdata.requesteddate === ""}
+                    error={!(!!feeWaiverData?.formdata.requesteddate)}
                     fullWidth
                 />
               </div>
@@ -373,7 +393,7 @@ export const FeeWaiverForm = ({
                     //InputProps={{inputProps: { min: feeWaiverReceived, max: formatDate(new Date())} }}
                     variant="outlined"
                     required
-                    error={feeWaiverData?.formdata.receiveddate === undefined || feeWaiverData?.formdata.receiveddate === ""}
+                    error={!(!!feeWaiverData?.formdata.receiveddate)}
                     fullWidth
                     disabled= {true}
                 />
@@ -482,8 +502,9 @@ export const FeeWaiverForm = ({
                         onChange={handleFormDataChanges}
                         required={feeWaiverData?.formdata.publicinterest || feeWaiverData?.formdata.inability}
                         fullWidth
-                        error={feeWaiverData?.formdata.publicinterest || feeWaiverData?.formdata.inability &&
-                            !(!!feeWaiverData?.formdata?.recordsdescription)}
+                        error= {validateField("recordsdescription")}
+                        // error={feeWaiverData?.formdata.publicinterest || feeWaiverData?.formdata.inability &&
+                        //     !(!!feeWaiverData?.formdata?.recordsdescription)}
                     />
                 </div>
                 <div className="col-lg-12 foi-details-col">
@@ -516,7 +537,9 @@ export const FeeWaiverForm = ({
                         value="true"
                         className="checkmark"
                         onChange={handleInabilityDetailsChanges}
-                        checked={!!feeWaiverData?.formdata?.inabilitydetails.hasproof ? feeWaiverData?.formdata?.inabilitydetails.hasproof : false}
+                        defaultChecked={false}
+                        checked={feeWaiverData?.formdata?.inabilitydetails.hasproof === true}
+                        //checked={!!feeWaiverData?.formdata?.inabilitydetails.hasproof ? feeWaiverData?.formdata?.inabilitydetails.hasproof : false}
                         />
                         <span className="checkmark"></span>
                         YES
@@ -530,7 +553,9 @@ export const FeeWaiverForm = ({
                         value="false"
                         className="checkmark"
                         onChange={handleInabilityDetailsChanges}
-                        checked={feeWaiverData?.formdata?.inabilitydetails.hasproof === false ? !feeWaiverData?.formdata?.inabilitydetails.hasproof : false}
+                        defaultChecked={false}
+                        checked={feeWaiverData?.formdata?.inabilitydetails.hasproof === false}
+                        //checked={feeWaiverData?.formdata?.inabilitydetails.hasproof === false ? !feeWaiverData?.formdata?.inabilitydetails.hasproof : false}
                         />
                         <span className="checkmark"></span>
                         NO
@@ -540,7 +565,7 @@ export const FeeWaiverForm = ({
             <div className="row foi-details-row">
               <div className="col-lg-12 foi-details-col">
                 <TextField
-                  id="description"
+                  id="inabilityDetailsDescription"
                   label="Describe evidence provided and whether it is sufficient"
                   multiline
                   rows={4}
@@ -550,8 +575,9 @@ export const FeeWaiverForm = ({
                   InputLabelProps={{ shrink: true, }}
                   onChange={handleInabilityDetailsChanges}
                   required={feeWaiverData?.formdata.inabilitydetails.hasproof}
-                  error={feeWaiverData?.formdata.inabilitydetails.hasproof &&
-                    !(!!feeWaiverData?.formdata?.inabilitydetails.description) }
+                  error={validateField("inabilityDetailsDescription")}
+                //   error={feeWaiverData?.formdata.inabilitydetails.hasproof &&
+                //     !(!!feeWaiverData?.formdata?.inabilitydetails.description) }
                   fullWidth
                 />
               </div>
@@ -578,7 +604,9 @@ export const FeeWaiverForm = ({
                         value='true'
                         className="checkmark"
                         onChange={handlePublicInterestDetailsChanges}
-                        checked={!!feeWaiverData?.formdata?.publicinterestdetails.debate ? feeWaiverData?.formdata?.publicinterestdetails.debate : false}
+                        defaultChecked={false}
+                        checked={feeWaiverData?.formdata?.publicinterestdetails.debate === true}
+                        //checked={!!feeWaiverData?.formdata?.publicinterestdetails.debate ? feeWaiverData?.formdata?.publicinterestdetails.debate : false}
                         />
                         <span className="checkmark"></span>
                         YES
@@ -593,7 +621,9 @@ export const FeeWaiverForm = ({
                         type="radio"
                         className="checkmark"
                         onChange={handlePublicInterestDetailsChanges}
-                        checked={feeWaiverData?.formdata?.publicinterestdetails.debate === false ? !feeWaiverData?.formdata?.publicinterestdetails.debate : false}
+                        defaultChecked={false}
+                        checked={feeWaiverData?.formdata?.publicinterestdetails.debate === false}
+                        //checked={feeWaiverData?.formdata?.publicinterestdetails.debate === false ? !feeWaiverData?.formdata?.publicinterestdetails.debate : false}
                         
                         />
                         <span className="checkmark"></span>
@@ -614,7 +644,9 @@ export const FeeWaiverForm = ({
                         type="radio"
                         className="checkmark"
                         onChange={handlePublicInterestDetailsChanges}
-                        checked={feeWaiverData?.formdata?.publicinterestdetails.environment === true? feeWaiverData?.formdata?.publicinterestdetails.environment : false}
+                        defaultChecked={false}
+                        checked={feeWaiverData?.formdata?.publicinterestdetails.environment === true}
+                        //checked={feeWaiverData?.formdata?.publicinterestdetails.environment === true? feeWaiverData?.formdata?.publicinterestdetails.environment : false}
                         />
                         <span className="checkmark"></span>
                         YES
@@ -628,7 +660,9 @@ export const FeeWaiverForm = ({
                         type="radio"
                         className="checkmark"
                         onChange={handlePublicInterestDetailsChanges}
-                        checked={feeWaiverData?.formdata?.publicinterestdetails.environment === false? !feeWaiverData?.formdata?.publicinterestdetails.environment : false}
+                        defaultChecked={false}
+                        checked={feeWaiverData?.formdata?.publicinterestdetails.environment === false}
+                        //checked={feeWaiverData?.formdata?.publicinterestdetails.environment === false? !feeWaiverData?.formdata?.publicinterestdetails.environment : false}
                         />
                         <span className="checkmark"></span>
                         NO
@@ -653,7 +687,9 @@ export const FeeWaiverForm = ({
                         value="true"
                         className="checkmark"
                         onChange={handlePublicInterestDetailsChanges}
-                        checked={feeWaiverData?.formdata?.publicinterestdetails.disclosing === true? feeWaiverData?.formdata?.publicinterestdetails.disclosing : false}
+                        defaultChecked={false}
+                        checked={feeWaiverData?.formdata?.publicinterestdetails.disclosing === true}
+                        //checked={feeWaiverData?.formdata?.publicinterestdetails.disclosing === true? feeWaiverData?.formdata?.publicinterestdetails.disclosing : false}
                         />
                         <span className="checkmark"></span>
                         YES
@@ -668,7 +704,9 @@ export const FeeWaiverForm = ({
                         value="false"
                         className="checkmark"
                         onChange={handlePublicInterestDetailsChanges}
-                        checked={feeWaiverData?.formdata?.publicinterestdetails.disclosing === false? !feeWaiverData?.formdata?.publicinterestdetails.disclosing : false}
+                        defaultChecked={false}
+                        checked={feeWaiverData?.formdata?.publicinterestdetails.disclosing === false}
+                        //checked={feeWaiverData?.formdata?.publicinterestdetails.disclosing === false? !feeWaiverData?.formdata?.publicinterestdetails.disclosing : false}
                         />
                         <span className="checkmark"></span>
                         NO
@@ -689,7 +727,9 @@ export const FeeWaiverForm = ({
                         value="true"
                         className="checkmark"
                         onChange={handlePublicInterestDetailsChanges}
-                        checked={feeWaiverData?.formdata?.publicinterestdetails.understanding === true? feeWaiverData?.formdata?.publicinterestdetails.understanding : false}
+                        defaultChecked={false}
+                        checked={feeWaiverData?.formdata?.publicinterestdetails.understanding === true}
+                        //checked={feeWaiverData?.formdata?.publicinterestdetails.understanding === true? feeWaiverData?.formdata?.publicinterestdetails.understanding : false}
                         />
                         <span className="checkmark"></span>
                         YES
@@ -704,7 +744,9 @@ export const FeeWaiverForm = ({
                         className="checkmark"
                         value="false"
                         onChange={handlePublicInterestDetailsChanges}
-                        checked={feeWaiverData?.formdata?.publicinterestdetails.understanding === false? !feeWaiverData?.formdata?.publicinterestdetails.understanding : false}
+                        defaultChecked={false}
+                        checked={feeWaiverData?.formdata?.publicinterestdetails.understanding === false}
+                        //checked={feeWaiverData?.formdata?.publicinterestdetails.understanding === false? !feeWaiverData?.formdata?.publicinterestdetails.understanding : false}
                         />
                         <span className="checkmark"></span>
                         NO
@@ -725,7 +767,9 @@ export const FeeWaiverForm = ({
                         value="true"
                         className="checkmark"
                         onChange={handlePublicInterestDetailsChanges}
-                        checked={feeWaiverData?.formdata?.publicinterestdetails.newpolicy === true? feeWaiverData?.formdata?.publicinterestdetails.newpolicy : false}
+                        defaultChecked={false}
+                        checked={feeWaiverData?.formdata?.publicinterestdetails.newpolicy === true}
+                        //checked={feeWaiverData?.formdata?.publicinterestdetails.newpolicy === true? feeWaiverData?.formdata?.publicinterestdetails.newpolicy : false}
                         />
                         <span className="checkmark"></span>
                         YES
@@ -740,7 +784,9 @@ export const FeeWaiverForm = ({
                         value="false"
                         className="checkmark"
                         onChange={handlePublicInterestDetailsChanges}
-                        checked={feeWaiverData?.formdata?.publicinterestdetails.newpolicy === false? !feeWaiverData?.formdata?.publicinterestdetails.newpolicy : false}
+                        defaultChecked={false}
+                        checked={feeWaiverData?.formdata?.publicinterestdetails.newpolicy === false}
+                        //checked={feeWaiverData?.formdata?.publicinterestdetails.newpolicy === false? !feeWaiverData?.formdata?.publicinterestdetails.newpolicy : false}
                         />
                         <span className="checkmark"></span>
                         NO
@@ -760,7 +806,9 @@ export const FeeWaiverForm = ({
                         value="true"
                         className="checkmark"
                         onChange={handlePublicInterestDetailsChanges}
-                        checked={feeWaiverData?.formdata?.publicinterestdetails.financing === true? feeWaiverData?.formdata?.publicinterestdetails.financing : false}
+                        defaultChecked={false}
+                        checked={feeWaiverData?.formdata?.publicinterestdetails.financing === true}
+                        //checked={feeWaiverData?.formdata?.publicinterestdetails.financing === true? feeWaiverData?.formdata?.publicinterestdetails.financing : false}
                         />
                         <span className="checkmark"></span>
                         YES
@@ -775,7 +823,9 @@ export const FeeWaiverForm = ({
                         value="false"
                         className="checkmark"
                         onChange={handlePublicInterestDetailsChanges}
-                        checked={feeWaiverData?.formdata?.publicinterestdetails.financing === false? !feeWaiverData?.formdata?.publicinterestdetails.financing : false}
+                        defaultChecked={false}
+                        checked={feeWaiverData?.formdata?.publicinterestdetails.financing === false}
+                        //checked={feeWaiverData?.formdata?.publicinterestdetails.financing === false? !feeWaiverData?.formdata?.publicinterestdetails.financing : false}
                         />
                         <span className="checkmark"></span>
                         NO
@@ -812,7 +862,9 @@ export const FeeWaiverForm = ({
                         value="partial"
                         className="checkmark"
                         onChange={handlePublicInterestDetailsChanges}
-                        checked={!!feeWaiverData?.formdata?.publicinterestdetails.analysis ?feeWaiverData?.formdata?.publicinterestdetails.analysis == 'partial' :false}
+                        defaultChecked={false}
+                        checked={feeWaiverData?.formdata?.publicinterestdetails.analysis == 'partial'}
+                        //checked={!!feeWaiverData?.formdata?.publicinterestdetails.analysis ?feeWaiverData?.formdata?.publicinterestdetails.analysis == 'partial' :false}
                         />
                         <span className="checkmark"></span>
                         PARTIALLY
@@ -827,7 +879,9 @@ export const FeeWaiverForm = ({
                         value="yes"
                         className="checkmark"
                         onChange={handlePublicInterestDetailsChanges}
-                        checked={!!feeWaiverData?.formdata?.publicinterestdetails.analysis ?feeWaiverData?.formdata?.publicinterestdetails.analysis == 'yes' :false}
+                        defaultChecked={false}
+                        checked={feeWaiverData?.formdata?.publicinterestdetails.analysis == 'yes'}
+                        //checked={!!feeWaiverData?.formdata?.publicinterestdetails.analysis ?feeWaiverData?.formdata?.publicinterestdetails.analysis == 'yes' :false}
                         />
                         <span className="checkmark"></span>
                         YES
@@ -842,7 +896,9 @@ export const FeeWaiverForm = ({
                         value="no"
                         className="checkmark"
                         onChange={handlePublicInterestDetailsChanges}
-                        checked={!!feeWaiverData?.formdata?.publicinterestdetails.analysis ?feeWaiverData?.formdata?.publicinterestdetails.analysis == 'no' :false}
+                        defaultChecked={false}
+                        checked={feeWaiverData?.formdata?.publicinterestdetails.analysis == 'no'}
+                        //checked={!!feeWaiverData?.formdata?.publicinterestdetails.analysis ?feeWaiverData?.formdata?.publicinterestdetails.analysis == 'no' :false}
                         />
                         <span className="checkmark"></span>
                         NO
@@ -863,9 +919,10 @@ export const FeeWaiverForm = ({
                   onChange={handlePublicInterestDetailsChanges}
                   required={feeWaiverData?.formdata?.publicinterestdetails.analysis === 'partial' ||
                   feeWaiverData?.formdata?.publicinterestdetails.analysis === 'yes'}
-                  error={feeWaiverData?.formdata?.publicinterestdetails.analysis === 'partial' ||
-                        feeWaiverData?.formdata?.publicinterestdetails.analysis === 'yes' &&
-                        !(!!feeWaiverData?.formdata?.publicinterestdetails.description)}
+                  error={validateField("publicInterestDescription")}
+                //   error={feeWaiverData?.formdata?.publicinterestdetails.analysis === 'partial' ||
+                //         feeWaiverData?.formdata?.publicinterestdetails.analysis === 'yes' &&
+                //         !(!!feeWaiverData?.formdata?.publicinterestdetails.description)}
                   fullWidth
                 />
               </div>
@@ -894,7 +951,9 @@ export const FeeWaiverForm = ({
                         value="true"
                         className="checkmark"
                         onChange={handleFormDataChanges}
-                        checked={feeWaiverData?.formdata?.disseminate === true? feeWaiverData?.formdata?.disseminate : false}
+                        defaultChecked={false}
+                        checked={feeWaiverData?.formdata?.disseminate === true}
+                        //checked={feeWaiverData?.formdata?.disseminate === true? feeWaiverData?.formdata?.disseminate : false}
                         />
                         <span className="checkmark"></span>
                         YES
@@ -909,7 +968,9 @@ export const FeeWaiverForm = ({
                         value="false"
                         className="checkmark"
                         onChange={handleFormDataChanges}
-                        checked={feeWaiverData?.formdata?.disseminate === false? !feeWaiverData?.formdata?.disseminate : false}
+                        defaultChecked={false}
+                        checked={feeWaiverData?.formdata?.disseminate === false}
+                        //checked={feeWaiverData?.formdata?.disseminate === false? !feeWaiverData?.formdata?.disseminate : false}
                         />
                         <span className="checkmark"></span>
                         NO
@@ -929,7 +990,9 @@ export const FeeWaiverForm = ({
                         value="true"
                         className="checkmark"
                         onChange={handleFormDataChanges}
-                        checked={feeWaiverData?.formdata?.abletodisseminate === true? feeWaiverData?.formdata?.abletodisseminate : false}
+                        defaultChecked={false}
+                        checked={feeWaiverData?.formdata?.abletodisseminate === true}
+                        //checked={feeWaiverData?.formdata?.abletodisseminate === true? feeWaiverData?.formdata?.abletodisseminate : false}
                         />
                         <span className="checkmark"></span>
                         YES
@@ -944,7 +1007,9 @@ export const FeeWaiverForm = ({
                         value="false"
                         className="checkmark"
                         onChange={handleFormDataChanges}
-                        checked={feeWaiverData?.formdata?.abletodisseminate === false? !feeWaiverData?.formdata?.abletodisseminate : false}
+                        defaultChecked={false}
+                        checked={feeWaiverData?.formdata?.abletodisseminate === false}
+                        //checked={feeWaiverData?.formdata?.abletodisseminate === false? !feeWaiverData?.formdata?.abletodisseminate : false}
                         />
                         <span className="checkmark"></span>
                         NO
@@ -978,7 +1043,9 @@ export const FeeWaiverForm = ({
                         value="true"
                         className="checkmark"
                         onChange={handleFormDataChanges}
-                        checked={feeWaiverData?.formdata?.narrow === true? feeWaiverData?.formdata?.narrow : false}
+                        defaultChecked={false}
+                        checked={feeWaiverData?.formdata?.narrow === true}
+                        //checked={feeWaiverData?.formdata?.narrow === true? feeWaiverData?.formdata?.narrow : false}
                         />
                         <span className="checkmark"></span>
                         YES
@@ -993,7 +1060,9 @@ export const FeeWaiverForm = ({
                         value="false"
                         className="checkmark"
                         onChange={handleFormDataChanges}
-                        checked={feeWaiverData?.formdata?.narrow === false? !feeWaiverData?.formdata?.narrow : false}
+                        defaultChecked={false}
+                        checked={feeWaiverData?.formdata?.narrow === false}
+                        //checked={feeWaiverData?.formdata?.narrow === false? !feeWaiverData?.formdata?.narrow : false}
                         />
                         <span className="checkmark"></span>
                         NO
@@ -1014,7 +1083,9 @@ export const FeeWaiverForm = ({
                         value="true"
                         className="checkmark"
                         onChange={handleFormDataChanges}
-                        checked={feeWaiverData?.formdata?.exceed === true? feeWaiverData?.formdata?.exceed : false}
+                        defaultChecked={false}
+                        checked={feeWaiverData?.formdata?.exceed === true}
+                        //checked={feeWaiverData?.formdata?.exceed === true? feeWaiverData?.formdata?.exceed : false}
                         />
                         <span className="checkmark"></span>
                         YES
@@ -1029,7 +1100,9 @@ export const FeeWaiverForm = ({
                         value="false"
                         className="checkmark"
                         onChange={handleFormDataChanges}
-                        checked={feeWaiverData?.formdata?.exceed === false? !feeWaiverData?.formdata?.exceed : false}
+                        defaultChecked={false}
+                        checked={feeWaiverData?.formdata?.exceed === false}
+                        //checked={feeWaiverData?.formdata?.exceed === false? !feeWaiverData?.formdata?.exceed : false}
                         />
                         <span className="checkmark"></span>
                         NO
@@ -1049,7 +1122,9 @@ export const FeeWaiverForm = ({
                         value="true"
                         className="checkmark"
                         onChange={handleFormDataChanges}
-                        checked={!!feeWaiverData?.formdata?.timelines ? feeWaiverData?.formdata?.timelines : false}
+                        defaultChecked={false}
+                        checked={feeWaiverData?.formdata?.timelines === true}
+                        //checked={!!feeWaiverData?.formdata?.timelines ? feeWaiverData?.formdata?.timelines : false}
                         />
                         <span className="checkmark"></span>
                         YES
@@ -1064,7 +1139,9 @@ export const FeeWaiverForm = ({
                         value="false"
                         className="checkmark"
                         onChange={handleFormDataChanges}
-                        checked={feeWaiverData?.formdata?.timelines === false? !feeWaiverData?.formdata?.timelines : false}
+                        defaultChecked={false}
+                        checked={feeWaiverData?.formdata?.timelines === false}
+                        //checked={feeWaiverData?.formdata?.timelines === false? !feeWaiverData?.formdata?.timelines : false}
                         />
                         <span className="checkmark"></span>
                         NO
@@ -1085,7 +1162,9 @@ export const FeeWaiverForm = ({
                         value="true"
                         className="checkmark"
                         onChange={handleFormDataChanges}
-                        checked={!!feeWaiverData?.formdata?.previous ? feeWaiverData?.formdata?.previous : false}
+                        defaultChecked={false}
+                        checked={feeWaiverData?.formdata?.previous === true}
+                        //checked={!!feeWaiverData?.formdata?.previous ? feeWaiverData?.formdata?.previous : false}
                         />
                         <span className="checkmark"></span>
                         YES
@@ -1100,7 +1179,9 @@ export const FeeWaiverForm = ({
                         type="radio"
                         className="checkmark"
                         onChange={handleFormDataChanges}
-                        checked={feeWaiverData?.formdata?.previous === false? !feeWaiverData?.formdata?.previous : false}
+                        defaultChecked={false}
+                        checked={feeWaiverData?.formdata?.previous === false}
+                        //checked={feeWaiverData?.formdata?.previous === false? !feeWaiverData?.formdata?.previous : false}
                         />
                         <span className="checkmark"></span>
                         NO
@@ -1121,8 +1202,9 @@ export const FeeWaiverForm = ({
                   onChange={handleFormDataChanges}
                   required={feeWaiverData?.formdata?.narrow || feeWaiverData?.formdata?.exceed || feeWaiverData?.formdata?.timelines ||
                             feeWaiverData?.formdata?.previous}
-                  error={(feeWaiverData?.formdata?.previous || feeWaiverData?.formdata?.narrow || feeWaiverData?.formdata?.exceed ||
-                        feeWaiverData?.formdata?.timelines) && !(!!feeWaiverData?.formdata?.description)}
+                  error={validateField("description")}
+                //   error={(feeWaiverData?.formdata?.previous || feeWaiverData?.formdata?.narrow || feeWaiverData?.formdata?.exceed ||
+                //         feeWaiverData?.formdata?.timelines) && !(!!feeWaiverData?.formdata?.description)}
                   fullWidth
                 />
               </div>
@@ -1151,7 +1233,9 @@ export const FeeWaiverForm = ({
                         value="partial"
                         className="checkmark"
                         onChange={handleRecommendationChanges}
-                        checked={!!feeWaiverData?.formdata?.recommendation.waive ? feeWaiverData?.formdata?.recommendation.waive === 'partial' : false}
+                        defaultChecked={false}
+                        checked={feeWaiverData?.formdata?.recommendation.waive === 'partial'}
+                        //checked={!!feeWaiverData?.formdata?.recommendation.waive ? feeWaiverData?.formdata?.recommendation.waive === 'partial' : false}
                         />
                         <span className="checkmark"></span>
                         Waive Fee in Part
@@ -1166,7 +1250,9 @@ export const FeeWaiverForm = ({
                         value="yes"
                         className="checkmark"
                         onChange={handleRecommendationChanges}
-                        checked={!!feeWaiverData?.formdata?.recommendation.waive ? feeWaiverData?.formdata?.recommendation.waive === 'yes' : false}
+                        defaultChecked={false}
+                        checked={feeWaiverData?.formdata?.recommendation.waive === 'yes'}
+                        //checked={!!feeWaiverData?.formdata?.recommendation.waive ? feeWaiverData?.formdata?.recommendation.waive === 'yes' : false}
                         />
                         <span className="checkmark"></span>
                         Waive Fee in Full
@@ -1181,7 +1267,9 @@ export const FeeWaiverForm = ({
                         type="radio"
                         className="checkmark"
                         onChange={handleRecommendationChanges}
-                        checked={!!feeWaiverData?.formdata?.recommendation.waive ? feeWaiverData?.formdata?.recommendation.waive === 'no' : false}
+                        defaultChecked={false}
+                        checked={feeWaiverData?.formdata?.recommendation.waive === 'no'}
+                        //checked={!!feeWaiverData?.formdata?.recommendation.waive ? feeWaiverData?.formdata?.recommendation.waive === 'no' : false}
                         />
                         <span className="checkmark"></span>
                         Do Not Waive Fee
@@ -1346,8 +1434,6 @@ export const FeeWaiverForm = ({
         </Accordion>
       </div>
       
-      {/* </form> */}
-
       <div className="col-lg-4 buttonContainer">
         <button
           type="button"
@@ -1370,10 +1456,9 @@ export const FeeWaiverForm = ({
       aria-describedby="state-change-dialog-description"
       maxWidth={'md'}
       fullWidth={true}
-      // id="state-change-dialog"
     >
       <DialogTitle disableTypography id="state-change-dialog-title">
-          <h2 className="state-change-header">CFR Form Status</h2>
+          <h2 className="state-change-header">Waiving Fees</h2>
           <IconButton className="title-col3" onClick={handleClose}>
             <i className="dialog-close-button">Close</i>
             <CloseIcon />
