@@ -129,7 +129,7 @@ var feeflow = execution.getVariable("feeflow");
 if (obj.status != 'On Hold' &amp;&amp; feeflow == 'ONGOING') {
 execution.setVariable("feeflow","NA");
 execution.setVariable("paymentstatus","CANCELLED");
-execution.getProcessEngineServices().getRuntimeService().createMessageCorrelation("foi-manage-payment").setVariable("paymentstatus","CANCELLED").setVariable("status",obj.status).setVariable("axisRequestId",execution.getVariable("axisRequestId")).setVariable("foiRequestID",execution.getVariable("foiRequestID")).setVariable("ministryRequestID",execution.getVariable("ministryRequestID")).correlateWithResult();
+execution.getProcessEngineServices().getRuntimeService().createMessageCorrelation("foi-manage-payment").processInstanceVariableEquals("axisRequestId",execution.getVariable("axisRequestId")).setVariable("paymentstatus","CANCELLED").setVariable("status",obj.status).setVariable("axisRequestId",execution.getVariable("axisRequestId")).setVariable("foiRequestID",execution.getVariable("foiRequestID")).setVariable("ministryRequestID",execution.getVariable("ministryRequestID")).correlateWithResult();
 }</camunda:script>
           </camunda:executionListener>
         </bpmn:extensionElements>
