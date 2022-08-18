@@ -124,7 +124,7 @@
 connector.getVariable("statusCode");</camunda:script>
             </camunda:outputParameter>
             <camunda:outputParameter name="axisRequestId">${S(response).prop("axisRequestId").stringValue()}</camunda:outputParameter>
-            <camunda:outputParameter name="fee">${S(response).prop("cfrfee").prop("feedata").prop("balanceDue").numberValue()}</camunda:outputParameter>
+            <camunda:outputParameter name="fee">${S(response).prop("cfrfee").prop("feedata").prop("balanceDue").stringValue()}</camunda:outputParameter>
             <camunda:outputParameter name="fileNumber">${S(response).prop("idNumber").stringValue()}</camunda:outputParameter>
             <camunda:outputParameter name="paymentstatus">NOT PAID</camunda:outputParameter>
           </camunda:inputOutput>
@@ -563,6 +563,43 @@ connector.getVariable("statusCode");</camunda:script>
       <bpmndi:BPMNShape id="Lane_1aaq844_di" bpmnElement="Lane_1aaq844" isHorizontal="true">
         <dc:Bounds x="170" y="650" width="1950" height="650" />
       </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_1p5hmik_di" bpmnElement="Flow_1p5hmik">
+        <di:waypoint x="1235" y="1180" />
+        <di:waypoint x="1302" y="1180" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1246" y="1162" width="45" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_04quflj_di" bpmnElement="Flow_04quflj">
+        <di:waypoint x="1210" y="1205" />
+        <di:waypoint x="1210" y="1230" />
+        <di:waypoint x="990" y="1230" />
+        <di:waypoint x="990" y="1120" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1073" y="1212" width="54" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0kd8ss0_di" bpmnElement="Flow_0kd8ss0">
+        <di:waypoint x="1138" y="1180" />
+        <di:waypoint x="1185" y="1180" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1d7gxi1_di" bpmnElement="Flow_1d7gxi1">
+        <di:waypoint x="1120" y="1138" />
+        <di:waypoint x="1120" y="1162" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0y63jln_di" bpmnElement="Flow_0y63jln">
+        <di:waypoint x="1080" y="288" />
+        <di:waypoint x="1200" y="288" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_18rkboh_di" bpmnElement="Flow_18rkboh">
+        <di:waypoint x="1070" y="1080" />
+        <di:waypoint x="400" y="1080" />
+        <di:waypoint x="400" y="935" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0sfszv6_di" bpmnElement="Flow_0sfszv6">
+        <di:waypoint x="1040" y="1080" />
+        <di:waypoint x="1070" y="1080" />
+      </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_06wfx6l_di" bpmnElement="Flow_06wfx6l">
         <di:waypoint x="470" y="995" />
         <di:waypoint x="470" y="910" />
@@ -715,43 +752,6 @@ connector.getVariable("statusCode");</camunda:script>
         <di:waypoint x="640" y="288" />
         <di:waypoint x="980" y="288" />
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_0sfszv6_di" bpmnElement="Flow_0sfszv6">
-        <di:waypoint x="1040" y="1080" />
-        <di:waypoint x="1070" y="1080" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_18rkboh_di" bpmnElement="Flow_18rkboh">
-        <di:waypoint x="1070" y="1080" />
-        <di:waypoint x="400" y="1080" />
-        <di:waypoint x="400" y="935" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_0y63jln_di" bpmnElement="Flow_0y63jln">
-        <di:waypoint x="1080" y="288" />
-        <di:waypoint x="1200" y="288" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_1d7gxi1_di" bpmnElement="Flow_1d7gxi1">
-        <di:waypoint x="1120" y="1138" />
-        <di:waypoint x="1120" y="1162" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_0kd8ss0_di" bpmnElement="Flow_0kd8ss0">
-        <di:waypoint x="1138" y="1180" />
-        <di:waypoint x="1185" y="1180" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_04quflj_di" bpmnElement="Flow_04quflj">
-        <di:waypoint x="1210" y="1205" />
-        <di:waypoint x="1210" y="1230" />
-        <di:waypoint x="990" y="1230" />
-        <di:waypoint x="990" y="1120" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="1073" y="1212" width="54" height="14" />
-        </bpmndi:BPMNLabel>
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_1p5hmik_di" bpmnElement="Flow_1p5hmik">
-        <di:waypoint x="1235" y="1180" />
-        <di:waypoint x="1302" y="1180" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="1246" y="1162" width="45" height="14" />
-        </bpmndi:BPMNLabel>
-      </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="Activity_0uv6wyi_di" bpmnElement="Activity_0k05bsn">
         <dc:Bounds x="980" y="248" width="100" height="80" />
       </bpmndi:BPMNShape>
@@ -826,9 +826,6 @@ connector.getVariable("statusCode");</camunda:script>
       <bpmndi:BPMNShape id="Gateway_1rpwru8_di" bpmnElement="Gateway_1rpwru8" isMarkerVisible="true">
         <dc:Bounds x="645" y="885" width="50" height="50" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_0jc83dv_di" bpmnElement="Activity_0jc83dv">
-        <dc:Bounds x="920" y="870" width="100" height="80" />
-      </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_1ka6mqq_di" bpmnElement="Activity_1ka6mqq">
         <dc:Bounds x="1070" y="870" width="100" height="80" />
       </bpmndi:BPMNShape>
@@ -851,11 +848,11 @@ connector.getVariable("statusCode");</camunda:script>
         <dc:Bounds x="500" y="870" width="100" height="80" />
         <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0jc83dv_di" bpmnElement="Activity_0jc83dv">
+        <dc:Bounds x="920" y="870" width="100" height="80" />
+      </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="BPMNShape_1bw6mzj" bpmnElement="Activity_07lppep">
         <dc:Bounds x="940" y="1040" width="100" height="80" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_1rs0u32_di" bpmnElement="Activity_1tkdc9h">
-        <dc:Bounds x="1070" y="1040" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Event_02ztt8q_di" bpmnElement="Event_1sitq6w">
         <dc:Bounds x="1102" y="1162" width="36" height="36" />
@@ -863,8 +860,14 @@ connector.getVariable("statusCode");</camunda:script>
       <bpmndi:BPMNShape id="Gateway_015rqa5_di" bpmnElement="Gateway_015rqa5" isMarkerVisible="true">
         <dc:Bounds x="1185" y="1155" width="50" height="50" />
       </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1rs0u32_di" bpmnElement="Activity_1tkdc9h">
+        <dc:Bounds x="1070" y="1040" width="100" height="80" />
+      </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Event_1wnfiii_di" bpmnElement="Event_1pldnh9">
         <dc:Bounds x="1302" y="1162" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0c9ytw1_di" bpmnElement="Event_1s2s2yf">
+        <dc:Bounds x="1102" y="1102" width="36" height="36" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="BPMNShape_1ufjazf" bpmnElement="save-sub-link">
         <dc:Bounds x="1422" y="310" width="36" height="36" />
@@ -878,15 +881,6 @@ connector.getVariable("statusCode");</camunda:script>
           <dc:Bounds x="548" y="182" width="25" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Event_0c9ytw1_di" bpmnElement="Event_1s2s2yf">
-        <dc:Bounds x="1102" y="1102" width="36" height="36" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Group_0nmwgct_di" bpmnElement="Group_0nmwgct">
-        <dc:Bounds x="890" y="850" width="300" height="120" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="996" y="836" width="68" height="14" />
-        </bpmndi:BPMNLabel>
-      </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Group_087f8ap_di" bpmnElement="Group_087f8ap">
         <dc:Bounds x="330" y="210" width="590" height="250" />
         <bpmndi:BPMNLabel>
@@ -897,6 +891,12 @@ connector.getVariable("statusCode");</camunda:script>
         <dc:Bounds x="1165" y="210" width="615" height="250" />
         <bpmndi:BPMNLabel>
           <dc:Bounds x="1410" y="174" width="85" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Group_0nmwgct_di" bpmnElement="Group_0nmwgct">
+        <dc:Bounds x="890" y="850" width="300" height="120" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="996" y="836" width="68" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Group_0ihi2fn_di" bpmnElement="Group_0ihi2fn">
