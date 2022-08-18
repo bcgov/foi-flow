@@ -263,6 +263,7 @@ const BottomButtonGroup = React.memo(
             break;
   
           case StateEnum.callforrecords.name:
+            saveRequestObject.paymentExpiryDate = ""
             saveRequestObject.requeststatusid = StateEnum.callforrecords.id;
             if (
               !("cfrDueDate" in saveRequestObject) ||
@@ -315,7 +316,7 @@ const BottomButtonGroup = React.memo(
             );
   
             saveRequestObject.requeststatusid = status.id;
-            if (currentSelectedStatus === StateEnum.onhold.name && !saveRequestObject.onholdTransitionDate) {
+            if (currentSelectedStatus === StateEnum.onhold.name && !saveRequestObject.paymentExpiryDate) {
               saveRequestObject.paymentExpiryDate = dueDateCalculation(new Date(), 20);
             }
             break;
