@@ -188,23 +188,23 @@ export const CFRForm = ({
   React.useEffect(() => {
     var formattedData = {
       formStatus: initialState.status === null ? 'init' : initialState.status,
-      amountDue: initialState.feedata.totalamountdue,
-      amountPaid: initialState.feedata.amountpaid,
+      amountDue: initialState.feedata?.totalamountdue,
+      amountPaid: initialState.feedata?.amountpaid,
       estimates: {
-        locating: initialState.feedata.estimatedlocatinghrs,
-        producing: initialState.feedata.estimatedproducinghrs,
-        iaoPreparing: initialState.feedata.estimatediaopreparinghrs,
-        ministryPreparing: initialState.feedata.estimatedministrypreparinghrs,
-        electronicPages: initialState.feedata.estimatedelectronicpages,
-        hardcopyPages: initialState.feedata.estimatedhardcopypages,
+        locating: initialState.feedata?.estimatedlocatinghrs,
+        producing: initialState.feedata?.estimatedproducinghrs,
+        iaoPreparing: initialState.feedata?.estimatediaopreparinghrs,
+        ministryPreparing: initialState.feedata?.estimatedministrypreparinghrs,
+        electronicPages: initialState.feedata?.estimatedelectronicpages,
+        hardcopyPages: initialState.feedata?.estimatedhardcopypages,
       },
       actual: {
-        locating: initialState.feedata.actuallocatinghrs,
-        producing: initialState.feedata.actualproducinghrs,
-        iaoPreparing: initialState.feedata.actualiaopreparinghrs,
-        ministryPreparing: initialState.feedata.actualministrypreparinghrs,
-        electronicPages: initialState.feedata.actualelectronicpages,
-        hardcopyPages: initialState.feedata.actualhardcopypages,
+        locating: initialState.feedata?.actuallocatinghrs,
+        producing: initialState.feedata?.actualproducinghrs,
+        iaoPreparing: initialState.feedata?.actualiaopreparinghrs,
+        ministryPreparing: initialState.feedata?.actualministrypreparinghrs,
+        electronicPages: initialState.feedata?.actualelectronicpages,
+        hardcopyPages: initialState.feedata?.actualhardcopypages,
       },
       suggestions: initialState.overallsuggestions
     };
