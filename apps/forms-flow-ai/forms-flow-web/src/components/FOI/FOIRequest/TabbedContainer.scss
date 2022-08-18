@@ -6,10 +6,10 @@
   display: inline-flex;  
   padding-top: 65px;
   position: relative;
-
+  overflow-y: scroll;
   margin-left: 10%;
   margin-right: 10%;
-
+  height: 90%;
   min-width: 80%;
 }
 
@@ -80,7 +80,7 @@
 
   .foitabheadercollection {
     width: fit-content;
-    height: auto;
+    height: calc(100% - 96px - 67px);
     border-radius: 0px 30px 30px 0px!important;
     margin-bottom: auto;
     padding-bottom: 2%;

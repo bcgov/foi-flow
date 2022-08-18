@@ -44,10 +44,18 @@
   .tab div.tablinks{
     height: 35px !important;
     padding: 2px 8px 2px 15px !important;
+    font-size: 14px!important;
   }
   .foileftpanelheader {
     padding-top: 10px !important;
     padding-bottom: 10px !important;
+  }
+  .foileftpaneldropdown{
+    padding-bottom: 5%!important;
+  }
+ 
+  .foitabheadercollection {
+    height: calc(100% - 80px - 67px)!important;
   }
 }
 
@@ -86,7 +94,7 @@
 
   .foitabheadercollection {
     width: fit-content;
-    height: auto;
+    height: calc(100% - 96px - 67px);
     border-radius: 0px 30px 30px 0px!important;
     margin-bottom: auto;
     padding-bottom: 2%;
@@ -299,3 +307,5 @@ span.circle
   display: inline-block;
   width: 100%;
 }
+
+
