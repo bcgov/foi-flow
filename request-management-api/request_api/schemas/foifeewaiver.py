@@ -53,11 +53,10 @@ class FOIFeeWaiverFormDataSchema(Schema):
     receiveddate = fields.Str(data_key="receiveddate")
     summary = fields.Str(data_key="summary", required=True)
     recordsdescription = fields.Str(data_key="recordsdescription")
-    type = fields.Str(data_key="type", validate=validate.OneOf(['public', 'inability']), required=True)
     inability = fields.Bool(required=True)
-    inabilitydetails = fields.Nested(FOIFeeWaiverInabilityDataSchema)
+    inabilitydetails = fields.Nested(FOIFeeWaiverInabilityDataSchema, allow_none=True)
     publicinterest = fields.Bool(required=True)
-    publicinterestdetails = fields.Nested(FOIFeeWaiverPublicDataSchema)
+    publicinterestdetails = fields.Nested(FOIFeeWaiverPublicDataSchema, allow_none=True)
     disseminate = fields.Bool(required=True)
     abletodisseminate = fields.Bool(required=True)
     narrow = fields.Bool(required=True)
@@ -65,6 +64,7 @@ class FOIFeeWaiverFormDataSchema(Schema):
     timelines = fields.Bool(required=True)
     previous = fields.Bool(required=True)
     reason = fields.Str()
+    description = fields.Str()
     recommendation = fields.Nested(FOIFeeWaiverRecommendationSchema, allow_none=False)
 
 class FOIFeeWaiverMinistryFormDataSchema(Schema):
