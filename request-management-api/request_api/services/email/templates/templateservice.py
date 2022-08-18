@@ -31,7 +31,7 @@ class templateservice:
         _templatename = templateconfig().gettemplatename(servicename)
         if _templatename is None:
             if requestjson is not None and requestjson != {}:
-                balancedue = requestjson["cfrfee"]['feedata']['totalamountdue'] - float(requestjson["cfrfee"]['feedata']['amountpaid'])
+                balancedue = float(data['cfrfee']['feedata']["balanceDue"])
                 if balancedue > 0:
                     return templateconfig().gettemplatename("HALFPAYMENT")
                 elif balancedue == 0:
