@@ -491,7 +491,7 @@ export const CFRForm = ({
                   }}
                   InputLabelProps={{ shrink: true }}
                   name="amountDue"
-                  value={formData?.amountDue.toFixed(2)}
+                  value={formData?.amountDue?.toFixed(2)}
                   onChange={handleAmountChanges}
                   variant="outlined"
                   placeholder="0"
@@ -506,7 +506,7 @@ export const CFRForm = ({
                 <span className="formLabel">Balance Remaining</span>
               </div>
               <div className="col-lg-2 foi-details-col">
-                <span className="formLabel">{"$"+(formData?.amountDue - formData?.amountPaid).toFixed(2)}</span>
+                <span className="formLabel">{"$"+(formData?.amountDue - formData?.amountPaid)?.toFixed(2)}</span>
               </div>
             </div>
             <div className="row foi-details-row">
