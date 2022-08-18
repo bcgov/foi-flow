@@ -104,7 +104,7 @@ class requestserviceministrybuilder(requestserviceconfigurator):
         documentarr = []
         documents = FOIMinistryRequestDocument().getdocuments(ministryrequestid, activeversion-1)
         # make isactive = False for all ministryRequestId and prev ministryVersion
-        FOIMinistryRequestDocument.deActivateMinistryDocumentsVersionByMinistry(ministryrequestid, activeversion, userid)
+        FOIMinistryRequestDocument.deActivateministrydocumentsversionbyministry(ministryrequestid, activeversion, userid)
         
         existingdocuments = self.createfoirequestdocumentfromobject(documents,ministryrequestid ,activeversion, userid)       
         documentarr = existingdocuments
