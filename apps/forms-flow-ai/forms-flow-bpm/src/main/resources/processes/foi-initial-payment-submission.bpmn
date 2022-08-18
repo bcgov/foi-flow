@@ -313,6 +313,7 @@ execution.setVariable("saveDataPayload", JSON.stringify(saveDataPayload));</camu
     <bpmn:eventBasedGateway id="Gateway_1771ld6">
       <bpmn:incoming>Flow_17nmoz9</bpmn:incoming>
       <bpmn:incoming>Flow_06wfx6l</bpmn:incoming>
+      <bpmn:incoming>Flow_18rkboh</bpmn:incoming>
       <bpmn:outgoing>Flow_1mb5bs3</bpmn:outgoing>
       <bpmn:outgoing>Flow_19al5dp</bpmn:outgoing>
     </bpmn:eventBasedGateway>
@@ -376,7 +377,6 @@ execution.setVariable("foistatuspayload", JSON.stringify(foistatuspayload))</cam
     <bpmn:endEvent id="Event_07sfh4u">
       <bpmn:incoming>Flow_0ib5b51</bpmn:incoming>
       <bpmn:incoming>Flow_0o3fy5y</bpmn:incoming>
-      <bpmn:incoming>Flow_18rkboh</bpmn:incoming>
     </bpmn:endEvent>
     <bpmn:sequenceFlow id="Flow_0ib5b51" sourceRef="Event_0q2irqu" targetRef="Event_07sfh4u" />
     <bpmn:sequenceFlow id="Flow_0o3fy5y" name="CANCELLED" sourceRef="Gateway_1rpwru8" targetRef="Event_07sfh4u">
@@ -476,7 +476,7 @@ execution.setVariable("paymentstatus", "EXPIRED");
       <bpmn:incoming>Flow_04quflj</bpmn:incoming>
       <bpmn:outgoing>Flow_0sfszv6</bpmn:outgoing>
     </bpmn:serviceTask>
-    <bpmn:sequenceFlow id="Flow_18rkboh" sourceRef="Activity_1tkdc9h" targetRef="Event_07sfh4u" />
+    <bpmn:sequenceFlow id="Flow_18rkboh" sourceRef="Activity_1tkdc9h" targetRef="Gateway_1771ld6" />
     <bpmn:sequenceFlow id="Flow_0y63jln" sourceRef="Activity_0k05bsn" targetRef="Activity_0v6rrmr" />
     <bpmn:sequenceFlow id="Flow_1d7gxi1" sourceRef="Event_1s2s2yf" targetRef="Event_1sitq6w" />
     <bpmn:intermediateCatchEvent id="Event_1sitq6w">
@@ -720,9 +720,9 @@ connector.getVariable("statusCode");</camunda:script>
         <di:waypoint x="1070" y="1080" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_18rkboh_di" bpmnElement="Flow_18rkboh">
-        <di:waypoint x="1170" y="1080" />
-        <di:waypoint x="1440" y="1080" />
-        <di:waypoint x="1440" y="928" />
+        <di:waypoint x="1070" y="1080" />
+        <di:waypoint x="400" y="1080" />
+        <di:waypoint x="400" y="935" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_0y63jln_di" bpmnElement="Flow_0y63jln">
         <di:waypoint x="1080" y="288" />
