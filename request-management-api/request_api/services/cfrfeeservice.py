@@ -32,7 +32,8 @@ class cfrfeeservice:
 
     def paycfrfee(self, ministryrequestid, amountpaid):
         cfrfee = self.__preparecfrfee(ministryrequestid, {'status': 'approved'}) # status should always be approved before payment
-        cfrfee.feedata['amountpaid'] += amountpaid
+        _amountpaid = cfrfee.feedata['amountpaid'] + amountpaid
+        cfrfee.feedata['amountpaid'] = '{:.2f}'.format(_amountpaid)
         cfrfee.feedata['paymentdate'] = datetime.now().astimezone(pytz.timezone(current_app.config['LEGISLATIVE_TIMEZONE'])).strftime('%Y-%m-%d')
         return FOIRequestCFRFee.createcfrfee(cfrfee, 'Online Payment')
     
