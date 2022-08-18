@@ -73,7 +73,13 @@ class FOIRawRequestDocument(db.Model):
         newdocument = FOIRawRequestDocument(documentpath=document["documentpath"], foidocumentid=document["foidocumentid"], version=document["version"], filename=document["filename"], category=document["category"], isactive=document["isactive"], foirequest_id=requestid, foirequestversion_id=requestversion, created_at=datetime.now(), createdby=userid)
         db.session.add(newdocument)
         db.session.commit()               
-        return DefaultMethodResult(True,'New Document version created', newdocument.foidocumentid)   
+        return DefaultMethodResult(True,'New Document version created', newdocument.foidocumentid)
+
+    @classmethod
+    def deActivaterawdocumentsversion(cls, documentid, currentversion, userid)->DefaultMethodResult:
+        db.session.query(FOIRawRequestDocument).filter(FOIRawRequestDocument.foidocumentid == documentid, FOIRawRequestDocument.version != currentversion).update({"isactive": False, "updated_at": datetime.now(),"updatedby": userid}, synchronize_session=False)
+        db.session.commit()
+        return DefaultMethodResult(True,'Raw Request Document Updated',documentid) 
     
     
 class FOIRawRequestDocumentSchema(ma.Schema):
