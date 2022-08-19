@@ -140,15 +140,6 @@ export const CFRForm = ({
       </div>]
   };
 
-  React.useEffect(() => {
-    if (ministryId) {
-      fetchCFRForm(
-        ministryId,
-        dispatch,
-      );
-    }
-  }, [ministryId]);
-
   const handleTextChanges = (e: React.ChangeEvent<HTMLInputElement>) => {
     const name : string = e.target.name;
     const value : string = e.target.value;
@@ -159,6 +150,7 @@ export const CFRForm = ({
   const initialState: any = useSelector((state: any) => state.foiRequests.foiRequestCFRForm);
 
   const blankForm: CFRFormData = {
+    cfrfeeid: "",
     formStatus: "init",
     amountDue: 0,
     amountPaid: 0,
@@ -223,8 +215,6 @@ export const CFRForm = ({
     }
   }, [initialFormData, formData]);
 
-  // React.useEffect(() => {
-  // }, []);
 
   const validateField = (value: number, step: number) => {
     return (value % step) !== 0;
@@ -400,6 +390,16 @@ export const CFRForm = ({
       return true;
     return false;
   } 
+
+  const disableNewCfrFormBtn = () => {
+    return(formData?.formStatus !== 'approved' || (requestState !== StateEnum.callforrecords.name && 
+      requestState !== StateEnum.feeassessed.name && requestState !== StateEnum.onhold.name));
+  }
+
+  const newCFRForm = () => {
+    setInitialFormData(blankForm);
+    setFormData(blankForm);
+  }
 
 
   return (
@@ -916,16 +916,26 @@ export const CFRForm = ({
           </AccordionDetails>
         </Accordion>
       </div>
-      <div className="col-lg-4 buttonContainer">
+      <div className="foi-bottom-button-group cfrform"> 
         <button
           type="button"
-          className="btn saveButton"
+          className="btn btn-bottom btn-save"
           onClick={save}
           color="primary"
           disabled={!validateFields()}
         >
           Save
         </button>
+        {isMinistry &&
+          <button
+            type="button"
+            className="btn btn-bottom btn-cancel"
+            onClick={newCFRForm}
+            disabled={disableNewCfrFormBtn()}
+          >
+            + Create New CFR Form
+          </button>
+        }
       </div>
     </div>
   </div></Box>

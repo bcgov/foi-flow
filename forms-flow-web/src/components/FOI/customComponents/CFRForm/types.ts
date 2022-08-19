@@ -1,4 +1,5 @@
 export type CFRFormData = {
+    cfrfeeid?: string;
     formStatus: string;
     amountDue: number;
     amountPaid: number;

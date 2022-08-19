@@ -20,13 +20,13 @@ class cfrfeeservice:
     Supports creation, update and delete of CFR fee form
     """
 
-    def createcfrfee(self, ministryrequestid, data, userid):
-        cfrfee = self.__preparecfrfee(ministryrequestid, data)
+    def createcfrfee(self, ministryrequestid, data, userid, cfrfeeid):
+        cfrfee = self.__preparecfrfee(ministryrequestid, data,cfrfeeid)
         cfrfee.__dict__.update(data)
         return FOIRequestCFRFee.createcfrfee(cfrfee, userid)
     
-    def sanctioncfrfee(self, ministryrequestid, data, userid):     
-        cfrfee = self.__preparecfrfee(ministryrequestid, data)   
+    def sanctioncfrfee(self, ministryrequestid, data, userid, cfrfeeid):     
+        cfrfee = self.__preparecfrfee(ministryrequestid, data, cfrfeeid)   
         cfrfee.feedata.update(data['feedata'])
         return FOIRequestCFRFee.createcfrfee(cfrfee, userid)
 
@@ -36,9 +36,10 @@ class cfrfeeservice:
         cfrfee.feedata['paymentdate'] = datetime.now().astimezone(pytz.timezone(current_app.config['LEGISLATIVE_TIMEZONE'])).strftime('%Y-%m-%d')
         return FOIRequestCFRFee.createcfrfee(cfrfee, 'Online Payment')
     
-    def __preparecfrfee(self, ministryrequestid, data):
+    def __preparecfrfee(self, ministryrequestid, data, cfrfeeid):
         cfrfee = FOIRequestCFRFee()
-        lkupcfrfee = self.getcfrfee(ministryrequestid)           
+        if(cfrfeeid is not None):
+            lkupcfrfee = self.getcfrfee(ministryrequestid)           
         _version = 1
         if lkupcfrfee:
             cfrfee.__dict__.update(lkupcfrfee)
