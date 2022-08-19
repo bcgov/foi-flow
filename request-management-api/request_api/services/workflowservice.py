@@ -29,8 +29,8 @@ class workflowservice:
             return bpmservice().unopenedcomplete(wfinstanceid, metadata, MessageType.intakecomplete.value) 
 
     def postopenedevent(self, id, wfinstanceid, requestsschema, data, newstatus, usertype):
-        assignedgroup = self.__getopenedassigneevalue(requestsschema, "assignedgroup") 
-        assignedto = self.__getopenedassigneevalue(requestsschema, "assignedto")
+        assignedgroup = self.__getopenedassigneevalue(requestsschema, "assignedgroup",usertype) 
+        assignedto = self.__getopenedassigneevalue(requestsschema, "assignedto",usertype)
         idnumber = self.__getvaluefromschema(requestsschema,"idNumber") if usertype == "iao" else None
         paymentexpirydate = self.__getvaluefromschema(requestsschema,"paymentExpiryDate")
         axisRequestId = self.__getvaluefromschema(requestsschema,"axisRequestId")
@@ -66,11 +66,11 @@ class workflowservice:
             bpmservice().openedevent(filenumber, assignedgroup, assignedto, messagename)
          
     
-    def __getopenedassigneevalue(self, requestsschema, property):
+    def __getopenedassigneevalue(self, requestsschema, property, usertype):
         if property == "assignedgroup":
-            return self.__getvaluefromschema(requestsschema,"assignedgroup") 
+            return self.__getvaluefromschema(requestsschema,"assignedgroup") if usertype == "iao" else self.__getvaluefromschema(requestsschema,"assignedministrygroup")
         elif property == "assignedto":
-            return self.__getvaluefromschema(requestsschema,"assignedto") 
+            return self.__getvaluefromschema(requestsschema,"assignedto") if usertype == "iao" else self.__getvaluefromschema(requestsschema,"assignedministryperson")
         else:
             return None
         
