@@ -29,8 +29,8 @@ class workflowservice:
             return bpmservice().unopenedcomplete(wfinstanceid, metadata, MessageType.intakecomplete.value) 
 
     def postopenedevent(self, id, wfinstanceid, requestsschema, data, newstatus, usertype):
-        assignedgroup = self.__getopenedassigneevalue(usertype, requestsschema, "assignedgroup")
-        assignedto = self.__getopenedassigneevalue(usertype, requestsschema, "assignedto")
+        assignedgroup = self.__getopenedassigneevalue(requestsschema, "assignedgroup") 
+        assignedto = self.__getopenedassigneevalue(requestsschema, "assignedto")
         idnumber = self.__getvaluefromschema(requestsschema,"idNumber") if usertype == "iao" else None
         paymentexpirydate = self.__getvaluefromschema(requestsschema,"paymentExpiryDate")
         axisRequestId = self.__getvaluefromschema(requestsschema,"axisRequestId")
@@ -43,7 +43,7 @@ class workflowservice:
                     metadata = json.dumps({"id": filenumber, "status": newstatus, "assignedGroup": assignedgroup, "assignedTo": assignedto, "assignedministrygroup":ministry["assignedministrygroup"], "ministryRequestID": id, "paymentExpiryDate": paymentexpirydate, "axisRequestId": axisRequestId})
                     messagename = self.__messagename(oldstatus, activity, usertype, self.__isprocessing(id))
                     self.__postopenedevent(id, filenumber, metadata, messagename, assignedgroup, assignedto, wfinstanceid, activity)
-    
+
     def postfeeevent(self, requestid, ministryrequestid, requestsschema, status):
         metadata = json.dumps({
             "id": requestsschema["idNumber"], 
@@ -66,11 +66,11 @@ class workflowservice:
             bpmservice().openedevent(filenumber, assignedgroup, assignedto, messagename)
          
     
-    def __getopenedassigneevalue(self, usertype, requestsschema, property):
+    def __getopenedassigneevalue(self, requestsschema, property):
         if property == "assignedgroup":
-            return self.__getvaluefromschema(requestsschema,"assignedGroup") if usertype == "iao" else self.__getvaluefromschema(requestsschema,"assignedministrygroup")                     
+            return self.__getvaluefromschema(requestsschema,"assignedgroup") 
         elif property == "assignedto":
-            return self.__getvaluefromschema(requestsschema,"assignedTo") if usertype == "iao" else self.__getvaluefromschema(requestsschema,"assignedministryperson") 
+            return self.__getvaluefromschema(requestsschema,"assignedto") 
         else:
             return None
         
@@ -114,7 +114,7 @@ class workflowservice:
         return ministryreq["requeststatus.name"]    
     
     def __getministryactivity(self, oldstatus, newstatus):
-        return Activity.save.value if oldstatus == newstatus else Activity.complete.value
+        return  Activity.complete.value if newstatus is not None and oldstatus != newstatus else Activity.save.value
 
 
 class UserType(Enum):
