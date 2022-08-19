@@ -26,6 +26,8 @@ import { setFOILoader } from '../../../../actions/FOI/foiRequestActions'
 import clsx from "clsx";
 import AxisSyncModal from "../AxisDetails/AxisSyncModal";
 
+import { PAYMENT_EXPIRY_DAYS} from "../../../../constants/FOI/constants";
+
 const useStyles = makeStyles((theme) => ({
   root: {
     width: "100%",
@@ -317,7 +319,7 @@ const BottomButtonGroup = React.memo(
   
             saveRequestObject.requeststatusid = status.id;
             if (currentSelectedStatus === StateEnum.onhold.name && !saveRequestObject.paymentExpiryDate) {
-              saveRequestObject.paymentExpiryDate = dueDateCalculation(new Date(), 20);
+              saveRequestObject.paymentExpiryDate = dueDateCalculation(new Date(), PAYMENT_EXPIRY_DAYS);
             }
             break;
         }

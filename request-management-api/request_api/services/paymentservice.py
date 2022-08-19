@@ -63,7 +63,7 @@ class paymentservice:
             }})
             document_service : DocumentGenerationService = DocumentGenerationService(receiptname)
             receipt = document_service.generate_receipt(data,receipt_template_path)
-            document_service.upload_receipt('fee_estimate_payment_receipt.pdf', receipt.content, ministry_request_id, data['bcgovcode'], data['idNumber'])
+            document_service.upload_receipt('Fee Estimate Payment Receipt.pdf', receipt.content, ministry_request_id, data['bcgovcode'], data['idNumber'])
             return DefaultMethodResult(True,'Payment Receipt created',ministry_request_id)
         except Exception as ex:   
             logging.exception(ex)         
