@@ -103,6 +103,9 @@ class requestserviceministrybuilder(requestserviceconfigurator):
     def createfoirequestdocuments(self,requestschema, ministryrequestid, activeversion, userid):
         documentarr = []
         documents = FOIMinistryRequestDocument().getdocuments(ministryrequestid, activeversion-1)
+        # make isactive = False for all ministryRequestId and prev ministryVersion
+        FOIMinistryRequestDocument.deActivateministrydocumentsversionbyministry(ministryrequestid, activeversion, userid)
+        
         existingdocuments = self.createfoirequestdocumentfromobject(documents,ministryrequestid ,activeversion, userid)       
         documentarr = existingdocuments
         if 'documents' in requestschema:
