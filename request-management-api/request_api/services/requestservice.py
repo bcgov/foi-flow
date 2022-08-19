@@ -71,8 +71,7 @@ class requestservice:
         foirequestschema = self.getrequest(requestid, ministryrequestid)        
         workflowservice().postfeeevent(requestid, ministryrequestid, foirequestschema, paymentstatus)            
     
-    async def posteventtoworkflow(self, id, wfinstanceid, requestschema, data, usertype): 
-        requeststatusid =  requestschema.get("requeststatusid") if 'requeststatusid' in requestschema  else None 
-        if requeststatusid is not None:
-            status = requestserviceconfigurator().getstatusname(requeststatusid)
-            workflowservice().postopenedevent(id, wfinstanceid, requestschema, data, status, usertype)
+    def posteventtoworkflow(self, id, wfinstanceid, requestschema, data, usertype): 
+        requeststatusid =  requestschema.get("requeststatusid") if 'requeststatusid' in requestschema  else None
+        status = requestserviceconfigurator().getstatusname(requeststatusid) if requeststatusid is not None else None
+        workflowservice().postopenedevent(id, wfinstanceid, requestschema, data, status, usertype)
