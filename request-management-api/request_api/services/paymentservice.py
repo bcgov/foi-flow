@@ -30,6 +30,7 @@ class paymentservice:
         payment.ministryrequestid = ministryrequestid
         payment.ministryrequestversion = ministryversion
         payment.paymenturl = data['paymenturl']
+        payment.paymentexpirydate = data['paymentexpirydate']
         payment.version = 1
         payment.createdby = 'System'
         _payment = FOIRequestPayment.getpayment(requestid, ministryrequestid)
@@ -44,7 +45,7 @@ class paymentservice:
 
     def createpaymentreceipt(self, request_id, ministry_request_id, data, parsed_args):
         try:
-            balancedue = data['cfrfee']['feedata']["balanceDue"]
+            balancedue = float(data['cfrfee']['feedata']["balanceDue"])
             basepath = 'request_api/receipt_templates/'
             receiptname = 'cfr_fee_payment_receipt'
             if balancedue > 0:
@@ -62,7 +63,7 @@ class paymentservice:
             }})
             document_service : DocumentGenerationService = DocumentGenerationService(receiptname)
             receipt = document_service.generate_receipt(data,receipt_template_path)
-            document_service.upload_receipt('fee_estimate_payment_receipt.pdf', receipt.content, ministry_request_id, data['bcgovcode'], data['idNumber'])
+            document_service.upload_receipt('Fee Estimate Payment Receipt.pdf', receipt.content, ministry_request_id, data['bcgovcode'], data['idNumber'])
             return DefaultMethodResult(True,'Payment Receipt created',ministry_request_id)
         except Exception as ex:   
             logging.exception(ex)         

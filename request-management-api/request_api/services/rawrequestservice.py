@@ -101,7 +101,7 @@ class rawrequestservice:
     def updateworkflowinstancewithstatus(self, wfinstanceid, requestid,notes, userid):
         return FOIRawRequest.updateworkflowinstancewithstatus(wfinstanceid,requestid,notes, userid)    
     
-    async def posteventtoworkflow(self, id, wfinstanceid, requestsschema, status):
+    def posteventtoworkflow(self, id, wfinstanceid, requestsschema, status):
         return workflowservice().postunopenedevent(id, wfinstanceid, requestsschema, status)
 
     def getrawrequests(self):

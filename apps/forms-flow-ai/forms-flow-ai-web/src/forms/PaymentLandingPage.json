@@ -265,13 +265,13 @@
                "labelMargin":"",
                "customClass":"",
                "modalEdit":false,
-               "defaultValue":"https://request-management-api-002-dev.apps.silver.devops.gov.bc.ca",
+               "defaultValue":"",
                "persistent":true,
                "protected":false,
                "dbIndex":false,
                "encrypted":false,
                "redrawOn":"",
-               "customDefaultValue":"",
+               "customDefaultValue":"value = localStorage.getItem(\"foiApiUrl\")",
                "calculateValue":"",
                "calculateServer":false,
                "key":"apiUrl",
@@ -340,7 +340,7 @@
                   
                ],
                "inputType":"hidden",
-               "id":"efsrsb"
+               "id":"ep8f5mn"
             },
             {
                "label":"Foi Request Id",
@@ -431,13 +431,13 @@
                "labelMargin":"",
                "customClass":"",
                "modalEdit":false,
-               "defaultValue":"true",
+               "defaultValue":"",
                "persistent":true,
                "protected":false,
                "dbIndex":false,
                "encrypted":false,
                "redrawOn":"",
-               "customDefaultValue":"",
+               "customDefaultValue":"console.log(\"here\")\r\nFormio.request(\r\n    data.apiUrl + '/api/foirequests/' + data.foiRequestId + '/ministryrequest/' + data.ministryRequestId +  '/payments/' + data.paymentId,\r\n    'PUT',\r\n    {\r\n    \"response_url\": window.location.href.split(\"?\")[1]\r\n    },\r\n    null,\r\n    {\r\n      headers: {\r\n        'content-type': 'application/json'\r\n      },\r\n      mode: 'no-cors'\r\n    }).then(function(result) {\r\n      if (result.status === 'PAID') {\r\n        console.log(\"Paid\");\r\n      } else {\r\n        console.log(\"Error while updating the payment\");\r\n      }\r\n    });",
                "calculateValue":"",
                "calculateServer":false,
                "key":"callUpdateAPI",
@@ -506,7 +506,7 @@
                   
                ],
                "inputType":"hidden",
-               "id":"exhekfu"
+               "id":"e7pdgbt"
             },
             {
                "label":"Transaction Approved",
@@ -520,7 +520,7 @@
                "dbIndex":false,
                "encrypted":false,
                "redrawOn":"",
-               "customDefaultValue":"var url = new URL(window.location.href);\ntrnApproved = url.searchParams.get('trnApproved');\nif (trnApproved !== '1') {\n  value = false;\n}",
+               "customDefaultValue":"// var url = new URL(window.location.href);\n// trnApproved = url.searchParams.get('trnApproved');\n// if (trnApproved !== '1') {\n//   value = false;\n// }\n\nvar url = new URL(window.location.href);\ntrnApproved = url.searchParams.get('messageText');\nif (trnApproved !== 'Approved') {\n  value = false;\n}\nelse {\n  value = true;\n}",
                "calculateValue":"",
                "calculateServer":false,
                "key":"transactionApproved",
@@ -531,24 +531,7 @@
                   
                },
                "logic":[
-                  {
-                     "name":"Call Update API",
-                     "trigger":{
-                        "type":"simple",
-                        "simple":{
-                           "show":true,
-                           "when":"callUpdateAPI",
-                           "eq":"true"
-                        }
-                     },
-                     "actions":[
-                        {
-                           "name":"Call Update API",
-                           "type":"customAction",
-                           "customAction":"console.log(\"here\")\ndata.callUpdateAPI = false;\nFormio.request(\n    data.apiUrl + '/api/foirequests/' + data.foiRequestId + '/ministryrequest/' + data.ministryRequestId +  '/payments/' + data.paymentId,\n    'PUT',\n    {\n    \"response_url\": window.location.href.split(\"?\")[1]\n    },\n    null,\n    {\n      headers: {\n        'content-type': 'application/json'\n      },\n      mode: 'no-cors'\n    }).then(function(result) {\n      if (result.status === 'PAID') {\n        instance.setValue(true);\n      } else {\n        instance.setValue(false);\n      }\n    });"
-                        }
-                     ]
-                  }
+                  
                ],
                "attributes":{
                   
@@ -606,7 +589,7 @@
                   
                ],
                "inputType":"hidden",
-               "id":"eqa62yj"
+               "id":"e74mafq"
             },
             {
                "label":"PayOnlineCard",
@@ -666,27 +649,64 @@
                         {
                            "components":[
                               {
-                                 "html":"<p>&nbsp; &nbsp;&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p><span class=\"text-big\" style=\"color:#003366;\"><strong>Payment Successful!</strong></span></p><p><span class=\"text-big\" style=\"color:#003366;\">Transaction ID: {{data.transactionNumber}}</span></p><p style=\"text-align:center;\">&nbsp;</p>",
-                                 "label":"Content",
+                                 "label":"HTML",
+                                 "labelWidth":"",
+                                 "labelMargin":"",
+                                 "tag":"p",
+                                 "className":"",
+                                 "attrs":[
+                                    {
+                                       "attr":"",
+                                       "value":""
+                                    }
+                                 ],
+                                 "content":"<br/><br/><p><h2 style=\"color:#003366;\">\n  <b>Payment Successful!</b>\n  </h2></p>\n  <p><h3 style=\"color:#003366;\">Transaction ID: {{data.transactionNumber}}</h3></p>\n  <p style=\"text-align:center;\">&nbsp;</p>",
                                  "refreshOnChange":false,
-                                 "key":"content4",
-                                 "type":"content",
+                                 "customClass":"",
+                                 "hidden":false,
+                                 "modalEdit":false,
+                                 "key":"html9",
+                                 "tags":[
+                                    
+                                 ],
+                                 "properties":{
+                                    
+                                 },
+                                 "conditional":{
+                                    "show":null,
+                                    "when":null,
+                                    "eq":"",
+                                    "json":""
+                                 },
+                                 "customConditional":"",
+                                 "logic":[
+                                    
+                                 ],
+                                 "attributes":{
+                                    
+                                 },
+                                 "overlay":{
+                                    "style":"",
+                                    "page":"",
+                                    "left":"",
+                                    "top":"",
+                                    "width":"",
+                                    "height":""
+                                 },
+                                 "type":"htmlelement",
                                  "input":false,
                                  "tableView":false,
                                  "placeholder":"",
                                  "prefix":"",
-                                 "customClass":"",
                                  "suffix":"",
                                  "multiple":false,
                                  "defaultValue":null,
                                  "protected":false,
                                  "unique":false,
-                                 "persistent":true,
-                                 "hidden":false,
+                                 "persistent":false,
                                  "clearOnHide":true,
                                  "refreshOn":"",
                                  "redrawOn":"",
-                                 "modalEdit":false,
                                  "dataGridLabel":false,
                                  "labelPosition":"top",
                                  "description":"",
@@ -701,9 +721,6 @@
                                  "calculateValue":"",
                                  "calculateServer":false,
                                  "widget":null,
-                                 "attributes":{
-                                    
-                                 },
                                  "validateOn":"change",
                                  "validate":{
                                     "required":false,
@@ -713,30 +730,15 @@
                                     "multiple":false,
                                     "unique":false
                                  },
-                                 "conditional":{
-                                    "show":null,
-                                    "when":null,
-                                    "eq":""
-                                 },
-                                 "overlay":{
-                                    "style":"",
-                                    "left":"",
-                                    "top":"",
-                                    "width":"",
-                                    "height":""
-                                 },
                                  "allowCalculateOverride":false,
                                  "encrypted":false,
                                  "showCharCount":false,
                                  "showWordCount":false,
-                                 "properties":{
-                                    
-                                 },
                                  "allowMultipleMasks":false,
                                  "addons":[
                                     
                                  ],
-                                 "id":"e0s40q"
+                                 "id":"ezf50qm"
                               },
                               {
                                  "html":"<p style=\"text-align:center;\">&nbsp;</p><p style=\"text-align:center;\"><span class=\"text-huge\" style=\"color:#003366;\"><strong>You have received an email regarding your request details including your new Legislated Due Date and a copy of your receipt</strong></span></p>",
@@ -1239,27 +1241,64 @@
                         {
                            "components":[
                               {
-                                 "html":"<p>&nbsp; &nbsp;&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p><span class=\"text-big\" style=\"color:#003366;\"><strong>Payment Failed</strong></span></p><p><span class=\"text-big\" style=\"color:#003366;\">Transaction ID: {{data.transactionNumber}}</span></p><p style=\"text-align:center;\">&nbsp;</p>",
-                                 "label":"Content",
+                                 "label":"HTML",
+                                 "labelWidth":"",
+                                 "labelMargin":"",
+                                 "tag":"p",
+                                 "className":"",
+                                 "attrs":[
+                                    {
+                                       "attr":"",
+                                       "value":""
+                                    }
+                                 ],
+                                 "content":"<br/><br/><p><h2 style=\"color:#003366;\">\n  <b>Payment Failed!</b>\n  </h2></p>\n  <p><h3 style=\"color:#003366;\">Transaction ID: {{data.transactionNumber}}</h3></p>\n  <p style=\"text-align:center;\">&nbsp;</p>",
                                  "refreshOnChange":false,
-                                 "key":"content6",
-                                 "type":"content",
+                                 "customClass":"",
+                                 "hidden":false,
+                                 "modalEdit":false,
+                                 "key":"html13",
+                                 "tags":[
+                                    
+                                 ],
+                                 "properties":{
+                                    
+                                 },
+                                 "conditional":{
+                                    "show":null,
+                                    "when":null,
+                                    "eq":"",
+                                    "json":""
+                                 },
+                                 "customConditional":"",
+                                 "logic":[
+                                    
+                                 ],
+                                 "attributes":{
+                                    
+                                 },
+                                 "overlay":{
+                                    "style":"",
+                                    "page":"",
+                                    "left":"",
+                                    "top":"",
+                                    "width":"",
+                                    "height":""
+                                 },
+                                 "type":"htmlelement",
                                  "input":false,
                                  "tableView":false,
                                  "placeholder":"",
                                  "prefix":"",
-                                 "customClass":"",
                                  "suffix":"",
                                  "multiple":false,
                                  "defaultValue":null,
                                  "protected":false,
                                  "unique":false,
-                                 "persistent":true,
-                                 "hidden":false,
+                                 "persistent":false,
                                  "clearOnHide":true,
                                  "refreshOn":"",
                                  "redrawOn":"",
-                                 "modalEdit":false,
                                  "dataGridLabel":false,
                                  "labelPosition":"top",
                                  "description":"",
@@ -1274,9 +1313,6 @@
                                  "calculateValue":"",
                                  "calculateServer":false,
                                  "widget":null,
-                                 "attributes":{
-                                    
-                                 },
                                  "validateOn":"change",
                                  "validate":{
                                     "required":false,
@@ -1286,30 +1322,15 @@
                                     "multiple":false,
                                     "unique":false
                                  },
-                                 "conditional":{
-                                    "show":null,
-                                    "when":null,
-                                    "eq":""
-                                 },
-                                 "overlay":{
-                                    "style":"",
-                                    "left":"",
-                                    "top":"",
-                                    "width":"",
-                                    "height":""
-                                 },
                                  "allowCalculateOverride":false,
                                  "encrypted":false,
                                  "showCharCount":false,
                                  "showWordCount":false,
-                                 "properties":{
-                                    
-                                 },
                                  "allowMultipleMasks":false,
                                  "addons":[
                                     
                                  ],
-                                 "id":"eppr2hu"
+                                 "id":"epdqrpf"
                               },
                               {
                                  "html":"<p style=\"text-align:center;\">&nbsp;</p><p style=\"text-align:center;\"><span class=\"text-huge\" style=\"color:#003366;\"><strong>We had an issue processing your payment. Please try again later. If the issue persists please contact IAO for more information.</strong></span></p>",
@@ -1667,27 +1688,56 @@
                                  "id":"eoft625"
                               },
                               {
-                                 "html":"<p style=\"text-align:center;\">&nbsp;</p><p style=\"text-align:center;\">&nbsp;</p><p style=\"text-align:center;\">&nbsp;</p><p style=\"text-align:center;\"><span style=\"background-color:rgb(255,255,255);color:rgb(0,51,102);\">If you would like to contact the Information Access Operations representative, please Email FOI at: FOI.Requests@gov.bc.ca, or call, Phone: 250-387-1321 | Toll Free: 833-283-8200</span></p>",
+                                 "html":"<p style=\"text-align:center;\">&nbsp;</p><p style=\"text-align:center;\">&nbsp;</p><p style=\"text-align:center;\"><span style=\"background-color:rgb(255,255,255);color:rgb(0,51,102);\">If you would like to contact the Information Access Operations representative, please Email FOI at: FOI.Requests@gov.bc.ca, or call, Phone: 250-387-1321 | Toll Free: 833-283-8200</span></p>",
                                  "label":"help",
+                                 "labelWidth":"",
+                                 "labelMargin":"",
+                                 "customClass":"",
                                  "refreshOnChange":false,
+                                 "hidden":false,
+                                 "modalEdit":false,
                                  "key":"help3",
+                                 "tags":[
+                                    
+                                 ],
+                                 "properties":{
+                                    
+                                 },
+                                 "conditional":{
+                                    "show":null,
+                                    "when":null,
+                                    "eq":"",
+                                    "json":""
+                                 },
+                                 "customConditional":"",
+                                 "logic":[
+                                    
+                                 ],
+                                 "attributes":{
+                                    
+                                 },
+                                 "overlay":{
+                                    "style":"",
+                                    "page":"",
+                                    "left":"",
+                                    "top":"",
+                                    "width":"",
+                                    "height":""
+                                 },
                                  "type":"content",
                                  "input":false,
                                  "tableView":false,
                                  "placeholder":"",
                                  "prefix":"",
-                                 "customClass":"",
                                  "suffix":"",
                                  "multiple":false,
                                  "defaultValue":null,
                                  "protected":false,
                                  "unique":false,
                                  "persistent":true,
-                                 "hidden":false,
                                  "clearOnHide":true,
                                  "refreshOn":"",
                                  "redrawOn":"",
-                                 "modalEdit":false,
                                  "dataGridLabel":false,
                                  "labelPosition":"top",
                                  "description":"",
@@ -1702,9 +1752,6 @@
                                  "calculateValue":"",
                                  "calculateServer":false,
                                  "widget":null,
-                                 "attributes":{
-                                    
-                                 },
                                  "validateOn":"change",
                                  "validate":{
                                     "required":false,
@@ -1714,30 +1761,15 @@
                                     "multiple":false,
                                     "unique":false
                                  },
-                                 "conditional":{
-                                    "show":null,
-                                    "when":null,
-                                    "eq":""
-                                 },
-                                 "overlay":{
-                                    "style":"",
-                                    "left":"",
-                                    "top":"",
-                                    "width":"",
-                                    "height":""
-                                 },
                                  "allowCalculateOverride":false,
                                  "encrypted":false,
                                  "showCharCount":false,
                                  "showWordCount":false,
-                                 "properties":{
-                                    
-                                 },
                                  "allowMultipleMasks":false,
                                  "addons":[
                                     
                                  ],
-                                 "id":"esaogj4"
+                                 "id":"ec5lafk"
                               }
                            ],
                            "width":10,
@@ -1830,166 +1862,6 @@
                      "lazyLoad":false,
                      "autoAdjust":false,
                      "id":"eassibt"
-                  },
-                  {
-                     "label":"HTML",
-                     "attrs":[
-                        {
-                           "attr":"",
-                           "value":""
-                        }
-                     ],
-                     "content":"<br/>",
-                     "refreshOnChange":false,
-                     "key":"html35",
-                     "type":"htmlelement",
-                     "input":false,
-                     "tableView":false,
-                     "placeholder":"",
-                     "prefix":"",
-                     "customClass":"",
-                     "suffix":"",
-                     "multiple":false,
-                     "defaultValue":null,
-                     "protected":false,
-                     "unique":false,
-                     "persistent":false,
-                     "hidden":false,
-                     "clearOnHide":true,
-                     "refreshOn":"",
-                     "redrawOn":"",
-                     "modalEdit":false,
-                     "dataGridLabel":false,
-                     "labelPosition":"top",
-                     "description":"",
-                     "errorLabel":"",
-                     "tooltip":"",
-                     "hideLabel":false,
-                     "tabindex":"",
-                     "disabled":false,
-                     "autofocus":false,
-                     "dbIndex":false,
-                     "customDefaultValue":"",
-                     "calculateValue":"",
-                     "calculateServer":false,
-                     "widget":null,
-                     "attributes":{
-                        
-                     },
-                     "validateOn":"change",
-                     "validate":{
-                        "required":false,
-                        "custom":"",
-                        "customPrivate":false,
-                        "strictDateValidation":false,
-                        "multiple":false,
-                        "unique":false
-                     },
-                     "conditional":{
-                        "show":null,
-                        "when":null,
-                        "eq":""
-                     },
-                     "overlay":{
-                        "style":"",
-                        "left":"",
-                        "top":"",
-                        "width":"",
-                        "height":""
-                     },
-                     "allowCalculateOverride":false,
-                     "encrypted":false,
-                     "showCharCount":false,
-                     "showWordCount":false,
-                     "properties":{
-                        
-                     },
-                     "allowMultipleMasks":false,
-                     "addons":[
-                        
-                     ],
-                     "tag":"p",
-                     "id":"eetd92"
-                  },
-                  {
-                     "label":"HTML",
-                     "attrs":[
-                        {
-                           "attr":"",
-                           "value":""
-                        }
-                     ],
-                     "content":"<br/>",
-                     "refreshOnChange":false,
-                     "key":"html36",
-                     "type":"htmlelement",
-                     "input":false,
-                     "tableView":false,
-                     "placeholder":"",
-                     "prefix":"",
-                     "customClass":"",
-                     "suffix":"",
-                     "multiple":false,
-                     "defaultValue":null,
-                     "protected":false,
-                     "unique":false,
-                     "persistent":false,
-                     "hidden":false,
-                     "clearOnHide":true,
-                     "refreshOn":"",
-                     "redrawOn":"",
-                     "modalEdit":false,
-                     "dataGridLabel":false,
-                     "labelPosition":"top",
-                     "description":"",
-                     "errorLabel":"",
-                     "tooltip":"",
-                     "hideLabel":false,
-                     "tabindex":"",
-                     "disabled":false,
-                     "autofocus":false,
-                     "dbIndex":false,
-                     "customDefaultValue":"",
-                     "calculateValue":"",
-                     "calculateServer":false,
-                     "widget":null,
-                     "attributes":{
-                        
-                     },
-                     "validateOn":"change",
-                     "validate":{
-                        "required":false,
-                        "custom":"",
-                        "customPrivate":false,
-                        "strictDateValidation":false,
-                        "multiple":false,
-                        "unique":false
-                     },
-                     "conditional":{
-                        "show":null,
-                        "when":null,
-                        "eq":""
-                     },
-                     "overlay":{
-                        "style":"",
-                        "left":"",
-                        "top":"",
-                        "width":"",
-                        "height":""
-                     },
-                     "allowCalculateOverride":false,
-                     "encrypted":false,
-                     "showCharCount":false,
-                     "showWordCount":false,
-                     "properties":{
-                        
-                     },
-                     "allowMultipleMasks":false,
-                     "addons":[
-                        
-                     ],
-                     "tag":"p",
-                     "id":"ew6v3wn"
                   }
                ],
                "placeholder":"",

@@ -144,7 +144,7 @@ services:
       - CAMUNDA_JDBC_DRIVER=org.postgresql.Driver
       - CAMUNDA_BPM_HISTORY_LEVEL=${CAMUNDA_BPM_HISTORY_LEVEL:-none}
       - CAMUNDA_APP_ROOT_LOG_FLAG=${CAMUNDA_APP_ROOT_LOG_FLAG:-ERROR}
-      - FORMSFLOW_API_URL=${FORMSFLOW_API_URL:-http://{your-ip-address}:5000}
+      - FORMSFLOW_API_URL=${FORMSFLOW_API_URL:-http://{your-ip-address}:16000}
       - FORMSFLOW_WEB_URL=${FORMSFLOW_WEB_URL:-http://{your-ip-address}:4000}
       - FORMIO_URL=${FORMIO_DEFAULT_PROJECT_URL:-http://{your-ip-address}:3001}   
       - FORMIO_ROOT_EMAIL=${FORMIO_ROOT_EMAIL:-admin@example.com}
@@ -184,6 +184,7 @@ services:
         - REACT_APP_FOI_FLOW_REPORTING_URL=${FOI_FLOW_REPORTING_URL}
         - REACT_APP_AXIS_API_URL=${AXIS_API_URL}
         - REACT_APP_SOCKETIO_CONNECT_NONCE=${SOCKETIO_CONNECT_NONCE}
+        - PAYMENT_EXPIRY_DAYS=${PAYMENT_EXPIRY_DAYS}
     volumes:
       - ".:/app"
       - "/app/node_modules"

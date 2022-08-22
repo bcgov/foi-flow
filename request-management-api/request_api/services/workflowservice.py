@@ -29,19 +29,21 @@ class workflowservice:
             return bpmservice().unopenedcomplete(wfinstanceid, metadata, MessageType.intakecomplete.value) 
 
     def postopenedevent(self, id, wfinstanceid, requestsschema, data, newstatus, usertype):
-        assignedgroup = self.__getopenedassigneevalue(usertype, requestsschema, "assignedgroup")
-        assignedto = self.__getopenedassigneevalue(usertype, requestsschema, "assignedto")
+        assignedgroup = self.__getopenedassigneevalue(requestsschema, "assignedgroup",usertype) 
+        assignedto = self.__getopenedassigneevalue(requestsschema, "assignedto",usertype)
         idnumber = self.__getvaluefromschema(requestsschema,"idNumber") if usertype == "iao" else None
+        paymentexpirydate = self.__getvaluefromschema(requestsschema,"paymentExpiryDate")
+        axisRequestId = self.__getvaluefromschema(requestsschema,"axisRequestId")
         if data.get("ministries") is not None:
             for ministry in data.get("ministries"): 
                 filenumber =  ministry["filenumber"] if (idnumber is None and  usertype == "ministry") else idnumber
                 if (ministry["filenumber"] == filenumber and usertype == "iao") or usertype == UserType.ministry.value:
                     oldstatus = self.__getministrystatus(filenumber, ministry["version"])
                     activity = self.__getministryactivity(oldstatus,newstatus)
-                    metadata = json.dumps({"id": filenumber, "status": newstatus, "assignedGroup": assignedgroup, "assignedTo": assignedto, "assignedministrygroup":ministry["assignedministrygroup"], "ministryRequestID": id})
+                    metadata = json.dumps({"id": filenumber, "status": newstatus, "assignedGroup": assignedgroup, "assignedTo": assignedto, "assignedministrygroup":ministry["assignedministrygroup"], "ministryRequestID": id, "paymentExpiryDate": paymentexpirydate, "axisRequestId": axisRequestId})
                     messagename = self.__messagename(oldstatus, activity, usertype, self.__isprocessing(id))
                     self.__postopenedevent(id, filenumber, metadata, messagename, assignedgroup, assignedto, wfinstanceid, activity)
-    
+
     def postfeeevent(self, requestid, ministryrequestid, requestsschema, status):
         metadata = json.dumps({
             "id": requestsschema["idNumber"], 
@@ -64,11 +66,11 @@ class workflowservice:
             bpmservice().openedevent(filenumber, assignedgroup, assignedto, messagename)
          
     
-    def __getopenedassigneevalue(self, usertype, requestsschema, property):
+    def __getopenedassigneevalue(self, requestsschema, property, usertype):
         if property == "assignedgroup":
-            return self.__getvaluefromschema(requestsschema,"assignedGroup") if usertype == "iao" else self.__getvaluefromschema(requestsschema,"assignedministrygroup")                     
+            return self.__getvaluefromschema(requestsschema,"assignedgroup") if usertype == "iao" else self.__getvaluefromschema(requestsschema,"assignedministrygroup")
         elif property == "assignedto":
-            return self.__getvaluefromschema(requestsschema,"assignedTo") if usertype == "iao" else self.__getvaluefromschema(requestsschema,"assignedministryperson") 
+            return self.__getvaluefromschema(requestsschema,"assignedto") if usertype == "iao" else self.__getvaluefromschema(requestsschema,"assignedministryperson")
         else:
             return None
         
@@ -112,7 +114,7 @@ class workflowservice:
         return ministryreq["requeststatus.name"]    
     
     def __getministryactivity(self, oldstatus, newstatus):
-        return Activity.save.value if oldstatus == newstatus else Activity.complete.value
+        return  Activity.complete.value if newstatus is not None and oldstatus != newstatus else Activity.save.value
 
 
 class UserType(Enum):
