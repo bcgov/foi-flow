@@ -61,11 +61,8 @@ export const saveCFRForm = (
   const apiUrl = replaceUrl(
     baseUrl,
     "<ministryrequestid>",
-    ministryId,
-    "<cfrfeeid>",
-    data?.cfrfeeid
+    ministryId
   );
-
   httpPOSTRequest(apiUrl, data)
     .then((res) => {
       if (res.data) {

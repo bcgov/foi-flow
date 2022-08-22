@@ -150,7 +150,7 @@ export const CFRForm = ({
   const initialState: any = useSelector((state: any) => state.foiRequests.foiRequestCFRForm);
 
   const blankForm: CFRFormData = {
-    cfrfeeid: "",
+    cfrfeeid: null,
     formStatus: "init",
     amountDue: 0,
     amountPaid: 0,
@@ -173,11 +173,13 @@ export const CFRForm = ({
     suggestions: ''
   };
 
-  const [initialFormData, setInitialFormData] = React.useState(blankForm);
-
-  const [formData, setFormData] = React.useState(initialFormData);
+  const [initialFormData, setInitialFormData] = useState(blankForm);
+  const [formData, setFormData] = useState(initialFormData);
+  const [isNewCFRForm, setIsNewCFRForm] = useState(false);
+  
 
   React.useEffect(() => {
+    
     var formattedData = {
       formStatus: initialState.status === null ? 'init' : initialState.status,
       amountDue: initialState.feedata.totalamountdue,
@@ -285,6 +287,7 @@ export const CFRForm = ({
   } 
 
   const save = () => {
+    const cfrFeeId = isNewCFRForm ? formData?.cfrfeeid : initialState?.cfrfeeid;
     var callback = (_res: string) => {
       setInitialFormData(formData)
       toast.success("CFR Form has been saved successfully.", {
@@ -303,6 +306,8 @@ export const CFRForm = ({
     };
     var data;
     if (isMinistry) {
+      if(isNewCFRForm)
+        formData.formStatus = 'review';
       data = {
         feedata:{
           amountpaid: formData.amountPaid,
@@ -321,7 +326,8 @@ export const CFRForm = ({
           actualhardcopypages: formData.actual.hardcopyPages,
         },
         overallsuggestions: formData.suggestions,
-        status: formData.formStatus === 'init' ? '' : formData.formStatus
+        status: formData.formStatus === 'init' ? '' : formData.formStatus,
+        cfrfeeid:cfrFeeId
       }
     } else {
       data = {
@@ -331,7 +337,8 @@ export const CFRForm = ({
           actualiaopreparinghrs: formData.actual.iaoPreparing,
           totalamountdue: formData.amountDue,
         },
-        status: formData.formStatus
+        status: formData.formStatus,
+        //cfrfeeid:cfrFeeId
       }
     }
     saveCFRForm(
@@ -399,6 +406,7 @@ export const CFRForm = ({
   const newCFRForm = () => {
     setInitialFormData(blankForm);
     setFormData(blankForm);
+    setIsNewCFRForm(true);
   }
 
 

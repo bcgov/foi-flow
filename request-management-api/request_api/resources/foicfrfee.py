@@ -37,7 +37,7 @@ TRACER = Tracer.get_instance()
 EXCEPTION_MESSAGE_BAD_REQUEST='Bad Request'
         
 @cors_preflight('POST,OPTIONS')
-@API.route('/foicfrfee/ministryrequest/<ministryrequestid>/cfrfeeid/<cfrfeeid>')
+@API.route('/foicfrfee/ministryrequest/<ministryrequestid>')
 class CreateFOICFRFee(Resource):
     """Creates CFR Fee for ministry request."""
        
@@ -45,13 +45,13 @@ class CreateFOICFRFee(Resource):
     @TRACER.trace()
     @cross_origin(origins=allowedorigins())
     #@auth.require
-    def post(ministryrequestid,cfrfeeid):      
+    def post(ministryrequestid):      
         try:
             if AuthHelper.getusertype() != "ministry":
                 return {'status': False, 'message':'UnAuthorized'}, 403
             requestjson = request.get_json() 
             foicfrfeeschema = FOICFRFeeSchema().load(requestjson)  
-            result = cfrfeeservice().createcfrfee(ministryrequestid, foicfrfeeschema,AuthHelper.getuserid(),cfrfeeid)
+            result = cfrfeeservice().createcfrfee(ministryrequestid, foicfrfeeschema,AuthHelper.getuserid())
             asyncio.ensure_future(eventservice().posteventforcfrfeeform(ministryrequestid, AuthHelper.getuserid(), AuthHelper.getusername()))
             return {'status': result.success, 'message':result.message,'id':result.identifier} , 200 
         except ValidationError as verr:
@@ -64,7 +64,7 @@ class CreateFOICFRFee(Resource):
             return {'status': exception.status_code, 'message':exception.message}, 500 
 
 @cors_preflight('POST,OPTIONS')
-@API.route('/foicfrfee/ministryrequest/<ministryrequestid>/cfrfeeid/<cfrfeeid>/sanction')
+@API.route('/foicfrfee/ministryrequest/<ministryrequestid>/sanction')
 class SanctionFOICFRFee(Resource):
     """Updates CFR Fee status and iao preparing field."""
        
@@ -72,14 +72,13 @@ class SanctionFOICFRFee(Resource):
     @TRACER.trace()
     @cross_origin(origins=allowedorigins())
     #@auth.require
-    def post(ministryrequestid,cfrfeeid):      
+    def post(ministryrequestid):      
         try:
             if AuthHelper.getusertype() != "iao":
                 return {'status': False, 'message':'UnAuthorized'}, 403
             requestjson = request.get_json() 
             foicfrfeeschema = FOICFRFeeSanctionSchema().load(requestjson)  
-            result = cfrfeeservice().sanctioncfrfee(ministryrequestid, foicfrfeeschema,AuthHelper.getuserid(), cfrfeeid)
-            
+            result = cfrfeeservice().sanctioncfrfee(ministryrequestid, foicfrfeeschema,AuthHelper.getuserid())
             asyncio.ensure_future(eventservice().posteventforcfrfeeform(ministryrequestid, AuthHelper.getuserid(), AuthHelper.getusername()))
             return {'status': result.success, 'message':result.message,'id':result.identifier} , 200 
         except ValidationError as verr:

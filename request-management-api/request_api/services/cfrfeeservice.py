@@ -20,13 +20,14 @@ class cfrfeeservice:
     Supports creation, update and delete of CFR fee form
     """
 
-    def createcfrfee(self, ministryrequestid, data, userid, cfrfeeid):
-        cfrfee = self.__preparecfrfee(ministryrequestid, data,cfrfeeid)
+    def createcfrfee(self, ministryrequestid, data, userid):
+        cfrfee = self.__preparecfrfee(ministryrequestid, data)
         cfrfee.__dict__.update(data)
         return FOIRequestCFRFee.createcfrfee(cfrfee, userid)
     
-    def sanctioncfrfee(self, ministryrequestid, data, userid, cfrfeeid):     
-        cfrfee = self.__preparecfrfee(ministryrequestid, data, cfrfeeid)   
+    def sanctioncfrfee(self, ministryrequestid, data, userid):   
+        issantioncfrfee = True
+        cfrfee = self.__preparecfrfee(ministryrequestid, data, issantioncfrfee)   
         cfrfee.feedata.update(data['feedata'])
         return FOIRequestCFRFee.createcfrfee(cfrfee, userid)
 
@@ -36,14 +37,21 @@ class cfrfeeservice:
         cfrfee.feedata['paymentdate'] = datetime.now().astimezone(pytz.timezone(current_app.config['LEGISLATIVE_TIMEZONE'])).strftime('%Y-%m-%d')
         return FOIRequestCFRFee.createcfrfee(cfrfee, 'Online Payment')
     
-    def __preparecfrfee(self, ministryrequestid, data, cfrfeeid):
+    def __preparecfrfee(self, ministryrequestid, data, issantioncfrfee= False):
+        
+        cfrfeeid= ""
         cfrfee = FOIRequestCFRFee()
-        if(cfrfeeid is not None):
-            lkupcfrfee = self.getcfrfee(ministryrequestid)           
+        lkupcfrfee = self.getcfrfee(ministryrequestid)      
+        if(issantioncfrfee is False):
+            cfrfeeid= data["cfrfeeid"]     
         _version = 1
         if lkupcfrfee:
-            cfrfee.__dict__.update(lkupcfrfee)
-            _version =  lkupcfrfee['version'] + 1
+            if(issantioncfrfee is False or cfrfeeid is None):
+                cfrfeeid =  lkupcfrfee['cfrfeeid'] + 1
+                cfrfee.cfrfeeid = cfrfeeid
+            else:
+                cfrfee.__dict__.update(lkupcfrfee)
+                _version =  lkupcfrfee['version'] + 1
         cfrfee.version = _version   
         cfrfee.ministryrequestid = ministryrequestid
         cfrfee.ministryrequestversion = FOIMinistryRequest.getversionforrequest(ministryrequestid)
