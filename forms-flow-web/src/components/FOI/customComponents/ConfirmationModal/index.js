@@ -190,7 +190,7 @@ export default function ConfirmationModal({requestId, openModal, handleModal, st
             && saveRequestObject.requeststatusid === StateEnum.signoff.id)
           ||
           (state.toLowerCase() === StateEnum.onhold.name.toLowerCase()
-            && saveRequestObject.requeststatusid === StateEnum.feeassessed.id
+            && (saveRequestObject.requeststatusid === StateEnum.feeassessed.id || saveRequestObject.requeststatusid === StateEnum.response.id)
             && saveRequestObject.email
             && cfrStatus == 'approved'
             && amountDue !== 0)

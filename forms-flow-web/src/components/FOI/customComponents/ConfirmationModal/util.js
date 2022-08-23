@@ -86,7 +86,7 @@ import { getFullnameList } from "../../../../helper/FOI/helper";
       case StateEnum.harms.name.toLowerCase():
           return {title: "Changing the state", body: `Are you sure you want to change Request #${_requestNumber} to ${StateEnum.harms.name}?`};
       case StateEnum.onhold.name.toLowerCase():
-          if (_cfrStatus !== 'approved') {
+          if (_cfrStatus !== 'approved' && _currentState?.toLowerCase() !== StateEnum.response.name.toLowerCase()) {
             return {
               title: "On Hold",
               body: "You must review and approve the CFR Form before you can put this request On Hold."
@@ -97,10 +97,16 @@ import { getFullnameList } from "../../../../helper/FOI/helper";
               body: "There is no applicant email on file. Please check the box to confirm that you have mailed the applicant a letter before you put this request On Hold."
             };
           } else {
-            return {
-              title: "On Hold",
-              body: <>Are you sure you want to change Request #{_requestNumber} to on hold? <br/> <b>This will stop the clock and automatically email the applicant the fee estimate.</b> </>};
-          }
+              if (_currentState?.toLowerCase() === StateEnum.response.name.toLowerCase()) {
+                return {
+                  title: "On Hold",
+                  body: <>Upload the completed Fee Estimate letter to change the state of this request to On Hold. When you change Request #{_requestNumber} to On Hold
+                  <b> the clock will be stopped and the applicant will automatically be emailed the fee estimate letter.</b> </>};
+                }
+              return {
+                title: "On Hold",
+                body: <>Are you sure you want to change Request #{_requestNumber} to on hold? <br/> <b>This will stop the clock and automatically email the applicant the fee estimate.</b> </>};
+            }
       case StateEnum.response.name.toLowerCase():
         if (_saveRequestObject.requeststatusid === StateEnum.signoff.id)
           return {title: "Ministry Sign Off", body: `Upload eApproval Logs to verify Ministry Approval and change the state.`};
