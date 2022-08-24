@@ -41,7 +41,7 @@ class FOIRequestCFRFee(db.Model):
     @classmethod
     def getcfrfee(cls, ministryrequestid)->DefaultMethodResult:   
         comment_schema = FOIRequestCFRFormSchema(many=False)
-        query = db.session.query(FOIRequestCFRFee).filter_by(ministryrequestid=ministryrequestid).order_by(FOIRequestCFRFee.version.desc()).first()
+        query = db.session.query(FOIRequestCFRFee).filter_by(ministryrequestid=ministryrequestid).order_by(FOIRequestCFRFee.cfrfeeid.desc(), FOIRequestCFRFee.version.desc()).first()
         return comment_schema.dump(query)   
     
     @classmethod

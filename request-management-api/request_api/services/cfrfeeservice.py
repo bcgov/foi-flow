@@ -52,7 +52,7 @@ class cfrfeeservice:
                 cfrfee.cfrfeeid = cfrfeeid
             else:
                 cfrfee.__dict__.update(lkupcfrfee)
-            _version =  lkupcfrfee['version'] + 1
+                _version =  lkupcfrfee['version'] + 1
         cfrfee.version = _version   
         cfrfee.ministryrequestid = ministryrequestid
         cfrfee.ministryrequestversion = FOIMinistryRequest.getversionforrequest(ministryrequestid)

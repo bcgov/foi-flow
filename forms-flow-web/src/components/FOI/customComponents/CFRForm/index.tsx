@@ -43,6 +43,7 @@ export const CFRForm = ({
 
   const userGroups = userDetail.groups.map(group => group.slice(1));
   const isMinistry = isMinistryLogin(userGroups);
+  const formHistory: Array<any> = useSelector((state: any) => state.foiRequests.foiRequestCFRFormHistory);
 
   const CFRStatuses = [
     {
@@ -53,12 +54,12 @@ export const CFRForm = ({
     {
       value: 'review',
       label: 'In Review with IAO',
-      disabled: false,
+      disabled: isMinistry && formHistory.length <= 0,
     },
     {
       value: 'clarification',
       label: 'Needs Clarification with Ministry',
-      disabled: false
+      disabled: isMinistry
     },
     {
       value: 'approved',
@@ -147,7 +148,6 @@ export const CFRForm = ({
   };
 
   const initialState: any = useSelector((state: any) => state.foiRequests.foiRequestCFRForm);
-  const formHistory: Array<any> = useSelector((state: any) => state.foiRequests.foiRequestCFRFormHistory);
 
   const blankForm: CFRFormData = {
     cfrfeeid: null,
@@ -285,6 +285,13 @@ export const CFRForm = ({
   };
 
  const cfrStatusDisabled = () => {
+    if (formHistory.length > 0 && (requestState === StateEnum.callforrecords.name || requestState === StateEnum.onhold.name)) {
+      if (isMinistry) {
+        return initialFormData.formStatus === 'review' || initialFormData.formStatus === 'approved';
+      } else {
+        return initialFormData.formStatus === 'clarification' || initialFormData.formStatus === 'init';
+      }
+    }
     if (requestState === StateEnum.feeassessed.name) {
       if (isMinistry) {
         return initialFormData.formStatus !== 'clarification';
@@ -315,9 +322,6 @@ export const CFRForm = ({
     };
     var data;
     if (isMinistry) {
-      if(isNewCFRForm)
-        formData.formStatus = 'review';
-      console.log("cfrFeeId",cfrFeeId);
       data = {
         feedata:{
           amountpaid: formData.amountPaid,
