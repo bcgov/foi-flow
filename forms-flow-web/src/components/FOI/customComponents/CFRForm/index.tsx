@@ -965,7 +965,7 @@ export const CFRForm = ({
               <div className="foi-bottom-button-group cfrform"> 
                 <button
                   type="button"
-                  className="btn btn-bottom btn-save"
+                  className="col-lg-4 btn btn-bottom btn-save"
                   onClick={save}
                   color="primary"
                   disabled={!validateFields()}
@@ -975,7 +975,7 @@ export const CFRForm = ({
                 {isMinistry &&
                   <button
                     type="button"
-                    className="btn btn-bottom btn-cancel"
+                    className="col-lg-4 btn btn-bottom btn-cancel"
                     onClick={newCFRForm}
                     disabled={disableNewCfrFormBtn()}
                   >
