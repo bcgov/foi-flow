@@ -4,7 +4,7 @@ labels:
     app: ${APP_NAME}
     app-group: forms-flow-ai
 metadata:
-  name: ${NAME}
+  name: forms-flow-ai-web
 objects:
   -
     apiVersion: v1
@@ -14,10 +14,10 @@ objects:
     data:
       keycloak.json: |-
         {
-        "realm": "${REACT_APP_KEYCLOAK_URL_REALM}",
-        "auth-server-url": "${AUTH_SERVER_URL}" ,
+        "realm": "${REALM}",
+        "auth-server-url": "${REACT_APP_KEYCLOAK_URL}/auth/" ,
         "ssl-required": "external",
-        "resource": "forms-flow-web",
+        "resource": "forms-flow-ai-web",
         "public-client": true,
         "verify-token-audience": true,
         "use-resource-role-mappings": true,
@@ -33,18 +33,25 @@ objects:
         // runtime-config.js vars
           window["_env_"] =  {
             "NODE_ENV": "production",
-            "REACT_APP_APPLICATION_NAME": "${REACT_APP_APPLICATION_NAME}",
+            "REACT_APP_CLIENT_ROLE": "formsflow-client",
+            "REACT_APP_STAFF_DESIGNER_ROLE": "formsflow-designer",
+            "REACT_APP_STAFF_REVIEWER_ROLE": "formsflow-reviewer",
+            "REACT_APP_CLIENT_ID": "${REACT_APP_CLIENT_ID}",
+            "REACT_APP_STAFF_REVIEWER_ID": "${REACT_APP_STAFF_REVIEWER_ID}",
+            "REACT_APP_STAFF_DESIGNER_ID": "${REACT_APP_STAFF_DESIGNER_ID}",
+            "REACT_APP_USER_RESOURCE_FORM_ID": "${REACT_APP_USER_RESOURCE_FORM_ID}",
+            "REACT_APP_API_SERVER_URL": "${REACT_APP_FORMS_SERVER_URL}",
+            "REACT_APP_API_PROJECT_URL": "${REACT_APP_FORMS_SERVER_URL}",
+            "REACT_APP_CAMUNDA_API_URI": "${REACT_APP_CAMUNDA_API_URI}",
+            "REACT_APP_KEYCLOAK_CLIENT": "forms-flow-web",
+            "REACT_APP_WEB_BASE_URL": "${REACT_APP_API_BASE_URL}",
+            "REACT_APP_ANONYMOUS_ID": "${REACT_APP_ANONYMOUS_ID}",
+            "REACT_APP_WEBSOCKET_ENCRYPT_KEY": "${REACT_APP_WEBSOCKET_ENCRYPT_KEY}",
+            "REACT_APP_KEYCLOAK_URL_REALM": "${REALM}",
             "REACT_APP_KEYCLOAK_URL": "${REACT_APP_KEYCLOAK_URL}",
-            "REACT_APP_KEYCLOAK_URL_REALM": "${REACT_APP_KEYCLOAK_URL_REALM}",
-            "REACT_APP_KEYCLOAK_CLIENT": "forms-flow-web",            
-            "REACT_APP_SOCKETIO_CONNECT_URL": "${REACT_APP_SOCKETIO_CONNECT_URL}",
-            "REACT_APP_SOCKETIO_CONNECT_NONCE": "${REACT_APP_SOCKETIO_CONNECT_NONCE}",
-            "REACT_APP_SOCKETIO_RECONNECTION_DELAY_MAX": ${REACT_APP_SOCKETIO_RECONNECTION_DELAY_MAX},
-            "REACT_APP_SOCKETIO_RECONNECTION_DELAY": ${REACT_APP_SOCKETIO_RECONNECTION_DELAY},            
-            "REACT_APP_AXIS_API_URL": "${REACT_APP_AXIS_API_URL}",
-            "REACT_APP_FOI_FLOW_REPORTING_URL": "${REACT_APP_FOI_FLOW_REPORTING_URL}",            
-            "REACT_APP_CAMUNDA_API_URI": "${REACT_APP_CAMUNDA_API_URI}",            
-            "REACT_APP_FOI_BASE_API_URL": "${REACT_APP_FOI_BASE_API_URL}"
+            "REACT_APP_APPLICATION_NAME": "${REACT_APP_APPLICATION_NAME}",
+            "REACT_APP_FORMIO_JWT_SECRET": "${REACT_APP_FORMIO_JWT_SECRET}",
+            "REACT_APP_USER_ACCESS_PERMISSIONS": {"accessAllowApplications":true, "accessAllowSubmissions":true}
           }
 
   -
@@ -86,20 +93,10 @@ objects:
         spec:
           containers:
             - env:
-              image: docker-registry.default.svc:5000/${IMAGE_NAMESPACE}/${IMAGE_NAME}:${TAG_NAME}
+              image: docker-registry.default.svc:5000/${IMAGE_NAMESPACE}/${NAME}:${TAG_NAME}
               name: ${NAME}
               ports:
                 - containerPort: 8080
-              readinessProbe:
-                failureThreshold: 3
-                httpGet:
-                  path: /index
-                  port: 8080
-                  scheme: HTTP
-                initialDelaySeconds: 60
-                periodSeconds: 60
-                successThreshold: 1
-                timeoutSeconds: 3
               resources: {}
               tty: true
               volumeMounts:
@@ -129,7 +126,7 @@ objects:
             from:
               kind: ImageStreamTag
               namespace: "${IMAGE_NAMESPACE}"
-              name: "${IMAGE_NAME}:${TAG_NAME}"
+              name: "${NAME}:${TAG_NAME}"
           type: ImageChange
     status: {}
 
@@ -174,25 +171,24 @@ parameters:
     displayName: APP_NAME
     description: The name assigned to all of the OpenShift resources associated to the forms-flow-ai
     required: true
-    value: foi-web
+    value: forms-flow-ai
   - name: NAME
     displayName: Name
     description: The name assigned to all of the OpenShift resources associated to the
       server instance.
     required: true
+    value: forms-flow-ai-web
   - name: IMAGE_NAMESPACE
     displayName: Image Namespace
     required: true
     description: The namespace of the OpenShift project containing the imagestream for
       the application.
-  - name: IMAGE_NAME
-    displayName: IMAGE_NAME
-    required: true
-    description: Image name to be pulled
+    value: ""
   - name: TAG_NAME
     displayName: Environment TAG name
     description: The TAG name for this environment, e.g., dev, test, prod
     required: true
+    value: ""
   - name: CPU_REQUEST
     displayName: Resources CPU Request
     description: The resources CPU request (in cores) for this build.
@@ -202,17 +198,17 @@ parameters:
     displayName: Resources CPU Limit
     description: The resources CPU limit (in cores) for this build.
     required: true
-    value: 200m
+    value: 750m
   - name: MEMORY_REQUEST
     displayName: Resources Memory Request
     description: The resources Memory request (in Mi, Gi, etc) for this build.
     required: true
-    value: 512Mi
+    value: 100Mi
   - name: MEMORY_LIMIT
     displayName: Resources Memory Limit
     description: The resources Memory limit (in Mi, Gi, etc) for this build.
     required: true
-    value: 1Gi
+    value: 2Gi
   - name: KC_MOUNT_PATH
     displayName: Mount config directory.
     description: The path to where the app config directory will get mounted.
@@ -228,48 +224,63 @@ parameters:
     description:
       Route to access Forms Flow AI Web site
     required: true
-  - name: REACT_APP_APPLICATION_NAME
-    displayName: REACT_APP_APPLICATION_NAME
-    description: the name displayed in the application home page
+  - name: REACT_APP_CLIENT_ID
+    displayName: REACT_APP_CLIENT_ID
+    description:
+      Route to access Forms Flow AI Web site
+    required: true
+  - name: REACT_APP_STAFF_REVIEWER_ID
+    displayName: REACT_APP_STAFF_REVIEWER_ID
+    description:
+      Route to access Forms Flow AI Web site
+    required: true
+  - name: REACT_APP_STAFF_DESIGNER_ID
+    displayName: REACT_APP_STAFF_DESIGNER_ID
+    description:
+      Route to access Forms Flow AI Web site
+    required: true
+  - name: REACT_APP_USER_RESOURCE_FORM_ID
+    displayName: REACT_APP_USER_RESOURCE_FORM_ID
+    description:
+      Route to access Forms Flow AI Web site
+    required: true
+  - name: REACT_APP_ANONYMOUS_ID
+    displayName: REACT_APPREACT_APP_ANONYMOUS_ID_CLIENT_ID
+    description:
+      Route to access Forms Flow AI Web site
+    required: true
+  - name: REACT_APP_API_BASE_URL
+    displayName: REACT_APP_API_BASE_URL
+    description:
+      Route to access Forms Flow AI AOI Web site
+    required: true
+  - name: REACT_APP_CAMUNDA_API_URI
+    displayName: REACT_APP_CAMUNDA_API_URI
+    description: Route to access Forms Flow API URL
+    required: true
+  - name: REACT_APP_FORMS_SERVER_URL
+    displayName: REACT_APP_FORMS_SERVER_URL
+    description:
+      Route to access Forms Flow AI Web site
+    required: true
+  - name: REACT_APP_WEBSOCKET_ENCRYPT_KEY
+    displayName: REACT_APP_WEBSOCKET_ENCRYPT_KEY
+    description:
+    required: true
+  - name: REALM
+    displayName: REALM
+    description: oidc REALM
     required: true
   - name: REACT_APP_KEYCLOAK_URL
     displayName: REACT_APP_KEYCLOAK_URL
     description: keycloak url without auth part in the url
-    required: true    
-  - name: REACT_APP_KEYCLOAK_URL_REALM
-    displayName: REACT_APP_KEYCLOAK_URL_REALM
-    description: oidc REALM
     required: true
-  - name: REACT_APP_SOCKETIO_CONNECT_URL
-    displayName: REACT_APP_SOCKETIO_CONNECT_URL
-    description: SocketIO Connect URL
+  - name: REACT_APP_APPLICATION_NAME
+    displayName: REACT_APP_APPLICATION_NAME
+    description: the name displayed in the application home page
     required: true
-  - name: REACT_APP_SOCKETIO_CONNECT_NONCE
-    displayName: REACT_APP_SOCKETIO_CONNECT_NONCE
-    description: SocketIO Connect Nonce
+  - name: REACT_APP_FORMIO_JWT_SECRET
+    displayName: FORMIO_JWT_SECRET
+    description: FormIO JWT Secret
     required: true
-  - name: REACT_APP_SOCKETIO_RECONNECTION_DELAY_MAX
-    displayName: REACT_APP_SOCKETIO_RECONNECTION_DELAY_MAX
-    description: SocketIO Reconnect Delay Max in Seconds
-    required: true
-  - name: REACT_APP_SOCKETIO_RECONNECTION_DELAY
-    displayName: REACT_APP_SOCKETIO_RECONNECTION_DELAY
-    description: SocketIO Reconnect Delay in Seconds
-    required: true        
-  - name: REACT_APP_AXIS_API_URL
-    displayName: REACT_APP_AXIS_API_URL
-    description: Integrated System. legacy API URL
-    required: true
-  - name: REACT_APP_FOI_FLOW_REPORTING_URL
-    displayName: REACT_APP_FOI_FLOW_REPORTING_URL
-    description: Integrated System. Reporting SSO URL
-    required: true    
-  - name: REACT_APP_CAMUNDA_API_URI
-    displayName: REACT_APP_CAMUNDA_API_URI
-    description:
-      Route to access Forms Flow AI Web site
-    required: true
-  - name: REACT_APP_FOI_BASE_API_URL
-    displayName: REACT_APP_FOI_BASE_API_URL
-    description: Business API url
-    required: true
+        
