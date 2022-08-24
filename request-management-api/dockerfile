@@ -2,7 +2,7 @@
 # FROM python:3.8
 
 # Necessary to pull images from bcgov and not hit Dockerhub quotas.
-FROM docker-remote.artifacts.developer.gov.bc.ca/python:3.8.5-buster
+FROM artifacts.developer.gov.bc.ca/docker-remote/python:3.8.5-buster
 EXPOSE 6402
 
 # Keeps Python from generating .pyc files in the container
