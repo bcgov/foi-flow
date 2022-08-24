@@ -154,6 +154,7 @@ export const CFRForm = ({
     formStatus: "init",
     amountDue: 0,
     amountPaid: 0,
+    balanceRemaining:0,
     estimates: {
       locating: 0,
       producing: 0,
@@ -184,6 +185,7 @@ export const CFRForm = ({
       formStatus: initialState.status === null ? 'init' : initialState.status,
       amountDue: initialState.feedata.totalamountdue,
       amountPaid: initialState.feedata.amountpaid,
+      balanceRemaining: +(initialState.feedata.totalamountdue - initialState.feedata.amountpaid)?.toFixed(2),
       estimates: {
         locating: initialState.feedata.estimatedlocatinghrs,
         producing: initialState.feedata.estimatedproducinghrs,
@@ -253,6 +255,13 @@ export const CFRForm = ({
     setFormData(values => ({...values, [name]: value}));
   };
 
+  // const handleBalanceRemainingChanges = () => {
+  //   const value = (formData?.amountDue - formData?.amountPaid)?.toFixed(2)
+  //   setFormData(values => ({...values, ["balanceRemaining"]: value}));
+  // }
+
+  
+
   const handleEstimateChanges = (e: React.ChangeEvent<HTMLInputElement>) => {
     const name: string = e.target.name;
     const value: number = +e.target.value;
@@ -308,10 +317,12 @@ export const CFRForm = ({
     if (isMinistry) {
       if(isNewCFRForm)
         formData.formStatus = 'review';
+      console.log("cfrFeeId",cfrFeeId);
       data = {
         feedata:{
           amountpaid: formData.amountPaid,
           totalamountdue: formData.amountDue,
+          balanceremaining: +(formData?.amountDue - formData?.amountPaid)?.toFixed(2),
           estimatedlocatinghrs: formData.estimates.locating,
           actuallocatinghrs: formData.actual.locating,
           estimatedproducinghrs: formData.estimates.producing,
@@ -327,7 +338,7 @@ export const CFRForm = ({
         },
         overallsuggestions: formData.suggestions,
         status: formData.formStatus === 'init' ? '' : formData.formStatus,
-        cfrfeeid:cfrFeeId
+        cfrfeeid:cfrFeeId ? cfrFeeId : null
       }
     } else {
       data = {
@@ -336,6 +347,7 @@ export const CFRForm = ({
           estimatediaopreparinghrs: formData.estimates.iaoPreparing,
           actualiaopreparinghrs: formData.actual.iaoPreparing,
           totalamountdue: formData.amountDue,
+          balanceremaining: +(formData?.amountDue - formData?.amountPaid)?.toFixed(2),
         },
         status: formData.formStatus,
         //cfrfeeid:cfrFeeId
@@ -383,6 +395,7 @@ export const CFRForm = ({
   };
 
   const cfrActualsDisabled = () => {
+    console.log("status1",formData?.formStatus);
     if(!isMinistry || formData?.formStatus !== 'approved' || requestState !== StateEnum.callforrecords.name)
       return true;
     if (isMinistry && formData?.amountPaid > 0){
@@ -392,8 +405,9 @@ export const CFRForm = ({
   } 
 
   const cfrEstimatedDisabled = () => {
+    console.log("status",initialFormData?.formStatus);
     if(!isMinistry || initialFormData?.formStatus === 'approved' || initialFormData?.formStatus === 'review' ||
-      (isMinistry && formData?.amountPaid > 0))
+      (isMinistry && formData?.amountPaid > 0 && !isNewCFRForm))
       return true;
     return false;
   } 
@@ -404,6 +418,10 @@ export const CFRForm = ({
   }
 
   const newCFRForm = () => {
+    //const newFormData = blankForm;
+    console.log("initialState",initialState);
+    console.log("blankForm",blankForm);
+    blankForm.amountPaid= initialState?.feedata?.amountpaid;
     setInitialFormData(blankForm);
     setFormData(blankForm);
     setIsNewCFRForm(true);
@@ -481,7 +499,7 @@ export const CFRForm = ({
                   value={formData?.amountPaid}
                   onChange={handleAmountPaidChanges}
                   onBlur={(e) => {
-                    e.target.value = parseFloat(e.target.value).toFixed(2);
+                    e.target.value = parseFloat(e.target.value)?.toFixed(2);
                   }}
                   fullWidth
                   disabled={isMinistry || requestState === StateEnum.feeassessed.name || formData?.formStatus !== 'approved'}
@@ -499,7 +517,7 @@ export const CFRForm = ({
                   }}
                   InputLabelProps={{ shrink: true }}
                   name="amountDue"
-                  value={formData?.amountDue.toFixed(2)}
+                  value={formData?.amountDue?.toFixed(2)}
                   onChange={handleAmountChanges}
                   variant="outlined"
                   placeholder="0"
@@ -514,7 +532,7 @@ export const CFRForm = ({
                 <span className="formLabel">Balance Remaining</span>
               </div>
               <div className="col-lg-2 foi-details-col">
-                <span className="formLabel">{"$"+(formData?.amountDue - formData?.amountPaid).toFixed(2)}</span>
+                <span className="formLabel">{"$"+(formData?.amountDue - formData?.amountPaid)?.toFixed(2)}</span>
               </div>
             </div>
             <div className="row foi-details-row">

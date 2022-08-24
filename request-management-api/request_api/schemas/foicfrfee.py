@@ -15,6 +15,7 @@ class FOIFeeDataSchema(Schema):
 
     amountpaid = fields.Float(data_key="amountpaid")
     totalamountdue = fields.Float(data_key="totalamountdue")
+    balanceremaining = fields.Float(data_key="balanceremaining")
     estimatedlocatinghrs = fields.Float(data_key="estimatedlocatinghrs")
     actuallocatinghrs = fields.Float(data_key="actuallocatinghrs")
     estimatedproducinghrs = fields.Float(data_key="estimatedproducinghrs")
@@ -46,6 +47,7 @@ class FOIFeeDataSanctionSchema(Schema):
     estimatediaopreparinghrs = fields.Float(data_key="estimatediaopreparinghrs")
     actualiaopreparinghrs = fields.Float(data_key="actualiaopreparinghrs")
     totalamountdue = fields.Float(data_key="totalamountdue")
+    balanceremaining = fields.Float(data_key="balanceremaining")
     
 class FOICFRFeeSanctionSchema(Schema):
     class Meta:  # pylint: disable=too-few-public-methods

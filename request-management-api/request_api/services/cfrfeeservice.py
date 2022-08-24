@@ -41,17 +41,17 @@ class cfrfeeservice:
         
         cfrfeeid= ""
         cfrfee = FOIRequestCFRFee()
-        lkupcfrfee = self.getcfrfee(ministryrequestid)      
+        lkupcfrfee = self.getcfrfee(ministryrequestid) 
         if(issantioncfrfee is False):
             cfrfeeid= data["cfrfeeid"]     
         _version = 1
         if lkupcfrfee:
-            if(issantioncfrfee is False or cfrfeeid is None):
+            if(issantioncfrfee is False and cfrfeeid is None):
                 cfrfeeid =  lkupcfrfee['cfrfeeid'] + 1
                 cfrfee.cfrfeeid = cfrfeeid
             else:
                 cfrfee.__dict__.update(lkupcfrfee)
-                _version =  lkupcfrfee['version'] + 1
+            _version =  lkupcfrfee['version'] + 1
         cfrfee.version = _version   
         cfrfee.ministryrequestid = ministryrequestid
         cfrfee.ministryrequestversion = FOIMinistryRequest.getversionforrequest(ministryrequestid)
