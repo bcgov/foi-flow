@@ -12,6 +12,8 @@ class templateconfig:
             return "fee_payment_confirmation_half.html"
         elif key == "FULLPAYMENT":
             return "fee_payment_confirmation_full.html"
+        elif key == "PAYOUTSTANDING":
+            return "fee_estimate_notification_outstanding.html"
         else:
             logging.info("Unknown key")
             return None
@@ -40,6 +42,10 @@ class templateconfig:
             return "Fee Estimate - Payment Receipt Sent"
         elif key == "FEE-ESTIMATE-PAYMENT-RECEIPT-FAILURE":
             return "Fee Estimate - Payment Receipt Correspondence Failed"
+        elif key == "PAYOUTSTANDING":
+            return "Fees - Estimate Outstanding Sent"
+        elif key == "PAYOUTSTANDING-SEND-FAILURE":
+            return "Fees - Estimate Outstanding Correspondence Failed"
         return None
 
     def getattachmentcategory(self, key):
@@ -55,6 +61,12 @@ class templateconfig:
             return "Fee Estimate - Payment Success"
         elif key == "FEE-ESTIMATE-PAYMENT-RECEIPT-FAILED":
             return "Fee Estimate - Payment Success - Correspondence Failed"
+        elif key == "PAYOUTSTANDING":
+            return "RESPONSE-ONHOLD"
+        elif key == "PAYOUTSTANDING-SUCCESSFUL":
+            return "Fee Estimate Outstanding - Letter"
+        elif key == "PAYOUTSTANDING-FAILED":
+            return "Fee Estimate Outstanding - Correspondence Failed"
         return None 
     
 
