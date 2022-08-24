@@ -65,7 +65,6 @@ export const saveCFRForm = (
     "<ministryrequestid>",
     ministryId
   );
-
   httpPOSTRequest(apiUrl, data)
     .then((res) => {
       if (res.data) {

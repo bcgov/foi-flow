@@ -150,9 +150,11 @@ export const CFRForm = ({
   const formHistory: Array<any> = useSelector((state: any) => state.foiRequests.foiRequestCFRFormHistory);
 
   const blankForm: CFRFormData = {
+    cfrfeeid: null,
     formStatus: "init",
     amountDue: 0,
     amountPaid: 0,
+    balanceRemaining:0,
     estimates: {
       locating: 0,
       producing: 0,
@@ -172,15 +174,18 @@ export const CFRForm = ({
     suggestions: ''
   };
 
-  const [initialFormData, setInitialFormData] = React.useState(blankForm);
-
-  const [formData, setFormData] = React.useState(initialFormData);
+  const [initialFormData, setInitialFormData] = useState(blankForm);
+  const [formData, setFormData] = useState(initialFormData);
+  const [isNewCFRForm, setIsNewCFRForm] = useState(false);
+  
 
   React.useEffect(() => {
+    
     var formattedData = {
       formStatus: initialState.status === null ? 'init' : initialState.status,
       amountDue: initialState.feedata?.totalamountdue,
       amountPaid: initialState.feedata?.amountpaid,
+      balanceRemaining: +(initialState.feedata?.totalamountdue - initialState.feedata?.amountpaid)?.toFixed(2),
       estimates: {
         locating: initialState.feedata?.estimatedlocatinghrs,
         producing: initialState.feedata?.estimatedproducinghrs,
@@ -214,8 +219,6 @@ export const CFRForm = ({
     }
   }, [initialFormData, formData]);
 
-  // React.useEffect(() => {
-  // }, []);
 
   const validateField = (value: number, step: number) => {
     return (value % step) !== 0;
@@ -252,6 +255,13 @@ export const CFRForm = ({
     setFormData(values => ({...values, [name]: value}));
   };
 
+  // const handleBalanceRemainingChanges = () => {
+  //   const value = (formData?.amountDue - formData?.amountPaid)?.toFixed(2)
+  //   setFormData(values => ({...values, ["balanceRemaining"]: value}));
+  // }
+
+  
+
   const handleEstimateChanges = (e: React.ChangeEvent<HTMLInputElement>) => {
     const name: string = e.target.name;
     const value: number = +e.target.value;
@@ -286,6 +296,7 @@ export const CFRForm = ({
   } 
 
   const save = () => {
+    const cfrFeeId = isNewCFRForm ? formData?.cfrfeeid : initialState?.cfrfeeid;
     var callback = (_res: string) => {
       setInitialFormData(formData)
       toast.success("CFR Form has been saved successfully.", {
@@ -304,10 +315,14 @@ export const CFRForm = ({
     };
     var data;
     if (isMinistry) {
+      if(isNewCFRForm)
+        formData.formStatus = 'review';
+      console.log("cfrFeeId",cfrFeeId);
       data = {
         feedata:{
           amountpaid: formData.amountPaid,
           totalamountdue: formData.amountDue,
+          balanceremaining: +(formData?.amountDue - formData?.amountPaid)?.toFixed(2),
           estimatedlocatinghrs: formData.estimates.locating,
           actuallocatinghrs: formData.actual.locating,
           estimatedproducinghrs: formData.estimates.producing,
@@ -322,7 +337,8 @@ export const CFRForm = ({
           actualhardcopypages: formData.actual.hardcopyPages,
         },
         overallsuggestions: formData.suggestions,
-        status: formData.formStatus === 'init' ? '' : formData.formStatus
+        status: formData.formStatus === 'init' ? '' : formData.formStatus,
+        cfrfeeid:cfrFeeId ? cfrFeeId : null
       }
     } else {
       data = {
@@ -331,8 +347,10 @@ export const CFRForm = ({
           estimatediaopreparinghrs: formData.estimates.iaoPreparing,
           actualiaopreparinghrs: formData.actual.iaoPreparing,
           totalamountdue: formData.amountDue,
+          balanceremaining: +(formData?.amountDue - formData?.amountPaid)?.toFixed(2),
         },
-        status: formData.formStatus
+        status: formData.formStatus,
+        //cfrfeeid:cfrFeeId
       }
     }
     saveCFRForm(
@@ -377,6 +395,7 @@ export const CFRForm = ({
   };
 
   const cfrActualsDisabled = () => {
+    console.log("status1",formData?.formStatus);
     if(!isMinistry || formData?.formStatus !== 'approved' || requestState !== StateEnum.callforrecords.name)
       return true;
     if (isMinistry && formData?.amountPaid > 0){
@@ -386,8 +405,9 @@ export const CFRForm = ({
   } 
 
   const cfrEstimatedDisabled = () => {
+    console.log("status",initialFormData?.formStatus);
     if(!isMinistry || initialFormData?.formStatus === 'approved' || initialFormData?.formStatus === 'review' ||
-      (isMinistry && formData?.amountPaid > 0))
+      (isMinistry && formData?.amountPaid > 0 && !isNewCFRForm))
       return true;
     return false;
   } 
@@ -395,6 +415,20 @@ export const CFRForm = ({
   const [historyModalOpen, setHistoryModal] = useState(false);
   const handleHistoryClose = () => {
     setHistoryModal(false);
+  }
+
+  const disableNewCfrFormBtn = () => {
+    return(formData?.formStatus !== 'approved' || (requestState !== StateEnum.callforrecords.name && 
+      requestState !== StateEnum.feeassessed.name && requestState !== StateEnum.onhold.name));
+  }
+
+  const newCFRForm = () => {
+    console.log("initialState",initialState);
+    console.log("blankForm",blankForm);
+    blankForm.amountPaid= initialState?.feedata?.amountpaid;
+    setInitialFormData(blankForm);
+    setFormData(blankForm);
+    setIsNewCFRForm(true);
   }
 
 
@@ -928,16 +962,26 @@ export const CFRForm = ({
                   </AccordionDetails>
                 </Accordion>
               </div>
-              <div className="col-lg-4 buttonContainer">
+              <div className="foi-bottom-button-group cfrform"> 
                 <button
                   type="button"
-                  className="btn saveButton"
+                  className="btn btn-bottom btn-save"
                   onClick={save}
                   color="primary"
                   disabled={!validateFields()}
                 >
                   Save
                 </button>
+                {isMinistry &&
+                  <button
+                    type="button"
+                    className="btn btn-bottom btn-cancel"
+                    onClick={newCFRForm}
+                    disabled={disableNewCfrFormBtn()}
+                  >
+                    + Create New CFR Form
+                  </button>
+                }
               </div>
             </div>
         </div>

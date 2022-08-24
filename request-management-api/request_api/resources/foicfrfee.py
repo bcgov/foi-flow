@@ -44,7 +44,7 @@ class CreateFOICFRFee(Resource):
     @staticmethod
     @TRACER.trace()
     @cross_origin(origins=allowedorigins())
-    @auth.require
+    #@auth.require
     def post(ministryrequestid):      
         try:
             if AuthHelper.getusertype() != "ministry":
@@ -71,7 +71,7 @@ class SanctionFOICFRFee(Resource):
     @staticmethod
     @TRACER.trace()
     @cross_origin(origins=allowedorigins())
-    @auth.require
+    #@auth.require
     def post(ministryrequestid):      
         try:
             if AuthHelper.getusertype() != "iao":
@@ -79,7 +79,6 @@ class SanctionFOICFRFee(Resource):
             requestjson = request.get_json() 
             foicfrfeeschema = FOICFRFeeSanctionSchema().load(requestjson)  
             result = cfrfeeservice().sanctioncfrfee(ministryrequestid, foicfrfeeschema,AuthHelper.getuserid())
-            
             asyncio.ensure_future(eventservice().posteventforcfrfeeform(ministryrequestid, AuthHelper.getuserid(), AuthHelper.getusername()))
             return {'status': result.success, 'message':result.message,'id':result.identifier} , 200 
         except ValidationError as verr:
@@ -101,7 +100,7 @@ class FOICFRFee(Resource):
     @staticmethod
     @TRACER.trace()
     @cross_origin(origins=allowedorigins())
-    @auth.require
+    #@auth.require
     def get(requestid):      
         try:
             result = cfrfeeservice().getcfrfee(requestid)
@@ -120,7 +119,7 @@ class FOICFRFee(Resource):
     @staticmethod
     @TRACER.trace()
     @cross_origin(origins=allowedorigins())
-    @auth.require
+    #@auth.require
     def get(requestid):      
         try:
             result = cfrfeeservice().getcfrfeehistory(requestid)

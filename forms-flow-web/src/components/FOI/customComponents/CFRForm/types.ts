@@ -1,7 +1,9 @@
 export type CFRFormData = {
+    cfrfeeid?: any;
     formStatus: string;
     amountDue: number;
     amountPaid: number;
+    balanceRemaining: number;
     estimates: {
       locating: number;
       producing: number;

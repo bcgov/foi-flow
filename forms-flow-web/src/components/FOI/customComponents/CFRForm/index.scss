@@ -127,6 +127,14 @@
   padding-right: 0 !important;
 }
 
+.cfrform { 
+  .btn-cancel {
+    border: 1px solid #38598A !important;
+    background-color: #FFFFFF !important;
+    color: #38598A !important;
+  }
+}
+
 @media (max-width: 1444px) {
   .cfrform-floatRightRight {
     display: none;
