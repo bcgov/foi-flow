@@ -149,6 +149,9 @@ export default function ConfirmationModal({requestId, openModal, handleModal, st
         else if (saveRequestObject.requeststatusid === StateEnum.feeassessed.id
           && state.toLowerCase() === StateEnum.onhold.name.toLowerCase())
           fileStatusTransition = StateTransitionCategories.feeonhold.name;
+        else if (saveRequestObject.requeststatusid === StateEnum.response.id
+            && state.toLowerCase() === StateEnum.onhold.name.toLowerCase())
+            fileStatusTransition = StateTransitionCategories.responseonhold.name;
 
         fileInfoList = files.map(file => {
           return {
