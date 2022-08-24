@@ -65,7 +65,9 @@ class cfrfeeservice:
     
     def __formatcfrfee(self,cfrfee):
         if cfrfee is not None and cfrfee != {}:
-            cfrfee['created_at'] = self.__pstformat(cfrfee['created_at'])   
+            cfrfee['created_at'] = self.__pstformat(cfrfee['created_at'])
+            if cfrfee.get('version_created_at') is not None:
+                cfrfee['version_created_at'] = self.__pstformat(cfrfee['version_created_at'])
             if cfrfee['cfrfeestatusid'] is not None:
                 cfrfee['status'] = cfrfee['cfrfeestatus.name']
                 cfrfee.pop('cfrfeestatus.name')

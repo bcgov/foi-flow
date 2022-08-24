@@ -4,6 +4,7 @@ import API from "../../endpoints";
   import {
     serviceActionError,
     setRequestCFRForm,
+    setRequestCFRFormHistory,
   } from "../../../actions/FOI/foiRequestActions";
   import { replaceUrl } from "../../../helper/FOI/helper";
   import { catchError } from "./foiServicesUtil";
@@ -24,7 +25,8 @@ export const fetchCFRForm = (
     .then((res) => {
       if (res.data) {
         if (!_.isEmpty(res.data)) {
-          dispatch(setRequestCFRForm(res.data));
+          dispatch(setRequestCFRForm(res.data.shift()));
+          dispatch(setRequestCFRFormHistory(res.data));
         }
       } else {
         console.log("Error in fetching CFR Form data", res);

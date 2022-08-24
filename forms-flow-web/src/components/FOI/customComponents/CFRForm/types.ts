@@ -31,3 +31,9 @@ export type params = {
   };
   setCFRUnsaved: Function;
 }
+
+export type modalParams = {
+  modalOpen: boolean;
+  handleClose: () => void;
+  formHistory: Array<any>
+}

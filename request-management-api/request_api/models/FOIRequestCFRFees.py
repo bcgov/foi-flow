@@ -1,12 +1,14 @@
 from flask.app import Flask
 from sqlalchemy.sql.schema import ForeignKey
 from .db import  db, ma
+from marshmallow import pre_dump, post_dump
 from datetime import datetime as datetime2
 from sqlalchemy.orm import relationship,backref
 from .default_method_result import DefaultMethodResult
 from sqlalchemy.dialects.postgresql import JSON, UUID
 from sqlalchemy.sql.expression import distinct
 from sqlalchemy import null, text, insert
+from .CFRFeeStatus import CFRFeeStatus
 import logging
 
 class FOIRequestCFRFee(db.Model):
@@ -38,19 +40,30 @@ class FOIRequestCFRFee(db.Model):
 
     @classmethod
     def getcfrfee(cls, ministryrequestid)->DefaultMethodResult:   
-        comment_schema = FOIRequestCommentSchema(many=False)
+        comment_schema = FOIRequestCFRFormSchema(many=False)
         query = db.session.query(FOIRequestCFRFee).filter_by(ministryrequestid=ministryrequestid).order_by(FOIRequestCFRFee.version.desc()).first()
         return comment_schema.dump(query)   
     
     @classmethod
     def getcfrfeehistory(cls, ministryrequestid)->DefaultMethodResult:   
-        comment_schema = FOIRequestCommentSchema(many=True)
-        query = db.session.query(FOIRequestCFRFee).filter_by(ministryrequestid=ministryrequestid).order_by(FOIRequestCFRFee.version.desc()).all()
-        return comment_schema.dump(query) 
+        comment_schema = FOIRequestCFRFormSchema(many=False)
+        subquery1 = db.session.query(FOIRequestCFRFee.cfrfeeid, db.func.max(FOIRequestCFRFee.version).label('version')).group_by(FOIRequestCFRFee.cfrfeeid).subquery()
+        subquery2 = db.session.query(FOIRequestCFRFee.cfrfeeid, FOIRequestCFRFee.created_at.label('version_created_at'), FOIRequestCFRFee.createdby.label('version_createdby')).filter_by(version=1).subquery()
+        query = db.session.query(FOIRequestCFRFee, subquery2.c.version_created_at, subquery2.c.version_createdby).filter_by(ministryrequestid=ministryrequestid).join(
+            subquery1, (FOIRequestCFRFee.cfrfeeid == subquery1.c.cfrfeeid) & (FOIRequestCFRFee.version == subquery1.c.version)
+        ).join(subquery2, (FOIRequestCFRFee.cfrfeeid == subquery2.c.cfrfeeid)).order_by(FOIRequestCFRFee.cfrfeeid.desc()).all()
+        history = []
+        for row in query:
+            print(row)
+            cfrfee = comment_schema.dump(row[0])
+            cfrfee['version_created_at'] = row[1]
+            cfrfee['version_createdby'] = row[2]
+            history.append(cfrfee)
+        return history
 
     @classmethod
     def getcfrfeebyid(cls, cfrfeeid) -> DefaultMethodResult:
-        comment_schema = FOIRequestCommentSchema()
+        comment_schema = FOIRequestCFRFormSchema()
         query = db.session.query(FOIRequestCFRFee).filter_by(cfrfeeid=cfrfeeid, isactive=True).first()
         return comment_schema.dump(query)
     
@@ -63,6 +76,8 @@ class FOIRequestCFRFee(db.Model):
             requeststates.append(_entry.cfrfeestatus.description)
         return requeststates  
        
-class FOIRequestCommentSchema(ma.Schema):
+class FOIRequestCFRFormSchema(ma.Schema):
     class Meta:
         fields = ('cfrfeeid', 'ministryrequestid', 'feedata', 'overallsuggestions', 'created_at','createdby','updated_at','updatedby','cfrfeestatusid', 'cfrfeestatus.name','cfrfeestatus.description','version') 
+
+
