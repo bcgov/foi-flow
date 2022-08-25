@@ -125,7 +125,8 @@ export default function ConfirmationModal({requestId, openModal, handleModal, st
         return true;
       }
       return files.length === 0 
-        && ((!allowStateChange && state.toLowerCase() === StateEnum.review.name.toLowerCase())
+            && (!isAnyAmountPaid && state.toLowerCase() === StateEnum.review.name.toLowerCase() && (saveRequestObject.requeststatusid === StateEnum.callforrecords.id ||
+              saveRequestObject.requeststatusid === StateEnum.harms.id)
             || (state.toLowerCase() === StateEnum.response.name.toLowerCase() && saveRequestObject.requeststatusid === StateEnum.signoff.id)
             || (state.toLowerCase() === StateEnum.onhold.name.toLowerCase() && saveRequestObject.requeststatusid === StateEnum.feeassessed.id && 
               saveRequestObject.email)
