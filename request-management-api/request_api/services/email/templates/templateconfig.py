@@ -24,6 +24,8 @@ class templateconfig:
             return "Your FOI Request ["+requestjson["axisRequestId"]+"]"
         elif key == "FEE-ESTIMATE-PAYMENT-RECEIPT":
             return "Your FOI Request ["+requestjson["axisRequestId"]+"] - Fee Payment Received"
+        elif key == "PAYOUTSTANDING":
+            return "Your FOI Request ["+requestjson["axisRequestId"]+"] - Outstanding Fee Estimate"
         return None   
         
     def getstage(self, key):        
