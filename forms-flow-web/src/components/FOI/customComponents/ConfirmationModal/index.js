@@ -149,6 +149,9 @@ export default function ConfirmationModal({requestId, openModal, handleModal, st
         else if (saveRequestObject.requeststatusid === StateEnum.feeassessed.id
           && state.toLowerCase() === StateEnum.onhold.name.toLowerCase())
           fileStatusTransition = StateTransitionCategories.feeonhold.name;
+        else if (saveRequestObject.requeststatusid === StateEnum.response.id
+            && state.toLowerCase() === StateEnum.onhold.name.toLowerCase())
+            fileStatusTransition = StateTransitionCategories.responseonhold.name;
 
         fileInfoList = files.map(file => {
           return {
@@ -190,7 +193,7 @@ export default function ConfirmationModal({requestId, openModal, handleModal, st
             && saveRequestObject.requeststatusid === StateEnum.signoff.id)
           ||
           (state.toLowerCase() === StateEnum.onhold.name.toLowerCase()
-            && saveRequestObject.requeststatusid === StateEnum.feeassessed.id
+            && (saveRequestObject.requeststatusid === StateEnum.feeassessed.id || saveRequestObject.requeststatusid === StateEnum.response.id)
             && saveRequestObject.email
             && cfrStatus == 'approved'
             && amountDue !== 0)

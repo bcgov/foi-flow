@@ -8,6 +8,7 @@ import {
   MinistryStateList,
   StateEnum,
 } from "../../../constants/FOI/statusEnum";
+import { useSelector } from "react-redux";
 
 import FOI_COMPONENT_CONSTANTS from "../../../constants/FOI/foiComponentConstants";
 
@@ -24,6 +25,9 @@ const StateDropDown = ({
   const _isMinistryCoordinator = isMinistryCoordinator;
 
   const [status, setStatus] = useState(requestState);
+  const cfrFeeData = useSelector((reduxState) => reduxState.foiRequests.foiRequestCFRForm.feedata);
+  const cfrStatus = useSelector((reduxState) => reduxState.foiRequests.foiRequestCFRForm.status);
+  const balanceDue = cfrFeeData?.totalamountdue - cfrFeeData?.amountpaid;
 
   React.useEffect(() => {
     if (requestState && requestState !== status) {
@@ -125,7 +129,13 @@ const StateDropDown = ({
       case StateEnum.response.name.toLowerCase():
         if (personalIAO)
           return _stateList.responseforpersonal;
-        return _stateList.response;
+        else if (balanceDue > 0 && cfrStatus === 'approved') {
+          return _stateList.response;
+        }
+        else {
+          return _stateList.response.filter(val => val.status.toLowerCase() !== StateEnum.onhold.name.toLowerCase());
+        }
+        
       default:
         return [];
     }

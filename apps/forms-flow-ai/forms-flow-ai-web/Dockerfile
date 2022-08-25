@@ -1,5 +1,5 @@
 # base image
-FROM docker-remote.artifacts.developer.gov.bc.ca/node:14.17.0-alpine as build-stage
+FROM artifacts.developer.gov.bc.ca/docker-remote/node:14.17.0-alpine as build-stage
 
 # set working directory
 WORKDIR /app
@@ -28,7 +28,7 @@ COPY ./${CUSTOM_SVG_DIR}/ /app/${CUSTOM_SVG_DIR}/
 RUN npm install
 RUN npm run build
 
-FROM docker-remote.artifacts.developer.gov.bc.ca/nginx:1.17 as production-stage
+FROM artifacts.developer.gov.bc.ca/docker-remote/nginx:1.17 as production-stage
 RUN mkdir /app
 COPY --from=build-stage /app/build /usr/share/nginx/html
 COPY nginx.conf /etc/nginx/nginx.conf
