@@ -139,7 +139,7 @@ const foiRequests = (state = initialState, action) => {
     case FOI_ACTION_CONSTANTS.FOI_REQUEST_CFR_FORM:
       return {
         ...state,
-        foiRequestCFRForm: _isEmpty(action.payload) ? initialState.foiRequestCFRForm : {
+        foiRequestCFRForm: _.isEmpty(action.payload) ? initialState.foiRequestCFRForm : {
           ...state.foiRequestCFRForm,
           ...action.payload
         }
