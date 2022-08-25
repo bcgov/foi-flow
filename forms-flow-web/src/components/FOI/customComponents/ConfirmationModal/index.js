@@ -279,7 +279,7 @@ export default function ConfirmationModal({requestId, openModal, handleModal, st
             </button>
           </DialogActions>
           <ConditionalComponent condition={state.toLowerCase() === StateEnum.onhold.name.toLowerCase()
-                                            && saveRequestObject.requeststatusid === StateEnum.feeassessed.id
+                                            && (saveRequestObject.requeststatusid === StateEnum.feeassessed.id || saveRequestObject.requeststatusid === StateEnum.response.id)
                                             && cfrStatus === 'approved'
                                             && !saveRequestObject.email}>
             <div id="state-change-dialog-checkbox">
