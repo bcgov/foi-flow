@@ -214,6 +214,13 @@ export const setRequestCFRForm = (data) => dispatch => {
     })
 }
 
+export const setRequestCFRFormHistory = (data) => dispatch => {
+    dispatch({
+        type:FOI_ACTION_CONSTANTS.FOI_REQUEST_CFR_FORM_HISTORY,
+        payload:data
+    })
+}
+
 export const setRequestExtensions = (data) => (dispatch) => {
   dispatch({
     type: FOI_ACTION_CONSTANTS.FOI_REQUEST_EXTENSIONS,
