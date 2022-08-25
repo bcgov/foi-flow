@@ -17,7 +17,7 @@ import { useSelector } from "react-redux";
 import './confirmationmodal.scss';
 import { StateEnum, StateTransitionCategories } from '../../../../constants/FOI/statusEnum';
 import FileUpload from '../FileUpload'
-import { formatDate, calculateDaysRemaining, ConditionalComponent } from "../../../../helper/FOI/helper";
+import { formatDate, calculateDaysRemaining, ConditionalComponent, isMinistryLogin } from "../../../../helper/FOI/helper";
 import { MimeTypeList, MaxFileSizeInMB, MaxNumberOfFiles } from "../../../../constants/FOI/enum";
 import { getMessage, getAssignedTo, getMinistryGroup, getSelectedMinistry, getSelectedMinistryAssignedTo, getProcessingTeams, getUpdatedAssignedTo } from './util';
 
@@ -76,6 +76,9 @@ export default function ConfirmationModal({requestId, openModal, handleModal, st
       setFiles(_files);
     }
     const [disableSaveBtn, setDisableSaveBtn] = React.useState( true );
+    const user = useSelector((reduxState) => reduxState.user.userDetail);
+    const userGroups = user?.groups?.map(group => group.slice(1));
+    let isMinistry = isMinistryLogin(userGroups);
 
     const cfrStatus = useSelector((reduxState) => reduxState.foiRequests.foiRequestCFRForm.status);
     const cfrFeeData = useSelector((reduxState) => reduxState.foiRequests.foiRequestCFRForm.feedata);
@@ -89,7 +92,7 @@ export default function ConfirmationModal({requestId, openModal, handleModal, st
     ];
     let allowStateChange = true;
     let isAnyAmountPaid = false;
-    if(cfrFeeData?.amountpaid > 0){
+    if(cfrFeeData?.amountpaid > 0 && isMinistry){
       isAnyAmountPaid = true;
       allowStateChange = Object.keys(cfrFeeData).some(function(k) {
           return actualsFeeDataFields.includes(k) && cfrFeeData[k] > 0
@@ -102,7 +105,7 @@ export default function ConfirmationModal({requestId, openModal, handleModal, st
       setMailed(event.target.checked);
       setDisableSaveBtn(!event.target.checked);
     };
-    const user = useSelector((state) => state.user.userDetail);
+   
 
     React.useEffect(() => {
       setDisableSaveBtn(state.toLowerCase() === StateEnum.closed.name.toLowerCase());
@@ -119,11 +122,8 @@ export default function ConfirmationModal({requestId, openModal, handleModal, st
             || (state.toLowerCase() === StateEnum.onhold.name.toLowerCase() && cfrStatus === 'approved' && !saveRequestObject.email && !mailed)
             || ((state.toLowerCase() === StateEnum.deduplication.name.toLowerCase() || 
                   state.toLowerCase() === StateEnum.review.name.toLowerCase()) && !allowStateChange)) {
-                    console.log("allowStateChange",allowStateChange);
         return true;
       }
-      console.log("file size",files.length);
-      console.log("isAnyAmountPaid",isAnyAmountPaid);
       return files.length === 0 
         && ((!allowStateChange && state.toLowerCase() === StateEnum.review.name.toLowerCase())
             || (state.toLowerCase() === StateEnum.response.name.toLowerCase() && saveRequestObject.requeststatusid === StateEnum.signoff.id)
@@ -176,7 +176,8 @@ export default function ConfirmationModal({requestId, openModal, handleModal, st
     }
 
     const addorUpdateConfirmationModal = () => {
-      if (state.toLowerCase() === StateEnum.closed.name.toLowerCase() && currentState?.toLowerCase() !== StateEnum.closed.name.toLowerCase()) {
+      if (state.toLowerCase() === StateEnum.closed.name.toLowerCase() && 
+          currentState?.toLowerCase() !== StateEnum.closed.name.toLowerCase()) {
         return (
           <CloseForm saveRequestObject={saveRequestObject} handleClosingDateChange={handleClosingDateChange} handleClosingReasonChange={handleClosingReasonChange} enableSaveBtn={enableSaveBtn} />
         );
@@ -185,7 +186,7 @@ export default function ConfirmationModal({requestId, openModal, handleModal, st
         (currentState?.toLowerCase() !== StateEnum.closed.name.toLowerCase())
         && 
         (
-          (state.toLowerCase() === StateEnum.review.name.toLowerCase() && !isAnyAmountPaid)
+          (state.toLowerCase() === StateEnum.review.name.toLowerCase() && (!isAnyAmountPaid || !isMinistry))
           ||
           (state.toLowerCase() === StateEnum.response.name.toLowerCase()
             && saveRequestObject.requeststatusid === StateEnum.signoff.id)
@@ -237,8 +238,6 @@ export default function ConfirmationModal({requestId, openModal, handleModal, st
 
       }
     }
-
-    console.log("disableSaveBtn",disableSaveBtn);
 
     return (
       <div className="state-change-dialog">
