@@ -25,8 +25,8 @@ export const fetchCFRForm = (
     .then((res) => {
       if (res.data) {
         if (!_.isEmpty(res.data)) {
-          dispatch(setRequestCFRForm(res.data.shift()));
-          dispatch(setRequestCFRFormHistory(res.data));
+          dispatch(setRequestCFRForm(res.data.current));
+          dispatch(setRequestCFRFormHistory(res.data.history));
         }
       } else {
         console.log("Error in fetching CFR Form data", res);

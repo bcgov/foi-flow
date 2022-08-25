@@ -49,7 +49,8 @@ class FOIRequestCFRFee(db.Model):
         comment_schema = FOIRequestCFRFormSchema(many=False)
         subquery1 = db.session.query(FOIRequestCFRFee.cfrfeeid, db.func.max(FOIRequestCFRFee.version).label('version')).group_by(FOIRequestCFRFee.cfrfeeid).subquery()
         subquery2 = db.session.query(FOIRequestCFRFee.cfrfeeid, FOIRequestCFRFee.created_at.label('version_created_at'), FOIRequestCFRFee.createdby.label('version_createdby')).filter_by(version=1).subquery()
-        query = db.session.query(FOIRequestCFRFee, subquery2.c.version_created_at, subquery2.c.version_createdby).filter_by(ministryrequestid=ministryrequestid).join(
+        query = db.session.query(FOIRequestCFRFee, subquery2.c.version_created_at, subquery2.c.version_createdby).filter_by(
+            ministryrequestid=ministryrequestid, cfrfeestatusid=2).join(
             subquery1, (FOIRequestCFRFee.cfrfeeid == subquery1.c.cfrfeeid) & (FOIRequestCFRFee.version == subquery1.c.version)
         ).join(subquery2, (FOIRequestCFRFee.cfrfeeid == subquery2.c.cfrfeeid)).order_by(FOIRequestCFRFee.cfrfeeid.desc()).all()
         history = []
