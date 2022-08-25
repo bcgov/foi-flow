@@ -91,7 +91,7 @@ class stateevent:
 
     def __createcfrentry(self, state, ministryrequestid, userid):
         if (state == "Fee Estimate"):
-            return cfrfeeservice().createcfrfee(ministryrequestid, {"status": "review"}, userid)
+            return cfrfeeservice().sanctioncfrfee(ministryrequestid, {"status": "review"}, userid)
         else:
             return DefaultMethodResult(True,'No action needed',ministryrequestid)
 
