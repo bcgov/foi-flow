@@ -117,16 +117,18 @@ export default function ConfirmationModal({requestId, openModal, handleModal, st
             || (state.toLowerCase() === StateEnum.onhold.name.toLowerCase() && amountDue === 0)
             || (state.toLowerCase() === StateEnum.onhold.name.toLowerCase() && cfrStatus !== 'approved')
             || (state.toLowerCase() === StateEnum.onhold.name.toLowerCase() && cfrStatus === 'approved' && !saveRequestObject.email && !mailed)
-            || (saveRequestObject.requeststatusid === StateEnum.callforrecords.id && 
-                (state.toLowerCase() === StateEnum.deduplication.name.toLowerCase() || 
+            || ((state.toLowerCase() === StateEnum.deduplication.name.toLowerCase() || 
                   state.toLowerCase() === StateEnum.review.name.toLowerCase()) && !allowStateChange)) {
+                    console.log("allowStateChange",allowStateChange);
         return true;
       }
+      console.log("file size",files.length);
+      console.log("isAnyAmountPaid",isAnyAmountPaid);
       return files.length === 0 
-        && ((!isAnyAmountPaid && state.toLowerCase() === StateEnum.review.name.toLowerCase() && saveRequestObject.requeststatusid === StateEnum.callforrecords.id)
+        && ((!allowStateChange && state.toLowerCase() === StateEnum.review.name.toLowerCase())
             || (state.toLowerCase() === StateEnum.response.name.toLowerCase() && saveRequestObject.requeststatusid === StateEnum.signoff.id)
-            || (state.toLowerCase() === StateEnum.review.name.toLowerCase() && saveRequestObject.requeststatusid === StateEnum.harms.id)
-            || (state.toLowerCase() === StateEnum.onhold.name.toLowerCase() && saveRequestObject.requeststatusid === StateEnum.feeassessed.id && saveRequestObject.email)
+            || (state.toLowerCase() === StateEnum.onhold.name.toLowerCase() && saveRequestObject.requeststatusid === StateEnum.feeassessed.id && 
+              saveRequestObject.email)
           )
     }
 
@@ -183,8 +185,7 @@ export default function ConfirmationModal({requestId, openModal, handleModal, st
         (currentState?.toLowerCase() !== StateEnum.closed.name.toLowerCase())
         && 
         (
-          (state.toLowerCase() === StateEnum.review.name.toLowerCase() && (saveRequestObject.requeststatusid === StateEnum.harms.id
-            || (saveRequestObject.requeststatusid === StateEnum.callforrecords.id && !isAnyAmountPaid)))
+          (state.toLowerCase() === StateEnum.review.name.toLowerCase() && !isAnyAmountPaid)
           ||
           (state.toLowerCase() === StateEnum.response.name.toLowerCase()
             && saveRequestObject.requeststatusid === StateEnum.signoff.id)
@@ -237,6 +238,7 @@ export default function ConfirmationModal({requestId, openModal, handleModal, st
       }
     }
 
+    console.log("disableSaveBtn",disableSaveBtn);
 
     return (
       <div className="state-change-dialog">
