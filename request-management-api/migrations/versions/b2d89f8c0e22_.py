@@ -17,7 +17,7 @@ depends_on = None
 
 
 def upgrade():
-    op.execute('Select setval(pg_get_serial_sequence(\'public."DocumentTypes"\', \'document_type_id\'), 2) ;')
+    op.execute('Select setval(pg_get_serial_sequence(\'public."DocumentTypes"\', \'document_type_id\'), 1) ;')
     op.execute('insert into  public."DocumentTypes"(document_type_name, description) VALUES (\'cfr_fee_payment_receipt\', \'Cfr Fee Payment Receipt\');commit;')
 
 

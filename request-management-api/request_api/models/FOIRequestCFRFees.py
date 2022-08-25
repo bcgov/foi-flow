@@ -54,7 +54,6 @@ class FOIRequestCFRFee(db.Model):
         ).join(subquery2, (FOIRequestCFRFee.cfrfeeid == subquery2.c.cfrfeeid)).order_by(FOIRequestCFRFee.cfrfeeid.desc()).all()
         history = []
         for row in query:
-            print(row)
             cfrfee = comment_schema.dump(row[0])
             cfrfee['version_created_at'] = row[1]
             cfrfee['version_createdby'] = row[2]

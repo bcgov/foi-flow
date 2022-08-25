@@ -176,12 +176,12 @@ export const CFRForm = ({
 
   const [initialFormData, setInitialFormData] = useState(blankForm);
   const [formData, setFormData] = useState(initialFormData);
-  const [isNewCFRForm, setIsNewCFRForm] = useState(false);
   
 
   React.useEffect(() => {
     
     var formattedData = {
+      cfrfeeid: initialState.cfrfeeid,
       formStatus: initialState.status === null ? 'init' : initialState.status,
       amountDue: initialState.feedata?.totalamountdue,
       amountPaid: initialState.feedata?.amountpaid,
@@ -255,13 +255,6 @@ export const CFRForm = ({
     setFormData(values => ({...values, [name]: value}));
   };
 
-  // const handleBalanceRemainingChanges = () => {
-  //   const value = (formData?.amountDue - formData?.amountPaid)?.toFixed(2)
-  //   setFormData(values => ({...values, ["balanceRemaining"]: value}));
-  // }
-
-  
-
   const handleEstimateChanges = (e: React.ChangeEvent<HTMLInputElement>) => {
     const name: string = e.target.name;
     const value: number = +e.target.value;
@@ -289,7 +282,7 @@ export const CFRForm = ({
       if (isMinistry) {
         return initialFormData.formStatus === 'review' || initialFormData.formStatus === 'approved';
       } else {
-        return initialFormData.formStatus === 'clarification' || initialFormData.formStatus === 'init';
+        return initialFormData.formStatus !== 'review';
       }
     }
     if (requestState === StateEnum.feeassessed.name) {
@@ -303,7 +296,6 @@ export const CFRForm = ({
   } 
 
   const save = () => {
-    const cfrFeeId = isNewCFRForm ? formData?.cfrfeeid : initialState?.cfrfeeid;
     var callback = (_res: string) => {
       setInitialFormData(formData)
       toast.success("CFR Form has been saved successfully.", {
@@ -342,7 +334,7 @@ export const CFRForm = ({
         },
         overallsuggestions: formData.suggestions,
         status: formData.formStatus === 'init' ? '' : formData.formStatus,
-        cfrfeeid:cfrFeeId ? cfrFeeId : null
+        cfrfeeid: formData.cfrfeeid
       }
     } else {
       data = {
@@ -354,7 +346,6 @@ export const CFRForm = ({
           balanceremaining: +(formData?.amountDue - formData?.amountPaid)?.toFixed(2),
         },
         status: formData.formStatus,
-        //cfrfeeid:cfrFeeId
       }
     }
     saveCFRForm(
@@ -389,7 +380,7 @@ export const CFRForm = ({
       Are you sure you would like to continue?</>);
     } else if (e.target.value === 'approved') {
       setModalMessage(<>Are you sure you want to change the status to <b>"Approved"</b>? The
-      CFR form will be locked for editing, and can only be unlocked by changing the status back</>);
+      CFR form will be locked for editing{formHistory.length > 0 ? "." : ", and can only be unlocked by changing the status back."}</>);
     } else if (e.target.value === 'clarification') {
       setModalMessage(<>By changing the CFR Form Status to <b>"Needs Clarification with Ministry" </b> you
       will be sending the form to the Ministry user and locking your ability to edit the form.
@@ -398,22 +389,18 @@ export const CFRForm = ({
     setModalOpen(true);
   };
 
+  
+  const [createModalOpen, setCreateModalOpen] = useState(false);
+  const handleCreateClose = () => {
+    setCreateModalOpen(false);
+  };
+
   const cfrActualsDisabled = () => {
-    console.log("status1",formData?.formStatus);
-    if(!isMinistry || formData?.formStatus !== 'approved' || requestState !== StateEnum.callforrecords.name)
-      return true;
-    if (isMinistry && formData?.amountPaid > 0){
-        return false;
-    } 
-    return true;
+    return !isMinistry || formData?.formStatus !== 'approved' || requestState !== StateEnum.callforrecords.name || formData?.amountPaid === 0;
   } 
 
   const cfrEstimatedDisabled = () => {
-    console.log("status",initialFormData?.formStatus);
-    if(!isMinistry || initialFormData?.formStatus === 'approved' || initialFormData?.formStatus === 'review' ||
-      (isMinistry && formData?.amountPaid > 0 && !isNewCFRForm))
-      return true;
-    return false;
+    return !isMinistry || initialFormData?.formStatus === 'approved' || initialFormData?.formStatus === 'review';
   } 
 
   const [historyModalOpen, setHistoryModal] = useState(false);
@@ -427,12 +414,10 @@ export const CFRForm = ({
   }
 
   const newCFRForm = () => {
-    console.log("initialState",initialState);
-    console.log("blankForm",blankForm);
+    setCreateModalOpen(false)
     blankForm.amountPaid= initialState?.feedata?.amountpaid;
     setInitialFormData(blankForm);
     setFormData(blankForm);
-    setIsNewCFRForm(true);
   }
 
 
@@ -980,7 +965,9 @@ export const CFRForm = ({
                   <button
                     type="button"
                     className="col-lg-4 btn btn-bottom btn-cancel"
-                    onClick={newCFRForm}
+                    onClick={() => {
+                      setCreateModalOpen(true)
+                    }}
                     disabled={disableNewCfrFormBtn()}
                   >
                     + Create New CFR Form
@@ -1023,6 +1010,47 @@ export const CFRForm = ({
             Save Change
           </button>
           <button className="btn-bottom btn-cancel" onClick={handleClose}>
+            Cancel
+          </button>
+        </DialogActions>
+      </Dialog>
+    </div>
+    <div className="state-change-dialog">
+      <Dialog
+        open={createModalOpen}
+        onClose={handleCreateClose}
+        aria-labelledby="state-change-dialog-title"
+        aria-describedby="state-change-dialog-description"
+        maxWidth={'md'}
+        fullWidth={true}
+        // id="state-change-dialog"
+      >
+        <DialogTitle disableTypography id="state-change-dialog-title">
+            <h2 className="state-change-header">Create New CFR Form </h2>
+            <IconButton className="title-col3" onClick={handleCreateClose}>
+              <i className="dialog-close-button">Close</i>
+              <CloseIcon />
+            </IconButton>
+          </DialogTitle>
+        <DialogContent className={'dialog-content-nomargin'}>
+          <DialogContentText id="state-change-dialog-description" component={'span'}>
+            <span className="confirmation-message create-new-modal-message">
+              Are you sure you want to create a new, blank CFR form? <br></br>
+              <em>
+                Any unsaved changes will be lost. The previous version will be locked for editing 
+                and viewable in the CFR Form History.
+              </em>
+            </span>
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <button
+            className={`btn-bottom btn-save btn`}
+            onClick={newCFRForm}
+          >
+            Continue
+          </button>
+          <button className="btn-bottom btn-cancel" onClick={handleCreateClose}>
             Cancel
           </button>
         </DialogActions>

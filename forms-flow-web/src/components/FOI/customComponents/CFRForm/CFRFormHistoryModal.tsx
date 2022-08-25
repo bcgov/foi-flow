@@ -67,7 +67,7 @@ export const CFRFormHistoryModal = React.memo(({
                         variant="outlined"
                         name="amountPaid"
                         type="number"
-                        value={entry.feedata.amountpaid}
+                        value={parseFloat(entry.feedata.amountpaid).toFixed(2)}
                         fullWidth
                         disabled={true}
                       />
@@ -84,7 +84,7 @@ export const CFRFormHistoryModal = React.memo(({
                         }}
                         InputLabelProps={{ shrink: true }}
                         name="amountDue"
-                        value={entry.feedata.totalamountdue}                        
+                        value={parseFloat(entry.feedata.totalamountdue).toFixed(2)}                        
                         variant="outlined"
                         placeholder="0"
                         fullWidth
