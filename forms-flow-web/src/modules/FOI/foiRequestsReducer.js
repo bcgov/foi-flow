@@ -136,13 +136,7 @@ const foiRequests = (state = initialState, action) => {
     case FOI_ACTION_CONSTANTS.FOI_REQUEST_ATTACHMENTS:
       return { ...state, foiRequestAttachments: action.payload };
     case FOI_ACTION_CONSTANTS.FOI_REQUEST_CFR_FORM:
-      return { 
-        ...state,
-        foiRequestCFRForm:{
-          ...state.foiRequestCFRForm,
-          ...action.payload
-        }
-      };
+      return { ...state, foiRequestCFRForm: action.payload};
     case FOI_ACTION_CONSTANTS.FOI_REQUEST_CFR_FORM_HISTORY:
       return { ...state, foiRequestCFRFormHistory: action.payload };
     case FOI_ACTION_CONSTANTS.FOI_REQUEST_EXTENSIONS:
