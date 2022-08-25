@@ -79,6 +79,11 @@ feeonhold: {
   fromState: "Fee Estimate",
   toState: "On Hold",
 },
+responseonhold: {
+  name: "response-onhold",
+  fromState: "Response",
+  toState: "On Hold",
+},
 });
 
 const AttachmentLetterCategories = Object.freeze({
