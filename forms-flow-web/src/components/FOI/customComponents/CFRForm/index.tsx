@@ -54,7 +54,7 @@ export const CFRForm = ({
     {
       value: 'review',
       label: 'In Review with IAO',
-      disabled: isMinistry && formHistory.length <= 0,
+      disabled: false,
     },
     {
       value: 'clarification',
