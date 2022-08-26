@@ -19,9 +19,9 @@ export const CFRFormHistoryModal = React.memo(({
   handleClose,
   formHistory,
 }: modalParams) => {
-  
+
   return (
-    
+
     <Dialog
       open={modalOpen}
       onClose={handleClose}
@@ -39,19 +39,26 @@ export const CFRFormHistoryModal = React.memo(({
         </IconButton>
       </DialogTitle>
       <DialogContent className={'dialog-content-nomargin'}>
-        {formHistory.map((entry: any, index: number) => {            
+        {formHistory.map((entry: any, index: number) => {
           return <div className='request-accordian' key={entry.cfrfeeid}>
             <Accordion defaultExpanded={false} className='history-entry-accordion'>
               <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                <Typography>CFR Form - Version {index + 1}</Typography>
+                <Typography className="history-entry-title">CFR Form - Version {index + 1}</Typography>
                 <Typography className="history-entry-username"> {entry.version_createdby} - {entry.version_created_at}</Typography>
               </AccordionSummary>
-              
-                <AccordionDetails 
+
+                <AccordionDetails
                   sx={{
-                    '& .MuiTextField-root': { m: 1 },
-                  }}    
+                    '& .MuiTextField-root': { my: 1, mx: 0 },
+                  }}
                 >
+                  <div className="row foi-details-row">
+                    <div className="col-lg-12 foi-details-col">
+                      <div className="historyLabel">
+                        OVERALL FEE ESTIMATE
+                      </div>
+                    </div>
+                  </div>
                   <div className="row foi-details-row">
                     <div className="col-lg-6 foi-details-col">
                       <TextField
@@ -84,12 +91,12 @@ export const CFRFormHistoryModal = React.memo(({
                         }}
                         InputLabelProps={{ shrink: true }}
                         name="amountDue"
-                        value={parseFloat(entry.feedata.totalamountdue).toFixed(2)}                        
+                        value={parseFloat(entry.feedata.totalamountdue).toFixed(2)}
                         variant="outlined"
                         placeholder="0"
                         fullWidth
                         disabled={true}
-                        // 
+                        //
                       />
                     </div>
                   </div>
@@ -108,7 +115,7 @@ export const CFRFormHistoryModal = React.memo(({
                   </div>
                   <div className="row foi-details-row">
                     <div className="col-lg-12 foi-details-col">
-                      <div className="formLabel">Locating/Retrieving</div>
+                      <div className="historyLabel">LOCATING/RETRIEVING</div>
                     </div>
                   </div>
                   <div className="row foi-details-row">
@@ -124,7 +131,7 @@ export const CFRFormHistoryModal = React.memo(({
                         }}
                         InputLabelProps={{ shrink: true }}
                         name="locating"
-                        value={entry.feedata.estimatedlocatinghrs}                        
+                        value={entry.feedata.estimatedlocatinghrs}
                         variant="outlined"
                         fullWidth
                         type="number"
@@ -144,7 +151,7 @@ export const CFRFormHistoryModal = React.memo(({
                         InputLabelProps={{ shrink: true }}
                         name="locating"
                         value={entry.feedata.actuallocatinghrs}
-                        
+
                         variant="outlined"
                         fullWidth
                         type="number"
@@ -154,8 +161,8 @@ export const CFRFormHistoryModal = React.memo(({
                   </div>
                   <div className="row foi-details-row">
                     <div className="col-lg-12 foi-details-col">
-                      <div className="formLabel">
-                        Producing
+                      <div className="historyLabel">
+                        PRODUCING
                       </div>
                     </div>
                   </div>
@@ -173,7 +180,7 @@ export const CFRFormHistoryModal = React.memo(({
                         InputLabelProps={{ shrink: true }}
                         name="producing"
                         value={entry.feedata.estimatedproducinghrs}
-                        
+
                         variant="outlined"
                         fullWidth
                         type="number"
@@ -193,7 +200,7 @@ export const CFRFormHistoryModal = React.memo(({
                         }}
                         InputLabelProps={{ shrink: true }}
                         name="producing"
-                        value={entry.feedata.actualproducinghrs}                        
+                        value={entry.feedata.actualproducinghrs}
                         variant="outlined"
                         fullWidth
                         type="number"
@@ -203,8 +210,8 @@ export const CFRFormHistoryModal = React.memo(({
                   </div>
                   <div className="row foi-details-row">
                     <div className="col-lg-12 foi-details-col">
-                      <div className="formLabel">
-                        Preparing
+                      <div className="historyLabel">
+                        PREPARING
                       </div>
                     </div>
                   </div>
@@ -221,7 +228,7 @@ export const CFRFormHistoryModal = React.memo(({
                         }}
                         InputLabelProps={{ shrink: true }}
                         name="iaoPreparing"
-                        value={entry.feedata.estimatediaopreparinghrs}                        
+                        value={entry.feedata.estimatediaopreparinghrs}
                         variant="outlined"
                         fullWidth
                         type="number"
@@ -243,7 +250,7 @@ export const CFRFormHistoryModal = React.memo(({
                         InputLabelProps={{ shrink: true }}
                         name="ministryPreparing"
                         value={entry.feedata.estimatedministrypreparinghrs}
-                        
+
                         variant="outlined"
                         fullWidth
                         type="number"
@@ -264,7 +271,7 @@ export const CFRFormHistoryModal = React.memo(({
                         }}
                         InputLabelProps={{ shrink: true }}
                         name="iaoPreparing"
-                        value={entry.feedata.actualiaopreparinghrs}                        
+                        value={entry.feedata.actualiaopreparinghrs}
                         variant="outlined"
                         fullWidth
                         type="number"
@@ -283,7 +290,7 @@ export const CFRFormHistoryModal = React.memo(({
                         }}
                         InputLabelProps={{ shrink: true }}
                         name="ministryPreparing"
-                        value={entry.feedata.actualministrypreparinghrs}                        
+                        value={entry.feedata.actualministrypreparinghrs}
                         variant="outlined"
                         fullWidth
                         type="number"
@@ -293,8 +300,8 @@ export const CFRFormHistoryModal = React.memo(({
                   </div>
                   <div className="row foi-details-row">
                     <div className="col-lg-12 foi-details-col">
-                      <div className="formLabel">
-                        Volume
+                      <div className="historyLabel">
+                        VOLUME
                       </div>
                     </div>
                   </div>
@@ -311,7 +318,7 @@ export const CFRFormHistoryModal = React.memo(({
                         }}
                         InputLabelProps={{ shrink: true }}
                         name="electronicPages"
-                        value={entry.feedata.estimatediaopreparinghrs}                        
+                        value={entry.feedata.estimatediaopreparinghrs}
                         variant="outlined"
                         fullWidth
                         type="number"
@@ -329,7 +336,7 @@ export const CFRFormHistoryModal = React.memo(({
                         }}
                         InputLabelProps={{ shrink: true }}
                         name="hardcopyPages"
-                        value={entry.feedata.estimatediaopreparinghrs}                        
+                        value={entry.feedata.estimatediaopreparinghrs}
                         variant="outlined"
                         fullWidth
                         type="number"
@@ -349,7 +356,7 @@ export const CFRFormHistoryModal = React.memo(({
                         }}
                         InputLabelProps={{ shrink: true }}
                         name="electronicPages"
-                        value={entry.feedata.estimatedelectronicpages}                        
+                        value={entry.feedata.estimatedelectronicpages}
                         variant="outlined"
                         fullWidth
                         type="number"
@@ -366,7 +373,7 @@ export const CFRFormHistoryModal = React.memo(({
                         }}
                         InputLabelProps={{ shrink: true }}
                         name="hardcopyPages"
-                        value={entry.feedata.estimatedelectronicpages}                        
+                        value={entry.feedata.estimatedelectronicpages}
                         variant="outlined"
                         fullWidth
                         type="number"
