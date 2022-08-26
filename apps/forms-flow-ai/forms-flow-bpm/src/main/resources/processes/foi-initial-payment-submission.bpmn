@@ -408,7 +408,7 @@ execution.setVariable("paymentstatus", "EXPIRED");
       <bpmn:incoming>Flow_19al5dp</bpmn:incoming>
       <bpmn:outgoing>Flow_03lwez1</bpmn:outgoing>
       <bpmn:timerEventDefinition id="TimerEventDefinition_1a2a3k5">
-        <bpmn:timeCycle xsi:type="bpmn:tFormalExpression">0 0/2 * 1/1 * ? *</bpmn:timeCycle>
+        <bpmn:timeCycle xsi:type="bpmn:tFormalExpression">0 0 13 1/1 * ? *</bpmn:timeCycle>
       </bpmn:timerEventDefinition>
     </bpmn:intermediateCatchEvent>
     <bpmn:sequenceFlow id="Flow_06wfx6l" name="&#60;=20 Days" sourceRef="Gateway_0xwy934" targetRef="Gateway_1771ld6">
