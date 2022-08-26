@@ -41,7 +41,7 @@ describe('FOI DivisionalStages component', () => {
         const localState = {            
             minDivStages: [{id:0,divisionid:1,stageid:1}],
             stageIterator:  [{id:0,divisionid:-1,stageid:-1}],
-            divisionalstages:{divisions: [{divisionid: 2, name: "Deputy Minister's Office"}] , stages:[{stageid: 1, name: "Clarification"}] }         
+            divisionalstages:{divisions: [{divisionid: 2, name: "Deputy Minister's Office"}] , stages:[{stageid: 1, name: "Clarification"}] }
         }
         useSelector.mockImplementation(callback => {
             return callback(localState);
@@ -55,14 +55,15 @@ describe('FOI DivisionalStages component', () => {
         const localState = {            
             minDivStages: [{id:0,divisionid:1,stageid:1}],
             stageIterator:  [{id:0,divisionid:-1,stageid:-1}],
-            divisionalstages:{divisions: [{divisionid: 2, name: "Deputy Minister's Office"}] , stages:[{stageid: 1, name: "Clarification"}] } ,
-            popminDivstatetoParent:  jest.fn(),        
+            divisionalstages:{divisions: [{divisionid: 2, name: "Deputy Minister's Office"}] , stages:[{stageid: 1, name: "Clarification"}] },
+            popminDivstatetoParent: jest.fn(),
+            setHasReceivedDate: jest.fn(),
         }
         useSelector.mockImplementation(callback => {
             return callback(localState);
         });
         
-        const tree = renderer.create(<Provider store={store}><DivisionalStages divisionalstages={localState.divisionalstages} existingDivStages={localState.minDivStages} popselecteddivstages={localState.popminDivstatetoParent} /></Provider>).toJSON();  
+        const tree = renderer.create(<Provider store={store}><DivisionalStages divisionalstages={localState.divisionalstages} existingDivStages={localState.minDivStages} popSelectedDivStages={localState.popminDivstatetoParent} setHasReceivedDate={localState.setHasReceivedDate} /></Provider>).toJSON();  
         expect(tree).toMatchSnapshot();
     })
   })

@@ -182,24 +182,20 @@ const isMinistryLogin = (userGroups) => {
   );
 };
 const isProcessingTeam = (userGroups) => {
-  return userGroups.some((userGroup) =>
+  return userGroups?.some((userGroup) =>
     KCProcessingTeams.includes(userGroup.replace("/", ""))
   );
 };
 
 const isFlexTeam = (userGroups) => {
   return (
-    userGroups
-      .map((userGroup) => userGroup.replace("/", ""))
-      .indexOf("Flex Team") !== -1
+    userGroups?.map((userGroup) => userGroup.replace("/", "")).indexOf("Flex Team") !== -1
   );
 };
 
 const isIntakeTeam = (userGroups) => {
   return (
-    userGroups
-      .map((userGroup) => userGroup.replace("/", ""))
-      .indexOf("Intake Team") !== -1
+    userGroups?.map((userGroup) => userGroup.replace("/", "")).indexOf("Intake Team") !== -1
   );
 };
 

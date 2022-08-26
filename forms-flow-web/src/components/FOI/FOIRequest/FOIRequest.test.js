@@ -25,11 +25,11 @@ describe('FOI FOIRequest component', () => {
         useParams.mockImplementation(() => {
             return mockAppState;
         });
-      });
-      afterEach(() => {
+    });
+    afterEach(() => {
         useSelector.mockClear();
         useParams.mockClear();
-      });
+    });
 
     const initialState = {output:10}
     const mockStore = configureStore()    

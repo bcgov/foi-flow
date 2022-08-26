@@ -4,6 +4,7 @@ import configureStore from "redux-mock-store";
 import AddExtensionModal from "./AddExtensionModal";
 import { shallow, mount } from "enzyme";
 import { formatDate } from "../../../../helper/FOI/helper";
+import { useParams } from "react-router-dom";
 
 jest.mock("react", () => ({
   ...jest.requireActual("react"),
@@ -12,6 +13,10 @@ jest.mock("react", () => ({
 jest.mock("react-redux", () => ({
   ...jest.requireActual("react-redux"),
   useSelector: jest.fn(),
+}));
+jest.mock("react-router-dom", () => ({
+  ...jest.requireActual("react-router-dom"),
+  useParams: jest.fn(),
 }));
 
 jest.mock("@material-ui/core/styles", () => {
@@ -93,6 +98,10 @@ describe("FOI AddExtensionModal component", () => {
 
     mockExtensionContext(localState);
 
+    useParams.mockImplementation(() => {
+      return {ministryId: "123", requestId: "345"};
+    }); 
+
     const wrapper = mount(
       <Provider store={store}>
         <AddExtensionModal />
@@ -161,6 +170,10 @@ describe("FOI AddExtensionModal component", () => {
     };   
 
     mockExtensionContext(localState);
+
+    useParams.mockImplementation(() => {
+      return {ministryId: "123", requestId: "345"};
+    }); 
 
     const wrapper = mount(
       <Provider store={store}>
