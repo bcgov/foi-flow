@@ -40,7 +40,7 @@ const MinistriesCanvassed = ({openModal,selectedMinistries, setModal} ) => {
 
 
  return( 
-    <div>     
+    <div data-testid="MinistriesCanvassed">     
     <Dialog className={classes.root} open={openModal} id="dialog-style"
       onClose={handleClose}
       maxWidth={'md'}
