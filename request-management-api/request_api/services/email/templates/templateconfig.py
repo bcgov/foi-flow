@@ -17,10 +17,9 @@ class templateconfig:
         else:
             logging.info("Unknown key")
             return None
-        return None
 
     def getsubject(self, key, requestjson):        
-        if key == "PAYONLINE":
+        if key == "PAYONLINE" or key == "PAYOUTSTANDING":
             return "Your FOI Request ["+requestjson["axisRequestId"]+"]"
         elif key == "FEE-ESTIMATE-PAYMENT-RECEIPT":
             return "Your FOI Request ["+requestjson["axisRequestId"]+"] - Fee Payment Received"
@@ -29,7 +28,7 @@ class templateconfig:
         return None   
         
     def getstage(self, key):        
-        if key == "PAYONLINE":
+        if key == "PAYONLINE" or key == "PAYOUTSTANDING":
             return "Fee Estimate"
         elif key == "FEE-ESTIMATE-PAYMENT-RECEIPT":  
             return "Fee Estimate - Payment Receipt"  
