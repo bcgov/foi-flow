@@ -64,7 +64,8 @@ describe('FOI StateDropDown component', () => {
             requestDetail: {
               selectedMinistries: ["AEST"]
             },
-            user: {"userDetail": {}}
+            user: {"userDetail": {}},
+            foiRequests: { foiRequestCFRForm: { feedata:{}, status: "" } }
         }
         useSelector.mockImplementation(callback => {
             return callback(localState);

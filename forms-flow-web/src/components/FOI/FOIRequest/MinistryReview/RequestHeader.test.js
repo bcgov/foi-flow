@@ -54,8 +54,8 @@ describe('FOI RequestHeader component', () => {
       it('FOI RequestHeader snapshot check', () => {
         store = mockStore(initialState)
         const localState = {
-            requestDetails: {requestDetails: {}},
-            foiRequests: {foiFullAssignedToList: []},
+            requestDetails: {requestDetails: {}, currentState: ""},
+            foiRequests: {foiFullAssignedToList: [], foiMinistryAssignedToList: []},
             user: {userDetail: {}}
         }
         useSelector.mockImplementation(callback => {
