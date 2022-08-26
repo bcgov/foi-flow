@@ -97,6 +97,50 @@
   color: #FFF;
 }
 
+.history-entry-accordion {
+  box-shadow: none !important;
+  .MuiAccordionSummary-root {
+    background-color: #ebeef3 !important;
+    border-radius: 4px !important;
+    color: #003366;
+    .MuiAccordionSummary-content {
+      justify-content: space-between;
+      .history-entry-username {
+        margin-right: 8px;
+      }
+    }
+  }
+
+  .MuiAccordionSummary-expandIconWrapper {
+    color: #003366 ;
+  }
+}
+
+.cfr-history-modal-header {
+  margin-left: 0;
+}
+
+.create-new-modal-message {
+  display: block;
+  text-align: center;
+  margin: 0 10%;
+}
+
+.btn-cfr-history {
+  float: right;
+  text-decoration: underline !important;
+  padding-bottom: 0 !important;
+  padding-right: 0 !important;
+}
+
+.cfrform { 
+  .btn-cancel {
+    border: 1px solid #38598A !important;
+    background-color: #FFFFFF !important;
+    color: #38598A !important;
+  }
+}
+
 @media (max-width: 1444px) {
   .cfrform-floatRightRight {
     display: none;

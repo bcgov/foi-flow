@@ -1,7 +1,9 @@
 export type CFRFormData = {
+    cfrfeeid?: any;
     formStatus: string;
     amountDue: number;
     amountPaid: number;
+    balanceRemaining: number;
     estimates: {
       locating: number;
       producing: number;
@@ -30,4 +32,10 @@ export type params = {
     groups: string[];
   };
   setCFRUnsaved: Function;
+}
+
+export type modalParams = {
+  modalOpen: boolean;
+  handleClose: () => void;
+  formHistory: Array<any>
 }
