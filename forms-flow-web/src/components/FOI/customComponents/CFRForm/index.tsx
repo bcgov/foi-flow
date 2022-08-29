@@ -426,7 +426,7 @@ export const CFRForm = ({
       <Box
         component="form"
         sx={{
-          '& .MuiTextField-root': { m: 1 },
+          '& .MuiTextField-root': { my: 1, mx: 0 },
         }}
         autoComplete="off"
       >

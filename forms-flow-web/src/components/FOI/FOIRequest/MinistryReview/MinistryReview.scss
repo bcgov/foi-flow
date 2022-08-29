@@ -55,6 +55,7 @@
 .foi-details-row {
     display: flex;
     width: 100%;
+    margin: 0 !important;
     // justify-content: space-around;
 }
 .foi-details-col {
@@ -80,6 +81,11 @@
     font-family: "BCSans-Bold", sans-serif !important;
     color: #f44336 !important;
 
+}
+
+.MuiFormLabel-root.Mui-disabled {
+    font-family: "BCSans-Bold", sans-serif !important;
+    color: rgba(0, 0, 0, 0.38) !important;
 }
 
 .PrivateNotchedOutline-legendLabelled-4 {
