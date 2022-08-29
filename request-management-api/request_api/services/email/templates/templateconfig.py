@@ -44,9 +44,9 @@ class templateconfig:
         elif key == "FEE-ESTIMATE-PAYMENT-RECEIPT-FAILURE":
             return "Fee Estimate - Payment Receipt Correspondence Failed"
         elif key == "PAYOUTSTANDING":
-            return "Fees - Estimate Outstanding Sent"
+            return "Fees - Balance Outstanding Sent"
         elif key == "PAYOUTSTANDING-SEND-FAILURE":
-            return "Fees - Estimate Outstanding Correspondence Failed"
+            return "Fees - Balance Outstanding Correspondence Failed"
         return None
 
     def getattachmentcategory(self, key):
@@ -65,9 +65,9 @@ class templateconfig:
         elif key == "PAYOUTSTANDING":
             return "RESPONSE-ONHOLD"
         elif key == "PAYOUTSTANDING-SUCCESSFUL":
-            return "Fee Estimate Outstanding - Letter"
+            return "Fee Balance Outstanding - Letter"
         elif key == "PAYOUTSTANDING-FAILED":
-            return "Fee Estimate Outstanding - Correspondence Failed"
+            return "Fee Balance Outstanding - Correspondence Failed"
         return None 
     
 
