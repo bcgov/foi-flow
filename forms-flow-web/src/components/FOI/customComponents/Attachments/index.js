@@ -490,7 +490,8 @@ const AttachmentPopup = React.memo(({indexValue, attachment, handlePopupButtonCl
     StateTransitionCategories.cfrfeeassessed.name,
     StateTransitionCategories.signoffresponse.name,
     StateTransitionCategories.harmsreview.name,
-    StateTransitionCategories.feeonhold.name    
+    StateTransitionCategories.feeonhold.name,
+    StateTransitionCategories.responseonhold.name  
   ];
 
   const emailCategories = [
@@ -499,7 +500,8 @@ const AttachmentPopup = React.memo(({indexValue, attachment, handlePopupButtonCl
     AttachmentLetterCategories.feeestimateletter.name,
     AttachmentLetterCategories.feeestimatepaymentreceipt.name,
     AttachmentLetterCategories.feeestimatepaymentcorrespondencesuccessful.name,
-    AttachmentLetterCategories.feeestimatepaymentcorrespondencefailed.name
+    AttachmentLetterCategories.feeestimatepaymentcorrespondencefailed.name,
+    AttachmentLetterCategories.feeestimateoutstandingletter.name
   ]
 
   const showReplace = (category) => {

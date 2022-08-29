@@ -10,7 +10,7 @@
     <bpmn:group id="Group_0nmwgct" categoryValueRef="CategoryValue_1dcilzu" />
     <bpmn:group id="Group_0ihi2fn" categoryValueRef="CategoryValue_1baekcn" />
   </bpmn:collaboration>
-  <bpmn:process id="foi-fee-processing" name="FOI Fee Processing" isExecutable="true" camunda:versionTag="2">
+  <bpmn:process id="foi-fee-processing" name="FOI Fee Processing" isExecutable="true" camunda:versionTag="3">
     <bpmn:laneSet id="LaneSet_1u7kp6i">
       <bpmn:lane id="Lane_1aaq844" name="Post Payment">
         <bpmn:flowNodeRef>Event_0dlzac7</bpmn:flowNodeRef>
@@ -48,14 +48,13 @@
         <bpmn:flowNodeRef>Event_0hclu9b</bpmn:flowNodeRef>
         <bpmn:flowNodeRef>save-sub-link</bpmn:flowNodeRef>
         <bpmn:flowNodeRef>get-req-details</bpmn:flowNodeRef>
-        <bpmn:flowNodeRef>Activity_0ye5rz5</bpmn:flowNodeRef>
       </bpmn:lane>
     </bpmn:laneSet>
     <bpmn:task id="Activity_0k05bsn" name="Create Submission">
       <bpmn:extensionElements>
         <camunda:executionListener class="org.camunda.bpm.extension.hooks.listeners.execution.ExternalSubmissionListener" event="start">
           <camunda:field name="formName">
-            <camunda:expression>payfeeonline</camunda:expression>
+            <camunda:expression>${paymentFormName}</camunda:expression>
           </camunda:field>
         </camunda:executionListener>
         <camunda:inputOutput>
@@ -67,7 +66,7 @@
           <camunda:property name="formName" value="payfeeonline" />
         </camunda:properties>
       </bpmn:extensionElements>
-      <bpmn:incoming>Flow_0bvlrss</bpmn:incoming>
+      <bpmn:incoming>Flow_1v47vyi</bpmn:incoming>
       <bpmn:outgoing>Flow_0s4pyno</bpmn:outgoing>
     </bpmn:task>
     <bpmn:startEvent id="Event_0crrhhb">
@@ -141,7 +140,7 @@ if (execution.getVariable("prevStatus") == "Response") {
         </camunda:executionListener>
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_17bdgfc</bpmn:incoming>
-      <bpmn:outgoing>Flow_0xfyalq</bpmn:outgoing>
+      <bpmn:outgoing>Flow_1v47vyi</bpmn:outgoing>
     </bpmn:serviceTask>
     <bpmn:intermediateCatchEvent id="Event_1k8aoc7">
       <bpmn:incoming>Flow_1ys38a6</bpmn:incoming>
@@ -544,12 +543,7 @@ connector.getVariable("statusCode");</camunda:script>
       <bpmn:messageEventDefinition id="MessageEventDefinition_15za33q" messageRef="Message_1rsz89u" />
     </bpmn:intermediateThrowEvent>
     <bpmn:sequenceFlow id="Flow_0s4pyno" sourceRef="Activity_0k05bsn" targetRef="Activity_0v6rrmr" />
-    <bpmn:userTask id="Activity_0ye5rz5" name="D1">
-      <bpmn:incoming>Flow_0xfyalq</bpmn:incoming>
-      <bpmn:outgoing>Flow_0bvlrss</bpmn:outgoing>
-    </bpmn:userTask>
-    <bpmn:sequenceFlow id="Flow_0xfyalq" sourceRef="invoke-reqmgmt-api" targetRef="Activity_0ye5rz5" />
-    <bpmn:sequenceFlow id="Flow_0bvlrss" sourceRef="Activity_0ye5rz5" targetRef="Activity_0k05bsn" />
+    <bpmn:sequenceFlow id="Flow_1v47vyi" sourceRef="invoke-reqmgmt-api" targetRef="Activity_0k05bsn" />
   </bpmn:process>
   <bpmn:message id="Message_1x26sx5" name="foi-manage-payment" />
   <bpmn:message id="Message_1rsz89u" name="foi-fee-expiry-notification-error" />
@@ -579,18 +573,6 @@ connector.getVariable("statusCode");</camunda:script>
       <bpmndi:BPMNShape id="Lane_1aaq844_di" bpmnElement="Lane_1aaq844" isHorizontal="true">
         <dc:Bounds x="170" y="650" width="1950" height="650" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNEdge id="Flow_0bvlrss_di" bpmnElement="Flow_0bvlrss">
-        <di:waypoint x="950" y="170" />
-        <di:waypoint x="950" y="209" />
-        <di:waypoint x="1030" y="209" />
-        <di:waypoint x="1030" y="248" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_0xfyalq_di" bpmnElement="Flow_0xfyalq">
-        <di:waypoint x="640" y="288" />
-        <di:waypoint x="770" y="288" />
-        <di:waypoint x="770" y="130" />
-        <di:waypoint x="900" y="130" />
-      </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_0s4pyno_di" bpmnElement="Flow_0s4pyno">
         <di:waypoint x="1080" y="288" />
         <di:waypoint x="1200" y="288" />
@@ -776,6 +758,10 @@ connector.getVariable("statusCode");</camunda:script>
           <dc:Bounds x="727" y="893" width="25" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1v47vyi_di" bpmnElement="Flow_1v47vyi">
+        <di:waypoint x="640" y="288" />
+        <di:waypoint x="980" y="288" />
+      </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="Activity_0uv6wyi_di" bpmnElement="Activity_0k05bsn">
         <dc:Bounds x="980" y="248" width="100" height="80" />
       </bpmndi:BPMNShape>
@@ -889,9 +875,6 @@ connector.getVariable("statusCode");</camunda:script>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Event_1wnfiii_di" bpmnElement="Event_1pldnh9">
         <dc:Bounds x="1302" y="1162" width="36" height="36" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_0rbgnv4_di" bpmnElement="Activity_0ye5rz5">
-        <dc:Bounds x="900" y="90" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Event_0c9ytw1_di" bpmnElement="Event_1s2s2yf">
         <dc:Bounds x="1102" y="1102" width="36" height="36" />
