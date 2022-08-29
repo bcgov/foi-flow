@@ -280,7 +280,7 @@ export const CFRForm = ({
  const cfrStatusDisabled = () => {
     if (formHistory.length > 0 && (requestState === StateEnum.callforrecords.name || requestState === StateEnum.onhold.name)) {
       if (isMinistry) {
-        return initialFormData.formStatus === 'review' || initialFormData.formStatus === 'approved';
+        return initialFormData.formStatus === 'review' || initialFormData.formStatus === 'approved' || isNewCFRForm;
       } else {
         return initialFormData.formStatus !== 'review';
       }
@@ -297,6 +297,7 @@ export const CFRForm = ({
 
   const save = () => {
     var callback = (_res: string) => {
+      setIsNewCFRForm(false)
       setInitialFormData(formData)
       toast.success("CFR Form has been saved successfully.", {
         position: "top-right",
@@ -413,11 +414,14 @@ export const CFRForm = ({
       requestState !== StateEnum.feeassessed.name && requestState !== StateEnum.onhold.name));
   }
 
+
+  const [isNewCFRForm, setIsNewCFRForm] = useState(false)
   const newCFRForm = () => {
     setCreateModalOpen(false)
     blankForm.amountPaid= initialState?.feedata?.amountpaid;
     setInitialFormData(blankForm);
     setFormData(blankForm);
+    setIsNewCFRForm(true)
   }
 
 
