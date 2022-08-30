@@ -27,7 +27,6 @@ const StateDropDown = ({
   const [status, setStatus] = useState(requestState);
   const cfrFeeData = useSelector((reduxState) => reduxState.foiRequests.foiRequestCFRForm.feedata);
   const cfrStatus = useSelector((reduxState) => reduxState.foiRequests.foiRequestCFRForm.status);
-  const balanceDue = cfrFeeData?.totalamountdue - cfrFeeData?.amountpaid;
 
   React.useEffect(() => {
     if (requestState && requestState !== status) {
@@ -129,7 +128,7 @@ const StateDropDown = ({
       case StateEnum.response.name.toLowerCase():
         if (personalIAO)
           return _stateList.responseforpersonal;
-        else if (balanceDue > 0 && cfrStatus === 'approved') {
+        else if (cfrFeeData?.balanceremaining > 0 && cfrStatus === 'approved') {
           return _stateList.response;
         }
         else {

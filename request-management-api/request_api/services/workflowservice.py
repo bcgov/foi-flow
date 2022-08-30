@@ -32,7 +32,7 @@ class workflowservice:
         assignedgroup = self.__getopenedassigneevalue(requestsschema, "assignedgroup",usertype) 
         assignedto = self.__getopenedassigneevalue(requestsschema, "assignedto",usertype)
         paymentexpirydate = self.__getvaluefromschema(requestsschema,"paymentExpiryDate")
-        axisRequestId = self.__getvaluefromschema(requestsschema,"axisRequestId")
+        axisrequestid = self.__getvaluefromschema(requestsschema,"axisRequestId")
         if data.get("ministries") is not None:
             for ministry in data.get("ministries"): 
                 filenumber =  ministry["filenumber"] 
@@ -40,7 +40,7 @@ class workflowservice:
                     oldstatus = self.__getministrystatus(filenumber, ministry["version"])
                     activity = self.__getministryactivity(oldstatus,newstatus)
                     previousstatus = self.__getpreviousministrystatus(id)
-                    metadata = json.dumps({"id": filenumber, "previousstatus":previousstatus, "status": ministry["status"] , "assignedGroup": assignedgroup, "assignedTo": assignedto, "assignedministrygroup":ministry["assignedministrygroup"], "ministryRequestID": id, "paymentExpiryDate": paymentexpirydate, "axisRequestId": axisRequestId})
+                    metadata = json.dumps({"id": filenumber, "previousstatus":previousstatus, "status": ministry["status"] , "assignedGroup": assignedgroup, "assignedTo": assignedto, "assignedministrygroup":ministry["assignedministrygroup"], "ministryRequestID": id, "paymentExpiryDate": paymentexpirydate, "axisRequestId": axisrequestid})
                     messagename = self.__messagename(oldstatus, activity, usertype, self.__isprocessing(id))
                     self.__postopenedevent(id, filenumber, metadata, messagename, assignedgroup, assignedto, wfinstanceid, activity)
 

@@ -108,6 +108,9 @@
       .history-entry-username {
         margin-right: 8px;
       }
+      .history-entry-title {
+        font-weight: 600
+      }
     }
   }
 
@@ -131,6 +134,12 @@
   text-decoration: underline !important;
   padding-bottom: 0 !important;
   padding-right: 0 !important;
+}
+
+.historyLabel {
+  padding: 5px;
+  color: #003366;
+  font-size: 15px;
 }
 
 .cfrform { 

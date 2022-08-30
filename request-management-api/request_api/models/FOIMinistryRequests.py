@@ -218,8 +218,8 @@ class FOIMinistryRequest(db.Model):
     def getstatesummary(cls, ministryrequestid):  
         transitions = []
         try:              
-            sql = """select status, version from (select distinct on (fs2."name") name as status, version from "FOIMinistryRequests" fm inner join "FOIRequestStatuses" fs2 on fm.requeststatusid = fs2.requeststatusid  
-            where foiministryrequestid=:ministryrequestid order by fs2."name", version asc) as fs3 order by version desc;"""
+            sql = """select status, version from (select distinct name as status, version from "FOIMinistryRequests" fm inner join "FOIRequestStatuses" fs2 on fm.requeststatusid = fs2.requeststatusid  
+            where foiministryrequestid=:ministryrequestid order by version asc) as fs3 order by version desc;"""
  
             rs = db.session.execute(text(sql), {'ministryrequestid': ministryrequestid})        
             for row in rs:

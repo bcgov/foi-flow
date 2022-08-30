@@ -108,7 +108,8 @@ describe('FOI RequestDescriptionBox component', () => {
             foiRequests: { 
                 foiProgramAreaList: [],
                 foiRequestDescriptionHistoryList: []
-            }
+            },
+            requiredRequestDetailsValues: { requestType: "general" }
         }
         useSelector.mockImplementation(callback => {
             return callback(localState);
@@ -116,7 +117,7 @@ describe('FOI RequestDescriptionBox component', () => {
         useParams.mockImplementation(() => {
             return {ministryId: "123"};
         }); 
-        const tree = renderer.create(<Provider store={store}><RequestDescriptionBox handleUpdatedProgramAreaList={localState.handleUpdatedProgramAreaList} handleInitialRequiredRequestDescriptionValues={localState.handleInitialRequiredRequestDescriptionValues} handleOnChangeRequiredRequestDescriptionValues={localState.handleOnChangeRequiredRequestDescriptionValues} programAreaList={localState.programAreaList} requestDetails={localState.requestDetails} createSaveRequestObject={localState.createSaveRequestObject} /></Provider>).toJSON();  
+        const tree = renderer.create(<Provider store={store}><RequestDescriptionBox handleUpdatedProgramAreaList={localState.handleUpdatedProgramAreaList} handleInitialRequiredRequestDescriptionValues={localState.handleInitialRequiredRequestDescriptionValues} handleOnChangeRequiredRequestDescriptionValues={localState.handleOnChangeRequiredRequestDescriptionValues} programAreaList={localState.programAreaList} requestDetails={localState.requestDetails} createSaveRequestObject={localState.createSaveRequestObject} requiredRequestDetailsValues={localState.requiredRequestDetailsValues} /></Provider>).toJSON();  
         expect(tree).toMatchSnapshot();
     })
   })

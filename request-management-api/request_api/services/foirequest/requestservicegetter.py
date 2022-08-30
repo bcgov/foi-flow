@@ -100,7 +100,7 @@ class requestservicegetter:
         payment = paymentservice().getpayment(foirequestid, foiministryrequestid)
         if cfrfee is not None and cfrfee != {}:
             requestdetails['cfrfee'] = cfrfee
-            _balancedue = cfrfee['feedata']['totalamountdue'] - float(cfrfee['feedata']['amountpaid'])
+            _balancedue = cfrfee['feedata']['balanceremaining']
             requestdetails['cfrfee']['feedata']["balanceDue"] = '{:.2f}'.format(_balancedue)
             requestdetails['cfrfee']['feedata']["totalamountdue"] = '{:.2f}'.format(requestdetails['cfrfee']['feedata']["totalamountdue"])
             
