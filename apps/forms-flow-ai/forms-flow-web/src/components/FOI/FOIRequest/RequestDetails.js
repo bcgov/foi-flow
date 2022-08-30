@@ -239,65 +239,32 @@ const RequestDetails = React.memo(
                 />
                 <TextField
                   id="originalDueDate"
-                      label="Original Due Date"
-                      type={requestDetails.originalDueDate ? "date" : "text"}
-                      value={requestDetails.originalDueDate || 'N/A'}
-                      inputProps={{ "aria-labelledby": "dueDate-label"}}
-                      InputLabelProps={{
-                      shrink: true,
-                      }}
-                      variant="outlined"
-                      required
-                      disabled
-                      fullWidth
+                  label="Original Due Date"
+                  type={requestDetails.originalDueDate ? "date" : "text"}
+                  value={requestDetails.originalDueDate || 'N/A'}
+                  inputProps={{ "aria-labelledby": "dueDate-label"}}
+                  InputLabelProps={{
+                  shrink: true,
+                  }}
+                  variant="outlined"
+                  required
+                  disabled
+                  fullWidth
                 />
                 <TextField
-                    id="dueDate"
-                    label="Legislated Due Date"
-                    type={requestDetails?.currentState?.toLowerCase() === StateEnum.onhold.name.toLowerCase() ? "text" : "date"}
-                    value={requestDetails?.currentState?.toLowerCase() === StateEnum.onhold.name.toLowerCase() ? 'N/A' : (dueDateText || '')}
-                    inputProps={{ "aria-labelledby": "dueDate-label"}}
-                    InputLabelProps={{
-                    shrink: true,
-                    }}
-                    variant="outlined"
-                    required
-                    disabled
-                    fullWidth
+                  id="dueDate"
+                  label="Legislated Due Date"
+                  type={requestDetails?.currentState?.toLowerCase() === StateEnum.onhold.name.toLowerCase() ? "text" : "date"}
+                  value={requestDetails?.currentState?.toLowerCase() === StateEnum.onhold.name.toLowerCase() ? 'N/A' : (dueDateText || '')}
+                  inputProps={{ "aria-labelledby": "dueDate-label"}}
+                  InputLabelProps={{
+                  shrink: true,
+                  }}
+                  variant="outlined"
+                  required
+                  disabled
+                  fullWidth
                 />
-                  {/* {requestDetails.currentState === undefined || (requestDetails.currentState && requestDetails.currentState.toLowerCase() !== StateEnum.onhold.name.toLowerCase()) ?
-                    <TextField
-                        id="dueDate"
-                        label="Legislated Due Date"
-                        type={requestDetails?.currentState?.toLowerCase() === StateEnum.onhold.name.toLowerCase() ? "text" : "date"}
-                        value={dueDateText || ''}
-                        inputProps={{ "aria-labelledby": "dueDate-label"}}
-                        InputLabelProps={{
-                        shrink: true,
-                        }}
-                        variant="outlined"
-                        required
-                        disabled
-                        fullWidth
-                    />
-                    :
-                    <TextField
-                        id="dueDate"
-                        label="Legislated Due Date"
-                        value="N/A"
-                        inputProps={{ "aria-labelledby": "dueDate-label"}}
-                        InputLabelProps={{
-                        shrink: true,
-                        }}
-                        variant="outlined"
-                        required
-                        disabled
-                        fullWidth
-                    />
-                  } */}
-
-
-
             </div>
             <div className="col-lg-6 foi-details-col">
                 <TextField
