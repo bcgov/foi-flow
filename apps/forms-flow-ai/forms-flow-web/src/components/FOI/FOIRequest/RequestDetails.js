@@ -240,8 +240,8 @@ const RequestDetails = React.memo(
                 <TextField
                   id="originalDueDate"
                   label="Original Due Date"
-                  type={requestDetails.originalDueDate ? "date" : "text"}
-                  value={requestDetails.originalDueDate || 'N/A'}
+                  type={requestDetails?.originalDueDate ? "date" : "text"}
+                  value={requestDetails?.originalDueDate || 'N/A'}
                   inputProps={{ "aria-labelledby": "dueDate-label"}}
                   InputLabelProps={{
                   shrink: true,
@@ -287,7 +287,7 @@ const RequestDetails = React.memo(
                 <TextField
                     id="recordsDueDate"
                     label="Records Due Date"
-                    value={requestDetails.cfrDueDate || 'N/A'}
+                    value={requestDetails?.cfrDueDate || 'N/A'}
                     inputProps={{ "aria-labelledby": "startDate-label"}}
                     InputLabelProps={{
                     shrink: true,
@@ -302,8 +302,8 @@ const RequestDetails = React.memo(
                 <TextField
                     id="closedDate"
                     label="Closed Date"
-                    value={requestDetails.currentState.toLowerCase() === StateEnum.closed.name.toLowerCase() ?
-                      requestDetails.lastStatusUpdateDate[0] : "N/A"}
+                    value={requestDetails?.currentState?.toLowerCase() === StateEnum.closed.name.toLowerCase() ?
+                      requestDetails?.lastStatusUpdateDate[0] : "N/A"}
                     inputProps={{ "aria-labelledby": "startDate-label"}}
                     InputLabelProps={{
                     shrink: true,
