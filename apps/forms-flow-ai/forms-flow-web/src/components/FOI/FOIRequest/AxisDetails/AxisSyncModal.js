@@ -25,7 +25,8 @@ import {StateEnum} from "../../../../constants/FOI/statusEnum";
 import { toast } from "react-toastify";
 import { createRequestDetailsObjectFunc,
          isAxisSyncDisplayField,
-         isMandatoryField } from "../utils";
+         isMandatoryField,
+         getUniqueIdentifier } from "../utils";
 import { formatDate } from "../../../../helper/FOI/helper";
 
 
@@ -175,23 +176,49 @@ const AxisSyncModal = ({ axisSyncModalOpen, setAxisSyncModalOpen, saveRequestObj
       }
     }
 
+    // const extensionUniqueIdentifiers = () => {
+    //   let axisUniqueIds = [];
+    //   let foiUniqueIds = [];
+    //   requestDetailsFromAxis[key]?.forEach(axisObj => {
+    //     axisUniqueIds.push(axisObj.extensionstatus+axisObj.extensionreson+formatDate(axisObj.extendedduedate, "MMM dd yyyy"));
+    //   })
+    //   extensions.forEach(obj => {
+    //     foiUniqueIds.push(obj.extensionstatus+obj.extensionreson+formatDate(obj.extendedduedate, "MMM dd yyyy"));
+    //   })
+    // }
+
 
     const compareExtensions = (key) => {
       let extensionsArr = [];
       let extensionSet = new Set();
-      const axisReasonIds = requestDetailsFromAxis[key].map(x => x.extensionreasonid);
-      const foiReqReasonIds = extensions.map(x => x.extensionreasonid);
-      const newAxisExtensionReasonIds = axisReasonIds.filter(x => !foiReqReasonIds.includes(x));
-      const newFoiExtensionReasonIds = foiReqReasonIds.filter(x => !axisReasonIds.includes(x));
+      // const axisReasonIds = requestDetailsFromAxis[key].map(x => x.extensionreasonid);
+      // const foiReqReasonIds = extensions.map(x => x.extensionreasonid);
+      // const newAxisExtensionReasonIds = axisReasonIds.filter(x => !foiReqReasonIds.includes(x));
+      // const newFoiExtensionReasonIds = foiReqReasonIds.filter(x => !axisReasonIds.includes(x));
+
+      let axisUniqueIds = [];
+      let foiUniqueIds = [];
+      requestDetailsFromAxis[key]?.forEach(axisObj => {
+        axisUniqueIds.push((axisObj.extensionstatusid+formatDate(axisObj.extendedduedate, "MMM dd yyyy")+
+        axisObj.extensionreasonid).replace(/\s+/g, ''));
+      })
+      extensions.forEach(obj => {
+        foiUniqueIds.push((obj.extensionstatusid+formatDate(obj.extendedduedate, "MMM dd yyyy")+
+        obj.extensionreasonid).replace(/\s+/g, ''));
+      })
+      const newAxisExtensionReasonIds = axisUniqueIds.filter(x => !foiUniqueIds.includes(x));
+      const newFoiExtensionReasonIds = foiUniqueIds.filter(x => !axisUniqueIds.includes(x));
+      console.log("axisUniqueIds",axisUniqueIds);
+      console.log("foiUniqueIds",foiUniqueIds);
       //Scenario: Additional extension added in FOI system which are not in AXIS.
-      if(newFoiExtensionReasonIds?.length > 0 || foiReqReasonIds?.length > axisReasonIds?.length ){
+      if(newFoiExtensionReasonIds?.length > 0 || foiUniqueIds?.length > axisUniqueIds?.length ){
         extensions.forEach(obj => {
-          let duplicateFoiExt = foiReqReasonIds.filter((item, index) => foiReqReasonIds.indexOf(item) !== index);
-          if(newFoiExtensionReasonIds.includes(obj.extensionreasonid)){
+          let duplicateFoiExt = foiUniqueIds.filter((item, index) => foiUniqueIds.indexOf(item) !== index);
+          if(newFoiExtensionReasonIds.includes(getUniqueIdentifier(obj))){
             const property = <><span style={{color: '#f44336'}}>{obj.extensionstatus+" - "+obj.extensionreson+" - "+formatDate(obj.extendedduedate, "MMM dd yyyy")+" will be DELETED."}</span><br /></>;
             extensionsArr.push(property);
           }
-          else if(duplicateFoiExt.includes(obj.extensionreasonid)){
+          else if(duplicateFoiExt.includes(getUniqueIdentifier(obj))){
             requestDetailsFromAxis[key]?.forEach(axisObj => {
               extensionsArr= fieldComparisonOfExtensionObj(axisObj,obj,extensionsArr,true,extensionSet);
             })
@@ -212,7 +239,7 @@ const AxisSyncModal = ({ axisSyncModalOpen, setAxisSyncModalOpen, saveRequestObj
     } 
 
     const fieldComparisonOfExtensionObj = (axisObj,obj,extensionsArr,removeCase, extensionSet) => {
-      if(axisObj.extensionreasonid === obj.extensionreasonid){
+      if(getUniqueIdentifier(axisObj) === getUniqueIdentifier(obj)){
         if(axisObj.extensionstatusid !== obj.extensionstatusid || axisObj.approvednoofdays !== obj.approvednoofdays ||
           axisObj.extendedduedays  !== obj.extendedduedays ||
           axisObj.extendedduedays !== obj.extendedduedays  || 
@@ -233,10 +260,33 @@ const AxisSyncModal = ({ axisSyncModalOpen, setAxisSyncModalOpen, saveRequestObj
       return extensionsArr;
     }
 
+    // const fieldComparisonOfExtensionObj = (axisObj,obj,extensionsArr,removeCase, extensionSet) => {
+    //   if(axisObj.extensionreasonid === obj.extensionreasonid){
+    //     if(axisObj.extensionstatusid !== obj.extensionstatusid || axisObj.approvednoofdays !== obj.approvednoofdays ||
+    //       axisObj.extendedduedays  !== obj.extendedduedays ||
+    //       axisObj.extendedduedays !== obj.extendedduedays  || 
+    //       !(obj.decisiondate === axisObj.approveddate || obj.decisiondate === axisObj.denieddate)){
+    //         if(removeCase){
+    //           const property = <><span style={{color: '#f44336'}}>{obj.extensionstatus+" - "+obj.extensionreson+" - "+formatDate(obj.extendedduedate, "MMM dd yyyy")+" will be DELETED."}</span><br /></>;
+    //           extensionsArr.push(property);
+    //         }
+    //         else{
+    //           if(!extensionSet.has(axisObj.extensionreasonid)){
+    //             const property = <>{axisObj.extensionstatus+" - "+axisObj.extensionreason+" - "+formatDate(axisObj.extendedduedate, "MMM dd yyyy")}<br /></>;
+    //             extensionsArr.push(property);
+    //             extensionSet.add(axisObj.extensionreasonid);
+    //           }
+    //         }
+    //     }
+    //   }
+    //   return extensionsArr;
+    // }
+
     const assignExtensionForDsiplay = (key,extensionsArr,newAxisExtensionReasonIds,extensionSet) => {
+      console.log("newAxisExtensionReasonIds",newAxisExtensionReasonIds);
       if(newAxisExtensionReasonIds?.length > 0){
         requestDetailsFromAxis[key].forEach(obj => {
-          if(newAxisExtensionReasonIds.includes(obj.extensionreasonid)){
+          if(newAxisExtensionReasonIds.includes(getUniqueIdentifier(obj))){
             const property = <>{obj.extensionstatus+" - "+obj.extensionreason+" - "+formatDate(obj.extendedduedate, "MMM dd yyyy")}<br /></>;
             extensionsArr.push(property);
           }

@@ -416,3 +416,7 @@ export const persistRequestFieldsNotInAxis = (newRequestDetails, existingRequest
   }
   return newRequestDetails;
 }
+
+export const getUniqueIdentifier = (obj) => {
+  return (obj.extensionstatusid+formatDate(obj.extendedduedate, "MMM dd yyyy")+obj.extensionreasonid).replace(/\s+/g, '');
+}

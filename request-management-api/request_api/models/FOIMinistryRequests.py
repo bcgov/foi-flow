@@ -675,8 +675,8 @@ class FOIMinistryRequest(db.Model):
         ]
 
         #subquery for getting extension count
-        subquery_extension_count = _session.query(FOIRequestExtension.foiministryrequest_id, func.count(distinct(FOIRequestExtension.foirequestextensionid)).label('extensions')).group_by(FOIRequestExtension.foiministryrequest_id).subquery()
-
+        subquery_extension_count = _session.query(FOIRequestExtension.foiministryrequest_id , func.count(distinct(FOIRequestExtension.foirequestextensionid)).filter(FOIRequestExtension.isactive == True).label('extensions')).group_by(FOIRequestExtension.foiministryrequest_id).subquery()
+        print("++++subquery_extension_count",subquery_extension_count)
         
         onbehalf_applicantmapping = aliased(FOIRequestApplicantMapping)
         onbehalf_applicant = aliased(FOIRequestApplicant)
