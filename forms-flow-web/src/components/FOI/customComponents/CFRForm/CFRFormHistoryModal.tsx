@@ -81,31 +81,36 @@ export const CFRFormHistoryModal = React.memo(({
                     </div>
                     <div className="col-lg-6 foi-details-col">
                       <TextField
-                        id="amountdue"
-                        label="Total Amount Due"
+                        id="balanceremaining"
+                        label="Balance Remaining"
                         inputProps={{
-                          "aria-labelledby": "amountdue-label"
+                          "aria-labelledby": "balanceremaining-label"
                         }}
                         InputProps={{
                           startAdornment: <InputAdornment position="start">$</InputAdornment>
                         }}
                         InputLabelProps={{ shrink: true }}
-                        name="amountDue"
-                        value={parseFloat(entry.feedata.totalamountdue).toFixed(2)}
+                        name="balanceRemaining"
+                        value={parseFloat(entry.feedata.balanceremaining).toFixed(2)}
                         variant="outlined"
                         placeholder="0"
                         fullWidth
                         disabled={true}
-                        //
                       />
                     </div>
                   </div>
                   <div className="row foi-details-row">
                     <div className="col-lg-4 foi-details-col">
-                      <span className="formLabel">Balance Remaining</span>
+                      <span className="formLabel">Estimated Total</span>
                     </div>
                     <div className="col-lg-2 foi-details-col">
-                      <span className="formLabel">{"$"+(entry.feedata.totalamountdue - entry.feedata.amountpaid)?.toFixed(2)}</span>
+                      <span className="formLabel">{"$"+parseFloat(entry.feedata.estimatedtotaldue).toFixed(2)}</span>
+                    </div>
+                    <div className="col-lg-4 foi-details-col">
+                      <span className="formLabel">Actual Total</span>
+                    </div>
+                    <div className="col-lg-2 foi-details-col">
+                      <span className="formLabel">{"$"+parseFloat(entry.feedata.actualtotaldue).toFixed(2)}</span>
                     </div>
                   </div>
                   <div className="row foi-details-row">

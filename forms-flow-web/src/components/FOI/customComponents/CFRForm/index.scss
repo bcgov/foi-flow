@@ -150,6 +150,12 @@
   }
 }
 
+.cfr-fee-totals {
+  display: flex;
+  width: 100%;
+  margin: 0 0 5px !important;
+}
+
 @media (max-width: 1444px) {
   .cfrform-floatRightRight {
     display: none;
