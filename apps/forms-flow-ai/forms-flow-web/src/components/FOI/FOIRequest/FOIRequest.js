@@ -56,9 +56,10 @@ import {
   handleBeforeUnload,
   findRequestState,
   isMandatoryField,
-  isAxisSyncDisplayField
+  isAxisSyncDisplayField,
+  getUniqueIdentifier
 } from "./utils";
-import { ConditionalComponent } from '../../../helper/FOI/helper';
+import { ConditionalComponent, formatDate } from '../../../helper/FOI/helper';
 import DivisionalTracking from './DivisionalTracking';
 import AxisDetails from './AxisDetails/AxisDetails';
 import AxisMessageBanner from "./AxisDetails/AxisMessageBanner";
@@ -288,16 +289,24 @@ const FOIRequest = React.memo(({ userDetail }) => {
   const extensionComparison = (axisData, key) => {
     if(requestExtensions.length !== axisData[key].length)
         return true;
-    const axisReasonIds = axisData[key].map(x => x.extensionreasonid);
-    const foiReqReasonIds = requestExtensions.map(x => x.extensionreasonid);
-    if(axisReasonIds.filter(x => !foiReqReasonIds.includes(x))?.length > 0){
+    let axisUniqueIds = [];
+    let foiUniqueIds = [];
+    axisData[key]?.forEach(axisObj => {
+      axisUniqueIds.push((axisObj.extensionstatusid+formatDate(axisObj.extendedduedate, "MMM dd yyyy")+
+      axisObj.extensionreasonid).replace(/\s+/g, ''));
+    })
+    requestExtensions.forEach(obj => {
+      foiUniqueIds.push((obj.extensionstatusid+formatDate(obj.extendedduedate, "MMM dd yyyy")+
+      obj.extensionreasonid).replace(/\s+/g, ''));
+    })
+    if(axisUniqueIds.filter(x => !foiUniqueIds.includes(x))?.length > 0){
       return true;
     }
       
     if(requestExtensions.length > 0 && axisData[key].length > 0){
       for(let axisObj of axisData[key]){
         for(let foiReqObj of requestExtensions){
-          if(axisObj.extensionreasonid === foiReqObj.extensionreasonid){
+          if(getUniqueIdentifier(axisObj) === getUniqueIdentifier(foiReqObj)){
             if(axisObj.extensionstatusid !== foiReqObj.extensionstatusid || axisObj.approvednoofdays !== foiReqObj.approvednoofdays ||
               axisObj.extendedduedays  !== foiReqObj.extendedduedays ||
               axisObj.extendedduedays !== foiReqObj.extendedduedays  || 
