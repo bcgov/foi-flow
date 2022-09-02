@@ -14,7 +14,8 @@ class FOIFeeDataSchema(Schema):
         """Exclude unknown fields in the deserialized output."""
 
     amountpaid = fields.Float(data_key="amountpaid")
-    totalamountdue = fields.Float(data_key="totalamountdue")
+    estimatedtotaldue = fields.Float(data_key="estimatedtotaldue")
+    actualtotaldue = fields.Float(data_key="actualtotaldue")
     balanceremaining = fields.Float(data_key="balanceremaining")
     estimatedlocatinghrs = fields.Float(data_key="estimatedlocatinghrs")
     actuallocatinghrs = fields.Float(data_key="actuallocatinghrs")
@@ -46,7 +47,8 @@ class FOIFeeDataSanctionSchema(Schema):
     amountpaid = fields.Float(data_key="amountpaid") 
     estimatediaopreparinghrs = fields.Float(data_key="estimatediaopreparinghrs")
     actualiaopreparinghrs = fields.Float(data_key="actualiaopreparinghrs")
-    totalamountdue = fields.Float(data_key="totalamountdue")
+    estimatedtotaldue = fields.Float(data_key="estimatedtotaldue")
+    actualtotaldue = fields.Float(data_key="actualtotaldue")
     balanceremaining = fields.Float(data_key="balanceremaining")
     
 class FOICFRFeeSanctionSchema(Schema):
