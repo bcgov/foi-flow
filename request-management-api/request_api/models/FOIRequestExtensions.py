@@ -43,7 +43,7 @@ class FOIRequestExtension(db.Model):
 
     @classmethod
     def saveextension(cls,ministryrequestid,ministryrequestversion, extension, extensionreason, userid, newduedate=None):
-        
+        print("Inside multiple save",extension)
         createuserid = extension['createdby'] if 'createdby' in extension and extension['createdby'] is not None else userid
         createdat = extension['created_at'] if 'created_at' in extension  and extension['created_at'] is not None else datetime.now()
         approveddate = extension['approveddate'] if 'approveddate' in extension else None
@@ -70,7 +70,8 @@ class FOIRequestExtension(db.Model):
         foiministryrequest_id=ministryrequestid, 
         foiministryrequestversion_id=ministryrequestversion, 
         created_at=createdat, 
-        createdby=createuserid)        
+        createdby=createuserid)   
+        print("newextension", newextension)     
         db.session.add(newextension)
         db.session.commit()
         return DefaultMethodResult(True,'Extension created', newextension.foirequestextensionid, newduedate)      
@@ -158,6 +159,12 @@ class FOIRequestExtension(db.Model):
         db.session.query(FOIRequestExtension).filter(FOIRequestExtension.foiministryrequest_id == ministryrequestid).update({"isactive": False, "updated_at": datetime.now(),"updatedby": userid}, synchronize_session=False)
         db.session.commit()
         return DefaultMethodResult(True,'Extensions disabled for the ministry',ministryrequestid)
+
+    @classmethod
+    def disableextension(cls, foirequestextensionid, userid):
+        db.session.query(FOIRequestExtension).filter(FOIRequestExtension.foirequestextensionid == foirequestextensionid).update({"isactive": False, "updated_at": datetime.now(),"updatedby": userid}, synchronize_session=False)
+        db.session.commit()
+        return DefaultMethodResult(True,'Extensions disabled for extension ',foirequestextensionid)
 
 class FOIRequestExtensionSchema(ma.Schema):
     class Meta:

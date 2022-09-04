@@ -50,6 +50,7 @@ const AxisSyncModal = ({ axisSyncModalOpen, setAxisSyncModalOpen, saveRequestObj
     const [axisExtensions, setAxisExtension] = React.useState([]);
     const dispatch = useDispatch();
     const extensions = useSelector((state) => state.foiRequests.foiRequestExtesions);
+    let updateExtensions = false;
 
     useEffect(()=>{
         if(Object.entries(requestDetailsFromAxis).length !== 0){
@@ -144,6 +145,7 @@ const AxisSyncModal = ({ axisSyncModalOpen, setAxisSyncModalOpen, saveRequestObj
           if(extensionsArr?.length > 0 || (extensionsArr?.length === 0 && 
               requestDetailsFromAxis[key].length === 0 && extensions?.length > 0))
             updatedObj[key] = extensionsArr;
+            updateExtensions = true;
           break;
         default:
           updatedObj[updatedField] = requestDetailsFromAxis[key];
@@ -279,7 +281,8 @@ const AxisSyncModal = ({ axisSyncModalOpen, setAxisSyncModalOpen, saveRequestObj
                 draggable: true,
                 progress: undefined,
               });
-              saveExtensions();
+              if(updateExtensions)
+                saveExtensions();
               const _state = getRequestState({
                 currentSelectedStatus,
                 requestState,

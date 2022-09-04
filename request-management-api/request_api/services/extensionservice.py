@@ -58,6 +58,7 @@ class extensionservice:
         extensionreason = extensionreasonservice().getextensionreasonbyid(reasonid)
         ispublicbodyextension = self.__ispublicbodyextension(reasonid)
         if ('extensionstatusid' in extensionschema and extensionschema['extensionstatusid'] == 2) or ispublicbodyextension == True:
+            print("Inside multiple save")
             self.validatecreateextension(ministryrequestid, extensionschema, ispublicbodyextension)
             ministryrequestschema = {
                 "duedate": extensionschema['extendedduedate']
@@ -73,6 +74,7 @@ class extensionservice:
                 version = self.__getversionforrequest(ministryrequestid)
                 extnsionresult = FOIRequestExtension.saveextension(ministryrequestid, version, extensionschema, extensionreason, userid, newduedate= newduedate)
         else:
+            print("Inside single save")
             extnsionresult = FOIRequestExtension.saveextension(ministryrequestid, version, extensionschema, extensionreason, userid)
         if 'documents' in extensionschema and extensionschema['extensionstatusid'] != 1:
             self.saveextensiondocument(extensionschema['documents'], ministryrequestid, userid, extnsionresult.identifier)
@@ -212,9 +214,10 @@ class extensionservice:
 
               
         #copyextension has the updated extension with soft delete(isactive: False) with the new version of extension       
-        updatedextension = self.__copyextensionproperties(extension, extensionschema, extensionversion)
+        #updatedextension = self.__copyextensionproperties(extension, extensionschema, extensionversion)
         # this will create a new version of extension with isactive = False
-        extensionresult = FOIRequestExtension.createextensionversion(ministryrequestid, ministryversion, updatedextension, userid)
+        #extensionresult = FOIRequestExtension.createextensionversion(ministryrequestid, ministryversion, updatedextension, userid)
+        extensionresult = FOIRequestExtension.disableextension(extension["foirequestextensionid"], userid)
         # once soft deleted, revert back the due date to prev due date
         # creates a new version of ministry request, extension, extensiondocuments(if any) and documents(if any)
         if extensionresult.success == True and prevstatus == 2:
