@@ -193,13 +193,12 @@ class extensionservice:
         return extensionresult
         
     def deleterequestextension(self, requestid, ministryrequestid, extensionid, userid):
-        extensionschema = {'isactive':False}
-        return self.createrequestextensionversionfordelete(requestid, ministryrequestid, extensionid, extensionschema, userid)
+        return self.createrequestextensionversionfordelete(requestid, ministryrequestid, extensionid, userid)
 
     # This is used for delete extension
     # soft delete of extension and related documents
     # due date reverted back to the prev approved due date
-    def createrequestextensionversionfordelete(self, requestid, ministryrequestid, extensionid, extensionschema, userid):
+    def createrequestextensionversionfordelete(self, requestid, ministryrequestid, extensionid, userid):
         ministryversion = self.__getversionforrequest(ministryrequestid)
         extension = FOIRequestExtension.getextension(extensionid)
         prevstatus = extension["extensionstatusid"]
