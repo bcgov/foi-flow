@@ -43,7 +43,6 @@ class FOIRequestExtension(db.Model):
 
     @classmethod
     def saveextension(cls,ministryrequestid,ministryrequestversion, extension, extensionreason, userid, newduedate=None):
-        print("Inside multiple save",extension)
         createuserid = extension['createdby'] if 'createdby' in extension and extension['createdby'] is not None else userid
         createdat = extension['created_at'] if 'created_at' in extension  and extension['created_at'] is not None else datetime.now()
         approveddate = extension['approveddate'] if 'approveddate' in extension else None
@@ -71,7 +70,6 @@ class FOIRequestExtension(db.Model):
         foiministryrequestversion_id=ministryrequestversion, 
         created_at=createdat, 
         createdby=createuserid)   
-        print("newextension", newextension)     
         db.session.add(newextension)
         db.session.commit()
         return DefaultMethodResult(True,'Extension created', newextension.foirequestextensionid, newduedate)      
@@ -165,6 +163,12 @@ class FOIRequestExtension(db.Model):
         db.session.query(FOIRequestExtension).filter(FOIRequestExtension.foirequestextensionid == foirequestextensionid).update({"isactive": False, "updated_at": datetime.now(),"updatedby": userid}, synchronize_session=False)
         db.session.commit()
         return DefaultMethodResult(True,'Extensions disabled for extension ',foirequestextensionid)
+
+    @classmethod
+    def disableoldversions(cls, version, ministryrequestid, userid):
+        db.session.query(FOIRequestExtension).filter(FOIRequestExtension.foiministryrequest_id == ministryrequestid,  FOIRequestExtension.foiministryrequestversion_id != version, FOIRequestExtension.isactive == True).update({"isactive": False, "updated_at": datetime.now(),"updatedby": userid}, synchronize_session=False)
+        db.session.commit()
+        return DefaultMethodResult(True,'Previous extensions disabled for ministry request ',ministryrequestid)
 
 class FOIRequestExtensionSchema(ma.Schema):
     class Meta:
