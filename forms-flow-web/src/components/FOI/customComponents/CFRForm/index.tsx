@@ -152,7 +152,8 @@ export const CFRForm = ({
   const blankForm: CFRFormData = {
     cfrfeeid: null,
     formStatus: "init",
-    amountDue: 0,
+    estimatedTotalDue: 0,
+    actualTotalDue: 0,
     amountPaid: 0,
     balanceRemaining:0,
     estimates: {
@@ -161,7 +162,7 @@ export const CFRForm = ({
       ministryPreparing: 0,
       iaoPreparing: 0,
       electronicPages: 0,
-      hardcopyPages: 0
+      hardcopyPages: 0,
     },
     actual: {
       locating: 0,
@@ -169,7 +170,7 @@ export const CFRForm = ({
       ministryPreparing: 0,
       iaoPreparing: 0,
       electronicPages: 0,
-      hardcopyPages: 0
+      hardcopyPages: 0,
     },
     suggestions: ''
   };
@@ -183,9 +184,10 @@ export const CFRForm = ({
     var formattedData = {
       cfrfeeid: initialState.cfrfeeid,
       formStatus: initialState.status === null ? 'init' : initialState.status,
-      amountDue: initialState.feedata?.totalamountdue,
+      estimatedTotalDue: initialState.feedata?.estimatedtotaldue,
+      actualTotalDue: initialState.feedata?.actualtotaldue,
       amountPaid: initialState.feedata?.amountpaid,
-      balanceRemaining: +(initialState.feedata?.totalamountdue - initialState.feedata?.amountpaid)?.toFixed(2),
+      balanceRemaining: initialState.feedata?.balanceremaining,
       estimates: {
         locating: initialState.feedata?.estimatedlocatinghrs,
         producing: initialState.feedata?.estimatedproducinghrs,
@@ -243,7 +245,7 @@ export const CFRForm = ({
   const handleAmountPaidChanges = (e: React.ChangeEvent<HTMLInputElement>) => {
     const name : string = e.target.name;
     const value : number = Math.floor((+e.target.value) * 100) / 100;
-    if (value <= formData.amountDue) {
+    if (value <= Math.max(formData.actualTotalDue, formData.estimatedTotalDue)) {
       setFormData(values => ({...values, [name]: value}));
     }
   };
@@ -261,8 +263,10 @@ export const CFRForm = ({
 
     const estimates = formData.estimates;
     const newEstimates = {...estimates, [name]: value};
-    let newFormData : CFRFormData = {...formData, ["estimates"]: newEstimates};
-    newFormData = calculateFees(newFormData);
+    let newFormData : CFRFormData = {
+      ...formData, ["estimates"]: newEstimates,
+      estimatedTotalDue: calculateFees(newEstimates)
+    };
     setFormData(newFormData);
   };
 
@@ -272,15 +276,22 @@ export const CFRForm = ({
 
     const actual = formData.actual;
     const newActual = {...actual, [name]: value};
-    let newFormData : CFRFormData = {...formData, ["actual"]: newActual};
-    newFormData = calculateFees(newFormData);
+    let newFormData : CFRFormData = {
+      ...formData,
+      ["actual"]: newActual,
+      actualTotalDue: calculateFees(newActual)
+    };
     setFormData(newFormData);
   };
 
- const cfrStatusDisabled = () => {
+  const calculateBalanceRemaining = () => {
+    return formData?.actualTotalDue ? (formData.actualTotalDue - formData.amountPaid) : (formData.estimatedTotalDue - formData.amountPaid);
+  }
+
+  const cfrStatusDisabled = () => {
     if (formHistory.length > 0 && (requestState === StateEnum.callforrecords.name || requestState === StateEnum.onhold.name)) {
       if (isMinistry) {
-        return initialFormData.formStatus === 'review' || initialFormData.formStatus === 'approved';
+        return initialFormData.formStatus === 'review' || initialFormData.formStatus === 'approved' || isNewCFRForm;
       } else {
         return initialFormData.formStatus !== 'review';
       }
@@ -297,6 +308,7 @@ export const CFRForm = ({
 
   const save = () => {
     var callback = (_res: string) => {
+      setIsNewCFRForm(false)
       setInitialFormData(formData)
       toast.success("CFR Form has been saved successfully.", {
         position: "top-right",
@@ -317,8 +329,9 @@ export const CFRForm = ({
       data = {
         feedata:{
           amountpaid: formData.amountPaid,
-          totalamountdue: formData.amountDue,
-          balanceremaining: +(formData?.amountDue - formData?.amountPaid)?.toFixed(2),
+          estimatedtotaldue: formData.estimatedTotalDue,
+          actualtotaldue: formData.actualTotalDue,
+          balanceremaining: calculateBalanceRemaining(),
           estimatedlocatinghrs: formData.estimates.locating,
           actuallocatinghrs: formData.actual.locating,
           estimatedproducinghrs: formData.estimates.producing,
@@ -342,8 +355,9 @@ export const CFRForm = ({
           amountpaid: formData.amountPaid,
           estimatediaopreparinghrs: formData.estimates.iaoPreparing,
           actualiaopreparinghrs: formData.actual.iaoPreparing,
-          totalamountdue: formData.amountDue,
-          balanceremaining: +(formData?.amountDue - formData?.amountPaid)?.toFixed(2),
+          estimatedtotaldue: formData.estimatedTotalDue,
+          actualtotaldue: formData.actualTotalDue,
+          balanceremaining: calculateBalanceRemaining(),
         },
         status: formData.formStatus,
       }
@@ -413,11 +427,14 @@ export const CFRForm = ({
       requestState !== StateEnum.feeassessed.name && requestState !== StateEnum.onhold.name));
   }
 
+
+  const [isNewCFRForm, setIsNewCFRForm] = useState(false)
   const newCFRForm = () => {
     setCreateModalOpen(false)
     blankForm.amountPaid= initialState?.feedata?.amountpaid;
     setInitialFormData(blankForm);
     setFormData(blankForm);
+    setIsNewCFRForm(true)
   }
 
 
@@ -484,7 +501,7 @@ export const CFRForm = ({
               <div className='request-accordian'>
                 <Accordion defaultExpanded={true}>
                   <AccordionSummary className="accordionSummary" expandIcon={<ExpandMoreIcon />} id="applicantDetails-header">
-                    <Typography className="heading">OVERALL FEES ESTIMATE</Typography>
+                    <Typography className="heading">PAYMENT DETAILS</Typography>
                   </AccordionSummary>
                   <AccordionDetails>
                     <div className="row foi-details-row">
@@ -495,7 +512,7 @@ export const CFRForm = ({
                           inputProps={{
                             "aria-labelledby": "amountpaid-label",
                             step: 0.01,
-                            max: formData.amountDue,
+                            max: Math.max(formData.estimatedTotalDue, formData.actualTotalDue),
                             min: 0
                           }}
                           InputProps={{
@@ -516,6 +533,23 @@ export const CFRForm = ({
                       </div>
                       <div className="col-lg-6 foi-details-col">
                         <TextField
+                          id="balanceremaining"
+                          label="Balance Remaining"
+                          inputProps={{
+                            "aria-labelledby": "balanceremaining-label"
+                          }}
+                          InputProps={{
+                            startAdornment: <InputAdornment position="start">$</InputAdornment>
+                          }}
+                          InputLabelProps={{ shrink: true }}
+                          name="balanceRemaining"
+                          value={calculateBalanceRemaining().toFixed(2)}
+                          variant="outlined"
+                          placeholder="0"
+                          fullWidth
+                          disabled={true}
+                        />
+                        {/* <TextField
                           id="amountdue"
                           label="Total Amount Due"
                           inputProps={{
@@ -533,22 +567,58 @@ export const CFRForm = ({
                           fullWidth
                           disabled={true}
                           // onChange={handleMiddleNameChange}
+                        /> */}
+                      </div>
+                    </div>
+                    <div className="row cfr-fee-totals">
+                      <div className="col-lg-4 foi-details-col">
+                        <span className="formLabel">Estimated Total</span>
+                      </div>
+                      <div className="col-lg-2 foi-details-col">
+                        <span className="formLabel">{"$"+(formData?.estimatedTotalDue)?.toFixed(2)}</span>
+                      </div>
+                      <div className="col-lg-4 foi-details-col">
+                        <span className="formLabel">Actual Total</span>
+                      </div>
+                      <div className="col-lg-2 foi-details-col">
+                        <span className="formLabel">{"$"+(formData?.actualTotalDue)?.toFixed(2)}</span>
+                      </div>
+                    </div>
+                    <div className="row foi-details-row">
+                      <div className="col-lg-6 foi-details-col">
+                        <TextField
+                          id="feewaiver"
+                          label="Fee Waiver Amount"
+                          inputProps={{
+                            "aria-labelledby": "feewaiver-label",
+                            step: 0.01,
+                            max: Math.max(formData.estimatedTotalDue, formData.actualTotalDue),
+                            min: 0
+                          }}
+                          InputProps={{
+                            startAdornment: <InputAdornment position="start">$</InputAdornment>
+                          }}
+                          InputLabelProps={{ shrink: true }}
+                          variant="outlined"
+                          name="feeWaiver"
+                          type="number"
+                          value={0}
+                          onChange={handleAmountPaidChanges}
+                          onBlur={(e) => {
+                            e.target.value = parseFloat(e.target.value).toFixed(2);
+                          }}
+                          fullWidth
+                          disabled={true}
                         />
                       </div>
                     </div>
-                    <div className="row foi-details-row">
-                      <div className="col-lg-4 foi-details-col">
-                        <span className="formLabel">Balance Remaining</span>
-                      </div>
-                      <div className="col-lg-2 foi-details-col">
-                        <span className="formLabel">{"$"+(formData?.amountDue - formData?.amountPaid)?.toFixed(2)}</span>
-                      </div>
-                    </div>
-                    <div className="row foi-details-row">
-                      <div className="col-lg-12 foi-details-col">
-                        <hr />
-                      </div>
-                    </div>
+                  </AccordionDetails>
+                </Accordion>
+                <Accordion defaultExpanded={true}>
+                  <AccordionSummary className="accordionSummary" expandIcon={<ExpandMoreIcon />} id="applicantDetails-header">
+                    <Typography className="heading">OVERALL FEES ESTIMATE</Typography>
+                  </AccordionSummary>
+                  <AccordionDetails>
                     <div className="row foi-details-row">
                       <div className="col-lg-12 foi-details-col">
                         <div className="formLabel">Locating/Retrieving - this includes searching all relevant sources.</div>
