@@ -21,7 +21,7 @@ class templateconfig:
     def getsubject(self, key, requestjson):        
         if key == "PAYONLINE" or key == "PAYOUTSTANDING":
             return "Your FOI Request ["+requestjson["axisRequestId"]+"]"
-        elif key == "FEE-ESTIMATE-PAYMENT-RECEIPT":
+        elif key == "FEE-ESTIMATE-PAYMENT-RECEIPT" or key == "PAYOUTSTANDING":
             return "Your FOI Request ["+requestjson["axisRequestId"]+"] - Fee Payment Received"
         elif key == "PAYOUTSTANDING":
             return "Your FOI Request ["+requestjson["axisRequestId"]+"] - Outstanding Fee Estimate"
