@@ -33,11 +33,7 @@ class cfrfeeservice:
     def paycfrfee(self, ministryrequestid, amountpaid):
         cfrfee = self.__preparecfrfee(ministryrequestid)
         _amountpaid = cfrfee.feedata['amountpaid'] + amountpaid
-        print("_amountpaid = ", _amountpaid)
-        print("amountpaid1 = ", amountpaid)
-        print("amountpaid2 = ", cfrfee.feedata['amountpaid'])
-        print("balanceremaining = ", cfrfee.feedata['balanceremaining'])
-        _balanceremaining = cfrfee.feedata['balanceremaining'] - _amountpaid
+        _balanceremaining = cfrfee.feedata['balanceremaining'] - amountpaid
         print("_balanceremaining = ", _balanceremaining)
         cfrfee.feedata['balanceremaining'] = _balanceremaining
         cfrfee.feedata['amountpaid'] = '{:.2f}'.format(_amountpaid)
