@@ -71,6 +71,8 @@ class extensionservice:
            
             if result.success == True:
                 version = self.__getversionforrequest(ministryrequestid)
+                #Set isactive:false for extensions with previous ministry request version
+                FOIRequestExtension.disableoldversions(version,ministryrequestid, userid)
                 extnsionresult = FOIRequestExtension.saveextension(ministryrequestid, version, extensionschema, extensionreason, userid, newduedate= newduedate)
         else:
             extnsionresult = FOIRequestExtension.saveextension(ministryrequestid, version, extensionschema, extensionreason, userid)
@@ -180,7 +182,8 @@ class extensionservice:
                 "duedate": extendedduedate if extendedduedate else updatedduedate
             }
             requestservice().saveministryrequestversion(ministryrequestschema, foirequestid, ministryrequestid, userid)
-        
+            version = self.__getversionforrequest(ministryrequestid)
+            FOIRequestExtension.disableoldversions(version,ministryrequestid, userid)
             newduedate = \
             ministryrequestschema['duedate'] \
             if isinstance(ministryrequestschema['duedate'], str) \
@@ -190,13 +193,12 @@ class extensionservice:
         return extensionresult
         
     def deleterequestextension(self, requestid, ministryrequestid, extensionid, userid):
-        extensionschema = {'isactive':False}
-        return self.createrequestextensionversionfordelete(requestid, ministryrequestid, extensionid, extensionschema, userid)
+        return self.createrequestextensionversionfordelete(requestid, ministryrequestid, extensionid, userid)
 
     # This is used for delete extension
     # soft delete of extension and related documents
     # due date reverted back to the prev approved due date
-    def createrequestextensionversionfordelete(self, requestid, ministryrequestid, extensionid, extensionschema, userid):
+    def createrequestextensionversionfordelete(self, requestid, ministryrequestid, extensionid, userid):
         ministryversion = self.__getversionforrequest(ministryrequestid)
         extension = FOIRequestExtension.getextension(extensionid)
         prevstatus = extension["extensionstatusid"]
@@ -212,9 +214,11 @@ class extensionservice:
 
               
         #copyextension has the updated extension with soft delete(isactive: False) with the new version of extension       
-        updatedextension = self.__copyextensionproperties(extension, extensionschema, extensionversion)
+        #updatedextension = self.__copyextensionproperties(extension, extensionschema, extensionversion)
         # this will create a new version of extension with isactive = False
-        extensionresult = FOIRequestExtension.createextensionversion(ministryrequestid, ministryversion, updatedextension, userid)
+        #extensionresult = FOIRequestExtension.createextensionversion(ministryrequestid, ministryversion, updatedextension, userid)
+        #LATEST UPDATE :- updates existing isactive field to false if delete performed & no new version will be created for delete.
+        extensionresult = FOIRequestExtension.disableextension(extension["foirequestextensionid"], userid)
         # once soft deleted, revert back the due date to prev due date
         # creates a new version of ministry request, extension, extensiondocuments(if any) and documents(if any)
         if extensionresult.success == True and prevstatus == 2:
@@ -222,6 +226,9 @@ class extensionservice:
                 "duedate": updatedduedate
             }
             requestservice().saveministryrequestversion(ministryrequestschema, requestid, ministryrequestid, userid)
+            version = self.__getversionforrequest(ministryrequestid)
+            #Set isactive:false for extensions with previous ministry request version
+            FOIRequestExtension.disableoldversions(version,ministryrequestid, userid)
             ## return due date
             
             newduedate = \
