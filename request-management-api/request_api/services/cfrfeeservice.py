@@ -33,8 +33,10 @@ class cfrfeeservice:
     def paycfrfee(self, ministryrequestid, amountpaid):
         cfrfee = self.__preparecfrfee(ministryrequestid)
         _amountpaid = cfrfee.feedata['amountpaid'] + amountpaid
+        print("_amountpaid = ", _amountpaid)
         _balanceremaining = cfrfee.feedata['balanceremaining'] - _amountpaid
-        cfrfee.feedata['balanceremaining'] = '{:.2f}'.format(_balanceremaining)
+        print("_balanceremaining = ", _balanceremaining)
+        cfrfee.feedata['balanceremaining'] = _balanceremaining
         cfrfee.feedata['amountpaid'] = '{:.2f}'.format(_amountpaid)
         cfrfee.feedata['paymentdate'] = datetime.now().astimezone(pytz.timezone(current_app.config['LEGISLATIVE_TIMEZONE'])).strftime('%Y-%m-%d')
         return FOIRequestCFRFee.createcfrfee(cfrfee, 'Online Payment')
