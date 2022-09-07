@@ -34,9 +34,12 @@ class templateservice:
         if _templatename is None:
             if requestjson is not None and requestjson != {}:
                 balancedue = float(requestjson['cfrfee']['feedata']["balanceDue"])
+                print("balancedue = ", balancedue)
                 if balancedue > 0:
+                    print("template = ", templateconfig().gettemplatename("HALFPAYMENT"))
                     return templateconfig().gettemplatename("HALFPAYMENT")
                 elif balancedue == 0:
+                    print("template = ", templateconfig().gettemplatename("FULLPAYMENT"))
                     return templateconfig().gettemplatename("FULLPAYMENT")
                 else: 
                     return None
