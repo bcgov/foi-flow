@@ -46,13 +46,18 @@ class paymentservice:
     def createpaymentreceipt(self, request_id, ministry_request_id, data, parsed_args):
         try:
             balancedue = float(data['cfrfee']['feedata']["balanceDue"])
+            prevstate = data["stateTransition"][1]["status"] if "stateTransition" in data and len(data["stateTransition"])  > 2 else None
             basepath = 'request_api/receipt_templates/'
             receiptname = 'cfr_fee_payment_receipt'
             if balancedue > 0:
                 receipt_template_path= basepath + self.getreceiptename('HALFPAYMENT') +".docx"
                 receiptname = self.getreceiptename('HALFPAYMENT')
             else:
-                receipt_template_path= basepath + self.getreceiptename('FULLPAYMENT')+".docx"
+                if prevstate.lower() == "response":
+                    filename = self.getreceiptename('PAYOUTSTANDING')
+                else:
+                    filename = self.getreceiptename('FULLPAYMENT')
+                receipt_template_path= basepath + filename + ".docx"
                 receiptname = self.getreceiptename('FULLPAYMENT')
             data['waivedAmount'] = data['cfrfee']['feedata']['estimatedlocatinghrs'] * 30 if data['cfrfee']['feedata']['estimatedlocatinghrs'] < 3 else 90
             data.update({'paymentInfo': {
@@ -74,6 +79,8 @@ class paymentservice:
             return "cfr_fee_payment_receipt_half"
         elif key == "FULLPAYMENT":
             return "cfr_fee_payment_receipt_full"
+        elif key == "PAYOUTSTANDING":
+            return "outstanding_fee_payment_receipt"
         else:
             logging.info("Unknown key")
             return None
