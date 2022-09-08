@@ -40,6 +40,15 @@ class extensionevent:
         except BusinessException as exception:
             return DefaultMethodResult(False,'unable to post comment - '+exception.message,extensionid)
 
+    def deleteexistingrelatedevents(self, ministryrequestid):
+        try:
+            notificationids = FOIRequestNotification().getextensionnotificationidsbyministry(ministryrequestid)
+            if notificationids:
+                self.__deleteaxisextensionnotifications(notificationids)
+            FOIRequestComment().deleteextensioncommentsbyministry(ministryrequestid)
+        except BusinessException as exception:
+            return DefaultMethodResult(False,'Issue in deleting previous event related to ministry id - '+exception.message,ministryrequestid)  
+
     def createaxisextensionevent(self, ministryrequestid, extensionid, userid, username, event):
         # get all extension comments and notification of the ministry id
         # delete all comments and notification related to ministry id and extension
@@ -50,14 +59,10 @@ class extensionevent:
         extensionsummaryforcomment = self.__maintained(curextension, prevextension, event)
         message = ""
         try:
-            notificationids = FOIRequestNotification().getextensionnotificationidsbyministry(ministryrequestid)
-            if notificationids:
-                self.__deleteaxisextensionnotifications(notificationids)
             notificationresponse = self.createnotification(ministryrequestid, extensionid, curextension, prevextension, userid, event)
             if extensionsummaryforcomment is None or (extensionsummaryforcomment and len(extensionsummaryforcomment) < 1):
                 return  DefaultMethodResult(True, MSG_NO_CHANGE ,extensionid)
             else:
-                FOIRequestComment().deleteextensioncommentsbyministry(ministryrequestid)
                 commentresponse = self.createcomment(ministryrequestid, userid, username, extensionsummaryforcomment)
                 if commentresponse.success == True:                    
                     message += 'Comment posted' 

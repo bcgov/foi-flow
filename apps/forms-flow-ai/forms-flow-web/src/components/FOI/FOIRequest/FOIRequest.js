@@ -218,6 +218,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
         setAxisMessage("");
     }
   }, [axisSyncedData, requestExtensions, checkExtension]);
+  
 
   const axisBannerCheck = () =>{
     dispatch(fetchRequestDataFromAxis(requestDetails.axisRequestId, saveRequestObject ,true, (err, data) => {
@@ -229,8 +230,10 @@ const FOIRequest = React.memo(({ userDetail }) => {
             setCheckExtension(false);
             setAxisMessage("WARNING");
           }
-          else
+          else{
+            setCheckExtension(true);
             setAxisMessage("");
+          }
         }
         else if(data){
           let responseMsg = data;

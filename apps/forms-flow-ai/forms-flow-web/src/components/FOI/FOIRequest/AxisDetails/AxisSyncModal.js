@@ -51,7 +51,7 @@ const AxisSyncModal = ({ axisSyncModalOpen, setAxisSyncModalOpen, saveRequestObj
     const [axisExtensions, setAxisExtension] = React.useState([]);
     const dispatch = useDispatch();
     const extensions = useSelector((state) => state.foiRequests.foiRequestExtesions);
-    let updateExtensions = false;
+    const [updateExtensions, setUpdateExtensions] = React.useState(false);
 
     useEffect(()=>{
         if(Object.entries(requestDetailsFromAxis).length !== 0){
@@ -114,7 +114,7 @@ const AxisSyncModal = ({ axisSyncModalOpen, setAxisSyncModalOpen, saveRequestObj
       return false;
     }
 
-    const assignDisplayedReqObj = (key,updatedObj, updatedField) => {     
+    const assignDisplayedReqObj = (key,updatedObj, updatedField) => {  
       switch (key) {
         case 'dueDate':
         case 'requestProcessStart':
@@ -144,9 +144,10 @@ const AxisSyncModal = ({ axisSyncModalOpen, setAxisSyncModalOpen, saveRequestObj
         case 'Extensions':
           let extensionsArr = compareExtensions(key);
           if(extensionsArr?.length > 0 || (extensionsArr?.length === 0 && 
-              requestDetailsFromAxis[key].length === 0 && extensions?.length > 0))
+              requestDetailsFromAxis[key].length === 0 && extensions?.length > 0)){
             updatedObj[key] = extensionsArr;
-            updateExtensions = true;
+            setUpdateExtensions(true);
+          }
           break;
         default:
           updatedObj[updatedField] = requestDetailsFromAxis[key];
@@ -154,7 +155,7 @@ const AxisSyncModal = ({ axisSyncModalOpen, setAxisSyncModalOpen, saveRequestObj
       }
       
     }
-
+    
     const compareAdditionalPersonalInfo = (axisKey , reqKey, axisAdditionalPersonalInfo, 
       foiReqAdditionalPersonalInfo, updatedObj) => {
       if(axisKey === reqKey){
@@ -289,8 +290,9 @@ const AxisSyncModal = ({ axisSyncModalOpen, setAxisSyncModalOpen, saveRequestObj
                 draggable: true,
                 progress: undefined,
               });
-              if(updateExtensions)
+              if(updateExtensions){
                 saveExtensions();
+              }
               const _state = getRequestState({
                 currentSelectedStatus,
                 requestState,
