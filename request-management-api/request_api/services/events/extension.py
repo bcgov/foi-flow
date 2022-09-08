@@ -42,6 +42,7 @@ class extensionevent:
 
     def deleteexistingrelatedevents(self, ministryrequestid):
         try:
+            print("Inside deleteexistingrelatedevents")
             notificationids = FOIRequestNotification().getextensionnotificationidsbyministry(ministryrequestid)
             if notificationids:
                 self.__deleteaxisextensionnotifications(notificationids)

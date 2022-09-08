@@ -40,6 +40,7 @@ class FOIRequestComment(db.Model):
 
     @classmethod
     def deleteextensioncommentsbyministry(cls, ministryid):
+        print("-->Inside deleteextensioncommentsbyministry",ministryid)
         db.session.query(FOIRequestComment).filter(FOIRequestComment.ministryrequestid.in_(ministryid), FOIRequestComment.commenttypeid == 2).delete(synchronize_session=False)
         db.session.commit()  
         return DefaultMethodResult(True,'Extensions comments deleted for the ministry ', ministryid)
