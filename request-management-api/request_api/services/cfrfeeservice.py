@@ -34,7 +34,6 @@ class cfrfeeservice:
         cfrfee = self.__preparecfrfee(ministryrequestid)
         _amountpaid = cfrfee.feedata['amountpaid'] + amountpaid
         _balanceremaining = cfrfee.feedata['balanceremaining'] - amountpaid
-        print("_balanceremaining = ", _balanceremaining)
         cfrfee.feedata['balanceremaining'] = _balanceremaining
         cfrfee.feedata['amountpaid'] = '{:.2f}'.format(_amountpaid)
         cfrfee.feedata['paymentdate'] = datetime.now().astimezone(pytz.timezone(current_app.config['LEGISLATIVE_TIMEZONE'])).strftime('%Y-%m-%d')
