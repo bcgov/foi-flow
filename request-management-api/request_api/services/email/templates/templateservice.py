@@ -35,6 +35,8 @@ class templateservice:
             if requestjson is not None and requestjson != {}:
                 balancedue = float(requestjson['cfrfee']['feedata']["balanceDue"])
                 prevstate = self.__getprevstate(requestjson)
+                print("PrevState = ", prevstate)
+                print("PrevState.lower = ", prevstate.lower())
                 print("balancedue = ", balancedue)
                 if balancedue > 0:
                     print("template = ", templateconfig().gettemplatename("HALFPAYMENT"))
