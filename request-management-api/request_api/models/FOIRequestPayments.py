@@ -20,6 +20,7 @@ class FOIRequestPayment(db.Model):
     ministryrequestversion=db.Column(db.Integer, db.ForeignKey('FOIMinistryRequests.version'))
     paymenturl = db.Column(db.Text, unique=False, nullable=True) 
     paymentexpirydate = db.Column(db.DateTime, nullable=True)
+    paidamount = db.Column(db.Numeric(10,2), nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.now)
     createdby = db.Column(db.String(120), unique=False, nullable=True)
     updated_at = db.Column(db.DateTime, nullable=True)
@@ -41,4 +42,4 @@ class FOIRequestPayment(db.Model):
       
 class FOIRequestPaymentSchema(ma.Schema):
     class Meta:
-        fields = ('paymentid', 'version', 'foirequestid', 'ministryrequestid', 'paymenturl','created_at','createdby','updated_at','updatedby', 'paymentexpirydate') 
+        fields = ('paymentid', 'version', 'foirequestid', 'ministryrequestid', 'paymenturl','created_at','createdby','updated_at','updatedby', 'paymentexpirydate', 'paidamount') 
