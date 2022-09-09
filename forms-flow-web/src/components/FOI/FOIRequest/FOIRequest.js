@@ -41,6 +41,7 @@ import { StateEnum } from '../../../constants/FOI/statusEnum';
 import { CommentSection } from '../customComponents/Comments';
 import { AttachmentSection } from '../customComponents/Attachments';
 import { CFRForm } from '../customComponents/CFRForm';
+import { ContactApplicant } from '../customComponents/ContactApplicant';
 import Loading from "../../../containers/Loading";
 import clsx from 'clsx';
 import { getAssignedTo, getHeaderText } from "./FOIRequestHeader/utils";
@@ -140,7 +141,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
       display: false,
       active: false,
     },
-    Option4: {
+    ContactApplicant: {
       display: false,
       active: false,
     },
@@ -724,6 +725,16 @@ const FOIRequest = React.memo(({ userDetail }) => {
                   Comments{" "}
                   {requestNotes?.length > 0 ? `(${requestNotes.length})` : ""}
                 </div>
+                <div
+                  className={clsx("tablinks", {
+                    active: tabLinksStatuses.ContactApplicant.active,
+                  })}
+                  name="ContactApplicant"
+                  onClick={() => tabclick("ContactApplicant")}
+                >
+                  Contact Applicant{" "}
+                  {requestNotes?.length > 0 ? `(${requestNotes.length})` : ""}
+                </div>
               </>
             )}
           </div>
@@ -1013,6 +1024,31 @@ const FOIRequest = React.memo(({ userDetail }) => {
                   setEditorChange={setEditorChange}
                   removeComment={removeComment}
                   setRemoveComment={setRemoveComment}
+                />
+              </>
+            ) : (
+              <Loading />
+            )}
+          </div>
+          <div
+            id="ContactApplicant"
+            className={clsx("tabcontent", {
+              active: tabLinksStatuses.ContactApplicant.active,
+              [classes.displayed]: tabLinksStatuses.ContactApplicant.display,
+              [classes.hidden]: !tabLinksStatuses.ContactApplicant.display,
+            })}
+          >
+            {!isLoading &&
+            requestNotes &&
+            (iaoassignedToList?.length > 0 ||
+              ministryAssignedToList?.length > 0) ? (
+              <>
+                <ContactApplicant
+                  requestNumber={requestNumber}
+                  requestState={requestState}
+                  userDetail={userDetail}
+                  ministryId={ministryId}
+                  requestId={requestId}
                 />
               </>
             ) : (

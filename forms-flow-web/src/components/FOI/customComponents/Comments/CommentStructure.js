@@ -22,7 +22,7 @@ import MenuList from "@material-ui/core/MenuList";
 import MenuItem from "@material-ui/core/MenuItem";
 
 
-const CommentStructure = ({ i, reply, parentId, totalcommentCount, currentIndex, isreplysection, hasAnotherUserComment, fullName }) => {
+const CommentStructure = ({ i, reply, parentId, totalcommentCount, currentIndex, isreplysection, hasAnotherUserComment, fullName, isEmail=false}) => {
 
   const actions = useContext(ActionContext)
   const edit = true
@@ -212,7 +212,7 @@ const CommentStructure = ({ i, reply, parentId, totalcommentCount, currentIndex,
       <div name={needCollapsed ? `hiddenreply_${parentId}` : `reply_${parentId}`} className={halfDivclassname} style={needCollapsed ? { display: 'none' } : {}} >
         <div
           className="userInfo"
-          style={reply && { marginLeft: 15, marginTop: '6px' }}
+          style={reply ? { marginLeft: 15, marginTop: '6px' }: {}}
         >
           <div className="commentsTwo">
 
@@ -225,7 +225,7 @@ const CommentStructure = ({ i, reply, parentId, totalcommentCount, currentIndex,
 
             
         </div>
-        <div className="userActions">
+        {!isEmail && <div className="userActions">
           <div>
             {i.commentTypeId === 1 && actions.userId === i.userId && actions.user && (
                 <>
@@ -249,7 +249,7 @@ const CommentStructure = ({ i, reply, parentId, totalcommentCount, currentIndex,
           </div>
           <div>
             <button id={`btncomment${i.commentId}`}
-              className={`replyBtn ${totalcommentCount === -100 || (isreplysection && totalcommentCount - 1 > currentIndex) ? " hide" : " show"}`}
+              className={`replyBtn ${(totalcommentCount === -100 || (isreplysection && totalcommentCount - 1 > currentIndex)) ? " hide" : " show"}`}
               onClick={() => actions.handleAction(i.commentId)}
               disabled={!actions.user}
             >
@@ -257,7 +257,7 @@ const CommentStructure = ({ i, reply, parentId, totalcommentCount, currentIndex,
               <FontAwesomeIcon icon={faReply} size='1x' color='#003366' /> Reply
             </button>
           </div>
-        </div>
+        </div>}
       </div>
       {
         i.replies && i.replies.length > 3 ? <div className="togglecollapseAll"><FontAwesomeIcon icon={toggleIcon} size='1x' color='#003366' /> <span onClick={(e) => toggleCollapse(e, i.commentId)}>Show more comments</span></div> : ""
