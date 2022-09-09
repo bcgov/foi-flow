@@ -14,6 +14,8 @@ class templateconfig:
             return "fee_payment_confirmation_full.html"
         elif key == "PAYOUTSTANDING":
             return "fee_estimate_notification_outstanding.html"
+        elif key == "PAYOUTSTANDINGFULLPAYMENT":
+            return "fee_payment_confirmation_outstanding.html"
         else:
             logging.info("Unknown key")
             return None
