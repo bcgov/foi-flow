@@ -108,9 +108,9 @@ class requestservicegetter:
                 requestdetails['cfrfee']['feedata']["totalamountdue"] = '{:.2f}'.format(requestdetails['cfrfee']['feedata']["estimatedtotaldue"])
             
         if payment is not None and payment != {}:
-            paidamount = payment['paidamount'] if payment['paidamount'] != None else 0
+            paidamount = float(payment['paidamount']) if payment['paidamount'] != None else 0
             requestdetails['cfrfee']['feedata']['paidamount'] = paidamount
-            requestdetails['cfrfee']['feedata']['depositpaid'] = float(cfrfee['feedata']['amountpaid']) - float(paidamount)
+            requestdetails['cfrfee']['feedata']['depositpaid'] = float(cfrfee['feedata']['amountpaid']) - paidamount
             requestdetails['cfrfee']['feedata']['paymenturl'] = payment['paymenturl']            
         return requestdetails
 
