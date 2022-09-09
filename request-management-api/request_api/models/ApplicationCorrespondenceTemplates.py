@@ -11,7 +11,7 @@ class ApplicationCorrespondenceTemplate(db.Model):
     __tablename__ = 'ApplicantCorrespondenceTemplates'
     # Defining the columns
 
-    template_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    templateid = db.Column(db.Integer, primary_key=True, autoincrement=True)
     documenturipath = db.Column(db.Text, nullable=False)
     description = db.Column(db.String(1000), nullable=True)
     name = db.Column(db.String(500), nullable=False)
@@ -21,11 +21,11 @@ class ApplicationCorrespondenceTemplate(db.Model):
     createdby = db.Column(db.String(120), unique=False, nullable=True)
 
     @classmethod
-    def get_template_by_id(cls, template_id: int):
+    def get_template_by_id(cls, templateid: int):
         """Given a type and optionally an extension, return the template."""
 
-        query = cls.query.filter_by(template_id = template_id). \
-            filter(ApplicationCorrespondenceTemplate.template_id == template_id)
+        query = cls.query.filter_by(templateid = templateid). \
+            filter(ApplicationCorrespondenceTemplate.templateid == templateid)
 
         return query.one_or_none()
 
@@ -49,5 +49,4 @@ class ApplicationCorrespondenceTemplate(db.Model):
 
 class ApplicationCorrespondenceTemplateSchema(ma.Schema):
     class Meta:
-        model = ApplicationCorrespondenceTemplate
-        exclude = []
+        fields = ('templateid','documenturipath', 'description','name','active','version','created_at','createdby')        

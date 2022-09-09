@@ -52,4 +52,6 @@ from .DocumentTemplate import DocumentTemplate
 from .FOIRequestExtensions import FOIRequestExtension
 from .FOIAssignees import FOIAssignee
 
+from .ApplicationCorrespondenceTemplates import ApplicationCorrespondenceTemplate
+
 #event.listen(Engine, 'before_cursor_execute', DBTracing.query_tracing)
