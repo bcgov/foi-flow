@@ -70,6 +70,12 @@ class templateconfig:
             return "Fee Balance Outstanding - Letter"
         elif key == "PAYOUTSTANDING-FAILED":
             return "Fee Balance Outstanding - Correspondence Failed"
+        elif key == "OUTSTANDING-PAYMENT-RECEIPT":
+            return "Fee Balance Outstanding - Payment Receipt"
+        elif key == "OUTSTANDING-PAYMENT-RECEIPT-SUCCESSFUL":
+            return "Fee Balance Outstanding - Payment Success"
+        elif key == "OUTSTANDING-PAYMENT-RECEIPT-FAILED":
+            return "Fee Balance Outstanding - Payment Success - Correspondence Failed"
         return None 
     
 
