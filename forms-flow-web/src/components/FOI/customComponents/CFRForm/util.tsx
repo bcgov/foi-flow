@@ -1,18 +1,15 @@
 import foiFees from '../../../../constants/FOI/foiFees.json';
-import type { CFRFormData } from './types';
+import type { CFRFormData, feeData } from './types';
 
-export const calculateFees = (cfrForm: CFRFormData) => {
-  let k: keyof typeof cfrForm.estimates;
+export const calculateFees = (feeData: feeData) => {
+  let k: keyof typeof feeData;
   let totalFee = 0;
 
-  for (k in cfrForm.estimates) {
-    let value = cfrForm.actual && cfrForm.actual[k] && cfrForm.actual[k] > 0 ? cfrForm.actual[k] : cfrForm.estimates[k];
-    totalFee += foiFees[k].type == "hour" ? calculateFeesByTime(k, value) : calculateFeesByPages(k, value);
+  for (k in feeData) {
+    totalFee += foiFees[k].type == "hour" ? calculateFeesByTime(k, feeData[k]) : calculateFeesByPages(k, feeData[k]);
   }
 
-  cfrForm.amountDue = +totalFee.toFixed(2);
-
-  return cfrForm;
+  return totalFee;
 };
 
 const calculateFeesByTime = (name: string, hours: number) => {
