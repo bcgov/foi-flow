@@ -6,6 +6,7 @@ from sqlalchemy.orm import relationship,backref
 from .default_method_result import DefaultMethodResult
 from sqlalchemy.sql.expression import distinct
 from sqlalchemy import or_,and_,text
+from .FOIApplicantCorrespondenceAttachments import FOIApplicantCorrespondenceAttachment
 
 class FOIApplicantCorrespondence(db.Model):
     # Name of the table in our database
@@ -39,10 +40,24 @@ class FOIApplicantCorrespondence(db.Model):
         return comment_schema.dump(query)
 
     @classmethod
-    def saveapplicantcorrespondence(cls, newapplicantcorrepondencelog)->DefaultMethodResult: 
+    def saveapplicantcorrespondence(cls, newapplicantcorrepondencelog,attachments)->DefaultMethodResult: 
         
         db.session.add(newapplicantcorrepondencelog)
-        db.session.commit()               
+        db.session.commit()
+        
+        try:
+            if(attachments is not None and len(attachments) > 0):
+
+                for _attachment in attachments:
+                    attachment = FOIApplicantCorrespondenceAttachment()
+                    attachment.applicantcorrespondenceid = newapplicantcorrepondencelog.applicantcorrespondenceid
+                    attachment.attachmentdocumenturipath = _attachment['url']
+                    attachment.attachmentfilename = _attachment['filename']
+                    attachment.createdby = newapplicantcorrepondencelog.createdby
+                    FOIApplicantCorrespondenceAttachment().saveapplicantcorrespondence(attachment)
+        except Exception:
+            return DefaultMethodResult(False,'applicantcorrepondence log exception while adding attachments',newapplicantcorrepondencelog.applicantcorrespondenceid)
+
         return DefaultMethodResult(True,'applicantcorrepondence log added',newapplicantcorrepondencelog.applicantcorrespondenceid)    
 
     

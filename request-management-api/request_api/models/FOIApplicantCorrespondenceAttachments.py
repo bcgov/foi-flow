@@ -12,13 +12,12 @@ class FOIApplicantCorrespondenceAttachment(db.Model):
     __tablename__ = 'FOIApplicantCorrespondenceAttachments'
     __table_args__ = (
         ForeignKeyConstraint(
-            ["foiministryrequest_id", "foiministryrequestversion_id"], ["FOIMinistryRequests.foiministryrequestid", "FOIMinistryRequests.version"]
+            ["applicantcorrespondenceid"], ["FOIApplicantCorrespondences.applicantcorrespondenceid"]
         ),
     )
         
     # Defining the columns
-    applicantcorrespondenceattachmentid = db.Column(db.Integer, primary_key=True,autoincrement=True)
-    applicantcorrespondenceid = db.Column(db.Integer, unique=False, nullable=False)    
+    applicantcorrespondenceattachmentid = db.Column(db.Integer, primary_key=True,autoincrement=True)      
     attachmentdocumenturipath = db.Column(db.Text, unique=False, nullable=False)
     attachmentfilename = db.Column(db.String(500), unique=False, nullable=False)
     
@@ -26,10 +25,8 @@ class FOIApplicantCorrespondenceAttachment(db.Model):
     updated_at = db.Column(db.DateTime, nullable=True)
     createdby = db.Column(db.String(120), unique=False, nullable=False)
     updatedby = db.Column(db.String(120), unique=False, nullable=True)
-    
-    #ForeignKey References   
-    
-    foiapplicantcorrespondence = relationship("FOIApplicantCorrespondences",foreign_keys="[FOIApplicantCorrespondences.applicantcorrespondenceid]")
+                 
+    applicantcorrespondenceid =db.Column(db.Integer, db.ForeignKey('FOIApplicantCorrespondences.applicantcorrespondenceid'))
     
 
     @classmethod

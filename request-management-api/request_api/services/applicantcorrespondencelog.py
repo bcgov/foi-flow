@@ -8,11 +8,11 @@ class applicantcorrespondenceservice:
         """
         return ApplicationCorrespondenceTemplate.getapplicantcorrespondencetemplates()
 
-    def saveapplicantcorrespondencelog(self,templateid,ministryrequestid,createdby,messagehtml):
+    def saveapplicantcorrespondencelog(self,templateid,ministryrequestid,createdby,messagehtml,attachments):
         applicantcorrespondencelog = FOIApplicantCorrespondence()
         applicantcorrespondencelog.templateid = templateid
         applicantcorrespondencelog.foiministryrequest_id = ministryrequestid
         applicantcorrespondencelog.correspondencemessagejson = messagehtml        
         applicantcorrespondencelog.foiministryrequestversion_id =FOIMinistryRequest.getversionforrequest(ministryrequestid=ministryrequestid) 
         applicantcorrespondencelog.createdby = createdby
-        return FOIApplicantCorrespondence.saveapplicantcorrespondence(applicantcorrespondencelog)
+        return FOIApplicantCorrespondence.saveapplicantcorrespondence(applicantcorrespondencelog,attachments)

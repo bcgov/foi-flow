@@ -70,10 +70,10 @@ class FOIFlowApplicantCorrespondence(Resource):
     def post(ministryrequestid):
         try:
            requestjson = request.get_json()
-           applicantcorrespondencelog = FOIApplicantCorrespondenceSchema().load(data=requestjson)
+           applicantcorrespondencelog = FOIApplicantCorrespondenceSchema().load(data=requestjson)           
            userid = AuthHelper.getuserid()          
            result = applicantcorrespondenceservice().saveapplicantcorrespondencelog(templateid=applicantcorrespondencelog['templateid'],
-           ministryrequestid=ministryrequestid,createdby=userid,messagehtml=applicantcorrespondencelog['correspondencemessagejson']) 
+           ministryrequestid=ministryrequestid,createdby=userid,messagehtml=applicantcorrespondencelog['correspondencemessagejson'],attachments=applicantcorrespondencelog['attachments']) 
            return {'status': result.success, 'message':result.message,'id':result.identifier} , 200      
         except BusinessException:
             return "Error happened while saving  applicant correspondence log" , 500 
