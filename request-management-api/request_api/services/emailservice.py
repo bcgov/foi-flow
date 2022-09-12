@@ -25,7 +25,6 @@ class emailservice:
             requestjson = requestservice().getrequestdetails(requestid,ministryrequestid)
             _messagepart = templateservice().generate_by_servicename_and_schema(servicename, requestjson)
             _messageattachmentlist = documentservice().getattachments(ministryrequestid, 'ministryrequest', templateconfig().getattachmentcategory(servicename).lower())
-            print("send requestjson = ", requestjson)
             return senderservice().send(servicename, _messagepart, _messageattachmentlist, requestjson)
         except Exception as ex:
             logging.exception(ex)
