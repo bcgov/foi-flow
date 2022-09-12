@@ -63,6 +63,7 @@ class paymentservice:
         try:
             balancedue = float(data['cfrfee']['feedata']["balanceDue"])
             prevstate = data["stateTransition"][2]["status"] if "stateTransition" in data and len(data["stateTransition"])  > 3 else None
+            print("receipt prevstate = ",prevstate)
             basepath = 'request_api/receipt_templates/'
             receiptname = 'cfr_fee_payment_receipt'
             attachmentcategory = "FEE-ESTIMATE-PAYMENT-RECEIPT"
@@ -83,6 +84,8 @@ class paymentservice:
                 'transactionId': parsed_args.get('pbcTxnNumber'),
                 'cardType': parsed_args.get('cardType')
             }})
+            print("receiptname = ",receiptname)
+            print("receipt_template_path = ",receipt_template_path)
             document_service : DocumentGenerationService = DocumentGenerationService(receiptname)
             receipt = document_service.generate_receipt(data,receipt_template_path)
             document_service.upload_receipt('Fee Estimate Payment Receipt.pdf', receipt.content, ministry_request_id, data['bcgovcode'], data['idNumber'], attachmentcategory)
