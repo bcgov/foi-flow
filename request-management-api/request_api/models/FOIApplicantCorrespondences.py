@@ -28,11 +28,9 @@ class FOIApplicantCorrespondence(db.Model):
     createdby = db.Column(db.String(120), unique=False, nullable=False)
     updatedby = db.Column(db.String(120), unique=False, nullable=True)
     
-    #ForeignKey References   
+    #ForeignKey References       
     foiministryrequest_id =db.Column(db.Integer, db.ForeignKey('FOIMinistryRequests.foiministryrequestid'))
-    foiministryrequestversion_id = db.Column(db.Integer, db.ForeignKey('FOIMinistryRequests.version'))    
-    foiministryrequest = relationship("FOIMinistryRequest",foreign_keys="[FOIMinistryRequestDocument.foiministryrequest_id]")
-    foiministryrequestversion = relationship("FOIMinistryRequest",foreign_keys="[FOIMinistryRequestDocument.foiministryrequestversion_id]")
+    foiministryrequestversion_id=db.Column(db.Integer, db.ForeignKey('FOIMinistryRequests.version'))
 
     @classmethod
     def getapplicantcorrespondences(cls,ministryrequestid):

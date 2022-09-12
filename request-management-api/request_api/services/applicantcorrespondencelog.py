@@ -1,5 +1,6 @@
 from request_api.models.ApplicationCorrespondenceTemplates import ApplicationCorrespondenceTemplate
 from request_api.models.FOIApplicantCorrespondences import FOIApplicantCorrespondence
+from request_api.models.FOIMinistryRequests import FOIMinistryRequest
 class applicantcorrespondenceservice:
 
     def getapplicantcorrespondencetemplates(self):
@@ -11,8 +12,7 @@ class applicantcorrespondenceservice:
         applicantcorrespondencelog = FOIApplicantCorrespondence()
         applicantcorrespondencelog.templateid = templateid
         applicantcorrespondencelog.foiministryrequest_id = ministryrequestid
-        applicantcorrespondencelog.correspondencemessagejson = messagehtml
-        #GET MINISTRY REQUEST and update version below
-        applicantcorrespondencelog.foiministryrequestversion = 1 
+        applicantcorrespondencelog.correspondencemessagejson = messagehtml        
+        applicantcorrespondencelog.foiministryrequestversion_id =FOIMinistryRequest.getversionforrequest(ministryrequestid=ministryrequestid) 
         applicantcorrespondencelog.createdby = createdby
         return FOIApplicantCorrespondence.saveapplicantcorrespondence(applicantcorrespondencelog)
