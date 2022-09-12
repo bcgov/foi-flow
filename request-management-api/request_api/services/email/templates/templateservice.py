@@ -52,7 +52,7 @@ class templateservice:
     
     def __getprevstate(self, requestjson):
         print("stateTransition = ", requestjson["stateTransition"])
-        return requestjson["stateTransition"][1]["status"] if "stateTransition" in requestjson and len(requestjson["stateTransition"])  > 2 else None
+        return requestjson["stateTransition"][2]["status"] if "stateTransition" in requestjson and len(requestjson["stateTransition"])  > 3 else None
 
     def __generatetemplate(self, emailtemplatename, dynamictemplatevalues):  
         emailtemplatehtml= storageservice().downloadtemplate(emailtemplatename)
