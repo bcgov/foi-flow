@@ -62,7 +62,7 @@ class paymentservice:
     def createpaymentreceipt(self, request_id, ministry_request_id, data, parsed_args):
         try:
             balancedue = float(data['cfrfee']['feedata']["balanceDue"])
-            prevstate = data["stateTransition"][2]["status"] if "stateTransition" in data and len(data["stateTransition"])  > 3 else None
+            prevstate = data["stateTransition"][1]["status"] if "stateTransition" in data and len(data["stateTransition"])  > 2 else None
             print("receipt prevstate = ",prevstate)
             basepath = 'request_api/receipt_templates/'
             receiptname = 'cfr_fee_payment_receipt'
