@@ -91,10 +91,17 @@ class Payment(Resource):
             fee: FeeService = FeeService(request_id=ministry_request_id, payment_id=payment_id)
             response, parsed_args = fee.complete_payment(request_json)
             if (response['status'] == 'PAID'):
-                cfrfeeservice().paycfrfee(ministry_request_id, float(parsed_args.get('trnAmount')))
-                data = requestservice().getrequestdetails(request_id, ministry_request_id)
+                amountpaid = float(parsed_args.get('trnAmount'))
+                cfrfeeservice().paycfrfee(ministry_request_id, amountpaid)
+                paymentservice().createpaymentversion(request_id, ministry_request_id, amountpaid)
+                data = requestservice().getrequestdetails(request_id, ministry_request_id)                
+                print("data = ", data)                
                 paymentservice().createpaymentreceipt(request_id, ministry_request_id, data, parsed_args)
-                result = requestservice().updaterequeststatus(request_id, ministry_request_id, 2)
+                prevstate = data["stateTransition"][1]["status"] if "stateTransition" in data and len(data["stateTransition"])  > 2 else None
+                statusid = 2
+                if prevstate.lower() == "response":
+                    statusid = 14
+                result = requestservice().updaterequeststatus(request_id, ministry_request_id, statusid)
                 if result.success == True:
                     asyncio.ensure_future(eventservice().postpaymentevent(ministry_request_id))
                     requestservice().postfeeeventtoworkflow(request_id, ministry_request_id, "PAID")
