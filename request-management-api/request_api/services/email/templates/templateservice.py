@@ -28,30 +28,22 @@ class templateservice:
         return None
 
     def __gettemplatenamewrapper(self, servicename, requestjson):
-        print("servicename = ", servicename)
         _templatename = templateconfig().gettemplatename(servicename)
-        print("_templatename = ", _templatename)
         if _templatename is None:
             if requestjson is not None and requestjson != {}:
                 balancedue = float(requestjson['cfrfee']['feedata']["balanceDue"])
                 prevstate = self.__getprevstate(requestjson)
-                print("PrevState = ", prevstate)
-                print("PrevState.lower = ", prevstate.lower())
-                print("balancedue = ", balancedue)
                 if balancedue > 0:
-                    print("template = ", templateconfig().gettemplatename("HALFPAYMENT"))
                     return templateconfig().gettemplatename("HALFPAYMENT")
                 elif balancedue == 0:
                     templatekey = "FULLPAYMENT"
                     if prevstate.lower() == "response":
-                        templatekey = "PAYOUTSTANDINGFULLPAYMENT" 
-                    print("template = ", templateconfig().gettemplatename(templatekey))
+                        templatekey = "PAYOUTSTANDINGFULLPAYMENT"
                     return templateconfig().gettemplatename(templatekey)
 
         return _templatename
     
     def __getprevstate(self, requestjson):
-        print("stateTransition = ", requestjson["stateTransition"])
         return requestjson["stateTransition"][2]["status"] if "stateTransition" in requestjson and len(requestjson["stateTransition"])  > 3 else None
 
     def __generatetemplate(self, emailtemplatename, dynamictemplatevalues):  
