@@ -71,12 +71,11 @@ class paymentservice:
                 receipt_template_path= basepath + self.getreceiptename('HALFPAYMENT') +".docx"
                 receiptname = self.getreceiptename('HALFPAYMENT')
             else:
-                filename = self.getreceiptename('FULLPAYMENT')
-                if prevstate.lower() == "response":
-                    filename = self.getreceiptename('PAYOUTSTANDING')
-                    attachmentcategory = "OUTSTANDING-PAYMENT-RECEIPT"
-                receipt_template_path= basepath + filename + ".docx"
                 receiptname = self.getreceiptename('FULLPAYMENT')
+                if prevstate.lower() == "response":
+                    receiptname = self.getreceiptename('PAYOUTSTANDING')
+                    attachmentcategory = "OUTSTANDING-PAYMENT-RECEIPT"
+                receipt_template_path= basepath + receiptname + ".docx"
             data['waivedAmount'] = data['cfrfee']['feedata']['estimatedlocatinghrs'] * 30 if data['cfrfee']['feedata']['estimatedlocatinghrs'] < 3 else 90
             data.update({'paymentInfo': {
                 'paymentDate': parsed_args.get('trnDate'),
