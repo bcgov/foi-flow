@@ -33,10 +33,12 @@ class FOIApplicantCorrespondence(db.Model):
     foiministryrequest_id =db.Column(db.Integer, db.ForeignKey('FOIMinistryRequests.foiministryrequestid'))
     foiministryrequestversion_id=db.Column(db.Integer, db.ForeignKey('FOIMinistryRequests.version'))
 
+    attachments = relationship('FOIApplicantCorrespondenceAttachment', backref=backref("FOIApplicantCorrespondenceAttachments"))
+    
     @classmethod
     def getapplicantcorrespondences(cls,ministryrequestid):
         comment_schema = FOIApplicantCorrespondenceSchema(many=True)
-        query = db.session.query(FOIApplicantCorrespondenceSchema).filter_by(foiministryrequest_id=ministryrequestid).order_by(FOIApplicantCorrespondence.applicantcorrespondenceid.desc()).all()
+        query = db.session.query(FOIApplicantCorrespondence).filter(FOIApplicantCorrespondence.foiministryrequest_id == ministryrequestid).order_by(FOIApplicantCorrespondence.applicantcorrespondenceid.desc()).all()
         return comment_schema.dump(query)
 
     @classmethod
@@ -54,7 +56,7 @@ class FOIApplicantCorrespondence(db.Model):
                     attachment.attachmentdocumenturipath = _attachment['url']
                     attachment.attachmentfilename = _attachment['filename']
                     attachment.createdby = newapplicantcorrepondencelog.createdby
-                    FOIApplicantCorrespondenceAttachment().saveapplicantcorrespondence(attachment)
+                    FOIApplicantCorrespondenceAttachment().saveapplicantcorrespondenceattachment(attachment)
         except Exception:
             return DefaultMethodResult(False,'applicantcorrepondence log exception while adding attachments',newapplicantcorrepondencelog.applicantcorrespondenceid)
 
@@ -63,5 +65,5 @@ class FOIApplicantCorrespondence(db.Model):
     
 class FOIApplicantCorrespondenceSchema(ma.Schema):
     class Meta:
-        fields = ('applicantcorrespondenceid','parentapplicantcorrespondenceid', 'templateid','correspondencemessagejson','foiministryrequest_id','foiministryrequestversion_id','created_at','createdby')
+        fields = ('applicantcorrespondenceid','parentapplicantcorrespondenceid', 'templateid','correspondencemessagejson','foiministryrequest_id','foiministryrequestversion_id','created_at','createdby','attachments')
     

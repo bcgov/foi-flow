@@ -29,14 +29,10 @@ class FOIApplicantCorrespondenceAttachment(db.Model):
     applicantcorrespondenceid =db.Column(db.Integer, db.ForeignKey('FOIApplicantCorrespondences.applicantcorrespondenceid'))
     
 
-    @classmethod
-    def getapplicantcorrespondences(cls,applicantcorrespondenceid):
-        comment_schema = FOIApplicantCorrespondenceAttachmentSchema(many=True)
-        query = db.session.query(FOIApplicantCorrespondenceAttachmentSchema).filter_by(applicantcorrespondenceid=applicantcorrespondenceid).order_by(FOIApplicantCorrespondenceAttachment.applicantcorrespondenceattachmentid.desc()).all()
-        return comment_schema.dump(query)
+
 
     @classmethod
-    def saveapplicantcorrespondence(cls, newapplicantcorrepondenceattachment)->DefaultMethodResult: 
+    def saveapplicantcorrespondenceattachment(cls, newapplicantcorrepondenceattachment)->DefaultMethodResult: 
         
         db.session.add(newapplicantcorrepondenceattachment)
         db.session.commit()               

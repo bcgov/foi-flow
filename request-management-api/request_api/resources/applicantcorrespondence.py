@@ -67,6 +67,41 @@ class FOIFlowApplicantCorrespondence(Resource):
     @TRACER.trace()
     @cross_origin(origins=allowedorigins())
     @auth.require
+    def get(ministryrequestid):
+        try:
+          
+            _correpondencelogs = applicantcorrespondenceservice().getapplicantcorrespondencelogs(ministryrequestid)           
+            correpondencelogs =[]
+            for _correpondencelog in _correpondencelogs:
+                attachments = []
+                for _attachment in _correpondencelog['attachments']: 
+                    attachment = {
+                        "applicantcorrespondenceattachmentid" : _attachment.applicantcorrespondenceattachmentid,
+                        "attachmentdocumenturipath" : _attachment.attachmentdocumenturipath,
+                        "attachmentfilename" : _attachment.attachmentfilename,
+                    } 
+                    attachments.append(attachment)                     
+
+                correpondencelog ={
+                    "applicantcorrespondenceid":_correpondencelog['applicantcorrespondenceid'],
+                    "parentapplicantcorrespondenceid":_correpondencelog['parentapplicantcorrespondenceid'],
+                    "templateid":_correpondencelog['templateid'],
+                    "correspondencemessagejson":_correpondencelog['correspondencemessagejson'],
+                    "created_at":_correpondencelog['created_at'],
+                    "createdby":_correpondencelog['createdby'],
+                    "attachments" : attachments
+                } 
+                correpondencelogs.append(correpondencelog)                  
+            return json.dumps(correpondencelogs) , 200      
+        except BusinessException:
+            return "Error happened while fetching  applicant correspondence logs" , 500 
+
+
+
+    @staticmethod
+    @TRACER.trace()
+    @cross_origin(origins=allowedorigins())
+    @auth.require
     def post(ministryrequestid):
         try:
            requestjson = request.get_json()

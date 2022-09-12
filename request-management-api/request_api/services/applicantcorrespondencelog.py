@@ -8,6 +8,11 @@ class applicantcorrespondenceservice:
         """
         return ApplicationCorrespondenceTemplate.getapplicantcorrespondencetemplates()
 
+    def getapplicantcorrespondencelogs(self,ministryrequestid):
+        """ Returns the active applicant correspondence logs
+        """
+        return FOIApplicantCorrespondence.getapplicantcorrespondences(ministryrequestid)
+
     def saveapplicantcorrespondencelog(self,templateid,ministryrequestid,createdby,messagehtml,attachments):
         applicantcorrespondencelog = FOIApplicantCorrespondence()
         applicantcorrespondencelog.templateid = templateid
