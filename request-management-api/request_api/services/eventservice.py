@@ -40,7 +40,6 @@ class eventservice:
     
     def posteventforaxisextension(self, ministryrequestid, extensionids, userid, username, event):
         try:
-            extensionevent().deleteexistingrelatedevents(ministryrequestid)
             for extensionid in extensionids:
                 extensioneventresponse = extensionevent().createaxisextensionevent(ministryrequestid, extensionid, userid, username, event)
                 if extensioneventresponse.success == False: 

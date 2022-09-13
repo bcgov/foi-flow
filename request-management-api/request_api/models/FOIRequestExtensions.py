@@ -76,12 +76,15 @@ class FOIRequestExtension(db.Model):
     
     @classmethod
     def saveextensions(cls, newextensions):
-        db.session.add_all(newextensions)
-        db.session.commit()
-        extensionids = []
-        for extension in newextensions:
-            extensionids.append(extension.foirequestextensionid)
-        return DefaultMethodResult(True,'Extensions created',-1,extensionids)
+        if(len(newextensions) > 0):
+            db.session.add_all(newextensions)
+            db.session.commit()
+            extensionids = []
+            for extension in newextensions:
+                extensionids.append(extension.foirequestextensionid)
+            return DefaultMethodResult(True,'Extensions created',-1,extensionids)
+        else:
+            return DefaultMethodResult(True,'No Extensions to add ')
 
     @classmethod
     def createextensionversion(cls,ministryrequestid,ministryrequestversion, extension, userid):
@@ -169,6 +172,15 @@ class FOIRequestExtension(db.Model):
         db.session.query(FOIRequestExtension).filter(FOIRequestExtension.foiministryrequest_id == ministryrequestid,  FOIRequestExtension.foiministryrequestversion_id != version, FOIRequestExtension.isactive == True).update({"isactive": False, "updated_at": datetime.now(),"updatedby": userid}, synchronize_session=False)
         db.session.commit()
         return DefaultMethodResult(True,'Previous extensions disabled for ministry request ',ministryrequestid)
+
+    @classmethod
+    def disableextensions(cls, foirequestextensionids, userid):
+        if(len(foirequestextensionids) > 0):
+            db.session.query(FOIRequestExtension).filter(FOIRequestExtension.foirequestextensionid.in_(foirequestextensionids)).update({"isactive": False, "updated_at": datetime.now(),"updatedby": userid}, synchronize_session=False)
+            db.session.commit()
+            return DefaultMethodResult(True,'Extensions disabled for extension ids ','',foirequestextensionids)
+        else:
+            return DefaultMethodResult(True,'No Extensions to disable ')
 
 class FOIRequestExtensionSchema(ma.Schema):
     class Meta:
