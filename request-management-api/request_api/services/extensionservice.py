@@ -98,7 +98,7 @@ class extensionservice:
         extensionstodelete=[]
         extensionidstodelete=[]
         existingextensions = FOIRequestExtension.getextensions(ministryrequestid, version)    
-        if(existingextensions is not None):  
+        if(len(existingextensions) > 0):  
             identifiersforexisting = []
             identifiersforaxis = []
             for existingextension in existingextensions:
@@ -117,6 +117,9 @@ class extensionservice:
                 if(identifierforexisting not in identifiersforaxis):
                     extensionstodelete.append(existingextension)
                     extensionidstodelete.append(existingextension["foirequestextensionid"])
+        else:
+            extensionstoadd = extensions
+
         return extensionstoadd, extensionstodelete, extensionidstodelete
     
     def saveaxisrequestextension(self, ministryrequestid, extensions, userid, username):
