@@ -92,7 +92,7 @@ class FOIRequestNotification(db.Model):
         notifications = []
         try:
             sql = sql = """select idnumber, axisnumber, notificationid, notification , notificationtypeid from "FOIRequestNotifications" where notification->>'extensionid' = :extensionid """
-            rs = db.session.execute(text(sql), {'extensionid': extensionid})
+            rs = db.session.execute(text(sql), {'extensionid': str(extensionid)})
             for row in rs:
                 notifications.append({"idnumber": row["idnumber"], "axisnumber": row["axisnumber"], "notificationid": row["notificationid"], "notification": row["notification"], "notificationtypeid": row["notificationtypeid"]})
         except Exception as ex:

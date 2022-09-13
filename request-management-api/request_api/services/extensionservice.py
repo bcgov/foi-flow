@@ -93,25 +93,49 @@ class extensionservice:
         if sum(publicbodyextensiondays) + extensionschema['extendedduedays'] > 30:
             raise BusinessException(Error.INVALID_INPUT)
         
+    def getextensiontobesaved(self, ministryrequestid, extensions,version):
+        extensionstoadd=[]  
+        extensionstodelete=[]
+        extensionidstodelete=[]
+        existingextensions = FOIRequestExtension.getextensions(ministryrequestid, version)    
+        if(existingextensions is not None):  
+            identifiersforexisting = []
+            identifiersforaxis = []
+            for existingextension in existingextensions:
+                datestring = str(existingextension["extendedduedate"]).split(" ",1)[0]
+                identifierforexisting= str(existingextension["extensionreasonid"])+datestring+str(existingextension["extensionstatusid"])   
+                identifiersforexisting.append(identifierforexisting)
+            for axisextension in extensions:
+                datestring = str(axisextension["extendedduedate"]).split(" ",1)[0]
+                identifierforaxis= str(axisextension["extensionreasonid"])+datestring+str(axisextension["extensionstatusid"])
+                identifiersforaxis.append(identifierforaxis)
+                if(identifierforaxis not in identifiersforexisting):
+                    extensionstoadd.append(axisextension)
+            for existingextension in existingextensions:
+                datestring = str(existingextension["extendedduedate"]).split(" ",1)[0]
+                identifierforexisting= str(existingextension["extensionreasonid"])+datestring+str(existingextension["extensionstatusid"])  
+                if(identifierforexisting not in identifiersforaxis):
+                    extensionstodelete.append(existingextension)
+                    extensionidstodelete.append(existingextension["foirequestextensionid"])
+        return extensionstoadd, extensionstodelete, extensionidstodelete
     
-    def saveaxisrequestextension(self, ministryrequestid, extensions, userid):
+    def saveaxisrequestextension(self, ministryrequestid, extensions, userid, username):
         version = self.__getversionforrequest(ministryrequestid)
-        # delete all exisitng extensions for this ministry
-        existingextensions = FOIRequestExtension.getextensions(ministryrequestid, version)        
-        for existingextension in existingextensions:            
-            self.__deleteextension(existingextension["foirequestextensionid"], ministryrequestid, userid)
+        extensionstoadd, extensionstodelete, extensionidstodelete = self.getextensiontobesaved(ministryrequestid, extensions,version)
+        if(len(extensionstodelete) > 0):
+            for existingextension in extensionstodelete:            
+                self.deletedocuments(existingextension['foirequestextensionid'], existingextension['version'], ministryrequestid, userid) 
+        deletedextensionresult= FOIRequestExtension.disableextensions(extensionidstodelete, userid)
         newextensions = []
-        for extension in extensions:
-            newextensions.append(self.__createextension(extension, ministryrequestid, version, userid))
+        if(len(extensionstoadd) > 0):
+            for extension in extensionstoadd:
+                newextensions.append(self.__createextension(extension, ministryrequestid, version, userid))
         extnsionresult = FOIRequestExtension.saveextensions(newextensions)
+        if deletedextensionresult.success == True and len(deletedextensionresult.args) > 0:
+            # Post event for system generated comments & notifications for deleted extensions 
+            eventservice().posteventforaxisextension(ministryrequestid, deletedextensionresult.args[0], userid, username, "delete")
         return extnsionresult
 
-    def __deleteextension(self, extensionid, ministryrequestid, userid):
-        extension = FOIRequestExtension.getextension(extensionid)
-        extensionversion = extension['version']
-        self.deletedocuments(extensionid, extensionversion, ministryrequestid, userid)  
-        FOIRequestExtension.deleteextensionbyministryid(ministryrequestid, userid)
-        
     def __createextension(self, extension, ministryrequestid, ministryrequestversion, userid): 
         createuserid = extension['createdby'] if 'createdby' in extension and extension['createdby'] is not None else userid
         createdat = extension['created_at'] if 'created_at' in extension  and extension['created_at'] is not None else datetime.now()

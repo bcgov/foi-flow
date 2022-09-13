@@ -51,7 +51,6 @@ class extensionevent:
 
     def createaxisextensionevent(self, ministryrequestid, extensionid, userid, username, event):
         # get all extension comments and notification of the ministry id
-        # delete all comments and notification related to ministry id and extension
         # add new comments and notification for the ministry id        
         version = FOIRequestExtension.getversionforextension(extensionid)       
         curextension = FOIRequestExtension().getextensionforversion(extensionid, version)
