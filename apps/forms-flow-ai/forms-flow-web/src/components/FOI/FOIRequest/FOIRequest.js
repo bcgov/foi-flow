@@ -159,7 +159,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
     requestState.toLowerCase() !== StateEnum.open.name.toLowerCase() &&
     requestState.toLowerCase() !== StateEnum.intakeinprogress.name.toLowerCase();
   const [axisSyncedData, setAxisSyncedData] = useState({});
-  const [checkExtension, setCheckExtension] = useState(false);
+  const [checkExtension, setCheckExtension] = useState(true);
   let bcgovcode = getBCgovCode(ministryId, requestDetails);
   const [headerText, setHeaderText]  = useState(getHeaderText({requestDetails, ministryId, requestState}));  
   document.title = requestDetails.axisRequestId || requestDetails.idNumber || headerText;
@@ -231,7 +231,6 @@ const FOIRequest = React.memo(({ userDetail }) => {
             setAxisMessage("WARNING");
           }
           else{
-            setCheckExtension(true);
             setAxisMessage("");
           }
         }
