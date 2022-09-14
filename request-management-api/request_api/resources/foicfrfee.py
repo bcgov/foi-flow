@@ -29,6 +29,7 @@ import logging
 from marshmallow import Schema, fields, validate, ValidationError
 import asyncio
 from request_api.services.eventservice import eventservice
+from request_api.services.requestservice import requestservice
 
 API = Namespace('FOICFRFee', description='Endpoints for FOI CFR Fee Form management')
 TRACER = Tracer.get_instance()
@@ -37,7 +38,7 @@ TRACER = Tracer.get_instance()
 EXCEPTION_MESSAGE_BAD_REQUEST='Bad Request'
         
 @cors_preflight('POST,OPTIONS')
-@API.route('/foicfrfee/ministryrequest/<ministryrequestid>')
+@API.route('/foicfrfee/foirequest/<requestid>/ministryrequest/<ministryrequestid>')
 class CreateFOICFRFee(Resource):
     """Creates CFR Fee for ministry request."""
        
@@ -45,7 +46,7 @@ class CreateFOICFRFee(Resource):
     @TRACER.trace()
     @cross_origin(origins=allowedorigins())
     @auth.require
-    def post(ministryrequestid):      
+    def post(requestid, ministryrequestid):      
         try:
             if AuthHelper.getusertype() != "ministry":
                 return {'status': False, 'message':'UnAuthorized'}, 403
@@ -64,7 +65,7 @@ class CreateFOICFRFee(Resource):
             return {'status': exception.status_code, 'message':exception.message}, 500 
 
 @cors_preflight('POST,OPTIONS')
-@API.route('/foicfrfee/ministryrequest/<ministryrequestid>/sanction')
+@API.route('/foicfrfee/foirequest/<requestid>/ministryrequest/<ministryrequestid>/sanction')
 class SanctionFOICFRFee(Resource):
     """Updates CFR Fee status and iao preparing field."""
        
@@ -72,14 +73,16 @@ class SanctionFOICFRFee(Resource):
     @TRACER.trace()
     @cross_origin(origins=allowedorigins())
     @auth.require
-    def post(ministryrequestid):      
+    def post(requestid, ministryrequestid):      
         try:
             if AuthHelper.getusertype() != "iao":
                 return {'status': False, 'message':'UnAuthorized'}, 403
             requestjson = request.get_json() 
-            foicfrfeeschema = FOICFRFeeSanctionSchema().load(requestjson)  
+            foicfrfeeschema = FOICFRFeeSanctionSchema().load(requestjson)
             result = cfrfeeservice().sanctioncfrfee(ministryrequestid, foicfrfeeschema,AuthHelper.getuserid())
             asyncio.ensure_future(eventservice().posteventforcfrfeeform(ministryrequestid, AuthHelper.getuserid(), AuthHelper.getusername()))
+            if (foicfrfeeschema["status"] == "approved"):
+                requestservice().postfeeeventtoworkflow(requestid, ministryrequestid, "CANCELLED")
             return {'status': result.success, 'message':result.message,'id':result.identifier} , 200 
         except ValidationError as verr:
             logging.error(verr)
