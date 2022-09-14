@@ -159,7 +159,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
     requestState.toLowerCase() !== StateEnum.open.name.toLowerCase() &&
     requestState.toLowerCase() !== StateEnum.intakeinprogress.name.toLowerCase();
   const [axisSyncedData, setAxisSyncedData] = useState({});
-  const [checkExtension, setCheckExtension] = useState(true);
+  const [checkExtension, setCheckExtension] = useState(false);
   let bcgovcode = getBCgovCode(ministryId, requestDetails);
   const [headerText, setHeaderText]  = useState(getHeaderText({requestDetails, ministryId, requestState}));  
   document.title = requestDetails.axisRequestId || requestDetails.idNumber || headerText;
@@ -310,9 +310,8 @@ const FOIRequest = React.memo(({ userDetail }) => {
       for(let axisObj of axisData[key]){
         for(let foiReqObj of requestExtensions){
           if(getUniqueIdentifier(axisObj) === getUniqueIdentifier(foiReqObj)){
-            if(axisObj.extensionstatusid !== foiReqObj.extensionstatusid || axisObj.approvednoofdays !== foiReqObj.approvednoofdays ||
+            if(axisObj.extensionstatusid !== foiReqObj.extensionstatusid ||
               axisObj.extendedduedays  !== foiReqObj.extendedduedays ||
-              axisObj.extendedduedays !== foiReqObj.extendedduedays  || 
               !(foiReqObj.decisiondate === axisObj.approveddate || foiReqObj.decisiondate === axisObj.denieddate)){
                 return true;
             }
