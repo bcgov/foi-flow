@@ -14,6 +14,8 @@ class templateconfig:
             return "fee_payment_confirmation_full.html"
         elif key == "PAYOUTSTANDING":
             return "fee_estimate_notification_outstanding.html"
+        elif key == "PAYOUTSTANDINGFULLPAYMENT":
+            return "fee_payment_confirmation_outstanding.html"
         else:
             logging.info("Unknown key")
             return None
@@ -21,7 +23,7 @@ class templateconfig:
     def getsubject(self, key, requestjson):        
         if key == "PAYONLINE" or key == "PAYOUTSTANDING":
             return "Your FOI Request ["+requestjson["axisRequestId"]+"]"
-        elif key == "FEE-ESTIMATE-PAYMENT-RECEIPT":
+        elif key == "FEE-ESTIMATE-PAYMENT-RECEIPT" or key == "OUTSTANDING-PAYMENT-RECEIPT":
             return "Your FOI Request ["+requestjson["axisRequestId"]+"] - Fee Payment Received"
         elif key == "PAYOUTSTANDING":
             return "Your FOI Request ["+requestjson["axisRequestId"]+"] - Outstanding Fee Estimate"
@@ -32,6 +34,8 @@ class templateconfig:
             return "Fee Estimate"
         elif key == "FEE-ESTIMATE-PAYMENT-RECEIPT":  
             return "Fee Estimate - Payment Receipt"  
+        elif key == "OUTSTANDING-PAYMENT-RECEIPT":
+            return "Fees - Balance Outstanding - Payment Receipt"
         return None 
     
     def getattachmentname(self, key):
@@ -47,6 +51,10 @@ class templateconfig:
             return "Fees - Balance Outstanding Sent"
         elif key == "PAYOUTSTANDING-SEND-FAILURE":
             return "Fees - Balance Outstanding Correspondence Failed"
+        if key == "OUTSTANDING-PAYMENT-RECEIPT":
+            return "Fees - Balance Outstanding - Payment Receipt Sent"
+        elif key == "OUTSTANDING-PAYMENT-RECEIPT-FAILURE":
+            return "Fees - Balance Outstanding - Payment Receipt Correspondence Failed"
         return None
 
     def getattachmentcategory(self, key):
@@ -68,6 +76,12 @@ class templateconfig:
             return "Fee Balance Outstanding - Letter"
         elif key == "PAYOUTSTANDING-FAILED":
             return "Fee Balance Outstanding - Correspondence Failed"
+        elif key == "OUTSTANDING-PAYMENT-RECEIPT":
+            return "Fee Balance Outstanding - Payment Receipt"
+        elif key == "OUTSTANDING-PAYMENT-RECEIPT-SUCCESSFUL":
+            return "Fee Balance Outstanding - Payment Success"
+        elif key == "OUTSTANDING-PAYMENT-RECEIPT-FAILED":
+            return "Fee Balance Outstanding - Payment Success - Correspondence Failed"
         return None 
     
 
