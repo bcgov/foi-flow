@@ -224,9 +224,8 @@ const AxisSyncModal = ({ axisSyncModalOpen, setAxisSyncModalOpen, saveRequestObj
 
     const fieldComparisonOfExtensionObj = (axisObj,obj,extensionsArr,removeCase, extensionSet) => {
       if(getUniqueIdentifier(axisObj) === getUniqueIdentifier(obj)){
-        if(axisObj.extensionstatusid !== obj.extensionstatusid || axisObj.approvednoofdays !== obj.approvednoofdays ||
-          axisObj.extendedduedays  !== obj.extendedduedays ||
-          axisObj.extendedduedays !== obj.extendedduedays  || 
+        if(axisObj.extensionstatusid !== obj.extensionstatusid ||
+          axisObj.extendedduedays !== obj.extendedduedays ||
           !(obj.decisiondate === axisObj.approveddate || obj.decisiondate === axisObj.denieddate)){
             if(removeCase){
               const property = <><span style={{color: '#f44336'}}>{obj.extensionstatus+" - "+obj.extensionreson+" - "+formatDate(obj.extendedduedate, "MMM dd yyyy")+" will be DELETED."}</span><br /></>;
