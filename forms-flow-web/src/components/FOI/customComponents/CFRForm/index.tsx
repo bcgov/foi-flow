@@ -77,6 +77,15 @@ export const CFRForm = ({
     }
   }, [ministryId]);
 
+  const tooltipTotals = {
+    "title": "Payment Details",
+    "content": [
+      <div className="toolTipContent">
+        <p>The balance remaining for a fee estimate is the Estimated total subtracted by the amount paid.
+          When actuals are entered, the balance remaining is the actual totals subtracted by the amount paid.
+          If the balance is negative, then an applicant may be owed a refund.</p>
+      </div>]
+  };
   const tooltipLocating = {
     "title": "Locating/Retrieving",
     "content": [
@@ -143,7 +152,7 @@ export const CFRForm = ({
   const handleTextChanges = (e: React.ChangeEvent<HTMLInputElement>) => {
     const name : string = e.target.name;
     const value : string = e.target.value;
-    
+
     setFormData(values => ({...values, [name]: value}));
   };
 
@@ -177,10 +186,10 @@ export const CFRForm = ({
 
   const [initialFormData, setInitialFormData] = useState(blankForm);
   const [formData, setFormData] = useState(initialFormData);
-  
+
 
   React.useEffect(() => {
-    
+
     var formattedData = {
       cfrfeeid: initialState.cfrfeeid,
       formStatus: initialState.status === null ? 'init' : initialState.status,
@@ -304,7 +313,7 @@ export const CFRForm = ({
       }
     }
     return true;
-  } 
+  }
 
   const save = () => {
     var callback = (_res: string) => {
@@ -373,7 +382,7 @@ export const CFRForm = ({
         errorToast(errorMessage)
       },
     )
-  }; 
+  };
 
 
   const [modalOpen, setModalOpen] = useState(false);
@@ -403,7 +412,7 @@ export const CFRForm = ({
     setModalOpen(true);
   };
 
-  
+
   const [createModalOpen, setCreateModalOpen] = useState(false);
   const handleCreateClose = () => {
     setCreateModalOpen(false);
@@ -411,11 +420,11 @@ export const CFRForm = ({
 
   const cfrActualsDisabled = () => {
     return !isMinistry || formData?.formStatus !== 'approved' || requestState !== StateEnum.callforrecords.name || formData?.amountPaid === 0;
-  } 
+  }
 
   const cfrEstimatedDisabled = () => {
     return !isMinistry || initialFormData?.formStatus === 'approved' || initialFormData?.formStatus === 'review';
-  } 
+  }
 
   const [historyModalOpen, setHistoryModal] = useState(false);
   const handleHistoryClose = () => {
@@ -423,7 +432,7 @@ export const CFRForm = ({
   }
 
   const disableNewCfrFormBtn = () => {
-    return(formData?.formStatus !== 'approved' || (requestState !== StateEnum.callforrecords.name && 
+    return(formData?.formStatus !== 'approved' || (requestState !== StateEnum.callforrecords.name &&
       requestState !== StateEnum.feeassessed.name && requestState !== StateEnum.onhold.name));
   }
 
@@ -611,6 +620,10 @@ export const CFRForm = ({
                           disabled={true}
                         />
                       </div>
+                    </div>
+                    <div className="cfrform-floatRight cfrform-totals">
+                      <CustomizedTooltip content={tooltipTotals} position={""} />
+                      <p className="hideContent" id="popup-6">Information6</p>
                     </div>
                   </AccordionDetails>
                 </Accordion>
@@ -827,7 +840,7 @@ export const CFRForm = ({
                           helperText={validateField(formData?.actual?.iaoPreparing, foiFees.iaoPreparing.unit) &&
                             "Hours must be entered in increments of " + foiFees.iaoPreparing.unit
                           }
-                          disabled={isMinistry || formData?.formStatus !== 'approved' 
+                          disabled={isMinistry || formData?.formStatus !== 'approved'
                           || (requestState !== StateEnum.deduplication.name && requestState !== StateEnum.review.name)}
                         />
                       </div>
@@ -1005,7 +1018,7 @@ export const CFRForm = ({
                       <div className="col-lg-12 foi-details-col">
                         <TextField
                           id="combinedsuggestions"
-                          label="Combined suggestions for futher clarifications   "
+                          label="Combined suggestions for futher clarifications"
                           multiline
                           rows={4}
                           name="suggestions"
@@ -1021,7 +1034,7 @@ export const CFRForm = ({
                   </AccordionDetails>
                 </Accordion>
               </div>
-              <div className="foi-bottom-button-group cfrform"> 
+              <div className="foi-bottom-button-group cfrform">
                 <button
                   type="button"
                   className="col-lg-4 btn btn-bottom btn-save"
@@ -1107,7 +1120,7 @@ export const CFRForm = ({
             <span className="confirmation-message create-new-modal-message">
               Are you sure you want to create a new, blank CFR form? <br></br>
               <em>
-                Any unsaved changes will be lost. The previous version will be locked for editing 
+                Any unsaved changes will be lost. The previous version will be locked for editing
                 and viewable in the CFR Form History.
               </em>
             </span>
