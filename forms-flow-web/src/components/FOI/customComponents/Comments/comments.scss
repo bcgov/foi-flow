@@ -144,6 +144,15 @@
   .halfDiv{
     display: flex;
     justify-content: space-between;
+    flex-wrap: wrap;
+
+    .email-attachment-item{
+      background-color: #4e7095;
+      color: white;
+      margin: 10px 15px;
+      padding: 5px 10px;
+      width: 100%;
+    }
     
 
     .userInfo{

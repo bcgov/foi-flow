@@ -258,6 +258,11 @@ const CommentStructure = ({ i, reply, parentId, totalcommentCount, currentIndex,
             </button>
           </div>
         </div>}
+        {isEmail && i.attachments?.map((attachment) => (
+          <div className="email-attachment-item" key={attachment.filename}>
+            <u>{attachment.filename}</u>
+          </div>
+        ))}
       </div>
       {
         i.replies && i.replies.length > 3 ? <div className="togglecollapseAll"><FontAwesomeIcon icon={toggleIcon} size='1x' color='#003366' /> <span onClick={(e) => toggleCollapse(e, i.commentId)}>Show more comments</span></div> : ""

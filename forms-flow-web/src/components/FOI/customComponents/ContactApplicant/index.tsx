@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useDispatch, useSelector } from "react-redux";
 import TextField from '@mui/material/TextField';
 import InputAdornment from "@mui/material/InputAdornment";
@@ -15,7 +15,7 @@ import { errorToast, isMinistryLogin } from "../../../../helper/FOI/helper";
 import type { params, CFRFormData } from './types';
 import { calculateFees } from './util';
 import foiFees from '../../../../constants/FOI/foiFees.json';
-import { fetchCFRForm, saveCFRForm } from "../../../../apiManager/services/FOI/foiCFRFormServices";
+import { fetchApplicantCorrespondence, saveEmailCorrespondence } from "../../../../apiManager/services/FOI/foiCorrespondenceServices";
 import _ from 'lodash';
 import { toast } from "react-toastify";
 import { StateEnum } from '../../../../constants/FOI/statusEnum';
@@ -37,14 +37,18 @@ import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import { getFullnameList } from '../../../../helper/FOI/helper'
 import CommentStructure from '../Comments/CommentStructure'
-import { any } from 'prop-types';
+import AttachmentModal from '../Attachments/AttachmentModal';
+import { MimeTypeList, MaxFileSizeInMB } from "../../../../constants/FOI/enum";
+import { getOSSHeaderDetails, saveFilesinS3, getFileFromS3 } from "../../../../apiManager/services/FOI/foiOSSServices";
 
 export const ContactApplicant = ({
   requestNumber,
   requestState,
   ministryId,
+  ministryCode,
   requestId,
   userDetail,
+  applicantCorrespondence,
 }: any) => {
 
   const dispatch = useDispatch();
@@ -58,16 +62,48 @@ export const ContactApplicant = ({
     return user && user.fullname ? user.fullname : userid;
   }
 
-  const getRequestNumber = ()=> {
+  const getRequestNumber = () => {
     if (requestNumber)
       return `Request #${requestNumber}`;
     return `Request #U-00${requestId}`;
   }
 
+  const handleContinueModal = (_value: any, _fileInfoList: any, files: any) => {
+    setModal(false)
+    if (files)
+      setFiles(files)
+  }
+
+
+  const [openModal, setModal] = useState(false);
+  function openAttachmentModal() {
+    setModal(true);
+  }
+  const [files, setFiles] = useState([]);
+
+  // const testTemplate;
+  const fileInfoList = [{
+    filename: "test.pdf",
+    s3sourceuri: "https://citz-foi-prod.objectstore.gov.bc.ca/dev-forms-foirequests/TEMPLATES/EMAILS/fee_estimate_notification.html"
+  }]
+  React.useEffect(() => {
+    getOSSHeaderDetails(fileInfoList, dispatch, (err: any, res: any) => {
+      if (!err) {
+        res.map(async (header: any, _index: any) => {
+          getFileFromS3(header, async (_err: any, response: any) => {
+            const text = await new Response(response.data).text()
+            console.log(text)
+          });
+        });
+      }
+    });
+  }, []);
+
   const templates = {
     newestimate: {
       value: 'newestimate',
       label: 'New Estimate',
+      templateid: 1,
       text: `<p>Dear {{firstName}} {{lastName}}</p>
       <p>Please see the attached regarding your FOI Request.</p>
       <p>If you would like to pay your estimate online, please click on this link:</p>
@@ -80,45 +116,48 @@ export const ContactApplicant = ({
     outstandingfee: {
       value: 'outstandingfee',
       label: 'Outstanding Fee',
-      text: `<p>Dear {{firstName}} {{lastName}}</p>
-      <p>Please see the attached regarding your FOI Request.</p>
-      <p>If you would like to pay your remaining balance online, please click on this link: </p>
-      <p><a href="{{cfrfee.feedata.paymenturl}}">Pay Online</a>
-      </p>
-      <br>
-      <p>Thank you,</p>
-      <p>{{assignedToFirstName}} {{assignedToLastName}}</p>
-      <p>{{assignedGroup}}</p>`
+      templateid: 2,
+      text: `<div>
+            <h4 style="color: #003366; display: block; text-align:center; font-family: 'BC Sans'; font-weight:bold">Freedom of Information and Protection for Privacy Act (FOIPPA)<br> Request for Records - Balance Due</h4>
+            </div>
+
+            <p>Dear {{firstName}} {{lastName}}</p>
+            <p>Please see the attached regarding your FOI Request.</p>
+            <p>If you would like to pay your remaining balance online, please click on this link: </p>
+            <p>
+              <a href="{{cfrfee.feedata.paymenturl}}">
+                Pay Online
+              </a>
+            </p>
+            <br>
+            <p>Thank you,</p>
+            <p>{{assignedToFirstName}} {{assignedToLastName}}</p>
+            <p>{{assignedGroup}}</p>`
     },
     none: {
       value: 'none',
       label: 'None',
+      templateid: null,
       text: ``
     }
   }
 
-  const messages = [
-    {
-      userid: 'nichkan@idir',
-      date: "2022 Sep 07 | 03:42 PM",
-      dateUF: "2022-09-07T22:42:59.830945+00:00",
-      text: `<p>Dear {{firstName}} {{lastName}},</p>
-      <p>Please see the attached regarding your FOI Request.</p>
-      <p>If you would like to pay your remaining balance online, please click on this link: </p>
-      <p><a href="http://www.google.com">Pay Online</a>
-      </p>
-      <br>
-      <p>Thank you,</p>
-      <p>{{assignedToFirstName}} {{assignedToLastName}}</p>
-      <p>{{assignedGroup}}</p>`,
-    },
-    {
-      userid: 'richaqi@idir',
-      date: "2022 Sep 07 | 03:42 PM",
-      dateUF: "2022-09-07T22:42:59.830945+00:00",
-      text: `Some other text`,
-    }
-  ]
+  const [messages, setMessages] = useState(applicantCorrespondence);
+
+  React.useEffect(() => {
+    setMessages(applicantCorrespondence);
+  }, [applicantCorrespondence])
+
+  const quillModules = useMemo(() => {
+    return {
+      toolbar: {
+        container: "#correspondence-editor-ql-toolbar",
+        handlers: {
+          link: openAttachmentModal,
+        }
+      }
+    };
+  }, []);
 
   const [editorValue, setEditorValue] = useState("")
   const [currentTemplate, setCurrentTemplate] = useState('')
@@ -127,6 +166,74 @@ export const ContactApplicant = ({
     setCurrentTemplate(e.target.value)
     setEditorValue(templates[e.target.value as keyof typeof templates].text)
   }
+
+  const removeFile = (index: number) => {
+    setFiles(prev => prev.filter((file, i) => i !== index))
+  }
+
+  const saveAttachments = async () => {
+    const fileInfoList = files?.map((file: any) => {
+      return {
+          ministrycode: ministryCode,
+          requestnumber: requestNumber ? requestNumber : `U-00${requestId}`,
+          filestatustransition: 'email-attachment',
+          filename: file.filename? file.filename : file.name,
+      }
+    });
+    let attachments: any = [];
+    try {
+      const response = await getOSSHeaderDetails(fileInfoList, dispatch);
+      for (let header of response.data) {
+        const _file = files.find((file: any) => file.filename === header.filename);
+        await saveFilesinS3(header, _file, dispatch, (_err: any, _res: any) => {
+          if (_res === 200) {
+            attachments.push({filename: header.filename, url: header.filename})
+            console.log("success")
+          }
+          else {
+            console.log("failure")
+          }
+        })
+      }
+    } catch (error) {
+      console.log(error)
+    }
+    return attachments
+  }
+
+  const save = async () => {
+    const attachments = await saveAttachments();
+    var callback = (_res: string) => {
+      setEditorValue("")
+      setFiles([])
+      setShowEditor(false)
+      toast.success("Message has been sent to applicant successfully", {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: true,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      });
+      dispatch(fetchApplicantCorrespondence(ministryId));
+    }
+    var data = {
+      templateid: currentTemplate ? templates[currentTemplate as keyof typeof templates].templateid : null,
+      correspondencemessagejson: editorValue,
+      foiministryrequest_id: ministryId,
+      attachments: attachments
+    };
+    saveEmailCorrespondence(
+      data,
+      requestId,
+      dispatch,
+      callback,
+      (errorMessage: string) => {
+        errorToast(errorMessage)
+      },
+    );
+  };
 
   const [showEditor, setShowEditor] = useState(false)
 
@@ -279,10 +386,30 @@ export const ContactApplicant = ({
             theme="snow"
             value={editorValue}
             onChange={setEditorValue}
-            modules={{toolbar: {container: "#correspondence-editor-ql-toolbar"}}}
+            modules={quillModules}
           />
-          <div>Attaachment 1</div>
-          <div>Attaachment 2</div>
+          {files.map((file: any, index: number) => (
+            <div className="email-attachment-item" key={file.filename}>
+              <u>{file.filename}</u>
+              <i
+                className="fa fa-times-circle"
+                onClick={() => removeFile(index)}
+              >
+              </i>
+            </div>
+          ))}
+          <AttachmentModal
+            modalFor={"add"}
+            openModal={openModal}
+            handleModal={handleContinueModal}
+            multipleFiles={true}
+            requestNumber={requestNumber}
+            requestId={requestId}
+            attachmentsArray={files}
+            existingDocuments={files}
+            attachment={{}}
+            handleRename={undefined}
+          />
         </div>
         <div id="correspondence-editor-ql-toolbar" className="ql-toolbar ql-snow">
           <span className="ql-formats">
@@ -302,8 +429,7 @@ export const ContactApplicant = ({
               className="btn addCorrespondence"
               data-variant="contained"
               onClick={(e) => {
-                console.log(editorValue);
-                setShowEditor(false)
+                save()
               }}
               color="primary"
             >
@@ -325,7 +451,7 @@ export const ContactApplicant = ({
         </Grid>
       </div>}
       <div style={{marginTop: '20px'}}>
-        {messages.map((message, index) => (
+        {messages.map((message: any, index: any) => (
           <div key={index} className="commentsection"
             data-msgid={index}
             style={{ display: 'block' }}
@@ -338,7 +464,7 @@ export const ContactApplicant = ({
               totalcommentCount={1}
               currentIndex={index}
               hasAnotherUserComment={false}
-              fullName={getFullname(message.userid)}
+              fullName={getFullname(message.createdby)}
               isEmail={true}
             />
           </div>

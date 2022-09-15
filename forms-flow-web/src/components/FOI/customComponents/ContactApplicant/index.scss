@@ -44,6 +44,10 @@
   }
 }
 
+#correspondence-editor-ql-toolbar {
+  padding-right: 0;
+}
+
 .email-template-dropdown{
   margin-top: 8px !important;
   > div {
@@ -52,5 +56,17 @@
         width: 0;
       }
     }
+  }
+}
+
+.email-attachment-item {
+  background-color: #4e7095;
+  color: white;
+  margin: 10px 15px;
+  padding: 5px 10px;
+  i {
+    float: right;
+    font-size: 20px;
+    margin-top: 2px;
   }
 }

@@ -58,7 +58,7 @@ import {
         'Authorization': headerDetails.authheader,
       }
     };
-    httpOSSPUTRequest(headerDetails.filepath, file, requestOptions)
+    return httpOSSPUTRequest(headerDetails.filepath, file, requestOptions)
       .then((res) => {
         if (res) {
           done(null, res.status);
