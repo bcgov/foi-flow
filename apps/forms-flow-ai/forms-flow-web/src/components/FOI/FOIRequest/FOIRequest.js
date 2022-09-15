@@ -218,6 +218,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
         setAxisMessage("");
     }
   }, [axisSyncedData, requestExtensions, checkExtension]);
+  
 
   const axisBannerCheck = () =>{
     dispatch(fetchRequestDataFromAxis(requestDetails.axisRequestId, saveRequestObject ,true, (err, data) => {
@@ -229,8 +230,9 @@ const FOIRequest = React.memo(({ userDetail }) => {
             setCheckExtension(false);
             setAxisMessage("WARNING");
           }
-          else
+          else{
             setAxisMessage("");
+          }
         }
         else if(data){
           let responseMsg = data;
@@ -307,9 +309,8 @@ const FOIRequest = React.memo(({ userDetail }) => {
       for(let axisObj of axisData[key]){
         for(let foiReqObj of requestExtensions){
           if(getUniqueIdentifier(axisObj) === getUniqueIdentifier(foiReqObj)){
-            if(axisObj.extensionstatusid !== foiReqObj.extensionstatusid || axisObj.approvednoofdays !== foiReqObj.approvednoofdays ||
+            if(axisObj.extensionstatusid !== foiReqObj.extensionstatusid ||
               axisObj.extendedduedays  !== foiReqObj.extendedduedays ||
-              axisObj.extendedduedays !== foiReqObj.extendedduedays  || 
               !(foiReqObj.decisiondate === axisObj.approveddate || foiReqObj.decisiondate === axisObj.denieddate)){
                 return true;
             }

@@ -71,6 +71,8 @@ class extensionservice:
            
             if result.success == True:
                 version = self.__getversionforrequest(ministryrequestid)
+                #Set isactive:false for extensions with previous ministry request version
+                FOIRequestExtension.disableoldversions(version,ministryrequestid, userid)
                 extnsionresult = FOIRequestExtension.saveextension(ministryrequestid, version, extensionschema, extensionreason, userid, newduedate= newduedate)
         else:
             extnsionresult = FOIRequestExtension.saveextension(ministryrequestid, version, extensionschema, extensionreason, userid)
@@ -91,25 +93,52 @@ class extensionservice:
         if sum(publicbodyextensiondays) + extensionschema['extendedduedays'] > 30:
             raise BusinessException(Error.INVALID_INPUT)
         
+    def getextensiontobesaved(self, ministryrequestid, extensions,version):
+        extensionstoadd=[]  
+        extensionstodelete=[]
+        extensionidstodelete=[]
+        existingextensions = FOIRequestExtension.getextensions(ministryrequestid, version)    
+        if(len(existingextensions) > 0):  
+            identifiersforexisting = []
+            identifiersforaxis = []
+            for existingextension in existingextensions:
+                datestring = str(existingextension["extendedduedate"]).split(" ",1)[0]
+                identifierforexisting= str(existingextension["extensionreasonid"])+datestring+str(existingextension["extensionstatusid"])   
+                identifiersforexisting.append(identifierforexisting)
+            for axisextension in extensions:
+                datestring = str(axisextension["extendedduedate"]).split(" ",1)[0]
+                identifierforaxis= str(axisextension["extensionreasonid"])+datestring+str(axisextension["extensionstatusid"])
+                identifiersforaxis.append(identifierforaxis)
+                if(identifierforaxis not in identifiersforexisting):
+                    extensionstoadd.append(axisextension)
+            for existingextension in existingextensions:
+                datestring = str(existingextension["extendedduedate"]).split(" ",1)[0]
+                identifierforexisting= str(existingextension["extensionreasonid"])+datestring+str(existingextension["extensionstatusid"])  
+                if(identifierforexisting not in identifiersforaxis):
+                    extensionstodelete.append(existingextension)
+                    extensionidstodelete.append(existingextension["foirequestextensionid"])
+        else:
+            extensionstoadd = extensions
+
+        return extensionstoadd, extensionstodelete, extensionidstodelete
     
-    def saveaxisrequestextension(self, ministryrequestid, extensions, userid):
+    def saveaxisrequestextension(self, ministryrequestid, extensions, userid, username):
         version = self.__getversionforrequest(ministryrequestid)
-        # delete all exisitng extensions for this ministry
-        existingextensions = FOIRequestExtension.getextensions(ministryrequestid, version)        
-        for existingextension in existingextensions:            
-            self.__deleteextension(existingextension["foirequestextensionid"], ministryrequestid, userid)
+        extensionstoadd, extensionstodelete, extensionidstodelete = self.getextensiontobesaved(ministryrequestid, extensions,version)
+        if(len(extensionstodelete) > 0):
+            for existingextension in extensionstodelete:            
+                self.deletedocuments(existingextension['foirequestextensionid'], existingextension['version'], ministryrequestid, userid) 
+        deletedextensionresult= FOIRequestExtension.disableextensions(extensionidstodelete, userid)
         newextensions = []
-        for extension in extensions:
-            newextensions.append(self.__createextension(extension, ministryrequestid, version, userid))
+        if(len(extensionstoadd) > 0):
+            for extension in extensionstoadd:
+                newextensions.append(self.__createextension(extension, ministryrequestid, version, userid))
         extnsionresult = FOIRequestExtension.saveextensions(newextensions)
+        if deletedextensionresult.success == True and len(deletedextensionresult.args) > 0:
+            # Post event for system generated comments & notifications for deleted extensions 
+            eventservice().posteventforaxisextension(ministryrequestid, deletedextensionresult.args[0], userid, username, "delete")
         return extnsionresult
 
-    def __deleteextension(self, extensionid, ministryrequestid, userid):
-        extension = FOIRequestExtension.getextension(extensionid)
-        extensionversion = extension['version']
-        self.deletedocuments(extensionid, extensionversion, ministryrequestid, userid)  
-        FOIRequestExtension.deleteextensionbyministryid(ministryrequestid, userid)
-        
     def __createextension(self, extension, ministryrequestid, ministryrequestversion, userid): 
         createuserid = extension['createdby'] if 'createdby' in extension and extension['createdby'] is not None else userid
         createdat = extension['created_at'] if 'created_at' in extension  and extension['created_at'] is not None else datetime.now()
@@ -180,7 +209,8 @@ class extensionservice:
                 "duedate": extendedduedate if extendedduedate else updatedduedate
             }
             requestservice().saveministryrequestversion(ministryrequestschema, foirequestid, ministryrequestid, userid)
-        
+            version = self.__getversionforrequest(ministryrequestid)
+            FOIRequestExtension.disableoldversions(version,ministryrequestid, userid)
             newduedate = \
             ministryrequestschema['duedate'] \
             if isinstance(ministryrequestschema['duedate'], str) \
@@ -190,13 +220,12 @@ class extensionservice:
         return extensionresult
         
     def deleterequestextension(self, requestid, ministryrequestid, extensionid, userid):
-        extensionschema = {'isactive':False}
-        return self.createrequestextensionversionfordelete(requestid, ministryrequestid, extensionid, extensionschema, userid)
+        return self.createrequestextensionversionfordelete(requestid, ministryrequestid, extensionid, userid)
 
     # This is used for delete extension
     # soft delete of extension and related documents
     # due date reverted back to the prev approved due date
-    def createrequestextensionversionfordelete(self, requestid, ministryrequestid, extensionid, extensionschema, userid):
+    def createrequestextensionversionfordelete(self, requestid, ministryrequestid, extensionid, userid):
         ministryversion = self.__getversionforrequest(ministryrequestid)
         extension = FOIRequestExtension.getextension(extensionid)
         prevstatus = extension["extensionstatusid"]
@@ -212,9 +241,11 @@ class extensionservice:
 
               
         #copyextension has the updated extension with soft delete(isactive: False) with the new version of extension       
-        updatedextension = self.__copyextensionproperties(extension, extensionschema, extensionversion)
+        #updatedextension = self.__copyextensionproperties(extension, extensionschema, extensionversion)
         # this will create a new version of extension with isactive = False
-        extensionresult = FOIRequestExtension.createextensionversion(ministryrequestid, ministryversion, updatedextension, userid)
+        #extensionresult = FOIRequestExtension.createextensionversion(ministryrequestid, ministryversion, updatedextension, userid)
+        #LATEST UPDATE :- updates existing isactive field to false if delete performed & no new version will be created for delete.
+        extensionresult = FOIRequestExtension.disableextension(extension["foirequestextensionid"], userid)
         # once soft deleted, revert back the due date to prev due date
         # creates a new version of ministry request, extension, extensiondocuments(if any) and documents(if any)
         if extensionresult.success == True and prevstatus == 2:
@@ -222,6 +253,9 @@ class extensionservice:
                 "duedate": updatedduedate
             }
             requestservice().saveministryrequestversion(ministryrequestschema, requestid, ministryrequestid, userid)
+            version = self.__getversionforrequest(ministryrequestid)
+            #Set isactive:false for extensions with previous ministry request version
+            FOIRequestExtension.disableoldversions(version,ministryrequestid, userid)
             ## return due date
             
             newduedate = \

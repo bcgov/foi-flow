@@ -51,6 +51,7 @@ const AxisSyncModal = ({ axisSyncModalOpen, setAxisSyncModalOpen, saveRequestObj
     const [axisExtensions, setAxisExtension] = React.useState([]);
     const dispatch = useDispatch();
     const extensions = useSelector((state) => state.foiRequests.foiRequestExtesions);
+    const [updateExtensions, setUpdateExtensions] = React.useState(false);
 
     useEffect(()=>{
         if(Object.entries(requestDetailsFromAxis).length !== 0){
@@ -113,7 +114,7 @@ const AxisSyncModal = ({ axisSyncModalOpen, setAxisSyncModalOpen, saveRequestObj
       return false;
     }
 
-    const assignDisplayedReqObj = (key,updatedObj, updatedField) => {     
+    const assignDisplayedReqObj = (key,updatedObj, updatedField) => {  
       switch (key) {
         case 'dueDate':
         case 'requestProcessStart':
@@ -143,8 +144,10 @@ const AxisSyncModal = ({ axisSyncModalOpen, setAxisSyncModalOpen, saveRequestObj
         case 'Extensions':
           let extensionsArr = compareExtensions(key);
           if(extensionsArr?.length > 0 || (extensionsArr?.length === 0 && 
-              requestDetailsFromAxis[key].length === 0 && extensions?.length > 0))
+              requestDetailsFromAxis[key].length === 0 && extensions?.length > 0)){
             updatedObj[key] = extensionsArr;
+            setUpdateExtensions(true);
+          }
           break;
         default:
           updatedObj[updatedField] = requestDetailsFromAxis[key];
@@ -152,7 +155,7 @@ const AxisSyncModal = ({ axisSyncModalOpen, setAxisSyncModalOpen, saveRequestObj
       }
       
     }
-
+    
     const compareAdditionalPersonalInfo = (axisKey , reqKey, axisAdditionalPersonalInfo, 
       foiReqAdditionalPersonalInfo, updatedObj) => {
       if(axisKey === reqKey){
@@ -221,9 +224,8 @@ const AxisSyncModal = ({ axisSyncModalOpen, setAxisSyncModalOpen, saveRequestObj
 
     const fieldComparisonOfExtensionObj = (axisObj,obj,extensionsArr,removeCase, extensionSet) => {
       if(getUniqueIdentifier(axisObj) === getUniqueIdentifier(obj)){
-        if(axisObj.extensionstatusid !== obj.extensionstatusid || axisObj.approvednoofdays !== obj.approvednoofdays ||
-          axisObj.extendedduedays  !== obj.extendedduedays ||
-          axisObj.extendedduedays !== obj.extendedduedays  || 
+        if(axisObj.extensionstatusid !== obj.extensionstatusid ||
+          axisObj.extendedduedays !== obj.extendedduedays ||
           !(obj.decisiondate === axisObj.approveddate || obj.decisiondate === axisObj.denieddate)){
             if(removeCase){
               const property = <><span style={{color: '#f44336'}}>{obj.extensionstatus+" - "+obj.extensionreson+" - "+formatDate(obj.extendedduedate, "MMM dd yyyy")+" will be DELETED."}</span><br /></>;
@@ -287,7 +289,9 @@ const AxisSyncModal = ({ axisSyncModalOpen, setAxisSyncModalOpen, saveRequestObj
                 draggable: true,
                 progress: undefined,
               });
-              saveExtensions();
+              if(updateExtensions){
+                saveExtensions();
+              }
               const _state = getRequestState({
                 currentSelectedStatus,
                 requestState,

@@ -35,12 +35,12 @@ class FOIRequestComment(db.Model):
         _createddate = datetime2.now().isoformat() if commentcreatedate is None else commentcreatedate        
         newcomment = FOIRequestComment(commenttypeid=commenttypeid, ministryrequestid=foirequestcomment["ministryrequestid"], version=version, comment=foirequestcomment["comment"], parentcommentid=parentcommentid, isactive=True, created_at=_createddate, createdby=userid,taggedusers=taggedusers)
         db.session.add(newcomment)
-        db.session.commit()               
+        db.session.commit()      
         return DefaultMethodResult(True,'Comment added',newcomment.commentid)    
 
     @classmethod
     def deleteextensioncommentsbyministry(cls, ministryid):
-        db.session.query(FOIRequestComment).filter(FOIRequestComment.ministryrequestid.in_(ministryid), FOIRequestComment.commenttypeid == 2).delete(synchronize_session=False)
+        db.session.query(FOIRequestComment).filter(FOIRequestComment.ministryrequestid == ministryid, FOIRequestComment.commenttypeid == 2).delete(synchronize_session=False)
         db.session.commit()  
         return DefaultMethodResult(True,'Extensions comments deleted for the ministry ', ministryid)
 
