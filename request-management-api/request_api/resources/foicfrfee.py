@@ -51,7 +51,8 @@ class CreateFOICFRFee(Resource):
             if AuthHelper.getusertype() != "ministry":
                 return {'status': False, 'message':'UnAuthorized'}, 403
             requestjson = request.get_json() 
-            foicfrfeeschema = FOICFRFeeSchema().load(requestjson)  
+            foicfrfeeschema = FOICFRFeeSchema().load(requestjson)
+            print("foicfrfeeschema = ", foicfrfeeschema)
             result = cfrfeeservice().createcfrfee(ministryrequestid, foicfrfeeschema,AuthHelper.getuserid())
             asyncio.ensure_future(eventservice().posteventforcfrfeeform(ministryrequestid, AuthHelper.getuserid(), AuthHelper.getusername()))
             return {'status': result.success, 'message':result.message,'id':result.identifier} , 200 
