@@ -60,11 +60,13 @@ export const saveCFRForm = (
   } else {
     baseUrl = API.FOI_POST_CFR_FORM_IAO;
   }
-  const apiUrl = replaceUrl(
+  const apiUrl = replaceUrl(replaceUrl(
     baseUrl,
-    "<ministryrequestid>",
-    ministryId
-  );
+    "<requestid>",
+    requestId
+  ), "<ministryrequestid>", ministryId);
+  console.log(`apiUrl == ${apiUrl}`)
+
   httpPOSTRequest(apiUrl, data)
     .then((res) => {
       if (res.data) {
