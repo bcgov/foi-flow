@@ -10,7 +10,7 @@
     <bpmn:group id="Group_0nmwgct" categoryValueRef="CategoryValue_1dcilzu" />
     <bpmn:group id="Group_0ihi2fn" categoryValueRef="CategoryValue_1baekcn" />
   </bpmn:collaboration>
-  <bpmn:process id="foi-fee-processing" name="FOI Fee Processing" isExecutable="true" camunda:versionTag="7">
+  <bpmn:process id="foi-fee-processing" name="FOI Fee Processing" isExecutable="true" camunda:versionTag="23">
     <bpmn:laneSet id="LaneSet_1u7kp6i">
       <bpmn:lane id="Lane_1aaq844" name="Post Payment">
         <bpmn:flowNodeRef>Event_0dlzac7</bpmn:flowNodeRef>
@@ -158,11 +158,7 @@ if (execution.getVariable("prevStatus") == "Response") {
       <bpmn:errorEventDefinition id="ErrorEventDefinition_1ffvmgj" errorRef="Error_06fsjjn" camunda:errorCodeVariable="responseCode" />
     </bpmn:boundaryEvent>
     <bpmn:sequenceFlow id="Flow_02gzt5c" name="PAID" sourceRef="Gateway_1rpwru8" targetRef="Activity_0jc83dv">
-      <bpmn:extensionElements>
-        <camunda:executionListener event="take">
-          <camunda:script scriptFormat="javascript">execution.setVariable("feeflow","NA");</camunda:script>
-        </camunda:executionListener>
-      </bpmn:extensionElements>
+      <bpmn:extensionElements />
       <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${paymentstatus == "PAID"}</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
     <bpmn:sequenceFlow id="Flow_0ldn3y8" name="Retry &#62; 3" sourceRef="Gateway_0q2f2o1" targetRef="Event_1tmmrt5">
@@ -204,11 +200,7 @@ execution.setVariable("prevStatus", obj.previousstatus);</camunda:script>
       </bpmn:extensionElements>
     </bpmn:sequenceFlow>
     <bpmn:sequenceFlow id="Flow_00aq624" name="EXPIRED" sourceRef="Gateway_1rpwru8" targetRef="Activity_07lppep">
-      <bpmn:extensionElements>
-        <camunda:executionListener event="take">
-          <camunda:script scriptFormat="javascript">execution.setVariable("feeflow","NA");</camunda:script>
-        </camunda:executionListener>
-      </bpmn:extensionElements>
+      <bpmn:extensionElements />
       <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${paymentstatus == "EXPIRED"}</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
     <bpmn:sequenceFlow id="Flow_1qzjx1y" sourceRef="Activity_1mkqp7n" targetRef="Gateway_1rpwru8" />
@@ -552,11 +544,7 @@ connector.getVariable("statusCode");</camunda:script>
     <bpmn:sequenceFlow id="Flow_0s4pyno" sourceRef="Activity_0k05bsn" targetRef="Activity_0v6rrmr" />
     <bpmn:sequenceFlow id="Flow_1v47vyi" sourceRef="invoke-reqmgmt-api" targetRef="Activity_0k05bsn" />
     <bpmn:sequenceFlow id="Flow_0o3fy5y" name="CANCELLED" sourceRef="Gateway_1rpwru8" targetRef="Event_07sfh4u">
-      <bpmn:extensionElements>
-        <camunda:executionListener event="take">
-          <camunda:script scriptFormat="javascript">execution.setVariable("feeflow","NA");</camunda:script>
-        </camunda:executionListener>
-      </bpmn:extensionElements>
+      <bpmn:extensionElements />
       <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${paymentstatus == "CANCELLED"}</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
     <bpmn:sequenceFlow id="Flow_0ib5b51" sourceRef="Event_0q2irqu" targetRef="Event_07sfh4u" />

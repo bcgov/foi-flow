@@ -64,4 +64,9 @@ if __name__ == "__main__":
         RedisSubscriberService().register_subscription()
     socketio.init_app(APP, async_mode='eventlet', 
                       path='/api/v1/socket.io')    
-    socketio.run(APP, port=port,host='0.0.0.0', log_output=False, use_reloader=False) 
+    socketio.run(APP, port=port,host='0.0.0.0', log_output=False, use_reloader=False)  
+    
+
+
+    
+    
