@@ -1,15 +1,12 @@
 
 from threading import Thread
-import os
+import eventlet
 #Monkey patch to allow for async actions (aka multiple workers)
-#Monkey patch only in non-development environments to support dev debugging.
-if os.getenv('FLASK_ENV') != "development" :
-    import eventlet
-    eventlet.monkey_patch()
+eventlet.monkey_patch()
 from distutils.log import debug
 
 
-
+import os
 from request_api import create_app, socketio
 from flask_socketio import ConnectionRefusedError
 from flask_socketio import emit
@@ -64,14 +61,11 @@ APP = create_app()
 if __name__ == "__main__":
     port = int(os.environ.get('PORT', 5000))    
     messagequeue = os.getenv('SOCKETIO_MESSAGE_QUEUE', 'INMEMORY')
-    if os.getenv('FLASK_ENV') != "production" :
-        APP.run()    
-    else:
-        if os.getenv("SOCKETIO_MESSAGE_QTYPE") == "REDIS":
-            RedisSubscriberService().register_subscription()
-        socketio.init_app(APP, async_mode='eventlet', 
+    if os.getenv("SOCKETIO_MESSAGE_QTYPE") == "REDIS":
+        RedisSubscriberService().register_subscription()
+    socketio.init_app(APP, async_mode='eventlet', 
                       path='/api/v1/socket.io')    
-        socketio.run(APP, port=port,host='0.0.0.0', log_output=False, use_reloader=False)  
+    socketio.run(APP, port=port,host='0.0.0.0', log_output=False, use_reloader=False)  
     
 
 
