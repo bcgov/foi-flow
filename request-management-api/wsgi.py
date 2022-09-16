@@ -64,7 +64,7 @@ APP = create_app()
 if __name__ == "__main__":
     port = int(os.environ.get('PORT', 5000))    
     messagequeue = os.getenv('SOCKETIO_MESSAGE_QUEUE', 'INMEMORY')
-    if os.getenv('FLASK_ENV') != "development" :
+    if os.getenv('FLASK_ENV') != "production" :
         APP.run()    
     else:
         if os.getenv("SOCKETIO_MESSAGE_QTYPE") == "REDIS":

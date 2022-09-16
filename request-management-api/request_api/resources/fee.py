@@ -94,8 +94,7 @@ class Payment(Resource):
                 amountpaid = float(parsed_args.get('trnAmount'))
                 cfrfeeservice().paycfrfee(ministry_request_id, amountpaid)
                 paymentservice().createpaymentversion(request_id, ministry_request_id, amountpaid)
-                data = requestservice().getrequestdetails(request_id, ministry_request_id)                
-                print("data = ", data)                
+                data = requestservice().getrequestdetails(request_id, ministry_request_id)
                 paymentservice().createpaymentreceipt(request_id, ministry_request_id, data, parsed_args)
                 prevstate = data["stateTransition"][1]["status"] if "stateTransition" in data and len(data["stateTransition"])  > 2 else None
                 statusid = 2
@@ -103,7 +102,7 @@ class Payment(Resource):
                     statusid = 14
                 result = requestservice().updaterequeststatus(request_id, ministry_request_id, statusid)
                 if result.success == True:
-                    asyncio.ensure_future(eventservice().postpaymentevent(ministry_request_id))
+                    asyncio.ensure_future(eventservice().postpaymentevent(ministry_request_id))                    
                     requestservice().postfeeeventtoworkflow(request_id, ministry_request_id, "PAID")
                     asyncio.ensure_future(eventservice().postevent(ministry_request_id,"ministryrequest","System","System", False))
             return response, 201

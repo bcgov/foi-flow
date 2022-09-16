@@ -67,8 +67,8 @@ const API = {
   FOI_GET_EXTENSION: `${FOI_BASE_API_URL}/api/foiextension/<extensionId>`,
 
   FOI_GET_CFR_FORM: `${FOI_BASE_API_URL}/api/foicfrfee/ministryrequest/<ministryrequestid>`,
-  FOI_POST_CFR_FORM: `${FOI_BASE_API_URL}/api/foicfrfee/ministryrequest/<ministryrequestid>`,
-  FOI_POST_CFR_FORM_IAO: `${FOI_BASE_API_URL}/api/foicfrfee/ministryrequest/<ministryrequestid>/sanction`,
+  FOI_POST_CFR_FORM: `${FOI_BASE_API_URL}/api/foicfrfee/foirequest/<requestid>/ministryrequest/<ministryrequestid>`,
+  FOI_POST_CFR_FORM_IAO: `${FOI_BASE_API_URL}/api/foicfrfee/foirequest/<requestid>/ministryrequest/<ministryrequestid>/sanction`,
 
   FOI_POST_EMAIL_CORRESPONDENCE: `${FOI_BASE_API_URL}/api/foiflow/applicantcorrespondence/<ministryrequestid>`,
   FOI_GET_EMAIL_CORRESPONDENCE: `${FOI_BASE_API_URL}/api/foiflow/applicantcorrespondence/<ministryrequestid>`,
