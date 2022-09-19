@@ -29,6 +29,7 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 import CloseIcon from '@material-ui/icons/Close';
 import IconButton from '@material-ui/core/IconButton';
 import { CFRFormHistoryModal } from './CFRFormHistoryModal';
+import Grid from "@material-ui/core/Grid";
 
 export const CFRForm = ({
   requestNumber,

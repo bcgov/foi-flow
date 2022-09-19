@@ -31,6 +31,9 @@ import {
 import {
   fetchFOIRequestAttachmentsList
 } from "../../../apiManager/services/FOI/foiAttachmentServices";
+import {
+  fetchApplicantCorrespondence
+} from "../../../apiManager/services/FOI/foiCorrespondenceServices";
 import { fetchFOIRequestNotesList } from "../../../apiManager/services/FOI/foiRequestNoteServices";
 import { makeStyles } from '@material-ui/core/styles';
 import FOI_COMPONENT_CONSTANTS from '../../../constants/FOI/foiComponentConstants';
@@ -41,6 +44,7 @@ import { StateEnum } from '../../../constants/FOI/statusEnum';
 import { CommentSection } from '../customComponents/Comments';
 import { AttachmentSection } from '../customComponents/Attachments';
 import { CFRForm } from '../customComponents/CFRForm';
+import { ContactApplicant } from '../customComponents/ContactApplicant';
 import Loading from "../../../containers/Loading";
 import clsx from 'clsx';
 import { getAssignedTo, getHeaderText } from "./FOIRequestHeader/utils";
@@ -110,6 +114,9 @@ const FOIRequest = React.memo(({ userDetail }) => {
   let requestAttachments = useSelector(
     (state) => state.foiRequests.foiRequestAttachments
   );
+  let applicantCorrespondence = useSelector(
+    (state) => state.foiRequests.foiRequestApplicantCorrespondence
+  );
   const [attachments, setAttachments] = useState(requestAttachments);
   const [comment, setComment] = useState([]);
   const [requestState, setRequestState] = useState(StateEnum.unopened.name);
@@ -140,7 +147,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
       display: false,
       active: false,
     },
-    Option4: {
+    ContactApplicant: {
       display: false,
       active: false,
     },
@@ -185,6 +192,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
       dispatch(fetchFOIRequestDescriptionList(requestId, ministryId));
       dispatch(fetchFOIRequestNotesList(requestId, ministryId));
       dispatch(fetchFOIRequestAttachmentsList(requestId, ministryId));
+      dispatch(fetchApplicantCorrespondence(ministryId));
     }
 
     dispatch(fetchFOICategoryList());
@@ -501,6 +509,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
       dispatch(fetchFOIRequestDetailsWrapper(id || requestId, ministryId));
       dispatch(fetchFOIRequestDescriptionList(id || requestId, ministryId));
       dispatch(fetchFOIRequestAttachmentsList(id || requestId, ministryId));
+      dispatch(fetchApplicantCorrespondence(ministryId));
       setStateChanged(false);
       setcurrentrequestStatus(_state);
       setTimeout(() => {
@@ -723,6 +732,16 @@ const FOIRequest = React.memo(({ userDetail }) => {
                 >
                   Comments{" "}
                   {requestNotes?.length > 0 ? `(${requestNotes.length})` : ""}
+                </div>
+                <div
+                  className={clsx("tablinks", {
+                    active: tabLinksStatuses.ContactApplicant.active,
+                  })}
+                  name="ContactApplicant"
+                  onClick={() => tabclick("ContactApplicant")}
+                >
+                  Contact Applicant{" "}
+                  {applicantCorrespondence?.length > 0 ? `(${applicantCorrespondence.length})` : ""}
                 </div>
               </>
             )}
@@ -1013,6 +1032,33 @@ const FOIRequest = React.memo(({ userDetail }) => {
                   setEditorChange={setEditorChange}
                   removeComment={removeComment}
                   setRemoveComment={setRemoveComment}
+                />
+              </>
+            ) : (
+              <Loading />
+            )}
+          </div>
+          <div
+            id="ContactApplicant"
+            className={clsx("tabcontent", {
+              active: tabLinksStatuses.ContactApplicant.active,
+              [classes.displayed]: tabLinksStatuses.ContactApplicant.display,
+              [classes.hidden]: !tabLinksStatuses.ContactApplicant.display,
+            })}
+          >
+            {!isLoading &&
+            requestNotes &&
+            (iaoassignedToList?.length > 0 ||
+              ministryAssignedToList?.length > 0) ? (
+              <>
+                <ContactApplicant
+                  requestNumber={requestNumber}
+                  requestState={requestState}
+                  userDetail={userDetail}
+                  ministryId={ministryId}
+                  ministryCode={requestDetails.bcgovcode}
+                  applicantCorrespondence={applicantCorrespondence}
+                  requestId={requestId}
                 />
               </>
             ) : (

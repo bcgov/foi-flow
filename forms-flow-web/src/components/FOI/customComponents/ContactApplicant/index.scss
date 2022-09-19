@@ -1,0 +1,72 @@
+.addCorrespondence {
+  color: #FFFFFF !important;
+  width: 100%;
+  margin: 0;
+  font-family: BCSans-Bold, sans-serif !important;
+  background-color: #38598A !important;
+}
+
+.previewEmail {
+  float: right;
+  button {
+    width: fit-content !important;
+    height: fit-content !important;
+    padding: 3px 25px !important;
+  }
+}
+
+.contact-applicant-container {
+  margin-top: 60px;
+  margin-left: 1em;
+  margin-right: 1em;
+}
+
+.search-grid-container {
+  display: inline-block !important;
+  margin: 20px 0 !important;
+}
+
+.search-grid {
+  // border-right: 2px solid #38598A;
+  background-color: rgba(56,89,138,0.1);
+}
+
+.search-icon {
+  color: #38598A;
+}
+
+.correspondence-editor {
+  border: 1px solid #003366 !important;
+  border-radius: 8px;
+  .ql-container.ql-snow {
+    height: 200px;
+    border: none
+  }
+}
+
+#correspondence-editor-ql-toolbar {
+  padding-right: 0;
+}
+
+.email-template-dropdown{
+  margin-top: 8px !important;
+  > div {
+    > fieldset {
+      > legend {
+        width: 0;
+      }
+    }
+  }
+}
+
+.email-attachment-item {
+  background-color: #4e7095;
+  color: white;
+  margin: 10px 15px;
+  padding: 5px 10px;
+  i {
+    float: right;
+    font-size: 20px;
+    margin-top: 2px;
+  }
+}
