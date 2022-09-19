@@ -46,7 +46,8 @@ class templateservice:
     def __getprevstate(self, requestjson):
         return requestjson["stateTransition"][2]["status"] if "stateTransition" in requestjson and len(requestjson["stateTransition"])  > 3 else None
 
-    def __generatetemplate(self, emailtemplatename, dynamictemplatevalues):  
+    def __generatetemplate(self, emailtemplatename, dynamictemplatevalues):
+        headerfooterhtml = storageservice().downloadtemplate('header_footer_template.html')  
         emailtemplatehtml= storageservice().downloadtemplate(emailtemplatename)
         if(emailtemplatehtml is None):
             raise ValueError('No template found')
@@ -58,6 +59,9 @@ class templateservice:
                 dynamictemplatevalues["assignedToFirstName"] = ""
                 dynamictemplatevalues["assignedToLastName"] = ""
 
-        template = Template(emailtemplatehtml)
-        templatedhtml = template.render(dynamictemplatevalues)
-        return templatedhtml
+        contenttemplate = Template(emailtemplatehtml)
+        content = contenttemplate.render(dynamictemplatevalues)
+        dynamictemplatevalues["content"] = content
+        finaltemplate = Template(headerfooterhtml)
+        finaltemplatedhtml = finaltemplate.render(dynamictemplatevalues)
+        return finaltemplatedhtml
