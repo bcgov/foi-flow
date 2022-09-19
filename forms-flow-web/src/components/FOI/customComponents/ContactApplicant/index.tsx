@@ -187,7 +187,7 @@ export const ContactApplicant = ({
         const _file = files.find((file: any) => file.filename === header.filename);
         await saveFilesinS3(header, _file, dispatch, (_err: any, _res: any) => {
           if (_res === 200) {
-            attachments.push({filename: header.filename, url: header.filename})
+            attachments.push({filename: header.filename, url: header.filepath})
             console.log("success")
           }
           else {
