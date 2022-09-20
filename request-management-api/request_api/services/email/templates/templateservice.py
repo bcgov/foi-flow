@@ -64,4 +64,4 @@ class templateservice:
         dynamictemplatevalues["content"] = content
         finaltemplate = Template(headerfooterhtml)
         finaltemplatedhtml = finaltemplate.render(dynamictemplatevalues)
-        return finaltemplatedhtml
+        return finaltemplatedhtml, content

@@ -226,7 +226,7 @@ export const ContactApplicant = ({
     };
     saveEmailCorrespondence(
       data,
-      requestId,
+      ministryId,
       dispatch,
       callback,
       (errorMessage: string) => {
