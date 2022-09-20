@@ -26,8 +26,8 @@ from request_api.services.rawrequestservice import rawrequestservice
 from request_api.services.documentservice import documentservice
 from request_api.services.eventservice import eventservice
 import json
-import asyncio
 from jose import jwt as josejwt
+from request_api.services.asyncwrapperservice import asyncwrapperservice
 
 API = Namespace('FOIRawRequests', description='Endpoints for FOI request management')
 TRACER = Tracer.get_instance()
@@ -77,14 +77,14 @@ class FOIRawRequest(Resource):
                 assigneemiddlename = requestdata['assigneemiddlename']
                 assigneelastname = requestdata['assigneelastname']
                 result = rawrequestservice().saverawrequestversion(updaterequest,requestid,assigneegroup,assignee,status,AuthHelper.getuserid(),assigneefirstname,assigneemiddlename,assigneelastname, actiontype)
-                asyncio.ensure_future(eventservice().postevent(requestid,"rawrequest",AuthHelper.getuserid(), AuthHelper.getusername(), AuthHelper.isministrymember()))
+                asyncwrapperservice().postevent(requestid,"rawrequest",AuthHelper.getuserid(), AuthHelper.getusername(), AuthHelper.isministrymember())
                 if result.success == True:
                     rawrequestservice().posteventtoworkflow(result.identifier, rawrequest['wfinstanceid'], updaterequest, status)
                     return {'status': result.success, 'message':result.message}, 200
             elif int(requestid) and str(requestid) == "-1":
                 result = rawrequestservice().saverawrequest(updaterequest,"intake",AuthHelper.getuserid(),notes="Request submitted from FOI Flow")
                 if result.success == True:
-                    asyncio.ensure_future(eventservice().postevent(result.identifier,"rawrequest",AuthHelper.getuserid(),AuthHelper.getusername(),AuthHelper.isministrymember()))
+                    asyncwrapperservice().postevent(result.identifier,"rawrequest",AuthHelper.getuserid(),AuthHelper.getusername(),AuthHelper.isministrymember())
                     return {'status': result.success, 'message':result.message,'id':result.identifier} , 200                
         except ValueError:
             return {'status': 500, 'message':INVALID_REQUEST_ID}, 500    
@@ -134,7 +134,7 @@ class FOIRawRequestLoadTest(Resource):
             username = 'Super Tester'
             if int(requestid) and str(requestid) == "-1":
                 result = rawrequestservice().saverawrequest(updaterequest,"intake",userid,notes="Request submitted from FOI Flow")               
-                asyncio.ensure_future(eventservice().postevent(result.identifier,"rawrequest",userid,username,False))
+                asyncwrapperservice().postevent(result.identifier,"rawrequest",userid,username,False)
                 return {'status': result.success, 'message':result.message,'id':result.identifier} , 200
         except ValueError:
             return {'status': 400, 'message':INVALID_REQUEST_ID}, 400    
