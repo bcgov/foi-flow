@@ -3,7 +3,7 @@
 
 [ ! -f .env ] || export $(grep -v '^#' .env | xargs)
 
-if [[ $FLASK_ENV="development" ]]
+if [[ $DEBUG_MODE="ON" ]]
 then
     python manage.py db && flask run -h 0.0.0.0 -p 5000
 else

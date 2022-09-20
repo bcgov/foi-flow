@@ -20,7 +20,8 @@ import os
 
 workers = int(os.environ.get('GUNICORN_PROCESSES', '1'))  # pylint: disable=invalid-name
 threads = int(os.environ.get('GUNICORN_THREADS', '1'))  # pylint: disable=invalid-name
-if os.getenv('FLASK_ENV') != "development":
+debugmode = str(os.environ.get('DEBUG_MODE', 'OFF'))  # Default flask debug mode to OFF
+if debugmode == "OFF":
    worker_class = 'eventlet'
 forwarded_allow_ips = '*'  # pylint: disable=invalid-name
 secure_scheme_headers = {'X-Forwarded-Proto': 'https'}  # pylint: disable=invalid-name

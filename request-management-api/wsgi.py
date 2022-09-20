@@ -3,7 +3,8 @@ from threading import Thread
 import os
 #Monkey patch to allow for async actions (aka multiple workers)
 #Monkey patch only in non-development environments to support dev debugging.
-if os.getenv('FLASK_ENV') != "development" :
+debugmode = str(os.environ.get('DEBUG_MODE', 'OFF'))  # Default flask debug mode to OFF
+if debugmode == "OFF":
     import eventlet
     eventlet.monkey_patch()
 from distutils.log import debug
@@ -64,11 +65,11 @@ APP = create_app()
 if __name__ == "__main__":
     port = int(os.environ.get('PORT', 5000))    
     messagequeue = os.getenv('SOCKETIO_MESSAGE_QUEUE', 'INMEMORY')
-    if os.getenv('FLASK_ENV') != "development" :
-        APP.run()    
-    else:
-        if os.getenv("SOCKETIO_MESSAGE_QTYPE") == "REDIS":
+    if os.getenv("SOCKETIO_MESSAGE_QTYPE") == "REDIS":
             RedisSubscriberService().register_subscription()
+    if os.getenv('DEBUG_MODE') == "ON":
+        APP.run()    
+    else:        
         socketio.init_app(APP, async_mode='eventlet', 
                       path='/api/v1/socket.io')    
         socketio.run(APP, port=port,host='0.0.0.0', log_output=False, use_reloader=False)  
