@@ -191,7 +191,6 @@ export const CFRForm = ({
 
 
   React.useEffect(() => {
-
     var formattedData = {
       cfrfeeid: initialState.cfrfeeid,
       formStatus: initialState.status === null ? 'init' : initialState.status,
@@ -258,8 +257,6 @@ export const CFRForm = ({
   const handleAmountPaidChanges = (e: React.ChangeEvent<HTMLInputElement>) => {
     const name : string = e.target.name;
     const value : number = Math.floor((+e.target.value) * 100) / 100;
-    console.log("name",name);
-    console.log("value",value);
     if (value <= Math.max(formData.actualTotalDue, formData.estimatedTotalDue)) {
       setFormData(values => ({...values, [name]: value}));
     }
@@ -300,9 +297,7 @@ export const CFRForm = ({
   };
 
   const calculateBalanceRemaining = () => {
-    let bal= formData?.actualTotalDue ? (formData.actualTotalDue - formData.amountPaid - formData.feewaiverAmount - formData.refundAmount) : (formData.estimatedTotalDue - formData.amountPaid - formData.feewaiverAmount - formData.refundAmount);
-    console.log("==>Balance Amount:",bal);
-    return formData?.actualTotalDue ? (formData.actualTotalDue - formData.amountPaid - formData.feewaiverAmount - formData.refundAmount) : (formData.estimatedTotalDue - formData.amountPaid - formData.feewaiverAmount - formData.refundAmount);
+    return formData?.actualTotalDue ? (formData.actualTotalDue - formData.amountPaid - formData.feewaiverAmount) : (formData.estimatedTotalDue - formData.amountPaid - formData.feewaiverAmount);
   }
 
   const cfrStatusDisabled = () => {
@@ -349,6 +344,8 @@ export const CFRForm = ({
           estimatedtotaldue: formData.estimatedTotalDue,
           actualtotaldue: formData.actualTotalDue,
           balanceremaining: calculateBalanceRemaining(),
+          feewaiveramount: formData.feewaiverAmount,
+          refundamount: formData.refundAmount,
           estimatedlocatinghrs: formData.estimates.locating,
           actuallocatinghrs: formData.actual.locating,
           estimatedproducinghrs: formData.estimates.producing,
