@@ -165,6 +165,8 @@ export const CFRForm = ({
     actualTotalDue: 0,
     amountPaid: 0,
     balanceRemaining:0,
+    feewaiverAmount:0,
+    refundAmount:0,
     estimates: {
       locating: 0,
       producing: 0,
@@ -197,6 +199,8 @@ export const CFRForm = ({
       actualTotalDue: initialState.feedata?.actualtotaldue,
       amountPaid: initialState.feedata?.amountpaid,
       balanceRemaining: initialState.feedata?.balanceremaining,
+      feewaiverAmount: initialState.feedata?.feewaiveramount,
+      refundAmount: initialState.feedata?.refundamount,
       estimates: {
         locating: initialState.feedata?.estimatedlocatinghrs,
         producing: initialState.feedata?.estimatedproducinghrs,
@@ -254,16 +258,18 @@ export const CFRForm = ({
   const handleAmountPaidChanges = (e: React.ChangeEvent<HTMLInputElement>) => {
     const name : string = e.target.name;
     const value : number = Math.floor((+e.target.value) * 100) / 100;
+    console.log("name",name);
+    console.log("value",value);
     if (value <= Math.max(formData.actualTotalDue, formData.estimatedTotalDue)) {
       setFormData(values => ({...values, [name]: value}));
     }
   };
 
-  const handleAmountChanges = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleRefundChanges = (e: React.ChangeEvent<HTMLInputElement>) => {
     const name : string = e.target.name;
-    const value : number = +e.target.value;
-
-    setFormData(values => ({...values, [name]: value}));
+    const value : number = Math.floor((+e.target.value) * 100) / 100;
+    if(value <= formData.amountPaid)
+      setFormData(values => ({...values, [name]: value}));
   };
 
   const handleEstimateChanges = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -294,7 +300,9 @@ export const CFRForm = ({
   };
 
   const calculateBalanceRemaining = () => {
-    return formData?.actualTotalDue ? (formData.actualTotalDue - formData.amountPaid) : (formData.estimatedTotalDue - formData.amountPaid);
+    let bal= formData?.actualTotalDue ? (formData.actualTotalDue - formData.amountPaid - formData.feewaiverAmount - formData.refundAmount) : (formData.estimatedTotalDue - formData.amountPaid - formData.feewaiverAmount - formData.refundAmount);
+    console.log("==>Balance Amount:",bal);
+    return formData?.actualTotalDue ? (formData.actualTotalDue - formData.amountPaid - formData.feewaiverAmount - formData.refundAmount) : (formData.estimatedTotalDue - formData.amountPaid - formData.feewaiverAmount - formData.refundAmount);
   }
 
   const cfrStatusDisabled = () => {
@@ -367,6 +375,8 @@ export const CFRForm = ({
           estimatedtotaldue: formData.estimatedTotalDue,
           actualtotaldue: formData.actualTotalDue,
           balanceremaining: calculateBalanceRemaining(),
+          feewaiveramount: formData.feewaiverAmount,
+          refundamount: formData.refundAmount,
         },
         status: formData.formStatus,
       }
@@ -444,6 +454,13 @@ export const CFRForm = ({
     setInitialFormData(blankForm);
     setFormData(blankForm);
     setIsNewCFRForm(true)
+  }
+
+  const isFeeWaiverDisabled = () => {
+    if(isMinistry || (!isMinistry && (requestState !== StateEnum.onhold.name || formData?.formStatus !== 'approved')))
+      return true;
+    else
+      return false;
   }
 
 
@@ -609,15 +626,41 @@ export const CFRForm = ({
                           }}
                           InputLabelProps={{ shrink: true }}
                           variant="outlined"
-                          name="feeWaiver"
+                          name="feewaiverAmount"
                           type="number"
-                          value={0}
+                          value={formData?.feewaiverAmount}
                           onChange={handleAmountPaidChanges}
                           onBlur={(e) => {
                             e.target.value = parseFloat(e.target.value).toFixed(2);
                           }}
                           fullWidth
-                          disabled={true}
+                          disabled={isFeeWaiverDisabled()}
+                        />
+                      </div>
+                      <div className="col-lg-6 foi-details-col">
+                        <TextField
+                          id="refund"
+                          label="Refund Amount"
+                          inputProps={{
+                            "aria-labelledby": "refund-label",
+                            step: 0.01,
+                            max: formData.amountPaid,
+                            min: 0
+                          }}
+                          InputProps={{
+                            startAdornment: <InputAdornment position="start">$</InputAdornment>
+                          }}
+                          InputLabelProps={{ shrink: true }}
+                          variant="outlined"
+                          name="refundAmount"
+                          type="number"
+                          value={formData?.refundAmount}
+                          onChange={handleRefundChanges}
+                          onBlur={(e) => {
+                            e.target.value = parseFloat(e.target.value).toFixed(2);
+                          }}
+                          fullWidth
+                          disabled={isFeeWaiverDisabled()}
                         />
                       </div>
                     </div>

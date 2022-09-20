@@ -5,6 +5,8 @@ export type CFRFormData = {
     actualTotalDue: number;
     amountPaid: number;
     balanceRemaining: number;
+    feewaiverAmount: number;
+    refundAmount: number;
     estimates: feeData;
     actual: feeData;
     suggestions: string;
