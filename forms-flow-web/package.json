@@ -105,7 +105,8 @@
     "semantic-ui-css": "^2.4.1",
     "socket.io-client": "^4.4.1",
     "source-map-explorer": "^2.5.2",
-    "typescript": "^4.7.2"
+    "typescript": "^4.7.2",
+    "react-frame-component": "^5.2.3"
   },
   "resolutions": {
     "xmldom": "^0.6.0",

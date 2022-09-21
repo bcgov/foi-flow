@@ -40,6 +40,7 @@ import CommentStructure from '../Comments/CommentStructure'
 import AttachmentModal from '../Attachments/AttachmentModal';
 import { MimeTypeList, MaxFileSizeInMB } from "../../../../constants/FOI/enum";
 import { getOSSHeaderDetails, saveFilesinS3, getFileFromS3 } from "../../../../apiManager/services/FOI/foiOSSServices";
+import { PreviewModal } from './PreviewModal';
 
 export const ContactApplicant = ({
   requestNumber,
@@ -187,7 +188,7 @@ export const ContactApplicant = ({
         const _file = files.find((file: any) => file.filename === header.filename);
         await saveFilesinS3(header, _file, dispatch, (_err: any, _res: any) => {
           if (_res === 200) {
-            attachments.push({filename: header.filename, url: header.filename})
+            attachments.push({filename: header.filename, url: header.filepath})
             console.log("success")
           }
           else {
@@ -201,7 +202,7 @@ export const ContactApplicant = ({
     return attachments
   }
 
-  const save = async () => {
+  const save = async (emailContent: string) => {
     const attachments = await saveAttachments();
     var callback = (_res: string) => {
       setEditorValue("")
@@ -220,7 +221,7 @@ export const ContactApplicant = ({
     }
     var data = {
       templateid: currentTemplate ? templates[currentTemplate as keyof typeof templates].templateid : null,
-      correspondencemessagejson: editorValue,
+      correspondencemessagejson: emailContent,
       foiministryrequest_id: ministryId,
       attachments: attachments
     };
@@ -236,6 +237,11 @@ export const ContactApplicant = ({
   };
 
   const [showEditor, setShowEditor] = useState(false)
+
+  const [previewModal, setPreviewModal] = useState(false);
+  const handlePreviewClose = () => {
+    setPreviewModal(false);
+  }
 
   return (
     <div className="contact-applicant-container">
@@ -425,12 +431,18 @@ export const ContactApplicant = ({
             <button className="ql-link" />
           </span>
           <div className="previewEmail">
+            <PreviewModal
+              modalOpen={previewModal}
+              handleClose={handlePreviewClose}
+              handleSave={save}
+              innerhtml={editorValue}
+              attachments={files}
+              // emailInfo={data}
+            />
             <button
               className="btn addCorrespondence"
               data-variant="contained"
-              onClick={(e) => {
-                save()
-              }}
+              onClick={() => setPreviewModal(true)}
               color="primary"
             >
               Preview & Send Email
