@@ -103,7 +103,13 @@ class RequestorType(Enum):
     applicant = 1
     onbehalfof = 2
     child = 3
+
 class FeeType(Enum):
     application = 'FOI0001'
     processing = 'FOI0002'
 
+class PaymentEventType(Enum):
+    paid = "PAID"    
+    expired = "EXPIRED"
+    outstandingpaid = "OUTSTANDINGPAID"
+    depositpaid = "DEPOSITPAID"
