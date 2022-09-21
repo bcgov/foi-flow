@@ -36,3 +36,18 @@ const calculateFeesByPages = (name: string, pages: number) => {
     return 0;
   }
 }
+
+export const renderTemplate = (template: string, content: string, params: Array<any>) => {
+  let templateArray = template.split(`<body style="color:black; font-family: 'BC Sans';">`);
+  let newContent = applyVariables(content, params);
+  return `${templateArray[0] || "<html>"} <body style="color:black; font-family: 'BC Sans';"> ${newContent} </body></html>`;
+}
+
+const applyVariables = (content: string, params: Array<any>) => {
+  let newContent = content;
+  params.forEach((item) => {
+    newContent = newContent.replace(item.name, item.value);
+  });
+
+  return newContent;
+}
