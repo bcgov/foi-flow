@@ -21,25 +21,27 @@ class cfrfeeservice:
     """
 
     def createcfrfee(self, ministryrequestid, data, userid):
-        cfrfee = self.__preparecfrfee(ministryrequestid, data)
+        cfrfee = self.__preparecfrfee(ministryrequestid, data, data.get('cfrfeeid') is not None)
         cfrfee.__dict__.update(data)
         return FOIRequestCFRFee.createcfrfee(cfrfee, userid)
     
-    def sanctioncfrfee(self, ministryrequestid, data, userid):     
-        cfrfee = self.__preparecfrfee(ministryrequestid, data)   
-        cfrfee.feedata.update(data['feedata'])
+    def sanctioncfrfee(self, ministryrequestid, data, userid):
+        cfrfee = self.__preparecfrfee(ministryrequestid, data)
+        cfrfee.feedata.update(data.get('feedata', {}))
         return FOIRequestCFRFee.createcfrfee(cfrfee, userid)
 
     def paycfrfee(self, ministryrequestid, amountpaid):
-        cfrfee = self.__preparecfrfee(ministryrequestid, {'status': 'approved'}) # status should always be approved before payment
+        cfrfee = self.__preparecfrfee(ministryrequestid)
         _amountpaid = cfrfee.feedata['amountpaid'] + amountpaid
+        _balanceremaining = cfrfee.feedata['balanceremaining'] - amountpaid
+        cfrfee.feedata['balanceremaining'] = _balanceremaining
         cfrfee.feedata['amountpaid'] = '{:.2f}'.format(_amountpaid)
         cfrfee.feedata['paymentdate'] = datetime.now().astimezone(pytz.timezone(current_app.config['LEGISLATIVE_TIMEZONE'])).strftime('%Y-%m-%d')
         return FOIRequestCFRFee.createcfrfee(cfrfee, 'Online Payment')
     
-    def __preparecfrfee(self, ministryrequestid, data):
+    def __preparecfrfee(self, ministryrequestid, data={}, getprevious=True):
         cfrfee = FOIRequestCFRFee()
-        lkupcfrfee = self.getcfrfee(ministryrequestid)           
+        lkupcfrfee = self.getcfrfee(ministryrequestid) if getprevious else None
         _version = 1
         if lkupcfrfee:
             cfrfee.__dict__.update(lkupcfrfee)
@@ -47,7 +49,8 @@ class cfrfeeservice:
         cfrfee.version = _version   
         cfrfee.ministryrequestid = ministryrequestid
         cfrfee.ministryrequestversion = FOIMinistryRequest.getversionforrequest(ministryrequestid)
-        cfrfee.cfrfeestatusid = cfrfeestatusservice().getcfrfeestatusidbyname(data['status']) if "status" in data and data['status'] not in (None,'') else None
+        if "status" in data and data['status'] not in (None,''):
+            cfrfee.cfrfeestatusid = cfrfeestatusservice().getcfrfeestatusidbyname(data['status'])
         return cfrfee
     
     
@@ -65,7 +68,9 @@ class cfrfeeservice:
     
     def __formatcfrfee(self,cfrfee):
         if cfrfee is not None and cfrfee != {}:
-            cfrfee['created_at'] = self.__pstformat(cfrfee['created_at'])   
+            cfrfee['created_at'] = self.__pstformat(cfrfee['created_at'])
+            if cfrfee.get('version_created_at') is not None:
+                cfrfee['version_created_at'] = self.__pstformat(cfrfee['version_created_at'])
             if cfrfee['cfrfeestatusid'] is not None:
                 cfrfee['status'] = cfrfee['cfrfeestatus.name']
                 cfrfee.pop('cfrfeestatus.name')

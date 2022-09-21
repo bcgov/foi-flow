@@ -38,22 +38,45 @@ class paymentservice:
             payment.version = _payment["version"] + 1
             payment.paymentid = _payment["paymentid"]
             
-        return FOIRequestPayment.savepayment(payment) 
+        return FOIRequestPayment.savepayment(payment)
+    
+    def createpaymentversion(self, request_id, ministry_request_id, amountpaid):
+        _payment = FOIRequestPayment.getpayment(request_id, ministry_request_id)
+        ministryversion = FOIMinistryRequest.getversionforrequest(ministry_request_id)
+        payment = FOIRequestPayment()
+        payment.foirequestid = request_id
+        payment.ministryrequestid = ministry_request_id
+        payment.ministryrequestversion = ministryversion
+        if _payment is not None and _payment != {}:            
+            payment.paymenturl = _payment['paymenturl']
+            payment.paymentexpirydate = _payment['paymentexpirydate']
+            payment.version = _payment['version'] + 1
+            payment.createdby = 'System'
+            payment.paymentid = _payment["paymentid"]
+            payment.paidamount = amountpaid            
+        return FOIRequestPayment.savepayment(payment)
 
     def getpayment(self, requestid, ministryrequestid):
-        return FOIRequestPayment.getpayment(requestid, ministryrequestid) 
+        return FOIRequestPayment.getpayment(requestid, ministryrequestid)
 
     def createpaymentreceipt(self, request_id, ministry_request_id, data, parsed_args):
         try:
             balancedue = float(data['cfrfee']['feedata']["balanceDue"])
+            prevstate = data["stateTransition"][1]["status"] if "stateTransition" in data and len(data["stateTransition"])  > 2 else None
             basepath = 'request_api/receipt_templates/'
             receiptname = 'cfr_fee_payment_receipt'
+            attachmentcategory = "FEE-ESTIMATE-PAYMENT-RECEIPT"
+            filename = "Fee Estimate Payment Receipt.pdf"
             if balancedue > 0:
                 receipt_template_path= basepath + self.getreceiptename('HALFPAYMENT') +".docx"
                 receiptname = self.getreceiptename('HALFPAYMENT')
             else:
-                receipt_template_path= basepath + self.getreceiptename('FULLPAYMENT')+".docx"
                 receiptname = self.getreceiptename('FULLPAYMENT')
+                if prevstate.lower() == "response":
+                    receiptname = self.getreceiptename('PAYOUTSTANDING')
+                    attachmentcategory = "OUTSTANDING-PAYMENT-RECEIPT"
+                    filename = "Fee Balance Outstanding Payment Receipt.pdf"
+                receipt_template_path= basepath + receiptname + ".docx"
             data['waivedAmount'] = data['cfrfee']['feedata']['estimatedlocatinghrs'] * 30 if data['cfrfee']['feedata']['estimatedlocatinghrs'] < 3 else 90
             data.update({'paymentInfo': {
                 'paymentDate': parsed_args.get('trnDate'),
@@ -63,7 +86,7 @@ class paymentservice:
             }})
             document_service : DocumentGenerationService = DocumentGenerationService(receiptname)
             receipt = document_service.generate_receipt(data,receipt_template_path)
-            document_service.upload_receipt('Fee Estimate Payment Receipt.pdf', receipt.content, ministry_request_id, data['bcgovcode'], data['idNumber'])
+            document_service.upload_receipt(filename, receipt.content, ministry_request_id, data['bcgovcode'], data['idNumber'], attachmentcategory)
             return DefaultMethodResult(True,'Payment Receipt created',ministry_request_id)
         except Exception as ex:   
             logging.exception(ex)         
@@ -74,6 +97,8 @@ class paymentservice:
             return "cfr_fee_payment_receipt_half"
         elif key == "FULLPAYMENT":
             return "cfr_fee_payment_receipt_full"
+        elif key == "PAYOUTSTANDING":
+            return "outstanding_fee_payment_receipt"
         else:
             logging.info("Unknown key")
             return None

@@ -12,23 +12,30 @@ class templateconfig:
             return "fee_payment_confirmation_half.html"
         elif key == "FULLPAYMENT":
             return "fee_payment_confirmation_full.html"
+        elif key == "PAYOUTSTANDING":
+            return "fee_estimate_notification_outstanding.html"
+        elif key == "PAYOUTSTANDINGFULLPAYMENT":
+            return "fee_payment_confirmation_outstanding.html"
         else:
             logging.info("Unknown key")
             return None
-        return None
 
     def getsubject(self, key, requestjson):        
-        if key == "PAYONLINE":
+        if key == "PAYONLINE" or key == "PAYOUTSTANDING":
             return "Your FOI Request ["+requestjson["axisRequestId"]+"]"
-        elif key == "FEE-ESTIMATE-PAYMENT-RECEIPT":
+        elif key == "FEE-ESTIMATE-PAYMENT-RECEIPT" or key == "OUTSTANDING-PAYMENT-RECEIPT":
             return "Your FOI Request ["+requestjson["axisRequestId"]+"] - Fee Payment Received"
+        elif key == "PAYOUTSTANDING":
+            return "Your FOI Request ["+requestjson["axisRequestId"]+"] - Outstanding Fee Estimate"
         return None   
         
     def getstage(self, key):        
-        if key == "PAYONLINE":
+        if key == "PAYONLINE" or key == "PAYOUTSTANDING":
             return "Fee Estimate"
         elif key == "FEE-ESTIMATE-PAYMENT-RECEIPT":  
             return "Fee Estimate - Payment Receipt"  
+        elif key == "OUTSTANDING-PAYMENT-RECEIPT":
+            return "Fees - Balance Outstanding - Payment Receipt"
         return None 
     
     def getattachmentname(self, key):
@@ -40,6 +47,14 @@ class templateconfig:
             return "Fee Estimate - Payment Receipt Sent"
         elif key == "FEE-ESTIMATE-PAYMENT-RECEIPT-FAILURE":
             return "Fee Estimate - Payment Receipt Correspondence Failed"
+        elif key == "PAYOUTSTANDING":
+            return "Fees - Balance Outstanding Sent"
+        elif key == "PAYOUTSTANDING-SEND-FAILURE":
+            return "Fees - Balance Outstanding Correspondence Failed"
+        if key == "OUTSTANDING-PAYMENT-RECEIPT":
+            return "Fees - Balance Outstanding - Payment Receipt Sent"
+        elif key == "OUTSTANDING-PAYMENT-RECEIPT-FAILURE":
+            return "Fees - Balance Outstanding - Payment Receipt Correspondence Failed"
         return None
 
     def getattachmentcategory(self, key):
@@ -55,6 +70,18 @@ class templateconfig:
             return "Fee Estimate - Payment Success"
         elif key == "FEE-ESTIMATE-PAYMENT-RECEIPT-FAILED":
             return "Fee Estimate - Payment Success - Correspondence Failed"
+        elif key == "PAYOUTSTANDING":
+            return "RESPONSE-ONHOLD"
+        elif key == "PAYOUTSTANDING-SUCCESSFUL":
+            return "Fee Balance Outstanding - Letter"
+        elif key == "PAYOUTSTANDING-FAILED":
+            return "Fee Balance Outstanding - Correspondence Failed"
+        elif key == "OUTSTANDING-PAYMENT-RECEIPT":
+            return "Fee Balance Outstanding - Payment Receipt"
+        elif key == "OUTSTANDING-PAYMENT-RECEIPT-SUCCESSFUL":
+            return "Fee Balance Outstanding - Payment Success"
+        elif key == "OUTSTANDING-PAYMENT-RECEIPT-FAILED":
+            return "Fee Balance Outstanding - Payment Success - Correspondence Failed"
         return None 
     
 

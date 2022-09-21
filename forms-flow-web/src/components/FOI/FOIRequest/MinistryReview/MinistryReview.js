@@ -52,7 +52,7 @@ import HomeIcon from '@mui/icons-material/Home';
 const useStyles = makeStyles((theme) => ({
   root: {
     "& .MuiTextField-root": {
-      margin: theme.spacing(1),
+      margin: theme.spacing(1, "0px"),
     },
   },
   validationErrorMessage: {

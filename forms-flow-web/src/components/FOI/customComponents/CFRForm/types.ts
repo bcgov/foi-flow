@@ -1,24 +1,22 @@
 export type CFRFormData = {
+    cfrfeeid?: any;
     formStatus: string;
-    amountDue: number;
+    estimatedTotalDue: number;
+    actualTotalDue: number;
     amountPaid: number;
-    estimates: {
-      locating: number;
-      producing: number;
-      ministryPreparing: number;
-      iaoPreparing: number;
-      electronicPages: number;
-      hardcopyPages: number;
-    };
-    actual: {
-      locating: number;
-      producing: number;
-      ministryPreparing: number;
-      iaoPreparing: number;
-      electronicPages: number;
-      hardcopyPages: number;
-    };
+    balanceRemaining: number;
+    estimates: feeData;
+    actual: feeData;
     suggestions: string;
+}
+
+export type feeData = {
+  locating: number;
+  producing: number;
+  ministryPreparing: number;
+  iaoPreparing: number;
+  electronicPages: number;
+  hardcopyPages: number;
 }
 
 export type params = {
@@ -30,4 +28,10 @@ export type params = {
     groups: string[];
   };
   setCFRUnsaved: Function;
+}
+
+export type modalParams = {
+  modalOpen: boolean;
+  handleClose: () => void;
+  formHistory: Array<any>
 }

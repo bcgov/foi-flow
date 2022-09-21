@@ -4,6 +4,7 @@ import API from "../../endpoints";
   import {
     serviceActionError,
     setRequestCFRForm,
+    setRequestCFRFormHistory,
   } from "../../../actions/FOI/foiRequestActions";
   import { replaceUrl } from "../../../helper/FOI/helper";
   import { catchError } from "./foiServicesUtil";
@@ -24,7 +25,8 @@ export const fetchCFRForm = (
     .then((res) => {
       if (res.data) {
         if (!_.isEmpty(res.data)) {
-          dispatch(setRequestCFRForm(res.data));
+          dispatch(setRequestCFRForm(res.data.current));
+          dispatch(setRequestCFRFormHistory(res.data.history));
         }
       } else {
         console.log("Error in fetching CFR Form data", res);
@@ -58,11 +60,12 @@ export const saveCFRForm = (
   } else {
     baseUrl = API.FOI_POST_CFR_FORM_IAO;
   }
-  const apiUrl = replaceUrl(
+  const apiUrl = replaceUrl(replaceUrl(
     baseUrl,
-    "<ministryrequestid>",
-    ministryId
-  );
+    "<requestid>",
+    requestId
+  ), "<ministryrequestid>", ministryId);
+  console.log(`apiUrl == ${apiUrl}`)
 
   httpPOSTRequest(apiUrl, data)
     .then((res) => {

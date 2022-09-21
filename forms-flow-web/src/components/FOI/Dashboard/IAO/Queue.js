@@ -44,13 +44,13 @@ const Queue = ({ userDetail, tableInfo }) => {
   ];
 
   const queueParams = useSelector((state) => state.foiRequests.queueParams);
-  const rowsState = useSelector((state) => state.foiRequests.queueParams.rowsState);
-  const sortModel = useSelector((state) => state.foiRequests.queueParams.sortModel || tableInfo.sort);
+  const rowsState = useSelector((state) => state.foiRequests.queueParams?.rowsState);
+  const sortModel = useSelector((state) => state.foiRequests.queueParams?.sortModel || tableInfo.sort);
 
   let serverSortModel;
 
 
-  const keyword = useSelector((state) => state.foiRequests.queueParams.keyword);
+  const keyword = useSelector((state) => state.foiRequests.queueParams?.keyword);
   const requestFilter = useSelector((state) => state.foiRequests.queueFilter);
 
   useEffect(() => {
@@ -216,13 +216,13 @@ const Queue = ({ userDetail, tableInfo }) => {
           rowHeight={30}
           headerHeight={50}
           rowCount={requestQueue?.meta?.total || 0}
-          pageSize={rowsState.pageSize}
+          pageSize={rowsState?.pageSize}
           // rowsPerPageOptions={[10]}
           hideFooterSelectedRowCount={true}
           disableColumnMenu={true}
           pagination
           paginationMode="server"
-          page={rowsState.page}
+          page={rowsState?.page}
           onPageChange={(newPage) => dispatch(setQueueParams({...queueParams, rowsState: {...rowsState, page: newPage}}))}
           onPageSizeChange={(newpageSize) =>
             dispatch(setQueueParams({...queueParams, rowsState: {...rowsState, pageSize: newpageSize}}))

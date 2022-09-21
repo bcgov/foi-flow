@@ -14,7 +14,9 @@ class FOIFeeDataSchema(Schema):
         """Exclude unknown fields in the deserialized output."""
 
     amountpaid = fields.Float(data_key="amountpaid")
-    totalamountdue = fields.Float(data_key="totalamountdue")
+    estimatedtotaldue = fields.Float(data_key="estimatedtotaldue")
+    actualtotaldue = fields.Float(data_key="actualtotaldue")
+    balanceremaining = fields.Float(data_key="balanceremaining")
     estimatedlocatinghrs = fields.Float(data_key="estimatedlocatinghrs")
     actuallocatinghrs = fields.Float(data_key="actuallocatinghrs")
     estimatedproducinghrs = fields.Float(data_key="estimatedproducinghrs")
@@ -36,6 +38,7 @@ class FOICFRFeeSchema(Schema):
     feedata = fields.Nested(FOIFeeDataSchema,allow_none=False)
     overallsuggestions = fields.Str(data_key="overallsuggestions")
     status = fields.Str(data_key="status")
+    cfrfeeid = fields.Int(data_key="cfrfeeid",required=False, allow_none=True)
  
 class FOIFeeDataSanctionSchema(Schema):
     class Meta:  # pylint: disable=too-few-public-methods
@@ -44,7 +47,9 @@ class FOIFeeDataSanctionSchema(Schema):
     amountpaid = fields.Float(data_key="amountpaid") 
     estimatediaopreparinghrs = fields.Float(data_key="estimatediaopreparinghrs")
     actualiaopreparinghrs = fields.Float(data_key="actualiaopreparinghrs")
-    totalamountdue = fields.Float(data_key="totalamountdue")
+    estimatedtotaldue = fields.Float(data_key="estimatedtotaldue")
+    actualtotaldue = fields.Float(data_key="actualtotaldue")
+    balanceremaining = fields.Float(data_key="balanceremaining")
     
 class FOICFRFeeSanctionSchema(Schema):
     class Meta:  # pylint: disable=too-few-public-methods

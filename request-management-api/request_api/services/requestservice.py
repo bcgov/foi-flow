@@ -36,6 +36,7 @@ class requestservice:
     def updaterequeststatus(self, requestid, ministryrequestid, statusid):
         foirequestschema = self.getrequest(requestid, ministryrequestid)
         foirequestschema['requeststatusid'] = statusid
+        print("foirequestschema ==== ",foirequestschema)
         return self.saverequestversion(foirequestschema, requestid, ministryrequestid,'Online Payment')
                
     def getrequest(self,foirequestid,foiministryrequestid): 
@@ -68,7 +69,7 @@ class requestservice:
         workflowservice().postunopenedevent(id, wfinstanceid, requestschema, "Open", ministries)            
     
     def postfeeeventtoworkflow(self, requestid, ministryrequestid, paymentstatus):
-        foirequestschema = self.getrequest(requestid, ministryrequestid)        
+        foirequestschema = self.getrequestdetails(requestid, ministryrequestid)        
         workflowservice().postfeeevent(requestid, ministryrequestid, foirequestschema, paymentstatus)            
     
     def posteventtoworkflow(self, id, wfinstanceid, requestschema, data, usertype): 

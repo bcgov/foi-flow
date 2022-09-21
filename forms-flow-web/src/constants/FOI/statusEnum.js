@@ -79,6 +79,11 @@ feeonhold: {
   fromState: "Fee Estimate",
   toState: "On Hold",
 },
+responseonhold: {
+  name: "response-onhold",
+  fromState: "Response",
+  toState: "On Hold",
+},
 });
 
 const AttachmentLetterCategories = Object.freeze({
@@ -87,7 +92,6 @@ const AttachmentLetterCategories = Object.freeze({
   },
   feeestimatefailed: {
     name: "fee estimate - correspondence - failed",
-
   },
   feeestimatesuccessful: {
     name: "fee estimate - successful",
@@ -101,7 +105,10 @@ const AttachmentLetterCategories = Object.freeze({
   },
   feeestimatepaymentcorrespondencefailed: {
     name: "fee estimate - payment success - correspondence failed"
-  }
+  },
+  feeestimateoutstandingletter: {
+    name: "fee balance outstanding - letter",
+  },
 
   });
 
