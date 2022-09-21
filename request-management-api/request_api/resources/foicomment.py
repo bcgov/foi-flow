@@ -27,7 +27,7 @@ from request_api.schemas.foicomment import  FOIRawRequestCommentSchema, FOIMinis
 from request_api.schemas.foicomment import  EditFOIRawRequestCommentSchema, FOIMinistryRequestCommentSchema
 import json
 from flask_cors import cross_origin
-import asyncio
+from request_api.services.asyncwrapperservice import asyncwrapperservice
 
 API = Namespace('FOIComment', description='Endpoints for FOI Comment management')
 TRACER = Tracer.get_instance()
@@ -51,7 +51,7 @@ class CreateFOIRequestComment(Resource):
             minrquescommentschema = FOIMinistryRequestCommentSchema().load(requestjson)  
             result = commentservice().createministryrequestcomment(minrquescommentschema, AuthHelper.getuserid())
             if result.success == True:
-                asyncio.ensure_future(eventservice().postcommentevent(result.identifier, "ministryrequest", AuthHelper.getuserid()))
+                asyncwrapperservice().postcommentevent(result.identifier, "ministryrequest", AuthHelper.getuserid())
             return {'status': result.success, 'message':result.message,'id':result.identifier} , 200 
         except KeyError as err:
             return {'status': False, 'message':err.messages}, 400        
@@ -74,7 +74,7 @@ class CreateFOIRawRequestComment(Resource):
             rawrqcommentschema = FOIRawRequestCommentSchema().load(requestjson)  
             result = commentservice().createrawrequestcomment(rawrqcommentschema, AuthHelper.getuserid())
             if result.success == True:
-                asyncio.ensure_future(eventservice().postcommentevent(result.identifier, "rawrequest", AuthHelper.getuserid()))
+                asyncwrapperservice().postcommentevent(result.identifier, "rawrequest", AuthHelper.getuserid())
             return {'status': result.success, 'message':result.message,'id':result.identifier} , 200
         except KeyError as err:
             return {'status': False, 'message':err.messages}, 400        
@@ -126,7 +126,7 @@ class FOIDisableComment(Resource):
             else:
                 result = commentservice().disablerawrequestcomment(commentid, AuthHelper.getuserid())
             if result.success == True:
-                asyncio.ensure_future(eventservice().postcommentevent(result.identifier, requesttype, AuthHelper.getuserid(), True))
+                asyncwrapperservice().postcommentevent(result.identifier, requesttype, AuthHelper.getuserid(), True)
             return {'status': result.success, 'message':result.message,'id':result.identifier} , 200 
         except KeyError as err:
             return {'status': False, 'message':err.messages}, 400        

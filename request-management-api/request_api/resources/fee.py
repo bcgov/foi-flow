@@ -19,7 +19,6 @@ from flask import request, send_file, Response
 from flask_cors import cross_origin
 from flask_restx import Namespace, Resource
 import json
-import asyncio
 
 from request_api.services import FeeService
 from request_api.services.cfrfeeservice import cfrfeeservice
@@ -30,6 +29,7 @@ from request_api.services.document_generation_service import DocumentGenerationS
 from request_api.utils.util import  cors_preflight, allowedorigins
 from request_api.exceptions import BusinessException
 from request_api.utils.enums import PaymentEventType
+from request_api.services.asyncwrapperservice import asyncwrapperservice
 API = Namespace('Fees', description='Endpoints for Fee and payments')
 
 
@@ -112,9 +112,9 @@ class Payment(Resource):
                         paymenteventtype = PaymentEventType.outstandingpaid.value
                 result = requestservice().updaterequeststatus(request_id, ministry_request_id, statusid)
                 if result.success == True:
-                    asyncio.ensure_future(eventservice().postpaymentevent(ministry_request_id, paymenteventtype))
+                    asyncwrapperservice().postpaymentevent(ministry_request_id)              
                     requestservice().postfeeeventtoworkflow(request_id, ministry_request_id, "PAID")
-                    asyncio.ensure_future(eventservice().postevent(ministry_request_id,"ministryrequest","System","System", False))
+                    asyncwrapperservice().postevent(ministry_request_id,"ministryrequest","System","System", False)
             return response, 201
         except BusinessException as e:
             return {'status': e.code, 'message': e.message}, e.status_code

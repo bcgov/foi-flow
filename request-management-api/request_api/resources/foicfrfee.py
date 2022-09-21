@@ -27,9 +27,9 @@ import json
 from flask_cors import cross_origin
 import logging
 from marshmallow import Schema, fields, validate, ValidationError
-import asyncio
 from request_api.services.eventservice import eventservice
 from request_api.services.requestservice import requestservice
+from request_api.services.asyncwrapperservice import asyncwrapperservice
 
 API = Namespace('FOICFRFee', description='Endpoints for FOI CFR Fee Form management')
 TRACER = Tracer.get_instance()
@@ -54,7 +54,7 @@ class CreateFOICFRFee(Resource):
             foicfrfeeschema = FOICFRFeeSchema().load(requestjson)
             print("foicfrfeeschema = ", foicfrfeeschema)
             result = cfrfeeservice().createcfrfee(ministryrequestid, foicfrfeeschema,AuthHelper.getuserid())
-            asyncio.ensure_future(eventservice().posteventforcfrfeeform(ministryrequestid, AuthHelper.getuserid(), AuthHelper.getusername()))
+            asyncwrapperservice().posteventforcfrfeeform(ministryrequestid, AuthHelper.getuserid(), AuthHelper.getusername())
             return {'status': result.success, 'message':result.message,'id':result.identifier} , 200 
         except ValidationError as verr:
             logging.error(verr)
@@ -81,7 +81,7 @@ class SanctionFOICFRFee(Resource):
             requestjson = request.get_json() 
             foicfrfeeschema = FOICFRFeeSanctionSchema().load(requestjson)
             result = cfrfeeservice().sanctioncfrfee(ministryrequestid, foicfrfeeschema,AuthHelper.getuserid())
-            asyncio.ensure_future(eventservice().posteventforcfrfeeform(ministryrequestid, AuthHelper.getuserid(), AuthHelper.getusername()))
+            asyncwrapperservice().posteventforcfrfeeform(ministryrequestid, AuthHelper.getuserid(), AuthHelper.getusername())
             if (foicfrfeeschema["status"] == "approved"):
                 requestservice().postfeeeventtoworkflow(requestid, ministryrequestid, "CANCELLED")
             return {'status': result.success, 'message':result.message,'id':result.identifier} , 200 

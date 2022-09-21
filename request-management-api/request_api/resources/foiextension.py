@@ -26,7 +26,6 @@ from request_api.utils.util import  cors_preflight, allowedorigins
 from request_api.exceptions import BusinessException, Error
 from request_api.services.extensionservice import extensionservice
 from request_api.schemas.foiextension import  FOIRequestExtensionSchema
-import asyncio
 
 import json
 from flask_cors import cross_origin
