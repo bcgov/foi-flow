@@ -52,6 +52,8 @@ const initialState = {
       estimatedministrypreparinghrs: 0,
       estimatediaopreparinghrs: 0,
       amountpaid: 0,
+      feewaiveramount: 0,
+      refundamount: 0,
       estimatedhardcopypages: 0,
       actualministrypreparinghrs: 0,
       actualiaopreparinghrs: 0,
