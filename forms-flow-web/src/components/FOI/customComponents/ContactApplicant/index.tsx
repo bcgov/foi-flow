@@ -40,6 +40,8 @@ import CommentStructure from '../Comments/CommentStructure'
 import AttachmentModal from '../Attachments/AttachmentModal';
 import { MimeTypeList, MaxFileSizeInMB } from "../../../../constants/FOI/enum";
 import { getOSSHeaderDetails, saveFilesinS3, getFileFromS3 } from "../../../../apiManager/services/FOI/foiOSSServices";
+import {dueDateCalculation} from '../../FOIRequest/BottomButtonGroup/utils';
+import { PAYMENT_EXPIRY_DAYS} from "../../../../constants/FOI/constants";
 
 export const ContactApplicant = ({
   requestNumber,
@@ -203,7 +205,7 @@ export const ContactApplicant = ({
 
   const save = async () => {
     const attachments = await saveAttachments();
-    var callback = (_res: string) => {
+    let callback = (_res: string) => {
       setEditorValue("")
       setFiles([])
       setShowEditor(false)
@@ -216,17 +218,19 @@ export const ContactApplicant = ({
         draggable: true,
         progress: undefined,
       });
-      dispatch(fetchApplicantCorrespondence(ministryId));
+      dispatch(fetchApplicantCorrespondence(requestId, ministryId));
     }
-    var data = {
+    let data = {
       templateid: currentTemplate ? templates[currentTemplate as keyof typeof templates].templateid : null,
       correspondencemessagejson: editorValue,
       foiministryrequest_id: ministryId,
-      attachments: attachments
+      attachments: attachments,
+      attributes: [{"paymentExpiryDate": dueDateCalculation(new Date(), PAYMENT_EXPIRY_DAYS)}]
     };
     saveEmailCorrespondence(
       data,
       requestId,
+      ministryId,
       dispatch,
       callback,
       (errorMessage: string) => {

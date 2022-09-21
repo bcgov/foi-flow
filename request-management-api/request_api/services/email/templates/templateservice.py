@@ -2,6 +2,7 @@ from jinja2 import Template
 from request_api.services.external.storageservice import storageservice
 from request_api.services.email.templates.templateconfig import templateconfig
 from request_api.services.requestservice import requestservice
+from request_api.services.applicantcorrespondence.applicantcorrespondencelog import applicantcorrespondenceservice
 import json
 import logging
 
@@ -19,10 +20,10 @@ class templateservice:
             logging.exception(ex)
         return None
 
-    def generate_by_servicename_and_schema(self, servicename, requestjson):
+    def generate_by_servicename_and_schema(self, servicename, requestjson, applicantcorrespondenceid = None):
         try:
             _templatename = self.__gettemplatenamewrapper(servicename, requestjson)
-            return self.__generatetemplate(_templatename, requestjson)
+            return self.__generatetemplate(_templatename, requestjson, applicantcorrespondenceid)
         except Exception as ex:
             logging.exception(ex)
         return None
@@ -46,9 +47,13 @@ class templateservice:
     def __getprevstate(self, requestjson):
         return requestjson["stateTransition"][2]["status"] if "stateTransition" in requestjson and len(requestjson["stateTransition"])  > 3 else None
 
-    def __generatetemplate(self, emailtemplatename, dynamictemplatevalues):
-        headerfooterhtml = storageservice().downloadtemplate('header_footer_template.html')  
-        emailtemplatehtml= storageservice().downloadtemplate(emailtemplatename)
+    def __generatetemplate(self, emailtemplatename, dynamictemplatevalues, applicantcorrespondenceid = None):
+        headerfooterhtml = storageservice().downloadtemplate('header_footer_template.html')
+        if applicantcorrespondenceid:
+            applicantcorrespondence = applicantcorrespondenceservice.getapplicantcorrespondencelogbyid(applicantcorrespondenceid)
+            emailtemplatehtml = applicantcorrespondence["correspondencemessagejson"] if applicantcorrespondence["correspondencemessagejson"] else None
+        else:
+            emailtemplatehtml= storageservice().downloadtemplate(emailtemplatename) #handle here.
         if(emailtemplatehtml is None):
             raise ValueError('No template found')
 

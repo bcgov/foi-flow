@@ -13,7 +13,7 @@
   <bpmn:collaboration id="Collaboration_18fcj2s">
     <bpmn:participant id="Participant_00kyu4q" name="FOI Email Processing" processRef="foi-email-processing" />
   </bpmn:collaboration>
-  <bpmn:process id="foi-email-processing" name="FOI Email Processing" isExecutable="true" camunda:versionTag="5">
+  <bpmn:process id="foi-email-processing" name="FOI Email Processing" isExecutable="true" camunda:versionTag="3">
     <bpmn:laneSet id="LaneSet_13e9jxh">
       <bpmn:lane id="Lane_05egm04" name="Audit  Email Correspondence">
         <bpmn:flowNodeRef>Event_18tkl5h</bpmn:flowNodeRef>
@@ -63,8 +63,15 @@ var userpass = system.getenv('KEYCLOAK_CLIENTID').concat(':',system.getenv('KEYC
 var base64userpass = base64.getEncoder().encodeToString(userpass.getBytes());
 execution.setVariable('base64userpass', base64userpass);
 execution.setVariable('realm', system.getenv('KEYCLOAK_URL_REALM'));
-execution.setVariable('foiApiUrl', system.getenv('FOI_REQ_MANAGEMENT_API_URL'));
-execution.setVariable('foiwebUrl', system.getenv('FORMSFLOW_WEB_URL'));</camunda:script>
+var apiendpoint = system.getenv('FOI_REQ_MANAGEMENT_API_URL')
+execution.setVariable('foiApiUrl', apiendpoint);
+execution.setVariable('foiwebUrl', system.getenv('FORMSFLOW_WEB_URL'));
+
+var sendapiendpoint = apiendpoint + "/api/foiemail/" + execution.getVariable("foiRequestID") + "/ministryrequest/" + execution.getVariable("ministryRequestID") + "/" + execution.getVariable("servicekey")
+if (execution.getVariable("applicantCorrespondenceId") != 0) {
+sendapiendpoint = apiendpoint + "/api/foiemail/" + execution.getVariable("foiRequestID") + "/ministryrequest/" + execution.getVariable("ministryRequestID") + "/" + execution.getVariable("servicekey") + "/" + execution.getVariable("applicantCorrespondenceId")
+}
+execution.setVariable('sendapiendpoint', sendapiendpoint);</camunda:script>
         </camunda:executionListener>
         <camunda:executionListener expression="${execution.setVariable(&#34;e_retry1&#34;, 0)}" event="take" />
       </bpmn:extensionElements>
@@ -113,7 +120,7 @@ execution.setVariable('foiwebUrl', system.getenv('FORMSFLOW_WEB_URL'));</camunda
       <bpmn:extensionElements>
         <camunda:connector>
           <camunda:inputOutput>
-            <camunda:inputParameter name="url">${foiApiUrl}/api/foiemail/${foiRequestID}/ministryrequest/${ministryRequestID}/${servicekey}</camunda:inputParameter>
+            <camunda:inputParameter name="url">${sendapiendpoint}</camunda:inputParameter>
             <camunda:inputParameter name="method">POST</camunda:inputParameter>
             <camunda:inputParameter name="headers">
               <camunda:map>

@@ -33,7 +33,7 @@ def upgrade():
         applicant_correspondence_templates,
         [
             {'name':'fee estimate notification','description':'fee estimate notification','active':True,'version':1 ,'documenturipath':'/TEMPLATES/EMAILS/fee_estimate_notification.html','created_at':datetime.now(),'createdby':'system'},
-            {'name':'outstanding fee estimate notification','description':'outstandingf fee estimate notification','active':True,'version':1 ,'documenturipath':'/TEMPLATES/EMAILS/fee_estimate_notification_outstanding.html','created_at':datetime.now(),'createdby':'system'},
+            {'name':'outstanding fee estimate notification','description':'outstanding fee estimate notification','active':True,'version':1 ,'documenturipath':'/TEMPLATES/EMAILS/fee_estimate_notification_outstanding.html','created_at':datetime.now(),'createdby':'system'},
 
         ]
     )

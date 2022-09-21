@@ -84,7 +84,21 @@ class bpmservice(camundaservice):
                                             })
             return requests.post(self._getUrl_(MessageType.managepayment.value), data=json.dumps(messageschema), headers = self._getHeaders_(token))
         else:
-            return  
+            return
+
+    def correspondance(self,filenumber, data, token=None):
+        if self.bpmengineresturl is not None:
+            messageschema = MessageSchema().dump({"messageName": MessageType.iaocorrenspodence.value,
+                                              "localCorrelationKeys":{
+                                                  "id": VariableSchema().dump({"type" : VariableType.String.value, "value": filenumber})
+                                                  },
+                                              "processVariables":{
+                                                  "foiRequestMetaData": VariableSchema().dump({"data" : VariableType.String.value, "value": data})}
+                                              })
+            print("messageschema = ", messageschema)
+            return requests.post(self._getUrl_(MessageType.iaocorrenspodence.value), data=json.dumps(messageschema), headers = self._getHeaders_(token))
+        else:
+            return 
  
 
     def reopenevent(self,processinstanceid, data, messagetype, token=None): 
@@ -123,5 +137,6 @@ class MessageType(Enum):
     ministrycomplete = "foi-ministry-complete"   
     feepayment = "foi-fee-payment"
     managepayment = "foi-manage-payment"
+    iaocorrenspodence = "foi-iao-correnspodence"
               
      

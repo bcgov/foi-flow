@@ -20,10 +20,10 @@ class emailservice:
     """ FOI Email Service
     """
   
-    def send(self, servicename, requestid, ministryrequestid):
+    def send(self, servicename, requestid, ministryrequestid, applicantcorrespondenceid = None):
         try:
             requestjson = requestservice().getrequestdetails(requestid,ministryrequestid)
-            _messagepart = templateservice().generate_by_servicename_and_schema(servicename, requestjson)
+            _messagepart = templateservice().generate_by_servicename_and_schema(servicename, requestjson, applicantcorrespondenceid)
             _messageattachmentlist = documentservice().getattachments(ministryrequestid, 'ministryrequest', templateconfig().getattachmentcategory(servicename).lower())
             return senderservice().send(servicename, _messagepart, _messageattachmentlist, requestjson)
         except Exception as ex:

@@ -10,6 +10,7 @@ from request_api.services.foirequest.requestservicegetter import requestserviceg
 from request_api.services.foirequest.requestservicecreate import requestservicecreate 
 from request_api.services.foirequest.requestserviceupdate import requestserviceupdate 
 from request_api.services.document_generation_service import DocumentGenerationService
+from request_api.services.applicantcorrespondence.applicantcorrespondencelog import applicantcorrespondenceservice
 
 class requestservice:
     """ FOI Request management service
@@ -76,3 +77,10 @@ class requestservice:
         requeststatusid =  requestschema.get("requeststatusid") if 'requeststatusid' in requestschema  else None
         status = requestserviceconfigurator().getstatusname(requeststatusid) if requeststatusid is not None else None
         workflowservice().postopenedevent(id, wfinstanceid, requestschema, data, status, usertype)
+    
+    def postcorrespondenceeventtoworkflow(self, requestid, ministryrequestid, applicantcorrespondenceid, templateid, attributes):
+        foirequestschema = self.getrequestdetails(requestid, ministryrequestid)
+        print("templateid = ", templateid)
+        templatename = applicantcorrespondenceservice.gettemplatebyid(templateid)
+        print("templatename = ", templatename)
+        workflowservice().postcorrenspodenceevent(ministryrequestid, foirequestschema, applicantcorrespondenceid, templatename, attributes)

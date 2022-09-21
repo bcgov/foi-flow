@@ -8,6 +8,12 @@ class applicantcorrespondenceservice:
         """ Returns the active applicant correspondence templates
         """
         return ApplicationCorrespondenceTemplate.getapplicantcorrespondencetemplates()
+    
+    def gettemplatebyid(self, templateid):
+        """ Returns the active applicant correspondence templates
+        """
+        print("templateid in gettemplatebyid = ", templateid)
+        return ApplicationCorrespondenceTemplate.get_template_by_id(templateid)
 
     def getapplicantcorrespondencelogs(self,ministryrequestid):
         """ Returns the active applicant correspondence logs
@@ -46,3 +52,7 @@ class applicantcorrespondenceservice:
         applicantcorrespondencelog.foiministryrequestversion_id =FOIMinistryRequest.getversionforrequest(ministryrequestid=ministryrequestid)
         applicantcorrespondencelog.createdby = createdby
         return FOIApplicantCorrespondence.saveapplicantcorrespondence(applicantcorrespondencelog,attachments)
+    
+    def getapplicantcorrespondencelogbyid(self, applicantcorrespondenceid):
+        return FOIApplicantCorrespondence.applicantcorrespondenceid(applicantcorrespondenceid)
+
