@@ -10,7 +10,7 @@ import IconButton from '@material-ui/core/IconButton';
 import CloseIcon from '@material-ui/icons/Close';
 import type { previewParams } from './types';
 import { getOSSHeaderDetails, getFileFromS3 } from "../../../../apiManager/services/FOI/foiOSSServices";
-import { renderTemplate } from './util';
+import { renderTemplate, applyVariables } from './util';
 
 export const PreviewModal = React.memo(({
   modalOpen,
@@ -51,13 +51,13 @@ export const PreviewModal = React.memo(({
     {name: "{{title}}", value: templateInfo?.label || ""},
     {name: "{{firstName}}", value: requestDetails.firstName},
     {name: "{{lastName}}", value: requestDetails.lastName},
-    {name: "{{assignedToFirstName}}", value: requestDetails.assignedToFirstName},
-    {name: "{{assignedToLastName}}", value: requestDetails.assignedToLastName},
+    {name: "{{assignedToFirstName}}", value: requestDetails.assignedToFirstName || ""},
+    {name: "{{assignedToLastName}}", value: requestDetails.assignedToLastName || ""},
     {name: "{{assignedGroup}}", value: requestDetails.assignedGroup},
   ];
 
   const handleSend = () => {
-    handleSave(innerhtml);
+    handleSave( applyVariables(innerhtml, templateVariables) );
   };
 
   return (
