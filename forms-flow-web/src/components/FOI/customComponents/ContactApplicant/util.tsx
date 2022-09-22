@@ -42,7 +42,7 @@ export const renderTemplate = (template: string, content: string, params: Array<
   return applyVariables(newTemplate, params);
 }
 
-const applyVariables = (content: string, params: Array<any>) => {
+export const applyVariables = (content: string, params: Array<any>) => {
   let newContent = content;
   params.forEach((item) => {
     newContent = newContent.replace(item.name, item.value);
