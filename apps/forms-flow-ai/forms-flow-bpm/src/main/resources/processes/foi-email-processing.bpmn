@@ -13,7 +13,7 @@
   <bpmn:collaboration id="Collaboration_18fcj2s">
     <bpmn:participant id="Participant_00kyu4q" name="FOI Email Processing" processRef="foi-email-processing" />
   </bpmn:collaboration>
-  <bpmn:process id="foi-email-processing" name="FOI Email Processing" isExecutable="true" camunda:versionTag="3">
+  <bpmn:process id="foi-email-processing" name="FOI Email Processing" isExecutable="true" camunda:versionTag="4">
     <bpmn:laneSet id="LaneSet_13e9jxh">
       <bpmn:lane id="Lane_05egm04" name="Audit  Email Correspondence">
         <bpmn:flowNodeRef>Event_18tkl5h</bpmn:flowNodeRef>
@@ -71,7 +71,7 @@ execution.setVariable('foiwebUrl', system.getenv('FORMSFLOW_WEB_URL'));</camunda
         <camunda:executionListener event="take">
           <camunda:script scriptFormat="javascript">var saveDataPayload = {
 };
-if (execution.getVariable("servicekey") == "correspondence") {
+if (execution.getVariable("servicekey") != null &amp;&amp; execution.getVariable("servicekey") == "correspondence") {
 saveDataPayload = {
  "templateName": execution.getVariable("templateName"),
  "applicantCorrespondenceId": execution.getVariable("applicantCorrespondenceId")

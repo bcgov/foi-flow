@@ -10,7 +10,7 @@
     <bpmn:group id="Group_0nmwgct" categoryValueRef="CategoryValue_1dcilzu" />
     <bpmn:group id="Group_0ihi2fn" categoryValueRef="CategoryValue_1baekcn" />
   </bpmn:collaboration>
-  <bpmn:process id="foi-fee-processing" name="FOI Fee Processing" isExecutable="true" camunda:versionTag="4">
+  <bpmn:process id="foi-fee-processing" name="FOI Fee Processing" isExecutable="true" camunda:versionTag="8">
     <bpmn:laneSet id="LaneSet_1u7kp6i">
       <bpmn:lane id="Lane_1aaq844" name="Post Payment">
         <bpmn:flowNodeRef>Event_0dlzac7</bpmn:flowNodeRef>
@@ -134,7 +134,8 @@ connector.getVariable("statusCode");</camunda:script>
           <camunda:script scriptFormat="javascript">var current = execution.getVariable("retry1");
 execution.setVariable("retry1", current+1);
 execution.setVariable("paymentFormName", "payfeeonline");
-if (execution.getVariable("prevStatus") == "Response") {
+var templatename = execution.getVariable("templateName")
+if (execution.getVariable("prevStatus") == "Response" || (templatename != null &amp;&amp; templatename =="outstandingfeeestimatenotification")) {
 	execution.setVariable("paymentFormName", "payoutstandingform");
 }</camunda:script>
         </camunda:executionListener>
@@ -219,7 +220,7 @@ execution.setVariable("prevStatus", obj.previousstatus);</camunda:script>
     <bpmn:intermediateThrowEvent id="Event_1y2hfyk" name="Notify Payment">
       <bpmn:extensionElements>
         <camunda:executionListener event="start">
-          <camunda:script scriptFormat="javascript">if (execution.getVariable("servicekey") == "correspondence"){
+          <camunda:script scriptFormat="javascript">if (execution.getVariable("servicekey") != null &amp;&amp; execution.getVariable("servicekey") == "correspondence"){
   execution.getProcessEngineServices().getRuntimeService().createMessageCorrelation("foi-email").setVariables(execution.variables).setVariable("servicekey","correspondence").correlateWithResult();
 }
 else if (execution.getVariable("prevStatus") == "Response") {
