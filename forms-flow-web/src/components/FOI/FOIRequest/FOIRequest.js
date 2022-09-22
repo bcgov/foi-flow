@@ -192,7 +192,8 @@ const FOIRequest = React.memo(({ userDetail }) => {
       dispatch(fetchFOIRequestDescriptionList(requestId, ministryId));
       dispatch(fetchFOIRequestNotesList(requestId, ministryId));
       dispatch(fetchFOIRequestAttachmentsList(requestId, ministryId));
-      dispatch(fetchApplicantCorrespondence(requestId,ministryId));
+      if (ministryId)
+        dispatch(fetchApplicantCorrespondence(requestId,ministryId));
     }
 
     dispatch(fetchFOICategoryList());
@@ -509,7 +510,8 @@ const FOIRequest = React.memo(({ userDetail }) => {
       dispatch(fetchFOIRequestDetailsWrapper(id || requestId, ministryId));
       dispatch(fetchFOIRequestDescriptionList(id || requestId, ministryId));
       dispatch(fetchFOIRequestAttachmentsList(id || requestId, ministryId));
-      dispatch(fetchApplicantCorrespondence(requestId, ministryId));
+      if (ministryId)
+        dispatch(fetchApplicantCorrespondence(requestId, ministryId));
       setStateChanged(false);
       setcurrentrequestStatus(_state);
       setTimeout(() => {
