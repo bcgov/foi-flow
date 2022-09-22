@@ -39,3 +39,12 @@ export type modalParams = {
   handleClose: () => void;
   formHistory: Array<any>
 }
+
+export type previewParams = {
+  modalOpen: boolean;
+  handleClose: () => void;
+  handleSave: (emailContent: string) => void;
+  innerhtml: string;
+  attachments: Array<any>;
+  templateInfo: any;
+}
