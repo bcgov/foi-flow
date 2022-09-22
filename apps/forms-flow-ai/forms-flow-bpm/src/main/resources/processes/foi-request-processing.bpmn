@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_0ar1f9w" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.0.0" modeler:executionPlatform="Camunda Platform" modeler:executionPlatformVersion="7.15.0">
-  <bpmn:process id="foi-request-processing" name="FOI Request Processing" isExecutable="true" camunda:versionTag="3">
+  <bpmn:process id="foi-request-processing" name="FOI Request Processing" isExecutable="true" camunda:versionTag="4">
     <bpmn:subProcess id="Activity_1vkdaxq">
       <bpmn:incoming>Flow_0ybze00</bpmn:incoming>
       <bpmn:multiInstanceLoopCharacteristics camunda:collection="${filenumbers.elements()}" camunda:elementVariable="subId" />
@@ -404,26 +404,16 @@ execution.setVariable("closure_sla_days",closure_sla_days+1);</camunda:script>
             <camunda:script scriptFormat="javascript">var obj = JSON.parse(foiRequestMetaData);
 taskIdName = obj.id+"_iaotaskId";
 execution.setVariable("status",obj.status);
-execution.setVariable("defaultMinistryAssignedGroup",obj.assignedministrygroup);
-execution.setVariable("minTaskName", obj.id+" Ministry Coordinator");
 execution.setVariable("ministryRequestID",obj.ministryRequestID);
 execution.setVariable("axisRequestId",obj.axisRequestId);
-if ("applicantcorrespondenceid" in obj) {
-  execution.setVariable("applicantCorrespondenceId",obj.applicantcorrespondenceid);
-}
-else {
-  execution.setVariable("applicantCorrespondenceId",0);
-}
-if ("templatename" in obj) {
-  execution.setVariable("templateName",obj.templatename);
-}
-else {
-  execution.setVariable("templateName","");
-}
+execution.setVariable("applicantCorrespondenceId",obj.applicantcorrespondenceid);
+execution.setVariable("templateName",obj.templatename);
+
 if (obj.status != 'Closed') {
-execution.getProcessEngineServices().getRuntimeService().createMessageCorrelation("foi-fee-payment").setVariables(execution.variables).setVariable("actiontype","correspondence").correlateWithResult();
+execution.getProcessEngineServices().getRuntimeService().createMessageCorrelation("foi-fee-payment").setVariables(execution.variables).setVariable("servicekey","correspondence").correlateWithResult();
 execution.setVariable("feeflow","ONGOING");
-}</camunda:script>
+}
+</camunda:script>
           </camunda:executionListener>
         </bpmn:extensionElements>
         <bpmn:messageEventDefinition id="MessageEventDefinition_0x851bz" messageRef="Message_0ve5ot8" />
@@ -446,7 +436,7 @@ execution.getProcessEngineServices().getTaskService().complete(execution.getVari
 execution.getProcessEngineServices().getTaskService().complete(execution.getVariable(taskIdName));
 }
 if (obj.status == 'On Hold') {
-execution.getProcessEngineServices().getRuntimeService().createMessageCorrelation("foi-fee-payment").setVariables(execution.variables).setVariable("actiontype","statechange").correlateWithResult();
+execution.getProcessEngineServices().getRuntimeService().createMessageCorrelation("foi-fee-payment").setVariables(execution.variables).setVariable("servicekey","NA").correlateWithResult();
 execution.setVariable("feeflow","ONGOING");
 }
 var feeflow = execution.getVariable("feeflow");

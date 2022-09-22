@@ -20,11 +20,18 @@ class emailservice:
     """ FOI Email Service
     """
   
-    def send(self, servicename, requestid, ministryrequestid, applicantcorrespondenceid = None):
+    def send(self, servicename, requestid, ministryrequestid, emailschema):
         try:
             requestjson = requestservice().getrequestdetails(requestid,ministryrequestid)
-            _messagepart = templateservice().generate_by_servicename_and_schema(servicename, requestjson, applicantcorrespondenceid)
-            _messageattachmentlist = documentservice().getattachments(ministryrequestid, 'ministryrequest', templateconfig().getattachmentcategory(servicename).lower())
+            _applicantcorrespondenceid = self.__getvaluefromschema(emailschema, "applicantcorrespondenceid")
+            _templatename = self.__getvaluefromschema(emailschema, "templatename")
+            _messagepart = templateservice().generate_by_servicename_and_schema(servicename, requestjson, _applicantcorrespondenceid)
+            _messageattachmentlist = []
+            if (_applicantcorrespondenceid):
+                servicename = _templatename.upper() if _templatename else ""
+                _messageattachmentlist = documentservice().getapplicantcorrespondenceattachmentsbyapplicantcorrespondenceid(_applicantcorrespondenceid)
+            else:
+                _messageattachmentlist = documentservice().getattachments(ministryrequestid, 'ministryrequest', templateconfig().getattachmentcategory(servicename).lower())
             return senderservice().send(servicename, _messagepart, _messageattachmentlist, requestjson)
         except Exception as ex:
             logging.exception(ex)
@@ -64,4 +71,7 @@ class emailservice:
             return _response
         except Exception as ex:
             logging.exception(ex)
+    
+    def __getvaluefromschema(self, emailschema, property):
+        return emailschema.get(property) if property in emailschema  else None 
             

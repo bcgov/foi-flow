@@ -21,12 +21,10 @@ class templateconfig:
             return None
 
     def getsubject(self, key, requestjson):        
-        if key == "PAYONLINE" or key == "PAYOUTSTANDING":
+        if key == "PAYONLINE" or key == "PAYOUTSTANDING" or key == "FEEESTIMATENOTIFICATION" or key == "OUTSTANDINGFEEESTIMATENOTIFICATION":
             return "Your FOI Request ["+requestjson["axisRequestId"]+"]"
         elif key == "FEE-ESTIMATE-PAYMENT-RECEIPT" or key == "OUTSTANDING-PAYMENT-RECEIPT":
             return "Your FOI Request ["+requestjson["axisRequestId"]+"] - Fee Payment Received"
-        elif key == "PAYOUTSTANDING":
-            return "Your FOI Request ["+requestjson["axisRequestId"]+"] - Outstanding Fee Estimate"
         return None   
         
     def getstage(self, key):        
@@ -58,11 +56,11 @@ class templateconfig:
         return None
 
     def getattachmentcategory(self, key):
-        if key == "PAYONLINE":
+        if key == "PAYONLINE" or key == "FEEESTIMATENOTIFICATION":
             return "FEEASSESSED-ONHOLD"
-        elif key == "PAYONLINE-SUCCESSFUL":
+        elif key == "PAYONLINE-SUCCESSFUL" or key == "FEEESTIMATENOTIFICATION-SUCCESSFUL":
             return "Fee Estimate - Letter"
-        elif key == "PAYONLINE-FAILED":
+        elif key == "PAYONLINE-FAILED" or key == "FEEESTIMATENOTIFICATION-FAILED":
             return "Fee Estimate - Correspondence Failed"
         elif key == "FEE-ESTIMATE-PAYMENT-RECEIPT":
             return "Fee Estimate - Payment Receipt"

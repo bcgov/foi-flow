@@ -23,7 +23,11 @@ class templateservice:
     def generate_by_servicename_and_schema(self, servicename, requestjson, applicantcorrespondenceid = None):
         try:
             _templatename = self.__gettemplatenamewrapper(servicename, requestjson)
-            return self.__generatetemplate(_templatename, requestjson, applicantcorrespondenceid)
+            if (applicantcorrespondenceid):
+                emailtemplatehtml = self.__generatecorrespondencetetemplate(applicantcorrespondenceid)
+            else:
+                emailtemplatehtml= storageservice().downloadtemplate(_templatename)
+            return self.__generatetemplate(requestjson, emailtemplatehtml)
         except Exception as ex:
             logging.exception(ex)
         return None
@@ -47,13 +51,8 @@ class templateservice:
     def __getprevstate(self, requestjson):
         return requestjson["stateTransition"][2]["status"] if "stateTransition" in requestjson and len(requestjson["stateTransition"])  > 3 else None
 
-    def __generatetemplate(self, emailtemplatename, dynamictemplatevalues, applicantcorrespondenceid = None):
-        headerfooterhtml = storageservice().downloadtemplate('header_footer_template.html')
-        if applicantcorrespondenceid:
-            applicantcorrespondence = applicantcorrespondenceservice.getapplicantcorrespondencelogbyid(applicantcorrespondenceid)
-            emailtemplatehtml = applicantcorrespondence["correspondencemessagejson"] if applicantcorrespondence["correspondencemessagejson"] else None
-        else:
-            emailtemplatehtml= storageservice().downloadtemplate(emailtemplatename) #handle here.
+    def __generatetemplate(self, dynamictemplatevalues, emailtemplatehtml):
+        headerfooterhtml = storageservice().downloadtemplate('header_footer_template.html')        
         if(emailtemplatehtml is None):
             raise ValueError('No template found')
 
@@ -70,3 +69,7 @@ class templateservice:
         finaltemplate = Template(headerfooterhtml)
         finaltemplatedhtml = finaltemplate.render(dynamictemplatevalues)
         return finaltemplatedhtml
+    
+    def __generatecorrespondencetetemplate(self, applicantcorrespondenceid):
+        applicantcorrespondence = applicantcorrespondenceservice().getapplicantcorrespondencelogbyid(applicantcorrespondenceid)
+        return applicantcorrespondence["correspondencemessagejson"] if applicantcorrespondence["correspondencemessagejson"] else None

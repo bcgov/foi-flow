@@ -65,15 +65,21 @@ execution.setVariable('base64userpass', base64userpass);
 execution.setVariable('realm', system.getenv('KEYCLOAK_URL_REALM'));
 var apiendpoint = system.getenv('FOI_REQ_MANAGEMENT_API_URL')
 execution.setVariable('foiApiUrl', apiendpoint);
-execution.setVariable('foiwebUrl', system.getenv('FORMSFLOW_WEB_URL'));
-
-var sendapiendpoint = apiendpoint + "/api/foiemail/" + execution.getVariable("foiRequestID") + "/ministryrequest/" + execution.getVariable("ministryRequestID") + "/" + execution.getVariable("servicekey")
-if (execution.getVariable("applicantCorrespondenceId") != 0) {
-sendapiendpoint = apiendpoint + "/api/foiemail/" + execution.getVariable("foiRequestID") + "/ministryrequest/" + execution.getVariable("ministryRequestID") + "/" + execution.getVariable("servicekey") + "/" + execution.getVariable("applicantCorrespondenceId")
-}
-execution.setVariable('sendapiendpoint', sendapiendpoint);</camunda:script>
+execution.setVariable('foiwebUrl', system.getenv('FORMSFLOW_WEB_URL'));</camunda:script>
         </camunda:executionListener>
         <camunda:executionListener expression="${execution.setVariable(&#34;e_retry1&#34;, 0)}" event="take" />
+        <camunda:executionListener event="take">
+          <camunda:script scriptFormat="javascript">var saveDataPayload = {
+};
+if (execution.getVariable("servicekey") == "correspondence") {
+saveDataPayload = {
+ "templateName": execution.getVariable("templateName"),
+ "applicantCorrespondenceId": execution.getVariable("applicantCorrespondenceId")
+}
+}
+
+execution.setVariable("saveDataPayload", JSON.stringify(saveDataPayload));</camunda:script>
+        </camunda:executionListener>
       </bpmn:extensionElements>
     </bpmn:sequenceFlow>
     <bpmn:sequenceFlow id="Flow_0kttlyh" sourceRef="Event_1ny8po2" targetRef="Event_11fpij1" />
@@ -120,7 +126,7 @@ execution.setVariable('sendapiendpoint', sendapiendpoint);</camunda:script>
       <bpmn:extensionElements>
         <camunda:connector>
           <camunda:inputOutput>
-            <camunda:inputParameter name="url">${sendapiendpoint}</camunda:inputParameter>
+            <camunda:inputParameter name="url">${foiApiUrl}/api/foiemail/${foiRequestID}/ministryrequest/${ministryRequestID}/${servicekey}</camunda:inputParameter>
             <camunda:inputParameter name="method">POST</camunda:inputParameter>
             <camunda:inputParameter name="headers">
               <camunda:map>
@@ -128,6 +134,7 @@ execution.setVariable('sendapiendpoint', sendapiendpoint);</camunda:script>
                 <camunda:entry key="Authorization">Bearer ${accessToken}</camunda:entry>
               </camunda:map>
             </camunda:inputParameter>
+            <camunda:inputParameter name="payload">${saveDataPayload}</camunda:inputParameter>
             <camunda:outputParameter name="responseCode">
               <camunda:script scriptFormat="javascript">if (connector.getVariable("statusCode") != 200) {
 	throw new org.camunda.bpm.engine.delegate.BpmnError("FOI-PAYMENT-EMAIL-API-ERR", response);

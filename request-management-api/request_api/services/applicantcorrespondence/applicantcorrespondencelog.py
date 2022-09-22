@@ -54,5 +54,5 @@ class applicantcorrespondenceservice:
         return FOIApplicantCorrespondence.saveapplicantcorrespondence(applicantcorrespondencelog,attachments)
     
     def getapplicantcorrespondencelogbyid(self, applicantcorrespondenceid):
-        return FOIApplicantCorrespondence.applicantcorrespondenceid(applicantcorrespondenceid)
+        return FOIApplicantCorrespondence.getapplicantcorrespondencebyid(applicantcorrespondenceid)
 

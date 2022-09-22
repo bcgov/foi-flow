@@ -57,15 +57,12 @@ class workflowservice:
         return bpmservice().feeevent(requestsschema["axisRequestId"], metadata, status)    
     
     def postcorrenspodenceevent(self, ministryid, requestsschema, applicantcorrespondenceid, templatename, attributes):
-        assignedgroup = self.__getvaluefromschema(requestsschema,"assignedGroup")
-        assignedto = self.__getvaluefromschema(requestsschema,"assignedTo")
         paymentexpirydate = self.__getvaluefromlist(attributes,"paymentExpiryDate")
         axisrequestid = self.__getvaluefromschema(requestsschema,"axisRequestId")
         filenumber = self.__getvaluefromschema(requestsschema,"idNumber")
         status = self.__getvaluefromschema(requestsschema,"currentState")
-        assignedministrygroup = self.__getvaluefromschema(requestsschema,"assignedministrygroup")
-        metadata = json.dumps({"id": filenumber, "status": status , "assignedGroup": assignedgroup, "assignedTo": assignedto, "assignedministrygroup":assignedministrygroup, "ministryRequestID": ministryid, "paymentExpiryDate": paymentexpirydate, "axisRequestId": axisrequestid, "applicantcorrespondenceid": applicantcorrespondenceid, "templatename": templatename.replace(" ", "")})
-        bpmservice().correspondance(filenumber, metadata)
+        metadata = json.dumps({"id": filenumber, "status": status , "ministryRequestID": ministryid, "paymentExpiryDate": paymentexpirydate, "axisRequestId": axisrequestid, "applicantcorrespondenceid": applicantcorrespondenceid, "templatename": templatename.replace(" ", "")})
+        bpmservice().correspondanceevent(filenumber, metadata)
 
     def __postopenedevent(self, id, filenumber, metadata, messagename, assignedgroup, assignedto, wfinstanceid, activity):
         if activity == Activity.complete.value:

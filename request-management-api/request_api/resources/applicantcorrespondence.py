@@ -88,11 +88,9 @@ class FOIFlowApplicantCorrespondence(Resource):
            requestjson = request.get_json()
            applicantcorrespondencelog = FOIApplicantCorrespondenceSchema().load(data=requestjson)           
            userid = AuthHelper.getuserid()
-           print("applicantcorrespondencelog = ", applicantcorrespondencelog)          
            result = applicantcorrespondenceservice().saveapplicantcorrespondencelog(templateid=applicantcorrespondencelog['templateid'],
            ministryrequestid=ministryrequestid,createdby=userid,messagehtml=applicantcorrespondencelog['correspondencemessagejson'],attachments=applicantcorrespondencelog['attachments'])
-           
-           requestservice().postcorrespondenceeventtoworkflow(ministryrequestid,  requestid, result.identifier, applicantcorrespondencelog['templateid'], applicantcorrespondencelog['attributes'])
+           requestservice().postcorrespondenceeventtoworkflow(ministryrequestid,  requestid, result.identifier, applicantcorrespondencelog['attributes'], applicantcorrespondencelog['templateid'])
            
            return {'status': result.success, 'message':result.message,'id':result.identifier} , 200      
         except BusinessException:

@@ -37,7 +37,6 @@ class requestservice:
     def updaterequeststatus(self, requestid, ministryrequestid, statusid):
         foirequestschema = self.getrequest(requestid, ministryrequestid)
         foirequestschema['requeststatusid'] = statusid
-        print("foirequestschema ==== ",foirequestschema)
         return self.saverequestversion(foirequestschema, requestid, ministryrequestid,'Online Payment')
                
     def getrequest(self,foirequestid,foiministryrequestid): 
@@ -78,9 +77,7 @@ class requestservice:
         status = requestserviceconfigurator().getstatusname(requeststatusid) if requeststatusid is not None else None
         workflowservice().postopenedevent(id, wfinstanceid, requestschema, data, status, usertype)
     
-    def postcorrespondenceeventtoworkflow(self, requestid, ministryrequestid, applicantcorrespondenceid, templateid, attributes):
+    def postcorrespondenceeventtoworkflow(self, requestid, ministryrequestid, applicantcorrespondenceid, attributes, templateid):
         foirequestschema = self.getrequestdetails(requestid, ministryrequestid)
-        print("templateid = ", templateid)
-        templatename = applicantcorrespondenceservice.gettemplatebyid(templateid)
-        print("templatename = ", templatename)
-        workflowservice().postcorrenspodenceevent(ministryrequestid, foirequestschema, applicantcorrespondenceid, templatename, attributes)
+        templatedetails = applicantcorrespondenceservice().gettemplatebyid(templateid)
+        workflowservice().postcorrenspodenceevent(ministryrequestid, foirequestschema, applicantcorrespondenceid, templatedetails.name, attributes)

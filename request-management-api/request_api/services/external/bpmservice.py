@@ -86,7 +86,7 @@ class bpmservice(camundaservice):
         else:
             return
 
-    def correspondance(self,filenumber, data, token=None):
+    def correspondanceevent(self,filenumber, data, token=None):
         if self.bpmengineresturl is not None:
             messageschema = MessageSchema().dump({"messageName": MessageType.iaocorrenspodence.value,
                                               "localCorrelationKeys":{

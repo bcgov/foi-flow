@@ -10,7 +10,7 @@
     <bpmn:group id="Group_0nmwgct" categoryValueRef="CategoryValue_1dcilzu" />
     <bpmn:group id="Group_0ihi2fn" categoryValueRef="CategoryValue_1baekcn" />
   </bpmn:collaboration>
-  <bpmn:process id="foi-fee-processing" name="FOI Fee Processing" isExecutable="true" camunda:versionTag="3">
+  <bpmn:process id="foi-fee-processing" name="FOI Fee Processing" isExecutable="true" camunda:versionTag="4">
     <bpmn:laneSet id="LaneSet_1u7kp6i">
       <bpmn:lane id="Lane_1aaq844" name="Post Payment">
         <bpmn:flowNodeRef>Event_0dlzac7</bpmn:flowNodeRef>
@@ -219,17 +219,13 @@ execution.setVariable("prevStatus", obj.previousstatus);</camunda:script>
     <bpmn:intermediateThrowEvent id="Event_1y2hfyk" name="Notify Payment">
       <bpmn:extensionElements>
         <camunda:executionListener event="start">
-          <camunda:script scriptFormat="javascript">var templateName = execution.getVariable("templateName")
-var applicantCorrespondenceId = execution.getVariable("applicantCorrespondenceId")
-var actiontype = execution.getVariable("actiontype")
-
-if (applicantCorrespondenceId != 0 &amp;&amp; templateName != "") {
-  	execution.getProcessEngineServices().getRuntimeService().createMessageCorrelation("foi-email").setVariables(execution.variables).setVariable("servicekey",templateName).setVariable("applicantcorrespondenceid",applicantCorrespondenceId).correlateWithResult();
+          <camunda:script scriptFormat="javascript">if (execution.getVariable("servicekey") == "correspondence"){
+  execution.getProcessEngineServices().getRuntimeService().createMessageCorrelation("foi-email").setVariables(execution.variables).setVariable("servicekey","correspondence").correlateWithResult();
 }
-else if (execution.getVariable("prevStatus") == "Response" &amp;&amp; actiontype == "statechange") {
+else if (execution.getVariable("prevStatus") == "Response") {
 	execution.getProcessEngineServices().getRuntimeService().createMessageCorrelation("foi-email").setVariables(execution.variables).setVariable("servicekey","payoutstanding").correlateWithResult();
 }
-else if (actiontype == "statechange") {
+else {
 	execution.getProcessEngineServices().getRuntimeService().createMessageCorrelation("foi-email").setVariables(execution.variables).setVariable("servicekey","payonline").correlateWithResult();
 }</camunda:script>
         </camunda:executionListener>
