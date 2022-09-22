@@ -38,9 +38,8 @@ const calculateFeesByPages = (name: string, pages: number) => {
 }
 
 export const renderTemplate = (template: string, content: string, params: Array<any>) => {
-  let templateArray = template.split(`<body style="color:black; font-family: 'BC Sans';">`);
-  let newContent = applyVariables(content, params);
-  return `${templateArray[0] || "<html>"} <body style="color:black; font-family: 'BC Sans';"> ${newContent} </body></html>`;
+  let newTemplate = template.replace("{{content}}", content);
+  return applyVariables(newTemplate, params);
 }
 
 const applyVariables = (content: string, params: Array<any>) => {

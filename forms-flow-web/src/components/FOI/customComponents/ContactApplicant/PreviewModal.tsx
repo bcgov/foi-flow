@@ -8,7 +8,6 @@ import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import IconButton from '@material-ui/core/IconButton';
 import CloseIcon from '@material-ui/icons/Close';
-import Frame from 'react-frame-component';
 import type { previewParams } from './types';
 import { getOSSHeaderDetails, getFileFromS3 } from "../../../../apiManager/services/FOI/foiOSSServices";
 import { renderTemplate } from './util';
@@ -18,7 +17,8 @@ export const PreviewModal = React.memo(({
   handleClose,
   handleSave,
   innerhtml,
-  attachments
+  attachments,
+  templateInfo
 }: previewParams) => {
 
   const dispatch = useDispatch();
@@ -30,7 +30,7 @@ export const PreviewModal = React.memo(({
   const [template, setTemplate] = useState("");
   const fileInfoList = [{
     filename: "fee_estimate_notification.html",
-    s3sourceuri: "https://citz-foi-prod.objectstore.gov.bc.ca/dev-forms-foirequests/TEMPLATES/EMAILS/fee_estimate_notification.html"
+    s3sourceuri: "https://citz-foi-prod.objectstore.gov.bc.ca/dev-forms-foirequests/TEMPLATES/EMAILS/header_footer_template.html"
   }]
   React.useEffect(() => {
     getOSSHeaderDetails(fileInfoList, dispatch, (err: any, res: any) => {
@@ -43,10 +43,11 @@ export const PreviewModal = React.memo(({
         });
       }
     });
-
   }, []);
 
   const templateVariables = [
+    {name: "{{axisRequestId}}", value: requestDetails.axisRequestId},
+    {name: "{{title}}", value: templateInfo?.description || ""},
     {name: "{{firstName}}", value: requestDetails.firstName},
     {name: "{{lastName}}", value: requestDetails.lastName},
     {name: "{{assignedToFirstName}}", value: requestDetails.assignedToFirstName},
@@ -78,10 +79,7 @@ export const PreviewModal = React.memo(({
       <DialogContent>
         <DialogContentText id="state-change-dialog-description" component={'span'}>
           <div className="preview-container">
-            <Frame initialContent={ renderTemplate(template, innerhtml, templateVariables) } className="preview-frame" sandbox="allow-same-origin" >
-            </Frame>
-            {/* <iframe srcDoc={newTemplate} className="preview-frame" /> */}
-
+            <iframe srcDoc={ renderTemplate(template, innerhtml, templateVariables) } className="preview-frame" sandbox="allow-same-origin" />
           </div>
           <div className="preview-container">
             {attachments.map((file: any, index: number) => (

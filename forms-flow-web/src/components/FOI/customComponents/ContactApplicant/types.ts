@@ -46,4 +46,5 @@ export type previewParams = {
   handleSave: (emailContent: string) => void;
   innerhtml: string;
   attachments: Array<any>;
+  templateInfo: any;
 }

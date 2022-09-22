@@ -104,6 +104,7 @@ export const ContactApplicant = ({
     newestimate: {
       value: 'newestimate',
       label: 'New Estimate',
+      description: 'Fee Estimate',
       templateid: 1,
       text: `<p>Dear {{firstName}} {{lastName}}</p>
       <p>Please see the attached regarding your FOI Request.</p>
@@ -117,12 +118,9 @@ export const ContactApplicant = ({
     outstandingfee: {
       value: 'outstandingfee',
       label: 'Outstanding Fee',
+      description: 'Balance Due',
       templateid: 2,
-      text: `<div>
-            <h4 style="color: #003366; display: block; text-align:center; font-family: 'BC Sans'; font-weight:bold">Freedom of Information and Protection for Privacy Act (FOIPPA)<br> Request for Records - Balance Due</h4>
-            </div>
-
-            <p>Dear {{firstName}} {{lastName}}</p>
+      text: `<p>Dear {{firstName}} {{lastName}}</p>
             <p>Please see the attached regarding your FOI Request.</p>
             <p>If you would like to pay your remaining balance online, please click on this link: </p>
             <p>
@@ -138,6 +136,7 @@ export const ContactApplicant = ({
     none: {
       value: 'none',
       label: 'None',
+      description: '',
       templateid: null,
       text: ``
     }
@@ -437,7 +436,7 @@ export const ContactApplicant = ({
               handleSave={save}
               innerhtml={editorValue}
               attachments={files}
-              // emailInfo={data}
+              templateInfo={templates[currentTemplate as keyof typeof templates]}
             />
             <button
               className="btn addCorrespondence"
