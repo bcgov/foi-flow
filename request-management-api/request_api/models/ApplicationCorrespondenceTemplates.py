@@ -17,6 +17,7 @@ class ApplicationCorrespondenceTemplate(db.Model):
     description = db.Column(db.String(1000), nullable=True)
     name = db.Column(db.String(500), nullable=False)
     active = db.Column(db.Boolean, nullable=False)
+    display = db.Column(db.Boolean, nullable=False)
     version = db.Column(db.Integer, nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.now)
     createdby = db.Column(db.String(120), unique=False, nullable=True)
@@ -59,4 +60,4 @@ class ApplicationCorrespondenceTemplate(db.Model):
 
 class ApplicationCorrespondenceTemplateSchema(ma.Schema):
     class Meta:
-        fields = ('templateid','documenturipath', 'description','name','active','version','created_at','createdby')        
+        fields = ('templateid','documenturipath', 'description','name','active', 'display','version','created_at','createdby')        

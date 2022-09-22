@@ -26,11 +26,12 @@ export const PreviewModal = React.memo(({
   //gets the request detail from the store
   const requestDetails: any = useSelector((state: any) => state.foiRequests.foiRequestDetail);
 
-  //get template - it's better to pass as prop than download from s3 - need integrate with parent component
+  //get template
+  const templatePath = "/TEMPLATES/EMAILS/header_footer_template.html";
   const [template, setTemplate] = useState("");
   const fileInfoList = [{
-    filename: "fee_estimate_notification.html",
-    s3sourceuri: "https://citz-foi-prod.objectstore.gov.bc.ca/dev-forms-foirequests/TEMPLATES/EMAILS/header_footer_template.html"
+    filename: "header_footer_template.html",
+    s3sourceuri: "https://citz-foi-prod.objectstore.gov.bc.ca/dev-forms-foirequests"+templatePath
   }]
   React.useEffect(() => {
     getOSSHeaderDetails(fileInfoList, dispatch, (err: any, res: any) => {
@@ -47,7 +48,7 @@ export const PreviewModal = React.memo(({
 
   const templateVariables = [
     {name: "{{axisRequestId}}", value: requestDetails.axisRequestId},
-    {name: "{{title}}", value: templateInfo?.description || ""},
+    {name: "{{title}}", value: templateInfo?.label || ""},
     {name: "{{firstName}}", value: requestDetails.firstName},
     {name: "{{lastName}}", value: requestDetails.lastName},
     {name: "{{assignedToFirstName}}", value: requestDetails.assignedToFirstName},

@@ -32,7 +32,8 @@ import {
   fetchFOIRequestAttachmentsList
 } from "../../../apiManager/services/FOI/foiAttachmentServices";
 import {
-  fetchApplicantCorrespondence
+  fetchApplicantCorrespondence,
+  fetchApplicantCorrespondenceTemplates
 } from "../../../apiManager/services/FOI/foiCorrespondenceServices";
 import { fetchFOIRequestNotesList } from "../../../apiManager/services/FOI/foiRequestNoteServices";
 import { makeStyles } from '@material-ui/core/styles';
@@ -117,6 +118,9 @@ const FOIRequest = React.memo(({ userDetail }) => {
   let applicantCorrespondence = useSelector(
     (state) => state.foiRequests.foiRequestApplicantCorrespondence
   );
+  let applicantCorrespondenceTemplates = useSelector(
+    (state) => state.foiRequests.foiRequestApplicantCorrespondenceTemplates
+  );
   const [attachments, setAttachments] = useState(requestAttachments);
   const [comment, setComment] = useState([]);
   const [requestState, setRequestState] = useState(StateEnum.unopened.name);
@@ -193,6 +197,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
       dispatch(fetchFOIRequestNotesList(requestId, ministryId));
       dispatch(fetchFOIRequestAttachmentsList(requestId, ministryId));
       dispatch(fetchApplicantCorrespondence(ministryId));
+      dispatch(fetchApplicantCorrespondenceTemplates());
     }
 
     dispatch(fetchFOICategoryList());
@@ -1058,6 +1063,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
                   ministryId={ministryId}
                   ministryCode={requestDetails.bcgovcode}
                   applicantCorrespondence={applicantCorrespondence}
+                  applicantCorrespondenceTemplates={applicantCorrespondenceTemplates}
                   requestId={requestId}
                 />
               </>

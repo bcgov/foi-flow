@@ -17,9 +17,9 @@ down_revision = '39989f4c2178'
 branch_labels = None
 depends_on = None
 
-
 def upgrade():
     op.execute('Truncate table public."ApplicantCorrespondenceTemplates" RESTART IDENTITY CASCADE;commit;')
+    op.execute('ALTER TABLE public."ApplicantCorrespondenceTemplates" ADD display Boolean')
     applicant_correspondence_templates = table('ApplicantCorrespondenceTemplates',
                                  column('name',String),
                                  column('documenturipath',Text),
@@ -45,3 +45,4 @@ def upgrade():
 
 def downgrade():
     op.execute('Truncate table public."ApplicantCorrespondenceTemplates" RESTART IDENTITY CASCADE;commit;')
+    op.execute('ALTER TABLE public."ApplicantCorrespondenceTemplates" DROP display')

@@ -15,7 +15,7 @@ import { errorToast, isMinistryLogin } from "../../../../helper/FOI/helper";
 import type { params, CFRFormData } from './types';
 import { calculateFees } from './util';
 import foiFees from '../../../../constants/FOI/foiFees.json';
-import { fetchApplicantCorrespondence, saveEmailCorrespondence } from "../../../../apiManager/services/FOI/foiCorrespondenceServices";
+import { fetchApplicantCorrespondence, saveEmailCorrespondence, fetchApplicantCorrespondenceTemplates } from "../../../../apiManager/services/FOI/foiCorrespondenceServices";
 import _ from 'lodash';
 import { toast } from "react-toastify";
 import { StateEnum } from '../../../../constants/FOI/statusEnum';
@@ -50,6 +50,7 @@ export const ContactApplicant = ({
   requestId,
   userDetail,
   applicantCorrespondence,
+  applicantCorrespondenceTemplates,
 }: any) => {
 
   const dispatch = useDispatch();
@@ -81,66 +82,50 @@ export const ContactApplicant = ({
     setModal(true);
   }
   const [files, setFiles] = useState([]);
-
-  // const testTemplate;
-  const fileInfoList = [{
-    filename: "test.pdf",
-    s3sourceuri: "https://citz-foi-prod.objectstore.gov.bc.ca/dev-forms-foirequests/TEMPLATES/EMAILS/fee_estimate_notification.html"
-  }]
-  React.useEffect(() => {
-    getOSSHeaderDetails(fileInfoList, dispatch, (err: any, res: any) => {
-      if (!err) {
-        res.map(async (header: any, _index: any) => {
-          getFileFromS3(header, async (_err: any, response: any) => {
-            const text = await new Response(response.data).text()
-            console.log(text)
-          });
-        });
-      }
-    });
-  }, []);
-
-  const templates = {
-    newestimate: {
-      value: 'newestimate',
-      label: 'New Estimate',
-      description: 'Fee Estimate',
-      templateid: 1,
-      text: `<p>Dear {{firstName}} {{lastName}}</p>
-      <p>Please see the attached regarding your FOI Request.</p>
-      <p>If you would like to pay your estimate online, please click on this link:</p>
-      <p><a href="{{cfrfee.feedata.paymenturl}}">Pay Online</a></p>
-      <p><br></p>
-      <p>Thank you,</p>
-      <p>{{assignedToFirstName}} {{assignedToLastName}}</p>
-      <p>{{assignedGroup}}</p>`
-    },
-    outstandingfee: {
-      value: 'outstandingfee',
-      label: 'Outstanding Fee',
-      description: 'Balance Due',
-      templateid: 2,
-      text: `<p>Dear {{firstName}} {{lastName}}</p>
-            <p>Please see the attached regarding your FOI Request.</p>
-            <p>If you would like to pay your remaining balance online, please click on this link: </p>
-            <p>
-              <a href="{{cfrfee.feedata.paymenturl}}">
-                Pay Online
-              </a>
-            </p>
-            <br>
-            <p>Thank you,</p>
-            <p>{{assignedToFirstName}} {{assignedToLastName}}</p>
-            <p>{{assignedGroup}}</p>`
-    },
-    none: {
-      value: 'none',
-      label: 'None',
-      description: '',
-      templateid: null,
-      text: ``
-    }
+  const [templates, setTemplates] = useState<any[]>([{value: "", label: "", templateid: null, text: ""}]);
+  interface Template {
+    value: string;
+    label: string;
+    templateid: number;
+    text: string;
   }
+ 
+  React.useEffect(() => {
+    let templateList: any = [{value: "", label: "", templateid: null, text: ""}];
+    let template = "";
+    let templateItem: Template = {
+      value: "",
+      label: "",
+      templateid: 0,
+      text: ""
+    }
+
+    applicantCorrespondenceTemplates.forEach((item: any) => {
+      const rootpath = "https://citz-foi-prod.objectstore.gov.bc.ca/dev-forms-foirequests"
+
+      const fileInfoList = [{
+        filename: item.name,
+        s3sourceuri: rootpath+item.documenturipath
+      }]
+
+      getOSSHeaderDetails(fileInfoList, dispatch, (err: any, res: any) => {
+        if (!err) {
+          res.map(async (header: any, _index: any) => {
+            getFileFromS3(header, async (_err: any, response: any) => {
+              templateItem = {
+                value: item.name,
+                label: item.description,
+                templateid: item.templateid,
+                text: await new Response(response.data).text()
+              }
+              templateList.push(templateItem);
+              setTemplates(templateList);
+            });
+          });
+        }
+      });
+    });
+  }, [])
 
   const [messages, setMessages] = useState(applicantCorrespondence);
 
@@ -160,11 +145,11 @@ export const ContactApplicant = ({
   }, []);
 
   const [editorValue, setEditorValue] = useState("")
-  const [currentTemplate, setCurrentTemplate] = useState('')
+  const [currentTemplate, setCurrentTemplate] = useState(0)
 
   const handleTemplateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setCurrentTemplate(e.target.value)
-    setEditorValue(templates[e.target.value as keyof typeof templates].text)
+    setCurrentTemplate(+e.target.value)
+    setEditorValue(templates[+e.target.value].text || "")
   }
 
   const removeFile = (index: number) => {
@@ -219,7 +204,7 @@ export const ContactApplicant = ({
       dispatch(fetchApplicantCorrespondence(ministryId));
     }
     var data = {
-      templateid: currentTemplate ? templates[currentTemplate as keyof typeof templates].templateid : null,
+      templateid: currentTemplate ? templates[currentTemplate].templateid : null,
       correspondencemessagejson: emailContent,
       foiministryrequest_id: ministryId,
       attachments: attachments
@@ -361,7 +346,7 @@ export const ContactApplicant = ({
             <TextField
               className="email-template-dropdown"
               id="emailtemplate"
-              label={currentTemplate === '' ? "Select Template" : ""}
+              label={currentTemplate === 0 ? "Select Template" : ""}
               inputProps={{ "aria-labelledby": "emailtemplate-label"}}
               InputLabelProps={{ shrink: false }}
               select
@@ -374,13 +359,13 @@ export const ContactApplicant = ({
               size="small"
               fullWidth
             >
-              {Object.keys(templates).map((option) => (
+              {templates.map((element: any, index: any) => (
               <MenuItem
-                key={templates[option as keyof typeof templates].value}
-                value={templates[option as keyof typeof templates].value}
+                key={index}
+                value={index}
                 // disabled={option.disabled}
               >
-                {templates[option as keyof typeof templates].label}
+                {element.label}
               </MenuItem>
               ))}
             </TextField>
@@ -436,7 +421,7 @@ export const ContactApplicant = ({
               handleSave={save}
               innerhtml={editorValue}
               attachments={files}
-              templateInfo={templates[currentTemplate as keyof typeof templates]}
+              templateInfo={templates[currentTemplate]}
             />
             <button
               className="btn addCorrespondence"
