@@ -13,6 +13,8 @@ from request_api.services.events.payment import paymentevent
 from request_api.services.events.email import emailevent
 from request_api.models.default_method_result import DefaultMethodResult
 from request_api.exceptions import BusinessException
+from request_api.utils.enums import PaymentEventType
+
 import json
 from flask import current_app
 class eventservice:
@@ -74,14 +76,17 @@ class eventservice:
     async def posteventforcfrfeeform(self, ministryrequestid, userid, username):
         try:
             cfrfeeeventresponse = cfrfeeformevent().createstatetransitionevent(ministryrequestid, userid, username)
+            feewaivercommentresponse, refundcommentresponse= cfrfeeformevent().createeventforupdatedamounts(ministryrequestid, userid, username)
             if cfrfeeeventresponse.success == False: 
                 current_app.logger.error("FOI Notification failed for event for CFRFEEFORM= %s" % (ministryrequestid))
+            if feewaivercommentresponse.success == False or refundcommentresponse.success == False: 
+                current_app.logger.error("FOI Comment failed for amount update event for CFRFEEFORM= %s" % (ministryrequestid))
         except BusinessException as exception:            
             self.__logbusinessexception(exception)
 
-    async def postpaymentevent(self, requestid):
+    async def postpaymentevent(self, requestid, paymenteventtype = PaymentEventType.paid.value):
         try:
-            paymeneteventresponse = paymentevent().createpaymentevent(requestid)
+            paymeneteventresponse = paymentevent().createpaymentevent(requestid, paymenteventtype)
             if paymeneteventresponse.success == False:
                 current_app.logger.error("FOI Notification failed for payment event for request= %s ; event response=%s" % (requestid, paymeneteventresponse.message))
         except BusinessException as exception:

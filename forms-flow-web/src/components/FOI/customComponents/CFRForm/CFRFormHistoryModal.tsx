@@ -114,6 +114,46 @@ export const CFRFormHistoryModal = React.memo(({
                     </div>
                   </div>
                   <div className="row foi-details-row">
+                    <div className="col-lg-6 foi-details-col">
+                      <TextField
+                        id="feewaiver"
+                        label="Fee Waiver Amount"
+                        inputProps={{
+                          "aria-labelledby": "feewaiver-label"
+                        }}
+                        InputProps={{
+                          startAdornment: <InputAdornment position="start">$</InputAdornment>
+                        }}
+                        InputLabelProps={{ shrink: true }}
+                        variant="outlined"
+                        name="feewaiverAmount"
+                        type="number"
+                        value={parseFloat(entry.feedata.feewaiveramount).toFixed(2)}
+                        fullWidth
+                        disabled={true}
+                      />
+                    </div>
+                    <div className="col-lg-6 foi-details-col">
+                      <TextField
+                        id="refund"
+                        label="Refund Amount"
+                        inputProps={{
+                          "aria-labelledby": "refund-label"
+                        }}
+                        InputProps={{
+                          startAdornment: <InputAdornment position="start">$</InputAdornment>
+                        }}
+                        InputLabelProps={{ shrink: true }}
+                        name="refundAmount"
+                        value={parseFloat(entry.feedata.refundamount).toFixed(2)}
+                        variant="outlined"
+                        placeholder="0"
+                        fullWidth
+                        disabled={true}
+                      />
+                    </div>
+                  </div>
+                  <div className="row foi-details-row">
                     <div className="col-lg-12 foi-details-col">
                       <hr />
                     </div>

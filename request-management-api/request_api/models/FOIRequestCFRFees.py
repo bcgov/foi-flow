@@ -75,6 +75,15 @@ class FOIRequestCFRFee(db.Model):
         for _entry in _entries:
             requeststates.append(_entry.cfrfeestatus.description)
         return requeststates  
+
+    @classmethod
+    def getfeedataforamountcomparison(cls, ministryrequestid):
+        _session = db.session
+        _entries = _session.query(FOIRequestCFRFee).filter(FOIRequestCFRFee.ministryrequestid == ministryrequestid and FOIRequestCFRFee.feedata is not null).order_by(FOIRequestCFRFee.version.desc()).limit(2)
+        feedata = []
+        for _entry in _entries:
+            feedata.append(_entry.feedata)
+        return feedata  
        
 class FOIRequestCFRFormSchema(ma.Schema):
     class Meta:
