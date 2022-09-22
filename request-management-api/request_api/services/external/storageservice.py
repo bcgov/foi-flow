@@ -89,14 +89,12 @@ class storageservice:
         return templatefile
 
 
-    def downloadtemplate(self, templatename): 
+    def downloadtemplate(self, templatepath):
 
-        s3templatefolder= "TEMPLATES"
         if(accesskey is None or secretkey is None or s3host is None or formsbucket is None):
             raise ValueError('accesskey is None or secretkey is None or S3 host is None or formsbucket is None')
         #To DO : make the values of templatetype and templatename dynamic
-        templatetype= 'EMAILS'
-        s3uri = 'https://{0}/{1}/{2}/{3}/{4}'.format(s3host,formsbucket,s3templatefolder,templatetype,templatename)
+        s3uri = 'https://{0}/{1}{2}'.format(s3host,formsbucket,templatepath)
         templatefile= self.download(s3uri)
         responsehtml=templatefile.text
         return responsehtml

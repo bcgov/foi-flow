@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from datetime import date, datetime
+import string
 
 from sqlalchemy import ForeignKey
 
@@ -30,9 +31,18 @@ class ApplicationCorrespondenceTemplate(db.Model):
         return query.one_or_none()
 
     @classmethod
+    def get_template_by_name(cls, name: string):
+        """Given a type and optionally an extension, return the template."""
+
+        query = cls.query.filter_by(name = name). \
+            filter(ApplicationCorrespondenceTemplate.name == name)
+
+        return query.one_or_none()
+
+    @classmethod
     def getapplicantcorrespondencetemplates(cls):
         correspondencetemplate_schema = ApplicationCorrespondenceTemplateSchema(many=True)
-        query = db.session.query(ApplicationCorrespondenceTemplate).filter_by(active=True).all()
+        query = db.session.query(ApplicationCorrespondenceTemplate).filter_by(active=True, display=True).all()
         return correspondencetemplate_schema.dump(query)    
 
     @staticmethod
