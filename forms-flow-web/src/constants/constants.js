@@ -37,8 +37,7 @@ export const SOCKETIO_CONNECT_NONCE =
   (window._env_ && window._env_.REACT_APP_SOCKETIO_CONNECT_NONCE) ||
   process.env.REACT_APP_SOCKETIO_CONNECT_NONCE;
 
-// export const OSS_S3_BUCKET_FULL_PATH = "https://" + ((window._env_ && window._env_.OSS_S3_HOST) ||
-// process.env.OSS_S3_HOST)+ "/" + ((window._env_ && window._env_.OSS_S3_FORMS_BUCKET) ||
-// process.env.OSS_S3_FORMS_BUCKET)
+export const OSS_S3_BUCKET_FULL_PATH = "https://" + ((window._env_ && window._env_.REACT_APP_OSS_S3_HOST) ||
+process.env.REACT_APP_OSS_S3_HOST || "citz-foi-prod.objectstore.gov.bc.ca")+ "/" + ((window._env_ && window._env_.REACT_APP_OSS_S3_FORMS_BUCKET) ||
+process.env.REACT_APP_OSS_S3_FORMS_BUCKET || "dev-forms-foirequests")
 
-export const OSS_S3_BUCKET_FULL_PATH = ((window._env_ && window._env_.OSS_S3_HOST) || process.env.OSS_S3_HOST)

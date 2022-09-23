@@ -185,8 +185,8 @@ services:
         - REACT_APP_AXIS_API_URL=${AXIS_API_URL}
         - REACT_APP_SOCKETIO_CONNECT_NONCE=${SOCKETIO_CONNECT_NONCE}
         - PAYMENT_EXPIRY_DAYS=${PAYMENT_EXPIRY_DAYS}
-        - OSS_S3_FORMS_BUCKET=${OSS_S3_FORMS_BUCKET}
-        - OSS_S3_HOST=${OSS_S3_HOST}
+        - REACT_APP_OSS_S3_FORMS_BUCKET=${OSS_S3_FORMS_BUCKET}
+        - REACT_APP_OSS_S3_HOST=${OSS_S3_HOST}
     volumes:
       - ".:/app"
       - "/app/node_modules"
