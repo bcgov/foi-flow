@@ -56,8 +56,6 @@ export const ContactApplicant = ({
 
   const dispatch = useDispatch();
 
-  console.log(applicantCorrespondence)
-
   const userGroups = userDetail.groups.map((group: any) => group.slice(1));  
   const fullNameList = getFullnameList()
 
@@ -100,7 +98,6 @@ export const ContactApplicant = ({
         res.map(async (header: any, _index: any) => {
           getFileFromS3(header, async (_err: any, response: any) => {
             const text = await new Response(response.data).text()
-            console.log(text)
           });
         });
       }
@@ -109,6 +106,8 @@ export const ContactApplicant = ({
 
   const formHistory: Array<any> = useSelector((state: any) => state.foiRequests.foiRequestCFRFormHistory);
   const approvedForm = formHistory?.find(form => form?.status?.toLowerCase() === 'approved');
+  const existingCorrespondence = applicantCorrespondence?.find((correspondence: any) => correspondence?.id === approvedForm?.cfrfeeid)
+  const previewButtonValue = existingCorrespondence ? "Preview & Resend Email" : "Preview & Send Email";
 
   const templates = {
     newestimate: {
@@ -451,7 +450,7 @@ export const ContactApplicant = ({
               }}
               color="primary"
             >
-              Preview & Send Email
+              {previewButtonValue}
             </button>
           </div>
         </div>
