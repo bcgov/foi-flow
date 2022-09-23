@@ -29,6 +29,7 @@ from request_api.utils.cache import cache_filter, response_filter
 from request_api.schemas.foiapplicantcorrespondencelog import  FOIApplicantCorrespondenceSchema
 from request_api.auth import auth, AuthHelper
 from request_api.services.requestservice import requestservice
+from request_api.services.cfrfeeservice import cfrfeeservice
 
 API = Namespace('FOIApplicantCorrespondenceLog', description='Endpoints for FOI Applicant Correspondence Log')
 TRACER = Tracer.get_instance()
@@ -85,14 +86,16 @@ class FOIFlowApplicantCorrespondence(Resource):
     @auth.require
     def post(requestid, ministryrequestid):
         try:
-           requestjson = request.get_json()
-           applicantcorrespondencelog = FOIApplicantCorrespondenceSchema().load(data=requestjson)           
-           userid = AuthHelper.getuserid()
-           result = applicantcorrespondenceservice().saveapplicantcorrespondencelog(templateid=applicantcorrespondencelog['templateid'],
-           ministryrequestid=ministryrequestid,createdby=userid,messagehtml=applicantcorrespondencelog['correspondencemessagejson'],attachments=applicantcorrespondencelog['attachments'])
-           requestservice().postcorrespondenceeventtoworkflow(ministryrequestid,  requestid, result.identifier, applicantcorrespondencelog['attributes'], applicantcorrespondencelog['templateid'])
+            requestjson = request.get_json()
+            applicantcorrespondencelog = FOIApplicantCorrespondenceSchema().load(data=requestjson)           
+            userid = AuthHelper.getuserid()
+            result = applicantcorrespondenceservice().saveapplicantcorrespondencelog(templateid=applicantcorrespondencelog['templateid'],
+            ministryrequestid=ministryrequestid,createdby=userid,messagehtml=applicantcorrespondencelog['correspondencemessagejson'],attachments=applicantcorrespondencelog['attachments'])
+            if cfrfeeservice().getactivepayment(requestid, ministryrequestid) != None:
+                requestservice().postfeeeventtoworkflow(requestid, ministryrequestid, "CANCELLED")
+            requestservice().postcorrespondenceeventtoworkflow(ministryrequestid,  requestid, result.identifier, applicantcorrespondencelog['attributes'], applicantcorrespondencelog['templateid'])
            
-           return {'status': result.success, 'message':result.message,'id':result.identifier} , 200      
+            return {'status': result.success, 'message':result.message,'id':result.identifier} , 200      
         except BusinessException:
             return "Error happened while saving  applicant correspondence log" , 500 
    
