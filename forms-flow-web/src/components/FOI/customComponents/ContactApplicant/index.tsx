@@ -68,14 +68,6 @@ export const ContactApplicant = ({
       {value: "", label: "", templateid: null, text: "", disabled: true}, 
       {value: "", label: "None", templateid: null, text: "", disabled: false}
     ];
-    let template = "";
-    let templateItem: Template = {
-      value: "",
-      label: "",
-      templateid: 0,
-      text: "",
-      disabled: false
-    }
 
     applicantCorrespondenceTemplates.forEach((item: any) => {
       const rootpath = OSS_S3_BUCKET_FULL_PATH
@@ -90,7 +82,7 @@ export const ContactApplicant = ({
         if (!err) {
           res.map(async (header: any, _index: any) => {
             getFileFromS3(header, async (_err: any, response: any) => {
-              templateItem = {
+              let templateItem: Template = {
                 value: item.name,
                 label: item.description,
                 templateid: item.templateid,
@@ -104,7 +96,7 @@ export const ContactApplicant = ({
         }
       });
     });
-  }, [])
+  }, [isCFRFormApproved])
 
   const [messages, setMessages] = useState(applicantCorrespondence);
 
