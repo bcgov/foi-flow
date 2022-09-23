@@ -668,6 +668,12 @@ const FOIRequest = React.memo(({ userDetail }) => {
     );
   }
 
+  const showContactApplicantTab = () => {
+    return (requestState !== StateEnum.intakeinprogress.name &&
+      requestState !== StateEnum.unopened.name &&
+      requestState !== StateEnum.open.name)
+  }
+
   return (!isLoading &&
     requestDetails &&
     Object.keys(requestDetails).length !== 0) ||
@@ -738,7 +744,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
                   Comments{" "}
                   {requestNotes?.length > 0 ? `(${requestNotes.length})` : ""}
                 </div>
-                <div
+                {showContactApplicantTab() && <div
                   className={clsx("tablinks", {
                     active: tabLinksStatuses.ContactApplicant.active,
                   })}
@@ -747,7 +753,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
                 >
                   Contact Applicant{" "}
                   {applicantCorrespondence?.length > 0 ? `(${applicantCorrespondence.length})` : ""}
-                </div>
+                </div>}
               </>
             )}
           </div>
@@ -1043,7 +1049,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
               <Loading />
             )}
           </div>
-          <div
+          {showContactApplicantTab() && <div
             id="ContactApplicant"
             className={clsx("tabcontent", {
               active: tabLinksStatuses.ContactApplicant.active,
@@ -1052,9 +1058,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
             })}
           >
             {!isLoading &&
-            requestNotes &&
-            (iaoassignedToList?.length > 0 ||
-              ministryAssignedToList?.length > 0) ? (
+            applicantCorrespondence  ? (
               <>
                 <ContactApplicant
                   requestNumber={requestNumber}
@@ -1070,7 +1074,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
             ) : (
               <Loading />
             )}
-          </div>
+          </div>}
         </div>
       </div>
     </div>

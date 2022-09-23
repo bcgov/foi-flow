@@ -33,7 +33,7 @@ export const ContactApplicant = ({
 }: any) => {
 
   const dispatch = useDispatch();
-  
+
   const isCFRFormApproved: boolean = useSelector((state: any) => state.foiRequests.foiRequestCFRFormHistory.length > 0);
 
   const fullNameList = getFullnameList()
@@ -61,17 +61,16 @@ export const ContactApplicant = ({
     setModal(true);
   }
   const [files, setFiles] = useState([]);
-  const [templates, setTemplates] = useState<any[]>([{value: "", label: "", templateid: null, text: "", disabled: true}]);  
- 
+  const [templates, setTemplates] = useState<any[]>([{value: "", label: "", templateid: null, text: "", disabled: true}]);
+
   React.useEffect(() => {
     let templateList: any = [
-      {value: "", label: "", templateid: null, text: "", disabled: true}, 
+      {value: "", label: "", templateid: null, text: "", disabled: true},
       {value: "", label: "None", templateid: null, text: "", disabled: false}
     ];
 
     applicantCorrespondenceTemplates.forEach((item: any) => {
       const rootpath = OSS_S3_BUCKET_FULL_PATH
-      console.log(rootpath)
 
       const fileInfoList = [{
         filename: item.name,
@@ -125,6 +124,11 @@ export const ContactApplicant = ({
 
   const removeFile = (index: number) => {
     setFiles(prev => prev.filter((file, i) => i !== index))
+  }
+
+  const onFilterChange = (filterValue: string) => {
+    let _filteredMessages = filterValue === "" ? applicantCorrespondence : applicantCorrespondence.filter((c: any) => c.text.toLowerCase().indexOf(filterValue.toLowerCase()) > -1)
+    setMessages(_filteredMessages)
   }
 
   const saveAttachments = async () => {
@@ -248,7 +252,6 @@ export const ContactApplicant = ({
           alignItems="center"
           xs={12}
           className="search-grid-container"
-          // sx={{ display: "inline-block"}}
         >
           <Paper
             component={Grid}
@@ -272,17 +275,13 @@ export const ContactApplicant = ({
               direction="row"
               xs={true}
               className="search-grid"
-              // sx={{
-              //   borderRight: "2px solid #38598A",
-              //   backgroundColor: "rgba(56,89,138,0.1)",
-              // }}
             >
               <label className="hideContent">Search Correspondence</label>
               <InputBase
                 id="foicommentfilter"
                 placeholder="Search Correspondence ..."
                 defaultValue={""}
-                // onChange={(e: any)=>{oncommentfilterkeychange(e.target.value.trim())}}
+                onChange={(e: any)=>{onFilterChange(e.target.value.trim())}}
                 sx={{
                   color: "#38598A",
                 }}
@@ -290,7 +289,6 @@ export const ContactApplicant = ({
                   <InputAdornment position="start">
                     <IconButton
                       className="search-icon"
-                      // sx={{ color: "#38598A" }}
                     >
                       <span className="hideContent">Search Correspondence ...</span>
                       <SearchIcon />
