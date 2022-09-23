@@ -2,6 +2,7 @@ from request_api.models.ApplicationCorrespondenceTemplates import ApplicationCor
 from request_api.models.FOIApplicantCorrespondences import FOIApplicantCorrespondence
 from request_api.models.FOIMinistryRequests import FOIMinistryRequest
 import maya
+import json
 class applicantcorrespondenceservice:
 
     def getapplicantcorrespondencetemplates(self):
@@ -29,12 +30,14 @@ class applicantcorrespondenceservice:
                         "filename" : _attachment.attachmentfilename,
                     }
                     attachments.append(attachment)
-
+                (_correspondencemessagejson, _isjson) = self.__getjsonobject(_correpondencelog['correspondencemessagejson'])
                 correpondencelog ={
                     "applicantcorrespondenceid":_correpondencelog['applicantcorrespondenceid'],
                     "parentapplicantcorrespondenceid":_correpondencelog['parentapplicantcorrespondenceid'],
                     "templateid":_correpondencelog['templateid'],
-                    "text":_correpondencelog['correspondencemessagejson'],
+                    "text":self.__getvaluefromjson(_correspondencemessagejson, 'emailhtml') if _isjson else _correspondencemessagejson,
+                    "id": self.__getvaluefromjson(_correspondencemessagejson, 'id') if _isjson else None,
+                    "type": self.__getvaluefromjson(_correspondencemessagejson, 'type') if _isjson else None,
                     "created_at":_correpondencelog['created_at'],
                     "createdby":_correpondencelog['createdby'],
                     "date": maya.parse(_correpondencelog["created_at"]).datetime(to_timezone='America/Vancouver', naive=False).strftime('%Y %b %d | %I:%M %p'),
@@ -56,3 +59,14 @@ class applicantcorrespondenceservice:
     def getapplicantcorrespondencelogbyid(self, applicantcorrespondenceid):
         return FOIApplicantCorrespondence.getapplicantcorrespondencebyid(applicantcorrespondenceid)
 
+
+
+    def __getjsonobject(self, correspondencemessagejson):
+        try:
+            data = json.loads(correspondencemessagejson)
+        except ValueError:
+            return correspondencemessagejson, False
+        return data, True
+
+    def __getvaluefromjson(self, jsonobject, property):
+        return jsonobject[property] if property in jsonobject else ""

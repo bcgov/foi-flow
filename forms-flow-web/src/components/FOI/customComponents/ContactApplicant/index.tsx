@@ -16,6 +16,7 @@ import type { params, CFRFormData } from './types';
 import { calculateFees } from './util';
 import foiFees from '../../../../constants/FOI/foiFees.json';
 import { fetchApplicantCorrespondence, saveEmailCorrespondence } from "../../../../apiManager/services/FOI/foiCorrespondenceServices";
+import { fetchCFRForm } from "../../../../apiManager/services/FOI/foiCFRFormServices";
 import _ from 'lodash';
 import { toast } from "react-toastify";
 import { StateEnum } from '../../../../constants/FOI/statusEnum';
@@ -55,8 +56,9 @@ export const ContactApplicant = ({
 
   const dispatch = useDispatch();
 
-  const userGroups = userDetail.groups.map((group: any) => group.slice(1));
+  console.log(applicantCorrespondence)
 
+  const userGroups = userDetail.groups.map((group: any) => group.slice(1));  
   const fullNameList = getFullnameList()
 
   const getFullname = (userid: string) => {
@@ -89,6 +91,10 @@ export const ContactApplicant = ({
     s3sourceuri: "https://citz-foi-prod.objectstore.gov.bc.ca/dev-forms-foirequests/TEMPLATES/EMAILS/fee_estimate_notification.html"
   }]
   React.useEffect(() => {
+    fetchCFRForm(
+      ministryId,
+      dispatch,
+    );
     getOSSHeaderDetails(fileInfoList, dispatch, (err: any, res: any) => {
       if (!err) {
         res.map(async (header: any, _index: any) => {
@@ -100,6 +106,9 @@ export const ContactApplicant = ({
       }
     });
   }, []);
+
+  const formHistory: Array<any> = useSelector((state: any) => state.foiRequests.foiRequestCFRFormHistory);
+  const approvedForm = formHistory?.find(form => form?.status?.toLowerCase() === 'approved');
 
   const templates = {
     newestimate: {
@@ -220,9 +229,14 @@ export const ContactApplicant = ({
       });
       dispatch(fetchApplicantCorrespondence(requestId, ministryId));
     }
+    const templateId = currentTemplate ? templates[currentTemplate as keyof typeof templates].templateid : null;
+    const type = (templateId && [1,2].includes(templateId)) ? "CFRFee": "";
     let data = {
       templateid: currentTemplate ? templates[currentTemplate as keyof typeof templates].templateid : null,
-      correspondencemessagejson: editorValue,
+      correspondencemessagejson: JSON.stringify ({"emailhtml": editorValue,
+                                  "id": approvedForm?.cfrfeeid,
+                                  "type": type
+                                  }),
       foiministryrequest_id: ministryId,
       attachments: attachments,
       attributes: [{"paymentExpiryDate": dueDateCalculation(new Date(), PAYMENT_EXPIRY_DAYS)}]
