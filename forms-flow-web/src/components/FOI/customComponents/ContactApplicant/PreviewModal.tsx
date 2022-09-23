@@ -11,6 +11,7 @@ import CloseIcon from '@material-ui/icons/Close';
 import type { previewParams } from './types';
 import { getOSSHeaderDetails, getFileFromS3 } from "../../../../apiManager/services/FOI/foiOSSServices";
 import { renderTemplate, applyVariables } from './util';
+import { OSS_S3_BUCKET_FULL_PATH } from "../../../../constants/constants"
 
 export const PreviewModal = React.memo(({
   modalOpen,
@@ -27,11 +28,12 @@ export const PreviewModal = React.memo(({
   const requestDetails: any = useSelector((state: any) => state.foiRequests.foiRequestDetail);
 
   //get template
+  const rootpath = OSS_S3_BUCKET_FULL_PATH
   const templatePath = "/TEMPLATES/EMAILS/header_footer_template.html";
   const [template, setTemplate] = useState("");
   const fileInfoList = [{
     filename: "header_footer_template.html",
-    s3sourceuri: "https://citz-foi-prod.objectstore.gov.bc.ca/dev-forms-foirequests"+templatePath
+    s3sourceuri: rootpath+templatePath
   }]
   React.useEffect(() => {
     getOSSHeaderDetails(fileInfoList, dispatch, (err: any, res: any) => {
