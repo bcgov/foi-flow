@@ -14,6 +14,9 @@ export const fetchApplicantCorrespondence = (
   ministryId,
   errorCallback = null
 ) => {
+  if (ministryId == null) {
+    return () => {};
+  }
   const apiUrl = replaceUrl(
     API.FOI_GET_EMAIL_CORRESPONDENCE,
     "<ministryrequestid>",
