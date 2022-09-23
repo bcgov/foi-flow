@@ -3,6 +3,7 @@ from os import stat
 from re import VERBOSE
 from request_api.models.FOIRequestCFRFees import FOIRequestCFRFee
 from request_api.models.FOIMinistryRequests import FOIMinistryRequest
+from request_api.models.FOIRequestPayments import FOIRequestPayment
 from request_api.services.cfrfeestatusservice import cfrfeestatusservice
 from dateutil.parser import parse
 
@@ -29,6 +30,9 @@ class cfrfeeservice:
         cfrfee = self.__preparecfrfee(ministryrequestid, data)
         cfrfee.feedata.update(data.get('feedata', {}))
         return FOIRequestCFRFee.createcfrfee(cfrfee, userid)
+
+    def getactivepayment(self, foirequestid, ministryrequestid):
+        return FOIRequestPayment.getactivepayment(foirequestid, ministryrequestid)
 
     def paycfrfee(self, ministryrequestid, amountpaid):
         cfrfee = self.__preparecfrfee(ministryrequestid)
