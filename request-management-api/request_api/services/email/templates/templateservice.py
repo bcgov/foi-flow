@@ -71,5 +71,4 @@ class templateservice:
         return finaltemplatedhtml
     
     def __generatecorrespondencetetemplate(self, applicantcorrespondenceid):
-        applicantcorrespondence = applicantcorrespondenceservice().getapplicantcorrespondencelogbyid(applicantcorrespondenceid)
-        return applicantcorrespondence["correspondencemessagejson"] if applicantcorrespondence["correspondencemessagejson"] else None
+        return applicantcorrespondenceservice().getapplicantcorrespondencelogbyid(applicantcorrespondenceid)

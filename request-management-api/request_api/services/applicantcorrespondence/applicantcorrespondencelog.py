@@ -3,6 +3,7 @@ from request_api.models.FOIApplicantCorrespondences import FOIApplicantCorrespon
 from request_api.models.FOIMinistryRequests import FOIMinistryRequest
 import maya
 import json
+from html.parser import HTMLParser
 class applicantcorrespondenceservice:
 
     def getapplicantcorrespondencetemplates(self):
@@ -57,7 +58,11 @@ class applicantcorrespondenceservice:
         return FOIApplicantCorrespondence.saveapplicantcorrespondence(applicantcorrespondencelog,attachments)
     
     def getapplicantcorrespondencelogbyid(self, applicantcorrespondenceid):
-        return FOIApplicantCorrespondence.getapplicantcorrespondencebyid(applicantcorrespondenceid)
+        applicantcorrespondence =  FOIApplicantCorrespondence.getapplicantcorrespondencebyid(applicantcorrespondenceid)
+        (_correspondencemessagejson, _isjson) = self.__getjsonobject(applicantcorrespondence["correspondencemessagejson"])
+        parser = HTMLParser()
+        emailhtml_decoded_string = parser.unescape(self.__getvaluefromjson(_correspondencemessagejson, 'emailhtml')) 
+        return emailhtml_decoded_string if _isjson else _correspondencemessagejson
 
 
 
