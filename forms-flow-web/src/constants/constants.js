@@ -36,3 +36,9 @@ process.env.REACT_APP_FOI_FLOW_REPORTING_URL;
 export const SOCKETIO_CONNECT_NONCE =
   (window._env_ && window._env_.REACT_APP_SOCKETIO_CONNECT_NONCE) ||
   process.env.REACT_APP_SOCKETIO_CONNECT_NONCE;
+
+// export const OSS_S3_BUCKET_FULL_PATH = "https://" + ((window._env_ && window._env_.OSS_S3_HOST) ||
+// process.env.OSS_S3_HOST)+ "/" + ((window._env_ && window._env_.OSS_S3_FORMS_BUCKET) ||
+// process.env.OSS_S3_FORMS_BUCKET)
+
+export const OSS_S3_BUCKET_FULL_PATH = ((window._env_ && window._env_.OSS_S3_HOST) || process.env.OSS_S3_HOST)

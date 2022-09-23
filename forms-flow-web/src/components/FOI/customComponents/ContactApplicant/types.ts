@@ -1,37 +1,18 @@
-export type CFRFormData = {
-    cfrfeeid?: any;
-    formStatus: string;
-    amountDue: number;
-    amountPaid: number;
-    balanceRemaining: number;
-    estimates: {
-      locating: number;
-      producing: number;
-      ministryPreparing: number;
-      iaoPreparing: number;
-      electronicPages: number;
-      hardcopyPages: number;
-    };
-    actual: {
-      locating: number;
-      producing: number;
-      ministryPreparing: number;
-      iaoPreparing: number;
-      electronicPages: number;
-      hardcopyPages: number;
-    };
-    suggestions: string;
+export interface Template {
+  value: string;
+  label: string;
+  templateid: number;
+  text: string;
+  disabled: boolean;
 }
 
-export type params = {
+export type params = {  
   requestNumber: string;
-  requestState: string;
   ministryId: number;
+  ministryCode: string;
   requestId: number;
-  userDetail: {
-    groups: string[];
-  };
-  setCFRUnsaved: Function;
+  applicantCorrespondence: Array<any>;
+  applicantCorrespondenceTemplates: Array<any>;
 }
 
 export type modalParams = {

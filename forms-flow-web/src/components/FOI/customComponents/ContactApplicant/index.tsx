@@ -4,58 +4,37 @@ import TextField from '@mui/material/TextField';
 import InputAdornment from "@mui/material/InputAdornment";
 import MenuItem from '@mui/material/MenuItem';
 import './index.scss'
-import Accordion from '@mui/material/Accordion';
-import AccordionSummary from '@mui/material/AccordionSummary';
-import AccordionDetails from '@mui/material/AccordionDetails';
-import Typography from '@mui/material/Typography';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import Box from '@mui/material/Box';
-import Chip from '@mui/material/Chip';
-import { errorToast, isMinistryLogin } from "../../../../helper/FOI/helper";
-import type { params, CFRFormData } from './types';
-import { calculateFees } from './util';
-import foiFees from '../../../../constants/FOI/foiFees.json';
+import { errorToast } from "../../../../helper/FOI/helper";
+import { toast } from "react-toastify";
+import type { params, Template } from './types';
 import { fetchApplicantCorrespondence, saveEmailCorrespondence, fetchApplicantCorrespondenceTemplates } from "../../../../apiManager/services/FOI/foiCorrespondenceServices";
 import _ from 'lodash';
-import { toast } from "react-toastify";
-import { StateEnum } from '../../../../constants/FOI/statusEnum';
-import { returnToQueue } from '../../../FOI/FOIRequest/BottomButtonGroup/utils';
-import CustomizedTooltip from '../Tooltip/MuiTooltip/Tooltip';
-import Dialog from '@material-ui/core/Dialog';
-import DialogActions from '@material-ui/core/DialogActions';
-import DialogContent from '@material-ui/core/DialogContent';
-import DialogContentText from '@material-ui/core/DialogContentText';
-import DialogTitle from '@material-ui/core/DialogTitle';
-import CloseIcon from '@material-ui/icons/Close';
 import IconButton from '@material-ui/core/IconButton';
 import Grid from "@material-ui/core/Grid";
 import Paper from "@mui/material/Paper";
 import SearchIcon from "@material-ui/icons/Search";
 import InputBase from "@mui/material/InputBase";
-import { SxProps } from '@mui/material';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import { getFullnameList } from '../../../../helper/FOI/helper'
 import CommentStructure from '../Comments/CommentStructure'
 import AttachmentModal from '../Attachments/AttachmentModal';
-import { MimeTypeList, MaxFileSizeInMB } from "../../../../constants/FOI/enum";
 import { getOSSHeaderDetails, saveFilesinS3, getFileFromS3 } from "../../../../apiManager/services/FOI/foiOSSServices";
 import { PreviewModal } from './PreviewModal';
+import { OSS_S3_BUCKET_FULL_PATH } from "../../../../constants/constants"
 
 export const ContactApplicant = ({
   requestNumber,
-  requestState,
   ministryId,
   ministryCode,
   requestId,
-  userDetail,
   applicantCorrespondence,
   applicantCorrespondenceTemplates,
 }: any) => {
 
   const dispatch = useDispatch();
-
-  const userGroups = userDetail.groups.map((group: any) => group.slice(1));
+  
+  const isCFRFormApproved: boolean = useSelector((state: any) => state.foiRequests.foiRequestCFRFormHistory.length > 0);
 
   const fullNameList = getFullnameList()
 
@@ -82,26 +61,25 @@ export const ContactApplicant = ({
     setModal(true);
   }
   const [files, setFiles] = useState([]);
-  const [templates, setTemplates] = useState<any[]>([{value: "", label: "", templateid: null, text: ""}]);
-  interface Template {
-    value: string;
-    label: string;
-    templateid: number;
-    text: string;
-  }
+  const [templates, setTemplates] = useState<any[]>([{value: "", label: "", templateid: null, text: "", disabled: true}]);  
  
   React.useEffect(() => {
-    let templateList: any = [{value: "", label: "", templateid: null, text: ""}];
+    let templateList: any = [
+      {value: "", label: "", templateid: null, text: "", disabled: true}, 
+      {value: "", label: "None", templateid: null, text: "", disabled: false}
+    ];
     let template = "";
     let templateItem: Template = {
       value: "",
       label: "",
       templateid: 0,
-      text: ""
+      text: "",
+      disabled: false
     }
 
     applicantCorrespondenceTemplates.forEach((item: any) => {
-      const rootpath = "https://citz-foi-prod.objectstore.gov.bc.ca/dev-forms-foirequests"
+      const rootpath = OSS_S3_BUCKET_FULL_PATH
+      console.log(rootpath)
 
       const fileInfoList = [{
         filename: item.name,
@@ -116,7 +94,8 @@ export const ContactApplicant = ({
                 value: item.name,
                 label: item.description,
                 templateid: item.templateid,
-                text: await new Response(response.data).text()
+                text: await new Response(response.data).text(),
+                disabled: !isCFRFormApproved
               }
               templateList.push(templateItem);
               setTemplates(templateList);
@@ -359,13 +338,13 @@ export const ContactApplicant = ({
               size="small"
               fullWidth
             >
-              {templates.map((element: any, index: any) => (
+              {templates.map((template: any, index: any) => (
               <MenuItem
                 key={index}
                 value={index}
-                // disabled={option.disabled}
+                disabled={template.disabled}
               >
-                {element.label}
+                {template.label}
               </MenuItem>
               ))}
             </TextField>
