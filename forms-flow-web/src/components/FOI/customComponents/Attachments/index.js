@@ -63,12 +63,7 @@ export const AttachmentSection = ({
   isMinistryCoordinator
 }) => {
   const classes = useStyles();
-  const [attachments, setAttachments] = useState(attachmentsArray.filter(
-    attachment => {
-      return ['feeassessed-onhold', 'fee estimate - payment receipt', 'response-onhold', 'fee balance outstanding - payment receipt']
-      .indexOf(attachment.category.toLowerCase()) === -1
-    }
-  ))
+  const [attachments, setAttachments] = useState(attachmentsArray)
   
   useEffect(() => {
     setAttachments(attachmentsArray);
