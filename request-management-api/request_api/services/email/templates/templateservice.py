@@ -23,27 +23,34 @@ class templateservice:
 
     def generate_by_servicename_and_schema(self, servicename, requestjson, applicantcorrespondenceid = None):
         try:
-            _template = self.__gettemplatewrapper(servicename, requestjson)
-            return self.__generatetemplate(_template, requestjson)
+            _template = self.__gettemplate(servicename)
+            if _template is None:
+                _templatename = self.__gettemplatenamewrapper(servicename, requestjson)
+                _template = self.__gettemplate(_templatename)
+            if (applicantcorrespondenceid):
+                emailtemplatehtml = self.__generatecorrespondencetetemplate(applicantcorrespondenceid)
+            else:
+                emailtemplatehtml= storageservice().downloadtemplate(_template.documenturipath)
+            return self.__generatetemplate(requestjson, emailtemplatehtml, _template.description)
         except Exception as ex:
             logging.exception(ex)
         return None
 
-    def __gettemplatewrapper(self, servicename, requestjson):
-        _template = self.__gettemplate(servicename)
-        if _template is None:
+    def __gettemplatenamewrapper(self, servicename, requestjson):
+        _templatename = templateconfig().gettemplatename(servicename)
+        if _templatename is None:
             if requestjson is not None and requestjson != {}:
                 balancedue = float(requestjson['cfrfee']['feedata']["balanceDue"])
                 prevstate = self.__getprevstate(requestjson)
                 if balancedue > 0:
-                    return self.__gettemplate("HALFPAYMENT")
+                    return templateconfig().gettemplatename("HALFPAYMENT")
                 elif balancedue == 0:
                     templatekey = "FULLPAYMENT"
                     if prevstate.lower() == "response":
                         templatekey = "PAYOUTSTANDINGFULLPAYMENT"
-                    return self.__gettemplate(templatekey)
+                    return templateconfig().gettemplatename(templatekey)
 
-        return _template
+        return _templatename
     
     def __getprevstate(self, requestjson):
         return requestjson["stateTransition"][2]["status"] if "stateTransition" in requestjson and len(requestjson["stateTransition"])  > 3 else None
@@ -51,9 +58,8 @@ class templateservice:
     def __gettemplate(self, templatename):
         return ApplicationCorrespondenceTemplate.get_template_by_name(templatename)
     
-    def __generatetemplate(self, emailtemplate, dynamictemplatevalues):
-        headerfooterhtml = storageservice().downloadtemplate('/TEMPLATES/EMAILS/header_footer_template.html')  
-        emailtemplatehtml= storageservice().downloadtemplate(emailtemplate.documenturipath)
+    def __generatetemplate(self, dynamictemplatevalues, emailtemplatehtml, title):
+        headerfooterhtml = storageservice().downloadtemplate('/TEMPLATES/EMAILS/header_footer_template.html')
         if(emailtemplatehtml is None):
             raise ValueError('No template found')
 
@@ -67,7 +73,11 @@ class templateservice:
         contenttemplate = Template(emailtemplatehtml)
         content = contenttemplate.render(dynamictemplatevalues)
         dynamictemplatevalues["content"] = content
-        dynamictemplatevalues['title'] = emailtemplate.description
+        dynamictemplatevalues['title'] = title
         finaltemplate = Template(headerfooterhtml)
         finaltemplatedhtml = finaltemplate.render(dynamictemplatevalues)
         return finaltemplatedhtml, content
+
+    
+    def __generatecorrespondencetetemplate(self, applicantcorrespondenceid):
+        return applicantcorrespondenceservice().getapplicantcorrespondencelogbyid(applicantcorrespondenceid)
