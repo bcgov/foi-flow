@@ -20,9 +20,15 @@ import MoreHorizIcon from "@material-ui/icons/MoreHoriz";
 import IconButton from "@material-ui/core/IconButton";
 import MenuList from "@material-ui/core/MenuList";
 import MenuItem from "@material-ui/core/MenuItem";
+import { getOSSHeaderDetails, getFileFromS3 } from "../../../../apiManager/services/FOI/foiOSSServices";
+import { saveAs } from "file-saver";
+import { downloadZip } from "client-zip";
+import { useDispatch } from "react-redux";
+import * as html2pdf from 'html-to-pdf-js';
+// import { html2pdf } from "html-to-pdf-js";
 
 
-const CommentStructure = ({ i, reply, parentId, totalcommentCount, currentIndex, isreplysection, hasAnotherUserComment, fullName, isEmail=false}) => {
+const CommentStructure = ({ i, reply, parentId, totalcommentCount, currentIndex, isreplysection, hasAnotherUserComment, fullName, isEmail=false, ministryId=null}) => {
 
   const actions = useContext(ActionContext)
   const edit = true
@@ -32,6 +38,8 @@ const CommentStructure = ({ i, reply, parentId, totalcommentCount, currentIndex,
 
   needCollapsed = isreplysection && totalcommentCount > 3 && currentIndex < totalcommentCount - 2 ? true : false
 
+
+  const dispatch = useDispatch();
 
   const [toggleIcon, settoggleIcon] = useState(faCaretDown)
 
@@ -117,27 +125,37 @@ const CommentStructure = ({ i, reply, parentId, totalcommentCount, currentIndex,
         }}
         onClose={() => setPopoverOpen(false)}
       >
-        <MenuList>
-          <MenuItem
-            onClick={() => {
-                actions.handleAction(i.commentId, edit)
-                setPopoverOpen(false);
-            }}
-          >
-            Edit
-          </MenuItem>
-          <MenuItem
-            onClick={() => {
-                closeTooltip();
-                setDeletePopoverOpen(true);
-                setPopoverOpen(false);
-            }}
-          >
-            Delete
-            
-            
-          </MenuItem>          
-        </MenuList>
+        {isEmail ?
+          <MenuList>
+            <MenuItem
+              onClick={() => {
+                  download();
+                  setPopoverOpen(false);
+              }}
+            >
+              Download
+            </MenuItem>
+          </MenuList> :
+          <MenuList>
+            <MenuItem
+              onClick={() => {
+                  actions.handleAction(i.commentId, edit)
+                  setPopoverOpen(false);
+              }}
+            >
+              Edit
+            </MenuItem>
+            <MenuItem
+              onClick={() => {
+                  closeTooltip();
+                  setDeletePopoverOpen(true);
+                  setPopoverOpen(false);
+              }}
+            >
+              Delete
+            </MenuItem>
+          </MenuList>
+        }
       </Popover>
       <DeleteAction />
       </>
@@ -147,6 +165,33 @@ const CommentStructure = ({ i, reply, parentId, totalcommentCount, currentIndex,
   const handleDialogClose = () => {
     closeTooltip()
     setDeletePopoverOpen(false);
+  }
+
+  const download = async () => {
+    let fileInfoList = i.attachments.map(attachment => {
+      return  {
+        filename: attachment.filename,
+        s3sourceuri: attachment.documenturipath
+      }
+    })
+    let blobs = [];
+    try {
+      const response = await getOSSHeaderDetails(fileInfoList, dispatch);
+      for (let header of response.data) {
+        await getFileFromS3(header, (_err, res) => {
+          let blob = new Blob([res.data], {type: "application/octet-stream"});
+          blobs.push({name: header.filename, lastModified: res.headers['last-modified'], input: blob})
+        });
+      }
+    } catch (error) {
+      console.log(error)
+    }
+    const element = document.querySelector(`[data-msg-halfdiv-id="${currentIndex}"]`);
+    html2pdf().from(element).outputPdf('blob').then(async (blob) => {
+      blobs.push({name: "Email Body.pdf", lastModified: new Date(), input: blob})
+      const zipfile = await downloadZip(blobs).blob()
+      saveAs(zipfile, fullName + " " + i.date.replace("|", "") + ".zip");
+    });
   }
 
   const DeleteAction = () => {
@@ -209,7 +254,7 @@ const CommentStructure = ({ i, reply, parentId, totalcommentCount, currentIndex,
 
   return (
     <>
-      <div name={needCollapsed ? `hiddenreply_${parentId}` : `reply_${parentId}`} className={halfDivclassname} style={needCollapsed ? { display: 'none' } : {}} >
+      <div {...(isEmail ? {"data-msg-halfdiv-id":`${currentIndex}`} : {})} name={needCollapsed ? `hiddenreply_${parentId}` : `reply_${parentId}`} className={halfDivclassname} style={needCollapsed ? { display: 'none' } : {}} >
         <div
           className="userInfo"
           style={reply ? { marginLeft: 15, marginTop: '6px' }: {}}
@@ -225,9 +270,9 @@ const CommentStructure = ({ i, reply, parentId, totalcommentCount, currentIndex,
 
             
         </div>
-        {!isEmail && <div className="userActions">
+        <div className="userActions">
           <div>
-            {i.commentTypeId === 1 && actions.userId === i.userId && actions.user && (
+            {(isEmail || (i.commentTypeId === 1 && actions.userId === i.userId && actions.user)) && (
                 <>
                     <IconButton
                     aria-label= "actions"
@@ -247,7 +292,7 @@ const CommentStructure = ({ i, reply, parentId, totalcommentCount, currentIndex,
                 </>
             )}
           </div>
-          <div>
+          {!isEmail && <div>
             <button id={`btncomment${i.commentId}`}
               className={`replyBtn ${(totalcommentCount === -100 || (isreplysection && totalcommentCount - 1 > currentIndex)) ? " hide" : " show"}`}
               onClick={() => actions.handleAction(i.commentId)}
@@ -256,11 +301,11 @@ const CommentStructure = ({ i, reply, parentId, totalcommentCount, currentIndex,
               {' '}
               <FontAwesomeIcon icon={faReply} size='1x' color='#003366' /> Reply
             </button>
-          </div>
-        </div>}
+          </div>}
+        </div>
         {isEmail && i.attachments?.map((attachment) => (
           <div className="email-attachment-item" key={attachment.filename}>
-            <u>{attachment.filename}</u>
+            <a href={`/foidocument?id=${ministryId}&filepath=${attachment.documenturipath.split('/').slice(4).join('/')}`}>{attachment.filename}</a>
           </div>
         ))}
       </div>

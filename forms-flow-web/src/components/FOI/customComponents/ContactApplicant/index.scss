@@ -70,3 +70,16 @@
     margin-top: 2px;
   }
 }
+
+.preview-container {
+  margin-left: 1em;
+  margin-right: 1em;
+}
+
+.preview-frame {
+  width: 100%;
+  min-height: 500px;
+  max-height: 900px;
+  border: none;
+  overflow: hidden;
+}

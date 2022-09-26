@@ -140,86 +140,88 @@
 
 }
 
-.commentsection{
-  .halfDiv{
-    display: flex;
-    justify-content: space-between;
-    flex-wrap: wrap;
+.halfDiv{
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
 
-    .email-attachment-item{
-      background-color: #4e7095;
+  .email-attachment-item{
+    background-color: #4e7095;
+    color: white;
+    margin: 10px 15px;
+    padding: 5px 10px;
+    width: 100%;
+    a {
       color: white;
-      margin: 10px 15px;
-      padding: 5px 10px;
-      width: 100%;
+      text-decoration: underline;
     }
+  }
+  
+
+  .userInfo{
+    display: flex;
+    flex-direction: column;
+    max-width: calc(100% - 70px);
     
 
-    .userInfo{
+    .commentsTwo{
       display: flex;
-      flex-direction: column;
-      max-width: calc(100% - 70px);
-     
-  
-      .commentsTwo{
+      margin: 4px 0;
+
+      .fullName{
         display: flex;
-        margin: 4px 0;
-  
-        .fullName{
-          display: flex;
-          margin-left: 10px;
-          font-size: 13px;
-          font-weight: bold;
-          padding-right: 10px;
-          margin-top: 4px;
-        }                
-      }
+        margin-left: 10px;
+        font-size: 13px;
+        font-weight: bold;
+        padding-right: 10px;
+        margin-top: 4px;
+      }                
     }
-    .userActions{  
-      position: relative;
+  }
+  .userActions{  
+    position: relative;
 
-      .actionsBtn{
-        float: right;
-        background-color: transparent;
-        border: none;
-        padding: 6px 12px;
-        border-radius: 50%;
-        cursor: pointer;
+    .actionsBtn{
+      float: right;
+      background-color: transparent;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 50%;
+      cursor: pointer;
 
-        &:hover{
-          outline:none;
-          background-color: #dbdbdb5d;
-        }
-        &:focus {outline:0;}
-        
-      }
-      .replyBtn{
-        position: absolute;
-        bottom: 0;
-        right: 0;
-        vertical-align: bottom;
-        background-color: transparent!important;
-        border:none;
-        color: #003366;
+      &:hover{
         outline:none;
-        font-weight: 600;
-        font-size:13px;       
-        width:70px;
-        padding: 5px;
-        border-radius: 4px;
-        
-        &:hover{
-          outline:none;
-          background-color: rgba(160, 160, 160, 0.315);
-        }
-        &:focus {outline:0;}
-
-        svg {
-          color: #003366;
-        }
+        background-color: #dbdbdb5d;
       }
-     
+      &:focus {outline:0;}
+      
     }
+    .replyBtn{
+      position: absolute;
+      bottom: 0;
+      right: 0;
+      vertical-align: bottom;
+      background-color: transparent!important;
+      border:none;
+      color: #003366;
+      outline:none;
+      font-weight: 600;
+      font-size:13px;       
+      width:70px;
+      padding: 5px;
+      border-radius: 4px;
+      
+      &:hover{
+        outline:none;
+        background-color: rgba(160, 160, 160, 0.315);
+      }
+      &:focus {outline:0;}
+
+      svg {
+        color: #003366;
+      }
+    }
+    
   }
 }
 
