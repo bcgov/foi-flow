@@ -131,7 +131,7 @@ class documentservice:
             filename = document.get('attachmentfilename')
             s3uri = document.get('attachmentdocumenturipath')
             attachment= storageservice().download(s3uri)
-            attachdocument = {"filename": filename, "file": attachment}
+            attachdocument = {"filename": filename, "file": attachment, "url": s3uri}
             attachmentlist.append(attachdocument)
         return attachmentlist
     
