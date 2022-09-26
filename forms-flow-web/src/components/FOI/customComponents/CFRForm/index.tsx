@@ -658,7 +658,7 @@ export const CFRForm = ({
                             e.target.value = parseFloat(e.target.value).toFixed(2);
                           }}
                           fullWidth
-                          disabled={isFeeWaiverDisabled()}
+                          disabled={isMinistry || (!isMinistry && formData?.formStatus !== 'approved')}
                         />
                       </div>
                     </div>
