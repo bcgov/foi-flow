@@ -10,7 +10,7 @@
     <bpmn:group id="Group_0nmwgct" categoryValueRef="CategoryValue_1dcilzu" />
     <bpmn:group id="Group_0ihi2fn" categoryValueRef="CategoryValue_1baekcn" />
   </bpmn:collaboration>
-  <bpmn:process id="foi-fee-processing" name="FOI Fee Processing" isExecutable="true" camunda:versionTag="8">
+  <bpmn:process id="foi-fee-processing" name="FOI Fee Processing" isExecutable="true" camunda:versionTag="3">
     <bpmn:laneSet id="LaneSet_1u7kp6i">
       <bpmn:lane id="Lane_1aaq844" name="Post Payment">
         <bpmn:flowNodeRef>Event_0dlzac7</bpmn:flowNodeRef>
@@ -135,7 +135,7 @@ connector.getVariable("statusCode");</camunda:script>
 execution.setVariable("retry1", current+1);
 execution.setVariable("paymentFormName", "payfeeonline");
 var templatename = execution.getVariable("templateName")
-if (execution.getVariable("prevStatus") == "Response" || (templatename != null &amp;&amp; templatename =="outstandingfeeestimatenotification")) {
+if ((execution.getVariable("prevStatus") != null &amp;&amp; execution.getVariable("prevStatus") == "Response") || (templatename != null &amp;&amp; templatename =="outstandingfeeestimatenotification")) {
 	execution.setVariable("paymentFormName", "payoutstandingform");
 }</camunda:script>
         </camunda:executionListener>
@@ -195,7 +195,9 @@ execution.setVariable('formioRootPassword', system.getenv('FORMIO_ROOT_PASSWORD'
 foiRequestMetaData = foiRequestMetaData.replace(/'/g, '"');
 var obj = JSON.parse(foiRequestMetaData);
 execution.setVariable("paymentExpiryDate",obj.paymentExpiryDate);
-execution.setVariable("prevStatus", obj.previousstatus);</camunda:script>
+if ("previousstatus" in obj) {
+  execution.setVariable("prevStatus", obj.previousstatus);
+}</camunda:script>
         </camunda:executionListener>
         <camunda:executionListener expression="${execution.setVariable(&#34;retry5&#34;, 0)}" event="take" />
       </bpmn:extensionElements>
@@ -223,7 +225,7 @@ execution.setVariable("prevStatus", obj.previousstatus);</camunda:script>
           <camunda:script scriptFormat="javascript">if (execution.getVariable("servicekey") != null &amp;&amp; execution.getVariable("servicekey") == "correspondence"){
   execution.getProcessEngineServices().getRuntimeService().createMessageCorrelation("foi-email").setVariables(execution.variables).setVariable("servicekey","correspondence").correlateWithResult();
 }
-else if (execution.getVariable("prevStatus") == "Response") {
+else if (execution.getVariable("prevStatus") != null &amp;&amp; execution.getVariable("prevStatus") == "Response") {
 	execution.getProcessEngineServices().getRuntimeService().createMessageCorrelation("foi-email").setVariables(execution.variables).setVariable("servicekey","payoutstanding").correlateWithResult();
 }
 else {

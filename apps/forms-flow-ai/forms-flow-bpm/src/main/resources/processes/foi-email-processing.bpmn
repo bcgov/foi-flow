@@ -13,7 +13,7 @@
   <bpmn:collaboration id="Collaboration_18fcj2s">
     <bpmn:participant id="Participant_00kyu4q" name="FOI Email Processing" processRef="foi-email-processing" />
   </bpmn:collaboration>
-  <bpmn:process id="foi-email-processing" name="FOI Email Processing" isExecutable="true" camunda:versionTag="4">
+  <bpmn:process id="foi-email-processing" name="FOI Email Processing" isExecutable="true" camunda:versionTag="2">
     <bpmn:laneSet id="LaneSet_13e9jxh">
       <bpmn:lane id="Lane_05egm04" name="Audit  Email Correspondence">
         <bpmn:flowNodeRef>Event_18tkl5h</bpmn:flowNodeRef>
@@ -227,7 +227,6 @@ execution.setVariable("e_retry2", current+1); </camunda:script>
               </camunda:map>
             </camunda:inputParameter>
             <camunda:inputParameter name="payload">grant_type=client_credentials</camunda:inputParameter>
-            <camunda:inputParameter name="Input_1tli7i1" />
             <camunda:outputParameter name="accessToken">${S(response).prop("access_token").stringValue()}</camunda:outputParameter>
           </camunda:inputOutput>
           <camunda:connectorId>http-connector</camunda:connectorId>
