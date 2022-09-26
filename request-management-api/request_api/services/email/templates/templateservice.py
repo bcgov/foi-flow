@@ -3,6 +3,7 @@ from request_api.services.external.storageservice import storageservice
 from request_api.services.email.templates.templateconfig import templateconfig
 from request_api.services.requestservice import requestservice
 from request_api.services.applicantcorrespondence.applicantcorrespondencelog import applicantcorrespondenceservice
+from request_api.models.ApplicationCorrespondenceTemplates import ApplicationCorrespondenceTemplate
 import json
 import logging
 
@@ -22,12 +23,15 @@ class templateservice:
 
     def generate_by_servicename_and_schema(self, servicename, requestjson, applicantcorrespondenceid = None):
         try:
-            _templatename = self.__gettemplatenamewrapper(servicename, requestjson)
+            _template = self.__gettemplate(servicename)
+            if _template is None:
+                _templatename = self.__gettemplatenamewrapper(servicename, requestjson)
+                _template = self.__gettemplate(_templatename)
             if (applicantcorrespondenceid):
                 emailtemplatehtml = self.__generatecorrespondencetetemplate(applicantcorrespondenceid)
             else:
-                emailtemplatehtml= storageservice().downloadtemplate(_templatename)
-            return self.__generatetemplate(requestjson, emailtemplatehtml)
+                emailtemplatehtml= storageservice().downloadtemplate(_template.documenturipath)
+            return self.__generatetemplate(requestjson, emailtemplatehtml, _template.description)
         except Exception as ex:
             logging.exception(ex)
         return None
@@ -51,8 +55,11 @@ class templateservice:
     def __getprevstate(self, requestjson):
         return requestjson["stateTransition"][2]["status"] if "stateTransition" in requestjson and len(requestjson["stateTransition"])  > 3 else None
 
-    def __generatetemplate(self, dynamictemplatevalues, emailtemplatehtml):
-        headerfooterhtml = storageservice().downloadtemplate('header_footer_template.html')        
+    def __gettemplate(self, templatename):
+        return ApplicationCorrespondenceTemplate.get_template_by_name(templatename)
+    
+    def __generatetemplate(self, dynamictemplatevalues, emailtemplatehtml, title):
+        headerfooterhtml = storageservice().downloadtemplate('/TEMPLATES/EMAILS/header_footer_template.html')
         if(emailtemplatehtml is None):
             raise ValueError('No template found')
 
@@ -66,9 +73,11 @@ class templateservice:
         contenttemplate = Template(emailtemplatehtml)
         content = contenttemplate.render(dynamictemplatevalues)
         dynamictemplatevalues["content"] = content
+        dynamictemplatevalues['title'] = title
         finaltemplate = Template(headerfooterhtml)
         finaltemplatedhtml = finaltemplate.render(dynamictemplatevalues)
-        return finaltemplatedhtml
+        return finaltemplatedhtml, content
+
     
     def __generatecorrespondencetetemplate(self, applicantcorrespondenceid):
         return applicantcorrespondenceservice().getapplicantcorrespondencelogbyid(applicantcorrespondenceid)

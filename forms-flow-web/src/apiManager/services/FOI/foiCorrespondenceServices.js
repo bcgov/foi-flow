@@ -3,7 +3,8 @@ import { httpGETRequest, httpPOSTRequest } from "../../httpRequestHandler";
 import API from "../../endpoints";
   import {
     serviceActionError,
-    setApplicantCorrespondence
+    setApplicantCorrespondence,
+    setApplicantCorrespondenceTemplates
   } from "../../../actions/FOI/foiRequestActions";
   import { replaceUrl } from "../../../helper/FOI/helper";
   import { catchError } from "./foiServicesUtil";
@@ -14,8 +15,12 @@ export const fetchApplicantCorrespondence = (
   ministryId,
   errorCallback = null
 ) => {
+  
+  if (ministryId == null) {
+    return () => {};
+  }
   const apiUrl = replaceUrl(replaceUrl(
-    API.FOI_POST_EMAIL_CORRESPONDENCE,
+    API.FOI_GET_EMAIL_CORRESPONDENCE,
     "<ministryrequestid>",
     ministryId),"<requestid>",requestId
   );
@@ -52,8 +57,7 @@ export const saveEmailCorrespondence = (
   if (!ministryId) {
     dispatch(serviceActionError("No request id"));
   }
-  let baseUrl = API.FOI_POST_EMAIL_CORRESPONDENCE;
-
+  
   const apiUrl = replaceUrl(replaceUrl(
     API.FOI_POST_EMAIL_CORRESPONDENCE,
     "<ministryrequestid>",
@@ -79,3 +83,28 @@ export const saveEmailCorrespondence = (
     });
 };
 
+export const fetchApplicantCorrespondenceTemplates = (
+  errorCallback = null
+) => {
+  const apiUrl = API.FOI_GET_EMAIL_CORRESPONDENCE_TEMPLATES;
+  return (dispatch) => {
+    httpGETRequest(apiUrl, {}, UserService.getToken())
+      .then((res) => {
+        if (res.data) {
+          if (!_.isEmpty(res.data)) {
+            dispatch(setApplicantCorrespondenceTemplates(res.data));
+          }
+        } else {
+          console.log("Error in fetching Applicant Correspondence templates", res);
+          dispatch(serviceActionError(res));
+        }
+      })
+      .catch((error) => {
+        console.log("Error in fetching Applicant Correspondence templates", error);
+        dispatch(serviceActionError(error));
+        if (errorCallback) {
+          errorCallback("An error occured while trying to fetch Applicant Correspondence templates");
+        }
+      });
+    };
+};

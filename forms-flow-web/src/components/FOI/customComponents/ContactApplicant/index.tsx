@@ -4,59 +4,40 @@ import TextField from '@mui/material/TextField';
 import InputAdornment from "@mui/material/InputAdornment";
 import MenuItem from '@mui/material/MenuItem';
 import './index.scss'
-import Accordion from '@mui/material/Accordion';
-import AccordionSummary from '@mui/material/AccordionSummary';
-import AccordionDetails from '@mui/material/AccordionDetails';
-import Typography from '@mui/material/Typography';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import Box from '@mui/material/Box';
-import Chip from '@mui/material/Chip';
-import { errorToast, isMinistryLogin } from "../../../../helper/FOI/helper";
-import type { params, CFRFormData } from './types';
-import { calculateFees } from './util';
-import foiFees from '../../../../constants/FOI/foiFees.json';
-import { fetchApplicantCorrespondence, saveEmailCorrespondence } from "../../../../apiManager/services/FOI/foiCorrespondenceServices";
-import { fetchCFRForm } from "../../../../apiManager/services/FOI/foiCFRFormServices";
-import _ from 'lodash';
+import { errorToast } from "../../../../helper/FOI/helper";
 import { toast } from "react-toastify";
-import { StateEnum } from '../../../../constants/FOI/statusEnum';
-import { returnToQueue } from '../../../FOI/FOIRequest/BottomButtonGroup/utils';
-import CustomizedTooltip from '../Tooltip/MuiTooltip/Tooltip';
-import Dialog from '@material-ui/core/Dialog';
-import DialogActions from '@material-ui/core/DialogActions';
-import DialogContent from '@material-ui/core/DialogContent';
-import DialogContentText from '@material-ui/core/DialogContentText';
-import DialogTitle from '@material-ui/core/DialogTitle';
-import CloseIcon from '@material-ui/icons/Close';
+import type { params, Template } from './types';
+import { fetchApplicantCorrespondence, saveEmailCorrespondence, fetchApplicantCorrespondenceTemplates } from "../../../../apiManager/services/FOI/foiCorrespondenceServices";
+import _ from 'lodash';
 import IconButton from '@material-ui/core/IconButton';
 import Grid from "@material-ui/core/Grid";
 import Paper from "@mui/material/Paper";
 import SearchIcon from "@material-ui/icons/Search";
 import InputBase from "@mui/material/InputBase";
-import { SxProps } from '@mui/material';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import { getFullnameList } from '../../../../helper/FOI/helper'
 import CommentStructure from '../Comments/CommentStructure'
 import AttachmentModal from '../Attachments/AttachmentModal';
-import { MimeTypeList, MaxFileSizeInMB } from "../../../../constants/FOI/enum";
 import { getOSSHeaderDetails, saveFilesinS3, getFileFromS3 } from "../../../../apiManager/services/FOI/foiOSSServices";
 import {dueDateCalculation} from '../../FOIRequest/BottomButtonGroup/utils';
 import { PAYMENT_EXPIRY_DAYS} from "../../../../constants/FOI/constants";
+import { PreviewModal } from './PreviewModal';
+import { OSS_S3_BUCKET_FULL_PATH } from "../../../../constants/constants"
 
 export const ContactApplicant = ({
   requestNumber,
-  requestState,
   ministryId,
   ministryCode,
   requestId,
-  userDetail,
   applicantCorrespondence,
+  applicantCorrespondenceTemplates,
 }: any) => {
 
   const dispatch = useDispatch();
 
-  const userGroups = userDetail.groups.map((group: any) => group.slice(1));  
+  const isCFRFormApproved: boolean = useSelector((state: any) => state.foiRequests.foiRequestCFRFormHistory.length > 0);
+
   const fullNameList = getFullnameList()
 
   const getFullname = (userid: string) => {
@@ -82,75 +63,46 @@ export const ContactApplicant = ({
     setModal(true);
   }
   const [files, setFiles] = useState([]);
+  const [templates, setTemplates] = useState<any[]>([{value: "", label: "", templateid: null, text: "", disabled: true}]);
 
-  // const testTemplate;
-  const fileInfoList = [{
-    filename: "test.pdf",
-    s3sourceuri: "https://citz-foi-prod.objectstore.gov.bc.ca/dev-forms-foirequests/TEMPLATES/EMAILS/fee_estimate_notification.html"
-  }]
   React.useEffect(() => {
-    fetchCFRForm(
-      ministryId,
-      dispatch,
-    );
-    getOSSHeaderDetails(fileInfoList, dispatch, (err: any, res: any) => {
-      if (!err) {
-        res.map(async (header: any, _index: any) => {
-          getFileFromS3(header, async (_err: any, response: any) => {
-            const text = await new Response(response.data).text()
+    let templateList: any = [
+      {value: "", label: "", templateid: null, text: "", disabled: true},
+      {value: "", label: "None", templateid: null, text: "", disabled: false}
+    ];
+
+    applicantCorrespondenceTemplates.forEach((item: any) => {
+      const rootpath = OSS_S3_BUCKET_FULL_PATH
+
+      const fileInfoList = [{
+        filename: item.name,
+        s3sourceuri: rootpath+item.documenturipath
+      }]
+
+      getOSSHeaderDetails(fileInfoList, dispatch, (err: any, res: any) => {
+        if (!err) {
+          res.map(async (header: any, _index: any) => {
+            getFileFromS3(header, async (_err: any, response: any) => {
+              let templateItem: Template = {
+                value: item.name,
+                label: item.description,
+                templateid: item.templateid,
+                text: await new Response(response.data).text(),
+                disabled: !isCFRFormApproved
+              }
+              templateList.push(templateItem);
+              setTemplates(templateList);
+            });
           });
-        });
-      }
+        }
+      });
     });
-  }, []);
+  }, [isCFRFormApproved]);
 
   const formHistory: Array<any> = useSelector((state: any) => state.foiRequests.foiRequestCFRFormHistory);
   const approvedForm = formHistory?.find(form => form?.status?.toLowerCase() === 'approved');
   const existingCorrespondence = applicantCorrespondence?.find((correspondence: any) => correspondence?.id === approvedForm?.cfrfeeid)
   const previewButtonValue = existingCorrespondence ? "Preview & Resend Email" : "Preview & Send Email";
-
-  const templates = {
-    newestimate: {
-      value: 'newestimate',
-      label: 'New Estimate',
-      templateid: 1,
-      text: `<p>Dear {{firstName}} {{lastName}}</p>
-      <p>Please see the attached regarding your FOI Request.</p>
-      <p>If you would like to pay your estimate online, please click on this link:</p>
-      <p><a href="{{cfrfee.feedata.paymenturl}}">Pay Online</a></p>
-      <p><br></p>
-      <p>Thank you,</p>
-      <p>{{assignedToFirstName}} {{assignedToLastName}}</p>
-      <p>{{assignedGroup}}</p>`
-    },
-    outstandingfee: {
-      value: 'outstandingfee',
-      label: 'Outstanding Fee',
-      templateid: 2,
-      text: `<div>
-            <h4 style="color: #003366; display: block; text-align:center; font-family: 'BC Sans'; font-weight:bold">Freedom of Information and Protection for Privacy Act (FOIPPA)<br> Request for Records - Balance Due</h4>
-            </div>
-
-            <p>Dear {{firstName}} {{lastName}}</p>
-            <p>Please see the attached regarding your FOI Request.</p>
-            <p>If you would like to pay your remaining balance online, please click on this link: </p>
-            <p>
-              <a href="{{cfrfee.feedata.paymenturl}}">
-                Pay Online
-              </a>
-            </p>
-            <br>
-            <p>Thank you,</p>
-            <p>{{assignedToFirstName}} {{assignedToLastName}}</p>
-            <p>{{assignedGroup}}</p>`
-    },
-    none: {
-      value: 'none',
-      label: 'None',
-      templateid: null,
-      text: ``
-    }
-  }
 
   const [messages, setMessages] = useState(applicantCorrespondence);
 
@@ -170,15 +122,20 @@ export const ContactApplicant = ({
   }, []);
 
   const [editorValue, setEditorValue] = useState("")
-  const [currentTemplate, setCurrentTemplate] = useState('')
+  const [currentTemplate, setCurrentTemplate] = useState(0)
 
   const handleTemplateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setCurrentTemplate(e.target.value)
-    setEditorValue(templates[e.target.value as keyof typeof templates].text)
+    setCurrentTemplate(+e.target.value)
+    setEditorValue(templates[+e.target.value].text || "")
   }
 
   const removeFile = (index: number) => {
     setFiles(prev => prev.filter((file, i) => i !== index))
+  }
+
+  const onFilterChange = (filterValue: string) => {
+    let _filteredMessages = filterValue === "" ? applicantCorrespondence : applicantCorrespondence.filter((c: any) => c.text.toLowerCase().indexOf(filterValue.toLowerCase()) > -1)
+    setMessages(_filteredMessages)
   }
 
   const saveAttachments = async () => {
@@ -211,7 +168,7 @@ export const ContactApplicant = ({
     return attachments
   }
 
-  const save = async () => {
+  const save = async (emailContent: string) => {
     const attachments = await saveAttachments();
     let callback = (_res: string) => {
       setEditorValue("")
@@ -253,6 +210,11 @@ export const ContactApplicant = ({
   };
 
   const [showEditor, setShowEditor] = useState(false)
+
+  const [previewModal, setPreviewModal] = useState(false);
+  const handlePreviewClose = () => {
+    setPreviewModal(false);
+  }
 
   return (
     <div className="contact-applicant-container">
@@ -304,7 +266,6 @@ export const ContactApplicant = ({
           alignItems="center"
           xs={12}
           className="search-grid-container"
-          // sx={{ display: "inline-block"}}
         >
           <Paper
             component={Grid}
@@ -328,17 +289,13 @@ export const ContactApplicant = ({
               direction="row"
               xs={true}
               className="search-grid"
-              // sx={{
-              //   borderRight: "2px solid #38598A",
-              //   backgroundColor: "rgba(56,89,138,0.1)",
-              // }}
             >
               <label className="hideContent">Search Correspondence</label>
               <InputBase
                 id="foicommentfilter"
                 placeholder="Search Correspondence ..."
                 defaultValue={""}
-                // onChange={(e: any)=>{oncommentfilterkeychange(e.target.value.trim())}}
+                onChange={(e: any)=>{onFilterChange(e.target.value.trim())}}
                 sx={{
                   color: "#38598A",
                 }}
@@ -346,7 +303,6 @@ export const ContactApplicant = ({
                   <InputAdornment position="start">
                     <IconButton
                       className="search-icon"
-                      // sx={{ color: "#38598A" }}
                     >
                       <span className="hideContent">Search Correspondence ...</span>
                       <SearchIcon />
@@ -373,7 +329,7 @@ export const ContactApplicant = ({
             <TextField
               className="email-template-dropdown"
               id="emailtemplate"
-              label={currentTemplate === '' ? "Select Template" : ""}
+              label={currentTemplate === 0 ? "Select Template" : ""}
               inputProps={{ "aria-labelledby": "emailtemplate-label"}}
               InputLabelProps={{ shrink: false }}
               select
@@ -386,13 +342,13 @@ export const ContactApplicant = ({
               size="small"
               fullWidth
             >
-              {Object.keys(templates).map((option) => (
+              {templates.map((template: any, index: any) => (
               <MenuItem
-                key={templates[option as keyof typeof templates].value}
-                value={templates[option as keyof typeof templates].value}
-                // disabled={option.disabled}
+                key={index}
+                value={index}
+                disabled={template.disabled}
               >
-                {templates[option as keyof typeof templates].label}
+                {template.label}
               </MenuItem>
               ))}
             </TextField>
@@ -442,12 +398,18 @@ export const ContactApplicant = ({
             <button className="ql-link" />
           </span>
           <div className="previewEmail">
+            <PreviewModal
+              modalOpen={previewModal}
+              handleClose={handlePreviewClose}
+              handleSave={save}
+              innerhtml={editorValue}
+              attachments={files}
+              templateInfo={templates[currentTemplate]}
+            />
             <button
               className="btn addCorrespondence"
               data-variant="contained"
-              onClick={(e) => {
-                save()
-              }}
+              onClick={() => setPreviewModal(true)}
               color="primary"
             >
               {previewButtonValue}
@@ -483,6 +445,7 @@ export const ContactApplicant = ({
               hasAnotherUserComment={false}
               fullName={getFullname(message.createdby)}
               isEmail={true}
+              ministryId={ministryId}
             />
           </div>
         ))}

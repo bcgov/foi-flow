@@ -11,7 +11,7 @@
     <bpmn:group id="Group_0ihi2fn" categoryValueRef="CategoryValue_1baekcn" />
     <bpmn:group id="Cancel_payment" categoryValueRef="CategoryValue_0ne55cy" />
   </bpmn:collaboration>
-  <bpmn:process id="foi-fee-processing" name="FOI Fee Processing" isExecutable="true" camunda:versionTag="3">
+  <bpmn:process id="foi-fee-processing" name="FOI Fee Processing" isExecutable="true" camunda:versionTag="4">
     <bpmn:laneSet id="LaneSet_1u7kp6i">
       <bpmn:lane id="Lane_1aaq844" name="Post Payment">
         <bpmn:flowNodeRef>Event_0dlzac7</bpmn:flowNodeRef>
@@ -142,7 +142,7 @@ connector.getVariable("statusCode");</camunda:script>
 execution.setVariable("retry1", current+1);
 execution.setVariable("paymentFormName", "payfeeonline");
 var templatename = execution.getVariable("templateName")
-if ((execution.getVariable("prevStatus") != null &amp;&amp; execution.getVariable("prevStatus") == "Response") || (templatename != null &amp;&amp; templatename =="outstandingfeeestimatenotification")) {
+if ((execution.getVariable("prevStatus") != null &amp;&amp; execution.getVariable("prevStatus") == "Response") || (templatename != null &amp;&amp; templatename.toLowerCase() =="payoutstanding")) {
 	execution.setVariable("paymentFormName", "payoutstandingform");
 }</camunda:script>
         </camunda:executionListener>

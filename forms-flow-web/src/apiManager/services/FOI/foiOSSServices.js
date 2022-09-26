@@ -2,12 +2,14 @@ import {
     httpPOSTRequest,
     httpOSSPUTRequest,
     httpOSSGETRequest,
+    httpGETRequest
   } from "../../httpRequestHandler";
   import API from "../../endpoints";
   import {
     serviceActionError,
   } from "../../../actions/FOI/foiRequestActions";
   import { fnDone } from "./foiServicesUtil";
+  import UserService from "../../../services/UserService";
   
   export const getOSSHeaderDetails = (data, dispatch, ...rest) => {
     const done = fnDone(rest);
@@ -98,4 +100,22 @@ import {
       });
   };
   
-  
+  export const getFOIS3DocumentPreSignedUrl = (filepath,ministryrequestid,dispatch, ...rest) => {
+    const done = fnDone(rest);
+    console.log(ministryrequestid)
+    const apiurl = API.FOI_GET_S3DOCUMENT_PRESIGNEDURL+ "/" + (ministryrequestid == undefined ? "-1" : ministryrequestid) +"?filepath="+filepath
+    const response = httpGETRequest(apiurl, {}, UserService.getToken());
+    response.then((res) => {
+        if (res.data) {
+          done(null, res.data);
+        } else {
+          dispatch(serviceActionError(res));
+          done("Error in getFOIS3DocumentPreSignedUrl");
+        }
+      })
+      .catch((error) => {
+        dispatch(serviceActionError(error));
+        done("Error in getFOIS3DocumentPreSignedUrl");
+      });
+    return response;
+  };

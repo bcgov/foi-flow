@@ -32,7 +32,8 @@ import {
   fetchFOIRequestAttachmentsList
 } from "../../../apiManager/services/FOI/foiAttachmentServices";
 import {
-  fetchApplicantCorrespondence
+  fetchApplicantCorrespondence,
+  fetchApplicantCorrespondenceTemplates
 } from "../../../apiManager/services/FOI/foiCorrespondenceServices";
 import { fetchFOIRequestNotesList } from "../../../apiManager/services/FOI/foiRequestNoteServices";
 import { makeStyles } from '@material-ui/core/styles';
@@ -117,6 +118,9 @@ const FOIRequest = React.memo(({ userDetail }) => {
   let applicantCorrespondence = useSelector(
     (state) => state.foiRequests.foiRequestApplicantCorrespondence
   );
+  let applicantCorrespondenceTemplates = useSelector(
+    (state) => state.foiRequests.foiRequestApplicantCorrespondenceTemplates
+  );
   const [attachments, setAttachments] = useState(requestAttachments);
   const [comment, setComment] = useState([]);
   const [requestState, setRequestState] = useState(StateEnum.unopened.name);
@@ -192,8 +196,8 @@ const FOIRequest = React.memo(({ userDetail }) => {
       dispatch(fetchFOIRequestDescriptionList(requestId, ministryId));
       dispatch(fetchFOIRequestNotesList(requestId, ministryId));
       dispatch(fetchFOIRequestAttachmentsList(requestId, ministryId));
-      if (ministryId)
-        dispatch(fetchApplicantCorrespondence(requestId,ministryId));
+      dispatch(fetchApplicantCorrespondence(requestId, ministryId));
+      dispatch(fetchApplicantCorrespondenceTemplates());
     }
 
     dispatch(fetchFOICategoryList());
@@ -665,6 +669,12 @@ const FOIRequest = React.memo(({ userDetail }) => {
     );
   }
 
+  const showContactApplicantTab = () => {
+    return (requestState !== StateEnum.intakeinprogress.name &&
+      requestState !== StateEnum.unopened.name &&
+      requestState !== StateEnum.open.name)
+  }
+
   return (!isLoading &&
     requestDetails &&
     Object.keys(requestDetails).length !== 0) ||
@@ -735,7 +745,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
                   Comments{" "}
                   {requestNotes?.length > 0 ? `(${requestNotes.length})` : ""}
                 </div>
-                <div
+                {showContactApplicantTab() && <div
                   className={clsx("tablinks", {
                     active: tabLinksStatuses.ContactApplicant.active,
                   })}
@@ -744,7 +754,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
                 >
                   Contact Applicant{" "}
                   {applicantCorrespondence?.length > 0 ? `(${applicantCorrespondence.length})` : ""}
-                </div>
+                </div>}
               </>
             )}
           </div>
@@ -1040,7 +1050,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
               <Loading />
             )}
           </div>
-          <div
+          {showContactApplicantTab() && <div
             id="ContactApplicant"
             className={clsx("tabcontent", {
               active: tabLinksStatuses.ContactApplicant.active,
@@ -1049,9 +1059,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
             })}
           >
             {!isLoading &&
-            requestNotes &&
-            (iaoassignedToList?.length > 0 ||
-              ministryAssignedToList?.length > 0) ? (
+            applicantCorrespondence  ? (
               <>
                 <ContactApplicant
                   requestNumber={requestNumber}
@@ -1060,13 +1068,14 @@ const FOIRequest = React.memo(({ userDetail }) => {
                   ministryId={ministryId}
                   ministryCode={requestDetails.bcgovcode}
                   applicantCorrespondence={applicantCorrespondence}
+                  applicantCorrespondenceTemplates={applicantCorrespondenceTemplates}
                   requestId={requestId}
                 />
               </>
             ) : (
               <Loading />
             )}
-          </div>
+          </div>}
         </div>
       </div>
     </div>
