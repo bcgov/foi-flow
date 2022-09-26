@@ -221,6 +221,20 @@ export const setRequestCFRFormHistory = (data) => dispatch => {
     })
 }
 
+export const setApplicantCorrespondence = (data) => dispatch => {
+    dispatch({
+        type:FOI_ACTION_CONSTANTS.FOI_REQUEST_APPLICANT_CORRESPONDENCE,
+        payload:data
+    })
+}
+
+export const setApplicantCorrespondenceTemplates = (data) => dispatch => {
+    dispatch({
+        type:FOI_ACTION_CONSTANTS.FOI_REQUEST_APPLICANT_CORRESPONDENCE_TEMPLATES,
+        payload:data
+    })
+}
+
 export const setRequestExtensions = (data) => (dispatch) => {
   dispatch({
     type: FOI_ACTION_CONSTANTS.FOI_REQUEST_EXTENSIONS,
