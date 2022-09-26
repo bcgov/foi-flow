@@ -30,17 +30,34 @@ class cfrfeeformevent:
             else:   
                 return DefaultMethodResult(False,'unable to post comment',requestid)
         return  DefaultMethodResult(True,'No change',requestid)
-    
-    def __createcomment(self, requestid, state, userid, username):
-        comment = self.__preparecomment(requestid, state, username)
+
+
+    def createeventforupdatedamounts(self, requestid, userid, username):
+        feedata = FOIRequestCFRFee.getfeedataforamountcomparison(requestid)  
+        updatedamounts={}
+        _feewaivercommentresponse=DefaultMethodResult(True,'No change',requestid)
+        _refundcommentresponse=DefaultMethodResult(True,'No change',requestid)
+        if len(feedata) == 2:
+            newfeedata = feedata[0]
+            oldfeedata = feedata[1]
+            if newfeedata["feewaiveramount"] != oldfeedata["feewaiveramount"]:
+                updatedamounts = {'feewaiveramountchanged': newfeedata["feewaiveramount"]}
+                _feewaivercommentresponse = self.__createcomment(requestid, None, userid, username, updatedamounts)
+            if newfeedata["refundamount"] != oldfeedata["refundamount"]:
+                updatedamounts = {'refundamountchanged': newfeedata["refundamount"]}
+                _refundcommentresponse = self.__createcomment(requestid, None, userid, username, updatedamounts)
+        return _feewaivercommentresponse, _refundcommentresponse
+
+    def __createcomment(self, requestid, state, userid, username, updatedamounts=None):
+        comment = self.__preparecomment(requestid, state, username, updatedamounts)
         return commentservice().createministryrequestcomment(comment, userid, 2)
 
     def __createnotification(self, requestid, state, userid):
         notification = self.__preparenotification(state)
         return notificationservice().createnotification({"message" : notification}, requestid, "ministryrequest", "CFR Fee Form", userid)
 
-    def __preparecomment(self, requestid, state, username):
-        comment = {"comment": self.__commentmessage(state, username)}
+    def __preparecomment(self, requestid, state, username, updatedamounts):
+        comment = {"comment": self.__commentmessage(state, username, updatedamounts)}
         comment['ministryrequestid']= requestid
         return comment
     
@@ -60,8 +77,15 @@ class cfrfeeformevent:
                     return newstate
             return None    
     
-    def __commentmessage(self, state, username):
-        return  username+' updated Fee Estimate status to '+state
+    def __commentmessage(self, state, username, updatedamounts):
+        if state is not None:
+            return  username+' updated Fee Estimate status to '+state
+        if updatedamounts is not None:
+            if 'feewaiveramountchanged' in updatedamounts and updatedamounts['feewaiveramountchanged'] is not None:
+                return username+ ' entered a fee waiver for the amount of $'+"{:.2f}".format(updatedamounts['feewaiveramountchanged'])
+            if 'refundamountchanged' in updatedamounts and updatedamounts['refundamountchanged'] is not None:
+                return username+ ' entered a refund for the amount of $'+"{:.2f}".format(updatedamounts['refundamountchanged'])
+        
 
     def __notificationmessage(self, state):
         return  'Updated Fee Estimate Status to '+state 

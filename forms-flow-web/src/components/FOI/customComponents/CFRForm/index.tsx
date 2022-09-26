@@ -29,6 +29,7 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 import CloseIcon from '@material-ui/icons/Close';
 import IconButton from '@material-ui/core/IconButton';
 import { CFRFormHistoryModal } from './CFRFormHistoryModal';
+import Grid from "@material-ui/core/Grid";
 
 export const CFRForm = ({
   requestNumber,
@@ -77,6 +78,15 @@ export const CFRForm = ({
     }
   }, [ministryId]);
 
+  const tooltipTotals = {
+    "title": "Payment Details",
+    "content": [
+      <div className="toolTipContent">
+        <p>The balance remaining for a fee estimate is the Estimated total subtracted by the amount paid.
+          When actuals are entered, the balance remaining is the actual totals subtracted by the amount paid.
+          If the balance is negative, then an applicant may be owed a refund.</p>
+      </div>]
+  };
   const tooltipLocating = {
     "title": "Locating/Retrieving",
     "content": [
@@ -143,7 +153,7 @@ export const CFRForm = ({
   const handleTextChanges = (e: React.ChangeEvent<HTMLInputElement>) => {
     const name : string = e.target.name;
     const value : string = e.target.value;
-    
+
     setFormData(values => ({...values, [name]: value}));
   };
 
@@ -156,6 +166,8 @@ export const CFRForm = ({
     actualTotalDue: 0,
     amountPaid: 0,
     balanceRemaining:0,
+    feewaiverAmount:0,
+    refundAmount:0,
     estimates: {
       locating: 0,
       producing: 0,
@@ -177,10 +189,9 @@ export const CFRForm = ({
 
   const [initialFormData, setInitialFormData] = useState(blankForm);
   const [formData, setFormData] = useState(initialFormData);
-  
+
 
   React.useEffect(() => {
-    
     var formattedData = {
       cfrfeeid: initialState.cfrfeeid,
       formStatus: initialState.status === null ? 'init' : initialState.status,
@@ -188,6 +199,8 @@ export const CFRForm = ({
       actualTotalDue: initialState.feedata?.actualtotaldue,
       amountPaid: initialState.feedata?.amountpaid,
       balanceRemaining: initialState.feedata?.balanceremaining,
+      feewaiverAmount: initialState.feedata?.feewaiveramount,
+      refundAmount: initialState.feedata?.refundamount,
       estimates: {
         locating: initialState.feedata?.estimatedlocatinghrs,
         producing: initialState.feedata?.estimatedproducinghrs,
@@ -250,11 +263,11 @@ export const CFRForm = ({
     }
   };
 
-  const handleAmountChanges = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleRefundChanges = (e: React.ChangeEvent<HTMLInputElement>) => {
     const name : string = e.target.name;
-    const value : number = +e.target.value;
-
-    setFormData(values => ({...values, [name]: value}));
+    const value : number = Math.floor((+e.target.value) * 100) / 100;
+    if(value <= formData.amountPaid)
+      setFormData(values => ({...values, [name]: value}));
   };
 
   const handleEstimateChanges = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -285,7 +298,7 @@ export const CFRForm = ({
   };
 
   const calculateBalanceRemaining = () => {
-    return formData?.actualTotalDue ? (formData.actualTotalDue - formData.amountPaid) : (formData.estimatedTotalDue - formData.amountPaid);
+    return formData?.actualTotalDue ? (formData.actualTotalDue - formData.amountPaid - formData.feewaiverAmount) : (formData.estimatedTotalDue - formData.amountPaid - formData.feewaiverAmount);
   }
 
   const cfrStatusDisabled = () => {
@@ -304,7 +317,7 @@ export const CFRForm = ({
       }
     }
     return true;
-  } 
+  }
 
   const save = () => {
     var callback = (_res: string) => {
@@ -332,6 +345,8 @@ export const CFRForm = ({
           estimatedtotaldue: formData.estimatedTotalDue,
           actualtotaldue: formData.actualTotalDue,
           balanceremaining: calculateBalanceRemaining(),
+          feewaiveramount: formData.feewaiverAmount,
+          refundamount: formData.refundAmount,
           estimatedlocatinghrs: formData.estimates.locating,
           actuallocatinghrs: formData.actual.locating,
           estimatedproducinghrs: formData.estimates.producing,
@@ -358,6 +373,8 @@ export const CFRForm = ({
           estimatedtotaldue: formData.estimatedTotalDue,
           actualtotaldue: formData.actualTotalDue,
           balanceremaining: calculateBalanceRemaining(),
+          feewaiveramount: formData.feewaiverAmount,
+          refundamount: formData.refundAmount,
         },
         status: formData.formStatus,
       }
@@ -373,7 +390,7 @@ export const CFRForm = ({
         errorToast(errorMessage)
       },
     )
-  }; 
+  };
 
 
   const [modalOpen, setModalOpen] = useState(false);
@@ -403,7 +420,7 @@ export const CFRForm = ({
     setModalOpen(true);
   };
 
-  
+
   const [createModalOpen, setCreateModalOpen] = useState(false);
   const handleCreateClose = () => {
     setCreateModalOpen(false);
@@ -411,11 +428,11 @@ export const CFRForm = ({
 
   const cfrActualsDisabled = () => {
     return !isMinistry || formData?.formStatus !== 'approved' || requestState !== StateEnum.callforrecords.name || formData?.amountPaid === 0;
-  } 
+  }
 
   const cfrEstimatedDisabled = () => {
     return !isMinistry || initialFormData?.formStatus === 'approved' || initialFormData?.formStatus === 'review';
-  } 
+  }
 
   const [historyModalOpen, setHistoryModal] = useState(false);
   const handleHistoryClose = () => {
@@ -423,7 +440,7 @@ export const CFRForm = ({
   }
 
   const disableNewCfrFormBtn = () => {
-    return(formData?.formStatus !== 'approved' || (requestState !== StateEnum.callforrecords.name && 
+    return(formData?.formStatus !== 'approved' || (requestState !== StateEnum.callforrecords.name &&
       requestState !== StateEnum.feeassessed.name && requestState !== StateEnum.onhold.name));
   }
 
@@ -435,6 +452,13 @@ export const CFRForm = ({
     setInitialFormData(blankForm);
     setFormData(blankForm);
     setIsNewCFRForm(true)
+  }
+
+  const isFeeWaiverDisabled = () => {
+    if(isMinistry || (!isMinistry && (requestState !== StateEnum.onhold.name || formData?.formStatus !== 'approved')))
+      return true;
+    else
+      return false;
   }
 
 
@@ -600,17 +624,47 @@ export const CFRForm = ({
                           }}
                           InputLabelProps={{ shrink: true }}
                           variant="outlined"
-                          name="feeWaiver"
+                          name="feewaiverAmount"
                           type="number"
-                          value={0}
+                          value={formData?.feewaiverAmount}
                           onChange={handleAmountPaidChanges}
                           onBlur={(e) => {
                             e.target.value = parseFloat(e.target.value).toFixed(2);
                           }}
                           fullWidth
-                          disabled={true}
+                          disabled={isFeeWaiverDisabled()}
                         />
                       </div>
+                      <div className="col-lg-6 foi-details-col">
+                        <TextField
+                          id="refund"
+                          label="Refund Amount"
+                          inputProps={{
+                            "aria-labelledby": "refund-label",
+                            step: 0.01,
+                            max: formData.amountPaid,
+                            min: 0
+                          }}
+                          InputProps={{
+                            startAdornment: <InputAdornment position="start">$</InputAdornment>
+                          }}
+                          InputLabelProps={{ shrink: true }}
+                          variant="outlined"
+                          name="refundAmount"
+                          type="number"
+                          value={formData?.refundAmount}
+                          onChange={handleRefundChanges}
+                          onBlur={(e) => {
+                            e.target.value = parseFloat(e.target.value).toFixed(2);
+                          }}
+                          fullWidth
+                          disabled={isMinistry || (!isMinistry && formData?.formStatus !== 'approved')}
+                        />
+                      </div>
+                    </div>
+                    <div className="cfrform-floatRight cfrform-totals">
+                      <CustomizedTooltip content={tooltipTotals} position={""} />
+                      <p className="hideContent" id="popup-6">Information6</p>
                     </div>
                   </AccordionDetails>
                 </Accordion>
@@ -827,7 +881,7 @@ export const CFRForm = ({
                           helperText={validateField(formData?.actual?.iaoPreparing, foiFees.iaoPreparing.unit) &&
                             "Hours must be entered in increments of " + foiFees.iaoPreparing.unit
                           }
-                          disabled={isMinistry || formData?.formStatus !== 'approved' 
+                          disabled={isMinistry || formData?.formStatus !== 'approved'
                           || (requestState !== StateEnum.deduplication.name && requestState !== StateEnum.review.name)}
                         />
                       </div>
@@ -1005,7 +1059,7 @@ export const CFRForm = ({
                       <div className="col-lg-12 foi-details-col">
                         <TextField
                           id="combinedsuggestions"
-                          label="Combined suggestions for futher clarifications   "
+                          label="Combined suggestions for futher clarifications"
                           multiline
                           rows={4}
                           name="suggestions"
@@ -1021,7 +1075,7 @@ export const CFRForm = ({
                   </AccordionDetails>
                 </Accordion>
               </div>
-              <div className="foi-bottom-button-group cfrform"> 
+              <div className="foi-bottom-button-group cfrform">
                 <button
                   type="button"
                   className="col-lg-4 btn btn-bottom btn-save"
@@ -1107,7 +1161,7 @@ export const CFRForm = ({
             <span className="confirmation-message create-new-modal-message">
               Are you sure you want to create a new, blank CFR form? <br></br>
               <em>
-                Any unsaved changes will be lost. The previous version will be locked for editing 
+                Any unsaved changes will be lost. The previous version will be locked for editing
                 and viewable in the CFR Form History.
               </em>
             </span>

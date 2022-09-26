@@ -57,13 +57,13 @@ class DocumentGenerationService:
         current_app.logger.info('Generating receipt')
         return self.cdgos_api_service.generate_receipt(template_hash_code= self.receipt_template.cdogs_hash_code, data= data)
 
-    def upload_receipt(self, filename, filebytes, ministryrequestid, ministrycode, filenumber):
+    def upload_receipt(self, filename, filebytes, ministryrequestid, ministrycode, filenumber, attachmentcategory):
         try:
             logging.info("Upload receipt for ministry request id"+ str(ministryrequestid))
             _response =  storageservice().uploadbytes(filename, filebytes, ministrycode, filenumber)
             logging.info("Upload status for payload"+ json.dumps(_response))
             if _response["success"] == True:
-                _documentschema = {"documents": [{"filename": _response["filename"], "documentpath": _response["documentpath"], "category": templateconfig().getattachmentcategory("FEE-ESTIMATE-PAYMENT-RECEIPT")}]}
+                _documentschema = {"documents": [{"filename": _response["filename"], "documentpath": _response["documentpath"], "category": templateconfig().getattachmentcategory(attachmentcategory)}]}
                 documentservice().createrequestdocument(ministryrequestid, _documentschema, "SYSTEM", "ministryrequest")
             return _response
         except Exception as ex:

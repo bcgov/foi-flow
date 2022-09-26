@@ -52,12 +52,16 @@ const initialState = {
       estimatedministrypreparinghrs: 0,
       estimatediaopreparinghrs: 0,
       amountpaid: 0,
+      feewaiveramount: 0,
+      refundamount: 0,
       estimatedhardcopypages: 0,
       actualministrypreparinghrs: 0,
       actualiaopreparinghrs: 0,
     }
   },
   foiRequestCFRFormHistory: [],
+  foiRequestApplicantCorrespondence: [],
+  foiRequestApplicantCorrespondenceTemplates: [],
   foiRequestExtesions: [],
   foiOpenedMinistries: [],
   resumeDefaultSorting: false,
@@ -147,6 +151,10 @@ const foiRequests = (state = initialState, action) => {
       };
     case FOI_ACTION_CONSTANTS.FOI_REQUEST_CFR_FORM_HISTORY:
       return { ...state, foiRequestCFRFormHistory: action.payload };
+    case FOI_ACTION_CONSTANTS.FOI_REQUEST_APPLICANT_CORRESPONDENCE:
+      return { ...state, foiRequestApplicantCorrespondence: action.payload };
+    case FOI_ACTION_CONSTANTS.FOI_REQUEST_APPLICANT_CORRESPONDENCE_TEMPLATES:
+      return { ...state, foiRequestApplicantCorrespondenceTemplates: action.payload };
     case FOI_ACTION_CONSTANTS.FOI_REQUEST_EXTENSIONS:
       return { ...state, foiRequestExtesions: action.payload };
     case FOI_ACTION_CONSTANTS.FOI_OPENED_MINISTRIES:

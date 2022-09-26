@@ -12,14 +12,15 @@ import maya
 import os
 from dateutil.parser import parse
 from pytz import timezone
+from request_api.utils.enums import PaymentEventType
 
 class paymentevent:
     """ FOI Event management service
 
     """
-    def createpaymentevent(self, requestid):
-        _commentresponse = self.__createcomment(requestid, PaymentEventType.paid.value)
-        _notificationresponse = self.__createnotification(requestid, PaymentEventType.paid.value)
+    def createpaymentevent(self, requestid, eventtype):
+        _commentresponse = self.__createcomment(requestid, eventtype)
+        _notificationresponse = self.__createnotification(requestid, eventtype)
         if _commentresponse.success == True and _notificationresponse.success == True:
             return DefaultMethodResult(True,'Payment notification posted',requestid)
         else:
@@ -49,6 +50,10 @@ class paymentevent:
             comment = {"comment": "Applicant has paid required fee. New LDD is " + FOIMinistryRequest.getduedate(requestid).strftime("%m/%d/%Y")}
         elif eventtype == PaymentEventType.expired.value:
             comment = {"comment": "Fees were due to be paid by " + self.gettoday() + ", you may consider closing the request as abandoned."}
+        elif eventtype == PaymentEventType.outstandingpaid.value:
+            comment = {"comment": "Applicant has paid outstanding fee. Response package can be released."}
+        elif eventtype == PaymentEventType.depositpaid.value:
+            comment = {"comment": "Applicant has paid deposit."}
         else:
             comment = None
         if comment is not None:
@@ -60,6 +65,10 @@ class paymentevent:
             return "Applicant has paid required fee, resume gathering. New LDD is " + FOIMinistryRequest.getduedate(requestid).strftime("%m/%d/%Y")
         elif eventtype == PaymentEventType.expired.value:
             return "Fees were due to be paid by " + FOIMinistryRequest.getduedate(requestid).strftime("%m/%d/%Y")+ ", you may consider closing the request as abandoned."
+        elif eventtype == PaymentEventType.outstandingpaid.value:
+            return "Applicant has paid outstanding fee. Response package can be released."
+        elif eventtype == PaymentEventType.depositpaid.value:
+            return "Applicant has paid deposit."
         else:
             return None
 
@@ -69,8 +78,3 @@ class paymentevent:
     def gettoday(self):
         now_pst = maya.parse(maya.now()).datetime(to_timezone='America/Vancouver', naive=False)
         return now_pst.strftime('%m/%d/%Y') 
-
-
-class PaymentEventType(Enum):
-    paid = "PAID"    
-    expired = "EXPIRED"

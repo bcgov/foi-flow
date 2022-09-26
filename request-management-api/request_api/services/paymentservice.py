@@ -65,15 +65,18 @@ class paymentservice:
             prevstate = data["stateTransition"][1]["status"] if "stateTransition" in data and len(data["stateTransition"])  > 2 else None
             basepath = 'request_api/receipt_templates/'
             receiptname = 'cfr_fee_payment_receipt'
+            attachmentcategory = "FEE-ESTIMATE-PAYMENT-RECEIPT"
+            filename = "Fee Estimate Payment Receipt.pdf"
             if balancedue > 0:
                 receipt_template_path= basepath + self.getreceiptename('HALFPAYMENT') +".docx"
                 receiptname = self.getreceiptename('HALFPAYMENT')
             else:
-                filename = self.getreceiptename('FULLPAYMENT')
-                if prevstate.lower() == "response":
-                    filename = self.getreceiptename('PAYOUTSTANDING')
-                receipt_template_path= basepath + filename + ".docx"
                 receiptname = self.getreceiptename('FULLPAYMENT')
+                if prevstate.lower() == "response":
+                    receiptname = self.getreceiptename('PAYOUTSTANDING')
+                    attachmentcategory = "OUTSTANDING-PAYMENT-RECEIPT"
+                    filename = "Fee Balance Outstanding Payment Receipt.pdf"
+                receipt_template_path= basepath + receiptname + ".docx"
             data['waivedAmount'] = data['cfrfee']['feedata']['estimatedlocatinghrs'] * 30 if data['cfrfee']['feedata']['estimatedlocatinghrs'] < 3 else 90
             data.update({'paymentInfo': {
                 'paymentDate': parsed_args.get('trnDate'),
@@ -83,7 +86,7 @@ class paymentservice:
             }})
             document_service : DocumentGenerationService = DocumentGenerationService(receiptname)
             receipt = document_service.generate_receipt(data,receipt_template_path)
-            document_service.upload_receipt('Fee Estimate Payment Receipt.pdf', receipt.content, ministry_request_id, data['bcgovcode'], data['idNumber'])
+            document_service.upload_receipt(filename, receipt.content, ministry_request_id, data['bcgovcode'], data['idNumber'], attachmentcategory)
             return DefaultMethodResult(True,'Payment Receipt created',ministry_request_id)
         except Exception as ex:   
             logging.exception(ex)         

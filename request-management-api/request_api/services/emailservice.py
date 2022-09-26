@@ -15,6 +15,7 @@ from request_api.services.email.senderservice import senderservice
 from request_api.services.email.inboxservice import inboxservice
 from request_api.services.eventservice import eventservice
 from request_api.services.requestservice import requestservice
+from request_api.services.applicantcorrespondencelog import applicantcorrespondenceservice
 
 class emailservice:
     """ FOI Email Service
@@ -23,8 +24,9 @@ class emailservice:
     def send(self, servicename, requestid, ministryrequestid):
         try:
             requestjson = requestservice().getrequestdetails(requestid,ministryrequestid)
-            _messagepart = templateservice().generate_by_servicename_and_schema(servicename, requestjson)
+            _messagepart, content = templateservice().generate_by_servicename_and_schema(servicename, requestjson)
             _messageattachmentlist = documentservice().getattachments(ministryrequestid, 'ministryrequest', templateconfig().getattachmentcategory(servicename).lower())
+            applicantcorrespondenceservice().saveapplicantcorrespondencelog(None, ministryrequestid, 'System Generated Email', content, _messageattachmentlist)
             return senderservice().send(servicename, _messagepart, _messageattachmentlist, requestjson)
         except Exception as ex:
             logging.exception(ex)

@@ -67,8 +67,12 @@ const API = {
   FOI_GET_EXTENSION: `${FOI_BASE_API_URL}/api/foiextension/<extensionId>`,
 
   FOI_GET_CFR_FORM: `${FOI_BASE_API_URL}/api/foicfrfee/ministryrequest/<ministryrequestid>`,
-  FOI_POST_CFR_FORM: `${FOI_BASE_API_URL}/api/foicfrfee/ministryrequest/<ministryrequestid>`,
-  FOI_POST_CFR_FORM_IAO: `${FOI_BASE_API_URL}/api/foicfrfee/ministryrequest/<ministryrequestid>/sanction`,
+  FOI_POST_CFR_FORM: `${FOI_BASE_API_URL}/api/foicfrfee/foirequest/<requestid>/ministryrequest/<ministryrequestid>`,
+  FOI_POST_CFR_FORM_IAO: `${FOI_BASE_API_URL}/api/foicfrfee/foirequest/<requestid>/ministryrequest/<ministryrequestid>/sanction`,
+
+  FOI_POST_EMAIL_CORRESPONDENCE: `${FOI_BASE_API_URL}/api/foiflow/applicantcorrespondence/<ministryrequestid>`,
+  FOI_GET_EMAIL_CORRESPONDENCE: `${FOI_BASE_API_URL}/api/foiflow/applicantcorrespondence/<ministryrequestid>`,
+  FOI_GET_EMAIL_CORRESPONDENCE_TEMPLATES: `${FOI_BASE_API_URL}/api/foiflow/applicantcorrespondence/templates`,
 
   FOI_GET_OPENED_MINISTRIES: `${FOI_BASE_API_URL}/api/foirawrequest/<requestid>/fields?names=ministries`,
 
@@ -80,5 +84,7 @@ const API = {
 
   FOI_REQUEST_ASSIGNEE_API: `${FOI_BASE_API_URL}/api/foirequests/<requestid>/ministryrequest/<ministryid>/<usertype>/assignee`,
   FOI_RAWREQUEST_ASSIGNEE_API:  `${FOI_BASE_API_URL}/api/foirawrequest/<requestid>/assignee`,
+
+  FOI_GET_S3DOCUMENT_PRESIGNEDURL:`${FOI_BASE_API_URL}/api/foiflow/oss/presigned`
 };
 export default API;

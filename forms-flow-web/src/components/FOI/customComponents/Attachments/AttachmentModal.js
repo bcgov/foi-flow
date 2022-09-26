@@ -37,7 +37,7 @@ const useStyles = makeStyles((theme) => ({
 
 }));
 
-export default function AttachmentModal({ modalFor, openModal, handleModal, multipleFiles, requestNumber, requestId, attachment, attachmentsArray, handleRename, isMinistryCoordinator }) {
+export default function AttachmentModal({ modalFor, openModal, handleModal, multipleFiles, requestNumber, requestId, attachment, attachmentsArray, handleRename, isMinistryCoordinator, existingDocuments=[] }) {
 
     const mimeTypes = multipleFiles ? MimeTypeList.attachmentLog : MimeTypeList.stateTransition;
     const maxFileSize = multipleFiles ? MaxFileSizeInMB.attachmentLog : MaxFileSizeInMB.stateTransition;
@@ -112,7 +112,7 @@ export default function AttachmentModal({ modalFor, openModal, handleModal, mult
       setFiles(_files);
     }
     const handleClose = () => {
-        if (files.length > 0 || (modalFor === 'rename' && attachment.filename !== (newFilename+"."+extension))) {
+        if ((files.length > 0 && files !== existingDocuments) || (modalFor === 'rename' && attachment.filename !== (newFilename+"."+extension))) {
             if (window.confirm("Are you sure you want to leave? Your changes will be lost.")) {
                 setFiles([]);
                 handleModal(false);
@@ -190,7 +190,7 @@ export default function AttachmentModal({ modalFor, openModal, handleModal, mult
       }
     }
     let message = getMessage();
-    const btnClass = (files.length === 0 && modalFor !== 'delete') ? classes.btndisabled : classes.btnenabled;
+    const btnClass = (files.length === 0 && existingDocuments.length === 0 && modalFor !== 'delete') ? classes.btndisabled : classes.btnenabled
   
     return (
       <div className="state-change-dialog">        
@@ -229,6 +229,7 @@ export default function AttachmentModal({ modalFor, openModal, handleModal, mult
                   handleTagChange={handleTagChange}
                   tagValue={tagValue}
                   isMinistryCoordinator={isMinistryCoordinator}
+                  existingDocuments={existingDocuments}
                 /> 
                 :
                 <ModalForRename modalFor={modalFor} newFilename={newFilename} updateFilename={updateFilename} errorMessage={errorMessage} extension={extension} />
@@ -242,7 +243,7 @@ export default function AttachmentModal({ modalFor, openModal, handleModal, mult
                 Save
               </button>
               :
-              <button className={`btn-bottom btn-save ${ btnClass }`} disabled={files.length === 0 && modalFor !== 'delete'} onClick={handleSave}>
+              <button className={`btn-bottom btn-save ${ btnClass }`} disabled={files.length === 0 && existingDocuments.length === 0 && modalFor !== 'delete'} onClick={handleSave}>
                 Continue
               </button>
             }

@@ -39,3 +39,8 @@ export const SOCKETIO_CONNECT_NONCE =
 
   export const FOI_FLOW_NEW_COMMENT_EXPIRY_IN_DAYS =  (window._env_ && window._env_.REACT_APP_FOI_FLOW_NEW_COMMENT_EXPIRY_IN_DAYS) ||
 process.env.REACT_APP_FOI_FLOW_NEW_COMMENT_EXPIRY_IN_DAYS || 2;
+
+export const OSS_S3_BUCKET_FULL_PATH = "https://" + ((window._env_ && window._env_.REACT_APP_OSS_S3_HOST) ||
+process.env.REACT_APP_OSS_S3_HOST || "citz-foi-prod.objectstore.gov.bc.ca")+ "/" + ((window._env_ && window._env_.REACT_APP_OSS_S3_FORMS_BUCKET) ||
+process.env.REACT_APP_OSS_S3_FORMS_BUCKET || "dev-forms-foirequests")
+

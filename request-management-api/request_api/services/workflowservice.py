@@ -47,7 +47,7 @@ class workflowservice:
     def postfeeevent(self, requestid, ministryrequestid, requestsschema, status):
         metadata = json.dumps({
             "id": requestsschema["idNumber"], 
-            "status": "Call For Records", 
+            "status": requestsschema["currentState"], 
             "assignedGroup": requestsschema["assignedGroup"], 
             "assignedTo": requestsschema["assignedTo"],
             "assignedministrygroup" : requestsschema["assignedministrygroup"],
