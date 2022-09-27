@@ -21,13 +21,15 @@ from request_api.auth import auth
 from request_api.tracer import Tracer
 from request_api.utils.util import  cors_preflight, allowedorigins
 from request_api.exceptions import BusinessException, Error
-from request_api.services.applicantcorrespondencelog import applicantcorrespondenceservice 
+from request_api.services.applicantcorrespondence.applicantcorrespondencelog import applicantcorrespondenceservice 
 import json
 from flask_cors import cross_origin
 import request_api
 from request_api.utils.cache import cache_filter, response_filter
 from request_api.schemas.foiapplicantcorrespondencelog import  FOIApplicantCorrespondenceSchema
 from request_api.auth import auth, AuthHelper
+from request_api.services.requestservice import requestservice
+from request_api.services.cfrfeeservice import cfrfeeservice
 
 API = Namespace('FOIApplicantCorrespondenceLog', description='Endpoints for FOI Applicant Correspondence Log')
 TRACER = Tracer.get_instance()
@@ -60,16 +62,17 @@ class FOIFlowApplicantCorrespondenceTemplates(Resource):
             return "Error happened while accessing  applicant correspondence templates" , 500  
 
 @cors_preflight('POST,OPTIONS')
-@API.route('/foiflow/applicantcorrespondence/<ministryrequestid>')
+@API.route('/foiflow/applicantcorrespondence/<requestid>/<ministryrequestid>')
 class FOIFlowApplicantCorrespondence(Resource):
 
     @staticmethod
     @TRACER.trace()
     @cross_origin(origins=allowedorigins())
     @auth.require
-    def get(ministryrequestid):
+    def get(requestid, ministryrequestid):
         try:
-          
+            print("requestid = ", requestid)
+            print("ministryrequestid = ", ministryrequestid)
             correspondencelogs = applicantcorrespondenceservice().getapplicantcorrespondencelogs(ministryrequestid)
             return json.dumps(correspondencelogs) , 200
         except BusinessException:
@@ -81,14 +84,18 @@ class FOIFlowApplicantCorrespondence(Resource):
     @TRACER.trace()
     @cross_origin(origins=allowedorigins())
     @auth.require
-    def post(ministryrequestid):
+    def post(requestid, ministryrequestid):
         try:
-           requestjson = request.get_json()
-           applicantcorrespondencelog = FOIApplicantCorrespondenceSchema().load(data=requestjson)           
-           userid = AuthHelper.getuserid()          
-           result = applicantcorrespondenceservice().saveapplicantcorrespondencelog(templateid=applicantcorrespondencelog['templateid'],
-           ministryrequestid=ministryrequestid,createdby=userid,messagehtml=applicantcorrespondencelog['correspondencemessagejson'],attachments=applicantcorrespondencelog['attachments']) 
-           return {'status': result.success, 'message':result.message,'id':result.identifier} , 200      
+            requestjson = request.get_json()
+            applicantcorrespondencelog = FOIApplicantCorrespondenceSchema().load(data=requestjson)           
+            userid = AuthHelper.getuserid()
+            result = applicantcorrespondenceservice().saveapplicantcorrespondencelog(templateid=applicantcorrespondencelog['templateid'],
+            ministryrequestid=ministryrequestid,createdby=userid,messagehtml=applicantcorrespondencelog['correspondencemessagejson'],attachments=applicantcorrespondencelog['attachments'])
+            if cfrfeeservice().getactivepayment(requestid, ministryrequestid) != None:
+                requestservice().postfeeeventtoworkflow(requestid, ministryrequestid, "CANCELLED")
+            requestservice().postcorrespondenceeventtoworkflow(ministryrequestid,  requestid, result.identifier, applicantcorrespondencelog['attributes'], applicantcorrespondencelog['templateid'])
+           
+            return {'status': result.success, 'message':result.message,'id':result.identifier} , 200      
         except BusinessException:
             return "Error happened while saving  applicant correspondence log" , 500 
    

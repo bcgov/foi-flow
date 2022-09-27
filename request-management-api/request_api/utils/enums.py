@@ -113,3 +113,8 @@ class PaymentEventType(Enum):
     expired = "EXPIRED"
     outstandingpaid = "OUTSTANDINGPAID"
     depositpaid = "DEPOSITPAID"
+
+class ServiceName(Enum):
+    payonline = "payonline"
+    payoutstanding = "payoutstanding"
+    correspondence = "correspondence"

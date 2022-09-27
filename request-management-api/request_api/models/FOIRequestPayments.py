@@ -8,7 +8,12 @@ from sqlalchemy.dialects.postgresql import JSON, UUID
 from sqlalchemy.sql.expression import distinct
 from sqlalchemy import text, and_, func
 import logging
+import maya
+import os
+from dateutil.parser import parse
+from pytz import timezone
 import json
+
 class FOIRequestPayment(db.Model):
     # Name of the table in our database
     __tablename__ = 'FOIRequestPayments' 
@@ -38,7 +43,24 @@ class FOIRequestPayment(db.Model):
         payment = db.session.query(FOIRequestPayment).filter(FOIRequestPayment.foirequestid == foirequestid, FOIRequestPayment.ministryrequestid == ministryrequestid).order_by(FOIRequestPayment.paymentid.desc(), FOIRequestPayment.version.desc()).first()
         return payment_schema.dump(payment)
  
-
+    @classmethod
+    def getactivepayment(cls, foirequestid, ministryrequestid) -> DefaultMethodResult:
+        now_pst = maya.parse(maya.now()).datetime(to_timezone='America/Vancouver', naive=False)
+        _psttoday = now_pst.strftime('%Y-%m-%d') 
+        try:
+            sql = sql = """select distinct on (paymentid) paymentid, paymenturl from "FOIRequestPayments" fp where foirequestid = :foirequestid and ministryrequestid  = :ministryrequestid  
+                                and TO_DATE(paymentexpirydate::TEXT,'YYYY-MM-DD') >=  TO_DATE(:today,'YYYY-MM-DD') 
+                                order by paymentid, version desc"""
+            rs = db.session.execute(text(sql), {'foirequestid': foirequestid, 'ministryrequestid' : ministryrequestid, 'today' : _psttoday})
+            for row in rs:
+                return ({"paymentid": row["paymentid"], "paymenturl": row["paymenturl"]})
+        except Exception as ex:
+            logging.error(ex)
+            raise ex
+        finally:
+            db.session.close()
+        return None        
+        
       
 class FOIRequestPaymentSchema(ma.Schema):
     class Meta:

@@ -10,6 +10,7 @@ from request_api.services.foirequest.requestservicegetter import requestserviceg
 from request_api.services.foirequest.requestservicecreate import requestservicecreate 
 from request_api.services.foirequest.requestserviceupdate import requestserviceupdate 
 from request_api.services.document_generation_service import DocumentGenerationService
+from request_api.services.applicantcorrespondence.applicantcorrespondencelog import applicantcorrespondenceservice
 
 class requestservice:
     """ FOI Request management service
@@ -36,7 +37,6 @@ class requestservice:
     def updaterequeststatus(self, requestid, ministryrequestid, statusid):
         foirequestschema = self.getrequest(requestid, ministryrequestid)
         foirequestschema['requeststatusid'] = statusid
-        print("foirequestschema ==== ",foirequestschema)
         return self.saverequestversion(foirequestschema, requestid, ministryrequestid,'Online Payment')
                
     def getrequest(self,foirequestid,foiministryrequestid): 
@@ -76,3 +76,8 @@ class requestservice:
         requeststatusid =  requestschema.get("requeststatusid") if 'requeststatusid' in requestschema  else None
         status = requestserviceconfigurator().getstatusname(requeststatusid) if requeststatusid is not None else None
         workflowservice().postopenedevent(id, wfinstanceid, requestschema, data, status, usertype)
+    
+    def postcorrespondenceeventtoworkflow(self, requestid, ministryrequestid, applicantcorrespondenceid, attributes, templateid):
+        foirequestschema = self.getrequestdetails(requestid, ministryrequestid)
+        templatedetails = applicantcorrespondenceservice().gettemplatebyid(templateid)
+        workflowservice().postcorrenspodenceevent(ministryrequestid, foirequestschema, applicantcorrespondenceid, templatedetails.name, attributes)

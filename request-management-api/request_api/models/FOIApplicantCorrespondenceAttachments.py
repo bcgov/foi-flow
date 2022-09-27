@@ -38,7 +38,12 @@ class FOIApplicantCorrespondenceAttachment(db.Model):
         db.session.commit()               
         return DefaultMethodResult(True,'applicant correpondence attachment added',newapplicantcorrepondenceattachment.applicantcorrespondenceattachmentid)    
 
-    
+    @classmethod
+    def getapplicantcorrespondenceattachmentsbyapplicantcorrespondenceid(cls,applicantcorrespondenceid):
+        correspondenceattachment_schema = FOIApplicantCorrespondenceAttachmentSchema(many=True)
+        query = db.session.query(FOIApplicantCorrespondenceAttachment).filter(FOIApplicantCorrespondenceAttachment.applicantcorrespondenceid == applicantcorrespondenceid).order_by(FOIApplicantCorrespondenceAttachment.applicantcorrespondenceattachmentid.asc()).all()
+        return correspondenceattachment_schema.dump(query)
+
 class FOIApplicantCorrespondenceAttachmentSchema(ma.Schema):
     class Meta:
         fields = ('applicantcorrespondenceattachmentid','applicantcorrespondenceid', 'attachmentdocumenturipath','attachmentfilename','created_at','createdby')

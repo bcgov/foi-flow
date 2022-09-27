@@ -13,7 +13,7 @@
   <bpmn:collaboration id="Collaboration_18fcj2s">
     <bpmn:participant id="Participant_00kyu4q" name="FOI Email Processing" processRef="foi-email-processing" />
   </bpmn:collaboration>
-  <bpmn:process id="foi-email-processing" name="FOI Email Processing" isExecutable="true" camunda:versionTag="5">
+  <bpmn:process id="foi-email-processing" name="FOI Email Processing" isExecutable="true" camunda:versionTag="2">
     <bpmn:laneSet id="LaneSet_13e9jxh">
       <bpmn:lane id="Lane_05egm04" name="Audit  Email Correspondence">
         <bpmn:flowNodeRef>Event_18tkl5h</bpmn:flowNodeRef>
@@ -63,10 +63,23 @@ var userpass = system.getenv('KEYCLOAK_CLIENTID').concat(':',system.getenv('KEYC
 var base64userpass = base64.getEncoder().encodeToString(userpass.getBytes());
 execution.setVariable('base64userpass', base64userpass);
 execution.setVariable('realm', system.getenv('KEYCLOAK_URL_REALM'));
-execution.setVariable('foiApiUrl', system.getenv('FOI_REQ_MANAGEMENT_API_URL'));
+var apiendpoint = system.getenv('FOI_REQ_MANAGEMENT_API_URL')
+execution.setVariable('foiApiUrl', apiendpoint);
 execution.setVariable('foiwebUrl', system.getenv('FORMSFLOW_WEB_URL'));</camunda:script>
         </camunda:executionListener>
         <camunda:executionListener expression="${execution.setVariable(&#34;e_retry1&#34;, 0)}" event="take" />
+        <camunda:executionListener event="take">
+          <camunda:script scriptFormat="javascript">var saveDataPayload = {
+};
+if (execution.getVariable("servicekey") != null &amp;&amp; execution.getVariable("servicekey") == "correspondence") {
+saveDataPayload = {
+ "templateName": execution.getVariable("templateName"),
+ "applicantCorrespondenceId": execution.getVariable("applicantCorrespondenceId")
+}
+}
+
+execution.setVariable("saveDataPayload", JSON.stringify(saveDataPayload));</camunda:script>
+        </camunda:executionListener>
       </bpmn:extensionElements>
     </bpmn:sequenceFlow>
     <bpmn:sequenceFlow id="Flow_0kttlyh" sourceRef="Event_1ny8po2" targetRef="Event_11fpij1" />
@@ -121,6 +134,7 @@ execution.setVariable('foiwebUrl', system.getenv('FORMSFLOW_WEB_URL'));</camunda
                 <camunda:entry key="Authorization">Bearer ${accessToken}</camunda:entry>
               </camunda:map>
             </camunda:inputParameter>
+            <camunda:inputParameter name="payload">${saveDataPayload}</camunda:inputParameter>
             <camunda:outputParameter name="responseCode">
               <camunda:script scriptFormat="javascript">if (connector.getVariable("statusCode") != 200) {
 	throw new org.camunda.bpm.engine.delegate.BpmnError("FOI-PAYMENT-EMAIL-API-ERR", response);
@@ -213,7 +227,6 @@ execution.setVariable("e_retry2", current+1); </camunda:script>
               </camunda:map>
             </camunda:inputParameter>
             <camunda:inputParameter name="payload">grant_type=client_credentials</camunda:inputParameter>
-            <camunda:inputParameter name="Input_1tli7i1" />
             <camunda:outputParameter name="accessToken">${S(response).prop("access_token").stringValue()}</camunda:outputParameter>
           </camunda:inputOutput>
           <camunda:connectorId>http-connector</camunda:connectorId>

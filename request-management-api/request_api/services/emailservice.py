@@ -15,17 +15,27 @@ from request_api.services.email.senderservice import senderservice
 from request_api.services.email.inboxservice import inboxservice
 from request_api.services.eventservice import eventservice
 from request_api.services.requestservice import requestservice
-from request_api.services.applicantcorrespondencelog import applicantcorrespondenceservice
+from request_api.services.applicantcorrespondence.applicantcorrespondencelog  import applicantcorrespondenceservice
+from request_api.utils.enums import ServiceName
 
 class emailservice:
     """ FOI Email Service
     """
   
-    def send(self, servicename, requestid, ministryrequestid):
+    def send(self, servicename, requestid, ministryrequestid, emailschema):
         try:
             requestjson = requestservice().getrequestdetails(requestid,ministryrequestid)
-            _messagepart, content = templateservice().generate_by_servicename_and_schema(servicename, requestjson)
-            _messageattachmentlist = documentservice().getattachments(ministryrequestid, 'ministryrequest', templateconfig().getattachmentcategory(servicename).lower())
+            _applicantcorrespondenceid = self.__getvaluefromschema(emailschema, "applicantcorrespondenceid")
+            _templatename = self.__getvaluefromschema(emailschema, "templatename")
+            if servicename == ServiceName.correspondence.value.upper():
+                servicename = _templatename
+            _messagepart, content = templateservice().generate_by_servicename_and_schema(servicename, requestjson, _applicantcorrespondenceid)
+            _messageattachmentlist = []
+            if (_applicantcorrespondenceid):
+                servicename = _templatename.upper() if _templatename else ""
+                _messageattachmentlist = documentservice().getapplicantcorrespondenceattachmentsbyapplicantcorrespondenceid(_applicantcorrespondenceid)
+            else:
+                _messageattachmentlist = documentservice().getattachments(ministryrequestid, 'ministryrequest', templateconfig().getattachmentcategory(servicename).lower())
             applicantcorrespondenceservice().saveapplicantcorrespondencelog(None, ministryrequestid, 'System Generated Email', content, _messageattachmentlist)
             return senderservice().send(servicename, _messagepart, _messageattachmentlist, requestjson)
         except Exception as ex:
@@ -66,4 +76,6 @@ class emailservice:
             return _response
         except Exception as ex:
             logging.exception(ex)
-            
+    
+    def __getvaluefromschema(self, emailschema, property):
+        return emailschema.get(property) if property in emailschema  else None
