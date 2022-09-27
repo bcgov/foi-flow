@@ -48,9 +48,18 @@ class FOIRequestPayment(db.Model):
         now_pst = maya.parse(maya.now()).datetime(to_timezone='America/Vancouver', naive=False)
         _psttoday = now_pst.strftime('%Y-%m-%d') 
         try:
-            sql = sql = """select distinct on (paymentid) paymentid, paymenturl from "FOIRequestPayments" fp where foirequestid = :foirequestid and ministryrequestid  = :ministryrequestid  
+            """
+            sql = select distinct on (paymentid) paymentid, paymenturl from "FOIRequestPayments" fp where foirequestid = :foirequestid and ministryrequestid  = :ministryrequestid  
                                 and TO_DATE(paymentexpirydate::TEXT,'YYYY-MM-DD') >=  TO_DATE(:today,'YYYY-MM-DD') 
-                                order by paymentid, version desc"""
+                                order by paymentid, version desc
+            """
+            sql =   """select fp1.paymentid , fp1.paymenturl, fp1.version from "FOIRequestPayments" fp1, (
+                                select distinct on (paymentid) paymentid, paymenturl, createdby, version  from "FOIRequestPayments" fp where foirequestid = :foirequestid and ministryrequestid  = :ministryrequestid  
+                                order by paymentid, version desc) as fp2 
+                                where fp1.paymentid = fp2.paymentid and fp1.version = fp2.version
+                                and fp1.createdby <> 'System_Cancel'
+                    """
+            
             rs = db.session.execute(text(sql), {'foirequestid': foirequestid, 'ministryrequestid' : ministryrequestid, 'today' : _psttoday})
             for row in rs:
                 return ({"paymentid": row["paymentid"], "paymenturl": row["paymenturl"]})
