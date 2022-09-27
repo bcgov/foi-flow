@@ -69,15 +69,6 @@ export const CFRForm = ({
     },
   ];
 
-  React.useEffect(() => {
-    if (ministryId) {
-      fetchCFRForm(
-        ministryId,
-        dispatch,
-      );
-    }
-  }, [ministryId]);
-
   const tooltipTotals = {
     "title": "Payment Details",
     "content": [
@@ -477,6 +468,10 @@ export const CFRForm = ({
               <div className="foi-request-review-header-row1">
                 <div className="col-9 foi-request-number-header">
                   <h3 className="foi-review-request-text">{requestNumber}</h3>
+                  <Chip
+                    label={initialFormData.formStatus === 'approved' ? "Version " + formHistory.length : "Version " + (formHistory.length + 1) + " Draft" }
+                    sx={{ backgroundColor: '#096DD1', color: '#fff', height: 19}}
+                  />
                 </div>
                 <div className="col-3">
                   <TextField

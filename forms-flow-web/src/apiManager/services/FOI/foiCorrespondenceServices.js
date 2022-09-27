@@ -26,9 +26,7 @@ export const fetchApplicantCorrespondence = (
     httpGETRequest(apiUrl, {}, UserService.getToken())
       .then((res) => {
         if (res.data) {
-          if (!_.isEmpty(res.data)) {
-            dispatch(setApplicantCorrespondence(res.data));
-          }
+          dispatch(setApplicantCorrespondence(res.data));
         } else {
           console.log("Error in fetching Applicant Correspondence data", res);
           dispatch(serviceActionError(res));

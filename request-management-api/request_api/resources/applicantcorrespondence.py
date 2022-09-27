@@ -46,6 +46,7 @@ class FOIFlowApplicantCorrespondenceTemplates(Resource):
     @TRACER.trace()
     @cross_origin(origins=allowedorigins())      
     @auth.require
+    @auth.belongstoiao
     @request_api.cache.cached(
         key_prefix="applicantcorrespondencetemplates",
         unless=cache_filter,
@@ -67,6 +68,7 @@ class FOIFlowApplicantCorrespondence(Resource):
     @TRACER.trace()
     @cross_origin(origins=allowedorigins())
     @auth.require
+    @auth.belongstoiao
     def get(ministryrequestid):
         try:
           
@@ -81,6 +83,7 @@ class FOIFlowApplicantCorrespondence(Resource):
     @TRACER.trace()
     @cross_origin(origins=allowedorigins())
     @auth.require
+    @auth.belongstoiao
     def post(ministryrequestid):
         try:
            requestjson = request.get_json()

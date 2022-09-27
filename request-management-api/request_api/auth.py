@@ -41,7 +41,15 @@ class Auth:
 
         return decorated
 
-
+    @classmethod
+    def belongstoiao(cls,func):
+        @wraps(func)
+        def decorated(type, id, field,*args, **kwargs):
+            usertype = AuthHelper.getusertype()
+            if(usertype == "iao"):
+                return func(type, id, field,*args, **kwargs)
+            return "Unauthorized" , 401
+        return decorated
 
     @classmethod
     def belongstosameministry(cls,func):
