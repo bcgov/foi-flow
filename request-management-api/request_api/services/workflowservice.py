@@ -4,6 +4,7 @@ import json
 from enum import Enum
 
 from request_api.services.external.bpmservice import MessageType, bpmservice
+from request_api.services.cfrfeeservice import cfrfeeservice
 from request_api.models.FOIRawRequests import FOIRawRequest
 from request_api.models.FOIMinistryRequests import FOIMinistryRequest
 """
@@ -40,7 +41,7 @@ class workflowservice:
                     oldstatus = self.__getministrystatus(filenumber, ministry["version"])
                     activity = self.__getministryactivity(oldstatus,newstatus)
                     previousstatus = self.__getpreviousministrystatus(id)
-                    metadata = json.dumps({"id": filenumber, "previousstatus":previousstatus, "status": ministry["status"] , "assignedGroup": assignedgroup, "assignedTo": assignedto, "assignedministrygroup":ministry["assignedministrygroup"], "ministryRequestID": id, "paymentExpiryDate": paymentexpirydate, "axisRequestId": axisrequestid})
+                    metadata = json.dumps({"id": filenumber, "previousstatus":previousstatus, "status": ministry["status"] , "assignedGroup": assignedgroup, "assignedTo": assignedto, "assignedministrygroup":ministry["assignedministrygroup"], "ministryRequestID": id, "isPaymentActive": self.__ispaymentactive(ministry["foirequestid"], id), "paymentExpiryDate": paymentexpirydate, "axisRequestId": axisrequestid})
                     messagename = self.__messagename(oldstatus, activity, usertype, self.__isprocessing(id))
                     self.__postopenedevent(id, filenumber, metadata, messagename, assignedgroup, assignedto, wfinstanceid, activity)
 
@@ -113,6 +114,10 @@ class workflowservice:
             if state == OpenedEvent.callforrecords.value and states[0] != OpenedEvent.callforrecords.value :
                 return True
         return False 
+
+    def __ispaymentactive(self, foirequestid, ministryid):
+        _payment = cfrfeeservice().getactivepayment(foirequestid, ministryid)
+        return True if _payment is not None else False
 
     def __getvaluefromschema(self,requestsschema, property):
         return requestsschema.get(property) if property in requestsschema  else None 
