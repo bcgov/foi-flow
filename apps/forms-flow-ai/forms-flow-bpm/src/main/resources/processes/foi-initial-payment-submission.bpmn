@@ -209,7 +209,14 @@ if ("previousstatus" in obj) {
         </camunda:executionListener>
         <camunda:executionListener expression="${execution.setVariable(&#34;retry5&#34;, 0)}" event="take" />
         <camunda:executionListener expression="${execution.setVariable(&#34;retry6&#34;, 0)}" event="take" />
-        <camunda:executionListener expression="${execution.setVariable(&#34;servicekey&#34;, &#34;na&#34;)}" event="take" />
+        <camunda:executionListener event="take">
+          <camunda:script scriptFormat="javascript">if (execution.getVariable("servicekey") &amp;&amp; execution.getVariable("servicekey") != null) {
+execution.setVariable("servicekey",execution.getVariable("servicekey"));
+} else {
+execution.setVariable("servicekey","na");
+}
+</camunda:script>
+        </camunda:executionListener>
       </bpmn:extensionElements>
     </bpmn:sequenceFlow>
     <bpmn:sequenceFlow id="Flow_00aq624" name="EXPIRED" sourceRef="Gateway_1rpwru8" targetRef="Activity_07lppep">
