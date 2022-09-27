@@ -139,9 +139,11 @@ class documentservice:
         """ Returns the active version of the request id based on type.
         """
         if requesttype == "ministryrequest":
-            return FOIMinistryRequest.getversionforrequest(requestid)[0]
+            document = FOIMinistryRequest.getversionforrequest(requestid)
         else:
-            return FOIRawRequest.getversionforrequest(requestid)[0]
+            document = FOIRawRequest.getversionforrequest(requestid)
+        if document:
+            return document[0]
 
     def __copydocumentproperties(self, document, documentschema, version):
         document['version'] = version +1
