@@ -43,12 +43,12 @@ class templateservice:
                 balancedue = float(requestjson['cfrfee']['feedata']["balanceDue"])
                 prevstate = self.__getprevstate(requestjson)
                 if balancedue > 0:
-                    return templateconfig().gettemplatename("HALFPAYMENT")
+                    return "HALFPAYMENT"
                 elif balancedue == 0:
                     templatekey = "FULLPAYMENT"
                     if prevstate.lower() == "response":
                         templatekey = "PAYOUTSTANDINGFULLPAYMENT"
-                    return templateconfig().gettemplatename(templatekey)
+                    return templatekey
 
         return _templatename
     
