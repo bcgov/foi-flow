@@ -102,7 +102,12 @@ const MinistryReview = React.memo(({ userDetail }) => {
     (state) => state.foiRequests.foiRequestComments
   );
   let requestAttachments = useSelector(
-    (state) => state.foiRequests.foiRequestAttachments
+    (state) => state.foiRequests.foiRequestAttachments.filter(
+      attachment => {
+        return ['feeassessed-onhold', 'fee estimate - payment receipt', 'response-onhold', 'fee balance outstanding - payment receipt']
+        .indexOf(attachment.category.toLowerCase()) === -1
+      }
+    )
   );
 
   const requestExtensions = useSelector(

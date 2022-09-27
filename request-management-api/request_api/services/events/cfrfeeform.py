@@ -82,9 +82,9 @@ class cfrfeeformevent:
             return  username+' updated Fee Estimate status to '+state
         if updatedamounts is not None:
             if 'feewaiveramountchanged' in updatedamounts and updatedamounts['feewaiveramountchanged'] is not None:
-                return username+ ' entered a fee waiver for the amount of $'+str(updatedamounts['feewaiveramountchanged'])
+                return username+ ' entered a fee waiver for the amount of $'+"{:.2f}".format(updatedamounts['feewaiveramountchanged'])
             if 'refundamountchanged' in updatedamounts and updatedamounts['refundamountchanged'] is not None:
-                return username+ ' entered a refund for the amount of $'+str(updatedamounts['refundamountchanged'])
+                return username+ ' entered a refund for the amount of $'+"{:.2f}".format(updatedamounts['refundamountchanged'])
         
 
     def __notificationmessage(self, state):
