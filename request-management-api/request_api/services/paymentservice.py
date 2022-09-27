@@ -50,6 +50,7 @@ class paymentservice:
         payment = self.__createpaymentInstance(request_id, ministry_request_id)
         if payment is not None and payment != {}:            
             payment.paymentexpirydate = datetime.now().isoformat()  
+            payment.createdby = 'System_Cancel'
         return FOIRequestPayment.savepayment(payment)
 
     def __createpaymentInstance(self, request_id, ministry_request_id):
