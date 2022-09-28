@@ -11,7 +11,7 @@
     <bpmn:group id="Group_0ihi2fn" categoryValueRef="CategoryValue_1baekcn" />
     <bpmn:group id="Cancel_payment" categoryValueRef="CategoryValue_0ne55cy" />
   </bpmn:collaboration>
-  <bpmn:process id="foi-fee-processing" name="FOI Fee Processing" isExecutable="true" camunda:versionTag="34">
+  <bpmn:process id="foi-fee-processing" name="FOI Fee Processing" isExecutable="true" camunda:versionTag="39">
     <bpmn:laneSet id="LaneSet_1u7kp6i">
       <bpmn:lane id="Lane_1u9yqiq" name="Create Payment Submission">
         <bpmn:flowNodeRef>Activity_0k05bsn</bpmn:flowNodeRef>
@@ -61,7 +61,6 @@
         <bpmn:flowNodeRef>Event_07sfh4u</bpmn:flowNodeRef>
         <bpmn:flowNodeRef>Activity_1mkqp7n</bpmn:flowNodeRef>
         <bpmn:flowNodeRef>Activity_1ka6mqq</bpmn:flowNodeRef>
-        <bpmn:flowNodeRef>Activity_1ab6zxo</bpmn:flowNodeRef>
       </bpmn:lane>
     </bpmn:laneSet>
     <bpmn:task id="Activity_0k05bsn" name="Create Submission">
@@ -515,7 +514,7 @@ execution.setVariable("servicekey","na");
       <bpmn:extensionElements />
       <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${paymentstatus == "PAID"}</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
-    <bpmn:sequenceFlow id="Flow_05dv10q" sourceRef="Activity_1ka6mqq" targetRef="Activity_1ab6zxo" />
+    <bpmn:sequenceFlow id="Flow_05dv10q" sourceRef="Activity_1ka6mqq" targetRef="Event_0q2irqu" />
     <bpmn:sequenceFlow id="Flow_0tmarie" sourceRef="Activity_0jc83dv" targetRef="Activity_1exws1a" />
     <bpmn:serviceTask id="Activity_07lppep" name="Get Token">
       <bpmn:extensionElements>
@@ -655,7 +654,7 @@ if ("nextStateName" in obj) {
 var saveDataPayload = {
 "nextStateName": nextStateName
 }
-execution.setVariable("saveDataPayload", saveDataPayload);</camunda:script>
+execution.setVariable("saveDataPayload", JSON.stringify(saveDataPayload));</camunda:script>
         </camunda:executionListener>
         <camunda:executionListener event="end">
           <camunda:script scriptFormat="javascript">var current = execution.getVariable("retry7");
@@ -697,7 +696,7 @@ else {
         </camunda:executionListener>
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_1o86b7t</bpmn:incoming>
-      <bpmn:incoming>Flow_1ua0cjx</bpmn:incoming>
+      <bpmn:incoming>Flow_05dv10q</bpmn:incoming>
       <bpmn:outgoing>Flow_0ib5b51</bpmn:outgoing>
       <bpmn:messageEventDefinition id="MessageEventDefinition_0gs70y7" />
     </bpmn:intermediateThrowEvent>
@@ -736,8 +735,10 @@ else {
           <camunda:script scriptFormat="javascript">var foiRequestMetaData = execution.getVariable("foiRequestMetaData");
 foiRequestMetaData = foiRequestMetaData.replace(/'/g, '"');
 var obj = JSON.parse(foiRequestMetaData);
-obj.status = execution.getVariable("nextStateName");
-execution.setVariable("foiRequestMetaData", obj);
+if ("nextStateName" in obj) {
+  obj.status = obj.nextStateName;
+}
+execution.setVariable("foiRequestMetaData", JSON.stringify(obj));
 
 var foistatuspayload = {
   "messageName" : "foi-iao-complete",
@@ -754,11 +755,6 @@ execution.setVariable("foistatuspayload", JSON.stringify(foistatuspayload))</cam
       <bpmn:incoming>Flow_11qcuod</bpmn:incoming>
       <bpmn:outgoing>Flow_05dv10q</bpmn:outgoing>
     </bpmn:serviceTask>
-    <bpmn:sequenceFlow id="Flow_1ua0cjx" sourceRef="Activity_1ab6zxo" targetRef="Event_0q2irqu" />
-    <bpmn:userTask id="Activity_1ab6zxo" name="D4">
-      <bpmn:incoming>Flow_05dv10q</bpmn:incoming>
-      <bpmn:outgoing>Flow_1ua0cjx</bpmn:outgoing>
-    </bpmn:userTask>
   </bpmn:process>
   <bpmn:message id="Message_1x26sx5" name="foi-manage-payment" />
   <bpmn:message id="Message_1rsz89u" name="foi-fee-expiry-notification-error" />
@@ -1029,7 +1025,7 @@ execution.setVariable("foistatuspayload", JSON.stringify(foistatuspayload))</cam
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_05dv10q_di" bpmnElement="Flow_05dv10q">
         <di:waypoint x="1490" y="1065" />
-        <di:waypoint x="1550" y="1065" />
+        <di:waypoint x="1762" y="1065" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_0tmarie_di" bpmnElement="Flow_0tmarie">
         <di:waypoint x="1030" y="1065" />
@@ -1058,10 +1054,6 @@ execution.setVariable("foistatuspayload", JSON.stringify(foistatuspayload))</cam
         <bpmndi:BPMNLabel>
           <dc:Bounds x="1178" y="1193" width="54" height="14" />
         </bpmndi:BPMNLabel>
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_1ua0cjx_di" bpmnElement="Flow_1ua0cjx">
-        <di:waypoint x="1650" y="1065" />
-        <di:waypoint x="1762" y="1065" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="Activity_0uv6wyi_di" bpmnElement="Activity_0k05bsn">
         <dc:Bounds x="980" y="293" width="100" height="80" />
@@ -1215,9 +1207,6 @@ execution.setVariable("foistatuspayload", JSON.stringify(foistatuspayload))</cam
       <bpmndi:BPMNShape id="Activity_1ka6mqq_di" bpmnElement="Activity_1ka6mqq">
         <dc:Bounds x="1390" y="1025" width="100" height="80" />
         <bpmndi:BPMNLabel />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_1tf3n9f_di" bpmnElement="Activity_1ab6zxo">
-        <dc:Bounds x="1550" y="1025" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="BPMNShape_065czdz" bpmnElement="Event_1979om9">
         <dc:Bounds x="1102" y="657" width="36" height="36" />
