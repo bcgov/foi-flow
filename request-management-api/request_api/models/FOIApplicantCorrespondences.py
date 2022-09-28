@@ -40,6 +40,12 @@ class FOIApplicantCorrespondence(db.Model):
         comment_schema = FOIApplicantCorrespondenceSchema(many=True)
         query = db.session.query(FOIApplicantCorrespondence).filter(FOIApplicantCorrespondence.foiministryrequest_id == ministryrequestid).order_by(FOIApplicantCorrespondence.applicantcorrespondenceid.desc()).all()
         return comment_schema.dump(query)
+    
+    @classmethod
+    def getapplicantcorrespondencebyid(cls,applicantcorrespondenceid):
+        correspondence_schema = FOIApplicantCorrespondenceSchema()
+        query = db.session.query(FOIApplicantCorrespondence).filter(FOIApplicantCorrespondence.applicantcorrespondenceid == applicantcorrespondenceid).first()
+        return correspondence_schema.dump(query)
 
     @classmethod
     def saveapplicantcorrespondence(cls, newapplicantcorrepondencelog,attachments)->DefaultMethodResult: 

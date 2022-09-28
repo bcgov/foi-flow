@@ -7,6 +7,7 @@ from request_api.models.FOIMinistryRequests import FOIMinistryRequest
 from request_api.models.FOIRawRequests import FOIRawRequest
 from request_api.schemas.foidocument import CreateDocumentSchema
 from request_api.services.external.storageservice import storageservice
+from request_api.models.FOIApplicantCorrespondenceAttachments import FOIApplicantCorrespondenceAttachment
 
 import json
 import base64
@@ -121,14 +122,28 @@ class documentservice:
         documents = FOIMinistryRequestDocument.getlatestdocumentsforemail(requestid, requestversion, category) if requesttype == "ministryrequest" else FOIRawRequestDocument.getdocuments(requestid, requestversion)
         return self.__formatcreateddate(documents)    
 
+    def getapplicantcorrespondenceattachmentsbyapplicantcorrespondenceid(self, applicantcorrespondenceid):
+        documents = FOIApplicantCorrespondenceAttachment.getapplicantcorrespondenceattachmentsbyapplicantcorrespondenceid(applicantcorrespondenceid)
+        if(documents is None):
+            raise ValueError('No template found')
+        attachmentlist = []
+        for document in documents:  
+            filename = document.get('attachmentfilename')
+            s3uri = document.get('attachmentdocumenturipath')
+            attachment= storageservice().download(s3uri)
+            attachdocument = {"filename": filename, "file": attachment, "url": s3uri}
+            attachmentlist.append(attachdocument)
+        return attachmentlist
     
     def __getversionforrequest(self, requestid, requesttype):
         """ Returns the active version of the request id based on type.
         """
         if requesttype == "ministryrequest":
-            return FOIMinistryRequest.getversionforrequest(requestid)[0]
+            document = FOIMinistryRequest.getversionforrequest(requestid)
         else:
-            return FOIRawRequest.getversionforrequest(requestid)[0]
+            document = FOIRawRequest.getversionforrequest(requestid)
+        if document:
+            return document[0]
 
     def __copydocumentproperties(self, document, documentschema, version):
         document['version'] = version +1
