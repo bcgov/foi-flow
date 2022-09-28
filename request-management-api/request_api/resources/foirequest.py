@@ -230,11 +230,7 @@ class FOIRequestsByStatusId(Resource):
         try: 
             print("statusid =================== ", statusid)                                  
             result = requestservice().updaterequeststatus(foirequestid, foiministryrequestid,statusid)
-            if result.success == True:
-                asyncio.ensure_future(eventservice().postevent(foiministryrequestid,"ministryrequest",AuthHelper.getuserid(),AuthHelper.getusername(),AuthHelper.isministrymember()))
-                return {'status': result.success, 'message':result.message,'id':result.identifier, 'ministryRequests': result.args[0]} , 200
-            else:
-                 return {'status': False, 'message':EXCEPTION_MESSAGE_NOTFOUND_REQUEST,'id':foirequestid} , 404
+            return {'status': result.success, 'message':result.message,'id':result.identifier, 'ministryRequests': result.args[0]} , 200
         except ValidationError as err:
             return {'status': False, 'message':err.messages}, 400
         except KeyError as err:
