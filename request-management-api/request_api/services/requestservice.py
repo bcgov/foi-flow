@@ -68,9 +68,9 @@ class requestservice:
     def postopeneventtoworkflow(self, id, wfinstanceid, requestschema, ministries):        
         workflowservice().postunopenedevent(id, wfinstanceid, requestschema, "Open", ministries)            
     
-    def postfeeeventtoworkflow(self, requestid, ministryrequestid, paymentstatus, statusid=None):
+    def postfeeeventtoworkflow(self, requestid, ministryrequestid, paymentstatus, nextstatename=None):
         foirequestschema = self.getrequestdetails(requestid, ministryrequestid)        
-        workflowservice().postfeeevent(requestid, ministryrequestid, foirequestschema, paymentstatus, statusid)            
+        workflowservice().postfeeevent(requestid, ministryrequestid, foirequestschema, paymentstatus, nextstatename)            
     
     def posteventtoworkflow(self, id, wfinstanceid, requestschema, data, usertype): 
         requeststatusid =  requestschema.get("requeststatusid") if 'requeststatusid' in requestschema  else None
