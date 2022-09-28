@@ -30,6 +30,7 @@ import CloseIcon from '@material-ui/icons/Close';
 import IconButton from '@material-ui/core/IconButton';
 import { CFRFormHistoryModal } from './CFRFormHistoryModal';
 import Grid from "@material-ui/core/Grid";
+import Tooltip from '../../customComponents/Tooltip/Tooltip';
 
 export const CFRForm = ({
   requestNumber,
@@ -69,6 +70,24 @@ export const CFRForm = ({
     },
   ];
 
+  const reasons = [
+    {
+      value: 'init',
+      label: 'Select Reason',
+      disabled: true
+    },
+    {
+      value: 'narrowedrequest',
+      label: 'Narrowed Request',
+      disabled: false,
+    },
+    {
+      value: 'revisedfeeestimate',
+      label: 'Revised Fee Estimate',
+      disabled: false,
+    }
+  ];
+
   React.useEffect(() => {
     if (ministryId) {
       fetchCFRForm(
@@ -78,6 +97,14 @@ export const CFRForm = ({
     }
   }, [ministryId]);
 
+  const tooltipReasons = {
+    "title": "Reasons",
+    "content": [
+      <div className="toolTipContent">
+        <p>Select 'Narrowed Request' when the applicant has narrowed their request. Select 'Revised Fee Estimate' 
+          when the request has not been narrowed but the estimated hours have changed.</p>
+      </div>]
+  };
   const tooltipTotals = {
     "title": "Payment Details",
     "content": [
@@ -184,7 +211,8 @@ export const CFRForm = ({
       electronicPages: 0,
       hardcopyPages: 0,
     },
-    suggestions: ''
+    suggestions: '',
+    reason:"init"
   };
 
   const [initialFormData, setInitialFormData] = useState(blankForm);
@@ -192,7 +220,7 @@ export const CFRForm = ({
 
 
   React.useEffect(() => {
-    var formattedData = {
+    let formattedData = {
       cfrfeeid: initialState.cfrfeeid,
       formStatus: initialState.status === null ? 'init' : initialState.status,
       estimatedTotalDue: initialState.feedata?.estimatedtotaldue,
@@ -217,7 +245,8 @@ export const CFRForm = ({
         electronicPages: initialState.feedata?.actualelectronicpages,
         hardcopyPages: initialState.feedata?.actualhardcopypages,
       },
-      suggestions: initialState.overallsuggestions
+      suggestions: initialState.overallsuggestions,
+      reason: initialState.reason === null ? "init" : initialState.reason
     };
     setInitialFormData(formattedData)
     setFormData(formattedData);
@@ -320,7 +349,7 @@ export const CFRForm = ({
   }
 
   const save = () => {
-    var callback = (_res: string) => {
+    let callback = (_res: string) => {
       setIsNewCFRForm(false)
       setInitialFormData(formData)
       toast.success("CFR Form has been saved successfully.", {
@@ -362,7 +391,8 @@ export const CFRForm = ({
         },
         overallsuggestions: formData.suggestions,
         status: formData.formStatus === 'init' ? '' : formData.formStatus,
-        cfrfeeid: formData.cfrfeeid
+        cfrfeeid: formData.cfrfeeid,
+        reason: formData.reason === "init" ? '' : formData.reason
       }
     } else {
       data = {
@@ -377,6 +407,7 @@ export const CFRForm = ({
           refundamount: formData.refundAmount,
         },
         status: formData.formStatus,
+        reason: formData.reason === "init" ? '' : formData.reason
       }
     }
     saveCFRForm(
@@ -420,7 +451,6 @@ export const CFRForm = ({
     setModalOpen(true);
   };
 
-
   const [createModalOpen, setCreateModalOpen] = useState(false);
   const handleCreateClose = () => {
     setCreateModalOpen(false);
@@ -461,7 +491,6 @@ export const CFRForm = ({
       return false;
   }
 
-
   return (
     <div className="foi-review-container">
       <Box
@@ -475,37 +504,76 @@ export const CFRForm = ({
           <div style={{marginTop: 20}}></div>
             <div className="container foi-review-request-container cfrform-container">
               <div className="foi-request-review-header-row1">
-                <div className="col-9 foi-request-number-header">
-                  <h3 className="foi-review-request-text">{requestNumber}</h3>
+                <div className="foi-request-review-header-col1">
+                  <div className="foi-request-number-header">
+                    <h3 className="foi-review-request-text">{requestNumber}</h3>
+                  </div>
                 </div>
-                <div className="col-3">
-                  <TextField
-                    id="cfrStatus"
-                    label={"CFR Status"}
-                    inputProps={{ "aria-labelledby": "cfrStatus-label"}}
-                    InputLabelProps={{ shrink: true }}
-                    select
-                    name="formStatus"
-                    value={formData?.formStatus}
-                    onChange={handleStatusChange}
-                    variant="outlined"
-                    fullWidth
-                    required
-                    disabled={cfrStatusDisabled()}
-                  >
-                    {CFRStatuses.map((option) => (
-                    <MenuItem
-                      key={option.value}
-                      value={option.value}
-                      disabled={option.disabled}
+                <div className='foi-assigned-to-container'>
+                  <div className='foi-assigned-to-inner-container'>
+                    <TextField
+                      id="cfrStatus"
+                      label={"CFR Status"}
+                      inputProps={{ "aria-labelledby": "cfrStatus-label"}}
+                      InputLabelProps={{ shrink: true }}
+                      select
+                      name="formStatus"
+                      value={formData?.formStatus}
+                      onChange={handleStatusChange}
+                      variant="outlined"
+                      fullWidth
+                      required
+                      disabled={cfrStatusDisabled()}
                     >
-                      {option.label}
-                    </MenuItem>
-                    ))}
-                  </TextField>
+                      {CFRStatuses.map((option) => (
+                      <MenuItem
+                        key={option.value}
+                        value={option.value}
+                        disabled={option.disabled}
+                      >
+                        {option.label}
+                      </MenuItem>
+                      ))}
+                    </TextField>
+                  </div>
+                  {formHistory.length > 1 || isNewCFRForm &&
+                  <>
+                    <div className='foi-assigned-to-inner-container'>
+                      <TextField
+                        id="reasons"
+                        label={"Reason for Creating New CFR Form"}
+                        inputProps={{ "aria-labelledby": "reasons-label"}}
+                        InputLabelProps={{ shrink: true }}
+                        placeholder={"Select Reason"}
+                        select
+                        name="reason"
+                        value={formData?.reason}
+                        onChange={handleTextChanges}
+                        variant="outlined"
+                        fullWidth
+                        required
+                        error={formData?.reason === 'init'}
+                      >
+                        {reasons.map((option) => (
+                        <MenuItem
+                          key={option.value}
+                          value={option.value}
+                          disabled={option.disabled}
+                        >
+                          {option.label}
+                        </MenuItem>
+                        ))}
+                      </TextField>
+                    </div>
+                  </>
+                  }
                 </div>
-
-
+                { formHistory.length > 1 || isNewCFRForm &&
+                  <div className="cfrform-reasons">
+                  <Tooltip content={tooltipReasons} position={""}/>
+                  <p className="hideContent" id="popup-7">Information7</p>
+                </div>
+                }
               </div>
               <div className="cfr-history-button">
                 <CFRFormHistoryModal
@@ -1081,7 +1149,7 @@ export const CFRForm = ({
                   className="col-lg-4 btn btn-bottom btn-save"
                   onClick={save}
                   color="primary"
-                  disabled={!validateFields()}
+                  disabled={!validateFields() || (formData?.reason === 'init' && formHistory.length <= 0)}
                 >
                   Save
                 </button>

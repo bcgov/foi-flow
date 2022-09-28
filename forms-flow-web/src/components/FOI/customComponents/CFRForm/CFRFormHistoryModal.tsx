@@ -43,7 +43,8 @@ export const CFRFormHistoryModal = React.memo(({
           return <div className='request-accordian' key={entry.cfrfeeid}>
             <Accordion defaultExpanded={false} className='history-entry-accordion'>
               <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                <Typography className="history-entry-title">CFR Form - Version {formHistory.length - index}</Typography>
+                <Typography className="history-entry-title">CFR Form - Version {formHistory.length - index}{entry['cfrformreason.description'] && " - "+entry['cfrformreason.description']} 
+                </Typography>
                 <Typography className="history-entry-username"> {entry.version_createdby} - {entry.version_created_at}</Typography>
               </AccordionSummary>
 

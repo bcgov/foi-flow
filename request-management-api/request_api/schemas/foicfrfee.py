@@ -41,6 +41,7 @@ class FOICFRFeeSchema(Schema):
     overallsuggestions = fields.Str(data_key="overallsuggestions")
     status = fields.Str(data_key="status")
     cfrfeeid = fields.Int(data_key="cfrfeeid",required=False, allow_none=True)
+    reason = fields.Str(data_key="reason")
  
 class FOIFeeDataSanctionSchema(Schema):
     class Meta:  # pylint: disable=too-few-public-methods
@@ -61,3 +62,4 @@ class FOICFRFeeSanctionSchema(Schema):
         
     feedata = fields.Nested(FOIFeeDataSanctionSchema,allow_none=False)
     status = fields.Str(data_key="status", required=True)
+    reason = fields.Str(data_key="reason")
