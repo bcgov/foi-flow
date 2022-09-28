@@ -11,14 +11,13 @@
     <bpmn:group id="Group_0ihi2fn" categoryValueRef="CategoryValue_1baekcn" />
     <bpmn:group id="Cancel_payment" categoryValueRef="CategoryValue_0ne55cy" />
   </bpmn:collaboration>
-  <bpmn:process id="foi-fee-processing" name="FOI Fee Processing" isExecutable="true" camunda:versionTag="29">
+  <bpmn:process id="foi-fee-processing" name="FOI Fee Processing" isExecutable="true" camunda:versionTag="30">
     <bpmn:laneSet id="LaneSet_1u7kp6i">
       <bpmn:lane id="Lane_1aaq844" name="Post Payment">
         <bpmn:flowNodeRef>Event_0dlzac7</bpmn:flowNodeRef>
         <bpmn:flowNodeRef>Gateway_1771ld6</bpmn:flowNodeRef>
         <bpmn:flowNodeRef>Event_05bv4ti</bpmn:flowNodeRef>
         <bpmn:flowNodeRef>Gateway_1rpwru8</bpmn:flowNodeRef>
-        <bpmn:flowNodeRef>Activity_1ka6mqq</bpmn:flowNodeRef>
         <bpmn:flowNodeRef>Event_1xghd1q</bpmn:flowNodeRef>
         <bpmn:flowNodeRef>Gateway_0xwy934</bpmn:flowNodeRef>
         <bpmn:flowNodeRef>Activity_1mkqp7n</bpmn:flowNodeRef>
@@ -39,8 +38,9 @@
         <bpmn:flowNodeRef>Activity_1c77pea</bpmn:flowNodeRef>
         <bpmn:flowNodeRef>Event_07sfh4u</bpmn:flowNodeRef>
         <bpmn:flowNodeRef>Event_0q2irqu</bpmn:flowNodeRef>
-        <bpmn:flowNodeRef>Activity_0myv4ya</bpmn:flowNodeRef>
         <bpmn:flowNodeRef>Activity_1exws1a</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Activity_0myv4ya</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Activity_1ka6mqq</bpmn:flowNodeRef>
       </bpmn:lane>
       <bpmn:lane id="Lane_1u9yqiq" name="Create Payment Submission">
         <bpmn:flowNodeRef>Activity_0k05bsn</bpmn:flowNodeRef>
@@ -232,8 +232,6 @@ execution.setVariable("servicekey","na");
         <camunda:executionListener expression="${execution.setVariable(&#34;paymentstatus&#34;, &#34;NOT PAID&#34;)}" event="take" />
       </bpmn:extensionElements>
     </bpmn:sequenceFlow>
-    <bpmn:sequenceFlow id="Flow_1eu3lad" sourceRef="Activity_1ka6mqq" targetRef="Activity_0myv4ya" />
-    <bpmn:sequenceFlow id="Flow_0hup5yp" sourceRef="Activity_0jc83dv" targetRef="Activity_1ka6mqq" />
     <bpmn:sequenceFlow id="Flow_0efzjr3" sourceRef="Activity_1a43pmz" targetRef="Event_1y2hfyk" />
     <bpmn:intermediateThrowEvent id="Event_1cv04sw" name="Manage Payment">
       <bpmn:incoming>Flow_04inq0o</bpmn:incoming>
@@ -369,38 +367,6 @@ execution.setVariable("saveDataPayload", JSON.stringify(saveDataPayload));</camu
       <bpmn:outgoing>Flow_00aq624</bpmn:outgoing>
       <bpmn:outgoing>Flow_0o3fy5y</bpmn:outgoing>
     </bpmn:exclusiveGateway>
-    <bpmn:serviceTask id="Activity_1ka6mqq" name="Change Request State">
-      <bpmn:extensionElements>
-        <camunda:connector>
-          <camunda:inputOutput>
-            <camunda:inputParameter name="payload">${foistatuspayload}</camunda:inputParameter>
-            <camunda:inputParameter name="url">${foiwfUrl}/message</camunda:inputParameter>
-            <camunda:inputParameter name="method">POST</camunda:inputParameter>
-            <camunda:inputParameter name="headers">
-              <camunda:map>
-                <camunda:entry key="Content-Type">application/json</camunda:entry>
-                <camunda:entry key="Authorization">Bearer ${accessToken}</camunda:entry>
-              </camunda:map>
-            </camunda:inputParameter>
-          </camunda:inputOutput>
-          <camunda:connectorId>http-connector</camunda:connectorId>
-        </camunda:connector>
-        <camunda:executionListener event="start">
-          <camunda:script scriptFormat="javascript">var foistatuspayload = {
-  "messageName" : "foi-iao-complete",
-  "localCorrelationKeys" : {
-    "id" : {"value" : execution.getVariable("fileNumber") , "type": "String"}
-  },
-  "processVariables" : {
-    "foiRequestMetaData" : {"value" : execution.getVariable("foiRequestMetaData") , "type": "String"}
-  }
-}
-execution.setVariable("foistatuspayload", JSON.stringify(foistatuspayload))</camunda:script>
-        </camunda:executionListener>
-      </bpmn:extensionElements>
-      <bpmn:incoming>Flow_0hup5yp</bpmn:incoming>
-      <bpmn:outgoing>Flow_1eu3lad</bpmn:outgoing>
-    </bpmn:serviceTask>
     <bpmn:sequenceFlow id="Flow_03lwez1" sourceRef="Event_1xghd1q" targetRef="Gateway_0xwy934">
       <bpmn:extensionElements>
         <camunda:executionListener expression="${execution.setVariable(&#34;date_on&#34;, now())}" event="take" />
@@ -469,7 +435,7 @@ execution.setVariable("paymentstatus", "EXPIRED");
         </camunda:connector>
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_0q1yoij</bpmn:incoming>
-      <bpmn:outgoing>Flow_0hup5yp</bpmn:outgoing>
+      <bpmn:outgoing>Flow_0tmarie</bpmn:outgoing>
     </bpmn:serviceTask>
     <bpmn:sequenceFlow id="Flow_0sfszv6" sourceRef="Activity_07lppep" targetRef="Activity_1tkdc9h" />
     <bpmn:serviceTask id="Activity_07lppep" name="Get Token">
@@ -655,7 +621,7 @@ execution.setVariable("retry6", current+1); </camunda:script>
       <bpmn:outgoing>Flow_1uanl8j</bpmn:outgoing>
     </bpmn:userTask>
     <bpmn:sequenceFlow id="Flow_1uanl8j" sourceRef="Activity_1c77pea" targetRef="Activity_1mkqp7n" />
-    <bpmn:sequenceFlow id="Flow_1o86b7t" sourceRef="Gateway_01k1226" targetRef="Event_0q2irqu">
+    <bpmn:sequenceFlow id="Flow_1o86b7t" name="CORRESPONDENCE" sourceRef="Gateway_01k1226" targetRef="Event_0q2irqu">
       <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${servicekey ==  "correspondence"}</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
     <bpmn:endEvent id="Event_07sfh4u">
@@ -674,16 +640,14 @@ else {
         </camunda:executionListener>
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_1o86b7t</bpmn:incoming>
-      <bpmn:incoming>Flow_11qcuod</bpmn:incoming>
+      <bpmn:incoming>Flow_05dv10q</bpmn:incoming>
       <bpmn:outgoing>Flow_0ib5b51</bpmn:outgoing>
       <bpmn:messageEventDefinition id="MessageEventDefinition_0gs70y7" />
     </bpmn:intermediateThrowEvent>
-    <bpmn:userTask id="Activity_0myv4ya" name="D3">
-      <bpmn:incoming>Flow_1eu3lad</bpmn:incoming>
-      <bpmn:outgoing>Flow_1rinskl</bpmn:outgoing>
-    </bpmn:userTask>
-    <bpmn:sequenceFlow id="Flow_1rinskl" sourceRef="Activity_0myv4ya" targetRef="Activity_1exws1a" />
-    <bpmn:sequenceFlow id="Flow_11qcuod" sourceRef="Activity_1exws1a" targetRef="Event_0q2irqu" />
+    <bpmn:sequenceFlow id="Flow_11qcuod" sourceRef="Activity_1exws1a" targetRef="Activity_0myv4ya" />
+    <bpmn:sequenceFlow id="Flow_05dv10q" sourceRef="Activity_1ka6mqq" targetRef="Event_0q2irqu" />
+    <bpmn:sequenceFlow id="Flow_038qstz" sourceRef="Activity_0myv4ya" targetRef="Activity_1ka6mqq" />
+    <bpmn:sequenceFlow id="Flow_0tmarie" sourceRef="Activity_0jc83dv" targetRef="Activity_1exws1a" />
     <bpmn:serviceTask id="Activity_1exws1a" name="Update Status">
       <bpmn:extensionElements>
         <camunda:connector>
@@ -705,8 +669,44 @@ if ("statusid" in obj) {
 }</camunda:script>
         </camunda:executionListener>
       </bpmn:extensionElements>
-      <bpmn:incoming>Flow_1rinskl</bpmn:incoming>
+      <bpmn:incoming>Flow_0tmarie</bpmn:incoming>
       <bpmn:outgoing>Flow_11qcuod</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:userTask id="Activity_0myv4ya" name="D3">
+      <bpmn:incoming>Flow_11qcuod</bpmn:incoming>
+      <bpmn:outgoing>Flow_038qstz</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:serviceTask id="Activity_1ka6mqq" name="Change Request State">
+      <bpmn:extensionElements>
+        <camunda:connector>
+          <camunda:inputOutput>
+            <camunda:inputParameter name="payload">${foistatuspayload}</camunda:inputParameter>
+            <camunda:inputParameter name="url">${foiwfUrl}/message</camunda:inputParameter>
+            <camunda:inputParameter name="method">POST</camunda:inputParameter>
+            <camunda:inputParameter name="headers">
+              <camunda:map>
+                <camunda:entry key="Content-Type">application/json</camunda:entry>
+                <camunda:entry key="Authorization">Bearer ${accessToken}</camunda:entry>
+              </camunda:map>
+            </camunda:inputParameter>
+          </camunda:inputOutput>
+          <camunda:connectorId>http-connector</camunda:connectorId>
+        </camunda:connector>
+        <camunda:executionListener event="start">
+          <camunda:script scriptFormat="javascript">var foistatuspayload = {
+  "messageName" : "foi-iao-complete",
+  "localCorrelationKeys" : {
+    "id" : {"value" : execution.getVariable("fileNumber") , "type": "String"}
+  },
+  "processVariables" : {
+    "foiRequestMetaData" : {"value" : execution.getVariable("foiRequestMetaData") , "type": "String"}
+  }
+}
+execution.setVariable("foistatuspayload", JSON.stringify(foistatuspayload))</camunda:script>
+        </camunda:executionListener>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_038qstz</bpmn:incoming>
+      <bpmn:outgoing>Flow_05dv10q</bpmn:outgoing>
     </bpmn:serviceTask>
   </bpmn:process>
   <bpmn:message id="Message_1x26sx5" name="foi-manage-payment" />
@@ -740,6 +740,25 @@ if ("statusid" in obj) {
       <bpmndi:BPMNShape id="Lane_1aaq844_di" bpmnElement="Lane_1aaq844" isHorizontal="true">
         <dc:Bounds x="170" y="490" width="1950" height="810" />
       </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_11qcuod_di" bpmnElement="Flow_11qcuod">
+        <di:waypoint x="1190" y="910" />
+        <di:waypoint x="1280" y="910" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1o86b7t_di" bpmnElement="Flow_1o86b7t">
+        <di:waypoint x="800" y="885" />
+        <di:waypoint x="800" y="810" />
+        <di:waypoint x="1750" y="810" />
+        <di:waypoint x="1750" y="892" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1241" y="776" width="87" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1uanl8j_di" bpmnElement="Flow_1uanl8j">
+        <di:waypoint x="520" y="740" />
+        <di:waypoint x="520" y="805" />
+        <di:waypoint x="580" y="805" />
+        <di:waypoint x="580" y="870" />
+      </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_0q1yoij_di" bpmnElement="Flow_0q1yoij">
         <di:waypoint x="825" y="910" />
         <di:waypoint x="920" y="910" />
@@ -902,14 +921,6 @@ if ("statusid" in obj) {
         <di:waypoint x="1490" y="288" />
         <di:waypoint x="1872" y="288" />
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_0hup5yp_di" bpmnElement="Flow_0hup5yp">
-        <di:waypoint x="1020" y="910" />
-        <di:waypoint x="1070" y="910" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_1eu3lad_di" bpmnElement="Flow_1eu3lad">
-        <di:waypoint x="1170" y="910" />
-        <di:waypoint x="1340" y="910" />
-      </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_17nmoz9_di" bpmnElement="Flow_17nmoz9">
         <di:waypoint x="298" y="910" />
         <di:waypoint x="375" y="910" />
@@ -968,25 +979,17 @@ if ("statusid" in obj) {
           <dc:Bounds x="716" y="893" width="25" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_1uanl8j_di" bpmnElement="Flow_1uanl8j">
-        <di:waypoint x="520" y="740" />
-        <di:waypoint x="520" y="805" />
-        <di:waypoint x="580" y="805" />
-        <di:waypoint x="580" y="870" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_1o86b7t_di" bpmnElement="Flow_1o86b7t">
-        <di:waypoint x="800" y="885" />
-        <di:waypoint x="800" y="790" />
-        <di:waypoint x="1750" y="790" />
-        <di:waypoint x="1750" y="892" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_1rinskl_di" bpmnElement="Flow_1rinskl">
-        <di:waypoint x="1440" y="910" />
-        <di:waypoint x="1530" y="910" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_11qcuod_di" bpmnElement="Flow_11qcuod">
-        <di:waypoint x="1630" y="910" />
+      <bpmndi:BPMNEdge id="Flow_05dv10q_di" bpmnElement="Flow_05dv10q">
+        <di:waypoint x="1580" y="910" />
         <di:waypoint x="1732" y="910" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_038qstz_di" bpmnElement="Flow_038qstz">
+        <di:waypoint x="1380" y="910" />
+        <di:waypoint x="1480" y="910" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0tmarie_di" bpmnElement="Flow_0tmarie">
+        <di:waypoint x="1020" y="910" />
+        <di:waypoint x="1090" y="910" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="Activity_0uv6wyi_di" bpmnElement="Activity_0k05bsn">
         <dc:Bounds x="980" y="248" width="100" height="80" />
@@ -1062,10 +1065,6 @@ if ("statusid" in obj) {
       <bpmndi:BPMNShape id="Gateway_1rpwru8_di" bpmnElement="Gateway_1rpwru8" isMarkerVisible="true">
         <dc:Bounds x="645" y="885" width="50" height="50" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_1ka6mqq_di" bpmnElement="Activity_1ka6mqq">
-        <dc:Bounds x="1070" y="870" width="100" height="80" />
-        <bpmndi:BPMNLabel />
-      </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Event_067sxb8_di" bpmnElement="Event_1xghd1q">
         <dc:Bounds x="382" y="1002" width="36" height="36" />
       </bpmndi:BPMNShape>
@@ -1128,11 +1127,15 @@ if ("statusid" in obj) {
           <dc:Bounds x="1712" y="938" width="76" height="27" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_1enpnjg_di" bpmnElement="Activity_0myv4ya">
-        <dc:Bounds x="1340" y="870" width="100" height="80" />
-      </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_1w40vrv_di" bpmnElement="Activity_1exws1a">
-        <dc:Bounds x="1530" y="870" width="100" height="80" />
+        <dc:Bounds x="1090" y="870" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1enpnjg_di" bpmnElement="Activity_0myv4ya">
+        <dc:Bounds x="1280" y="870" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1ka6mqq_di" bpmnElement="Activity_1ka6mqq">
+        <dc:Bounds x="1480" y="870" width="100" height="80" />
         <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="BPMNShape_065czdz" bpmnElement="Event_1979om9">
@@ -1169,9 +1172,9 @@ if ("statusid" in obj) {
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Group_0nmwgct_di" bpmnElement="Group_0nmwgct">
-        <dc:Bounds x="890" y="850" width="300" height="120" />
+        <dc:Bounds x="890" y="850" width="790" height="120" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="996" y="836" width="68" height="14" />
+          <dc:Bounds x="1225" y="836" width="68" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Group_0ihi2fn_di" bpmnElement="Group_0ihi2fn">
