@@ -228,7 +228,7 @@ class FOIRequestsByStatusId(Resource):
     def post(foirequestid,foiministryrequestid,statusid):
         """ POST Method for capturing FOI requests before processing"""
         try: 
-            print("statusid = ", statusid)                                  
+            print("statusid =================== ", statusid)                                  
             result = requestservice().updaterequeststatus(foirequestid, foiministryrequestid,statusid)
             if result.success == True:
                 asyncio.ensure_future(eventservice().postevent(foiministryrequestid,"ministryrequest",AuthHelper.getuserid(),AuthHelper.getusername(),AuthHelper.isministrymember()))
