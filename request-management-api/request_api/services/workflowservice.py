@@ -45,7 +45,7 @@ class workflowservice:
                     messagename = self.__messagename(oldstatus, activity, usertype, self.__isprocessing(id))
                     self.__postopenedevent(id, filenumber, metadata, messagename, assignedgroup, assignedto, wfinstanceid, activity)
 
-    def postfeeevent(self, requestid, ministryrequestid, requestsschema, status):
+    def postfeeevent(self, requestid, ministryrequestid, requestsschema, paymentstatus, statusid=None):
         metadata = json.dumps({
             "id": requestsschema["idNumber"], 
             "status": requestsschema["currentState"], 
@@ -53,9 +53,10 @@ class workflowservice:
             "assignedTo": requestsschema["assignedTo"],
             "assignedministrygroup" : requestsschema["assignedministrygroup"],
             "ministryRequestID" : ministryrequestid,
-			"foiRequestID" :requestid
+			"foiRequestID" :requestid,
+            "statusid": statusid
             })
-        return bpmservice().feeevent(requestsschema["axisRequestId"], metadata, status)    
+        return bpmservice().feeevent(requestsschema["axisRequestId"], metadata, paymentstatus)    
     
     def postcorrenspodenceevent(self, ministryid, requestsschema, applicantcorrespondenceid, templatename, attributes):
         paymentexpirydate = self.__getvaluefromlist(attributes,"paymentExpiryDate")
