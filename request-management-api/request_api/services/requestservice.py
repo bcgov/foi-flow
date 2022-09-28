@@ -37,7 +37,6 @@ class requestservice:
     def updaterequeststatus(self, requestid, ministryrequestid, statusid):
         foirequestschema = self.getrequest(requestid, ministryrequestid)
         foirequestschema['requeststatusid'] = statusid
-        print("foirequestschema === ", foirequestschema)
         return self.saverequestversion(foirequestschema, requestid, ministryrequestid,'Online Payment')
                
     def getrequest(self,foirequestid,foiministryrequestid): 
