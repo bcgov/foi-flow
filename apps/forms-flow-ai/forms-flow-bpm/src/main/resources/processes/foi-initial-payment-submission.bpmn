@@ -635,8 +635,8 @@ connector.getVariable("statusCode");</camunda:script>
               </camunda:map>
             </camunda:inputParameter>
             <camunda:inputParameter name="method">POST</camunda:inputParameter>
-            <camunda:inputParameter name="url">${foiApiUrl}/api/foirequests/${foiRequestID}/ministryrequest/${ministryRequestID}/status/${statusid}</camunda:inputParameter>
-            <camunda:inputParameter name="payload">${savePayLoad}</camunda:inputParameter>
+            <camunda:inputParameter name="url">${foiApiUrl}/api/foirequests/${foiRequestID}/ministryrequest/${ministryRequestID}/status</camunda:inputParameter>
+            <camunda:inputParameter name="payload">${saveDataPayload}</camunda:inputParameter>
             <camunda:outputParameter name="responseCode">if (connector.getVariable("statusCode") != 200) {
 	throw new org.camunda.bpm.engine.delegate.BpmnError("FOI-CANCEL-SUB-API-ERR", response);
 }
@@ -648,13 +648,14 @@ connector.getVariable("statusCode");</camunda:outputParameter>
           <camunda:script scriptFormat="javascript">var foiRequestMetaData = execution.getVariable("foiRequestMetaData");
 foiRequestMetaData = foiRequestMetaData.replace(/'/g, '"');
 var obj = JSON.parse(foiRequestMetaData);
-var savePayLoad = { }
+var nextStateName = "";
 if ("nextStateName" in obj) {
-  savePayLoad.nextStateName = obj.nextStateName
-  execution.setVariable("nextStateName", obj.nextStateName);
+  nextStateName = obj.nextStateName;
 }
-
-execution.setVariable("savePayLoad", savePayLoad);</camunda:script>
+var saveDataPayload = {
+"nextStateName": nextStateName
+}
+execution.setVariable("saveDataPayload", saveDataPayload);</camunda:script>
         </camunda:executionListener>
         <camunda:executionListener event="end">
           <camunda:script scriptFormat="javascript">var current = execution.getVariable("retry7");

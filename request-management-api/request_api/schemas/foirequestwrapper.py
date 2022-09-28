@@ -124,7 +124,10 @@ class EditableFOIMinistryRequestWrapperSchema(Schema):
 
 class EditableFOIRequestWrapperSchema(Schema):
     wfinstanceid = fields.Str(data_key="wfinstanceId",allow_none=True)
-    selectedMinistries = fields.Nested(EditableFOIMinistryRequestWrapperSchema, many=True)  
+    selectedMinistries = fields.Nested(EditableFOIMinistryRequestWrapperSchema, many=True)
+
+class FOIRequestStatusSchema(Schema):
+    nextstatename = fields.Str(data_key="nextStateName",allow_none=True) 
 
 class FOIMinistryRequestDivisionSchema(Schema):
     class Meta:  # pylint: disable=too-few-public-methods
