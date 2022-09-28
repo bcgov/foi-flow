@@ -106,8 +106,8 @@ const AttachmentFilter = ({handleFilterChange, filterValue, handleKeywordChange,
                             label={"ALL"}
                             color="primary"
                             size="small"
-                            onClick={()=>{handleFilterChange('')}}
-                            clicked={filterValue == ''}
+                            onClick={()=>{handleFilterChange('ALL')}}
+                            clicked={filterValue == 'ALL'}
                         />
                     </Stack>
                 </Grid>

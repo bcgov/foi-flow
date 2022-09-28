@@ -20,6 +20,7 @@ import MenuItem from "@material-ui/core/MenuItem";
 import { saveAs } from "file-saver";
 import { downloadZip } from "client-zip";
 import AttachmentFilter from './AttachmentFilter';
+import { getCategory } from './util';
 
 const useStyles = makeStyles((_theme) => ({
   createButton: {
@@ -90,7 +91,7 @@ export const AttachmentSection = ({
   const [updateAttachment, setUpdateAttachment] = useState({});
   const [fullnameList, setFullnameList] = useState(getFullnameList);
   const [attachmentsForDisplay, setAttachmentsForDisplay] = useState(attachments)
-  const [filterValue, setFilterValue] = useState('');
+  const [filterValue, setFilterValue] = useState('ALL');
   const [keywordValue, setKeywordValue] = useState('');
 
   const addAttachments = () => {
@@ -120,8 +121,16 @@ export const AttachmentSection = ({
   },[filterValue, keywordValue, attachments])
 
   const searchAttachments = (_attachments, _filterValue, _keywordValue) =>  {
-    return _attachments.filter( attachment => attachment.category.toLowerCase().includes(_filterValue?.toLowerCase()) 
-              && ( attachment.category.toLowerCase().includes(_keywordValue?.toLowerCase()) || attachment.filename.toLowerCase().includes(_keywordValue?.toLowerCase()) || attachment.createdby.toLowerCase().includes(_keywordValue?.toLowerCase()) ));
+    return _attachments.filter( attachment => {
+              let onecategory = getCategory(attachment.category.toLowerCase());
+              return (
+                (_filterValue==="ALL"?true:onecategory.tags.includes(_filterValue?.toLowerCase()))
+                && ( onecategory.tags.join('-').includes(_keywordValue?.toLowerCase())
+                      || attachment.category.toLowerCase().includes(_keywordValue?.toLowerCase()) 
+                      || attachment.filename.toLowerCase().includes(_keywordValue?.toLowerCase()) 
+                      || attachment.createdby.toLowerCase().includes(_keywordValue?.toLowerCase()) )
+              )
+    });
   }
 
   const replaceAttachment = () => {
@@ -421,10 +430,6 @@ const Attachment = React.memo(({indexValue, attachment, handlePopupButtonClick, 
       setDisabled(isMinistryCoordinator && disableCategory())
     }
   }, [attachment])
-
-  const getCategory = (category) => {
-    return AttachmentCategories.categorys.find(element => element.name === category);
-  }
 
   const attachmenttitle = ()=>{
 
