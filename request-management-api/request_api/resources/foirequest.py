@@ -214,3 +214,30 @@ class FOIRequestDetailsByMinistryId(Resource):
             return {'status': False, 'message':err.messages}, 400        
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500
+
+    
+@cors_preflight('GET,POST,PUT,OPTIONS')
+@API.route('/foirequests/<int:foirequestid>/ministryrequest/<int:foiministryrequestid>/status/<int:statusid>')
+class FOIRequestsByStatusId(Resource):
+    """Creates a new version of foi request for iao updates"""
+
+    @staticmethod
+    @TRACER.trace()
+    @cross_origin(origins=allowedorigins())
+    @auth.require
+    def post(foirequestid,foiministryrequestid,statusid):
+        """ POST Method for capturing FOI requests before processing"""
+        try: 
+            print("statusid = ", statusid)                                  
+            result = requestservice().updaterequeststatus(foirequestid, foiministryrequestid,statusid)
+            if result.success == True:
+                asyncio.ensure_future(eventservice().postevent(foiministryrequestid,"ministryrequest",AuthHelper.getuserid(),AuthHelper.getusername(),AuthHelper.isministrymember()))
+                return {'status': result.success, 'message':result.message,'id':result.identifier, 'ministryRequests': result.args[0]} , 200
+            else:
+                 return {'status': False, 'message':EXCEPTION_MESSAGE_NOTFOUND_REQUEST,'id':foirequestid} , 404
+        except ValidationError as err:
+            return {'status': False, 'message':err.messages}, 400
+        except KeyError as err:
+            return {'status': False, 'message':err.messages}, 400    
+        except BusinessException as exception:            
+            return {'status': exception.status_code, 'message':exception.message}, 500
