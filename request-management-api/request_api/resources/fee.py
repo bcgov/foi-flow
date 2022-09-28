@@ -29,7 +29,7 @@ from request_api.services.eventservice import eventservice
 from request_api.services.document_generation_service import DocumentGenerationService
 from request_api.utils.util import  cors_preflight, allowedorigins
 from request_api.exceptions import BusinessException
-from request_api.utils.enums import PaymentEventType
+from request_api.utils.enums import PaymentEventType, StateName
 API = Namespace('Fees', description='Endpoints for Fee and payments')
 
 
@@ -98,14 +98,14 @@ class Payment(Resource):
                 data = requestservice().getrequestdetails(request_id, ministry_request_id)
                 paymentservice().createpaymentreceipt(request_id, ministry_request_id, data, parsed_args)
                 prevstate = data["stateTransition"][1]["status"] if "stateTransition" in data and len(data["stateTransition"])  > 2 else None
-                statusid = 2
+                nextstatename = StateName.callforrecords.value
 
                 balancedue = float(data['cfrfee']['feedata']["balanceDue"])
                 paymenteventtype = PaymentEventType.paid.value
                 if balancedue > 0:
                     paymenteventtype = PaymentEventType.depositpaid.value
                 if prevstate.lower() == "response":
-                    statusid = 14
+                    nextstatename = StateName.response.value
 
                     #outstanding
                     if balancedue == 0:
@@ -113,7 +113,7 @@ class Payment(Resource):
                 # result = requestservice().updaterequeststatus(request_id, ministry_request_id, statusid)
                 # if result.success == True:
                 asyncio.ensure_future(eventservice().postpaymentevent(ministry_request_id, paymenteventtype))
-                requestservice().postfeeeventtoworkflow(request_id, ministry_request_id, "PAID", statusid)
+                requestservice().postfeeeventtoworkflow(request_id, ministry_request_id, "PAID", nextstatename)
                 asyncio.ensure_future(eventservice().postevent(ministry_request_id,"ministryrequest","System","System", False))
             return response, 201
         except BusinessException as e:
