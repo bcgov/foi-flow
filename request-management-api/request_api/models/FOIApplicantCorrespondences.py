@@ -46,6 +46,12 @@ class FOIApplicantCorrespondence(db.Model):
         correspondence_schema = FOIApplicantCorrespondenceSchema()
         query = db.session.query(FOIApplicantCorrespondence).filter(FOIApplicantCorrespondence.applicantcorrespondenceid == applicantcorrespondenceid).first()
         return correspondence_schema.dump(query)
+    
+    @classmethod
+    def getlatestapplicantcorrespondence(cls,ministryrequestid):
+        correspondence_schema = FOIApplicantCorrespondenceSchema()
+        query = db.session.query(FOIApplicantCorrespondence).filter(FOIApplicantCorrespondence.foiministryrequest_id == ministryrequestid, FOIApplicantCorrespondence.createdby != 'System Generated Email').order_by(FOIApplicantCorrespondence.applicantcorrespondenceid.desc()).first()
+        return correspondence_schema.dump(query)
 
     @classmethod
     def saveapplicantcorrespondence(cls, newapplicantcorrepondencelog,attachments)->DefaultMethodResult: 

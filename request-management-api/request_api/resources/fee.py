@@ -14,6 +14,7 @@
 """API endpoints for managing a Feee resource."""
 
 from datetime import datetime
+from re import template
 
 from flask import request, send_file, Response
 from flask_cors import cross_origin
@@ -27,6 +28,7 @@ from request_api.services.requestservice import requestservice
 from request_api.services.paymentservice import paymentservice
 from request_api.services.eventservice import eventservice
 from request_api.services.document_generation_service import DocumentGenerationService
+from request_api.services.applicantcorrespondence.applicantcorrespondencelog  import applicantcorrespondenceservice
 from request_api.utils.util import  cors_preflight, allowedorigins
 from request_api.exceptions import BusinessException
 from request_api.utils.enums import PaymentEventType, StateName
@@ -99,7 +101,14 @@ class Payment(Resource):
                 paymentservice().createpaymentreceipt(request_id, ministry_request_id, data, parsed_args)
                 prevstate = data["stateTransition"][1]["status"] if "stateTransition" in data and len(data["stateTransition"])  > 2 else None
                 nextstatename = StateName.callforrecords.value
-
+                latestcorrespondence = applicantcorrespondenceservice().getlatestapplicantcorrespondence(ministry_request_id)
+                print('latestcorrespondence = ', latestcorrespondence)
+                templateid = latestcorrespondence['templateid'] if 'templateid' in latestcorrespondence else None
+                print('templateid = ', templateid)
+                templatename = ""
+                if templateid:
+                    templatename = applicantcorrespondenceservice().gettemplatebyid(templateid)
+                print('templatename = ', templatename)
                 balancedue = float(data['cfrfee']['feedata']["balanceDue"])
                 paymenteventtype = PaymentEventType.paid.value
                 if balancedue > 0:
@@ -107,9 +116,9 @@ class Payment(Resource):
                 if prevstate.lower() == "response":
                     nextstatename = StateName.response.value
 
-                    #outstanding
-                    if balancedue == 0:
-                        paymenteventtype = PaymentEventType.outstandingpaid.value
+                #outstanding
+                if balancedue == 0 and (templatename == 'PAYOUTSTANDING' or prevstate.lower() == "response"):
+                    paymenteventtype = PaymentEventType.outstandingpaid.value
                 # result = requestservice().updaterequeststatus(request_id, ministry_request_id, statusid)
                 # if result.success == True:
                 asyncio.ensure_future(eventservice().postpaymentevent(ministry_request_id, paymenteventtype))
