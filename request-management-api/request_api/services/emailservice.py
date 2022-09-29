@@ -33,7 +33,7 @@ class emailservice:
                 servicename = _templatename
             _messagepart, content = templateservice().generate_by_servicename_and_schema(servicename, requestjson, _applicantcorrespondenceid)
             _messageattachmentlist = []
-            if (_applicantcorrespondenceid):
+            if (_applicantcorrespondenceid and templateconfig().isnotreceipt(servicename)):
                 servicename = _templatename.upper() if _templatename else ""
                 _messageattachmentlist = documentservice().getapplicantcorrespondenceattachmentsbyapplicantcorrespondenceid(_applicantcorrespondenceid)
             else:
