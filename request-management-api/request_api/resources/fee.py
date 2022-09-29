@@ -107,7 +107,7 @@ class Payment(Resource):
                 print('templateid = ', templateid)
                 templatename = ""
                 if templateid:
-                    templatename = applicantcorrespondenceservice().gettemplatebyid(templateid)['name']
+                    templatename = applicantcorrespondenceservice().gettemplatebyid(templateid).name
                 print('templatename = ', templatename)
                 balancedue = float(data['cfrfee']['feedata']["balanceDue"])
                 paymenteventtype = PaymentEventType.paid.value
