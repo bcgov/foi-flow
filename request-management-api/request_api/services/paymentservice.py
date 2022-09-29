@@ -4,11 +4,8 @@ from re import VERBOSE
 from request_api.models.FOIRequestPayments import FOIRequestPayment
 from request_api.models.FOIMinistryRequests import FOIMinistryRequest
 from request_api.services.document_generation_service import DocumentGenerationService
-from request_api.services.external.storageservice import storageservice
 from request_api.models.default_method_result import DefaultMethodResult
 from request_api.services.applicantcorrespondence.applicantcorrespondencelog import applicantcorrespondenceservice
-from request_api.services.requestservice import requestservice
-from request_api.services.eventservice import eventservice
 from request_api.utils.enums import PaymentEventType, StateName
 
 import json
@@ -110,8 +107,8 @@ class paymentservice:
         except Exception as ex:   
             logging.exception(ex)         
             return DefaultMethodResult(False,'Unable to create Payment Receipt',ministry_request_id)
-    
-    def postpayment(self, request_id, ministry_request_id, data, status):
+
+    def postpayment(self, ministry_request_id, data):
         prevstate = data["stateTransition"][1]["status"] if "stateTransition" in data and len(data["stateTransition"])  > 2 else None
         nextstatename = StateName.callforrecords.value
                 
@@ -125,9 +122,7 @@ class paymentservice:
         #outstanding
         if balancedue == 0 and ((templatename and templatename == 'PAYOUTSTANDING') or prevstate.lower() == "response"):
             paymenteventtype = PaymentEventType.outstandingpaid.value
-                
-        asyncio.ensure_future(eventservice().postpaymentevent(ministry_request_id, paymenteventtype))
-        requestservice().postfeeeventtoworkflow(request_id, ministry_request_id, status, nextstatename)
+        return nextstatename, paymenteventtype
 
     def getreceiptename(self, key):
         if key == "HALFPAYMENT":
