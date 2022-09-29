@@ -245,9 +245,10 @@ execution.setVariable('isIMAPEnabled', system.getenv('isIMAPEnabled'));</camunda
         </camunda:executionListener>
         <camunda:executionListener expression="${execution.setVariable(&#34;e_retry1&#34;, 0)}" event="take" />
         <camunda:executionListener event="take">
-          <camunda:script scriptFormat="javascript">var saveDataPayload = {
+          <camunda:script scriptFormat="javascript">var templatename = execution.getVariable("templateName");
+var saveDataPayload = {
 };
-if (execution.getVariable("servicekey") != null &amp;&amp; execution.getVariable("servicekey") == "correspondence") {
+if ((execution.getVariable("servicekey") != null &amp;&amp; execution.getVariable("servicekey") == "correspondence") || (templatename != null &amp;&amp; (templatename == 'PAYOUTSTANDING' || templatename == 'PAYONLINE' ))) {
 saveDataPayload = {
  "templateName": execution.getVariable("templateName"),
  "applicantCorrespondenceId": execution.getVariable("applicantCorrespondenceId")
