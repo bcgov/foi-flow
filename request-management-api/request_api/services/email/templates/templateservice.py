@@ -40,18 +40,22 @@ class templateservice:
         _templatename = templateconfig().gettemplatename(servicename)
         print("__gettemplatenamewrapper _templatename = ", _templatename)
         print("__gettemplatenamewrapper servicename = ", servicename)
+        print("requestjson == ", requestjson)
         if _templatename is None:
             if requestjson is not None and requestjson != {}:
                 balancedue = float(requestjson['cfrfee']['feedata']["balanceDue"])
                 prevstate = self.__getprevstate(requestjson)
                 if balancedue > 0:
+                    print("__gettemplatenamewrapper templatekey = HALFPAYMENT")
                     return "HALFPAYMENT"
+
                 elif balancedue == 0:
                     templatekey = "FULLPAYMENT"
                     if prevstate.lower() == "response":
                         templatekey = "PAYOUTSTANDINGFULLPAYMENT"
+                    print("__gettemplatenamewrapper templatekey = ", templatekey)
                     return templatekey
-
+        
         return _templatename
     
     def __getprevstate(self, requestjson):
