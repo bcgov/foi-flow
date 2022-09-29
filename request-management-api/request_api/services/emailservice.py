@@ -27,6 +27,8 @@ class emailservice:
             requestjson = requestservice().getrequestdetails(requestid,ministryrequestid)
             _applicantcorrespondenceid = self.__getvaluefromschema(emailschema, "applicantcorrespondenceid")
             _templatename = self.__getvaluefromschema(emailschema, "templatename")
+            print("_templatename == ", _templatename)
+            print("servicename == ", servicename)
             if servicename == ServiceName.correspondence.value.upper():
                 servicename = _templatename
             _messagepart, content = templateservice().generate_by_servicename_and_schema(servicename, requestjson, _applicantcorrespondenceid)

@@ -72,7 +72,7 @@ class paymentservice:
     def getpayment(self, requestid, ministryrequestid):
         return FOIRequestPayment.getpayment(requestid, ministryrequestid)
 
-    def createpaymentreceipt(self, request_id, ministry_request_id, data, parsed_args):
+    def createpaymentreceipt(self, request_id, ministry_request_id, data, parsed_args, templatename = None):
         try:
             balancedue = float(data['cfrfee']['feedata']["balanceDue"])
             prevstate = data["stateTransition"][1]["status"] if "stateTransition" in data and len(data["stateTransition"])  > 2 else None
@@ -85,7 +85,7 @@ class paymentservice:
                 receiptname = self.getreceiptename('HALFPAYMENT')
             else:
                 receiptname = self.getreceiptename('FULLPAYMENT')
-                if prevstate.lower() == "response":
+                if prevstate.lower() == "response" or templatename == 'PAYOUTSTANDING':
                     receiptname = self.getreceiptename('PAYOUTSTANDING')
                     attachmentcategory = "OUTSTANDING-PAYMENT-RECEIPT"
                     filename = "Fee Balance Outstanding Payment Receipt.pdf"
