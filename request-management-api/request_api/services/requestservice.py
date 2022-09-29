@@ -8,8 +8,7 @@ from request_api.services.commentservice import commentservice
 from request_api.services.foirequest.requestserviceconfigurator import requestserviceconfigurator 
 from request_api.services.foirequest.requestservicegetter import requestservicegetter 
 from request_api.services.foirequest.requestservicecreate import requestservicecreate 
-from request_api.services.foirequest.requestserviceupdate import requestserviceupdate 
-from request_api.services.document_generation_service import DocumentGenerationService
+from request_api.services.foirequest.requestserviceupdate import requestserviceupdate
 from request_api.services.applicantcorrespondence.applicantcorrespondencelog import applicantcorrespondenceservice
 from request_api.models.FOIRequestStatus import FOIRequestStatus
 

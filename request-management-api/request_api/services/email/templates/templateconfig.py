@@ -80,7 +80,13 @@ class templateconfig:
             return "Fee Balance Outstanding - Payment Success"
         elif key == "OUTSTANDING-PAYMENT-RECEIPT-FAILED":
             return "Fee Balance Outstanding - Payment Success - Correspondence Failed"
-        return None 
+        return None
+
+    
+    def isnotreceipt(self, key):
+        if key == "FEE-ESTIMATE-PAYMENT-RECEIPT" or key == "OUTSTANDING-PAYMENT-RECEIPT":  
+            return False
+        return True
     
 
     
