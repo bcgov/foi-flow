@@ -4,6 +4,7 @@ import json
 from enum import Enum
 
 from request_api.services.external.bpmservice import MessageType, bpmservice
+from request_api.services.cfrfeeservice import cfrfeeservice
 from request_api.models.FOIRawRequests import FOIRawRequest
 from request_api.models.FOIMinistryRequests import FOIMinistryRequest
 """
@@ -40,11 +41,11 @@ class workflowservice:
                     oldstatus = self.__getministrystatus(filenumber, ministry["version"])
                     activity = self.__getministryactivity(oldstatus,newstatus)
                     previousstatus = self.__getpreviousministrystatus(id)
-                    metadata = json.dumps({"id": filenumber, "previousstatus":previousstatus, "status": ministry["status"] , "assignedGroup": assignedgroup, "assignedTo": assignedto, "assignedministrygroup":ministry["assignedministrygroup"], "ministryRequestID": id, "paymentExpiryDate": paymentexpirydate, "axisRequestId": axisrequestid})
+                    metadata = json.dumps({"id": filenumber, "previousstatus":previousstatus, "status": ministry["status"] , "assignedGroup": assignedgroup, "assignedTo": assignedto, "assignedministrygroup":ministry["assignedministrygroup"], "ministryRequestID": id, "isPaymentActive": self.__ispaymentactive(ministry["foirequestid"], id), "paymentExpiryDate": paymentexpirydate, "axisRequestId": axisrequestid})
                     messagename = self.__messagename(oldstatus, activity, usertype, self.__isprocessing(id))
                     self.__postopenedevent(id, filenumber, metadata, messagename, assignedgroup, assignedto, wfinstanceid, activity)
 
-    def postfeeevent(self, requestid, ministryrequestid, requestsschema, status):
+    def postfeeevent(self, requestid, ministryrequestid, requestsschema, paymentstatus, nextstatename=None):
         metadata = json.dumps({
             "id": requestsschema["idNumber"], 
             "status": requestsschema["currentState"], 
@@ -52,10 +53,19 @@ class workflowservice:
             "assignedTo": requestsschema["assignedTo"],
             "assignedministrygroup" : requestsschema["assignedministrygroup"],
             "ministryRequestID" : ministryrequestid,
-			"foiRequestID" :requestid
+			"foiRequestID" :requestid,
+            "nextStateName": nextstatename
             })
-        return bpmservice().feeevent(requestsschema["axisRequestId"], metadata, status)    
+        return bpmservice().feeevent(requestsschema["axisRequestId"], metadata, paymentstatus)    
     
+    def postcorrenspodenceevent(self, ministryid, requestsschema, applicantcorrespondenceid, templatename, attributes):
+        paymentexpirydate = self.__getvaluefromlist(attributes,"paymentExpiryDate")
+        axisrequestid = self.__getvaluefromschema(requestsschema,"axisRequestId")
+        filenumber = self.__getvaluefromschema(requestsschema,"idNumber")
+        status = self.__getvaluefromschema(requestsschema,"currentState")
+        metadata = json.dumps({"id": filenumber, "status": status , "ministryRequestID": ministryid, "paymentExpiryDate": paymentexpirydate, "axisRequestId": axisrequestid, "applicantcorrespondenceid": applicantcorrespondenceid, "templatename": templatename.replace(" ", "")})
+        bpmservice().correspondanceevent(filenumber, metadata)
+
     def __postopenedevent(self, id, filenumber, metadata, messagename, assignedgroup, assignedto, wfinstanceid, activity):
         if activity == Activity.complete.value:
             if self.__hasreopened(id, "ministryrequest") == True:
@@ -106,8 +116,18 @@ class workflowservice:
                 return True
         return False 
 
+    def __ispaymentactive(self, foirequestid, ministryid):
+        _payment = cfrfeeservice().getactivepayment(foirequestid, ministryid)
+        return True if _payment is not None else False
+
     def __getvaluefromschema(self,requestsschema, property):
-        return requestsschema.get(property) if property in requestsschema  else None  
+        return requestsschema.get(property) if property in requestsschema  else None 
+
+    def __getvaluefromlist(self,attributes, property):
+        for attribute in attributes:
+            if property in attribute:
+                return attribute.get(property)
+            return ""
     
     def __getministrystatus(self,filenumber, version):
         ministryreq = FOIMinistryRequest.getrequestbyfilenumberandversion(filenumber,version-1)

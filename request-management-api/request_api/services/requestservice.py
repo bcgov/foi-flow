@@ -10,6 +10,8 @@ from request_api.services.foirequest.requestservicegetter import requestserviceg
 from request_api.services.foirequest.requestservicecreate import requestservicecreate 
 from request_api.services.foirequest.requestserviceupdate import requestserviceupdate 
 from request_api.services.document_generation_service import DocumentGenerationService
+from request_api.services.applicantcorrespondence.applicantcorrespondencelog import applicantcorrespondenceservice
+from request_api.models.FOIRequestStatus import FOIRequestStatus
 
 class requestservice:
     """ FOI Request management service
@@ -33,10 +35,10 @@ class requestservice:
     def updateministryrequestduedate(self, ministryrequestid, duedate, userid):
         return requestserviceupdate().updateministryrequestduedate(ministryrequestid, duedate, userid)
     
-    def updaterequeststatus(self, requestid, ministryrequestid, statusid):
+    def updaterequeststatus(self, requestid, ministryrequestid, nextstatename):
         foirequestschema = self.getrequest(requestid, ministryrequestid)
-        foirequestschema['requeststatusid'] = statusid
-        print("foirequestschema ==== ",foirequestschema)
+        status = FOIRequestStatus().getrequeststatusid(nextstatename)
+        foirequestschema['requeststatusid'] = status['requeststatusid']
         return self.saverequestversion(foirequestschema, requestid, ministryrequestid,'Online Payment')
                
     def getrequest(self,foirequestid,foiministryrequestid): 
@@ -68,11 +70,16 @@ class requestservice:
     def postopeneventtoworkflow(self, id, wfinstanceid, requestschema, ministries):        
         workflowservice().postunopenedevent(id, wfinstanceid, requestschema, "Open", ministries)            
     
-    def postfeeeventtoworkflow(self, requestid, ministryrequestid, paymentstatus):
+    def postfeeeventtoworkflow(self, requestid, ministryrequestid, paymentstatus, nextstatename=None):
         foirequestschema = self.getrequestdetails(requestid, ministryrequestid)        
-        workflowservice().postfeeevent(requestid, ministryrequestid, foirequestschema, paymentstatus)            
+        workflowservice().postfeeevent(requestid, ministryrequestid, foirequestschema, paymentstatus, nextstatename)            
     
     def posteventtoworkflow(self, id, wfinstanceid, requestschema, data, usertype): 
         requeststatusid =  requestschema.get("requeststatusid") if 'requeststatusid' in requestschema  else None
         status = requestserviceconfigurator().getstatusname(requeststatusid) if requeststatusid is not None else None
         workflowservice().postopenedevent(id, wfinstanceid, requestschema, data, status, usertype)
+    
+    def postcorrespondenceeventtoworkflow(self, requestid, ministryrequestid, applicantcorrespondenceid, attributes, templateid):
+        foirequestschema = self.getrequestdetails(requestid, ministryrequestid)
+        templatedetails = applicantcorrespondenceservice().gettemplatebyid(templateid)
+        workflowservice().postcorrenspodenceevent(ministryrequestid, foirequestschema, applicantcorrespondenceid, templatedetails.name, attributes)

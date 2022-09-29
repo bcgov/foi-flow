@@ -64,7 +64,7 @@ class paymentevent:
         if eventtype == PaymentEventType.paid.value:
             return "Applicant has paid required fee, resume gathering. New LDD is " + FOIMinistryRequest.getduedate(requestid).strftime("%m/%d/%Y")
         elif eventtype == PaymentEventType.expired.value:
-            return "Fees were due to be paid by " + FOIMinistryRequest.getduedate(requestid).strftime("%m/%d/%Y")+ ", you may consider closing the request as abandoned."
+            return "Fees were due to be paid by " + self.gettoday() + ", you may consider closing the request as abandoned."
         elif eventtype == PaymentEventType.outstandingpaid.value:
             return "Applicant has paid outstanding fee. Response package can be released."
         elif eventtype == PaymentEventType.depositpaid.value:

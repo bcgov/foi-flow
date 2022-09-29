@@ -9,7 +9,7 @@ from request_api.models.default_method_result import DefaultMethodResult
 
 import json
 from dateutil.parser import parse
-import datetime 
+from datetime import datetime
 
 from dateutil import parser
 from dateutil import tz
@@ -29,8 +29,8 @@ class paymentservice:
         payment.foirequestid = requestid
         payment.ministryrequestid = ministryrequestid
         payment.ministryrequestversion = ministryversion
-        payment.paymenturl = data['paymenturl']
-        payment.paymentexpirydate = data['paymentexpirydate']
+        payment.paymenturl = data['paymenturl'] if 'paymenturl' in data else None
+        payment.paymentexpirydate = data['paymentexpirydate'] if 'paymentexpirydate' in data else None
         payment.version = 1
         payment.createdby = 'System'
         _payment = FOIRequestPayment.getpayment(requestid, ministryrequestid)
@@ -41,6 +41,19 @@ class paymentservice:
         return FOIRequestPayment.savepayment(payment)
     
     def createpaymentversion(self, request_id, ministry_request_id, amountpaid):
+        payment = self.__createpaymentinstance(request_id, ministry_request_id)
+        if payment is not None and payment != {}:            
+            payment.paidamount = amountpaid            
+        return FOIRequestPayment.savepayment(payment)
+
+    def cancelpayment(self, request_id, ministry_request_id):
+        payment = self.__createpaymentinstance(request_id, ministry_request_id)
+        if payment is not None and payment != {}:            
+            payment.paymentexpirydate = datetime.now().isoformat()  
+            payment.createdby = 'System_Cancel'
+        return FOIRequestPayment.savepayment(payment)
+
+    def __createpaymentinstance(self, request_id, ministry_request_id):
         _payment = FOIRequestPayment.getpayment(request_id, ministry_request_id)
         ministryversion = FOIMinistryRequest.getversionforrequest(ministry_request_id)
         payment = FOIRequestPayment()
@@ -53,8 +66,8 @@ class paymentservice:
             payment.version = _payment['version'] + 1
             payment.createdby = 'System'
             payment.paymentid = _payment["paymentid"]
-            payment.paidamount = amountpaid            
-        return FOIRequestPayment.savepayment(payment)
+        return payment
+
 
     def getpayment(self, requestid, ministryrequestid):
         return FOIRequestPayment.getpayment(requestid, ministryrequestid)
