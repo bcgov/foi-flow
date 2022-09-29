@@ -30,8 +30,8 @@ class emailservice:
             print("_templatename == ", _templatename)
             print("servicename == ", servicename)
             if servicename == ServiceName.correspondence.value.upper():
-                servicename = _templatename
-            _messagepart, content = templateservice().generate_by_servicename_and_schema(servicename, requestjson, _applicantcorrespondenceid)
+                servicename = _templatename            
+            _messagepart, content = templateservice().generate_by_servicename_and_schema(servicename, requestjson, ministryrequestid, _applicantcorrespondenceid)
             _messageattachmentlist = []
             if (_applicantcorrespondenceid and templateconfig().isnotreceipt(servicename)):
                 servicename = _templatename.upper() if _templatename else ""

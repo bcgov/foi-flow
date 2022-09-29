@@ -98,32 +98,25 @@ class Payment(Resource):
                 cfrfeeservice().paycfrfee(ministry_request_id, amountpaid)
                 paymentservice().createpaymentversion(request_id, ministry_request_id, amountpaid)
                 data = requestservice().getrequestdetails(request_id, ministry_request_id)
-                latestcorrespondence = applicantcorrespondenceservice().getlatestapplicantcorrespondence(ministry_request_id)
-                print('latestcorrespondence = ', latestcorrespondence)
-                templateid = latestcorrespondence['templateid'] if 'templateid' in latestcorrespondence else None
-                print('templateid = ', templateid)
-                templatename = ""
-                if templateid:
-                    templatename = applicantcorrespondenceservice().gettemplatebyid(templateid).name
-                print('templatename = ', templatename)
-                paymentservice().createpaymentreceipt(request_id, ministry_request_id, data, parsed_args, templatename)
-                prevstate = data["stateTransition"][1]["status"] if "stateTransition" in data and len(data["stateTransition"])  > 2 else None
-                nextstatename = StateName.callforrecords.value
+                paymentservice().createpaymentreceipt(request_id, ministry_request_id, data, parsed_args)
+                # prevstate = data["stateTransition"][1]["status"] if "stateTransition" in data and len(data["stateTransition"])  > 2 else None
+                # nextstatename = StateName.callforrecords.value
                 
-                balancedue = float(data['cfrfee']['feedata']["balanceDue"])
-                paymenteventtype = PaymentEventType.paid.value
-                if balancedue > 0:
-                    paymenteventtype = PaymentEventType.depositpaid.value
-                if prevstate.lower() == "response":
-                    nextstatename = StateName.response.value
+                # balancedue = float(data['cfrfee']['feedata']["balanceDue"])
+                # paymenteventtype = PaymentEventType.paid.value
+                # if balancedue > 0:
+                #     paymenteventtype = PaymentEventType.depositpaid.value
+                # if prevstate.lower() == "response":
+                #     nextstatename = StateName.response.value
 
-                #outstanding
-                if balancedue == 0 and (templatename == 'PAYOUTSTANDING' or prevstate.lower() == "response"):
-                    paymenteventtype = PaymentEventType.outstandingpaid.value
-                # result = requestservice().updaterequeststatus(request_id, ministry_request_id, statusid)
-                # if result.success == True:
-                asyncio.ensure_future(eventservice().postpaymentevent(ministry_request_id, paymenteventtype))
-                requestservice().postfeeeventtoworkflow(request_id, ministry_request_id, "PAID", nextstatename)
+                # #outstanding
+                # if balancedue == 0 and (templatename == 'PAYOUTSTANDING' or prevstate.lower() == "response"):
+                #     paymenteventtype = PaymentEventType.outstandingpaid.value
+                # # result = requestservice().updaterequeststatus(request_id, ministry_request_id, statusid)
+                # # if result.success == True:
+                # asyncio.ensure_future(eventservice().postpaymentevent(ministry_request_id, paymenteventtype))
+                # requestservice().postfeeeventtoworkflow(request_id, ministry_request_id, "PAID", nextstatename)
+                paymentservice().postpayment(request_id, ministry_request_id, data, "PAID")
                 asyncio.ensure_future(eventservice().postevent(ministry_request_id,"ministryrequest","System","System", False))
             return response, 201
         except BusinessException as e:

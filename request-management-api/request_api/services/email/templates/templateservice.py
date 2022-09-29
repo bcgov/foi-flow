@@ -16,16 +16,16 @@ class templateservice:
         try:
             _request = requestservice().getrequestdetails(requestid,ministryrequestid)
             requestjson = json.dumps(_request)
-            return self.generate_by_servicename_and_schema(servicename, requestjson)
+            return self.generate_by_servicename_and_schema(servicename, requestjson, ministryrequestid)
         except Exception as ex:
             logging.exception(ex)
         return None
 
-    def generate_by_servicename_and_schema(self, servicename, requestjson, applicantcorrespondenceid = None):
+    def generate_by_servicename_and_schema(self, servicename, requestjson, ministryrequestid, applicantcorrespondenceid = None):
         try:
             _template = self.__gettemplate(servicename)
             if _template is None:
-                _templatename = self.__gettemplatenamewrapper(servicename, requestjson)
+                _templatename = self.__gettemplatenamewrapper(servicename, requestjson, ministryrequestid)
                 _template = self.__gettemplate(_templatename)
             print("isnotreceipt ==== ", templateconfig().isnotreceipt(servicename))
             if (applicantcorrespondenceid and templateconfig().isnotreceipt(servicename)):
@@ -37,12 +37,13 @@ class templateservice:
             logging.exception(ex)
         return None
 
-    def __gettemplatenamewrapper(self, servicename, requestjson):
+    def __gettemplatenamewrapper(self, servicename, requestjson, ministryrequestid):
         _templatename = templateconfig().gettemplatename(servicename)
         print("__gettemplatenamewrapper _templatename = ", _templatename)
         print("__gettemplatenamewrapper servicename = ", servicename)
         print("requestjson == ", requestjson)
         if _templatename is None:
+            _latesttemplatename = self.__getlatesttemplatename(ministryrequestid)
             if requestjson is not None and requestjson != {}:
                 balancedue = float(requestjson['cfrfee']['feedata']["balanceDue"])
                 prevstate = self.__getprevstate(requestjson)
@@ -52,12 +53,19 @@ class templateservice:
 
                 elif balancedue == 0:
                     templatekey = "FULLPAYMENT"
-                    if prevstate.lower() == "response":
+                    if prevstate.lower() == "response" or (_latesttemplatename and _latesttemplatename == 'PAYOUTSTANDING'):
                         templatekey = "PAYOUTSTANDINGFULLPAYMENT"
                     print("__gettemplatenamewrapper templatekey = ", templatekey)
                     return templatekey
         
         return _templatename
+    
+    def __getlatesttemplatename(self, ministryrequestid):
+        latestcorrespondence = applicantcorrespondenceservice().getlatestapplicantcorrespondence(ministryrequestid)
+        _latesttemplateid = latestcorrespondence['templateid'] if 'templateid' in latestcorrespondence else None
+        if _latesttemplateid:
+            return applicantcorrespondenceservice().gettemplatebyid(_latesttemplateid).name
+        return None
     
     def __getprevstate(self, requestjson):
         return requestjson["stateTransition"][2]["status"] if "stateTransition" in requestjson and len(requestjson["stateTransition"])  > 3 else None
