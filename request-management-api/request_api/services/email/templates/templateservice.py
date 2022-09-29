@@ -27,7 +27,8 @@ class templateservice:
             if _template is None:
                 _templatename = self.__gettemplatenamewrapper(servicename, requestjson)
                 _template = self.__gettemplate(_templatename)
-            if (applicantcorrespondenceid):
+            print("isnotreceipt ==== ", templateconfig().isnotreceipt(servicename))
+            if (applicantcorrespondenceid and templateconfig().isnotreceipt(servicename)):
                 emailtemplatehtml = self.__generatecorrespondencetetemplate(applicantcorrespondenceid)
             else:
                 emailtemplatehtml= storageservice().downloadtemplate(_template.documenturipath)
