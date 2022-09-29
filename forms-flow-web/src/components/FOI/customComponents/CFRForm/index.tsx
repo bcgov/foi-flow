@@ -491,6 +491,8 @@ export const CFRForm = ({
       return false;
   }
 
+  console.log("Status1",formData.cfrfeeid);
+  console.log("Status2",formData.cfrfeeid !== formHistory[0].cfrfeeid);
   return (
     <div className="foi-review-container">
       <Box
@@ -508,6 +510,10 @@ export const CFRForm = ({
                   <div className="foi-request-number-header">
                     <h3 className="foi-review-request-text">{requestNumber}</h3>
                   </div>
+                  <Chip
+                    label={initialFormData.formStatus === 'approved' ? "Version " + formHistory.length : "Version " + (formHistory.length + 1) + " Draft" }
+                    sx={{ backgroundColor: '#096DD1', color: '#fff', height: 19}}
+                  />
                 </div>
                 <div className='foi-assigned-to-container'>
                   <div className='foi-assigned-to-inner-container'>
@@ -536,7 +542,7 @@ export const CFRForm = ({
                       ))}
                     </TextField>
                   </div>
-                  {formHistory.length > 1 || isNewCFRForm &&
+                  {(isNewCFRForm || (formData.cfrfeeid !== formHistory[0].cfrfeeid) || formHistory.length > 1)  &&
                   <>
                     <div className='foi-assigned-to-inner-container'>
                       <TextField
@@ -553,6 +559,7 @@ export const CFRForm = ({
                         fullWidth
                         required
                         error={formData?.reason === 'init'}
+                        disabled={!isMinistry}
                       >
                         {reasons.map((option) => (
                         <MenuItem
@@ -568,7 +575,7 @@ export const CFRForm = ({
                   </>
                   }
                 </div>
-                { formHistory.length > 1 || isNewCFRForm &&
+                { (isNewCFRForm || (formHistory.length > 0 && formData?.cfrfeeid !== formHistory[0]?.cfrfeeid) || formHistory.length > 1) &&
                   <div className="cfrform-reasons">
                   <Tooltip content={tooltipReasons} position={""}/>
                   <p className="hideContent" id="popup-7">Information7</p>

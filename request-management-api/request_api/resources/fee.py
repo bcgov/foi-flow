@@ -110,11 +110,11 @@ class Payment(Resource):
                     #outstanding
                     if balancedue == 0:
                         paymenteventtype = PaymentEventType.outstandingpaid.value
-                result = requestservice().updaterequeststatus(request_id, ministry_request_id, statusid)
-                if result.success == True:
-                    asyncio.ensure_future(eventservice().postpaymentevent(ministry_request_id, paymenteventtype))
-                    requestservice().postfeeeventtoworkflow(request_id, ministry_request_id, "PAID")
-                    asyncio.ensure_future(eventservice().postevent(ministry_request_id,"ministryrequest","System","System", False))
+                # result = requestservice().updaterequeststatus(request_id, ministry_request_id, statusid)
+                # if result.success == True:
+                asyncio.ensure_future(eventservice().postpaymentevent(ministry_request_id, paymenteventtype))
+                requestservice().postfeeeventtoworkflow(request_id, ministry_request_id, "PAID", statusid)
+                asyncio.ensure_future(eventservice().postevent(ministry_request_id,"ministryrequest","System","System", False))
             return response, 201
         except BusinessException as e:
             return {'status': e.code, 'message': e.message}, e.status_code
