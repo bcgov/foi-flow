@@ -38,6 +38,8 @@ class templateservice:
 
     def __gettemplatenamewrapper(self, servicename, requestjson):
         _templatename = templateconfig().gettemplatename(servicename)
+        print("__gettemplatenamewrapper _templatename = ", _templatename)
+        print("__gettemplatenamewrapper servicename = ", servicename)
         if _templatename is None:
             if requestjson is not None and requestjson != {}:
                 balancedue = float(requestjson['cfrfee']['feedata']["balanceDue"])
