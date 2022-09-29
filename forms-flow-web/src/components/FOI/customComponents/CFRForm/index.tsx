@@ -571,16 +571,14 @@ export const CFRForm = ({
                         </MenuItem>
                         ))}
                       </TextField>
+                      <div className="cfrform-floatRight cfrform-reasons">
+                        <Tooltip content={tooltipReasons} position={""}/>
+                        <p className="hideContent" id="popup-7">Information7</p>
+                      </div>
                     </div>
                   </>
                   }
                 </div>
-                { (isNewCFRForm || (formHistory.length > 0 && formData?.cfrfeeid !== formHistory[0]?.cfrfeeid) || formHistory.length > 1) &&
-                  <div className="cfrform-reasons">
-                  <Tooltip content={tooltipReasons} position={""}/>
-                  <p className="hideContent" id="popup-7">Information7</p>
-                </div>
-                }
               </div>
               <div className="cfr-history-button">
                 <CFRFormHistoryModal
