@@ -491,8 +491,6 @@ export const CFRForm = ({
       return false;
   }
 
-  console.log("Status1",formData.cfrfeeid);
-  console.log("Status2",formData.cfrfeeid !== formHistory[0].cfrfeeid);
   return (
     <div className="foi-review-container">
       <Box
@@ -542,7 +540,7 @@ export const CFRForm = ({
                       ))}
                     </TextField>
                   </div>
-                  {(isNewCFRForm || (formData.cfrfeeid !== formHistory[0].cfrfeeid) || formHistory.length > 1)  &&
+                  {(isNewCFRForm || (formData?.cfrfeeid !== formHistory[0]?.cfrfeeid) || formHistory?.length > 1)  &&
                   <>
                     <div className='foi-assigned-to-inner-container'>
                       <TextField
