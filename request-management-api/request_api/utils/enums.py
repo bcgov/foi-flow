@@ -74,7 +74,6 @@ class MinistryTeamWithKeycloackGroup(Enum):
 
 class ProcessingTeamWithKeycloackGroup(Enum):
     scanningteam = "Scanning Team"
-    businessteam = "Business Team"
     centralteam = "Central Team"
     justicehealthteam = "Justice Health Team"
     mcfdpersonalteam = "MCFD Personals Team"
