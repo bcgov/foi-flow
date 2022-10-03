@@ -491,8 +491,6 @@ export const CFRForm = ({
       return false;
   }
 
-  console.log("Status1",formData.cfrfeeid);
-  console.log("Status2",formData.cfrfeeid !== formHistory[0].cfrfeeid);
   return (
     <div className="foi-review-container">
       <Box
