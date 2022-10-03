@@ -49,6 +49,8 @@ class senderservice:
             )
             msg.attach(part)
         try:
+            print("MAIL_SERVER_SMTP = ",MAIL_SERVER_SMTP)
+            print("MAIL_SERVER_SMTP_PORT = ",MAIL_SERVER_SMTP_PORT)
             with smtplib.SMTP(MAIL_SERVER_SMTP,  MAIL_SERVER_SMTP_PORT) as smtpobj:
                 smtpobj.ehlo()
                 smtpobj.starttls()
