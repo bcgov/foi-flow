@@ -5,6 +5,7 @@ from request_api.models.FOIRequestCFRFees import FOIRequestCFRFee
 from request_api.models.FOIMinistryRequests import FOIMinistryRequest
 from request_api.models.FOIRequestPayments import FOIRequestPayment
 from request_api.services.cfrfeestatusservice import cfrfeestatusservice
+from request_api.services.cfrformreasonservice import cfrformreasonservice
 from dateutil.parser import parse
 
 from dateutil import parser
@@ -55,6 +56,8 @@ class cfrfeeservice:
         cfrfee.ministryrequestversion = FOIMinistryRequest.getversionforrequest(ministryrequestid)
         if "status" in data and data['status'] not in (None,''):
             cfrfee.cfrfeestatusid = cfrfeestatusservice().getcfrfeestatusidbyname(data['status'])
+        if "reason" in data and data['reason'] not in (None,''):
+            cfrfee.cfrformreasonid = cfrformreasonservice().getcfrformreasonidbyname(data['reason'])
         return cfrfee
     
     
@@ -80,6 +83,11 @@ class cfrfeeservice:
                 cfrfee.pop('cfrfeestatus.name')
             else:
                 cfrfee['status'] = None    
+            if cfrfee['cfrformreasonid'] is not None:
+                cfrfee['reason'] = cfrfee['cfrformreason.name']
+                cfrfee.pop('cfrformreason.name')
+            else:
+                cfrfee['reason'] = None
             return cfrfee 
         else:
             return {}
