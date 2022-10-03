@@ -4,12 +4,14 @@ from re import VERBOSE
 from request_api.models.FOIRequestPayments import FOIRequestPayment
 from request_api.models.FOIMinistryRequests import FOIMinistryRequest
 from request_api.services.document_generation_service import DocumentGenerationService
-from request_api.services.external.storageservice import storageservice
 from request_api.models.default_method_result import DefaultMethodResult
+from request_api.services.applicantcorrespondence.applicantcorrespondencelog import applicantcorrespondenceservice
+from request_api.utils.enums import PaymentEventType, StateName
 
 import json
 from dateutil.parser import parse
-import datetime 
+from datetime import datetime
+import asyncio
 
 from dateutil import parser
 from dateutil import tz
@@ -29,8 +31,8 @@ class paymentservice:
         payment.foirequestid = requestid
         payment.ministryrequestid = ministryrequestid
         payment.ministryrequestversion = ministryversion
-        payment.paymenturl = data['paymenturl']
-        payment.paymentexpirydate = data['paymentexpirydate']
+        payment.paymenturl = data['paymenturl'] if 'paymenturl' in data else None
+        payment.paymentexpirydate = data['paymentexpirydate'] if 'paymentexpirydate' in data else None
         payment.version = 1
         payment.createdby = 'System'
         _payment = FOIRequestPayment.getpayment(requestid, ministryrequestid)
@@ -41,6 +43,19 @@ class paymentservice:
         return FOIRequestPayment.savepayment(payment)
     
     def createpaymentversion(self, request_id, ministry_request_id, amountpaid):
+        payment = self.__createpaymentinstance(request_id, ministry_request_id)
+        if payment is not None and payment != {}:            
+            payment.paidamount = amountpaid            
+        return FOIRequestPayment.savepayment(payment)
+
+    def cancelpayment(self, request_id, ministry_request_id):
+        payment = self.__createpaymentinstance(request_id, ministry_request_id)
+        if payment is not None and payment != {}:            
+            payment.paymentexpirydate = datetime.now().isoformat()  
+            payment.createdby = 'System_Cancel'
+        return FOIRequestPayment.savepayment(payment)
+
+    def __createpaymentinstance(self, request_id, ministry_request_id):
         _payment = FOIRequestPayment.getpayment(request_id, ministry_request_id)
         ministryversion = FOIMinistryRequest.getversionforrequest(ministry_request_id)
         payment = FOIRequestPayment()
@@ -53,14 +68,15 @@ class paymentservice:
             payment.version = _payment['version'] + 1
             payment.createdby = 'System'
             payment.paymentid = _payment["paymentid"]
-            payment.paidamount = amountpaid            
-        return FOIRequestPayment.savepayment(payment)
+        return payment
+
 
     def getpayment(self, requestid, ministryrequestid):
         return FOIRequestPayment.getpayment(requestid, ministryrequestid)
 
     def createpaymentreceipt(self, request_id, ministry_request_id, data, parsed_args):
         try:
+            templatename = self.__getlatesttemplatename(ministry_request_id)
             balancedue = float(data['cfrfee']['feedata']["balanceDue"])
             prevstate = data["stateTransition"][1]["status"] if "stateTransition" in data and len(data["stateTransition"])  > 2 else None
             basepath = 'request_api/receipt_templates/'
@@ -72,7 +88,7 @@ class paymentservice:
                 receiptname = self.getreceiptename('HALFPAYMENT')
             else:
                 receiptname = self.getreceiptename('FULLPAYMENT')
-                if prevstate.lower() == "response":
+                if prevstate.lower() == "response" or (templatename and templatename == 'PAYOUTSTANDING'):
                     receiptname = self.getreceiptename('PAYOUTSTANDING')
                     attachmentcategory = "OUTSTANDING-PAYMENT-RECEIPT"
                     filename = "Fee Balance Outstanding Payment Receipt.pdf"
@@ -92,6 +108,22 @@ class paymentservice:
             logging.exception(ex)         
             return DefaultMethodResult(False,'Unable to create Payment Receipt',ministry_request_id)
 
+    def postpayment(self, ministry_request_id, data):
+        prevstate = data["stateTransition"][1]["status"] if "stateTransition" in data and len(data["stateTransition"])  > 2 else None
+        nextstatename = StateName.callforrecords.value
+                
+        balancedue = float(data['cfrfee']['feedata']["balanceDue"])
+        paymenteventtype = PaymentEventType.paid.value
+        if balancedue > 0:
+            paymenteventtype = PaymentEventType.depositpaid.value
+        if prevstate.lower() == "response":
+            nextstatename = StateName.response.value
+        templatename = self.__getlatesttemplatename(ministry_request_id)
+        #outstanding
+        if balancedue == 0 and ((templatename and templatename == 'PAYOUTSTANDING') or prevstate.lower() == "response"):
+            paymenteventtype = PaymentEventType.outstandingpaid.value
+        return nextstatename, paymenteventtype
+
     def getreceiptename(self, key):
         if key == "HALFPAYMENT":
             return "cfr_fee_payment_receipt_half"
@@ -102,3 +134,10 @@ class paymentservice:
         else:
             logging.info("Unknown key")
             return None
+    
+    def __getlatesttemplatename(self, ministryrequestid):
+        latestcorrespondence = applicantcorrespondenceservice().getlatestapplicantcorrespondence(ministryrequestid)
+        _latesttemplateid = latestcorrespondence['templateid'] if 'templateid' in latestcorrespondence else None
+        if _latesttemplateid:
+            return applicantcorrespondenceservice().gettemplatebyid(_latesttemplateid).name
+        return None

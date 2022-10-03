@@ -119,3 +119,23 @@ class CommentType(Enum):
     UserComment = 1
     SystemGenerated = 2
     DivisionStages = 3
+class ServiceName(Enum):
+    payonline = "payonline"
+    payoutstanding = "payoutstanding"
+    correspondence = "correspondence"
+
+class StateName(Enum):
+    open = "Open"
+    callforrecords = "Call For Records"
+    closed = "Closed"
+    redirect = "Redirect"
+    unopened = "Unopened"
+    intakeinprogress = "Intake in Progress"
+    recordsreview = "Records Review"
+    feeestimate = "Fee Estimate"
+    consult = "Consult"
+    ministrysignoff = "Ministry Sign Off"
+    onhold = "On Hold"
+    deduplication = "Deduplication"
+    harmsassessment = "Harms Assessment"    
+    response = "Response"

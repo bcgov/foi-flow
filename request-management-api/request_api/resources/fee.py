@@ -14,6 +14,7 @@
 """API endpoints for managing a Feee resource."""
 
 from datetime import datetime
+from re import template
 
 from flask import request, send_file, Response
 from flask_cors import cross_origin
@@ -27,9 +28,10 @@ from request_api.services.requestservice import requestservice
 from request_api.services.paymentservice import paymentservice
 from request_api.services.eventservice import eventservice
 from request_api.services.document_generation_service import DocumentGenerationService
+from request_api.services.applicantcorrespondence.applicantcorrespondencelog  import applicantcorrespondenceservice
 from request_api.utils.util import  cors_preflight, allowedorigins
 from request_api.exceptions import BusinessException
-from request_api.utils.enums import PaymentEventType
+from request_api.utils.enums import PaymentEventType, StateName
 API = Namespace('Fees', description='Endpoints for Fee and payments')
 
 
@@ -97,24 +99,26 @@ class Payment(Resource):
                 paymentservice().createpaymentversion(request_id, ministry_request_id, amountpaid)
                 data = requestservice().getrequestdetails(request_id, ministry_request_id)
                 paymentservice().createpaymentreceipt(request_id, ministry_request_id, data, parsed_args)
-                prevstate = data["stateTransition"][1]["status"] if "stateTransition" in data and len(data["stateTransition"])  > 2 else None
-                statusid = 2
+                # prevstate = data["stateTransition"][1]["status"] if "stateTransition" in data and len(data["stateTransition"])  > 2 else None
+                # nextstatename = StateName.callforrecords.value
+                
+                # balancedue = float(data['cfrfee']['feedata']["balanceDue"])
+                # paymenteventtype = PaymentEventType.paid.value
+                # if balancedue > 0:
+                #     paymenteventtype = PaymentEventType.depositpaid.value
+                # if prevstate.lower() == "response":
+                #     nextstatename = StateName.response.value
 
-                balancedue = float(data['cfrfee']['feedata']["balanceDue"])
-                paymenteventtype = PaymentEventType.paid.value
-                if balancedue > 0:
-                    paymenteventtype = PaymentEventType.depositpaid.value
-                if prevstate.lower() == "response":
-                    statusid = 14
-
-                    #outstanding
-                    if balancedue == 0:
-                        paymenteventtype = PaymentEventType.outstandingpaid.value
-                result = requestservice().updaterequeststatus(request_id, ministry_request_id, statusid)
-                if result.success == True:
-                    asyncio.ensure_future(eventservice().postpaymentevent(ministry_request_id, paymenteventtype))
-                    requestservice().postfeeeventtoworkflow(request_id, ministry_request_id, "PAID")
-                    asyncio.ensure_future(eventservice().postevent(ministry_request_id,"ministryrequest","System","System", False))
+                # #outstanding
+                # if balancedue == 0 and (templatename == 'PAYOUTSTANDING' or prevstate.lower() == "response"):
+                #     paymenteventtype = PaymentEventType.outstandingpaid.value
+                # # result = requestservice().updaterequeststatus(request_id, ministry_request_id, statusid)
+                # # if result.success == True:
+                nextstatename, paymenteventtype = paymentservice().postpayment(ministry_request_id, data)
+                asyncio.ensure_future(eventservice().postpaymentevent(ministry_request_id, paymenteventtype))
+                requestservice().postfeeeventtoworkflow(request_id, ministry_request_id, "PAID", nextstatename)
+                
+                asyncio.ensure_future(eventservice().postevent(ministry_request_id,"ministryrequest","System","System", False))
             return response, 201
         except BusinessException as e:
             return {'status': e.code, 'message': e.message}, e.status_code

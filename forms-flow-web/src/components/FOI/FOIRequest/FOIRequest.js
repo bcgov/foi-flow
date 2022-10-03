@@ -32,6 +32,9 @@ import {
   fetchFOIRequestAttachmentsList
 } from "../../../apiManager/services/FOI/foiAttachmentServices";
 import {
+  fetchCFRForm
+} from "../../../apiManager/services/FOI/foiCFRFormServices";
+import {
   fetchApplicantCorrespondence,
   fetchApplicantCorrespondenceTemplates
 } from "../../../apiManager/services/FOI/foiCorrespondenceServices";
@@ -113,13 +116,21 @@ const FOIRequest = React.memo(({ userDetail }) => {
     (state) => state.foiRequests.foiRequestComments
   );
   let requestAttachments = useSelector(
-    (state) => state.foiRequests.foiRequestAttachments
+    (state) => state.foiRequests.foiRequestAttachments.filter(
+      attachment => {
+        return ['feeassessed-onhold', 'fee estimate - payment receipt', 'response-onhold', 'fee balance outstanding - payment receipt']
+        .indexOf(attachment.category.toLowerCase()) === -1
+      }
+    )
   );
   let applicantCorrespondence = useSelector(
     (state) => state.foiRequests.foiRequestApplicantCorrespondence
   );
   let applicantCorrespondenceTemplates = useSelector(
     (state) => state.foiRequests.foiRequestApplicantCorrespondenceTemplates
+  );
+  let CFRFormHistoryLength = useSelector(
+    (state) => state.foiRequests.foiRequestCFRFormHistory.length
   );
   const [attachments, setAttachments] = useState(requestAttachments);
   const [comment, setComment] = useState([]);
@@ -196,7 +207,8 @@ const FOIRequest = React.memo(({ userDetail }) => {
       dispatch(fetchFOIRequestDescriptionList(requestId, ministryId));
       dispatch(fetchFOIRequestNotesList(requestId, ministryId));
       dispatch(fetchFOIRequestAttachmentsList(requestId, ministryId));
-      dispatch(fetchApplicantCorrespondence(ministryId));
+      fetchCFRForm(ministryId,dispatch);
+      dispatch(fetchApplicantCorrespondence(requestId, ministryId));
       dispatch(fetchApplicantCorrespondenceTemplates());
     }
 
@@ -514,7 +526,8 @@ const FOIRequest = React.memo(({ userDetail }) => {
       dispatch(fetchFOIRequestDetailsWrapper(id || requestId, ministryId));
       dispatch(fetchFOIRequestDescriptionList(id || requestId, ministryId));
       dispatch(fetchFOIRequestAttachmentsList(id || requestId, ministryId));
-      dispatch(fetchApplicantCorrespondence(ministryId));
+      fetchCFRForm(ministryId,dispatch);
+      dispatch(fetchApplicantCorrespondence(requestId, ministryId));
       setStateChanged(false);
       setcurrentrequestStatus(_state);
       setTimeout(() => {
@@ -719,7 +732,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
                     name="CFRForm"
                     onClick={() => tabclick("CFRForm")}
                   >
-                    CFR Form
+                    CFR Form{CFRFormHistoryLength > 0 ? ` (${CFRFormHistoryLength})` : ""}
                   </div>
                 )}
                 <div

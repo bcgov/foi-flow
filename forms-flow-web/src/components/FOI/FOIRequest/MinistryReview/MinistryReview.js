@@ -26,6 +26,10 @@ import {
 } from "../../../../apiManager/services/FOI/foiRequestNoteServices";
 
 import {
+  fetchCFRForm
+} from "../../../../apiManager/services/FOI/foiCFRFormServices";
+
+import {
   ConditionalComponent,
   calculateDaysRemaining,
 } from "../../../../helper/FOI/helper";
@@ -102,7 +106,16 @@ const MinistryReview = React.memo(({ userDetail }) => {
     (state) => state.foiRequests.foiRequestComments
   );
   let requestAttachments = useSelector(
-    (state) => state.foiRequests.foiRequestAttachments
+    (state) => state.foiRequests.foiRequestAttachments.filter(
+      attachment => {
+        return ['feeassessed-onhold', 'fee estimate - payment receipt', 'response-onhold', 'fee balance outstanding - payment receipt']
+        .indexOf(attachment.category.toLowerCase()) === -1
+      }
+    )
+  );
+
+  let CFRFormHistoryLength = useSelector(
+    (state) => state.foiRequests.foiRequestCFRFormHistory.length
   );
 
   const requestExtensions = useSelector(
@@ -165,6 +178,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
       dispatch(fetchFOIRequestDescriptionList(requestId, ministryId));
       dispatch(fetchFOIRequestNotesList(requestId, ministryId));
       dispatch(fetchFOIRequestAttachmentsList(requestId, ministryId));
+      fetchCFRForm(ministryId,dispatch);
       if (bcgovcode) dispatch(fetchFOIMinistryAssignedToList(bcgovcode));
     }
   }, [requestId, ministryId, comment, attachments]);
@@ -247,6 +261,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
       setUnSavedRequest(_unSaved);
       dispatch(fetchFOIMinistryViewRequestDetails(requestId, ministryId));
       dispatch(fetchFOIRequestAttachmentsList(requestId, ministryId));
+      fetchCFRForm(ministryId,dispatch);
       setStateChanged(false);
       setcurrentrequestStatus(_state);
       setTimeout(() => {
@@ -475,7 +490,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
               name="CFRForm"
               onClick={() => tabclick("CFRForm")}
             >
-              CFR Form
+              CFR Form{CFRFormHistoryLength > 0 ? ` (${CFRFormHistoryLength})` : ""}
             </div>)}
             <div
               className={clsx("tablinks", {

@@ -11,24 +11,24 @@ import API from "../../endpoints";
   import _ from 'lodash';
 
 export const fetchApplicantCorrespondence = (
+  requestId,
   ministryId,
   errorCallback = null
 ) => {
+  
   if (ministryId == null) {
     return () => {};
   }
-  const apiUrl = replaceUrl(
+  const apiUrl = replaceUrl(replaceUrl(
     API.FOI_GET_EMAIL_CORRESPONDENCE,
     "<ministryrequestid>",
-    ministryId
+    ministryId),"<requestid>",requestId
   );
   return (dispatch) => {
     httpGETRequest(apiUrl, {}, UserService.getToken())
       .then((res) => {
         if (res.data) {
-          if (!_.isEmpty(res.data)) {
-            dispatch(setApplicantCorrespondence(res.data));
-          }
+          dispatch(setApplicantCorrespondence(res.data));
         } else {
           console.log("Error in fetching Applicant Correspondence data", res);
           dispatch(serviceActionError(res));
@@ -46,6 +46,7 @@ export const fetchApplicantCorrespondence = (
 
 export const saveEmailCorrespondence = (
   data,
+  requestId,
   ministryId,
   dispatch,
   callback,
@@ -54,12 +55,11 @@ export const saveEmailCorrespondence = (
   if (!ministryId) {
     dispatch(serviceActionError("No request id"));
   }
-  let baseUrl = API.FOI_POST_EMAIL_CORRESPONDENCE;
-
-  const apiUrl = replaceUrl(
-    baseUrl,
+  
+  const apiUrl = replaceUrl(replaceUrl(
+    API.FOI_POST_EMAIL_CORRESPONDENCE,
     "<ministryrequestid>",
-    ministryId
+    ministryId),"<requestid>",requestId
   );
   httpPOSTRequest(apiUrl, data)
     .then((res) => {

@@ -20,6 +20,8 @@ import { getFullnameList } from '../../../../helper/FOI/helper'
 import CommentStructure from '../Comments/CommentStructure'
 import AttachmentModal from '../Attachments/AttachmentModal';
 import { getOSSHeaderDetails, saveFilesinS3, getFileFromS3 } from "../../../../apiManager/services/FOI/foiOSSServices";
+import {dueDateCalculation} from '../../FOIRequest/BottomButtonGroup/utils';
+import { PAYMENT_EXPIRY_DAYS} from "../../../../constants/FOI/constants";
 import { PreviewModal } from './PreviewModal';
 import { OSS_S3_BUCKET_FULL_PATH } from "../../../../constants/constants"
 
@@ -95,7 +97,12 @@ export const ContactApplicant = ({
         }
       });
     });
-  }, [isCFRFormApproved])
+  }, [isCFRFormApproved]);
+
+  const formHistory: Array<any> = useSelector((state: any) => state.foiRequests.foiRequestCFRFormHistory);
+  const approvedForm = formHistory?.find(form => form?.status?.toLowerCase() === 'approved');
+  const existingCorrespondence = applicantCorrespondence?.find((correspondence: any) => correspondence?.id === approvedForm?.cfrfeeid)
+  const previewButtonValue = existingCorrespondence ? "Preview & Resend Email" : "Preview & Send Email";
 
   const [messages, setMessages] = useState(applicantCorrespondence);
 
@@ -163,7 +170,7 @@ export const ContactApplicant = ({
 
   const save = async (emailContent: string) => {
     const attachments = await saveAttachments();
-    var callback = (_res: string) => {
+    let callback = (_res: string) => {
       setEditorValue("")
       setFiles([])
       setShowEditor(false)
@@ -176,16 +183,23 @@ export const ContactApplicant = ({
         draggable: true,
         progress: undefined,
       });
-      dispatch(fetchApplicantCorrespondence(ministryId));
+      dispatch(fetchApplicantCorrespondence(requestId, ministryId));
     }
-    var data = {
-      templateid: currentTemplate ? templates[currentTemplate].templateid : null,
-      correspondencemessagejson: emailContent,
+    const templateId = currentTemplate ? templates[currentTemplate as keyof typeof templates].templateid : null;
+    const type = (templateId && [1,2].includes(templateId)) ? "CFRFee": "";
+    let data = {
+      templateid: currentTemplate ? templates[currentTemplate as keyof typeof templates].templateid : null,
+      correspondencemessagejson: JSON.stringify ({"emailhtml": editorValue,
+                                  "id": approvedForm?.cfrfeeid,
+                                  "type": type
+                                  }),
       foiministryrequest_id: ministryId,
-      attachments: attachments
+      attachments: attachments,
+      attributes: [{"paymentExpiryDate": dueDateCalculation(new Date(), PAYMENT_EXPIRY_DAYS)}]
     };
     saveEmailCorrespondence(
       data,
+      requestId,
       ministryId,
       dispatch,
       callback,
@@ -399,7 +413,7 @@ export const ContactApplicant = ({
               onClick={() => setPreviewModal(true)}
               color="primary"
             >
-              Preview & Send Email
+              {previewButtonValue}
             </button>
           </div>
         </div>

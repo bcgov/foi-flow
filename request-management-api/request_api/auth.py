@@ -41,7 +41,16 @@ class Auth:
 
         return decorated
 
-
+    @classmethod
+    def hasusertype(cls,usertype):
+        def decorated(f):
+            @wraps(f)
+            def wrapper(*args, **kwargs):
+                if(usertype == AuthHelper.getusertype()):
+                    return f(*args, **kwargs)
+                return "Unauthorized" , 401
+            return wrapper
+        return decorated
 
     @classmethod
     def belongstosameministry(cls,func):

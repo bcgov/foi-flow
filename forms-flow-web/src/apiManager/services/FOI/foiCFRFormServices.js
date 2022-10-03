@@ -16,30 +16,32 @@ export const fetchCFRForm = (
   dispatch,
   errorCallback = null
 ) => {
-  const apiUrl = replaceUrl(
-    API.FOI_GET_CFR_FORM,
-    "<ministryrequestid>",
-    ministryId
-  );
-  httpGETRequest(apiUrl, {}, UserService.getToken())
-    .then((res) => {
-      if (res.data) {
-        if (!_.isEmpty(res.data)) {
-          dispatch(setRequestCFRForm(res.data.current));
-          dispatch(setRequestCFRFormHistory(res.data.history));
+  if (ministryId) {
+    const apiUrl = replaceUrl(
+      API.FOI_GET_CFR_FORM,
+      "<ministryrequestid>",
+      ministryId
+    );
+    httpGETRequest(apiUrl, {}, UserService.getToken())
+      .then((res) => {
+        if (res.data) {
+          if (!_.isEmpty(res.data)) {
+            dispatch(setRequestCFRForm(res.data.current));
+            dispatch(setRequestCFRFormHistory(res.data.history));
+          }
+        } else {
+          console.log("Error in fetching CFR Form data", res);
+          dispatch(serviceActionError(res));
         }
-      } else {
-        console.log("Error in fetching CFR Form data", res);
-        dispatch(serviceActionError(res));
-      }
-    })
-    .catch((error) => {
-      console.log("Error in fetching CFR Form data", error);
-      dispatch(serviceActionError(error));
-      if (errorCallback) {
-        errorCallback("An error occured while trying to save CFR form data");
-      }
-    });
+      })
+      .catch((error) => {
+        console.log("Error in fetching CFR Form data", error);
+        dispatch(serviceActionError(error));
+        if (errorCallback) {
+          errorCallback("An error occured while trying to save CFR form data");
+        }
+      });
+  }
 };
 
 export const saveCFRForm = (

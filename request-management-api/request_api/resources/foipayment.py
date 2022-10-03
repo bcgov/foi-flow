@@ -53,6 +53,24 @@ class CreateFOIPayment(Resource):
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500
 
+@cors_preflight('POST,OPTIONS')
+@API.route('/foipayment/<requestid>/ministryrequest/<ministryrequestid>/cancel')
+class CreateFOIPayment(Resource):
+    """Handles applicant payment actions"""
+
+       
+    @staticmethod
+    @TRACER.trace()
+    @cross_origin(origins=allowedorigins())
+    @auth.require
+    def post(requestid, ministryrequestid):      
+        try:
+            result = paymentservice().cancelpayment(requestid, ministryrequestid)
+            return {'status': result.success, 'message':result.message,'id':result.identifier} , 200 
+        except KeyError as err:
+            return {'status': False, 'message':err.messages}, 400        
+        except BusinessException as exception:            
+            return {'status': exception.status_code, 'message':exception.message}, 500
 
 @cors_preflight('GET,OPTIONS')
 @API.route('/foipayment/<requestid>/ministryrequest/<ministryrequestid>')
