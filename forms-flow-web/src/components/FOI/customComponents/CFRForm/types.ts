@@ -10,6 +10,7 @@ export type CFRFormData = {
     estimates: feeData;
     actual: feeData;
     suggestions: string;
+    reason: string;
 }
 
 export type feeData = {

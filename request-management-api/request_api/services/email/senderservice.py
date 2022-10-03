@@ -49,11 +49,13 @@ class senderservice:
             )
             msg.attach(part)
         try:
+            print("MAIL_SERVER_SMTP = ",MAIL_SERVER_SMTP)
+            print("MAIL_SERVER_SMTP_PORT = ",MAIL_SERVER_SMTP_PORT)
             with smtplib.SMTP(MAIL_SERVER_SMTP,  MAIL_SERVER_SMTP_PORT) as smtpobj:
                 smtpobj.ehlo()
                 smtpobj.starttls()
                 smtpobj.ehlo()
-                smtpobj.login(MAIL_SRV_USERID, MAIL_SRV_PASSWORD)
+                #smtpobj.login(MAIL_SRV_USERID, MAIL_SRV_PASSWORD)
                 smtpobj.sendmail(msg['From'],  msg['To'], msg.as_string())
                 smtpobj.quit()
                 logging.debug("End: Send email for request = "+json.dumps(requestjson))
