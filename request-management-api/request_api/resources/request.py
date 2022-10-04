@@ -28,6 +28,10 @@ from request_api.services.eventservice import eventservice
 import json
 import asyncio
 from jose import jwt as josejwt
+import holidays
+from datetime import datetime, timedelta
+import os
+import pytz
 
 API = Namespace('FOIRawRequests', description='Endpoints for FOI request management')
 TRACER = Tracer.get_instance()
@@ -35,6 +39,9 @@ with open('request_api/schemas/schemas/rawrequest.json') as f:
         schema = json.load(f)
 
 INVALID_REQUEST_ID = 'Invalid Request Id'
+
+SHORT_DATE_FORMAT = '%Y-%m-%d'
+LONG_DATE_FORMAT = '%Y-%m-%d %H:%M:%S'
 
 @cors_preflight('GET,POST,OPTIONS')
 @API.route('/foirawrequest/<requestid>')
@@ -66,31 +73,41 @@ class FOIRawRequest(Resource):
     def post(requestid=None, actiontype=None):
         try :                        
             updaterequest = request.get_json()
+            requestdata = getparams(updaterequest)
+            assigneegroup = requestdata['assigneegroup']
+            assignee = requestdata['assignee']
+            assigneefirstname = requestdata['assigneefirstname']
+            assigneemiddlename = requestdata['assigneemiddlename']
+            assigneelastname = requestdata['assigneelastname']
+
             if int(requestid) and str(requestid) != "-1" :
                 status = rawrequestservice().getstatus(updaterequest)
-                rawrequest = rawrequestservice().getrawrequest(requestid)
-                requestdata = getparams(updaterequest)
-
-                assigneegroup = requestdata['assigneegroup']
-                assignee = requestdata['assignee']
-                assigneefirstname = requestdata['assigneefirstname']
-                assigneemiddlename = requestdata['assigneemiddlename']
-                assigneelastname = requestdata['assigneelastname']
-                result = rawrequestservice().saverawrequestversion(updaterequest,requestid,assigneegroup,assignee,status,AuthHelper.getuserid(),assigneefirstname,assigneemiddlename,assigneelastname, actiontype)
-                asyncio.ensure_future(eventservice().postevent(requestid,"rawrequest",AuthHelper.getuserid(), AuthHelper.getusername(), AuthHelper.isministrymember()))
+                rawrequest = rawrequestservice().getrawrequest(requestid)            
+                result = rawrequestservice().saverawrequestversion(updaterequest,requestid,assigneegroup,assignee,status,AuthHelper.getuserid(),assigneefirstname,assigneemiddlename,assigneelastname, actiontype)                
+                assignee = ''
+                if(actiontype == 'assignee'):
+                    assignee = getassignee(assigneefirstname,assigneelastname,assigneegroup)                  
+                asyncio.ensure_future(eventservice().postevent(requestid,"rawrequest",AuthHelper.getuserid(), AuthHelper.getusername(), AuthHelper.isministrymember(),assignee))
                 if result.success == True:
-                    rawrequestservice().posteventtoworkflow(result.identifier, rawrequest['wfinstanceid'], updaterequest, status)
+                    asyncio.ensure_future(rawrequestservice().posteventtoworkflow(result.identifier, rawrequest['wfinstanceid'], updaterequest, status))
                     return {'status': result.success, 'message':result.message}, 200
             elif int(requestid) and str(requestid) == "-1":
                 result = rawrequestservice().saverawrequest(updaterequest,"intake",AuthHelper.getuserid(),notes="Request submitted from FOI Flow")
                 if result.success == True:
-                    asyncio.ensure_future(eventservice().postevent(result.identifier,"rawrequest",AuthHelper.getuserid(),AuthHelper.getusername(),AuthHelper.isministrymember()))
+                    assignee = getassignee(assigneefirstname,assigneelastname,assigneegroup)
+                    asyncio.ensure_future(eventservice().postevent(result.identifier,"rawrequest",AuthHelper.getuserid(),AuthHelper.getusername(),AuthHelper.isministrymember(),assignee))
                     return {'status': result.success, 'message':result.message,'id':result.identifier} , 200                
         except ValueError:
             return {'status': 500, 'message':INVALID_REQUEST_ID}, 500    
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500
-    
+
+def getassignee(assigneefirstname,assigneelastname,assigneegroup):
+    if(assigneefirstname !='' and assigneelastname!=''):
+        return  "{0}, {1}".format(assigneelastname,assigneefirstname)
+    else: 
+        return  assigneegroup
+
 def getparams(updaterequest):
     return {
         'assigneegroup': updaterequest["assignedGroup"] if 'assignedGroup' in updaterequest  else None,
@@ -99,7 +116,7 @@ def getparams(updaterequest):
         'assigneemiddlename': updaterequest["assignedToMiddleName"] if updaterequest.get("assignedToMiddleName") != None else None,
         'assigneelastname': updaterequest["assignedToLastName"] if updaterequest.get("assignedToLastName") != None else None
     }
-
+    
 @cors_preflight('GET,OPTIONS')
 @API.route('/foirawrequest/axisrequestid/<axisrequestid>')
 class FOIAXISRequest(Resource):
@@ -134,7 +151,7 @@ class FOIRawRequestLoadTest(Resource):
             username = 'Super Tester'
             if int(requestid) and str(requestid) == "-1":
                 result = rawrequestservice().saverawrequest(updaterequest,"intake",userid,notes="Request submitted from FOI Flow")               
-                asyncio.ensure_future(eventservice().postevent(result.identifier,"rawrequest",userid,username,False))
+                asyncio.ensure_future(eventservice().postevent(result.identifier,"rawrequest",userid,username,False,''))
                 return {'status': result.success, 'message':result.message,'id':result.identifier} , 200
         except ValueError:
             return {'status': 400, 'message':INVALID_REQUEST_ID}, 400    
@@ -167,7 +184,7 @@ class FOIRawRequestBPMProcess(Resource):
                 return {'status': "Invalid PUT request", 'message':"Key Error on JSON input, please confirm requestid and wfinstanceid"}, 500
             except ValueError as valuexception:
                 return {'status': "BAD Request", 'message': str(valuexception)}, 500           
-                       
+
 @cors_preflight('GET,POST,OPTIONS')
 @API.route('/foirawrequests')
 class FOIRawRequests(Resource):
@@ -182,6 +199,13 @@ class FOIRawRequests(Resource):
         try:
             request_json = request.get_json()
             requestdatajson = request_json['requestData']  
+
+            #add received date to json
+            receiveddatetext = requestdatajson["receivedDateUF"] if 'receivedDateUF' in requestdatajson else datetime.now(pytz.timezone("America/Vancouver")).strftime(LONG_DATE_FORMAT)
+            receiveddate = _skiptoworkday(receiveddatetext, 0)
+            requestdatajson['receivedDate'] = receiveddate.strftime(SHORT_DATE_FORMAT)
+            requestdatajson['receivedDateUF'] = receiveddate.strftime(LONG_DATE_FORMAT)
+
             #get attachments
             attachments = requestdatajson['Attachments'] if 'Attachments' in requestdatajson else None
             notes = 'Request submission from FOI WebForm'
@@ -196,7 +220,52 @@ class FOIRawRequests(Resource):
             return {'status': "TypeError", 'message':"Error while parsing JSON in request"}, 500   
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500
-        
+
+
+def _skiptoworkday(datetimevalue, extradiff=0):
+    """skip weekend, holiday, weekdays (after 16:30)"""
+    receiveddate = datetime.strptime(datetimevalue, LONG_DATE_FORMAT) if isinstance(datetimevalue, str) else datetimevalue
+
+    ca_holidays = _getholidays()
+    diff = 0
+    if receiveddate.isoweekday() in [6, 7]: #weekend - add 1 day
+        diff += 1
+        if _isholiday(receiveddate.strftime(SHORT_DATE_FORMAT), ca_holidays): #holiday in weekend - add an extra day
+            extradiff += 1
+    else:
+        if _isholiday(receiveddate.strftime(SHORT_DATE_FORMAT), ca_holidays): #holiday in weekdays - add 1 day
+            diff += 1
+        else: # submitted after 16:30 in weekdays
+            if receiveddate.hour > 16 or (receiveddate.hour == 16 and receiveddate.minute > 30):
+                diff += 1
+            else:
+                receiveddate += timedelta(days=extradiff)
+                return receiveddate
+
+    receiveddate += timedelta(days=diff)
+    receiveddate = receiveddate.replace(hour=0, minute=0, second=0, microsecond=0) #reset time
+    return _skiptoworkday(receiveddate, extradiff)
+
+def _getholidays():        
+    ca_holidays = []
+    for date, name in sorted(holidays.CA(prov='BC', years=datetime.today().year).items()):
+        ca_holidays.append(date.strftime(SHORT_DATE_FORMAT))
+    if 'FOI_ADDITIONAL_HOLIDAYS' in os.environ and os.getenv('FOI_ADDITIONAL_HOLIDAYS') != '':
+        _addldays = os.getenv('FOI_ADDITIONAL_HOLIDAYS')
+        for _addlday in _addldays.split(","):
+            ca_holidays.append(_addlday.strip().replace('XXXX',str(datetime.today().year)))
+
+    if 'FOI_INVALID_HOLIDAYS' in os.environ and os.getenv('FOI_INVALID_HOLIDAYS') != '': #remove dec 24, dec 27 from holidays
+        _invaliddays = os.getenv('FOI_INVALID_HOLIDAYS')
+        for _invalidday in _invaliddays.split(","):
+            if _invalidday in ca_holidays:
+                ca_holidays.remove(_invalidday.strip().replace('XXXX',str(datetime.today().year)))
+    
+    return ca_holidays
+
+def _isholiday(input, ca_holidays):
+    return input in ca_holidays   
+
 @cors_preflight('GET,OPTIONS')
 @API.route('/foirawrequest/<requestid>/fields')
 class FOIRawRequestFields(Resource):

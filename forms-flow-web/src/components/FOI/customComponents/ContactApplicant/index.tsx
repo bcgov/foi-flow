@@ -382,6 +382,7 @@ export const ContactApplicant = ({
             existingDocuments={files}
             attachment={{}}
             handleRename={undefined}
+            isMinistryCoordinator={false}
           />
         </div>
         <div id="correspondence-editor-ql-toolbar" className="ql-toolbar ql-snow">
