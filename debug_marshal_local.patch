@@ -1,4 +1,4 @@
-﻿diff --git a/forms-flow-web/src/apiManager/endpoints/config.js b/forms-flow-web/src/apiManager/endpoints/config.js
+diff --git a/forms-flow-web/src/apiManager/endpoints/config.js b/forms-flow-web/src/apiManager/endpoints/config.js
 index 3db8dea3..2ce4c997 100644
 --- a/forms-flow-web/src/apiManager/endpoints/config.js
 +++ b/forms-flow-web/src/apiManager/endpoints/config.js

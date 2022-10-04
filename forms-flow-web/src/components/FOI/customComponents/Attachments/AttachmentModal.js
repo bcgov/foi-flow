@@ -37,7 +37,7 @@ const useStyles = makeStyles((theme) => ({
 
 }));
 
-export default function AttachmentModal({ modalFor, openModal, handleModal, multipleFiles, requestNumber, requestId, attachment, attachmentsArray, handleRename, existingDocuments=[], uploadFor="attachment"}) {
+export default function AttachmentModal({ modalFor, openModal, handleModal, multipleFiles, requestNumber, requestId, attachment, attachmentsArray, handleRename, isMinistryCoordinator, existingDocuments=[], uploadFor="attachment" }) {
 
     const mimeTypes = multipleFiles ? MimeTypeList.attachmentLog : MimeTypeList.stateTransition;
     const maxFileSize = multipleFiles ? MaxFileSizeInMB.attachmentLog : MaxFileSizeInMB.stateTransition;
@@ -47,6 +47,7 @@ export default function AttachmentModal({ modalFor, openModal, handleModal, mult
     const [newFilename, setNewFilename] = useState("");
     const [extension, setExtension] = useState("");
     const [errorMessage, setErrorMessage] = useState();
+    const [tagValue, setTagValue] = useState("general");
     const attchmentFileNameList = attachmentsArray.map(_file => _file.filename.toLowerCase());
 
     useEffect(() => {
@@ -124,28 +125,32 @@ export default function AttachmentModal({ modalFor, openModal, handleModal, mult
         }
     };
 
+    const handleTagChange = (_tagValue) => {
+      setTagValue(_tagValue);
+    };
+
     const handleSave = () => {
       if (modalFor.toLowerCase() === "delete") {
         handleModal(true, null, null);
       }
       else {
         let fileInfoList = [];
-        
-          let fileStatusTransition = "";
-          if (modalFor === 'replace') {
-            fileStatusTransition = attachment?.category;
+
+        let fileStatusTransition = "";
+        if (modalFor === 'replace') {
+          fileStatusTransition = attachment?.category;
+        }
+        else {
+          fileStatusTransition = tagValue;
+        }
+        fileInfoList = files?.map(file => {
+          return {
+              ministrycode: "Misc",
+              requestnumber: requestNumber ? requestNumber : `U-00${requestId}`,
+              filestatustransition: fileStatusTransition,
+              filename: file.filename? file.filename : file.name,
           }
-          else {
-            fileStatusTransition = "general";
-          }
-            fileInfoList = files?.map(file => {
-            return {
-                ministrycode: "Misc",
-                requestnumber: requestNumber ? requestNumber : `U-00${requestId}`,
-                filestatustransition: fileStatusTransition,
-                filename: file.filename? file.filename : file.name,
-            }
-            });
+        });
         
         handleModal(true, fileInfoList, files);
       }
@@ -197,7 +202,7 @@ export default function AttachmentModal({ modalFor, openModal, handleModal, mult
           maxWidth={'md'}
           fullWidth={true}
         >
-          <DialogTitle disableTypography id="state-change-dialog-title">
+          <DialogTitle disableTypography id="state-change-dialog-title" className="add-attachment-modal-title">
               <h2 className="state-change-header">{message.title}</h2>
               <IconButton aria-label= "close" onClick={handleClose}>
                 <CloseIcon />
@@ -220,6 +225,10 @@ export default function AttachmentModal({ modalFor, openModal, handleModal, mult
                   maxFileSize={maxFileSize} 
                   totalFileSize={totalFileSize} 
                   updateFilesCb={updateFilesCb}
+                  modalFor={modalFor}
+                  handleTagChange={handleTagChange}
+                  tagValue={tagValue}
+                  isMinistryCoordinator={isMinistryCoordinator}
                   existingDocuments={existingDocuments}
                 /> 
                 :

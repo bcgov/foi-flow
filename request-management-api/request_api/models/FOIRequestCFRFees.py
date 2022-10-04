@@ -27,6 +27,8 @@ class FOIRequestCFRFee(db.Model):
     createdby = db.Column(db.String(120), unique=False, nullable=True)
     updated_at = db.Column(db.DateTime, nullable=True)
     updatedby = db.Column(db.String(120), unique=False, nullable=True)
+    cfrformreasonid =db.Column(db.Integer, db.ForeignKey('CFRFormReasons.cfrformreasonid'), nullable=True)
+    cfrformreason = relationship("CFRFormReason",backref=backref("CFRFormReason"),uselist=False)
 
     
     @classmethod    
@@ -87,6 +89,6 @@ class FOIRequestCFRFee(db.Model):
        
 class FOIRequestCFRFormSchema(ma.Schema):
     class Meta:
-        fields = ('cfrfeeid', 'ministryrequestid', 'feedata', 'overallsuggestions', 'created_at','createdby','updated_at','updatedby','cfrfeestatusid', 'cfrfeestatus.name','cfrfeestatus.description','version') 
+        fields = ('cfrfeeid', 'ministryrequestid', 'feedata', 'overallsuggestions', 'created_at','createdby','updated_at','updatedby','cfrfeestatusid', 'cfrfeestatus.name','cfrfeestatus.description','version','cfrformreasonid','cfrformreason.name','cfrformreason.description') 
 
 

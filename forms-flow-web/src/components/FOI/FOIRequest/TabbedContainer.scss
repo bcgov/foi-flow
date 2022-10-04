@@ -7,11 +7,8 @@
   padding-top: 65px;
   position: relative;
   overflow-y: scroll;
-
   margin-left: 10%;
   margin-right: 10%;
-  margin-bottom: 5%;
-
   height: 90%;
   min-width: 80%;
 }
@@ -49,8 +46,7 @@
 .foitabbedContainer{
   display: inline-flex;  
   background-color: white;  
-  // min-width: 100%;
-  width: 89vw;
+  min-width: 100%;
 }
 
   
@@ -163,7 +159,7 @@
   {
       padding-left: 12%;
       padding-top: 20%;
-      padding-bottom: 20%;
+      padding-bottom: 10%;
   }
 
   .foileftpanelheader h1 {
@@ -173,6 +169,12 @@
 .foileftpanelheader h1 > a {
     text-decoration: none!important;
     color: white;
+}
+.foileftpanelrequestno {
+  color: white;
+  font-weight: bold;
+  margin-left: 10px;
+  padding-left: 15px;
 }
 
 .foileftpaneldropdown {

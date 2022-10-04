@@ -64,7 +64,8 @@ class applicantcorrespondenceservice:
         emailhtml_decoded_string = parser.unescape(self.__getvaluefromjson(_correspondencemessagejson, 'emailhtml')) 
         return emailhtml_decoded_string if _isjson else _correspondencemessagejson
 
-
+    def getlatestapplicantcorrespondence(self, ministryid):
+        return FOIApplicantCorrespondence().getlatestapplicantcorrespondence(ministryid)
 
     def __getjsonobject(self, correspondencemessagejson):
         try:

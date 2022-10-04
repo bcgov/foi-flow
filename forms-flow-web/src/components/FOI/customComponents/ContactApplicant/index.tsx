@@ -382,6 +382,7 @@ export const ContactApplicant = ({
             existingDocuments={files}
             attachment={{}}
             handleRename={undefined}
+            isMinistryCoordinator={false}
             uploadFor={"email"}
           />
         </div>
@@ -412,6 +413,7 @@ export const ContactApplicant = ({
               data-variant="contained"
               onClick={() => setPreviewModal(true)}
               color="primary"
+              disabled={(files?.length <= 0)}
             >
               {previewButtonValue}
             </button>
