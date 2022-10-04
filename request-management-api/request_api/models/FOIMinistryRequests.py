@@ -638,7 +638,7 @@ class FOIMinistryRequest(db.Model):
     def getupcomingdivisionduerecords(cls):
         upcomingduerecords = []
         try:
-            sql = """select axisrequestid, filenumber, fma.foiministryrequestid , fma.foiministryrequestversion, fma.foirequest_id
+            sql = """select axisrequestid, filenumber, fma.foiministryrequestid , fma.foiministryrequestversion, fma.foirequest_id, 
                         frd.divisionid, frd.stageid, pad2."name" divisionname, pads."name" stagename, 
                         to_char(divisionduedate, 'YYYY-MM-DD') as duedate, frd.created_at, frd.createdby 
                         from "FOIMinistryRequestDivisions" frd 
@@ -652,7 +652,7 @@ class FOIMinistryRequest(db.Model):
             rs = db.session.execute(text(sql))        
             for row in rs:
                 upcomingduerecords.append({"axisrequestid": row["axisrequestid"], "filenumber": row["filenumber"], 
-                                            "foiministryrequestid": row["foiministryrequestversion"], "version": row["foiministryrequestversion"], 
+                                            "foiministryrequestid": row["foiministryrequestid"], "version": row["foiministryrequestversion"], 
                                             "foirequest_id": row["foirequest_id"], "created_at": row["created_at"], "createdby": row["createdby"],
                                             "divisionid": row["divisionid"],"divisionname": row["divisionname"],
                                             "stageid": row["stageid"], "stagename": row["stagename"], 

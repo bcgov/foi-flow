@@ -50,7 +50,7 @@ class divisiondateevent(duecalculator):
         return self.__getformattedprefix(data)+ ' due Today'
 
     def __getformattedprefix(self,data):
-        _message = data['divisioname']
+        _message = data['divisionname']
         if data['stageid'] == 5:
             _message += " records are"
         elif data['stageid'] == 7:
