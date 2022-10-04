@@ -49,34 +49,8 @@ class FOIRequestGetRecord(Resource):
             return {'status': False, 'message':err.messages}, 400        
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500
-
 @cors_preflight('POST,OPTIONS')
 @API.route('/foirecord/<requestid>/ministryrequest/<ministryrequestid>')
-class FOIRequestCreateRecord(Resource):
-    """Resource for Creating FOI records."""
-
-       
-    @staticmethod
-    @TRACER.trace()
-    @cross_origin(origins=allowedorigins())
-    @auth.require
-    def post(requestid, ministryrequestid):      
-        try:
-            requestjson = request.get_json()
-            recordschema = FOIRequestCreateRecordSchema().load(requestjson)
-            records = []
-            records.append(recordschema.copy())
-            response = recordservice().create(requestid, ministryrequestid, records, AuthHelper.getuserid())
-            respcode = 200 if response.success == True else 500
-            return {'status': response.success, 'message':response.message,'data': response.args[0]} , respcode
-        except KeyError as err:
-            return {'status': False, 'message':err.messages}, 400        
-        except BusinessException as exception:            
-            return {'status': exception.status_code, 'message':exception.message}, 500
-
-
-@cors_preflight('POST,OPTIONS')
-@API.route('/foirecord/<requestid>/ministryrequest/<ministryrequestid>/bulk')
 class FOIRequestBulkCreateRecord(Resource):
     """Resource for Creating FOI records."""
 
@@ -92,7 +66,7 @@ class FOIRequestBulkCreateRecord(Resource):
             print(requestid)
             print(ministryrequestid)
             print(recordschema)
-            response = recordservice().create(requestid, ministryrequestid, recordschema, AuthHelper.getuserid(), True)
+            response = recordservice().create(requestid, ministryrequestid, recordschema, AuthHelper.getuserid())
             respcode = 200 if response.success == True else 500
             return {'status': response.success, 'message':response.message,'data': response.args[0]} , respcode
         except KeyError as err:

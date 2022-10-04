@@ -11,11 +11,10 @@ class recordservice:
     """ FOI record management service
     """
     
-    def create(self, requestid, ministryrequestid, recordschema, userid, ismany=False):
+    def create(self, requestid, ministryrequestid, recordschema, userid):
         """Creates a record for a user with document details passed in for an opened request.
         """
-        _record =  recordschema.get("records") if ismany == True else recordschema 
-        return self.__bulkcreate(requestid, ministryrequestid, _record, userid)
+        return self.__bulkcreate(requestid, ministryrequestid, recordschema.get("records"), userid)
         
     def fetch(self, requestid, ministryrequestid):
         records = FOIRequestRecord.fetch(requestid, ministryrequestid)
