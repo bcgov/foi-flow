@@ -29,7 +29,8 @@ const FileUpload = ({
     modalFor,
     handleTagChange,
     tagValue,
-    isMinistryCoordinator
+    isMinistryCoordinator,
+    uploadFor="attachment"
 }) => {
     const fileInputField = useRef(null);
     const [files, setFiles] = useState({ ...existingDocuments });    
@@ -172,7 +173,7 @@ const FileUpload = ({
     const getCategoriesForTaging = () => {
       const _tags = AttachmentCategories.categorys.filter(category => category.type.includes("tag"));
       let _tagList = [];
-      if(modalFor === 'add') {
+      if(modalFor === 'add' && uploadFor === 'attachment') {
         for(let tag of _tags) {
           if(!isMinistryCoordinator) {
             _tagList.push(
@@ -211,7 +212,7 @@ const FileUpload = ({
 
   return (
     <>
-      {modalFor === 'add' && (<div>
+      {modalFor === 'add' && uploadFor === 'attachment' && (<div>
         <div className="tagtitle">
           <span>Select one tag that correspondences to the document you are uploading</span>
         </div>
@@ -265,7 +266,7 @@ const FileUpload = ({
           </div>
         </div>
       </section>
-      {modalFor === 'add' && (<div className="tag-message-container">
+      {modalFor === 'add' && uploadFor === 'attachment' && (<div className="tag-message-container">
         <p>When uploading more than one attachment, all attachments will have the save selected tag.</p>
       </div>)}
       <ul className="error-message-ul">

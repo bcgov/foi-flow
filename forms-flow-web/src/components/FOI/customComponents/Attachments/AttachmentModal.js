@@ -230,6 +230,7 @@ export default function AttachmentModal({ modalFor, openModal, handleModal, mult
                   tagValue={tagValue}
                   isMinistryCoordinator={isMinistryCoordinator}
                   existingDocuments={existingDocuments}
+                  uploadFor={uploadFor}
                 /> 
                 :
                 <ModalForRename modalFor={modalFor} newFilename={newFilename} updateFilename={updateFilename} errorMessage={errorMessage} extension={extension} />
