@@ -29,7 +29,9 @@ class notificationconfig:
         elif notificationtype == "Tagged User Comments":
             return 10 
         elif notificationtype == "Group Members":
-            return 12 
+            return 12
+        elif notificationtype == "Division Due Reminder":
+            return 13 
         return 0     
     
     def getnotificationusertypeid(self, notificationusertype):
