@@ -9,7 +9,7 @@ public."FOIMinistryRequests" JOIN (
   SELECT foiministryrequestid, MAX(version) version
   FROM public."FOIMinistryRequests" where assignedgroup = 'Business Team'
   GROUP BY foiministryrequestid
-  ) max_version USING (foiministryrequestid, version)
+  ) max_version USING (foiministryrequestid, version);
 
 
 select * from public."FOIRawRequestWatchers" where watchedbygroup = 'Business Team';
@@ -22,11 +22,17 @@ UPDATE public."FOIMinistryRequests" ministryrequests SET assignedgroup = 'Centra
   SELECT foiministryrequestid, MAX(version) version
   FROM public."FOIMinistryRequests" where assignedgroup = 'Business Team'
   GROUP BY foiministryrequestid
-  ) max_version WHERE ministryrequests.foiministryrequestid = max_version.foiministryrequestid and  ministryrequests.version = max_version.version
+  ) max_version WHERE ministryrequests.foiministryrequestid = max_version.foiministryrequestid and  ministryrequests.version = max_version.version;
+
 UPDATE public."FOIRequestWatchers" SET watchedbygroup = 'Central Team' WHERE watchedbygroup = 'Business Team';
 
 
 --CAMUNDA DB ---
-select * from act_ru_variable where text_ like '%Business%'
-select * from act_ru_authorization where group_id_ like '%Business%'
-select * from act_ru_identitylink where group_id_ like '%Business%'
+select * from act_ru_variable where text_ like '%Business%';
+select * from act_ru_authorization where group_id_ like '%Business%';
+select * from act_ru_identitylink where group_id_ like '%Business%';
+
+
+UPDATE act_ru_variable SET text_ = replace(text_,'Business','Central') where text_ like '%Business%';
+UPDATE act_ru_authorization SET group_id_ = 'Central Team' where group_id_ like '%Business%';
+UPDATE act_ru_identitylink SET group_id_ = 'Central Team' where group_id_ like '%Business%';
