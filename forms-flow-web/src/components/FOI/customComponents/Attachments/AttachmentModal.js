@@ -37,7 +37,7 @@ const useStyles = makeStyles((theme) => ({
 
 }));
 
-export default function AttachmentModal({ modalFor, openModal, handleModal, multipleFiles, requestNumber, requestId, attachment, attachmentsArray, handleRename, existingDocuments=[] }) {
+export default function AttachmentModal({ modalFor, openModal, handleModal, multipleFiles, requestNumber, requestId, attachment, attachmentsArray, handleRename, existingDocuments=[], uploadFor="attachment"}) {
 
     const mimeTypes = multipleFiles ? MimeTypeList.attachmentLog : MimeTypeList.stateTransition;
     const maxFileSize = multipleFiles ? MaxFileSizeInMB.attachmentLog : MaxFileSizeInMB.stateTransition;
@@ -235,7 +235,7 @@ export default function AttachmentModal({ modalFor, openModal, handleModal, mult
               </button>
               :
               <button className={`btn-bottom btn-save ${ btnClass }`} disabled={files.length === 0 && existingDocuments.length === 0 && modalFor !== 'delete'} onClick={handleSave}>
-                Continue
+                {uploadFor === "email" ? "Save Changes" : "Continue"}
               </button>
             }
             <button className="btn-bottom btn-cancel" onClick={handleClose}>
