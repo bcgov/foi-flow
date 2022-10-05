@@ -35,7 +35,6 @@ const extensionStatusLabel = Object.freeze({
 
 const KCProcessingTeams = [
   "Scanning Team", 
-  "Business Team", 
   "Central Team", 
   "Justice Health Team", 
   "MCFD Personals Team", 
