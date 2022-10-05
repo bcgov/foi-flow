@@ -61,6 +61,7 @@
         <bpmn:flowNodeRef>Activity_1mkqp7n</bpmn:flowNodeRef>
         <bpmn:flowNodeRef>Activity_1ka6mqq</bpmn:flowNodeRef>
         <bpmn:flowNodeRef>Event_0q2irqu</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Event_1wwsw8u</bpmn:flowNodeRef>
       </bpmn:lane>
     </bpmn:laneSet>
     <bpmn:task id="Activity_0k05bsn" name="Create Submission">
@@ -557,6 +558,7 @@ connector.getVariable("statusCode");</camunda:script>
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_0sfszv6</bpmn:incoming>
       <bpmn:outgoing>Flow_18rkboh</bpmn:outgoing>
+      <bpmn:outgoing>Flow_1bmyxxs</bpmn:outgoing>
     </bpmn:serviceTask>
     <bpmn:boundaryEvent id="Event_1s2s2yf" attachedToRef="Activity_1tkdc9h">
       <bpmn:outgoing>Flow_1d7gxi1</bpmn:outgoing>
@@ -756,6 +758,10 @@ else {
       <bpmn:outgoing>Flow_04inq0o</bpmn:outgoing>
       <bpmn:messageEventDefinition id="MessageEventDefinition_078vvwz" />
     </bpmn:intermediateThrowEvent>
+    <bpmn:endEvent id="Event_1wwsw8u">
+      <bpmn:incoming>Flow_1bmyxxs</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_1bmyxxs" sourceRef="Activity_1tkdc9h" targetRef="Event_1wwsw8u" />
   </bpmn:process>
   <bpmn:message id="Message_1x26sx5" name="foi-manage-payment" />
   <bpmn:message id="Message_1rsz89u" name="foi-fee-expiry-notification-error" />
@@ -1056,6 +1062,10 @@ else {
         <di:waypoint x="1300" y="1065" />
         <di:waypoint x="1390" y="1065" />
       </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1bmyxxs_di" bpmnElement="Flow_1bmyxxs">
+        <di:waypoint x="1170" y="1410" />
+        <di:waypoint x="1382" y="1410" />
+      </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="Activity_0uv6wyi_di" bpmnElement="Activity_0k05bsn">
         <dc:Bounds x="980" y="293" width="100" height="80" />
       </bpmndi:BPMNShape>
@@ -1208,6 +1218,9 @@ else {
         <bpmndi:BPMNLabel>
           <dc:Bounds x="1924" y="358" width="76" height="14" />
         </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1wwsw8u_di" bpmnElement="Event_1wwsw8u">
+        <dc:Bounds x="1382" y="1392" width="36" height="36" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Event_1cjocwt_di" bpmnElement="Event_1aetqrp">
         <dc:Bounds x="1232" y="1087" width="36" height="36" />
