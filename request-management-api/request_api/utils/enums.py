@@ -114,6 +114,11 @@ class PaymentEventType(Enum):
     outstandingpaid = "OUTSTANDINGPAID"
     depositpaid = "DEPOSITPAID"
 
+class CommentType(Enum):
+    """Authorization header types."""
+    UserComment = 1
+    SystemGenerated = 2
+    DivisionStages = 3
 class ServiceName(Enum):
     payonline = "payonline"
     payoutstanding = "payoutstanding"

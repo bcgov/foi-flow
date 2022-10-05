@@ -7,8 +7,13 @@ import { countOccurrences,
   allowedFileSize, 
   convertNestedObjectToArray, 
   convertBytesToMB } from "./util";
-import "./FileUpload.scss"
-import clsx from "clsx"
+import {
+  ClickableChip  
+} from "../../Dashboard/utils";
+import Stack from "@mui/material/Stack";
+import "./FileUpload.scss";
+import clsx from "clsx";
+import { AttachmentCategories } from '../../../../constants/FOI/statusEnum';
 
 const FileUpload = ({
     multipleFiles,
@@ -20,7 +25,12 @@ const FileUpload = ({
     attachment,
     customFormat = {},
     existingDocuments = [],
-    maxNumberOfFiles = 10
+    maxNumberOfFiles = 10,
+    modalFor,
+    handleTagChange,
+    tagValue,
+    isMinistryCoordinator,
+    uploadFor="attachment"
 }) => {
     const fileInputField = useRef(null);
     const [files, setFiles] = useState({ ...existingDocuments });    
@@ -120,7 +130,7 @@ const FileUpload = ({
         }
         setFiles(updatedFilesDetails[0]);
         callUpdateFilesCb(updatedFilesDetails[0]);
-    }
+      }
     }
    
     const handleNewFileUpload = (e) => {
@@ -133,7 +143,7 @@ const FileUpload = ({
       const newFiles = e.dataTransfer.files;
       const totalNoOfFiles = Object.entries(files).length + newFiles.length; 
       validateFiles(newFiles, totalNoOfFiles);
-  }
+    }
     const removeFile = (fileName) => {
         const _file = files[fileName];
         const sizeInMB = (_file.size / (1024*1024)).toFixed(2);
@@ -157,10 +167,61 @@ const FileUpload = ({
     
     const showDragandDrop = () => {
       if (Object.entries(files).length === 0)
-        return "Drag and drop request letter(s) or"
+        return "Drag and drop attachments, or"
     }
+
+    const getCategoriesForTaging = () => {
+      const _tags = AttachmentCategories.categorys.filter(category => category.type.includes("tag"));
+      let _tagList = [];
+      if(modalFor === 'add' && uploadFor === 'attachment') {
+        for(let tag of _tags) {
+          if(!isMinistryCoordinator) {
+            _tagList.push(
+              <ClickableChip
+                id={`${tag.name}Tag`}
+                key={`${tag.name}-tag`}
+                label={tag.display.toUpperCase()}
+                color="primary"
+                size="small"
+                onClick={()=>{handleTagChange(tag.name)}}
+                clicked={tagValue == tag.name}
+              />
+            );
+          } else {
+            if(tag.name !== "applicant") {
+              _tagList.push(
+                <ClickableChip
+                  id={`${tag.name}Tag`}
+                  key={`${tag.name}-tag`}
+                  label={tag.display.toUpperCase()}
+                  color="primary"
+                  size="small"
+                  onClick={()=>{handleTagChange(tag.name)}}
+                  clicked={tagValue == tag.name}
+                />
+              );
+            }
+          }
+        }
+      }
+
+      return _tagList;
+    };
+
+    let tagList = getCategoriesForTaging();
+
   return (
     <>
+      {modalFor === 'add' && uploadFor === 'attachment' && (<div>
+        <div className="tagtitle">
+          <span>Select one tag that correspondences to the document you are uploading</span>
+        </div>
+        <div className="taglist">
+          <Stack direction="row" sx={{ overflowX: "hidden" }} spacing={1}>
+            {tagList}
+          </Stack>
+        </div>
+      </div>)}
       <section
         className={clsx("file-upload-container", {
           [customFormat.container]: !!customFormat.container,
@@ -202,10 +263,12 @@ const FileUpload = ({
             <button className="btn-add-files" type="button" onClick={handleUploadBtnClick}>              
                   Add Files
             </button>  : null}
+          </div>
         </div>
-        </div>
-        
       </section>
+      {modalFor === 'add' && uploadFor === 'attachment' && (<div className="tag-message-container">
+        <p>When uploading more than one attachment, all attachments will have the save selected tag.</p>
+      </div>)}
       <ul className="error-message-ul">
         {errorMessage
           ? errorMessage.map((error) => (

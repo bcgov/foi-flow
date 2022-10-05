@@ -5,7 +5,7 @@ import AttachmentModal from './AttachmentModal';
 import Loading from "../../../../containers/Loading";
 import { getOSSHeaderDetails, saveFilesinS3, getFileFromS3 } from "../../../../apiManager/services/FOI/foiOSSServices";
 import { saveFOIRequestAttachmentsList, replaceFOIRequestAttachment, saveNewFilename, deleteFOIRequestAttachment } from "../../../../apiManager/services/FOI/foiAttachmentServices";
-import { StateTransitionCategories, AttachmentLetterCategories } from '../../../../constants/FOI/statusEnum'
+import { StateTransitionCategories, AttachmentCategories, AttachmentLetterCategories } from '../../../../constants/FOI/statusEnum'
 import { addToFullnameList, getFullnameList, ConditionalComponent } from '../../../../helper/FOI/helper';
 import Grid from "@material-ui/core/Grid";
 import { makeStyles } from "@material-ui/core/styles";
@@ -19,6 +19,8 @@ import MenuList from "@material-ui/core/MenuList";
 import MenuItem from "@material-ui/core/MenuItem";
 import { saveAs } from "file-saver";
 import { downloadZip } from "client-zip";
+import AttachmentFilter from './AttachmentFilter';
+import { getCategory } from './util';
 
 const useStyles = makeStyles((_theme) => ({
   createButton: {
@@ -30,10 +32,13 @@ const useStyles = makeStyles((_theme) => ({
   },
   chip: {
     fontWeight: "bold",
+    height: "18px",
+    marginBottom: "15px",
   },
   chipPrimary: {
     color: "#fff",
-    backgroundColor: "#003366",
+    height: "18px",
+    marginBottom: "15px",
   },
   ellipses: {
     color: "#38598A",
@@ -80,6 +85,9 @@ export const AttachmentSection = ({
   const [modalFor, setModalFor] = useState("add");
   const [updateAttachment, setUpdateAttachment] = useState({});
   const [fullnameList, setFullnameList] = useState(getFullnameList);
+  const [attachmentsForDisplay, setAttachmentsForDisplay] = useState(attachments)
+  const [filterValue, setFilterValue] = useState('ALL');
+  const [keywordValue, setKeywordValue] = useState('');
 
   const addAttachments = () => {
     setModalFor('add');
@@ -102,6 +110,23 @@ export const AttachmentSection = ({
       }
     }
   },[successCount])
+
+  React.useEffect(() => {
+    setAttachmentsForDisplay(searchAttachments(attachments, filterValue, keywordValue));
+  },[filterValue, keywordValue, attachments])
+
+  const searchAttachments = (_attachments, _filterValue, _keywordValue) =>  {
+    return _attachments.filter( attachment => {
+              let onecategory = getCategory(attachment.category.toLowerCase());
+              return (
+                (_filterValue==="ALL"?true:onecategory.tags.includes(_filterValue?.toLowerCase()))
+                && ( onecategory.tags.join('-').includes(_keywordValue?.toLowerCase())
+                      || attachment.category.toLowerCase().includes(_keywordValue?.toLowerCase()) 
+                      || attachment.filename.toLowerCase().includes(_keywordValue?.toLowerCase()) 
+                      || attachment.createdby.toLowerCase().includes(_keywordValue?.toLowerCase()) )
+              )
+    });
+  }
 
   const replaceAttachment = () => {
     const replaceDocumentObject = {filename: documents[0].filename, documentpath: documents[0].documentpath};
@@ -139,7 +164,8 @@ export const AttachmentSection = ({
           if (!err) {
             res.map((header, index) => {
               const _file = files.find(file => file.filename === header.filename);
-              const documentDetails = {documentpath: header.filepath, filename: header.filename, category: 'general'};
+              const _fileInfo = fileInfoList.find(fileInfo => fileInfo.filename === header.filename);
+              const documentDetails = {documentpath: header.filepath, filename: header.filename, category: _fileInfo.filestatustransition};
               _documents.push(documentDetails);
               setDocuments(_documents);
               saveFilesinS3(header, _file, dispatch, (_err, _res) => {
@@ -181,7 +207,7 @@ export const AttachmentSection = ({
 
   const downloadAllDocuments = async () => {
     let fileInfoList = []
-    attachments.forEach(attachment => {
+    attachmentsForDisplay.forEach(attachment => {
       if (!(isMinistryCoordinator && attachment.category == 'personal')) {
         fileInfoList.push({
             ministrycode: "Misc",
@@ -280,19 +306,28 @@ export const AttachmentSection = ({
   }
 
   let attachmentsList = [];
-  for(let i=0; i<attachments.length; i++) {
+  for(let i=0; i<attachmentsForDisplay.length; i++) {
     attachmentsList.push(
     <Attachment 
       key={i}
       indexValue={i} 
-      attachment={attachments[i]} 
+      attachment={attachmentsForDisplay[i]} 
       handlePopupButtonClick={handlePopupButtonClick} 
       getFullname={getFullname} 
       isMinistryCoordinator={isMinistryCoordinator}
+      ministryId={ministryId}
       classes={classes} 
     />);
   }
-  
+
+  const handleFilterChange = (_newFilterValue) => {
+    setFilterValue(_newFilterValue);
+  }
+
+  const handleKeywordChange = (_newKeywordValue) => {
+    setKeywordValue(_newKeywordValue);
+  }
+
   return (
     <div className={classes.container}>
       {isAttachmentLoading ? (
@@ -343,6 +378,16 @@ export const AttachmentSection = ({
               spacing={1}
               className={classes.attachmentLog}
             >
+              <AttachmentFilter handleFilterChange={handleFilterChange} filterValue={filterValue} handleKeywordChange={handleKeywordChange} keyWordValue={keywordValue} isMinistryCoordinator={isMinistryCoordinator} />
+            </Grid>
+            <Grid
+              container
+              direction="row"
+              justify="flex-start"
+              alignItems="flex-start"
+              spacing={1}
+              className={classes.attachmentLog}
+            >
               {attachmentsList}
             </Grid>
           </Grid>
@@ -357,6 +402,7 @@ export const AttachmentSection = ({
             attachment={updateAttachment}
             attachmentsArray={attachmentsArray}
             handleRename={handleRename}
+            isMinistryCoordinator={isMinistryCoordinator}
           />
         </>
       )}
@@ -365,10 +411,10 @@ export const AttachmentSection = ({
 }
 
 
-const Attachment = React.memo(({indexValue, attachment, handlePopupButtonClick, getFullname, isMinistryCoordinator}) => {
+const Attachment = React.memo(({indexValue, attachment, handlePopupButtonClick, getFullname, isMinistryCoordinator,ministryId}) => {
   
   const classes = useStyles();
-  
+
   const disableCategory = () => {
     if (['personal', AttachmentLetterCategories.feeestimatefailed.name, AttachmentLetterCategories.feeestimatesuccessful.name, AttachmentLetterCategories.feeestimateletter.name, AttachmentLetterCategories.feeestimatepaymentreceipt.name, AttachmentLetterCategories.feeestimatepaymentcorrespondencesuccessful.name, AttachmentLetterCategories.feeestimatepaymentcorrespondencefailed.name].includes(attachment.category?.toLowerCase()) )
       return true;      
@@ -380,87 +426,133 @@ const Attachment = React.memo(({indexValue, attachment, handlePopupButtonClick, 
     }
   }, [attachment])
 
-  const getCategory = (category) => {
-    switch(category) {
-      case "cfr-review":
-        return "cfr - review";
-      case "cfr-feeassessed":
-        return "cfr - fee estimate";
-      case "signoff-response":
-        return "signoff - response";
-      case "harms-review":
-        return "harms assessment - review";
-      default:
-        return category || "general";
-    }
-  }
+  const attachmenttitle = ()=>{
 
-  return (
-    <Grid
-      container
-      item
-      xs={12}
-      direction="row"
-      justify="flex-start"
-      alignItems="flex-start"
-      spacing={1}
-    >
-      <Grid item xs={11}>
-        <div
-          className={`attachment-name ${disabled ? "attachment-disabled" : ""}`}
+    if (disabled)
+    {
+      return (
+        <div 
+          className="attachment-name attachment-disabled"
         >
           {attachment.filename}
         </div>
-        <Chip
-          label={getCategory(attachment.category).toUpperCase()}
-          size="small"
-          className={clsx(classes.chip, {
-            [classes.chipPrimary]: !disabled,
-          })}
-        />
+      )
+    }
+
+    if(attachment.documentpath.toLowerCase().indexOf('.eml') > 0  || attachment.documentpath.toLowerCase().indexOf('.msg') > 0 || attachment.documentpath.toLowerCase().indexOf('.txt') > 0)
+    {
+      return (
+        <div 
+          className="attachment-name viewattachment" onClick={()=>handlePopupButtonClick("download", attachment)}
+        >
+          {attachment.filename}
+        </div>
+      )
+     
+    }   
+    else{
+      return (
+        <div onClick={()=>{
+          opendocumentintab(attachment,ministryId);
+        }}
+          className="attachment-name viewattachment"
+        >
+          {attachment.filename}
+        </div>
+      )
+    }
+
+    
+  }
+
+  return (
+    <>
+      <Grid
+        container
+        item
+        xs={12}
+        direction="row"
+        justify="flex-start"
+        alignItems="flex-start"
+        spacing={1}
+      >
+        <Grid item xs={11}>
+          {attachmenttitle()}
+        </Grid>
+        <Grid 
+          item 
+          xs={1}
+          container
+          direction="row-reverse"
+          justifyContent="flex-start"
+          alignItems="flex-start"
+        >
+          <AttachmentPopup
+            indexValue={indexValue}
+            attachment={attachment}
+            handlePopupButtonClick={handlePopupButtonClick}
+            disabled={disabled}
+            ministryId={ministryId}
+          />
+        </Grid>
       </Grid>
       <Grid 
-        item 
-        xs={1}
         container
-        direction="row-reverse"
-        justifyContent="flex-start"
+        direction="row"
+        justify="flex-start"
         alignItems="flex-start"
+        spacing={1}
       >
-        <AttachmentPopup
-          indexValue={indexValue}
-          attachment={attachment}
-          handlePopupButtonClick={handlePopupButtonClick}
-          disabled={disabled}
-        />
+        <Grid item xs={2} style={{ minWidth: "150px" }} >
+          <Chip
+            label={getCategory(attachment.category).display}
+            size="small"
+            className={clsx(classes.chip, {
+              [classes.chipPrimary]: !disabled,
+            })}
+            style={{backgroundColor: disabled?"#e0e0e0":getCategory(attachment.category).bgcolor, width: "130px"}}
+          />
+        </Grid>
+        <Grid item xs={2}>
+          <div
+            className={`attachment-owner ${
+              disabled ? "attachment-disabled" : ""
+            }`}
+          >
+            {getFullname(attachment.createdby)}
+          </div>
+        </Grid>
+        <Grid item xs={4}>
+          <div
+            className={`attachment-time ${disabled ? "attachment-disabled" : ""}`}
+          >
+            {attachment.created_at}
+          </div>
+        </Grid>
       </Grid>
-
-      <Grid item xs={12}>
-        <div
-          className={`attachment-time ${disabled ? "attachment-disabled" : ""}`}
-        >
-          {attachment.created_at}
-        </div>
+      <Grid 
+        container
+        direction="row"
+        justify="flex-start"
+        alignItems="flex-start"
+        spacing={3}
+      >
+        <Grid item xs={12}>
+          <Divider className={"attachment-divider"} />
+        </Grid>
       </Grid>
-
-      <Grid item xs={12}>
-        <div
-          className={`attachment-owner ${
-            disabled ? "attachment-disabled" : ""
-          }`}
-        >
-          {getFullname(attachment.createdby)}
-        </div>
-      </Grid>
-
-      <Grid item xs={12}>
-        <Divider />
-      </Grid>
-    </Grid>
+    </>
   );
 })
 
-const AttachmentPopup = React.memo(({indexValue, attachment, handlePopupButtonClick, disabled}) => {
+const opendocumentintab =(attachment,ministryId)=>
+{
+  let relativedocpath = attachment.documentpath.split('/').slice(4).join('/')
+  let url =`/foidocument?id=${ministryId}&filepath=${relativedocpath}`;
+  window.open(url, '_blank').focus();
+}
+
+const AttachmentPopup = React.memo(({indexValue, attachment, handlePopupButtonClick, disabled,ministryId}) => {
   const ref = React.useRef();
   const closeTooltip = () => ref.current && ref ? ref.current.close():{};
 
@@ -477,6 +569,11 @@ const AttachmentPopup = React.memo(({indexValue, attachment, handlePopupButtonCl
   const handleDownload = () =>{
     closeTooltip();   
     handlePopupButtonClick("download", attachment);
+  }
+
+  const handleView =()=>{
+    closeTooltip();    
+    opendocumentintab(attachment,ministryId);
   }
 
   const handleDelete = () => {
@@ -551,7 +648,8 @@ const AttachmentPopup = React.memo(({indexValue, attachment, handlePopupButtonCl
     return (<DeleteMenu />)
   }
 
-  const ActionsPopover = () => {
+  const ActionsPopover = ({RestrictViewInBrowser}) => {
+
     return (
       <Popover
         anchorReference="anchorPosition"
@@ -573,6 +671,16 @@ const AttachmentPopup = React.memo(({indexValue, attachment, handlePopupButtonCl
         onClose={() => setPopoverOpen(false)}
       >
         <MenuList>
+{!RestrictViewInBrowser ?
+        <MenuItem
+            onClick={() => {
+                handleView();
+                setPopoverOpen(false);
+            }}
+          >
+            View
+          </MenuItem>
+          :""}
           <MenuItem
             onClick={() => {
                 handleDownload();
@@ -614,7 +722,7 @@ const AttachmentPopup = React.memo(({indexValue, attachment, handlePopupButtonCl
       >
       <MoreHorizIcon />
     </IconButton>
-    <ActionsPopover />
+    <ActionsPopover RestrictViewInBrowser={attachment.documentpath.toLowerCase().indexOf('.eml') > 0 || attachment.documentpath.toLowerCase().indexOf('.msg') > 0 ? true:false }/>
   </>
   );
 })
