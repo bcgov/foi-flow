@@ -11,7 +11,7 @@
     <bpmn:group id="Group_0ihi2fn" categoryValueRef="CategoryValue_1baekcn" />
     <bpmn:group id="Cancel_payment" categoryValueRef="CategoryValue_0ne55cy" />
   </bpmn:collaboration>
-  <bpmn:process id="foi-fee-processing" name="FOI Fee Processing" isExecutable="true" camunda:versionTag="43">
+  <bpmn:process id="foi-fee-processing" name="FOI Fee Processing" isExecutable="true" camunda:versionTag="45">
     <bpmn:laneSet id="LaneSet_1u7kp6i">
       <bpmn:lane id="Lane_1u9yqiq" name="Create Payment Submission">
         <bpmn:flowNodeRef>Activity_0k05bsn</bpmn:flowNodeRef>
@@ -50,7 +50,6 @@
         <bpmn:flowNodeRef>Activity_1tkdc9h</bpmn:flowNodeRef>
         <bpmn:flowNodeRef>Event_1s2s2yf</bpmn:flowNodeRef>
         <bpmn:flowNodeRef>Event_1sitq6w</bpmn:flowNodeRef>
-        <bpmn:flowNodeRef>Gateway_01k1226</bpmn:flowNodeRef>
         <bpmn:flowNodeRef>Activity_0jc83dv</bpmn:flowNodeRef>
         <bpmn:flowNodeRef>Activity_1exws1a</bpmn:flowNodeRef>
         <bpmn:flowNodeRef>Event_1aetqrp</bpmn:flowNodeRef>
@@ -62,6 +61,7 @@
         <bpmn:flowNodeRef>Activity_1ka6mqq</bpmn:flowNodeRef>
         <bpmn:flowNodeRef>Event_0q2irqu</bpmn:flowNodeRef>
         <bpmn:flowNodeRef>Event_1wwsw8u</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_01k1226</bpmn:flowNodeRef>
       </bpmn:lane>
     </bpmn:laneSet>
     <bpmn:task id="Activity_0k05bsn" name="Create Submission">
@@ -251,7 +251,6 @@ execution.setVariable("saveDataPayload", JSON.stringify(saveDataPayload));</camu
     <bpmn:eventBasedGateway id="Gateway_1771ld6">
       <bpmn:incoming>Flow_17nmoz9</bpmn:incoming>
       <bpmn:incoming>Flow_06wfx6l</bpmn:incoming>
-      <bpmn:incoming>Flow_18rkboh</bpmn:incoming>
       <bpmn:outgoing>Flow_1mb5bs3</bpmn:outgoing>
       <bpmn:outgoing>Flow_19al5dp</bpmn:outgoing>
     </bpmn:eventBasedGateway>
@@ -395,7 +394,6 @@ execution.setVariable("retry6", current+1); </camunda:script>
     </bpmn:sequenceFlow>
     <bpmn:sequenceFlow id="Flow_0kd8ss0" sourceRef="Event_1sitq6w" targetRef="Gateway_015rqa5" />
     <bpmn:sequenceFlow id="Flow_1d7gxi1" sourceRef="Event_1s2s2yf" targetRef="Event_1sitq6w" />
-    <bpmn:sequenceFlow id="Flow_18rkboh" sourceRef="Activity_1tkdc9h" targetRef="Gateway_1771ld6" />
     <bpmn:sequenceFlow id="Flow_0sfszv6" sourceRef="Activity_07lppep" targetRef="Activity_1tkdc9h" />
     <bpmn:sequenceFlow id="Flow_06wfx6l" name="&#60;=20 Days" sourceRef="Gateway_0xwy934" targetRef="Gateway_1771ld6">
       <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${paymentstatus != "EXPIRED"}</bpmn:conditionExpression>
@@ -557,7 +555,6 @@ connector.getVariable("statusCode");</camunda:script>
         </camunda:connector>
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_0sfszv6</bpmn:incoming>
-      <bpmn:outgoing>Flow_18rkboh</bpmn:outgoing>
       <bpmn:outgoing>Flow_1bmyxxs</bpmn:outgoing>
     </bpmn:serviceTask>
     <bpmn:boundaryEvent id="Event_1s2s2yf" attachedToRef="Activity_1tkdc9h">
@@ -571,11 +568,6 @@ connector.getVariable("statusCode");</camunda:script>
         <bpmn:timeDuration xsi:type="bpmn:tFormalExpression">PT1M</bpmn:timeDuration>
       </bpmn:timerEventDefinition>
     </bpmn:intermediateCatchEvent>
-    <bpmn:exclusiveGateway id="Gateway_01k1226">
-      <bpmn:incoming>Flow_02gzt5c</bpmn:incoming>
-      <bpmn:outgoing>Flow_0q1yoij</bpmn:outgoing>
-      <bpmn:outgoing>Flow_1o86b7t</bpmn:outgoing>
-    </bpmn:exclusiveGateway>
     <bpmn:sequenceFlow id="Flow_086gb69" sourceRef="Event_1aetqrp" targetRef="Event_0bbrkee" />
     <bpmn:sequenceFlow id="Flow_0sj0g8t" sourceRef="Event_0bbrkee" targetRef="Gateway_1fn1pe3" />
     <bpmn:sequenceFlow id="Flow_1fbp4hl" name="Retry &#62;3" sourceRef="Gateway_1fn1pe3" targetRef="Event_042h1m7">
@@ -762,6 +754,11 @@ else {
       <bpmn:incoming>Flow_1bmyxxs</bpmn:incoming>
     </bpmn:endEvent>
     <bpmn:sequenceFlow id="Flow_1bmyxxs" sourceRef="Activity_1tkdc9h" targetRef="Event_1wwsw8u" />
+    <bpmn:exclusiveGateway id="Gateway_01k1226">
+      <bpmn:incoming>Flow_02gzt5c</bpmn:incoming>
+      <bpmn:outgoing>Flow_0q1yoij</bpmn:outgoing>
+      <bpmn:outgoing>Flow_1o86b7t</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
   </bpmn:process>
   <bpmn:message id="Message_1x26sx5" name="foi-manage-payment" />
   <bpmn:message id="Message_1rsz89u" name="foi-fee-expiry-notification-error" />
@@ -794,6 +791,10 @@ else {
       <bpmndi:BPMNShape id="Lane_1u9yqiq_di" bpmnElement="Lane_1u9yqiq" isHorizontal="true">
         <dc:Bounds x="170" y="125" width="1950" height="410" />
       </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_1bmyxxs_di" bpmnElement="Flow_1bmyxxs">
+        <di:waypoint x="1170" y="1410" />
+        <di:waypoint x="1382" y="1410" />
+      </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_0txnwov_di" bpmnElement="Flow_0txnwov">
         <di:waypoint x="1380" y="1195" />
         <di:waypoint x="1380" y="1210" />
@@ -827,11 +828,10 @@ else {
         <di:waypoint x="1842" y="1065" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_02gzt5c_di" bpmnElement="Flow_02gzt5c">
-        <di:waypoint x="670" y="980" />
-        <di:waypoint x="670" y="1065" />
-        <di:waypoint x="775" y="1065" />
+        <di:waypoint x="695" y="955" />
+        <di:waypoint x="775" y="955" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="701" y="1048" width="25" height="14" />
+          <dc:Bounds x="716" y="938" width="25" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_0ldn3y8_di" bpmnElement="Flow_0ldn3y8">
@@ -954,11 +954,6 @@ else {
         <di:waypoint x="960" y="1410" />
         <di:waypoint x="1070" y="1410" />
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_18rkboh_di" bpmnElement="Flow_18rkboh">
-        <di:waypoint x="1070" y="1410" />
-        <di:waypoint x="400" y="1410" />
-        <di:waypoint x="400" y="980" />
-      </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_1d7gxi1_di" bpmnElement="Flow_1d7gxi1">
         <di:waypoint x="1120" y="1468" />
         <di:waypoint x="1120" y="1512" />
@@ -1043,16 +1038,16 @@ else {
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_0q1yoij_di" bpmnElement="Flow_0q1yoij">
-        <di:waypoint x="825" y="1065" />
+        <di:waypoint x="800" y="980" />
+        <di:waypoint x="800" y="1065" />
         <di:waypoint x="930" y="1065" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="736" y="1090" width="68" height="27" />
+          <dc:Bounds x="806" y="995" width="68" height="27" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_1o86b7t_di" bpmnElement="Flow_1o86b7t">
-        <di:waypoint x="800" y="1040" />
-        <di:waypoint x="800" y="950" />
-        <di:waypoint x="1860" y="950" />
+        <di:waypoint x="825" y="955" />
+        <di:waypoint x="1860" y="955" />
         <di:waypoint x="1860" y="1047" />
         <bpmndi:BPMNLabel>
           <dc:Bounds x="1297" y="916" width="87" height="27" />
@@ -1061,10 +1056,6 @@ else {
       <bpmndi:BPMNEdge id="Flow_11qcuod_di" bpmnElement="Flow_11qcuod">
         <di:waypoint x="1300" y="1065" />
         <di:waypoint x="1390" y="1065" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_1bmyxxs_di" bpmnElement="Flow_1bmyxxs">
-        <di:waypoint x="1170" y="1410" />
-        <di:waypoint x="1382" y="1410" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="Activity_0uv6wyi_di" bpmnElement="Activity_0k05bsn">
         <dc:Bounds x="980" y="293" width="100" height="80" />
@@ -1174,9 +1165,6 @@ else {
       <bpmndi:BPMNShape id="Event_02ztt8q_di" bpmnElement="Event_1sitq6w">
         <dc:Bounds x="1102" y="1512" width="36" height="36" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Gateway_01k1226_di" bpmnElement="Gateway_01k1226" isMarkerVisible="true">
-        <dc:Bounds x="775" y="1040" width="50" height="50" />
-      </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_0jc83dv_di" bpmnElement="Activity_0jc83dv">
         <dc:Bounds x="930" y="1025" width="100" height="80" />
       </bpmndi:BPMNShape>
@@ -1221,6 +1209,9 @@ else {
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Event_1wwsw8u_di" bpmnElement="Event_1wwsw8u">
         <dc:Bounds x="1382" y="1392" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_01k1226_di" bpmnElement="Gateway_01k1226" isMarkerVisible="true">
+        <dc:Bounds x="775" y="930" width="50" height="50" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Event_1cjocwt_di" bpmnElement="Event_1aetqrp">
         <dc:Bounds x="1232" y="1087" width="36" height="36" />
