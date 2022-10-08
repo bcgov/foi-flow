@@ -20,7 +20,7 @@ class FOIRequestRecord(db.Model):
     ministryrequestversion=db.Column(db.Integer, db.ForeignKey('FOIMinistryRequests.version'))
     filename = db.Column(db.Text, unique=False, nullable=True)
     s3uripath = db.Column(db.Text, unique=False, nullable=True)
-    divisionid = db.Column(db.Integer, db.ForeignKey('ProgramAreaDivisions.divisionid'))
+    attributes = db.Column(JSON, unique=False, nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.now)
     createdby = db.Column(db.String(120), unique=False, nullable=True)
     updated_at = db.Column(db.DateTime, nullable=True)
@@ -40,18 +40,17 @@ class FOIRequestRecord(db.Model):
     def fetch(cls, foirequestid, ministryrequestid) -> DefaultMethodResult:
         records = []
         try:
-            sql =   """select distinct on (fr1.recordid) recordid, fr1.filename, fr1.s3uripath, fr1.divisionid, pad2."name" divisionname,
+            sql =   """select distinct on (fr1.recordid) recordid, fr1.filename, fr1.s3uripath, fr1."attributes" attributes, 
                             fr1.createdby createdby, fr1.created_at 
-                            from "FOIRequestRecords" fr1, "ProgramAreaDivisions" pad2
-                            where fr1.divisionid = pad2.divisionid 
-                            and fr1.foirequestid = :foirequestid and fr1.ministryrequestid = :ministryrequestid
+                            from "FOIRequestRecords" fr1
+                            where fr1.foirequestid = :foirequestid and fr1.ministryrequestid = :ministryrequestid
                             order by recordid, version desc
                     """
             
             rs = db.session.execute(text(sql), {'foirequestid': foirequestid, 'ministryrequestid' : ministryrequestid})
            
             for row in rs:
-                records.append({"recordid": row["recordid"], "filename": row["filename"], "s3uripath": row["s3uripath"], "divisionid": row["divisionid"], "divisionname": row["divisionname"], "createdby": row["createdby"], "created_at": row["created_at"]})
+                records.append({"recordid": row["recordid"], "filename": row["filename"], "s3uripath": row["s3uripath"],  "attributes": row["attributes"], "createdby": row["createdby"], "created_at": row["created_at"]})
             return records
         except Exception as ex:
             logging.error(ex)
@@ -61,4 +60,4 @@ class FOIRequestRecord(db.Model):
     
 class FOIRequestRecordSchema(ma.Schema):
     class Meta:
-        fields = ('recordid','version','foirequestid','ministryrequestid','ministryrequestversion','divisionid','filename','s3uripath','created_at','createdby','updated_at','updatedby') 
+        fields = ('recordid','version','foirequestid','ministryrequestid','ministryrequestversion','attributes','filename','s3uripath','created_at','createdby','updated_at','updatedby') 

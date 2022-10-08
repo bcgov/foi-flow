@@ -23,7 +23,7 @@ from request_api.tracer import Tracer
 from request_api.utils.util import  cors_preflight, allowedorigins
 from request_api.exceptions import BusinessException, Error
 from request_api.services.recordservice import recordservice
-from request_api.schemas.foirecord import  FOIRequestCreateRecordSchema, FOIRequestBulkCreateRecordSchema
+from request_api.schemas.foirecord import  FOIRequestBulkCreateRecordSchema
 import json
 from flask_cors import cross_origin
 
@@ -64,9 +64,6 @@ class FOIRequestBulkCreateRecord(Resource):
         try:
             requestjson = request.get_json()
             recordschema = FOIRequestBulkCreateRecordSchema().load(requestjson)
-            print(requestid)
-            print(ministryrequestid)
-            print(recordschema)
             response = recordservice().create(requestid, ministryrequestid, recordschema, AuthHelper.getuserid())
             respcode = 200 if response.success == True else 500
             return {'status': response.success, 'message':response.message,'data': response.args[0]} , respcode
