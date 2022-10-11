@@ -7,6 +7,7 @@ from request_api.services.events.assignment import assignmentevent
 from request_api.services.events.cfrdate import cfrdateevent
 from request_api.services.events.comment import commentevent
 from request_api.services.events.legislativedate import legislativedateevent
+from request_api.services.events.divisiondate import divisiondateevent
 from request_api.services.events.extension import extensionevent
 from request_api.models.default_method_result import DefaultMethodResult
 from request_api.exceptions import BusinessException
@@ -51,8 +52,9 @@ class eventservice:
         try:
             cfreventresponse = cfrdateevent().createdueevent() 
             legislativeeventresponse = legislativedateevent().createdueevent()   
-            if cfreventresponse.success == False or legislativeeventresponse.success == False:
-                current_app.logger.error("FOI Notification failed for event cfr response=%s ; legislative response=%s" % (cfreventresponse.message, legislativeeventresponse.message))     
+            divisioneventresponse = divisiondateevent().createdueevent()   
+            if cfreventresponse.success == False or legislativeeventresponse.success == False or divisioneventresponse.success == False:
+                current_app.logger.error("FOI Notification failed for reminder event response=%s ; legislative response=%s ; division response=%s" % (cfreventresponse.message, legislativeeventresponse.message, divisioneventresponse.message,))     
                 return DefaultMethodResult(False,'Due reminder notifications failed',cfreventresponse.identifier)
             return DefaultMethodResult(True,'Due reminder notifications created',cfreventresponse.identifier)
         except BusinessException as exception:            
