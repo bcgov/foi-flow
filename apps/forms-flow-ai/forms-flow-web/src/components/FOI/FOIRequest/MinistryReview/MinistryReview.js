@@ -25,6 +25,8 @@ import {
   fetchFOIRequestNotesList
 } from "../../../../apiManager/services/FOI/foiRequestNoteServices";
 
+import { fetchFOIRecords } from "../../../../apiManager/services/FOI/foiRecordServices";
+
 import {
   ConditionalComponent,
   calculateDaysRemaining,
@@ -47,6 +49,7 @@ import clsx from "clsx";
 import { getMinistryBottomTextMap, alertUser, getHeaderText } from "./utils";
 import DivisionalTracking from "../DivisionalTracking";
 import HomeIcon from '@mui/icons-material/Home';
+import { RecordsLog } from '../../customComponents/Records';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -103,6 +106,9 @@ const MinistryReview = React.memo(({ userDetail }) => {
   let requestAttachments = useSelector(
     (state) => state.foiRequests.foiRequestAttachments
   );
+  let requestRecords = useSelector(
+    (state) => state.foiRequests.foiRequestRecords
+  );
 
   const requestExtensions = useSelector(
     (state) => state.foiRequests.foiRequestExtesions
@@ -130,7 +136,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
       display: false,
       active: false,
     },
-    Option4: {
+    Records: {
       display: false,
       active: false,
     },
@@ -160,6 +166,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
       dispatch(fetchFOIRequestDescriptionList(requestId, ministryId));
       dispatch(fetchFOIRequestNotesList(requestId, ministryId));
       dispatch(fetchFOIRequestAttachmentsList(requestId, ministryId));
+      dispatch(fetchFOIRecords(requestId, ministryId));
       if (bcgovcode) dispatch(fetchFOIMinistryAssignedToList(bcgovcode));
     }
   }, [requestId, ministryId, comment, attachments]);
@@ -191,6 +198,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
   }, [requestDetails]);
 
   const [unSavedRequest, setUnSavedRequest] = React.useState(false);
+  const [recordsUploading, setRecordsUploading] = React.useState(false);
   const hideBottomText = [
     StateEnum.onhold.name.toLowerCase(),
     StateEnum.closed.name.toLowerCase(),
@@ -241,6 +249,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
       setUnSavedRequest(_unSaved);
       dispatch(fetchFOIMinistryViewRequestDetails(requestId, ministryId));
       dispatch(fetchFOIRequestAttachmentsList(requestId, ministryId));
+      dispatch(fetchFOIRecords(requestId, ministryId));
       setStateChanged(false);
       setcurrentrequestStatus(_state);
       setTimeout(() => {
@@ -488,6 +497,15 @@ const MinistryReview = React.memo(({ userDetail }) => {
                 ? `(${requestNotes.length})`
                 : ""}
             </div>
+            <div
+              className={clsx("tablinks", {
+                active: tabLinksStatuses.Records.active,
+              })}
+              name="Records"
+              onClick={() => tabclick("Records")}
+            >
+              Records
+            </div>
           </div>
 
           <div className="foileftpanelstatus">
@@ -571,6 +589,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
                           isValidationError={isValidationError}
                           saveMinistryRequestObject={saveMinistryRequestObject}
                           unSavedRequest={unSavedRequest}
+                          recordsUploading={recordsUploading}
                           handleSaveRequest={handleSaveRequest}
                           currentSelectedStatus={_currentrequestStatus}
                           hasStatusRequestSaved={hasStatusRequestSaved}
@@ -622,8 +641,8 @@ const MinistryReview = React.memo(({ userDetail }) => {
           >
             {!isLoading &&
             requestNotes &&
-            iaoassignedToList.length > 0 ||
-            ministryAssignedToList.length > 0 ? (
+            iaoassignedToList?.length > 0 ||
+            ministryAssignedToList?.length > 0 ? (
               <>
                 <CommentSection
                   currentUser={
@@ -649,6 +668,34 @@ const MinistryReview = React.memo(({ userDetail }) => {
                   setEditorChange={setEditorChange}
                   removeComment={removeComment}
                   setRemoveComment={setRemoveComment}
+                />
+              </>
+            ) : (
+              <Loading />
+            )}
+          </div>
+          <div
+            id="Records"
+            className={clsx("tabcontent", {
+              active: tabLinksStatuses.Records.active,
+              [classes.displayed]: tabLinksStatuses.Records.display,
+              [classes.hidden]: !tabLinksStatuses.Records.display,
+            })}
+          >
+            {!isAttachmentListLoading &&
+            (iaoassignedToList?.length > 0 ||
+              ministryAssignedToList?.length > 0) ? (
+              <>
+                <RecordsLog
+                  recordsArray={requestRecords}
+                  requestId={requestId}
+                  ministryId={ministryId}
+                  requestNumber={requestNumber}
+                  iaoassignedToList={iaoassignedToList}
+                  ministryAssignedToList={ministryAssignedToList}
+                  isMinistryCoordinator={true}
+                  bcgovcode={JSON.parse(bcgovcode)}
+                  setRecordsUploading={setRecordsUploading}
                 />
               </>
             ) : (

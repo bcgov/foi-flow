@@ -32,6 +32,7 @@ import {
   fetchFOIRequestAttachmentsList
 } from "../../../apiManager/services/FOI/foiAttachmentServices";
 import { fetchFOIRequestNotesList } from "../../../apiManager/services/FOI/foiRequestNoteServices";
+import { fetchFOIRecords } from "../../../apiManager/services/FOI/foiRecordServices";
 import { makeStyles } from '@material-ui/core/styles';
 import FOI_COMPONENT_CONSTANTS from '../../../constants/FOI/foiComponentConstants';
 import { push } from "connected-react-router";
@@ -64,6 +65,7 @@ import DivisionalTracking from './DivisionalTracking';
 import AxisDetails from './AxisDetails/AxisDetails';
 import AxisMessageBanner from "./AxisDetails/AxisMessageBanner";
 import HomeIcon from '@mui/icons-material/Home';
+import { RecordsLog } from '../customComponents/Records';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -110,6 +112,9 @@ const FOIRequest = React.memo(({ userDetail }) => {
   let requestAttachments = useSelector(
     (state) => state.foiRequests.foiRequestAttachments
   );
+  let requestRecords = useSelector(
+    (state) => state.foiRequests.foiRequestRecords
+  );
   const [attachments, setAttachments] = useState(requestAttachments);
   const [comment, setComment] = useState([]);
   const [requestState, setRequestState] = useState(StateEnum.unopened.name);
@@ -136,7 +141,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
       display: false,
       active: false,
     },
-    Option4: {
+    Records: {
       display: false,
       active: false,
     },
@@ -179,6 +184,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
       dispatch(fetchFOIRequestDescriptionList(requestId, ministryId));
       dispatch(fetchFOIRequestNotesList(requestId, ministryId));
       dispatch(fetchFOIRequestAttachmentsList(requestId, ministryId));
+      dispatch(fetchFOIRecords(requestId, ministryId));
     }
 
     dispatch(fetchFOICategoryList());
@@ -377,6 +383,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
     requiredContactDetailsValue
   );
   const [unSavedRequest, setUnSavedRequest] = React.useState(false);
+  const [recordsUploading, setRecordsUploading] = React.useState(false);
   const [headerValue, setHeader] = useState("");
   const [requiredAxisDetails, setRequiredAxisDetails] = React.useState(
     requiredAxisDetailsValue
@@ -711,6 +718,15 @@ const FOIRequest = React.memo(({ userDetail }) => {
                   Comments{" "}
                   {requestNotes?.length > 0 ? `(${requestNotes.length})` : ""}
                 </div>
+                <div
+                  className={clsx("tablinks", {
+                    active: tabLinksStatuses.Records.active,
+                  })}
+                  name="Records"
+                  onClick={() => tabclick("Records")}
+                >
+                  Records
+                </div>
               </>
             )}
           </div>
@@ -899,6 +915,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
                         urlIndexCreateRequest={urlIndexCreateRequest}
                         saveRequestObject={saveRequestObject}
                         unSavedRequest={unSavedRequest}
+                        recordsUploading={recordsUploading}
                         handleSaveRequest={handleSaveRequest}
                         handleOpenRequest={handleOpenRequest}
                         currentSelectedStatus={_currentrequestStatus}
@@ -982,6 +999,34 @@ const FOIRequest = React.memo(({ userDetail }) => {
                   setEditorChange={setEditorChange}
                   removeComment={removeComment}
                   setRemoveComment={setRemoveComment}
+                />
+              </>
+            ) : (
+              <Loading />
+            )}
+          </div>
+          <div
+            id="Records"
+            className={clsx("tabcontent", {
+              active: tabLinksStatuses.Records.active,
+              [classes.displayed]: tabLinksStatuses.Records.display,
+              [classes.hidden]: !tabLinksStatuses.Records.display,
+            })}
+          >
+            {!isAttachmentListLoading &&
+            (iaoassignedToList?.length > 0 ||
+              ministryAssignedToList?.length > 0) ? (
+              <>
+                <RecordsLog
+                  recordsArray={requestRecords}
+                  requestId={requestId}
+                  ministryId={ministryId}
+                  requestNumber={requestNumber}
+                  iaoassignedToList={iaoassignedToList}
+                  ministryAssignedToList={ministryAssignedToList}
+                  isMinistryCoordinator={false}
+                  bcgovcode={requestDetails.bcgovcode}
+                  setRecordsUploading={setRecordsUploading}
                 />
               </>
             ) : (

@@ -29,7 +29,7 @@ return (
   direction="row"
   container
   item
-  xs={11}
+  xs={12}
   elevation={0}
 >
   <Grid

@@ -1,0 +1,827 @@
+import React, { useEffect, useState } from 'react'
+import '../Attachments/attachments.scss'
+import './records.scss'
+import { useDispatch, useSelector } from "react-redux";
+import AttachmentModal from '../Attachments/AttachmentModal';
+import Loading from "../../../../containers/Loading";
+import { getOSSHeaderDetails, saveFilesinS3, getFileFromS3, postFOIS3DocumentPreSignedUrl, getFOIS3DocumentPreSignedUrl } from "../../../../apiManager/services/FOI/foiOSSServices";
+import { saveFOIRequestAttachmentsList, replaceFOIRequestAttachment, saveNewFilename, deleteFOIRequestAttachment } from "../../../../apiManager/services/FOI/foiAttachmentServices";
+import { fetchFOIRecords, saveFOIRecords } from "../../../../apiManager/services/FOI/foiRecordServices";
+import { StateTransitionCategories, AttachmentCategories } from '../../../../constants/FOI/statusEnum'
+import { addToFullnameList, getFullnameList, ConditionalComponent } from '../../../../helper/FOI/helper';
+import Grid from "@material-ui/core/Grid";
+import { makeStyles } from "@material-ui/core/styles";
+import clsx from "clsx"
+import Chip from "@material-ui/core/Chip";
+import Divider from "@material-ui/core/Divider";
+import Popover from "@material-ui/core/Popover";
+import MoreHorizIcon from "@material-ui/icons/MoreHoriz";
+import IconButton from "@material-ui/core/IconButton";
+import MenuList from "@material-ui/core/MenuList";
+import MenuItem from "@material-ui/core/MenuItem";
+import { saveAs } from "file-saver";
+import { downloadZip } from "client-zip";
+import AttachmentFilter from '../Attachments/AttachmentFilter';
+import Accordion from '@material-ui/core/Accordion';
+import {  ClickableChip  } from "../../Dashboard/utils";
+import Stack from "@mui/material/Stack";
+import AccordionSummary from '@material-ui/core/AccordionSummary';
+import AccordionDetails from '@material-ui/core/AccordionDetails';
+import Typography from '@material-ui/core/Typography';
+import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+import SearchIcon from "@material-ui/icons/Search";
+import InputAdornment from "@mui/material/InputAdornment";
+import InputBase from "@mui/material/InputBase";
+import Paper from "@mui/material/Paper";
+import { toast } from "react-toastify";
+
+
+const useStyles = makeStyles((_theme) => ({
+  createButton: {
+    margin: 0,
+    width: "100%",
+    backgroundColor: "#38598A",
+    color: "#FFFFFF",
+    fontFamily: " BCSans-Bold, sans-serif !important",
+  },
+  chip: {
+    fontWeight: "bold",
+    height: "18px",
+  },
+  chipPrimary: {
+    color: "#fff",
+    height: "18px",
+  },
+  ellipses: {
+    color: "#38598A",
+  },
+  container: {
+    marginTop: "60px",
+    marginLeft: "1em",
+    marginRight: "1em",
+  },
+  headerSection: {
+    marginBottom: "2em",
+  },
+  recordLog: {
+    marginTop: "1em"
+  },
+  heading: {
+    color: '#FFF',
+    fontSize: '16px !important',
+    fontWeight: 'bold !important',
+    flexDirection: 'row-reverse',
+  },
+}));
+
+export const RecordsLog = ({
+  requestNumber,
+  recordsArray,
+  requestId,
+  ministryId,
+  bcgovcode,
+  iaoassignedToList,
+  ministryAssignedToList,
+  isMinistryCoordinator,
+  setRecordsUploading
+}) => {
+  const classes = useStyles();
+  const [records, setRecords] = useState(recordsArray)
+
+  useEffect(() => {
+    setRecords(recordsArray)
+  }, [recordsArray])
+
+  const divisions = useSelector(state => isMinistryCoordinator ?
+    state.foiRequests.foiMinistryViewRequestDetail.divisions :
+    state.foiRequests.foiRequestDetail.divisions
+  );
+
+  // useEffect(() => {
+  //   let divisions = [...new Map(recordsArray.map(record => [record.divisionname, {division: record.divisionname}])).values()];
+  //   console.log(_records)
+  //   _records.forEach(division => {
+  //     division.records = records.filter(record => record.divisionname === division.division)
+  //   })
+  //   setRecordsForDisplay(_records);
+  // }, [records])
+
+
+
+  const [openModal, setModal] = useState(false);
+  const dispatch = useDispatch();
+  const [isAttachmentLoading, setAttachmentLoading] = useState(false);
+  const [multipleFiles, setMultipleFiles] = useState(true);
+  const [modalFor, setModalFor] = useState("add");
+  const [updateAttachment, setUpdateAttachment] = useState({});
+  const [searchValue, setSearchValue] = useState("");
+  const [filterValue, setFilterValue] = useState(-1);
+  const [fullnameList, setFullnameList] = useState(getFullnameList);
+
+  const addAttachments = () => {
+    setModalFor('add');
+    setMultipleFiles(true);
+    setUpdateAttachment({});
+    setModal(true);
+  }
+
+  const dispatchRequestAttachment = (err) => {
+    if (!err) {
+      setAttachmentLoading(false);
+      dispatch(fetchFOIRecords(requestId, ministryId))
+    }
+  }
+
+  const handleContinueModal = (value, fileInfoList, files) => {
+    setModal(false);
+    if (modalFor === 'delete' && value) {
+      const documentId = ministryId ? updateAttachment.foiministrydocumentid : updateAttachment.foidocumentid;
+      dispatch(deleteFOIRequestAttachment(requestId, ministryId, documentId, {}));
+    }
+    else if (files) {
+      saveDocument(value, fileInfoList, files);
+    }
+  }
+
+  const saveDocument = (value, fileInfoList, files) => {
+    if (value) {
+      if (files.length !== 0) {
+        setRecordsUploading(true)
+        postFOIS3DocumentPreSignedUrl(ministryId, fileInfoList, 'records', dispatch, async (err, res) => {
+          let _documents = [];
+          if (!err) {
+            var completed = 0;
+            let failed = 0;
+            const toastID = toast.loading("Uploading files (" + completed + "/" + fileInfoList.length + ")")
+            for (let header of res) {
+              const _file = files.find(file => file.filename === header.filename);
+              const _fileInfo = fileInfoList.find(fileInfo => fileInfo.filename === header.filename);
+              const documentDetails = {
+                s3uripath: header.filepathdb,
+                filename: header.filename,
+                attributes:{
+                  divisions:[{divisionid: _fileInfo.divisionid}],
+                  lastmodified: _file.lastModifiedDate
+                }
+              };
+              await saveFilesinS3(header, _file, dispatch, (_err, _res) => {
+                if (!_err && _res === 200) {
+                  completed++;
+                  toast.update(toastID, {
+                    render: "Exporting files (" + completed + "/" + fileInfoList.length + ")",
+                    isLoading: true,
+                  })
+                  _documents.push(documentDetails);
+                }
+                else {
+                  failed++;
+                }
+              })
+            }
+
+            dispatch(saveFOIRecords(requestId, ministryId, {records: _documents},(err, _res) => {
+                dispatchRequestAttachment(err);
+            }));
+            var toastOptions = {
+              render: failed > 0 ? failed.length + " file uploads failed" : fileInfoList.length + ' Files successfully saved',
+              type: failed > 0 ? "error" : "success",
+            }
+            toast.update(toastID, {
+              ...toastOptions,
+              isLoading: false,
+              autoClose: 3000,
+              hideProgressBar: true,
+              closeOnClick: true,
+              pauseOnHover: true,
+              draggable: true,
+              closeButton: true
+            });
+            setRecordsUploading(false)
+          }
+        })
+      }
+    }
+  }
+
+  const downloadDocument = (file) => {
+    getFOIS3DocumentPreSignedUrl(file.s3uripath.split('/').slice(4).join('/'), ministryId, dispatch, (err, res) => {
+      if (!err) {
+        getFileFromS3({filepath: res}, (_err, response) => {
+          let blob = new Blob([response.data], {type: "application/octet-stream"});
+          saveAs(blob, file.filename)
+        });
+      }
+    }, 'records', bcgovcode);
+  }
+
+  const downloadAllDocuments = async () => {
+    let blobs = [];
+    var completed = 0;
+    let failed = 0;
+    const toastID = toast.loading("Exporting files (" + completed + "/" + records.length + ")")
+    try {
+      for (let record of records) {
+        const response = await getFOIS3DocumentPreSignedUrl(record.s3uripath.split('/').slice(4).join('/'), ministryId, dispatch, null, 'records', bcgovcode)
+        await getFileFromS3({filepath: response.data}, (_err, res) => {
+          let blob = new Blob([res.data], {type: "application/octet-stream"});
+          blobs.push({name: record.filename, lastModified: res.headers['last-modified'], input: blob})
+          completed++;
+          toast.update(toastID, {
+            render: "Exporting files (" + completed + "/" + records.length + ")",
+            isLoading: true,
+          })
+        });
+      }
+    } catch (error) {
+      console.log(error)
+    }
+    var toastOptions = {
+      render: failed > 0 ? failed.length + " file(s) failed to download" : records.length + ' Files exported',
+      type: failed > 0 ? "error" : "success",
+    }
+    toast.update(toastID, {
+      ...toastOptions,
+      isLoading: false,
+      autoClose: 3000,
+      hideProgressBar: true,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      closeButton: true
+    });
+    const zipfile = await downloadZip(blobs).blob()
+    saveAs(zipfile, requestNumber + ".zip");
+  }
+
+  const hasDocumentsToExport = records.filter(record => !(isMinistryCoordinator && record.category == 'personal')).length > 0;
+
+  const handlePopupButtonClick = (action, _record) => {
+    setUpdateAttachment(_record);
+    setMultipleFiles(false);
+    switch (action) {
+      case "replace":
+        setModalFor("replace");
+        setModal(true);
+        break;
+      case "rename":
+        setModalFor("rename");
+        setModal(true);
+        break;
+      case "download":
+        downloadDocument(_record);
+        setModalFor("download");
+        setModal(false);
+        break;
+      case "delete":
+        setModalFor("delete")
+        setModal(true)
+        break;
+      default:
+        setModal(false);
+        break;
+    }
+  }
+
+  const handleRename = (_record, newFilename) => {
+    setModal(false);
+
+    if (updateAttachment.filename !== newFilename) {
+      const documentId = ministryId ? updateAttachment.foiministrydocumentid : updateAttachment.foidocumentid;
+      dispatch(saveNewFilename(newFilename, documentId, requestId, ministryId, (err, _res) => {
+        if (!err) {
+          setAttachmentLoading(false);
+        }
+      }));
+    }
+  }
+
+  const getFullname = (userId) => {
+    let user;
+
+    if(fullnameList) {
+      user = fullnameList.find(u => u.username === userId);
+      return user && user.fullname ? user.fullname : userId;
+    } else {
+
+      if(iaoassignedToList.length > 0) {
+        addToFullnameList(iaoassignedToList, "iao");
+        setFullnameList(getFullnameList());
+      }
+
+      if(ministryAssignedToList.length > 0) {
+        addToFullnameList(iaoassignedToList, bcgovcode);
+        setFullnameList(getFullnameList());
+      }
+
+      user = fullnameList.find(u => u.username === userId);
+      return user && user.fullname ? user.fullname : userId;
+    }
+  };
+
+  const getRequestNumber = ()=> {
+    if (requestNumber)
+      return `Request #${requestNumber}`;
+    return `Request #U-00${requestId}`;
+  }
+
+  // const onFilterChange = (filterValue) => {
+    // let _filteredRecords = filterValue === "" ?
+    // recordsArray :
+    // recordsArray.filter(r =>
+    //   r.filename.toLowerCase().includes(filterValue?.toLowerCase()) ||
+    //   r.createdby.toLowerCase().includes(filterValue?.toLowerCase()) ||
+    //   r.attributes.findIndex(a => a.divisionname.toLowerCase() === filterValue?.toLowerCase().trim()) > -1
+    // );
+    // setRecords(_filteredRecords)
+  // }
+
+
+  React.useEffect(() => {
+    setRecords(searchAttachments(recordsArray, filterValue, searchValue));
+  },[filterValue, searchValue, recordsArray])
+
+  const searchAttachments = (_recordsArray, _filterValue, _keywordValue) =>  {
+    return _recordsArray.filter(r =>
+      (r.filename.toLowerCase().includes(_keywordValue?.toLowerCase()) ||
+      r.createdby.toLowerCase().includes(_keywordValue?.toLowerCase())) &&
+      (_filterValue > -1 ? r.attributes.findIndex(a => a.divisionid === _filterValue) > -1 : true))
+    }
+
+  return (
+    <div className={classes.container}>
+      {isAttachmentLoading ? (
+        <Grid container alignItems="center">
+          <Loading costumStyle={{ position: "relative" }} />
+        </Grid>
+      ) : (
+        <>
+          <Grid
+            container
+            direction="row"
+            justify="flex-start"
+            alignItems="flex-start"
+            spacing={1}
+          >
+            <Grid item xs={6}>
+              <h1 className="foi-review-request-text foi-ministry-requestheadertext">
+                {getRequestNumber()}
+              </h1>
+            </Grid>
+            <Grid item xs={3}>
+              <ConditionalComponent condition={hasDocumentsToExport}>
+                <button
+                  className="btn addAttachment foi-export-button"
+                  variant="contained"
+                  onClick={downloadAllDocuments}
+                  color="primary"
+                >
+                  Export All
+                </button>
+              </ConditionalComponent>
+            </Grid>
+            <Grid item xs={3}>
+              {isMinistryCoordinator ?
+                <button
+                  className={clsx("btn", "addAttachment", classes.createButton)}
+                  variant="contained"
+                  onClick={addAttachments}
+                  color="primary"
+                >
+                  + Upload Records
+                </button> :
+                <button
+                  className={clsx("btn", "addAttachment", classes.createButton)}
+                  variant="contained"
+                  // onClick={}
+                  color="primary"
+                >
+                  Redact Records
+                </button>
+              }
+            </Grid>
+            <Grid
+              container
+              item
+              direction="row"
+              justify="flex-start"
+              alignItems="flex-start"
+              xs={12}
+              className={classes.recordLog}
+            >
+              <Paper
+                component={Grid}
+                sx={{
+                  border: "1px solid #38598A",
+                  color: "#38598A",
+                  maxWidth:"100%",
+                  backgroundColor: "rgba(56,89,138,0.1)"
+                }}
+                alignItems="center"
+                justifyContent="center"
+                direction="row"
+                container
+                item
+                xs={12}
+                elevation={0}
+              >
+                <Grid
+                  item
+                  container
+                  alignItems="center"
+                  direction="row"
+                  xs={true}
+                  className="search-grid"
+                >
+                  <label className="hideContent">Filter Records</label>
+                  <InputBase
+                    id="foicommentfilter"
+                    placeholder="Filter Records ..."
+                    defaultValue={""}
+                    onChange={(e)=>{setSearchValue(e.target.value.trim())}}
+                    sx={{
+                      color: "#38598A",
+                    }}
+                    startAdornment={
+                      <InputAdornment position="start">
+                        <IconButton
+                          className="search-icon"
+                        >
+                          <span className="hideContent">Filter Records ...</span>
+                          <SearchIcon />
+                        </IconButton>
+                      </InputAdornment>
+                    }
+                    fullWidth
+                  />
+                </Grid>
+              </Paper>
+            </Grid>
+            <Grid>
+              <Stack direction="row" sx={{ overflowX: "scroll", paddingBottom: "5px" }} spacing={1}>
+                {divisions.map(division =>
+                  <ClickableChip
+                    id={`${division.divisionid}Tag`}
+                    key={`${division.divisionid}-tag`}
+                    label={division.divisionname.toUpperCase()}
+                    color="primary"
+                    size="small"
+                    onClick={(e)=>{setFilterValue(division.divisionid === filterValue ? -1 : division.divisionid)}}
+                    clicked={filterValue == division.divisionid}
+                  />
+                )}
+              </Stack>
+            </Grid>
+            <Grid
+              container
+              item
+              xs={12}
+              direction="row"
+              justify="flex-start"
+              alignItems="flex-start"
+              // spacing={1}
+              className={classes.recordLog}
+            >
+              {records.map((record, i) =>
+                // <Grid item xs={12}>
+                  // <div className='request-accordian records-accordion'>
+                  //   <Accordion defaultExpanded={false} key={index} className={classes.accordionSummary}>
+                  //     <AccordionSummary className={classes.heading} expandIcon={<ExpandMoreIcon />}>
+                  //       <Typography >{division.division}</Typography>
+                  //     </AccordionSummary>
+                  //     <AccordionDetails>
+                  //       {division.records.map((file, i) =>
+                          <Attachment
+                            key={i}
+                            indexValue={i}
+                            record={record}
+                            handlePopupButtonClick={handlePopupButtonClick}
+                            getFullname={getFullname}
+                            isMinistryCoordinator={isMinistryCoordinator}
+                            ministryId={ministryId}
+                            classes={classes}
+                          />
+                  //       )}
+                  //     </AccordionDetails>
+                  //   </Accordion>
+                  // </div>
+                // </Grid>
+              )}
+            </Grid>
+          </Grid>
+
+          <AttachmentModal
+            modalFor={modalFor}
+            openModal={openModal}
+            handleModal={handleContinueModal}
+            multipleFiles={multipleFiles}
+            requestNumber={requestNumber}
+            requestId={requestId}
+            record={updateAttachment}
+            attachmentsArray={[]}
+            handleRename={handleRename}
+            isMinistryCoordinator={isMinistryCoordinator}
+            uploadFor={"records"}
+            // maxNoFiles={100}
+            bcgovcode={bcgovcode}
+          />
+        </>
+      )}
+    </div>
+  );
+}
+
+
+const Attachment = React.memo(({indexValue, record, handlePopupButtonClick, getFullname, isMinistryCoordinator,ministryId}) => {
+
+  const classes = useStyles();
+  const [disabled, setDisabled] = useState(false);
+  // useEffect(() => {
+  //   if(record && record.filename) {
+  //     setDisabled(isMinistryCoordinator && record.category == 'personal')
+  //   }
+  // }, [record])
+
+
+  const getCategory = (category) => {
+    return AttachmentCategories.categorys.find(element => element.name === category);
+  }
+
+  const recordtitle = ()=>{
+
+    if (disabled)
+    {
+      return (
+        <div
+          className="record-name record-disabled"
+        >
+          {record.filename}
+        </div>
+      )
+    }
+
+    if(record.filename.toLowerCase().indexOf('.eml') > 0  || record.filename.toLowerCase().indexOf('.msg') > 0 || record.filename.toLowerCase().indexOf('.txt') > 0)
+    {
+      return (
+        <div
+          className="record-name viewrecord" onClick={()=>handlePopupButtonClick("download", record)}
+        >
+          {record.filename}
+        </div>
+      )
+
+    }
+    else{
+      return (
+        <div onClick={()=>{
+          opendocumentintab(record,ministryId);
+        }}
+          className="record-name viewrecord"
+        >
+          {record.filename}
+        </div>
+      )
+    }
+
+
+  }
+
+  return (
+    <>
+      <Grid
+        container
+        item
+        xs={12}
+        direction="row"
+        justify="flex-start"
+        alignItems="flex-start"
+        spacing={1}
+      >
+        <Grid item xs={true}>
+          {record.filename}
+        {/* </Grid>
+        <Grid item xs={true} > */}
+          {record.attributes.map((division, i) =>
+            <Chip
+              key={i}
+              label={division.divisionname}
+              size="small"
+              className={clsx(classes.chip, classes.chipPrimary)}
+              style={{backgroundColor: "#003366", margin: "4px"}}
+            />
+          )}
+        </Grid>
+        <Grid item xs={1.5}>
+          <div
+            className={`record-owner ${
+              disabled ? "record-disabled" : ""
+            }`}
+          >
+            {getFullname(record.createdby)}
+          </div>
+        </Grid>
+        <Grid item xs={2.5}>
+          <div
+            className={`record-time ${disabled ? "record-disabled" : ""}`}
+          >
+            {record.created_at}
+          </div>
+        </Grid>
+        <Grid
+          item
+          xs={1}
+          container
+          direction="row-reverse"
+          justifyContent="flex-start"
+          alignItems="flex-start"
+        >
+          <AttachmentPopup
+            indexValue={indexValue}
+            record={record}
+            handlePopupButtonClick={handlePopupButtonClick}
+            disabled={disabled}
+            ministryId={ministryId}
+          />
+        </Grid>
+      </Grid>
+      <Grid
+        container
+        direction="row"
+        justify="flex-start"
+        alignItems="flex-start"
+        spacing={3}
+      >
+        <Grid item xs={12}>
+          <Divider className={"record-divider"} />
+        </Grid>
+      </Grid>
+    </>
+  );
+})
+
+const opendocumentintab =(record,ministryId)=>
+{
+  let relativedocpath = record.documentpath.split('/').slice(4).join('/')
+  let url =`/foidocument?id=${ministryId}&filepath=${relativedocpath}`;
+  window.open(url, '_blank').focus();
+}
+
+const AttachmentPopup = React.memo(({indexValue, record, handlePopupButtonClick, disabled,ministryId}) => {
+  const ref = React.useRef();
+  const closeTooltip = () => ref.current && ref ? ref.current.close():{};
+
+  const handleRename = () => {
+    closeTooltip();
+    handlePopupButtonClick("rename", record);
+  }
+
+  const handleReplace = () => {
+    closeTooltip();
+    handlePopupButtonClick("replace", record);
+  }
+
+  const handleDownload = () =>{
+    closeTooltip();
+    handlePopupButtonClick("download", record);
+  }
+
+  const handleView =()=>{
+    closeTooltip();
+    opendocumentintab(record,ministryId);
+  }
+
+  const handleDelete = () => {
+    closeTooltip();
+    handlePopupButtonClick("delete", record);
+  };
+
+  const transitionStates = [
+    "statetransition",
+    StateTransitionCategories.cfrreview.name,
+    StateTransitionCategories.cfrfeeassessed.name,
+    StateTransitionCategories.signoffresponse.name,
+    StateTransitionCategories.harmsreview.name
+  ];
+
+  const showReplace = (category) => {
+    return transitionStates.includes(category.toLowerCase());
+  }
+  const [popoverOpen, setPopoverOpen] = useState(false);
+  const [anchorPosition, setAnchorPosition] = useState(null);
+
+  const ReplaceMenu = () => {
+    return (
+      <MenuItem
+        onClick={() => {
+          handleReplace();
+          setPopoverOpen(false);
+         }}
+      >
+        Replace
+      </MenuItem>
+    )
+  }
+
+  const DeleteMenu = () => {
+
+    return (
+      <MenuItem
+        onClick={() => {
+          handleDelete();
+          setPopoverOpen(false);
+         }}
+      >
+        Delete
+      </MenuItem>
+    )
+
+  }
+
+  // const AddMenuItems = () => {
+  //   if (showReplace(record.category))
+  //     return (<ReplaceMenu />)
+  //   return (<DeleteMenu />)
+  // }
+
+  const ActionsPopover = ({RestrictViewInBrowser}) => {
+
+    return (
+      <Popover
+        anchorReference="anchorPosition"
+        anchorPosition={
+          anchorPosition && {
+            top: anchorPosition.top,
+            left: anchorPosition.left,
+          }
+        }
+        open={popoverOpen}
+        anchorOrigin={{
+          vertical: "top",
+          horizontal: "left",
+        }}
+        transformOrigin={{
+          vertical: "top",
+          horizontal: "left",
+        }}
+        onClose={() => setPopoverOpen(false)}
+      >
+        <MenuList>
+{!RestrictViewInBrowser ?
+        <MenuItem
+            onClick={() => {
+                handleView();
+                setPopoverOpen(false);
+            }}
+          >
+            View
+          </MenuItem>
+          :""}
+          <MenuItem
+            onClick={() => {
+                handleDownload();
+                setPopoverOpen(false);
+            }}
+          >
+            Download
+          </MenuItem>
+          <MenuItem
+            onClick={() => {
+                handleRename();
+                setPopoverOpen(false);
+            }}
+          >
+            Rename
+          </MenuItem>
+          <DeleteMenu />
+
+          {/* {record.category === "personal" ? (
+          ""
+        ) : <DeleteMenu />} */}
+        </MenuList>
+      </Popover>
+    );
+  };
+
+  return (
+    <>
+      <IconButton
+        className="records-actions-btn"
+        aria-label= "actions"
+        id={`ellipse-icon-${indexValue}`}
+        key={`ellipse-icon-${indexValue}`}
+        color="primary"
+        disabled={disabled}
+        onClick={(e) => {
+          setPopoverOpen(true);
+          setAnchorPosition(
+            e.currentTarget.getBoundingClientRect()
+          );
+        }}
+      >
+      <MoreHorizIcon />
+    </IconButton>
+    <ActionsPopover RestrictViewInBrowser={true}/>
+  </>
+  );
+})
+
+export default RecordsLog
