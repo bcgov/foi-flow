@@ -25,7 +25,8 @@ import {StateEnum} from "../../../../constants/FOI/statusEnum";
 import { toast } from "react-toastify";
 import { createRequestDetailsObjectFunc,
          isAxisSyncDisplayField,
-         isMandatoryField } from "../utils";
+         isMandatoryField,
+         getUniqueIdentifier } from "../utils";
 import { formatDate } from "../../../../helper/FOI/helper";
 
 
@@ -50,6 +51,7 @@ const AxisSyncModal = ({ axisSyncModalOpen, setAxisSyncModalOpen, saveRequestObj
     const [axisExtensions, setAxisExtension] = React.useState([]);
     const dispatch = useDispatch();
     const extensions = useSelector((state) => state.foiRequests.foiRequestExtesions);
+    const [updateExtensions, setUpdateExtensions] = React.useState(false);
 
     useEffect(()=>{
         if(Object.entries(requestDetailsFromAxis).length !== 0){
@@ -112,7 +114,7 @@ const AxisSyncModal = ({ axisSyncModalOpen, setAxisSyncModalOpen, saveRequestObj
       return false;
     }
 
-    const assignDisplayedReqObj = (key,updatedObj, updatedField) => {     
+    const assignDisplayedReqObj = (key,updatedObj, updatedField) => {  
       switch (key) {
         case 'dueDate':
         case 'requestProcessStart':
@@ -127,25 +129,25 @@ const AxisSyncModal = ({ axisSyncModalOpen, setAxisSyncModalOpen, saveRequestObj
           updatedObj[updatedField] =formatDate(requestDetailsFromAxis['receivedDate'], "MMM dd yyyy");
           break;
         case 'additionalPersonalInfo':
-          let foiReqAdditionalPersonalInfo = saveRequestObject[key];
-          let axisAdditionalPersonalInfo = requestDetailsFromAxis[key];
-          for(let axisKey of Object.keys(axisAdditionalPersonalInfo)){
-            for(let reqKey of Object.keys(foiReqAdditionalPersonalInfo)){
-              updatedObj = compareAdditionalPersonalInfo(axisKey , reqKey, axisAdditionalPersonalInfo, 
-                foiReqAdditionalPersonalInfo, updatedObj);
-            }
-          }
-          for(let reqKey of Object.keys(foiReqAdditionalPersonalInfo)){
-              if(!Object.keys(axisAdditionalPersonalInfo).includes(reqKey)){
-                axisAdditionalPersonalInfo[reqKey] = foiReqAdditionalPersonalInfo[reqKey];
+          if(requestDetailsFromAxis.requestType === 'personal'){
+            let foiReqAdditionalPersonalInfo = saveRequestObject[key];
+            let axisAdditionalPersonalInfo = requestDetailsFromAxis[key];
+            for(let axisKey of Object.keys(axisAdditionalPersonalInfo)){
+              for(let reqKey of Object.keys(foiReqAdditionalPersonalInfo)){
+                updatedObj = compareAdditionalPersonalInfo(axisKey , reqKey, axisAdditionalPersonalInfo, 
+                  foiReqAdditionalPersonalInfo, updatedObj);
               }
+            }
+            persistAdditionalDetailFieldsNotInAxis(foiReqAdditionalPersonalInfo, axisAdditionalPersonalInfo)
           }
           break;
         case 'Extensions':
           let extensionsArr = compareExtensions(key);
           if(extensionsArr?.length > 0 || (extensionsArr?.length === 0 && 
-              requestDetailsFromAxis[key].length === 0 && extensions?.length > 0))
+              requestDetailsFromAxis[key].length === 0 && extensions?.length > 0)){
             updatedObj[key] = extensionsArr;
+            setUpdateExtensions(true);
+          }
           break;
         default:
           updatedObj[updatedField] = requestDetailsFromAxis[key];
@@ -153,42 +155,54 @@ const AxisSyncModal = ({ axisSyncModalOpen, setAxisSyncModalOpen, saveRequestObj
       }
       
     }
-
+    
     const compareAdditionalPersonalInfo = (axisKey , reqKey, axisAdditionalPersonalInfo, 
       foiReqAdditionalPersonalInfo, updatedObj) => {
       if(axisKey === reqKey){
         if(axisAdditionalPersonalInfo[axisKey] !== foiReqAdditionalPersonalInfo[axisKey] ){
-          if(axisKey === 'birthDate')
-            updatedObj[axisKey] = axisAdditionalPersonalInfo[axisKey] && 
-              formatDate(axisAdditionalPersonalInfo[axisKey], "MMM dd yyyy");
-          else{
-            if(isAxisSyncDisplayField(axisKey))
-              updatedObj[isAxisSyncDisplayField(axisKey)] = axisAdditionalPersonalInfo[axisKey];
-            else
-              updatedObj[axisKey] = axisAdditionalPersonalInfo[axisKey];
+          if(isAxisSyncDisplayField(axisKey)){
+            updatedObj[isAxisSyncDisplayField(axisKey)] = (axisKey === 'birthDate' && axisAdditionalPersonalInfo[axisKey]) ? 
+            formatDate(axisAdditionalPersonalInfo[axisKey], "MMM dd yyyy") : axisAdditionalPersonalInfo[axisKey];
           }
-            
+          else
+            updatedObj[axisKey] = axisAdditionalPersonalInfo[axisKey];
         }
       }
       return updatedObj;
     }
 
+    const persistAdditionalDetailFieldsNotInAxis = (foiReqAdditionalPersonalInfo,axisAdditionalPersonalInfo) => {
+      for(let reqKey of Object.keys(foiReqAdditionalPersonalInfo)){
+        if(!Object.keys(axisAdditionalPersonalInfo).includes(reqKey)){
+          axisAdditionalPersonalInfo[reqKey] = foiReqAdditionalPersonalInfo[reqKey];
+        }
+      }
+    }
+
     const compareExtensions = (key) => {
       let extensionsArr = [];
       let extensionSet = new Set();
-      const axisReasonIds = requestDetailsFromAxis[key].map(x => x.extensionreasonid);
-      const foiReqReasonIds = extensions.map(x => x.extensionreasonid);
-      const newAxisExtensionReasonIds = axisReasonIds.filter(x => !foiReqReasonIds.includes(x));
-      const newFoiExtensionReasonIds = foiReqReasonIds.filter(x => !axisReasonIds.includes(x));
+      let axisUniqueIds = [];
+      let foiUniqueIds = [];
+      requestDetailsFromAxis[key]?.forEach(axisObj => {
+        axisUniqueIds.push((axisObj.extensionstatusid+formatDate(axisObj.extendedduedate, "MMM dd yyyy")+
+        axisObj.extensionreasonid).replace(/\s+/g, ''));
+      })
+      extensions.forEach(obj => {
+        foiUniqueIds.push((obj.extensionstatusid+formatDate(obj.extendedduedate, "MMM dd yyyy")+
+        obj.extensionreasonid).replace(/\s+/g, ''));
+      })
+      const newAxisExtensionUniqueIds = axisUniqueIds.filter(x => !foiUniqueIds.includes(x));
+      const newFoiExtensionUniqueIds = foiUniqueIds.filter(x => !axisUniqueIds.includes(x));
       //Scenario: Additional extension added in FOI system which are not in AXIS.
-      if(newFoiExtensionReasonIds?.length > 0 || foiReqReasonIds?.length > axisReasonIds?.length ){
+      if(newFoiExtensionUniqueIds?.length > 0 || foiUniqueIds?.length > axisUniqueIds?.length ){
         extensions.forEach(obj => {
-          let duplicateFoiExt = foiReqReasonIds.filter((item, index) => foiReqReasonIds.indexOf(item) !== index);
-          if(newFoiExtensionReasonIds.includes(obj.extensionreasonid)){
+          let duplicateFoiExt = foiUniqueIds.filter((item, index) => foiUniqueIds.indexOf(item) !== index);
+          if(newFoiExtensionUniqueIds.includes(getUniqueIdentifier(obj))){
             const property = <><span style={{color: '#f44336'}}>{obj.extensionstatus+" - "+obj.extensionreson+" - "+formatDate(obj.extendedduedate, "MMM dd yyyy")+" will be DELETED."}</span><br /></>;
             extensionsArr.push(property);
           }
-          else if(duplicateFoiExt.includes(obj.extensionreasonid)){
+          else if(duplicateFoiExt.includes(getUniqueIdentifier(obj))){
             requestDetailsFromAxis[key]?.forEach(axisObj => {
               extensionsArr= fieldComparisonOfExtensionObj(axisObj,obj,extensionsArr,true,extensionSet);
             })
@@ -197,7 +211,7 @@ const AxisSyncModal = ({ axisSyncModalOpen, setAxisSyncModalOpen, saveRequestObj
       }
       //Scenario: Display only those axis extensions which are not yet synced.
       if(extensions.length > 0 && requestDetailsFromAxis[key]?.length > 0){
-            extensionsArr = assignExtensionForDsiplay(key,extensionsArr,newAxisExtensionReasonIds,extensionSet);
+            extensionsArr = assignExtensionForDsiplay(key,extensionsArr,newAxisExtensionUniqueIds,extensionSet);
       }
       else if(requestDetailsFromAxis[key]?.length > 0){
         requestDetailsFromAxis[key].forEach(obj => {
@@ -209,10 +223,9 @@ const AxisSyncModal = ({ axisSyncModalOpen, setAxisSyncModalOpen, saveRequestObj
     } 
 
     const fieldComparisonOfExtensionObj = (axisObj,obj,extensionsArr,removeCase, extensionSet) => {
-      if(axisObj.extensionreasonid === obj.extensionreasonid){
-        if(axisObj.extensionstatusid !== obj.extensionstatusid || axisObj.approvednoofdays !== obj.approvednoofdays ||
-          axisObj.extendedduedays  !== obj.extendedduedays ||
-          axisObj.extendedduedays !== obj.extendedduedays  || 
+      if(getUniqueIdentifier(axisObj) === getUniqueIdentifier(obj)){
+        if(axisObj.extensionstatusid !== obj.extensionstatusid ||
+          axisObj.extendedduedays !== obj.extendedduedays ||
           !(obj.decisiondate === axisObj.approveddate || obj.decisiondate === axisObj.denieddate)){
             if(removeCase){
               const property = <><span style={{color: '#f44336'}}>{obj.extensionstatus+" - "+obj.extensionreson+" - "+formatDate(obj.extendedduedate, "MMM dd yyyy")+" will be DELETED."}</span><br /></>;
@@ -230,10 +243,10 @@ const AxisSyncModal = ({ axisSyncModalOpen, setAxisSyncModalOpen, saveRequestObj
       return extensionsArr;
     }
 
-    const assignExtensionForDsiplay = (key,extensionsArr,newAxisExtensionReasonIds,extensionSet) => {
-      if(newAxisExtensionReasonIds?.length > 0){
+    const assignExtensionForDsiplay = (key,extensionsArr,newAxisExtensionUniqueIds,extensionSet) => {
+      if(newAxisExtensionUniqueIds?.length > 0){
         requestDetailsFromAxis[key].forEach(obj => {
-          if(newAxisExtensionReasonIds.includes(obj.extensionreasonid)){
+          if(newAxisExtensionUniqueIds.includes(getUniqueIdentifier(obj))){
             const property = <>{obj.extensionstatus+" - "+obj.extensionreason+" - "+formatDate(obj.extendedduedate, "MMM dd yyyy")}<br /></>;
             extensionsArr.push(property);
           }
@@ -276,7 +289,9 @@ const AxisSyncModal = ({ axisSyncModalOpen, setAxisSyncModalOpen, saveRequestObj
                 draggable: true,
                 progress: undefined,
               });
-              saveExtensions();
+              if(updateExtensions){
+                saveExtensions();
+              }
               const _state = getRequestState({
                 currentSelectedStatus,
                 requestState,
