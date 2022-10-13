@@ -46,7 +46,7 @@ class eventservice:
     def posteventforaxisextension(self, ministryrequestid, extensionids, userid, username, event):
         try:
             for extensionid in extensionids:
-                extensioneventresponse = extensionevent().createaxisextensionevent(ministryrequestid, extensionid, userid, username, event)
+                extensioneventresponse = extensionevent().createextensionevent(ministryrequestid, extensionid, userid, username, event)
                 if extensioneventresponse.success == False: 
                     current_app.logger.error("FOI Notification failed for event for extension= %s" % (extensionid))
         except BusinessException as exception:            
