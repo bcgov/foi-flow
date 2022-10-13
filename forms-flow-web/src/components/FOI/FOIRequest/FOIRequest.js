@@ -65,7 +65,8 @@ import {
   handleBeforeUnload,
   findRequestState,
   isMandatoryField,
-  isAxisSyncDisplayField
+  isAxisSyncDisplayField,
+  getUniqueIdentifier
 } from "./utils";
 import { ConditionalComponent } from '../../../helper/FOI/helper';
 import DivisionalTracking from './DivisionalTracking';
@@ -260,8 +261,9 @@ const FOIRequest = React.memo(({ userDetail }) => {
             setCheckExtension(false);
             setAxisMessage("WARNING");
           }
-          else
+          else {
             setAxisMessage("");
+          }
         }
         else if(data){
           let responseMsg = data;
@@ -326,10 +328,9 @@ const FOIRequest = React.memo(({ userDetail }) => {
     if(requestExtensions.length > 0 && axisData[key].length > 0){
       for(let axisObj of axisData[key]){
         for(let foiReqObj of requestExtensions){
-          if(axisObj.extensionreasonid === foiReqObj.extensionreasonid){
-            if(axisObj.extensionstatusid !== foiReqObj.extensionstatusid || axisObj.approvednoofdays !== foiReqObj.approvednoofdays ||
+          if(getUniqueIdentifier(axisObj) === getUniqueIdentifier(foiReqObj)){
+            if(axisObj.extensionstatusid !== foiReqObj.extensionstatusid ||
               axisObj.extendedduedays  !== foiReqObj.extendedduedays ||
-              axisObj.extendedduedays !== foiReqObj.extendedduedays  || 
               !(foiReqObj.decisiondate === axisObj.approveddate || foiReqObj.decisiondate === axisObj.denieddate)){
                 return true;
             }

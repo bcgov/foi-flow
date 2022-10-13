@@ -394,3 +394,29 @@ export const countOfMinistrySelected = (selectedMinistryList) => {
     return n + (ministry.isChecked);
   }, 0);
 }
+
+export const persistRequestFieldsNotInAxis = (newRequestDetails, existingRequestDetails) => {
+  newRequestDetails.assignedGroup = existingRequestDetails.assignedGroup;
+  newRequestDetails.assignedTo= existingRequestDetails.assignedTo;
+  newRequestDetails.assignedToFirstName= existingRequestDetails.assignedToFirstName;
+  newRequestDetails.assignedToLastName= existingRequestDetails.assignedToLastName;
+  newRequestDetails.assignedToName= existingRequestDetails.assignedToName;
+  let foiReqAdditionalPersonalInfo = existingRequestDetails.additionalPersonalInfo;
+  let axisAdditionalPersonalInfo = newRequestDetails.additionalPersonalInfo;
+  if(newRequestDetails.requestType === 'personal'){
+    for(let key of Object.keys(existingRequestDetails)){
+      if((key == 'correctionalServiceNumber' || key == 'publicServiceEmployeeNumber' ) && !isAxisSyncDisplayField(key))
+        newRequestDetails[key] = existingRequestDetails[key];
+    }
+    for(let key of Object.keys(foiReqAdditionalPersonalInfo)){
+      if(!isAxisSyncDisplayField(key)){
+        axisAdditionalPersonalInfo[key] = foiReqAdditionalPersonalInfo[key];
+      }
+    }
+  }
+  return newRequestDetails;
+}
+
+export const getUniqueIdentifier = (obj) => {
+  return (obj.extensionstatusid+formatDate(obj.extendedduedate, "MMM dd yyyy")+obj.extensionreasonid).replace(/\s+/g, '');
+}
