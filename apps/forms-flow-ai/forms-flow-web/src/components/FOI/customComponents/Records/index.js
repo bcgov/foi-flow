@@ -72,6 +72,15 @@ const useStyles = makeStyles((_theme) => ({
     fontWeight: 'bold !important',
     flexDirection: 'row-reverse',
   },
+  actions: {
+    maxWidth: "40px"
+  },
+  createDate: {
+    maxWidth: "200px"
+  },
+  createBy: {
+    maxWidth: "180px"
+  }
 }));
 
 export const RecordsLog = ({
@@ -610,7 +619,7 @@ const Attachment = React.memo(({indexValue, record, handlePopupButtonClick, getF
             />
           )}
         </Grid>
-        <Grid item xs={1.5}>
+        <Grid item xs={2} className={classes.createBy}>
           <div
             className={`record-owner ${
               disabled ? "record-disabled" : ""
@@ -619,7 +628,7 @@ const Attachment = React.memo(({indexValue, record, handlePopupButtonClick, getF
             {getFullname(record.createdby)}
           </div>
         </Grid>
-        <Grid item xs={2.5}>
+        <Grid item xs={3} className={classes.createDate}>
           <div
             className={`record-time ${disabled ? "record-disabled" : ""}`}
           >
@@ -629,6 +638,7 @@ const Attachment = React.memo(({indexValue, record, handlePopupButtonClick, getF
         <Grid
           item
           xs={1}
+          className={classes.actions}
           container
           direction="row-reverse"
           justifyContent="flex-start"
