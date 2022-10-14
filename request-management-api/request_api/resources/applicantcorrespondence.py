@@ -73,8 +73,6 @@ class FOIFlowApplicantCorrespondence(Resource):
     @auth.hasusertype('iao')
     def get(requestid, ministryrequestid):
         try:
-            print("requestid = ", requestid)
-            print("ministryrequestid = ", ministryrequestid)
             correspondencelogs = applicantcorrespondenceservice().getapplicantcorrespondencelogs(ministryrequestid)
             return json.dumps(correspondencelogs) , 200
         except BusinessException:
@@ -91,9 +89,7 @@ class FOIFlowApplicantCorrespondence(Resource):
         try:
             requestjson = request.get_json()
             applicantcorrespondencelog = FOIApplicantCorrespondenceSchema().load(data=requestjson)           
-            userid = AuthHelper.getuserid()
-            result = applicantcorrespondenceservice().saveapplicantcorrespondencelog(templateid=applicantcorrespondencelog['templateid'],
-            ministryrequestid=ministryrequestid,createdby=userid,messagehtml=applicantcorrespondencelog['correspondencemessagejson'],attachments=applicantcorrespondencelog['attachments'])
+            result = applicantcorrespondenceservice().saveapplicantcorrespondencelog(applicantcorrespondencelog, ministryrequestid, AuthHelper.getuserid())
             if cfrfeeservice().getactivepayment(requestid, ministryrequestid) != None:
                 requestservice().postfeeeventtoworkflow(requestid, ministryrequestid, "CANCELLED")
             requestservice().postcorrespondenceeventtoworkflow(ministryrequestid,  requestid, result.identifier, applicantcorrespondencelog['attributes'], applicantcorrespondencelog['templateid'])

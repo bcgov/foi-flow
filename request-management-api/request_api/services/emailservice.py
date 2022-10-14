@@ -17,6 +17,7 @@ from request_api.services.eventservice import eventservice
 from request_api.services.requestservice import requestservice
 from request_api.services.applicantcorrespondence.applicantcorrespondencelog  import applicantcorrespondenceservice
 from request_api.utils.enums import ServiceName
+import logging
 
 class emailservice:
     """ FOI Email Service
@@ -27,8 +28,8 @@ class emailservice:
             requestjson = requestservice().getrequestdetails(requestid,ministryrequestid)
             _applicantcorrespondenceid = self.__getvaluefromschema(emailschema, "applicantcorrespondenceid")
             _templatename = self.__getvaluefromschema(emailschema, "templatename")
-            print("_templatename == ", _templatename)
-            print("servicename == ", servicename)
+            logging.info("_templatename == ", _templatename)
+            logging.info("servicename == ", servicename)
             if servicename == ServiceName.correspondence.value.upper():
                 servicename = _templatename            
             _messagepart, content = templateservice().generate_by_servicename_and_schema(servicename, requestjson, ministryrequestid, _applicantcorrespondenceid)
@@ -38,7 +39,7 @@ class emailservice:
                 _messageattachmentlist = documentservice().getapplicantcorrespondenceattachmentsbyapplicantcorrespondenceid(_applicantcorrespondenceid)
             else:
                 _messageattachmentlist = documentservice().getattachments(ministryrequestid, 'ministryrequest', templateconfig().getattachmentcategory(servicename).lower())
-            applicantcorrespondenceservice().saveapplicantcorrespondencelog(None, ministryrequestid, 'System Generated Email', content, _messageattachmentlist)
+            applicantcorrespondenceservice().updateapplicantcorrespondencelog(_applicantcorrespondenceid, {"message": content})
             return senderservice().send(servicename, _messagepart, _messageattachmentlist, requestjson)
         except Exception as ex:
             logging.exception(ex)
