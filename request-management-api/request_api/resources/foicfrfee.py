@@ -80,7 +80,7 @@ class SanctionFOICFRFee(Resource):
             requestjson = request.get_json() 
             foicfrfeeschema = FOICFRFeeSanctionSchema().load(requestjson)
             result = cfrfeeservice().sanctioncfrfee(ministryrequestid, foicfrfeeschema,AuthHelper.getuserid())
-            asyncio.ensure_future(eventservice().posteventforcfrfeeform(ministryrequestid, AuthHelper.getuserid(), AuthHelper.getusername()))
+            asyncio.ensure_future(eventservice().posteventforsanctioncfrfeeform(ministryrequestid, AuthHelper.getuserid(), AuthHelper.getusername()))
             if (foicfrfeeschema["status"] == "approved") and cfrfeeservice().getactivepayment(requestid, ministryrequestid) != None:
                 requestservice().postfeeeventtoworkflow(requestid, ministryrequestid, "CANCELLED")
             return {'status': result.success, 'message':result.message,'id':result.identifier} , 200 
