@@ -73,12 +73,13 @@ class eventservice:
         except BusinessException as exception:            
             self.__logbusinessexception(exception)
 
+    async def posteventforsanctioncfrfeeform(self, ministryrequestid, userid, username):
+        self.__posteventforsanctioncfrfeeform(ministryrequestid, userid, username)
+    
     async def posteventforcfrfeeform(self, ministryrequestid, userid, username):
         try:
-            cfrfeeeventresponse = cfrfeeformevent().createstatetransitionevent(ministryrequestid, userid, username)
-            feewaivercommentresponse, refundcommentresponse= cfrfeeformevent().createeventforupdatedamounts(ministryrequestid, userid, username)
-            if cfrfeeeventresponse.success == False: 
-                current_app.logger.error("FOI Notification failed for event for CFRFEEFORM= %s" % (ministryrequestid))
+            self.__posteventforsanctioncfrfeeform(ministryrequestid, userid, username)
+            feewaivercommentresponse, refundcommentresponse= cfrfeeformevent().createeventforupdatedamounts(ministryrequestid, userid, username)                
             if feewaivercommentresponse.success == False or refundcommentresponse.success == False: 
                 current_app.logger.error("FOI Comment failed for amount update event for CFRFEEFORM= %s" % (ministryrequestid))
         except BusinessException as exception:            
@@ -111,3 +112,11 @@ class eventservice:
 
     def __logbusinessexception(self, exception):
         current_app.logger.error("%s,%s" % ('FOI Comment Notification Error', exception.message))
+    
+    def __posteventforsanctioncfrfeeform(self, ministryrequestid, userid, username):
+        try:           
+            cfrfeeeventresponse = cfrfeeformevent().createstatetransitionevent(ministryrequestid, userid, username)
+            if cfrfeeeventresponse.success == False: 
+                current_app.logger.error("FOI Notification failed for event for CFRFEEFORM= %s" % (ministryrequestid))
+        except BusinessException as exception:            
+            self.__logbusinessexception(exception)

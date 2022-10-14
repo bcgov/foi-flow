@@ -70,13 +70,14 @@ class FOIRequestCFRFee(db.Model):
         return comment_schema.dump(query)
     
     @classmethod
-    def getstatenavigation(cls, ministryrequestid):
+    def getstatenavigation(cls, ministryrequestid, cfrfeeid):
         _session = db.session
-        _entries = _session.query(FOIRequestCFRFee).filter(FOIRequestCFRFee.ministryrequestid == ministryrequestid and FOIRequestCFRFee.cfrfeestatusid is not null).order_by(FOIRequestCFRFee.version.desc()).limit(2)
+        _entries = _session.query(FOIRequestCFRFee).filter_by(ministryrequestid = ministryrequestid, cfrfeeid = cfrfeeid).order_by(FOIRequestCFRFee.version.desc()).limit(2)
         requeststates = []
         for _entry in _entries:
-            requeststates.append(_entry.cfrfeestatus.description)
-        return requeststates  
+            if _entry.cfrfeestatusid: 
+                requeststates.append(_entry.cfrfeestatus.description)
+        return requeststates
 
     @classmethod
     def getfeedataforamountcomparison(cls, ministryrequestid):
