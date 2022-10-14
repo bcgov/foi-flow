@@ -39,9 +39,6 @@ class templateservice:
 
     def __gettemplatenamewrapper(self, servicename, requestjson, ministryrequestid):
         _templatename = templateconfig().gettemplatename(servicename)
-        print("__gettemplatenamewrapper _templatename = ", _templatename)
-        print("__gettemplatenamewrapper servicename = ", servicename)
-        print("requestjson == ", requestjson)
         if _templatename is None:
             _latesttemplatename = self.__getlatesttemplatename(ministryrequestid)
             if requestjson is not None and requestjson != {}:
