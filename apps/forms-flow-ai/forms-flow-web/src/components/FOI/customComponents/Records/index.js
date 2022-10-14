@@ -76,10 +76,19 @@ const useStyles = makeStyles((_theme) => ({
     maxWidth: "40px"
   },
   createDate: {
-    maxWidth: "200px"
+    maxWidth: "200px",
+    fontStyle: "italic"
   },
   createBy: {
-    maxWidth: "180px"
+    maxWidth: "180px",
+    fontStyle: "italic"
+  },
+  filename: {
+    fontWeight: "bold"
+  },
+  divider: {
+    marginTop: "-5px",
+    marginBottom: "-5px"
   }
 }));
 
@@ -465,7 +474,7 @@ export const RecordsLog = ({
                 </Grid>
               </Paper>
             </Grid>
-            <Grid>
+            <Grid item container direction="row" xs={12}>
               <Stack direction="row" sx={{ overflowX: "scroll", paddingBottom: "5px" }} spacing={1}>
                 {divisions.map(division =>
                   <ClickableChip
@@ -605,11 +614,11 @@ const Attachment = React.memo(({indexValue, record, handlePopupButtonClick, getF
         alignItems="flex-start"
         spacing={1}
       >
-        <Grid item xs={true}>
+        <Grid item xs={true} className={classes.filename}>
           {record.filename}
         {/* </Grid>
         <Grid item xs={true} > */}
-          {record.attributes.map((division, i) =>
+          {/* {record.attributes.map((division, i) =>
             <Chip
               key={i}
               label={division.divisionname}
@@ -617,7 +626,7 @@ const Attachment = React.memo(({indexValue, record, handlePopupButtonClick, getF
               className={clsx(classes.chip, classes.chipPrimary)}
               style={{backgroundColor: "#003366", margin: "4px"}}
             />
-          )}
+          )} */}
         </Grid>
         <Grid item xs={2} className={classes.createBy}>
           <div
@@ -658,7 +667,27 @@ const Attachment = React.memo(({indexValue, record, handlePopupButtonClick, getF
         direction="row"
         justify="flex-start"
         alignItems="flex-start"
+        spacing={1}
+      >
+        {record.attributes.map((division, i) =>
+          <Chip
+            item
+            key={i}
+            label={division.divisionname}
+            size="small"
+            className={clsx(classes.chip, classes.chipPrimary)}
+            style={{backgroundColor: "#003366", margin: "4px"}}
+          />
+        )}
+
+      </Grid>
+      <Grid
+        container
+        direction="row"
+        justify="flex-start"
+        alignItems="flex-start"
         spacing={3}
+        className={classes.divider}
       >
         <Grid item xs={12}>
           <Divider className={"record-divider"} />
