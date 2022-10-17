@@ -50,7 +50,7 @@ export default function AttachmentModal({
   handleRename,
   isMinistryCoordinator,
   uploadFor="attachment",
-  maxNoFiles=10,
+  maxNoFiles,
   bcgovcode
 }) {
 

@@ -77,17 +77,19 @@ const useStyles = makeStyles((_theme) => ({
   },
   createDate: {
     maxWidth: "200px",
-    fontStyle: "italic"
+    fontStyle: "italic",
+    fontSize: "14px"
   },
   createBy: {
     maxWidth: "180px",
-    fontStyle: "italic"
+    fontStyle: "italic",
+    fontSize: "14px"
   },
   filename: {
     fontWeight: "bold"
   },
   divider: {
-    marginTop: "-5px",
+    marginTop: "-2px",
     marginBottom: "-5px"
   }
 }));
@@ -186,7 +188,7 @@ export const RecordsLog = ({
                 if (!_err && _res === 200) {
                   completed++;
                   toast.update(toastID, {
-                    render: "Exporting files (" + completed + "/" + fileInfoList.length + ")",
+                    render: "Uploading files (" + completed + "/" + fileInfoList.length + ")",
                     isLoading: true,
                   })
                   _documents.push(documentDetails);
@@ -432,7 +434,9 @@ export const RecordsLog = ({
                   border: "1px solid #38598A",
                   color: "#38598A",
                   maxWidth:"100%",
-                  backgroundColor: "rgba(56,89,138,0.1)"
+                  backgroundColor: "rgba(56,89,138,0.1)",
+                  borderBottomLeftRadius: 0,
+                  borderBottomRightRadius: 0
                 }}
                 alignItems="center"
                 justifyContent="center"
@@ -473,21 +477,39 @@ export const RecordsLog = ({
                   />
                 </Grid>
               </Paper>
-            </Grid>
-            <Grid item container direction="row" xs={12}>
-              <Stack direction="row" sx={{ overflowX: "scroll", paddingBottom: "5px" }} spacing={1}>
+              <Paper
+                component={Grid}
+                sx={{
+                  border: "1px solid #38598A",
+                  color: "#38598A",
+                  maxWidth:"100%",
+                  paddingTop: "8px",
+                  borderTopLeftRadius: 0,
+                  borderTopRightRadius: 0,
+                  borderTop: "none"
+                }}
+                alignItems="center"
+                justifyContent="flex-start"
+                direction="row"
+                container
+                item
+                xs={12}
+                elevation={0}
+              >
                 {divisions.map(division =>
                   <ClickableChip
+                    item
                     id={`${division.divisionid}Tag`}
                     key={`${division.divisionid}-tag`}
                     label={division.divisionname.toUpperCase()}
+                    sx={{width: "fit-content", marginLeft: "8px", marginBottom: "8px" }}
                     color="primary"
                     size="small"
                     onClick={(e)=>{setFilterValue(division.divisionid === filterValue ? -1 : division.divisionid)}}
                     clicked={filterValue == division.divisionid}
                   />
-                )}
-              </Stack>
+                  )}
+              </Paper>
             </Grid>
             <Grid
               container
@@ -496,33 +518,19 @@ export const RecordsLog = ({
               direction="row"
               justify="flex-start"
               alignItems="flex-start"
-              // spacing={1}
               className={classes.recordLog}
             >
               {records.map((record, i) =>
-                // <Grid item xs={12}>
-                  // <div className='request-accordian records-accordion'>
-                  //   <Accordion defaultExpanded={false} key={index} className={classes.accordionSummary}>
-                  //     <AccordionSummary className={classes.heading} expandIcon={<ExpandMoreIcon />}>
-                  //       <Typography >{division.division}</Typography>
-                  //     </AccordionSummary>
-                  //     <AccordionDetails>
-                  //       {division.records.map((file, i) =>
-                          <Attachment
-                            key={i}
-                            indexValue={i}
-                            record={record}
-                            handlePopupButtonClick={handlePopupButtonClick}
-                            getFullname={getFullname}
-                            isMinistryCoordinator={isMinistryCoordinator}
-                            ministryId={ministryId}
-                            classes={classes}
-                          />
-                  //       )}
-                  //     </AccordionDetails>
-                  //   </Accordion>
-                  // </div>
-                // </Grid>
+                <Attachment
+                  key={i}
+                  indexValue={i}
+                  record={record}
+                  handlePopupButtonClick={handlePopupButtonClick}
+                  getFullname={getFullname}
+                  isMinistryCoordinator={isMinistryCoordinator}
+                  ministryId={ministryId}
+                  classes={classes}
+                />
               )}
             </Grid>
           </Grid>
@@ -539,7 +547,6 @@ export const RecordsLog = ({
             handleRename={handleRename}
             isMinistryCoordinator={isMinistryCoordinator}
             uploadFor={"records"}
-            // maxNoFiles={100}
             bcgovcode={bcgovcode}
           />
         </>

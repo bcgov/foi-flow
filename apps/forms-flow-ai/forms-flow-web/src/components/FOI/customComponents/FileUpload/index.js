@@ -24,7 +24,7 @@ const FileUpload = ({
     attachment,
     customFormat = {},
     existingDocuments = [],
-    maxNumberOfFiles = 10,
+    maxNumberOfFiles,
     modalFor,
     handleTagChange,
     tagValue,
@@ -117,7 +117,7 @@ const FileUpload = ({
     };
 
     const validateFiles = (newFiles, totalFiles) => {
-      if (multipleFiles && (newFiles.length > maxNumberOfFiles  || totalFiles > maxNumberOfFiles)) {
+      if (multipleFiles && maxNumberOfFiles && (newFiles.length > maxNumberOfFiles  || totalFiles > maxNumberOfFiles)) {
         setErrorMessage([`A maximum of ${maxNumberOfFiles} files can be uploaded at one time. Only ${maxNumberOfFiles} files have been added this upload window, please upload additional files separately`]);
       } else if (!multipleFiles && totalFiles > 1) {
         return
@@ -176,19 +176,18 @@ const FileUpload = ({
           <span>Select one {uploadFor === 'records' ? "division" : "tag"} that corresponds to the document(s) you are uploading</span>
         </div>
         <div className="taglist">
-          <Stack direction="row" sx={{ overflowX: "scroll", paddingBottom: "5px" }} spacing={1}>
-            {tagList.map(tag =>
-              <ClickableChip
-                id={`${tag.name}Tag`}
-                key={`${tag.name}-tag`}
-                label={tag.display.toUpperCase()}
-                color="primary"
-                size="small"
-                onClick={()=>{handleTagChange(tag.name)}}
-                clicked={tagValue == tag.name}
-              />
-            )}
-          </Stack>
+          {tagList.map(tag =>
+            <ClickableChip
+              id={`${tag.name}Tag`}
+              key={`${tag.name}-tag`}
+              label={tag.display.toUpperCase()}
+              sx={{width: "fit-content", marginRight: "8px", marginBottom: "8px"}}
+              color="primary"
+              size="small"
+              onClick={()=>{handleTagChange(tag.name)}}
+              clicked={tagValue == tag.name}
+            />
+          )}
         </div>
       </div>)}
       <section

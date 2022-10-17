@@ -50,6 +50,7 @@ import { getMinistryBottomTextMap, alertUser, getHeaderText } from "./utils";
 import DivisionalTracking from "../DivisionalTracking";
 import HomeIcon from '@mui/icons-material/Home';
 import { RecordsLog } from '../../customComponents/Records';
+import { UnsavedModal } from "../../customComponents";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -273,6 +274,26 @@ const MinistryReview = React.memo(({ userDetail }) => {
     setcurrentrequestStatus("");
   };
 
+
+  const [unsavedPrompt, setUnsavedPrompt] = useState(false);
+  const [unsavedMessage, setUnsavedMessage] = useState(<></>);
+  const handleUnsavedContinue = () => {
+    window.removeEventListener("beforeunload", alertUser);
+    dispatch(push(`/foi/dashboard`))
+  }
+
+  const returnToQueue = (e) => {
+    if (unSavedRequest) {
+      setUnsavedMessage(<>Are you sure you want to leave? Your changes will be lost.</>)
+      setUnsavedPrompt(true)
+    } else if (recordsUploading) {
+      setUnsavedMessage(<>Are you sure you want to leave? Records are currently in the process of being uploaded.<br/> If you continue they will not be saved.</>)
+      setUnsavedPrompt(true)
+    } else {
+      dispatch(push(`/foi/dashboard`))
+    }
+  }
+
   let foitabheaderBG;
   const classes = useStyles();
 
@@ -458,7 +479,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
       <div className="foitabbedContainer">
         <div className={foitabheaderBG}>
           <div className="foileftpanelheader">
-            <a href="/foi/dashboard" aria-label="dashboard link"><i className='fa fa-home' style={{fontSize:"45px", color: "white"}}></i></a>
+            <i aria-label="dashboard link" onClick={returnToQueue} className='fa fa-home' style={{fontSize:"45px", color: "white", cursor: "pointer"}}></i>
           </div>
           <h4 className="foileftpanelrequestno">{getHeaderText(requestDetails)}</h4>
           <div className="foileftpaneldropdown">{stateBox}</div>
@@ -539,7 +560,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
                         <Chip
                           label={"Advanced Search"}
                           sx={{ backgroundColor: '#fff', border:'1px solid #038', color: '#038', height: 19, cursor: 'pointer' }}
-                          onClick={() => dispatch(push(`/foi/dashboard`))}
+                          onClick={returnToQueue}
                         />
                       }
                       {!showAdvancedSearch &&
@@ -547,7 +568,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
                           icon={<HomeIcon fontSize="small" sx={{color: '#038 !important'}}/>}
                           label={"Request Queue"}
                           sx={{ backgroundColor: '#fff', border:'1px solid #038', color: '#038', height: 19, cursor: 'pointer' }}
-                          onClick={() => dispatch(push(`/foi/dashboard`))}
+                          onClick={returnToQueue}
                         />
                       }
                       <Chip
@@ -702,6 +723,12 @@ const MinistryReview = React.memo(({ userDetail }) => {
               <Loading />
             )}
           </div>
+          <UnsavedModal
+            modalOpen={unsavedPrompt}
+            handleClose={() => setUnsavedPrompt(false)}
+            handleContinue={handleUnsavedContinue}
+            modalMessage={unsavedMessage}
+          />
         </div>
       </div>
     </div>
