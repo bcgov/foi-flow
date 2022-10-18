@@ -670,6 +670,13 @@ const FOIRequest = React.memo(({ userDetail }) => {
   
   const showAdvancedSearch = useSelector((state) => state.foiRequests.showAdvancedSearch)
 
+  const showRecordsTab = () => {
+    return (requestState !== StateEnum.intakeinprogress.name &&
+      requestState !== StateEnum.unopened.name &&
+      requestState !== StateEnum.open.name
+    );
+  }
+
   const disableBannerForClosed = () => {
    if(stateTransition?.find( ({ status }) => status?.toLowerCase() === StateEnum.intakeinprogress.name.toLowerCase())){
       if(axisMessage === "WARNING")
@@ -737,7 +744,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
                   Comments{" "}
                   {requestNotes?.length > 0 ? `(${requestNotes.length})` : ""}
                 </div>
-                <div
+                {showRecordsTab && <div
                   className={clsx("tablinks", {
                     active: tabLinksStatuses.Records.active,
                   })}
@@ -745,7 +752,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
                   onClick={() => tabclick("Records")}
                 >
                   Records
-                </div>
+                </div>}
               </>
             )}
           </div>
@@ -1032,7 +1039,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
               [classes.hidden]: !tabLinksStatuses.Records.display,
             })}
           >
-            {!isAttachmentListLoading &&
+            {showRecordsTab() && !isAttachmentListLoading &&
             (iaoassignedToList?.length > 0 ||
               ministryAssignedToList?.length > 0) ? (
               <>
