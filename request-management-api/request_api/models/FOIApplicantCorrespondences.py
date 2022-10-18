@@ -7,6 +7,7 @@ from .default_method_result import DefaultMethodResult
 from sqlalchemy.sql.expression import distinct
 from sqlalchemy import or_,and_,text
 from .FOIApplicantCorrespondenceAttachments import FOIApplicantCorrespondenceAttachment
+from sqlalchemy.dialects.postgresql import JSON, UUID
 
 class FOIApplicantCorrespondence(db.Model):
     # Name of the table in our database
@@ -22,8 +23,11 @@ class FOIApplicantCorrespondence(db.Model):
     parentapplicantcorrespondenceid = db.Column(db.Integer)
     templateid = db.Column(db.Integer, nullable=True)
     correspondencemessagejson = db.Column(db.Text, unique=False, nullable=False)
+
+    sentcorrespondencemessage = db.Column(JSON, unique=False, nullable=True)
+    sent_at = db.Column(db.DateTime, nullable=True)
+    sentby = db.Column(db.String(120), unique=False, nullable=True)
    
- 
     created_at = db.Column(db.DateTime, default=datetime.now)
     updated_at = db.Column(db.DateTime, nullable=True)
     createdby = db.Column(db.String(120), unique=False, nullable=False)
@@ -74,8 +78,19 @@ class FOIApplicantCorrespondence(db.Model):
 
         return DefaultMethodResult(True,'applicantcorrepondence log added',newapplicantcorrepondencelog.applicantcorrespondenceid)    
 
-    
+
+    @classmethod
+    def updatesentcorrespondence(cls, applicantcorrespondenceid, content)->DefaultMethodResult: 
+        dbquery = db.session.query(FOIApplicantCorrespondence)
+        _correspondence = dbquery.filter_by(applicantcorrespondenceid=applicantcorrespondenceid)
+        if(_correspondence.count() > 0) :
+            _correspondence.update({FOIApplicantCorrespondence.sentcorrespondencemessage:content, FOIApplicantCorrespondence.sent_at:datetime.now(), FOIApplicantCorrespondence.sentby:"System Generated Email"}, synchronize_session = False)
+            db.session.commit()
+            return DefaultMethodResult(True,'Applicant correspondence updated for Id',applicantcorrespondenceid)
+        else:
+            return DefaultMethodResult(False,'Applicant correspondence not exists',-1)        
+
 class FOIApplicantCorrespondenceSchema(ma.Schema):
     class Meta:
-        fields = ('applicantcorrespondenceid','parentapplicantcorrespondenceid', 'templateid','correspondencemessagejson','foiministryrequest_id','foiministryrequestversion_id','created_at','createdby','attachments')
+        fields = ('applicantcorrespondenceid','parentapplicantcorrespondenceid', 'templateid','correspondencemessagejson','foiministryrequest_id','foiministryrequestversion_id','created_at','createdby','attachments','sentcorrespondencemessage','sent_at','sentby')
     

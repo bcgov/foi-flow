@@ -32,30 +32,34 @@ class applicantcorrespondenceservice:
                     }
                     attachments.append(attachment)
                 (_correspondencemessagejson, _isjson) = self.__getjsonobject(_correpondencelog['correspondencemessagejson'])
+                _sentcorrespondencemessagejson = json.loads(_correpondencelog["sentcorrespondencemessage"]) if _correpondencelog['sentcorrespondencemessage'] not in [None,''] else None
                 correpondencelog ={
                     "applicantcorrespondenceid":_correpondencelog['applicantcorrespondenceid'],
                     "parentapplicantcorrespondenceid":_correpondencelog['parentapplicantcorrespondenceid'],
                     "templateid":_correpondencelog['templateid'],
-                    "text":self.__getvaluefromjson(_correspondencemessagejson, 'emailhtml') if _isjson else _correspondencemessagejson,
+                    "text": _sentcorrespondencemessagejson['message'] if _sentcorrespondencemessagejson is not None else self.__getvaluefromjson(_correspondencemessagejson, 'emailhtml') ,
                     "id": self.__getvaluefromjson(_correspondencemessagejson, 'id') if _isjson else None,
                     "type": self.__getvaluefromjson(_correspondencemessagejson, 'type') if _isjson else None,
-                    "created_at":_correpondencelog['created_at'],
-                    "createdby":_correpondencelog['createdby'],
-                    "date": maya.parse(_correpondencelog["created_at"]).datetime(to_timezone='America/Vancouver', naive=False).strftime('%Y %b %d | %I:%M %p'),
-                    "userId":_correpondencelog['createdby'],
+                    "created_at":_correpondencelog['sent_at'] if _sentcorrespondencemessagejson is not None else _correpondencelog['created_at'],
+                    "createdby":_correpondencelog['sentby'] if  _sentcorrespondencemessagejson is not None else _correpondencelog['createdby'],
+                    "date": self.__pstformat(_correpondencelog['sent_at']) if _sentcorrespondencemessagejson is not None else self.__pstformat(_correpondencelog['created_at']),
+                    "userId":_correpondencelog['sentby'] if _sentcorrespondencemessagejson is not None else _correpondencelog['createdby'],
                     "attachments" : attachments
                 }
                 correspondencelogs.append(correpondencelog)
         return correspondencelogs
 
-    def saveapplicantcorrespondencelog(self,templateid,ministryrequestid,createdby,messagehtml,attachments):
+    def saveapplicantcorrespondencelog(self, data, ministryrequestid, userid):
         applicantcorrespondencelog = FOIApplicantCorrespondence()
-        applicantcorrespondencelog.templateid = templateid
+        applicantcorrespondencelog.templateid = data['templateid']
         applicantcorrespondencelog.foiministryrequest_id = ministryrequestid
-        applicantcorrespondencelog.correspondencemessagejson = messagehtml
+        applicantcorrespondencelog.correspondencemessagejson = data['correspondencemessagejson']
         applicantcorrespondencelog.foiministryrequestversion_id =FOIMinistryRequest.getversionforrequest(ministryrequestid=ministryrequestid)
-        applicantcorrespondencelog.createdby = createdby
-        return FOIApplicantCorrespondence.saveapplicantcorrespondence(applicantcorrespondencelog,attachments)
+        applicantcorrespondencelog.createdby = userid
+        return FOIApplicantCorrespondence.saveapplicantcorrespondence(applicantcorrespondencelog,data['attachments'])
+
+    def updateapplicantcorrespondencelog(self, correspondenceid, content):
+        return FOIApplicantCorrespondence.updatesentcorrespondence(correspondenceid, content)
     
     def getapplicantcorrespondencelogbyid(self, applicantcorrespondenceid):
         applicantcorrespondence =  FOIApplicantCorrespondence.getapplicantcorrespondencebyid(applicantcorrespondenceid)
@@ -75,4 +79,7 @@ class applicantcorrespondenceservice:
         return data, True
 
     def __getvaluefromjson(self, jsonobject, property):
-        return jsonobject[property] if property in jsonobject else ""
+        return jsonobject[property] if jsonobject is not None else None
+
+    def __pstformat(self, _date):
+        return maya.parse(_date).datetime(to_timezone='America/Vancouver', naive=False).strftime('%Y %b %d | %I:%M %p')
