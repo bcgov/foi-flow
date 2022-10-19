@@ -14,6 +14,7 @@ from request_api.services.eventservice import eventservice
 from request_api.services.rawrequest.rawrequestservicegetter import rawrequestservicegetter
 from request_api.exceptions import BusinessException, Error
 from request_api.models.default_method_result import DefaultMethodResult
+import logging
 
 class rawrequestservice:
     """ FOI Raw Request management service
@@ -62,7 +63,11 @@ class rawrequestservice:
             data['assignedGroup'] = assigneegroup
             data['assignedTo'] = assignee
             json_data = json.dumps(data)
-            asyncio.ensure_future(redispubservice.publishrequest(json_data))
+            try:
+                workflowservice().createinstance(redispubservice.foirequestqueueredischannel, json_data)
+            except Exception as ex:
+                logging.error("Unable to create instance", ex)
+                asyncio.ensure_future(redispubservice.publishrequest(json_data))
         return result
 
     @staticmethod
