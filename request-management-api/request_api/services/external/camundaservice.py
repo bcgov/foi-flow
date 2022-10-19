@@ -35,3 +35,4 @@ class camundaservice:
 
 class VariableType(Enum):
     String = "String"
+    Integer = "Integer"

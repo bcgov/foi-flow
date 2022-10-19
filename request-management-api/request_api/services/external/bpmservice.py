@@ -3,7 +3,7 @@ import os
 import json
 from enum import Enum
 
-from request_api.schemas.external.bpmschema import MessageSchema, VariableSchema 
+from request_api.schemas.external.bpmschema import MessageSchema, VariableSchema, VariableMessageSchema 
 from request_api.services.external.camundaservice import camundaservice, VariableType 
 
 """
@@ -14,6 +14,18 @@ __author__      = "sumathi.thirumani@aot-technologies.com"
 
 """
 class bpmservice(camundaservice):
+
+
+    def createinstance(self, messagequeue, message, token=None):
+        if self.bpmengineresturl is not None:
+            _variables = {"variables":{}}
+            for key in message:                
+                    _variabletype = VariableType.Integer.value if key in ["id"] else  VariableType.String.value
+                    _variables["variables"][key] = {"type" : _variabletype, "value": message[key]} 
+            variableschema = VariableMessageSchema().dump(_variables)
+            return requests.post(self._getUrl_(None,self._geProcessDefinitionKey_(messagequeue)), data=json.dumps(variableschema), headers = self._getHeaders_(token))
+        else:
+            return
     
      
     def unopenedevent(self,processinstanceid, userid, messagetype, token=None):
@@ -105,11 +117,18 @@ class bpmservice(camundaservice):
         return self.unopenedcomplete(processinstanceid, data, messagetype, token)
 
 
-    def _getUrl_(self, messagetype):
+    def _getUrl_(self, messagetype, definitionkey=None):
         if messagetype is not None:
             return self.bpmengineresturl+"/message"
+        elif definitionkey is not None:
+            return self.bpmengineresturl+"/process-definition/key/"+definitionkey+"/start"
         return self.bpmengineresturl
-    
+
+    def _geProcessDefinitionKey_(self, messagequeue):
+        if messagequeue == "foi-rawrequest":
+            return "foi-request"
+        return None
+
     def _getserviceaccounttoken_(self):
         auth_response = requests.post(self.bpmtokenurl, auth=(self.bpmclientid, self.bpmclientsecret), headers={
             'Content-Type': 'application/x-www-form-urlencoded'}, data='grant_type=client_credentials')
@@ -138,5 +157,3 @@ class MessageType(Enum):
     feepayment = "foi-fee-payment"
     managepayment = "foi-manage-payment"
     iaocorrenspodence = "foi-iao-correnspodence"
-              
-     
