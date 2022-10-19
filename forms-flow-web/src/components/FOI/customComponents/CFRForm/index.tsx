@@ -540,7 +540,7 @@ export const CFRForm = ({
                       ))}
                     </TextField>
                   </div>
-                  {(isNewCFRForm || (formData?.cfrfeeid !== formHistory[0]?.cfrfeeid) || formHistory?.length > 1)  &&
+                  {(isNewCFRForm || (formHistory?.length > 0 && (formData?.cfrfeeid !== formHistory[0]?.cfrfeeid)) || formHistory?.length > 1)  &&
                   <>
                     <div className='foi-assigned-to-inner-container'>
                       <TextField

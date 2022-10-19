@@ -4,7 +4,8 @@ import API from "../../endpoints";
   import {
     serviceActionError,
     setApplicantCorrespondence,
-    setApplicantCorrespondenceTemplates
+    setApplicantCorrespondenceTemplates,
+    setFOICorrespondenceLoader
   } from "../../../actions/FOI/foiRequestActions";
   import { replaceUrl } from "../../../helper/FOI/helper";
   import { catchError } from "./foiServicesUtil";
@@ -41,6 +42,7 @@ export const fetchApplicantCorrespondence = (
           errorCallback("An error occured while trying to save Applicant Correspondence data");
         }
       });
+      dispatch(setFOICorrespondenceLoader(false));
     };
 };
 
@@ -55,7 +57,7 @@ export const saveEmailCorrespondence = (
   if (!ministryId) {
     dispatch(serviceActionError("No request id"));
   }
-  
+  dispatch(setFOICorrespondenceLoader(true));
   const apiUrl = replaceUrl(replaceUrl(
     API.FOI_POST_EMAIL_CORRESPONDENCE,
     "<ministryrequestid>",
