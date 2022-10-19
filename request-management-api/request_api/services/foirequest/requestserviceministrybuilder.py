@@ -102,15 +102,15 @@ class requestserviceministrybuilder(requestserviceconfigurator):
     
     def createfoirequestdocuments(self,requestschema, ministryrequestid, activeversion, userid):
         documentarr = []
-        documents = FOIMinistryRequestDocument().getdocuments(ministryrequestid, activeversion-1)
+        # documents = FOIMinistryRequestDocument().getdocuments(ministryrequestid, activeversion-1)
         # make isactive = False for all ministryRequestId and prev ministryVersion
-        FOIMinistryRequestDocument.deActivateministrydocumentsversionbyministry(ministryrequestid, activeversion, userid)
+        # FOIMinistryRequestDocument.deActivateministrydocumentsversionbyministry(ministryrequestid, activeversion, userid)
         
-        existingdocuments = self.createfoirequestdocumentfromobject(documents,ministryrequestid ,activeversion, userid)       
-        documentarr = existingdocuments
+        # existingdocuments = self.createfoirequestdocumentfromobject(documents,ministryrequestid ,activeversion, userid)       
+        # documentarr = existingdocuments
         if 'documents' in requestschema:
-            newdocuments = self.createfoirequestdocument(requestschema,ministryrequestid ,activeversion, userid)  
-            documentarr = newdocuments + existingdocuments
+            documentarr = self.createfoirequestdocument(requestschema,ministryrequestid ,activeversion, userid)  
+            # documentarr = newdocuments #+ existingdocuments
         return documentarr
 
     def createfoirequestextensions(self, ministryrequestid, activeversion, userid):
@@ -247,7 +247,7 @@ class requestserviceministrybuilder(requestserviceconfigurator):
                 ministrydocument.createdby = userid
                 ministrydocument.created_at = datetime2.now().isoformat()
                 documentarr.append(ministrydocument)
-            return documentarr    
+        return documentarr    
     
     def createfoirequestdivision(self, requestschema, requestid, version, userid):
         divisionarr = []

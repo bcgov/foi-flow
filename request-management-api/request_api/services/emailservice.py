@@ -28,8 +28,8 @@ class emailservice:
             requestjson = requestservice().getrequestdetails(requestid,ministryrequestid)
             _applicantcorrespondenceid = self.__getvaluefromschema(emailschema, "applicantcorrespondenceid")
             _templatename = self.__getvaluefromschema(emailschema, "templatename")
-            logging.info("_templatename == ", _templatename)
-            logging.info("servicename == ", servicename)
+            logging.info("_templatename == "+ _templatename)
+            logging.info("servicename == "+ servicename)
             if servicename == ServiceName.correspondence.value.upper():
                 servicename = _templatename            
             _messagepart, content = templateservice().generate_by_servicename_and_schema(servicename, requestjson, ministryrequestid, _applicantcorrespondenceid)
@@ -39,7 +39,15 @@ class emailservice:
                 _messageattachmentlist = documentservice().getapplicantcorrespondenceattachmentsbyapplicantcorrespondenceid(_applicantcorrespondenceid)
             else:
                 _messageattachmentlist = documentservice().getattachments(ministryrequestid, 'ministryrequest', templateconfig().getattachmentcategory(servicename).lower())
-            applicantcorrespondenceservice().updateapplicantcorrespondencelog(_applicantcorrespondenceid, {"message": content})
+            if _applicantcorrespondenceid:
+                applicantcorrespondenceservice().updateapplicantcorrespondencelog(_applicantcorrespondenceid, {"message": content})
+            else:
+                data = {
+                    "templateid": None,
+                    "correspondencemessagejson": {"message": content},
+                    "attachments": _messageattachmentlist
+                }
+                applicantcorrespondenceservice().saveapplicantcorrespondencelog(data, ministryrequestid, 'system')
             return senderservice().send(servicename, _messagepart, _messageattachmentlist, requestjson)
         except Exception as ex:
             logging.exception(ex)

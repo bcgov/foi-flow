@@ -119,7 +119,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
   let requestAttachments = useSelector(
     (state) => state.foiRequests.foiRequestAttachments.filter(
       attachment => {
-        return ['feeassessed-onhold', 'fee estimate - payment receipt', 'response-onhold', 'fee balance outstanding - payment receipt']
+        return ['fee estimate - payment receipt', 'response-onhold', 'fee balance outstanding - payment receipt']
         .indexOf(attachment.category.toLowerCase()) === -1
       }
     )
