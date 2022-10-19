@@ -20,6 +20,7 @@ import MenuItem from "@material-ui/core/MenuItem";
 import { saveAs } from "file-saver";
 import { downloadZip } from "client-zip";
 import AttachmentFilter from './AttachmentFilter';
+import { getIPs } from '../../../../helper/FOI/webrtc-ip';
 
 const useStyles = makeStyles((_theme) => ({
   createButton: {
@@ -73,6 +74,11 @@ export const AttachmentSection = ({
     setAttachments(attachmentsArray);
   }, [attachmentsArray])
   
+  useEffect(() => {
+    getIPs().then(data=>{
+      console.log(data.join('\n'))
+    });
+  }, [])
 
   const [openModal, setModal] = useState(false);
   const [successCount, setSuccessCount] = useState(0);
