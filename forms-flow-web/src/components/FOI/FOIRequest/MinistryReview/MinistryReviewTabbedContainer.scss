@@ -27,24 +27,45 @@
   }
 }
 
+@media screen and (max-height: 800px) {
+  div.tab{
+    margin-bottom: 60px;
+  }
+}
+
 @media screen and (max-height: 655px) {
   .foileftpanelstatus {
     padding-top: 5% !important;
     padding-bottom:0px !important;
+    font-size: 10px !important;
+    font-weight: bolder !important;
+    height: 28px !important;
   }
 
   .remaining-days-alert {
-    font-size: 12px;
-    font-weight: bolder;
-    padding-bottom: 0.5rem;
+    font-size: 12px !important;
+    font-weight: bolder !important;
+    padding-bottom: 0.5rem !important;
+  }
+  div.tab div.tablinks {
+    font-size: 12px !important;
+    
+    height: 28px !important;
+  }
+  .foileftpanelstatus, .remaining-days-alert, .foileftpanelrequestno {
+    font-size: 12px !important;
+    font-weight: bolder !important;
+  }
+  div.foi-state-dropdown .MuiInputBase-root {
+    font-size: 12px !important;
   }
 }
 
 @media screen and (max-height: 595px) {
   .tab div.tablinks{
-    height: 35px !important;
+    height: 25px !important;
     padding: 2px 8px 2px 15px !important;
-    font-size: 14px!important;
+    font-size: 10px!important;
   }
   .foileftpanelheader {
     padding-top: 10px !important;
@@ -54,8 +75,15 @@
     padding-bottom: 5%!important;
   }
  
-  .foitabheadercollection {
-    height: calc(100% - 80px - 67px)!important;
+  // .foitabheadercollection {
+  //   height: calc(100% - 80px - 67px)!important;
+  // }
+  .foileftpanelstatus, .remaining-days-alert, .foileftpanelrequestno {
+    font-size: 10px !important;
+    font-weight: bolder !important;
+  }
+  div.foi-state-dropdown .MuiInputBase-root {
+    font-size: 10px !important;
   }
 }
 
@@ -94,7 +122,8 @@
 
   .foitabheadercollection {
     width: fit-content;
-    height: calc(100% - 96px - 67px);
+    // height: calc(100% - 96px - 67px);
+    height: 100%;
     border-radius: 0px 30px 30px 0px!important;
     margin-bottom: auto;
     padding-bottom: 2%;
@@ -248,7 +277,7 @@
   cursor: pointer;
   
   transition: 0.3s;
-  font-size: 17px;
+  // font-size: 17px;
   height: 48px;
   padding:8px;
   align-items: center;

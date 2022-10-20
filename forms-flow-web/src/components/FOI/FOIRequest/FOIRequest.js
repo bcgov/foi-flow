@@ -68,7 +68,7 @@ import {
   isAxisSyncDisplayField,
   getUniqueIdentifier
 } from "./utils";
-import { ConditionalComponent } from '../../../helper/FOI/helper';
+import { ConditionalComponent, formatDate } from '../../../helper/FOI/helper';
 import DivisionalTracking from './DivisionalTracking';
 import AxisDetails from './AxisDetails/AxisDetails';
 import AxisMessageBanner from "./AxisDetails/AxisMessageBanner";
@@ -272,8 +272,9 @@ const FOIRequest = React.memo(({ userDetail }) => {
             setAxisMessage("ERROR");
         }
       }
-      else
+      else{
         setAxisMessage("ERROR");
+      }
     }));
   }
 
@@ -293,13 +294,15 @@ const FOIRequest = React.memo(({ userDetail }) => {
   const checkValidation = (key,axisData) => {
     let mandatoryField = isMandatoryField(key);
     if(key === 'additionalPersonalInfo'){
-      let foiReqAdditionalPersonalInfo = requestDetails[key];
-      let axisAdditionalPersonalInfo = axisData[key];
-      for(let axisKey of Object.keys(axisAdditionalPersonalInfo)){
-        for(let reqKey of Object.keys(foiReqAdditionalPersonalInfo)){
-          if(axisKey === reqKey){
-            if(axisAdditionalPersonalInfo[axisKey] !== foiReqAdditionalPersonalInfo[axisKey] ){
-              return true;
+      if(axisData.requestType === 'personal'){
+        let foiReqAdditionalPersonalInfo = requestDetails[key];
+        let axisAdditionalPersonalInfo = axisData[key];
+        for(let axisKey of Object.keys(axisAdditionalPersonalInfo)){
+          for(let reqKey of Object.keys(foiReqAdditionalPersonalInfo)){
+            if(axisKey === reqKey){
+              if(axisAdditionalPersonalInfo[axisKey] !== foiReqAdditionalPersonalInfo[axisKey] ){
+                return true;
+              }
             }
           }
         }
@@ -319,9 +322,17 @@ const FOIRequest = React.memo(({ userDetail }) => {
   const extensionComparison = (axisData, key) => {
     if(requestExtensions.length !== axisData[key].length)
         return true;
-    const axisReasonIds = axisData[key].map(x => x.extensionreasonid);
-    const foiReqReasonIds = requestExtensions.map(x => x.extensionreasonid);
-    if(axisReasonIds.filter(x => !foiReqReasonIds.includes(x))?.length > 0){
+    let axisUniqueIds = [];
+    let foiUniqueIds = [];
+    axisData[key]?.forEach(axisObj => {
+      axisUniqueIds.push((axisObj.extensionstatusid+formatDate(axisObj.extendedduedate, "MMM dd yyyy")+
+      axisObj.extensionreasonid).replace(/\s+/g, ''));
+    })
+    requestExtensions.forEach(obj => {
+      foiUniqueIds.push((obj.extensionstatusid+formatDate(obj.extendedduedate, "MMM dd yyyy")+
+      obj.extensionreasonid).replace(/\s+/g, ''));
+    })
+    if(axisUniqueIds.filter(x => !foiUniqueIds.includes(x))?.length > 0){
       return true;
     }
       
@@ -599,6 +610,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
 
   const tabclick = (param) => {
     if (param === "Comments") {
+      sessionStorage.setItem('foicommentcategory',1) 
       setRemoveComment(false);
       changeTabLinkStatuses(param);
       return;
@@ -695,11 +707,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
     <div className={`foiformcontent ${axisMessage === "WARNING" && !disableBannerForClosed() && 'request-scrollbar-height'}`}>
       <div className="foitabbedContainer">
         <div className={foitabheaderBG}>
-          <div className="foileftpanelheader">
-            <a href="/foi/dashboard" aria-label="dashboard link">
-              <i className='fa fa-home' style={{fontSize:"45px", color:"#fff"}}></i>
-            </a>
-          </div>
+          <h4 className="foileftpanelrequestno">{headerText}</h4>
           <div className="foileftpaneldropdown">
             <StateDropDown
               requestState={requestState}
