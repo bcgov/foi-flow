@@ -47,7 +47,10 @@ class GetFOIDocument(Resource):
         if requesttype != "ministryrequest" and requesttype != "rawrequest":
             return {'status': False, 'message':'Bad Request'}, 400          
         try:
+            print("here")
             print(request.remote_addr)
+            print(request.environ['REMOTE_ADDR'])
+            print(request.environ['HTTP_X_FORWARDED_FOR'])
             result = documentservice().getrequestdocumentsbyrole(requestid, requesttype, AuthHelper.isministrymember())
             return json.dumps(result), 200
         except KeyError as err:
