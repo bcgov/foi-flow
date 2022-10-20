@@ -73,12 +73,7 @@ export const AttachmentSection = ({
   useEffect(() => {
     setAttachments(attachmentsArray);
   }, [attachmentsArray])
-  
-  useEffect(() => {
-    getIPs().then(data=>{
-      console.log(data.join('\n'))
-    });
-  }, [])
+
 
   const [openModal, setModal] = useState(false);
   const [successCount, setSuccessCount] = useState(0);
@@ -95,6 +90,9 @@ export const AttachmentSection = ({
   const [keywordValue, setKeywordValue] = useState('');
 
   const addAttachments = () => {
+    getIPs().then(data=>{
+      console.log(data.join('\n'))
+    });
     setModalFor('add');
     setMultipleFiles(true);
     setUpdateAttachment({});
