@@ -27,6 +27,12 @@
   }
 }
 
+@media screen and (max-height: 1024px) {
+  div.tab{
+    margin-bottom: 160px;
+  }
+}
+
 @media screen and (max-height: 800px) {
   div.tab{
     margin-bottom: 60px;
@@ -46,6 +52,9 @@
     font-size: 12px !important;
     font-weight: bolder !important;
     padding-bottom: 0.5rem !important;
+  }
+  div.tab{
+    margin-bottom: 30px;
   }
   div.tab div.tablinks {
     font-size: 12px !important;
