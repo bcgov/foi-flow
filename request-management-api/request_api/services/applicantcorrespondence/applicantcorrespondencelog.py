@@ -41,15 +41,13 @@ class applicantcorrespondenceservice:
         applicantcorrespondencelog.templateid = data['templateid']
         applicantcorrespondencelog.foiministryrequest_id = ministryrequestid
         applicantcorrespondencelog.foiministryrequestversion_id =FOIMinistryRequest.getversionforrequest(ministryrequestid=ministryrequestid)
-
         if userid == 'system':
             applicantcorrespondencelog.sentcorrespondencemessage = data['correspondencemessagejson']
-            applicantcorrespondencelog.sent_at = datetime.now()
             applicantcorrespondencelog.sentby = 'System Generated Email'
+            applicantcorrespondencelog.sent_at = datetime.now()
         else:
             applicantcorrespondencelog.correspondencemessagejson = data['correspondencemessagejson']
-            applicantcorrespondencelog.createdby = userid
-       
+            applicantcorrespondencelog.createdby = userid       
         return FOIApplicantCorrespondence.saveapplicantcorrespondence(applicantcorrespondencelog,data['attachments'])
 
     def updateapplicantcorrespondencelog(self, correspondenceid, content):
