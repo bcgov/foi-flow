@@ -393,6 +393,7 @@ export const AttachmentSection = ({
             attachment={updateAttachment}
             attachmentsArray={attachmentsArray}
             handleRename={handleRename}
+            maxNoFiles={10}
             isMinistryCoordinator={isMinistryCoordinator}
           />
         </>

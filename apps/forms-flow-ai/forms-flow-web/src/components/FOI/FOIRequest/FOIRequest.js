@@ -32,6 +32,7 @@ import {
   fetchFOIRequestAttachmentsList
 } from "../../../apiManager/services/FOI/foiAttachmentServices";
 import { fetchFOIRequestNotesList } from "../../../apiManager/services/FOI/foiRequestNoteServices";
+import { fetchFOIRecords } from "../../../apiManager/services/FOI/foiRecordServices";
 import { makeStyles } from '@material-ui/core/styles';
 import FOI_COMPONENT_CONSTANTS from '../../../constants/FOI/foiComponentConstants';
 import { push } from "connected-react-router";
@@ -64,6 +65,8 @@ import DivisionalTracking from './DivisionalTracking';
 import AxisDetails from './AxisDetails/AxisDetails';
 import AxisMessageBanner from "./AxisDetails/AxisMessageBanner";
 import HomeIcon from '@mui/icons-material/Home';
+import { RecordsLog } from '../customComponents/Records';
+import { UnsavedModal } from "../customComponents";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -110,6 +113,9 @@ const FOIRequest = React.memo(({ userDetail }) => {
   let requestAttachments = useSelector(
     (state) => state.foiRequests.foiRequestAttachments
   );
+  let requestRecords = useSelector(
+    (state) => state.foiRequests.foiRequestRecords
+  );
   const [attachments, setAttachments] = useState(requestAttachments);
   const [comment, setComment] = useState([]);
   const [requestState, setRequestState] = useState(StateEnum.unopened.name);
@@ -117,6 +123,26 @@ const FOIRequest = React.memo(({ userDetail }) => {
     requestState?.toLowerCase() === StateEnum.closed.name.toLowerCase();
   const [_tabStatus, settabStatus] = React.useState(requestState);
   let foitabheaderBG = getTabBG(_tabStatus, requestState);
+
+  const [unsavedPrompt, setUnsavedPrompt] = useState(false);
+  const [unsavedMessage, setUnsavedMessage] = useState(<></>);
+  const handleUnsavedContinue = () => {
+    window.removeEventListener("popstate");
+    window.removeEventListener("beforeunload", handleBeforeUnload);
+    dispatch(push(`/foi/dashboard`))
+  }
+
+  const returnToQueue = (e) => {
+    if (unSavedRequest) {
+      setUnsavedMessage(<>Are you sure you want to leave? Your changes will be lost.</>)
+      setUnsavedPrompt(true)
+    } else if (recordsUploading) {
+      setUnsavedMessage(<>Are you sure you want to leave? Records are currently in the process of being uploaded.<br/> If you continue they will not be saved.</>)
+      setUnsavedPrompt(true)
+    } else {
+      dispatch(push(`/foi/dashboard`))
+    }
+  }
 
 
   //editorChange and removeComment added to handle Navigate away from Comments tabs
@@ -136,7 +162,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
       display: false,
       active: false,
     },
-    Option4: {
+    Records: {
       display: false,
       active: false,
     },
@@ -179,6 +205,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
       dispatch(fetchFOIRequestDescriptionList(requestId, ministryId));
       dispatch(fetchFOIRequestNotesList(requestId, ministryId));
       dispatch(fetchFOIRequestAttachmentsList(requestId, ministryId));
+      dispatch(fetchFOIRecords(requestId, ministryId));
     }
 
     dispatch(fetchFOICategoryList());
@@ -377,6 +404,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
     requiredContactDetailsValue
   );
   const [unSavedRequest, setUnSavedRequest] = React.useState(false);
+  const [recordsUploading, setRecordsUploading] = React.useState(false);
   const [headerValue, setHeader] = useState("");
   const [requiredAxisDetails, setRequiredAxisDetails] = React.useState(
     requiredAxisDetailsValue
@@ -642,6 +670,13 @@ const FOIRequest = React.memo(({ userDetail }) => {
   
   const showAdvancedSearch = useSelector((state) => state.foiRequests.showAdvancedSearch)
 
+  const showRecordsTab = () => {
+    return (requestState !== StateEnum.intakeinprogress.name &&
+      requestState !== StateEnum.unopened.name &&
+      requestState !== StateEnum.open.name
+    );
+  }
+
   const disableBannerForClosed = () => {
    if(stateTransition?.find( ({ status }) => status?.toLowerCase() === StateEnum.intakeinprogress.name.toLowerCase())){
       if(axisMessage === "WARNING")
@@ -659,9 +694,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
       <div className="foitabbedContainer">
         <div className={foitabheaderBG}>
           <div className="foileftpanelheader">
-            <a href="/foi/dashboard" aria-label="dashboard link">
-              <i className='fa fa-home' style={{fontSize:"45px", color:"#fff"}}></i>
-            </a>
+            <i aria-label="dashboard link" onClick={returnToQueue} className='fa fa-home' style={{fontSize:"45px", color: "white", cursor: "pointer"}}></i>           
           </div>
           <h4 className="foileftpanelrequestno">{headerText}</h4>
           <div className="foileftpaneldropdown">
@@ -711,6 +744,15 @@ const FOIRequest = React.memo(({ userDetail }) => {
                   Comments{" "}
                   {requestNotes?.length > 0 ? `(${requestNotes.length})` : ""}
                 </div>
+                {showRecordsTab && <div
+                  className={clsx("tablinks", {
+                    active: tabLinksStatuses.Records.active,
+                  })}
+                  name="Records"
+                  onClick={() => tabclick("Records")}
+                >
+                  Records
+                </div>}
               </>
             )}
           </div>
@@ -753,7 +795,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
                         <Chip
                           label={"Advanced Search"}
                           sx={{ backgroundColor: '#fff', border:'1px solid #038', color: '#038', height: 19, cursor: 'pointer' }}
-                          onClick={() => dispatch(push(`/foi/dashboard`))}
+                          onClick={returnToQueue}
                         />
                       }
                       {!showAdvancedSearch &&
@@ -761,7 +803,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
                           icon={<HomeIcon fontSize="small" sx={{color: '#038 !important'}}/>}
                           label={"Request Queue"}
                           sx={{ backgroundColor: '#fff', border:'1px solid #038', color: '#038', height: 19, cursor: 'pointer' }}
-                          onClick={() => dispatch(push(`/foi/dashboard`))}
+                          onClick={returnToQueue}
                         />
                       }
                       <Chip
@@ -899,6 +941,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
                         urlIndexCreateRequest={urlIndexCreateRequest}
                         saveRequestObject={saveRequestObject}
                         unSavedRequest={unSavedRequest}
+                        recordsUploading={recordsUploading}
                         handleSaveRequest={handleSaveRequest}
                         handleOpenRequest={handleOpenRequest}
                         currentSelectedStatus={_currentrequestStatus}
@@ -988,6 +1031,40 @@ const FOIRequest = React.memo(({ userDetail }) => {
               <Loading />
             )}
           </div>
+          <div
+            id="Records"
+            className={clsx("tabcontent", {
+              active: tabLinksStatuses.Records.active,
+              [classes.displayed]: tabLinksStatuses.Records.display,
+              [classes.hidden]: !tabLinksStatuses.Records.display,
+            })}
+          >
+            {showRecordsTab() && !isAttachmentListLoading &&
+            (iaoassignedToList?.length > 0 ||
+              ministryAssignedToList?.length > 0) ? (
+              <>
+                <RecordsLog
+                  recordsArray={requestRecords}
+                  requestId={requestId}
+                  ministryId={ministryId}
+                  requestNumber={requestNumber}
+                  iaoassignedToList={iaoassignedToList}
+                  ministryAssignedToList={ministryAssignedToList}
+                  isMinistryCoordinator={false}
+                  bcgovcode={requestDetails.bcgovcode}
+                  setRecordsUploading={setRecordsUploading}
+                />
+              </>
+            ) : (
+              <Loading />
+            )}
+          </div>
+          <UnsavedModal
+            modalOpen={unsavedPrompt}
+            handleClose={() => setUnsavedPrompt(false)}
+            handleContinue={handleUnsavedContinue}
+            modalMessage={unsavedMessage}
+          />
         </div>
       </div>
     </div>

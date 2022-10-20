@@ -12,14 +12,8 @@ export const calculateStageCounter = (existingDivStages) => {
   }
 
   return existingDivStages.map((item, index) => {
-    return {
-      id: index,
-      divisionid: item.divisionid,
-      stageid: item.stageid,
-      divisionDueDate: item.divisionDueDate,
-      eApproval: item.eApproval,
-      divisionReceivedDate: item.divisionReceivedDate
-    };
+    item.id = index;
+    return item;
   });
 };
 

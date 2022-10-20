@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useSelector } from "react-redux";
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
@@ -12,7 +13,7 @@ import './attachmentmodal.scss';
 import FileUpload from '../FileUpload';
 import { makeStyles } from '@material-ui/core/styles';
 import { MimeTypeList, MaxFileSizeInMB } from "../../../../constants/FOI/enum";
-import { StateTransitionCategories } from '../../../../constants/FOI/statusEnum';
+import { StateTransitionCategories, AttachmentCategories } from '../../../../constants/FOI/statusEnum';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -37,17 +38,53 @@ const useStyles = makeStyles((theme) => ({
 
 }));
 
-export default function AttachmentModal({ modalFor, openModal, handleModal, multipleFiles, requestNumber, requestId, attachment, attachmentsArray, handleRename, isMinistryCoordinator }) {
+export default function AttachmentModal({
+  modalFor,
+  openModal,
+  handleModal,
+  multipleFiles,
+  requestNumber,
+  requestId,
+  attachment,
+  attachmentsArray,
+  handleRename,
+  isMinistryCoordinator,
+  uploadFor="attachment",
+  maxNoFiles,
+  bcgovcode
+}) {
+
+    const divisions = useSelector(state => isMinistryCoordinator ?
+      state.foiRequests.foiMinistryViewRequestDetail.divisions :
+      state.foiRequests.foiRequestDetail.divisions
+    );
+
+    // const ministryCode = useSelector()
+
+    let tagList = [];
+    if(uploadFor === 'attachment') {
+      tagList = AttachmentCategories.categorys.filter(category => category.type.includes("tag"));
+      if (isMinistryCoordinator) {
+        tagList = tagList.filter(tag => tag.name !== "applicant")
+      }
+    } else if (uploadFor === 'records') {
+      tagList = divisions.map(division => {
+        return {
+          name: division.divisionid,
+          display: division.divisionname,
+        }
+      });
+    }
 
     const mimeTypes = multipleFiles ? MimeTypeList.attachmentLog : MimeTypeList.stateTransition;
-    const maxFileSize = multipleFiles ? MaxFileSizeInMB.attachmentLog : MaxFileSizeInMB.stateTransition;
+    const maxFileSize = uploadFor === 'records' ? MaxFileSizeInMB.totalFileSize : multipleFiles ? MaxFileSizeInMB.attachmentLog : MaxFileSizeInMB.stateTransition;
     const totalFileSize = multipleFiles ? MaxFileSizeInMB.totalFileSize : MaxFileSizeInMB.stateTransition;
     const classes = useStyles();
     const [files, setFiles] = useState([]);
     const [newFilename, setNewFilename] = useState("");
     const [extension, setExtension] = useState("");
     const [errorMessage, setErrorMessage] = useState();
-    const [tagValue, setTagValue] = useState("general");
+    const [tagValue, setTagValue] = useState(tagList[0].name || "general");
     const attchmentFileNameList = attachmentsArray.map(_file => _file.filename.toLowerCase());
 
     useEffect(() => {
@@ -139,16 +176,18 @@ export default function AttachmentModal({ modalFor, openModal, handleModal, mult
         let fileStatusTransition = "";
         if (modalFor === 'replace') {
           fileStatusTransition = attachment?.category;
-        }
-        else {
-          fileStatusTransition = tagValue;
+        } else if (uploadFor === "records") {
+          fileStatusTransition = divisions.find(division => division.divisionid === tagValue).divisionname;
+        } else {
+          fileStatusTransition = tagValue
         }
         fileInfoList = files?.map(file => {
           return {
-              ministrycode: "Misc",
+              ministrycode: uploadFor === "records" ? bcgovcode : "Misc",
               requestnumber: requestNumber ? requestNumber : `U-00${requestId}`,
               filestatustransition: fileStatusTransition,
               filename: file.filename? file.filename : file.name,
+              ...(uploadFor === "records") && {divisionid: tagValue}
           }
         });
         
@@ -226,9 +265,11 @@ export default function AttachmentModal({ modalFor, openModal, handleModal, mult
                   totalFileSize={totalFileSize} 
                   updateFilesCb={updateFilesCb}
                   modalFor={modalFor}
+                  uploadFor={uploadFor}
+                  tagList={tagList}
                   handleTagChange={handleTagChange}
                   tagValue={tagValue}
-                  isMinistryCoordinator={isMinistryCoordinator}
+                  maxNumberOfFiles={maxNoFiles}
                 /> 
                 :
                 <ModalForRename modalFor={modalFor} newFilename={newFilename} updateFilename={updateFilename} errorMessage={errorMessage} extension={extension} />

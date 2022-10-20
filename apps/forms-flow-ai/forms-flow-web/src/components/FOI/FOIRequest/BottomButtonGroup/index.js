@@ -55,6 +55,7 @@ const BottomButtonGroup = React.memo(
     urlIndexCreateRequest,
     saveRequestObject,
     unSavedRequest,
+    recordsUploading,
     handleSaveRequest,
     handleOpenRequest,
     currentSelectedStatus,
@@ -175,7 +176,7 @@ const BottomButtonGroup = React.memo(
     }, [currentSelectedStatus, stateChanged]);
 
     React.useEffect(() => {
-      if (unSavedRequest) {
+      if (unSavedRequest || recordsUploading) {
         window.history.pushState(null, null, window.location.pathname);
         window.addEventListener("popstate", handleOnHashChange);
         window.addEventListener("beforeunload", handleBeforeUnload);
@@ -184,7 +185,7 @@ const BottomButtonGroup = React.memo(
           window.removeEventListener("beforeunload", handleBeforeUnload);
         };
       }
-    }, [unSavedRequest]);
+    }, [unSavedRequest, recordsUploading]);
 
     const openRequest = () => {
       saveRequestObject.id = saveRequestObject.id
@@ -377,7 +378,7 @@ const BottomButtonGroup = React.memo(
           <button
             type="button"
             className={`btn btn-bottom ${classes.btnsecondaryenabled}`}
-            onClick={(e) => returnToQueue(e, unSavedRequest)}
+            onClick={(e) => returnToQueue(e, unSavedRequest || recordsUploading)}
           >
             Return to Queue
           </button>

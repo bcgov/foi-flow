@@ -25,6 +25,8 @@ import {
   fetchFOIRequestNotesList
 } from "../../../../apiManager/services/FOI/foiRequestNoteServices";
 
+import { fetchFOIRecords } from "../../../../apiManager/services/FOI/foiRecordServices";
+
 import {
   ConditionalComponent,
   calculateDaysRemaining,
@@ -47,6 +49,8 @@ import clsx from "clsx";
 import { getMinistryBottomTextMap, alertUser, getHeaderText } from "./utils";
 import DivisionalTracking from "../DivisionalTracking";
 import HomeIcon from '@mui/icons-material/Home';
+import { RecordsLog } from '../../customComponents/Records';
+import { UnsavedModal } from "../../customComponents";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -103,6 +107,9 @@ const MinistryReview = React.memo(({ userDetail }) => {
   let requestAttachments = useSelector(
     (state) => state.foiRequests.foiRequestAttachments
   );
+  let requestRecords = useSelector(
+    (state) => state.foiRequests.foiRequestRecords
+  );
 
   const requestExtensions = useSelector(
     (state) => state.foiRequests.foiRequestExtesions
@@ -130,7 +137,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
       display: false,
       active: false,
     },
-    Option4: {
+    Records: {
       display: false,
       active: false,
     },
@@ -160,6 +167,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
       dispatch(fetchFOIRequestDescriptionList(requestId, ministryId));
       dispatch(fetchFOIRequestNotesList(requestId, ministryId));
       dispatch(fetchFOIRequestAttachmentsList(requestId, ministryId));
+      dispatch(fetchFOIRecords(requestId, ministryId));
       if (bcgovcode) dispatch(fetchFOIMinistryAssignedToList(bcgovcode));
     }
   }, [requestId, ministryId, comment, attachments]);
@@ -191,6 +199,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
   }, [requestDetails]);
 
   const [unSavedRequest, setUnSavedRequest] = React.useState(false);
+  const [recordsUploading, setRecordsUploading] = React.useState(false);
   const hideBottomText = [
     StateEnum.onhold.name.toLowerCase(),
     StateEnum.closed.name.toLowerCase(),
@@ -241,6 +250,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
       setUnSavedRequest(_unSaved);
       dispatch(fetchFOIMinistryViewRequestDetails(requestId, ministryId));
       dispatch(fetchFOIRequestAttachmentsList(requestId, ministryId));
+      dispatch(fetchFOIRecords(requestId, ministryId));
       setStateChanged(false);
       setcurrentrequestStatus(_state);
       setTimeout(() => {
@@ -263,6 +273,26 @@ const MinistryReview = React.memo(({ userDetail }) => {
     settabStatus(state);
     setcurrentrequestStatus("");
   };
+
+
+  const [unsavedPrompt, setUnsavedPrompt] = useState(false);
+  const [unsavedMessage, setUnsavedMessage] = useState(<></>);
+  const handleUnsavedContinue = () => {
+    window.removeEventListener("beforeunload", alertUser);
+    dispatch(push(`/foi/dashboard`))
+  }
+
+  const returnToQueue = (e) => {
+    if (unSavedRequest) {
+      setUnsavedMessage(<>Are you sure you want to leave? Your changes will be lost.</>)
+      setUnsavedPrompt(true)
+    } else if (recordsUploading) {
+      setUnsavedMessage(<>Are you sure you want to leave? Records are currently in the process of being uploaded.<br/> If you continue they will not be saved.</>)
+      setUnsavedPrompt(true)
+    } else {
+      dispatch(push(`/foi/dashboard`))
+    }
+  }
 
   let foitabheaderBG;
   const classes = useStyles();
@@ -449,7 +479,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
       <div className="foitabbedContainer">
         <div className={foitabheaderBG}>
           <div className="foileftpanelheader">
-            <a href="/foi/dashboard" aria-label="dashboard link"><i className='fa fa-home' style={{fontSize:"45px", color: "white"}}></i></a>
+            <i aria-label="dashboard link" onClick={returnToQueue} className='fa fa-home' style={{fontSize:"45px", color: "white", cursor: "pointer"}}></i>
           </div>
           <h4 className="foileftpanelrequestno">{getHeaderText(requestDetails)}</h4>
           <div className="foileftpaneldropdown">{stateBox}</div>
@@ -488,6 +518,15 @@ const MinistryReview = React.memo(({ userDetail }) => {
                 ? `(${requestNotes.length})`
                 : ""}
             </div>
+            <div
+              className={clsx("tablinks", {
+                active: tabLinksStatuses.Records.active,
+              })}
+              name="Records"
+              onClick={() => tabclick("Records")}
+            >
+              Records
+            </div>
           </div>
 
           <div className="foileftpanelstatus">
@@ -521,7 +560,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
                         <Chip
                           label={"Advanced Search"}
                           sx={{ backgroundColor: '#fff', border:'1px solid #038', color: '#038', height: 19, cursor: 'pointer' }}
-                          onClick={() => dispatch(push(`/foi/dashboard`))}
+                          onClick={returnToQueue}
                         />
                       }
                       {!showAdvancedSearch &&
@@ -529,7 +568,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
                           icon={<HomeIcon fontSize="small" sx={{color: '#038 !important'}}/>}
                           label={"Request Queue"}
                           sx={{ backgroundColor: '#fff', border:'1px solid #038', color: '#038', height: 19, cursor: 'pointer' }}
-                          onClick={() => dispatch(push(`/foi/dashboard`))}
+                          onClick={returnToQueue}
                         />
                       }
                       <Chip
@@ -571,6 +610,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
                           isValidationError={isValidationError}
                           saveMinistryRequestObject={saveMinistryRequestObject}
                           unSavedRequest={unSavedRequest}
+                          recordsUploading={recordsUploading}
                           handleSaveRequest={handleSaveRequest}
                           currentSelectedStatus={_currentrequestStatus}
                           hasStatusRequestSaved={hasStatusRequestSaved}
@@ -622,8 +662,8 @@ const MinistryReview = React.memo(({ userDetail }) => {
           >
             {!isLoading &&
             requestNotes &&
-            iaoassignedToList.length > 0 ||
-            ministryAssignedToList.length > 0 ? (
+            iaoassignedToList?.length > 0 ||
+            ministryAssignedToList?.length > 0 ? (
               <>
                 <CommentSection
                   currentUser={
@@ -655,6 +695,40 @@ const MinistryReview = React.memo(({ userDetail }) => {
               <Loading />
             )}
           </div>
+          <div
+            id="Records"
+            className={clsx("tabcontent", {
+              active: tabLinksStatuses.Records.active,
+              [classes.displayed]: tabLinksStatuses.Records.display,
+              [classes.hidden]: !tabLinksStatuses.Records.display,
+            })}
+          >
+            {!isAttachmentListLoading &&
+            (iaoassignedToList?.length > 0 ||
+              ministryAssignedToList?.length > 0) ? (
+              <>
+                <RecordsLog
+                  recordsArray={requestRecords}
+                  requestId={requestId}
+                  ministryId={ministryId}
+                  requestNumber={requestNumber}
+                  iaoassignedToList={iaoassignedToList}
+                  ministryAssignedToList={ministryAssignedToList}
+                  isMinistryCoordinator={true}
+                  bcgovcode={JSON.parse(bcgovcode)}
+                  setRecordsUploading={setRecordsUploading}
+                />
+              </>
+            ) : (
+              <Loading />
+            )}
+          </div>
+          <UnsavedModal
+            modalOpen={unsavedPrompt}
+            handleClose={() => setUnsavedPrompt(false)}
+            handleContinue={handleUnsavedContinue}
+            modalMessage={unsavedMessage}
+          />
         </div>
       </div>
     </div>

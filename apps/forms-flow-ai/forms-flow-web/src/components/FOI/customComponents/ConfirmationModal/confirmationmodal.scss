@@ -60,7 +60,7 @@
 }
 
 #state-change-dialog-description {
-    padding-left: 50px;
+    display: block;
     color: black; 
 }
 
@@ -121,4 +121,8 @@
 
 .dialog-content-nomargin {
     margin: initial;
+}
+
+#state-change-dialog .MuiDialogContent-root, #state-change-dialog .MuiDialogActions-root {
+    padding: 20px 100px !important;
 }
