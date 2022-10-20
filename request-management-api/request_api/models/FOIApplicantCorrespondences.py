@@ -59,13 +59,10 @@ class FOIApplicantCorrespondence(db.Model):
 
     @classmethod
     def saveapplicantcorrespondence(cls, newapplicantcorrepondencelog,attachments)->DefaultMethodResult: 
-        
         db.session.add(newapplicantcorrepondencelog)
         db.session.commit()
-        
         try:
             if(attachments is not None and len(attachments) > 0):
-
                 for _attachment in attachments:
                     attachment = FOIApplicantCorrespondenceAttachment()
                     attachment.applicantcorrespondenceid = newapplicantcorrepondencelog.applicantcorrespondenceid

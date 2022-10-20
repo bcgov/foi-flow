@@ -101,7 +101,6 @@ class requestserviceministrybuilder(requestserviceconfigurator):
         }
     
     def createfoirequestdocuments(self,requestschema, ministryrequestid, activeversion, userid):
-        documentarr = []
         # documents = FOIMinistryRequestDocument().getdocuments(ministryrequestid, activeversion-1)
         # make isactive = False for all ministryRequestId and prev ministryVersion
         # FOIMinistryRequestDocument.deActivateministrydocumentsversionbyministry(ministryrequestid, activeversion, userid)
@@ -109,9 +108,9 @@ class requestserviceministrybuilder(requestserviceconfigurator):
         # existingdocuments = self.createfoirequestdocumentfromobject(documents,ministryrequestid ,activeversion, userid)       
         # documentarr = existingdocuments
         if 'documents' in requestschema:
-            documentarr = self.createfoirequestdocument(requestschema,ministryrequestid ,activeversion, userid)  
+            return self.createfoirequestdocument(requestschema,ministryrequestid ,activeversion, userid)  
             # documentarr = newdocuments #+ existingdocuments
-        return documentarr
+        return []
 
     def createfoirequestextensions(self, ministryrequestid, activeversion, userid):
         extensions = FOIRequestExtension().getextensions(ministryrequestid, activeversion-1)
@@ -119,8 +118,7 @@ class requestserviceministrybuilder(requestserviceconfigurator):
         existingextensions = self.createfoirequestextensionfromobject(extensions,ministryrequestid ,activeversion, userid)
         if existingextensions is not None:
             return existingextensions
-        else:
-            return []
+        return []
     
     def createfoirequestappplicantfromobject(self, requestapplicants, requestid, version, userid): 
         requestapplicantarr = []
