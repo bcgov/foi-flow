@@ -281,7 +281,9 @@ export const CFRForm = ({
         return false;
       }
     }
-    return !_.isEqual(initialFormData, formData);
+    let initialFormCopy = _.omit(initialFormData, ['reason']);
+    let formDataCopy = _.omit(formData, ['reason']);
+    return !_.isEqual(initialFormCopy, formDataCopy);
   }
 
   const handleAmountPaidChanges = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -540,7 +542,7 @@ export const CFRForm = ({
                       ))}
                     </TextField>
                   </div>
-                  {(isNewCFRForm || (formData?.cfrfeeid !== formHistory[0]?.cfrfeeid) || formHistory?.length > 1)  &&
+                  {(isNewCFRForm || (formHistory?.length > 0 && (formData?.cfrfeeid !== formHistory[0]?.cfrfeeid)) || formHistory?.length > 1)  &&
                   <>
                     <div className='foi-assigned-to-inner-container'>
                       <TextField
@@ -1152,7 +1154,7 @@ export const CFRForm = ({
                   className="col-lg-4 btn btn-bottom btn-save"
                   onClick={save}
                   color="primary"
-                  disabled={!validateFields() || (formData?.reason === 'init' && formHistory.length <= 0)}
+                  disabled={!validateFields() || (formData?.reason === 'init' && isNewCFRForm)}
                 >
                   Save
                 </button>

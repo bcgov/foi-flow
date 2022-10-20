@@ -20,10 +20,12 @@ import { getFullnameList } from '../../../../helper/FOI/helper'
 import CommentStructure from '../Comments/CommentStructure'
 import AttachmentModal from '../Attachments/AttachmentModal';
 import { getOSSHeaderDetails, saveFilesinS3, getFileFromS3 } from "../../../../apiManager/services/FOI/foiOSSServices";
-import {dueDateCalculation} from '../../FOIRequest/BottomButtonGroup/utils';
-import { PAYMENT_EXPIRY_DAYS} from "../../../../constants/FOI/constants";
+import { dueDateCalculation } from '../../FOIRequest/BottomButtonGroup/utils';
+import { PAYMENT_EXPIRY_DAYS } from "../../../../constants/FOI/constants";
 import { PreviewModal } from './PreviewModal';
-import { OSS_S3_BUCKET_FULL_PATH } from "../../../../constants/constants"
+import { OSS_S3_BUCKET_FULL_PATH } from "../../../../constants/constants";
+import Loading from "../../../../containers/Loading";
+import {setFOICorrespondenceLoader} from "../../../../actions/FOI/foiRequestActions";
 
 export const ContactApplicant = ({
   requestNumber,
@@ -35,9 +37,8 @@ export const ContactApplicant = ({
 }: any) => {
 
   const dispatch = useDispatch();
-
   const isCFRFormApproved: boolean = useSelector((state: any) => state.foiRequests.foiRequestCFRFormHistory.length > 0);
-
+  const isLoading: boolean = useSelector((state: any) => state.foiRequests.isCorrespondenceLoading);
   const fullNameList = getFullnameList()
 
   const getFullname = (userid: string) => {
@@ -57,18 +58,17 @@ export const ContactApplicant = ({
       setFiles(files)
   }
 
-
   const [openModal, setModal] = useState(false);
   function openAttachmentModal() {
     setModal(true);
   }
   const [files, setFiles] = useState([]);
-  const [templates, setTemplates] = useState<any[]>([{value: "", label: "", templateid: null, text: "", disabled: true}]);
+  const [templates, setTemplates] = useState<any[]>([{ value: "", label: "", templateid: null, text: "", disabled: true }]);
 
   React.useEffect(() => {
     let templateList: any = [
-      {value: "", label: "", templateid: null, text: "", disabled: true},
-      {value: "", label: "None", templateid: null, text: "", disabled: false}
+      { value: "", label: "", templateid: null, text: "", disabled: true },
+      { value: "", label: "None", templateid: null, text: "", disabled: false }
     ];
 
     applicantCorrespondenceTemplates.forEach((item: any) => {
@@ -76,7 +76,7 @@ export const ContactApplicant = ({
 
       const fileInfoList = [{
         filename: item.name,
-        s3sourceuri: rootpath+item.documenturipath
+        s3sourceuri: rootpath + item.documenturipath
       }]
 
       getOSSHeaderDetails(fileInfoList, dispatch, (err: any, res: any) => {
@@ -105,6 +105,7 @@ export const ContactApplicant = ({
   const previewButtonValue = existingCorrespondence ? "Preview & Resend Email" : "Preview & Send Email";
 
   const [messages, setMessages] = useState(applicantCorrespondence);
+  const [disablePreview, setDisablePreview] = useState(false);
 
   React.useEffect(() => {
     setMessages(applicantCorrespondence);
@@ -141,10 +142,10 @@ export const ContactApplicant = ({
   const saveAttachments = async () => {
     const fileInfoList = files?.map((file: any) => {
       return {
-          ministrycode: ministryCode,
-          requestnumber: requestNumber ? requestNumber : `U-00${requestId}`,
-          filestatustransition: 'email-attachment',
-          filename: file.filename? file.filename : file.name,
+        ministrycode: ministryCode,
+        requestnumber: requestNumber ? requestNumber : `U-00${requestId}`,
+        filestatustransition: 'email-attachment',
+        filename: file.filename ? file.filename : file.name,
       }
     });
     let attachments: any = [];
@@ -154,7 +155,7 @@ export const ContactApplicant = ({
         const _file = files.find((file: any) => file.filename === header.filename);
         await saveFilesinS3(header, _file, dispatch, (_err: any, _res: any) => {
           if (_res === 200) {
-            attachments.push({filename: header.filename, url: header.filepath})
+            attachments.push({ filename: header.filename, url: header.filepath })
             console.log("success")
           }
           else {
@@ -169,9 +170,12 @@ export const ContactApplicant = ({
   }
 
   const save = async (emailContent: string) => {
+    setDisablePreview(true);
+    setPreviewModal(false);
     const attachments = await saveAttachments();
     let callback = (_res: string) => {
       setEditorValue("")
+      setCurrentTemplate(0)
       setFiles([])
       setShowEditor(false)
       toast.success("Message has been sent to applicant successfully", {
@@ -186,16 +190,17 @@ export const ContactApplicant = ({
       dispatch(fetchApplicantCorrespondence(requestId, ministryId));
     }
     const templateId = currentTemplate ? templates[currentTemplate as keyof typeof templates].templateid : null;
-    const type = (templateId && [1,2].includes(templateId)) ? "CFRFee": "";
+    const type = (templateId && [1, 2].includes(templateId)) ? "CFRFee" : "";
     let data = {
       templateid: currentTemplate ? templates[currentTemplate as keyof typeof templates].templateid : null,
-      correspondencemessagejson: JSON.stringify ({"emailhtml": editorValue,
-                                  "id": approvedForm?.cfrfeeid,
-                                  "type": type
-                                  }),
+      correspondencemessagejson: JSON.stringify({
+        "emailhtml": editorValue,
+        "id": approvedForm?.cfrfeeid,
+        "type": type
+      }),
       foiministryrequest_id: ministryId,
       attachments: attachments,
-      attributes: [{"paymentExpiryDate": dueDateCalculation(new Date(), PAYMENT_EXPIRY_DAYS)}]
+      attributes: [{ "paymentExpiryDate": dueDateCalculation(new Date(), PAYMENT_EXPIRY_DAYS) }]
     };
     saveEmailCorrespondence(
       data,
@@ -205,8 +210,11 @@ export const ContactApplicant = ({
       callback,
       (errorMessage: string) => {
         errorToast(errorMessage)
+        dispatch(setFOICorrespondenceLoader(false));
       },
     );
+    setFOICorrespondenceLoader(false);
+    setDisablePreview(false);
   };
 
   const [showEditor, setShowEditor] = useState(false)
@@ -216,7 +224,7 @@ export const ContactApplicant = ({
     setPreviewModal(false);
   }
 
-  return (
+  return !isLoading ? (
     <div className="contact-applicant-container">
       <Grid
         container
@@ -272,7 +280,7 @@ export const ContactApplicant = ({
             sx={{
               border: "1px solid #38598A",
               color: "#38598A",
-              maxWidth:"100%"
+              maxWidth: "100%"
             }}
             alignItems="center"
             justifyContent="center"
@@ -295,7 +303,7 @@ export const ContactApplicant = ({
                 id="foicommentfilter"
                 placeholder="Search Correspondence ..."
                 defaultValue={""}
-                onChange={(e: any)=>{onFilterChange(e.target.value.trim())}}
+                onChange={(e: any) => { onFilterChange(e.target.value.trim()) }}
                 sx={{
                   color: "#38598A",
                 }}
@@ -330,7 +338,7 @@ export const ContactApplicant = ({
               className="email-template-dropdown"
               id="emailtemplate"
               label={currentTemplate === 0 ? "Select Template" : ""}
-              inputProps={{ "aria-labelledby": "emailtemplate-label"}}
+              inputProps={{ "aria-labelledby": "emailtemplate-label" }}
               InputLabelProps={{ shrink: false }}
               select
               name="emailtemplate"
@@ -343,13 +351,13 @@ export const ContactApplicant = ({
               fullWidth
             >
               {templates.map((template: any, index: any) => (
-              <MenuItem
-                key={index}
-                value={index}
-                disabled={template.disabled}
-              >
-                {template.label}
-              </MenuItem>
+                <MenuItem
+                  key={index}
+                  value={index}
+                  disabled={template.disabled}
+                >
+                  {template.label}
+                </MenuItem>
               ))}
             </TextField>
           </Grid>
@@ -413,7 +421,7 @@ export const ContactApplicant = ({
               data-variant="contained"
               onClick={() => setPreviewModal(true)}
               color="primary"
-              disabled={(files?.length <= 0)}
+              disabled={(files?.length <= 0 || currentTemplate <= 1 || disablePreview)}
             >
               {previewButtonValue}
             </button>
@@ -432,7 +440,7 @@ export const ContactApplicant = ({
           </Grid>
         </Grid>
       </div>}
-      <div style={{marginTop: '20px'}}>
+      <div style={{ marginTop: '20px' }}>
         {messages.map((message: any, index: any) => (
           <div key={index} className="commentsection"
             data-msgid={index}
@@ -453,7 +461,8 @@ export const ContactApplicant = ({
           </div>
         ))}
       </div>
-
     </div>
+  ) : (
+    <Loading />
   );
-}
+};
