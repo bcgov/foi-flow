@@ -22,8 +22,13 @@ class documentservice:
         documents = FOIMinistryRequestDocument.getdocuments(requestid, requestversion) if requesttype == "ministryrequest" else FOIRawRequestDocument.getdocuments(requestid, requestversion)
         return self.__formatcreateddate(documents)
     
+    def getactiverequestdocuments(self, requestid, requesttype, version=None):
+        requestversion =  self.__getversionforrequest(requestid,requesttype) if version is None else version
+        documents = FOIMinistryRequestDocument.getactivedocuments(requestid) if requesttype == "ministryrequest" else FOIRawRequestDocument.getdocuments(requestid, requestversion)
+        return self.__formatcreateddate(documents)
+    
     def getrequestdocumentsbyrole(self, requestid, requesttype, isministrymember):
-        documents = self.getrequestdocuments(requestid, requesttype)
+        documents = self.getactiverequestdocuments(requestid, requesttype)
         if isministrymember:
             for document in documents:
                 if document["category"] == "personal":

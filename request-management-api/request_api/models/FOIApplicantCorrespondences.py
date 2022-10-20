@@ -22,7 +22,7 @@ class FOIApplicantCorrespondence(db.Model):
     applicantcorrespondenceid = db.Column(db.Integer, primary_key=True,autoincrement=True)
     parentapplicantcorrespondenceid = db.Column(db.Integer)
     templateid = db.Column(db.Integer, nullable=True)
-    correspondencemessagejson = db.Column(db.Text, unique=False, nullable=False)
+    correspondencemessagejson = db.Column(db.Text, unique=False, nullable=True)
 
     sentcorrespondencemessage = db.Column(JSON, unique=False, nullable=True)
     sent_at = db.Column(db.DateTime, nullable=True)
@@ -59,13 +59,10 @@ class FOIApplicantCorrespondence(db.Model):
 
     @classmethod
     def saveapplicantcorrespondence(cls, newapplicantcorrepondencelog,attachments)->DefaultMethodResult: 
-        
         db.session.add(newapplicantcorrepondencelog)
         db.session.commit()
-        
         try:
             if(attachments is not None and len(attachments) > 0):
-
                 for _attachment in attachments:
                     attachment = FOIApplicantCorrespondenceAttachment()
                     attachment.applicantcorrespondenceid = newapplicantcorrepondencelog.applicantcorrespondenceid

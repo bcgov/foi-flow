@@ -26,24 +26,15 @@ class emailservice:
     def send(self, servicename, requestid, ministryrequestid, emailschema):
         try:
             requestjson = requestservice().getrequestdetails(requestid,ministryrequestid)
-            _applicantcorrespondenceid = self.__getvaluefromschema(emailschema, "applicantcorrespondenceid")
             _templatename = self.__getvaluefromschema(emailschema, "templatename")
-            logging.info("_templatename == ", _templatename)
-            logging.info("servicename == ", servicename)
-            if servicename == ServiceName.correspondence.value.upper():
-                servicename = _templatename            
+            servicename = _templatename  if servicename == ServiceName.correspondence.value.upper() else servicename 
+            _applicantcorrespondenceid = self.__getvaluefromschema(emailschema, "applicantcorrespondenceid")
             _messagepart, content = templateservice().generate_by_servicename_and_schema(servicename, requestjson, ministryrequestid, _applicantcorrespondenceid)
-            _messageattachmentlist = []
-            if (_applicantcorrespondenceid and templateconfig().isnotreceipt(servicename)):
-                servicename = _templatename.upper() if _templatename else ""
-                _messageattachmentlist = documentservice().getapplicantcorrespondenceattachmentsbyapplicantcorrespondenceid(_applicantcorrespondenceid)
-            else:
-                _messageattachmentlist = documentservice().getattachments(ministryrequestid, 'ministryrequest', templateconfig().getattachmentcategory(servicename).lower())
-            applicantcorrespondenceservice().updateapplicantcorrespondencelog(_applicantcorrespondenceid, {"message": content})
+            _messageattachmentlist = self.__get_attachments(ministryrequestid, _templatename, emailschema, servicename)
+            self.__pre_send_correspondence_audit(ministryrequestid,emailschema, content)
             return senderservice().send(servicename, _messagepart, _messageattachmentlist, requestjson)
         except Exception as ex:
             logging.exception(ex)
-        
 
     def acknowledge(self, servicename, requestid, ministryrequestid):
         try:
@@ -58,7 +49,30 @@ class emailservice:
         except Exception as ex:
             logging.exception(ex)
             return {"success" : False, "message": "Acknowledgement successful"}
-    
+
+    def __get_attachments(self, ministryrequestid, _templatename, emailschema, servicename):
+        _messageattachmentlist = []
+        _applicantcorrespondenceid = self.__getvaluefromschema(emailschema, "applicantcorrespondenceid")
+        if (_applicantcorrespondenceid and templateconfig().isnotreceipt(servicename)):
+            servicename = _templatename.upper() if _templatename else ""
+            _messageattachmentlist = documentservice().getapplicantcorrespondenceattachmentsbyapplicantcorrespondenceid(_applicantcorrespondenceid)
+        else:
+            _messageattachmentlist = documentservice().getattachments(ministryrequestid, 'ministryrequest', templateconfig().getattachmentcategory(servicename).lower())
+        return _messageattachmentlist   
+
+
+    def __pre_send_correspondence_audit(self, ministryrequestid, emailschema, content, attachmentlist=None):
+        _applicantcorrespondenceid = self.__getvaluefromschema(emailschema, "applicantcorrespondenceid")
+        if _applicantcorrespondenceid:
+            return applicantcorrespondenceservice().updateapplicantcorrespondencelog(_applicantcorrespondenceid, {"message": content})
+        else:
+            data = {
+                "templateid": None,
+                "correspondencemessagejson": {"message": content},
+                "attachments": attachmentlist
+            }
+            return applicantcorrespondenceservice().saveapplicantcorrespondencelog(data, ministryrequestid, 'system')
+        
 
     def __upload_sent_email(self, servicekey, ministryrequestid, requestjson):
         try:
