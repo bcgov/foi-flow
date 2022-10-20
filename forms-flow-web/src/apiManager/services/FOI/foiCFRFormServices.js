@@ -11,7 +11,7 @@ import API from "../../endpoints";
   import { fetchFOIRequestNotesList } from "../../../apiManager/services/FOI/foiRequestNoteServices";
   import _ from 'lodash';
 
-export const fetchCFRForm = (
+export const fetchCFRForm = async (
   ministryId,
   dispatch,
   errorCallback = null
