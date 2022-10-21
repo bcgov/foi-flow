@@ -115,7 +115,7 @@ class documentservice:
     
     def getreceiptattachments(self, ministryrequestid, category):
         print("category = ", category)
-        _documents = FOIMinistryRequestDocument.getlatestreceiptdocumentforemail(ministryrequestid, category)
+        _documents = FOIMinistryRequestDocument().getlatestreceiptdocumentforemail(ministryrequestid, category)
         documents = self.__formatcreateddate(_documents) 
         return self.__getattachmentlist(documents)
     
