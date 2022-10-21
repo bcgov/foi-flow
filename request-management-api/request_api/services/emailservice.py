@@ -58,6 +58,8 @@ class emailservice:
         if (_applicantcorrespondenceid and templateconfig().isnotreceipt(servicename)):
             _messageattachmentlist = documentservice().getapplicantcorrespondenceattachmentsbyapplicantcorrespondenceid(_applicantcorrespondenceid)
         elif templateconfig().isnotreceipt(servicename) is not True:
+            print("servicename = ", servicename)
+            print("category = ",templateconfig().getattachmentcategory(servicename).lower())
             _messageattachmentlist = documentservice().getreceiptattachments(ministryrequestid, templateconfig().getattachmentcategory(servicename).lower())
         else:
             _messageattachmentlist = documentservice().getattachments(ministryrequestid, 'ministryrequest', templateconfig().getattachmentcategory(servicename).lower())
