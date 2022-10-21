@@ -84,7 +84,7 @@ export default function AttachmentModal({
     const [newFilename, setNewFilename] = useState("");
     const [extension, setExtension] = useState("");
     const [errorMessage, setErrorMessage] = useState();
-    const [tagValue, setTagValue] = useState(tagList[0].name || "general");
+    const [tagValue, setTagValue] = useState(tagList[0]?.name || "general");
     const attchmentFileNameList = attachmentsArray.map(_file => _file.filename.toLowerCase());
 
     useEffect(() => {

@@ -14,6 +14,7 @@ import {
   import { replaceUrl } from "../../../helper/FOI/helper";
 
  export const fetchFOIRecords = (requestId, ministryId, ...rest) => {
+  if (ministryId) {
     const done = fnDone(rest);
     let apiUrl = replaceUrl(replaceUrl(
       API.FOI_GET_RECORDS,
@@ -40,7 +41,8 @@ import {
           done(error);
         });
     };
-  };
+  }
+};
 
   export const saveFOIRecords = (requestId, ministryId, data, ...rest) => {
     let apiUrl = replaceUrl(replaceUrl(
