@@ -111,20 +111,15 @@ class documentservice:
 
     def getattachments(self, requestid, requesttype, category):        
         documents = self.getlatestdocumentsforemail(requestid, requesttype, category)  
-        if(documents is None):
-            raise ValueError('No template found')
-        attachmentlist = []
-        for document in documents:  
-            filename = document.get('filename')
-            s3uri = document.get('documentpath')
-            attachment= storageservice().download(s3uri)
-            attachdocument = {"filename": filename, "file": attachment, "url": s3uri}
-            attachmentlist.append(attachdocument)
-        return attachmentlist
+        return self.__getattachmentlist(documents)
+    
+    def getreceiptattachments(self, ministryrequestid, category):      
+        _documents = FOIMinistryRequestDocument.getlatestreceiptdocumentforemail(ministryrequestid, category)
+        documents = self.__formatcreateddate(_documents) 
+        return self.__getattachmentlist(documents)
     
     def getlatestdocumentsforemail(self, requestid, requesttype, category, version=None):
         requestversion =  self.__getversionforrequest(requestid,requesttype) if version is None else version
-        print("requestversion = ",requestversion)
         documents = FOIMinistryRequestDocument.getlatestdocumentsforemail(requestid, requestversion, category) if requesttype == "ministryrequest" else FOIRawRequestDocument.getdocuments(requestid, requestversion)
         return self.__formatcreateddate(documents)    
 
@@ -136,6 +131,18 @@ class documentservice:
         for document in documents:  
             filename = document.get('attachmentfilename')
             s3uri = document.get('attachmentdocumenturipath')
+            attachment= storageservice().download(s3uri)
+            attachdocument = {"filename": filename, "file": attachment, "url": s3uri}
+            attachmentlist.append(attachdocument)
+        return attachmentlist
+    
+    def __getattachmentlist(self, documents):
+        if(documents is None):
+            raise ValueError('No template found')
+        attachmentlist = []
+        for document in documents:  
+            filename = document.get('filename')
+            s3uri = document.get('documentpath')
             attachment= storageservice().download(s3uri)
             attachdocument = {"filename": filename, "file": attachment, "url": s3uri}
             attachmentlist.append(attachdocument)
