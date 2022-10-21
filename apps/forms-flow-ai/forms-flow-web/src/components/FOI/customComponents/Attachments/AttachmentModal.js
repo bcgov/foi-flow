@@ -51,15 +51,9 @@ export default function AttachmentModal({
   isMinistryCoordinator,
   uploadFor="attachment",
   maxNoFiles,
-  bcgovcode
+  bcgovcode,
+  divisions=[]
 }) {
-
-    const divisions = useSelector(state => isMinistryCoordinator ?
-      state.foiRequests.foiMinistryViewRequestDetail.divisions :
-      state.foiRequests.foiRequestDetail.divisions
-    );
-
-    // const ministryCode = useSelector()
 
     let tagList = [];
     if(uploadFor === 'attachment') {

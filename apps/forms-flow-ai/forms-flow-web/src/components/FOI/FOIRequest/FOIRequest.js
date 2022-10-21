@@ -205,7 +205,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
       dispatch(fetchFOIRequestDescriptionList(requestId, ministryId));
       dispatch(fetchFOIRequestNotesList(requestId, ministryId));
       dispatch(fetchFOIRequestAttachmentsList(requestId, ministryId));
-      dispatch(fetchFOIRecords(requestId, ministryId));
+      fetchFOIRecords(requestId, ministryId);
     }
 
     dispatch(fetchFOICategoryList());
@@ -673,7 +673,8 @@ const FOIRequest = React.memo(({ userDetail }) => {
   const showRecordsTab = () => {
     return (requestState !== StateEnum.intakeinprogress.name &&
       requestState !== StateEnum.unopened.name &&
-      requestState !== StateEnum.open.name
+      requestState !== StateEnum.open.name &&
+      requestDetails?.divisions?.length > 0
     );
   }
 
@@ -744,7 +745,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
                   Comments{" "}
                   {requestNotes?.length > 0 ? `(${requestNotes.length})` : ""}
                 </div>
-                {showRecordsTab && <div
+                {showRecordsTab() && <div
                   className={clsx("tablinks", {
                     active: tabLinksStatuses.Records.active,
                   })}
@@ -1053,6 +1054,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
                   isMinistryCoordinator={false}
                   bcgovcode={requestDetails.bcgovcode}
                   setRecordsUploading={setRecordsUploading}
+                  divisions={requestDetails.divisions}
                 />
               </>
             ) : (

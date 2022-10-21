@@ -167,7 +167,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
       dispatch(fetchFOIRequestDescriptionList(requestId, ministryId));
       dispatch(fetchFOIRequestNotesList(requestId, ministryId));
       dispatch(fetchFOIRequestAttachmentsList(requestId, ministryId));
-      dispatch(fetchFOIRecords(requestId, ministryId));
+      fetchFOIRecords(requestId, ministryId);
       if (bcgovcode) dispatch(fetchFOIMinistryAssignedToList(bcgovcode));
     }
   }, [requestId, ministryId, comment, attachments]);
@@ -181,6 +181,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
     React.useState(requestDetails);
 
   const [divstages, setdivStages] = React.useState([]);
+  const [originalDivisions, setOriginalDivisions] = React.useState([])
   const [hasReceivedDate, setHasReceivedDate] = React.useState(true);
 
   let ministryassignedtousername = "Unassigned";
@@ -192,11 +193,14 @@ const MinistryReview = React.memo(({ userDetail }) => {
         ? requestDetailsValue.assignedministryperson
         : "Unassigned";
     setMinistryAssignedToValue(ministryassignedtousername);
+    if (!unSavedRequest && requestDetails?.divisions) {
+      setOriginalDivisions(requestDetails.divisions)
+    }
     if (requestDetails && Object.keys(requestDetails).length !== 0) {
       setRequestState(requestDetails.currentState);
       settabStatus(requestDetails.currentState);
     }
-  }, [requestDetails]);
+  }, [requestDetails, unSavedRequest]);
 
   const [unSavedRequest, setUnSavedRequest] = React.useState(false);
   const [recordsUploading, setRecordsUploading] = React.useState(false);
@@ -518,7 +522,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
                 ? `(${requestNotes.length})`
                 : ""}
             </div>
-            <div
+            {originalDivisions?.length > 0 &&<div
               className={clsx("tablinks", {
                 active: tabLinksStatuses.Records.active,
               })}
@@ -526,7 +530,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
               onClick={() => tabclick("Records")}
             >
               Records
-            </div>
+            </div>}
           </div>
 
           <div className="foileftpanelstatus">
@@ -703,11 +707,12 @@ const MinistryReview = React.memo(({ userDetail }) => {
               [classes.hidden]: !tabLinksStatuses.Records.display,
             })}
           >
-            {!isAttachmentListLoading &&
+            {!isAttachmentListLoading && originalDivisions?.length > 0 &&
             (iaoassignedToList?.length > 0 ||
               ministryAssignedToList?.length > 0) ? (
               <>
                 <RecordsLog
+                  divisions={originalDivisions}
                   recordsArray={requestRecords}
                   requestId={requestId}
                   ministryId={ministryId}
