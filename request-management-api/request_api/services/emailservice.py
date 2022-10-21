@@ -57,6 +57,8 @@ class emailservice:
         _applicantcorrespondenceid = self.__getvaluefromschema(emailschema, "applicantcorrespondenceid")
         if (_applicantcorrespondenceid and templateconfig().isnotreceipt(servicename)):
             _messageattachmentlist = documentservice().getapplicantcorrespondenceattachmentsbyapplicantcorrespondenceid(_applicantcorrespondenceid)
+        elif templateconfig().isnotreceipt(servicename) is not True:
+            _messageattachmentlist = documentservice().getreceiptattachments(ministryrequestid, templateconfig().getattachmentcategory(servicename).lower())
         else:
             _messageattachmentlist = documentservice().getattachments(ministryrequestid, 'ministryrequest', templateconfig().getattachmentcategory(servicename).lower())
         return _messageattachmentlist   
