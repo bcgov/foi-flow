@@ -120,6 +120,7 @@ class documentservice:
     
     def getlatestdocumentsforemail(self, requestid, requesttype, category, version=None):
         requestversion =  self.__getversionforrequest(requestid,requesttype) if version is None else version
+        print("requestversion = ",requestversion)
         documents = FOIMinistryRequestDocument.getlatestdocumentsforemail(requestid, requestversion, category) if requesttype == "ministryrequest" else FOIRawRequestDocument.getdocuments(requestid, requestversion)
         return self.__formatcreateddate(documents)    
 
