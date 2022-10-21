@@ -110,6 +110,7 @@ class FOIMinistryRequestDocument(db.Model):
         return documents 
 
     def getlatestreceiptdocumentforemail(cls, ministryrequestid, category):
+        print("getlatestreceiptdocumentforemail category = ", category)
         sql = 'SELECT DISTINCT ON (foiministrydocumentid) foiministrydocumentid, filename, documentpath, category, isactive, created_at , createdby, version FROM "FOIMinistryRequestDocuments" where foiministryrequest_id =:ministryrequestid and lower(category) = lower(:category) ORDER BY foiministrydocumentid DESC limit 1'
 
         rs = db.session.execute(text(sql), {'ministryrequestid': ministryrequestid, 'category': category})
