@@ -4,6 +4,7 @@ from re import VERBOSE
 from request_api.models.FOIRequestCFRFees import FOIRequestCFRFee
 from request_api.models.FOIMinistryRequests import FOIMinistryRequest
 from request_api.services.commentservice import commentservice
+from request_api.services.cfrfeeservice import cfrfeeservice
 from request_api.services.notificationservice import notificationservice
 import json
 from request_api.models.default_method_result import DefaultMethodResult
@@ -21,7 +22,8 @@ class cfrfeeformevent:
 
     """
     def createstatetransitionevent(self, requestid, userid, username):
-        state = self.__haschanged(requestid)
+        cfrfee = cfrfeeservice().getcfrfee(requestid)
+        state = self.__haschanged(requestid, cfrfee['cfrfeeid'])
         if state is not None:
             _commentresponse = self.__createcomment(requestid, state, userid, username)
             _notificationresponse = self.__createnotification(requestid, state, userid)
@@ -64,18 +66,16 @@ class cfrfeeformevent:
     def __preparenotification(self, state):
         return self.__notificationmessage(state)
         
-    def __haschanged(self, requestid):
-        status = FOIMinistryRequest.getrequeststatusById(requestid)
-        if status[0]['requeststatusid'] != 8:
-            return None
-        else:
-            states = FOIRequestCFRFee.getstatenavigation(requestid)        
-            if len(states) == 2:
-                newstate = states[0]
-                oldstate = states[1]
-                if newstate != oldstate and status:
-                    return newstate
-            return None    
+    def __haschanged(self, requestid, cfrfeeid):
+        states = FOIRequestCFRFee.getstatenavigation(requestid, cfrfeeid)        
+        if len(states) == 2:
+            newstate = states[0]
+            oldstate = states[1]
+            if newstate != oldstate:
+                return newstate
+        elif len(states) == 1:
+            return states[0]
+        return None
     
     def __commentmessage(self, state, username, updatedamounts):
         if state is not None:

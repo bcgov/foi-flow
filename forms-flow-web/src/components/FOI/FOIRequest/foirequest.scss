@@ -60,7 +60,6 @@
 .foi-details-row {
     display: flex;
     width: 100%;
-    margin: 0 !important;
 }
 .foi-details-col {
     display: block;    
@@ -158,4 +157,8 @@ height: fit-content;
     &::-webkit-scrollbar-track {
         margin-top: 105px !important;
     }
+}
+
+.foi-details-row-break {
+    margin-bottom: 2em;
 }

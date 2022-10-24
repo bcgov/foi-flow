@@ -2,6 +2,7 @@ import requests
 import os
 import json
 from enum import Enum
+from request_api.exceptions import BusinessException
 
 from request_api.services.external.bpmservice import MessageType, bpmservice
 from request_api.services.cfrfeeservice import cfrfeeservice
@@ -15,6 +16,12 @@ __author__      = "sumathi.thirumani@aot-technologies.com"
 
 """
 class workflowservice:
+
+    def createinstance(self, definitionkey, message):
+        response = bpmservice().createinstance(definitionkey, json.loads(message))
+        if response.status_code != 200:
+            raise BusinessException("Unable to create instance for key"+ definitionkey)
+
 
     def postunopenedevent(self, id, wfinstanceid, requestsschema, status, ministries=None):
         assignedgroup = requestsschema["assignedGroup"] if 'assignedGroup' in requestsschema  else None

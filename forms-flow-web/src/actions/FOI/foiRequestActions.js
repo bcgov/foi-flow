@@ -269,3 +269,10 @@ export const setResumeDefaultSorting = (data) => (dispatch) => {
         payload: data,
     });
 };
+
+export const setFOICorrespondenceLoader = (data) => dispatch =>{
+    dispatch({
+        type:FOI_ACTION_CONSTANTS.IS_CORRESPONDENCE_LOADING,
+        payload:data
+    })
+}

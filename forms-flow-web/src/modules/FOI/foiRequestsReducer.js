@@ -65,6 +65,7 @@ const initialState = {
   foiRequestExtesions: [],
   foiOpenedMinistries: [],
   resumeDefaultSorting: false,
+  isCorrespondenceLoading: true,
 };
 
 const foiRequests = (state = initialState, action) => {
@@ -163,6 +164,8 @@ const foiRequests = (state = initialState, action) => {
       return { ...state, foiAxisRequestIds: action.payload };
     case FOI_ACTION_CONSTANTS.RESUME_DEFAULT_SORTING:
       return { ...state, resumeDefaultSorting: action.payload };
+    case FOI_ACTION_CONSTANTS.IS_CORRESPONDENCE_LOADING:
+      return { ...state, isCorrespondenceLoading: action.payload };
     default:
       return state;
   }
