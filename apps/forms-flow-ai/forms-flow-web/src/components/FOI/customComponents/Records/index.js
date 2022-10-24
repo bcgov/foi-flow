@@ -167,7 +167,7 @@ export const RecordsLog = ({
           let _documents = [];
           if (!err) {
             var completed = 0;
-            let failed = 0;
+            let failed = [];
             const toastID = toast.loading("Uploading files (" + completed + "/" + fileInfoList.length + ")")
             for (let header of res) {
               const _file = files.find(file => file.filename === header.filename);
@@ -190,7 +190,7 @@ export const RecordsLog = ({
                   _documents.push(documentDetails);
                 }
                 else {
-                  failed++;
+                  failed.push(header.filename);
                 }
               })
             }
@@ -199,11 +199,14 @@ export const RecordsLog = ({
                 dispatchRequestAttachment(err);
             }));
             var toastOptions = {
-              render: failed > 0 ? failed.length + " file uploads failed" : fileInfoList.length + ' Files successfully saved',
-              type: failed > 0 ? "error" : "success",
+              render: failed.length > 0 ? 
+                "The following " + failed.length + " file uploads failed\n- " + failed.join("\n- ")  : 
+                fileInfoList.length + ' Files successfully saved',
+              type: failed.length > 0 ? "error" : "success",
             }
             toast.update(toastID, {
               ...toastOptions,
+              className: "file-upload-toast",
               isLoading: false,
               autoClose: 3000,
               hideProgressBar: true,
