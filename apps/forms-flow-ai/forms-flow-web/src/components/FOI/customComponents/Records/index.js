@@ -95,6 +95,7 @@ const useStyles = makeStyles((_theme) => ({
 }));
 
 export const RecordsLog = ({
+  divisions,
   requestNumber,
   recordsArray,
   requestId,
@@ -111,11 +112,6 @@ export const RecordsLog = ({
   useEffect(() => {
     setRecords(recordsArray)
   }, [recordsArray])
-
-  const divisions = useSelector(state => isMinistryCoordinator ?
-    state.foiRequests.foiMinistryViewRequestDetail.divisions :
-    state.foiRequests.foiRequestDetail.divisions
-  );
 
   // useEffect(() => {
   //   let divisions = [...new Map(recordsArray.map(record => [record.divisionname, {division: record.divisionname}])).values()];
@@ -548,6 +544,7 @@ export const RecordsLog = ({
             isMinistryCoordinator={isMinistryCoordinator}
             uploadFor={"records"}
             bcgovcode={bcgovcode}
+            divisions={divisions}
           />
         </>
       )}
