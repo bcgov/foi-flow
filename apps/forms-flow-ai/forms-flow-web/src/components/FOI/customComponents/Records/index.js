@@ -113,6 +113,8 @@ export const RecordsLog = ({
     setRecords(recordsArray)
   }, [recordsArray])
 
+  const divisionFilters = [...new Map(recordsArray.reduce((acc, file) => [...acc, ...new Map(file.attributes.map(division => [division.divisionid, division]))], [])).values()]
+
   // useEffect(() => {
   //   let divisions = [...new Map(recordsArray.map(record => [record.divisionname, {division: record.divisionname}])).values()];
   //   console.log(_records)
@@ -394,7 +396,7 @@ export const RecordsLog = ({
                   onClick={downloadAllDocuments}
                   color="primary"
                 >
-                  Export All
+                  Export Shown
                 </button>
               </ConditionalComponent>
             </Grid>
@@ -495,7 +497,7 @@ export const RecordsLog = ({
                 xs={12}
                 elevation={0}
               >
-                {divisions.map(division =>
+                {divisionFilters.map(division =>
                   <ClickableChip
                     item
                     id={`${division.divisionid}Tag`}
