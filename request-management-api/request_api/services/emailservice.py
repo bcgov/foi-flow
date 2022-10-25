@@ -27,11 +27,16 @@ class emailservice:
         try:
             requestjson = requestservice().getrequestdetails(requestid,ministryrequestid)
             _templatename = self.__getvaluefromschema(emailschema, "templatename")
-            servicename = _templatename  if servicename == ServiceName.correspondence.value.upper() else servicename 
+            print("_templatename = ",_templatename)
+            servicename = _templatename  if servicename == ServiceName.correspondence.value.upper() else servicename
+            print("servicename1 = ",servicename)
             _applicantcorrespondenceid = self.__getvaluefromschema(emailschema, "applicantcorrespondenceid")
             _messagepart, content = templateservice().generate_by_servicename_and_schema(servicename, requestjson, ministryrequestid, _applicantcorrespondenceid)
-            _messageattachmentlist = self.__get_attachments(ministryrequestid, _templatename, emailschema, servicename)
-            self.__pre_send_correspondence_audit(ministryrequestid,emailschema, content)
+            if (_applicantcorrespondenceid and templateconfig().isnotreceipt(servicename)):
+                servicename = _templatename.upper() if _templatename else ""
+                print("servicename2 = ",servicename)
+            _messageattachmentlist = self.__get_attachments(ministryrequestid, emailschema, servicename)
+            self.__pre_send_correspondence_audit(ministryrequestid,emailschema, content, _messageattachmentlist)
             return senderservice().send(servicename, _messagepart, _messageattachmentlist, requestjson)
         except Exception as ex:
             logging.exception(ex)
@@ -50,12 +55,15 @@ class emailservice:
             logging.exception(ex)
             return {"success" : False, "message": "Acknowledgement successful"}
 
-    def __get_attachments(self, ministryrequestid, _templatename, emailschema, servicename):
+    def __get_attachments(self, ministryrequestid, emailschema, servicename):
         _messageattachmentlist = []
         _applicantcorrespondenceid = self.__getvaluefromschema(emailschema, "applicantcorrespondenceid")
         if (_applicantcorrespondenceid and templateconfig().isnotreceipt(servicename)):
-            servicename = _templatename.upper() if _templatename else ""
             _messageattachmentlist = documentservice().getapplicantcorrespondenceattachmentsbyapplicantcorrespondenceid(_applicantcorrespondenceid)
+        elif templateconfig().isnotreceipt(servicename) is not True:
+            print("servicename = ", servicename)
+            print("category = ",templateconfig().getattachmentcategory(servicename).lower())
+            _messageattachmentlist = documentservice().getreceiptattachments(ministryrequestid, templateconfig().getattachmentcategory(servicename).lower())
         else:
             _messageattachmentlist = documentservice().getattachments(ministryrequestid, 'ministryrequest', templateconfig().getattachmentcategory(servicename).lower())
         return _messageattachmentlist   

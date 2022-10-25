@@ -107,6 +107,17 @@ class FOIMinistryRequestDocument(db.Model):
         for row in rs:
             if row["isactive"] == True:
                 documents.append({"foiministrydocumentid": row["foiministrydocumentid"], "filename": row["filename"], "documentpath": row["documentpath"], "category": row["category"], "created_at": row["created_at"].strftime('%Y-%m-%d %H:%M:%S.%f'), "createdby": row["createdby"]})
+        return documents 
+
+    def getlatestreceiptdocumentforemail(cls, ministryrequestid, category):
+        print("getlatestreceiptdocumentforemail category = ", category)
+        sql = 'SELECT DISTINCT ON (foiministrydocumentid) foiministrydocumentid, filename, documentpath, category, isactive, created_at , createdby, version FROM "FOIMinistryRequestDocuments" where foiministryrequest_id =:ministryrequestid and lower(category) = lower(:category) ORDER BY foiministrydocumentid DESC limit 1'
+
+        rs = db.session.execute(text(sql), {'ministryrequestid': ministryrequestid, 'category': category})
+        documents = []
+        for row in rs:
+            if row["isactive"] == True:
+                documents.append({"foiministrydocumentid": row["foiministrydocumentid"], "filename": row["filename"], "documentpath": row["documentpath"], "category": row["category"], "created_at": row["created_at"].strftime('%Y-%m-%d %H:%M:%S.%f'), "createdby": row["createdby"]})
         return documents  
 
     @classmethod
