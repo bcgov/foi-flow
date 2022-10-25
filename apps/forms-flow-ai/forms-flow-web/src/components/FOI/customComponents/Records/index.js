@@ -114,6 +114,8 @@ export const RecordsLog = ({
   }, [recordsArray])
 
   const divisionFilters = [...new Map(recordsArray.reduce((acc, file) => [...acc, ...new Map(file.attributes.map(division => [division.divisionid, division]))], [])).values()]
+  if (divisionFilters.length > 0) divisionFilters.push({divisionid: -1, divisionname: "ALL"})
+
 
   // useEffect(() => {
   //   let divisions = [...new Map(recordsArray.map(record => [record.divisionname, {division: record.divisionname}])).values()];
