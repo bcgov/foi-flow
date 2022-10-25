@@ -172,10 +172,10 @@ const MinistryReview = React.memo(({ userDetail }) => {
     }
   }, []);
 
-  useEffect(() => {
+  useEffect(async () => {
     if (ministryId) {
-      dispatch(fetchFOIMinistryViewRequestDetails(requestId, ministryId));
-      dispatch(fetchFOIRequestDescriptionList(requestId, ministryId));
+      await Promise.all([dispatch(fetchFOIMinistryViewRequestDetails(requestId, ministryId)),
+      dispatch(fetchFOIRequestDescriptionList(requestId, ministryId))]);
       dispatch(fetchFOIRequestNotesList(requestId, ministryId));
       dispatch(fetchFOIRequestAttachmentsList(requestId, ministryId));
       fetchCFRForm(ministryId,dispatch);
@@ -255,11 +255,11 @@ const MinistryReview = React.memo(({ userDetail }) => {
 
   const [updateStateDropDown, setUpdateStateDropdown] = useState(false);
   const [stateChanged, setStateChanged] = useState(false);
-  const handleSaveRequest = (_state, _unSaved, id) => {
+  const handleSaveRequest = async(_state, _unSaved, id) => {
     setHeader(_state);
     if (!_unSaved && ministryId && requestId) {
       setUnSavedRequest(_unSaved);
-      dispatch(fetchFOIMinistryViewRequestDetails(requestId, ministryId));
+      await Promise.all([dispatch(fetchFOIMinistryViewRequestDetails(requestId, ministryId))]);
       dispatch(fetchFOIRequestAttachmentsList(requestId, ministryId));
       fetchCFRForm(ministryId,dispatch);
       setStateChanged(false);
