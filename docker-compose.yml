@@ -144,9 +144,9 @@ services:
       - CAMUNDA_JDBC_DRIVER=org.postgresql.Driver
       - CAMUNDA_BPM_HISTORY_LEVEL=${CAMUNDA_BPM_HISTORY_LEVEL:-none}
       - CAMUNDA_APP_ROOT_LOG_FLAG=${CAMUNDA_APP_ROOT_LOG_FLAG:-ERROR}
-      - FORMSFLOW_API_URL=${FORMSFLOW_API_URL:-http://{your-ip-address}:16000}
-      - FORMSFLOW_WEB_URL=${FORMSFLOW_WEB_URL:-http://{your-ip-address}:4000}
-      - FORMIO_URL=${FORMIO_DEFAULT_PROJECT_URL:-http://{your-ip-address}:3001}   
+      - FORMSFLOW_API_URL=${FORMSFLOW_API_URL:-http://192.168.4.26:16000}
+      - FORMSFLOW_WEB_URL=${FORMSFLOW_WEB_URL:-http://192.168.4.26:4000}
+      - FORMIO_URL=${FORMIO_DEFAULT_PROJECT_URL:-http://192.168.4.26:3001}   
       - FORMIO_ROOT_EMAIL=${FORMIO_ROOT_EMAIL:-admin@example.com}
       - FORMIO_ROOT_PASSWORD=${FORMIO_ROOT_PASSWORD:-changeme}
       - APP_SECURITY_ORIGIN=${APP_SECURITY_ORIGIN:-*}
@@ -159,6 +159,7 @@ services:
       - WEBSOCKET_FOI_RAWREQUEST_TOPIC=${WEBSOCKET_FOI_RAWREQUEST_TOPIC}
       - FORMSFLOW_WF_URL=${FORMSFLOW_WF_URL}
       - FOI_REQ_MANAGEMENT_API_URL=${FOI_REQ_MANAGEMENT_API_URL}
+      - isIMAPEnabled=${isIMAPEnabled:-False}
     depends_on: 
       - forms-flow-bpm-db
     networks:
@@ -187,6 +188,7 @@ services:
         - PAYMENT_EXPIRY_DAYS=${PAYMENT_EXPIRY_DAYS}
         - REACT_APP_OSS_S3_FORMS_BUCKET=${OSS_S3_FORMS_BUCKET}
         - REACT_APP_OSS_S3_HOST=${OSS_S3_HOST}
+        - REDACTION_APP_URL=${REDACTION_APP_URL}
     volumes:
       - ".:/app"
       - "/app/node_modules"
