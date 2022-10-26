@@ -1103,7 +1103,6 @@ export const CFRForm = ({
                       <p className="hideContent" id="popup-1">Information1</p>
                     </div>
                     <div className="cfrform-floatRightRight cfrform-locating">
-                      <Chip className="cfrform-chip" label='Click "i" for more details' color="primary" variant="outlined" />
                       <p className="hideContent" id="popup-5">Information5</p>
                     </div>
                     <div className="cfrform-floatRight cfrform-producing">

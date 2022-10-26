@@ -200,12 +200,12 @@ const FOIRequest = React.memo(({ userDetail }) => {
   }, []);
 
   const dispatch = useDispatch();
-  useEffect(() => {
+   useEffect(async() => {
     if (isAddRequest) {
       dispatch(fetchFOIAssignedToList("", "", ""));
     } else {
-      dispatch(fetchFOIRequestDetailsWrapper(requestId, ministryId));
-      dispatch(fetchFOIRequestDescriptionList(requestId, ministryId));
+      await Promise.all([dispatch(fetchFOIRequestDetailsWrapper(requestId, ministryId)),
+      dispatch(fetchFOIRequestDescriptionList(requestId, ministryId))]);
       dispatch(fetchFOIRequestNotesList(requestId, ministryId));
       dispatch(fetchFOIRequestAttachmentsList(requestId, ministryId));
       fetchCFRForm(ministryId,dispatch);
