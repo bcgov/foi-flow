@@ -57,7 +57,7 @@ class FOIRequestPayment(db.Model):
                                 select distinct on (paymentid) paymentid, paymenturl, createdby, version  from "FOIRequestPayments" fp where foirequestid = :foirequestid and ministryrequestid  = :ministryrequestid  
                                 order by paymentid, version desc) as fp2 
                                 where fp1.paymentid = fp2.paymentid and fp1.version = fp2.version
-                                and fp1.createdby <> 'System_Cancel'
+                                and fp1.createdby <> 'System_Cancel' and fp1.paidamount is null
                     """
             
             rs = db.session.execute(text(sql), {'foirequestid': foirequestid, 'ministryrequestid' : ministryrequestid, 'today' : _psttoday})
