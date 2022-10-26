@@ -159,6 +159,7 @@ services:
       - WEBSOCKET_FOI_RAWREQUEST_TOPIC=${WEBSOCKET_FOI_RAWREQUEST_TOPIC}
       - FORMSFLOW_WF_URL=${FORMSFLOW_WF_URL}
       - FOI_REQ_MANAGEMENT_API_URL=${FOI_REQ_MANAGEMENT_API_URL}
+      - isIMAPEnabled=${isIMAPEnabled:-False}
     depends_on: 
       - forms-flow-bpm-db
     networks:

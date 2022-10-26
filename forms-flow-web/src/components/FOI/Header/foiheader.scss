@@ -11,7 +11,7 @@ nav h2 {
   font-family: 'BCSans-Bold', sans-serif !important;
   font-weight: 100 !important;
   color: #fff;
-  margin-left: 40px;  
+  // margin-left: 40px;
 }
 
 .banner-left {
@@ -79,7 +79,7 @@ nav h2 {
 }
 
 .foiheaderAppNamesection{
-  display: inline-block;
+  display: inline-flex;
   width: auto!important;
   top: 7px;
 }
@@ -136,6 +136,20 @@ nav h2 {
     }
   }
   max-width: none !important;
+}
+
+.foihomebtn {
+  font-size: 30px !important;
+  color: #FFFFFF;
+  display: inline-flex !important;
+}
+
+a h2 {
+  padding-left: 6px;
+}
+
+.foiheaderAppNamesection a:hover {
+  text-decoration: none !important;
 }
 
 /*  Mobile screens (phones, 500px and down) */

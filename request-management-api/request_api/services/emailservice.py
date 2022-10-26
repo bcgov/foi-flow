@@ -36,7 +36,7 @@ class emailservice:
                 servicename = _templatename.upper() if _templatename else ""
                 print("servicename2 = ",servicename)
             _messageattachmentlist = self.__get_attachments(ministryrequestid, emailschema, servicename)
-            self.__pre_send_correspondence_audit(ministryrequestid,emailschema, content, _messageattachmentlist)
+            self.__pre_send_correspondence_audit(ministryrequestid,emailschema, content, templateconfig().isnotreceipt(servicename), _messageattachmentlist)
             return senderservice().send(servicename, _messagepart, _messageattachmentlist, requestjson)
         except Exception as ex:
             logging.exception(ex)
@@ -69,9 +69,9 @@ class emailservice:
         return _messageattachmentlist   
 
 
-    def __pre_send_correspondence_audit(self, ministryrequestid, emailschema, content, attachmentlist=None):
+    def __pre_send_correspondence_audit(self, ministryrequestid, emailschema, content, isnotreceipt, attachmentlist=None):
         _applicantcorrespondenceid = self.__getvaluefromschema(emailschema, "applicantcorrespondenceid")
-        if _applicantcorrespondenceid:
+        if _applicantcorrespondenceid and isnotreceipt:
             return applicantcorrespondenceservice().updateapplicantcorrespondencelog(_applicantcorrespondenceid, {"message": content})
         else:
             data = {
