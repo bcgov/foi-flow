@@ -38,63 +38,63 @@
   .foileftpanelstatus {
     padding-top: 5% !important;
     padding-bottom:0px !important;
-    font-size: 10px !important;
+    font-size: 15px !important;
     font-weight: bolder !important;
     height: 28px !important;
   }
 
   .remaining-days-alert {
-    font-size: 12px !important;
+    font-size: 15px !important;
     font-weight: bolder !important;
     // padding-bottom: 0.5rem !important;
   }
   div.tab{
-    margin-bottom: 30px;
+    margin-bottom: 50%;
     height: 38%;
   }
   div.tab div.tablinks {
-    font-size: 12px !important;    
-    height: 40px !important;
+    font-size: 15px !important;    
+    height: 35px !important;
   }
   .foileftpanelrequestno {
-    font-size: 12px !important;
+    font-size: 15px !important;
     font-weight: bolder !important;
   }
   div.foi-state-dropdown .MuiInputBase-root {
-    font-size: 12px !important;
+    font-size: 15px !important;
   }
 
 
 }
 
-@media screen and (min-height: 500px) and (max-height: 690px) {
+@media screen and (min-height: 545px) and (max-height: 690px) {
   .foileftpanelstatus {
     padding-top: 5% !important;
     padding-bottom:0px !important;
-    font-size: 10px !important;
+    font-size: 15px !important;
     font-weight: bolder !important;
     height: 28px !important;
   }
 
   .remaining-days-alert {
-    font-size: 12px !important;
+    font-size: 15px !important;
     font-weight: bolder !important;
     // padding-bottom: 0.5rem !important;
   }
   div.tab{
-    margin-bottom: 30px;
-    height: 38%;
+    margin-bottom: 30%;
+    height: 35%;
   }
   div.tab div.tablinks {
-    font-size: 12px !important;    
-    height: 28px !important;
+    font-size: 15px !important;    
+    height: 30px !important;
   }
   .foileftpanelrequestno {
-    font-size: 12px !important;
+    font-size: 15px !important;
     font-weight: bolder !important;
   }
   div.foi-state-dropdown .MuiInputBase-root {
-    font-size: 12px !important;
+    font-size: 15px !important;
   }
 }
 
@@ -102,7 +102,7 @@
   .tab div.tablinks{
     height: 25px !important;
     padding: 2px 8px 2px 15px !important;
-    font-size: 10px!important;
+    font-size: 15px!important;
   }
   .foileftpanelheader {
     padding-top: 10px !important;
@@ -116,11 +116,11 @@
   //   height: calc(100% - 80px - 67px)!important;
   // }
   .foileftpanelstatus, .remaining-days-alert, .foileftpanelrequestno {
-    font-size: 10px !important;
+    font-size: 15px !important;
     font-weight: bolder !important;
   }
   div.foi-state-dropdown .MuiInputBase-root {
-    font-size: 10px !important;
+    font-size: 15px !important;
   }
 }
 
