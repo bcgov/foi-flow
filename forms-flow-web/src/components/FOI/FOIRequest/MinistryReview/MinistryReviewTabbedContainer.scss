@@ -82,7 +82,7 @@
     // padding-bottom: 0.5rem !important;
   }
   div.tab{
-    margin-bottom: 30%;
+    margin-bottom: 20%;
     height: 35%;
   }
   div.tab div.tablinks {
@@ -98,7 +98,7 @@
   }
 }
 
-@media screen and (max-height: 595px) {
+@media screen and (max-height: 544px) {
   .tab div.tablinks{
     height: 25px !important;
     padding: 2px 8px 2px 15px !important;

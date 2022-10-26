@@ -468,6 +468,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
     <div className="foiformcontent">
       <div className="foitabbedContainer">
         <div className={foitabheaderBG}>
+        <h4 className="foileftpanelrequestno">{getHeaderText(requestDetails)}</h4>
           <div className="foileftpaneldropdown">{stateBox}</div>
 
           <div className="tab">
