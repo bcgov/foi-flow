@@ -468,9 +468,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
     <div className="foiformcontent">
       <div className="foitabbedContainer">
         <div className={foitabheaderBG}>
-          <div className="foileftpanelheader">
-            <a href="/foi/dashboard" aria-label="dashboard link"><i className='fa fa-home' style={{fontSize:"45px", color: "white"}}></i></a>
-          </div>
+        <h4 className="foileftpanelrequestno">{getHeaderText(requestDetails)}</h4>
           <div className="foileftpaneldropdown">{stateBox}</div>
 
           <div className="tab">
