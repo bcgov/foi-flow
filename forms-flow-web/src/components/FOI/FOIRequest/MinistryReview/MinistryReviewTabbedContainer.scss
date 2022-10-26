@@ -34,20 +34,6 @@
 }
 
 @media screen and (min-height: 691px) and (max-height: 800px) {
-  
-  .foileftpanelstatus {
-    padding-top: 5% !important;
-    padding-bottom:0px !important;
-    font-size: 15px !important;
-    font-weight: bolder !important;
-    height: 28px !important;
-  }
-
-  .remaining-days-alert {
-    font-size: 15px !important;
-    font-weight: bolder !important;
-    // padding-bottom: 0.5rem !important;
-  }
   div.tab{
     margin-bottom: 50%;
     height: 38%;
@@ -56,18 +42,21 @@
     font-size: 15px !important;    
     height: 35px !important;
   }
-  .foileftpanelrequestno {
-    font-size: 15px !important;
-    font-weight: bolder !important;
-  }
-  div.foi-state-dropdown .MuiInputBase-root {
-    font-size: 15px !important;
-  }
-
-
 }
 
 @media screen and (min-height: 545px) and (max-height: 690px) {
+  div.tab{
+    margin-bottom: 20%;
+    height: 35%;
+  }
+  div.tab div.tablinks {
+    font-size: 15px !important;    
+    height: 30px !important;
+  }
+}
+
+
+@media screen and (max-height: 800px) {
   .foileftpanelstatus {
     padding-top: 5% !important;
     padding-bottom:0px !important;
@@ -80,14 +69,6 @@
     font-size: 15px !important;
     font-weight: bolder !important;
     // padding-bottom: 0.5rem !important;
-  }
-  div.tab{
-    margin-bottom: 20%;
-    height: 35%;
-  }
-  div.tab div.tablinks {
-    font-size: 15px !important;    
-    height: 30px !important;
   }
   .foileftpanelrequestno {
     font-size: 15px !important;
