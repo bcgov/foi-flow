@@ -481,6 +481,8 @@ export const CFRForm = ({
   const newCFRForm = () => {
     setCreateModalOpen(false)
     blankForm.amountPaid= initialState?.feedata?.amountpaid;
+    blankForm.feewaiverAmount = initialState?.feedata?.feewaiveramount;
+    blankForm.refundAmount = initialState?.feedata?.refundamount;
     setInitialFormData(blankForm);
     setFormData(blankForm);
     setIsNewCFRForm(true)
