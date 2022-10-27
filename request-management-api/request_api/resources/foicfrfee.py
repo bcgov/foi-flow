@@ -52,7 +52,12 @@ class CreateFOICFRFee(Resource):
                 return {'status': False, 'message':'UnAuthorized'}, 403
             requestjson = request.get_json() 
             foicfrfeeschema = FOICFRFeeSchema().load(requestjson)
+            print("foicfrfeeschema = ", foicfrfeeschema)
+            print("foicfrfeeschema saction feewaiveramount = ", foicfrfeeschema['feedata']['feewaiveramount'])
+            print("foicfrfeeschema saction refundamount = ", foicfrfeeschema['feedata']['refundamount'])
             result = cfrfeeservice().createcfrfee(ministryrequestid, foicfrfeeschema,AuthHelper.getuserid())
+            # asyncio.ensure_future(eventservice().posteventforsanctioncfrfeeform(ministryrequestid, AuthHelper.getuserid(), AuthHelper.getusername()))
+            # if foicfrfeeschema['feedata']['feewaiveramount'] > 0 or foicfrfeeschema['feedata']['refundamount'] > 0:
             asyncio.ensure_future(eventservice().posteventforcfrfeeform(ministryrequestid, AuthHelper.getuserid(), AuthHelper.getusername()))
             return {'status': result.success, 'message':result.message,'id':result.identifier} , 200 
         except ValidationError as verr:
@@ -79,8 +84,13 @@ class SanctionFOICFRFee(Resource):
                 return {'status': False, 'message':'UnAuthorized'}, 403
             requestjson = request.get_json() 
             foicfrfeeschema = FOICFRFeeSanctionSchema().load(requestjson)
+            print("foicfrfeeschema saction = ", foicfrfeeschema)
+            print("foicfrfeeschema saction feewaiveramount = ", foicfrfeeschema['feedata']['feewaiveramount'])
+            print("foicfrfeeschema saction refundamount = ", foicfrfeeschema['feedata']['refundamount'])
             result = cfrfeeservice().sanctioncfrfee(ministryrequestid, foicfrfeeschema,AuthHelper.getuserid())
-            asyncio.ensure_future(eventservice().posteventforsanctioncfrfeeform(ministryrequestid, AuthHelper.getuserid(), AuthHelper.getusername()))
+            # asyncio.ensure_future(eventservice().posteventforsanctioncfrfeeform(ministryrequestid, AuthHelper.getuserid(), AuthHelper.getusername()))
+            # if foicfrfeeschema['feedata']['feewaiveramount'] > 0 or foicfrfeeschema['feedata']['refundamount'] > 0:
+            asyncio.ensure_future(eventservice().posteventforcfrfeeform(ministryrequestid, AuthHelper.getuserid(), AuthHelper.getusername()))
             if (foicfrfeeschema["status"] == "approved") and cfrfeeservice().getactivepayment(requestid, ministryrequestid) != None:
                 requestservice().postfeeeventtoworkflow(requestid, ministryrequestid, "CANCELLED")
             return {'status': result.success, 'message':result.message,'id':result.identifier} , 200 

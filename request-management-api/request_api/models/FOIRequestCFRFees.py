@@ -82,7 +82,7 @@ class FOIRequestCFRFee(db.Model):
     @classmethod
     def getfeedataforamountcomparison(cls, ministryrequestid):
         _session = db.session
-        _entries = _session.query(FOIRequestCFRFee).filter(FOIRequestCFRFee.ministryrequestid == ministryrequestid and FOIRequestCFRFee.feedata is not null).order_by(FOIRequestCFRFee.version.desc()).limit(2)
+        _entries = _session.query(FOIRequestCFRFee).filter(FOIRequestCFRFee.ministryrequestid == ministryrequestid and FOIRequestCFRFee.feedata is not null).order_by(FOIRequestCFRFee.cfrfeeid.desc(), FOIRequestCFRFee.version.desc()).limit(2)
         feedata = []
         for _entry in _entries:
             feedata.append(_entry.feedata)

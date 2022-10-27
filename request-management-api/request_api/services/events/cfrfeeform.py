@@ -42,10 +42,10 @@ class cfrfeeformevent:
         if len(feedata) == 2:
             newfeedata = feedata[0]
             oldfeedata = feedata[1]
-            if newfeedata["feewaiveramount"] != oldfeedata["feewaiveramount"]:
+            if newfeedata["feewaiveramount"] != oldfeedata["feewaiveramount"] and newfeedata["feewaiveramount"] > 0:
                 updatedamounts = {'feewaiveramountchanged': newfeedata["feewaiveramount"]}
                 _feewaivercommentresponse = self.__createcomment(requestid, None, userid, username, updatedamounts)
-            if newfeedata["refundamount"] != oldfeedata["refundamount"]:
+            if newfeedata["refundamount"] != oldfeedata["refundamount"] and newfeedata["refundamount"] > 0:
                 updatedamounts = {'refundamountchanged': newfeedata["refundamount"]}
                 _refundcommentresponse = self.__createcomment(requestid, None, userid, username, updatedamounts)
         return _feewaivercommentresponse, _refundcommentresponse
