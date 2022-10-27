@@ -1,5 +1,5 @@
 
-from marshmallow import EXCLUDE, Schema, fields
+from marshmallow import EXCLUDE, Schema, fields, validate
 
 """
 This class  consolidates schemas of CFR Fee Form operations.
@@ -48,6 +48,8 @@ class FOIFeeDataSanctionSchema(Schema):
         """Exclude unknown fields in the deserialized output."""
 
     amountpaid = fields.Float(data_key="amountpaid") 
+    estimatepaymentmethod = fields.Str(data_key="estimatepaymentmethod", validate=validate.OneOf(['moneyorder', 'creditcardphone', 'cheque', 'cash']), required=False)
+    balancepaymentmethod = fields.Str(data_key="balancepaymentmethod", validate=validate.OneOf(['moneyorder', 'creditcardphone', 'cheque', 'cash']), required=False)
     estimatediaopreparinghrs = fields.Float(data_key="estimatediaopreparinghrs")
     actualiaopreparinghrs = fields.Float(data_key="actualiaopreparinghrs")
     estimatedtotaldue = fields.Float(data_key="estimatedtotaldue")

@@ -3,6 +3,8 @@ export type CFRFormData = {
     formStatus: string;
     estimatedTotalDue: number;
     actualTotalDue: number;
+    estimatePaymentMethod: string;
+    balancePaymentMethod: string;
     amountPaid: number;
     balanceRemaining: number;
     feewaiverAmount: number;

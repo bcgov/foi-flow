@@ -39,6 +39,8 @@ const initialState = {
   foiRequestCFRForm: {
     overallsuggestions: "",
     status: "init",
+    estimatepaymentmethod:"",
+    balancepaymentmethod:"",
     feedata: {
       estimatedtotaldue: 0,
       actualtotaldue: 0,
