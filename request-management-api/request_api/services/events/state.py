@@ -90,7 +90,8 @@ class stateevent:
         return  'Moved to '+self.__formatstate(state)+ ' State'        
 
     def __createcfrentry(self, state, ministryrequestid, userid):
-        if (state == "Fee Estimate"):
+        cfrfee = cfrfeeservice().getcfrfee(ministryrequestid)
+        if (state == "Fee Estimate" and cfrfee['cfrfeestatusid'] in (None, '')):
             return cfrfeeservice().sanctioncfrfee(ministryrequestid, {"status": "review"}, userid)
         else:
             return DefaultMethodResult(True,'No action needed',ministryrequestid)

@@ -78,7 +78,6 @@ class eventservice:
     
     async def posteventforcfrfeeform(self, ministryrequestid, userid, username):
         try:
-            self.__posteventforsanctioncfrfeeform(ministryrequestid, userid, username)
             feewaivercommentresponse, refundcommentresponse= cfrfeeformevent().createeventforupdatedamounts(ministryrequestid, userid, username)                
             if feewaivercommentresponse.success == False or refundcommentresponse.success == False: 
                 current_app.logger.error("FOI Comment failed for amount update event for CFRFEEFORM= %s" % (ministryrequestid))
