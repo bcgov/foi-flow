@@ -98,7 +98,6 @@ class Payment(Resource):
                 cfrfeeservice().paycfrfee(ministry_request_id, amountpaid)
                 paymentservice().createpaymentversion(request_id, ministry_request_id, amountpaid)
                 data = requestservice().getrequestdetails(request_id, ministry_request_id)
-                print("data == ", data)
                 paymentservice().createpaymentreceipt(request_id, ministry_request_id, data, parsed_args)
                 # prevstate = data["stateTransition"][1]["status"] if "stateTransition" in data and len(data["stateTransition"])  > 2 else None
                 # nextstatename = StateName.callforrecords.value

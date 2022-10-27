@@ -91,8 +91,6 @@ class stateevent:
 
     def __createcfrentry(self, state, ministryrequestid, userid):
         cfrfee = cfrfeeservice().getcfrfee(ministryrequestid)
-        print("cfrfee == ", cfrfee)
-        print("cfrfee['cfrfeestatusid'] == ", cfrfee['cfrfeestatusid'])
         if (state == "Fee Estimate" and cfrfee['cfrfeestatusid'] in (None, '')):
             return cfrfeeservice().sanctioncfrfee(ministryrequestid, {"status": "review"}, userid)
         else:
