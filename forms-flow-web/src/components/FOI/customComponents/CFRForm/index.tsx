@@ -281,9 +281,7 @@ export const CFRForm = ({
         return false;
       }
     }
-    let initialFormCopy = _.omit(initialFormData, ['reason']);
-    let formDataCopy = _.omit(formData, ['reason']);
-    return !_.isEqual(initialFormCopy, formDataCopy);
+    return !_.isEqual(initialFormData, formData);
   }
 
   const handleAmountPaidChanges = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -561,7 +559,7 @@ export const CFRForm = ({
                         fullWidth
                         required
                         error={formData?.reason === 'init'}
-                        disabled={!isMinistry}
+                        disabled={!isMinistry || formData?.formStatus === 'approved' || formData?.formStatus === 'review'}
                       >
                         {reasons.map((option) => (
                         <MenuItem
