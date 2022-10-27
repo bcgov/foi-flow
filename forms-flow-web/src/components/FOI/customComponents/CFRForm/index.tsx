@@ -559,7 +559,7 @@ export const CFRForm = ({
                         fullWidth
                         required
                         error={formData?.reason === 'init'}
-                        disabled={!isMinistry || formData?.formStatus === 'approved' || formData?.formStatus === 'review'}
+                        disabled={!isMinistry || formData?.formStatus === 'approved'}
                       >
                         {reasons.map((option) => (
                         <MenuItem
