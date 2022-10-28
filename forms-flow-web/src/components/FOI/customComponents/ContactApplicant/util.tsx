@@ -11,3 +11,16 @@ export const applyVariables = (content: string, params: Array<any>) => {
 
   return newContent;
 }
+
+export const getTemplateVariables = (requestDetails: any, templateInfo: any) => {
+  return [
+    {name: "{{axisRequestId}}", value: requestDetails.axisRequestId},
+    {name: "{{title}}", value: templateInfo?.label || ""},
+    {name: "{{firstName}}", value: requestDetails.firstName},
+    {name: "{{lastName}}", value: requestDetails.lastName},
+    {name: "{{assignedToFirstName}}", value: requestDetails.assignedToFirstName || ""},
+    {name: "{{assignedToLastName}}", value: requestDetails.assignedToLastName || ""},
+    {name: "{{assignedGroup}}", value: requestDetails.assignedGroup},
+  ];
+  
+}

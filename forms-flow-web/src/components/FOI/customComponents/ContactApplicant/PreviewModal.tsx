@@ -10,7 +10,7 @@ import IconButton from '@material-ui/core/IconButton';
 import CloseIcon from '@material-ui/icons/Close';
 import type { previewParams } from './types';
 import { getOSSHeaderDetails, getFileFromS3 } from "../../../../apiManager/services/FOI/foiOSSServices";
-import { renderTemplate, applyVariables } from './util';
+import { renderTemplate, applyVariables, getTemplateVariables } from './util';
 import { OSS_S3_BUCKET_FULL_PATH } from "../../../../constants/constants"
 
 export const PreviewModal = React.memo(({
@@ -48,15 +48,7 @@ export const PreviewModal = React.memo(({
     });
   }, []);
 
-  const templateVariables = [
-    {name: "{{axisRequestId}}", value: requestDetails.axisRequestId},
-    {name: "{{title}}", value: templateInfo?.label || ""},
-    {name: "{{firstName}}", value: requestDetails.firstName},
-    {name: "{{lastName}}", value: requestDetails.lastName},
-    {name: "{{assignedToFirstName}}", value: requestDetails.assignedToFirstName || ""},
-    {name: "{{assignedToLastName}}", value: requestDetails.assignedToLastName || ""},
-    {name: "{{assignedGroup}}", value: requestDetails.assignedGroup},
-  ];
+  const templateVariables = getTemplateVariables(requestDetails, templateInfo);
 
   const handleSend = () => {
     handleSave( applyVariables(innerhtml, templateVariables) );

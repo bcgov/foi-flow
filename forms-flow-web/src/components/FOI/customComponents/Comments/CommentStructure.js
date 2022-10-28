@@ -305,7 +305,7 @@ const CommentStructure = ({ i, reply, parentId, totalcommentCount, currentIndex,
         </div>
         {isEmail && i.attachments?.map((attachment) => (
           <div className="email-attachment-item" key={attachment.filename}>
-            <a href={`/foidocument?id=${ministryId}&filepath=${attachment.documenturipath.split('/').slice(4).join('/')}`}>{attachment.filename}</a>
+            <a href={`/foidocument?id=${ministryId}&filepath=${attachment.documenturipath.split('/').slice(4).join('/')}`} target="_blank">{attachment.filename}</a>
           </div>
         ))}
       </div>

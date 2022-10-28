@@ -42,11 +42,15 @@ class cfrfeeformevent:
         if len(feedata) == 2:
             newfeedata = feedata[0]
             oldfeedata = feedata[1]
-            if newfeedata["feewaiveramount"] != oldfeedata["feewaiveramount"]:
-                updatedamounts = {'feewaiveramountchanged': newfeedata["feewaiveramount"]}
+            newfeewaiveramount = self.__getvaluefromschema(newfeedata, "feewaiveramount")
+            oldfeewaiveramount = self.__getvaluefromschema(oldfeedata, "feewaiveramount")
+            if newfeewaiveramount != oldfeewaiveramount:
+                updatedamounts = {'feewaiveramountchanged': newfeewaiveramount}
                 _feewaivercommentresponse = self.__createcomment(requestid, None, userid, username, updatedamounts)
-            if newfeedata["refundamount"] != oldfeedata["refundamount"]:
-                updatedamounts = {'refundamountchanged': newfeedata["refundamount"]}
+            newrefundamount = self.__getvaluefromschema(newfeedata, "refundamount")
+            oldrefundamount = self.__getvaluefromschema(oldfeedata, "refundamount")
+            if newrefundamount != oldrefundamount:
+                updatedamounts = {'refundamountchanged': newrefundamount}
                 _refundcommentresponse = self.__createcomment(requestid, None, userid, username, updatedamounts)
         return _feewaivercommentresponse, _refundcommentresponse
 
@@ -89,3 +93,6 @@ class cfrfeeformevent:
 
     def __notificationmessage(self, state):
         return  'Updated Fee Estimate Status to '+state 
+    
+    def __getvaluefromschema(self,requestsschema, property):
+        return requestsschema.get(property) if property in requestsschema  else None 
