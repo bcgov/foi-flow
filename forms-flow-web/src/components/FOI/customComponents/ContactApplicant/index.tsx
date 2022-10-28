@@ -4,10 +4,10 @@ import TextField from '@mui/material/TextField';
 import InputAdornment from "@mui/material/InputAdornment";
 import MenuItem from '@mui/material/MenuItem';
 import './index.scss'
-import { errorToast } from "../../../../helper/FOI/helper";
+import { errorToast, getFullnameList } from "../../../../helper/FOI/helper";
 import { toast } from "react-toastify";
-import type { params, Template } from './types';
-import { fetchApplicantCorrespondence, saveEmailCorrespondence, fetchApplicantCorrespondenceTemplates } from "../../../../apiManager/services/FOI/foiCorrespondenceServices";
+import type { Template } from './types';
+import { fetchApplicantCorrespondence, saveEmailCorrespondence } from "../../../../apiManager/services/FOI/foiCorrespondenceServices";
 import _ from 'lodash';
 import IconButton from '@material-ui/core/IconButton';
 import Grid from "@material-ui/core/Grid";
@@ -16,7 +16,6 @@ import SearchIcon from "@material-ui/icons/Search";
 import InputBase from "@mui/material/InputBase";
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
-import { getFullnameList } from '../../../../helper/FOI/helper'
 import CommentStructure from '../Comments/CommentStructure'
 import AttachmentModal from '../Attachments/AttachmentModal';
 import { getOSSHeaderDetails, saveFilesinS3, getFileFromS3 } from "../../../../apiManager/services/FOI/foiOSSServices";
@@ -26,6 +25,7 @@ import { PreviewModal } from './PreviewModal';
 import { OSS_S3_BUCKET_FULL_PATH } from "../../../../constants/constants";
 import Loading from "../../../../containers/Loading";
 import {setFOICorrespondenceLoader} from "../../../../actions/FOI/foiRequestActions";
+import { applyVariables, getTemplateVariables } from './util';
 
 export const ContactApplicant = ({
   requestNumber,
@@ -104,6 +104,8 @@ export const ContactApplicant = ({
   const existingCorrespondence = applicantCorrespondence?.find((correspondence: any) => correspondence?.id === approvedForm?.cfrfeeid)
   const previewButtonValue = existingCorrespondence ? "Preview & Resend Email" : "Preview & Send Email";
 
+  const requestDetails: any = useSelector((state: any) => state.foiRequests.foiRequestDetail);
+
   const [messages, setMessages] = useState(applicantCorrespondence);
   const [disablePreview, setDisablePreview] = useState(false);
 
@@ -127,7 +129,9 @@ export const ContactApplicant = ({
 
   const handleTemplateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setCurrentTemplate(+e.target.value)
-    setEditorValue(templates[+e.target.value].text || "")
+    const templateVariables = getTemplateVariables(requestDetails, templates[+e.target.value]);
+    const finalTemplate = applyVariables(templates[+e.target.value].text || "", templateVariables);
+    setEditorValue(finalTemplate)
   }
 
   const removeFile = (index: number) => {
