@@ -27,35 +27,81 @@
   }
 }
 
-@media screen and (max-height: 655px) {
-  .foileftpanelstatus {
-    padding-top: 5% !important;
-    padding-bottom:0px !important;
-  }
-
-  .remaining-days-alert {
-    font-size: 12px;
-    font-weight: bolder;
-    padding-bottom: 0.5rem;
+@media screen and (max-height: 1024px) {
+  div.tab{
+    margin-bottom: 160px;
   }
 }
 
-@media screen and (max-height: 595px) {
-  .tab div.tablinks{
+@media screen and (min-height: 691px) and (max-height: 800px) {
+  div.tab{
+    margin-bottom: 50%;
+    height: 38%;
+  }
+  div.tab div.tablinks {
+    font-size: 15px !important;    
     height: 35px !important;
+  }
+}
+
+@media screen and (min-height: 545px) and (max-height: 690px) {
+  div.tab{
+    margin-bottom: 20%;
+    height: 35%;
+  }
+  div.tab div.tablinks {
+    font-size: 15px !important;    
+    height: 30px !important;
+  }
+}
+
+
+@media screen and (max-height: 800px) {
+  .foileftpanelstatus {
+    padding-top: 5% !important;
+    padding-bottom:0px !important;
+    font-size: 15px !important;
+    font-weight: bolder !important;
+    height: 28px !important;
+  }
+
+  .remaining-days-alert {
+    font-size: 15px !important;
+    font-weight: bolder !important;
+    // padding-bottom: 0.5rem !important;
+  }
+  .foileftpanelrequestno {
+    font-size: 15px !important;
+    font-weight: bolder !important;
+  }
+  div.foi-state-dropdown .MuiInputBase-root {
+    font-size: 15px !important;
+  }
+}
+
+@media screen and (max-height: 544px) {
+  .tab div.tablinks{
+    height: 25px !important;
     padding: 2px 8px 2px 15px !important;
-    font-size: 14px!important;
+    font-size: 15px!important;
   }
   .foileftpanelheader {
     padding-top: 10px !important;
     padding-bottom: 10px !important;
   }
-  .foileftpaneldropdown{
-    padding-bottom: 5%!important;
-  }
+  // .foileftpaneldropdown{
+  //   padding-bottom: 5%!important;
+  // }
  
-  .foitabheadercollection {
-    height: calc(100% - 80px - 67px)!important;
+  // .foitabheadercollection {
+  //   height: calc(100% - 80px - 67px)!important;
+  // }
+  .foileftpanelstatus, .remaining-days-alert, .foileftpanelrequestno {
+    font-size: 15px !important;
+    font-weight: bolder !important;
+  }
+  div.foi-state-dropdown .MuiInputBase-root {
+    font-size: 15px !important;
   }
 }
 
@@ -94,7 +140,8 @@
 
   .foitabheadercollection {
     width: fit-content;
-    height: calc(100% - 96px - 67px);
+    // height: calc(100% - 96px - 67px);
+    height: 100%;
     border-radius: 0px 30px 30px 0px!important;
     margin-bottom: auto;
     padding-bottom: 2%;
@@ -234,7 +281,7 @@
 
 /* Style the tab */
 .tab {
-  overflow: hidden;
+  // overflow: hidden;
   height: 35%;
  position: relative;
 }
@@ -248,7 +295,7 @@
   cursor: pointer;
   
   transition: 0.3s;
-  font-size: 17px;
+  // font-size: 17px;
   height: 48px;
   padding:8px;
   align-items: center;

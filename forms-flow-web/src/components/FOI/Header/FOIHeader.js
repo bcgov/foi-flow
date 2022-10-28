@@ -108,7 +108,10 @@ const triggerPopup = () => {
             </a>
           </div>
           <div className="col-md-3 col-sm-4 foiheaderAppNamesection">
-          <h2>FOI</h2>
+          <a href="/foi/dashboard" aria-label="dashboard link">
+              <i className='fa fa-home foihomebtn'><h2>FOI</h2></i>
+          </a>
+          {/* <h2>FOI</h2> */}
           </div>
             <div className="col-md-6 col-sm-4 foiheaderUserStatusSection">
           { isAuthenticated &&

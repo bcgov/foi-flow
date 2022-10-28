@@ -299,9 +299,7 @@ export const CFRForm = ({
         return false;
       }
     }
-    let initialFormCopy = _.omit(initialFormData, ['reason']);
-    let formDataCopy = _.omit(formData, ['reason']);
-    return !_.isEqual(initialFormCopy, formDataCopy);
+    return !_.isEqual(initialFormData, formData);
   }
 
   const handlePaymentMethodChanges = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -525,6 +523,8 @@ export const CFRForm = ({
     blankForm.amountPaid= initialState?.feedata?.amountpaid;
     blankForm.estimatePaymentMethod = initialState?.feedata?.estimatePaymentMethod || 'init';
     blankForm.balancePaymentMethod= initialState?.feedata?.balancePaymentMethod || 'init';
+    blankForm.feewaiverAmount = initialState?.feedata?.feewaiveramount;
+    blankForm.refundAmount = initialState?.feedata?.refundamount;
     setInitialFormData(blankForm);
     setFormData(blankForm);
     setIsNewCFRForm(true)
@@ -603,7 +603,7 @@ export const CFRForm = ({
                         fullWidth
                         required
                         error={formData?.reason === 'init'}
-                        disabled={!isMinistry}
+                        disabled={!isMinistry || formData?.formStatus === 'approved'}
                       >
                         {reasons.map((option) => (
                         <MenuItem
