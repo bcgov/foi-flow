@@ -42,6 +42,8 @@ const initialState = {
     feedata: {
       estimatedtotaldue: 0,
       actualtotaldue: 0,
+      estimatepaymentmethod:"",
+      balancepaymentmethod:"",
       actualhardcopypages: 0,
       actualproducinghrs: 0,
       actuallocatinghrs: 0,
