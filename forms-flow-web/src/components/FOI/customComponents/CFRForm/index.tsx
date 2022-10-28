@@ -192,8 +192,8 @@ export const CFRForm = ({
     estimatedTotalDue: 0,
     actualTotalDue: 0,
     amountPaid: 0,
-    estimatePaymentMethod: "",
-    balancePaymentMethod: "",
+    estimatePaymentMethod: "init",
+    balancePaymentMethod: "init",
     balanceRemaining:0,
     feewaiverAmount:0,
     refundAmount:0,
@@ -523,8 +523,8 @@ export const CFRForm = ({
   const newCFRForm = () => {
     setCreateModalOpen(false)
     blankForm.amountPaid= initialState?.feedata?.amountpaid;
-    blankForm.estimatePaymentMethod = initialState?.feedata?.estimatePaymentMethod || 'init';
-    blankForm.balancePaymentMethod= initialState?.feedata?.balancePaymentMethod || 'init';
+    blankForm.estimatePaymentMethod = initialState?.feedata?.estimatepaymentmethod || 'init';
+    blankForm.balancePaymentMethod= initialState?.feedata?.balancepaymentmethod || 'init';
     blankForm.feewaiverAmount = initialState?.feedata?.feewaiveramount;
     blankForm.refundAmount = initialState?.feedata?.refundamount;
     setInitialFormData(blankForm);
