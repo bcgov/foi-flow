@@ -114,6 +114,7 @@ class Payment(Resource):
                 #     paymenteventtype = PaymentEventType.outstandingpaid.value
                 # # result = requestservice().updaterequeststatus(request_id, ministry_request_id, statusid)
                 # # if result.success == True:
+                cfrfeeservice().updatepaymentmethod(ministry_request_id, paymenteventtype)
                 nextstatename, paymenteventtype = paymentservice().postpayment(ministry_request_id, data)
                 asyncio.ensure_future(eventservice().postpaymentevent(ministry_request_id, paymenteventtype))
                 requestservice().postfeeeventtoworkflow(request_id, ministry_request_id, "PAID", nextstatename)

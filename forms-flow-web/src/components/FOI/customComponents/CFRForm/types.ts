@@ -3,6 +3,8 @@ export type CFRFormData = {
     formStatus: string;
     estimatedTotalDue: number;
     actualTotalDue: number;
+    estimatePaymentMethod: string;
+    balancePaymentMethod: string;
     amountPaid: number;
     balanceRemaining: number;
     feewaiverAmount: number;
@@ -36,5 +38,6 @@ export type params = {
 export type modalParams = {
   modalOpen: boolean;
   handleClose: () => void;
-  formHistory: Array<any>
+  formHistory: Array<any>;
+  isMinistry: boolean;
 }

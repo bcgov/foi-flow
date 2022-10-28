@@ -37,7 +37,8 @@ export const ContactApplicant = ({
 }: any) => {
 
   const dispatch = useDispatch();
-  const isCFRFormApproved: boolean = useSelector((state: any) => state.foiRequests.foiRequestCFRFormHistory.length > 0);
+  const isCFRFormApproved: boolean = useSelector((state: any) => state.foiRequests.foiRequestCFRForm.status === 'approved');
+  const isEstimatePaid: boolean = useSelector((state: any) => state.foiRequests.foiRequestCFRForm.feedata.estimatepaymentmethod !== '');
   const isLoading: boolean = useSelector((state: any) => state.foiRequests.isCorrespondenceLoading);
   const fullNameList = getFullnameList()
 
@@ -88,7 +89,7 @@ export const ContactApplicant = ({
                 label: item.description,
                 templateid: item.templateid,
                 text: await new Response(response.data).text(),
-                disabled: !isCFRFormApproved
+                disabled: !isCFRFormApproved || (item.name === 'PAYONLINE' && isEstimatePaid)
               }
               templateList.push(templateItem);
               setTemplates(templateList);
@@ -97,7 +98,7 @@ export const ContactApplicant = ({
         }
       });
     });
-  }, [isCFRFormApproved]);
+  }, [isCFRFormApproved, isEstimatePaid]);
 
   const formHistory: Array<any> = useSelector((state: any) => state.foiRequests.foiRequestCFRFormHistory);
   const approvedForm = formHistory?.find(form => form?.status?.toLowerCase() === 'approved');
