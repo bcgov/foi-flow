@@ -281,9 +281,7 @@ export const CFRForm = ({
         return false;
       }
     }
-    let initialFormCopy = _.omit(initialFormData, ['reason']);
-    let formDataCopy = _.omit(formData, ['reason']);
-    return !_.isEqual(initialFormCopy, formDataCopy);
+    return !_.isEqual(initialFormData, formData);
   }
 
   const handleAmountPaidChanges = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -481,6 +479,8 @@ export const CFRForm = ({
   const newCFRForm = () => {
     setCreateModalOpen(false)
     blankForm.amountPaid= initialState?.feedata?.amountpaid;
+    blankForm.feewaiverAmount = initialState?.feedata?.feewaiveramount;
+    blankForm.refundAmount = initialState?.feedata?.refundamount;
     setInitialFormData(blankForm);
     setFormData(blankForm);
     setIsNewCFRForm(true)
@@ -559,7 +559,7 @@ export const CFRForm = ({
                         fullWidth
                         required
                         error={formData?.reason === 'init'}
-                        disabled={!isMinistry}
+                        disabled={!isMinistry || formData?.formStatus === 'approved'}
                       >
                         {reasons.map((option) => (
                         <MenuItem
