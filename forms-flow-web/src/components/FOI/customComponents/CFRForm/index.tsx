@@ -310,16 +310,18 @@ export const CFRForm = ({
 
   const handleAmountPaidChanges = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value : number = Math.floor((+e.target.value) * 100) / 100;
-    if (value === 0) {
-      setFormData(values => ({...values, estimatePaymentMethod: 'init', balancePaymentMethod: 'init'}));
-    } else if (formData.amountPaid === 0 && value > 0) {
-      setFormData(values => ({
-        ...values,
-        estimatePaymentMethod: initialFormData.estimatePaymentMethod,
-        balancePaymentMethod: initialFormData.balancePaymentMethod
-      }));
+    if (value <= Math.max(formData.actualTotalDue, formData.estimatedTotalDue)) {
+      if (value === 0) {
+        setFormData(values => ({...values, estimatePaymentMethod: 'init', balancePaymentMethod: 'init', amountPaid: value}));
+      } else if (formData.amountPaid === 0 && value > 0) {
+        setFormData(values => ({
+          ...values,
+          estimatePaymentMethod: initialFormData.estimatePaymentMethod,
+          balancePaymentMethod: initialFormData.balancePaymentMethod,
+          amountPaid: value
+        }));
+      }
     }
-    handleAmountChanges(e)
   };
 
   const handleAmountChanges = (e: React.ChangeEvent<HTMLInputElement>) => {
