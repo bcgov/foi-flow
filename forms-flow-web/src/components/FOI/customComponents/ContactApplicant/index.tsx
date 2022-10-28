@@ -69,7 +69,7 @@ export const ContactApplicant = ({
   React.useEffect(() => {
     let templateList: any = [
       { value: "", label: "", templateid: null, text: "", disabled: true },
-      { value: "", label: "None", templateid: null, text: "", disabled: false }
+      // { value: "", label: "None", templateid: null, text: "", disabled: false }
     ];
 
     applicantCorrespondenceTemplates.forEach((item: any) => {
