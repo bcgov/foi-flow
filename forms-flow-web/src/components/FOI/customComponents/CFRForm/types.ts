@@ -38,5 +38,6 @@ export type params = {
 export type modalParams = {
   modalOpen: boolean;
   handleClose: () => void;
-  formHistory: Array<any>
+  formHistory: Array<any>;
+  isMinistry: boolean;
 }

@@ -13,11 +13,14 @@ import Typography from '@mui/material/Typography';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import TextField from '@mui/material/TextField';
 import InputAdornment from "@mui/material/InputAdornment";
+import { paymentMethods } from './util';
+import MenuItem from '@mui/material/MenuItem';
 
 export const CFRFormHistoryModal = React.memo(({
   modalOpen,
   handleClose,
   formHistory,
+  isMinistry
 }: modalParams) => {
 
   return (
@@ -60,6 +63,60 @@ export const CFRFormHistoryModal = React.memo(({
                       </div>
                     </div>
                   </div>
+                  {!isMinistry && <div className="row foi-details-row">
+                    <div className="col-lg-6 foi-details-col">
+                      <TextField
+                        id="estimatePaymentMethod"
+                        label="Estimate Payment Method"
+                        inputProps={{
+                          "aria-labelledby": "estimatePaymentMethod-label"
+                        }}
+                        InputLabelProps={{ shrink: true }}
+                        variant="outlined"
+                        select
+                        name="estimatePaymentMethod"
+                        value={entry.feedata.estimatepaymentmethod}
+                        fullWidth
+                        disabled={true}
+                      >
+                        {paymentMethods.map((option) => (
+                        <MenuItem
+                          key={option.value}
+                          value={option.value}
+                          disabled={option.disabled}
+                        >
+                          {option.label}
+                        </MenuItem>
+                        ))}
+                      </TextField>
+                    </div>
+                    <div className="col-lg-6 foi-details-col">
+                      <TextField
+                        id="balancePaymentMethod"
+                        label="Balance Payment Method"
+                        inputProps={{
+                          "aria-labelledby": "balancePaymentMethod-label"
+                        }}
+                        InputLabelProps={{ shrink: true }}
+                        select
+                        variant="outlined"
+                        name="balancePaymentMethod"
+                        value={entry.feedata.balancepaymentmethod}
+                        fullWidth
+                        disabled={true}
+                        >
+                          {paymentMethods.map((option) => (
+                          <MenuItem
+                            key={option.value}
+                            value={option.value}
+                            disabled={option.disabled}
+                          >
+                            {option.label}
+                          </MenuItem>
+                          ))}
+                        </TextField>
+                    </div>
+                  </div>}
                   <div className="row foi-details-row">
                     <div className="col-lg-6 foi-details-col">
                       <TextField

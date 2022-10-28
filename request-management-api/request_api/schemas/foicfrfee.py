@@ -16,6 +16,8 @@ class FOIFeeDataSchema(Schema):
     amountpaid = fields.Float(data_key="amountpaid")
     estimatedtotaldue = fields.Float(data_key="estimatedtotaldue")
     actualtotaldue = fields.Float(data_key="actualtotaldue")
+    estimatepaymentmethod = fields.Str(data_key="estimatepaymentmethod", validate=validate.OneOf(['moneyorder', 'creditcardphone', 'cheque', 'cash']), required=False)
+    balancepaymentmethod = fields.Str(data_key="balancepaymentmethod", validate=validate.OneOf(['moneyorder', 'creditcardphone', 'cheque', 'cash']), required=False)
     balanceremaining = fields.Float(data_key="balanceremaining")
     feewaiveramount = fields.Float(data_key="feewaiveramount")
     refundamount = fields.Float(data_key="refundamount")

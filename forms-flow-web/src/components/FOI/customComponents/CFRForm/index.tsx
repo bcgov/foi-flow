@@ -13,7 +13,7 @@ import Box from '@mui/material/Box';
 import Chip from '@mui/material/Chip';
 import { errorToast, isMinistryLogin } from "../../../../helper/FOI/helper";
 import type { params, CFRFormData } from './types';
-import { calculateFees } from './util';
+import { calculateFees, paymentMethods } from './util';
 import foiFees from '../../../../constants/FOI/foiFees.json';
 import { fetchCFRForm, saveCFRForm } from "../../../../apiManager/services/FOI/foiCFRFormServices";
 import _ from 'lodash';
@@ -84,39 +84,6 @@ export const CFRForm = ({
     {
       value: 'revisedfeeestimate',
       label: 'Revised Fee Estimate',
-      disabled: false,
-    }
-  ];
-
-  const paymentMethods = [
-    {
-      value: 'init',
-      label: 'Select Payment Method',
-      disabled: true
-    },
-    {
-      value: 'creditcardonline',
-      label: 'Credit Card - Online',
-      disabled: true,
-    },
-    {
-      value: 'creditcardphone',
-      label: 'Credit Card - Phone',
-      disabled: false,
-    },
-    {
-      value: 'cheque',
-      label: 'Cheque',
-      disabled: false,
-    },
-    {
-      value: 'moneyorder',
-      label: 'Money Order',
-      disabled: false,
-    },
-    {
-      value: 'cash',
-      label: 'Cash',
       disabled: false,
     }
   ];
@@ -312,7 +279,7 @@ export const CFRForm = ({
   const validateBalancePaymentMethod = () => {
     return initialFormData?.amountPaid !== 0 &&
     formData?.amountPaid !== 0 &&
-    formData?.amountPaid !== initialFormData?.amountPaid &&
+    formData?.amountPaid > initialFormData?.amountPaid &&
     formData?.balancePaymentMethod === 'init'
   }
 
@@ -344,11 +311,17 @@ export const CFRForm = ({
   };
 
   const handleAmountPaidChanges = (e: React.ChangeEvent<HTMLInputElement>) => {
-    handleAmountChanges(e)
     const value : number = Math.floor((+e.target.value) * 100) / 100;
     if (value === 0) {
       setFormData(values => ({...values, estimatePaymentMethod: 'init', balancePaymentMethod: 'init'}));
+    } else if (formData.amountPaid === 0 && value > 0) {
+      setFormData(values => ({
+        ...values,
+        estimatePaymentMethod: initialFormData.estimatePaymentMethod,
+        balancePaymentMethod: initialFormData.balancePaymentMethod
+      }));
     }
+    handleAmountChanges(e)
   };
 
   const handleAmountChanges = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -440,6 +413,8 @@ export const CFRForm = ({
           amountpaid: formData.amountPaid,
           estimatedtotaldue: formData.estimatedTotalDue,
           actualtotaldue: formData.actualTotalDue,
+          ...formData.estimatePaymentMethod !== 'init' && {estimatepaymentmethod: formData.estimatePaymentMethod},
+          ...formData.balancePaymentMethod !== 'init' && {balancepaymentmethod: formData.balancePaymentMethod},
           balanceremaining: calculateBalanceRemaining(),
           feewaiveramount: formData.feewaiverAmount,
           refundamount: formData.refundAmount,
@@ -548,6 +523,8 @@ export const CFRForm = ({
   const newCFRForm = () => {
     setCreateModalOpen(false)
     blankForm.amountPaid= initialState?.feedata?.amountpaid;
+    blankForm.estimatePaymentMethod = initialState?.feedata?.estimatePaymentMethod || 'init';
+    blankForm.balancePaymentMethod= initialState?.feedata?.balancePaymentMethod || 'init';
     setInitialFormData(blankForm);
     setFormData(blankForm);
     setIsNewCFRForm(true)
@@ -652,6 +629,7 @@ export const CFRForm = ({
                   modalOpen={historyModalOpen}
                   handleClose={handleHistoryClose}
                   formHistory={formHistory}
+                  isMinistry={isMinistry}
                 />
                 <button
                   type="button"
@@ -712,7 +690,7 @@ export const CFRForm = ({
                           variant="outlined"
                           fullWidth
                           required
-                          disabled={initialFormData?.formStatus !== 'approved' || initialFormData?.amountPaid === 0 || formData?.amountPaid === initialFormData?.amountPaid}
+                          disabled={initialFormData?.formStatus !== 'approved' || initialFormData?.amountPaid === 0 || formData?.amountPaid <= initialFormData?.amountPaid}
                           error={validateBalancePaymentMethod()}
                           helperText={validateBalancePaymentMethod() &&
                             "Balance payment method must be specified if amount paid is manually updated"
