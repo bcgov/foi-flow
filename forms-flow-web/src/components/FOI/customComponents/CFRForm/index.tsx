@@ -320,6 +320,8 @@ export const CFRForm = ({
           balancePaymentMethod: initialFormData.balancePaymentMethod,
           amountPaid: value
         }));
+      } else {
+        setFormData(values => ({...values, amountPaid: value}));
       }
     }
   };
