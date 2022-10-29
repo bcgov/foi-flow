@@ -309,26 +309,24 @@ export const CFRForm = ({
   };
 
   const handleAmountPaidChanges = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value : number = Math.floor((+e.target.value) * 100) / 100;
-    if (value <= Math.max(formData.actualTotalDue, formData.estimatedTotalDue)) {
-      if (value === 0) {
-        setFormData(values => ({...values, estimatePaymentMethod: 'init', balancePaymentMethod: 'init', amountPaid: value}));
-      } else if (formData.amountPaid === 0 && value > 0) {
-        setFormData(values => ({
-          ...values,
-          estimatePaymentMethod: initialFormData.estimatePaymentMethod,
-          balancePaymentMethod: initialFormData.balancePaymentMethod,
-          amountPaid: value
-        }));
-      } else {
-        setFormData(values => ({...values, amountPaid: value}));
-      }
+    var re = new RegExp('^-?\\d+(?:\.\\d{0,' + (2 || -1) + '})?');
+    const value : number = +e.target.value.match(re)[0]
+    if (value === 0) {
+      setFormData(values => ({...values, estimatePaymentMethod: 'init', balancePaymentMethod: 'init'}));
+    } else if (formData.amountPaid === 0 && value > 0) {
+      setFormData(values => ({
+        ...values,
+        estimatePaymentMethod: initialFormData.estimatePaymentMethod,
+        balancePaymentMethod: initialFormData.balancePaymentMethod
+      }));
     }
+    handleAmountChanges(e)
   };
 
   const handleAmountChanges = (e: React.ChangeEvent<HTMLInputElement>) => {
     const name : string = e.target.name;
-    const value : number = Math.floor((+e.target.value) * 100) / 100;
+    var re = new RegExp('^-?\\d+(?:\.\\d{0,' + (2 || -1) + '})?');
+    const value : number = +e.target.value.match(re)[0]
     if (value <= Math.max(formData.actualTotalDue, formData.estimatedTotalDue)) {
       setFormData(values => ({...values, [name]: value}));
     }
