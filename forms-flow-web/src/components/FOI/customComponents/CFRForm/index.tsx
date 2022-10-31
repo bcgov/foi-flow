@@ -372,8 +372,10 @@ export const CFRForm = ({
       balanceRemaining = (formData.actualTotalDue - formData.amountPaid - formData.feewaiverAmount);
     else
       balanceRemaining = (formData.estimatedTotalDue - formData.amountPaid - formData.feewaiverAmount)
-    console.log(!Number.isNaN(balanceRemaining))
-    console.log(balanceRemaining)
+    
+    console.log(`estimated = ${formData.estimatedTotalDue}`)
+    console.log(`amountPaid = ${formData.amountPaid}`)
+    console.log(`feewaiverAmount = ${formData.feewaiverAmount}`)
     return !Number.isNaN(balanceRemaining) || balanceRemaining  ? balanceRemaining : 0;
   }
 
