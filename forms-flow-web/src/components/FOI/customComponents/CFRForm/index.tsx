@@ -367,7 +367,12 @@ export const CFRForm = ({
   };
 
   const calculateBalanceRemaining = () => {
-    return formData?.actualTotalDue ? (formData.actualTotalDue - formData.amountPaid - formData.feewaiverAmount) : (formData.estimatedTotalDue - formData.amountPaid - formData.feewaiverAmount);
+    let balanceRemaining = 0;
+    if (formData?.actualTotalDue)
+      balanceRemaining = (formData.actualTotalDue - formData.amountPaid - formData.feewaiverAmount);
+    else
+      balanceRemaining = (formData.estimatedTotalDue - formData.amountPaid - formData.feewaiverAmount)
+    return balanceRemaining > 0 ? balanceRemaining : 0;
   }
 
   const cfrStatusDisabled = () => {
