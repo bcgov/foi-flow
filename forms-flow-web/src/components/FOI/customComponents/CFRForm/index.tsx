@@ -231,7 +231,7 @@ export const CFRForm = ({
       balancePaymentMethod: initialState.feedata?.balancepaymentmethod || 'init',
       amountPaid: initialState.feedata?.amountpaid,
       balanceRemaining: initialState.feedata?.balanceremaining,
-      feewaiverAmount: initialState.feedata?.feewaiveramount,
+      feewaiverAmount: initialState.feedata?.feewaiveramount || 0,
       refundAmount: initialState.feedata?.refundamount,
       estimates: {
         locating: initialState.feedata?.estimatedlocatinghrs,
@@ -372,7 +372,8 @@ export const CFRForm = ({
       balanceRemaining = (formData.actualTotalDue - formData.amountPaid - formData.feewaiverAmount);
     else
       balanceRemaining = (formData.estimatedTotalDue - formData.amountPaid - formData.feewaiverAmount)
-    
+    console.log(!Number.isNaN(balanceRemaining))
+    console.log(balanceRemaining)
     return !Number.isNaN(balanceRemaining) || balanceRemaining  ? balanceRemaining : 0;
   }
 
