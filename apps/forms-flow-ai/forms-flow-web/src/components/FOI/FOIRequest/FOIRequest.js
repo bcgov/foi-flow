@@ -205,7 +205,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
       dispatch(fetchFOIRequestDescriptionList(requestId, ministryId));
       dispatch(fetchFOIRequestNotesList(requestId, ministryId));
       dispatch(fetchFOIRequestAttachmentsList(requestId, ministryId));
-      fetchFOIRecords(requestId, ministryId);
+      dispatch(fetchFOIRecords(requestId, ministryId));
     }
 
     dispatch(fetchFOICategoryList());

@@ -14,34 +14,35 @@ import {
   import { replaceUrl } from "../../../helper/FOI/helper";
 
  export const fetchFOIRecords = (requestId, ministryId, ...rest) => {
-  if (ministryId) {
-    const done = fnDone(rest);
-    let apiUrl = replaceUrl(replaceUrl(
-      API.FOI_GET_RECORDS,
-     "<ministryrequestid>", ministryId),
-     "<requestid>", requestId);
-    return (dispatch) => {
-      httpGETRequest(apiUrl, {}, UserService.getToken())
-        .then((res) => {
-          if (res.data) {
-            dispatch(setRequestRecords(res.data));
-            dispatch(setFOIAttachmentListLoader(false));
-            done(null, res.data);
-
-          } else {
-            console.log("Error in fetching records", res);
-            dispatch(serviceActionError(res));
-            dispatch(setFOIAttachmentListLoader(false));
-          }
-        })
-        .catch((error) => {
-          console.log("Error in fetching records", error);
-          dispatch(serviceActionError(error));
-          dispatch(setFOIAttachmentListLoader(false));
-          done(error);
-        });
-    };
+  if (!ministryId) {
+    return () => {};
   }
+  const done = fnDone(rest);
+  let apiUrl = replaceUrl(replaceUrl(
+    API.FOI_GET_RECORDS,
+    "<ministryrequestid>", ministryId),
+    "<requestid>", requestId);
+  return (dispatch) => {
+    httpGETRequest(apiUrl, {}, UserService.getToken())
+      .then((res) => {
+        if (res.data) {
+          dispatch(setRequestRecords(res.data));
+          dispatch(setFOIAttachmentListLoader(false));
+          done(null, res.data);
+
+        } else {
+          console.log("Error in fetching records", res);
+          dispatch(serviceActionError(res));
+          dispatch(setFOIAttachmentListLoader(false));
+        }
+      })
+      .catch((error) => {
+        console.log("Error in fetching records", error);
+        dispatch(serviceActionError(error));
+        dispatch(setFOIAttachmentListLoader(false));
+        done(error);
+      });
+  };
 };
 
   export const saveFOIRecords = (requestId, ministryId, data, ...rest) => {

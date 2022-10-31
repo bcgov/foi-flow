@@ -167,7 +167,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
       dispatch(fetchFOIRequestDescriptionList(requestId, ministryId));
       dispatch(fetchFOIRequestNotesList(requestId, ministryId));
       dispatch(fetchFOIRequestAttachmentsList(requestId, ministryId));
-      fetchFOIRecords(requestId, ministryId);
+      dispatch(fetchFOIRecords(requestId, ministryId));
       if (bcgovcode) dispatch(fetchFOIMinistryAssignedToList(bcgovcode));
     }
   }, [requestId, ministryId, comment, attachments]);

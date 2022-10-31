@@ -15,3 +15,11 @@
 .records-actions-btn {
     padding: 0 !important;
 }
+
+.file-upload-toast {
+    .Toastify__toast-body {
+        > div:last-child {
+            white-space: pre-line;
+        }
+    }
+}
