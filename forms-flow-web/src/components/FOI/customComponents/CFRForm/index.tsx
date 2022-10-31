@@ -287,13 +287,13 @@ export const CFRForm = ({
     if (validateBalancePaymentMethod() || validateEstimatePaymentMethod()) {
       return false;
     }
-    var field: keyof typeof formData.estimates;
+    let field: keyof typeof formData.estimates;
     for (field in formData.estimates) {
       if (validateField(formData.estimates[field], foiFees[field].unit)) {
         return false;
       }
     }
-    var afield: keyof typeof formData.actual
+    let afield: keyof typeof formData.actual
     for (afield in formData.actual) {
       if (validateField(formData.actual[afield], foiFees[afield].unit)) {
         return false;
@@ -309,7 +309,7 @@ export const CFRForm = ({
   };
 
   const handleAmountPaidChanges = (e: React.ChangeEvent<HTMLInputElement>) => {
-    var re = new RegExp('^-?\\d+(?:\.\\d{0,' + (2 || -1) + '})?');
+    let re = new RegExp('^-?\\d+(?:\.\\d{0,' + (2 || -1) + '})?');
     const value : number = +e.target.value.match(re)[0]
     if (value === 0) {
       setFormData(values => ({...values, estimatePaymentMethod: 'init', balancePaymentMethod: 'init'}));
@@ -325,7 +325,7 @@ export const CFRForm = ({
 
   const handleAmountChanges = (e: React.ChangeEvent<HTMLInputElement>) => {
     const name : string = e.target.name;
-    var re = new RegExp('^-?\\d+(?:\.\\d{0,' + (2 || -1) + '})?');
+    let re = new RegExp('^-?\\d+(?:\.\\d{0,' + (2 || -1) + '})?');
     const value : number = +e.target.value.match(re)[0]
     if (value <= Math.max(formData.actualTotalDue, formData.estimatedTotalDue)) {
       setFormData(values => ({...values, [name]: value}));
@@ -367,7 +367,12 @@ export const CFRForm = ({
   };
 
   const calculateBalanceRemaining = () => {
-    return formData?.actualTotalDue ? (formData.actualTotalDue - formData.amountPaid - formData.feewaiverAmount) : (formData.estimatedTotalDue - formData.amountPaid - formData.feewaiverAmount);
+    let balanceRemaining = 0;
+    if (formData?.actualTotalDue)
+      balanceRemaining = (formData.actualTotalDue - formData.amountPaid - formData.feewaiverAmount);
+    else
+      balanceRemaining = (formData.estimatedTotalDue - formData.amountPaid - formData.feewaiverAmount)
+    return balanceRemaining > 0 ? balanceRemaining : 0;
   }
 
   const cfrStatusDisabled = () => {
@@ -406,7 +411,7 @@ export const CFRForm = ({
         dispatch,
       );
     };
-    var data;
+    let data;
     if (isMinistry) {
       data = {
         feedata:{
