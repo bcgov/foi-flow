@@ -372,7 +372,7 @@ export const CFRForm = ({
       balanceRemaining = (formData.actualTotalDue - formData.amountPaid - formData.feewaiverAmount);
     else
       balanceRemaining = (formData.estimatedTotalDue - formData.amountPaid - formData.feewaiverAmount)
-    return balanceRemaining > 0 ? balanceRemaining : 0;
+    return !Number.isNaN(balanceRemaining) || balanceRemaining  ? balanceRemaining : 0;
   }
 
   const cfrStatusDisabled = () => {
