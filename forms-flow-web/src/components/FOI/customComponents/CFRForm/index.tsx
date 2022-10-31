@@ -787,13 +787,13 @@ export const CFRForm = ({
                         <span className="formLabel">Estimated Total</span>
                       </div>
                       <div className="col-lg-2 foi-details-col">
-                        <span className="formLabel">{"$"+(formData?.estimatedTotalDue)?.toFixed(2) || 0}</span>
+                        <span className="formLabel">{`$${+(formData?.estimatedTotalDue || 0)?.toFixed(2) || 0}`}</span>
                       </div>
                       <div className="col-lg-4 foi-details-col">
                         <span className="formLabel">Actual Total</span>
                       </div>
                       <div className="col-lg-2 foi-details-col">
-                        <span className="formLabel">{"$"+(formData?.actualTotalDue)?.toFixed(2) || 0}</span>
+                        <span className="formLabel">{`$${+(formData?.actualTotalDue || 0)?.toFixed(2) || 0}`}</span>
                       </div>
                     </div>
                     <div className="row foi-details-row">
