@@ -225,8 +225,8 @@ export const CFRForm = ({
     let formattedData = {
       cfrfeeid: initialState.cfrfeeid,
       formStatus: initialState.status === null ? 'init' : initialState.status,
-      estimatedTotalDue: initialState.feedata?.estimatedtotaldue,
-      actualTotalDue: initialState.feedata?.actualtotaldue,
+      estimatedTotalDue: initialState.feedata?.estimatedtotaldue || 0,
+      actualTotalDue: initialState.feedata?.actualtotaldue || 0,
       estimatePaymentMethod: initialState.feedata?.estimatepaymentmethod || 'init',
       balancePaymentMethod: initialState.feedata?.balancepaymentmethod || 'init',
       amountPaid: initialState.feedata?.amountpaid,
