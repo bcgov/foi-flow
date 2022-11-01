@@ -225,13 +225,13 @@ export const CFRForm = ({
     let formattedData = {
       cfrfeeid: initialState.cfrfeeid,
       formStatus: initialState.status === null ? 'init' : initialState.status,
-      estimatedTotalDue: initialState.feedata?.estimatedtotaldue,
-      actualTotalDue: initialState.feedata?.actualtotaldue,
+      estimatedTotalDue: initialState.feedata?.estimatedtotaldue || 0,
+      actualTotalDue: initialState.feedata?.actualtotaldue || 0,
       estimatePaymentMethod: initialState.feedata?.estimatepaymentmethod || 'init',
       balancePaymentMethod: initialState.feedata?.balancepaymentmethod || 'init',
       amountPaid: initialState.feedata?.amountpaid,
       balanceRemaining: initialState.feedata?.balanceremaining,
-      feewaiverAmount: initialState.feedata?.feewaiveramount,
+      feewaiverAmount: initialState.feedata?.feewaiveramount || 0,
       refundAmount: initialState.feedata?.refundamount,
       estimates: {
         locating: initialState.feedata?.estimatedlocatinghrs,
@@ -786,13 +786,13 @@ export const CFRForm = ({
                         <span className="formLabel">Estimated Total</span>
                       </div>
                       <div className="col-lg-2 foi-details-col">
-                        <span className="formLabel">{"$"+(formData?.estimatedTotalDue)?.toFixed(2) || 0}</span>
+                        <span className="formLabel">{`$${+(formData?.estimatedTotalDue || 0)?.toFixed(2) || 0}`}</span>
                       </div>
                       <div className="col-lg-4 foi-details-col">
                         <span className="formLabel">Actual Total</span>
                       </div>
                       <div className="col-lg-2 foi-details-col">
-                        <span className="formLabel">{"$"+(formData?.actualTotalDue)?.toFixed(2) || 0}</span>
+                        <span className="formLabel">{`$${+(formData?.actualTotalDue || 0)?.toFixed(2) || 0}`}</span>
                       </div>
                     </div>
                     <div className="row foi-details-row">
