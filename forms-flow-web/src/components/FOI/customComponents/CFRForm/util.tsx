@@ -33,3 +33,36 @@ const calculateFeesByPages = (name: string, pages: number) => {
     return 0;
   }
 }
+
+export const paymentMethods = [
+  {
+    value: 'init',
+    label: 'Select Payment Method',
+    disabled: true
+  },
+  {
+    value: 'creditcardonline',
+    label: 'Credit Card - Online',
+    disabled: true,
+  },
+  {
+    value: 'creditcardphone',
+    label: 'Credit Card - Phone',
+    disabled: false,
+  },
+  {
+    value: 'cheque',
+    label: 'Cheque',
+    disabled: false,
+  },
+  {
+    value: 'moneyorder',
+    label: 'Money Order',
+    disabled: false,
+  },
+  {
+    value: 'cash',
+    label: 'Cash',
+    disabled: false,
+  }
+];

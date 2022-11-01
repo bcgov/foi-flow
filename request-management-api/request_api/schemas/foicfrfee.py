@@ -1,5 +1,5 @@
 
-from marshmallow import EXCLUDE, Schema, fields
+from marshmallow import EXCLUDE, Schema, fields, validate
 
 """
 This class  consolidates schemas of CFR Fee Form operations.
@@ -16,6 +16,8 @@ class FOIFeeDataSchema(Schema):
     amountpaid = fields.Float(data_key="amountpaid")
     estimatedtotaldue = fields.Float(data_key="estimatedtotaldue")
     actualtotaldue = fields.Float(data_key="actualtotaldue")
+    estimatepaymentmethod = fields.Str(data_key="estimatepaymentmethod", validate=validate.OneOf(['moneyorder', 'creditcardphone', 'creditcardonline', 'cheque', 'cash']), required=False)
+    balancepaymentmethod = fields.Str(data_key="balancepaymentmethod", validate=validate.OneOf(['moneyorder', 'creditcardphone', 'creditcardonline', 'cheque', 'cash']), required=False)
     balanceremaining = fields.Float(data_key="balanceremaining")
     feewaiveramount = fields.Float(data_key="feewaiveramount")
     refundamount = fields.Float(data_key="refundamount")
@@ -48,6 +50,8 @@ class FOIFeeDataSanctionSchema(Schema):
         """Exclude unknown fields in the deserialized output."""
 
     amountpaid = fields.Float(data_key="amountpaid") 
+    estimatepaymentmethod = fields.Str(data_key="estimatepaymentmethod", validate=validate.OneOf(['moneyorder', 'creditcardphone', 'creditcardonline', 'cheque', 'cash']), required=False)
+    balancepaymentmethod = fields.Str(data_key="balancepaymentmethod", validate=validate.OneOf(['moneyorder', 'creditcardphone', 'creditcardonline', 'cheque', 'cash']), required=False)
     estimatediaopreparinghrs = fields.Float(data_key="estimatediaopreparinghrs")
     actualiaopreparinghrs = fields.Float(data_key="actualiaopreparinghrs")
     estimatedtotaldue = fields.Float(data_key="estimatedtotaldue")

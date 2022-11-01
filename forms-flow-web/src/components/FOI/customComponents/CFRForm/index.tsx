@@ -13,7 +13,7 @@ import Box from '@mui/material/Box';
 import Chip from '@mui/material/Chip';
 import { errorToast, isMinistryLogin } from "../../../../helper/FOI/helper";
 import type { params, CFRFormData } from './types';
-import { calculateFees } from './util';
+import { calculateFees, paymentMethods } from './util';
 import foiFees from '../../../../constants/FOI/foiFees.json';
 import { fetchCFRForm, saveCFRForm } from "../../../../apiManager/services/FOI/foiCFRFormServices";
 import _ from 'lodash';
@@ -101,7 +101,7 @@ export const CFRForm = ({
     "title": "Reasons",
     "content": [
       <div className="toolTipContent">
-        <p>Select 'Narrowed Request' when the applicant has narrowed their request. Select 'Revised Fee Estimate' 
+        <p>Select 'Narrowed Request' when the applicant has narrowed their request. Select 'Revised Fee Estimate'
           when the request has not been narrowed but the estimated hours have changed.</p>
       </div>]
   };
@@ -192,6 +192,8 @@ export const CFRForm = ({
     estimatedTotalDue: 0,
     actualTotalDue: 0,
     amountPaid: 0,
+    estimatePaymentMethod: "init",
+    balancePaymentMethod: "init",
     balanceRemaining:0,
     feewaiverAmount:0,
     refundAmount:0,
@@ -223,11 +225,13 @@ export const CFRForm = ({
     let formattedData = {
       cfrfeeid: initialState.cfrfeeid,
       formStatus: initialState.status === null ? 'init' : initialState.status,
-      estimatedTotalDue: initialState.feedata?.estimatedtotaldue,
-      actualTotalDue: initialState.feedata?.actualtotaldue,
+      estimatedTotalDue: initialState.feedata?.estimatedtotaldue || 0,
+      actualTotalDue: initialState.feedata?.actualtotaldue || 0,
+      estimatePaymentMethod: initialState.feedata?.estimatepaymentmethod || 'init',
+      balancePaymentMethod: initialState.feedata?.balancepaymentmethod || 'init',
       amountPaid: initialState.feedata?.amountpaid,
       balanceRemaining: initialState.feedata?.balanceremaining,
-      feewaiverAmount: initialState.feedata?.feewaiveramount,
+      feewaiverAmount: initialState.feedata?.feewaiveramount || 0,
       refundAmount: initialState.feedata?.refundamount,
       estimates: {
         locating: initialState.feedata?.estimatedlocatinghrs,
@@ -268,14 +272,28 @@ export const CFRForm = ({
     return (value % step) !== 0;
   }
 
+  const validateEstimatePaymentMethod = () => {
+    return initialFormData?.amountPaid === 0 && formData?.amountPaid > 0 && formData?.estimatePaymentMethod === 'init'
+  }
+
+  const validateBalancePaymentMethod = () => {
+    return initialFormData?.amountPaid !== 0 &&
+    formData?.amountPaid !== 0 &&
+    formData?.amountPaid > initialFormData?.amountPaid &&
+    formData?.balancePaymentMethod === 'init'
+  }
+
   const validateFields = () => {
-    var field: keyof typeof formData.estimates;
+    if (validateBalancePaymentMethod() || validateEstimatePaymentMethod()) {
+      return false;
+    }
+    let field: keyof typeof formData.estimates;
     for (field in formData.estimates) {
       if (validateField(formData.estimates[field], foiFees[field].unit)) {
         return false;
       }
     }
-    var afield: keyof typeof formData.actual
+    let afield: keyof typeof formData.actual
     for (afield in formData.actual) {
       if (validateField(formData.actual[afield], foiFees[afield].unit)) {
         return false;
@@ -284,9 +302,31 @@ export const CFRForm = ({
     return !_.isEqual(initialFormData, formData);
   }
 
-  const handleAmountPaidChanges = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handlePaymentMethodChanges = (e: React.ChangeEvent<HTMLInputElement>) => {
     const name : string = e.target.name;
-    const value : number = Math.floor((+e.target.value) * 100) / 100;
+    const value : string = e.target.value;
+    setFormData(values => ({...values, [name]: value}));
+  };
+
+  const handleAmountPaidChanges = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const re = new RegExp('^-?\\d+(?:\.\\d{0,' + (2 || -1) + '})?');
+    const value : number = +e.target.value.match(re)![0]
+    if (value === 0) {
+      setFormData(values => ({...values, estimatePaymentMethod: 'init', balancePaymentMethod: 'init'}));
+    } else if (formData.amountPaid === 0 && value > 0) {
+      setFormData(values => ({
+        ...values,
+        estimatePaymentMethod: initialFormData.estimatePaymentMethod,
+        balancePaymentMethod: initialFormData.balancePaymentMethod
+      }));
+    }
+    handleAmountChanges(e)
+  };
+
+  const handleAmountChanges = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const name : string = e.target.name;
+    const re = new RegExp('^-?\\d+(?:\.\\d{0,' + (2 || -1) + '})?');
+    const value : number = +e.target.value.match(re)![0]
     if (value <= Math.max(formData.actualTotalDue, formData.estimatedTotalDue)) {
       setFormData(values => ({...values, [name]: value}));
     }
@@ -327,7 +367,12 @@ export const CFRForm = ({
   };
 
   const calculateBalanceRemaining = () => {
-    return formData?.actualTotalDue ? (formData.actualTotalDue - formData.amountPaid - formData.feewaiverAmount) : (formData.estimatedTotalDue - formData.amountPaid - formData.feewaiverAmount);
+    let balanceRemaining = 0;
+    if (formData?.actualTotalDue)
+      balanceRemaining = (formData.actualTotalDue - formData.amountPaid - formData.feewaiverAmount);
+    else
+      balanceRemaining = (formData.estimatedTotalDue - formData.amountPaid - formData.feewaiverAmount)
+    return !Number.isNaN(balanceRemaining) || balanceRemaining  ? balanceRemaining : 0;
   }
 
   const cfrStatusDisabled = () => {
@@ -366,13 +411,15 @@ export const CFRForm = ({
         dispatch,
       );
     };
-    var data;
+    let data;
     if (isMinistry) {
       data = {
         feedata:{
           amountpaid: formData.amountPaid,
           estimatedtotaldue: formData.estimatedTotalDue,
           actualtotaldue: formData.actualTotalDue,
+          ...formData.estimatePaymentMethod !== 'init' && {estimatepaymentmethod: formData.estimatePaymentMethod},
+          ...formData.balancePaymentMethod !== 'init' && {balancepaymentmethod: formData.balancePaymentMethod},
           balanceremaining: calculateBalanceRemaining(),
           feewaiveramount: formData.feewaiverAmount,
           refundamount: formData.refundAmount,
@@ -402,6 +449,8 @@ export const CFRForm = ({
           actualiaopreparinghrs: formData.actual.iaoPreparing,
           estimatedtotaldue: formData.estimatedTotalDue,
           actualtotaldue: formData.actualTotalDue,
+          ...formData.estimatePaymentMethod !== 'init' && {estimatepaymentmethod: formData.estimatePaymentMethod},
+          ...formData.balancePaymentMethod !== 'init' && {balancepaymentmethod: formData.balancePaymentMethod},
           balanceremaining: calculateBalanceRemaining(),
           feewaiveramount: formData.feewaiverAmount,
           refundamount: formData.refundAmount,
@@ -479,6 +528,8 @@ export const CFRForm = ({
   const newCFRForm = () => {
     setCreateModalOpen(false)
     blankForm.amountPaid= initialState?.feedata?.amountpaid;
+    blankForm.estimatePaymentMethod = initialState?.feedata?.estimatepaymentmethod || 'init';
+    blankForm.balancePaymentMethod= initialState?.feedata?.balancepaymentmethod || 'init';
     blankForm.feewaiverAmount = initialState?.feedata?.feewaiveramount;
     blankForm.refundAmount = initialState?.feedata?.refundamount;
     setInitialFormData(blankForm);
@@ -585,6 +636,7 @@ export const CFRForm = ({
                   modalOpen={historyModalOpen}
                   handleClose={handleHistoryClose}
                   formHistory={formHistory}
+                  isMinistry={isMinistry}
                 />
                 <button
                   type="button"
@@ -601,6 +653,68 @@ export const CFRForm = ({
                     <Typography className="heading">PAYMENT DETAILS</Typography>
                   </AccordionSummary>
                   <AccordionDetails>
+                    {!isMinistry && <div className="row foi-details-row">
+                      <div className="col-lg-6 foi-details-col">
+                        <TextField
+                          id="estimatePaymentMethod"
+                          label={"Estimate Payment Method"}
+                          inputProps={{ "aria-labelledby": "estimatePaymentMethod-label"}}
+                          InputLabelProps={{ shrink: true }}
+                          select
+                          name="estimatePaymentMethod"
+                          value={formData?.estimatePaymentMethod}
+                          onChange={handlePaymentMethodChanges}
+                          variant="outlined"
+                          fullWidth
+                          required
+                          disabled={initialFormData?.formStatus !== 'approved' || initialFormData?.amountPaid !== 0 || formData?.amountPaid === initialFormData?.amountPaid}
+                          error={validateEstimatePaymentMethod()}
+                          helperText={validateEstimatePaymentMethod() &&
+                            "Estimate payment method must be specified if amount paid is manually added"
+                          }
+                        >
+                          {paymentMethods.map((option) => (
+                          <MenuItem
+                            key={option.value}
+                            value={option.value}
+                            disabled={option.disabled}
+                          >
+                            {option.label}
+                          </MenuItem>
+                          ))}
+                        </TextField>
+                      </div>
+                      <div className="col-lg-6 foi-details-col">
+                        <TextField
+                          id="balancePaymentMethod"
+                          label={"Balance Payment Method"}
+                          inputProps={{ "aria-labelledby": "balancePaymentMethod-label"}}
+                          InputLabelProps={{ shrink: true }}
+                          select
+                          name="balancePaymentMethod"
+                          value={formData?.balancePaymentMethod}
+                          onChange={handlePaymentMethodChanges}
+                          variant="outlined"
+                          fullWidth
+                          required
+                          disabled={initialFormData?.formStatus !== 'approved' || initialFormData?.amountPaid === 0 || formData?.amountPaid <= initialFormData?.amountPaid}
+                          error={validateBalancePaymentMethod()}
+                          helperText={validateBalancePaymentMethod() &&
+                            "Balance payment method must be specified if amount paid is manually updated"
+                          }
+                        >
+                          {paymentMethods.map((option) => (
+                          <MenuItem
+                            key={option.value}
+                            value={option.value}
+                            disabled={option.disabled}
+                          >
+                            {option.label}
+                          </MenuItem>
+                          ))}
+                        </TextField>
+                      </div>
+                    </div>}
                     <div className="row foi-details-row">
                       <div className="col-lg-6 foi-details-col">
                         <TextField
@@ -672,13 +786,13 @@ export const CFRForm = ({
                         <span className="formLabel">Estimated Total</span>
                       </div>
                       <div className="col-lg-2 foi-details-col">
-                        <span className="formLabel">{"$"+(formData?.estimatedTotalDue)?.toFixed(2)}</span>
+                        <span className="formLabel">{`$${+(formData?.estimatedTotalDue || 0)?.toFixed(2) || 0}`}</span>
                       </div>
                       <div className="col-lg-4 foi-details-col">
                         <span className="formLabel">Actual Total</span>
                       </div>
                       <div className="col-lg-2 foi-details-col">
-                        <span className="formLabel">{"$"+(formData?.actualTotalDue)?.toFixed(2)}</span>
+                        <span className="formLabel">{`$${+(formData?.actualTotalDue || 0)?.toFixed(2) || 0}`}</span>
                       </div>
                     </div>
                     <div className="row foi-details-row">
@@ -700,7 +814,7 @@ export const CFRForm = ({
                           name="feewaiverAmount"
                           type="number"
                           value={formData?.feewaiverAmount}
-                          onChange={handleAmountPaidChanges}
+                          onChange={handleAmountChanges}
                           onBlur={(e) => {
                             e.target.value = parseFloat(e.target.value).toFixed(2);
                           }}

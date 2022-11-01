@@ -87,6 +87,15 @@ class FOIRequestCFRFee(db.Model):
         for _entry in _entries:
             feedata.append(_entry.feedata)
         return feedata  
+
+    @classmethod
+    def updatecfrfeedatabyid(cls, ministryrequestid, feedata)->DefaultMethodResult:
+        sq = db.session.query(FOIRequestCFRFee.cfrfeeid, FOIRequestCFRFee.version).filter_by(ministryrequestid=ministryrequestid).order_by(FOIRequestCFRFee.cfrfeeid.desc(), FOIRequestCFRFee.version.desc()).limit(1).subquery()
+        cfrfee = db.session.query(FOIRequestCFRFee).filter_by(cfrfeeid=sq.c.cfrfeeid, version=sq.c.version)
+        cfrfee.update({FOIRequestCFRFee.feedata: feedata, FOIRequestCFRFee.updatedby: 'Online Payment',
+                        FOIRequestCFRFee.updated_at: datetime2.now().isoformat()}, synchronize_session=False)
+        db.session.commit()
+        return DefaultMethodResult(True,'CFR Fee Data updated for ministry request : '+ str(ministryrequestid), sq.c.cfrfeeid)
        
 class FOIRequestCFRFormSchema(ma.Schema):
     class Meta:

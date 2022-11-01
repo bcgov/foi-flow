@@ -15,6 +15,7 @@ import os
 
 import request_api
 import redis
+import logging
 
 class Config(object):
     ## type 'redis' is deprecated
@@ -46,3 +47,13 @@ def response_filter(resp):
         return True
     else:
         return False
+
+
+def clear_cache():
+    try:
+        if os.getenv('CACHE_ENABLED') == 'Y':
+            cache_client.flushall()
+        return True
+    except Exception as ex:    
+        logging.error(ex)        
+    return False

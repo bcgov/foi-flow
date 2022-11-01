@@ -6,6 +6,7 @@ from request_api.models.FOIMinistryRequests import FOIMinistryRequest
 from request_api.models.FOIRequestPayments import FOIRequestPayment
 from request_api.services.cfrfeestatusservice import cfrfeestatusservice
 from request_api.services.cfrformreasonservice import cfrformreasonservice
+from request_api.utils.enums import PaymentEventType
 from dateutil.parser import parse
 
 from dateutil import parser
@@ -43,6 +44,15 @@ class cfrfeeservice:
         cfrfee.feedata['amountpaid'] = '{:.2f}'.format(_amountpaid)
         cfrfee.feedata['paymentdate'] = datetime.now().astimezone(pytz.timezone(current_app.config['LEGISLATIVE_TIMEZONE'])).strftime('%Y-%m-%d')
         return FOIRequestCFRFee.createcfrfee(cfrfee, 'Online Payment')
+
+    def updatepaymentmethod(self, ministryrequestid, paymenttype):
+        cfrfee = FOIRequestCFRFee.getcfrfee(ministryrequestid)
+        feedata = cfrfee['feedata']
+        if (paymenttype == PaymentEventType.outstandingpaid.value):
+            feedata['balancepaymentmethod'] = 'creditcardonline'
+        else:
+            feedata['estimatepaymentmethod'] = 'creditcardonline'
+        return FOIRequestCFRFee.updatecfrfeedatabyid(ministryrequestid, feedata)
     
     def __preparecfrfee(self, ministryrequestid, data={}, getprevious=True):
         cfrfee = FOIRequestCFRFee()
@@ -51,6 +61,8 @@ class cfrfeeservice:
         if lkupcfrfee:
             cfrfee.__dict__.update(lkupcfrfee)
             _version =  lkupcfrfee['version'] + 1
+            cfrfee.updated_at = None
+            cfrfee.updatedby = None
         cfrfee.version = _version   
         cfrfee.ministryrequestid = ministryrequestid
         cfrfee.ministryrequestversion = FOIMinistryRequest.getversionforrequest(ministryrequestid)

@@ -11,3 +11,25 @@ export const applyVariables = (content: string, params: Array<any>) => {
 
   return newContent;
 }
+
+export const getTemplateVariables = (requestDetails: any, templateInfo: any) => {
+  return [
+    {name: "{{axisRequestId}}", value: requestDetails.axisRequestId},
+    {name: "{{title}}", value: templateInfo?.label || ""},
+    {name: "{{firstName}}", value: requestDetails.firstName},
+    {name: "{{lastName}}", value: requestDetails.lastName},
+    {name: "{{assignedToFirstName}}", value: requestDetails.assignedToFirstName || ""},
+    {name: "{{assignedToLastName}}", value: requestDetails.assignedToLastName || ""},
+    {name: "{{assignedGroup}}", value: requestDetails.assignedGroup},
+  ];
+  
+}
+
+export const isTemplateDisabled = (currentCFRForm: any, template: any) => {
+  if (template.name === 'PAYONLINE') {
+    return currentCFRForm.status !== 'approved' || "estimatepaymentmethod" in currentCFRForm.feedata
+  } else if (template.name === 'PAYOUTSTANDING') {
+    return currentCFRForm.status !== 'approved' || !("estimatepaymentmethod" in currentCFRForm.feedata) || currentCFRForm.feedata.balanceremaining <= 0
+  }
+  return false
+}
