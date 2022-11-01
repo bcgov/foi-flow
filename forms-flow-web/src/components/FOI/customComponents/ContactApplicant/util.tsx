@@ -24,3 +24,12 @@ export const getTemplateVariables = (requestDetails: any, templateInfo: any) => 
   ];
   
 }
+
+export const isTemplateDisabled = (currentCFRForm: any, template: any) => {
+  if (template.name === 'PAYONLINE') {
+    return currentCFRForm.status !== 'approved' || "estimatepaymentmethod" in currentCFRForm.feedata
+  } else if (template.name === 'PAYOUTSTANDING') {
+    return currentCFRForm.status !== 'approved' || !("estimatepaymentmethod" in currentCFRForm.feedata) || currentCFRForm.feedata.balanceremaining <= 0
+  }
+  return false
+}
