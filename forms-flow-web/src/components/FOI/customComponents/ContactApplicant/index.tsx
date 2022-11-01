@@ -25,10 +25,12 @@ import { PreviewModal } from './PreviewModal';
 import { OSS_S3_BUCKET_FULL_PATH } from "../../../../constants/constants";
 import Loading from "../../../../containers/Loading";
 import {setFOICorrespondenceLoader} from "../../../../actions/FOI/foiRequestActions";
-import { applyVariables, getTemplateVariables } from './util';
+import { applyVariables, getTemplateVariables, isTemplateDisabled } from './util';
+import { StateEnum } from '../../../../constants/FOI/statusEnum';
 
 export const ContactApplicant = ({
   requestNumber,
+  requestState,
   ministryId,
   ministryCode,
   requestId,
@@ -37,8 +39,7 @@ export const ContactApplicant = ({
 }: any) => {
 
   const dispatch = useDispatch();
-  const isCFRFormApproved: boolean = useSelector((state: any) => state.foiRequests.foiRequestCFRForm.status === 'approved');
-  const isEstimatePaid: boolean = useSelector((state: any) => state.foiRequests.foiRequestCFRForm.feedata.estimatepaymentmethod !== '');
+  const currentCFRForm: any = useSelector((state: any) => state.foiRequests.foiRequestCFRForm);
   const isLoading: boolean = useSelector((state: any) => state.foiRequests.isCorrespondenceLoading);
   const fullNameList = getFullnameList()
 
@@ -89,7 +90,7 @@ export const ContactApplicant = ({
                 label: item.description,
                 templateid: item.templateid,
                 text: await new Response(response.data).text(),
-                disabled: !isCFRFormApproved || (item.name === 'PAYONLINE' && isEstimatePaid)
+                disabled: isTemplateDisabled(currentCFRForm, item)
               }
               templateList.push(templateItem);
               setTemplates(templateList);
@@ -98,7 +99,7 @@ export const ContactApplicant = ({
         }
       });
     });
-  }, [isCFRFormApproved, isEstimatePaid]);
+  }, [currentCFRForm]);
 
   const formHistory: Array<any> = useSelector((state: any) => state.foiRequests.foiRequestCFRFormHistory);
   const approvedForm = formHistory?.find(form => form?.status?.toLowerCase() === 'approved');
@@ -261,6 +262,7 @@ export const ContactApplicant = ({
             data-variant="contained"
             onClick={() => setShowEditor(true)}
             color="primary"
+            disabled={currentCFRForm.feedata.balanceremaining <= 0 || requestState === StateEnum.feeassessed.name}
           >
             + Add New Correspondence
           </button>
