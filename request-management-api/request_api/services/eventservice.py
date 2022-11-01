@@ -6,6 +6,7 @@ from request_api.services.events.division import divisionevent
 from request_api.services.events.assignment import assignmentevent
 from request_api.services.events.cfrdate import cfrdateevent
 from request_api.services.events.comment import commentevent
+from request_api.services.events.watcher import watcherevent
 from request_api.services.events.legislativedate import legislativedateevent
 from request_api.services.events.divisiondate import divisiondateevent
 from request_api.services.events.extension import extensionevent
@@ -67,6 +68,14 @@ class eventservice:
                 current_app.logger.error("FOI Notification failed for comment event=%s" % (commentresponse.message))     
                 return DefaultMethodResult(False,'Comment notifications failed',commentresponse.identifier)
             return DefaultMethodResult(True,'Comment notifications created',commentresponse.identifier)
+        except BusinessException as exception:            
+            self.__logbusinessexception(exception)
+
+    def posteventforremovedwatcher(self, requestid, requesttype, userid, username,previousassignee,isactive):
+        try: 
+            removedwatcherresponse = watcherevent().createwatcherevent(requestid, requesttype, userid,username, previousassignee, isactive)           
+            if removedwatcherresponse.success == False: 
+                current_app.logger.error("FOI Notification failed for event for request= %s ; watcher response=%s" % (requestid, removedwatcherresponse.message))
         except BusinessException as exception:            
             self.__logbusinessexception(exception)
         

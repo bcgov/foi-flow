@@ -16,36 +16,46 @@ class assignmentevent:
 
     """
     def createassignmentevent(self, requestid, requesttype, userid, isministryuser,assigneename,username):
-        ischanged = self.__haschanged(requestid, requesttype)        
+        ischanged, previousassignee = self.__haschanged(requestid, requesttype)   
         commentrespose = self.__createcomment(assigneename,username,requestid,userid,requesttype)        
         if ischanged == True:
-            notificationresponse = self.__createnotification(requestid, requesttype, userid, isministryuser)          
-            
-            if notificationresponse.success == True and commentrespose.success == True:
-                return DefaultMethodResult(True,'Assignment Notification, Comment has been created',requestid)
+            notificationresponse = self.__createnotification(requestid, requesttype, userid, isministryuser,username,previousassignee)   
+            previousassigneenotification = None        
+            if previousassignee is not None and previousassignee !='' and previousassignee != userid:
+                previousassigneenotification = self.__createnotification(requestid, requesttype, userid, isministryuser, username, previousassignee, True)
+            if notificationresponse.success == True and commentrespose.success == True and \
+                (previousassigneenotification is None or (previousassigneenotification is not None and previousassigneenotification.success == True)):
+                    return DefaultMethodResult(True,'Assignment Notification, Comment has been created',requestid)
             else:   
                 return DefaultMethodResult(False,'unable to create notification and/or comment for assignment',requestid)            
 
         return  DefaultMethodResult(True,'No change',requestid)
 
-    def __createnotification(self, requestid, requesttype, userid, isministryuser):
-        notification = self.__preparenotification()
-        return notificationservice().createnotification({"message" : notification}, requestid, requesttype, self.__assignmenttype(isministryuser), userid)
+    def __createnotification(self, requestid, requesttype, userid, isministryuser,username, previousassignee, removedassignee=False):
+        notification = self.__preparenotification(username,removedassignee)
+        iscleanup = True
+        if removedassignee == False:
+            previousassignee = None
+        else:
+            iscleanup = False
+        return notificationservice().createnotification({"message" : notification}, requestid, requesttype, self.__assignmenttype(isministryuser), userid, previousassignee, iscleanup)
 
-    def __preparenotification(self):
-        return self.__notificationmessage()
+    def __preparenotification(self,username,removedassignee):
+        return self.__notificationmessage(username,removedassignee)
             
     def __haschanged(self, requestid, requesttype):
         assignments = self.__getassignments(requestid, requesttype)
+        previousassignee = ""
         if len(assignments) ==1 and self.__isnoneorblank(assignments[0]) == False:
-            return True
+            return True, previousassignee
         if len(assignments) == 2 and \
             ((assignments[0]['assignedto'] != assignments[1]['assignedto'] and self.__isnoneorblank(assignments[0]['assignedto']) == False) \
             or (requesttype == "ministryrequest" and \
                 assignments[0]['assignedministryperson'] != assignments[1]['assignedministryperson'] \
-                    and self.__isnoneorblank(assignments[0]['assignedministryperson']) == False)):
-            return True
-        return False
+                    and self.__isnoneorblank(assignments[0]['assignedministryperson']) == False)): 
+                    previousassignee= assignments[1]['assignedto'] if assignments[0]['assignedto'] != assignments[1]['assignedto'] else assignments[1]['assignedministryperson']
+                    return True, previousassignee
+        return False, previousassignee
     
     def __isnoneorblank(self, value):
         if value is not None and value != '':
@@ -57,8 +67,11 @@ class assignmentevent:
         else:
             return FOIRawRequest.getassignmenttransition(requestid)
 
-    def __notificationmessage(self):
-        return  'New Request Assigned to You.'        
+    def __notificationmessage(self,username,removedassignee):
+        if removedassignee == True:
+            return username+' has removed your assignment to this request'  
+        else:
+            return 'New Request Assigned to You.'      
             
     def __assignmenttype(self, isministryuser):
         return 'Ministry Assignment' if isministryuser == True else 'IAO Assignment'

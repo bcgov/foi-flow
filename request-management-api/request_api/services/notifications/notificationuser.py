@@ -13,16 +13,18 @@ class notificationuser:
 
     """
     
-    def getnotificationusers(self, notificationtype, requesttype, userid, foirequest, foicomment=None):
+    def getnotificationusers(self, notificationtype, requesttype, userid, foirequest, foicomment=None, previousassignee=None):
         notificationusers = []
         if 'Assignment' in notificationtype:
-            _users = self.__getassignees(foirequest, requesttype, notificationtype)
+            _users = self.__getassignees(foirequest, requesttype, notificationtype, previousassignee)
         elif 'Reply User Comments' in notificationtype:
             _users = self.__getcommentusers(foirequest, foicomment, requesttype)
         elif 'Tagged User Comments' in notificationtype:
             _users = self.__gettaggedusers(foicomment)
         elif 'Group Members' in notificationtype:
             _users = self.__getgroupmembers(foirequest["assignedministrygroup"])
+        elif 'Watcher' in notificationtype:
+            _users = self.__getwatchers(foirequest, requesttype, previousassignee)
         else:
             _users = self.__getassignees(foirequest, requesttype, notificationtype) + self.__getwatchers(foirequest, requesttype)
         for user in _users:
@@ -48,23 +50,29 @@ class notificationuser:
                         return True
         return False
         
-    def __getwatchers(self, foirequest, requesttype):
+    def __getwatchers(self, foirequest, requesttype, previousassignee=None):
         notificationusers = []
-        if requesttype == "ministryrequest":
-            watchers =  watcherservice().getallministryrequestwatchers(foirequest["foiministryrequestid"])
+        if previousassignee is not None:
+            notificationusers.append({"userid": previousassignee, "usertype":notificationconfig().getnotificationusertypeid("Watcher")})
         else:
-            watchers =  watcherservice().getrawrequestwatchers(foirequest['requestid'])
-        for watcher in watchers:
-                notificationusers.append({"userid":watcher["watchedby"], "usertype":notificationconfig().getnotificationusertypeid("Watcher")})
+            if requesttype == "ministryrequest":
+                watchers =  watcherservice().getallministryrequestwatchers(foirequest["foiministryrequestid"])
+            else:
+                watchers =  watcherservice().getrawrequestwatchers(foirequest['requestid'])
+            for watcher in watchers:
+                    notificationusers.append({"userid":watcher["watchedby"], "usertype":notificationconfig().getnotificationusertypeid("Watcher")})
         return notificationusers        
     
-    def __getassignees(self, foirequest, requesttype, notificationtype):
+    def __getassignees(self, foirequest, requesttype, notificationtype, previousassignee=None):
         notificationusers = []
         notificationtypeid = notificationconfig().getnotificationusertypeid("Assignee")
-        if requesttype == "ministryrequest" and foirequest["assignedministryperson"] is not None and (notificationtype == 'Ministry Assignment' or 'Assignment' not in notificationtype):
-            notificationusers.append({"userid":foirequest["assignedministryperson"], "usertype":notificationtypeid})
-        if foirequest["assignedto"] is not None and foirequest["assignedto"] != '' and (notificationtype == 'IAO Assignment' or 'Assignment' not in notificationtype):
-            notificationusers.append({"userid":foirequest["assignedto"], "usertype":notificationtypeid})
+        if previousassignee is not None:
+            notificationusers.append({"userid": previousassignee, "usertype":notificationtypeid})
+        else:
+            if requesttype == "ministryrequest" and foirequest["assignedministryperson"] is not None and (notificationtype == 'Ministry Assignment' or 'Assignment' not in notificationtype):
+                notificationusers.append({"userid":foirequest["assignedministryperson"], "usertype":notificationtypeid})
+            if foirequest["assignedto"] is not None and foirequest["assignedto"] != '' and (notificationtype == 'IAO Assignment' or 'Assignment' not in notificationtype):
+                notificationusers.append({"userid":foirequest["assignedto"], "usertype":notificationtypeid})
         return notificationusers          
     
     def __getcommentusers(self, foirequest, comment, requesttype):

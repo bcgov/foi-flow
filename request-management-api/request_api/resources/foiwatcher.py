@@ -23,6 +23,7 @@ from request_api.tracer import Tracer
 from request_api.utils.util import  cors_preflight, allowedorigins
 from request_api.exceptions import BusinessException, Error
 from request_api.services.watcherservice import watcherservice
+from request_api.services.eventservice import eventservice
 from request_api.schemas.foiwatcher import  FOIRawRequestWatcherSchema, FOIMinistryRequestWatcherSchema
 import json
 from flask_cors import cross_origin
@@ -67,6 +68,8 @@ class CreateFOIRawRequestWatcher(Resource):
             requestjson = request.get_json() 
             rawrquestwatcherschema = FOIRawRequestWatcherSchema().load(requestjson)  
             result = watcherservice().createrawrequestwatcher(rawrquestwatcherschema, AuthHelper.getuserid(), AuthHelper.getusergroups())
+            if result.success == True:
+                eventservice().posteventforremovedwatcher(requestjson["requestid"],"rawrequest",AuthHelper.getuserid(), AuthHelper.getusername(),requestjson["watchedby"], requestjson["isactive"] )
             return {'status': result.success, 'message':result.message} , 200 
         except KeyError as err:
             return {'status': False, 'message':err.messages}, 400        
@@ -126,6 +129,8 @@ class CreateFOIRequestWatcher(Resource):
             requestjson = request.get_json() 
             minrquestwatcherschema = FOIMinistryRequestWatcherSchema().load(requestjson)  
             result = watcherservice().createministryrequestwatcher(minrquestwatcherschema, AuthHelper.getuserid(),AuthHelper.getusergroups())
+            if result.success == True:
+                eventservice().posteventforremovedwatcher(requestjson["ministryrequestid"],"ministryrequest",AuthHelper.getuserid(), AuthHelper.getusername(),requestjson["watchedby"], requestjson["isactive"] )      
             return {'status': result.success, 'message':result.message} , 200 
         except KeyError as err:
             return {'status': False, 'message':err.messages}, 400        

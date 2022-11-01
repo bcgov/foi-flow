@@ -41,7 +41,7 @@ class divisiondateevent(duecalculator):
         
     def __createnotification(self, message, requestid):
         if message is not None: 
-            return notificationservice().createnotification({"message" : message}, requestid, "ministryrequest", self.__notificationtype(), self.__defaultuserid(), False)
+            return notificationservice().createnotification({"message" : message}, requestid, "ministryrequest", self.__notificationtype(), self.__defaultuserid(), None, False)
                     
     def __upcomingduemessage(self, data):
         return self.__getformattedprefix(data)+ ' due on ' + parse(str(data['duedate'])).strftime("%Y %b %d").upper()  
