@@ -111,7 +111,7 @@ class FOIRawRequestNotificationUser(db.Model):
             raise ex
         finally:
             db.session.close()
-        return notificationids
+        return ids
 
 class FOIRawRequestNotificationUserSchema(ma.Schema):
     class Meta:
