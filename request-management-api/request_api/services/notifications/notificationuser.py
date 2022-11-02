@@ -13,22 +13,24 @@ class notificationuser:
 
     """
     
-    def getnotificationusers(self, notificationtype, requesttype, userid, foirequest, foicomment=None, previousassignee=None):
+    def getnotificationusers(self, notificationtype, requesttype, userid, foirequest, requestjson=None):
         notificationusers = []
-        if 'Assignment' in notificationtype:
-            _users = self.__getassignees(foirequest, requesttype, notificationtype, previousassignee)
+        if 'User Assignment Removal' == notificationtype:
+            _users = self.__getassignees(foirequest, requesttype, notificationtype, requestjson)
+        elif 'Assignment' in notificationtype:
+            _users = self.__getassignees(foirequest, requesttype, notificationtype)
         elif 'Reply User Comments' in notificationtype:
-            _users = self.__getcommentusers(foirequest, foicomment, requesttype)
+            _users = self.__getcommentusers(foirequest, requestjson, requesttype)
         elif 'Tagged User Comments' in notificationtype:
-            _users = self.__gettaggedusers(foicomment)
+            _users = self.__gettaggedusers(requestjson)
         elif 'Group Members' in notificationtype:
             _users = self.__getgroupmembers(foirequest["assignedministrygroup"])
         elif 'Watcher' in notificationtype:
-            _users = self.__getwatchers(foirequest, requesttype, previousassignee)
+            _users = self.__getwatchers(notificationtype, foirequest, requesttype, requestjson)        
         else:
-            _users = self.__getassignees(foirequest, requesttype, notificationtype) + self.__getwatchers(foirequest, requesttype)
+            _users = self.__getassignees(foirequest, requesttype, notificationtype) + self.__getwatchers(notificationtype, foirequest, requesttype)
         for user in _users:
-            if self.__isignorable(user, notificationusers, userid) == False and (("Tagged User Comments" not in notificationtype and self.__istaggeduser(user, foicomment, notificationtype) == False) or "Tagged User Comments" in notificationtype):
+            if self.__isignorable(user, notificationusers, userid) == False and (("Tagged User Comments" not in notificationtype and self.__istaggeduser(user, requestjson, notificationtype) == False) or "Tagged User Comments" in notificationtype):
                 notificationusers.append(user)
         return notificationusers     
     
@@ -50,10 +52,10 @@ class notificationuser:
                         return True
         return False
         
-    def __getwatchers(self, foirequest, requesttype, previousassignee=None):
+    def __getwatchers(self, notificationtype, foirequest, requesttype, requestjson=None):
         notificationusers = []
-        if previousassignee is not None:
-            notificationusers.append({"userid": previousassignee, "usertype":notificationconfig().getnotificationusertypeid("Watcher")})
+        if notificationtype == "Watcher":
+            notificationusers.append({"userid": requestjson['watchedby'], "usertype":notificationconfig().getnotificationusertypeid("Watcher")})
         else:
             if requesttype == "ministryrequest":
                 watchers =  watcherservice().getallministryrequestwatchers(foirequest["foiministryrequestid"])
@@ -63,11 +65,11 @@ class notificationuser:
                     notificationusers.append({"userid":watcher["watchedby"], "usertype":notificationconfig().getnotificationusertypeid("Watcher")})
         return notificationusers        
     
-    def __getassignees(self, foirequest, requesttype, notificationtype, previousassignee=None):
+    def __getassignees(self, foirequest, requesttype, notificationtype, requestjson=None):
         notificationusers = []
         notificationtypeid = notificationconfig().getnotificationusertypeid("Assignee")
-        if previousassignee is not None:
-            notificationusers.append({"userid": previousassignee, "usertype":notificationtypeid})
+        if notificationtype == 'User Assignment Removal':
+            notificationusers.append({"userid": requestjson['userid'], "usertype":notificationtypeid})
         else:
             if requesttype == "ministryrequest" and foirequest["assignedministryperson"] is not None and (notificationtype == 'Ministry Assignment' or 'Assignment' not in notificationtype):
                 notificationusers.append({"userid":foirequest["assignedministryperson"], "usertype":notificationtypeid})

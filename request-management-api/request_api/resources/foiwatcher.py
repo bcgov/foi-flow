@@ -69,7 +69,7 @@ class CreateFOIRawRequestWatcher(Resource):
             rawrquestwatcherschema = FOIRawRequestWatcherSchema().load(requestjson)  
             result = watcherservice().createrawrequestwatcher(rawrquestwatcherschema, AuthHelper.getuserid(), AuthHelper.getusergroups())
             if result.success == True:
-                eventservice().posteventforremovedwatcher(requestjson["requestid"],"rawrequest",AuthHelper.getuserid(), AuthHelper.getusername(),requestjson["watchedby"], requestjson["isactive"] )
+                eventservice().posteventforwatcher(requestjson["requestid"], requestjson, "rawrequest",AuthHelper.getuserid(), AuthHelper.getusername())
             return {'status': result.success, 'message':result.message} , 200 
         except KeyError as err:
             return {'status': False, 'message':err.messages}, 400        
@@ -130,7 +130,7 @@ class CreateFOIRequestWatcher(Resource):
             minrquestwatcherschema = FOIMinistryRequestWatcherSchema().load(requestjson)  
             result = watcherservice().createministryrequestwatcher(minrquestwatcherschema, AuthHelper.getuserid(),AuthHelper.getusergroups())
             if result.success == True:
-                eventservice().posteventforremovedwatcher(requestjson["ministryrequestid"],"ministryrequest",AuthHelper.getuserid(), AuthHelper.getusername(),requestjson["watchedby"], requestjson["isactive"] )      
+                eventservice().posteventforwatcher(requestjson["ministryrequestid"], requestjson, "ministryrequest",AuthHelper.getuserid(), AuthHelper.getusername())
             return {'status': result.success, 'message':result.message} , 200 
         except KeyError as err:
             return {'status': False, 'message':err.messages}, 400        
