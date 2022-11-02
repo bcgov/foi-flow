@@ -33,7 +33,9 @@ class notificationconfig:
         elif notificationtype == "Division Due Reminder":
             return 13 
         elif notificationtype == "Watcher":
-            return 14 
+            return 14
+        elif notificationtype == "User Assignment Removal":
+            return 15 
         return 0     
     
     def getnotificationusertypeid(self, notificationusertype):

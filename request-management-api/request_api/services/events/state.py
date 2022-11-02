@@ -51,10 +51,10 @@ class stateevent:
         notification = self.__preparenotification(state)
         if state == 'Closed' or state == 'Archived' :
             notificationservice().dismissnotificationsbyrequestid(requestid, requesttype)
-        response = notificationservice().createnotification({"message" : notification}, requestid, requesttype, "State", userid, None)
+        response = notificationservice().createnotification({"message" : notification}, requestid, requesttype, "State", userid)
         if _notificationtype == "Group Members":
             notification = self.__preparegroupmembernotification(state)
-            groupmemberresponse = notificationservice().createnotification({"message" : notification}, requestid, requesttype, _notificationtype, userid, None)
+            groupmemberresponse = notificationservice().createnotification({"message" : notification}, requestid, requesttype, _notificationtype, userid)
             if response.success == True and groupmemberresponse.success == True :
                 return DefaultMethodResult(True,'Notification added',requestid)
             else:   

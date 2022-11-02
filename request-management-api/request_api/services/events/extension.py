@@ -94,7 +94,7 @@ class extensionevent:
             notification = self.__preparenotification(extensionsummary)
             if notificationandcleanup == True:
                 self.__deleteextensionnotification(extensionid)
-            return notificationservice().createnotification({"extensionid": extensionid, "message": notification}, ministryrequestid, "ministryrequest", "Extension", userid, None, False)
+            return notificationservice().createnotification({"extensionid": extensionid, "message": notification}, ministryrequestid, "ministryrequest", "Extension", userid, False)
 
     def __deleteaxisextensionnotifications(self, notificationids):
         notificationservice().dismissnotificationbyid("ministryrequest", notificationids)

@@ -112,7 +112,7 @@ class FOIRawRequestNotificationUser(db.Model):
         finally:
             db.session.close()
         return notificationids
-    
+
 class FOIRawRequestNotificationUserSchema(ma.Schema):
     class Meta:
         fields = ('notificationid', 'userid','notificationusertypeid','created_at','createdby','updated_at','updatedby') 

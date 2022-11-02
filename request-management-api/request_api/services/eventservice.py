@@ -71,11 +71,11 @@ class eventservice:
         except BusinessException as exception:            
             self.__logbusinessexception(exception)
 
-    def posteventforremovedwatcher(self, requestid, requesttype, userid, username,previousassignee,isactive):
+    def posteventforwatcher(self, requestid, request, requesttype, userid, username):
         try: 
-            removedwatcherresponse = watcherevent().createwatcherevent(requestid, requesttype, userid,username, previousassignee, isactive)           
-            if removedwatcherresponse.success == False: 
-                current_app.logger.error("FOI Notification failed for event for request= %s ; watcher response=%s" % (requestid, removedwatcherresponse.message))
+            watcherresponse = watcherevent().createwatcherevent(requestid, request, requesttype, userid,username)           
+            if watcherresponse.success == False: 
+                current_app.logger.error("FOI Notification failed for event for request= %s ; watcher response=%s" % (requestid, watcherresponse.message))
         except BusinessException as exception:            
             self.__logbusinessexception(exception)
         
