@@ -17,7 +17,7 @@ class watcherservice:
         if 'watchedbygroup' in data:
             return FOIRawRequestWatcher.savewatcher(data, version, userid)
         else:
-            return FOIRawRequestWatcher.savewatcherbygroups(data, version, userid, self.__getwatchablegroups(usergroups))
+            return FOIRawRequestWatcher.savewatcherbygroups(data, version, userid, self.__getwatchablegroups(usergroups))       
 
     
     def getrawrequestwatchers(self, requestid):
@@ -39,7 +39,7 @@ class watcherservice:
         if 'watchedbygroup' in data:
             return FOIRequestWatcher.savewatcher(data, version, userid) 
         else:
-            return FOIRequestWatcher.savewatcherbygroups(data, version, userid, self.__getwatchablegroups(usergroups))        
+            return FOIRequestWatcher.savewatcherbygroups(data, version, userid, self.__getwatchablegroups(usergroups))  
         
     
     def getministryrequestwatchers(self, ministryrequestid, isministrymember):

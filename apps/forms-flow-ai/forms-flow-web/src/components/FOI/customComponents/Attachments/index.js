@@ -72,7 +72,7 @@ export const AttachmentSection = ({
   useEffect(() => {
     setAttachments(attachmentsArray);
   }, [attachmentsArray])
-  
+
 
   const [openModal, setModal] = useState(false);
   const [successCount, setSuccessCount] = useState(0);
