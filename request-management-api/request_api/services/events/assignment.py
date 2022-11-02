@@ -36,9 +36,10 @@ class assignmentevent:
         iscleanup = True
         if removedassignee == False:
             previousassignee = None
+            return notificationservice().createnotification({"message" : notification}, requestid, requesttype, self.__assignmenttype(isministryuser) , userid, previousassignee, iscleanup)
         else:
             iscleanup = False
-        return notificationservice().createnotification({"message" : notification}, requestid, requesttype, self.__assignmenttype(isministryuser), userid, previousassignee, iscleanup)
+            return notificationservice().createnotification({"message" : notification}, requestid, requesttype, 'User Assignment Removal', userid, previousassignee, iscleanup)
 
     def __preparenotification(self,username,removedassignee):
         return self.__notificationmessage(username,removedassignee)
