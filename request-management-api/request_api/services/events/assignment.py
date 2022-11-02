@@ -29,7 +29,7 @@ class assignmentevent:
             if self.__isnoneorblank(previousassignee) == False and previousassignee != userid:
                 previousassigneenotification = self.__createnotificationforremoval(requestid, requesttype, userid, username, previousassignee)
             if notificationresponse.success == True and commentrespose.success == True and \
-                (previousassigneenotification is None or (previousassigneenotification is not None and previousassigneenotification.success == True)):
+                (previousassigneenotification is None or previousassigneenotification.success == True):
                     return DefaultMethodResult(True,'Assignment Notification, Comment has been created',requestid)
             else:   
                 return DefaultMethodResult(False,'unable to create notification and/or comment for assignment',requestid)            
