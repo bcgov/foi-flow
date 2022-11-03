@@ -67,7 +67,7 @@ class rawrequestservicegetter:
             if request['status'] == 'Closed':
                 request['requestrawdata']['stateTransition']= FOIRawRequest.getstatesummary(requestid)
             request['requestrawdata']['wfinstanceid'] = request['wfinstanceid']
-            request['requestrawdata']['closedate']= request['closedate']
+            request['requestrawdata']['closedate']= self.__getclosedate(request['closedate'])
             return request['requestrawdata']    
         elif request != {} and request['sourceofsubmission'] == "intake":
             requestrawdata = request['requestrawdata']
@@ -84,10 +84,14 @@ class rawrequestservicegetter:
             request['requestrawdata']['requeststatusid'] =  requeststatus['requeststatusid']            
             request['requestrawdata']['lastStatusUpdateDate'] = FOIRawRequest.getLastStatusUpdateDate(requestid, request['status']).strftime(self.__generaldateformat())
             request['requestrawdata']['stateTransition']= FOIRawRequest.getstatesummary(requestid)
-            request['requestrawdata']['closedate']= request['closedate']
+            request['requestrawdata']['closedate']= self.__getclosedate(request['closedate'])
             return request['requestrawdata']
         else:
             return None
+
+    def __getclosedate(self, requestclosedate):
+        closedate = parse(requestclosedate).strftime(self.__generaldateformat()) if requestclosedate is not None else None
+        return closedate
         
     def getrawrequestfieldsforid(self, requestid, fields):   
         request = FOIRawRequest.get_request(requestid)    
@@ -156,7 +160,7 @@ class rawrequestservicegetter:
                                'selectedMinistries': requestrawdata['ministry']['selectedMinistry'],
                                'lastStatusUpdateDate': FOIRawRequest.getLastStatusUpdateDate(requestid, request['status']).strftime(self.__generaldateformat()),
                                'stateTransition': FOIRawRequest.getstatesummary(requestid),
-                               'closedate': request['closedate'] if request['closedate'] is not None else None
+                               'closedate': request['closedate'].strftime(self.__generaldateformat()) if request['closedate'] is not None else None
                                }
 
     def __prepareadditionalpersonalinfo(self, requestrawdata):
