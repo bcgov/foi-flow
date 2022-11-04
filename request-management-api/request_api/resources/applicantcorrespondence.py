@@ -92,7 +92,7 @@ class FOIFlowApplicantCorrespondence(Resource):
             result = applicantcorrespondenceservice().saveapplicantcorrespondencelog(applicantcorrespondencelog, ministryrequestid, AuthHelper.getuserid())
             if cfrfeeservice().getactivepayment(requestid, ministryrequestid) != None:
                 requestservice().postfeeeventtoworkflow(requestid, ministryrequestid, "CANCELLED")
-            requestservice().postcorrespondenceeventtoworkflow(ministryrequestid,  requestid, result.identifier, applicantcorrespondencelog['attributes'], applicantcorrespondencelog['templateid'])
+            requestservice().postcorrespondenceeventtoworkflow(requestid, ministryrequestid, result.identifier, applicantcorrespondencelog['attributes'], applicantcorrespondencelog['templateid'])
            
             return {'status': result.success, 'message':result.message,'id':result.identifier} , 200      
         except BusinessException:
