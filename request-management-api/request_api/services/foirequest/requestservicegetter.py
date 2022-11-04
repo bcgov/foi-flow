@@ -17,7 +17,7 @@ class requestservicegetter:
        
     def getrequest(self,foirequestid,foiministryrequestid):        
         request = FOIRequest.getrequest(foirequestid)
-	print("request = ", request)
+        print("request = ", request)
         print("request = ", dict(request))
         print("request = ", request.__dict__)
         requestministry = FOIMinistryRequest.getrequestbyministryrequestid(foiministryrequestid)
