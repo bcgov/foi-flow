@@ -26,10 +26,11 @@ export const getTemplateVariables = (requestDetails: any, templateInfo: any) => 
 }
 
 export const isTemplateDisabled = (currentCFRForm: any, template: any) => {
+  console.log(`${currentCFRForm.status}, ${"estimatepaymentmethod" in currentCFRForm.feedata}, ${currentCFRForm.feedata.actualTotalDue}, ${currentCFRForm.feedata.balanceremaining}`);
   if (template.name === 'PAYONLINE') {
-    return currentCFRForm.status !== 'approved' || "estimatepaymentmethod" in currentCFRForm.feedata
+    return currentCFRForm.status !== 'approved' || "estimatepaymentmethod" in currentCFRForm.feedata || currentCFRForm.feedata.actualTotalDue > 0
   } else if (template.name === 'PAYOUTSTANDING') {
-    return currentCFRForm.status !== 'approved' || !("estimatepaymentmethod" in currentCFRForm.feedata) || currentCFRForm.feedata.balanceremaining <= 0
+    return currentCFRForm.status !== 'approved' || !("estimatepaymentmethod" in currentCFRForm.feedata) || currentCFRForm.feedata.balanceremaining <= 0 || currentCFRForm.feedata.actualTotalDue <= 0
   }
   return false
 }
