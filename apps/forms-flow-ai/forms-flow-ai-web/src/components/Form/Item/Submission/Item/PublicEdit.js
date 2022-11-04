@@ -42,16 +42,20 @@ const PublicEdit = React.memo((props) => {
   if ((isFormActive ||  (isSubActive && !isFormSubmissionLoading))) {
       return <Loading />;
   }
+  console.log(`errors == ${JSON.stringify(errors)}`);
+  if (errors.includes("Token Expired")) {
+    window.location.reload();
+  }
   return (
       <div className="container overflow-y-auto">
         <div className={`main-header ${classes.publicstyle}`}>
           <SubmissionError modalOpen={props.submissionError.modalOpen}
-            message={props.submissionError.message}
+            errors={errors}
             onConfirm={props.onConfirm}
           >
           </SubmissionError>
         </div>
-        <Errors errors={errors} />
+        {/* <Errors errors={errors} /> */}
         <LoadingOverlay active={isFormSubmissionLoading} spinner text='Loading...' className="col-12">
           <div className="ml-4 mr-4">
         <Form
@@ -102,8 +106,7 @@ const mapDispatchToProps = (dispatch, ownProps) => {
       dispatch(saveSubmission('submission', submission, onFormSubmit?formId: ownProps.match.params.formId));
     },
     onConfirm: () => {
-      const ErrorDetails = { modalOpen: false, message: "" }
-      dispatch(setFormSubmissionError(ErrorDetails))
+      window.location.reload();
     }
   }
 }
