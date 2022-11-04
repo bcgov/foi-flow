@@ -43,13 +43,10 @@ const PublicEdit = React.memo((props) => {
       return <Loading />;
   }
   console.log(`errors == ${JSON.stringify(errors)}`);
-  if (errors.includes("Token Expired")) {
-    window.location.reload();
-  }
   return (
       <div className="container overflow-y-auto">
         <div className={`main-header ${classes.publicstyle}`}>
-          <SubmissionError modalOpen={props.submissionError.modalOpen}
+          <SubmissionError modalOpen={errors.includes("Token Expired")}
             errors={errors}
             onConfirm={props.onConfirm}
           >
