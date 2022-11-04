@@ -428,7 +428,7 @@ export const ContactApplicant = ({
               data-variant="contained"
               onClick={() => setPreviewModal(true)}
               color="primary"
-              disabled={(files?.length <= 0 || currentTemplate <= 1 || disablePreview)}
+              disabled={(files?.length <= 0 || currentTemplate <= 0 || disablePreview)}
             >
               {previewButtonValue}
             </button>
