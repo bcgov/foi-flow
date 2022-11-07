@@ -45,6 +45,12 @@ class FOIRequestCFRFee(db.Model):
         comment_schema = FOIRequestCFRFormSchema(many=False)
         query = db.session.query(FOIRequestCFRFee).filter_by(ministryrequestid=ministryrequestid).order_by(FOIRequestCFRFee.cfrfeeid.desc(), FOIRequestCFRFee.version.desc()).first()
         return comment_schema.dump(query)   
+
+    @classmethod
+    def getapprovedcfrfee(cls, ministryrequestid)->DefaultMethodResult:   
+        comment_schema = FOIRequestCFRFormSchema(many=False)
+        query = db.session.query(FOIRequestCFRFee).filter_by(ministryrequestid=ministryrequestid, cfrfeestatusid=2).order_by(FOIRequestCFRFee.cfrfeeid.desc(), FOIRequestCFRFee.version.desc()).first()
+        return comment_schema.dump(query)  
     
     @classmethod
     def getcfrfeehistory(cls, ministryrequestid)->DefaultMethodResult:   

@@ -99,7 +99,7 @@ class requestservicegetter:
     
     def getrequestdetails(self,foirequestid, foiministryrequestid):
         requestdetails = self.getrequest(foirequestid, foiministryrequestid)
-        cfrfee = cfrfeeservice().getcfrfee(foiministryrequestid)
+        cfrfee = cfrfeeservice().getapprovedcfrfee(foiministryrequestid)
         payment = paymentservice().getpayment(foirequestid, foiministryrequestid)
         if cfrfee is not None and cfrfee != {}:
             requestdetails['cfrfee'] = cfrfee

@@ -77,6 +77,10 @@ class cfrfeeservice:
         cfrfee = FOIRequestCFRFee.getcfrfee(ministryrequestid)
         return self.__formatcfrfee(cfrfee)
 
+    def getapprovedcfrfee(self, ministryrequestid):
+        cfrfee = FOIRequestCFRFee.getapprovedcfrfee(ministryrequestid)
+        return self.__formatcfrfee(cfrfee)
+
     
     def getcfrfeehistory(self, ministryrequestid):
         cfrfees = []
