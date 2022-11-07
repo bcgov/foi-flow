@@ -303,7 +303,7 @@ const RequestDetails = React.memo(
                     id="closedDate"
                     label="Closed Date"
                     value={requestDetails?.currentState?.toLowerCase() === StateEnum.closed.name.toLowerCase() ?
-                      requestDetails?.lastStatusUpdateDate[0] : "N/A"}
+                      requestDetails?.closedate : "N/A"}
                     inputProps={{ "aria-labelledby": "startDate-label"}}
                     InputLabelProps={{
                     shrink: true,
