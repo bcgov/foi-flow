@@ -83,3 +83,20 @@
   border: none;
   overflow: hidden;
 }
+
+.tooltip-floatRight {
+  cursor: pointer;
+  display: block;
+  z-index: 2;
+  position: absolute;
+  right: -20px;
+}
+
+.tooltip-floatRight button{
+  padding: 0px 20px 0px 0px !important;
+  min-width: 0px !important;
+}
+
+.tooltip-preview {
+  top: 470px;
+}
