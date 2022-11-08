@@ -27,6 +27,7 @@ import Loading from "../../../../containers/Loading";
 import {setFOICorrespondenceLoader} from "../../../../actions/FOI/foiRequestActions";
 import { applyVariables, getTemplateVariables, isTemplateDisabled } from './util';
 import { StateEnum } from '../../../../constants/FOI/statusEnum';
+import CustomizedTooltip from '../Tooltip/MuiTooltip/Tooltip';
 
 export const ContactApplicant = ({
   requestNumber,
@@ -230,6 +231,14 @@ export const ContactApplicant = ({
     setPreviewModal(false);
   }
 
+  const tooltipPreview = {
+    "title": previewButtonValue,
+    "content": [
+      <div className="toolTipContent">
+        <p>Please select a template and add an attachment before previewing the email</p>
+      </div>]
+  };
+
   return !isLoading ? (
     <div className="contact-applicant-container">
       <Grid
@@ -432,6 +441,10 @@ export const ContactApplicant = ({
             >
               {previewButtonValue}
             </button>
+            <div className="tooltip-floatRight tooltip-preview">
+              <CustomizedTooltip content={tooltipPreview} position={""} />
+              <p className="hideContent" id="popup-1">Information1</p>
+            </div>
           </div>
         </div>
         <Grid
