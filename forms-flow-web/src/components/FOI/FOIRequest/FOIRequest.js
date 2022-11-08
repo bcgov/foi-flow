@@ -372,6 +372,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
     receivedDate: "",
     requestStartDate: "",
     dueDate: "",
+    requestState: "",
   };
 
   const requiredApplicantDetailsValues = {
