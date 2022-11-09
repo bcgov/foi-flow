@@ -6,7 +6,7 @@ import Button from 'react-bootstrap/Button';
 const SubmissionError = React.memo((props) => {
     const { modalOpen=false, onConfirm, errors } = props;
     let message = "";
-    if (errors.includes("Token Expired")) {
+    if (errors?.includes("Token Expired")) {
         message = "Something went wrong. Please click Refresh button to reload the page."
     }
     console.log(`message === ${message}`);

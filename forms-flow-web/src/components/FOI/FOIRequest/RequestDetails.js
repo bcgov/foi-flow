@@ -7,7 +7,7 @@ import Input from '@material-ui/core/Input';
 import { formatDate, addBusinessDays, businessDay } from "../../../helper/FOI/helper";
 import FOI_COMPONENT_CONSTANTS from '../../../constants/FOI/foiComponentConstants';
 import { StateEnum } from '../../../constants/FOI/statusEnum';
-import { shouldDisableFieldForMinistryRequests } from "./utils"
+import { shouldDisableFieldForMinistryRequests, findRequestState } from "./utils"
 import { makeStyles } from '@material-ui/styles';
 import Accordion from '@material-ui/core/Accordion';
 import AccordionSummary from '@material-ui/core/AccordionSummary';
@@ -125,6 +125,7 @@ const RequestDetails = React.memo(
         receivedDate: !!receivedDate ? formatDate(receivedDate, 'yyyy MM, dd'): "",
         requestStartDate: startDate ? formatDate(startDate): "",
         dueDate:  validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.DUE_DATE, startDate ? formatDate(startDate): ""),
+        requestState: findRequestState(requestDetails?.requeststatusid)
       }
       //event bubble up - sets the initial value to validate the required fields
       handleRequestDetailsInitialValue(requestDetailsObject);

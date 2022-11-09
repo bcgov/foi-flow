@@ -302,13 +302,6 @@ export const checkValidationError = (
   requiredRequestDetailsValues,
   requiredAxisDetails
 ) => {
-  console.log(requiredApplicantDetails)
-  console.log(contactDetailsNotGiven)
-  console.log(requiredRequestDescriptionValues)
-  console.log(validation)
-  console.log(assignedToValue)
-  console.log(requiredRequestDetailsValues)
-  console.log(requiredAxisDetails)
 
   return (
     requiredApplicantDetails.firstName === "" ||
@@ -316,7 +309,8 @@ export const checkValidationError = (
     requiredApplicantDetails.category.toLowerCase().includes("select") ||
     contactDetailsNotGiven ||
     requiredRequestDescriptionValues.description === "" ||
-    !requiredRequestDescriptionValues.isProgramAreaSelected ||
+    (!requiredRequestDescriptionValues.isProgramAreaSelected 
+      && [StateEnum.unopened.name.toLowerCase(), StateEnum.intakeinprogress.name.toLowerCase()].includes(requiredRequestDetailsValues?.requestState?.toLowerCase())) ||
     (requiredRequestDetailsValues.requestType.toLowerCase() ===
       FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_GENERAL &&
       !requiredRequestDescriptionValues.ispiiredacted) ||

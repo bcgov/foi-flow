@@ -334,7 +334,8 @@ export const CFRForm = ({
 
   const handleRefundChanges = (e: React.ChangeEvent<HTMLInputElement>) => {
     const name : string = e.target.name;
-    const value : number = Math.floor((+e.target.value) * 100) / 100;
+    const re = new RegExp('^-?\\d+(?:\.\\d{0,' + (2 || -1) + '})?');
+    const value : number = +e.target.value.match(re)![0]
     if(value <= formData.amountPaid)
       setFormData(values => ({...values, [name]: value}));
   };
@@ -373,6 +374,17 @@ export const CFRForm = ({
     else
       balanceRemaining = (formData.estimatedTotalDue - formData.amountPaid - formData.feewaiverAmount)
     return !Number.isNaN(balanceRemaining) || balanceRemaining  ? balanceRemaining : 0;
+  }
+
+  const calculateRefundAmount = () => {
+    let refundAmount = formData?.refundAmount || 0;
+    console.log(`refundAmount initial = ${refundAmount}`);
+    const balanceRemaining = calculateBalanceRemaining();
+    console.log(`balanceRemaining = ${balanceRemaining}`);
+    if (balanceRemaining < 0)
+      refundAmount = Math.abs(balanceRemaining);
+    console.log(`refundAmount = ${refundAmount}`);
+    return refundAmount;
   }
 
   const cfrStatusDisabled = () => {
@@ -422,7 +434,7 @@ export const CFRForm = ({
           ...formData.balancePaymentMethod !== 'init' && {balancepaymentmethod: formData.balancePaymentMethod},
           balanceremaining: calculateBalanceRemaining(),
           feewaiveramount: formData.feewaiverAmount,
-          refundamount: formData.refundAmount,
+          refundamount: calculateRefundAmount(),//formData.refundAmount,
           estimatedlocatinghrs: formData.estimates.locating,
           actuallocatinghrs: formData.actual.locating,
           estimatedproducinghrs: formData.estimates.producing,
@@ -453,7 +465,7 @@ export const CFRForm = ({
           ...formData.balancePaymentMethod !== 'init' && {balancepaymentmethod: formData.balancePaymentMethod},
           balanceremaining: calculateBalanceRemaining(),
           feewaiveramount: formData.feewaiverAmount,
-          refundamount: formData.refundAmount,
+          refundamount: calculateRefundAmount(),//formData.refundAmount,
         },
         status: formData.formStatus,
         reason: formData.reason === "init" ? '' : formData.reason
@@ -839,7 +851,7 @@ export const CFRForm = ({
                           variant="outlined"
                           name="refundAmount"
                           type="number"
-                          value={formData?.refundAmount}
+                          value={calculateRefundAmount().toFixed(2)}
                           onChange={handleRefundChanges}
                           onBlur={(e) => {
                             e.target.value = parseFloat(e.target.value).toFixed(2);
