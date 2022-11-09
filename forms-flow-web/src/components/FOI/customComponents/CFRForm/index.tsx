@@ -376,17 +376,6 @@ export const CFRForm = ({
     return !Number.isNaN(balanceRemaining) || balanceRemaining  ? balanceRemaining : 0;
   }
 
-  const calculateRefundAmount = () => {
-    let refundAmount = formData?.refundAmount || 0;
-    console.log(`refundAmount initial = ${refundAmount}`);
-    const balanceRemaining = calculateBalanceRemaining();
-    console.log(`balanceRemaining = ${balanceRemaining}`);
-    if (balanceRemaining < 0)
-      refundAmount = Math.abs(balanceRemaining);
-    console.log(`refundAmount = ${refundAmount}`);
-    return refundAmount;
-  }
-
   const cfrStatusDisabled = () => {
     if (formHistory.length > 0 && (requestState === StateEnum.callforrecords.name || requestState === StateEnum.feeassessed.name || requestState === StateEnum.onhold.name)) {
       if (isMinistry) {
@@ -434,7 +423,7 @@ export const CFRForm = ({
           ...formData.balancePaymentMethod !== 'init' && {balancepaymentmethod: formData.balancePaymentMethod},
           balanceremaining: calculateBalanceRemaining(),
           feewaiveramount: formData.feewaiverAmount,
-          refundamount: calculateRefundAmount(),//formData.refundAmount,
+          refundamount: formData.refundAmount,
           estimatedlocatinghrs: formData.estimates.locating,
           actuallocatinghrs: formData.actual.locating,
           estimatedproducinghrs: formData.estimates.producing,
@@ -465,7 +454,7 @@ export const CFRForm = ({
           ...formData.balancePaymentMethod !== 'init' && {balancepaymentmethod: formData.balancePaymentMethod},
           balanceremaining: calculateBalanceRemaining(),
           feewaiveramount: formData.feewaiverAmount,
-          refundamount: calculateRefundAmount(),//formData.refundAmount,
+          refundamount: formData.refundAmount,
         },
         status: formData.formStatus,
         reason: formData.reason === "init" ? '' : formData.reason
@@ -851,7 +840,7 @@ export const CFRForm = ({
                           variant="outlined"
                           name="refundAmount"
                           type="number"
-                          value={calculateRefundAmount().toFixed(2)}
+                          value={formData?.refundAmount}
                           onChange={handleRefundChanges}
                           onBlur={(e) => {
                             e.target.value = parseFloat(e.target.value).toFixed(2);
