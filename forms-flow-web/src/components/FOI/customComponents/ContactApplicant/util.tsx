@@ -26,6 +26,7 @@ export const getTemplateVariables = (requestDetails: any, templateInfo: any) => 
 }
 
 export const isTemplateDisabled = (currentCFRForm: any, template: any) => {
+  console.log(currentCFRForm);
   console.log(`${currentCFRForm.status}, ${"estimatepaymentmethod" in currentCFRForm.feedata}, ${currentCFRForm.feedata.actualtotaldue}, ${currentCFRForm.feedata.balanceremaining}`);
   if (template.name === 'PAYONLINE') {
     return currentCFRForm.status !== 'approved' || ("estimatepaymentmethod" in currentCFRForm.feedata && currentCFRForm.feedata.actualtotaldue > 0)
