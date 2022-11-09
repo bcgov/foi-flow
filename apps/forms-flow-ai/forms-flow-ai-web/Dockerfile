@@ -13,7 +13,7 @@ RUN apk update && apk upgrade && \
 # Clone code
 RUN git clone -b ${FORMIO_SOURCE_REPO_BRANCH} ${FORMIO_SOURCE_REPO_URL} /web/
 
-RUN cp -rf /web/forms-flow-web/* /app/
+RUN cp -rf /web/forms-flow-ai-web/* /app/
 RUN rm /app/public/logo.svg
 COPY /public/logo.svg /app/public/
 
