@@ -851,7 +851,7 @@ export const CFRForm = ({
                           variant="outlined"
                           name="refundAmount"
                           type="number"
-                          value={formData?.refundAmount}
+                          value={calculateRefundAmount().toFixed(2)}
                           onChange={handleRefundChanges}
                           onBlur={(e) => {
                             e.target.value = parseFloat(e.target.value).toFixed(2);
