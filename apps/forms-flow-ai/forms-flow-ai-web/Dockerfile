@@ -11,19 +11,20 @@ RUN apk update && apk upgrade && \
     apk add --no-cache bash git openssh
 
 # Clone code
-RUN git clone -b ${FORMIO_SOURCE_REPO_BRANCH} ${FORMIO_SOURCE_REPO_URL} /web/
+#RUN git clone -b ${FORMIO_SOURCE_REPO_BRANCH} ${FORMIO_SOURCE_REPO_URL} /web/
 
-RUN cp -rnf /web/forms-flow-web/* /app/
-RUN rm /app/public/logo.svg
-COPY /public/logo.svg /app/public/
+#RUN cp -rf /web/forms-flow-web/* /app/
+COPY . /app/
+#RUN rm /app/public/logo.svg
+#COPY /public/logo.svg /app/public/
 
 ARG CUSTOM_SRC_DIR=src
 
 # Override these files they have custom changes in the sbc_divapps directory
-COPY ./${CUSTOM_SRC_DIR}/  /app/${CUSTOM_SRC_DIR}/
+#COPY ./${CUSTOM_SRC_DIR}/  /app/${CUSTOM_SRC_DIR}/
 
-ARG CUSTOM_SVG_DIR=public/webfonts
-COPY ./${CUSTOM_SVG_DIR}/ /app/${CUSTOM_SVG_DIR}/
+#ARG CUSTOM_SVG_DIR=public/webfonts
+#COPY ./${CUSTOM_SVG_DIR}/ /app/${CUSTOM_SVG_DIR}/
 
 RUN npm install
 RUN npm run build
