@@ -521,9 +521,12 @@ export const CFRForm = ({
 
   const disableNewCfrFormBtn = () => {
     return(formData?.formStatus !== 'approved' || (requestState !== StateEnum.callforrecords.name &&
-      requestState !== StateEnum.feeassessed.name && requestState !== StateEnum.onhold.name));
+      requestState !== StateEnum.feeassessed.name && requestState !== StateEnum.onhold.name) || (requestState === StateEnum.onhold.name && formData?.actualTotalDue > 0));
   }
 
+  const disableAmountPaid = () => {
+    return (isMinistry || requestState === StateEnum.feeassessed.name || formData?.formStatus !== 'approved' || 'balancePaymentMethod' in formData)
+  }
 
   const [isNewCFRForm, setIsNewCFRForm] = useState(false)
   const newCFRForm = () => {
@@ -740,7 +743,7 @@ export const CFRForm = ({
                             e.target.value = parseFloat(e.target.value).toFixed(2);
                           }}
                           fullWidth
-                          disabled={isMinistry || requestState === StateEnum.feeassessed.name || formData?.formStatus !== 'approved'}
+                          disabled={disableAmountPaid()}
                         />
                       </div>
                       <div className="col-lg-6 foi-details-col">
