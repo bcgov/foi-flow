@@ -525,6 +525,8 @@ export const CFRForm = ({
   }
 
   const disableAmountPaid = () => {
+    console.log(formData);
+    console.log(`balancePaymentMethod in obj = ${'balancePaymentMethod' in formData}`);
     return (isMinistry || requestState === StateEnum.feeassessed.name || formData?.formStatus !== 'approved' || 'balancePaymentMethod' in formData)
   }
 
