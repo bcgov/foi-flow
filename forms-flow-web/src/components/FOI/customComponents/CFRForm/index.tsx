@@ -378,9 +378,12 @@ export const CFRForm = ({
 
   const calculateRefundAmount = () => {
     let refundAmount = formData?.refundAmount || 0;
+    console.log(`refundAmount initial = ${refundAmount}`);
     const balanceRemaining = calculateBalanceRemaining();
+    console.log(`balanceRemaining = ${balanceRemaining}`);
     if (balanceRemaining < 0)
       refundAmount = formData?.refundAmount - balanceRemaining;
+    console.log(`refundAmount = ${refundAmount}`);
     return refundAmount;
   }
 
