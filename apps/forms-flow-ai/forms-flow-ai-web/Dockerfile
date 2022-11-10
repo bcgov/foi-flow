@@ -22,8 +22,10 @@ ARG CUSTOM_SRC_DIR=src
 # Override these files they have custom changes in the sbc_divapps directory
 COPY ./${CUSTOM_SRC_DIR}/  /app/${CUSTOM_SRC_DIR}/
 
-ARG CUSTOM_SVG_DIR=public/webfonts
+#ARG CUSTOM_SVG_DIR=public
 COPY ./${CUSTOM_SVG_DIR}/ /app/${CUSTOM_SVG_DIR}/
+
+
 
 RUN npm install
 RUN npm run build
