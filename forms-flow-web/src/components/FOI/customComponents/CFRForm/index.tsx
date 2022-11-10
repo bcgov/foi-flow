@@ -524,9 +524,7 @@ export const CFRForm = ({
       requestState !== StateEnum.feeassessed.name && requestState !== StateEnum.onhold.name) || (requestState === StateEnum.onhold.name && formData?.actualTotalDue > 0));
   }
 
- const disableAmountPaid = () => {
-    console.log(formData)
-    console.log(`balancePaymentMethod in obj = ${('balancePaymentMethod' in formData && formData?.balancePaymentMethod !== "init")}`)
+  const disableAmountPaid = () => {
     return (isMinistry || requestState === StateEnum.feeassessed.name || formData?.formStatus !== 'approved' || ('balancePaymentMethod' in formData && formData?.balancePaymentMethod !== "init"))
   }
 
