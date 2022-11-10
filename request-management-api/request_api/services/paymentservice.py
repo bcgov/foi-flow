@@ -94,6 +94,7 @@ class paymentservice:
                     filename = "Fee Balance Outstanding Payment Receipt.pdf"
                 receipt_template_path= basepath + receiptname + ".docx"
             data['waivedAmount'] = data['cfrfee']['feedata']['estimatedlocatinghrs'] * 30 if data['cfrfee']['feedata']['estimatedlocatinghrs'] < 3 else 90
+            data['logourl'] = "https://dev-marshal-foirequest.apps.silver.devops.gov.bc.ca/static/media/logo-banner.e5eec500.png"
             data.update({'paymentInfo': {
                 'paymentDate': parsed_args.get('trnDate'),
                 'orderId': parsed_args.get('trnOrderId'),
