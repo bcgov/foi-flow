@@ -334,7 +334,8 @@ export const CFRForm = ({
 
   const handleRefundChanges = (e: React.ChangeEvent<HTMLInputElement>) => {
     const name : string = e.target.name;
-    const value : number = Math.floor((+e.target.value) * 100) / 100;
+    const re = new RegExp('^-?\\d+(?:\.\\d{0,' + (2 || -1) + '})?');
+    const value : number = +e.target.value.match(re)![0]
     if(value <= formData.amountPaid)
       setFormData(values => ({...values, [name]: value}));
   };
@@ -520,9 +521,12 @@ export const CFRForm = ({
 
   const disableNewCfrFormBtn = () => {
     return(formData?.formStatus !== 'approved' || (requestState !== StateEnum.callforrecords.name &&
-      requestState !== StateEnum.feeassessed.name && requestState !== StateEnum.onhold.name));
+      requestState !== StateEnum.feeassessed.name && requestState !== StateEnum.onhold.name) || (requestState === StateEnum.onhold.name && formData?.actualTotalDue > 0));
   }
 
+  const disableAmountPaid = () => {
+    return (isMinistry || requestState === StateEnum.feeassessed.name || formData?.formStatus !== 'approved' || ('balancePaymentMethod' in formData && formData?.balancePaymentMethod !== "init"))
+  }
 
   const [isNewCFRForm, setIsNewCFRForm] = useState(false)
   const newCFRForm = () => {
@@ -739,7 +743,7 @@ export const CFRForm = ({
                             e.target.value = parseFloat(e.target.value).toFixed(2);
                           }}
                           fullWidth
-                          disabled={isMinistry || requestState === StateEnum.feeassessed.name || formData?.formStatus !== 'approved'}
+                          disabled={disableAmountPaid()}
                         />
                       </div>
                       <div className="col-lg-6 foi-details-col">

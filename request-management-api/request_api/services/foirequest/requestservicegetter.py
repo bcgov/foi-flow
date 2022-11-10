@@ -17,6 +17,9 @@ class requestservicegetter:
        
     def getrequest(self,foirequestid,foiministryrequestid):        
         request = FOIRequest.getrequest(foirequestid)
+        print("request = ", request)
+        print("request = ", dict(request))
+        print("foirequestid = ", foirequestid)
         requestministry = FOIMinistryRequest.getrequestbyministryrequestid(foiministryrequestid)
         requestcontactinformation = FOIRequestContactInformation.getrequestcontactinformation(foirequestid,request['version'])
         requestapplicants = FOIRequestApplicantMapping.getrequestapplicants(foirequestid,request['version'])
@@ -96,7 +99,7 @@ class requestservicegetter:
     
     def getrequestdetails(self,foirequestid, foiministryrequestid):
         requestdetails = self.getrequest(foirequestid, foiministryrequestid)
-        cfrfee = cfrfeeservice().getcfrfee(foiministryrequestid)
+        cfrfee = cfrfeeservice().getapprovedcfrfee(foiministryrequestid)
         payment = paymentservice().getpayment(foirequestid, foiministryrequestid)
         if cfrfee is not None and cfrfee != {}:
             requestdetails['cfrfee'] = cfrfee

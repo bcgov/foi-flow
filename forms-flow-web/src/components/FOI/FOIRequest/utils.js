@@ -302,13 +302,15 @@ export const checkValidationError = (
   requiredRequestDetailsValues,
   requiredAxisDetails
 ) => {
+
   return (
     requiredApplicantDetails.firstName === "" ||
     requiredApplicantDetails.lastName === "" ||
     requiredApplicantDetails.category.toLowerCase().includes("select") ||
     contactDetailsNotGiven ||
     requiredRequestDescriptionValues.description === "" ||
-    !requiredRequestDescriptionValues.isProgramAreaSelected ||
+    (!requiredRequestDescriptionValues.isProgramAreaSelected 
+      && [StateEnum.unopened.name.toLowerCase(), StateEnum.intakeinprogress.name.toLowerCase()].includes(requiredRequestDetailsValues?.requestState?.toLowerCase())) ||
     (requiredRequestDetailsValues.requestType.toLowerCase() ===
       FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_GENERAL &&
       !requiredRequestDescriptionValues.ispiiredacted) ||
