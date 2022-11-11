@@ -586,3 +586,81 @@ div[disabled] {
 .classApplicationName{
   width: 20%;
 }
+
+.navbar-toggler-icon{
+  display: none;
+}
+
+@media screen and (min-width: 0px) and (max-width: 575px) {
+  .mobileh1content{
+    padding-top: 1%;
+    font-family: BCSans-Regular,sans-serif!important;
+    font-size: 18px;
+    font-weight: 600;
+  }
+
+  .btn-outline-bcblue{
+    font-size: 14px;
+    padding: 4px;
+  }
+  .mobilesubcontent{
+    font-size: 15px;
+  }
+
+  .mobilebreak{
+    display: none;
+  }
+
+  .mobileh3content{
+    font-size: 16px;
+    font-weight: 600;
+  }
+
+  #feedescheader , #estimatedfeeheader, #feedescription, #estimatedfeeheader, #feevalue{
+    display: none;
+  }
+
+  #feedescriptionmobile {
+    display: block;
+
+    b,strong {
+      font-weight: bold!important;
+    }
+  }
+
+  #mainrequestnumber, .mainrequestnumber{
+    display: none;
+}
+
+#mainrequestnumbermobile, .mainrequestnumbermobile{
+  display: block;
+  padding-top: 5%;
+  
+}
+
+div[data-testid="wrapper"]
+{
+  padding-right: 0px; 
+     padding-left: 0px;
+}
+
+  /* show it on small screens */
+}
+
+
+@media screen and (min-width: 576px)  {
+  #feedescriptionmobile {
+    display: none;
+  }
+
+  #mainrequestnumbermobile , .mainrequestnumbermobile  {
+        display: none;
+  }
+
+  #mainrequestnumber, .mainrequestnumber {
+    padding-top: 0.5%;
+    display: block;
+}
+
+  /* hide it elsewhere */
+}
