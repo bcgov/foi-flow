@@ -17,10 +17,8 @@ depends_on = None
 
 
 def upgrade():
-    op.execute('ALTER TABLE public."FOIRequestPayments" ADD paymentexpirydate timestamp') 
-    op.execute('Insert into public."NotificationTypes" (name, description, isactive) values (\'Payment\', \'Payment\', true);commit;')
+    op.execute('ALTER TABLE public."FOIRequestPayments" ADD paymentexpirydate timestamp')
 
 
 def downgrade():
-    op.execute('ALTER TABLE public."FOIRequestPayments" DROP paymentexpirydate') 
-    op.execute('delete from  public."NotificationTypes" where name in (\'Payment\');commit;')
+    op.execute('ALTER TABLE public."FOIRequestPayments" DROP paymentexpirydate')

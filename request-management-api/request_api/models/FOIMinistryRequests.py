@@ -635,6 +635,36 @@ class FOIMinistryRequest(db.Model):
             raise ex
         finally:
             db.session.close()
+        return upcomingduerecords
+
+    @classmethod
+    def getupcomingdivisionduerecords(cls):
+        upcomingduerecords = []
+        try:
+            sql = """select axisrequestid, filenumber, fma.foiministryrequestid , fma.foiministryrequestversion, fma.foirequest_id, 
+                        frd.divisionid, frd.stageid, pad2."name" divisionname, pads."name" stagename, 
+                        to_char(divisionduedate, 'YYYY-MM-DD') as duedate, frd.created_at, frd.createdby 
+                        from "FOIMinistryRequestDivisions" frd 
+                        inner join (select distinct on (fpa.foiministryrequestid) foiministryrequestid, version as foiministryrequestversion, axisrequestid, filenumber, foirequest_id 
+                                    from "FOIMinistryRequests" fpa where requeststatusid not in (5,6,4,11,3,15) 
+                                    order by fpa.foiministryrequestid , fpa.version desc) fma on frd.foiministryrequest_id = fma.foiministryrequestid and frd.foiministryrequestversion_id = fma.foiministryrequestversion 
+                        inner join "ProgramAreaDivisions" pad2 on frd.divisionid  = pad2.divisionid 
+                        inner join "ProgramAreaDivisionStages" pads on frd.stageid  = pads.stageid and frd.stageid in (5, 7, 9) 
+                        and frd.divisionduedate  between  NOW() - INTERVAL '7 DAY' AND NOW() + INTERVAL '7 DAY' 
+                        order by frd.foiministryrequest_id , frd.foiministryrequestversion_id desc;""" 
+            rs = db.session.execute(text(sql))        
+            for row in rs:
+                upcomingduerecords.append({"axisrequestid": row["axisrequestid"], "filenumber": row["filenumber"], 
+                                            "foiministryrequestid": row["foiministryrequestid"], "version": row["foiministryrequestversion"], 
+                                            "foirequest_id": row["foirequest_id"], "created_at": row["created_at"], "createdby": row["createdby"],
+                                            "divisionid": row["divisionid"],"divisionname": row["divisionname"],
+                                            "stageid": row["stageid"], "stagename": row["stagename"], 
+                                            "duedate": row["duedate"]})
+        except Exception as ex:
+            logging.error(ex)
+            raise ex
+        finally:
+            db.session.close()
         return upcomingduerecords    
 
     @classmethod
