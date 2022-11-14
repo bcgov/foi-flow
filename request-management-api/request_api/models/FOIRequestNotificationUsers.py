@@ -98,7 +98,22 @@ class FOIRequestNotificationUser(db.Model):
         finally:
             db.session.close()
         return notifications  
-
+    
+    @classmethod
+    def getnotificationidsbyuserandid(cls, userid, notificationids):
+        ids = []
+        try:
+            sql = """select notificationid from "FOIRequestNotificationUsers" where userid = :userid and notificationid = ANY(:notificationids) """
+            rs = db.session.execute(text(sql), {'userid': userid, 'notificationids': notificationids})
+            for row in rs:
+                ids.append(row["notificationid"])
+        except Exception as ex:
+            logging.error(ex)
+            raise ex
+        finally:
+            db.session.close()
+        return ids
+        
 class FOIRequestNotificationUserSchema(ma.Schema):
     class Meta:
         fields = ('notificationid', 'userid','notificationusertypeid','created_at','createdby','updated_at','updatedby') 
