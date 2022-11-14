@@ -1,66 +1,112 @@
 .footerstyle {
   background-color: #003366;
-  color: #ffff;   
- position: relative!important;
+  color: #ffff;
+  position: relative !important;
 }
 
-.footerstyle a   {
-// font-family: 'BCSans-Regular', sans-serif;
-color: #ffff;
-text-decoration: none;
-font-size: small;
+.footerstyle a {
+  // font-family: 'BCSans-Regular', sans-serif;
+  color: #ffff;
+  text-decoration: none;
+  font-size: small;
 
 }
-.footerstyle a:hover
-{
-color: #ffff;
-text-decoration: none;
+
+.footerstyle a:hover {
+  color: #ffff;
+  text-decoration: none;
 }
 
 .footerstyle ul {
-list-style: none;
-padding-inline-start: unset;
+  list-style: none;
+  padding-inline-start: unset;
 }
 
 .footerstyle li {
-padding-top:3px;
-padding-bottom: 3px;
+  padding-top: 3px;
+  padding-bottom: 3px;
 }
 
-.foi-footer-nav{   
+.foi-footer-nav {
   width: 100%;
 }
-.foi-footer-nav{
+
+.foi-footer-nav {
   background-color: #036 !important;
-    
-    padding: 20px 0 !important;
-    color: #fff;
+
+  padding: 20px 0 !important;
+  color: #fff;
 }
 
-// nav {
-//     background-color: #036 !important;
-    
-//     padding: 20px 0 !important;
-//     color: #fff;
-//   }
-  
-  nav h2 {
-    font-family: 'BCSans-Bold', sans-serif !important;
-    font-weight: 100 !important;
-    color: #fff;
-    margin-left: 40px;  
-  }
+
+
+nav h2 {
+  font-family: 'BCSans-Bold', sans-serif !important;
+  font-weight: 100 !important;
+  color: #fff;
+  margin-left: 40px;
+}
 
 
 
-.foiContainer{
+.foiContainer {
   margin: 0 8% !important;
   padding: 0 15px !important;
   display: block !important;
-  > div {
-    > div{
+
+  >div {
+    >div {
       padding: 0;
     }
   }
+
   max-width: none !important;
+}
+
+.foi-mobile-footer-nav {
+  background-color: #036 !important;
+
+  padding: 5px 0 !important;
+  color: #fff;
+
+  .foimobileContainer {
+    margin: 0 3% !important;
+    padding: 0 5px !important;
+    display: block !important;
+
+    >div {
+      >div {
+        padding: 0;
+      }
+    }
+
+    max-width: none !important;
+  }
+}
+
+@media screen and (min-width: 0px) and (max-width: 575px) {
+  .foi-footer-nav {
+    display: none;
+  }
+  .foi-mobile-footer-nav{
+    display: block;
+  }
+
+  .foifootercolumn {
+    padding-left: 20%;
+  }
+
+  /* show it on small screens */
+}
+
+@media screen and (min-width: 576px)  {
+  .foi-footer-nav {
+    display: block;
+  }
+
+  .foi-mobile-footer-nav{
+    display: none;
+  }
+
+  /* hide it elsewhere */
 }
