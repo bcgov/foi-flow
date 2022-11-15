@@ -304,6 +304,10 @@ export const checkValidationError = (
   isAddRequest
 ) => {
 
+  console.log(`!isprogramareaselected = ${!requiredRequestDescriptionValues.isProgramAreaSelected}`)
+  console.log(`state includes = ${[StateEnum.unopened.name.toLowerCase(), StateEnum.intakeinprogress.name.toLowerCase()].includes(requiredRequestDetailsValues?.requestState?.toLowerCase())}`)
+  console.log(`isAddrequest = ${isAddRequest}`)
+  
   return (
     requiredApplicantDetails.firstName === "" ||
     requiredApplicantDetails.lastName === "" ||
