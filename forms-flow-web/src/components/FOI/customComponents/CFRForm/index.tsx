@@ -379,7 +379,7 @@ export const CFRForm = ({
   const cfrStatusDisabled = () => {
     if (formHistory.length > 0 && [StateEnum.feeassessed.name, StateEnum.onhold.name, StateEnum.callforrecords.name].includes(requestState)) {
       if (isMinistry) {
-        return ['review', 'approved', 'init'].includes(initialFormData.formStatus) || isNewCFRForm;
+        return ['review', 'approved'].includes(initialFormData.formStatus) || isNewCFRForm;
       } else {
         return initialFormData.formStatus !== 'review';
       }
