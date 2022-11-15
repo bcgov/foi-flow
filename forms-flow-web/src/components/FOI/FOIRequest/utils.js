@@ -301,11 +301,11 @@ export const checkValidationError = (
   assignedToValue,
   requiredRequestDetailsValues,
   requiredAxisDetails,
-  isAddRequest
+  isAddRequest,
+  currentrequestStatus
 ) => {
 
-  console.log(requiredRequestDetailsValues);
-  
+  console.log(`currentrequestStatus = ${currentrequestStatus}`)
   return (
     requiredApplicantDetails.firstName === "" ||
     requiredApplicantDetails.lastName === "" ||
