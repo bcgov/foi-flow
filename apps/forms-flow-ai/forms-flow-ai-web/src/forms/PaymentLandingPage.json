@@ -387,7 +387,7 @@
                     "dbIndex": false,
                     "encrypted": false,
                     "redrawOn": "",
-                    "customDefaultValue": "console.log(\"here\")\r\nFormio.request(\r\n    data.apiUrl + '/api/foirequests/' + data.foiRequestId + '/ministryrequest/' + data.ministryRequestId +  '/payments/' + data.paymentId,\r\n    'PUT',\r\n    {\r\n    \"response_url\": window.location.href.split(\"?\")[1]\r\n    },\r\n    null,\r\n    {\r\n      headers: {\r\n        'content-type': 'application/json'\r\n      },\r\n      mode: 'no-cors'\r\n    }).then(function(result) {\r\n      if (result.status === 'PAID') {\r\n        console.log(\"Paid\");\r\n      } else {\r\n        console.log(\"Error while updating the payment\");\r\n      }\r\n    });",
+                    "customDefaultValue": "console.log(\"here\")\r\nFormio.request(\r\n    data.apiUrl + '/api/cfrfee/' + data.foiRequestId + '/ministryrequest/' + data.ministryRequestId +  '/payments/' + data.paymentId,\r\n    'PUT',\r\n    {\r\n    \"response_url\": window.location.href.split(\"?\")[1]\r\n    },\r\n    null,\r\n    {\r\n      headers: {\r\n        'content-type': 'application/json'\r\n      },\r\n      mode: 'no-cors'\r\n    }).then(function(result) {\r\n      if (result.status === 'PAID') {\r\n        console.log(\"Paid\");\r\n      } else {\r\n        console.log(\"Error while updating the payment\");\r\n      }\r\n    });",
                     "calculateValue": "",
                     "calculateServer": false,
                     "key": "callUpdateAPI",
@@ -1390,7 +1390,7 @@
                                                                 "height": ""
                                                             },
                                                             "type": "button",
-                                                            "custom": "Formio.request(\n  data.apiUrl + '/api/foirawrequests/' + data.ministryRequestId + '/payments',\n  'POST',\n  {\n   \"fee_code\":\"FOI0002\",\n   \"quantity\":\"1\",\n  \"return_route\":\"/public/form/paymentlanding/foirequest/\"+data.foiRequestId,\n   \"retry\":true,\n   \"transaction_number\":data.transactionNumber\n  },\n  null,\n  {\n    headers: {\n      'content-type': 'application/json'\n    },\n    mode: 'no-cors'\n  }).then(function(result) {\n    window.location.href = result.paybc_url\n  });",
+                                                            "custom": "Formio.request(\n  data.apiUrl + '/api/cfrfee/' + data.ministryRequestId + '/payments',\n  'POST',\n  {\n   \"fee_code\":\"FOI0002\",\n   \"quantity\":\"1\",\n  \"return_route\":\"/public/form/paymentlanding/foirequest/\"+data.foiRequestId,\n   \"retry\":true,\n   \"transaction_number\":data.transactionNumber\n  },\n  null,\n  {\n    headers: {\n      'content-type': 'application/json'\n    },\n    mode: 'no-cors'\n  }).then(function(result) {\n    window.location.href = result.paybc_url\n  });",
                                                             "input": true,
                                                             "placeholder": "",
                                                             "prefix": "",
@@ -5082,7 +5082,7 @@
                                                         "height": ""
                                                     },
                                                     "type": "button",
-                                                    "custom": "Formio.request(\n  data.apiUrl + '/api/foirawrequests/' + data.ministryRequestId + '/payments',\n  'POST',\n  {\n   \"fee_code\":\"FOI0002\",\n   \"quantity\":\"1\",\n   \"return_route\":\"returnRoute\",\n   \"half\":data.half\n  },\n  null,\n  {\n    headers: {\n      'content-type': 'application/json'\n    },\n    mode: 'no-cors'\n  }).then(function(result) {\n    window.location.href = result.paybc_url\n  });",
+                                                    "custom": "Formio.request(\n  data.apiUrl + '/api/cfrfee/' + data.ministryRequestId + '/payments',\n  'POST',\n  {\n   \"fee_code\":\"FOI0002\",\n   \"quantity\":\"1\",\n   \"return_route\":\"returnRoute\",\n   \"half\":data.half\n  },\n  null,\n  {\n    headers: {\n      'content-type': 'application/json'\n    },\n    mode: 'no-cors'\n  }).then(function(result) {\n    window.location.href = result.paybc_url\n  });",
                                                     "input": true,
                                                     "placeholder": "",
                                                     "prefix": "",
