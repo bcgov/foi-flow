@@ -305,7 +305,8 @@ export const checkValidationError = (
   currentrequestStatus
 ) => {
 
-  console.log(`currentrequestStatus = ${currentrequestStatus}`)
+  console.log(`!isprogramareaselected = ${!requiredRequestDescriptionValues.isProgramAreaSelected}`)
+  console.log(`state in = ${[StateEnum.unopened.name.toLowerCase(), StateEnum.intakeinprogress.name.toLowerCase()].includes(currentrequestStatus?.toLowerCase())}`)
   return (
     requiredApplicantDetails.firstName === "" ||
     requiredApplicantDetails.lastName === "" ||
@@ -313,7 +314,7 @@ export const checkValidationError = (
     contactDetailsNotGiven ||
     requiredRequestDescriptionValues.description === "" ||
     (!requiredRequestDescriptionValues.isProgramAreaSelected 
-      && ([StateEnum.unopened.name.toLowerCase(), StateEnum.intakeinprogress.name.toLowerCase()].includes(requiredRequestDetailsValues?.requestState?.toLowerCase()) || isAddRequest)) ||
+      && ([StateEnum.unopened.name.toLowerCase(), StateEnum.intakeinprogress.name.toLowerCase()].includes(currentrequestStatus?.toLowerCase()) || isAddRequest)) ||
     (requiredRequestDetailsValues.requestType.toLowerCase() ===
       FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_GENERAL &&
       !requiredRequestDescriptionValues.ispiiredacted) ||

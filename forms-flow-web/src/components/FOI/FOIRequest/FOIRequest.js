@@ -203,8 +203,9 @@ const FOIRequest = React.memo(({ userDetail }) => {
    useEffect(async() => {
     if (isAddRequest) {
       dispatch(fetchFOIAssignedToList("", "", ""));
+      dispatch(fetchFOIProgramAreaList());
     } else {
-      await Promise.all([dispatch(fetchFOIRequestDetailsWrapper(requestId, ministryId)),
+      await Promise.all([dispatch(fetchFOIProgramAreaList()), dispatch(fetchFOIRequestDetailsWrapper(requestId, ministryId)),
       dispatch(fetchFOIRequestDescriptionList(requestId, ministryId))]);
       dispatch(fetchFOIRequestNotesList(requestId, ministryId));
       dispatch(fetchFOIRequestAttachmentsList(requestId, ministryId));
@@ -213,8 +214,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
       dispatch(fetchApplicantCorrespondenceTemplates());
     }
 
-    dispatch(fetchFOICategoryList());
-    dispatch(fetchFOIProgramAreaList());
+    dispatch(fetchFOICategoryList());    
     dispatch(fetchFOIReceivedModeList());
     dispatch(fetchFOIDeliveryModeList());
     dispatch(fetchClosingReasonList());
