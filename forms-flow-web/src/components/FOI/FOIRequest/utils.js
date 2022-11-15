@@ -303,8 +303,6 @@ export const checkValidationError = (
   requiredAxisDetails
 ) => {
 
-  console.log(requiredRequestDescriptionValues);
-  console.log(requiredRequestDetailsValues);
   return (
     requiredApplicantDetails.firstName === "" ||
     requiredApplicantDetails.lastName === "" ||
