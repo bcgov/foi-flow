@@ -305,7 +305,8 @@ export const checkValidationError = (
   currentrequestStatus
 ) => {
 
-  console.log(`currentrequestStatus = ${currentrequestStatus}`)
+  console.log(`!isprogramareaselected = ${!requiredRequestDescriptionValues.isProgramAreaSelected}`)
+  console.log(`state in = ${[StateEnum.unopened.name.toLowerCase(), StateEnum.intakeinprogress.name.toLowerCase()].includes(currentrequestStatus?.toLowerCase())}`)
   return (
     requiredApplicantDetails.firstName === "" ||
     requiredApplicantDetails.lastName === "" ||
