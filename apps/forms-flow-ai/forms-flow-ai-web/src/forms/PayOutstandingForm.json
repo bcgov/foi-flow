@@ -1899,7 +1899,7 @@
                                             "tableView": false,
                                             "key": "submit1",
                                             "type": "button",
-                                            "custom": "console.log(data)\nvar foiBaseApiUrl = localStorage.getItem(\"foiApiUrl\")\nFormio.request(\n  foiBaseApiUrl + '/api/foirawrequests/' + data.ministryRequestID + '/payments',\n  'POST',\n  {\n   \"fee_code\":\"FOI0002\",\n   \"quantity\":\"1\",\n   \"return_route\":\"/public/form/paymentlanding/foirequest/\"+data.foiRequestID,\n   \"half\":data.half\n  },\n  null,\n  {\n    headers: {\n      'content-type': 'application/json'\n    },\n    mode: 'no-cors'\n  }).then(function(result) {\n    window.location.href = result.paybc_url\n  });",
+                                            "custom": "console.log(data)\nvar foiBaseApiUrl = localStorage.getItem(\"foiApiUrl\")\nFormio.request(\n  foiBaseApiUrl + '/api/cfrfee/' + data.ministryRequestID + '/payments',\n  'POST',\n  {\n   \"fee_code\":\"FOI0002\",\n   \"quantity\":\"1\",\n   \"return_route\":\"/public/form/paymentlanding/foirequest/\"+data.foiRequestID,\n   \"half\":data.half\n  },\n  null,\n  {\n    headers: {\n      'content-type': 'application/json'\n    },\n    mode: 'no-cors'\n  }).then(function(result) {\n    window.location.href = result.paybc_url\n  });",
                                             "input": true,
                                             "placeholder": "",
                                             "prefix": "",
