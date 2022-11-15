@@ -496,7 +496,9 @@ const FOIRequest = React.memo(({ userDetail }) => {
     validation,
     assignedToValue,
     requiredRequestDetailsValues,
-    requiredAxisDetails
+    requiredAxisDetails,
+    isAddRequest,
+    _currentrequestStatus
   );
 
   const classes = useStyles();
