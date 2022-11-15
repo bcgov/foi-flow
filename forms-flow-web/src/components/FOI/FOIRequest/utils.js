@@ -300,7 +300,8 @@ export const checkValidationError = (
   validation,
   assignedToValue,
   requiredRequestDetailsValues,
-  requiredAxisDetails
+  requiredAxisDetails,
+  isAddRequest
 ) => {
 
   return (
@@ -310,7 +311,7 @@ export const checkValidationError = (
     contactDetailsNotGiven ||
     requiredRequestDescriptionValues.description === "" ||
     (!requiredRequestDescriptionValues.isProgramAreaSelected 
-      && [StateEnum.unopened.name.toLowerCase(), StateEnum.intakeinprogress.name.toLowerCase()].includes(requiredRequestDetailsValues?.requestState?.toLowerCase())) ||
+      && ([StateEnum.unopened.name.toLowerCase(), StateEnum.intakeinprogress.name.toLowerCase()].includes(requiredRequestDetailsValues?.requestState?.toLowerCase()) || isAddRequest)) ||
     (requiredRequestDetailsValues.requestType.toLowerCase() ===
       FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_GENERAL &&
       !requiredRequestDescriptionValues.ispiiredacted) ||
