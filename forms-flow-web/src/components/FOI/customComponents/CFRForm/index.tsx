@@ -377,16 +377,17 @@ export const CFRForm = ({
   }
 
   const cfrStatusDisabled = () => {
-    if (formHistory.length > 0 && (requestState === StateEnum.callforrecords.name || requestState === StateEnum.feeassessed.name || requestState === StateEnum.onhold.name)) {
+    if (formHistory.length > 0 && [StateEnum.feeassessed.name, StateEnum.onhold.name, StateEnum.callforrecords.name].includes(requestState)) {
       if (isMinistry) {
-        return initialFormData.formStatus === 'review' || initialFormData.formStatus === 'approved' || isNewCFRForm;
+        return ['review', 'approved', 'init'].includes(initialFormData.formStatus) || isNewCFRForm;
       } else {
         return initialFormData.formStatus !== 'review';
       }
     }
-    if (requestState === StateEnum.feeassessed.name) {
+    console.log(formData)
+    if (formData.balanceRemaining > 0 &&  [StateEnum.feeassessed.name, StateEnum.onhold.name].includes(requestState)) {
       if (isMinistry) {
-        return initialFormData.formStatus !== 'clarification';
+        return !['clarification', 'init'].includes(initialFormData.formStatus);
       } else {
         return initialFormData.formStatus === 'clarification';
       }
