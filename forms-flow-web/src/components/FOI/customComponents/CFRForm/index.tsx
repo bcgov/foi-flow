@@ -384,7 +384,6 @@ export const CFRForm = ({
         return initialFormData.formStatus !== 'review';
       }
     }
-    console.log(formData)
     if (formData.balanceRemaining > 0 &&  [StateEnum.feeassessed.name, StateEnum.onhold.name].includes(requestState)) {
       if (isMinistry) {
         return !['clarification', 'init'].includes(initialFormData.formStatus);
