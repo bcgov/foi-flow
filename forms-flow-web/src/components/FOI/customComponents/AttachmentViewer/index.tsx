@@ -22,8 +22,6 @@ const [presignedUrl, setpresignedUrl] = React.useState(filepath);
                                                    
                         setpresignedUrl(viwerUrl)                        
                   })
-                           
-                  console.log(filepath)
             }            
       },[filepath]);
 

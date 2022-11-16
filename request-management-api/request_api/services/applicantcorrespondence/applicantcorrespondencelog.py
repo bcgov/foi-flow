@@ -15,7 +15,6 @@ class applicantcorrespondenceservice:
     def gettemplatebyid(self, templateid):
         """ Returns the active applicant correspondence templates
         """
-        print("templateid in gettemplatebyid = ", templateid)
         return ApplicationCorrespondenceTemplate.get_template_by_id(templateid)
 
     def getapplicantcorrespondencelogs(self,ministryrequestid):
