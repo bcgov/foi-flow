@@ -32,8 +32,13 @@ class requestservicebuilder(requestserviceconfigurator):
         foiministryrequest.description = requestschema.get("description")
         foiministryrequest.duedate = requestschema.get("dueDate")
         if requestschema.get("cfrDueDate") is not None and requestschema.get("cfrDueDate")  != "":
-            foiministryrequest.cfrduedate = requestschema.get("cfrDueDate")        
-        foiministryrequest.startdate = requestschema.get("startDate")
+            foiministryrequest.cfrduedate = requestschema.get("cfrDueDate")
+        startdate = ""
+        if (requestschema.get("startDate") is not None):
+            startdate = requestschema.get("startDate")
+        elif (requestschema.get("requestProcessStart") is not None):
+            startdate = requestschema.get("requestProcessStart")
+        foiministryrequest.startdate = startdate
         foiministryrequest.createdby = userid
         requeststatusid =  self.getpropertyvaluefromschema(requestschema, 'requeststatusid')
         if requeststatusid is not None:

@@ -25,6 +25,7 @@ from request_api.exceptions import BusinessException, Error
 from request_api.services.watcherservice import watcherservice
 from request_api.services.eventservice import eventservice
 from request_api.schemas.foiwatcher import  FOIRawRequestWatcherSchema, FOIMinistryRequestWatcherSchema
+from request_api.services.eventservice import eventservice
 import json
 from flask_cors import cross_origin
 

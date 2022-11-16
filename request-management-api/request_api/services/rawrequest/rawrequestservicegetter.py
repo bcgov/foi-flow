@@ -28,16 +28,14 @@ class rawrequestservicegetter:
             
             assignedgroupvalue = request.assignedgroup if request.assignedgroup else "Unassigned" 
             assignedtovalue = request.assignedto if request.assignedto else "Unassigned"
-            dt = maya.parse(request.created_at).datetime(to_timezone='America/Vancouver', naive=False)
-            _createddate = dt
-
+            _createddate = request.created_at
             unopenrequest = {'id': request.requestid,
                              'firstName': firstname,
                              'lastName': lastname,
                              'requestType': requesttype,
                              'currentState': request.status,
-                             'receivedDate': request.requestrawdata["receivedDate"] if "receivedDate" in request.requestrawdata else _createddate.strftime('%Y %b, %d'),
-                             'receivedDateUF':request.requestrawdata["receivedDateUF"] if "receivedDateUF" in request.requestrawdata else str(_createddate),
+                             'receivedDate': _createddate.strftime('%Y %b, %d'),
+                             'receivedDateUF': str(_createddate),
                              'assignedGroup': assignedgroupvalue,
                              'assignedTo': assignedtovalue,
                              'xgov': 'No',
@@ -88,11 +86,11 @@ class rawrequestservicegetter:
             return request['requestrawdata']
         else:
             return None
-
+    
     def __getclosedate(self, requestclosedate):
         closedate = parse(requestclosedate).strftime(self.__generaldateformat()) if requestclosedate is not None else None
         return closedate
-        
+
     def getrawrequestfieldsforid(self, requestid, fields):   
         request = FOIRawRequest.get_request(requestid)    
         fieldsresp = {}
@@ -133,8 +131,8 @@ class rawrequestservicegetter:
                                'lastName': contactinfo['lastName'],
                                'businessName': contactinfo['businessName'],                               
                                'currentState': request['status'],
-                               'receivedDate': requestrawdata["receivedDate"] if "receivedDate" in requestrawdata else _createddate.strftime('%Y %b, %d'),
-                               'receivedDateUF':requestrawdata["receivedDateUF"] if "receivedDateUF" in requestrawdata else _createddate.strftime('%Y-%m-%d %H:%M:%S.%f'),
+                               'receivedDate': _createddate.strftime('%Y %b, %d'),
+                               'receivedDateUF': _createddate.strftime('%Y-%m-%d %H:%M:%S.%f'),
                                'assignedGroup': request["assignedgroup"] if "assignedgroup" in request else "Unassigned",
                                'assignedTo': request["assignedto"] if "assignedto" in request else "Unassigned",
                                'assignedToFirstName': assignee["firstname"] if assignee is not None and "firstname" in assignee else None,

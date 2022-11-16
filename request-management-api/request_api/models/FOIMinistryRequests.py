@@ -218,8 +218,8 @@ class FOIMinistryRequest(db.Model):
     def getstatesummary(cls, ministryrequestid):  
         transitions = []
         try:              
-            sql = """select status, version from (select distinct on (fs2."name") name as status, version from "FOIMinistryRequests" fm inner join "FOIRequestStatuses" fs2 on fm.requeststatusid = fs2.requeststatusid  
-            where foiministryrequestid=:ministryrequestid order by fs2."name", version asc) as fs3 order by version desc;"""
+            sql = """select status, version from (select distinct name as status, version from "FOIMinistryRequests" fm inner join "FOIRequestStatuses" fs2 on fm.requeststatusid = fs2.requeststatusid  
+            where foiministryrequestid=:ministryrequestid order by version asc) as fs3 order by version desc;"""
  
             rs = db.session.execute(text(sql), {'ministryrequestid': ministryrequestid})        
             for row in rs:
@@ -596,7 +596,11 @@ class FOIMinistryRequest(db.Model):
     @classmethod
     def getrequestoriginalduedate(cls,ministryrequestid):       
         return db.session.query(FOIMinistryRequest.duedate).filter(FOIMinistryRequest.foiministryrequestid == ministryrequestid, FOIMinistryRequest.requeststatusid == 1).order_by(FOIMinistryRequest.version).first()[0]
-         
+
+    @classmethod
+    def getduedate(cls,ministryrequestid):
+        return db.session.query(FOIMinistryRequest.duedate).filter(FOIMinistryRequest.foiministryrequestid == ministryrequestid).order_by(FOIMinistryRequest.version.desc()).first()[0]
+
     @classmethod
     def getupcomingcfrduerecords(cls):
         upcomingduerecords = []
@@ -631,8 +635,7 @@ class FOIMinistryRequest(db.Model):
             raise ex
         finally:
             db.session.close()
-        return upcomingduerecords    
-
+        return upcomingduerecords
 
     @classmethod
     def getupcomingdivisionduerecords(cls):
@@ -662,7 +665,7 @@ class FOIMinistryRequest(db.Model):
             raise ex
         finally:
             db.session.close()
-        return upcomingduerecords  
+        return upcomingduerecords    
 
     @classmethod
     def updateduedate(cls, ministryrequestid, duedate, userid)->DefaultMethodResult:
@@ -706,7 +709,9 @@ class FOIMinistryRequest(db.Model):
         ]
 
         #subquery for getting extension count
-        subquery_extension_count = _session.query(FOIRequestExtension.foiministryrequest_id , func.count(distinct(FOIRequestExtension.foirequestextensionid)).filter(FOIRequestExtension.isactive == True).label('extensions')).group_by(FOIRequestExtension.foiministryrequest_id).subquery()
+        subquery_extension_count = _session.query(FOIRequestExtension.foiministryrequest_id, func.count(distinct(FOIRequestExtension.foirequestextensionid)).label('extensions')).group_by(FOIRequestExtension.foiministryrequest_id).subquery()
+
+        
         onbehalf_applicantmapping = aliased(FOIRequestApplicantMapping)
         onbehalf_applicant = aliased(FOIRequestApplicant)
 
@@ -998,12 +1003,10 @@ class FOIMinistryRequest(db.Model):
             elif(params['search'] == 'assigneename'):
                 searchcondition1 = []
                 searchcondition2 = []
-                searchcondition3 = []
                 for keyword in params['keywords']:
                     searchcondition1.append(FOIMinistryRequest.findfield('assignedToFirstName', iaoassignee, ministryassignee).ilike('%'+keyword+'%'))
                     searchcondition2.append(FOIMinistryRequest.findfield('assignedToLastName', iaoassignee, ministryassignee).ilike('%'+keyword+'%'))
-                    searchcondition3.append(FOIMinistryRequest.assignedgroup.ilike('%'+keyword+'%'))
-                return or_(and_(*searchcondition1), and_(*searchcondition2), and_(*searchcondition3))
+                return or_(and_(*searchcondition1), and_(*searchcondition2))
             elif(params['search'] == 'ministryassigneename'):
                 searchcondition1 = []
                 searchcondition2 = []
@@ -1016,6 +1019,13 @@ class FOIMinistryRequest(db.Model):
                 for keyword in params['keywords']:
                     searchcondition.append(FOIMinistryRequest.findfield(params['search'], iaoassignee, ministryassignee).ilike('%'+keyword+'%'))
                 return and_(*searchcondition)
+    @classmethod
+    def getfilenumberforrequest(cls,requestid, ministryrequestid):
+        return db.session.query(FOIMinistryRequest.filenumber).filter_by(foiministryrequestid=ministryrequestid, foirequest_id=requestid).first()[0]
+
+    @classmethod
+    def getaxisrequestidforrequest(cls,requestid, ministryrequestid):   
+        return db.session.query(FOIMinistryRequest.axisrequestid).filter_by(foiministryrequestid=ministryrequestid, foirequest_id=requestid).first()[0]
 
 class FOIMinistryRequestSchema(ma.Schema):
     class Meta:

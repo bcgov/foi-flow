@@ -76,6 +76,7 @@ class FOIRequestWrapperSchema(Schema):
     fromDate = fields.Str(data_key="fromDate",allow_none=True)
     toDate = fields.Str(data_key="toDate",allow_none=True)
     dueDate = fields.Str(data_key="dueDate", required=True,validate=[validate.Length(min=1, error=BLANK_EXCEPTION_MESSAGE)])
+    paymentExpiryDate = fields.Str(data_key="paymentExpiryDate", required=False,allow_none=True)
     cfrDueDate = fields.Date(data_key="cfrDueDate", required=False,allow_none=True)
     deliveryMode = fields.Str(data_key="deliveryMode", required=True,validate=[validate.Length(min=1, error=BLANK_EXCEPTION_MESSAGE)])   
     receivedMode = fields.Str(data_key="receivedMode", required=True,validate=[validate.Length(min=1, error=BLANK_EXCEPTION_MESSAGE)])   
@@ -123,7 +124,10 @@ class EditableFOIMinistryRequestWrapperSchema(Schema):
 
 class EditableFOIRequestWrapperSchema(Schema):
     wfinstanceid = fields.Str(data_key="wfinstanceId",allow_none=True)
-    selectedMinistries = fields.Nested(EditableFOIMinistryRequestWrapperSchema, many=True)  
+    selectedMinistries = fields.Nested(EditableFOIMinistryRequestWrapperSchema, many=True)
+
+class FOIRequestStatusSchema(Schema):
+    nextstatename = fields.Str(data_key="nextStateName",allow_none=True) 
 
 class FOIMinistryRequestDivisionSchema(Schema):
     class Meta:  # pylint: disable=too-few-public-methods

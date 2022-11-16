@@ -40,6 +40,11 @@ from .foidocument import API as FOIDOCUMENT_API
 from .foiextension import API as FOIEXTENSION_API
 from .fee import API as FEE_API
 from .foinotification import API as FOINOTIFICATION_API
+from .foicfrfee import API as FOICFRFEE_API
+from .foiemail import API as FOIEMAIL_API
+from .foipayment import API as FOIPAYMENT_API
+from .applicantcorrespondence import API as APPLICANTCORRESPONDENCE_API
+
 
 __all__ = ('API_BLUEPRINT')
 
@@ -74,3 +79,7 @@ API.add_namespace(FOIDOCUMENT_API,'/api')
 API.add_namespace(FOIEXTENSION_API,'/api')
 API.add_namespace(FEE_API,'/api')
 API.add_namespace(FOINOTIFICATION_API,'/api')
+API.add_namespace(FOICFRFEE_API, '/api')
+API.add_namespace(FOIEMAIL_API, '/api')
+API.add_namespace(FOIPAYMENT_API, '/api')
+API.add_namespace(APPLICANTCORRESPONDENCE_API, '/api')

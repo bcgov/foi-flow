@@ -67,7 +67,6 @@ class assignmentevent:
         if value is not None and value != '':
             return False
         return True
-
     def __getassignments(self, requestid, requesttype):
         if requesttype == "ministryrequest":
             return FOIMinistryRequest.getassignmenttransition(requestid)
@@ -78,8 +77,8 @@ class assignmentevent:
         if isremoved == True:
             return username+' has removed your assignment to this request'  
         else:
-            return 'New Request Assigned to You.'      
-            
+            return 'New Request Assigned to You.'  
+
     def __assignmenttype(self, isministryuser):
         return 'Ministry Assignment' if isministryuser == True else 'IAO Assignment'
 

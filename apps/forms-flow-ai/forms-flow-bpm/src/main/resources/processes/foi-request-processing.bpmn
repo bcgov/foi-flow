@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_0ar1f9w" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="4.8.1" modeler:executionPlatform="Camunda Platform" modeler:executionPlatformVersion="7.15.0">
-  <bpmn:process id="foi-request-processing" name="FOI Request Processing" isExecutable="true" camunda:versionTag="2">
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_0ar1f9w" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.0.0" modeler:executionPlatform="Camunda Platform" modeler:executionPlatformVersion="7.15.0">
+  <bpmn:process id="foi-request-processing" name="FOI Request Processing" isExecutable="true" camunda:versionTag="3">
     <bpmn:subProcess id="Activity_1vkdaxq">
       <bpmn:incoming>Flow_0ybze00</bpmn:incoming>
       <bpmn:multiInstanceLoopCharacteristics camunda:collection="${filenumbers.elements()}" camunda:elementVariable="subId" />
@@ -103,25 +103,6 @@ function cleanup(){
           </camunda:executionListener>
         </bpmn:extensionElements>
         <bpmn:messageEventDefinition id="MessageEventDefinition_0guaafc" messageRef="Message_1i76tyy" />
-      </bpmn:boundaryEvent>
-      <bpmn:boundaryEvent id="Event_1tvpamu" name="Complete" cancelActivity="false" attachedToRef="Activity_0jdrlcz">
-        <bpmn:extensionElements>
-          <camunda:executionListener event="start">
-            <camunda:script scriptFormat="javascript">var foiRequestMetaData = execution.getVariable("foiRequestMetaData");
-foiRequestMetaData = foiRequestMetaData.replace(/'/g, '"');
-var obj = JSON.parse(foiRequestMetaData);
-taskIdName = obj.id+"_iaotaskId";
-execution.setVariable("status",obj.status);
-execution.setVariable("defaultMinistryAssignedGroup",obj.assignedministrygroup);
-execution.setVariable("minTaskName", obj.id+" Ministry Coordinator");
-if (obj.status == 'Closed') {
-mintaskIdName = obj.id+"_ministrytaskId";
-execution.getProcessEngineServices().getTaskService().complete(execution.getVariable(mintaskIdName));
-execution.getProcessEngineServices().getTaskService().complete(execution.getVariable(taskIdName));
-}</camunda:script>
-          </camunda:executionListener>
-        </bpmn:extensionElements>
-        <bpmn:messageEventDefinition id="MessageEventDefinition_1djus76" messageRef="Message_0302cqj" />
       </bpmn:boundaryEvent>
       <bpmn:userTask id="Activity_085uygz" name="Ministry Coordinator" camunda:candidateGroups="${defaultMinistryAssignedGroup}">
         <bpmn:extensionElements>
@@ -236,10 +217,12 @@ foiRequestMetaData = foiRequestMetaData.replace(/'/g, '"');
 var obj = JSON.parse(foiRequestMetaData);
 var foiRequestId = obj.id;
 var dataArr = [];
+if(obj.ministries){
 for (var i = 0; i &lt; obj.ministries.length; i++) {
 	if ( taskName == obj.ministries[i].filenumber) {
 		assignGroup(obj.ministries[i].assignedgroup);
 	}  
+}
 }
 function assignGroup(assignedGroup){
 var currentCandidateGroups = task.execution.getProcessEngineServices().getTaskService().getIdentityLinksForTask(taskId);
@@ -253,8 +236,7 @@ for (var m = 0; m &lt; currentGroups.length; m++) {
 	task.execution.getProcessEngineServices().getTaskService().deleteCandidateGroup(taskId,currentGroups[m]);
 }
 task.execution.getProcessEngineServices().getTaskService().addCandidateGroup(taskId,assignedGroup);
-}
-</camunda:script>
+}</camunda:script>
           </camunda:taskListener>
         </bpmn:extensionElements>
         <bpmn:incoming>Flow_0agk11f</bpmn:incoming>
@@ -328,6 +310,9 @@ function cleanup(){
       </bpmn:boundaryEvent>
       <bpmn:sequenceFlow id="Flow_0agk11f" sourceRef="Event_07v3ugi" targetRef="Activity_0cj09ml" />
       <bpmn:sequenceFlow id="Flow_16isi99" name="Call For Records" sourceRef="Activity_0cj09ml" targetRef="Gateway_0wfu2wz">
+        <bpmn:extensionElements>
+          <camunda:executionListener expression="${execution.setVariable(&#34;feeflow&#34;,&#34;NA&#34;)}" event="take" />
+        </bpmn:extensionElements>
         <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${status == 'Call For Records'}</bpmn:conditionExpression>
       </bpmn:sequenceFlow>
       <bpmn:sequenceFlow id="Flow_147j7sl" name="Closed" sourceRef="Activity_0cj09ml" targetRef="Gateway_0m8um6n">
@@ -414,6 +399,59 @@ execution.setVariable("closure_sla_days",closure_sla_days+1);</camunda:script>
       </bpmn:parallelGateway>
       <bpmn:sequenceFlow id="Flow_0ywom1u" sourceRef="Gateway_0ezgrjz" targetRef="Activity_0jdrlcz" />
       <bpmn:sequenceFlow id="Flow_1pvm9x9" sourceRef="Gateway_0ezgrjz" targetRef="Activity_085uygz" />
+      <bpmn:boundaryEvent id="correnspodance" name="Correnspodence" cancelActivity="false" attachedToRef="Activity_0jdrlcz">
+        <bpmn:extensionElements>
+          <camunda:executionListener event="start">
+            <camunda:script scriptFormat="javascript">var obj = JSON.parse(foiRequestMetaData);
+taskIdName = obj.id+"_iaotaskId";
+execution.setVariable("status",obj.status);
+execution.setVariable("ministryRequestID",obj.ministryRequestID);
+execution.setVariable("axisRequestId",obj.axisRequestId);
+execution.setVariable("applicantCorrespondenceId",obj.applicantcorrespondenceid);
+execution.setVariable("templateName",obj.templatename);
+
+if (obj.status != 'Closed') {
+execution.getProcessEngineServices().getRuntimeService().createMessageCorrelation("foi-fee-payment").setVariables(execution.variables).setVariable("servicekey","correspondence").correlateWithResult();
+execution.setVariable("feeflow","ONGOING");
+}
+</camunda:script>
+          </camunda:executionListener>
+        </bpmn:extensionElements>
+        <bpmn:messageEventDefinition id="MessageEventDefinition_0x851bz" messageRef="Message_0ve5ot8" />
+      </bpmn:boundaryEvent>
+      <bpmn:boundaryEvent id="Event_1tvpamu" name="Complete" cancelActivity="false" attachedToRef="Activity_0jdrlcz">
+        <bpmn:extensionElements>
+          <camunda:executionListener event="start">
+            <camunda:script scriptFormat="javascript">var foiRequestMetaData = execution.getVariable("foiRequestMetaData");
+foiRequestMetaData = foiRequestMetaData.replace(/'/g, '"');
+var obj = JSON.parse(foiRequestMetaData);
+taskIdName = obj.id+"_iaotaskId";
+execution.setVariable("status",obj.status);
+execution.setVariable("defaultMinistryAssignedGroup",obj.assignedministrygroup);
+execution.setVariable("minTaskName", obj.id+" Ministry Coordinator");
+execution.setVariable("ministryRequestID",obj.ministryRequestID);
+execution.setVariable("axisRequestId",obj.axisRequestId);
+if (obj.status == 'Closed') {
+mintaskIdName = obj.id+"_ministrytaskId";
+execution.getProcessEngineServices().getTaskService().complete(execution.getVariable(mintaskIdName));
+execution.getProcessEngineServices().getTaskService().complete(execution.getVariable(taskIdName));
+}
+if (obj.status == 'On Hold') {
+execution.setVariable("applicantCorrespondenceId",0);
+execution.setVariable("templateName","");
+execution.getProcessEngineServices().getRuntimeService().createMessageCorrelation("foi-fee-payment").setVariables(execution.variables).correlateWithResult();
+execution.setVariable("feeflow","ONGOING");
+}
+var feeflow = execution.getVariable("feeflow");
+if (obj.status != 'On Hold' &amp;&amp; feeflow == 'ONGOING' &amp;&amp; obj.isPaymentActive == true) {
+execution.setVariable("feeflow","NA");
+execution.setVariable("paymentstatus","CANCELLED");
+execution.getProcessEngineServices().getRuntimeService().createMessageCorrelation("foi-manage-payment").processInstanceVariableEquals("axisRequestId",execution.getVariable("axisRequestId")).setVariable("paymentstatus","CANCELLED").setVariable("status",obj.status).setVariable("axisRequestId",execution.getVariable("axisRequestId")).setVariable("foiRequestID",execution.getVariable("foiRequestID")).setVariable("ministryRequestID",execution.getVariable("ministryRequestID")).correlateWithResult();
+}</camunda:script>
+          </camunda:executionListener>
+        </bpmn:extensionElements>
+        <bpmn:messageEventDefinition id="MessageEventDefinition_17hzj0a" messageRef="Message_0302cqj" />
+      </bpmn:boundaryEvent>
     </bpmn:subProcess>
     <bpmn:sequenceFlow id="Flow_0cj6jqd" name="apply Settings" sourceRef="StartEvent_1" targetRef="Gateway_04irril">
       <bpmn:extensionElements>
@@ -467,6 +505,7 @@ execution.getProcessEngineServices().getRuntimeService().createMessageCorrelatio
   <bpmn:message id="Message_1dxelmp" name="Message_1bf9k1k" />
   <bpmn:message id="Message_0b4kmuc" name="foi-iao-open-assignment" />
   <bpmn:message id="Message_0ptv8xh" name="foi-iao-reopen" />
+  <bpmn:message id="Message_0ve5ot8" name="foi-iao-correnspodence" />
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
     <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="foi-request-processing">
       <bpmndi:BPMNEdge id="Flow_00l2nzc_di" bpmnElement="Flow_00l2nzc">
@@ -632,6 +671,18 @@ execution.getProcessEngineServices().getRuntimeService().createMessageCorrelatio
       <bpmndi:BPMNShape id="Gateway_0b57f9z_di" bpmnElement="Gateway_0ezgrjz">
         <dc:Bounds x="885" y="515" width="50" height="50" />
       </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_13fql6r_di" bpmnElement="Event_1tvpamu">
+        <dc:Bounds x="732" y="302" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="726" y="345" width="48" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_0spgxkt" bpmnElement="correnspodance">
+        <dc:Bounds x="792" y="302" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="769" y="345" width="82" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Event_12h21bj_di" bpmnElement="Event_12h21bj">
         <dc:Bounds x="472" y="384" width="36" height="36" />
         <bpmndi:BPMNLabel>
@@ -656,16 +707,10 @@ execution.getProcessEngineServices().getRuntimeService().createMessageCorrelatio
           <dc:Bounds x="736" y="515" width="29" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Event_1gtcxiv_di" bpmnElement="Event_1tvpamu">
-        <dc:Bounds x="782" y="302" width="36" height="36" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="776" y="345" width="48" height="14" />
-        </bpmndi:BPMNLabel>
-      </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Event_0gz2in9_di" bpmnElement="Event_1qgwj93">
-        <dc:Bounds x="732" y="302" width="36" height="36" />
+        <dc:Bounds x="812" y="222" width="36" height="36" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="736" y="345" width="29" height="14" />
+          <dc:Bounds x="816" y="265" width="29" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Event_1ylofsn_di" bpmnElement="StartEvent_1">

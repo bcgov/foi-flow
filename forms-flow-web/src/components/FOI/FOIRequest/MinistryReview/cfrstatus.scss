@@ -1,0 +1,28 @@
+#foi-cfrstatus-dropdown {
+    padding-top: 0px !important;
+    padding-bottom: 0px !important;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.foi-cfrstate-dropdown .MuiOutlinedInput-root {
+    color: gray;
+} 
+
+.foi-cfrstate-dropdown .MuiOutlinedInput-root .MuiSvgIcon-root {
+    color: gray;
+} 
+
+.foi-cfrstate-menuitem  {
+    padding-left: 0px !important;
+}
+.foi-menuitem-span {
+    width: 10px;
+    height: 30px;
+    display: inline-block;
+    margin-right: 6px;
+}
+
+#foi-cfrstatus-dropdown .foi-menuitem-span {
+    display: none !important;
+}

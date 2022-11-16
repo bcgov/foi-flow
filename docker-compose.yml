@@ -60,7 +60,6 @@ services:
       - OSS_S3_SERVICE=${OSS_S3_SERVICE}
       - FOI_NOTIFICATION_DAYS=${FOI_NOTIFICATION_DAYS}
       - FOI_ADDITIONAL_HOLIDAYS=${FOI_ADDITIONAL_HOLIDAYS}
-      - FOI_INVALID_HOLIDAYS=${FOI_INVALID_HOLIDAYS}
       - SOCKETIO_PING_INTERVAL=${SOCKETIO_PING_INTERVAL}
       - SOCKETIO_PING_TIMEOUT=${SOCKETIO_PING_TIMEOUT}
       - SOCKETIO_LOG_ENABLED=${SOCKETIO_LOG_ENABLED}
@@ -72,7 +71,22 @@ services:
       - SOCKETIO_REDIS_SLEEP_TIME=${SOCKETIO_REDIS_SLEEP_TIME}
       - SOCKETIO_CONNECT_NONCE=${SOCKETIO_CONNECT_NONCE}
       - CACHE_REDISURL=${CACHE_REDISURL}
-      - SWAGGER_CORS=${SWAGGER_CORS}
+      - PAYBC_REF_NUMBER=${PAYBC_REF_NUMBER}
+      - PAYBC_PORTAL_URL=${PAYBC_PORTAL_URL}
+      - PAYBC_TXN_PREFIX=${PAYBC_TXN_PREFIX}
+      - PAYBC_API_KEY=${PAYBC_API_KEY}
+      - PAYBC_API_BASE_URL=${PAYBC_API_BASE_URL}
+      - PAYBC_API_CLIENT=${PAYBC_API_CLIENT}
+      - PAYBC_API_SECRET=${PAYBC_API_SECRET}
+      - FOI_FFA_URL=${FOI_FFA_URL}
+      - EMAIL_SERVER_IMAP=${EMAIL_SERVER_IMAP}
+      - EMAIL_SERVER_SMTP=${EMAIL_SERVER_SMTP}
+      - EMAIL_SERVER_SMTP_PORT=${EMAIL_SERVER_SMTP_PORT}
+      - EMAIL_SRUSERID=${EMAIL_SRUSERID}
+      - EMAIL_SRPWD=${EMAIL_SRPWD} 
+      - EMAIL_SENDER_ADDRESS=${EMAIL_SENDER_ADDRESS}
+      - EMAIL_FOLDER_OUTBOX=${EMAIL_FOLDER_OUTBOX}
+      - EMAIL_FOLDER_INBOX=${EMAIL_FOLDER_INBOX}      
       #- LOG_ROOT=${LOG_ROOT}
       #- LOG_BASIC=${LOG_BASIC}
       #- LOG_TRACING=${LOG_TRACING}
@@ -130,8 +144,9 @@ services:
       - CAMUNDA_JDBC_DRIVER=org.postgresql.Driver
       - CAMUNDA_BPM_HISTORY_LEVEL=${CAMUNDA_BPM_HISTORY_LEVEL:-none}
       - CAMUNDA_APP_ROOT_LOG_FLAG=${CAMUNDA_APP_ROOT_LOG_FLAG:-ERROR}
-      - FORMSFLOW_API_URL=${FORMSFLOW_API_URL:-http://localhost:5000}
-      - FORMIO_URL=${FORMIO_DEFAULT_PROJECT_URL:-http://localhost:3000}
+      - FORMSFLOW_API_URL=${FORMSFLOW_API_URL:-http://{your-ip-address}:16000}
+      - FORMSFLOW_WEB_URL=${FORMSFLOW_WEB_URL:-http://{your-ip-address}:4000}
+      - FORMIO_URL=${FORMIO_DEFAULT_PROJECT_URL:-http://{your-ip-address}:3001}   
       - FORMIO_ROOT_EMAIL=${FORMIO_ROOT_EMAIL:-admin@example.com}
       - FORMIO_ROOT_PASSWORD=${FORMIO_ROOT_PASSWORD:-changeme}
       - APP_SECURITY_ORIGIN=${APP_SECURITY_ORIGIN:-*}
@@ -144,15 +159,16 @@ services:
       - WEBSOCKET_FOI_RAWREQUEST_TOPIC=${WEBSOCKET_FOI_RAWREQUEST_TOPIC}
       - FORMSFLOW_WF_URL=${FORMSFLOW_WF_URL}
       - FOI_REQ_MANAGEMENT_API_URL=${FOI_REQ_MANAGEMENT_API_URL}
+      - isIMAPEnabled=${isIMAPEnabled:-False}
     depends_on: 
       - forms-flow-bpm-db
     networks:
       - forms-flow-bpm-network
       
-  forms-flow-web:
-    container_name: forms-flow-web
+  foi-web:
+    container_name: foi-web
     build:
-      context: ./apps/forms-flow-ai/forms-flow-web/
+      context: ./forms-flow-web/
       dockerfile: Dockerfile.local
       args:
         - NODE_ENV=${NODE_ENV:-development}
@@ -169,6 +185,9 @@ services:
         - REACT_APP_FOI_FLOW_REPORTING_URL=${FOI_FLOW_REPORTING_URL}
         - REACT_APP_AXIS_API_URL=${AXIS_API_URL}
         - REACT_APP_SOCKETIO_CONNECT_NONCE=${SOCKETIO_CONNECT_NONCE}
+        - PAYMENT_EXPIRY_DAYS=${PAYMENT_EXPIRY_DAYS}
+        - REACT_APP_OSS_S3_FORMS_BUCKET=${OSS_S3_FORMS_BUCKET}
+        - REACT_APP_OSS_S3_HOST=${OSS_S3_HOST}
     volumes:
       - ".:/app"
       - "/app/node_modules"

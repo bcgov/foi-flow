@@ -30,8 +30,7 @@ class CdogsApiService:
     def __init__(self):
         self.access_token = self._get_access_token();
 
-    file_dir = os.path.dirname(os.path.realpath('__file__'))
-    receipt_template_path = os.path.join(file_dir, 'request_api/receipt_templates/receipt_word.docx')
+    
 
     def generate_receipt(self, template_hash_code: str, data):
         request_body = {
@@ -49,15 +48,17 @@ class CdogsApiService:
             'Content-Type': 'application/json',
             'Authorization': f'Bearer {self.access_token}'
         }
-        
         url = f"{current_app.config['CDOGS_BASE_URL']}/api/v2/template/{template_hash_code}/render"
         return self._post_generate_receipt(json_request_body, headers, url)
 
     def _post_generate_receipt(self, json_request_body, headers, url):
         return requests.post(url, data= json_request_body, headers= headers)
 
-    def upload_template(self, template_file_path: str = receipt_template_path):
+    def upload_template(self, receipt_template_path: str):
         
+        file_dir = os.path.dirname(os.path.realpath('__file__'))
+        template_file_path = os.path.join(file_dir, receipt_template_path)
+
         headers = {
         "Authorization": f'Bearer {self.access_token}'
         }

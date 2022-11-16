@@ -1,0 +1,71 @@
+.axis-sync{
+
+    .MuiCollapse-root {
+        background-color: white !important;
+    }
+
+    .MuiAccordionDetails-root {
+        justify-content: center;
+        padding: 60px !important;
+    }
+
+    .MuiAccordion-root {
+        border: #38598A 1px solid;
+    }
+
+    .MuiPaper-rounded{
+        border-radius: 4px !important;
+    }
+}
+
+.axis-accordian-detail{
+
+    display: contents;
+    justify-content: center;
+
+    // table{
+    //     min-width: 60%;
+    // }
+    
+    td {
+        word-break: break-word;
+    }
+    
+    // td.row-width {
+    //     width: 0%;
+    //     white-space: nowrap;
+    // }
+}
+
+.axis-updated-fields{
+    font-weight: bold;
+    text-transform: capitalize;
+}
+
+.axis-modal-actions{
+    padding: 8px 30px;
+}
+
+.axis-modal-action-cancel{
+    margin-right: 0px !important;
+    float: right !important;
+    width: 48% !important;
+    background-color: #FFFFFF;
+    border: 2px solid #38598A;
+    border-radius: 4px;
+    color: #38598A;
+    margin-top: 10px;
+    height: 34px;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+
+.confirmation-msg{
+    font-size: 23px;
+    text-align: center;
+}
+
+.updated-contents-table {
+    table-layout: fixed;
+}
