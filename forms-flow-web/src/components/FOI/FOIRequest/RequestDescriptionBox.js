@@ -67,9 +67,6 @@ const RequestDescription = React.memo(({
       if(Object.entries(requestDetails).length !== 0){
         setSelectedMinistries();
       }
-      console.log(`isprogramareaselected  = ${requestDetails?.selectedMinistries?.length === 1 && requestDetails?.selectedMinistries.some(programArea =>
-        (isValidMinistryCode(programArea.code, masterProgramAreaList)))}`)
-      console.log(requestDetails?.selectedMinistries)
         const descriptionObject = {
             startDate: !!requestDetails.fromDate ? formatDate(new Date(requestDetails.fromDate)): "",
             endDate: !!requestDetails.toDate ? formatDate(new Date(requestDetails.toDate)): "",
