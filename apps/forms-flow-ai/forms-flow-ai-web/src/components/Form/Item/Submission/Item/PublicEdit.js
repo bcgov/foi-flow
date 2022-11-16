@@ -42,7 +42,7 @@ const PublicEdit = React.memo((props) => {
   if ((isFormActive ||  (isSubActive && !isFormSubmissionLoading))) {
       return <Loading />;
   }
-  console.log(`errors == ${JSON.stringify(errors)}`);
+  
   return (
       <div className="container overflow-y-auto">
         <div className={`main-header ${classes.publicstyle}`}>
