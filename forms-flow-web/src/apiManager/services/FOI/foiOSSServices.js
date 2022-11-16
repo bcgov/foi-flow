@@ -102,7 +102,6 @@ import {
   
   export const getFOIS3DocumentPreSignedUrl = (filepath,ministryrequestid,dispatch, ...rest) => {
     const done = fnDone(rest);
-    console.log(ministryrequestid)
     const apiurl = API.FOI_GET_S3DOCUMENT_PRESIGNEDURL+ "/" + (ministryrequestid == undefined ? "-1" : ministryrequestid) +"?filepath="+filepath
     const response = httpGETRequest(apiurl, {}, UserService.getToken());
     response.then((res) => {

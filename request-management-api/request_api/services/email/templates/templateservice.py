@@ -27,7 +27,6 @@ class templateservice:
             if _template is None:
                 _templatename = self.__gettemplatenamewrapper(servicename, requestjson, ministryrequestid)
                 _template = self.__gettemplate(_templatename)
-            print("isnotreceipt ==== ", templateconfig().isnotreceipt(servicename))
             if (applicantcorrespondenceid and applicantcorrespondenceid != 0 and templateconfig().isnotreceipt(servicename)):
                 emailtemplatehtml = self.__generatecorrespondencetetemplate(applicantcorrespondenceid)
             else:
@@ -45,14 +44,12 @@ class templateservice:
                 balancedue = float(requestjson['cfrfee']['feedata']["balanceDue"])
                 prevstate = self.__getprevstate(requestjson)
                 if balancedue > 0:
-                    print("__gettemplatenamewrapper templatekey = HALFPAYMENT")
                     return "HALFPAYMENT"
 
                 elif balancedue == 0:
                     templatekey = "FULLPAYMENT"
                     if prevstate.lower() == "response" or (_latesttemplatename and _latesttemplatename == 'PAYOUTSTANDING'):
                         templatekey = "PAYOUTSTANDINGFULLPAYMENT"
-                    print("__gettemplatenamewrapper templatekey = ", templatekey)
                     return templatekey
         
         return _templatename
