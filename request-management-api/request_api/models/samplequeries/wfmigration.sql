@@ -11,8 +11,8 @@ Modified FOI Request Processes (related to Fee)
 
 **********************************************************************************************************************
 Below given instructions are for migrating foi-request-processing to latest deployed definition version
-Note#1: The approach that would be taken for migration is semi-automation for manual verificaiton between the steps.
-Note#2: The below given instructions to be followed after deploying th 
+Note#1: The approach that would be taken for migration is incremental (semi-automation) with manual verification between the steps.
+Note#2: The below given instructions to be followed after deploying the WF
 **********************************************************************************************************************
 */
 
