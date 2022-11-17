@@ -7,7 +7,7 @@ on:
       - dev
       - dev-AC-212d
     paths:
-      - "apps/forms-flow-ai/forms-flow-web/**"
+      - "forms-flow-web/**"
   workflow_dispatch:
     inputs:
       environment:
@@ -18,7 +18,7 @@ on:
 defaults:
   run:
     shell: bash
-    working-directory: ./apps/forms-flow-ai/forms-flow-web
+    working-directory: ./forms-flow-web
 
 env:
   APP_NAME: "forms-flow-web"
@@ -49,7 +49,7 @@ jobs:
       - name: Build from dev branch
         shell: bash
         run: |
-          oc patch bc/${{ env.APP_NAME }} -p '{"spec":{"source":{"git":{"ref":"dev"}}}}'
+          oc patch bc/${{ env.APP_NAME }} -p '{"spec":{"source":{"contextDir":"/forms-flow-web","git":{"ref":"dev"}}}}'
 
       - name: Start Build Openshift
         shell: bash

@@ -28,14 +28,16 @@ class rawrequestservicegetter:
             
             assignedgroupvalue = request.assignedgroup if request.assignedgroup else "Unassigned" 
             assignedtovalue = request.assignedto if request.assignedto else "Unassigned"
-            _createddate = request.created_at
+            dt = maya.parse(request.created_at).datetime(to_timezone='America/Vancouver', naive=False)
+            _createddate = dt
+
             unopenrequest = {'id': request.requestid,
                              'firstName': firstname,
                              'lastName': lastname,
                              'requestType': requesttype,
                              'currentState': request.status,
-                             'receivedDate': _createddate.strftime('%Y %b, %d'),
-                             'receivedDateUF': str(_createddate),
+                             'receivedDate': request.requestrawdata["receivedDate"] if "receivedDate" in request.requestrawdata else _createddate.strftime('%Y %b, %d'),
+                             'receivedDateUF':request.requestrawdata["receivedDateUF"] if "receivedDateUF" in request.requestrawdata else str(_createddate),
                              'assignedGroup': assignedgroupvalue,
                              'assignedTo': assignedtovalue,
                              'xgov': 'No',

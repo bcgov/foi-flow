@@ -143,16 +143,12 @@ namespace MCS.FOI.AXISIntegration.DataModels
         [DataMember(Name = "anotherLastName")]
         public string OnBehalfLastName { get; set; }
         
-        [DataMember(Name = "personalHealthNumber")]
-        public string PersonalHealthNumber { get; set; }
-
-        public AdditionalPersonalInformation(string birthDate, string anotherFirstName, string anotherMiddleName, string anotherLastName, string personalHealthNumber="")
+        public AdditionalPersonalInformation(string birthDate, string anotherFirstName, string anotherMiddleName, string anotherLastName)
         {
             ApplicantDOB = birthDate;
             OnBehalfFirstName = anotherFirstName;
             OnBehalfMiddleName = anotherMiddleName;
             OnBehalfLastName = anotherLastName;
-            PersonalHealthNumber = personalHealthNumber;
         }
 
     }

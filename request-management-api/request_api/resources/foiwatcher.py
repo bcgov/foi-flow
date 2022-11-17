@@ -23,6 +23,7 @@ from request_api.tracer import Tracer
 from request_api.utils.util import  cors_preflight, allowedorigins
 from request_api.exceptions import BusinessException, Error
 from request_api.services.watcherservice import watcherservice
+from request_api.services.eventservice import eventservice
 from request_api.schemas.foiwatcher import  FOIRawRequestWatcherSchema, FOIMinistryRequestWatcherSchema
 from request_api.services.eventservice import eventservice
 import json

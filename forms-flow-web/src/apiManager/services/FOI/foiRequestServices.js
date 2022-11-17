@@ -18,7 +18,8 @@ import {
 import { fetchFOIAssignedToList, fetchFOIMinistryAssignedToList, fetchFOIProcessingTeamList } from "./foiMasterDataServices";
 import { catchError, fnDone} from './foiServicesUtil';
 import UserService from "../../../services/UserService";
-import { replaceUrl } from "../../../helper/FOI/helper"; 
+import { replaceUrl } from "../../../helper/FOI/helper";
+import { persistRequestFieldsNotInAxis } from "../../../components/FOI/FOIRequest/utils";
 
 export const fetchFOIRequestList = () => {
   return (dispatch) => {
@@ -435,12 +436,8 @@ export const fetchRequestDataFromAxis = (axisRequestId, isModal,requestDetails, 
         if (res.data) {
           let newRequest = res.data;
           if(!isModal && Object.entries(newRequest).length !== 0){
-            if(Object.entries(requestDetails).length !== 0){
-              newRequest['assignedGroup'] = requestDetails['assignedGroup'];
-              newRequest['assignedTo'] = requestDetails['assignedTo'];
-              newRequest['assignedToFirstName'] = requestDetails['assignedToFirstName'];
-              newRequest['assignedToLastName'] = requestDetails['assignedToLastName'];
-              newRequest['assignedToName'] = requestDetails['assignedToName'];
+            if(Object.entries(requestDetails).length !== 0 && requestDetails.currentState === "Unopened"){
+              newRequest= persistRequestFieldsNotInAxis(newRequest,requestDetails);
             }
             dispatch(setFOIRequestDetail(newRequest));
           }
