@@ -1,18 +1,59 @@
-apiVersion: batch/v1beta1
-kind: CronJob
+kind: Template
+apiVersion: v1
 metadata:
-  name: send-usage-emails
-  namespace: d7abee-dev
-spec:
-  successfulJobsHistoryLimit: 1
-  failedJobsHistoryLimit: 1
-  schedule: '0 0 1 * *'
-  jobTemplate:
-    spec:
-      template:
-        spec:
-          containers:
-            - name: send-usage-emails
-              image: image-registry.openshift-image-registry.svc:5000/d7abeez-tools/backup-to-s3:latest
-              args:
-          restartPolicy: OnFailure
+  name: "${API_NAME}-build-template"
+  creationTimestamp: 
+objects:
+- kind: CronJob
+  apiVersion: batch/v1
+  metadata:
+    name: backup-to-s3
+    namespace: d7abee-dev
+  spec:
+    successfulJobsHistoryLimit: 1
+    failedJobsHistoryLimit: 1
+    schedule: '0 0 1 * *'
+    jobTemplate:
+      spec:
+        template:
+          spec:
+            containers:
+              - name: backup-to-s3
+                image: image-registry.openshift-image-registry.svc:5000/d7abee-tools/backup-to-s3:latest
+                args:
+                env:
+                  - name: OSS_S3_BACKUP_BUCKET
+                    value: ${OSS_S3_BACKUP_BUCKET}
+                  - name: OSS_S3_FORMS_ACCESS_KEY_ID
+                    value: ${OSS_S3_FORMS_ACCESS_KEY_ID}
+                  - name: OSS_S3_FORMS_SECRET_ACCESS_KEY
+                    value: ${OSS_S3_FORMS_SECRET_ACCESS_KEY}
+                  - name: OSS_S3_HOST
+                    value: ${OSS_S3_HOST}
+                  - name: OSS_S3_REGION
+                    value: ${OSS_S3_REGION}
+                  - name: OSS_S3_SERVICE
+                    value: ${OSS_S3_SERVICE}
+                  - name: BACKUP_DIRECTORY
+                    value: ${BACKUP_DIRECTORY}
+            restartPolicy: OnFailure
+parameters:
+- name: API_NAME
+  displayName: Name
+  description: The name assigned to all of the resources defined in this template.
+  required: true
+  value: backup-to-s3
+- name: OSS_S3_BACKUP_BUCKET
+  required: true
+- name: OSS_S3_FORMS_ACCESS_KEY_ID
+  required: true
+- name: OSS_S3_FORMS_SECRET_ACCESS_KEY
+  required: true
+- name: OSS_S3_HOST
+  required: true
+- name: OSS_S3_REGION
+  required: true
+- name: OSS_S3_SERVICE
+  required: true
+- name: BACKUP_DIRECTORY
+  required: true
