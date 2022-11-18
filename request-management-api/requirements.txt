@@ -74,4 +74,5 @@ pyopenssl
 pyasn1
 secure==0.3.0
 boto3==1.24.35
+walrus==0.8.2
 -e git+https://github.com/bcgov/sbc-common-components.git#egg=sbc-common-components&subdirectory=python

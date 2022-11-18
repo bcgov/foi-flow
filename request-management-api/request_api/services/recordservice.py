@@ -1,9 +1,10 @@
 
-from os import stat
+from os import stat, path
 from re import VERBOSE
 from request_api.models.FOIRequestRecords import FOIRequestRecord
 from request_api.models.FOIMinistryRequests import FOIMinistryRequest
 from request_api.models.FOIMinistryRequestDivisions import FOIMinistryRequestDivision
+from request_api.services.external.eventqueueservice import eventqueueservice
 import json
 from datetime import datetime
 import maya
@@ -34,7 +35,13 @@ class recordservice:
                             version = 1, createdby = userid, created_at = datetime.now())
             record.__dict__.update(entry)
             recordlist.append(record)
-        return FOIRequestRecord.create(recordlist)
+        dbresponse = FOIRequestRecord.create(recordlist)
+        if (dbresponse.success):
+            for entry in records:
+                _filename, extension = path.splitext(entry['s3uripath'])
+                if extension in ['.doc','.docx','.xls','.xlsx', '.ics', '.msg']:
+                    eventqueueservice().add("file-conversion", {"S3Path": entry['s3uripath']})
+        return dbresponse
 
 
     def __format(self, records, divisions):
