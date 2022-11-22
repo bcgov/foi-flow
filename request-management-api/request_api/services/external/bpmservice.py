@@ -15,6 +15,11 @@ __author__      = "sumathi.thirumani@aot-technologies.com"
 """
 class bpmservice(camundaservice):
 
+    def getinstancevariables(self, instanceid, token=None):
+        if self.bpmengineresturl is not None:
+            response = requests.get(self.bpmengineresturl+"/process-instance/"+str(instanceid)+"/variables", headers = self._getHeaders_(token))
+            return json.loads(response.content) if response.ok else None
+        return None
 
     def createinstance(self, messagequeue, message, token=None):
         if self.bpmengineresturl is not None:
@@ -123,6 +128,7 @@ class bpmservice(camundaservice):
         elif definitionkey is not None:
             return self.bpmengineresturl+"/process-definition/key/"+definitionkey+"/start"
         return self.bpmengineresturl
+
 
     def _geProcessDefinitionKey_(self, messagequeue):
         if messagequeue == "foi-rawrequest":

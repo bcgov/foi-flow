@@ -66,7 +66,8 @@ class requestservice:
         for ministry in ministries:
             documentservice().copyrequestdocuments(ministry["id"], attachments, userid)
     
-    def postopeneventtoworkflow(self, id, wfinstanceid, requestschema, ministries):        
+    def postopeneventtoworkflow(self, id, wfinstanceid, requestschema, ministries):
+        workflowservice().syncwfinstance("rawrequest", id)
         workflowservice().postunopenedevent(id, wfinstanceid, requestschema, "Open", ministries)            
     
     def postfeeeventtoworkflow(self, requestid, ministryrequestid, paymentstatus, nextstatename=None):
@@ -76,9 +77,11 @@ class requestservice:
     def posteventtoworkflow(self, id, wfinstanceid, requestschema, data, usertype): 
         requeststatusid =  requestschema.get("requeststatusid") if 'requeststatusid' in requestschema  else None
         status = requestserviceconfigurator().getstatusname(requeststatusid) if requeststatusid is not None else None
+        workflowservice().syncwfinstance("ministryrequest", id)
         workflowservice().postopenedevent(id, wfinstanceid, requestschema, data, status, usertype)
     
     def postcorrespondenceeventtoworkflow(self, requestid, ministryrequestid, applicantcorrespondenceid, attributes, templateid):
         foirequestschema = self.getrequestdetails(requestid, ministryrequestid)
         templatedetails = applicantcorrespondenceservice().gettemplatebyid(templateid)
+        workflowservice().syncwfinstance("ministryrequest", id, True)
         workflowservice().postcorrenspodenceevent(ministryrequestid, foirequestschema, applicantcorrespondenceid, templatedetails.name, attributes)
