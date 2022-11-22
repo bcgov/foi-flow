@@ -5,6 +5,7 @@ from aws_requests_auth.aws_auth import AWSRequestsAuth
 import os
 import uuid
 import mimetypes
+import logging
 
 from request_api.models.DocumentPathMapper import DocumentPathMapper
 from request_api.utils.enums import DocumentPathMapperCategory
@@ -13,6 +14,13 @@ import boto3
 from botocore.exceptions import ClientError
 from botocore.config import Config
 
+
+formsbucket = os.getenv('OSS_S3_FORMS_BUCKET')
+accesskey = os.getenv('OSS_S3_FORMS_ACCESS_KEY_ID') 
+secretkey = os.getenv('OSS_S3_FORMS_SECRET_ACCESS_KEY')
+s3host = os.getenv('OSS_S3_HOST')
+s3region = os.getenv('OSS_S3_REGION')
+s3service = os.getenv('OSS_S3_SERVICE')
 class storageservice:
     """This class is reserved for S3 storage services integration.
     """
@@ -156,3 +164,28 @@ class storageservice:
             return '{0}/{1}/{2}/{3}'.format(ministrycode,requestnumber,filestatustransition,uniquefilename)
         elif category.lower() == 'records':
             return '{0}/{1}'.format(requestnumber,uniquefilename)
+    
+    def download(self, s3uri): 
+
+        if(accesskey is None or secretkey is None or s3host is None or formsbucket is None):
+            raise ValueError('accesskey is None or secretkey is None or S3 host is None or formsbucket is None')
+        
+        auth = AWSRequestsAuth(aws_access_key=accesskey,
+                    aws_secret_access_key=secretkey,
+                    aws_host=s3host,
+                    aws_region=s3region,
+                    aws_service=s3service)
+
+        templatefile= requests.get(s3uri, auth=auth)
+        return templatefile
+
+
+    def downloadtemplate(self, templatepath):
+
+        if(accesskey is None or secretkey is None or s3host is None or formsbucket is None):
+            raise ValueError('accesskey is None or secretkey is None or S3 host is None or formsbucket is None')
+        #To DO : make the values of templatetype and templatename dynamic
+        s3uri = 'https://{0}/{1}{2}'.format(s3host,formsbucket,templatepath)
+        templatefile= self.download(s3uri)
+        responsehtml=templatefile.text
+        return responsehtml

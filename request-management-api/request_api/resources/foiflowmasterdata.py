@@ -37,7 +37,7 @@ import requests
 from aws_requests_auth.aws_auth import AWSRequestsAuth
 import os
 import uuid
-from request_api.utils.cache import cache_filter, response_filter
+from request_api.utils.cache import cache_filter, response_filter, clear_cache
 from request_api.auth import AuthHelper
 
 import boto3
@@ -54,7 +54,7 @@ class FOIFlowApplicantCategories(Resource):
     """
     @staticmethod
     @TRACER.trace()
-    @cross_origin(origins=allowedorigins())      
+    @cross_origin(origins=allowedorigins())
     @auth.require
     @request_api.cache.cached(
         key_prefix="applicantcategories",
@@ -77,7 +77,7 @@ class FOIFlowProgramAreas(Resource):
     """
     @staticmethod
     @TRACER.trace()
-    @cross_origin(origins=allowedorigins())      
+    @cross_origin(origins=allowedorigins())
     @auth.require
     @request_api.cache.cached(
         key_prefix="programareas",
@@ -100,7 +100,7 @@ class FOIFlowProgramAreas(Resource):
     """
     @staticmethod
     @TRACER.trace()
-    @cross_origin(origins=allowedorigins())      
+    @cross_origin(origins=allowedorigins())
     @auth.require
     #@request_api.cache.cached(key_prefix="programareas")
     def get():
@@ -126,7 +126,7 @@ class FOIFlowDeliveryModes(Resource):
     """
     @staticmethod
     @TRACER.trace()
-    @cross_origin(origins=allowedorigins())       
+    @cross_origin(origins=allowedorigins())
     @auth.require
     @request_api.cache.cached(
         key_prefix="deliverymodes",
@@ -148,7 +148,7 @@ class FOIFlowReceivedModes(Resource):
     """
     @staticmethod
     @TRACER.trace()
-    @cross_origin(origins=allowedorigins())       
+    @cross_origin(origins=allowedorigins())
     @auth.require
     @request_api.cache.cached(
         key_prefix="receivedmodes",
@@ -170,7 +170,7 @@ class FOIFlowDivisions(Resource):
     """
     @staticmethod
     @TRACER.trace()
-    @cross_origin(origins=allowedorigins())       
+    @cross_origin(origins=allowedorigins())
     @auth.require
     @request_api.cache.cached(
         unless=cache_filter,
@@ -182,8 +182,8 @@ class FOIFlowDivisions(Resource):
             jsondata = json.dumps(data)
             return jsondata , 200
         except BusinessException:
-            return "Error happened while accessing divisions" , 500 
-        
+            return "Error happened while accessing divisions" , 500
+
 @cors_preflight('GET,OPTIONS')
 @API.route('/foiflow/closereasons')
 class FOIFlowCloseReasons(Resource):
@@ -191,7 +191,7 @@ class FOIFlowCloseReasons(Resource):
     """
     @staticmethod
     @TRACER.trace()
-    @cross_origin(origins=allowedorigins())       
+    @cross_origin(origins=allowedorigins())
     @auth.require
     @request_api.cache.cached(
         key_prefix="closereasons",
@@ -213,7 +213,7 @@ class FOIFlowDocumentStorage(Resource):
     """
     @staticmethod
     @TRACER.trace()
-    @cross_origin(origins=allowedorigins())       
+    @cross_origin(origins=allowedorigins())
     @auth.require
     @auth.ismemberofgroups(getrequiredmemberships())
     def post():
@@ -230,8 +230,8 @@ class FOIFlowDocumentStorage(Resource):
 class FOIFlowS3Presigned(Resource):
 
     @staticmethod
-    @TRACER.trace()    
-    @cross_origin(origins=allowedorigins())       
+    @TRACER.trace()
+    @cross_origin(origins=allowedorigins())
     @auth.require
     @auth.documentbelongstosameministry
     def get(ministryrequestid, category="attachments", bcgovcode=None):
@@ -266,7 +266,7 @@ class FOIFlowExtensionReasons(Resource):
     """
     @staticmethod
     @TRACER.trace()
-    @cross_origin(origins=allowedorigins())       
+    @cross_origin(origins=allowedorigins())
     @auth.require
     @request_api.cache.cached(
         key_prefix="extensionreasons",
@@ -280,4 +280,19 @@ class FOIFlowExtensionReasons(Resource):
             return jsondata , 200
         except BusinessException as exception:
             return {'status': exception.status_code, 'message':exception.message}, 500
-               
+
+@cors_preflight('POST,OPTIONS')
+@API.route('/foiflow/cache/flushall')
+class FOIFlowProgramAreas(Resource):
+    """Retrieves all active program areas.
+    """
+    @staticmethod
+    @TRACER.trace()
+    @cross_origin(origins=allowedorigins())
+    @auth.require
+    def post():
+        try:
+            resp_flag = clear_cache()
+            return {"success": resp_flag } , 200 if resp_flag == True else 500
+        except BusinessException:
+            return "Error happened while clearing cache" , 500

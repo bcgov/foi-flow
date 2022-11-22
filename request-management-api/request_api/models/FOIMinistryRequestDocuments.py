@@ -44,6 +44,16 @@ class FOIMinistryRequestDocument(db.Model):
             if row["isactive"] == True:
                 documents.append({"foiministrydocumentid": row["foiministrydocumentid"], "filename": row["filename"], "documentpath": row["documentpath"], "category": row["category"], "created_at": row["created_at"].strftime('%Y-%m-%d %H:%M:%S.%f'), "createdby": row["createdby"], "version": row["version"]})
         return documents
+    
+    @classmethod
+    def getactivedocuments(cls,ministryrequestid):
+        sql = 'SELECT * FROM (SELECT DISTINCT ON (foiministrydocumentid) foiministrydocumentid, filename, documentpath, category, isactive, created_at , createdby, version FROM "FOIMinistryRequestDocuments" where foiministryrequest_id =:ministryrequestid ORDER BY foiministrydocumentid, version DESC) AS list ORDER BY created_at DESC'
+        rs = db.session.execute(text(sql), {'ministryrequestid': ministryrequestid})
+        documents = []
+        for row in rs:
+            if row["isactive"] == True:
+                documents.append({"foiministrydocumentid": row["foiministrydocumentid"], "filename": row["filename"], "documentpath": row["documentpath"], "category": row["category"], "created_at": row["created_at"].strftime('%Y-%m-%d %H:%M:%S.%f'), "createdby": row["createdby"], "version": row["version"]})
+        return documents
 
     @classmethod
     def getdocumentsbycategory(cls, ministryrequestid, ministryrequestversion, category):
@@ -85,8 +95,42 @@ class FOIMinistryRequestDocument(db.Model):
         newdocument = FOIMinistryRequestDocument(documentpath=document["documentpath"], foiministrydocumentid=document["foiministrydocumentid"], version=document["version"], filename=document["filename"], category=document["category"], isactive=document["isactive"], foiministryrequest_id=ministryrequestid, foiministryrequestversion_id=ministryrequestversion, created_at=datetime.now(), createdby=userid)
         db.session.add(newdocument)
         db.session.commit()               
-        return DefaultMethodResult(True,'New Document version created', newdocument.foiministrydocumentid)   
+        return DefaultMethodResult(True,'New Document version created', newdocument.foiministrydocumentid)  
+
+    @classmethod
+
+    def getlatestdocumentsforemail(cls, ministryrequestid, ministryrequestversion, category):
+        sql = 'SELECT DISTINCT ON (foiministrydocumentid) foiministrydocumentid, filename, documentpath, category, isactive, created_at , createdby, version FROM "FOIMinistryRequestDocuments" where foiministryrequest_id =:ministryrequestid and foiministryrequestversion_id = :ministryrequestversion and lower(category) = lower(:category) ORDER BY foiministrydocumentid DESC'
+
+        rs = db.session.execute(text(sql), {'ministryrequestid': ministryrequestid, 'ministryrequestversion':ministryrequestversion, 'category': category})
+        documents = []
+        for row in rs:
+            if row["isactive"] == True:
+                documents.append({"foiministrydocumentid": row["foiministrydocumentid"], "filename": row["filename"], "documentpath": row["documentpath"], "category": row["category"], "created_at": row["created_at"].strftime('%Y-%m-%d %H:%M:%S.%f'), "createdby": row["createdby"]})
+        return documents 
+
+    def getlatestreceiptdocumentforemail(cls, ministryrequestid, category):
+        print("getlatestreceiptdocumentforemail category = ", category)
+        sql = 'SELECT DISTINCT ON (foiministrydocumentid) foiministrydocumentid, filename, documentpath, category, isactive, created_at , createdby, version FROM "FOIMinistryRequestDocuments" where foiministryrequest_id =:ministryrequestid and lower(category) = lower(:category) ORDER BY foiministrydocumentid DESC limit 1'
+
+        rs = db.session.execute(text(sql), {'ministryrequestid': ministryrequestid, 'category': category})
+        documents = []
+        for row in rs:
+            if row["isactive"] == True:
+                documents.append({"foiministrydocumentid": row["foiministrydocumentid"], "filename": row["filename"], "documentpath": row["documentpath"], "category": row["category"], "created_at": row["created_at"].strftime('%Y-%m-%d %H:%M:%S.%f'), "createdby": row["createdby"]})
+        return documents  
+
+    @classmethod
+    def deActivateministrydocumentsversion(cls, foiministrydocumentid, currentversion, userid)->DefaultMethodResult:
+        db.session.query(FOIMinistryRequestDocument).filter(FOIMinistryRequestDocument.foiministrydocumentid == foiministrydocumentid, FOIMinistryRequestDocument.version != currentversion).update({"isactive": False, "updated_at": datetime.now(),"updatedby": userid}, synchronize_session=False)
+        db.session.commit()
+        return DefaultMethodResult(True,'Ministry Document Updated',foiministrydocumentid)
     
+    @classmethod
+    def deActivateministrydocumentsversionbyministry(cls, ministryid, ministryversion, userid)->DefaultMethodResult:
+        db.session.query(FOIMinistryRequestDocument).filter(FOIMinistryRequestDocument.foiministryrequest_id == ministryid, FOIMinistryRequestDocument.foiministryrequestversion_id != ministryversion).update({"isactive": False, "updated_at": datetime.now(),"updatedby": userid}, synchronize_session=False)
+        db.session.commit()
+        return DefaultMethodResult(True,'Documents Updated for the ministry',ministryid) 
     
 class FOIMinistryRequestDocumentSchema(ma.Schema):
     class Meta:

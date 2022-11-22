@@ -3,6 +3,7 @@ from os import stat
 from re import VERBOSE
 from request_api.services.commentservice import commentservice
 from request_api.services.notificationservice import notificationservice
+from request_api.services.cfrfeeservice import cfrfeeservice
 from request_api.models.FOIRawRequests import FOIRawRequest
 from request_api.models.FOIMinistryRequests import FOIMinistryRequest
 from request_api.models.FOIRequestStatus import FOIRequestStatus
@@ -18,7 +19,8 @@ class stateevent:
         if state is not None:
             _commentresponse = self.__createcomment(requestid, state, requesttype, userid, username)
             _notificationresponse = self.__createnotification(requestid, state, requesttype, userid)
-            if _commentresponse.success == True and _notificationresponse.success == True :
+            _cfrresponse = self.__createcfrentry(state, requestid, userid)
+            if _commentresponse.success == True and _notificationresponse.success == True and _cfrresponse.success == True:
                 return DefaultMethodResult(True,'Comment posted',requestid)
             else:   
                 return DefaultMethodResult(False,'unable to post comment',requestid)
@@ -86,6 +88,13 @@ class stateevent:
 
     def __notificationmessage(self, state):
         return  'Moved to '+self.__formatstate(state)+ ' State'        
+
+    def __createcfrentry(self, state, ministryrequestid, userid):
+        cfrfee = cfrfeeservice().getcfrfee(ministryrequestid)
+        if (state == "Fee Estimate" and cfrfee['cfrfeestatusid'] in (None, '')):
+            return cfrfeeservice().sanctioncfrfee(ministryrequestid, {"status": "review"}, userid)
+        else:
+            return DefaultMethodResult(True,'No action needed',ministryrequestid)
 
     def __groupmembernotificationmessage(self, state):
         return  'New request is in '+state  

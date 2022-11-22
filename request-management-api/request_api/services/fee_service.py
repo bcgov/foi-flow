@@ -9,7 +9,9 @@ import requests
 from flask import current_app
 
 from request_api.exceptions import BusinessException, Error
-from request_api.models import FeeCode, Payment, RevenueAccount, FOIRawRequest
+from request_api.models import FeeCode, Payment, RevenueAccount, FOIRawRequest, FOIMinistryRequest
+from request_api.services.cfrfeeservice import cfrfeeservice
+from request_api.utils.enums import FeeType
 from .hash_service import HashService
 
 
@@ -20,11 +22,26 @@ class FeeService:
 
     """
 
-    def __init__(self, request_id: int, payment_id=None):
+    def __init__(self, request_id: int, code: str=None, payment_id=None):
         self.request_id = request_id
-        if FOIRawRequest.get_request(request_id) is None:
+        if payment_id:
+            self.payment: Payment = Payment.find_by_id(payment_id)
+            self.fee_code: FeeCode = FeeCode.find_by_id(self.payment.fee_code_id)
+        else:
+            self.payment = None
+            self.fee_code: FeeCode = FeeCode.get_fee(code=code, valid_date=date.today())
+        if not self.fee_code:
             raise BusinessException(Error.INVALID_INPUT)
-        self.payment: Payment = Payment.find_by_id(payment_id) if payment_id else None
+
+        # If application fee, use raw request id, else use minsitry request id
+        if self.fee_code.code == FeeType.application.value:
+            self.request = FOIRawRequest.get_request(request_id)
+            if self.request is None:
+                raise BusinessException(Error.INVALID_INPUT)
+        else:
+            self.request = FOIMinistryRequest.getrequestbyministryrequestid(request_id)
+            if self.request is None:
+                raise BusinessException(Error.INVALID_INPUT)
 
     @staticmethod
     def get_fee(code: str, quantity: int, valid_date: date):
@@ -46,24 +63,21 @@ class FeeService:
         return fee_response
 
     def init_payment(self, pay_request: Dict):
-        """Initialize payment request."""
-        fee = FeeCode.get_fee(
-            code=pay_request.get('fee_code'), valid_date=date.today()
-        )
-        if not fee:
-            raise BusinessException(Error.INVALID_INPUT)
-
         return_route = pay_request.get('return_route')
         quantity = int(pay_request.get('quantity', 1))
+        if self.fee_code.code == FeeType.processing.value:
+            total = self._get_cfr_fee(self.request_id, pay_request)
+        else:
+            total = quantity * self.fee_code.fee
         self.payment = Payment(
-            fee_code_id=fee.fee_code_id,
+            fee_code_id=self.fee_code.fee_code_id,
             quantity=quantity,
-            total=quantity * fee.fee,
+            total=total,
             status='PENDING',
             request_id=self.request_id
         ).flush()
 
-        self.payment.paybc_url = self._get_paybc_url(fee, return_route)
+        self.payment.paybc_url = self._get_paybc_url(self.fee_code, return_route)
         self.payment.transaction_number = self._get_transaction_number()
         self.payment.commit()
         pay_response = self._dump()
@@ -73,6 +87,7 @@ class FeeService:
         """Complete payment."""
         response_url = pay_response.get('response_url')
         current_app.logger.debug('response_url : %s', response_url)
+        
         if self.payment.status == 'PAID' or not response_url:
             raise BusinessException(Error.INVALID_INPUT)
 
@@ -80,6 +95,7 @@ class FeeService:
         self.payment.commit()
 
         parsed_args = HashService.parse_url_params(response_url)
+        
         # Validate transaction number
         if self.payment.transaction_number != parsed_args.get('pbcTxnNumber'):
             raise BusinessException(Error.INVALID_INPUT)
@@ -100,7 +116,7 @@ class FeeService:
         self.payment.status = 'PAID' if paybc_status == 'PAID' else parsed_args.get('messageText').upper()
         self.payment.commit()
 
-        return self._dump()
+        return self._dump(), parsed_args
 
     def check_if_paid(self):
         """Check payment."""
@@ -138,7 +154,11 @@ class FeeService:
         """Return the payment system url."""
         date_val = datetime.now().astimezone(pytz.timezone(current_app.config['LEGISLATIVE_TIMEZONE'])).strftime(
             '%Y-%m-%d')
-        return_url = f"{current_app.config['FOI_WEB_PAY_URL']}{return_route if return_route else ''}/{self.payment.request_id}/{self.payment.payment_id}"
+        if self.fee_code.code == FeeType.application.value:
+            base_url = current_app.config['FOI_WEB_PAY_URL']
+        if self.fee_code.code == FeeType.processing.value:
+            base_url = current_app.config['FOI_FFA_URL']
+        return_url = f"{base_url}{return_route if return_route else ''}/{self.payment.request_id}/{self.payment.payment_id}"
         revenue_account: RevenueAccount = RevenueAccount.find_by_id(fee_code.revenue_account_id)
 
         url_params_dict = {'trnDate': date_val,
@@ -209,3 +229,13 @@ class FeeService:
 
         current_app.logger.debug('>Getting token')
         return response
+
+    def _get_cfr_fee(self, ministry_request_id, pay_request):
+        if pay_request.get('retry', False):
+            return Payment.find_failed_transaction(pay_request['transaction_number']).total
+        else:
+            fee = cfrfeeservice().getcfrfee(ministry_request_id)['feedata']['balanceremaining']
+            if pay_request.get('half', False):
+                return fee/2
+            else:
+                return fee

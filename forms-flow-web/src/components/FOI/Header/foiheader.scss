@@ -1,0 +1,188 @@
+
+
+nav {
+  background-color: #036 !important;
+  
+  padding: 10px 0 !important;
+  color: #fff;
+}
+
+nav h2 {
+  font-family: 'BCSans-Bold', sans-serif !important;
+  font-weight: 100 !important;
+  color: #fff;
+  // margin-left: 40px;
+}
+
+.banner-left {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  margin: 0;
+  
+}
+.banner-right {
+  display: flex;
+  
+  font-family: 'BCSans-Bold', sans-serif!important;
+  color: #fff;
+}
+.navbar-text {
+  font-family: 'BCSans-Bold', sans-serif!important;  
+  color: #fff !important;
+  margin-right: 40px;
+  
+}
+
+.bell-icon {
+  padding-top: 0.5rem;
+  
+  .MuiBadge-badge{
+    visibility: visible !important;
+  }
+
+  .MuiBadge-anchorOriginTopRightRectangle {
+    transform: scale(0.85) translate(50%, -50%);
+  }
+
+  .MuiBadge-colorSecondary{
+    background-color: #9E2929 !important;
+  }
+}
+
+.report-icon{
+  padding-top: 0.5rem;
+
+  a {
+    color: white;
+    padding-right: 10px;
+    i {
+      display: none;
+    }
+  }
+}
+
+.signout-btn {
+  border: none;
+  background-color:  #036 !important;
+  width: 100%;
+  height: 100%;   
+  font-family: 'BCSans-Bold', sans-serif!important;
+  color: #FFFF;
+  border-color: #FFFF !important;
+  position: relative;
+  max-height: 40px;
+}
+
+.foiheaderLogosection{
+  display: inline;
+}
+
+.foiheaderAppNamesection{
+  display: inline-flex;
+  width: auto!important;
+  top: 7px;
+}
+
+.foiheaderUserStatusSection {
+  display: inline;
+  width: auto!important;
+  float: right;
+}
+
+.foi-bell {
+  font: normal normal normal 14px/1 FontAwesome, sans-serif !important;
+}
+
+.notification-popup-content{
+  border: 1px solid #214E7A !important;
+  border-radius: 10px !important;
+  background-color: #fff !important;
+  width: 425px !important;
+  top: 75px !important;
+  padding: 0px !important;
+  z-index: 1400 !important;
+}
+
+.notification-popup-content .list-group-item{
+  background-color: transparent !important;
+}
+
+.notification-popup-arrow {
+  display: none;
+}
+
+.notification-popup-drawer{
+  border-top-left-radius: 15px;
+  border-top-right-radius: 15px;
+  background-color: #E5EAEF;
+  cursor: pointer;
+}
+
+.drawer-div{
+  padding-left: 7px;
+  width: 30px;
+  margin-right: 40px;
+  height: 70px;
+  cursor: pointer;
+}
+
+.foiContainer{
+  margin: 0 10.5% !important;
+  padding: 0 !important;
+  > div {
+    > div{
+      padding: 0;
+    }
+  }
+  max-width: none !important;
+}
+
+.foihomebtn {
+  font-size: 30px !important;
+  color: #FFFFFF;
+  display: inline-flex !important;
+}
+
+a h2 {
+  padding-left: 6px;
+}
+
+.foiheaderAppNamesection a:hover {
+  text-decoration: none !important;
+}
+
+/*  Mobile screens (phones, 500px and down) */
+@media only screen  and (max-width: 500px) {
+
+  .foihamburgermenu , .foihamburgermenulist{
+   width:100%;
+  }
+
+  .foiheaderLogosection , .foiheaderAppNamesection , .foiheaderUserStatusSection {
+    padding-left: 5px!important;
+    padding-right: 5px!important;
+  }
+  .foiheaderUserStatusSection {
+
+    float: none;
+  }
+
+  .foinavitem {
+    padding: 4px;
+  }
+
+  .foiContainer{
+    padding-left: 2px!important;
+    padding-right: 2px!important;
+  }
+
+  .foiNavBarToggle{
+    float: right;
+  }
+
+.foiheaderAppNamesection > h2 {
+  margin-left: 5%;
+}
+
+}

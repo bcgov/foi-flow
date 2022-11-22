@@ -796,4 +796,4 @@ class FOIRawRequest(db.Model):
 
 class FOIRawRequestSchema(ma.Schema):
     class Meta:
-        fields = ('requestid', 'requestrawdata', 'status','notes','created_at','wfinstanceid','version','updated_at','assignedgroup','assignedto','updatedby','createdby','sourceofsubmission','ispiiredacted','assignee.firstname','assignee.lastname', 'axisrequestid', 'axissyncdate')
+        fields = ('requestid', 'requestrawdata', 'status','notes','created_at','wfinstanceid','version','updated_at','assignedgroup','assignedto','updatedby','createdby','sourceofsubmission','ispiiredacted','assignee.firstname','assignee.lastname', 'axisrequestid', 'axissyncdate', 'closedate')

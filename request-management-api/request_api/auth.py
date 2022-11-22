@@ -41,7 +41,16 @@ class Auth:
 
         return decorated
 
-
+    @classmethod
+    def hasusertype(cls,usertype):
+        def decorated(f):
+            @wraps(f)
+            def wrapper(*args, **kwargs):
+                if(usertype == AuthHelper.getusertype()):
+                    return f(*args, **kwargs)
+                return "Unauthorized" , 401
+            return wrapper
+        return decorated
 
     @classmethod
     def belongstosameministry(cls,func):
@@ -60,7 +69,7 @@ class Auth:
                 else:
                     return func(type, id, field,*args, **kwargs)            
         return decorated           
-
+           
     @classmethod
     def documentbelongstosameministry(cls,func):
         @wraps(func)
@@ -77,7 +86,7 @@ class Auth:
                     return retval
                 else:
                     return func(id, *args, **kwargs)            
-        return decorated        
+        return decorated 
              
     
     @classmethod

@@ -7,6 +7,8 @@ from request_api.models.FOIRequestContactInformation import FOIRequestContactInf
 from request_api.models.FOIRequestPersonalAttributes import FOIRequestPersonalAttribute
 from request_api.models.FOIRequestApplicantMappings import FOIRequestApplicantMapping
 from dateutil.parser import parse
+from request_api.services.cfrfeeservice import cfrfeeservice
+from request_api.services.paymentservice import paymentservice
 
 
 class requestservicegetter:
@@ -91,6 +93,26 @@ class requestservicegetter:
             additionalpersonalinfo.update(additionalpersonalinfodetails)                
             baserequestinfo['additionalPersonalInfo'] = additionalpersonalinfo 
         return baserequestinfo
+    
+    def getrequestdetails(self,foirequestid, foiministryrequestid):
+        requestdetails = self.getrequest(foirequestid, foiministryrequestid)
+        cfrfee = cfrfeeservice().getapprovedcfrfee(foiministryrequestid)
+        payment = paymentservice().getpayment(foirequestid, foiministryrequestid)
+        if cfrfee is not None and cfrfee != {}:
+            requestdetails['cfrfee'] = cfrfee
+            _balancedue = cfrfee['feedata']['balanceremaining']
+            requestdetails['cfrfee']['feedata']["balanceDue"] = '{:.2f}'.format(_balancedue)
+            if cfrfee['feedata']['actualtotaldue']:
+                requestdetails['cfrfee']['feedata']["totalamountdue"] = '{:.2f}'.format(requestdetails['cfrfee']['feedata']["actualtotaldue"])
+            else:
+                requestdetails['cfrfee']['feedata']["totalamountdue"] = '{:.2f}'.format(requestdetails['cfrfee']['feedata']["estimatedtotaldue"])
+            
+        if payment is not None and payment != {}:
+            paidamount = float(payment['paidamount']) if payment['paidamount'] != None else 0
+            requestdetails['cfrfee']['feedata']['paidamount'] = '{:.2f}'.format(paidamount)
+            requestdetails['cfrfee']['feedata']['depositpaid'] = '{:.2f}'.format(float(cfrfee['feedata']['amountpaid']) - paidamount)
+            requestdetails['cfrfee']['feedata']['paymenturl'] = payment['paymenturl']            
+        return requestdetails
 
     def __preparebaseinfo(self,request,foiministryrequestid,requestministry,requestministrydivisions):
         _receiveddate = parse(request['receiveddate'])
@@ -118,6 +140,7 @@ class requestservicegetter:
             'requestProcessStart': parse(requestministry['startdate']).strftime(self.__genericdateformat()) if requestministry['startdate'] is not None else '',
             'dueDate':parse(requestministry['duedate']).strftime(self.__genericdateformat()),            
             'programareaid':requestministry['programarea.programareaid'],
+            'bcgovcode':requestministry['programarea.bcgovcode'],
             'category':request['applicantcategory.name'],
             'categoryid':request['applicantcategory.applicantcategoryid'],
             'assignedministrygroup':requestministry["assignedministrygroup"],
@@ -130,6 +153,7 @@ class requestservicegetter:
             'assignedToLastName': requestministry["assignee.lastname"] if requestministry["assignedto"] != None else None,
             'assignedministrypersonFirstName': requestministry["ministryassignee.firstname"] if requestministry["assignedministryperson"] != None else None,
             'assignedministrypersonLastName': requestministry["ministryassignee.lastname"] if requestministry["assignedministryperson"] != None else None,
+            'closedate': parse(requestministry['closedate']).strftime(self.__genericdateformat()) if requestministry['closedate'] is not None else None,
         }
         if requestministry['cfrduedate'] is not None:
             baserequestinfo.update({'cfrDueDate':parse(requestministry['cfrduedate']).strftime(self.__genericdateformat())})
