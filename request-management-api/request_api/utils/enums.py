@@ -110,3 +110,8 @@ class CommentType(Enum):
     UserComment = 1
     SystemGenerated = 2
     DivisionStages = 3
+
+class DocumentPathMapperCategory(Enum):
+
+    Attachments = "Attachments"
+    Records = "Records"

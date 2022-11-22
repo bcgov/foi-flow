@@ -127,7 +127,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
   const [unsavedPrompt, setUnsavedPrompt] = useState(false);
   const [unsavedMessage, setUnsavedMessage] = useState(<></>);
   const handleUnsavedContinue = () => {
-    window.removeEventListener("popstate");
+    window.removeEventListener("popstate", handleOnHashChange);
     window.removeEventListener("beforeunload", handleBeforeUnload);
     dispatch(push(`/foi/dashboard`))
   }
@@ -1052,7 +1052,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
                   iaoassignedToList={iaoassignedToList}
                   ministryAssignedToList={ministryAssignedToList}
                   isMinistryCoordinator={false}
-                  bcgovcode={requestDetails.bcgovcode}
+                  bcgovcode={bcgovcode}
                   setRecordsUploading={setRecordsUploading}
                   divisions={requestDetails.divisions}
                 />

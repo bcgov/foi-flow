@@ -101,7 +101,7 @@ import {
 
   export const getFOIS3DocumentPreSignedUrl = (filepath,ministryrequestid,dispatch,...rest) => {
     const done = fnDone(rest);
-    const type = rest[1] || 'attachment';
+    const type = rest[1] || 'attachments';
     const bcgovcode = rest[2];
     console.log(ministryrequestid)
     const apiurl = API.FOI_GET_S3DOCUMENT_PRESIGNEDURL+ "/" + (ministryrequestid == undefined ? "-1" : ministryrequestid) +"/" + type + "/" + bcgovcode + "?filepath="+filepath
@@ -121,9 +121,9 @@ import {
     return response;
   };
   
-  export const postFOIS3DocumentPreSignedUrl = (ministryrequestid, data, category, dispatch, ...rest) => {
+  export const postFOIS3DocumentPreSignedUrl = (ministryrequestid, data, category, bcgovcode, dispatch, ...rest) => {
     const done = fnDone(rest);
-    const apiurl = API.FOI_POST_S3DOCUMENT_PRESIGNEDURL+ "/" + (ministryrequestid == undefined ? "-1" : ministryrequestid) + "/" + category;
+    const apiurl = API.FOI_POST_S3DOCUMENT_PRESIGNEDURL+ "/" + (ministryrequestid == undefined ? "-1" : ministryrequestid) + "/" + category + "/" + bcgovcode;
     const response = httpPOSTRequest(apiurl, data, UserService.getToken());
     response.then((res) => {
         if (res.data) {

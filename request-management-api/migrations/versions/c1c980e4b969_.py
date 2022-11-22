@@ -29,8 +29,8 @@ def upgrade():
         sa.Column('isactive', sa.Boolean(), nullable=False),
         sa.Column('createdby', sa.String(length=120), nullable=True),
         sa.Column('created_at', sa.DateTime(), nullable=True, default=datetime.now()),
-        sa.Column('updatedby', sa.String(length=120), nullable=True), 
-        sa.Column('updated_at', sa.DateTime(), nullable=True),   
+        sa.Column('updatedby', sa.String(length=120), nullable=True),
+        sa.Column('updated_at', sa.DateTime(), nullable=True),
         sa.PrimaryKeyConstraint('documentpathid')
     )
     docment_path_mapper = table('DocumentPathMapper',
@@ -44,9 +44,22 @@ def upgrade():
         docment_path_mapper,
         [
             {'category':'Attachments','bucket':'$environment-forms-foirequests','isactive':True,'createdby':'System'},
-            {'category':'Records','bucket':'$bcgovcode-$environment','isactive':True,'createdby':'System'}
         ]
-    ) # ### end Alembic commands ###
+    )
+    op.execute('''INSERT INTO public."DocumentPathMapper"(
+	category, bucket, isactive, createdby)
+	Select 'Records', lower(bcgovcode) || '-$environment' , true, 'System' from
+	public."ProgramAreas" where isactive = true''')
+
+
+    # ### end Alembic commands ###
+
+    # #### run the following query separately through pgAdmin
+
+    # update public."DocumentPathMapper" set attributes = '{
+    #     "s3accesskey":"** enter access key **",
+    #     "s3secretkey":"** enter secret key **"
+    # }' where bucket ilike '** enter bucket name here **%'
 
 
 def downgrade():

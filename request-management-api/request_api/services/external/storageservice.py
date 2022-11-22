@@ -7,6 +7,7 @@ import uuid
 import mimetypes
 
 from request_api.models.DocumentPathMapper import DocumentPathMapper
+from request_api.utils.enums import DocumentPathMapperCategory
 
 import boto3
 from botocore.exceptions import ClientError
@@ -25,8 +26,9 @@ class storageservice:
     s3environment = os.getenv('OSS_S3_ENVIRONMENT') 
     s3timeout = 3600
 
-    def upload(self, attachment):        
-        formsbucket = self.__getbucket("Attachments")
+    def upload(self, attachment):
+        docpathmapper = DocumentPathMapper().getdocumentpath("Attachments")
+        formsbucket = self.__formatbucketname(docpathmapper['bucket'])
         
         if(self.accesskey is None or self.secretkey is None or self.s3host is None or formsbucket is None):
             raise ValueError('accesskey is None or secretkey is None or S3 host is None or formsbucket is None')
@@ -74,9 +76,10 @@ class storageservice:
             s3sourceuri = foirequestform.get('s3sourceuri')
             filenamesplittext = os.path.splitext(filename)
             uniquefilename = '{0}{1}'.format(uuid.uuid4(),filenamesplittext[1]) 
-            formsbucket = self.__getbucket(category,ministrycode)               
-            auth = AWSRequestsAuth(aws_access_key=self.accesskey,
-                    aws_secret_access_key=self.secretkey,
+            docpathmapper = DocumentPathMapper().getdocumentpath(category,ministrycode)
+            formsbucket = self.__formatbucketname(docpathmapper['bucket'])
+            auth = AWSRequestsAuth(aws_access_key=docpathmapper['attributes']['s3accesskey'],
+                    aws_secret_access_key=docpathmapper['attributes']['s3secretkey'],
                     aws_host=self.s3host,
                     aws_region=self.s3region,
                     aws_service=self.s3service) 
@@ -92,8 +95,9 @@ class storageservice:
         return requestfilejson
 
     def retrieve_s3_presigned(self, filepath, category="attachments", bcgovcode=None):
-        formsbucket = self.__getbucket(category, bcgovcode)
-        s3client = self.__get_s3client(category)
+        docpathmapper = DocumentPathMapper().getdocumentpath(category, bcgovcode)
+        formsbucket = self.__formatbucketname(docpathmapper['bucket'])
+        s3client = self.__get_s3client(category, docpathmapper)
         filename, file_extension = os.path.splitext(filepath)    
         response = s3client.generate_presigned_url(
             ClientMethod='get_object',
@@ -102,8 +106,10 @@ class storageservice:
         )
         return response
 
-    def bulk_upload_s3_presigned(self, ministryrequestid, requestfilejson, category):
-        s3client = self.__get_s3client(category)
+    def bulk_upload_s3_presigned(self, ministryrequestid, requestfilejson, category, bcgovcode=None):
+        docpathmapper = DocumentPathMapper().getdocumentpath(category, bcgovcode)
+        formsbucket = self.__formatbucketname(docpathmapper['bucket'])
+        s3client = self.__get_s3client(category, docpathmapper)
         for file in requestfilejson:                
             foirequestform = FOIRequestsFormsList().load(file)                
             ministrycode = foirequestform.get('ministrycode')
@@ -113,7 +119,6 @@ class storageservice:
             filenamesplittext = os.path.splitext(filename)
             uniquefilename = '{0}{1}'.format(uuid.uuid4(),filenamesplittext[1])
             filepath = self.__getfilepath(category,ministrycode,requestnumber,filestatustransition,uniquefilename)
-            formsbucket = self.__getbucket(category,ministrycode)
             response = s3client.generate_presigned_url(
                 ClientMethod='put_object',
                 Params=   {
@@ -128,35 +133,23 @@ class storageservice:
         return requestfilejson    
 
     def is_valid_category(self, category):
-        docpathmappers = DocumentPathMapper().getdocumentpath()
-        for docpathmapper in docpathmappers:
-            if docpathmapper['category'].lower() == category:
-                return True
-        return False    
+        categories = set(item.value.lower() for item in DocumentPathMapperCategory)
+        return category in categories
 
-    def __get_s3client(self, category):
+    def __get_s3client(self, category, docpathmapper):
         return boto3.client('s3',config=Config(signature_version='s3v4'),
             endpoint_url='https://{0}/'.format(self.s3host),
-            aws_access_key_id= self.accesskey if category == 'attachments' else self.recordsaccesskey,
-            aws_secret_access_key= self.secretkey if category == 'attachments' else self.recordssecretkey,
+            aws_access_key_id= docpathmapper['attributes']['s3accesskey'],
+            aws_secret_access_key= docpathmapper['attributes']['s3secretkey'],
             region_name= self.s3region
         )
 
     def __getbucket(self, category, programarea=None):
-        docpathmappers = DocumentPathMapper().getdocumentpath()
-        defaultbucket = None
-        for docpathmapper in docpathmappers:
-            if docpathmapper['category'].lower() == "attachments":
-                defaultbucket = self.__formatbucketname(docpathmapper['bucket'], programarea)
-            if docpathmapper['category'].lower() == category.lower():
-                return self.__formatbucketname(docpathmapper['bucket'], programarea)
-        return  defaultbucket 
+        docpathmapper = DocumentPathMapper().getdocumentpath(category, programarea if category.lower() == "attachments" else None)
+        return self.__formatbucketname(docpathmapper['bucket'], programarea)
 
-    def __formatbucketname(self, bucket, bcgovcode):
-        _bucket = bucket.replace('$environment', self.s3environment)
-        if bcgovcode is not None:
-            _bucket = _bucket.replace('$bcgovcode', bcgovcode.lower())
-        return _bucket        
+    def __formatbucketname(self, bucket):
+        return bucket.replace('$environment', self.s3environment)
 
     def __getfilepath(self,category,ministrycode,requestnumber,filestatustransition,uniquefilename):
         if category.lower() == 'attachments':

@@ -167,7 +167,7 @@ export const RecordsLog = ({
     if (value) {
       if (files.length !== 0) {
         setRecordsUploading(true)
-        postFOIS3DocumentPreSignedUrl(ministryId, fileInfoList, 'records', dispatch, async (err, res) => {
+        postFOIS3DocumentPreSignedUrl(ministryId, fileInfoList, 'records', bcgovcode, dispatch, async (err, res) => {
           let _documents = [];
           if (!err) {
             var completed = 0;
