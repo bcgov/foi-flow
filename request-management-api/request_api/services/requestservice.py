@@ -5,6 +5,7 @@ from request_api.services.documentservice import documentservice
 from request_api.services.workflowservice import workflowservice
 from request_api.services.watcherservice import watcherservice
 from request_api.services.commentservice import commentservice
+from request_api.services.paymentservice import paymentservice
 from request_api.services.foirequest.requestserviceconfigurator import requestserviceconfigurator 
 from request_api.services.foirequest.requestservicegetter import requestservicegetter 
 from request_api.services.foirequest.requestservicecreate import requestservicecreate 
@@ -23,7 +24,8 @@ class requestservice:
         return requestservicecreate().saverequest(foirequestschema, userid, foirequestid, ministryid, filenumber, version, rawrequestid, wfinstanceid)     
     
     def saverequestversion(self,foirequestschema, foirequestid , ministryid, userid):
-        return requestservicecreate().saverequestversion(foirequestschema, foirequestid , ministryid, userid)     
+        return requestservicecreate().saverequestversion(foirequestschema, foirequestid , ministryid, userid)
+            
     
     def saveministryrequestversion(self,ministryrequestschema, foirequestid , ministryid, userid, usertype = None):
          return requestservicecreate().saveministryrequestversion(ministryrequestschema, foirequestid , ministryid, userid, usertype)      
@@ -83,5 +85,5 @@ class requestservice:
     def postcorrespondenceeventtoworkflow(self, requestid, ministryrequestid, applicantcorrespondenceid, attributes, templateid):
         foirequestschema = self.getrequestdetails(requestid, ministryrequestid)
         templatedetails = applicantcorrespondenceservice().gettemplatebyid(templateid)
-        workflowservice().syncwfinstance("ministryrequest", id, True)
+        workflowservice().syncwfinstance("ministryrequest", ministryrequestid, True)
         workflowservice().postcorrenspodenceevent(ministryrequestid, foirequestschema, applicantcorrespondenceid, templatedetails.name, attributes)
