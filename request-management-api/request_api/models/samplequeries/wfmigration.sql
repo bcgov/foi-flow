@@ -55,10 +55,15 @@ Note: This to be ran after completion of Step 2 to 5 i.e. migration of all insta
 */
 INSERT INTO public.act_ru_event_subscr (id_, rev_, event_type_, event_name_, execution_id_, 
 proc_inst_id_, activity_id_, configuration_, created_, tenant_id_)
-select gen_random_uuid (),1, 'message', 'foi-iao-correnspodence', ext.execution_id_, tmp1.proc_inst_id_,
+select tmp1.proc_inst_id_, 1, 'message', 'foi-iao-correnspodence', ext.execution_id_, tmp1.proc_inst_id_,
 'correnspodance', NULL, now(), null from
 (select distinct proc_inst_id_  from act_ru_variable arv where name_='status' and text_ <> 'Open' 
 and proc_inst_id_  not in (select proc_inst_id_ from act_ru_event_subscr arv where event_name_='foi-iao-correnspodence')) as tmp1,
 act_ru_task ext where tmp1.proc_inst_id_ = ext.proc_inst_id_
 and name_ like '%IAO'
 commit;
+
+/* 
+This needs to be run only in the marshals.
+ */
+update public.act_ru_event_subscr set activity_id_ = 'Event_1tvpamu' where activity_id_ = 'complete'
