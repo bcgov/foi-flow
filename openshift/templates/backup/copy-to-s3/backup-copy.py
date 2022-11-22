@@ -63,11 +63,13 @@ def upload_directory(client, local_directory, bucket, destination):
 
             # TODO: Re-write this into normal if/else, no need to try/except it
             try:
-                client.head_object(Bucket=bucket, Key=s3_path)
-                print("Path found on S3! Skipping %s..." % s3_path)
+                # client.head_object(Bucket=bucket, Key=s3_path)
+                # print("Path found on S3! Skipping %s..." % s3_path)
+                print("DRY-RUN: Path found on S3! Skipping %s..." % s3_path)
             except:
-                print("Uploading %s..." % s3_path)
-                client.upload_file(local_path, bucket, s3_path)
+                # print("Uploading %s..." % s3_path)
+                print("DRY-RUN: Uploading %s..." % s3_path)
+                # client.upload_file(local_path, bucket, s3_path)
 
 
 if __name__ == "__main__":
