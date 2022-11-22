@@ -9,7 +9,6 @@ from request_api.services.cfrfeeservice import cfrfeeservice
 from request_api.models.FOIRawRequests import FOIRawRequest
 from request_api.models.FOIMinistryRequests import FOIMinistryRequest
 from request_api.models.FOIRequests import FOIRequest
-
 import logging
 """
 This class is reserved for workflow services integration.
@@ -105,13 +104,11 @@ class workflowservice:
         print("previous state"+entry_n_minus_1["status"])
         if "status" not in _variables and entry_n_minus_1["status"] not in ("Open"):
             for entry in _all_activity_desc:
-                if entry["status"] == "Call For Records":
-                    print("submit for CFR")
+                if entry["status"] == OpenedEvent.callforrecords.value:
                     self.__sync_complete_event(requestid, wfinstanceid, entry)
                     _variables = bpmservice().getinstancevariables(wfinstanceid)
-                    print(_variables)
                     break            
-            if entry_n_minus_1["status"] not in ("Open","Call For Records") and _variables["status"]["value"] != entry_n_minus_1["status"]:
+            if entry_n_minus_1["status"] not in (UnopenedEvent.open.value,OpenedEvent.callforrecords.value) and _variables["status"]["value"] != entry_n_minus_1["status"]:
                 self.__sync_complete_event(requestid, wfinstanceid, entry_n_minus_1)
             
 
@@ -229,7 +226,7 @@ class workflowservice:
         if _len > 1:
             return ministryreq[1]["status"]
         elif _len == 1:
-            return "Intake in Progress"
+            return UnopenedEvent.intakeinprogress.value
         else:
             return None   
 
@@ -241,7 +238,7 @@ class workflowservice:
                 if int(entry["version"]) < version:
                     return entry["status"]
         elif _len == 1:
-            return "Intake in Progress"
+            return UnopenedEvent.intakeinprogress.value
         else:
             return None  
     
