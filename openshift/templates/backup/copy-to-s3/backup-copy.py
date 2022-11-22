@@ -19,6 +19,10 @@ S3_REGION = os.getenv('OSS_S3_REGION')
 BACKUP_DIRECTORY = os.getenv('BACKUP_DIRECTORY')
 S3_SERVICE = os.getenv('OSS_S3_SERVICE')
 
+
+# Optional env value.  If true, will not upload to S3, will only log
+DRY_RUN = os.getenv('DRY_RUN') or False
+
 def create_s3_connection():
     print('Creating s3 connection')
     print('Printing environment variables...')
@@ -53,7 +57,6 @@ def upload_directory(client, local_directory, bucket, destination):
             # construct the full local path
             local_path = os.path.join(root, filename)
 
-            # construct the full Dropbox path
             relative_path = os.path.relpath(local_path, local_directory)
             s3_path = os.path.join(destination, relative_path)
 
@@ -62,14 +65,20 @@ def upload_directory(client, local_directory, bucket, destination):
             print('Searching "%s" in "%s"' % (s3_path, bucket))
 
             # TODO: Re-write this into normal if/else, no need to try/except it
+            # USE POSTMAN FOR "nosuchbucket" test.
+            # Add StackOverFlow post of current suggestion of uploading backup-container to S3
             try:
-                # client.head_object(Bucket=bucket, Key=s3_path)
-                # print("Path found on S3! Skipping %s..." % s3_path)
-                print("DRY-RUN: Path found on S3! Skipping %s..." % s3_path)
+                if DRY_RUN:
+                    print("DRY-RUN: Path found on S3! Skipping %s..." % s3_path)
+                else:
+                    client.head_object(Bucket=bucket, Key=s3_path)
+                    print("Path found on S3! Skipping %s..." % s3_path)
             except:
-                # print("Uploading %s..." % s3_path)
-                print("DRY-RUN: Uploading %s..." % s3_path)
-                # client.upload_file(local_path, bucket, s3_path)
+                if DRY_RUN:
+                    print("DRY-RUN: Uploading %s..." % s3_path)
+                else:
+                    print("Uploading %s..." % s3_path)
+                    client.upload_file(local_path, bucket, s3_path)
 
 
 if __name__ == "__main__":
