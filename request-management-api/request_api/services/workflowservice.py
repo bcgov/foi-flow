@@ -102,7 +102,7 @@ class workflowservice:
                 else:
                     self.__sync_state_transition(requestid, _req_instance_n, _all_activity_desc, True)
             _raw_metadata_n = FOIRawRequest.getworkflowinstancebyraw(requestid) if requesttype == "rawrequest" else FOIRawRequest.getworkflowinstancebyministry(requestid)
-            return _raw_metadata_n.wfinstanceid if requesttype == "rawrequest" else _req_instance
+            return _raw_metadata_n.wfinstanceid if requesttype == "rawrequest" else _req_instance_n
         except Exception as ex:
             logging.error(ex)
         return None
