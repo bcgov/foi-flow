@@ -120,7 +120,7 @@ class FOIRequestsById(Resource):
         """ POST Method for capturing FOI requests before processing"""
         try:
             request_json = request.get_json()            
-            foirequestschema = FOIRequestWrapperSchema().load(request_json)                                    
+            foirequestschema = FOIRequestWrapperSchema().load(request_json)  
             result = requestservice().saverequestversion(foirequestschema, foirequestid, foiministryrequestid,AuthHelper.getuserid())
             if result.success == True:
                 asyncio.ensure_future(eventservice().postevent(foiministryrequestid,"ministryrequest",AuthHelper.getuserid(),AuthHelper.getusername(),AuthHelper.isministrymember()))

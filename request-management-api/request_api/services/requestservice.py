@@ -24,7 +24,10 @@ class requestservice:
         return requestservicecreate().saverequest(foirequestschema, userid, foirequestid, ministryid, filenumber, version, rawrequestid, wfinstanceid)     
     
     def saverequestversion(self,foirequestschema, foirequestid , ministryid, userid):
-        return requestservicecreate().saverequestversion(foirequestschema, foirequestid , ministryid, userid)
+        responseschema = requestservicecreate().saverequestversion(foirequestschema, foirequestid , ministryid, userid) 
+        if "paymentExpiryDate" in foirequestschema and foirequestschema["paymentExpiryDate"] not in (None, ""):
+            paymentservice().createpayment(foirequestid, ministryid, foirequestschema, userid)
+        return responseschema
             
     
     def saveministryrequestversion(self,ministryrequestschema, foirequestid , ministryid, userid, usertype = None):

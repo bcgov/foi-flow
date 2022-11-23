@@ -15,12 +15,6 @@ __author__      = "sumathi.thirumani@aot-technologies.com"
 """
 class bpmservice(camundaservice):
 
-    def getinstancevariables(self, instanceid, token=None):
-        if self.bpmengineresturl is not None:
-            response = requests.get(self.bpmengineresturl+"/process-instance/"+str(instanceid)+"/variables", headers = self._getHeaders_(token))
-            return json.loads(response.content) if response.ok else None
-        return None
-
     def createinstance(self, messagequeue, message, token=None):
         if self.bpmengineresturl is not None:
             _variables = {"variables":{}}
@@ -31,9 +25,14 @@ class bpmservice(camundaservice):
             return requests.post(self._getUrl_(None,self._geProcessDefinitionKey_(messagequeue)), data=json.dumps(variableschema), headers = self._getHeaders_(token))
         else:
             return
-    
-     
-    def unopenedevent(self,processinstanceid, userid, messagetype, token=None):
+
+    def getinstancevariables(self, instanceid, token=None):
+        if self.bpmengineresturl is not None:
+            response = requests.get(self.bpmengineresturl+"/process-instance/"+str(instanceid)+"/variables", headers = self._getHeaders_(token))
+            return json.loads(response.content) if response.ok else None
+        return None
+
+    def unopenedsave(self,processinstanceid, userid, messagetype, token=None):
         if self.bpmengineresturl is not None:
             messageschema = MessageSchema().dump({"processInstanceId": processinstanceid,
                                               "messageName": messagetype, 
@@ -41,7 +40,7 @@ class bpmservice(camundaservice):
                                                   "assignedTo": VariableSchema().dump({"type" : VariableType.String.value, "value": userid})
                                                   }
                                               })
-            return requests.post(self._getUrl_(messagetype), data=json.dumps(messageschema), headers = self._getHeaders_(token))
+            return self.__post_message(messagetype, messageschema, token)
         else:
             return
 
@@ -54,12 +53,12 @@ class bpmservice(camundaservice):
                                                   "foiRequestMetaData": VariableSchema().dump({"data" : VariableType.String.value, "value": data})
                                                   }
                                               })
-            return requests.post(self._getUrl_(messagetype), data=json.dumps(messageschema), headers = self._getHeaders_(token))
+            return self.__post_message(messagetype, messageschema, token)
         else:
             return
         
-        
-    def openedevent(self, filenumber, groupname, userid, messagetype, token=None):
+    """"       
+    def opened(self, filenumber, groupname, userid, messagetype, token=None):
         if self.bpmengineresturl is not None:
             messageschema = MessageSchema().dump({"messageName": messagetype,
                                               "localCorrelationKeys":{
@@ -74,8 +73,8 @@ class bpmservice(camundaservice):
             return requests.post(self._getUrl_(messagetype), data=json.dumps(messageschema), headers = self._getHeaders_(token))
         else:
             return   
- 
-        
+    """
+
     def openedcomplete(self,filenumber, data, messagetype, token=None):
         if self.bpmengineresturl is not None:
             messageschema = MessageSchema().dump({"messageName": messagetype,
@@ -85,7 +84,7 @@ class bpmservice(camundaservice):
                                               "processVariables":{
                                                   "foiRequestMetaData": VariableSchema().dump({"data" : VariableType.String.value, "value": data})}
                                               })
-            return requests.post(self._getUrl_(messagetype), data=json.dumps(messageschema), headers = self._getHeaders_(token))
+            return self.__post_message(messagetype, messageschema, token)
         else:
             return    
         
@@ -99,7 +98,7 @@ class bpmservice(camundaservice):
                                                 "foiRequestMetaData": VariableSchema().dump({"data" : VariableType.String.value, "value": data}),
                                                 "paymentstatus": VariableSchema().dump({"type" : VariableType.String.value, "value": paymentstatus})}
                                             })
-            return requests.post(self._getUrl_(MessageType.managepayment.value), data=json.dumps(messageschema), headers = self._getHeaders_(token))
+            return self.__post_message(MessageType.managepayment.value, messageschema, token)
         else:
             return
 
@@ -112,15 +111,15 @@ class bpmservice(camundaservice):
                                               "processVariables":{
                                                   "foiRequestMetaData": VariableSchema().dump({"data" : VariableType.String.value, "value": data})}
                                               })
-            print("messageschema = ", messageschema)
-            return requests.post(self._getUrl_(MessageType.iaocorrenspodence.value), data=json.dumps(messageschema), headers = self._getHeaders_(token))
+            return self.__post_message(MessageType.iaocorrenspodence.value, messageschema, token)
         else:
             return 
  
-
     def reopenevent(self,processinstanceid, data, messagetype, token=None): 
         return self.unopenedcomplete(processinstanceid, data, messagetype, token)
 
+    def __post_message(self, messagetype, messageschema, token=None):
+        return requests.post(self._getUrl_(messagetype), data=json.dumps(messageschema), headers = self._getHeaders_(token))
 
     def _getUrl_(self, messagetype, definitionkey=None):
         if messagetype is not None:
@@ -128,7 +127,6 @@ class bpmservice(camundaservice):
         elif definitionkey is not None:
             return self.bpmengineresturl+"/process-definition/key/"+definitionkey+"/start"
         return self.bpmengineresturl
-
 
     def _geProcessDefinitionKey_(self, messagequeue):
         if messagequeue == "foi-rawrequest":
