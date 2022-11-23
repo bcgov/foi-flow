@@ -17,6 +17,7 @@ from .FOIRawRequestWatchers import FOIRawRequestWatcher
 from .FOIAssignees import FOIAssignee
 import logging
 from dateutil import parser
+import json
 
 class FOIRawRequest(db.Model):
     # Name of the table in our database
@@ -151,6 +152,38 @@ class FOIRawRequest(db.Model):
             return DefaultMethodResult(True,'Request versioned - {0}'.format(str(_version)),requestid,request.wfinstanceid,assignee)    
         else:
             return DefaultMethodResult(True,'No request foound')
+
+    @classmethod
+    def getworkflowinstancebyraw(cls,requestid)->DefaultMethodResult:
+        request_schema = FOIRawRequestSchema()
+        try:
+            sql = """select wfinstanceid, assignedto, assignedgroup, requestid  from "FOIRawRequests" fr where requestid = :requestid order by "version" desc limit 1;"""
+            rs = db.session.execute(text(sql), {'requestid': requestid})
+            for row in rs:
+                request_schema.__dict__.update({"requestid": row["requestid"],"assignedto": row["assignedto"], "assignedgroup": row["assignedgroup"], "wfinstanceid": row["wfinstanceid"]})
+        except Exception as ex:
+            logging.error(ex)
+        finally:
+            db.session.close()  
+        return request_schema
+
+
+    @classmethod
+    def getworkflowinstancebyministry(cls,requestid)->DefaultMethodResult:
+        request_schema = FOIRawRequestSchema()
+        try:
+            sql = """select fr.wfinstanceid,  fr.assignedto,  fr.assignedgroup, fr.requestid 
+                        from "FOIMinistryRequests" fr2, "FOIRequests" fr3, "FOIRawRequests" fr 
+                        where fr2.foirequest_id = fr3.foirequestid and fr3.foirawrequestid  = fr.requestid 
+                        and fr2.foiministryrequestid= :requestid order by fr."version" desc limit 1"""
+            rs = db.session.execute(text(sql), {'requestid': requestid})
+            for row in rs:
+                request_schema.__dict__.update({"requestid": row["requestid"], "assignedto": row["assignedto"], "assignedgroup": row["assignedgroup"], "wfinstanceid": row["wfinstanceid"]})
+        except Exception as ex:
+            logging.error(ex)
+        finally:
+            db.session.close()  
+        return request_schema
             
     @classmethod
     def updateworkflowinstance(cls,wfinstanceid,requestid, userid)->DefaultMethodResult:
