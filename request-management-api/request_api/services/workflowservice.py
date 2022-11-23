@@ -27,7 +27,10 @@ class workflowservice:
             raise BusinessException("Unable to create instance for key"+ definitionkey)
         return response
 
-    def postunopenedevent(self, id, wfinstanceid, requestsschema, status, ministries=None):
+    def postunopenedevent(self, id, wfinstanceid, requestsschema, status, ministries=None):        
+        if wfinstanceid in (None,""):
+            logging.error("WF INSTANCE IS INVALID")
+            return
         assignedgroup = requestsschema["assignedGroup"] if 'assignedGroup' in requestsschema  else None
         assignedto = requestsschema["assignedTo"] if 'assignedTo' in requestsschema  else None 
         if status == UnopenedEvent.intakeinprogress.value:
@@ -78,7 +81,7 @@ class workflowservice:
         metadata = json.dumps({"id": filenumber, "status": status , "ministryRequestID": ministryid, "paymentExpiryDate": paymentexpirydate, "axisRequestId": axisrequestid, "applicantcorrespondenceid": applicantcorrespondenceid, "templatename": templatename.replace(" ", "")})
         bpmservice().correspondanceevent(filenumber, metadata)
 
-    def syncwfinstance(self, requesttype, requestid, isallactivity=False):        
+    def syncwfinstance(self, requesttype, requestid, isallactivity=False):      
         try:
             _raw_metadata = FOIRawRequest.getworkflowinstancebyraw(requestid) if requesttype == "rawrequest" else FOIRawRequest.getworkflowinstancebyministry(requestid)
             # Check raw request instance creation - Reconcile with new instance creation
@@ -97,10 +100,10 @@ class workflowservice:
                     self.syncwfinstance("ministryrequest", requestid, isallactivity)
                 else:
                     self.__sync_state_transition(requestid, _req_instance_n, _all_activity_desc, True)
-            return True
+            return _raw_metadata.wfinstanceid if requesttype == "rawrequest" else _req_instance
         except Exception as ex:
             logging.error(ex)
-        return False
+        return None
 
     def __sync_state_transition(self, requestid, wfinstanceid, _all_activity_desc, isallactivity):
         _all_activity_asc = FOIMinistryRequest.getactivitybyid(requestid)[::-1]  
