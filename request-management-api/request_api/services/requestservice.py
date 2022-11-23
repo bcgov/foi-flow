@@ -72,7 +72,7 @@ class requestservice:
             documentservice().copyrequestdocuments(ministry["id"], attachments, userid)
     
     def postopeneventtoworkflow(self, id, wfinstanceid, requestschema, ministries):
-        workflowservice().syncwfinstance("rawrequest", id)
+        workflowservice().syncwfinstance("rawrequest", requestschema['id'])
         workflowservice().postunopenedevent(id, wfinstanceid, requestschema, "Open", ministries)            
     
     def postfeeeventtoworkflow(self, requestid, ministryrequestid, paymentstatus, nextstatename=None):
