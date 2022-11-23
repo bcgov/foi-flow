@@ -1145,7 +1145,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
                   iaoassignedToList={iaoassignedToList}
                   ministryAssignedToList={ministryAssignedToList}
                   isMinistryCoordinator={false}
-                  bcgovcode={bcgovcode}
+                  bcgovcode={JSON.parse(bcgovcode)}
                   setRecordsUploading={setRecordsUploading}
                   divisions={requestDetails.divisions}
                 />

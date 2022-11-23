@@ -34,6 +34,30 @@ class storageservice:
     s3environment = os.getenv('OSS_S3_ENVIRONMENT') 
     s3timeout = 3600
 
+    def uploadbytes(self, filename, bytes, ministrycode, requestnumber):
+        try: 
+            auth = AWSRequestsAuth(aws_access_key=accesskey,
+                aws_secret_access_key=secretkey,
+                aws_host=s3host,
+                aws_region=s3region,
+                aws_service=s3service) 
+        
+            s3uri = 'https://{0}/{1}/{2}/{3}/{4}'.format(s3host,formsbucket, ministrycode, requestnumber, filename)        
+            response = requests.put(s3uri, data=None, auth=auth)
+            header = {
+                'X-Amz-Date': response.request.headers['x-amz-date'],
+                'Authorization': response.request.headers['Authorization'],
+                'Content-Type': mimetypes.MimeTypes().guess_type(filename)[0]
+            }
+
+            #upload to S3
+            requests.put(s3uri, data=bytes, headers=header)
+            attachmentobj = {"success": True, 'filename': filename, 'documentpath': s3uri}
+        except Exception as ex:
+            logging.error(ex)
+            attachmentobj = {"success": False, 'filename': filename, 'documentpath': None}   
+        return attachmentobj
+
     def upload(self, attachment):
         docpathmapper = DocumentPathMapper().getdocumentpath("Attachments")
         formsbucket = self.__formatbucketname(docpathmapper['bucket'])

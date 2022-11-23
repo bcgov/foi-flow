@@ -267,7 +267,6 @@ export default function AttachmentModal({
                   maxNumberOfFiles={maxNoFiles}
                   isMinistryCoordinator={isMinistryCoordinator}
                   existingDocuments={existingDocuments}
-                  uploadFor={uploadFor}
                 /> 
                 :
                 <ModalForRename modalFor={modalFor} newFilename={newFilename} updateFilename={updateFilename} errorMessage={errorMessage} extension={extension} />

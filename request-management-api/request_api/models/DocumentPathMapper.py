@@ -2,11 +2,14 @@ from .db import  db, ma
 from .default_method_result import DefaultMethodResult
 from datetime import datetime
 from request_api.utils.enums import DocumentPathMapperCategory
+from request_api.exceptions import BusinessException
 import json
 from sqlalchemy import func
+from request_api import status as http_status
+from request_api.exceptions.errors import Error
 
 class DocumentPathMapper(db.Model):
-    __tablename__ = 'DocumentPathMapper' 
+    __tablename__ = 'DocumentPathMapper'
     # Defining the columns
     documentpathid = db.Column(db.Integer, primary_key=True,autoincrement=True)
     category = db.Column(db.Text, unique=False, nullable=False)
@@ -25,7 +28,12 @@ class DocumentPathMapper(db.Model):
         if category.lower() == DocumentPathMapperCategory.Records.value.lower():
             query = query.filter(DocumentPathMapper.bucket.ilike(programarea.lower() + '%'))
         pathmap = documentpath_schema.dump(query.first())
-        pathmap['attributes'] = json.loads(pathmap['attributes'])
+        try:
+            pathmap['attributes'] = json.loads(pathmap['attributes'])
+        except TypeError:
+            err = object.__new__(Error)
+            raise BusinessException(Error.MISSING_ACCESS_KEY)
+
         return pathmap
 
 

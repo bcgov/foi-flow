@@ -408,6 +408,8 @@ export const ContactApplicant = ({
             handleRename={undefined}
             isMinistryCoordinator={false}
             uploadFor={"email"}
+            maxNoFiles={10}
+            bcgovcode={undefined}
           />
         </div>
         <div id="correspondence-editor-ql-toolbar" className="ql-toolbar ql-snow">
