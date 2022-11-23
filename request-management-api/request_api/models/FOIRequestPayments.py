@@ -35,7 +35,16 @@ class FOIRequestPayment(db.Model):
     def savepayment(cls, newpayment)->DefaultMethodResult:                
         db.session.add(newpayment)
         db.session.commit()               
-        return DefaultMethodResult(True,'Payment added')   
+        return DefaultMethodResult(True,'Payment added')  
+
+    @classmethod
+    def updatepayment(cls, paymentid, paymenturl, userid)->DefaultMethodResult:
+        currequest = db.session.query(FOIRequestPayment).filter_by(paymentid=paymentid).order_by(FOIRequestPayment.version.desc()).first()
+        setattr(currequest,'paymenturl',paymenturl)
+        setattr(currequest,'updated_at',datetime.now().isoformat())
+        setattr(currequest,'updatedby',userid)
+        db.session.commit()  
+        return DefaultMethodResult(True,'Payment updated',paymentid) 
 
     @classmethod
     def getpayment(cls, foirequestid, ministryrequestid)->DefaultMethodResult:                
