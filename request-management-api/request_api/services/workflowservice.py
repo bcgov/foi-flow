@@ -87,6 +87,7 @@ class workflowservice:
             # Check raw request instance creation - Reconcile with new instance creation
             if _raw_metadata.wfinstanceid in (None, ""):
                 self.createinstance(RedisPublisherService().foirequestqueueredischannel, json.dumps(self.__prepare_raw_requestobj(_raw_metadata)))
+            
             if requesttype == "ministryrequest":
                 _req_instance = FOIRequest.getworkflowinstance(requestid)            
                 if _req_instance in (None, ""):
@@ -100,7 +101,8 @@ class workflowservice:
                     self.syncwfinstance("ministryrequest", requestid, isallactivity)
                 else:
                     self.__sync_state_transition(requestid, _req_instance_n, _all_activity_desc, True)
-            return _raw_metadata.wfinstanceid if requesttype == "rawrequest" else _req_instance
+            _raw_metadata_n = FOIRawRequest.getworkflowinstancebyraw(requestid) if requesttype == "rawrequest" else FOIRawRequest.getworkflowinstancebyministry(requestid)
+            return _raw_metadata_n.wfinstanceid if requesttype == "rawrequest" else _req_instance
         except Exception as ex:
             logging.error(ex)
         return None
