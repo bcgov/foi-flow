@@ -124,13 +124,17 @@ class workflowservice:
         _activity_itr = _all_activity_asc if isallactivity == True else _all_activity_asc_nall     
         _variables = bpmservice().getinstancevariables(wfinstanceid)  
         entry_n = _activity_itr[-1]
-        if _variables in (None, []) or (_variables not in (None, []) and "status" not in _variables) and entry_n["status"] not in (UnopenedEvent.open.value):
+        # No instance or (WF in Open state) and (previous state != Open) -> Move from Open to CFR
+        #and entry_n["status"] not in (UnopenedEvent.open.value)
+        if _variables in (None, []) or (_variables not in (None, []) and "status" not in _variables):
             for entry in _all_activity_desc:
-                if entry["status"] == OpenedEvent.callforrecords.value:
+                if entry["status"] == OpenedEvent.callforrecords.value and ((_variables not in (None, []) and "status" not in _variables) or (_variables not in (None, []) and _variables["status"]["value"] != OpenedEvent.callforrecords.value)):
                     self.__sync_complete_event(requestid, wfinstanceid, entry)
                     _variables = bpmservice().getinstancevariables(wfinstanceid)
-                    break            
-        if entry_n["status"] not in (UnopenedEvent.open.value, OpenedEvent.callforrecords.value) and (_variables in (None, []) or _variables["status"]["value"] != entry_n["status"]):
+                    break     
+        # Sync only N-1 action
+        #entry_n["status"] not in (UnopenedEvent.open.value, OpenedEvent.callforrecords.value) and 
+        if _variables in (None, []) or _variables["status"]["value"] != entry_n["status"]:
             self.__sync_complete_event(requestid, wfinstanceid, entry_n)
         return    
 
