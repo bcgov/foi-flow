@@ -104,7 +104,7 @@ class FOIRequest(db.Model):
         request_schema = FOIRequestsSchema()
         try:
             sql = """select fr3.wfinstanceid, fr2.foirequest_id  from "FOIMinistryRequests" fr2, "FOIRequests" fr3 
-                        where fr2.foirequest_id = fr3.foirequestid and fr2.foiministryrequestid=:requestid 
+                        where fr2.foirequest_id = fr3.foirequestid and fr3.wfinstanceid is not null and fr2.foiministryrequestid=:requestid 
                         order by  fr2."version" desc limit 1"""
             rs = db.session.execute(text(sql), {'requestid': requestid})
             for row in rs:                
