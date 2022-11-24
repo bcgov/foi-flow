@@ -11,7 +11,7 @@ import CloseIcon from '@material-ui/icons/Close';
 import type { previewParams } from './types';
 import { getOSSHeaderDetails, getFileFromS3 } from "../../../../apiManager/services/FOI/foiOSSServices";
 import { renderTemplate, applyVariables, getTemplateVariables } from './util';
-import { OSS_S3_BUCKET_FULL_PATH } from "../../../../constants/constants"
+import { OSS_S3_BUCKET_FULL_PATH, FOI_FFA_URL } from "../../../../constants/constants"
 
 export const PreviewModal = React.memo(({
   modalOpen,
@@ -47,9 +47,8 @@ export const PreviewModal = React.memo(({
       }
     });
   }, []);
-
+  requestDetails["ffaurl"] = FOI_FFA_URL;
   const templateVariables = getTemplateVariables(requestDetails, templateInfo);
-
   const handleSend = () => {
     handleSave( applyVariables(innerhtml, templateVariables) );
   };
