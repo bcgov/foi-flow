@@ -103,12 +103,12 @@ class FOIRequest(db.Model):
     def getworkflowinstance(cls,requestid)->DefaultMethodResult:
         request_schema = FOIRequestsSchema()
         try:
-            sql = """select fr3.wfinstanceid, fr2.foirequest_id  from "FOIMinistryRequests" fr2, "FOIRequests" fr3 
-                        where fr2.foirequest_id = fr3.foirequestid and fr3.wfinstanceid is not null and fr2.foiministryrequestid=:requestid 
-                        order by  fr2."version" desc limit 1"""
+            sql = """select fr3.wfinstanceid, fr3.foirequestid  from "FOIMinistryRequests" fr2, "FOIRequests" fr3 
+                        where fr2.foirequest_id = fr3.foirequestid and fr2.foiministryrequestid=:requestid 
+                        order by  fr3."version" desc limit 1"""
             rs = db.session.execute(text(sql), {'requestid': requestid})
             for row in rs:                
-                request_schema.__dict__.update({"wfinstanceid":row["wfinstanceid"] , "foirequestid": row["foirequest_id"]})
+                request_schema.__dict__.update({"wfinstanceid":row["wfinstanceid"] , "foirequestid": row["foirequestid"]})
         except Exception as ex:
             logging.error(ex)
         finally:
