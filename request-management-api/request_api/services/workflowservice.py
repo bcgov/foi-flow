@@ -87,40 +87,53 @@ class workflowservice:
             # Check raw request instance creation - Reconcile with new instance creation
             if _raw_metadata.wfinstanceid in (None, ""):
                 self.createinstance(RedisPublisherService().foirequestqueueredischannel, json.dumps(self.__prepare_raw_requestobj(_raw_metadata)))
-            
+            #Get updated raw PID
+            _raw_metadata_n = FOIRawRequest.getworkflowinstancebyraw(requestid) if requesttype == "rawrequest" else FOIRawRequest.getworkflowinstancebyministry(requestid)
             if requesttype == "ministryrequest":
-                _req_instance = FOIRequest.getworkflowinstance(requestid)            
-                if _req_instance in (None, ""):
-                    _req_ministries = FOIMinistryRequest.getministriesopenedbyuid(_raw_metadata.requestid)     
-                    self.postunopenedevent(requestid, _raw_metadata.wfinstanceid, self.__prepare_raw_requestobj(_raw_metadata), UnopenedEvent.open.value, _req_ministries)
+                _req_metadata = FOIRequest.getworkflowinstance(requestid)   #address correlation N 
+                #Search WF Engine using raw PID                
+                wf_foirequest_pid = bpmservice().searchinstancebyvariable("rawRequestPID", _raw_metadata_n.wfinstanceid)
+                # FOI - NO | WF - YES 
+                if _req_metadata.wfinstanceid in (None, "") and wf_foirequest_pid not in (None, ""):
+                    print("match-1")
+                    FOIRequest.updateWFInstance(_req_metadata.foirequestid, wf_foirequest_pid, "System")  
+                    _req_metadata.__dict__.update({"wfinstanceid":wf_foirequest_pid})
+                # FOI - YES | WF - NO and FOI - NO  | WF - NO 
+                if (_req_metadata.wfinstanceid not in (None, "") and wf_foirequest_pid in (None, "")) or (_req_metadata.wfinstanceid in (None, "") and wf_foirequest_pid in (None, "")): 
+                    _req_ministries = FOIMinistryRequest.getministriesopenedbyuid(_raw_metadata_n.requestid) 
+                    self.postunopenedevent(requestid, _raw_metadata_n.wfinstanceid, self.__prepare_raw_requestobj(_raw_metadata_n), UnopenedEvent.open.value, _req_ministries)
+                # WF - YES | FOI - YES - No Action Required
+
                 # Check foi request instance creation - Reconcile by transition to Open
                 _all_activity_desc = FOIMinistryRequest.getactivitybyid(requestid)             
-                _req_instance_n = FOIRequest.getworkflowinstance(requestid)            
+                _req_metadata_n = FOIRequest.getworkflowinstance(requestid)            
                 # Check Current status in WF engine
-                if _req_instance_n in (None, ""):
-                    self.syncwfinstance("ministryrequest", requestid, isallactivity)
-                else:
-                    self.__sync_state_transition(requestid, _req_instance_n, _all_activity_desc, True)
-            _raw_metadata_n = FOIRawRequest.getworkflowinstancebyraw(requestid) if requesttype == "rawrequest" else FOIRawRequest.getworkflowinstancebyministry(requestid)
-            return _raw_metadata_n.wfinstanceid if requesttype == "rawrequest" else _req_instance_n
+                #if _req_metadata_n.wfinstanceid in (None, ""):
+                    #self.syncwfinstance("ministryrequest", requestid, isallactivity)
+                #else:
+                self.__sync_state_transition(requestid, _req_metadata_n.wfinstanceid, _all_activity_desc, isallactivity)
+                return _req_metadata_n.wfinstanceid
+            
+            return _raw_metadata_n.wfinstanceid 
         except Exception as ex:
             logging.error(ex)
         return None
 
     def __sync_state_transition(self, requestid, wfinstanceid, _all_activity_desc, isallactivity):
         _all_activity_asc = FOIMinistryRequest.getactivitybyid(requestid)[::-1]  
-        _activity_itr = _all_activity_asc if isallactivity == True else _all_activity_asc[:-1]        
+        _all_activity_asc_nall = _all_activity_asc[:-1] if len(_all_activity_asc)>1 else _all_activity_asc
+        _activity_itr = _all_activity_asc if isallactivity == True else _all_activity_asc_nall     
         _variables = bpmservice().getinstancevariables(wfinstanceid)  
-        entry_n = _activity_itr[-1]      
-        if "status" not in _variables and entry_n["status"] not in (UnopenedEvent.open.value):
+        entry_n = _activity_itr[-1]
+        if (_variables not in (None, []) and "status" not in _variables) and entry_n["status"] not in (UnopenedEvent.open.value):
             for entry in _all_activity_desc:
                 if entry["status"] == OpenedEvent.callforrecords.value:
                     self.__sync_complete_event(requestid, wfinstanceid, entry)
                     _variables = bpmservice().getinstancevariables(wfinstanceid)
                     break            
-            if entry_n["status"] not in (UnopenedEvent.open.value, OpenedEvent.callforrecords.value) and _variables["status"]["value"] != entry_n["status"]:
-                self.__sync_complete_event(requestid, wfinstanceid, entry_n)
-            
+        if entry_n["status"] not in (UnopenedEvent.open.value, OpenedEvent.callforrecords.value) and (_variables in (None, []) or _variables["status"]["value"] != entry_n["status"]):
+            self.__sync_complete_event(requestid, wfinstanceid, entry_n)
+        return    
 
     def __sync_complete_event(self, requestid, wfinstanceid, minrequest):
         requestsschema, data = self.__prepare_ministry_complete(minrequest)   

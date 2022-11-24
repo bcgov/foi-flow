@@ -683,7 +683,7 @@ class FOIMinistryRequest(db.Model):
         setattr(currequest,'updatedby',userid)
         db.session.commit()  
         return DefaultMethodResult(True,'Request updated',ministryrequestid)
-    
+  
     @classmethod   
     def getministriesopenedbyuid(cls, rawrequestid):
         ministries = []
