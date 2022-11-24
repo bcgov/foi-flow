@@ -95,7 +95,6 @@ class workflowservice:
                 wf_foirequest_pid = bpmservice().searchinstancebyvariable("rawRequestPID", _raw_metadata_n.wfinstanceid)
                 # FOI - NO | WF - YES 
                 if _req_metadata.wfinstanceid in (None, "") and wf_foirequest_pid not in (None, ""):
-                    print("match-1")
                     FOIRequest.updateWFInstance(_req_metadata.foirequestid, wf_foirequest_pid, "System")  
                     _req_metadata.__dict__.update({"wfinstanceid":wf_foirequest_pid})
                 # FOI - YES | WF - NO and FOI - NO  | WF - NO 
@@ -125,7 +124,7 @@ class workflowservice:
         _activity_itr = _all_activity_asc if isallactivity == True else _all_activity_asc_nall     
         _variables = bpmservice().getinstancevariables(wfinstanceid)  
         entry_n = _activity_itr[-1]
-        if (_variables not in (None, []) and "status" not in _variables) and entry_n["status"] not in (UnopenedEvent.open.value):
+        if _variables in (None, []) or (_variables not in (None, []) and "status" not in _variables) and entry_n["status"] not in (UnopenedEvent.open.value):
             for entry in _all_activity_desc:
                 if entry["status"] == OpenedEvent.callforrecords.value:
                     self.__sync_complete_event(requestid, wfinstanceid, entry)
