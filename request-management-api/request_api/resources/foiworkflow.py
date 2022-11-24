@@ -44,7 +44,7 @@ class FOIWorkflow(Resource):
         try:
             logging.info("request details = %s | %s", requesttype, requestid)
             response = workflowservice().syncwfinstance(requesttype, requestid, True)
-            return json.dumps({"message": response}), 200
+            return json.dumps({"message": str(response)}), 200
         except ValueError as err:
             return {'status': 500, 'message':err.messages}, 500
         except KeyError as err:

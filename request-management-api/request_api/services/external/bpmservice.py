@@ -32,6 +32,14 @@ class bpmservice(camundaservice):
             return json.loads(response.content) if response.ok else None
         return None
 
+    def searchinstancebyvariable(self, key, value, token=None):
+        if self.bpmengineresturl is not None:
+            response = requests.get(self.bpmengineresturl+"/process-instance?variables="+key+"_eq_"+str(value), headers = self._getHeaders_(token))
+            if response.ok:
+                _response = json.loads(response.content)
+                return _response[0]["id"] if _response not in ("", []) else None
+        return None
+
     def unopenedsave(self,processinstanceid, userid, messagetype, token=None):
         if self.bpmengineresturl is not None:
             messageschema = MessageSchema().dump({"processInstanceId": processinstanceid,
