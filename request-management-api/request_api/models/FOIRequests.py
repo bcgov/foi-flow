@@ -99,22 +99,21 @@ class FOIRequest(db.Model):
         db.session.commit()  
         return DefaultMethodResult(True,'Request updated',foirequestid)
 
-
     @classmethod
     def getworkflowinstance(cls,requestid)->DefaultMethodResult:
-        instanceid = None
+        request_schema = FOIRequestsSchema()
         try:
-            sql = """select fr3.wfinstanceid from "FOIMinistryRequests" fr2, "FOIRequests" fr3 
+            sql = """select fr3.wfinstanceid, fr3.foirequestid  from "FOIMinistryRequests" fr2, "FOIRequests" fr3 
                         where fr2.foirequest_id = fr3.foirequestid and fr2.foiministryrequestid=:requestid 
-                        and fr3.wfinstanceid is not null order by  fr2."version" limit 1;"""
+                        order by  fr3."version" desc limit 1"""
             rs = db.session.execute(text(sql), {'requestid': requestid})
-            for row in rs:
-                instanceid =  row[0]
+            for row in rs:                
+                request_schema.__dict__.update({"wfinstanceid":row["wfinstanceid"] , "foirequestid": row["foirequestid"]})
         except Exception as ex:
             logging.error(ex)
         finally:
             db.session.close()
-        return instanceid  
+        return request_schema  
     
 class FOIRequestsSchema(ma.Schema):
     class Meta:
