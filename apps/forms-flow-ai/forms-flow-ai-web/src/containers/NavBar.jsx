@@ -18,7 +18,7 @@ const NavBar = React.memo(() => {
   const userRoles = useSelector((state) => state.user.roles);
   const showApplications= useSelector((state) => state.user.showApplications);
   const dispatch = useDispatch();
-  const logoPath = "/logobanner.jpg";
+  const logoPath = "/logo.svg";
   const appName = APPLICATION_NAME;
 
   const logout = () => {
