@@ -57,7 +57,7 @@ class workflowservice:
                     activity = self.__getministryactivity(oldstatus,newstatus) if issync == False else Activity.complete.value
                     isprocessing = self.__isprocessing(id) if issync == False else False  
                     messagename = self.__messagename(oldstatus, activity, usertype, isprocessing)
-                    metadata = json.dumps({"id": filenumber, "previousstatus":previousstatus, "status": ministry["status"] , "assignedGroup": assignedgroup, "assignedTo": assignedto, "assignedministrygroup":ministry["assignedministrygroup"], "ministryRequestID": id, "isPaymentActive": self.__ispaymentactive(ministry["foirequestid"], id), "paymentExpiryDate": paymentexpirydate, "axisRequestId": axisrequestid})
+                    metadata = json.dumps({"id": filenumber, "previousstatus":previousstatus, "status": ministry["status"] , "assignedGroup": assignedgroup, "assignedTo": assignedto, "assignedministrygroup":ministry["assignedministrygroup"], "ministryRequestID": id, "isPaymentActive": self.__ispaymentactive(ministry["foirequestid"], id), "paymentExpiryDate": paymentexpirydate, "axisRequestId": axisrequestid, "issync": issync})
                     if issync == True:                        
                         _variables = bpmservice().getinstancevariables(wfinstanceid)    
                         if ministry["status"] == OpenedEvent.callforrecords.value:
@@ -79,13 +79,13 @@ class workflowservice:
             })
         return bpmservice().feeevent(requestsschema["axisRequestId"], metadata, paymentstatus)    
     
-    def postcorrenspodenceevent(self, ministryid, requestsschema, applicantcorrespondenceid, templatename, attributes):
+    def postcorrenspodenceevent(self, wfinstanceid, ministryid, requestsschema, applicantcorrespondenceid, templatename, attributes):
         paymentexpirydate = self.__getvaluefromlist(attributes,"paymentExpiryDate")
         axisrequestid = self.__getvaluefromschema(requestsschema,"axisRequestId")
         filenumber = self.__getvaluefromschema(requestsschema,"idNumber")
         status = self.__getvaluefromschema(requestsschema,"currentState")
         metadata = json.dumps({"id": filenumber, "status": status , "ministryRequestID": ministryid, "paymentExpiryDate": paymentexpirydate, "axisRequestId": axisrequestid, "applicantcorrespondenceid": applicantcorrespondenceid, "templatename": templatename.replace(" ", "")})
-        bpmservice().correspondanceevent(filenumber, metadata)
+        bpmservice().correspondanceevent(wfinstanceid, filenumber, metadata)
 
     def syncwfinstance(self, requesttype, requestid, isallactivity=False):      
         try:
@@ -98,7 +98,7 @@ class workflowservice:
             if requesttype == "ministryrequest":
                 _req_metadata = FOIRequest.getworkflowinstance(requestid)   #address correlation N 
                 #Search WF Engine using raw PID                
-                wf_foirequest_pid = bpmservice().searchinstancebyvariable("rawRequestPID", _raw_metadata_n.wfinstanceid)
+                wf_foirequest_pid = bpmservice().searchinstancebyvariable("foi-request-processing", "rawRequestPID", _raw_metadata_n.wfinstanceid)
                 # FOI - NO | WF - YES 
                 if _req_metadata.wfinstanceid in (None, "") and wf_foirequest_pid not in (None, ""):
                     FOIRequest.updateWFInstance(_req_metadata.foirequestid, wf_foirequest_pid, "System")  
@@ -177,7 +177,7 @@ class workflowservice:
             if self.__hasreopened(id, "ministryrequest") == True:
                 bpmservice().reopenevent(wfinstanceid, metadata, MessageType.iaoreopen.value)
             else:
-                bpmservice().openedcomplete(filenumber, metadata, messagename)   
+                bpmservice().openedcomplete(wfinstanceid, filenumber, metadata, messagename)   
         else:
             bpmservice().unopenedsave(filenumber, assignedgroup, assignedto, messagename)
          
