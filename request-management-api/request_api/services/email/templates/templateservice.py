@@ -69,7 +69,6 @@ class templateservice:
         return ApplicationCorrespondenceTemplate.get_template_by_name(templatename)
     
     def __generatetemplate(self, dynamictemplatevalues, emailtemplatehtml, title):
-        print("FFAURL = ", current_app.config['FOI_FFA_URL'])
         dynamictemplatevalues["ffaurl"] = current_app.config['FOI_FFA_URL']
         headerfooterhtml = storageservice().downloadtemplate('/TEMPLATES/EMAILS/header_footer_template.html')
         if(emailtemplatehtml is None):
@@ -88,7 +87,6 @@ class templateservice:
         dynamictemplatevalues['title'] = title
         finaltemplate = Template(headerfooterhtml)
         finaltemplatedhtml = finaltemplate.render(dynamictemplatevalues)
-        print("finaltemplatedhtml = ", finaltemplatedhtml)
         return finaltemplatedhtml, content
 
     
