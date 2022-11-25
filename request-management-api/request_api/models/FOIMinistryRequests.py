@@ -105,6 +105,8 @@ class FOIMinistryRequest(db.Model):
         finally:
             db.session.close()
         return statusdate
+
+ 
     
     @classmethod
     def getassignmenttransition(cls,requestid):
@@ -217,13 +219,19 @@ class FOIMinistryRequest(db.Model):
     @classmethod
     def getstatesummary(cls, ministryrequestid):  
         transitions = []
-        try:              
-            sql = """select status, version from (select distinct on (fs2."name") name as status, version from "FOIMinistryRequests" fm inner join "FOIRequestStatuses" fs2 on fm.requeststatusid = fs2.requeststatusid  
-            where foiministryrequestid=:ministryrequestid order by fs2."name", version asc) as fs3 order by version desc;"""
- 
-            rs = db.session.execute(text(sql), {'ministryrequestid': ministryrequestid})        
+        try:
+            """              
+            sql =select status, version from (select distinct name as status, version from "FOIMinistryRequests" fm inner join "FOIRequestStatuses" fs2 on fm.requeststatusid = fs2.requeststatusid  
+            where foiministryrequestid=:ministryrequestid order by version asc) as fs3 order by version desc;
+            """
+            sql = """select fm2.version, fs2."name" as status from  "FOIMinistryRequests" fm2  inner join "FOIRequestStatuses" fs2 on fm2.requeststatusid = fs2.requeststatusid 
+                        where fm2.foiministryrequestid=:ministryrequestid order by version desc"""
+            rs = db.session.execute(text(sql), {'ministryrequestid': ministryrequestid})  
+            _tmp_state = None       
             for row in rs:
-                transitions.append({"status": row["status"], "version": row["version"]})
+                if row["status"] != _tmp_state:
+                    transitions.append({"status": row["status"], "version": row["version"]})
+                    _tmp_state = row["status"]
         except Exception as ex:
             logging.error(ex)
             raise ex
@@ -596,7 +604,11 @@ class FOIMinistryRequest(db.Model):
     @classmethod
     def getrequestoriginalduedate(cls,ministryrequestid):       
         return db.session.query(FOIMinistryRequest.duedate).filter(FOIMinistryRequest.foiministryrequestid == ministryrequestid, FOIMinistryRequest.requeststatusid == 1).order_by(FOIMinistryRequest.version).first()[0]
-         
+
+    @classmethod
+    def getduedate(cls,ministryrequestid):
+        return db.session.query(FOIMinistryRequest.duedate).filter(FOIMinistryRequest.foiministryrequestid == ministryrequestid).order_by(FOIMinistryRequest.version.desc()).first()[0]
+
     @classmethod
     def getupcomingcfrduerecords(cls):
         upcomingduerecords = []
@@ -631,8 +643,7 @@ class FOIMinistryRequest(db.Model):
             raise ex
         finally:
             db.session.close()
-        return upcomingduerecords    
-
+        return upcomingduerecords
 
     @classmethod
     def getupcomingdivisionduerecords(cls):
@@ -662,7 +673,7 @@ class FOIMinistryRequest(db.Model):
             raise ex
         finally:
             db.session.close()
-        return upcomingduerecords  
+        return upcomingduerecords    
 
     @classmethod
     def updateduedate(cls, ministryrequestid, duedate, userid)->DefaultMethodResult:
@@ -672,24 +683,60 @@ class FOIMinistryRequest(db.Model):
         setattr(currequest,'updatedby',userid)
         db.session.commit()  
         return DefaultMethodResult(True,'Request updated',ministryrequestid)
-    
+  
     @classmethod   
     def getministriesopenedbyuid(cls, rawrequestid):
         ministries = []
         try:
-            sql = """select distinct filenumber, axisrequestid, foiministryrequestid, foirequest_id, pa."name" from "FOIMinistryRequests" fpa 
+            """
+            sql = select distinct filenumber, axisrequestid, foiministryrequestid, foirequest_id, pa."name" from "FOIMinistryRequests" fpa 
                     inner join  "FOIRequests" frt on fpa.foirequest_id  = frt.foirequestid and fpa.foirequestversion_id = frt."version" 
                     inner join "ProgramAreas" pa on fpa.programareaid  = pa.programareaid 
-                    where fpa.isactive = true and frt.isactive =true and frt.foirawrequestid=:rawrequestid;""" 
+                    where fpa.isactive = true and frt.isactive =true and frt.foirawrequestid=:rawrequestid;
+            """
+            sql = """select distinct filenumber, axisrequestid, foiministryrequestid, foirequest_id, pa."name", 
+                        assignedministrygroup, assignedministryperson, assignedgroup, assignedto, fs2."name" as status
+                        from "FOIMinistryRequests" fpa  
+                        inner join  "FOIRequests" frt on fpa.foirequest_id  = frt.foirequestid and frt."version" = fpa.foirequestversion_id and frt."version" = 1 
+                        inner join "ProgramAreas" pa on fpa.programareaid  = pa.programareaid 
+                        inner join "FOIRequestStatuses" fs2 on fpa.requeststatusid = fs2.requeststatusid 
+                        where frt.foirawrequestid=:rawrequestid; """ 
             rs = db.session.execute(text(sql), {'rawrequestid': rawrequestid})           
             for row in rs:
-                ministries.append({"filenumber": row["filenumber"], "axisrequestid": row["axisrequestid"], "name": row["name"], "requestid": row["foirequest_id"],"ministryrequestid": row["foiministryrequestid"]})
+                ministries.append({"filenumber": row["filenumber"], "axisrequestid": row["axisrequestid"], "name": row["name"], "requestid": row["foirequest_id"],"ministryrequestid": row["foiministryrequestid"],
+                                    "assignedministrygroup": row["assignedministrygroup"], "assignedministryperson": row["assignedministryperson"], "assignedgroup": row["assignedgroup"], "assignedto": row["assignedto"],
+                                    "id": row["foiministryrequestid"], "foirequestid": row["foirequest_id"], "status": row["status"]})
         except Exception as ex:
             logging.error(ex)
             raise ex
         finally:
             db.session.close()
         return ministries
+
+
+    @classmethod   
+    def getactivitybyid(cls, ministryrequestid):
+        ministries = []
+        try:
+            sql = """select fm2.filenumber, fm2.axisrequestid, fm2.foiministryrequestid, fm2.foirequest_id, fm2.version, fs2."name" as status,
+                        fm2.assignedministrygroup, fm2.assignedministryperson, fm2.assignedgroup, fm2.assignedto  
+                        from  "FOIMinistryRequests" fm2  inner join "FOIRequestStatuses" fs2 on fm2.requeststatusid = fs2.requeststatusid 
+                        where fm2.foiministryrequestid=:ministryrequestid order by version desc""" 
+            rs = db.session.execute(text(sql), {'ministryrequestid': ministryrequestid})   
+            _tmp_state = None        
+            for row in rs:
+                if row["status"] != _tmp_state:
+                    ministries.append({"id": row["foiministryrequestid"], "foirequestid": row["foirequest_id"], "axisrequestid": row["axisrequestid"], "filenumber": row["filenumber"], "status": row["status"], 
+                                    "assignedministrygroup": row["assignedministrygroup"], "assignedministryperson": row["assignedministryperson"], 
+                                    "assignedgroup": row["assignedgroup"], "assignedto": row["assignedto"], "version": row["version"] 
+                                     })
+                    _tmp_state = row["status"] 
+        except Exception as ex:
+            logging.error(ex)
+            raise ex
+        finally:
+            db.session.close()
+        return ministries 
 
     @classmethod
     def getbasequery(cls, iaoassignee, ministryassignee):
@@ -707,6 +754,8 @@ class FOIMinistryRequest(db.Model):
 
         #subquery for getting extension count
         subquery_extension_count = _session.query(FOIRequestExtension.foiministryrequest_id , func.count(distinct(FOIRequestExtension.foirequestextensionid)).filter(FOIRequestExtension.isactive == True).label('extensions')).group_by(FOIRequestExtension.foiministryrequest_id).subquery()
+
+        
         onbehalf_applicantmapping = aliased(FOIRequestApplicantMapping)
         onbehalf_applicant = aliased(FOIRequestApplicant)
 
@@ -1016,6 +1065,13 @@ class FOIMinistryRequest(db.Model):
                 for keyword in params['keywords']:
                     searchcondition.append(FOIMinistryRequest.findfield(params['search'], iaoassignee, ministryassignee).ilike('%'+keyword+'%'))
                 return and_(*searchcondition)
+    @classmethod
+    def getfilenumberforrequest(cls,requestid, ministryrequestid):
+        return db.session.query(FOIMinistryRequest.filenumber).filter_by(foiministryrequestid=ministryrequestid, foirequest_id=requestid).first()[0]
+
+    @classmethod
+    def getaxisrequestidforrequest(cls,requestid, ministryrequestid):   
+        return db.session.query(FOIMinistryRequest.axisrequestid).filter_by(foiministryrequestid=ministryrequestid, foirequest_id=requestid).first()[0]
 
 class FOIMinistryRequestSchema(ma.Schema):
     class Meta:

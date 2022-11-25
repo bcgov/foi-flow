@@ -98,7 +98,7 @@ class FOIRequestNotificationUser(db.Model):
         finally:
             db.session.close()
         return notifications  
-
+    
     @classmethod
     def getnotificationidsbyuserandid(cls, userid, notificationids):
         ids = []
@@ -113,7 +113,7 @@ class FOIRequestNotificationUser(db.Model):
         finally:
             db.session.close()
         return ids
-
+        
 class FOIRequestNotificationUserSchema(ma.Schema):
     class Meta:
         fields = ('notificationid', 'userid','notificationusertypeid','created_at','createdby','updated_at','updatedby') 

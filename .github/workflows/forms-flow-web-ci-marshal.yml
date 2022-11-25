@@ -1,0 +1,29 @@
+name: Forms Flow Web CI
+
+
+on:
+  pull_request:
+    branches:
+      - test-marshal
+      - dev-marshal
+    paths:
+      - "forms-flow-web/**"
+
+
+defaults:
+  run:
+    shell: bash
+    working-directory: ./forms-flow-web
+
+jobs:
+  forms-flow-web-docker-build-check:
+    runs-on: ubuntu-20.04
+    name: Build dockerfile to ensure it works
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: docker build to check strictness
+        id: docker-build
+        run: |
+          docker build -f Dockerfile.local .
+

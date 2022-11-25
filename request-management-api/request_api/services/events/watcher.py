@@ -20,7 +20,7 @@ class watcherevent:
             notificationservice().dismissnotifications_by_requestid_type_userid(requestid, requesttype, 'Watcher', watcher['watchedby'])       
         return  DefaultMethodResult(True,'No change',requestid)
 
-    
+
     def __createnotification(self, requesttype, watcher, userid, username):
         notification = self.__preparenotification(username)
         return notificationservice().createwatchernotification({"message" : notification}, requesttype, watcher, userid)
@@ -29,7 +29,4 @@ class watcherevent:
         return self.__notificationmessage(username)
 
     def __notificationmessage(self,username):
-        return username+' has removed you as a watcher to this request'        
-            
-
-        
+        return username+' has removed you as a watcher to this request' 

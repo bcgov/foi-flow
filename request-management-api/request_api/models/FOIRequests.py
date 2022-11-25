@@ -6,6 +6,8 @@ from sqlalchemy.orm import relationship,backref
 from .default_method_result import DefaultMethodResult
 from sqlalchemy.dialects.postgresql import JSON, UUID
 from sqlalchemy.sql.expression import distinct
+from sqlalchemy import text
+import logging
 
 import json
 class FOIRequest(db.Model):
@@ -71,7 +73,7 @@ class FOIRequest(db.Model):
         for ministry in foirequest.ministryRequests:
             assignedministrygroup = ministry.assignedministrygroup if ministry.assignedministrygroup is not None else ""                                
             assignedgroup = ministry.assignedgroup if ministry.assignedgroup is not None else ""                                
-            ministryarr.append({"id": ministry.foiministryrequestid, "filenumber": ministry.filenumber, "status": ministry.requeststatus.name, "assignedministrygroup": assignedministrygroup, "assignedgroup": assignedgroup, "version":ministry.version})    
+            ministryarr.append({"id": ministry.foiministryrequestid, "foirequestid": ministry.foirequest_id, "axisrequestid": ministry.axisrequestid, "filenumber": ministry.filenumber, "status": ministry.requeststatus.name, "assignedministrygroup": assignedministrygroup, "assignedgroup": assignedgroup, "version":ministry.version})    
         return DefaultMethodResult(True,'Request added',foirequest.foirequestid,ministryarr,foirequest.wfinstanceid)
                           
     @classmethod
@@ -96,6 +98,22 @@ class FOIRequest(db.Model):
         currequest.updatedby = userid
         db.session.commit()  
         return DefaultMethodResult(True,'Request updated',foirequestid)
+
+    @classmethod
+    def getworkflowinstance(cls,requestid)->DefaultMethodResult:
+        request_schema = FOIRequestsSchema()
+        try:
+            sql = """select fr3.wfinstanceid, fr3.foirequestid  from "FOIMinistryRequests" fr2, "FOIRequests" fr3 
+                        where fr2.foirequest_id = fr3.foirequestid and fr2.foiministryrequestid=:requestid 
+                        order by  fr3."version" desc limit 1"""
+            rs = db.session.execute(text(sql), {'requestid': requestid})
+            for row in rs:                
+                request_schema.__dict__.update({"wfinstanceid":row["wfinstanceid"] , "foirequestid": row["foirequestid"]})
+        except Exception as ex:
+            logging.error(ex)
+        finally:
+            db.session.close()
+        return request_schema  
     
 class FOIRequestsSchema(ma.Schema):
     class Meta:

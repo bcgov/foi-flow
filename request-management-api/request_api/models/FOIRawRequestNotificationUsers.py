@@ -97,7 +97,7 @@ class FOIRawRequestNotificationUser(db.Model):
         db.session.query(FOIRawRequestNotificationUser).filter(FOIRawRequestNotificationUser.notificationid.in_(notificationids)).delete(synchronize_session=False)
         db.session.commit()  
         return DefaultMethodResult(True,'Notifications deleted for id',notificationids)  
-
+     
     @classmethod
     def getnotificationidsbyuserandid(cls, userid, notificationids):
         ids = []
@@ -112,7 +112,7 @@ class FOIRawRequestNotificationUser(db.Model):
         finally:
             db.session.close()
         return ids
-
+        
 class FOIRawRequestNotificationUserSchema(ma.Schema):
     class Meta:
         fields = ('notificationid', 'userid','notificationusertypeid','created_at','createdby','updated_at','updatedby') 
