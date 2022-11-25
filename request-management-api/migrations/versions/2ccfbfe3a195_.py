@@ -1,7 +1,7 @@
 """empty message
 
 Revision ID: 2ccfbfe3a195
-Revises: b23c56f40dff
+Revises: 6d0085ebcf15
 Create Date: 2022-08-15 11:05:48.013459
 
 """
@@ -17,10 +17,8 @@ depends_on = None
 
 
 def upgrade():
-    op.execute('ALTER TABLE public."FOIRequestPayments" ADD paymentexpirydate timestamp') 
-    op.execute('Insert into public."NotificationTypes" (name, description, isactive) values (\'Payment\', \'Payment\', true);commit;')
+    op.execute('ALTER TABLE public."FOIRequestPayments" ADD paymentexpirydate timestamp')
 
 
 def downgrade():
-    op.execute('ALTER TABLE public."FOIRequestPayments" DROP paymentexpirydate') 
-    op.execute('delete from  public."NotificationTypes" where name in (\'Payment\');commit;')
+    op.execute('ALTER TABLE public."FOIRequestPayments" DROP paymentexpirydate')

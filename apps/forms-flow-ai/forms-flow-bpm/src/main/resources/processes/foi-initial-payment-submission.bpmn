@@ -299,6 +299,7 @@ execution.setVariable("saveDataPayload", JSON.stringify(saveDataPayload));</camu
                 <camunda:entry key="Authorization">Bearer ${accessToken}</camunda:entry>
               </camunda:map>
             </camunda:inputParameter>
+            <camunda:inputParameter name="payload">${saveDataPayload}</camunda:inputParameter>
             <camunda:outputParameter name="responseCode">
               <camunda:script scriptFormat="javascript">if (connector.getVariable("statusCode") != 200) {
 	throw new org.camunda.bpm.engine.delegate.BpmnError("FOI-CANCEL-SUB-API-ERR", response);
@@ -753,7 +754,7 @@ else {
     <bpmn:sequenceFlow id="Flow_18hb94c" sourceRef="Gateway_1xvmjq8" targetRef="Activity_0k05bsn">
       <bpmn:extensionElements>
         <camunda:executionListener event="take">
-          <camunda:script scriptFormat="javascript"></camunda:script>
+          <camunda:script scriptFormat="javascript" />
         </camunda:executionListener>
       </bpmn:extensionElements>
       <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${balanceDue_f &gt; 0}</bpmn:conditionExpression>
@@ -819,6 +820,14 @@ execution.setVariable("balanceDue_f", parseFloat(fee)); </camunda:script>
       <bpmndi:BPMNShape id="Lane_1u9yqiq_di" bpmnElement="Lane_1u9yqiq" isHorizontal="true">
         <dc:Bounds x="170" y="125" width="1950" height="410" />
       </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_05oxz1b_di" bpmnElement="Flow_05oxz1b">
+        <di:waypoint x="980" y="308" />
+        <di:waypoint x="980" y="238" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_18hb94c_di" bpmnElement="Flow_18hb94c">
+        <di:waypoint x="1005" y="333" />
+        <di:waypoint x="1050" y="333" />
+      </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_1bmyxxs_di" bpmnElement="Flow_1bmyxxs">
         <di:waypoint x="1170" y="1410" />
         <di:waypoint x="1382" y="1410" />
@@ -1082,14 +1091,6 @@ execution.setVariable("balanceDue_f", parseFloat(fee)); </camunda:script>
       <bpmndi:BPMNEdge id="Flow_11qcuod_di" bpmnElement="Flow_11qcuod">
         <di:waypoint x="1300" y="1065" />
         <di:waypoint x="1390" y="1065" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_18hb94c_di" bpmnElement="Flow_18hb94c">
-        <di:waypoint x="1005" y="333" />
-        <di:waypoint x="1050" y="333" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_05oxz1b_di" bpmnElement="Flow_05oxz1b">
-        <di:waypoint x="980" y="308" />
-        <di:waypoint x="980" y="238" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="Event_1wipndr_di" bpmnElement="Event_0crrhhb">
         <dc:Bounds x="212" y="315" width="36" height="36" />

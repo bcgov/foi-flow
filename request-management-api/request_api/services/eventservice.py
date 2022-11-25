@@ -6,7 +6,9 @@ from request_api.services.events.division import divisionevent
 from request_api.services.events.assignment import assignmentevent
 from request_api.services.events.cfrdate import cfrdateevent
 from request_api.services.events.comment import commentevent
+from request_api.services.events.watcher import watcherevent
 from request_api.services.events.legislativedate import legislativedateevent
+from request_api.services.events.divisiondate import divisiondateevent
 from request_api.services.events.extension import extensionevent
 from request_api.services.events.cfrfeeform import cfrfeeformevent
 from request_api.services.events.payment import paymentevent
@@ -56,8 +58,9 @@ class eventservice:
         try:
             cfreventresponse = cfrdateevent().createdueevent() 
             legislativeeventresponse = legislativedateevent().createdueevent()   
-            if cfreventresponse.success == False or legislativeeventresponse.success == False:
-                current_app.logger.error("FOI Notification failed for event cfr response=%s ; legislative response=%s" % (cfreventresponse.message, legislativeeventresponse.message))     
+            divisioneventresponse = divisiondateevent().createdueevent()   
+            if cfreventresponse.success == False or legislativeeventresponse.success == False or divisioneventresponse.success == False:
+                current_app.logger.error("FOI Notification failed for reminder event response=%s ; legislative response=%s ; division response=%s" % (cfreventresponse.message, legislativeeventresponse.message, divisioneventresponse.message,))     
                 return DefaultMethodResult(False,'Due reminder notifications failed',cfreventresponse.identifier)
             return DefaultMethodResult(True,'Due reminder notifications created',cfreventresponse.identifier)
         except BusinessException as exception:            
@@ -72,6 +75,15 @@ class eventservice:
             return DefaultMethodResult(True,'Comment notifications created',commentresponse.identifier)
         except BusinessException as exception:            
             self.__logbusinessexception(exception)
+    
+    def posteventforwatcher(self, requestid, request, requesttype, userid, username):
+        try: 
+            watcherresponse = watcherevent().createwatcherevent(requestid, request, requesttype, userid,username)           
+            if watcherresponse.success == False: 
+                current_app.logger.error("FOI Notification failed for event for request= %s ; watcher response=%s" % (requestid, watcherresponse.message))
+        except BusinessException as exception:            
+            self.__logbusinessexception(exception)
+
 
     async def posteventforsanctioncfrfeeform(self, ministryrequestid, userid, username):
         self.__posteventforsanctioncfrfeeform(ministryrequestid, userid, username)

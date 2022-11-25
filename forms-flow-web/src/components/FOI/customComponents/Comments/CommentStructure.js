@@ -25,7 +25,7 @@ import { saveAs } from "file-saver";
 import { downloadZip } from "client-zip";
 import { useDispatch } from "react-redux";
 import * as html2pdf from 'html-to-pdf-js';
-// import { html2pdf } from "html-to-pdf-js";
+import NewCommentIndicator from './NewCommentIndicator';
 
 
 const CommentStructure = ({ i, reply, parentId, totalcommentCount, currentIndex, isreplysection, hasAnotherUserComment, fullName, isEmail=false, ministryId=null}) => {
@@ -259,6 +259,7 @@ const CommentStructure = ({ i, reply, parentId, totalcommentCount, currentIndex,
           className="userInfo"
           style={reply ? { marginLeft: 15, marginTop: '6px' }: {}}
         >
+          <NewCommentIndicator commentdate={i.dateUF}/>
           <div className="commentsTwo">
 
             <div className="fullName">{fullName} </div> |  <div className="commentdate">{i.date} </div>

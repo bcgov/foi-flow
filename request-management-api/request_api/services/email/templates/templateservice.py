@@ -6,6 +6,7 @@ from request_api.services.applicantcorrespondence.applicantcorrespondencelog imp
 from request_api.models.ApplicationCorrespondenceTemplates import ApplicationCorrespondenceTemplate
 import json
 import logging
+from flask import current_app
 
 class templateservice:
     """This class is reserved for jinja templating services integration.
@@ -27,7 +28,6 @@ class templateservice:
             if _template is None:
                 _templatename = self.__gettemplatenamewrapper(servicename, requestjson, ministryrequestid)
                 _template = self.__gettemplate(_templatename)
-            print("isnotreceipt ==== ", templateconfig().isnotreceipt(servicename))
             if (applicantcorrespondenceid and applicantcorrespondenceid != 0 and templateconfig().isnotreceipt(servicename)):
                 emailtemplatehtml = self.__generatecorrespondencetetemplate(applicantcorrespondenceid)
             else:
@@ -45,14 +45,12 @@ class templateservice:
                 balancedue = float(requestjson['cfrfee']['feedata']["balanceDue"])
                 prevstate = self.__getprevstate(requestjson)
                 if balancedue > 0:
-                    print("__gettemplatenamewrapper templatekey = HALFPAYMENT")
                     return "HALFPAYMENT"
 
                 elif balancedue == 0:
                     templatekey = "FULLPAYMENT"
                     if prevstate.lower() == "response" or (_latesttemplatename and _latesttemplatename == 'PAYOUTSTANDING'):
                         templatekey = "PAYOUTSTANDINGFULLPAYMENT"
-                    print("__gettemplatenamewrapper templatekey = ", templatekey)
                     return templatekey
         
         return _templatename
@@ -71,6 +69,7 @@ class templateservice:
         return ApplicationCorrespondenceTemplate.get_template_by_name(templatename)
     
     def __generatetemplate(self, dynamictemplatevalues, emailtemplatehtml, title):
+        dynamictemplatevalues["ffaurl"] = current_app.config['FOI_FFA_URL']
         headerfooterhtml = storageservice().downloadtemplate('/TEMPLATES/EMAILS/header_footer_template.html')
         if(emailtemplatehtml is None):
             raise ValueError('No template found')

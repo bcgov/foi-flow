@@ -25,22 +25,24 @@ class paymentservice:
     Supports creation, update and delete of payment
     """
     
-    def createpayment(self, requestid, ministryrequestid, data):
+    def createpayment(self, requestid, ministryrequestid, data, createdby='System'):
         payment = FOIRequestPayment()
         ministryversion = FOIMinistryRequest.getversionforrequest(ministryrequestid)
         payment.foirequestid = requestid
         payment.ministryrequestid = ministryrequestid
         payment.ministryrequestversion = ministryversion
         payment.paymenturl = data['paymenturl'] if 'paymenturl' in data else None
-        payment.paymentexpirydate = data['paymentexpirydate'] if 'paymentexpirydate' in data else None
+        payment.paymentexpirydate = data['paymentExpiryDate'] if 'paymentExpiryDate' in data else self.getpaymentexpirydate(requestid, ministryrequestid)
         payment.version = 1
-        payment.createdby = 'System'
+        payment.createdby = createdby
         _payment = FOIRequestPayment.getpayment(requestid, ministryrequestid)
         if _payment is not None and _payment != {}:
             payment.version = _payment["version"] + 1
-            payment.paymentid = _payment["paymentid"]
-            
+            payment.paymentid = _payment["paymentid"]            
         return FOIRequestPayment.savepayment(payment)
+
+    def updatepayment(self, paymentid, data, userid):
+        return FOIRequestPayment.updatepayment(paymentid, data["paymenturl"], userid)
     
     def createpaymentversion(self, request_id, ministry_request_id, amountpaid):
         payment = self.__createpaymentinstance(request_id, ministry_request_id)
@@ -48,9 +50,10 @@ class paymentservice:
             payment.paidamount = amountpaid            
         return FOIRequestPayment.savepayment(payment)
 
-    def cancelpayment(self, request_id, ministry_request_id):
+    def cancelpayment(self, request_id, ministry_request_id, paymentschema):
         payment = self.__createpaymentinstance(request_id, ministry_request_id)
-        if payment is not None and payment != {}:            
+        if payment is not None and payment != {}:   
+            payment.paymenturl = paymentschema['paymenturl']        
             payment.paymentexpirydate = datetime.now().isoformat()  
             payment.createdby = 'System_Cancel'
         return FOIRequestPayment.savepayment(payment)
@@ -73,6 +76,13 @@ class paymentservice:
 
     def getpayment(self, requestid, ministryrequestid):
         return FOIRequestPayment.getpayment(requestid, ministryrequestid)
+
+    def getpaymentexpirydate(self, requestid, ministryrequestid):
+        payment = FOIRequestPayment.getpayment(requestid, ministryrequestid)
+        paymentexpirydate = payment["paymentexpirydate"] if payment not in (None, {}) else None
+        if paymentexpirydate is not None:
+            return parse(str(paymentexpirydate)).strftime("%Y-%m-%d")
+        return ""
 
     def createpaymentreceipt(self, request_id, ministry_request_id, data, parsed_args):
         try:

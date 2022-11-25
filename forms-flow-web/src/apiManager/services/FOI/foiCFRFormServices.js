@@ -67,8 +67,7 @@ export const saveCFRForm = (
     "<requestid>",
     requestId
   ), "<ministryrequestid>", ministryId);
-  console.log(`apiUrl == ${apiUrl}`)
-
+  
   httpPOSTRequest(apiUrl, data)
     .then((res) => {
       if (res.data) {

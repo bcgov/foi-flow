@@ -55,6 +55,24 @@ const OnBehalfOfDetails = React.memo(({additionalInfo, createSaveRequestObject, 
     const [anotherNickNameText, setAnotherNickName] = React.useState(validateFields(additionalInfo, FOI_COMPONENT_CONSTANTS.ANOTHER_NICKNAME));
     const dob = validateFields(additionalInfo, FOI_COMPONENT_CONSTANTS.ANOTHER_DOB);
     const [anotherDOBText, setAnotherDOB] = React.useState(dob);
+
+    React.useEffect(() => {
+        setAnotherFirstName(
+            validateFields(additionalInfo, FOI_COMPONENT_CONSTANTS.ANOTHER_FIRST_NAME)
+        );
+        setAnotherMiddleName(
+            validateFields(additionalInfo, FOI_COMPONENT_CONSTANTS.ANOTHER_MIDDLE_NAME)
+        );
+        setAnotherLastName(
+            validateFields(additionalInfo, FOI_COMPONENT_CONSTANTS.ANOTHER_LAST_NAME)
+        );
+        setAnotherNickName(
+            validateFields(additionalInfo, FOI_COMPONENT_CONSTANTS.ANOTHER_NICKNAME)
+        );
+        setAnotherDOB(
+            validateFields(additionalInfo, FOI_COMPONENT_CONSTANTS.ANOTHER_DOB)
+        );
+    }, [additionalInfo]);
     
     const handleFirtNameChange = (e) => {
         setAnotherFirstName(e.target.value);

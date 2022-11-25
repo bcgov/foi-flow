@@ -310,7 +310,7 @@ export const CFRForm = ({
 
   const handleAmountPaidChanges = (e: React.ChangeEvent<HTMLInputElement>) => {
     const re = new RegExp('^-?\\d+(?:\.\\d{0,' + (2 || -1) + '})?');
-    const value : number = +e.target.value.match(re)![0]
+    const value : number = +(e.target.value.match(re)?.[0] || 0)
     if (value === 0) {
       setFormData(values => ({...values, estimatePaymentMethod: 'init', balancePaymentMethod: 'init'}));
     } else if (formData.amountPaid === 0 && value > 0) {
@@ -326,7 +326,7 @@ export const CFRForm = ({
   const handleAmountChanges = (e: React.ChangeEvent<HTMLInputElement>) => {
     const name : string = e.target.name;
     const re = new RegExp('^-?\\d+(?:\.\\d{0,' + (2 || -1) + '})?');
-    const value : number = +e.target.value.match(re)![0]
+    const value : number = +(e.target.value.match(re)?.[0] || 0)
     if (value <= Math.max(formData.actualTotalDue, formData.estimatedTotalDue)) {
       setFormData(values => ({...values, [name]: value}));
     }
@@ -335,7 +335,7 @@ export const CFRForm = ({
   const handleRefundChanges = (e: React.ChangeEvent<HTMLInputElement>) => {
     const name : string = e.target.name;
     const re = new RegExp('^-?\\d+(?:\.\\d{0,' + (2 || -1) + '})?');
-    const value : number = +e.target.value.match(re)![0]
+    const value : number = +(e.target.value.match(re)?.[0] || 0)
     if(value <= formData.amountPaid)
       setFormData(values => ({...values, [name]: value}));
   };
@@ -377,16 +377,16 @@ export const CFRForm = ({
   }
 
   const cfrStatusDisabled = () => {
-    if (formHistory.length > 0 && (requestState === StateEnum.callforrecords.name || requestState === StateEnum.feeassessed.name || requestState === StateEnum.onhold.name)) {
+    if (formHistory.length > 0 && [StateEnum.feeassessed.name, StateEnum.onhold.name, StateEnum.callforrecords.name].includes(requestState)) {
       if (isMinistry) {
-        return initialFormData.formStatus === 'review' || initialFormData.formStatus === 'approved' || isNewCFRForm;
+        return ['review', 'approved'].includes(initialFormData.formStatus) || isNewCFRForm;
       } else {
         return initialFormData.formStatus !== 'review';
       }
     }
-    if (requestState === StateEnum.feeassessed.name) {
+    if (formData.balanceRemaining > 0 &&  [StateEnum.feeassessed.name, StateEnum.onhold.name].includes(requestState)) {
       if (isMinistry) {
-        return initialFormData.formStatus !== 'clarification';
+        return !['clarification', 'init'].includes(initialFormData.formStatus);
       } else {
         return initialFormData.formStatus === 'clarification';
       }

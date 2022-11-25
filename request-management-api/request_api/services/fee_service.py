@@ -87,7 +87,7 @@ class FeeService:
         """Complete payment."""
         response_url = pay_response.get('response_url')
         current_app.logger.debug('response_url : %s', response_url)
-        print(self.payment.status)
+        
         if self.payment.status == 'PAID' or not response_url:
             raise BusinessException(Error.INVALID_INPUT)
 
@@ -95,9 +95,8 @@ class FeeService:
         self.payment.commit()
 
         parsed_args = HashService.parse_url_params(response_url)
-        print(parsed_args)
+        
         # Validate transaction number
-        print(self.payment.transaction_number)
         if self.payment.transaction_number != parsed_args.get('pbcTxnNumber'):
             raise BusinessException(Error.INVALID_INPUT)
 

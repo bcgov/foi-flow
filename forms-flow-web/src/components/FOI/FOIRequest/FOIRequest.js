@@ -203,8 +203,9 @@ const FOIRequest = React.memo(({ userDetail }) => {
    useEffect(async() => {
     if (isAddRequest) {
       dispatch(fetchFOIAssignedToList("", "", ""));
+      dispatch(fetchFOIProgramAreaList());
     } else {
-      await Promise.all([dispatch(fetchFOIRequestDetailsWrapper(requestId, ministryId)),
+      await Promise.all([dispatch(fetchFOIProgramAreaList()), dispatch(fetchFOIRequestDetailsWrapper(requestId, ministryId)),
       dispatch(fetchFOIRequestDescriptionList(requestId, ministryId))]);
       dispatch(fetchFOIRequestNotesList(requestId, ministryId));
       dispatch(fetchFOIRequestAttachmentsList(requestId, ministryId));
@@ -213,8 +214,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
       dispatch(fetchApplicantCorrespondenceTemplates());
     }
 
-    dispatch(fetchFOICategoryList());
-    dispatch(fetchFOIProgramAreaList());
+    dispatch(fetchFOICategoryList());    
     dispatch(fetchFOIReceivedModeList());
     dispatch(fetchFOIDeliveryModeList());
     dispatch(fetchClosingReasonList());
@@ -496,7 +496,9 @@ const FOIRequest = React.memo(({ userDetail }) => {
     validation,
     assignedToValue,
     requiredRequestDetailsValues,
-    requiredAxisDetails
+    requiredAxisDetails,
+    isAddRequest,
+    _currentrequestStatus
   );
 
   const classes = useStyles();
@@ -799,8 +801,8 @@ const FOIRequest = React.memo(({ userDetail }) => {
             id="Request"
             className={clsx("tabcontent", {
               active: tabLinksStatuses.Request.active,
-              [classes.displayed]: tabLinksStatuses.Request.display,
-              [classes.hidden]: !tabLinksStatuses.Request.display,
+              [classes.displayed]: tabLinksStatuses.Request?.display,
+              [classes.hidden]: !tabLinksStatuses.Request?.display,
             })}
           >
             <div className="container foi-review-request-container">
@@ -988,8 +990,8 @@ const FOIRequest = React.memo(({ userDetail }) => {
             id="Attachments"
             className={clsx("tabcontent", {
               active: tabLinksStatuses.Attachments.active,
-              [classes.displayed]: tabLinksStatuses.Attachments.display,
-              [classes.hidden]: !tabLinksStatuses.Attachments.display,
+              [classes.displayed]: tabLinksStatuses.Attachments?.display,
+              [classes.hidden]: !tabLinksStatuses.Attachments?.display,
             })}
           >
             {!isAttachmentListLoading &&
@@ -1017,8 +1019,8 @@ const FOIRequest = React.memo(({ userDetail }) => {
             id="CFRForm"
             className={clsx("tabcontent", {
               active: tabLinksStatuses.CFRForm.active,
-              [classes.displayed]: tabLinksStatuses.CFRForm.display,
-              [classes.hidden]: !tabLinksStatuses.CFRForm.display,
+              [classes.displayed]: tabLinksStatuses.CFRForm?.display,
+              [classes.hidden]: !tabLinksStatuses.CFRForm?.display,
             })}
           >
             <CFRForm            
@@ -1034,8 +1036,8 @@ const FOIRequest = React.memo(({ userDetail }) => {
             id="Comments"
             className={clsx("tabcontent", {
               active: tabLinksStatuses.Comments.active,
-              [classes.displayed]: tabLinksStatuses.Comments.display,
-              [classes.hidden]: !tabLinksStatuses.Comments.display,
+              [classes.displayed]: tabLinksStatuses.Comments?.display,
+              [classes.hidden]: !tabLinksStatuses.Comments?.display,
             })}
           >
             {!isLoading &&
@@ -1077,8 +1079,8 @@ const FOIRequest = React.memo(({ userDetail }) => {
             id="ContactApplicant"
             className={clsx("tabcontent", {
               active: tabLinksStatuses.ContactApplicant.active,
-              [classes.displayed]: tabLinksStatuses.ContactApplicant.display,
-              [classes.hidden]: !tabLinksStatuses.ContactApplicant.display,
+              [classes.displayed]: tabLinksStatuses.ContactApplicant?.display,
+              [classes.hidden]: !tabLinksStatuses.ContactApplicant?.display,
             })}
           >
             {!isLoading &&

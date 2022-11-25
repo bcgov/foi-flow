@@ -28,14 +28,16 @@ class rawrequestservicegetter:
             
             assignedgroupvalue = request.assignedgroup if request.assignedgroup else "Unassigned" 
             assignedtovalue = request.assignedto if request.assignedto else "Unassigned"
-            _createddate = request.created_at
+            dt = maya.parse(request.created_at).datetime(to_timezone='America/Vancouver', naive=False)
+            _createddate = dt
+
             unopenrequest = {'id': request.requestid,
                              'firstName': firstname,
                              'lastName': lastname,
                              'requestType': requesttype,
                              'currentState': request.status,
-                             'receivedDate': _createddate.strftime('%Y %b, %d'),
-                             'receivedDateUF': str(_createddate),
+                             'receivedDate': request.requestrawdata["receivedDate"] if "receivedDate" in request.requestrawdata else _createddate.strftime('%Y %b, %d'),
+                             'receivedDateUF':request.requestrawdata["receivedDateUF"] if "receivedDateUF" in request.requestrawdata else str(_createddate),
                              'assignedGroup': assignedgroupvalue,
                              'assignedTo': assignedtovalue,
                              'xgov': 'No',
@@ -65,6 +67,7 @@ class rawrequestservicegetter:
             if request['status'] == 'Closed':
                 request['requestrawdata']['stateTransition']= FOIRawRequest.getstatesummary(requestid)
             request['requestrawdata']['wfinstanceid'] = request['wfinstanceid']
+            request['requestrawdata']['closedate']= self.__getclosedate(request['closedate'])
             return request['requestrawdata']    
         elif request != {} and request['sourceofsubmission'] == "intake":
             requestrawdata = request['requestrawdata']
@@ -81,10 +84,15 @@ class rawrequestservicegetter:
             request['requestrawdata']['requeststatusid'] =  requeststatus['requeststatusid']            
             request['requestrawdata']['lastStatusUpdateDate'] = FOIRawRequest.getLastStatusUpdateDate(requestid, request['status']).strftime(self.__generaldateformat())
             request['requestrawdata']['stateTransition']= FOIRawRequest.getstatesummary(requestid)
+            request['requestrawdata']['closedate']= self.__getclosedate(request['closedate'])
             return request['requestrawdata']
         else:
             return None
-        
+    
+    def __getclosedate(self, requestclosedate):
+        closedate = parse(requestclosedate).strftime(self.__generaldateformat()) if requestclosedate is not None else None
+        return closedate
+
     def getrawrequestfieldsforid(self, requestid, fields):   
         request = FOIRawRequest.get_request(requestid)    
         fieldsresp = {}
@@ -151,7 +159,8 @@ class rawrequestservicegetter:
                                'topic': decriptiontimeframe['topic'],
                                'selectedMinistries': requestrawdata['ministry']['selectedMinistry'],
                                'lastStatusUpdateDate': FOIRawRequest.getLastStatusUpdateDate(requestid, request['status']).strftime(self.__generaldateformat()),
-                               'stateTransition': FOIRawRequest.getstatesummary(requestid)
+                               'stateTransition': FOIRawRequest.getstatesummary(requestid),
+                               'closedate': request['closedate'].strftime(self.__generaldateformat()) if request['closedate'] is not None else None
                                }
 
     def __prepareadditionalpersonalinfo(self, requestrawdata):

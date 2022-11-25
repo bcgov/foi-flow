@@ -188,6 +188,7 @@ services:
         - PAYMENT_EXPIRY_DAYS=${PAYMENT_EXPIRY_DAYS}
         - REACT_APP_OSS_S3_FORMS_BUCKET=${OSS_S3_FORMS_BUCKET}
         - REACT_APP_OSS_S3_HOST=${OSS_S3_HOST}
+        - FOI_FFA_URL=${FOI_FFA_URL}
     volumes:
       - ".:/app"
       - "/app/node_modules"

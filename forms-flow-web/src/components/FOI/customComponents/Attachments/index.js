@@ -505,7 +505,7 @@ const Attachment = React.memo(({indexValue, attachment, handlePopupButtonClick, 
       >
         <Grid item xs={2} style={{ minWidth: "150px" }} >
           <Chip
-            label={getCategory(attachment.category).display}
+            label={getCategory(attachment.category)?.display}
             size="small"
             className={clsx(classes.chip, {
               [classes.chipPrimary]: !disabled,

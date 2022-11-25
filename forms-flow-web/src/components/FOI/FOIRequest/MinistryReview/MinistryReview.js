@@ -531,8 +531,8 @@ const MinistryReview = React.memo(({ userDetail }) => {
             id="Request"
             className={clsx("tabcontent", {
               active: tabLinksStatuses.Request.active,
-              [classes.displayed]: tabLinksStatuses.Request.display,
-              [classes.hidden]: !tabLinksStatuses.Request.display,
+              [classes.displayed]: tabLinksStatuses.Request?.display,
+              [classes.hidden]: !tabLinksStatuses.Request?.display,
             })}
           >
             <div className="container foi-review-request-container">
@@ -612,8 +612,8 @@ const MinistryReview = React.memo(({ userDetail }) => {
             id="CFRForm"
             className={clsx("tabcontent", {
               active: tabLinksStatuses.CFRForm.active,
-              [classes.displayed]: tabLinksStatuses.CFRForm.display,
-              [classes.hidden]: !tabLinksStatuses.CFRForm.display,
+              [classes.displayed]: tabLinksStatuses.CFRForm?.display,
+              [classes.hidden]: !tabLinksStatuses.CFRForm?.display,
             })}
           >
             <CFRForm            
@@ -629,8 +629,8 @@ const MinistryReview = React.memo(({ userDetail }) => {
             id="Attachments"
             className={clsx("tabcontent", {
               active: tabLinksStatuses.Attachments.active,
-              [classes.displayed]: tabLinksStatuses.Attachments.display,
-              [classes.hidden]: !tabLinksStatuses.Attachments.display,
+              [classes.displayed]: tabLinksStatuses.Attachments?.display,
+              [classes.hidden]: !tabLinksStatuses.Attachments?.display,
             })}
           >
             {!isAttachmentListLoading &&
@@ -660,8 +660,8 @@ const MinistryReview = React.memo(({ userDetail }) => {
             id="Comments"
             className={clsx("tabcontent", {
               active: tabLinksStatuses.Comments.active,
-              [classes.displayed]: tabLinksStatuses.Comments.display,
-              [classes.hidden]: !tabLinksStatuses.Comments.display,
+              [classes.displayed]: tabLinksStatuses.Comments?.display,
+              [classes.hidden]: !tabLinksStatuses.Comments?.display,
             })}
           >
             {!isLoading &&

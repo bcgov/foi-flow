@@ -30,6 +30,7 @@ from request_api.schemas.foiapplicantcorrespondencelog import  FOIApplicantCorre
 from request_api.auth import auth, AuthHelper
 from request_api.services.requestservice import requestservice
 from request_api.services.cfrfeeservice import cfrfeeservice
+from request_api.services.paymentservice import paymentservice
 
 API = Namespace('FOIApplicantCorrespondenceLog', description='Endpoints for FOI Applicant Correspondence Log')
 TRACER = Tracer.get_instance()
@@ -88,13 +89,21 @@ class FOIFlowApplicantCorrespondence(Resource):
     def post(requestid, ministryrequestid):
         try:
             requestjson = request.get_json()
-            applicantcorrespondencelog = FOIApplicantCorrespondenceSchema().load(data=requestjson)           
-            result = applicantcorrespondenceservice().saveapplicantcorrespondencelog(applicantcorrespondencelog, ministryrequestid, AuthHelper.getuserid())
+            applicantcorrespondencelog = FOIApplicantCorrespondenceSchema().load(data=requestjson) 
+            result = applicantcorrespondenceservice().saveapplicantcorrespondencelog(requestid, ministryrequestid, applicantcorrespondencelog, AuthHelper.getuserid())
             if cfrfeeservice().getactivepayment(requestid, ministryrequestid) != None:
                 requestservice().postfeeeventtoworkflow(requestid, ministryrequestid, "CANCELLED")
+            if result.success == True:
+                _attributes = applicantcorrespondencelog["attributes"][0] if "attributes" in applicantcorrespondencelog else None
+                _paymentexpirydate =  _attributes["paymentExpiryDate"] if _attributes is not None and "paymentExpiryDate" in _attributes else None
+                if _paymentexpirydate not in (None, ""):
+                    paymentservice().createpayment(requestid, ministryrequestid, _attributes, AuthHelper.getuserid())            
             requestservice().postcorrespondenceeventtoworkflow(requestid, ministryrequestid, result.identifier, applicantcorrespondencelog['attributes'], applicantcorrespondencelog['templateid'])
            
             return {'status': result.success, 'message':result.message,'id':result.identifier} , 200      
         except BusinessException:
             return "Error happened while saving  applicant correspondence log" , 500 
+
+
+
    

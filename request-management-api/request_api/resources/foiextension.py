@@ -116,10 +116,11 @@ class SaveAXISRequestExtension(Resource):
             rquesextensionschema = request.get_json()
             if (AuthHelper.isministrymember() == False):           
                 result = extensionservice().saveaxisrequestextension(ministryrequestid, rquesextensionschema, AuthHelper.getuserid(), AuthHelper.getusername())
-                 # Post event for system generated comments & notifications for added extensions 
-                if len(result.args) > 0:
-                    eventservice().posteventforaxisextension(ministryrequestid, result.args[0], AuthHelper.getuserid(), AuthHelper.getusername(), "add")
-                return {'status': result.success, 'message':result.message} , 200
+                if result.success == True:
+                    # Post event for system generated comments & notifications for added extensions 
+                    if len(result.args) > 0:
+                        eventservice().posteventforaxisextension(ministryrequestid, result.args[0], AuthHelper.getuserid(), AuthHelper.getusername(), "add")
+                    return {'status': result.success, 'message':result.message} , 200
         except KeyError as err:
             return {'status': False, 'message':err.messages}, 400        
         except BusinessException as exception:            
