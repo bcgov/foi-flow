@@ -89,5 +89,5 @@ class requestservice:
     def postcorrespondenceeventtoworkflow(self, requestid, ministryrequestid, applicantcorrespondenceid, attributes, templateid):
         foirequestschema = self.getrequestdetails(requestid, ministryrequestid)
         templatedetails = applicantcorrespondenceservice().gettemplatebyid(templateid)
-        workflowservice().syncwfinstance("ministryrequest", ministryrequestid, True)
-        workflowservice().postcorrenspodenceevent(ministryrequestid, foirequestschema, applicantcorrespondenceid, templatedetails.name, attributes)
+        wfinstanceid = workflowservice().syncwfinstance("ministryrequest", ministryrequestid, True)
+        workflowservice().postcorrenspodenceevent(wfinstanceid, ministryrequestid, foirequestschema, applicantcorrespondenceid, templatedetails.name, attributes)
