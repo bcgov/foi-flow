@@ -27,17 +27,22 @@ class bpmservice(camundaservice):
             return
 
     def getinstancevariables(self, instanceid, token=None):
+        print(instanceid)
         if self.bpmengineresturl is not None:
             response = requests.get(self.bpmengineresturl+"/process-instance/"+str(instanceid)+"/variables", headers = self._getHeaders_(token))
+            print(response)
             return json.loads(response.content) if response.ok else None
         return None
 
-    def searchinstancebyvariable(self, key, value, token=None):
+    def searchinstancebyvariable(self, definition_prefix, key, value, token=None):
         if self.bpmengineresturl is not None:
             response = requests.get(self.bpmengineresturl+"/process-instance?variables="+key+"_eq_"+str(value), headers = self._getHeaders_(token))
             if response.ok:
                 _response = json.loads(response.content)
-                return _response[0]["id"] if _response not in ("", []) else None
+                if _response not in ("", [], None) and len(_response) > 0:
+                    for entry in _response:
+                        if entry["definitionId"].lower().startswith(definition_prefix): 
+                            return entry["id"]
         return None
 
     def unopenedsave(self,processinstanceid, userid, messagetype, token=None):
@@ -83,9 +88,10 @@ class bpmservice(camundaservice):
             return   
     """
 
-    def openedcomplete(self,filenumber, data, messagetype, token=None):
+    def openedcomplete(self, wfinstanceid, filenumber, data, messagetype, token=None):
         if self.bpmengineresturl is not None:
             messageschema = MessageSchema().dump({"messageName": messagetype,
+                                              "processInstanceId": wfinstanceid,
                                               "localCorrelationKeys":{
                                                   "id": VariableSchema().dump({"type" : VariableType.String.value, "value": filenumber})
                                                   },
@@ -110,9 +116,10 @@ class bpmservice(camundaservice):
         else:
             return
 
-    def correspondanceevent(self,filenumber, data, token=None):
+    def correspondanceevent(self,wfinstanceid, filenumber, data, token=None):
         if self.bpmengineresturl is not None:
             messageschema = MessageSchema().dump({"messageName": MessageType.iaocorrenspodence.value,
+                                              "processInstanceId": wfinstanceid,
                                               "localCorrelationKeys":{
                                                   "id": VariableSchema().dump({"type" : VariableType.String.value, "value": filenumber})
                                                   },
