@@ -62,7 +62,7 @@ class workflowservice:
                     metadata = json.dumps({"id": filenumber, "previousstatus":previousstatus, "status": ministry["status"] , "assignedGroup": assignedgroup, "assignedTo": assignedto, "assignedministrygroup":ministry["assignedministrygroup"], "ministryRequestID": id, "isPaymentActive": self.__ispaymentactive(ministry["foirequestid"], id), "paymentExpiryDate": paymentexpirydate, "axisRequestId": axisrequestid, "issync": issync})
                     if issync == True:                        
                         _variables = bpmservice().getinstancevariables(wfinstanceid)    
-                        if ministry["status"] == OpenedEvent.callforrecords.value and (_variables not in (None, []) and "status" in _variables and _variables["status"]["value"] != OpenedEvent.callforrecords.value):
+                        if ministry["status"] == OpenedEvent.callforrecords.value and (("status" not in _variables) or (_variables not in (None, []) and "status" in _variables and _variables["status"]["value"] != OpenedEvent.callforrecords.value)):
                             messagename = MessageType.iaoopencomplete.value
                         if _variables not in (None, []) and "status" in _variables and _variables["status"]["value"] == "Closed":
                             return bpmservice().reopenevent(wfinstanceid, metadata, MessageType.iaoreopen.value)                     
@@ -158,22 +158,21 @@ class workflowservice:
         if isallactivity == False:
             _activity_itr_desc.pop(0)
         _variables = bpmservice().getinstancevariables(wfinstanceid)  
-        data = current if isallactivity == True else previous
         # SP: Stuck in Open -> Move from Open to CFR
-        if _variables in (None, []) or (_variables not in (None, []) and "status" not in _variables):
+        if _variables not in (None, []) and "status" not in _variables:
             for entry in _activity_itr_desc:
-                if entry["status"] == OpenedEvent.callforrecords.value and current["status"] != OpenedEvent.callforrecords.value:
+                if entry["status"] == OpenedEvent.callforrecords.value and ((isallactivity == True) or (isallactivity == False and current["status"] != OpenedEvent.callforrecords.value)):
                     self.__sync_complete_event(requestid, wfinstanceid, entry)
                     break
         # Sync action
         _variables = bpmservice().getinstancevariables(wfinstanceid)
         oldstatus = self.__getministrystatus(current["filenumber"], current["version"])             
-        activity = self.__getministryactivity(oldstatus,current["status"])
+        activity = Activity.save.value if isallactivity == True else self.__getministryactivity(oldstatus,current["status"])
         if _variables not in (None, []) and "status" in _variables:
             if activity == Activity.save.value and _variables["status"]["value"] != current["status"]:
                 self.__sync_complete_event(requestid, wfinstanceid, current)   
-            if activity == Activity.complete.value and _variables["status"]["value"] != data["status"]:   
-                self.__sync_complete_event(requestid, wfinstanceid, data)        
+            if activity == Activity.complete.value and _variables["status"]["value"] != previous["status"]:   
+                self.__sync_complete_event(requestid, wfinstanceid, previous)        
 
     def __sync_complete_event(self, requestid, wfinstanceid, minrequest):
         requestsschema, data = self.__prepare_ministry_complete(minrequest)   
