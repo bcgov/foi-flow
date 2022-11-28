@@ -45,7 +45,8 @@ class workflowservice:
                 metadata = json.dumps({"id": id, "status": status, "assignedGroup": assignedgroup, "assignedTo": assignedto})
             return bpmservice().unopenedcomplete(wfinstanceid, metadata, MessageType.intakecomplete.value) 
 
-    def postopenedevent(self, id, wfinstanceid, requestsschema, data, newstatus, usertype, issync=False):
+    def postopenedevent(self, id, wfinstanceid, requestsschema, data, newstatus, usertype):
+        ("not here")
         assignedgroup = self.__getopenedassigneevalue(requestsschema, "assignedgroup",usertype) 
         assignedto = self.__getopenedassigneevalue(requestsschema, "assignedto",usertype)        
         axisrequestid = self.__getvaluefromschema(requestsschema,"axisRequestId")
@@ -54,22 +55,39 @@ class workflowservice:
                 filenumber =  ministry["filenumber"] 
                 if int(ministry["id"]) == int(id): 
                     paymentexpirydate = paymentservice().getpaymentexpirydate(int(ministry["foirequestid"]), int(ministry["id"]))                     
-                    previousstatus =  self.__getpreviousministrystatus(id) if issync == False else self.__getprevioustatusbyversion(id, int(ministry["version"]))
-                    oldstatus = self.__getministrystatus(filenumber, ministry["version"]) if issync == False else previousstatus                
-                    activity = self.__getministryactivity(oldstatus,newstatus) if issync == False else Activity.complete.value
-                    isprocessing = self.__isprocessing(id) if issync == False else False  
+                    previousstatus =  self.__getpreviousministrystatus(id)
+                    oldstatus = self.__getministrystatus(filenumber, ministry["version"])             
+                    activity = self.__getministryactivity(oldstatus,newstatus)
+                    isprocessing = self.__isprocessing(id) 
                     messagename = self.__messagename(oldstatus, activity, usertype, isprocessing)
-                    metadata = json.dumps({"id": filenumber, "previousstatus":previousstatus, "status": ministry["status"] , "assignedGroup": assignedgroup, "assignedTo": assignedto, "assignedministrygroup":ministry["assignedministrygroup"], "ministryRequestID": id, "isPaymentActive": self.__ispaymentactive(ministry["foirequestid"], id), "paymentExpiryDate": paymentexpirydate, "axisRequestId": axisrequestid, "issync": issync})
-                    if issync == True:                        
-                        _variables = bpmservice().getinstancevariables(wfinstanceid)    
-                        if ministry["status"] == OpenedEvent.callforrecords.value and (("status" not in _variables) or (_variables not in (None, []) and "status" in _variables and _variables["status"]["value"] != OpenedEvent.callforrecords.value)):
-                            messagename = MessageType.iaoopencomplete.value
-                        elif  _variables not in (None, []) and ("status" in _variables and _variables["status"]["value"] == "Closed"):
-                            return bpmservice().reopenevent(wfinstanceid, metadata, MessageType.iaoreopen.value)                     
-                        else:
-                            return bpmservice().openedcomplete(wfinstanceid, filenumber, metadata, messagename)       
+                    metadata = json.dumps({"id": filenumber, "previousstatus":previousstatus, "status": ministry["status"] , "assignedGroup": assignedgroup, "assignedTo": assignedto, "assignedministrygroup":ministry["assignedministrygroup"], "ministryRequestID": id, "isPaymentActive": self.__ispaymentactive(ministry["foirequestid"], id), "paymentExpiryDate": paymentexpirydate, "axisRequestId": axisrequestid, "issync": False})
                     self.__postopenedevent(id, filenumber, metadata, messagename, assignedgroup, assignedto, wfinstanceid, activity)
 
+    def syncopenedevent(self, id, wfinstanceid, requestsschema, data, usertype):
+        assignedgroup = self.__getopenedassigneevalue(requestsschema, "assignedgroup",usertype) 
+        assignedto = self.__getopenedassigneevalue(requestsschema, "assignedto",usertype)        
+        axisrequestid = self.__getvaluefromschema(requestsschema,"axisRequestId")
+        if data.get("ministries") is not None:
+            for ministry in data.get("ministries"): 
+                filenumber =  ministry["filenumber"] 
+                if int(ministry["id"]) == int(id): 
+                    paymentexpirydate = paymentservice().getpaymentexpirydate(int(ministry["foirequestid"]), int(ministry["id"]))                     
+                    previousstatus =  self.__getprevioustatusbyversion(id, int(ministry["version"]))
+                    isprocessing = self.__isprocessing(id) 
+                    if isprocessing == False:
+                        messagename = MessageType.iaoopencomplete.value 
+                    else:
+                        messagename = MessageType.iaocomplete.value if usertype == "iao" else MessageType.ministrycomplete.value
+                    metadata = json.dumps({"id": filenumber, "previousstatus":previousstatus, "status": ministry["status"] , "assignedGroup": assignedgroup, "assignedTo": assignedto, "assignedministrygroup":ministry["assignedministrygroup"], "ministryRequestID": id, "isPaymentActive": self.__ispaymentactive(ministry["foirequestid"], id), "paymentExpiryDate": paymentexpirydate, "axisRequestId": axisrequestid, "issync": True})
+                    _variables = bpmservice().getinstancevariables(wfinstanceid)    
+                    if ministry["status"] == OpenedEvent.callforrecords.value and (("status" not in _variables) or (_variables not in (None, []) and "status" in _variables and _variables["status"]["value"] != OpenedEvent.callforrecords.value)):
+                        messagename = MessageType.iaoopencomplete.value
+                    if _variables not in (None, []) and ("status" in _variables and _variables["status"]["value"] == "Closed"):
+                        return bpmservice().reopenevent(wfinstanceid, metadata, messagename)                     
+                    bpmservice().openedcomplete(wfinstanceid, filenumber, metadata, messagename)       
+                
+
+    
     def postfeeevent(self, requestid, ministryrequestid, requestsschema, paymentstatus, nextstatename=None):
         metadata = json.dumps({
             "id": requestsschema["idNumber"], 
@@ -176,9 +194,10 @@ class workflowservice:
             if activity == Activity.complete.value and _variables["status"]["value"] != previous["status"]:   
                 self.__sync_complete_event(requestid, wfinstanceid, previous)        
 
+
     def __sync_complete_event(self, requestid, wfinstanceid, minrequest):
         requestsschema, data = self.__prepare_ministry_complete(minrequest)   
-        self.postopenedevent(requestid, wfinstanceid, requestsschema, data, minrequest["status"], self.__getusertype(minrequest["status"]), True)        
+        self.syncopenedevent(requestid, wfinstanceid, requestsschema, data, self.__getusertype(minrequest["status"]))        
 
     def __prepare_raw_requestobj(self, _rawinstance):
         data = {}
@@ -223,7 +242,7 @@ class workflowservice:
         
              
     def __messagename(self, status, activity, usertype, isprocessing=False):   
-        if status == UnopenedEvent.open.value and isprocessing == False:
+        if status == UnopenedEvent.open.value and isprocessing == False :
             return MessageType.iaoopencomplete.value if activity == Activity.complete.value else MessageType.iaoopenclaim.value
         elif status == OpenedEvent.reopen.value:
             return MessageType.iaoreopen.value
@@ -232,8 +251,8 @@ class workflowservice:
                 return MessageType.ministrycomplete.value if activity == Activity.complete.value else MessageType.ministryclaim.value   
             else:
                 return MessageType.iaocomplete.value if activity == Activity.complete.value else MessageType.iaoclaim.value       
-
-
+    
+    
     def __hasreopened(self, requestid, requesttype):
         if requesttype == "rawrequest":
             states =  FOIRawRequest.getstatenavigation(requestid)
