@@ -64,8 +64,10 @@ class workflowservice:
                         _variables = bpmservice().getinstancevariables(wfinstanceid)    
                         if ministry["status"] == OpenedEvent.callforrecords.value and (("status" not in _variables) or (_variables not in (None, []) and "status" in _variables and _variables["status"]["value"] != OpenedEvent.callforrecords.value)):
                             messagename = MessageType.iaoopencomplete.value
-                        if _variables not in (None, []) and "status" in _variables and _variables["status"]["value"] == "Closed":
+                        elif  _variables not in (None, []) and ("status" in _variables and _variables["status"]["value"] == "Closed"):
                             return bpmservice().reopenevent(wfinstanceid, metadata, MessageType.iaoreopen.value)                     
+                        else:
+                            return bpmservice().openedcomplete(wfinstanceid, filenumber, metadata, messagename)       
                     self.__postopenedevent(id, filenumber, metadata, messagename, assignedgroup, assignedto, wfinstanceid, activity)
 
     def postfeeevent(self, requestid, ministryrequestid, requestsschema, paymentstatus, nextstatename=None):
