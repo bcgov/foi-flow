@@ -36,12 +36,11 @@ class recordservice:
             record.__dict__.update(entry)
             recordlist.append(record)
         dbresponse = FOIRequestRecord.create(recordlist)
-        # commented out for initial commit
-        # if (dbresponse.success):
-        #     for entry in records:
-        #         _filename, extension = path.splitext(entry['s3uripath'])
-        #         if extension in ['.doc','.docx','.xls','.xlsx', '.ics', '.msg']:
-        #             eventqueueservice().add("file-conversion", {"S3Path": entry['s3uripath']})
+        if (dbresponse.success):
+            for entry in records:
+                _filename, extension = path.splitext(entry['s3uripath'])
+                if extension in ['.doc','.docx','.xls','.xlsx', '.ics', '.msg']:
+                    eventqueueservice().add("file-conversion", {"S3Path": entry['s3uripath']})
         return dbresponse
 
 
