@@ -4,7 +4,7 @@ import json
 from enum import Enum
 from request_api.exceptions import BusinessException
 from request_api.utils.redispublisher import RedisPublisherService
-from request_api.services.external.bpmservice import MessageType, bpmservice
+from request_api.services.external.bpmservice import MessageType, bpmservice, ProcessDefinitionKey
 from request_api.services.cfrfeeservice import cfrfeeservice
 from request_api.services.paymentservice import paymentservice
 from request_api.models.FOIRawRequests import FOIRawRequest
@@ -12,6 +12,8 @@ from request_api.models.FOIMinistryRequests import FOIMinistryRequest
 from request_api.models.FOIRequests import FOIRequest
 from request_api.utils.enums import StateName
 import logging
+from request_api.schemas.external.bpmschema import VariableSchema
+from request_api.services.external.camundaservice import VariableType 
 """
 This class is reserved for workflow services integration.
 Supported operations: claim
@@ -23,7 +25,7 @@ class workflowservice:
 
     def createinstance(self, definitionkey, message):
         response = bpmservice().createinstance(definitionkey, json.loads(message))
-        if response.status_code != 200:
+        if response is None:
             raise BusinessException("Unable to create instance for key"+ definitionkey)
         return response
 
@@ -60,10 +62,12 @@ class workflowservice:
                     metadata = json.dumps({"id": filenumber, "previousstatus":previousstatus, "status": ministry["status"] , "assignedGroup": assignedgroup, "assignedTo": assignedto, "assignedministrygroup":ministry["assignedministrygroup"], "ministryRequestID": id, "isPaymentActive": self.__ispaymentactive(ministry["foirequestid"], id), "paymentExpiryDate": paymentexpirydate, "axisRequestId": axisrequestid, "issync": issync})
                     if issync == True:                        
                         _variables = bpmservice().getinstancevariables(wfinstanceid)    
-                        if ministry["status"] == OpenedEvent.callforrecords.value:
+                        if ministry["status"] == OpenedEvent.callforrecords.value and (("status" not in _variables) or (_variables not in (None, []) and "status" in _variables and _variables["status"]["value"] != OpenedEvent.callforrecords.value)):
                             messagename = MessageType.iaoopencomplete.value
-                        if _variables not in (None, []) and "status" in _variables and _variables["status"]["value"] == "Closed":
+                        elif  _variables not in (None, []) and ("status" in _variables and _variables["status"]["value"] == "Closed"):
                             return bpmservice().reopenevent(wfinstanceid, metadata, MessageType.iaoreopen.value)                     
+                        else:
+                            return bpmservice().openedcomplete(wfinstanceid, filenumber, metadata, messagename)       
                     self.__postopenedevent(id, filenumber, metadata, messagename, assignedgroup, assignedto, wfinstanceid, activity)
 
     def postfeeevent(self, requestid, ministryrequestid, requestsschema, paymentstatus, nextstatename=None):
@@ -89,40 +93,65 @@ class workflowservice:
 
     def syncwfinstance(self, requesttype, requestid, isallactivity=False):      
         try:
-            _raw_metadata = FOIRawRequest.getworkflowinstancebyraw(requestid) if requesttype == "rawrequest" else FOIRawRequest.getworkflowinstancebyministry(requestid)
-            # Check raw request instance creation - Reconcile with new instance creation
-            if _raw_metadata.wfinstanceid in (None, ""):
-                self.createinstance(RedisPublisherService().foirequestqueueredischannel, json.dumps(self.__prepare_raw_requestobj(_raw_metadata)))
-            #Get updated raw PID
-            _raw_metadata_n = FOIRawRequest.getworkflowinstancebyraw(requestid) if requesttype == "rawrequest" else FOIRawRequest.getworkflowinstancebyministry(requestid)
+            # Sync and get raw instance details from FOI DB
+            raw_metadata = self.__sync_raw_request(requesttype, requestid)
             if requesttype == "ministryrequest":
-                _req_metadata = FOIRequest.getworkflowinstance(requestid)   #address correlation N 
-                #Search WF Engine using raw PID                
-                wf_foirequest_pid = bpmservice().searchinstancebyvariable("foi-request-processing", "rawRequestPID", _raw_metadata_n.wfinstanceid)
-                # FOI - NO | WF - YES 
-                if _req_metadata.wfinstanceid in (None, "") and wf_foirequest_pid not in (None, ""):
-                    FOIRequest.updateWFInstance(_req_metadata.foirequestid, wf_foirequest_pid, "System")  
-                    _req_metadata.__dict__.update({"wfinstanceid":wf_foirequest_pid})
-                # FOI - YES | WF - NO and FOI - NO  | WF - NO 
-                if (_req_metadata.wfinstanceid not in (None, "") and wf_foirequest_pid in (None, "")) or (_req_metadata.wfinstanceid in (None, "") and wf_foirequest_pid in (None, "")): 
-                    _req_ministries = FOIMinistryRequest.getministriesopenedbyuid(_raw_metadata_n.requestid) 
-                    self.postunopenedevent(requestid, _raw_metadata_n.wfinstanceid, self.__prepare_raw_requestobj(_raw_metadata_n), UnopenedEvent.open.value, _req_ministries)
-                # WF - YES | FOI - YES - No Action Required
-
+                req_metadata = self.__sync_foi_request(requestid, raw_metadata)     
                 # Check foi request instance creation - Reconcile by transition to Open
                 _all_activity_desc = FOIMinistryRequest.getactivitybyid(requestid)             
-                _req_metadata_n = FOIRequest.getworkflowinstance(requestid)            
-                # Check Current status in WF engine
-                #if _req_metadata_n.wfinstanceid in (None, ""):
-                    #self.syncwfinstance("ministryrequest", requestid, isallactivity)
-                #else:
-                self.__sync_state_transition(requestid, _req_metadata_n.wfinstanceid, _all_activity_desc, isallactivity)
-                return _req_metadata_n.wfinstanceid
-            
-            return _raw_metadata_n.wfinstanceid 
+                self.__sync_state_transition(requestid, str(req_metadata.wfinstanceid), _all_activity_desc, isallactivity)
+                return req_metadata.wfinstanceid            
+            return raw_metadata.wfinstanceid 
         except Exception as ex:
             logging.error(ex)
         return None
+
+    def __sync_raw_request(self, requesttype, requestid):
+        # Search for WF ID 
+        requestid = int(requestid)
+        _raw_metadata = FOIRawRequest.getworkflowinstancebyraw(requestid) if requesttype == "rawrequest" else FOIRawRequest.getworkflowinstancebyministry(requestid)
+        wf_rawrequest_pid = self.__get_wf_pid("rawrequest", _raw_metadata)    
+        # Check for exists - Reconcile with new instance creation
+        if wf_rawrequest_pid not in  (None, "") and _raw_metadata.wfinstanceid not in (None, "") and str(_raw_metadata.wfinstanceid) == wf_rawrequest_pid:
+            return _raw_metadata
+        # WF Instance is not present
+        if wf_rawrequest_pid in (None, ""):
+            self.createinstance(RedisPublisherService().foirequestqueueredischannel, json.dumps(self.__prepare_raw_requestobj(_raw_metadata)))
+        else:
+            if _raw_metadata.wfinstanceid in (None, "") or str(_raw_metadata.wfinstanceid) != wf_rawrequest_pid:
+                FOIRawRequest.updateworkflowinstance_n(wf_rawrequest_pid, int(_raw_metadata.requestid), "System")
+        return FOIRawRequest.getworkflowinstancebyraw(requestid) if requesttype == "rawrequest" else FOIRawRequest.getworkflowinstancebyministry(requestid)      
+
+    def __sync_foi_request(self, requestid, raw_metadata):
+        requestid = int(requestid)
+        _req_metadata = FOIRequest.getworkflowinstance(requestid)
+        wf_foirequest_pid = self.__get_wf_pid("ministryrequest", raw_metadata, _req_metadata)  
+        if wf_foirequest_pid not in (None, "") and _req_metadata.wfinstanceid not in (None, "") and str(_req_metadata.wfinstanceid) == wf_foirequest_pid:
+            return _req_metadata
+        if wf_foirequest_pid in (None, ""):
+            _req_ministries = FOIMinistryRequest.getministriesopenedbyuid(raw_metadata.requestid) 
+            self.postunopenedevent(requestid, raw_metadata.wfinstanceid, self.__prepare_raw_requestobj(raw_metadata), UnopenedEvent.open.value, _req_ministries)
+        else:
+            if _req_metadata.wfinstanceid in (None, "") or str(_req_metadata.wfinstanceid) != wf_foirequest_pid:
+                FOIRequest.updateWFInstance(_req_metadata.foirequestid, wf_foirequest_pid, "System")  
+        return FOIRequest.getworkflowinstance(requestid)
+
+    def __get_wf_pid(self, requesttype, _raw_metadata, _req_metadata=None):
+        if requesttype == "rawrequest":
+            searchby = [{"name":"id" ,"operator":"eq","value": int(_raw_metadata.requestid)}]
+            return bpmservice().searchinstancebyvariable(ProcessDefinitionKey.rawrequest.value, searchby)  
+        elif requesttype == "ministryrequest":
+            searchby = [{"name":"foiRequestID","operator":"eq","value": int(_req_metadata.foirequestid)},
+                    {"name": "rawRequestPID","operator":"eq","value": str(_raw_metadata.wfinstanceid)}]
+            wf_foirequest_pid = bpmservice().searchinstancebyvariable(ProcessDefinitionKey.ministryrequest.value, searchby)
+            if wf_foirequest_pid in (None, ""):
+                searchby = [{"name":"foiRequestID","operator":"eq","value": str(_req_metadata.foirequestid)},
+                    {"name": "rawRequestPID","operator":"eq","value": str(_raw_metadata.wfinstanceid)}]
+                wf_foirequest_pid = bpmservice().searchinstancebyvariable(ProcessDefinitionKey.ministryrequest.value, searchby) 
+            return wf_foirequest_pid   
+        else:
+            logging.info("Unknown requestype %s", requesttype)
+            return None
 
     def __sync_state_transition(self, requestid, wfinstanceid, _all_activity_desc, isallactivity): 
         current = _all_activity_desc[0]
@@ -131,19 +160,21 @@ class workflowservice:
         if isallactivity == False:
             _activity_itr_desc.pop(0)
         _variables = bpmservice().getinstancevariables(wfinstanceid)  
-                
-        # No instance or (WF in Open state) and (previous state != Open) -> Move from Open to CFR
-        #and entry_n["status"] not in (UnopenedEvent.open.value)
-        if _variables in (None, []) or (_variables not in (None, []) and "status" not in _variables):
+        # SP: Stuck in Open -> Move from Open to CFR
+        if _variables not in (None, []) and "status" not in _variables:
             for entry in _activity_itr_desc:
-                if entry["status"] == OpenedEvent.callforrecords.value and current["status"] != OpenedEvent.callforrecords.value:
+                if entry["status"] == OpenedEvent.callforrecords.value and ((isallactivity == True) or (isallactivity == False and current["status"] != OpenedEvent.callforrecords.value)):
                     self.__sync_complete_event(requestid, wfinstanceid, entry)
                     break
         # Sync action
-        data = current if isallactivity == True else previous
         _variables = bpmservice().getinstancevariables(wfinstanceid)
-        if _variables in (None, []) or (_variables not in (None, []) and "status" in _variables and _variables["status"]["value"] != data["status"]):
-            self.__sync_complete_event(requestid, wfinstanceid, data)            
+        oldstatus = self.__getministrystatus(current["filenumber"], current["version"])             
+        activity = Activity.save.value if isallactivity == True else self.__getministryactivity(oldstatus,current["status"])
+        if _variables not in (None, []) and "status" in _variables:
+            if activity == Activity.save.value and _variables["status"]["value"] != current["status"]:
+                self.__sync_complete_event(requestid, wfinstanceid, current)   
+            if activity == Activity.complete.value and _variables["status"]["value"] != previous["status"]:   
+                self.__sync_complete_event(requestid, wfinstanceid, previous)        
 
     def __sync_complete_event(self, requestid, wfinstanceid, minrequest):
         requestsschema, data = self.__prepare_ministry_complete(minrequest)   

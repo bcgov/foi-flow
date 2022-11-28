@@ -22,27 +22,40 @@ class bpmservice(camundaservice):
                     _variabletype = VariableType.Integer.value if key in ["id"] else  VariableType.String.value
                     _variables["variables"][key] = {"type" : _variabletype, "value": message[key]} 
             variableschema = VariableMessageSchema().dump(_variables)
-            return requests.post(self._getUrl_(None,self._geProcessDefinitionKey_(messagequeue)), data=json.dumps(variableschema), headers = self._getHeaders_(token))
-        else:
-            return
+            createresponce =  requests.post(self._getUrl_(None,self._geProcessDefinitionKey_(messagequeue)), data=json.dumps(variableschema), headers = self._getHeaders_(token))
+            if createresponce.ok:
+                _createresponce = json.loads(createresponce.content)
+                return _createresponce["id"]
+        return None
 
     def getinstancevariables(self, instanceid, token=None):
-        print(instanceid)
         if self.bpmengineresturl is not None:
             response = requests.get(self.bpmengineresturl+"/process-instance/"+str(instanceid)+"/variables", headers = self._getHeaders_(token))
-            print(response)
             return json.loads(response.content) if response.ok else None
         return None
 
-    def searchinstancebyvariable(self, definition_prefix, key, value, token=None):
-        if self.bpmengineresturl is not None:
-            response = requests.get(self.bpmengineresturl+"/process-instance?variables="+key+"_eq_"+str(value), headers = self._getHeaders_(token))
-            if response.ok:
-                _response = json.loads(response.content)
-                if _response not in ("", [], None) and len(_response) > 0:
-                    for entry in _response:
-                        if entry["definitionId"].lower().startswith(definition_prefix): 
-                            return entry["id"]
+    def searchinstancebyvariable(self, definitionkey, searchby, token=None):
+        if self.bpmengineresturl is not None:        
+            searchschema = {"processDefinitionKey": definitionkey, 
+                    "variables": searchby,
+                    "sortBy":"definitionId","sortOrder":"desc",
+                    "maxResults":1
+                    }
+            searchresponse = requests.post(self.bpmengineresturl+"/process-instance",data=json.dumps(searchschema), headers = self._getHeaders_(token))
+            if searchresponse.ok:
+                _search_content = json.loads(searchresponse.content)
+                if _search_content not in ([], None) and len(_search_content) > 0:
+                    return self.searchprocessinstance(str(_search_content[0]["id"]))        
+            return None
+        return None
+
+    def searchprocessinstance(self, pid, token=None):
+        if self.bpmengineresturl is not None:        
+            if pid not in (None, ""):
+                idresponse = requests.get(self.bpmengineresturl+"/process-instance/"+pid, headers = self._getHeaders_(token))
+                if idresponse.ok:
+                    return pid
+            return None
         return None
 
     def unopenedsave(self,processinstanceid, userid, messagetype, token=None):
@@ -176,3 +189,8 @@ class MessageType(Enum):
     feepayment = "foi-fee-payment"
     managepayment = "foi-manage-payment"
     iaocorrenspodence = "foi-iao-correnspodence"
+
+class ProcessDefinitionKey(Enum):
+    rawrequest = "foi-request"
+    ministryrequest = "foi-request-processing"
+  
