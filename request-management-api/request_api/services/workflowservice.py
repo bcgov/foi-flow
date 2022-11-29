@@ -34,9 +34,11 @@ class workflowservice:
             logging.error("WF INSTANCE IS INVALID")
             return
         assignedgroup = requestsschema["assignedGroup"] if 'assignedGroup' in requestsschema  else None
-        assignedto = requestsschema["assignedTo"] if 'assignedTo' in requestsschema  else None 
+        assignedto = requestsschema["assignedTo"] if 'assignedTo' in requestsschema  else None
+        print("status === ",status)
         if status == UnopenedEvent.intakeinprogress.value:
             messagename = MessageType.intakereopen.value if self.__hasreopened(id, "rawrequest") == True else MessageType.intakeclaim.value
+            print("messagename == ",messagename)
             return bpmservice().unopenedsave(wfinstanceid, assignedto, messagename)                 
         else:
             if status == UnopenedEvent.open.value:
@@ -116,6 +118,7 @@ class workflowservice:
             return _raw_metadata
         # WF Instance is not present
         if wf_rawrequest_pid in (None, ""):
+            print("Recreate instance")
             self.createinstance(RedisPublisherService().foirequestqueueredischannel, json.dumps(self.__prepare_raw_requestobj(_raw_metadata)))
         else:
             if _raw_metadata.wfinstanceid in (None, "") or str(_raw_metadata.wfinstanceid) != wf_rawrequest_pid:
@@ -125,10 +128,12 @@ class workflowservice:
     def __sync_foi_request(self, requestid, raw_metadata):
         requestid = int(requestid)
         _req_metadata = FOIRequest.getworkflowinstance(requestid)
-        wf_foirequest_pid = self.__get_wf_pid("ministryrequest", raw_metadata, _req_metadata)  
+        wf_foirequest_pid = self.__get_wf_pid("ministryrequest", raw_metadata, _req_metadata)
+        print("wf_foirequest_pid == ", wf_foirequest_pid)
         if wf_foirequest_pid not in (None, "") and _req_metadata.wfinstanceid not in (None, "") and str(_req_metadata.wfinstanceid) == wf_foirequest_pid:
             return _req_metadata
         if wf_foirequest_pid in (None, ""):
+            print("wf_foirequest_pid None")
             _req_ministries = FOIMinistryRequest.getministriesopenedbyuid(raw_metadata.requestid) 
             self.postunopenedevent(requestid, raw_metadata.wfinstanceid, self.__prepare_raw_requestobj(raw_metadata), UnopenedEvent.open.value, _req_ministries)
         else:
