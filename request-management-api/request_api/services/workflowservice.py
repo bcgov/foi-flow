@@ -35,6 +35,7 @@ class workflowservice:
             return
         assignedgroup = requestsschema["assignedGroup"] if 'assignedGroup' in requestsschema  else None
         assignedto = requestsschema["assignedTo"] if 'assignedTo' in requestsschema  else None
+        print("id = ", id)
         print("status === ",status)
         if status == UnopenedEvent.intakeinprogress.value:
             messagename = MessageType.intakereopen.value if self.__hasreopened(id, "rawrequest") == True else MessageType.intakeclaim.value
@@ -45,6 +46,7 @@ class workflowservice:
                 metadata = json.dumps({"id": id, "status": status, "ministries": ministries, "assignedGroup": assignedgroup, "assignedTo": assignedto})
             else:            
                 metadata = json.dumps({"id": id, "status": status, "assignedGroup": assignedgroup, "assignedTo": assignedto})
+            print("metadata = ",metadata)
             return bpmservice().unopenedcomplete(wfinstanceid, metadata, MessageType.intakecomplete.value) 
 
     def postopenedevent(self, id, wfinstanceid, requestsschema, data, newstatus, usertype, issync=False):
@@ -62,6 +64,9 @@ class workflowservice:
                     isprocessing = self.__isprocessing(id) if issync == False else False  
                     messagename = self.__messagename(oldstatus, activity, usertype, isprocessing)
                     metadata = json.dumps({"id": filenumber, "previousstatus":previousstatus, "status": ministry["status"] , "assignedGroup": assignedgroup, "assignedTo": assignedto, "assignedministrygroup":ministry["assignedministrygroup"], "ministryRequestID": id, "isPaymentActive": self.__ispaymentactive(ministry["foirequestid"], id), "paymentExpiryDate": paymentexpirydate, "axisRequestId": axisrequestid, "issync": issync})
+                    print("issync == ", issync)
+                    print("ministry == ", ministry)
+                    print("postopenedevent metadata === ", metadata)
                     if issync == True:                        
                         _variables = bpmservice().getinstancevariables(wfinstanceid)    
                         if ministry["status"] == OpenedEvent.callforrecords.value and (("status" not in _variables) or (_variables not in (None, []) and "status" in _variables and _variables["status"]["value"] != OpenedEvent.callforrecords.value)):
@@ -208,6 +213,7 @@ class workflowservice:
         return UserType.iao.value
 
     def __postopenedevent(self, id, filenumber, metadata, messagename, assignedgroup, assignedto, wfinstanceid, activity):
+        print("activity == ", activity)
         if activity == Activity.complete.value:
 
             if self.__hasreopened(id, "ministryrequest") == True:
