@@ -437,14 +437,14 @@ mintaskIdName = obj.id+"_ministrytaskId";
 execution.getProcessEngineServices().getTaskService().complete(execution.getVariable(mintaskIdName));
 execution.getProcessEngineServices().getTaskService().complete(execution.getVariable(taskIdName));
 }
-if (obj.status == 'On Hold' &amp;&amp; issync == "False") {
+if (obj.status == 'On Hold' &amp;&amp; issync === false) {
 execution.setVariable("applicantCorrespondenceId",0);
 execution.setVariable("templateName","");
 execution.getProcessEngineServices().getRuntimeService().createMessageCorrelation("foi-fee-payment").setVariables(execution.variables).correlateWithResult();
 execution.setVariable("feeflow","ONGOING");
 }
 var feeflow = execution.getVariable("feeflow");
-if (obj.status != 'On Hold' &amp;&amp; feeflow == 'ONGOING' &amp;&amp; obj.isPaymentActive == true &amp;&amp; issync == "False") {
+if (obj.status != 'On Hold' &amp;&amp; feeflow == 'ONGOING' &amp;&amp; obj.isPaymentActive == true &amp;&amp; issync === false) {
 execution.setVariable("feeflow","NA");
 execution.setVariable("paymentstatus","CANCELLED");
 execution.getProcessEngineServices().getRuntimeService().createMessageCorrelation("foi-manage-payment").processInstanceVariableEquals("axisRequestId",execution.getVariable("axisRequestId")).setVariable("paymentstatus","CANCELLED").setVariable("status",obj.status).setVariable("axisRequestId",execution.getVariable("axisRequestId")).setVariable("foiRequestID",execution.getVariable("foiRequestID")).setVariable("ministryRequestID",execution.getVariable("ministryRequestID")).correlateWithResult();
