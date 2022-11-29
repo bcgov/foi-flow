@@ -143,6 +143,7 @@ class workflowservice:
             self.postunopenedevent(requestid, raw_metadata.wfinstanceid, self.__prepare_raw_requestobj(raw_metadata), UnopenedEvent.open.value, _req_ministries)
         else:
             if _req_metadata.wfinstanceid in (None, "") or str(_req_metadata.wfinstanceid) != wf_foirequest_pid:
+                print("update WF Instance ID")
                 FOIRequest.updateWFInstance(_req_metadata.foirequestid, wf_foirequest_pid, "System")  
         return FOIRequest.getworkflowinstance(requestid)
 
