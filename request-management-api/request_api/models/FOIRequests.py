@@ -78,12 +78,14 @@ class FOIRequest(db.Model):
                           
     @classmethod
     def updateWFInstance(cls, foirequestid, wfinstanceid, userid)->DefaultMethodResult:
-        currequest = db.session.query(FOIRequest).filter_by(foirequestid=foirequestid).order_by(FOIRequest.version.desc()).first()
-        setattr(currequest,'wfinstanceid',wfinstanceid)
-        setattr(currequest,'updated_at',datetime.now().isoformat())
-        setattr(currequest,'updatedby',userid)
-        db.session.commit()  
-        return DefaultMethodResult(True,'Request updated',foirequestid)
+        if wfinstanceid not in (None, ""):
+            currequest = db.session.query(FOIRequest).filter_by(foirequestid=foirequestid).order_by(FOIRequest.version.desc()).first()
+            setattr(currequest,'wfinstanceid',wfinstanceid)
+            setattr(currequest,'updated_at',datetime.now().isoformat())
+            setattr(currequest,'updatedby',userid)
+            db.session.commit()  
+            return DefaultMethodResult(True,'Request updated',foirequestid)
+        return DefaultMethodResult(True,'wfinstanceid is None',foirequestid)
     
     @classmethod
     def updateStatus(cls, foirequestid, updatedministries, userid)->DefaultMethodResult:
