@@ -127,12 +127,9 @@ class requestservicebuilder(requestserviceconfigurator):
     def isNotBlankorNone(self, dataschema, key, location):        
         if location == "main":
             if key in dataschema and  dataschema.get(key) is not None and dataschema.get(key)  and dataschema.get(key)  != "":
-                print("dataschema.get(key) == ", dataschema.get(key))
                 return True
         else:
-            if dataschema.get(location) is not None and key in dataschema.get(location) and dataschema.get(location)[key] and dataschema.get(location)[key] is not None and dataschema.get(location)[key] !="":     
-                print("dataschema.get(location) == ", dataschema.get(location))
-                print("dataschema.get(location)[key] == ", dataschema.get(location)[key])
+            if dataschema.get(location) is not None and key in dataschema.get(location) and dataschema.get(location)[key] and dataschema.get(location)[key] is not None and dataschema.get(location)[key] !="":
                 return True
         return False          
     

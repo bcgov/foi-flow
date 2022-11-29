@@ -11,7 +11,6 @@ class requestserviceupdate(requestservicebuilder):
     """
 
     def updaterequest(self,foirequestschema,foirequestid,userid):
-        print("foirequestschema == ",foirequestschema)
         if self.isNotBlankorNone(foirequestschema,"wfinstanceid","main") == True:
             return FOIRequest.updateWFInstance(foirequestid, foirequestschema.get("wfinstanceid"), userid)
         if foirequestschema.get("selectedMinistries") is not None:
