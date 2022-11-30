@@ -11,6 +11,7 @@ from sqlalchemy.dialects import postgresql
 from sqlalchemy.sql import column, table
 from sqlalchemy.sql.sqltypes import Boolean, String
 from datetime import datetime
+import os
 
 # revision identifiers, used by Alembic.
 revision = 'c1c980e4b969'
@@ -40,15 +41,18 @@ def upgrade():
                                  column('isactive',Boolean),
                                  column('createdby',String),
                                    )
+
+    s3environment = os.getenv('OSS_S3_ENVIRONMENT')
+
     op.bulk_insert(
         docment_path_mapper,
         [
-            {'category':'Attachments','bucket':'$environment-forms-foirequests','isactive':True,'createdby':'System'},
+            {'category':'Attachments','bucket': s3environment + '-forms-foirequests','isactive':True,'createdby':'System'},
         ]
     )
     op.execute('''INSERT INTO public."DocumentPathMapper"(
 	category, bucket, isactive, createdby)
-	Select 'Records', lower(bcgovcode) || '-$environment' , true, 'System' from
+	Select 'Records', lower(bcgovcode) || '-''' + s3environment + '''' , true, 'System' from
 	public."ProgramAreas" where isactive = true''')
 
 

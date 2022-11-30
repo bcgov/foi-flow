@@ -41,7 +41,7 @@ class storageservice:
                 aws_host=s3host,
                 aws_region=s3region,
                 aws_service=s3service) 
-        
+
             s3uri = 'https://{0}/{1}/{2}/{3}/{4}'.format(s3host,formsbucket, ministrycode, requestnumber, filename)        
             response = requests.put(s3uri, data=None, auth=auth)
             header = {
@@ -60,7 +60,7 @@ class storageservice:
 
     def upload(self, attachment):
         docpathmapper = DocumentPathMapper().getdocumentpath("Attachments")
-        formsbucket = self.__formatbucketname(docpathmapper['bucket'])
+        formsbucket = docpathmapper['bucket']
         
         if(self.accesskey is None or self.secretkey is None or self.s3host is None or formsbucket is None):
             raise ValueError('accesskey is None or secretkey is None or S3 host is None or formsbucket is None')
@@ -109,7 +109,7 @@ class storageservice:
             filenamesplittext = os.path.splitext(filename)
             uniquefilename = '{0}{1}'.format(uuid.uuid4(),filenamesplittext[1]) 
             docpathmapper = DocumentPathMapper().getdocumentpath(category,ministrycode)
-            formsbucket = self.__formatbucketname(docpathmapper['bucket'])
+            formsbucket = docpathmapper['bucket']
             auth = AWSRequestsAuth(aws_access_key=docpathmapper['attributes']['s3accesskey'],
                     aws_secret_access_key=docpathmapper['attributes']['s3secretkey'],
                     aws_host=self.s3host,
@@ -128,7 +128,7 @@ class storageservice:
 
     def retrieve_s3_presigned(self, filepath, category="attachments", bcgovcode=None):
         docpathmapper = DocumentPathMapper().getdocumentpath(category, bcgovcode)
-        formsbucket = self.__formatbucketname(docpathmapper['bucket'])
+        formsbucket = docpathmapper['bucket']
         s3client = self.__get_s3client(category, docpathmapper)
         filename, file_extension = os.path.splitext(filepath)    
         response = s3client.generate_presigned_url(
@@ -140,7 +140,7 @@ class storageservice:
 
     def bulk_upload_s3_presigned(self, ministryrequestid, requestfilejson, category, bcgovcode=None):
         docpathmapper = DocumentPathMapper().getdocumentpath(category, bcgovcode)
-        formsbucket = self.__formatbucketname(docpathmapper['bucket'])
+        formsbucket = docpathmapper['bucket']
         s3client = self.__get_s3client(category, docpathmapper)
         for file in requestfilejson:                
             foirequestform = FOIRequestsFormsList().load(file)                
@@ -178,10 +178,7 @@ class storageservice:
 
     def __getbucket(self, category, programarea=None):
         docpathmapper = DocumentPathMapper().getdocumentpath(category, programarea if category.lower() == "attachments" else None)
-        return self.__formatbucketname(docpathmapper['bucket'], programarea)
-
-    def __formatbucketname(self, bucket):
-        return bucket.replace('$environment', self.s3environment)
+        return docpathmapper['bucket']
 
     def __getfilepath(self,category,ministrycode,requestnumber,filestatustransition,uniquefilename):
         if category.lower() == 'attachments':
