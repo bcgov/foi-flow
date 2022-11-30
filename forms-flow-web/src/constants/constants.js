@@ -44,3 +44,5 @@ export const OSS_S3_BUCKET_FULL_PATH = "https://" + ((window._env_ && window._en
 process.env.REACT_APP_OSS_S3_HOST || "citz-foi-prod.objectstore.gov.bc.ca")+ "/" + ((window._env_ && window._env_.REACT_APP_OSS_S3_FORMS_BUCKET) ||
 process.env.REACT_APP_OSS_S3_FORMS_BUCKET || "dev-forms-foirequests")
 
+export const FOI_FFA_URL =  (window._env_ && window._env_.FOI_FFA_URL) ||
+process.env.FOI_FFA_URL || "http://localhost:4000";

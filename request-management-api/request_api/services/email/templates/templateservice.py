@@ -6,6 +6,7 @@ from request_api.services.applicantcorrespondence.applicantcorrespondencelog imp
 from request_api.models.ApplicationCorrespondenceTemplates import ApplicationCorrespondenceTemplate
 import json
 import logging
+from flask import current_app
 
 class templateservice:
     """This class is reserved for jinja templating services integration.
@@ -68,6 +69,7 @@ class templateservice:
         return ApplicationCorrespondenceTemplate.get_template_by_name(templatename)
     
     def __generatetemplate(self, dynamictemplatevalues, emailtemplatehtml, title):
+        dynamictemplatevalues["ffaurl"] = current_app.config['FOI_FFA_URL']
         headerfooterhtml = storageservice().downloadtemplate('/TEMPLATES/EMAILS/header_footer_template.html')
         if(emailtemplatehtml is None):
             raise ValueError('No template found')

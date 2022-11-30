@@ -6,7 +6,7 @@ export const renderTemplate = (template: string, content: string, params: Array<
 export const applyVariables = (content: string, params: Array<any>) => {
   let newContent = content;
   params.forEach((item) => {
-    newContent = newContent.replace(item.name, item.value);
+    newContent = newContent.replaceAll(item.name, item.value);
   });
 
   return newContent;
@@ -21,6 +21,7 @@ export const getTemplateVariables = (requestDetails: any, templateInfo: any) => 
     {name: "{{assignedToFirstName}}", value: requestDetails.assignedToFirstName || ""},
     {name: "{{assignedToLastName}}", value: requestDetails.assignedToLastName || ""},
     {name: "{{assignedGroup}}", value: requestDetails.assignedGroup},
+    {name: "{{ffaurl}}", value: requestDetails.ffaurl},
   ];
   
 }
