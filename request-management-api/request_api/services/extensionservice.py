@@ -93,6 +93,7 @@ class extensionservice:
         if sum(publicbodyextensiondays) + extensionschema['extendedduedays'] > 30:
             raise BusinessException(Error.INVALID_INPUT)
         
+    
     def getextensiontobesaved(self, ministryrequestid, extensions,version):
         extensionstoadd=[]  
         extensionstodelete=[]
@@ -121,7 +122,7 @@ class extensionservice:
             extensionstoadd = extensions
 
         return extensionstoadd, extensionstodelete, extensionidstodelete
-    
+
     def saveaxisrequestextension(self, ministryrequestid, extensions, userid, username):
         version = self.__getversionforrequest(ministryrequestid)
         extensionstoadd, extensionstodelete, extensionidstodelete = self.getextensiontobesaved(ministryrequestid, extensions,version)
@@ -138,7 +139,7 @@ class extensionservice:
             # Post event for system generated comments & notifications for deleted extensions 
             eventservice().posteventforaxisextension(ministryrequestid, deletedextensionresult.args[0], userid, username, "delete")
         return extnsionresult
-
+        
     def __createextension(self, extension, ministryrequestid, ministryrequestversion, userid): 
         createuserid = extension['createdby'] if 'createdby' in extension and extension['createdby'] is not None else userid
         createdat = extension['created_at'] if 'created_at' in extension  and extension['created_at'] is not None else datetime.now()
@@ -209,8 +210,10 @@ class extensionservice:
                 "duedate": extendedduedate if extendedduedate else updatedduedate
             }
             requestservice().saveministryrequestversion(ministryrequestschema, foirequestid, ministryrequestid, userid)
+            
             version = self.__getversionforrequest(ministryrequestid)
             FOIRequestExtension.disableoldversions(version,ministryrequestid, userid)
+
             newduedate = \
             ministryrequestschema['duedate'] \
             if isinstance(ministryrequestschema['duedate'], str) \
@@ -241,9 +244,9 @@ class extensionservice:
 
               
         #copyextension has the updated extension with soft delete(isactive: False) with the new version of extension       
-        #updatedextension = self.__copyextensionproperties(extension, extensionschema, extensionversion)
+        # updatedextension = self.__copyextensionproperties(extension, extensionschema, extensionversion)
         # this will create a new version of extension with isactive = False
-        #extensionresult = FOIRequestExtension.createextensionversion(ministryrequestid, ministryversion, updatedextension, userid)
+        # extensionresult = FOIRequestExtension.createextensionversion(ministryrequestid, ministryversion, updatedextension, userid)
         #LATEST UPDATE :- updates existing isactive field to false if delete performed & no new version will be created for delete.
         extensionresult = FOIRequestExtension.disableextension(extension["foirequestextensionid"], userid)
         # once soft deleted, revert back the due date to prev due date

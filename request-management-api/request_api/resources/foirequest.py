@@ -26,7 +26,7 @@ from request_api.exceptions import BusinessException
 from request_api.services.requestservice import requestservice
 from request_api.services.rawrequestservice import rawrequestservice
 from request_api.services.eventservice import eventservice
-from request_api.schemas.foirequestwrapper import  FOIRequestWrapperSchema, EditableFOIRequestWrapperSchema, FOIRequestMinistrySchema
+from request_api.schemas.foirequestwrapper import  FOIRequestWrapperSchema, EditableFOIRequestWrapperSchema, FOIRequestMinistrySchema, FOIRequestStatusSchema
 from request_api.schemas.foiassignee import FOIRequestAssigneeSchema
 from marshmallow import Schema, fields, validate, ValidationError
 from request_api.utils.enums import MinistryTeamWithKeycloackGroup
@@ -98,7 +98,7 @@ class FOIRequests(Resource):
                     requestservice().copywatchers(request_json['id'],result.args[0],AuthHelper.getuserid())
                     requestservice().copycomments(request_json['id'],result.args[0],AuthHelper.getuserid())
                     requestservice().copydocuments(request_json['id'],result.args[0],AuthHelper.getuserid())
-                    requestservice().postopeneventtoworkflow(result.identifier, rawresult.args[0],request_json,result.args[0])
+                    requestservice().postopeneventtoworkflow(result.identifier, request_json,result.args[0])
             return {'status': result.success, 'message':result.message,'id':result.identifier, 'ministryRequests': result.args[0]} , 200
         except ValidationError as err:
                     return {'status': False, 'message':err.messages}, 400
@@ -120,12 +120,12 @@ class FOIRequestsById(Resource):
         """ POST Method for capturing FOI requests before processing"""
         try:
             request_json = request.get_json()            
-            foirequestschema = FOIRequestWrapperSchema().load(request_json)                                    
+            foirequestschema = FOIRequestWrapperSchema().load(request_json)  
             result = requestservice().saverequestversion(foirequestschema, foirequestid, foiministryrequestid,AuthHelper.getuserid())
             if result.success == True:
                 asyncio.ensure_future(eventservice().postevent(foiministryrequestid,"ministryrequest",AuthHelper.getuserid(),AuthHelper.getusername(),AuthHelper.isministrymember()))
-                metadata = json.dumps({"id": result.identifier, "ministries": result.args[0]})               
-                asyncio.ensure_future(requestservice().posteventtoworkflow(foiministryrequestid,  result.args[1], foirequestschema, json.loads(metadata),"iao"))
+                metadata = json.dumps({"id": result.identifier, "ministries": result.args[0]})
+                requestservice().posteventtoworkflow(foiministryrequestid,  foirequestschema, json.loads(metadata),"iao")
                 return {'status': result.success, 'message':result.message,'id':result.identifier, 'ministryRequests': result.args[0]} , 200
             else:
                  return {'status': False, 'message':EXCEPTION_MESSAGE_NOTFOUND_REQUEST,'id':foirequestid} , 404
@@ -165,7 +165,7 @@ class FOIRequestsByIdAndType(Resource):
             if result.success == True:
                 asyncio.ensure_future(eventservice().postevent(foiministryrequestid,"ministryrequest",AuthHelper.getuserid(),AuthHelper.getusername(),AuthHelper.isministrymember(),assigneename))
                 metadata = json.dumps({"id": result.identifier, "ministries": result.args[0]})
-                asyncio.ensure_future(requestservice().posteventtoworkflow(foiministryrequestid, result.args[1], ministryrequestschema, json.loads(metadata),"ministry"))
+                requestservice().posteventtoworkflow(foiministryrequestid, ministryrequestschema, json.loads(metadata),usertype)
                 return {'status': result.success, 'message':result.message,'id':result.identifier, 'ministryRequests': result.args[0]} , 200
             else:
                  return {'status': False, 'message':EXCEPTION_MESSAGE_NOTFOUND_REQUEST,'id':foirequestid} , 404
@@ -210,4 +210,54 @@ class FOIRequestUpdateById(Resource):
         except ValidationError as err:
             return {'status': False, 'message':err.messages}, 40
         except BusinessException as exception:
+            return {'status': exception.status_code, 'message':exception.message}, 500
+
+
+@cors_preflight('GET,OPTIONS')
+@API.route('/foirequests/<int:foirequestid>/ministryrequest/<int:foiministryrequestid>/payonline')
+class FOIRequestDetailsByMinistryId(Resource):
+    """Retrieve foi request for opened request"""
+    
+    @staticmethod
+    @TRACER.trace()
+    @cross_origin(origins=allowedorigins())
+    @auth.require
+    def get(foirequestid, foiministryrequestid):
+        try :
+            jsondata = {}
+            statuscode = 200            
+            jsondata = requestservice().getrequestdetails(foirequestid, foiministryrequestid)            
+            return jsondata , statuscode 
+        except ValueError:
+            return {'status': 500, 'message':"Invalid Request Id"}, 500
+        except KeyError as err:
+            return {'status': False, 'message':err.messages}, 400        
+        except BusinessException as exception:            
+            return {'status': exception.status_code, 'message':exception.message}, 500
+
+    
+@cors_preflight('GET,POST,PUT,OPTIONS')
+@API.route('/foirequests/<int:foirequestid>/ministryrequest/<int:foiministryrequestid>/status')
+class FOIRequestsByStatusId(Resource):
+    """Creates a new version of foi request for iao updates"""
+
+    @staticmethod
+    @TRACER.trace()
+    @cross_origin(origins=allowedorigins())
+    @auth.require
+    def post(foirequestid,foiministryrequestid):
+        """ POST Method for capturing FOI requests before processing"""
+        try: 
+            requestjson = request.get_json()
+            statusschema = FOIRequestStatusSchema().load(requestjson)
+            nextstatename =  statusschema['nextstatename']  if 'nextstatename' in  statusschema else None 
+            if nextstatename != "":
+                result = requestservice().updaterequeststatus(foirequestid, foiministryrequestid, nextstatename)
+                return {'status': result.success, 'message':result.message,'id':result.identifier, 'ministryRequests': result.args[0]} , 200
+            return {'status': False, 'message':EXCEPTION_MESSAGE_NOTFOUND_REQUEST,'id':foirequestid} , 404
+        except ValidationError as err:
+            return {'status': False, 'message':err.messages}, 400
+        except KeyError as err:
+            return {'status': False, 'message':err.messages}, 400    
+        except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500

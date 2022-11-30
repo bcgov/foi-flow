@@ -20,6 +20,7 @@ asyncio-nats-streaming==0.4.0
 attrs==20.3.0
 bcrypt==3.2.0
 blinker==1.4
+boto3==1.24.35
 cachelib==0.1.1
 certifi==2020.12.5
 cffi==1.14.5
@@ -73,5 +74,5 @@ ndg-httpsclient
 pyopenssl
 pyasn1
 secure==0.3.0
-boto3==1.24.35
+imap-tools==0.56.0
 -e git+https://github.com/bcgov/sbc-common-components.git#egg=sbc-common-components&subdirectory=python

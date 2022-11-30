@@ -32,7 +32,7 @@ class notificationuser:
         for user in _users:
             if self.__isignorable(user, notificationusers, userid) == False and (("Tagged User Comments" not in notificationtype and self.__istaggeduser(user, requestjson, notificationtype) == False) or "Tagged User Comments" in notificationtype):
                 notificationusers.append(user)
-        return notificationusers     
+        return notificationusers    
     
     def __isignorable(self, notificationuser, users, userid):
         if notificationuser["userid"] == userid:
@@ -63,7 +63,7 @@ class notificationuser:
                 watchers =  watcherservice().getrawrequestwatchers(foirequest['requestid'])
             for watcher in watchers:
                     notificationusers.append({"userid":watcher["watchedby"], "usertype":notificationconfig().getnotificationusertypeid("Watcher")})
-        return notificationusers        
+        return notificationusers         
     
     def __getassignees(self, foirequest, requesttype, notificationtype, requestjson=None):
         notificationusers = []

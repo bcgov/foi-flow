@@ -1,0 +1,175 @@
+/* add css module styles here (optional) */
+
+.container {
+  padding-left: 5%;
+  padding-right: 5%;
+  margin-top: 20px;
+}
+
+.heading {
+  color: #FFF;
+  font-size: 16px !important;
+  font-weight: bold !important;
+}
+
+.accordionSummary {
+  flex-direction: row-reverse;
+}
+
+.formLabel {
+  padding: 15px 5px;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.buttonContainer {
+  padding-left: 0px !important;
+}
+
+.saveButton {
+  margin: 0;
+  width: 100%;
+  background-color: #38598A !important;
+  color: #FFFFFF !important;
+  font-family: BCSans-Bold, sans-serif !important;
+  margin-top: 20px;
+  margin-bottom: 50px;
+}
+
+.cfrform-floatRight {
+  cursor: pointer;
+  display: block;
+  z-index: 2;
+  position: absolute;
+  right: -20px;
+}
+
+.cfrform-floatRight button{
+  padding: 0px;
+  min-width: 0px;
+}
+
+.cfrform-floatRightRight {
+  cursor: pointer;
+  display: block;
+  position: absolute;
+  right: -190px;
+}
+
+.cfrform-totals {
+  top: 132px;
+  p {
+    margin: 3px;
+  }
+}
+
+.cfrform-locating {
+  top: 200px;
+}
+
+.cfrform-producing {
+  top: 325px;
+}
+
+.cfrform-preparing {
+  top: 465px;
+}
+
+.cfrform-volume {
+  top: 590px;
+}
+
+.hideContent {
+    display: none;
+}
+
+.toolTipContent ul {
+  padding-left: 10px;
+}
+
+.cfrform-chip {
+  color: #38598A !important;
+  border-top-color:#38598A !important;
+  border-top-width: 2px !important;
+  border-right-color:#38598A !important;
+  border-right-width: 2px !important;
+  border-bottom-color:#38598A !important;
+  border-bottom-width: 2px !important;
+  border-left-color: #38598A !important;
+  border-left-width: 2px !important;
+}
+
+.cfrform-container .MuiAccordionSummary-expandIconWrapper {
+  padding: 12px;
+  color: #FFF;
+}
+
+.history-entry-accordion {
+  box-shadow: none !important;
+  .MuiAccordionSummary-root {
+    background-color: #ebeef3 !important;
+    border-radius: 4px !important;
+    color: #003366;
+    .MuiAccordionSummary-content {
+      justify-content: space-between;
+      .history-entry-username {
+        margin-right: 8px;
+      }
+      .history-entry-title {
+        font-weight: 600
+      }
+    }
+  }
+
+  .MuiAccordionSummary-expandIconWrapper {
+    color: #003366 ;
+  }
+}
+
+.cfr-history-modal-header {
+  margin-left: 0;
+}
+
+.create-new-modal-message {
+  display: block;
+  text-align: center;
+  margin: 0 10%;
+}
+
+.btn-cfr-history {
+  float: right;
+  text-decoration: underline !important;
+  padding-bottom: 0 !important;
+  padding-right: 0 !important;
+}
+
+.historyLabel {
+  padding: 5px;
+  color: #003366;
+  font-size: 15px;
+}
+
+.cfrform { 
+  .btn-cancel {
+    border: 1px solid #38598A !important;
+    background-color: #FFFFFF !important;
+    color: #38598A !important;
+  }
+}
+
+.cfr-fee-totals {
+  display: flex;
+  width: 100%;
+  margin: 0 0 5px !important;
+}
+
+.cfrform-reasons {
+  top: 140px;
+  right: 4% !important;
+}
+
+@media (max-width: 1444px) {
+  .cfrform-floatRightRight {
+    display: none;
+  }
+}

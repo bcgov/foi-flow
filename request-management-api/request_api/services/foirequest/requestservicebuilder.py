@@ -32,8 +32,13 @@ class requestservicebuilder(requestserviceconfigurator):
         foiministryrequest.description = requestschema.get("description")
         foiministryrequest.duedate = requestschema.get("dueDate")
         if requestschema.get("cfrDueDate") is not None and requestschema.get("cfrDueDate")  != "":
-            foiministryrequest.cfrduedate = requestschema.get("cfrDueDate")        
-        foiministryrequest.startdate = requestschema.get("startDate")
+            foiministryrequest.cfrduedate = requestschema.get("cfrDueDate")
+        startdate = ""
+        if (requestschema.get("startDate") is not None):
+            startdate = requestschema.get("startDate")
+        elif (requestschema.get("requestProcessStart") is not None):
+            startdate = requestschema.get("requestProcessStart")
+        foiministryrequest.startdate = startdate
         foiministryrequest.createdby = userid
         requeststatusid =  self.getpropertyvaluefromschema(requestschema, 'requeststatusid')
         if requeststatusid is not None:
@@ -124,7 +129,7 @@ class requestservicebuilder(requestserviceconfigurator):
             if key in dataschema and  dataschema.get(key) is not None and dataschema.get(key)  and dataschema.get(key)  != "":
                 return True
         else:
-            if dataschema.get(location) is not None and key in dataschema.get(location) and dataschema.get(location)[key] and dataschema.get(location)[key] is not None and dataschema.get(location)[key] !="":     
+            if dataschema.get(location) is not None and key in dataschema.get(location) and dataschema.get(location)[key] and dataschema.get(location)[key] is not None and dataschema.get(location)[key] !="":
                 return True
         return False          
     

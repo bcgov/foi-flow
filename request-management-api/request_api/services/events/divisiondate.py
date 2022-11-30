@@ -1,4 +1,3 @@
-
 from os import stat
 from re import VERBOSE
 from request_api.services.notifications.duecalculator import duecalculator
@@ -17,9 +16,8 @@ from dateutil.parser import parse
 
 class divisiondateevent(duecalculator):
     """ FOI Event management service
-
     """
-           
+
     def createdueevent(self):
         try: 
             _today = self.gettoday()
@@ -38,14 +36,14 @@ class divisiondateevent(duecalculator):
         except BusinessException as exception:            
             current_app.logger.error("%s,%s" % ('Legislative reminder Notification Error', exception.message))
             return DefaultMethodResult(False,'Division reminder notifications failed',_today)
-        
+
     def __createnotification(self, message, requestid):
         if message is not None: 
             return notificationservice().createnotification({"message" : message}, requestid, "ministryrequest", self.__notificationtype(), self.__defaultuserid(), False)
-                    
+
     def __upcomingduemessage(self, data):
         return self.__getformattedprefix(data)+ ' due on ' + parse(str(data['duedate'])).strftime("%Y %b %d").upper()  
-   
+
     def __todayduemessage(self, data):
         return self.__getformattedprefix(data)+ ' due Today'
 
@@ -58,9 +56,9 @@ class divisiondateevent(duecalculator):
         elif data['stageid'] == 9:
             _message += " sign off is"        
         return _message
-    
+
     def __notificationtype(self):
         return "Division Due Reminder"
-    
+
     def __defaultuserid(self):
-        return "System"        
+        return "System"       
