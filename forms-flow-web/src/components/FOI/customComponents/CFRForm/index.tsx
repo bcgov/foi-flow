@@ -491,8 +491,7 @@ export const CFRForm = ({
       will be sending the form to the IAO user and locking your ability to edit the form.
       Are you sure you would like to continue?</>);
     } else if (e.target.value === 'approved') {
-      setModalMessage(<>Are you sure you want to change the status to <b>"Approved"</b>? The
-      CFR form will be locked for editing{formHistory.length > 0 ? "." : ", and can only be unlocked by changing the status back."}</>);
+      setModalMessage(<>Are you sure you want to change the status to <b>"Approved"</b>? Once approved, a CFR form is uneditable. Any changes will require a new CFR form to be created.</>);
     } else if (e.target.value === 'clarification') {
       setModalMessage(<>By changing the CFR Form Status to <b>"Needs Clarification with Ministry" </b> you
       will be sending the form to the Ministry user and locking your ability to edit the form.
