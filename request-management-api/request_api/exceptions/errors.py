@@ -31,6 +31,7 @@ class Error(Enum):
     INVALID_REFRESH_TOKEN = 'Invalid refresh token.', http_status.HTTP_400_BAD_REQUEST
     UNDEFINED_ERROR = 'Undefined error.', http_status.HTTP_400_BAD_REQUEST
     SERVICE_UNAVAILABLE = 'Service Unavailable', http_status.HTTP_500_INTERNAL_SERVER_ERROR
+    MISSING_ACCESS_KEY = 'S3 Access Key missing in Document Path Mapper attributes', http_status.HTTP_500_INTERNAL_SERVER_ERROR
 
     def __new__(cls, message, status_code):
         """Attributes for the enum."""

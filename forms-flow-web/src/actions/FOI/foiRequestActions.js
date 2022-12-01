@@ -242,6 +242,13 @@ export const setRequestExtensions = (data) => (dispatch) => {
   });
 };
 
+export const setRequestRecords = (data) => (dispatch) => {
+    dispatch({
+      type: FOI_ACTION_CONSTANTS.FOI_REQUEST_RECORDS,
+      payload: data,
+    });
+  };
+
 export const setOpenedMinistries = (data) => (dispatch) => {
     dispatch({
       type: FOI_ACTION_CONSTANTS.FOI_OPENED_MINISTRIES,

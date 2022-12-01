@@ -210,7 +210,8 @@ export default function ConfirmationModal({requestId, openModal, handleModal, st
               maxFileSize={state.toLowerCase() === StateEnum.onhold.name.toLowerCase()?MaxFileSizeInMB.feeEstimateAttachment:MaxFileSizeInMB.stateTransition}
               updateFilesCb={updateFilesCb}
               totalFileSize={state.toLowerCase() === StateEnum.onhold.name.toLowerCase()?MaxFileSizeInMB.totalFeeEstimateFileSize:MaxFileSizeInMB.totalFileSize}
-              maxNumberOfFiles={state.toLowerCase() === StateEnum.onhold.name.toLowerCase()?MaxNumberOfFiles.feeEstimateFiles:MaxNumberOfFiles.attachments}
+              maxNumberOfFiles={state.toLowerCase() === StateEnum.onhold.name.toLowerCase()?MaxNumberOfFiles.feeEstimateFiles:MaxNumberOfFiles.attachments}              
+              className={classes.fileUploadBox}
             />
           </div>
         );
