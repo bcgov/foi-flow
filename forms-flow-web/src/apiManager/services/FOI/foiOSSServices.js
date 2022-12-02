@@ -71,7 +71,7 @@ import {
       })
       .catch((error) => {
         dispatch(serviceActionError(error));
-        done("Error in saving files to S3");
+        done(error);
       });
   };
   
@@ -99,10 +99,13 @@ import {
         done("Error in getting files from S3");
       });
   };
-  
-  export const getFOIS3DocumentPreSignedUrl = (filepath,ministryrequestid,dispatch, ...rest) => {
+
+  export const getFOIS3DocumentPreSignedUrl = (filepath,ministryrequestid,dispatch,...rest) => {
     const done = fnDone(rest);
-    const apiurl = API.FOI_GET_S3DOCUMENT_PRESIGNEDURL+ "/" + (ministryrequestid == undefined ? "-1" : ministryrequestid) +"?filepath="+filepath
+    const type = rest[1] || 'attachments';
+    const bcgovcode = rest[2];
+    console.log(ministryrequestid)
+    const apiurl = API.FOI_GET_S3DOCUMENT_PRESIGNEDURL+ "/" + (ministryrequestid == undefined ? "-1" : ministryrequestid) +"/" + type + "/" + bcgovcode + "?filepath="+filepath
     const response = httpGETRequest(apiurl, {}, UserService.getToken());
     response.then((res) => {
         if (res.data) {
@@ -118,3 +121,23 @@ import {
       });
     return response;
   };
+  
+  export const postFOIS3DocumentPreSignedUrl = (ministryrequestid, data, category, bcgovcode, dispatch, ...rest) => {
+    const done = fnDone(rest);
+    const apiurl = API.FOI_POST_S3DOCUMENT_PRESIGNEDURL+ "/" + (ministryrequestid == undefined ? "-1" : ministryrequestid) + "/" + category + "/" + bcgovcode;
+    const response = httpPOSTRequest(apiurl, data, UserService.getToken());
+    response.then((res) => {
+        if (res.data) {
+          done(null, res.data);
+        } else {
+          dispatch(serviceActionError(res));
+          done("Error in postFOIS3DocumentPreSignedUrl");
+        }
+      })
+      .catch((error) => {
+        dispatch(serviceActionError(error));
+        done("Error in postFOIS3DocumentPreSignedUrl");
+      });
+    return response;
+  };
+  

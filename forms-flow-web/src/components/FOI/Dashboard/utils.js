@@ -147,10 +147,11 @@ export const getDaysLeft = (params) => {
   }
 };
 
-export const ClickableChip = ({ clicked, ...rest }) => {
+export const ClickableChip = ({ clicked, sx={}, ...rest }) => {
   return (
     <Chip
-      sx={{
+      sx={[
+        {
         ...(clicked
           ? {
               backgroundColor: "#38598A",
@@ -161,7 +162,14 @@ export const ClickableChip = ({ clicked, ...rest }) => {
               border: "1px solid #38598A",
               width: "100%",
             }),
-      }}
+          ...sx
+        },
+        {
+          '&:focus': {
+            backgroundColor: "#38598A",
+          }
+        },
+      ]}
       variant={clicked ? "filled" : "outlined"}
       {...rest}
     />

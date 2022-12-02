@@ -402,6 +402,7 @@ export const AttachmentSection = ({
             attachment={updateAttachment}
             attachmentsArray={attachmentsArray}
             handleRename={handleRename}
+            maxNoFiles={10}
             isMinistryCoordinator={isMinistryCoordinator}
           />
         </>
@@ -548,7 +549,7 @@ const Attachment = React.memo(({indexValue, attachment, handlePopupButtonClick, 
 const opendocumentintab =(attachment,ministryId)=>
 {
   let relativedocpath = attachment.documentpath.split('/').slice(4).join('/')
-  let url =`/foidocument?id=${ministryId}&filepath=${relativedocpath}`;
+  let url =`/foidocument?id=${ministryId || -1}&filepath=${relativedocpath}`;
   window.open(url, '_blank').focus();
 }
 

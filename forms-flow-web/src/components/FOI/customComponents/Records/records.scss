@@ -1,0 +1,25 @@
+.records-accordion {
+    width:100%;
+    .MuiAccordion-root {
+        margin: 10px 0 !important;
+        border: #003366 1px solid;
+        background-color: #FFFFFF !important;
+    }
+
+    .MuiAccordionSummary-root {
+        min-height: 35px;
+        height: 35px;
+    }
+}
+
+.records-actions-btn {
+    padding: 0 !important;
+}
+
+.file-upload-toast {
+    .Toastify__toast-body {
+        > div:last-child {
+            white-space: pre-line;
+        }
+    }
+}
