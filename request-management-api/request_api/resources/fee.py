@@ -103,8 +103,8 @@ class Payment(Resource):
                 paymentservice().createpaymentreceipt(request_id, ministry_request_id, data, parsed_args)
                 nextstatename, paymenteventtype = paymentservice().postpayment(ministry_request_id, data)
                 cfrfeeservice().updatepaymentmethod(ministry_request_id, paymenteventtype)
-                # update status and due date should happen here
-                requestservice().updaterequeststatus(request_id, ministry_request_id, nextstatename)
+                # automated state transition and due date calculation
+                requestservice().postpaymentstatetransition(request_id, ministry_request_id, nextstatename)
                 asyncio.ensure_future(eventservice().postpaymentevent(ministry_request_id, paymenteventtype))
                 requestservice().postfeeeventtoworkflow(request_id, ministry_request_id, "PAID", nextstatename)
                 
