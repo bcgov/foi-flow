@@ -565,7 +565,7 @@ execution.setVariable("balanceDue_f", parseFloat(fee)); </camunda:script>
       <bpmn:incoming>Flow_02gzt5c</bpmn:incoming>
       <bpmn:outgoing>Flow_0tmarie</bpmn:outgoing>
     </bpmn:serviceTask>
-    <bpmn:serviceTask id="Activity_1ka6mqq" name="Update WF Message">
+    <bpmn:serviceTask id="Activity_1ka6mqq" name="Sync FOI Status in WF">
       <bpmn:extensionElements>
         <camunda:connector>
           <camunda:inputOutput>
@@ -710,7 +710,7 @@ connector.getVariable("statusCode");</camunda:script>
   </bpmn:category>
   <bpmn:error id="Error_0ccuaf4" name="FOI-CANCEL-SUB-API-ERR" camunda:errorMessage="FOI Cancel Submission Link Failed." />
   <bpmn:category id="Category_1y77j5j">
-    <bpmn:categoryValue id="CategoryValue_1dcilzu" value="Message Update" />
+    <bpmn:categoryValue id="CategoryValue_1dcilzu" value="Sync WF Status" />
   </bpmn:category>
   <bpmn:category id="Category_0qftq87">
     <bpmn:categoryValue id="CategoryValue_1baekcn" value="Expiry Notification" />
@@ -1105,6 +1105,9 @@ connector.getVariable("statusCode");</camunda:script>
       <bpmndi:BPMNShape id="Event_1wnfiii_di" bpmnElement="Event_1pldnh9">
         <dc:Bounds x="1462" y="1382" width="36" height="36" />
       </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0c9ytw1_di" bpmnElement="Event_1s2s2yf">
+        <dc:Bounds x="1112" y="1312" width="36" height="36" />
+      </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Event_17odcea_di" bpmnElement="get-req-details">
         <dc:Bounds x="572" y="355" width="36" height="36" />
         <bpmndi:BPMNLabel>
@@ -1123,9 +1126,6 @@ connector.getVariable("statusCode");</camunda:script>
           <dc:Bounds x="548" y="182" width="25" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Event_0c9ytw1_di" bpmnElement="Event_1s2s2yf">
-        <dc:Bounds x="1112" y="1312" width="36" height="36" />
-      </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Group_087f8ap_di" bpmnElement="Group_087f8ap">
         <dc:Bounds x="330" y="210" width="590" height="250" />
         <bpmndi:BPMNLabel>
@@ -1138,22 +1138,22 @@ connector.getVariable("statusCode");</camunda:script>
           <dc:Bounds x="1410" y="209" width="86" height="27" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Group_0b2abdf_di" bpmnElement="Cancel_payment">
-        <dc:Bounds x="842" y="585" width="575" height="235" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="1049" y="551" width="70" height="27" />
-        </bpmndi:BPMNLabel>
-      </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Group_0nmwgct_di" bpmnElement="Group_0nmwgct">
         <dc:Bounds x="840" y="855" width="560" height="230" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="1064" y="841" width="84" height="14" />
+          <dc:Bounds x="1068" y="841" width="79" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Group_0ihi2fn_di" bpmnElement="Group_0ihi2fn">
         <dc:Bounds x="785" y="1152" width="810" height="355" />
         <bpmndi:BPMNLabel>
           <dc:Bounds x="1146" y="1159" width="89" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Group_0b2abdf_di" bpmnElement="Cancel_payment">
+        <dc:Bounds x="842" y="585" width="575" height="235" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1049" y="551" width="70" height="27" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
     </bpmndi:BPMNPlane>

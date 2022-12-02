@@ -40,11 +40,12 @@ class requestservice:
     def updateministryrequestduedate(self, ministryrequestid, duedate, userid):
         return requestserviceupdate().updateministryrequestduedate(ministryrequestid, duedate, userid)
     
-    def updaterequeststatus(self, requestid, ministryrequestid, nextstatename):
-        foirequestschema = self.getrequest(requestid, ministryrequestid)
+    def postpaymentstatetransition(self, requestid, ministryrequestid, nextstatename):
+        foirequest = self.getrequest(requestid, ministryrequestid)
         status = FOIRequestStatus().getrequeststatusid(nextstatename)
-        foirequestschema['requeststatusid'] = status['requeststatusid']
-        return self.saverequestversion(foirequestschema, requestid, ministryrequestid,'Online Payment')
+        foirequest['requeststatusid'] = status['requeststatusid']
+        # update due date here
+        return self.saverequestversion(foirequest, requestid, ministryrequestid,'Online Payment')
                
     def getrequest(self,foirequestid,foiministryrequestid): 
         return requestservicegetter().getrequest(foirequestid, foiministryrequestid)
