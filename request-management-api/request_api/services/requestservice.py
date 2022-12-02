@@ -14,6 +14,7 @@ from request_api.services.applicantcorrespondence.applicantcorrespondencelog imp
 from request_api.models.FOIRequestStatus import FOIRequestStatus
 from request_api.models.FOIRawRequests import FOIRawRequest
 from request_api.models.FOIMinistryRequests import FOIMinistryRequest
+from request_api.utils.enums import StateName
 class requestservice:
     """ FOI Request management service
 
@@ -40,11 +41,17 @@ class requestservice:
     def updateministryrequestduedate(self, ministryrequestid, duedate, userid):
         return requestserviceupdate().updateministryrequestduedate(ministryrequestid, duedate, userid)
     
-    def updaterequeststatus(self, requestid, ministryrequestid, nextstatename):
-        foirequestschema = self.getrequest(requestid, ministryrequestid)
+    def postpaymentstatetransition(self, requestid, ministryrequestid, nextstatename):
+        foirequest = self.getrequest(requestid, ministryrequestid)
+        currentstatus = foirequest["stateTransition"][0]["status"] if "stateTransition" in foirequest and len(foirequest["stateTransition"])  > 1 else None
         status = FOIRequestStatus().getrequeststatusid(nextstatename)
-        foirequestschema['requeststatusid'] = status['requeststatusid']
-        return self.saverequestversion(foirequestschema, requestid, ministryrequestid,'Online Payment')
+        print("currentstatus == ",currentstatus)
+        if currentstatus not in (None, "") and currentstatus == StateName.onhold.value:
+            print('update due date here')
+        
+        foirequest['requeststatusid'] = status['requeststatusid']
+        print("foirequest == ", foirequest)       
+        return self.saverequestversion(foirequest, requestid, ministryrequestid,'Online Payment')
                
     def getrequest(self,foirequestid,foiministryrequestid): 
         return requestservicegetter().getrequest(foirequestid, foiministryrequestid)
