@@ -132,6 +132,7 @@ class paymentservice:
         #outstanding
         if balancedue == 0 and ((templatename and templatename == 'PAYOUTSTANDING') or prevstate.lower() == "response"):
             paymenteventtype = PaymentEventType.outstandingpaid.value
+            nextstatename = StateName.response.value
         return nextstatename, paymenteventtype
 
     def getreceiptename(self, key):
