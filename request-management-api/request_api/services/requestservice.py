@@ -15,6 +15,8 @@ from request_api.models.FOIRequestStatus import FOIRequestStatus
 from request_api.models.FOIRawRequests import FOIRawRequest
 from request_api.models.FOIMinistryRequests import FOIMinistryRequest
 from request_api.utils.enums import StateName
+from request_api.services.notifications.duecalculator import duecalculator
+
 class requestservice:
     """ FOI Request management service
 
@@ -45,14 +47,12 @@ class requestservice:
         foirequest = self.getrequest(requestid, ministryrequestid)
         currentstatus = foirequest["stateTransition"][0]["status"] if "stateTransition" in foirequest and len(foirequest["stateTransition"])  > 1 else None
         status = FOIRequestStatus().getrequeststatusid(nextstatename)
-        print("currentstatus == ",currentstatus)
         if currentstatus not in (None, "") and currentstatus == StateName.onhold.value:
-            print('update due date here')
-        
+            onhold_extend_days = duecalculator().getbusinessdaysbetween(foirequest["onholdTransitionDate"])
+            foirequest['dueDate'] = duecalculator().addbusinessdays(foirequest["dueDate"], onhold_extend_days)
         foirequest['requeststatusid'] = status['requeststatusid']
-        print("foirequest == ", foirequest)       
         return self.saverequestversion(foirequest, requestid, ministryrequestid,'Online Payment')
-               
+           
     def getrequest(self,foirequestid,foiministryrequestid): 
         return requestservicegetter().getrequest(foirequestid, foiministryrequestid)
     
