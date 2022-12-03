@@ -61,6 +61,9 @@ class duecalculator:
             ca_holidays.extend(self.__getholidaysbyyear(year))
         return ca_holidays
 
+    def formatedate(self, input, format):
+        _inpdate =  self.__getdate(input)
+        return _inpdate.strftime(format) 
 
     def __getholidaysbyyear(self, year):        
         ca_holidays = []
@@ -74,7 +77,7 @@ class duecalculator:
 
     def __formatdate(self, input):
         _inpdate =  self.__getdate(input)
-        return _inpdate.strftime(self.__getdefaultdateformat())   
+        return _inpdate.strftime(self.__getdefaultdateformat())      
     
     def __isweekday(self, inpdate):
         _inpdate = self.__getdate(inpdate)
