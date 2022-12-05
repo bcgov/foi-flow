@@ -2127,32 +2127,55 @@
                         },
                         {
                             "label": "HTML",
+                            "labelWidth": "",
+                            "labelMargin": "",
+                            "tag": "p",
+                            "className": "",
                             "attrs": [
                                 {
                                     "attr": "",
                                     "value": ""
                                 }
                             ],
-                            "content": "<center style='color: #003366'>If you would like to contact the Information Access Operations representative to better clarify your request and try and reduce your fee <br/> please, Email FOI at: FOI.Requests@gov.bc.ca, or call, Phone: 250-387-1321 | Toll Free: 833-283-8200 </center>",
+                            "content": "<center style='color: #003366'>If you would like to contact an Information Access Operations representative to better clarify your request and try and reduce your fee <br/> please, Email FOI at: FOI.Requests@gov.bc.ca, or call, Phone: 250-387-1321 | Toll Free: 833-283-8200 </center>",
                             "refreshOnChange": false,
+                            "customClass": "",
+                            "hidden": false,
+                            "modalEdit": false,
                             "key": "html25",
+                            "tags": [],
+                            "properties": {},
+                            "conditional": {
+                                "show": null,
+                                "when": null,
+                                "eq": "",
+                                "json": ""
+                            },
+                            "customConditional": "",
+                            "logic": [],
+                            "attributes": {},
+                            "overlay": {
+                                "style": "",
+                                "page": "",
+                                "left": "",
+                                "top": "",
+                                "width": "",
+                                "height": ""
+                            },
                             "type": "htmlelement",
                             "input": false,
                             "tableView": false,
                             "placeholder": "",
                             "prefix": "",
-                            "customClass": "",
                             "suffix": "",
                             "multiple": false,
                             "defaultValue": null,
                             "protected": false,
                             "unique": false,
                             "persistent": false,
-                            "hidden": false,
                             "clearOnHide": true,
                             "refreshOn": "",
                             "redrawOn": "",
-                            "modalEdit": false,
                             "dataGridLabel": false,
                             "labelPosition": "top",
                             "description": "",
@@ -2167,7 +2190,6 @@
                             "calculateValue": "",
                             "calculateServer": false,
                             "widget": null,
-                            "attributes": {},
                             "validateOn": "change",
                             "validate": {
                                 "required": false,
@@ -2177,27 +2199,13 @@
                                 "multiple": false,
                                 "unique": false
                             },
-                            "conditional": {
-                                "show": null,
-                                "when": null,
-                                "eq": ""
-                            },
-                            "overlay": {
-                                "style": "",
-                                "left": "",
-                                "top": "",
-                                "width": "",
-                                "height": ""
-                            },
                             "allowCalculateOverride": false,
                             "encrypted": false,
                             "showCharCount": false,
                             "showWordCount": false,
-                            "properties": {},
                             "allowMultipleMasks": false,
                             "addons": [],
-                            "tag": "p",
-                            "id": "e5heqp8"
+                            "id": "e60gx5"
                         }
                     ],
                     "placeholder": "",
