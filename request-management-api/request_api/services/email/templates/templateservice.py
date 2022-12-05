@@ -7,6 +7,9 @@ from request_api.models.ApplicationCorrespondenceTemplates import ApplicationCor
 import json
 import logging
 from flask import current_app
+from request_api.services.email.templates.templatefilters import init_filters
+
+init_filters()
 
 class templateservice:
     """This class is reserved for jinja templating services integration.
@@ -66,8 +69,8 @@ class templateservice:
         return requestjson["stateTransition"][2]["status"] if "stateTransition" in requestjson and len(requestjson["stateTransition"])  > 3 else None
 
     def __gettemplate(self, templatename):
-        return ApplicationCorrespondenceTemplate.get_template_by_name(templatename)
-    
+        return ApplicationCorrespondenceTemplate.get_template_by_name(templatename)  
+
     def __generatetemplate(self, dynamictemplatevalues, emailtemplatehtml, title):
         dynamictemplatevalues["ffaurl"] = current_app.config['FOI_FFA_URL']
         headerfooterhtml = storageservice().downloadtemplate('/TEMPLATES/EMAILS/header_footer_template.html')
@@ -81,7 +84,7 @@ class templateservice:
                 dynamictemplatevalues["assignedToFirstName"] = ""
                 dynamictemplatevalues["assignedToLastName"] = ""
 
-        contenttemplate = Template(emailtemplatehtml)
+        contenttemplate = Template(emailtemplatehtml)   
         content = contenttemplate.render(dynamictemplatevalues)
         dynamictemplatevalues["content"] = content
         dynamictemplatevalues['title'] = title
@@ -89,6 +92,5 @@ class templateservice:
         finaltemplatedhtml = finaltemplate.render(dynamictemplatevalues)
         return finaltemplatedhtml, content
 
-    
     def __generatecorrespondencetetemplate(self, applicantcorrespondenceid):
         return applicantcorrespondenceservice().getapplicantcorrespondencelogbyid(applicantcorrespondenceid)
