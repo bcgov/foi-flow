@@ -41,11 +41,11 @@ class duecalculator:
         date2 = date2 if date2 not in (None, '') else self.gettoday()
         __fromdate = self.__getdate(date1) if self.__getdate(date1).date() <= self.__getdate(date2).date() else self.__getdate(date2)
         __todate = self.__getdate(date2) if self.__getdate(date2).date() >= self.__getdate(date1).date() else self.__getdate(date1)
-        __calcdate =__fromdate
-        while self.__getdate(__calcdate).date() <= self.__getdate(__todate).date():
-            __calcdate =  __calcdate + timedelta(days=1)
-            if self.__formatdate(__calcdate) not in _holidays and self.__isweekday(__calcdate) == True:
+        __fromcalcdate =__fromdate
+        while self.__getdate(__fromcalcdate).date() < self.__getdate(__todate).date():
+            if self.__formatdate(__fromcalcdate) not in _holidays and self.__isweekday(__fromcalcdate) == True:
                 businessdays += 1
+            __fromcalcdate =  __fromcalcdate + timedelta(days=1)            
         return businessdays    
 
  
