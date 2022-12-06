@@ -44,7 +44,7 @@ class FOIRequestRecord(db.Model):
                             fr1.createdby createdby, fr1.created_at 
                             from "FOIRequestRecords" fr1
                             where fr1.foirequestid = :foirequestid and fr1.ministryrequestid = :ministryrequestid
-                            order by recordid, version desc
+                            order by recordid desc, version desc
                     """
             
             rs = db.session.execute(text(sql), {'foirequestid': foirequestid, 'ministryrequestid' : ministryrequestid})
