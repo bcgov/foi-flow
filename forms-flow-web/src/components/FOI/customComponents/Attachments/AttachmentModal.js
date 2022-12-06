@@ -187,6 +187,7 @@ export default function AttachmentModal({
         });
         
         handleModal(true, fileInfoList, files);
+        setFiles([]);
       }
     }  
     const getMessage = () => {
