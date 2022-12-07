@@ -1,13 +1,9 @@
   
     <p>Dear {{firstName}} {{lastName}},</p>
-    <p>Information Access Operations has received your payment for request #{{axisRequestId}} on {{cfrfee.feedata.paymentdate | formatdate('%B %d, %Y')}}.</p>
+    <p>Information Access Operations has received your payment for FOI request #{{axisRequestId}} on {{cfrfee.feedata.paymentdate | formatdate('%B %d, %Y')}}.</p>
     <p>FOI Request # {{axisRequestId}} is now due on {{dueDate | formatdate('%B %d, %Y')}}.</p>
-    <p>You have paid a <b>$ {{cfrfee.feedata.amountpaid}} deposit</b> on your request. 
-      This leaves an estimated remaining balance of $ {{cfrfee.feedata.balanceDue}} which is due upon completion of the request.
-      <i>You will NOT receive your records until the remaining balance is paid in full.</i>
-      <span style="color:FireBrick;">Fees are subject
-      to changes based off of the actual amount of time it takes the Ministry to gather records for your request.</span>
-    </p>
+    <p>You have paid a <b>$ {{cfrfee.feedata.amountpaid}}</b> deposit on your request. This leaves an estimated remaining balance of $ {{cfrfee.feedata.balanceDue}} which is due when the request is complete. You will NOT receive your records until the remaining balance is paid in full.</p>
+    <p>Fees are subject to changes based off of the actual amount of time it takes the Ministry to gather records for your request. Please also be advised that payments completed on holidays or weekends will be considered received the next business day.</p>
     <p>Your request has been taken off hold, the Ministry is now continuing to work on your request and gather responsive records.</p>
     <br>
     <p>Thank you,</p> 
