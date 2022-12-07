@@ -9,7 +9,7 @@ from request_api.models.FOIRequestApplicantMappings import FOIRequestApplicantMa
 from dateutil.parser import parse
 from request_api.services.cfrfeeservice import cfrfeeservice
 from request_api.services.paymentservice import paymentservice
-
+import maya
 
 class requestservicegetter:
     """ This class consolidates retrival of FOI request for actors: iao and ministry. 
@@ -182,7 +182,7 @@ class requestservicegetter:
         transitions = FOIMinistryRequest.getrequeststatusById(foiministryrequestid)
         for entry in transitions:
             if entry['requeststatusid'] == 11:
-                onholddate = parse(str(entry['created_at'])).strftime("%Y-%m-%d")
+                onholddate = maya.parse(entry['created_at']).datetime(to_timezone='America/Vancouver', naive=False).strftime("%Y-%m-%d")
             else:
                 if onholddate is not None:
                     break;

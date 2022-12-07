@@ -50,6 +50,7 @@ class requestservice:
         if currentstatus not in (None, "") and currentstatus == StateName.onhold.value:
             onhold_extend_days = duecalculator().getbusinessdaysbetween(foirequest["onholdTransitionDate"])
             foirequest['dueDate'] = duecalculator().addbusinessdays(foirequest["dueDate"], onhold_extend_days)
+            foirequest['cfrDueDate'] = duecalculator().addbusinessdays(foirequest["cfrDueDate"], onhold_extend_days)
         foirequest['requeststatusid'] = status['requeststatusid']
         return self.saverequestversion(foirequest, requestid, ministryrequestid,'Online Payment')
            
