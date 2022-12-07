@@ -1,5 +1,5 @@
 
-from os import stat, path
+from os import stat, path,getenv
 from re import VERBOSE
 from request_api.models.FOIRequestRecords import FOIRequestRecord
 from request_api.models.FOIMinistryRequests import FOIMinistryRequest
@@ -29,6 +29,9 @@ class recordservice:
         """Creates bulk records for a user with document details passed in for an opened request.
         """
         _ministryversion = FOIMinistryRequest.getversionforrequest(ministryrequestid)
+        _ministryrequest = FOIMinistryRequest.getrequestbyministryrequestid(ministryrequestid)
+        conversionstreamkey = getenv('EVENT_QUEUE_CONVERSION_STREAMKEY')
+        dedupestreamkey = getenv('EVENT_QUEUE_DEDUPE_STREAMKEY')
         recordlist = []
         for entry in records:
             record = FOIRequestRecord(foirequestid=requestid, ministryrequestid = ministryrequestid, ministryrequestversion=_ministryversion, 
@@ -37,10 +40,17 @@ class recordservice:
             recordlist.append(record)
         dbresponse = FOIRequestRecord.create(recordlist)
         if (dbresponse.success):
-            for entry in records:
+            for entry in records:                
                 _filename, extension = path.splitext(entry['s3uripath'])
                 if extension in ['.doc','.docx','.xls','.xlsx', '.ics', '.msg']:
-                    eventqueueservice().add("file-conversion", {"S3Path": entry['s3uripath']})
+                    eventqueueservice().add(conversionstreamkey, {"S3Path": entry['s3uripath']})
+                if extension in ['.pdf']:
+                    eventqueueservice().add(dedupestreamkey, {"s3filepath": entry['s3uripath'],
+                    "requestnumber": _ministryrequest['axisrequestid'],
+                     "bcgovcode": _ministryrequest['programarea.bcgovcode'],
+                     "filename": entry['filename'],
+                     "ministryrequestid": ministryrequestid
+                    })    
         return dbresponse
 
 
