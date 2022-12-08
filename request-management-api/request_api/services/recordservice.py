@@ -43,7 +43,7 @@ class recordservice:
             recordlist.append(record)
         dbresponse = FOIRequestRecord.create(recordlist)
         if (dbresponse.success):
-            for entry in records:                
+            for entry in records:                               
                 _filename, extension = path.splitext(entry['s3uripath'])
                 if extension in ['.doc','.docx','.xls','.xlsx', '.ics', '.msg']:
                     eventqueueservice().add(conversionstreamkey, {"S3Path": entry['s3uripath']})
@@ -52,7 +52,8 @@ class recordservice:
                     "requestnumber": _ministryrequest['axisrequestid'],
                      "bcgovcode": _ministryrequest['programarea.bcgovcode'],
                      "filename": entry['filename'],
-                     "ministryrequestid": ministryrequestid
+                     "ministryrequestid": ministryrequestid,
+                     "attributes": json.dumps(entry['attributes'])
                     })    
         return dbresponse
 
