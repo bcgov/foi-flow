@@ -2,7 +2,7 @@ name: Dev-Marshal formsflow.ai Web CD
 
 on:
   push:
-  branches:
+    branches:
       - dev
       - dev-marshal
       - test-marshal
