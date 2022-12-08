@@ -113,7 +113,7 @@ export const RecordsLog = ({
     setRecords(recordsArray)
   }, [recordsArray])
 
-  const divisionFilters = [...new Map(recordsArray.reduce((acc, file) => [...acc, ...new Map(file.attributes.map(division => [division.divisionid, division]))], [])).values()]
+  const divisionFilters = [...new Map(recordsArray.reduce((acc, file) => [...acc, ...new Map(file.attributes.divisions.map(division => [division.divisionid, division]))], [])).values()]
   if (divisionFilters.length > 0) divisionFilters.push({divisionid: -1, divisionname: "ALL"})
 
 
@@ -367,7 +367,7 @@ export const RecordsLog = ({
     return _recordsArray.filter(r =>
       (r.filename.toLowerCase().includes(_keywordValue?.toLowerCase()) ||
       r.createdby.toLowerCase().includes(_keywordValue?.toLowerCase())) &&
-      (_filterValue > -1 ? r.attributes.findIndex(a => a.divisionid === _filterValue) > -1 : true))
+      (_filterValue > -1 ? r.attributes.divisions.findIndex(a => a.divisionid === _filterValue) > -1 : true))
     }
 
   return (
@@ -680,7 +680,7 @@ const Attachment = React.memo(({indexValue, record, handlePopupButtonClick, getF
         alignItems="flex-start"
         spacing={1}
       >
-        {record.attributes.map((division, i) =>
+        {record.attributes.divisions.map((division, i) =>
           <Chip
             item
             key={i}

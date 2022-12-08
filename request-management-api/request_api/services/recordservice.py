@@ -8,6 +8,7 @@ from request_api.services.external.eventqueueservice import eventqueueservice
 import json
 from datetime import datetime
 import maya
+import uuid
 
 class recordservice:
     """ FOI record management service
@@ -30,7 +31,9 @@ class recordservice:
         """
         _ministryversion = FOIMinistryRequest.getversionforrequest(ministryrequestid)
         recordlist = []
+        batch = str(uuid.uuid4())
         for entry in records:
+            entry['attributes']['batch'] = batch
             record = FOIRequestRecord(foirequestid=requestid, ministryrequestid = ministryrequestid, ministryrequestversion=_ministryversion, 
                             version = 1, createdby = userid, created_at = datetime.now())
             record.__dict__.update(entry)
@@ -57,11 +60,11 @@ class recordservice:
         return record
 
     def __attributesformat(self, record, divisions):
-        attributes = json.loads(record['attributes'])
-        attribute_divisions = attributes.get('divisions')
+        record['attributes'] = json.loads(record['attributes'])
+        attribute_divisions = record['attributes'].get('divisions')
         for division in attribute_divisions:
             division['divisionname'] = self.__getdivisionname(divisions, division['divisionid']).replace(u"’", u"'")
-        record['attributes'] = attribute_divisions
+        record['attributes']['divisions'] = attribute_divisions
         return record
 
     def __getdivisionname(self, divisions, divisionid):
