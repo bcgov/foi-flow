@@ -1,6 +1,6 @@
 from os import stat
 from re import VERBOSE
-from request_api.services.notifications.duecalculator import duecalculator
+from request_api.services.commons.duecalculator import duecalculator
 from request_api.services.notificationservice import notificationservice
 from request_api.models.FOIMinistryRequests import FOIMinistryRequest
 import json

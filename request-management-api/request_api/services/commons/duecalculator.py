@@ -1,20 +1,19 @@
 
 from os import stat
 from re import VERBOSE
-import json
 from datetime import datetime as datetime2
 from datetime import datetime, timedelta
 import holidays
-import maya
 import os
 from dateutil.parser import parse
 from pytz import timezone
+from request_api.utils.commons.datetimehandler import datetimehandler
 
 class duecalculator:
     """ Due date calculator helper service
 
     """
-                
+
     def getpreviousbusinessday(self, cfrduedate,ca_holidays):
         _prevbusinessday = self.__getpreviousweekday(cfrduedate)
         if self.__isholiday(_prevbusinessday,ca_holidays) == False:            
@@ -23,15 +22,15 @@ class duecalculator:
             return self.getpreviousbusinessday(_prevbusinessday,ca_holidays)
 
     def formatduedate(self,input):
-        return self.__formatdate(input)
+        return datetimehandler().formatdate(input)
 
     def addbusinessdays(self, inpdate, days):
         _holidays = self.getholidays()
         businessdays = 0
-        __calcdate = self.__getdate(inpdate)
+        __calcdate = datetimehandler().getdate(inpdate)
         while businessdays < days:
             __calcdate =  __calcdate + timedelta(days=1)
-            if self.__formatdate(__calcdate) not in _holidays and self.__isweekday(__calcdate) == True:
+            if self.isbusinessday(__calcdate, _holidays) == True:
                 businessdays += 1              
         return __calcdate
 
@@ -39,20 +38,17 @@ class duecalculator:
         _holidays = self.getholidays()
         businessdays = 0
         date2 = date2 if date2 not in (None, '') else self.gettoday()
-        __fromdate = self.__getdate(date1) if self.__getdate(date1).date() <= self.__getdate(date2).date() else self.__getdate(date2)
-        __todate = self.__getdate(date2) if self.__getdate(date2).date() >= self.__getdate(date1).date() else self.__getdate(date1)
+        _date1_date_fmt = datetimehandler().getdate(date1)
+        _date2_date_fmt = datetimehandler().getdate(date2)
+        __fromdate = _date1_date_fmt if _date1_date_fmt <= _date2_date_fmt else _date2_date_fmt
+        __todate = _date2_date_fmt if _date2_date_fmt >= _date1_date_fmt else _date1_date_fmt
         __fromcalcdate =__fromdate
-        while self.__getdate(__fromcalcdate).date() < self.__getdate(__todate).date():
-            if self.__formatdate(__fromcalcdate) not in _holidays and self.__isweekday(__fromcalcdate) == True:
+        while datetimehandler().getdate(__fromcalcdate).date() < datetimehandler().getdate(__todate).date():
+            if self.isbusinessday(__fromcalcdate, _holidays) == True:
                 businessdays += 1
-            __fromcalcdate =  __fromcalcdate + timedelta(days=1)            
-        return businessdays    
+            __fromcalcdate =  __fromcalcdate + timedelta(days=1)           
+        return businessdays  
 
- 
-    def gettoday(self):
-        now_pst = maya.parse(maya.now()).datetime(to_timezone=self.__getdefaulttimezone(), naive=False)
-        return now_pst.strftime(self.__getdefaultdateformat()) 
-    
     def getholidays(self):
         ca_holidays = []
         currentyear = datetime.today().year
@@ -61,26 +57,30 @@ class duecalculator:
             ca_holidays.extend(self.__getholidaysbyyear(year))
         return ca_holidays
 
-    def formatedate(self, input, format):
-        _inpdate =  self.__getdate(input)
-        return _inpdate.strftime(format) 
+    def gettoday(self):
+        return datetimehandler().gettoday()
+
+    def now(self):
+        return datetimehandler().now()
 
     def __getholidaysbyyear(self, year):        
         ca_holidays = []
         for date, name in sorted(holidays.CA(prov='BC', years=year).items()):
-            ca_holidays.append(date.strftime(self.__getdefaultdateformat()))
+            ca_holidays.append(date.strftime(datetimehandler().getdefaultdateformat()))
         if 'FOI_ADDITIONAL_HOLIDAYS' in os.environ and os.getenv('FOI_ADDITIONAL_HOLIDAYS') != '':
             _addldays = os.getenv('FOI_ADDITIONAL_HOLIDAYS')
             for _addlday in _addldays.split(","):
                 ca_holidays.append(_addlday.strip().replace('XXXX',str(year)))
         return ca_holidays    
 
-    def __formatdate(self, input):
-        _inpdate =  self.__getdate(input)
-        return _inpdate.strftime(self.__getdefaultdateformat())      
-    
+    def isbusinessday(self, inpdate, holidays=None):
+        _holidays = self.getholidays() if holidays is None else holidays
+        if datetimehandler().formatdate(inpdate) not in _holidays and self.__isweekday(inpdate) == True:
+            return True
+        return False
+
     def __isweekday(self, inpdate):
-        _inpdate = self.__getdate(inpdate)
+        _inpdate = datetimehandler().getdate(inpdate)
         if _inpdate.weekday() < 5:
             return True
         else:   
@@ -88,7 +88,7 @@ class duecalculator:
     
     def __getpreviousweekday(self, cfrduedate):
         diff = 1
-        _cfrduedate = self.__getdate(cfrduedate)  
+        _cfrduedate = datetimehandler().getdate(cfrduedate)  
         if _cfrduedate.weekday() == 0:
             diff = 3
         elif _cfrduedate.weekday() == 6:
@@ -96,16 +96,8 @@ class duecalculator:
         else :
             diff = 1  
         res = _cfrduedate - timedelta(days=diff)
-        return res.strftime(self.__getdefaultdateformat())     
-
-    def __getdate(self, inputdate):
-        return  datetime.strptime(inputdate, "%Y-%m-%d") if isinstance(inputdate, str) else inputdate            
+        return res.strftime(datetimehandler().getdefaultdateformat())           
    
     def __isholiday(self, input, ca_holidays):
         return input in ca_holidays   
       
-    def __getdefaulttimezone(self):
-        return 'America/Vancouver'
-
-    def __getdefaultdateformat(self):
-        return '%Y-%m-%d'
