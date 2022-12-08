@@ -1,0 +1,72 @@
+name: Dev-Marshal formsflow.ai Web CD
+
+on:
+  push:
+    paths:
+      - "apps/forms-flow-ai/forms-flow-ai-web/**"
+      - ".github/workflows/forms-flow-ai-web-cd.yml"
+
+defaults:
+  run:
+    shell: bash
+    working-directory: ./apps/forms-flow-ai/forms-flow-ai-web
+env:
+  APP_NAME: "forms-flow-ai-web"
+
+jobs:
+  forms-flow-ai-web-cd-by-push:
+    runs-on: ubuntu-20.04
+
+    if: github.event_name == 'push' && github.repository == 'bcgov/foi-flow'
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set ENV variables
+        id: set-variable
+        run: |
+          if [ ${{ github.ref_name }} == 'dev' ]; then
+            echo "For ${{ github.ref_name }} branch"
+            echo "TOOLS_NAME=${{secrets.OPENSHIFT4_AI_FRONTEND_REPOSITORY}}" >> $GITHUB_ENV
+            echo "TAG_NAME="dev"" >> $GITHUB_ENV
+            echo "BRANCH_NAME="dev"" >> $GITHUB_ENV
+          elif [ ${{ github.ref }} == 'dev-marshal' ]; then
+            echo "For ${{ github.ref_name }} branch"
+            echo "TOOLS_NAME=${{secrets.OPENSHIFT4_AI_FRONTEND_REPOSITORY}}" >> $GITHUB_ENV
+            echo "TAG_NAME="dev"" >> $GITHUB_ENV
+            echo "BRANCH_NAME="dev-marshal"" >> $GITHUB_ENV
+          else
+            echo "For ${{ github.ref_name }} branch"
+          fi
+        shell: bash
+
+      - name: Login Openshift
+        shell: bash
+        run: |
+          oc login --server=${{secrets.OPENSHIFT4_LOGIN_REGISTRY}} --token=${{secrets.OPENSHIFT4_AI_SA_TOKEN}}
+
+
+      - name: Tools project
+        shell: bash
+        run: |
+          oc project ${{ secrets.OPENSHIFT4_AI_FRONTEND_REPOSITORY }}-tools
+
+      - name: Build from ${{ env.BRANCH_NAME }} branch
+        shell: bash
+        run: |
+          oc patch bc/${{ env.APP_NAME }} -p '{"spec":{"source":{"git":{"ref":"${{ env.BRANCH_NAME }}"}}}}'
+
+      # - name: Start Build Openshift
+      #   shell: bash
+      #   run: |
+      #     oc start-build ${{ env.APP_NAME }} --wait
+
+
+      # - name: Tag+Deploy for ${{ env.TAG_NAME }}
+      #   shell: bash
+      #   run: |
+      #     oc tag ${{ env.APP_NAME }}:latest ${{ env.APP_NAME }}:${{ env.TAG_NAME }}
+
+      # - name: Watch new rollout (trigger by image change in Openshift)
+      #   shell: bash
+      #   run: |
+      #     oc rollout status dc/${{ env.APP_NAME }} -n ${{ secrets.OPENSHIFT4_AI_FRONTEND_REPOSITORY }}-${{ env.TAG_NAME }} -w
+
