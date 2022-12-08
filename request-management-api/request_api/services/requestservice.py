@@ -120,9 +120,10 @@ class requestservice:
 
 
     def __isincludeoffhold(self):
-        _paymentconfig = json.loads(os.getenv("PAYMENT_CONFIG",''))
-        if _paymentconfig in (None, ''):
+        payment_config_str = os.getenv("PAYMENT_CONFIG",'')        
+        if payment_config_str in (None, ''):
             return False, False
+        _paymentconfig = json.loads(payment_config_str)
         duedate_includeoffhold = True if _paymentconfig["duedate"]["includeoffhold"] == "Y" else False
         cfrduedate_includeoffhold = True if _paymentconfig["cfrduedate"]["includeoffhold"] == "Y" else False
         return duedate_includeoffhold, cfrduedate_includeoffhold
