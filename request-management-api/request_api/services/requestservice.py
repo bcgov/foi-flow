@@ -51,12 +51,10 @@ class requestservice:
         currentstatus = foirequest["stateTransition"][0]["status"] if "stateTransition" in foirequest and len(foirequest["stateTransition"])  > 1 else None
         status = FOIRequestStatus().getrequeststatusid(nextstatename)
         if currentstatus not in (None, "") and currentstatus == StateName.onhold.value:
-            _paymentdate_pst = datetimehandler().convert_to_pst(paymentdate)
             print("-----------------------------------------------")
             print(paymentdate)
-            print(_paymentdate_pst)
             print("-----------------------------------------------")
-            calc_duedate, calc_cfrduedate = self.calculateduedate(foirequest, _paymentdate_pst)
+            calc_duedate, calc_cfrduedate = self.calculateduedate(foirequest, paymentdate)
             foirequest['dueDate'] = calc_duedate
             foirequest['cfrDueDate'] = calc_cfrduedate
         foirequest['requeststatusid'] = status['requeststatusid']
