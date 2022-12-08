@@ -58,19 +58,19 @@ jobs:
         run: |
           oc patch bc/${{ env.APP_NAME }} -p '{"spec":{"source":{"git":{"ref":"${{ env.BRANCH_NAME }}"}}}}'
 
-      # - name: Start Build Openshift
-      #   shell: bash
-      #   run: |
-      #     oc start-build ${{ env.APP_NAME }} --wait
+      - name: Start Build Openshift
+        shell: bash
+        run: |
+          oc start-build ${{ env.APP_NAME }} --wait
 
 
-      # - name: Tag+Deploy for ${{ env.TAG_NAME }}
-      #   shell: bash
-      #   run: |
-      #     oc tag ${{ env.APP_NAME }}:latest ${{ env.APP_NAME }}:${{ env.TAG_NAME }}
+      - name: Tag+Deploy for ${{ env.TAG_NAME }}
+        shell: bash
+        run: |
+          oc tag ${{ env.APP_NAME }}:latest ${{ env.APP_NAME }}:${{ env.TAG_NAME }}
 
-      # - name: Watch new rollout (trigger by image change in Openshift)
-      #   shell: bash
-      #   run: |
-      #     oc rollout status dc/${{ env.APP_NAME }} -n ${{ secrets.OPENSHIFT4_AI_FRONTEND_REPOSITORY }}-${{ env.TAG_NAME }} -w
+      - name: Watch new rollout (trigger by image change in Openshift)
+        shell: bash
+        run: |
+          oc rollout status dc/${{ env.APP_NAME }} -n ${{ secrets.OPENSHIFT4_AI_FRONTEND_REPOSITORY }}-${{ env.TAG_NAME }} -w
 
