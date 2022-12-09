@@ -6,6 +6,8 @@ on:
     branches:
       - main
       - dev
+      - dev-marshal
+      - test-marshal
     paths:
       - "forms-flow-web/**"
   # Todo - Remove before merging in.
