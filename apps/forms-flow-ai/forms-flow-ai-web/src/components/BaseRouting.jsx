@@ -19,6 +19,7 @@ const useStyles = makeStyles(() => ({
 
 const BaseRouting = React.memo(({store}) => {
   const isAuth = useSelector((state) => state.user.isAuthenticated);
+  console.log(`isAuth = ${isAuth}`)
   const classes = useStyles();
   const getStyle = () => {
     if (isAuth)
