@@ -59,6 +59,9 @@ class FOIMinistryRequest(db.Model):
     axissyncdate = db.Column(db.DateTime, nullable=True)    
     axisrequestid = db.Column(db.String(120), nullable=True)
     requestpagecount = db.Column(db.String(20), nullable=True)
+
+    isiaorestricted = db.Column(db.Boolean, unique=False, nullable=False,default=False)
+
     #ForeignKey References
     
     closereasonid = db.Column(db.Integer,ForeignKey('CloseReasons.closereasonid'))
