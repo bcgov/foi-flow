@@ -1,16 +1,13 @@
-name: DEV Forms-Flow-Web CD
+name: Forms-Flow-Web CD
 
 
 on:
   push:
     branches:
       - dev
-      - dev-AC-212d
       - dev-marshal
       - test-marshal
       - main
-      - dev-AC-212c
-      - dev-DV-3160-2
     paths:
       - "forms-flow-web/**"
 

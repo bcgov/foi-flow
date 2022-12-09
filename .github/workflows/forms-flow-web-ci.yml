@@ -10,11 +10,6 @@ on:
       - test-marshal
     paths:
       - "forms-flow-web/**"
-  # Todo - Remove before merging in.
-  push:
-    branches:
-      - dev-AC-212d
-
 
 defaults:
   run:

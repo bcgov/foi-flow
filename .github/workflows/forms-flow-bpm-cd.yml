@@ -6,11 +6,8 @@ on:
     branches:
       - dev
       - dev-marshal
-      - dev-AC-212d
       - test-marshal
       - main
-      - dev-AC-212c
-      - dev-DV-3160-2
     paths:
       - "apps/forms-flow-ai/forms-flow-bpm/**"
 

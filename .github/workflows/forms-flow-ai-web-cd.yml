@@ -7,7 +7,6 @@ on:
       - dev-marshal
       - test-marshal
       - main
-      - dev-DV-3160-2
     paths:
       - "apps/forms-flow-ai/forms-flow-ai-web/**"
       - ".github/workflows/forms-flow-ai-web-cd.yml"
