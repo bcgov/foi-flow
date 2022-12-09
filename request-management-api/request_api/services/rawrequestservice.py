@@ -30,7 +30,7 @@ class rawrequestservice:
         assigneemiddlename = requestdatajson["assignedToMiddleName"] if requestdatajson.get("assignedToMiddleName") != None else None
         assigneelastname = requestdatajson["assignedToLastName"] if requestdatajson.get("assignedToLastName") != None else None
         ispiiredacted = requestdatajson["ispiiredacted"] if 'ispiiredacted' in requestdatajson  else False
-
+        isiaorestricted = requestdatajson["isiaorestricted"] if 'isiaorestricted' in requestdatajson  else False
         axisrequestid = requestdatajson["axisRequestId"] if 'axisRequestId' in requestdatajson  else None
         isaxisrequestidpresent = False
         if axisrequestid is not None:
@@ -52,7 +52,8 @@ class rawrequestservice:
                                                     assigneemiddlename=assigneemiddlename,
                                                     assigneelastname=assigneelastname,
                                                     axisrequestid=axisrequestid,
-                                                    axissyncdate=axissyncdate
+                                                    axissyncdate=axissyncdate,
+                                                    isiaorestricted = isiaorestricted
                                                 )
         else:            
             raise ValueError("Duplicate AXIS Request ID")
@@ -91,11 +92,12 @@ class rawrequestservice:
 
     def saverawrequestversion(self, _requestdatajson, _requestid, _assigneegroup, _assignee, status, userid, assigneefirstname, assigneemiddlename, assigneelastname, actiontype=None):
         ispiiredacted = _requestdatajson["ispiiredacted"] if 'ispiiredacted' in _requestdatajson  else False
+        isiaorestricted = _requestdatajson["isiaorestricted"] if 'isiaorestricted' in _requestdatajson  else False
         #Get documents
         if actiontype == "assignee":
-            result = FOIRawRequest.saverawrequestassigneeversion(_requestid, _assigneegroup, _assignee, userid, assigneefirstname, assigneemiddlename, assigneelastname)
+            result = FOIRawRequest.saverawrequestassigneeversion(_requestid, _assigneegroup, _assignee, userid, assigneefirstname, assigneemiddlename, assigneelastname,isiaorestricted)
         else:
-            result = FOIRawRequest.saverawrequestversion(_requestdatajson, _requestid, _assigneegroup, _assignee, status,ispiiredacted, userid, assigneefirstname, assigneemiddlename, assigneelastname)
+            result = FOIRawRequest.saverawrequestversion(_requestdatajson, _requestid, _assigneegroup, _assignee, status,ispiiredacted, userid, assigneefirstname, assigneemiddlename, assigneelastname,isiaorestricted)
         documentservice().createrawrequestdocumentversion(_requestid)
         return result
 
