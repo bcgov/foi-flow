@@ -34,6 +34,9 @@ import InputAdornment from "@mui/material/InputAdornment";
 import InputBase from "@mui/material/InputBase";
 import Paper from "@mui/material/Paper";
 import { toast } from "react-toastify";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCheckCircle, faTimesCircle, faSpinner } from '@fortawesome/free-solid-svg-icons';
+import {faTimesCircle } from '@fortawesome/free-regular-svg-icons';
 
 
 const useStyles = makeStyles((_theme) => ({
@@ -91,6 +94,9 @@ const useStyles = makeStyles((_theme) => ({
   divider: {
     marginTop: "-2px",
     marginBottom: "-5px"
+  },
+  topDivider: {
+    paddingTop: '0px !important',
   }
 }));
 
@@ -431,6 +437,47 @@ export const RecordsLog = ({
               xs={12}
               className={classes.recordLog}
             >
+             <Grid container spacing={4}>
+                <Grid item xs={3}>
+                  <span>Number of Deduplicated Files</span>
+                  <span className='number-spacing'>0</span>
+                </Grid>
+                <Grid item xs={3}>
+                  <span>Number of Files Removed</span>
+                  <span className='number-spacing'>0</span>
+                </Grid>
+                <Grid item xs={3}>
+                  <span>Number of Files Converted to PDF</span>
+                  <span className='number-spacing'>0</span>
+
+                </Grid>
+                <Grid item xs={3}>
+                  <span>Number of Batches Uploaded</span>
+                  <span className='number-spacing'>0</span>
+                </Grid>
+              </Grid> 
+            </Grid>
+            <Grid
+              container
+              direction="row"
+              justify="flex-start"
+              alignItems="flex-start"
+              spacing={3}
+              className={classes.divider}
+            >
+              <Grid item xs={12} className={classes.topDivider}>
+                <Divider className={"record-divider"} style={{backgroundColor: '#979797'}}/>
+              </Grid>
+            </Grid>
+            <Grid
+              container
+              item
+              direction="row"
+              justify="flex-start"
+              alignItems="flex-start"
+              xs={12}
+              className={classes.recordLog}
+            >
               <Paper
                 component={Grid}
                 sx={{
@@ -625,6 +672,11 @@ const Attachment = React.memo(({indexValue, record, handlePopupButtonClick, getF
         alignItems="flex-start"
         spacing={1}
       >
+        <Grid item xs={2} className={classes.actions}>
+          <FontAwesomeIcon icon={faTimesCircle} size='2x' color='#A0192F'/>
+          <FontAwesomeIcon icon={faCheckCircle} size='1x' color='#1B8103' />
+          <FontAwesomeIcon icon={faSpinner} size='2x' color='#FAA915'/>
+        </Grid>
         <Grid item xs={true} className={classes.filename}>
           {record.filename}
         {/* </Grid>
@@ -639,7 +691,7 @@ const Attachment = React.memo(({indexValue, record, handlePopupButtonClick, getF
             />
           )} */}
         </Grid>
-        <Grid item xs={2} className={classes.createBy}>
+        {/* <Grid item xs={2} className={classes.createBy}>
           <div
             className={`record-owner ${
               disabled ? "record-disabled" : ""
@@ -654,7 +706,7 @@ const Attachment = React.memo(({indexValue, record, handlePopupButtonClick, getF
           >
             {record.created_at}
           </div>
-        </Grid>
+        </Grid> */}
         <Grid
           item
           xs={1}
@@ -675,12 +727,15 @@ const Attachment = React.memo(({indexValue, record, handlePopupButtonClick, getF
       </Grid>
       <Grid
         container
+        item
+        xs={12}
         direction="row"
         justify="flex-start"
         alignItems="flex-start"
-        spacing={1}
+        spacing={3}
       >
-        {record.attributes.divisions.map((division, i) =>
+      <Grid item xs={2}>
+        {record.attributes.map((division, i) =>
           <Chip
             item
             key={i}
@@ -690,7 +745,23 @@ const Attachment = React.memo(({indexValue, record, handlePopupButtonClick, getF
             style={{backgroundColor: "#003366", margin: "4px"}}
           />
         )}
-
+      </Grid>
+      <Grid item xs={2} className={classes.createBy}>
+          <div
+            className={`record-owner ${
+              disabled ? "record-disabled" : ""
+            }`}
+          >
+            {getFullname(record.createdby)}
+          </div>
+        </Grid>
+        <Grid item xs={3} className={classes.createDate}>
+          <div
+            className={`record-time ${disabled ? "record-disabled" : ""}`}
+          >
+            {record.created_at}
+          </div>
+        </Grid>
       </Grid>
       <Grid
         container

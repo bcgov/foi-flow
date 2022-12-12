@@ -22,19 +22,18 @@ from request_api.auth import auth, AuthHelper
 from request_api.tracer import Tracer
 from request_api.utils.util import  cors_preflight, allowedorigins
 from request_api.exceptions import BusinessException, Error
-from request_api.services.recordservice import recordservice
+from request_api.services.recorddedupeservice import recorddedupeservice
 from request_api.schemas.foirecord import  FOIRequestBulkCreateRecordSchema
 import json
 from flask_cors import cross_origin
 
 
-API = Namespace('FOIWatcher', description='Endpoints for FOI record management')
+API = Namespace('RECORDDEDUPE', description='Endpoints for FOI record management')
 TRACER = Tracer.get_instance()
 
 @cors_preflight('GET,OPTIONS')
-#@API.route('/foirecord/<requestid>/ministryrequest/<ministryrequestid>')
+@API.route('/foirecord/<requestid>/ministryrequest/<ministryrequestid>')
 class FOIRequestGetRecord(Resource):
-    """Retrieve watchers for unopened request"""
 
        
     @staticmethod
@@ -43,31 +42,10 @@ class FOIRequestGetRecord(Resource):
     @auth.require
     def get(requestid, ministryrequestid):      
         try:
-            result = recordservice().fetch(requestid, ministryrequestid)
+            result = recorddedupeservice().fetchmergedrecords(requestid, ministryrequestid)
             return json.dumps(result), 200
         except KeyError as err:
             return {'status': False, 'message':err.messages}, 400        
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500
 
-@cors_preflight('POST,OPTIONS')
-@API.route('/foirecord/<requestid>/ministryrequest/<ministryrequestid>')
-class FOIRequestBulkCreateRecord(Resource):
-    """Resource for Creating FOI records."""
-
-       
-    @staticmethod
-    @TRACER.trace()
-    @cross_origin(origins=allowedorigins())
-    @auth.require
-    def post(requestid, ministryrequestid):      
-        try:
-            requestjson = request.get_json()
-            recordschema = FOIRequestBulkCreateRecordSchema().load(requestjson)
-            response = recordservice().create(requestid, ministryrequestid, recordschema, AuthHelper.getuserid())
-            respcode = 200 if response.success == True else 500
-            return {'status': response.success, 'message':response.message,'data': response.args[0]} , respcode
-        except KeyError as err:
-            return {'status': False, 'message':err.messages}, 400        
-        except BusinessException as exception:            
-            return {'status': exception.status_code, 'message':exception.message}, 500
