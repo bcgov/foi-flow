@@ -51,12 +51,7 @@ class requestservice:
         currentstatus = foirequest["stateTransition"][0]["status"] if "stateTransition" in foirequest and len(foirequest["stateTransition"])  > 1 else None
         status = FOIRequestStatus().getrequeststatusid(nextstatename)
         if currentstatus not in (None, "") and currentstatus == StateName.onhold.value:
-            _paymentdate_pst = datetimehandler().convert_to_pst(paymentdate)
-            print("-----------------------------------------------")
-            print(paymentdate)
-            print(_paymentdate_pst)
-            print("-----------------------------------------------")
-            calc_duedate, calc_cfrduedate = self.calculateduedate(foirequest, _paymentdate_pst)
+            calc_duedate, calc_cfrduedate = self.calculateduedate(foirequest, paymentdate)
             foirequest['dueDate'] = calc_duedate
             foirequest['cfrDueDate'] = calc_cfrduedate
         foirequest['requeststatusid'] = status['requeststatusid']
@@ -122,7 +117,7 @@ class requestservice:
     def __isincludeoffhold(self):
         payment_config_str = os.getenv("PAYMENT_CONFIG",'')        
         if payment_config_str in (None, ''):
-            return False, False
+            return True, True
         _paymentconfig = json.loads(payment_config_str)
         duedate_includeoffhold = True if _paymentconfig["duedate"]["includeoffhold"] == "Y" else False
         cfrduedate_includeoffhold = True if _paymentconfig["cfrduedate"]["includeoffhold"] == "Y" else False
