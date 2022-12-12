@@ -13,7 +13,7 @@ S3_HOST = os.getenv('OSS_S3_HOST')
 S3_REGION = os.getenv('OSS_S3_REGION')
 BACKUP_DIRECTORY = os.getenv('BACKUP_DIRECTORY')
 S3_SERVICE = os.getenv('OSS_S3_SERVICE')
-UPLOAD_DIRECTORY = os.getenv('UPLOAD_DIRECTORY')
+UPLOAD_DIRECTORY = os.getenv('UPLOAD_DIRECTORY') or '/dev/'
 
 # Optional env value.  If true, will not upload to S3, will only log
 DRY_RUN = os.getenv('DRY_RUN') or False
