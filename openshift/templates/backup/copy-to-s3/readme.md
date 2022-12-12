@@ -10,6 +10,19 @@ source backup-copy/bin/activate
 
 ```
 
+
+## Pre-requisite for OpenShift: Backup-container pvc
+
+The backup-container pvc, normally called "foi-bkup-pvc" is by default a Read-Write-One PVC.  This won't work for us, we need ReadWriteMany.
+
+So:
+
+1. Create a new PVC called "foi-bkup-shared-pvc"
+2. Change backup-container to use new PVC. 
+3. Optionally: delete old PVC
+
+This copy-to-s3 script is configured to use `foi-bkup-shared-pvc`, but if you use something different just change `deploy-job.yaml`
+
 ## Deploy to OpenShift
 
 ```bash
@@ -22,6 +35,8 @@ oc start-build backup-to-s3-build
 # then upload job yaml
 
 oc process -f deploy-job.yaml --param-file=.env -o yaml
+
+oc process -f deploy-job.yaml --param-file=.env -o yaml | oc apply -f -
 ```
 
 
