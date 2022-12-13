@@ -21,7 +21,6 @@ DRY_RUN = os.getenv('DRY_RUN') or False
 def create_s3_connection():
     print('Creating s3 connection')
     print('Printing environment variables...')
-    print({BACKUP_BUCKET, ACCESS_KEY, S3_HOST})
 
     s3client = boto3.client('s3',config=Config(signature_version='s3v4'),
         endpoint_url='https://{0}/'.format(S3_HOST),
