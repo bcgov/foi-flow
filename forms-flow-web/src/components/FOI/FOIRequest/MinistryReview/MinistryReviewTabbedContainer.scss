@@ -31,9 +31,12 @@
   div.tab{
     margin-bottom: 160px;
   }
+  .foitabheadercollection {
+    padding-bottom: 1% !important;
+  }
 }
 
-@media screen and (min-height: 691px) and (max-height: 800px) {
+@media screen and (min-height: 680px) and (max-height: 800px) {
   div.tab{
     margin-bottom: 50%;
     height: 38%;
@@ -42,9 +45,13 @@
     font-size: 15px !important;    
     height: 35px !important;
   }
+  .foitabheadercollection {
+    padding-bottom: 6% !important;
+  }
+ 
 }
 
-@media screen and (min-height: 545px) and (max-height: 690px) {
+@media screen and (min-height: 544px) and (max-height: 680px) {
   div.tab{
     margin-bottom: 20%;
     height: 35%;
@@ -52,6 +59,9 @@
   div.tab div.tablinks {
     font-size: 15px !important;    
     height: 30px !important;
+  }
+  .foitabheadercollection {
+    padding-bottom: 5% !important;
   }
 }
 
@@ -141,10 +151,10 @@
   .foitabheadercollection {
     width: fit-content;
     // height: calc(100% - 96px - 67px);
-    height: 100%;
+    // height: 100%;
     border-radius: 0px 30px 30px 0px!important;
     margin-bottom: auto;
-    padding-bottom: 2%;
+    padding-bottom: 8%;
     min-width: 200px;
     position: fixed;
     z-index: 10;
