@@ -9,7 +9,6 @@ const SubmissionError = React.memo((props) => {
     if (errors?.includes("Token Expired")) {
         message = "Something went wrong. Please click Refresh button to reload the page."
     }
-    console.log(`message === ${message}`);
     return (
       <>
           <Modal show={modalOpen}>

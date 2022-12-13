@@ -679,7 +679,7 @@
                     "dbIndex": false,
                     "encrypted": false,
                     "redrawOn": "",
-                    "customDefaultValue": "console.log(data)\nif ((data.status == \"On Hold\" || data.templateName == \"PAYONLINE\") && data.paymentstatus == \"NOT PAID\") {\n  console.log(\"inside if\")\n    value = \"payOnlinePage1\";\n}\nelse if (data.paymentstatus == \"PAID\") {\n   console.log(\"inside else\")\n  value = \"payOnlineExpiry\";\n}",
+                    "customDefaultValue": "if ((data.status == \"On Hold\" || data.templateName == \"PAYONLINE\") && data.paymentstatus == \"NOT PAID\") {\n    value = \"payOnlinePage1\";\n}\nelse if (data.paymentstatus == \"PAID\") {\n  value = \"payOnlineExpiry\";\n}",
                     "calculateValue": "if (data.paymentstatus == \"PAID\" || data.paymentstatus == \"EXPIRED\" || data.paymentstatus == \"CANCELLED\") {\n  value = \"payOnlineExpiry\";\n}",
                     "calculateServer": false,
                     "key": "currentPage",
@@ -738,7 +738,7 @@
                     "allowMultipleMasks": false,
                     "addons": [],
                     "inputType": "hidden",
-                    "id": "e0n3n9p"
+                    "id": "enz8iad"
                 },
                 {
                     "legend": "",
@@ -1377,7 +1377,7 @@
                                             "value": ""
                                         }
                                     ],
-                                    "content": "If you need additional assistance or want other payment options please call, Phone: <a href=\"tel:+1 250-387-1321\">250-387-1321</a> | Toll Free: <a href='tel:+1833-283-8200'>833-283-8200</a>",
+                                    "content": "If you need additional assistance or prefer different payment options, please email: <a href='mailto:FOI.Requests@gov.bc.ca'>FOI.Requests@gov.bc.ca</a>, or call <a href=\"tel:+1 250-387-1321\">250-387-1321</a> | Toll Free: <a href='tel:+1833-283-8200'>833-283-8200</a>",
                                     "refreshOnChange": false,
                                     "customClass": "",
                                     "hidden": false,
@@ -1445,7 +1445,7 @@
                                     "showWordCount": false,
                                     "allowMultipleMasks": false,
                                     "addons": [],
-                                    "id": "euvehx"
+                                    "id": "ery2eyk"
                                 }
                             ],
                             "placeholder": "",
@@ -3569,7 +3569,7 @@
                                             "value": ""
                                         }
                                     ],
-                                    "content": "<center class='mobilesubcontent' style='color: #003366'>If you would like to contact an Information Access Operations representative to better clarify your request and try and reduce your fee <br/> please, Email FOI at: <a href='mailto:FOI.Requests@gov.bc.ca'>FOI.Requests@gov.bc.ca</a>, or call, Phone:<a href=\"tel:+1 250-387-1321\">250-387-1321</a> | Toll Free: <a href='tel:+1833-283-8200'>833-283-8200</a> </center>",
+                                    "content": "<center class='mobilesubcontent' style='color: #003366'>If you would like to contact an Information Access Operations representative to better clarify your request and try to reduce your fee, <br/> please email: <a href='mailto:FOI.Requests@gov.bc.ca'>FOI.Requests@gov.bc.ca</a>, or call <a href=\"tel:+1 250-387-1321\">250-387-1321</a> | Toll Free: <a href='tel:+1833-283-8200'>833-283-8200</a> </center>",
                                     "refreshOnChange": false,
                                     "customClass": "",
                                     "hidden": false,
@@ -3637,7 +3637,7 @@
                                     "showWordCount": false,
                                     "allowMultipleMasks": false,
                                     "addons": [],
-                                    "id": "e144f7c"
+                                    "id": "eqv6kgb"
                                 }
                             ],
                             "id": "ema9bo9"
@@ -5442,7 +5442,7 @@
                                             "value": ""
                                         }
                                     ],
-                                    "content": "<center class='mobilesubcontent' style='color: #003366'>If you would like to contact an Information Access Operations representative to better clarify your request and try and reduce your fee <br/> please, Email FOI at: <a href='mailto:FOI.Requests@gov.bc.ca'>FOI.Requests@gov.bc.ca</a>, or call, Phone:<a href=\"tel:+1 250-387-1321\">250-387-1321</a> | Toll Free: <a href='tel:+1833-283-8200'>833-283-8200</a> </center>",
+                                    "content": "<center class='mobilesubcontent' style='color: #003366'>If you would like to contact an Information Access Operations representative to better clarify your request and try to reduce your fee, <br/> please email: <a href='mailto:FOI.Requests@gov.bc.ca'>FOI.Requests@gov.bc.ca</a>, or call <a href=\"tel:+1 250-387-1321\">250-387-1321</a> | Toll Free: <a href='tel:+1833-283-8200'>833-283-8200</a> </center>",
                                     "refreshOnChange": false,
                                     "customClass": "",
                                     "hidden": false,
@@ -5510,7 +5510,7 @@
                                     "showWordCount": false,
                                     "allowMultipleMasks": false,
                                     "addons": [],
-                                    "id": "eav22ud"
+                                    "id": "e0etd5h"
                                 }
                             ],
                             "placeholder": "",
