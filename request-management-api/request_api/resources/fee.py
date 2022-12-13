@@ -95,9 +95,6 @@ class Payment(Resource):
             request_json = request.get_json()
             fee: FeeService = FeeService(request_id=ministry_request_id, payment_id=payment_id)
             response, parsed_args = fee.complete_payment(request_json)
-            print("fee payment response info")
-            print(response)
-            print(parsed_args)
             if (response['status'] == 'PAID'):
                 amountpaid = float(parsed_args.get('trnAmount'))
                 cfrfeeservice().paycfrfee(ministry_request_id, amountpaid)
@@ -107,7 +104,7 @@ class Payment(Resource):
                 nextstatename, paymenteventtype = paymentservice().postpayment(ministry_request_id, data)
                 cfrfeeservice().updatepaymentmethod(ministry_request_id, paymenteventtype)
                 # automated state transition and due date calculation
-                requestservice().postpaymentstatetransition(request_id, ministry_request_id, nextstatename, response["completed_on"])
+                requestservice().postpaymentstatetransition(request_id, ministry_request_id, nextstatename, parsed_args.get('trnDate'))
                 asyncio.ensure_future(eventservice().postpaymentevent(ministry_request_id, paymenteventtype))
                 requestservice().postfeeeventtoworkflow(request_id, ministry_request_id, "PAID", nextstatename)
                 
