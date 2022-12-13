@@ -121,9 +121,9 @@ const MinistryReview = React.memo(({ userDetail }) => {
   let CFRFormHistoryLength = useSelector(
     (state) => state.foiRequests.foiRequestCFRFormHistory.length
   );
-  let requestRecords = useSelector(
-    (state) => state.foiRequests.foiRequestRecords
-  );
+  // let requestRecords = useSelector(
+  //   (state) => state.foiRequests.foiRequestRecords
+  // );
 
   const requestExtensions = useSelector(
     (state) => state.foiRequests.foiRequestExtesions
@@ -757,7 +757,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
               <>
                 <RecordsLog
                   divisions={originalDivisions}
-                  recordsArray={requestRecords}
+                  //recordsObj={requestRecords}
                   requestId={requestId}
                   ministryId={ministryId}
                   requestNumber={requestNumber}

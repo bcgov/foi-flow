@@ -136,9 +136,9 @@ const FOIRequest = React.memo(({ userDetail }) => {
   let CFRFormHistoryLength = useSelector(
     (state) => state.foiRequests.foiRequestCFRFormHistory.length
   );
-  let requestRecords = useSelector(
-    (state) => state.foiRequests.foiRequestRecords
-  );
+  // let requestRecords = useSelector(
+  //   (state) => state.foiRequests.foiRequestRecords
+  // );
   const [attachments, setAttachments] = useState(requestAttachments);
   const [comment, setComment] = useState([]);
   const [requestState, setRequestState] = useState(StateEnum.unopened.name);
@@ -1138,7 +1138,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
               ministryAssignedToList?.length > 0) ? (
               <>
                 <RecordsLog
-                  recordsArray={requestRecords}
+                  //recordsObj={requestRecords}
                   requestId={requestId}
                   ministryId={ministryId}
                   requestNumber={requestNumber}

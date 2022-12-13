@@ -62,7 +62,7 @@ class recorddedupeservice:
                     record['isduplicate']=False
         result['records']= uploadedrecords
         result['dedupedfiles']= len(dedupedrecords)
-        duplicaterecords = list(filter(lambda x: record['isduplicate'] == True, dedupedrecords))
+        duplicaterecords = list(filter(lambda x: x['isduplicate'] == True, dedupedrecords))
         result['removedfiles']= len(duplicaterecords)
         return result
 

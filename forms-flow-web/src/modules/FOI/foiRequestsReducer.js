@@ -36,7 +36,12 @@ const initialState = {
   foiWatcherList: [],
   foiRequestComments: [],
   foiRequestAttachments: [],
-  foiRequestRecords: [],
+  foiRequestRecords: {
+    records: [],
+    dedupedfiles:0,
+    removedfiles:0,
+    batchcount:0
+  },
   foiRequestCFRForm: {
     overallsuggestions: "",
     status: "init",
