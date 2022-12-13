@@ -12,7 +12,7 @@ objects:
   spec:
     successfulJobsHistoryLimit: 1
     failedJobsHistoryLimit: 1
-    schedule: '30 4 * * *'
+    schedule: 'CRON_TZ=America/Vancouver 30 4 * * *'
     jobTemplate:
       spec:
         template:
@@ -43,6 +43,8 @@ objects:
                     value: ${OSS_S3_SERVICE}
                   - name: BACKUP_DIRECTORY
                     value: ${BACKUP_DIRECTORY}
+                  - name: UPLOAD_DIRECTORY
+                    value: ${UPLOAD_DIRECTORY}
             restartPolicy: OnFailure
 parameters:
 - name: API_NAME
@@ -63,4 +65,6 @@ parameters:
 - name: OSS_S3_SERVICE
   required: true
 - name: BACKUP_DIRECTORY
+  required: true
+- name: UPLOAD_DIRECTORY
   required: true
