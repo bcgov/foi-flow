@@ -46,7 +46,7 @@ from .foiemail import API as FOIEMAIL_API
 from .foipayment import API as FOIPAYMENT_API
 from .applicantcorrespondence import API as APPLICANTCORRESPONDENCE_API
 from .recorddedupe import API as RECORDDEDUPE_API
-
+from .foiworkflow import API as FOIWORKFLOW_API
 
 __all__ = ('API_BLUEPRINT')
 
@@ -87,4 +87,4 @@ API.add_namespace(FOIEMAIL_API, '/api')
 API.add_namespace(FOIPAYMENT_API, '/api')
 API.add_namespace(APPLICANTCORRESPONDENCE_API, '/api')
 API.add_namespace(RECORDDEDUPE_API,'/api')
-
+API.add_namespace(FOIWORKFLOW_API, '/api')

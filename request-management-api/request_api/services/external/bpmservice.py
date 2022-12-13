@@ -15,7 +15,6 @@ __author__      = "sumathi.thirumani@aot-technologies.com"
 """
 class bpmservice(camundaservice):
 
-
     def createinstance(self, messagequeue, message, token=None):
         if self.bpmengineresturl is not None:
             _variables = {"variables":{}}
@@ -23,12 +22,43 @@ class bpmservice(camundaservice):
                     _variabletype = VariableType.Integer.value if key in ["id"] else  VariableType.String.value
                     _variables["variables"][key] = {"type" : _variabletype, "value": message[key]} 
             variableschema = VariableMessageSchema().dump(_variables)
-            return requests.post(self._getUrl_(None,self._geProcessDefinitionKey_(messagequeue)), data=json.dumps(variableschema), headers = self._getHeaders_(token))
-        else:
-            return
-    
-     
-    def unopenedevent(self,processinstanceid, userid, messagetype, token=None):
+            createresponce =  requests.post(self._getUrl_(None,self._geProcessDefinitionKey_(messagequeue)), data=json.dumps(variableschema), headers = self._getHeaders_(token))
+            if createresponce.ok:
+                _createresponce = json.loads(createresponce.content)
+                return _createresponce["id"]
+        return None
+
+    def getinstancevariables(self, instanceid, token=None):
+        if self.bpmengineresturl is not None:
+            response = requests.get(self.bpmengineresturl+"/process-instance/"+str(instanceid)+"/variables", headers = self._getHeaders_(token))
+            return json.loads(response.content) if response.ok else None
+        return None
+
+    def searchinstancebyvariable(self, definitionkey, searchby, token=None):
+        if self.bpmengineresturl is not None:        
+            searchschema = {"processDefinitionKey": definitionkey, 
+                    "variables": searchby,
+                    "sortBy":"definitionId","sortOrder":"desc",
+                    "maxResults":1
+                    }
+            searchresponse = requests.post(self.bpmengineresturl+"/process-instance",data=json.dumps(searchschema), headers = self._getHeaders_(token))
+            if searchresponse.ok:
+                _search_content = json.loads(searchresponse.content)
+                if _search_content not in ([], None) and len(_search_content) > 0:
+                    return self.searchprocessinstance(str(_search_content[0]["id"]))        
+            return None
+        return None
+
+    def searchprocessinstance(self, pid, token=None):
+        if self.bpmengineresturl is not None:        
+            if pid not in (None, ""):
+                idresponse = requests.get(self.bpmengineresturl+"/process-instance/"+pid, headers = self._getHeaders_(token))
+                if idresponse.ok:
+                    return pid
+            return None
+        return None
+
+    def unopenedsave(self,processinstanceid, userid, messagetype, token=None):
         if self.bpmengineresturl is not None:
             messageschema = MessageSchema().dump({"processInstanceId": processinstanceid,
                                               "messageName": messagetype, 
@@ -36,7 +66,7 @@ class bpmservice(camundaservice):
                                                   "assignedTo": VariableSchema().dump({"type" : VariableType.String.value, "value": userid})
                                                   }
                                               })
-            return requests.post(self._getUrl_(messagetype), data=json.dumps(messageschema), headers = self._getHeaders_(token))
+            return self.__post_message(messagetype, messageschema, token)
         else:
             return
 
@@ -49,12 +79,12 @@ class bpmservice(camundaservice):
                                                   "foiRequestMetaData": VariableSchema().dump({"data" : VariableType.String.value, "value": data})
                                                   }
                                               })
-            return requests.post(self._getUrl_(messagetype), data=json.dumps(messageschema), headers = self._getHeaders_(token))
+            return self.__post_message(messagetype, messageschema, token)
         else:
             return
         
-        
-    def openedevent(self, filenumber, groupname, userid, messagetype, token=None):
+    """"       
+    def opened(self, filenumber, groupname, userid, messagetype, token=None):
         if self.bpmengineresturl is not None:
             messageschema = MessageSchema().dump({"messageName": messagetype,
                                               "localCorrelationKeys":{
@@ -69,18 +99,19 @@ class bpmservice(camundaservice):
             return requests.post(self._getUrl_(messagetype), data=json.dumps(messageschema), headers = self._getHeaders_(token))
         else:
             return   
- 
-        
-    def openedcomplete(self,filenumber, data, messagetype, token=None):
+    """
+
+    def openedcomplete(self, wfinstanceid, filenumber, data, messagetype, token=None):
         if self.bpmengineresturl is not None:
             messageschema = MessageSchema().dump({"messageName": messagetype,
+                                              "processInstanceId": wfinstanceid,
                                               "localCorrelationKeys":{
                                                   "id": VariableSchema().dump({"type" : VariableType.String.value, "value": filenumber})
                                                   },
                                               "processVariables":{
                                                   "foiRequestMetaData": VariableSchema().dump({"data" : VariableType.String.value, "value": data})}
                                               })
-            return requests.post(self._getUrl_(messagetype), data=json.dumps(messageschema), headers = self._getHeaders_(token))
+            return self.__post_message(messagetype, messageschema, token)
         else:
             return    
         
@@ -94,28 +125,29 @@ class bpmservice(camundaservice):
                                                 "foiRequestMetaData": VariableSchema().dump({"data" : VariableType.String.value, "value": data}),
                                                 "paymentstatus": VariableSchema().dump({"type" : VariableType.String.value, "value": paymentstatus})}
                                             })
-            return requests.post(self._getUrl_(MessageType.managepayment.value), data=json.dumps(messageschema), headers = self._getHeaders_(token))
+            return self.__post_message(MessageType.managepayment.value, messageschema, token)
         else:
             return
 
-    def correspondanceevent(self,filenumber, data, token=None):
+    def correspondanceevent(self,wfinstanceid, filenumber, data, token=None):
         if self.bpmengineresturl is not None:
             messageschema = MessageSchema().dump({"messageName": MessageType.iaocorrenspodence.value,
+                                              "processInstanceId": wfinstanceid,
                                               "localCorrelationKeys":{
                                                   "id": VariableSchema().dump({"type" : VariableType.String.value, "value": filenumber})
                                                   },
                                               "processVariables":{
                                                   "foiRequestMetaData": VariableSchema().dump({"data" : VariableType.String.value, "value": data})}
                                               })
-            print("messageschema = ", messageschema)
-            return requests.post(self._getUrl_(MessageType.iaocorrenspodence.value), data=json.dumps(messageschema), headers = self._getHeaders_(token))
+            return self.__post_message(MessageType.iaocorrenspodence.value, messageschema, token)
         else:
             return 
  
-
     def reopenevent(self,processinstanceid, data, messagetype, token=None): 
         return self.unopenedcomplete(processinstanceid, data, messagetype, token)
 
+    def __post_message(self, messagetype, messageschema, token=None):
+        return requests.post(self._getUrl_(messagetype), data=json.dumps(messageschema), headers = self._getHeaders_(token))
 
     def _getUrl_(self, messagetype, definitionkey=None):
         if messagetype is not None:
@@ -157,3 +189,8 @@ class MessageType(Enum):
     feepayment = "foi-fee-payment"
     managepayment = "foi-manage-payment"
     iaocorrenspodence = "foi-iao-correnspodence"
+
+class ProcessDefinitionKey(Enum):
+    rawrequest = "foi-request"
+    ministryrequest = "foi-request-processing"
+  

@@ -35,7 +35,16 @@ class FOIRequestPayment(db.Model):
     def savepayment(cls, newpayment)->DefaultMethodResult:                
         db.session.add(newpayment)
         db.session.commit()               
-        return DefaultMethodResult(True,'Payment added')   
+        return DefaultMethodResult(True,'Payment added')  
+
+    @classmethod
+    def updatepayment(cls, paymentid, paymenturl, userid)->DefaultMethodResult:
+        currequest = db.session.query(FOIRequestPayment).filter_by(paymentid=paymentid).order_by(FOIRequestPayment.version.desc()).first()
+        setattr(currequest,'paymenturl',paymenturl)
+        setattr(currequest,'updated_at',datetime.now().isoformat())
+        setattr(currequest,'updatedby',userid)
+        db.session.commit()  
+        return DefaultMethodResult(True,'Payment updated',paymentid) 
 
     @classmethod
     def getpayment(cls, foirequestid, ministryrequestid)->DefaultMethodResult:                
@@ -57,7 +66,7 @@ class FOIRequestPayment(db.Model):
                                 select distinct on (paymentid) paymentid, paymenturl, createdby, version  from "FOIRequestPayments" fp where foirequestid = :foirequestid and ministryrequestid  = :ministryrequestid  
                                 order by paymentid, version desc) as fp2 
                                 where fp1.paymentid = fp2.paymentid and fp1.version = fp2.version
-                                and fp1.createdby <> 'System_Cancel' and fp1.paidamount is null
+                                and fp1.createdby <> 'System_Cancel' and fp1.paymenturl is not null and fp1.paidamount is null
                     """
             
             rs = db.session.execute(text(sql), {'foirequestid': foirequestid, 'ministryrequestid' : ministryrequestid, 'today' : _psttoday})

@@ -1,6 +1,7 @@
 from request_api.models.ApplicationCorrespondenceTemplates import ApplicationCorrespondenceTemplate
 from request_api.models.FOIApplicantCorrespondences import FOIApplicantCorrespondence
 from request_api.models.FOIMinistryRequests import FOIMinistryRequest
+
 import maya
 import json
 from html.parser import HTMLParser
@@ -35,7 +36,7 @@ class applicantcorrespondenceservice:
                 correspondencelogs.append(correpondencelog)
         return correspondencelogs
 
-    def saveapplicantcorrespondencelog(self, data, ministryrequestid, userid):
+    def saveapplicantcorrespondencelog(self, requestid, ministryrequestid, data, userid):
         applicantcorrespondencelog = FOIApplicantCorrespondence()
         applicantcorrespondencelog.templateid = data['templateid']
         applicantcorrespondencelog.foiministryrequest_id = ministryrequestid
@@ -47,7 +48,8 @@ class applicantcorrespondenceservice:
         else:
             applicantcorrespondencelog.correspondencemessagejson = data['correspondencemessagejson']
             applicantcorrespondencelog.createdby = userid       
-        return FOIApplicantCorrespondence.saveapplicantcorrespondence(applicantcorrespondencelog,data['attachments'])
+        return FOIApplicantCorrespondence.saveapplicantcorrespondence(applicantcorrespondencelog,data['attachments'])        
+       
 
     def updateapplicantcorrespondencelog(self, correspondenceid, content):
         return FOIApplicantCorrespondence.updatesentcorrespondence(correspondenceid, content)

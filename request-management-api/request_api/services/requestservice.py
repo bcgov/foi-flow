@@ -5,13 +5,15 @@ from request_api.services.documentservice import documentservice
 from request_api.services.workflowservice import workflowservice
 from request_api.services.watcherservice import watcherservice
 from request_api.services.commentservice import commentservice
+from request_api.services.paymentservice import paymentservice
 from request_api.services.foirequest.requestserviceconfigurator import requestserviceconfigurator 
 from request_api.services.foirequest.requestservicegetter import requestservicegetter 
 from request_api.services.foirequest.requestservicecreate import requestservicecreate 
 from request_api.services.foirequest.requestserviceupdate import requestserviceupdate
 from request_api.services.applicantcorrespondence.applicantcorrespondencelog import applicantcorrespondenceservice
 from request_api.models.FOIRequestStatus import FOIRequestStatus
-
+from request_api.models.FOIRawRequests import FOIRawRequest
+from request_api.models.FOIMinistryRequests import FOIMinistryRequest
 class requestservice:
     """ FOI Request management service
 
@@ -23,7 +25,11 @@ class requestservice:
         return requestservicecreate().saverequest(foirequestschema, userid, foirequestid, ministryid, filenumber, version, rawrequestid, wfinstanceid)     
     
     def saverequestversion(self,foirequestschema, foirequestid , ministryid, userid):
-        return requestservicecreate().saverequestversion(foirequestschema, foirequestid , ministryid, userid)     
+        responseschema = requestservicecreate().saverequestversion(foirequestschema, foirequestid , ministryid, userid) 
+        if "paymentExpiryDate" in foirequestschema and foirequestschema["paymentExpiryDate"] not in (None, ""):
+            paymentservice().createpayment(foirequestid, ministryid, foirequestschema, userid)
+        return responseschema
+            
     
     def saveministryrequestversion(self,ministryrequestschema, foirequestid , ministryid, userid, usertype = None):
          return requestservicecreate().saveministryrequestversion(ministryrequestschema, foirequestid , ministryid, userid, usertype)      
@@ -66,19 +72,22 @@ class requestservice:
         for ministry in ministries:
             documentservice().copyrequestdocuments(ministry["id"], attachments, userid)
     
-    def postopeneventtoworkflow(self, id, wfinstanceid, requestschema, ministries):        
-        workflowservice().postunopenedevent(id, wfinstanceid, requestschema, "Open", ministries)            
+    def postopeneventtoworkflow(self, id, requestschema, ministries):
+        pid = workflowservice().syncwfinstance("rawrequest", requestschema['id'])
+        workflowservice().postunopenedevent(id, pid, requestschema, "Open", ministries)            
     
     def postfeeeventtoworkflow(self, requestid, ministryrequestid, paymentstatus, nextstatename=None):
         foirequestschema = self.getrequestdetails(requestid, ministryrequestid)        
         workflowservice().postfeeevent(requestid, ministryrequestid, foirequestschema, paymentstatus, nextstatename)            
     
-    def posteventtoworkflow(self, id, wfinstanceid, requestschema, data, usertype): 
+    def posteventtoworkflow(self, id, requestschema, data, usertype): 
         requeststatusid =  requestschema.get("requeststatusid") if 'requeststatusid' in requestschema  else None
         status = requestserviceconfigurator().getstatusname(requeststatusid) if requeststatusid is not None else None
-        workflowservice().postopenedevent(id, wfinstanceid, requestschema, data, status, usertype)
+        pid = workflowservice().syncwfinstance("ministryrequest", id)
+        workflowservice().postopenedevent(id, pid, requestschema, data, status, usertype)
     
     def postcorrespondenceeventtoworkflow(self, requestid, ministryrequestid, applicantcorrespondenceid, attributes, templateid):
         foirequestschema = self.getrequestdetails(requestid, ministryrequestid)
         templatedetails = applicantcorrespondenceservice().gettemplatebyid(templateid)
-        workflowservice().postcorrenspodenceevent(ministryrequestid, foirequestschema, applicantcorrespondenceid, templatedetails.name, attributes)
+        wfinstanceid = workflowservice().syncwfinstance("ministryrequest", ministryrequestid, True)
+        workflowservice().postcorrenspodenceevent(wfinstanceid, ministryrequestid, foirequestschema, applicantcorrespondenceid, templatedetails.name, attributes)

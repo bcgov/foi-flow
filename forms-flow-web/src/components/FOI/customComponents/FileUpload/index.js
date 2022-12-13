@@ -167,7 +167,7 @@ const FileUpload = ({
     
     const showDragandDrop = () => {
       if (Object.entries(files).length === 0)
-        return "Drag and drop attachments, or"
+        return "Drag and drop attachments, or click Add Files"
     }
 
   return (
