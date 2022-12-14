@@ -60,6 +60,8 @@ class recorddedupeservice:
                 else:
                     record['isdeduplicated']= False
                     record['isduplicate']=False
+        batchcount = FOIRequestRecord.getbatchcount()
+        result['batchcount']=batchcount
         result['records']= uploadedrecords
         result['dedupedfiles']= len(dedupedrecords)
         duplicaterecords = list(filter(lambda x: x['isduplicate'] == True, dedupedrecords))

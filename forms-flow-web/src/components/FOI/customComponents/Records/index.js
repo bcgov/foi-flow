@@ -129,7 +129,7 @@ export const RecordsLog = ({
   );
 
   const classes = useStyles();
-  const [records, setRecords] = useState(recordsObj.records);
+  const [records, setRecords] = useState(recordsObj?.records);
 
 
   useEffect(() => {
@@ -139,8 +139,8 @@ export const RecordsLog = ({
   }, [recordsObj])
 
  
-  const divisionFilters = [...new Map(recordsObj.records.reduce((acc, file) => [...acc, ...new Map(file.attributes.divisions.map(division => [division.divisionid, division]))], [])).values()]
-  if (divisionFilters.length > 0) divisionFilters.push({divisionid: -1, divisionname: "ALL"})
+  const divisionFilters = [...new Map(recordsObj?.records?.reduce((acc, file) => [...acc, ...new Map(file?.attributes?.divisions?.map(division => [division?.divisionid, division]))], [])).values()]
+  if (divisionFilters?.length > 0) divisionFilters?.push({divisionid: -1, divisionname: "ALL"})
 
 
   // useEffect(() => {
@@ -396,7 +396,7 @@ export const RecordsLog = ({
     return _recordsArray.filter(r =>
       (r.filename.toLowerCase().includes(_keywordValue?.toLowerCase()) ||
       r.createdby.toLowerCase().includes(_keywordValue?.toLowerCase())) &&
-      (_filterValue > -1 ? r.attributes.divisions.findIndex(a => a.divisionid === _filterValue) > -1 : true))
+      (_filterValue > -1 ? r.attributes?.divisions?.findIndex(a => a.divisionid === _filterValue) > -1 : true))
     }
 
   return (
@@ -717,7 +717,7 @@ const Attachment = React.memo(({indexValue, record, handlePopupButtonClick, getF
         </Grid>
         <Grid
           item
-          xs={1}
+          xs={2}
           
           container
           direction="row-reverse"
@@ -743,7 +743,7 @@ const Attachment = React.memo(({indexValue, record, handlePopupButtonClick, getF
         spacing={3}
       >
       <Grid item xs={3}>
-        {record.attributes.map((division, i) =>
+        {record.attributes?.divisions?.map((division, i) =>
           <Chip
             item
             key={i}
