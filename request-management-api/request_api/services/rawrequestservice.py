@@ -29,8 +29,7 @@ class rawrequestservice:
         assigneefirstname = requestdatajson["assignedToFirstName"] if requestdatajson.get("assignedToFirstName") != None else None
         assigneemiddlename = requestdatajson["assignedToMiddleName"] if requestdatajson.get("assignedToMiddleName") != None else None
         assigneelastname = requestdatajson["assignedToLastName"] if requestdatajson.get("assignedToLastName") != None else None
-        ispiiredacted = requestdatajson["ispiiredacted"] if 'ispiiredacted' in requestdatajson  else False
-        isiaorestricted = requestdatajson["isiaorestricted"] if 'isiaorestricted' in requestdatajson  else False
+        ispiiredacted = requestdatajson["ispiiredacted"] if 'ispiiredacted' in requestdatajson  else False        
         axisrequestid = requestdatajson["axisRequestId"] if 'axisRequestId' in requestdatajson  else None
         isaxisrequestidpresent = False
         if axisrequestid is not None:
@@ -52,8 +51,7 @@ class rawrequestservice:
                                                     assigneemiddlename=assigneemiddlename,
                                                     assigneelastname=assigneelastname,
                                                     axisrequestid=axisrequestid,
-                                                    axissyncdate=axissyncdate,
-                                                    isiaorestricted = isiaorestricted
+                                                    axissyncdate=axissyncdate                                                    
                                                 )
         else:            
             raise ValueError("Duplicate AXIS Request ID")
@@ -91,13 +89,12 @@ class rawrequestservice:
         raise BusinessException(Error.DATA_NOT_FOUND)    
 
     def saverawrequestversion(self, _requestdatajson, _requestid, _assigneegroup, _assignee, status, userid, assigneefirstname, assigneemiddlename, assigneelastname, actiontype=None):
-        ispiiredacted = _requestdatajson["ispiiredacted"] if 'ispiiredacted' in _requestdatajson  else False
-        isiaorestricted = _requestdatajson["isiaorestricted"] if 'isiaorestricted' in _requestdatajson  else False
+        ispiiredacted = _requestdatajson["ispiiredacted"] if 'ispiiredacted' in _requestdatajson  else False        
         #Get documents
         if actiontype == "assignee":
-            result = FOIRawRequest.saverawrequestassigneeversion(_requestid, _assigneegroup, _assignee, userid, assigneefirstname, assigneemiddlename, assigneelastname,isiaorestricted)
+            result = FOIRawRequest.saverawrequestassigneeversion(_requestid, _assigneegroup, _assignee, userid, assigneefirstname, assigneemiddlename, assigneelastname)
         else:
-            result = FOIRawRequest.saverawrequestversion(_requestdatajson, _requestid, _assigneegroup, _assignee, status,ispiiredacted, userid, assigneefirstname, assigneemiddlename, assigneelastname,isiaorestricted)
+            result = FOIRawRequest.saverawrequestversion(_requestdatajson, _requestid, _assigneegroup, _assignee, status,ispiiredacted, userid, assigneefirstname, assigneemiddlename, assigneelastname)
         documentservice().createrawrequestdocumentversion(_requestid)
         return result
 
