@@ -34,25 +34,25 @@ jobs:
             echo "TOOLS_NAME=${{secrets.OPENSHIFT4_AI_FRONTEND_REPOSITORY}}" >> $GITHUB_ENV
             echo "TAG_NAME="dev"" >> $GITHUB_ENV
             echo "BRANCH_NAME="dev"" >> $GITHUB_ENV
-            echo "PROJECT_NAME="dev"" >> $GITHUB_ENV
-          elif [ ${{ github.ref }} == 'dev-marshal' ]; then
+            echo "ENV_NAME="dev"" >> $GITHUB_ENV
+          elif [ ${{ github.ref_name }} == 'dev-marshal' ]; then
             echo "For ${{ github.ref_name }} branch"
             echo "TOOLS_NAME=${{secrets.OPENSHIFT4_AI_E2_FRONTEND_REPOSITORY}}" >> $GITHUB_ENV
             echo "TAG_NAME="dev"" >> $GITHUB_ENV
             echo "BRANCH_NAME="dev-marshal"" >> $GITHUB_ENV
-            echo "PROJECT_NAME="dev"" >> $GITHUB_ENV
-          elif [ ${{ github.ref }} == 'test-marshal' ]; then
+            echo "ENV_NAME="dev"" >> $GITHUB_ENV
+          elif [ ${{ github.ref_name }} == 'test-marshal' ]; then
             echo "For ${{ github.ref_name }} branch"
             echo "TOOLS_NAME=${{secrets.OPENSHIFT4_AI_E2_FRONTEND_REPOSITORY}}" >> $GITHUB_ENV
             echo "TAG_NAME="test"" >> $GITHUB_ENV
             echo "BRANCH_NAME="test-marshal"" >> $GITHUB_ENV
-            echo "PROJECT_NAME="test"" >> $GITHUB_ENV
-          elif [ ${{ github.ref }} == 'main' ]; then
+            echo "ENV_NAME="test"" >> $GITHUB_ENV
+          elif [ ${{ github.ref_name }} == 'main' ]; then
             echo "For ${{ github.ref_name }} branch"
             echo "TOOLS_NAME=${{secrets.OPENSHIFT4_AI_FRONTEND_REPOSITORY}}" >> $GITHUB_ENV
             echo "TAG_NAME="test"" >> $GITHUB_ENV
             echo "BRANCH_NAME="main"" >> $GITHUB_ENV
-            echo "PROJECT_NAME="test"" >> $GITHUB_ENV
+            echo "ENV_NAME="test"" >> $GITHUB_ENV
           else
             echo "For ${{ github.ref_name }} branch"
           fi
@@ -88,5 +88,5 @@ jobs:
       - name: Watch new rollout (trigger by image change in Openshift)
         shell: bash
         run: |
-          oc rollout status dc/${{ env.APP_NAME }} -n ${{ env.TOOLS_NAME }}-${{ env.PROJECT_NAME }} -w
+          oc rollout status dc/${{ env.APP_NAME }} -n ${{ env.TOOLS_NAME }}-${{ env.ENV_NAME }} -w
 
