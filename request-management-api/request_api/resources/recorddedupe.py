@@ -32,7 +32,7 @@ API = Namespace('RECORDDEDUPE', description='Endpoints for FOI record management
 TRACER = Tracer.get_instance()
 
 @cors_preflight('GET,OPTIONS')
-@API.route('/foirecord/<requestid>/ministryrequest/<ministryrequestid>')
+# @API.route('/foirecord/<requestid>/ministryrequest/<ministryrequestid>')
 class FOIRequestGetRecord(Resource):
 
        

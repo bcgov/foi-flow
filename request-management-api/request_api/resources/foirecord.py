@@ -17,7 +17,6 @@
 from flask import g, request
 from flask_restx import Namespace, Resource, cors
 from flask_expects_json import expects_json
-from request_api.auth import auth
 from request_api.auth import auth, AuthHelper
 from request_api.tracer import Tracer
 from request_api.utils.util import  cors_preflight, allowedorigins
@@ -32,7 +31,7 @@ API = Namespace('FOIWatcher', description='Endpoints for FOI record management')
 TRACER = Tracer.get_instance()
 
 @cors_preflight('GET,OPTIONS')
-#@API.route('/foirecord/<requestid>/ministryrequest/<ministryrequestid>')
+@API.route('/foirecord/<requestid>/ministryrequest/<ministryrequestid>')
 class FOIRequestGetRecord(Resource):
     """Retrieve watchers for unopened request"""
 
