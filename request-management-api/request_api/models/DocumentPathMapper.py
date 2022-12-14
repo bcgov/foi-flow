@@ -31,7 +31,6 @@ class DocumentPathMapper(db.Model):
         try:
             pathmap['attributes'] = json.loads(pathmap['attributes'])
         except TypeError:
-            err = object.__new__(Error)
             raise BusinessException(Error.MISSING_ACCESS_KEY)
 
         return pathmap

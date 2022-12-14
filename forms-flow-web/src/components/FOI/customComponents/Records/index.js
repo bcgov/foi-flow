@@ -735,7 +735,7 @@ const Attachment = React.memo(({indexValue, record, handlePopupButtonClick, getF
         spacing={3}
       >
       <Grid item xs={2}>
-        {record.attributes.map((division, i) =>
+        {record.attributes.divisions.map((division, i) =>
           <Chip
             item
             key={i}
