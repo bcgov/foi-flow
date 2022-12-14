@@ -36,13 +36,13 @@ jobs:
             echo "PROJECT_NAME="dev"" >> $GITHUB_ENV
           elif [ ${{ github.ref }} == 'dev-marshal' ]; then
             echo "For ${{ github.ref_name }} branch"
-            echo "TOOLS_NAME=${{secrets.OPENSHIFT4_AI_E2_FRONTEND_REPOSITORY}}" >> $GITHUB_ENV
+            echo "TOOLS_NAME=${{secrets.OPENSHIFT4_AI_FRONTEND_REPOSITORY}}" >> $GITHUB_ENV
             echo "TAG_NAME="dev"" >> $GITHUB_ENV
             echo "BRANCH_NAME="dev-marshal"" >> $GITHUB_ENV
             echo "PROJECT_NAME="dev"" >> $GITHUB_ENV
           elif [ ${{ github.ref }} == 'test-marshal' ]; then
             echo "For ${{ github.ref_name }} branch"
-            echo "TOOLS_NAME=${{secrets.OPENSHIFT4_AI_E2_FRONTEND_REPOSITORY}}" >> $GITHUB_ENV
+            echo "TOOLS_NAME=${{secrets.OPENSHIFT4_AI_FRONTEND_REPOSITORY}}" >> $GITHUB_ENV
             echo "TAG_NAME="test"" >> $GITHUB_ENV
             echo "BRANCH_NAME="test-marshal"" >> $GITHUB_ENV
             echo "PROJECT_NAME="test"" >> $GITHUB_ENV
