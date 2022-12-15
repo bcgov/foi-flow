@@ -694,7 +694,7 @@ const Attachment = React.memo(({indexValue, record, handlePopupButtonClick, getF
         justify="flex-start"
         alignItems="flex-start"
       >
-        <Grid item xs={7}>
+        <Grid item xs={6}>
             { record.isduplicate ?
               <FontAwesomeIcon icon={faTimesCircle} size='2x' color='#A0192F' className={classes.statusIcons}/>:
               record.isdeduplicated ?
@@ -704,13 +704,13 @@ const Attachment = React.memo(({indexValue, record, handlePopupButtonClick, getF
           <span className={classes.filename}>{record.filename} </span>
           <span className={classes.fileSize}>{record?.attributes?.filesize > 0 ? (record?.attributes?.filesize / 1024).toFixed(2) : 0} KB</span>
         </Grid>
-        <Grid item xs={5} direction="row" 
+        <Grid item xs={6} direction="row" 
             justifyContent="flex-end"
             alignItems="flex-end"
             className={classes.recordStatus}>
             { 
               record.isduplicate ?
-              <span>Duplicate of {duplicateof}</span>:
+              <span>Duplicate of {record.duplicateof}</span>:
               record.isdeduplicated ?
               <span>Ready for Redaction</span>:
               <span>Deduplication & file conversion in progress</span>
