@@ -155,6 +155,7 @@ export default function AttachmentModal({
             handleModal(false);
             parseFileName(attachment);
         }
+        if (uploadFor === 'records') setTagValue("");
     };
 
     const handleTagChange = (_tagValue) => {
