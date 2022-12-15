@@ -24,6 +24,7 @@ class CreateRecordAttributeSchema(Schema):
     #divisions = fields.List(fields.Int(),data_key="divisions",required=True)
     divisions = fields.Nested(DivisionSchema, many=True, validate=validate.Length(min=1), required=True,allow_none=False)
     lastmodified = fields.Str(data_key="lastmodified",allow_none=False, validate=[validate.Length(max=120, error=MAX_EXCEPTION_MESSAGE)])
+    filesize = fields.Int(data_key="filesize", allow_none=False)
 
 class FOIRequestCreateRecordSchema(Schema):
     class Meta:  # pylint: disable=too-few-public-methods
