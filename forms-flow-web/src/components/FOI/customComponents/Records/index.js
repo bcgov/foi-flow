@@ -84,7 +84,8 @@ const useStyles = makeStyles((_theme) => ({
   },
   createBy: {
     fontStyle: "italic",
-    fontSize: "14px"
+    fontSize: "14px",
+    display: "flex"
   },
   filename: {
     fontWeight: "bold"
@@ -697,7 +698,7 @@ const Attachment = React.memo(({indexValue, record, handlePopupButtonClick, getF
             { record.isduplicate ?
               <FontAwesomeIcon icon={faTimesCircle} size='2x' color='#A0192F' className={classes.statusIcons}/>:
               record.isdeduplicated ?
-              <FontAwesomeIcon icon={faCheckCircle} size='1x' color='#1B8103' className={classes.statusIcons}/>: 
+              <FontAwesomeIcon icon={faCheckCircle} size='2x' color='#1B8103' className={classes.statusIcons}/>: 
               <FontAwesomeIcon icon={faSpinner} size='2x' color='#FAA915' className={classes.statusIcons}/>
             }
           <span className={classes.filename}>{record.filename} </span>
@@ -709,7 +710,7 @@ const Attachment = React.memo(({indexValue, record, handlePopupButtonClick, getF
             className={classes.recordStatus}>
             { 
               record.isduplicate ?
-              <span>Removed Document as Duplicate</span>:
+              <span>Duplicate of {duplicateof}</span>:
               record.isdeduplicated ?
               <span>Ready for Redaction</span>:
               <span>Deduplication & file conversion in progress</span>
