@@ -76,15 +76,13 @@ const useStyles = makeStyles((_theme) => ({
     flexDirection: 'row-reverse',
   },
   actions: {
-    maxWidth: "40px"
+    textAlign:'right'
   },
   createDate: {
-    maxWidth: "200px",
     fontStyle: "italic",
     fontSize: "14px"
   },
   createBy: {
-    maxWidth: "180px",
     fontStyle: "italic",
     fontSize: "14px"
   },
@@ -100,15 +98,25 @@ const useStyles = makeStyles((_theme) => ({
   },
   recordStatus:{
     fontSize:"12px",
-    color:"#000000",
+    color:"#a7a1a1",
+    display:"flex"
   },
   statusIcons: {
     height: "20px",
-    width: "20px !important"
+    paddingRight:"10px"
   },
   recordReports:{
     marginTop: "1em",
-    fontSize: "14px"
+    fontSize: "14px",
+    marginBottom: "0px",
+    marginLeft: "15px",
+    fontWeight:'bold'
+  },
+  // reportText:{
+  //   fontWeight:'bold'
+  // },
+  fileSize: {
+    paddingLeft:'20px'
   }
 }));
 
@@ -133,25 +141,12 @@ export const RecordsLog = ({
 
 
   useEffect(() => {
-    console.log("RECORDS in useeffect:",recordsObj);
     setRecords(recordsObj?.records)
-    console.log("Records",records);
   }, [recordsObj])
 
  
   const divisionFilters = [...new Map(recordsObj?.records?.reduce((acc, file) => [...acc, ...new Map(file?.attributes?.divisions?.map(division => [division?.divisionid, division]))], [])).values()]
   if (divisionFilters?.length > 0) divisionFilters?.push({divisionid: -1, divisionname: "ALL"})
-
-
-  // useEffect(() => {
-  //   let divisions = [...new Map(recordsObj.records.map(record => [record.divisionname, {division: record.divisionname}])).values()];
-  //   console.log(_records)
-  //   _records.forEach(division => {
-  //     division.records = records.filter(record => record.divisionname === division.division)
-  //   })
-  //   setRecordsForDisplay(_records);
-  // }, [records])
-
 
 
   const [openModal, setModal] = useState(false);
@@ -183,7 +178,6 @@ export const RecordsLog = ({
     if (modalFor === 'delete' && value) {
       //const documentId = ministryId ? updateAttachment.foiministrydocumentid : updateAttachment.foidocumentid;
       const documentId = updateAttachment.recordid;
-      console.log("documentId:",documentId);
       dispatch(deleteFOIRequestAttachment(requestId, ministryId, documentId, {}));
     }
     else if (files) {
@@ -209,7 +203,8 @@ export const RecordsLog = ({
                 filename: header.filename,
                 attributes:{
                   divisions:[{divisionid: _fileInfo.divisionid}],
-                  lastmodified: _file.lastModifiedDate
+                  lastmodified: _file.lastModifiedDate,
+                  filesize: _file.size
                 }
               };
               await saveFilesinS3(header, _file, dispatch, (_err, _res) => {
@@ -226,7 +221,6 @@ export const RecordsLog = ({
                 }
               })
             }
-
             dispatch(saveFOIRecords(requestId, ministryId, {records: _documents},(err, _res) => {
                 dispatchRequestAttachment(err);
             }));
@@ -307,7 +301,6 @@ export const RecordsLog = ({
   const hasDocumentsToExport = records.filter(record => !(isMinistryCoordinator && record.category == 'personal')).length > 0;
 
   const handlePopupButtonClick = (action, _record) => {
-    console.log("_record:",_record);
     setUpdateAttachment(_record);
     setMultipleFiles(false);
     switch (action) {
@@ -460,7 +453,7 @@ export const RecordsLog = ({
               xs={12}
               className={classes.recordReports}
             >
-             <Grid container spacing={4}>
+             <Grid container spacing={2} className={classes.reportText}>
                 <Grid item xs={3}>
                   <span>Deduplicated Files:</span>
                   <span className='number-spacing'>{recordsObj.dedupedfiles}</span>
@@ -474,10 +467,16 @@ export const RecordsLog = ({
                   <span className='number-spacing'>0</span>
 
                 </Grid>
-                <Grid item xs={3}>
+                <Grid item xs={3} direction="row-reverse">
+                  <span style={{float:"right"}}>
+                    <span >Batches Uploaded:</span>
+                    <span className='number-spacing'>{recordsObj.batchcount ? recordsObj.batchcount : 0}</span>
+                  </span>
+                </Grid>
+                {/* <Grid item xs={3}>
                   <span>Batches Uploaded:</span>
                   <span className='number-spacing'>{recordsObj.batchcount ? recordsObj.batchcount : 0}</span>
-                </Grid>
+                </Grid> */}
               </Grid> 
             </Grid>
             <Grid
@@ -693,20 +692,21 @@ const Attachment = React.memo(({indexValue, record, handlePopupButtonClick, getF
         direction="row"
         justify="flex-start"
         alignItems="flex-start"
-        spacing={1}
       >
-        <Grid item xs={2} className={classes.actions}>
-        { record.isduplicate ?
-          <FontAwesomeIcon icon={faTimesCircle} size='2x' color='#A0192F' className={classes.statusIcons}/>:
-          record.isdeduplicated ?
-          <FontAwesomeIcon icon={faCheckCircle} size='1x' color='#1B8103' className={classes.statusIcons}/>: 
-          <FontAwesomeIcon icon={faSpinner} size='2x' color='#FAA915' className={classes.statusIcons}/>
-        }
+        <Grid item xs={7}>
+            { record.isduplicate ?
+              <FontAwesomeIcon icon={faTimesCircle} size='2x' color='#A0192F' className={classes.statusIcons}/>:
+              record.isdeduplicated ?
+              <FontAwesomeIcon icon={faCheckCircle} size='1x' color='#1B8103' className={classes.statusIcons}/>: 
+              <FontAwesomeIcon icon={faSpinner} size='2x' color='#FAA915' className={classes.statusIcons}/>
+            }
+          <span className={classes.filename}>{record.filename} </span>
+          <span className={classes.fileSize}>{record?.attributes?.filesize > 0 ? (record?.attributes?.filesize / 1024).toFixed(2) : 0} KB</span>
         </Grid>
-        <Grid item xs={7} className={classes.filename}>
-          {record.filename}
-        </Grid>
-        <Grid item xs={2} className={classes.recordStatus}>
+        <Grid item xs={5} direction="row" 
+            justifyContent="flex-end"
+            alignItems="flex-end"
+            className={classes.recordStatus}>
             { 
               record.isduplicate ?
               <span>Removed Document as Duplicate</span>:
@@ -714,17 +714,7 @@ const Attachment = React.memo(({indexValue, record, handlePopupButtonClick, getF
               <span>Ready for Redaction</span>:
               <span>Deduplication & file conversion in progress</span>
             }
-        </Grid>
-        <Grid
-          item
-          xs={2}
-          
-          container
-          direction="row-reverse"
-          justifyContent="flex-start"
-          alignItems="flex-start"
-        >
-          <AttachmentPopup
+            <AttachmentPopup
             indexValue={indexValue}
             record={record}
             handlePopupButtonClick={handlePopupButtonClick}
@@ -736,13 +726,12 @@ const Attachment = React.memo(({indexValue, record, handlePopupButtonClick, getF
       <Grid
         container
         item
-        xs={12}
+        xs="auto"
         direction="row"
         justify="flex-start"
         alignItems="flex-start"
-        spacing={3}
       >
-      <Grid item xs={3}>
+      <Grid item xs={6}>
         {record.attributes?.divisions?.map((division, i) =>
           <Chip
             item
@@ -754,7 +743,11 @@ const Attachment = React.memo(({indexValue, record, handlePopupButtonClick, getF
           />
         )}
       </Grid>
-      <Grid item xs={2} className={classes.createBy}>
+      <Grid item xs={2} 
+        direction="row"
+        justifyContent="flex-end"
+        alignItems="flex-end" 
+        className={classes.createBy}>
           <div
             className={`record-owner ${
               disabled ? "record-disabled" : ""
@@ -763,9 +756,13 @@ const Attachment = React.memo(({indexValue, record, handlePopupButtonClick, getF
             {getFullname(record.createdby)}
           </div>
         </Grid>
-        <Grid item xs={2} className={classes.createDate}>
+        <Grid item xs={4} 
+         direction="row"
+         justifyContent="flex-end"
+         alignItems="flex-end" 
+         className={classes.createDate}>
           <div
-            className={`record-time ${disabled ? "record-disabled" : ""}`}
+            className='record-time'
           >
             {record.created_at}
           </div>
