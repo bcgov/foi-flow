@@ -285,3 +285,20 @@ class FOIRawRequestFields(Resource):
             return {'status': 500, 'message':"Invalid Request"}, 400    
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500
+
+@cors_preflight('GET,POST,OPTIONS')
+@API.route('/foirawrequest/restricted/<requestid>/<isiaorestricted>')
+class FOIRawRequestIAORestricted(Resource):
+
+    @staticmethod    
+    @cross_origin(origins=allowedorigins())
+    @auth.require
+    def post(requestid=None, isiaorestricted=False):
+        try :            
+            if int(requestid) and str(requestid) != "-1" :
+                result = rawrequestservice().saverawrequestiaorestricted(requestid,isiaorestricted,AuthHelper.getuserid())
+                return json.dumps(result), 200
+        except ValueError:
+            return {'status': 500, 'message':"Invalid Request"}, 400    
+        except BusinessException as exception:            
+            return {'status': exception.status_code, 'message':exception.message}, 500  

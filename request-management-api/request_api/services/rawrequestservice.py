@@ -98,6 +98,9 @@ class rawrequestservice:
         documentservice().createrawrequestdocumentversion(_requestid)
         return result
 
+    def saverawrequestiaorestricted(self,_requestid,_iaorestricted,_updatedby):
+        result = FOIRawRequest.saveiaorestrictedrawrequest(_requestid,_iaorestricted,_updatedby)
+        return result
    
     def updateworkflowinstance(self, wfinstanceid, requestid, userid):
         return FOIRawRequest.updateworkflowinstance(wfinstanceid, requestid, userid)
