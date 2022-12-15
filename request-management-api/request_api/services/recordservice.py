@@ -53,7 +53,8 @@ class recordservice:
                 result['removedfiles'] += 1
         result['records'] = self.__format(list(uploadedrecords.values()), divisions)
         result['dedupedfiles'] = len(dedupedrecords)
-        result['batchcount'] = len(set(map(lambda record: record['attributes']['batch'], result['records'])))
+        # result['batchcount'] = len(set(map(lambda record: record['attributes']['batch'], result['records'])))
+        result['batchcount'] = FOIRequestRecord.getbatchcount()
         return result
 
 
