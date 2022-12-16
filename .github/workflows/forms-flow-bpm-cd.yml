@@ -1,19 +1,15 @@
-name: DEV Forms-Flow-bpm CD
+name: Forms-Flow-bpm CD
 
 
 on:
   push:
     branches:
       - dev
-      - dev-AC-212d
+      - dev-marshal
+      - test-marshal
+      - main
     paths:
       - "apps/forms-flow-ai/forms-flow-bpm/**"
-  workflow_dispatch:
-    inputs:
-      environment:
-        description: "Environment (dev/test/prod)"
-        required: true
-        default: "dev"
 
 defaults:
   run:
@@ -22,18 +18,45 @@ defaults:
 
 env:
   APP_NAME: "forms-flow-bpm"
-  TAG_NAME: "dev"
 
 jobs:
   forms-flow-bpm-cd-by-push:
     runs-on: ubuntu-20.04
 
     if: github.event_name == 'push' && github.repository == 'bcgov/foi-flow'
-    environment:
-      name: "dev"
-
     steps:
       - uses: actions/checkout@v2
+      - name: Set ENV variables
+        id: set-variable
+        run: |
+          if [ ${{ github.ref_name }} == 'dev' ]; then
+            echo "For ${{ github.ref_name }} branch"
+            echo "TOOLS_NAME=${{secrets.OPENSHIFT4_FRONTEND_REPOSITORY}}" >> $GITHUB_ENV
+            echo "TAG_NAME="dev"" >> $GITHUB_ENV
+            echo "BRANCH_NAME="dev"" >> $GITHUB_ENV
+            echo "ENV_NAME="dev"" >> $GITHUB_ENV
+          elif [ ${{ github.ref_name }} == 'dev-marshal' ]; then
+            echo "For ${{ github.ref_name }} branch"
+            echo "TOOLS_NAME=${{secrets.OPENSHIFT4_FRONTEND_REPOSITORY}}" >> $GITHUB_ENV
+            echo "TAG_NAME="dev-marshal"" >> $GITHUB_ENV
+            echo "BRANCH_NAME="dev-marshal"" >> $GITHUB_ENV
+            echo "ENV_NAME="dev"" >> $GITHUB_ENV
+          elif [ ${{ github.ref_name }} == 'test-marshal' ]; then
+            echo "For ${{ github.ref_name }} branch"
+            echo "TOOLS_NAME=${{secrets.OPENSHIFT4_FRONTEND_REPOSITORY}}" >> $GITHUB_ENV
+            echo "TAG_NAME="test-marshal"" >> $GITHUB_ENV
+            echo "BRANCH_NAME="test-marshal"" >> $GITHUB_ENV
+            echo "ENV_NAME="test"" >> $GITHUB_ENV
+          elif [ ${{ github.ref_name }} == 'main' ]; then
+            echo "For ${{ github.ref_name }} branch"
+            echo "TOOLS_NAME=${{secrets.OPENSHIFT4_FRONTEND_REPOSITORY}}" >> $GITHUB_ENV
+            echo "TAG_NAME="test"" >> $GITHUB_ENV
+            echo "BRANCH_NAME="main"" >> $GITHUB_ENV
+            echo "ENV_NAME="test"" >> $GITHUB_ENV
+          else
+            echo "For ${{ github.ref_name }} branch"
+          fi
+        shell: bash
 
       - name: Login Openshift
         shell: bash
@@ -44,12 +67,12 @@ jobs:
       - name: Tools project
         shell: bash
         run: |
-          oc project ${{ secrets.OPENSHIFT4_FRONTEND_REPOSITORY }}-tools
+          oc project ${{ env.TOOLS_NAME }}-tools
 
-      - name: Build from dev branch
+      - name: Build from ${{ env.BRANCH_NAME }} branch
         shell: bash
         run: |
-          oc patch bc/${{ env.APP_NAME }} -p '{"spec":{"source":{"git":{"ref":"dev"}}}}'
+          oc patch bc/${{ env.APP_NAME }} -p '{"spec":{"source":{"git":{"ref":"${{ env.BRANCH_NAME }}"}}}}'
 
       - name: Start Build Openshift
         shell: bash
@@ -57,7 +80,7 @@ jobs:
           oc start-build ${{ env.APP_NAME }} --wait
 
 
-      - name: Tag+Deploy for DEV
+      - name: Tag+Deploy for ${{ env.TAG_NAME }}
         shell: bash
         run: |
           oc tag ${{ env.APP_NAME }}:latest ${{ env.APP_NAME }}:${{ env.TAG_NAME }}
@@ -65,15 +88,4 @@ jobs:
       - name: Watch new rollout (trigger by image change in Openshift)
         shell: bash
         run: |
-          oc rollout status dc/${{ env.APP_NAME }} -n ${{ secrets.OPENSHIFT4_FRONTEND_REPOSITORY }}-${{ env.TAG_NAME }} -w
-
-      # - name: Rocket.Chat Notification
-      #   uses: RocketChat/Rocket.Chat.GitHub.Action.Notification@master
-      #   if: failure()
-      #   with:
-      #     type: ${{ job.status }}
-      #     job_name: "*Auth web Built and Deployed to ${{env.TAG_NAME}}*"
-      #     channel: "#registries-bot"
-      #     url: ${{ secrets.ROCKETCHAT_WEBHOOK }}
-      #     commit: true
-      #     token: ${{ secrets.GITHUB_TOKEN }}
+          oc rollout status dc/${{ env.APP_NAME }} -n ${{ env.TOOLS_NAME }}-${{ env.ENV_NAME }} -w
