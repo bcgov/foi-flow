@@ -101,23 +101,10 @@ class Payment(Resource):
                 paymentservice().createpaymentversion(request_id, ministry_request_id, amountpaid)
                 data = requestservice().getrequestdetails(request_id, ministry_request_id)
                 paymentservice().createpaymentreceipt(request_id, ministry_request_id, data, parsed_args)
-                # prevstate = data["stateTransition"][1]["status"] if "stateTransition" in data and len(data["stateTransition"])  > 2 else None
-                # nextstatename = StateName.callforrecords.value
-                
-                # balancedue = float(data['cfrfee']['feedata']["balanceDue"])
-                # paymenteventtype = PaymentEventType.paid.value
-                # if balancedue > 0:
-                #     paymenteventtype = PaymentEventType.depositpaid.value
-                # if prevstate.lower() == "response":
-                #     nextstatename = StateName.response.value
-
-                # #outstanding
-                # if balancedue == 0 and (templatename == 'PAYOUTSTANDING' or prevstate.lower() == "response"):
-                #     paymenteventtype = PaymentEventType.outstandingpaid.value
-                # # result = requestservice().updaterequeststatus(request_id, ministry_request_id, statusid)
-                # # if result.success == True:
                 nextstatename, paymenteventtype = paymentservice().postpayment(ministry_request_id, data)
                 cfrfeeservice().updatepaymentmethod(ministry_request_id, paymenteventtype)
+                # automated state transition and due date calculation
+                requestservice().postpaymentstatetransition(request_id, ministry_request_id, nextstatename, parsed_args.get('trnDate'))
                 asyncio.ensure_future(eventservice().postpaymentevent(ministry_request_id, paymenteventtype))
                 requestservice().postfeeeventtoworkflow(request_id, ministry_request_id, "PAID", nextstatename)
                 
