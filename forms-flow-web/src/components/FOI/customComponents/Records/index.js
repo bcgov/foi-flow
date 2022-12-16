@@ -34,6 +34,9 @@ import InputAdornment from "@mui/material/InputAdornment";
 import InputBase from "@mui/material/InputBase";
 import Paper from "@mui/material/Paper";
 import { toast } from "react-toastify";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCheckCircle, faTimesCircle  } from '@fortawesome/free-regular-svg-icons';
+import {faSpinner } from '@fortawesome/free-solid-svg-icons';
 
 
 const useStyles = makeStyles((_theme) => ({
@@ -73,17 +76,16 @@ const useStyles = makeStyles((_theme) => ({
     flexDirection: 'row-reverse',
   },
   actions: {
-    maxWidth: "40px"
+    textAlign:'right'
   },
   createDate: {
-    maxWidth: "200px",
     fontStyle: "italic",
     fontSize: "14px"
   },
   createBy: {
-    maxWidth: "180px",
     fontStyle: "italic",
-    fontSize: "14px"
+    fontSize: "14px",
+    display: "flex"
   },
   filename: {
     fontWeight: "bold"
@@ -91,13 +93,37 @@ const useStyles = makeStyles((_theme) => ({
   divider: {
     marginTop: "-2px",
     marginBottom: "-5px"
+  },
+  topDivider: {
+    paddingTop: '0px !important',
+  },
+  recordStatus:{
+    fontSize:"12px",
+    color:"#a7a1a1",
+    display:"flex"
+  },
+  statusIcons: {
+    height: "20px",
+    paddingRight:"10px"
+  },
+  recordReports:{
+    marginTop: "1em",
+    fontSize: "14px",
+    marginBottom: "0px",
+    marginLeft: "15px",
+    fontWeight:'bold'
+  },
+  // reportText:{
+  //   fontWeight:'bold'
+  // },
+  fileSize: {
+    paddingLeft:'20px'
   }
 }));
 
 export const RecordsLog = ({
   divisions,
   requestNumber,
-  recordsArray,
   requestId,
   ministryId,
   bcgovcode,
@@ -106,26 +132,22 @@ export const RecordsLog = ({
   isMinistryCoordinator,
   setRecordsUploading
 }) => {
+
+  let recordsObj = useSelector(
+    (state) => state.foiRequests.foiRequestRecords
+  );
+
   const classes = useStyles();
-  const [records, setRecords] = useState(recordsArray)
+  const [records, setRecords] = useState(recordsObj?.records);
+
 
   useEffect(() => {
-    setRecords(recordsArray)
-  }, [recordsArray])
+    setRecords(recordsObj?.records)
+  }, [recordsObj])
 
-  const divisionFilters = [...new Map(recordsArray.reduce((acc, file) => [...acc, ...new Map(file.attributes.map(division => [division.divisionid, division]))], [])).values()]
-  if (divisionFilters.length > 0) divisionFilters.push({divisionid: -1, divisionname: "ALL"})
-
-
-  // useEffect(() => {
-  //   let divisions = [...new Map(recordsArray.map(record => [record.divisionname, {division: record.divisionname}])).values()];
-  //   console.log(_records)
-  //   _records.forEach(division => {
-  //     division.records = records.filter(record => record.divisionname === division.division)
-  //   })
-  //   setRecordsForDisplay(_records);
-  // }, [records])
-
+ 
+  const divisionFilters = [...new Map(recordsObj?.records?.reduce((acc, file) => [...acc, ...new Map(file?.attributes?.divisions?.map(division => [division?.divisionid, division]))], [])).values()]
+  if (divisionFilters?.length > 0) divisionFilters?.push({divisionid: -1, divisionname: "ALL"})
 
 
   const [openModal, setModal] = useState(false);
@@ -155,7 +177,8 @@ export const RecordsLog = ({
   const handleContinueModal = (value, fileInfoList, files) => {
     setModal(false);
     if (modalFor === 'delete' && value) {
-      const documentId = ministryId ? updateAttachment.foiministrydocumentid : updateAttachment.foidocumentid;
+      //const documentId = ministryId ? updateAttachment.foiministrydocumentid : updateAttachment.foidocumentid;
+      const documentId = updateAttachment.recordid;
       dispatch(deleteFOIRequestAttachment(requestId, ministryId, documentId, {}));
     }
     else if (files) {
@@ -181,7 +204,8 @@ export const RecordsLog = ({
                 filename: header.filename,
                 attributes:{
                   divisions:[{divisionid: _fileInfo.divisionid}],
-                  lastmodified: _file.lastModifiedDate
+                  lastmodified: _file.lastModifiedDate,
+                  filesize: _file.size
                 }
               };
               await saveFilesinS3(header, _file, dispatch, (_err, _res) => {
@@ -198,7 +222,6 @@ export const RecordsLog = ({
                 }
               })
             }
-
             dispatch(saveFOIRecords(requestId, ministryId, {records: _documents},(err, _res) => {
                 dispatchRequestAttachment(err);
             }));
@@ -349,8 +372,8 @@ export const RecordsLog = ({
 
   // const onFilterChange = (filterValue) => {
     // let _filteredRecords = filterValue === "" ?
-    // recordsArray :
-    // recordsArray.filter(r =>
+    // records.records :
+    // records.records.filter(r =>
     //   r.filename.toLowerCase().includes(filterValue?.toLowerCase()) ||
     //   r.createdby.toLowerCase().includes(filterValue?.toLowerCase()) ||
     //   r.attributes.findIndex(a => a.divisionname.toLowerCase() === filterValue?.toLowerCase().trim()) > -1
@@ -360,14 +383,14 @@ export const RecordsLog = ({
 
 
   React.useEffect(() => {
-    setRecords(searchAttachments(recordsArray, filterValue, searchValue));
-  },[filterValue, searchValue, recordsArray])
+    setRecords(searchAttachments(recordsObj.records, filterValue, searchValue));
+  },[filterValue, searchValue, recordsObj])
 
   const searchAttachments = (_recordsArray, _filterValue, _keywordValue) =>  {
     return _recordsArray.filter(r =>
       (r.filename.toLowerCase().includes(_keywordValue?.toLowerCase()) ||
       r.createdby.toLowerCase().includes(_keywordValue?.toLowerCase())) &&
-      (_filterValue > -1 ? r.attributes.findIndex(a => a.divisionid === _filterValue) > -1 : true))
+      (_filterValue > -1 ? r.attributes?.divisions?.findIndex(a => a.divisionid === _filterValue) > -1 : true))
     }
 
   return (
@@ -421,6 +444,53 @@ export const RecordsLog = ({
                   Redact Records
                 </button>
               }
+            </Grid>
+            <Grid
+              container
+              item
+              direction="row"
+              justify="flex-start"
+              alignItems="flex-start"
+              xs={12}
+              className={classes.recordReports}
+            >
+             <Grid container spacing={2} className={classes.reportText}>
+                <Grid item xs={3}>
+                  <span>Deduplicated Files:</span>
+                  <span className='number-spacing'>{recordsObj.dedupedfiles}</span>
+                </Grid>
+                <Grid item xs={3}>
+                  <span>Files Removed:</span>
+                  <span className='number-spacing'>{recordsObj.removedfiles}</span>
+                </Grid>
+                <Grid item xs={3}>
+                  <span>Files Converted to PDF:</span>
+                  <span className='number-spacing'>0</span>
+
+                </Grid>
+                <Grid item xs={3} direction="row-reverse">
+                  <span style={{float:"right"}}>
+                    <span >Batches Uploaded:</span>
+                    <span className='number-spacing'>{recordsObj.batchcount ? recordsObj.batchcount : 0}</span>
+                  </span>
+                </Grid>
+                {/* <Grid item xs={3}>
+                  <span>Batches Uploaded:</span>
+                  <span className='number-spacing'>{recordsObj.batchcount ? recordsObj.batchcount : 0}</span>
+                </Grid> */}
+              </Grid> 
+            </Grid>
+            <Grid
+              container
+              direction="row"
+              justify="flex-start"
+              alignItems="flex-start"
+              spacing={3}
+              className={classes.divider}
+            >
+              <Grid item xs={12} className={classes.topDivider}>
+                <Divider className={"record-divider"} style={{backgroundColor: '#979797'}}/>
+              </Grid>
             </Grid>
             <Grid
               container
@@ -623,48 +693,29 @@ const Attachment = React.memo(({indexValue, record, handlePopupButtonClick, getF
         direction="row"
         justify="flex-start"
         alignItems="flex-start"
-        spacing={1}
       >
-        <Grid item xs={true} className={classes.filename}>
-          {record.filename}
-        {/* </Grid>
-        <Grid item xs={true} > */}
-          {/* {record.attributes.map((division, i) =>
-            <Chip
-              key={i}
-              label={division.divisionname}
-              size="small"
-              className={clsx(classes.chip, classes.chipPrimary)}
-              style={{backgroundColor: "#003366", margin: "4px"}}
-            />
-          )} */}
+        <Grid item xs={6}>
+            { record.isduplicate ?
+              <FontAwesomeIcon icon={faTimesCircle} size='2x' color='#A0192F' className={classes.statusIcons}/>:
+              record.isdeduplicated ?
+              <FontAwesomeIcon icon={faCheckCircle} size='2x' color='#1B8103' className={classes.statusIcons}/>: 
+              <FontAwesomeIcon icon={faSpinner} size='2x' color='#FAA915' className={classes.statusIcons}/>
+            }
+          <span className={classes.filename}>{record.filename} </span>
+          <span className={classes.fileSize}>{record?.attributes?.filesize > 0 ? (record?.attributes?.filesize / 1024).toFixed(2) : 0} KB</span>
         </Grid>
-        <Grid item xs={2} className={classes.createBy}>
-          <div
-            className={`record-owner ${
-              disabled ? "record-disabled" : ""
-            }`}
-          >
-            {getFullname(record.createdby)}
-          </div>
-        </Grid>
-        <Grid item xs={3} className={classes.createDate}>
-          <div
-            className={`record-time ${disabled ? "record-disabled" : ""}`}
-          >
-            {record.created_at}
-          </div>
-        </Grid>
-        <Grid
-          item
-          xs={1}
-          className={classes.actions}
-          container
-          direction="row-reverse"
-          justifyContent="flex-start"
-          alignItems="flex-start"
-        >
-          <AttachmentPopup
+        <Grid item xs={6} direction="row" 
+            justifyContent="flex-end"
+            alignItems="flex-end"
+            className={classes.recordStatus}>
+            { 
+              record.isduplicate ?
+              <span>Duplicate of {record.duplicateof}</span>:
+              record.isdeduplicated ?
+              <span>Ready for Redaction</span>:
+              <span>Deduplication & file conversion in progress</span>
+            }
+            <AttachmentPopup
             indexValue={indexValue}
             record={record}
             handlePopupButtonClick={handlePopupButtonClick}
@@ -675,12 +726,14 @@ const Attachment = React.memo(({indexValue, record, handlePopupButtonClick, getF
       </Grid>
       <Grid
         container
+        item
+        xs="auto"
         direction="row"
         justify="flex-start"
         alignItems="flex-start"
-        spacing={1}
       >
-        {record.attributes.map((division, i) =>
+      <Grid item xs={6}>
+        {record.attributes?.divisions?.map((division, i) =>
           <Chip
             item
             key={i}
@@ -690,7 +743,31 @@ const Attachment = React.memo(({indexValue, record, handlePopupButtonClick, getF
             style={{backgroundColor: "#003366", margin: "4px"}}
           />
         )}
-
+      </Grid>
+      <Grid item xs={2} 
+        direction="row"
+        justifyContent="flex-end"
+        alignItems="flex-end" 
+        className={classes.createBy}>
+          <div
+            className={`record-owner ${
+              disabled ? "record-disabled" : ""
+            }`}
+          >
+            {getFullname(record.createdby)}
+          </div>
+        </Grid>
+        <Grid item xs={4} 
+         direction="row"
+         justifyContent="flex-end"
+         alignItems="flex-end" 
+         className={classes.createDate}>
+          <div
+            className='record-time'
+          >
+            {record.created_at}
+          </div>
+        </Grid>
       </Grid>
       <Grid
         container
@@ -863,7 +940,7 @@ const AttachmentPopup = React.memo(({indexValue, record, handlePopupButtonClick,
         onClick={(e) => {
           setPopoverOpen(true);
           setAnchorPosition(
-            e.currentTarget.getBoundingClientRect()
+            e?.currentTarget?.getBoundingClientRect()
           );
         }}
       >

@@ -79,7 +79,7 @@ export default function AttachmentModal({
     const [newFilename, setNewFilename] = useState("");
     const [extension, setExtension] = useState("");
     const [errorMessage, setErrorMessage] = useState();
-    const [tagValue, setTagValue] = useState(tagList[0]?.name || "general");
+    const [tagValue, setTagValue] = useState(uploadFor === 'records' ? "" : "general");
     const attchmentFileNameList = attachmentsArray.map(_file => _file.filename.toLowerCase());
 
     useEffect(() => {
@@ -155,6 +155,7 @@ export default function AttachmentModal({
             handleModal(false);
             parseFileName(attachment);
         }
+        if (uploadFor === 'records') setTagValue("");
     };
 
     const handleTagChange = (_tagValue) => {
@@ -188,6 +189,7 @@ export default function AttachmentModal({
         
         handleModal(true, fileInfoList, files);
         setFiles([]);
+        if (uploadFor === 'records') setTagValue("");
       }
     }  
     const getMessage = () => {
@@ -281,7 +283,7 @@ export default function AttachmentModal({
                 Save
               </button>
               :
-              <button className={`btn-bottom btn-save ${ btnClass }`} disabled={files.length === 0 && existingDocuments.length === 0 && modalFor !== 'delete'} onClick={handleSave}>
+              <button className={`btn-bottom btn-save ${ btnClass }`} disabled={(files.length === 0 && existingDocuments.length === 0 && modalFor !== 'delete') || tagValue === ""} onClick={handleSave}>
                 {uploadFor === "email" ? "Save Changes" : "Continue"}
               </button>
             }
