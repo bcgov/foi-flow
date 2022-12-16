@@ -60,14 +60,14 @@ class FOIRequestRecord(db.Model):
 
 
     @classmethod   
-    def getbatchcount(cls):
+    def getbatchcount(cls, ministryrequestid):
         batchcount = 0
         try:
-            sql = """select distinct count(  
+            sql = """select count(  distinct
                         json_extract_path_text("attributes" ::json,'batch')) AS batch_count
-                        FROM
-                        "FOIRequestRecords" """
-            rs = db.session.execute(text(sql))
+                        FROM "FOIRequestRecords"
+                        where ministryrequestid = :ministryrequestid  """
+            rs = db.session.execute(text(sql), {'ministryrequestid', ministryrequestid})
             for row in rs:
                 batchcount = row["batch_count"]
         except Exception as ex:
