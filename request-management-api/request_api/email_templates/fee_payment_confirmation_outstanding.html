@@ -1,8 +1,9 @@
     <p>Dear {{firstName}} {{lastName}},</p>
-    <p>Information Access Operations has received your payment for request #{{axisRequestId}} on {{cfrfee.feedata.paymentdate}}.</p>
+    <p>Information Access Operations has received your payment for FOI request #{{axisRequestId}} on {{cfrfee.feedata.paymentdate | formatdate('%B %d, %Y')}}.</p>
+    <p>FOI Request # {{axisRequestId}} is now due on {{dueDate| formatdate('%B %d, %Y')}}.</p>
     <p>You paid an initial deposit of <b>$ {{cfrfee.feedata.depositpaid}} </b> on your request, 
       and this confirms receipt of payment for the outstanding balance of <b>$ {{cfrfee.feedata.paidamount}} </b> per the attached. </p>
-    
+    <p>Please also be advised that payments completed on holidays and weekends will be considered received the next business day. </p>
     <br>
     <p>Thank you,</p> 
     <p>{{assignedToFirstName}} {{assignedToLastName}}<br>

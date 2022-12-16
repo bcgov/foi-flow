@@ -51,6 +51,7 @@ class recordservice:
             record['attributes'] = dedupedrecord['attributes']
             if dedupedrecord['isduplicate']:
                 result['removedfiles'] += 1
+                record['duplicateof'] = dedupedrecord['duplicateof']
         result['records'] = self.__format(list(uploadedrecords.values()), divisions)
         result['dedupedfiles'] = len(dedupedrecords)
         # result['batchcount'] = len(set(map(lambda record: record['attributes']['batch'], result['records'])))
