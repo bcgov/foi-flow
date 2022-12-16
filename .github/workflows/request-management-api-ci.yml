@@ -6,6 +6,8 @@ on:
     branches:
       - main
       - dev
+      - dev-marshal
+      - test-marshal
     paths:
       - "request-management-api/**"
 
