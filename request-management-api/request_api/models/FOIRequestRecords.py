@@ -67,7 +67,7 @@ class FOIRequestRecord(db.Model):
                         json_extract_path_text("attributes" ::json,'batch')) AS batch_count
                         FROM "FOIRequestRecords"
                         where ministryrequestid = :ministryrequestid  """
-            rs = db.session.execute(text(sql), {'ministryrequestid', ministryrequestid})
+            rs = db.session.execute(text(sql), {'ministryrequestid': ministryrequestid})
             for row in rs:
                 batchcount = row["batch_count"]
         except Exception as ex:

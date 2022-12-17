@@ -54,8 +54,8 @@ class recordservice:
                 record['duplicateof'] = dedupedrecord['duplicateof']
         result['records'] = self.__format(list(uploadedrecords.values()), divisions)
         result['dedupedfiles'] = len(dedupedrecords)
-        result['batchcount'] = len(set(map(lambda record: record['attributes']['batch'], result['records'])))
-        # result['batchcount'] = FOIRequestRecord.getbatchcount(ministryrequestid)
+        # result['batchcount'] = len(set(map(lambda record: record['attributes']['batch'], result['records'])))
+        result['batchcount'] = FOIRequestRecord.getbatchcount(ministryrequestid)
         return result
 
 
