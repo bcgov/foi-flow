@@ -610,6 +610,11 @@ class FOIMinistryRequest(db.Model):
         return db.session.query(FOIMinistryRequest.duedate).filter(FOIMinistryRequest.foiministryrequestid == ministryrequestid).order_by(FOIMinistryRequest.version.desc()).first()[0]
 
     @classmethod
+    def getlastpaymentdate(cls,ministryrequestid):
+        data = db.session.query(FOIMinistryRequest.created_at).filter(FOIMinistryRequest.foiministryrequestid == ministryrequestid, FOIMinistryRequest.createdby == 'Online Payment').order_by(FOIMinistryRequest.version.desc()).first()
+        return None if data in (None, '') else data[0]
+    
+    @classmethod
     def getupcomingcfrduerecords(cls):
         upcomingduerecords = []
         try:

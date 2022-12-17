@@ -51,7 +51,7 @@ class requestservice:
         currentstatus = foirequest["stateTransition"][0]["status"] if "stateTransition" in foirequest and len(foirequest["stateTransition"])  > 1 else None
         status = FOIRequestStatus().getrequeststatusid(nextstatename)
         if currentstatus not in (None, "") and currentstatus == StateName.onhold.value:
-            calc_duedate, calc_cfrduedate = self.calculateduedate(foirequest, paymentdate)
+            calc_duedate, calc_cfrduedate = self.calculateduedate(ministryrequestid, foirequest, paymentdate)
             foirequest['dueDate'] = calc_duedate
             foirequest['cfrDueDate'] = calc_cfrduedate
         foirequest['requeststatusid'] = status['requeststatusid']
@@ -103,7 +103,10 @@ class requestservice:
         wfinstanceid = workflowservice().syncwfinstance("ministryrequest", ministryrequestid, True)
         workflowservice().postcorrenspodenceevent(wfinstanceid, ministryrequestid, foirequestschema, applicantcorrespondenceid, templatedetails.name, attributes)
 
-    def calculateduedate(self, foirequest, paymentdate):
+    def calculateduedate(self, ministryrequestid, foirequest, paymentdate):        
+        skipcalculation = self.__skipduedatecalculation(ministryrequestid, paymentdate)
+        if skipcalculation == True:
+            return foirequest["dueDate"], foirequest["cfrDueDate"]
         duedate_includeoffhold, cfrduedate_includeoffhold = self.__isincludeoffhold()
         onhold_extend_days = duecalculator().getbusinessdaysbetween(foirequest["onholdTransitionDate"], paymentdate)
         isoffhold_businessday = duecalculator().isbusinessday(paymentdate)
@@ -113,6 +116,13 @@ class requestservice:
         calc_cfrduedate = duecalculator().addbusinessdays(foirequest["cfrDueDate"], cfrduedate_extend_days) 
         return calc_duedate, calc_cfrduedate
 
+    def __skipduedatecalculation(self, ministryrequestid, paymentdate):
+        previouspayment = FOIMinistryRequest.getlastpaymentdate(ministryrequestid)
+        if previouspayment not in (None, ''):
+            previouspaymentdate_pst = datetimehandler().convert_to_pst(previouspayment)
+            if datetimehandler().getdate(previouspaymentdate_pst).date() == datetimehandler().getdate(paymentdate).date():
+                return True
+        return False            
 
     def __isincludeoffhold(self):
         payment_config_str = os.getenv("PAYMENT_CONFIG",'')        
