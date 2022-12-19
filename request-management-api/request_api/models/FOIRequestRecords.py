@@ -57,6 +57,25 @@ class FOIRequestRecord(db.Model):
             raise ex
         finally:
             db.session.close()
+
+
+    @classmethod   
+    def getbatchcount(cls, ministryrequestid):
+        batchcount = 0
+        try:
+            sql = """select count(  distinct
+                        json_extract_path_text("attributes" ::json,'batch')) AS batch_count
+                        FROM "FOIRequestRecords"
+                        where ministryrequestid = :ministryrequestid  """
+            rs = db.session.execute(text(sql), {'ministryrequestid': ministryrequestid})
+            for row in rs:
+                batchcount = row["batch_count"]
+        except Exception as ex:
+            logging.error(ex)
+            raise ex
+        finally:
+            db.session.close()
+        return batchcount
     
 class FOIRequestRecordSchema(ma.Schema):
     class Meta:

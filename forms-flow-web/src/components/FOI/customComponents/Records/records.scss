@@ -13,7 +13,7 @@
 }
 
 .records-actions-btn {
-    padding: 0 !important;
+    padding: 0 0 0 40px !important;
 }
 
 .file-upload-toast {
@@ -22,4 +22,16 @@
             white-space: pre-line;
         }
     }
+}
+
+.number-spacing{
+    margin-left: 21px;
+    padding: 3px 9px;
+    background-color: #808080;
+    color: white;
+}
+
+.record-time {
+    text-align: right;
+    margin-right: 62px;
 }

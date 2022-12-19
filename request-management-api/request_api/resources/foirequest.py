@@ -81,7 +81,7 @@ class FOIRequests(Resource):
         """ POST Method for capturing FOI requests before processing"""
         try:
             request_json = request.get_json() 
-            foirequestschema = FOIRequestWrapperSchema().load(request_json)       
+            foirequestschema = FOIRequestWrapperSchema().load(request_json)
             assignedgroup = request_json['assignedGroup'] if 'assignedGroup' in foirequestschema  else None
             assignedto = request_json['assignedTo'] if 'assignedTo' in foirequestschema  else None
             assignedtofirstname = request_json["assignedToFirstName"] if request_json.get("assignedToFirstName") != None else None
