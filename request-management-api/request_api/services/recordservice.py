@@ -44,7 +44,6 @@ class recordservice:
 
         result['removedfiles'] = 0
         for dedupedrecord in dedupedrecords:
-            print(type(dedupedrecord))
             record = uploadedrecords[dedupedrecord['filepath']]
             record['isdeduplicated'] = True
             record['isduplicate'] = dedupedrecord['isduplicate']
