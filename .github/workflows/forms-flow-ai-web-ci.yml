@@ -6,6 +6,8 @@ on:
     branches:
       - dev
       - main
+      - dev-marshal
+      - test-marshal
     paths:
       - "apps/forms-flow-ai/forms-flow-ai-web/**"
 
