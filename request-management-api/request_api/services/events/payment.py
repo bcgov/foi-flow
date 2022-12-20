@@ -53,7 +53,7 @@ class paymentevent:
         elif eventtype == PaymentEventType.outstandingpaid.value:
             comment = {"comment": "Applicant has paid outstanding fee. Response package can be released."}
         elif eventtype == PaymentEventType.depositpaid.value:
-            comment = {"comment": "Applicant has paid deposit."}
+            comment = {"comment": "Applicant has paid deposit. New LDD is " + FOIMinistryRequest.getduedate(requestid).strftime("%m/%d/%Y")}
         else:
             comment = None
         if comment is not None:
