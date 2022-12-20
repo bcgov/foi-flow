@@ -31,12 +31,13 @@ class requestservice:
         return requestservicecreate().saverequest(foirequestschema, userid, foirequestid, ministryid, filenumber, version, rawrequestid, wfinstanceid)     
     
     def saverequestversion(self,foirequestschema, foirequestid , ministryid, userid):
-        responseschema = requestservicecreate().saverequestversion(foirequestschema, foirequestid , ministryid, userid) 
+        nextstatename = FOIRequestStatus.getrequeststatusname(foirequestschema['requeststatusid'])
+        rev_foirequestschema = self.updateduedate(foirequestid, ministryid, datetimehandler().gettoday(), foirequestschema, nextstatename)        
+        responseschema = requestservicecreate().saverequestversion(rev_foirequestschema, foirequestid , ministryid, userid) 
         if "paymentExpiryDate" in foirequestschema and foirequestschema["paymentExpiryDate"] not in (None, ""):
             paymentservice().createpayment(foirequestid, ministryid, foirequestschema, userid)
         return responseschema
-            
-    
+
     def saveministryrequestversion(self,ministryrequestschema, foirequestid , ministryid, userid, usertype = None):
          return requestservicecreate().saveministryrequestversion(ministryrequestschema, foirequestid , ministryid, userid, usertype)      
      
@@ -47,15 +48,26 @@ class requestservice:
         return requestserviceupdate().updateministryrequestduedate(ministryrequestid, duedate, userid)
     
     def postpaymentstatetransition(self, requestid, ministryrequestid, nextstatename, paymentdate):
+        _foirequest = self.getrequest(requestid, ministryrequestid)
+        foirequest = self.updateduedate(requestid, ministryrequestid, paymentdate, _foirequest, nextstatename)  
+        status = FOIRequestStatus().getrequeststatusid(nextstatename)  
+        foirequest['requeststatusid'] = status['requeststatusid']
+        return requestservicecreate().saverequestversion(foirequest, requestid , ministryrequestid, 'Online Payment')
+        
+    def updateduedate(self, requestid, ministryrequestid, offholddate, foirequestschema, nextstatename):
         foirequest = self.getrequest(requestid, ministryrequestid)
         currentstatus = foirequest["stateTransition"][0]["status"] if "stateTransition" in foirequest and len(foirequest["stateTransition"])  > 1 else None
-        status = FOIRequestStatus().getrequeststatusid(nextstatename)
-        if currentstatus not in (None, "") and currentstatus == StateName.onhold.value:
-            calc_duedate, calc_cfrduedate = self.calculateduedate(ministryrequestid, foirequest, paymentdate)
-            foirequest['dueDate'] = calc_duedate
-            foirequest['cfrDueDate'] = calc_cfrduedate
-        foirequest['requeststatusid'] = status['requeststatusid']
-        return self.saverequestversion(foirequest, requestid, ministryrequestid,'Online Payment')
+        #Check for Off Hold
+        if currentstatus not in (None, "") and currentstatus == StateName.onhold.value and nextstatename != StateName.response.value:
+            skipcalculation = self.__skipduedatecalculation(ministryrequestid, offholddate)
+            #Skip multiple off hold in a day
+            if skipcalculation == True:
+                calc_duedate, calc_cfrduedate = foirequest["dueDate"], foirequest["cfrDueDate"]  
+            else:
+                calc_duedate, calc_cfrduedate = self.calculateduedate(ministryrequestid, foirequest, offholddate)
+            foirequestschema['dueDate'] = calc_duedate
+            foirequestschema['cfrDueDate'] = calc_cfrduedate  
+        return foirequestschema
 
     def getrequest(self,foirequestid,foiministryrequestid): 
         return requestservicegetter().getrequest(foirequestid, foiministryrequestid)
@@ -104,9 +116,6 @@ class requestservice:
         workflowservice().postcorrenspodenceevent(wfinstanceid, ministryrequestid, foirequestschema, applicantcorrespondenceid, templatedetails.name, attributes)
 
     def calculateduedate(self, ministryrequestid, foirequest, paymentdate):        
-        skipcalculation = self.__skipduedatecalculation(ministryrequestid, paymentdate)
-        if skipcalculation == True:
-            return foirequest["dueDate"], foirequest["cfrDueDate"]
         duedate_includeoffhold, cfrduedate_includeoffhold = self.__isincludeoffhold()
         onhold_extend_days = duecalculator().getbusinessdaysbetween(foirequest["onholdTransitionDate"], paymentdate)
         isoffhold_businessday = duecalculator().isbusinessday(paymentdate)
@@ -116,11 +125,11 @@ class requestservice:
         calc_cfrduedate = duecalculator().addbusinessdays(foirequest["cfrDueDate"], cfrduedate_extend_days) 
         return calc_duedate, calc_cfrduedate
 
-    def __skipduedatecalculation(self, ministryrequestid, paymentdate):
-        previouspayment = FOIMinistryRequest.getlastpaymentdate(ministryrequestid)
-        if previouspayment not in (None, ''):
-            previouspaymentdate_pst = datetimehandler().convert_to_pst(previouspayment)
-            if datetimehandler().getdate(previouspaymentdate_pst).date() == datetimehandler().getdate(paymentdate).date():
+    def __skipduedatecalculation(self, ministryrequestid, offholddate):
+        previousoffholddate = FOIMinistryRequest.getlastoffholddate(ministryrequestid)
+        if previousoffholddate not in (None, ''):
+            previouspaymentdate_pst = datetimehandler().convert_to_pst(previousoffholddate)
+            if datetimehandler().getdate(previouspaymentdate_pst).date() == datetimehandler().getdate(offholddate).date():
                 return True
         return False            
 
