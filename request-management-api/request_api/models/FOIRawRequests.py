@@ -116,17 +116,17 @@ class FOIRawRequest(db.Model):
     def saveiaorestrictedrawrequest(cls,requestid,_isiaorestricted=False, _updatedby=None)->DefaultMethodResult:
         currentrequest = db.session.query(FOIRawRequest).filter_by(requestid=requestid).order_by(FOIRawRequest.version.desc()).first()
         request = currentrequest
-        request.version = currentrequest.version+1        
+        _version = currentrequest.version+1               
         insertstmt = (
             insert(FOIRawRequest).
             values(
                     requestid=request.requestid, 
                     requestrawdata=request.requestrawdata,
-                    version=request.version,
+                    version=_version,
                     updatedby=_updatedby,
                     updated_at=datetime.now(),
                     status=request.status,
-                    assignedgroup=request.assigneegroup,
+                    assignedgroup=request.assignedgroup,
                     assignedto=request.assignedto,
                     wfinstanceid=request.wfinstanceid,
                     sourceofsubmission=request.sourceofsubmission,
@@ -138,14 +138,14 @@ class FOIRawRequest(db.Model):
                     axissyncdate=request.axissyncdate,
                     created_at=request.created_at,
                     requirespayment = request.requirespayment,
-                    isiaorestricted = _isiaorestricted,
+                    isiaorestricted =_isiaorestricted,
                     notes = request.notes,
                     
             )
         )
         db.session.execute(insertstmt)               
         db.session.commit()                
-        return DefaultMethodResult(True,'Request Updated for iaorestricted - {0}'.format(str(request.version)),requestid,request.wfinstanceid,isiaorestricted)    
+        return DefaultMethodResult(True,'Request Updated for iaorestricted - {0}'.format(str(request.version)),requestid,request.wfinstanceid,_isiaorestricted)    
 
     @classmethod
     def saverawrequestassigneeversion(cls,requestid,assigneegroup,assignee,userid,assigneefirstname=None,assigneemiddlename=None,assigneelastname=None)->DefaultMethodResult:        
