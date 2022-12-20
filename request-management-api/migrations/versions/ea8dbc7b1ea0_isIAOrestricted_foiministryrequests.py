@@ -17,8 +17,19 @@ depends_on = None
 
 
 def upgrade():
-    op.add_column('FOIMinistryRequests', sa.Column('isiaorestricted', sa.Boolean, unique=False, nullable=True, default=False))
+    op.create_table('FOIRestrictedMinistryRequests',
+        sa.Column('restrictionid', sa.Integer(), autoincrement=True, nullable=False),
+        sa.Column('ministryrequestid', sa.Integer(), nullable=False),
+        sa.Column('version', sa.Integer(), nullable=False),
+        sa.Column('type', sa.String(length=50), nullable=False),
+        sa.Column('isrestricted', sa.Boolean(), nullable=False),
+        sa.Column('created_at', sa.DateTime(), nullable=False),
+        sa.Column('createdby', sa.String(length=120), nullable=False),        
+        sa.Column('isactive', sa.Boolean(), nullable=False),
+        sa.ForeignKeyConstraint(['ministryrequestid', 'version'], ['FOIMinistryRequests.foiministryrequestid', 'FOIMinistryRequests.version'], ),
+        sa.PrimaryKeyConstraint('restrictionid')
+    )
 
 
 def downgrade():
-    op.drop_column('FOIMinistryRequests', 'isiaorestricted')
+    op.drop_table('FOIRestrictedMinistryRequests')
