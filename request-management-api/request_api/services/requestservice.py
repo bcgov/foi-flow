@@ -14,6 +14,7 @@ from request_api.services.applicantcorrespondence.applicantcorrespondencelog imp
 from request_api.models.FOIRequestStatus import FOIRequestStatus
 from request_api.models.FOIRawRequests import FOIRawRequest
 from request_api.models.FOIMinistryRequests import FOIMinistryRequest
+from request_api.models.FOIRestrictedMinistryRequests import FOIRestrictedMinistryRequest
 from request_api.utils.enums import StateName
 from request_api.services.commons.duecalculator import duecalculator
 from request_api.utils.commons.datetimehandler import datetimehandler
@@ -124,3 +125,8 @@ class requestservice:
         return duedate_includeoffhold, cfrduedate_includeoffhold
 
     
+    def saverestrictedrequest(self,ministryrequestid,type, isrestricted,userid):
+        version = FOIMinistryRequest.getversionforrequest(ministryrequestid)
+        FOIRestrictedMinistryRequest.disablerestrictedrequests(ministryrequestid,type,userid)
+        return FOIRestrictedMinistryRequest.saverestrictedrequest(ministryrequestid,type,isrestricted, version, userid)
+

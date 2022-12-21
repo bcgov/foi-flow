@@ -20,7 +20,7 @@ from flask_expects_json import expects_json
 from flask_cors import cross_origin
 from request_api.auth import auth, AuthHelper
 from request_api.tracer import Tracer
-from request_api.utils.util import  cors_preflight, allowedorigins
+from request_api.utils.util import  cors_preflight, allowedorigins,str_to_bool
 from request_api.exceptions import BusinessException
 from request_api.services.rawrequestservice import rawrequestservice
 from request_api.services.documentservice import documentservice
@@ -32,6 +32,8 @@ import holidays
 from datetime import datetime, timedelta
 import os
 import pytz
+
+
 
 API = Namespace('FOIRawRequests', description='Endpoints for FOI request management')
 TRACER = Tracer.get_instance()
@@ -285,3 +287,26 @@ class FOIRawRequestFields(Resource):
             return {'status': 500, 'message':"Invalid Request"}, 400    
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500
+
+@cors_preflight('GET,POST,OPTIONS')
+@API.route('/foirawrequest/restricted/<requestid>')
+class FOIRawRequestIAORestricted(Resource):
+
+    @staticmethod    
+    @cross_origin(origins=allowedorigins())
+    @auth.require
+    def post(requestid=None):
+        try :            
+            if int(requestid) and str(requestid) != "-1" :
+                request_json = request.get_json()                
+                _isiaorestricted = request_json['isrestricted'] if request_json['isrestricted'] is not None else False                
+                isiaorestricted = str_to_bool(_isiaorestricted)
+                result = rawrequestservice().saverawrequestiaorestricted(requestid,isiaorestricted,AuthHelper.getuserid())
+                if result.success:
+                  return {'status': result.success, 'message':result.message,'id':result.identifier} , 200
+                else:
+                  return {'status': result.success, 'message':result.message,'id':result.identifier} , 500  
+        except ValueError:
+            return {'status': 500, 'message':"Invalid Request"}, 400    
+        except BusinessException as exception:            
+            return {'status': exception.status_code, 'message':exception.message}, 500  

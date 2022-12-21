@@ -98,4 +98,12 @@ def escape_wam_friendly_url(param):
     encode_org_name = urllib.parse.quote(base64_org_name, safe='')
     return encode_org_name
 
+def str_to_bool(s):
+    if s == 'True':
+         return True
+    elif s == 'False':
+         return False
+    else:
+         raise ValueError # evil ValueError that doesn't tell you what the wrong value was    
+
 
