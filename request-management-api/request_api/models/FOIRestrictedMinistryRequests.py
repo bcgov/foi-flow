@@ -25,11 +25,19 @@ class FOIRestrictedMinistryRequest(db.Model):
     createdby = db.Column(db.String(120), unique=False, nullable=False)
 
     @classmethod
-    def saverestrictedrequest(cls, foirestrictedrequest, ministryrequestid ,type,isrestricted,version, userid)->DefaultMethodResult:                
+    def saverestrictedrequest(cls, ministryrequestid ,type,isrestricted,version, userid)->DefaultMethodResult:                
         restrictedrequest = FOIRestrictedMinistryRequest(ministryrequestid=ministryrequestid , version=version, type=type, isrestricted=isrestricted, isactive=True, createdby=userid)
         db.session.add(restrictedrequest)
         db.session.commit()               
-        return DefaultMethodResult(True,'Restricted Request added')   
+        return DefaultMethodResult(True,'Restricted Request added')  
+
+
+    @classmethod
+    def getrestricteddetails(cls,ministryrequestid ,type):
+        data_schema = FOIRestrictedMinistryRequestSchema()            
+        request = db.session.query(FOIRestrictedMinistryRequest).filter_by(ministryrequestid=ministryrequestid,type=type,isactive=True).order_by(FOIRestrictedMinistryRequest.created_at.desc()).first()
+        return data_schema.dump(request)
+
 
     @classmethod
     def disablerestrictedrequests(cls, ministryrequestid, type, userid):   

@@ -249,7 +249,7 @@ class FOIRestrictedMinistryRequest(Resource):
                 request_json = request.get_json()                  
                 _isrestricted = request_json['isrestricted'] if request_json['isrestricted'] is not None else False                
                 isrestricted = str_to_bool(_isrestricted)                                                           
-                result = requestservice().saverestrictedrequest(request_json,ministryrequestid,type,isrestricted,AuthHelper.getuserid())
+                result = requestservice().saverestrictedrequest(ministryrequestid,type,isrestricted,AuthHelper.getuserid())
                 if result.success:
                   return {'status': result.success, 'message':result.message,'id':result.identifier} , 200
                 else:

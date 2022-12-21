@@ -100,8 +100,8 @@ class requestservice:
         wfinstanceid = workflowservice().syncwfinstance("ministryrequest", ministryrequestid, True)
         workflowservice().postcorrenspodenceevent(wfinstanceid, ministryrequestid, foirequestschema, applicantcorrespondenceid, templatedetails.name, attributes)
 
-    def saverestrictedrequest(self,foirestrictedrequest,ministryrequestid,type, isrestricted,userid):
+    def saverestrictedrequest(self,ministryrequestid,type, isrestricted,userid):
         version = FOIMinistryRequest.getversionforrequest(ministryrequestid)
         FOIRestrictedMinistryRequest.disablerestrictedrequests(ministryrequestid,type,userid)
-        return FOIRestrictedMinistryRequest.saverestrictedrequest(foirestrictedrequest,ministryrequestid,type,isrestricted, version, userid)
+        return FOIRestrictedMinistryRequest.saverestrictedrequest(ministryrequestid,type,isrestricted, version, userid)
 

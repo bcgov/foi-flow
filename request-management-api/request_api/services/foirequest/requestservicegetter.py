@@ -6,6 +6,7 @@ from request_api.models.FOIMinistryRequestDivisions import FOIMinistryRequestDiv
 from request_api.models.FOIRequestContactInformation import FOIRequestContactInformation
 from request_api.models.FOIRequestPersonalAttributes import FOIRequestPersonalAttribute
 from request_api.models.FOIRequestApplicantMappings import FOIRequestApplicantMapping
+from request_api.models.FOIRestrictedMinistryRequests import FOIRestrictedMinistryRequest
 from dateutil.parser import parse
 from request_api.services.cfrfeeservice import cfrfeeservice
 from request_api.services.paymentservice import paymentservice
@@ -21,7 +22,8 @@ class requestservicegetter:
         requestcontactinformation = FOIRequestContactInformation.getrequestcontactinformation(foirequestid,request['version'])
         requestapplicants = FOIRequestApplicantMapping.getrequestapplicants(foirequestid,request['version'])
         requestministrydivisions = FOIMinistryRequestDivision.getdivisions(foiministryrequestid,requestministry['version'])
-        
+        iaorestrictrequestdetails = FOIRestrictedMinistryRequest.getrestricteddetails(ministryrequestid=foiministryrequestid,type='iao')
+
         baserequestinfo = self.__preparebaseinfo(request,foiministryrequestid,requestministry,requestministrydivisions)
         baserequestinfo['lastStatusUpdateDate'] = FOIMinistryRequest.getLastStatusUpdateDate(foiministryrequestid, requestministry['requeststatus.requeststatusid']).strftime(self.__genericdateformat()),
         for contactinfo in requestcontactinformation:
@@ -51,6 +53,7 @@ class requestservicegetter:
         baserequestinfo['additionalPersonalInfo'] = additionalpersonalinfo
         originalduedate = FOIMinistryRequest.getrequestoriginalduedate(foiministryrequestid)       
         baserequestinfo['originalDueDate'] = originalduedate.strftime(self.__genericdateformat())
+        baserequestinfo['iaorestricteddetails'] = iaorestrictrequestdetails
         return baserequestinfo
     
     def preparepersonalattributes(self, foirequestid, version):
