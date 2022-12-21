@@ -14,6 +14,7 @@ from request_api.services.applicantcorrespondence.applicantcorrespondencelog imp
 from request_api.models.FOIRequestStatus import FOIRequestStatus
 from request_api.models.FOIRawRequests import FOIRawRequest
 from request_api.models.FOIMinistryRequests import FOIMinistryRequest
+from request_api.models.FOIRestrictedMinistryRequests import FOIRestrictedMinistryRequest
 from request_api.utils.enums import StateName
 from request_api.services.notifications.duecalculator import duecalculator
 
@@ -98,3 +99,9 @@ class requestservice:
         templatedetails = applicantcorrespondenceservice().gettemplatebyid(templateid)
         wfinstanceid = workflowservice().syncwfinstance("ministryrequest", ministryrequestid, True)
         workflowservice().postcorrenspodenceevent(wfinstanceid, ministryrequestid, foirequestschema, applicantcorrespondenceid, templatedetails.name, attributes)
+
+    def saverestrictedrequest(self,foirestrictedrequest,ministryrequestid,type, isrestricted,userid):
+        version = FOIMinistryRequest.getversionforrequest(ministryrequestid)
+        FOIRestrictedMinistryRequest.disablerestrictedrequests(ministryrequestid,type,userid)
+        return FOIRestrictedMinistryRequest.saverestrictedrequest(foirestrictedrequest,ministryrequestid,type,isrestricted, version, userid)
+

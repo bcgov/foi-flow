@@ -21,7 +21,7 @@ from flask_cors import cross_origin
 from request_api.auth import auth, AuthHelper
 from request_api.services.eventservice import eventservice
 from request_api.tracer import Tracer
-from request_api.utils.util import  cors_preflight, allowedorigins, getrequiredmemberships
+from request_api.utils.util import  cors_preflight, allowedorigins, getrequiredmemberships,str_to_bool
 from request_api.exceptions import BusinessException
 from request_api.services.requestservice import requestservice
 from request_api.services.rawrequestservice import rawrequestservice
@@ -234,3 +234,27 @@ class FOIRequestDetailsByMinistryId(Resource):
             return {'status': False, 'message':err.messages}, 400        
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500
+
+
+@cors_preflight('GET,POST,OPTIONS')
+@API.route('/foirequests/restricted/<ministryrequestid>/<type>')
+class FOIRestrictedMinistryRequest(Resource):
+
+    @staticmethod    
+    @cross_origin(origins=allowedorigins())
+    @auth.require
+    def post(ministryrequestid=None,type=None):
+        try :            
+            if (int(ministryrequestid) and str(ministryrequestid) != "-1") or (type is not None and (type.lower() == 'iao' or type.lower() == 'ministry')) :
+                request_json = request.get_json()                  
+                _isrestricted = request_json['isrestricted'] if request_json['isrestricted'] is not None else False                
+                isrestricted = str_to_bool(_isrestricted)                                                           
+                result = requestservice().saverestrictedrequest(request_json,ministryrequestid,type,isrestricted,AuthHelper.getuserid())
+                if result.success:
+                  return {'status': result.success, 'message':result.message,'id':result.identifier} , 200
+                else:
+                  return {'status': result.success, 'message':result.message,'id':result.identifier} , 500  
+        except ValueError:
+            return {'status': 500, 'message':"Invalid Request"}, 400    
+        except BusinessException as exception:            
+            return {'status': exception.status_code, 'message':exception.message}, 500 

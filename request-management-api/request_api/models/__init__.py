@@ -55,4 +55,6 @@ from .FOIAssignees import FOIAssignee
 from .ApplicationCorrespondenceTemplates import ApplicationCorrespondenceTemplate
 from .FOIApplicantCorrespondenceAttachments import FOIApplicantCorrespondenceAttachment
 
+from .FOIRestrictedMinistryRequests import FOIRestrictedMinistryRequest
+
 #event.listen(Engine, 'before_cursor_execute', DBTracing.query_tracing)

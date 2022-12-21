@@ -60,7 +60,7 @@ class FOIMinistryRequest(db.Model):
     axisrequestid = db.Column(db.String(120), nullable=True)
     requestpagecount = db.Column(db.String(20), nullable=True)
 
-    isiaorestricted = db.Column(db.Boolean, unique=False, nullable=False,default=False)
+    
 
     #ForeignKey References
     
@@ -1084,5 +1084,5 @@ class FOIMinistryRequestSchema(ma.Schema):
                 'foirequest.receivedmodeid','requeststatus.requeststatusid','requeststatus.name','programarea.bcgovcode',
                 'programarea.name','foirequest_id','foirequestversion_id','created_at','updated_at','createdby','assignedministryperson',
                 'assignedministrygroup','cfrduedate','closedate','closereasonid','closereason.name',
-                'assignee.firstname','assignee.lastname','ministryassignee.firstname','ministryassignee.lastname', 'axisrequestid', 'axissyncdate', 'requestpagecount','isiaorestricted')
+                'assignee.firstname','assignee.lastname','ministryassignee.firstname','ministryassignee.lastname', 'axisrequestid', 'axissyncdate', 'requestpagecount')
     
