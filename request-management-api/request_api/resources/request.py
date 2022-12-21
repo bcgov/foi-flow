@@ -299,7 +299,7 @@ class FOIRawRequestIAORestricted(Resource):
         try :            
             if int(requestid) and str(requestid) != "-1" :
                 request_json = request.get_json()                
-                _isiaorestricted = request_json['isiaorestricted'] if request_json['isiaorestricted'] is not None else False                
+                _isiaorestricted = request_json['isrestricted'] if request_json['isrestricted'] is not None else False                
                 isiaorestricted = str_to_bool(_isiaorestricted)
                 result = rawrequestservice().saverawrequestiaorestricted(requestid,isiaorestricted,AuthHelper.getuserid())
                 if result.success:
