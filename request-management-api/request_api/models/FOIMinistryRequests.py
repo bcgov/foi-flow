@@ -22,6 +22,7 @@ from request_api.utils.enums import RequestorType
 import logging
 from sqlalchemy.sql.sqltypes import Date
 from dateutil import parser
+from request_api.utils.enums import StateName
 
 class FOIMinistryRequest(db.Model):
     # Name of the table in our database
@@ -238,6 +239,37 @@ class FOIMinistryRequest(db.Model):
         finally:
             db.session.close()
         return transitions
+
+    @classmethod
+    def getlastoffholddate(cls, ministryrequestid):  
+        transitions = []
+        try:
+            sql = """select fm2.version, fs2."name" as status, fm2.created_at from  "FOIMinistryRequests" fm2  inner join "FOIRequestStatuses" fs2 on fm2.requeststatusid = fs2.requeststatusid 
+                        where fm2.foiministryrequestid=:ministryrequestid order by version asc"""
+            rs = db.session.execute(text(sql), {'ministryrequestid': ministryrequestid})  
+            _tmp_state = None       
+            for row in rs:
+                if row["status"] != _tmp_state:
+                    transitions.append({"status": row["status"], "version": row["version"], "created_at": row["created_at"]})
+                    _tmp_state = row["status"]
+            desc_transitions = transitions[::-1]
+            index = 0
+            onhold_occurance = 0
+            recent_offhold_index = None
+            offhold_indicator = False
+            for entry in desc_transitions:
+                if entry["status"] == StateName.onhold.value:
+                    onhold_occurance = onhold_occurance + 1
+                    if onhold_occurance > 1:
+                        recent_offhold_index = index
+                        offhold_indicator = True
+                index = index + 1     
+            return None if offhold_indicator == False or recent_offhold_index == 0 else desc_transitions[recent_offhold_index-1]["created_at"]
+        except Exception as ex:
+            logging.error(ex)
+            raise ex
+        finally:
+            db.session.close()
 
     @classmethod
     def getstatenavigation(cls, ministryrequestid): 
@@ -609,6 +641,7 @@ class FOIMinistryRequest(db.Model):
     def getduedate(cls,ministryrequestid):
         return db.session.query(FOIMinistryRequest.duedate).filter(FOIMinistryRequest.foiministryrequestid == ministryrequestid).order_by(FOIMinistryRequest.version.desc()).first()[0]
 
+   
     @classmethod
     def getupcomingcfrduerecords(cls):
         upcomingduerecords = []

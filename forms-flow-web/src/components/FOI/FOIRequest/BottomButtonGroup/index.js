@@ -274,7 +274,7 @@ const BottomButtonGroup = React.memo(
               const calculatedCFRDueDate = dueDateCalculation(new Date(), 10);
               saveRequestObject.cfrDueDate = calculatedCFRDueDate;
             }
-            if (
+            /*if (
               ![StateEnum.closed.name, StateEnum.onhold.name].includes(
                 currentSelectedStatus
               ) &&
@@ -299,7 +299,7 @@ const BottomButtonGroup = React.memo(
               );
               saveRequestObject.cfrDueDate = calculatedCFRDueDate;
               saveRequestObject.dueDate = calculatedRequestDueDate;
-            }
+            }*/
             break;
   
           case StateEnum.redirect.name:
