@@ -1,0 +1,68 @@
+.requestRestriction {
+
+    margin: 5px 30px;
+
+
+    .restrict-dropdown-all {
+        padding-top: 10px; 
+        display: flex;
+        min-width: 200px !important;
+    }
+
+    .restrict-icon{
+        color: #A0192F;
+        padding-left: 14px;
+        margin-top: 3px;
+    }
+
+    .restrict-label {
+        border: 1px solid #a0192f;
+        width: 100px;
+        border-radius: 40px 0 0 40px;
+    }
+
+    .restrict-select{
+        border: 1px solid #a0192f;
+        //padding-top: 8px;
+        //width:40px;
+        height: 40px;
+        border-radius: 40px;
+        padding-left: 3px;
+        //background: linear-gradient(to right, rgba(160,25,47,0.32) 80%, #a0192f 0%);
+    }
+
+
+    .restrict-dropdown {
+        color: black !important;
+        width: 155px;
+        padding-left: 10px;
+    }
+    
+    .restrict-dropdown .MuiSelect-icon {
+        color: white !important;
+    }
+    
+    .restrict-dropdown .MuiOutlinedInput-notchedOutline {
+        border: none !important;
+    }
+
+    .restrict-dropdown .MuiInputBase-input,
+    .restrict-dropdown .MuiOutlinedInput-input {
+        padding: 0px !important
+    }
+
+}
+
+#restricted-modal-text{
+    margin: 15px 65px;
+    display: block;
+    color: #000;
+}
+
+.modal-msg {
+    text-align: center;
+}
+
+.modal-msg-description {
+    padding-top: 25px;
+}

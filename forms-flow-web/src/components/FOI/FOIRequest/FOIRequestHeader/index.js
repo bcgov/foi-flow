@@ -17,6 +17,7 @@ import {
 } from "../../../../apiManager/services/FOI/foiAssigneeServices";
 import { toast } from "react-toastify";
 import _ from 'lodash';
+import RequestRestriction from "../../customComponents/RequestRestriction";
 
 const useStyles = makeStyles((theme) => ({
     formControl: {
@@ -171,14 +172,51 @@ const FOIRequestHeader = React.memo(
     const ministryAssignedTo = getMinistryAssignedTo();
     const watcherList = assignedToList.filter(assignedTo => assignedTo.type === 'iao');
     return (
+      <>
       <div className="foi-request-review-header-row1">
-        <div className="foi-request-review-header-col1">
           <div className="foi-request-review-header-col1-row">
             <Link href="#" onClick={preventDefault}>
               <h3 className="foi-review-request-text">{headerText}</h3>
             </Link>
           </div>
-          {window.location.href.indexOf(FOI_COMPONENT_CONSTANTS.ADDREQUEST) ===
+          <div className="foi-assigned-to-container">
+            <div className="foi-assigned-to-inner-container">
+              <TextField
+                id="assignedTo"
+                label={showMinistryAssignedTo ? "IAO Assigned To" : "Assigned To"}
+                inputProps={{ "aria-labelledby": "assignedTo-label"}}
+                InputLabelProps={{ shrink: true }}
+                select
+                value={selectedAssignedTo}
+                onChange={saveAssigneeDetails}
+                input={<Input />}
+                variant="outlined"
+                fullWidth
+                required
+                disabled={disableInput}
+                error={selectedAssignedTo.toLowerCase().includes("unassigned")}
+              >
+                {menuItems}
+              </TextField>
+            </div>
+
+            {showMinistryAssignedTo && (
+              <>
+              <TextField
+                  id="ministryAssignedTotxt"
+                  label="Ministry Assigned To"
+                  InputLabelProps={{ shrink: true }}
+                  value={ministryAssignedTo}
+                  variant="outlined"
+                  fullWidth
+                  disabled={true}
+                />
+              </>
+            )}
+          </div>
+      </div>
+      <div className="foi-request-review-header-row1">
+        {window.location.href.indexOf(FOI_COMPONENT_CONSTANTS.ADDREQUEST) ===
             -1 && (
             <div
               className="foi-request-review-header-col1-row"
@@ -193,44 +231,12 @@ const FOIRequestHeader = React.memo(
               />
             </div>
           )}
-        </div>
-
-        <div className="foi-assigned-to-container">
-          <div className="foi-assigned-to-inner-container">
-            <TextField
-              id="assignedTo"
-              label={showMinistryAssignedTo ? "IAO Assigned To" : "Assigned To"}
-              inputProps={{ "aria-labelledby": "assignedTo-label"}}
-              InputLabelProps={{ shrink: true }}
-              select
-              value={selectedAssignedTo}
-              onChange={saveAssigneeDetails}
-              input={<Input />}
-              variant="outlined"
-              fullWidth
-              required
-              disabled={disableInput}
-              error={selectedAssignedTo.toLowerCase().includes("unassigned")}
-            >
-              {menuItems}
-            </TextField>
-          </div>
-
-          {showMinistryAssignedTo && (
-            <>
-            <TextField
-                id="ministryAssignedTotxt"
-                label="Ministry Assigned To"
-                InputLabelProps={{ shrink: true }}
-                value={ministryAssignedTo}
-                variant="outlined"
-                fullWidth
-                disabled={true}
-              />
-            </>
-          )}
-        </div>
+        {!isAddRequest && requestDetails?.currentState?.toLowerCase() !== 'unopened' &&
+         <RequestRestriction 
+          isiaorestricted= {requestDetails?.isiaorestricted} />
+        }
       </div>
+      </>
     );
   }
 );
