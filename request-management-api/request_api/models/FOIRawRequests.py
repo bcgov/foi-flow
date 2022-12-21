@@ -101,7 +101,8 @@ class FOIRawRequest(db.Model):
                     closedate=closedate,
                     closereasonid=closereasonid,
                     axisrequestid= axisrequestid,
-                    axissyncdate=axissyncdate
+                    axissyncdate=axissyncdate,
+                    isiaorestricted = request.isiaorestricted
                    
                 )
             )
@@ -183,7 +184,8 @@ class FOIRawRequest(db.Model):
                     closedate=closedate,
                     closereasonid=closereasonid,
                     axisrequestid= axisrequestid,
-                    axissyncdate=axissyncdate
+                    axissyncdate=axissyncdate,
+                    isiaorestricted = request.isiaorestricted
                     
                 )
             )

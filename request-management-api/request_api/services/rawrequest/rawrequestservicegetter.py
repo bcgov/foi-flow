@@ -68,6 +68,7 @@ class rawrequestservicegetter:
                 request['requestrawdata']['stateTransition']= FOIRawRequest.getstatesummary(requestid)
             request['requestrawdata']['wfinstanceid'] = request['wfinstanceid']
             request['requestrawdata']['closedate']= self.__getclosedate(request['closedate'])
+            request['requestrawdata']['isiaorestricted']= request['isiaorestricted']
             return request['requestrawdata']    
         elif request != {} and request['sourceofsubmission'] == "intake":
             requestrawdata = request['requestrawdata']
@@ -85,6 +86,7 @@ class rawrequestservicegetter:
             request['requestrawdata']['lastStatusUpdateDate'] = FOIRawRequest.getLastStatusUpdateDate(requestid, request['status']).strftime(self.__generaldateformat())
             request['requestrawdata']['stateTransition']= FOIRawRequest.getstatesummary(requestid)
             request['requestrawdata']['closedate']= self.__getclosedate(request['closedate'])
+            request['requestrawdata']['isiaorestricted']= request['isiaorestricted']
             return request['requestrawdata']
         else:
             return None
@@ -126,6 +128,7 @@ class rawrequestservicegetter:
         return {'id': request['requestid'],
                                'wfinstanceid': request['wfinstanceid'],
                                'ispiiredacted': request['ispiiredacted'],
+                               'isiaorestricted': request['isiaorestricted'],
                                'sourceOfSubmission': request['sourceofsubmission'],
                                'requestType': requesttype,
                                'firstName': contactinfo['firstName'],
