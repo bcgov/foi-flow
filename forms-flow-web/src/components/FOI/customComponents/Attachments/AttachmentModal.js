@@ -283,7 +283,7 @@ export default function AttachmentModal({
                 Save
               </button>
               :
-              <button className={`btn-bottom btn-save ${ btnClass }`} disabled={(files.length === 0 && existingDocuments.length === 0 && modalFor !== 'delete') || tagValue === ""} onClick={handleSave}>
+              <button className={`btn-bottom btn-save ${ btnClass }`} disabled={((files.length === 0 && existingDocuments.length === 0) || tagValue === "") && modalFor !== 'delete' } onClick={handleSave}>
                 {uploadFor === "email" ? "Save Changes" : "Continue"}
               </button>
             }
