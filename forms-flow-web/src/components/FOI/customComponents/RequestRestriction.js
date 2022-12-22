@@ -28,24 +28,24 @@ const RequestRestriction= ({isiaorestricted, userDetail, requestDetails}) =>{
     const [modalMessage, setModalMessage] = useState(<></>);    
     const [modalDescription, setModalDescription] = useState(<></>);
     const { requestId, ministryId } = useParams();
+    const dispatch = useDispatch();
 
 
     useEffect(() => {
         setIsRestricted(isiaorestricted);
-        if(isiaorestricted == 'True')
+        if(isiaorestricted){
             setRestrictionType("restricted");
-        else
+        }else{
             setRestrictionType("unrestricted");
-    }, [isiaorestricted]);
+        }
+    }, []);
 
     const isIAORestrictedFileManager = () => {
         return userDetail?.role?.includes("IAORestrictedFilesManager");
     }
 
     const isRequestAssignedToTeam = () => {
-        console.log("::",(!requestDetails?.assignedTo && requestDetails?.assignedGroup));
-        console.log("!!",(requestDetails?.assignedTo == null && requestDetails?.assignedGroup != null));
-        return (requestDetails?.assignedTo == null && requestDetails?.assignedGroup != null);
+        return (!requestDetails?.assignedTo && requestDetails?.assignedGroup);
     }
 
     const restriction = [
@@ -108,7 +108,7 @@ const RequestRestriction= ({isiaorestricted, userDetail, requestDetails}) =>{
         let data = {
             "isrestricted": isRestricted
         }
-        restrictRequest(data, requestId, ministryId, type,(err, data) => {
+        dispatch(restrictRequest(data, requestId, ministryId, type,(err, data) => {
             if(!err){
                 fetchFOIRequestDetailsWrapper(requestId, ministryId);
                 if(isRestricted == 'True')
@@ -116,8 +116,7 @@ const RequestRestriction= ({isiaorestricted, userDetail, requestDetails}) =>{
                 else
                     setRestrictionType("unrestricted");
             }
-        },
-        )
+        }))
       };
 
 

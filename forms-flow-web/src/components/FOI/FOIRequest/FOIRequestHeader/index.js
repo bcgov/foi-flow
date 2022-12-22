@@ -243,7 +243,7 @@ const FOIRequestHeader = React.memo(
           )}
         {!isAddRequest && status.toLowerCase() !== StateEnum.unopened.name.toLowerCase() &&
          <RequestRestriction 
-          isiaorestricted= {isRestricted}
+          isiaorestricted= {isRestricted()}
           userDetail={userDetail}
           requestDetails={requestDetails}
           />
