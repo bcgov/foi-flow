@@ -1,4 +1,5 @@
 import React, { useEffect, useState }  from 'react';
+import { useParams } from 'react-router-dom';
 import { useSelector, useDispatch } from "react-redux";
 import OutlinedInput from '@material-ui/core/OutlinedInput';
 import InputLabel from '@mui/material/InputLabel';
@@ -16,22 +17,36 @@ import CloseIcon from '@material-ui/icons/Close';
 import IconButton from '@material-ui/core/IconButton';
 import TextField from '@mui/material/TextField';
 import './requestrestriction.scss';
+import {restrictRequest, fetchFOIRequestDetailsWrapper} from '../../../apiManager/services/FOI/foiRequestServices';
 
 
-const RequestRestriction= ({isiaorestricted}) =>{ 
+const RequestRestriction= ({isiaorestricted, userDetail, requestDetails}) =>{ 
 
     const [restrictionType, setRestrictionType] = useState("unrestricted");
+    const [isRestricted, setIsRestricted] = useState(isiaorestricted);
     const [modalOpen, setModalOpen] = useState(false);
     const [modalMessage, setModalMessage] = useState(<></>);    
     const [modalDescription, setModalDescription] = useState(<></>);
+    const { requestId, ministryId } = useParams();
+
 
     useEffect(() => {
-        if(isiaorestricted)
+        setIsRestricted(isiaorestricted);
+        if(isiaorestricted == 'True')
             setRestrictionType("restricted");
         else
             setRestrictionType("unrestricted");
     }, [isiaorestricted]);
 
+    const isIAORestrictedFileManager = () => {
+        return userDetail?.role?.includes("IAORestrictedFilesManager");
+    }
+
+    const isRequestAssignedToTeam = () => {
+        console.log("::",(!requestDetails?.assignedTo && requestDetails?.assignedGroup));
+        console.log("!!",(requestDetails?.assignedTo == null && requestDetails?.assignedGroup != null));
+        return (requestDetails?.assignedTo == null && requestDetails?.assignedGroup != null);
+    }
 
     const restriction = [
         {
@@ -47,34 +62,63 @@ const RequestRestriction= ({isiaorestricted}) =>{
     ];
 
     const handleValueChange = (e) => {
-        setRestrictionType(e.target.value);
+        setModalOpen(true);
         if(e.target.value?.toLowerCase() == 'restricted'){
-            console.log("Restricted!!");
-            setModalOpen(true);
-            setModalMessage("Are you sure you want to flag this as a restricted file ?");
-            setModalDescription("If you change this to be a restrcited file only the Intake Manager and any user assigned or selected as watchers will be able to view this request content.");
+            if(isIAORestrictedFileManager()){
+                if(!isRequestAssignedToTeam()){
+                    setIsRestricted('True');
+                    setModalMessage("Are you sure you want to flag this as a restricted file ?");
+                    setModalDescription("If you change this to be a restrcited file only the Intake Manager and any user assigned or selected as watchers will be able to view this request content.");
+                }
+                else{
+                    setModalMessage("A request can only be restricted when it is assigned to one team member, not a team queue.");
+                }
+            }
+            else{
+                setModalMessage("Only the Intake Manager can restrict a request.");
+            }
         }
         else {
-            setModalOpen(true);
-            setModalMessage("Are you sure you want to remove the restricted file flag on this request ?");
-            setModalDescription("If you restrcit this file only all IAO users will be able to search and find the request, and all users "+
-            "on the respective Ministry will be able to see this request.");
+            if(isIAORestrictedFileManager()){
+                setIsRestricted('False');
+                setModalMessage("Are you sure you want to remove the restricted file flag on this request ?");
+                setModalDescription("If you restrcit this file only all IAO users will be able to search and find the request, and all users "+
+                "on the respective Ministry will be able to see this request.");
+            }
+            else{
+                setModalMessage("Only the Intake Manager can remove the restricted flag on a request");
+                setModalDescription("If you would like to have this request unrestricted please contact the Intake Manager as they are the original user"+
+                " who flagged this as a restricted request.");
+            }
         }
-        // setModalMessage("Only the Intake Manager can remove the restricted flag on a request ?");
-        // setModalDescription("If you would like to have this request restricted please contact the Intake Manager"+
-        // " as they are the original user who flagged this as a restricted request.");
-        // setModalMessage("A request can only be restricted when it is assigned to one team member, not a team queue.");
+       
     }
 
     const handleSave = () => {
         setModalOpen(false);
-        //save();
+        save();
     };
 
     const handleClose = () => {
         setModalOpen(false);
     };
 
+    const save = () => {
+        let type = "iao";
+        let data = {
+            "isrestricted": isRestricted
+        }
+        restrictRequest(data, requestId, ministryId, type,(err, data) => {
+            if(!err){
+                fetchFOIRequestDetailsWrapper(requestId, ministryId);
+                if(isRestricted == 'True')
+                    setRestrictionType("restricted");
+                else
+                    setRestrictionType("unrestricted");
+            }
+        },
+        )
+      };
 
 
     return (  
@@ -145,6 +189,7 @@ const RequestRestriction= ({isiaorestricted}) =>{
                 <button
                 className={`btn-bottom btn-save btn`}
                 onClick={handleSave}
+                disabled={!isIAORestrictedFileManager()}
                 >
                 Save Change
                 </button>

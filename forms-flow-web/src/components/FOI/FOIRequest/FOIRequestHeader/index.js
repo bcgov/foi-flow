@@ -9,7 +9,7 @@ import Input from '@material-ui/core/Input';
 import FOI_COMPONENT_CONSTANTS from '../../../../constants/FOI/foiComponentConstants';
 import { StateEnum } from '../../../../constants/FOI/statusEnum';
 import { useParams } from 'react-router-dom';
-import { calculateDaysRemaining } from "../../../../helper/FOI/helper";
+import { calculateDaysRemaining, isMinistryCoordinator, isMinistryLogin } from "../../../../helper/FOI/helper";
 import { Watcher } from '../../customComponents';
 import { createAssigneeDetails } from '../utils'
 import {
@@ -56,6 +56,8 @@ const FOIRequestHeader = React.memo(
     const assignedToList = useSelector(
       (state) => state.foiRequests.foiAssignedToList
     );
+    const userGroups = userDetail?.groups?.map(group => group.slice(1));
+    let isMinistry = isMinistryLogin(userGroups);
    
     let assigneeDetails = _.pick(requestDetails, ['assignedGroup', 'assignedTo','assignedToFirstName','assignedToLastName',
     'assignedministrygroup','assignedministryperson','assignedministrypersonFirstName','assignedministrypersonLastName']);
@@ -171,6 +173,14 @@ const FOIRequestHeader = React.memo(
     }
     const ministryAssignedTo = getMinistryAssignedTo();
     const watcherList = assignedToList.filter(assignedTo => assignedTo.type === 'iao');
+
+    const isRestricted = () => {
+      if(isMinistry)
+        return requestDetails?.iaorestrictedetails?.isrestricted
+      else
+        return requestDetails?.isiaorestricted
+    }
+    
     return (
       <>
       <div className="foi-request-review-header-row1">
@@ -231,9 +241,12 @@ const FOIRequestHeader = React.memo(
               />
             </div>
           )}
-        {!isAddRequest && requestDetails?.currentState?.toLowerCase() !== 'unopened' &&
+        {!isAddRequest && status.toLowerCase() !== StateEnum.unopened.name.toLowerCase() &&
          <RequestRestriction 
-          isiaorestricted= {requestDetails?.isiaorestricted} />
+          isiaorestricted= {isRestricted}
+          userDetail={userDetail}
+          requestDetails={requestDetails}
+          />
         }
       </div>
       </>
