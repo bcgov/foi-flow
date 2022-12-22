@@ -258,8 +258,9 @@ def _getholidays():
     if 'FOI_INVALID_HOLIDAYS' in os.environ and os.getenv('FOI_INVALID_HOLIDAYS') != '': #remove dec 24, dec 27 from holidays
         _invaliddays = os.getenv('FOI_INVALID_HOLIDAYS')
         for _invalidday in _invaliddays.split(","):
+            _invalidday = _invalidday.strip().replace('XXXX',str(datetime.today().year))
             if _invalidday in ca_holidays:
-                ca_holidays.remove(_invalidday.strip().replace('XXXX',str(datetime.today().year)))
+                ca_holidays.remove(_invalidday)
     
     return ca_holidays
 
