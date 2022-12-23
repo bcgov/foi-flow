@@ -150,6 +150,7 @@ class dashboardservice:
                 unopenrequest = self.__preparefoirequestinfo(request, _receiveddate.strftime(SHORT_DATEFORMAT), _receiveddate.strftime(LONG_DATEFORMAT), idnumberprefix= 'U-00')
                 unopenrequest.update({'description':request.description})
                 unopenrequest.update({'assignedToFormatted': request.assignedToFormatted})
+                unopenrequest.update({'isiaorestricted': request.isiaorestricted})
                 requestqueue.append(unopenrequest)
             else:
                 _openrequest = self.__preparefoirequestinfo(request,  _receiveddate.strftime(SHORT_DATEFORMAT), _receiveddate.strftime(LONG_DATEFORMAT))
@@ -158,6 +159,8 @@ class dashboardservice:
                 _openrequest.update({'description':request.description})
                 _openrequest.update({'assignedToFormatted': request.assignedToFormatted})
                 _openrequest.update({'ministryAssignedToFormatted': request.ministryAssignedToFormatted})
+                restrictedrequest = FOIRestrictedMinistryRequest.getrestricteddetails(request.ministryrequestid,'iao')
+                _openrequest.update({'isiaorestricted': restrictedrequest['isrestricted']})
                 requestqueue.append(_openrequest)    
 
         meta = {
