@@ -1,5 +1,6 @@
 from request_api.models.FOIRawRequests import FOIRawRequest
 from request_api.models.FOIMinistryRequests import FOIMinistryRequest
+from request_api.models.FOIRestrictedMinistryRequests import FOIRestrictedMinistryRequest
 from dateutil import tz, parser
 import datetime as dt
 from pytz import timezone
@@ -42,7 +43,7 @@ class dashboardservice:
         baserequestinfo.update({'assignedToLastName': request.assignedToLastName})
         baserequestinfo.update({'onBehalfFirstName': request.onBehalfFirstName})
         baserequestinfo.update({'onBehalfLastName': request.onBehalfLastName})
-        baserequestinfo.update({'requestPageCount': request.requestPageCount})
+        baserequestinfo.update({'requestPageCount': request.requestPageCount})        
         return baserequestinfo
         
     def __preparebaserequestinfo(self, id, requesttype, status, receiveddate, receiveddateuf, assignedgroup, assignedto, idnumber, axisrequestid, version):
@@ -62,14 +63,16 @@ class dashboardservice:
         requests = FOIRawRequest.getrequestspagination(groups, page, size, sortingitems, sortingorders, filterfields, keyword, additionalfilter, userid)
         requestqueue = []
         for request in requests.items:
+            
             if(request.receivedDateUF is None): #request from online form has no received date in json
                 _receiveddate = maya.parse(request.created_at).datetime(to_timezone='America/Vancouver', naive=False)
             else:
                 _receiveddate = parser.parse(request.receivedDateUF)
 
-            if(request.ministryrequestid == None):
+            if(request.ministryrequestid == None):                
                 unopenrequest = self.__preparefoirequestinfo(request, _receiveddate.strftime(SHORT_DATEFORMAT), _receiveddate.strftime(LONG_DATEFORMAT), idnumberprefix= 'U-00')
                 unopenrequest.update({'assignedToFormatted': request.assignedToFormatted})
+                unopenrequest.update({'isiaorestricted': request.isiaorestricted})
                 requestqueue.append(unopenrequest)
             else:
                 _openrequest = self.__preparefoirequestinfo(request, _receiveddate.strftime(SHORT_DATEFORMAT), _receiveddate.strftime(LONG_DATEFORMAT))
@@ -77,6 +80,8 @@ class dashboardservice:
                 _openrequest.update({'extensions': request.extensions})
                 _openrequest.update({'assignedToFormatted': request.assignedToFormatted})
                 _openrequest.update({'ministryAssignedToFormatted': request.ministryAssignedToFormatted})
+                restrictedrequest = FOIRestrictedMinistryRequest.getrestricteddetails(request.ministryrequestid,'iao')
+                _openrequest.update({'isiaorestricted': restrictedrequest['isrestricted']})
                 requestqueue.append(_openrequest)    
 
         meta = {
