@@ -41,6 +41,7 @@ class MinistryTeamWithKeycloackGroup(Enum):
     DAS = "DAS Ministry Team"
     EAO = "EAO Ministry Team"
     EDU = "EDU Ministry Team"
+    EDUC = "EDUC Ministry Team"
     EMBC = "EMBC Ministry Team"
     EMLI = "EMLI Ministry Team"
     ENV = "ENV Ministry Team"
