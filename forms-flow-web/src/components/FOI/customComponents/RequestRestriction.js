@@ -20,7 +20,7 @@ import './requestrestriction.scss';
 import {restrictRequest, fetchFOIRequestDetailsWrapper} from '../../../apiManager/services/FOI/foiRequestServices';
 
 
-const RequestRestriction= ({isiaorestricted, userDetail, requestDetails}) =>{ 
+const RequestRestriction= ({isiaorestricted, isIAORestrictedFileManager, requestDetails}) =>{ 
 
     const [restrictionType, setRestrictionType] = useState("unrestricted");
     const [isRestricted, setIsRestricted] = useState(isiaorestricted);
@@ -40,9 +40,7 @@ const RequestRestriction= ({isiaorestricted, userDetail, requestDetails}) =>{
         }
     }, []);
 
-    const isIAORestrictedFileManager = () => {
-        return userDetail?.role?.includes("IAORestrictedFilesManager");
-    }
+
 
     const isRequestAssignedToTeam = () => {
         return (!requestDetails?.assignedTo && requestDetails?.assignedGroup);
@@ -52,19 +50,19 @@ const RequestRestriction= ({isiaorestricted, userDetail, requestDetails}) =>{
         {
           value: 'unrestricted',
           label: 'Unrestricted',
-          disabled: false // To Do : Add condition
+          disabled: !isiaorestricted
         },
         {
           value: 'restricted',
           label: 'Restricted',
-          disabled: false,
+          disabled: isiaorestricted,
         }
     ];
 
     const handleValueChange = (e) => {
         setModalOpen(true);
         if(e.target.value?.toLowerCase() == 'restricted'){
-            if(isIAORestrictedFileManager()){
+            if(isIAORestrictedFileManager){
                 if(!isRequestAssignedToTeam()){
                     setIsRestricted('True');
                     setModalMessage("Are you sure you want to flag this as a restricted file ?");
@@ -79,7 +77,7 @@ const RequestRestriction= ({isiaorestricted, userDetail, requestDetails}) =>{
             }
         }
         else {
-            if(isIAORestrictedFileManager()){
+            if(isIAORestrictedFileManager){
                 setIsRestricted('False');
                 setModalMessage("Are you sure you want to remove the restricted file flag on this request ?");
                 setModalDescription("If you restrcit this file only all IAO users will be able to search and find the request, and all users "+
@@ -110,7 +108,7 @@ const RequestRestriction= ({isiaorestricted, userDetail, requestDetails}) =>{
         }
         dispatch(restrictRequest(data, requestId, ministryId, type,(err, data) => {
             if(!err){
-                fetchFOIRequestDetailsWrapper(requestId, ministryId);
+                dispatch(fetchFOIRequestDetailsWrapper(requestId, ministryId));
                 if(isRestricted == 'True')
                     setRestrictionType("restricted");
                 else
@@ -188,7 +186,7 @@ const RequestRestriction= ({isiaorestricted, userDetail, requestDetails}) =>{
                 <button
                 className={`btn-bottom btn-save btn`}
                 onClick={handleSave}
-                disabled={!isIAORestrictedFileManager()}
+                disabled={!isIAORestrictedFileManager}
                 >
                 Save Change
                 </button>

@@ -6,6 +6,7 @@ import MINISTRYGROUPS from '../../constants/FOI/foiministrygroupConstants';
 import { SESSION_SECURITY_KEY, SESSION_LIFETIME } from "../../constants/constants";
 import { toast } from "react-toastify";
 import { KCProcessingTeams } from "../../constants/FOI/enum";
+import _ from 'lodash';
 
 let isBetween = require("dayjs/plugin/isBetween");
 let utc = require("dayjs/plugin/utc");
@@ -340,6 +341,11 @@ const errorToast = (errorMessage) => {
   });
 };
 
+
+const isRequestWatcherOrAssignee = (requestWatchers,requestAssignees,userId) => {
+  return (_.map(requestWatchers, "watchedby").includes(userId) || (requestAssignees.assignedTo == userId));
+}
+
 export {
   replaceUrl,
   formatDate,
@@ -357,6 +363,7 @@ export {
   removeBusinessDays,
   getMinistryCode,
   errorToast,
+  isRequestWatcherOrAssignee,
   formatDateInPst,
   isProcessingTeam,
   isFlexTeam,

@@ -9,7 +9,7 @@ import Input from '@material-ui/core/Input';
 import FOI_COMPONENT_CONSTANTS from '../../../../constants/FOI/foiComponentConstants';
 import { StateEnum } from '../../../../constants/FOI/statusEnum';
 import { useParams } from 'react-router-dom';
-import { calculateDaysRemaining, isMinistryCoordinator, isMinistryLogin } from "../../../../helper/FOI/helper";
+import { calculateDaysRemaining, isMinistryCoordinator, isMinistryLogin, isRequestWatcherOrAssignee } from "../../../../helper/FOI/helper";
 import { Watcher } from '../../customComponents';
 import { createAssigneeDetails } from '../utils'
 import {
@@ -82,6 +82,9 @@ const FOIRequestHeader = React.memo(
     const [selectedAssignedTo, setAssignedTo] = React.useState(() => getAssignedTo(assigneeDetails));
 
     const preventDefault = (event) => event.preventDefault();
+
+    const requestWatchers = useSelector((state) => state.foiRequests.foiWatcherList);
+
 
 
     useEffect(() => {
@@ -174,6 +177,10 @@ const FOIRequestHeader = React.memo(
     const ministryAssignedTo = getMinistryAssignedTo();
     const watcherList = assignedToList.filter(assignedTo => assignedTo.type === 'iao');
 
+    const isIAORestrictedFileManager = () => {
+      return userDetail?.role?.includes("IAORestrictedFilesManager");
+    }
+
     const isRestricted = () => {
       if(isMinistry)
         return requestDetails?.iaorestrictedetails?.isrestricted
@@ -241,10 +248,10 @@ const FOIRequestHeader = React.memo(
               />
             </div>
           )}
-        {!isAddRequest && status.toLowerCase() !== StateEnum.unopened.name.toLowerCase() &&
+        {!isAddRequest && status.toLowerCase() !== StateEnum.unopened.name.toLowerCase() && (isRequestWatcherOrAssignee(requestWatchers,assigneeObj,userDetail?.preferred_username) || isIAORestrictedFileManager()) && 
          <RequestRestriction 
           isiaorestricted= {isRestricted()}
-          userDetail={userDetail}
+          isIAORestrictedFileManager={isIAORestrictedFileManager()}
           requestDetails={requestDetails}
           />
         }
