@@ -6,6 +6,7 @@ import datetime as dt
 from pytz import timezone
 import pytz
 import maya
+from request_api.auth import AuthHelper
 
 from flask import jsonify
 
@@ -61,8 +62,7 @@ class dashboardservice:
 
     def getrequestqueuepagination(self, groups=None, page=1, size=10, sortingitems=[], sortingorders=[], filterfields=[], keyword=None, additionalfilter='All', userid=None):
         requests = FOIRawRequest.getrequestspagination(groups, page, size, sortingitems, sortingorders, filterfields, keyword, additionalfilter, userid)
-        requestqueue = []
-        print(userid)
+        requestqueue = []        
         for request in requests.items:
             
             if(request.receivedDateUF is None): #request from online form has no received date in json
@@ -164,7 +164,12 @@ class dashboardservice:
                 unopenrequest.update({'description':request.description})
                 unopenrequest.update({'assignedToFormatted': request.assignedToFormatted})
                 unopenrequest.update({'isiaorestricted': request.isiaorestricted})
-                requestqueue.append(unopenrequest)
+                
+                if request.isiaorestricted == True and request.assignedTo == AuthHelper.getuserid():
+                    requestqueue.append(unopenrequest)
+                
+                if (request.isiaorestricted == False or request.isiaorestricted == None):
+                    requestqueue.append(unopenrequest) 
             else:
                 _openrequest = self.__preparefoirequestinfo(request,  _receiveddate.strftime(SHORT_DATEFORMAT), _receiveddate.strftime(LONG_DATEFORMAT))
                 _openrequest.update({'ministryrequestid':request.ministryrequestid})
@@ -174,7 +179,12 @@ class dashboardservice:
                 _openrequest.update({'ministryAssignedToFormatted': request.ministryAssignedToFormatted})
                 restrictedrequest = FOIRestrictedMinistryRequest.getrestricteddetails(request.ministryrequestid,'iao')
                 _openrequest.update({'isiaorestricted': restrictedrequest['isrestricted']})
-                requestqueue.append(_openrequest)    
+                                                                
+                if restrictedrequest['isrestricted'] == True and request.assignedTo == AuthHelper.getuserid():
+                    requestqueue.append(_openrequest)
+
+                if restrictedrequest['isrestricted'] == False or restrictedrequest['isrestricted']  == None:
+                     requestqueue.append(_openrequest)     
 
         meta = {
             'page': requests.page,
