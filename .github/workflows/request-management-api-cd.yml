@@ -8,6 +8,9 @@ on:
       - dev-marshal
       - test-marshal
       - main
+    paths-ignore:
+      - "request-management-api/request_api/email_templates/**"
+      - "request-management-api/request_api/models/samplequeries/**"
     paths:
       - "request-management-api/**"
 

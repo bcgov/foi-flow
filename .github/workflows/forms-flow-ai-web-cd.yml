@@ -7,6 +7,8 @@ on:
       - dev-marshal
       - test-marshal
       - main
+    paths-ignore:
+      - "apps/forms-flow-ai/forms-flow-ai-web/src/forms/**"
     paths:
       - "apps/forms-flow-ai/forms-flow-ai-web/**"
       - ".github/workflows/forms-flow-ai-web-cd.yml"
