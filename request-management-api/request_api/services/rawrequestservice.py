@@ -14,6 +14,7 @@ from request_api.services.eventservice import eventservice
 from request_api.services.rawrequest.rawrequestservicegetter import rawrequestservicegetter
 from request_api.exceptions import BusinessException, Error
 from request_api.models.default_method_result import DefaultMethodResult
+from request_api.models.FOIRawRequestWatchers import FOIRawRequestWatcher
 import logging
 
 class rawrequestservice:
@@ -141,3 +142,6 @@ class rawrequestservice:
         if countofaxisrequestid > 0:
             return True
         return False
+
+    def israwrequestwatcher(self,requestid, userid):
+        return FOIRawRequestWatcher.isawatcher(requestid,userid)    

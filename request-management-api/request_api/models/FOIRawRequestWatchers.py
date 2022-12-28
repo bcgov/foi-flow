@@ -60,11 +60,11 @@ class FOIRawRequestWatcher(db.Model):
     def isawatcher(cls, requestid,userid):  
         _iswatcher = False
         try:              
-            sql = 'select distinct on (watchedby, watchedbygroup) watchedby, watchedbygroup, isactive from "FOIRawRequestWatchers" where requestid=:requestid and watchedby=:watchedby and isactive=True order by watchedby, watchedbygroup, created_at desc'
+            sql = 'select distinct on (watchedby, watchedbygroup) watchedby, watchedbygroup, isactive from "FOIRawRequestWatchers" where requestid=:requestid and watchedby=:watchedby  order by watchedby, watchedbygroup, created_at desc'
             rs = db.session.execute(text(sql), {'requestid': requestid,'watchedby':userid})        
-            num_results = rs.rowcount
-            if int(num_results) > 0:
-                _iswatcher = True
+            for row in rs:
+                if row["isactive"] == True:
+                    _iswatcher = True
         except Exception as ex:
             logging.error(ex)
             raise ex

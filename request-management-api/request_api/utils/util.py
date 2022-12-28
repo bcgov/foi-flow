@@ -25,10 +25,11 @@ from functools import wraps
 from humps.main import camelize, decamelize
 from flask import request, g
 from sqlalchemy.sql.expression import false
-from request_api.auth import jwt as _authjwt
+from request_api.auth import jwt as _authjwt,AuthHelper
 import jwt
 import os
 from request_api.utils.enums import MinistryTeamWithKeycloackGroup, ProcessingTeamWithKeycloackGroup
+from request_api.services.rawrequestservice import rawrequestservice
 
 
 def cors_preflight(methods):
@@ -105,5 +106,21 @@ def str_to_bool(s):
          return False
     else:
          raise ValueError # evil ValueError that doesn't tell you what the wrong value was    
+
+def canrestictdata(requestid,assignee,isrestricted,israwrequest):
+
+    _isawatcher = false
+    currentuser = AuthHelper.getuserid()
+    if israwrequest :
+        _isawatcher = rawrequestservice().israwrequestwatcher(requestid,currentuser)
+
+    isiaorestrictedfilemanager = AuthHelper.isiaorestrictedfilemanager()
+    print('Current user is {0} , is a watcher: {1} and is file manager {2} '.format(currentuser,_isawatcher,isiaorestrictedfilemanager))
+    if(isrestricted and currentuser != assignee and _isawatcher == False and isiaorestrictedfilemanager == False):
+        return True
+    else:
+        return False    
+
+        
 
 

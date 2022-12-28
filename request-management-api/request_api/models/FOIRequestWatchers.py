@@ -76,11 +76,11 @@ class FOIRequestWatcher(db.Model):
     def isaiaoministryrequestwatcher(cls, ministryrequestid,userid):
         _iswatcher = False    
         try:           
-            sql = 'select distinct on (watchedby, watchedbygroup) watchedby, watchedbygroup, isactive from "FOIRequestWatchers" where ministryrequestid=:ministryrequestid and watchedby=:watchedby and isactive=True and watchedbygroup not like \'%Ministry Team\' order by watchedby, watchedbygroup, created_at desc'
+            sql = 'select distinct on (watchedby, watchedbygroup) watchedby, watchedbygroup, isactive from "FOIRequestWatchers" where ministryrequestid=:ministryrequestid and watchedby=:watchedby  and watchedbygroup not like \'%Ministry Team\' order by watchedby, watchedbygroup, created_at desc'
             rs = db.session.execute(text(sql), {'ministryrequestid': ministryrequestid,'watchedby':userid})        
-            num_results = rs.rowcount
-            if int(num_results) > 0:
-                _iswatcher = True
+            for row in rs:
+                if row["isactive"] == True:
+                    _iswatcher = True
         except Exception as ex:
             logging.error(ex)
             raise ex

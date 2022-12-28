@@ -20,7 +20,7 @@ from flask_expects_json import expects_json
 from flask_cors import cross_origin
 from request_api.auth import auth, AuthHelper
 from request_api.tracer import Tracer
-from request_api.utils.util import  cors_preflight, allowedorigins,str_to_bool
+from request_api.utils.util import  cors_preflight, allowedorigins,str_to_bool,canrestictdata
 from request_api.exceptions import BusinessException
 from request_api.services.rawrequestservice import rawrequestservice
 from request_api.services.documentservice import documentservice
@@ -58,11 +58,22 @@ class FOIRawRequest(Resource):
     def get(requestid=None):
         try : 
             jsondata = {}
+            statuscode = 401
             requestidisinteger = int(requestid)
             if requestidisinteger :                
-                baserequestinfo = rawrequestservice().getrawrequest(requestid)                                    
-                jsondata = json.dumps(baserequestinfo)
-            return jsondata , 200 
+                baserequestinfo = rawrequestservice().getrawrequest(requestid)
+
+                assignee = baserequestinfo['assignedTo']
+                isiaorestricted = baserequestinfo['isiaorestricted']
+                print('Request # {0} Assigned to {1} and is restricted {2} '.format(requestid,assignee,isiaorestricted))
+                if(isiaorestricted and canrestictdata(requestid,assignee,isiaorestricted,True)):
+                    jsondata = {'status': 401, 'message':'Restricted Request'}
+                    statuscode = 401
+                else:
+                    jsondata = json.dumps(baserequestinfo)
+                    statuscode = 200
+
+            return jsondata , statuscode 
         except ValueError:
             return {'status': 500, 'message':INVALID_REQUEST_ID}, 500    
         except BusinessException as exception:            
