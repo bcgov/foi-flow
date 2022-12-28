@@ -45,6 +45,7 @@ const PublicEdit = React.memo((props) => {
   
   return (
       <div className="container overflow-y-auto">
+        <h1 hidden>BC government online payment form</h1>
         <div className={`main-header ${classes.publicstyle}`}>
           <SubmissionError modalOpen={errors?.includes("Token Expired")}
             errors={errors}
