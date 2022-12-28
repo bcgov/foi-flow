@@ -1,6 +1,8 @@
 from request_api.models.FOIRawRequests import FOIRawRequest
 from request_api.models.FOIMinistryRequests import FOIMinistryRequest
 from request_api.models.FOIRestrictedMinistryRequests import FOIRestrictedMinistryRequest
+from request_api.models.FOIRawRequestWatchers import FOIRawRequestWatcher
+from request_api.models.FOIRequestWatchers import FOIRequestWatcher
 from dateutil import tz, parser
 import datetime as dt
 from pytz import timezone
@@ -75,7 +77,9 @@ class dashboardservice:
                 unopenrequest.update({'assignedToFormatted': request.assignedToFormatted})
                 unopenrequest.update({'isiaorestricted': request.isiaorestricted}) 
 
-                if request.isiaorestricted == True and request.assignedTo == userid:
+                isawatcher = FOIRawRequestWatcher.isawatcher(request.id,userid)                
+                print('For requestid {0} , this user {1} is a wathcer {2}'.format(request.id,userid,isawatcher))
+                if request.isiaorestricted == True and (request.assignedTo == userid or isawatcher):
                     requestqueue.append(unopenrequest)
                 
                 if (request.isiaorestricted == False or request.isiaorestricted == None):
@@ -90,7 +94,8 @@ class dashboardservice:
                 restrictedrequest = FOIRestrictedMinistryRequest.getrestricteddetails(request.ministryrequestid,'iao')
                 _openrequest.update({'isiaorestricted': restrictedrequest['isrestricted']})
 
-                if restrictedrequest['isrestricted'] == True and request.assignedTo == userid:
+                isaiaoministryrequestwatcher = FOIRequestWatcher.isaiaoministryrequestwatcher(request.ministryrequestid,userid)
+                if restrictedrequest['isrestricted'] == True and (request.assignedTo == userid or isaiaoministryrequestwatcher):
                     requestqueue.append(_openrequest)
 
                 if restrictedrequest['isrestricted'] == False or restrictedrequest['isrestricted']  == None:
@@ -159,13 +164,17 @@ class dashboardservice:
             else:
                 _receiveddate = parser.parse(request.receivedDateUF)
 
+            userid = AuthHelper.getuserid()
             if(request.ministryrequestid == None):
                 unopenrequest = self.__preparefoirequestinfo(request, _receiveddate.strftime(SHORT_DATEFORMAT), _receiveddate.strftime(LONG_DATEFORMAT), idnumberprefix= 'U-00')
                 unopenrequest.update({'description':request.description})
                 unopenrequest.update({'assignedToFormatted': request.assignedToFormatted})
                 unopenrequest.update({'isiaorestricted': request.isiaorestricted})
+
                 
-                if request.isiaorestricted == True and request.assignedTo == AuthHelper.getuserid():
+                isawatcher = FOIRawRequestWatcher.isawatcher(request.id,userid)
+                
+                if request.isiaorestricted == True and (request.assignedTo == userid or isawatcher):
                     requestqueue.append(unopenrequest)
                 
                 if (request.isiaorestricted == False or request.isiaorestricted == None):
@@ -179,8 +188,10 @@ class dashboardservice:
                 _openrequest.update({'ministryAssignedToFormatted': request.ministryAssignedToFormatted})
                 restrictedrequest = FOIRestrictedMinistryRequest.getrestricteddetails(request.ministryrequestid,'iao')
                 _openrequest.update({'isiaorestricted': restrictedrequest['isrestricted']})
-                                                                
-                if restrictedrequest['isrestricted'] == True and request.assignedTo == AuthHelper.getuserid():
+
+                isaiaoministryrequestwatcher = FOIRequestWatcher.isaiaoministryrequestwatcher(request.ministryrequestid,userid)  
+
+                if restrictedrequest['isrestricted'] == True and (request.assignedTo == userid or isaiaoministryrequestwatcher):
                     requestqueue.append(_openrequest)
 
                 if restrictedrequest['isrestricted'] == False or restrictedrequest['isrestricted']  == None:

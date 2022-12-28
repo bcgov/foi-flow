@@ -73,6 +73,22 @@ class FOIRequestWatcher(db.Model):
         return watchers 
 
     @classmethod
+    def isaiaoministryrequestwatcher(cls, ministryrequestid,userid):
+        _iswatcher = False    
+        try:           
+            sql = 'select distinct on (watchedby, watchedbygroup) watchedby, watchedbygroup, isactive from "FOIRequestWatchers" where ministryrequestid=:ministryrequestid and watchedby=:watchedby and isactive=True and watchedbygroup not like \'%Ministry Team\' order by watchedby, watchedbygroup, created_at desc'
+            rs = db.session.execute(text(sql), {'ministryrequestid': ministryrequestid,'watchedby':userid})        
+            num_results = rs.rowcount
+            if int(num_results) > 0:
+                _iswatcher = True
+        except Exception as ex:
+            logging.error(ex)
+            raise ex
+        finally:
+            db.session.close()
+        return _iswatcher 
+
+    @classmethod
     def getrequestidsbyuserid(cls, userid):
         #subquery for getting latest watching status
         subquery_max = db.session.query(FOIRequestWatcher.ministryrequestid, FOIRequestWatcher.watchedby ,func.max(FOIRequestWatcher.watcherid).label('max_watcherid')).group_by(FOIRequestWatcher.ministryrequestid, FOIRequestWatcher.watchedby).subquery()
