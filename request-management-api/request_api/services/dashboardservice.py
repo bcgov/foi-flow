@@ -62,7 +62,7 @@ class dashboardservice:
             'version':version
         }
 
-    def getrequestqueuepagination(self, groups=None, page=1, size=10, sortingitems=[], sortingorders=[], filterfields=[], keyword=None, additionalfilter='All', userid=None):
+    def getrequestqueuepagination(self, groups=None, page=1, size=10, sortingitems=[], sortingorders=[], filterfields=[], keyword=None, additionalfilter='All', userid=None):        
         requests = FOIRawRequest.getrequestspagination(groups, page, size, sortingitems, sortingorders, filterfields, keyword, additionalfilter, userid)
         requestqueue = []        
         for request in requests.items:
@@ -77,9 +77,8 @@ class dashboardservice:
                 unopenrequest.update({'assignedToFormatted': request.assignedToFormatted})
                 unopenrequest.update({'isiaorestricted': request.isiaorestricted}) 
 
-                isawatcher = FOIRawRequestWatcher.isawatcher(request.id,userid)                
-                print('For requestid {0} , this user {1} is a wathcer {2}'.format(request.id,userid,isawatcher))
-                if request.isiaorestricted == True and (request.assignedTo == userid or isawatcher):
+                isawatcher = FOIRawRequestWatcher.isawatcher(request.id,userid)                                
+                if request.isiaorestricted == True and (request.assignedTo == userid or isawatcher or  AuthHelper.isiaorestrictedfilemanager()):
                     requestqueue.append(unopenrequest)
                 
                 if (request.isiaorestricted == False or request.isiaorestricted == None):
@@ -174,7 +173,7 @@ class dashboardservice:
                 
                 isawatcher = FOIRawRequestWatcher.isawatcher(request.id,userid)
                 
-                if request.isiaorestricted == True and (request.assignedTo == userid or isawatcher):
+                if request.isiaorestricted == True and (request.assignedTo == userid or isawatcher or AuthHelper.isiaorestrictedfilemanager()):
                     requestqueue.append(unopenrequest)
                 
                 if (request.isiaorestricted == False or request.isiaorestricted == None):
