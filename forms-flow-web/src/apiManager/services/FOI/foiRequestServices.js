@@ -455,23 +455,23 @@ export const fetchRequestDataFromAxis = (axisRequestId, isModal,requestDetails, 
   }
 };
 
-export const restrictRequest = (data, requestId, ministryId, type, ...rest) => {
+export const restrictRequest = (data, requestId, ministryId, type="iao", ...rest) => {
   const done = fnDone(rest);
   let apiUrl = "";
-  if (ministryId)
-    apiUrl= replaceUrl(
+  if (ministryId){
+    apiUrl= replaceUrl(replaceUrl(
       API.FOI_POST_MINISTRYREQUEST_RESTRICTION,
       "<ministryrequestid>",
-      ministryId,
-      "<type>",
-      type
-    );
-  else
+      ministryId),"<type>",type
+    ); 
+  }
+  else{
     apiUrl= replaceUrl(
       API.FOI_POST_RAWREQUEST_RESTRICTION,
       "<requestid>",
       requestId
     );
+  }
   return (dispatch) => {
     httpPOSTRequest(apiUrl, data)
       .then((res) => {

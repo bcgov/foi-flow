@@ -9,7 +9,7 @@ import Input from '@material-ui/core/Input';
 import FOI_COMPONENT_CONSTANTS from '../../../../constants/FOI/foiComponentConstants';
 import { StateEnum } from '../../../../constants/FOI/statusEnum';
 import { useParams } from 'react-router-dom';
-import { calculateDaysRemaining, isMinistryCoordinator, isMinistryLogin, isRequestWatcherOrAssignee } from "../../../../helper/FOI/helper";
+import { calculateDaysRemaining, isRequestWatcherOrAssignee } from "../../../../helper/FOI/helper";
 import { Watcher } from '../../customComponents';
 import { createAssigneeDetails } from '../utils'
 import {
@@ -56,8 +56,6 @@ const FOIRequestHeader = React.memo(
     const assignedToList = useSelector(
       (state) => state.foiRequests.foiAssignedToList
     );
-    const userGroups = userDetail?.groups?.map(group => group.slice(1));
-    let isMinistry = isMinistryLogin(userGroups);
    
     let assigneeDetails = _.pick(requestDetails, ['assignedGroup', 'assignedTo','assignedToFirstName','assignedToLastName',
     'assignedministrygroup','assignedministryperson','assignedministrypersonFirstName','assignedministrypersonLastName']);
@@ -187,8 +185,8 @@ const FOIRequestHeader = React.memo(
     }
 
     const isRestricted = () => {
-      if(isMinistry)
-        return requestDetails?.iaorestrictedetails?.isrestricted
+      if(ministryId)
+        return requestDetails?.iaorestricteddetails?.isrestricted
       else
         return requestDetails?.isiaorestricted
     }
