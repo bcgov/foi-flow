@@ -8,10 +8,9 @@ on:
       - dev-marshal
       - test-marshal
       - main
-    paths-ignore:
-      - "apps/forms-flow-ai/forms-flow-bpm/src/main/resources/processes/**"
     paths:
       - "apps/forms-flow-ai/forms-flow-bpm/**"
+      - "!apps/forms-flow-ai/forms-flow-bpm/src/main/resources/processes/**"
 
 defaults:
   run:

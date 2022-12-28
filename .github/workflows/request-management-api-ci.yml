@@ -7,12 +7,11 @@ on:
       - main
       - dev
       - dev-marshal
-      - test-marshal
-    paths-ignore:
-      - "request-management-api/request_api/email_templates/**"
-      - "request-management-api/request_api/models/samplequeries/**"
+      - test-marshal      
     paths:
       - "request-management-api/**"
+      - "!request-management-api/request_api/email_templates/**"
+      - "!request-management-api/request_api/models/samplequeries/**"
 
 defaults:
   run:

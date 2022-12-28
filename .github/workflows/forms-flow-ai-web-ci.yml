@@ -8,10 +8,9 @@ on:
       - main
       - dev-marshal
       - test-marshal
-    paths-ignore:
-      - "apps/forms-flow-ai/forms-flow-ai-web/src/forms/**"
     paths:
       - "apps/forms-flow-ai/forms-flow-ai-web/**"
+      - "!apps/forms-flow-ai/forms-flow-ai-web/src/forms/**"
 
 defaults:
   run:
