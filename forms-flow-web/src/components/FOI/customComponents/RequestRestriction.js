@@ -41,7 +41,6 @@ const RequestRestriction= ({isiaorestricted, isIAORestrictedFileManager, request
     }, []);
 
 
-
     const isRequestAssignedToTeam = () => {
         return (!requestDetails?.assignedTo && requestDetails?.assignedGroup);
     }
@@ -61,35 +60,50 @@ const RequestRestriction= ({isiaorestricted, isIAORestrictedFileManager, request
 
     const handleValueChange = (e) => {
         setModalOpen(true);
+        let description="";
+        let message="";
         if(e.target.value?.toLowerCase() == 'restricted'){
             if(isIAORestrictedFileManager){
                 if(!isRequestAssignedToTeam()){
                     setIsRestricted('True');
-                    setModalMessage("Are you sure you want to flag this as a restricted file ?");
-                    setModalDescription("If you change this to be a restrcited file only the Intake Manager and any user assigned or selected as watchers will be able to view this request content.");
+                    message="Are you sure you want to flag this as a restricted file ?";
+                    description= <span>
+                    If you change this to be a restrcited file only the
+                    <b> Intake Manager </b>and
+                    <b> any user assigned </b>
+                    or selected as
+                    <b> Watchers </b>
+                    will be able to view this request content.
+                  </span>
                 }
                 else{
-                    setModalMessage("A request can only be restricted when it is assigned to one team member, not a team queue.");
+                    message="A request can only be restricted when it is assigned to one team member, not a team queue.";
+                    description="";
                 }
             }
             else{
-                setModalMessage("Only the Intake Manager can restrict a request.");
+                message="Only the Intake Manager can restrict a request.";
+                description="";
             }
         }
         else {
             if(isIAORestrictedFileManager){
                 setIsRestricted('False');
-                setModalMessage("Are you sure you want to remove the restricted file flag on this request ?");
-                setModalDescription("If you restrcit this file only all IAO users will be able to search and find the request, and all users "+
-                "on the respective Ministry will be able to see this request.");
+                message="Are you sure you want to remove the restricted file flag on this request ?";
+                description="If you unrestrcit this file only all IAO users will be able to search and find the request, and all users "+
+                "on the respective Ministry will be able to see this request.";
             }
             else{
-                setModalMessage("Only the Intake Manager can remove the restricted flag on a request");
-                setModalDescription("If you would like to have this request unrestricted please contact the Intake Manager as they are the original user"+
-                " who flagged this as a restricted request.");
+                message="Only the Intake Manager can remove the restricted flag on a request";
+                description= <span>
+                    If you would like to have this request unrestricted please contact the
+                    <b> Intake Manager </b>
+                    as they are the original user who flagged this as a restricted request.
+                    </span>
             }
         }
-       
+        setModalMessage(message);
+        setModalDescription(description);
     }
 
     const handleSave = () => {
@@ -186,7 +200,7 @@ const RequestRestriction= ({isiaorestricted, isIAORestrictedFileManager, request
                 <button
                 className={`btn-bottom btn-save btn`}
                 onClick={handleSave}
-                disabled={!isIAORestrictedFileManager}
+                disabled={!isIAORestrictedFileManager || isRequestAssignedToTeam()}
                 >
                 Save Change
                 </button>

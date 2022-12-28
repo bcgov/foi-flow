@@ -136,6 +136,11 @@ const FOIRequestHeader = React.memo(
                   );
                   //event bubble up - to validate required fields
                   handleAssignedToValue(event.target.value);
+                  requestDetails.assignedGroup = assigneeDetails.assignedGroup;
+                  requestDetails.assignedTo = assigneeDetails.assignedTo;
+                  requestDetails.assignedToFirstName = assigneeDetails.assignedToFirstName;
+                  requestDetails.assignedToLastName = assigneeDetails.assignedToLastName;
+                  requestDetails.assignedToName = assigneeDetails.assignedToName
                 } else {
                   toast.error(
                     "Temporarily unable to save the assignee. Please try again in a few minutes.",
@@ -153,7 +158,7 @@ const FOIRequestHeader = React.memo(
               })
             )
           }
-        }
+    }
 
     const status = getStatus({ headerValue, requestDetails });
 
