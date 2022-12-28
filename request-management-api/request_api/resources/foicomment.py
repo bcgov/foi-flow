@@ -20,9 +20,10 @@ from flask_expects_json import expects_json
 from request_api.auth import auth, AuthHelper
 from request_api.services.eventservice import eventservice
 from request_api.tracer import Tracer
-from request_api.utils.util import  cors_preflight, allowedorigins
+from request_api.utils.util import  cors_preflight, allowedorigins,canrestictdata
 from request_api.exceptions import BusinessException, Error
 from request_api.services.commentservice import commentservice
+from request_api.services.rawrequestservice import rawrequestservice
 from request_api.schemas.foicomment import  FOIRawRequestCommentSchema, FOIMinistryRequestCommentSchema
 from request_api.schemas.foicomment import  EditFOIRawRequestCommentSchema, FOIMinistryRequestCommentSchema
 import json
@@ -95,11 +96,18 @@ class FOIComment(Resource):
         if requesttype != "ministryrequest" and requesttype != "rawrequest":
                 return {'status': False, 'message': EXCEPTION_MESSAGE_BAD_REQUEST}, 400 
         try:
+            _canrestrictdata = False
             if requesttype == "ministryrequest":
                 result = commentservice().getministryrequestcomments(requestid)
             else:
+                baserequestinfo = rawrequestservice().getrawrequest(requestid)
+                _canrestrictdata = canrestictdata(requestid,baserequestinfo['assignedTo'],baserequestinfo['isiaorestricted'],True)
                 result = commentservice().getrawrequestcomments(requestid)
-            return json.dumps(result), 200
+            
+            if(_canrestrictdata == False):
+                return json.dumps(result), 200
+            else:
+                return {'status': 401, 'message':'Restricted Request'} , 401
         except KeyError as err:
             return {'status': False, 'message':err.messages}, 400        
         except BusinessException as exception:            
