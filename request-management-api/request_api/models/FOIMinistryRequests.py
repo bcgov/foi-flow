@@ -14,6 +14,7 @@ from .FOIRequestApplicants import FOIRequestApplicant
 from .FOIRequestStatus import FOIRequestStatus
 from .ApplicantCategories import ApplicantCategory
 from .FOIRequestWatchers import FOIRequestWatcher
+from .FOIRestrictedMinistryRequests import FOIRestrictedMinistryRequest
 from .ProgramAreas import ProgramArea
 from request_api.utils.enums import ProcessingTeamWithKeycloackGroup, IAOTeamWithKeycloackGroup
 from .FOIAssignees import FOIAssignee
@@ -292,6 +293,7 @@ class FOIMinistryRequest(db.Model):
         subquery_extension_count = _session.query(FOIRequestExtension.foiministryrequest_id, func.count(distinct(FOIRequestExtension.foirequestextensionid)).filter(FOIRequestExtension.isactive == True).label('extensions')).group_by(FOIRequestExtension.foiministryrequest_id).subquery()
 
 
+
         onbehalf_applicantmapping = aliased(FOIRequestApplicantMapping)
         onbehalf_applicant = aliased(FOIRequestApplicant)
 
@@ -373,6 +375,7 @@ class FOIMinistryRequest(db.Model):
                            ],
                            else_ = subquery_extension_count.c.extensions).label('extensions')
 
+
         selectedcolumns = [
             FOIRequest.foirequestid.label('id'),
             FOIMinistryRequest.version,
@@ -410,7 +413,8 @@ class FOIMinistryRequest(db.Model):
             ministryassignedtoformatted,
             FOIMinistryRequest.closedate,
             onbehalfformatted,
-            extensions
+            extensions,
+            literal(None).label('isiaorestricted')
         ]
 
         basequery = _session.query(
@@ -871,7 +875,8 @@ class FOIMinistryRequest(db.Model):
             ministryassignedtoformatted,
             FOIMinistryRequest.closedate,
             onbehalfformatted,
-            extensions
+            extensions,            
+            literal(None).label('isiaorestricted')
         ]
 
         basequery = _session.query(

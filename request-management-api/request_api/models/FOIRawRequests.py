@@ -500,7 +500,8 @@ class FOIRawRequest(db.Model):
             literal(None).label('ministryAssignedToFormatted'),
             literal(None).label('closedate'),
             literal(None).label('onBehalfFormatted'),
-            literal(None).label('extensions')
+            literal(None).label('extensions'),
+            FOIRawRequest.isiaorestricted            
         ]
 
         basequery = _session.query(*selectedcolumns).join(subquery_maxversion, and_(*joincondition)).join(FOIAssignee, FOIAssignee.username == FOIRawRequest.assignedto, isouter=True)
