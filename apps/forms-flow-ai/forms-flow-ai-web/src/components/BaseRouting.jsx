@@ -29,7 +29,7 @@ const BaseRouting = React.memo(({store}) => {
   return (
     <>
       {isAuth?<NavBar/>:null}
-      <div className="wrapper">
+      <div className="wrapper" id="content" role="main" aria-label="main">
           <div className={`container-fluid content main-container ${getStyle()}`}>
             <ToastContainer />
             <Switch>
