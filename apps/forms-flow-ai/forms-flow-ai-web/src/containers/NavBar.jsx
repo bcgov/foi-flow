@@ -32,7 +32,7 @@ const NavBar = React.memo(() => {
 
   return (
     <header>
-      <div role="main" aria-label="header">
+      <div id="header" role="banner" aria-label="header">
         <Navbar collapseOnSelect expand="lg" className="topheading-border-bottom" fixed="top">
           <Container fluid className="service-bc-navbar-background">
             <Navbar.Brand className="d-flex" >
