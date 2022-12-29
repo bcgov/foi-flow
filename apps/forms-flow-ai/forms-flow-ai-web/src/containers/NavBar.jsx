@@ -31,8 +31,7 @@ const NavBar = React.memo(() => {
   }
 
   return (
-    <header>
-      <div id="header" role="banner" aria-label="header">
+    <header id="header" role="banner" aria-label="header">      
         <Navbar collapseOnSelect expand="lg" className="topheading-border-bottom" fixed="top">
           <Container fluid className="service-bc-navbar-background">
             <Navbar.Brand className="d-flex" >
@@ -228,8 +227,7 @@ const NavBar = React.memo(() => {
                 </Nav>
               </Navbar.Collapse> : null}
           </Container>
-        </Navbar>
-      </div>
+        </Navbar>      
     </header>
   );
 })

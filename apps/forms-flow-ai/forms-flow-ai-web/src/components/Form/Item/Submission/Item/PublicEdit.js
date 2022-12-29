@@ -44,7 +44,7 @@ const PublicEdit = React.memo((props) => {
   }
   
   return (
-      <div className="container overflow-y-auto" id="content" role="main" aria-label="main">
+      <div className="container overflow-y-auto">
         <div className={`main-header ${classes.publicstyle}`}>
           <SubmissionError modalOpen={errors?.includes("Token Expired")}
             errors={errors}
