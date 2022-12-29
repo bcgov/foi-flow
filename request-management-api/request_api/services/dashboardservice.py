@@ -64,7 +64,7 @@ class dashboardservice:
 
     def getrequestqueuepagination(self, groups=None, page=1, size=10, sortingitems=[], sortingorders=[], filterfields=[], keyword=None, additionalfilter='All', userid=None):        
         requests = FOIRawRequest.getrequestspagination(groups, page, size, sortingitems, sortingorders, filterfields, keyword, additionalfilter, userid)
-        requestqueue = []        
+        requestqueue = []                
         for request in requests.items:
             
             if(request.receivedDateUF is None): #request from online form has no received date in json
@@ -83,7 +83,8 @@ class dashboardservice:
                     unopenrequest.update({'firstName': 'Request'})
                     requestqueue.append(unopenrequest)
                 
-                if (request.isiaorestricted == False or request.isiaorestricted == None):
+                
+                if (request.isiaorestricted == False or request.isiaorestricted == None) and keyword != "restricted":
                     requestqueue.append(unopenrequest) 
 
             else:
@@ -101,7 +102,7 @@ class dashboardservice:
                     _openrequest.update({'firstName': 'Request'})
                     requestqueue.append(_openrequest)
 
-                if restrictedrequest['isrestricted'] == False or restrictedrequest['isrestricted']  == None:
+                if (restrictedrequest['isrestricted'] == False or restrictedrequest['isrestricted']  == None) and  keyword != "restricted":
                      requestqueue.append(_openrequest)   
                    
 
@@ -114,6 +115,9 @@ class dashboardservice:
             'has_next': requests.has_next,
             'has_prev': requests.has_prev,
         }
+
+
+
 
         return jsonify({'data': requestqueue, 'meta': meta})
 

@@ -298,7 +298,7 @@ class FOIMinistryRequest(db.Model):
         onbehalf_applicant = aliased(FOIRequestApplicant)
 
         #filter/search
-        if(len(filterfields) > 0 and keyword is not None):
+        if(len(filterfields) > 0 and keyword is not None and keyword != "restricted"):
             filtercondition = []
             for field in filterfields:
                 filtercondition.append(FOIMinistryRequest.findfield(field, iaoassignee, ministryassignee).ilike('%'+keyword+'%'))
@@ -481,7 +481,7 @@ class FOIMinistryRequest(db.Model):
             dbquery = basequery.filter(ministryfilter)
 
 
-        if(keyword is None):
+        if(keyword is None or keyword == "restricted"):
             return dbquery
         else:
             return dbquery.filter(or_(*filtercondition))

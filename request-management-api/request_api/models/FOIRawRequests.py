@@ -536,17 +536,18 @@ class FOIRawRequest(db.Model):
 
         #filter/search
         filtercondition = []
-        for field in filterfields:
-            if(field == 'idNumber'):
-                keyword = keyword.replace('u-00', '')
-
-            filtercondition.append(FOIRawRequest.findfield(field).ilike('%'+keyword+'%'))
-            if(field == 'firstName'):
-                filtercondition.append(FOIRawRequest.findfield('contactFirstName').ilike('%'+keyword+'%'))
-            if(field == 'lastName'):
-                filtercondition.append(FOIRawRequest.findfield('contactLastName').ilike('%'+keyword+'%'))
-            if(field == 'requestType'):
-                filtercondition.append(FOIRawRequest.findfield('requestTypeRequestType').ilike('%'+keyword+'%'))
+        if(keyword != 'restricted'):
+            for field in filterfields:
+                if(field == 'idNumber'):
+                    keyword = keyword.replace('u-00', '')
+                
+                filtercondition.append(FOIRawRequest.findfield(field).ilike('%'+keyword+'%'))
+                if(field == 'firstName'):
+                    filtercondition.append(FOIRawRequest.findfield('contactFirstName').ilike('%'+keyword+'%'))
+                if(field == 'lastName'):
+                    filtercondition.append(FOIRawRequest.findfield('contactLastName').ilike('%'+keyword+'%'))
+                if(field == 'requestType'):
+                    filtercondition.append(FOIRawRequest.findfield('requestTypeRequestType').ilike('%'+keyword+'%'))
         
         return or_(*filtercondition)
 
