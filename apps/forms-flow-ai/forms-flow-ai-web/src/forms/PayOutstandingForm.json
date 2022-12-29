@@ -2137,7 +2137,7 @@
                                     "value": ""
                                 }
                             ],
-                            "content": "<center style='color: #003366'>If you would like to contact an Information Access Operations representative to better clarify your request and try and reduce your fee <br/> please, Email FOI at: FOI.Requests@gov.bc.ca, or call, Phone: 250-387-1321 | Toll Free: 833-283-8200 </center>",
+                            "content": "<center class='mobilesubcontent' style='color: #003366'>If you would like to contact an Information Access Operations representative to better clarify your request and try to reduce your fee, <br/> please email: <a href='mailto:FOI.Requests@gov.bc.ca'>FOI.Requests@gov.bc.ca</a>, or call <a href=\"tel:+1 250-387-1321\">250-387-1321</a> | Toll Free: <a href='tel:+1833-283-8200'>833-283-8200</a> </center>",
                             "refreshOnChange": false,
                             "customClass": "",
                             "hidden": false,
@@ -2205,7 +2205,7 @@
                             "showWordCount": false,
                             "allowMultipleMasks": false,
                             "addons": [],
-                            "id": "e60gx5"
+                            "id": "ei23z17"
                         }
                     ],
                     "placeholder": "",

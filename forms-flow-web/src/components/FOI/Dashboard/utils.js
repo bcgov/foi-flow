@@ -6,6 +6,8 @@ import {
 } from "../../../helper/FOI/helper";
 import { StateEnum } from "../../../constants/FOI/statusEnum";
 import Chip from "@mui/material/Chip";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faFlag, faTimes } from '@fortawesome/free-solid-svg-icons'; 
 
 export const debounce = (func, wait) => {
   let timeout;
@@ -172,3 +174,19 @@ export const addYears = (n) => {
   const currentDate = new Date();
   return currentDate.setFullYear(currentDate.getFullYear() + n);
 };
+
+export const displayIcon = (params) => {
+  return (
+    params?.row?.isiaorestricted ? 
+    <><FontAwesomeIcon icon={faFlag} size='2x' className='restrict-icon' />
+    </> : ""
+  );
+};
+
+export const displayHeaderIcon = (params) => {
+  return (
+    <span className="foi-dashboard-restricted"><FontAwesomeIcon icon={faTimes} size='2x' className='restrict-icon' />
+    </span> 
+  );
+};
+

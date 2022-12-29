@@ -16,7 +16,10 @@ from request_api.models.FOIRawRequests import FOIRawRequest
 from request_api.models.FOIMinistryRequests import FOIMinistryRequest
 from request_api.models.FOIRestrictedMinistryRequests import FOIRestrictedMinistryRequest
 from request_api.utils.enums import StateName
-from request_api.services.notifications.duecalculator import duecalculator
+from request_api.services.commons.duecalculator import duecalculator
+from request_api.utils.commons.datetimehandler import datetimehandler
+import os
+import json
 
 class requestservice:
     """ FOI Request management service
@@ -44,16 +47,17 @@ class requestservice:
     def updateministryrequestduedate(self, ministryrequestid, duedate, userid):
         return requestserviceupdate().updateministryrequestduedate(ministryrequestid, duedate, userid)
     
-    def postpaymentstatetransition(self, requestid, ministryrequestid, nextstatename):
+    def postpaymentstatetransition(self, requestid, ministryrequestid, nextstatename, paymentdate):
         foirequest = self.getrequest(requestid, ministryrequestid)
         currentstatus = foirequest["stateTransition"][0]["status"] if "stateTransition" in foirequest and len(foirequest["stateTransition"])  > 1 else None
         status = FOIRequestStatus().getrequeststatusid(nextstatename)
         if currentstatus not in (None, "") and currentstatus == StateName.onhold.value:
-            onhold_extend_days = duecalculator().getbusinessdaysbetween(foirequest["onholdTransitionDate"])
-            foirequest['dueDate'] = duecalculator().addbusinessdays(foirequest["dueDate"], onhold_extend_days)
+            calc_duedate, calc_cfrduedate = self.calculateduedate(foirequest, paymentdate)
+            foirequest['dueDate'] = calc_duedate
+            foirequest['cfrDueDate'] = calc_cfrduedate
         foirequest['requeststatusid'] = status['requeststatusid']
         return self.saverequestversion(foirequest, requestid, ministryrequestid,'Online Payment')
-           
+
     def getrequest(self,foirequestid,foiministryrequestid): 
         return requestservicegetter().getrequest(foirequestid, foiministryrequestid)
     
@@ -100,6 +104,27 @@ class requestservice:
         wfinstanceid = workflowservice().syncwfinstance("ministryrequest", ministryrequestid, True)
         workflowservice().postcorrenspodenceevent(wfinstanceid, ministryrequestid, foirequestschema, applicantcorrespondenceid, templatedetails.name, attributes)
 
+    def calculateduedate(self, foirequest, paymentdate):
+        duedate_includeoffhold, cfrduedate_includeoffhold = self.__isincludeoffhold()
+        onhold_extend_days = duecalculator().getbusinessdaysbetween(foirequest["onholdTransitionDate"], paymentdate)
+        isoffhold_businessday = duecalculator().isbusinessday(paymentdate)
+        duedate_extend_days = onhold_extend_days + 1 if isoffhold_businessday == True and duedate_includeoffhold == True else onhold_extend_days
+        cfrduedate_extend_days = onhold_extend_days + 1 if isoffhold_businessday == True and cfrduedate_includeoffhold == True else onhold_extend_days
+        calc_duedate = duecalculator().addbusinessdays(foirequest["dueDate"], duedate_extend_days)    
+        calc_cfrduedate = duecalculator().addbusinessdays(foirequest["cfrDueDate"], cfrduedate_extend_days) 
+        return calc_duedate, calc_cfrduedate
+
+
+    def __isincludeoffhold(self):
+        payment_config_str = os.getenv("PAYMENT_CONFIG",'')        
+        if payment_config_str in (None, ''):
+            return True, True
+        _paymentconfig = json.loads(payment_config_str)
+        duedate_includeoffhold = True if _paymentconfig["duedate"]["includeoffhold"] == "Y" else False
+        cfrduedate_includeoffhold = True if _paymentconfig["cfrduedate"]["includeoffhold"] == "Y" else False
+        return duedate_includeoffhold, cfrduedate_includeoffhold
+
+    
     def saverestrictedrequest(self,ministryrequestid,type, isrestricted,userid):
         version = FOIMinistryRequest.getversionforrequest(ministryrequestid)
         FOIRestrictedMinistryRequest.disablerestrictedrequests(ministryrequestid,type,userid)

@@ -9,7 +9,7 @@ import Input from '@material-ui/core/Input';
 import FOI_COMPONENT_CONSTANTS from '../../../../constants/FOI/foiComponentConstants';
 import { StateEnum } from '../../../../constants/FOI/statusEnum';
 import { useParams } from 'react-router-dom';
-import { calculateDaysRemaining } from "../../../../helper/FOI/helper";
+import { calculateDaysRemaining, isRequestWatcherOrAssignee } from "../../../../helper/FOI/helper";
 import { Watcher } from '../../customComponents';
 import { createAssigneeDetails } from '../utils'
 import {
@@ -17,6 +17,7 @@ import {
 } from "../../../../apiManager/services/FOI/foiAssigneeServices";
 import { toast } from "react-toastify";
 import _ from 'lodash';
+import RequestRestriction from "../../customComponents/RequestRestriction";
 
 const useStyles = makeStyles((theme) => ({
     formControl: {
@@ -80,6 +81,9 @@ const FOIRequestHeader = React.memo(
 
     const preventDefault = (event) => event.preventDefault();
 
+    const requestWatchers = useSelector((state) => state.foiRequests.foiWatcherList);
+
+
 
     useEffect(() => {
       // handle case where assigned user was removed from group
@@ -130,6 +134,11 @@ const FOIRequestHeader = React.memo(
                   );
                   //event bubble up - to validate required fields
                   handleAssignedToValue(event.target.value);
+                  requestDetails.assignedGroup = assigneeDetails.assignedGroup;
+                  requestDetails.assignedTo = assigneeDetails.assignedTo;
+                  requestDetails.assignedToFirstName = assigneeDetails.assignedToFirstName;
+                  requestDetails.assignedToLastName = assigneeDetails.assignedToLastName;
+                  requestDetails.assignedToName = assigneeDetails.assignedToName
                 } else {
                   toast.error(
                     "Temporarily unable to save the assignee. Please try again in a few minutes.",
@@ -147,7 +156,7 @@ const FOIRequestHeader = React.memo(
               })
             )
           }
-        }
+    }
 
     const status = getStatus({ headerValue, requestDetails });
 
@@ -170,15 +179,64 @@ const FOIRequestHeader = React.memo(
     }
     const ministryAssignedTo = getMinistryAssignedTo();
     const watcherList = assignedToList.filter(assignedTo => assignedTo.type === 'iao');
+
+    const isIAORestrictedFileManager = () => {
+      return userDetail?.role?.includes("IAORestrictedFilesManager");
+    }
+
+    const isRestricted = () => {
+      if(ministryId)
+        return requestDetails?.iaorestricteddetails?.isrestricted
+      else
+        return requestDetails?.isiaorestricted
+    }
+    
     return (
+      <>
       <div className="foi-request-review-header-row1">
-        <div className="foi-request-review-header-col1">
           <div className="foi-request-review-header-col1-row">
             <Link href="#" onClick={preventDefault}>
               <h3 className="foi-review-request-text">{headerText}</h3>
             </Link>
           </div>
-          {window.location.href.indexOf(FOI_COMPONENT_CONSTANTS.ADDREQUEST) ===
+          <div className="foi-assigned-to-container">
+            <div className="foi-assigned-to-inner-container">
+              <TextField
+                id="assignedTo"
+                label={showMinistryAssignedTo ? "IAO Assigned To" : "Assigned To"}
+                inputProps={{ "aria-labelledby": "assignedTo-label"}}
+                InputLabelProps={{ shrink: true }}
+                select
+                value={selectedAssignedTo}
+                onChange={saveAssigneeDetails}
+                input={<Input />}
+                variant="outlined"
+                fullWidth
+                required
+                disabled={disableInput}
+                error={selectedAssignedTo.toLowerCase().includes("unassigned")}
+              >
+                {menuItems}
+              </TextField>
+            </div>
+
+            {showMinistryAssignedTo && (
+              <>
+              <TextField
+                  id="ministryAssignedTotxt"
+                  label="Ministry Assigned To"
+                  InputLabelProps={{ shrink: true }}
+                  value={ministryAssignedTo}
+                  variant="outlined"
+                  fullWidth
+                  disabled={true}
+                />
+              </>
+            )}
+          </div>
+      </div>
+      <div className="foi-request-review-header-row1">
+        {window.location.href.indexOf(FOI_COMPONENT_CONSTANTS.ADDREQUEST) ===
             -1 && (
             <div
               className="foi-request-review-header-col1-row"
@@ -193,44 +251,15 @@ const FOIRequestHeader = React.memo(
               />
             </div>
           )}
-        </div>
-
-        <div className="foi-assigned-to-container">
-          <div className="foi-assigned-to-inner-container">
-            <TextField
-              id="assignedTo"
-              label={showMinistryAssignedTo ? "IAO Assigned To" : "Assigned To"}
-              inputProps={{ "aria-labelledby": "assignedTo-label"}}
-              InputLabelProps={{ shrink: true }}
-              select
-              value={selectedAssignedTo}
-              onChange={saveAssigneeDetails}
-              input={<Input />}
-              variant="outlined"
-              fullWidth
-              required
-              disabled={disableInput}
-              error={selectedAssignedTo.toLowerCase().includes("unassigned")}
-            >
-              {menuItems}
-            </TextField>
-          </div>
-
-          {showMinistryAssignedTo && (
-            <>
-            <TextField
-                id="ministryAssignedTotxt"
-                label="Ministry Assigned To"
-                InputLabelProps={{ shrink: true }}
-                value={ministryAssignedTo}
-                variant="outlined"
-                fullWidth
-                disabled={true}
-              />
-            </>
-          )}
-        </div>
+        {!isAddRequest && status.toLowerCase() !== StateEnum.unopened.name.toLowerCase() && (isRequestWatcherOrAssignee(requestWatchers,assigneeObj,userDetail?.preferred_username) || isIAORestrictedFileManager()) && 
+         <RequestRestriction 
+          isiaorestricted= {isRestricted()}
+          isIAORestrictedFileManager={isIAORestrictedFileManager()}
+          requestDetails={requestDetails}
+          />
+        }
       </div>
+      </>
     );
   }
 );

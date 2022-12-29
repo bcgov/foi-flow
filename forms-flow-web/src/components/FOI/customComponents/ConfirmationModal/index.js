@@ -61,7 +61,7 @@ export default function ConfirmationModal({requestId, openModal, handleModal, st
     const selectedMinistries = saveRequestObject?.selectedMinistries?.map(ministry => ministry.code);
     const updatedProcessingTeamList = getProcessingTeams(processingTeamList, selectedMinistries);
     const assignedTo= getAssignedTo(saveRequestObject);
-    const updatedAssignedTo = getUpdatedAssignedTo(assignedTo, updatedProcessingTeamList, state, saveRequestObject?.requestType)
+    const updatedAssignedTo = getUpdatedAssignedTo(assignedTo, updatedProcessingTeamList, state, saveRequestObject?.requestType, saveRequestObject?.isiaorestricted)
     const ministryGroup = getMinistryGroup(saveRequestObject);
     const selectedMinistry = getSelectedMinistry(saveRequestObject, ministryGroup);
     const selectedMinistryAssignedTo = getSelectedMinistryAssignedTo(saveRequestObject, selectedMinistry);
@@ -128,7 +128,7 @@ export default function ConfirmationModal({requestId, openModal, handleModal, st
             && (!isAnyAmountPaid && state.toLowerCase() === StateEnum.review.name.toLowerCase() && (saveRequestObject.requeststatusid === StateEnum.callforrecords.id ||
               saveRequestObject.requeststatusid === StateEnum.harms.id)
             || (state.toLowerCase() === StateEnum.response.name.toLowerCase() && saveRequestObject.requeststatusid === StateEnum.signoff.id)
-            || (state.toLowerCase() === StateEnum.onhold.name.toLowerCase() && saveRequestObject.requeststatusid === StateEnum.feeassessed.id && 
+            || (state.toLowerCase() === StateEnum.onhold.name.toLowerCase() && (saveRequestObject.requeststatusid === StateEnum.feeassessed.id || saveRequestObject.requeststatusid === StateEnum.response.id) && 
               saveRequestObject.email)
           )
     }

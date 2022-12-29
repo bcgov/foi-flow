@@ -1,22 +1,23 @@
-name: Forms Flow Web CI
+name: Forms-Flow-AI-Web CI
 
 
 on:
   pull_request:
     branches:
-      - test-marshal
+      - dev
+      - main
       - dev-marshal
+      - test-marshal
     paths:
-      - "forms-flow-web/**"
-
+      - "apps/forms-flow-ai/forms-flow-ai-web/**"
 
 defaults:
   run:
     shell: bash
-    working-directory: ./forms-flow-web
+    working-directory: ./apps/forms-flow-ai/forms-flow-ai-web
 
 jobs:
-  forms-flow-web-docker-build-check:
+  forms-flow-ai-web-docker-build-check:
     runs-on: ubuntu-20.04
     name: Build dockerfile to ensure it works
 
