@@ -7,8 +7,7 @@ import { Container } from "@material-ui/core";
 
 const Footer = React.memo(() => {
   return (
-    <footer className="footerstyle">
-      <div role="contentinfo" aria-label="footer" id="footer">
+    <footer className="footerstyle" role="contentinfo" aria-label="footer" id="footer">
         <Navbar collapseOnSelect fixed="bottom" expand="sm" bg="#036" variant="dark" style={{ borderTop: "2px solid #fcba19" }} className="foi-footer-nav">
           <Container className="foiContainer">
             <Nav className="ml-auto">
@@ -58,7 +57,6 @@ const Footer = React.memo(() => {
             </Nav>
           </Container>
         </Navbar>
-      </div>
     </footer>
   );
 });
