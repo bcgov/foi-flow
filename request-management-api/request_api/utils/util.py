@@ -30,6 +30,7 @@ import jwt
 import os
 from request_api.utils.enums import MinistryTeamWithKeycloackGroup, ProcessingTeamWithKeycloackGroup
 from request_api.services.rawrequestservice import rawrequestservice
+from request_api.models.FOIRequestWatchers import  FOIRequestWatcher
 
 
 def cors_preflight(methods):
@@ -109,10 +110,12 @@ def str_to_bool(s):
 
 def canrestictdata(requestid,assignee,isrestricted,israwrequest):
 
-    _isawatcher = false
+    _isawatcher = False
     currentuser = AuthHelper.getuserid()
     if israwrequest :
         _isawatcher = rawrequestservice().israwrequestwatcher(requestid,currentuser)
+    else:
+        _isawatcher = FOIRequestWatcher.isaiaoministryrequestwatcher(requestid,currentuser)
 
     isiaorestrictedfilemanager = AuthHelper.isiaorestrictedfilemanager()
     print('Current user is {0} , is a watcher: {1} and is file manager {2} '.format(currentuser,_isawatcher,isiaorestrictedfilemanager))

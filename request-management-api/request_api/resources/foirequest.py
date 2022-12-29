@@ -21,7 +21,7 @@ from flask_cors import cross_origin
 from request_api.auth import auth, AuthHelper
 from request_api.services.eventservice import eventservice
 from request_api.tracer import Tracer
-from request_api.utils.util import  cors_preflight, allowedorigins, getrequiredmemberships,str_to_bool
+from request_api.utils.util import  cors_preflight, allowedorigins, getrequiredmemberships,str_to_bool,canrestictdata
 from request_api.exceptions import BusinessException
 from request_api.services.requestservice import requestservice
 from request_api.services.rawrequestservice import rawrequestservice
@@ -55,6 +55,11 @@ class FOIRequest(Resource):
             statuscode = 200
             if (AuthHelper.getusertype() == "iao") and (usertype is None or (usertype == "iao")):
                 jsondata = requestservice().getrequest(foirequestid,foiministryrequestid)
+                assignee = jsondata['assignedTo']
+                isrestricted = jsondata['iaorestricteddetails']['isrestricted'] if (jsondata['iaorestricteddetails'] and jsondata['iaorestricteddetails']['isrestricted']) is not None else False
+                if(canrestictdata(foiministryrequestid,assignee,isrestricted,False)):
+                    jsondata = {}
+                    statuscode = 401
             elif  usertype is not None and usertype == "ministry" and AuthHelper.getusertype() == "ministry":
                 jsondata = requestservice().getrequestdetailsforministry(foirequestid,foiministryrequestid,AuthHelper.getministrygroups())
             else:
