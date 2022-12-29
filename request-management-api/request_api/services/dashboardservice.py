@@ -79,6 +79,8 @@ class dashboardservice:
 
                 isawatcher = FOIRawRequestWatcher.isawatcher(request.id,userid)                                
                 if request.isiaorestricted == True and (request.assignedTo == userid or isawatcher or  AuthHelper.isiaorestrictedfilemanager()):
+                    unopenrequest.update({'lastName': 'Restricted'})
+                    unopenrequest.update({'firstName': 'Request'})
                     requestqueue.append(unopenrequest)
                 
                 if (request.isiaorestricted == False or request.isiaorestricted == None):
@@ -95,6 +97,8 @@ class dashboardservice:
 
                 isaiaoministryrequestwatcher = FOIRequestWatcher.isaiaoministryrequestwatcher(request.ministryrequestid,userid)
                 if restrictedrequest['isrestricted'] == True and (request.assignedTo == userid or isaiaoministryrequestwatcher):
+                    _openrequest.update({'lastName': 'Restricted'})
+                    _openrequest.update({'firstName': 'Request'})
                     requestqueue.append(_openrequest)
 
                 if restrictedrequest['isrestricted'] == False or restrictedrequest['isrestricted']  == None:
