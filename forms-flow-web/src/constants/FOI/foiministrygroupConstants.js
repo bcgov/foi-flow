@@ -1,5 +1,6 @@
 const MINISTRYGROUPS = {
     AEST : "AEST Ministry Team",
+    PSE : "PSE Ministry Team",
     AGR : "AGR Ministry Team",
     BRD : "BRD Ministry Team",
     CAS : "CAS Ministry Team",
