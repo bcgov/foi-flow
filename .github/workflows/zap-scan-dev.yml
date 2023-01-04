@@ -1,0 +1,48 @@
+name: Zap Scanning
+
+on:
+  push:
+    branches:
+      - dev
+      - dev-ac-1398 #testing purpose
+    
+  workflow_dispatch:
+    inputs:
+      environment:
+        type: choice
+        description: Target environment to deploy latest changes
+        default: "dev"
+        required: true
+        # options:
+        # - dev
+        # - test
+        # - prod
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  zap_scan_frontend:
+    runs-on: ubuntu-latest
+    name: Scan the epd-Frontend 
+    steps:
+      - name: ZAP Scan
+        uses: zaproxy/action-full-scan@v0.4.0
+        with:
+          allow_issue_writing: false
+          token: ${{ secrets.GITHUB_TOKEN }}
+          issue_title: 'ZAP Scan Report'
+          target: 'https://dev.foirequests.gov.bc.ca/'
+
+  zap_scan_request_management:
+    runs-on: ubuntu-latest
+    name: Scan the epd-backend-applications
+    steps:
+      - name: ZAP Scan
+        uses: zaproxy/action-api-scan@v0.2.0
+        with:
+          allow_issue_writing: false
+          token: ${{ secrets.GITHUB_TOKEN }}
+          issue_title: 'ZAP Scan Report'
+          target: 'https://request-management-api-dev.apps.silver.devops.gov.bc.ca/'
