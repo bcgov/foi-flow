@@ -33,7 +33,7 @@ jobs:
           allow_issue_writing: false
           token: ${{ secrets.GITHUB_TOKEN }}
           issue_title: 'ZAP Scan Report'
-          target: 'https://dev.foirequests.gov.bc.ca/'
+          target: 'https://dev-marshal-foirequest.apps.silver.devops.gov.bc.ca/'
 
   zap_scan_request_management:
     runs-on: ubuntu-latest
@@ -45,4 +45,4 @@ jobs:
           allow_issue_writing: false
           token: ${{ secrets.GITHUB_TOKEN }}
           issue_title: 'ZAP Scan Report'
-          target: 'https://request-management-api-dev.apps.silver.devops.gov.bc.ca/'
+          target: 'https://request-management-api-002-dev.apps.silver.devops.gov.bc.ca/'
