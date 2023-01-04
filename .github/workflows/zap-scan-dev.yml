@@ -25,7 +25,7 @@ concurrency:
 jobs:
   zap_scan_frontend:
     runs-on: ubuntu-latest
-    name: Scan the epd-Frontend 
+    name: Scan the frontend
     steps:
       - name: ZAP Scan
         uses: zaproxy/action-full-scan@v0.4.0
@@ -37,7 +37,7 @@ jobs:
 
   zap_scan_request_management:
     runs-on: ubuntu-latest
-    name: Scan the epd-backend-applications
+    name: Scan the request management api
     steps:
       - name: ZAP Scan
         uses: zaproxy/action-api-scan@v0.2.0
