@@ -35,8 +35,8 @@ import InputBase from "@mui/material/InputBase";
 import Paper from "@mui/material/Paper";
 import { toast } from "react-toastify";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCheckCircle, faTimesCircle  } from '@fortawesome/free-regular-svg-icons';
-import {faSpinner } from '@fortawesome/free-solid-svg-icons';
+import { faCheckCircle, faClone } from '@fortawesome/free-regular-svg-icons';
+import {faSpinner, faExclamationCircle } from '@fortawesome/free-solid-svg-icons';
 
 
 const useStyles = makeStyles((_theme) => ({
@@ -458,16 +458,16 @@ export const RecordsLog = ({
             >
              <Grid container spacing={2} className={classes.reportText}>
                 <Grid item xs={3}>
-                  <span>Deduplicated Files:</span>
+                  <span>Files Uploaded:</span>
                   <span className='number-spacing'>{recordsObj.dedupedfiles}</span>
                 </Grid>
                 <Grid item xs={3}>
-                  <span>Files Removed:</span>
+                  <span>Deduplicated Files:</span>
                   <span className='number-spacing'>{recordsObj.removedfiles}</span>
                 </Grid>
                 <Grid item xs={3}>
                   <span>Files Converted to PDF:</span>
-                  <span className='number-spacing'>0</span>
+                  <span className='number-spacing'>{recordsObj.convertedfiles}</span>
 
                 </Grid>
                 <Grid item xs={3} direction="row-reverse">
@@ -697,8 +697,10 @@ const Attachment = React.memo(({indexValue, record, handlePopupButtonClick, getF
         alignItems="flex-start"
       >
         <Grid item xs={6}>
-            { record.isduplicate ?
-              <FontAwesomeIcon icon={faTimesCircle} size='2x' color='#A0192F' className={classes.statusIcons}/>:
+            { record.failed ?
+              <FontAwesomeIcon icon={faExclamationCircle} size='2x' color='#A0192F' className={classes.statusIcons}/>:
+              record.isduplicate ?
+              <FontAwesomeIcon icon={faClone} size='2x' color='#FF873D' className={classes.statusIcons}/>:
               record.isdeduplicated ?
               <FontAwesomeIcon icon={faCheckCircle} size='2x' color='#1B8103' className={classes.statusIcons}/>: 
               <FontAwesomeIcon icon={faSpinner} size='2x' color='#FAA915' className={classes.statusIcons}/>
@@ -711,6 +713,8 @@ const Attachment = React.memo(({indexValue, record, handlePopupButtonClick, getF
             alignItems="flex-end"
             className={classes.recordStatus}>
             { 
+              record.failed ?
+              <span>Error during {record.failed}</span>:
               record.isduplicate ?
               <span>Duplicate of {record.duplicateof}</span>:
               record.isdeduplicated ?
