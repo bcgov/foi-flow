@@ -8,7 +8,7 @@ objects:
   apiVersion: batch/v1
   metadata:
     name: backup-to-s3
-    namespace: d7abee-test
+    namespace: ****-test
   spec:
     successfulJobsHistoryLimit: 1
     failedJobsHistoryLimit: 1
@@ -23,7 +23,7 @@ objects:
                   claimName: foi-bkup-shared-pvc
             containers:
               - name: backup-to-s3
-                image: image-registry.openshift-image-registry.svc:5000/d7abee-tools/backup-to-s3:latest
+                image: image-registry.openshift-image-registry.svc:5000/****-tools/backup-to-s3:latest
                 volumeMounts:
                   - name: foi-bkup-shared-pvc
                     mountPath: /backups/
