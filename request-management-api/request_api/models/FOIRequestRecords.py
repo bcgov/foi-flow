@@ -48,8 +48,8 @@ class FOIRequestRecord(db.Model):
 								  from public."FOIRequestRecords"
 								  group by recordid)
 								  fr2  on fr1.recordid = fr2.recordid and fr1.version = fr2.max
-                            where fr1.foirequestid = 1
-							and fr1.ministryrequestid = 1 and isactive = true
+                            where fr1.foirequestid = :foirequestid
+							and fr1.ministryrequestid = :ministryrequestid and isactive = true
                             order by recordid desc, version desc
                     """
 
@@ -80,7 +80,7 @@ class FOIRequestRecord(db.Model):
 						join (select max(version), recordid
 								  from public."FOIRequestRecords"
 								  group by recordid) r2 on r2.max = r.version and r2.recordid = r.recordid
-                        where ministryrequestid = 1 and isactive = true  """
+                        where ministryrequestid = :ministryrequestid and isactive = true  """
             rs = db.session.execute(text(sql), {'ministryrequestid': ministryrequestid})
             for row in rs:
                 batchcount = row["batch_count"]
