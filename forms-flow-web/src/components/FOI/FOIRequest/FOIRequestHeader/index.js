@@ -18,6 +18,7 @@ import {
 import { toast } from "react-toastify";
 import _ from 'lodash';
 import RequestRestriction from "../../customComponents/RequestRestriction";
+import ConfirmModal from "../../customComponents/ConfirmModal";
 
 const useStyles = makeStyles((theme) => ({
     formControl: {
@@ -56,7 +57,7 @@ const FOIRequestHeader = React.memo(
     const assignedToList = useSelector(
       (state) => state.foiRequests.foiAssignedToList
     );
-   
+    let isIAORestrictedRequest = false;
     let assigneeDetails = _.pick(requestDetails, ['assignedGroup', 'assignedTo','assignedToFirstName','assignedToLastName',
     'assignedministrygroup','assignedministryperson','assignedministrypersonFirstName','assignedministrypersonLastName']);
     const [assigneeObj, setAssigneeObj] = useState(assigneeDetails);
@@ -68,9 +69,9 @@ const FOIRequestHeader = React.memo(
         ? calculateDaysRemaining(requestDetails.cfrDueDate)
         : "";
       handlestatusudpate(_daysRemaining, _status, _cfrDaysRemaining);
-     
+      isIAORestrictedRequest = isRestricted();
+      
     }, [requestDetails, handleAssignedToInitialValue, handlestatusudpate]);
-
     useEffect(() => {
       setAssignedTo(getAssignedTo(assigneeObj));
     }, [assigneeObj]);
@@ -82,8 +83,11 @@ const FOIRequestHeader = React.memo(
     const preventDefault = (event) => event.preventDefault();
 
     const requestWatchers = useSelector((state) => state.foiRequests.foiWatcherList);
-
-
+    const [showModal, setShowModal] = useState(false);
+    const [modalMessage, setModalMessage] = useState(<></>);    
+    const [modalDescription, setModalDescription] = useState(<></>);
+    const [assigneeVal, setAssigneeVal]= useState("");
+    const [assigneeName,setAssigneeName] = useState("");
 
     useEffect(() => {
       // handle case where assigned user was removed from group
@@ -98,64 +102,85 @@ const FOIRequestHeader = React.memo(
 
     useEffect(() => {
       setMenuItems(
-        getMenuItems({ classes, assignedToList, selectedAssignedTo })
+        getMenuItems({ classes, assignedToList, selectedAssignedTo, isIAORestrictedRequest })
       );
     }, [selectedAssignedTo, assignedToList]);
+
+
+    const handleAssigneeUpdate = (event) => {
+      console.log("Event:", event);
+      setAssigneeVal(event?.target?.value);
+      setAssigneeName(event?.target?.name);
+      console.log("assigneeVal inside handleAssigneeUpdate:",assigneeVal);
+      console.log("assigneeName inside handleAssigneeUpdate:",assigneeName);
+
+      if(isIAORestrictedRequest){
+        setModalMessage(<span>Are you sure you want to assign <b>{assigneeName}</b> to this request?</span>);
+        setModalDescription(<span><i>This will allow them to have access to this restricted request content.</i></span>);
+        setShowModal(true);
+      }
+      else
+        saveAssigneeDetails(assigneeVal, assigneeName);
+    }
     
-    const saveAssigneeDetails = (event) => {
-      setAssignedTo(event.target.value);
-          if (isAddRequest) {
-            //event bubble up - to validate required fields
-            handleAssignedToValue(event.target.value);
-            createSaveRequestObject(
-              FOI_COMPONENT_CONSTANTS.ASSIGNED_TO,
-              event.target.value,
-              event.target.name
-            );
-          } else {
-            setAssigneeObj(createAssigneeDetails(event.target.value, event.target.name));  
-            assigneeDetails = createAssigneeDetails(event.target.value, event.target.name);
-            dispatch(
-              saveAssignee(assigneeDetails, requestId, ministryId, false, (err, _res) => {
-                if(!err) {
-                  toast.success("Assignee has been saved successfully.", {
-                    position: "top-right",
-                    autoClose: 3000,
-                    hideProgressBar: true,
-                    closeOnClick: true,
-                    pauseOnHover: true,
-                    draggable: true,
-                    progress: undefined,
-                  });
-                  createSaveRequestObject(
-                    FOI_COMPONENT_CONSTANTS.ASSIGNED_TO,
-                    event.target.value,
-                    event.target.name
-                  );
-                  //event bubble up - to validate required fields
-                  handleAssignedToValue(event.target.value);
-                  requestDetails.assignedGroup = assigneeDetails.assignedGroup;
-                  requestDetails.assignedTo = assigneeDetails.assignedTo;
-                  requestDetails.assignedToFirstName = assigneeDetails.assignedToFirstName;
-                  requestDetails.assignedToLastName = assigneeDetails.assignedToLastName;
-                  requestDetails.assignedToName = assigneeDetails.assignedToName
-                } else {
-                  toast.error(
-                    "Temporarily unable to save the assignee. Please try again in a few minutes.",
-                    {
-                      position: "top-right",
-                      autoClose: 3000,
-                      hideProgressBar: true,
-                      closeOnClick: true,
-                      pauseOnHover: true,
-                      draggable: true,
-                      progress: undefined,
-                    }
-                  );
+    const saveAssigneeDetails = (assigneeVal, assigneeName) => {
+      console.log("assigneeVal",assigneeVal);
+      console.log("assigneeName",assigneeName);
+
+      setAssignedTo(assigneeVal);
+      if (isAddRequest) {
+        //event bubble up - to validate required fields
+        handleAssignedToValue(assigneeVal);
+        createSaveRequestObject(
+          FOI_COMPONENT_CONSTANTS.ASSIGNED_TO,
+          assigneeVal,
+          assigneeName
+        );
+      } else {
+        setAssigneeObj(createAssigneeDetails(assigneeVal, assigneeName));  
+        assigneeDetails = createAssigneeDetails(assigneeVal, assigneeName);
+        dispatch(
+          saveAssignee(assigneeDetails, requestId, ministryId, false, (err, _res) => {
+            if(!err) {
+              toast.success("Assignee has been saved successfully.", {
+                position: "top-right",
+                autoClose: 3000,
+                hideProgressBar: true,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+              });
+              createSaveRequestObject(
+                FOI_COMPONENT_CONSTANTS.ASSIGNED_TO,
+                assigneeVal,
+                assigneeName
+              );
+              //event bubble up - to validate required fields
+              handleAssignedToValue(assigneeVal);
+              requestDetails.assignedGroup = assigneeDetails.assignedGroup;
+              requestDetails.assignedTo = assigneeDetails.assignedTo;
+              requestDetails.assignedToFirstName = assigneeDetails.assignedToFirstName;
+              requestDetails.assignedToLastName = assigneeDetails.assignedToLastName;
+              requestDetails.assignedToName = assigneeDetails.assignedToName
+            } else {
+              toast.error(
+                "Temporarily unable to save the assignee. Please try again in a few minutes.",
+                {
+                  position: "top-right",
+                  autoClose: 3000,
+                  hideProgressBar: true,
+                  closeOnClick: true,
+                  pauseOnHover: true,
+                  draggable: true,
+                  progress: undefined,
                 }
-              })
-            )
-          }
+              );
+            }
+          })
+        )
+      }
+      
     }
 
     const status = getStatus({ headerValue, requestDetails });
@@ -185,10 +210,11 @@ const FOIRequestHeader = React.memo(
     }
 
     const isRestricted = () => {
-      if(ministryId)
-        return requestDetails?.iaorestricteddetails?.isrestricted
+      if(ministryId){
+        return requestDetails?.iaorestricteddetails?.isrestricted;
+      } 
       else
-        return requestDetails?.isiaorestricted
+        return requestDetails?.isiaorestricted;
     }
     
     return (
@@ -208,7 +234,7 @@ const FOIRequestHeader = React.memo(
                 InputLabelProps={{ shrink: true }}
                 select
                 value={selectedAssignedTo}
-                onChange={saveAssigneeDetails}
+                onChange={handleAssigneeUpdate}
                 input={<Input />}
                 variant="outlined"
                 fullWidth
@@ -259,8 +285,17 @@ const FOIRequestHeader = React.memo(
           />
         }
       </div>
+
+      <ConfirmModal 
+          modalMessage= {modalMessage}
+          modalDescription= {modalDescription} 
+          showModal={showModal}
+          saveAssigneeDetails = {saveAssigneeDetails}
+          assigneeVal={assigneeVal}
+          assigneeName ={assigneeName} />
       </>
     );
+    
   }
 );
 

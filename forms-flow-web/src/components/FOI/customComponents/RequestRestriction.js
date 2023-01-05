@@ -129,7 +129,7 @@ const RequestRestriction= ({isiaorestricted, isIAORestrictedFileManager, request
                     setRestrictionType("unrestricted");
             }
         }))
-      };
+    };
 
 
     return (  

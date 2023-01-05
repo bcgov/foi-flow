@@ -185,7 +185,7 @@ export const displayIcon = (params) => {
 
 export const displayHeaderIcon = (params) => {
   return (
-    <span className="foi-dashboard-restricted"><FontAwesomeIcon icon={faTimes} size='2x' className='restrict-icon' />
+    <span className="foi-dashboard-restricted"><FontAwesomeIcon icon={faFlag} size='2x' className='restrict-icon' />
     </span> 
   );
 };
