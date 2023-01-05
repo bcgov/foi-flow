@@ -66,6 +66,7 @@ const initialState = {
   foiOpenedMinistries: [],
   resumeDefaultSorting: false,
   isCorrespondenceLoading: true,
+  foiSubjectCodeList: [],
 };
 
 const foiRequests = (state = initialState, action) => {
@@ -166,6 +167,8 @@ const foiRequests = (state = initialState, action) => {
       return { ...state, resumeDefaultSorting: action.payload };
     case FOI_ACTION_CONSTANTS.IS_CORRESPONDENCE_LOADING:
       return { ...state, isCorrespondenceLoading: action.payload };
+    case FOI_ACTION_CONSTANTS.FOI_SUBJECT_CODELIST:
+      return { ...state, foiSubjectCodeList: action.payload };
     default:
       return state;
   }

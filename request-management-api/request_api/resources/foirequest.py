@@ -80,9 +80,9 @@ class FOIRequests(Resource):
     def post():
         """ POST Method for capturing FOI requests before processing"""
         try:
-            request_json = request.get_json() 
+            request_json = request.get_json()
             foirequestschema = FOIRequestWrapperSchema().load(request_json)
-            print("test CI/CD")      
+            
             assignedgroup = request_json['assignedGroup'] if 'assignedGroup' in foirequestschema  else None
             assignedto = request_json['assignedTo'] if 'assignedTo' in foirequestschema  else None
             assignedtofirstname = request_json["assignedToFirstName"] if request_json.get("assignedToFirstName") != None else None
@@ -93,12 +93,13 @@ class FOIRequests(Resource):
 
             eventservice().posteventsync(request_json['id'],"rawrequest",AuthHelper.getuserid(), AuthHelper.getusername(), AuthHelper.isministrymember())
 
-            if rawresult.success == True:   
+            if rawresult.success == True:
                 result = requestservice().saverequest(foirequestschema,AuthHelper.getuserid())
                 if result.success == True:
                     requestservice().copywatchers(request_json['id'],result.args[0],AuthHelper.getuserid())
                     requestservice().copycomments(request_json['id'],result.args[0],AuthHelper.getuserid())
                     requestservice().copydocuments(request_json['id'],result.args[0],AuthHelper.getuserid())
+                    requestservice().copysubjectcode(request_json['subjectCode'],result.args[0],AuthHelper.getuserid())
                     requestservice().postopeneventtoworkflow(result.identifier, request_json,result.args[0])
             return {'status': result.success, 'message':result.message,'id':result.identifier, 'ministryRequests': result.args[0]} , 200
         except ValidationError as err:

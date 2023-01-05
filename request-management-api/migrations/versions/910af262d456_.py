@@ -98,6 +98,7 @@ def upgrade():
             {'name':'Speculation Tax','description':'Speculation Tax','isaxissubjectcode':True,'isactive':True},
             {'name':'Student Loan or Educational Records','description':'Student Loan or Educational Records','isaxissubjectcode':True,'isactive':True},
             {'name':'Trans Mountain (Kinder Morgan)','description':'Trans Mountain (Kinder Morgan)','isaxissubjectcode':True,'isactive':True},
+            {'name':'Transition Binders','description':'Transition Binders','isaxissubjectcode':True,'isactive':True},
             {'name':'Undetermined','description':'Undetermined','isaxissubjectcode':True,'isactive':True},
             {'name':'Wildfires','description':'Wildfires','isaxissubjectcode':True,'isactive':True},
         ]
@@ -116,7 +117,6 @@ def upgrade():
     sa.ForeignKeyConstraint(['foiministryrequestid','foiministryrequestversion'], ['FOIMinistryRequests.foiministryrequestid', 'FOIMinistryRequests.version'], ),
     sa.PrimaryKeyConstraint('foiministrysubjectcodeid')
     )
-
 
 def downgrade():
     op.drop_table('FOIMinistryRequestSubjectCodes')

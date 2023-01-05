@@ -20,6 +20,12 @@ class SubjectCode(db.Model):
         subjectcode_schema = SubjectCodeSchema()
         query = db.session.query(SubjectCode).filter_by(name=subjectcode).first()
         return subjectcode_schema.dump(query)
+    
+    @classmethod
+    def getsubjectcodebyid(cls,subjectcodeid):
+        subjectcode_schema = SubjectCodeSchema()
+        query = db.session.query(SubjectCode).filter_by(subjectcodeid=subjectcodeid).first()
+        return subjectcode_schema.dump(query)
 
 class SubjectCodeSchema(ma.Schema):
     class Meta:

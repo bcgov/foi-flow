@@ -117,6 +117,9 @@ namespace MCS.FOI.AXISIntegration.DataModels
         [DataMember(Name = "requestPageCount")]
         public int RequestPageCount { get; set; }
 
+        [DataMember(Name = "subjectCode")]
+        public string SubjectCode { get; set; }
+
         [DataMember(Name = "selectedMinistries")]
         public List<Ministry> SelectedMinistries { get; set; }
         

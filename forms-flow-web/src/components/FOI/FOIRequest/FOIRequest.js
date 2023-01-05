@@ -22,6 +22,7 @@ import {
   fetchFOIReceivedModeList,
   fetchClosingReasonList,
   fetchFOIMinistryAssignedToList,
+  fetchFOISubjectCodeList,
 } from "../../../apiManager/services/FOI/foiMasterDataServices";
 import {
   fetchFOIRequestDetailsWrapper,
@@ -217,6 +218,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
     dispatch(fetchFOICategoryList());    
     dispatch(fetchFOIReceivedModeList());
     dispatch(fetchFOIDeliveryModeList());
+    dispatch(fetchFOISubjectCodeList());
     dispatch(fetchClosingReasonList());
 
     if (bcgovcode) dispatch(fetchFOIMinistryAssignedToList(bcgovcode));
