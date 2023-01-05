@@ -10,6 +10,7 @@ const MINISTRYGROUPS = {
     DAS : "DAS Ministry Team",
     EAO : "EAO Ministry Team",
     EDU : "EDU Ministry Team",
+    ECC : "ECC Ministry Team",
     EMBC : "EMBC Ministry Team",
     EMLI : "EMLI Ministry Team",
     FIN : "FIN Ministry Team",
