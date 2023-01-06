@@ -13,7 +13,7 @@ import {
   import UserService from "../../../services/UserService";
   import { replaceUrl } from "../../../helper/FOI/helper";
 
- export const fetchFOIRecords = (requestId, ministryId, ...rest) => {
+export const fetchFOIRecords = (requestId, ministryId, ...rest) => {
   if (!ministryId) {
     return () => {};
   }
@@ -45,7 +45,7 @@ import {
   };
 };
 
-  export const saveFOIRecords = (requestId, ministryId, data, ...rest) => {
+export const saveFOIRecords = (requestId, ministryId, data, ...rest) => {
     let apiUrl = replaceUrl(replaceUrl(
       API.FOI_GET_RECORDS,
      "<ministryrequestid>", ministryId),
@@ -53,22 +53,37 @@ import {
     return (dispatch) => {
       postRecord(dispatch, apiUrl, data, "Error in posting records", rest);
     };
-  };
+};
 
-  const postRecord = (dispatch, apiUrl, data, errorMessage, rest) => {
-    const done = fnDone(rest);
-    httpPOSTRequest(apiUrl, data)
-        .then((res) => {
-          if (res.data) {
-            dispatch(setFOIAttachmentListLoader(false));
-            done(null, res.data);
-          } else {
-            dispatch(serviceActionError(res));
-            throw new Error(errorMessage);
-          }
-        })
-        .catch((error) => {
-          dispatch(serviceActionError(error));
-          dispatch(setFOILoader(false));
-        });
+export const deleteFOIRecords = (requestId, ministryId, recordId, ...rest) => {
+  if (!ministryId) {
+    return () => {};
+  }
+  const done = fnDone(rest);
+  let apiUrl = replaceUrl(replaceUrl(replaceUrl(
+    API.FOI_DELETE_RECORDS,
+    "<ministryrequestid>", ministryId),
+    "<requestid>", requestId),
+    "<recordid>", recordId);
+    return (dispatch) => {
+      postRecord(dispatch, apiUrl, {}, "Error in deleting records", rest);
+    };
+};
+
+const postRecord = (dispatch, apiUrl, data, errorMessage, rest) => {
+  const done = fnDone(rest);
+  httpPOSTRequest(apiUrl, data)
+      .then((res) => {
+        if (res.data) {
+          dispatch(setFOIAttachmentListLoader(false));
+          done(null, res.data);
+        } else {
+          dispatch(serviceActionError(res));
+          throw new Error(errorMessage);
+        }
+      })
+      .catch((error) => {
+        dispatch(serviceActionError(error));
+        dispatch(setFOILoader(false));
+      });
 }

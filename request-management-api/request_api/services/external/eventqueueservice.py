@@ -2,6 +2,7 @@ import os
 from walrus import Database
 from request_api.models.default_method_result import DefaultMethodResult
 from request_api.exceptions import BusinessException
+import logging
 
 class eventqueueservice:
     """This class is reserved for integration with event queue (currently redis streams).
@@ -13,6 +14,10 @@ class eventqueueservice:
     db = Database(host=host, port=port, db=0,password=password)
 
     def add(self, streamkey, payload):
-        stream = self.db.Stream(streamkey)
-        msgid = stream.add(payload, id="*")
-        return DefaultMethodResult(True,'Added to stream',msgid)
+        try:
+            stream = self.db.Stream(streamkey)
+            msgid = stream.add(payload, id="*")
+            return DefaultMethodResult(True,'Added to stream',msgid)
+        except Exception as err:
+            logging.error("Error in contacting Redis Stream")
+            logging.error(err)

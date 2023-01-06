@@ -89,6 +89,7 @@ const API = {
   FOI_POST_S3DOCUMENT_PRESIGNEDURL:`${FOI_BASE_API_URL}/api/foiflow/oss/presigned`,
 
   FOI_GET_RECORDS:`${FOI_BASE_API_URL}/api/foirecord/<requestid>/ministryrequest/<ministryrequestid>`,
-  FOI_POST_RECORDS:`${FOI_BASE_API_URL}/api/foirecord/<requestid>/ministryrequest/<ministryrequestid>`
+  FOI_POST_RECORDS:`${FOI_BASE_API_URL}/api/foirecord/<requestid>/ministryrequest/<ministryrequestid>`,
+  FOI_DELETE_RECORDS:`${FOI_BASE_API_URL}/api/foirecord/<requestid>/ministryrequest/<ministryrequestid>/recordid/<recordid>/delete`
 };
 export default API;

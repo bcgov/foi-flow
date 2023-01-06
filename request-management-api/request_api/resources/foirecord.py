@@ -35,18 +35,18 @@ TRACER = Tracer.get_instance()
 class FOIRequestGetRecord(Resource):
     """Retrieve watchers for unopened request"""
 
-       
+
     @staticmethod
     @TRACER.trace()
     @cross_origin(origins=allowedorigins())
     @auth.require
-    def get(requestid, ministryrequestid):      
+    def get(requestid, ministryrequestid):
         try:
             result = recordservice().fetch(requestid, ministryrequestid)
             return json.dumps(result), 200
         except KeyError as err:
-            return {'status': False, 'message':err.messages}, 400        
-        except BusinessException as exception:            
+            return {'status': False, 'message':err.messages}, 400
+        except BusinessException as exception:
             return {'status': exception.status_code, 'message':exception.message}, 500
 
 @cors_preflight('POST,OPTIONS')
@@ -54,12 +54,12 @@ class FOIRequestGetRecord(Resource):
 class FOIRequestBulkCreateRecord(Resource):
     """Resource for Creating FOI records."""
 
-       
+
     @staticmethod
     @TRACER.trace()
     @cross_origin(origins=allowedorigins())
     @auth.require
-    def post(requestid, ministryrequestid):      
+    def post(requestid, ministryrequestid):
         try:
             requestjson = request.get_json()
             recordschema = FOIRequestBulkCreateRecordSchema().load(requestjson)
@@ -67,6 +67,25 @@ class FOIRequestBulkCreateRecord(Resource):
             respcode = 200 if response.success == True else 500
             return {'status': response.success, 'message':response.message,'data': response.args[0]} , respcode
         except KeyError as err:
-            return {'status': False, 'message':err.messages}, 400        
-        except BusinessException as exception:            
+            return {'status': False, 'message':err.messages}, 400
+        except BusinessException as exception:
+            return {'status': exception.status_code, 'message':exception.message}, 500
+
+@cors_preflight('POST,OPTIONS')
+@API.route('/foirecord/<requestid>/ministryrequest/<ministryrequestid>/recordid/<recordid>/delete')
+class DeleteFOIDocument(Resource):
+    """Resource for soft delete FOI requests."""
+
+
+    @staticmethod
+    @TRACER.trace()
+    @cross_origin(origins=allowedorigins())
+    @auth.require
+    def post(requestid, ministryrequestid, recordid):
+        try:
+            result = recordservice().delete(requestid, ministryrequestid, recordid, AuthHelper.getuserid())
+            return {'status': result.success, 'message':result.message,'id':result.identifier} , 200
+        except KeyError as err:
+            return {'status': False, 'message':err.messages}, 400
+        except BusinessException as exception:
             return {'status': exception.status_code, 'message':exception.message}, 500

@@ -11,7 +11,7 @@ import logging
 import json
 class FOIRequestRecord(db.Model):
     # Name of the table in our database
-    __tablename__ = 'FOIRequestRecords' 
+    __tablename__ = 'FOIRequestRecords'
     # Defining the columns
     recordid = db.Column(db.Integer, primary_key=True,autoincrement=True)
     version =db.Column(db.Integer,primary_key=True,nullable=False)
@@ -25,8 +25,9 @@ class FOIRequestRecord(db.Model):
     createdby = db.Column(db.String(120), unique=False, nullable=True)
     updated_at = db.Column(db.DateTime, nullable=True)
     updatedby = db.Column(db.String(120), unique=False, nullable=True)
+    isactive = db.Column(db.Boolean, unique=False, nullable=False,default=True)
 
- 
+
     @classmethod
     def create(cls, records):
         db.session.add_all(records)
@@ -34,21 +35,26 @@ class FOIRequestRecord(db.Model):
         _recordids = []
         for record in records:
             _recordids.append({"filename": record.filename, "recordid": record.recordid})
-        return DefaultMethodResult(True,'Records created', -1, _recordids) 
+        return DefaultMethodResult(True,'Records created', -1, _recordids)
 
     @classmethod
     def fetch(cls, foirequestid, ministryrequestid) -> DefaultMethodResult:
         records = []
         try:
-            sql =   """select distinct on (fr1.recordid) recordid, fr1.filename, fr1.s3uripath, fr1."attributes" attributes, 
-                            fr1.createdby createdby, fr1.created_at 
-                            from "FOIRequestRecords" fr1
-                            where fr1.foirequestid = :foirequestid and fr1.ministryrequestid = :ministryrequestid
+            sql =   """select distinct on (fr1.recordid) fr1.isactive, fr1.recordid, fr1.filename, fr1.s3uripath, fr1."attributes" attributes,
+                            fr1.createdby createdby, fr1.created_at
+                            from public."FOIRequestRecords" fr1
+							join (select max(version), recordid
+								  from public."FOIRequestRecords"
+								  group by recordid)
+								  fr2  on fr1.recordid = fr2.recordid and fr1.version = fr2.max
+                            where fr1.foirequestid = :foirequestid
+							and fr1.ministryrequestid = :ministryrequestid and isactive = true
                             order by recordid desc, version desc
                     """
-            
+
             rs = db.session.execute(text(sql), {'foirequestid': foirequestid, 'ministryrequestid' : ministryrequestid})
-           
+
             for row in rs:
                 records.append({"recordid": row["recordid"], "filename": row["filename"], "s3uripath": row["s3uripath"],  "attributes": row["attributes"], "createdby": row["createdby"], "created_at": row["created_at"]})
             return records
@@ -58,15 +64,23 @@ class FOIRequestRecord(db.Model):
         finally:
             db.session.close()
 
+    @classmethod
+    def getrecordbyid(cls, recordid)->DefaultMethodResult:
+        comment_schema = FOIRequestRecordSchema(many=False)
+        query = db.session.query(FOIRequestRecord).filter_by(recordid=recordid).order_by(FOIRequestRecord.version.desc()).first()
+        return comment_schema.dump(query)
 
-    @classmethod   
+    @classmethod
     def getbatchcount(cls, ministryrequestid):
         batchcount = 0
         try:
-            sql = """select count(  distinct
+            sql = """select  count(distinct
                         json_extract_path_text("attributes" ::json,'batch')) AS batch_count
-                        FROM "FOIRequestRecords"
-                        where ministryrequestid = :ministryrequestid  """
+                        FROM "FOIRequestRecords" r
+						join (select max(version), recordid
+								  from public."FOIRequestRecords"
+								  group by recordid) r2 on r2.max = r.version and r2.recordid = r.recordid
+                        where ministryrequestid = :ministryrequestid and isactive = true  """
             rs = db.session.execute(text(sql), {'ministryrequestid': ministryrequestid})
             for row in rs:
                 batchcount = row["batch_count"]
@@ -76,7 +90,7 @@ class FOIRequestRecord(db.Model):
         finally:
             db.session.close()
         return batchcount
-    
+
 class FOIRequestRecordSchema(ma.Schema):
     class Meta:
-        fields = ('recordid','version','foirequestid','ministryrequestid','ministryrequestversion','attributes','filename','s3uripath','created_at','createdby','updated_at','updatedby') 
+        fields = ('recordid','version','foirequestid','ministryrequestid','ministryrequestversion','attributes','filename','s3uripath','created_at','createdby','updated_at','updatedby')
