@@ -67,11 +67,8 @@ const RequestDescription = React.memo(({
       return "Select Subject Code (if required)"
     }
 
-    const [selectedSubjectCode, setSelectedSubjectCode] = React.useState(getSubjectCode());
-
     //updates the default values from the request description box    
     useEffect(() => {
-
       setStartDate(!!requestDetails.fromDate ? formatDate(new Date(requestDetails.fromDate)): "");
       setEndDate(!!requestDetails.toDate ? formatDate(new Date(requestDetails.toDate)): "");
       setRequestDescription(!!requestDetails.description ? requestDetails.description : "");
@@ -86,7 +83,8 @@ const RequestDescription = React.memo(({
             description: !!requestDetails.description ? requestDetails.description : "",
             isProgramAreaSelected: requestDetails?.selectedMinistries?.length === 1 && requestDetails?.selectedMinistries.some(programArea =>
               (isValidMinistryCode(programArea.code, masterProgramAreaList))),
-            ispiiredacted: ministryId ? true : !!requestDetails.ispiiredacted
+            ispiiredacted: ministryId ? true : !!requestDetails.ispiiredacted,
+            subjectCode: getSubjectCode()
         }
         handleInitialRequiredRequestDescriptionValues(descriptionObject);
     },[requestDetails, handleInitialRequiredRequestDescriptionValues])     
@@ -133,6 +131,7 @@ const RequestDescription = React.memo(({
     const [endDate, setEndDate] = React.useState(!!requestDetails.toDate ? formatDate(new Date(requestDetails.toDate)): "");
     const [requestDescriptionText, setRequestDescription] = React.useState(!!requestDetails.description ? requestDetails.description : "");
     const [isPIIRedacted, setPIIRedacted] = React.useState(ministryId ? true : !!requestDetails.ispiiredacted);
+    const [selectedSubjectCode, setSelectedSubjectCode] = React.useState(getSubjectCode());
 
     const handlePIIRedacted = (event) => {
         setPIIRedacted(event.target.checked);
@@ -177,6 +176,7 @@ const RequestDescription = React.memo(({
 
     const handleSubjectCodeChange = (e) => {
       setSelectedSubjectCode(e.target.value);
+      handleOnChangeRequiredRequestDescriptionValues(e.target.checked, FOI_COMPONENT_CONSTANTS.SUBJECT_CODE)
       createSaveRequestObject(FOI_COMPONENT_CONSTANTS.SUBJECT_CODE, e.target.value);
     }
 
