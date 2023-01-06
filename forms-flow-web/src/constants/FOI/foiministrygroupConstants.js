@@ -20,6 +20,7 @@ const MINISTRYGROUPS = {
     IIO : "IIO Ministry Team",
     IRR : "IRR Ministry Team",
     JERI : "JERI Ministry Team",
+    JED : "JED Ministry Team",
     LBR : "LBR Ministry Team",
     LDB : "LDB Ministry Team",
     LWR : "LWR Ministry Team",
