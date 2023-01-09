@@ -28,6 +28,8 @@ COPY ./${CUSTOM_SVG_DIR}/ /app/${CUSTOM_SVG_DIR}/
 
 
 RUN npm install
+#Patching for KC upgrate v7.16.x
+RUN npm install keycloak-js@20.0.2
 RUN npm run build
 
 FROM artifacts.developer.gov.bc.ca/docker-remote/nginx:1.17 as production-stage
