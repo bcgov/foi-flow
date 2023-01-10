@@ -10,17 +10,27 @@ import IconButton from '@material-ui/core/IconButton';
 import TextField from '@mui/material/TextField';
 
 
-const ConfirmModal= ({modalMessage, modalDescription, showModal, saveAssigneeDetails, assigneeVal,assigneeName}) =>{ 
+const ConfirmModal= ({
+    modalMessage,
+    modalDescription,
+    showModal,
+    saveAssigneeDetails,
+    assigneeVal,
+    assigneeName,
+    resetModal
+}) =>{ 
 
     const [modalOpen, setModalOpen] = useState(showModal);
 
     const handleSave = () => {
         setModalOpen(false);
         saveAssigneeDetails(assigneeVal,assigneeName);
+        resetModal();
     };
 
     const handleClose = () => {
         setModalOpen(false);
+        resetModal();
     };
 
     // console.log("modalMessage: ",modalMessage);
