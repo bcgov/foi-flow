@@ -195,6 +195,7 @@ export default function Watcher({
           handleWatcherUpdate(watcher);
       }
       else {
+        watcher.isactive = true;
         if(isIAORestrictedRequest) {
           setModalForCheckBox(false);
           setNewWatcherObj(watcher);
@@ -203,7 +204,6 @@ export default function Watcher({
           setShowModal(true);
         }
         else {
-          watcher.isactive = true;
           setUseraWatcher(watcher.isactive);
           handleWatcherUpdate(watcher);
         }
