@@ -10,6 +10,7 @@ on:
       - test-marshal
     paths:
       - "apps/forms-flow-ai/forms-flow-ai-web/**"
+      - "!apps/forms-flow-ai/forms-flow-ai-web/src/forms/**"
 
 defaults:
   run:
