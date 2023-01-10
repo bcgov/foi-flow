@@ -87,6 +87,7 @@ const FOIRequestHeader = React.memo(
     const [modalDescription, setModalDescription] = useState(<></>);
     const [assigneeVal, setAssigneeVal]= useState("");
     const [assigneeName,setAssigneeName] = useState("");
+    const [isLoaded, setIsLoaded] = useState(false);
 
     useEffect(() => {
       // handle case where assigned user was removed from group
@@ -104,7 +105,6 @@ const FOIRequestHeader = React.memo(
         getMenuItems({ classes, assignedToList, selectedAssignedTo, isIAORestrictedRequest })
       );
     }, [selectedAssignedTo, assignedToList]);
-
 
     const handleAssigneeUpdate = (event) => {
       let AssigneeValue = event?.target?.value;
@@ -219,14 +219,16 @@ const FOIRequestHeader = React.memo(
     
     return (
       <>
-      <div className="foi-request-review-header-row1">
-          <div className="foi-request-review-header-col1-row">
-            <Link href="#" onClick={preventDefault}>
-              <h3 className="foi-review-request-text">{headerText}</h3>
-            </Link>
+      <div className='row'>
+        <div className="col-lg-6">
+          <div className='axis-request-id'>
+              <Link href="#" onClick={preventDefault}>
+                <h3 className="foi-review-request-text">{headerText}</h3>
+              </Link>
           </div>
-          <div className="foi-assigned-to-container">
-            <div className="foi-assigned-to-inner-container">
+        </div>
+        <div className="col-lg-6">
+          <div className="foi-assignee-dropdown">
               <TextField
                 id="assignedTo"
                 label={showMinistryAssignedTo ? "IAO Assigned To" : "Assigned To"}
@@ -245,46 +247,53 @@ const FOIRequestHeader = React.memo(
                 {menuItems}
               </TextField>
             </div>
-
-            {showMinistryAssignedTo && (
-              <>
-              <TextField
-                  id="ministryAssignedTotxt"
-                  label="Ministry Assigned To"
-                  InputLabelProps={{ shrink: true }}
-                  value={ministryAssignedTo}
-                  variant="outlined"
-                  fullWidth
-                  disabled={true}
-                />
-              </>
-            )}
-          </div>
+        </div>
       </div>
-      <div className="foi-request-review-header-row1">
-        {window.location.href.indexOf(FOI_COMPONENT_CONSTANTS.ADDREQUEST) ===
-            -1 && (
-            <div
-              className="foi-request-review-header-col1-row"
-              style={{ marginTop: 5 + "px", display: "block" }}
-            >
-              <Watcher
-                watcherFullList={watcherList}
-                requestId={requestId}
-                ministryId={ministryId}
-                userDetail={userDetail}
-                disableInput={disableInput}
-                isIAORestrictedRequest={isIAORestrictedRequest}
-              />
-            </div>
-          )}
-        {!isAddRequest && status.toLowerCase() !== StateEnum.unopened.name.toLowerCase() && (isRequestWatcherOrAssignee(requestWatchers,assigneeObj,userDetail?.preferred_username) || isIAORestrictedFileManager()) && 
-         <RequestRestriction 
-          isiaorestricted= {isRestricted()}
-          isIAORestrictedFileManager={isIAORestrictedFileManager()}
-          requestDetails={requestDetails}
-          />
-        }
+      <div className='row'>
+        <div className="col-lg-8">
+          <div className="foi-request-review-header-col1-row">
+          {window.location.href.indexOf(FOI_COMPONENT_CONSTANTS.ADDREQUEST) ===
+              -1 && (
+              <div className="foi-request-review-header-col1-row">
+                <Watcher
+                  watcherFullList={watcherList}
+                  requestId={requestId}
+                  ministryId={ministryId}
+                  userDetail={userDetail}
+                  disableInput={disableInput}
+                  isIAORestrictedRequest={isIAORestrictedRequest}
+                  setIsLoaded={setIsLoaded}
+                />
+              </div>
+            )}
+          {!isAddRequest && status.toLowerCase() !== StateEnum.unopened.name.toLowerCase() && 
+            (isLoaded && (isRequestWatcherOrAssignee(requestWatchers,assigneeObj,userDetail?.preferred_username) || 
+              isIAORestrictedFileManager())) && 
+          <RequestRestriction 
+            isiaorestricted= {isRestricted()}
+            isIAORestrictedFileManager={isIAORestrictedFileManager()}
+            requestDetails={requestDetails}
+            />
+          }
+          </div>
+        </div>
+        <div className="col-lg-4">
+          <div className="foi-assignee-dropdown">
+            {showMinistryAssignedTo && (
+                  <>
+                  <TextField
+                      id="ministryAssignedTotxt"
+                      label="Ministry Assigned To"
+                      InputLabelProps={{ shrink: true }}
+                      value={ministryAssignedTo}
+                      variant="outlined"
+                      fullWidth
+                      disabled={true}
+                    />
+                  </>
+                )}
+          </div>
+        </div>
       </div>
 
       <ConfirmModal 

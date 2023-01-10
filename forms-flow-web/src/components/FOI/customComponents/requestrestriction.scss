@@ -1,7 +1,6 @@
 .requestRestriction {
 
-    margin: 5px 30px;
-
+    margin-left: 15px;
 
     .restrict-dropdown-all {
         padding-top: 10px; 
@@ -51,6 +50,10 @@
         padding: 0px !important
     }
 
+    @media (max-width: 1242px) {
+        margin-left: 0px;
+    }
+
 }
 
 #restricted-modal-text{
@@ -66,3 +69,4 @@
 .modal-msg-description {
     padding-top: 25px;
 }
+
