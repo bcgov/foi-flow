@@ -147,7 +147,7 @@ export const RecordsLog = ({
 
  
   const divisionFilters = [...new Map(recordsObj?.records?.reduce((acc, file) => [...acc, ...new Map(file?.attributes?.divisions?.map(division => [division?.divisionid, division]))], [])).values()]
-  if (divisionFilters?.length > 0) divisionFilters?.push({divisionid: -1, divisionname: "ALL"})
+  if (divisionFilters?.length > 0) divisionFilters?.push({divisionid: -1, divisionname: "All"})
 
 
   const [openModal, setModal] = useState(false);
@@ -251,12 +251,18 @@ export const RecordsLog = ({
     }
   }
 
-  const downloadDocument = (file) => {
-    getFOIS3DocumentPreSignedUrl(file.s3uripath.split('/').slice(4).join('/'), ministryId, dispatch, (err, res) => {
+  const downloadDocument = (file, isPDF = false) => {
+    var s3filepath = file.s3uripath;
+    var filename = file.filename
+    if (isPDF) {
+      s3filepath = s3filepath.substr(0, s3filepath.lastIndexOf(".")) + ".pdf";
+      filename = filename + ".pdf";
+    }
+    getFOIS3DocumentPreSignedUrl(s3filepath.split('/').slice(4).join('/'), ministryId, dispatch, (err, res) => {
       if (!err) {
         getFileFromS3({filepath: res}, (_err, response) => {
           let blob = new Blob([response.data], {type: "application/octet-stream"});
-          saveAs(blob, file.filename)
+          saveAs(blob, filename)
         });
       }
     }, 'records', bcgovcode);
@@ -266,16 +272,23 @@ export const RecordsLog = ({
     let blobs = [];
     var completed = 0;
     let failed = 0;
-    const toastID = toast.loading("Exporting files (" + completed + "/" + records.length + ")")
+    var exporting = records.filter(record => !record.isduplicate)
+    const toastID = toast.loading("Exporting files (" + completed + "/" + exporting.length + ")")
     try {
-      for (let record of records) {
-        const response = await getFOIS3DocumentPreSignedUrl(record.s3uripath.split('/').slice(4).join('/'), ministryId, dispatch, null, 'records', bcgovcode)
+      for (let record of exporting) {
+        var filepath = record.s3uripath
+        var filename = record.filename
+        if (record.isdeduplicated && record.filename.toLowerCase().indexOf('.pdf') === -1) {
+          filepath = filepath.substr(0, filepath.lastIndexOf(".")) + ".pdf";
+          filename += ".pdf";
+        }
+        const response = await getFOIS3DocumentPreSignedUrl(filepath.split('/').slice(4).join('/'), ministryId, dispatch, null, 'records', bcgovcode)
         await getFileFromS3({filepath: response.data}, (_err, res) => {
           let blob = new Blob([res.data], {type: "application/octet-stream"});
-          blobs.push({name: record.filename, lastModified: res.headers['last-modified'], input: blob})
+          blobs.push({name: filename, lastModified: res.headers['last-modified'], input: blob})
           completed++;
           toast.update(toastID, {
-            render: "Exporting files (" + completed + "/" + records.length + ")",
+            render: "Exporting files (" + completed + "/" + exporting.length + ")",
             isLoading: true,
           })
         });
@@ -284,7 +297,7 @@ export const RecordsLog = ({
       console.log(error)
     }
     var toastOptions = {
-      render: failed > 0 ? failed.length + " file(s) failed to download" : records.length + ' Files exported',
+      render: failed > 0 ? failed.length + " file(s) failed to download" : exporting.length + ' Files exported',
       type: failed > 0 ? "error" : "success",
     }
     toast.update(toastID, {
@@ -298,7 +311,8 @@ export const RecordsLog = ({
       closeButton: true
     });
     const zipfile = await downloadZip(blobs).blob()
-    saveAs(zipfile, requestNumber + ".zip");
+    var currentFilter = divisionFilters.find(division => division.divisionid === filterValue).divisionname;
+    saveAs(zipfile, requestNumber + " Records - " + currentFilter + ".zip");
   }
 
   const hasDocumentsToExport = records.filter(record => !(isMinistryCoordinator && record.category == 'personal')).length > 0;
@@ -318,6 +332,10 @@ export const RecordsLog = ({
       case "download":
         downloadDocument(_record);
         setModalFor("download");
+        setModal(false);
+        break;
+      case "downloadPDF":
+        downloadDocument(_record, true);
         setModal(false);
         break;
       case "delete":
@@ -817,6 +835,11 @@ const AttachmentPopup = React.memo(({indexValue, record, handlePopupButtonClick,
     handlePopupButtonClick("download", record);
   }
 
+  const handleDownloadPDF = () =>{
+    closeTooltip();
+    handlePopupButtonClick("downloadPDF", record);
+  }
+
   const handleView =()=>{
     closeTooltip();
     opendocumentintab(record,ministryId);
@@ -875,7 +898,7 @@ const AttachmentPopup = React.memo(({indexValue, record, handlePopupButtonClick,
   //   return (<DeleteMenu />)
   // }
 
-  const ActionsPopover = ({RestrictViewInBrowser}) => {
+  const ActionsPopover = ({RestrictViewInBrowser, record}) => {
 
     return (
       <Popover
@@ -916,14 +939,14 @@ const AttachmentPopup = React.memo(({indexValue, record, handlePopupButtonClick,
           >
             Download
           </MenuItem>
-          <MenuItem
+          {record.isdeduplicated && record.filename.toLowerCase().indexOf('.pdf') === -1 && <MenuItem
             onClick={() => {
-                handleRename();
+                handleDownloadPDF();
                 setPopoverOpen(false);
             }}
           >
-            Rename
-          </MenuItem>
+            Download PDF
+          </MenuItem>}
           <DeleteMenu />
 
           {/* {record.category === "personal" ? (
@@ -952,7 +975,7 @@ const AttachmentPopup = React.memo(({indexValue, record, handlePopupButtonClick,
       >
       <MoreHorizIcon />
     </IconButton>
-    <ActionsPopover RestrictViewInBrowser={true}/>
+    <ActionsPopover RestrictViewInBrowser={true} record={record}/>
   </>
   );
 })
