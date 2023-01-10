@@ -141,13 +141,9 @@ export default function Watcher({
 
     // watcher list checkboxes
     const handleChange = (event) => {
-      console.log("handleChange", event);
-      console.log("personName", personName);
-
       const {
         target: { value },
       } = event;
-      console.log("value", value);
       
       let newPersonName = typeof value === 'string' ? value.split(',') : value;
 
@@ -155,15 +151,12 @@ export default function Watcher({
     
       if (event.nativeEvent.target.dataset.value) {
         currentWatcher = event.nativeEvent.target.dataset.value;
-        console.log("currentWatcher1", currentWatcher);
       }
       else if (event.nativeEvent.target.name) {
         currentWatcher = event.nativeEvent.target.name;
-        console.log("currentWatcher2", currentWatcher);
       }
 
       if(newPersonName.length > personName.length && isIAORestrictedRequest) {
-        console.log("??????");
         setModalForCheckBox(true);
         setNewWatcher(currentWatcher);
         setCurrentWatchers(event.target.value);
@@ -188,11 +181,6 @@ export default function Watcher({
 
     // watcher toggle
     const watcherOnChange = (event) => {
-      console.log("watcherOnChange", event);
-      console.log("personName", personName);
-      console.log("isUseraWatcher", isUseraWatcher);
-      console.log("isIAORestrictedRequest", isIAORestrictedRequest);
-
       let watcher = {};
       if (ministryId) {
           watcher.ministryrequestid = ministryId;
@@ -208,7 +196,6 @@ export default function Watcher({
       }
       else {
         if(isIAORestrictedRequest) {
-          console.log("???");
           setModalForCheckBox(false);
           setNewWatcherObj(watcher);
           setModalMessage(<span>Are you sure you want to assign <b>{userDetail.preferred_username}</b> as a watcher?</span>);

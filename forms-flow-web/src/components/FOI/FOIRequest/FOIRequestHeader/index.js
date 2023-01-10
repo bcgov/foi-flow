@@ -127,9 +127,6 @@ const FOIRequestHeader = React.memo(
     }
 
     const saveAssigneeDetails = (assigneeVal, assigneeName) => {
-      console.log("assigneeVal",assigneeVal);
-      console.log("assigneeName",assigneeName);
-
       setAssignedTo(assigneeVal);
       if (isAddRequest) {
         //event bubble up - to validate required fields
