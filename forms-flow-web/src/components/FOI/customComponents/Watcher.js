@@ -1,4 +1,4 @@
-import React  from 'react';
+import React, { useState } from 'react';
 import { useSelector, useDispatch } from "react-redux";
 import OutlinedInput from '@material-ui/core/OutlinedInput';
 import InputLabel from '@mui/material/InputLabel';
@@ -8,6 +8,7 @@ import Checkbox from '@material-ui/core/Checkbox';
 import { makeStyles } from '@material-ui/core/styles';
 import './Watcher.scss'
 import { saveWatcher, fetchFOIWatcherList } from "../../../apiManager/services/FOI/foiWatcherServices";
+import ConfirmModalWatcher from "./ConfirmModalWatcher";
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
@@ -34,7 +35,14 @@ const useStyles = makeStyles((theme) => ({
     },
   }));
 
-export default function Watcher({watcherFullList, requestId, ministryId, userDetail, disableInput}) {    
+export default function Watcher({
+  watcherFullList,
+  requestId,
+  ministryId,
+  userDetail,
+  disableInput,
+  isIAORestrictedRequest
+}) {    
     const classes = useStyles();
     const dispatch = useDispatch();
 
@@ -68,8 +76,8 @@ export default function Watcher({watcherFullList, requestId, ministryId, userDet
         return  firstName !== "" ? `${lastName}, ${firstName}` : username;
     }
 
-   //creates the grouped menu items for assignedTo combobox
-   const getMenuItems = () => {
+    //creates the grouped menu items for assignedTo combobox
+    const getMenuItems = () => {
        let menuItems = [];
        let i = 1;      
        if (watcherFullList && watcherFullList.length > 0) {
@@ -90,85 +98,148 @@ export default function Watcher({watcherFullList, requestId, ministryId, userDet
            }
        }
        return menuItems;
-   }
-
-  const handleWatcherUpdate = (watcher) => {
-    dispatch(saveWatcher(ministryId, watcher, (err, _res) => {
-      if(!err) {
-        setUpdateWatchList(!updateWatchList);
-      }
-    }));
-
-  }
-   const updateWatcher = (currentWatcher, watchers) => {
-    let watcher = {};
-    if (ministryId) {
-      watcher.ministryrequestid = ministryId;
     }
-    else {
-      watcher.requestid = requestId;
-    }
-    const watcherDetails = currentWatcher.split('|');
-    watcher.watchedbygroup = watcherDetails[0];
-    watcher.watchedby = watcherDetails[1];
-    const isActive = watchers? !!watchers.find(_watcher => _watcher === currentWatcher): false;
-    watcher.isactive = isActive;
-    if (watcher.watchedby === userDetail.preferred_username) {
-      setUseraWatcher(watcher.isactive);
-    }
-    handleWatcherUpdate(watcher);
-  }
 
-  const handleChange = (event) => {
-    const {
-      target: { value },
-    } = event;
-    
-    setPersonName(
-      typeof value === 'string' ? value.split(',') : value,
-    );
-
-    let currentWatcher = "";
+    const handleWatcherUpdate = (watcher) => {
+      dispatch(saveWatcher(ministryId, watcher, (err, _res) => {
+        if(!err) {
+          setUpdateWatchList(!updateWatchList);
+        }
+      }));
+    }
    
-    if (event.nativeEvent.target.dataset.value) {
-      currentWatcher = event.nativeEvent.target.dataset.value;     
-    }
-    else if (event.nativeEvent.target.name) {
-      currentWatcher = event.nativeEvent.target.name;
-    }
-    
-    updateWatcher(currentWatcher, event.target.value);
-  };
-
-const watcherOnChange = (event) => {
-    
-    let watcher = {};
-    if (ministryId) {
+    const updateWatcher = (currentWatcher, watchers) => {
+      let watcher = {};
+      if (ministryId) {
         watcher.ministryrequestid = ministryId;
-    }
-    else {
+      }
+      else {
         watcher.requestid = requestId;
+      }
+      const watcherDetails = currentWatcher.split('|');
+      watcher.watchedbygroup = watcherDetails[0];
+      watcher.watchedby = watcherDetails[1];
+      const isActive = watchers? !!watchers.find(_watcher => _watcher === currentWatcher): false;
+      watcher.isactive = isActive;
+      if (watcher.watchedby === userDetail.preferred_username) {
+        setUseraWatcher(watcher.isactive);
+      }
+      handleWatcherUpdate(watcher);
     }
-        watcher.watchedby = userDetail.preferred_username;
-        if (isUseraWatcher) { 
-            watcher.isactive = false;
+
+    // watcher modal
+    const [modalForCheckBox, setModalForCheckBox] = React.useState(true);
+    const [newWatcherObj, setNewWatcherObj] = React.useState({});
+    const [showModal, setShowModal] = useState(false);
+    const [modalMessage, setModalMessage] = useState(<></>);    
+    const [modalDescription, setModalDescription] = useState(<></>);
+    const [newWatcher, setNewWatcher] = React.useState("");
+    const [currentWatchers, setCurrentWatchers] = React.useState(['Unassigned']);
+    const resetModal = () => {
+      setShowModal(false);
+    }
+
+    // watcher list checkboxes
+    const handleChange = (event) => {
+      console.log("handleChange", event);
+      console.log("personName", personName);
+
+      const {
+        target: { value },
+      } = event;
+      console.log("value", value);
+      
+      let newPersonName = typeof value === 'string' ? value.split(',') : value;
+
+      let currentWatcher = "";
+    
+      if (event.nativeEvent.target.dataset.value) {
+        currentWatcher = event.nativeEvent.target.dataset.value;
+        console.log("currentWatcher1", currentWatcher);
+      }
+      else if (event.nativeEvent.target.name) {
+        currentWatcher = event.nativeEvent.target.name;
+        console.log("currentWatcher2", currentWatcher);
+      }
+
+      if(newPersonName.length > personName.length && isIAORestrictedRequest) {
+        console.log("??????");
+        setModalForCheckBox(true);
+        setNewWatcher(currentWatcher);
+        setCurrentWatchers(event.target.value);
+        setModalMessage(<span>Are you sure you want to assign <b>{currentWatcher}</b> as a watcher?</span>);
+        setModalDescription(<span><i>This will allow them to have access to this restricted request content.</i></span>);
+        setShowModal(true);
+
+      } else {
+        setPersonName(
+          newPersonName
+        );
+  
+        updateWatcher(currentWatcher, event.target.value);
+      }
+    };
+
+    const saveChangeCheckbox = (newPersonName, currentWatcher, currentWatchers) => {
+      setShowModal(false);
+      setPersonName(newPersonName);
+      updateWatcher(currentWatcher, currentWatchers);
+    }
+
+    // watcher toggle
+    const watcherOnChange = (event) => {
+      console.log("watcherOnChange", event);
+      console.log("personName", personName);
+      console.log("isUseraWatcher", isUseraWatcher);
+      console.log("isIAORestrictedRequest", isIAORestrictedRequest);
+
+      let watcher = {};
+      if (ministryId) {
+          watcher.ministryrequestid = ministryId;
+      }
+      else {
+          watcher.requestid = requestId;
+      }
+      watcher.watchedby = userDetail.preferred_username;
+      if (isUseraWatcher) { 
+          watcher.isactive = false;
+          setUseraWatcher(watcher.isactive);
+          handleWatcherUpdate(watcher);
+      }
+      else {
+        if(isIAORestrictedRequest) {
+          console.log("???");
+          setModalForCheckBox(false);
+          setNewWatcherObj(watcher);
+          setModalMessage(<span>Are you sure you want to assign <b>{userDetail.preferred_username}</b> as a watcher?</span>);
+          setModalDescription(<span><i>This will allow them to have access to this restricted request content.</i></span>);
+          setShowModal(true);
         }
         else {
-            watcher.isactive = true;
+          watcher.isactive = true;
+          setUseraWatcher(watcher.isactive);
+          handleWatcherUpdate(watcher);
         }
-        setUseraWatcher(watcher.isactive);
-        handleWatcherUpdate(watcher);
-        event.preventDefault();
-}
+      }
 
-  const renderValue = (_option) => {
-    return <span>{noOfWatchers}</span>;
-  }
-    return (  
-        
-        <div>
-              <div className="foi-watcher-all">
-                   <button onClick={watcherOnChange} className="foi-eye-container" disabled = {disableInput} > <i className="fa fa-eye foi-eye"></i> {isUseraWatcher? "Unwatch" : "Watch" }</button>
+      event.preventDefault();
+    }
+
+    const saveChangeButton = (watcher) => {
+      setShowModal(false);
+      setUseraWatcher(true);
+      handleWatcherUpdate(watcher);
+    }
+
+    const renderValue = (_option) => {
+      return <span>{noOfWatchers}</span>;
+    }
+
+    return (
+      <>
+      <div>
+            <div className="foi-watcher-all">
+                <button onClick={watcherOnChange} className="foi-eye-container" disabled = {disableInput} > <i className="fa fa-eye foi-eye"></i> {isUseraWatcher? "Unwatch" : "Watch" }</button>
                 <div className="foi-watcher-select">
                     <i className="fa fa-user-o"></i>                    
                     <InputLabel id="foi-watcher-label">
@@ -191,6 +262,21 @@ const watcherOnChange = (event) => {
                 </div>
             </div>
       </div> 
-           
+
+      <ConfirmModalWatcher
+        modalForCheckBox = {modalForCheckBox}
+        modalMessage= {modalMessage}
+        modalDescription= {modalDescription} 
+        showModal={showModal}
+        saveChangeButton = {saveChangeButton}
+        saveChangeCheckbox = {saveChangeCheckbox}
+        watcherObj={newWatcherObj}
+        watcherList ={personName}
+        resetModal = {resetModal}
+        newWatcher = {newWatcher}
+        currentWatchers = {currentWatchers}
+         />
+
+      </>
     );
   }
