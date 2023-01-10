@@ -57,7 +57,7 @@ const FOIRequestHeader = React.memo(
     const assignedToList = useSelector(
       (state) => state.foiRequests.foiAssignedToList
     );
-    let isIAORestrictedRequest = false;
+    const [isIAORestrictedRequest,setIsIAORestrictedRequest] = useState(false);
     let assigneeDetails = _.pick(requestDetails, ['assignedGroup', 'assignedTo','assignedToFirstName','assignedToLastName',
     'assignedministrygroup','assignedministryperson','assignedministrypersonFirstName','assignedministrypersonLastName']);
     const [assigneeObj, setAssigneeObj] = useState(assigneeDetails);
@@ -69,8 +69,7 @@ const FOIRequestHeader = React.memo(
         ? calculateDaysRemaining(requestDetails.cfrDueDate)
         : "";
       handlestatusudpate(_daysRemaining, _status, _cfrDaysRemaining);
-      isIAORestrictedRequest = isRestricted();
-      
+      setIsIAORestrictedRequest(isRestricted());
     }, [requestDetails, handleAssignedToInitialValue, handlestatusudpate]);
     useEffect(() => {
       setAssignedTo(getAssignedTo(assigneeObj));
@@ -108,21 +107,25 @@ const FOIRequestHeader = React.memo(
 
 
     const handleAssigneeUpdate = (event) => {
-      console.log("Event:", event);
-      setAssigneeVal(event?.target?.value);
-      setAssigneeName(event?.target?.name);
-      console.log("assigneeVal inside handleAssigneeUpdate:",assigneeVal);
-      console.log("assigneeName inside handleAssigneeUpdate:",assigneeName);
+      let AssigneeValue = event?.target?.value;
+      let [groupName, username, firstName, lastName] = AssigneeValue.split('|');
+      let fullName = firstName !== "" ? `${lastName}, ${firstName}` : username;
+      setAssigneeVal(AssigneeValue);
+      setAssigneeName(fullName);
 
       if(isIAORestrictedRequest){
-        setModalMessage(<span>Are you sure you want to assign <b>{assigneeName}</b> to this request?</span>);
+        setModalMessage(<span>Are you sure you want to assign <b>{fullName}</b> to this request?</span>);
         setModalDescription(<span><i>This will allow them to have access to this restricted request content.</i></span>);
         setShowModal(true);
       }
       else
-        saveAssigneeDetails(assigneeVal, assigneeName);
+        saveAssigneeDetails(AssigneeValue, fullName);
     }
     
+    const resetModal = () => {
+      setShowModal(false);
+    }
+
     const saveAssigneeDetails = (assigneeVal, assigneeName) => {
       console.log("assigneeVal",assigneeVal);
       console.log("assigneeName",assigneeName);
@@ -261,10 +264,13 @@ const FOIRequestHeader = React.memo(
                   ministryId={ministryId}
                   userDetail={userDetail}
                   disableInput={disableInput}
+                  isIAORestrictedRequest={isIAORestrictedRequest}
                 />
               </div>
             )}
-          {!isAddRequest && status.toLowerCase() !== StateEnum.unopened.name.toLowerCase() && (isRequestWatcherOrAssignee(requestWatchers,assigneeObj,userDetail?.preferred_username) || isIAORestrictedFileManager()) && 
+          {!isAddRequest && status.toLowerCase() !== StateEnum.unopened.name.toLowerCase() && 
+            (isRequestWatcherOrAssignee(requestWatchers,assigneeObj,userDetail?.preferred_username) || 
+              isIAORestrictedFileManager()) && 
           <RequestRestriction 
             isiaorestricted= {isRestricted()}
             isIAORestrictedFileManager={isIAORestrictedFileManager()}
@@ -298,7 +304,8 @@ const FOIRequestHeader = React.memo(
           showModal={showModal}
           saveAssigneeDetails = {saveAssigneeDetails}
           assigneeVal={assigneeVal}
-          assigneeName ={assigneeName} />
+          assigneeName ={assigneeName}
+          resetModal = {resetModal} />
       </>
     );
     

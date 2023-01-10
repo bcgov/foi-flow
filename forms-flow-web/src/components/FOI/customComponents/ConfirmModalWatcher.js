@@ -10,21 +10,29 @@ import IconButton from '@material-ui/core/IconButton';
 import TextField from '@mui/material/TextField';
 
 
-const ConfirmModal= ({
+const ConfirmModal1= ({
+    modalForCheckBox,
     modalMessage,
     modalDescription,
     showModal,
-    saveAssigneeDetails,
-    assigneeVal,
-    assigneeName,
-    resetModal
+    saveChangeButton,
+    saveChangeCheckbox,
+    watcherObj,
+    watcherList,
+    resetModal,
+    newWatcher,
+    currentWatchers
 }) =>{ 
 
     const [modalOpen, setModalOpen] = useState(showModal);
 
     const handleSave = () => {
         setModalOpen(false);
-        saveAssigneeDetails(assigneeVal,assigneeName);
+        if(modalForCheckBox) {
+            saveChangeCheckbox(watcherList, newWatcher, currentWatchers);
+        } else {
+            saveChangeButton(watcherObj);
+        }
         resetModal();
     };
 
@@ -88,4 +96,4 @@ const ConfirmModal= ({
     );
 };
 
-export default ConfirmModal;
+export default ConfirmModal1;
