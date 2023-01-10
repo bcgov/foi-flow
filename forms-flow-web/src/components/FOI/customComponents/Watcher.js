@@ -41,7 +41,8 @@ export default function Watcher({
   ministryId,
   userDetail,
   disableInput,
-  isIAORestrictedRequest
+  isIAORestrictedRequest,
+  setIsLoaded
 }) {    
     const classes = useStyles();
     const dispatch = useDispatch();
@@ -51,12 +52,13 @@ export default function Watcher({
 
     React.useEffect(() => {
         dispatch(fetchFOIWatcherList(requestId,ministryId));
+        
     },[dispatch, updateWatchList, requestId, ministryId] )
 
     const [personName, setPersonName] = React.useState(['Unassigned']);
     const [noOfWatchers, setNoOfWatchers] = React.useState(0);
     const requestWatcherList = useSelector((state) => state.foiRequests.foiWatcherList);
-
+    const isFirstRun = React.useRef(true);
     const getCountOfWatchers = (_watcherList) => {
       const watchedByList = requestWatcherList.map(watcher => watcher.watchedby);
       return new Set(watchedByList).size;
@@ -69,6 +71,10 @@ export default function Watcher({
         setPersonName(watchList.length > 0 ? watchList : ['Unassigned']);
         setNoOfWatchers(getCountOfWatchers(requestWatcherList));
         setUseraWatcher(!!watcherUsers.find(watcher => watcher === userDetail.preferred_username))
+        if (isFirstRun.current)
+          isFirstRun.current = false;
+        else
+          setIsLoaded(true);
       },[requestWatcherList, userDetail])
 
       

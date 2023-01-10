@@ -87,6 +87,7 @@ const FOIRequestHeader = React.memo(
     const [modalDescription, setModalDescription] = useState(<></>);
     const [assigneeVal, setAssigneeVal]= useState("");
     const [assigneeName,setAssigneeName] = useState("");
+    const [isLoaded, setIsLoaded] = useState(false);
 
     useEffect(() => {
       // handle case where assigned user was removed from group
@@ -104,7 +105,6 @@ const FOIRequestHeader = React.memo(
         getMenuItems({ classes, assignedToList, selectedAssignedTo, isIAORestrictedRequest })
       );
     }, [selectedAssignedTo, assignedToList]);
-
 
     const handleAssigneeUpdate = (event) => {
       let AssigneeValue = event?.target?.value;
@@ -127,9 +127,6 @@ const FOIRequestHeader = React.memo(
     }
 
     const saveAssigneeDetails = (assigneeVal, assigneeName) => {
-      console.log("assigneeVal",assigneeVal);
-      console.log("assigneeName",assigneeName);
-
       setAssignedTo(assigneeVal);
       if (isAddRequest) {
         //event bubble up - to validate required fields
@@ -265,12 +262,13 @@ const FOIRequestHeader = React.memo(
                   userDetail={userDetail}
                   disableInput={disableInput}
                   isIAORestrictedRequest={isIAORestrictedRequest}
+                  setIsLoaded={setIsLoaded}
                 />
               </div>
             )}
           {!isAddRequest && status.toLowerCase() !== StateEnum.unopened.name.toLowerCase() && 
-            (isRequestWatcherOrAssignee(requestWatchers,assigneeObj,userDetail?.preferred_username) || 
-              isIAORestrictedFileManager()) && 
+            (isLoaded && (isRequestWatcherOrAssignee(requestWatchers,assigneeObj,userDetail?.preferred_username) || 
+              isIAORestrictedFileManager())) && 
           <RequestRestriction 
             isiaorestricted= {isRestricted()}
             isIAORestrictedFileManager={isIAORestrictedFileManager()}
