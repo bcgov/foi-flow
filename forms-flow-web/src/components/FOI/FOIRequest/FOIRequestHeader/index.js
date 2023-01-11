@@ -61,6 +61,20 @@ const FOIRequestHeader = React.memo(
     let assigneeDetails = _.pick(requestDetails, ['assignedGroup', 'assignedTo','assignedToFirstName','assignedToLastName',
     'assignedministrygroup','assignedministryperson','assignedministrypersonFirstName','assignedministrypersonLastName']);
     const [assigneeObj, setAssigneeObj] = useState(assigneeDetails);
+
+    const isIAORestrictedFileManager = () => {
+      return userDetail?.role?.includes("IAORestrictedFilesManager");
+    }
+
+    const isRestricted = () => {
+      if(ministryId){
+        return requestDetails?.iaorestricteddetails?.isrestricted;
+      } 
+      else
+        return requestDetails?.isiaorestricted;
+    }
+
+    const [disableHeaderInput, setDisableHeaderInput] = useState(disableInput || (isRestricted() && !isIAORestrictedFileManager()));
     //handle default value for the validation of required fields
     React.useEffect(() => {
       let _daysRemaining = calculateDaysRemaining(requestDetails.dueDate);
@@ -70,6 +84,7 @@ const FOIRequestHeader = React.memo(
         : "";
       handlestatusudpate(_daysRemaining, _status, _cfrDaysRemaining);
       setIsIAORestrictedRequest(isRestricted());
+      setDisableHeaderInput(disableInput || (isRestricted() && !isIAORestrictedFileManager()));
     }, [requestDetails, handleAssignedToInitialValue, handlestatusudpate]);
     useEffect(() => {
       setAssignedTo(getAssignedTo(assigneeObj));
@@ -205,18 +220,6 @@ const FOIRequestHeader = React.memo(
     const ministryAssignedTo = getMinistryAssignedTo();
     const watcherList = assignedToList.filter(assignedTo => assignedTo.type === 'iao');
 
-    const isIAORestrictedFileManager = () => {
-      return userDetail?.role?.includes("IAORestrictedFilesManager");
-    }
-
-    const isRestricted = () => {
-      if(ministryId){
-        return requestDetails?.iaorestricteddetails?.isrestricted;
-      } 
-      else
-        return requestDetails?.isiaorestricted;
-    }
-    
     return (
       <>
       <div className='row'>
@@ -241,7 +244,7 @@ const FOIRequestHeader = React.memo(
                 variant="outlined"
                 fullWidth
                 required
-                disabled={disableInput}
+                disabled={disableHeaderInput}
                 error={selectedAssignedTo.toLowerCase().includes("unassigned")}
               >
                 {menuItems}
@@ -260,7 +263,7 @@ const FOIRequestHeader = React.memo(
                   requestId={requestId}
                   ministryId={ministryId}
                   userDetail={userDetail}
-                  disableInput={disableInput}
+                  disableInput={disableHeaderInput}
                   isIAORestrictedRequest={isIAORestrictedRequest}
                   setIsLoaded={setIsLoaded}
                 />
