@@ -194,7 +194,8 @@ export const createAssigneeDetails = (value, value2) => {
         assigneeObject.assignedGroup = "Unassigned";
         assigneeObject.assignedTo = assignedTo[0];
       }
-      assigneeObject.assignedToName = value2;
+        //assigneeObject.assignedToName = value2;
+        assigneeObject.assignedToName = value2 ? value2 : `${assigneeObject.assignedToFirstName}, ${assigneeObject.assignedToFirstName}`;
       return assigneeObject;
 }
 
