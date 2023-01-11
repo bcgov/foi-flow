@@ -45,6 +45,12 @@ class recordservice:
                         record['attributes'] = dedupedrecord['attributes']
                         if dedupedrecord['isduplicate']:
                             record['duplicateof'] = dedupedrecord['duplicateof']
+                            # merge duplicate divisions with original
+                            originalrecord = uploadedrecords[path.splitext(dedupedrecord['duplicatefilepath'])[0]]
+                            divid = lambda div : div['divisionid']
+                            divobj = lambda divid : {"divisionid" : divid}
+                            originalrecord['attributes']['divisions'] = list(map(divobj, set(map(divid, originalrecord['attributes']['divisions'])).union(set(map(divid, dedupedrecord['attributes']['divisions'])))))
+
                     if dedupedrecord['isduplicate']:
                         result['removedfiles'] += 1
                 # result['dedupedfiles'] = len(dedupedrecords)
