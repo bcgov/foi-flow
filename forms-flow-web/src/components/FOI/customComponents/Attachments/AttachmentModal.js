@@ -62,7 +62,7 @@ export default function AttachmentModal({
       if (isMinistryCoordinator) {
         tagList = tagList.filter(tag => tag.name !== "applicant")
       }
-    } else if (uploadFor === 'records') {
+    } else if (uploadFor === 'record') {
       tagList = divisions.map(division => {
         return {
           name: division.divisionid,
@@ -72,14 +72,14 @@ export default function AttachmentModal({
     }
 
     const mimeTypes = multipleFiles ? MimeTypeList.attachmentLog : MimeTypeList.stateTransition;
-    const maxFileSize = uploadFor === 'records' ? MaxFileSizeInMB.totalFileSize : multipleFiles ? MaxFileSizeInMB.attachmentLog : MaxFileSizeInMB.stateTransition;
+    const maxFileSize = uploadFor === 'record' ? MaxFileSizeInMB.totalFileSize : multipleFiles ? MaxFileSizeInMB.attachmentLog : MaxFileSizeInMB.stateTransition;
     const totalFileSize = multipleFiles ? MaxFileSizeInMB.totalFileSize : MaxFileSizeInMB.stateTransition;
     const classes = useStyles();
     const [files, setFiles] = useState([]);
     const [newFilename, setNewFilename] = useState("");
     const [extension, setExtension] = useState("");
     const [errorMessage, setErrorMessage] = useState();
-    const [tagValue, setTagValue] = useState(uploadFor === 'records' ? "" : "general");
+    const [tagValue, setTagValue] = useState(uploadFor === 'record' ? "" : "general");
     const attchmentFileNameList = attachmentsArray.map(_file => _file.filename.toLowerCase());
 
     useEffect(() => {
@@ -155,7 +155,7 @@ export default function AttachmentModal({
             handleModal(false);
             parseFileName(attachment);
         }
-        if (uploadFor === 'records') setTagValue("");
+        if (uploadFor === 'record') setTagValue("");
     };
 
     const handleTagChange = (_tagValue) => {
@@ -172,24 +172,24 @@ export default function AttachmentModal({
         let fileStatusTransition = "";
         if (modalFor === 'replace') {
           fileStatusTransition = attachment?.category;
-        } else if (uploadFor === "records") {
+        } else if (uploadFor === "record") {
           fileStatusTransition = divisions.find(division => division.divisionid === tagValue).divisionname;
         } else {
           fileStatusTransition = tagValue
         }
         fileInfoList = files?.map(file => {
           return {
-              ministrycode: uploadFor === "records" ? bcgovcode : "Misc",
+              ministrycode: uploadFor === "record" ? bcgovcode : "Misc",
               requestnumber: requestNumber ? requestNumber : `U-00${requestId}`,
               filestatustransition: fileStatusTransition,
               filename: file.filename? file.filename : file.name,
-              ...(uploadFor === "records") && {divisionid: tagValue}
+              ...(uploadFor === "record") && {divisionid: tagValue}
           }
         });
         
         handleModal(true, fileInfoList, files);
         setFiles([]);
-        if (uploadFor === 'records') setTagValue("");
+        if (uploadFor === 'record') setTagValue("");
       }
     }  
     const getMessage = () => {

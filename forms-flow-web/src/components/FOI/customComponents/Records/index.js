@@ -639,7 +639,7 @@ export const RecordsLog = ({
             attachmentsArray={[]}
             handleRename={handleRename}
             isMinistryCoordinator={isMinistryCoordinator}
-            uploadFor={"records"}
+            uploadFor={"record"}
             bcgovcode={bcgovcode}
             divisions={divisions}
           />

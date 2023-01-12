@@ -36,6 +36,7 @@ const FileUpload = ({
     const [files, setFiles] = useState({ ...existingDocuments });    
     const [totalFileSizeCalculated, setTotalFileSize] = useState(0);
     const [errorMessage, setErrorMessage] = useState([]); 
+    const [includeAttachments, setIncludeAttachments] = useState(true);
     const handleUploadBtnClick = (e) => {
       e.stopPropagation();
       fileInputField.current.click();
@@ -172,9 +173,9 @@ const FileUpload = ({
 
   return (
     <>
-      {((modalFor === "add" && uploadFor === "attachment") || uploadFor === 'records') && (<div>
+      {((modalFor === "add" && uploadFor === "attachment") || uploadFor === 'record') && (<div>
         <div className="tagtitle">
-          <span>Select one {uploadFor === 'records' ? "division" : "tag"} that corresponds to the document(s) you are uploading</span>
+          <span>Select one {uploadFor === 'record' ? "division" : "tag"} that corresponds to the document(s) you are uploading</span>
         </div>
         <div className="taglist">
           {tagList.map(tag =>
@@ -235,8 +236,18 @@ const FileUpload = ({
           </div>
         </div>
       </section>
-      {uploadFor === "attachment" && modalFor === "add" && (<div className="tag-message-container">
-        <p>When uploading more than one attachment, all attachments will have the same selected tag.</p>
+      {modalFor === "add" && (<div className="tag-message-container">
+        <p>When uploading more than one {uploadFor}, all {uploadFor}s will have the same selected tag.</p>
+      </div>)}
+      {uploadFor === "record" && modalFor === "add" && (<div className="tag-message-container">                          
+        <input
+          id="includeAttachmentsCheckbox"
+          type="checkbox"
+          className="checkmark"
+          checked={includeAttachments}
+          onChange={setIncludeAttachments}          
+        />
+        <p>Include any and all attachments in any uploaded records.</p>
       </div>)}
       <ul className="error-message-ul">
         {errorMessage
