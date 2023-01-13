@@ -52,7 +52,6 @@ export default function Watcher({
 
     React.useEffect(() => {
         dispatch(fetchFOIWatcherList(requestId,ministryId));
-        
     },[dispatch, updateWatchList, requestId, ministryId] )
 
     const [personName, setPersonName] = React.useState(['Unassigned']);
@@ -63,6 +62,11 @@ export default function Watcher({
       const watchedByList = requestWatcherList.map(watcher => watcher.watchedby);
       return new Set(watchedByList).size;
     }
+
+    const getFullName = (lastName, firstName, username) => {
+      return  firstName !== "" ? `${lastName}, ${firstName}` : username;
+    }
+    const [userFullName, setUserFullName] = React.useState(getFullName(userDetail.given_name, userDetail.family_name, userDetail.preferred_username));
     React.useEffect(() => {
         const watchList = requestWatcherList.map(watcher => {
             return `${watcher.watchedbygroup}|${watcher.watchedby}`;
@@ -75,12 +79,8 @@ export default function Watcher({
           isFirstRun.current = false;
         else
           setIsLoaded(true);
+        setUserFullName(getFullName(userDetail.given_name, userDetail.family_name, userDetail.preferred_username));
       },[requestWatcherList, userDetail])
-
-      
-    const getFullName = (lastName, firstName, username) => {
-        return  firstName !== "" ? `${lastName}, ${firstName}` : username;
-    }
 
     //creates the grouped menu items for assignedTo combobox
     const getMenuItems = () => {
@@ -106,7 +106,23 @@ export default function Watcher({
        return menuItems;
     }
 
+    const findWatcherFullname = (watcher) => {
+      if(watcherFullList && watcherFullList.length > 0) {
+        let group = watcherFullList?.find(_group => _group.name === watcher.watchedbygroup)?.members;
+        if(group) {
+          let member = group.find(_watcher => _watcher.username === watcher.watchedby);
+          if(member) {
+            return getFullName(member.lastname, member.firstname, member.username);
+          }
+        }
+      }
+      return watcher.watchedby;
+    }
+
     const handleWatcherUpdate = (watcher) => {
+      watcher.fullname = watcher.fullname ? watcher.fullname : findWatcherFullname(watcher);
+      watcher.isrestricted = isIAORestrictedRequest;
+
       dispatch(saveWatcher(ministryId, watcher, (err, _res) => {
         if(!err) {
           setUpdateWatchList(!updateWatchList);
@@ -130,6 +146,7 @@ export default function Watcher({
       if (watcher.watchedby === userDetail.preferred_username) {
         setUseraWatcher(watcher.isactive);
       }
+
       handleWatcherUpdate(watcher);
     }
 
@@ -195,6 +212,7 @@ export default function Watcher({
           watcher.requestid = requestId;
       }
       watcher.watchedby = userDetail.preferred_username;
+      watcher.fullname = userFullName;
       if (isUseraWatcher) { 
           watcher.isactive = false;
           setUseraWatcher(watcher.isactive);
@@ -239,18 +257,18 @@ export default function Watcher({
                       Watchers
                     </InputLabel>
                     <Select
-                    id="foi-watcher"
-                    className="foi-watcher"
-                    multiple
-                    value={personName}
-                    onChange={handleChange}
-                    inputProps={{'aria-labelledby': 'foi-watcher-label'}}
-                    input={<OutlinedInput label="Tag" />}
-                    renderValue={renderValue}                    
-                    MenuProps={MenuProps}
-                    disabled = {disableInput}
+                      id="foi-watcher"
+                      className="foi-watcher"
+                      multiple
+                      value={personName}
+                      onChange={handleChange}
+                      inputProps={{'aria-labelledby': 'foi-watcher-label'}}
+                      input={<OutlinedInput label="Tag" />}
+                      renderValue={renderValue}                    
+                      MenuProps={MenuProps}
+                      disabled = {disableInput}
                     >
-                    {getMenuItems()}
+                      {getMenuItems()}
                     </Select>
                 </div>
             </div>
