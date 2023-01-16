@@ -75,11 +75,17 @@ class KeycloakAdminService:
     def __createuser(self, user):
         return {
                 'id':user['id'],
-                'username':user['username'],                       
+                'username': self.__formatusername(user),                       
                 'email': user['email'] if 'email' in user is not None else None,
                 'firstname':user['firstName'] if 'firstName' in user is not None else None,
                 'lastname': user['lastName'] if 'lastName' in user is not None else None                        
             } 
+
+    def __formatusername(self,user):
+        if "attributes" in user and "idir_username" in user["attributes"]:
+            _username = user["attributes"]["idir_username"][0].lower()
+            return _username+"@idir" if _username.endswith("@idir") == False else _username
+        return user['username']
         
     def getheaders(self):
         return {
