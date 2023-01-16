@@ -130,13 +130,12 @@ class AuthHelper:
     def getuserid(cls):
         token = request.headers.get("Authorization", None)
         unverified_claims = josejwt.get_unverified_claims(token.partition("Bearer")[2].strip())
+        if 'identity_provider' in unverified_claims and unverified_claims['identity_provider'] == "idir":
+            claim_name = 'foi_preferred_username' if "foi_preferred_username" in unverified_claims else 'preferred_username'
+            claim_value = unverified_claims[claim_name].lower()
+            return claim_value+'@idir' if claim_value.endswith("@idir") == False else claim_value
         return unverified_claims['preferred_username']
     
-    @classmethod
-    def getwsuserid(cls, token):
-        unverified_claims = josejwt.get_unverified_claims(token.strip())
-        return unverified_claims['preferred_username']  
-
     @classmethod
     def getusername(cls):
         token = request.headers.get("Authorization", None)
