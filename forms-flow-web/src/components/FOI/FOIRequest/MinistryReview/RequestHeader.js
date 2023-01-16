@@ -59,8 +59,8 @@ const RequestHeader = React.memo(({requestDetails, userDetail, handleMinistryAss
     
     const assignedToValue = getFullName();
 
-    // const disableInput = false;
-    // const isIAORestrictedRequest = false;
+    const disableInput = false;
+    const isIAORestrictedRequest = false;
     const setIsLoaded = () => {};
 
     const watcherBox = (
@@ -72,8 +72,8 @@ const RequestHeader = React.memo(({requestDetails, userDetail, handleMinistryAss
                 watcherFullList={ministryAssignedToList}
                 ministryId={ministryId}
                 userDetail={userDetail}
-                // disableInput={disableInput}
-                // isIAORestrictedRequest={isIAORestrictedRequest}
+                disableInput={disableInput}
+                isIAORestrictedRequest={isIAORestrictedRequest}
                 setIsLoaded={setIsLoaded}
             />
         )
