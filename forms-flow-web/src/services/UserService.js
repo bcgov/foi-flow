@@ -45,8 +45,16 @@ const initKeycloak = (store, ...rest) => {
         store.dispatch(setUserRole(UserRoles));
         store.dispatch(setUserToken(KeycloakData.token));
 
-        KeycloakData.loadUserInfo().then((res) => {
+        KeycloakData.loadUserInfo().then((res) => {  
+          //Begin - Changes for IDIR mapping
+          if ("identity_provider" in res && res["identity_provider"] == "idir") {
+              let claim_name =  "foi_preferred_username" in res ? "foi_preferred_username" : "preferred_username"
+              let claim_value =  res[claim_name].toLowerCase()
+              res["preferred_username"] = claim_value.endsWith("@idir") ? claim_value : claim_value.concat("@idir")
+          }  
+          //End - Changed for IDIR mapping        
           store.dispatch(setUserDetails(res));
+          
           const userGroups = res.groups.map((group) => group.slice(1));
           const authorized =
             isIntakeTeam(userGroups) ||
