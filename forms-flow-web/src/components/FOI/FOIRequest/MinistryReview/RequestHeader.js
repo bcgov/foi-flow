@@ -59,12 +59,23 @@ const RequestHeader = React.memo(({requestDetails, userDetail, handleMinistryAss
     
     const assignedToValue = getFullName();
 
+    const disableInput = false;
+    const isIAORestrictedRequest = false;
+    const setIsLoaded = () => {};
+
     const watcherBox = (
         requestState?.toLowerCase() == StateEnum.closed.name.toLowerCase() ?
         (<></>)
         :
         (
-            <Watcher watcherFullList={ministryAssignedToList} ministryId={ministryId} userDetail={userDetail} />
+            <Watcher
+                watcherFullList={ministryAssignedToList}
+                ministryId={ministryId}
+                userDetail={userDetail}
+                disableInput={disableInput}
+                isIAORestrictedRequest={isIAORestrictedRequest}
+                setIsLoaded={setIsLoaded}
+            />
         )
       );
 
