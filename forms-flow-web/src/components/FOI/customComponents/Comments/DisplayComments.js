@@ -1,15 +1,17 @@
-import React, { useContext, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import './comments.scss'
 import InputField from './InputField'
 import { ActionContext } from './ActionContext'
 import 'reactjs-popup/dist/index.css'
 import CommentStructure from './CommentStructure'
-import { addToFullnameList, getFullnameList } from '../../../../helper/FOI/helper'
+import { addToFullnameList, getFullnameList,addToRestrictedRequestTagList,getRestrictedRequestTagList } from '../../../../helper/FOI/helper'
 
 
-const DisplayComments = ({ comments, bcgovcode, currentUser, iaoassignedToList, ministryAssignedToList, setEditorChange, removeComment, setRemoveComment }) => {
+const DisplayComments = ({ comments, bcgovcode, currentUser, iaoassignedToList, ministryAssignedToList, isRestricted, assigneeDetails, requestWatchers, 
+  setEditorChange, removeComment, setRemoveComment }) => {
 
   const [fullnameList, setFullnameList] = useState(getFullnameList);
+  const [commentTagList, setCommentTagList] = useState(getRestrictedRequestTagList());
 
   const finduserbyuserid = (userId) => {
     let user = fullnameList.find(u => u.username === userId);
@@ -40,6 +42,13 @@ const DisplayComments = ({ comments, bcgovcode, currentUser, iaoassignedToList, 
       return "Request History"
     }
   }
+
+  useEffect(()=>{
+    if(isRestricted){
+      addToRestrictedRequestTagList(requestWatchers, assigneeDetails, fullnameList, bcgovcode);
+      setCommentTagList(getRestrictedRequestTagList());
+    }
+  }, [assigneeDetails, requestWatchers]);
 
   const showhiddencomments = (_e, count) => {
     let hiddencomments = document.getElementsByName('commentsectionhidden')
@@ -136,7 +145,7 @@ const DisplayComments = ({ comments, bcgovcode, currentUser, iaoassignedToList, 
               inputvalue={a.text}
               edit
               parentId={i.commentId}
-              fullnameList={fullnameList}
+              fullnameList={isRestricted? commentTagList :fullnameList}
               //Handles Navigate Away
               setEditorChange={setEditorChange} removeComment={removeComment} setRemoveComment={setRemoveComment}
             />
@@ -164,7 +173,7 @@ const DisplayComments = ({ comments, bcgovcode, currentUser, iaoassignedToList, 
                 cancellor={a.commentId}
                 parentId={i.commentId}
                 child
-                fullnameList={fullnameList}
+                fullnameList={isRestricted? commentTagList :fullnameList}
                 //Handles Navigate Away
                 setEditorChange={setEditorChange} removeComment={removeComment} setRemoveComment={setRemoveComment}
               />
@@ -189,7 +198,7 @@ const DisplayComments = ({ comments, bcgovcode, currentUser, iaoassignedToList, 
               {
                 actions.replies.filter((id) => id === i.commentId).length !== 0 &&
                 (
-                  <InputField cancellor={i.commentId} parentId={i.commentId} fullnameList={fullnameList} //Handles Navigate Away
+                  <InputField cancellor={i.commentId} parentId={i.commentId} fullnameList={isRestricted? commentTagList :fullnameList} //Handles Navigate Away
                     setEditorChange={setEditorChange} removeComment={removeComment} setRemoveComment={setRemoveComment} />
                 )
               }

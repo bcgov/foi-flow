@@ -1,9 +1,12 @@
 import React, { useEffect, useState } from 'react'
+import { useSelector } from "react-redux"
 import './comments.scss'
 import DisplayComments from './DisplayComments'
 import { ActionProvider } from './ActionContext'
 import Input from './Input'
 import CommentFilter from './CommentFilter'
+import { addToRestrictedRequestTagList,getRestrictedRequestTagList } from '../../../../helper/FOI/helper'
+
 
 
 export const CommentSection = ({
@@ -22,8 +25,11 @@ export const CommentSection = ({
   //Handles Navigate Away
   setEditorChange,
   removeComment,
-  setRemoveComment
+  setRemoveComment,
+  isRestricted,
+  assigneeDetails
 }) => {
+  const requestWatchers = useSelector((state) => state.foiRequests.foiWatcherList);
   const [showaddbox, setshowaddbox] = useState(false)
   const [comments, setcomments] = useState([])
   let _commentcategory = sessionStorage.getItem('foicommentcategory')
@@ -68,6 +74,7 @@ export const CommentSection = ({
         return requestHeaderString+`U-00${requestid}`
       }  
   }
+
  
   return (
     <ActionProvider
@@ -96,13 +103,15 @@ export const CommentSection = ({
 { showaddbox ?
         <div className="inputBox" style={{ display: showaddbox ? 'block' : 'none' }}>
           {<Input add="add"  bcgovcode={bcgovcode} iaoassignedToList={iaoassignedToList} ministryAssignedToList={ministryAssignedToList} //Handles Navigate Away
-          setEditorChange={setEditorChange} removeComment={removeComment} setRemoveComment={setRemoveComment}/>}
+          setEditorChange={setEditorChange} removeComment={removeComment} setRemoveComment={setRemoveComment} isRestricted={isRestricted} 
+          assigneeDetails={assigneeDetails} requestWatchers={requestWatchers}  />}
         </div> :null}
         <div className="displayComments">
           <div className="filterComments" >
             <CommentFilter oncommentfilterchange={onfilterchange} filterValue={filterValue === null ? 1 : filterValue} oncommentfilterkeychange={(k)=>{setfilterkeyValue(k)}}/>
           </div>
           <DisplayComments comments={comments} bcgovcode={bcgovcode} currentUser={currentUser} iaoassignedToList={iaoassignedToList} ministryAssignedToList={ministryAssignedToList} 
+           isRestricted={isRestricted} assigneeDetails={assigneeDetails} requestWatchers={requestWatchers}
           //Handles Navigate Away
           setEditorChange={setEditorChange} removeComment={removeComment} setRemoveComment={setRemoveComment} />
         </div>

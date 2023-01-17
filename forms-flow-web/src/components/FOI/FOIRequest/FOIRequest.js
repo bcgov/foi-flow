@@ -66,13 +66,16 @@ import {
   findRequestState,
   isMandatoryField,
   isAxisSyncDisplayField,
-  getUniqueIdentifier
+  getUniqueIdentifier,
+  isRequestRestricted
 } from "./utils";
 import { ConditionalComponent, formatDate } from '../../../helper/FOI/helper';
 import DivisionalTracking from './DivisionalTracking';
 import AxisDetails from './AxisDetails/AxisDetails';
 import AxisMessageBanner from "./AxisDetails/AxisMessageBanner";
 import HomeIcon from '@mui/icons-material/Home';
+import _ from 'lodash';
+
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -1069,6 +1072,9 @@ const FOIRequest = React.memo(({ userDetail }) => {
                   setEditorChange={setEditorChange}
                   removeComment={removeComment}
                   setRemoveComment={setRemoveComment}
+                  isRestricted={isRequestRestricted(requestDetails,ministryId)}
+                  assigneeDetails={ _.pick(requestDetails, ['assignedGroup', 'assignedTo','assignedToFirstName','assignedToLastName',
+                  'assignedministrygroup','assignedministryperson','assignedministrypersonFirstName','assignedministrypersonLastName'])}
                 />
               </>
             ) : (
