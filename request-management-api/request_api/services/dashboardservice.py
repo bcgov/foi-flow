@@ -94,7 +94,7 @@ class dashboardservice:
                 _openrequest.update({'assignedToFormatted': request.assignedToFormatted})
                 _openrequest.update({'ministryAssignedToFormatted': request.ministryAssignedToFormatted})
                 restrictedrequest = FOIRestrictedMinistryRequest.getrestricteddetails(request.ministryrequestid,'iao')
-                if not hasattr(restrictedrequest, 'isrestricted'):
+                if 'isrestricted' not in restrictedrequest:
                     restrictedrequest['isrestricted'] = False
 
                 _openrequest.update({'isiaorestricted': restrictedrequest['isrestricted']})
@@ -196,7 +196,7 @@ class dashboardservice:
                 _openrequest.update({'assignedToFormatted': request.assignedToFormatted})
                 _openrequest.update({'ministryAssignedToFormatted': request.ministryAssignedToFormatted})
                 restrictedrequest = FOIRestrictedMinistryRequest.getrestricteddetails(request.ministryrequestid,'iao')
-                if not hasattr(restrictedrequest, 'isrestricted'):
+                if 'isrestricted' not in restrictedrequest:
                     restrictedrequest['isrestricted'] = False
 
                 _openrequest.update({'isiaorestricted': restrictedrequest['isrestricted']})
