@@ -11,6 +11,7 @@ class ProgramAreaDivision(db.Model):
     programareaid = db.Column(db.Integer, db.ForeignKey('ProgramAreas.programareaid'))
     name = db.Column(db.String(500), unique=False, nullable=False)    
     isactive = db.Column(db.Boolean, unique=False, nullable=False)
+    sortorder = db.Column(db.Integer, unique=False, nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.now)
     createdby = db.Column(db.String(120), unique=False, default='System')
     
@@ -30,4 +31,4 @@ class ProgramAreaDivision(db.Model):
 
 class ProgramAreaDivisionSchema(ma.Schema):
     class Meta:
-        fields = ('divisionid','programareaid', 'name','isactive')
+        fields = ('divisionid','programareaid', 'name','isactive','sortorder')

@@ -70,6 +70,8 @@ COPY package.json /forms-flow-ai-web/app/package.json
 
 RUN npm install --unsafe-perm
 #RUN npm install react-scripts@3.0.1 -g --silent
+#Patching for KC upgrate v7.16.x
+RUN npm install keycloak-js@20.0.2
 COPY . /forms-flow-ai-web/app/
 RUN npm run build
 
