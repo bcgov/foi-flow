@@ -56,7 +56,7 @@ class FOIRequest(Resource):
             if (AuthHelper.getusertype() == "iao") and (usertype is None or (usertype == "iao")):
                 jsondata = requestservice().getrequest(foirequestid,foiministryrequestid)
                 assignee = jsondata['assignedTo']
-                isrestricted = jsondata['iaorestricteddetails']['isrestricted'] if (jsondata['iaorestricteddetails'] and jsondata['iaorestricteddetails']['isrestricted']) is not None else False
+                isrestricted = jsondata['iaorestricteddetails']['isrestricted'] if ('isrestricted' in jsondata['iaorestricteddetails']) else False
                 if(canrestictdata(foiministryrequestid,assignee,isrestricted,False)):
                     jsondata = {}
                     statuscode = 401

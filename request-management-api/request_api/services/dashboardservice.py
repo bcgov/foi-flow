@@ -94,8 +94,10 @@ class dashboardservice:
                 _openrequest.update({'assignedToFormatted': request.assignedToFormatted})
                 _openrequest.update({'ministryAssignedToFormatted': request.ministryAssignedToFormatted})
                 restrictedrequest = FOIRestrictedMinistryRequest.getrestricteddetails(request.ministryrequestid,'iao')
-                _openrequest.update({'isiaorestricted': restrictedrequest['isrestricted']})
+                if 'isrestricted' not in restrictedrequest:
+                    restrictedrequest['isrestricted'] = False
 
+                _openrequest.update({'isiaorestricted': restrictedrequest['isrestricted']})
                 isaiaoministryrequestwatcher = FOIRequestWatcher.isaiaoministryrequestwatcher(request.ministryrequestid,userid)
                 if restrictedrequest['isrestricted'] == True and (request.assignedTo == userid or isaiaoministryrequestwatcher):
                     _openrequest.update({'lastName': 'Restricted'})
@@ -194,8 +196,10 @@ class dashboardservice:
                 _openrequest.update({'assignedToFormatted': request.assignedToFormatted})
                 _openrequest.update({'ministryAssignedToFormatted': request.ministryAssignedToFormatted})
                 restrictedrequest = FOIRestrictedMinistryRequest.getrestricteddetails(request.ministryrequestid,'iao')
-                _openrequest.update({'isiaorestricted': restrictedrequest['isrestricted']})
+                if 'isrestricted' not in restrictedrequest:
+                    restrictedrequest['isrestricted'] = False
 
+                _openrequest.update({'isiaorestricted': restrictedrequest['isrestricted']})
                 isaiaoministryrequestwatcher = FOIRequestWatcher.isaiaoministryrequestwatcher(request.ministryrequestid,userid)  
 
                 if restrictedrequest['isrestricted'] == True and (request.assignedTo == userid or isaiaoministryrequestwatcher):
