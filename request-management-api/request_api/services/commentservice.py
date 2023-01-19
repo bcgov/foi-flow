@@ -5,6 +5,7 @@ from request_api.models.FOIRequestComments import FOIRequestComment
 from request_api.models.FOIMinistryRequests import FOIMinistryRequest
 from request_api.models.FOIRawRequestComments import FOIRawRequestComment
 from request_api.models.FOIRawRequests import FOIRawRequest
+from request_api.services.assigneeservice import assigneeservice
 import json
 from dateutil.parser import parse
 import datetime 
@@ -107,3 +108,35 @@ class commentservice:
                 "commentTypeId":comment['commenttypeid'],
                 "taggedusers" : comment['taggedusers']
         }     
+
+    def createcommenttagginguserlist(self,watchers, baserequestinfo):
+        
+        userlist = []
+        #watchergroups = {}
+        if baserequestinfo is not None:
+            print("\nbaserequestinfo",baserequestinfo)
+            user= self.__formatuserlist(baserequestinfo['assignedTo'], baserequestinfo['assignedToFirstName'], "", baserequestinfo['assignedToLastName'])
+            userlist.append(user)
+            teamname = baserequestinfo['selectedMinistries'][0]['code'].lower()+"ministryteam"
+            ministryteam = assigneeservice().getmembersbygroupname(teamname) 
+            print('\nministryteam',ministryteam)
+            if ministryteam is not None:
+                for ministry in ministryteam:
+                    for member in ministry['members']:
+                        user= self.__formatuserlist(member['username'], member['firstname'], "", member['lastname'])
+                        userlist.append(user)
+            if watchers is not None:
+                for watcher in watchers:
+                    user= self.__formatuserlist(watcher.watchedby, "", "", "")
+                    userlist.append(user)
+                #     watchergroups.add(watcher.watchedbygroup)
+                # watcherteams = assigneeservice().getmembersbygroupname(baserequestinfo['bcgovcode']) 
+        return userlist
+
+    def __formatuserlist(self, username, firstname, middlename, lastname):
+        user={}
+        user['username'] = username
+        user['firstname'] = firstname
+        user['middlename'] = middlename
+        user['lastname'] = lastname
+        return user

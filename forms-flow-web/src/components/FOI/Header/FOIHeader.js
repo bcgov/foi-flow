@@ -16,7 +16,7 @@ import {isMinistryLogin, getMinistryCode} from "../../../helper/FOI/helper";
 import io from "socket.io-client";
 import {SOCKETIO_CONNECT_URL, SOCKETIO_RECONNECTION_DELAY, SOCKETIO_RECONNECTION_DELAY_MAX, FOI_FLOW_REPORTING_URL, SOCKETIO_CONNECT_NONCE} from "../../../constants/constants";
 import { fetchFOIFullAssignedToList } from "../../../apiManager/services/FOI/foiMasterDataServices";
-
+import {setFOIAssignedToListLoader} from "../../../actions/FOI/foiRequestActions";
 
 const FOIHeader = React.memo(({unauthorized=false}) => { 
 
@@ -41,8 +41,11 @@ const userGroups = user?.groups?.map(group => group.slice(1));
 isMinistry = isMinistryLogin(userGroups);
 ministryCode = getMinistryCode(userGroups);
 
-useEffect(() => {     
+useEffect(() => {   
+  console.log("Inside useeffect of header")  
   if(!unauthorized && isAuthenticated){
+    console.log("Inside useeffect of header-authenticated!")  
+    setFOIAssignedToListLoader(true);
     dispatch(fetchFOIFullAssignedToList());
     dispatch(fetchFOINotifications());  
 	const options = {

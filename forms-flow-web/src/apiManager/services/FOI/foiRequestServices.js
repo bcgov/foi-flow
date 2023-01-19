@@ -489,3 +489,27 @@ export const restrictRequest = (data, requestId, ministryId, type="iao", ...rest
   };
 };
 
+export const fetchORestrictedRequestCommentTagList = (requestid, ...rest) => {
+  const done = fnDone(rest);
+  const apiUrlgetRequestDetails = replaceUrl(
+    API.FOI_GET_RESTRICTED_RAWREQUEST_TAG_LIST,
+    "<requestid>",
+    requestid
+  );
+  return (dispatch) => {
+    httpGETRequest(apiUrlgetRequestDetails, {}, UserService.getToken())
+      .then((res) => {
+        if (res.data) {
+          //dispatch(setOpenedMinistries(res.data));
+          done(null, res.data);
+        } else {
+          dispatch(serviceActionError(res));
+          throw new Error(`Error in fetching user list for tagging in comments# ${requestid}`);
+        }
+      })
+      .catch((error) => {
+        catchError(error, dispatch);
+      });
+  }
+};
+

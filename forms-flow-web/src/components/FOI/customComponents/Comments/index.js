@@ -1,13 +1,12 @@
 import React, { useEffect, useState } from 'react'
-import { useSelector } from "react-redux"
+import { useDispatch, useSelector } from "react-redux"
 import './comments.scss'
 import DisplayComments from './DisplayComments'
 import { ActionProvider } from './ActionContext'
 import Input from './Input'
 import CommentFilter from './CommentFilter'
-import { addToRestrictedRequestTagList,getRestrictedRequestTagList } from '../../../../helper/FOI/helper'
-
-
+import Loading from "../../../../containers/Loading";
+import {fetchORestrictedRequestCommentTagList} from "../../../../apiManager/services/FOI/foiRequestServices";
 
 export const CommentSection = ({
   commentsArray,
@@ -27,7 +26,8 @@ export const CommentSection = ({
   removeComment,
   setRemoveComment,
   isRestricted,
-  assigneeDetails
+  assigneeDetails,
+  istabactive
 }) => {
   const requestWatchers = useSelector((state) => state.foiRequests.foiWatcherList);
   const [showaddbox, setshowaddbox] = useState(false)
@@ -41,13 +41,31 @@ export const CommentSection = ({
     let filteredcomments = filterkeyinCommentsandReplies(_commentsbyCategory,_filteredcomments)        
     setcomments(filteredcomments)         
   }, [filterValue,commentsArray ,filterkeyValue])
+  let restrictedReqTaglist= [];
+  const dispatch = useDispatch(); 
+  console.log("istabactive:",istabactive);
+
+  //useEffect(()=> {
+    
+    if(istabactive && isRestricted){
+      console.log("Call API!!");
+      dispatch(fetchORestrictedRequestCommentTagList(requestid,(err, res) =>{
+        console.log("Response",res);
+        if(!err){
+          console.log("Response",res);
+          restrictedReqTaglist = res;
+        }
+      }))
+    }
+  //}, []);
  
   const onfilterchange = (_filterValue) => { 
     sessionStorage.setItem('foicommentcategory',_filterValue)   
     setfilterValue(_filterValue)       
     setcomments([])
   }
-
+  const isAssignedToListLoading = useSelector((state) => state.foiRequests.isAssignedToListLoading);
+  console.log("isAssignedToListLoading",isAssignedToListLoading);
   const filterkeyinCommentsandReplies = (_comments,filtercomments)=>{
       _comments.forEach(_comment=>{
             if(_comment.replies!=undefined && _comment.replies.length > 0 )
@@ -77,6 +95,9 @@ export const CommentSection = ({
 
  
   return (
+    <>
+    { !isAssignedToListLoading ?
+      (
     <ActionProvider
       currentUser={currentUser}
       setComment={setComment}
@@ -103,8 +124,7 @@ export const CommentSection = ({
 { showaddbox ?
         <div className="inputBox" style={{ display: showaddbox ? 'block' : 'none' }}>
           {<Input add="add"  bcgovcode={bcgovcode} iaoassignedToList={iaoassignedToList} ministryAssignedToList={ministryAssignedToList} //Handles Navigate Away
-          setEditorChange={setEditorChange} removeComment={removeComment} setRemoveComment={setRemoveComment} isRestricted={isRestricted} 
-          assigneeDetails={assigneeDetails} requestWatchers={requestWatchers}  />}
+          setEditorChange={setEditorChange} removeComment={removeComment} setRemoveComment={setRemoveComment} restrictedReqTaglist={restrictedReqTaglist}  />}
         </div> :null}
         <div className="displayComments">
           <div className="filterComments" >
@@ -117,7 +137,11 @@ export const CommentSection = ({
         </div>
 
       </div>
-    </ActionProvider>
+    </ActionProvider>)
+    :
+    (<Loading />)
+  }
+  </>
   )
 }
 

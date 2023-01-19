@@ -348,7 +348,6 @@ const isRequestWatcherOrAssignee = (requestWatchers,requestAssignees,userId) => 
 
 const addToRestrictedRequestTagList = (requestWatchers, assigneeDetails, fullnameList, bcgovcode) => {
 
-  console.log("fullnameList:", fullnameList);
   let fullnameArray = [];
   let currentMember;
   if(assigneeDetails){

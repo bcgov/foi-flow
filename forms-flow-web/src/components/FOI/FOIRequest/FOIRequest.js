@@ -1075,6 +1075,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
                   isRestricted={isRequestRestricted(requestDetails,ministryId)}
                   assigneeDetails={ _.pick(requestDetails, ['assignedGroup', 'assignedTo','assignedToFirstName','assignedToLastName',
                   'assignedministrygroup','assignedministryperson','assignedministrypersonFirstName','assignedministrypersonLastName'])}
+                  istabactive={tabLinksStatuses?.Comments?.active}
                 />
               </>
             ) : (
