@@ -18,6 +18,7 @@ class FOIRawRequestWatcherSchema(Schema):
     watchedbygroup = fields.Str(data_key="watchedbygroup",allow_none=True, validate=[validate.Length(max=250, error=MAX_EXCEPTION_MESSAGE)])
     watchedby = fields.Str(data_key="watchedby", validate=[validate.Length(max=120, error=MAX_EXCEPTION_MESSAGE)])
     isactive = fields.Bool(data_key="isactive")
+    fullname = fields.Str(data_key="fullname",allow_none=True ,validate=[validate.Length(max=250, error=MAX_EXCEPTION_MESSAGE)])
 
 
 class FOIMinistryRequestWatcherSchema(Schema):
@@ -29,3 +30,4 @@ class FOIMinistryRequestWatcherSchema(Schema):
     watchedbygroup = fields.Str(data_key="watchedbygroup",allow_none=True, validate=[validate.Length(max=250, error=MAX_EXCEPTION_MESSAGE)])
     watchedby = fields.Str(data_key="watchedby", validate=[validate.Length(max=120, error=MAX_EXCEPTION_MESSAGE)])
     isactive = fields.Bool(data_key="isactive")
+    fullname = fields.Str(data_key="fullname",allow_none=True ,validate=[validate.Length(max=250, error=MAX_EXCEPTION_MESSAGE)])

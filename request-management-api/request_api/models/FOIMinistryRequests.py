@@ -14,6 +14,7 @@ from .FOIRequestApplicants import FOIRequestApplicant
 from .FOIRequestStatus import FOIRequestStatus
 from .ApplicantCategories import ApplicantCategory
 from .FOIRequestWatchers import FOIRequestWatcher
+from .FOIRestrictedMinistryRequests import FOIRestrictedMinistryRequest
 from .ProgramAreas import ProgramArea
 from request_api.utils.enums import ProcessingTeamWithKeycloackGroup, IAOTeamWithKeycloackGroup
 from .FOIAssignees import FOIAssignee
@@ -60,6 +61,9 @@ class FOIMinistryRequest(db.Model):
     axissyncdate = db.Column(db.DateTime, nullable=True)    
     axisrequestid = db.Column(db.String(120), nullable=True)
     requestpagecount = db.Column(db.String(20), nullable=True)
+
+    
+
     #ForeignKey References
     
     closereasonid = db.Column(db.Integer,ForeignKey('CloseReasons.closereasonid'))
@@ -321,11 +325,12 @@ class FOIMinistryRequest(db.Model):
         subquery_extension_count = _session.query(FOIRequestExtension.foiministryrequest_id, func.count(distinct(FOIRequestExtension.foirequestextensionid)).filter(FOIRequestExtension.isactive == True).label('extensions')).group_by(FOIRequestExtension.foiministryrequest_id).subquery()
 
 
+
         onbehalf_applicantmapping = aliased(FOIRequestApplicantMapping)
         onbehalf_applicant = aliased(FOIRequestApplicant)
 
         #filter/search
-        if(len(filterfields) > 0 and keyword is not None):
+        if(len(filterfields) > 0 and keyword is not None and keyword != "restricted"):
             filtercondition = []
             for field in filterfields:
                 filtercondition.append(FOIMinistryRequest.findfield(field, iaoassignee, ministryassignee).ilike('%'+keyword+'%'))
@@ -402,6 +407,7 @@ class FOIMinistryRequest(db.Model):
                            ],
                            else_ = subquery_extension_count.c.extensions).label('extensions')
 
+
         selectedcolumns = [
             FOIRequest.foirequestid.label('id'),
             FOIMinistryRequest.version,
@@ -439,7 +445,8 @@ class FOIMinistryRequest(db.Model):
             ministryassignedtoformatted,
             FOIMinistryRequest.closedate,
             onbehalfformatted,
-            extensions
+            extensions,
+            literal(None).label('isiaorestricted')
         ]
 
         basequery = _session.query(
@@ -506,7 +513,7 @@ class FOIMinistryRequest(db.Model):
             dbquery = basequery.filter(ministryfilter)
 
 
-        if(keyword is None):
+        if(keyword is None or keyword == "restricted"):
             return dbquery
         else:
             return dbquery.filter(or_(*filtercondition))
@@ -901,7 +908,8 @@ class FOIMinistryRequest(db.Model):
             ministryassignedtoformatted,
             FOIMinistryRequest.closedate,
             onbehalfformatted,
-            extensions
+            extensions,            
+            literal(None).label('isiaorestricted')
         ]
 
         basequery = _session.query(

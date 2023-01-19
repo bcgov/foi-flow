@@ -14,6 +14,7 @@ from request_api.services.eventservice import eventservice
 from request_api.services.rawrequest.rawrequestservicegetter import rawrequestservicegetter
 from request_api.exceptions import BusinessException, Error
 from request_api.models.default_method_result import DefaultMethodResult
+from request_api.models.FOIRawRequestWatchers import FOIRawRequestWatcher
 import logging
 
 class rawrequestservice:
@@ -29,8 +30,7 @@ class rawrequestservice:
         assigneefirstname = requestdatajson["assignedToFirstName"] if requestdatajson.get("assignedToFirstName") != None else None
         assigneemiddlename = requestdatajson["assignedToMiddleName"] if requestdatajson.get("assignedToMiddleName") != None else None
         assigneelastname = requestdatajson["assignedToLastName"] if requestdatajson.get("assignedToLastName") != None else None
-        ispiiredacted = requestdatajson["ispiiredacted"] if 'ispiiredacted' in requestdatajson  else False
-
+        ispiiredacted = requestdatajson["ispiiredacted"] if 'ispiiredacted' in requestdatajson  else False        
         axisrequestid = requestdatajson["axisRequestId"] if 'axisRequestId' in requestdatajson  else None
         isaxisrequestidpresent = False
         if axisrequestid is not None:
@@ -52,7 +52,7 @@ class rawrequestservice:
                                                     assigneemiddlename=assigneemiddlename,
                                                     assigneelastname=assigneelastname,
                                                     axisrequestid=axisrequestid,
-                                                    axissyncdate=axissyncdate
+                                                    axissyncdate=axissyncdate                                                    
                                                 )
         else:            
             raise ValueError("Duplicate AXIS Request ID")
@@ -90,7 +90,7 @@ class rawrequestservice:
         raise BusinessException(Error.DATA_NOT_FOUND)    
 
     def saverawrequestversion(self, _requestdatajson, _requestid, _assigneegroup, _assignee, status, userid, assigneefirstname, assigneemiddlename, assigneelastname, actiontype=None):
-        ispiiredacted = _requestdatajson["ispiiredacted"] if 'ispiiredacted' in _requestdatajson  else False
+        ispiiredacted = _requestdatajson["ispiiredacted"] if 'ispiiredacted' in _requestdatajson  else False        
         #Get documents
         if actiontype == "assignee":
             result = FOIRawRequest.saverawrequestassigneeversion(_requestid, _assigneegroup, _assignee, userid, assigneefirstname, assigneemiddlename, assigneelastname)
@@ -99,6 +99,9 @@ class rawrequestservice:
         documentservice().createrawrequestdocumentversion(_requestid)
         return result
 
+    def saverawrequestiaorestricted(self,_requestid,_iaorestricted,_updatedby):
+        result = FOIRawRequest.saveiaorestrictedrawrequest(_requestid,_iaorestricted,_updatedby)
+        return result
    
     def updateworkflowinstance(self, wfinstanceid, requestid, userid):
         return FOIRawRequest.updateworkflowinstance(wfinstanceid, requestid, userid)
@@ -139,3 +142,6 @@ class rawrequestservice:
         if countofaxisrequestid > 0:
             return True
         return False
+
+    def israwrequestwatcher(self,requestid, userid):
+        return FOIRawRequestWatcher.isawatcher(requestid,userid)    

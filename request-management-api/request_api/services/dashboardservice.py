@@ -1,10 +1,14 @@
 from request_api.models.FOIRawRequests import FOIRawRequest
 from request_api.models.FOIMinistryRequests import FOIMinistryRequest
+from request_api.models.FOIRestrictedMinistryRequests import FOIRestrictedMinistryRequest
+from request_api.models.FOIRawRequestWatchers import FOIRawRequestWatcher
+from request_api.models.FOIRequestWatchers import FOIRequestWatcher
 from dateutil import tz, parser
 import datetime as dt
 from pytz import timezone
 import pytz
 import maya
+from request_api.auth import AuthHelper
 
 from flask import jsonify
 
@@ -42,7 +46,7 @@ class dashboardservice:
         baserequestinfo.update({'assignedToLastName': request.assignedToLastName})
         baserequestinfo.update({'onBehalfFirstName': request.onBehalfFirstName})
         baserequestinfo.update({'onBehalfLastName': request.onBehalfLastName})
-        baserequestinfo.update({'requestPageCount': request.requestPageCount})
+        baserequestinfo.update({'requestPageCount': request.requestPageCount})        
         return baserequestinfo
         
     def __preparebaserequestinfo(self, id, requesttype, status, receiveddate, receiveddateuf, assignedgroup, assignedto, idnumber, axisrequestid, version):
@@ -58,26 +62,49 @@ class dashboardservice:
             'version':version
         }
 
-    def getrequestqueuepagination(self, groups=None, page=1, size=10, sortingitems=[], sortingorders=[], filterfields=[], keyword=None, additionalfilter='All', userid=None):
+    def getrequestqueuepagination(self, groups=None, page=1, size=10, sortingitems=[], sortingorders=[], filterfields=[], keyword=None, additionalfilter='All', userid=None):        
         requests = FOIRawRequest.getrequestspagination(groups, page, size, sortingitems, sortingorders, filterfields, keyword, additionalfilter, userid)
-        requestqueue = []
+        requestqueue = []                
         for request in requests.items:
+            
             if(request.receivedDateUF is None): #request from online form has no received date in json
                 _receiveddate = maya.parse(request.created_at).datetime(to_timezone='America/Vancouver', naive=False)
             else:
                 _receiveddate = parser.parse(request.receivedDateUF)
 
-            if(request.ministryrequestid == None):
+            if(request.ministryrequestid == None):                
                 unopenrequest = self.__preparefoirequestinfo(request, _receiveddate.strftime(SHORT_DATEFORMAT), _receiveddate.strftime(LONG_DATEFORMAT), idnumberprefix= 'U-00')
                 unopenrequest.update({'assignedToFormatted': request.assignedToFormatted})
-                requestqueue.append(unopenrequest)
+                unopenrequest.update({'isiaorestricted': request.isiaorestricted}) 
+
+                isawatcher = FOIRawRequestWatcher.isawatcher(request.id,userid)                                
+                if request.isiaorestricted == True and (request.assignedTo == userid or isawatcher or  AuthHelper.isiaorestrictedfilemanager()):
+                    unopenrequest.update({'lastName': 'Restricted'})
+                    unopenrequest.update({'firstName': 'Request'})
+                    requestqueue.append(unopenrequest)
+                
+                
+                if (request.isiaorestricted == False or request.isiaorestricted == None) and keyword != "restricted":
+                    requestqueue.append(unopenrequest) 
+
             else:
                 _openrequest = self.__preparefoirequestinfo(request, _receiveddate.strftime(SHORT_DATEFORMAT), _receiveddate.strftime(LONG_DATEFORMAT))
                 _openrequest.update({'ministryrequestid': request.ministryrequestid})
                 _openrequest.update({'extensions': request.extensions})
                 _openrequest.update({'assignedToFormatted': request.assignedToFormatted})
                 _openrequest.update({'ministryAssignedToFormatted': request.ministryAssignedToFormatted})
-                requestqueue.append(_openrequest)    
+                restrictedrequest = FOIRestrictedMinistryRequest.getrestricteddetails(request.ministryrequestid,'iao')
+                _openrequest.update({'isiaorestricted': restrictedrequest['isrestricted']})
+
+                isaiaoministryrequestwatcher = FOIRequestWatcher.isaiaoministryrequestwatcher(request.ministryrequestid,userid)
+                if restrictedrequest['isrestricted'] == True and (request.assignedTo == userid or isaiaoministryrequestwatcher):
+                    _openrequest.update({'lastName': 'Restricted'})
+                    _openrequest.update({'firstName': 'Request'})
+                    requestqueue.append(_openrequest)
+
+                if (restrictedrequest['isrestricted'] == False or restrictedrequest['isrestricted']  == None) and  keyword != "restricted":
+                     requestqueue.append(_openrequest)   
+                   
 
         meta = {
             'page': requests.page,
@@ -88,6 +115,9 @@ class dashboardservice:
             'has_next': requests.has_next,
             'has_prev': requests.has_prev,
         }
+
+
+
 
         return jsonify({'data': requestqueue, 'meta': meta})
 
@@ -141,11 +171,21 @@ class dashboardservice:
             else:
                 _receiveddate = parser.parse(request.receivedDateUF)
 
+            userid = AuthHelper.getuserid()
             if(request.ministryrequestid == None):
                 unopenrequest = self.__preparefoirequestinfo(request, _receiveddate.strftime(SHORT_DATEFORMAT), _receiveddate.strftime(LONG_DATEFORMAT), idnumberprefix= 'U-00')
                 unopenrequest.update({'description':request.description})
                 unopenrequest.update({'assignedToFormatted': request.assignedToFormatted})
-                requestqueue.append(unopenrequest)
+                unopenrequest.update({'isiaorestricted': request.isiaorestricted})
+
+                
+                isawatcher = FOIRawRequestWatcher.isawatcher(request.id,userid)
+                
+                if request.isiaorestricted == True and (request.assignedTo == userid or isawatcher or AuthHelper.isiaorestrictedfilemanager()):
+                    requestqueue.append(unopenrequest)
+                
+                if (request.isiaorestricted == False or request.isiaorestricted == None):
+                    requestqueue.append(unopenrequest) 
             else:
                 _openrequest = self.__preparefoirequestinfo(request,  _receiveddate.strftime(SHORT_DATEFORMAT), _receiveddate.strftime(LONG_DATEFORMAT))
                 _openrequest.update({'ministryrequestid':request.ministryrequestid})
@@ -153,7 +193,16 @@ class dashboardservice:
                 _openrequest.update({'description':request.description})
                 _openrequest.update({'assignedToFormatted': request.assignedToFormatted})
                 _openrequest.update({'ministryAssignedToFormatted': request.ministryAssignedToFormatted})
-                requestqueue.append(_openrequest)    
+                restrictedrequest = FOIRestrictedMinistryRequest.getrestricteddetails(request.ministryrequestid,'iao')
+                _openrequest.update({'isiaorestricted': restrictedrequest['isrestricted']})
+
+                isaiaoministryrequestwatcher = FOIRequestWatcher.isaiaoministryrequestwatcher(request.ministryrequestid,userid)  
+
+                if restrictedrequest['isrestricted'] == True and (request.assignedTo == userid or isaiaoministryrequestwatcher):
+                    requestqueue.append(_openrequest)
+
+                if restrictedrequest['isrestricted'] == False or restrictedrequest['isrestricted']  == None:
+                     requestqueue.append(_openrequest)     
 
         meta = {
             'page': requests.page,

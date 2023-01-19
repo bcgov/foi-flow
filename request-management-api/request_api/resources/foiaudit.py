@@ -20,9 +20,10 @@ from flask_expects_json import expects_json
 from flask_cors import cross_origin
 from request_api.auth import auth, AuthHelper
 from request_api.tracer import Tracer
-from request_api.utils.util import  cors_preflight, allowedorigins
+from request_api.utils.util import  cors_preflight, allowedorigins,canrestictdata
 from request_api.exceptions import BusinessException, Error
 from request_api.services.auditservice import auditservice
+from request_api.services.rawrequestservice import rawrequestservice
 import json
 
 
@@ -46,11 +47,18 @@ class FOIAuditByField(Resource):
         if (type is None or id is None or field is None) or ((type is not None and type != "rawrequest" and type != "ministryrequest") or (field is not None and field != "description")):
             return {'status': False, 'message':'Bad Request'}, 400
 
+        _canrestrictdata = False
+        if(type == 'rawrequest'):
+            baserequestinfo = rawrequestservice().getrawrequest(id)
+            _canrestrictdata = canrestictdata(id,baserequestinfo['assignedTo'],baserequestinfo['isiaorestricted'],True)
+
         try:
             isall = False if request.url.endswith('summary') else True      
             result = auditservice().getauditforfield(type, id, field, isall)
-            if result is not None:
+            if _canrestrictdata is False and result is not None:
                 return {"audit": result}, 200
+            elif _canrestrictdata:
+                return {'status': 401, 'message':'Restricted Request'} , 401
             else:
                 return {'status': False, 'message':'Not Found'}, 404   
         except BusinessException as exception:            

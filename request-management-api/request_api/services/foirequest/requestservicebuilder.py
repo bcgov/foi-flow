@@ -47,7 +47,6 @@ class requestservicebuilder(requestserviceconfigurator):
             foiministryrequest.recordsearchfromdate = requestschema.get("fromDate")
         if self.isNotBlankorNone(requestschema,"toDate","main") == True:
             foiministryrequest.recordsearchtodate = requestschema.get("toDate")
-        
         self.__updateassignedtoandgroup(foiministryrequest, requestschema, ministry, status, filenumber, ministryid)
         self.__updateministryassignedtoandgroup(foiministryrequest, requestschema, ministry, status)
 
@@ -81,7 +80,7 @@ class requestservicebuilder(requestserviceconfigurator):
             requestserviceministrybuilder().createfoiassigneefromobject(requestschema.get("assignedTo"), requestschema.get("assignedToFirstName"), requestschema.get("assignedToMiddleName"), requestschema.get("assignedToLastName"))
         else:
             foiministryrequest.assignedto = None
-        if(ministryid is None and filenumber is None and status == "Open"):
+        if(ministryid is None and filenumber is None and status == "Open" and requestschema.get("isiaorestricted") == False):
             foiministryrequest.assignedto = None
             foiministryrequest.assignedgroup = self.__getgroupname(requestschema.get("requestType"), ministry["code"])
 

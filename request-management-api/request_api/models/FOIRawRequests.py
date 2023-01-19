@@ -43,6 +43,8 @@ class FOIRawRequest(db.Model):
     axissyncdate = db.Column(db.DateTime, nullable=True)    
     axisrequestid = db.Column(db.String(120), nullable=True)
 
+    isiaorestricted = db.Column(db.Boolean, unique=False, nullable=False,default=False)
+
     closereasonid = db.Column(db.Integer,ForeignKey('CloseReasons.closereasonid'))
     closereason = relationship("CloseReason", uselist=False)
 
@@ -79,7 +81,7 @@ class FOIRawRequest(db.Model):
             closedate = _requestrawdata["closedate"] if 'closedate' in _requestrawdata  else None
             closereasonid = _requestrawdata["closereasonid"] if 'closereasonid' in _requestrawdata  else None
             axisrequestid = _requestrawdata["axisRequestId"] if 'axisRequestId' in _requestrawdata  else None
-            axissyncdate = _requestrawdata["axisSyncDate"] if 'axisSyncDate' in _requestrawdata  else None           
+            axissyncdate = _requestrawdata["axisSyncDate"] if 'axisSyncDate' in _requestrawdata  else None            
             _version = request.version+1           
             insertstmt =(
                 insert(FOIRawRequest).
@@ -100,6 +102,8 @@ class FOIRawRequest(db.Model):
                     closereasonid=closereasonid,
                     axisrequestid= axisrequestid,
                     axissyncdate=axissyncdate,
+                    isiaorestricted = request.isiaorestricted
+                   
                 )
             )
             db.session.execute(insertstmt)               
@@ -108,6 +112,42 @@ class FOIRawRequest(db.Model):
         else:
             return DefaultMethodResult(True,'No request foound')
     
+
+    @classmethod
+    def saveiaorestrictedrawrequest(cls,requestid,_isiaorestricted=False, _updatedby=None)->DefaultMethodResult:
+        currentrequest = db.session.query(FOIRawRequest).filter_by(requestid=requestid).order_by(FOIRawRequest.version.desc()).first()
+        request = currentrequest
+        _version = currentrequest.version+1               
+        insertstmt = (
+            insert(FOIRawRequest).
+            values(
+                    requestid=request.requestid, 
+                    requestrawdata=request.requestrawdata,
+                    version=_version,
+                    updatedby=_updatedby,
+                    updated_at=datetime.now(),
+                    status=request.status,
+                    assignedgroup=request.assignedgroup,
+                    assignedto=request.assignedto,
+                    wfinstanceid=request.wfinstanceid,
+                    sourceofsubmission=request.sourceofsubmission,
+                    ispiiredacted=request.ispiiredacted,
+                    createdby=request.createdby,
+                    closedate=request.closedate,
+                    closereasonid=request.closereasonid,
+                    axisrequestid= request.axisrequestid,
+                    axissyncdate=request.axissyncdate,
+                    created_at=request.created_at,
+                    requirespayment = request.requirespayment,
+                    isiaorestricted =_isiaorestricted,
+                    notes = request.notes,
+                    
+            )
+        )
+        db.session.execute(insertstmt)               
+        db.session.commit()                
+        return DefaultMethodResult(True,'Request Updated for iaorestricted - {0}'.format(str(request.version)),requestid,request.wfinstanceid,_isiaorestricted)    
+
     @classmethod
     def saverawrequestassigneeversion(cls,requestid,assigneegroup,assignee,userid,assigneefirstname=None,assigneemiddlename=None,assigneelastname=None)->DefaultMethodResult:        
         request = db.session.query(FOIRawRequest).filter_by(requestid=requestid).order_by(FOIRawRequest.version.desc()).first()
@@ -145,6 +185,8 @@ class FOIRawRequest(db.Model):
                     closereasonid=closereasonid,
                     axisrequestid= axisrequestid,
                     axissyncdate=axissyncdate,
+                    isiaorestricted = request.isiaorestricted
+                    
                 )
             )
             db.session.execute(insertstmt)               
@@ -458,7 +500,8 @@ class FOIRawRequest(db.Model):
             literal(None).label('ministryAssignedToFormatted'),
             literal(None).label('closedate'),
             literal(None).label('onBehalfFormatted'),
-            literal(None).label('extensions')
+            literal(None).label('extensions'),
+            FOIRawRequest.isiaorestricted            
         ]
 
         basequery = _session.query(*selectedcolumns).join(subquery_maxversion, and_(*joincondition)).join(FOIAssignee, FOIAssignee.username == FOIRawRequest.assignedto, isouter=True)
@@ -493,17 +536,18 @@ class FOIRawRequest(db.Model):
 
         #filter/search
         filtercondition = []
-        for field in filterfields:
-            if(field == 'idNumber'):
-                keyword = keyword.replace('u-00', '')
-
-            filtercondition.append(FOIRawRequest.findfield(field).ilike('%'+keyword+'%'))
-            if(field == 'firstName'):
-                filtercondition.append(FOIRawRequest.findfield('contactFirstName').ilike('%'+keyword+'%'))
-            if(field == 'lastName'):
-                filtercondition.append(FOIRawRequest.findfield('contactLastName').ilike('%'+keyword+'%'))
-            if(field == 'requestType'):
-                filtercondition.append(FOIRawRequest.findfield('requestTypeRequestType').ilike('%'+keyword+'%'))
+        if(keyword != 'restricted'):
+            for field in filterfields:
+                if(field == 'idNumber'):
+                    keyword = keyword.replace('u-00', '')
+                
+                filtercondition.append(FOIRawRequest.findfield(field).ilike('%'+keyword+'%'))
+                if(field == 'firstName'):
+                    filtercondition.append(FOIRawRequest.findfield('contactFirstName').ilike('%'+keyword+'%'))
+                if(field == 'lastName'):
+                    filtercondition.append(FOIRawRequest.findfield('contactLastName').ilike('%'+keyword+'%'))
+                if(field == 'requestType'):
+                    filtercondition.append(FOIRawRequest.findfield('requestTypeRequestType').ilike('%'+keyword+'%'))
         
         return or_(*filtercondition)
 
@@ -842,4 +886,4 @@ class FOIRawRequest(db.Model):
 
 class FOIRawRequestSchema(ma.Schema):
     class Meta:
-        fields = ('requestid', 'requestrawdata', 'status','notes','created_at','wfinstanceid','version','updated_at','assignedgroup','assignedto','updatedby','createdby','sourceofsubmission','ispiiredacted','assignee.firstname','assignee.lastname', 'axisrequestid', 'axissyncdate', 'closedate')
+        fields = ('requestid', 'requestrawdata', 'status','notes','created_at','wfinstanceid','version','updated_at','assignedgroup','assignedto','updatedby','createdby','sourceofsubmission','ispiiredacted','assignee.firstname','assignee.lastname', 'axisrequestid', 'axissyncdate', 'closedate','isiaorestricted')

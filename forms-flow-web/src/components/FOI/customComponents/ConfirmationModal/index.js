@@ -61,7 +61,7 @@ export default function ConfirmationModal({requestId, openModal, handleModal, st
     const selectedMinistries = saveRequestObject?.selectedMinistries?.map(ministry => ministry.code);
     const updatedProcessingTeamList = getProcessingTeams(processingTeamList, selectedMinistries);
     const assignedTo= getAssignedTo(saveRequestObject);
-    const updatedAssignedTo = getUpdatedAssignedTo(assignedTo, updatedProcessingTeamList, state, saveRequestObject?.requestType)
+    const updatedAssignedTo = getUpdatedAssignedTo(assignedTo, updatedProcessingTeamList, state, saveRequestObject?.requestType, saveRequestObject?.isiaorestricted)
     const ministryGroup = getMinistryGroup(saveRequestObject);
     const selectedMinistry = getSelectedMinistry(saveRequestObject, ministryGroup);
     const selectedMinistryAssignedTo = getSelectedMinistryAssignedTo(saveRequestObject, selectedMinistry);

@@ -11,6 +11,7 @@ export const getMenuItems = ({
   classes,
   assignedToList,
   selectedAssignedTo,
+  isIAORestrictedRequest
 }) => {
   let menuItems = [];
   menuItems.push(
@@ -40,6 +41,7 @@ export const getMenuItems = ({
         className={classes.group}
         key={group.id}
         value={`${group.name}|${group.name}`}
+        disabled={isIAORestrictedRequest}
       >
         {group.name}
       </MenuItem>
@@ -59,7 +61,6 @@ export const getMenuItems = ({
     menuItems.push(assigneeItems);
 
   });
-
   return menuItems;
 };
 
