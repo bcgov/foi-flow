@@ -10,6 +10,7 @@ const Input = ({ add, bcgovcode, iaoassignedToList, ministryAssignedToList, setE
   const [fullnameList, setFullnameList] = useState(getFullnameList());
   //const [commentTagList, setCommentTagList] = useState(getRestrictedRequestTagList());
 
+   //console.log("fullnameList",fullnameList)
  
     if (!fullnameList) {
         console.log("Else!!");

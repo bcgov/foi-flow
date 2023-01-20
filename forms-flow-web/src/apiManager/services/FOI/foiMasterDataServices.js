@@ -159,7 +159,6 @@ import {
     }
 
     if (fullnameTeamArray.includes("iao")) {
-      console.log("Inside service call from header-IAO!");
       return (dispatch) => {
         dispatch(setFOIFullAssignedToList(getAssignToList("iao")));
         dispatch(setFOIAssignedToListLoader(false));
@@ -179,7 +178,6 @@ import {
               let data = foiFullAssignedToList.map((assignedTo) => {
                 return { ...assignedTo };
               });
-              console.log("Inside service call from header!",data);
               addToFullnameList(data, "iao");
               dispatch(setFOIFullAssignedToList(data));
               dispatch(setFOIAssignedToListLoader(false));

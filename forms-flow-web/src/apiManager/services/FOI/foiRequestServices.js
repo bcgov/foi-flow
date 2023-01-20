@@ -489,7 +489,7 @@ export const restrictRequest = (data, requestId, ministryId, type="iao", ...rest
   };
 };
 
-export const fetchORestrictedRequestCommentTagList = (requestid, ...rest) => {
+export const fetchRestrictedRequestCommentTagList = (requestid, ...rest) => {
   const done = fnDone(rest);
   const apiUrlgetRequestDetails = replaceUrl(
     API.FOI_GET_RESTRICTED_RAWREQUEST_TAG_LIST,

@@ -42,9 +42,7 @@ isMinistry = isMinistryLogin(userGroups);
 ministryCode = getMinistryCode(userGroups);
 
 useEffect(() => {   
-  console.log("Inside useeffect of header")  
   if(!unauthorized && isAuthenticated){
-    console.log("Inside useeffect of header-authenticated!")  
     setFOIAssignedToListLoader(true);
     dispatch(fetchFOIFullAssignedToList());
     dispatch(fetchFOINotifications());  

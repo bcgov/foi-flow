@@ -127,7 +127,7 @@ class commentservice:
                         userlist.append(user)
             if watchers is not None:
                 for watcher in watchers:
-                    user= self.__formatuserlist(watcher.watchedby, "", "", "")
+                    user= self.__formatuserlist(watcher['watchedby'], "", "", "")
                     userlist.append(user)
                 #     watchergroups.add(watcher.watchedbygroup)
                 # watcherteams = assigneeservice().getmembersbygroupname(baserequestinfo['bcgovcode']) 
@@ -137,6 +137,8 @@ class commentservice:
         user={}
         user['username'] = username
         user['firstname'] = firstname
-        user['middlename'] = middlename
+        #user['middlename'] = middlename
         user['lastname'] = lastname
+        user['fullname'] = lastname+","+firstname
+        user['name'] = lastname+","+firstname
         return user

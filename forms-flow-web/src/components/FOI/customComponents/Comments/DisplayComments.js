@@ -7,11 +7,11 @@ import CommentStructure from './CommentStructure'
 import { addToFullnameList, getFullnameList,addToRestrictedRequestTagList,getRestrictedRequestTagList } from '../../../../helper/FOI/helper'
 
 
-const DisplayComments = ({ comments, bcgovcode, currentUser, iaoassignedToList, ministryAssignedToList, isRestricted, assigneeDetails, requestWatchers, 
+const DisplayComments = ({ comments, bcgovcode, currentUser, iaoassignedToList, ministryAssignedToList, restrictedReqTaglist, 
   setEditorChange, removeComment, setRemoveComment }) => {
 
   const [fullnameList, setFullnameList] = useState(getFullnameList);
-  const [commentTagList, setCommentTagList] = useState(getRestrictedRequestTagList());
+  //const [commentTagList, setCommentTagList] = useState(getRestrictedRequestTagList());
 
   const finduserbyuserid = (userId) => {
     let user = fullnameList.find(u => u.username === userId);
@@ -43,12 +43,12 @@ const DisplayComments = ({ comments, bcgovcode, currentUser, iaoassignedToList, 
     }
   }
 
-  useEffect(()=>{
-    if(isRestricted){
-      addToRestrictedRequestTagList(requestWatchers, assigneeDetails, fullnameList, bcgovcode);
-      setCommentTagList(getRestrictedRequestTagList());
-    }
-  }, [assigneeDetails, requestWatchers]);
+  // useEffect(()=>{
+  //   if(isRestricted){
+  //     addToRestrictedRequestTagList(requestWatchers, assigneeDetails, fullnameList, bcgovcode);
+  //     setCommentTagList(getRestrictedRequestTagList());
+  //   }
+  // }, [assigneeDetails, requestWatchers]);
 
   const showhiddencomments = (_e, count) => {
     let hiddencomments = document.getElementsByName('commentsectionhidden')
@@ -145,7 +145,8 @@ const DisplayComments = ({ comments, bcgovcode, currentUser, iaoassignedToList, 
               inputvalue={a.text}
               edit
               parentId={i.commentId}
-              fullnameList={isRestricted? commentTagList :fullnameList}
+              fullnameList={fullnameList}
+              restrictedReqTaglist={restrictedReqTaglist}
               //Handles Navigate Away
               setEditorChange={setEditorChange} removeComment={removeComment} setRemoveComment={setRemoveComment}
             />
@@ -173,7 +174,8 @@ const DisplayComments = ({ comments, bcgovcode, currentUser, iaoassignedToList, 
                 cancellor={a.commentId}
                 parentId={i.commentId}
                 child
-                fullnameList={isRestricted? commentTagList :fullnameList}
+                fullnameList={fullnameList}
+                restrictedReqTaglist={restrictedReqTaglist}
                 //Handles Navigate Away
                 setEditorChange={setEditorChange} removeComment={removeComment} setRemoveComment={setRemoveComment}
               />
@@ -190,7 +192,7 @@ const DisplayComments = ({ comments, bcgovcode, currentUser, iaoassignedToList, 
           comments.map((i, index) => (
             <div key={i.commentId} className="commentsection" data-comid={i.commentId} name={index >= limit ? 'commentsectionhidden' : ""} style={index >= limit && !showmorehidden ? { display: 'none' } : { display: 'block' }}>
               {actions.editArr.filter((id) => id === i.commentId).length !== 0 ? (
-                <InputField cancellor={i.commentId} inputvalue={i.text} edit fullnameList={fullnameList} //Handles Navigate Away
+                <InputField cancellor={i.commentId} inputvalue={i.text} edit fullnameList={fullnameList} restrictedReqTaglist={restrictedReqTaglist} //Handles Navigate Away
                   setEditorChange={setEditorChange} removeComment={removeComment} setRemoveComment={setRemoveComment} />
               ) : (
                 <CommentStructure i={i} handleEdit={() => actions.handleAction} totalcommentCount={gettotalcommentflag(i)} currentIndex={index} c={false} hasAnotherUserComment={(i.replies && i.replies.filter(r => r.userId !== currentUser.userId).length > 0)} fullName={getfullName(i.commentTypeId, i.userId)} />
@@ -198,7 +200,7 @@ const DisplayComments = ({ comments, bcgovcode, currentUser, iaoassignedToList, 
               {
                 actions.replies.filter((id) => id === i.commentId).length !== 0 &&
                 (
-                  <InputField cancellor={i.commentId} parentId={i.commentId} fullnameList={isRestricted? commentTagList :fullnameList} //Handles Navigate Away
+                  <InputField cancellor={i.commentId} parentId={i.commentId} fullnameList={fullnameList} restrictedReqTaglist={restrictedReqTaglist}//Handles Navigate Away
                     setEditorChange={setEditorChange} removeComment={removeComment} setRemoveComment={setRemoveComment} />
                 )
               }
