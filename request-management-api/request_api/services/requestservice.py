@@ -144,8 +144,9 @@ class requestservice:
         return duedate_includeoffhold, cfrduedate_includeoffhold
 
     
-    def saverestrictedrequest(self,ministryrequestid,type, isrestricted,userid):
-        version = FOIMinistryRequest.getversionforrequest(ministryrequestid)
-        FOIRestrictedMinistryRequest.disablerestrictedrequests(ministryrequestid,type,userid)
-        return FOIRestrictedMinistryRequest.saverestrictedrequest(ministryrequestid,type,isrestricted, version, userid)
+    def saverestrictedrequest(self, ministries, type, isrestricted,userid):
+        for ministry in ministries:
+            version = FOIMinistryRequest.getversionforrequest(ministry["id"])
+            FOIRestrictedMinistryRequest.disablerestrictedrequests(ministry["id"], type, userid)
+            FOIRestrictedMinistryRequest.saverestrictedrequest(ministry["id"], type, isrestricted, version, userid)
 
