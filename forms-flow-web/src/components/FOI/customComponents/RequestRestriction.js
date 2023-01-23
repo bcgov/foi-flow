@@ -25,6 +25,7 @@ const RequestRestriction= ({isiaorestricted, isIAORestrictedFileManager, request
     const [restrictionType, setRestrictionType] = useState("unrestricted");
     const [isRestricted, setIsRestricted] = useState(isiaorestricted);
     const [modalOpen, setModalOpen] = useState(false);
+    const [modalHeading, setModalHeading] = useState(""); 
     const [modalMessage, setModalMessage] = useState(<></>);    
     const [modalDescription, setModalDescription] = useState(<></>);
     const { requestId, ministryId } = useParams();
@@ -62,10 +63,12 @@ const RequestRestriction= ({isiaorestricted, isIAORestrictedFileManager, request
         setModalOpen(true);
         let description="";
         let message="";
+        let heading="";
         if(e.target.value?.toLowerCase() == 'restricted'){
             if(isIAORestrictedFileManager){
                 if(!isRequestAssignedToTeam()){
                     setIsRestricted('True');
+                    heading = "Restricted File";
                     message="Are you sure you want to flag this as a restricted file ?";
                     description= <span>
                     If you change this to be a restrcited file only the
@@ -77,11 +80,13 @@ const RequestRestriction= ({isiaorestricted, isIAORestrictedFileManager, request
                   </span>
                 }
                 else{
+                    heading = "Restrict File";
                     message="A request can only be restricted when it is assigned to one team member, not a team queue.";
                     description="";
                 }
             }
             else{
+                heading = "Restrict File";
                 message="Only the Intake Manager can restrict a request.";
                 description="";
             }
@@ -89,11 +94,13 @@ const RequestRestriction= ({isiaorestricted, isIAORestrictedFileManager, request
         else {
             if(isIAORestrictedFileManager){
                 setIsRestricted('False');
+                heading = "Unrestricted File";
                 message="Are you sure you want to remove the restricted file flag on this request ?";
                 description="If you unrestrcit this file only all IAO users will be able to search and find the request, and all users "+
                 "on the respective Ministry will be able to see this request.";
             }
             else{
+                heading = "Unrestrict File";
                 message="Only the Intake Manager can remove the restricted flag on a request";
                 description= <span>
                     If you would like to have this request unrestricted please contact the
@@ -102,6 +109,7 @@ const RequestRestriction= ({isiaorestricted, isIAORestrictedFileManager, request
                     </span>
             }
         }
+        setModalHeading(heading);
         setModalMessage(message);
         setModalDescription(description);
     }
@@ -178,7 +186,7 @@ const RequestRestriction= ({isiaorestricted, isIAORestrictedFileManager, request
             // id="state-change-dialog"
             >
             <DialogTitle disableTypography id="state-change-dialog-title">
-                <h2 className="state-change-header">Restricted File</h2>
+                <h2 className="state-change-header">{modalHeading}</h2>
                 <IconButton className="title-col3" onClick={handleClose}>
                     <i className="dialog-close-button">Close</i>
                     <CloseIcon />
