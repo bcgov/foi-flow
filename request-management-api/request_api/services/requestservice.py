@@ -143,10 +143,15 @@ class requestservice:
         cfrduedate_includeoffhold = True if _paymentconfig["cfrduedate"]["includeoffhold"] == "Y" else False
         return duedate_includeoffhold, cfrduedate_includeoffhold
 
-    
-    def saverestrictedrequest(self, ministries, type, isrestricted,userid):
+    # intake in progress to open: create a restricted request record for each selected ministries
+    def createrestrictedrequests(self, ministries, type, isrestricted,userid):
         for ministry in ministries:
             version = FOIMinistryRequest.getversionforrequest(ministry["id"])
             FOIRestrictedMinistryRequest.disablerestrictedrequests(ministry["id"], type, userid)
             FOIRestrictedMinistryRequest.saverestrictedrequest(ministry["id"], type, isrestricted, version, userid)
+
+    def saverestrictedrequest(self,ministryrequestid,type, isrestricted,userid):
+        version = FOIMinistryRequest.getversionforrequest(ministryrequestid)
+        FOIRestrictedMinistryRequest.disablerestrictedrequests(ministryrequestid,type,userid)
+        return FOIRestrictedMinistryRequest.saverestrictedrequest(ministryrequestid,type,isrestricted, version, userid)
 
