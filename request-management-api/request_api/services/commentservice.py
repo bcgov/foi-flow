@@ -1,6 +1,7 @@
 
 from os import stat
 from re import VERBOSE
+from operator import itemgetter
 from request_api.models.FOIRequestComments import FOIRequestComment
 from request_api.models.FOIMinistryRequests import FOIMinistryRequest
 from request_api.models.FOIRawRequestComments import FOIRawRequestComment
@@ -15,6 +16,7 @@ from dateutil import tz
 from pytz import timezone
 import pytz
 import maya
+
 
 
 class commentservice:
@@ -110,34 +112,50 @@ class commentservice:
         }     
 
     def createcommenttagginguserlist(self,watchers, baserequestinfo):
-        
         userlist = []
-        #watchergroups = {}
+        watcherteams= []
         if baserequestinfo is not None:
-            print("\nbaserequestinfo",baserequestinfo)
-            user= self.__formatuserlist(baserequestinfo['assignedTo'], baserequestinfo['assignedToFirstName'], "", baserequestinfo['assignedToLastName'])
+            user= self.__formatuserlist(baserequestinfo['assignedTo'], baserequestinfo['assignedToFirstName'], baserequestinfo['assignedToLastName'])
             userlist.append(user)
-            teamname = baserequestinfo['selectedMinistries'][0]['code'].lower()+"ministryteam"
+            if 'programarea.bcgovcode' in baserequestinfo:
+                teamname = baserequestinfo['programarea.bcgovcode'].lower()+"ministryteam"
+            else:
+                teamname = baserequestinfo['selectedMinistries'][0]['code'].lower()+"ministryteam"
             ministryteam = assigneeservice().getmembersbygroupname(teamname) 
             print('\nministryteam',ministryteam)
             if ministryteam is not None:
                 for ministry in ministryteam:
                     for member in ministry['members']:
-                        user= self.__formatuserlist(member['username'], member['firstname'], "", member['lastname'])
+                        user= self.__formatuserlist(member['username'], member['firstname'], member['lastname'])
                         userlist.append(user)
             if watchers is not None:
-                for watcher in watchers:
-                    user= self.__formatuserlist(watcher['watchedby'], "", "", "")
-                    userlist.append(user)
-                #     watchergroups.add(watcher.watchedbygroup)
-                # watcherteams = assigneeservice().getmembersbygroupname(baserequestinfo['bcgovcode']) 
+                # watchergrouplist= list(map(itemgetter('watchedbygroup'), watchers))
+                # watchergroups = set(watchergrouplist)
+                # print("\nwatchergroups:",watchergroups)
+                # for group in watchergroups:
+                #     watcherteams.append(assigneeservice().getmembersbygroupname(group)) 
+                # print("\nwatcherteams:",watcherteams)
+                self.__getwatchernames(watchers,watcherteams, userlist)
+        print("\nuserlist:",userlist)
         return userlist
 
-    def __formatuserlist(self, username, firstname, middlename, lastname):
+    def __getwatchernames(self, watchers, watcherteams, userlist):
+        watchergrouplist= list(map(itemgetter('watchedbygroup'), watchers))
+        watchergroups = set(watchergrouplist)
+        print("\nwatchergroups:",watchergroups)
+        for group in watchergroups:
+            watcherteams.append(assigneeservice().getmembersbygroupname(group)) 
+        print("\nwatcherteams:",watcherteams)
+        for watcher in watchers:
+            for team in watcherteams:
+                member= list(filter(lambda x: x['username'] == watcher['watchedby'], team[0]['members']))
+                user= self.__formatuserlist(watcher['watchedby'], member[0]['firstname'], member[0]['lastname'])
+                userlist.append(user)
+
+    def __formatuserlist(self, username, firstname, lastname):
         user={}
         user['username'] = username
         user['firstname'] = firstname
-        #user['middlename'] = middlename
         user['lastname'] = lastname
         user['fullname'] = lastname+","+firstname
         user['name'] = lastname+","+firstname

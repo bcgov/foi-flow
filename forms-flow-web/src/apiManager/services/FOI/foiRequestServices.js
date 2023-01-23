@@ -14,6 +14,7 @@ import {
   setFOIRequestDescriptionHistory,
   setFOIMinistryRequestList,
   setOpenedMinistries,
+  setCommentTagListLoader
 } from "../../../actions/FOI/foiRequestActions";
 import { fetchFOIAssignedToList, fetchFOIMinistryAssignedToList, fetchFOIProcessingTeamList } from "./foiMasterDataServices";
 import { catchError, fnDone} from './foiServicesUtil';
@@ -489,9 +490,14 @@ export const restrictRequest = (data, requestId, ministryId, type="iao", ...rest
   };
 };
 
-export const fetchRestrictedRequestCommentTagList = (requestid, ...rest) => {
+export const fetchRestrictedRequestCommentTagList = (requestid, ministryId, ...rest) => {
+  setCommentTagListLoader(true);
   const done = fnDone(rest);
-  const apiUrlgetRequestDetails = replaceUrl(
+  const apiUrlgetRequestDetails = ministryId? replaceUrl(
+    API.FOI_GET_RESTRICTED_MINISTRYREQUEST_TAG_LIST,
+    "<ministryrequest>",
+    ministryId
+  ) : replaceUrl(
     API.FOI_GET_RESTRICTED_RAWREQUEST_TAG_LIST,
     "<requestid>",
     requestid
@@ -500,12 +506,12 @@ export const fetchRestrictedRequestCommentTagList = (requestid, ...rest) => {
     httpGETRequest(apiUrlgetRequestDetails, {}, UserService.getToken())
       .then((res) => {
         if (res.data) {
-          //dispatch(setOpenedMinistries(res.data));
           done(null, res.data);
         } else {
           dispatch(serviceActionError(res));
           throw new Error(`Error in fetching user list for tagging in comments# ${requestid}`);
         }
+        setCommentTagListLoader(false);
       })
       .catch((error) => {
         catchError(error, dispatch);

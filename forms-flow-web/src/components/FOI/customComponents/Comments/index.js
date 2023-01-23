@@ -43,31 +43,29 @@ export const CommentSection = ({
   }, [filterValue,commentsArray ,filterkeyValue])
   const [restrictedReqTaglist, setRestrictedReqTaglist]= useState([]);
   const dispatch = useDispatch(); 
-  //console.log("istabactive:",istabactive);
+  const isCommentTagListLoading = useSelector((state) => state.foiRequests.isCommentTagListLoading);
 
   useEffect(()=> {
     console.log("use effect!!");
     if(istabactive&&isRestricted){
       console.log("Call API!!",assigneeDetails);
-      console.log("Call API!!-watcher",requestWatchers);
-      console.log("Call API!!-isRestricted",isRestricted);
-
-      dispatch(fetchRestrictedRequestCommentTagList(requestid,(err, res) =>{
+      dispatch(fetchRestrictedRequestCommentTagList(requestid, ministryId, (err, res) =>{
         if(!err){
-          console.log("Response",res);
+          console.log("Response:",res);
           setRestrictedReqTaglist(res);
         }
       }))
     }
   }, [istabactive]);
  
+  console.log("isCommentTagListLoading:",isCommentTagListLoading);
+
   const onfilterchange = (_filterValue) => { 
     sessionStorage.setItem('foicommentcategory',_filterValue)   
     setfilterValue(_filterValue)       
     setcomments([])
   }
-  const isAssignedToListLoading = useSelector((state) => state.foiRequests.isAssignedToListLoading);
-  //console.log("isAssignedToListLoading",isAssignedToListLoading);
+
   const filterkeyinCommentsandReplies = (_comments,filtercomments)=>{
       _comments.forEach(_comment=>{
             if(_comment.replies!=undefined && _comment.replies.length > 0 )
@@ -98,7 +96,7 @@ export const CommentSection = ({
  
   return (
     <>
-    { !isAssignedToListLoading ?
+    { !isCommentTagListLoading ?
       (
     <ActionProvider
       currentUser={currentUser}

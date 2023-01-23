@@ -26,8 +26,8 @@ from request_api.services.commentservice import commentservice
 from request_api.services.rawrequestservice import rawrequestservice
 from request_api.schemas.foicomment import  FOIRawRequestCommentSchema, FOIMinistryRequestCommentSchema
 from request_api.schemas.foicomment import  EditFOIRawRequestCommentSchema, FOIMinistryRequestCommentSchema
-from request_api.services.assigneeservice import assigneeservice
 from request_api.services.watcherservice import watcherservice
+from request_api.services.foirequest.requestservicegetter import requestservicegetter
 import json
 from flask_cors import cross_origin
 import asyncio
@@ -172,24 +172,6 @@ class FOIUpdateComment(Resource):
             return {'status': exception.status_code, 'message':exception.message}, 500
 
 
-# @cors_preflight('GET,OPTIONS')
-# @API.route('/foicomment/ministryrequest/<ministryrequestid>/restricted')
-# class FOIRestrictedRequestTagList(Resource):
-
-#     @staticmethod    
-#     @cross_origin(origins=allowedorigins())
-#     @auth.require
-#     def get(ministryrequestid=None):
-#         try :            
-#              result = assigneeservice().getmembersbygroupname(groupname) 
-#              result = watcherservice().getministryrequestwatchers(ministryrequestid,AuthHelper.isministrymember())
-#              #request = FOIRequest.getrequest(foirequestid)
-
-#         except ValueError:
-#             return {'status': 500, 'message':"Invalid Request"}, 400    
-#         except BusinessException as exception:            
-#             return {'status': exception.status_code, 'message':exception.message}, 500 
-
 @cors_preflight('GET,OPTIONS')
 @API.route('/foicomment/rawrequest/<requestid>/restricted')
 class FOIRestrictedRequestTagList(Resource):
@@ -202,8 +184,25 @@ class FOIRestrictedRequestTagList(Resource):
             watchers = watcherservice().getrawrequestwatchers(requestid)
             baserequestinfo = rawrequestservice().getrawrequest(requestid)
             result = commentservice().createcommenttagginguserlist(watchers, baserequestinfo)
-            #request = FOIRequest.getrequest(foirequestid)
             return json.dumps(result), 200
+        except ValueError:
+            return {'status': 500, 'message':"Invalid Request"}, 400    
+        except BusinessException as exception:            
+            return {'status': exception.status_code, 'message':exception.message}, 500 
+
+@cors_preflight('GET,OPTIONS')
+@API.route('/foicomment/ministryrequest/<ministryrequestid>/restricted')
+class FOIRestrictedRequestTagList(Resource):
+
+    @staticmethod    
+    @cross_origin(origins=allowedorigins())
+    @auth.require
+    def get(ministryrequestid=None):
+        try :            
+             watchers = watcherservice().getallministryrequestwatchers(ministryrequestid)
+             baserequestinfo = requestservicegetter().getministryrequest(ministryrequestid)
+             result = commentservice().createcommenttagginguserlist(watchers, baserequestinfo)
+             return json.dumps(result), 200
         except ValueError:
             return {'status': 500, 'message':"Invalid Request"}, 400    
         except BusinessException as exception:            

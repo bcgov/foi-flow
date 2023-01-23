@@ -43,13 +43,6 @@ const DisplayComments = ({ comments, bcgovcode, currentUser, iaoassignedToList, 
     }
   }
 
-  // useEffect(()=>{
-  //   if(isRestricted){
-  //     addToRestrictedRequestTagList(requestWatchers, assigneeDetails, fullnameList, bcgovcode);
-  //     setCommentTagList(getRestrictedRequestTagList());
-  //   }
-  // }, [assigneeDetails, requestWatchers]);
-
   const showhiddencomments = (_e, count) => {
     let hiddencomments = document.getElementsByName('commentsectionhidden')
     if (hiddencomments && Array.from(hiddencomments).filter((_c) => _c.style.display === 'none').length > 0) {
