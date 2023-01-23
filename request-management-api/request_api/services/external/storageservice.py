@@ -149,8 +149,8 @@ class storageservice:
             filestatustransition = foirequestform.get('filestatustransition')
             filename = foirequestform.get('filename')
             filenamesplittext = os.path.splitext(filename)
-            uniquefilename = '{0}{1}'.format(uuid.uuid4(),filenamesplittext[1])
-            filepath = self.__getfilepath(category,ministrycode,requestnumber,filestatustransition,uniquefilename)
+            uniquefilename = '/'.join(file.get('filepath', "").split('/')[5:]) or '{0}{1}'.format(uuid.uuid4(),filenamesplittext[1])
+            filepath = '/'.join(file.get('filepath', "").split('/')[4:]) or self.__getfilepath(category,ministrycode,requestnumber,filestatustransition,uniquefilename)
             response = s3client.generate_presigned_url(
                 ClientMethod='put_object',
                 Params=   {

@@ -198,7 +198,9 @@ export default function AttachmentModal({
           return {title: "Add Attachment", body: ""};
         case "replace":
           let _message = {};
-            if (attachment) {              
+            if (uploadFor === 'record') {
+              _message = {title: "Replace Records", body:`Replace record with manually converted PDF of the same document. The original file will still be available for download.` }
+            } else if (attachment) {
               switch(attachment.category.toLowerCase()) {
                 case StateTransitionCategories.cfrreview.name: 
                   _message = {title: "Replace Attachment", body: <>This attachment must be replaced as it was uploaded during the state change. Please replace attachment with document from Request #{requestNumber} changing from <b>{StateTransitionCategories.cfrreview.fromState}</b> to <b>{StateTransitionCategories.cfrreview.toState}</b>.</>};
@@ -227,7 +229,18 @@ export default function AttachmentModal({
       }
     }
     let message = getMessage();
-    const btnClass = (files.length === 0 && existingDocuments.length === 0 && modalFor !== 'delete') ? classes.btndisabled : classes.btnenabled
+
+    const isSaveDisabled = () => {
+      if (modalFor === 'delete') {
+        return false;
+      } else if (files.length === 0 && existingDocuments.length === 0) {
+        return true;
+      } else if (modalFor === 'add') {
+        return tagValue === "";
+      } else if (modalFor === 'replace') {
+        return false;
+      }
+    }
   
     return (
       <div className="state-change-dialog">        
@@ -283,7 +296,7 @@ export default function AttachmentModal({
                 Save
               </button>
               :
-              <button className={`btn-bottom btn-save ${ btnClass }`} disabled={((files.length === 0 && existingDocuments.length === 0) || tagValue === "") && modalFor !== 'delete' } onClick={handleSave}>
+              <button className={`btn-bottom btn-save ${ isSaveDisabled() ? classes.btndisabled : classes.btnenabled }`} disabled={isSaveDisabled()} onClick={handleSave}>
                 {uploadFor === "email" ? "Save Changes" : "Continue"}
               </button>
             }
