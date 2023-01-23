@@ -269,9 +269,8 @@ const FOIRequestHeader = React.memo(
                 />
               </div>
             )}
-          {!isAddRequest && status.toLowerCase() !== StateEnum.unopened.name.toLowerCase() && 
-            (isLoaded && (isRequestWatcherOrAssignee(requestWatchers,assigneeObj,userDetail?.preferred_username) || 
-              isIAORestrictedFileManager())) && 
+          {!isAddRequest && status.toLowerCase() !== StateEnum.unopened.name.toLowerCase() && (isIAORestrictedFileManager() ||
+            (isLoaded && isRequestWatcherOrAssignee(requestWatchers,assigneeObj,userDetail?.preferred_username))) && 
           <RequestRestriction 
             isiaorestricted= {isRestricted()}
             isIAORestrictedFileManager={isIAORestrictedFileManager()}
