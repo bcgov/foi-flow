@@ -60,6 +60,7 @@ const RequestRestriction= ({isiaorestricted, isIAORestrictedFileManager, request
     ];
 
     const handleValueChange = (e) => {
+        console.log("requestDetails", requestDetails);
         setModalOpen(true);
         let description="";
         let message="";
@@ -67,6 +68,7 @@ const RequestRestriction= ({isiaorestricted, isIAORestrictedFileManager, request
         if(e.target.value?.toLowerCase() == 'restricted'){
             if(isIAORestrictedFileManager){
                 if(!isRequestAssignedToTeam()){
+                    console.log("1",isRequestAssignedToTeam());
                     setIsRestricted('True');
                     heading = "Restricted File";
                     message="Are you sure you want to flag this as a restricted file ?";
@@ -80,6 +82,7 @@ const RequestRestriction= ({isiaorestricted, isIAORestrictedFileManager, request
                   </span>
                 }
                 else{
+                    console.log("2",isRequestAssignedToTeam());
                     heading = "Restrict File";
                     message="A request can only be restricted when it is assigned to one team member, not a team queue.";
                     description="";
