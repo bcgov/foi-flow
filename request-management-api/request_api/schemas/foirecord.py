@@ -43,3 +43,36 @@ class FOIRequestBulkCreateRecordSchema(Schema):
 
         unknown = EXCLUDE    
     records = fields.Nested(FOIRequestCreateRecordSchema, many=True, validate=validate.Length(min=1), required=True,allow_none=False)
+
+class RetryRecordAttributeSchema(Schema):
+    class Meta:  # pylint: disable=too-few-public-methods
+        """Exclude unknown fields in the deserialized output."""
+
+        unknown = EXCLUDE
+    #divisions = fields.List(fields.Int(),data_key="divisions",required=True)
+    divisions = fields.Nested(DivisionSchema, many=True, validate=validate.Length(min=1), required=True,allow_none=False)
+    lastmodified = fields.Str(data_key="lastmodified",allow_none=False, validate=[validate.Length(max=120, error=MAX_EXCEPTION_MESSAGE)])
+    filesize = fields.Int(data_key="filesize", allow_none=False)
+    batch = fields.Str(data_key="batch", allow_none=False, validate=validate.Length(min=1), required=True)
+    incompatible = fields.Boolean(required=True,allow_none=False)
+    extension = fields.Str(validate=validate.Length(min=1, max=10), required=True,allow_none=False)
+
+class FOIRequestRetryRecordSchema(Schema):
+    class Meta:  # pylint: disable=too-few-public-methods
+        """Exclude unknown fields in the deserialized output."""
+
+        unknown = EXCLUDE
+    attributes = fields.Nested(RetryRecordAttributeSchema)
+    s3uripath = fields.Str(data_key="s3uripath",allow_none=False, validate=[validate.Length(max=1000, error=MAX_EXCEPTION_MESSAGE)])
+    filename = fields.Str(data_key="filename",allow_none=False, validate=[validate.Length(max=120, error=MAX_EXCEPTION_MESSAGE)])
+    trigger = fields.Str(validate=validate.OneOf(['recordreplace', 'recordretry']), required=True,allow_none=False)
+    service = fields.Str(validate=validate.OneOf(['deduplication', 'conversion']), required=True,allow_none=False)
+
+
+
+class FOIRequestBulkRetryRecordSchema(Schema):
+    class Meta:  # pylint: disable=too-few-public-methods
+        """Exclude unknown fields in the deserialized output."""
+
+        unknown = EXCLUDE
+    records = fields.Nested(FOIRequestRetryRecordSchema, many=True, validate=validate.Length(min=1), required=True,allow_none=False)
