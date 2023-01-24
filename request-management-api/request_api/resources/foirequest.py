@@ -56,7 +56,7 @@ class FOIRequest(Resource):
             if (AuthHelper.getusertype() == "iao") and (usertype is None or (usertype == "iao")):
                 jsondata = requestservice().getrequest(foirequestid,foiministryrequestid)
                 assignee = jsondata['assignedTo']
-                isrestricted = jsondata['iaorestricteddetails']['isrestricted'] if (jsondata['iaorestricteddetails'] and jsondata['iaorestricteddetails']['isrestricted']) is not None else False
+                isrestricted = jsondata['iaorestricteddetails']['isrestricted'] if ('isrestricted' in jsondata['iaorestricteddetails']) else False
                 if(canrestictdata(foiministryrequestid,assignee,isrestricted,False)):
                     jsondata = {}
                     statuscode = 401
@@ -87,7 +87,6 @@ class FOIRequests(Resource):
         try:
             request_json = request.get_json() 
             foirequestschema = FOIRequestWrapperSchema().load(request_json)
-            print("test CI/CD")      
             assignedgroup = request_json['assignedGroup'] if 'assignedGroup' in foirequestschema  else None
             assignedto = request_json['assignedTo'] if 'assignedTo' in foirequestschema  else None
             assignedtofirstname = request_json["assignedToFirstName"] if request_json.get("assignedToFirstName") != None else None
@@ -105,7 +104,7 @@ class FOIRequests(Resource):
                     requestservice().copycomments(request_json['id'],result.args[0],AuthHelper.getuserid())
                     requestservice().copydocuments(request_json['id'],result.args[0],AuthHelper.getuserid())
                     requestservice().postopeneventtoworkflow(result.identifier, request_json,result.args[0])
-                    requestservice().saverestrictedrequest(request_json['id'],'iao',request_json["isiaorestricted"],AuthHelper.getuserid())
+                    requestservice().createrestrictedrequests(result.args[0],'iao',request_json["isiaorestricted"],AuthHelper.getuserid())
             return {'status': result.success, 'message':result.message,'id':result.identifier, 'ministryRequests': result.args[0]} , 200
         except ValidationError as err:
                     return {'status': False, 'message':err.messages}, 400

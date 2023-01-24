@@ -165,10 +165,10 @@ class AuthHelper:
 
     @classmethod
     def isiaorestrictedfilemanager(cls):
-        roles = cls.getuserroles()       
-        print("\nroles in isiaorestrictedfilemanager:",roles) 
+        #roles is an array of strings
+        roles = cls.getuserroles()        
         try:      
-            if roles.index('IAORestrictedFilesManager') > 0:
+            if 'IAORestrictedFilesManager' in roles:
                 return True    
             else:            
                 return False

@@ -118,7 +118,7 @@ def canrestictdata(requestid,assignee,isrestricted,israwrequest):
         _isawatcher = FOIRequestWatcher.isaiaoministryrequestwatcher(requestid,currentuser)
 
     isiaorestrictedfilemanager = AuthHelper.isiaorestrictedfilemanager()
-    print('Current user is {0} , is a watcher: {1} and is file manager {2} '.format(currentuser,_isawatcher,isiaorestrictedfilemanager))
+    # print('Current user is {0} , is a watcher: {1} and is file manager {2} '.format(currentuser,_isawatcher,isiaorestrictedfilemanager))
     if(isrestricted and currentuser != assignee and _isawatcher == False and isiaorestrictedfilemanager == False):
         return True
     else:
