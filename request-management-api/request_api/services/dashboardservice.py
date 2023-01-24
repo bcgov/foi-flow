@@ -66,6 +66,8 @@ class dashboardservice:
         requests = FOIRawRequest.getrequestspagination(groups, page, size, sortingitems, sortingorders, filterfields, keyword, additionalfilter, userid, AuthHelper.isiaorestrictedfilemanager())
         requestqueue = []                
         for request in requests.items:
+            print("request:")
+            print(request)
             
             if(request.receivedDateUF is None): #request from online form has no received date in json
                 _receiveddate = maya.parse(request.created_at).datetime(to_timezone='America/Vancouver', naive=False)
@@ -93,6 +95,8 @@ class dashboardservice:
                 # restrictedrequest = FOIRestrictedMinistryRequest.getrestricteddetails(request.ministryrequestid,'iao')
                 # if 'isrestricted' not in restrictedrequest:
                 #     restrictedrequest['isrestricted'] = False
+                print(request.ministryrequestid)
+                print(request.isiaorestricted)
                 isiaorestricted = request.isiaorestricted if request.isiaorestricted == True else False
 
                 _openrequest.update({'isiaorestricted': isiaorestricted})
