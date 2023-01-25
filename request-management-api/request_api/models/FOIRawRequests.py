@@ -386,7 +386,7 @@ class FOIRawRequest(db.Model):
         return requeststates    
 
     @classmethod
-    def getbasequery(cls, additionalfilter=None, userid=None):
+    def getbasequery(cls, additionalfilter=None, userid=None, isiaorestrictedfilemanager=False):
         _session = db.session
 
         #rawrequests
@@ -463,6 +463,12 @@ class FOIRawRequest(db.Model):
                            ],
                            else_ = cast(FOIRawRequest.requestrawdata['receivedDateUF'].astext, TIMESTAMP)).label('intakeSorting')
 
+        isiaorestricted = case([
+                            (FOIRawRequest.isiaorestricted.is_(None),
+                             False),
+                           ],
+                           else_ = FOIRawRequest.isiaorestricted).label('isiaorestricted')
+
         selectedcolumns = [
             FOIRawRequest.requestid.label('id'),
             FOIRawRequest.version,
@@ -501,13 +507,20 @@ class FOIRawRequest(db.Model):
             literal(None).label('closedate'),
             literal(None).label('onBehalfFormatted'),
             literal(None).label('extensions'),
-            FOIRawRequest.isiaorestricted            
+            isiaorestricted,
+            literal(None).label('isministryrestricted')
         ]
 
         basequery = _session.query(*selectedcolumns).join(subquery_maxversion, and_(*joincondition)).join(FOIAssignee, FOIAssignee.username == FOIRawRequest.assignedto, isouter=True)
 
         if additionalfilter is None:
-            return basequery.filter(FOIRawRequest.status.notin_(['Archived']))
+            if(isiaorestrictedfilemanager == True):
+                return basequery.filter(FOIRawRequest.status.notin_(['Archived']))
+            else:
+                return basequery.filter(
+                    and_(
+                        FOIRawRequest.status.notin_(['Archived']),
+                        or_(FOIRawRequest.isiaorestricted == False, and_(FOIRawRequest.isiaorestricted == True, FOIRawRequest.assignedto == userid))))
         else:
             if(additionalfilter == 'watchingRequests' and userid is not None):
                 #watchby
@@ -517,11 +530,17 @@ class FOIRawRequest(db.Model):
                 #myrequest
                 return basequery.filter(and_(FOIRawRequest.status.notin_(['Archived']), FOIRawRequest.assignedto == userid))
             else:
-                return basequery.filter(FOIRawRequest.status.notin_(['Archived']))
+                if(isiaorestrictedfilemanager == True):
+                    return basequery.filter(FOIRawRequest.status.notin_(['Archived']))
+                else:
+                    return basequery.filter(
+                        and_(
+                            FOIRawRequest.status.notin_(['Archived']),
+                            or_(FOIRawRequest.isiaorestricted == False, and_(FOIRawRequest.isiaorestricted == True, FOIRawRequest.assignedto == userid))))
 
     @classmethod
-    def getrequestssubquery(cls, filterfields, keyword, additionalfilter, userid):
-        basequery = FOIRawRequest.getbasequery(additionalfilter, userid)
+    def getrequestssubquery(cls, filterfields, keyword, additionalfilter, userid, isiaorestrictedfilemanager):
+        basequery = FOIRawRequest.getbasequery(additionalfilter, userid, isiaorestrictedfilemanager)
         basequery = basequery.filter(FOIRawRequest.status != 'Unopened').filter(FOIRawRequest.status != 'Closed')
         #filter/search
         if(len(filterfields) > 0 and keyword is not None):
@@ -548,23 +567,25 @@ class FOIRawRequest(db.Model):
                     filtercondition.append(FOIRawRequest.findfield('contactLastName').ilike('%'+keyword+'%'))
                 if(field == 'requestType'):
                     filtercondition.append(FOIRawRequest.findfield('requestTypeRequestType').ilike('%'+keyword+'%'))
-        
+        else:
+            filtercondition.append(FOIRawRequest.isiaorestricted == True)
+
         return or_(*filtercondition)
 
 
     @classmethod
-    def getrequestspagination(cls, groups, page, size, sortingitems, sortingorders, filterfields, keyword, additionalfilter, userid):
+    def getrequestspagination(cls, groups, page, size, sortingitems, sortingorders, filterfields, keyword, additionalfilter, userid, isiaorestrictedfilemanager, isministryrestrictedfilemanager=False):
         #ministry requests
         iaoassignee = aliased(FOIAssignee)
         ministryassignee = aliased(FOIAssignee)
-        subquery_ministry_queue = FOIMinistryRequest.getrequestssubquery(groups, filterfields, keyword, additionalfilter, userid, iaoassignee, ministryassignee)
+        subquery_ministry_queue = FOIMinistryRequest.getrequestssubquery(groups, filterfields, keyword, additionalfilter, userid, iaoassignee, ministryassignee, 'IAO', isiaorestrictedfilemanager, isministryrestrictedfilemanager)
 
         #sorting
         sortingcondition = FOIRawRequest.getsorting(sortingitems, sortingorders)
 
         #rawrequests
         if "Intake Team" in groups or groups is None:                
-            subquery_rawrequest_queue = FOIRawRequest.getrequestssubquery(filterfields, keyword, additionalfilter, userid)
+            subquery_rawrequest_queue = FOIRawRequest.getrequestssubquery(filterfields, keyword, additionalfilter, userid, isiaorestrictedfilemanager)
             query_full_queue = subquery_rawrequest_queue.union(subquery_ministry_queue)
             return query_full_queue.order_by(*sortingcondition).paginate(page=page, per_page=size)
         else:
@@ -620,7 +641,8 @@ class FOIRawRequest(db.Model):
             'cfrduedate',
             'applicantcategory',
             'onBehalfFormatted',
-            'extensions'
+            'extensions',
+            'isiaorestricted'
         ]
         if x in validfields:
             return True
@@ -649,8 +671,8 @@ class FOIRawRequest(db.Model):
 
 
     @classmethod
-    def advancedsearch(cls, params):
-        basequery = FOIRawRequest.getbasequery()
+    def advancedsearch(cls, params, userid, isiaorestrictedfilemanager=False):
+        basequery = FOIRawRequest.getbasequery(None, userid, isiaorestrictedfilemanager)
 
         #filter/search
         filtercondition = FOIRawRequest.getfilterforadvancedsearch(params)
@@ -659,7 +681,7 @@ class FOIRawRequest(db.Model):
         #ministry requests
         iaoassignee = aliased(FOIAssignee)
         ministryassignee = aliased(FOIAssignee)
-        subquery_ministry_queue = FOIMinistryRequest.advancedsearchsubquery(params, iaoassignee, ministryassignee)
+        subquery_ministry_queue = FOIMinistryRequest.advancedsearchsubquery(params, iaoassignee, ministryassignee, userid, 'IAO', isiaorestrictedfilemanager)
 
         #sorting
         sortingcondition = FOIRawRequest.getsorting(params['sortingitems'], params['sortingorders'])

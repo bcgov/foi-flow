@@ -308,7 +308,9 @@ class FOIMinistryRequest(db.Model):
         return requeststates
 
     @classmethod
-    def getrequestssubquery(cls, groups, filterfields, keyword, additionalfilter, userid, iaoassignee, ministryassignee, requestby='IAO'):
+    def getrequestssubquery(cls, groups, filterfields, keyword, additionalfilter, userid, iaoassignee, ministryassignee, requestby='IAO', isiaorestrictedfilemanager=False, isministryrestrictedfilemanager=False):
+        #for queue/dashboard
+
         _session = db.session
 
         #ministry filter for group/team
@@ -324,16 +326,32 @@ class FOIMinistryRequest(db.Model):
         #subquery for getting extension count
         subquery_extension_count = _session.query(FOIRequestExtension.foiministryrequest_id, func.count(distinct(FOIRequestExtension.foirequestextensionid)).filter(FOIRequestExtension.isactive == True).label('extensions')).group_by(FOIRequestExtension.foiministryrequest_id).subquery()
 
-
-
         onbehalf_applicantmapping = aliased(FOIRequestApplicantMapping)
         onbehalf_applicant = aliased(FOIRequestApplicant)
 
+        #subquery for getting latest version of FOIRestrictedMinistryRequest
+        subquery_iao_restricted_maxversion = _session.query(FOIRestrictedMinistryRequest.ministryrequestid, func.max(FOIRestrictedMinistryRequest.version).label('iao_restrict_max_version')).filter(FOIRestrictedMinistryRequest.type=='iao').group_by(FOIRestrictedMinistryRequest.ministryrequestid).subquery()
+        joincondition_iao_restrict = [
+            subquery_iao_restricted_maxversion.c.ministryrequestid == FOIMinistryRequest.foiministryrequestid
+        ]
+
+        subquery_ministry_restricted_maxversion = _session.query(FOIRestrictedMinistryRequest.ministryrequestid, func.max(FOIRestrictedMinistryRequest.version).label('ministry_restrict_max_version')).filter(FOIRestrictedMinistryRequest.type=='ministry').group_by(FOIRestrictedMinistryRequest.ministryrequestid).subquery()
+        joincondition_ministry_restrict = [
+            subquery_ministry_restricted_maxversion.c.ministryrequestid == FOIMinistryRequest.foiministryrequestid
+        ]
+
+        ministry_restricted_requests = aliased(FOIRestrictedMinistryRequest)
+
         #filter/search
-        if(len(filterfields) > 0 and keyword is not None and keyword != "restricted"):
+        if(len(filterfields) > 0 and keyword is not None):
             filtercondition = []
-            for field in filterfields:
-                filtercondition.append(FOIMinistryRequest.findfield(field, iaoassignee, ministryassignee).ilike('%'+keyword+'%'))
+
+            if(keyword != "restricted"):
+                for field in filterfields:
+                    filtercondition.append(FOIMinistryRequest.findfield(field, iaoassignee, ministryassignee).ilike('%'+keyword+'%'))
+            else:
+                filtercondition.append(FOIRestrictedMinistryRequest.isrestricted == True)
+                filtercondition.append(ministry_restricted_requests.isrestricted == True)
 
         intakesorting = case([
                             (and_(FOIMinistryRequest.assignedto == None, FOIMinistryRequest.assignedgroup == 'Intake Team'), # Unassigned requests first
@@ -446,7 +464,8 @@ class FOIMinistryRequest(db.Model):
             FOIMinistryRequest.closedate,
             onbehalfformatted,
             extensions,
-            literal(None).label('isiaorestricted')
+            FOIRestrictedMinistryRequest.isrestricted.label('isiaorestricted'),
+            ministry_restricted_requests.isrestricted.label('isministryrestricted')
         ]
 
         basequery = _session.query(
@@ -495,6 +514,28 @@ class FOIMinistryRequest(db.Model):
                                 ministryassignee,
                                 ministryassignee.username == FOIMinistryRequest.assignedministryperson,
                                 isouter=True
+                            ).join(
+                                subquery_iao_restricted_maxversion,
+                                and_(*joincondition_iao_restrict),
+                                isouter=True
+                            ).join(
+                                FOIRestrictedMinistryRequest,
+                                and_(
+                                    FOIRestrictedMinistryRequest.ministryrequestid == FOIMinistryRequest.foiministryrequestid,
+                                    FOIRestrictedMinistryRequest.version == subquery_iao_restricted_maxversion.c.iao_restrict_max_version,
+                                    FOIRestrictedMinistryRequest.type == 'iao'),
+                                isouter=True
+                            ).join(
+                                subquery_ministry_restricted_maxversion,
+                                and_(*joincondition_ministry_restrict),
+                                isouter=True
+                            ).join(
+                                ministry_restricted_requests,
+                                and_(
+                                    ministry_restricted_requests.ministryrequestid == FOIMinistryRequest.foiministryrequestid,
+                                    ministry_restricted_requests.version == subquery_ministry_restricted_maxversion.c.ministry_restrict_max_version,
+                                    ministry_restricted_requests.type == 'ministry'),
+                                isouter=True
                             ).filter(FOIMinistryRequest.requeststatusid != 3)
 
         if(additionalfilter == 'watchingRequests'):
@@ -510,21 +551,29 @@ class FOIMinistryRequest(db.Model):
             else:
                 dbquery = basequery.filter(FOIMinistryRequest.assignedministryperson == userid).filter(ministryfilter)
         else:
-            dbquery = basequery.filter(ministryfilter)
+            if(isiaorestrictedfilemanager == True):
+                dbquery = basequery.filter(ministryfilter)
+            elif(isministryrestrictedfilemanager == True):
+                dbquery = basequery.filter(ministryfilter)
+            else:
+                if(requestby == 'IAO'):
+                    dbquery = basequery.filter(or_(or_(FOIRestrictedMinistryRequest.isrestricted == False, FOIRestrictedMinistryRequest.isrestricted == None), and_(FOIRestrictedMinistryRequest.isrestricted == True, FOIMinistryRequest.assignedto == userid))).filter(ministryfilter)
+                else:
+                    dbquery = basequery.filter(or_(or_(ministry_restricted_requests.isrestricted == False, ministry_restricted_requests.isrestricted == None), and_(ministry_restricted_requests.isrestricted == True, FOIMinistryRequest.assignedministryperson == userid))).filter(ministryfilter)
 
 
-        if(keyword is None or keyword == "restricted"):
+        if(keyword is None):
             return dbquery
         else:
             return dbquery.filter(or_(*filtercondition))
 
     @classmethod
-    def getrequestspagination(cls, group, page, size, sortingitems, sortingorders, filterfields, keyword, additionalfilter, userid):
+    def getrequestspagination(cls, group, page, size, sortingitems, sortingorders, filterfields, keyword, additionalfilter, userid, isiaorestrictedfilemanager, isministryrestrictedfilemanager):
         iaoassignee = aliased(FOIAssignee)
         ministryassignee = aliased(FOIAssignee)
         requestby = 'Ministry'
 
-        subquery = FOIMinistryRequest.getrequestssubquery(group, filterfields, keyword, additionalfilter, userid, iaoassignee, ministryassignee, requestby)
+        subquery = FOIMinistryRequest.getrequestssubquery(group, filterfields, keyword, additionalfilter, userid, iaoassignee, ministryassignee, requestby, isiaorestrictedfilemanager, isministryrestrictedfilemanager)
 
         #sorting
         sortingcondition = FOIMinistryRequest.getsorting(sortingitems, sortingorders, iaoassignee, ministryassignee)
@@ -779,7 +828,9 @@ class FOIMinistryRequest(db.Model):
         return ministries 
 
     @classmethod
-    def getbasequery(cls, iaoassignee, ministryassignee):
+    def getbasequery(cls, iaoassignee, ministryassignee, userid=None, requestby='IAO', isiaorestrictedfilemanager=False, isministryrestrictedfilemanager=False):
+        #for advanced search
+
         _session = db.session
 
         #ministry filter for group/team
@@ -798,6 +849,19 @@ class FOIMinistryRequest(db.Model):
         
         onbehalf_applicantmapping = aliased(FOIRequestApplicantMapping)
         onbehalf_applicant = aliased(FOIRequestApplicant)
+
+        #subquery for getting latest version of FOIRestrictedMinistryRequest
+        subquery_iao_restricted_maxversion = _session.query(FOIRestrictedMinistryRequest.ministryrequestid, func.max(FOIRestrictedMinistryRequest.version).label('iao_restrict_max_version')).filter(FOIRestrictedMinistryRequest.type=='iao').group_by(FOIRestrictedMinistryRequest.ministryrequestid).subquery()
+        joincondition_iao_restrict = [
+            subquery_iao_restricted_maxversion.c.ministryrequestid == FOIMinistryRequest.foiministryrequestid
+        ]
+
+        subquery_ministry_restricted_maxversion = _session.query(FOIRestrictedMinistryRequest.ministryrequestid, func.max(FOIRestrictedMinistryRequest.version).label('ministry_restrict_max_version')).filter(FOIRestrictedMinistryRequest.type=='ministry').group_by(FOIRestrictedMinistryRequest.ministryrequestid).subquery()
+        joincondition_ministry_restrict = [
+            subquery_ministry_restricted_maxversion.c.ministryrequestid == FOIMinistryRequest.foiministryrequestid
+        ]
+
+        ministry_restricted_requests = aliased(FOIRestrictedMinistryRequest)
 
         intakesorting = case([
                             (FOIMinistryRequest.assignedto == None, # Unassigned requests first
@@ -908,8 +972,9 @@ class FOIMinistryRequest(db.Model):
             ministryassignedtoformatted,
             FOIMinistryRequest.closedate,
             onbehalfformatted,
-            extensions,            
-            literal(None).label('isiaorestricted')
+            extensions,
+            FOIRestrictedMinistryRequest.isrestricted.label('isiaorestricted'),
+            ministry_restricted_requests.isrestricted.label('isministryrestricted')
         ]
 
         basequery = _session.query(
@@ -958,12 +1023,44 @@ class FOIMinistryRequest(db.Model):
                                 ministryassignee,
                                 ministryassignee.username == FOIMinistryRequest.assignedministryperson,
                                 isouter=True
+                            ).join(
+                                subquery_iao_restricted_maxversion,
+                                and_(*joincondition_iao_restrict),
+                                isouter=True
+                            ).join(
+                                FOIRestrictedMinistryRequest,
+                                and_(
+                                    FOIRestrictedMinistryRequest.ministryrequestid == FOIMinistryRequest.foiministryrequestid,
+                                    FOIRestrictedMinistryRequest.version == subquery_iao_restricted_maxversion.c.iao_restrict_max_version,
+                                    FOIRestrictedMinistryRequest.type == 'iao'),
+                                isouter=True
+                            ).join(
+                                subquery_ministry_restricted_maxversion,
+                                and_(*joincondition_ministry_restrict),
+                                isouter=True
+                            ).join(
+                                ministry_restricted_requests,
+                                and_(
+                                    ministry_restricted_requests.ministryrequestid == FOIMinistryRequest.foiministryrequestid,
+                                    ministry_restricted_requests.version == subquery_ministry_restricted_maxversion.c.ministry_restrict_max_version,
+                                    ministry_restricted_requests.type == 'ministry'),
+                                isouter=True
                             )
 
-        return basequery.filter(ministryfilter)
+        if(isiaorestrictedfilemanager == True):
+            dbquery = basequery.filter(ministryfilter)
+        elif(isministryrestrictedfilemanager == True):
+            dbquery = basequery.filter(ministryfilter)
+        else:
+            if(requestby == 'IAO'):
+                dbquery = basequery.filter(or_(or_(FOIRestrictedMinistryRequest.isrestricted == False, FOIRestrictedMinistryRequest.isrestricted == None), and_(FOIRestrictedMinistryRequest.isrestricted == True, FOIMinistryRequest.assignedto == userid))).filter(ministryfilter)
+            else:
+                dbquery = basequery.filter(or_(or_(ministry_restricted_requests.isrestricted == False, ministry_restricted_requests.isrestricted == None), and_(ministry_restricted_requests.isrestricted == True, FOIMinistryRequest.assignedministryperson == userid))).filter(ministryfilter)
+
+        return dbquery
 
     @classmethod
-    def advancedsearch(cls, params):
+    def advancedsearch(cls, params, userid, isministryrestrictedfilemanager = False):
         #ministry requests
         iaoassignee = aliased(FOIAssignee)
         ministryassignee = aliased(FOIAssignee)
@@ -975,7 +1072,7 @@ class FOIMinistryRequest(db.Model):
         #ministry advanced search show cfr onwards
         statefilter = FOIMinistryRequest.requeststatusid.in_([2,3,7,9,8,10,11,12,13,14,16])
 
-        ministry_queue = FOIMinistryRequest.advancedsearchsubquery(params, iaoassignee, ministryassignee).filter(and_(or_(*groupfilter), statefilter))
+        ministry_queue = FOIMinistryRequest.advancedsearchsubquery(params, iaoassignee, ministryassignee, userid, 'Ministry', False, isministryrestrictedfilemanager).filter(and_(or_(*groupfilter), statefilter))
 
         #sorting
         sortingcondition = FOIMinistryRequest.getsorting(params['sortingitems'], params['sortingorders'], iaoassignee, ministryassignee)
@@ -983,8 +1080,8 @@ class FOIMinistryRequest(db.Model):
         return ministry_queue.order_by(*sortingcondition).paginate(page=params['page'], per_page=params['size'])
 
     @classmethod
-    def advancedsearchsubquery(cls, params, iaoassignee, ministryassignee):
-        basequery = FOIMinistryRequest.getbasequery(iaoassignee, ministryassignee)
+    def advancedsearchsubquery(cls, params, iaoassignee, ministryassignee, userid, requestby, isiaorestrictedfilemanager, isministryrestrictedfilemanager=False):
+        basequery = FOIMinistryRequest.getbasequery(iaoassignee, ministryassignee, userid, requestby, isiaorestrictedfilemanager, isministryrestrictedfilemanager)
 
         #filter/search
         filtercondition = FOIMinistryRequest.getfilterforadvancedsearch(params, iaoassignee, ministryassignee)

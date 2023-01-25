@@ -63,7 +63,7 @@ class dashboardservice:
         }
 
     def getrequestqueuepagination(self, groups=None, page=1, size=10, sortingitems=[], sortingorders=[], filterfields=[], keyword=None, additionalfilter='All', userid=None):        
-        requests = FOIRawRequest.getrequestspagination(groups, page, size, sortingitems, sortingorders, filterfields, keyword, additionalfilter, userid)
+        requests = FOIRawRequest.getrequestspagination(groups, page, size, sortingitems, sortingorders, filterfields, keyword, additionalfilter, userid, AuthHelper.isiaorestrictedfilemanager())
         requestqueue = []                
         for request in requests.items:
             
@@ -77,15 +77,12 @@ class dashboardservice:
                 unopenrequest.update({'assignedToFormatted': request.assignedToFormatted})
                 unopenrequest.update({'isiaorestricted': request.isiaorestricted}) 
 
-                isawatcher = FOIRawRequestWatcher.isawatcher(request.id,userid)                                
-                if request.isiaorestricted == True and (request.assignedTo == userid or isawatcher or  AuthHelper.isiaorestrictedfilemanager()):
+                # isawatcher = FOIRawRequestWatcher.isawatcher(request.id,userid)                                
+                if request.isiaorestricted == True:
                     unopenrequest.update({'lastName': 'Restricted'})
                     unopenrequest.update({'firstName': 'Request'})
-                    requestqueue.append(unopenrequest)
                 
-                
-                if (request.isiaorestricted == False or request.isiaorestricted == None) and keyword != "restricted":
-                    requestqueue.append(unopenrequest) 
+                requestqueue.append(unopenrequest) 
 
             else:
                 _openrequest = self.__preparefoirequestinfo(request, _receiveddate.strftime(SHORT_DATEFORMAT), _receiveddate.strftime(LONG_DATEFORMAT))
@@ -93,19 +90,15 @@ class dashboardservice:
                 _openrequest.update({'extensions': request.extensions})
                 _openrequest.update({'assignedToFormatted': request.assignedToFormatted})
                 _openrequest.update({'ministryAssignedToFormatted': request.ministryAssignedToFormatted})
-                restrictedrequest = FOIRestrictedMinistryRequest.getrestricteddetails(request.ministryrequestid,'iao')
-                if 'isrestricted' not in restrictedrequest:
-                    restrictedrequest['isrestricted'] = False
 
-                _openrequest.update({'isiaorestricted': restrictedrequest['isrestricted']})
-                isaiaoministryrequestwatcher = FOIRequestWatcher.isaiaoministryrequestwatcher(request.ministryrequestid,userid)
-                if restrictedrequest['isrestricted'] == True and (request.assignedTo == userid or isaiaoministryrequestwatcher):
+                isiaorestricted = request.isiaorestricted if request.isiaorestricted == True else False
+                _openrequest.update({'isiaorestricted': isiaorestricted})
+
+                if isiaorestricted == True:
                     _openrequest.update({'lastName': 'Restricted'})
                     _openrequest.update({'firstName': 'Request'})
-                    requestqueue.append(_openrequest)
 
-                if (restrictedrequest['isrestricted'] == False or restrictedrequest['isrestricted']  == None) and  keyword != "restricted":
-                     requestqueue.append(_openrequest)   
+                requestqueue.append(_openrequest)   
                    
 
         meta = {
@@ -124,7 +117,10 @@ class dashboardservice:
         return jsonify({'data': requestqueue, 'meta': meta})
 
     def getministryrequestqueuepagination (self, groups=None, page=1, size=10, sortingitems=[], sortingorders=[], filterfields=[], keyword=None, additionalfilter='All', userid=None):
-        requests = FOIMinistryRequest.getrequestspagination(groups, page, size, sortingitems, sortingorders, filterfields, keyword, additionalfilter, userid)
+        isiaorestrictedfilemanager = False
+        isministryrestrictedfilemanager = False
+
+        requests = FOIMinistryRequest.getrequestspagination(groups, page, size, sortingitems, sortingorders, filterfields, keyword, additionalfilter, userid, isiaorestrictedfilemanager, isministryrestrictedfilemanager)
 
         requestqueue = []
         for request in requests.items:
@@ -160,11 +156,13 @@ class dashboardservice:
         return jsonify({'data': requestqueue, 'meta': meta})
 
     def advancedsearch(self, params={'usertype': 'iao', 'groups':None, 'page':1, 'size':10, 'sortingitems':[], 'sortingorders':[], 'requeststate':[], 'requeststatus':[], 'requesttype':[], 'publicbody':[], 'daterangetype':None, 'fromdate':None, 'todate':None, 'search':None, 'keywords':[], 'userid':None}):
-        
+        userid = AuthHelper.getuserid()
+
         if (params['usertype'] == "iao"):
-            requests = FOIRawRequest.advancedsearch(params)
+            requests = FOIRawRequest.advancedsearch(params, userid, AuthHelper.isiaorestrictedfilemanager())
         else:
-            requests = FOIMinistryRequest.advancedsearch(params)
+            isministryrestrictedfilemanager = False
+            requests = FOIMinistryRequest.advancedsearch(params, userid, isministryrestrictedfilemanager)
         
         requestqueue = []
         for request in requests.items:
@@ -173,21 +171,13 @@ class dashboardservice:
             else:
                 _receiveddate = parser.parse(request.receivedDateUF)
 
-            userid = AuthHelper.getuserid()
             if(request.ministryrequestid == None):
                 unopenrequest = self.__preparefoirequestinfo(request, _receiveddate.strftime(SHORT_DATEFORMAT), _receiveddate.strftime(LONG_DATEFORMAT), idnumberprefix= 'U-00')
                 unopenrequest.update({'description':request.description})
                 unopenrequest.update({'assignedToFormatted': request.assignedToFormatted})
                 unopenrequest.update({'isiaorestricted': request.isiaorestricted})
 
-                
-                isawatcher = FOIRawRequestWatcher.isawatcher(request.id,userid)
-                
-                if request.isiaorestricted == True and (request.assignedTo == userid or isawatcher or AuthHelper.isiaorestrictedfilemanager()):
-                    requestqueue.append(unopenrequest)
-                
-                if (request.isiaorestricted == False or request.isiaorestricted == None):
-                    requestqueue.append(unopenrequest) 
+                requestqueue.append(unopenrequest)
             else:
                 _openrequest = self.__preparefoirequestinfo(request,  _receiveddate.strftime(SHORT_DATEFORMAT), _receiveddate.strftime(LONG_DATEFORMAT))
                 _openrequest.update({'ministryrequestid':request.ministryrequestid})
@@ -195,18 +185,11 @@ class dashboardservice:
                 _openrequest.update({'description':request.description})
                 _openrequest.update({'assignedToFormatted': request.assignedToFormatted})
                 _openrequest.update({'ministryAssignedToFormatted': request.ministryAssignedToFormatted})
-                restrictedrequest = FOIRestrictedMinistryRequest.getrestricteddetails(request.ministryrequestid,'iao')
-                if 'isrestricted' not in restrictedrequest:
-                    restrictedrequest['isrestricted'] = False
 
-                _openrequest.update({'isiaorestricted': restrictedrequest['isrestricted']})
-                isaiaoministryrequestwatcher = FOIRequestWatcher.isaiaoministryrequestwatcher(request.ministryrequestid,userid)  
+                isiaorestricted = request.isiaorestricted if request.isiaorestricted == True else False
+                _openrequest.update({'isiaorestricted': isiaorestricted})
 
-                if restrictedrequest['isrestricted'] == True and (request.assignedTo == userid or isaiaoministryrequestwatcher):
-                    requestqueue.append(_openrequest)
-
-                if restrictedrequest['isrestricted'] == False or restrictedrequest['isrestricted']  == None:
-                     requestqueue.append(_openrequest)     
+                requestqueue.append(_openrequest)
 
         meta = {
             'page': requests.page,
