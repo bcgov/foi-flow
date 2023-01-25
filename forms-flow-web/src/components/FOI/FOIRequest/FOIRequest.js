@@ -26,7 +26,8 @@ import {
 import {
   fetchFOIRequestDetailsWrapper,
   fetchFOIRequestDescriptionList,
-  fetchRequestDataFromAxis
+  fetchRequestDataFromAxis,
+  fetchRestrictedRequestCommentTagList
 } from "../../../apiManager/services/FOI/foiRequestServices";
 import {
   fetchFOIRequestAttachmentsList
@@ -66,10 +67,9 @@ import {
   findRequestState,
   isMandatoryField,
   isAxisSyncDisplayField,
-  getUniqueIdentifier,
-  isRequestRestricted
+  getUniqueIdentifier
 } from "./utils";
-import { ConditionalComponent, formatDate } from '../../../helper/FOI/helper';
+import { ConditionalComponent, formatDate, isRequestRestricted } from '../../../helper/FOI/helper';
 import DivisionalTracking from './DivisionalTracking';
 import AxisDetails from './AxisDetails/AxisDetails';
 import AxisMessageBanner from "./AxisDetails/AxisMessageBanner";
@@ -196,14 +196,15 @@ const FOIRequest = React.memo(({ userDetail }) => {
   let bcgovcode = getBCgovCode(ministryId, requestDetails);
   const [headerText, setHeaderText]  = useState(getHeaderText({requestDetails, ministryId, requestState}));  
   document.title = requestDetails.axisRequestId || requestDetails.idNumber || headerText;
+  const dispatch = useDispatch();
+  const [isIAORestricted, setIsIAORestricted] = useState(false);
 
   useEffect(() => {
     if (window.location.href.indexOf("comments") > -1) {
       tabclick("Comments");
     }
   }, []);
-
-  const dispatch = useDispatch();
+  
    useEffect(async() => {
     if (isAddRequest) {
       dispatch(fetchFOIAssignedToList("", "", ""));
@@ -241,8 +242,15 @@ const FOIRequest = React.memo(({ userDetail }) => {
       setHeaderText(getHeaderText({requestDetails, ministryId, requestState}));
       if(requestDetails.axisRequestId)
         axisBannerCheck();
+        setIsIAORestricted(isRequestRestricted(requestDetails,ministryId));
     }
   }, [requestDetails]);
+
+
+  useEffect(() => {
+    if(isIAORestricted)
+      dispatch(fetchRestrictedRequestCommentTagList(requestId, ministryId));
+  }, [isIAORestricted]);
 
 
   useEffect(() => {
@@ -1074,9 +1082,6 @@ const FOIRequest = React.memo(({ userDetail }) => {
                   removeComment={removeComment}
                   setRemoveComment={setRemoveComment}
                   isRestricted={isRequestRestricted(requestDetails,ministryId)}
-                  assigneeDetails={ _.pick(requestDetails, ['assignedGroup', 'assignedTo','assignedToFirstName','assignedToLastName',
-                  'assignedministrygroup','assignedministryperson','assignedministrypersonFirstName','assignedministrypersonLastName'])}
-                  istabactive={tabLinksStatuses?.Comments?.active}
                 />
               </>
             ) : (

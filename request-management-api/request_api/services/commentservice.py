@@ -111,46 +111,43 @@ class commentservice:
                 "taggedusers" : comment['taggedusers']
         }     
 
-    def createcommenttagginguserlist(self,watchers, baserequestinfo):
+    def createcommenttagginguserlist(self,watchers, baserequestinfo, ministryid=None):
         userlist = []
         watcherteams= []
         if baserequestinfo is not None:
-            user= self.__formatuserlist(baserequestinfo['assignedTo'], baserequestinfo['assignedToFirstName'], baserequestinfo['assignedToLastName'])
+            if ministryid is not None:
+                user= self.__formatuserlist(baserequestinfo['assignedto'], baserequestinfo['assignee.firstname'], baserequestinfo['assignee.lastname'])
+            else:
+                user= self.__formatuserlist(baserequestinfo['assignedTo'], baserequestinfo['assignedToFirstName'], baserequestinfo['assignedToLastName'])
             userlist.append(user)
             if 'programarea.bcgovcode' in baserequestinfo:
                 teamname = baserequestinfo['programarea.bcgovcode'].lower()+"ministryteam"
             else:
                 teamname = baserequestinfo['selectedMinistries'][0]['code'].lower()+"ministryteam"
             ministryteam = assigneeservice().getmembersbygroupname(teamname) 
-            print('\nministryteam',ministryteam)
-            if ministryteam is not None:
-                for ministry in ministryteam:
-                    for member in ministry['members']:
-                        user= self.__formatuserlist(member['username'], member['firstname'], member['lastname'])
-                        userlist.append(user)
+            for ministry in ministryteam:
+                for member in ministry['members']:
+                    user= self.__formatuserlist(member['username'], member['firstname'], member['lastname'])
+                    userlist.append(user)
             if watchers is not None:
-                # watchergrouplist= list(map(itemgetter('watchedbygroup'), watchers))
-                # watchergroups = set(watchergrouplist)
-                # print("\nwatchergroups:",watchergroups)
-                # for group in watchergroups:
-                #     watcherteams.append(assigneeservice().getmembersbygroupname(group)) 
-                # print("\nwatcherteams:",watcherteams)
                 self.__getwatchernames(watchers,watcherteams, userlist)
-        print("\nuserlist:",userlist)
         return userlist
 
     def __getwatchernames(self, watchers, watcherteams, userlist):
         watchergrouplist= list(map(itemgetter('watchedbygroup'), watchers))
         watchergroups = set(watchergrouplist)
-        print("\nwatchergroups:",watchergroups)
         for group in watchergroups:
             watcherteams.append(assigneeservice().getmembersbygroupname(group)) 
-        print("\nwatcherteams:",watcherteams)
         for watcher in watchers:
-            for team in watcherteams:
-                member= list(filter(lambda x: x['username'] == watcher['watchedby'], team[0]['members']))
-                user= self.__formatuserlist(watcher['watchedby'], member[0]['firstname'], member[0]['lastname'])
-                userlist.append(user)
+            #check if user already in list
+            existingusernames = list(map(itemgetter('username'), userlist))
+            if watcher['watchedby'] not in existingusernames:
+                for team in watcherteams:
+                    member= list(filter(lambda x: x['username'] == watcher['watchedby'], team[0]['members']))
+                    if len(member) > 0:
+                        user= self.__formatuserlist(watcher['watchedby'], member[0]['firstname'], member[0]['lastname'])
+                        userlist.append(user)
+                        break
 
     def __formatuserlist(self, username, firstname, lastname):
         user={}

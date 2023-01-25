@@ -5,8 +5,6 @@ import DisplayComments from './DisplayComments'
 import { ActionProvider } from './ActionContext'
 import Input from './Input'
 import CommentFilter from './CommentFilter'
-import Loading from "../../../../containers/Loading";
-import {fetchRestrictedRequestCommentTagList} from "../../../../apiManager/services/FOI/foiRequestServices";
 
 export const CommentSection = ({
   commentsArray,
@@ -26,8 +24,6 @@ export const CommentSection = ({
   removeComment,
   setRemoveComment,
   isRestricted,
-  assigneeDetails,
-  istabactive
 }) => {
   const requestWatchers = useSelector((state) => state.foiRequests.foiWatcherList);
   const [showaddbox, setshowaddbox] = useState(false)
@@ -41,25 +37,11 @@ export const CommentSection = ({
     let filteredcomments = filterkeyinCommentsandReplies(_commentsbyCategory,_filteredcomments)        
     setcomments(filteredcomments)         
   }, [filterValue,commentsArray ,filterkeyValue])
-  const [restrictedReqTaglist, setRestrictedReqTaglist]= useState([]);
+  //const [restrictedReqTaglist, setRestrictedReqTaglist]= useState([]);
+  let restrictedReqTaglist = useSelector((state) => state.foiRequests.restrictedReqTaglist);
   const dispatch = useDispatch(); 
   const isCommentTagListLoading = useSelector((state) => state.foiRequests.isCommentTagListLoading);
-
-  useEffect(()=> {
-    console.log("use effect!!");
-    if(istabactive&&isRestricted){
-      console.log("Call API!!",assigneeDetails);
-      dispatch(fetchRestrictedRequestCommentTagList(requestid, ministryId, (err, res) =>{
-        if(!err){
-          console.log("Response:",res);
-          setRestrictedReqTaglist(res);
-        }
-      }))
-    }
-  }, [istabactive]);
- 
-  console.log("isCommentTagListLoading:",isCommentTagListLoading);
-
+  
   const onfilterchange = (_filterValue) => { 
     sessionStorage.setItem('foicommentcategory',_filterValue)   
     setfilterValue(_filterValue)       
@@ -95,9 +77,6 @@ export const CommentSection = ({
 
  
   return (
-    <>
-    { !isCommentTagListLoading ?
-      (
     <ActionProvider
       currentUser={currentUser}
       setComment={setComment}
@@ -124,24 +103,21 @@ export const CommentSection = ({
 { showaddbox ?
         <div className="inputBox" style={{ display: showaddbox ? 'block' : 'none' }}>
           {<Input add="add"  bcgovcode={bcgovcode} iaoassignedToList={iaoassignedToList} ministryAssignedToList={ministryAssignedToList} //Handles Navigate Away
-          setEditorChange={setEditorChange} removeComment={removeComment} setRemoveComment={setRemoveComment} restrictedReqTaglist={restrictedReqTaglist}  />}
+          setEditorChange={setEditorChange} removeComment={removeComment} setRemoveComment={setRemoveComment} 
+          restrictedReqTaglist={restrictedReqTaglist} isRestricted={isRestricted} />}
         </div> :null}
         <div className="displayComments">
           <div className="filterComments" >
             <CommentFilter oncommentfilterchange={onfilterchange} filterValue={filterValue === null ? 1 : filterValue} oncommentfilterkeychange={(k)=>{setfilterkeyValue(k)}}/>
           </div>
           <DisplayComments comments={comments} bcgovcode={bcgovcode} currentUser={currentUser} iaoassignedToList={iaoassignedToList} ministryAssignedToList={ministryAssignedToList} 
-           restrictedReqTaglist={restrictedReqTaglist}
+           restrictedReqTaglist={restrictedReqTaglist} isRestricted={isRestricted}
           //Handles Navigate Away
           setEditorChange={setEditorChange} removeComment={removeComment} setRemoveComment={setRemoveComment} />
         </div>
 
       </div>
-    </ActionProvider>)
-    :
-    (<Loading />)
-  }
-  </>
+    </ActionProvider>
   )
 }
 

@@ -15,6 +15,9 @@ import { createAssigneeDetails } from '../utils'
 import {
   saveAssignee
 } from "../../../../apiManager/services/FOI/foiAssigneeServices";
+import {
+  fetchRestrictedRequestCommentTagList
+} from "../../../../apiManager/services/FOI/foiRequestServices";
 import { toast } from "react-toastify";
 import _ from 'lodash';
 import RequestRestriction from "../../customComponents/RequestRestriction";
@@ -178,6 +181,8 @@ const FOIRequestHeader = React.memo(
               requestDetails.assignedToFirstName = assigneeDetails.assignedToFirstName;
               requestDetails.assignedToLastName = assigneeDetails.assignedToLastName;
               requestDetails.assignedToName = assigneeDetails.assignedToName
+              if(isRestricted())
+                dispatch(fetchRestrictedRequestCommentTagList(requestId, ministryId));
             } else {
               toast.error(
                 "Temporarily unable to save the assignee. Please try again in a few minutes.",

@@ -426,10 +426,3 @@ export const getUniqueIdentifier = (obj) => {
   return (obj.extensionstatusid+formatDate(obj.extendedduedate, "MMM dd yyyy")+obj.extensionreasonid).replace(/\s+/g, '');
 }
 
-export const isRequestRestricted = (requestDetails, ministryId) => {
-  if(ministryId){
-    return requestDetails?.iaorestricteddetails?.isrestricted;
-  } 
-  else
-    return requestDetails?.isiaorestricted;
-}

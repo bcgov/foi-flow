@@ -385,6 +385,14 @@ const getRestrictedRequestTagList = () => {
   return getSessionData("restrictedrequesttagList") || [];
 };
 
+const isRequestRestricted = (requestDetails, ministryId) => {
+  if(ministryId){
+    return requestDetails?.iaorestricteddetails?.isrestricted;
+  } 
+  else
+    return requestDetails?.isiaorestricted;
+}
+
 
 export {
   replaceUrl,
@@ -411,5 +419,6 @@ export {
   encrypt,
   decrypt,
   addToRestrictedRequestTagList,
-  getRestrictedRequestTagList
+  getRestrictedRequestTagList,
+  isRequestRestricted
 };

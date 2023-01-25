@@ -201,7 +201,7 @@ class FOIRestrictedRequestTagList(Resource):
         try :            
              watchers = watcherservice().getallministryrequestwatchers(ministryrequestid)
              baserequestinfo = requestservicegetter().getministryrequest(ministryrequestid)
-             result = commentservice().createcommenttagginguserlist(watchers, baserequestinfo)
+             result = commentservice().createcommenttagginguserlist(watchers, baserequestinfo, ministryrequestid)
              return json.dumps(result), 200
         except ValueError:
             return {'status': 500, 'message':"Invalid Request"}, 400    
