@@ -557,9 +557,9 @@ class FOIMinistryRequest(db.Model):
                 dbquery = basequery.filter(ministryfilter)
             else:
                 if(requestby == 'IAO'):
-                    dbquery = basequery.filter(or_(FOIRestrictedMinistryRequest.isrestricted == False, and_(FOIRestrictedMinistryRequest.isrestricted == True, FOIMinistryRequest.assignedto == userid))).filter(ministryfilter)
+                    dbquery = basequery.filter(or_(or_(FOIRestrictedMinistryRequest.isrestricted == False, FOIRestrictedMinistryRequest.isrestricted == None), and_(FOIRestrictedMinistryRequest.isrestricted == True, FOIMinistryRequest.assignedto == userid))).filter(ministryfilter)
                 else:
-                    dbquery = basequery.filter(or_(ministry_restricted_requests.isrestricted == False, and_(ministry_restricted_requests.isrestricted == True, FOIMinistryRequest.assignedministryperson == userid))).filter(ministryfilter)
+                    dbquery = basequery.filter(or_(or_(ministry_restricted_requests.isrestricted == False, ministry_restricted_requests.isrestricted == None), and_(ministry_restricted_requests.isrestricted == True, FOIMinistryRequest.assignedministryperson == userid))).filter(ministryfilter)
 
 
         if(keyword is None):
@@ -1053,9 +1053,9 @@ class FOIMinistryRequest(db.Model):
             dbquery = basequery.filter(ministryfilter)
         else:
             if(requestby == 'IAO'):
-                dbquery = basequery.filter(or_(FOIRestrictedMinistryRequest.isrestricted == False, and_(FOIRestrictedMinistryRequest.isrestricted == True, FOIMinistryRequest.assignedto == userid))).filter(ministryfilter)
+                dbquery = basequery.filter(or_(or_(FOIRestrictedMinistryRequest.isrestricted == False, FOIRestrictedMinistryRequest.isrestricted == None), and_(FOIRestrictedMinistryRequest.isrestricted == True, FOIMinistryRequest.assignedto == userid))).filter(ministryfilter)
             else:
-                dbquery = basequery.filter(or_(ministry_restricted_requests.isrestricted == False, and_(ministry_restricted_requests.isrestricted == True, FOIMinistryRequest.assignedministryperson == userid))).filter(ministryfilter)
+                dbquery = basequery.filter(or_(or_(ministry_restricted_requests.isrestricted == False, ministry_restricted_requests.isrestricted == None), and_(ministry_restricted_requests.isrestricted == True, FOIMinistryRequest.assignedministryperson == userid))).filter(ministryfilter)
 
         return dbquery
 
