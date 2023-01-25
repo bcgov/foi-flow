@@ -641,7 +641,8 @@ class FOIRawRequest(db.Model):
             'cfrduedate',
             'applicantcategory',
             'onBehalfFormatted',
-            'extensions'
+            'extensions',
+            'isiaorestricted'
         ]
         if x in validfields:
             return True
