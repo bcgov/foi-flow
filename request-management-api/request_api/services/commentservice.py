@@ -7,6 +7,7 @@ from request_api.models.FOIMinistryRequests import FOIMinistryRequest
 from request_api.models.FOIRawRequestComments import FOIRawRequestComment
 from request_api.models.FOIRawRequests import FOIRawRequest
 from request_api.services.assigneeservice import assigneeservice
+from request_api.services.watcherservice import watcherservice
 import json
 from dateutil.parser import parse
 import datetime 
@@ -111,17 +112,20 @@ class commentservice:
                 "taggedusers" : comment['taggedusers']
         }     
 
-    def createcommenttagginguserlist(self,watchers, baserequestinfo, ministryid=None):
+    def createcommenttagginguserlist(self,type,requestid):
+        if type == "ministryrequest":
+            watchers = watcherservice().getallministryrequestwatchers(requestid)
+            baserequestinfo = FOIMinistryRequest.getmetadata(requestid)
+        else:
+            watchers = watcherservice().getrawrequestwatchers(requestid)
+            baserequestinfo = FOIRawRequest.getmetadata(requestid)
         userlist = []
         watcherteams= []
         if baserequestinfo is not None:
-            if ministryid is not None:
-                user= self.__formatuserlist(baserequestinfo['assignedto'], baserequestinfo['assignee.firstname'], baserequestinfo['assignee.lastname'])
-            else:
-                user= self.__formatuserlist(baserequestinfo['assignedTo'], baserequestinfo['assignedToFirstName'], baserequestinfo['assignedToLastName'])
+            user= self.__formatuserlist(baserequestinfo['assignedTo'], baserequestinfo['assignedToFirstName'], baserequestinfo['assignedToLastName'])
             userlist.append(user)
-            if 'programarea.bcgovcode' in baserequestinfo:
-                teamname = baserequestinfo['programarea.bcgovcode'].lower()+"ministryteam"
+            if 'bcgovcode' in baserequestinfo:
+                teamname = baserequestinfo['bcgovcode'].lower()+"ministryteam"
             else:
                 teamname = baserequestinfo['selectedMinistries'][0]['code'].lower()+"ministryteam"
             ministryteam = assigneeservice().getmembersbygroupname(teamname) 

@@ -26,8 +26,6 @@ from request_api.services.commentservice import commentservice
 from request_api.services.rawrequestservice import rawrequestservice
 from request_api.schemas.foicomment import  FOIRawRequestCommentSchema, FOIMinistryRequestCommentSchema
 from request_api.schemas.foicomment import  EditFOIRawRequestCommentSchema, FOIMinistryRequestCommentSchema
-from request_api.services.watcherservice import watcherservice
-from request_api.services.foirequest.requestservicegetter import requestservicegetter
 import json
 from flask_cors import cross_origin
 import asyncio
@@ -181,9 +179,7 @@ class FOIRestrictedRequestTagList(Resource):
     @auth.require
     def get(requestid=None):
         try :       
-            watchers = watcherservice().getrawrequestwatchers(requestid)
-            baserequestinfo = rawrequestservice().getrawrequest(requestid)
-            result = commentservice().createcommenttagginguserlist(watchers, baserequestinfo)
+            result = commentservice().createcommenttagginguserlist("rawrequest",requestid)
             return json.dumps(result), 200
         except ValueError:
             return {'status': 500, 'message':"Invalid Request"}, 400    
@@ -199,9 +195,7 @@ class FOIRestrictedRequestTagList(Resource):
     @auth.require
     def get(ministryrequestid=None):
         try :            
-             watchers = watcherservice().getallministryrequestwatchers(ministryrequestid)
-             baserequestinfo = requestservicegetter().getministryrequest(ministryrequestid)
-             result = commentservice().createcommenttagginguserlist(watchers, baserequestinfo, ministryrequestid)
+             result = commentservice().createcommenttagginguserlist("ministryrequest",ministryrequestid)
              return json.dumps(result), 200
         except ValueError:
             return {'status': 500, 'message':"Invalid Request"}, 400    

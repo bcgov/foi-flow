@@ -906,6 +906,29 @@ class FOIRawRequest(db.Model):
         finally:
             db.session.close()        
 
+    @classmethod
+    def getmetadata(cls,requestid):
+        requestdetails = {}
+        try:
+            sql = """select requestrawdata ->> 'assignedTo' as assignedTo,
+            requestrawdata ->> 'assignedToFirstName' as assignedToFirstName,
+            requestrawdata ->> 'assignedToLastName' as assignedToLastName,
+            requestrawdata -> 'selectedMinistries'-> 0 ->> 'code' as bcgovcode from "FOIRawRequests" 
+                    where requestid = :requestid
+                    order by version desc limit 1;"""
+            rs = db.session.execute(text(sql), {'requestid': requestid})
+            for row in rs:
+                requestdetails["assignedTo"] = row['assignedto']
+                requestdetails["assignedToFirstName"] = row["assignedtofirstname"]
+                requestdetails["assignedToLastName"] = row["assignedtolastname"]
+                requestdetails["bcgovcode"] = row["bcgovcode"]
+        except Exception as ex:
+            logging.error(ex)
+            raise ex
+        finally:
+            db.session.close()
+        return requestdetails
+
 class FOIRawRequestSchema(ma.Schema):
     class Meta:
         fields = ('requestid', 'requestrawdata', 'status','notes','created_at','wfinstanceid','version','updated_at','assignedgroup','assignedto','updatedby','createdby','sourceofsubmission','ispiiredacted','assignee.firstname','assignee.lastname', 'axisrequestid', 'axissyncdate', 'closedate','isiaorestricted')

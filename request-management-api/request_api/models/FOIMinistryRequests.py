@@ -1210,6 +1210,29 @@ class FOIMinistryRequest(db.Model):
     @classmethod
     def getaxisrequestidforrequest(cls,requestid, ministryrequestid):   
         return db.session.query(FOIMinistryRequest.axisrequestid).filter_by(foiministryrequestid=ministryrequestid, foirequest_id=requestid).first()[0]
+    
+    @classmethod
+    def getmetadata(cls,ministryrequestid):
+        requestdetails = {}
+        try:
+            sql = """select version, assignedto, fa.firstname, fa.lastname, pa.bcgovcode from "FOIMinistryRequests" fmr 
+                    INNER JOIN "FOIAssignees" fa ON fa.username = fmr.assignedto
+                    INNER JOIN "ProgramAreas" pa ON pa.programareaid = fmr.programareaid
+                    where foiministryrequestid = :ministryrequestid
+                    order by version desc limit 1;"""
+            rs = db.session.execute(text(sql), {'ministryrequestid': ministryrequestid})
+            for row in rs:
+                print("\nResponse:", row)
+                requestdetails["assignedTo"] = row["assignedto"]
+                requestdetails["assignedToFirstName"] = row["firstname"]
+                requestdetails["assignedToLastName"] = row["lastname"]
+                requestdetails["bcgovcode"] = row["bcgovcode"]
+        except Exception as ex:
+            logging.error(ex)
+            raise ex
+        finally:
+            db.session.close()
+        return requestdetails
 
 class FOIMinistryRequestSchema(ma.Schema):
     class Meta:
