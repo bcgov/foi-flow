@@ -24,18 +24,16 @@ const mentionPlugin = createMentionPlugin();
 const { Toolbar } = staticToolbarPlugin;
 const { MentionSuggestions } = mentionPlugin
 const plugins = [staticToolbarPlugin, mentionPlugin];
-const AddCommentField = ({ cancellor, parentId, add, fullnameList ,  //setEditorChange, removeComment and setRemoveComment added to handle Navigate away from Comments tabs 
-  setEditorChange, removeComment, setRemoveComment }) => {
+const AddCommentField = ({ cancellor, parentId, add, fullnameList , restrictedReqTaglist,  //setEditorChange, removeComment and setRemoveComment added to handle Navigate away from Comments tabs 
+  setEditorChange, removeComment, setRemoveComment, isRestricted }) => {
   let maxcharacterlimit = 1000  
   const [uftext, setuftext] = useState('')
   const [textlength, setTextLength] = useState(1000)
   const [open, setOpen] = useState(false);
-  
   let fulluserlist = suggestionList([...fullnameList]).sort(namesort)
-  const mentionList = fulluserlist;
+  const mentionList = isRestricted ? restrictedReqTaglist :fulluserlist;
   const [suggestions, setSuggestions] = useState(mentionList);
   const [editorState, setEditorState] = useState(EditorState.createEmpty())
-
   const onOpenChange = (_open) => {
     setOpen(_open);
   }

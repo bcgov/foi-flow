@@ -69,35 +69,33 @@ const RequestRestriction= ({isiaorestricted, isIAORestrictedFileManager, request
                 if(!isRequestAssignedToTeam()){
                     setIsRestricted('True');
                     heading = "Restricted File";
-                    message="Are you sure you want to flag this as a restricted file ?";
+                    message="Are you sure you want to flag this as a restricted file?";
                     description= <span>
-                    If you change this to be a restrcited file only the
+                    If you change this to be a restrcited file, only the
                     <b> Intake Manager </b>and
                     <b> any user assigned </b>
-                    or selected as
-                    <b> Watchers </b>
+                    or selected as a
+                    <b> Watcher </b>
                     will be able to view this request content.
                   </span>
                 }
                 else{
                     heading = "Restrict File";
                     message="A request can only be restricted when it is assigned to one team member, not a team queue.";
-                    description="";
                 }
             }
             else{
                 heading = "Restrict File";
                 message="Only the Intake Manager can restrict a request.";
-                description="";
             }
         }
         else {
             if(isIAORestrictedFileManager){
                 setIsRestricted('False');
                 heading = "Unrestricted File";
-                message="Are you sure you want to remove the restricted file flag on this request ?";
-                description="If you unrestrcit this file only all IAO users will be able to search and find the request, and all users "+
-                "on the respective Ministry will be able to see this request.";
+                message="Are you sure you want to remove the restricted file flag on this request?";
+                description="If you unrestrcit this file, all IAO users will be able to search and find the request, and all ministry users "+
+                "for the respective ministry will be able to see this request.";
             }
             else{
                 heading = "Unrestrict File";

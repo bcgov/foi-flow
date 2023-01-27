@@ -190,6 +190,10 @@ class requestservicegetter:
                 if onholddate is not None:
                     break
         return onholddate
+
+    def getministryrequest(self, foiministryrequestid):
+        requestministry = FOIMinistryRequest.getrequestbyministryrequestid(foiministryrequestid)
+        return requestministry
     
     def __genericdateformat(self):
         return '%Y-%m-%d'
