@@ -71,7 +71,7 @@ const RequestRestriction= ({isiaorestricted, isIAORestrictedFileManager, request
                     heading = "Restricted File";
                     message="Are you sure you want to flag this as a restricted file?";
                     description= <span>
-                    If you change this to be a restrcited file, only the
+                    If you change this to be a restricted file, only the
                     <b> Intake Manager </b>and
                     <b> any user assigned </b>
                     or selected as a
@@ -94,7 +94,7 @@ const RequestRestriction= ({isiaorestricted, isIAORestrictedFileManager, request
                 setIsRestricted('False');
                 heading = "Unrestricted File";
                 message="Are you sure you want to remove the restricted file flag on this request?";
-                description="If you unrestrcit this file, all IAO users will be able to search and find the request, and all ministry users "+
+                description="If you unrestrict this file, all IAO users will be able to search and find the request, and all ministry users "+
                 "for the respective ministry will be able to see this request.";
             }
             else{
