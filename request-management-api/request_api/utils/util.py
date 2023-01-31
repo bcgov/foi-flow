@@ -124,6 +124,19 @@ def canrestictdata(requestid,assignee,isrestricted,israwrequest):
     else:
         return False    
 
+def canrestictdata_ministry(requestid,assignee,isrestricted):
+
+    _isawatcher = False
+    currentuser = AuthHelper.getuserid()
+    _isawatcher = FOIRequestWatcher.isaministryministryrequestwatcher(requestid,currentuser)
+
+    isministryrestrictedfilemanager = AuthHelper.isministryrestrictedfilemanager()
+    print('Current user is {0} , is a watcher: {1} and is file manager {2} '.format(currentuser,_isawatcher,isministryrestrictedfilemanager))
+    if(isrestricted and currentuser != assignee and _isawatcher == False and isministryrestrictedfilemanager == False):
+        return True
+    else:
+        return False   
+
         
 
 

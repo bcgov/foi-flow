@@ -346,6 +346,10 @@ const isRequestWatcherOrAssignee = (requestWatchers,requestAssignees,userId) => 
   return (_.map(requestWatchers, "watchedby").includes(userId) || (requestAssignees.assignedTo == userId));
 }
 
+const isRequestWatcherOrMinistryAssignee = (requestWatchers,ministryAssigneeValue,userId) => {
+  return (_.map(requestWatchers, "watchedby").includes(userId) || (ministryAssigneeValue.includes(userId)));
+}
+
 export {
   replaceUrl,
   formatDate,
@@ -364,6 +368,7 @@ export {
   getMinistryCode,
   errorToast,
   isRequestWatcherOrAssignee,
+  isRequestWatcherOrMinistryAssignee,
   formatDateInPst,
   isProcessingTeam,
   isFlexTeam,

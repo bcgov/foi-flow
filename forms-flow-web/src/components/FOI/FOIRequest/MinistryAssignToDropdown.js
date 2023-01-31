@@ -26,7 +26,16 @@ const useStyles = makeStyles((theme) => ({
         opacity: 1,
     },
   }));
-const MinistryAssignToDropdown  = React.memo(({requestState, requestDetails, ministryAssignedToList, handleMinistryAssignedToValue, isMinistryCoordinator, requestId, ministryId, setSaveMinistryRequestObject}) => {
+const MinistryAssignToDropdown  = React.memo(({
+  requestState,
+  requestDetails,
+  ministryAssignedToList,
+  handleMinistryAssignedToValue,
+  isMinistryCoordinator,
+  requestId,
+  ministryId,
+  setSaveMinistryRequestObject
+}) => {
    
      /**
      *  Header of Review request in the UI

@@ -21,7 +21,7 @@ from flask_cors import cross_origin
 from request_api.auth import auth, AuthHelper
 from request_api.services.eventservice import eventservice
 from request_api.tracer import Tracer
-from request_api.utils.util import  cors_preflight, allowedorigins, getrequiredmemberships,str_to_bool,canrestictdata
+from request_api.utils.util import  cors_preflight, allowedorigins, getrequiredmemberships,str_to_bool,canrestictdata,canrestictdata_ministry
 from request_api.exceptions import BusinessException
 from request_api.services.requestservice import requestservice
 from request_api.services.rawrequestservice import rawrequestservice
@@ -62,6 +62,11 @@ class FOIRequest(Resource):
                     statuscode = 401
             elif  usertype is not None and usertype == "ministry" and AuthHelper.getusertype() == "ministry":
                 jsondata = requestservice().getrequestdetailsforministry(foirequestid,foiministryrequestid,AuthHelper.getministrygroups())
+                assignee = jsondata['assignedministryperson']
+                isrestricted = jsondata['ministryrestricteddetails']['isrestricted'] if ('isrestricted' in jsondata['ministryrestricteddetails']) else False
+                if(canrestictdata_ministry(foiministryrequestid,assignee,isrestricted)):
+                    jsondata = {}
+                    statuscode = 401
             else:
                 statuscode = 401 
             return jsondata , statuscode 
@@ -173,6 +178,7 @@ class FOIRequestsByIdAndType(Resource):
                 asyncio.ensure_future(eventservice().postevent(foiministryrequestid,"ministryrequest",AuthHelper.getuserid(),AuthHelper.getusername(),AuthHelper.isministrymember(),assigneename))
                 metadata = json.dumps({"id": result.identifier, "ministries": result.args[0]})
                 requestservice().posteventtoworkflow(foiministryrequestid, ministryrequestschema, json.loads(metadata),usertype)
+                requestservice().saverestrictedrequest(foiministryrequestid,'ministry',request_json["isministryrestricted"],AuthHelper.getuserid())
                 return {'status': result.success, 'message':result.message,'id':result.identifier, 'ministryRequests': result.args[0]} , 200
             else:
                  return {'status': False, 'message':EXCEPTION_MESSAGE_NOTFOUND_REQUEST,'id':foirequestid} , 404

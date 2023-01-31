@@ -175,6 +175,18 @@ class AuthHelper:
         except ValueError:
             return False
 
+    @classmethod
+    def isministryrestrictedfilemanager(cls):
+        #roles is an array of strings
+        roles = cls.getuserroles()        
+        try:      
+            if 'MinistryRestrictedFilesManager' in roles:
+                return True    
+            else:            
+                return False
+        except ValueError:
+            return False
+
     
     @classmethod        
     def getusergroups(cls):

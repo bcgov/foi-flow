@@ -20,14 +20,14 @@ import './requestrestriction.scss';
 import {restrictRequest, fetchFOIRequestDetailsWrapper} from '../../../apiManager/services/FOI/foiRequestServices';
 
 
-const RequestRestriction= ({
-    isiaorestricted,
-    isIAORestrictedFileManager,
+const RequestMinistryRestriction= ({
+    isministryrestricted,
+    isMinistryRestrictedFileManager,
     requestDetails
 }) =>{ 
 
     const [restrictionType, setRestrictionType] = useState("unrestricted");
-    const [isRestricted, setIsRestricted] = useState(isiaorestricted);
+    const [isRestricted, setIsRestricted] = useState(isministryrestricted);
     const [modalOpen, setModalOpen] = useState(false);
     const [modalMessage, setModalMessage] = useState(<></>);    
     const [modalDescription, setModalDescription] = useState(<></>);
@@ -36,8 +36,8 @@ const RequestRestriction= ({
 
 
     useEffect(() => {
-        setIsRestricted(isiaorestricted);
-        if(isiaorestricted){
+        setIsRestricted(isministryrestricted);
+        if(isministryrestricted){
             setRestrictionType("restricted");
         }else{
             setRestrictionType("unrestricted");
@@ -45,20 +45,20 @@ const RequestRestriction= ({
     }, []);
 
 
-    const isRequestAssignedToTeam = () => {
-        return (!requestDetails?.assignedTo && requestDetails?.assignedGroup);
+    const isRequestAssignedToMinistryTeam = () => {
+        return (!requestDetails?.assignedministryperson && requestDetails?.assignedministrygroup);
     }
 
     const restriction = [
         {
           value: 'unrestricted',
           label: 'Unrestricted',
-          disabled: !isiaorestricted
+          disabled: !isministryrestricted
         },
         {
           value: 'restricted',
           label: 'Restricted',
-          disabled: isiaorestricted,
+          disabled: isministryrestricted,
         }
     ];
 
@@ -67,13 +67,14 @@ const RequestRestriction= ({
         let description="";
         let message="";
         if(e.target.value?.toLowerCase() == 'restricted'){
-            if(isIAORestrictedFileManager){
-                if(!isRequestAssignedToTeam()){
+            if(isMinistryRestrictedFileManager){
+                if(!isRequestAssignedToMinistryTeam()){
+                    console.log("1",isRequestAssignedToMinistryTeam());
                     setIsRestricted('True');
                     message="Are you sure you want to flag this as a restricted file ?";
                     description= <span>
-                    If you change this to be a restrcited file only the
-                    <b> Intake Manager </b>and
+                    If you change this to be a restricted file only the
+                    <b> Ministry Manager </b>and
                     <b> any user assigned </b>
                     or selected as
                     <b> Watchers </b>
@@ -81,27 +82,28 @@ const RequestRestriction= ({
                   </span>
                 }
                 else{
+                    console.log("2",isRequestAssignedToMinistryTeam());
                     message="A request can only be restricted when it is assigned to one team member, not a team queue.";
                     description="";
                 }
             }
             else{
-                message="Only the Intake Manager can restrict a request.";
+                message="Only the Ministry Manager can restrict a request.";
                 description="";
             }
         }
         else {
-            if(isIAORestrictedFileManager){
+            if(isMinistryRestrictedFileManager){
                 setIsRestricted('False');
                 message="Are you sure you want to remove the restricted file flag on this request ?";
-                description="If you unrestrcit this file only all IAO users will be able to search and find the request, and all users "+
+                description="If you unrestrict this file only all IAO users will be able to search and find the request, and all users "+
                 "on the respective Ministry will be able to see this request.";
             }
             else{
                 message="Only the Intake Manager can remove the restricted flag on a request";
                 description= <span>
                     If you would like to have this request unrestricted please contact the
-                    <b> Intake Manager </b>
+                    <b> Ministry Manager </b>
                     as they are the original user who flagged this as a restricted request.
                     </span>
             }
@@ -120,7 +122,7 @@ const RequestRestriction= ({
     };
 
     const save = () => {
-        let type = "iao";
+        let type = "ministry";
         let data = {
             "isrestricted": isRestricted
         }
@@ -204,7 +206,7 @@ const RequestRestriction= ({
                 <button
                 className={`btn-bottom btn-save btn`}
                 onClick={handleSave}
-                disabled={!isIAORestrictedFileManager || isRequestAssignedToTeam()}
+                disabled={!isMinistryRestrictedFileManager || isRequestAssignedToMinistryTeam()}
                 >
                 Save Change
                 </button>
@@ -218,4 +220,4 @@ const RequestRestriction= ({
     );
 };
 
-export default RequestRestriction;
+export default RequestMinistryRestriction;

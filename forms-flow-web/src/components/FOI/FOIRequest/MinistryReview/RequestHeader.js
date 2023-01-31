@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import { InputLabel } from '@material-ui/core';
 import Link from '@material-ui/core/Link';
 import TextField from '@material-ui/core/TextField';
@@ -9,8 +9,16 @@ import { Watcher } from '../../customComponents';
 import { useParams } from 'react-router-dom';
 import { getHeaderText } from './utils';
 import { StateEnum } from '../../../../constants/FOI/statusEnum';
+import { isRequestWatcherOrMinistryAssignee } from "../../../../helper/FOI/helper";
+import RequestMinistryRestriction from "../../customComponents/RequestMinistryRestriction";
 
-const RequestHeader = React.memo(({requestDetails, userDetail, handleMinistryAssignedToValue, setSaveMinistryRequestObject}) => {
+const RequestHeader = React.memo(({
+    requestDetails,
+    userDetail,
+    handleMinistryAssignedToValue,
+    setSaveMinistryRequestObject,
+    ministryAssigneeValue
+}) => {
 
     const { requestId, ministryId } = useParams();
     const _requestDetails = requestDetails;
@@ -59,9 +67,16 @@ const RequestHeader = React.memo(({requestDetails, userDetail, handleMinistryAss
     
     const assignedToValue = getFullName();
 
-    const disableInput = false;
-    const isIAORestrictedRequest = false;
-    const setIsLoaded = () => {};
+    const [isMinistryRestrictedRequest, setIsMinistryRestrictedRequest] = useState(false);
+    const isMinistryRestrictedFileManager = () => {
+        return userDetail?.role?.includes("MinistryRestrictedFilesManager");
+    }
+    const isRestricted = () => {
+        return requestDetails?.ministryrestricteddetails?.isrestricted;
+    }
+    const [disableHeaderInput, setDisableHeaderInput] = useState( isRestricted() && !isMinistryRestrictedFileManager() );
+    const [isLoaded, setIsLoaded] = useState(false);
+    const requestWatchers = useSelector((state) => state.foiRequests.foiWatcherList);
 
     const watcherBox = (
         requestState?.toLowerCase() == StateEnum.closed.name.toLowerCase() ?
@@ -72,8 +87,8 @@ const RequestHeader = React.memo(({requestDetails, userDetail, handleMinistryAss
                 watcherFullList={ministryAssignedToList}
                 ministryId={ministryId}
                 userDetail={userDetail}
-                disableInput={disableInput}
-                isIAORestrictedRequest={isIAORestrictedRequest}
+                disableInput={false}
+                isIAORestrictedRequest={false}
                 setIsLoaded={setIsLoaded}
             />
         )
@@ -89,7 +104,18 @@ const RequestHeader = React.memo(({requestDetails, userDetail, handleMinistryAss
                     </Link>
                 </div>
                 <div className="foi-request-review-header-col1-row axis-request-id" style={{marginTop:5+'px',display:'block'}}>
-                    {watcherBox}
+                    <div className="foi-request-review-header-col1-row">
+                        {watcherBox}
+                    </div>
+                    {
+                    (isLoaded && (isRequestWatcherOrMinistryAssignee(requestWatchers,ministryAssigneeValue,userDetail?.preferred_username) || 
+                        isMinistryRestrictedFileManager())) &&
+                        <RequestMinistryRestriction 
+                            isministryrestricted={isRestricted()}
+                            isMinistryRestrictedFileManager={isMinistryRestrictedFileManager()}
+                            requestDetails={requestDetails}
+                        />
+                    }
                 </div>
             </div>
             <div className="foi-assigned-to-container">
@@ -116,14 +142,7 @@ const RequestHeader = React.memo(({requestDetails, userDetail, handleMinistryAss
             </div>
         </div>
 
-
-
-
     );
-
-
-
-
 })
 
 export default RequestHeader

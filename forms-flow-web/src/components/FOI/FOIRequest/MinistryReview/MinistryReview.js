@@ -575,6 +575,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
                           setSaveMinistryRequestObject={
                             setSaveMinistryRequestObject
                           }
+                          ministryAssigneeValue={ministryAssignedToValue}
                         />
                         <ApplicantDetails requestDetails={requestDetails} />
                         <ChildDetails requestDetails={requestDetails} />
