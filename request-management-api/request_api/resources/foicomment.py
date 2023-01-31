@@ -168,3 +168,36 @@ class FOIUpdateComment(Resource):
             return {'status': False, 'message':err.messages}, 400        
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500
+
+
+@cors_preflight('GET,OPTIONS')
+@API.route('/foicomment/rawrequest/<requestid>/restricted')
+class FOIRestrictedRequestTagList(Resource):
+
+    @staticmethod    
+    @cross_origin(origins=allowedorigins())
+    @auth.require
+    def get(requestid=None):
+        try :       
+            result = commentservice().createcommenttagginguserlist("rawrequest",requestid)
+            return json.dumps(result), 200
+        except ValueError:
+            return {'status': 500, 'message':"Invalid Request"}, 400    
+        except BusinessException as exception:            
+            return {'status': exception.status_code, 'message':exception.message}, 500 
+
+@cors_preflight('GET,OPTIONS')
+@API.route('/foicomment/ministryrequest/<ministryrequestid>/restricted')
+class FOIRestrictedRequestTagList(Resource):
+
+    @staticmethod    
+    @cross_origin(origins=allowedorigins())
+    @auth.require
+    def get(ministryrequestid=None):
+        try :            
+             result = commentservice().createcommenttagginguserlist("ministryrequest",ministryrequestid)
+             return json.dumps(result), 200
+        except ValueError:
+            return {'status': 500, 'message':"Invalid Request"}, 400    
+        except BusinessException as exception:            
+            return {'status': exception.status_code, 'message':exception.message}, 500 

@@ -12,7 +12,7 @@
   const suggestionList = (teamlist) =>{
     teamlist.forEach(ful => {
         ful.name = ful.fullname;
-        if(ful.fullname.indexOf(',')> 0)
+        if(ful.fullname?.indexOf(',')> 0)
         {
           let _name = ful.fullname.split(',')
           ful.firstname = _name[1].trim().toLowerCase()

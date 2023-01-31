@@ -1,10 +1,13 @@
 
 from os import stat
 from re import VERBOSE
+from operator import itemgetter
 from request_api.models.FOIRequestComments import FOIRequestComment
 from request_api.models.FOIMinistryRequests import FOIMinistryRequest
 from request_api.models.FOIRawRequestComments import FOIRawRequestComment
 from request_api.models.FOIRawRequests import FOIRawRequest
+from request_api.services.assigneeservice import assigneeservice
+from request_api.services.watcherservice import watcherservice
 import json
 from dateutil.parser import parse
 import datetime 
@@ -14,6 +17,7 @@ from dateutil import tz
 from pytz import timezone
 import pytz
 import maya
+
 
 
 class commentservice:
@@ -107,3 +111,53 @@ class commentservice:
                 "commentTypeId":comment['commenttypeid'],
                 "taggedusers" : comment['taggedusers']
         }     
+
+    def createcommenttagginguserlist(self,type,requestid):
+        if type == "ministryrequest":
+            watchers = watcherservice().getallministryrequestwatchers(requestid)
+            baserequestinfo = FOIMinistryRequest.getmetadata(requestid)
+        else:
+            watchers = watcherservice().getrawrequestwatchers(requestid)
+            baserequestinfo = FOIRawRequest.getmetadata(requestid)
+        userlist = []
+        watcherteams= []
+        if baserequestinfo is not None:
+            user= self.__formatuserlist(baserequestinfo['assignedTo'], baserequestinfo['assignedToFirstName'], baserequestinfo['assignedToLastName'])
+            userlist.append(user)
+            if 'bcgovcode' in baserequestinfo:
+                teamname = baserequestinfo['bcgovcode'].lower()+"ministryteam"
+            else:
+                teamname = baserequestinfo['selectedMinistries'][0]['code'].lower()+"ministryteam"
+            ministryteam = assigneeservice().getmembersbygroupname(teamname) 
+            for ministry in ministryteam:
+                for member in ministry['members']:
+                    user= self.__formatuserlist(member['username'], member['firstname'], member['lastname'])
+                    userlist.append(user)
+            if watchers is not None:
+                self.__getwatchernames(watchers,watcherteams, userlist)
+        return userlist
+
+    def __getwatchernames(self, watchers, watcherteams, userlist):
+        watchergrouplist= list(map(itemgetter('watchedbygroup'), watchers))
+        watchergroups = set(watchergrouplist)
+        for group in watchergroups:
+            watcherteams.append(assigneeservice().getmembersbygroupname(group)) 
+        for watcher in watchers:
+            #check if user already in list
+            existingusernames = list(map(itemgetter('username'), userlist))
+            if watcher['watchedby'] not in existingusernames:
+                for team in watcherteams:
+                    member= list(filter(lambda x: x['username'] == watcher['watchedby'], team[0]['members']))
+                    if len(member) > 0:
+                        user= self.__formatuserlist(watcher['watchedby'], member[0]['firstname'], member[0]['lastname'])
+                        userlist.append(user)
+                        break
+
+    def __formatuserlist(self, username, firstname, lastname):
+        user={}
+        user['username'] = username
+        user['firstname'] = firstname
+        user['lastname'] = lastname
+        user['fullname'] = lastname+","+firstname
+        user['name'] = lastname+","+firstname
+        return user

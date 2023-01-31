@@ -237,7 +237,6 @@ const saveSessionData = (key, data) => {
 
 const getSessionData = (key) => {
   let sessionObject = decrypt(sessionStorage.getItem(key));
-
   if (sessionObject && sessionObject.sessionData && sessionObject.expiresAt) {
     let currentDate = new Date();
     let expirationDate = sessionObject.expiresAt;
@@ -297,6 +296,7 @@ const addToFullnameList = (userArray, foiteam) => {
       saveSessionData(`${_team}AssignToList`, userArray);
     }
   }
+  //console.log("fullnameArray::", fullnameArray);
   saveSessionData("fullnameList", fullnameArray);
 };
 
@@ -305,7 +305,7 @@ const getFullnameList = () => {
 };
 
 const getAssignToList = (team) => {
-  return getSessionData(`${team.toLowerCase()}AssignToList`);
+  return getSessionData((`${team.toLowerCase()}AssignToList`).replaceAll('"',''));
 };
 
 const getFullnameTeamList = () => {
@@ -341,13 +341,59 @@ const errorToast = (errorMessage) => {
   });
 };
 
-
 const isRequestWatcherOrAssignee = (requestWatchers,requestAssignees,userId) => {
   return (_.map(requestWatchers, "watchedby").includes(userId) || (requestAssignees.assignedTo == userId));
 }
 
 const isRequestWatcherOrMinistryAssignee = (requestWatchers,ministryAssigneeValue,userId) => {
   return (_.map(requestWatchers, "watchedby").includes(userId) || (ministryAssigneeValue.includes(userId)));
+}
+
+const addToRestrictedRequestTagList = (requestWatchers, assigneeDetails, fullnameList, bcgovcode) => {
+
+  let fullnameArray = [];
+  let currentMember;
+  if(assigneeDetails){
+    currentMember = {
+      username: assigneeDetails?.assignedTo,
+      fullname: `${assigneeDetails?.assignedToLastName}, ${assigneeDetails?.assignedToFirstName}`,
+    };
+    fullnameArray.push(currentMember);
+  }
+  if(requestWatchers){
+    requestWatchers?.forEach((watcher) => {
+      let fullName = fullnameList?.filter((e) => e.username === watcher?.watchedby);
+      currentMember = {
+        username: watcher?.watchedby,
+        fullname: fullName[0]?.fullname,
+      };
+      fullnameArray.push(currentMember);
+    });
+  }
+  let ministryList = getAssignToList(bcgovcode);
+  if(ministryList && ministryList[0]?.members?.length > 0){
+    ministryList[0]?.members?.forEach((ministryUser) => {
+      currentMember = {
+        username: ministryUser?.username,
+        fullname: `${ministryUser?.lastname}, ${ministryUser?.firstname}`,
+      };
+      fullnameArray.push(currentMember);
+    });
+  }
+  console.log("restrictedrequesttagList:",fullnameArray);
+  saveSessionData("restrictedrequesttagList", fullnameArray);
+};
+
+const getRestrictedRequestTagList = () => {
+  return getSessionData("restrictedrequesttagList") || [];
+};
+
+const isRequestRestricted = (requestDetails, ministryId) => {
+  if(ministryId){
+    return requestDetails?.iaorestricteddetails?.isrestricted;
+  } 
+  else
+    return requestDetails?.isiaorestricted;
 }
 
 export {
@@ -375,4 +421,7 @@ export {
   isIntakeTeam,
   encrypt,
   decrypt,
+  addToRestrictedRequestTagList,
+  getRestrictedRequestTagList,
+  isRequestRestricted
 };

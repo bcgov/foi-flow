@@ -9,6 +9,9 @@ import { makeStyles } from '@material-ui/core/styles';
 import './Watcher.scss'
 import { saveWatcher, fetchFOIWatcherList } from "../../../apiManager/services/FOI/foiWatcherServices";
 import ConfirmModalWatcher from "./ConfirmModalWatcher";
+import {
+  fetchRestrictedRequestCommentTagList
+} from "../../../apiManager/services/FOI/foiRequestServices";
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
@@ -126,6 +129,9 @@ export default function Watcher({
       dispatch(saveWatcher(ministryId, watcher, (err, _res) => {
         if(!err) {
           setUpdateWatchList(!updateWatchList);
+          if(isIAORestrictedRequest)
+            dispatch(fetchRestrictedRequestCommentTagList(requestId, ministryId));
+
         }
       }));
     }
