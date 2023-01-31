@@ -122,6 +122,7 @@ class recordservice:
                     "batch": batch,
                     "jobid": jobids[entry['s3uripath']],
                     "trigger": 'recordupload',
+                    "createdby": userid
                 }
                 if extension in ['.doc','.docx','.xls','.xlsx', '.ics', '.msg']:
                     eventqueueservice().add(conversionstreamkey, streamobject)
