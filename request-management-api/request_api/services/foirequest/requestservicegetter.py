@@ -73,7 +73,7 @@ class requestservicegetter:
         request = FOIRequest.getrequest(foirequestid)
         requestministry = FOIMinistryRequest.getrequestbyministryrequestid(foiministryrequestid)
         requestministrydivisions = FOIMinistryRequestDivision.getdivisions(foiministryrequestid,requestministry['version'])
-        ministryrestrictrequestdetails = FOIRestrictedMinistryRequest.getrestricteddetails(ministryrequestid=foiministryrequestid,type='ministry')
+        ministryrestrictrequestdetails = FOIRestrictedMinistryRequest.getrestricteddetails(foiministryrequestid,type='ministry')
         baserequestinfo = {}
         if requestministry["assignedministrygroup"] in authmembershipgroups:
             baserequestinfo = self.__preparebaseinfo(request,foiministryrequestid,requestministry,requestministrydivisions)

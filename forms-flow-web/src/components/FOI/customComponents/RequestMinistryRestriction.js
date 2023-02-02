@@ -17,7 +17,7 @@ import CloseIcon from '@material-ui/icons/Close';
 import IconButton from '@material-ui/core/IconButton';
 import TextField from '@mui/material/TextField';
 import './requestrestriction.scss';
-import {restrictRequest, fetchFOIRequestDetailsWrapper} from '../../../apiManager/services/FOI/foiRequestServices';
+import {restrictRequest, fetchFOIMinistryViewRequestDetails} from '../../../apiManager/services/FOI/foiRequestServices';
 
 
 const RequestMinistryRestriction= ({
@@ -29,6 +29,7 @@ const RequestMinistryRestriction= ({
     const [restrictionType, setRestrictionType] = useState("unrestricted");
     const [isRestricted, setIsRestricted] = useState(isministryrestricted);
     const [modalOpen, setModalOpen] = useState(false);
+    const [modalHeading, setModalHeading] = useState(""); 
     const [modalMessage, setModalMessage] = useState(<></>);    
     const [modalDescription, setModalDescription] = useState(<></>);
     const { requestId, ministryId } = useParams();
@@ -66,6 +67,7 @@ const RequestMinistryRestriction= ({
         setModalOpen(true);
         let description="";
         let message="";
+        let heading="";
         if(e.target.value?.toLowerCase() == 'restricted'){
             if(isMinistryRestrictedFileManager){
                 if(!isRequestAssignedToMinistryTeam()){
@@ -82,24 +84,25 @@ const RequestMinistryRestriction= ({
                   </span>
                 }
                 else{
-                    console.log("2",isRequestAssignedToMinistryTeam());
+                    heading = "Restrict File";
                     message="A request can only be restricted when it is assigned to one team member, not a team queue.";
-                    description="";
                 }
             }
             else{
+                heading = "Restrict File";
                 message="Only the Ministry Manager can restrict a request.";
-                description="";
             }
         }
         else {
             if(isMinistryRestrictedFileManager){
                 setIsRestricted('False');
+                heading = "Unrestricted File";
                 message="Are you sure you want to remove the restricted file flag on this request ?";
                 description="If you unrestrict this file only all IAO users will be able to search and find the request, and all users "+
                 "on the respective Ministry will be able to see this request.";
             }
             else{
+                heading = "Unrestrict File";
                 message="Only the Intake Manager can remove the restricted flag on a request";
                 description= <span>
                     If you would like to have this request unrestricted please contact the
@@ -108,6 +111,7 @@ const RequestMinistryRestriction= ({
                     </span>
             }
         }
+        setModalHeading(heading);
         setModalMessage(message);
         setModalDescription(description);
     }
@@ -128,7 +132,7 @@ const RequestMinistryRestriction= ({
         }
         dispatch(restrictRequest(data, requestId, ministryId, type,(err, data) => {
             if(!err){
-                dispatch(fetchFOIRequestDetailsWrapper(requestId, ministryId));
+                dispatch(fetchFOIMinistryViewRequestDetails(requestId, ministryId));
                 if(isRestricted == 'True')
                     setRestrictionType("restricted");
                 else
@@ -184,7 +188,7 @@ const RequestMinistryRestriction= ({
             // id="state-change-dialog"
             >
             <DialogTitle disableTypography id="state-change-dialog-title">
-                <h2 className="state-change-header">Restricted File</h2>
+                <h2 className="state-change-header">{modalHeading}</h2>
                 <IconButton className="title-col3" onClick={handleClose}>
                     <i className="dialog-close-button">Close</i>
                     <CloseIcon />

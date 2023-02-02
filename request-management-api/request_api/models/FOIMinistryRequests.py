@@ -1185,7 +1185,7 @@ class FOIMinistryRequest(db.Model):
                     order by version desc limit 1;"""
             rs = db.session.execute(text(sql), {'ministryrequestid': ministryrequestid})
             for row in rs:
-                print("\nResponse:", row)
+                # print("\nResponse:", row)
                 requestdetails["assignedTo"] = row["assignedto"]
                 requestdetails["assignedToFirstName"] = row["firstname"]
                 requestdetails["assignedToLastName"] = row["lastname"]
