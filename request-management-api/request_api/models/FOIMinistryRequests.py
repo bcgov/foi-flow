@@ -341,8 +341,10 @@ class FOIMinistryRequest(db.Model):
                 for field in filterfields:
                     filtercondition.append(FOIMinistryRequest.findfield(field, iaoassignee, ministryassignee).ilike('%'+keyword+'%'))
             else:
-                filtercondition.append(FOIRestrictedMinistryRequest.isrestricted == True)
-                filtercondition.append(ministry_restricted_requests.isrestricted == True)
+                if(requestby == 'IAO'):
+                    filtercondition.append(FOIRestrictedMinistryRequest.isrestricted == True)
+                else:
+                    filtercondition.append(ministry_restricted_requests.isrestricted == True)
 
         intakesorting = case([
                             (and_(FOIMinistryRequest.assignedto == None, FOIMinistryRequest.assignedgroup == 'Intake Team'), # Unassigned requests first
