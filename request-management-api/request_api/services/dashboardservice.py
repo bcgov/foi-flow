@@ -117,10 +117,7 @@ class dashboardservice:
         return jsonify({'data': requestqueue, 'meta': meta})
 
     def getministryrequestqueuepagination (self, groups=None, page=1, size=10, sortingitems=[], sortingorders=[], filterfields=[], keyword=None, additionalfilter='All', userid=None):
-        isiaorestrictedfilemanager = False
-        isministryrestrictedfilemanager = False
-
-        requests = FOIMinistryRequest.getrequestspagination(groups, page, size, sortingitems, sortingorders, filterfields, keyword, additionalfilter, userid, isiaorestrictedfilemanager, isministryrestrictedfilemanager)
+        requests = FOIMinistryRequest.getrequestspagination(groups, page, size, sortingitems, sortingorders, filterfields, keyword, additionalfilter, userid, AuthHelper.isiaorestrictedfilemanager(), AuthHelper.isministryrestrictedfilemanager())
 
         requestqueue = []
         for request in requests.items:
@@ -141,6 +138,9 @@ class dashboardservice:
             _openrequest.update({'assignedministrypersonLastName': request.assignedministrypersonLastName})
             _openrequest.update({'assignedToFormatted': request.assignedToFormatted})
             _openrequest.update({'ministryAssignedToFormatted': request.ministryAssignedToFormatted})
+            
+            isministryrestricted = request.isministryrestricted if request.isministryrestricted == True else False
+            _openrequest.update({'isministryrestricted': isministryrestricted})
             requestqueue.append(_openrequest)
 
         meta = {

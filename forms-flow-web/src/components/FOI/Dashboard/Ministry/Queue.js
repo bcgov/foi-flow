@@ -6,7 +6,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { push } from "connected-react-router";
 import { fetchFOIMinistryRequestListByPage } from "../../../../apiManager/services/FOI/foiRequestServices";
 import Loading from "../../../../containers/Loading";
-import { debounce, ClickableChip } from "../utils";
+import { debounce, ClickableChip, displayIconMinistry, displayHeaderIcon } from "../utils";
 import Grid from "@mui/material/Grid";
 import Stack from "@mui/material/Stack";
 import SearchIcon from "@material-ui/icons/Search";
@@ -165,6 +165,14 @@ const Queue = ({ userDetail, tableInfo }) => {
       hide: true,
       renderCell: (_params) => <span></span>,
     },
+    {
+      field: "isministryrestricted",
+      renderHeader: displayHeaderIcon,
+      headerAlign: "left",
+      renderCell: displayIconMinistry,
+      cellClassName: 'foi-dashboard-restricted',
+      flex: 1,
+    }
   ]);
 
   const requestFilterChange = (filter) => {

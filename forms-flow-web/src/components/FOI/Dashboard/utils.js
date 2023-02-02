@@ -183,6 +183,14 @@ export const displayIcon = (params) => {
   );
 };
 
+export const displayIconMinistry = (params) => {
+  return (
+    params?.row?.isministryrestricted ? 
+    <><FontAwesomeIcon icon={faFlag} size='2x' className='restrict-icon' />
+    </> : ""
+  );
+};
+
 export const displayHeaderIcon = (params) => {
   return (
     <span className="foi-dashboard-restricted"><FontAwesomeIcon icon={faFlag} size='2x' className='restrict-icon' />
