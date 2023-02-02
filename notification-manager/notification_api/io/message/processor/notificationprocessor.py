@@ -21,7 +21,7 @@ class notificationprocessor:
   
 
     def __createnotification(self, notification):
-        return notificationservice().createnotification("ministryrequest", notification.ministryrequestid, {"message": self.__notificationmessage(notification.createdby)}, "Record", notification.createdby )
+        return notificationservice().createnotification("ministryrequest", notification.ministryrequestid, {"message": self.__notificationmessage(notification.createdby)}, "Records", notification.createdby )
 
     def __createcomment(self, notification):
         comment = {"comment": self.__commentmessage(notification.createdby)}     
