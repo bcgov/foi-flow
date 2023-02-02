@@ -123,6 +123,7 @@ class recordservice:
                 "batch": record['attributes']['batch'],
                 "jobid": jobids[record['s3uripath']],
                 "trigger": record['trigger'],
+                "createdby": record['createdby']
             }
             return eventqueueservice().add(streamkey, streamobject)
 
