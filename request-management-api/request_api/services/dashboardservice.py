@@ -161,8 +161,7 @@ class dashboardservice:
         if (params['usertype'] == "iao"):
             requests = FOIRawRequest.advancedsearch(params, userid, AuthHelper.isiaorestrictedfilemanager())
         else:
-            isministryrestrictedfilemanager = False
-            requests = FOIMinistryRequest.advancedsearch(params, userid, isministryrestrictedfilemanager)
+            requests = FOIMinistryRequest.advancedsearch(params, userid, AuthHelper.isministryrestrictedfilemanager())
         
         requestqueue = []
         for request in requests.items:
