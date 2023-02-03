@@ -43,10 +43,13 @@ namespace MCS.FOI.AXISIntegrationWebAPI
             services.AddScoped<IRequestDA, RequestsDA>();
 
             var serviceProvider = services.BuildServiceProvider();
-            var logger = serviceProvider.GetService<ILogger<RequestsDA>>();
+            //var FOIFlowlogger = serviceProvider.GetService<ILogger<FOIFlowRequestUsersDA>>();
+            var logger = serviceProvider.GetService<ILogger<RequestsDA>>();            
             var requestlogger = serviceProvider.GetService<ILogger<RequestSearchController>>();
             services.AddSingleton(typeof(ILogger), logger);
+            //services.AddSingleton(typeof(ILogger), FOIFlowlogger);
             services.AddSingleton(typeof(ILogger), requestlogger);
+            
 
             services.AddControllers();
 

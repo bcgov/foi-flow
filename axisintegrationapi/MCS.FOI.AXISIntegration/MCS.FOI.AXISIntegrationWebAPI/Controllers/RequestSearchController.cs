@@ -19,12 +19,13 @@ namespace MCS.FOI.AXISIntegrationWebAPI.Controllers
 
         private readonly ILogger<RequestSearchController> _logger;
         private readonly IRequestDA _requestDA;
+        private readonly IFOIFlowRequestUserDA _fOIFlowRequestUser;
 
-
-        public RequestSearchController(ILogger<RequestSearchController> logger, IRequestDA requestDA)
+        public RequestSearchController(ILogger<RequestSearchController> logger, IRequestDA requestDA,IFOIFlowRequestUserDA fOIFlowRequestUser)
         {
             _logger = logger;
             _requestDA = requestDA;
+            _fOIFlowRequestUser = fOIFlowRequestUser;
         }
 
         [HttpGet]
@@ -32,7 +33,9 @@ namespace MCS.FOI.AXISIntegrationWebAPI.Controllers
         public string Get(string requestNumber)
         {
             try
-            {                
+            { 
+                var isIAORestrictedRequestManager = User.HasClaim(claim => claim.Value == "/IAO Restricted Files Manager" && claim.Type == "groups");
+                _fOIFlowRequestUser.GetAssigneesandWatchers(0, "");
                 if (!string.IsNullOrEmpty(requestNumber) && requestNumber.Length > 10)
                     return _requestDA.GetAXISRequestString(requestNumber);
                 else
