@@ -123,6 +123,7 @@ class recordservice:
                 "batch": record['attributes']['batch'],
                 "jobid": jobids[record['s3uripath']],
                 "trigger": record['trigger'],
+                "createdby": record['createdby']
             }
             return eventqueueservice().add(streamkey, streamobject)
 
@@ -168,6 +169,7 @@ class recordservice:
                     "batch": batch,
                     "jobid": jobids[entry['s3uripath']],
                     "trigger": 'recordupload',
+                    "createdby": userid
                 }
                 if extension in FILE_CONVERSION_FILE_TYPES:
                     eventqueueservice().add(self.conversionstreamkey, streamobject)
