@@ -396,6 +396,10 @@ const isRequestRestricted = (requestDetails, ministryId) => {
     return requestDetails?.isiaorestricted;
 }
 
+const isRequestMinistryRestricted = (requestDetails) => {
+  return requestDetails?.ministryrestricteddetails?.isrestricted;
+}
+
 export {
   replaceUrl,
   formatDate,
@@ -423,5 +427,6 @@ export {
   decrypt,
   addToRestrictedRequestTagList,
   getRestrictedRequestTagList,
-  isRequestRestricted
+  isRequestRestricted,
+  isRequestMinistryRestricted
 };
