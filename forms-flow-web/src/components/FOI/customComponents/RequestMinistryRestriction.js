@@ -71,7 +71,6 @@ const RequestMinistryRestriction= ({
         if(e.target.value?.toLowerCase() == 'restricted'){
             if(isMinistryRestrictedFileManager){
                 if(!isRequestAssignedToMinistryTeam()){
-                    console.log("1",isRequestAssignedToMinistryTeam());
                     setIsRestricted('True');
                     message="Are you sure you want to flag this as a restricted file ?";
                     description= <span>
