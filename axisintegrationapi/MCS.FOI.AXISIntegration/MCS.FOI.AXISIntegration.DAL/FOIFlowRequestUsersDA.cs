@@ -3,6 +3,7 @@ using MCS.FOI.AXISIntegration.DataModels;
 using MCS.FOI.AXISIntegration.Utilities;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
@@ -29,23 +30,72 @@ namespace MCS.FOI.AXISIntegration.DAL
             SettingsManager.DBConnectionInitializer();
         }
 
+        private string getrawrequestusersquery(int id)
+        {
+            return   @"(WITH summary AS (
+                    SELECT w.watcherid, 
+                           w.watchedby,
+		                   w.isactive,
+                           ROW_NUMBER() OVER(PARTITION BY w.watchedby,w.requestid 
+                                                 ORDER BY w.created_at DESC) AS rank
+                      FROM public.""FOIRawRequestWatchers"" w WHERE w.requestid=?)
+                 SELECT watchedby as userid
+                   FROM summary 
+                 WHERE rank = 1 and summary.isactive=true)
+ 
+                 union all
+ 
+                 (SELECT assignedto as userid FROM public.""FOIRawRequests"" WHERE requestid=? ORDER BY created_at DESC limit 1 )";
+        }
+
+        private string getministryrequestusersquery(int id)
+        {
+            return @"(WITH summary AS(
+                       SELECT w.watcherid,
+                                w.watchedby,
+                                w.isactive,
+                              ROW_NUMBER() OVER(PARTITION BY w.watchedby, w.ministryrequestid
+                                                    ORDER BY w.created_at DESC) AS rank
+                          FROM public.""FOIRequestWatchers"" w WHERE w.ministryrequestid=?)
+                     SELECT watchedby as userid
+                       FROM summary
+                     WHERE rank = 1 and summary.isactive=true)
+                      union all
+
+                     (SELECT assignedto as userid FROM public.""FOIMinistryRequests"" WHERE foiministryrequestid = ? ORDER BY created_at DESC limit 1 )";
+        }
+
         public List<FOIFlowRequestUser> GetAssigneesandWatchers(int id, string type)
         {
             ConnectionString = SettingsManager.FOIFlowConnectionString;
+            List<FOIFlowRequestUser> fOIFlowRequestUsers= null;
+            string query = type == "rawrequest" ? getrawrequestusersquery(id) : getministryrequestusersquery(id);
+           
 
-            string query = @"SELECT * FROM FOIRawRequestWatchers";   //TODO : WIP : NEed to refine. just for testing...         
             using (odbcConnection = new OdbcConnection(ConnectionString))
             {
+                
+                using OdbcCommand sqlSelectCommand = new OdbcCommand(query, odbcConnection);
+
+                sqlSelectCommand.Parameters.Add("@id1", OdbcType.Int).Value = id;
+                sqlSelectCommand.Parameters.Add("@id1", OdbcType.Int).Value = id;
+
                 odbcConnection.Open();
-                using OdbcCommand sqlSelectCommand = new(query, odbcConnection);
-                OdbcDataReader DbReader = sqlSelectCommand.ExecuteReader();
+                OdbcDataReader DbReader = sqlSelectCommand.ExecuteReader(CommandBehavior.CloseConnection);
                 try
                 {
+                    if(DbReader.HasRows)
+                    {
+                        fOIFlowRequestUsers = new List<FOIFlowRequestUser>();
+                    }
 
 
                     while (DbReader.Read())
                     {
+                        var _username = Convert.ToString(DbReader["userid"]);
 
+                        if (fOIFlowRequestUsers.Where(u => u.username == _username).Any() == false)
+                        { fOIFlowRequestUsers.Add(new() { username = _username }); }
                     }
                 }
                 catch (SqlException ex)
@@ -64,7 +114,7 @@ namespace MCS.FOI.AXISIntegration.DAL
 
                 }
             }
-            return null;
+            return fOIFlowRequestUsers;
         }
     }
 }
