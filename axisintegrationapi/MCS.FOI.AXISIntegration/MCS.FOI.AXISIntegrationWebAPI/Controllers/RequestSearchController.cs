@@ -12,7 +12,7 @@ using System.Linq;
 
 namespace MCS.FOI.AXISIntegrationWebAPI.Controllers
 {
-    [Route("api/[controller]/{requestNumber}/{type}")]
+    [Route("api/[controller]/{requestNumber}")]
     [ApiController]
     [EnableCors(PolicyName = "FOIOrigins")]
     [Authorize(Policy = "IAOTeam")]
@@ -44,7 +44,7 @@ namespace MCS.FOI.AXISIntegrationWebAPI.Controllers
 
         [HttpGet]
 
-        public ActionResult<string> Get(string requestNumber, string type)
+        public ActionResult<string> Get(string requestNumber)
         {
             try
             {
@@ -54,7 +54,7 @@ namespace MCS.FOI.AXISIntegrationWebAPI.Controllers
 
                 if (!isIAORestrictedRequestManager)
                 {
-                    var users = _fOIFlowRequestUser.GetAssigneesandWatchers(requestNumber, type);
+                    var users = _fOIFlowRequestUser.GetAssigneesandWatchers(requestNumber);
                     if (users != null)
                     {
                         foreach (var user in users)
@@ -69,7 +69,7 @@ namespace MCS.FOI.AXISIntegrationWebAPI.Controllers
                 }
 
 
-                if (!string.IsNullOrEmpty(requestNumber) && requestNumber.Length > 10 && !string.IsNullOrEmpty(type))
+                if (!string.IsNullOrEmpty(requestNumber) && requestNumber.Length > 10)
                 {
                     AXISRequest axisrequest = _requestDA.GetAXISRequest(requestNumber);
                     var isrestricted = axisrequest.IsRestricted;

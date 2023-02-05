@@ -3,6 +3,7 @@ using MCS.FOI.AXISIntegration.DataModels;
 using MCS.FOI.AXISIntegration.Utilities;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Data;
@@ -65,11 +66,11 @@ namespace MCS.FOI.AXISIntegration.DAL
                      (SELECT assignedto as userid FROM public.""FOIMinistryRequests"" WHERE axisrequestid=? ORDER BY created_at DESC limit 1 )";
         }
 
-        public List<FOIFlowRequestUser> GetAssigneesandWatchers(string axisrequestid, string type)
+        public List<FOIFlowRequestUser> GetAssigneesandWatchers(string axisrequestid)
         {
             ConnectionString = SettingsManager.FOIFlowConnectionString;
             List<FOIFlowRequestUser> fOIFlowRequestUsers= null;
-            string query = type == "rawrequest" ? getrawrequestusersquery(axisrequestid) : getministryrequestusersquery(axisrequestid);
+            string query = this.IsRawRequest(axisrequestid) ? getrawrequestusersquery(axisrequestid) : getministryrequestusersquery(axisrequestid);
            
 
             using (odbcConnection = new OdbcConnection(ConnectionString))
@@ -115,6 +116,55 @@ namespace MCS.FOI.AXISIntegration.DAL
                 }
             }
             return fOIFlowRequestUsers;
+        }
+
+        public bool IsRawRequest(string axisrequestid)
+        {
+            var israwrequest = true;
+            ConnectionString = SettingsManager.FOIFlowConnectionString;
+
+            using (odbcConnection = new OdbcConnection(ConnectionString))
+            {
+
+                using OdbcCommand sqlSelectCommand = new OdbcCommand(@"SELECT isactive as isministryrequest FROM public.""FOIMinistryRequests"" WHERE axisrequestid=? ORDER BY created_at DESC limit 1", odbcConnection);
+
+                sqlSelectCommand.Parameters.Add("@id1", OdbcType.VarChar).Value = axisrequestid;
+               
+
+                odbcConnection.Open();
+                OdbcDataReader DbReader = sqlSelectCommand.ExecuteReader(CommandBehavior.CloseConnection);
+                try
+                {
+                    if (DbReader.HasRows)
+                    {
+                        israwrequest = false;
+                    }
+
+
+                    while (DbReader.Read() && DbReader.HasRows)
+                    {
+                        israwrequest = Convert.ToString(DbReader["isministryrequest"]) == "1" ? false : true;                        
+                    }
+                }
+                catch (SqlException ex)
+                {
+                    Ilogger.Log(LogLevel.Error, ex.Message);
+                }
+                catch (Exception e)
+                {
+                    Ilogger.Log(LogLevel.Error, e.Message);
+                }
+                finally
+                {
+                    DbReader.Close();
+                    sqlSelectCommand.Dispose();
+                    odbcConnection.Close();
+
+                }
+            }
+
+
+            return israwrequest;
         }
     }
 }

@@ -9,6 +9,8 @@ namespace MCS.FOI.AXISIntegration.DAL.Interfaces
 {
     public interface IFOIFlowRequestUserDA
     {
-        public List<FOIFlowRequestUser> GetAssigneesandWatchers(string axisrequestid, string type);
+        public List<FOIFlowRequestUser> GetAssigneesandWatchers(string axisrequestid);
+
+        public bool IsRawRequest(string axisrequestid);
     }
 }
