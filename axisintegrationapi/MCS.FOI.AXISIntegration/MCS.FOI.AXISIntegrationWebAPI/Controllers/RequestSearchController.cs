@@ -50,7 +50,7 @@ namespace MCS.FOI.AXISIntegrationWebAPI.Controllers
             {
                 var isIAORestrictedRequestManager = User.HasClaim(claim => claim.Value == "/IAO Restricted Files Manager" && claim.Type == "groups");
                 var isassigneeorwatcher = false;
-
+                
 
                 if (!isIAORestrictedRequestManager)
                 {
@@ -59,9 +59,12 @@ namespace MCS.FOI.AXISIntegrationWebAPI.Controllers
                     {
                         foreach (var user in users)
                         {
-                            isassigneeorwatcher = User.HasClaim(claim => claim.Value.ToUpper() == user.username.ToUpper().Replace("@IDIR", "") && claim.Type == "foi_preferred_username");
+                            _logger.Log(LogLevel.Information, $"assignee-watcher user is {user.username}");
+                            isassigneeorwatcher = User.HasClaim(claim => claim.Value.ToUpper() == user.username.ToUpper().Replace("@IDIR", "") && (claim.Type == "foi_preferred_username")) ||
+                                User.HasClaim(claim => claim.Value.ToUpper() == user.username.ToUpper() && (claim.Type == "preferred_username"));
                             if (isassigneeorwatcher)
                             {
+                                _logger.Log(LogLevel.Information, $"This user is a  assignee or watcher {user.username}");
                                 break;
                             }
                         }
@@ -73,6 +76,8 @@ namespace MCS.FOI.AXISIntegrationWebAPI.Controllers
                 {
                     AXISRequest axisrequest = _requestDA.GetAXISRequest(requestNumber);
                     var isrestricted = axisrequest.IsRestricted;
+
+                    _logger.Log(LogLevel.Information, $"This Request {requestNumber} is restricted {isrestricted} and current user is an assignee {isassigneeorwatcher}");
 
                     if (isIAORestrictedRequestManager || !isrestricted)
                         return this.GetAXISRequestString(axisrequest);
