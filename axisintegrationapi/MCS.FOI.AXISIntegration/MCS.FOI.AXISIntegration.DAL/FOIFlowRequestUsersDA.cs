@@ -30,46 +30,46 @@ namespace MCS.FOI.AXISIntegration.DAL
             SettingsManager.DBConnectionInitializer();
         }
 
-        private string getrawrequestusersquery(int id)
+        private string getrawrequestusersquery(string axisrequestid)
         {
-            return   @"(WITH summary AS (
+            return @"(WITH summary AS (
                     SELECT w.watcherid, 
                            w.watchedby,
 		                   w.isactive,
                            ROW_NUMBER() OVER(PARTITION BY w.watchedby,w.requestid 
                                                  ORDER BY w.created_at DESC) AS rank
-                      FROM public.""FOIRawRequestWatchers"" w WHERE w.requestid=?)
+                      FROM public.""FOIRawRequestWatchers"" w WHERE w.requestid in (SELECT requestid FROM public.""FOIRawRequests"" WHERE axisrequestid=? ORDER BY created_at DESC LIMIT 1))
                  SELECT watchedby as userid
                    FROM summary 
                  WHERE rank = 1 and summary.isactive=true)
  
                  union all
  
-                 (SELECT assignedto as userid FROM public.""FOIRawRequests"" WHERE requestid=? ORDER BY created_at DESC limit 1 )";
+                 (SELECT assignedto as userid FROM public.""FOIRawRequests"" WHERE axisrequestid=? ORDER BY created_at DESC limit 1 )";
         }
 
-        private string getministryrequestusersquery(int id)
+        private string getministryrequestusersquery(string axisrequestid)
         {
-            return @"(WITH summary AS(
-                       SELECT w.watcherid,
-                                w.watchedby,
-                                w.isactive,
-                              ROW_NUMBER() OVER(PARTITION BY w.watchedby, w.ministryrequestid
-                                                    ORDER BY w.created_at DESC) AS rank
-                          FROM public.""FOIRequestWatchers"" w WHERE w.ministryrequestid=?)
+            return @"(WITH summary AS (
+                        SELECT w.watcherid, 
+                               w.watchedby,
+		                       w.isactive,
+                               ROW_NUMBER() OVER(PARTITION BY w.watchedby,w.ministryrequestid 
+                                                     ORDER BY w.created_at DESC) AS rank
+                          FROM public.""FOIRequestWatchers"" w WHERE w.ministryrequestid in (SELECT foiministryrequestid FROM public.""FOIMinistryRequests"" where axisrequestid=? ORDER BY created_at DESC limit 1))
                      SELECT watchedby as userid
-                       FROM summary
+                       FROM summary 
                      WHERE rank = 1 and summary.isactive=true)
                       union all
-
-                     (SELECT assignedto as userid FROM public.""FOIMinistryRequests"" WHERE foiministryrequestid = ? ORDER BY created_at DESC limit 1 )";
+ 
+                     (SELECT assignedto as userid FROM public.""FOIMinistryRequests"" WHERE axisrequestid=? ORDER BY created_at DESC limit 1 )";
         }
 
-        public List<FOIFlowRequestUser> GetAssigneesandWatchers(int id, string type)
+        public List<FOIFlowRequestUser> GetAssigneesandWatchers(string axisrequestid, string type)
         {
             ConnectionString = SettingsManager.FOIFlowConnectionString;
             List<FOIFlowRequestUser> fOIFlowRequestUsers= null;
-            string query = type == "rawrequest" ? getrawrequestusersquery(id) : getministryrequestusersquery(id);
+            string query = type == "rawrequest" ? getrawrequestusersquery(axisrequestid) : getministryrequestusersquery(axisrequestid);
            
 
             using (odbcConnection = new OdbcConnection(ConnectionString))
@@ -77,8 +77,8 @@ namespace MCS.FOI.AXISIntegration.DAL
                 
                 using OdbcCommand sqlSelectCommand = new OdbcCommand(query, odbcConnection);
 
-                sqlSelectCommand.Parameters.Add("@id1", OdbcType.Int).Value = id;
-                sqlSelectCommand.Parameters.Add("@id1", OdbcType.Int).Value = id;
+                sqlSelectCommand.Parameters.Add("@id1", OdbcType.VarChar).Value = axisrequestid;
+                sqlSelectCommand.Parameters.Add("@id1", OdbcType.VarChar).Value = axisrequestid;
 
                 odbcConnection.Open();
                 OdbcDataReader DbReader = sqlSelectCommand.ExecuteReader(CommandBehavior.CloseConnection);
