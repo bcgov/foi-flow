@@ -96,15 +96,34 @@ const RequestHeader = React.memo(({
       );
 
     return (
-
-        <div className="foi-request-review-header-row1">
-            <div className="foi-request-review-header-col1">
+        <>
+        <div className="row">
+            <div className="col-lg-6">
                 <div className="foi-request-review-header-col1-row axis-request-id">
                     <Link href="#" onClick={preventDefault}>
                         <h1 className="foi-review-request-text foi-ministry-requestheadertext">{headerText}</h1>
                     </Link>
                 </div>
-                <div className="foi-request-review-header-col1-row axis-request-id" style={{marginTop:5+'px',display:'block'}}>
+            </div>
+            <div className="col-lg-6">
+                <div className="foi-assignee-dropdown">
+                    <TextField
+                        id="assignedTo"
+                        label="IAO Assigned To"
+                        InputLabelProps={{ shrink: true, }}                              
+                        value={assignedToValue}                    
+                        input={<InputLabel />} 
+                        variant="outlined"
+                        fullWidth                    
+                        disabled = {true}                                        
+                    >                               
+                    </TextField> 
+                </div>
+            </div>
+        </div>
+        <div className="row">
+            <div className="col-lg-8">
+                <div className="foi-request-review-header-col1-row">
                     <div className="foi-request-review-header-col1-row">
                         {watcherBox}
                     </div>
@@ -119,31 +138,18 @@ const RequestHeader = React.memo(({
                     }
                 </div>
             </div>
-            <div className="foi-assigned-to-container">
-                <div className="foi-assigned-to-inner-container">
-                    <TextField
-                        id="assignedTo"
-                        label="IAO Assigned To"
-                        InputLabelProps={{ shrink: true, }}                              
-                        value={assignedToValue}                    
-                        input={<InputLabel />} 
-                        variant="outlined"
-                        fullWidth                    
-                        disabled = {true}                                        
-                    >                               
-                    </TextField> 
-                </div>
-                <>
+            <div className="col-lg-4">
+                <div className="foi-assignee-dropdown">
                     <MinistryAssignToDropdown requestState={requestState} requestDetails={_requestDetails} 
                     ministryAssignedToList={ministryAssignedToList} 
                     handleMinistryAssignedToValue={handleMinistryAssignedToValue} 
                     isMinistryCoordinator={true} requestId={requestId} ministryId={ministryId} 
                     setSaveMinistryRequestObject={setSaveMinistryRequestObject}
                     disableInput={disableHeaderInput} />
-                </>
+                </div>
             </div>
         </div>
-
+        </>
     );
 })
 
