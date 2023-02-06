@@ -10,6 +10,8 @@ const AxisMessageBanner = ({axisMessage, requestDetails}) => {
   const warningMessage = () => {
     if(axisMessage === "WARNING")
       return "Updates to this request have been made in AXIS. Please sync to AXIS before continuing."
+    else if(axisMessage === "UNAUTHORIZED")
+      return "You are not authorized to sync this request, please contact the Intake Manager for assistance."
     else if(axisMessage === "ERROR")
       return "System is unable to connect with AXIS, please update request in both systems"
   }
