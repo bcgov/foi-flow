@@ -67,13 +67,13 @@ const RequestHeader = React.memo(({
     
     const assignedToValue = getFullName();
 
-    const [isMinistryRestrictedRequest, setIsMinistryRestrictedRequest] = useState(false);
     const isMinistryRestrictedFileManager = () => {
         return userDetail?.role?.includes("MinistryRestrictedFilesManager");
     }
     const isRestricted = () => {
         return requestDetails?.ministryrestricteddetails?.isrestricted;
     }
+    const [isMinistryRestrictedRequest, setIsMinistryRestrictedRequest] = useState( isRestricted() );
     const [disableHeaderInput, setDisableHeaderInput] = useState( isRestricted() && !isMinistryRestrictedFileManager() );
     const [isLoaded, setIsLoaded] = useState(false);
     const requestWatchers = useSelector((state) => state.foiRequests.foiWatcherList);
@@ -87,9 +87,10 @@ const RequestHeader = React.memo(({
                 watcherFullList={ministryAssignedToList}
                 ministryId={ministryId}
                 userDetail={userDetail}
-                disableInput={false}
+                disableInput={disableHeaderInput}
                 isIAORestrictedRequest={false}
                 setIsLoaded={setIsLoaded}
+                isMinistryRestrictedRequest={isMinistryRestrictedRequest}
             />
         )
       );
