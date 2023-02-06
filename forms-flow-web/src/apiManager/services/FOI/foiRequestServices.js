@@ -451,7 +451,14 @@ export const fetchRequestDataFromAxis = (axisRequestId, isModal,requestDetails, 
       })
       .catch((error) => {
         catchError(error, dispatch);
+        if (error.message.indexOf('401')> -1)
+        {
+          done(null,"Unauthorized-RestrictedAxisRequest");
+        }
+        else{
+        
         done(null,"Exception happened while GET operations of request");
+        }
       });
   }
 };
