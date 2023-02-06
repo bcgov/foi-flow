@@ -60,6 +60,8 @@ class requestservicebuilder(requestserviceconfigurator):
         foiministryrequest.version = activeversion
         foiministryrequest.closedate = self.getpropertyvaluefromschema(requestschema, 'closedate')
         foiministryrequest.closereasonid = self.getpropertyvaluefromschema(requestschema, 'closereasonid')
+        if self.getpropertyvaluefromschema(requestschema, 'isofflinepayment') is not None:
+            foiministryrequest.isofflinepayment =  self.getpropertyvaluefromschema(requestschema, 'isofflinepayment')    
         return foiministryrequest
 
     def __updateministryassignedtoandgroup(self, foiministryrequest, requestschema, ministry, status):
