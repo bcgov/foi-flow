@@ -190,12 +190,16 @@ export default function Watcher({
       else if (event.nativeEvent.target.name) {
         currentWatcher = event.nativeEvent.target.name;
       }
-
       if(newPersonName.length > personName.length && isrestricted) {
+        let watcherObj = {
+          "watchedbygroup": currentWatcher?.split('|')[0],
+          "watchedby": currentWatcher?.split('|')[1]
+        }
+        let newWatcherFullName = findWatcherFullname(watcherObj)
         setModalForCheckBox(true);
         setNewWatcher(currentWatcher);
         setCurrentWatchers(event.target.value);
-        setModalMessage(<span>Are you sure you want to assign <b>{currentWatcher}</b> as a watcher?</span>);
+        setModalMessage(<span>Are you sure you want to assign <b>{newWatcherFullName}</b> as a watcher?</span>);
         setModalDescription(<span><i>This will allow them to have access to this restricted request content.</i></span>);
         setShowModal(true);
 

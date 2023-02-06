@@ -7,11 +7,10 @@ using System.Threading.Tasks;
 
 namespace MCS.FOI.AXISIntegration.DAL.Interfaces
 {
-    public interface IRequestDA
+    public interface IFOIFlowRequestUserDA
     {
-        public string GetAXISRequestString(string requestNumber);
+        public List<FOIFlowRequestUser> GetAssigneesandWatchers(string axisrequestid);
 
-        public AXISRequest GetAXISRequest(string request);
-
+        public bool IsRawRequest(string axisrequestid);
     }
 }

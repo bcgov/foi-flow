@@ -10,4 +10,5 @@ namespace MCS.FOI.AXISIntegration.Utilities.Types
         Test = 1,
         Development = 2
     }
+
 }
