@@ -6,7 +6,7 @@ import AttachmentModal from '../Attachments/AttachmentModal';
 import Loading from "../../../../containers/Loading";
 import { getOSSHeaderDetails, saveFilesinS3, getFileFromS3, postFOIS3DocumentPreSignedUrl, getFOIS3DocumentPreSignedUrl } from "../../../../apiManager/services/FOI/foiOSSServices";
 import { saveFOIRequestAttachmentsList, replaceFOIRequestAttachment, saveNewFilename, deleteFOIRequestAttachment } from "../../../../apiManager/services/FOI/foiAttachmentServices";
-import { fetchFOIRecords, saveFOIRecords, deleteFOIRecords } from "../../../../apiManager/services/FOI/foiRecordServices";
+import { fetchFOIRecords, saveFOIRecords, deleteFOIRecords, retryFOIRecordProcessing } from "../../../../apiManager/services/FOI/foiRecordServices";
 import { StateTransitionCategories, AttachmentCategories } from '../../../../constants/FOI/statusEnum'
 import { addToFullnameList, getFullnameList, ConditionalComponent } from '../../../../helper/FOI/helper';
 import Grid from "@material-ui/core/Grid";
@@ -36,7 +36,7 @@ import Paper from "@mui/material/Paper";
 import { toast } from "react-toastify";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCheckCircle, faClone } from '@fortawesome/free-regular-svg-icons';
-import {faSpinner, faExclamationCircle } from '@fortawesome/free-solid-svg-icons';
+import {faSpinner, faExclamationCircle, faBan } from '@fortawesome/free-solid-svg-icons';
 
 
 const useStyles = makeStyles((_theme) => ({
@@ -145,9 +145,13 @@ export const RecordsLog = ({
     setRecords(recordsObj?.records)
   }, [recordsObj])
 
- 
+
   const divisionFilters = [...new Map(recordsObj?.records?.reduce((acc, file) => [...acc, ...new Map(file?.attributes?.divisions?.map(division => [division?.divisionid, division]))], [])).values()]
-  if (divisionFilters?.length > 0) divisionFilters?.push({divisionid: -1, divisionname: "All"})
+  if (divisionFilters?.length > 0) divisionFilters?.push(
+    {divisionid: -1, divisionname: "All"},
+    {divisionid: -2, divisionname: "Errors"},
+    {divisionid: -3, divisionname: "Incompatible"}
+  )
 
 
   const [openModal, setModal] = useState(false);
@@ -192,6 +196,9 @@ export const RecordsLog = ({
     if (value) {
       if (files.length !== 0) {
         setRecordsUploading(true)
+        if (modalFor === 'replace') {
+          fileInfoList[0].filepath = updateAttachment.s3uripath.substr(0, updateAttachment.s3uripath.lastIndexOf(".")) + ".pdf";
+        }
         postFOIS3DocumentPreSignedUrl(ministryId, fileInfoList, 'records', bcgovcode, dispatch, async (err, res) => {
           let _documents = [];
           if (!err) {
@@ -201,15 +208,22 @@ export const RecordsLog = ({
             for (let header of res) {
               const _file = files.find(file => file.filename === header.filename);
               const _fileInfo = fileInfoList.find(fileInfo => fileInfo.filename === header.filename);
-              const documentDetails = {
-                s3uripath: header.filepathdb,
-                filename: header.filename,
-                attributes:{
-                  divisions:[{divisionid: _fileInfo.divisionid}],
-                  lastmodified: _file.lastModifiedDate,
-                  filesize: _file.size
-                }
-              };
+              const documentDetails = modalFor === 'replace' ?
+                {
+                  ...updateAttachment,
+                  s3uripath: header.filepathdb,
+                  trigger: 'recordreplace',
+                  service: 'deduplication'
+                }:
+                {
+                  s3uripath: header.filepathdb,
+                  filename: header.filename,
+                  attributes:{
+                    divisions:[{divisionid: _fileInfo.divisionid}],
+                    lastmodified: _file.lastModifiedDate,
+                    filesize: _file.size
+                  }
+                };
               await saveFilesinS3(header, _file, dispatch, (_err, _res) => {
                 if (!_err && _res === 200) {
                   completed++;
@@ -224,12 +238,18 @@ export const RecordsLog = ({
                 }
               })
             }
-            dispatch(saveFOIRecords(requestId, ministryId, {records: _documents},(err, _res) => {
-                dispatchRequestAttachment(err);
-            }));
+            if (modalFor === 'replace') {
+              dispatch(retryFOIRecordProcessing(requestId, ministryId, {records: _documents},(err, _res) => {
+                  dispatchRequestAttachment(err);
+              }));
+            } else {
+              dispatch(saveFOIRecords(requestId, ministryId, {records: _documents},(err, _res) => {
+                  dispatchRequestAttachment(err);
+              }));
+            }
             var toastOptions = {
-              render: failed.length > 0 ? 
-                "The following " + failed.length + " file uploads failed\n- " + failed.join("\n- ")  : 
+              render: failed.length > 0 ?
+                "The following " + failed.length + " file uploads failed\n- " + failed.join("\n- ")  :
                 fileInfoList.length + ' Files successfully saved',
               type: failed.length > 0 ? "error" : "success",
             }
@@ -278,7 +298,7 @@ export const RecordsLog = ({
       for (let record of exporting) {
         var filepath = record.s3uripath
         var filename = record.filename
-        if (record.isdeduplicated && record.filename.toLowerCase().indexOf('.pdf') === -1) {
+        if (record.isdeduplicated && ['.doc','.docx','.xls','.xlsx', '.ics', '.msg'].includes(record.attributes.extension)) {
           filepath = filepath.substr(0, filepath.lastIndexOf(".")) + ".pdf";
           filename += ".pdf";
         }
@@ -315,6 +335,17 @@ export const RecordsLog = ({
     saveAs(zipfile, requestNumber + " Records - " + currentFilter + ".zip");
   }
 
+  const retryDocument = (record) => {
+    record.trigger = 'recordretry'
+    record.service = record.failed
+    if (record.service === 'deduplication') {
+      record['s3uripath'] = record['s3uripath'].substr(0, record['s3uripath'].lastIndexOf(".")) + ".pdf";
+    }
+    dispatch(retryFOIRecordProcessing(requestId, ministryId, {records: [record]},(err, _res) => {
+        dispatchRequestAttachment(err);
+    }));
+  }
+
   const hasDocumentsToExport = records.filter(record => !(isMinistryCoordinator && record.category == 'personal')).length > 0;
 
   const handlePopupButtonClick = (action, _record) => {
@@ -336,11 +367,16 @@ export const RecordsLog = ({
         break;
       case "downloadPDF":
         downloadDocument(_record, true);
+        setModalFor("download");
         setModal(false);
         break;
       case "delete":
         setModalFor("delete")
         setModal(true)
+        break;
+      case "retry":
+        retryDocument(_record);
+        setModal(false)
         break;
       default:
         setModal(false);
@@ -410,7 +446,12 @@ export const RecordsLog = ({
     return _recordsArray.filter(r =>
       (r.filename.toLowerCase().includes(_keywordValue?.toLowerCase()) ||
       r.createdby.toLowerCase().includes(_keywordValue?.toLowerCase())) &&
-      (_filterValue > -1 ? r.attributes?.divisions?.findIndex(a => a.divisionid === _filterValue) > -1 : true))
+      (
+        _filterValue === -3 ? r.attributes?.incompatible :
+        _filterValue === -2 ? r.failed && !r.isdeduplicated:
+        _filterValue > -1 ? r.attributes?.divisions?.findIndex(a => a.divisionid === _filterValue) > -1 :
+        true
+      ))
     }
 
   return (
@@ -498,7 +539,7 @@ export const RecordsLog = ({
                   <span>Batches Uploaded:</span>
                   <span className='number-spacing'>{recordsObj.batchcount ? recordsObj.batchcount : 0}</span>
                 </Grid> */}
-              </Grid> 
+              </Grid>
             </Grid>
             <Grid
               container
@@ -596,7 +637,7 @@ export const RecordsLog = ({
                     key={`${division.divisionid}-tag`}
                     label={division.divisionname.toUpperCase()}
                     sx={{width: "fit-content", marginLeft: "8px", marginBottom: "8px" }}
-                    color="primary"
+                    color={division.divisionid === -2 ? '#A0192F' : division.divisionid === -3 ? '#B57808' : 'primary'}
                     size="small"
                     onClick={(e)=>{setFilterValue(division.divisionid === filterValue ? -1 : division.divisionid)}}
                     clicked={filterValue == division.divisionid}
@@ -639,7 +680,7 @@ export const RecordsLog = ({
             attachmentsArray={[]}
             handleRename={handleRename}
             isMinistryCoordinator={isMinistryCoordinator}
-            uploadFor={"records"}
+            uploadFor={"record"}
             bcgovcode={bcgovcode}
             divisions={divisions}
           />
@@ -715,28 +756,36 @@ const Attachment = React.memo(({indexValue, record, handlePopupButtonClick, getF
         alignItems="flex-start"
       >
         <Grid item xs={6}>
-            { record.failed ?
-              <FontAwesomeIcon icon={faExclamationCircle} size='2x' color='#A0192F' className={classes.statusIcons}/>:
+            {
+
+              record.attributes.incompatible ?
+              <FontAwesomeIcon icon={faBan} size='2x' color='#FAA915' className={classes.statusIcons}/>:
               record.isduplicate ?
               <FontAwesomeIcon icon={faClone} size='2x' color='#FF873D' className={classes.statusIcons}/>:
               record.isdeduplicated ?
-              <FontAwesomeIcon icon={faCheckCircle} size='2x' color='#1B8103' className={classes.statusIcons}/>: 
+              <FontAwesomeIcon icon={faCheckCircle} size='2x' color='#1B8103' className={classes.statusIcons}/>:
+              record.failed ?
+              <FontAwesomeIcon icon={faExclamationCircle} size='2x' color='#A0192F' className={classes.statusIcons}/>:
               <FontAwesomeIcon icon={faSpinner} size='2x' color='#FAA915' className={classes.statusIcons}/>
             }
           <span className={classes.filename}>{record.filename} </span>
           <span className={classes.fileSize}>{record?.attributes?.filesize > 0 ? (record?.attributes?.filesize / 1024).toFixed(2) : 0} KB</span>
         </Grid>
-        <Grid item xs={6} direction="row" 
+        <Grid item xs={6} direction="row"
             justifyContent="flex-end"
             alignItems="flex-end"
             className={classes.recordStatus}>
-            { 
-              record.failed ?
-              <span>Error during {record.failed}</span>:
+            {
+              record.attributes.incompatible ?
+              <span>Incompatible File Type</span>:
+              record.attributes.trigger === 'recordreplace' ?
+              <span>Record Manually Replaced Due to Error</span>:
               record.isduplicate ?
               <span>Duplicate of {record.duplicateof}</span>:
               record.isdeduplicated ?
               <span>Ready for Redaction</span>:
+              record.failed ?
+              <span>Error during {record.failed}</span>:
               <span>Deduplication & file conversion in progress</span>
             }
             <AttachmentPopup
@@ -768,10 +817,10 @@ const Attachment = React.memo(({indexValue, record, handlePopupButtonClick, getF
           />
         )}
       </Grid>
-      <Grid item xs={2} 
+      <Grid item xs={2}
         direction="row"
         justifyContent="flex-end"
-        alignItems="flex-end" 
+        alignItems="flex-end"
         className={classes.createBy}>
           <div
             className={`record-owner ${
@@ -781,10 +830,10 @@ const Attachment = React.memo(({indexValue, record, handlePopupButtonClick, getF
             {getFullname(record.createdby)}
           </div>
         </Grid>
-        <Grid item xs={4} 
+        <Grid item xs={4}
          direction="row"
          justifyContent="flex-end"
-         alignItems="flex-end" 
+         alignItems="flex-end"
          className={classes.createDate}>
           <div
             className='record-time'
@@ -848,6 +897,11 @@ const AttachmentPopup = React.memo(({indexValue, record, handlePopupButtonClick,
   const handleDelete = () => {
     closeTooltip();
     handlePopupButtonClick("delete", record);
+  };
+
+  const handleRetry = () => {
+    closeTooltip();
+    handlePopupButtonClick("retry", record);
   };
 
   const transitionStates = [
@@ -931,23 +985,39 @@ const AttachmentPopup = React.memo(({indexValue, record, handlePopupButtonClick,
             View
           </MenuItem>
           :""}
+          {!record.isdeduplicated && record.failed && <MenuItem
+            onClick={() => {
+                handleReplace();
+                setPopoverOpen(false);
+            }}
+          >
+            Replace Manually
+          </MenuItem>}
+          {record.isdeduplicated && ['.doc','.docx','.xls','.xlsx', '.ics', '.msg'].includes(record.attributes.extension) && <MenuItem
+            onClick={() => {
+                handleDownloadPDF();
+                setPopoverOpen(false);
+            }}
+          >
+            Download Converted
+          </MenuItem>}
           <MenuItem
             onClick={() => {
                 handleDownload();
                 setPopoverOpen(false);
             }}
           >
-            Download
+            Download Original
           </MenuItem>
-          {record.isdeduplicated && record.filename.toLowerCase().indexOf('.pdf') === -1 && <MenuItem
+          <DeleteMenu />
+          {!record.isdeduplicated && record.failed && <MenuItem
             onClick={() => {
-                handleDownloadPDF();
+                handleRetry();
                 setPopoverOpen(false);
             }}
           >
-            Download PDF
+            Re-Try
           </MenuItem>}
-          <DeleteMenu />
 
           {/* {record.category === "personal" ? (
           ""

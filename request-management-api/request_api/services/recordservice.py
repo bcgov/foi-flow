@@ -1,6 +1,7 @@
 
 from os import stat, path,getenv
 from re import VERBOSE
+from request_api.utils.constants import FILE_CONVERSION_FILE_TYPES, DEDUPE_FILE_TYPES
 from request_api.models.FOIRequestRecords import FOIRequestRecord
 from request_api.models.FOIMinistryRequests import FOIMinistryRequest
 from request_api.models.FOIMinistryRequestDivisions import FOIMinistryRequestDivision
@@ -19,6 +20,8 @@ class recordservice:
     tokenurl =  getenv("BPM_TOKEN_URL")
     docreviewerapiurl =  getenv("FOI_DOCREVIEWER_BASE_API_URL")
     docreviewerapitimeout =  getenv("FOI_DOCREVIEWER_BASE_API_TIMEOUT")
+    conversionstreamkey = getenv('EVENT_QUEUE_CONVERSION_STREAMKEY')
+    dedupestreamkey = getenv('EVENT_QUEUE_DEDUPE_STREAMKEY')
 
     def create(self, requestid, ministryrequestid, recordschema, userid):
         """Creates a record for a user with document details passed in for an opened request.
@@ -87,30 +90,74 @@ class recordservice:
         else:
             return DefaultMethodResult(False,'Error in deleting Record', -1, recordid)
 
+    def retry(self, _requestid, ministryrequestid, data):
+        _ministryrequest = FOIMinistryRequest.getrequestbyministryrequestid(ministryrequestid)
+        for record in data['records']:
+            _filepath, extension = path.splitext(record['s3uripath'])
+            if record['service'] == 'deduplication':
+                if extension not in DEDUPE_FILE_TYPES:
+                    return DefaultMethodResult(False,'Dedupe only accepts the following formats: ' + ', '.join(DEDUPE_FILE_TYPES), -1, record['recordid'])
+                else:
+                    streamkey = self.dedupestreamkey
+            elif record['service'] == 'conversion':
+                if extension not in FILE_CONVERSION_FILE_TYPES:
+                    return DefaultMethodResult(False,'File Conversion only accepts the following formats: ' + ', '.join(FILE_CONVERSION_FILE_TYPES), -1, record['recordid'])
+                else:
+                    streamkey = self.conversionstreamkey
+            jobids, err = self.__makedocreviewerrequest('POST', '/api/jobstatus', {
+                'records': [record],
+                'batch': record['attributes']['batch'],
+                'trigger': record['trigger'],
+                'ministryrequestid': ministryrequestid
+            })
+            if err:
+                return DefaultMethodResult(False,'Error in contacting Doc Reviewer API', -1, ministryrequestid)
+            record['attributes']['trigger'] = record['trigger']
+            streamobject = {
+                "s3filepath": record['s3uripath'],
+                "requestnumber": _ministryrequest['axisrequestid'],
+                "bcgovcode": _ministryrequest['programarea.bcgovcode'],
+                "filename": record['filename'],
+                "ministryrequestid": ministryrequestid,
+                "attributes": json.dumps(record['attributes']),
+                "batch": record['attributes']['batch'],
+                "jobid": jobids[record['s3uripath']],
+                "trigger": record['trigger'],
+                "createdby": record['createdby']
+            }
+            return eventqueueservice().add(streamkey, streamobject)
+
+
     def __bulkcreate(self, requestid, ministryrequestid, records, userid):
         """Creates bulk records for a user with document details passed in for an opened request.
         """
         _ministryversion = FOIMinistryRequest.getversionforrequest(ministryrequestid)
         _ministryrequest = FOIMinistryRequest.getrequestbyministryrequestid(ministryrequestid)
-        conversionstreamkey = getenv('EVENT_QUEUE_CONVERSION_STREAMKEY')
-        dedupestreamkey = getenv('EVENT_QUEUE_DEDUPE_STREAMKEY')
         recordlist = []
         batch = str(uuid.uuid4())
         for entry in records:
             entry['attributes']['batch'] = batch
+            _filepath, extension = path.splitext(entry['filename'])
+            entry['attributes']['extension'] = extension
+            entry['attributes']['incompatible'] = extension not in FILE_CONVERSION_FILE_TYPES + DEDUPE_FILE_TYPES
             record = FOIRequestRecord(foirequestid=requestid, ministryrequestid = ministryrequestid, ministryrequestversion=_ministryversion,
                             version = 1, createdby = userid, created_at = datetime.now())
             record.__dict__.update(entry)
             recordlist.append(record)
         dbresponse = FOIRequestRecord.create(recordlist)
         if (dbresponse.success):
+            processingrecords = list(filter(lambda record: not record['attributes'].get('incompatible', False), records))
             # record all jobs before sending first redis stream message to avoid race condition
-            jobids, err = self.__makedocreviewerrequest('POST', '/api/jobstatus', {'records': records, 'batch': batch, 'trigger': 'recordupload', 'ministryrequestid': ministryrequestid})
-            print(jobids)
+            jobids, err = self.__makedocreviewerrequest('POST', '/api/jobstatus', {
+                'records': processingrecords,
+                'batch': batch,
+                'trigger': 'recordupload',
+                'ministryrequestid': ministryrequestid
+            })
             if err:
                 return DefaultMethodResult(False,'Error in contacting Doc Reviewer API', -1, ministryrequestid)
             # send message to redis stream for each file
-            for entry in records:
+            for entry in processingrecords:
                 _filename, extension = path.splitext(entry['s3uripath'])
                 streamobject = {
                     "s3filepath": entry['s3uripath'],
@@ -124,10 +171,10 @@ class recordservice:
                     "trigger": 'recordupload',
                     "createdby": userid
                 }
-                if extension in ['.doc','.docx','.xls','.xlsx', '.ics', '.msg']:
-                    eventqueueservice().add(conversionstreamkey, streamobject)
-                if extension in ['.pdf']:
-                    eventqueueservice().add(dedupestreamkey, streamobject)
+                if extension in FILE_CONVERSION_FILE_TYPES:
+                    eventqueueservice().add(self.conversionstreamkey, streamobject)
+                if extension in DEDUPE_FILE_TYPES:
+                    eventqueueservice().add(self.dedupestreamkey, streamobject)
         return dbresponse
 
 
