@@ -437,7 +437,11 @@ mintaskIdName = obj.id+"_ministrytaskId";
 execution.getProcessEngineServices().getTaskService().complete(execution.getVariable(mintaskIdName));
 execution.getProcessEngineServices().getTaskService().complete(execution.getVariable(taskIdName));
 }
-if (obj.status == 'On Hold' &amp;&amp; issync === false) {
+isofflinepayment = false;
+if( 'isofflinepayment' in obj) {
+ isofflinepayment = obj.isofflinepayment;
+}
+if (obj.status == 'On Hold' &amp;&amp; issync === false &amp;&amp; isofflinepayment === false) {
 execution.setVariable("applicantCorrespondenceId",0);
 execution.setVariable("templateName","");
 execution.getProcessEngineServices().getRuntimeService().createMessageCorrelation("foi-fee-payment").setVariables(execution.variables).correlateWithResult();

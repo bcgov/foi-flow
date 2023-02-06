@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_1te5mlw" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.0.0" modeler:executionPlatform="Camunda Platform" modeler:executionPlatformVersion="7.15.0">
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_1te5mlw" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.1.0" modeler:executionPlatform="Camunda Platform" modeler:executionPlatformVersion="7.15.0">
   <bpmn:error id="Error_06fsjjn" name="FOI-REQ-DETAIL-API-ERR" camunda:errorMessage="FOI Get Request Details Failed." />
   <bpmn:message id="Message_1yee5gs" name="foi-reminder-error" />
   <bpmn:message id="Message_0a9jdmw" name="foi-fee-payment" />
@@ -118,6 +118,8 @@ connector.getVariable("statusCode");</camunda:script>
             <camunda:outputParameter name="fee">${S(response).prop("cfrfee").prop("feedata").prop("balanceDue").stringValue()}</camunda:outputParameter>
             <camunda:outputParameter name="fileNumber">${S(response).prop("idNumber").stringValue()}</camunda:outputParameter>
             <camunda:outputParameter name="paymentstatus">NOT PAID</camunda:outputParameter>
+            <camunda:outputParameter name="email">${S(response).prop("email").stringValue()}</camunda:outputParameter>
+            <camunda:outputParameter name="isofflinepayment">${S(response).prop("isofflinepayment").boolValue()}</camunda:outputParameter>
           </camunda:inputOutput>
           <camunda:connectorId>http-connector</camunda:connectorId>
         </camunda:connector>
@@ -517,7 +519,7 @@ else {
       <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${balanceDue_f &gt; 0}</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
     <bpmn:sequenceFlow id="Flow_05oxz1b" sourceRef="Gateway_1xvmjq8" targetRef="Event_1iql791">
-      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${balanceDue_f &lt;= 0}</bpmn:conditionExpression>
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${balanceDue_f &lt;= 0 || email == "" || isofflinepayment == false}</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
     <bpmn:exclusiveGateway id="Gateway_1xvmjq8" name="balanceDue &#62; 0">
       <bpmn:extensionElements>

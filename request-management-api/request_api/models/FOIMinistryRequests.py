@@ -89,6 +89,8 @@ class FOIMinistryRequest(db.Model):
     assignee = relationship('FOIAssignee', foreign_keys="[FOIMinistryRequest.assignedto]")
     ministryassignee = relationship('FOIAssignee', foreign_keys="[FOIMinistryRequest.assignedministryperson]")
 
+    isofflinepayment = db.Column(db.Boolean, unique=False, nullable=True,default=False)
+
     @classmethod
     def getrequest(cls,ministryrequestid):
         request_schema = FOIMinistryRequestSchema(many=True)
@@ -1233,6 +1235,22 @@ class FOIMinistryRequest(db.Model):
         finally:
             db.session.close()
         return requestdetails
+
+    @classmethod
+    def isofflinepayment(cls,ministryrequestid):
+        try:
+            sql = """select isofflinepayment from "FOIMinistryRequests" fci where 
+             foiministryrequestid = :ministryrequestid and isofflinepayment = true limit 1;"""
+            rs = db.session.execute(text(sql), {'ministryrequestid': ministryrequestid})
+            for row in rs:
+                if row["isofflinepayment"] == True:
+                    return True
+            return False
+        except Exception as ex:
+            logging.error(ex)
+            raise ex
+        finally:
+            db.session.close()
 
 class FOIMinistryRequestSchema(ma.Schema):
     class Meta:
