@@ -239,7 +239,7 @@ export default function Watcher({
         if(isrestricted) {
           setModalForCheckBox(false);
           setNewWatcherObj(watcher);
-          setModalMessage(<span>Are you sure you want to assign <b>{userDetail.preferred_username}</b> as a watcher?</span>);
+          setModalMessage(<span>Are you sure you want to assign <b>{userFullName}</b> as a watcher?</span>);
           setModalDescription(<span><i>This will allow them to have access to this restricted request content.</i></span>);
           setShowModal(true);
         }
