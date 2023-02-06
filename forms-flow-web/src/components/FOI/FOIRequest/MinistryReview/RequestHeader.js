@@ -138,7 +138,8 @@ const RequestHeader = React.memo(({
                     ministryAssignedToList={ministryAssignedToList} 
                     handleMinistryAssignedToValue={handleMinistryAssignedToValue} 
                     isMinistryCoordinator={true} requestId={requestId} ministryId={ministryId} 
-                    setSaveMinistryRequestObject={setSaveMinistryRequestObject} />
+                    setSaveMinistryRequestObject={setSaveMinistryRequestObject}
+                    disableInput={disableHeaderInput} />
                 </>
             </div>
         </div>
