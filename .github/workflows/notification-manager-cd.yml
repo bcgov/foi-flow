@@ -20,7 +20,7 @@ env:
   APP_NAME: "notification-manager"
 
 jobs:
-  request-management-api-cd-by-push:
+  notification-manager-cd-by-push:
     runs-on: ubuntu-20.04
 
     if: github.event_name == 'push' && github.repository == 'bcgov/foi-flow'
