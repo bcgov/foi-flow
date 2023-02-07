@@ -7,6 +7,7 @@ set REPO_BRANCH=v4.0.5-alpha
 SET START_REDIS=N
 set BPM_DIRECTORY=%cd%/apps/forms-flow-ai/forms-flow-bpm
 set FFA_WEB_DIRECTORY=%cd%/apps/forms-flow-ai/forms-flow-ai-web
+set NOTIFICATION_DIRECTORY=%cd%/notification-manager
 set FFA_DIRECTORY=%BPM_DIRECTORY%/../%REPO_BRANCH%
 
 
@@ -37,8 +38,12 @@ if /I !ypropchoice! == y (
 	echo "Starting forms-flow-ai..."
 	docker-compose -f %FFA_DIRECTORY%/../docker-compose.yml up --build -d forms-flow-webapi forms-flow-web
 )
+set /p npropchoice="Is the docreviewer up? [Y/N]"
+if /I !npropchoice! == y (
+echo "Starting Notification Manager..."
+	docker-compose -f %NOTIFICATION_DIRECTORY%/docker-compose.yml up --build -d
 )
-
+)
 if /I '%choice%'=='N' (
    
 set /P servicenames="Enter services(s) here (ex: web, api, bpm, ffa) separated by space?"
