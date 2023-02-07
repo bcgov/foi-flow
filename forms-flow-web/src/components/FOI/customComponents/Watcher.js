@@ -12,6 +12,9 @@ import ConfirmModalWatcher from "./ConfirmModalWatcher";
 import {
   fetchRestrictedRequestCommentTagList
 } from "../../../apiManager/services/FOI/foiRequestServices";
+import { addToRestrictedRequestTagList } from "../../../helper/FOI/helper";
+import _ from 'lodash';
+
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
@@ -45,7 +48,10 @@ export default function Watcher({
   userDetail,
   disableInput,
   isIAORestrictedRequest,
-  setIsLoaded
+  setIsLoaded,
+  isMinistryRestrictedRequest,
+  assigneeDetails,
+  requestWatchers
 }) {    
     const classes = useStyles();
     const dispatch = useDispatch();
@@ -70,6 +76,7 @@ export default function Watcher({
       return  firstName !== "" ? `${lastName}, ${firstName}` : username;
     }
     const [userFullName, setUserFullName] = React.useState(getFullName(userDetail.given_name, userDetail.family_name, userDetail.preferred_username));
+    const [isrestricted, setIsrestricted] = React.useState(!!(isIAORestrictedRequest || isMinistryRestrictedRequest));
     React.useEffect(() => {
         const watchList = requestWatcherList.map(watcher => {
             return `${watcher.watchedbygroup}|${watcher.watchedby}`;
@@ -85,16 +92,20 @@ export default function Watcher({
         setUserFullName(getFullName(userDetail.given_name, userDetail.family_name, userDetail.preferred_username));
       },[requestWatcherList, userDetail])
 
+    React.useEffect(() => {
+      setIsrestricted(!!(isIAORestrictedRequest || isMinistryRestrictedRequest));
+    },[isIAORestrictedRequest, isMinistryRestrictedRequest])
+
     //creates the grouped menu items for assignedTo combobox
     const getMenuItems = () => {
        let menuItems = [];
        let i = 1;      
        if (watcherFullList && watcherFullList.length > 0) {
-           for (let group of watcherFullList) {             
+           for (let group of watcherFullList) {   
                menuItems.push(<MenuItem className={`${classes.item} foi-watcher-menuitem`} disabled={true} key={group.id} value={`${group.name}|${group.name}`}>
                    {group.name}
                </MenuItem>);
-               for (let assignee of group.members) {               
+               for (let assignee of group.members) {
                    menuItems.push(<MenuItem key={`${assignee.id}${i++}`} className={`${classes.item} foi-watcher-menuitem`} 
                    value={`${group.name}|${assignee.username}`} 
                    disabled={assignee.username.toLowerCase().includes("unassigned")}
@@ -124,14 +135,15 @@ export default function Watcher({
 
     const handleWatcherUpdate = (watcher) => {
       watcher.fullname = watcher.fullname ? watcher.fullname : findWatcherFullname(watcher);
-      watcher.isrestricted = isIAORestrictedRequest;
+      watcher.isrestricted = isrestricted;
 
       dispatch(saveWatcher(ministryId, watcher, (err, _res) => {
         if(!err) {
           setUpdateWatchList(!updateWatchList);
           if(isIAORestrictedRequest)
             dispatch(fetchRestrictedRequestCommentTagList(requestId, ministryId));
-
+          else if(isMinistryRestrictedRequest)
+            addToRestrictedRequestTagList(requestWatchers,assigneeDetails);
         }
       }));
     }
@@ -184,7 +196,7 @@ export default function Watcher({
       else if (event.nativeEvent.target.name) {
         currentWatcher = event.nativeEvent.target.name;
       }
-      if(newPersonName.length > personName.length && isIAORestrictedRequest) {
+      if(newPersonName.length > personName.length && isrestricted) {
         let watcherObj = {
           "watchedbygroup": currentWatcher?.split('|')[0],
           "watchedby": currentWatcher?.split('|')[1]
@@ -230,10 +242,10 @@ export default function Watcher({
       }
       else {
         watcher.isactive = true;
-        if(isIAORestrictedRequest) {
+        if(isrestricted) {
           setModalForCheckBox(false);
           setNewWatcherObj(watcher);
-          setModalMessage(<span>Are you sure you want to assign <b>{userDetail.preferred_username}</b> as a watcher?</span>);
+          setModalMessage(<span>Are you sure you want to assign <b>{userFullName}</b> as a watcher?</span>);
           setModalDescription(<span><i>This will allow them to have access to this restricted request content.</i></span>);
           setShowModal(true);
         }

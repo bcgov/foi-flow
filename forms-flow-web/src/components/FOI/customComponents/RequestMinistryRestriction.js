@@ -17,17 +17,17 @@ import CloseIcon from '@material-ui/icons/Close';
 import IconButton from '@material-ui/core/IconButton';
 import TextField from '@mui/material/TextField';
 import './requestrestriction.scss';
-import {restrictRequest, fetchFOIRequestDetailsWrapper} from '../../../apiManager/services/FOI/foiRequestServices';
+import {restrictRequest, fetchFOIMinistryViewRequestDetails} from '../../../apiManager/services/FOI/foiRequestServices';
 
 
-const RequestRestriction= ({
-    isiaorestricted,
-    isIAORestrictedFileManager,
+const RequestMinistryRestriction= ({
+    isministryrestricted,
+    isMinistryRestrictedFileManager,
     requestDetails
 }) =>{ 
 
     const [restrictionType, setRestrictionType] = useState("unrestricted");
-    const [isRestricted, setIsRestricted] = useState(isiaorestricted);
+    const [isRestricted, setIsRestricted] = useState(isministryrestricted);
     const [modalOpen, setModalOpen] = useState(false);
     const [modalHeading, setModalHeading] = useState(""); 
     const [modalMessage, setModalMessage] = useState(<></>);    
@@ -37,8 +37,8 @@ const RequestRestriction= ({
 
 
     useEffect(() => {
-        setIsRestricted(isiaorestricted);
-        if(isiaorestricted){
+        setIsRestricted(isministryrestricted);
+        if(isministryrestricted){
             setRestrictionType("restricted");
         }else{
             setRestrictionType("unrestricted");
@@ -46,20 +46,20 @@ const RequestRestriction= ({
     }, []);
 
 
-    const isRequestAssignedToTeam = () => {
-        return (!requestDetails?.assignedTo && requestDetails?.assignedGroup);
+    const isRequestAssignedToMinistryTeam = () => {
+        return (!requestDetails?.assignedministryperson && requestDetails?.assignedministrygroup);
     }
 
     const restriction = [
         {
           value: 'unrestricted',
           label: 'Unrestricted',
-          disabled: !isiaorestricted
+          disabled: !isministryrestricted
         },
         {
           value: 'restricted',
           label: 'Restricted',
-          disabled: isiaorestricted,
+          disabled: isministryrestricted,
         }
     ];
 
@@ -69,17 +69,16 @@ const RequestRestriction= ({
         let message="";
         let heading="";
         if(e.target.value?.toLowerCase() == 'restricted'){
-            if(isIAORestrictedFileManager){
-                if(!isRequestAssignedToTeam()){
+            if(isMinistryRestrictedFileManager){
+                if(!isRequestAssignedToMinistryTeam()){
                     setIsRestricted('True');
-                    heading = "Restricted File";
-                    message="Are you sure you want to flag this as a restricted file?";
+                    message="Are you sure you want to flag this as a restricted file ?";
                     description= <span>
-                    If you change this to be a restricted file, only the
-                    <b> Intake Manager </b>and
+                    If you change this to be a restricted file only the
+                    <b> Ministry Manager </b>and
                     <b> any user assigned </b>
-                    or selected as a
-                    <b> Watcher </b>
+                    or selected as
+                    <b> Watchers </b>
                     will be able to view this request content.
                   </span>
                 }
@@ -90,23 +89,23 @@ const RequestRestriction= ({
             }
             else{
                 heading = "Restrict File";
-                message="Only the Intake Manager can restrict a request.";
+                message="Only the Ministry Manager can restrict a request.";
             }
         }
         else {
-            if(isIAORestrictedFileManager){
+            if(isMinistryRestrictedFileManager){
                 setIsRestricted('False');
                 heading = "Unrestricted File";
-                message="Are you sure you want to remove the restricted file flag on this request?";
-                description="If you unrestrict this file, all IAO users will be able to search and find the request, and all ministry users "+
-                "for the respective ministry will be able to see this request.";
+                message="Are you sure you want to remove the restricted file flag on this request ?";
+                description="If you unrestrict this file only all IAO users will be able to search and find the request, and all users "+
+                "on the respective Ministry will be able to see this request.";
             }
             else{
                 heading = "Unrestrict File";
                 message="Only the Intake Manager can remove the restricted flag on a request";
                 description= <span>
                     If you would like to have this request unrestricted please contact the
-                    <b> Intake Manager </b>
+                    <b> Ministry Manager </b>
                     as they are the original user who flagged this as a restricted request.
                     </span>
             }
@@ -126,13 +125,13 @@ const RequestRestriction= ({
     };
 
     const save = () => {
-        let type = "iao";
+        let type = "ministry";
         let data = {
             "isrestricted": isRestricted
         }
         dispatch(restrictRequest(data, requestId, ministryId, type,(err, data) => {
             if(!err){
-                dispatch(fetchFOIRequestDetailsWrapper(requestId, ministryId));
+                dispatch(fetchFOIMinistryViewRequestDetails(requestId, ministryId));
                 if(isRestricted == 'True')
                     setRestrictionType("restricted");
                 else
@@ -210,7 +209,7 @@ const RequestRestriction= ({
                 <button
                 className={`btn-bottom btn-save btn`}
                 onClick={handleSave}
-                disabled={!isIAORestrictedFileManager || isRequestAssignedToTeam()}
+                disabled={!isMinistryRestrictedFileManager || isRequestAssignedToMinistryTeam()}
                 >
                 Save Change
                 </button>
@@ -224,4 +223,4 @@ const RequestRestriction= ({
     );
 };
 
-export default RequestRestriction;
+export default RequestMinistryRestriction;

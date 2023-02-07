@@ -10,7 +10,7 @@ import IconButton from '@material-ui/core/IconButton';
 import TextField from '@mui/material/TextField';
 
 
-const ConfirmModal1= ({
+const ConfirmModalWatcher= ({
     modalForCheckBox,
     modalMessage,
     modalDescription,
@@ -96,4 +96,4 @@ const ConfirmModal1= ({
     );
 };
 
-export default ConfirmModal1;
+export default ConfirmModalWatcher;

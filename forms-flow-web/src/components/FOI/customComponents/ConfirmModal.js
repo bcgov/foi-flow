@@ -33,9 +33,6 @@ const ConfirmModal= ({
         resetModal();
     };
 
-    // console.log("modalMessage: ",modalMessage);
-    // console.log("modalDescription==",modalDescription);
-
     useEffect(() => {
         setModalOpen(showModal);
       }, [showModal]);

@@ -72,8 +72,8 @@ class requestservicegetter:
     def getrequestdetailsforministry(self,foirequestid,foiministryrequestid, authmembershipgroups):
         request = FOIRequest.getrequest(foirequestid)
         requestministry = FOIMinistryRequest.getrequestbyministryrequestid(foiministryrequestid)
-        requestministrydivisions = FOIMinistryRequestDivision.getdivisions(foiministryrequestid,requestministry['version'])        
-        
+        requestministrydivisions = FOIMinistryRequestDivision.getdivisions(foiministryrequestid,requestministry['version'])
+        ministryrestrictrequestdetails = FOIRestrictedMinistryRequest.getrestricteddetails(foiministryrequestid,type='ministry')
         baserequestinfo = {}
         if requestministry["assignedministrygroup"] in authmembershipgroups:
             baserequestinfo = self.__preparebaseinfo(request,foiministryrequestid,requestministry,requestministrydivisions)
@@ -93,8 +93,9 @@ class requestservicegetter:
                 additionalpersonalinfo.update(self.__prepareadditionalpersonalinfo(requestortypeid, firstname, middlename, lastname, dob))
             baserequestdetails, additionalpersonalinfodetails = self.preparepersonalattributes(foirequestid, request['version'])
             baserequestinfo.update(baserequestdetails)
-            additionalpersonalinfo.update(additionalpersonalinfodetails)                
-            baserequestinfo['additionalPersonalInfo'] = additionalpersonalinfo 
+            additionalpersonalinfo.update(additionalpersonalinfodetails)
+            baserequestinfo['additionalPersonalInfo'] = additionalpersonalinfo
+        baserequestinfo['ministryrestricteddetails'] = ministryrestrictrequestdetails
         return baserequestinfo
     
     def getrequestdetails(self,foirequestid, foiministryrequestid):
