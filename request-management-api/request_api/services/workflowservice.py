@@ -65,7 +65,7 @@ class workflowservice:
                         "assignedministrygroup":ministry["assignedministrygroup"], 
                         "ministryRequestID": id, "isPaymentActive": self.__ispaymentactive(ministry["foirequestid"], id), 
                         "paymentExpiryDate": paymentexpirydate, "axisRequestId": axisrequestid, "issync": issync,
-                        "isofflinepayment": FOIMinistryRequest.isofflinepayment(id)})
+                        "isofflinepayment": FOIMinistryRequest.getofflinepaymentflag(id)})
                     if issync == True:                        
                         _variables = bpmservice().getinstancevariables(wfinstanceid)    
                         if ministry["status"] == OpenedEvent.callforrecords.value and (("status" not in _variables) or (_variables not in (None, []) and "status" in _variables and _variables["status"]["value"] != OpenedEvent.callforrecords.value)):

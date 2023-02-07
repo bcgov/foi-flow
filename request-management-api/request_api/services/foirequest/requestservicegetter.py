@@ -157,7 +157,7 @@ class requestservicegetter:
             'assignedministrypersonFirstName': requestministry["ministryassignee.firstname"] if requestministry["assignedministryperson"] != None else None,
             'assignedministrypersonLastName': requestministry["ministryassignee.lastname"] if requestministry["assignedministryperson"] != None else None,
             'closedate': parse(requestministry['closedate']).strftime(self.__genericdateformat()) if requestministry['closedate'] is not None else None,
-            'isofflinepayment': FOIMinistryRequest.isofflinepayment(foiministryrequestid)
+            'isofflinepayment': FOIMinistryRequest.getofflinepaymentflag(foiministryrequestid)
         }
         if requestministry['cfrduedate'] is not None:
             baserequestinfo.update({'cfrDueDate':parse(requestministry['cfrduedate']).strftime(self.__genericdateformat())})

@@ -1237,7 +1237,7 @@ class FOIMinistryRequest(db.Model):
         return requestdetails
 
     @classmethod
-    def isofflinepayment(cls,ministryrequestid):
+    def getofflinepaymentflag(cls,ministryrequestid):
         try:
             sql = """select isofflinepayment from "FOIMinistryRequests" fci where 
              foiministryrequestid = :ministryrequestid and isofflinepayment = true limit 1;"""
