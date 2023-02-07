@@ -145,14 +145,13 @@ const RequestHeader = React.memo(({
             <div className="col-lg-4">
                 <div className="foi-assignee-dropdown">
                     <MinistryAssignToDropdown requestState={requestState} requestDetails={_requestDetails} 
-                        ministryAssignedToList={ministryAssignedToList} 
-                        handleMinistryAssignedToValue={handleMinistryAssignedToValue} 
-                        isMinistryCoordinator={true} requestId={requestId} ministryId={ministryId} 
-                        setSaveMinistryRequestObject={setSaveMinistryRequestObject} 
-                        disableInput={disableHeaderInput}
-                        isRestricted= {isRestricted()} 
-                        requestWatchers={requestWatchers}
-                    />
+                    ministryAssignedToList={ministryAssignedToList} 
+                    handleMinistryAssignedToValue={handleMinistryAssignedToValue} 
+                    isMinistryCoordinator={true} requestId={requestId} ministryId={ministryId} 
+                    setSaveMinistryRequestObject={setSaveMinistryRequestObject}
+                    disableInput={disableHeaderInput} 
+                    isRestricted= {isRestricted()} 
+                    requestWatchers={requestWatchers}/>
                 </div>
             </div>
         </div>

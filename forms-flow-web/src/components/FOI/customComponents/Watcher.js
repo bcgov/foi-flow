@@ -48,8 +48,8 @@ export default function Watcher({
   userDetail,
   disableInput,
   isIAORestrictedRequest,
-  isMinistryRestrictedRequest,
   setIsLoaded,
+  isMinistryRestrictedRequest,
   assigneeDetails,
   requestWatchers
 }) {    
