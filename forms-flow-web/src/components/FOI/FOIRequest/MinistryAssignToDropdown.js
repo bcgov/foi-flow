@@ -6,7 +6,7 @@ import MenuItem from '@material-ui/core/MenuItem';
 import Input from '@material-ui/core/Input';
 import { StateEnum } from '../../../constants/FOI/statusEnum';
 import { createAssignedToDetailsObject } from './MinistryReview/utils';
-import { isRequestMinistryRestricted } from '../../../helper/FOI/helper';
+import { isRequestMinistryRestricted, addToRestrictedRequestTagList } from '../../../helper/FOI/helper';
 import {
   saveAssignee
 } from "../../../apiManager/services/FOI/foiAssigneeServices";
@@ -38,7 +38,9 @@ const MinistryAssignToDropdown  = React.memo(({
   requestId,
   ministryId,
   setSaveMinistryRequestObject,
-  isDisabled
+  isDisabled,
+  isRestricted,
+  requestWatchers
 }) => {
    
      /**
@@ -162,6 +164,8 @@ const MinistryAssignToDropdown  = React.memo(({
             handleMinistryAssignedToValue(assigneeVal);
             let reqObj= updateAssigneeInRequestDetails(requestDetails);
             setSaveMinistryRequestObject(reqObj);
+            if(isRestricted)
+              addToRestrictedRequestTagList(requestWatchers,assigneeDetails);
           }
           else {
             toast.error(

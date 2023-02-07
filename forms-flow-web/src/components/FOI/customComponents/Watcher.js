@@ -12,6 +12,9 @@ import ConfirmModalWatcher from "./ConfirmModalWatcher";
 import {
   fetchRestrictedRequestCommentTagList
 } from "../../../apiManager/services/FOI/foiRequestServices";
+import { addToRestrictedRequestTagList } from "../../../helper/FOI/helper";
+import _ from 'lodash';
+
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
@@ -45,7 +48,10 @@ export default function Watcher({
   userDetail,
   disableInput,
   isIAORestrictedRequest,
-  setIsLoaded
+  isMinistryRestrictedRequest,
+  setIsLoaded,
+  assigneeDetails,
+  requestWatchers
 }) {    
     const classes = useStyles();
     const dispatch = useDispatch();
@@ -131,7 +137,8 @@ export default function Watcher({
           setUpdateWatchList(!updateWatchList);
           if(isIAORestrictedRequest)
             dispatch(fetchRestrictedRequestCommentTagList(requestId, ministryId));
-
+          else if(isMinistryRestrictedRequest)
+            addToRestrictedRequestTagList(requestWatchers,assigneeDetails);
         }
       }));
     }

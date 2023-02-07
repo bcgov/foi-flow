@@ -9,8 +9,10 @@ import { Watcher } from '../../customComponents';
 import { useParams } from 'react-router-dom';
 import { getHeaderText } from './utils';
 import { StateEnum } from '../../../../constants/FOI/statusEnum';
-import { isRequestWatcherOrMinistryAssignee } from "../../../../helper/FOI/helper";
+import { isRequestWatcherOrMinistryAssignee, addToRestrictedRequestTagList } from "../../../../helper/FOI/helper";
 import RequestMinistryRestriction from "../../customComponents/RequestMinistryRestriction";
+import _ from 'lodash';
+
 
 const RequestHeader = React.memo(({
     requestDetails,
@@ -89,7 +91,10 @@ const RequestHeader = React.memo(({
                 userDetail={userDetail}
                 disableInput={false}
                 isIAORestrictedRequest={false}
+                isMinistryRestrictedRequest={isRestricted()}
                 setIsLoaded={setIsLoaded}
+                assigneeDetails={_.pick(requestDetails, ['assignedministrygroup','assignedministryperson','assignedministrypersonFirstName','assignedministrypersonLastName'])}
+                requestWatchers={requestWatchers}
             />
         )
       );
@@ -144,7 +149,10 @@ const RequestHeader = React.memo(({
                         handleMinistryAssignedToValue={handleMinistryAssignedToValue} 
                         isMinistryCoordinator={true} requestId={requestId} ministryId={ministryId} 
                         setSaveMinistryRequestObject={setSaveMinistryRequestObject} 
-                        isDisabled={isRestricted() && !isMinistryRestrictedFileManager()} />
+                        isDisabled={isRestricted() && !isMinistryRestrictedFileManager()}
+                        isRestricted= {isRestricted()} 
+                        requestWatchers={requestWatchers}
+                />
                 </div>
             </div>
         </div>

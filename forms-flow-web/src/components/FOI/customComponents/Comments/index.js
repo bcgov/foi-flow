@@ -5,6 +5,7 @@ import DisplayComments from './DisplayComments'
 import { ActionProvider } from './ActionContext'
 import Input from './Input'
 import CommentFilter from './CommentFilter'
+import { getMinistryRestrictedTagList } from "../../../../helper/FOI/helper";
 
 export const CommentSection = ({
   commentsArray,
@@ -23,7 +24,8 @@ export const CommentSection = ({
   setEditorChange,
   removeComment,
   setRemoveComment,
-  isRestricted,
+  restrictionType,
+  isRestricted
 }) => {
   const requestWatchers = useSelector((state) => state.foiRequests.foiWatcherList);
   const [showaddbox, setshowaddbox] = useState(false)
@@ -37,11 +39,9 @@ export const CommentSection = ({
     let filteredcomments = filterkeyinCommentsandReplies(_commentsbyCategory,_filteredcomments)        
     setcomments(filteredcomments)         
   }, [filterValue,commentsArray ,filterkeyValue])
-  //const [restrictedReqTaglist, setRestrictedReqTaglist]= useState([]);
   let restrictedReqTaglist = useSelector((state) => state.foiRequests.restrictedReqTaglist);
-  const dispatch = useDispatch(); 
   const isCommentTagListLoading = useSelector((state) => state.foiRequests.isCommentTagListLoading);
-  
+
   const onfilterchange = (_filterValue) => { 
     sessionStorage.setItem('foicommentcategory',_filterValue)   
     setfilterValue(_filterValue)       
@@ -104,14 +104,14 @@ export const CommentSection = ({
         <div className="inputBox" style={{ display: showaddbox ? 'block' : 'none' }}>
           {<Input add="add"  bcgovcode={bcgovcode} iaoassignedToList={iaoassignedToList} ministryAssignedToList={ministryAssignedToList} //Handles Navigate Away
           setEditorChange={setEditorChange} removeComment={removeComment} setRemoveComment={setRemoveComment} 
-          restrictedReqTaglist={restrictedReqTaglist} isRestricted={isRestricted} />}
+          restrictedReqTaglist={restrictionType == "ministry"?getMinistryRestrictedTagList():restrictedReqTaglist} isRestricted={isRestricted} />}
         </div> :null}
         <div className="displayComments">
           <div className="filterComments" >
             <CommentFilter oncommentfilterchange={onfilterchange} filterValue={filterValue === null ? 1 : filterValue} oncommentfilterkeychange={(k)=>{setfilterkeyValue(k)}}/>
           </div>
           <DisplayComments comments={comments} bcgovcode={bcgovcode} currentUser={currentUser} iaoassignedToList={iaoassignedToList} ministryAssignedToList={ministryAssignedToList} 
-           restrictedReqTaglist={restrictedReqTaglist} isRestricted={isRestricted}
+           restrictedReqTaglist={restrictionType == "ministry"?getMinistryRestrictedTagList():restrictedReqTaglist} isRestricted={isRestricted}
           //Handles Navigate Away
           setEditorChange={setEditorChange} removeComment={removeComment} setRemoveComment={setRemoveComment} />
         </div>
