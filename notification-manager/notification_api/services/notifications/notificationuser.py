@@ -29,12 +29,12 @@ class notificationuser:
         else:
             _users = self.__getassignees(foirequest, requesttype, notificationtype) + self.__getwatchers(notificationtype, foirequest, requesttype)
         for user in _users:
-            if self.__isignorable(user, notificationusers, userid) == False and (("Tagged User Comments" not in notificationtype and self.__istaggeduser(user, requestjson, notificationtype) == False) or "Tagged User Comments" in notificationtype):
+            if self.__isignorable(user, notificationusers, userid, notificationtype) == False and (("Tagged User Comments" not in notificationtype and self.__istaggeduser(user, requestjson, notificationtype) == False) or "Tagged User Comments" in notificationtype):
                 notificationusers.append(user)
         return notificationusers    
     
-    def __isignorable(self, notificationuser, users, userid):
-        if notificationuser["userid"] == userid:
+    def __isignorable(self, notificationuser, users, userid, notificationtype):
+        if notificationuser["userid"] == userid and "Records" not in notificationtype:
             return True
         else: 
             for user in users:
