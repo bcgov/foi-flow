@@ -296,7 +296,6 @@ const addToFullnameList = (userArray, foiteam) => {
       saveSessionData(`${_team}AssignToList`, userArray);
     }
   }
-  //console.log("fullnameArray::", fullnameArray);
   saveSessionData("fullnameList", fullnameArray);
 };
 
@@ -310,6 +309,10 @@ const getAssignToList = (team) => {
 
 const getFullnameTeamList = () => {
   return getSessionData("fullnameTeamList");
+};
+
+const getMinistryRestrictedTagList = () => {
+  return getSessionData("ministryRestrictedTagList");
 };
 
 const ConditionalComponent = ({ condition, children }) => {
@@ -349,39 +352,57 @@ const isRequestWatcherOrMinistryAssignee = (requestWatchers,ministryAssigneeValu
   return (_.map(requestWatchers, "watchedby").includes(userId) || (ministryAssigneeValue.includes(userId)));
 }
 
-const addToRestrictedRequestTagList = (requestWatchers, assigneeDetails, fullnameList, bcgovcode) => {
-
+const addToRestrictedRequestTagList = (requestWatchers, assigneeDetails) => {
+  let fullnameList = getFullnameList();
   let fullnameArray = [];
+  let fullnameSet = new Set();
   let currentMember;
   if(assigneeDetails){
     currentMember = {
-      username: assigneeDetails?.assignedTo,
-      fullname: `${assigneeDetails?.assignedToLastName}, ${assigneeDetails?.assignedToFirstName}`,
+      username: assigneeDetails?.assignedministryperson,
+      firstname: assigneeDetails?.assignedministrypersonFirstName,
+      lastname: assigneeDetails?.assignedministrypersonLastName,
+      fullname: `${assigneeDetails?.assignedministrypersonLastName}, ${assigneeDetails?.assignedministrypersonFirstName}`,
+      name: `${assigneeDetails?.assignedministrypersonLastName}, ${assigneeDetails?.assignedministrypersonFirstName}`,
     };
     fullnameArray.push(currentMember);
+    fullnameSet.add(currentMember);
   }
   if(requestWatchers){
     requestWatchers?.forEach((watcher) => {
       let fullName = fullnameList?.filter((e) => e.username === watcher?.watchedby);
       currentMember = {
         username: watcher?.watchedby,
+        firstname: fullName[0]?.firstname,
+        lastname: fullName[0]?.lastname,
         fullname: fullName[0]?.fullname,
+        name: fullName[0]?.fullname,
       };
-      fullnameArray.push(currentMember);
+      if(!fullnameArray?.some((e) => e.username === watcher?.watchedby))
+        fullnameArray.push(currentMember);
+      fullnameSet.add(currentMember);
+
     });
   }
-  let ministryList = getAssignToList(bcgovcode);
-  if(ministryList && ministryList[0]?.members?.length > 0){
-    ministryList[0]?.members?.forEach((ministryUser) => {
-      currentMember = {
-        username: ministryUser?.username,
-        fullname: `${ministryUser?.lastname}, ${ministryUser?.firstname}`,
-      };
-      fullnameArray.push(currentMember);
+  let IAOList = getAssignToList('iao')?.filter((e) => e.type === 'iao');
+  if(IAOList && IAOList?.length > 0){
+    IAOList.forEach((team) => {
+      team?.members.forEach((ministryUser) => {
+        currentMember = {
+          username: ministryUser?.username,
+          firstname: ministryUser?.firstname,
+          lastname: ministryUser?.lastname,
+          fullname: `${ministryUser?.lastname}, ${ministryUser?.firstname}`,
+          name: `${ministryUser?.lastname}, ${ministryUser?.firstname}`
+        };
+        if(!fullnameArray?.some((e) => e.username === ministryUser?.username))
+          fullnameArray.push(currentMember);
+        fullnameSet.add(currentMember);
+
+      });
     });
   }
-  console.log("restrictedrequesttagList:",fullnameArray);
-  saveSessionData("restrictedrequesttagList", fullnameArray);
+  saveSessionData("ministryRestrictedTagList", fullnameArray);
 };
 
 const getRestrictedRequestTagList = () => {
@@ -428,5 +449,6 @@ export {
   addToRestrictedRequestTagList,
   getRestrictedRequestTagList,
   isRequestRestricted,
-  isRequestMinistryRestricted
+  isRequestMinistryRestricted,
+  getMinistryRestrictedTagList
 };

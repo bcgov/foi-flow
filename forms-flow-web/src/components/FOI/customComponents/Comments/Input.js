@@ -9,7 +9,6 @@ const Input = ({ add, bcgovcode, iaoassignedToList, ministryAssignedToList, setE
   const [fullnameList, setFullnameList] = useState(getFullnameList());
  
     if (!fullnameList) {
-        console.log("Else!!");
         if (iaoassignedToList.length > 0) {
           addToFullnameList(iaoassignedToList, "iao");
           setFullnameList(getFullnameList());
@@ -21,9 +20,6 @@ const Input = ({ add, bcgovcode, iaoassignedToList, ministryAssignedToList, setE
         }
     }
       
-
-
-
 
   const action = useContext(ActionContext)
   return  (
