@@ -56,6 +56,7 @@ class RetryRecordAttributeSchema(Schema):
     batch = fields.Str(data_key="batch", allow_none=False, validate=validate.Length(min=1), required=True)
     incompatible = fields.Boolean(required=True,allow_none=False)
     extension = fields.Str(validate=validate.Length(min=1, max=10), required=True,allow_none=False)
+    isattachment = fields.Boolean(required=False,allow_none=False)
 
 class FOIRequestRetryRecordSchema(Schema):
     class Meta:  # pylint: disable=too-few-public-methods
@@ -67,6 +68,8 @@ class FOIRequestRetryRecordSchema(Schema):
     filename = fields.Str(data_key="filename",allow_none=False, validate=[validate.Length(max=120, error=MAX_EXCEPTION_MESSAGE)])
     trigger = fields.Str(validate=validate.OneOf(['recordreplace', 'recordretry']), required=True,allow_none=False)
     service = fields.Str(validate=validate.OneOf(['deduplication', 'conversion']), required=True,allow_none=False)
+    documentmasterid = fields.Integer(required=True,allow_none=True)
+    outputdocumentmasterid = fields.Integer(required=False,allow_none=True)
 
 
 

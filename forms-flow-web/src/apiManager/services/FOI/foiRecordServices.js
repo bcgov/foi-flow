@@ -80,11 +80,19 @@ export const deleteFOIRecords = (requestId, ministryId, recordId, ...rest) => {
     };
 };
 
+export const deleteReviewerRecords = (filepaths, ...rest) => {
+  const done = fnDone(rest);
+  let apiUrl = API.DOC_REVIEWER_DELETE_RECORDS;
+    return (dispatch) => {
+      postRecord(dispatch, apiUrl, filepaths, "Error in deleting records", rest);
+    };
+};
+
 const postRecord = (dispatch, apiUrl, data, errorMessage, rest) => {
   const done = fnDone(rest);
   httpPOSTRequest(apiUrl, data)
       .then((res) => {
-        if (res.data) {
+        if (res.data && res.data.status) {
           dispatch(setFOIAttachmentListLoader(false));
           done(null, res.data);
         } else {
