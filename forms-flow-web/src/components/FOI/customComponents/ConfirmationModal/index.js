@@ -104,6 +104,7 @@ export default function ConfirmationModal({requestId, openModal, handleModal, st
     const handleMailedChange = (event) => {
       setMailed(event.target.checked);
       setDisableSaveBtn(!event.target.checked);
+      saveRequestObject.isofflinepayment=event.target.checked;
     };
    
 
