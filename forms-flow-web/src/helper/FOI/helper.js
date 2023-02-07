@@ -370,13 +370,14 @@ const addToRestrictedRequestTagList = (requestWatchers, assigneeDetails) => {
   }
   if(requestWatchers){
     requestWatchers?.forEach((watcher) => {
-      let fullName = fullnameList?.filter((e) => e.username === watcher?.watchedby);
+      let fullNameArray = fullnameList?.filter((e) => e.username === watcher?.watchedby);
+      let fullName= fullNameArray[0].fullname;
       currentMember = {
         username: watcher?.watchedby,
-        firstname: fullName[0]?.firstname,
-        lastname: fullName[0]?.lastname,
-        fullname: fullName[0]?.fullname,
-        name: fullName[0]?.fullname,
+        firstname: fullName?.split(",")[1],
+        lastname: fullName?.split(",")[0],
+        fullname: fullName,
+        name: fullName,
       };
       if(!fullnameArray?.some((e) => e.username === watcher?.watchedby))
         fullnameArray.push(currentMember);

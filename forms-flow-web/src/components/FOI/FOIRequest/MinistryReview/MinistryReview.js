@@ -221,7 +221,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
       let assigneeDetails=_.pick(requestDetails, ['assignedministrygroup','assignedministryperson','assignedministrypersonFirstName','assignedministrypersonLastName']);
       addToRestrictedRequestTagList(requestWatchers,assigneeDetails);
     }
-  }, [isMinistryRestricted]);
+  }, [isMinistryRestricted, requestWatchers]);
 
   const [unSavedRequest, setUnSavedRequest] = React.useState(false);
   const [CFRUnsaved, setCFRUnsaved] = React.useState(false);
