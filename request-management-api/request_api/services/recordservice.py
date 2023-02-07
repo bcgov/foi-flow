@@ -142,6 +142,7 @@ class recordservice:
                 "jobid": jobids[record['s3uripath']]['jobid'],
                 "documentmasterid": jobids[record['s3uripath']]['masterid'],
                 "trigger": record['trigger'],
+                "createdby": record['createdby']
             }
             if record.get('outputdocumentmasterid', False):
                 streamobject['outputdocumentmasterid'] = record['outputdocumentmasterid']
@@ -191,6 +192,7 @@ class recordservice:
                     "jobid": jobids[entry['s3uripath']]['jobid'],
                     "documentmasterid": jobids[entry['s3uripath']]['masterid'],
                     "trigger": 'recordupload',
+                    "createdby": userid
                 }
                 if extension in FILE_CONVERSION_FILE_TYPES:
                     eventqueueservice().add(self.conversionstreamkey, streamobject)

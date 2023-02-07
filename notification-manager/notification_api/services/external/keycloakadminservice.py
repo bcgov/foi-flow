@@ -1,31 +1,24 @@
 import requests
 import os
 import ast
-import request_api
-from request_api.models.OperatingTeams import OperatingTeam
+from notification_api.config import KEYCLOAK_ADMIN_HOST, KEYCLOAK_ADMIN_REALM, KEYCLOAK_ADMIN_CLIENT_ID, KEYCLOAK_ADMIN_CLIENT_SECRET, KEYCLOAK_ADMIN_SRVACCOUNT, KEYCLOAK_ADMIN_SRVPASSWORD
+from notification_api.dao.models.OperatingTeams import OperatingTeam
 
 
 class KeycloakAdminService:
 
-    keycloakhost = os.getenv('KEYCLOAK_ADMIN_HOST')
-    keycloakrealm = os.getenv('KEYCLOAK_ADMIN_REALM')
-    keycloakclientid = os.getenv('KEYCLOAK_ADMIN_CLIENT_ID')
-    keycloakclientsecret = os.getenv('KEYCLOAK_ADMIN_CLIENT_SECRET')
-    keycloakadminserviceaccount = os.getenv('KEYCLOAK_ADMIN_SRVACCOUNT')
-    keycloakadminservicepassword = os.getenv('KEYCLOAK_ADMIN_SRVPASSWORD')
-    keycloakadminintakegroupid = os.getenv('KEYCLOAK_ADMIN_INTAKE_GROUPID')
-    
+  
         
     def get_token(self):
         
-        url = '{0}/auth/realms/{1}/protocol/openid-connect/token'.format(self.keycloakhost,self.keycloakrealm)        
+        url = '{0}/auth/realms/{1}/protocol/openid-connect/token'.format(KEYCLOAK_ADMIN_HOST,KEYCLOAK_ADMIN_REALM)        
         params = {
 
-            'client_id': self.keycloakclientid,
+            'client_id': KEYCLOAK_ADMIN_CLIENT_ID,
             'grant_type': 'password',
-            'username' : self.keycloakadminserviceaccount,
-            'password': self.keycloakadminservicepassword,
-            'client_secret':self.keycloakclientsecret
+            'username' :KEYCLOAK_ADMIN_SRVACCOUNT,
+            'password': KEYCLOAK_ADMIN_SRVPASSWORD,
+            'client_secret':KEYCLOAK_ADMIN_CLIENT_SECRET
         }
         x = requests.post(url, params, verify=True).content.decode('utf-8')       
         return str(ast.literal_eval(x)['access_token'])        
@@ -45,7 +38,7 @@ class KeycloakAdminService:
     
     
     def getallgroups(self):
-        url ='{0}/auth/admin/realms/{1}/groups'.format(self.keycloakhost,self.keycloakrealm)
+        url ='{0}/auth/admin/realms/{1}/groups'.format(KEYCLOAK_ADMIN_HOST,KEYCLOAK_ADMIN_REALM)
         groupsresponse = requests.get(url, headers=self.getheaders())
         groups = []
         if groupsresponse.status_code == 200 and groupsresponse.content != '': 
@@ -63,7 +56,7 @@ class KeycloakAdminService:
     
 
     def getgroupmembersbyid(self, groupid):
-        groupurl ='{0}/auth/admin/realms/{1}/groups/{2}/members'.format(self.keycloakhost,self.keycloakrealm,groupid)
+        groupurl ='{0}/auth/admin/realms/{1}/groups/{2}/members'.format(KEYCLOAK_ADMIN_HOST,KEYCLOAK_ADMIN_REALM,groupid)
         groupresponse = requests.get(groupurl, headers=self.getheaders())
         users = []
         if groupresponse.status_code == 200 and groupresponse.content != '': 
@@ -71,6 +64,37 @@ class KeycloakAdminService:
                 _user =  self.__createuser(user)
                 users.append(_user)
         return users 
+
+    def getuserbyidir(self, idir):
+        #Below idir is expected to have of format xyz@idir
+        user = self.__getuser(idir)
+        if user is None:
+            #Check for user existence of format XYZ
+            user = self.__getuser(idir.split('@')[0].upper())  
+        if user is None:
+            #Search local accounts
+            user = self.__getlocaluser(idir)
+        return user   
+
+    def __getuser(self, idir):
+        userurl ='{0}/auth/admin/realms/{1}/users?q=idir_username:{2}'.format(KEYCLOAK_ADMIN_HOST,KEYCLOAK_ADMIN_REALM,idir)
+        userresponse = requests.get(userurl, headers=self.getheaders())
+        _user = None
+        if userresponse.status_code == 200 and userresponse.content != '': 
+            for user in userresponse.json():           
+                _user =  self.__createuser(user)
+                break  
+        return _user     
+
+    def __getlocaluser(self, idir):
+        userurl ='{0}/auth/admin/realms/{1}/users?username={2}'.format(KEYCLOAK_ADMIN_HOST,KEYCLOAK_ADMIN_REALM,idir)
+        userresponse = requests.get(userurl, headers=self.getheaders())
+        _user = None
+        if userresponse.status_code == 200 and userresponse.content != '': 
+            for user in userresponse.json():           
+                _user =  self.__createuser(user)
+                break  
+        return _user 
     
     def __createuser(self, user):
         return {
