@@ -105,7 +105,7 @@ class ReplaceFOIDocument(Resource):
         try:
             requestjson = request.get_json()
             recordschema = FOIRequestBulkRetryRecordSchema().load(requestjson, unknown=INCLUDE)
-            result = recordservice().retry(requestid, ministryrequestid, recordschema)
+            result = recordservice().retry(requestid, ministryrequestid, recordschema, AuthHelper.getuserid())
             return {'status': result.success, 'message':result.message,'id':result.identifier} , 200
         except KeyError as err:
             return {'status': False, 'message':err.messages}, 400
