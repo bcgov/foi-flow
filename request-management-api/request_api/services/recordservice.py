@@ -109,7 +109,7 @@ class recordservice:
         else:
             return DefaultMethodResult(False,'Error in deleting Record', -1, recordid)
 
-    def retry(self, _requestid, ministryrequestid, data, userid):
+    def retry(self, _requestid, ministryrequestid, data):
         _ministryrequest = FOIMinistryRequest.getrequestbyministryrequestid(ministryrequestid)
         for record in data['records']:
             _filepath, extension = path.splitext(record['s3uripath'])
@@ -142,7 +142,7 @@ class recordservice:
                 "jobid": jobids[record['s3uripath']]['jobid'],
                 "documentmasterid": jobids[record['s3uripath']]['masterid'],
                 "trigger": record['trigger'],
-                "createdby": userid
+                "createdby": record['createdby']
             }
             if record.get('outputdocumentmasterid', False):
                 streamobject['outputdocumentmasterid'] = record['outputdocumentmasterid']

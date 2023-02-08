@@ -57,6 +57,7 @@ class RetryRecordAttributeSchema(Schema):
     incompatible = fields.Boolean(required=True,allow_none=False)
     extension = fields.Str(validate=validate.Length(min=1, max=10), required=True,allow_none=False)
     isattachment = fields.Boolean(required=False,allow_none=False)
+    createdby = fields.Str(validate=validate.Length(min=1),required=True,allow_none=False)
 
 class FOIRequestRetryRecordSchema(Schema):
     class Meta:  # pylint: disable=too-few-public-methods
