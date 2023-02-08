@@ -6,6 +6,7 @@ import MINISTRYGROUPS from '../../constants/FOI/foiministrygroupConstants';
 import { SESSION_SECURITY_KEY, SESSION_LIFETIME } from "../../constants/constants";
 import { toast } from "react-toastify";
 import { KCProcessingTeams } from "../../constants/FOI/enum";
+import _ from 'lodash';
 
 let isBetween = require("dayjs/plugin/isBetween");
 let utc = require("dayjs/plugin/utc");
@@ -236,7 +237,6 @@ const saveSessionData = (key, data) => {
 
 const getSessionData = (key) => {
   let sessionObject = decrypt(sessionStorage.getItem(key));
-
   if (sessionObject && sessionObject.sessionData && sessionObject.expiresAt) {
     let currentDate = new Date();
     let expirationDate = sessionObject.expiresAt;
@@ -304,11 +304,15 @@ const getFullnameList = () => {
 };
 
 const getAssignToList = (team) => {
-  return getSessionData(`${team.toLowerCase()}AssignToList`);
+  return getSessionData((`${team.toLowerCase()}AssignToList`).replaceAll('"',''));
 };
 
 const getFullnameTeamList = () => {
   return getSessionData("fullnameTeamList");
+};
+
+const getMinistryRestrictedTagList = () => {
+  return getSessionData("ministryRestrictedTagList");
 };
 
 const ConditionalComponent = ({ condition, children }) => {
@@ -340,6 +344,84 @@ const errorToast = (errorMessage) => {
   });
 };
 
+const isRequestWatcherOrAssignee = (requestWatchers,requestAssignees,userId) => {
+  return (_.map(requestWatchers, "watchedby").includes(userId) || (requestAssignees.assignedTo == userId));
+}
+
+const isRequestWatcherOrMinistryAssignee = (requestWatchers,ministryAssigneeValue,userId) => {
+  return (_.map(requestWatchers, "watchedby").includes(userId) || (ministryAssigneeValue.includes(userId)));
+}
+
+const addToRestrictedRequestTagList = (requestWatchers, assigneeDetails) => {
+  let fullnameList = getFullnameList();
+  let fullnameArray = [];
+  let fullnameSet = new Set();
+  let currentMember;
+  if(assigneeDetails){
+    currentMember = {
+      username: assigneeDetails?.assignedministryperson,
+      firstname: assigneeDetails?.assignedministrypersonFirstName,
+      lastname: assigneeDetails?.assignedministrypersonLastName,
+      fullname: `${assigneeDetails?.assignedministrypersonLastName}, ${assigneeDetails?.assignedministrypersonFirstName}`,
+      name: `${assigneeDetails?.assignedministrypersonLastName}, ${assigneeDetails?.assignedministrypersonFirstName}`,
+    };
+    fullnameArray.push(currentMember);
+    fullnameSet.add(currentMember);
+  }
+  if(requestWatchers){
+    requestWatchers?.forEach((watcher) => {
+      let fullNameArray = fullnameList?.filter((e) => e.username === watcher?.watchedby);
+      let fullName= fullNameArray[0].fullname;
+      currentMember = {
+        username: watcher?.watchedby,
+        firstname: fullName?.split(",")[1],
+        lastname: fullName?.split(",")[0],
+        fullname: fullName,
+        name: fullName,
+      };
+      if(!fullnameArray?.some((e) => e.username === watcher?.watchedby))
+        fullnameArray.push(currentMember);
+      fullnameSet.add(currentMember);
+
+    });
+  }
+  let IAOList = getAssignToList('iao')?.filter((e) => e.type === 'iao');
+  if(IAOList && IAOList?.length > 0){
+    IAOList.forEach((team) => {
+      team?.members.forEach((ministryUser) => {
+        currentMember = {
+          username: ministryUser?.username,
+          firstname: ministryUser?.firstname,
+          lastname: ministryUser?.lastname,
+          fullname: `${ministryUser?.lastname}, ${ministryUser?.firstname}`,
+          name: `${ministryUser?.lastname}, ${ministryUser?.firstname}`
+        };
+        if(!fullnameArray?.some((e) => e.username === ministryUser?.username))
+          fullnameArray.push(currentMember);
+        fullnameSet.add(currentMember);
+
+      });
+    });
+  }
+  saveSessionData("ministryRestrictedTagList", fullnameArray);
+};
+
+const getRestrictedRequestTagList = () => {
+  return getSessionData("restrictedrequesttagList") || [];
+};
+
+const isRequestRestricted = (requestDetails, ministryId) => {
+  if(ministryId){
+    return requestDetails?.iaorestricteddetails?.isrestricted;
+  } 
+  else
+    return requestDetails?.isiaorestricted;
+}
+
+const isRequestMinistryRestricted = (requestDetails) => {
+  return requestDetails?.ministryrestricteddetails?.isrestricted;
+}
+
 export {
   replaceUrl,
   formatDate,
@@ -357,10 +439,17 @@ export {
   removeBusinessDays,
   getMinistryCode,
   errorToast,
+  isRequestWatcherOrAssignee,
+  isRequestWatcherOrMinistryAssignee,
   formatDateInPst,
   isProcessingTeam,
   isFlexTeam,
   isIntakeTeam,
   encrypt,
   decrypt,
+  addToRestrictedRequestTagList,
+  getRestrictedRequestTagList,
+  isRequestRestricted,
+  isRequestMinistryRestricted,
+  getMinistryRestrictedTagList
 };

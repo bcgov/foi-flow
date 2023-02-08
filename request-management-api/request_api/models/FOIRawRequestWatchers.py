@@ -57,6 +57,22 @@ class FOIRawRequestWatcher(db.Model):
         return watchers  
 
     @classmethod
+    def isawatcher(cls, requestid,userid):  
+        _iswatcher = False
+        try:              
+            sql = 'select distinct on (watchedby, watchedbygroup) watchedby, watchedbygroup, isactive from "FOIRawRequestWatchers" where requestid=:requestid and watchedby=:watchedby  order by watchedby, watchedbygroup, created_at desc'
+            rs = db.session.execute(text(sql), {'requestid': requestid,'watchedby':userid})        
+            for row in rs:
+                if row["isactive"] == True:
+                    _iswatcher = True
+        except Exception as ex:
+            logging.error(ex)
+            raise ex
+        finally:
+            db.session.close()
+        return _iswatcher 
+
+    @classmethod
     def getrequestidsbyuserid(cls, userid):
         #subquery for getting latest watching status
         subquery_max = db.session.query(FOIRawRequestWatcher.requestid, FOIRawRequestWatcher.watchedby ,func.max(FOIRawRequestWatcher.watcherid).label('max_watcherid')).group_by(FOIRawRequestWatcher.requestid, FOIRawRequestWatcher.watchedby).subquery()

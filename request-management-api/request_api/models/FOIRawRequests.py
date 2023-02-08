@@ -43,6 +43,8 @@ class FOIRawRequest(db.Model):
     axissyncdate = db.Column(db.DateTime, nullable=True)    
     axisrequestid = db.Column(db.String(120), nullable=True)
 
+    isiaorestricted = db.Column(db.Boolean, unique=False, nullable=False,default=False)
+
     closereasonid = db.Column(db.Integer,ForeignKey('CloseReasons.closereasonid'))
     closereason = relationship("CloseReason", uselist=False)
 
@@ -79,7 +81,7 @@ class FOIRawRequest(db.Model):
             closedate = _requestrawdata["closedate"] if 'closedate' in _requestrawdata  else None
             closereasonid = _requestrawdata["closereasonid"] if 'closereasonid' in _requestrawdata  else None
             axisrequestid = _requestrawdata["axisRequestId"] if 'axisRequestId' in _requestrawdata  else None
-            axissyncdate = _requestrawdata["axisSyncDate"] if 'axisSyncDate' in _requestrawdata  else None           
+            axissyncdate = _requestrawdata["axisSyncDate"] if 'axisSyncDate' in _requestrawdata  else None            
             _version = request.version+1           
             insertstmt =(
                 insert(FOIRawRequest).
@@ -100,6 +102,8 @@ class FOIRawRequest(db.Model):
                     closereasonid=closereasonid,
                     axisrequestid= axisrequestid,
                     axissyncdate=axissyncdate,
+                    isiaorestricted = request.isiaorestricted
+                   
                 )
             )
             db.session.execute(insertstmt)               
@@ -108,6 +112,42 @@ class FOIRawRequest(db.Model):
         else:
             return DefaultMethodResult(True,'No request foound')
     
+
+    @classmethod
+    def saveiaorestrictedrawrequest(cls,requestid,_isiaorestricted=False, _updatedby=None)->DefaultMethodResult:
+        currentrequest = db.session.query(FOIRawRequest).filter_by(requestid=requestid).order_by(FOIRawRequest.version.desc()).first()
+        request = currentrequest
+        _version = currentrequest.version+1               
+        insertstmt = (
+            insert(FOIRawRequest).
+            values(
+                    requestid=request.requestid, 
+                    requestrawdata=request.requestrawdata,
+                    version=_version,
+                    updatedby=_updatedby,
+                    updated_at=datetime.now(),
+                    status=request.status,
+                    assignedgroup=request.assignedgroup,
+                    assignedto=request.assignedto,
+                    wfinstanceid=request.wfinstanceid,
+                    sourceofsubmission=request.sourceofsubmission,
+                    ispiiredacted=request.ispiiredacted,
+                    createdby=request.createdby,
+                    closedate=request.closedate,
+                    closereasonid=request.closereasonid,
+                    axisrequestid= request.axisrequestid,
+                    axissyncdate=request.axissyncdate,
+                    created_at=request.created_at,
+                    requirespayment = request.requirespayment,
+                    isiaorestricted =_isiaorestricted,
+                    notes = request.notes,
+                    
+            )
+        )
+        db.session.execute(insertstmt)               
+        db.session.commit()                
+        return DefaultMethodResult(True,'Request Updated for iaorestricted - {0}'.format(str(request.version)),requestid,request.wfinstanceid,_isiaorestricted)    
+
     @classmethod
     def saverawrequestassigneeversion(cls,requestid,assigneegroup,assignee,userid,assigneefirstname=None,assigneemiddlename=None,assigneelastname=None)->DefaultMethodResult:        
         request = db.session.query(FOIRawRequest).filter_by(requestid=requestid).order_by(FOIRawRequest.version.desc()).first()
@@ -145,6 +185,8 @@ class FOIRawRequest(db.Model):
                     closereasonid=closereasonid,
                     axisrequestid= axisrequestid,
                     axissyncdate=axissyncdate,
+                    isiaorestricted = request.isiaorestricted
+                    
                 )
             )
             db.session.execute(insertstmt)               
@@ -344,7 +386,7 @@ class FOIRawRequest(db.Model):
         return requeststates    
 
     @classmethod
-    def getbasequery(cls, additionalfilter=None, userid=None):
+    def getbasequery(cls, additionalfilter=None, userid=None, isiaorestrictedfilemanager=False):
         _session = db.session
 
         #rawrequests
@@ -421,6 +463,12 @@ class FOIRawRequest(db.Model):
                            ],
                            else_ = cast(FOIRawRequest.requestrawdata['receivedDateUF'].astext, TIMESTAMP)).label('intakeSorting')
 
+        isiaorestricted = case([
+                            (FOIRawRequest.isiaorestricted.is_(None),
+                             False),
+                           ],
+                           else_ = FOIRawRequest.isiaorestricted).label('isiaorestricted')
+
         selectedcolumns = [
             FOIRawRequest.requestid.label('id'),
             FOIRawRequest.version,
@@ -458,13 +506,21 @@ class FOIRawRequest(db.Model):
             literal(None).label('ministryAssignedToFormatted'),
             literal(None).label('closedate'),
             literal(None).label('onBehalfFormatted'),
-            literal(None).label('extensions')
+            literal(None).label('extensions'),
+            isiaorestricted,
+            literal(None).label('isministryrestricted')
         ]
 
         basequery = _session.query(*selectedcolumns).join(subquery_maxversion, and_(*joincondition)).join(FOIAssignee, FOIAssignee.username == FOIRawRequest.assignedto, isouter=True)
 
         if additionalfilter is None:
-            return basequery.filter(FOIRawRequest.status.notin_(['Archived']))
+            if(isiaorestrictedfilemanager == True):
+                return basequery.filter(FOIRawRequest.status.notin_(['Archived']))
+            else:
+                return basequery.filter(
+                    and_(
+                        FOIRawRequest.status.notin_(['Archived']),
+                        or_(FOIRawRequest.isiaorestricted == False, and_(FOIRawRequest.isiaorestricted == True, FOIRawRequest.assignedto == userid))))
         else:
             if(additionalfilter == 'watchingRequests' and userid is not None):
                 #watchby
@@ -474,11 +530,17 @@ class FOIRawRequest(db.Model):
                 #myrequest
                 return basequery.filter(and_(FOIRawRequest.status.notin_(['Archived']), FOIRawRequest.assignedto == userid))
             else:
-                return basequery.filter(FOIRawRequest.status.notin_(['Archived']))
+                if(isiaorestrictedfilemanager == True):
+                    return basequery.filter(FOIRawRequest.status.notin_(['Archived']))
+                else:
+                    return basequery.filter(
+                        and_(
+                            FOIRawRequest.status.notin_(['Archived']),
+                            or_(FOIRawRequest.isiaorestricted == False, and_(FOIRawRequest.isiaorestricted == True, FOIRawRequest.assignedto == userid))))
 
     @classmethod
-    def getrequestssubquery(cls, filterfields, keyword, additionalfilter, userid):
-        basequery = FOIRawRequest.getbasequery(additionalfilter, userid)
+    def getrequestssubquery(cls, filterfields, keyword, additionalfilter, userid, isiaorestrictedfilemanager):
+        basequery = FOIRawRequest.getbasequery(additionalfilter, userid, isiaorestrictedfilemanager)
         basequery = basequery.filter(FOIRawRequest.status != 'Unopened').filter(FOIRawRequest.status != 'Closed')
         #filter/search
         if(len(filterfields) > 0 and keyword is not None):
@@ -493,34 +555,37 @@ class FOIRawRequest(db.Model):
 
         #filter/search
         filtercondition = []
-        for field in filterfields:
-            if(field == 'idNumber'):
-                keyword = keyword.replace('u-00', '')
+        if(keyword != 'restricted'):
+            for field in filterfields:
+                if(field == 'idNumber'):
+                    keyword = keyword.replace('u-00', '')
+                
+                filtercondition.append(FOIRawRequest.findfield(field).ilike('%'+keyword+'%'))
+                if(field == 'firstName'):
+                    filtercondition.append(FOIRawRequest.findfield('contactFirstName').ilike('%'+keyword+'%'))
+                if(field == 'lastName'):
+                    filtercondition.append(FOIRawRequest.findfield('contactLastName').ilike('%'+keyword+'%'))
+                if(field == 'requestType'):
+                    filtercondition.append(FOIRawRequest.findfield('requestTypeRequestType').ilike('%'+keyword+'%'))
+        else:
+            filtercondition.append(FOIRawRequest.isiaorestricted == True)
 
-            filtercondition.append(FOIRawRequest.findfield(field).ilike('%'+keyword+'%'))
-            if(field == 'firstName'):
-                filtercondition.append(FOIRawRequest.findfield('contactFirstName').ilike('%'+keyword+'%'))
-            if(field == 'lastName'):
-                filtercondition.append(FOIRawRequest.findfield('contactLastName').ilike('%'+keyword+'%'))
-            if(field == 'requestType'):
-                filtercondition.append(FOIRawRequest.findfield('requestTypeRequestType').ilike('%'+keyword+'%'))
-        
         return or_(*filtercondition)
 
 
     @classmethod
-    def getrequestspagination(cls, groups, page, size, sortingitems, sortingorders, filterfields, keyword, additionalfilter, userid):
+    def getrequestspagination(cls, groups, page, size, sortingitems, sortingorders, filterfields, keyword, additionalfilter, userid, isiaorestrictedfilemanager, isministryrestrictedfilemanager=False):
         #ministry requests
         iaoassignee = aliased(FOIAssignee)
         ministryassignee = aliased(FOIAssignee)
-        subquery_ministry_queue = FOIMinistryRequest.getrequestssubquery(groups, filterfields, keyword, additionalfilter, userid, iaoassignee, ministryassignee)
+        subquery_ministry_queue = FOIMinistryRequest.getrequestssubquery(groups, filterfields, keyword, additionalfilter, userid, iaoassignee, ministryassignee, 'IAO', isiaorestrictedfilemanager, isministryrestrictedfilemanager)
 
         #sorting
         sortingcondition = FOIRawRequest.getsorting(sortingitems, sortingorders)
 
         #rawrequests
         if "Intake Team" in groups or groups is None:                
-            subquery_rawrequest_queue = FOIRawRequest.getrequestssubquery(filterfields, keyword, additionalfilter, userid)
+            subquery_rawrequest_queue = FOIRawRequest.getrequestssubquery(filterfields, keyword, additionalfilter, userid, isiaorestrictedfilemanager)
             query_full_queue = subquery_rawrequest_queue.union(subquery_ministry_queue)
             return query_full_queue.order_by(*sortingcondition).paginate(page=page, per_page=size)
         else:
@@ -576,7 +641,8 @@ class FOIRawRequest(db.Model):
             'cfrduedate',
             'applicantcategory',
             'onBehalfFormatted',
-            'extensions'
+            'extensions',
+            'isiaorestricted'
         ]
         if x in validfields:
             return True
@@ -605,8 +671,8 @@ class FOIRawRequest(db.Model):
 
 
     @classmethod
-    def advancedsearch(cls, params):
-        basequery = FOIRawRequest.getbasequery()
+    def advancedsearch(cls, params, userid, isiaorestrictedfilemanager=False):
+        basequery = FOIRawRequest.getbasequery(None, userid, isiaorestrictedfilemanager)
 
         #filter/search
         filtercondition = FOIRawRequest.getfilterforadvancedsearch(params)
@@ -615,7 +681,7 @@ class FOIRawRequest(db.Model):
         #ministry requests
         iaoassignee = aliased(FOIAssignee)
         ministryassignee = aliased(FOIAssignee)
-        subquery_ministry_queue = FOIMinistryRequest.advancedsearchsubquery(params, iaoassignee, ministryassignee)
+        subquery_ministry_queue = FOIMinistryRequest.advancedsearchsubquery(params, iaoassignee, ministryassignee, userid, 'IAO', isiaorestrictedfilemanager)
 
         #sorting
         sortingcondition = FOIRawRequest.getsorting(params['sortingitems'], params['sortingorders'])
@@ -840,6 +906,29 @@ class FOIRawRequest(db.Model):
         finally:
             db.session.close()        
 
+    @classmethod
+    def getmetadata(cls,requestid):
+        requestdetails = {}
+        try:
+            sql = """select requestrawdata ->> 'assignedTo' as assignedTo,
+            requestrawdata ->> 'assignedToFirstName' as assignedToFirstName,
+            requestrawdata ->> 'assignedToLastName' as assignedToLastName,
+            requestrawdata -> 'selectedMinistries'-> 0 ->> 'code' as bcgovcode from "FOIRawRequests" 
+                    where requestid = :requestid
+                    order by version desc limit 1;"""
+            rs = db.session.execute(text(sql), {'requestid': requestid})
+            for row in rs:
+                requestdetails["assignedTo"] = row['assignedto']
+                requestdetails["assignedToFirstName"] = row["assignedtofirstname"]
+                requestdetails["assignedToLastName"] = row["assignedtolastname"]
+                requestdetails["bcgovcode"] = row["bcgovcode"]
+        except Exception as ex:
+            logging.error(ex)
+            raise ex
+        finally:
+            db.session.close()
+        return requestdetails
+
 class FOIRawRequestSchema(ma.Schema):
     class Meta:
-        fields = ('requestid', 'requestrawdata', 'status','notes','created_at','wfinstanceid','version','updated_at','assignedgroup','assignedto','updatedby','createdby','sourceofsubmission','ispiiredacted','assignee.firstname','assignee.lastname', 'axisrequestid', 'axissyncdate', 'closedate')
+        fields = ('requestid', 'requestrawdata', 'status','notes','created_at','wfinstanceid','version','updated_at','assignedgroup','assignedto','updatedby','createdby','sourceofsubmission','ispiiredacted','assignee.firstname','assignee.lastname', 'axisrequestid', 'axissyncdate', 'closedate','isiaorestricted')

@@ -77,8 +77,11 @@ class eventservice:
             self.__logbusinessexception(exception)
     
     def posteventforwatcher(self, requestid, request, requesttype, userid, username):
-        try: 
-            watcherresponse = watcherevent().createwatcherevent(requestid, request, requesttype, userid,username)           
+        try:
+            if request['isrestricted']:
+                watcherresponse = watcherevent().createwatchereventforrestricted(requestid, request, requesttype, userid, username)
+            else:
+                watcherresponse = watcherevent().createwatcherevent(requestid, request, requesttype, userid, username)
             if watcherresponse.success == False: 
                 current_app.logger.error("FOI Notification failed for event for request= %s ; watcher response=%s" % (requestid, watcherresponse.message))
         except BusinessException as exception:            
