@@ -586,7 +586,7 @@ class FOIMinistryRequest(db.Model):
     @classmethod
     def getfieldforsorting(cls, field, order, iaoassignee, ministryassignee):
         #get one field
-        customizedfields = ['assignedToFormatted', 'ministryAssignedToFormatted', 'duedate', 'cfrduedate', 'ministrySorting', 'onBehalfFormatted', 'extensions']
+        customizedfields = ['assignedToFormatted', 'ministryAssignedToFormatted', 'duedate', 'cfrduedate', 'ministrySorting', 'onBehalfFormatted', 'extensions', 'isministryrestricted']
         if(field in customizedfields):
             if(order == 'desc'):
                 return nullslast(desc(field))
