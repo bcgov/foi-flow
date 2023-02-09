@@ -83,7 +83,8 @@ class FOIRawRequestWatcher(db.Model):
         ]
 
         return db.session.query(
-                                FOIRawRequestWatcher.requestid
+                                FOIRawRequestWatcher.requestid,
+                                FOIRawRequestWatcher.watchedby
                             ).join(
                                 subquery_max,
                                 and_(*joincondition)

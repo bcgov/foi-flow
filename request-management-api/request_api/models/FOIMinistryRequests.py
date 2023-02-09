@@ -1017,10 +1017,31 @@ class FOIMinistryRequest(db.Model):
         if(isiaorestrictedfilemanager == True or isministryrestrictedfilemanager == True):
             dbquery = basequery.filter(ministryfilter)
         else:
+            #watchby
+            activefilter = and_(FOIMinistryRequest.isactive == True, FOIRequestStatus.isactive == True)
+
+            subquery_watchby = FOIRequestWatcher.getrequestidsbyuserid(userid)
+            newbasequery = basequery.join(
+                                        subquery_watchby,
+                                        subquery_watchby.c.ministryrequestid == FOIMinistryRequest.foiministryrequestid,
+                                        isouter=True).filter(activefilter)
+
             if(requestby == 'IAO'):
-                dbquery = basequery.filter(or_(or_(FOIRestrictedMinistryRequest.isrestricted == False, FOIRestrictedMinistryRequest.isrestricted == None), and_(FOIRestrictedMinistryRequest.isrestricted == True, FOIMinistryRequest.assignedto == userid))).filter(ministryfilter)
+                dbquery = newbasequery.filter(
+                                            or_(
+                                                or_(FOIRestrictedMinistryRequest.isrestricted == False, FOIRestrictedMinistryRequest.isrestricted == None),
+                                                and_(FOIRestrictedMinistryRequest.isrestricted == True, FOIMinistryRequest.assignedto == userid),
+                                                and_(FOIRestrictedMinistryRequest.isrestricted == True, subquery_watchby.c.watchedby == userid),
+                                            )
+                                        ).filter(ministryfilter)
             else:
-                dbquery = basequery.filter(or_(or_(ministry_restricted_requests.isrestricted == False, ministry_restricted_requests.isrestricted == None), and_(ministry_restricted_requests.isrestricted == True, FOIMinistryRequest.assignedministryperson == userid))).filter(ministryfilter)
+                dbquery = newbasequery.filter(
+                                            or_(
+                                                or_(ministry_restricted_requests.isrestricted == False, ministry_restricted_requests.isrestricted == None),
+                                                and_(ministry_restricted_requests.isrestricted == True, FOIMinistryRequest.assignedministryperson == userid),
+                                                and_(ministry_restricted_requests.isrestricted == True, subquery_watchby.c.watchedby == userid),
+                                            )
+                                        ).filter(ministryfilter)
 
         return dbquery
 
