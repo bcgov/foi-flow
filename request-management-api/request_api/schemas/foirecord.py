@@ -57,7 +57,6 @@ class RetryRecordAttributeSchema(Schema):
     incompatible = fields.Boolean(required=True,allow_none=False)
     extension = fields.Str(validate=validate.Length(min=1, max=10), required=True,allow_none=False)
     isattachment = fields.Boolean(required=False,allow_none=False)
-    createdby = fields.Str(validate=validate.Length(min=1),required=True,allow_none=False)
 
 class FOIRequestRetryRecordSchema(Schema):
     class Meta:  # pylint: disable=too-few-public-methods
@@ -71,6 +70,7 @@ class FOIRequestRetryRecordSchema(Schema):
     service = fields.Str(validate=validate.OneOf(['deduplication', 'conversion']), required=True,allow_none=False)
     documentmasterid = fields.Integer(required=True,allow_none=True)
     outputdocumentmasterid = fields.Integer(required=False,allow_none=True)
+    createdby = fields.Str(validate=validate.Length(min=1),required=True,allow_none=False)
 
 
 
