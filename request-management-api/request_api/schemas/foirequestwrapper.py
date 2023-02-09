@@ -108,12 +108,14 @@ class FOIRequestWrapperSchema(Schema):
     closereasonid = fields.Int(data_key="closereasonid",allow_none=True)
     correctionalServiceNumber = fields.Str(data_key="correctionalServiceNumber",allow_none=True, validate=[validate.Length(max=50, error=MAX_EXCEPTION_MESSAGE)]) 
     publicServiceEmployeeNumber = fields.Str(data_key="publicServiceEmployeeNumber",allow_none=True, validate=[validate.Length(max=50, error=MAX_EXCEPTION_MESSAGE)]) 
-  
+    isiaorestricted =   fields.Bool(data_key="isiaorestricted")
+    
     selectedMinistries = fields.Nested(FOIMinistryRequestWrapperSchema, many=True)
     additionalPersonalInfo = fields.Nested(FOIAdditionallPersonalInfoWrapperSchema,required=False,allow_none=True)
     documents = fields.Nested(FOIMinistryRequestDocumentSchema, many=True,allow_none=True)
     idNumber = fields.Str(data_key="idNumber",allow_none=True, validate=[validate.Length(max=120, error=MAX_EXCEPTION_MESSAGE)]) 
     subjectCode = fields.Str(data_key="subjectCode",allow_none=True, validate=[validate.Length(max=120, error=MAX_EXCEPTION_MESSAGE)])   
+    isofflinepayment =   fields.Bool(data_key="isofflinepayment")
 
 class EditableFOIMinistryRequestWrapperSchema(Schema):
     class Meta:  # pylint: disable=too-few-public-methods

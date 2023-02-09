@@ -32,7 +32,7 @@ namespace MCS.FOI.AXISIntegration.DAL
             return "{}";
         }
 
-        private AXISRequest GetAXISRequest(string request)
+        public AXISRequest GetAXISRequest(string request)
         {
             AXISRequest axisRequest = new();
             DataTable axisDataTable = GetAxisRequestData(request);
@@ -43,6 +43,7 @@ namespace MCS.FOI.AXISIntegration.DAL
                 {
                     axisRequest.AXISRequestID = request;
                     axisRequest.Category = Convert.ToString(row["category"]);
+                    axisRequest.IsRestricted = Convert.ToString(row["requestType"]).ToLower().Contains("restricted");
                     axisRequest.RequestType = RequestsHelper.GetRequestType(Convert.ToString(row["requestType"]));
 
                     axisRequest.ReceivedDate = RequestsHelper.ConvertDateToString(row, "receivedDate", "yyyy-MM-dd");

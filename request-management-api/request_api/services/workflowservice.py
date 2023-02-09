@@ -59,7 +59,13 @@ class workflowservice:
                     activity = self.__getministryactivity(oldstatus,newstatus) if issync == False else Activity.complete.value
                     isprocessing = self.__isprocessing(id) if issync == False else False  
                     messagename = self.__messagename(oldstatus, activity, usertype, isprocessing)
-                    metadata = json.dumps({"id": filenumber, "previousstatus":previousstatus, "status": ministry["status"] , "assignedGroup": assignedgroup, "assignedTo": assignedto, "assignedministrygroup":ministry["assignedministrygroup"], "ministryRequestID": id, "isPaymentActive": self.__ispaymentactive(ministry["foirequestid"], id), "paymentExpiryDate": paymentexpirydate, "axisRequestId": axisrequestid, "issync": issync})
+                    metadata = json.dumps(
+                        {"id": filenumber, "previousstatus":previousstatus, "status": ministry["status"] , 
+                        "assignedGroup": assignedgroup, "assignedTo": assignedto, 
+                        "assignedministrygroup":ministry["assignedministrygroup"], 
+                        "ministryRequestID": id, "isPaymentActive": self.__ispaymentactive(ministry["foirequestid"], id), 
+                        "paymentExpiryDate": paymentexpirydate, "axisRequestId": axisrequestid, "issync": issync,
+                        "isofflinepayment": FOIMinistryRequest.getofflinepaymentflag(id)})
                     if issync == True:                        
                         _variables = bpmservice().getinstancevariables(wfinstanceid)    
                         if ministry["status"] == OpenedEvent.callforrecords.value and (("status" not in _variables) or (_variables not in (None, []) and "status" in _variables and _variables["status"]["value"] != OpenedEvent.callforrecords.value)):

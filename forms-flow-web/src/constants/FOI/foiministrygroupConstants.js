@@ -1,5 +1,6 @@
 const MINISTRYGROUPS = {
     AEST : "AEST Ministry Team",
+    PSE : "PSE Ministry Team",
     AGR : "AGR Ministry Team",
     BRD : "BRD Ministry Team",
     CAS : "CAS Ministry Team",
@@ -9,6 +10,7 @@ const MINISTRYGROUPS = {
     DAS : "DAS Ministry Team",
     EAO : "EAO Ministry Team",
     EDU : "EDU Ministry Team",
+    ECC : "ECC Ministry Team",
     EMBC : "EMBC Ministry Team",
     EMLI : "EMLI Ministry Team",
     FIN : "FIN Ministry Team",
@@ -18,6 +20,7 @@ const MINISTRYGROUPS = {
     IIO : "IIO Ministry Team",
     IRR : "IRR Ministry Team",
     JERI : "JERI Ministry Team",
+    JED : "JED Ministry Team",
     LBR : "LBR Ministry Team",
     LDB : "LDB Ministry Team",
     LWR : "LWR Ministry Team",

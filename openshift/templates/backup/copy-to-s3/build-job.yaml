@@ -1,0 +1,96 @@
+---
+kind: Template
+apiVersion: v1
+metadata:
+  name: "${API_NAME}-build-template"
+  creationTimestamp: 
+objects:
+- kind: ImageStream
+  apiVersion: v1
+  metadata:
+    name: "${API_NAME}"
+- kind: BuildConfig
+  apiVersion: v1
+  metadata:
+    name: "${API_NAME}-build"
+    labels:
+      app: "${API_NAME}-build"
+  spec:
+    runPolicy: Serial
+    source:
+      type: Git
+      git:
+        uri: "${GIT_REPO_URL}"
+        ref: "${GIT_REF}"
+      contextDir: "${SOURCE_CONTEXT_DIR}"
+      # sourceSecret:
+      #   name: github-token
+    strategy:
+      type: Docker
+      dockerStrategy:
+        dockerfilePath: "${DOCKER_FILE_PATH}"
+        pullSecret: 
+          name: artifactory-creds
+      # type: Source
+      # sourceStrategy:
+      #   from:
+      #     kind: ImageStreamTag
+      #     namespace: openshift
+      #     name: 'python:3.8-ubi7'
+    output:
+      to:
+        kind: ImageStreamTag
+        name: "${API_NAME}:latest"
+parameters:
+- name: API_NAME
+  displayName: Name
+  description: The name assigned to all of the resources defined in this template.
+  required: true
+  value: backup-to-s3
+- name: GIT_REPO_URL
+  displayName: Git Repo URL
+  description: The URL to your GIT repo.
+  required: true
+  value: https://github.com/bcgov/foi-flow
+- name: GIT_REF
+  displayName: Git Reference
+  description: The git reference or branch.
+  required: true
+  value: dev-ac-2794
+- name: SOURCE_CONTEXT_DIR
+  displayName: Source Context Directory
+  description: The source context directory.
+  required: false
+  value: openshift/templates/backup/copy-to-s3
+- name: DOCKER_FILE_PATH
+  displayName: Docker File Path
+  description: The path to the docker file defining the build.
+  required: false
+  value: "Dockerfile"
+# - name: SOURCE_IMAGE_KIND
+#   displayName: Source Image Kind
+#   description: The 'kind' (type) of the  source image; typically ImageStreamTag, or
+#     DockerImage.
+#   required: true
+#   value: ImageStreamTag
+# - name: SOURCE_IMAGE_NAME
+#   displayName: Source Image Name
+#   description: The name of the source image.
+#   required: true
+#   value: adjudication-api
+# - name: SOURCE_IMAGE_TAG
+#   displayName: Source Image Tag
+#   description: The tag of the source image.
+#   required: true
+#   value: dev
+# - name: OUTPUT_IMAGE_TAG
+#   displayName: Output Image Tag
+#   description: The tag given to the built image.
+#   required: true
+#   value: latest
+# - name: TAG_NAME
+#   displayName: Name
+#   description: The name assigned to all of the resources defined in this templates.
+#   required: true
+#   value: dev
+

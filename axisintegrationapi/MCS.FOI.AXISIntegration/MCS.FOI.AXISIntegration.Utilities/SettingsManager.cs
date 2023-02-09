@@ -22,15 +22,21 @@ namespace MCS.FOI.AXISIntegration.Utilities
             InitConfiguration();
 
             var setting = InitOptions<ConnectionStrings>("ConnectionStrings");
+            var foiflowdbsetting = InitOptions<FOIFlowConnectionStrings>("FOIFlowConnectionStrings");
 
             DevelopmentConnectionString = setting.DevelopmentConnection;
             TestConnectionString = setting.TestConnection;
             ProductionConnectionString = setting.ProductionConnection;
 
+            FOIFlowDevelopmentConnectionString = foiflowdbsetting.FOIPGDevelopmentConnection;
+            FOIFlowTestConnectionString = foiflowdbsetting.FOIPGTestConnection;
+            FOIFlowProductionConnectionString = foiflowdbsetting.FOIPGProductionConnection;
+
             Environment = setting.Environment;
+            FOIFlowEnvironment = foiflowdbsetting.Environment;
 
             ConnectionString = AssignConnectionString(Environment);
-
+            FOIFlowConnectionString = AssignFOIFlowConnectionString(FOIFlowEnvironment);
         }
 
         public static void AuthConnectionInitializer()
@@ -57,6 +63,14 @@ namespace MCS.FOI.AXISIntegration.Utilities
             _ => throw new ArgumentOutOfRangeException(nameof(environment), environment, null)
         };
 
+        private static string AssignFOIFlowConnectionString(Environments environment) => environment switch
+        {
+            Environments.Production => FOIFlowProductionConnectionString,
+            Environments.Test => FOIFlowTestConnectionString,
+            Environments.Development => FOIFlowDevelopmentConnectionString,
+            _ => throw new ArgumentOutOfRangeException(nameof(environment), environment, null)
+        };
+
         /// <summary>
         /// Development connection string
         /// </summary>
@@ -77,6 +91,20 @@ namespace MCS.FOI.AXISIntegration.Utilities
         /// Current environment
         /// </summary>
         public static Environments Environment { get; set; }
+
+
+        public static string FOIFlowDevelopmentConnectionString { get; set; }
+        public static string FOIFlowTestConnectionString { get; set; }
+
+        public static string FOIFlowProductionConnectionString { get; set; }
+        /// <summary>
+        /// Current connection string
+        /// </summary>
+        public static string FOIFlowConnectionString { get; set; }
+        /// <summary>
+        /// Current environment
+        /// </summary>
+        public static Environments FOIFlowEnvironment { get; set; }
 
         public static string JWT_OIDC_WELL_KNOWN_CONFIG { get; set; }
 

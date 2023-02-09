@@ -130,13 +130,13 @@ class AuthHelper:
     def getuserid(cls):
         token = request.headers.get("Authorization", None)
         unverified_claims = josejwt.get_unverified_claims(token.partition("Bearer")[2].strip())
+        
+        if 'identity_provider' in unverified_claims and unverified_claims['identity_provider'] == "idir":
+            claim_name = 'foi_preferred_username' if "foi_preferred_username" in unverified_claims else 'preferred_username'
+            claim_value = unverified_claims[claim_name].lower()
+            return claim_value+'@idir' if claim_value.endswith("@idir") == False else claim_value
         return unverified_claims['preferred_username']
     
-    @classmethod
-    def getwsuserid(cls, token):
-        unverified_claims = josejwt.get_unverified_claims(token.strip())
-        return unverified_claims['preferred_username']  
-
     @classmethod
     def getusername(cls):
         token = request.headers.get("Authorization", None)
@@ -162,6 +162,31 @@ class AuthHelper:
             if len(processinggroups) > 0:
                 return True
         return False
+
+    @classmethod
+    def isiaorestrictedfilemanager(cls):
+        #roles is an array of strings
+        roles = cls.getuserroles()        
+        try:      
+            if 'IAORestrictedFilesManager' in roles:
+                return True    
+            else:            
+                return False
+        except ValueError:
+            return False
+
+    @classmethod
+    def isministryrestrictedfilemanager(cls):
+        #roles is an array of strings
+        roles = cls.getuserroles()        
+        try:      
+            if 'MinistryRestrictedFilesManager' in roles:
+                return True    
+            else:            
+                return False
+        except ValueError:
+            return False
+
     
     @classmethod        
     def getusergroups(cls):
@@ -170,6 +195,14 @@ class AuthHelper:
         usergroups = unverified_claims['groups']
         usergroups = [usergroup.replace('/','',1) if usergroup.startswith('/') else usergroup for usergroup in usergroups]
         return usergroups
+
+    @classmethod        
+    def getuserroles(cls):
+        token = request.headers.get("Authorization", None)
+        unverified_claims = josejwt.get_unverified_claims(token.partition("Bearer")[2].strip())
+        roles = unverified_claims['role']
+        roles = [role.replace('/','',1) if role.startswith('/') else role for role in roles]
+        return roles 
     
     @classmethod        
     def getusertype(cls): 

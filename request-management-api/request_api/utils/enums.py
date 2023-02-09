@@ -67,6 +67,9 @@ class MinistryTeamWithKeycloackGroup(Enum):
     TACS = "TACS Ministry Team"
     TIC = "TIC Ministry Team"
     TRAN = "TRAN Ministry Team"
+    PSE = "PSE Ministry Team"
+    ECC = "ECC Ministry Team"
+    JED = "JED Ministry Team"
 
     @staticmethod
     def list():

@@ -27,7 +27,8 @@ import {
 import {
   fetchFOIRequestDetailsWrapper,
   fetchFOIRequestDescriptionList,
-  fetchRequestDataFromAxis
+  fetchRequestDataFromAxis,
+  fetchRestrictedRequestCommentTagList
 } from "../../../apiManager/services/FOI/foiRequestServices";
 import {
   fetchFOIRequestAttachmentsList
@@ -69,11 +70,13 @@ import {
   isAxisSyncDisplayField,
   getUniqueIdentifier
 } from "./utils";
-import { ConditionalComponent, formatDate } from '../../../helper/FOI/helper';
+import { ConditionalComponent, formatDate, isRequestRestricted } from '../../../helper/FOI/helper';
 import DivisionalTracking from './DivisionalTracking';
 import AxisDetails from './AxisDetails/AxisDetails';
 import AxisMessageBanner from "./AxisDetails/AxisMessageBanner";
 import HomeIcon from '@mui/icons-material/Home';
+import _ from 'lodash';
+
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -142,7 +145,6 @@ const FOIRequest = React.memo(({ userDetail }) => {
   const [_tabStatus, settabStatus] = React.useState(requestState);
   let foitabheaderBG = getTabBG(_tabStatus, requestState);
 
-
   //editorChange and removeComment added to handle Navigate away from Comments tabs
   const [editorChange, setEditorChange] = useState(false);
   const [axisMessage, setAxisMessage] = React.useState("");
@@ -193,14 +195,15 @@ const FOIRequest = React.memo(({ userDetail }) => {
   let bcgovcode = getBCgovCode(ministryId, requestDetails);
   const [headerText, setHeaderText]  = useState(getHeaderText({requestDetails, ministryId, requestState}));  
   document.title = requestDetails.axisRequestId || requestDetails.idNumber || headerText;
+  const dispatch = useDispatch();
+  const [isIAORestricted, setIsIAORestricted] = useState(false);
 
   useEffect(() => {
     if (window.location.href.indexOf("comments") > -1) {
       tabclick("Comments");
     }
   }, []);
-
-  const dispatch = useDispatch();
+  
    useEffect(async() => {
     if (isAddRequest) {
       dispatch(fetchFOIAssignedToList("", "", ""));
@@ -239,8 +242,15 @@ const FOIRequest = React.memo(({ userDetail }) => {
       setHeaderText(getHeaderText({requestDetails, ministryId, requestState}));
       if(requestDetails.axisRequestId)
         axisBannerCheck();
+        setIsIAORestricted(isRequestRestricted(requestDetails,ministryId));
     }
   }, [requestDetails]);
+
+
+  useEffect(() => {
+    if(isIAORestricted)
+      dispatch(fetchRestrictedRequestCommentTagList(requestId, ministryId));
+  }, [isIAORestricted]);
 
 
   useEffect(() => {
@@ -1071,6 +1081,8 @@ const FOIRequest = React.memo(({ userDetail }) => {
                   setEditorChange={setEditorChange}
                   removeComment={removeComment}
                   setRemoveComment={setRemoveComment}
+                  restrictionType={isRequestRestricted(requestDetails,ministryId) ? "iao" : ""}
+                  isRestricted={isRequestRestricted(requestDetails,ministryId)}
                 />
               </>
             ) : (

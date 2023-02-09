@@ -27,7 +27,10 @@ namespace MCS.FOI.AXISIntegration.DataModels
        
         [DataMember(Name = "requestType")]
         public string RequestType { get; set; }
-       
+
+        [DataMember(Name = "isRestricted")]
+        public bool IsRestricted { get; set; }
+
         [DataMember(Name = "receivedDate")]
         public string ReceivedDate { get; set; }
 

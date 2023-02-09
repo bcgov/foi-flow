@@ -14,6 +14,7 @@ import {
   setFOIRequestDescriptionHistory,
   setFOIMinistryRequestList,
   setOpenedMinistries,
+  setRestrictedReqTaglist
 } from "../../../actions/FOI/foiRequestActions";
 import { fetchFOIAssignedToList, fetchFOIMinistryAssignedToList, fetchFOIProcessingTeamList } from "./foiMasterDataServices";
 import { catchError, fnDone} from './foiServicesUtil';
@@ -450,7 +451,76 @@ export const fetchRequestDataFromAxis = (axisRequestId, isModal,requestDetails, 
       })
       .catch((error) => {
         catchError(error, dispatch);
+        if (error.message.indexOf('401')> -1)
+        {
+          done(null,"Unauthorized-RestrictedAxisRequest");
+        }
+        else{
+        
         done(null,"Exception happened while GET operations of request");
+        }
+      });
+  }
+};
+
+export const restrictRequest = (data, requestId, ministryId, type="iao", ...rest) => {
+  const done = fnDone(rest);
+  let apiUrl = "";
+  if (ministryId){
+    apiUrl= replaceUrl(replaceUrl(
+      API.FOI_POST_MINISTRYREQUEST_RESTRICTION,
+      "<ministryrequestid>",
+      ministryId),"<type>",type
+    ); 
+  }
+  else{
+    apiUrl= replaceUrl(
+      API.FOI_POST_RAWREQUEST_RESTRICTION,
+      "<requestid>",
+      requestId
+    );
+  }
+  return (dispatch) => {
+    httpPOSTRequest(apiUrl, data)
+      .then((res) => {
+        if (res.data) {
+          done(null, res.data);
+        } else {
+          dispatch(serviceActionError(res));
+          throw new Error("Error while restricting/unrestricting the request");
+        }
+      })
+      .catch((error) => {
+        done(error);
+        catchError(error, dispatch);
+      });
+  };
+};
+
+export const fetchRestrictedRequestCommentTagList = (requestid, ministryId, ...rest) => {
+  const done = fnDone(rest);
+  const apiUrlgetRequestDetails = ministryId? replaceUrl(
+    API.FOI_GET_RESTRICTED_MINISTRYREQUEST_TAG_LIST,
+    "<ministryrequestid>",
+    ministryId
+  ) : replaceUrl(
+    API.FOI_GET_RESTRICTED_RAWREQUEST_TAG_LIST,
+    "<requestid>",
+    requestid
+  );
+  return (dispatch) => {
+    httpGETRequest(apiUrlgetRequestDetails, {}, UserService.getToken())
+      .then((res) => {
+        if (res.data) {
+          dispatch(setRestrictedReqTaglist(res.data));
+          done(null, res.data);
+        } else {
+          dispatch(serviceActionError(res));
+          throw new Error(`Error in fetching user list for tagging in comments# ${requestid}`);
+        }
+      })
+      .catch((error) => {
+        catchError(error, dispatch);
       });
   }
 };
