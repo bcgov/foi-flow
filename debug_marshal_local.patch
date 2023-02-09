@@ -1,20 +1,34 @@
 diff --git a/forms-flow-web/src/apiManager/endpoints/config.js b/forms-flow-web/src/apiManager/endpoints/config.js
-index 3db8dea3..2ce4c997 100644
+index 6baadfb0..dd8765db 100644
 --- a/forms-flow-web/src/apiManager/endpoints/config.js
 +++ b/forms-flow-web/src/apiManager/endpoints/config.js
-@@ -1,6 +1,8 @@
+@@ -1,8 +1,10 @@
  
  export const WEB_BASE_URL = (window._env_ && window._env_.REACT_APP_WEB_BASE_URL) || process.env.REACT_APP_WEB_BASE_URL;
  
 -export const FOI_BASE_API_URL = `${(window._env_ && window._env_.REACT_APP_FOI_BASE_API_URL) || process.env.REACT_APP_FOI_BASE_API_URL}`;
 +// export const FOI_BASE_API_URL = `${(window._env_ && window._env_.REACT_APP_FOI_BASE_API_URL) || process.env.REACT_APP_FOI_BASE_API_URL}`;
  
--export const AXIS_API_URL = `${(window._env_ && window._env_.REACT_APP_AXIS_API_URL) || process.env.REACT_APP_AXIS_API_URL}`;
+ export const AXIS_API_URL = `${(window._env_ && window._env_.REACT_APP_AXIS_API_URL) || process.env.REACT_APP_AXIS_API_URL}`;
+ 
+-export const DOC_REVIEWER_BASE_API_URL = `${(window._env_ && window._env_.REACT_APP_DOCREVIEWER_BASE_API_URL) || process.env.REACT_APP_DOCREVIEWER_BASE_API_URL}`;
 \ No newline at end of file
-+export const AXIS_API_URL = `${(window._env_ && window._env_.REACT_APP_AXIS_API_URL) || process.env.REACT_APP_AXIS_API_URL}`;
-+
++// export const DOC_REVIEWER_BASE_API_URL = `${(window._env_ && window._env_.REACT_APP_DOCREVIEWER_BASE_API_URL) || process.env.REACT_APP_DOCREVIEWER_BASE_API_URL}`;
 +export const FOI_BASE_API_URL = `http://localhost:15000`;
-\ No newline at end of file
++export const DOC_REVIEWER_BASE_API_URL = `http://localhost:15500`;
+diff --git a/forms-flow-web/src/apiManager/services/FOI/foiRecordServices.js b/forms-flow-web/src/apiManager/services/FOI/foiRecordServices.js
+index 8ac66fbe..0c2c4807 100644
+--- a/forms-flow-web/src/apiManager/services/FOI/foiRecordServices.js
++++ b/forms-flow-web/src/apiManager/services/FOI/foiRecordServices.js
+@@ -26,7 +26,7 @@ export const fetchFOIRecords = (requestId, ministryId, ...rest) => {
+     httpGETRequest(apiUrl, {}, UserService.getToken())
+       .then((res) => {
+         if (res.data) {
+-          dispatch(setRequestRecords(res.data));
++          dispatch(setRequestRecords(res.data.records));
+           dispatch(setFOIAttachmentListLoader(false));
+           done(null, res.data);
+ 
 diff --git a/forms-flow-web/src/components/FOI/FOIAuthenticateRouting.jsx b/forms-flow-web/src/components/FOI/FOIAuthenticateRouting.jsx
 index 6b89abed..a79f4d5b 100644
 --- a/forms-flow-web/src/components/FOI/FOIAuthenticateRouting.jsx
@@ -119,6 +133,29 @@ index 52a7535c..2ae851a9 100644
                  <Home />
                  <FOIFooter />
              </Route>
+diff --git a/forms-flow-web/src/components/FOI/customComponents/Records/index.js b/forms-flow-web/src/components/FOI/customComponents/Records/index.js
+index ff37361b..a809bf3a 100644
+--- a/forms-flow-web/src/components/FOI/customComponents/Records/index.js
++++ b/forms-flow-web/src/components/FOI/customComponents/Records/index.js
+@@ -35,6 +35,7 @@ import InputBase from "@mui/material/InputBase";
+ import Paper from "@mui/material/Paper";
+ import { toast } from "react-toastify";
+ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
++<<<<<<< Updated upstream
+ import { faCheckCircle, faClone } from '@fortawesome/free-regular-svg-icons';
+ import {faSpinner, faExclamationCircle, faBan, faArrowTurnUp } from '@fortawesome/free-solid-svg-icons';import Dialog from '@material-ui/core/Dialog';
+ import DialogActions from '@material-ui/core/DialogActions';
+@@ -43,6 +44,10 @@ import DialogContentText from '@material-ui/core/DialogContentText';
+ import DialogTitle from '@material-ui/core/DialogTitle';
+ import CloseIcon from '@material-ui/icons/Close';
+ import _ from 'lodash';
++=======
++import { faCheckCircle, faTimesCircle, faSpinner } from '@fortawesome/free-solid-svg-icons';
++// import {faTimesCircle } from '@fortawesome/free-regular-svg-icons';
++>>>>>>> Stashed changes
+ 
+ 
+ const useStyles = makeStyles((_theme) => ({
 diff --git a/forms-flow-web/src/modules/userDetailReducer.js b/forms-flow-web/src/modules/userDetailReducer.js
 index be9cb015..deeee4ca 100644
 --- a/forms-flow-web/src/modules/userDetailReducer.js
@@ -141,7 +178,7 @@ index be9cb015..deeee4ca 100644
  
  
 diff --git a/request-management-api/request_api/auth.py b/request-management-api/request_api/auth.py
-index 2585ac3b..bfe8e505 100644
+index 32e44370..787006cc 100644
 --- a/request-management-api/request_api/auth.py
 +++ b/request-management-api/request_api/auth.py
 @@ -32,11 +32,11 @@ class Auth:
@@ -159,7 +196,7 @@ index 2585ac3b..bfe8e505 100644
              return f(*args, **kwargs)
  
          return decorated
-@@ -46,11 +46,11 @@ class Auth:
+@@ -55,11 +55,11 @@ class Auth:
      @classmethod
      def belongstosameministry(cls,func):
          @wraps(func)
@@ -173,7 +210,7 @@ index 2585ac3b..bfe8e505 100644
                  requestministry = FOIMinistryRequest.getrequestbyministryrequestid(id)
                  ministrygroups = AuthHelper.getministrygroups()
                  expectedministrygroup = MinistryTeamWithKeycloackGroup[requestministry['programarea.bcgovcode']].value
-@@ -58,17 +58,17 @@ class Auth:
+@@ -67,17 +67,17 @@ class Auth:
                  if(expectedministrygroup not in ministrygroups):
                      return retval
                  else:
@@ -196,7 +233,7 @@ index 2585ac3b..bfe8e505 100644
                  requestministry = FOIMinistryRequest.getrequestbyministryrequestid(ministryrequestid)
                  ministrygroups = AuthHelper.getministrygroups()
                  expectedministrygroup = MinistryTeamWithKeycloackGroup[requestministry['programarea.bcgovcode']].value
-@@ -76,10 +76,10 @@ class Auth:
+@@ -85,10 +85,10 @@ class Auth:
                  if(expectedministrygroup not in ministrygroups):
                      return retval
                  else:
@@ -211,7 +248,7 @@ index 2585ac3b..bfe8e505 100644
      @classmethod
      def ismemberofgroups(cls, groups):
          """Check that at least one of the realm groups are in the token.
-@@ -92,110 +92,115 @@ class Auth:
+@@ -101,113 +101,118 @@ class Auth:
              #@Auth.require
              @wraps(f)
              def wrapper(*args, **kwargs):
@@ -260,19 +297,20 @@ index 2585ac3b..bfe8e505 100644
      def getuserid(cls):
 -        token = request.headers.get("Authorization", None)
 -        unverified_claims = josejwt.get_unverified_claims(token.partition("Bearer")[2].strip())
+-        if 'identity_provider' in unverified_claims and unverified_claims['identity_provider'] == "idir":
+-            claim_name = 'foi_preferred_username' if "foi_preferred_username" in unverified_claims else 'preferred_username'
+-            claim_value = unverified_claims[claim_name].lower()
+-            return claim_value+'@idir' if claim_value.endswith("@idir") == False else claim_value
 -        return unverified_claims['preferred_username']
--    
 +        # token = request.headers.get("Authorization", None)
 +        # unverified_claims = josejwt.get_unverified_claims(token.partition("Bearer")[2].strip())
++        # if 'identity_provider' in unverified_claims and unverified_claims['identity_provider'] == "idir":
++        #     claim_name = 'foi_preferred_username' if "foi_preferred_username" in unverified_claims else 'preferred_username'
++        #     claim_value = unverified_claims[claim_name].lower()
++        #     return claim_value+'@idir' if claim_value.endswith("@idir") == False else claim_value
 +        # return unverified_claims['preferred_username']
 +        return 'RICHAQI@idir'
-+
-     @classmethod
-     def getwsuserid(cls, token):
-         unverified_claims = josejwt.get_unverified_claims(token.strip())
--        return unverified_claims['preferred_username']  
-+        return unverified_claims['preferred_username']
- 
+     
      @classmethod
      def getusername(cls):
 -        token = request.headers.get("Authorization", None)
@@ -361,10 +399,6 @@ index 2585ac3b..bfe8e505 100644
 -    def getministrygroups(cls): 
 -        usergroups = cls.getusergroups()
 -        return list(set(usergroups).intersection(MinistryTeamWithKeycloackGroup.list()))   
--      
--
--        
-\ No newline at end of file
 +        # token = request.headers.get("Authorization", None)
 +        # unverified_claims = josejwt.get_unverified_claims(token.partition("Bearer")[2].strip())
 +        # usergroups = unverified_claims['groups']
@@ -410,4 +444,11 @@ index 2585ac3b..bfe8e505 100644
 +        # usergroups = cls.getusergroups()
 +        # return list(set(usergroups).intersection(MinistryTeamWithKeycloackGroup.list()))
 +        return ['EDU Ministry Team']
+ 
+     @classmethod        
+     def getauthtoken(cls): 
+         return request.headers.get("Authorization", None)
+-      
+-
+-        
 \ No newline at end of file
