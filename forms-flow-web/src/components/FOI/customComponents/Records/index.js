@@ -740,7 +740,7 @@ export const RecordsLog = ({
             isMinistryCoordinator={isMinistryCoordinator}
             uploadFor={"record"}
             bcgovcode={bcgovcode}
-            divisions={divisions}
+            divisions={divisions.filter(d => d.divisionname.toLowerCase() !== 'communications')}
           />
           <div className="state-change-dialog">
             <Dialog
