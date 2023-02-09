@@ -6,7 +6,7 @@ import AttachmentModal from '../Attachments/AttachmentModal';
 import Loading from "../../../../containers/Loading";
 import { getOSSHeaderDetails, saveFilesinS3, getFileFromS3, postFOIS3DocumentPreSignedUrl, getFOIS3DocumentPreSignedUrl } from "../../../../apiManager/services/FOI/foiOSSServices";
 import { saveFOIRequestAttachmentsList, replaceFOIRequestAttachment, saveNewFilename, deleteFOIRequestAttachment } from "../../../../apiManager/services/FOI/foiAttachmentServices";
-import { fetchFOIRecords, saveFOIRecords, deleteFOIRecords, retryFOIRecordProcessing } from "../../../../apiManager/services/FOI/foiRecordServices";
+import { fetchFOIRecords, saveFOIRecords, deleteFOIRecords, retryFOIRecordProcessing, deleteReviewerRecords } from "../../../../apiManager/services/FOI/foiRecordServices";
 import { StateTransitionCategories, AttachmentCategories } from '../../../../constants/FOI/statusEnum'
 import { addToFullnameList, getFullnameList, ConditionalComponent } from '../../../../helper/FOI/helper';
 import Grid from "@material-ui/core/Grid";
@@ -36,7 +36,13 @@ import Paper from "@mui/material/Paper";
 import { toast } from "react-toastify";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCheckCircle, faClone } from '@fortawesome/free-regular-svg-icons';
-import {faSpinner, faExclamationCircle, faBan } from '@fortawesome/free-solid-svg-icons';
+import {faSpinner, faExclamationCircle, faBan, faArrowTurnUp } from '@fortawesome/free-solid-svg-icons';import Dialog from '@material-ui/core/Dialog';
+import DialogActions from '@material-ui/core/DialogActions';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogContentText from '@material-ui/core/DialogContentText';
+import DialogTitle from '@material-ui/core/DialogTitle';
+import CloseIcon from '@material-ui/icons/Close';
+import _ from 'lodash';
 
 
 const useStyles = makeStyles((_theme) => ({
@@ -106,6 +112,11 @@ const useStyles = makeStyles((_theme) => ({
     height: "20px",
     paddingRight:"10px"
   },
+  attachmentIcon: {
+    height: "20px",
+    margin:"0 15px",
+    rotate:"90deg"
+  },
   recordReports:{
     marginTop: "1em",
     fontSize: "14px",
@@ -155,6 +166,7 @@ export const RecordsLog = ({
 
 
   const [openModal, setModal] = useState(false);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const dispatch = useDispatch();
   const [isAttachmentLoading, setAttachmentLoading] = useState(false);
   const [multipleFiles, setMultipleFiles] = useState(true);
@@ -182,10 +194,16 @@ export const RecordsLog = ({
     setModal(false);
     if (modalFor === 'delete' && value) {
       //const documentId = ministryId ? updateAttachment.foiministrydocumentid : updateAttachment.foidocumentid;
-      const recordId = updateAttachment.recordid;
-      dispatch(deleteFOIRecords(requestId, ministryId, recordId, (err, _res) => {
-        dispatchRequestAttachment(err);
-      }));
+      if (updateAttachment.isattachment) {
+        dispatch(deleteReviewerRecords({filepaths: [updateAttachment]},(err, _res) => {
+          dispatchRequestAttachment(err);
+        }));
+      } else {
+        const recordId = updateAttachment.recordid;
+        dispatch(deleteFOIRecords(requestId, ministryId, recordId, (err, _res) => {
+          dispatchRequestAttachment(err);
+        }));
+      }
     }
     else if (files) {
       saveDocument(value, fileInfoList, files);
@@ -293,12 +311,17 @@ export const RecordsLog = ({
     var completed = 0;
     let failed = 0;
     var exporting = records.filter(record => !record.isduplicate)
+    for (let record of exporting) {
+      if (record.attachments) for (let attachment of record.attachments) {
+        if (!attachment.isduplicate) exporting.push(attachment);
+      }
+    }
     const toastID = toast.loading("Exporting files (" + completed + "/" + exporting.length + ")")
     try {
       for (let record of exporting) {
         var filepath = record.s3uripath
         var filename = record.filename
-        if (record.isdeduplicated && ['.doc','.docx','.xls','.xlsx', '.ics', '.msg'].includes(record.attributes.extension)) {
+        if (record.isredactionready && ['.doc','.docx','.xls','.xlsx', '.ics', '.msg'].includes(record.attributes?.extension)) {
           filepath = filepath.substr(0, filepath.lastIndexOf(".")) + ".pdf";
           filename += ".pdf";
         }
@@ -336,13 +359,29 @@ export const RecordsLog = ({
   }
 
   const retryDocument = (record) => {
-    record.trigger = 'recordretry'
-    record.service = record.failed
+    record.trigger = 'recordretry';
+    record.service = record.failed;
+    if (record.isattachment) {
+      var parentRecord = recordsObj.records.find(r => r.recordid = record.rootparentid);
+      record.attributes.divisions = parentRecord.attributes.divisions;
+      record.attributes.batch = parentRecord.attributes.batch;
+      record.attributes.extension = record['s3uripath'].substr(record['s3uripath'].lastIndexOf("."), record['s3uripath'].length);
+      record.attributes.incompatible = false;
+      record.attributes.isattachment = true;
+    }
     if (record.service === 'deduplication') {
       record['s3uripath'] = record['s3uripath'].substr(0, record['s3uripath'].lastIndexOf(".")) + ".pdf";
     }
     dispatch(retryFOIRecordProcessing(requestId, ministryId, {records: [record]},(err, _res) => {
         dispatchRequestAttachment(err);
+    }));
+  }
+
+  const removeAttachments = () => {
+    setDeleteModalOpen(false);
+    var attachments = records.reduce((acc, record) => {return record.attachments ? acc.concat(record.attachments.map(a => a.filepath)) : acc}, []);
+    dispatch(deleteReviewerRecords({filepaths: attachments},(err, _res) => {
+      dispatchRequestAttachment(err);
     }));
   }
 
@@ -432,26 +471,33 @@ export const RecordsLog = ({
     // records.records.filter(r =>
     //   r.filename.toLowerCase().includes(filterValue?.toLowerCase()) ||
     //   r.createdby.toLowerCase().includes(filterValue?.toLowerCase()) ||
-    //   r.attributes.findIndex(a => a.divisionname.toLowerCase() === filterValue?.toLowerCase().trim()) > -1
+    //   r.attributes?.findIndex(a => a.divisionname.toLowerCase() === filterValue?.toLowerCase().trim()) > -1
     // );
     // setRecords(_filteredRecords)
   // }
 
 
   React.useEffect(() => {
-    setRecords(searchAttachments(recordsObj.records, filterValue, searchValue));
+    setRecords(searchAttachments(_.cloneDeep(recordsObj.records), filterValue, searchValue));
   },[filterValue, searchValue, recordsObj])
 
   const searchAttachments = (_recordsArray, _filterValue, _keywordValue) =>  {
-    return _recordsArray.filter(r =>
-      (r.filename.toLowerCase().includes(_keywordValue?.toLowerCase()) ||
-      r.createdby.toLowerCase().includes(_keywordValue?.toLowerCase())) &&
-      (
-        _filterValue === -3 ? r.attributes?.incompatible :
-        _filterValue === -2 ? r.failed && !r.isdeduplicated:
-        _filterValue > -1 ? r.attributes?.divisions?.findIndex(a => a.divisionid === _filterValue) > -1 :
-        true
-      ))
+    var filterFunction = (r) => {
+      if (r.attachments?.length > 0) {
+        r.attachments = r.attachments.filter(filterFunction)
+        return r.attachments.length > 0;
+      } else {
+        return (r.filename.toLowerCase().includes(_keywordValue?.toLowerCase()) ||
+        r.createdby.toLowerCase().includes(_keywordValue?.toLowerCase())) &&
+        (
+          _filterValue === -3 ? r.attributes?.incompatible :
+          _filterValue === -2 ? r.failed && !r.isredactionready:
+          _filterValue > -1 ? r.attributes?.divisions?.findIndex(a => a.divisionid === _filterValue) > -1 :
+          true
+        )
+      }
+    }
+    return _recordsArray.filter(filterFunction)
     }
 
   return (
@@ -474,7 +520,19 @@ export const RecordsLog = ({
                 {getRequestNumber()}
               </h1>
             </Grid>
-            <Grid item xs={3}>
+            <Grid item xs={2}>
+              <ConditionalComponent condition={records.filter(record => record.attachments?.length > 0).length > 0}>
+                <button
+                  className="btn addAttachment foi-export-button"
+                  variant="contained"
+                  onClick={() => setDeleteModalOpen(true)}
+                  color="primary"
+                >
+                  Remove Attachments
+                </button>
+              </ConditionalComponent>
+            </Grid>
+            <Grid item xs={2}>
               <ConditionalComponent condition={hasDocumentsToExport}>
                 <button
                   className="btn addAttachment foi-export-button"
@@ -486,7 +544,7 @@ export const RecordsLog = ({
                 </button>
               </ConditionalComponent>
             </Grid>
-            <Grid item xs={3}>
+            <Grid item xs={2}>
               {isMinistryCoordinator ?
                 <button
                   className={clsx("btn", "addAttachment", classes.createButton)}
@@ -684,6 +742,44 @@ export const RecordsLog = ({
             bcgovcode={bcgovcode}
             divisions={divisions}
           />
+          <div className="state-change-dialog">
+            <Dialog
+              open={deleteModalOpen}
+              onClose={() => setDeleteModalOpen(false)}
+              aria-labelledby="state-change-dialog-title"
+              aria-describedby="state-change-dialog-description"
+              maxWidth={'md'}
+              fullWidth={true}
+              // id="state-change-dialog"
+            >
+              <DialogTitle disableTypography id="state-change-dialog-title">
+                  <h2 className="state-change-header">Remove Attachments</h2>
+                  <IconButton className="title-col3" onClick={() => setDeleteModalOpen(false)}>
+                    <i className="dialog-close-button">Close</i>
+                    <CloseIcon />
+                  </IconButton>
+                </DialogTitle>
+              <DialogContent className={'dialog-content-nomargin'}>
+                <DialogContentText id="state-change-dialog-description" component={'span'} style={{textAlign: "center"}}>
+                  <span className="confirmation-message">
+                    Are you sure you want to delete the attachments from this request? <br></br>
+                    <i>This will remove all attachments from the redaction app.</i>
+                  </span>
+                </DialogContentText>
+              </DialogContent>
+              <DialogActions>
+                <button
+                  className={`btn-bottom btn-save btn`}
+                  onClick={removeAttachments}
+                >
+                  Continue
+                </button>
+                <button className="btn-bottom btn-cancel" onClick={() => setDeleteModalOpen(false)}>
+                  Cancel
+                </button>
+              </DialogActions>
+            </Dialog>
+          </div>
         </>
       )}
     </div>
@@ -755,19 +851,20 @@ const Attachment = React.memo(({indexValue, record, handlePopupButtonClick, getF
         justify="flex-start"
         alignItems="flex-start"
       >
-        <Grid item xs={6}>
-            {
 
-              record.attributes.incompatible ?
-              <FontAwesomeIcon icon={faBan} size='2x' color='#FAA915' className={classes.statusIcons}/>:
-              record.isduplicate ?
-              <FontAwesomeIcon icon={faClone} size='2x' color='#FF873D' className={classes.statusIcons}/>:
-              record.isdeduplicated ?
-              <FontAwesomeIcon icon={faCheckCircle} size='2x' color='#1B8103' className={classes.statusIcons}/>:
-              record.failed ?
-              <FontAwesomeIcon icon={faExclamationCircle} size='2x' color='#A0192F' className={classes.statusIcons}/>:
-              <FontAwesomeIcon icon={faSpinner} size='2x' color='#FAA915' className={classes.statusIcons}/>
-            }
+        <Grid item xs={6}>
+          {record.isattachment && <FontAwesomeIcon icon={faArrowTurnUp} size='2x' className={classes.attachmentIcon}/>}
+          {
+            record.attributes?.incompatible ?
+            <FontAwesomeIcon icon={faBan} size='2x' color='#FAA915' className={classes.statusIcons}/>:
+            record.isduplicate ?
+            <FontAwesomeIcon icon={faClone} size='2x' color='#FF873D' className={classes.statusIcons}/>:
+            record.isredactionready ?
+            <FontAwesomeIcon icon={faCheckCircle} size='2x' color='#1B8103' className={classes.statusIcons}/>:
+            record.failed ?
+            <FontAwesomeIcon icon={faExclamationCircle} size='2x' color='#A0192F' className={classes.statusIcons}/>:
+            <FontAwesomeIcon icon={faSpinner} size='2x' color='#FAA915' className={classes.statusIcons}/>
+          }
           <span className={classes.filename}>{record.filename} </span>
           <span className={classes.fileSize}>{record?.attributes?.filesize > 0 ? (record?.attributes?.filesize / 1024).toFixed(2) : 0} KB</span>
         </Grid>
@@ -776,13 +873,13 @@ const Attachment = React.memo(({indexValue, record, handlePopupButtonClick, getF
             alignItems="flex-end"
             className={classes.recordStatus}>
             {
-              record.attributes.incompatible ?
+              record.attributes?.incompatible ?
               <span>Incompatible File Type</span>:
-              record.attributes.trigger === 'recordreplace' ?
+              record.trigger === 'recordreplace' ?
               <span>Record Manually Replaced Due to Error</span>:
               record.isduplicate ?
               <span>Duplicate of {record.duplicateof}</span>:
-              record.isdeduplicated ?
+              record.isredactionready ?
               <span>Ready for Redaction</span>:
               record.failed ?
               <span>Error during {record.failed}</span>:
@@ -805,19 +902,19 @@ const Attachment = React.memo(({indexValue, record, handlePopupButtonClick, getF
         justify="flex-start"
         alignItems="flex-start"
       >
-      <Grid item xs={6}>
-        {record.attributes?.divisions?.map((division, i) =>
-          <Chip
-            item
-            key={i}
-            label={division.divisionname}
-            size="small"
-            className={clsx(classes.chip, classes.chipPrimary)}
-            style={{backgroundColor: "#003366", margin: "4px"}}
-          />
-        )}
-      </Grid>
-      <Grid item xs={2}
+        <Grid item xs={6}>
+          {record.attributes?.divisions?.map((division, i) =>
+            <Chip
+              item
+              key={i}
+              label={division.divisionname}
+              size="small"
+              className={clsx(classes.chip, classes.chipPrimary)}
+              style={{backgroundColor: "#003366", margin: record.isattachment && i === 0 ? "4px 4px 4px 60px" : "4px"}}
+            />
+          )}
+        </Grid>
+        <Grid item xs={2}
         direction="row"
         justifyContent="flex-end"
         alignItems="flex-end"
@@ -854,6 +951,18 @@ const Attachment = React.memo(({indexValue, record, handlePopupButtonClick, getF
           <Divider className={"record-divider"} />
         </Grid>
       </Grid>
+      {record?.attachments?.map((attachment, i) =>
+        <Attachment
+          key={"attachment" + i}
+          indexValue={i}
+          record={attachment}
+          handlePopupButtonClick={handlePopupButtonClick}
+          getFullname={getFullname}
+          isMinistryCoordinator={isMinistryCoordinator}
+          ministryId={ministryId}
+          classes={classes}
+        />
+      )}
     </>
   );
 })
@@ -985,7 +1094,7 @@ const AttachmentPopup = React.memo(({indexValue, record, handlePopupButtonClick,
             View
           </MenuItem>
           :""}
-          {!record.isdeduplicated && record.failed && <MenuItem
+          {!record.isredactionready && record.failed && <MenuItem
             onClick={() => {
                 handleReplace();
                 setPopoverOpen(false);
@@ -993,7 +1102,7 @@ const AttachmentPopup = React.memo(({indexValue, record, handlePopupButtonClick,
           >
             Replace Manually
           </MenuItem>}
-          {record.isdeduplicated && ['.doc','.docx','.xls','.xlsx', '.ics', '.msg'].includes(record.attributes.extension) && <MenuItem
+          {record.isredactionready && ['.doc','.docx','.xls','.xlsx', '.ics', '.msg'].includes(record.attributes?.extension) && <MenuItem
             onClick={() => {
                 handleDownloadPDF();
                 setPopoverOpen(false);
@@ -1010,7 +1119,7 @@ const AttachmentPopup = React.memo(({indexValue, record, handlePopupButtonClick,
             Download Original
           </MenuItem>
           <DeleteMenu />
-          {!record.isdeduplicated && record.failed && <MenuItem
+          {!record.isredactionready && record.failed && <MenuItem
             onClick={() => {
                 handleRetry();
                 setPopoverOpen(false);

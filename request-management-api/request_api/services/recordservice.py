@@ -33,41 +33,60 @@ class recordservice:
         _ministryversion = FOIMinistryRequest.getversionforrequest(ministryrequestid)
         divisions = FOIMinistryRequestDivision.getdivisions(ministryrequestid, _ministryversion)
 
-        result = {}
-        uploadedrecords = {path.splitext(record['s3uripath'])[0] : {**record, **{"isdeduplicated": False, "isduplicate": False}} for record in uploadedrecords}
+        result = {'dedupedfiles': 0, 'convertedfiles': 0}
+        uploadedrecords = {record['recordid'] : {**record, **{"isredactionready": False, "isduplicate": False}} for record in uploadedrecords}
         result['removedfiles'] = 0
         if len(uploadedrecords) > 0:
             response, err = self.__makedocreviewerrequest('GET', '/api/dedupestatus/{0}'.format(ministryrequestid))
             if err is None:
-                dedupedrecords = response['documents']
-                for dedupedrecord in dedupedrecords:
-                    if not dedupedrecord['isattachment']:
-                        record = uploadedrecords[path.splitext(dedupedrecord['filepath'])[0]]
-                        record['isdeduplicated'] = True
-                        record['isduplicate'] = dedupedrecord['isduplicate']
-                        record['attributes'] = dedupedrecord['attributes']
-                        if dedupedrecord['isduplicate']:
-                            record['duplicateof'] = dedupedrecord['duplicateof']
-                            # merge duplicate divisions with original
-                            originalrecord = uploadedrecords[path.splitext(dedupedrecord['duplicatefilepath'])[0]]
-                            divid = lambda div : div['divisionid']
-                            divobj = lambda divid : {"divisionid" : divid}
-                            originalrecord['attributes']['divisions'] = list(map(divobj, set(map(divid, originalrecord['attributes']['divisions'])).union(set(map(divid, dedupedrecord['attributes']['divisions'])))))
-
-                    if dedupedrecord['isduplicate']:
+                masterrecords = {record['documentmasterid']: record for record in response}
+                for key in masterrecords:
+                    masterrecord = masterrecords[key]
+                    if masterrecord.get('parentid', False):
+                        record = masterrecord
+                        record['isattachment'] = True
+                        record['s3uripath'] = masterrecord['filepath']
+                        record['rootparentid'] = self.__findrootparentrecordid(record['documentmasterid'], masterrecords)
+                        parentrecord = uploadedrecords[record['rootparentid']]
+                        # if not record['attributes']:
+                        #     _filename, extension = path.splitext(record['s3uripath'])
+                        #     record['attributes'] = {
+                        #         'divisions': parentrecord['attributes']['divisions'],
+                        #         'batch': parentrecord['attributes']['batch'],
+                        #         'extension': extension,
+                        #         'incompatible': extension not in FILE_CONVERSION_FILE_TYPES + DEDUPE_FILE_TYPES,
+                        #         'isattachment': True
+                        #     }
+                        parentrecord.setdefault('attachments', [])
+                        parentrecord['attachments'].append(record)
+                        if masterrecord['isduplicate']:
+                            originalrecord = masterrecords[masterrecord['duplicatemasterid']]
+                    else:
+                        record = uploadedrecords[masterrecord['recordid']]
+                        record['isduplicate'] = masterrecord['isduplicate']
+                        record['attributes'] = masterrecord['attributes']
+                        record['isredactionready'] = masterrecord['isredactionready']
+                        record['trigger'] = masterrecord['trigger']
+                        record['documentmasterid'] = masterrecord['documentmasterid']
+                        record['outputdocumentmasterid'] = masterrecord['outputdocumentmasterid']
+                        if masterrecord['isduplicate']:
+                            record['duplicateof'] = masterrecord['duplicateof']
+                            originalrecord = uploadedrecords[masterrecord['recordid']]
+                    if masterrecord['conversionstatus'] == 'error':
+                        record['failed'] = 'conversion'
+                    elif masterrecord['conversionstatus'] == 'completed':
+                        result['convertedfiles'] += 1
+                    if masterrecord['deduplicationstatus'] == 'error':
+                        record['failed'] = 'deduplication'
+                    elif masterrecord['deduplicationstatus'] == 'completed':
+                        result['dedupedfiles'] += 1
+                    if masterrecord['isduplicate']:
                         result['removedfiles'] += 1
-                # result['dedupedfiles'] = len(dedupedrecords)
-                result['dedupedfiles'] = response['filesdeduped']
-                result['convertedfiles'] = response['filesconverted']
-                for failedrecord in (response['conversionerrors']):
-                    record = uploadedrecords[path.splitext(failedrecord)[0]]
-                    record['failed'] = 'conversion'
-                for failedrecord in (response['dedupeerrors']):
-                    record = uploadedrecords[path.splitext(failedrecord)[0]]
-                    record['failed'] = 'deduplication'
-
-        else:
-            result.update({'dedupedfiles': 0, 'convertedfiles': 0})
+                        # merge duplicate divisions with original
+                        divid = lambda div : div['divisionid']
+                        divobj = lambda divid : {"divisionid" : divid}
+                        originalrecord['attributes']['divisions'] = list(map(divobj, set(map(divid, originalrecord['attributes']['divisions'])).union(set(map(divid, masterrecord['attributes']['divisions'])))))
+                # result['dedupedfiles'] = len(masterrecords)
         result['records'] = self.__format(list(uploadedrecords.values()), divisions)
         # result['batchcount'] = len(set(map(lambda record: record['attributes']['batch'], result['records'])))
         result['batchcount'] = FOIRequestRecord.getbatchcount(ministryrequestid)
@@ -82,11 +101,11 @@ class recordservice:
         newrecord.__dict__.update(record)
         response = FOIRequestRecord.create([newrecord])
         if (response.success):
-            _apiresponse, err = self.__makedocreviewerrequest('POST', '/api/document/delete', {'filepath': record['s3uripath']})
-            if err is None:
-                return DefaultMethodResult(True,'Record marked as inactive', -1, recordid)
-            else:
-                return DefaultMethodResult(False,'Error in contacting Doc Reviewer API', -1, recordid)
+            if (not record['attributes'].get('incompatible', False)):
+                _apiresponse, err = self.__makedocreviewerrequest('POST', '/api/document/delete', {'filepaths': [record['s3uripath']]})
+                if err:
+                    return DefaultMethodResult(False,'Error in contacting Doc Reviewer API', -1, recordid)
+            return DefaultMethodResult(True,'Record marked as inactive', -1, recordid)
         else:
             return DefaultMethodResult(False,'Error in deleting Record', -1, recordid)
 
@@ -112,7 +131,6 @@ class recordservice:
             })
             if err:
                 return DefaultMethodResult(False,'Error in contacting Doc Reviewer API', -1, ministryrequestid)
-            record['attributes']['trigger'] = record['trigger']
             streamobject = {
                 "s3filepath": record['s3uripath'],
                 "requestnumber": _ministryrequest['axisrequestid'],
@@ -121,10 +139,13 @@ class recordservice:
                 "ministryrequestid": ministryrequestid,
                 "attributes": json.dumps(record['attributes']),
                 "batch": record['attributes']['batch'],
-                "jobid": jobids[record['s3uripath']],
+                "jobid": jobids[record['s3uripath']]['jobid'],
+                "documentmasterid": jobids[record['s3uripath']]['masterid'],
                 "trigger": record['trigger'],
                 "createdby": record['createdby']
             }
+            if record.get('outputdocumentmasterid', False):
+                streamobject['outputdocumentmasterid'] = record['outputdocumentmasterid']
             return eventqueueservice().add(streamkey, streamobject)
 
 
@@ -146,7 +167,8 @@ class recordservice:
             recordlist.append(record)
         dbresponse = FOIRequestRecord.create(recordlist)
         if (dbresponse.success):
-            processingrecords = list(filter(lambda record: not record['attributes'].get('incompatible', False), records))
+            processingrecords = [{**record, **{"recordid": dbresponse.args[0][record['s3uripath']]['recordid']}} for record in records if not record['attributes'].get('incompatible', False)]
+            print(processingrecords)
             # record all jobs before sending first redis stream message to avoid race condition
             jobids, err = self.__makedocreviewerrequest('POST', '/api/jobstatus', {
                 'records': processingrecords,
@@ -167,7 +189,8 @@ class recordservice:
                     "ministryrequestid": ministryrequestid,
                     "attributes": json.dumps(entry['attributes']),
                     "batch": batch,
-                    "jobid": jobids[entry['s3uripath']],
+                    "jobid": jobids[entry['s3uripath']]['jobid'],
+                    "documentmasterid": jobids[entry['s3uripath']]['masterid'],
                     "trigger": 'recordupload',
                     "createdby": userid
                 }
@@ -182,6 +205,8 @@ class recordservice:
         for record in records:
             record = self.__pstformat(record)
             record = self.__attributesformat(record, divisions)
+            if (record.get('attachments', False)):
+                record['attachments'] = self.__format(record['attachments'], divisions)
         return records
 
     def __pstformat(self, record):
@@ -191,11 +216,11 @@ class recordservice:
 
     def __attributesformat(self, record, divisions):
         if isinstance(record['attributes'], str):
-            record['attributes'] = json.loads(record['attributes'])
-        attribute_divisions = record['attributes'].get('divisions')
+            record['attributes'] = json.loads(record.get('attributes'))
+        record['attributes'] = record['attributes'] or {}
+        attribute_divisions = record['attributes'].get('divisions', [])
         for division in attribute_divisions:
             division['divisionname'] = self.__getdivisionname(divisions, division['divisionid']).replace(u"’", u"'")
-        record['attributes']['divisions'] = attribute_divisions
         return record
 
     def __getdivisionname(self, divisions, divisionid):
@@ -228,5 +253,8 @@ class recordservice:
             logging.error(err)
             return None, err
 
-
+    def __findrootparentrecordid(self, masterid, records):
+        while records[masterid]['recordid'] is None:
+            masterid = records[masterid]['parentid']
+        return records[masterid]['recordid']
 

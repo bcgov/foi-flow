@@ -32,9 +32,9 @@ class FOIRequestRecord(db.Model):
     def create(cls, records):
         db.session.add_all(records)
         db.session.commit()
-        _recordids = []
+        _recordids = {}
         for record in records:
-            _recordids.append({"filename": record.filename, "recordid": record.recordid})
+            _recordids[record.s3uripath] = {"filename": record.filename, "recordid": record.recordid}
         return DefaultMethodResult(True,'Records created', -1, _recordids)
 
     @classmethod
