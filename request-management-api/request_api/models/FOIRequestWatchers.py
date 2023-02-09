@@ -115,7 +115,8 @@ class FOIRequestWatcher(db.Model):
         ]
 
         return db.session.query(
-                                FOIRequestWatcher.ministryrequestid
+                                FOIRequestWatcher.ministryrequestid,
+                                FOIRequestWatcher.watchedby
                             ).join(
                                 subquery_max,
                                 and_(*joincondition)

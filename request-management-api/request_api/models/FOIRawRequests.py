@@ -517,10 +517,19 @@ class FOIRawRequest(db.Model):
             if(isiaorestrictedfilemanager == True):
                 return basequery.filter(FOIRawRequest.status.notin_(['Archived']))
             else:
-                return basequery.filter(
-                    and_(
-                        FOIRawRequest.status.notin_(['Archived']),
-                        or_(FOIRawRequest.isiaorestricted == False, and_(FOIRawRequest.isiaorestricted == True, FOIRawRequest.assignedto == userid))))
+                subquery_watchby = FOIRawRequestWatcher.getrequestidsbyuserid(userid)
+
+                return basequery.join(
+                                    subquery_watchby,
+                                    subquery_watchby.c.requestid == FOIRawRequest.requestid,
+                                    isouter=True
+                                ).filter(
+                                    and_(
+                                        FOIRawRequest.status.notin_(['Archived']),
+                                        or_(
+                                            FOIRawRequest.isiaorestricted == False,
+                                            and_(FOIRawRequest.isiaorestricted == True, FOIRawRequest.assignedto == userid),
+                                            and_(FOIRawRequest.isiaorestricted == True, subquery_watchby.c.watchedby == userid))))
         else:
             if(additionalfilter == 'watchingRequests' and userid is not None):
                 #watchby
