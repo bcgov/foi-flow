@@ -12,7 +12,7 @@ const initialState = {
   foiAdvancedSearchParams: {},
   isAssignedToListLoading: true,
   isAttachmentListLoading: true,
-  isCommentTagListLoading: false,
+  isCommentTagListLoading: true,
   foiRequestsList: null,
   foiMinistryRequestsList: [],
   foiRequestsCount: 0,
@@ -93,8 +93,8 @@ const foiRequests = (state = initialState, action) => {
       return { ...state, isAssignedToListLoading: action.payload };
     case FOI_ACTION_CONSTANTS.IS_ATTACHMENTLIST_LOADING:
       return { ...state, isAttachmentListLoading: action.payload };
-    // case FOI_ACTION_CONSTANTS.IS_COMMENTTAGLIST_LOADING:
-    //   return { ...state, isCommentTagListLoading: action.payload };
+    case FOI_ACTION_CONSTANTS.IS_COMMENTTAGLIST_LOADING:
+      return { ...state, isCommentTagListLoading: action.payload };
     case FOI_ACTION_CONSTANTS.FOI_LIST_REQUESTS:
       return { ...state, foiRequestsList: action.payload, isLoading: false };
     case FOI_ACTION_CONSTANTS.FOI_MINISTRY_REQUESTSLIST:

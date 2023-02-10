@@ -6,6 +6,8 @@ import { ActionProvider } from './ActionContext'
 import Input from './Input'
 import CommentFilter from './CommentFilter'
 import { getMinistryRestrictedTagList } from "../../../../helper/FOI/helper";
+import Loading from "../../../../containers/Loading";
+
 
 export const CommentSection = ({
   commentsArray,
@@ -75,8 +77,10 @@ export const CommentSection = ({
       }  
   }
 
- 
+ console.log("isCommentTagListLoading:",isCommentTagListLoading);
   return (
+    !isCommentTagListLoading ? 
+    <>
     <ActionProvider
       currentUser={currentUser}
       setComment={setComment}
@@ -118,6 +122,7 @@ export const CommentSection = ({
 
       </div>
     </ActionProvider>
+    </> : <Loading />
   )
 }
 
