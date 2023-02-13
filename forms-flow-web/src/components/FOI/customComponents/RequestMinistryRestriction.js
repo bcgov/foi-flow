@@ -98,7 +98,7 @@ const RequestMinistryRestriction= ({
                 setIsRestricted('False');
                 heading = "Unrestricted File";
                 message="Are you sure you want to remove the restricted file flag on this request?";
-                description="If you unrestrict this file, only all IAO users will be able to search and find the request, and all users "+
+                description="If you unrestrict this file, all IAO users will be able to search and find the request, and all users "+
                 "on the respective Ministry will be able to see this request.";
             }
             else{
