@@ -72,9 +72,10 @@ const RequestMinistryRestriction= ({
             if(isMinistryRestrictedFileManager){
                 if(!isRequestAssignedToMinistryTeam()){
                     setIsRestricted('True');
-                    message="Are you sure you want to flag this as a restricted file ?";
+                    heading = "Restricted File";
+                    message="Are you sure you want to flag this as a restricted file?";
                     description= <span>
-                    If you change this to be a restricted file only the
+                    If you change this to be a restricted file, only the
                     <b> Ministry Manager </b>and
                     <b> any user assigned </b>
                     or selected as
@@ -96,15 +97,15 @@ const RequestMinistryRestriction= ({
             if(isMinistryRestrictedFileManager){
                 setIsRestricted('False');
                 heading = "Unrestricted File";
-                message="Are you sure you want to remove the restricted file flag on this request ?";
-                description="If you unrestrict this file only all IAO users will be able to search and find the request, and all users "+
+                message="Are you sure you want to remove the restricted file flag on this request?";
+                description="If you unrestrict this file, all IAO users will be able to search and find the request, and all users "+
                 "on the respective Ministry will be able to see this request.";
             }
             else{
                 heading = "Unrestrict File";
-                message="Only the Intake Manager can remove the restricted flag on a request";
+                message="Only the Ministry Manager can remove the restricted flag on a request";
                 description= <span>
-                    If you would like to have this request unrestricted please contact the
+                    If you would like to have this request unrestricted, please contact the
                     <b> Ministry Manager </b>
                     as they are the original user who flagged this as a restricted request.
                     </span>
