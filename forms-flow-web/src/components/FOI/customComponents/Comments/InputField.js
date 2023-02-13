@@ -46,7 +46,7 @@ const InputField = ({ cancellor, parentId, child, inputvalue, edit, main, add, f
   // Check editor text for mentions
   const onSearchChange = ({ value }) => {      
     let filterlist = mentionList.filter(function(item){      
-      return (item.firstname?.indexOf(value?.toLowerCase()) === 0 || item.lastname?.indexOf(value?.toLowerCase()) === 0)
+      return (item.firstname?.toLowerCase()?.indexOf(value?.toLowerCase()) === 0 || item.lastname?.toLowerCase()?.indexOf(value?.toLowerCase()) === 0)
     }).sort(namesort)        
     if(filterlist?.length >0 )    
       setSuggestions(defaultSuggestionsFilter(value, filterlist))
