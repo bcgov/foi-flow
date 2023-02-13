@@ -1,7 +1,7 @@
 
 from os import stat
 from re import VERBOSE
-from request_api.services.notifications.duecalculator import duecalculator
+from request_api.services.commons.duecalculator import duecalculator
 from request_api.services.notificationservice import notificationservice
 from request_api.models.FOIMinistryRequests import FOIMinistryRequest
 import json
@@ -41,7 +41,7 @@ class legislativedateevent(duecalculator):
         
     def __createnotification(self, message, requestid):
         if message is not None: 
-            return notificationservice().createnotificationwithoutcleanup({"message" : message}, requestid, "ministryrequest", self.__notificationtype(), self.__defaultuserid())
+            return notificationservice().createnotification({"message" : message}, requestid, "ministryrequest", self.__notificationtype(), self.__defaultuserid(), False)
                     
     def __upcomingduemessage(self, duedate):
         return 'Legislative Due Date due on ' + parse(str(duedate)).strftime("%Y %b %d").upper()  

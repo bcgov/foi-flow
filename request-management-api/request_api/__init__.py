@@ -20,7 +20,6 @@ import json
 import os
 import logging
 from flask import Flask
-from sbc_common_components.exception_handling.exception_handler import ExceptionHandler  # noqa: I001
 
 import request_api.config as config
 from request_api.config import _Config
@@ -47,15 +46,16 @@ SOCKETIO_CORS_ORIGIN= os.getenv('CORS_ORIGIN').split(",")
 socketio = SocketIO(logger=SOCKETIO_LOG_ENABLED, engineio_logger=SOCKETIO_LOG_ENABLED,ping_timeout=SOCKETIO_PING_TIMEOUT,ping_interval=SOCKETIO_PING_INTERVAL,cors_allowed_origins=SOCKETIO_CORS_ORIGIN)
 
 #Setup log
-configure_logging(app)
+configure_logging()
 
 # Security Response headers
 csp = (
     secure.ContentSecurityPolicy()
     .default_src("'self'")
-    .script_src("'self'")
+    .script_src("'self'","'unsafe-inline'")
+    .style_src("'self'","'unsafe-inline'")
     .object_src('self')
-    .connect_src('self')
+    .connect_src("'self'","'unsafe-inline'")
 )
 hsts = secure.StrictTransportSecurity().include_subdomains().preload().max_age(31536000)
 referrer = secure.ReferrerPolicy().no_referrer()
@@ -95,7 +95,7 @@ def create_app(run_mode=os.getenv('FLASK_ENV', 'development')):
         print("JWTSET DONE!!!!!!!!!!!!!!!!")
         setup_jwt_manager(app, jwt)
 
-    ExceptionHandler(app)
+    #ExceptionHandler(app)
 
 
     register_shellcontext(app)

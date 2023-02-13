@@ -68,7 +68,7 @@ class RestService:
                                           timeout=current_app.config.get('CONNECT_TIMEOUT', 10))
             if raise_for_status:
                 response.raise_for_status()
-        except (ReqConnectionError, ConnectTimeout) as exc:
+        except (ReqConnectionError) as exc:
             current_app.logger.error('---Error on POST---')
             current_app.logger.error(exc)
             raise ServiceUnavailableException(exc) from exc
@@ -147,7 +147,7 @@ class RestService:
         try:
             response = session.get(endpoint, headers=headers, timeout=current_app.config.get('CONNECT_TIMEOUT'))
             response.raise_for_status()
-        except (ReqConnectionError, ConnectTimeout) as exc:
+        except (ReqConnectionError) as exc:
             current_app.logger.error('---Error on GET---')
             current_app.logger.error(exc)
             raise ServiceUnavailableException(exc) from exc

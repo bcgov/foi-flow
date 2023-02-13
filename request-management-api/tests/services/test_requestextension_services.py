@@ -13,8 +13,9 @@ def pytest_namespace():
     return {'requestidtoupdate': 0}
 
 def test_create_extension(session):
-    ministryrequestid = 1
-    response = extensionservice().createrequestextnesion(ministryrequestid, requestjson, userid='dviswana@idir')
+    requestid = 1
+    ministryrequestid = 1    
+    response = extensionservice().createrequestextension(requestid, ministryrequestid, requestjson, userid='dviswana@idir')
     requestid = response.identifier
     pytest.approxrequestidtoupdate = requestid    
     assert response.success == True 

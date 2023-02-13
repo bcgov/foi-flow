@@ -29,6 +29,8 @@ class FOIMinistryRequestDivision(db.Model):
     
     divisionduedate = db.Column(db.DateTime, nullable=True)
     eapproval = db.Column(db.String(12), nullable=True)
+
+    divisionreceiveddate = db.Column(db.DateTime, nullable=True)
        
     created_at = db.Column(db.DateTime, default=datetime.now)
     updated_at = db.Column(db.DateTime, nullable=True)
@@ -51,5 +53,5 @@ class FOIMinistryRequestDivision(db.Model):
    
 class FOIMinistryRequestDivisionSchema(ma.Schema):
     class Meta:
-        fields = ('foiministrydivisionid','division.divisionid','division.name','stage.stageid','stage.name','foiministryrequest_id','foiministryrequestversion_id', 'divisionduedate', 'eapproval')
+        fields = ('foiministrydivisionid','division.divisionid','division.name','stage.stageid','stage.name','foiministryrequest_id','foiministryrequestversion_id', 'divisionduedate', 'eapproval', 'divisionreceiveddate')
     

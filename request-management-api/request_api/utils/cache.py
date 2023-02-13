@@ -15,6 +15,7 @@ import os
 
 import request_api
 import redis
+import logging
 
 class Config(object):
     ## type 'redis' is deprecated
@@ -30,7 +31,7 @@ class Config(object):
 cache_client = redis.from_url(os.getenv('CACHE_REDISURL'))
 
 ## If true, bypass cache
-def cache_filter(*args, **kwargs):
+def cache_filter():
     if os.getenv('CACHE_ENABLED') != 'Y':
         return True    
     
@@ -46,3 +47,13 @@ def response_filter(resp):
         return True
     else:
         return False
+
+
+def clear_cache():
+    try:
+        if os.getenv('CACHE_ENABLED') == 'Y':
+            cache_client.flushall()
+        return True
+    except Exception as ex:    
+        logging.error(ex)        
+    return False

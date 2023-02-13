@@ -5,6 +5,13 @@
     },
     "address":"4801",
     "assignedGroup":"Flex Team",
+    "assignedTo": "foiflex@idir",
+    "assignedToFirstName": "foiflex",
+    "assignedToLastName": "proxy",
+    "assignedministrygroup":"EDU Ministry Team",
+    "assignedministryperson":"foiedu@idir",
+    "assignedministrypersonFirstName":"foiedu",
+    "assignedministrypersonLastName":"foiedu",
     "businessName":"",
     "category":"Business",
     "categoryid":1,
@@ -32,8 +39,8 @@
     "requeststatusid":1,
     "selectedMinistries":[
        {
-          "code":"FLNR",
-          "name":"Ministry of Forests, Lands, Natural Resource Operations and Rural Development",
+          "code":"LBR",
+          "name":"Ministry of Labour",
           "selected":"true"
        }
     ],

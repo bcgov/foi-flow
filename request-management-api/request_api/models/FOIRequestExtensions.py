@@ -6,7 +6,7 @@ from sqlalchemy.orm import relationship,backref
 from .default_method_result import DefaultMethodResult
 from sqlalchemy.sql.expression import distinct
 from sqlalchemy import or_,and_,text
-
+import logging
 class FOIRequestExtension(db.Model):
     # Name of the table in our database
     __tablename__ = 'FOIRequestExtensions'   
@@ -77,12 +77,15 @@ class FOIRequestExtension(db.Model):
     
     @classmethod
     def saveextensions(cls, newextensions):
-        db.session.add_all(newextensions)
-        db.session.commit()
-        extensionids = []
-        for extension in newextensions:
-            extensionids.append(extension.foirequestextensionid)
-        return DefaultMethodResult(True,'Extensions created',-1,extensionids)
+        if(len(newextensions) > 0):
+            db.session.add_all(newextensions)
+            db.session.commit()
+            extensionids = []
+            for extension in newextensions:
+                extensionids.append(extension.foirequestextensionid)
+            return DefaultMethodResult(True,'Extensions created',-1,extensionids)
+        else:
+            return DefaultMethodResult(True,'No Extensions to add ')
 
     @classmethod
     def createextensionversion(cls,ministryrequestid,ministryrequestversion, extension, userid):
@@ -95,34 +98,47 @@ class FOIRequestExtension(db.Model):
 
     @classmethod   
     def getextensions(cls,ministryrequestid,ministryrequestversion):
-        sql = 'SELECT * FROM (SELECT DISTINCT ON (foirequestextensionid) foirequestextensionid, fre.extensionreasonid, er.reason, er.extensiontype, fre.extensionstatusid, es.name, extendedduedays, extendedduedate, decisiondate, approvednoofdays, fre.isactive, created_at , createdby, fre.version FROM "FOIRequestExtensions" fre INNER JOIN "ExtensionReasons" er ON fre.extensionreasonid = er.extensionreasonid INNER JOIN "ExtensionStatuses" es ON fre.extensionstatusid = es.extensionstatusid where foiministryrequest_id =:ministryrequestid and foiministryrequestversion_id = :ministryrequestversion ORDER BY foirequestextensionid, version DESC) AS list ORDER BY created_at DESC'
-        rs = db.session.execute(text(sql), {'ministryrequestid': ministryrequestid, 'ministryrequestversion':ministryrequestversion})
         extensions = []
-        for row in rs:
-            if row["isactive"] == True:
-                extensions.append(dict(row))
+        try:
+            sql = 'SELECT * FROM (SELECT DISTINCT ON (foirequestextensionid) foirequestextensionid, fre.extensionreasonid, er.reason, er.extensiontype, fre.extensionstatusid, es.name, extendedduedays, extendedduedate, decisiondate, approvednoofdays, fre.isactive, created_at , createdby, fre.version FROM "FOIRequestExtensions" fre INNER JOIN "ExtensionReasons" er ON fre.extensionreasonid = er.extensionreasonid INNER JOIN "ExtensionStatuses" es ON fre.extensionstatusid = es.extensionstatusid where foiministryrequest_id =:ministryrequestid and foiministryrequestversion_id = :ministryrequestversion ORDER BY foirequestextensionid, version DESC) AS list ORDER BY extensionstatusid ASC, created_at DESC'
+            rs = db.session.execute(text(sql), {'ministryrequestid': ministryrequestid, 'ministryrequestversion':ministryrequestversion})
+            for row in rs:
+                if row["isactive"] == True:
+                    extensions.append(dict(row))
+        except Exception as ex:
+            logging.error(ex)
+            raise ex
+        finally:
+            db.session.close()
         return extensions
     
     @classmethod   
     def getextensionscount(cls,ministryrequestid):
-        sql = """SELECT 
-                    count(*) as extensions_count
-                    FROM 
-                    (
-                        SELECT 
-                            DISTINCT ON (foirequestextensionid) foirequestextensionid, 
-                            fre.extensionstatusid 
+        extensioncount = 0
+        try:
+            sql = """SELECT 
+                        count(*) as extensions_count
                         FROM 
-                            "FOIRequestExtensions" fre 
-                            INNER JOIN "ExtensionStatuses" es ON fre.extensionstatusid = es.extensionstatusid 
-                        WHERE foiministryrequest_id = :ministryrequestid 
-                            AND es.extensionstatusid = 2
-                            AND fre.isactive is True
-                    ) AS list """
-        rs = db.session.execute(text(sql), {'ministryrequestid': ministryrequestid})
-        for row in rs:
-            return row["extensions_count"]
-        return None
+                        (
+                            SELECT 
+                                DISTINCT ON (foirequestextensionid) foirequestextensionid, 
+                                fre.extensionstatusid 
+                            FROM 
+                                "FOIRequestExtensions" fre 
+                                INNER JOIN "ExtensionStatuses" es ON fre.extensionstatusid = es.extensionstatusid 
+                            WHERE foiministryrequest_id = :ministryrequestid 
+                                AND es.extensionstatusid = 2
+                                AND fre.isactive is True
+                        ) AS list """
+            rs = db.session.execute(text(sql), {'ministryrequestid': ministryrequestid})
+            for row in rs:
+                extensioncount = row["extensions_count"]
+        except Exception as ex:
+            logging.error(ex)
+            raise ex
+        finally:
+            db.session.close()
+        return extensioncount
 
     @classmethod
     def getlatestapprovedextension(cls, extensionid, ministryrequestid, ministryrequestversion):   
@@ -141,11 +157,32 @@ class FOIRequestExtension(db.Model):
         return extension_schema.dump(extension)
 
     @classmethod
-    def deleteextensionbyministry(cls, ministryid):
-        db.session.query(FOIRequestExtension).filter(FOIRequestExtension.foiministryrequest_id == ministryid).delete()
-        db.session.commit()  
-        return DefaultMethodResult(True,'Extensions deleted for the ministry ', ministryid)  
+    def deleteextensionbyministryid(cls, ministryrequestid, userid):
+        db.session.query(FOIRequestExtension).filter(FOIRequestExtension.foiministryrequest_id == ministryrequestid).update({"isactive": False, "updated_at": datetime.now(),"updatedby": userid}, synchronize_session=False)
+        db.session.commit()
+        return DefaultMethodResult(True,'Extensions disabled for the ministry',ministryrequestid)
+    
+    @classmethod
+    def disableextension(cls, foirequestextensionid, userid):
+        db.session.query(FOIRequestExtension).filter(FOIRequestExtension.foirequestextensionid == foirequestextensionid).update({"isactive": False, "updated_at": datetime.now(),"updatedby": userid}, synchronize_session=False)
+        db.session.commit()
+        return DefaultMethodResult(True,'Extensions disabled for extension ',foirequestextensionid)
 
+    @classmethod
+    def disableoldversions(cls, version, ministryrequestid, userid):
+        db.session.query(FOIRequestExtension).filter(FOIRequestExtension.foiministryrequest_id == ministryrequestid,  FOIRequestExtension.foiministryrequestversion_id != version, FOIRequestExtension.isactive == True).update({"isactive": False, "updated_at": datetime.now(),"updatedby": userid}, synchronize_session=False)
+        db.session.commit()
+        return DefaultMethodResult(True,'Previous extensions disabled for ministry request ',ministryrequestid)
+
+    @classmethod
+    def disableextensions(cls, foirequestextensionids, userid):
+        if(len(foirequestextensionids) > 0):
+            db.session.query(FOIRequestExtension).filter(FOIRequestExtension.foirequestextensionid.in_(foirequestextensionids)).update({"isactive": False, "updated_at": datetime.now(),"updatedby": userid}, synchronize_session=False)
+            db.session.commit()
+            return DefaultMethodResult(True,'Extensions disabled for extension ids ','',foirequestextensionids)
+        else:
+            return DefaultMethodResult(True,'No Extensions to disable ')
+            
 class FOIRequestExtensionSchema(ma.Schema):
     class Meta:
         fields = ('foirequestextensionid', 'extensionreasonid', 'extensionstatusid', 'foiministryrequest_id', 'foiministryrequestversion_id', 'extendedduedays', 'extendedduedate', 'decisiondate', 'approvednoofdays', 'version', 'isactive')

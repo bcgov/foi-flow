@@ -7,7 +7,7 @@ from .default_method_result import DefaultMethodResult
 from sqlalchemy.dialects.postgresql import JSON, UUID
 from sqlalchemy.sql.expression import distinct
 from sqlalchemy import text
-
+import logging
 import json
 class FOIRequestNotificationUser(db.Model):
     # Name of the table in our database
@@ -52,34 +52,68 @@ class FOIRequestNotificationUser(db.Model):
     
     @classmethod 
     def getnotificationsbyid(cls, notificationuserid):
-        sql = """select notificationid, count(1) as relcount from "FOIRequestNotificationUsers" frnu 
-                    where notificationid in (select notificationid from "FOIRequestNotificationUsers" frnu  where notificationuserid  = :notificationuserid) group by notificationid """
-        rs = db.session.execute(text(sql), {'notificationuserid': notificationuserid})
         notifications = []
-        for row in rs:
-            notifications.append({"notificationid": row["notificationid"], "count" : row["relcount"]})
+        try:
+            sql = """select notificationid, count(1) as relcount from "FOIRequestNotificationUsers" frnu 
+                    where notificationid in (select notificationid from "FOIRequestNotificationUsers" frnu  where notificationuserid  = :notificationuserid) group by notificationid """
+            rs = db.session.execute(text(sql), {'notificationuserid': notificationuserid})
+        
+            for row in rs:
+                notifications.append({"notificationid": row["notificationid"], "count" : row["relcount"]})
+        except Exception as ex:
+            logging.error(ex)
+            raise ex
+        finally:
+            db.session.close()
         return notifications
     
     @classmethod 
     def getnotificationsbyuser(cls, userid):
-        sql = """select notificationid, count(1) as relcount from "FOIRequestNotificationUsers" frnu 
-                    where notificationid in (select notificationid from "FOIRequestNotificationUsers" frnu  where userid = :userid) group by notificationid """
-        rs = db.session.execute(text(sql), {'userid': userid})
         notifications = []
-        for row in rs:
-            notifications.append({"notificationid": row["notificationid"], "count" : row["relcount"]})
+        try:
+            sql = """select notificationid, count(1) as relcount from "FOIRequestNotificationUsers" frnu 
+                    where notificationid in (select notificationid from "FOIRequestNotificationUsers" frnu  where userid = :userid) group by notificationid """
+            rs = db.session.execute(text(sql), {'userid': userid})
+            for row in rs:
+                notifications.append({"notificationid": row["notificationid"], "count" : row["relcount"]})
+        except Exception as ex:
+            logging.error(ex)
+            raise ex
+        finally:
+            db.session.close()
         return notifications
     
     @classmethod 
     def getnotificationsbyuserandtype(cls, userid, notificationusertypeid):
-        sql = """select notificationid, count(1) as relcount from "FOIRequestNotificationUsers" frnu 
-                    where notificationid in (select notificationid from "FOIRequestNotificationUsers" frnu  where userid = :userid and notificationusertypeid = :notificationusertypeid) group by notificationid """
-        rs = db.session.execute(text(sql), {'userid': userid, 'notificationusertypeid':notificationusertypeid})
         notifications = []
-        for row in rs:
-            notifications.append({"notificationid": row["notificationid"], "count" : row["relcount"]})
+        try:
+            sql = """select notificationid, count(1) as relcount from "FOIRequestNotificationUsers" frnu 
+                    where notificationid in (select notificationid from "FOIRequestNotificationUsers" frnu  where userid = :userid and notificationusertypeid = :notificationusertypeid) group by notificationid """
+            rs = db.session.execute(text(sql), {'userid': userid, 'notificationusertypeid':notificationusertypeid})
+            for row in rs:
+                notifications.append({"notificationid": row["notificationid"], "count" : row["relcount"]})
+        except Exception as ex:
+            logging.error(ex)
+            raise ex
+        finally:
+            db.session.close()
         return notifications  
-
+    
+    @classmethod
+    def getnotificationidsbyuserandid(cls, userid, notificationids):
+        ids = []
+        try:
+            sql = """select notificationid from "FOIRequestNotificationUsers" where userid = :userid and notificationid = ANY(:notificationids) """
+            rs = db.session.execute(text(sql), {'userid': userid, 'notificationids': notificationids})
+            for row in rs:
+                ids.append(row["notificationid"])
+        except Exception as ex:
+            logging.error(ex)
+            raise ex
+        finally:
+            db.session.close()
+        return ids
+        
 class FOIRequestNotificationUserSchema(ma.Schema):
     class Meta:
         fields = ('notificationid', 'userid','notificationusertypeid','created_at','createdby','updated_at','updatedby') 

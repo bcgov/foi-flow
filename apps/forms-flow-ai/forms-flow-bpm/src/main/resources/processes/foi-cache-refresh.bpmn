@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_1ulxe15" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.1.0" modeler:executionPlatform="Camunda Platform" modeler:executionPlatformVersion="7.17.0">
+  <bpmn:process id="cache_refresh" name="Cache Refresh" isExecutable="true">
+    <bpmn:startEvent id="StartEvent_1">
+      <bpmn:outgoing>Flow_0qym7g1</bpmn:outgoing>
+      <bpmn:timerEventDefinition id="TimerEventDefinition_0f35rt9">
+        <bpmn:timeCycle xsi:type="bpmn:tFormalExpression">0 0/2 * 1/1 * ? *</bpmn:timeCycle>
+      </bpmn:timerEventDefinition>
+    </bpmn:startEvent>
+    <bpmn:endEvent id="Event_1v60pt7">
+      <bpmn:incoming>Flow_01j0a91</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:serviceTask id="Activity_1r0oka0" name="Get Token">
+      <bpmn:extensionElements>
+        <camunda:connector>
+          <camunda:inputOutput>
+            <camunda:inputParameter name="url">${keycloakURL}/auth/realms/${realm}/protocol/openid-connect/token</camunda:inputParameter>
+            <camunda:inputParameter name="method">POST</camunda:inputParameter>
+            <camunda:inputParameter name="headers">
+              <camunda:map>
+                <camunda:entry key="Content-Type">application/x-www-form-urlencoded</camunda:entry>
+                <camunda:entry key="Authorization">Basic ${base64userpass}</camunda:entry>
+                <camunda:entry key="Accept">application/json</camunda:entry>
+              </camunda:map>
+            </camunda:inputParameter>
+            <camunda:inputParameter name="payload">grant_type=client_credentials</camunda:inputParameter>
+            <camunda:outputParameter name="accessToken">${S(response).prop("access_token").stringValue()}</camunda:outputParameter>
+          </camunda:inputOutput>
+          <camunda:connectorId>http-connector</camunda:connectorId>
+        </camunda:connector>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0qym7g1</bpmn:incoming>
+      <bpmn:incoming>Flow_1o3gosy</bpmn:incoming>
+      <bpmn:outgoing>Flow_17bdgfc</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:serviceTask id="cache_refresh_api" name="Invoke Cache Refresh API">
+      <bpmn:extensionElements>
+        <camunda:connector>
+          <camunda:inputOutput>
+            <camunda:inputParameter name="url">${foiApiUrl}/api/foiflow/cache/flushall</camunda:inputParameter>
+            <camunda:inputParameter name="method">POST</camunda:inputParameter>
+            <camunda:inputParameter name="headers">
+              <camunda:map>
+                <camunda:entry key="Content-Type">application/json</camunda:entry>
+                <camunda:entry key="Authorization">Bearer ${accessToken}</camunda:entry>
+              </camunda:map>
+            </camunda:inputParameter>
+            <camunda:outputParameter name="responseCode">
+              <camunda:script scriptFormat="javascript">if (connector.getVariable("statusCode") != 200) {
+	throw new org.camunda.bpm.engine.delegate.BpmnError("FOI-CACHE_REFRESH-API-ERR", response);
+}
+connector.getVariable("statusCode");</camunda:script>
+            </camunda:outputParameter>
+          </camunda:inputOutput>
+          <camunda:connectorId>http-connector</camunda:connectorId>
+        </camunda:connector>
+        <camunda:executionListener event="end">
+          <camunda:script scriptFormat="javascript">var current = execution.getVariable("retry");
+execution.setVariable("retry", current+1); </camunda:script>
+        </camunda:executionListener>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_17bdgfc</bpmn:incoming>
+      <bpmn:outgoing>Flow_01j0a91</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:intermediateCatchEvent id="Event_1k8aoc7">
+      <bpmn:incoming>Flow_1ys38a6</bpmn:incoming>
+      <bpmn:outgoing>Flow_1kzesmk</bpmn:outgoing>
+      <bpmn:timerEventDefinition id="TimerEventDefinition_18j8uyi">
+        <bpmn:timeDuration xsi:type="bpmn:tFormalExpression">PT1M</bpmn:timeDuration>
+      </bpmn:timerEventDefinition>
+    </bpmn:intermediateCatchEvent>
+    <bpmn:exclusiveGateway id="Gateway_0q2f2o1">
+      <bpmn:incoming>Flow_1kzesmk</bpmn:incoming>
+      <bpmn:outgoing>Flow_1o3gosy</bpmn:outgoing>
+      <bpmn:outgoing>Flow_017kmm6</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:intermediateThrowEvent id="Event_1tmmrt5" name="API Failure Message">
+      <bpmn:incoming>Flow_017kmm6</bpmn:incoming>
+      <bpmn:messageEventDefinition id="MessageEventDefinition_0950kk2" messageRef="Message_0ly6bea" />
+    </bpmn:intermediateThrowEvent>
+    <bpmn:boundaryEvent id="Event_17odcea" attachedToRef="cache_refresh_api">
+      <bpmn:outgoing>Flow_1ys38a6</bpmn:outgoing>
+      <bpmn:errorEventDefinition id="ErrorEventDefinition_1ffvmgj" errorRef="Error_06fsjjn" camunda:errorCodeVariable="responseCode" />
+    </bpmn:boundaryEvent>
+    <bpmn:sequenceFlow id="Flow_0qym7g1" name="apply Settings" sourceRef="StartEvent_1" targetRef="Activity_1r0oka0">
+      <bpmn:extensionElements>
+        <camunda:executionListener expression="${execution.setVariable(&#34;retry&#34;, 0)}" event="take" />
+        <camunda:executionListener event="take">
+          <camunda:script scriptFormat="javascript">var system = java.lang.System;
+var base64 = java.util.Base64;
+execution.setVariable('keycloakURL', system.getenv('KEYCLOAK_URL'));
+var userpass = system.getenv('KEYCLOAK_CLIENTID').concat(':',system.getenv('KEYCLOAK_CLIENTSECRET'))
+var base64userpass = base64.getEncoder().encodeToString(userpass.getBytes());
+execution.setVariable('base64userpass', base64userpass);
+execution.setVariable('realm', system.getenv('KEYCLOAK_URL_REALM'));
+execution.setVariable('foiApiUrl', system.getenv('FOI_REQ_MANAGEMENT_API_URL'));</camunda:script>
+        </camunda:executionListener>
+      </bpmn:extensionElements>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_01j0a91" sourceRef="cache_refresh_api" targetRef="Event_1v60pt7" />
+    <bpmn:sequenceFlow id="Flow_1o3gosy" name="Retry [1..3]" sourceRef="Gateway_0q2f2o1" targetRef="Activity_1r0oka0">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${retry &lt;= 3}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_17bdgfc" sourceRef="Activity_1r0oka0" targetRef="cache_refresh_api" />
+    <bpmn:sequenceFlow id="Flow_1ys38a6" sourceRef="Event_17odcea" targetRef="Event_1k8aoc7" />
+    <bpmn:sequenceFlow id="Flow_1kzesmk" sourceRef="Event_1k8aoc7" targetRef="Gateway_0q2f2o1" />
+    <bpmn:sequenceFlow id="Flow_017kmm6" name="Retry &#62; 3" sourceRef="Gateway_0q2f2o1" targetRef="Event_1tmmrt5">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${retry &gt; 3}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+  </bpmn:process>
+  <bpmn:message id="Message_0ly6bea" name="foi-reminder-error" />
+  <bpmn:error id="Error_06fsjjn" name="FOI-CACHE_REFRESH-API-ERR" camunda:errorMessage="FOI Request invocation failed." />
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="cache_refresh">
+      <bpmndi:BPMNEdge id="Flow_0qym7g1_di" bpmnElement="Flow_0qym7g1">
+        <di:waypoint x="188" y="120" />
+        <di:waypoint x="293" y="120" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="198" y="102" width="70" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_01j0a91_di" bpmnElement="Flow_01j0a91">
+        <di:waypoint x="583" y="120" />
+        <di:waypoint x="685" y="120" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1o3gosy_di" bpmnElement="Flow_1o3gosy">
+        <di:waypoint x="508" y="293" />
+        <di:waypoint x="343" y="293" />
+        <di:waypoint x="343" y="160" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="403" y="276" width="54" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_17bdgfc_di" bpmnElement="Flow_17bdgfc">
+        <di:waypoint x="393" y="120" />
+        <di:waypoint x="483" y="120" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1ys38a6_di" bpmnElement="Flow_1ys38a6">
+        <di:waypoint x="533" y="178" />
+        <di:waypoint x="533" y="205" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1kzesmk_di" bpmnElement="Flow_1kzesmk">
+        <di:waypoint x="533" y="241" />
+        <di:waypoint x="533" y="268" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_017kmm6_di" bpmnElement="Flow_017kmm6">
+        <di:waypoint x="558" y="293" />
+        <di:waypoint x="685" y="293" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="600" y="275" width="45" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Event_1u3lluf_di" bpmnElement="StartEvent_1">
+        <dc:Bounds x="152" y="102" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1v60pt7_di" bpmnElement="Event_1v60pt7">
+        <dc:Bounds x="685" y="102" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1r0oka0_di" bpmnElement="Activity_1r0oka0">
+        <dc:Bounds x="293" y="80" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0gfn3o4_di" bpmnElement="cache_refresh_api">
+        <dc:Bounds x="483" y="80" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1k8aoc7_di" bpmnElement="Event_1k8aoc7">
+        <dc:Bounds x="515" y="205" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_0q2f2o1_di" bpmnElement="Gateway_0q2f2o1" isMarkerVisible="true">
+        <dc:Bounds x="508" y="268" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1b3k3ug_di" bpmnElement="Event_1tmmrt5">
+        <dc:Bounds x="685" y="275" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="677" y="318" width="55" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_17odcea_di" bpmnElement="Event_17odcea">
+        <dc:Bounds x="515" y="142" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="548" y="182" width="25" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

@@ -43,7 +43,7 @@ def update_failed_gl_codes(transaction_numbers: List[str]) -> None:  # pylint: d
             payment_details: dict = fee_service.get_paybc_transaction_details()
             print('Received payment details', payment_details.get('paymentstatus'))
             # Process only of the status of the payment is PAID, else ignore
-            if payment_details and payment_details.get('paymentstatus') == 'PAID':
+            if payment_details.get('paymentstatus') == 'PAID':
                 has_gl_completed: bool = True
                 # Check if any of the revenue line GL status is REJCTED or PAID (and not COMPLETED)
                 for revenue in payment_details.get('revenue'):

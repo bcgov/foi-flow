@@ -6,7 +6,7 @@ from sqlalchemy.orm import relationship,backref
 from .default_method_result import DefaultMethodResult
 from sqlalchemy.sql.expression import distinct
 from sqlalchemy import or_,and_,text
-
+import logging
 class FOIRawRequestDocument(db.Model):
     # Name of the table in our database
     __tablename__ = 'FOIRawRequestDocuments'
@@ -35,12 +35,19 @@ class FOIRawRequestDocument(db.Model):
 
     @classmethod
     def getdocuments(cls,requestid, requestversion):
-        sql = 'SELECT * FROM (SELECT DISTINCT ON (foidocumentid) foidocumentid, filename, documentpath, category, isactive, created_at , createdby FROM "FOIRawRequestDocuments" where foirequest_id =:requestid and foirequestversion_id = :requestversion ORDER BY foidocumentid, version DESC) AS list ORDER BY created_at DESC'
-        rs = db.session.execute(text(sql), {'requestid': requestid, 'requestversion': requestversion})
         documents = []
-        for row in rs:
-            if row["isactive"] == True:
-                documents.append({"foidocumentid": row["foidocumentid"], "filename": row["filename"], "documentpath": row["documentpath"], "category": row["category"], "created_at": row["created_at"].strftime('%Y-%m-%d %H:%M:%S.%f'), "createdby": row["createdby"]})
+        try:
+            sql = 'SELECT * FROM (SELECT DISTINCT ON (foidocumentid) foidocumentid, filename, documentpath, category, isactive, created_at , createdby FROM "FOIRawRequestDocuments" where foirequest_id =:requestid and foirequestversion_id = :requestversion ORDER BY foidocumentid, version DESC) AS list ORDER BY created_at DESC'
+            rs = db.session.execute(text(sql), {'requestid': requestid, 'requestversion': requestversion})
+        
+            for row in rs:
+                if row["isactive"] == True:
+                    documents.append({"foidocumentid": row["foidocumentid"], "filename": row["filename"], "documentpath": row["documentpath"], "category": row["category"], "created_at": row["created_at"].strftime('%Y-%m-%d %H:%M:%S.%f'), "createdby": row["createdby"]})
+        except Exception as ex:
+            logging.error(ex)
+            raise ex
+        finally:
+            db.session.close()
         return documents 
     
     @classmethod
@@ -66,7 +73,13 @@ class FOIRawRequestDocument(db.Model):
         newdocument = FOIRawRequestDocument(documentpath=document["documentpath"], foidocumentid=document["foidocumentid"], version=document["version"], filename=document["filename"], category=document["category"], isactive=document["isactive"], foirequest_id=requestid, foirequestversion_id=requestversion, created_at=datetime.now(), createdby=userid)
         db.session.add(newdocument)
         db.session.commit()               
-        return DefaultMethodResult(True,'New Document version created', newdocument.foidocumentid)   
+        return DefaultMethodResult(True,'New Document version created', newdocument.foidocumentid)
+
+    @classmethod
+    def deActivaterawdocumentsversion(cls, documentid, currentversion, userid)->DefaultMethodResult:
+        db.session.query(FOIRawRequestDocument).filter(FOIRawRequestDocument.foidocumentid == documentid, FOIRawRequestDocument.version != currentversion).update({"isactive": False, "updated_at": datetime.now(),"updatedby": userid}, synchronize_session=False)
+        db.session.commit()
+        return DefaultMethodResult(True,'Raw Request Document Updated',documentid) 
     
     
 class FOIRawRequestDocumentSchema(ma.Schema):

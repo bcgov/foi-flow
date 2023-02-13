@@ -32,15 +32,15 @@ namespace MCS.FOI.AXISIntegration.DAL
             return code switch
             {
                 "AED" => "AEST",
-                "AGR" => "AFF",
+                "AGR" => "AGR",
                 "MAG" => "AG",
                 "CFD" => "MCF",
                 "CTZ" => "CITZ",
-                "EDU" => "EDUC",
+                "EDU" => "EDU",
                 "EML" => "EMLI",
                 "MOE" => "ENV",
                 "FIN" => "FIN",
-                "FNR" => "FLNR",
+                "FNR" => "FOR",
                 "HLTH" => "HLTH",
                 "IRR" => "IRR",
                 "JER" => "JERI",

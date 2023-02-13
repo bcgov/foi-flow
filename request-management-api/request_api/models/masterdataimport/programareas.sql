@@ -1,18 +1,20 @@
 
 INSERT INTO public."ProgramAreas"(name, type, isactive, bcgovcode, iaocode) VALUES ('Ministry of Advanced Education and Skills Training','BC GOV Ministry', True,'AEST','AED');
-INSERT INTO public."ProgramAreas"(name, type, isactive, bcgovcode, iaocode) VALUES ('Ministry of Agriculture, Food and Fisheries','BC GOV Ministry', True,'AFF','AGR');
+INSERT INTO public."ProgramAreas"(name, type, isactive, bcgovcode, iaocode) VALUES ('Ministry of Agriculture and Food','BC GOV Ministry', True,'AGR','AGR');
 INSERT INTO public."ProgramAreas"(name, type, isactive, bcgovcode, iaocode) VALUES ('Ministry of Attorney General','BC GOV Ministry', True,'AG','MAG');
 INSERT INTO public."ProgramAreas"(name, type, isactive, bcgovcode, iaocode) VALUES ('Ministry of Children and Family Development','BC GOV Ministry', True,'MCF','CFD');
 INSERT INTO public."ProgramAreas"(name, type, isactive, bcgovcode, iaocode) VALUES ('Ministry of Citizens’ Services','BC GOV Ministry', True,'CITZ','CTZ');
-INSERT INTO public."ProgramAreas"(name, type, isactive, bcgovcode, iaocode) VALUES ('Ministry of Education','BC GOV Ministry', True,'EDUC','EDU');
+INSERT INTO public."ProgramAreas"(name, type, isactive, bcgovcode, iaocode) VALUES ('Ministry of Education and Childcare','BC GOV Ministry', True,'EDU','EDU');
 INSERT INTO public."ProgramAreas"(name, type, isactive, bcgovcode, iaocode) VALUES ('Ministry of Energy, Mines and Low Carbon Innovation','BC GOV Ministry', True,'EMLI','EML');
 INSERT INTO public."ProgramAreas"(name, type, isactive, bcgovcode, iaocode) VALUES ('Ministry of Environment and Climate Change Strategy','BC GOV Ministry', True,'ENV','MOE');
 INSERT INTO public."ProgramAreas"(name, type, isactive, bcgovcode, iaocode) VALUES ('Ministry of Finance','BC GOV Ministry', True,'FIN','FIN');
-INSERT INTO public."ProgramAreas"(name, type, isactive, bcgovcode, iaocode) VALUES ('Ministry of Forests, Lands, Natural Resource Operations and Rural Development','BC GOV Ministry', True,'FLNR','FNR');
+INSERT INTO public."ProgramAreas"(name, type, isactive, bcgovcode, iaocode) VALUES ('Ministry of Forests','BC GOV Ministry', True,'FOR','FOR');
 INSERT INTO public."ProgramAreas"(name, type, isactive, bcgovcode, iaocode) VALUES ('Ministry of Health','BC GOV Ministry', True,'HLTH','HTH');
 INSERT INTO public."ProgramAreas"(name, type, isactive, bcgovcode, iaocode) VALUES ('Ministry of Indigenous Relations and Reconciliation','BC GOV Ministry', True,'IRR','IRR');
+INSERT INTO public."ProgramAreas"(name, type, isactive, bcgovcode, iaocode) VALUES ('Ministry of Declaration Act Secretariat','BC GOV Ministry', True,'DAS','DAS');
 INSERT INTO public."ProgramAreas"(name, type, isactive, bcgovcode, iaocode) VALUES ('Ministry of Jobs, Economic Recovery and Innovation','BC GOV Ministry', True,'JERI','JER');
 INSERT INTO public."ProgramAreas"(name, type, isactive, bcgovcode, iaocode) VALUES ('Ministry of Labour','BC GOV Ministry', True,'LBR','LBR');
+INSERT INTO public."ProgramAreas"(name, type, isactive, bcgovcode, iaocode) VALUES ('Ministry of Lands, Water and Resource Stewardship','BC GOV Ministry', True,'LWR','LWR');
 INSERT INTO public."ProgramAreas"(name, type, isactive, bcgovcode, iaocode) VALUES ('Ministry of Mental Health and Addictions','BC GOV Ministry', True,'MMHA','MHA');
 INSERT INTO public."ProgramAreas"(name, type, isactive, bcgovcode, iaocode) VALUES ('Ministry of Municipal Affairs','BC GOV Ministry', True,'MUNI','MMA');
 INSERT INTO public."ProgramAreas"(name, type, isactive, bcgovcode, iaocode) VALUES ('Ministry of Public Safety and Solicitor General','BC GOV Ministry', True,'PSSG','PSS');

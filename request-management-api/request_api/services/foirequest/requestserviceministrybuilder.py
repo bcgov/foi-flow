@@ -34,7 +34,7 @@ class requestserviceministrybuilder(requestserviceconfigurator):
         foirequest.createdby = userid
         return foirequest
     
-    def createfoiministryrequestfromobject(self, ministryschema, requestschema, userid):
+    def createfoiministryrequestfromobject(self, ministryschema, requestschema, userid, usertype = None):
         requestdict = self.createfoiministryrequestfromobject1(ministryschema, requestschema)
         foiministryrequest = FOIMinistryRequest()
         foiministryrequest.foiministryrequestid = ministryschema["foiministryrequestid"] 
@@ -47,28 +47,29 @@ class requestserviceministrybuilder(requestserviceconfigurator):
         foiministryrequest.filenumber = ministryschema["filenumber"]
         foiministryrequest.axissyncdate = ministryschema["axissyncdate"]
         foiministryrequest.axisrequestid = ministryschema["axisrequestid"]
+        foiministryrequest.requestpagecount = ministryschema["requestpagecount"]
         foiministryrequest.cfrduedate = requestdict['cfrduedate']
         foiministryrequest.startdate = requestdict['startdate']
         foiministryrequest.duedate = requestdict['duedate']
         foiministryrequest.assignedministrygroup = requestdict['assignedministrygroup']
         if 'assignedministryperson' in requestschema and requestschema['assignedministryperson'] not in (None,''):
             foiministryrequest.assignedministryperson = requestschema['assignedministryperson']
-            firstname = requestschema['assignedministrypersonFirstName'] if requestschema['assignedministryperson'] != None else None
+            firstname = requestschema['assignedministrypersonFirstName']
             middlename = None
-            lastname = requestschema['assignedministrypersonLastName'] if requestschema['assignedministryperson'] != None else None
+            lastname = requestschema['assignedministrypersonLastName']
             self.createfoiassigneefromobject(requestschema['assignedministryperson'], firstname, middlename, lastname)
         else:
             foiministryrequest.assignedministryperson = ministryschema["assignedministryperson"]
 
-        foiministryrequest.assignedgroup = requestdict['assignedgroup']
+        foiministryrequest.assignedgroup = requestschema['assignedgroup'] if 'assignedgroup' in requestschema and requestschema['assignedgroup'] not in (None,'') else requestdict['assignedgroup']
         if 'assignedto' in requestschema and requestschema['assignedto'] not in (None,''):
             foiministryrequest.assignedto = requestschema['assignedto']
-            fn = requestschema['assignedtoFirstName'] if requestschema['assignedto'] != None else None
+            fn = requestschema['assignedToFirstName'] if requestschema['assignedto'] != None else None
             mn = None
-            ln = requestschema['assignedtoLastName'] if requestschema['assignedto'] != None else None
+            ln = requestschema['assignedToLastName'] if requestschema['assignedto'] != None else None
             self.createfoiassigneefromobject(requestschema['assignedto'], fn, mn, ln)
         else:
-            foiministryrequest.assignedto = ministryschema["assignedto"]
+            foiministryrequest.assignedto = None if usertype == "iao" and 'assignedto' in requestschema and requestschema['assignedto'] in (None, '') else ministryschema["assignedto"] 
 
         foiministryrequest.requeststatusid = requestdict['requeststatusid']
         foiministryrequest.programareaid = requestdict['programareaid']
@@ -100,14 +101,16 @@ class requestserviceministrybuilder(requestserviceconfigurator):
         }
     
     def createfoirequestdocuments(self,requestschema, ministryrequestid, activeversion, userid):
-        documentarr = []
-        documents = FOIMinistryRequestDocument().getdocuments(ministryrequestid, activeversion-1)
-        existingdocuments = self.createfoirequestdocumentfromobject(documents,ministryrequestid ,activeversion, userid)       
-        documentarr = existingdocuments
+        # documents = FOIMinistryRequestDocument().getdocuments(ministryrequestid, activeversion-1)
+        # make isactive = False for all ministryRequestId and prev ministryVersion
+        # FOIMinistryRequestDocument.deActivateministrydocumentsversionbyministry(ministryrequestid, activeversion, userid)
+        
+        # existingdocuments = self.createfoirequestdocumentfromobject(documents,ministryrequestid ,activeversion, userid)       
+        # documentarr = existingdocuments
         if 'documents' in requestschema:
-            newdocuments = self.createfoirequestdocument(requestschema,ministryrequestid ,activeversion, userid)  
-            documentarr = newdocuments + existingdocuments
-        return documentarr
+            return self.createfoirequestdocument(requestschema,ministryrequestid ,activeversion, userid)  
+            # documentarr = newdocuments #+ existingdocuments
+        return []
 
     def createfoirequestextensions(self, ministryrequestid, activeversion, userid):
         extensions = FOIRequestExtension().getextensions(ministryrequestid, activeversion-1)
@@ -115,8 +118,7 @@ class requestserviceministrybuilder(requestserviceconfigurator):
         existingextensions = self.createfoirequestextensionfromobject(extensions,ministryrequestid ,activeversion, userid)
         if existingextensions is not None:
             return existingextensions
-        else:
-            return []
+        return []
     
     def createfoirequestappplicantfromobject(self, requestapplicants, requestid, version, userid): 
         requestapplicantarr = []
@@ -163,6 +165,7 @@ class requestserviceministrybuilder(requestserviceconfigurator):
             ministrydivision.stageid = division["stage.stageid"]
             ministrydivision.divisionduedate = division["divisionduedate"]
             ministrydivision.eapproval = division["eapproval"]
+            ministrydivision.divisionreceiveddate = division["divisionreceiveddate"]
             ministrydivision.foiministryrequest_id = requestid
             ministrydivision.foiministryrequestversion_id = version
             ministrydivision.createdby = userid
@@ -242,7 +245,7 @@ class requestserviceministrybuilder(requestserviceconfigurator):
                 ministrydocument.createdby = userid
                 ministrydocument.created_at = datetime2.now().isoformat()
                 documentarr.append(ministrydocument)
-            return documentarr    
+        return documentarr    
     
     def createfoirequestdivision(self, requestschema, requestid, version, userid):
         divisionarr = []
@@ -253,6 +256,7 @@ class requestserviceministrybuilder(requestserviceconfigurator):
                 ministrydivision.stageid = division["stageid"]
                 ministrydivision.divisionduedate = division["divisionDueDate"] if "divisionDueDate" in division and division["divisionDueDate"] != '' else None
                 ministrydivision.eapproval = division["eApproval"] if "eApproval" in division else None
+                ministrydivision.divisionreceiveddate = division["divisionReceivedDate"] if "divisionReceivedDate" in division and division["divisionReceivedDate"] != '' else None
                 ministrydivision.foiministryrequest_id = requestid
                 ministrydivision.foiministryrequestversion_id = version
                 ministrydivision.createdby = userid

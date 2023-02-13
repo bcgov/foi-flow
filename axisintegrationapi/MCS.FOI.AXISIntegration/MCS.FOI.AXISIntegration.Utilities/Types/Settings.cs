@@ -6,5 +6,7 @@
     public class Settings
     {
         public ConnectionStrings ConnectionStrings { get; set; }
+
+        public FOIFlowConnectionStrings FOIFlowConnectionStrings { get; set; }
     }
 }

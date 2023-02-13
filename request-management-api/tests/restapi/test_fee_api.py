@@ -10,9 +10,10 @@ def test_get_fee(app, client, fee_code, expected_status_code):
     response = client.get(f'/api/fees/{fee_code}', content_type='application/json')
     assert response.status_code == expected_status_code
 
-
+with open('tests/samplerequestjson/rawrequest.json') as x:
+  rawrequestjson = json.load(x)
 def test_create_payment(app, client):
-    foi_req = client.post(f'/api/foirawrequests', data=json.dumps({'requestData': {}}), content_type='application/json')
+    foi_req = client.post(f'/api/foirawrequests', data=json.dumps(rawrequestjson), content_type='application/json')
     request_id = foi_req.json.get('id')
     fee_code = 'FOI0001'
     pay_response = client.post(f'/api/foirawrequests/{request_id}/payments', data=json.dumps({
@@ -24,7 +25,8 @@ def test_create_payment(app, client):
     assert pay_response.json.get('total') == fee_response.json.get('total')
     assert pay_response.json.get('status') == 'PENDING'
 
-
+with open('tests/samplerequestjson/rawrequest.json') as x:
+  rawrequestjson = json.load(x)
 def test_complete_payment(app, client, monkeypatch):
     with app.app_context():
         fee_code = 'FOI0001'
@@ -42,7 +44,7 @@ def test_complete_payment(app, client, monkeypatch):
         monkeypatch.setattr('request_api.services.fee_service.FeeService.get_paybc_transaction_details',
                             mock_paybc_response)
 
-        foi_req = client.post(f'/api/foirawrequests', data=json.dumps({'requestData': {}}),
+        foi_req = client.post(f'/api/foirawrequests', data=json.dumps(rawrequestjson),
                               content_type='application/json')
         request_id = foi_req.json.get('id')
 
@@ -66,11 +68,13 @@ class TestResponse:
         self.status_code = status_code
         self.content = content
         self.headers = headers
-        
+
+with open('tests/samplerequestjson/rawrequest.json') as x:
+  rawrequestjson = json.load(x)        
 def test_generate_receipt(app, client, monkeypatch):
     with app.app_context():
         
-        foi_req = client.post(f'/api/foirawrequests', data=json.dumps({'requestData': {}}), content_type='application/json')
+        foi_req = client.post(f'/api/foirawrequests', data=json.dumps(rawrequestjson), content_type='application/json')
         
         request_id = foi_req.json.get('id')
         fee_code = 'FOI0001'

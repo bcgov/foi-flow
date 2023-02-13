@@ -7,7 +7,7 @@ from .default_method_result import DefaultMethodResult
 from sqlalchemy.dialects.postgresql import JSON, UUID
 from sqlalchemy.sql.expression import distinct
 from sqlalchemy import text, and_, func
-
+import logging
 import json
 class FOIRequestWatcher(db.Model):
     # Name of the table in our database
@@ -41,24 +41,68 @@ class FOIRequestWatcher(db.Model):
         return DefaultMethodResult(True,'Request added')
 
     @classmethod
-    def getMinistrywatchers(cls, ministryrequestid):                
-        sql = 'select distinct on (watchedby, watchedbygroup) watchedby, watchedbygroup, isactive from "FOIRequestWatchers" where ministryrequestid=:ministryrequestid and watchedbygroup like \'%Ministry Team\' order by watchedby, watchedbygroup, created_at desc'
-        rs = db.session.execute(text(sql), {'ministryrequestid': ministryrequestid})
-        watchers = []
-        for row in rs:
-            if row["isactive"] == True:
-                watchers.append({"watchedby": row["watchedby"], "watchedbygroup": row["watchedbygroup"]})
+    def getMinistrywatchers(cls, ministryrequestid):
+        watchers = []                
+        try:
+            sql = 'select distinct on (watchedby, watchedbygroup) watchedby, watchedbygroup, isactive from "FOIRequestWatchers" where ministryrequestid=:ministryrequestid and watchedbygroup like \'%Ministry Team\' order by watchedby, watchedbygroup, created_at desc'
+            rs = db.session.execute(text(sql), {'ministryrequestid': ministryrequestid})        
+            for row in rs:
+                if row["isactive"] == True:
+                    watchers.append({"watchedby": row["watchedby"], "watchedbygroup": row["watchedbygroup"]})
+        except Exception as ex:
+            logging.error(ex)
+            raise ex
+        finally:
+            db.session.close()
         return watchers 
     
     @classmethod
-    def getNonMinistrywatchers(cls, ministryrequestid):                
-        sql = 'select distinct on (watchedby, watchedbygroup) watchedby, watchedbygroup, isactive from "FOIRequestWatchers" where ministryrequestid=:ministryrequestid and watchedbygroup not like \'%Ministry Team\' order by watchedby, watchedbygroup, created_at desc'
-        rs = db.session.execute(text(sql), {'ministryrequestid': ministryrequestid})
-        watchers = []
-        for row in rs:
-            if row["isactive"] == True:
-                watchers.append({"watchedby": row["watchedby"], "watchedbygroup": row["watchedbygroup"]})
+    def getNonMinistrywatchers(cls, ministryrequestid):
+        watchers = []     
+        try:           
+            sql = 'select distinct on (watchedby, watchedbygroup) watchedby, watchedbygroup, isactive from "FOIRequestWatchers" where ministryrequestid=:ministryrequestid and watchedbygroup not like \'%Ministry Team\' order by watchedby, watchedbygroup, created_at desc'
+            rs = db.session.execute(text(sql), {'ministryrequestid': ministryrequestid})        
+            for row in rs:
+                if row["isactive"] == True:
+                    watchers.append({"watchedby": row["watchedby"], "watchedbygroup": row["watchedbygroup"]})
+        except Exception as ex:
+            logging.error(ex)
+            raise ex
+        finally:
+            db.session.close()
         return watchers 
+
+    @classmethod
+    def isaiaoministryrequestwatcher(cls, ministryrequestid,userid):
+        _iswatcher = False    
+        try:           
+            sql = 'select distinct on (watchedby, watchedbygroup) watchedby, watchedbygroup, isactive from "FOIRequestWatchers" where ministryrequestid=:ministryrequestid and watchedby=:watchedby  and watchedbygroup not like \'%Ministry Team\' order by watchedby, watchedbygroup, created_at desc'
+            rs = db.session.execute(text(sql), {'ministryrequestid': ministryrequestid,'watchedby':userid})        
+            for row in rs:
+                if row["isactive"] == True:
+                    _iswatcher = True
+        except Exception as ex:
+            logging.error(ex)
+            raise ex
+        finally:
+            db.session.close()
+        return _iswatcher 
+
+    @classmethod
+    def isaministryministryrequestwatcher(cls, ministryrequestid,userid):
+        _iswatcher = False    
+        try:           
+            sql = 'select distinct on (watchedby, watchedbygroup) watchedby, watchedbygroup, isactive from "FOIRequestWatchers" where ministryrequestid=:ministryrequestid and watchedby=:watchedby  and watchedbygroup like \'%Ministry Team\' order by watchedby, watchedbygroup, created_at desc'
+            rs = db.session.execute(text(sql), {'ministryrequestid': ministryrequestid,'watchedby':userid})        
+            for row in rs:
+                if row["isactive"] == True:
+                    _iswatcher = True
+        except Exception as ex:
+            logging.error(ex)
+            raise ex
+        finally:
+            db.session.close()
+        return _iswatcher 
 
     @classmethod
     def getrequestidsbyuserid(cls, userid):
@@ -71,7 +115,8 @@ class FOIRequestWatcher(db.Model):
         ]
 
         return db.session.query(
-                                FOIRequestWatcher.ministryrequestid
+                                FOIRequestWatcher.ministryrequestid,
+                                FOIRequestWatcher.watchedby
                             ).join(
                                 subquery_max,
                                 and_(*joincondition)

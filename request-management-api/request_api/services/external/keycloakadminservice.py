@@ -2,6 +2,7 @@ import requests
 import os
 import ast
 import request_api
+from request_api.models.OperatingTeams import OperatingTeam
 
 
 class KeycloakAdminService:
@@ -57,11 +58,11 @@ class KeycloakAdminService:
     def getgroupsandmembers(self, allowedgroups = None):
         allowedgroups = self.getgroups(allowedgroups)
         for group in allowedgroups:
-            group["members"] = self.getgroupmembersbyid(group["id"], group["name"])
+            group["members"] = self.getgroupmembersbyid(group["id"])
         return allowedgroups  
     
 
-    def getgroupmembersbyid(self, groupid, groupname):
+    def getgroupmembersbyid(self, groupid):
         groupurl ='{0}/auth/admin/realms/{1}/groups/{2}/members'.format(self.keycloakhost,self.keycloakrealm,groupid)
         groupresponse = requests.get(groupurl, headers=self.getheaders())
         users = []
@@ -74,11 +75,17 @@ class KeycloakAdminService:
     def __createuser(self, user):
         return {
                 'id':user['id'],
-                'username':user['username'],                       
+                'username': self.__formatusername(user),                       
                 'email': user['email'] if 'email' in user is not None else None,
                 'firstname':user['firstName'] if 'firstName' in user is not None else None,
                 'lastname': user['lastName'] if 'lastName' in user is not None else None                        
             } 
+
+    def __formatusername(self,user):
+        if "attributes" in user and "idir_username" in user["attributes"]:
+            _username = user["attributes"]["idir_username"][0].lower()
+            return _username+"@idir" if _username.endswith("@idir") == False else _username
+        return user['username']
         
     def getheaders(self):
         return {
@@ -88,6 +95,15 @@ class KeycloakAdminService:
     
     def formatgroupname(self,input):
         return input.lower().replace(' ', '')  
+
+    def getmembersbygroupname(self, groupname):
+        _groups = []
+        _groups.append({"name":groupname, "type": OperatingTeam.gettype(groupname)})
+        allowedgroups = self.getgroups(_groups)
+        for group in allowedgroups:
+            if(group["name"] == groupname):
+                group["members"] = self.getgroupmembersbyid(group["id"])
+        return allowedgroups
         
 
     

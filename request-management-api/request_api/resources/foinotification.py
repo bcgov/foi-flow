@@ -97,3 +97,23 @@ class FOIReminderNotification(Resource):
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500
         
+
+@cors_preflight('POST,OPTIONS')
+@API.route('/foinotifications/<int:request_id>/ministryrequest/<int:ministry_request_id>/payment/expiry')
+class FOIReminderNotification(Resource):
+    """Resource for managing FOI requests."""
+
+       
+    @staticmethod
+    @TRACER.trace()
+    @cross_origin(origins=allowedorigins())
+    @auth.require
+    def post(request_id: int, ministry_request_id: int):      
+        try:
+            reminderresponse = eventservice().postpaymentexpiryevent(ministry_request_id)
+            respcode = 200 if reminderresponse.success == True else 500
+            return {'status': reminderresponse.success, 'message':reminderresponse.message,'id': reminderresponse.identifier} , respcode
+        except KeyError as err:
+            return {'status': False, 'message':err.messages}, 400        
+        except BusinessException as exception:            
+            return {'status': exception.status_code, 'message':exception.message}, 500

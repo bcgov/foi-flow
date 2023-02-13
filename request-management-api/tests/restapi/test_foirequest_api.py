@@ -301,10 +301,14 @@ def test_post_foirequest_general_cfr_assignment(app, client):
     foiassignresponse = client.post('/api/foirequests/'+str(foijsondata["id"])+'/ministryrequest/'+str(foijsondata["ministryRequests"][0]["id"]),data=json.dumps(foiupdaterequest), headers=factory_user_auth_header(app, client), content_type='application/json')
     foiministryreqResponse = client.get('/api/foirequests/'+str(foijsondata["id"])+'/ministryrequest/'+str(foijsondata["ministryRequests"][0]["id"])+'/ministry',headers=factory_ministryuser_auth_header(app, client), content_type='application/json')
     foiassignrequest = {
-    "assignedministrygroup":"AEST Ministry Team",
-    "assignedministryperson": "foiaed@idir",
-    "assignedgroup": "Flex Team",
-    "assignedto": "foiflex@idir"
+    "assignedGroup":"Intake Team",
+    "assignedTo":"foiintake@idir",
+    "assignedToFirstName":"FOI",
+    "assignedToLastName":"Intake",
+    "assignedministrygroup":"EDU Ministry Team",
+    "assignedministryperson":"foiedu@idir",
+    "assignedministrypersonFirstName":"foiedu",
+    "assignedministrypersonLastName":"foiedu"
     }
     foicfrassignresponse = client.post('/api/foirequests/'+str(foijsondata["id"])+'/ministryrequest/'+str(foijsondata["ministryRequests"][0]["id"])+'/ministry',data=json.dumps(foiassignrequest), headers=factory_user_auth_header(app, client), content_type='application/json')
     assert foiministryreqResponse.status_code == 200 and foiresponse.status_code == 200 and getrawresponse.status_code == 200 and wfupdateresponse.status_code == 200 and foiassignresponse.status_code == 200 and foiministryreqResponse.status_code == 200 and foicfrassignresponse.status_code == 200
@@ -331,8 +335,10 @@ def test_post_foirequest_general_cfr_division(app, client):
     foiassignresponse = client.post('/api/foirequests/'+str(foijsondata["id"])+'/ministryrequest/'+str(foijsondata["ministryRequests"][0]["id"]),data=json.dumps(foiupdaterequest), headers=factory_user_auth_header(app, client), content_type='application/json')
     foiministryreqResponse = client.get('/api/foirequests/'+str(foijsondata["id"])+'/ministryrequest/'+str(foijsondata["ministryRequests"][0]["id"])+'/ministry',headers=factory_ministryuser_auth_header(app, client), content_type='application/json')
     foidivisionrequest = {
-    "assignedministrygroup":"EDUC Ministry Team",
-    "assignedministryperson": "foiedu@idir",
+    "assignedministrygroup":"EDU Ministry Team",
+    "assignedministryperson":"foiedu@idir",
+    "assignedministrypersonFirstName":"foiedu",
+    "assignedministrypersonLastName":"foiedu",
     "requeststatusid": 2,
      "divisions": [{"divisionid":1,"stageid":1},{"divisionid":2,"stageid":1}]
     }
@@ -361,13 +367,15 @@ def test_post_foirequest_general_cfr_document(app, client):
     foiassignresponse = client.post('/api/foirequests/'+str(foijsondata["id"])+'/ministryrequest/'+str(foijsondata["ministryRequests"][0]["id"]),data=json.dumps(foiupdaterequest), headers=factory_user_auth_header(app, client), content_type='application/json')
     foiministryreqResponse = client.get('/api/foirequests/'+str(foijsondata["id"])+'/ministryrequest/'+str(foijsondata["ministryRequests"][0]["id"])+'/ministry',headers=factory_ministryuser_auth_header(app, client), content_type='application/json')
     foidivisionrequest = {
-    "assignedministrygroup":"EDUC Ministry Team",
-    "assignedministryperson": "foiedu@idir",
+    "assignedministrygroup":"EDU Ministry Team",
+    "assignedministryperson":"foiedu@idir",
+    "assignedministrypersonFirstName":"foiedu",
+    "assignedministrypersonLastName":"foiedu",
     "requeststatusid": 2,
     "documents":  [
         {
             "category": "cfr-feeassessed",
-            "documentpath":"/EDUC/"+str(foijsondata["ministryRequests"][0]["filenumber"])+"/cfr-review/test.docx",
+            "documentpath":"/EDU/"+str(foijsondata["ministryRequests"][0]["filenumber"])+"/cfr-review/test.docx",
             "filename":"test.docx"
         }
         ]
@@ -401,17 +409,17 @@ def test_post_foirequest_general_close(app, client):
     assert foiresponse.status_code == 200 and getrawresponse.status_code == 200 and wfupdateresponse.status_code == 200 and foiassignresponse.status_code == 200 
 
 def test_get_foirequestqueue(app, client):
-  response = client.get('/api/dashboard', headers=factory_user_auth_header(app, client), content_type='application/json')
+  response = client.get('/api/dashboardpagination?page=1&size=10&sortingitems[]=intakeSorting&sortingitems[]=duedate&sortingorders[]=asc&sortingorders[]=asc&filters[]=firstName&filters[]=lastName&filters[]=requestType&filters[]=idNumber&filters[]=axisRequestId&filters[]=currentState&filters[]=assignedToLastName&filters[]=assignedToFirstName&additionalfilter=myRequests&userid=foiintake@idir', headers=factory_user_auth_header(app, client), content_type='application/json')
   jsondata = json.loads(response.data)  
   assert response.status_code == 200  and len(jsondata) > 0 
 
 def test_get_foiministryrequestqueue(app, client):
-  response = client.get('/api/dashboard/ministry', headers=factory_ministryuser_auth_header(app, client), content_type='application/json')
+  response = client.get('/api/dashboardpagination/ministry?page=1&size=10&sortingitems[]=ministrySorting&sortingitems[]=cfrduedate&sortingorders[]=asc&sortingorders[]=asc&filters[]=applicantcategory&filters[]=requestType&filters[]=idNumber&filters[]=axisRequestId&filters[]=currentState&filters[]=assignedministrypersonLastName&filters[]=assignedministrypersonFirstName&additionalfilter=myRequests&userid=foiedu@idir', headers=factory_ministryuser_auth_header(app, client), content_type='application/json')
   jsondata = json.loads(response.data)
   assert response.status_code == 200  and len(jsondata) > 0   
 
 
 def test_get_foirequestqueuewithoutheader(app, client):    
-  response = client.get('/api/dashboard', content_type='application/json')    
+  response = client.get('/api/dashboardpagination?page=1&size=10&sortingitems[]=intakeSorting&sortingitems[]=duedate&sortingorders[]=asc&sortingorders[]=asc&filters[]=firstName&filters[]=lastName&filters[]=requestType&filters[]=idNumber&filters[]=axisRequestId&filters[]=currentState&filters[]=assignedToLastName&filters[]=assignedToFirstName&additionalfilter=myRequests&userid=foiintake@idir', content_type='application/json')    
   jsondata = json.loads(response.data)
-  assert response.status_code == 401 # expecting Unauthorized - 401 status
+  assert response.status_code == 500

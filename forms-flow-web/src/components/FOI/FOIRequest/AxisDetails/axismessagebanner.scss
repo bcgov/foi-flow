@@ -1,0 +1,45 @@
+
+.axis-banner-div {
+    font-size: 15px;
+    color: #000000;
+}
+
+.axis-message {
+    font-weight: bold;
+    text-transform: uppercase;
+    margin-left: 35px;
+    padding-right: 10px;
+}
+
+.axis-sync-date {
+    font-style: italic;
+
+    float: right;
+}
+
+.update-warning {
+    background-color: #FFC709 !important;
+}
+
+.no-connection {
+    background-color: #F97957 !important;
+}
+
+.axis-banner {
+
+    padding-bottom: 40px;
+    
+    .alert {
+        height: 40px;
+        width: calc(102vw - 10% - 200px);
+        z-index: 3;
+        margin-left: -2%;
+        position: fixed !important;
+    }
+}
+
+@media screen and (max-width: 1355px) {
+    .axis-banner .alert{
+        height: 40px !important;
+    }
+  }

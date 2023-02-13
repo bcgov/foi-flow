@@ -36,8 +36,12 @@ import requests
 from aws_requests_auth.aws_auth import AWSRequestsAuth
 import os
 import uuid
-from request_api.utils.cache import cache_filter, response_filter
+from request_api.utils.cache import cache_filter, response_filter, clear_cache
 from request_api.auth import AuthHelper
+
+import boto3
+from botocore.exceptions import ClientError
+from botocore.config import Config
 
 API = Namespace('FOI Flow Master Data', description='Endpoints for FOI Flow master data')
 TRACER = Tracer.get_instance()
@@ -49,7 +53,7 @@ class FOIFlowApplicantCategories(Resource):
     """
     @staticmethod
     @TRACER.trace()
-    @cross_origin(origins=allowedorigins())      
+    @cross_origin(origins=allowedorigins())
     @auth.require
     @request_api.cache.cached(
         key_prefix="applicantcategories",
@@ -72,7 +76,7 @@ class FOIFlowProgramAreas(Resource):
     """
     @staticmethod
     @TRACER.trace()
-    @cross_origin(origins=allowedorigins())      
+    @cross_origin(origins=allowedorigins())
     @auth.require
     @request_api.cache.cached(
         key_prefix="programareas",
@@ -95,7 +99,7 @@ class FOIFlowProgramAreas(Resource):
     """
     @staticmethod
     @TRACER.trace()
-    @cross_origin(origins=allowedorigins())      
+    @cross_origin(origins=allowedorigins())
     @auth.require
     #@request_api.cache.cached(key_prefix="programareas")
     def get():
@@ -121,7 +125,7 @@ class FOIFlowDeliveryModes(Resource):
     """
     @staticmethod
     @TRACER.trace()
-    @cross_origin(origins=allowedorigins())       
+    @cross_origin(origins=allowedorigins())
     @auth.require
     @request_api.cache.cached(
         key_prefix="deliverymodes",
@@ -143,7 +147,7 @@ class FOIFlowReceivedModes(Resource):
     """
     @staticmethod
     @TRACER.trace()
-    @cross_origin(origins=allowedorigins())       
+    @cross_origin(origins=allowedorigins())
     @auth.require
     @request_api.cache.cached(
         key_prefix="receivedmodes",
@@ -165,7 +169,7 @@ class FOIFlowDivisions(Resource):
     """
     @staticmethod
     @TRACER.trace()
-    @cross_origin(origins=allowedorigins())       
+    @cross_origin(origins=allowedorigins())
     @auth.require
     @request_api.cache.cached(
         unless=cache_filter,
@@ -177,8 +181,8 @@ class FOIFlowDivisions(Resource):
             jsondata = json.dumps(data)
             return jsondata , 200
         except BusinessException:
-            return "Error happened while accessing divisions" , 500 
-        
+            return "Error happened while accessing divisions" , 500
+
 @cors_preflight('GET,OPTIONS')
 @API.route('/foiflow/closereasons')
 class FOIFlowCloseReasons(Resource):
@@ -186,7 +190,7 @@ class FOIFlowCloseReasons(Resource):
     """
     @staticmethod
     @TRACER.trace()
-    @cross_origin(origins=allowedorigins())       
+    @cross_origin(origins=allowedorigins())
     @auth.require
     @request_api.cache.cached(
         key_prefix="closereasons",
@@ -208,14 +212,14 @@ class FOIFlowDocumentStorage(Resource):
     """
     @staticmethod
     @TRACER.trace()
-    @cross_origin(origins=allowedorigins())       
+    @cross_origin(origins=allowedorigins())
     @auth.require
     @auth.ismemberofgroups(getrequiredmemberships())
     def post():
         try:
 
             formsbucket = os.getenv('OSS_S3_FORMS_BUCKET')
-            accesskey = os.getenv('OSS_S3_FORMS_ACCESS_KEY_ID') 
+            accesskey = os.getenv('OSS_S3_FORMS_ACCESS_KEY_ID')
             secretkey = os.getenv('OSS_S3_FORMS_SECRET_ACCESS_KEY')
             s3host = os.getenv('OSS_S3_HOST')
             s3region = os.getenv('OSS_S3_REGION')
@@ -226,37 +230,72 @@ class FOIFlowDocumentStorage(Resource):
 
             requestfilejson = request.get_json()
 
-            for file in requestfilejson:                
-                foirequestform = FOIRequestsFormsList().load(file)                
+            for file in requestfilejson:
+                foirequestform = FOIRequestsFormsList().load(file)
                 ministrycode = foirequestform.get('ministrycode')
                 requestnumber = foirequestform.get('requestnumber')
                 filestatustransition = foirequestform.get('filestatustransition')
                 filename = foirequestform.get('filename')
                 s3sourceuri = foirequestform.get('s3sourceuri')
                 filenamesplittext = os.path.splitext(filename)
-                uniquefilename = '{0}{1}'.format(uuid.uuid4(),filenamesplittext[1])                
+                uniquefilename = '{0}{1}'.format(uuid.uuid4(),filenamesplittext[1])
                 auth = AWSRequestsAuth(aws_access_key=accesskey,
                         aws_secret_access_key=secretkey,
                         aws_host=s3host,
                         aws_region=s3region,
-                        aws_service=s3service) 
+                        aws_service=s3service)
 
-                s3uri = s3sourceuri if s3sourceuri is not None else 'https://{0}/{1}/{2}/{3}/{4}/{5}'.format(s3host,formsbucket,ministrycode,requestnumber,filestatustransition,uniquefilename)        
-                
+                s3uri = s3sourceuri if s3sourceuri is not None else 'https://{0}/{1}/{2}/{3}/{4}/{5}'.format(s3host,formsbucket,ministrycode,requestnumber,filestatustransition,uniquefilename)
+
                 response = requests.put(s3uri,data=None,auth=auth) if s3sourceuri is None  else requests.get(s3uri,auth=auth)
 
 
                 file['filepath']=s3uri
-                file['authheader']=response.request.headers['Authorization'] 
+                file['authheader']=response.request.headers['Authorization']
                 file['amzdate']=response.request.headers['x-amz-date']
                 file['uniquefilename']=uniquefilename if s3sourceuri is None else ''
                 file['filestatustransition']=filestatustransition  if s3sourceuri is None else ''
-                
-                
+
+
             return json.dumps(requestfilejson) , 200
-        except BusinessException as exception:            
+        except BusinessException as exception:
             return {'status': exception.status_code, 'message':exception.message}, 500
-    
+
+@cors_preflight('GET,OPTIONS')
+@API.route('/foiflow/oss/presigned/<ministryrequestid>')
+class FOIFlowS3Presigned(Resource):
+
+    @staticmethod
+    @TRACER.trace()
+    @cross_origin(origins=allowedorigins())
+    @auth.require
+    @auth.documentbelongstosameministry
+    def get(ministryrequestid):
+        try :
+            formsbucket = os.getenv('OSS_S3_FORMS_BUCKET')
+            accesskey = os.getenv('OSS_S3_FORMS_ACCESS_KEY_ID')
+            secretkey = os.getenv('OSS_S3_FORMS_SECRET_ACCESS_KEY')
+            s3host = os.getenv('OSS_S3_HOST')
+            s3region = os.getenv('OSS_S3_REGION')
+            filepath = request.args.get('filepath')
+
+            s3client = boto3.client('s3',config=Config(signature_version='s3v4'),
+            endpoint_url='https://{0}/'.format(s3host),
+            aws_access_key_id= accesskey,
+            aws_secret_access_key= secretkey,region_name= s3region
+                )
+
+            filename, file_extension = os.path.splitext(filepath)
+            response = s3client.generate_presigned_url(
+                ClientMethod='get_object',
+                Params=   {'Bucket': formsbucket, 'Key': '{0}'.format(filepath),'ResponseContentType': '{0}/{1}'.format('image' if file_extension in ['.png','.jpg','.jpeg','.gif'] else 'application',file_extension.replace('.',''))},
+                ExpiresIn=3600,HttpMethod='GET'
+                )
+
+            return json.dumps(response),200
+        except BusinessException as exception:
+         return {'status': exception.status_code, 'message':exception.message}, 500
+
 @cors_preflight('GET,OPTIONS')
 @API.route('/foiflow/extensionreasons')
 class FOIFlowExtensionReasons(Resource):
@@ -264,7 +303,7 @@ class FOIFlowExtensionReasons(Resource):
     """
     @staticmethod
     @TRACER.trace()
-    @cross_origin(origins=allowedorigins())       
+    @cross_origin(origins=allowedorigins())
     @auth.require
     @request_api.cache.cached(
         key_prefix="extensionreasons",
@@ -277,4 +316,20 @@ class FOIFlowExtensionReasons(Resource):
             jsondata = json.dumps(data)
             return jsondata , 200
         except BusinessException as exception:
-            return {'status': exception.status_code, 'message':exception.message}, 500        
+            return {'status': exception.status_code, 'message':exception.message}, 500
+
+@cors_preflight('POST,OPTIONS')
+@API.route('/foiflow/cache/flushall')
+class FOIFlowProgramAreas(Resource):
+    """Retrieves all active program areas.
+    """
+    @staticmethod
+    @TRACER.trace()
+    @cross_origin(origins=allowedorigins())
+    @auth.require
+    def post():
+        try:
+            resp_flag = clear_cache()
+            return {"success": resp_flag } , 200 if resp_flag == True else 500
+        except BusinessException:
+            return "Error happened while clearing cache" , 500

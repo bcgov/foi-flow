@@ -16,6 +16,7 @@
 Test helper functions to load and assert that a JSON payload validates against a defined schema.
 """
 import json
+import logging
 from os import listdir, path
 from typing import Tuple
 
@@ -65,7 +66,7 @@ def get_schema_store(validate_schema: bool = False, schema_search_path: str = No
 
         return schemastore
     except (SchemaError, json.JSONDecodeError) as error:
-        # handle schema error
+        logging.error(error)
         raise error
 
 

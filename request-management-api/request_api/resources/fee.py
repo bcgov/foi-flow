@@ -14,15 +14,24 @@
 """API endpoints for managing a Feee resource."""
 
 from datetime import datetime
+from re import template
 
 from flask import request, send_file, Response
 from flask_cors import cross_origin
 from flask_restx import Namespace, Resource
+import json
+import asyncio
 
 from request_api.services import FeeService
+from request_api.services.cfrfeeservice import cfrfeeservice
+from request_api.services.requestservice import requestservice
+from request_api.services.paymentservice import paymentservice
+from request_api.services.eventservice import eventservice
 from request_api.services.document_generation_service import DocumentGenerationService
+from request_api.services.applicantcorrespondence.applicantcorrespondencelog  import applicantcorrespondenceservice
 from request_api.utils.util import  cors_preflight, allowedorigins
 from request_api.exceptions import BusinessException
+from request_api.utils.enums import PaymentEventType, StateName
 API = Namespace('Fees', description='Endpoints for Fee and payments')
 
 
@@ -43,6 +52,7 @@ class Fee(Resource):
 
 @cors_preflight('POST,OPTIONS')
 @API.route('/foirawrequests/<int:request_id>/payments')
+@API.route('/cfrfee/<int:request_id>/payments')
 class Payment(Resource):
 
     @staticmethod
@@ -50,7 +60,7 @@ class Payment(Resource):
     def post(request_id: int):
         try:
             request_json = request.get_json()
-            fee_service: FeeService = FeeService(request_id=request_id)
+            fee_service: FeeService = FeeService(request_id=request_id, code=request_json['fee_code'])
             pay_response = fee_service.init_payment(request_json)
             return pay_response, 201
         except BusinessException as e:
@@ -67,8 +77,39 @@ class Payment(Resource):
         try:
             request_json = request.get_json()
             fee_service: FeeService = FeeService(request_id=request_id, payment_id=payment_id)
-            pay_response = fee_service.complete_payment(request_json)
+            pay_response = fee_service.complete_payment(request_json)[0]
             return pay_response, 201
+        except BusinessException as e:
+            return {'status': e.code, 'message': e.message}, e.status_code
+
+
+@cors_preflight('PUT,OPTIONS')
+@API.route('/foirequests/<int:request_id>/ministryrequest/<int:ministry_request_id>/payments/<int:payment_id>')
+@API.route('/cfrfee/<int:request_id>/ministryrequest/<int:ministry_request_id>/payments/<int:payment_id>')
+class Payment(Resource):
+
+    @staticmethod
+    @cross_origin(origins=allowedorigins())
+    def put(request_id: int, ministry_request_id: int, payment_id: int):
+        try:
+            request_json = request.get_json()
+            fee: FeeService = FeeService(request_id=ministry_request_id, payment_id=payment_id)
+            response, parsed_args = fee.complete_payment(request_json)
+            if (response['status'] == 'PAID'):
+                amountpaid = float(parsed_args.get('trnAmount'))
+                cfrfeeservice().paycfrfee(ministry_request_id, amountpaid)
+                paymentservice().createpaymentversion(request_id, ministry_request_id, amountpaid)
+                data = requestservice().getrequestdetails(request_id, ministry_request_id)
+                paymentservice().createpaymentreceipt(request_id, ministry_request_id, data, parsed_args)
+                nextstatename, paymenteventtype = paymentservice().postpayment(ministry_request_id, data)
+                cfrfeeservice().updatepaymentmethod(ministry_request_id, paymenteventtype)
+                # automated state transition and due date calculation
+                requestservice().postpaymentstatetransition(request_id, ministry_request_id, nextstatename, parsed_args.get('trnDate'))
+                asyncio.ensure_future(eventservice().postpaymentevent(ministry_request_id, paymenteventtype))
+                requestservice().postfeeeventtoworkflow(request_id, ministry_request_id, "PAID", nextstatename)
+                
+                asyncio.ensure_future(eventservice().postevent(ministry_request_id,"ministryrequest","System","System", False))
+            return response, 201
         except BusinessException as e:
             return {'status': e.code, 'message': e.message}, e.status_code
 
@@ -85,7 +126,8 @@ class Payment(Resource):
             paid = fee_service.check_if_paid()
             if paid is False:
                 return {'status': False, 'message': "Fee has not been paid"}, 400
-            document_service : DocumentGenerationService = DocumentGenerationService()
+            documenttypename='receipt'
+            document_service : DocumentGenerationService = DocumentGenerationService(documenttypename)
             response = document_service.generate_receipt(data= request_json)
             
             return Response(
@@ -96,3 +138,5 @@ class Payment(Resource):
 
         except BusinessException as e:
             return {'status': e.code, 'message': e.message}, e.status_code
+
+

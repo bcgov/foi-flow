@@ -45,6 +45,7 @@ execution.setVariable('foiApiUrl', system.getenv('FOI_REQ_MANAGEMENT_API_URL'));
         </camunda:connector>
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_0qym7g1</bpmn:incoming>
+      <bpmn:incoming>Flow_1o3gosy</bpmn:incoming>
       <bpmn:outgoing>Flow_17bdgfc</bpmn:outgoing>
     </bpmn:serviceTask>
     <bpmn:sequenceFlow id="Flow_17bdgfc" sourceRef="Activity_1r0oka0" targetRef="Activity_0gfn3o4" />
@@ -69,9 +70,12 @@ connector.getVariable("statusCode");</camunda:script>
           </camunda:inputOutput>
           <camunda:connectorId>http-connector</camunda:connectorId>
         </camunda:connector>
+        <camunda:executionListener event="end">
+          <camunda:script scriptFormat="javascript">var current = execution.getVariable("retry");
+execution.setVariable("retry", current+1); </camunda:script>
+        </camunda:executionListener>
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_17bdgfc</bpmn:incoming>
-      <bpmn:incoming>Flow_1o3gosy</bpmn:incoming>
       <bpmn:outgoing>Flow_01j0a91</bpmn:outgoing>
     </bpmn:serviceTask>
     <bpmn:boundaryEvent id="Event_17odcea" attachedToRef="Activity_0gfn3o4">
@@ -93,7 +97,7 @@ connector.getVariable("statusCode");</camunda:script>
     </bpmn:exclusiveGateway>
     <bpmn:sequenceFlow id="Flow_1ys38a6" sourceRef="Event_17odcea" targetRef="Event_1k8aoc7" />
     <bpmn:sequenceFlow id="Flow_1kzesmk" sourceRef="Event_1k8aoc7" targetRef="Gateway_0q2f2o1" />
-    <bpmn:sequenceFlow id="Flow_1o3gosy" name="Retry [1..3]" sourceRef="Gateway_0q2f2o1" targetRef="Activity_0gfn3o4">
+    <bpmn:sequenceFlow id="Flow_1o3gosy" name="Retry [1..3]" sourceRef="Gateway_0q2f2o1" targetRef="Activity_1r0oka0">
       <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${retry &lt;= 3}</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
     <bpmn:intermediateThrowEvent id="Event_1tmmrt5" name="API Failure Message">
@@ -117,11 +121,10 @@ connector.getVariable("statusCode");</camunda:script>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_1o3gosy_di" bpmnElement="Flow_1o3gosy">
         <di:waypoint x="535" y="290" />
-        <di:waypoint x="440" y="290" />
-        <di:waypoint x="440" y="140" />
-        <di:waypoint x="510" y="140" />
+        <di:waypoint x="370" y="290" />
+        <di:waypoint x="370" y="157" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="463" y="273" width="54" height="14" />
+          <dc:Bounds x="430" y="273" width="54" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_1kzesmk_di" bpmnElement="Flow_1kzesmk">

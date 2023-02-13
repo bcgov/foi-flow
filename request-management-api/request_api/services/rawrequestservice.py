@@ -13,6 +13,9 @@ from request_api.services.documentservice import documentservice
 from request_api.services.eventservice import eventservice
 from request_api.services.rawrequest.rawrequestservicegetter import rawrequestservicegetter
 from request_api.exceptions import BusinessException, Error
+from request_api.models.default_method_result import DefaultMethodResult
+from request_api.models.FOIRawRequestWatchers import FOIRawRequestWatcher
+import logging
 
 class rawrequestservice:
     """ FOI Raw Request management service
@@ -27,27 +30,32 @@ class rawrequestservice:
         assigneefirstname = requestdatajson["assignedToFirstName"] if requestdatajson.get("assignedToFirstName") != None else None
         assigneemiddlename = requestdatajson["assignedToMiddleName"] if requestdatajson.get("assignedToMiddleName") != None else None
         assigneelastname = requestdatajson["assignedToLastName"] if requestdatajson.get("assignedToLastName") != None else None
-        ispiiredacted = requestdatajson["ispiiredacted"] if 'ispiiredacted' in requestdatajson  else False
-
+        ispiiredacted = requestdatajson["ispiiredacted"] if 'ispiiredacted' in requestdatajson  else False        
         axisrequestid = requestdatajson["axisRequestId"] if 'axisRequestId' in requestdatajson  else None
+        isaxisrequestidpresent = False
+        if axisrequestid is not None:
+            isaxisrequestidpresent = self.isaxisrequestidpresent(axisrequestid)
         axissyncdate = requestdatajson["axisSyncDate"] if 'axisSyncDate' in requestdatajson  else None
 
         requirespayment =  rawrequestservice.doesrequirepayment(requestdatajson) if sourceofsubmission == "onlineform"  else False 
-        result = FOIRawRequest.saverawrequest(
-                                                _requestrawdata=requestdatajson,
-                                                sourceofsubmission= sourceofsubmission,
-                                                ispiiredacted=ispiiredacted,
-                                                userid= userid,
-                                                assigneegroup=assigneegroup,
-                                                assignee=assignee,
-                                                requirespayment=requirespayment,
-                                                notes=notes,
-                                                assigneefirstname=assigneefirstname,
-                                                assigneemiddlename=assigneemiddlename,
-                                                assigneelastname=assigneelastname,
-                                                axisrequestid=axisrequestid,
-                                                axissyncdate=axissyncdate
-                                            )
+        if axisrequestid is None or isaxisrequestidpresent == False:
+            result = FOIRawRequest.saverawrequest(
+                                                    _requestrawdata=requestdatajson,
+                                                    sourceofsubmission= sourceofsubmission,
+                                                    ispiiredacted=ispiiredacted,
+                                                    userid= userid,
+                                                    assigneegroup=assigneegroup,
+                                                    assignee=assignee,
+                                                    requirespayment=requirespayment,
+                                                    notes=notes,
+                                                    assigneefirstname=assigneefirstname,
+                                                    assigneemiddlename=assigneemiddlename,
+                                                    assigneelastname=assigneelastname,
+                                                    axisrequestid=axisrequestid,
+                                                    axissyncdate=axissyncdate                                                    
+                                                )
+        else:            
+            raise ValueError("Duplicate AXIS Request ID")
         if result.success:
             redispubservice = RedisPublisherService()
             data = {}
@@ -55,7 +63,11 @@ class rawrequestservice:
             data['assignedGroup'] = assigneegroup
             data['assignedTo'] = assignee
             json_data = json.dumps(data)
-            asyncio.create_task(redispubservice.publishrequest(json_data))
+            try:
+                workflowservice().createinstance(redispubservice.foirequestqueueredischannel, json_data)
+            except Exception as ex:
+                logging.error("Unable to create instance", ex)
+                asyncio.ensure_future(redispubservice.publishrequest(json_data))
         return result
 
     @staticmethod
@@ -77,13 +89,19 @@ class rawrequestservice:
             return requestdatajson['requiresPayment']            
         raise BusinessException(Error.DATA_NOT_FOUND)    
 
-    def saverawrequestversion(self, _requestdatajson, _requestid, _assigneegroup, _assignee, status, userid, username, isministryuser, assigneefirstname, assigneemiddlename, assigneelastname):
-        ispiiredacted = _requestdatajson["ispiiredacted"] if 'ispiiredacted' in _requestdatajson  else False
+    def saverawrequestversion(self, _requestdatajson, _requestid, _assigneegroup, _assignee, status, userid, assigneefirstname, assigneemiddlename, assigneelastname, actiontype=None):
+        ispiiredacted = _requestdatajson["ispiiredacted"] if 'ispiiredacted' in _requestdatajson  else False        
         #Get documents
-        result = FOIRawRequest.saverawrequestversion(_requestdatajson, _requestid, _assigneegroup, _assignee, status,ispiiredacted, userid, assigneefirstname, assigneemiddlename, assigneelastname)
+        if actiontype == "assignee":
+            result = FOIRawRequest.saverawrequestassigneeversion(_requestid, _assigneegroup, _assignee, userid, assigneefirstname, assigneemiddlename, assigneelastname)
+        else:
+            result = FOIRawRequest.saverawrequestversion(_requestdatajson, _requestid, _assigneegroup, _assignee, status,ispiiredacted, userid, assigneefirstname, assigneemiddlename, assigneelastname)
         documentservice().createrawrequestdocumentversion(_requestid)
         return result
 
+    def saverawrequestiaorestricted(self,_requestid,_iaorestricted,_updatedby):
+        result = FOIRawRequest.saveiaorestrictedrawrequest(_requestid,_iaorestricted,_updatedby)
+        return result
    
     def updateworkflowinstance(self, wfinstanceid, requestid, userid):
         return FOIRawRequest.updateworkflowinstance(wfinstanceid, requestid, userid)
@@ -91,8 +109,9 @@ class rawrequestservice:
     def updateworkflowinstancewithstatus(self, wfinstanceid, requestid,notes, userid):
         return FOIRawRequest.updateworkflowinstancewithstatus(wfinstanceid,requestid,notes, userid)    
     
-    async def posteventtoworkflow(self, id, wfinstanceid, requestsschema, status):
-        return workflowservice().postunopenedevent(id, wfinstanceid, requestsschema, status)
+    def posteventtoworkflow(self, id, requestsschema, status):
+        pid = workflowservice().syncwfinstance("rawrequest", id)
+        return workflowservice().postunopenedevent(id, pid, requestsschema, status)
 
     def getrawrequests(self):
         return rawrequestservicegetter().getallrawrequests()
@@ -116,4 +135,13 @@ class rawrequestservice:
         return 'Intake in Progress'
 
     def getaxisequestids(self):
-        return rawrequestservicegetter().getaxisequestids()     
+        return rawrequestservicegetter().getaxisequestids()
+    
+    def isaxisrequestidpresent(self, axisrequestid):
+        countofaxisrequestid = rawrequestservicegetter().getcountofaxisequestidbyaxisequestid(axisrequestid)
+        if countofaxisrequestid > 0:
+            return True
+        return False
+
+    def israwrequestwatcher(self,requestid, userid):
+        return FOIRawRequestWatcher.isawatcher(requestid,userid)    

@@ -1,6 +1,6 @@
 from enum import unique
 
-from sqlalchemy.sql.sqltypes import DateTime, String
+from sqlalchemy.sql.sqltypes import DateTime, String, Date
 
 from flask.app import Flask
 from sqlalchemy.sql.schema import ForeignKey, ForeignKeyConstraint
@@ -10,13 +10,14 @@ from sqlalchemy.dialects.postgresql import JSON, UUID
 from .default_method_result import DefaultMethodResult
 from datetime import datetime
 from sqlalchemy.orm import relationship, backref, aliased
-from sqlalchemy import insert, and_, or_, text, func, literal, cast, asc, desc, case, nullsfirst, nullslast
+from sqlalchemy import insert, and_, or_, text, func, literal, cast, asc, desc, case, nullsfirst, nullslast, TIMESTAMP
 
 from .FOIMinistryRequests import FOIMinistryRequest
 from .FOIRawRequestWatchers import FOIRawRequestWatcher
 from .FOIAssignees import FOIAssignee
-
+import logging
 from dateutil import parser
+import json
 
 class FOIRawRequest(db.Model):
     # Name of the table in our database
@@ -41,6 +42,8 @@ class FOIRawRequest(db.Model):
     
     axissyncdate = db.Column(db.DateTime, nullable=True)    
     axisrequestid = db.Column(db.String(120), nullable=True)
+
+    isiaorestricted = db.Column(db.Boolean, unique=False, nullable=False,default=False)
 
     closereasonid = db.Column(db.Integer,ForeignKey('CloseReasons.closereasonid'))
     closereason = relationship("CloseReason", uselist=False)
@@ -78,7 +81,7 @@ class FOIRawRequest(db.Model):
             closedate = _requestrawdata["closedate"] if 'closedate' in _requestrawdata  else None
             closereasonid = _requestrawdata["closereasonid"] if 'closereasonid' in _requestrawdata  else None
             axisrequestid = _requestrawdata["axisRequestId"] if 'axisRequestId' in _requestrawdata  else None
-            axissyncdate = _requestrawdata["axisSyncDate"] if 'axisSyncDate' in _requestrawdata  else None           
+            axissyncdate = _requestrawdata["axisSyncDate"] if 'axisSyncDate' in _requestrawdata  else None            
             _version = request.version+1           
             insertstmt =(
                 insert(FOIRawRequest).
@@ -99,6 +102,8 @@ class FOIRawRequest(db.Model):
                     closereasonid=closereasonid,
                     axisrequestid= axisrequestid,
                     axissyncdate=axissyncdate,
+                    isiaorestricted = request.isiaorestricted
+                   
                 )
             )
             db.session.execute(insertstmt)               
@@ -106,6 +111,121 @@ class FOIRawRequest(db.Model):
             return DefaultMethodResult(True,'Request versioned - {0}'.format(str(_version)),requestid,request.wfinstanceid,assignee)    
         else:
             return DefaultMethodResult(True,'No request foound')
+    
+
+    @classmethod
+    def saveiaorestrictedrawrequest(cls,requestid,_isiaorestricted=False, _updatedby=None)->DefaultMethodResult:
+        currentrequest = db.session.query(FOIRawRequest).filter_by(requestid=requestid).order_by(FOIRawRequest.version.desc()).first()
+        request = currentrequest
+        _version = currentrequest.version+1               
+        insertstmt = (
+            insert(FOIRawRequest).
+            values(
+                    requestid=request.requestid, 
+                    requestrawdata=request.requestrawdata,
+                    version=_version,
+                    updatedby=_updatedby,
+                    updated_at=datetime.now(),
+                    status=request.status,
+                    assignedgroup=request.assignedgroup,
+                    assignedto=request.assignedto,
+                    wfinstanceid=request.wfinstanceid,
+                    sourceofsubmission=request.sourceofsubmission,
+                    ispiiredacted=request.ispiiredacted,
+                    createdby=request.createdby,
+                    closedate=request.closedate,
+                    closereasonid=request.closereasonid,
+                    axisrequestid= request.axisrequestid,
+                    axissyncdate=request.axissyncdate,
+                    created_at=request.created_at,
+                    requirespayment = request.requirespayment,
+                    isiaorestricted =_isiaorestricted,
+                    notes = request.notes,
+                    
+            )
+        )
+        db.session.execute(insertstmt)               
+        db.session.commit()                
+        return DefaultMethodResult(True,'Request Updated for iaorestricted - {0}'.format(str(request.version)),requestid,request.wfinstanceid,_isiaorestricted)    
+
+    @classmethod
+    def saverawrequestassigneeversion(cls,requestid,assigneegroup,assignee,userid,assigneefirstname=None,assigneemiddlename=None,assigneelastname=None)->DefaultMethodResult:        
+        request = db.session.query(FOIRawRequest).filter_by(requestid=requestid).order_by(FOIRawRequest.version.desc()).first()
+        if request is not None:
+            _assginee = assignee if assignee not in (None,'') else None
+            if _assginee not in (None,''):
+                FOIAssignee.saveassignee(_assginee, assigneefirstname, assigneemiddlename, assigneelastname)
+
+            closedate = request.closedate
+            closereasonid = request.closereasonid
+            axisrequestid = request.axisrequestid
+            axissyncdate = request.axissyncdate
+            _version = request.version+1
+            rawrequest = request.requestrawdata
+            rawrequest["assignedGroup"] = assigneegroup
+            rawrequest["assignedTo"] = _assginee
+            rawrequest["assignedToFirstName"] = assigneefirstname
+            rawrequest["assignedToLastName"] = assigneelastname
+            insertstmt =(
+                insert(FOIRawRequest).
+                values(
+                    requestid=request.requestid, 
+                    requestrawdata=rawrequest,
+                    version=_version,
+                    updatedby=None,
+                    updated_at=datetime.now(),
+                    status=request.status,
+                    assignedgroup=assigneegroup,
+                    assignedto=_assginee,
+                    wfinstanceid=request.wfinstanceid,
+                    sourceofsubmission=request.sourceofsubmission,
+                    ispiiredacted=request.ispiiredacted,
+                    createdby=userid,
+                    closedate=closedate,
+                    closereasonid=closereasonid,
+                    axisrequestid= axisrequestid,
+                    axissyncdate=axissyncdate,
+                    isiaorestricted = request.isiaorestricted
+                    
+                )
+            )
+            db.session.execute(insertstmt)               
+            db.session.commit()                
+            return DefaultMethodResult(True,'Request versioned - {0}'.format(str(_version)),requestid,request.wfinstanceid,assignee)    
+        else:
+            return DefaultMethodResult(True,'No request foound')
+
+    @classmethod
+    def getworkflowinstancebyraw(cls,requestid)->DefaultMethodResult:
+        request_schema = FOIRawRequestSchema()
+        try:
+            sql = """select wfinstanceid, assignedto, assignedgroup, requestid  from "FOIRawRequests" fr where requestid = :requestid order by "version" desc limit 1;"""
+            rs = db.session.execute(text(sql), {'requestid': requestid})
+            for row in rs:
+                request_schema.__dict__.update({"requestid": row["requestid"],"assignedto": row["assignedto"], "assignedgroup": row["assignedgroup"], "wfinstanceid": row["wfinstanceid"]})
+        except Exception as ex:
+            logging.error(ex)
+        finally:
+            db.session.close()  
+        return request_schema
+
+
+    @classmethod
+    def getworkflowinstancebyministry(cls,requestid)->DefaultMethodResult:
+        request_schema = FOIRawRequestSchema()
+        try:
+            sql = """select fr.wfinstanceid,  fr.assignedto,  fr.assignedgroup, fr.requestid 
+                        from "FOIMinistryRequests" fr2, "FOIRequests" fr3, "FOIRawRequests" fr 
+                        where fr2.foirequest_id = fr3.foirequestid and fr3.foirawrequestid  = fr.requestid 
+                        and fr2.foiministryrequestid= :requestid order by fr."version" desc limit 1"""
+            rs = db.session.execute(text(sql), {'requestid': requestid})
+            for row in rs:
+                request_schema.__dict__.update({"requestid": row["requestid"], "assignedto": row["assignedto"], "assignedgroup": row["assignedgroup"], "wfinstanceid": row["wfinstanceid"]})
+        except Exception as ex:
+            logging.error(ex)
+        finally:
+            db.session.close()  
+        return request_schema
             
     @classmethod
     def updateworkflowinstance(cls,wfinstanceid,requestid, userid)->DefaultMethodResult:
@@ -121,7 +241,20 @@ class FOIRawRequest(db.Model):
             else:
                 return DefaultMethodResult(False,'WF instance already exists',requestid) 
         else:
-            return DefaultMethodResult(False,'Requestid not exists',-1)              
+            return DefaultMethodResult(False,'Requestid not exists',-1)      
+
+    @classmethod
+    def updateworkflowinstance_n(cls,wfinstanceid,requestid, userid)->DefaultMethodResult:
+        updatedat = datetime.now()
+        dbquery = db.session.query(FOIRawRequest)
+        _requestraqw = dbquery.filter_by(requestid=requestid).order_by(FOIRawRequest.version.desc()).first()
+        requestraqw = dbquery.filter_by(requestid=requestid,version = _requestraqw.version)        
+        if(requestraqw.count() > 0) :            
+            requestraqw.update({FOIRawRequest.wfinstanceid:wfinstanceid, FOIRawRequest.updated_at:updatedat,FOIRawRequest.updatedby:userid}, synchronize_session = False)
+            db.session.commit()
+            return DefaultMethodResult(True,'Request updated',requestid)       
+        else:
+            return DefaultMethodResult(False,'Requestid not exists',-1)        
 
     @classmethod
     def updateworkflowinstancewithstatus(cls,wfinstanceid,requestid,notes,userid)-> DefaultMethodResult:
@@ -155,26 +288,32 @@ class FOIRawRequest(db.Model):
 
     @classmethod
     def getDescriptionSummaryById(cls, requestid):
-        sql = """select * ,
-                    CASE WHEN description = (select requestrawdata -> 'descriptionTimeframe' ->> 'description' from "FOIRawRequests" where requestid = :requestid and status = 'Unopened') 
-                            then 'Online Form' 
-                            else savedby END  as createdby 
-                    from (select CASE WHEN lower(status) <> 'unopened' 
-                            then requestrawdata ->> 'description' 
-                            ELSE requestrawdata -> 'descriptionTimeframe' ->> 'description' END as description ,  
-                        CASE WHEN lower(status) <> 'unopened' 
-                            then requestrawdata ->> 'fromDate' 
-                            ELSE requestrawdata -> 'descriptionTimeframe' ->> 'fromDate' END as fromdate, 
-                        CASE WHEN lower(status) <> 'unopened'
-                            then requestrawdata ->> 'toDate' 
-                            ELSE requestrawdata -> 'descriptionTimeframe' ->> 'toDate' END as todate, 
-                        to_char(created_at, 'YYYY-MM-DD HH24:MI:SS') as createdat, status, ispiiredacted,
-                        createdby as savedby from "FOIRawRequests" fr 
-                    where requestid = :requestid order by version ) as sq;"""
-        rs = db.session.execute(text(sql), {'requestid': requestid})
         requests = []
-        for row in rs:
-            requests.append(dict(row))
+        try:
+            sql = """select * ,
+                        CASE WHEN description = (select requestrawdata -> 'descriptionTimeframe' ->> 'description' from "FOIRawRequests" where requestid = :requestid and status = 'Unopened' and version = 1) 
+                                then 'Online Form' 
+                                else savedby END  as createdby 
+                        from (select CASE WHEN lower(status) <> 'unopened' 
+                                then requestrawdata ->> 'description' 
+                                ELSE requestrawdata -> 'descriptionTimeframe' ->> 'description' END as description ,  
+                            CASE WHEN lower(status) <> 'unopened' 
+                                then requestrawdata ->> 'fromDate' 
+                                ELSE requestrawdata -> 'descriptionTimeframe' ->> 'fromDate' END as fromdate, 
+                            CASE WHEN lower(status) <> 'unopened'
+                                then requestrawdata ->> 'toDate' 
+                                ELSE requestrawdata -> 'descriptionTimeframe' ->> 'toDate' END as todate, 
+                            to_char(created_at, 'YYYY-MM-DD HH24:MI:SS') as createdat, status, ispiiredacted,
+                            createdby as savedby from "FOIRawRequests" fr 
+                        where requestid = :requestid order by version ) as sq;"""
+            rs = db.session.execute(text(sql), {'requestid': requestid})
+            for row in rs:
+                requests.append(dict(row))
+        except Exception as ex:
+            logging.error(ex)
+            raise ex
+        finally:
+            db.session.close()
         return requests
 
     @classmethod
@@ -185,21 +324,35 @@ class FOIRawRequest(db.Model):
     
     @classmethod
     def getLastStatusUpdateDate(cls,requestid,status):
-        sql = """select created_at from "FOIRawRequests" 
-                    where requestid = :requestid and status = :status
-                    order by version desc limit 1;"""
-        rs = db.session.execute(text(sql), {'requestid': requestid, 'status': status})
-        return [row[0] for row in rs][0]
+        lastupdatedate = None
+        try:
+            sql = """select created_at from "FOIRawRequests" 
+                        where requestid = :requestid and status = :status
+                        order by version desc limit 1;"""
+            rs = db.session.execute(text(sql), {'requestid': requestid, 'status': status})
+            lastupdatedate = [row[0] for row in rs][0]
+        except Exception as ex:
+            logging.error(ex)
+            raise ex
+        finally:
+            db.session.close()
+        return lastupdatedate
 
     @classmethod
     def getassignmenttransition(cls,requestid):
-        sql = """select version, assignedto, status from "FOIRawRequests" 
-                    where requestid = :requestid
-                    order by version desc limit 2;"""
-        rs = db.session.execute(text(sql), {'requestid': requestid})
         assignments = []
-        for row in rs:
-            assignments.append({"assignedto": row["assignedto"], "status": row["status"], "version": row["version"]})
+        try:
+            sql = """select version, assignedto, status from "FOIRawRequests" 
+                        where requestid = :requestid
+                        order by version desc limit 2;"""
+            rs = db.session.execute(text(sql), {'requestid': requestid})            
+            for row in rs:
+                assignments.append({"assignedto": row["assignedto"], "status": row["status"], "version": row["version"]})
+        except Exception as ex:
+            logging.error(ex)
+            raise ex
+        finally:
+            db.session.close()
         return assignments
     
     @classmethod
@@ -207,13 +360,20 @@ class FOIRawRequest(db.Model):
         return db.session.query(FOIRawRequest.version).filter_by(requestid=requestid).order_by(FOIRawRequest.version.desc()).first()
     
     @classmethod
-    def getstatesummary(cls, requestid):                
-        sql = """select status, version from (select distinct on (status) status, version from "FOIRawRequests" 
-        where requestid=:requestid order by status, version asc) as fs3 order by version desc"""
-        rs = db.session.execute(text(sql), {'requestid': requestid})
+    def getstatesummary(cls, requestid):     
         transitions = []
-        for row in rs:
-            transitions.append({"status": row["status"], "version": row["version"]})
+        try:           
+            sql = """select status, version from (select distinct on (status) status, version from "FOIRawRequests" 
+            where requestid=:requestid order by status, version asc) as fs3 order by version desc"""
+            rs = db.session.execute(text(sql), {'requestid': requestid})
+            
+            for row in rs:
+                transitions.append({"status": row["status"], "version": row["version"]})
+        except Exception as ex:
+            logging.error(ex)
+            raise ex
+        finally:
+            db.session.close()
         return transitions
 
     @classmethod
@@ -226,7 +386,7 @@ class FOIRawRequest(db.Model):
         return requeststates    
 
     @classmethod
-    def getbasequery(cls, additionalfilter=None, userid=None):
+    def getbasequery(cls, additionalfilter=None, userid=None, isiaorestrictedfilemanager=False):
         _session = db.session
 
         #rawrequests
@@ -262,6 +422,16 @@ class FOIRawRequest(db.Model):
                              literal(None)),
                            ],
                            else_ = FOIRawRequest.requestrawdata['dueDate'].astext).label('duedate')
+        receiveddate = case([
+                            (and_(FOIRawRequest.status == 'Unopened', FOIRawRequest.requestrawdata['receivedDate'].is_(None)),
+                             func.to_char(FOIRawRequest.created_at, 'YYYY-mm-DD')),
+                           ],
+                           else_ = FOIRawRequest.requestrawdata['receivedDate'].astext).label('receivedDate')
+        receiveddateuf = case([
+                            (and_(FOIRawRequest.status == 'Unopened', FOIRawRequest.requestrawdata['receivedDateUF'].is_(None)),
+                             func.to_char(FOIRawRequest.created_at, 'YYYY-mm-DD HH:MM:SS')),
+                           ],
+                           else_ = FOIRawRequest.requestrawdata['receivedDateUF'].astext).label('receivedDateUF')
 
         assignedtoformatted = case([
                             (and_(FOIAssignee.lastname.isnot(None), FOIAssignee.firstname.isnot(None)),
@@ -287,6 +457,18 @@ class FOIRawRequest(db.Model):
             ],
             else_ = cast(FOIRawRequest.requestrawdata['requestPageCount'], String)).label('requestPageCount')
 
+        intakesorting = case([
+                            (FOIRawRequest.assignedto == None, # Unassigned requests first
+                             literal(None)),
+                           ],
+                           else_ = cast(FOIRawRequest.requestrawdata['receivedDateUF'].astext, TIMESTAMP)).label('intakeSorting')
+
+        isiaorestricted = case([
+                            (FOIRawRequest.isiaorestricted.is_(None),
+                             False),
+                           ],
+                           else_ = FOIRawRequest.isiaorestricted).label('isiaorestricted')
+
         selectedcolumns = [
             FOIRawRequest.requestid.label('id'),
             FOIRawRequest.version,
@@ -294,8 +476,8 @@ class FOIRawRequest(db.Model):
             firstname,
             lastname,
             requesttype,
-            FOIRawRequest.requestrawdata['receivedDate'].astext.label('receivedDate'),
-            FOIRawRequest.requestrawdata['receivedDateUF'].astext.label('receivedDateUF'),
+            receiveddate,
+            receiveddateuf,
             FOIRawRequest.status.label('currentState'),
             FOIRawRequest.assignedgroup.label('assignedGroup'),
             FOIRawRequest.assignedto.label('assignedTo'),
@@ -317,16 +499,37 @@ class FOIRawRequest(db.Model):
             description,
             literal(None).label('onBehalfFirstName'),
             literal(None).label('onBehalfLastName'),
-            FOIRawRequest.status.label('stateForSorting'),
+            literal(None).label('defaultSorting'),
+            intakesorting,
+            literal(None).label('ministrySorting'),
             assignedtoformatted,
             literal(None).label('ministryAssignedToFormatted'),
-            literal(None).label('closedate')
+            literal(None).label('closedate'),
+            literal(None).label('onBehalfFormatted'),
+            literal(None).label('extensions'),
+            isiaorestricted,
+            literal(None).label('isministryrestricted')
         ]
 
         basequery = _session.query(*selectedcolumns).join(subquery_maxversion, and_(*joincondition)).join(FOIAssignee, FOIAssignee.username == FOIRawRequest.assignedto, isouter=True)
 
         if additionalfilter is None:
-            return basequery.filter(FOIRawRequest.status.notin_(['Archived']))
+            if(isiaorestrictedfilemanager == True):
+                return basequery.filter(FOIRawRequest.status.notin_(['Archived']))
+            else:
+                subquery_watchby = FOIRawRequestWatcher.getrequestidsbyuserid(userid)
+
+                return basequery.join(
+                                    subquery_watchby,
+                                    subquery_watchby.c.requestid == FOIRawRequest.requestid,
+                                    isouter=True
+                                ).filter(
+                                    and_(
+                                        FOIRawRequest.status.notin_(['Archived']),
+                                        or_(
+                                            FOIRawRequest.isiaorestricted == False,
+                                            and_(FOIRawRequest.isiaorestricted == True, FOIRawRequest.assignedto == userid),
+                                            and_(FOIRawRequest.isiaorestricted == True, subquery_watchby.c.watchedby == userid))))
         else:
             if(additionalfilter == 'watchingRequests' and userid is not None):
                 #watchby
@@ -336,11 +539,17 @@ class FOIRawRequest(db.Model):
                 #myrequest
                 return basequery.filter(and_(FOIRawRequest.status.notin_(['Archived']), FOIRawRequest.assignedto == userid))
             else:
-                return basequery.filter(FOIRawRequest.status.notin_(['Archived']))
+                if(isiaorestrictedfilemanager == True):
+                    return basequery.filter(FOIRawRequest.status.notin_(['Archived']))
+                else:
+                    return basequery.filter(
+                        and_(
+                            FOIRawRequest.status.notin_(['Archived']),
+                            or_(FOIRawRequest.isiaorestricted == False, and_(FOIRawRequest.isiaorestricted == True, FOIRawRequest.assignedto == userid))))
 
     @classmethod
-    def getrequestssubquery(cls, filterfields, keyword, additionalfilter, userid):
-        basequery = FOIRawRequest.getbasequery(additionalfilter, userid)
+    def getrequestssubquery(cls, filterfields, keyword, additionalfilter, userid, isiaorestrictedfilemanager):
+        basequery = FOIRawRequest.getbasequery(additionalfilter, userid, isiaorestrictedfilemanager)
         basequery = basequery.filter(FOIRawRequest.status != 'Unopened').filter(FOIRawRequest.status != 'Closed')
         #filter/search
         if(len(filterfields) > 0 and keyword is not None):
@@ -355,34 +564,37 @@ class FOIRawRequest(db.Model):
 
         #filter/search
         filtercondition = []
-        for field in filterfields:
-            if(field == 'idNumber'):
-                keyword = keyword.replace('u-00', '')
+        if(keyword != 'restricted'):
+            for field in filterfields:
+                if(field == 'idNumber'):
+                    keyword = keyword.replace('u-00', '')
+                
+                filtercondition.append(FOIRawRequest.findfield(field).ilike('%'+keyword+'%'))
+                if(field == 'firstName'):
+                    filtercondition.append(FOIRawRequest.findfield('contactFirstName').ilike('%'+keyword+'%'))
+                if(field == 'lastName'):
+                    filtercondition.append(FOIRawRequest.findfield('contactLastName').ilike('%'+keyword+'%'))
+                if(field == 'requestType'):
+                    filtercondition.append(FOIRawRequest.findfield('requestTypeRequestType').ilike('%'+keyword+'%'))
+        else:
+            filtercondition.append(FOIRawRequest.isiaorestricted == True)
 
-            filtercondition.append(FOIRawRequest.findfield(field).ilike('%'+keyword+'%'))
-            if(field == 'firstName'):
-                filtercondition.append(FOIRawRequest.findfield('contactFirstName').ilike('%'+keyword+'%'))
-            if(field == 'lastName'):
-                filtercondition.append(FOIRawRequest.findfield('contactLastName').ilike('%'+keyword+'%'))
-            if(field == 'requestType'):
-                filtercondition.append(FOIRawRequest.findfield('requestTypeRequestType').ilike('%'+keyword+'%'))
-        
         return or_(*filtercondition)
 
 
     @classmethod
-    def getrequestspagination(cls, groups, page, size, sortingitems, sortingorders, filterfields, keyword, additionalfilter, userid):
+    def getrequestspagination(cls, groups, page, size, sortingitems, sortingorders, filterfields, keyword, additionalfilter, userid, isiaorestrictedfilemanager, isministryrestrictedfilemanager=False):
         #ministry requests
         iaoassignee = aliased(FOIAssignee)
         ministryassignee = aliased(FOIAssignee)
-        subquery_ministry_queue = FOIMinistryRequest.getrequestssubquery(groups, filterfields, keyword, additionalfilter, userid, iaoassignee, ministryassignee)
+        subquery_ministry_queue = FOIMinistryRequest.getrequestssubquery(groups, filterfields, keyword, additionalfilter, userid, iaoassignee, ministryassignee, 'IAO', isiaorestrictedfilemanager, isministryrestrictedfilemanager)
 
         #sorting
         sortingcondition = FOIRawRequest.getsorting(sortingitems, sortingorders)
 
         #rawrequests
         if "Intake Team" in groups or groups is None:                
-            subquery_rawrequest_queue = FOIRawRequest.getrequestssubquery(filterfields, keyword, additionalfilter, userid)
+            subquery_rawrequest_queue = FOIRawRequest.getrequestssubquery(filterfields, keyword, additionalfilter, userid, isiaorestrictedfilemanager)
             query_full_queue = subquery_rawrequest_queue.union(subquery_ministry_queue)
             return query_full_queue.order_by(*sortingcondition).paginate(page=page, per_page=size)
         else:
@@ -398,7 +610,7 @@ class FOIRawRequest(db.Model):
             'requestType': FOIRawRequest.requestrawdata['requestType'].astext,
             'requestTypeRequestType': FOIRawRequest.requestrawdata['requestType']['requestType'].astext,
             'idNumber': cast(FOIRawRequest.requestid, String),
-            # 'axisRequestId': cast(FOIRawRequest.axisrequestid, String),
+            'axisRequestId': cast(FOIRawRequest.axisrequestid, String),
             'axisrequest_number': cast(FOIRawRequest.axisrequestid, String),
             'currentState': FOIRawRequest.status,
             'assignedTo': FOIRawRequest.assignedto,
@@ -416,7 +628,31 @@ class FOIRawRequest(db.Model):
     
     @classmethod
     def validatefield(cls, x):
-        validfields = ['firstName', 'lastName', 'requestType', 'idNumber', 'axisRequestId', 'requestPageCount', 'currentState', 'assignedTo', 'receivedDate', 'assignedToFirstName', 'assignedToLastName', 'duedate', 'stateForSorting', 'assignedToFormatted', 'ministryAssignedToFormatted']
+        validfields = [
+            'firstName',
+            'lastName',
+            'requestType',
+            'idNumber',
+            'axisRequestId',
+            'requestPageCount',
+            'currentState',
+            'assignedTo',
+            'receivedDate',
+            'receivedDateUF',
+            'assignedToFirstName',
+            'assignedToLastName',
+            'duedate',
+            'defaultSorting',
+            'intakeSorting',
+            'ministrySorting',
+            'assignedToFormatted',
+            'ministryAssignedToFormatted',
+            'cfrduedate',
+            'applicantcategory',
+            'onBehalfFormatted',
+            'extensions',
+            'isiaorestricted'
+        ]
         if x in validfields:
             return True
         else:
@@ -428,7 +664,7 @@ class FOIRawRequest(db.Model):
         if(len(sortingitems) > 0 and len(sortingorders) > 0 and len(sortingitems) == len(sortingorders)):
             for field in sortingitems:
                 if(FOIRawRequest.validatefield(field)):
-                    order = sortingorders.pop()
+                    order = sortingorders.pop(0)
                     if(order == 'desc'):
                         sortingcondition.append(nullslast(desc(field)))
                     else:
@@ -436,13 +672,16 @@ class FOIRawRequest(db.Model):
         #default sorting
         if(len(sortingcondition) == 0):
             sortingcondition.append(asc('currentState'))
+
+        #always sort by created_at last to prevent pagination collisions
+        sortingcondition.append(asc('created_at'))
         
         return sortingcondition
 
 
     @classmethod
-    def advancedsearch(cls, params):
-        basequery = FOIRawRequest.getbasequery()
+    def advancedsearch(cls, params, userid, isiaorestrictedfilemanager=False):
+        basequery = FOIRawRequest.getbasequery(None, userid, isiaorestrictedfilemanager)
 
         #filter/search
         filtercondition = FOIRawRequest.getfilterforadvancedsearch(params)
@@ -451,7 +690,7 @@ class FOIRawRequest(db.Model):
         #ministry requests
         iaoassignee = aliased(FOIAssignee)
         ministryassignee = aliased(FOIAssignee)
-        subquery_ministry_queue = FOIMinistryRequest.advancedsearchsubquery(params, iaoassignee, ministryassignee)
+        subquery_ministry_queue = FOIMinistryRequest.advancedsearchsubquery(params, iaoassignee, ministryassignee, userid, 'IAO', isiaorestrictedfilemanager)
 
         #sorting
         sortingcondition = FOIRawRequest.getsorting(params['sortingitems'], params['sortingorders'])
@@ -516,24 +755,24 @@ class FOIRawRequest(db.Model):
                     #online form submission has no receivedDate in json - using created_at
                     filterconditionfordate.append(
                         or_(
-                            and_(FOIRawRequest.requestrawdata['receivedDate'].is_(None), FOIRawRequest.created_at >= parser.parse(params['fromdate'])),
-                            and_(FOIRawRequest.requestrawdata['receivedDate'].isnot(None), FOIRawRequest.findfield(params['daterangetype']) >= params['fromdate']),
+                            and_(FOIRawRequest.requestrawdata['receivedDate'].is_(None), FOIRawRequest.created_at.cast(Date) >= parser.parse(params['fromdate'])),
+                            and_(FOIRawRequest.requestrawdata['receivedDate'].isnot(None), FOIRawRequest.findfield(params['daterangetype']).cast(Date) >= parser.parse(params['fromdate'])),
                         )
                     )
                 else:
-                    filterconditionfordate.append(FOIRawRequest.findfield(params['daterangetype']) >= params['fromdate'])
+                    filterconditionfordate.append(FOIRawRequest.findfield(params['daterangetype']).cast(Date) >= parser.parse(params['fromdate']))
 
             if(params['todate'] is not None):
                 if(params['daterangetype'] == 'receivedDate'):
                     #online form submission has no receivedDate in json - using created_at
                     filterconditionfordate.append(
                         or_(
-                            and_(FOIRawRequest.requestrawdata['receivedDate'].is_(None), FOIRawRequest.created_at <= parser.parse(params['todate'])),
-                            and_(FOIRawRequest.requestrawdata['receivedDate'].isnot(None), FOIRawRequest.findfield(params['daterangetype']).cast(DateTime) <= parser.parse(params['todate'])),
+                            and_(FOIRawRequest.requestrawdata['receivedDate'].is_(None), FOIRawRequest.created_at.cast(Date) <= parser.parse(params['todate'])),
+                            and_(FOIRawRequest.requestrawdata['receivedDate'].isnot(None), FOIRawRequest.findfield(params['daterangetype']).cast(Date) <= parser.parse(params['todate'])),
                         )
                     )
                 else:
-                    filterconditionfordate.append(FOIRawRequest.findfield(params['daterangetype']).cast(DateTime) <= parser.parse(params['todate']))
+                    filterconditionfordate.append(FOIRawRequest.findfield(params['daterangetype']).cast(Date) <= parser.parse(params['todate']))
 
         return filterconditionfordate
 
@@ -581,46 +820,15 @@ class FOIRawRequest(db.Model):
     def getfilterforsearch(cls, params):
         #axis request #, raw request #, applicant name, assignee name, request description, subject code
         if(params['search'] == 'requestdescription'):
-            searchcondition1 = []
-            searchcondition2 = []
-            for keyword in params['keywords']:
-                searchcondition1.append(FOIRawRequest.findfield('description').ilike('%'+keyword+'%'))
-                searchcondition2.append(FOIRawRequest.findfield('descriptionDescription').ilike('%'+keyword+'%'))
-            return or_(and_(*searchcondition1), and_(*searchcondition2))
+            return FOIRawRequest.__getfilterfordescription(params)
         elif(params['search'] == 'applicantname'):
-            searchcondition1 = []
-            searchcondition2 = []
-            searchcondition3 = []
-            searchcondition4 = []
-            for keyword in params['keywords']:
-                searchcondition1.append(FOIRawRequest.findfield('firstName').ilike('%'+keyword+'%'))
-                searchcondition2.append(FOIRawRequest.findfield('lastName').ilike('%'+keyword+'%'))
-                searchcondition3.append(FOIRawRequest.findfield('contactFirstName').ilike('%'+keyword+'%'))
-                searchcondition4.append(FOIRawRequest.findfield('contactLastName').ilike('%'+keyword+'%'))
-            return or_(and_(*searchcondition1), and_(*searchcondition2), and_(*searchcondition3), and_(*searchcondition4))
+            return FOIRawRequest.__getfilterforapplicantname(params)
         elif(params['search'] == 'assigneename'):
-            searchcondition1 = []
-            searchcondition2 = []
-            for keyword in params['keywords']:
-                searchcondition1.append(FOIRawRequest.findfield('assignedToFirstName').ilike('%'+keyword+'%'))
-                searchcondition2.append(FOIRawRequest.findfield('assignedToLastName').ilike('%'+keyword+'%'))
-            return or_(and_(*searchcondition1), and_(*searchcondition2))
+            return FOIRawRequest.__getfilterforassigneename(params)
         elif(params['search'] == 'idnumber'):
-            searchcondition = []
-            for keyword in params['keywords']:
-                keyword = keyword.lower()
-                keyword = keyword.replace('u-00', '')
-                searchcondition.append(FOIRawRequest.findfield('idNumber').ilike('%'+keyword+'%'))
-            return and_(*searchcondition)
+            return FOIRawRequest.__getfilterforidnumber(params)
         elif(params['search'] == 'axisrequest_number'):
-            searchcondition1 = []
-            searchcondition2 = []
-            for keyword in params['keywords']:
-                keyword = keyword.lower()
-                keyword = keyword.replace('u-00', '')
-                searchcondition1.append(FOIRawRequest.findfield('idNumber').ilike('%'+keyword+'%'))
-                searchcondition2.append(FOIRawRequest.findfield('axisrequest_number').ilike('%'+keyword+'%'))
-            return or_(and_(*searchcondition1), and_(*searchcondition2))
+            return FOIRawRequest.__getfilterforaxisnumber(params)
         else:
             searchcondition = []
             for keyword in params['keywords']:
@@ -628,15 +836,108 @@ class FOIRawRequest(db.Model):
             return and_(*searchcondition)
     
     @classmethod
+    def __getfilterfordescription(cls,params):
+        searchcondition1 = []
+        searchcondition2 = []
+        for keyword in params['keywords']:
+            searchcondition1.append(FOIRawRequest.findfield('description').ilike('%'+keyword+'%'))
+            searchcondition2.append(FOIRawRequest.findfield('descriptionDescription').ilike('%'+keyword+'%'))
+        return or_(and_(*searchcondition1), and_(*searchcondition2))    
+    
+    @classmethod
+    def __getfilterforapplicantname(cls,params):
+        searchcondition1 = []
+        searchcondition2 = []
+        searchcondition3 = []
+        searchcondition4 = []
+        for keyword in params['keywords']:
+            searchcondition1.append(FOIRawRequest.findfield('firstName').ilike('%'+keyword+'%'))
+            searchcondition2.append(FOIRawRequest.findfield('lastName').ilike('%'+keyword+'%'))
+            searchcondition3.append(FOIRawRequest.findfield('contactFirstName').ilike('%'+keyword+'%'))
+            searchcondition4.append(FOIRawRequest.findfield('contactLastName').ilike('%'+keyword+'%'))
+        return or_(and_(*searchcondition1), and_(*searchcondition2), and_(*searchcondition3), and_(*searchcondition4))
+    
+    @classmethod        
+    def __getfilterforassigneename(cls,params):
+        searchcondition1 = []
+        searchcondition2 = []
+        searchcondition3 = []
+        for keyword in params['keywords']:
+            searchcondition1.append(FOIRawRequest.findfield('assignedToFirstName').ilike('%'+keyword+'%'))
+            searchcondition2.append(FOIRawRequest.findfield('assignedToLastName').ilike('%'+keyword+'%'))
+            searchcondition3.append(FOIRawRequest.assignedgroup.ilike('%'+keyword+'%'))
+        return or_(and_(*searchcondition1), and_(*searchcondition2), and_(*searchcondition3))
+
+    @classmethod
+    def __getfilterforidnumber(cls,params):
+        searchcondition = []
+        for keyword in params['keywords']:
+            keyword = keyword.lower()
+            keyword = keyword.replace('u-00', '')
+            searchcondition.append(FOIRawRequest.findfield('idNumber').ilike('%'+keyword+'%'))
+        return and_(*searchcondition)
+    
+    @classmethod
+    def __getfilterforaxisnumber(cls,params):
+        searchcondition1 = []
+        searchcondition2 = []
+        for keyword in params['keywords']:
+            keyword = keyword.lower()
+            keyword = keyword.replace('u-00', '')
+            searchcondition1.append(FOIRawRequest.findfield('idNumber').ilike('%'+keyword+'%'))
+            searchcondition2.append(FOIRawRequest.findfield('axisrequest_number').ilike('%'+keyword+'%'))
+        return or_(and_(*searchcondition1), and_(*searchcondition2))
+    
+    
+    @classmethod
     def getDistinctAXISRequestIds(cls):
-        
-        sql = """select distinct axisrequestid from "FOIRawRequests" where axisrequestid is not null;"""
-        axisids = db.session.execute(text(sql))
         axisrequestids = []
-        for axisid in axisids:
-            axisrequestids.append(axisid[0])
-        return axisrequestids 
+        try:
+            sql = """select distinct axisrequestid from "FOIRawRequests" where axisrequestid is not null;"""
+            axisids = db.session.execute(text(sql))
+            for axisid in axisids:
+                axisrequestids.append(axisid[0])
+        except Exception as ex:
+            logging.error(ex)
+            raise ex
+        finally:
+            db.session.close()
+        return axisrequestids
+
+    @classmethod
+    def getCountOfAXISRequestIdbyAXISRequestId(cls, axisrequestid):       
+        try:
+            query  = db.session.query(func.count(FOIRawRequest.axisrequestid)).filter_by(axisrequestid=axisrequestid)
+            return query.scalar()
+        except Exception as ex:
+            logging.error(ex)
+            raise ex
+        finally:
+            db.session.close()        
+
+    @classmethod
+    def getmetadata(cls,requestid):
+        requestdetails = {}
+        try:
+            sql = """select requestrawdata ->> 'assignedTo' as assignedTo,
+            requestrawdata ->> 'assignedToFirstName' as assignedToFirstName,
+            requestrawdata ->> 'assignedToLastName' as assignedToLastName,
+            requestrawdata -> 'selectedMinistries'-> 0 ->> 'code' as bcgovcode from "FOIRawRequests" 
+                    where requestid = :requestid
+                    order by version desc limit 1;"""
+            rs = db.session.execute(text(sql), {'requestid': requestid})
+            for row in rs:
+                requestdetails["assignedTo"] = row['assignedto']
+                requestdetails["assignedToFirstName"] = row["assignedtofirstname"]
+                requestdetails["assignedToLastName"] = row["assignedtolastname"]
+                requestdetails["bcgovcode"] = row["bcgovcode"]
+        except Exception as ex:
+            logging.error(ex)
+            raise ex
+        finally:
+            db.session.close()
+        return requestdetails
 
 class FOIRawRequestSchema(ma.Schema):
     class Meta:
-        fields = ('requestid', 'requestrawdata', 'status','notes','created_at','wfinstanceid','version','updated_at','assignedgroup','assignedto','updatedby','createdby','sourceofsubmission','ispiiredacted','assignee.firstname','assignee.lastname', 'axisrequestid', 'axissyncdate')
+        fields = ('requestid', 'requestrawdata', 'status','notes','created_at','wfinstanceid','version','updated_at','assignedgroup','assignedto','updatedby','createdby','sourceofsubmission','ispiiredacted','assignee.firstname','assignee.lastname', 'axisrequestid', 'axissyncdate', 'closedate','isiaorestricted')

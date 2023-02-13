@@ -41,9 +41,10 @@ objects:
         from:
           kind: ImageStreamTag
           namespace: "${IMAGE_NAMESPACE}"
-          name: "${API_NAME}:${TAG_NAME}"
+          # name: "${API_NAME}:${TAG_NAME}"
+          name: "${IMAGE_STREAM_NAME_FULL}"
     - type: ConfigChange
-    replicas: 2
+    replicas: 1
     test: false
     selector:
       app: "${API_NAME}"
@@ -66,73 +67,276 @@ objects:
               valueFrom:
                 secretKeyRef:
                   name: "${DB_SECRETS}"
-                  key: database-user
+                  key: app-db-username
             - name: DATABASE_PASSWORD
               valueFrom:
                 secretKeyRef:
                   name: "${DB_SECRETS}"
-                  key: database-password
+                  key: app-db-password
             - name: DATABASE_NAME
               valueFrom:
                 secretKeyRef:
-                  name: "${DB_SECRETS}"
-                  key: database-name
+                  name: "${REQUEST_MANAGEMENT_SECRETS}"
+                  key: "DATABASE_NAME"
             - name: DATABASE_HOST
-              value: "${DB_SECRETS}"
+              value: "${DATABASE_HOST}"
             - name: FLASK_ENV
               value: production
+
             - name: FOI_REQUESTQUEUE_REDISHOST
-              value: redis-formio
+              valueFrom:
+                secretKeyRef:
+                  name: "${REQUEST_MANAGEMENT_SECRETS}"
+                  key: FOI_REQUESTQUEUE_REDISHOST
             - name: FOI_REQUESTQUEUE_REDISPORT
-              value: 6379
+              valueFrom:
+                secretKeyRef:
+                  name: "${REQUEST_MANAGEMENT_SECRETS}"
+                  key: FOI_REQUESTQUEUE_REDISPORT
             - name: FOI_REQUESTQUEUE_REDISPASSWORD
-              value: TODO
+              valueFrom:
+                secretKeyRef:
+                  name: "${REQUEST_MANAGEMENT_SECRETS}"
+                  key: FOI_REQUESTQUEUE_REDISPASSWORD
             - name: FOI_REQUESTQUEUE_REDISCHANNEL
-              value: foi-rawrequest
+              valueFrom:
+                secretKeyRef:
+                  name: "${REQUEST_MANAGEMENT_SECRETS}"
+                  key: FOI_REQUESTQUEUE_REDISCHANNEL
             - name: KEYCLOAK_ADMIN_HOST
-              value: https://dev.oidc.gov.bc.ca
+              valueFrom:
+                secretKeyRef:
+                  name: "${REQUEST_MANAGEMENT_SECRETS}"
+                  key: KEYCLOAK_ADMIN_HOST
             - name: KEYCLOAK_ADMIN_REALM
-              value: TODO
+              valueFrom:
+                secretKeyRef:
+                  name: "${REQUEST_MANAGEMENT_SECRETS}"
+                  key: KEYCLOAK_ADMIN_REALM
             - name: KEYCLOAK_ADMIN_CLIENT_ID
-              value: TODO
+              valueFrom:
+                secretKeyRef:
+                  name: "${REQUEST_MANAGEMENT_SECRETS}"
+                  key: KEYCLOAK_ADMIN_CLIENT_ID
             - name: KEYCLOAK_ADMIN_CLIENT_SECRET
-              value: TODO
+              valueFrom:
+                secretKeyRef:
+                  name: "${REQUEST_MANAGEMENT_SECRETS}"
+                  key: KEYCLOAK_ADMIN_CLIENT_SECRET
             - name: KEYCLOAK_ADMIN_SRVACCOUNT
-              value: TODO
+              valueFrom:
+                secretKeyRef:
+                  name: "${REQUEST_MANAGEMENT_SECRETS}"
+                  key: KEYCLOAK_ADMIN_SRVACCOUNT
             - name: KEYCLOAK_ADMIN_SRVPASSWORD
-              value: TODO
+              valueFrom:
+                secretKeyRef:
+                  name: "${REQUEST_MANAGEMENT_SECRETS}"
+                  key: KEYCLOAK_ADMIN_SRVPASSWORD
             - name: KEYCLOAK_ADMIN_INTAKE_GROUPID
-              value: TODO
+              valueFrom:
+                secretKeyRef:
+                  name: "${REQUEST_MANAGEMENT_SECRETS}"
+                  key: KEYCLOAK_ADMIN_INTAKE_GROUPID
             - name: BPM_ENGINE_REST_URL
-              value: TODO
+              valueFrom:
+                secretKeyRef:
+                  name: "${REQUEST_MANAGEMENT_SECRETS}"
+                  key: BPM_ENGINE_REST_URL
             - name: BPM_TOKEN_URL
-              value: TODO
+              valueFrom:
+                secretKeyRef:
+                  name: "${REQUEST_MANAGEMENT_SECRETS}"
+                  key: BPM_TOKEN_URL
             - name: BPM_CLIENT_ID
-              value: TODO
+              valueFrom:
+                secretKeyRef:
+                  name: "${REQUEST_MANAGEMENT_SECRETS}"
+                  key: BPM_CLIENT_ID
             - name: BPM_CLIENT_SECRET
-              value: TODO
+              valueFrom:
+                secretKeyRef:
+                  name: "${REQUEST_MANAGEMENT_SECRETS}"
+                  key: BPM_CLIENT_SECRET
             - name: JWT_OIDC_WELL_KNOWN_CONFIG
-              value: TODO
+              valueFrom:
+                secretKeyRef:
+                  name: "${REQUEST_MANAGEMENT_SECRETS}"
+                  key: JWT_OIDC_WELL_KNOWN_CONFIG
             - name: JWT_OIDC_AUDIENCE
-              value: forms-flow-web
+              valueFrom:
+                secretKeyRef:
+                  name: "${REQUEST_MANAGEMENT_SECRETS}"
+                  key: JWT_OIDC_AUDIENCE
             - name: JWT_OIDC_ISSUER
-              value: TODO
+              valueFrom:
+                secretKeyRef:
+                  name: "${REQUEST_MANAGEMENT_SECRETS}"
+                  key: JWT_OIDC_ISSUER
             - name: JWT_OIDC_ALGORITHMS
-              value: RS256
+              valueFrom:
+                secretKeyRef:
+                  name: "${REQUEST_MANAGEMENT_SECRETS}"
+                  key: JWT_OIDC_ALGORITHMS
             - name: CORS_ORIGIN
-              value: TODO
+              value: "${CORS_ORIGIN}"
             - name: JWT_OIDC_JWKS_URI
-              value: TODO
+              valueFrom:
+                secretKeyRef:
+                  name: "${REQUEST_MANAGEMENT_SECRETS}"
+                  key: JWT_OIDC_JWKS_URI
             - name: JWT_OIDC_CACHING_ENABLED
-              value: True
+              value: 'True'
             - name: JWT_OIDC_JWKS_CACHE_TIMEOUT
-              value: 300
+              value: "300"
             - name: CACHE_TIMEOUT
-              value: 36000
+              value: "36000"
             - name: FOI_REQUESTQUEUE_REDISURL
-              value: TODO
+              valueFrom:
+                secretKeyRef:
+                  name: "${REQUEST_MANAGEMENT_SECRETS}"
+                  key: FOI_REQUESTQUEUE_REDISURL
             - name: CACHE_ENABLED
-              value: N
+              value: 'N'
+            - name: OSS_S3_FORMS_BUCKET
+              valueFrom:
+                secretKeyRef:
+                  name: "${REQUEST_MANAGEMENT_SECRETS}"
+                  key: OSS_S3_FORMS_BUCKET
+            - name: OSS_S3_FORMS_ACCESS_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  name: "${REQUEST_MANAGEMENT_SECRETS}"
+                  key: OSS_S3_FORMS_ACCESS_KEY_ID
+            - name: OSS_S3_FORMS_SECRET_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: "${REQUEST_MANAGEMENT_SECRETS}"
+                  key: OSS_S3_FORMS_SECRET_ACCESS_KEY
+            - name: OSS_S3_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: "${REQUEST_MANAGEMENT_SECRETS}"
+                  key: OSS_S3_HOST
+            - name: OSS_S3_REGION
+              valueFrom:
+                secretKeyRef:
+                  name: "${REQUEST_MANAGEMENT_SECRETS}"
+                  key: OSS_S3_REGION
+            - name: OSS_S3_SERVICE
+              valueFrom:
+                secretKeyRef:
+                  name: "${REQUEST_MANAGEMENT_SECRETS}"
+                  key: OSS_S3_SERVICE
+            - name: FOI_NOTIFICATION_DAYS
+              value: '14'
+            - name: FOI_ADDITIONAL_HOLIDAYS
+              value: '30-09-XXXX'
+            - name: SOCKETIO_PING_INTERVAL
+              value: '30'
+            - name: SOCKETIO_PING_TIMEOUT
+              value: '5'
+            - name: SOCKETIO_LOG_ENABLED
+              value: 'False'
+            - name: SOCKETIO_MESSAGE_QTYPE
+              value: 'REDIS'
+            - name: SOCKETIO_REDISURL
+              valueFrom:
+                secretKeyRef:
+                  name: "${REQUEST_MANAGEMENT_SECRETS}"
+                  key: SOCKETIO_REDISURL
+            - name: SOCKETIO_REDIS_COMMENT_CHANNEL
+              valueFrom:
+                secretKeyRef:
+                  name: "${REQUEST_MANAGEMENT_SECRETS}"
+                  key: SOCKETIO_REDIS_COMMENT_CHANNEL
+            - name: SOCKETIO_REDIS_HEALTHCHECK_INTERVAL
+              value: '3'
+            - name: SOCKETIO_REDIS_CONNECT_TIMEOUT
+              value: '10'
+            - name: SOCKETIO_REDIS_SLEEP_TIME
+              value: '3.0'
+            - name: SOCKETIO_CONNECT_NONCE
+              valueFrom:
+                secretKeyRef:
+                  name: "${REQUEST_MANAGEMENT_SECRETS}"
+                  key: SOCKETIO_CONNECT_NONCE
+            - name: CACHE_REDISURL
+              valueFrom:
+                secretKeyRef:
+                  name: "${REQUEST_MANAGEMENT_SECRETS}"
+                  key: CACHE_REDISURL
+            - name: FOI_WEB_PAY_URL
+              valueFrom:
+                secretKeyRef:
+                  name: "${REQUEST_MANAGEMENT_SECRETS}"
+                  key: FOI_WEB_PAY_URL
+            - name: FOI_FFA_URL
+              valueFrom:
+                secretKeyRef:
+                  name: "${REQUEST_MANAGEMENT_SECRETS}"
+                  key: FOI_FFA_URL
+            - name: PAYBC_REF_NUMBER
+              valueFrom:
+                secretKeyRef:
+                  name: "${REQUEST_MANAGEMENT_SECRETS}"
+                  key: PAYBC_REF_NUMBER
+            - name: PAYBC_PORTAL_URL
+              valueFrom:
+                secretKeyRef:
+                  name: "${REQUEST_MANAGEMENT_SECRETS}"
+                  key: PAYBC_PORTAL_URL
+            - name: PAYBC_TXN_PREFIX
+              valueFrom:
+                secretKeyRef:
+                  name: "${REQUEST_MANAGEMENT_SECRETS}"
+                  key: PAYBC_TXN_PREFIX
+            - name: PAYBC_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: "${REQUEST_MANAGEMENT_SECRETS}"
+                  key: PAYBC_API_KEY
+            - name: PAYBC_API_BASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: "${REQUEST_MANAGEMENT_SECRETS}"
+                  key: PAYBC_API_BASE_URL
+            - name: PAYBC_API_CLIENT
+              valueFrom:
+                secretKeyRef:
+                  name: "${REQUEST_MANAGEMENT_SECRETS}"
+                  key: PAYBC_API_CLIENT
+            - name: PAYBC_API_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: "${REQUEST_MANAGEMENT_SECRETS}"
+                  key: PAYBC_API_SECRET
+            - name: CDOGS_BASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: "${REQUEST_MANAGEMENT_SECRETS}"
+                  key: CDOGS_BASE_URL
+            - name: CDOGS_SERVICE_CLIENT
+              valueFrom:
+                secretKeyRef:
+                  name: "${REQUEST_MANAGEMENT_SECRETS}"
+                  key: CDOGS_SERVICE_CLIENT
+            - name: CDOGS_SERVICE_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: "${REQUEST_MANAGEMENT_SECRETS}"
+                  key: CDOGS_SERVICE_CLIENT_SECRET
+            - name: CDOGS_TOKEN_URL
+              valueFrom:
+                secretKeyRef:
+                  name: "${REQUEST_MANAGEMENT_SECRETS}"
+                  key: CDOGS_TOKEN_URL
+
+
+          ## TODO: NEED TO GET CDOGS AND PAYBC ENVS IN HERE TOO
+          ## TODO: NEED TO GET CDOGS AND PAYBC ENVS IN HERE TOOTODO: NEED TO GET CDOGS AND PAYBC ENVS IN HERE TOO
+  
+  
           # command:
           #   - gunicorn
           #   - '-b'
@@ -146,30 +350,21 @@ objects:
           #     name: ${API_NAME}-config
           resources:
             requests:
-              cpu: "100m"
-              memory: "100Mi"
+              cpu: "50m"
+              memory: "250Mi"
             limits:
-              cpu: "750m"
-              memory: "2Gi"
-          # livenessProbe:
-          #   httpGet:
-          #     # TODO - Change to proper health check once
-          #     path: "/"
-          #     port: 5000
-          #     scheme: HTTP
-          #   timeoutSeconds: 1
-          #   periodSeconds: 10
-          #   successThreshold: 1
-          #   failureThreshold: 3
-          # readinessProbe:
-          #   httpGet:
-          #     path: "/"
-          #     port: 5000
-          #     scheme: HTTP
-          #   timeoutSeconds: 1
-          #   periodSeconds: 10
-          #   successThreshold: 1
-          #   failureThreshold: 3
+              cpu: "150m"
+              memory: "500Mi"
+          readinessProbe:
+            httpGet:
+              path: /api/readyz
+              port: 5000
+              scheme: HTTP
+            initialDelaySeconds: 60
+            timeoutSeconds: 3
+            periodSeconds: 60
+            successThreshold: 1
+            failureThreshold: 3          
           terminationMessagePath: "/dev/termination-log"
           terminationMessagePolicy: File
           imagePullPolicy: Always
@@ -241,8 +436,30 @@ parameters:
   description: The TAG name for this environment, e.g., dev, test, prod
   required: true
   value: test
+- name: DATABASE_HOST
+  displayName: Database service name
+  description: Must match service name of database, eg patroni-master-002
+  required: true
 - name: DB_SECRETS
   displayName: Environment TAG name
   description: The TAG name for this environment, e.g., dev, test, prod
   required: true
   value: postgresql
+- name: REQUEST_MANAGEMENT_SECRETS
+  displayName: Request Management Secrets
+  description: Name of secret for all request-management-api values
+  required: true
+- name: IMAGE_STREAM_NAME_FULL
+  displayName: Full image stream name (eg "request-management-api:dev")
+  description: Includes ImageStream name and tag
+  required: true
+  value: request-management-api:dev
+- name: CORS_ORIGIN
+  displayName: CORS Origin whitelists
+  description: Whitelist for CORS requests
+  required: true
+- name: DATABASE_NAME
+  displayName: Name of database in the patroni instance
+  description: Name of the database
+  required: true
+  value: foidb

@@ -19,7 +19,7 @@ class requestservicebuilder(requestserviceconfigurator):
     """ This class consolidates the helper functions for creating new foi request based on iao actions. 
     """
 
-    def createministry(self, requestschema, ministry, activeversion, userid, filenumber=None, ministryid=None):                      
+    def createministry(self, requestschema, ministry, activeversion, userid, filenumber=None, ministryid=None):
         foiministryrequest = FOIMinistryRequest()
         foiministryrequest.__dict__.update(ministry)
         foiministryrequest.requeststatusid = requestschema.get("requeststatusid")
@@ -32,32 +32,23 @@ class requestservicebuilder(requestserviceconfigurator):
         foiministryrequest.description = requestschema.get("description")
         foiministryrequest.duedate = requestschema.get("dueDate")
         if requestschema.get("cfrDueDate") is not None and requestschema.get("cfrDueDate")  != "":
-            foiministryrequest.cfrduedate = requestschema.get("cfrDueDate")        
-        foiministryrequest.startdate = requestschema.get("startDate")
+            foiministryrequest.cfrduedate = requestschema.get("cfrDueDate")
+        startdate = ""
+        if (requestschema.get("startDate") is not None):
+            startdate = requestschema.get("startDate")
+        elif (requestschema.get("requestProcessStart") is not None):
+            startdate = requestschema.get("requestProcessStart")
+        foiministryrequest.startdate = startdate
         foiministryrequest.createdby = userid
         requeststatusid =  self.getpropertyvaluefromschema(requestschema, 'requeststatusid')
         if requeststatusid is not None:
-            status = self.getstatusname(requeststatusid)       
-            if self.__isgrouprequired(status):
-                foiministryrequest.assignedministrygroup = MinistryTeamWithKeycloackGroup[ministry["code"]].value
+            status = self.getstatusname(requeststatusid)
         if self.isNotBlankorNone(requestschema,"fromDate","main") == True:
             foiministryrequest.recordsearchfromdate = requestschema.get("fromDate")
         if self.isNotBlankorNone(requestschema,"toDate","main") == True:
-            foiministryrequest.recordsearchtodate = requestschema.get("toDate")        
-        foiministryrequest.assignedgroup = requestschema.get("assignedGroup")
-        if self.isNotBlankorNone(requestschema,"assignedTo","main") == True:
-            foiministryrequest.assignedto = requestschema.get("assignedTo")
-            requestserviceministrybuilder().createfoiassigneefromobject(requestschema.get("assignedTo"), requestschema.get("assignedToFirstName"), requestschema.get("assignedToMiddleName"), requestschema.get("assignedToLastName"))
-        else:
-            foiministryrequest.assignedto = None
-        if self.isNotBlankorNone(requestschema,"assignedministrygroup","main") == True:
-            foiministryrequest.assignedministrygroup = requestschema.get("assignedministrygroup")
-        if self.isNotBlankorNone(requestschema,"assignedministryperson","main") == True:
-            foiministryrequest.assignedministryperson = requestschema.get("assignedministryperson")
-            requestserviceministrybuilder().createfoiassigneefromobject(requestschema.get("assignedministryperson"), requestschema.get("assignedministrypersonFirstName"), requestschema.get("assignedministrypersonMiddleName"), requestschema.get("assignedministrypersonLastName"))
-        if(ministryid is None and filenumber is None and status == "Open"):
-            foiministryrequest.assignedto = None
-            foiministryrequest.assignedgroup = self.__getgroupname(requestschema.get("requestType"), ministry["code"])
+            foiministryrequest.recordsearchtodate = requestschema.get("toDate")
+        self.__updateassignedtoandgroup(foiministryrequest, requestschema, ministry, status, filenumber, ministryid)
+        self.__updateministryassignedtoandgroup(foiministryrequest, requestschema, ministry, status)
 
         if ministryid is not None:
             foiministryrequest.foiministryrequestid = ministryid
@@ -69,8 +60,32 @@ class requestservicebuilder(requestserviceconfigurator):
         foiministryrequest.version = activeversion
         foiministryrequest.closedate = self.getpropertyvaluefromschema(requestschema, 'closedate')
         foiministryrequest.closereasonid = self.getpropertyvaluefromschema(requestschema, 'closereasonid')
+        if self.getpropertyvaluefromschema(requestschema, 'isofflinepayment') is not None:
+            foiministryrequest.isofflinepayment =  self.getpropertyvaluefromschema(requestschema, 'isofflinepayment')    
         return foiministryrequest
-    
+
+    def __updateministryassignedtoandgroup(self, foiministryrequest, requestschema, ministry, status):
+        if self.__isgrouprequired(status):
+                foiministryrequest.assignedministrygroup = MinistryTeamWithKeycloackGroup[ministry["code"]].value
+        if self.isNotBlankorNone(requestschema,"assignedministrygroup","main") == True:
+            foiministryrequest.assignedministrygroup = requestschema.get("assignedministrygroup")
+        if self.isNotBlankorNone(requestschema,"assignedministryperson","main") == True and requestschema.get("reopen") != True:
+            foiministryrequest.assignedministryperson = requestschema.get("assignedministryperson")
+            requestserviceministrybuilder().createfoiassigneefromobject(requestschema.get("assignedministryperson"), requestschema.get("assignedministrypersonFirstName"), requestschema.get("assignedministrypersonMiddleName"), requestschema.get("assignedministrypersonLastName"))
+        else:
+            foiministryrequest.assignedministryperson = None
+
+    def __updateassignedtoandgroup(self, foiministryrequest, requestschema, ministry, status, filenumber=None, ministryid=None):
+        foiministryrequest.assignedgroup = requestschema.get("assignedGroup")
+        if self.isNotBlankorNone(requestschema,"assignedTo","main") == True:
+            foiministryrequest.assignedto = requestschema.get("assignedTo")
+            requestserviceministrybuilder().createfoiassigneefromobject(requestschema.get("assignedTo"), requestschema.get("assignedToFirstName"), requestschema.get("assignedToMiddleName"), requestschema.get("assignedToLastName"))
+        else:
+            foiministryrequest.assignedto = None
+        if(ministryid is None and filenumber is None and status == "Open" and requestschema.get("isiaorestricted") == False):
+            foiministryrequest.assignedto = None
+            foiministryrequest.assignedgroup = self.__getgroupname(requestschema.get("requestType"), ministry["code"])
+
     def __isgrouprequired(self,status):
         if status == "Call For Records" or status == "Review" or status == "Consult" or status == "Fee Assessed" or status == "Ministry Sign Off" or status == "Response":
             return True
@@ -115,7 +130,7 @@ class requestservicebuilder(requestserviceconfigurator):
             if key in dataschema and  dataschema.get(key) is not None and dataschema.get(key)  and dataschema.get(key)  != "":
                 return True
         else:
-            if dataschema.get(location) is not None and key in dataschema.get(location) and dataschema.get(location)[key] and dataschema.get(location)[key] is not None and dataschema.get(location)[key] !="":     
+            if dataschema.get(location) is not None and key in dataschema.get(location) and dataschema.get(location)[key] and dataschema.get(location)[key] is not None and dataschema.get(location)[key] !="":
                 return True
         return False          
     

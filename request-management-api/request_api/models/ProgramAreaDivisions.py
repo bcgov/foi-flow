@@ -11,6 +11,7 @@ class ProgramAreaDivision(db.Model):
     programareaid = db.Column(db.Integer, db.ForeignKey('ProgramAreas.programareaid'))
     name = db.Column(db.String(500), unique=False, nullable=False)    
     isactive = db.Column(db.Boolean, unique=False, nullable=False)
+    sortorder = db.Column(db.Integer, unique=False, nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.now)
     createdby = db.Column(db.String(120), unique=False, default='System')
     
@@ -23,11 +24,11 @@ class ProgramAreaDivision(db.Model):
     @classmethod
     def getprogramareadivisions(cls,programareaid):
         division_schema = ProgramAreaDivisionSchema(many=True)
-        query = db.session.query(ProgramAreaDivision).filter_by(programareaid=programareaid).order_by(ProgramAreaDivision.name.asc())
+        query = db.session.query(ProgramAreaDivision).filter_by(programareaid=programareaid, isactive=True).order_by(ProgramAreaDivision.name.asc())
         return division_schema.dump(query)
     
              
 
 class ProgramAreaDivisionSchema(ma.Schema):
     class Meta:
-        fields = ('divisionid','programareaid', 'name','isactive')
+        fields = ('divisionid','programareaid', 'name','isactive','sortorder')
