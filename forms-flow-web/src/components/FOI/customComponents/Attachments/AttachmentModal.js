@@ -223,7 +223,11 @@ export default function AttachmentModal({
         case "rename":
           return {title: "Rename Attachment", body: ""};
         case "delete":
-          return {title: "Delete Attachment", body: "Are you sure you want to delete the attachment?"};            
+          if (uploadFor === 'record') {
+            return {title: "Delete Record", body: <>Are you sure you want to delete this record?<br></br><i>If you delete this record, the record will not appear in the redaction app for review by IAO.</i></>};
+          } else {
+            return {title: "Delete Attachment", body: "Are you sure you want to delete the attachment?"};
+          }          
         default:
             return {title: "", body: ""};
       }
