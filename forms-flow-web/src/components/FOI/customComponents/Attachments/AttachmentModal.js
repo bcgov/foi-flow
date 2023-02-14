@@ -264,7 +264,7 @@ export default function AttachmentModal({
             </DialogTitle>
           <DialogContent>
             <DialogContentText id="state-change-dialog-description" component={'span'}>
-              <div className="modal-message">
+              <div className="attachment-modal-message">
                 <span className="confirmation-message">
                   {message.body}                               
                 </span>                
