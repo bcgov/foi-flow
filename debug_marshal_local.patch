@@ -15,20 +15,7 @@ index 6baadfb0..dd8765db 100644
 \ No newline at end of file
 +// export const DOC_REVIEWER_BASE_API_URL = `${(window._env_ && window._env_.REACT_APP_DOCREVIEWER_BASE_API_URL) || process.env.REACT_APP_DOCREVIEWER_BASE_API_URL}`;
 +export const FOI_BASE_API_URL = `http://localhost:15000`;
-+export const DOC_REVIEWER_BASE_API_URL = `http://localhost:15500`;
-diff --git a/forms-flow-web/src/apiManager/services/FOI/foiRecordServices.js b/forms-flow-web/src/apiManager/services/FOI/foiRecordServices.js
-index 8ac66fbe..0c2c4807 100644
---- a/forms-flow-web/src/apiManager/services/FOI/foiRecordServices.js
-+++ b/forms-flow-web/src/apiManager/services/FOI/foiRecordServices.js
-@@ -26,7 +26,7 @@ export const fetchFOIRecords = (requestId, ministryId, ...rest) => {
-     httpGETRequest(apiUrl, {}, UserService.getToken())
-       .then((res) => {
-         if (res.data) {
--          dispatch(setRequestRecords(res.data));
-+          dispatch(setRequestRecords(res.data.records));
-           dispatch(setFOIAttachmentListLoader(false));
-           done(null, res.data);
- 
++export const DOC_REVIEWER_BASE_API_URL = `http://localhost:15500`; 
 diff --git a/forms-flow-web/src/components/FOI/FOIAuthenticateRouting.jsx b/forms-flow-web/src/components/FOI/FOIAuthenticateRouting.jsx
 index 6b89abed..a79f4d5b 100644
 --- a/forms-flow-web/src/components/FOI/FOIAuthenticateRouting.jsx
