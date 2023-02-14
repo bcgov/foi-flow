@@ -158,6 +158,6 @@ class commentservice:
         user['username'] = username
         user['firstname'] = firstname
         user['lastname'] = lastname
-        user['fullname'] = lastname+","+firstname
-        user['name'] = lastname+","+firstname
+        user['fullname'] = lastname+", "+firstname
+        user['name'] = lastname+", "+firstname
         return user
