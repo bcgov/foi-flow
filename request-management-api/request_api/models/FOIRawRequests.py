@@ -469,6 +469,12 @@ class FOIRawRequest(db.Model):
                            ],
                            else_ = FOIRawRequest.isiaorestricted).label('isiaorestricted')
 
+        subjectcode = case([
+            (FOIRawRequest.requestrawdata['subjectCode'].is_(None),
+            literal(None)),
+            ],
+            else_ = cast(FOIRawRequest.requestrawdata['subjectCode'], String)).label('subjectcode')
+
         selectedcolumns = [
             FOIRawRequest.requestid.label('id'),
             FOIRawRequest.version,
@@ -508,7 +514,8 @@ class FOIRawRequest(db.Model):
             literal(None).label('onBehalfFormatted'),
             literal(None).label('extensions'),
             isiaorestricted,
-            literal(None).label('isministryrestricted')
+            literal(None).label('isministryrestricted'),
+            subjectcode
         ]
 
         basequery = _session.query(*selectedcolumns).join(subquery_maxversion, and_(*joincondition)).join(FOIAssignee, FOIAssignee.username == FOIRawRequest.assignedto, isouter=True)
@@ -623,7 +630,8 @@ class FOIRawRequest(db.Model):
             'ministryMinistry': FOIRawRequest.requestrawdata['ministry']['selectedMinistry'].astext,
             'duedate': FOIRawRequest.requestrawdata['dueDate'].astext,
             'DueDateValue': FOIRawRequest.requestrawdata['dueDate'].astext,
-            'DaysLeftValue': FOIRawRequest.requestrawdata['dueDate'].astext
+            'DaysLeftValue': FOIRawRequest.requestrawdata['dueDate'].astext,
+            'subjectcode': FOIRawRequest.requestrawdata['subjectCode'].astext
         }.get(x, cast(FOIRawRequest.requestid, String))
     
     @classmethod
