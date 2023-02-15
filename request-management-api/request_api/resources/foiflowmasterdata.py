@@ -30,6 +30,7 @@ from request_api.services.divisionstageservice import divisionstageservice
 from request_api.services.closereasonservice import closereasonservice
 from request_api.schemas.foirequestsformslist import  FOIRequestsFormsList
 from request_api.services.extensionreasonservice import extensionreasonservice
+from request_api.services.cacheservice import cacheservice
 import json
 import request_api
 import requests
@@ -85,6 +86,7 @@ class FOIFlowProgramAreas(Resource):
         )
     def get():
         try:
+            print("Inside Program areas!")
             data = programareaservice().getprogramareas()
             jsondata = json.dumps(data)
             return jsondata , 200
@@ -330,6 +332,22 @@ class FOIFlowProgramAreas(Resource):
     def post():
         try:
             resp_flag = clear_cache()
+            return {"success": resp_flag } , 200 if resp_flag == True else 500
+        except BusinessException:
+            return "Error happened while clearing cache" , 500
+
+@cors_preflight('POST,OPTIONS')
+@API.route('/foiflow/cache/refresh')
+class FOIFlowRefreshCache(Resource):
+    """Clear all cached data and fetch all the
+        master data again"""
+    @staticmethod
+    @TRACER.trace()
+    @cross_origin(origins=allowedorigins())
+    @auth.require
+    def post():
+        try:
+            resp_flag = cacheservice().refreshcache()
             return {"success": resp_flag } , 200 if resp_flag == True else 500
         except BusinessException:
             return "Error happened while clearing cache" , 500

@@ -239,5 +239,7 @@ class AuthHelper:
         usergroups = cls.getusergroups()
         return list(set(usergroups).intersection(MinistryTeamWithKeycloackGroup.list()))   
       
-
+    @classmethod        
+    def getauthtoken(cls): 
+        return request.headers.get("Authorization", None)
         
