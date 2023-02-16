@@ -1,13 +1,25 @@
 import logging
 import os
 import requests
-from request_api.utils.cache import clear_cache
+from request_api.utils.cache import clear_cache, clear_keycloak_cache
 from request_api.auth import AuthHelper
 from request_api.services.external.keycloakadminservice import KeycloakAdminService
 
 class cacheservice:
     
     request_url = os.getenv("FOI_REQ_MANAGEMENT_API_URL")
+
+    def refreshkeycloakcache(self):
+        try:
+            result= False
+            resp_flag = clear_keycloak_cache("foiassignees")
+            if resp_flag:
+                apiurls = self.__getapilist()
+                result=self.__invokeresources(apiurls)
+            return result
+        except Exception as ex:    
+            logging.error(ex)        
+        return False
 
     def refreshcache(self):
         try:
@@ -25,13 +37,13 @@ class cacheservice:
         try:
             apiurls=[]
             apiurls.append(self.request_url+'/api/foiassignees')
-            apiurls.append(self.request_url+'/api/foiflow/programareas')
-            apiurls.append(self.request_url+'/api/foiflow/deliverymodes')
-            apiurls.append(self.request_url+'/api/foiflow/receivedmodes')
-            apiurls.append(self.request_url+'/api/foiflow/closereasons')
-            apiurls.append(self.request_url+'/api/foiflow/extensionreasons')
-            apiurls.append(self.request_url+'/api/foiflow/applicantcategories')
-            apiurls.append(self.request_url+'/api/foiflow/applicantcorrespondence/templates')
+            # apiurls.append(self.request_url+'/api/foiflow/programareas')
+            # apiurls.append(self.request_url+'/api/foiflow/deliverymodes')
+            # apiurls.append(self.request_url+'/api/foiflow/receivedmodes')
+            # apiurls.append(self.request_url+'/api/foiflow/closereasons')
+            # apiurls.append(self.request_url+'/api/foiflow/extensionreasons')
+            # apiurls.append(self.request_url+'/api/foiflow/applicantcategories')
+            # apiurls.append(self.request_url+'/api/foiflow/applicantcorrespondence/templates')
         except Exception as ex:    
             logging.error(ex)        
         return apiurls

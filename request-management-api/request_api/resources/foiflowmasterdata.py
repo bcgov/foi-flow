@@ -336,7 +336,7 @@ class FOIFlowProgramAreas(Resource):
             return "Error happened while clearing cache" , 500
 
 @cors_preflight('POST,OPTIONS')
-@API.route('/foiflow/cache/refresh')
+@API.route('/foiflow/keycloak/cache/refresh')
 class FOIFlowRefreshCache(Resource):
     """Clear all cached data and fetch all the
         master data again"""
@@ -346,7 +346,7 @@ class FOIFlowRefreshCache(Resource):
     @auth.require
     def post():
         try:
-            resp_flag = cacheservice().refreshcache()
+            resp_flag = cacheservice().refreshkeycloakcache()
             return {"success": resp_flag } , 200 if resp_flag == True else 500
         except BusinessException:
             return "Error happened while clearing cache" , 500

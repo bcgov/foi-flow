@@ -57,3 +57,23 @@ def clear_cache():
     except Exception as ex:    
         logging.error(ex)        
     return False
+
+
+## If true, bypass cache
+def keycloak_cache_filter():
+    if os.getenv('KEYCLOAK_CACHE_ENABLED') != 'Y':
+        return True    
+    try:        
+        cache_client.ping()
+    except Exception:    
+        return True
+    return False
+
+def clear_keycloak_cache(key):
+    try:
+        if os.getenv('KEYCLOAK_CACHE_ENABLED') == 'Y':
+            cache_client.delete(key)
+        return True
+    except Exception as ex:    
+        logging.error(ex)        
+    return False
