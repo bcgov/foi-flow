@@ -86,7 +86,6 @@ class FOIFlowProgramAreas(Resource):
         )
     def get():
         try:
-            print("Inside Program areas!")
             data = programareaservice().getprogramareas()
             jsondata = json.dumps(data)
             return jsondata , 200
