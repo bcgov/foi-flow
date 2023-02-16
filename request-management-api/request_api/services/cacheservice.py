@@ -38,10 +38,9 @@ class cacheservice:
 
     def __invokeresources(self, apiurls):
         try:
-            
             headers= {"Authorization": "Bearer " + KeycloakAdminService().get_token()}
             for url in apiurls:
-                requests.get(url, headers)
+                requests.get(url, headers=headers)
             return True
         except Exception as ex:    
             logging.error(ex)        
