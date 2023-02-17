@@ -16,7 +16,8 @@ import {
     setFOIReceivedModeList,
     setFOIMinistryDivisionalStages,
     setClosingReasons,
-    setCommentTagListLoader    
+    setFOISubjectCodeList,  
+    setCommentTagListLoader, 
   } from "../../../actions/FOI/foiRequestActions";
   import { fnDone } from "./foiServicesUtil";
   import UserService from "../../../services/UserService";
@@ -355,6 +356,33 @@ import {
         })
         .catch((error) => {
           console.log(`Error while fetching ministry(${bcgovcode}) divisional stage master data`, error);
+          dispatch(serviceActionError(error));
+          dispatch(setFOILoader(false));
+        });
+    };
+  };
+
+  export const fetchFOISubjectCodeList = () => {
+    const firstSubjectCode = { "subjectcodeid": 0, "name": "Select Subject Code (if required)" };
+    return (dispatch) => {
+      httpGETRequest(API.FOI_GET_SUBJECT_CODELIST, {}, UserService.getToken())
+        .then((res) => {
+          if (res.data) {
+            const foiSubjectCodeList = res.data;
+            let data = foiSubjectCodeList.map((subjectCode) => {
+              return { ...subjectCode };
+            });
+            data.unshift(firstSubjectCode);
+            dispatch(setFOISubjectCodeList(data));
+            dispatch(setFOILoader(false));
+          } else {
+            console.log("Error while fetching subject code master data", res);
+            dispatch(serviceActionError(res));
+            dispatch(setFOILoader(false));
+          }
+        })
+        .catch((error) => {
+          console.log("Error while fetching delivery mode master data", error);
           dispatch(serviceActionError(error));
           dispatch(setFOILoader(false));
         });

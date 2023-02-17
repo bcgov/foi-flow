@@ -11,9 +11,12 @@ from request_api.services.foirequest.requestservicegetter import requestserviceg
 from request_api.services.foirequest.requestservicecreate import requestservicecreate 
 from request_api.services.foirequest.requestserviceupdate import requestserviceupdate
 from request_api.services.applicantcorrespondence.applicantcorrespondencelog import applicantcorrespondenceservice
+from request_api.services.subjectcodeservice import subjectcodeservice
 from request_api.models.FOIRequestStatus import FOIRequestStatus
 from request_api.models.FOIRawRequests import FOIRawRequest
 from request_api.models.FOIMinistryRequests import FOIMinistryRequest
+from request_api.models.FOIMinistryRequestSubjectCodes import FOIMinistryRequestSubjectCode
+from request_api.models.SubjectCodes import SubjectCode
 from request_api.models.FOIRestrictedMinistryRequests import FOIRestrictedMinistryRequest
 from request_api.utils.enums import StateName
 from request_api.services.commons.duecalculator import duecalculator
@@ -95,6 +98,11 @@ class requestservice:
         attachments = documentservice().getrequestdocuments(int(rawrequestid),"rawrequest")
         for ministry in ministries:
             documentservice().copyrequestdocuments(ministry["id"], attachments, userid)
+
+    def copysubjectcode(self, subjectcode, ministries, userid):
+        if subjectcode:
+            for ministry in ministries:
+                subjectcodeservice().savesubjectcode(ministry["id"],  subjectcode, userid)
     
     def postopeneventtoworkflow(self, id, requestschema, ministries):
         pid = workflowservice().syncwfinstance("rawrequest", requestschema['id'])

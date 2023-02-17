@@ -31,6 +31,7 @@ from request_api.services.closereasonservice import closereasonservice
 from request_api.schemas.foirequestsformslist import  FOIRequestsFormsList
 from request_api.services.extensionreasonservice import extensionreasonservice
 from request_api.services.cacheservice import cacheservice
+from request_api.services.subjectcodeservice import subjectcodeservice
 import json
 import request_api
 import requests
@@ -318,6 +319,28 @@ class FOIFlowExtensionReasons(Resource):
             return jsondata , 200
         except BusinessException as exception:
             return {'status': exception.status_code, 'message':exception.message}, 500
+    
+@cors_preflight('GET,OPTIONS')
+@API.route('/foiflow/subjectcodes')
+class FOIFlowSubjectCodes(Resource):
+    """Retrieves all active subject codes.
+    """
+    @staticmethod
+    @TRACER.trace()
+    @cross_origin(origins=allowedorigins())
+    @auth.require
+    @request_api.cache.cached(
+        key_prefix="subjectcodes",
+        unless=cache_filter,
+        response_filter=response_filter
+        )
+    def get():
+        try:
+            data = subjectcodeservice().getsubjectcodes()
+            jsondata = json.dumps(data)
+            return jsondata , 200
+        except BusinessException:
+            return "Error happened while accessing subject codes" , 500
 
 @cors_preflight('POST,OPTIONS')
 @API.route('/foiflow/cache/refresh')

@@ -87,6 +87,7 @@ const API = {
 
   FOI_GET_S3DOCUMENT_PRESIGNEDURL:`${FOI_BASE_API_URL}/api/foiflow/oss/presigned`,
 
+  FOI_GET_SUBJECT_CODELIST: `${FOI_BASE_API_URL}/api/foiflow/subjectcodes`,
   FOI_POST_RAWREQUEST_RESTRICTION: `${FOI_BASE_API_URL}/api/foirawrequest/restricted/<requestid>`,
   FOI_POST_MINISTRYREQUEST_RESTRICTION: `${FOI_BASE_API_URL}/api/foirequests/restricted/<ministryrequestid>/<type>`,
 
