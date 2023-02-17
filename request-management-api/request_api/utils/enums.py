@@ -42,6 +42,7 @@ class MinistryTeamWithKeycloackGroup(Enum):
     EAO = "EAO Ministry Team"
     EDU = "EDU Ministry Team"
     EMBC = "EMBC Ministry Team"
+    EMC = "EMC Ministry Team"
     EMLI = "EMLI Ministry Team"
     ENV = "ENV Ministry Team"
     FIN = "FIN Ministry Team"
@@ -54,6 +55,7 @@ class MinistryTeamWithKeycloackGroup(Enum):
     LBR = "LBR Ministry Team"
     LDB = "LDB Ministry Team"
     LWR = "LWR Ministry Team"
+    WLR = "WLR Ministry Team"
     MCF = "MCF Ministry Team"
     MGC = "MGC Ministry Team"
     MMHA = "MMHA Ministry Team"
@@ -70,6 +72,8 @@ class MinistryTeamWithKeycloackGroup(Enum):
     PSE = "PSE Ministry Team"
     ECC = "ECC Ministry Team"
     JED = "JED Ministry Team"
+    COR = "COR Ministry Team"
+    HSG = "HSG Ministry Team"
 
     @staticmethod
     def list():
