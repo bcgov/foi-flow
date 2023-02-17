@@ -109,7 +109,8 @@ class FOIRequests(Resource):
                     requestservice().copywatchers(request_json['id'],result.args[0],AuthHelper.getuserid())
                     requestservice().copycomments(request_json['id'],result.args[0],AuthHelper.getuserid())
                     requestservice().copydocuments(request_json['id'],result.args[0],AuthHelper.getuserid())
-                    requestservice().copysubjectcode(request_json['subjectCode'],result.args[0],AuthHelper.getuserid())
+                    if 'subjectCode' in request_json:
+                        requestservice().copysubjectcode(request_json['subjectCode'],result.args[0],AuthHelper.getuserid())
                     requestservice().postopeneventtoworkflow(result.identifier, request_json,result.args[0])
                     requestservice().createrestrictedrequests(result.args[0],'iao',request_json["isiaorestricted"],AuthHelper.getuserid())
             return {'status': result.success, 'message':result.message,'id':result.identifier, 'ministryRequests': result.args[0]} , 200

@@ -92,11 +92,11 @@ class requestserviceministrybuilder(requestserviceconfigurator):
             return self.createfoirequestdivisionfromobject(divisions,foiministryrequestid, foiministryrequestversion + 1, userid)  
 
     def __createministrysubjectcode(self, requestschema, foiministryrequestid, foiministryrequestversion, userid):
-        if 'subjectCode' in requestschema:
-                return self.createfoirequestsubjectcode(requestschema, foiministryrequestid, foiministryrequestversion +1, userid)
+        subjectcode = FOIMinistryRequestSubjectCode().getministrysubjectcode(foiministryrequestid, foiministryrequestversion)
+        if subjectcode:
+            return self.createfoirequestsubjectcodefromobject(subjectcode, foiministryrequestid, foiministryrequestversion + 1, userid)
         else:
-            subjectcode = FOIMinistryRequestSubjectCode().getministrysubjectcode(foiministryrequestid, foiministryrequestversion)
-            return self.createfoirequestsubjectcodefromobject(subjectcode, foiministryrequestid, foiministryrequestversion + 1, userid) 
+            return []
 
     def createfoiministryrequestfromobject1(self, ministryschema, requestschema):  
         return {

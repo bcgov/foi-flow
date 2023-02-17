@@ -36,9 +36,11 @@ class subjectcodeservice:
         """ Returns the ministry subject code name
         """
         ministrysubjectcode = self.getministrysubjectcode(foiministryrequestid)
-        print("ministrysubjectcode = ",ministrysubjectcode)
-        subjectcode = self.getsubjectcodebyid(ministrysubjectcode['subjectcodeid'])
-        return subjectcode['name']
+        if ministrysubjectcode:
+            subjectcode = self.getsubjectcodebyid(ministrysubjectcode['subjectcodeid'])
+            return subjectcode['name']
+        else:
+            return ''
     
     def __getministryversionforrequest(self, requestid):
         """ Returns the active version of the request id based on type.

@@ -57,7 +57,7 @@ class requestservicebuilder(requestserviceconfigurator):
             foiministryrequest.divisions = requestserviceministrybuilder().createfoirequestdivisionfromobject(divisions, ministryid, activeversion, userid)  
             foiministryrequest.documents = requestserviceministrybuilder().createfoirequestdocuments(requestschema,ministryid , activeversion , userid)
             foiministryrequest.extensions = requestserviceministrybuilder().createfoirequestextensions(ministryid, activeversion, userid)
-            if 'subjectCode' in requestschema:
+            if 'subjectCode' in requestschema and requestschema['subjectCode'] is not None and requestschema['subjectCode'] != '':
                 foiministryrequest.subjectcode = requestserviceministrybuilder().createfoirequestsubjectcode(requestschema, ministryid, activeversion, userid)
         foiministryrequest.version = activeversion
         foiministryrequest.closedate = self.getpropertyvaluefromschema(requestschema, 'closedate')
