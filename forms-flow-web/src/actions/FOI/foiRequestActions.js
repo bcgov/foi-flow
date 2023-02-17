@@ -283,6 +283,13 @@ export const setFOICorrespondenceLoader = (data) => dispatch =>{
     })
 }
 
+export const setFOISubjectCodeList = (data) => dispatch =>{
+    dispatch({
+        type:FOI_ACTION_CONSTANTS.FOI_SUBJECT_CODELIST,
+        payload:data
+    })
+}
+
 export const setRestrictedReqTaglist = (data) => dispatch =>{
     dispatch({
         type:FOI_ACTION_CONSTANTS.RESTRICTED_COMMENT_TAG_LIST,

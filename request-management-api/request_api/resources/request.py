@@ -65,7 +65,7 @@ class FOIRawRequest(Resource):
 
                 assignee = baserequestinfo['assignedTo']
                 isiaorestricted = baserequestinfo['isiaorestricted']
-                print('Request # {0} Assigned to {1} and is restricted {2} '.format(requestid,assignee,isiaorestricted))
+                # print('Request # {0} Assigned to {1} and is restricted {2} '.format(requestid,assignee,isiaorestricted))
                 if(isiaorestricted and canrestictdata(requestid,assignee,isiaorestricted,True)):
                     jsondata = {'status': 401, 'message':'Restricted Request'}
                     statuscode = 401

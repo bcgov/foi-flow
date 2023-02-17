@@ -6,10 +6,12 @@ from request_api.models.FOIMinistryRequestDivisions import FOIMinistryRequestDiv
 from request_api.models.FOIRequestContactInformation import FOIRequestContactInformation
 from request_api.models.FOIRequestPersonalAttributes import FOIRequestPersonalAttribute
 from request_api.models.FOIRequestApplicantMappings import FOIRequestApplicantMapping
+from request_api.models.FOIMinistryRequestSubjectCodes import FOIMinistryRequestSubjectCode
 from request_api.models.FOIRestrictedMinistryRequests import FOIRestrictedMinistryRequest
 from dateutil.parser import parse
 from request_api.services.cfrfeeservice import cfrfeeservice
 from request_api.services.paymentservice import paymentservice
+from request_api.services.subjectcodeservice import subjectcodeservice
 from request_api.utils.commons.datetimehandler import datetimehandler
 
 class requestservicegetter:
@@ -158,6 +160,7 @@ class requestservicegetter:
             'assignedministrypersonFirstName': requestministry["ministryassignee.firstname"] if requestministry["assignedministryperson"] != None else None,
             'assignedministrypersonLastName': requestministry["ministryassignee.lastname"] if requestministry["assignedministryperson"] != None else None,
             'closedate': parse(requestministry['closedate']).strftime(self.__genericdateformat()) if requestministry['closedate'] is not None else None,
+            'subjectCode': subjectcodeservice().getministrysubjectcodename(foiministryrequestid),
             'isofflinepayment': FOIMinistryRequest.getofflinepaymentflag(foiministryrequestid)
         }
         if requestministry['cfrduedate'] is not None:
