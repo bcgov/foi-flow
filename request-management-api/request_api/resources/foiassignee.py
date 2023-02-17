@@ -25,7 +25,7 @@ from request_api.services.assigneeservice import assigneeservice
 import json
 from flask_cors import cross_origin
 import request_api
-from request_api.utils.cache import cache_filter, response_filter, keycloak_cache_filter, clear_keycloak_cache
+from request_api.utils.cache import cache_filter, response_filter
 
 API = Namespace('FOIAssignee', description='Endpoints for FOI assignee management')
 TRACER = Tracer.get_instance()
@@ -46,8 +46,8 @@ class FOIAssignees(Resource):
     @cross_origin(origins=allowedorigins())
     @auth.require
     @request_api.cache.cached(
-        key_prefix="foiassignees",
-        unless=keycloak_cache_filter,
+        key_prefix="keycloakusers",
+        unless=cache_filter,
         response_filter=response_filter
         )
     def get(requestype=None, status=None, bcgovcode=None):
@@ -75,7 +75,7 @@ class FOIAssigneesByTypeAndStatus(Resource):
     @cross_origin(origins=allowedorigins())
     @auth.require
     @request_api.cache.cached(
-        unless=cache_filter,
+        unless=False,
         response_filter=response_filter
         )
     def get(requestype=None, status=None, bcgovcode=None):
@@ -92,7 +92,7 @@ class FOIAssigneesByTypeAndStatus(Resource):
         
 @cors_preflight('GET,OPTIONS')
 @API.route('/foiassignees/group/<groupname>')
-class FOIAssigneesByTypeAndStatus(Resource):
+class FOIAssigneesByGroup(Resource):
     """esource for retriving FOI assignees based on group."""
 
     @staticmethod

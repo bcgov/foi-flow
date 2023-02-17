@@ -1,53 +1,64 @@
 import logging
 import os
 import requests
-from request_api.utils.cache import clear_cache, clear_keycloak_cache
+from request_api.utils.cache import clear_cache, clear_cache_key
 from request_api.auth import AuthHelper
 from request_api.services.external.keycloakadminservice import KeycloakAdminService
+from request_api.utils.enums import CacheUrls
 
 class cacheservice:
     
     request_url = os.getenv("FOI_REQ_MANAGEMENT_API_URL")
-
-    def refreshkeycloakcache(self):
+    
+    def refreshcache(self, request_json):
         try:
             result= False
-            resp_flag = clear_keycloak_cache("foiassignees")
-            if resp_flag:
-                apiurls = self.__getapilist()
-                result=self.__invokeresources(apiurls)
+            if(request_json is not None and 'key' in request_json):
+                result= self.__refreshcachebykey(request_json['key'])
+            else:
+                resp_flag = clear_cache()
+                if resp_flag:
+                    apiurls = self.__getmasterdataapilist()
+                    result=self.__invokeresources(apiurls)
             return result
+        except Exception as ex:    
+            logging.error(ex)   
+        return False
+    
+    def __refreshcachebykey(self, key):
+        try:
+            result= False
+            resp_flag = clear_cache_key(key)
+            if resp_flag:
+                apiurls = self.__getapilistbykey(key)
+                result= self.__invokeresources(apiurls)
+                return result
         except Exception as ex:    
             logging.error(ex)        
         return False
 
-    def refreshcache(self):
-        try:
-            result= False
-            resp_flag = clear_cache()
-            if resp_flag:
-                apiurls = self.__getapilist()
-                result=self.__invokeresources(apiurls)
-            return result
-        except Exception as ex:    
-            logging.error(ex)        
-        return False
-
-    def __getapilist(self):
+    def __getmasterdataapilist(self):
         try:
             apiurls=[]
-            apiurls.append(self.request_url+'/api/foiassignees')
-            # apiurls.append(self.request_url+'/api/foiflow/programareas')
-            # apiurls.append(self.request_url+'/api/foiflow/deliverymodes')
-            # apiurls.append(self.request_url+'/api/foiflow/receivedmodes')
-            # apiurls.append(self.request_url+'/api/foiflow/closereasons')
-            # apiurls.append(self.request_url+'/api/foiflow/extensionreasons')
-            # apiurls.append(self.request_url+'/api/foiflow/applicantcategories')
-            # apiurls.append(self.request_url+'/api/foiflow/applicantcorrespondence/templates')
+            apiurls.append(self.request_url+CacheUrls.keycloakusers.value)
+            apiurls.append(self.request_url+CacheUrls.programareas.value)
+            apiurls.append(self.request_url+CacheUrls.deliverymodes.value)
+            apiurls.append(self.request_url+CacheUrls.receivedmodes.value)
+            apiurls.append(self.request_url+CacheUrls.closereasons.value)
+            apiurls.append(self.request_url+CacheUrls.extensionreasons.value)
+            apiurls.append(self.request_url+CacheUrls.applicantcategories.value)
         except Exception as ex:    
             logging.error(ex)        
         return apiurls
-
+    
+    def __getapilistbykey(self, key):
+        try:
+            apiurls=[]
+            apiurls.append(self.request_url+CacheUrls[key].value)
+        except Exception as ex:    
+            logging.error(ex)        
+        return apiurls
+    
     def __invokeresources(self, apiurls):
         try:
             headers= {"Authorization": "Bearer " + KeycloakAdminService().get_token()}
@@ -55,5 +66,5 @@ class cacheservice:
                 requests.get(url, headers=headers)
             return True
         except Exception as ex:    
-            logging.error(ex)        
+            logging.error(ex)    
         return False

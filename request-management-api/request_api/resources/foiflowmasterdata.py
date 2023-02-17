@@ -320,33 +320,18 @@ class FOIFlowExtensionReasons(Resource):
             return {'status': exception.status_code, 'message':exception.message}, 500
 
 @cors_preflight('POST,OPTIONS')
-@API.route('/foiflow/cache/flushall')
-class FOIFlowProgramAreas(Resource):
-    """Retrieves all active program areas.
-    """
-    @staticmethod
-    @TRACER.trace()
-    @cross_origin(origins=allowedorigins())
-    @auth.require
-    def post():
-        try:
-            resp_flag = clear_cache()
-            return {"success": resp_flag } , 200 if resp_flag == True else 500
-        except BusinessException:
-            return "Error happened while clearing cache" , 500
-
-@cors_preflight('POST,OPTIONS')
-@API.route('/foiflow/keycloak/cache/refresh')
+@API.route('/foiflow/cache/refresh')
 class FOIFlowRefreshCache(Resource):
     """Clear all cached data and fetch all the
-        master data again"""
+        master data again based on key"""
     @staticmethod
     @TRACER.trace()
     @cross_origin(origins=allowedorigins())
     @auth.require
     def post():
         try:
-            resp_flag = cacheservice().refreshkeycloakcache()
+            request_json = request.get_json() if request.data else None
+            resp_flag = cacheservice().refreshcache(request_json)
             return {"success": resp_flag } , 200 if resp_flag == True else 500
         except BusinessException:
             return "Error happened while clearing cache" , 500
