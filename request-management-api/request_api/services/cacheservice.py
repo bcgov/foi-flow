@@ -2,14 +2,13 @@ import logging
 import os
 import requests
 from request_api.utils.cache import clear_cache, clear_cache_key
-from request_api.auth import AuthHelper
 from request_api.services.external.keycloakadminservice import KeycloakAdminService
 from request_api.utils.enums import CacheUrls
 
 class cacheservice:
     
     request_url = os.getenv("FOI_REQ_MANAGEMENT_API_URL")
-    
+
     def refreshcache(self, request_json):
         try:
             result= False
