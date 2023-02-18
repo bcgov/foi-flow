@@ -16,7 +16,8 @@ import {
     setFOIReceivedModeList,
     setFOIMinistryDivisionalStages,
     setClosingReasons,
-    setFOISubjectCodeList,   
+    setFOISubjectCodeList,  
+    setCommentTagListLoader, 
   } from "../../../actions/FOI/foiRequestActions";
   import { fnDone } from "./foiServicesUtil";
   import UserService from "../../../services/UserService";
@@ -161,12 +162,14 @@ import {
 
     if (fullnameTeamArray.includes("iao")) {
       return (dispatch) => {
+        console.log("iao!!");
         dispatch(setFOIFullAssignedToList(getAssignToList("iao")));
         dispatch(setFOIAssignedToListLoader(false));
+        dispatch(setCommentTagListLoader(false));
       };
     } else {
       const done = fnDone(rest);
-
+      console.log("no iao!!");
       return (dispatch) => {
         httpGETRequest(
           API.FOI_GET_ASSIGNEDTO_ALLGROUP_LIST_API,
@@ -191,6 +194,8 @@ import {
               dispatch(serviceActionError(res));
               dispatch(setFOIAssignedToListLoader(false));
             }
+            console.log("Setting loader False in service!!");
+            dispatch(setCommentTagListLoader(false));
           })
           .catch((error) => {
             console.log(
@@ -199,6 +204,7 @@ import {
             );
             dispatch(serviceActionError(error));
             dispatch(setFOIAssignedToListLoader(false));
+            dispatch(setCommentTagListLoader(false));
             done(error);
           });
       };

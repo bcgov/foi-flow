@@ -239,5 +239,4 @@ class AuthHelper:
         usergroups = cls.getusergroups()
         return list(set(usergroups).intersection(MinistryTeamWithKeycloackGroup.list()))   
       
-
         
