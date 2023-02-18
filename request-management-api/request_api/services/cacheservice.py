@@ -4,6 +4,7 @@ import requests
 from request_api.utils.cache import clear_cache, clear_cache_key
 from request_api.services.external.keycloakadminservice import KeycloakAdminService
 from request_api.utils.enums import CacheUrls
+from request_api.exceptions import BusinessException
 
 class cacheservice:
     
@@ -17,8 +18,7 @@ class cacheservice:
             else:
                 resp_flag = clear_cache()
                 if resp_flag:
-                    apiurls = self.__getmasterdataapilist()
-                    result=self.__invokeresources(apiurls)
+                    result=self.__invokeresources(self.__getapilistbykey())
             return result
         except Exception as ex:    
             logging.error(ex)   
@@ -29,16 +29,18 @@ class cacheservice:
             result= False
             resp_flag = clear_cache_key(key)
             if resp_flag:
-                apiurls = self.__getapilistbykey(key)
-                result= self.__invokeresources(apiurls)
+                result= self.__invokeresources(self.__getapilistbykey(key))
                 return result
-        except Exception as ex:    
-            logging.error(ex)        
+        except BusinessException as ex:    
+            logging.error(ex)   
+            return {'status': ex.status_code, 'message':ex.message}, 500     
         return False
 
-    def __getmasterdataapilist(self):
-        try:
-            apiurls=[]
+    def __getapilistbykey(self, key=None):
+        apiurls=[]
+        if key is not None:
+            apiurls.append(self.request_url+CacheUrls[key].value)
+        else:
             apiurls.append(self.request_url+CacheUrls.keycloakusers.value)
             apiurls.append(self.request_url+CacheUrls.programareas.value)
             apiurls.append(self.request_url+CacheUrls.deliverymodes.value)
@@ -46,24 +48,14 @@ class cacheservice:
             apiurls.append(self.request_url+CacheUrls.closereasons.value)
             apiurls.append(self.request_url+CacheUrls.extensionreasons.value)
             apiurls.append(self.request_url+CacheUrls.applicantcategories.value)
-        except Exception as ex:    
-            logging.error(ex)        
         return apiurls
-    
-    def __getapilistbykey(self, key):
-        try:
-            apiurls=[]
-            apiurls.append(self.request_url+CacheUrls[key].value)
-        except Exception as ex:    
-            logging.error(ex)        
-        return apiurls
-    
+
     def __invokeresources(self, apiurls):
         try:
             headers= {"Authorization": "Bearer " + KeycloakAdminService().get_token()}
             for url in apiurls:
                 requests.get(url, headers=headers)
             return True
-        except Exception as ex:    
-            logging.error(ex)    
-        return False
+        except BusinessException as ex:    
+            logging.error(ex)   
+            return {'status': ex.status_code, 'message':ex.message}, 500

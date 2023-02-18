@@ -346,7 +346,15 @@ class FOIFlowSubjectCodes(Resource):
 @API.route('/foiflow/cache/refresh')
 class FOIFlowRefreshCache(Resource):
     """Clear all cached data and fetch all the
-        master data again based on key"""
+        master data again based on key.
+       N.B: This method will be invoked by the nightly
+       job without any body so that all masterdata
+       is flushed and recalled again.
+       For caching a single key 
+       (eg:if someone updates any keycloak users)
+       Call API through Postman with following body:
+       Body: { "key": "keycloakusers" } 
+    """
     @staticmethod
     @TRACER.trace()
     @cross_origin(origins=allowedorigins())
