@@ -9,12 +9,12 @@
          <key>CSS</key>
       </entry>
       <entry>
-         <key>XPATH</key>
-         <value>//div[@id='Attachments']/div/div/div[4]/div[3]/div/div</value>
-      </entry>
-      <entry>
          <key>BASIC</key>
          <value>id(&quot;Attachments&quot;)/div[1]/div[@class=&quot;section&quot;]/div[@class=&quot;displayAttachments&quot;]/div[@class=&quot;container-fluid&quot;][2]/div[@class=&quot;row foi-details-row&quot;]/div[@class=&quot;row foi-details-row&quot;]/div[@class=&quot;col-sm-12 foi-details-col&quot;]/div[@class=&quot;col-sm-10&quot;]/div[@class=&quot;attachment-name&quot;]</value>
+      </entry>
+      <entry>
+         <key>XPATH</key>
+         <value>//div[@id='Attachments']/div/div/div[5]/div/div/div</value>
       </entry>
    </selectorCollection>
    <selectorMethod>XPATH</selectorMethod>
@@ -25,6 +25,7 @@
       <name>tag</name>
       <type>Main</type>
       <value>div</value>
+      <webElementGuid>e7d6a831-8e20-49c8-885b-5554fb82ce5b</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -32,6 +33,7 @@
       <name>class</name>
       <type>Main</type>
       <value>attachment-name </value>
+      <webElementGuid>992e8f4d-6f03-438b-bf36-d9c22aebde88</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -39,6 +41,7 @@
       <name>text</name>
       <type>Main</type>
       <value>test.docx</value>
+      <webElementGuid>2cfd4c8f-38ca-4094-ab80-a45c782fc792</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>true</isSelected>
@@ -46,6 +49,7 @@
       <name>xpath</name>
       <type>Main</type>
       <value>id(&quot;Attachments&quot;)/div[1]/div[@class=&quot;section&quot;]/div[@class=&quot;displayAttachments&quot;]/div[@class=&quot;container-fluid&quot;][2]/div[@class=&quot;row foi-details-row&quot;]/div[@class=&quot;row foi-details-row&quot;]/div[@class=&quot;col-sm-12 foi-details-col&quot;]/div[@class=&quot;col-sm-10&quot;]/div[@class=&quot;attachment-name&quot;]</value>
+      <webElementGuid>505b43c0-ba91-46ad-8c2c-122298aef26d</webElementGuid>
    </webElementProperties>
    <webElementXpaths>
       <isSelected>true</isSelected>
@@ -53,6 +57,7 @@
       <name>xpath:idRelative</name>
       <type>Main</type>
       <value>//div[@id='Attachments']/div/div/div[4]/div[2]/div/div/div/div/div</value>
+      <webElementGuid>052edafd-aedd-47cd-9a6b-eaf56c284bca</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -60,6 +65,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>(.//*[normalize-space(text()) and normalize-space(.)='User, Super'])[1]/following::div[8]</value>
+      <webElementGuid>42243d04-22f0-4162-993c-2f654d9de666</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -67,6 +73,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>(.//*[normalize-space(text()) and normalize-space(.)='general'])[1]/following::div[14]</value>
+      <webElementGuid>4c9dddd4-c74d-4bf1-ba6d-9fcf9d3f80a1</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -74,6 +81,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>(.//*[normalize-space(text()) and normalize-space(.)='general'])[2]/preceding::div[1]</value>
+      <webElementGuid>65ed5a4c-564f-426f-be21-716e8d0b1d2b</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -81,6 +89,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>(.//*[normalize-space(text()) and normalize-space(.)='Flex, Intake'])[1]/preceding::div[6]</value>
+      <webElementGuid>141eb0e2-ca75-4e01-ae0a-ad4c29604487</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -88,6 +97,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>//*/text()[normalize-space(.)='test.docx']/parent::*</value>
+      <webElementGuid>9e91218e-aa85-45b5-91ac-540eea2fe0c7</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -95,5 +105,6 @@
       <name>xpath:position</name>
       <type>Main</type>
       <value>//div[4]/div[2]/div/div/div/div/div</value>
+      <webElementGuid>e2351b3f-6028-4498-beaa-48f5b3626741</webElementGuid>
    </webElementXpaths>
 </WebElementEntity>
