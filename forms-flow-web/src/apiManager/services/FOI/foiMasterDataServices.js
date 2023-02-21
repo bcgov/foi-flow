@@ -162,14 +162,12 @@ import {
 
     if (fullnameTeamArray.includes("iao")) {
       return (dispatch) => {
-        console.log("iao!!");
         dispatch(setFOIFullAssignedToList(getAssignToList("iao")));
         dispatch(setFOIAssignedToListLoader(false));
         dispatch(setCommentTagListLoader(false));
       };
     } else {
       const done = fnDone(rest);
-      console.log("no iao!!");
       return (dispatch) => {
         httpGETRequest(
           API.FOI_GET_ASSIGNEDTO_ALLGROUP_LIST_API,
@@ -194,7 +192,6 @@ import {
               dispatch(serviceActionError(res));
               dispatch(setFOIAssignedToListLoader(false));
             }
-            console.log("Setting loader False in service!!");
             dispatch(setCommentTagListLoader(false));
           })
           .catch((error) => {

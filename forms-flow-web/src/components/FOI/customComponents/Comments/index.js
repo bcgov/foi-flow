@@ -77,7 +77,6 @@ export const CommentSection = ({
       }  
   }
 
- console.log("isCommentTagListLoading:",isCommentTagListLoading);
   return (
     !isCommentTagListLoading ? 
     <>
