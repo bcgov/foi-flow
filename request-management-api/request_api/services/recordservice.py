@@ -48,6 +48,7 @@ class recordservice:
                         record['s3uripath'] = masterrecord['filepath']
                         record['rootparentid'] = self.__findrootparentrecordid(record['documentmasterid'], masterrecords)
                         parentrecord = uploadedrecords[record['rootparentid']]
+                        record['createdby'] = parentrecord['createdby']
                         # if not record['attributes']:
                         #     _filename, extension = path.splitext(record['s3uripath'])
                         #     record['attributes'] = {
