@@ -32,13 +32,10 @@ const RequestHeader = React.memo(({
 
     const dispatch = useDispatch();
     useEffect(() => {
-      console.log("Inside Useeffect!!");
       if (assignedToList?.length === 0) {
-        console.log("Actual Call==> assignedList empty!!");
         dispatch(fetchFOIFullAssignedToList());
       }
       else{
-        console.log("Setting Loader False!!");
         dispatch(setCommentTagListLoader(false));
       }
     }, [dispatch]); 
