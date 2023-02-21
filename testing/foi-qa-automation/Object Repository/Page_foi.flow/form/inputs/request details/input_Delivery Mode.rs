@@ -6,15 +6,19 @@
    <elementGuidId>a7223929-9df3-4e33-84e3-66c792f8f0b9</elementGuidId>
    <selectorCollection>
       <entry>
-         <key>XPATH</key>
-         <value>//div[@id='deliveryMode']</value>
-      </entry>
-      <entry>
          <key>CSS</key>
          <value>body.no-scroll</value>
       </entry>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[(text() = 'Select Delivery Mode' or . = 'Select Delivery Mode')]</value>
+      </entry>
+      <entry>
+         <key>XPATH</key>
+         <value>//div[@id='deliveryMode']</value>
+      </entry>
    </selectorCollection>
-   <selectorMethod>XPATH</selectorMethod>
+   <selectorMethod>BASIC</selectorMethod>
    <useRalativeImagePath>true</useRalativeImagePath>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -22,6 +26,7 @@
       <name>tag</name>
       <type>Main</type>
       <value>body</value>
+      <webElementGuid>2d1cd89e-55ba-463a-8a3b-04af3e19d7b5</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -29,13 +34,15 @@
       <name>class</name>
       <type>Main</type>
       <value>no-scroll</value>
+      <webElementGuid>090ff078-c8ee-4cc1-9426-8b6175dc4246</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>true</isSelected>
       <matchCondition>equals</matchCondition>
       <name>text</name>
       <type>Main</type>
-      <value>FOI  Intake User Sign OutFOIUnopened​RequestOption 4Add RequestAssigned To *UnassignedAssigned To *APPLICANT DETAILSApplicant First Name *Applicant First Name *Applicant Middle NameApplicant Middle NameApplicant Last Name *Applicant Last Name *OrganizationOrganizationCategory *IndividualCategory *Email *Email *CHILD DETAILSFirst NameFirst NameMiddle NameMiddle NameLast NameLast NameAlso Known AsAlso Known AsDate of BirthDate of BirthAttached DocumentsON BEHALF OF DETAILSFirst NameFirst NameMiddle NameMiddle NameLast NameLast NameAlso Known AsAlso Known AsDate of BirthDate of BirthAttached DocumentsADDRESS AND CONTACT INFORMATIONStreet Address *Street Address *Secondary Street AddressSecondary Street AddressCity *City *Province *Province *Country *Country *Postal Code *Postal Code *Home PhoneHome PhoneMobile PhoneMobile PhoneWork PhoneWork PhoneAlternative PhoneAlternative PhoneREQUEST DESCRIPTIONDescription HistoryDate Range for Record SearchStart DateStart DateEnd DateEnd DateRequest Description *testing 123 descriptionRequest Description *Description contains NO Personal InformationSelect Ministry Client *AEDAGRMAGCFDCTZEDUEMLMOEFINFNRHLTHIRRJERLBRMHAMMAPSSMSDTACTRAOCCPSABRDCLBCASEMBEAOGCPIIOOOPLDBTICOBCMGCREQUEST DETAILSRequest Type *personalRequest Type *Received Mode *EmailReceived Mode *Delivery Mode *Select Delivery ModeDelivery Mode *Received Date *Received Date *Start Date *Start Date *Due Date *Due Date *ADDITIONAL APPLICANT DETAILSPersonal Health NumberPersonal Health NumberDate of BirthDate of BirthIdentity VerifiedIdentity VerifiedCorrections NumberCorrections NumberEmployee NumberEmployee NumberREQUEST NOTESSaveReturn to QueueRequest #U-00undefined+ Add CommentAll CommentsRequest HistoryUser CommentsNo comments under this filter categoryShow more commentsOption 4HelpContactDisclaimerPrivacyAccessibilityCopyrightlet newWorker;if(&quot;serviceWorker&quot;in navigator){let e;navigator.serviceWorker.register(&quot;/service-worker.js&quot;).then(e=>{e.addEventListener(&quot;updatefound&quot;,()=>{newWorker=e.installing,newWorker.addEventListener(&quot;statechange&quot;,()=>{switch(newWorker.state){case&quot;installed&quot;:navigator.serviceWorker.controller&amp;&amp;newWorker.postMessage({action:&quot;skipWaiting&quot;})}})})},e=>{console.log(&quot;Worker registration failed&quot;,e)}).catch(e=>{console.log(e)}),navigator.serviceWorker.addEventListener(&quot;controllerchange&quot;,(function(){e||(window.location.reload(),e=!0)}))}else console.log(&quot;Service Worker is not supported by browser.&quot;).scrollable-page{position:relative;overflow-y:scroll;top:0;right:0;bottom:0;left:0;-ms-overflow-style:none;scrollbar-width:none}.scrollable-page::-webkit-scrollbar{display:none}.no-scroll{overflow:auto}body{font-family:BCSans-Regular,sans-serif!important}This website requires JavaScript.!function(e){function r(r){for(var n,f,l=r[0],a=r[1],i=r[2],p=0,s=[];p&lt;l.length;p++)f=l[p],Object.prototype.hasOwnProperty.call(o,f)&amp;&amp;o[f]&amp;&amp;s.push(o[f][0]),o[f]=0;for(n in a)Object.prototype.hasOwnProperty.call(a,n)&amp;&amp;(e[n]=a[n]);for(c&amp;&amp;c(r);s.length;)s.shift()();return u.push.apply(u,i||[]),t()}function t(){for(var e,r=0;r&lt;u.length;r++){for(var t=u[r],n=!0,l=1;l&lt;t.length;l++){var a=t[l];0!==o[a]&amp;&amp;(n=!1)}n&amp;&amp;(u.splice(r--,1),e=f(f.s=t[0]))}return e}var n={},o={1:0},u=[];function f(r){if(n[r])return n[r].exports;var t=n[r]={i:r,l:!1,exports:{}};return e[r].call(t.exports,t,t.exports,f),t.l=!0,t.exports}f.m=e,f.c=n,f.d=function(e,r,t){f.o(e,r)||Object.defineProperty(e,r,{enumerable:!0,get:t})},f.r=function(e){&quot;undefined&quot;!=typeof Symbol&amp;&amp;Symbol.toStringTag&amp;&amp;Object.defineProperty(e,Symbol.toStringTag,{value:&quot;Module&quot;}),Object.defineProperty(e,&quot;__esModule&quot;,{value:!0})},f.t=function(e,r){if(1&amp;r&amp;&amp;(e=f(e)),8&amp;r)return e;if(4&amp;r&amp;&amp;&quot;object&quot;==typeof e&amp;&amp;e&amp;&amp;e.__esModule)return e;var t=Object.create(null);if(f.r(t),Object.defineProperty(t,&quot;default&quot;,{enumerable:!0,value:e}),2&amp;r&amp;&amp;&quot;string&quot;!=typeof e)for(var n in e)f.d(t,n,function(r){return e[r]}.bind(null,n));return t},f.n=function(e){var r=e&amp;&amp;e.__esModule?function(){return e.default}:function(){return e};return f.d(r,&quot;a&quot;,r),r},f.o=function(e,r){return Object.prototype.hasOwnProperty.call(e,r)},f.p=&quot;/&quot;;var l=this[&quot;webpackJsonpformsflow-ai-react&quot;]=this[&quot;webpackJsonpformsflow-ai-react&quot;]||[],a=l.push.bind(l);l.push=r,l=l.slice();for(var i=0;i&lt;l.length;i++)r(l[i]);var c=a;t()}([])Select Delivery ModeSecure File TransferIn Person Pick up</value>
+      <value>Select Delivery Mode</value>
+      <webElementGuid>fdfd7455-cac1-4a06-9ad4-2eaa5b14dadf</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -43,6 +50,7 @@
       <name>xpath</name>
       <type>Main</type>
       <value>/html[1]/body[@class=&quot;no-scroll&quot;]</value>
+      <webElementGuid>8dea8991-a074-49cf-ab6e-68630495cb57</webElementGuid>
    </webElementProperties>
    <webElementXpaths>
       <isSelected>true</isSelected>
@@ -50,5 +58,6 @@
       <name>xpath:position</name>
       <type>Main</type>
       <value>//body</value>
+      <webElementGuid>5f7f9a8b-2b18-4f76-9bd7-4dd342a81072</webElementGuid>
    </webElementXpaths>
 </WebElementEntity>

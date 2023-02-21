@@ -63,6 +63,8 @@ WebUI.setText(findTestObject('Page_foi.flow/form/inputs/request description/text
 
 WebUI.scrollToElement(findTestObject('Page_foi.flow/form/button_Save'), 0)
 
+//WebUI.scrollToElement(findTestObject('Page_foi.flow/form/inputs/request description/span_EDU_checkmark'), 0)
+
 WebUI.click(findTestObject('Page_foi.flow/form/inputs/request description/span_EDU_checkmark'))
 
 WebUI.takeScreenshotAsCheckpoint('current_viewport')

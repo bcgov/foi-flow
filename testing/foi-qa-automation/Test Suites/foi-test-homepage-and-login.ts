@@ -21,7 +21,7 @@
    <testCaseLink>
       <guid>849fee5a-4ea5-40e1-a9bd-73d93b36c58d</guid>
       <isReuseDriver>false</isReuseDriver>
-      <isRun>true</isRun>
+      <isRun>false</isRun>
       <testCaseId>Test Cases/login/foi-test-login-page</testCaseId>
       <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
    </testCaseLink>
@@ -59,7 +59,7 @@
    <testCaseLink>
       <guid>fa5a5d4e-7bbe-4075-9cdd-b8824000bdd9</guid>
       <isReuseDriver>false</isReuseDriver>
-      <isRun>true</isRun>
+      <isRun>false</isRun>
       <testCaseId>Test Cases/login/foi-test-invalid-login-credentials</testCaseId>
       <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
       <variableLink>

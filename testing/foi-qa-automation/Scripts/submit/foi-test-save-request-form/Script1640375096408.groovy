@@ -45,7 +45,7 @@ if (WebUI.getText(findTestObject('Page_foi.flow/form/inputs/request details/inpu
     WebUI.click(findTestObject('Page_foi.flow/form/inputs/request description/span_no PI Checkbox'))
 }
 
-WebUI.scrollToElement(findTestObject('Page_foi.flow/form/inputs/request description/span_EDU_checkmark'), 0)
+WebUI.scrollToElement(findTestObject('Page_foi.flow/form/inputs/request details/input_Delivery Mode'), 0)
 
 WebUI.click(findTestObject('Page_foi.flow/form/inputs/request details/input_Delivery Mode'))
 

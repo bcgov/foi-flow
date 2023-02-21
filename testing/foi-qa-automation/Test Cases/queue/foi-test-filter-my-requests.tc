@@ -5,6 +5,24 @@
    <tag></tag>
    <comment></comment>
    <testCaseGuid>4b2180a7-b21a-4ad7-a1c9-4acf62267197</testCaseGuid>
+   <variableLinks>
+      <testDataLinkId></testDataLinkId>
+      <type>DEFAULT</type>
+      <value></value>
+      <variableId>51df4c94-7a9c-408d-8d19-e94963af5958</variableId>
+   </variableLinks>
+   <variableLinks>
+      <testDataLinkId></testDataLinkId>
+      <type>DEFAULT</type>
+      <value></value>
+      <variableId>f3d615f8-7cbf-415f-87d6-fd3ee7795826</variableId>
+   </variableLinks>
+   <variableLinks>
+      <testDataLinkId></testDataLinkId>
+      <type>DEFAULT</type>
+      <value></value>
+      <variableId>b1d2d061-b89d-403d-ab65-67eec74af1b3</variableId>
+   </variableLinks>
    <variable>
       <defaultValue>GlobalVariable.firstname</defaultValue>
       <description></description>

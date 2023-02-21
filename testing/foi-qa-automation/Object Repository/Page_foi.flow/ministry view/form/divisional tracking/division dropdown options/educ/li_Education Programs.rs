@@ -6,15 +6,15 @@
    <elementGuidId>0bd782cd-363d-4baf-9c67-9164f4257866</elementGuidId>
    <selectorCollection>
       <entry>
-         <key>XPATH</key>
-         <value>//div[@id='menu-']/div[3]/ul/li[3]</value>
-      </entry>
-      <entry>
          <key>CSS</key>
       </entry>
       <entry>
          <key>BASIC</key>
-         <value>//*[(text() = 'Education Programs' or . = 'Education Programs')]</value>
+         <value>//*[@data-value = '3' and (text() = 'Learning and Education Programs' or . = 'Learning and Education Programs')]</value>
+      </entry>
+      <entry>
+         <key>XPATH</key>
+         <value>//div[@id='menu-']/div[3]/ul/li[3]</value>
       </entry>
    </selectorCollection>
    <selectorMethod>BASIC</selectorMethod>
@@ -25,6 +25,7 @@
       <name>tag</name>
       <type>Main</type>
       <value>li</value>
+      <webElementGuid>e3d0a87f-51b2-428a-b734-300886da8436</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -32,6 +33,7 @@
       <name>class</name>
       <type>Main</type>
       <value>MuiButtonBase-root MuiListItem-root MuiMenuItem-root foi-division-menuitem MuiMenuItem-gutters MuiListItem-gutters MuiListItem-button</value>
+      <webElementGuid>4eb3a451-30ce-4717-b862-079054647482</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -39,6 +41,7 @@
       <name>tabindex</name>
       <type>Main</type>
       <value>-1</value>
+      <webElementGuid>cf8617ea-6f39-43d2-975c-177340cb3dbd</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -46,6 +49,7 @@
       <name>role</name>
       <type>Main</type>
       <value>option</value>
+      <webElementGuid>f47a9ad8-4a9e-4d70-82fc-5b6f0ac6e605</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -53,20 +57,23 @@
       <name>aria-disabled</name>
       <type>Main</type>
       <value>false</value>
+      <webElementGuid>3bac24df-3de7-4949-aae2-f3d1eac25a14</webElementGuid>
    </webElementProperties>
    <webElementProperties>
-      <isSelected>false</isSelected>
+      <isSelected>true</isSelected>
       <matchCondition>equals</matchCondition>
       <name>data-value</name>
       <type>Main</type>
       <value>3</value>
+      <webElementGuid>bc9ef897-c443-4a3d-a9ef-98c4342b06a0</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>true</isSelected>
       <matchCondition>equals</matchCondition>
       <name>text</name>
       <type>Main</type>
-      <value>Education Programs</value>
+      <value>Learning and Education Programs</value>
+      <webElementGuid>f8004dc3-d5a5-4c1c-a335-5f97a5b1621c</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -74,6 +81,7 @@
       <name>xpath</name>
       <type>Main</type>
       <value>id(&quot;menu-&quot;)/div[@class=&quot;MuiPaper-root MuiMenu-paper MuiPopover-paper MuiPaper-elevation8 MuiPaper-rounded&quot;]/ul[@class=&quot;MuiList-root MuiMenu-list MuiList-padding&quot;]/li[@class=&quot;MuiButtonBase-root MuiListItem-root MuiMenuItem-root foi-division-menuitem MuiMenuItem-gutters MuiListItem-gutters MuiListItem-button&quot;]</value>
+      <webElementGuid>8984474a-d957-4d18-956c-85d37597959f</webElementGuid>
    </webElementProperties>
    <webElementXpaths>
       <isSelected>true</isSelected>
@@ -81,6 +89,7 @@
       <name>xpath:idRelative</name>
       <type>Main</type>
       <value>//div[@id='menu-']/div[3]/ul/li[3]</value>
+      <webElementGuid>83713db5-24b5-437d-b3c4-755ccf4a76ae</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -88,6 +97,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>(.//*[normalize-space(text()) and normalize-space(.)=concat('Deputy Minister', &quot;'&quot;, 's Office')])[1]/following::li[1]</value>
+      <webElementGuid>91f7b05a-9a03-4268-8463-9ede640295f5</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -95,6 +105,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>(.//*[normalize-space(text()) and normalize-space(.)='Select Division'])[2]/following::li[2]</value>
+      <webElementGuid>74867431-4feb-4ee7-98a4-383c123ffb67</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -102,6 +113,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>(.//*[normalize-space(text()) and normalize-space(.)='Governance &amp; Analytics'])[1]/preceding::li[1]</value>
+      <webElementGuid>d129a4e3-00e5-446a-be59-5b1de6d9adde</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -109,6 +121,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>(.//*[normalize-space(text()) and normalize-space(.)='Learning'])[1]/preceding::li[2]</value>
+      <webElementGuid>04114474-0035-4001-86fe-c047bb3284e8</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -116,6 +129,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>//*/text()[normalize-space(.)='Education Programs']/parent::*</value>
+      <webElementGuid>445d03ec-67e9-4e25-b6f8-8087cc926246</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -123,5 +137,6 @@
       <name>xpath:position</name>
       <type>Main</type>
       <value>//div[3]/ul/li[3]</value>
+      <webElementGuid>a602e37c-f736-477f-8d98-7b2ee5a7d05d</webElementGuid>
    </webElementXpaths>
 </WebElementEntity>

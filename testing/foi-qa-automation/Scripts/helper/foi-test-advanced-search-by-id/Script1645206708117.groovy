@@ -27,6 +27,8 @@ WebUI.click(findTestObject('Page_foi.flow/queue/advanced search/input_Request St
 
 WebUI.setText(findTestObject('Page_foi.flow/queue/advanced search/input_advancedSearch'), requestID)
 
+WebUI.scrollToElement(findTestObject('Page_foi.flow/queue/advanced search/button_Apply Search'), 0)
+
 WebUI.click(findTestObject('Page_foi.flow/queue/advanced search/button_Apply Search'))
 
 if (clickOnRequest) {

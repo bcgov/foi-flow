@@ -67,7 +67,7 @@ WebUI.verifyElementPresent(findTestObject('Page_foi.flow/queue/div_request queue
 
 WebUI.click(findTestObject('Page_foi.flow/queue/div_My Requests'))
 
-WebUI.verifyElementNotPresent(findTestObject('Page_foi.flow/queue/div_request queue row 1'), 0)
+WebUI.verifyElementPresent(findTestObject('Page_foi.flow/queue/div_request queue row 1'), 0)
 
 WebUI.click(findTestObject('Page_foi.flow/queue/div_My Team Requests'))
 

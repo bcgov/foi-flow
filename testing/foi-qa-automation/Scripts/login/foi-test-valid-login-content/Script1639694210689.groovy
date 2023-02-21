@@ -67,7 +67,7 @@ WebUI.verifyElementText(findTestObject('Page_foi.flow/navbar/button_Sign Out'), 
 
 WebUI.verifyElementVisible(findTestObject('Page_foi.flow/queue/nav_pagination'))
 
-WebUI.click(findTestObject('Page_foi.flow/navbar/reporting link'), FailureHandling.STOP_ON_FAILURE)
+WebUI.click(findTestObject('Page_foi.flow/navbar/Page_ABC-2099-50/svg_FOI Intake_bi bi-bar-chart-line'), FailureHandling.STOP_ON_FAILURE)
 
 WebUI.switchToWindowIndex(1, FailureHandling.STOP_ON_FAILURE)
 

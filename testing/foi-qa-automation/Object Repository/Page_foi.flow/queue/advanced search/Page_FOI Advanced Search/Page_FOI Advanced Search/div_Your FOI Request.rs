@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>div_Your FOI Request</name>
+   <tag></tag>
+   <elementGuidId>6510cff8-3c06-4c0f-b5bf-198a3c15b447</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>CSS</key>
+         <value>div.MuiGrid-root.MuiGrid-container.MuiGrid-spacing-xs-1.foi-grid-container.css-tuxzvu</value>
+      </entry>
+      <entry>
+         <key>XPATH</key>
+         <value>//div[@id='app']/div/div[3]/div</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>XPATH</selectorMethod>
+   <useRalativeImagePath>true</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>tag</name>
+      <type>Main</type>
+      <value>div</value>
+      <webElementGuid>ad3f5781-9352-47d2-b981-d59ff1b55d3d</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>class</name>
+      <type>Main</type>
+      <value>MuiGrid-root MuiGrid-container MuiGrid-spacing-xs-1 foi-grid-container css-tuxzvu</value>
+      <webElementGuid>391dedcb-dab3-45e0-b15e-a1d86ae31608</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>text</name>
+      <type>Main</type>
+      <value>Your FOI Request QueueAdvanced SearchAdd RequestSearch in Queue​Search in QueueMY REQUESTSMY TEAM'S REQUESTSWATCHING REQUESTSNo rowsAPPLICANT NAMEREQUEST TYPEID NUMBERTotal # of Request in Queue: 0Rows per page:102050100Search​SearchFilter byREQUEST DESCRIPTIONID NUMBERAXIS REQUEST #APPLICANT NAMEASSIGNEE NAMESUBJECT CODERequest StateUnopenedCall for RecordsRecords ReviewMinistry Sign OffClosedRequest StatusOverdueOn TimeRequest TypePersonalGeneralSearch by Date RangeType of Date RangeSelect Type of Date RangeType of Date RangeFromFromtoToToSearch by Public BodyPublic BodyAllPublic BodyApply SearchClear All FiltersInformation1Information2Search ResultsAPPLICANT NAMEREQUEST TYPEID NUMBERCURRENT STATEASSIGNED TORECEIVED DATELastname, FirstnamegeneralU-0022UnopenedUnassignedFEB 15 2023Lastname, FirstnamegeneralU-0021UnopenedUnassignedFEB 15 2023Lastname, FirstnamegeneralU-0020UnopenedUnassignedFEB 15 2023Lastname, FirstnamegeneralU-0019UnopenedUnassignedFEB 15 2023Lastname, FirstnamegeneralU-0018UnopenedUnassignedFEB 15 2023Lastname, FirstnamegeneralU-0017UnopenedUnassignedFEB 15 2023Lastname, FirstnamegeneralU-0016UnopenedUnassignedFEB 15 2023Lastname, FirstnamegeneralU-0015UnopenedUnassignedFEB 15 2023Lastname, FirstnamegeneralU-0014UnopenedUnassignedFEB 15 2023Lastname, FirstnamegeneralU-0013UnopenedUnassignedFEB 15 2023Lastname, FirstnamegeneralU-0012UnopenedUnassignedFEB 15 2023Lastname, FirstnamegeneralU-0011UnopenedUnassignedFEB 15 2023Lastname, FirstnamegeneralU-0010UnopenedUnassignedFEB 14 2023Lastname, FirstnamegeneralU-009UnopenedUnassignedFEB 14 2023Lastname, FirstnamegeneralU-008UnopenedUnassignedFEB 14 2023Lastname, FirstnamegeneralU-007UnopenedUnassignedFEB 14 2023Lastname, FirstnamegeneralU-006UnopenedUnassignedFEB 14 2023Lastname, FirstnamegeneralU-005UnopenedUnassignedFEB 14 2023Lastname, FirstnamegeneralU-004UnopenedUnassignedFEB 14 2023Lastname, FirstnamegeneralU-003UnopenedUnassignedFEB 14 2023Lastname, FirstnamegeneralU-002UnopenedUnassignedFEB 14 2023Lastname, FirstnamegeneralU-001UnopenedUnassignedFEB 14 2023Total # of Request in Queue: 221Rows per page:102050100</value>
+      <webElementGuid>3269fa73-792b-47eb-92d5-5e042faca8aa</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>id(&quot;app&quot;)/div[1]/div[@class=&quot;container foi-container&quot;]/div[@class=&quot;MuiGrid-root MuiGrid-container MuiGrid-spacing-xs-1 foi-grid-container css-tuxzvu&quot;]</value>
+      <webElementGuid>d8a524d8-1782-415e-b9d6-0eff786fa511</webElementGuid>
+   </webElementProperties>
+   <webElementXpaths>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:idRelative</name>
+      <type>Main</type>
+      <value>//div[@id='app']/div/div[3]/div</value>
+      <webElementGuid>370a1383-0d9b-4f28-a40c-2e5f3dca6dac</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='Sign Out'])[1]/following::div[2]</value>
+      <webElementGuid>77daddaa-ee9d-4a92-a03a-c2c2dbc499c3</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:position</name>
+      <type>Main</type>
+      <value>//div[3]/div</value>
+      <webElementGuid>c21e5a54-396c-4acd-8d63-5b3f3df02053</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:customAttributes</name>
+      <type>Main</type>
+      <value>//div[(text() = concat(&quot;Your FOI Request QueueAdvanced SearchAdd RequestSearch in Queue​Search in QueueMY REQUESTSMY TEAM&quot; , &quot;'&quot; , &quot;S REQUESTSWATCHING REQUESTSNo rowsAPPLICANT NAMEREQUEST TYPEID NUMBERTotal # of Request in Queue: 0Rows per page:102050100Search​SearchFilter byREQUEST DESCRIPTIONID NUMBERAXIS REQUEST #APPLICANT NAMEASSIGNEE NAMESUBJECT CODERequest StateUnopenedCall for RecordsRecords ReviewMinistry Sign OffClosedRequest StatusOverdueOn TimeRequest TypePersonalGeneralSearch by Date RangeType of Date RangeSelect Type of Date RangeType of Date RangeFromFromtoToToSearch by Public BodyPublic BodyAllPublic BodyApply SearchClear All FiltersInformation1Information2Search ResultsAPPLICANT NAMEREQUEST TYPEID NUMBERCURRENT STATEASSIGNED TORECEIVED DATELastname, FirstnamegeneralU-0022UnopenedUnassignedFEB 15 2023Lastname, FirstnamegeneralU-0021UnopenedUnassignedFEB 15 2023Lastname, FirstnamegeneralU-0020UnopenedUnassignedFEB 15 2023Lastname, FirstnamegeneralU-0019UnopenedUnassignedFEB 15 2023Lastname, FirstnamegeneralU-0018UnopenedUnassignedFEB 15 2023Lastname, FirstnamegeneralU-0017UnopenedUnassignedFEB 15 2023Lastname, FirstnamegeneralU-0016UnopenedUnassignedFEB 15 2023Lastname, FirstnamegeneralU-0015UnopenedUnassignedFEB 15 2023Lastname, FirstnamegeneralU-0014UnopenedUnassignedFEB 15 2023Lastname, FirstnamegeneralU-0013UnopenedUnassignedFEB 15 2023Lastname, FirstnamegeneralU-0012UnopenedUnassignedFEB 15 2023Lastname, FirstnamegeneralU-0011UnopenedUnassignedFEB 15 2023Lastname, FirstnamegeneralU-0010UnopenedUnassignedFEB 14 2023Lastname, FirstnamegeneralU-009UnopenedUnassignedFEB 14 2023Lastname, FirstnamegeneralU-008UnopenedUnassignedFEB 14 2023Lastname, FirstnamegeneralU-007UnopenedUnassignedFEB 14 2023Lastname, FirstnamegeneralU-006UnopenedUnassignedFEB 14 2023Lastname, FirstnamegeneralU-005UnopenedUnassignedFEB 14 2023Lastname, FirstnamegeneralU-004UnopenedUnassignedFEB 14 2023Lastname, FirstnamegeneralU-003UnopenedUnassignedFEB 14 2023Lastname, FirstnamegeneralU-002UnopenedUnassignedFEB 14 2023Lastname, FirstnamegeneralU-001UnopenedUnassignedFEB 14 2023Total # of Request in Queue: 221Rows per page:102050100&quot;) or . = concat(&quot;Your FOI Request QueueAdvanced SearchAdd RequestSearch in Queue​Search in QueueMY REQUESTSMY TEAM&quot; , &quot;'&quot; , &quot;S REQUESTSWATCHING REQUESTSNo rowsAPPLICANT NAMEREQUEST TYPEID NUMBERTotal # of Request in Queue: 0Rows per page:102050100Search​SearchFilter byREQUEST DESCRIPTIONID NUMBERAXIS REQUEST #APPLICANT NAMEASSIGNEE NAMESUBJECT CODERequest StateUnopenedCall for RecordsRecords ReviewMinistry Sign OffClosedRequest StatusOverdueOn TimeRequest TypePersonalGeneralSearch by Date RangeType of Date RangeSelect Type of Date RangeType of Date RangeFromFromtoToToSearch by Public BodyPublic BodyAllPublic BodyApply SearchClear All FiltersInformation1Information2Search ResultsAPPLICANT NAMEREQUEST TYPEID NUMBERCURRENT STATEASSIGNED TORECEIVED DATELastname, FirstnamegeneralU-0022UnopenedUnassignedFEB 15 2023Lastname, FirstnamegeneralU-0021UnopenedUnassignedFEB 15 2023Lastname, FirstnamegeneralU-0020UnopenedUnassignedFEB 15 2023Lastname, FirstnamegeneralU-0019UnopenedUnassignedFEB 15 2023Lastname, FirstnamegeneralU-0018UnopenedUnassignedFEB 15 2023Lastname, FirstnamegeneralU-0017UnopenedUnassignedFEB 15 2023Lastname, FirstnamegeneralU-0016UnopenedUnassignedFEB 15 2023Lastname, FirstnamegeneralU-0015UnopenedUnassignedFEB 15 2023Lastname, FirstnamegeneralU-0014UnopenedUnassignedFEB 15 2023Lastname, FirstnamegeneralU-0013UnopenedUnassignedFEB 15 2023Lastname, FirstnamegeneralU-0012UnopenedUnassignedFEB 15 2023Lastname, FirstnamegeneralU-0011UnopenedUnassignedFEB 15 2023Lastname, FirstnamegeneralU-0010UnopenedUnassignedFEB 14 2023Lastname, FirstnamegeneralU-009UnopenedUnassignedFEB 14 2023Lastname, FirstnamegeneralU-008UnopenedUnassignedFEB 14 2023Lastname, FirstnamegeneralU-007UnopenedUnassignedFEB 14 2023Lastname, FirstnamegeneralU-006UnopenedUnassignedFEB 14 2023Lastname, FirstnamegeneralU-005UnopenedUnassignedFEB 14 2023Lastname, FirstnamegeneralU-004UnopenedUnassignedFEB 14 2023Lastname, FirstnamegeneralU-003UnopenedUnassignedFEB 14 2023Lastname, FirstnamegeneralU-002UnopenedUnassignedFEB 14 2023Lastname, FirstnamegeneralU-001UnopenedUnassignedFEB 14 2023Total # of Request in Queue: 221Rows per page:102050100&quot;))]</value>
+      <webElementGuid>f17e4ea4-662c-41ae-9c5a-e39eaafee495</webElementGuid>
+   </webElementXpaths>
+</WebElementEntity>
