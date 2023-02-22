@@ -74,10 +74,10 @@ class FOIAssigneesByTypeAndStatus(Resource):
     @TRACER.trace()
     @cross_origin(origins=allowedorigins())
     @auth.require
-    @request_api.cache.cached(
-        unless=False,
-        response_filter=response_filter
-        )
+    # @request_api.cache.cached(
+    #     unless=False,
+    #     response_filter=response_filter
+    #     )
     def get(requestype=None, status=None, bcgovcode=None):
         if requestype is not None and (requestype != "personal" and requestype != "general"):
             return {'status': False, 'message':EXCEPTION_MESSAGE_BAD_REQUEST}, 400   
@@ -99,10 +99,10 @@ class FOIAssigneesByGroup(Resource):
     @TRACER.trace()
     @cross_origin(origins=allowedorigins())
     @auth.require
-    @request_api.cache.cached(
-        unless=cache_filter,
-        response_filter=response_filter
-        )
+    # @request_api.cache.cached(
+    #     unless=cache_filter,
+    #     response_filter=response_filter
+    #     )
     def get(groupname):
         """ POST Method for capturing FOI requests before processing"""
         try:
@@ -125,10 +125,10 @@ class FOIAssigneesTeams(Resource):
     @TRACER.trace()
     @cross_origin(origins=allowedorigins())
     @auth.require
-    @request_api.cache.cached(
-        unless=cache_filter,
-        response_filter=response_filter
-        )
+    # @request_api.cache.cached(
+    #     unless=cache_filter,
+    #     response_filter=response_filter
+    #     )
     def get(requestype):
         """ POST Method for capturing FOI requests before processing"""
         try:
