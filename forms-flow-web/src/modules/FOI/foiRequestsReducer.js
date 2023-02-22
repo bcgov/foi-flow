@@ -12,7 +12,7 @@ const initialState = {
   foiAdvancedSearchParams: {},
   isAssignedToListLoading: true,
   isAttachmentListLoading: true,
-  isCommentTagListLoading: false,
+  isCommentTagListLoading: true,
   foiRequestsList: null,
   foiMinistryRequestsList: [],
   foiRequestsCount: 0,
@@ -67,6 +67,7 @@ const initialState = {
   foiOpenedMinistries: [],
   resumeDefaultSorting: false,
   isCorrespondenceLoading: true,
+  foiSubjectCodeList: [],
   restrictedReqTaglist:[]
   
 };
@@ -93,8 +94,8 @@ const foiRequests = (state = initialState, action) => {
       return { ...state, isAssignedToListLoading: action.payload };
     case FOI_ACTION_CONSTANTS.IS_ATTACHMENTLIST_LOADING:
       return { ...state, isAttachmentListLoading: action.payload };
-    // case FOI_ACTION_CONSTANTS.IS_COMMENTTAGLIST_LOADING:
-    //   return { ...state, isCommentTagListLoading: action.payload };
+    case FOI_ACTION_CONSTANTS.IS_COMMENTTAGLIST_LOADING:
+      return { ...state, isCommentTagListLoading: action.payload };
     case FOI_ACTION_CONSTANTS.FOI_LIST_REQUESTS:
       return { ...state, foiRequestsList: action.payload, isLoading: false };
     case FOI_ACTION_CONSTANTS.FOI_MINISTRY_REQUESTSLIST:
@@ -171,6 +172,8 @@ const foiRequests = (state = initialState, action) => {
       return { ...state, resumeDefaultSorting: action.payload };
     case FOI_ACTION_CONSTANTS.IS_CORRESPONDENCE_LOADING:
       return { ...state, isCorrespondenceLoading: action.payload };
+    case FOI_ACTION_CONSTANTS.FOI_SUBJECT_CODELIST:
+      return { ...state, foiSubjectCodeList: action.payload };
     case FOI_ACTION_CONSTANTS.RESTRICTED_COMMENT_TAG_LIST:
       return { ...state, restrictedReqTaglist: action.payload };
     default:

@@ -145,3 +145,13 @@ class StateName(Enum):
     deduplication = "Deduplication"
     harmsassessment = "Harms Assessment"    
     response = "Response"
+
+class CacheUrls(Enum):
+    keycloakusers= "/api/foiassignees"
+    programareas= "/api/foiflow/programareas"
+    deliverymodes= "/api/foiflow/deliverymodes"
+    receivedmodes= "/api/foiflow/receivedmodes"
+    closereasons= "/api/foiflow/closereasons"
+    extensionreasons= "/api/foiflow/extensionreasons"
+    applicantcategories= "/api/foiflow/applicantcategories"
+    subjectcodes= "/api/foiflow/subjectcodes"

@@ -114,6 +114,7 @@ class FOIRequestWrapperSchema(Schema):
     additionalPersonalInfo = fields.Nested(FOIAdditionallPersonalInfoWrapperSchema,required=False,allow_none=True)
     documents = fields.Nested(FOIMinistryRequestDocumentSchema, many=True,allow_none=True)
     idNumber = fields.Str(data_key="idNumber",allow_none=True, validate=[validate.Length(max=120, error=MAX_EXCEPTION_MESSAGE)]) 
+    subjectCode = fields.Str(data_key="subjectCode",allow_none=True, validate=[validate.Length(max=120, error=MAX_EXCEPTION_MESSAGE)])   
     isofflinepayment =   fields.Bool(data_key="isofflinepayment")
 
 class EditableFOIMinistryRequestWrapperSchema(Schema):

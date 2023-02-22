@@ -24,6 +24,8 @@ import logging
 from sqlalchemy.sql.sqltypes import Date
 from dateutil import parser
 from request_api.utils.enums import StateName
+from .FOIMinistryRequestSubjectCodes import FOIMinistryRequestSubjectCode
+from .SubjectCodes import SubjectCode
 
 class FOIMinistryRequest(db.Model):
     # Name of the table in our database
@@ -89,6 +91,8 @@ class FOIMinistryRequest(db.Model):
     assignee = relationship('FOIAssignee', foreign_keys="[FOIMinistryRequest.assignedto]")
     ministryassignee = relationship('FOIAssignee', foreign_keys="[FOIMinistryRequest.assignedministryperson]")
 
+    subjectcode = relationship('FOIMinistryRequestSubjectCode', primaryjoin="and_(FOIMinistryRequest.foiministryrequestid==FOIMinistryRequestSubjectCode.foiministryrequestid, "
+                        "FOIMinistryRequest.version==FOIMinistryRequestSubjectCode.foiministryrequestversion)") 
     isofflinepayment = db.Column(db.Boolean, unique=False, nullable=True,default=False)
 
     @classmethod
@@ -460,7 +464,8 @@ class FOIMinistryRequest(db.Model):
             onbehalfformatted,
             extensions,
             FOIRestrictedMinistryRequest.isrestricted.label('isiaorestricted'),
-            ministry_restricted_requests.isrestricted.label('isministryrestricted')
+            ministry_restricted_requests.isrestricted.label('isministryrestricted'),
+            SubjectCode.name.label('subjectcode')
         ]
 
         basequery = _session.query(
@@ -522,6 +527,14 @@ class FOIMinistryRequest(db.Model):
                                     ministry_restricted_requests.ministryrequestid == FOIMinistryRequest.foiministryrequestid,
                                     ministry_restricted_requests.type == 'ministry',
                                     ministry_restricted_requests.isactive == True),
+                                isouter=True
+                            ).join(
+                                FOIMinistryRequestSubjectCode,
+                                and_(FOIMinistryRequestSubjectCode.foiministryrequestid == FOIMinistryRequest.foiministryrequestid, FOIMinistryRequestSubjectCode.foiministryrequestversion == FOIMinistryRequest.version),
+                                isouter=True
+                            ).join(
+                                SubjectCode,
+                                SubjectCode.subjectcodeid == FOIMinistryRequestSubjectCode.subjectcodeid,
                                 isouter=True
                             ).filter(FOIMinistryRequest.requeststatusid != 3)
 
@@ -628,7 +641,8 @@ class FOIMinistryRequest(db.Model):
             'DaysLeftValue': FOIMinistryRequest.duedate,
             'ministry': func.upper(ProgramArea.bcgovcode),
             'requestPageCount': FOIMinistryRequest.requestpagecount,
-            'closedate': FOIMinistryRequest.closedate
+            'closedate': FOIMinistryRequest.closedate,
+            'subjectcode': SubjectCode.name
         }.get(x, FOIMinistryRequest.axisrequestid)
 
     @classmethod
@@ -949,7 +963,8 @@ class FOIMinistryRequest(db.Model):
             onbehalfformatted,
             extensions,
             FOIRestrictedMinistryRequest.isrestricted.label('isiaorestricted'),
-            ministry_restricted_requests.isrestricted.label('isministryrestricted')
+            ministry_restricted_requests.isrestricted.label('isministryrestricted'),
+            SubjectCode.name.label('subjectcode')
         ]
 
         basequery = _session.query(
@@ -1011,6 +1026,14 @@ class FOIMinistryRequest(db.Model):
                                     ministry_restricted_requests.ministryrequestid == FOIMinistryRequest.foiministryrequestid,
                                     ministry_restricted_requests.type == 'ministry',
                                     ministry_restricted_requests.isactive == True),
+                                isouter=True
+                            ).join(
+                                FOIMinistryRequestSubjectCode,
+                                and_(FOIMinistryRequestSubjectCode.foiministryrequestid == FOIMinistryRequest.foiministryrequestid, FOIMinistryRequestSubjectCode.foiministryrequestversion == FOIMinistryRequest.version),
+                                isouter=True
+                            ).join(
+                                SubjectCode,
+                                SubjectCode.subjectcodeid == FOIMinistryRequestSubjectCode.subjectcodeid,
                                 isouter=True
                             )
 

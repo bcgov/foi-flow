@@ -74,7 +74,9 @@ const FOI_COMPONENT_CONSTANTS = {
     AXIS_REQUEST_ID:"axisRequestId",
     EAPPROVAL:"eApproval",
     DIVISION_DUE_DATE: "divisionDueDate",
-    DIVISION_RECEIVED_DATE: "divisionReceivedDate"
+    DIVISION_RECEIVED_DATE: "divisionReceivedDate",
+
+    SUBJECT_CODE: "subjectCode"
   };
   
   export default FOI_COMPONENT_CONSTANTS;

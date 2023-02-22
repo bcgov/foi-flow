@@ -12,7 +12,7 @@ import { StateEnum } from '../../../../constants/FOI/statusEnum';
 import { isRequestWatcherOrMinistryAssignee, addToRestrictedRequestTagList } from "../../../../helper/FOI/helper";
 import RequestMinistryRestriction from "../../customComponents/RequestMinistryRestriction";
 import _ from 'lodash';
-
+import {setCommentTagListLoader} from "../../../../actions/FOI/foiRequestActions";
 
 const RequestHeader = React.memo(({
     requestDetails,
@@ -21,7 +21,6 @@ const RequestHeader = React.memo(({
     setSaveMinistryRequestObject,
     ministryAssigneeValue
 }) => {
-
     const { requestId, ministryId } = useParams();
     const _requestDetails = requestDetails;
     const ministryAssignedToList = useSelector(state=> state.foiRequests.foiMinistryAssignedToList);
@@ -35,6 +34,9 @@ const RequestHeader = React.memo(({
     useEffect(() => {
       if (assignedToList?.length === 0) {
         dispatch(fetchFOIFullAssignedToList());
+      }
+      else{
+        dispatch(setCommentTagListLoader(false));
       }
     }, [dispatch]); 
 

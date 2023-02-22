@@ -41,12 +41,12 @@ export const setFOIAttachmentListLoader = (data) => dispatch =>{
         payload:data
     })
 }
-// export const setCommentTagListLoader = (data) => dispatch =>{
-//     dispatch({
-//         type:FOI_ACTION_CONSTANTS.IS_COMMENTTAGLIST_LOADING,
-//         payload:data
-//     })
-// }
+export const setCommentTagListLoader = (data) => dispatch =>{
+    dispatch({
+        type:FOI_ACTION_CONSTANTS.IS_COMMENTTAGLIST_LOADING,
+        payload:data
+    })
+}
 export const setFOIUpdateLoader = (data) => dispatch =>{
     dispatch({
         type:FOI_ACTION_CONSTANTS.FOI_IS_REQUEST_UPDATED,
@@ -279,6 +279,13 @@ export const setResumeDefaultSorting = (data) => (dispatch) => {
 export const setFOICorrespondenceLoader = (data) => dispatch =>{
     dispatch({
         type:FOI_ACTION_CONSTANTS.IS_CORRESPONDENCE_LOADING,
+        payload:data
+    })
+}
+
+export const setFOISubjectCodeList = (data) => dispatch =>{
+    dispatch({
+        type:FOI_ACTION_CONSTANTS.FOI_SUBJECT_CODELIST,
         payload:data
     })
 }
