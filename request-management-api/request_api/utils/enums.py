@@ -154,3 +154,4 @@ class CacheUrls(Enum):
     closereasons= "/api/foiflow/closereasons"
     extensionreasons= "/api/foiflow/extensionreasons"
     applicantcategories= "/api/foiflow/applicantcategories"
+    subjectcodes= "api/foiflow/subjectcodes"

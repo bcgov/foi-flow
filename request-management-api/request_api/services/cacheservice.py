@@ -48,6 +48,7 @@ class cacheservice:
             apiurls.append(self.request_url+CacheUrls.closereasons.value)
             apiurls.append(self.request_url+CacheUrls.extensionreasons.value)
             apiurls.append(self.request_url+CacheUrls.applicantcategories.value)
+            apiurls.append(self.request_url+CacheUrls.subjectcodes.value)
         return apiurls
 
     def __invokeresources(self, apiurls):
