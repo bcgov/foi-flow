@@ -2,22 +2,23 @@ from request_api.models.ProgramAreaDivisions import ProgramAreaDivision
 
 class programareadivisionservice:
 
-    def getprogramareadivisions(self):
-        """ Returns the active program area divisions
+    def getallprogramareadivisions(self):
+        """ Returns all active program area divisions
         """
-        return
+        divisions = ProgramAreaDivision.getallprogramareadivisons()
+        return divisions
     
-    def createprogramareadivision(self):
+    def createprogramareadivision(self, data):
         """ Creates a program area division
         """
-        return
+        return ProgramAreaDivision.createprogramareadivision(data)
 
-    def updateprogramareadivision(self):
+    def updateprogramareadivision(self, divisionid, data):
         """ Updates an existing program area division
         """
-        return
+        return ProgramAreaDivision.updateprogramareadivision(divisionid, data)
     
-    def disableprogramareadivision(self):
+    def disableprogramareadivision(self, divisionid):
         """ Disable a program area division
         """
-        return
+        return ProgramAreaDivision.disableprogramareadivision(divisionid)

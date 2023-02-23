@@ -28,10 +28,10 @@ class ProgramAreaDivision(db.Model):
         return division_schema.dump(query)
     
     @classmethod
-    def createprogramareadivision(cls, programareaid, name,)->DefaultMethodResult:
+    def createprogramareadivision(cls, programareadivision)->DefaultMethodResult:
         isactive = True
         created_at = datetime2.now().isoformat()
-        newprogramareadivision = ProgramAreaDivision(programareaid=programareaid, name=name, isactive=isactive, created_at=created_at)
+        newprogramareadivision = ProgramAreaDivision(programareaid=programareadivision["programareaid"], name=programareadivision["name"], isactive=isactive, created_at=created_at)
         db.session.add(newprogramareadivision)
         db.session.commit()      
         return DefaultMethodResult(True,'Division added',newprogramareadivision.divisionid)
@@ -48,7 +48,7 @@ class ProgramAreaDivision(db.Model):
             return DefaultMethodResult(True,'No Division found',divisionid)  
     
     @classmethod
-    def updateprogramareadivision(cls, divisionid, programareadivision, userid):   
+    def updateprogramareadivision(cls, divisionid, programareadivision):   
         dbquery = db.session.query(ProgramAreaDivision)
         division = dbquery.filter_by(divisionid=divisionid)
         if(division.count() > 0) :             
