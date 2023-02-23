@@ -27,6 +27,38 @@ class ProgramAreaDivision(db.Model):
         query = db.session.query(ProgramAreaDivision).filter_by(programareaid=programareaid, isactive=True).order_by(ProgramAreaDivision.name.asc())
         return division_schema.dump(query)
     
+    @classmethod
+    def createprogramareadivision(cls, programareaid, name,)->DefaultMethodResult:
+        isactive = True
+        created_at = datetime2.now().isoformat()
+        newprogramareadivision = ProgramAreaDivision(programareaid=programareaid, name=name, isactive=isactive, created_at=created_at)
+        db.session.add(newprogramareadivision)
+        db.session.commit()      
+        return DefaultMethodResult(True,'Division added',newprogramareadivision.divisionid)
+
+    @classmethod
+    def disableprogramareadivision(cls, divisionid):   
+        dbquery = db.session.query(ProgramAreaDivision)
+        division = dbquery.filter_by(divisionid=divisionid)
+        if(division.count() > 0) :             
+            division.update({ProgramAreaDivision.isactive:False}, synchronize_session = False)
+            db.session.commit()
+            return DefaultMethodResult(True,'Division disabled',divisionid)
+        else:
+            return DefaultMethodResult(True,'No Division found',divisionid)  
+    
+    @classmethod
+    def updateprogramareadivision(cls, divisionid, programareadivision, userid):   
+        dbquery = db.session.query(ProgramAreaDivision)
+        division = dbquery.filter_by(divisionid=divisionid)
+        if(division.count() > 0) :             
+            division.update({ProgramAreaDivision.programareaid:programareadivision["programareaid"], ProgramAreaDivision.name:programareadivision["name"], ProgramAreaDivision.isactive:True, ProgramAreaDivision.sortorder:programareadivision["sortorder"]}, synchronize_session = False)
+            db.session.commit()
+            return DefaultMethodResult(True,'Division updated',divisionid)
+        else:
+            return DefaultMethodResult(True,'No Division found',divisionid)  
+
+    
              
 
 class ProgramAreaDivisionSchema(ma.Schema):
