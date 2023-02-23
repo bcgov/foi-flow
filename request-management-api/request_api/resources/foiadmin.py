@@ -22,6 +22,7 @@ from request_api.utils.util import  cors_preflight, allowedorigins
 from request_api.exceptions import BusinessException, Error
 from request_api.services.programareaservice import programareaservice
 from request_api.services.programareadivisionservice import programareadivisionservice
+from request_api.schemas.foiprogramareadivision import FOIProgramAreaDivisionSchema
 import json
 from flask_cors import cross_origin
 import request_api
@@ -45,7 +46,13 @@ class FOIProgramAreaDivisions(Resource):
     @cross_origin(origins=allowedorigins())
     #@auth.require
     def get(requesttype):
-        return {'status': True, 'message': 'test get divisions'}, 200    
+        try:
+            result = programareadivisionservice().getallprogramareadivisions()
+            return json.dumps(result), 200
+        except KeyError as err:
+            return {'status': False, 'message':err.messages}, 400        
+        except BusinessException as exception:            
+            return {'status': exception.status_code, 'message':exception.message}, 500     
 
 @cors_preflight('POST,OPTIONS')
 @API.route('/foiadmin/division/<requesttype>')
@@ -57,7 +64,17 @@ class CreateFOIProgramAreaDivision(Resource):
     @cross_origin(origins=allowedorigins())
     #@auth.require
     def post(requesttype):
-        return {'status': True, 'message': 'test create division'}, 200    
+        try:
+            requestjson = request.get_json()
+            programareadivisionschema = FOIProgramAreaDivisionSchema().load(requestjson)
+            result = programareadivisionservice().createprogramareadivision(programareadivisionschema)
+            # if result.success == True:
+            #   asyncio.ensure_future();
+            return {'status': result.success, 'message':result.message, 'id':result.identifier}, 200 
+        except KeyError as err:
+            return {'status': False, 'message':err.messages}, 400        
+        except BusinessException as exception:            
+            return {'status': exception.status_code, 'message':exception.message}, 500             
 
 
 @cors_preflight('PUT,OPTIONS')
@@ -70,7 +87,17 @@ class UpdateFOIProgramAreaDivision(Resource):
     @cross_origin(origins=allowedorigins())
     #@auth.require
     def put(requesttype, divisionid):
-        return {'status': True, 'message': 'test update division'}, 200    
+        try:
+            requestjson = request.get_json()
+            programareadivisionschema = FOIProgramAreaDivisionSchema().load(requestjson)
+            result = programareadivisionservice().updateprogramareadivision(divisionid, programareadivisionschema)
+            # if result.success == True:
+            #   asyncio.ensure_future();
+            return {'status': result.success, 'message':result.message, 'id':result.identifier}, 200 
+        except KeyError as err:
+            return {'status': False, 'message':err.messages}, 400        
+        except BusinessException as exception:            
+            return {'status': exception.status_code, 'message':exception.message}, 500  
 
 
 @cors_preflight('PUT,OPTIONS')
@@ -82,5 +109,13 @@ class DisableFOIProgramAreaDivision(Resource):
     @cross_origin(origins=allowedorigins())
     #@auth.require
     def put(requesttype, divisionid):
-        return {'status': True, 'message': 'test disable division'}, 200    
+        try:
+            result = programareadivisionservice().disableprogramareadivision(divisionid)
+            # if result.success == True:
+            #   asyncio.ensure_future();
+            return {'status': result.success, 'message':result.message, 'id':result.identifier}, 200 
+        except KeyError as err:
+            return {'status': False, 'message':err.messages}, 400        
+        except BusinessException as exception:            
+            return {'status': exception.status_code, 'message':exception.message}, 500   
 
