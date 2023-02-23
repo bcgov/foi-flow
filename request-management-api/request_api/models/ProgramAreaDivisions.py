@@ -1,4 +1,5 @@
 from .db import  db, ma
+from datetime import datetime as datetime2
 from .default_method_result import DefaultMethodResult
 from sqlalchemy.orm import relationship,backref
 from datetime import datetime
@@ -29,9 +30,8 @@ class ProgramAreaDivision(db.Model):
     
     @classmethod
     def createprogramareadivision(cls, programareadivision)->DefaultMethodResult:
-        isactive = True
         created_at = datetime2.now().isoformat()
-        newprogramareadivision = ProgramAreaDivision(programareaid=programareadivision["programareaid"], name=programareadivision["name"], isactive=isactive, created_at=created_at)
+        newprogramareadivision = ProgramAreaDivision(programareaid=programareadivision["programareaid"], name=programareadivision["name"], isactive=True, created_at=created_at)
         db.session.add(newprogramareadivision)
         db.session.commit()      
         return DefaultMethodResult(True,'Division added',newprogramareadivision.divisionid)
