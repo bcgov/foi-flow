@@ -3,18 +3,22 @@
    <description></description>
    <name>button_Watch</name>
    <tag></tag>
-   <elementGuidId>4609b1c4-5d49-4e8a-991b-b7ee38860d6f</elementGuidId>
+   <elementGuidId>eb22339b-2bf4-4d1d-8d0c-d65d1ef3b312</elementGuidId>
    <selectorCollection>
       <entry>
          <key>XPATH</key>
-         <value>//div[@id='Request']/div/div/form/div/div/div[2]/div/div/button</value>
+         <value>//div[@id='Request']/div/div/form/div[2]/div/div/div/div/div/button</value>
+      </entry>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[(text() = '  Watch' or . = '  Watch')]</value>
       </entry>
       <entry>
          <key>CSS</key>
          <value>button.foi-eye-container</value>
       </entry>
    </selectorCollection>
-   <selectorMethod>XPATH</selectorMethod>
+   <selectorMethod>BASIC</selectorMethod>
    <useRalativeImagePath>true</useRalativeImagePath>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -22,6 +26,7 @@
       <name>tag</name>
       <type>Main</type>
       <value>button</value>
+      <webElementGuid>ac0da7fb-62a6-46b5-8466-757670270202</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -29,6 +34,7 @@
       <name>class</name>
       <type>Main</type>
       <value>foi-eye-container</value>
+      <webElementGuid>c65e0bbf-fb30-4882-b882-d1601aea913c</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>true</isSelected>
@@ -36,34 +42,39 @@
       <name>text</name>
       <type>Main</type>
       <value>  Watch</value>
+      <webElementGuid>ba4f7927-629e-4ccd-86a0-cf3044930e08</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
       <matchCondition>equals</matchCondition>
       <name>xpath</name>
       <type>Main</type>
-      <value>id(&quot;Request&quot;)/div[@class=&quot;container foi-review-request-container&quot;]/div[@class=&quot;foi-review-container&quot;]/form[@class=&quot;jss5 foi-request-form&quot;]/div[@class=&quot;foi-request-review-header-row1&quot;]/div[@class=&quot;foi-request-review-header-col1&quot;]/div[@class=&quot;foi-request-review-header-col1-row&quot;]/div[1]/div[@class=&quot;foi-watcher-all&quot;]/button[@class=&quot;foi-eye-container&quot;]</value>
+      <value>id(&quot;Request&quot;)/div[@class=&quot;container foi-review-request-container&quot;]/div[@class=&quot;foi-review-container&quot;]/form[@class=&quot;jss142 foi-request-form&quot;]/div[@class=&quot;row&quot;]/div[@class=&quot;col-lg-8&quot;]/div[@class=&quot;foi-request-review-header-col1-row&quot;]/div[@class=&quot;foi-request-review-header-col1-row&quot;]/div[1]/div[@class=&quot;foi-watcher-all&quot;]/button[@class=&quot;foi-eye-container&quot;]</value>
+      <webElementGuid>139a735e-558f-4b75-a7f2-7271526a78f4</webElementGuid>
    </webElementProperties>
    <webElementXpaths>
       <isSelected>true</isSelected>
       <matchCondition>equals</matchCondition>
       <name>xpath:idRelative</name>
       <type>Main</type>
-      <value>//div[@id='Request']/div/div/form/div/div/div[2]/div/div/button</value>
+      <value>//div[@id='Request']/div/div/form/div[2]/div/div/div/div/div/button</value>
+      <webElementGuid>4bfdc2b1-b997-4f6c-9633-a996883148fb</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
       <matchCondition>equals</matchCondition>
       <name>xpath:neighbor</name>
       <type>Main</type>
-      <value>(.//*[normalize-space(text()) and normalize-space(.)='Review Request'])[1]/following::button[1]</value>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='Intake, FOI'])[1]/following::button[1]</value>
+      <webElementGuid>7c23d579-ed8d-4099-b848-df41a57e7f18</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
       <matchCondition>equals</matchCondition>
       <name>xpath:neighbor</name>
       <type>Main</type>
-      <value>(.//*[normalize-space(text()) and normalize-space(.)='Option 4'])[1]/following::button[1]</value>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='Watchers'])[1]/preceding::button[1]</value>
+      <webElementGuid>6a38e9f9-8ba9-49e6-bdae-b51138e88724</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -71,6 +82,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>(.//*[normalize-space(text()) and normalize-space(.)='Tag'])[1]/preceding::button[1]</value>
+      <webElementGuid>ea46645a-067a-455b-8365-22d48074858b</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -78,12 +90,22 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>//*/text()[normalize-space(.)='Watch']/parent::*</value>
+      <webElementGuid>a4f63af2-4ca0-4182-9d71-0689149f1985</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
       <matchCondition>equals</matchCondition>
       <name>xpath:position</name>
       <type>Main</type>
-      <value>//div[2]/div/div/button</value>
+      <value>//form/div[2]/div/div/div/div/div/button</value>
+      <webElementGuid>35f8671e-1f91-4950-998d-3ffd13a2dffc</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:customAttributes</name>
+      <type>Main</type>
+      <value>//button[(text() = '  Watch' or . = '  Watch')]</value>
+      <webElementGuid>c31ae8c0-9a0f-45d4-b16e-64b64cec74a9</webElementGuid>
    </webElementXpaths>
 </WebElementEntity>

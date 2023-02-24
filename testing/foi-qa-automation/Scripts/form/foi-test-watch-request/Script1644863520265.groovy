@@ -31,9 +31,9 @@ def requestID = WebUI.callTestCase(findTestCase('submit/foi-test-save-request-fo
 
 WebUI.refresh()
 
-WebUI.verifyElementPresent(findTestObject('Page_foi.flow/form/watch/button_Watch'), 0)
+WebUI.verifyElementPresent(findTestObject('null'), 0)
 
-WebUI.verifyElementText(findTestObject('Page_foi.flow/form/watch/button_Watch'), 'Watch')
+WebUI.verifyElementText(findTestObject('null'), 'Watch')
 
 WebUI.verifyElementPresent(findTestObject('Page_foi.flow/form/watch/i_Watch eye icon'), 0)
 
@@ -41,31 +41,31 @@ WebUI.verifyElementText(findTestObject('Page_foi.flow/form/watch/span_Watch Coun
 
 WebUI.verifyElementPresent(findTestObject('Page_foi.flow/form/watch/i_Watch user icon'), 0)
 
-WebUI.click(findTestObject('Page_foi.flow/form/watch/button_Watch'))
+WebUI.click(findTestObject('null'))
 
-WebUI.verifyElementText(findTestObject('Page_foi.flow/form/watch/button_Watch'), 'Unwatch')
+WebUI.verifyElementText(findTestObject('null'), 'Unwatch')
 
 WebUI.verifyElementText(findTestObject('Page_foi.flow/form/watch/span_Watch Counter'), '1')
 
 WebUI.refresh()
 
-WebUI.verifyElementText(findTestObject('Page_foi.flow/form/watch/button_Watch'), 'Unwatch')
+WebUI.verifyElementText(findTestObject('null'), 'Unwatch')
 
 WebUI.verifyElementText(findTestObject('Page_foi.flow/form/watch/span_Watch Counter'), '1')
 
-WebUI.click(findTestObject('Page_foi.flow/form/watch/button_Unwatch'))
+WebUI.click(findTestObject('null'))
 
 WebUI.verifyElementText(findTestObject('Page_foi.flow/form/watch/span_Watch Counter'), '0')
 
-WebUI.verifyElementText(findTestObject('Page_foi.flow/form/watch/button_Watch'), 'Watch')
+WebUI.verifyElementText(findTestObject('null'), 'Watch')
 
 WebUI.refresh()
 
 WebUI.verifyElementText(findTestObject('Page_foi.flow/form/watch/span_Watch Counter'), '0')
 
-WebUI.verifyElementText(findTestObject('Page_foi.flow/form/watch/button_Watch'), 'Watch')
+WebUI.verifyElementText(findTestObject('null'), 'Watch')
 
-WebUI.verifyElementText(findTestObject('Page_foi.flow/form/watch/button_Watch'), 'Watch')
+WebUI.verifyElementText(findTestObject('null'), 'Watch')
 
 WebUI.click(findTestObject('Page_foi.flow/form/watch/div_add other watchers'), FailureHandling.STOP_ON_FAILURE)
 
@@ -141,5 +141,5 @@ WebUI.click(findTestObject('Page_foi.flow/queue/div_request queue row 1'), Failu
 
 WebUI.verifyElementText(findTestObject('Page_foi.flow/form/watch/span_Watch Counter'), '1')
 
-WebUI.verifyElementText(findTestObject('Page_foi.flow/form/watch/button_Watch'), 'Unwatch')
+WebUI.verifyElementText(findTestObject('null'), 'Unwatch')
 

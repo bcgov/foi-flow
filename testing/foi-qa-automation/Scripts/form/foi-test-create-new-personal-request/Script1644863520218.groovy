@@ -102,7 +102,7 @@ WebUI.setText(findTestObject('Page_foi.flow/form/inputs/applicant details/input_
 
 WebUI.click(findTestObject('Page_foi.flow/form/inputs/applicant details/input_Category'))
 
-WebUI.click(findTestObject('Object Repository/Page_foi.flow/form/inputs/applicant details/category dropdown/li_' + category))
+WebUI.click(findTestObject('Page_foi.flow/form/inputs/applicant details/category dropdown/li_Individual'), FailureHandling.STOP_ON_FAILURE)
 
 WebUI.setText(findTestObject('Page_foi.flow/form/inputs/address/input_Street Address_outlined-streetAddress'), streetAddress)
 
@@ -120,13 +120,18 @@ WebUI.setText(findTestObject('Page_foi.flow/form/inputs/address/input_Home Phone
 
 WebUI.setText(findTestObject('Page_foi.flow/form/inputs/request description/textarea_request description'), description)
 
-WebUI.click(findTestObject('Page_foi.flow/form/inputs/request description/Page_ABC-2099-50/span_EDU_checkmark'))
+WebUI.click(findTestObject('Page_foi.flow/form/inputs/request description/span_EDU_selectspanEDU'))
 
 WebUI.scrollToElement(findTestObject('Page_foi.flow/form/button_Save'), 0)
 
 WebUI.setText(findTestObject('Page_foi.flow/form/inputs/request details/input_Start Date'), '2021-12-16')
 
-WebUI.setText(findTestObject('Page_foi.flow/form/inputs/request details/input_Received Date'), '2021-12-16')
+WebUI.waitForElementClickable(findTestObject('Page_foi.flow/form/inputs/request details/input_Received Date_receivedDate'), 
+    0)
+
+WebUI.setText(findTestObject('Page_foi.flow/form/inputs/request details/input_Received Date_receivedDate'), '2021-12-16')
+
+WebUI.click(findTestObject('Page_foi.flow/form/inputs/request details/input_Received Date_receivedDate'))
 
 WebUI.click(findTestObject('Page_foi.flow/form/inputs/request details/input_Request Type'))
 

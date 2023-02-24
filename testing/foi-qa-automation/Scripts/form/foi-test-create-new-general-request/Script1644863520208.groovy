@@ -61,17 +61,23 @@ WebUI.setText(findTestObject('Page_foi.flow/form/inputs/address/input_Home Phone
 
 WebUI.setText(findTestObject('Page_foi.flow/form/inputs/request description/textarea_request description'), 'testing 123 description')
 
-WebUI.scrollToElement(findTestObject('Page_foi.flow/form/button_Save'), 0)
-
+//WebUI.scrollToPosition(0, 0)
+//WebUI.scrollToElement(findTestObject('Page_foi.flow/form/inputs/request description/Page_ABC-2099-50/label_EDU'), 0)
+//WebUI.scrollToElement(findTestObject('Page_foi.flow/form/inputs/request description/span_EDU_selectspanEDU'), 0)
 //WebUI.scrollToElement(findTestObject('Page_foi.flow/form/inputs/request description/span_EDU_checkmark'), 0)
-
-WebUI.click(findTestObject('Page_foi.flow/form/inputs/request description/span_EDU_checkmark'))
+WebUI.click(findTestObject('Page_foi.flow/form/inputs/request description/span_EDU_selectspanEDU'))
 
 WebUI.takeScreenshotAsCheckpoint('current_viewport')
 
+WebUI.scrollToElement(findTestObject('Page_foi.flow/form/inputs/request details/input_Start Date'), 0)
+
 WebUI.setText(findTestObject('Page_foi.flow/form/inputs/request details/input_Start Date'), '2021-12-16')
 
-WebUI.setText(findTestObject('Page_foi.flow/form/inputs/request details/input_Received Date'), '2021-12-16')
+WebUI.click(findTestObject('Page_foi.flow/form/inputs/request details/input_Received Date_receivedDate'))
+
+//WebUI.setText(findTestObject('Page_foi.flow/form/inputs/request details/input_Received Date_receivedDate'), '2023-02-23')
+
+WebUI.scrollToElement(findTestObject('Page_foi.flow/form/inputs/request details/input_Request Type'), 0)
 
 WebUI.click(findTestObject('Page_foi.flow/form/inputs/request details/input_Request Type'))
 
@@ -87,6 +93,8 @@ WebUI.click(findTestObject('Page_foi.flow/form/inputs/request description/span_n
 WebUI.verifyMatch(WebUI.getCSSValue(findTestObject('Page_foi.flow/form/inputs/request description/span_no PI Checkbox'), 
         'color'), 'rgba(0, 0, 0, 0.87)', false)
 
+WebUI.scrollToElement(findTestObject('Page_foi.flow/form/inputs/request details/input_Received Mode'), 0)
+
 WebUI.click(findTestObject('Page_foi.flow/form/inputs/request details/input_Received Mode'))
 
 WebUI.click(findTestObject('Page_foi.flow/form/inputs/request details/received mode options/li_Email'))
@@ -99,8 +107,9 @@ WebUI.scrollToElement(findTestObject('Page_foi.flow/form/button_Save'), 0)
 
 WebUI.click(findTestObject('Page_foi.flow/form/button_Save'))
 
-WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
+WebUI.delay(5)
 
+//WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
 def requestID = WebUI.getUrl(FailureHandling.STOP_ON_FAILURE).split('/')[5]
 
 WebUI.navigateToUrl(GlobalVariable.BASE_URL + '/foi/dashboard')

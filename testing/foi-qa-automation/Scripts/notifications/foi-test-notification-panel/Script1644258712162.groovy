@@ -103,7 +103,7 @@ WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT, FailureHandling.STOP_ON_FAILURE)
 
 WebUI.click(findTestObject('Page_foi.flow/queue/div_request queue row 1'))
 
-WebUI.click(findTestObject('Page_foi.flow/form/watch/button_Watch'))
+WebUI.click(findTestObject('null'))
 
 DriverFactory.changeWebDriver(user1)
 

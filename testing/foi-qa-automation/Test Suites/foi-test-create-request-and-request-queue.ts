@@ -175,14 +175,14 @@
    <testCaseLink>
       <guid>a90c8360-8cfa-46b1-86fd-fed9d00ba5e1</guid>
       <isReuseDriver>false</isReuseDriver>
-      <isRun>false</isRun>
+      <isRun>true</isRun>
       <testCaseId>Test Cases/submit/foi-test-submit-new-request-from-public</testCaseId>
       <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
    </testCaseLink>
    <testCaseLink>
       <guid>f5addc69-f127-42fc-8d31-3aa3e962915c</guid>
       <isReuseDriver>false</isReuseDriver>
-      <isRun>false</isRun>
+      <isRun>true</isRun>
       <testCaseId>Test Cases/queue/foi-test-filter-my-requests</testCaseId>
       <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
       <variableLink>
@@ -207,7 +207,7 @@
    <testCaseLink>
       <guid>c174ce3b-4daf-4b0e-b79e-5159bcfac46e</guid>
       <isReuseDriver>false</isReuseDriver>
-      <isRun>false</isRun>
+      <isRun>true</isRun>
       <testCaseId>Test Cases/queue/foi-test-filter-watching-requests</testCaseId>
       <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
    </testCaseLink>
