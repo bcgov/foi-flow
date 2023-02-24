@@ -33,6 +33,11 @@ const API = {
   FOI_GET_CLOSING_REASONS: `${FOI_BASE_API_URL}/api/foiflow/closereasons`,
   FOI_POST_OSS_HEADER: `${FOI_BASE_API_URL}/api/foiflow/oss/authheader`,
 
+  FOI_GET_PROGRAMAREADIVISIONS_API: `${FOI_BASE_API_URL}/api/foiadmin/divisions`,
+  FOI_POST_PROGRAMAREADIVISION_API: `${FOI_BASE_API_URL}/api/foiadmin/division`,
+  FOI_PUT_PROGRAMAREADIVISIONS_API: `${FOI_BASE_API_URL}/api/foiadmin/division/<divisionid>`,
+  FOI_DELETE_PROGRAMAREADIVISIONS_API: `${FOI_BASE_API_URL}/api/foiadmin/division/<divisionid>/disable`,
+
   FOI_POST_COMMENT_RAWREQUEST: `${FOI_BASE_API_URL}/api/foicomment/rawrequest`,
   FOI_GET_COMMENT_RAWREQUEST: `${FOI_BASE_API_URL}/api/foicomment/rawrequest/<requestid>`,
   FOI_PUT_COMMENT_RAWREQUEST: `${FOI_BASE_API_URL}/api/foicomment/rawrequest/<requestid>`,
