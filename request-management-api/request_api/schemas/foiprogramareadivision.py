@@ -8,3 +8,4 @@ class FOIProgramAreaDivisionSchema(Schema):
     programareaid = fields.Int(data_key="programareaid")
     name = fields.Str(data_key="name")
     isactive = fields.Bool(data_key="isactive",allow_none=True)
+    sortorder = fields.Int(data_key="sortorder",allow_none=True)

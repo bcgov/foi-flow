@@ -37,7 +37,7 @@ EXCEPTION_MESSAGE_BAD_REQUEST='Bad Request'
 EXCEPTION_MESSAGE_NOT_FOUND='Not Found'
 
 @cors_preflight('GET,OPTIONS')
-@API.route('/foiadmin/divisions/<requesttype>')
+@API.route('/foiadmin/divisions')
 class FOIProgramAreaDivisions(Resource):
     """Retrieves all FOI program area divisions"""
 
@@ -45,7 +45,7 @@ class FOIProgramAreaDivisions(Resource):
     @TRACER.trace()
     @cross_origin(origins=allowedorigins())
     #@auth.require
-    def get(requesttype):
+    def get():
         try:
             result = programareadivisionservice().getallprogramareadivisions()
             return json.dumps(result), 200
@@ -55,7 +55,7 @@ class FOIProgramAreaDivisions(Resource):
             return {'status': exception.status_code, 'message':exception.message}, 500     
 
 @cors_preflight('POST,OPTIONS')
-@API.route('/foiadmin/division/<requesttype>')
+@API.route('/foiadmin/division')
 class CreateFOIProgramAreaDivision(Resource):
     """Creates FOI program area division"""
 
@@ -63,7 +63,7 @@ class CreateFOIProgramAreaDivision(Resource):
     @TRACER.trace()
     @cross_origin(origins=allowedorigins())
     #@auth.require
-    def post(requesttype):
+    def post():
         try:
             requestjson = request.get_json()
             programareadivisionschema = FOIProgramAreaDivisionSchema().load(requestjson)
@@ -78,7 +78,7 @@ class CreateFOIProgramAreaDivision(Resource):
 
 
 @cors_preflight('PUT,OPTIONS')
-@API.route('/foiadmin/division/<requesttype>/<divisionid>')
+@API.route('/foiadmin/division/<divisionid>')
 class UpdateFOIProgramAreaDivision(Resource):
     """Updates FOI program area division"""
 
@@ -86,7 +86,7 @@ class UpdateFOIProgramAreaDivision(Resource):
     @TRACER.trace()
     @cross_origin(origins=allowedorigins())
     #@auth.require
-    def put(requesttype, divisionid):
+    def put(divisionid):
         try:
             requestjson = request.get_json()
             programareadivisionschema = FOIProgramAreaDivisionSchema().load(requestjson)
@@ -101,14 +101,14 @@ class UpdateFOIProgramAreaDivision(Resource):
 
 
 @cors_preflight('PUT,OPTIONS')
-@API.route('/foiadmin/division/<requesttype>/<divisionid>/disable')
+@API.route('/foiadmin/division/<divisionid>/disable')
 class DisableFOIProgramAreaDivision(Resource):
     """Disables FOI program area division"""
     @staticmethod
     @TRACER.trace()
     @cross_origin(origins=allowedorigins())
     #@auth.require
-    def put(requesttype, divisionid):
+    def put(divisionid):
         try:
             result = programareadivisionservice().disableprogramareadivision(divisionid)
             # if result.success == True:
