@@ -7,7 +7,7 @@
    <selectorCollection>
       <entry>
          <key>XPATH</key>
-         <value>//div[@id='Request']/div/div/form/div/div/div[2]/div/div/div/i</value>
+         <value>//div[@id='Request']/div/div/form/div[2]/div/div/div/div/div/div/i</value>
       </entry>
       <entry>
          <key>CSS</key>
@@ -22,6 +22,7 @@
       <name>tag</name>
       <type>Main</type>
       <value>i</value>
+      <webElementGuid>90bcdbd1-2488-42ea-9faa-da2ad562998a</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -29,6 +30,7 @@
       <name>class</name>
       <type>Main</type>
       <value>fa fa-user-o</value>
+      <webElementGuid>05ed4fcd-59a3-48bf-9f55-2f283f63ba18</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>true</isSelected>
@@ -36,6 +38,7 @@
       <name>xpath</name>
       <type>Main</type>
       <value>id(&quot;Request&quot;)/div[@class=&quot;container foi-review-request-container&quot;]/div[@class=&quot;foi-review-container&quot;]/form[@class=&quot;jss5 foi-request-form&quot;]/div[@class=&quot;foi-request-review-header-row1&quot;]/div[@class=&quot;foi-request-review-header-col1&quot;]/div[@class=&quot;foi-request-review-header-col1-row&quot;]/div[1]/div[@class=&quot;foi-watcher-all&quot;]/div[@class=&quot;foi-watcher-select&quot;]/i[@class=&quot;fa fa-user-o&quot;]</value>
+      <webElementGuid>e55b0e84-b903-4263-9477-e691458aa77a</webElementGuid>
    </webElementProperties>
    <webElementXpaths>
       <isSelected>true</isSelected>
@@ -43,6 +46,7 @@
       <name>xpath:idRelative</name>
       <type>Main</type>
       <value>//div[@id='Request']/div/div/form/div/div/div[2]/div/div/div/i</value>
+      <webElementGuid>bb30e5d1-1f41-430b-95fd-d915ed81f08d</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -50,5 +54,6 @@
       <name>xpath:position</name>
       <type>Main</type>
       <value>//div/i</value>
+      <webElementGuid>ff66f044-079d-45d4-a919-903a58ab0943</webElementGuid>
    </webElementXpaths>
 </WebElementEntity>

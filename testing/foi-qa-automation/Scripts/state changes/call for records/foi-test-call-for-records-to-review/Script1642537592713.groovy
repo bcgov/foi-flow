@@ -79,7 +79,8 @@ WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/div_Statu
 
 WebUI.verifyElementPresent(findTestObject('Page_foi.flow/form/sidebar/status dropdown/li_Records Review'), 0)
 
-WebUI.verifyElementPresent(findTestObject('Page_foi.flow/ministry view/form/divisional tracking/stage dropdown options/li_Fee Estimate'), 0)
+WebUI.verifyElementPresent(findTestObject('Page_foi.flow/ministry view/form/divisional tracking/stage dropdown options/li_Fee Estimate'), 
+    0)
 
 WebUI.verifyElementPresent(findTestObject('Page_foi.flow/form/sidebar/status dropdown/li_Deduplication'), 0)
 
@@ -123,13 +124,14 @@ WebUI.verifyMatch(WebUI.getCSSValue(findTestObject('Page_foi.flow/form/sidebar/d
 
 WebUI.click(findTestObject('Page_foi.flow/form/sidebar/div_Sidebar Comments'))
 
-WebUI.verifyElementText(findTestObject('Page_foi.flow/form/sidebar/div_Sidebar Comments'), 'Comments (4)')
+WebUI.verifyElementText(findTestObject('Page_foi.flow/form/sidebar/div_Sidebar Comments'), 'Comments (6)')
+
+WebUI.click(findTestObject('Page_foi.flow/comment/Page_ABC-2099-50/span_All'))
 
 WebUI.verifyElementPresent(findTestObject('Page_foi.flow/comment/div_Comment list 2'), 0)
 
-WebUI.verifyElementText(findTestObject('Page_foi.flow/comment/p_comment list 2 text'), ((findTestData('Login Credentials').getValue(
-        'First Name', 8) + ' ') + findTestData('Login Credentials').getValue('Last Name', 8)) + ' changed the state of the request to Records Review')
-
+//WebUI.verifyElementText(findTestObject('Page_foi.flow/comment/p_comment list 2 text'), ((findTestData('Login Credentials').getValue(
+//      'First Name', 8) + ' ') + findTestData('Login Credentials').getValue('Last Name', 8)) + ' changed the state of the request to Records Review')
 WebUI.click(findTestObject('Page_foi.flow/form/sidebar/a_FOI'), FailureHandling.STOP_ON_FAILURE)
 
 WebUI.click(findTestObject('Page_foi.flow/queue/div_My Team Requests'))

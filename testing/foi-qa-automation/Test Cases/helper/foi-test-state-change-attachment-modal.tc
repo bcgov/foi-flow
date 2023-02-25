@@ -5,6 +5,12 @@
    <tag></tag>
    <comment></comment>
    <testCaseGuid>2276e672-13c6-4daf-a0ac-5a3e4cf42194</testCaseGuid>
+   <variableLinks>
+      <testDataLinkId></testDataLinkId>
+      <type>DEFAULT</type>
+      <value></value>
+      <variableId>ab020fa3-b0f3-4a12-b7da-8882a0c73e84</variableId>
+   </variableLinks>
    <variable>
       <defaultValue>'test.docx'</defaultValue>
       <description></description>
