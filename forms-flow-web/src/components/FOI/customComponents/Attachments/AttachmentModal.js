@@ -199,7 +199,7 @@ export default function AttachmentModal({
         case "replace":
           let _message = {};
             if (uploadFor === 'record') {
-              _message = {title: "Replace Records", body:`Replace record with manually converted PDF of the same document. The original file will still be available for download.` }
+              _message = {title: "Replace Records", body:<>Replace record with manually converted PDF of the same document.<br></br>The original file will still be available for download.</> }
             } else if (attachment) {
               switch(attachment.category.toLowerCase()) {
                 case StateTransitionCategories.cfrreview.name: 
