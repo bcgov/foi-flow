@@ -588,7 +588,9 @@ const AttachmentPopup = React.memo(({indexValue, attachment, handlePopupButtonCl
     StateTransitionCategories.signoffresponse.name,
     StateTransitionCategories.harmsreview.name,
     StateTransitionCategories.feeonhold.name,
-    StateTransitionCategories.responseonhold.name  
+    StateTransitionCategories.responseonhold.name,
+    StateTransitionCategories.responsereview.name,
+    StateTransitionCategories.signoffreview.name
   ];
 
   const emailCategories = [
