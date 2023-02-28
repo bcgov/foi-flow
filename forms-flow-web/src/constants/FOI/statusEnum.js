@@ -13,7 +13,7 @@ const StateList = Object.freeze({
     review: [{status: "Records Review", isSelected: false}, {status: "Call For Records", isSelected: false}, {status: "Consult", isSelected: false}, {status: "Ministry Sign Off", isSelected: false}, {status: "Response", isSelected: false}, {status: "Closed", isSelected: false}],
     signoff: [{status: "Ministry Sign Off", isSelected: false}, {status: "Closed", isSelected: false}],
     response: [{status: "Response", isSelected: false}, {status: "On Hold", isSelected: false}, {status: "Records Review", isSelected: false}, {status: "Closed", isSelected: false}],
-    responseforpersonal: [{status: "Response", isSelected: false}, {status: "Records Review", isSelected: false}, {status: "Closed", isSelected: false}],    
+    responseforpersonal: [{status: "Response", isSelected: false}, {status: "Records Review", isSelected: false}, {status: "Closed", isSelected: false}],
 });
 
 const MinistryStateList = Object.freeze({
@@ -84,6 +84,16 @@ const StateTransitionCategories = Object.freeze({
     fromState: "Response",
     toState: "On Hold",
   },
+  responsereview: {
+    name: "response-review",
+    fromState: "Response",
+    toState: "Records Review",
+  },
+  signoffreview: {
+    name: "signoff-review",
+    fromState: "Ministry Sign Off",
+    toState: "Records Review",
+  },
 });
 
 const AttachmentCategories = Object.freeze({
@@ -97,7 +107,7 @@ const AttachmentCategories = Object.freeze({
     },
     {
       name: "personal",
-      tags: ["]personal"],
+      tags: ["personal"],
       display: "Personal",
       bgcolor: "#FAA915",
       type: ["personal"],
@@ -206,6 +216,27 @@ const AttachmentCategories = Object.freeze({
       display: "Extensions",
       bgcolor: "#1A1A1A",
       type: ["tag"],
+    },
+    { // transition: Response -> On hold
+      name: "response-onhold",
+      tags: ["response-onhold"],
+      display: "Response > On Hold",
+      bgcolor: "#F99F16",
+      type: ["transition"],
+    },
+    { // transition: Records Review -> Response
+      name: "response-review",
+      tags: ["response-review"],
+      display: "Response > Review",
+      bgcolor: "#04596C",
+      type: ["transition"],
+    },
+    { // transition: Records Review -> Response
+      name: "signoff-review",
+      tags: ["signoff-review"],
+      display: "Sign Off > Review",
+      bgcolor: "#04596C",
+      type: ["transition"],
     },
   ]
 });
