@@ -6,7 +6,7 @@
    <defaultProfile>true</defaultProfile>
    <GlobalVariableEntity>
       <description></description>
-      <initValue>'https://dev.foirequests.gov.bc.ca'</initValue>
+      <initValue>'http://foiflow.local:3000'</initValue>
       <name>BASE_URL</name>
    </GlobalVariableEntity>
    <GlobalVariableEntity>
@@ -21,7 +21,7 @@
    </GlobalVariableEntity>
    <GlobalVariableEntity>
       <description></description>
-      <initValue>'Intake'</initValue>
+      <initValue>'foiIntake'</initValue>
       <name>firstname</name>
    </GlobalVariableEntity>
    <GlobalVariableEntity>
@@ -31,7 +31,7 @@
    </GlobalVariableEntity>
    <GlobalVariableEntity>
       <description></description>
-      <initValue>'https://request-management-api-dev.apps.silver.devops.gov.bc.ca'</initValue>
+      <initValue>'http://foiflow.local:15000'</initValue>
       <name>api_domain</name>
    </GlobalVariableEntity>
    <GlobalVariableEntity>

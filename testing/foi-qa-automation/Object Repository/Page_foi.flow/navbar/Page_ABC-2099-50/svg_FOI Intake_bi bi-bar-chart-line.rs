@@ -10,11 +10,15 @@
          <value>(.//*[normalize-space(text()) and normalize-space(.)='FOI'])[1]/following::*[name()='svg'][1]</value>
       </entry>
       <entry>
+         <key>BASIC</key>
+         <value>id(&quot;responsive-navbar-nav&quot;)/div[@class=&quot;ml-auto navbar-nav&quot;]/div[@class=&quot;ml-auto banner-right foihamburgermenu&quot;]/ul[@class=&quot;navbar-nav foihamburgermenulist&quot;]/li[@class=&quot;report-icon foinavitem&quot;]/a[1]/svg[@class=&quot;bi bi-bar-chart-line&quot;]</value>
+      </entry>
+      <entry>
          <key>CSS</key>
          <value>svg.bi.bi-bar-chart-line</value>
       </entry>
    </selectorCollection>
-   <selectorMethod>BASIC</selectorMethod>
+   <selectorMethod>XPATH</selectorMethod>
    <useRalativeImagePath>true</useRalativeImagePath>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -22,7 +26,7 @@
       <name>tag</name>
       <type>Main</type>
       <value>svg</value>
-      <webElementGuid>864e8df7-73a4-4b2d-bfe9-bab2646dbc24</webElementGuid>
+      <webElementGuid>944e7d71-f1ab-4024-850e-5de8560e9cdd</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -30,7 +34,7 @@
       <name>xmlns</name>
       <type>Main</type>
       <value>http://www.w3.org/2000/svg</value>
-      <webElementGuid>0b2be447-2c9b-4ba0-8b9c-2f1df3b9b738</webElementGuid>
+      <webElementGuid>c1b4a787-9c43-4e5e-ba39-dea09c266974</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -38,7 +42,7 @@
       <name>width</name>
       <type>Main</type>
       <value>16</value>
-      <webElementGuid>3a9dcb2e-1460-45fc-9a84-62d246d48b95</webElementGuid>
+      <webElementGuid>7561e855-ed50-459e-a44f-21c5c1297a6b</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -46,7 +50,7 @@
       <name>height</name>
       <type>Main</type>
       <value>16</value>
-      <webElementGuid>ae31b707-b179-4a44-befd-0c8607e9d246</webElementGuid>
+      <webElementGuid>511a8961-2a0c-43b1-a4d7-b98aed20a237</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -54,7 +58,7 @@
       <name>fill</name>
       <type>Main</type>
       <value>currentColor</value>
-      <webElementGuid>2a479dc7-5d65-4478-be96-722bc92b3b85</webElementGuid>
+      <webElementGuid>bfdfea6a-f5e9-4e26-9041-5f3967f2fce4</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -62,7 +66,7 @@
       <name>class</name>
       <type>Main</type>
       <value>bi bi-bar-chart-line</value>
-      <webElementGuid>4766d630-0354-4dbd-946b-e1b59d0262f6</webElementGuid>
+      <webElementGuid>f9bdf03b-0da0-47ab-b84b-8fc0534d71c1</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -70,7 +74,7 @@
       <name>viewBox</name>
       <type>Main</type>
       <value>0 0 16 16</value>
-      <webElementGuid>8d8bf8ea-b68b-4fd0-ab34-4235b5b33dc1</webElementGuid>
+      <webElementGuid>46583ae8-2a09-4a3c-af1a-103c6562ee13</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>true</isSelected>
@@ -78,7 +82,7 @@
       <name>xpath</name>
       <type>Main</type>
       <value>id(&quot;responsive-navbar-nav&quot;)/div[@class=&quot;ml-auto navbar-nav&quot;]/div[@class=&quot;ml-auto banner-right foihamburgermenu&quot;]/ul[@class=&quot;navbar-nav foihamburgermenulist&quot;]/li[@class=&quot;report-icon foinavitem&quot;]/a[1]/svg[@class=&quot;bi bi-bar-chart-line&quot;]</value>
-      <webElementGuid>04fbd56d-5dd0-4d81-b539-32882866f908</webElementGuid>
+      <webElementGuid>d2bf31a9-6dea-46c7-b166-b5a11f422176</webElementGuid>
    </webElementProperties>
    <webElementXpaths>
       <isSelected>true</isSelected>
@@ -86,7 +90,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>(.//*[normalize-space(text()) and normalize-space(.)='FOI'])[1]/following::*[name()='svg'][1]</value>
-      <webElementGuid>a1bd8848-6c84-425d-bab3-0458f2b0ccfc</webElementGuid>
+      <webElementGuid>8ffdd0bf-7bd3-491a-b618-086dd299dab1</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -94,7 +98,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>(.//*[normalize-space(text()) and normalize-space(.)='Sign Out'])[1]/preceding::*[name()='svg'][1]</value>
-      <webElementGuid>4980e19d-3ce4-4a32-b76b-96d71b9b7a44</webElementGuid>
+      <webElementGuid>2f084d46-a15d-4a5d-8cdb-4484ecd1d52e</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -102,6 +106,6 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>(.//*[normalize-space(text()) and normalize-space(.)='ABC-2099-50'])[2]/preceding::*[name()='svg'][1]</value>
-      <webElementGuid>70f5ec32-0082-452d-ba45-7ea0a876af9a</webElementGuid>
+      <webElementGuid>b5cd2523-1ff8-45ba-8924-2659bd2aba68</webElementGuid>
    </webElementXpaths>
 </WebElementEntity>

@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>div_Clarification</name>
+   <tag></tag>
+   <elementGuidId>71df1691-a476-45ea-b3c4-edf579630480</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>XPATH</key>
+         <value>//div[@id='divisionalTracking']/div/div/div[3]</value>
+      </entry>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[(text() = 'Clarification' or . = 'Clarification')]</value>
+      </entry>
+      <entry>
+         <key>CSS</key>
+         <value>div.text-left.col</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <useRalativeImagePath>true</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>tag</name>
+      <type>Main</type>
+      <value>div</value>
+      <webElementGuid>b8dbfbee-9e7f-4570-a2a7-b85130292d6b</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>class</name>
+      <type>Main</type>
+      <value>text-left col</value>
+      <webElementGuid>48744869-7ec1-47de-90f9-8edb78e8620d</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>text</name>
+      <type>Main</type>
+      <value>Clarification</value>
+      <webElementGuid>8978dbf7-ea75-4443-8d13-cb02ec852117</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>id(&quot;divisionalTracking&quot;)/div[@class=&quot;MuiAccordionDetails-root&quot;]/div[@class=&quot;divisions-row row&quot;]/div[@class=&quot;text-left col&quot;]</value>
+      <webElementGuid>7f029a2f-053a-4d31-a4cb-8d74a7e7521a</webElementGuid>
+   </webElementProperties>
+   <webElementXpaths>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:idRelative</name>
+      <type>Main</type>
+      <value>//div[@id='divisionalTracking']/div/div/div[3]</value>
+      <webElementGuid>337fba35-7823-4b15-a6c1-3fccbb2c85c8</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='Deputy Minister’s Office'])[1]/following::div[5]</value>
+      <webElementGuid>db69fc7e-cff1-4b1c-98b0-6ba336d20686</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='No extensions taken.'])[1]/following::div[17]</value>
+      <webElementGuid>8953e445-8886-4863-aa29-1d255fefcb40</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='Sync with AXIS'])[1]/preceding::div[1]</value>
+      <webElementGuid>57fb22ba-e4c2-4952-903b-191b9b146f34</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='Save'])[1]/preceding::div[1]</value>
+      <webElementGuid>7771d0e3-61da-4879-b7b4-ab8b17d8e4d3</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>//*/text()[normalize-space(.)='Clarification']/parent::*</value>
+      <webElementGuid>4387330a-4bf4-4851-a160-721bbfc4b46e</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:position</name>
+      <type>Main</type>
+      <value>//div[9]/div/div[2]/div/div/div/div/div/div[3]</value>
+      <webElementGuid>d18f46be-b40b-471f-9be2-f6316cb8a296</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:customAttributes</name>
+      <type>Main</type>
+      <value>//div[(text() = 'Clarification' or . = 'Clarification')]</value>
+      <webElementGuid>43b91b1d-ade6-4775-9fa9-2e695ff7d93c</webElementGuid>
+   </webElementXpaths>
+</WebElementEntity>
