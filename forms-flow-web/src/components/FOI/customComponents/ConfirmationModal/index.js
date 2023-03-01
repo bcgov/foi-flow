@@ -153,8 +153,14 @@ export default function ConfirmationModal({requestId, openModal, handleModal, st
           && state.toLowerCase() === StateEnum.onhold.name.toLowerCase())
           fileStatusTransition = StateTransitionCategories.feeonhold.name;
         else if (saveRequestObject.requeststatusid === StateEnum.response.id
-            && state.toLowerCase() === StateEnum.onhold.name.toLowerCase())
-            fileStatusTransition = StateTransitionCategories.responseonhold.name;
+          && state.toLowerCase() === StateEnum.onhold.name.toLowerCase())
+          fileStatusTransition = StateTransitionCategories.responseonhold.name;
+        else if (saveRequestObject.requeststatusid === StateEnum.response.id
+          && state.toLowerCase() === StateEnum.review.name.toLowerCase())
+          fileStatusTransition = StateTransitionCategories.responsereview.name;
+        else if (saveRequestObject.requeststatusid === StateEnum.signoff.id
+          && state.toLowerCase() === StateEnum.review.name.toLowerCase())
+          fileStatusTransition = StateTransitionCategories.signoffreview.name;
 
         fileInfoList = files.map(file => {
           return {

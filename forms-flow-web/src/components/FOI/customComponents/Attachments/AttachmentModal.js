@@ -214,6 +214,12 @@ export default function AttachmentModal({
                 case StateTransitionCategories.harmsreview.name: 
                   _message = {title: "Replace Attachment", body: <>This attachment must be replaced as it was uploaded during the state change. Please replace attachment with document from Request #{requestNumber} changing from <b>{StateTransitionCategories.harmsreview.fromState}</b> to <b>{StateTransitionCategories.harmsreview.toState}</b>.</>};
                   break;
+                case StateTransitionCategories.responsereview.name: 
+                  _message = {title: "Replace Attachment", body: <>This attachment must be replaced as it was uploaded during the state change. Please replace attachment with document from Request #{requestNumber} changing from <b>{StateTransitionCategories.responsereview.fromState}</b> to <b>{StateTransitionCategories.responsereview.toState}</b>.</>};
+                  break;
+                case StateTransitionCategories.signoffreview.name: 
+                  _message = {title: "Replace Attachment", body: <>This attachment must be replaced as it was uploaded during the state change. Please replace attachment with document from Request #{requestNumber} changing from <b>{StateTransitionCategories.signoffreview.fromState}</b> to <b>{StateTransitionCategories.signoffreview.toState}</b>.</>};
+                  break;
                 default:
                   _message = {title: "Replace Attachment", body:`This attachment must be replaced as it was uploaded during the state change. Please replace attachment with document from Request #${requestNumber}` }                  
                   break;
