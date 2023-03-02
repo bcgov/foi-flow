@@ -144,7 +144,8 @@ WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/li_Call F
 WebUI.verifyElementPresent(findTestObject('Page_foi.flow/form/state change dialog/div_State Change Dialog'), 0)
 
 WebUI.verifyElementText(findTestObject('Page_foi.flow/form/state change dialog/span_State Change Dialog message'), ('Are you sure you want to change Request #' + 
-    WebUI.getText(findTestObject('Page_foi.flow/ministry view/form/h1_Ministry Form Request Title'), FailureHandling.STOP_ON_FAILURE)) + ' to Call For Records?')
+    WebUI.getText(findTestObject('Page_foi.flow/ministry view/form/h1_Ministry Form Request Title'), FailureHandling.STOP_ON_FAILURE)) + 
+    ' to Call For Records?')
 
 WebUI.verifyElementPresent(findTestObject('Page_foi.flow/form/state change dialog/td_Next Assignee'), 0)
 
@@ -167,6 +168,10 @@ WebUI.verifyElementAttributeValue(findTestObject('Page_foi.flow/form/sidebar/sta
     0)
 
 WebUI.click(findTestObject('Page_foi.flow/form/sidebar/div_Sidebar Comments'))
+
+WebUI.click(findTestObject('Page_foi.flow/comment/Page_ABC-2099-50/span_All'))
+
+WebUI.delay(8)
 
 WebUI.verifyElementText(findTestObject('Page_foi.flow/comment/p_comment list 1 text'), ((findTestData('Login Credentials').getValue(
         'First Name', 8) + ' ') + findTestData('Login Credentials').getValue('Last Name', 8)) + ' changed the state of the request to Call For Records')

@@ -6,16 +6,16 @@
    <elementGuidId>c2e1e24d-b0cc-4654-ba79-357440b45514</elementGuidId>
    <selectorCollection>
       <entry>
-         <key>CSS</key>
-         <value>h1 > a</value>
+         <key>XPATH</key>
+         <value>//div[@id='app']/div/div[2]/div/nav/div/div/div/div[2]/a/i</value>
       </entry>
       <entry>
          <key>BASIC</key>
          <value>//*[@href = '/foi/dashboard' and (text() = 'FOI' or . = 'FOI')]</value>
       </entry>
       <entry>
-         <key>XPATH</key>
-         <value>//div[@id='app']/div/div[2]/div/nav/div/div/div/div[2]/a/i/h2</value>
+         <key>CSS</key>
+         <value>h1 > a</value>
       </entry>
    </selectorCollection>
    <selectorMethod>XPATH</selectorMethod>
@@ -26,7 +26,7 @@
       <name>tag</name>
       <type>Main</type>
       <value>a</value>
-      <webElementGuid>322231f6-11e2-49f1-904d-054bffe93a68</webElementGuid>
+      <webElementGuid>881c8331-4af5-466c-a11d-238d91a67c5d</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>true</isSelected>
@@ -34,7 +34,7 @@
       <name>href</name>
       <type>Main</type>
       <value>/foi/dashboard</value>
-      <webElementGuid>43681919-f5e9-4849-a8e4-3e4e7f5c3aed</webElementGuid>
+      <webElementGuid>8c9c5f75-c269-424a-8266-526accfd2cd6</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>true</isSelected>
@@ -42,7 +42,7 @@
       <name>text</name>
       <type>Main</type>
       <value>FOI</value>
-      <webElementGuid>13bffd63-4ba2-41c4-89a4-86335ceda1cd</webElementGuid>
+      <webElementGuid>18edd025-c933-4459-89c8-ef42b0dc9d56</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -50,7 +50,7 @@
       <name>xpath</name>
       <type>Main</type>
       <value>id(&quot;app&quot;)/div[1]/div[@class=&quot;foiformcontent&quot;]/div[@class=&quot;foitabbedContainer&quot;]/div[@class=&quot;foitabheadercollection foitabheaderCFRG&quot;]/div[@class=&quot;foileftpanelheader&quot;]/h1[1]/a[1]</value>
-      <webElementGuid>7f08a390-2e84-47fd-a9e6-bf28ddce33dc</webElementGuid>
+      <webElementGuid>21e09853-08f2-4359-9448-84b81f3d4fb3</webElementGuid>
    </webElementProperties>
    <webElementXpaths>
       <isSelected>true</isSelected>
@@ -58,7 +58,7 @@
       <name>xpath:idRelative</name>
       <type>Main</type>
       <value>//div[@id='app']/div/div[3]/div/div/div/h1/a</value>
-      <webElementGuid>2256b1a8-4613-4f5a-998e-3dd9aa38dbc4</webElementGuid>
+      <webElementGuid>d3aaa5e4-58b1-4dff-9d8e-7538ab7c2d1c</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -66,7 +66,7 @@
       <name>xpath:link</name>
       <type>Main</type>
       <value>//a[contains(text(),'FOI')]</value>
-      <webElementGuid>968f5103-ebf0-491a-887e-fe5201690a13</webElementGuid>
+      <webElementGuid>adc9c9db-b33d-4755-9b14-704b192695be</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -74,7 +74,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>(.//*[normalize-space(text()) and normalize-space(.)='Sign Out'])[1]/following::a[1]</value>
-      <webElementGuid>bce2de30-ef60-4857-b3da-0f143a20be55</webElementGuid>
+      <webElementGuid>74033420-c04d-41b0-8b23-7113b372019f</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -82,7 +82,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>(.//*[normalize-space(text()) and normalize-space(.)='Call For Records'])[1]/preceding::a[1]</value>
-      <webElementGuid>22114001-fa13-4597-9a0d-add5f63c988a</webElementGuid>
+      <webElementGuid>ac1ffacc-4f91-4f08-a429-dcaeae987c99</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -90,7 +90,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>(.//*[normalize-space(text()) and normalize-space(.)='​'])[1]/preceding::a[1]</value>
-      <webElementGuid>d228abc8-fb25-43ce-920f-20c4d7f910a4</webElementGuid>
+      <webElementGuid>61a18ec8-c9ea-48d6-8c41-1ffae7cbadc3</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -98,7 +98,7 @@
       <name>xpath:href</name>
       <type>Main</type>
       <value>(//a[contains(@href, '/foi/dashboard')])[2]</value>
-      <webElementGuid>66d47d7b-4004-40d4-952e-3d80fb4068be</webElementGuid>
+      <webElementGuid>23f754d2-966a-43ff-8cd8-c76379c39586</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -106,7 +106,7 @@
       <name>xpath:position</name>
       <type>Main</type>
       <value>//h1/a</value>
-      <webElementGuid>f4113e77-a5cc-4c41-9a70-0d290bc2c9c3</webElementGuid>
+      <webElementGuid>98aaa7fd-53a7-45bc-b4f1-478b28e3a17f</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -114,6 +114,6 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>(.//*[normalize-space(text()) and normalize-space(.)='Open'])[1]/preceding::a[1]</value>
-      <webElementGuid>c98ab2b7-ea3c-4948-b611-d16de2b75507</webElementGuid>
+      <webElementGuid>da2c46d9-a65b-4443-a990-5aa5640c8759</webElementGuid>
    </webElementXpaths>
 </WebElementEntity>

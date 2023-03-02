@@ -117,7 +117,7 @@ WebUI.click(findTestObject('Page_foi.flow/comment/Page_ABC-2099-50/span_All'))
 
 WebUI.verifyElementPresent(findTestObject('Page_foi.flow/comment/div_Comment list 2'), 0)
 
-WebUI.verifyElementText(findTestObject('Page_foi.flow/comment/Page_ABC-2099-50/Page_EDU-222-12345/p_commentlist3'), ((findTestData(
+WebUI.verifyElementText(findTestObject('Page_foi.flow/comment/Page_ABC-2099-50/p_commentlist3'), ((findTestData(
         'Login Credentials').getValue('First Name', 8) + ' ') + findTestData('Login Credentials').getValue('Last Name', 
         8)) + ' changed the state of the request to Ministry Sign Off')
 
