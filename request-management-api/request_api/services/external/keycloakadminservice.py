@@ -70,6 +70,8 @@ class KeycloakAdminService:
             for user in groupresponse.json():           
                 _user =  self.__createuser(user)
                 users.append(_user)
+        if users not in (None, []):
+            return sorted(users, key=lambda k: str(k['lastname']), reverse = False)
         return users 
     
     def __createuser(self, user):
