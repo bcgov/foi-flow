@@ -6,15 +6,15 @@
    <elementGuidId>89ba0e08-e94b-4829-9ad6-e7e6503daa19</elementGuidId>
    <selectorCollection>
       <entry>
+         <key>CSS</key>
+         <value>div.commenttext > p</value>
+      </entry>
+      <entry>
          <key>BASIC</key>
       </entry>
       <entry>
          <key>XPATH</key>
-         <value>//div[@id='Comments']/div/div[2]/div[2]/div/div/div/div[2]/p</value>
-      </entry>
-      <entry>
-         <key>CSS</key>
-         <value>div.commenttext > p</value>
+         <value>//div[@id='Comments']/div/div[2]/div[2]/div[2]/div/div/div[2]/p</value>
       </entry>
    </selectorCollection>
    <selectorMethod>XPATH</selectorMethod>
@@ -25,7 +25,7 @@
       <name>tag</name>
       <type>Main</type>
       <value>p</value>
-      <webElementGuid>790dce32-e0a5-4163-b8ec-677bee72eb77</webElementGuid>
+      <webElementGuid>cceca7f3-224f-4b13-ae7a-61cd4accda58</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -33,7 +33,7 @@
       <name>text</name>
       <type>Main</type>
       <value>Intake Flex changed the state of the request to Intake in Progress</value>
-      <webElementGuid>086a44d0-63b9-4a52-83b5-5690d8ab65d6</webElementGuid>
+      <webElementGuid>9436a921-f8a2-48c4-a0fc-89bc4204d817</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -41,7 +41,7 @@
       <name>xpath</name>
       <type>Main</type>
       <value>id(&quot;Comments&quot;)/div[@class=&quot;section&quot;]/div[@class=&quot;displayComments&quot;]/div[2]/div[@class=&quot;commentsection&quot;]/div[@class=&quot;halfDiv&quot;]/div[@class=&quot;userInfo&quot;]/div[@class=&quot;commenttext&quot;]/p[1]</value>
-      <webElementGuid>c9365030-c538-4a49-9ddf-d1242149d253</webElementGuid>
+      <webElementGuid>3089567b-2084-4569-84e1-9f5e2aab04d2</webElementGuid>
    </webElementProperties>
    <webElementXpaths>
       <isSelected>true</isSelected>
@@ -49,7 +49,7 @@
       <name>xpath:idRelative</name>
       <type>Main</type>
       <value>//div[@id='Comments']/div/div[3]/div[2]/div/div/div/div[2]/p</value>
-      <webElementGuid>d8229774-6508-4304-8ee0-10cca276256b</webElementGuid>
+      <webElementGuid>5e9050c5-3046-4f57-aefa-0f1ce1b53001</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -57,7 +57,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>(.//*[normalize-space(text()) and normalize-space(.)='Request History'])[2]/following::p[1]</value>
-      <webElementGuid>b62cd4ab-c709-499b-823d-b5970c91c417</webElementGuid>
+      <webElementGuid>1a2fa8b1-f647-4b73-a151-e6c8e738036e</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -65,7 +65,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>(.//*[normalize-space(text()) and normalize-space(.)='Show more comments'])[1]/preceding::p[1]</value>
-      <webElementGuid>91d8058a-e6cd-467b-bff3-abf8f058ba8c</webElementGuid>
+      <webElementGuid>39c2cc68-3d41-4309-bd18-61db5f948ace</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -73,7 +73,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>//*/text()[normalize-space(.)='Intake Flex changed the state of the request to Intake in Progress']/parent::*</value>
-      <webElementGuid>c273c6df-f603-4ed5-8fac-cba8f9330fa2</webElementGuid>
+      <webElementGuid>97005bcc-6207-4cc0-8717-2d9eb0b77f95</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -81,6 +81,6 @@
       <name>xpath:position</name>
       <type>Main</type>
       <value>//div[2]/div[3]/div/div[2]/div[2]/div/div/div/div/div</value>
-      <webElementGuid>448172cb-539e-443d-90f2-d7d2e3ab91ef</webElementGuid>
+      <webElementGuid>bd28c625-09e7-452c-a658-79d7434b74f6</webElementGuid>
    </webElementXpaths>
 </WebElementEntity>

@@ -11,11 +11,24 @@
       <value></value>
       <variableId>87536d59-aad0-4bc9-a7dc-c048efb3795c</variableId>
    </variableLinks>
+   <variableLinks>
+      <testDataLinkId></testDataLinkId>
+      <type>DEFAULT</type>
+      <value></value>
+      <variableId>f18da3c8-4fb7-4986-85d2-1935e4216c5d</variableId>
+   </variableLinks>
    <variable>
       <defaultValue>GlobalVariable.BASE_URL</defaultValue>
       <description></description>
       <id>87536d59-aad0-4bc9-a7dc-c048efb3795c</id>
       <masked>false</masked>
       <name>URL</name>
+   </variable>
+   <variable>
+      <defaultValue>''</defaultValue>
+      <description></description>
+      <id>f18da3c8-4fb7-4986-85d2-1935e4216c5d</id>
+      <masked>false</masked>
+      <name>requestID</name>
    </variable>
 </TestCaseEntity>

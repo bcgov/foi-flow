@@ -20,14 +20,13 @@ import org.openqa.selenium.WebDriver as WebDriver
 import com.kms.katalon.core.webui.driver.DriverFactory as DriverFactory
 import groovy.json.JsonSlurper as JsonSlurper
 
-
-
 WebUI.callTestCase(findTestCase('helper/foi-test-login'), [('password') : findTestData('Login Credentials').getValue('Password', 
             8), ('username') : findTestData('Login Credentials').getValue('Username', 8)], FailureHandling.STOP_ON_FAILURE)
 
 WebUI.click(findTestObject('Page_foi.flow/queue/div_My Team Requests'))
 
-//WebUI.setText(findTestObject('Page_foi.flow/queue/input_Dashboard Filter'), requestID)
+WebUI.setText(findTestObject('Page_foi.flow/queue/input_Dashboard Filter'), requestID)
+
 WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
 
 WebUI.click(findTestObject('Page_foi.flow/queue/div_request queue row 1'))
@@ -36,8 +35,7 @@ WebUI.click(findTestObject('Page_foi.flow/ministry view/form/div_ministry assign
 
 WebUI.click(findTestObject('Page_foi.flow/ministry view/form/ministry assignee/li_ministry assignee foiedu, foiedu'))
 
-requestID = WebUI.getText(findTestObject('Page_foi.flow/form/Page_ABC-2099-310/h1_ABC-2099-310'), FailureHandling.STOP_ON_FAILURE)
-
+//requestID = WebUI.getText(findTestObject('Page_foi.flow/form/Page_ABC-2099-310/h1_ABC-2099-310'), FailureHandling.STOP_ON_FAILURE)
 WebUI.scrollToElement(findTestObject('Page_foi.flow/form/button_Save'), 0)
 
 WebUI.click(findTestObject('Page_foi.flow/ministry view/form/divisional tracking/div_ministry division dropdown'))
@@ -95,8 +93,8 @@ WebUI.verifyElementText(findTestObject('Page_foi.flow/ministry view/form/divisio
 
 WebUI.verifyElementText(findTestObject('Page_foi.flow/ministry view/form/divisional tracking/Page_EDU-234-56789/div_Clarification'), 
     'Clarification')
-//WebDriver ministryUser = DriverFactory.getWebDriver()
 
+//WebDriver ministryUser = DriverFactory.getWebDriver()
 DriverFactory.changeWebDriver(ministryUser)
 
 WebUI.click(findTestObject('Page_foi.flow/form/sidebar/div_Sidebar Comments'), FailureHandling.STOP_ON_FAILURE)
@@ -124,15 +122,15 @@ DriverFactory.changeWebDriver(IAOuser)
 
 WebUI.refresh()
 
-WebUI.verifyElementText(findTestObject('Page_foi.flow/ministry view/form/divisional tracking/division dropdown options/li_Deputy Ministers Office'), 
-    'Deputy Minister’s Office')
+WebUI.verifyElementText(findTestObject('Page_foi.flow/form/div_divison tracking iao view row 1 division'), 'Deputy Minister’s Office')
 
-WebUI.verifyElementText(findTestObject('Page_foi.flow/ministry view/form/divisional tracking/stage dropdown options/li_Assigned to Division'), 
-    'Assigned to Division')
+WebUI.verifyElementText(findTestObject('Page_foi.flow/form/div_divison tracking iao view row 1 stage'), 'Assigned to Division')
 
 DriverFactory.changeWebDriver(ministryUser)
 
 WebUI.click(findTestObject('Page_foi.flow/form/sidebar/div_Sidebar Comments'), FailureHandling.STOP_ON_FAILURE)
+
+WebUI.click(findTestObject('Page_foi.flow/comment/Page_ABC-2099-50/Page_EDU-222-12345/span_Divisional Tracking'))
 
 WebUI.verifyElementText(findTestObject('Page_foi.flow/comment/p_comment list 1 text'), 'Deputy Minister’s Office division has been updated to stage Assigned to Division')
 
@@ -146,7 +144,7 @@ WebUI.scrollToElement(findTestObject('Page_foi.flow/form/button_Save'), 0)
 
 WebUI.click(findTestObject('Page_foi.flow/ministry view/form/divisional tracking/div_ministry division dropdown'))
 
-WebUI.click(findTestObject('Page_foi.flow/ministry view/form/divisional tracking/division dropdown options/li_Ministers Office'), 
+WebUI.click(findTestObject('Page_foi.flow/ministry view/form/divisional tracking/division dropdown options/educ/li_Education Programs'), 
     FailureHandling.STOP_ON_FAILURE)
 
 WebUI.click(findTestObject('Page_foi.flow/form/button_Save'), FailureHandling.STOP_ON_FAILURE)
@@ -155,24 +153,23 @@ DriverFactory.changeWebDriver(IAOuser)
 
 WebUI.refresh()
 
-WebUI.verifyElementText(findTestObject('Page_foi.flow/ministry view/form/divisional tracking/division dropdown options/li_Ministers Office'), 
-    'Minister\'s Office')
+WebUI.verifyElementText(findTestObject('Page_foi.flow/form/div_divison tracking iao view row 1 division'), 'Learning and Education Programs')
 
 WebUI.verifyElementText(findTestObject('Page_foi.flow/form/div_divison tracking iao view row 1 stage'), 'Assigned to Division')
 
-WebUI.verifyElementNotPresent(findTestObject('Page_foi.flow/ministry view/form/divisional tracking/division dropdown options/li_Deputy Ministers Office'), 
-    0)
+WebUI.verifyElementNotPresent(findTestObject('Page_foi.flow/form/div_divison tracking iao view row 2 division'), 0)
 
-WebUI.verifyElementPresent(findTestObject('Page_foi.flow/ministry view/form/divisional tracking/stage dropdown options/li_Assigned to Division'), 
-    0)
+WebUI.verifyElementNotPresent(findTestObject('Page_foi.flow/form/div_divison tracking iao view row 2 stage'), 0)
 
 DriverFactory.changeWebDriver(ministryUser)
 
 WebUI.click(findTestObject('Page_foi.flow/form/sidebar/div_Sidebar Comments'), FailureHandling.STOP_ON_FAILURE)
 
-WebUI.verifyElementText(findTestObject('Page_foi.flow/comment/p_comment list 2 text'), 'Minister\'s Office division has been added with stage Assigned to Division')
+WebUI.click(findTestObject('Page_foi.flow/comment/Page_ABC-2099-50/Page_EDU-222-12345/span_Divisional Tracking'))
 
-WebUI.verifyElementText(findTestObject('Page_foi.flow/comment/p_comment list 1 text'), 'Deputy Minister’s Office division with stage Assigned to Division has been removed')
+WebUI.verifyElementText(findTestObject('Page_foi.flow/comment/p_comment list 1 text'), 'Learning and Education Programs division has been added with stage Assigned to Division')
+
+WebUI.verifyElementText(findTestObject('Page_foi.flow/comment/p_comment list 2 text'), 'Deputy Minister’s Office division with stage Assigned to Division has been removed')
 
 WebUI.click(findTestObject('Page_foi.flow/form/sidebar/div_Sidebar Request'), FailureHandling.STOP_ON_FAILURE)
 
@@ -180,12 +177,12 @@ WebUI.scrollToElement(findTestObject('Page_foi.flow/form/button_Save'), 0)
 
 WebUI.click(findTestObject('Page_foi.flow/ministry view/form/divisional tracking/button_Add division to track'), FailureHandling.STOP_ON_FAILURE)
 
-WebUI.click(findTestObject('Page_foi.flow/ministry view/form/divisional tracking/div_ministry division dropdown'))
+WebUI.click(findTestObject('Page_foi.flow/ministry view/form/divisional tracking/div_ministry division dropdown row 2'))
 
 WebUI.click(findTestObject('Page_foi.flow/ministry view/form/divisional tracking/division dropdown options/li_Ministers Office'), 
     FailureHandling.STOP_ON_FAILURE)
 
-WebUI.click(findTestObject('Page_foi.flow/ministry view/form/divisional tracking/div_ministry division stage'))
+WebUI.click(findTestObject('Page_foi.flow/ministry view/form/divisional tracking/div_ministry division stage row 2'))
 
 WebUI.click(findTestObject('Page_foi.flow/ministry view/form/divisional tracking/stage dropdown options/li_Clarification'), 
     FailureHandling.STOP_ON_FAILURE)
@@ -198,17 +195,13 @@ DriverFactory.changeWebDriver(IAOuser)
 
 WebUI.refresh()
 
-WebUI.verifyElementText(findTestObject('Page_foi.flow/ministry view/form/divisional tracking/div_ministry division dropdown'), 
-    'Minister\'s Office')
+WebUI.verifyElementText(findTestObject('Page_foi.flow/form/div_divison tracking iao view row 1 division'), 'Learning and Education Programs')
 
-WebUI.verifyElementText(findTestObject('Page_foi.flow/ministry view/form/divisional tracking/div_ministry division stage'), 
-    'Assigned to Division')
+WebUI.verifyElementText(findTestObject('Page_foi.flow/form/div_divison tracking iao view row 1 stage'), 'Assigned to Division')
 
-WebUI.verifyElementText(findTestObject('Page_foi.flow/ministry view/form/divisional tracking/div_ministry division dropdown row 2'), 
-    'Deputy Minister\'s Office')
+WebUI.verifyElementText(findTestObject('Page_foi.flow/form/div_divison tracking iao view row 2 division'), 'Minister’s Office')
 
-WebUI.verifyElementText(findTestObject('Page_foi.flow/ministry view/form/divisional tracking/div_Division stage row 1'), 
-    'Clarification')
+WebUI.verifyElementText(findTestObject('Page_foi.flow/form/div_divison tracking iao view row 2 stage'), 'Clarification')
 
 DriverFactory.changeWebDriver(ministryUser)
 
@@ -222,14 +215,15 @@ WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT, FailureHandling.STOP_ON_FAILURE)
 
 WebUI.click(findTestObject('Page_foi.flow/form/sidebar/div_Sidebar Comments'), FailureHandling.STOP_ON_FAILURE)
 
+WebUI.click(findTestObject('Page_foi.flow/comment/Page_ABC-2099-50/Page_EDU-222-12345/span_Divisional Tracking'))
+
 WebUI.verifyElementText(findTestObject('Page_foi.flow/comment/p_comment list 1 text'), 'Minister’s Office division with stage Clarification has been removed')
 
 DriverFactory.changeWebDriver(IAOuser)
 
 WebUI.refresh()
 
-WebUI.verifyElementText(findTestObject('Page_foi.flow/ministry view/form/divisional tracking/div_ministry division dropdown'), 
-    'Education Programs')
+WebUI.verifyElementText(findTestObject('Page_foi.flow/form/div_divison tracking iao view row 1 division'), 'Learning and Education Programs')
 
 WebUI.verifyElementText(findTestObject('Page_foi.flow/form/div_divison tracking iao view row 1 stage'), 'Assigned to Division')
 

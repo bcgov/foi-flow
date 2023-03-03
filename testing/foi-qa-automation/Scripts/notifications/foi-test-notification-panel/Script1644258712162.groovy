@@ -103,7 +103,7 @@ WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT, FailureHandling.STOP_ON_FAILURE)
 
 WebUI.click(findTestObject('Page_foi.flow/queue/div_request queue row 1'))
 
-WebUI.click(findTestObject('null'))
+WebUI.click(findTestObject('Page_foi.flow/form/watch/button_Watch'))
 
 DriverFactory.changeWebDriver(user1)
 
@@ -114,6 +114,8 @@ WebUI.click(findTestObject('Page_foi.flow/form/assignee dropdown/li_assignee use
 WebUI.scrollToElement(findTestObject('Page_foi.flow/form/button_Save'), 0)
 
 WebUI.clickOffset(findTestObject('Page_foi.flow/navbar/notification/notification bell'), -2, 4)
+
+WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT, FailureHandling.STOP_ON_FAILURE)
 
 if (WebUI.verifyElementPresent(findTestObject('Page_foi.flow/navbar/notification/div_notification list 1'), 1, FailureHandling.OPTIONAL)) {
     WebUI.click(findTestObject('Page_foi.flow/navbar/notification/div_notifiation Dismiss All'))

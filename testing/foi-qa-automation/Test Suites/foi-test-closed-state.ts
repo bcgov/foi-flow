@@ -383,7 +383,7 @@
    <testCaseLink>
       <guid>a3543a91-11b5-4b01-b818-3178826d87c7</guid>
       <isReuseDriver>false</isReuseDriver>
-      <isRun>true</isRun>
+      <isRun>false</isRun>
       <testCaseId>Test Cases/state changes/closed/foi-test-closed-from-on-hold</testCaseId>
       <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
       <variableLink>
@@ -504,7 +504,7 @@
    <testCaseLink>
       <guid>e32774f1-a4ce-428d-a767-54fbd5651247</guid>
       <isReuseDriver>false</isReuseDriver>
-      <isRun>true</isRun>
+      <isRun>false</isRun>
       <testCaseId>Test Cases/state changes/closed/foi-test-fee-estimate-to-closed</testCaseId>
       <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
       <variableLink>

@@ -24,9 +24,9 @@ def today = new Date()
 
 WebUI.callTestCase(findTestCase('submit/foi-test-save-request-form'), [:], FailureHandling.STOP_ON_FAILURE)
 
-println(today.format('HHmm', TimeZone.getTimeZone("Canada/Pacific")).toInteger() > 1630)
+println(today.format('HHmm', TimeZone.getTimeZone('Canada/Pacific')).toInteger() > 1630)
 
-if (today.format('HHmm', TimeZone.getTimeZone("Canada/Pacific")).toInteger() > 1630) {
+if (today.format('HHmm', TimeZone.getTimeZone('Canada/Pacific')).toInteger() > 1630) {
     today = today.next()
 }
 
@@ -105,21 +105,27 @@ WebUI.verifyElementPresent(findTestObject('Page_foi.flow/form/closing modal/drop
 
 WebUI.verifyElementPresent(findTestObject('Page_foi.flow/form/closing modal/dropdown options/li_Access Denied'), 0)
 
-WebUI.verifyElementPresent(findTestObject('Page_foi.flow/form/closing modal/dropdown options/li_Application Fee - Abandoned'), 0)
+WebUI.verifyElementPresent(findTestObject('Page_foi.flow/form/closing modal/dropdown options/li_Application Fee - Abandoned'), 
+    0)
 
 WebUI.verifyElementPresent(findTestObject('Page_foi.flow/form/closing modal/dropdown options/li_Full Disclosure'), 0)
 
-WebUI.verifyElementPresent(findTestObject('Page_foi.flow/form/closing modal/dropdown options/li_No Resp. Records ExistLocated'), 0)
+WebUI.verifyElementPresent(findTestObject('Page_foi.flow/form/closing modal/dropdown options/li_No Resp. Records ExistLocated'), 
+    0)
 
-WebUI.verifyElementPresent(findTestObject('Page_foi.flow/form/closing modal/dropdown options/li_Outside Scope of Act'), 0)
+WebUI.verifyElementPresent(findTestObject('Page_foi.flow/form/closing modal/dropdown options/li_Outside Scope of Act'), 
+    0)
 
 WebUI.verifyElementPresent(findTestObject('Page_foi.flow/form/closing modal/dropdown options/li_Partial Disclosure'), 0)
 
-WebUI.verifyElementPresent(findTestObject('Page_foi.flow/form/closing modal/dropdown options/li_Records in another MinOrg'), 0)
+WebUI.verifyElementPresent(findTestObject('Page_foi.flow/form/closing modal/dropdown options/li_Records in another MinOrg'), 
+    0)
 
-WebUI.verifyElementPresent(findTestObject('Page_foi.flow/form/closing modal/dropdown options/li_Refuse to Confirm or Deny'), 0)
+WebUI.verifyElementPresent(findTestObject('Page_foi.flow/form/closing modal/dropdown options/li_Refuse to Confirm or Deny'), 
+    0)
 
-WebUI.verifyElementPresent(findTestObject('Page_foi.flow/form/closing modal/dropdown options/li_Routinely Releasable'), 0)
+WebUI.verifyElementPresent(findTestObject('Page_foi.flow/form/closing modal/dropdown options/li_Routinely Releasable'), 
+    0)
 
 WebUI.verifyElementPresent(findTestObject('Page_foi.flow/form/closing modal/dropdown options/li_Section 43'), 0)
 
@@ -159,6 +165,10 @@ WebUI.verifyMatch(WebUI.getCSSValue(findTestObject('Page_foi.flow/form/sidebar/d
     false)
 
 WebUI.click(findTestObject('Page_foi.flow/form/sidebar/div_Sidebar Comments'), FailureHandling.STOP_ON_FAILURE)
+
+WebUI.click(findTestObject('Page_foi.flow/comment/Page_ABC-2099-50/span_Request History Comments'))
+
+WebUI.delay(5)
 
 WebUI.verifyElementText(findTestObject('Page_foi.flow/comment/p_comment list 1 text'), ((firstname + ' ') + lastname) + 
     ' changed the state of the request to Closed')

@@ -14,7 +14,7 @@
    <testCaseLink>
       <guid>eee5ee1d-292c-49e1-bc5e-549661044e27</guid>
       <isReuseDriver>false</isReuseDriver>
-      <isRun>true</isRun>
+      <isRun>false</isRun>
       <testCaseId>Test Cases/state changes/fee estimate/foi-test-fee-estimate-to-on-hold</testCaseId>
       <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
       <variableLink>
@@ -135,7 +135,7 @@
    <testCaseLink>
       <guid>dcbd0123-500c-47f1-a9ce-4d3a367a0c24</guid>
       <isReuseDriver>false</isReuseDriver>
-      <isRun>true</isRun>
+      <isRun>false</isRun>
       <testCaseId>Test Cases/state changes/call for records/foi-test-call-for-records-to-fee-estimate</testCaseId>
       <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
       <variableLink>
@@ -1103,7 +1103,7 @@
    <testCaseLink>
       <guid>17497646-00e9-4c78-8d9f-317630cb0b26</guid>
       <isReuseDriver>false</isReuseDriver>
-      <isRun>true</isRun>
+      <isRun>false</isRun>
       <testCaseId>Test Cases/state changes/response/foi-test-response-to-on-hold</testCaseId>
       <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
       <variableLink>

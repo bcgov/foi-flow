@@ -92,9 +92,9 @@ WebUI.click(findTestObject('Page_foi.flow/form/state change dialog/button_Save C
 
 WebUI.delay(5)
 
-WebUI.click(findTestObject('Page_foi.flow/form/sidebar/Page_FOI Request Queue/h2_FOI'))
+//WebUI.click(findTestObject('Page_foi.flow/form/sidebar/Page_FOI Request Queue/h2_FOI'))
 
-//WebUI.navigateToUrl(GlobalVariable.BASE_URL + '/foi/dashboard')
+WebUI.navigateToUrl(GlobalVariable.BASE_URL + '/foi/dashboard')
 WebUI.click(findTestObject('Page_foi.flow/queue/div_My Team Requests'))
 
 WebUI.setText(findTestObject('Page_foi.flow/queue/input_Dashboard Filter'), requestID)
