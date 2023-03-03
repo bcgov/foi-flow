@@ -42,6 +42,7 @@ class MinistryTeamWithKeycloackGroup(Enum):
     EAO = "EAO Ministry Team"
     EDU = "EDU Ministry Team"
     EMBC = "EMBC Ministry Team"
+    EMC = "EMC Ministry Team"
     EMLI = "EMLI Ministry Team"
     ENV = "ENV Ministry Team"
     FIN = "FIN Ministry Team"
@@ -54,6 +55,7 @@ class MinistryTeamWithKeycloackGroup(Enum):
     LBR = "LBR Ministry Team"
     LDB = "LDB Ministry Team"
     LWR = "LWR Ministry Team"
+    WLR = "WLR Ministry Team"
     MCF = "MCF Ministry Team"
     MGC = "MGC Ministry Team"
     MMHA = "MMHA Ministry Team"
@@ -67,6 +69,11 @@ class MinistryTeamWithKeycloackGroup(Enum):
     TACS = "TACS Ministry Team"
     TIC = "TIC Ministry Team"
     TRAN = "TRAN Ministry Team"
+    PSE = "PSE Ministry Team"
+    ECC = "ECC Ministry Team"
+    JED = "JED Ministry Team"
+    COR = "COR Ministry Team"
+    HSG = "HSG Ministry Team"
 
     @staticmethod
     def list():
@@ -143,3 +150,13 @@ class StateName(Enum):
     deduplication = "Deduplication"
     harmsassessment = "Harms Assessment"    
     response = "Response"
+
+class CacheUrls(Enum):
+    keycloakusers= "/api/foiassignees"
+    programareas= "/api/foiflow/programareas"
+    deliverymodes= "/api/foiflow/deliverymodes"
+    receivedmodes= "/api/foiflow/receivedmodes"
+    closereasons= "/api/foiflow/closereasons"
+    extensionreasons= "/api/foiflow/extensionreasons"
+    applicantcategories= "/api/foiflow/applicantcategories"
+    subjectcodes= "/api/foiflow/subjectcodes"

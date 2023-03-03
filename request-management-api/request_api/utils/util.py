@@ -25,10 +25,12 @@ from functools import wraps
 from humps.main import camelize, decamelize
 from flask import request, g
 from sqlalchemy.sql.expression import false
-from request_api.auth import jwt as _authjwt
+from request_api.auth import jwt as _authjwt,AuthHelper
 import jwt
 import os
 from request_api.utils.enums import MinistryTeamWithKeycloackGroup, ProcessingTeamWithKeycloackGroup
+from request_api.services.rawrequestservice import rawrequestservice
+from request_api.models.FOIRequestWatchers import  FOIRequestWatcher
 
 
 def cors_preflight(methods):
@@ -97,5 +99,44 @@ def escape_wam_friendly_url(param):
     base64_org_name = base64.b64encode(bytes(param, encoding='utf-8')).decode('utf-8')
     encode_org_name = urllib.parse.quote(base64_org_name, safe='')
     return encode_org_name
+
+def str_to_bool(s):
+    if s == 'True':
+         return True
+    elif s == 'False':
+         return False
+    else:
+         raise ValueError # evil ValueError that doesn't tell you what the wrong value was    
+
+def canrestictdata(requestid,assignee,isrestricted,israwrequest):
+
+    _isawatcher = False
+    currentuser = AuthHelper.getuserid()
+    if israwrequest :
+        _isawatcher = rawrequestservice().israwrequestwatcher(requestid,currentuser)
+    else:
+        _isawatcher = FOIRequestWatcher.isaiaoministryrequestwatcher(requestid,currentuser)
+
+    isiaorestrictedfilemanager = AuthHelper.isiaorestrictedfilemanager()
+    # print('Current user is {0} , is a watcher: {1} and is file manager {2} '.format(currentuser,_isawatcher,isiaorestrictedfilemanager))
+    if(isrestricted and currentuser != assignee and _isawatcher == False and isiaorestrictedfilemanager == False):
+        return True
+    else:
+        return False    
+
+def canrestictdata_ministry(requestid,assignee,isrestricted):
+
+    _isawatcher = False
+    currentuser = AuthHelper.getuserid()
+    _isawatcher = FOIRequestWatcher.isaministryministryrequestwatcher(requestid,currentuser)
+
+    isministryrestrictedfilemanager = AuthHelper.isministryrestrictedfilemanager()
+    # print('Current user is {0}, assignee is {3}, is a watcher: {1} and is file manager {2} '.format(currentuser,_isawatcher,isministryrestrictedfilemanager,assignee))
+    if(isrestricted and currentuser != assignee and _isawatcher == False and isministryrestrictedfilemanager == False):
+        return True
+    else:
+        return False   
+
+        
 
 

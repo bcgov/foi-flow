@@ -2,6 +2,8 @@ import React, { useEffect } from 'react';
 import { useSelector } from "react-redux";
 import "./requestdescriptionbox.scss";
 import TextField from '@material-ui/core/TextField';
+import MenuItem from '@material-ui/core/MenuItem';
+import Input from '@material-ui/core/Input';
 import { MinistriesList } from '../customComponents';
 import { makeStyles } from '@material-ui/core/styles';
 import FOI_COMPONENT_CONSTANTS from '../../../constants/FOI/foiComponentConstants';
@@ -55,14 +57,22 @@ const RequestDescription = React.memo(({
     //gets the program area list master data
     var masterProgramAreaList = useSelector(state=> state.foiRequests.foiProgramAreaList);
     var requestDescriptionHistoryList = useSelector(state=> state.foiRequests.foiRequestDescriptionHistoryList);
+    const subjectCodeList = useSelector(state=> state.foiRequests.foiSubjectCodeList);
 
     const [localProgramAreaList, setLocalProgramAreaList] = React.useState([])
+
+    const getSubjectCode = () => {
+      if (requestDetails?.subjectCode)
+        return requestDetails.subjectCode;
+      return "Select Subject Code (if required)"
+    }
+
     //updates the default values from the request description box    
     useEffect(() => {
-
       setStartDate(!!requestDetails.fromDate ? formatDate(new Date(requestDetails.fromDate)): "");
       setEndDate(!!requestDetails.toDate ? formatDate(new Date(requestDetails.toDate)): "");
       setRequestDescription(!!requestDetails.description ? requestDetails.description : "");
+      setSelectedSubjectCode(getSubjectCode())
       setPIIRedacted(ministryId ? true : !!requestDetails.ispiiredacted);
       if(Object.entries(requestDetails).length !== 0){
         setSelectedMinistries();
@@ -73,7 +83,8 @@ const RequestDescription = React.memo(({
             description: !!requestDetails.description ? requestDetails.description : "",
             isProgramAreaSelected: requestDetails?.selectedMinistries?.length === 1 && requestDetails?.selectedMinistries.some(programArea =>
               (isValidMinistryCode(programArea.code, masterProgramAreaList))),
-            ispiiredacted: ministryId ? true : !!requestDetails.ispiiredacted
+            ispiiredacted: ministryId ? true : !!requestDetails.ispiiredacted,
+            subjectCode: getSubjectCode()
         }
         handleInitialRequiredRequestDescriptionValues(descriptionObject);
     },[requestDetails, handleInitialRequiredRequestDescriptionValues])     
@@ -120,6 +131,7 @@ const RequestDescription = React.memo(({
     const [endDate, setEndDate] = React.useState(!!requestDetails.toDate ? formatDate(new Date(requestDetails.toDate)): "");
     const [requestDescriptionText, setRequestDescription] = React.useState(!!requestDetails.description ? requestDetails.description : "");
     const [isPIIRedacted, setPIIRedacted] = React.useState(ministryId ? true : !!requestDetails.ispiiredacted);
+    const [selectedSubjectCode, setSelectedSubjectCode] = React.useState(getSubjectCode());
 
     const handlePIIRedacted = (event) => {
         setPIIRedacted(event.target.checked);
@@ -156,6 +168,16 @@ const RequestDescription = React.memo(({
           FOI_COMPONENT_CONSTANTS.IS_PROGRAM_AREA_SELECTED);     //event bubble up- update the required fields to validate later
         handleUpdatedProgramAreaList(updatedProgramAreaList);    //event bubble up - Updated program area list
         createSaveRequestObject(FOI_COMPONENT_CONSTANTS.PROGRAM_AREA_LIST, updatedProgramAreaList);
+    }
+
+    const subjectCodes = subjectCodeList.map((item) => {
+      return ( <MenuItem key={item.name} value={item.name} disabled={item.name.toLowerCase().includes("select")}>{item.name}</MenuItem> )
+    });
+
+    const handleSubjectCodeChange = (e) => {
+      setSelectedSubjectCode(e.target.value);
+      handleOnChangeRequiredRequestDescriptionValues(e.target.checked, FOI_COMPONENT_CONSTANTS.SUBJECT_CODE)
+      createSaveRequestObject(FOI_COMPONENT_CONSTANTS.SUBJECT_CODE, e.target.value);
     }
 
     const [openModal, setOpenModal] = React.useState(false);
@@ -277,6 +299,27 @@ const RequestDescription = React.memo(({
             </div>    
           </div>
         )}
+        <div className="row foi-details-row foi-request-description-row">
+            <div className="col-lg-6 foi-details-col">
+                <h5 className="foi-date-range-h5">Request Subject Code (if required)</h5>
+            </div>
+            <div className="col-lg-6 foi-details-col">
+              <TextField
+                      id="subjectCode"
+                      label="Subject Codes"
+                      inputProps={{ "aria-labelledby": "subjectCode-label"}}
+                      InputLabelProps={{ shrink: true, }}
+                      select
+                      value={selectedSubjectCode}
+                      onChange={handleSubjectCodeChange}
+                      input={<Input />}
+                      variant="outlined"
+                      fullWidth
+                  >
+                  {subjectCodes}
+                </TextField> 
+            </div>                                                                        
+        </div>
         { (Object.entries(localProgramAreaList).length !== 0 && (!requestDetails.currentState || statesBeforeOpen.includes(requestDetails.currentState?.toLowerCase()))) &&
         <MinistriesList masterProgramAreaList={localProgramAreaList} handleUpdatedMasterProgramAreaList={handleUpdatedMasterProgramAreaList} disableInput={disableInput} />
         }

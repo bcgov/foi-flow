@@ -595,6 +595,88 @@
                     "id": "eobf0q4"
                 },
                 {
+                    "label": "HTML",
+                    "labelWidth": "",
+                    "labelMargin": "",
+                    "tag": "p",
+                    "className": "",
+                    "attrs": [
+                        {
+                            "attr": "",
+                            "value": ""
+                        }
+                    ],
+                    "content": "<p hidden id = \"l-em1y8gd-applicationId\">applicationId</p>\r\n<p hidden id = \"l-e6z1qd9-applicationStatus\">applicationStatus</p>\r\n<p hidden id=\"l-eiphgsk-ministryRequestID\">ministryRequestID</p>\r\n<p hidden id=\"l-eo9ryyv-foiRequestID\">foiRequestID</p>\r\n<p hidden id=\"l-efpqr5n-axisRequestId\">axisRequestId</p>\r\n<p hidden id = \"l-ebrur2-fee\">fee</p>\r\n<p hidden id = \"l-eut7zis-status\">status</p>\r\n<p hidden id = \"l-enkegb-paymentstatus\">paymentstatus</p>\r\n<p hidden id = \"l-eq1t624-templateName\">templateName</p>\r\n<p hidden id = \"l-eobf0q4-currentPage\">currentPage</p>\r\n",
+                    "refreshOnChange": false,
+                    "customClass": "",
+                    "hidden": false,
+                    "modalEdit": false,
+                    "key": "html1",
+                    "tags": [],
+                    "properties": {},
+                    "conditional": {
+                        "show": null,
+                        "when": null,
+                        "eq": "",
+                        "json": ""
+                    },
+                    "customConditional": "",
+                    "logic": [],
+                    "attributes": {},
+                    "overlay": {
+                        "style": "",
+                        "page": "",
+                        "left": "",
+                        "top": "",
+                        "width": "",
+                        "height": ""
+                    },
+                    "type": "htmlelement",
+                    "input": false,
+                    "tableView": false,
+                    "placeholder": "",
+                    "prefix": "",
+                    "suffix": "",
+                    "multiple": false,
+                    "defaultValue": null,
+                    "protected": false,
+                    "unique": false,
+                    "persistent": false,
+                    "clearOnHide": true,
+                    "refreshOn": "",
+                    "redrawOn": "",
+                    "dataGridLabel": false,
+                    "labelPosition": "top",
+                    "description": "",
+                    "errorLabel": "",
+                    "tooltip": "",
+                    "hideLabel": false,
+                    "tabindex": "",
+                    "disabled": false,
+                    "autofocus": false,
+                    "dbIndex": false,
+                    "customDefaultValue": "",
+                    "calculateValue": "",
+                    "calculateServer": false,
+                    "widget": null,
+                    "validateOn": "change",
+                    "validate": {
+                        "required": false,
+                        "custom": "",
+                        "customPrivate": false,
+                        "strictDateValidation": false,
+                        "multiple": false,
+                        "unique": false
+                    },
+                    "allowCalculateOverride": false,
+                    "encrypted": false,
+                    "showCharCount": false,
+                    "showWordCount": false,
+                    "allowMultipleMasks": false,
+                    "addons": [],
+                    "id": "e7jickg"
+                },
+                {
                     "label": "Pay Outstanding Page1",
                     "labelWidth": "",
                     "labelMargin": "",
@@ -2137,7 +2219,7 @@
                                     "value": ""
                                 }
                             ],
-                            "content": "<center class='mobilesubcontent' style='color: #003366'>If you would like to contact an Information Access Operations representative to better clarify your request and try to reduce your fee, <br/> please email: <a href='mailto:FOI.Requests@gov.bc.ca'>FOI.Requests@gov.bc.ca</a>, or call <a href=\"tel:+1 250-387-1321\">250-387-1321</a> | Toll Free: <a href='tel:+1833-283-8200'>833-283-8200</a> </center>",
+                            "content": "<center class='mobilesubcontent' style='color: #003366'>If you would like to contact an Information Access Operations representative to better clarify your request and try to reduce your fee, <br/> please email: <a href='mailto:FOI.Requests@gov.bc.ca' style='color: #0051A8'>FOI.Requests@gov.bc.ca</a>, or call <a href=\"tel:+1 250-387-1321\" style='color: #0051A8'>250-387-1321</a> | Toll Free: <a href='tel:+1833-283-8200' style='color: #0051A8'>833-283-8200</a> </center>",
                             "refreshOnChange": false,
                             "customClass": "",
                             "hidden": false,
@@ -2205,7 +2287,7 @@
                             "showWordCount": false,
                             "allowMultipleMasks": false,
                             "addons": [],
-                            "id": "ei23z17"
+                            "id": "e3vawwt"
                         }
                     ],
                     "placeholder": "",
