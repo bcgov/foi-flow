@@ -7,7 +7,7 @@ import {
 import { StateEnum } from "../../../constants/FOI/statusEnum";
 import Chip from "@mui/material/Chip";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faFlag, faTimes } from '@fortawesome/free-solid-svg-icons'; 
+import { faFlag } from '@fortawesome/free-solid-svg-icons'; 
 
 export const debounce = (func, wait) => {
   let timeout;
