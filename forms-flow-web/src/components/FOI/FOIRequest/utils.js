@@ -218,7 +218,7 @@ export const createRequestDetailsObjectFunc = (
     case FOI_COMPONENT_CONSTANTS.RQUESTDETAILS_INITIALVALUES:
       requestObject.receivedDate = value.receivedDate?formatDate(value.receivedDate, "yyyy MMM, dd"): "";
       requestObject.receivedDateUF = value.receivedDate
-        ? new Date(value.receivedDate).toISOString()
+        ? new Date(value.receivedDate)?.toISOString()
         : "";
       requestObject.requestProcessStart = value.requestStartDate;
       requestObject.dueDate = value.dueDate;
@@ -234,9 +234,11 @@ export const createRequestDetailsObjectFunc = (
       requestObject.assignedToName = assigneeDetails.assignedToName
       break;
     case FOI_COMPONENT_CONSTANTS.RECEIVED_DATE:
-      requestObject.receivedDate = formatDate(value, "yyyy MMM, dd");
-      const receivedDateUTC = new Date(value).toISOString();
-      requestObject.receivedDateUF = receivedDateUTC;
+      if(!!value){
+        requestObject.receivedDate = formatDate(value, "yyyy MMM, dd");
+        const receivedDateUTC = new Date(value)?.toISOString();
+        requestObject.receivedDateUF = receivedDateUTC;
+      }
       break;
     case FOI_COMPONENT_CONSTANTS.REQUEST_START_DATE:
       requestObject.requestProcessStart = value;
