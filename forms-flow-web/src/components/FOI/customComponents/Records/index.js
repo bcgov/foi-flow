@@ -43,6 +43,7 @@ import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import CloseIcon from '@material-ui/icons/Close';
 import _ from 'lodash';
+import { DOC_REVIEWER_WEB_URL } from "../../../../constants/constants";
 
 
 const useStyles = makeStyles((_theme) => ({
@@ -554,14 +555,16 @@ export const RecordsLog = ({
                 >
                   + Upload Records
                 </button> :
-                <button
-                  className={clsx("btn", "addAttachment", classes.createButton)}
-                  variant="contained"
-                  // onClick={}
-                  color="primary"
-                >
-                  Redact Records
-                </button>
+                <a href={DOC_REVIEWER_WEB_URL + "/foi/" + ministryId}>
+                  <button
+                    className={clsx("btn", "addAttachment", classes.createButton)}
+                    variant="contained"
+                    // onClick={}
+                    color="primary"
+                  >
+                    Redact Records
+                  </button>
+                </a>
               }
             </Grid>
             <Grid
