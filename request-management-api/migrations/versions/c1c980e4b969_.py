@@ -47,12 +47,12 @@ def upgrade():
     op.bulk_insert(
         docment_path_mapper,
         [
-            {'category':'Attachments','bucket': s3environment + '-forms-foirequests','isactive':True,'createdby':'System'},
+            {'category':'Attachments','bucket': s3environment + '-forms-foirequests-e','isactive':True,'createdby':'System'},
         ]
     )
     op.execute('''INSERT INTO public."DocumentPathMapper"(
 	category, bucket, isactive, createdby)
-	Select 'Records', lower(bcgovcode) || '-''' + s3environment + '''' , true, 'System' from
+	Select 'Records', lower(bcgovcode) || '-''' + s3environment + '''-e' , true, 'System' from
 	public."ProgramAreas" where isactive = true''')
 
 
