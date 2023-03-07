@@ -10,11 +10,15 @@
          <value>//div[@id='Request']/div/div/form/div/div/div[2]/div/div/button</value>
       </entry>
       <entry>
+         <key>BASIC</key>
+         <value>//*[(text() = '  Watch' or . = '  Watch')]</value>
+      </entry>
+      <entry>
          <key>CSS</key>
          <value>button.foi-eye-container</value>
       </entry>
    </selectorCollection>
-   <selectorMethod>XPATH</selectorMethod>
+   <selectorMethod>BASIC</selectorMethod>
    <useRalativeImagePath>true</useRalativeImagePath>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -22,6 +26,7 @@
       <name>tag</name>
       <type>Main</type>
       <value>button</value>
+      <webElementGuid>01d8852f-9ac4-49b4-835f-279458a7e0e7</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -29,6 +34,7 @@
       <name>class</name>
       <type>Main</type>
       <value>foi-eye-container</value>
+      <webElementGuid>109fba45-da0a-4934-aebb-3a21c0bfaf40</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>true</isSelected>
@@ -36,6 +42,7 @@
       <name>text</name>
       <type>Main</type>
       <value>  Watch</value>
+      <webElementGuid>caec4bff-48df-4be5-b89e-96dcfe4a482f</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -43,6 +50,7 @@
       <name>xpath</name>
       <type>Main</type>
       <value>id(&quot;Request&quot;)/div[@class=&quot;container foi-review-request-container&quot;]/div[@class=&quot;foi-review-container&quot;]/form[@class=&quot;jss5 foi-request-form&quot;]/div[@class=&quot;foi-request-review-header-row1&quot;]/div[@class=&quot;foi-request-review-header-col1&quot;]/div[@class=&quot;foi-request-review-header-col1-row&quot;]/div[1]/div[@class=&quot;foi-watcher-all&quot;]/button[@class=&quot;foi-eye-container&quot;]</value>
+      <webElementGuid>87835955-3c8d-4154-9def-9d57be60ccbe</webElementGuid>
    </webElementProperties>
    <webElementXpaths>
       <isSelected>true</isSelected>
@@ -50,6 +58,7 @@
       <name>xpath:idRelative</name>
       <type>Main</type>
       <value>//div[@id='Request']/div/div/form/div/div/div[2]/div/div/button</value>
+      <webElementGuid>1ace6571-6e5f-4046-acb3-dabf499972ef</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -57,6 +66,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>(.//*[normalize-space(text()) and normalize-space(.)='Review Request'])[1]/following::button[1]</value>
+      <webElementGuid>a712b29f-8291-484f-a012-325bc11b9632</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -64,6 +74,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>(.//*[normalize-space(text()) and normalize-space(.)='Option 4'])[1]/following::button[1]</value>
+      <webElementGuid>90356f03-2b3b-44a6-9d31-cbfc4f747e44</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -71,6 +82,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>(.//*[normalize-space(text()) and normalize-space(.)='Tag'])[1]/preceding::button[1]</value>
+      <webElementGuid>2019895f-c4f3-4c20-ba06-c78e75dd37fd</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -78,6 +90,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>//*/text()[normalize-space(.)='Watch']/parent::*</value>
+      <webElementGuid>3c601ab4-2bcc-4b02-b34a-94a01fe69e98</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -85,5 +98,6 @@
       <name>xpath:position</name>
       <type>Main</type>
       <value>//div[2]/div/div/button</value>
+      <webElementGuid>3ab7ff4b-cf9f-425b-9499-6e43a4e5b43b</webElementGuid>
    </webElementXpaths>
 </WebElementEntity>

@@ -6,12 +6,12 @@
    <elementGuidId>c2e1e24d-b0cc-4654-ba79-357440b45514</elementGuidId>
    <selectorCollection>
       <entry>
-         <key>XPATH</key>
-         <value>//div[@id='app']/div/div[3]/div/div/div/a</value>
-      </entry>
-      <entry>
          <key>CSS</key>
          <value>h1 > a</value>
+      </entry>
+      <entry>
+         <key>XPATH</key>
+         <value>//div[@id='app']/div/div[2]/div/nav/div/div/div/div[2]/a</value>
       </entry>
    </selectorCollection>
    <selectorMethod>XPATH</selectorMethod>
@@ -22,6 +22,7 @@
       <name>tag</name>
       <type>Main</type>
       <value>a</value>
+      <webElementGuid>efd6a5ba-9b52-4d93-b5d1-257b71ccfe2c</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>true</isSelected>
@@ -29,6 +30,7 @@
       <name>href</name>
       <type>Main</type>
       <value>/foi/dashboard</value>
+      <webElementGuid>9ce04a55-f449-4d82-93f6-b02c2230afbe</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>true</isSelected>
@@ -36,6 +38,7 @@
       <name>text</name>
       <type>Main</type>
       <value>FOI</value>
+      <webElementGuid>b24824e2-fcdc-4631-8425-0ca8bc41de24</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -43,6 +46,7 @@
       <name>xpath</name>
       <type>Main</type>
       <value>id(&quot;app&quot;)/div[1]/div[@class=&quot;foiformcontent&quot;]/div[@class=&quot;foitabbedContainer&quot;]/div[@class=&quot;foitabheadercollection foitabheaderCFRG&quot;]/div[@class=&quot;foileftpanelheader&quot;]/h1[1]/a[1]</value>
+      <webElementGuid>58ad96e8-0ea2-4cc0-b08c-b282ce58af9f</webElementGuid>
    </webElementProperties>
    <webElementXpaths>
       <isSelected>true</isSelected>
@@ -50,6 +54,7 @@
       <name>xpath:idRelative</name>
       <type>Main</type>
       <value>//div[@id='app']/div/div[3]/div/div/div/h1/a</value>
+      <webElementGuid>00298141-f9ec-410b-873c-ee71eae57b8d</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -57,6 +62,7 @@
       <name>xpath:link</name>
       <type>Main</type>
       <value>//a[contains(text(),'FOI')]</value>
+      <webElementGuid>6b6c5ef3-cb0d-4f05-a6eb-370883c7bbe7</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -64,6 +70,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>(.//*[normalize-space(text()) and normalize-space(.)='Sign Out'])[1]/following::a[1]</value>
+      <webElementGuid>6f85ce35-3b71-42a5-a23a-7470cc352d58</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -71,6 +78,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>(.//*[normalize-space(text()) and normalize-space(.)='Call For Records'])[1]/preceding::a[1]</value>
+      <webElementGuid>956a0120-3b49-42f6-84da-7f690b46486a</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -78,6 +86,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>(.//*[normalize-space(text()) and normalize-space(.)='​'])[1]/preceding::a[1]</value>
+      <webElementGuid>b08becb7-0cc8-4b7e-8283-cd19eea0bd09</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -85,6 +94,7 @@
       <name>xpath:href</name>
       <type>Main</type>
       <value>(//a[contains(@href, '/foi/dashboard')])[2]</value>
+      <webElementGuid>9270a1cc-f6d0-41e1-997a-68c6847d27a7</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -92,6 +102,7 @@
       <name>xpath:position</name>
       <type>Main</type>
       <value>//h1/a</value>
+      <webElementGuid>2a4d802e-6d8b-48e1-8de4-359270fb5574</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -99,5 +110,6 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>(.//*[normalize-space(text()) and normalize-space(.)='Open'])[1]/preceding::a[1]</value>
+      <webElementGuid>191b3f87-abed-4ba4-837a-417d36d78f1b</webElementGuid>
    </webElementXpaths>
 </WebElementEntity>
