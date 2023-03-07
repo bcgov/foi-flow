@@ -10,6 +10,7 @@ on:
       - main
     paths:
       - "apps/forms-flow-ai/forms-flow-bpm/**"
+      - "!apps/forms-flow-ai/forms-flow-bpm/src/main/resources/processes/**"
 
 defaults:
   run:

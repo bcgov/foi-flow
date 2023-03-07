@@ -66,8 +66,8 @@ class CreateFOIRawRequestWatcher(Resource):
     @auth.require
     def post():      
         try:
-            requestjson = request.get_json() 
-            rawrquestwatcherschema = FOIRawRequestWatcherSchema().load(requestjson)  
+            requestjson = request.get_json()
+            rawrquestwatcherschema = FOIRawRequestWatcherSchema().load(requestjson)
             result = watcherservice().createrawrequestwatcher(rawrquestwatcherschema, AuthHelper.getuserid(), AuthHelper.getusergroups())
             if result.success == True:
                 eventservice().posteventforwatcher(requestjson["requestid"], requestjson, "rawrequest",AuthHelper.getuserid(), AuthHelper.getusername())
@@ -127,11 +127,11 @@ class CreateFOIRequestWatcher(Resource):
     @auth.require
     def post():      
         try:
-            requestjson = request.get_json() 
-            minrquestwatcherschema = FOIMinistryRequestWatcherSchema().load(requestjson)  
+            requestjson = request.get_json()
+            minrquestwatcherschema = FOIMinistryRequestWatcherSchema().load(requestjson)
             result = watcherservice().createministryrequestwatcher(minrquestwatcherschema, AuthHelper.getuserid(),AuthHelper.getusergroups())
             if result.success == True:
-                eventservice().posteventforwatcher(requestjson["ministryrequestid"], requestjson, "ministryrequest",AuthHelper.getuserid(), AuthHelper.getusername())
+                eventservice().posteventforwatcher(requestjson["ministryrequestid"], requestjson, "ministryrequest", AuthHelper.getuserid(), AuthHelper.getusername())
             return {'status': result.success, 'message':result.message} , 200 
         except KeyError as err:
             return {'status': False, 'message':err.messages}, 400        

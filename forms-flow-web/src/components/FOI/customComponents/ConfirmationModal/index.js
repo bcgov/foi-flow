@@ -61,7 +61,7 @@ export default function ConfirmationModal({requestId, openModal, handleModal, st
     const selectedMinistries = saveRequestObject?.selectedMinistries?.map(ministry => ministry.code);
     const updatedProcessingTeamList = getProcessingTeams(processingTeamList, selectedMinistries);
     const assignedTo= getAssignedTo(saveRequestObject);
-    const updatedAssignedTo = getUpdatedAssignedTo(assignedTo, updatedProcessingTeamList, state, saveRequestObject?.requestType)
+    const updatedAssignedTo = getUpdatedAssignedTo(assignedTo, updatedProcessingTeamList, state, saveRequestObject?.requestType, saveRequestObject?.isiaorestricted)
     const ministryGroup = getMinistryGroup(saveRequestObject);
     const selectedMinistry = getSelectedMinistry(saveRequestObject, ministryGroup);
     const selectedMinistryAssignedTo = getSelectedMinistryAssignedTo(saveRequestObject, selectedMinistry);
@@ -104,6 +104,7 @@ export default function ConfirmationModal({requestId, openModal, handleModal, st
     const handleMailedChange = (event) => {
       setMailed(event.target.checked);
       setDisableSaveBtn(!event.target.checked);
+      saveRequestObject.isofflinepayment=event.target.checked;
     };
    
 
@@ -153,8 +154,14 @@ export default function ConfirmationModal({requestId, openModal, handleModal, st
           && state.toLowerCase() === StateEnum.onhold.name.toLowerCase())
           fileStatusTransition = StateTransitionCategories.feeonhold.name;
         else if (saveRequestObject.requeststatusid === StateEnum.response.id
-            && state.toLowerCase() === StateEnum.onhold.name.toLowerCase())
-            fileStatusTransition = StateTransitionCategories.responseonhold.name;
+          && state.toLowerCase() === StateEnum.onhold.name.toLowerCase())
+          fileStatusTransition = StateTransitionCategories.responseonhold.name;
+        else if (saveRequestObject.requeststatusid === StateEnum.response.id
+          && state.toLowerCase() === StateEnum.review.name.toLowerCase())
+          fileStatusTransition = StateTransitionCategories.responsereview.name;
+        else if (saveRequestObject.requeststatusid === StateEnum.signoff.id
+          && state.toLowerCase() === StateEnum.review.name.toLowerCase())
+          fileStatusTransition = StateTransitionCategories.signoffreview.name;
 
         fileInfoList = files.map(file => {
           return {

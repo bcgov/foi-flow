@@ -9,7 +9,7 @@ on:
       - main
     paths:
       - "apps/forms-flow-ai/forms-flow-ai-web/**"
-      - ".github/workflows/forms-flow-ai-web-cd.yml"
+      - "!apps/forms-flow-ai/forms-flow-ai-web/src/forms/**"
 
 defaults:
   run:
