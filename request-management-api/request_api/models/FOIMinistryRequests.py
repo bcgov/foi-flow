@@ -97,7 +97,7 @@ class FOIMinistryRequest(db.Model):
 
     @classmethod
     def getrequest(cls,ministryrequestid):
-        request_schema = FOIMinistryRequestSchema(many=True)
+        request_schema = FOIMinistryRequestSchema(many=False)
         query = db.session.query(FOIMinistryRequest).filter_by(foiministryrequestid=ministryrequestid).order_by(FOIMinistryRequest.version.desc()).first()
         return request_schema.dump(query)
 

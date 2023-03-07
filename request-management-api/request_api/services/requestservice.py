@@ -81,6 +81,9 @@ class requestservice:
     
     def getrequestdetails(self,foirequestid, foiministryrequestid):
         return requestservicegetter().getrequestdetails(foirequestid, foiministryrequestid)
+
+    def getrequestid(self, foiministryrequestid):
+        return FOIMinistryRequest.getrequest(foiministryrequestid)['foirequest_id']
     
     def copywatchers(self, rawrequestid, ministries, userid):
         watchers = watcherservice().getrawrequestwatchers(int(rawrequestid))
