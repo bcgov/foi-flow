@@ -27,8 +27,7 @@ WebUI.click(findTestObject('Page_foi.flow/queue/button_Add Request'))
 
 WebUI.click(findTestObject('Page_foi.flow/form/assignee dropdown/div_Assigned'))
 
-WebUI.click(findTestObject('Page_foi.flow/form/assignee dropdown/li_assignee user option', [('user') : (lastname + ', ') + 
-            firstname]))
+WebUI.click(findTestObject('Page_foi.flow/form/assignee dropdown/Page_Add Request/li_Flex, Intake'))
 
 Random random = new Random()
 
@@ -61,22 +60,25 @@ WebUI.setText(findTestObject('Page_foi.flow/form/inputs/address/input_Home Phone
 
 WebUI.setText(findTestObject('Page_foi.flow/form/inputs/request description/textarea_request description'), 'testing 123 description')
 
+WebUI.scrollToElement(findTestObject('Page_foi.flow/form/inputs/request description/textarea_request description'), 0)
+
 //WebUI.scrollToPosition(0, 0)
 //WebUI.scrollToElement(findTestObject('Page_foi.flow/form/inputs/request description/Page_ABC-2099-50/label_EDU'), 0)
 //WebUI.scrollToElement(findTestObject('Page_foi.flow/form/inputs/request description/span_EDU_selectspanEDU'), 0)
 //WebUI.scrollToElement(findTestObject('Page_foi.flow/form/inputs/request description/span_EDU_checkmark'), 0)
 WebUI.click(findTestObject('Page_foi.flow/form/inputs/request description/span_EDU_selectspanEDU'))
 
-WebUI.takeScreenshotAsCheckpoint('current_viewport')
+WebUI.scrollToElement(findTestObject('Page_foi.flow/form/button_Save'), 0)
 
-WebUI.scrollToElement(findTestObject('Page_foi.flow/form/inputs/request details/input_Start Date'), 0)
-
+//WebUI.takeScreenshotAsCheckpoint('current_viewport')
 WebUI.setText(findTestObject('Page_foi.flow/form/inputs/request details/input_Start Date'), '2021-12-16')
 
-WebUI.click(findTestObject('Page_foi.flow/form/inputs/request details/input_Received Date_receivedDate'))
+WebUI.waitForElementClickable(findTestObject('Page_foi.flow/form/inputs/request details/input_Received Date_receivedDate'), 
+    0)
+
+WebUI.setText(findTestObject('Page_foi.flow/form/inputs/request details/input_Received Date_receivedDate'), '2021-12-16')
 
 //WebUI.setText(findTestObject('Page_foi.flow/form/inputs/request details/input_Received Date_receivedDate'), '2023-02-23')
-
 WebUI.scrollToElement(findTestObject('Page_foi.flow/form/inputs/request details/input_Request Type'), 0)
 
 WebUI.click(findTestObject('Page_foi.flow/form/inputs/request details/input_Request Type'))

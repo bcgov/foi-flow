@@ -6,6 +6,10 @@
    <elementGuidId>7366997d-6688-4721-80a9-4711d3d648eb</elementGuidId>
    <selectorCollection>
       <entry>
+         <key>CSS</key>
+         <value>#receivedDate</value>
+      </entry>
+      <entry>
          <key>XPATH</key>
          <value>//input[@id='receivedDate']</value>
       </entry>
@@ -13,12 +17,8 @@
          <key>BASIC</key>
          <value>//*[@id = 'receivedDate' and @type = 'date']</value>
       </entry>
-      <entry>
-         <key>CSS</key>
-         <value>#receivedDate</value>
-      </entry>
    </selectorCollection>
-   <selectorMethod>BASIC</selectorMethod>
+   <selectorMethod>XPATH</selectorMethod>
    <useRalativeImagePath>true</useRalativeImagePath>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -26,7 +26,7 @@
       <name>tag</name>
       <type>Main</type>
       <value>input</value>
-      <webElementGuid>0bab4c6f-2bea-4e28-b92a-22128a72c735</webElementGuid>
+      <webElementGuid>d59a3619-32fa-489c-8e23-d1d9b050823e</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -34,7 +34,7 @@
       <name>aria-invalid</name>
       <type>Main</type>
       <value>true</value>
-      <webElementGuid>b7e912e0-f2f7-4c0d-b6bd-34d80a66c913</webElementGuid>
+      <webElementGuid>39cdb260-888c-4b81-8c9e-57820eb78e3c</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>true</isSelected>
@@ -42,7 +42,7 @@
       <name>id</name>
       <type>Main</type>
       <value>receivedDate</value>
-      <webElementGuid>3700b123-b044-4705-88be-e363caf99016</webElementGuid>
+      <webElementGuid>2134541d-136f-461d-9409-ef3d2ae1c5a6</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>true</isSelected>
@@ -50,7 +50,7 @@
       <name>type</name>
       <type>Main</type>
       <value>date</value>
-      <webElementGuid>07998b4f-2db1-47f8-9efa-c5fe7ca6cd75</webElementGuid>
+      <webElementGuid>5623d697-28c1-474a-8d88-610acbe591a3</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -58,7 +58,7 @@
       <name>max</name>
       <type>Main</type>
       <value>2023-02-23</value>
-      <webElementGuid>d79a919c-b040-4ff7-8668-7dabb98b5e7c</webElementGuid>
+      <webElementGuid>bbdb92d6-f5cc-4d52-bb7e-ed44f0b7adea</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -66,7 +66,7 @@
       <name>class</name>
       <type>Main</type>
       <value>MuiInputBase-input MuiOutlinedInput-input</value>
-      <webElementGuid>3556bcdb-bf09-4bc3-bb1f-8e72da1ff765</webElementGuid>
+      <webElementGuid>f94f6c80-853b-49e5-8f1e-7c8b8e201bb9</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -74,7 +74,7 @@
       <name>xpath</name>
       <type>Main</type>
       <value>id(&quot;receivedDate&quot;)</value>
-      <webElementGuid>a965c63d-baef-4c19-aeca-d19b6d9122e9</webElementGuid>
+      <webElementGuid>69e6c7d5-42b0-4df6-ba1c-291e4e582522</webElementGuid>
    </webElementProperties>
    <webElementXpaths>
       <isSelected>true</isSelected>
@@ -82,7 +82,7 @@
       <name>xpath:attributes</name>
       <type>Main</type>
       <value>//input[@id='receivedDate']</value>
-      <webElementGuid>a9e17f80-dc99-4cad-854f-e56b49c627fe</webElementGuid>
+      <webElementGuid>60235ac3-5378-4f50-a03b-aa1c200b5152</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -90,7 +90,7 @@
       <name>xpath:idRelative</name>
       <type>Main</type>
       <value>//div[@id='Request']/div/div/form/div[8]/div/div[2]/div/div/div/div/div/div/div/div/input</value>
-      <webElementGuid>da3734c4-cf72-4427-836f-2976be7d9913</webElementGuid>
+      <webElementGuid>963bbdf8-12fa-47d9-96a8-928ff28e5a91</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -98,7 +98,7 @@
       <name>xpath:position</name>
       <type>Main</type>
       <value>//div[8]/div/div[2]/div/div/div/div/div/div/div/div/input</value>
-      <webElementGuid>827b684a-5e31-4d39-8bd7-c088a6af6e7c</webElementGuid>
+      <webElementGuid>1c2db3f6-5bf1-40ce-a21c-c5978673a583</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -106,6 +106,6 @@
       <name>xpath:customAttributes</name>
       <type>Main</type>
       <value>//input[@id = 'receivedDate' and @type = 'date']</value>
-      <webElementGuid>b904bcdd-389d-464c-884f-37ed1e2c4761</webElementGuid>
+      <webElementGuid>87d5feb5-c762-4537-98ff-f1734f8ed179</webElementGuid>
    </webElementXpaths>
 </WebElementEntity>
