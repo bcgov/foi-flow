@@ -39,7 +39,7 @@ WebUI.click(findTestObject('Page_foi.flow/comment/button_Post comment'), Failure
 
 WebUI.verifyElementText(findTestObject('Page_foi.flow/comment/p_comment list 1 text'), 'test comment')
 
-WebUI.verifyElementText(findTestObject('Page_foi.flow/comment/p_comment list 2 text'), (lastname + ', ') + firstname)
+WebUI.verifyElementText(findTestObject('Page_foi.flow/comment/div_Comment list 1 user'), (lastname + ', ') + firstname)
 
 WebUI.click(findTestObject('Page_foi.flow/comment/Page_ABC-2099-50/span_Request History Comments'), FailureHandling.STOP_ON_FAILURE)
 
@@ -54,7 +54,7 @@ WebUI.click(findTestObject('Page_foi.flow/comment/Page_ABC-2099-50/span_All'), F
 
 WebUI.verifyElementText(findTestObject('Page_foi.flow/comment/p_comment list 1 text'), 'test comment')
 
-WebUI.verifyElementText(findTestObject('Page_foi.flow/comment/p_comment list 2 text'), (lastname + ', ') + firstname)
+WebUI.verifyElementText(findTestObject('Page_foi.flow/comment/div_Comment list 1 user'), (lastname + ', ') + firstname)
 
 for (int i = 2; i < 10; i++) {
     WebUI.click(findTestObject('Page_foi.flow/comment/button_Add Comment'), FailureHandling.STOP_ON_FAILURE)
