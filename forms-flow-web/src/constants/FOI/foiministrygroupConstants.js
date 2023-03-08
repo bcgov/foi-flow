@@ -1,5 +1,6 @@
 const MINISTRYGROUPS = {
     AEST : "AEST Ministry Team",
+    PSE : "PSE Ministry Team",
     AGR : "AGR Ministry Team",
     BRD : "BRD Ministry Team",
     CAS : "CAS Ministry Team",
@@ -9,7 +10,9 @@ const MINISTRYGROUPS = {
     DAS : "DAS Ministry Team",
     EAO : "EAO Ministry Team",
     EDU : "EDU Ministry Team",
+    ECC : "ECC Ministry Team",
     EMBC : "EMBC Ministry Team",
+    EMC : "EMC Ministry Team",
     EMLI : "EMLI Ministry Team",
     FIN : "FIN Ministry Team",
     FOR : "FOR Ministry Team",
@@ -18,9 +21,11 @@ const MINISTRYGROUPS = {
     IIO : "IIO Ministry Team",
     IRR : "IRR Ministry Team",
     JERI : "JERI Ministry Team",
+    JED : "JED Ministry Team",
     LBR : "LBR Ministry Team",
     LDB : "LDB Ministry Team",
     LWR : "LWR Ministry Team",
+    WLR : "WLR Ministry Team",
     AG : "AG Ministry Team",
     MGC : "MGC Ministry Team",
     MMHA : "MMHA Ministry Team",
@@ -34,7 +39,10 @@ const MINISTRYGROUPS = {
     PSSG : "PSSG Ministry Team",
     TACS : "TACS Ministry Team",
     TIC : "TIC Ministry Team",
-    TRAN : "TRAN Ministry Team"
+    TRAN : "TRAN Ministry Team",
+    COR : "COR Ministry Team",
+    HSG : "HSG Ministry Team"
+
   };
 
   export default MINISTRYGROUPS;  

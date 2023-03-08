@@ -32,7 +32,7 @@ namespace MCS.FOI.AXISIntegration.DAL
             return "{}";
         }
 
-        private AXISRequest GetAXISRequest(string request)
+        public AXISRequest GetAXISRequest(string request)
         {
             AXISRequest axisRequest = new();
             DataTable axisDataTable = GetAxisRequestData(request);
@@ -43,6 +43,7 @@ namespace MCS.FOI.AXISIntegration.DAL
                 {
                     axisRequest.AXISRequestID = request;
                     axisRequest.Category = Convert.ToString(row["category"]);
+                    axisRequest.IsRestricted = Convert.ToString(row["requestType"]).ToLower().Contains("restricted");
                     axisRequest.RequestType = RequestsHelper.GetRequestType(Convert.ToString(row["requestType"]));
 
                     axisRequest.ReceivedDate = RequestsHelper.ConvertDateToString(row, "receivedDate", "yyyy-MM-dd");
@@ -80,6 +81,7 @@ namespace MCS.FOI.AXISIntegration.DAL
                     axisRequest.RequestDescriptionToDate = RequestsHelper.ConvertDateToString(row, "reqDescriptionToDate", "yyyy-MM-dd");
                     axisRequest.Ispiiredacted = true;
                     axisRequest.RequestPageCount = Convert.ToInt32(row["requestPageCount"]);
+                    axisRequest.SubjectCode = Convert.ToString(row["subjectCode"]);
                     List<Ministry> ministryList = new()
                     {
                         new Ministry(RequestsHelper.GetMinistryCode(Convert.ToString(row["selectedMinistry"])))
@@ -147,6 +149,7 @@ namespace MCS.FOI.AXISIntegration.DAL
                 sum(distinct case when requests.IREQUESTID = reviewlog.IREQUESTID and reviewlog.IDOCID = documents.IDOCID then documents.SIPAGECOUNT 
                 when requests.IREQUESTID = redaction.IREQUESTID and redaction.IDOCID = ldocuments.IDOCID then ldocuments.SIPAGECOUNT 
                 else 0 end) as requestPageCount,
+                REPLACE(requestfields.CUSTOMFIELD33, CHAR(160), ' ') as subjectCode,
                 (SELECT TOP 1 cfr.sdtDueDate FROM tblRequestForDocuments cfr WITH (NOLOCK) 
                 INNER JOIN tblProgramOffices programoffice WITH (NOLOCK) ON programoffice.tiProgramOfficeID = cfr.tiProgramOfficeID 
                 WHERE requests.iRequestID = cfr.iRequestID 
@@ -169,6 +172,7 @@ namespace MCS.FOI.AXISIntegration.DAL
                 LEFT OUTER JOIN dbo.TBLRedactionlayers redaction WITH (NOLOCK) ON requests.IREQUESTID = redaction.IREQUESTID
                 LEFT OUTER JOIN dbo.TBLDOCUMENTS ldocuments WITH (NOLOCK) ON redaction.IDOCID = ldocuments.IDOCID
                 LEFT OUTER JOIN dbo.TBLREQUESTERCUSTOMFIELDS requestorfields WITH (NOLOCK) ON requesters.iRequesterID = requestorfields.IREQUESTERID
+                LEFT OUTER JOIN dbo.TBLREQUESTCUSTOMFIELDS requestfields WITH (NOLOCK) ON requests.iRequestID = requestfields.iRequestID
                 WHERE 
                 vcVisibleRequestID = @vcVisibleRequestID
                 GROUP BY requests.sdtReceivedDate, requests.sdtTargetDate, requests.sdtOriginalTargetDate, requests.vcDescription,
@@ -177,7 +181,7 @@ namespace MCS.FOI.AXISIntegration.DAL
                 requesters.vcAddress1, requesters.vcAddress2, requesters.vcCity, requesters.vcZipCode,
                 requesters.vcHome, requesters.vcMobile, requesters.vcWork1, requesters.vcWork2, requesters.vcFirstName, requesters.vcLastName, requesters.vcMiddleName,
                 requests.iRequestID, requesters.vcCompany, requesters.vcEmailID, onbehalf.vcFirstName, onbehalf.vcLastName, onbehalf.vcMiddleName,
-                requestTypes.iLabelID, requests.vcVisibleRequestID, requests.tiOfficeID, office.OFFICE_ID,requestorfields.CUSTOMFIELD35";
+                requestTypes.iLabelID, requests.vcVisibleRequestID, requests.tiOfficeID, office.OFFICE_ID,requestorfields.CUSTOMFIELD35, REPLACE(requestfields.CUSTOMFIELD33, CHAR(160), ' ')";
             DataTable dataTable = new();
             using (sqlConnection = new SqlConnection(ConnectionString))
             {

@@ -70,8 +70,8 @@ class FOIRequestTeam(db.Model):
                     left join "ProgramAreas" pa on ft.programareaid = pa.programareaid 
                     where ft.isactive = true and lower(ft.requesttype) = 'personal' 
                     and replace(lower(fs2."name"),' ','') = 'open'
-                    and ot."name" <> 'Intake Team'
-                    and (lower(pa.bcgovcode) = :bcgovcode or ft.programareaid  is null)"""
+                    and ot."name" not in ('Intake Team','Flex Team')
+                    and (lower(pa.bcgovcode) = :bcgovcode or ft.programareaid  is null) limit 1"""
             rs = db.session.execute(text(sql), {'bcgovcode':bcgovcode.lower()})
             for row in rs:
                 defaultteam = row["name"]

@@ -77,7 +77,9 @@ const AxisDetails = React.memo(({
                 else if(data){
                     let responseMsg = data;
                     responseMsg+='';
-                    if(responseMsg.indexOf("Exception happened while GET operations of request") >= 0)
+                    if(responseMsg.indexOf("Unauthorized-RestrictedAxisRequest") >= 0)
+                      setAxisMessage("UNAUTHORIZED");
+                    else if(responseMsg.indexOf("Exception happened while GET operations of request") >= 0)
                       setAxisMessage("ERROR");
                     else if(responseMsg.indexOf("Axis Id exists") >= 0){
                         axisIdValidation = {field: "AxisId", helperTextValue: "AXIS ID Number already exists"};

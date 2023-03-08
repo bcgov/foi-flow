@@ -3,6 +3,8 @@ import {
   getDaysLeft,
   getReceivedDate,
   // onBehalfFullName,
+  displayIcon,
+  displayHeaderIcon,
 } from "../utils";
 import {
   isProcessingTeam,
@@ -81,6 +83,14 @@ const ProcessingTeamColumns = [
     headerAlign: "left",
     flex: 0.5,
   },
+  {
+    field: "isiaorestricted",
+    renderHeader: displayHeaderIcon,
+    headerAlign: "left",
+    renderCell:displayIcon,
+    cellClassName: 'foi-dashboard-restricted',
+    flex: 1,
+    }
 ];
 
 const IntakeTeamColumns = [
@@ -130,6 +140,14 @@ const IntakeTeamColumns = [
     hide: true,
     renderCell: (_params) => <span></span>,
   },
+  {
+  field: "isiaorestricted",
+  renderHeader: displayHeaderIcon,
+  headerAlign: "left",
+  renderCell:displayIcon,
+  cellClassName: 'foi-dashboard-restricted',
+  flex: 1,
+  }
 ];
 
 const FlexTeamColumns = [
@@ -186,6 +204,14 @@ const FlexTeamColumns = [
     flex: 0.75,
     // sortable: false,
   },
+  {
+    field: "isiaorestricted",
+    renderHeader: displayHeaderIcon,
+    headerAlign: "left",
+    renderCell:displayIcon,
+    cellClassName: 'foi-dashboard-restricted',
+    flex: 1,
+  }
 ];
 
 const defaultTableInfo = {

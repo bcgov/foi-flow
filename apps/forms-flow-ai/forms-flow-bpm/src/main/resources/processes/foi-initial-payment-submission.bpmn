@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_1te5mlw" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.0.0" modeler:executionPlatform="Camunda Platform" modeler:executionPlatformVersion="7.15.0">
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_1te5mlw" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.1.0" modeler:executionPlatform="Camunda Platform" modeler:executionPlatformVersion="7.15.0">
   <bpmn:error id="Error_06fsjjn" name="FOI-REQ-DETAIL-API-ERR" camunda:errorMessage="FOI Get Request Details Failed." />
   <bpmn:message id="Message_1yee5gs" name="foi-reminder-error" />
   <bpmn:message id="Message_0a9jdmw" name="foi-fee-payment" />
@@ -11,7 +11,7 @@
     <bpmn:group id="Group_0ihi2fn" categoryValueRef="CategoryValue_1baekcn" />
     <bpmn:group id="Cancel_payment" categoryValueRef="CategoryValue_0ne55cy" />
   </bpmn:collaboration>
-  <bpmn:process id="foi-fee-processing" name="FOI Fee Processing" isExecutable="true" camunda:versionTag="3">
+  <bpmn:process id="foi-fee-processing" name="FOI Fee Processing" isExecutable="true" camunda:versionTag="4">
     <bpmn:laneSet id="LaneSet_1u7kp6i">
       <bpmn:lane id="Lane_1u9yqiq" name="Create Payment Submission">
         <bpmn:flowNodeRef>Event_0crrhhb</bpmn:flowNodeRef>
@@ -54,10 +54,10 @@
         <bpmn:flowNodeRef>Activity_07lppep</bpmn:flowNodeRef>
         <bpmn:flowNodeRef>Activity_1tkdc9h</bpmn:flowNodeRef>
         <bpmn:flowNodeRef>Event_1s2s2yf</bpmn:flowNodeRef>
-        <bpmn:flowNodeRef>Event_1wwsw8u</bpmn:flowNodeRef>
         <bpmn:flowNodeRef>Event_1sitq6w</bpmn:flowNodeRef>
         <bpmn:flowNodeRef>Gateway_015rqa5</bpmn:flowNodeRef>
         <bpmn:flowNodeRef>Event_1pldnh9</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Event_1wwsw8u</bpmn:flowNodeRef>
       </bpmn:lane>
     </bpmn:laneSet>
     <bpmn:startEvent id="Event_0crrhhb">
@@ -118,6 +118,8 @@ connector.getVariable("statusCode");</camunda:script>
             <camunda:outputParameter name="fee">${S(response).prop("cfrfee").prop("feedata").prop("balanceDue").stringValue()}</camunda:outputParameter>
             <camunda:outputParameter name="fileNumber">${S(response).prop("idNumber").stringValue()}</camunda:outputParameter>
             <camunda:outputParameter name="paymentstatus">NOT PAID</camunda:outputParameter>
+            <camunda:outputParameter name="email">${S(response).prop("email").stringValue()}</camunda:outputParameter>
+            <camunda:outputParameter name="isofflinepayment">${S(response).prop("isofflinepayment").boolValue()}</camunda:outputParameter>
           </camunda:inputOutput>
           <camunda:connectorId>http-connector</camunda:connectorId>
         </camunda:connector>
@@ -384,7 +386,8 @@ var date2 = new Date(date_on);
 var diffTime = Math.abs(date2 - date1);
 var diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24)); 
 execution.setVariable("elapsed_days", diffDays);
-if (diffDays == 0) {
+var expirycounter = execution.getVariable("expirycounter");
+if (diffDays == 0 &amp;&amp; expirycounter &lt; 1) {
 execution.setVariable("paymentstatus", "EXPIRED");
 }</camunda:script>
         </camunda:executionListener>
@@ -451,6 +454,7 @@ execution.setVariable("servicekey","na");
 </camunda:script>
         </camunda:executionListener>
         <camunda:executionListener expression="${execution.setVariable(&#34;retry7&#34;, 0)}" event="take" />
+        <camunda:executionListener expression="${execution.setVariable(&#34;expirycounter&#34;, 0)}" event="take" />
       </bpmn:extensionElements>
     </bpmn:sequenceFlow>
     <bpmn:sequenceFlow id="Flow_1o3gosy" name="Retry [1..3]" sourceRef="Gateway_0q2f2o1" targetRef="get-api-token">
@@ -515,7 +519,7 @@ else {
       <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${balanceDue_f &gt; 0}</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
     <bpmn:sequenceFlow id="Flow_05oxz1b" sourceRef="Gateway_1xvmjq8" targetRef="Event_1iql791">
-      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${balanceDue_f &lt;= 0}</bpmn:conditionExpression>
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${balanceDue_f &lt;= 0 || email == "" || isofflinepayment == false}</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
     <bpmn:exclusiveGateway id="Gateway_1xvmjq8" name="balanceDue &#62; 0">
       <bpmn:extensionElements>
@@ -652,7 +656,12 @@ else {
       <bpmn:extensionElements>
         <camunda:executionListener event="end">
           <camunda:script scriptFormat="javascript">var current = execution.getVariable("retry5");
-execution.setVariable("retry5", current+1); </camunda:script>
+execution.setVariable("retry5", current+1);
+
+var counter = execution.getVariable("expirycounter");
+execution.setVariable("expirycounter", counter+1); 
+
+execution.setVariable("paymentstatus", "NA"); </camunda:script>
         </camunda:executionListener>
         <camunda:connector>
           <camunda:inputOutput>
@@ -680,9 +689,6 @@ connector.getVariable("statusCode");</camunda:script>
       <bpmn:outgoing>Flow_1d7gxi1</bpmn:outgoing>
       <bpmn:errorEventDefinition id="ErrorEventDefinition_0gavjpw" errorRef="Error_1fo3gea" camunda:errorCodeVariable="responseCode" />
     </bpmn:boundaryEvent>
-    <bpmn:endEvent id="Event_1wwsw8u">
-      <bpmn:incoming>Flow_1bmyxxs</bpmn:incoming>
-    </bpmn:endEvent>
     <bpmn:intermediateCatchEvent id="Event_1sitq6w">
       <bpmn:incoming>Flow_1d7gxi1</bpmn:incoming>
       <bpmn:outgoing>Flow_0kd8ss0</bpmn:outgoing>
@@ -698,6 +704,11 @@ connector.getVariable("statusCode");</camunda:script>
     <bpmn:intermediateThrowEvent id="Event_1pldnh9">
       <bpmn:incoming>Flow_1p5hmik</bpmn:incoming>
       <bpmn:messageEventDefinition id="MessageEventDefinition_15za33q" messageRef="Message_1rsz89u" />
+    </bpmn:intermediateThrowEvent>
+    <bpmn:intermediateThrowEvent id="Event_1wwsw8u" name="Manage Payment">
+      <bpmn:extensionElements />
+      <bpmn:incoming>Flow_1bmyxxs</bpmn:incoming>
+      <bpmn:linkEventDefinition id="LinkEventDefinition_1km9hu4" name="MANAGE-FEE-PAYMENT" />
     </bpmn:intermediateThrowEvent>
   </bpmn:process>
   <bpmn:message id="Message_1x26sx5" name="foi-manage-payment" />
@@ -720,6 +731,7 @@ connector.getVariable("statusCode");</camunda:script>
   <bpmn:category id="Category_1r5u37p">
     <bpmn:categoryValue id="CategoryValue_0ne55cy" value="Update Expiry Date" />
   </bpmn:category>
+  <bpmn:message id="Message_138v7i5" name="Message_138v7i5" />
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
     <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Collaboration_1rbxo3f">
       <bpmndi:BPMNShape id="Participant_105327x_di" bpmnElement="Participant_105327x" isHorizontal="true">
@@ -1093,9 +1105,6 @@ connector.getVariable("statusCode");</camunda:script>
       <bpmndi:BPMNShape id="Activity_1rs0u32_di" bpmnElement="Activity_1tkdc9h">
         <dc:Bounds x="1080" y="1250" width="100" height="80" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Event_1wwsw8u_di" bpmnElement="Event_1wwsw8u">
-        <dc:Bounds x="1362" y="1272" width="36" height="36" />
-      </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Event_02ztt8q_di" bpmnElement="Event_1sitq6w">
         <dc:Bounds x="1112" y="1382" width="36" height="36" />
       </bpmndi:BPMNShape>
@@ -1104,6 +1113,12 @@ connector.getVariable("statusCode");</camunda:script>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Event_1wnfiii_di" bpmnElement="Event_1pldnh9">
         <dc:Bounds x="1462" y="1382" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1jszytp_di" bpmnElement="Event_1wwsw8u">
+        <dc:Bounds x="1362" y="1272" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1337" y="1315" width="88" height="14" />
+        </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Event_0c9ytw1_di" bpmnElement="Event_1s2s2yf">
         <dc:Bounds x="1112" y="1312" width="36" height="36" />

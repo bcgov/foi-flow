@@ -123,10 +123,12 @@ import { getFullnameList } from "../../../../helper/FOI/helper";
     return updatedList?.filter((v, i, a) => a.indexOf(v) === i);
   }
 
-  export const getUpdatedAssignedTo = (_assignedTo, _processingTeamList, _state, _requestType) => {
-    if (_requestType?.toLowerCase() === 'personal' && _state?.toLowerCase() === StateEnum.open.name.toLowerCase())
+  export const getUpdatedAssignedTo = (_assignedTo, _processingTeamList, _state, _requestType, isiaorestricted) => {
+    if (_requestType?.toLowerCase() === 'personal' && _state?.toLowerCase() === StateEnum.open.name.toLowerCase()
+    && !isiaorestricted)
       return _processingTeamList.join(", ");
-    else if (_requestType?.toLowerCase() === 'general' && _state?.toLowerCase() === StateEnum.open.name.toLowerCase())
+    else if (_requestType?.toLowerCase() === 'general' && _state?.toLowerCase() === StateEnum.open.name.toLowerCase()
+    && !isiaorestricted)
       return "Flex Team";
     else
       return _assignedTo;
