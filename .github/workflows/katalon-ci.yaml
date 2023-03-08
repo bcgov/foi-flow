@@ -3,7 +3,7 @@ on:
   # schedule:
   #   - cron: "00 20 * * *"
   push:
-    branches: [ dev-NK-automationscripts ]
+    branches: [ dev-automationscripts ]
   # pull_request:
     # branches: [ dev ]
 
