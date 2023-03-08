@@ -148,7 +148,7 @@ WebUI.verifyElementNotPresent(findTestObject('Page_foi.flow/form/watch/div_watch
 
 WebUI.click(findTestObject('Page_foi.flow/form/assignee dropdown/div_Unassigned'))
 
-WebUI.click(findTestObject('Page_foi.flow/form/assignee dropdown/Page_ABC-2099-293/li_foiedu2, foiedu2'))
+WebUI.click(findTestObject('Page_foi.flow/form/assignee dropdown/li_foiedu2, foiedu2 (1)'))
 
 WebUI.click(findTestObject('Page_foi.flow/navbar/button_Sign Out'))
 

@@ -6,16 +6,16 @@
    <elementGuidId>c21d9158-f82a-4208-81d9-87934f32cbeb</elementGuidId>
    <selectorCollection>
       <entry>
+         <key>CSS</key>
+         <value>svg.bi.bi-bar-chart-line</value>
+      </entry>
+      <entry>
          <key>XPATH</key>
          <value>(.//*[normalize-space(text()) and normalize-space(.)='FOI'])[1]/following::*[name()='svg'][1]</value>
       </entry>
       <entry>
          <key>BASIC</key>
          <value>id(&quot;responsive-navbar-nav&quot;)/div[@class=&quot;ml-auto navbar-nav&quot;]/div[@class=&quot;ml-auto banner-right foihamburgermenu&quot;]/ul[@class=&quot;navbar-nav foihamburgermenulist&quot;]/li[@class=&quot;report-icon foinavitem&quot;]/a[1]/svg[@class=&quot;bi bi-bar-chart-line&quot;]</value>
-      </entry>
-      <entry>
-         <key>CSS</key>
-         <value>svg.bi.bi-bar-chart-line</value>
       </entry>
    </selectorCollection>
    <selectorMethod>XPATH</selectorMethod>

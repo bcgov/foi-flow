@@ -79,7 +79,7 @@ WebUI.verifyElementNotPresent(findTestObject('Page_foi.flow/ministry view/form/d
 
 WebUI.click(findTestObject('Page_foi.flow/form/sidebar/div_Sidebar Comments'))
 
-WebUI.click(findTestObject('Page_foi.flow/comment/Page_ABC-2099-50/span_All'))
+WebUI.click(findTestObject('Page_foi.flow/comment/span_All'))
 
 WebUI.verifyElementPresent(findTestObject('Page_foi.flow/comment/div_Comment list 1'), 0)
 

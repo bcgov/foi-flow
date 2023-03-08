@@ -80,7 +80,7 @@ assert WebUI.getAttribute(findTestObject('Page_foi.flow/form/inputs/request deta
 
 WebUI.click(findTestObject('Page_foi.flow/form/assignee dropdown/div_Assigned'))
 
-WebUI.click(findTestObject('Page_foi.flow/form/assignee dropdown/Page_Add Request/li_Flex, Intake'))
+WebUI.click(findTestObject('Page_foi.flow/form/assignee dropdown/li_Flex, Intake'))
 
 Random random = new Random()
 

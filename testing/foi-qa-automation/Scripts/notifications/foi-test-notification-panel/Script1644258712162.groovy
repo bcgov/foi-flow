@@ -109,7 +109,7 @@ DriverFactory.changeWebDriver(user1)
 
 WebUI.click(findTestObject('Page_foi.flow/form/assignee dropdown/div_Assigned'))
 
-WebUI.click(findTestObject('Page_foi.flow/form/assignee dropdown/Page_ABC-2099-104/li_Intake, FOI'))
+WebUI.click(findTestObject('Page_foi.flow/form/assignee dropdown/li_Intake, FOI'))
 
 WebUI.scrollToElement(findTestObject('Page_foi.flow/form/button_Save'), 0)
 
@@ -279,7 +279,7 @@ def requestID2 = WebUI.callTestCase(findTestCase('submit/foi-test-save-request-f
 
 WebUI.click(findTestObject('Page_foi.flow/form/assignee dropdown/div_Assigned'))
 
-WebUI.click(findTestObject('Page_foi.flow/form/assignee dropdown/Page_ABC-2099-104/li_Intake, FOI'))
+WebUI.click(findTestObject('Page_foi.flow/form/assignee dropdown/li_Intake, FOI'))
 
 WebUI.scrollToElement(findTestObject('Page_foi.flow/form/button_Save'), 0)
 

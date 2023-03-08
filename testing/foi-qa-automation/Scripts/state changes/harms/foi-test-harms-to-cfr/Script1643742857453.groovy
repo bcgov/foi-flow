@@ -169,7 +169,7 @@ WebUI.verifyElementAttributeValue(findTestObject('Page_foi.flow/form/sidebar/sta
 
 WebUI.click(findTestObject('Page_foi.flow/form/sidebar/div_Sidebar Comments'))
 
-WebUI.click(findTestObject('Page_foi.flow/comment/Page_ABC-2099-50/span_All'))
+WebUI.click(findTestObject('Page_foi.flow/comment/span_All'))
 
 WebUI.delay(8)
 

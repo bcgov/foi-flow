@@ -41,16 +41,16 @@ WebUI.verifyElementText(findTestObject('Page_foi.flow/comment/p_comment list 1 t
 
 WebUI.verifyElementText(findTestObject('Page_foi.flow/comment/div_Comment list 1 user'), (lastname + ', ') + firstname)
 
-WebUI.click(findTestObject('Page_foi.flow/comment/Page_ABC-2099-50/span_Request History Comments'), FailureHandling.STOP_ON_FAILURE)
+WebUI.click(findTestObject('Page_foi.flow/comment/span_Request History Comments'), FailureHandling.STOP_ON_FAILURE)
 
 WebUI.verifyElementText(findTestObject('Page_foi.flow/comment/p_comment list 1 text'), ((firstname + ' ') + lastname) + 
     ' changed the state of the request to Open')
 
-WebUI.click(findTestObject('Page_foi.flow/comment/Page_ABC-2099-50/span_User Comments'), FailureHandling.STOP_ON_FAILURE)
+WebUI.click(findTestObject('Page_foi.flow/comment/span_User Comments'), FailureHandling.STOP_ON_FAILURE)
 
 WebUI.verifyElementText(findTestObject('Page_foi.flow/comment/p_comment list 1 text'), 'test comment')
 
-WebUI.click(findTestObject('Page_foi.flow/comment/Page_ABC-2099-50/span_All'), FailureHandling.STOP_ON_FAILURE)
+WebUI.click(findTestObject('Page_foi.flow/comment/span_All'), FailureHandling.STOP_ON_FAILURE)
 
 WebUI.verifyElementText(findTestObject('Page_foi.flow/comment/p_comment list 1 text'), 'test comment')
 

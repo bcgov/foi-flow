@@ -113,11 +113,11 @@ WebUI.click(findTestObject('Page_foi.flow/form/sidebar/div_Sidebar Comments'))
 
 WebUI.verifyElementText(findTestObject('Page_foi.flow/form/sidebar/div_Sidebar Comments'), 'Comments (6)')
 
-WebUI.click(findTestObject('Page_foi.flow/comment/Page_ABC-2099-50/span_All'))
+WebUI.click(findTestObject('Page_foi.flow/comment/span_All'))
 
 WebUI.verifyElementPresent(findTestObject('Page_foi.flow/comment/div_Comment list 2'), 0)
 
-WebUI.verifyElementText(findTestObject('Page_foi.flow/comment/Page_ABC-2099-50/p_commentlist3'), ((findTestData(
+WebUI.verifyElementText(findTestObject('Page_foi.flow/comment/p_commentlist3'), ((findTestData(
         'Login Credentials').getValue('First Name', 8) + ' ') + findTestData('Login Credentials').getValue('Last Name', 
         8)) + ' changed the state of the request to Ministry Sign Off')
 

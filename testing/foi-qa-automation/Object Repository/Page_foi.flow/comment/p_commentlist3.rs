@@ -6,15 +6,15 @@
    <elementGuidId>8f8f42f8-3341-42bd-b8ae-248aac1997de</elementGuidId>
    <selectorCollection>
       <entry>
+         <key>CSS</key>
+      </entry>
+      <entry>
          <key>XPATH</key>
          <value>//div[@id='Comments']/div/div[2]/div[2]/div[2]/div/div/div[2]/p</value>
       </entry>
       <entry>
          <key>BASIC</key>
          <value>id(&quot;Comments&quot;)/div[@class=&quot;section&quot;]/div[@class=&quot;displayComments&quot;]/div[2]/div[@class=&quot;commentsection&quot;]/div[@class=&quot;halfDiv&quot;]/div[@class=&quot;userInfo&quot;]/div[@class=&quot;commenttext&quot;]/p[1][count(. | //*[(text() = 'foiedu foiedu changed the state of the request to Ministry Sign Off' or . = 'foiedu foiedu changed the state of the request to Ministry Sign Off')]) = count(//*[(text() = 'foiedu foiedu changed the state of the request to Ministry Sign Off' or . = 'foiedu foiedu changed the state of the request to Ministry Sign Off')])]</value>
-      </entry>
-      <entry>
-         <key>CSS</key>
       </entry>
    </selectorCollection>
    <selectorMethod>BASIC</selectorMethod>

@@ -6,12 +6,12 @@
    <elementGuidId>86191cbf-3e79-4b94-97e9-810f3da06eea</elementGuidId>
    <selectorCollection>
       <entry>
-         <key>XPATH</key>
-         <value>//div[@id='allComments']/span</value>
-      </entry>
-      <entry>
          <key>CSS</key>
          <value>#allComments > span.MuiChip-label.MuiChip-labelSmall.css-1pjtbja</value>
+      </entry>
+      <entry>
+         <key>XPATH</key>
+         <value>//div[@id='allComments']/span</value>
       </entry>
    </selectorCollection>
    <selectorMethod>XPATH</selectorMethod>

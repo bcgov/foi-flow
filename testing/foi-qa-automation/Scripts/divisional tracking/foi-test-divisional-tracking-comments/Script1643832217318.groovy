@@ -35,7 +35,7 @@ WebUI.click(findTestObject('Page_foi.flow/ministry view/form/div_ministry assign
 
 WebUI.click(findTestObject('Page_foi.flow/ministry view/form/ministry assignee/li_ministry assignee foiedu, foiedu'))
 
-//requestID = WebUI.getText(findTestObject('Page_foi.flow/form/Page_ABC-2099-310/h1_ABC-2099-310'), FailureHandling.STOP_ON_FAILURE)
+//requestID = WebUI.getText(findTestObject('null'), FailureHandling.STOP_ON_FAILURE)
 WebUI.scrollToElement(findTestObject('Page_foi.flow/form/button_Save'), 0)
 
 WebUI.click(findTestObject('Page_foi.flow/ministry view/form/divisional tracking/div_ministry division dropdown'))
@@ -75,7 +75,7 @@ WebUI.click(findTestObject('Page_foi.flow/queue/div_My Team Requests'))
 //WebUI.callTestCase(findTestCase('helper/foi-test-advanced-search-by-id'), [('requestID') : requestID], FailureHandling.STOP_ON_FAILURE)
 //WebUI.click(findTestObject('Page_foi.flow/queue/h3_Advanced Search'))
 //WebUI.click(findTestObject('Page_foi.flow/queue/advanced search/div_advanced search field selector ID NUMBER'))
-//WebUI.click(findTestObject('Page_foi.flow/queue/Page_FOI Advanced Search/span_Call for Records'))
+//WebUI.click(findTestObject('null'))
 //WebUI.setText(findTestObject('Page_foi.flow/queue/advanced search/input_advancedSearch'), requestID)
 WebUI.setText(findTestObject('Page_foi.flow/queue/input_Dashboard Filter'), requestID)
 
@@ -88,10 +88,10 @@ WebUI.click(findTestObject('Page_foi.flow/queue/div_request queue row 1'))
 WebUI.scrollToElement(findTestObject('Page_foi.flow/form/button_Save'), 0)
 
 //WebUI.click(findTestObject('Page_foi.flow/ministry view/form/divisional tracking/div_ministry division dropdown'))
-WebUI.verifyElementText(findTestObject('Page_foi.flow/ministry view/form/divisional tracking/Page_EDU-234-56789/div_Deputy Ministers Office'), 
+WebUI.verifyElementText(findTestObject('Page_foi.flow/ministry view/form/divisional tracking/division dropdown options/div_Deputy Ministers Office'), 
     'Deputy Minister’s Office')
 
-WebUI.verifyElementText(findTestObject('Page_foi.flow/ministry view/form/divisional tracking/Page_EDU-234-56789/div_Clarification'), 
+WebUI.verifyElementText(findTestObject('Page_foi.flow/ministry view/form/divisional tracking/division dropdown options/div_Clarification'), 
     'Clarification')
 
 //WebDriver ministryUser = DriverFactory.getWebDriver()
@@ -99,7 +99,7 @@ DriverFactory.changeWebDriver(ministryUser)
 
 WebUI.click(findTestObject('Page_foi.flow/form/sidebar/div_Sidebar Comments'), FailureHandling.STOP_ON_FAILURE)
 
-WebUI.click(findTestObject('Page_foi.flow/comment/Page_ABC-2099-50/Page_EDU-222-12345/span_Divisional Tracking'))
+WebUI.click(findTestObject('Page_foi.flow/comment/span_Divisional Tracking'))
 
 WebUI.verifyElementText(findTestObject('Page_foi.flow/comment/p_comment list 1 text'), 'Deputy Minister’s Office division has been added with stage Clarification')
 
@@ -130,7 +130,7 @@ DriverFactory.changeWebDriver(ministryUser)
 
 WebUI.click(findTestObject('Page_foi.flow/form/sidebar/div_Sidebar Comments'), FailureHandling.STOP_ON_FAILURE)
 
-WebUI.click(findTestObject('Page_foi.flow/comment/Page_ABC-2099-50/Page_EDU-222-12345/span_Divisional Tracking'))
+WebUI.click(findTestObject('Page_foi.flow/comment/span_Divisional Tracking'))
 
 WebUI.verifyElementText(findTestObject('Page_foi.flow/comment/p_comment list 1 text'), 'Deputy Minister’s Office division has been updated to stage Assigned to Division')
 
@@ -165,7 +165,7 @@ DriverFactory.changeWebDriver(ministryUser)
 
 WebUI.click(findTestObject('Page_foi.flow/form/sidebar/div_Sidebar Comments'), FailureHandling.STOP_ON_FAILURE)
 
-WebUI.click(findTestObject('Page_foi.flow/comment/Page_ABC-2099-50/Page_EDU-222-12345/span_Divisional Tracking'))
+WebUI.click(findTestObject('Page_foi.flow/comment/span_Divisional Tracking'))
 
 WebUI.verifyElementText(findTestObject('Page_foi.flow/comment/p_comment list 1 text'), 'Learning and Education Programs division has been added with stage Assigned to Division')
 
@@ -215,7 +215,7 @@ WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT, FailureHandling.STOP_ON_FAILURE)
 
 WebUI.click(findTestObject('Page_foi.flow/form/sidebar/div_Sidebar Comments'), FailureHandling.STOP_ON_FAILURE)
 
-WebUI.click(findTestObject('Page_foi.flow/comment/Page_ABC-2099-50/Page_EDU-222-12345/span_Divisional Tracking'))
+WebUI.click(findTestObject('Page_foi.flow/comment/span_Divisional Tracking'))
 
 WebUI.verifyElementText(findTestObject('Page_foi.flow/comment/p_comment list 1 text'), 'Minister’s Office division with stage Clarification has been removed')
 

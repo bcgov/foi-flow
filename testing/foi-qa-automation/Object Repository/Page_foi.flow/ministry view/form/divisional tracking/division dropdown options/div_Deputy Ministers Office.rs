@@ -6,16 +6,16 @@
    <elementGuidId>1d1923ff-7aa4-401d-bcee-d881cca95424</elementGuidId>
    <selectorCollection>
       <entry>
+         <key>CSS</key>
+         <value>div.text-right.col</value>
+      </entry>
+      <entry>
          <key>XPATH</key>
          <value>//div[@id='divisionalTracking']/div/div/div</value>
       </entry>
       <entry>
          <key>BASIC</key>
          <value>//*[(text() = 'Deputy Minister’s Office' or . = 'Deputy Minister’s Office')]</value>
-      </entry>
-      <entry>
-         <key>CSS</key>
-         <value>div.text-right.col</value>
       </entry>
    </selectorCollection>
    <selectorMethod>BASIC</selectorMethod>

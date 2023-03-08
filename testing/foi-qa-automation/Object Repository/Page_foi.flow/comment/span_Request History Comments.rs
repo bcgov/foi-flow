@@ -1,119 +1,119 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <WebElementEntity>
    <description></description>
-   <name>div_Clarification</name>
+   <name>span_Request History Comments</name>
    <tag></tag>
-   <elementGuidId>71df1691-a476-45ea-b3c4-edf579630480</elementGuidId>
+   <elementGuidId>4e68651a-3886-4321-9d12-c670498ede11</elementGuidId>
    <selectorCollection>
       <entry>
+         <key>CSS</key>
+         <value>#teamRequests > span.MuiChip-label.MuiChip-labelSmall.css-1pjtbja</value>
+      </entry>
+      <entry>
          <key>XPATH</key>
-         <value>//div[@id='divisionalTracking']/div/div/div[3]</value>
+         <value>//span[(text() = 'Request History Comments' or . = 'Request History Comments')]</value>
       </entry>
       <entry>
          <key>BASIC</key>
-         <value>//*[(text() = 'Clarification' or . = 'Clarification')]</value>
-      </entry>
-      <entry>
-         <key>CSS</key>
-         <value>div.text-left.col</value>
+         <value>//*[(text() = 'Request History Comments' or . = 'Request History Comments')]</value>
       </entry>
    </selectorCollection>
-   <selectorMethod>BASIC</selectorMethod>
+   <selectorMethod>XPATH</selectorMethod>
    <useRalativeImagePath>true</useRalativeImagePath>
    <webElementProperties>
       <isSelected>false</isSelected>
       <matchCondition>equals</matchCondition>
       <name>tag</name>
       <type>Main</type>
-      <value>div</value>
-      <webElementGuid>b8dbfbee-9e7f-4570-a2a7-b85130292d6b</webElementGuid>
+      <value>span</value>
+      <webElementGuid>5d29acbc-a48f-4daf-bd8a-9230cfe73db4</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
       <matchCondition>equals</matchCondition>
       <name>class</name>
       <type>Main</type>
-      <value>text-left col</value>
-      <webElementGuid>48744869-7ec1-47de-90f9-8edb78e8620d</webElementGuid>
+      <value>MuiChip-label MuiChip-labelSmall css-1pjtbja</value>
+      <webElementGuid>9b1845f8-784a-442d-a1b3-6d12755cd209</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>true</isSelected>
       <matchCondition>equals</matchCondition>
       <name>text</name>
       <type>Main</type>
-      <value>Clarification</value>
-      <webElementGuid>8978dbf7-ea75-4443-8d13-cb02ec852117</webElementGuid>
+      <value>Request History Comments</value>
+      <webElementGuid>bd13632f-1940-467d-81a8-5f2e17c372ab</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
       <matchCondition>equals</matchCondition>
       <name>xpath</name>
       <type>Main</type>
-      <value>id(&quot;divisionalTracking&quot;)/div[@class=&quot;MuiAccordionDetails-root&quot;]/div[@class=&quot;divisions-row row&quot;]/div[@class=&quot;text-left col&quot;]</value>
-      <webElementGuid>7f029a2f-053a-4d31-a4cb-8d74a7e7521a</webElementGuid>
+      <value>id(&quot;teamRequests&quot;)/span[@class=&quot;MuiChip-label MuiChip-labelSmall css-1pjtbja&quot;]</value>
+      <webElementGuid>37f8f251-57f3-427f-825a-2e2aeef20d6e</webElementGuid>
    </webElementProperties>
    <webElementXpaths>
       <isSelected>true</isSelected>
       <matchCondition>equals</matchCondition>
       <name>xpath:idRelative</name>
       <type>Main</type>
-      <value>//div[@id='divisionalTracking']/div/div/div[3]</value>
-      <webElementGuid>337fba35-7823-4b15-a6c1-3fccbb2c85c8</webElementGuid>
+      <value>//div[@id='teamRequests']/span</value>
+      <webElementGuid>c9ce3216-157e-4aee-b52a-231a7dde15f4</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
       <matchCondition>equals</matchCondition>
       <name>xpath:neighbor</name>
       <type>Main</type>
-      <value>(.//*[normalize-space(text()) and normalize-space(.)='Deputy Minister’s Office'])[1]/following::div[5]</value>
-      <webElementGuid>db69fc7e-cff1-4b1c-98b0-6ba336d20686</webElementGuid>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='User Comments'])[1]/following::span[2]</value>
+      <webElementGuid>6818dcb4-15e0-4cc1-991f-f60b48d5cc74</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
       <matchCondition>equals</matchCondition>
       <name>xpath:neighbor</name>
       <type>Main</type>
-      <value>(.//*[normalize-space(text()) and normalize-space(.)='No extensions taken.'])[1]/following::div[17]</value>
-      <webElementGuid>8953e445-8886-4863-aa29-1d255fefcb40</webElementGuid>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='Search Comments'])[2]/following::span[4]</value>
+      <webElementGuid>adaddaea-9573-48c3-a099-b733748328ab</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
       <matchCondition>equals</matchCondition>
       <name>xpath:neighbor</name>
       <type>Main</type>
-      <value>(.//*[normalize-space(text()) and normalize-space(.)='Sync with AXIS'])[1]/preceding::div[1]</value>
-      <webElementGuid>57fb22ba-e4c2-4952-903b-191b9b146f34</webElementGuid>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='Divisional Tracking'])[1]/preceding::span[2]</value>
+      <webElementGuid>c1c398b3-7d3b-4748-a23c-9042c00f178e</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
       <matchCondition>equals</matchCondition>
       <name>xpath:neighbor</name>
       <type>Main</type>
-      <value>(.//*[normalize-space(text()) and normalize-space(.)='Save'])[1]/preceding::div[1]</value>
-      <webElementGuid>7771d0e3-61da-4879-b7b4-ab8b17d8e4d3</webElementGuid>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='All'])[1]/preceding::span[4]</value>
+      <webElementGuid>c68849e6-b693-423e-95d9-fc1ed645e924</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
       <matchCondition>equals</matchCondition>
       <name>xpath:neighbor</name>
       <type>Main</type>
-      <value>//*/text()[normalize-space(.)='Clarification']/parent::*</value>
-      <webElementGuid>4387330a-4bf4-4851-a160-721bbfc4b46e</webElementGuid>
+      <value>//*/text()[normalize-space(.)='Request History Comments']/parent::*</value>
+      <webElementGuid>170ef4b7-6ba1-4f3f-a82f-1409a4cb0b7f</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
       <matchCondition>equals</matchCondition>
       <name>xpath:position</name>
       <type>Main</type>
-      <value>//div[9]/div/div[2]/div/div/div/div/div/div[3]</value>
-      <webElementGuid>d18f46be-b40b-471f-9be2-f6316cb8a296</webElementGuid>
+      <value>//div[2]/div/div/div/div[2]/div/div[2]/span</value>
+      <webElementGuid>a13785e9-38b6-4a0f-810c-9b9f23eafe02</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
       <matchCondition>equals</matchCondition>
       <name>xpath:customAttributes</name>
       <type>Main</type>
-      <value>//div[(text() = 'Clarification' or . = 'Clarification')]</value>
-      <webElementGuid>43b91b1d-ade6-4775-9fa9-2e695ff7d93c</webElementGuid>
+      <value>//span[(text() = 'Request History Comments' or . = 'Request History Comments')]</value>
+      <webElementGuid>eaaae93e-8a4d-46bf-b3b7-0809be39ae5e</webElementGuid>
    </webElementXpaths>
 </WebElementEntity>

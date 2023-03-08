@@ -142,7 +142,7 @@ WebUI.verifyElementAttributeValue(findTestObject('Page_foi.flow/form/sidebar/sta
 
 WebUI.click(findTestObject('Page_foi.flow/form/sidebar/div_Sidebar Comments'))
 
-WebUI.click(findTestObject('Page_foi.flow/comment/Page_ABC-2099-50/span_Request History Comments'))
+WebUI.click(findTestObject('Page_foi.flow/comment/span_Request History Comments'))
 
 WebUI.verifyElementText(findTestObject('Page_foi.flow/comment/p_comment list 1 text'), ((findTestData('Login Credentials').getValue(
         'First Name', 7) + ' ') + findTestData('Login Credentials').getValue('Last Name', 7)) + ' changed the state of the request to Closed')
@@ -172,7 +172,7 @@ WebUI.verifyElementAttributeValue(findTestObject('Page_foi.flow/form/inputs/requ
 
 WebUI.click(findTestObject('Page_foi.flow/form/sidebar/div_Sidebar Comments'))
 
-WebUI.click(findTestObject('Page_foi.flow/comment/Page_ABC-2099-50/span_Request History Comments'))
+WebUI.click(findTestObject('Page_foi.flow/comment/span_Request History Comments'))
 
 //WebUI.verifyElementText(findTestObject('Page_foi.flow/comment/p_comment list 1 text'), ((findTestData('Login Credentials').getValue(
  //       'First Name', 7) + ' ') + findTestData('Login Credentials').getValue('Last Name', 7)) + ' changed the state of the request to Deduplication')

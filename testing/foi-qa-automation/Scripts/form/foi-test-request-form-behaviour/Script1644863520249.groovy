@@ -107,7 +107,7 @@ def earlierDate = new Date().plus(10)
 //    'min', WebUI.getAttribute(findTestObject('Page_foi.flow/form/inputs/request description/input_Search Start Date'), 'value'), 
 //   0)
 //WebUI.scrollToPosition(534, 10)
-//WebUI.waitForElementClickable(findTestObject('TC/Page_U-00200/span_EDU_checkmark'), 0)
+//WebUI.waitForElementClickable(findTestObject('null'), 0)
 //WebUI.verifyElementHasAttribute(findTestObject('Page_foi.flow/form/inputs/request description/input_EDU checkbox'), 'checked', 
 //   0)
 
@@ -149,11 +149,11 @@ WebUI.verifyElementAttributeValue(findTestObject('Page_foi.flow/form/sidebar/div
 WebUI.verifyElementAttributeValue(findTestObject('Page_foi.flow/form/sidebar/div_Sidebar Comments'), 'class', 'tablinks active', 
     0)
 
-WebUI.verifyElementPresent(findTestObject('Page_foi.flow/comment/Page_ABC-2099-50/span_All'), 0)
+WebUI.verifyElementPresent(findTestObject('Page_foi.flow/comment/span_All'), 0)
 
-WebUI.verifyElementPresent(findTestObject('Page_foi.flow/comment/Page_ABC-2099-50/span_Request History Comments'), 0)
+WebUI.verifyElementPresent(findTestObject('Page_foi.flow/comment/span_Request History Comments'), 0)
 
-WebUI.verifyElementPresent(findTestObject('Page_foi.flow/comment/Page_ABC-2099-50/span_User Comments'), 0)
+WebUI.verifyElementPresent(findTestObject('Page_foi.flow/comment/span_User Comments'), 0)
 
 WebUI.verifyElementPresent(findTestObject('Page_foi.flow/form/sidebar/a_FOI'), 0 //WebUI.verifyElementPresent(findTestObject('Page_foi.flow/form/sidebar/i_Home logo'), 0)
     //WebUI.verifyElementAttributeValue(findTestObject('Page_foi.flow/form/sidebar/a_FOI'), 'href', GlobalVariable.BASE_URL + 

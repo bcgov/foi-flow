@@ -84,7 +84,7 @@ WebUI.click(findTestObject('Page_foi.flow/form/assignee dropdown/div_Assigned'))
 WebUI.verifyElementPresent(findTestObject('Page_foi.flow/form/assignee dropdown/li_Flex Team'), 0)
 
 //WebUI.verifyElementPresent(findTestObject('Page_foi.flow/form/assignee dropdown/li_Processing Team'), 0)
-WebUI.click(findTestObject('Page_foi.flow/form/assignee dropdown/Page_U-00197/li_Processing, foiIntake'), FailureHandling.STOP_ON_FAILURE)
+WebUI.click(findTestObject('Page_foi.flow/form/assignee dropdown/li_Processing, foiIntake'), FailureHandling.STOP_ON_FAILURE)
 
 WebUI.click(findTestObject('Page_foi.flow/form/watch/div_add other watchers'))
 
