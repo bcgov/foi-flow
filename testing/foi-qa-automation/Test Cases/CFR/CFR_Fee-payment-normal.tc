@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <TestCaseEntity>
    <description></description>
-   <name>TC</name>
+   <name>CFR_Fee-payment-normal</name>
    <tag></tag>
    <comment></comment>
-   <testCaseGuid>e7ddb81b-dc80-415c-a70e-2da52ffc9407</testCaseGuid>
+   <testCaseGuid>f317e3a0-e9a2-4c9f-8d1e-e9eadf79eabd</testCaseGuid>
 </TestCaseEntity>

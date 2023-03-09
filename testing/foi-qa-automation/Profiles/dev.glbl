@@ -6,7 +6,7 @@
    <defaultProfile>true</defaultProfile>
    <GlobalVariableEntity>
       <description></description>
-      <initValue>'https://dev.foirequests.gov.bc.ca/'</initValue>
+      <initValue>'https://dev.foirequests.gov.bc.ca'</initValue>
       <name>BASE_URL</name>
    </GlobalVariableEntity>
    <GlobalVariableEntity>
