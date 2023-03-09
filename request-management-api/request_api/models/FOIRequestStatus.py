@@ -22,6 +22,12 @@ class FOIRequestStatus(db.Model):
         query = db.session.query(FOIRequestStatus).filter_by(name=status).first()
         return requeststatus_schema.dump(query)
 
+    @classmethod
+    def getrequeststatusname(cls,statusid):
+        requeststatus_schema = RequestStatusSchema()
+        query = db.session.query(FOIRequestStatus).filter_by(requeststatusid=statusid, isactive=True).first()
+        return requeststatus_schema.dump(query)
+
 class RequestStatusSchema(ma.Schema):
     class Meta:
         fields = ('requeststatusid', 'name', 'description','isactive')

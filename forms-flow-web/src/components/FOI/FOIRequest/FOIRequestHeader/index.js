@@ -9,14 +9,19 @@ import Input from '@material-ui/core/Input';
 import FOI_COMPONENT_CONSTANTS from '../../../../constants/FOI/foiComponentConstants';
 import { StateEnum } from '../../../../constants/FOI/statusEnum';
 import { useParams } from 'react-router-dom';
-import { calculateDaysRemaining } from "../../../../helper/FOI/helper";
+import { calculateDaysRemaining, isRequestWatcherOrAssignee } from "../../../../helper/FOI/helper";
 import { Watcher } from '../../customComponents';
 import { createAssigneeDetails } from '../utils'
 import {
   saveAssignee
 } from "../../../../apiManager/services/FOI/foiAssigneeServices";
+import {
+  fetchRestrictedRequestCommentTagList
+} from "../../../../apiManager/services/FOI/foiRequestServices";
 import { toast } from "react-toastify";
 import _ from 'lodash';
+import RequestRestriction from "../../customComponents/RequestRestriction";
+import ConfirmModal from "../../customComponents/ConfirmModal";
 
 const useStyles = makeStyles((theme) => ({
     formControl: {
@@ -55,10 +60,24 @@ const FOIRequestHeader = React.memo(
     const assignedToList = useSelector(
       (state) => state.foiRequests.foiAssignedToList
     );
-   
+    const [isIAORestrictedRequest,setIsIAORestrictedRequest] = useState(false);
     let assigneeDetails = _.pick(requestDetails, ['assignedGroup', 'assignedTo','assignedToFirstName','assignedToLastName',
     'assignedministrygroup','assignedministryperson','assignedministrypersonFirstName','assignedministrypersonLastName']);
     const [assigneeObj, setAssigneeObj] = useState(assigneeDetails);
+
+    const isIAORestrictedFileManager = () => {
+      return userDetail?.role?.includes("IAORestrictedFilesManager");
+    }
+
+    const isRestricted = () => {
+      if(ministryId){
+        return requestDetails?.iaorestricteddetails?.isrestricted;
+      } 
+      else
+        return requestDetails?.isiaorestricted;
+    }
+
+    const [disableHeaderInput, setDisableHeaderInput] = useState(disableInput || (isRestricted() && !isIAORestrictedFileManager()));
     //handle default value for the validation of required fields
     React.useEffect(() => {
       let _daysRemaining = calculateDaysRemaining(requestDetails.dueDate);
@@ -67,9 +86,9 @@ const FOIRequestHeader = React.memo(
         ? calculateDaysRemaining(requestDetails.cfrDueDate)
         : "";
       handlestatusudpate(_daysRemaining, _status, _cfrDaysRemaining);
-     
+      setIsIAORestrictedRequest(isRestricted());
+      setDisableHeaderInput(disableInput || (isRestricted() && !isIAORestrictedFileManager()));
     }, [requestDetails, handleAssignedToInitialValue, handlestatusudpate]);
-
     useEffect(() => {
       setAssignedTo(getAssignedTo(assigneeObj));
     }, [assigneeObj]);
@@ -80,6 +99,13 @@ const FOIRequestHeader = React.memo(
 
     const preventDefault = (event) => event.preventDefault();
 
+    const requestWatchers = useSelector((state) => state.foiRequests.foiWatcherList);
+    const [showModal, setShowModal] = useState(false);
+    const [modalMessage, setModalMessage] = useState(<></>);    
+    const [modalDescription, setModalDescription] = useState(<></>);
+    const [assigneeVal, setAssigneeVal]= useState("");
+    const [assigneeName,setAssigneeName] = useState("");
+    const [isLoaded, setIsLoaded] = useState(false);
 
     useEffect(() => {
       // handle case where assigned user was removed from group
@@ -94,60 +120,88 @@ const FOIRequestHeader = React.memo(
 
     useEffect(() => {
       setMenuItems(
-        getMenuItems({ classes, assignedToList, selectedAssignedTo })
+        getMenuItems({ classes, assignedToList, selectedAssignedTo, isIAORestrictedRequest })
       );
     }, [selectedAssignedTo, assignedToList]);
+
+    const handleAssigneeUpdate = (event) => {
+      let AssigneeValue = event?.target?.value;
+      let [groupName, username, firstName, lastName] = AssigneeValue.split('|');
+      let fullName = firstName !== "" ? `${lastName}, ${firstName}` : username;
+      setAssigneeVal(AssigneeValue);
+      setAssigneeName(fullName);
+
+      if(isIAORestrictedRequest){
+        setModalMessage(<span>Are you sure you want to assign <b>{fullName}</b> to this request?</span>);
+        setModalDescription(<span><i>This will allow them to have access to this restricted request content.</i></span>);
+        setShowModal(true);
+      }
+      else
+        saveAssigneeDetails(AssigneeValue, fullName);
+    }
     
-    const saveAssigneeDetails = (event) => {
-      setAssignedTo(event.target.value);
-          if (isAddRequest) {
-            //event bubble up - to validate required fields
-            handleAssignedToValue(event.target.value);
-            createSaveRequestObject(
-              FOI_COMPONENT_CONSTANTS.ASSIGNED_TO,
-              event.target.value,
-              event.target.name
-            );
-          } else {
-            setAssigneeObj(createAssigneeDetails(event.target.value, event.target.name));  
-            assigneeDetails = createAssigneeDetails(event.target.value, event.target.name);
-            dispatch(
-              saveAssignee(assigneeDetails, requestId, ministryId, false, (err, _res) => {
-                if(!err) {
-                  toast.success("Assignee has been saved successfully.", {
-                    position: "top-right",
-                    autoClose: 3000,
-                    hideProgressBar: true,
-                    closeOnClick: true,
-                    pauseOnHover: true,
-                    draggable: true,
-                    progress: undefined,
-                  });
-                  createSaveRequestObject(
-                    FOI_COMPONENT_CONSTANTS.ASSIGNED_TO,
-                    event.target.value,
-                    event.target.name
-                  );
-                  //event bubble up - to validate required fields
-                  handleAssignedToValue(event.target.value);
-                } else {
-                  toast.error(
-                    "Temporarily unable to save the assignee. Please try again in a few minutes.",
-                    {
-                      position: "top-right",
-                      autoClose: 3000,
-                      hideProgressBar: true,
-                      closeOnClick: true,
-                      pauseOnHover: true,
-                      draggable: true,
-                      progress: undefined,
-                    }
-                  );
+    const resetModal = () => {
+      setShowModal(false);
+    }
+
+    const saveAssigneeDetails = (assigneeVal, assigneeName) => {
+      setAssignedTo(assigneeVal);
+      if (isAddRequest) {
+        //event bubble up - to validate required fields
+        handleAssignedToValue(assigneeVal);
+        createSaveRequestObject(
+          FOI_COMPONENT_CONSTANTS.ASSIGNED_TO,
+          assigneeVal,
+          assigneeName
+        );
+      } else {
+        setAssigneeObj(createAssigneeDetails(assigneeVal, assigneeName));  
+        assigneeDetails = createAssigneeDetails(assigneeVal, assigneeName);
+        dispatch(
+          saveAssignee(assigneeDetails, requestId, ministryId, false, (err, _res) => {
+            if(!err) {
+              toast.success("Assignee has been saved successfully.", {
+                position: "top-right",
+                autoClose: 3000,
+                hideProgressBar: true,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+              });
+              createSaveRequestObject(
+                FOI_COMPONENT_CONSTANTS.ASSIGNED_TO,
+                assigneeVal,
+                assigneeName
+              );
+              //event bubble up - to validate required fields
+              handleAssignedToValue(assigneeVal);
+              requestDetails.assignedGroup = assigneeDetails.assignedGroup;
+              requestDetails.assignedTo = assigneeDetails.assignedTo;
+              requestDetails.assignedToFirstName = assigneeDetails.assignedToFirstName;
+              requestDetails.assignedToLastName = assigneeDetails.assignedToLastName;
+              requestDetails.assignedToName = assigneeDetails.assignedToName
+              if(isRestricted())
+                dispatch(fetchRestrictedRequestCommentTagList(requestId, ministryId));
+            } else {
+              toast.error(
+                "Temporarily unable to save the assignee. Please try again in a few minutes.",
+                {
+                  position: "top-right",
+                  autoClose: 3000,
+                  hideProgressBar: true,
+                  closeOnClick: true,
+                  pauseOnHover: true,
+                  draggable: true,
+                  progress: undefined,
                 }
-              })
-            )
-          }
-        }
+              );
+            }
+          })
+        )
+      }
+      
+    }
 
     const status = getStatus({ headerValue, requestDetails });
 
@@ -170,68 +224,96 @@ const FOIRequestHeader = React.memo(
     }
     const ministryAssignedTo = getMinistryAssignedTo();
     const watcherList = assignedToList.filter(assignedTo => assignedTo.type === 'iao');
+
     return (
-      <div className="foi-request-review-header-row1">
-        <div className="foi-request-review-header-col1">
-          <div className="foi-request-review-header-col1-row">
-            <Link href="#" onClick={preventDefault}>
-              <h3 className="foi-review-request-text">{headerText}</h3>
-            </Link>
+      <>
+      <div className='row'>
+        <div className="col-lg-6">
+          <div className='axis-request-id'>
+              <Link href="#" onClick={preventDefault}>
+                <h3 className="foi-review-request-text">{headerText}</h3>
+              </Link>
           </div>
-          {window.location.href.indexOf(FOI_COMPONENT_CONSTANTS.ADDREQUEST) ===
-            -1 && (
-            <div
-              className="foi-request-review-header-col1-row"
-              style={{ marginTop: 5 + "px", display: "block" }}
-            >
-              <Watcher
-                watcherFullList={watcherList}
-                requestId={requestId}
-                ministryId={ministryId}
-                userDetail={userDetail}
-                disableInput={disableInput}
-              />
-            </div>
-          )}
         </div>
-
-        <div className="foi-assigned-to-container">
-          <div className="foi-assigned-to-inner-container">
-            <TextField
-              id="assignedTo"
-              label={showMinistryAssignedTo ? "IAO Assigned To" : "Assigned To"}
-              inputProps={{ "aria-labelledby": "assignedTo-label"}}
-              InputLabelProps={{ shrink: true }}
-              select
-              value={selectedAssignedTo}
-              onChange={saveAssigneeDetails}
-              input={<Input />}
-              variant="outlined"
-              fullWidth
-              required
-              disabled={disableInput}
-              error={selectedAssignedTo.toLowerCase().includes("unassigned")}
-            >
-              {menuItems}
-            </TextField>
-          </div>
-
-          {showMinistryAssignedTo && (
-            <>
-            <TextField
-                id="ministryAssignedTotxt"
-                label="Ministry Assigned To"
+        <div className="col-lg-6">
+          <div className="foi-assignee-dropdown">
+              <TextField
+                id="assignedTo"
+                label={showMinistryAssignedTo ? "IAO Assigned To" : "Assigned To"}
+                inputProps={{ "aria-labelledby": "assignedTo-label"}}
                 InputLabelProps={{ shrink: true }}
-                value={ministryAssignedTo}
+                select
+                value={selectedAssignedTo}
+                onChange={handleAssigneeUpdate}
+                input={<Input />}
                 variant="outlined"
                 fullWidth
-                disabled={true}
-              />
-            </>
-          )}
+                required
+                disabled={disableHeaderInput}
+                error={selectedAssignedTo.toLowerCase().includes("unassigned")}
+              >
+                {menuItems}
+              </TextField>
+            </div>
         </div>
       </div>
+      <div className='row'>
+        <div className="col-lg-8">
+          <div className="foi-request-review-header-col1-row">
+          {window.location.href.indexOf(FOI_COMPONENT_CONSTANTS.ADDREQUEST) ===
+              -1 && (
+              <div className="foi-request-review-header-col1-row">
+                <Watcher
+                  watcherFullList={watcherList}
+                  requestId={requestId}
+                  ministryId={ministryId}
+                  userDetail={userDetail}
+                  disableInput={disableHeaderInput}
+                  isIAORestrictedRequest={isIAORestrictedRequest}
+                  setIsLoaded={setIsLoaded}
+                />
+              </div>
+            )}
+          {!isAddRequest && status.toLowerCase() !== StateEnum.unopened.name.toLowerCase() && (isIAORestrictedFileManager() ||
+            (isLoaded && isRequestWatcherOrAssignee(requestWatchers,assigneeObj,userDetail?.preferred_username))) && 
+          <RequestRestriction 
+            isiaorestricted= {isRestricted()}
+            isIAORestrictedFileManager={isIAORestrictedFileManager()}
+            requestDetails={requestDetails}
+            />
+          }
+          </div>
+        </div>
+        <div className="col-lg-4">
+          <div className="foi-assignee-dropdown">
+            {showMinistryAssignedTo && (
+                  <>
+                  <TextField
+                      id="ministryAssignedTotxt"
+                      label="Ministry Assigned To"
+                      InputLabelProps={{ shrink: true }}
+                      value={ministryAssignedTo}
+                      variant="outlined"
+                      fullWidth
+                      disabled={true}
+                    />
+                  </>
+                )}
+          </div>
+        </div>
+      </div>
+
+      <ConfirmModal 
+          modalMessage= {modalMessage}
+          modalDescription= {modalDescription} 
+          showModal={showModal}
+          saveAssigneeDetails = {saveAssigneeDetails}
+          assigneeVal={assigneeVal}
+          assigneeName ={assigneeName}
+          resetModal = {resetModal} />
+      </>
     );
+    
   }
 );
 

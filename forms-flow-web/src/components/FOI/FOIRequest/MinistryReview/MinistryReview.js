@@ -34,6 +34,7 @@ import {
 import {
   ConditionalComponent,
   calculateDaysRemaining,
+  addToRestrictedRequestTagList
 } from "../../../../helper/FOI/helper";
 import ApplicantDetails from "./ApplicantDetails";
 import ChildDetails from "./ChildDetails";
@@ -56,6 +57,8 @@ import DivisionalTracking from "../DivisionalTracking";
 import HomeIcon from '@mui/icons-material/Home';
 import { RecordsLog } from '../../customComponents/Records';
 import { UnsavedModal } from "../../customComponents";
+import _ from 'lodash';
+
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -172,6 +175,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
 
   const [attachments, setAttachments] = useState(requestAttachments);
   const dispatch = useDispatch();
+  const requestWatchers = useSelector((state) => state.foiRequests.foiWatcherList);
 
   useEffect(() => {
     if (window.location.href.indexOf("comments") > -1) {
@@ -202,6 +206,8 @@ const MinistryReview = React.memo(({ userDetail }) => {
   const [divstages, setdivStages] = React.useState([]);
   const [originalDivisions, setOriginalDivisions] = React.useState([])
   const [hasReceivedDate, setHasReceivedDate] = React.useState(true);
+  const [isMinistryRestricted, setIsMinistryRestricted] = useState(false);
+
 
   let ministryassignedtousername = "Unassigned";
   useEffect(() => {
@@ -218,8 +224,16 @@ const MinistryReview = React.memo(({ userDetail }) => {
     if (requestDetails && Object.keys(requestDetails).length !== 0) {
       setRequestState(requestDetails.currentState);
       settabStatus(requestDetails.currentState);
+      setIsMinistryRestricted(requestDetails.ministryrestricteddetails?.isrestricted);
     }
   }, [requestDetails, unSavedRequest]);
+
+  useEffect(() => {
+    if(isMinistryRestricted){
+      let assigneeDetails=_.pick(requestDetails, ['assignedministrygroup','assignedministryperson','assignedministrypersonFirstName','assignedministrypersonLastName']);
+      addToRestrictedRequestTagList(requestWatchers,assigneeDetails);
+    }
+  }, [isMinistryRestricted, requestWatchers]);
 
   const [unSavedRequest, setUnSavedRequest] = React.useState(false);
   const [recordsUploading, setRecordsUploading] = React.useState(false);
@@ -618,6 +632,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
                           setSaveMinistryRequestObject={
                             setSaveMinistryRequestObject
                           }
+                          ministryAssigneeValue={ministryAssignedToValue}
                         />
                         <ApplicantDetails requestDetails={requestDetails} />
                         <ChildDetails requestDetails={requestDetails} />
@@ -737,6 +752,8 @@ const MinistryReview = React.memo(({ userDetail }) => {
                   setEditorChange={setEditorChange}
                   removeComment={removeComment}
                   setRemoveComment={setRemoveComment}
+                  restrictionType={requestDetails?.ministryrestricteddetails?.isrestricted ? "ministry" : ""}
+                  isRestricted={requestDetails?.ministryrestricteddetails?.isrestricted}
                 />
               </>
             ) : (

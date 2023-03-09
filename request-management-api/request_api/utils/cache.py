@@ -57,3 +57,13 @@ def clear_cache():
     except Exception as ex:    
         logging.error(ex)        
     return False
+
+
+def clear_cache_key(key):
+    try:
+        if os.getenv('CACHE_ENABLED') == 'Y':
+            cache_client.delete(key)
+            return True
+    except Exception as ex:    
+        logging.error(ex)        
+    return False

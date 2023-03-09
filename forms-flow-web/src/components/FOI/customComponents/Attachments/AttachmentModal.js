@@ -199,7 +199,7 @@ export default function AttachmentModal({
         case "replace":
           let _message = {};
             if (uploadFor === 'record') {
-              _message = {title: "Replace Records", body:`Replace record with manually converted PDF of the same document. The original file will still be available for download.` }
+              _message = {title: "Replace Records", body:<>Replace record with manually converted PDF of the same document.<br></br>The original file will still be available for download.</> }
             } else if (attachment) {
               switch(attachment.category.toLowerCase()) {
                 case StateTransitionCategories.cfrreview.name: 
@@ -213,6 +213,12 @@ export default function AttachmentModal({
                   break;
                 case StateTransitionCategories.harmsreview.name: 
                   _message = {title: "Replace Attachment", body: <>This attachment must be replaced as it was uploaded during the state change. Please replace attachment with document from Request #{requestNumber} changing from <b>{StateTransitionCategories.harmsreview.fromState}</b> to <b>{StateTransitionCategories.harmsreview.toState}</b>.</>};
+                  break;
+                case StateTransitionCategories.responsereview.name: 
+                  _message = {title: "Replace Attachment", body: <>This attachment must be replaced as it was uploaded during the state change. Please replace attachment with document from Request #{requestNumber} changing from <b>{StateTransitionCategories.responsereview.fromState}</b> to <b>{StateTransitionCategories.responsereview.toState}</b>.</>};
+                  break;
+                case StateTransitionCategories.signoffreview.name: 
+                  _message = {title: "Replace Attachment", body: <>This attachment must be replaced as it was uploaded during the state change. Please replace attachment with document from Request #{requestNumber} changing from <b>{StateTransitionCategories.signoffreview.fromState}</b> to <b>{StateTransitionCategories.signoffreview.toState}</b>.</>};
                   break;
                 default:
                   _message = {title: "Replace Attachment", body:`This attachment must be replaced as it was uploaded during the state change. Please replace attachment with document from Request #${requestNumber}` }                  

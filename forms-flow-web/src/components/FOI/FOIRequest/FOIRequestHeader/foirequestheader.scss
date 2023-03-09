@@ -27,9 +27,6 @@
     text-transform: capitalize;
 }
 .foi-request-review-header-col1-row {
-    // margin-left: auto;
-    margin-top: 20px;
-    //display: inline-block;
     display: inline-flex;
     height: fit-content;
 }
@@ -60,8 +57,25 @@
     display: inline-block;
     margin-top: 5px;
     min-width: 350px;
-    margin-right: 8px;
+    //margin-right: 8px;
 }
 .foi-assigned-to-inner-container .makeStyles-item-35 {
     padding-right: 24px !important;
+}
+
+.foi-assignee-dropdown {
+    //display: inline-block;
+    margin-top: 5px;
+    min-width: 350px;
+    float: right;
+}
+
+.axis-request-id {
+    margin-top: 20px !important;
+}
+
+@media (max-width: 1242px) {
+    .foi-request-review-header-col1-row {
+        display:block;
+    }
 }

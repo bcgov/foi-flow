@@ -1,0 +1,51 @@
+name: Zap Scanning
+
+on:
+  schedule:
+    - cron: "0 11 * * *" # 3am pst
+  push:
+    branches:
+      - dev
+      - dev-ac-1398 #testing purpose
+    
+  workflow_dispatch:
+    inputs:
+      environment:
+        type: choice
+        description: Target environment to deploy latest changes
+        default: "dev"
+        required: true
+        # options:
+        # - dev
+        # - test
+        # - prod
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  zap_scan_frontend:
+    runs-on: ubuntu-latest
+    name: Scan the frontend
+    steps:
+      - name: ZAP Scan
+        uses: zaproxy/action-full-scan@v0.4.0
+        with:
+          allow_issue_writing: false
+          token: ${{ secrets.GITHUB_TOKEN }}
+          issue_title: 'ZAP Scan Report'
+          target: ${{ secrets.ZAP_URL_DEV_MARSHALL_FRONTEND }}
+          
+
+  zap_scan_request_management:
+    runs-on: ubuntu-latest
+    name: Scan the request management api
+    steps:
+      - name: ZAP Scan
+        uses: zaproxy/action-api-scan@v0.2.0
+        with:
+          allow_issue_writing: false
+          token: ${{ secrets.GITHUB_TOKEN }}
+          issue_title: 'ZAP Scan Report'
+          target: ${{ secrets.ZAP_URL_DEV_REQ_MGMT }}

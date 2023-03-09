@@ -1,90 +1,97 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta
-      name="viewport"
-      content="width=device-width,initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
-    />
-    <meta name="description" content="foi.flow" />
-    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
-    <meta http-equiv="Pragma" content="no-cache" />
-    <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
-    <meta name="mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="theme-color" content="#536878" />
-    <link rel="shortcut icon" href="%PUBLIC_URL%/FOI/assets/Images/favicon.ico" />
-    <link rel="apple-touch-icon" href="%PUBLIC_URL%/FOI/assets/Images/favicon.ico"/>
-    <title>foi.flow</title>
-  </head>
-  <body class="no-scroll">
-    <div id="app" class="scrollable-page"></div>
-    <script src="%PUBLIC_URL%/config/config.js"></script>
-    <script>
-      // Check that service workers are supported
-      let newWorker;
 
-      if ('serviceWorker' in navigator) {
-        // Register the service worker
-        navigator.serviceWorker.register('/service-worker.js').then(reg => {
-          reg.addEventListener('updatefound', () => {
-            // An updated service worker has appeared in reg.installing!
-            newWorker = reg.installing;
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0, maximum-scale=2.0, user-scalable=yes" />
+  <meta name="description" content="BC Government Online Payment" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="theme-color" content="#536878" />
+  <link rel="shortcut icon" href="%PUBLIC_URL%/FOI/assets/Images/favicon.ico" />
+  <link rel="apple-touch-icon" href="%PUBLIC_URL%/FOI/assets/Images/favicon.ico" />
+  <title>BC Government Online Payment</title>
+</head>
 
-            newWorker.addEventListener('statechange', () => {
+<body class="no-scroll">
+  <h1 hidden>BC government online payment form</h1>
+  <div id="app" class="scrollable-page" role="img"
+    aria-label="The image of British Columbia parliament buildings in Victoria"></div>
+  <script src="%PUBLIC_URL%/config/config.js"></script>
+  <script>
+    // Check that service workers are supported
+    let newWorker;
 
-              // Has service worker state changed?
-              switch (newWorker.state) {
-                case 'installed':
+    if ('serviceWorker' in navigator) {
+      // Register the service worker
+      navigator.serviceWorker.register('/service-worker.js').then(reg => {
+        reg.addEventListener('updatefound', () => {
+          // An updated service worker has appeared in reg.installing!
+          newWorker = reg.installing;
 
-                  // There is a new service worker available, show the notification
-                  if (navigator.serviceWorker.controller) {
-                    newWorker.postMessage({ action: 'skipWaiting' });
-                  }
+          newWorker.addEventListener('statechange', () => {
 
-                  break;
-              }
-            });
+            // Has service worker state changed?
+            switch (newWorker.state) {
+              case 'installed':
+
+                // There is a new service worker available, show the notification
+                if (navigator.serviceWorker.controller) {
+                  newWorker.postMessage({ action: 'skipWaiting' });
+                }
+
+                break;
+            }
           });
-        },(err) => {
-            console.log("Worker registration failed", err);
-        }).catch((err) => {
-          console.log(err);
         });
-        let refreshing;
-        // The event listener that is fired when the service worker updates
-        // Here we reload the page
-        navigator.serviceWorker.addEventListener('controllerchange', function () {
-          if (refreshing) return;
-          window.location.reload();
-          refreshing = true;
-        });
-      }else{
-          console.log("Service Worker is not supported by browser.");
-      }
-    </script>
-    <style>
-      .scrollable-page {
-        position: fixed;
-        overflow-y: scroll;
-        top: 0;
-        right: 0;
-        bottom: 0;
-        left: 0;
-        -ms-overflow-style: none;  /* IE and Edge */
-  scrollbar-width: none;  /* Firefox */
-      }
-      .scrollable-page::-webkit-scrollbar {
-    display: none;
-}
-      .no-scroll{
-        overflow: hidden;
-      }
-      body {
-         
-         font-family: 'BCSans-Regular', sans-serif !important;
-       }
-    </style>
-    <noscript>This website requires JavaScript.</noscript>
-  </body>
+      }, (err) => {
+        console.log("Worker registration failed", err);
+      }).catch((err) => {
+        console.log(err);
+      });
+      let refreshing;
+      // The event listener that is fired when the service worker updates
+      // Here we reload the page
+      navigator.serviceWorker.addEventListener('controllerchange', function () {
+        if (refreshing) return;
+        window.location.reload();
+        refreshing = true;
+      });
+    } else {
+      console.log("Service Worker is not supported by browser.");
+    }
+  </script>
+  <style>
+    .scrollable-page {
+      position: fixed;
+      overflow-y: scroll;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      -ms-overflow-style: none;
+      /* IE and Edge */
+      scrollbar-width: none;
+      /* Firefox */
+    }
+
+    .scrollable-page::-webkit-scrollbar {
+      display: none;
+    }
+
+    .no-scroll {
+      overflow: hidden;
+    }
+
+    body {
+
+      font-family: 'BCSans-Regular', sans-serif !important;
+    }
+  </style>
+  <noscript>This website requires JavaScript.</noscript>
+</body>
+
 </html>

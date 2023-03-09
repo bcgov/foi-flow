@@ -102,7 +102,7 @@ const RequestDetails = React.memo(
       if (receivedDateString !== "" && ((receivedDateString.getHours() > 16 || (receivedDateString.getHours() === 16 && receivedDateString.getMinutes() > 30)) || !businessDay(dateString))) {
           receivedDateString = addBusinessDays(receivedDateString, 1);
       }
-      return receivedDateString;
+      return formatDate(receivedDateString);
     }
 
     //updates the default values from the request details
@@ -122,7 +122,7 @@ const RequestDetails = React.memo(
         requestType: validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.REQUEST_TYPE),
         receivedMode: validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.RECEIVED_MODE),
         deliveryMode: validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.DELIVERY_MODE),
-        receivedDate: !!receivedDate ? formatDate(receivedDate, 'yyyy MM, dd'): "",
+        receivedDate: !!receivedDate ? formatDate(receivedDate): "",
         requestStartDate: startDate ? formatDate(startDate): "",
         dueDate:  validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.DUE_DATE, startDate ? formatDate(startDate): ""),
         requestState: findRequestState(requestDetails?.requeststatusid)
@@ -211,6 +211,7 @@ const RequestDetails = React.memo(
       handleRequestDetailsValue(e.target.value, FOI_COMPONENT_CONSTANTS.DELIVERY_MODE);
       createSaveRequestObject(FOI_COMPONENT_CONSTANTS.DELIVERY_MODE, e.target.value);
     }
+    
      return (
 
       <div className='request-accordian' >
