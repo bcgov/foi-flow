@@ -60,9 +60,9 @@ import { getFullnameList } from "../../../../helper/FOI/helper";
         if(!allowStateChange)
           return {title: "Changing the state", body: `Unable to change state until fee estimate actuals have been completed.`};
         else if (!isAnyAmountPaid &&  _saveRequestObject.requeststatusid === StateEnum.callforrecords.id)
-          return {title: "Review Request", body: `Upload completed Call for Records form to change the state.`};
+          return {title: "Review Request", body: `Upload completed Call for Records form (if required) to change the state.`};
         else if (_saveRequestObject.requeststatusid === StateEnum.harms.id)
-          return {title: "Review Request", body: `Are you sure you want to change Request #${_requestNumber} to ${StateEnum.review.name}?`};
+          return {title: "Review Request", body: `Upload completed Call for Records form (if required) to change the state.`};
         else
           return {title: "Changing the state", body: `Are you sure you want to change Request #${_requestNumber} to ${StateEnum.review.name}?`};
       case StateEnum.consult.name.toLowerCase():
@@ -109,7 +109,7 @@ import { getFullnameList } from "../../../../helper/FOI/helper";
             }
       case StateEnum.response.name.toLowerCase():
         if (_saveRequestObject.requeststatusid === StateEnum.signoff.id)
-          return {title: "Ministry Sign Off", body: `Upload eApproval Logs to verify Ministry Approval and change the state.`};
+          return {title: "Ministry Sign Off", body: `Upload E-Approval log or completed sign form (if required) to change the state.`};
         else
           return {title: "Changing the state", body: `Are you sure you want to change Request #${_requestNumber} to ${StateEnum.response.name}?`};
       default:
