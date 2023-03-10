@@ -5,6 +5,24 @@
    <tag></tag>
    <comment></comment>
    <testCaseGuid>3f220393-47f8-4636-b07b-478d88449d74</testCaseGuid>
+   <variableLinks>
+      <testDataLinkId></testDataLinkId>
+      <type>DEFAULT</type>
+      <value></value>
+      <variableId>e4745f4e-abb6-41e8-a609-61e18606e440</variableId>
+   </variableLinks>
+   <variableLinks>
+      <testDataLinkId></testDataLinkId>
+      <type>DEFAULT</type>
+      <value></value>
+      <variableId>adaba906-fbce-4ea5-a826-7988062f8df4</variableId>
+   </variableLinks>
+   <variableLinks>
+      <testDataLinkId></testDataLinkId>
+      <type>DEFAULT</type>
+      <value></value>
+      <variableId>7412eb4c-4a9d-4a54-84fd-d9f242d6f570</variableId>
+   </variableLinks>
    <variable>
       <defaultValue>GlobalVariable.username</defaultValue>
       <description></description>
@@ -18,5 +36,12 @@
       <id>adaba906-fbce-4ea5-a826-7988062f8df4</id>
       <masked>false</masked>
       <name>password</name>
+   </variable>
+   <variable>
+      <defaultValue>GlobalVariable.BASE_URL</defaultValue>
+      <description></description>
+      <id>7412eb4c-4a9d-4a54-84fd-d9f242d6f570</id>
+      <masked>false</masked>
+      <name>variable</name>
    </variable>
 </TestCaseEntity>

@@ -28,9 +28,10 @@ WebUI.callTestCase(findTestCase('helper/foi-test-advanced-search-by-id'), [('req
 
 WebUI.click(findTestObject('Page_foi.flow/form/assignee dropdown/div_Assigned'))
 
-WebUI.click(findTestObject('Page_foi.flow/form/assignee dropdown/li_assignee user option', [('user') : (lastname + ', ') + 
-            firstname]))
+WebUI.click(findTestObject('Page_foi.flow/form/assignee dropdown/li_Flex, foiIntake (1)'))
 
+//WebUI.click(findTestObject('Page_foi.flow/form/assignee dropdown/li_assignee user option', [('user') : (lastname + ', ') + 
+//           firstname]))
 WebUI.setText(findTestObject('Page_foi.flow/form/inputs/input_AXIS ID Number'), 'ABC-2099-' + requestID)
 
 WebUI.click(findTestObject('Page_foi.flow/form/inputs/applicant details/div_Category'))
@@ -45,7 +46,7 @@ if (WebUI.getText(findTestObject('Page_foi.flow/form/inputs/request details/inpu
     WebUI.click(findTestObject('Page_foi.flow/form/inputs/request description/span_no PI Checkbox'))
 }
 
-WebUI.scrollToElement(findTestObject('Page_foi.flow/form/inputs/request description/span_EDU_checkmark'), 0)
+WebUI.scrollToElement(findTestObject('Page_foi.flow/form/inputs/request details/input_Delivery Mode'), 0)
 
 WebUI.click(findTestObject('Page_foi.flow/form/inputs/request details/input_Delivery Mode'))
 

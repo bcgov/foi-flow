@@ -7,13 +7,17 @@
    <selectorCollection>
       <entry>
          <key>XPATH</key>
-         <value>//div[@id='menu-']/div[3]/ul/li[4]</value>
+         <value>//div[@id='menu-']/div[3]/ul/li[11]</value>
+      </entry>
+      <entry>
+         <key>BASIC</key>
+         <value>id(&quot;menu-&quot;)/div[@class=&quot;MuiPaper-root MuiPaper-elevation MuiPaper-rounded MuiPaper-elevation1 MuiMenu-paper MuiPaper-root MuiPaper-elevation MuiPaper-rounded MuiPaper-elevation8 MuiPopover-paper css-177ic5c&quot;]/ul[@class=&quot;MuiList-root MuiList-padding MuiMenu-list css-r8u8y9&quot;]/li[@class=&quot;MuiButtonBase-root MuiListItem-root MuiMenuItem-root foi-divisionstage-menuitem MuiMenuItem-gutters MuiListItem-gutters MuiListItem-button&quot;][count(. | //*[(text() = 'Awaiting Fee estimate' or . = 'Awaiting Fee estimate')]) = count(//*[(text() = 'Awaiting Fee estimate' or . = 'Awaiting Fee estimate')])]</value>
       </entry>
       <entry>
          <key>CSS</key>
       </entry>
    </selectorCollection>
-   <selectorMethod>BASIC</selectorMethod>
+   <selectorMethod>XPATH</selectorMethod>
    <useRalativeImagePath>true</useRalativeImagePath>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -21,6 +25,7 @@
       <name>tag</name>
       <type>Main</type>
       <value>li</value>
+      <webElementGuid>84c3e0e4-3469-496a-8e4d-2e0856819f81</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -28,6 +33,7 @@
       <name>class</name>
       <type>Main</type>
       <value>MuiButtonBase-root MuiListItem-root MuiMenuItem-root foi-divisionstage-menuitem MuiMenuItem-gutters MuiListItem-gutters MuiListItem-button</value>
+      <webElementGuid>a22c3f22-a0a4-4144-a437-5134ea255254</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -35,6 +41,7 @@
       <name>tabindex</name>
       <type>Main</type>
       <value>-1</value>
+      <webElementGuid>1dbdd905-1601-4662-9cd2-8cf488b2d226</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -42,6 +49,7 @@
       <name>role</name>
       <type>Main</type>
       <value>option</value>
+      <webElementGuid>9bc281a2-456f-4131-89c2-bbdfdaff2a0c</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -49,6 +57,7 @@
       <name>aria-disabled</name>
       <type>Main</type>
       <value>false</value>
+      <webElementGuid>caeca502-15aa-4ed4-b993-e436cfa45fe9</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -56,20 +65,23 @@
       <name>data-value</name>
       <type>Main</type>
       <value>3</value>
+      <webElementGuid>21ed561f-6ede-492a-b075-89a9d7bf0090</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>true</isSelected>
       <matchCondition>equals</matchCondition>
       <name>text</name>
       <type>Main</type>
-      <value>Awaiting Fees</value>
+      <value>Awaiting Fee estimate</value>
+      <webElementGuid>71e25b4a-254e-4976-98f4-0a9afd3713bf</webElementGuid>
    </webElementProperties>
    <webElementProperties>
-      <isSelected>false</isSelected>
+      <isSelected>true</isSelected>
       <matchCondition>equals</matchCondition>
       <name>xpath</name>
       <type>Main</type>
-      <value>id(&quot;menu-&quot;)/div[@class=&quot;MuiPaper-root MuiMenu-paper MuiPopover-paper MuiPaper-elevation8 MuiPaper-rounded&quot;]/ul[@class=&quot;MuiList-root MuiMenu-list MuiList-padding&quot;]/li[@class=&quot;MuiButtonBase-root MuiListItem-root MuiMenuItem-root foi-divisionstage-menuitem MuiMenuItem-gutters MuiListItem-gutters MuiListItem-button&quot;]</value>
+      <value>id(&quot;menu-&quot;)/div[@class=&quot;MuiPaper-root MuiPaper-elevation MuiPaper-rounded MuiPaper-elevation1 MuiMenu-paper MuiPaper-root MuiPaper-elevation MuiPaper-rounded MuiPaper-elevation8 MuiPopover-paper css-177ic5c&quot;]/ul[@class=&quot;MuiList-root MuiList-padding MuiMenu-list css-r8u8y9&quot;]/li[@class=&quot;MuiButtonBase-root MuiListItem-root MuiMenuItem-root foi-divisionstage-menuitem MuiMenuItem-gutters MuiListItem-gutters MuiListItem-button&quot;]</value>
+      <webElementGuid>547b4a56-1b4a-424b-8404-c695bd7a4a3d</webElementGuid>
    </webElementProperties>
    <webElementXpaths>
       <isSelected>true</isSelected>
@@ -77,6 +89,7 @@
       <name>xpath:idRelative</name>
       <type>Main</type>
       <value>//div[@id='menu-']/div[3]/ul/li[4]</value>
+      <webElementGuid>cc5fc3a9-ba3a-49ec-bbed-25c521a8c272</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -84,6 +97,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>(.//*[normalize-space(text()) and normalize-space(.)='Assigned to Division'])[1]/following::li[1]</value>
+      <webElementGuid>de9e3622-7bb7-4e9a-b441-786f0d94ba11</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -91,6 +105,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>(.//*[normalize-space(text()) and normalize-space(.)='Clarification'])[1]/following::li[2]</value>
+      <webElementGuid>9a6abe31-0f85-40c7-a333-b5818c5d41a5</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -98,6 +113,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>(.//*[normalize-space(text()) and normalize-space(.)='Fees Received'])[1]/preceding::li[1]</value>
+      <webElementGuid>51a11599-2774-413b-b61e-6c77de136700</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -105,6 +121,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>(.//*[normalize-space(text()) and normalize-space(.)='Gathering Records'])[1]/preceding::li[2]</value>
+      <webElementGuid>cd39a2e5-3d0b-4d3f-9a7d-7b9cdaf3d290</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -112,6 +129,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>//*/text()[normalize-space(.)='Awaiting Fees']/parent::*</value>
+      <webElementGuid>7bff1a5d-5a93-4cf9-ad83-d2994d0e3597</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -119,5 +137,6 @@
       <name>xpath:position</name>
       <type>Main</type>
       <value>//li[4]</value>
+      <webElementGuid>2ad47752-9779-425b-bf35-f63db5371d11</webElementGuid>
    </webElementXpaths>
 </WebElementEntity>

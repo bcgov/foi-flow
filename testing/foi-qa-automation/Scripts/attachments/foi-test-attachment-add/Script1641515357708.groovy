@@ -17,7 +17,6 @@ import com.kms.katalon.core.windows.keyword.WindowsBuiltinKeywords as Windows
 import internal.GlobalVariable as GlobalVariable
 import org.openqa.selenium.Keys as Keys
 import com.kms.katalon.core.configuration.RunConfiguration as RunConfiguration
-
 import groovy.json.JsonSlurper as JsonSlurper
 
 WebUI.openBrowser(GlobalVariable.BASE_URL)
@@ -26,7 +25,8 @@ WebUI.callTestCase(findTestCase('helper/foi-test-login'), [:], FailureHandling.S
 
 WebUI.maximizeWindow()
 
-WebUI.callTestCase(findTestCase('helper/foi-test-advanced-search-by-id'), [('requestID') : requestID], FailureHandling.STOP_ON_FAILURE)
+WebUI.callTestCase(findTestCase('helper/foi-test-advanced-search-by-id'), [('requestID') : requestID, ('clickOnRequest') : true], 
+    FailureHandling.STOP_ON_FAILURE)
 
 WebUI.verifyElementText(findTestObject('Page_foi.flow/form/sidebar/status dropdown/div_Status'), 'Unopened')
 
@@ -34,11 +34,9 @@ WebUI.click(findTestObject('Page_foi.flow/form/sidebar/div_Sidebar Attachments')
 
 WebUI.verifyElementText(findTestObject('Page_foi.flow/form/sidebar/div_Sidebar Attachments'), 'Attachments')
 
-WebUI.verifyElementNotPresent(findTestObject('Page_foi.flow/attachment/div_attachments list row 1'), 0)
-
 WebUI.click(findTestObject('Page_foi.flow/attachment/button_Add Attachment'), FailureHandling.STOP_ON_FAILURE)
 
-println RunConfiguration.getProjectDir() +  '/Test Attachments'
+println(RunConfiguration.getProjectDir() + '/Test Attachments')
 
 WebUI.uploadFile(findTestObject('Page_foi.flow/attachment/input_Add Files_file-upload-input'), RunConfiguration.getProjectDir() + 
     '/Test Attachments/test.docx')
@@ -56,6 +54,8 @@ WebUI.verifyElementText(findTestObject('Page_foi.flow/attachment/div_attachment 
 WebUI.verifyElementPresent(findTestObject('Page_foi.flow/attachment/div_attachment list 1 created time'), 0)
 
 WebUI.verifyElementText(findTestObject('Page_foi.flow/form/sidebar/div_Sidebar Attachments'), 'Attachments (1)')
+
+WebUI.verifyElementPresent(findTestObject('Page_foi.flow/attachment/div_attachments list row 1'), 0)
 
 WebUI.click(findTestObject('Page_foi.flow/attachment/button_Add Attachment'), FailureHandling.STOP_ON_FAILURE)
 
@@ -75,7 +75,7 @@ WebUI.verifyElementText(findTestObject('Page_foi.flow/attachment/div_attachment 
 
 WebUI.verifyElementText(findTestObject('Page_foi.flow/attachment/div_attachment list 2 name'), 'test2.docx')
 
-WebUI.verifyElementText(findTestObject('Page_foi.flow/attachment/div_attachment list 3 name'), 'test.docx')
+WebUI.verifyElementText(findTestObject('Page_foi.flow/attachment/div_attachment list 3 name'), 'test2.pdf')
 
 WebUI.refresh()
 
@@ -85,7 +85,7 @@ WebUI.verifyElementText(findTestObject('Page_foi.flow/attachment/div_attachment 
 
 WebUI.verifyElementText(findTestObject('Page_foi.flow/attachment/div_attachment list 2 name'), 'test2.docx')
 
-WebUI.verifyElementText(findTestObject('Page_foi.flow/attachment/div_attachment list 3 name'), 'test.docx')
+WebUI.verifyElementText(findTestObject('Page_foi.flow/attachment/div_attachment list 3 name'), 'test2.pdf')
 
 WebUI.click(findTestObject('Page_foi.flow/attachment/button_attachments row 1 actions'), FailureHandling.STOP_ON_FAILURE)
 

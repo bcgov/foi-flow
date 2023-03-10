@@ -6,15 +6,19 @@
    <elementGuidId>30cdf4dc-a06b-4893-acb3-10d49dfb5ddc</elementGuidId>
    <selectorCollection>
       <entry>
+         <key>BASIC</key>
+         <value>//*[@type = 'radio' and @id = 'rbrequesthistory' and @name = 'commentsfilter']</value>
+      </entry>
+      <entry>
          <key>XPATH</key>
-         <value>//input[@id='rbrequesthistory']</value>
+         <value>//div[@id='teamRequests']/span</value>
       </entry>
       <entry>
          <key>CSS</key>
          <value>#rbrequesthistory</value>
       </entry>
    </selectorCollection>
-   <selectorMethod>XPATH</selectorMethod>
+   <selectorMethod>BASIC</selectorMethod>
    <useRalativeImagePath>true</useRalativeImagePath>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -22,6 +26,7 @@
       <name>tag</name>
       <type>Main</type>
       <value>input</value>
+      <webElementGuid>59e5d5d9-2d2d-44ac-997f-50d8ad897118</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>true</isSelected>
@@ -29,6 +34,7 @@
       <name>type</name>
       <type>Main</type>
       <value>radio</value>
+      <webElementGuid>234f8b98-6858-404b-8c5f-0b8a422487b2</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>true</isSelected>
@@ -36,6 +42,7 @@
       <name>id</name>
       <type>Main</type>
       <value>rbrequesthistory</value>
+      <webElementGuid>2dacb491-2be7-4ebf-87a1-0089c8d1d38e</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>true</isSelected>
@@ -43,6 +50,7 @@
       <name>name</name>
       <type>Main</type>
       <value>commentsfilter</value>
+      <webElementGuid>1b166546-195d-4ebc-8b55-d781ac9f1fb8</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -50,6 +58,7 @@
       <name>value</name>
       <type>Main</type>
       <value>2</value>
+      <webElementGuid>2009fc5a-33af-48d6-996e-c49d1baf9fd8</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -57,6 +66,15 @@
       <name>xpath</name>
       <type>Main</type>
       <value>id(&quot;rbrequesthistory&quot;)</value>
+      <webElementGuid>b7526b32-f231-43da-bf48-268f133d9428</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>tesxt</name>
+      <type>Main</type>
+      <value>Request History Comments</value>
+      <webElementGuid>36209aee-036c-4b9b-8b75-dc12f534a1be</webElementGuid>
    </webElementProperties>
    <webElementXpaths>
       <isSelected>true</isSelected>
@@ -64,6 +82,7 @@
       <name>xpath:attributes</name>
       <type>Main</type>
       <value>//input[@id='rbrequesthistory']</value>
+      <webElementGuid>70cf3081-8f89-47a1-8129-b6e7d68bf136</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -71,19 +90,22 @@
       <name>xpath:idRelative</name>
       <type>Main</type>
       <value>//div[@id='Comments']/div/div[4]/div/input[2]</value>
+      <webElementGuid>ebd9d300-c090-4ef2-ba2a-a8238367ce22</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
       <matchCondition>equals</matchCondition>
       <name>xpath:position</name>
       <type>Main</type>
-      <value>//input[2]</value>
+      <value>//div[2]/div/div/div/div[2]/div/div[2]/span</value>
+      <webElementGuid>6ba14ea5-73cc-427b-8285-2036f035f5a1</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
       <matchCondition>equals</matchCondition>
       <name>xpath:customAttributes</name>
       <type>Main</type>
-      <value>//input[@type = 'radio' and @id = 'rbrequesthistory' and @name = 'commentsfilter']</value>
+      <value>//span[(text() = 'Request History Comments' or . = 'Request History Comments')]</value>
+      <webElementGuid>704ae554-b55e-4b96-858c-f5f4349352c8</webElementGuid>
    </webElementXpaths>
 </WebElementEntity>

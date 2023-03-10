@@ -6,12 +6,12 @@
    <elementGuidId>72a9fb9a-cd14-4e64-adef-a8e7ccae6966</elementGuidId>
    <selectorCollection>
       <entry>
-         <key>XPATH</key>
-         <value>//div[@id='Attachments']/div/div/div[4]/div</value>
-      </entry>
-      <entry>
          <key>CSS</key>
          <value>div.container-fluid</value>
+      </entry>
+      <entry>
+         <key>XPATH</key>
+         <value>//div[@id='Attachments']/div/div/div[5]/div[2]/div[3]/div</value>
       </entry>
       <entry>
          <key>BASIC</key>
@@ -26,6 +26,7 @@
       <name>tag</name>
       <type>Main</type>
       <value>div</value>
+      <webElementGuid>2c46cd0e-c0db-4f2a-994d-a931d4c90872</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -33,6 +34,7 @@
       <name>class</name>
       <type>Main</type>
       <value>container-fluid</value>
+      <webElementGuid>3fb2f223-7308-4185-b283-15bab6cff2f3</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>true</isSelected>
@@ -40,6 +42,7 @@
       <name>text</name>
       <type>Main</type>
       <value>QA master.xlsxgeneral2021 Dec 31 | 04:41 PMUser, Super</value>
+      <webElementGuid>c125cdaa-a003-4bf9-a342-f4876fcccd8b</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -47,6 +50,7 @@
       <name>xpath</name>
       <type>Main</type>
       <value>id(&quot;Attachments&quot;)/div[1]/div[@class=&quot;section&quot;]/div[@class=&quot;displayAttachments&quot;]/div[@class=&quot;container-fluid&quot;]</value>
+      <webElementGuid>44ba565d-eccc-4a4e-a544-87238b3e1eb9</webElementGuid>
    </webElementProperties>
    <webElementXpaths>
       <isSelected>true</isSelected>
@@ -54,6 +58,7 @@
       <name>xpath:idRelative</name>
       <type>Main</type>
       <value>//div[@id='Attachments']/div/div/div[4]/div</value>
+      <webElementGuid>497a043d-ebd3-4edd-a54b-a44bc0e04c26</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -61,6 +66,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>(.//*[normalize-space(text()) and normalize-space(.)='+ Add Attachment'])[1]/following::div[3]</value>
+      <webElementGuid>62c2395c-b4ee-45bf-be1c-069af4aaa3b0</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -68,6 +74,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>(.//*[normalize-space(text()) and normalize-space(.)='Request #EDU-2022-37521'])[1]/following::div[4]</value>
+      <webElementGuid>a8b16e55-da26-4273-9e43-0fe286689298</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -75,5 +82,6 @@
       <name>xpath:position</name>
       <type>Main</type>
       <value>//div[2]/div/div/div[4]/div</value>
+      <webElementGuid>53900241-404d-487c-a674-4e10148d6c5b</webElementGuid>
    </webElementXpaths>
 </WebElementEntity>

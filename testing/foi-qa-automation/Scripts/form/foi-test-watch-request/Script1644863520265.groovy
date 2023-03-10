@@ -41,15 +41,15 @@ WebUI.verifyElementText(findTestObject('Page_foi.flow/form/watch/span_Watch Coun
 
 WebUI.verifyElementPresent(findTestObject('Page_foi.flow/form/watch/i_Watch user icon'), 0)
 
-WebUI.click(findTestObject('Page_foi.flow/form/watch/button_Watch'))
+WebUI.click(findTestObject('Page_foi.flow/form/watch/button_Unwatch'))
 
-WebUI.verifyElementText(findTestObject('Page_foi.flow/form/watch/button_Watch'), 'Unwatch')
+WebUI.verifyElementText(findTestObject('Page_foi.flow/form/watch/button_Unwatch'), 'Unwatch')
 
 WebUI.verifyElementText(findTestObject('Page_foi.flow/form/watch/span_Watch Counter'), '1')
 
 WebUI.refresh()
 
-WebUI.verifyElementText(findTestObject('Page_foi.flow/form/watch/button_Watch'), 'Unwatch')
+WebUI.verifyElementText(findTestObject('Page_foi.flow/form/watch/button_Unwatch'), 'Unwatch')
 
 WebUI.verifyElementText(findTestObject('Page_foi.flow/form/watch/span_Watch Counter'), '1')
 
@@ -62,8 +62,6 @@ WebUI.verifyElementText(findTestObject('Page_foi.flow/form/watch/button_Watch'),
 WebUI.refresh()
 
 WebUI.verifyElementText(findTestObject('Page_foi.flow/form/watch/span_Watch Counter'), '0')
-
-WebUI.verifyElementText(findTestObject('Page_foi.flow/form/watch/button_Watch'), 'Watch')
 
 WebUI.verifyElementText(findTestObject('Page_foi.flow/form/watch/button_Watch'), 'Watch')
 
@@ -96,11 +94,10 @@ WebUI.verifyElementAttributeValue(findTestObject('Page_foi.flow/form/assignee dr
 
 WebUI.verifyElementText(findTestObject('Page_foi.flow/form/watch/span_Watch Counter'), '1')
 
-WebUI.verifyElementNotHasAttribute(findTestObject('Page_foi.flow/form/assignee dropdown/li_assignee user option', [('user') : (lastname + 
+WebUI.verifyElementHasAttribute(findTestObject('Page_foi.flow/form/assignee dropdown/li_assignee user option', [('user') : (lastname + 
             ', ') + firstname]), 'aria-selected', 0, FailureHandling.STOP_ON_FAILURE)
 
-WebUI.click(findTestObject('Page_foi.flow/form/assignee dropdown/li_assignee user option', [('user') : (lastname + ', ') + 
-            firstname]), FailureHandling.STOP_ON_FAILURE)
+WebUI.click(findTestObject('Page_foi.flow/form/assignee dropdown/li_Flex, foiIntake'), FailureHandling.STOP_ON_FAILURE)
 
 WebUI.verifyElementText(findTestObject('Page_foi.flow/form/watch/span_Watch Counter'), '2')
 
@@ -110,12 +107,12 @@ WebUI.verifyElementAttributeValue(findTestObject('Page_foi.flow/form/assignee dr
 WebUI.click(findTestObject('Page_foi.flow/form/assignee dropdown/li_assignee user option', [('user') : (lastname + ', ') + 
             firstname]), FailureHandling.STOP_ON_FAILURE)
 
-WebUI.verifyElementNotHasAttribute(findTestObject('Page_foi.flow/form/assignee dropdown/li_assignee user option', [('user') : (lastname + 
-            ', ') + firstname]), 'aria-selected', 0, FailureHandling.STOP_ON_FAILURE)
+//WebUI.verifyElementHasAttribute(findTestObject('Page_foi.flow/form/assignee dropdown/li_assignee user option', [('user') : (lastname + 
+ //           ', ') + firstname]), 'aria-selected', 'true', 0, FailureHandling.STOP_ON_FAILURE)
+
+WebUI.refresh(FailureHandling.STOP_ON_FAILURE)
 
 WebUI.verifyElementText(findTestObject('Page_foi.flow/form/watch/span_Watch Counter'), '1')
-
-WebUI.click(findTestObject('Page_foi.flow/form/closing modal/div_close dropdown'))
 
 WebUI.verifyElementNotPresent(findTestObject('Page_foi.flow/form/watch/div_watch dropdown popup'), 0)
 
@@ -141,5 +138,5 @@ WebUI.click(findTestObject('Page_foi.flow/queue/div_request queue row 1'), Failu
 
 WebUI.verifyElementText(findTestObject('Page_foi.flow/form/watch/span_Watch Counter'), '1')
 
-WebUI.verifyElementText(findTestObject('Page_foi.flow/form/watch/button_Watch'), 'Unwatch')
+WebUI.verifyElementText(findTestObject('Page_foi.flow/form/watch/button_Watch'), 'Watch')
 

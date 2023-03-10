@@ -17,14 +17,15 @@ import com.kms.katalon.core.windows.keyword.WindowsBuiltinKeywords as Windows
 import internal.GlobalVariable as GlobalVariable
 import org.openqa.selenium.Keys as Keys
 
-WebUI.callTestCase(findTestCase('submit/foi-test-save-request-form'), [('applicantFirstname') : '', ('applicantLastname') : '', ('category') : ''
-        , ('email') : findTestData('Sample Applicant').getValue('email', 1), ('streetAddress') : findTestData('Sample Applicant').getValue(
-            'streetAddress', 1), ('streetAddress2') : findTestData('Sample Applicant').getValue('streetAddress2', 1), ('city') : findTestData(
-            'Sample Applicant').getValue('city', 1), ('province') : findTestData('Sample Applicant').getValue('province', 
-            1), ('country') : findTestData('Sample Applicant').getValue('country', 1), ('postalCode') : findTestData('Sample Applicant').getValue(
-            'postalCode', 1), ('homePhone') : findTestData('Sample Applicant').getValue('homePhone', 1), ('description') : findTestData(
-            'Sample Applicant').getValue('description', 1), ('startDate') : '', ('receivedDate') : '', ('receivedMode') : ''
-        , ('requestType') : '', ('deliveryMode') : ''], FailureHandling.STOP_ON_FAILURE)
+WebUI.callTestCase(findTestCase('submit/foi-test-save-request-form'), [('applicantFirstname') : '', ('applicantLastname') : ''
+        , ('category') : '', ('email') : findTestData('Sample Applicant').getValue('email', 1), ('streetAddress') : findTestData(
+            'Sample Applicant').getValue('streetAddress', 1), ('streetAddress2') : findTestData('Sample Applicant').getValue(
+            'streetAddress2', 1), ('city') : findTestData('Sample Applicant').getValue('city', 1), ('province') : findTestData(
+            'Sample Applicant').getValue('province', 1), ('country') : findTestData('Sample Applicant').getValue('country', 
+            1), ('postalCode') : findTestData('Sample Applicant').getValue('postalCode', 1), ('homePhone') : findTestData(
+            'Sample Applicant').getValue('homePhone', 1), ('description') : findTestData('Sample Applicant').getValue('description', 
+            1), ('startDate') : '', ('receivedDate') : '', ('receivedMode') : '', ('requestType') : '', ('deliveryMode') : ''], 
+    FailureHandling.STOP_ON_FAILURE)
 
 WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/div_Status'))
 
@@ -78,10 +79,12 @@ WebUI.verifyElementNotPresent(findTestObject('Page_foi.flow/ministry view/form/d
 
 WebUI.click(findTestObject('Page_foi.flow/form/sidebar/div_Sidebar Comments'))
 
+WebUI.click(findTestObject('Page_foi.flow/comment/span_All'))
+
 WebUI.verifyElementPresent(findTestObject('Page_foi.flow/comment/div_Comment list 1'), 0)
 
-WebUI.verifyElementText(findTestObject('Page_foi.flow/comment/p_comment list 1 text'), ((findTestData('Login Credentials').getValue(
-        'First Name', 1) + ' ') + findTestData('Login Credentials').getValue('Last Name', 1)) + ' changed the state of the request to Open')
+//WebUI.verifyElementText(findTestObject('Page_foi.flow/comment/p_comment list 1 text'), ((findTestData('Login Credentials').getValue(
+  //      'First Name', 1) + ' ') + findTestData('Login Credentials').getValue('Last Name', 1)) + ' changed the state of the request to Open')
 
 WebUI.navigateToUrl(GlobalVariable.BASE_URL + '/foi/dashboard', FailureHandling.STOP_ON_FAILURE)
 

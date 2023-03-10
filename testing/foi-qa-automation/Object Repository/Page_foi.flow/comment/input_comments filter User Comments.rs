@@ -7,14 +7,18 @@
    <selectorCollection>
       <entry>
          <key>XPATH</key>
-         <value>//input[@id='rbusercomments']</value>
+         <value>//div[@id='myRequests']/span</value>
+      </entry>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@type = 'radio' and @id = 'rbusercomments' and @name = 'commentsfilter']</value>
       </entry>
       <entry>
          <key>CSS</key>
          <value>#rbusercomments</value>
       </entry>
    </selectorCollection>
-   <selectorMethod>XPATH</selectorMethod>
+   <selectorMethod>BASIC</selectorMethod>
    <useRalativeImagePath>true</useRalativeImagePath>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -22,6 +26,7 @@
       <name>tag</name>
       <type>Main</type>
       <value>input</value>
+      <webElementGuid>5ce35df0-51e6-470a-aee1-b1988476053d</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>true</isSelected>
@@ -29,6 +34,7 @@
       <name>type</name>
       <type>Main</type>
       <value>radio</value>
+      <webElementGuid>0518f71d-7718-4c46-9ae6-9d5fbbe230ad</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>true</isSelected>
@@ -36,6 +42,7 @@
       <name>id</name>
       <type>Main</type>
       <value>rbusercomments</value>
+      <webElementGuid>50894060-75df-42bf-b1d0-47c34e09583c</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>true</isSelected>
@@ -43,6 +50,7 @@
       <name>name</name>
       <type>Main</type>
       <value>commentsfilter</value>
+      <webElementGuid>8723e2a0-c59c-4cf1-8974-8914c864f26f</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -50,6 +58,7 @@
       <name>value</name>
       <type>Main</type>
       <value>1</value>
+      <webElementGuid>07cb8c23-2605-48ff-9afd-47469429632d</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -57,6 +66,15 @@
       <name>xpath</name>
       <type>Main</type>
       <value>id(&quot;rbusercomments&quot;)</value>
+      <webElementGuid>53844f04-f23f-46ff-a8b2-94c3eea5dbcc</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>text</name>
+      <type>Main</type>
+      <value>usercomments</value>
+      <webElementGuid>af8f8f99-64c1-4720-aa48-bfd0e386304b</webElementGuid>
    </webElementProperties>
    <webElementXpaths>
       <isSelected>true</isSelected>
@@ -64,6 +82,7 @@
       <name>xpath:attributes</name>
       <type>Main</type>
       <value>//input[@id='rbusercomments']</value>
+      <webElementGuid>25df107e-9ec4-4277-9858-736dcea4ba0f</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -71,6 +90,7 @@
       <name>xpath:idRelative</name>
       <type>Main</type>
       <value>//div[@id='Comments']/div/div[4]/div/input[3]</value>
+      <webElementGuid>9f38a97e-d3cb-456c-9dea-64f9ce42a8de</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -78,12 +98,14 @@
       <name>xpath:position</name>
       <type>Main</type>
       <value>//input[3]</value>
+      <webElementGuid>7f392027-498c-4400-88d6-545708048ff5</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
       <matchCondition>equals</matchCondition>
       <name>xpath:customAttributes</name>
       <type>Main</type>
-      <value>//input[@type = 'radio' and @id = 'rbusercomments' and @name = 'commentsfilter']</value>
+      <value>//span[(text() = 'User Comments' or . = 'User Comments')]</value>
+      <webElementGuid>3ff186f1-6a9d-4849-bb85-14b0fdd9f958</webElementGuid>
    </webElementXpaths>
 </WebElementEntity>

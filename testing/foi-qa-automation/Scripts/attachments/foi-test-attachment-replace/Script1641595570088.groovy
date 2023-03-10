@@ -78,14 +78,15 @@ WebUI.click(findTestObject('Page_foi.flow/ministry view/form/divisional tracking
 
 WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/div_Status'))
 
-WebUI.click(findTestObject('Page_foi.flow/ministry view/form/divisional tracking/stage dropdown options/li_Fee Estimate'))
+WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/li_Records Review'))
 
+//println(RunConfiguration.getProjectDir() + '/Test Attachments')
 WebUI.uploadFile(findTestObject('Page_foi.flow/attachment/input_Add Files_file-upload-input'), RunConfiguration.getProjectDir() + 
     '/Test Attachments/test.docx' //WebUI.click(findTestObject('Page_foi.flow/navbar/button_Sign Out'))
     //WebUI.click(findTestObject('Page_foi.flow/navbar/button_Sign Out'))
     )
 
-WebUI.click(findTestObject('Page_foi.flow/form/state change dialog/button_Save Change'))
+WebUI.click(findTestObject('Page_foi.flow/form/state change dialog/button_Continue'))
 
 WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT, FailureHandling.STOP_ON_FAILURE)
 
@@ -103,7 +104,7 @@ WebUI.verifyElementText(findTestObject('Page_foi.flow/attachment/h2_Replace Atta
 
 WebUI.verifyElementText(findTestObject('Page_foi.flow/attachment/span_replace attachment instructions'), ('This attachment must be replaced as it was uploaded during the state change. Please replace attachment with document from ' + 
     WebUI.getText(findTestObject('Page_foi.flow/attachment/h1_Attachments Request Title'), FailureHandling.STOP_ON_FAILURE)) + 
-    ' changing from Call For Records to Fee Estimate .')
+    ' changing from Call For Records to Records Review.')
 
 WebUI.verifyElementNotClickable(findTestObject('Page_foi.flow/form/state change dialog/button_Continue'), FailureHandling.STOP_ON_FAILURE)
 

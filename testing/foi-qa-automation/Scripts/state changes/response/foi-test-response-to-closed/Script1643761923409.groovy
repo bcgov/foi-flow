@@ -90,10 +90,11 @@ WebUI.uploadFile(findTestObject('Page_foi.flow/attachment/input_Add Files_file-u
 
 WebUI.click(findTestObject('Page_foi.flow/form/state change dialog/button_Save Change'))
 
-WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT, FailureHandling.STOP_ON_FAILURE)
+WebUI.delay(5)
+
+//WebUI.click(findTestObject('Page_foi.flow/form/sidebar/Page_FOI Request Queue/h2_FOI'))
 
 WebUI.navigateToUrl(GlobalVariable.BASE_URL + '/foi/dashboard')
-
 WebUI.click(findTestObject('Page_foi.flow/queue/div_My Team Requests'))
 
 WebUI.setText(findTestObject('Page_foi.flow/queue/input_Dashboard Filter'), requestID)
@@ -163,7 +164,8 @@ WebUI.verifyElementNotPresent(findTestObject('Page_foi.flow/form/sidebar/status 
 
 WebUI.verifyElementNotPresent(findTestObject('Page_foi.flow/form/sidebar/status dropdown/li_On Hold'), 0)
 
-WebUI.verifyElementNotPresent(findTestObject('Page_foi.flow/ministry view/form/divisional tracking/stage dropdown options/li_Fee Estimate'), 0)
+WebUI.verifyElementNotPresent(findTestObject('Page_foi.flow/ministry view/form/divisional tracking/stage dropdown options/li_Fee Estimate'), 
+    0)
 
 WebUI.verifyElementNotPresent(findTestObject('Page_foi.flow/form/sidebar/status dropdown/li_Deduplication'), 0)
 
@@ -178,7 +180,8 @@ WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT, FailureHandling.STOP_ON_FAILURE)
 WebUI.verifyElementAttributeValue(findTestObject('Page_foi.flow/form/sidebar/status dropdown/input_Status'), 'value', 'Response', 
     0)
 
-WebUI.verifyElementAttributeValue(findTestObject('Page_foi.flow/form/inputs/request details/input_Due Date'), 'value', ldd, 0)
+WebUI.verifyElementAttributeValue(findTestObject('Page_foi.flow/form/inputs/request details/input_Due Date'), 'value', ldd, 
+    0)
 
 WebUI.navigateToUrl(GlobalVariable.BASE_URL + '/foi/dashboard')
 

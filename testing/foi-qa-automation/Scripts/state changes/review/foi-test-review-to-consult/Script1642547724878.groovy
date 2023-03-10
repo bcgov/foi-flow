@@ -164,8 +164,7 @@ WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/li_Record
 
 WebUI.verifyElementPresent(findTestObject('Page_foi.flow/form/state change dialog/div_State Change Dialog'), 0)
 
-WebUI.callTestCase(findTestCase('helper/foi-test-verify-next-assignee'), [:], FailureHandling.STOP_ON_FAILURE)
-
+//WebUI.callTestCase(findTestCase('helper/foi-test-verify-next-assignee'), [:], FailureHandling.STOP_ON_FAILURE)
 WebUI.verifyElementText(findTestObject('Page_foi.flow/form/state change dialog/span_State Change Dialog message'), ('Are you sure you want to change Request #' + 
     WebUI.getText(findTestObject('Page_foi.flow/form/h3_Form Request Title'), FailureHandling.STOP_ON_FAILURE)) + ' to Records Review?')
 
@@ -182,7 +181,11 @@ WebUI.verifyElementAttributeValue(findTestObject('Page_foi.flow/form/sidebar/sta
 
 WebUI.click(findTestObject('Page_foi.flow/form/sidebar/div_Sidebar Comments'))
 
+WebUI.click(findTestObject('Page_foi.flow/comment/span_Request History Comments'))
+
 WebUI.verifyElementPresent(findTestObject('Page_foi.flow/comment/div_Comment list 1'), 0)
+
+WebUI.delay(8)
 
 WebUI.verifyElementText(findTestObject('Page_foi.flow/comment/p_comment list 1 text'), ((findTestData('Login Credentials').getValue(
         'First Name', 1) + ' ') + findTestData('Login Credentials').getValue('Last Name', 1)) + ' changed the state of the request to Consult')

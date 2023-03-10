@@ -57,7 +57,7 @@ WebUI.verifyElementPresent(findTestObject('Page_foi.flow/queue/div_request queue
 
 WebUI.click(findTestObject('Page_foi.flow/queue/div_request queue row 1'))
 
-WebUI.click(findTestObject('Page_foi.flow/form/watch/button_Watch'))
+WebUI.click(findTestObject('Page_foi.flow/form/watch/button_Unwatch'))
 
 WebUI.scrollToElement(findTestObject('Page_foi.flow/form/button_Return to Queue'), 0)
 

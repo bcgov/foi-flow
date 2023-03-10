@@ -6,15 +6,19 @@
    <elementGuidId>4738b59e-cabe-466c-ae7f-b99911fda3c0</elementGuidId>
    <selectorCollection>
       <entry>
-         <key>CSS</key>
-         <value>span.pficon.pficon-error-circle-o</value>
-      </entry>
-      <entry>
          <key>XPATH</key>
          <value>//div[@id='kc-content-wrapper']/div/span</value>
       </entry>
+      <entry>
+         <key>BASIC</key>
+         <value>id(&quot;kc-content-wrapper&quot;)/div[@class=&quot;alert alert-error&quot;]/span[@class=&quot;pficon pficon-error-circle-o&quot;]</value>
+      </entry>
+      <entry>
+         <key>CSS</key>
+         <value>span.pficon.pficon-error-circle-o</value>
+      </entry>
    </selectorCollection>
-   <selectorMethod>XPATH</selectorMethod>
+   <selectorMethod>BASIC</selectorMethod>
    <useRalativeImagePath>true</useRalativeImagePath>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -22,6 +26,7 @@
       <name>tag</name>
       <type>Main</type>
       <value>span</value>
+      <webElementGuid>90c596c3-93f8-403c-b604-59fb3c731109</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -29,6 +34,7 @@
       <name>class</name>
       <type>Main</type>
       <value>pficon pficon-error-circle-o</value>
+      <webElementGuid>ba22e2ca-785d-4b9f-8111-9558ef52387e</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>true</isSelected>
@@ -36,6 +42,7 @@
       <name>xpath</name>
       <type>Main</type>
       <value>id(&quot;kc-content-wrapper&quot;)/div[@class=&quot;alert alert-error&quot;]/span[@class=&quot;pficon pficon-error-circle-o&quot;]</value>
+      <webElementGuid>ced69b8b-accd-4086-93df-5646c6f84577</webElementGuid>
    </webElementProperties>
    <webElementXpaths>
       <isSelected>true</isSelected>
@@ -43,6 +50,7 @@
       <name>xpath:idRelative</name>
       <type>Main</type>
       <value>//div[@id='kc-content-wrapper']/div/span</value>
+      <webElementGuid>7b799287-91ec-445c-bd5b-5c9099311c4f</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -50,5 +58,6 @@
       <name>xpath:position</name>
       <type>Main</type>
       <value>//span</value>
+      <webElementGuid>fd159cf8-9cc9-4450-8a86-d24d28410b3f</webElementGuid>
    </webElementXpaths>
 </WebElementEntity>

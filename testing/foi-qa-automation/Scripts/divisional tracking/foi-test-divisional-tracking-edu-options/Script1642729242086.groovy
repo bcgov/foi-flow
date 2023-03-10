@@ -188,6 +188,15 @@ WebUI.click(findTestObject('Page_foi.flow/ministry view/form/divisional tracking
 
 WebUI.click(findTestObject('Page_foi.flow/ministry view/form/divisional tracking/button_Add division to track'), FailureHandling.STOP_ON_FAILURE)
 
+WebUI.click(findTestObject('Page_foi.flow/ministry view/form/divisional tracking/button_Add division to track'))
+
+WebUI.click(findTestObject('Page_foi.flow/ministry view/form/divisional tracking/button_Add division to track'))
+
+WebUI.scrollToElement(findTestObject('Page_foi.flow/ministry view/form/divisional tracking/button_Add division to track'), 
+    0)
+
+WebUI.click(findTestObject('Page_foi.flow/ministry view/form/divisional tracking/button_Add division to track'))
+
 WebUI.verifyElementNotPresent(findTestObject('Page_foi.flow/ministry view/form/divisional tracking/button_Add division to track'), 
     0)
 

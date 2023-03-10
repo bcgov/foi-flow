@@ -1,0 +1,284 @@
+import static com.kms.katalon.core.checkpoint.CheckpointFactory.findCheckpoint
+import static com.kms.katalon.core.testcase.TestCaseFactory.findTestCase
+import static com.kms.katalon.core.testdata.TestDataFactory.findTestData
+import static com.kms.katalon.core.testobject.ObjectRepository.findTestObject
+import static com.kms.katalon.core.testobject.ObjectRepository.findWindowsObject
+import com.kms.katalon.core.checkpoint.Checkpoint as Checkpoint
+import com.kms.katalon.core.cucumber.keyword.CucumberBuiltinKeywords as CucumberKW
+import com.kms.katalon.core.mobile.keyword.MobileBuiltInKeywords as Mobile
+import com.kms.katalon.core.model.FailureHandling as FailureHandling
+import com.kms.katalon.core.testcase.TestCase as TestCase
+import com.kms.katalon.core.testdata.TestData as TestData
+import com.kms.katalon.core.testng.keyword.TestNGBuiltinKeywords as TestNGKW
+import com.kms.katalon.core.testobject.TestObject as TestObject
+import com.kms.katalon.core.webservice.keyword.WSBuiltInKeywords as WS
+import com.kms.katalon.core.webui.keyword.WebUiBuiltInKeywords as WebUI
+import com.kms.katalon.core.windows.keyword.WindowsBuiltinKeywords as Windows
+import internal.GlobalVariable as GlobalVariable
+import org.openqa.selenium.Keys as Keys
+import com.kms.katalon.core.configuration.RunConfiguration as RunConfiguration
+import org.openqa.selenium.WebDriver as WebDriver
+import com.kms.katalon.core.webui.driver.DriverFactory as DriverFactory
+import groovy.json.JsonSlurper as JsonSlurper
+
+WebUI.callTestCase(findTestCase('submit/foi-test-save-request-form'), [('password') : findTestData('Login Credentials').getValue(
+            'Password', 1), ('username') : findTestData('Login Credentials').getValue('Username', 1), ('firstname') : findTestData(
+            'Login Credentials').getValue('First Name', 1), ('lastname') : findTestData('Login Credentials').getValue('Last Name', 
+            6), ('applicantFirstname') : '', ('applicantLastname') : '', ('category') : '', ('email') : findTestData('Sample Applicant').getValue(
+            'email', 1), ('streetAddress') : findTestData('Sample Applicant').getValue('streetAddress', 1), ('streetAddress2') : findTestData(
+            'Sample Applicant').getValue('streetAddress2', 1), ('city') : findTestData('Sample Applicant').getValue('city', 
+            1), ('province') : findTestData('Sample Applicant').getValue('province', 1), ('country') : findTestData('Sample Applicant').getValue(
+            'country', 1), ('postalCode') : findTestData('Sample Applicant').getValue('postalCode', 1), ('homePhone') : findTestData(
+            'Sample Applicant').getValue('homePhone', 1), ('description') : findTestData('Sample Applicant').getValue('description', 
+            1), ('startDate') : '', ('receivedDate') : '', ('receivedMode') : '', ('requestType') : '', ('deliveryMode') : ''], 
+    FailureHandling.STOP_ON_FAILURE)
+
+WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/div_Status'))
+
+WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/li_Open'))
+
+WebUI.click(findTestObject('Page_foi.flow/form/state change dialog/button_Save Change'))
+
+WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
+
+WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/div_Status'))
+
+WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/li_Call For Records'))
+
+requestID = WebUI.getText(findTestObject('Page_foi.flow/form/h3_Form Request Title'), FailureHandling.STOP_ON_FAILURE)
+
+WebUI.click(findTestObject('Page_foi.flow/form/state change dialog/button_Save Change'))
+
+WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT, FailureHandling.STOP_ON_FAILURE)
+
+//WebUI.click(findTestObject('Page_foi.flow/navbar/button_Sign Out'))
+WebDriver IAOuser = DriverFactory.getWebDriver()
+
+WebDriver ministryUser = CustomKeywords.'browser.newWindow.open'()
+
+DriverFactory.changeWebDriver(ministryUser)
+
+WebUI.navigateToUrl(GlobalVariable.BASE_URL)
+
+WebUI.callTestCase(findTestCase('helper/foi-test-login'), [('password') : findTestData('Login Credentials').getValue('Password', 
+            8), ('username') : findTestData('Login Credentials').getValue('Username', 8)], FailureHandling.STOP_ON_FAILURE)
+
+WebUI.click(findTestObject('Page_foi.flow/queue/div_My Team Requests'))
+
+WebUI.setText(findTestObject('Page_foi.flow/queue/input_Dashboard Filter'), requestID)
+
+WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
+
+WebUI.click(findTestObject('Page_foi.flow/queue/div_request queue row 1'))
+
+WebUI.click(findTestObject('Page_foi.flow/ministry view/form/div_ministry assigned to'), FailureHandling.STOP_ON_FAILURE)
+
+WebUI.click(findTestObject('Page_foi.flow/ministry view/form/ministry assignee/li_ministry assignee foiedu, foiedu'))
+
+WebUI.scrollToElement(findTestObject('Page_foi.flow/form/button_Save'), 0)
+
+WebUI.click(findTestObject('null'))
+
+WebUI.verifyElementVisible(findTestObject('CFR/input_Actual Hours_locating'))
+
+WebUI.verifyElementVisible(findTestObject('CFR/input_Actual Hours_producing'))
+
+WebUI.verifyElementVisible(findTestObject('CFR/input_Estimated Hours IAO_iaoPreparing'))
+
+WebUI.verifyElementVisible(findTestObject('CFR/input_Estimated Hours_locating'))
+
+WebUI.verifyElementClickable(findTestObject('CFR/input_Estimated Hours_locating'))
+
+WebUI.verifyElementVisible(findTestObject('CFR/input_Estimated Hours_producing'))
+
+WebUI.verifyElementClickable(findTestObject('CFR/input_Estimated Hours_producing'))
+
+WebUI.verifyElementVisible(findTestObject('CFR/input_Hardcopy Estimated Pages_hardcopyPages'))
+
+WebUI.verifyElementClickable(findTestObject('CFR/input_Hardcopy Estimated Pages_hardcopyPages'))
+
+WebUI.verifyElementVisible(findTestObject('CFR/input_Actual Hours IAO_iaoPreparing'))
+
+WebUI.verifyElementVisible(findTestObject('CFR/input_Fee Waiver Amount_feewaiverAmount'))
+
+WebUI.verifyElementVisible(findTestObject('CFR/input_Refund Amount_refundAmount'))
+
+WebUI.verifyElementVisible(findTestObject('CFR/input_Amount Paid_amountPaid'))
+
+WebUI.verifyElementVisible(findTestObject('CFR/input_Balance Remaining_balanceRemaining'))
+
+WebUI.verifyElementClickable(findTestObject('CFR/input_Estimated Hours Ministry_ministryPreparing'))
+
+WebUI.verifyElementVisible(findTestObject('CFR/textarea_Combined suggestions for futher clarifications_suggestions'))
+
+WebUI.setText(findTestObject('null'), '5')
+
+WebUI.setText(findTestObject('null'), '3')
+
+WebUI.setText(findTestObject('CFR/input_Estimated Hours Ministry_ministryPreparing'), 
+    '4')
+
+WebUI.setText(findTestObject('CFR/input_Hardcopy Estimated Pages_hardcopyPages'), '8')
+
+WebUI.setText(findTestObject('CFR/textarea_Combined suggestions for futher clarifications_suggestions'), 
+    'verified')
+
+WebUI.scrollToElement(findTestObject('CFR/div_270.8'), 0)
+
+WebUI.verifyElementText(findTestObject('CFR/div_270.8'), '$270.8')
+
+WebUI.delay(3)
+
+WebUI.maximizeWindow()
+
+WebUI.scrollToElement(findTestObject('CFR/button_Save'), 0)
+
+WebUI.click(findTestObject('CFR/button_Save'))
+
+WebUI.delay(4)
+
+WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/div_Status'))
+
+WebUI.click(findTestObject('null'))
+
+WebUI.click(findTestObject('null'))
+
+DriverFactory.changeWebDriver(IAOuser)
+
+WebUI.refresh()
+
+WebUI.verifyElementAttributeValue(findTestObject('Page_foi.flow/form/sidebar/status dropdown/input_Status'), 'value', 'Fee Estimate', 
+    0)
+
+WebUI.verifyElementPresent(findTestObject('null'), 0)
+
+WebUI.click(findTestObject('null'))
+
+WebUI.click(findTestObject('null'))
+
+WebUI.click(findTestObject('Object Repository/CFR/CFR_status/li_Needs Clarification with Ministry'))
+
+WebUI.click(findTestObject('null'))
+
+DriverFactory.changeWebDriver(ministryUser)
+
+WebUI.refresh()
+
+WebUI.click(findTestObject('null'))
+
+WebUI.click(findTestObject('null'))
+
+WebUI.click(findTestObject('Object Repository/CFR/CFR_status/li_In Review with IAO'))
+
+WebUI.click(findTestObject('null'))
+
+DriverFactory.changeWebDriver(IAOuser)
+
+WebUI.refresh()
+
+WebUI.click(findTestObject('null'))
+
+WebUI.setText(findTestObject('null'), '1')
+
+WebUI.click(findTestObject('null'))
+
+WebUI.click(findTestObject('null'))
+
+WebUI.click(findTestObject('Object Repository/CFR/CFR_status/body_FOI  Intake Flex 1Sign OutABC-700-602S_d39e5c'))
+
+WebUI.click(findTestObject('Object Repository/CFR/CFR_status/li_Approved'))
+
+WebUI.click(findTestObject('null'))
+
+WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/div_Status'))
+
+WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/li_On Hold'))
+
+WebUI.click(findTestObject('Object Repository/CFR/button_Add Files'))
+
+WebUI.click(findTestObject('null'))
+
+WebUI.click(findTestObject('null'))
+
+WebUI.click(findTestObject('CFR/a_Pay Online'))
+
+WebUI.click(findTestObject('CFR/Payment_Info/button_Pay Online'))
+
+WebUI.click(findTestObject('CFR/Payment_Info/input_Card Number_trnCardNumber'))
+
+WebUI.click(findTestObject('CFR/Payment_Info/input_Card CVD_trnCardCvd'))
+
+WebUI.click(findTestObject('CFR/Payment_Info/button_Process Payment'))
+
+WebUI.verifyElementPresent(findTestObject('CFR/Payment_Info/b_Payment Successful'), 0)
+
+//WebUI.click(findTestObject('null'))
+//WebUI.click(findTestObject('null'))
+WebUI.navigateToUrl(GlobalVariable.BASE_URL)
+
+//WebUI.callTestCase(findTestCase('helper/foi-test-login'), [('password') : findTestData('Login Credentials').getValue('Password', 
+          //  1), ('username') : findTestData('Login Credentials').getValue('Username', 1)], FailureHandling.STOP_ON_FAILURE)
+
+WebUI.click(findTestObject('Page_foi.flow/queue/div_My Team Requests'))
+
+WebUI.setText(findTestObject('Page_foi.flow/queue/input_Dashboard Filter'), requestID)
+
+WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
+
+WebUI.click(findTestObject('Page_foi.flow/queue/div_request queue row 1'))
+WebUI.click(findTestObject('null'))
+
+WebUI.click(findTestObject('Object Repository/CFR/button_Add Files'))
+WebUI.click(findTestObject('Page_foi.flow/attachment/button_Add Attachment'), FailureHandling.STOP_ON_FAILURE)
+
+println(RunConfiguration.getProjectDir() + '/Test Attachments')
+
+WebUI.uploadFile(findTestObject('Page_foi.flow/attachment/input_Add Files_file-upload-input'), RunConfiguration.getProjectDir() +
+	'/Test Attachments/test.docx')
+
+WebUI.click(findTestObject('null'))
+
+WebUI.click(findTestObject('Object Repository/CFR/button_Preview  Send Email'))
+
+WebUI.click(findTestObject('Object Repository/CFR/button_Send Email'))
+
+WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/li_On Hold'))
+
+WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/div_Status'))
+
+WebUI.click(findTestObject('null'))
+
+WebUI.click(findTestObject('null'))
+
+DriverFactory.changeWebDriver(ministryUser)
+
+WebUI.refresh()
+
+WebUI.click(findTestObject('null'))
+
+WebUI.verifyElementText(findTestObject('CFR/input_Amount Paid_amountPaid'), '$270.8')
+
+WebUI.setText(findTestObject('null'), '10')
+
+WebUI.verifyElementText(findTestObject('CFR/span_0'), '$210.8')
+
+WebUI.verifyElementText(findTestObject('CFR/input_Balance Remaining_balanceRemaining'), '-60.8')
+
+WebUI.click(findTestObject('null'))
+
+WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/div_Status'))
+
+WebUI.click(findTestObject('null'))
+
+DriverFactory.changeWebDriver(IAOuser)
+
+WebUI.refresh()
+
+WebUI.click(findTestObject('null'))
+
+WebUI.click(findTestObject('null'))
+
+WebUI.click(findTestObject('null'))
+
+WebUI.click(findTestObject('null'))
+

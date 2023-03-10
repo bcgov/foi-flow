@@ -104,5 +104,5 @@ WebUI.verifyElementNotPresent(findTestObject('Page_foi.flow/ministry view/form/d
 
 WebUI.click(findTestObject('Page_foi.flow/navbar/button_Sign Out'))
 
-WebUI.acceptAlert(FailureHandling.STOP_ON_FAILURE)
+//WebUI.acceptAlert(FailureHandling.STOP_ON_FAILURE)
 

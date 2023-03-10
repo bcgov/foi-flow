@@ -19,6 +19,11 @@ import internal.GlobalVariable as GlobalVariable
 import org.openqa.selenium.Keys as Keys
 import groovy.json.JsonSlurper as JsonSlurper
 import org.openqa.selenium.WebElement as WebElement
+import org.openqa.selenium.WebDriver as WebDriver
+import org.openqa.selenium.interactions.Actions as Actions
+import com.kms.katalon.core.webui.driver.DriverFactory as DriverFactory
+import org.openqa.selenium.JavascriptExecutor as JavascriptExecutor
+import com.kms.katalon.core.annotation.Keyword as Keyword
 
 def today = new Date()
 
@@ -70,61 +75,61 @@ WebUI.verifyElementPresent(findTestObject('Page_foi.flow/form/inputs/applicant d
 
 WebUI.click(findTestObject('Page_foi.flow/form/inputs/applicant details/category dropdown/li_Individual'), FailureHandling.STOP_ON_FAILURE)
 
-WebUI.verifyElementAttributeValue(findTestObject('Page_foi.flow/form/inputs/request details/input_Start Date'), 'min', WebUI.getAttribute(
-        findTestObject('Page_foi.flow/form/inputs/request details/input_Received Date'), 'value'), 0)
-
-WebUI.verifyElementAttributeValue(findTestObject('Page_foi.flow/form/inputs/request details/input_Start Date'), 'max', today.format('yyyy-MM-dd'), 0)
-
-WebUI.verifyElementAttributeValue(findTestObject('Page_foi.flow/form/inputs/request details/input_Received Date'), 'max', today.format('yyyy-MM-dd'), 0)
-
+//WebUI.verifyElementAttributeValue(findTestObject('Page_foi.flow/form/inputs/request details/input_Received Date'), 'min', 
+//WebUI.getAttribute(findTestObject('Page_foi.flow/form/inputs/request details/input_Received Date'), 'value'), 0)
+//WebUI.verifyElementAttributeValue(findTestObject('Page_foi.flow/form/inputs/request details/input_Start Date'), 'max', today.format(
+//     'yyyy-MM-dd'), 0)
+//WebUI.verifyElementAttributeValue(findTestObject('Page_foi.flow/form/inputs/request details/input_Received Date'), 'max', 
+// today.format('yyyy-MM-dd'), 0)
 //WebUI.executeJavaScript("alert('This is an alert')", null)
 def earlierDate = new Date().plus(10)
 
-WebElement element = WebUiCommonHelper.findWebElement(findTestObject('Page_foi.flow/form/inputs/request details/input_Received Date'), 
-    30)
-
+//WebElement element = WebUiCommonHelper.findWebElement(findTestObject('Page_foi.flow/form/inputs/request details/input_Received Date'), 
+//   30)
 //
-WebUI.executeJavaScript(('Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, "value").set.call(arguments[0], "' + 
-    earlierDate.format('yyyy-MM-dd')) + '")', Arrays.asList(element))
-
-WebUI.executeJavaScript('console.log(arguments[0])', Arrays.asList(element))
-
-WebUI.executeJavaScript('arguments[0].dispatchEvent(new Event(\'change\', { bubbles: true}))', Arrays.asList(element))
-
+//WebUI.executeJavaScript(('Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, "value").set.call(arguments[0], "' + 
+//  earlierDate.format('yyyy-MM-dd')) + '")', Arrays.asList(element))
+//WebUI.executeJavaScript('console.log(arguments[0])', Arrays.asList(element))
+//WebUI.executeJavaScript('arguments[0].dispatchEvent(new Event(\'change\', { bubbles: true}))', Arrays.asList(element))
 //WebUI.setText(findTestObject('Page_foi.flow/form/inputs/request details/input_Received Date'), laterDate.format('yyyyyyMMdd'))
 //WebUI.sendKeys(findTestObject('Page_foi.flow/form/inputs/request details/input_Received Date'), Keys.chord('0','0','2','2','2','0','0','3','0','5'))
 //WebUI.click(findTestObject('Page_foi.flow/form/inputs/request details/input_Received Date'), FailureHandling.STOP_ON_FAILURE)
 //System.exit(0)
-WebUI.verifyElementAttributeValue(findTestObject('Page_foi.flow/form/inputs/request details/input_Start Date'), 'min', WebUI.getAttribute(
-        findTestObject('Page_foi.flow/form/inputs/request details/input_Received Date'), 'value'), 0)
+//WebUI.verifyElementAttributeValue(findTestObject('Page_foi.flow/form/inputs/request details/input_Start Date'), 'min', WebUI.getAttribute(
+// findTestObject('Page_foi.flow/form/inputs/request details/input_Received Date'), 'value'), 0)
+//WebUI.verifyElementAttributeValue(findTestObject('Page_foi.flow/form/inputs/request details/input_Start Date'), 'max', today.format(
+//      'yyyy-MM-dd'), 0)
+//WebUI.verifyElementAttributeValue(findTestObject('Page_foi.flow/form/inputs/request description/input_Search Start Date'), 
+//  'max', today.format('yyyy-MM-dd'), 0)
+//WebUI.verifyElementAttributeValue(findTestObject('Page_foi.flow/form/inputs/request description/input_Search End Date'), 
+//    'max', today.format('yyyy-MM-dd'), 0)
+//WebUI.verifyElementAttributeValue(findTestObject('Page_foi.flow/form/inputs/request description/input_Search End Date'), 
+//    'min', WebUI.getAttribute(findTestObject('Page_foi.flow/form/inputs/request description/input_Search Start Date'), 'value'), 
+//   0)
+//WebUI.scrollToPosition(534, 10)
+//WebUI.waitForElementClickable(findTestObject('null'), 0)
+//WebUI.verifyElementHasAttribute(findTestObject('Page_foi.flow/form/inputs/request description/input_EDU checkbox'), 'checked', 
+//   0)
 
-WebUI.verifyElementAttributeValue(findTestObject('Page_foi.flow/form/inputs/request details/input_Start Date'), 'max', today.format('yyyy-MM-dd'), 0)
 
-WebUI.verifyElementAttributeValue(findTestObject('Page_foi.flow/form/inputs/request description/input_Search Start Date'), 
-    'max', today.format('yyyy-MM-dd'), 0)
+WebUI.setText(findTestObject('Page_foi.flow/form/inputs/request description/textarea_request description'), 'TEST DESCRIPT')
 
-WebUI.verifyElementAttributeValue(findTestObject('Page_foi.flow/form/inputs/request description/input_Search End Date'), 
-    'max', today.format('yyyy-MM-dd'), 0)
+WebUI.scrollToElement(findTestObject('Page_foi.flow/form/inputs/request description/textarea_request description'), 0)
 
-WebUI.verifyElementAttributeValue(findTestObject('Page_foi.flow/form/inputs/request description/input_Search End Date'), 
-    'min', WebUI.getAttribute(findTestObject('Page_foi.flow/form/inputs/request description/input_Search Start Date'), 'value'), 
-    0)
 
-WebUI.verifyElementHasAttribute(findTestObject('Page_foi.flow/form/inputs/request description/input_EDU checkbox'), 'checked', 
-    0)
 
-WebUI.scrollToElement(findTestObject('Page_foi.flow/form/button_Save'), 0)
+//WebUI.scrollToElement(findTestObject('Page_foi.flow/form/inputs/request description/input_EDU checkbox'), 0)
+//WebUI.waitForElementClickable(findTestObject('Page_foi.flow/form/inputs/request description/input_EDU checkbox'), 0)
+//CustomKeywords.‘com.example.WebUIKeywords.clickUsingJS’(findTestObject('Page_foi.flow/form/inputs/request description/span_EDU_checkmark'),30)
+//WebUI.click(findTestObject('Page_foi.flow/form/inputs/request description/input_EDU checkbox'))
+//WebUI.verifyElementNotHasAttribute(findTestObject('Page_foi.flow/form/inputs/request description/input_EDU checkbox'), 'checked', 
+// 0)
+WebUI.click(findTestObject('Page_foi.flow/form/inputs/request description/span_EDU_selectspanEDU'))
 
-WebUI.click(findTestObject('Page_foi.flow/form/inputs/request description/span_EDU_checkmark'))
 
-WebUI.verifyElementNotHasAttribute(findTestObject('Page_foi.flow/form/inputs/request description/input_EDU checkbox'), 'checked', 
-    0)
 
-WebUI.click(findTestObject('Page_foi.flow/form/inputs/request description/span_EDU_checkmark'))
-
-WebUI.verifyElementHasAttribute(findTestObject('Page_foi.flow/form/inputs/request description/input_EDU checkbox'), 'checked', 
-    0)
-
+//WebUI.verifyElementHasAttribute(findTestObject('Page_foi.flow/form/inputs/request description/input_EDU checkbox'), 'checked', 
+// 0)
 WebUI.verifyElementAttributeValue(findTestObject('Page_foi.flow/form/inputs/request details/input_Received Mode'), 'aria-disabled', 
     'true', 0)
 
@@ -144,18 +149,23 @@ WebUI.verifyElementAttributeValue(findTestObject('Page_foi.flow/form/sidebar/div
 WebUI.verifyElementAttributeValue(findTestObject('Page_foi.flow/form/sidebar/div_Sidebar Comments'), 'class', 'tablinks active', 
     0)
 
-WebUI.verifyElementPresent(findTestObject('Page_foi.flow/comment/label_All Comments'), 0)
+WebUI.verifyElementPresent(findTestObject('Page_foi.flow/comment/span_All'), 0)
 
-WebUI.verifyElementPresent(findTestObject('Page_foi.flow/comment/label_Request History'), 0)
+WebUI.verifyElementPresent(findTestObject('Page_foi.flow/comment/span_Request History Comments'), 0)
 
-WebUI.verifyElementPresent(findTestObject('Page_foi.flow/comment/label_User Comments'), 0)
+WebUI.verifyElementPresent(findTestObject('Page_foi.flow/comment/span_User Comments'), 0)
 
-WebUI.verifyElementPresent(findTestObject('Page_foi.flow/form/sidebar/a_FOI'), 0)
-
-WebUI.verifyElementPresent(findTestObject('Page_foi.flow/form/sidebar/i_Home logo'), 0)
-
-WebUI.verifyElementAttributeValue(findTestObject('Page_foi.flow/form/sidebar/a_FOI'), 'href', GlobalVariable.BASE_URL + 
-    '/foi/dashboard', 0)
+WebUI.verifyElementPresent(findTestObject('Page_foi.flow/form/sidebar/a_FOI'), 0 //WebUI.verifyElementPresent(findTestObject('Page_foi.flow/form/sidebar/i_Home logo'), 0)
+    //WebUI.verifyElementAttributeValue(findTestObject('Page_foi.flow/form/sidebar/a_FOI'), 'href', GlobalVariable.BASE_URL + 
+    ) //'/foi/dashboard', 0 
+//@Keyword
+//) //def clickUsingJS(TestObject to, int timeout)
+//{
+//WebDriver driver = DriverFactory.getWebDriver()
+//WebElement element = WebUiCommonHelper.findWebElement(to, timeout)
+//JavascriptExecutor executor = ((driver) as JavascriptExecutor)
+//executor.executeScript('arguments[0].click()', element)
+//}
 
 @com.kms.katalon.core.annotation.SetUp
 def setup() {

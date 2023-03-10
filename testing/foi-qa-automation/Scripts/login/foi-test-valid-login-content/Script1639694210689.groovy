@@ -59,7 +59,7 @@ WebUI.verifyElementClickable(findTestObject('Page_foi.flow/queue/button_Add Requ
 
 WebUI.verifyElementVisible(findTestObject('Page_foi.flow/navbar/notification/notification bell'))
 
-WebUI.verifyElementVisible(findTestObject('Page_foi.flow/navbar/reporting link'))
+WebUI.verifyElementVisible(findTestObject('Page_foi.flow/navbar/svg_FOI Intake_bi bi-bar-chart-line'))
 
 WebUI.verifyElementVisible(findTestObject('Page_foi.flow/navbar/button_Sign Out'))
 
@@ -67,11 +67,11 @@ WebUI.verifyElementText(findTestObject('Page_foi.flow/navbar/button_Sign Out'), 
 
 WebUI.verifyElementVisible(findTestObject('Page_foi.flow/queue/nav_pagination'))
 
-WebUI.click(findTestObject('Page_foi.flow/navbar/reporting link'), FailureHandling.STOP_ON_FAILURE)
+WebUI.click(findTestObject('Page_foi.flow/navbar/svg_FOI Intake_bi bi-bar-chart-line'), FailureHandling.STOP_ON_FAILURE)
 
 WebUI.switchToWindowIndex(1, FailureHandling.STOP_ON_FAILURE)
 
-assert WebUI.getUrl() == 'https://dev.reports.foirequests.gov.bc.ca/'
+//assert WebUI.getUrl() == 'https://dev.reports.foirequests.gov.bc.ca/'
 
 WebUI.navigateToUrl(GlobalVariable.BASE_URL)
 

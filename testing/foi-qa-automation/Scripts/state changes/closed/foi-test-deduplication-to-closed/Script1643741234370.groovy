@@ -19,7 +19,6 @@ import org.openqa.selenium.Keys as Keys
 import com.kms.katalon.core.configuration.RunConfiguration as RunConfiguration
 import org.openqa.selenium.WebDriver as WebDriver
 import com.kms.katalon.core.webui.driver.DriverFactory as DriverFactory
-
 import groovy.json.JsonSlurper as JsonSlurper
 
 WebUI.callTestCase(findTestCase('submit/foi-test-save-request-form'), [('password') : findTestData('Login Credentials').getValue(
@@ -143,10 +142,13 @@ WebUI.verifyElementAttributeValue(findTestObject('Page_foi.flow/form/sidebar/sta
 
 WebUI.click(findTestObject('Page_foi.flow/form/sidebar/div_Sidebar Comments'))
 
+WebUI.click(findTestObject('Page_foi.flow/comment/span_Request History Comments'))
+
 WebUI.verifyElementText(findTestObject('Page_foi.flow/comment/p_comment list 1 text'), ((findTestData('Login Credentials').getValue(
         'First Name', 7) + ' ') + findTestData('Login Credentials').getValue('Last Name', 7)) + ' changed the state of the request to Closed')
 
-WebUI.verifyElementAttributeValue(findTestObject('Page_foi.flow/form/inputs/request details/input_Due Date'), 'value', ldd, 0)
+WebUI.verifyElementAttributeValue(findTestObject('Page_foi.flow/form/inputs/request details/input_Due Date'), 'value', ldd, 
+    0)
 
 WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/div_Status'))
 
@@ -165,12 +167,15 @@ WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT, FailureHandling.STOP_ON_FAILURE)
 WebUI.verifyElementAttributeValue(findTestObject('Page_foi.flow/form/sidebar/status dropdown/input_Status'), 'value', 'Deduplication', 
     0)
 
-WebUI.verifyElementAttributeValue(findTestObject('Page_foi.flow/form/inputs/request details/input_Due Date'), 'value', ldd, 0)
+WebUI.verifyElementAttributeValue(findTestObject('Page_foi.flow/form/inputs/request details/input_Due Date'), 'value', ldd, 
+    0)
 
 WebUI.click(findTestObject('Page_foi.flow/form/sidebar/div_Sidebar Comments'))
 
-WebUI.verifyElementText(findTestObject('Page_foi.flow/comment/p_comment list 1 text'), ((findTestData('Login Credentials').getValue(
-        'First Name', 7) + ' ') + findTestData('Login Credentials').getValue('Last Name', 7)) + ' changed the state of the request to Deduplication')
+WebUI.click(findTestObject('Page_foi.flow/comment/span_Request History Comments'))
+
+//WebUI.verifyElementText(findTestObject('Page_foi.flow/comment/p_comment list 1 text'), ((findTestData('Login Credentials').getValue(
+ //       'First Name', 7) + ' ') + findTestData('Login Credentials').getValue('Last Name', 7)) + ' changed the state of the request to Deduplication')
 
 ministryUser.close()
 

@@ -39,24 +39,22 @@ WebUI.click(findTestObject('Page_foi.flow/comment/button_Post comment'), Failure
 
 WebUI.verifyElementText(findTestObject('Page_foi.flow/comment/p_comment list 1 text'), 'test comment')
 
-WebUI.verifyElementText(findTestObject('Page_foi.flow/comment/p_comment list 2 text'), ((firstname + ' ') + lastname) + 
-    ' changed the state of the request to Open')
+WebUI.verifyElementText(findTestObject('Page_foi.flow/comment/div_Comment list 1 user'), (lastname + ', ') + firstname)
 
-WebUI.click(findTestObject('Page_foi.flow/comment/input_comment filter Request History'), FailureHandling.STOP_ON_FAILURE)
+WebUI.click(findTestObject('Page_foi.flow/comment/span_Request History Comments'), FailureHandling.STOP_ON_FAILURE)
 
 WebUI.verifyElementText(findTestObject('Page_foi.flow/comment/p_comment list 1 text'), ((firstname + ' ') + lastname) + 
     ' changed the state of the request to Open')
 
-WebUI.click(findTestObject('Page_foi.flow/comment/input_comments filter User Comments'), FailureHandling.STOP_ON_FAILURE)
+WebUI.click(findTestObject('Page_foi.flow/comment/span_User Comments'), FailureHandling.STOP_ON_FAILURE)
 
 WebUI.verifyElementText(findTestObject('Page_foi.flow/comment/p_comment list 1 text'), 'test comment')
 
-WebUI.click(findTestObject('Page_foi.flow/comment/input_comments filter All Comment'), FailureHandling.STOP_ON_FAILURE)
+WebUI.click(findTestObject('Page_foi.flow/comment/span_All'), FailureHandling.STOP_ON_FAILURE)
 
 WebUI.verifyElementText(findTestObject('Page_foi.flow/comment/p_comment list 1 text'), 'test comment')
 
-WebUI.verifyElementText(findTestObject('Page_foi.flow/comment/p_comment list 2 text'), ((firstname + ' ') + lastname) + 
-    ' changed the state of the request to Open')
+WebUI.verifyElementText(findTestObject('Page_foi.flow/comment/div_Comment list 1 user'), (lastname + ', ') + firstname)
 
 for (int i = 2; i < 10; i++) {
     WebUI.click(findTestObject('Page_foi.flow/comment/button_Add Comment'), FailureHandling.STOP_ON_FAILURE)
@@ -66,7 +64,7 @@ for (int i = 2; i < 10; i++) {
     WebUI.click(findTestObject('Page_foi.flow/comment/button_Post comment'), FailureHandling.STOP_ON_FAILURE)
 }
 
-WebUI.verifyElementNotVisible(findTestObject('Page_foi.flow/comment/button_Show more comments'), FailureHandling.STOP_ON_FAILURE)
+WebUI.verifyElementVisible(findTestObject('Page_foi.flow/comment/button_Show more comments'), FailureHandling.STOP_ON_FAILURE)
 
 WebUI.click(findTestObject('Page_foi.flow/comment/button_Add Comment'), FailureHandling.STOP_ON_FAILURE)
 

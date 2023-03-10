@@ -81,13 +81,13 @@ WebUI.verifyElementPresent(findTestObject('Page_foi.flow/form/watch/i_Watch user
 
 WebUI.click(findTestObject('Page_foi.flow/form/watch/button_Watch'))
 
-WebUI.verifyElementText(findTestObject('Page_foi.flow/form/watch/button_Watch'), 'Unwatch')
+WebUI.verifyElementText(findTestObject('Page_foi.flow/form/watch/button_Unwatch'), 'Unwatch')
 
 WebUI.verifyElementText(findTestObject('Page_foi.flow/form/watch/span_Watch Counter'), '1')
 
 WebUI.refresh()
 
-WebUI.verifyElementText(findTestObject('Page_foi.flow/form/watch/button_Watch'), 'Unwatch')
+WebUI.verifyElementText(findTestObject('Page_foi.flow/form/watch/button_Unwatch'), 'Unwatch')
 
 WebUI.verifyElementText(findTestObject('Page_foi.flow/form/watch/span_Watch Counter'), '1')
 
@@ -103,8 +103,7 @@ WebUI.verifyElementText(findTestObject('Page_foi.flow/form/watch/span_Watch Coun
 
 WebUI.verifyElementText(findTestObject('Page_foi.flow/form/watch/button_Watch'), 'Watch')
 
-WebUI.verifyElementText(findTestObject('Page_foi.flow/form/watch/button_Watch'), 'Watch')
-
+//WebUI.verifyElementText(findTestObject('null'), 'Watch')
 WebUI.click(findTestObject('Page_foi.flow/form/watch/div_add other watchers'), FailureHandling.STOP_ON_FAILURE)
 
 WebUI.verifyElementPresent(findTestObject('Page_foi.flow/form/watch/div_watch dropdown popup'), 0)
@@ -116,38 +115,40 @@ WebUI.verifyElementNotPresent(findTestObject('Page_foi.flow/form/assignee dropdo
 
 WebUI.verifyElementPresent(findTestObject('Page_foi.flow/ministry view/form/ministry assignee/li_EDU Ministry Team'), 0)
 
-WebUI.verifyElementNotHasAttribute(findTestObject('Page_foi.flow/form/assignee dropdown/li_assignee user option', [('user') : teammate]), 
-    'aria-selected', 0, FailureHandling.STOP_ON_FAILURE)
+WebUI.verifyElementNotHasAttribute(findTestObject('Page_foi.flow/form/assignee dropdown/li_foiedu2, foiedu2'), 'aria-selected', 
+    0, FailureHandling.STOP_ON_FAILURE)
 
-WebUI.click(findTestObject('Page_foi.flow/form/assignee dropdown/li_assignee user option', [('user') : teammate]), FailureHandling.STOP_ON_FAILURE)
+WebUI.click(findTestObject('Page_foi.flow/form/assignee dropdown/li_foiedu2, foiedu2'), FailureHandling.STOP_ON_FAILURE)
 
-WebUI.verifyElementAttributeValue(findTestObject('Page_foi.flow/form/assignee dropdown/li_assignee user option', [('user') : teammate]), 
-    'aria-selected', 'true', 0)
+WebUI.verifyElementAttributeValue(findTestObject('Page_foi.flow/form/assignee dropdown/li_foiedu2, foiedu2'), 'aria-selected', 
+    'true', 0)
 
 WebUI.verifyElementText(findTestObject('Page_foi.flow/form/watch/span_Watch Counter'), '1')
 
-WebUI.verifyElementNotHasAttribute(findTestObject('Page_foi.flow/form/assignee dropdown/li_assignee user option', [('user') : (lastname + 
-            ', ') + firstname]), 'aria-selected', 0, FailureHandling.STOP_ON_FAILURE)
+WebUI.verifyElementNotHasAttribute(findTestObject('Page_foi.flow/form/assignee dropdown/li_foiedu, foiedu'), 'aria-selected', 
+    0, FailureHandling.STOP_ON_FAILURE)
 
-WebUI.click(findTestObject('Page_foi.flow/form/assignee dropdown/li_assignee user option', [('user') : (lastname + ', ') + 
-            firstname]), FailureHandling.STOP_ON_FAILURE)
+WebUI.click(findTestObject('Page_foi.flow/form/assignee dropdown/li_foiedu, foiedu'), FailureHandling.STOP_ON_FAILURE)
 
-WebUI.verifyElementAttributeValue(findTestObject('Page_foi.flow/form/assignee dropdown/li_assignee user option', [('user') : (lastname + 
-            ', ') + firstname]), 'aria-selected', 'true', 0)
+WebUI.verifyElementAttributeValue(findTestObject('Page_foi.flow/form/assignee dropdown/li_foiedu, foiedu'), 'aria-selected', 
+    'true', 0)
 
 WebUI.verifyElementText(findTestObject('Page_foi.flow/form/watch/span_Watch Counter'), '2')
 
-WebUI.click(findTestObject('Page_foi.flow/form/assignee dropdown/li_assignee user option', [('user') : (lastname + ', ') + 
-            firstname]), FailureHandling.STOP_ON_FAILURE)
+WebUI.click(findTestObject('Page_foi.flow/form/assignee dropdown/li_foiedu, foiedu'), FailureHandling.STOP_ON_FAILURE)
 
-WebUI.verifyElementNotHasAttribute(findTestObject('Page_foi.flow/form/assignee dropdown/li_assignee user option', [('user') : (lastname + 
-            ', ') + firstname]), 'aria-selected', 0, FailureHandling.STOP_ON_FAILURE)
+WebUI.verifyElementNotHasAttribute(findTestObject('Page_foi.flow/form/assignee dropdown/li_foiedu, foiedu'), 'aria-selected', 
+    0, FailureHandling.STOP_ON_FAILURE)
 
 WebUI.verifyElementText(findTestObject('Page_foi.flow/form/watch/span_Watch Counter'), '1')
 
 WebUI.click(findTestObject('Page_foi.flow/form/closing modal/div_close dropdown'))
 
 WebUI.verifyElementNotPresent(findTestObject('Page_foi.flow/form/watch/div_watch dropdown popup'), 0)
+
+WebUI.click(findTestObject('Page_foi.flow/form/assignee dropdown/div_Unassigned'))
+
+WebUI.click(findTestObject('Page_foi.flow/form/assignee dropdown/li_foiedu2, foiedu2 (1)'))
 
 WebUI.click(findTestObject('Page_foi.flow/navbar/button_Sign Out'))
 
@@ -168,5 +169,5 @@ WebUI.click(findTestObject('Page_foi.flow/queue/div_request queue row 1'), Failu
 
 WebUI.verifyElementText(findTestObject('Page_foi.flow/form/watch/span_Watch Counter'), '1')
 
-WebUI.verifyElementText(findTestObject('Page_foi.flow/form/watch/button_Watch'), 'Unwatch')
+WebUI.verifyElementText(findTestObject('Page_foi.flow/form/watch/button_Unwatch'), 'Unwatch')
 

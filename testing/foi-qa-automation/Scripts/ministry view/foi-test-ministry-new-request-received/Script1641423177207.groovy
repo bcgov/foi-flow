@@ -69,11 +69,13 @@ WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
 //WebUI.verifyElementText(findTestObject('Page_foi.flow/form/sidebar/h4_CFR Due in 10 Days'), 'CFR Due in 10 Days')
 WebUI.click(findTestObject('Page_foi.flow/form/sidebar/div_Sidebar Comments'))
 
-WebUI.verifyElementText(findTestObject('Page_foi.flow/form/sidebar/div_Sidebar Comments'), 'Comments (2)')
+WebUI.verifyElementText(findTestObject('Page_foi.flow/form/sidebar/div_Sidebar Comments'), 'Comments (3)')
+
+WebUI.click(findTestObject('Page_foi.flow/comment/span_All'))
 
 WebUI.verifyElementPresent(findTestObject('Page_foi.flow/comment/div_Comment list 1'), 0)
 
-WebUI.verifyElementText(findTestObject('Page_foi.flow/comment/p_comment list 1 text'), ((firstname + ' ') + lastname) + 
+WebUI.verifyElementText(findTestObject('Page_foi.flow/comment/p_comment list 2 text'), ((firstname + ' ') + lastname) + 
     ' changed the state of the request to Call For Records')
 
 WebUI.verifyElementAttributeValue(findTestObject('Page_foi.flow/form/sidebar/status dropdown/input_Status'), 'value', 'Call For Records', 

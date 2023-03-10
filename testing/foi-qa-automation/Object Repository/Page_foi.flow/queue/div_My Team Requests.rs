@@ -6,15 +6,15 @@
    <elementGuidId>39e1548e-2374-437d-955c-99c4d242e003</elementGuidId>
    <selectorCollection>
       <entry>
-         <key>CSS</key>
-      </entry>
-      <entry>
          <key>BASIC</key>
          <value>//div[@id = 'teamRequests' and (text() = concat(&quot;MY TEAM&quot; , &quot;'&quot; , &quot;S REQUESTS&quot;) or . = concat(&quot;MY TEAM&quot; , &quot;'&quot; , &quot;S REQUESTS&quot;))]</value>
       </entry>
       <entry>
          <key>XPATH</key>
          <value>(//div[@id='teamRequests'])</value>
+      </entry>
+      <entry>
+         <key>CSS</key>
       </entry>
    </selectorCollection>
    <selectorMethod>BASIC</selectorMethod>
@@ -25,6 +25,7 @@
       <name>tag</name>
       <type>Main</type>
       <value>div</value>
+      <webElementGuid>6f9cc3c7-5ecc-413f-9c84-6a2acadef06f</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -32,6 +33,7 @@
       <name>class</name>
       <type>Main</type>
       <value>foi-personal-radio</value>
+      <webElementGuid>2f195636-5bd7-4684-a34c-6c7e5b22b00e</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -39,6 +41,7 @@
       <name>name</name>
       <type>Main</type>
       <value>requestFilter</value>
+      <webElementGuid>ee0f1ad0-8b69-44c8-a5e0-2865c2b8192d</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -46,6 +49,7 @@
       <name>value</name>
       <type>Main</type>
       <value>watchingRequests</value>
+      <webElementGuid>b2a97e4b-e4f7-46b4-b7f1-2d2401fe814b</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -53,6 +57,7 @@
       <name>xpath</name>
       <type>Main</type>
       <value>id(&quot;app&quot;)/div[1]/div[@class=&quot;container foi-container&quot;]/div[@class=&quot;col-sm-12 col-md-12 foi-grid-container&quot;]/div[@class=&quot;foi-dashboard-row2&quot;]/div[@class=&quot;foi-request-type&quot;]/input[@class=&quot;foi-personal-radio&quot;]</value>
+      <webElementGuid>5a99057a-c591-4912-b667-1b6a8f88223f</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>true</isSelected>
@@ -60,6 +65,7 @@
       <name>id</name>
       <type>Main</type>
       <value>teamRequests</value>
+      <webElementGuid>2e5cd56c-44d2-468e-b589-9887ccadc4b3</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>true</isSelected>
@@ -67,6 +73,7 @@
       <name>text</name>
       <type>Main</type>
       <value>MY TEAM'S REQUESTS</value>
+      <webElementGuid>782d06ce-35d3-4218-9c6f-3c4eed33fc3a</webElementGuid>
    </webElementProperties>
    <webElementXpaths>
       <isSelected>true</isSelected>
@@ -74,6 +81,7 @@
       <name>xpath:attributes</name>
       <type>Main</type>
       <value>(//input[@name='requestFilter'])[2]</value>
+      <webElementGuid>f353c101-747e-4ee6-a4af-8b60e8ad2af1</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -81,6 +89,7 @@
       <name>xpath:idRelative</name>
       <type>Main</type>
       <value>//div[@id='app']/div/div[3]/div/div[2]/div[2]/input[2]</value>
+      <webElementGuid>5d0ddbea-97c2-46ee-b6f8-2fa016f3271c</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -88,6 +97,7 @@
       <name>xpath:position</name>
       <type>Main</type>
       <value>//input[2]</value>
+      <webElementGuid>55c04bff-ecb1-4d5c-a824-4152e1c18a2a</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -95,6 +105,7 @@
       <name>xpath:attributes</name>
       <type>Main</type>
       <value>//input[@name='requestFilter']</value>
+      <webElementGuid>fb7782f6-6bee-43b0-9e57-771d22f2c1c5</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -102,6 +113,7 @@
       <name>xpath:idRelative</name>
       <type>Main</type>
       <value>//div[@id='app']/div/div[3]/div/div[2]/div[2]/input</value>
+      <webElementGuid>2fb73bb4-1b80-45e4-8e4f-75050ca42610</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -109,5 +121,6 @@
       <name>xpath:position</name>
       <type>Main</type>
       <value>//div[2]/input</value>
+      <webElementGuid>f95877a3-7c98-4f98-af0c-5ec3d8ae1f05</webElementGuid>
    </webElementXpaths>
 </WebElementEntity>

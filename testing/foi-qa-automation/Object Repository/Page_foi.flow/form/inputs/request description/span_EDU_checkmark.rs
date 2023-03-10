@@ -6,52 +6,66 @@
    <elementGuidId>12b73caa-6e79-4cbb-88a9-44ee66a96014</elementGuidId>
    <selectorCollection>
       <entry>
+         <key>BASIC</key>
+         <value>//*[@data-programareaid = '6']</value>
+      </entry>
+      <entry>
          <key>XPATH</key>
-         <value>//label[.='EDU']/span</value>
+         <value>id(&quot;Request&quot;)/div[@class=&quot;container foi-review-request-container&quot;]/div[@class=&quot;foi-review-container&quot;]/form[@class=&quot;jss11 foi-request-form&quot;]/div[@class=&quot;request-accordian&quot;]/div[@class=&quot;MuiPaper-root MuiAccordion-root Mui-expanded MuiAccordion-rounded MuiPaper-elevation1 MuiPaper-rounded&quot;]/div[@class=&quot;MuiCollapse-root MuiCollapse-entered&quot;]/div[@class=&quot;MuiCollapse-wrapper&quot;]/div[@class=&quot;MuiCollapse-wrapperInner&quot;]/div[1]/div[@class=&quot;MuiAccordionDetails-root&quot;]/div[@class=&quot;foi-ministries-container&quot;]/div[@class=&quot;foi-ministries-checkboxes&quot;]/label[@class=&quot;check-item&quot;]/span[@class=&quot;checkmark&quot;]</value>
       </entry>
       <entry>
          <key>CSS</key>
-      </entry>
-      <entry>
-         <key>BASIC</key>
-         <value>id(&quot;Request&quot;)/div[@class=&quot;container foi-review-request-container&quot;]/div[@class=&quot;foi-review-container&quot;]/form[@class=&quot;jss5 foi-request-form&quot;]/div[@class=&quot;MuiPaper-root MuiCard-root foi-details-card MuiPaper-elevation1 MuiPaper-rounded&quot;]/div[@class=&quot;MuiCardContent-root&quot;]/div[@class=&quot;foi-ministries-container&quot;]/div[@class=&quot;foi-ministries-checkboxes&quot;]/label[@class=&quot;check-item&quot;]/span[@class=&quot;checkmark&quot;]</value>
+         <value></value>
       </entry>
    </selectorCollection>
-   <selectorMethod>XPATH</selectorMethod>
+   <selectorMethod>BASIC</selectorMethod>
    <useRalativeImagePath>true</useRalativeImagePath>
    <webElementProperties>
       <isSelected>false</isSelected>
       <matchCondition>equals</matchCondition>
-      <name>tag</name>
+      <name>xpath</name>
       <type>Main</type>
-      <value>span</value>
+      <value>id(&quot;Request&quot;)/div[@class=&quot;container foi-review-request-container&quot;]/div[@class=&quot;foi-review-container&quot;]/form[@class=&quot;jss11 foi-request-form&quot;]/div[@class=&quot;request-accordian&quot;]/div[@class=&quot;MuiPaper-root MuiAccordion-root Mui-expanded MuiAccordion-rounded MuiPaper-elevation1 MuiPaper-rounded&quot;]/div[@class=&quot;MuiCollapse-root MuiCollapse-entered&quot;]/div[@class=&quot;MuiCollapse-wrapper&quot;]/div[@class=&quot;MuiCollapse-wrapperInner&quot;]/div[1]/div[@class=&quot;MuiAccordionDetails-root&quot;]/div[@class=&quot;foi-ministries-container&quot;]/div[@class=&quot;foi-ministries-checkboxes&quot;]/label[@class=&quot;check-item&quot;]/span[@class=&quot;checkmark&quot;]</value>
+      <webElementGuid>f73133a4-c15c-450a-affd-43b0db587f8c</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
       <matchCondition>equals</matchCondition>
-      <name>class</name>
+      <name>position</name>
       <type>Main</type>
-      <value>checkmark</value>
+      <value>//label[11]/span</value>
+      <webElementGuid>efe9cf24-12c9-42c2-97c8-8498e17397b0</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>type</name>
+      <type>Main</type>
+      <value>checkbox</value>
+      <webElementGuid>067c1e63-191b-4fd2-b704-b35ad136ad0c</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>true</isSelected>
       <matchCondition>equals</matchCondition>
-      <name>xpath</name>
+      <name>data-programareaid</name>
       <type>Main</type>
-      <value>id(&quot;Request&quot;)/div[@class=&quot;container foi-review-request-container&quot;]/div[@class=&quot;foi-review-container&quot;]/form[@class=&quot;jss5 foi-request-form&quot;]/div[@class=&quot;MuiPaper-root MuiCard-root foi-details-card MuiPaper-elevation1 MuiPaper-rounded&quot;]/div[@class=&quot;MuiCardContent-root&quot;]/div[@class=&quot;foi-ministries-container&quot;]/div[@class=&quot;foi-ministries-checkboxes&quot;]/label[@class=&quot;check-item&quot;]/span[@class=&quot;checkmark&quot;]</value>
+      <value>6</value>
+      <webElementGuid>09f80003-f171-42eb-9147-8b32f50ff6fe</webElementGuid>
    </webElementProperties>
    <webElementXpaths>
       <isSelected>true</isSelected>
       <matchCondition>equals</matchCondition>
       <name>xpath:idRelative</name>
       <type>Main</type>
-      <value>//div[@id='Request']/div/div/form/div[6]/div/div[4]/div/label[6]/span</value>
+      <value>//div[@id='Request']/div/div/form/div[7]/div/div[2]/div/div/div/div/div[6]/div/label[11]/span</value>
+      <webElementGuid>abf67de1-acde-4799-9e45-140467498e43</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
       <matchCondition>equals</matchCondition>
       <name>xpath:position</name>
       <type>Main</type>
-      <value>//label[6]/span</value>
+      <value>//label[11]/span</value>
+      <webElementGuid>bbf595c7-53e6-4bd3-9a0c-24228460a49e</webElementGuid>
    </webElementXpaths>
 </WebElementEntity>

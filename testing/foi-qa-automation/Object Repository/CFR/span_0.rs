@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>span_0</name>
+   <tag></tag>
+   <elementGuidId>41d61d10-008a-4272-ae9a-7271a0cbfad9</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>CSS</key>
+         <value></value>
+      </entry>
+      <entry>
+         <key>XPATH</key>
+         <value>//div[@id='CFRForm']/div/form/div/div[2]/div[3]/div/div[2]/div/div/div/div/div[2]/div[4]/span</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <useRalativeImagePath>true</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>tag</name>
+      <type>Main</type>
+      <value>span</value>
+      <webElementGuid>3e578f83-62e3-4721-a364-852f447546b3</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>class</name>
+      <type>Main</type>
+      <value>formLabel</value>
+      <webElementGuid>416638d8-9360-4bf2-bbf3-4b31c257602d</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>text</name>
+      <type>Main</type>
+      <value>$0</value>
+      <webElementGuid>3572823e-4e73-4c58-a8a4-b329698e9654</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>id(&quot;CFRForm&quot;)/div[@class=&quot;foi-review-container&quot;]/form[@class=&quot;MuiBox-root css-1cidgyh&quot;]/div[@class=&quot;foi-request-form&quot;]/div[@class=&quot;container foi-review-request-container cfrform-container&quot;]/div[@class=&quot;request-accordian&quot;]/div[@class=&quot;MuiPaper-root MuiPaper-elevation MuiPaper-rounded MuiPaper-elevation1 MuiAccordion-root MuiAccordion-rounded Mui-expanded MuiAccordion-gutters css-67l5gl&quot;]/div[@class=&quot;MuiCollapse-root MuiCollapse-vertical MuiCollapse-entered css-c4sutr&quot;]/div[@class=&quot;MuiCollapse-wrapper MuiCollapse-vertical css-hboir5&quot;]/div[@class=&quot;MuiCollapse-wrapperInner MuiCollapse-vertical css-8atqhb&quot;]/div[@class=&quot;MuiAccordion-region&quot;]/div[@class=&quot;MuiAccordionDetails-root css-u7qq7e&quot;]/div[@class=&quot;row cfr-fee-totals&quot;]/div[@class=&quot;col-lg-2 foi-details-col&quot;]/span[@class=&quot;formLabel&quot;]</value>
+      <webElementGuid>05145099-6917-4219-b8bc-16a75e4ec730</webElementGuid>
+   </webElementProperties>
+   <webElementXpaths>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:idRelative</name>
+      <type>Main</type>
+      <value>//div[@id='CFRForm']/div/form/div/div[2]/div[3]/div/div[2]/div/div/div/div/div[2]/div[4]/span</value>
+      <webElementGuid>008f587f-4e3d-4fa8-9ab9-f1041b0bed18</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='Actual Total'])[1]/following::span[1]</value>
+      <webElementGuid>c14221c1-edf3-44d2-b7b2-a29685520bfa</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='$0'])[1]/following::span[2]</value>
+      <webElementGuid>64eee155-8ff3-4242-a6cb-1ad44a394c89</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='Fee Waiver Amount'])[1]/preceding::span[1]</value>
+      <webElementGuid>7a1d9991-97fe-44ec-b110-b03146af6640</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='Fee Waiver Amount'])[2]/preceding::span[1]</value>
+      <webElementGuid>ccf222ac-2668-45c9-a579-1e1d53d0266b</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:position</name>
+      <type>Main</type>
+      <value>//div[4]/span</value>
+      <webElementGuid>c2f6e66b-2c8f-4ae3-a4eb-f4e9d5415559</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:customAttributes</name>
+      <type>Main</type>
+      <value>//span[(text() = '$0' or . = '$0')]</value>
+      <webElementGuid>d6bd8122-c1f7-410c-9758-078bf88c93a4</webElementGuid>
+   </webElementXpaths>
+</WebElementEntity>

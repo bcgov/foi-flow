@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>button_Add New Correspondence</name>
+   <tag></tag>
+   <elementGuidId>dd686b36-c547-41ee-9c54-b1b01e139893</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>CSS</key>
+         <value>button.btn.addCorrespondence</value>
+      </entry>
+      <entry>
+         <key>XPATH</key>
+         <value>//div[@id='ContactApplicant']/div/div/div[3]/button</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>XPATH</selectorMethod>
+   <useRalativeImagePath>true</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>tag</name>
+      <type>Main</type>
+      <value>button</value>
+      <webElementGuid>a5e77d6e-efe2-4c19-af5c-8facdca1c88e</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>class</name>
+      <type>Main</type>
+      <value>btn addCorrespondence</value>
+      <webElementGuid>371579b2-f821-4b45-bbd6-c7e16d53cba7</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>data-variant</name>
+      <type>Main</type>
+      <value>contained</value>
+      <webElementGuid>5e975888-206b-4c3f-8666-74a7e342e492</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>color</name>
+      <type>Main</type>
+      <value>primary</value>
+      <webElementGuid>6e2a11ed-8793-4b31-9015-aed737d3a40f</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>text</name>
+      <type>Main</type>
+      <value>+ Add New Correspondence</value>
+      <webElementGuid>941737f3-1f1b-4a7e-bc84-358d7a8c08f1</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>id(&quot;ContactApplicant&quot;)/div[@class=&quot;contact-applicant-container&quot;]/div[@class=&quot;MuiGrid-root MuiGrid-container MuiGrid-spacing-xs-1 MuiGrid-align-items-xs-flex-start&quot;]/div[@class=&quot;MuiGrid-root MuiGrid-item MuiGrid-grid-xs-3&quot;]/button[@class=&quot;btn addCorrespondence&quot;]</value>
+      <webElementGuid>0ed25549-e009-43c9-825c-cb094cb6311d</webElementGuid>
+   </webElementProperties>
+   <webElementXpaths>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:idRelative</name>
+      <type>Main</type>
+      <value>//div[@id='ContactApplicant']/div/div/div[3]/button</value>
+      <webElementGuid>03131f64-9eb7-436d-b92b-90a85cbb6c34</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='Request #ABC-700-602'])[3]/following::button[1]</value>
+      <webElementGuid>8a914c31-0311-4e7b-985e-9c123628775a</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='Show more comments'])[1]/following::button[1]</value>
+      <webElementGuid>21330f7e-0677-45bd-a660-fce68e88592b</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='Search Correspondence'])[1]/preceding::button[1]</value>
+      <webElementGuid>3030717e-c9b2-4b74-9465-8e7b98c8928d</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='​'])[3]/preceding::button[1]</value>
+      <webElementGuid>a496a6db-c671-4767-aae5-a07ab284de54</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>//*/text()[normalize-space(.)='+ Add New Correspondence']/parent::*</value>
+      <webElementGuid>70827247-c03c-4128-9773-a33031a3c56a</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:position</name>
+      <type>Main</type>
+      <value>//div[5]/div/div/div[3]/button</value>
+      <webElementGuid>7ff38d77-431f-47f7-83b7-56dfb0f7dd6b</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:customAttributes</name>
+      <type>Main</type>
+      <value>//button[(text() = '+ Add New Correspondence' or . = '+ Add New Correspondence')]</value>
+      <webElementGuid>599f1634-8068-49be-b78c-fda3c7f43735</webElementGuid>
+   </webElementXpaths>
+</WebElementEntity>

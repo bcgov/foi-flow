@@ -10,12 +10,12 @@
          <value>(//button[@type='button'])[2]</value>
       </entry>
       <entry>
-         <key>CSS</key>
-         <value>button.btn.btn-primary.signout-btn</value>
-      </entry>
-      <entry>
          <key>BASIC</key>
          <value>//*[@type = 'button' and (text() = 'Sign Out' or . = 'Sign Out')]</value>
+      </entry>
+      <entry>
+         <key>CSS</key>
+         <value>button.btn.btn-primary.signout-btn</value>
       </entry>
    </selectorCollection>
    <selectorMethod>BASIC</selectorMethod>
@@ -26,6 +26,7 @@
       <name>tag</name>
       <type>Main</type>
       <value>button</value>
+      <webElementGuid>1ba320e8-bd99-4c4e-8350-ec3072bb6009</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>true</isSelected>
@@ -33,6 +34,7 @@
       <name>type</name>
       <type>Main</type>
       <value>button</value>
+      <webElementGuid>6af1e1d7-5d47-4d66-ab97-9ef9337efcd5</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -40,6 +42,7 @@
       <name>class</name>
       <type>Main</type>
       <value>btn btn-primary signout-btn</value>
+      <webElementGuid>c415c682-9138-4c69-83a5-c4c196a264fb</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>true</isSelected>
@@ -47,6 +50,7 @@
       <name>text</name>
       <type>Main</type>
       <value>Sign Out</value>
+      <webElementGuid>cb5405b8-021c-49e2-88ef-7352985c717e</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -54,6 +58,7 @@
       <name>xpath</name>
       <type>Main</type>
       <value>id(&quot;responsive-navbar-nav&quot;)/div[@class=&quot;ml-auto navbar-nav&quot;]/div[@class=&quot;ml-auto banner-right foihamburgermenu&quot;]/ul[@class=&quot;navbar-nav foihamburgermenulist&quot;]/li[@class=&quot;nav-item foinavitem&quot;]/button[@class=&quot;btn btn-primary signout-btn&quot;]</value>
+      <webElementGuid>3ebe4320-82d6-4568-b676-7026e81fd2f6</webElementGuid>
    </webElementProperties>
    <webElementXpaths>
       <isSelected>true</isSelected>
@@ -61,6 +66,7 @@
       <name>xpath:attributes</name>
       <type>Main</type>
       <value>(//button[@type='button'])[2]</value>
+      <webElementGuid>ed5d3e45-d664-41f4-b9d0-393449d2d5e3</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -68,6 +74,7 @@
       <name>xpath:idRelative</name>
       <type>Main</type>
       <value>//div[@id='responsive-navbar-nav']/div/div/ul/li[3]/button</value>
+      <webElementGuid>769017c1-25d0-4fa2-bdc5-7ebacf3b2b8b</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -75,6 +82,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>(.//*[normalize-space(text()) and normalize-space(.)='FOI'])[1]/following::button[2]</value>
+      <webElementGuid>505d6def-8947-4527-a7a9-8a4c73350ff8</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -82,6 +90,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>(.//*[normalize-space(text()) and normalize-space(.)='Your FOI Request Queue'])[1]/preceding::button[1]</value>
+      <webElementGuid>c1836281-eb1c-496d-932d-ccb7af62ea3a</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -89,6 +98,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>(.//*[normalize-space(text()) and normalize-space(.)='Add Request'])[1]/preceding::button[1]</value>
+      <webElementGuid>987bb359-5f7d-4744-984a-b870df06df68</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -96,6 +106,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>//*/text()[normalize-space(.)='Sign Out']/parent::*</value>
+      <webElementGuid>d338c703-25b2-43c3-8985-c14bc97b4142</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -103,5 +114,6 @@
       <name>xpath:position</name>
       <type>Main</type>
       <value>//li[3]/button</value>
+      <webElementGuid>2c71ec7f-39fa-4782-80f5-d562a1f830cb</webElementGuid>
    </webElementXpaths>
 </WebElementEntity>

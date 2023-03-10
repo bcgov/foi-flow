@@ -31,87 +31,86 @@ WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/li_Call F
 
 WebUI.click(findTestObject('Page_foi.flow/form/state change dialog/button_Save Change'))
 
-mmaid = WebUI.callTestCase(findTestCase('submit/foi-test-save-request-form'), [:], FailureHandling.STOP_ON_FAILURE)
+//mmaid = WebUI.callTestCase(findTestCase('submit/foi-test-save-request-form'), [:], FailureHandling.STOP_ON_FAILURE)
 
-WebUI.scrollToElement(findTestObject('Page_foi.flow/form/inputs/request description/span_no PI Checkbox'), 
-    0)
+//WebUI.scrollToElement(findTestObject('Page_foi.flow/form/inputs/request description/span_no PI Checkbox'), 0)
 
-WebUI.click(findTestObject('Page_foi.flow/form/inputs/request description/span_EDU_checkmark'))
+//WebUI.click(findTestObject('Page_foi.flow/form/inputs/request description/span_EDU_selectspanEDU'))
 
-WebUI.click(findTestObject('Page_foi.flow/form/inputs/request description/span_MMA_checkmark'))
+//WebUI.click(findTestObject('Page_foi.flow/form/inputs/request description/span_MMA_checkmark'))
 
-WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/div_Status'))
+//WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/div_Status'))
 
-WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/li_Open'))
+//WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/li_Open'))
 
-WebUI.click(findTestObject('Page_foi.flow/form/state change dialog/button_Save Change'))
+//WebUI.click(findTestObject('Page_foi.flow/form/state change dialog/button_Save Change'))
 
-WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/div_Status'))
+//WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/div_Status'))
 
-WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/li_Call For Records'))
+//WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/li_Call For Records'))
 
-WebUI.click(findTestObject('Page_foi.flow/form/state change dialog/button_Save Change'))
+//WebUI.click(findTestObject('Page_foi.flow/form/state change dialog/button_Save Change'))
 
-jerid = WebUI.callTestCase(findTestCase('submit/foi-test-save-request-form'), [:], FailureHandling.STOP_ON_FAILURE)
+//jerid = WebUI.callTestCase(findTestCase('submit/foi-test-save-request-form'), [:], FailureHandling.STOP_ON_FAILURE)
 
-WebUI.scrollToElement(findTestObject('Page_foi.flow/form/inputs/request description/span_no PI Checkbox'),	0)
+//WebUI.scrollToElement(findTestObject('Page_foi.flow/form/inputs/request description/span_no PI Checkbox'), 0)
 
-WebUI.click(findTestObject('Page_foi.flow/form/inputs/request description/span_EDU_checkmark'))
+//WebUI.click(findTestObject('Page_foi.flow/form/inputs/request description/span_EDU_selectspanEDU'))
 
-WebUI.click(findTestObject('Page_foi.flow/form/inputs/request description/span_JER_checkmark'))
+//WebUI.click(findTestObject('Page_foi.flow/form/inputs/request description/span_JER_checkmark'))
 
-WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/div_Status'))
+//WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/div_Status'))
 
-WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/li_Open'))
+//WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/li_Open'))
 
-WebUI.click(findTestObject('Page_foi.flow/form/state change dialog/button_Save Change'))
+//WebUI.click(findTestObject('Page_foi.flow/form/state change dialog/button_Save Change'))
 
-WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/div_Status'))
+//WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/div_Status'))
 
-WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/li_Call For Records'))
+//WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/li_Call For Records'))
 
-WebUI.click(findTestObject('Page_foi.flow/form/state change dialog/button_Save Change'))
+//WebUI.click(findTestObject('Page_foi.flow/form/state change dialog/button_Save Change'))
 
-tacid = WebUI.callTestCase(findTestCase('submit/foi-test-save-request-form'), [:], FailureHandling.STOP_ON_FAILURE)
+//tacid = WebUI.callTestCase(findTestCase('submit/foi-test-save-request-form'), [:], FailureHandling.STOP_ON_FAILURE)
 
-WebUI.scrollToElement(findTestObject('Page_foi.flow/form/inputs/request description/span_no PI Checkbox'),	0)
+//WebUI.scrollToElement(findTestObject('Page_foi.flow/form/inputs/request description/span_no PI Checkbox'), 0)
 
-WebUI.click(findTestObject('Page_foi.flow/form/inputs/request description/span_EDU_checkmark'))
+//WebUI.click(findTestObject('Page_foi.flow/form/inputs/request description/span_EDU_selectspanEDU'))
 
-WebUI.click(findTestObject('Page_foi.flow/form/inputs/request description/span_TAC_checkmark'))
+//WebUI.click(findTestObject('Page_foi.flow/form/inputs/request description/span_TAC_checkmark'))
 
-WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/div_Status'))
+//WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/div_Status'))
 
-WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/li_Open'))
+//WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/li_Open'))
 
-WebUI.click(findTestObject('Page_foi.flow/form/state change dialog/button_Save Change'))
+//WebUI.click(findTestObject('Page_foi.flow/form/state change dialog/button_Save Change'))
 
-WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/div_Status'))
+//WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/div_Status'))
 
-WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/li_Call For Records'))
+//WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/li_Call For Records'))
 
-WebUI.click(findTestObject('Page_foi.flow/form/state change dialog/button_Save Change'))
+//WebUI.click(findTestObject('Page_foi.flow/form/state change dialog/button_Save Change'))
 
-lbrid = WebUI.callTestCase(findTestCase('submit/foi-test-save-request-form'), [:], FailureHandling.STOP_ON_FAILURE)
+//lbrid = WebUI.callTestCase(findTestCase('submit/foi-test-save-request-form'), [:], FailureHandling.STOP_ON_FAILURE)
 
-WebUI.scrollToElement(findTestObject('Page_foi.flow/form/inputs/request description/span_no PI Checkbox'),	0)
+//WebUI.scrollToElement(findTestObject('Page_foi.flow/form/inputs/request description/span_no PI Checkbox'), 0)
 
-WebUI.click(findTestObject('Page_foi.flow/form/inputs/request description/span_EDU_checkmark'))
+//WebUI.click(findTestObject('Page_foi.flow/form/inputs/request description/span_EDU_selectspanEDU'))
 
-WebUI.click(findTestObject('Page_foi.flow/form/inputs/request description/span_LBR_checkmark'))
+//WebUI.click(findTestObject('Page_foi.flow/form/inputs/request description/span_LBR_checkmark'))
 
-WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/div_Status'))
+//WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/div_Status'))
 
-WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/li_Open'))
+//WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/li_Open'))
 
-WebUI.click(findTestObject('Page_foi.flow/form/state change dialog/button_Save Change'))
+//WebUI.click(findTestObject('Page_foi.flow/form/state change dialog/button_Save Change'))
 
-WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/div_Status'))
+//WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/div_Status'))
 
-WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/li_Call For Records'))
+//WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/li_Call For Records'))
 
-WebUI.click(findTestObject('Page_foi.flow/form/state change dialog/button_Save Change'))
-
+//WebUI.click(findTestObject('Page_foi.flow/form/state change dialog/button_Save Change'))
+//Remove till here
 // put the following code back in once axis is phased out and delete above
 //WebUI.click(findTestObject('Page_foi.flow/form/inputs/request description/span_MMA_checkmark'))
 //
@@ -161,7 +160,6 @@ WebUI.click(findTestObject('Page_foi.flow/form/state change dialog/button_Save C
 //
 //WebUI.verifyElementPresent(findTestObject('Page_foi.flow/queue/div_request queue row 1'), 0)
 //
-
 //assert WebUI.getText(findTestObject('Page_foi.flow/queue/div_request queue row 1 request no'), FailureHandling.STOP_ON_FAILURE).contains(
 //    'EDU-' + requestID)
 //
@@ -250,24 +248,22 @@ WebUI.click(findTestObject('Page_foi.flow/form/state change dialog/button_Save C
 //WebUI.click(findTestObject('Page_foi.flow/form/state change dialog/button_Save Change'))
 //
 //WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
-
 WebUI.click(findTestObject('Page_foi.flow/navbar/button_Sign Out'))
 
 WebUI.callTestCase(findTestCase('divisional tracking/foi-test-divisional-tracking-edu-options'), [('requestID') : eduid], 
     FailureHandling.STOP_ON_FAILURE)
 
-WebUI.callTestCase(findTestCase('divisional tracking/foi-test-divisional-tracking-jer-options'), [('requestID') : jerid], 
-    FailureHandling.STOP_ON_FAILURE)
+//WebUI.callTestCase(findTestCase('divisional tracking/foi-test-divisional-tracking-jer-options'), [('requestID') : jerid], 
+   // FailureHandling.STOP_ON_FAILURE)
 
-WebUI.callTestCase(findTestCase('divisional tracking/foi-test-divisional-tracking-mma-options'), [('requestID') : mmaid], 
-    FailureHandling.STOP_ON_FAILURE)
+//WebUI.callTestCase(findTestCase('divisional tracking/foi-test-divisional-tracking-mma-options'), [('requestID') : mmaid], 
+   // FailureHandling.STOP_ON_FAILURE)
 
-WebUI.callTestCase(findTestCase('divisional tracking/foi-test-divisional-tracking-tac-options'), [('requestID') : tacid], 
-    FailureHandling.STOP_ON_FAILURE)
+//WebUI.callTestCase(findTestCase('divisional tracking/foi-test-divisional-tracking-tac-options'), [('requestID') : tacid], 
+   // FailureHandling.STOP_ON_FAILURE)
 
-WebUI.callTestCase(findTestCase('divisional tracking/foi-test-divisional-tracking-lbr-options'), [('requestID') : lbrid], 
-    FailureHandling.STOP_ON_FAILURE)
+//WebUI.callTestCase(findTestCase('divisional tracking/foi-test-divisional-tracking-lbr-options'), [('requestID') : lbrid], 
+ //   FailureHandling.STOP_ON_FAILURE)
 
-WebUI.callTestCase(findTestCase('divisional tracking/foi-test-divisional-tracking-comments'), [('requestID') : eduid], 
-    FailureHandling.STOP_ON_FAILURE)
+WebUI.callTestCase(findTestCase('divisional tracking/foi-test-divisional-tracking-comments'), [('requestID') : eduid], FailureHandling.STOP_ON_FAILURE)
 

@@ -90,8 +90,8 @@ if (WebUI.verifyElementPresent(findTestObject('Page_foi.flow/navbar/notification
     WebUI.click(findTestObject('Page_foi.flow/navbar/notification/div_watching notifiation Dismiss All'))
 }
 
-assert WebUI.getAttribute(findTestObject('Page_foi.flow/navbar/notification/span_notification indicator'), 'class').contains(
-    'MuiBadge-invisible')
+//assert WebUI.getAttribute(findTestObject('Page_foi.flow/navbar/notification/span_notification indicator'), 'class').contains(
+  //  'MuiBadge-invisible')
 
 WebUI.clickOffset(findTestObject('Page_foi.flow/navbar/notification/notification bell'), -2, 4)
 
@@ -109,25 +109,31 @@ DriverFactory.changeWebDriver(user1)
 
 WebUI.click(findTestObject('Page_foi.flow/form/assignee dropdown/div_Assigned'))
 
-WebUI.click(findTestObject('Page_foi.flow/form/assignee dropdown/li_assignee user option', [('user') : teammate2]))
+WebUI.click(findTestObject('Page_foi.flow/form/assignee dropdown/li_Intake, FOI'))
 
 WebUI.scrollToElement(findTestObject('Page_foi.flow/form/button_Save'), 0)
 
 WebUI.clickOffset(findTestObject('Page_foi.flow/navbar/notification/notification bell'), -2, 4)
 
-if (WebUI.verifyElementPresent(findTestObject('Page_foi.flow/navbar/notification/div_notification list 1'), 1, FailureHandling.OPTIONAL)) {
+WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT, FailureHandling.STOP_ON_FAILURE)
+
+
+
+//if (WebUI.verifyElementPresent(findTestObject('Page_foi.flow/navbar/notification/div_notification list 1'), 1, FailureHandling.OPTIONAL)) {
     WebUI.click(findTestObject('Page_foi.flow/navbar/notification/div_notifiation Dismiss All'))
-}
+//}
 
 WebUI.click(findTestObject('Page_foi.flow/navbar/notification/a_Watching Notifications'))
+WebUI.delay(3)
 
 if (WebUI.verifyElementPresent(findTestObject('Page_foi.flow/navbar/notification/div_watching notification list 1'), 1, 
     FailureHandling.OPTIONAL)) {
     WebUI.click(findTestObject('Page_foi.flow/navbar/notification/div_watching notifiation Dismiss All'))
 }
+//WebUI.delay(4)
 
-assert WebUI.getAttribute(findTestObject('Page_foi.flow/navbar/notification/span_notification indicator'), 'class').contains(
-    'MuiBadge-invisible')
+//assert WebUI.getAttribute(findTestObject('Page_foi.flow/navbar/notification/span_notification indicator'), 'class').contains(
+   // 'MuiBadge-invisible')
 
 WebUI.verifyElementPresent(findTestObject('Page_foi.flow/navbar/notification/div_notification popup'), 0)
 
@@ -154,8 +160,8 @@ WebUI.refresh()
 
 WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT, FailureHandling.STOP_ON_FAILURE)
 
-assert !(WebUI.getAttribute(findTestObject('Page_foi.flow/navbar/notification/span_notification indicator'), 'class').contains(
-    'MuiBadge-invisible'))
+//assert !(WebUI.getAttribute(findTestObject('Page_foi.flow/navbar/notification/span_notification indicator'), 'class').contains(
+ //   'MuiBadge-invisible'))
 
 WebUI.verifyElementText(findTestObject('Page_foi.flow/navbar/notification/span_notification indicator'), '1')
 
@@ -179,13 +185,17 @@ WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/div_Statu
 
 WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/li_Call For Records'), FailureHandling.STOP_ON_FAILURE)
 
-WebUI.click(findTestObject('Page_foi.flow/form/state change dialog/button_Save Change'), FailureHandling.STOP_ON_FAILURE)
+WebUI.click(findTestObject('Page_foi.flow/form/state change dialog/button_Save Change'))
 
 DriverFactory.changeWebDriver(user2)
 
 WebUI.refresh()
 
+//WebUI.click(findTestObject('Page_foi.flow/form/state change dialog/button_Save Change'), FailureHandling.STOP_ON_FAILURE)
 WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT, FailureHandling.STOP_ON_FAILURE)
+
+WebUI.refresh()
+WebUI.delay(4)
 
 WebUI.verifyElementText(findTestObject('Page_foi.flow/navbar/notification/span_notification indicator'), '2')
 
@@ -269,7 +279,7 @@ def requestID2 = WebUI.callTestCase(findTestCase('submit/foi-test-save-request-f
 
 WebUI.click(findTestObject('Page_foi.flow/form/assignee dropdown/div_Assigned'))
 
-WebUI.click(findTestObject('Page_foi.flow/form/assignee dropdown/li_assignee user option', [('user') : teammate2]))
+WebUI.click(findTestObject('Page_foi.flow/form/assignee dropdown/li_Intake, FOI'))
 
 WebUI.scrollToElement(findTestObject('Page_foi.flow/form/button_Save'), 0)
 

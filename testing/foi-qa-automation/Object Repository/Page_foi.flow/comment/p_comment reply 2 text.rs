@@ -10,6 +10,10 @@
          <value>//div[@id='Comments']/div/div[3]/div[2]/div/div[2]/div[2]/div/div/div[2]/p</value>
       </entry>
       <entry>
+         <key>BASIC</key>
+         <value>id(&quot;Comments&quot;)/div[@class=&quot;section&quot;]/div[@class=&quot;displayComments&quot;]/div[2]/div[@class=&quot;commentsection&quot;]/div[@class=&quot;replySection&quot;]/div[2]/div[@class=&quot;halfDiv undermaincomment&quot;]/div[@class=&quot;userInfo&quot;]/div[@class=&quot;commenttext&quot;]/p[1]</value>
+      </entry>
+      <entry>
          <key>CSS</key>
       </entry>
    </selectorCollection>
@@ -21,6 +25,7 @@
       <name>tag</name>
       <type>Main</type>
       <value>p</value>
+      <webElementGuid>7e745d7a-092c-4b58-9877-ea98c6953fe0</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -28,6 +33,7 @@
       <name>text</name>
       <type>Main</type>
       <value>test</value>
+      <webElementGuid>ff1a09dd-d3e0-453d-a514-f4b6c1766396</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>true</isSelected>
@@ -35,6 +41,7 @@
       <name>xpath</name>
       <type>Main</type>
       <value>id(&quot;Comments&quot;)/div[@class=&quot;section&quot;]/div[@class=&quot;displayComments&quot;]/div[2]/div[@class=&quot;commentsection&quot;]/div[@class=&quot;replySection&quot;]/div[2]/div[@class=&quot;halfDiv undermaincomment&quot;]/div[@class=&quot;userInfo&quot;]/div[@class=&quot;commenttext&quot;]/p[1]</value>
+      <webElementGuid>eb01103b-3134-45a3-8382-ead401543fa1</webElementGuid>
    </webElementProperties>
    <webElementXpaths>
       <isSelected>true</isSelected>
@@ -42,6 +49,7 @@
       <name>xpath:idRelative</name>
       <type>Main</type>
       <value>//div[@id='Comments']/div/div[3]/div[2]/div/div[2]/div[2]/div/div/div[2]/p</value>
+      <webElementGuid>af050fe3-e3a9-4368-96f9-199c7f3becda</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -49,6 +57,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>(.//*[normalize-space(text()) and normalize-space(.)='User, Super'])[2]/following::p[1]</value>
+      <webElementGuid>a7f1b460-fb6c-4682-b503-7071f35a22f6</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -56,6 +65,7 @@
       <name>xpath:position</name>
       <type>Main</type>
       <value>//div[2]/div/div[2]/div[2]/div/div/div[2]/p</value>
+      <webElementGuid>df150343-1789-4e98-99ed-20e2ceabd88a</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -63,5 +73,6 @@
       <name>xpath:customAttributes</name>
       <type>Main</type>
       <value>//p[(text() = 'test' or . = 'test')]</value>
+      <webElementGuid>d468c32f-11b6-4fb0-ac30-13ab693ac492</webElementGuid>
    </webElementXpaths>
 </WebElementEntity>
