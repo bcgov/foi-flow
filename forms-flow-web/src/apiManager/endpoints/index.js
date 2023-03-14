@@ -86,6 +86,7 @@ const API = {
   FOI_RAWREQUEST_ASSIGNEE_API:  `${FOI_BASE_API_URL}/api/foirawrequest/<requestid>/assignee`,
 
   FOI_GET_S3DOCUMENT_PRESIGNEDURL:`${FOI_BASE_API_URL}/api/foiflow/oss/presigned`,
+  FOI_POST_S3DOCUMENT_PRESIGNEDURL:`${FOI_BASE_API_URL}/api/foiflow/oss/presigned`,
 
   FOI_GET_SUBJECT_CODELIST: `${FOI_BASE_API_URL}/api/foiflow/subjectcodes`,
   FOI_POST_RAWREQUEST_RESTRICTION: `${FOI_BASE_API_URL}/api/foirawrequest/restricted/<requestid>`,
