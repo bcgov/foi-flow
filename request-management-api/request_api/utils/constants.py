@@ -23,5 +23,8 @@ DEDUPE_FILE_TYPES = ['.pdf','.json',
    '.shx', '.shp','.dbf','.kml','.kmz','.geojson','.cpg','.prj','.sbn','.sbx','.gml','.gdb','.freelist','.atx','.gpkg','.mbtiles','.mpk','.wkt',
   '.las','.lasd','.laz','.dwf','.dwg','.dxf','.csv','.txt','.png','.jpg']
 
+NONREDACTABLE_FILE_TYPES = ['.json',
+   '.shx', '.shp','.dbf','.kml','.kmz','.geojson','.cpg','.prj','.sbn','.sbx','.gml','.gdb','.freelist','.atx','.gpkg','.mbtiles','.mpk','.wkt',
+  '.las','.lasd','.laz','.dwf','.dwg','.dxf','.csv','.txt']
 
 
