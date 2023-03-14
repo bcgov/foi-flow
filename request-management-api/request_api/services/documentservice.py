@@ -71,9 +71,9 @@ class documentservice:
     def createministrydocumentversion(self, ministryrequestid, documentid, documentschema, userid):
         version = self.__getversionforrequest(ministryrequestid, "ministryrequest")        
         document = FOIMinistryRequestDocument.getdocument(documentid)
-        FOIMinistryRequestDocument.deActivateministrydocumentsversion(documentid, document['version']+1, userid)
         if document:
-           return FOIMinistryRequestDocument.createdocumentversion(ministryrequestid, version, self.__copydocumentproperties(document,documentschema,document['version']), userid)          
+            FOIMinistryRequestDocument.deActivateministrydocumentsversion(documentid, document['version']+1, userid)
+            return FOIMinistryRequestDocument.createdocumentversion(ministryrequestid, version, self.__copydocumentproperties(document,documentschema,document['version']), userid)          
         elif isinstance(documentschema, list):            
             return FOIMinistryRequestDocument.createdocuments(ministryrequestid, version, documentschema, userid)
         else:
