@@ -77,13 +77,13 @@ WebUI.click(findTestObject('Page_foi.flow/ministry view/form/ministry assignee/l
 
 WebUI.scrollToElement(findTestObject('Page_foi.flow/form/button_Save'), 0)
 
-WebUI.click(findTestObject('null'))
+WebUI.click(findTestObject('CFR/div_CFR Form'))
 
 WebUI.verifyElementVisible(findTestObject('CFR/input_Actual Hours_locating'))
 
 WebUI.verifyElementVisible(findTestObject('CFR/input_Actual Hours_producing'))
 
-WebUI.verifyElementVisible(findTestObject('CFR/input_Estimated Hours IAO_iaoPreparing'))
+WebUI.verifyElementVisible(findTestObject('CFR/input_Actual Hours IAO_iaoPreparing'))
 
 WebUI.verifyElementVisible(findTestObject('CFR/input_Estimated Hours_locating'))
 
@@ -111,25 +111,21 @@ WebUI.verifyElementClickable(findTestObject('CFR/input_Estimated Hours Ministry_
 
 WebUI.verifyElementVisible(findTestObject('CFR/textarea_Combined suggestions for futher clarifications_suggestions'))
 
-WebUI.setText(findTestObject('null'), '5')
+WebUI.setText(findTestObject('CFR/input_Estimated Hours_locating'), '5')
 
-WebUI.setText(findTestObject('null'), '3')
+WebUI.setText(findTestObject('CFR/input_Estimated Hours_producing'), '3')
 
-WebUI.setText(findTestObject('CFR/input_Estimated Hours Ministry_ministryPreparing'), 
-    '4')
+WebUI.setText(findTestObject('CFR/input_Estimated Hours Ministry_ministryPreparing'), '4')
 
 WebUI.setText(findTestObject('CFR/input_Hardcopy Estimated Pages_hardcopyPages'), '8')
 
-WebUI.setText(findTestObject('CFR/textarea_Combined suggestions for futher clarifications_suggestions'), 
-    'verified')
+WebUI.setText(findTestObject('CFR/textarea_Combined suggestions for futher clarifications_suggestions'), 'verified')
 
 WebUI.scrollToElement(findTestObject('CFR/div_270.8'), 0)
 
 WebUI.verifyElementText(findTestObject('CFR/div_270.8'), '$270.8')
 
 WebUI.delay(3)
-
-WebUI.maximizeWindow()
 
 WebUI.scrollToElement(findTestObject('CFR/button_Save'), 0)
 
@@ -139,9 +135,9 @@ WebUI.delay(4)
 
 WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/div_Status'))
 
-WebUI.click(findTestObject('null'))
+WebUI.click(findTestObject('Page_foi.flow/ministry view/form/divisional tracking/stage dropdown options/li_Fee Estimate'))
 
-WebUI.click(findTestObject('null'))
+WebUI.click(findTestObject('Page_foi.flow/form/state change dialog/button_Save Change'))
 
 DriverFactory.changeWebDriver(IAOuser)
 
@@ -150,75 +146,137 @@ WebUI.refresh()
 WebUI.verifyElementAttributeValue(findTestObject('Page_foi.flow/form/sidebar/status dropdown/input_Status'), 'value', 'Fee Estimate', 
     0)
 
-WebUI.verifyElementPresent(findTestObject('null'), 0)
+WebUI.verifyElementPresent(findTestObject('CFR/div_Contact Applicant'), 0)
 
-WebUI.click(findTestObject('null'))
+WebUI.click(findTestObject('CFR/div_CFR Form'))
 
-WebUI.click(findTestObject('null'))
+WebUI.scrollToElement(findTestObject('Page_foi.flow/form/sidebar/a_FOI'), 0)
 
-WebUI.click(findTestObject('Object Repository/CFR/CFR_status/li_Needs Clarification with Ministry'))
+WebUI.scrollToElement(findTestObject('CFR/CFR_status/div_Approved'), 0)
 
-WebUI.click(findTestObject('null'))
+WebUI.click(findTestObject('CFR/CFR_status/div_Approved'))
+
+WebUI.click(findTestObject('CFR/CFR_status/li_Needs Clarification with Ministry'))
+
+WebUI.click(findTestObject('Page_foi.flow/form/state change dialog/button_Save Change'))
 
 DriverFactory.changeWebDriver(ministryUser)
 
 WebUI.refresh()
 
-WebUI.click(findTestObject('null'))
+WebUI.click(findTestObject('CFR/div_CFR Form'))
 
-WebUI.click(findTestObject('null'))
+WebUI.scrollToElement(findTestObject('CFR/CFR_status/div_Approved'), 0)
 
-WebUI.click(findTestObject('Object Repository/CFR/CFR_status/li_In Review with IAO'))
+WebUI.click(findTestObject('CFR/CFR_status/div_Approved'))
 
-WebUI.click(findTestObject('null'))
+WebUI.click(findTestObject('CFR/CFR_status/li_In Review with IAO'))
+
+WebUI.click(findTestObject('Page_foi.flow/form/state change dialog/button_Save Change'))
 
 DriverFactory.changeWebDriver(IAOuser)
 
 WebUI.refresh()
 
-WebUI.click(findTestObject('null'))
+WebUI.click(findTestObject('CFR/div_CFR Form'))
 
-WebUI.setText(findTestObject('null'), '1')
+WebUI.setText(findTestObject('CFR/input_Estimated Hours IAO_iaoPreparing'), '1')
 
-WebUI.click(findTestObject('null'))
+WebUI.verifyElementText(findTestObject('CFR/span_300.8'), '$300.8')
 
-WebUI.click(findTestObject('null'))
+WebUI.scrollToElement(findTestObject('CFR/button_Save'), 0)
 
-WebUI.click(findTestObject('Object Repository/CFR/CFR_status/body_FOI  Intake Flex 1Sign OutABC-700-602S_d39e5c'))
-
-WebUI.click(findTestObject('Object Repository/CFR/CFR_status/li_Approved'))
-
-WebUI.click(findTestObject('null'))
+//WebUI.click(findTestObject('Object Repository/CFR/Page_ABC-700-602/p_hr(s)'))
+WebUI.click(findTestObject('CFR/button_Save'))
 
 WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/div_Status'))
 
 WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/li_On Hold'))
 
-WebUI.click(findTestObject('Object Repository/CFR/button_Add Files'))
+WebUI.click(findTestObject('Page_foi.flow/form/state change dialog/button_Cancel'))
 
-WebUI.click(findTestObject('null'))
+WebUI.scrollToElement(findTestObject('CFR/CFR_status/div_Approved'), 0)
 
-WebUI.click(findTestObject('null'))
+WebUI.click(findTestObject('CFR/CFR_status/div_Approved'))
+
+WebUI.click(findTestObject('CFR/CFR_status/li_Approved'))
+
+WebUI.click(findTestObject('Page_foi.flow/form/state change dialog/button_Save Change'))
+
+WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/div_Status'))
+
+WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/li_On Hold'))
+
+WebUI.click(findTestObject('Page_foi.flow/attachment/button_Add Files'))
+
+//println(RunConfiguration.getProjectDir() + '/Test Attachments')
+WebUI.uploadFile(findTestObject('Page_foi.flow/attachment/input_Add Files_file-upload-input'), RunConfiguration.getProjectDir() + 
+    '/Test Attachments/test2.pdf')
+
+WebUI.click(findTestObject('Page_foi.flow/form/state change dialog/button_Save Change'))
+
+WebUI.click(findTestObject('Page_foi.flow/form/sidebar/div_Sidebar Comments'))
+
+WebUI.scrollToElement(findTestObject('Page_foi.flow/comment/span_Request History Comments'), 0)
+
+WebUI.click(findTestObject('Page_foi.flow/comment/span_Request History Comments'))
+
+WebUI.delay(3)
+
+WebUI.verifyElementText(findTestObject('Page_foi.flow/comment/p_comment list 1 text'), ((findTestData('Login Credentials').getValue(
+        'First Name', 1) + ' ') + findTestData('Login Credentials').getValue('Last Name', 1)) + ' changed the state of the request to On Hold')
+
+WebUI.click(findTestObject('CFR/div_Contact Applicant'))
+
+WebUI.verifyElementPresent(findTestObject('CFR/Payment_Info/Payment_received_notification'), 0)
+
+WebUI.click(findTestObject('CFR/button_Add New Correspondence'))
+
+WebUI.click(findTestObject('CFR/Payment_Info/Page_ABC-2099-13988/div_'))
+
+WebUI.click(findTestObject('CFR/Payment_Info/Page_ABC-2099-13988/li_Fee Estimate'))
+
+WebUI.click(findTestObject('CFR/Payment_Info/Page_ABC-2099-13988/svg'))
+
+WebUI.click(findTestObject('CFR/button_Add Files'))
+
+WebUI.uploadFile(findTestObject('Page_foi.flow/attachment/input_Add Files_file-upload-input'), RunConfiguration.getProjectDir() + 
+    '/Test Attachments/test2.pdf')
+
+WebUI.click(findTestObject('Page_foi.flow/form/state change dialog/button_Save Change'))
+
+WebUI.click(findTestObject('CFR/button_Preview  Send Email'))
+
+WebUI.click(findTestObject('CFR/button_Send Email'))
+
+WebUI.delay(4)
+
+WebUI.scrollToElement(findTestObject('CFR/a_Pay Online'), 0)
 
 WebUI.click(findTestObject('CFR/a_Pay Online'))
 
 WebUI.click(findTestObject('CFR/Payment_Info/button_Pay Online'))
 
-WebUI.click(findTestObject('CFR/Payment_Info/input_Card Number_trnCardNumber'))
+WebUI.scrollToElement(findTestObject('CFR/Payment_Info/button_Pay Full Estimate Fee'), 0)
 
-WebUI.click(findTestObject('CFR/Payment_Info/input_Card CVD_trnCardCvd'))
+WebUI.click(findTestObject('CFR/Payment_Info/button_Pay Full Estimate Fee'))
 
 WebUI.click(findTestObject('CFR/Payment_Info/button_Process Payment'))
 
+WebUI.setText(findTestObject('CFR/Payment_Info/input_Card Number_trnCardNumber'), '4030000010001234')
+
+WebUI.setText(findTestObject('CFR/Payment_Info/input_Card CVD_trnCardCvd'), '123')
+
+WebUI.click(findTestObject('CFR/Payment_Info/input_concat(What, , s this)_submitButton'))
+
 WebUI.verifyElementPresent(findTestObject('CFR/Payment_Info/b_Payment Successful'), 0)
 
-//WebUI.click(findTestObject('null'))
-//WebUI.click(findTestObject('null'))
+//WebUI.click(findTestObject('Object Repository/CFR/Page_ABC-700-602/div_Contact Applicant (1)'))
+//WebUI.click(findTestObject('Object Repository/CFR/Page_ABC-700-602/path_Pay Online_ql-even ql-stroke'))
 WebUI.navigateToUrl(GlobalVariable.BASE_URL)
 
 //WebUI.callTestCase(findTestCase('helper/foi-test-login'), [('password') : findTestData('Login Credentials').getValue('Password', 
-          //  1), ('username') : findTestData('Login Credentials').getValue('Username', 1)], FailureHandling.STOP_ON_FAILURE)
-
+//  1), ('username') : findTestData('Login Credentials').getValue('Username', 1)], FailureHandling.STOP_ON_FAILURE)
 WebUI.click(findTestObject('Page_foi.flow/queue/div_My Team Requests'))
 
 WebUI.setText(findTestObject('Page_foi.flow/queue/input_Dashboard Filter'), requestID)
@@ -226,59 +284,55 @@ WebUI.setText(findTestObject('Page_foi.flow/queue/input_Dashboard Filter'), requ
 WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
 
 WebUI.click(findTestObject('Page_foi.flow/queue/div_request queue row 1'))
-WebUI.click(findTestObject('null'))
 
-WebUI.click(findTestObject('Object Repository/CFR/button_Add Files'))
-WebUI.click(findTestObject('Page_foi.flow/attachment/button_Add Attachment'), FailureHandling.STOP_ON_FAILURE)
+WebUI.verifyElementAttributeValue(findTestObject('Page_foi.flow/form/sidebar/status dropdown/input_Status'), 'value', 'Call For Records', 
+    0)
 
-println(RunConfiguration.getProjectDir() + '/Test Attachments')
+WebUI.click(findTestObject('CFR/div_Contact Applicant'))
 
-WebUI.uploadFile(findTestObject('Page_foi.flow/attachment/input_Add Files_file-upload-input'), RunConfiguration.getProjectDir() +
-	'/Test Attachments/test.docx')
+WebUI.verifyElementPresent(findTestObject('CFR/Payment_Info/Payment_email_notification'), 0)
 
-WebUI.click(findTestObject('null'))
+WebUI.verifyElementPresent(findTestObject('CFR/Payment_Info/Payment_received_notification'), 0)
 
-WebUI.click(findTestObject('Object Repository/CFR/button_Preview  Send Email'))
-
-WebUI.click(findTestObject('Object Repository/CFR/button_Send Email'))
-
-WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/li_On Hold'))
-
-WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/div_Status'))
-
-WebUI.click(findTestObject('null'))
-
-WebUI.click(findTestObject('null'))
-
+//WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/div_Status'))
+//WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/li_Call For Records'))
+//WebUI.click(findTestObject('Page_foi.flow/form/state change dialog/button_Save Change'))
 DriverFactory.changeWebDriver(ministryUser)
 
 WebUI.refresh()
 
-WebUI.click(findTestObject('null'))
+WebUI.click(findTestObject('CFR/div_CFR Form'))
 
-WebUI.verifyElementText(findTestObject('CFR/input_Amount Paid_amountPaid'), '$270.8')
+WebUI.verifyElementText(findTestObject('CFR/input_Amount Paid_amountPaid'), '$300.8')
 
-WebUI.setText(findTestObject('null'), '10')
+WebUI.setText(findTestObject('CFR/input_Actual Hours_producing'), '10')
 
 WebUI.verifyElementText(findTestObject('CFR/span_0'), '$210.8')
 
-WebUI.verifyElementText(findTestObject('CFR/input_Balance Remaining_balanceRemaining'), '-60.8')
+WebUI.verifyElementText(findTestObject('CFR/input_Balance Remaining_balanceRemaining'), '-90.8')
 
-WebUI.click(findTestObject('null'))
+WebUI.click(findTestObject('CFR/button_Save'))
 
 WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/div_Status'))
 
-WebUI.click(findTestObject('null'))
+WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/li_Records Review'))
 
 DriverFactory.changeWebDriver(IAOuser)
 
 WebUI.refresh()
 
-WebUI.click(findTestObject('null'))
+WebUI.click(findTestObject('CFR/div_CFR Form'))
 
-WebUI.click(findTestObject('null'))
+WebUI.setText(findTestObject('CFR/input_Actual Hours IAO_iaoPreparing'), '1')
 
-WebUI.click(findTestObject('null'))
+WebUI.verifyElementText(findTestObject('CFR/span_0'), '$210.8')
 
-WebUI.click(findTestObject('null'))
+WebUI.verifyElementText(findTestObject('CFR/input_Balance Remaining_balanceRemaining'), '-90.8')
+
+//WebUI.acceptAlert()
+WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/div_Status'))
+
+WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/li_Closed'))
+
+WebUI.click(findTestObject('Object Repository/CFR/Page_ABC-700-602/button_Save Change'))
 

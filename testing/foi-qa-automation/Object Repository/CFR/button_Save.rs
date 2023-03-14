@@ -15,10 +15,10 @@
       </entry>
       <entry>
          <key>XPATH</key>
-         <value>(//button[@type='button'])[5]</value>
+         <value>//button[@id='btncfrsave']</value>
       </entry>
    </selectorCollection>
-   <selectorMethod>BASIC</selectorMethod>
+   <selectorMethod>XPATH</selectorMethod>
    <useRalativeImagePath>true</useRalativeImagePath>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -26,7 +26,7 @@
       <name>tag</name>
       <type>Main</type>
       <value>button</value>
-      <webElementGuid>d17e27ca-e038-454c-8c5f-7e21983eef1b</webElementGuid>
+      <webElementGuid>ea83a49c-39d5-402b-880a-53511c886a41</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>true</isSelected>
@@ -34,7 +34,7 @@
       <name>type</name>
       <type>Main</type>
       <value>button</value>
-      <webElementGuid>a40d5508-dde4-49df-938d-5cdace571f06</webElementGuid>
+      <webElementGuid>1b8d7456-6981-484e-8bf3-9cc3274807fa</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -42,7 +42,7 @@
       <name>class</name>
       <type>Main</type>
       <value>btn btn-bottom jss45</value>
-      <webElementGuid>5955f635-3c19-4e19-9f8b-c481cacaa2e2</webElementGuid>
+      <webElementGuid>20c7c784-4e01-4660-a452-add9a5d3c7e2</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>true</isSelected>
@@ -50,7 +50,7 @@
       <name>text</name>
       <type>Main</type>
       <value>Save</value>
-      <webElementGuid>9781dcd6-96a9-490a-b909-6e29f4ceab2d</webElementGuid>
+      <webElementGuid>f0204e68-45d6-49a1-b836-cedfc9903dad</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>true</isSelected>
@@ -58,7 +58,7 @@
       <name>xpath</name>
       <type>Main</type>
       <value>id(&quot;Request&quot;)/div[@class=&quot;container foi-review-request-container&quot;]/div[@class=&quot;foi-review-container&quot;]/form[@class=&quot;jss11 foi-request-form&quot;]/div[@class=&quot;jss42&quot;]/div[@class=&quot;foi-bottom-button-group&quot;]/button[@class=&quot;btn btn-bottom jss45&quot;]</value>
-      <webElementGuid>f87f00d0-04d3-45a4-bd82-e74ae8331f36</webElementGuid>
+      <webElementGuid>e8cfacf8-ee0c-45b3-977f-ac251409a534</webElementGuid>
    </webElementProperties>
    <webElementXpaths>
       <isSelected>true</isSelected>
@@ -66,7 +66,7 @@
       <name>xpath:attributes</name>
       <type>Main</type>
       <value>(//button[@type='button'])[5]</value>
-      <webElementGuid>78841f0d-6cf1-413a-8913-8ddf8506510f</webElementGuid>
+      <webElementGuid>b6237d12-329a-4b90-b21e-a31d596aaf7d</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -74,7 +74,7 @@
       <name>xpath:idRelative</name>
       <type>Main</type>
       <value>//div[@id='Request']/div/div/form/div[9]/div/button</value>
-      <webElementGuid>7a746ae7-db5d-4efa-bd42-667807641917</webElementGuid>
+      <webElementGuid>857e04c3-3879-4402-afd9-36697945b1da</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -82,7 +82,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>(.//*[normalize-space(text()) and normalize-space(.)='Online Form'])[1]/following::button[1]</value>
-      <webElementGuid>0434d719-1a06-4230-bf34-06d57578b905</webElementGuid>
+      <webElementGuid>7093a799-3937-4233-aaf8-a09efa16bca2</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -90,7 +90,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>(.//*[normalize-space(text()) and normalize-space(.)='Return to Queue'])[1]/preceding::button[1]</value>
-      <webElementGuid>d9a83a46-23fe-4c98-8f1a-63597cd9ef4c</webElementGuid>
+      <webElementGuid>9e57f211-bbc4-4035-8cbe-758839527fb9</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -98,7 +98,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>(.//*[normalize-space(text()) and normalize-space(.)='Request #U-0013893'])[1]/preceding::button[2]</value>
-      <webElementGuid>7ce03808-7d62-42dd-8c83-f5b365b46961</webElementGuid>
+      <webElementGuid>0e437ca3-7097-4377-9c19-8814e7584174</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -106,7 +106,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>//*/text()[normalize-space(.)='Save']/parent::*</value>
-      <webElementGuid>8e70db87-a5ee-4a62-a3a4-b0fc50667f16</webElementGuid>
+      <webElementGuid>1882c813-0f1e-4644-b17f-9d309844245a</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -114,7 +114,7 @@
       <name>xpath:position</name>
       <type>Main</type>
       <value>//div[9]/div/button</value>
-      <webElementGuid>f0e8926a-623e-45a2-9cb5-1dc849332a3e</webElementGuid>
+      <webElementGuid>ef4d9a1a-9a8c-441c-8c9a-483811557f56</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -122,6 +122,6 @@
       <name>xpath:customAttributes</name>
       <type>Main</type>
       <value>//button[@type = 'button' and (text() = 'Save' or . = 'Save')]</value>
-      <webElementGuid>b746fd1c-667f-4954-aec7-2f6dd9910b23</webElementGuid>
+      <webElementGuid>12433398-629d-4ca8-99b1-9361e83fcbaf</webElementGuid>
    </webElementXpaths>
 </WebElementEntity>

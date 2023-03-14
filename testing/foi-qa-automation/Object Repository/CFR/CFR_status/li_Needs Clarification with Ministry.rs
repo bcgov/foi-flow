@@ -6,14 +6,18 @@
    <elementGuidId>a2da4262-b8aa-4d12-8696-f3900751dc7b</elementGuidId>
    <selectorCollection>
       <entry>
-         <key>CSS</key>
+         <key>BASIC</key>
+         <value>id(&quot;menu-formStatus&quot;)/div[@class=&quot;MuiPaper-root MuiPaper-elevation MuiPaper-rounded MuiPaper-elevation1 MuiMenu-paper MuiPaper-root MuiPaper-elevation MuiPaper-rounded MuiPaper-elevation8 MuiPopover-paper css-177ic5c&quot;]/ul[@class=&quot;MuiList-root MuiList-padding MuiMenu-list css-r8u8y9&quot;]/li[@class=&quot;MuiMenuItem-root MuiMenuItem-gutters MuiButtonBase-root css-1km1ehz&quot;][count(. | //*[(text() = 'Needs Clarification with Ministry' or . = 'Needs Clarification with Ministry')]) = count(//*[(text() = 'Needs Clarification with Ministry' or . = 'Needs Clarification with Ministry')])]</value>
       </entry>
       <entry>
          <key>XPATH</key>
          <value>//div[@id='menu-formStatus']/div[3]/ul/li[3]</value>
       </entry>
+      <entry>
+         <key>CSS</key>
+      </entry>
    </selectorCollection>
-   <selectorMethod>XPATH</selectorMethod>
+   <selectorMethod>BASIC</selectorMethod>
    <useRalativeImagePath>true</useRalativeImagePath>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -21,7 +25,7 @@
       <name>tag</name>
       <type>Main</type>
       <value>li</value>
-      <webElementGuid>730ed63a-8958-476e-a91a-6a7a3654c7fe</webElementGuid>
+      <webElementGuid>00954390-027e-4bce-a426-e71b0dac9a0e</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -29,7 +33,7 @@
       <name>class</name>
       <type>Main</type>
       <value>MuiMenuItem-root MuiMenuItem-gutters MuiButtonBase-root css-1km1ehz</value>
-      <webElementGuid>cbee30bd-a7f0-4455-bef9-19f97eb1cd1d</webElementGuid>
+      <webElementGuid>fe133e4a-01b9-417a-a14b-8cc2c9ca4245</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -37,7 +41,7 @@
       <name>tabindex</name>
       <type>Main</type>
       <value>-1</value>
-      <webElementGuid>7c41269b-f04f-4459-9c39-a4552c5ba3f3</webElementGuid>
+      <webElementGuid>702d79e1-35d7-4120-9483-f0181c02a927</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -45,7 +49,7 @@
       <name>role</name>
       <type>Main</type>
       <value>option</value>
-      <webElementGuid>3f8e0378-2b87-49f9-a101-aa418139bc75</webElementGuid>
+      <webElementGuid>48469348-5189-4c87-a42d-91e457ff6dc1</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -53,7 +57,7 @@
       <name>aria-selected</name>
       <type>Main</type>
       <value>false</value>
-      <webElementGuid>fc0cd153-975e-405b-b44a-a27916944b21</webElementGuid>
+      <webElementGuid>affe118f-cfae-4016-9e85-fc95bac67246</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -61,7 +65,7 @@
       <name>data-value</name>
       <type>Main</type>
       <value>clarification</value>
-      <webElementGuid>00debda0-b80f-45b1-a8e2-6c197fb20c86</webElementGuid>
+      <webElementGuid>9be5f496-4e69-4519-828b-38a54f346de5</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>true</isSelected>
@@ -69,15 +73,15 @@
       <name>text</name>
       <type>Main</type>
       <value>Needs Clarification with Ministry</value>
-      <webElementGuid>b3aa027c-6074-4e79-afe5-a9823a795f3e</webElementGuid>
+      <webElementGuid>d13291bc-b19a-4aa4-a00e-9751b54dab7a</webElementGuid>
    </webElementProperties>
    <webElementProperties>
-      <isSelected>false</isSelected>
+      <isSelected>true</isSelected>
       <matchCondition>equals</matchCondition>
       <name>xpath</name>
       <type>Main</type>
       <value>id(&quot;menu-formStatus&quot;)/div[@class=&quot;MuiPaper-root MuiPaper-elevation MuiPaper-rounded MuiPaper-elevation1 MuiMenu-paper MuiPaper-root MuiPaper-elevation MuiPaper-rounded MuiPaper-elevation8 MuiPopover-paper css-177ic5c&quot;]/ul[@class=&quot;MuiList-root MuiList-padding MuiMenu-list css-r8u8y9&quot;]/li[@class=&quot;MuiMenuItem-root MuiMenuItem-gutters MuiButtonBase-root css-1km1ehz&quot;]</value>
-      <webElementGuid>de456848-1366-46f1-8c95-c2b85ccdaec6</webElementGuid>
+      <webElementGuid>caa3bc3f-6d84-455e-a3ad-c635148f161b</webElementGuid>
    </webElementProperties>
    <webElementXpaths>
       <isSelected>true</isSelected>
@@ -85,7 +89,7 @@
       <name>xpath:idRelative</name>
       <type>Main</type>
       <value>//div[@id='menu-formStatus']/div[3]/ul/li[3]</value>
-      <webElementGuid>4f2876e5-9ab1-41dd-8c5c-6db0028fe834</webElementGuid>
+      <webElementGuid>9450e710-48e5-4e00-b546-16d28706f1c4</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -93,7 +97,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>(.//*[normalize-space(text()) and normalize-space(.)='In Review with IAO'])[2]/following::li[1]</value>
-      <webElementGuid>f14dcbb9-31cc-4fe8-86c4-c06d9f3a0ac7</webElementGuid>
+      <webElementGuid>6510cf0b-d9ff-49e4-b7ef-d3cddbd33d97</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -101,7 +105,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>(.//*[normalize-space(text()) and normalize-space(.)='Select CFR Form Status'])[1]/following::li[2]</value>
-      <webElementGuid>736ee942-791b-4506-b643-a28d5329ffba</webElementGuid>
+      <webElementGuid>9c295129-469a-47f3-8f21-fa535db64d91</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -109,7 +113,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>(.//*[normalize-space(text()) and normalize-space(.)='Approved'])[1]/preceding::li[1]</value>
-      <webElementGuid>c5802054-1f60-4b09-8653-ff30dd662401</webElementGuid>
+      <webElementGuid>b45fd54e-42ed-45ac-95c0-9fd9b6d6db60</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -117,7 +121,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>//*/text()[normalize-space(.)='Needs Clarification with Ministry']/parent::*</value>
-      <webElementGuid>0e64293d-7512-42bf-a4da-6a0c4f8c6a34</webElementGuid>
+      <webElementGuid>cd84f82d-01cf-424a-ac3d-290bc29962fe</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -125,7 +129,7 @@
       <name>xpath:position</name>
       <type>Main</type>
       <value>//div[3]/ul/li[3]</value>
-      <webElementGuid>4330cc66-3899-43f8-8a29-1d3665e6a202</webElementGuid>
+      <webElementGuid>5cd696e6-7d26-4e5b-a56b-2060d6b91cf9</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -133,6 +137,6 @@
       <name>xpath:customAttributes</name>
       <type>Main</type>
       <value>//li[(text() = 'Needs Clarification with Ministry' or . = 'Needs Clarification with Ministry')]</value>
-      <webElementGuid>61f49d78-5183-491b-870f-643065f0e694</webElementGuid>
+      <webElementGuid>6f917021-eb94-45b1-a9a8-bb96e4b70dc5</webElementGuid>
    </webElementXpaths>
 </WebElementEntity>
