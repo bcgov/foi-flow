@@ -1,7 +1,7 @@
 
 from os import stat, path,getenv
 from re import VERBOSE
-from request_api.utils.constants import FILE_CONVERSION_FILE_TYPES, DEDUPE_FILE_TYPES
+from request_api.utils.constants import FILE_CONVERSION_FILE_TYPES, DEDUPE_FILE_TYPES, NONREDACTABLE_FILE_TYPES
 from request_api.models.FOIRequestRecords import FOIRequestRecord
 from request_api.models.FOIMinistryRequests import FOIMinistryRequest
 from request_api.models.FOIMinistryRequestDivisions import FOIMinistryRequestDivision
@@ -161,14 +161,16 @@ class recordservice:
             entry['attributes']['batch'] = batch
             _filepath, extension = path.splitext(entry['filename'])
             entry['attributes']['extension'] = extension
-            entry['attributes']['incompatible'] = extension not in FILE_CONVERSION_FILE_TYPES + DEDUPE_FILE_TYPES
+            entry['attributes']['incompatible'] =  extension in NONREDACTABLE_FILE_TYPES
             record = FOIRequestRecord(foirequestid=requestid, ministryrequestid = ministryrequestid, ministryrequestversion=_ministryversion,
                             version = 1, createdby = userid, created_at = datetime.now())
             record.__dict__.update(entry)
             recordlist.append(record)
         dbresponse = FOIRequestRecord.create(recordlist)
         if (dbresponse.success):
-            processingrecords = [{**record, **{"recordid": dbresponse.args[0][record['s3uripath']]['recordid']}} for record in records if not record['attributes'].get('incompatible', False)]
+            #processingrecords = [{**record, **{"recordid": dbresponse.args[0][record['s3uripath']]['recordid']}} for record in records if not record['attributes'].get('incompatible', False)]
+            processingrecords = [{**record, **{"recordid": dbresponse.args[0][record['s3uripath']]['recordid']}} for record in records]
+           
             print(processingrecords)
             # record all jobs before sending first redis stream message to avoid race condition
             jobids, err = self.__makedocreviewerrequest('POST', '/api/jobstatus', {
@@ -193,11 +195,13 @@ class recordservice:
                     "jobid": jobids[entry['s3uripath']]['jobid'],
                     "documentmasterid": jobids[entry['s3uripath']]['masterid'],
                     "trigger": 'recordupload',
-                    "createdby": userid
+                    "createdby": userid,
+                    "incompatible": 'true' if extension in NONREDACTABLE_FILE_TYPES else 'false'
                 }
                 if extension in FILE_CONVERSION_FILE_TYPES:
                     eventqueueservice().add(self.conversionstreamkey, streamobject)
                 if extension in DEDUPE_FILE_TYPES:
+                    print('alert:reached DEDUPE event condition')
                     eventqueueservice().add(self.dedupestreamkey, streamobject)
         return dbresponse
 
@@ -221,7 +225,8 @@ class recordservice:
         record['attributes'] = record['attributes'] or {}
         attribute_divisions = record['attributes'].get('divisions', [])
         for division in attribute_divisions:
-            division['divisionname'] = self.__getdivisionname(divisions, division['divisionid']).replace(u"’", u"'")
+            _divisionname = self.__getdivisionname(divisions, division['divisionid'])
+            division['divisionname'] = _divisionname.replace(u"’", u"'") if _divisionname is not None else ''
         return record
 
     def __getdivisionname(self, divisions, divisionid):

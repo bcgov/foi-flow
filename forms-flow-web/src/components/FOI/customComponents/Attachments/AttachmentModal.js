@@ -71,7 +71,7 @@ export default function AttachmentModal({
       });
     }
 
-    const mimeTypes = multipleFiles ? MimeTypeList.attachmentLog : MimeTypeList.stateTransition;
+    const mimeTypes = multipleFiles ? (uploadFor === 'attachment' ? MimeTypeList.attachmentLog : MimeTypeList.recordsLog ): MimeTypeList.stateTransition;
     const maxFileSize = uploadFor === 'record' ? MaxFileSizeInMB.totalFileSize : multipleFiles ? MaxFileSizeInMB.attachmentLog : MaxFileSizeInMB.stateTransition;
     const totalFileSize = multipleFiles ? MaxFileSizeInMB.totalFileSize : MaxFileSizeInMB.stateTransition;
     const classes = useStyles();
