@@ -18,12 +18,13 @@ class FOIRequestComment(db.Model):
     version =db.Column(db.Integer, db.ForeignKey('FOIMinistryRequests.version'))
     comment = db.Column(db.Text, unique=False, nullable=True)
     taggedusers = db.Column(JSON, unique=False, nullable=True)  
-    parentcommentid = db.Column(db.Integer, nullable=True)
+    parentcommentid = db.Column(db.Integer, db.ForeignKey('FOIRequestComments.commentid'), nullable=True)
     isactive = db.Column(db.Boolean, unique=False, nullable=False)
     created_at = db.Column(db.DateTime, default=datetime2.now)
     createdby = db.Column(db.String(120), unique=False, nullable=True)
     updated_at = db.Column(db.DateTime, nullable=True)
     updatedby = db.Column(db.String(120), unique=False, nullable=True)
+    parentcomment = relationship("FOIRequestComment", backref=backref("FOIRequestComments"), remote_side=[commentid], uselist=False)
 
     commenttypeid = db.Column(db.Integer, unique=False, nullable=False)
  
@@ -102,4 +103,4 @@ class FOIRequestComment(db.Model):
         return users    
 class FOIRequestCommentSchema(ma.Schema):
     class Meta:
-        fields = ('commentid', 'ministryrequestid', 'parentcommentid','comment', 'commenttypeid','commenttype','isactive','created_at','createdby','updated_at','updatedby','taggedusers') 
+        fields = ('commentid', 'ministryrequestid', 'parentcommentid','comment', 'commenttypeid','commenttype','isactive','created_at','createdby','updated_at','updatedby','taggedusers', 'parentcomment.taggedusers') 

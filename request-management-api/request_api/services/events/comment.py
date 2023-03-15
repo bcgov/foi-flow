@@ -33,7 +33,7 @@ class commentevent:
     def __createcommentnotification(self, commentid, requesttype, userid):
         _comment = self.__getcomment(commentid,requesttype)
         notificationservice().createcommentnotification(self.getcommentmessage(commentid, _comment), _comment, self.__getcommenttype(_comment), requesttype, userid)
-        if _comment["taggedusers"] != '[]':                
+        if _comment["taggedusers"] != '[]' or _comment.get("parentcomment.taggedusers", '[]') != '[]':
             notificationservice().createcommentnotification(self.getcommentmessage(commentid, _comment), _comment, "Tagged User Comments", requesttype, userid)    
         self.__pushcommentnotification(commentid)
         return DefaultMethodResult(True,'Comment notifications created',commentid)

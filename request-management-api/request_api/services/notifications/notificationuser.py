@@ -108,8 +108,11 @@ class notificationuser:
             return FOIRawRequestComment.getcommentusers(comment["commentid"])
             
     def __gettaggedusers(self, comment): 
-        if comment["taggedusers"] != '[]':
-            return self.__preparetaggeduser(json.loads(comment["taggedusers"]))          
+        taggedusers = json.loads(comment["taggedusers"]) + json.loads(comment.get("parentcomment.taggedusers", '[]'))
+        if taggedusers:
+            taggedusers = {x['username']: x for x in taggedusers}
+            taggedusers = [taggedusers[key] for key in taggedusers]
+            return self.__preparetaggeduser(taggedusers)          
         return None   
     
     def __preparetaggeduser(self, data):
