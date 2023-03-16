@@ -1,5 +1,5 @@
 import {
-  getOSSHeaderDetails,
+  postFOIS3DocumentPreSignedUrl,
   saveFilesinS3,
 } from "../../../../apiManager/services/FOI/foiOSSServices";
 import { toast } from "react-toastify";
@@ -26,7 +26,7 @@ export const uploadFiles = async (
   const fileInfoList = getFileInfoList(filesToUpload, idNumber, statusLabel);
 
   const headers = await new Promise((resolve, reject) => {
-    getOSSHeaderDetails(fileInfoList, dispatch, (err, res) => {
+    postFOIS3DocumentPreSignedUrl(-1, fileInfoList, 'attachments', idNumber.split("-")[0], dispatch, (err, res) => {
       if (err) {
         reject(
           "An internal server error occured while attempting to upload files"
@@ -47,7 +47,7 @@ export const uploadFiles = async (
             reject("An error occurred while attempting to upload files");
           }
           resolve({
-            documentpath: header.filepath,
+            documentpath: header.filepathdb,
             filename: header.filename,
             category: header.filestatustransition,
           });

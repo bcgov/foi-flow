@@ -17,6 +17,7 @@ from flask import request
 from flask_restx import Namespace, Resource
 from flask_cors import cross_origin
 from request_api.auth import auth
+from request_api.services.external.storageservice import storageservice
 
 
 from request_api.tracer import Tracer
@@ -220,51 +221,14 @@ class FOIFlowDocumentStorage(Resource):
     def post():
         try:
 
-            formsbucket = os.getenv('OSS_S3_FORMS_BUCKET')
-            accesskey = os.getenv('OSS_S3_FORMS_ACCESS_KEY_ID')
-            secretkey = os.getenv('OSS_S3_FORMS_SECRET_ACCESS_KEY')
-            s3host = os.getenv('OSS_S3_HOST')
-            s3region = os.getenv('OSS_S3_REGION')
-            s3service = os.getenv('OSS_S3_SERVICE')
-
-            if(accesskey is None or secretkey is None or s3host is None or formsbucket is None):
-                return {'status': "Configuration Issue", 'message':"accesskey is None or secretkey is None or S3 host is None or formsbucket is None"}, 500
-
-            requestfilejson = request.get_json()
-
-            for file in requestfilejson:
-                foirequestform = FOIRequestsFormsList().load(file)
-                ministrycode = foirequestform.get('ministrycode')
-                requestnumber = foirequestform.get('requestnumber')
-                filestatustransition = foirequestform.get('filestatustransition')
-                filename = foirequestform.get('filename')
-                s3sourceuri = foirequestform.get('s3sourceuri')
-                filenamesplittext = os.path.splitext(filename)
-                uniquefilename = '{0}{1}'.format(uuid.uuid4(),filenamesplittext[1])
-                auth = AWSRequestsAuth(aws_access_key=accesskey,
-                        aws_secret_access_key=secretkey,
-                        aws_host=s3host,
-                        aws_region=s3region,
-                        aws_service=s3service)
-
-                s3uri = s3sourceuri if s3sourceuri is not None else 'https://{0}/{1}/{2}/{3}/{4}/{5}'.format(s3host,formsbucket,ministrycode,requestnumber,filestatustransition,uniquefilename)
-
-                response = requests.put(s3uri,data=None,auth=auth) if s3sourceuri is None  else requests.get(s3uri,auth=auth)
-
-
-                file['filepath']=s3uri
-                file['authheader']=response.request.headers['Authorization']
-                file['amzdate']=response.request.headers['x-amz-date']
-                file['uniquefilename']=uniquefilename if s3sourceuri is None else ''
-                file['filestatustransition']=filestatustransition  if s3sourceuri is None else ''
-
-
-            return json.dumps(requestfilejson) , 200
+            responsefilejson = storageservice().bulk_upload(request.get_json(), "Attachments")
+            return json.dumps(responsefilejson),200
         except BusinessException as exception:
             return {'status': exception.status_code, 'message':exception.message}, 500
 
 @cors_preflight('GET,OPTIONS')
 @API.route('/foiflow/oss/presigned/<ministryrequestid>')
+@API.route('/foiflow/oss/presigned/<ministryrequestid>/<category>/<bcgovcode>')
 class FOIFlowS3Presigned(Resource):
 
     @staticmethod
@@ -272,29 +236,28 @@ class FOIFlowS3Presigned(Resource):
     @cross_origin(origins=allowedorigins())
     @auth.require
     @auth.documentbelongstosameministry
-    def get(ministryrequestid):
+    def get(ministryrequestid, category="attachments", bcgovcode=None):
         try :
-            formsbucket = os.getenv('OSS_S3_FORMS_BUCKET')
-            accesskey = os.getenv('OSS_S3_FORMS_ACCESS_KEY_ID')
-            secretkey = os.getenv('OSS_S3_FORMS_SECRET_ACCESS_KEY')
-            s3host = os.getenv('OSS_S3_HOST')
-            s3region = os.getenv('OSS_S3_REGION')
-            filepath = request.args.get('filepath')
-
-            s3client = boto3.client('s3',config=Config(signature_version='s3v4'),
-            endpoint_url='https://{0}/'.format(s3host),
-            aws_access_key_id= accesskey,
-            aws_secret_access_key= secretkey,region_name= s3region
-                )
-
-            filename, file_extension = os.path.splitext(filepath)
-            response = s3client.generate_presigned_url(
-                ClientMethod='get_object',
-                Params=   {'Bucket': formsbucket, 'Key': '{0}'.format(filepath),'ResponseContentType': '{0}/{1}'.format('image' if file_extension in ['.png','.jpg','.jpeg','.gif'] else 'application',file_extension.replace('.',''))},
-                ExpiresIn=3600,HttpMethod='GET'
-                )
-
+            response = storageservice().retrieve_s3_presigned(request.args.get('filepath'), category, bcgovcode)
             return json.dumps(response),200
+        except BusinessException as exception:
+         return {'status': exception.status_code, 'message':exception.message}, 500
+
+@cors_preflight('POST,OPTIONS')
+@API.route('/foiflow/oss/presigned/<ministryrequestid>/<category>/<bcgovcode>')
+class FOIFlowS3Presigned(Resource):
+
+    @staticmethod
+    @TRACER.trace()
+    @cross_origin(origins=allowedorigins())
+    # @auth.require
+    # @auth.documentbelongstosameministry
+    def post(ministryrequestid, category, bcgovcode=None):
+        try :
+            if storageservice().is_valid_category(category) == False:
+                return {'status': 400, 'message':"Bad Request"}, 400
+            responsefilejson = storageservice().bulk_upload_s3_presigned(ministryrequestid, request.get_json(), category, bcgovcode)
+            return json.dumps(responsefilejson),200
         except BusinessException as exception:
          return {'status': exception.status_code, 'message':exception.message}, 500
 
@@ -319,7 +282,7 @@ class FOIFlowExtensionReasons(Resource):
             return jsondata , 200
         except BusinessException as exception:
             return {'status': exception.status_code, 'message':exception.message}, 500
-    
+
 @cors_preflight('GET,OPTIONS')
 @API.route('/foiflow/subjectcodes')
 class FOIFlowSubjectCodes(Resource):
