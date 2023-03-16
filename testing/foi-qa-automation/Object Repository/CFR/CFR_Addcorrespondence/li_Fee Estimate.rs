@@ -11,10 +11,13 @@
       </entry>
       <entry>
          <key>CSS</key>
-         <value></value>
+      </entry>
+      <entry>
+         <key>BASIC</key>
+         <value>id(&quot;menu-emailtemplate&quot;)/div[@class=&quot;MuiPaper-root MuiPaper-elevation MuiPaper-rounded MuiPaper-elevation1 MuiMenu-paper MuiPaper-root MuiPaper-elevation MuiPaper-rounded MuiPaper-elevation8 MuiPopover-paper css-177ic5c&quot;]/ul[@class=&quot;MuiList-root MuiList-padding MuiMenu-list css-r8u8y9&quot;]/li[@class=&quot;MuiMenuItem-root MuiMenuItem-gutters MuiButtonBase-root css-1km1ehz&quot;][count(. | //*[(text() = 'Fee Estimate' or . = 'Fee Estimate')]) = count(//*[(text() = 'Fee Estimate' or . = 'Fee Estimate')])]</value>
       </entry>
    </selectorCollection>
-   <selectorMethod>XPATH</selectorMethod>
+   <selectorMethod>BASIC</selectorMethod>
    <useRalativeImagePath>true</useRalativeImagePath>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -22,7 +25,7 @@
       <name>tag</name>
       <type>Main</type>
       <value>li</value>
-      <webElementGuid>e1d682f5-80af-4da0-9b6e-645a563739ba</webElementGuid>
+      <webElementGuid>7036cb9a-0c42-494a-a654-ac1cc6ebebee</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -30,7 +33,7 @@
       <name>class</name>
       <type>Main</type>
       <value>MuiMenuItem-root MuiMenuItem-gutters MuiButtonBase-root css-1km1ehz</value>
-      <webElementGuid>abe610e6-3b09-45c1-89c1-44ac7fd1c1c6</webElementGuid>
+      <webElementGuid>04f2cc45-95ba-45b5-857f-9361e3399d00</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -38,7 +41,7 @@
       <name>tabindex</name>
       <type>Main</type>
       <value>0</value>
-      <webElementGuid>4be7054f-8e75-4639-945e-8966fcff7331</webElementGuid>
+      <webElementGuid>1e2f3733-900c-43e2-8a41-aceec4de9af8</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -46,7 +49,7 @@
       <name>role</name>
       <type>Main</type>
       <value>option</value>
-      <webElementGuid>1e279b82-7e50-4b6f-9823-8282be3eb71e</webElementGuid>
+      <webElementGuid>30d2626c-d56c-432d-8a3d-e2f58b40a0c8</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -54,7 +57,7 @@
       <name>aria-selected</name>
       <type>Main</type>
       <value>false</value>
-      <webElementGuid>71c94246-ea5b-4b3a-8e01-3bf830d9bcb3</webElementGuid>
+      <webElementGuid>2ea64e8c-35b8-456b-bfc1-aacd29c4a2b3</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -62,7 +65,7 @@
       <name>data-value</name>
       <type>Main</type>
       <value>1</value>
-      <webElementGuid>cddcd284-a8eb-4697-b383-ea38d3b36983</webElementGuid>
+      <webElementGuid>8aa812ef-8887-4cd5-8f86-9ade8f29a814</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>true</isSelected>
@@ -70,15 +73,15 @@
       <name>text</name>
       <type>Main</type>
       <value>Fee Estimate</value>
-      <webElementGuid>c674572b-0128-48de-b1aa-ac7e8b6c0e1b</webElementGuid>
+      <webElementGuid>77187b20-dc71-4db5-be8c-5332ef03ee28</webElementGuid>
    </webElementProperties>
    <webElementProperties>
-      <isSelected>false</isSelected>
+      <isSelected>true</isSelected>
       <matchCondition>equals</matchCondition>
       <name>xpath</name>
       <type>Main</type>
       <value>id(&quot;menu-emailtemplate&quot;)/div[@class=&quot;MuiPaper-root MuiPaper-elevation MuiPaper-rounded MuiPaper-elevation1 MuiMenu-paper MuiPaper-root MuiPaper-elevation MuiPaper-rounded MuiPaper-elevation8 MuiPopover-paper css-177ic5c&quot;]/ul[@class=&quot;MuiList-root MuiList-padding MuiMenu-list css-r8u8y9&quot;]/li[@class=&quot;MuiMenuItem-root MuiMenuItem-gutters MuiButtonBase-root css-1km1ehz&quot;]</value>
-      <webElementGuid>75562e4f-4086-46d7-84af-0d1cc956758b</webElementGuid>
+      <webElementGuid>98be6508-7880-4ee7-b809-5ef58089cbcc</webElementGuid>
    </webElementProperties>
    <webElementXpaths>
       <isSelected>true</isSelected>
@@ -86,7 +89,7 @@
       <name>xpath:idRelative</name>
       <type>Main</type>
       <value>//div[@id='menu-emailtemplate']/div[3]/ul/li[2]</value>
-      <webElementGuid>522198e8-0833-44f6-93e9-5c0112c3723a</webElementGuid>
+      <webElementGuid>661acb3c-7056-4416-a2ad-58323fd14bc1</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -94,7 +97,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>(.//*[normalize-space(text()) and normalize-space(.)='`'])[2]/following::li[2]</value>
-      <webElementGuid>5ab5e301-6b65-43e2-8dbe-7c215bd32b92</webElementGuid>
+      <webElementGuid>995821f7-20d5-4a4b-8b7a-116b715ba44c</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -102,7 +105,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>(.//*[normalize-space(text()) and normalize-space(.)='Alt'])[2]/following::li[2]</value>
-      <webElementGuid>706e65ad-61c8-45ba-bbe1-f8055809bcf9</webElementGuid>
+      <webElementGuid>6584f1ed-6e7f-43a2-a598-79b717ae9574</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -110,7 +113,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>(.//*[normalize-space(text()) and normalize-space(.)='Outstanding Fee'])[1]/preceding::li[1]</value>
-      <webElementGuid>098da3a0-f940-4b59-b3ff-1ce06ce76ca0</webElementGuid>
+      <webElementGuid>dfb5cb66-76f9-4ff8-b301-bafc64675bc0</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -118,7 +121,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>//*/text()[normalize-space(.)='Fee Estimate']/parent::*</value>
-      <webElementGuid>0b73fa64-9759-41f2-97fc-7ad69c5d4263</webElementGuid>
+      <webElementGuid>4930533a-59fd-4baa-a4e8-6638df35add8</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -126,7 +129,7 @@
       <name>xpath:position</name>
       <type>Main</type>
       <value>//div[3]/div[3]/ul/li[2]</value>
-      <webElementGuid>90c0754e-4b63-4daa-a6cb-fa775ec53b14</webElementGuid>
+      <webElementGuid>051f0113-c308-4215-b780-4b3297cd20e5</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -134,6 +137,6 @@
       <name>xpath:customAttributes</name>
       <type>Main</type>
       <value>//li[(text() = 'Fee Estimate' or . = 'Fee Estimate')]</value>
-      <webElementGuid>7d6fac69-06a3-428f-813a-50f59e9372b8</webElementGuid>
+      <webElementGuid>b75bc08f-50ff-4742-8089-db3292534331</webElementGuid>
    </webElementXpaths>
 </WebElementEntity>

@@ -1,24 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <WebElementEntity>
    <description></description>
-   <name>input_Amount Paid_amountPaid</name>
+   <name>input_Fee Waiver Amount_feewaiverAmount</name>
    <tag></tag>
-   <elementGuidId>1706f688-0741-456e-8275-e4329c60ccea</elementGuidId>
+   <elementGuidId>4b965969-e0af-40e2-b546-806b6c48a874</elementGuidId>
    <selectorCollection>
       <entry>
          <key>CSS</key>
-         <value>#amountpaid</value>
+         <value>#feewaiver</value>
       </entry>
       <entry>
          <key>XPATH</key>
-         <value>//input[@id='amountpaid']</value>
-      </entry>
-      <entry>
-         <key>BASIC</key>
-         <value>//*[@id = 'amountpaid' and @name = 'amountPaid' and @type = 'number']</value>
+         <value>//input[@id='feewaiver']</value>
       </entry>
    </selectorCollection>
-   <selectorMethod>BASIC</selectorMethod>
+   <selectorMethod>XPATH</selectorMethod>
    <useRalativeImagePath>true</useRalativeImagePath>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -26,7 +22,7 @@
       <name>tag</name>
       <type>Main</type>
       <value>input</value>
-      <webElementGuid>cf377506-c338-4b9c-8610-d0f28fca7caa</webElementGuid>
+      <webElementGuid>4cbe23d6-ff1d-4ac7-8d83-c5a5f40df58a</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -34,23 +30,23 @@
       <name>aria-invalid</name>
       <type>Main</type>
       <value>false</value>
-      <webElementGuid>ce3d1f64-c32c-44a6-b0a6-826a1e466a22</webElementGuid>
+      <webElementGuid>6b2f7906-8402-492c-9127-4832805e4aa3</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>true</isSelected>
       <matchCondition>equals</matchCondition>
       <name>id</name>
       <type>Main</type>
-      <value>amountpaid</value>
-      <webElementGuid>90b9bdda-8327-4961-b653-3b6d5876f09c</webElementGuid>
+      <value>feewaiver</value>
+      <webElementGuid>e9197fa7-5a48-4e6f-be89-b88ea1ff3fa1</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>true</isSelected>
       <matchCondition>equals</matchCondition>
       <name>name</name>
       <type>Main</type>
-      <value>amountPaid</value>
-      <webElementGuid>a4df2ecb-25f7-4f40-8d72-12a2ccb1bd76</webElementGuid>
+      <value>feewaiverAmount</value>
+      <webElementGuid>316239f7-3f87-48ea-bc55-034000fa1701</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>true</isSelected>
@@ -58,15 +54,15 @@
       <name>type</name>
       <type>Main</type>
       <value>number</value>
-      <webElementGuid>00afee30-532e-42df-ba24-afa3c31993f4</webElementGuid>
+      <webElementGuid>dfa75aed-2e86-4c00-9d41-ae9fe9477735</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
       <matchCondition>equals</matchCondition>
       <name>aria-labelledby</name>
       <type>Main</type>
-      <value>amountpaid-label</value>
-      <webElementGuid>dda2b30d-eb7b-46da-86e4-cc83b81bcef5</webElementGuid>
+      <value>feewaiver-label</value>
+      <webElementGuid>86e3c305-0edd-438c-9d41-8b1c34220b0d</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -74,15 +70,15 @@
       <name>step</name>
       <type>Main</type>
       <value>0.01</value>
-      <webElementGuid>58af4a21-095e-4b71-bc99-c6e93bdca241</webElementGuid>
+      <webElementGuid>f98702e6-d7c6-4811-b3e8-7272833ca700</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
       <matchCondition>equals</matchCondition>
       <name>max</name>
       <type>Main</type>
-      <value>0</value>
-      <webElementGuid>36ee133b-1b62-4747-b0d0-b47363a3e8fd</webElementGuid>
+      <value>405</value>
+      <webElementGuid>7a07fa32-b14b-4970-b017-d49cee84c1bd</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -90,15 +86,15 @@
       <name>min</name>
       <type>Main</type>
       <value>0</value>
-      <webElementGuid>613b9ff0-02fc-4724-b3eb-1a48385bf18b</webElementGuid>
+      <webElementGuid>31fa50f0-8810-4362-bc80-8197561144af</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
       <matchCondition>equals</matchCondition>
       <name>class</name>
       <type>Main</type>
-      <value>MuiOutlinedInput-input MuiInputBase-input Mui-disabled MuiInputBase-inputAdornedStart css-1ixds2g</value>
-      <webElementGuid>796a376f-d28f-44c0-a09c-4a99be8a41ce</webElementGuid>
+      <value>MuiOutlinedInput-input MuiInputBase-input MuiInputBase-inputAdornedStart css-1ixds2g</value>
+      <webElementGuid>632a618e-0435-497f-a6d2-caa8ae8e4bc7</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -106,46 +102,46 @@
       <name>value</name>
       <type>Main</type>
       <value>0</value>
-      <webElementGuid>c7ffedf4-d6f6-4693-8db6-e752a454cfbb</webElementGuid>
+      <webElementGuid>40d676b0-6c8b-470a-8620-3e1e72b540cb</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
       <matchCondition>equals</matchCondition>
       <name>xpath</name>
       <type>Main</type>
-      <value>id(&quot;amountpaid&quot;)</value>
-      <webElementGuid>b7ee1a3d-38f1-42af-be66-258a90b6fabf</webElementGuid>
+      <value>id(&quot;feewaiver&quot;)</value>
+      <webElementGuid>2914b70c-1473-4ee2-862c-cb903009dc7c</webElementGuid>
    </webElementProperties>
    <webElementXpaths>
       <isSelected>true</isSelected>
       <matchCondition>equals</matchCondition>
       <name>xpath:attributes</name>
       <type>Main</type>
-      <value>//input[@id='amountpaid']</value>
-      <webElementGuid>3258badd-3067-42c9-bb43-accb1c05be25</webElementGuid>
+      <value>//input[@id='feewaiver']</value>
+      <webElementGuid>9164188c-457b-48a1-b86c-87e2de306088</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
       <matchCondition>equals</matchCondition>
       <name>xpath:idRelative</name>
       <type>Main</type>
-      <value>//div[@id='CFRForm']/div/form/div/div[2]/div[3]/div/div[2]/div/div/div/div/div/div/div/div/input</value>
-      <webElementGuid>1bca60f3-7ac1-46da-9ca0-211bf40de5cf</webElementGuid>
+      <value>//div[@id='CFRForm']/div/form/div/div[2]/div[3]/div/div[2]/div/div/div/div/div[4]/div/div/div/input</value>
+      <webElementGuid>75b2ee6e-f5cc-4e0a-83cc-286ceec047c0</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
       <matchCondition>equals</matchCondition>
       <name>xpath:position</name>
       <type>Main</type>
-      <value>//div[2]/div[3]/div/div[2]/div/div/div/div/div/div/div/div/input</value>
-      <webElementGuid>16899c66-0b6f-4efe-ba8d-aed07f0d9f68</webElementGuid>
+      <value>//div[4]/div/div/div/input</value>
+      <webElementGuid>b5546ca5-b214-40d0-9817-9d7342d241b6</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
       <matchCondition>equals</matchCondition>
       <name>xpath:customAttributes</name>
       <type>Main</type>
-      <value>//input[@id = 'amountpaid' and @name = 'amountPaid' and @type = 'number']</value>
-      <webElementGuid>df5d2922-8335-4dc3-aa23-65203fe30ab6</webElementGuid>
+      <value>//input[@id = 'feewaiver' and @name = 'feewaiverAmount' and @type = 'number']</value>
+      <webElementGuid>850a2580-6a6f-4b0e-ab97-dae499807781</webElementGuid>
    </webElementXpaths>
 </WebElementEntity>

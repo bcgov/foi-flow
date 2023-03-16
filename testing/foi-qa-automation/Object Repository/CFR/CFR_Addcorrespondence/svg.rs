@@ -13,6 +13,10 @@
          <key>CSS</key>
          <value>button.ql-link > svg</value>
       </entry>
+      <entry>
+         <key>BASIC</key>
+         <value>id(&quot;correspondence-editor-ql-toolbar&quot;)/span[@class=&quot;ql-formats&quot;]/button[@class=&quot;ql-link&quot;]/svg[1]</value>
+      </entry>
    </selectorCollection>
    <selectorMethod>XPATH</selectorMethod>
    <useRalativeImagePath>true</useRalativeImagePath>
@@ -22,7 +26,7 @@
       <name>tag</name>
       <type>Main</type>
       <value>svg</value>
-      <webElementGuid>f5336f74-4373-4c20-bea8-80af34a54aed</webElementGuid>
+      <webElementGuid>a9258d37-bede-45e2-831a-9c15fe4ba01f</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -30,7 +34,7 @@
       <name>viewBox</name>
       <type>Main</type>
       <value>0 0 18 18</value>
-      <webElementGuid>af323cda-0843-4cbf-af05-da5f575ca34b</webElementGuid>
+      <webElementGuid>d4f9e653-0a2f-46ea-811c-03306e79dbc8</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>true</isSelected>
@@ -38,7 +42,7 @@
       <name>xpath</name>
       <type>Main</type>
       <value>id(&quot;correspondence-editor-ql-toolbar&quot;)/span[@class=&quot;ql-formats&quot;]/button[@class=&quot;ql-link&quot;]/svg[1]</value>
-      <webElementGuid>f2948336-d717-4d7d-8ebd-4fb7e93ea1a6</webElementGuid>
+      <webElementGuid>cdafb5f9-ae7c-4271-b043-39d399a616c0</webElementGuid>
    </webElementProperties>
    <webElementXpaths>
       <isSelected>true</isSelected>
@@ -46,7 +50,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>(.//*[normalize-space(text()) and normalize-space(.)='Pay Online'])[1]/following::*[name()='svg'][6]</value>
-      <webElementGuid>4415f01e-684d-42aa-9456-2f9e5c30d53d</webElementGuid>
+      <webElementGuid>64defb9b-38fe-4ad3-8637-945337809619</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -54,7 +58,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>(.//*[normalize-space(text()) and normalize-space(.)='​'])[4]/following::*[name()='svg'][6]</value>
-      <webElementGuid>e6c35ee8-4a60-46bd-b5d3-8022eb1f37fa</webElementGuid>
+      <webElementGuid>c373d9bc-8bba-4cda-add3-580da7dfebf5</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -62,6 +66,6 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>(.//*[normalize-space(text()) and normalize-space(.)='Preview &amp; Send Email'])[1]/preceding::*[name()='svg'][1]</value>
-      <webElementGuid>87a0cd86-0acc-4e4c-a78f-97ccaa099558</webElementGuid>
+      <webElementGuid>b672ff8e-417e-4c8d-9ca9-3fdee490c20e</webElementGuid>
    </webElementXpaths>
 </WebElementEntity>
