@@ -34,13 +34,13 @@ class KeycloakAdminService:
     def getgroups(self, allowedgroups = None):
         groups = []
         globalgroups = self.getallgroups()         
-        for group in globalgroups:
-            if allowedgroups is not None:
-                for allowedgroup in allowedgroups:
+        if allowedgroups is not None:
+            for allowedgroup in allowedgroups:
+                for group in globalgroups:
                     if self.formatgroupname(group["name"]) == self.formatgroupname(allowedgroup["name"]):   
                         groups.append({'id': group['id'],'name':group['name'], 'type': allowedgroup["type"] })
-            else:
-                groups.append({'id': group['id'],'name':group['name'], 'type':None})
+        else:
+            groups = globalgroups
         return groups  
     
     
@@ -51,7 +51,7 @@ class KeycloakAdminService:
         if groupsresponse.status_code == 200 and groupsresponse.content != '': 
             globalgroups =  groupsresponse.json()         
             for group in globalgroups:
-                groups.append({'id': group['id'],'name':group['name']})
+                groups.append({'id': group['id'],'name':group['name'], 'type':None})
         return groups      
     
  
