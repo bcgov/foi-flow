@@ -18,7 +18,7 @@ depends_on = None
 
 def upgrade():
     op.execute('''INSERT INTO public."OperatingTeams"(name, description, type, isactive) VALUES ('Central and Economy Team', 'Central and Economy Team', 'iao', true);commit;''')
-    op.execute('''INSERT INTO public."OperatingTeams"(name, description, type, isactive) VALUES ('Justice and Resource Team', 'Justice and Resource Team', 'iao', true);commit;''')
+    op.execute('''INSERT INTO public."OperatingTeams"(name, description, type, isactive) VALUES ('Resource and Justice Team', 'Resource and Justice Team', 'iao', true);commit;''')
     op.execute('''INSERT INTO public."OperatingTeams"(name, description, type, isactive) VALUES ('Community and Health Team', 'Community and Health Team', 'iao', true);commit;''')
     op.execute('''INSERT INTO public."OperatingTeams"(name, description, type, isactive) VALUES ('Children and Family Team', 'Children and Family Team', 'iao', true);commit;''')
     op.execute('''INSERT INTO public."OperatingTeams"(name, description, type, isactive) VALUES ('Children and Education Team', 'Children and Family Team', 'iao', true);commit;''')
@@ -43,10 +43,10 @@ def upgrade():
 	(select programareaid from public."ProgramAreas" where iaocode in ('OOP', 'PSA', 'FIN', 'TRA', 'TIC',  'GCP', 'JED', 'MMA','LBR','TAC','CTZ','CAS','LDB','OBC','MGC')) sq2
     ''')
 
-    # insert into FOI Request Teams for Justice and Resource Team
+    # insert into FOI Request Teams for Resource and Justice Team
     op.execute('''INSERT INTO public."FOIRequestTeams"(	requesttype, requeststatusid, teamid, programareaid, isactive)
 	select requesttype, requeststatusid, teamid, programareaid, isactive from
-	(select 'General' as requesttype, (select teamid from public."OperatingTeams" where name = 'Justice and Resource Team') as teamid, requeststatusid, true as isactive
+	(select 'General' as requesttype, (select teamid from public."OperatingTeams" where name = 'Resource and Justice Team') as teamid, requeststatusid, true as isactive
 	 from public."FOIRequestStatuses" where name in (
         'Call For Records','Closed','Records Review','Fee Estimate','Consult','Ministry Sign Off','On Hold','Harms Assessment','Response'
     )) sq,
@@ -55,7 +55,7 @@ def upgrade():
 
     op.execute('''INSERT INTO public."FOIRequestTeams"(	requesttype, requeststatusid, teamid, programareaid, isactive)
 	select requesttype, requeststatusid, teamid, programareaid, isactive from
-	(select 'Personal' as requesttype, (select teamid from public."OperatingTeams" where name = 'Justice and Resource Team') as teamid, requeststatusid, true as isactive
+	(select 'Personal' as requesttype, (select teamid from public."OperatingTeams" where name = 'Resource and Justice Team') as teamid, requeststatusid, true as isactive
 	 from public."FOIRequestStatuses" where name in (
         'Open','Call For Records','Closed','Records Review','Fee Estimate','Consult','Ministry Sign Off','On Hold','Deduplication','Harms Assessment','Response'
     )) sq,
@@ -125,6 +125,6 @@ def upgrade():
 
 def downgrade():
     op.execute('''Delete from public."FOIRequestTeams" where teamid in
-    (select teamid from public."OperatingTeams" where name in ('Central and Economy Team','Justice and Resource Team','Community and Health Team','Children and Family Team','Children and Education Team','Coordinated Response Unit'))''')
+    (select teamid from public."OperatingTeams" where name in ('Central and Economy Team','Resource and Justice Team','Community and Health Team','Children and Family Team','Children and Education Team','Coordinated Response Unit'))''')
 
-    op.execute('''Delete from public."OperatingTeams" where name in ('Central and Economy Team','Justice and Resource Team','Community and Health Team','Children and Family Team','Children and Education Team','Coordinated Response Unit')''')
+    op.execute('''Delete from public."OperatingTeams" where name in ('Central and Economy Team','Resource and Justice Team','Community and Health Team','Children and Family Team','Children and Education Team','Coordinated Response Unit')''')
