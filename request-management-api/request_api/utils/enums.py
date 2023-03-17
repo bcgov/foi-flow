@@ -86,6 +86,12 @@ class ProcessingTeamWithKeycloackGroup(Enum):
     mcfdpersonalteam = "MCFD Personals Team"
     resouceteam = "Resource Team"
     socialtechteam = "Social Education"
+    centraleconteam = "Central and Economy Team"
+    justiceresourceteam = "Justice and Resource Team"
+    communityhealthteam = "Community and Health Team"
+    childrenfamilyteam = "Children and Family Team"
+    childreneducationteam = "Children and Education Team"
+    coordinatedresponseunit = "Coordinated Response Unit"
 
     @staticmethod
     def list():
