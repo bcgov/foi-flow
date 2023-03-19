@@ -6,12 +6,12 @@
    <elementGuidId>d9ede591-9d54-4b6a-99a4-9c71f86eb101</elementGuidId>
    <selectorCollection>
       <entry>
-         <key>XPATH</key>
-         <value>//div[@name='reply_null']</value>
-      </entry>
-      <entry>
          <key>CSS</key>
          <value>div[name=&quot;reply_null&quot;]</value>
+      </entry>
+      <entry>
+         <key>XPATH</key>
+         <value>//div[@name='reply_null']</value>
       </entry>
    </selectorCollection>
    <selectorMethod>XPATH</selectorMethod>

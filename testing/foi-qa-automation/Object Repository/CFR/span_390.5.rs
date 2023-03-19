@@ -1,20 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <WebElementEntity>
    <description></description>
-   <name>span_0</name>
+   <name>span_390.5</name>
    <tag></tag>
-   <elementGuidId>41d61d10-008a-4272-ae9a-7271a0cbfad9</elementGuidId>
+   <elementGuidId>1c81340b-b1bd-4c37-8ebd-a1b6d54d6343</elementGuidId>
    <selectorCollection>
       <entry>
          <key>CSS</key>
-      </entry>
-      <entry>
-         <key>BASIC</key>
-         <value>//*[(text() = '$0' or . = '$0')]</value>
+         <value>div.col-lg-2.foi-details-col > span.formLabel</value>
       </entry>
       <entry>
          <key>XPATH</key>
-         <value>//div[@id='CFRForm']/div/form/div/div[2]/div[3]/div/div[2]/div/div/div/div/div[2]/div[4]/span</value>
+         <value>//div[@id='CFRForm']/div/form/div/div[2]/div[3]/div/div[2]/div/div/div/div/div[3]/div[2]/span</value>
       </entry>
    </selectorCollection>
    <selectorMethod>XPATH</selectorMethod>
@@ -25,7 +22,7 @@
       <name>tag</name>
       <type>Main</type>
       <value>span</value>
-      <webElementGuid>791950ee-3a78-4f74-99a5-eff1eb19c819</webElementGuid>
+      <webElementGuid>8dc39a5f-5146-48c1-a589-1bf5eff092b0</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -33,15 +30,15 @@
       <name>class</name>
       <type>Main</type>
       <value>formLabel</value>
-      <webElementGuid>f0a1af35-275b-4faa-bafe-47e905de758d</webElementGuid>
+      <webElementGuid>00995e99-6f20-4361-a0dd-99f37ec7d2c5</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>true</isSelected>
       <matchCondition>equals</matchCondition>
       <name>text</name>
       <type>Main</type>
-      <value>$0</value>
-      <webElementGuid>fbe8324a-873b-414a-b36c-ad60cf65d03e</webElementGuid>
+      <value>$390.5</value>
+      <webElementGuid>a1202ccd-c056-49b6-9fe8-3d55a1988a06</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -49,62 +46,70 @@
       <name>xpath</name>
       <type>Main</type>
       <value>id(&quot;CFRForm&quot;)/div[@class=&quot;foi-review-container&quot;]/form[@class=&quot;MuiBox-root css-1cidgyh&quot;]/div[@class=&quot;foi-request-form&quot;]/div[@class=&quot;container foi-review-request-container cfrform-container&quot;]/div[@class=&quot;request-accordian&quot;]/div[@class=&quot;MuiPaper-root MuiPaper-elevation MuiPaper-rounded MuiPaper-elevation1 MuiAccordion-root MuiAccordion-rounded Mui-expanded MuiAccordion-gutters css-67l5gl&quot;]/div[@class=&quot;MuiCollapse-root MuiCollapse-vertical MuiCollapse-entered css-c4sutr&quot;]/div[@class=&quot;MuiCollapse-wrapper MuiCollapse-vertical css-hboir5&quot;]/div[@class=&quot;MuiCollapse-wrapperInner MuiCollapse-vertical css-8atqhb&quot;]/div[@class=&quot;MuiAccordion-region&quot;]/div[@class=&quot;MuiAccordionDetails-root css-u7qq7e&quot;]/div[@class=&quot;row cfr-fee-totals&quot;]/div[@class=&quot;col-lg-2 foi-details-col&quot;]/span[@class=&quot;formLabel&quot;]</value>
-      <webElementGuid>2f74433e-c926-4066-8939-6d53434a2881</webElementGuid>
+      <webElementGuid>1bf04dd4-723d-475e-a551-e178918532c0</webElementGuid>
    </webElementProperties>
    <webElementXpaths>
       <isSelected>true</isSelected>
       <matchCondition>equals</matchCondition>
       <name>xpath:idRelative</name>
       <type>Main</type>
-      <value>//div[@id='CFRForm']/div/form/div/div[2]/div[3]/div/div[2]/div/div/div/div/div[2]/div[4]/span</value>
-      <webElementGuid>a1cc4bc7-ddf5-4ca0-a90d-4dcc9e0db7d7</webElementGuid>
+      <value>//div[@id='CFRForm']/div/form/div/div[2]/div[3]/div/div[2]/div/div/div/div/div[3]/div[2]/span</value>
+      <webElementGuid>a54425a9-eb59-4786-a66d-9e91f120a13c</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
       <matchCondition>equals</matchCondition>
       <name>xpath:neighbor</name>
       <type>Main</type>
-      <value>(.//*[normalize-space(text()) and normalize-space(.)='Actual Total'])[1]/following::span[1]</value>
-      <webElementGuid>b926c265-d4cc-43cf-aaca-62dde9dba930</webElementGuid>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='Estimated Total'])[1]/following::span[1]</value>
+      <webElementGuid>af16e32c-1c35-40c1-b190-c26b834218c4</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
       <matchCondition>equals</matchCondition>
       <name>xpath:neighbor</name>
       <type>Main</type>
-      <value>(.//*[normalize-space(text()) and normalize-space(.)='$0'])[1]/following::span[2]</value>
-      <webElementGuid>1912c1dc-b468-4cbb-88d0-7a1629318d0e</webElementGuid>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='Balance Remaining'])[2]/following::span[2]</value>
+      <webElementGuid>27d895a8-18b6-41ae-83cd-2680e982200f</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
       <matchCondition>equals</matchCondition>
       <name>xpath:neighbor</name>
       <type>Main</type>
-      <value>(.//*[normalize-space(text()) and normalize-space(.)='Fee Waiver Amount'])[1]/preceding::span[1]</value>
-      <webElementGuid>a46c0a24-cf5a-480c-a638-60e92c2997ef</webElementGuid>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='Actual Total'])[1]/preceding::span[1]</value>
+      <webElementGuid>a647fb13-6420-40ee-a734-1636b7562e7a</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
       <matchCondition>equals</matchCondition>
       <name>xpath:neighbor</name>
       <type>Main</type>
-      <value>(.//*[normalize-space(text()) and normalize-space(.)='Fee Waiver Amount'])[2]/preceding::span[1]</value>
-      <webElementGuid>a9f877f8-a863-4950-bae1-2e53384e2e3a</webElementGuid>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='$480'])[1]/preceding::span[2]</value>
+      <webElementGuid>6521b4e3-3739-4d0d-a32a-a775ee26c585</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>//*/text()[normalize-space(.)='$390.5']/parent::*</value>
+      <webElementGuid>b4b4ed1d-6320-43bb-9355-68f3b8804b98</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
       <matchCondition>equals</matchCondition>
       <name>xpath:position</name>
       <type>Main</type>
-      <value>//div[4]/span</value>
-      <webElementGuid>98bcd83e-3f99-4bef-88be-6f052346aea7</webElementGuid>
+      <value>//div[3]/div[2]/span</value>
+      <webElementGuid>b7eb4443-b4eb-410b-b0ba-8a36df1251af</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
       <matchCondition>equals</matchCondition>
       <name>xpath:customAttributes</name>
       <type>Main</type>
-      <value>//span[(text() = '$0' or . = '$0')]</value>
-      <webElementGuid>32a1645f-be31-4c9d-af8e-d987e0e4e702</webElementGuid>
+      <value>//span[(text() = '$390.5' or . = '$390.5')]</value>
+      <webElementGuid>3db8a4f8-e6d2-453f-a3b9-5cce6eba821a</webElementGuid>
    </webElementXpaths>
 </WebElementEntity>

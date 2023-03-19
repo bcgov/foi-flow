@@ -6,12 +6,12 @@
    <elementGuidId>a5b6ae71-4013-466f-a587-fbdf1b1ce67c</elementGuidId>
    <selectorCollection>
       <entry>
-         <key>XPATH</key>
-         <value>//div[@id='cfrStatus']</value>
-      </entry>
-      <entry>
          <key>CSS</key>
          <value>#cfrStatus</value>
+      </entry>
+      <entry>
+         <key>XPATH</key>
+         <value>//div[@id='cfrStatus']</value>
       </entry>
    </selectorCollection>
    <selectorMethod>XPATH</selectorMethod>

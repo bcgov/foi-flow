@@ -151,11 +151,10 @@ WebUI.verifyElementPresent(findTestObject('CFR/div_Contact Applicant'), 0)
 
 WebUI.click(findTestObject('CFR/div_CFR Form'))
 
-WebUI.scrollToElement(findTestObject('CFR/CFR_Addcorrespondence/h3_CFRrequest-Title'), 0)
-
+//WebUI.scrollToElement(findTestObject('CFR/CFR_status/Page_ABC-2099-3921/div_idapp'), 0)
 WebUI.delay(3)
 
-WebUI.scrollToElement(findTestObject('CFR/CFR_status/div_Approved'), 0)
+WebUI.scrollToPosition(1141, 60)
 
 WebUI.click(findTestObject('CFR/CFR_status/div_Approved'))
 
@@ -169,7 +168,7 @@ WebUI.refresh()
 
 WebUI.click(findTestObject('CFR/div_CFR Form'))
 
-WebUI.scrollToElement(findTestObject('CFR/CFR_Addcorrespondence/h3_CFRrequest-Title'), 0)
+WebUI.scrollToPosition(1141, 60)
 
 WebUI.click(findTestObject('CFR/CFR_status/div_Approved'))
 
@@ -198,9 +197,11 @@ WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/li_On Hol
 
 WebUI.click(findTestObject('Page_foi.flow/form/state change dialog/button_Cancel'))
 
-WebUI.scrollToElement(findTestObject('Page_foi.flow/form/h3_Form Request Title'), 0)
+WebUI.refresh(FailureHandling.STOP_ON_FAILURE)
 
-WebUI.scrollToElement(findTestObject('CFR/CFR_status/div_Approved'), 0)
+WebUI.click(findTestObject('CFR/div_CFR Form'))
+
+WebUI.scrollToPosition(1141, 60)
 
 WebUI.click(findTestObject('CFR/CFR_status/div_Approved'))
 
@@ -222,10 +223,7 @@ WebUI.click(findTestObject('Page_foi.flow/form/state change dialog/button_Save C
 
 WebUI.click(findTestObject('Page_foi.flow/form/sidebar/div_Sidebar Comments'))
 
-WebUI.scrollToElement(findTestObject('Page_foi.flow/comment/button_Add Comment'), 0)
-
 //WebUI.scrollToElement(findTestObject('Page_foi.flow/comment/span_Request History Comments'), 0)
-
 WebUI.click(findTestObject('Page_foi.flow/comment/span_Request History Comments'))
 
 WebUI.delay(3)
@@ -298,14 +296,13 @@ WebUI.scrollToElement(findTestObject('Page_foi.flow/form/inputs/request details/
     0)
 
 //def ldd = new Date()
-
 def ldd = WebUI.getAttribute(findTestObject('Page_foi.flow/form/inputs/request details/Page_ABC-2099-7654195/input_Legislated Due Date_dueDate'), 
-   'value')
-def newldddate =Date.parse('yyyy-MM-dd', ldd).format('MM/dd/yyyy')
+    'value')
+
+def newldddate = Date.parse('yyyy-MM-dd', ldd).format('MM/dd/yyyy')
 
 //WebUI.setText(findTestObject(‘Lower Enter Verification Code path’), str)
 //def newldd = ldd.format('mm/dd/yyyy')
-
 System.out.println(newldddate)
 
 //def newldddate = new Date().parse('mm/dd/yyyy', ldd)
