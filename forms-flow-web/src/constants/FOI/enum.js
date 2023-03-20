@@ -47,7 +47,14 @@ const KCProcessingTeams = [
 "Justice Health Team", 
 "MCFD Personals Team", 
 "Resource Team", 
-"Social Education"]
+"Social Education",
+"Central and Economy Team",
+"Resource and Justice Team",
+"Community and Health Team",
+"Children and Family Team",
+"Children and Education Team",
+"Coordinated Response Unit",
+]
 
 export {
 MimeTypeList,
