@@ -360,7 +360,7 @@ const BottomButtonGroup = React.memo(
         let _documents = [];
         if (!err) {
           res.map((header, index) => {
-            const _file = files?.find((file) => file.name === header.filename);
+            const _file = files?.find((file) => file.filename === header.filename);
             const documentpath = {
               documentpath: header.filepathdb,
               filename: header.filename,
