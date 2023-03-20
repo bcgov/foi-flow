@@ -49,7 +49,7 @@ const KCProcessingTeams = [
 "Resource Team", 
 "Social Education",
 "Central and Economy Team",
-"Justice and Resource Team",
+"Resource and Justice Team",
 "Community and Health Team",
 "Children and Family Team",
 "Children and Education Team",

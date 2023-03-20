@@ -87,7 +87,7 @@ class ProcessingTeamWithKeycloackGroup(Enum):
     resouceteam = "Resource Team"
     socialtechteam = "Social Education"
     centraleconteam = "Central and Economy Team"
-    justiceresourceteam = "Justice and Resource Team"
+    resourcejusticeteam = "Resource and Justice Team"
     communityhealthteam = "Community and Health Team"
     childrenfamilyteam = "Children and Family Team"
     childreneducationteam = "Children and Education Team"
