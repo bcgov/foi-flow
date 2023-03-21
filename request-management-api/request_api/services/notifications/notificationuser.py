@@ -80,7 +80,7 @@ class notificationuser:
     def __getcommentusers(self, foirequest, comment, requesttype):
         _requestusers = self.getnotificationusers("General", requesttype, "nouser", foirequest)
         commentusers = []
-        commentusers.append({"userid":comment["createdby"], "usertype":self.__getcommentusertype(comment["createdby"],_requestusers)})
+        commentusers.extend(_requestusers)
         taggedusers = self.__gettaggedusers(comment)
         if taggedusers is not None:
             commentusers.extend(taggedusers)
@@ -88,7 +88,7 @@ class notificationuser:
             _commentusers = self.__getrelatedusers(comment, requesttype)
             for _commentuser in _commentusers:
                 commentusers.append({"userid":_commentuser["createdby"], "usertype":self.__getcommentusertype(_commentuser["createdby"],_requestusers)})
-                _skiptaguserforreplies = True
+                _skiptaguserforreplies = False
                 if _skiptaguserforreplies == False:
                     taggedusers = self.__gettaggedusers(_commentuser)
                     if taggedusers is not None:
@@ -107,12 +107,9 @@ class notificationuser:
         else:
             return FOIRawRequestComment.getcommentusers(comment["commentid"])
             
-    def __gettaggedusers(self, comment): 
-        taggedusers = json.loads(comment["taggedusers"]) + json.loads(comment.get("parentcomment.taggedusers", '[]'))
-        if taggedusers:
-            taggedusers = {x['username']: x for x in taggedusers}
-            taggedusers = [taggedusers[key] for key in taggedusers]
-            return self.__preparetaggeduser(taggedusers)          
+    def __gettaggedusers(self, comment):
+        if comment["taggedusers"] != '[]':
+            return self.__preparetaggeduser(json.loads(comment["taggedusers"]))         
         return None   
     
     def __preparetaggeduser(self, data):

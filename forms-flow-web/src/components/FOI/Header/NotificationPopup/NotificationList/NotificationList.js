@@ -76,7 +76,7 @@ const NotificationList = ({notification, isMinistry, ministryCode}) => {
     else if(type === "Tagged User Comments")
       return "You've been tagged in a comment:";
     else
-      return "New Reply to Your comment:";
+      return "New Reply to a comment:";
   }
 
   const commentText = (message) => {

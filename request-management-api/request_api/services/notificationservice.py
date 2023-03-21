@@ -52,6 +52,23 @@ class notificationservice:
         requestid = watcher["ministryrequestid"] if requesttype == "ministryrequest" else watcher["requestid"]
         foirequest = self.getrequest(requestid, requesttype)   
         return  self.__createnotification(message, requestid, requesttype, 'Watcher', userid, foirequest, watcher)
+    
+    def editcommentnotification(self, message, comment, userid):
+        notificationsusers = FOIRequestNotification.getcommentnotifications(comment['commentid'])
+        notifications = {}
+        for notification in notificationsusers:
+            notifications[notification['notificationid']] = notification
+        for id in notifications:
+            notifications[id]['notification'] = message
+            requesttype = self.__getnotificationtypefromid(notifications[id]['idnumber'])
+            if requesttype == 'ministryrequest':
+                result = FOIRequestNotification.updatenotification(notifications[id], userid)
+            else:
+                result = FOIRawRequestNotification.updatenotification(notifications[id], userid)
+            if not result.success:
+                return result
+        return DefaultMethodResult(True,'Notifications updated for comment id',comment['commentid'])
+
 
     def getnotifications(self, userid):
         return FOIRequestNotification.getconsolidatednotifications(userid, notificationconfig().getnotificationdays())
