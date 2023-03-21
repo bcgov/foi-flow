@@ -93,6 +93,10 @@ const API = {
   FOI_POST_RECORDS:`${FOI_BASE_API_URL}/api/foirecord/<requestid>/ministryrequest/<ministryrequestid>`,
   FOI_DELETE_RECORDS:`${FOI_BASE_API_URL}/api/foirecord/<requestid>/ministryrequest/<ministryrequestid>/recordid/<recordid>/delete`,
   DOC_REVIEWER_DELETE_RECORDS:`${DOC_REVIEWER_BASE_API_URL}/api/document/delete`,
+  
+  FOI_DOWNLOAD_RECORDS_FOR_HARMS:`${FOI_BASE_API_URL}/api/foirecord/<requestid>/ministryrequest/<ministryrequestid>/download/harms`,
+  FOI_DOWNLOAD_RECORDS_FOR_SIGN_OFF:`${FOI_BASE_API_URL}/api/foirecord/<requestid>/ministryrequest/<ministryrequestid>/download/redlines`,
+  FOI_DOWNLOAD_RECORDS_FOR_FINAL_PACKAGE:`${FOI_BASE_API_URL}/api/foirecord/<requestid>/ministryrequest/<ministryrequestid>/download/finalpackage`,
 
   FOI_GET_SUBJECT_CODELIST: `${FOI_BASE_API_URL}/api/foiflow/subjectcodes`,
   FOI_POST_RAWREQUEST_RESTRICTION: `${FOI_BASE_API_URL}/api/foirawrequest/restricted/<requestid>`,

@@ -6,8 +6,9 @@ import AttachmentModal from '../Attachments/AttachmentModal';
 import Loading from "../../../../containers/Loading";
 import { getOSSHeaderDetails, saveFilesinS3, getFileFromS3, postFOIS3DocumentPreSignedUrl, getFOIS3DocumentPreSignedUrl } from "../../../../apiManager/services/FOI/foiOSSServices";
 import { saveFOIRequestAttachmentsList, replaceFOIRequestAttachment, saveNewFilename, deleteFOIRequestAttachment } from "../../../../apiManager/services/FOI/foiAttachmentServices";
-import { fetchFOIRecords, saveFOIRecords, deleteFOIRecords, retryFOIRecordProcessing, deleteReviewerRecords } from "../../../../apiManager/services/FOI/foiRecordServices";
+import { fetchFOIRecords, saveFOIRecords, deleteFOIRecords, retryFOIRecordProcessing, deleteReviewerRecords, downloadFOIRecordsForHarms } from "../../../../apiManager/services/FOI/foiRecordServices";
 import { StateTransitionCategories, AttachmentCategories } from '../../../../constants/FOI/statusEnum'
+import { RecordsDownloadList } from '../../../../constants/FOI/enum';
 import { addToFullnameList, getFullnameList, ConditionalComponent } from '../../../../helper/FOI/helper';
 import Grid from "@material-ui/core/Grid";
 import { makeStyles } from "@material-ui/core/styles";
@@ -19,6 +20,8 @@ import MoreHorizIcon from "@material-ui/icons/MoreHoriz";
 import IconButton from "@material-ui/core/IconButton";
 import MenuList from "@material-ui/core/MenuList";
 import MenuItem from "@material-ui/core/MenuItem";
+import TextField from '@mui/material/TextField';
+import CircularProgress from '@mui/material/CircularProgress';
 import { saveAs } from "file-saver";
 import { downloadZip } from "client-zip";
 import AttachmentFilter from '../Attachments/AttachmentFilter';
@@ -176,6 +179,9 @@ export const RecordsLog = ({
   const [searchValue, setSearchValue] = useState("");
   const [filterValue, setFilterValue] = useState(-1);
   const [fullnameList, setFullnameList] = useState(getFullnameList);
+  const [currentDownload, setCurrentDownload] = useState(0)
+  const [isDownloadInProgress, setIsDownloadInProgress] = useState(false)
+  
 
   const addAttachments = () => {
     setModalFor('add');
@@ -305,6 +311,87 @@ export const RecordsLog = ({
         });
       }
     }, 'records', bcgovcode);
+  }  
+
+  const handleDownloadChange = (e) => {
+    // if (e.target.value != 1)
+    setCurrentDownload(e.target.value);
+    setIsDownloadInProgress(true);
+    downloadLinearHarmsDocuments()
+  }
+
+  const downloadLinearHarmsDocuments = () => {
+    var completed = 0;
+    let failed = 0;
+    var exporting = recordsObj?.records.filter(record => !record.isduplicate)
+    for (let record of exporting) {
+      if (record.attachments) for (let attachment of record.attachments) {
+        if (!attachment.isduplicate) exporting.push(attachment);
+      }
+    }
+    try {
+      let message = {       
+        attributes: []
+      }
+      let attributes = [];
+      // const fileObj = {
+      //   recordid: 0,
+      //   filename: "",
+      //   s3uripath: "",
+      //   lastmodified: "",
+      // }
+      // const attributeObj = {
+      //   divisionid: "",
+      //   divisionname: "",
+      //   files: []
+      // }
+      
+      for (let record of exporting) {
+        const fileObj = {}
+        const attributeObj = {files: []}
+        var filepath = record.s3uripath
+        var filename = record.filename
+        if (record.isredactionready && ['.doc','.docx','.xls','.xlsx', '.ics', '.msg'].includes(record.attributes?.extension)) {
+          filepath = filepath.substr(0, filepath.lastIndexOf(".")) + ".pdf";
+          filename += ".pdf";
+        }
+        fileObj.recordid = record.recordid;
+        fileObj.filename = filename;
+        fileObj.s3uripath = filepath;
+        fileObj.lastmodified = record.attributes.lastmodified;
+        for (let division of record.attributes.divisions) {
+          attributeObj.divisionid = division.divisionid
+          attributeObj.divisionname = division.divisionname?.replace("'", "")
+          attributeObj.files.push(fileObj)
+        }
+        //attributes will have unique files array and division combination
+        attributes.push(attributeObj)        
+      }
+
+      //This will return the result by merging the files with same division id (order by lastmodified asc)
+      var result = attributes.reduce((acc, val) => {
+        var found = acc.find((findval) => val.divisionid === findval.divisionid);
+        if (!found) acc.push(val)
+        else found.files = found.files.concat(
+          val.files.filter((f) => !found.files.find((findval) => f.recordid === findval.recordid))).sort((a,b) => {
+                return new Date(Date.parse(a.lastmodified)) - new Date(Date.parse(b.lastmodified))
+              });
+        return acc;
+      }, []);
+
+      message.requestnumber = requestNumber
+      message.bcgovcode = bcgovcode
+      message.attributes = result
+
+      console.log(`message >>>>>>>> ${JSON.stringify(message)}`);
+      dispatch(downloadFOIRecordsForHarms(requestId, ministryId, message,(err, _res) => {
+        dispatchRequestAttachment(err);
+    }));
+
+    } catch (error) {
+      console.log(error)
+    }
+
   }
 
   const downloadAllDocuments = async () => {
@@ -466,6 +553,12 @@ export const RecordsLog = ({
     return `Request #U-00${requestId}`;
   }
 
+  const getCurrentDownload = () => {
+    if (currentDownload === 1 && isDownloadInProgress)
+      return 0;
+    return currentDownload;
+  }
+
   // const onFilterChange = (filterValue) => {
     // let _filteredRecords = filterValue === "" ?
     // records.records :
@@ -521,6 +614,14 @@ export const RecordsLog = ({
                 {getRequestNumber()}
               </h1>
             </Grid>
+          </Grid>
+          <Grid
+            container
+            direction="row"
+            justify="flex-start"
+            alignItems="flex-start"
+            spacing={1}
+          >
             <Grid item xs={2}>
               <ConditionalComponent condition={records.filter(record => record.attachments?.length > 0).length > 0}>
                 <button
@@ -531,6 +632,56 @@ export const RecordsLog = ({
                 >
                   Remove Attachments
                 </button>
+              </ConditionalComponent>
+            </Grid>
+            <Grid item xs={4}>
+              <ConditionalComponent condition={hasDocumentsToExport}>
+              <TextField
+              className="download-dropdown custom-select-wrapper foi-download-button"
+              id="download"
+              label={currentDownload === 0 ? "Download" : ""}
+              inputProps={{ "aria-labelledby": "download-label" }}
+              InputProps={{
+                startAdornment: isDownloadInProgress && <InputAdornment position="start">
+                  <CircularProgress class="download-progress-adornment"/>
+                  {/* <CircularProgress/> */}
+                  </InputAdornment>
+              }}
+              InputLabelProps={{ shrink: false }}
+              select
+              name="download"
+              value={getCurrentDownload()}
+              onChange={handleDownloadChange}
+              placeholder="Download"
+              variant="outlined"
+              size="small"
+              fullWidth
+            >
+              {RecordsDownloadList.map((item, index) => {
+
+                if (item.id !=0) {
+                  return (
+                    // <>
+                    //   <CircularProgress/>
+                      <MenuItem
+                        className="download-menu-item"
+                        key={index}
+                        value={index}
+                        disabled={item.disabled}
+                        sx={{ display: 'flex' }}
+                      >
+                        {
+                        (isDownloadInProgress && index === currentDownload) && <CircularProgress class="download-progress"/>
+                        
+                        }
+                        {item.label}
+                      </MenuItem>
+                    // </>
+                  )
+                }
+
+              } )}
+            </TextField>
               </ConditionalComponent>
             </Grid>
             <Grid item xs={2}>

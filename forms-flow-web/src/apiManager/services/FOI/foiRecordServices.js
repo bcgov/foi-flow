@@ -88,12 +88,23 @@ export const deleteReviewerRecords = (filepaths, ...rest) => {
     };
 };
 
-const postRecord = (dispatch, apiUrl, data, errorMessage, rest) => {
+export const downloadFOIRecordsForHarms = (requestId, ministryId, data, ...rest) => {
+  let apiUrl = replaceUrl(replaceUrl(
+    API.FOI_DOWNLOAD_RECORDS_FOR_HARMS,
+   "<ministryrequestid>", ministryId),
+   "<requestid>", requestId);
+  return (dispatch) => {
+    postRecord(dispatch, apiUrl, data, "Error in posting records", rest, "download");
+  };
+};
+
+const postRecord = (dispatch, apiUrl, data, errorMessage, rest, type="download") => {
   const done = fnDone(rest);
   httpPOSTRequest(apiUrl, data)
       .then((res) => {
         if (res.data && res.data.status) {
-          dispatch(setFOIAttachmentListLoader(false));
+          if(type !== "download")
+            dispatch(setFOIAttachmentListLoader(false));
           done(null, res.data);
         } else {
           dispatch(serviceActionError(res));
@@ -105,3 +116,5 @@ const postRecord = (dispatch, apiUrl, data, errorMessage, rest) => {
         dispatch(setFOILoader(false));
       });
 }
+
+

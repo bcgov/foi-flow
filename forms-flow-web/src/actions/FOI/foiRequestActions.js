@@ -41,6 +41,12 @@ export const setFOIAttachmentListLoader = (data) => dispatch =>{
         payload:data
     })
 }
+export const setFOIDownloadLoader = (data) => dispatch =>{
+    dispatch({
+        type:FOI_ACTION_CONSTANTS.IS_DOWNLOAD_INPROGRESS,
+        payload:data
+    })
+}
 export const setCommentTagListLoader = (data) => dispatch =>{
     dispatch({
         type:FOI_ACTION_CONSTANTS.IS_COMMENTTAGLIST_LOADING,

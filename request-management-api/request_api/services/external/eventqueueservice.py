@@ -16,7 +16,9 @@ class eventqueueservice:
     def add(self, streamkey, payload):
         try:
             stream = self.db.Stream(streamkey)
+            print("streamkey >>> ", streamkey)
             msgid = stream.add(payload, id="*")
+            print("msgid >>>>> ", msgid)
             return DefaultMethodResult(True,'Added to stream',msgid.decode('utf-8'))
         except Exception as err:
             logging.error("Error in contacting Redis Stream")

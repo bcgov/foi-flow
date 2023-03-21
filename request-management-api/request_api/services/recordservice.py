@@ -22,6 +22,8 @@ class recordservice:
     docreviewerapitimeout =  getenv("FOI_DOCREVIEWER_BASE_API_TIMEOUT")
     conversionstreamkey = getenv('EVENT_QUEUE_CONVERSION_STREAMKEY')
     dedupestreamkey = getenv('EVENT_QUEUE_DEDUPE_STREAMKEY')
+    pdfstitchstreamkey = getenv('EVENT_QUEUE_DEDUPE_STREAMKEY')
+
 
     def create(self, requestid, ministryrequestid, recordschema, userid):
         """Creates a record for a user with document details passed in for an opened request.
@@ -148,7 +150,25 @@ class recordservice:
             if record.get('outputdocumentmasterid', False):
                 streamobject['outputdocumentmasterid'] = record['outputdocumentmasterid']
             return eventqueueservice().add(streamkey, streamobject)
+        
+    def triggerpdfstitchservice(self, requestid, ministryrequestid, recordschema, userid):
+        """Calls the BE job for stitching the documents.
+        """
+        return self.__triggerpdfstitchservice(requestid, ministryrequestid, recordschema, userid)
 
+    def __triggerpdfstitchservice(self, requestid, ministryrequestid, message, userid):
+        """Call the BE job for stitching the documents.
+        """
+        streamobject = {
+            "requestnumber": message["requestnumber"],
+            "bcgovcode": message["bcgovcode"],
+            "createdby": userid,
+            "requestid": requestid,
+            "ministryrequestid": ministryrequestid,
+            "attributes": json.JSONEncoder().encode(message["attributes"])
+        }
+        print("final message >>>>>> ", streamobject)
+        return eventqueueservice().add(self.pdfstitchstreamkey, streamobject)
 
     def __bulkcreate(self, requestid, ministryrequestid, records, userid):
         """Creates bulk records for a user with document details passed in for an opened request.
