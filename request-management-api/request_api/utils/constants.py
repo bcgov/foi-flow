@@ -19,7 +19,12 @@ FORMAT_CONTACT_ADDRESS='JSON'
 BLANK_EXCEPTION_MESSAGE = 'Field cannot be blank'
 MAX_EXCEPTION_MESSAGE = 'Field exceeds the size limit'
 FILE_CONVERSION_FILE_TYPES = ['.doc','.docx','.xls','.xlsx', '.ics', '.msg']
-DEDUPE_FILE_TYPES = ['.pdf']
+DEDUPE_FILE_TYPES = ['.pdf','.json',
+   '.shx', '.shp','.dbf','.kml','.kmz','.geojson','.cpg','.prj','.sbn','.sbx','.gml','.gdb','.freelist','.atx','.gpkg','.mbtiles','.mpk','.wkt',
+  '.las','.lasd','.laz','.dwf','.dwg','.dxf','.csv','.txt','.png','.jpg']
 
+NONREDACTABLE_FILE_TYPES = ['.json',
+   '.shx', '.shp','.dbf','.kml','.kmz','.geojson','.cpg','.prj','.sbn','.sbx','.gml','.gdb','.freelist','.atx','.gpkg','.mbtiles','.mpk','.wkt',
+  '.las','.lasd','.laz','.dwf','.dwg','.dxf','.csv','.txt']
 
 

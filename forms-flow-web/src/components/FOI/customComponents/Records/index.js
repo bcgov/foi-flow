@@ -858,6 +858,8 @@ const Attachment = React.memo(({indexValue, record, handlePopupButtonClick, getF
         <Grid item xs={6}>
           {record.isattachment && <FontAwesomeIcon icon={faArrowTurnUp} size='2x' className={classes.attachmentIcon}/>}
           {
+            record.isduplicate && record.attributes?.incompatible ?
+            <FontAwesomeIcon icon={faClone} size='2x' color='#FF873D' className={classes.statusIcons}/>:
             record.attributes?.incompatible ?
             <FontAwesomeIcon icon={faBan} size='2x' color='#FAA915' className={classes.statusIcons}/>:
             record.isduplicate ?
@@ -876,6 +878,8 @@ const Attachment = React.memo(({indexValue, record, handlePopupButtonClick, getF
             alignItems="flex-end"
             className={classes.recordStatus}>
             {
+              record.isduplicate && record.attributes?.incompatible ?
+              <span>Duplicate of {record.duplicateof}</span>:
               record.attributes?.incompatible ?
               <span>Incompatible File Type</span>:
               record.trigger === 'recordreplace' ?
