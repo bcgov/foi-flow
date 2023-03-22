@@ -6,12 +6,12 @@
    <elementGuidId>88b56292-c467-4e5c-92ce-5b4ea647be85</elementGuidId>
    <selectorCollection>
       <entry>
-         <key>CSS</key>
-         <value>div.foitabheadercollection.foitabheaderCFRG</value>
-      </entry>
-      <entry>
          <key>XPATH</key>
          <value>//div[@id='CFRForm']</value>
+      </entry>
+      <entry>
+         <key>CSS</key>
+         <value>div.foitabheadercollection.foitabheaderCFRG</value>
       </entry>
    </selectorCollection>
    <selectorMethod>XPATH</selectorMethod>

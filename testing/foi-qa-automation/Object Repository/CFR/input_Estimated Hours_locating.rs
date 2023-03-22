@@ -13,8 +13,12 @@
          <key>XPATH</key>
          <value>//input[@id='estimatedlocating']</value>
       </entry>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@id = 'estimatedlocating' and @name = 'locating' and @type = 'number']</value>
+      </entry>
    </selectorCollection>
-   <selectorMethod>XPATH</selectorMethod>
+   <selectorMethod>BASIC</selectorMethod>
    <useRalativeImagePath>true</useRalativeImagePath>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -22,7 +26,7 @@
       <name>tag</name>
       <type>Main</type>
       <value>input</value>
-      <webElementGuid>bc5e4575-7862-4b14-8036-87a500ba95c6</webElementGuid>
+      <webElementGuid>f3a8f02e-db34-48d1-8d20-6825d8790196</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -30,7 +34,7 @@
       <name>aria-invalid</name>
       <type>Main</type>
       <value>false</value>
-      <webElementGuid>b0312f94-1b7a-45e8-bf5d-268a452f915a</webElementGuid>
+      <webElementGuid>5ae4c629-8109-4a66-8005-bfeac96e99cf</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>true</isSelected>
@@ -38,7 +42,7 @@
       <name>id</name>
       <type>Main</type>
       <value>estimatedlocating</value>
-      <webElementGuid>ca4447ca-d272-4cfb-9b4e-440f047d8966</webElementGuid>
+      <webElementGuid>32b5c071-a43e-4186-84dc-cbfad5da219b</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>true</isSelected>
@@ -46,7 +50,7 @@
       <name>name</name>
       <type>Main</type>
       <value>locating</value>
-      <webElementGuid>36d3e7b9-8611-48af-b7c0-eadde282705e</webElementGuid>
+      <webElementGuid>90d34570-fabc-4a8f-af77-0be07f808a0a</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>true</isSelected>
@@ -54,7 +58,7 @@
       <name>type</name>
       <type>Main</type>
       <value>number</value>
-      <webElementGuid>27b2d88c-c5be-4775-997b-48c9dfd8a442</webElementGuid>
+      <webElementGuid>1bb92170-a9c5-4035-b4ed-41373bf8ee8a</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -62,7 +66,7 @@
       <name>aria-labelledby</name>
       <type>Main</type>
       <value>estimatedlocating-label</value>
-      <webElementGuid>c2b8deec-b965-4dea-aa3f-8e89edb9bf5a</webElementGuid>
+      <webElementGuid>54201759-6e38-49af-b55d-228d698650b7</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -70,7 +74,7 @@
       <name>step</name>
       <type>Main</type>
       <value>0.25</value>
-      <webElementGuid>ce39a055-1b47-4d60-ace8-8a380ed011d9</webElementGuid>
+      <webElementGuid>20f9802b-4238-41b7-a1de-d7e8bfd26c56</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -78,7 +82,7 @@
       <name>min</name>
       <type>Main</type>
       <value>0</value>
-      <webElementGuid>95bfbd6b-b619-4e88-8a74-9293f7ba2fd4</webElementGuid>
+      <webElementGuid>c729bd6c-fe17-4626-a569-b6efaf831553</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -86,7 +90,7 @@
       <name>class</name>
       <type>Main</type>
       <value>MuiOutlinedInput-input MuiInputBase-input Mui-disabled MuiInputBase-inputAdornedEnd css-1uvydh2</value>
-      <webElementGuid>a102d91d-5128-4539-a7de-86f0dbb03dc1</webElementGuid>
+      <webElementGuid>5da31301-01e3-4676-a11f-aeea23029b43</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -94,7 +98,7 @@
       <name>value</name>
       <type>Main</type>
       <value>0</value>
-      <webElementGuid>a102b847-16d7-4ce3-9140-15379c4456e5</webElementGuid>
+      <webElementGuid>5b6b819b-3de2-47c7-ad03-545764592878</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -102,7 +106,7 @@
       <name>xpath</name>
       <type>Main</type>
       <value>id(&quot;estimatedlocating&quot;)</value>
-      <webElementGuid>52dd0add-e035-4ec6-b639-a982525b7fd7</webElementGuid>
+      <webElementGuid>13b2e589-20d3-4527-ab43-66041c5a89ec</webElementGuid>
    </webElementProperties>
    <webElementXpaths>
       <isSelected>true</isSelected>
@@ -110,7 +114,7 @@
       <name>xpath:attributes</name>
       <type>Main</type>
       <value>//input[@id='estimatedlocating']</value>
-      <webElementGuid>2fefee4c-3435-420e-90dd-d9916027f446</webElementGuid>
+      <webElementGuid>4298235f-b157-4955-b985-8008a52f6b66</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -118,7 +122,7 @@
       <name>xpath:idRelative</name>
       <type>Main</type>
       <value>//div[@id='CFRForm']/div/form/div/div[2]/div[3]/div[2]/div[2]/div/div/div/div/div[2]/div/div/div/input</value>
-      <webElementGuid>8f07b659-e0e2-427b-85b5-6813c8d5a9a5</webElementGuid>
+      <webElementGuid>3245978f-39ca-46a7-992d-7b0d730db82f</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -126,7 +130,7 @@
       <name>xpath:position</name>
       <type>Main</type>
       <value>//div[2]/div[2]/div/div/div/div/div[2]/div/div/div/input</value>
-      <webElementGuid>b42d87ca-deff-4c28-9795-8fa4b3e429de</webElementGuid>
+      <webElementGuid>aeb76e77-7bec-4dba-98c0-ac8f0cd86ba7</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -134,6 +138,6 @@
       <name>xpath:customAttributes</name>
       <type>Main</type>
       <value>//input[@id = 'estimatedlocating' and @name = 'locating' and @type = 'number']</value>
-      <webElementGuid>07738a79-c316-4a09-8528-dc0ede207946</webElementGuid>
+      <webElementGuid>fec8a061-8caf-4dfa-84b1-b8d97ba59e3b</webElementGuid>
    </webElementXpaths>
 </WebElementEntity>

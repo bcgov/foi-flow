@@ -1,24 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <WebElementEntity>
    <description></description>
-   <name>input_Balance Remaining_balanceRemaining</name>
+   <name>input_Amount Paid_amountPaid</name>
    <tag></tag>
-   <elementGuidId>799928ea-3f8f-4f03-a979-bb0435669826</elementGuidId>
+   <elementGuidId>2f3af62b-fa42-4a92-bd3d-3384a305baa8</elementGuidId>
    <selectorCollection>
       <entry>
-         <key>BASIC</key>
-         <value>//*[@id = 'balanceremaining' and @name = 'balanceRemaining' and @placeholder = '0' and @type = 'text' and @value = '0.00']</value>
-      </entry>
-      <entry>
          <key>XPATH</key>
-         <value>//input[@id='balanceremaining']</value>
+         <value>//input[@id='amountpaid']</value>
       </entry>
       <entry>
          <key>CSS</key>
-         <value>#balanceremaining</value>
+         <value>#amountpaid</value>
       </entry>
    </selectorCollection>
-   <selectorMethod>BASIC</selectorMethod>
+   <selectorMethod>XPATH</selectorMethod>
    <useRalativeImagePath>true</useRalativeImagePath>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -26,7 +22,7 @@
       <name>tag</name>
       <type>Main</type>
       <value>input</value>
-      <webElementGuid>52409bde-d006-45c0-bd12-01c23af9c146</webElementGuid>
+      <webElementGuid>7e9e2291-2887-410f-a986-f5436659fd12</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -34,102 +30,118 @@
       <name>aria-invalid</name>
       <type>Main</type>
       <value>false</value>
-      <webElementGuid>338b374a-0cd0-4ef0-9c01-90c20c5be889</webElementGuid>
+      <webElementGuid>27fd9bc7-f346-4c59-9006-315bdd5c8f76</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>true</isSelected>
       <matchCondition>equals</matchCondition>
       <name>id</name>
       <type>Main</type>
-      <value>balanceremaining</value>
-      <webElementGuid>7788c68e-4307-4768-98ee-f412c60e02cc</webElementGuid>
+      <value>amountpaid</value>
+      <webElementGuid>10201388-2cd3-4619-a0cd-3ce07a13fac2</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>true</isSelected>
       <matchCondition>equals</matchCondition>
       <name>name</name>
       <type>Main</type>
-      <value>balanceRemaining</value>
-      <webElementGuid>424a1353-1278-449a-a249-813aec5701a3</webElementGuid>
-   </webElementProperties>
-   <webElementProperties>
-      <isSelected>true</isSelected>
-      <matchCondition>equals</matchCondition>
-      <name>placeholder</name>
-      <type>Main</type>
-      <value>0</value>
-      <webElementGuid>c5e8d7ec-1f55-4e1b-94a1-e3e3efe24545</webElementGuid>
+      <value>amountPaid</value>
+      <webElementGuid>e0b50948-12cb-47fd-8854-4fb7259b4168</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>true</isSelected>
       <matchCondition>equals</matchCondition>
       <name>type</name>
       <type>Main</type>
-      <value>text</value>
-      <webElementGuid>4092de02-c20b-4865-a521-7c0f96f0e529</webElementGuid>
+      <value>number</value>
+      <webElementGuid>c591c023-a771-4635-a32f-d7d8c0952bb3</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
       <matchCondition>equals</matchCondition>
       <name>aria-labelledby</name>
       <type>Main</type>
-      <value>balanceremaining-label</value>
-      <webElementGuid>a89eca99-90d5-4ca1-9e65-a8e0ea0fde79</webElementGuid>
+      <value>amountpaid-label</value>
+      <webElementGuid>8c94b0b8-1533-408f-8288-0c92df318bf4</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>step</name>
+      <type>Main</type>
+      <value>0.01</value>
+      <webElementGuid>b59907de-967d-4ca2-bf01-4a5e181f3f26</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>max</name>
+      <type>Main</type>
+      <value>480</value>
+      <webElementGuid>cd2ad995-b3ba-4052-91e6-a889b699c780</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>min</name>
+      <type>Main</type>
+      <value>0</value>
+      <webElementGuid>3cc831c6-1126-4762-9d4a-083acc589d3b</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
       <matchCondition>equals</matchCondition>
       <name>class</name>
       <type>Main</type>
-      <value>MuiOutlinedInput-input MuiInputBase-input Mui-disabled MuiInputBase-inputAdornedStart css-1ixds2g</value>
-      <webElementGuid>c4f2de26-7e2e-402a-b00a-c958c952205f</webElementGuid>
+      <value>MuiOutlinedInput-input MuiInputBase-input MuiInputBase-inputAdornedStart css-1ixds2g</value>
+      <webElementGuid>791fbcb3-bbe5-4034-94dd-b8295f6dddb4</webElementGuid>
    </webElementProperties>
    <webElementProperties>
-      <isSelected>true</isSelected>
+      <isSelected>false</isSelected>
       <matchCondition>equals</matchCondition>
       <name>value</name>
       <type>Main</type>
-      <value>0.00</value>
-      <webElementGuid>9b35122a-15de-43b1-9348-534ae9631efb</webElementGuid>
+      <value>390.5</value>
+      <webElementGuid>a100cc55-d95b-4e49-a354-771a5c339050</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
       <matchCondition>equals</matchCondition>
       <name>xpath</name>
       <type>Main</type>
-      <value>id(&quot;balanceremaining&quot;)</value>
-      <webElementGuid>88e85baf-dd2c-4686-b8fb-79cd8e1268b8</webElementGuid>
+      <value>id(&quot;amountpaid&quot;)</value>
+      <webElementGuid>5ec9f79a-e25e-4f9c-ae84-90b39613f458</webElementGuid>
    </webElementProperties>
    <webElementXpaths>
       <isSelected>true</isSelected>
       <matchCondition>equals</matchCondition>
       <name>xpath:attributes</name>
       <type>Main</type>
-      <value>//input[@id='balanceremaining']</value>
-      <webElementGuid>f88c835b-82cd-43e8-9c18-7f766ae07f3d</webElementGuid>
+      <value>//input[@id='amountpaid']</value>
+      <webElementGuid>10994e37-89d7-46e4-8cc6-b5d78b613238</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
       <matchCondition>equals</matchCondition>
       <name>xpath:idRelative</name>
       <type>Main</type>
-      <value>//div[@id='CFRForm']/div/form/div/div[2]/div[3]/div/div[2]/div/div/div/div/div/div[2]/div/div/input</value>
-      <webElementGuid>3bee1fd7-e595-46cb-b5b5-c072e999cc13</webElementGuid>
+      <value>//div[@id='CFRForm']/div/form/div/div[2]/div[3]/div/div[2]/div/div/div/div/div[2]/div/div/div/input</value>
+      <webElementGuid>e505c224-5765-4f84-8815-b8513b176276</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
       <matchCondition>equals</matchCondition>
       <name>xpath:position</name>
       <type>Main</type>
-      <value>//div[2]/div/div/div/div/div/div[2]/div/div/input</value>
-      <webElementGuid>e09825ae-3236-4091-a62f-9f5e292fb492</webElementGuid>
+      <value>//div[3]/div/div[2]/div/div/div/div/div[2]/div/div/div/input</value>
+      <webElementGuid>77f3eddb-3959-4095-8452-4b5336702005</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
       <matchCondition>equals</matchCondition>
       <name>xpath:customAttributes</name>
       <type>Main</type>
-      <value>//input[@id = 'balanceremaining' and @name = 'balanceRemaining' and @placeholder = '0' and @type = 'text']</value>
-      <webElementGuid>dccb1c1c-92b4-44cd-9e2a-fb0abac714a5</webElementGuid>
+      <value>//input[@id = 'amountpaid' and @name = 'amountPaid' and @type = 'number']</value>
+      <webElementGuid>4bd67ad6-419f-437e-b4f3-cf85c86b7ca2</webElementGuid>
    </webElementXpaths>
 </WebElementEntity>

@@ -1,23 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <WebElementEntity>
    <description></description>
-   <name>li_Outstanding Fee</name>
+   <name>li_Cash</name>
    <tag></tag>
-   <elementGuidId>49212cab-dcaf-4dd9-8955-a38c989dfe7f</elementGuidId>
+   <elementGuidId>dfe6ff6e-40ed-49f8-a09c-c767b7876215</elementGuidId>
    <selectorCollection>
       <entry>
          <key>XPATH</key>
-         <value>//div[@id='menu-emailtemplate']/div[3]/ul/li[3]</value>
-      </entry>
-      <entry>
-         <key>BASIC</key>
-         <value>id(&quot;menu-emailtemplate&quot;)/div[@class=&quot;MuiPaper-root MuiPaper-elevation MuiPaper-rounded MuiPaper-elevation1 MuiMenu-paper MuiPaper-root MuiPaper-elevation MuiPaper-rounded MuiPaper-elevation8 MuiPopover-paper css-177ic5c&quot;]/ul[@class=&quot;MuiList-root MuiList-padding MuiMenu-list css-r8u8y9&quot;]/li[@class=&quot;MuiMenuItem-root MuiMenuItem-gutters MuiButtonBase-root css-1km1ehz&quot;][count(. | //*[(text() = 'Outstanding Fee' or . = 'Outstanding Fee')]) = count(//*[(text() = 'Outstanding Fee' or . = 'Outstanding Fee')])]</value>
+         <value>//div[@id='menu-balancePaymentMethod']/div[3]/ul/li[6]</value>
       </entry>
       <entry>
          <key>CSS</key>
       </entry>
    </selectorCollection>
-   <selectorMethod>BASIC</selectorMethod>
+   <selectorMethod>XPATH</selectorMethod>
    <useRalativeImagePath>true</useRalativeImagePath>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -25,7 +21,7 @@
       <name>tag</name>
       <type>Main</type>
       <value>li</value>
-      <webElementGuid>5bf51d8a-8a76-42f7-afdb-39b1738f0542</webElementGuid>
+      <webElementGuid>6bf5549f-c312-4069-8489-592c3a7f294d</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -33,15 +29,15 @@
       <name>class</name>
       <type>Main</type>
       <value>MuiMenuItem-root MuiMenuItem-gutters MuiButtonBase-root css-1km1ehz</value>
-      <webElementGuid>7c6ac609-d7a4-4a94-a286-8aee652a9b26</webElementGuid>
+      <webElementGuid>e2c652fd-3f78-4ab2-bac9-5261f01ac8d8</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
       <matchCondition>equals</matchCondition>
       <name>tabindex</name>
       <type>Main</type>
-      <value>0</value>
-      <webElementGuid>605507d3-1247-4e29-aafe-fdefbb07ba35</webElementGuid>
+      <value>-1</value>
+      <webElementGuid>904a3082-ae3e-4d15-a2be-9e96da8ec557</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -49,7 +45,7 @@
       <name>role</name>
       <type>Main</type>
       <value>option</value>
-      <webElementGuid>fa56d15f-1ccf-439b-80d8-48fc56210c20</webElementGuid>
+      <webElementGuid>6d3ea8f3-8166-4559-b377-8f7daf2df5fb</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -57,78 +53,78 @@
       <name>aria-selected</name>
       <type>Main</type>
       <value>false</value>
-      <webElementGuid>52d76b4f-3136-4226-b9d8-3344bd176da9</webElementGuid>
+      <webElementGuid>002629d3-f22c-49cc-8480-57f36a5cf63f</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
       <matchCondition>equals</matchCondition>
       <name>data-value</name>
       <type>Main</type>
-      <value>2</value>
-      <webElementGuid>236cfcb0-7db5-49ab-acfb-c4e9361366da</webElementGuid>
+      <value>cash</value>
+      <webElementGuid>ebef65f1-f7ce-4cce-9f78-3cd909667096</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>true</isSelected>
       <matchCondition>equals</matchCondition>
       <name>text</name>
       <type>Main</type>
-      <value>Outstanding Fee</value>
-      <webElementGuid>042b2695-e7fe-46c7-a230-bf0193bf0e70</webElementGuid>
+      <value>Cash</value>
+      <webElementGuid>ca84750c-e0bb-46ca-93a5-79881060f3c7</webElementGuid>
    </webElementProperties>
    <webElementProperties>
-      <isSelected>true</isSelected>
+      <isSelected>false</isSelected>
       <matchCondition>equals</matchCondition>
       <name>xpath</name>
       <type>Main</type>
-      <value>id(&quot;menu-emailtemplate&quot;)/div[@class=&quot;MuiPaper-root MuiPaper-elevation MuiPaper-rounded MuiPaper-elevation1 MuiMenu-paper MuiPaper-root MuiPaper-elevation MuiPaper-rounded MuiPaper-elevation8 MuiPopover-paper css-177ic5c&quot;]/ul[@class=&quot;MuiList-root MuiList-padding MuiMenu-list css-r8u8y9&quot;]/li[@class=&quot;MuiMenuItem-root MuiMenuItem-gutters MuiButtonBase-root css-1km1ehz&quot;]</value>
-      <webElementGuid>8de86f70-efc5-42ac-8879-f7e85bd24337</webElementGuid>
+      <value>id(&quot;menu-balancePaymentMethod&quot;)/div[@class=&quot;MuiPaper-root MuiPaper-elevation MuiPaper-rounded MuiPaper-elevation1 MuiMenu-paper MuiPaper-root MuiPaper-elevation MuiPaper-rounded MuiPaper-elevation8 MuiPopover-paper css-177ic5c&quot;]/ul[@class=&quot;MuiList-root MuiList-padding MuiMenu-list css-r8u8y9&quot;]/li[@class=&quot;MuiMenuItem-root MuiMenuItem-gutters MuiButtonBase-root css-1km1ehz&quot;]</value>
+      <webElementGuid>1791f082-48b7-4232-a902-8a6c524e4b59</webElementGuid>
    </webElementProperties>
    <webElementXpaths>
       <isSelected>true</isSelected>
       <matchCondition>equals</matchCondition>
       <name>xpath:idRelative</name>
       <type>Main</type>
-      <value>//div[@id='menu-emailtemplate']/div[3]/ul/li[3]</value>
-      <webElementGuid>7aba77c3-4969-4a5c-8f34-dcbc1d93369f</webElementGuid>
+      <value>//div[@id='menu-balancePaymentMethod']/div[3]/ul/li[6]</value>
+      <webElementGuid>654e7fc4-fed3-40d1-bc18-792478a755d8</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
       <matchCondition>equals</matchCondition>
       <name>xpath:neighbor</name>
       <type>Main</type>
-      <value>(.//*[normalize-space(text()) and normalize-space(.)='Fee Estimate'])[1]/following::li[1]</value>
-      <webElementGuid>dcdca623-3a1e-4b4d-bc1d-be8a2958348e</webElementGuid>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='Money Order'])[1]/following::li[1]</value>
+      <webElementGuid>6057a757-1067-4784-8633-fd574a6a5bd6</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
       <matchCondition>equals</matchCondition>
       <name>xpath:neighbor</name>
       <type>Main</type>
-      <value>(.//*[normalize-space(text()) and normalize-space(.)='`'])[2]/following::li[3]</value>
-      <webElementGuid>0ee75f4d-3b97-4b25-84ed-57dc705677f3</webElementGuid>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='Cheque'])[1]/following::li[2]</value>
+      <webElementGuid>363ac4e3-f9b4-4682-88e6-71a8d0146400</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
       <matchCondition>equals</matchCondition>
       <name>xpath:neighbor</name>
       <type>Main</type>
-      <value>//*/text()[normalize-space(.)='Outstanding Fee']/parent::*</value>
-      <webElementGuid>8b472584-21e6-4727-92c2-8f6821f78f8d</webElementGuid>
+      <value>//*/text()[normalize-space(.)='Cash']/parent::*</value>
+      <webElementGuid>236fae09-f79b-4590-93fd-e7682ca3bf27</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
       <matchCondition>equals</matchCondition>
       <name>xpath:position</name>
       <type>Main</type>
-      <value>//div[3]/ul/li[3]</value>
-      <webElementGuid>50bafee5-1d5a-4125-a49d-f65c1aaabc76</webElementGuid>
+      <value>//li[6]</value>
+      <webElementGuid>92ebc904-22e8-4f73-827b-d35599c1086e</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
       <matchCondition>equals</matchCondition>
       <name>xpath:customAttributes</name>
       <type>Main</type>
-      <value>//li[(text() = 'Outstanding Fee' or . = 'Outstanding Fee')]</value>
-      <webElementGuid>fe0c8097-dc16-4034-9ad5-a7540ad2ba25</webElementGuid>
+      <value>//li[(text() = 'Cash' or . = 'Cash')]</value>
+      <webElementGuid>fff90218-fddd-4c85-a88a-043dcd0beea8</webElementGuid>
    </webElementXpaths>
 </WebElementEntity>

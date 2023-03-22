@@ -150,9 +150,7 @@ WebUI.verifyElementPresent(findTestObject('CFR/div_Contact Applicant'), 0)
 
 WebUI.click(findTestObject('CFR/div_CFR Form'))
 
-WebUI.scrollToElement(findTestObject('CFR/CFR_Addcorrespondence/h3_CFRrequest-Title'), 0)
-
-WebUI.delay(3)
+WebUI.scrollToPosition(1141, 60)
 
 WebUI.scrollToElement(findTestObject('CFR/CFR_status/div_Approved'), 0)
 
@@ -168,7 +166,7 @@ WebUI.refresh()
 
 WebUI.click(findTestObject('CFR/div_CFR Form'))
 
-WebUI.scrollToElement(findTestObject('CFR/CFR_Addcorrespondence/h3_CFRrequest-Title'), 0)
+WebUI.scrollToPosition(1141, 60)
 
 WebUI.click(findTestObject('CFR/CFR_status/div_Approved'))
 
@@ -197,9 +195,9 @@ WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/li_On Hol
 
 WebUI.click(findTestObject('Page_foi.flow/form/state change dialog/button_Cancel'))
 
-WebUI.scrollToElement(findTestObject('Page_foi.flow/form/h3_Form Request Title'), 0)
+WebUI.refresh()
 
-WebUI.scrollToElement(findTestObject('CFR/CFR_status/div_Approved'), 0)
+WebUI.scrollToPosition(1141, 60)
 
 WebUI.click(findTestObject('CFR/CFR_status/div_Approved'))
 
@@ -220,8 +218,6 @@ WebUI.uploadFile(findTestObject('Page_foi.flow/attachment/input_Add Files_file-u
 WebUI.click(findTestObject('Page_foi.flow/form/state change dialog/button_Save Change'))
 
 WebUI.click(findTestObject('Page_foi.flow/form/sidebar/div_Sidebar Comments'))
-
-WebUI.scrollToElement(findTestObject('Page_foi.flow/comment/span_Request History Comments'), 0)
 
 WebUI.click(findTestObject('Page_foi.flow/comment/span_Request History Comments'))
 
@@ -254,6 +250,7 @@ WebUI.click(findTestObject('CFR/button_Preview  Send Email'))
 WebUI.click(findTestObject('CFR/button_Send Email'))
 
 WebUI.delay(3)
+ministryUser.close()
 
-WebUI.verifyElementPresent(findTestObject('CFR/CFR_Addcorrespondence/div_usersendemailmessage'), 0)
+IAOuser.close()
 

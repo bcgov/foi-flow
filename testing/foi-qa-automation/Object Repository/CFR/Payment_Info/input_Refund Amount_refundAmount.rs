@@ -1,24 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <WebElementEntity>
    <description></description>
-   <name>input_Balance Remaining_balanceRemaining</name>
+   <name>input_Refund Amount_refundAmount</name>
    <tag></tag>
-   <elementGuidId>799928ea-3f8f-4f03-a979-bb0435669826</elementGuidId>
+   <elementGuidId>f38a974a-ff2a-410c-a14c-b22ecd0ff2f4</elementGuidId>
    <selectorCollection>
       <entry>
-         <key>BASIC</key>
-         <value>//*[@id = 'balanceremaining' and @name = 'balanceRemaining' and @placeholder = '0' and @type = 'text' and @value = '0.00']</value>
-      </entry>
-      <entry>
          <key>XPATH</key>
-         <value>//input[@id='balanceremaining']</value>
+         <value>//input[@id='refund']</value>
       </entry>
       <entry>
          <key>CSS</key>
-         <value>#balanceremaining</value>
+         <value>#refund</value>
       </entry>
    </selectorCollection>
-   <selectorMethod>BASIC</selectorMethod>
+   <selectorMethod>XPATH</selectorMethod>
    <useRalativeImagePath>true</useRalativeImagePath>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -26,7 +22,7 @@
       <name>tag</name>
       <type>Main</type>
       <value>input</value>
-      <webElementGuid>52409bde-d006-45c0-bd12-01c23af9c146</webElementGuid>
+      <webElementGuid>924179a6-656a-409e-9b4f-e6be19580707</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -34,102 +30,118 @@
       <name>aria-invalid</name>
       <type>Main</type>
       <value>false</value>
-      <webElementGuid>338b374a-0cd0-4ef0-9c01-90c20c5be889</webElementGuid>
+      <webElementGuid>0e05ff27-bc67-47f8-a16e-368863012f04</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>true</isSelected>
       <matchCondition>equals</matchCondition>
       <name>id</name>
       <type>Main</type>
-      <value>balanceremaining</value>
-      <webElementGuid>7788c68e-4307-4768-98ee-f412c60e02cc</webElementGuid>
+      <value>refund</value>
+      <webElementGuid>4ab84754-73f6-48b0-8bf6-8f825aa8cc66</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>true</isSelected>
       <matchCondition>equals</matchCondition>
       <name>name</name>
       <type>Main</type>
-      <value>balanceRemaining</value>
-      <webElementGuid>424a1353-1278-449a-a249-813aec5701a3</webElementGuid>
-   </webElementProperties>
-   <webElementProperties>
-      <isSelected>true</isSelected>
-      <matchCondition>equals</matchCondition>
-      <name>placeholder</name>
-      <type>Main</type>
-      <value>0</value>
-      <webElementGuid>c5e8d7ec-1f55-4e1b-94a1-e3e3efe24545</webElementGuid>
+      <value>refundAmount</value>
+      <webElementGuid>a7e88d06-a897-4779-a095-ed65a5cf3db5</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>true</isSelected>
       <matchCondition>equals</matchCondition>
       <name>type</name>
       <type>Main</type>
-      <value>text</value>
-      <webElementGuid>4092de02-c20b-4865-a521-7c0f96f0e529</webElementGuid>
+      <value>number</value>
+      <webElementGuid>3c92f2aa-6d1e-4d00-85af-c989ea7448cd</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
       <matchCondition>equals</matchCondition>
       <name>aria-labelledby</name>
       <type>Main</type>
-      <value>balanceremaining-label</value>
-      <webElementGuid>a89eca99-90d5-4ca1-9e65-a8e0ea0fde79</webElementGuid>
+      <value>refund-label</value>
+      <webElementGuid>f980f28e-4ed5-4b27-8b6b-70ddcb812540</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>step</name>
+      <type>Main</type>
+      <value>0.01</value>
+      <webElementGuid>434531ab-8ace-4186-819a-d27bdc2cc701</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>max</name>
+      <type>Main</type>
+      <value>390.5</value>
+      <webElementGuid>179c060c-7f0c-4975-82a2-f2b93bb89669</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>min</name>
+      <type>Main</type>
+      <value>0</value>
+      <webElementGuid>95aa4cd9-8e2a-4335-b09e-1af584c46846</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
       <matchCondition>equals</matchCondition>
       <name>class</name>
       <type>Main</type>
-      <value>MuiOutlinedInput-input MuiInputBase-input Mui-disabled MuiInputBase-inputAdornedStart css-1ixds2g</value>
-      <webElementGuid>c4f2de26-7e2e-402a-b00a-c958c952205f</webElementGuid>
+      <value>MuiOutlinedInput-input MuiInputBase-input MuiInputBase-inputAdornedStart css-1ixds2g</value>
+      <webElementGuid>0e043d8a-58bd-4c8f-afe4-4c62bdb6585d</webElementGuid>
    </webElementProperties>
    <webElementProperties>
-      <isSelected>true</isSelected>
+      <isSelected>false</isSelected>
       <matchCondition>equals</matchCondition>
       <name>value</name>
       <type>Main</type>
-      <value>0.00</value>
-      <webElementGuid>9b35122a-15de-43b1-9348-534ae9631efb</webElementGuid>
+      <value>10.5</value>
+      <webElementGuid>a257ca4d-e08e-439d-a327-ba1d6eb3d2ba</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
       <matchCondition>equals</matchCondition>
       <name>xpath</name>
       <type>Main</type>
-      <value>id(&quot;balanceremaining&quot;)</value>
-      <webElementGuid>88e85baf-dd2c-4686-b8fb-79cd8e1268b8</webElementGuid>
+      <value>id(&quot;refund&quot;)</value>
+      <webElementGuid>87723ffe-35e8-4acf-8eda-1535930cc8d8</webElementGuid>
    </webElementProperties>
    <webElementXpaths>
       <isSelected>true</isSelected>
       <matchCondition>equals</matchCondition>
       <name>xpath:attributes</name>
       <type>Main</type>
-      <value>//input[@id='balanceremaining']</value>
-      <webElementGuid>f88c835b-82cd-43e8-9c18-7f766ae07f3d</webElementGuid>
+      <value>//input[@id='refund']</value>
+      <webElementGuid>7079e740-26ee-44ef-aaf9-f9a1cf692513</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
       <matchCondition>equals</matchCondition>
       <name>xpath:idRelative</name>
       <type>Main</type>
-      <value>//div[@id='CFRForm']/div/form/div/div[2]/div[3]/div/div[2]/div/div/div/div/div/div[2]/div/div/input</value>
-      <webElementGuid>3bee1fd7-e595-46cb-b5b5-c072e999cc13</webElementGuid>
+      <value>//div[@id='CFRForm']/div/form/div/div[2]/div[3]/div/div[2]/div/div/div/div/div[4]/div[2]/div/div/input</value>
+      <webElementGuid>d02e9b4d-d691-4245-9452-f6f6131fad50</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
       <matchCondition>equals</matchCondition>
       <name>xpath:position</name>
       <type>Main</type>
-      <value>//div[2]/div/div/div/div/div/div[2]/div/div/input</value>
-      <webElementGuid>e09825ae-3236-4091-a62f-9f5e292fb492</webElementGuid>
+      <value>//div[4]/div[2]/div/div/input</value>
+      <webElementGuid>43fffd32-d398-4df9-bcc4-75814b07a05b</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
       <matchCondition>equals</matchCondition>
       <name>xpath:customAttributes</name>
       <type>Main</type>
-      <value>//input[@id = 'balanceremaining' and @name = 'balanceRemaining' and @placeholder = '0' and @type = 'text']</value>
-      <webElementGuid>dccb1c1c-92b4-44cd-9e2a-fb0abac714a5</webElementGuid>
+      <value>//input[@id = 'refund' and @name = 'refundAmount' and @type = 'number']</value>
+      <webElementGuid>f19a2628-08f6-45c3-9f47-1b33181119f1</webElementGuid>
    </webElementXpaths>
 </WebElementEntity>

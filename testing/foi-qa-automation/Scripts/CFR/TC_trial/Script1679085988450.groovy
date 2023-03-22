@@ -55,7 +55,7 @@ WebUI.scrollToElement(findTestObject('CFR/button_Save'), 0)
 
 WebUI.delay(3)
 
-//WebUI.scrollToElement(findTestObject('CFR/CFR_status/Page_ABC-2099-3921/div_idapp'), 0)
+//WebUI.scrollToElement(findTestObject('CFR/CFR_status/div_idapp'), 0)
 
 WebUI.scrollToPosition(1160, 90)
 
