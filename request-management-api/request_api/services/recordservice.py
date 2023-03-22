@@ -159,7 +159,19 @@ class recordservice:
     def __triggerpdfstitchservice(self, requestid, ministryrequestid, message, userid):
         """Call the BE job for stitching the documents.
         """
+        job, err = self.__makedocreviewerrequest('POST', '/api/pdfstitchjobstatus', {
+                "createdby": userid,
+                "ministryrequestid": ministryrequestid,
+                "inputfiles":message["attributes"],
+                "category": "Harms"
+            })
+        print("job ========== ",job)
+        print("jobid ========== ",job.get("id"))
+        if err:
+            return DefaultMethodResult(False,'Error in contacting Doc Reviewer API', -1, ministryrequestid)
         streamobject = {
+            "jobid": job.get("id"),
+            "category": "Harms",
             "requestnumber": message["requestnumber"],
             "bcgovcode": message["bcgovcode"],
             "createdby": userid,
