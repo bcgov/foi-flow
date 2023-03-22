@@ -184,25 +184,27 @@ class recordservice:
             # send message to redis stream for each file
             for entry in processingrecords:
                 _filename, extension = path.splitext(entry['s3uripath'])
-                streamobject = {
-                    "s3filepath": entry['s3uripath'],
-                    "requestnumber": _ministryrequest['axisrequestid'],
-                    "bcgovcode": _ministryrequest['programarea.bcgovcode'],
-                    "filename": entry['filename'],
-                    "ministryrequestid": ministryrequestid,
-                    "attributes": json.dumps(entry['attributes']),
-                    "batch": batch,
-                    "jobid": jobids[entry['s3uripath']]['jobid'],
-                    "documentmasterid": jobids[entry['s3uripath']]['masterid'],
-                    "trigger": 'recordupload',
-                    "createdby": userid,
-                    "incompatible": 'true' if extension in NONREDACTABLE_FILE_TYPES else 'false'
-                }
-                if extension in FILE_CONVERSION_FILE_TYPES:
-                    eventqueueservice().add(self.conversionstreamkey, streamobject)
-                if extension in DEDUPE_FILE_TYPES:
-                    print('alert:reached DEDUPE event condition')
-                    eventqueueservice().add(self.dedupestreamkey, streamobject)
+                if 'error' in jobids[entry['s3uripath']]:
+                    logging.error("Doc Reviewer API was given an unsupported file type - no job triggered - Record ID: {0} File Name: {1} ".format(entry['recordid'], entry['filename']))
+                else:
+                    streamobject = {
+                        "s3filepath": entry['s3uripath'],
+                        "requestnumber": _ministryrequest['axisrequestid'],
+                        "bcgovcode": _ministryrequest['programarea.bcgovcode'],
+                        "filename": entry['filename'],
+                        "ministryrequestid": ministryrequestid,
+                        "attributes": json.dumps(entry['attributes']),
+                        "batch": batch,
+                        "jobid": jobids[entry['s3uripath']]['jobid'],
+                        "documentmasterid": jobids[entry['s3uripath']]['masterid'],
+                        "trigger": 'recordupload',
+                        "createdby": userid,
+                        "incompatible": 'true' if extension in NONREDACTABLE_FILE_TYPES else 'false'
+                    }
+                    if extension in FILE_CONVERSION_FILE_TYPES:
+                        eventqueueservice().add(self.conversionstreamkey, streamobject)
+                    if extension in DEDUPE_FILE_TYPES:
+                        eventqueueservice().add(self.dedupestreamkey, streamobject)
         return dbresponse
 
 
@@ -230,12 +232,7 @@ class recordservice:
         return record
 
     def __getdivisionname(self, divisions, divisionid):
-        print("debug disappearing files")
-        print(divisions)
         for division in divisions:
-            print(division['division.divisionid'])
-            print(divisionid)
-            print(division['division.divisionid'] == divisionid)
             if division['division.divisionid'] == divisionid:
                 return division['division.name']
         return None
