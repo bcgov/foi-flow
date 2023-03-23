@@ -14,6 +14,8 @@ import maya
 import uuid
 import requests
 import logging
+import copy
+
 class recordservice:
     """ FOI record management service
     """
@@ -29,70 +31,122 @@ class recordservice:
         return self.__bulkcreate(requestid, ministryrequestid, recordschema.get("records"), userid)
 
     def fetch(self, requestid, ministryrequestid):
-        uploadedrecords = FOIRequestRecord.fetch(requestid, ministryrequestid)
+        result = {'dedupedfiles': 0, 'convertedfiles': 0, 'removedfiles': 0}
         _ministryversion = FOIMinistryRequest.getversionforrequest(ministryrequestid)
         divisions = FOIMinistryRequestDivision.getdivisions(ministryrequestid, _ministryversion)
-
-        result = {'dedupedfiles': 0, 'convertedfiles': 0}
-        uploadedrecords = {record['recordid'] : {**record, **{"isredactionready": False, "isduplicate": False}} for record in uploadedrecords}
-        result['removedfiles'] = 0
+        uploadedrecords = FOIRequestRecord.fetch(requestid, ministryrequestid)
+        batchids = []
+        resultrecords = []
         if len(uploadedrecords) > 0:
-            response, err = self.__makedocreviewerrequest('GET', '/api/dedupestatus/{0}'.format(ministryrequestid))
-            if err is None:
-                masterrecords = {record['documentmasterid']: record for record in response}
-                for key in masterrecords:
-                    masterrecord = masterrecords[key]
-                    if masterrecord.get('parentid', False):
-                        record = masterrecord
-                        record['isattachment'] = True
-                        record['s3uripath'] = masterrecord['filepath']
-                        record['rootparentid'] = self.__findrootparentrecordid(record['documentmasterid'], masterrecords)
-                        parentrecord = uploadedrecords[record['rootparentid']]
-                        record['createdby'] = parentrecord['createdby']
-                        # if not record['attributes']:
-                        #     _filename, extension = path.splitext(record['s3uripath'])
-                        #     record['attributes'] = {
-                        #         'divisions': parentrecord['attributes']['divisions'],
-                        #         'batch': parentrecord['attributes']['batch'],
-                        #         'extension': extension,
-                        #         'incompatible': extension not in FILE_CONVERSION_FILE_TYPES + DEDUPE_FILE_TYPES,
-                        #         'isattachment': True
-                        #     }
-                        parentrecord.setdefault('attachments', [])
-                        parentrecord['attachments'].append(record)
-                        if masterrecord['isduplicate']:
-                            originalrecord = masterrecords[masterrecord['duplicatemasterid']]
-                    else:
-                        record = uploadedrecords[masterrecord['recordid']]
-                        record['isduplicate'] = masterrecord['isduplicate']
-                        record['attributes'] = masterrecord['attributes']
-                        record['isredactionready'] = masterrecord['isredactionready']
-                        record['trigger'] = masterrecord['trigger']
-                        record['documentmasterid'] = masterrecord['documentmasterid']
-                        record['outputdocumentmasterid'] = masterrecord['outputdocumentmasterid']
-                        if masterrecord['isduplicate']:
-                            record['duplicateof'] = masterrecord['duplicateof']
-                            originalrecord = uploadedrecords[masterrecord['recordid']]
-                    if masterrecord['conversionstatus'] == 'error':
-                        record['failed'] = 'conversion'
-                    elif masterrecord['conversionstatus'] == 'completed':
-                        result['convertedfiles'] += 1
-                    if masterrecord['deduplicationstatus'] == 'error':
-                        record['failed'] = 'deduplication'
-                    elif masterrecord['deduplicationstatus'] == 'completed':
-                        result['dedupedfiles'] += 1
-                    if masterrecord['isduplicate']:
-                        result['removedfiles'] += 1
-                        # merge duplicate divisions with original
-                        divid = lambda div : div['divisionid']
-                        divobj = lambda divid : {"divisionid" : divid}
-                        originalrecord['attributes']['divisions'] = list(map(divobj, set(map(divid, originalrecord['attributes']['divisions'])).union(set(map(divid, masterrecord['attributes']['divisions'])))))
-                # result['dedupedfiles'] = len(masterrecords)
-        result['records'] = self.__format(list(uploadedrecords.values()), divisions)
-        # result['batchcount'] = len(set(map(lambda record: record['attributes']['batch'], result['records'])))
-        result['batchcount'] = FOIRequestRecord.getbatchcount(ministryrequestid)
-        return result
+            computingresponses, err = self.__makedocreviewerrequest('GET', '/api/dedupestatus/{0}'.format(ministryrequestid))
+            if err is None: 
+                _convertedfiles, _dedupedfiles, _removedfiles = self.__getcomputingsummary(computingresponses)
+                for record in uploadedrecords:
+                    _computingresponse = self.__getcomputingresponse(computingresponses, "recordid", record)
+                    _record = self.__preparerecord(record,_computingresponse, computingresponses,divisions)
+                    resultrecords.append(_record)
+                    if record["batchid"] not in batchids:
+                        batchids.append(record["batchid"])  
+                resultrecords = self.__handleduplicate(resultrecords)  
+                result["convertedfiles"] =  _convertedfiles
+                result["dedupedfiles"] = _dedupedfiles
+                result["removedfiles"] =  _removedfiles 
+            result['batchcount'] = len(batchids)
+            result["records"] = resultrecords
+        return result  
+            
+    def __preparerecord(self, record, _computingresponse, computingresponses, divisions):
+        _record = self.__pstformat(record)
+        documentmasterid = _computingresponse["documentmasterid"]
+        _record['isduplicate'] = _computingresponse['isduplicate']
+        _record['attributes'] = self.__formatrecordattributes(_computingresponse['attributes'], divisions)
+        _record['isredactionready'] = _computingresponse['isredactionready']
+        _record['trigger'] = _computingresponse['trigger']
+        _record['documentmasterid'] = _computingresponse["documentmasterid"]
+        _record['outputdocumentmasterid'] = documentmasterid 
+        _record['attachments'] = []
+        if _computingresponse['isduplicate']:
+            _record['duplicatemasterid'] = _computingresponse['duplicatemasterid']  
+            _record['duplicateof'] = _computingresponse['duplicateof']    
+        attachment_list = self.__getcomputingresponse(computingresponses, "parentid", documentmasterid)
+        for attachment in attachment_list:
+            _attachement = self.__pstformat(attachment)
+            _attachement['isattachment'] = True
+            _attachement['s3uripath'] = attachment['filepath']
+            _attachement['rootparentid'] = record["recordid"]
+            _attachement['createdby'] = record['createdby']
+            _attachement['attributes'] = self.__formatrecordattributes(attachment['attributes'], divisions)
+            _record['attachments'].append(_attachement)                      
+        _computingresponse_err = self.__getcomputingerror(_computingresponse)
+        if _computingresponse_err is not None:
+            record['failed'] = _computingresponse_err                
+        return _record
+    
+    def __formatrecordattributes(self, attributes, divisions):
+        if isinstance(attributes, str):
+            attributes = json.loads(attributes)
+        attribute_divisions = attributes.get('divisions', [])
+        for division in attribute_divisions:
+            _divisionname = self.__getdivisionname(divisions, division['divisionid'])
+            division['divisionname'] = _divisionname.replace(u"’", u"'") if _divisionname is not None else ''
+        return attributes    
+    
+    def __handleduplicate(self, resultrecords):        
+        _resultrecords = copy.deepcopy(resultrecords)
+        for result in resultrecords:
+            if result["isduplicate"] == True:
+                _resultrecords = self.__mergeduplicatedivisions(resultrecords, result["duplicatemasterid"], self.__getrecorddivisions(result["attributes"]) )
+            _attachments = result["attachments"]
+            for attachment in _attachments:
+                if attachment["isduplicate"] == True:
+                    _resultrecords = self.__mergeduplicatedivisions(resultrecords, attachment["duplicatemasterid"], self.__getrecorddivisions(attachment["attributes"]))
+        return _resultrecords              
 
+
+    def __mergeduplicatedivisions(self, _resultrecords, duplicatemasterid, divisions):
+        for entry in _resultrecords:
+            if int(entry["documentmasterid"]) == int(duplicatemasterid):
+                resultattributes = entry["attributes"]
+                resultattributes["divisions"] = self.__getrecorddivisions(resultattributes) + divisions 
+            _attachments = entry["attachments"]
+            for attachment in _attachments:
+                if int(attachment["documentmasterid"]) == int(duplicatemasterid): 
+                    attattributes = attachment["attributes"]
+                    attattributes["divisions"] = self.__getrecorddivisions(attattributes) + divisions    
+        return _resultrecords
+    
+    def __getrecorddivisions(self, _attributes):
+        if isinstance(_attributes, str):
+            _attributes = json.loads(_attributes)  
+        return _attributes.get('divisions', [])  
+
+    def __getcomputingresponse(self, response, filterby, data: any):
+        if filterby == "recordid":
+            filtered_response = [x for x in response if x["recordid"] == data["recordid"] and x["filename"] == data["filename"]]
+            return filtered_response[0]
+        else:
+            filtered_response = [x for x in response if x[filterby] == data]
+            return filtered_response
+
+    def __getcomputingerror(self, computingresponse):
+        if computingresponse['conversionstatus'] == 'error':
+            return 'conversion' 
+        elif computingresponse['deduplicationstatus'] == 'error':
+            return 'deduplication'  
+        return None 
+    
+    def __getcomputingsummary(self, computingresponse):
+        _convertedfiles = _dedupedfiles = _removedfiles = 0
+        for entry in computingresponse:
+            if entry["conversionstatus"] == "completed":
+                _convertedfiles += 1 
+            if entry["deduplicationstatus"] == "completed":
+                _dedupedfiles += 1 
+            if entry["isduplicate"] == True:
+                _removedfiles += 1 
+        return _convertedfiles, _dedupedfiles, _removedfiles
+                
+    
     def delete(self, requestid, ministryrequestid, recordid, userid):
         record = FOIRequestRecord.getrecordbyid(recordid)
         record['attributes'] = json.loads(record['attributes'])
@@ -205,37 +259,14 @@ class recordservice:
                     eventqueueservice().add(self.dedupestreamkey, streamobject)
         return dbresponse
 
-
-    def __format(self, records, divisions):
-        for record in records:
-            record = self.__pstformat(record)
-            record = self.__attributesformat(record, divisions)
-            if (record.get('attachments', False)):
-                record['attachments'] = self.__format(record['attachments'], divisions)
-        return records
-
     def __pstformat(self, record):
         formatedcreateddate = maya.parse(record['created_at']).datetime(to_timezone='America/Vancouver', naive=False)
         record['created_at'] = formatedcreateddate.strftime('%Y %b %d | %I:%M %p')
         return record
 
-    def __attributesformat(self, record, divisions):
-        if isinstance(record['attributes'], str):
-            record['attributes'] = json.loads(record.get('attributes'))
-        record['attributes'] = record['attributes'] or {}
-        attribute_divisions = record['attributes'].get('divisions', [])
-        for division in attribute_divisions:
-            _divisionname = self.__getdivisionname(divisions, division['divisionid'])
-            division['divisionname'] = _divisionname.replace(u"’", u"'") if _divisionname is not None else ''
-        return record
-
+    
     def __getdivisionname(self, divisions, divisionid):
-        print("debug disappearing files")
-        print(divisions)
         for division in divisions:
-            print(division['division.divisionid'])
-            print(divisionid)
-            print(division['division.divisionid'] == divisionid)
             if division['division.divisionid'] == divisionid:
                 return division['division.name']
         return None
@@ -259,8 +290,5 @@ class recordservice:
             logging.error(err)
             return None, err
 
-    def __findrootparentrecordid(self, masterid, records):
-        while records[masterid]['recordid'] is None:
-            masterid = records[masterid]['parentid']
-        return records[masterid]['recordid']
+    
 

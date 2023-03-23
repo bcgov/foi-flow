@@ -38,31 +38,28 @@ class FOIRequestRecord(db.Model):
         return DefaultMethodResult(True,'Records created', -1, _recordids)
 
     @classmethod
-    def fetch(cls, foirequestid, ministryrequestid) -> DefaultMethodResult:
+    def fetch(cls, foirequestid, ministryrequestid):
         records = []
         try:
-            sql =   """select distinct on (fr1.recordid) fr1.isactive, fr1.recordid, fr1.filename, fr1.s3uripath, fr1."attributes" attributes,
-                            fr1.createdby createdby, fr1.created_at
-                            from public."FOIRequestRecords" fr1
-							join (select max(version), recordid
-								  from public."FOIRequestRecords"
-								  group by recordid)
-								  fr2  on fr1.recordid = fr2.recordid and fr1.version = fr2.max
-                            where fr1.foirequestid = :foirequestid
-							and fr1.ministryrequestid = :ministryrequestid and isactive = true
-                            order by recordid desc, version desc
+            sql =   """select distinct on (fr1.recordid) recordid, fr1.isactive, fr1.filename, 
+                        fr1.s3uripath, fr1."attributes" attributes, json_extract_path_text("attributes" ::json,'batch') as batchid,
+                        fr1.createdby createdby, fr1.created_at
+                        from public."FOIRequestRecords" fr1 
+                        where fr1.foirequestid = :foirequestid and fr1.ministryrequestid = :ministryrequestid  
+                        order by recordid desc, version desc
                     """
 
             rs = db.session.execute(text(sql), {'foirequestid': foirequestid, 'ministryrequestid' : ministryrequestid})
 
             for row in rs:
-                records.append({"recordid": row["recordid"], "filename": row["filename"], "s3uripath": row["s3uripath"],  "attributes": row["attributes"], "createdby": row["createdby"], "created_at": row["created_at"]})
-            return records
+                if row["isactive"] == True:
+                    records.append({"recordid": row["recordid"], "filename": row["filename"], "s3uripath": row["s3uripath"],  "attributes": row["attributes"], "batchid": row["batchid"], "createdby": row["createdby"], "created_at": row["created_at"]})
         except Exception as ex:
             logging.error(ex)
             raise ex
         finally:
             db.session.close()
+        return records
 
     @classmethod
     def getrecordbyid(cls, recordid)->DefaultMethodResult:
