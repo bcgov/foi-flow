@@ -22,7 +22,7 @@ class recordservice:
     docreviewerapitimeout =  getenv("FOI_DOCREVIEWER_BASE_API_TIMEOUT")
     conversionstreamkey = getenv('EVENT_QUEUE_CONVERSION_STREAMKEY')
     dedupestreamkey = getenv('EVENT_QUEUE_DEDUPE_STREAMKEY')
-    pdfstitchstreamkey = getenv('EVENT_QUEUE_DEDUPE_STREAMKEY')
+    pdfstitchstreamkey = getenv('EVENT_QUEUE_PDFSTITCH_STREAMKEY')
 
 
     def create(self, requestid, ministryrequestid, recordschema, userid):
