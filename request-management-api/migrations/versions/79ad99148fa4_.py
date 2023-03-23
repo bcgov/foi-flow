@@ -21,5 +21,7 @@ def upgrade():
 
 
 def downgrade():
+    op.execute('delete from  public."FOIRequestNotificationUsers" where notificationid in (select notificationid from  public."FOIRequestNotifications" where notificationtypeid in (select notificationtypeid from  public."NotificationTypes" where name in (\'Records\')));commit;')
+    op.execute('delete from  public."FOIRequestNotifications" where notificationtypeid in (select notificationtypeid from  public."NotificationTypes" where name in (\'Records\'));commit;')
     op.execute('delete from  public."NotificationTypes" where name in (\'Records\');commit;')
 
