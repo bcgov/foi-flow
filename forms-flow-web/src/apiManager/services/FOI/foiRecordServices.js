@@ -58,7 +58,6 @@ export const fetchPDFStitchStatusForHarms = (requestId, ministryId, ...rest) => 
     httpGETRequest(apiUrl, {}, UserService.getToken())
       .then((res) => {
         if (res.data) {
-          console.log(`Data ==== ${JSON.stringify(res.data)}`)
           dispatch(setFOIPDFStitchStatusForHarms(res.data));
           done(null, res.data);
 
