@@ -31,7 +31,7 @@ class recordservice:
         return self.__bulkcreate(requestid, ministryrequestid, recordschema.get("records"), userid)
 
     def fetch(self, requestid, ministryrequestid):
-        result = {'dedupedfiles': 0, 'convertedfiles': 0, 'removedfiles': 0}
+        result = {'dedupedfiles': 0, 'convertedfiles': 0, 'removedfiles': 0, 'records':[]}
         _ministryversion = FOIMinistryRequest.getversionforrequest(ministryrequestid)
         divisions = FOIMinistryRequestDivision.getdivisions(ministryrequestid, _ministryversion)
         uploadedrecords = FOIRequestRecord.fetch(requestid, ministryrequestid)
