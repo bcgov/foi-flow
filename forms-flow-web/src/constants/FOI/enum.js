@@ -56,6 +56,19 @@ const KCProcessingTeams = [
 "Resource Team", 
 "Social Education"]
 
+const RecordsDownloadList = [
+  {id: 0, "label": "Download", disabled: true },
+  {id: 1, "label": "Download for Harms", disabled: false },
+  {id: 2, "label": "Download Redline for Sign Off", disabled: true },
+  {id: 3, "label": "Download Final Package", disabled: true },    
+]
+
+const RecordDownloadCategory = Object.freeze({
+  "harms": "harms",
+  "readline": "readline",
+  "finalpackage": "finalpackage",
+  });
+
 export {
 MimeTypeList,
 MaxFileSizeInMB,
@@ -63,4 +76,6 @@ MaxNumberOfFiles,
 extensionStatusId,
 extensionStatusLabel,
 KCProcessingTeams,
+RecordsDownloadList,
+RecordDownloadCategory
 };

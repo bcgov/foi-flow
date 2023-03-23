@@ -22,6 +22,8 @@ class recordservice(recordservicebase):
     """
     conversionstreamkey = getenv('EVENT_QUEUE_CONVERSION_STREAMKEY')
     dedupestreamkey = getenv('EVENT_QUEUE_DEDUPE_STREAMKEY')
+    pdfstitchstreamkey = getenv('EVENT_QUEUE_DEDUPE_STREAMKEY')
+
 
     def create(self, requestid, ministryrequestid, recordschema, userid):
         """Creates a record for a user with document details passed in for an opened request.
@@ -86,7 +88,47 @@ class recordservice(recordservicebase):
             if record.get('outputdocumentmasterid', False):
                 streamobject['outputdocumentmasterid'] = record['outputdocumentmasterid']
             return eventqueueservice().add(streamkey, streamobject)
+        
+    def triggerpdfstitchservice(self, requestid, ministryrequestid, recordschema, userid):
+        """Calls the BE job for stitching the documents.
+        """
+        return self.__triggerpdfstitchservice(requestid, ministryrequestid, recordschema, userid)
+    
+    def getpdfstitchpackagetodownload(self, ministryid, category):
+        response, err = self.makedocreviewerrequest('GET', '/api/pdfstitch/{0}/{1}'.format(ministryid, category))
+        return response
 
+    def getpdfstichstatus(self, ministryid, category):
+        response, err = self.makedocreviewerrequest('GET', '/api/pdfstitchjobstatus/{0}/{1}'.format(ministryid, category))
+        if response is not None:
+            return response.get("status")
+        return None
+
+    def __triggerpdfstitchservice(self, requestid, ministryrequestid, message, userid):
+        """Call the BE job for stitching the documents.
+        """
+        job, err = self.makedocreviewerrequest('POST', '/api/pdfstitchjobstatus', {
+                "createdby": userid,
+                "ministryrequestid": ministryrequestid,
+                "inputfiles":message["attributes"],
+                "category": message["category"]
+            })
+        print("job ========== ",job)
+        print("jobid ========== ",job.get("id"))
+        if err:
+            return DefaultMethodResult(False,'Error in contacting Doc Reviewer API', -1, ministryrequestid)
+        streamobject = {
+            "jobid": job.get("id"),
+            "category": message["category"],
+            "requestnumber": message["requestnumber"],
+            "bcgovcode": message["bcgovcode"],
+            "createdby": userid,
+            "requestid": requestid,
+            "ministryrequestid": ministryrequestid,
+            "attributes": json.JSONEncoder().encode(message["attributes"])
+        }
+        print("final message >>>>>> ", streamobject)
+        return eventqueueservice().add(self.pdfstitchstreamkey, streamobject)
 
     def __bulkcreate(self, requestid, ministryrequestid, records, userid):
         """Creates bulk records for a user with document details passed in for an opened request.
@@ -122,25 +164,27 @@ class recordservice(recordservicebase):
             # send message to redis stream for each file
             for entry in processingrecords:
                 _filename, extension = path.splitext(entry['s3uripath'])
-                streamobject = {
-                    "s3filepath": entry['s3uripath'],
-                    "requestnumber": _ministryrequest['axisrequestid'],
-                    "bcgovcode": _ministryrequest['programarea.bcgovcode'],
-                    "filename": entry['filename'],
-                    "ministryrequestid": ministryrequestid,
-                    "attributes": json.dumps(entry['attributes']),
-                    "batch": batch,
-                    "jobid": jobids[entry['s3uripath']]['jobid'],
-                    "documentmasterid": jobids[entry['s3uripath']]['masterid'],
-                    "trigger": 'recordupload',
-                    "createdby": userid,
-                    "incompatible": 'true' if extension in NONREDACTABLE_FILE_TYPES else 'false'
-                }
-                if extension in FILE_CONVERSION_FILE_TYPES:
-                    eventqueueservice().add(self.conversionstreamkey, streamobject)
-                if extension in DEDUPE_FILE_TYPES:
-                    print('alert:reached DEDUPE event condition')
-                    eventqueueservice().add(self.dedupestreamkey, streamobject)
+                if 'error' in jobids[entry['s3uripath']]:
+                    logging.error("Doc Reviewer API was given an unsupported file type - no job triggered - Record ID: {0} File Name: {1} ".format(entry['recordid'], entry['filename']))
+                else:
+                    streamobject = {
+                        "s3filepath": entry['s3uripath'],
+                        "requestnumber": _ministryrequest['axisrequestid'],
+                        "bcgovcode": _ministryrequest['programarea.bcgovcode'],
+                        "filename": entry['filename'],
+                        "ministryrequestid": ministryrequestid,
+                        "attributes": json.dumps(entry['attributes']),
+                        "batch": batch,
+                        "jobid": jobids[entry['s3uripath']]['jobid'],
+                        "documentmasterid": jobids[entry['s3uripath']]['masterid'],
+                        "trigger": 'recordupload',
+                        "createdby": userid,
+                        "incompatible": 'true' if extension in NONREDACTABLE_FILE_TYPES else 'false'
+                    }
+                    if extension in FILE_CONVERSION_FILE_TYPES:
+                        eventqueueservice().add(self.conversionstreamkey, streamobject)
+                    if extension in DEDUPE_FILE_TYPES:
+                        eventqueueservice().add(self.dedupestreamkey, streamobject)
         return dbresponse
 
     

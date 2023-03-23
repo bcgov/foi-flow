@@ -80,3 +80,36 @@ class FOIRequestBulkRetryRecordSchema(Schema):
 
         unknown = EXCLUDE
     records = fields.Nested(FOIRequestRetryRecordSchema, many=True, validate=validate.Length(min=1), required=True,allow_none=False)
+
+
+class FileSchema(Schema):
+    class Meta:  # pylint: disable=too-few-public-methods
+        """Exclude unknown fields in the deserialized output."""
+
+        unknown = EXCLUDE 
+    recordid = fields.Int(data_key="recordid",allow_none=False)
+    filename = fields.Str(data_key="filename",allow_none=False, validate=[validate.Length(max=120, error=MAX_EXCEPTION_MESSAGE)])
+    s3uripath = fields.Str(data_key="s3uripath",allow_none=False, validate=[validate.Length(max=1000, error=MAX_EXCEPTION_MESSAGE)])
+    lastmodified = fields.Str(data_key="lastmodified",allow_none=False, validate=[validate.Length(max=120, error=MAX_EXCEPTION_MESSAGE)])
+
+class DownloadRecordAttributeSchema(Schema):
+    class Meta:  # pylint: disable=too-few-public-methods
+        """Exclude unknown fields in the deserialized output."""
+
+        unknown = EXCLUDE 
+    files = fields.Nested(FileSchema, many=True, validate=validate.Length(min=1), required=True,allow_none=False)
+    divisionname = fields.Str(data_key="divisionname",allow_none=False, validate=[validate.Length(max=120, error=MAX_EXCEPTION_MESSAGE)])
+    divisionid = fields.Int(data_key="divisionid", allow_none=False)
+
+class FOIRequestRecordDownloadSchema(Schema):
+    class Meta:  # pylint: disable=too-few-public-methods
+        """Exclude unknown fields in the deserialized output."""
+
+        unknown = EXCLUDE    
+    requestnumber = fields.Str(data_key="requestnumber",allow_none=False, validate=[validate.Length(max=100, error=MAX_EXCEPTION_MESSAGE)])
+    bcgovcode = fields.Str(data_key="bcgovcode",allow_none=False, validate=[validate.Length(max=20, error=MAX_EXCEPTION_MESSAGE)])
+    category = fields.Str(data_key="category",allow_none=False, validate=[validate.Length(max=25, error=MAX_EXCEPTION_MESSAGE)])
+    attributes = fields.Nested(DownloadRecordAttributeSchema, many=True, validate=validate.Length(min=1), required=True,allow_none=False)
+    
+    
+
