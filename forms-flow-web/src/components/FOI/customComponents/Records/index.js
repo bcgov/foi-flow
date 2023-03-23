@@ -8,7 +8,7 @@ import { getOSSHeaderDetails, saveFilesinS3, getFileFromS3, postFOIS3DocumentPre
 import { saveFOIRequestAttachmentsList, replaceFOIRequestAttachment, saveNewFilename, deleteFOIRequestAttachment } from "../../../../apiManager/services/FOI/foiAttachmentServices";
 import { fetchFOIRecords, saveFOIRecords, deleteFOIRecords, retryFOIRecordProcessing, deleteReviewerRecords, triggerDownloadFOIRecordsForHarms, fetchPDFStitchedRecordForHarms } from "../../../../apiManager/services/FOI/foiRecordServices";
 import { StateTransitionCategories, AttachmentCategories } from '../../../../constants/FOI/statusEnum'
-import { RecordsDownloadList } from '../../../../constants/FOI/enum';
+import { RecordsDownloadList, RecordDownloadCategory } from '../../../../constants/FOI/enum';
 import { addToFullnameList, getFullnameList, ConditionalComponent } from '../../../../helper/FOI/helper';
 import Grid from "@material-ui/core/Grid";
 import { makeStyles } from "@material-ui/core/styles";
@@ -427,6 +427,7 @@ export const RecordsLog = ({
       message.requestnumber = requestNumber
       message.bcgovcode = bcgovcode
       message.attributes = result
+      message.category = RecordDownloadCategory.harms
 
       dispatch(triggerDownloadFOIRecordsForHarms(requestId, ministryId, message,(err, _res) => {
         dispatchRequestAttachment(err);

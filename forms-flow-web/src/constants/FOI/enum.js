@@ -63,6 +63,12 @@ const RecordsDownloadList = [
   {id: 3, "label": "Download Final Package", disabled: true },    
 ]
 
+const RecordDownloadCategory = Object.freeze({
+  "harms": "harms",
+  "readline": "readline",
+  "finalpackage": "finalpackage",
+  });
+
 export {
 MimeTypeList,
 MaxFileSizeInMB,
@@ -70,5 +76,6 @@ MaxNumberOfFiles,
 extensionStatusId,
 extensionStatusLabel,
 KCProcessingTeams,
-RecordsDownloadList
+RecordsDownloadList,
+RecordDownloadCategory
 };
