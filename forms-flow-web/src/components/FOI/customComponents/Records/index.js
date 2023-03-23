@@ -6,7 +6,7 @@ import AttachmentModal from '../Attachments/AttachmentModal';
 import Loading from "../../../../containers/Loading";
 import { getOSSHeaderDetails, saveFilesinS3, getFileFromS3, postFOIS3DocumentPreSignedUrl, getFOIS3DocumentPreSignedUrl } from "../../../../apiManager/services/FOI/foiOSSServices";
 import { saveFOIRequestAttachmentsList, replaceFOIRequestAttachment, saveNewFilename, deleteFOIRequestAttachment } from "../../../../apiManager/services/FOI/foiAttachmentServices";
-import { fetchFOIRecords, saveFOIRecords, deleteFOIRecords, retryFOIRecordProcessing, deleteReviewerRecords, downloadFOIRecordsForHarms } from "../../../../apiManager/services/FOI/foiRecordServices";
+import { fetchFOIRecords, saveFOIRecords, deleteFOIRecords, retryFOIRecordProcessing, deleteReviewerRecords, triggerDownloadFOIRecordsForHarms, fetchPDFStitchedRecordForHarms } from "../../../../apiManager/services/FOI/foiRecordServices";
 import { StateTransitionCategories, AttachmentCategories } from '../../../../constants/FOI/statusEnum'
 import { RecordsDownloadList } from '../../../../constants/FOI/enum';
 import { addToFullnameList, getFullnameList, ConditionalComponent } from '../../../../helper/FOI/helper';
@@ -152,9 +152,15 @@ export const RecordsLog = ({
     (state) => state.foiRequests.foiRequestRecords
   );
 
+ let pdfStitchStatus = useSelector(
+    (state) => state.foiRequests.foiPDFStitchStatusForHarms
+  );
+
+  let pdfStitchedRecord = useSelector(
+    (state) => state.foiRequests.foiPDFStitchedRecordForHarms
+  );  
   const classes = useStyles();
   const [records, setRecords] = useState(recordsObj?.records);
-
 
   useEffect(() => {
     setRecords(recordsObj?.records)
@@ -179,9 +185,36 @@ export const RecordsLog = ({
   const [searchValue, setSearchValue] = useState("");
   const [filterValue, setFilterValue] = useState(-1);
   const [fullnameList, setFullnameList] = useState(getFullnameList);
-  const [currentDownload, setCurrentDownload] = useState(0)
+  const [currentDownload, setCurrentDownload] = useState(0) 
   const [isDownloadInProgress, setIsDownloadInProgress] = useState(false)
+  const [isDownloadReady, setIsDownloadReady] = useState(false)
+  const [isDownloadFailed, setIsDownloadFailed] = useState(false)
   
+  useEffect(() => {
+    switch(pdfStitchStatus) {      
+      case "started":
+      case "pushedtostream":
+        setIsDownloadInProgress(true);
+        setIsDownloadReady(false);
+        setIsDownloadFailed(false);
+        break;
+      case "completed":
+        setIsDownloadInProgress(false);
+        setIsDownloadReady(true);
+        setIsDownloadFailed(false);
+        break;
+      case "error":
+        setIsDownloadInProgress(false);
+        setIsDownloadReady(false);
+        setIsDownloadFailed(true);
+        break;
+      default:
+        setIsDownloadInProgress(false);
+        setIsDownloadReady(false);
+        setIsDownloadFailed(false);
+        break;
+    }
+  }, [pdfStitchStatus])
 
   const addAttachments = () => {
     setModalFor('add');
@@ -314,16 +347,38 @@ export const RecordsLog = ({
   }  
 
   const handleDownloadChange = (e) => {
-    // if (e.target.value != 1)
-    setCurrentDownload(e.target.value);
-    setIsDownloadInProgress(true);
-    downloadLinearHarmsDocuments()
+    if (e.target.value === 1 && ["not started", "error"].includes(pdfStitchStatus)) {
+      toast.info("In progress. You will be notified when the records are ready for download.", {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: true,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "colored",
+        backgroundColor: "#FFA500"
+      });
+      setCurrentDownload(e.target.value);
+      setIsDownloadInProgress(true);
+      downloadLinearHarmsDocuments()
+    }
+    else if (e.target.value === 1 && pdfStitchStatus === "completed") {
+      const s3filepath = pdfStitchedRecord.finalpackagepath
+      const filename = requestNumber + ".zip"
+      getFOIS3DocumentPreSignedUrl(s3filepath.split('/').slice(4).join('/'), ministryId, dispatch, (err, res) => {
+        if (!err) {
+          getFileFromS3({filepath: res}, (_err, response) => {
+            let blob = new Blob([response.data], {type: "application/octet-stream"});
+            saveAs(blob, filename)
+          });
+        }
+      }, 'records', bcgovcode);
+    }
   }
 
   const downloadLinearHarmsDocuments = () => {
-    var completed = 0;
-    let failed = 0;
-    var exporting = recordsObj?.records.filter(record => !record.isduplicate)
+    let exporting = recordsObj?.records.filter(record => !record.isduplicate)
     for (let record of exporting) {
       if (record.attachments) for (let attachment of record.attachments) {
         if (!attachment.isduplicate) exporting.push(attachment);
@@ -333,24 +388,12 @@ export const RecordsLog = ({
       let message = {       
         attributes: []
       }
-      let attributes = [];
-      // const fileObj = {
-      //   recordid: 0,
-      //   filename: "",
-      //   s3uripath: "",
-      //   lastmodified: "",
-      // }
-      // const attributeObj = {
-      //   divisionid: "",
-      //   divisionname: "",
-      //   files: []
-      // }
-      
+      let attributes = [];      
       for (let record of exporting) {
         const fileObj = {}
         const attributeObj = {files: []}
-        var filepath = record.s3uripath
-        var filename = record.filename
+        let filepath = record.s3uripath
+        let filename = record.filename
         if (record.isredactionready && ['.doc','.docx','.xls','.xlsx', '.ics', '.msg'].includes(record.attributes?.extension)) {
           filepath = filepath.substr(0, filepath.lastIndexOf(".")) + ".pdf";
           filename += ".pdf";
@@ -369,8 +412,8 @@ export const RecordsLog = ({
       }
 
       //This will return the result by merging the files with same division id (order by lastmodified asc)
-      var result = attributes.reduce((acc, val) => {
-        var found = acc.find((findval) => val.divisionid === findval.divisionid);
+      let result = attributes.reduce((acc, val) => {
+        let found = acc.find((findval) => val.divisionid === findval.divisionid);
         if (!found) acc.push(val)
         else found.files = found.files.concat(
           val.files.filter((f) => !found.files.find((findval) => f.recordid === findval.recordid))).sort((a,b) => {
@@ -383,8 +426,7 @@ export const RecordsLog = ({
       message.bcgovcode = bcgovcode
       message.attributes = result
 
-      console.log(`message >>>>>>>> ${JSON.stringify(message)}`);
-      dispatch(downloadFOIRecordsForHarms(requestId, ministryId, message,(err, _res) => {
+      dispatch(triggerDownloadFOIRecordsForHarms(requestId, ministryId, message,(err, _res) => {
         dispatchRequestAttachment(err);
     }));
 
@@ -474,6 +516,7 @@ export const RecordsLog = ({
   }
 
   const hasDocumentsToExport = records.filter(record => !(isMinistryCoordinator && record.category == 'personal')).length > 0;
+  const hasDocumentsToDownload = records.filter(record => record.category !== 'personal').length > 0;
 
   const handlePopupButtonClick = (action, _record) => {
     setUpdateAttachment(_record);
@@ -635,22 +678,27 @@ export const RecordsLog = ({
               </ConditionalComponent>
             </Grid>
             <Grid item xs={4}>
-              <ConditionalComponent condition={hasDocumentsToExport}>
+              <ConditionalComponent condition={hasDocumentsToDownload}>
               <TextField
               className="download-dropdown custom-select-wrapper foi-download-button"
               id="download"
               label={currentDownload === 0 ? "Download" : ""}
               inputProps={{ "aria-labelledby": "download-label" }}
-              InputProps={{
-                startAdornment: isDownloadInProgress && <InputAdornment position="start">
-                  <CircularProgress class="download-progress-adornment"/>
-                  {/* <CircularProgress/> */}
-                  </InputAdornment>
-              }}
+            //   InputProps={{
+            //     startAdornment: isDownloadInProgress && <InputAdornment position="start">
+            //       {/* <CircularProgress class="download-progress-adornment"/> */}
+            //       {/* <CircularProgress/> */}
+            //       record.isredactionready ?
+            //       <FontAwesomeIcon icon={faCheckCircle} size='2x' color='#1B8103' className={classes.statusIcons}/>:
+            // record.failed ?
+            // <FontAwesomeIcon icon={faExclamationCircle} size='2x' color='#A0192F' className={classes.statusIcons}/>:
+            // <FontAwesomeIcon icon={faSpinner} size='2x' color='#FAA915' className={classes.statusIcons}/>
+            //       </InputAdornment>
+            //   }}
               InputLabelProps={{ shrink: false }}
               select
               name="download"
-              value={getCurrentDownload()}
+              value={currentDownload}
               onChange={handleDownloadChange}
               placeholder="Download"
               variant="outlined"
@@ -661,18 +709,19 @@ export const RecordsLog = ({
 
                 if (item.id !=0) {
                   return (
-                    // <>
-                    //   <CircularProgress/>
                       <MenuItem
                         className="download-menu-item"
-                        key={index}
+                        key={item.id}
                         value={index}
                         disabled={item.disabled}
                         sx={{ display: 'flex' }}
                       >
                         {
-                        (isDownloadInProgress && index === currentDownload) && <CircularProgress class="download-progress"/>
-                        
+                          !item.disabled && (isDownloadReady && !item.disabled ?
+                          <FontAwesomeIcon icon={faCheckCircle} size='2x' color='#1B8103' className={classes.statusIcons}/>:
+                          isDownloadFailed && !item.disabled ?
+                          <FontAwesomeIcon icon={faExclamationCircle} size='2x' color='#A0192F' className={classes.statusIcons}/>:
+                          isDownloadInProgress && !item.disabled ? <FontAwesomeIcon icon={faSpinner} size='2x' color='#FAA915' className={classes.statusIcons}/>:null) 
                         }
                         {item.label}
                       </MenuItem>

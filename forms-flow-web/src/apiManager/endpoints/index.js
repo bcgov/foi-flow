@@ -94,9 +94,12 @@ const API = {
   FOI_DELETE_RECORDS:`${FOI_BASE_API_URL}/api/foirecord/<requestid>/ministryrequest/<ministryrequestid>/recordid/<recordid>/delete`,
   DOC_REVIEWER_DELETE_RECORDS:`${DOC_REVIEWER_BASE_API_URL}/api/document/delete`,
   
+  FOI_TRIGGER_DOWNLOAD_RECORDS_FOR_HARMS:`${FOI_BASE_API_URL}/api/foirecord/<requestid>/ministryrequest/<ministryrequestid>/triggerdownload/harms`,
+  FOI_TRIGGER_DOWNLOAD_RECORDS_FOR_SIGN_OFF:`${FOI_BASE_API_URL}/api/foirecord/<requestid>/ministryrequest/<ministryrequestid>/triggerdownload/redlines`,
+  FOI_TRIGGER_DOWNLOAD_RECORDS_FOR_FINAL_PACKAGE:`${FOI_BASE_API_URL}/api/foirecord/<requestid>/ministryrequest/<ministryrequestid>/triggerdownload/finalpackage`,
+
   FOI_DOWNLOAD_RECORDS_FOR_HARMS:`${FOI_BASE_API_URL}/api/foirecord/<requestid>/ministryrequest/<ministryrequestid>/download/harms`,
-  FOI_DOWNLOAD_RECORDS_FOR_SIGN_OFF:`${FOI_BASE_API_URL}/api/foirecord/<requestid>/ministryrequest/<ministryrequestid>/download/redlines`,
-  FOI_DOWNLOAD_RECORDS_FOR_FINAL_PACKAGE:`${FOI_BASE_API_URL}/api/foirecord/<requestid>/ministryrequest/<ministryrequestid>/download/finalpackage`,
+  FOI_PDF_STITCH_STATUS_FOR_HARMS:`${FOI_BASE_API_URL}/api/foirecord/<requestid>/ministryrequest/<ministryrequestid>/pdfstitchjobstatus/harms`,
 
   FOI_GET_SUBJECT_CODELIST: `${FOI_BASE_API_URL}/api/foiflow/subjectcodes`,
   FOI_POST_RAWREQUEST_RESTRICTION: `${FOI_BASE_API_URL}/api/foirawrequest/restricted/<requestid>`,

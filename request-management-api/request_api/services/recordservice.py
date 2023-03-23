@@ -155,6 +155,14 @@ class recordservice:
         """Calls the BE job for stitching the documents.
         """
         return self.__triggerpdfstitchservice(requestid, ministryrequestid, recordschema, userid)
+    
+    def getpdfstitchpackagetodownload(self, ministryid, category):
+        response, err = self.__makedocreviewerrequest('GET', '/api/pdfstitch/{0}/{1}'.format(ministryid, category))
+        return response
+
+    def getpdfstichstatus(self, ministryid, category):
+        response, err = self.__makedocreviewerrequest('GET', '/api/pdfstitchjobstatus/{0}/{1}'.format(ministryid, category))
+        return response.get("status")
 
     def __triggerpdfstitchservice(self, requestid, ministryrequestid, message, userid):
         """Call the BE job for stitching the documents.

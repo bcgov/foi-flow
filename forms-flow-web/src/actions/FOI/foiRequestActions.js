@@ -41,12 +41,6 @@ export const setFOIAttachmentListLoader = (data) => dispatch =>{
         payload:data
     })
 }
-export const setFOIDownloadLoader = (data) => dispatch =>{
-    dispatch({
-        type:FOI_ACTION_CONSTANTS.IS_DOWNLOAD_INPROGRESS,
-        payload:data
-    })
-}
 export const setCommentTagListLoader = (data) => dispatch =>{
     dispatch({
         type:FOI_ACTION_CONSTANTS.IS_COMMENTTAGLIST_LOADING,
@@ -86,6 +80,18 @@ export const setFOIRequestDetail = (data) => dispatch =>{
 export const setFOIMinistryViewRequestDetail = (data) => dispatch =>{
     dispatch({
         type:FOI_ACTION_CONSTANTS.FOI_MINISTRYVIEW_REQUEST_DETAIL,
+        payload:data
+    })
+}
+export const setFOIPDFStitchedRecordForHarms = (data) => dispatch =>{
+    dispatch({
+        type:FOI_ACTION_CONSTANTS.FOI_PDF_STITCHED_RECORD_FOR_HARMS,
+        payload:data
+    })
+}
+export const setFOIPDFStitchStatusForHarms = (data) => dispatch =>{
+    dispatch({
+        type:FOI_ACTION_CONSTANTS.FOI_PDF_STITCHED_STATUS_FOR_HARMS,
         payload:data
     })
 }
