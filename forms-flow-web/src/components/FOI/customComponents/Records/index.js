@@ -359,8 +359,10 @@ export const RecordsLog = ({
         theme: "colored",
         backgroundColor: "#FFA500"
       });
-      setCurrentDownload(e.target.value);
-      setIsDownloadInProgress(true);
+      setIsDownloadInProgress(true);      
+      setIsDownloadReady(false);
+      setIsDownloadFailed(false);
+      setCurrentDownload(e.target.value);      
       downloadLinearHarmsDocuments()
     }
     else if (e.target.value === 1 && pdfStitchStatus === "completed") {
@@ -432,6 +434,18 @@ export const RecordsLog = ({
 
     } catch (error) {
       console.log(error)
+      toast.error(
+        "Temporarily unable to process your request. Please try again in a few minutes.",
+        {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: true,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+        }
+      );
     }
 
   }
