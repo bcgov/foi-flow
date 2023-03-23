@@ -108,6 +108,7 @@ class FOIRequestRecordDownloadSchema(Schema):
         unknown = EXCLUDE    
     requestnumber = fields.Str(data_key="requestnumber",allow_none=False, validate=[validate.Length(max=100, error=MAX_EXCEPTION_MESSAGE)])
     bcgovcode = fields.Str(data_key="bcgovcode",allow_none=False, validate=[validate.Length(max=20, error=MAX_EXCEPTION_MESSAGE)])
+    category = fields.Str(data_key="category",allow_none=False, validate=[validate.Length(max=25, error=MAX_EXCEPTION_MESSAGE)])
     attributes = fields.Nested(DownloadRecordAttributeSchema, many=True, validate=validate.Length(min=1), required=True,allow_none=False)
     
     

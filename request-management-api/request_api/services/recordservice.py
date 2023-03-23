@@ -162,7 +162,9 @@ class recordservice:
 
     def getpdfstichstatus(self, ministryid, category):
         response, err = self.__makedocreviewerrequest('GET', '/api/pdfstitchjobstatus/{0}/{1}'.format(ministryid, category))
-        return response.get("status")
+        if response is not None:
+            return response.get("status")
+        return None
 
     def __triggerpdfstitchservice(self, requestid, ministryrequestid, message, userid):
         """Call the BE job for stitching the documents.
@@ -171,7 +173,7 @@ class recordservice:
                 "createdby": userid,
                 "ministryrequestid": ministryrequestid,
                 "inputfiles":message["attributes"],
-                "category": "Harms"
+                "category": message["category"]
             })
         print("job ========== ",job)
         print("jobid ========== ",job.get("id"))
@@ -179,7 +181,7 @@ class recordservice:
             return DefaultMethodResult(False,'Error in contacting Doc Reviewer API', -1, ministryrequestid)
         streamobject = {
             "jobid": job.get("id"),
-            "category": "Harms",
+            "category": message["category"],
             "requestnumber": message["requestnumber"],
             "bcgovcode": message["bcgovcode"],
             "createdby": userid,
