@@ -1,24 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <WebElementEntity>
    <description></description>
-   <name>input_Balance Remaining_balanceRemaining</name>
+   <name>input_Estimated Hours_locating</name>
    <tag></tag>
-   <elementGuidId>799928ea-3f8f-4f03-a979-bb0435669826</elementGuidId>
+   <elementGuidId>c1bbf19a-b5e8-4bf0-82ac-071acff704f5</elementGuidId>
    <selectorCollection>
       <entry>
          <key>CSS</key>
-         <value>#balanceremaining</value>
-      </entry>
-      <entry>
-         <key>BASIC</key>
-         <value>//*[@id = 'balanceremaining']</value>
+         <value>#estimatedlocating</value>
       </entry>
       <entry>
          <key>XPATH</key>
-         <value>//input[@id='balanceremaining']</value>
+         <value>//input[@id='estimatedlocating']</value>
       </entry>
    </selectorCollection>
-   <selectorMethod>BASIC</selectorMethod>
+   <selectorMethod>XPATH</selectorMethod>
    <useRalativeImagePath>true</useRalativeImagePath>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -26,7 +22,7 @@
       <name>tag</name>
       <type>Main</type>
       <value>input</value>
-      <webElementGuid>071d39e7-a085-40f5-9695-1036174cab29</webElementGuid>
+      <webElementGuid>33160fe9-3906-4939-925a-4b9bd12b45bf</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -34,102 +30,110 @@
       <name>aria-invalid</name>
       <type>Main</type>
       <value>false</value>
-      <webElementGuid>ec1b0cc5-a6f2-470d-b3df-daa306a8fa56</webElementGuid>
+      <webElementGuid>d82c11f1-4f25-495b-8d54-4d338da5108e</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>true</isSelected>
       <matchCondition>equals</matchCondition>
       <name>id</name>
       <type>Main</type>
-      <value>balanceremaining</value>
-      <webElementGuid>c343a52a-2cce-4838-92aa-f974356334d4</webElementGuid>
+      <value>estimatedlocating</value>
+      <webElementGuid>6433b7d0-5ea3-422f-bea7-acde83634475</webElementGuid>
    </webElementProperties>
    <webElementProperties>
-      <isSelected>false</isSelected>
+      <isSelected>true</isSelected>
       <matchCondition>equals</matchCondition>
       <name>name</name>
       <type>Main</type>
-      <value>balanceRemaining</value>
-      <webElementGuid>9c742f72-48c4-4967-93f8-ade816c66816</webElementGuid>
+      <value>locating</value>
+      <webElementGuid>a4a2f034-e546-4439-9c46-503ac1455506</webElementGuid>
    </webElementProperties>
    <webElementProperties>
-      <isSelected>false</isSelected>
-      <matchCondition>equals</matchCondition>
-      <name>placeholder</name>
-      <type>Main</type>
-      <value>0</value>
-      <webElementGuid>62322f6c-91e8-4c70-b1d8-9cc0b4e23a86</webElementGuid>
-   </webElementProperties>
-   <webElementProperties>
-      <isSelected>false</isSelected>
+      <isSelected>true</isSelected>
       <matchCondition>equals</matchCondition>
       <name>type</name>
       <type>Main</type>
-      <value>text</value>
-      <webElementGuid>32a27dab-2315-4f2e-b97f-9436c6893e09</webElementGuid>
+      <value>number</value>
+      <webElementGuid>4b9ae4f7-f1af-4637-8863-a1d64d6bc5d2</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
       <matchCondition>equals</matchCondition>
       <name>aria-labelledby</name>
       <type>Main</type>
-      <value>balanceremaining-label</value>
-      <webElementGuid>3e3c4e39-7be3-47fd-ac4d-23408dacb084</webElementGuid>
+      <value>estimatedlocating-label</value>
+      <webElementGuid>19064829-729b-4267-bc5b-542069a93fb6</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>step</name>
+      <type>Main</type>
+      <value>0.25</value>
+      <webElementGuid>4b22da29-5566-4b2c-a5a1-0732f2de7371</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>min</name>
+      <type>Main</type>
+      <value>0</value>
+      <webElementGuid>d8f9d553-c392-408c-a5b5-e19814a3eb62</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
       <matchCondition>equals</matchCondition>
       <name>class</name>
       <type>Main</type>
-      <value>MuiOutlinedInput-input MuiInputBase-input Mui-disabled MuiInputBase-inputAdornedStart css-1ixds2g</value>
-      <webElementGuid>a98eb021-989f-4e0a-8165-bef72ce4e7ff</webElementGuid>
+      <value>MuiOutlinedInput-input MuiInputBase-input MuiInputBase-inputAdornedEnd css-1uvydh2</value>
+      <webElementGuid>8edd54ff-7693-42c8-9545-380c9f116dd9</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
       <matchCondition>equals</matchCondition>
       <name>value</name>
       <type>Main</type>
-      <value>0.00</value>
-      <webElementGuid>12f63455-94ec-42b7-832e-fd211e7790e7</webElementGuid>
+      <value>0</value>
+      <webElementGuid>1bc58c9c-f072-4079-919a-0f9a1a503cce</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
       <matchCondition>equals</matchCondition>
       <name>xpath</name>
       <type>Main</type>
-      <value>id(&quot;balanceremaining&quot;)</value>
-      <webElementGuid>e1c8582e-7d71-48fb-aac4-081adfba759f</webElementGuid>
+      <value>id(&quot;estimatedlocating&quot;)</value>
+      <webElementGuid>06268f7c-8815-4677-9be2-5297b44876a6</webElementGuid>
    </webElementProperties>
    <webElementXpaths>
       <isSelected>true</isSelected>
       <matchCondition>equals</matchCondition>
       <name>xpath:attributes</name>
       <type>Main</type>
-      <value>//input[@id='balanceremaining']</value>
-      <webElementGuid>00d1f707-d2db-4428-978f-b94a119b60e1</webElementGuid>
+      <value>//input[@id='estimatedlocating']</value>
+      <webElementGuid>d402c1af-8f31-4554-a43b-2fea50f8ba29</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
       <matchCondition>equals</matchCondition>
       <name>xpath:idRelative</name>
       <type>Main</type>
-      <value>//div[@id='CFRForm']/div/form/div/div[2]/div[3]/div/div[2]/div/div/div/div/div/div[2]/div/div/input</value>
-      <webElementGuid>bbc3d7ae-2fdb-4016-a55e-aefbb8dfa9a6</webElementGuid>
+      <value>//div[@id='CFRForm']/div/form/div/div[2]/div[3]/div[2]/div[2]/div/div/div/div/div[2]/div/div/div/input</value>
+      <webElementGuid>ceb52e58-193c-4b43-b914-1925633c6667</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
       <matchCondition>equals</matchCondition>
       <name>xpath:position</name>
       <type>Main</type>
-      <value>//div[2]/div/div/div/div/div/div[2]/div/div/input</value>
-      <webElementGuid>c005b459-4cda-461d-ad4c-0090a36b3f22</webElementGuid>
+      <value>//div/div/div/div/div[2]/div/div/div/input</value>
+      <webElementGuid>17746fb5-6952-446e-906d-b76baa8d5bb6</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
       <matchCondition>equals</matchCondition>
       <name>xpath:customAttributes</name>
       <type>Main</type>
-      <value>//input[@id = 'balanceremaining' and @name = 'balanceRemaining' and @placeholder = '0' and @type = 'text']</value>
-      <webElementGuid>be5cffdf-38dc-41c9-9900-b28221fad652</webElementGuid>
+      <value>//input[@id = 'estimatedlocating' and @name = 'locating' and @type = 'number']</value>
+      <webElementGuid>a53e9461-6041-43d4-9fcd-0f31f34b3cf2</webElementGuid>
    </webElementXpaths>
 </WebElementEntity>

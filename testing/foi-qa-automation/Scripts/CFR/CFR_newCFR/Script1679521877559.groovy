@@ -75,7 +75,8 @@ WebUI.click(findTestObject('Page_foi.flow/ministry view/form/div_ministry assign
 
 WebUI.click(findTestObject('Page_foi.flow/ministry view/form/ministry assignee/li_ministry assignee foiedu, foiedu'))
 
-WebUI.delay(3)
+//def ldd=WebUI.(findTestObject('Page_foi.flow/queue/div_queue header LDD'))
+WebUI.scrollToElement(findTestObject('Page_foi.flow/form/button_Save'), 0)
 
 WebUI.refresh()
 
@@ -152,9 +153,10 @@ WebUI.verifyElementPresent(findTestObject('CFR/div_Contact Applicant'), 0)
 
 WebUI.click(findTestObject('CFR/div_CFR Form'))
 
-WebUI.scrollToPosition(1141, 60)
+//WebUI.scrollToElement(findTestObject('CFR/CFR_status/div_idapp'), 0)
+WebUI.delay(3)
 
-WebUI.scrollToElement(findTestObject('CFR/CFR_status/div_Approved'), 0)
+WebUI.scrollToPosition(1141, 60)
 
 WebUI.click(findTestObject('CFR/CFR_status/div_Approved'))
 
@@ -175,6 +177,8 @@ WebUI.click(findTestObject('CFR/CFR_status/div_Approved'))
 WebUI.click(findTestObject('CFR/CFR_status/li_In Review with IAO'))
 
 WebUI.click(findTestObject('Page_foi.flow/form/state change dialog/button_Save Change'))
+
+WebUI.verifyElementNotClickable(findTestObject('CFR/NewCFR/Page_ABC-2099-14102/button_Create New CFR Form'))
 
 DriverFactory.changeWebDriver(IAOuser)
 
@@ -197,7 +201,9 @@ WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/li_On Hol
 
 WebUI.click(findTestObject('Page_foi.flow/form/state change dialog/button_Cancel'))
 
-WebUI.refresh()
+WebUI.refresh(FailureHandling.STOP_ON_FAILURE)
+
+WebUI.click(findTestObject('CFR/div_CFR Form'))
 
 WebUI.scrollToPosition(1141, 60)
 
@@ -207,52 +213,97 @@ WebUI.click(findTestObject('CFR/CFR_status/li_Approved'))
 
 WebUI.click(findTestObject('Page_foi.flow/form/state change dialog/button_Save Change'))
 
-WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/div_Status'))
+DriverFactory.changeWebDriver(ministryUser)
 
-WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/li_On Hold'))
+WebUI.refresh()
 
-WebUI.click(findTestObject('Page_foi.flow/attachment/button_Add Files'))
+WebUI.click(findTestObject('CFR/div_CFR Form'))
 
-//println(RunConfiguration.getProjectDir() + '/Test Attachments')
-WebUI.uploadFile(findTestObject('Page_foi.flow/attachment/input_Add Files_file-upload-input'), RunConfiguration.getProjectDir() + 
-    '/Test Attachments/test2.pdf')
+WebUI.click(findTestObject('CFR/NewCFR/Page_ABC-2099-14102/button_Create New CFR Form'))
 
-WebUI.click(findTestObject('Page_foi.flow/form/state change dialog/button_Save Change'))
+WebUI.click(findTestObject('CFR/NewCFR/Page_ABC-2099-14102/button_Continue'))
+
+WebUI.setText(findTestObject('CFR/input_Estimated Hours_locating'), '5')
+
+WebUI.setText(findTestObject('CFR/input_Estimated Hours_producing'), '3')
+
+WebUI.scrollToElement(findTestObject('CFR/CFR_status/div_Select CFR Form Status'), 0)
+
+WebUI.click(findTestObject('CFR/NewCFR/Page_ABC-2099-14102/div_Select Reason'))
+
+WebUI.click(findTestObject('CFR/NewCFR/Page_ABC-2099-14102/li_Revised Fee Estimate'))
+
+WebUI.scrollToElement(findTestObject('CFR/button_Save'), 0)
+
+WebUI.click(findTestObject('CFR/button_Save'))
+
+WebUI.refresh()
+
+//WebUI.click(findTestObject('CFR/div_CFR Form'))
+//WebUI.scrollToElement(findTestObject('CFR/CFR_status/Page_ABC-2099-7734023/label_CFR Status'), 0)
+//WebUI.scrollToPosition(782, 5)
+//WebUI.click(findTestObject('CFR/CFR_status/div_Approved'))
+//WebUI.click(findTestObject('CFR/CFR_status/li_In Review with IAO'))
+//WebUI.click(findTestObject('Page_foi.flow/form/state change dialog/button_Save Change'))
+//WebUI.refresh()
+//WebUI.scrollToElement(findTestObject('CFR/button_Save'), 0)
+//WebUI.click(findTestObject('CFR/button_Save'))
+//WebUI.click(findTestObject('Page_foi.flow/form/sidebar/div_Sidebar Request'))
+//WebUI.click(findTestObject('CFR/div_CFR Form'))
+//WebUI.click(findTestObject('CFR/div_CFR Form'))
+//WebUI.refresh()
+WebUI.click(findTestObject('CFR/div_CFR Form'))
+
+WebUI.delay(3)
 
 WebUI.click(findTestObject('Page_foi.flow/form/sidebar/div_Sidebar Comments'))
 
-WebUI.click(findTestObject('Page_foi.flow/comment/span_Request History Comments'))
+WebUI.refresh()
+
+WebUI.click(findTestObject('CFR/div_CFR Form'), FailureHandling.STOP_ON_FAILURE)
+
+WebUI.click(findTestObject('CFR/NewCFR/Page_ABC-2099-14102/button_CFR Form History'))
+
+WebUI.click(findTestObject('CFR/NewCFR/Page_ABC-2099-14102/p_CFR Form - Version 1 - Original'))
 
 WebUI.delay(3)
 
-WebUI.verifyElementText(findTestObject('Page_foi.flow/comment/p_comment list 1 text'), ((findTestData('Login Credentials').getValue(
-        'First Name', 1) + ' ') + findTestData('Login Credentials').getValue('Last Name', 1)) + ' changed the state of the request to On Hold')
+WebUI.click(findTestObject('CFR/NewCFR/Page_ABC-2099-14102/svg_Close_MuiSvgIcon-root'))
 
-WebUI.click(findTestObject('CFR/div_Contact Applicant'))
-
-WebUI.verifyElementPresent(findTestObject('CFR/Payment_Info/Payment_received_notification'), 0)
-
-WebUI.click(findTestObject('CFR/button_Add New Correspondence'))
-
-WebUI.click(findTestObject('CFR/CFR_Addcorrespondence/div_'))
-
-WebUI.click(findTestObject('CFR/CFR_Addcorrespondence/li_Fee Estimate'))
-
-WebUI.click(findTestObject('CFR/CFR_Addcorrespondence/svg'))
-
-WebUI.click(findTestObject('CFR/CFR_Addcorrespondence/button_Add Files'))
-
-WebUI.uploadFile(findTestObject('Page_foi.flow/attachment/input_Add Files_file-upload-input'), RunConfiguration.getProjectDir() + 
-    '/Test Attachments/test2.pdf')
-
-WebUI.click(findTestObject('CFR/CFR_Addcorrespondence/button_Save Changes'))
-
-WebUI.click(findTestObject('CFR/button_Preview  Send Email'))
-
-WebUI.click(findTestObject('CFR/button_Send Email'))
-
-WebUI.delay(3)
-
+//WebUI.refresh()
+//WebUI.click(findTestObject('CFR/div_CFR Form'))
+//
+//WebUI.delay(3)
+//DriverFactory.changeWebDriver(IAOuser)
+//WebUI.refresh()
+//WebUI.click(findTestObject('CFR/div_CFR Form'))
+////WebUI.setText(findTestObject('CFR/input_Estimated Hours IAO_iaoPreparing'), '1')
+//WebUI.verifyElementText(findTestObject('CFR/span_300.8'), '$180')
+//WebUI.scrollToElement(findTestObject('CFR/button_Save'), 0)
+//WebUI.delay(3)
+//WebUI.click(findTestObject('Object Repository/CFR/Page_ABC-700-602/p_hr(s)'))
+//WebUI.click(findTestObject('CFR/button_Save'))
+//WebUI.refresh()
+//WebUI.click(findTestObject('CFR/div_CFR Form'))
+//WebUI.scrollToPosition(1141, 60)
+//WebUI.click(findTestObject('CFR/CFR_status/div_Approved'))
+//WebUI.click(findTestObject('CFR/CFR_status/li_Approved'))
+//WebUI.click(findTestObject('Page_foi.flow/form/state change dialog/button_Save Change'))
+//WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/div_Status'))
+//WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/li_On Hold'))
+//WebUI.click(findTestObject('Page_foi.flow/attachment/button_Add Files'))
+//println(RunConfiguration.getProjectDir() + '/Test Attachments')
+//WebUI.uploadFile(findTestObject('Page_foi.flow/attachment/input_Add Files_file-upload-input'), RunConfiguration.getProjectDir() + 
+//  '/Test Attachments/test2.pdf')
+//WebUI.click(findTestObject('Page_foi.flow/form/state change dialog/button_Save Change'))
+//WebUI.click(findTestObject('Page_foi.flow/form/sidebar/div_Sidebar Comments'))
+//WebUI.scrollToElement(findTestObject('Page_foi.flow/comment/span_Request History Comments'), 0)
+//WebUI.click(findTestObject('Page_foi.flow/comment/span_Request History Comments'))
+//WebUI.delay(3)
+//WebUI.verifyElementText(findTestObject('Page_foi.flow/comment/p_comment list 1 text'), ((findTestData('Login Credentials').getValue(
+//    'First Name', 1) + ' ') + findTestData('Login Credentials').getValue('Last Name', 1)) + ' changed the state of the request to On Hold')
+//WebUI.click(findTestObject('CFR/div_Contact Applicant'))
+//WebUI.verifyElementPresent(findTestObject('CFR/Payment_Info/Payment_received_notification'), 0)
 ministryUser.close()
 
 IAOuser.close()

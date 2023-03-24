@@ -35,6 +35,8 @@ WebUI.callTestCase(findTestCase('submit/foi-test-save-request-form'), [('passwor
 
 WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/div_Status'))
 
+def b = 1
+
 WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/li_Open'))
 
 WebUI.click(findTestObject('Page_foi.flow/form/state change dialog/button_Save Change'))
@@ -85,8 +87,16 @@ WebUI.click(findTestObject('Page_foi.flow/ministry view/form/div_ministry assign
 
 WebUI.click(findTestObject('Page_foi.flow/ministry view/form/ministry assignee/li_ministry assignee foiedu, foiedu'))
 
+WebUI.click(findTestObject('Page_foi.flow/form/watch/div_add other watchers'), FailureHandling.STOP_ON_FAILURE)
+
+WebUI.click(findTestObject('Page_foi.flow/form/assignee dropdown/li_foiedu2, foiedu2'))
+
+//WebUI.click(findTestObject('Page_foi.flow/form/closing modal/div_close dropdown'))
 //def ldd=WebUI.(findTestObject('Page_foi.flow/queue/div_queue header LDD'))
-WebUI.scrollToElement(findTestObject('Page_foi.flow/form/button_Save'), 0)
+//WebUI.scrollToElement(findTestObject('Page_foi.flow/form/button_Save'), 0)
+WebUI.delay(3)
+
+WebUI.refresh()
 
 WebUI.click(findTestObject('CFR/div_CFR Form'))
 
@@ -253,11 +263,7 @@ WebUI.verifyElementPresent(findTestObject('Page_foi.flow/navbar/notification/div
 
 WebUI.verifyElementText(findTestObject('Page_foi.flow/navbar/notification/div_notification list 1 message'), 'Updated Fee Estimate Status to Approved')
 
-//WebUI.click(findTestObject('Page_foi.flow/navbar/notification/a_Watching Notifications'))
-
-//WebUI.verifyElementText(findTestObject('Page_foi.flow/navbar/notification/div_notification list 1 request id'), 'requestID')
-
-//WebUI.verifyElementText(findTestObject('Page_foi.flow/navbar/notification/div_watching notification list 1 message'), 'Updated Fee Estimate Status to Approved')
+WebUI.verifyElementText(findTestObject('Page_foi.flow/navbar/notification/div_notification list 1 request id'), requestID)
 
 WebUI.clickOffset(findTestObject('Page_foi.flow/navbar/notification/notification bell'), -2, 4)
 
@@ -271,7 +277,8 @@ WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/li_On Hol
 
 WebUI.click(findTestObject('Page_foi.flow/attachment/button_Add Files'))
 
-//println(RunConfiguration.getProjectDir() + '/Test Attachments')
+println(RunConfiguration.getProjectDir() + '/Test Attachments')
+
 WebUI.uploadFile(findTestObject('Page_foi.flow/attachment/input_Add Files_file-upload-input'), RunConfiguration.getProjectDir() + 
     '/Test Attachments/test2.pdf')
 
@@ -315,6 +322,10 @@ WebUI.scrollToElement(findTestObject('CFR/Payment_Info/button_Pay Deposit (12)')
 WebUI.click(findTestObject('CFR/Payment_Info/button_Pay Deposit (12)'))
 
 WebUI.click(findTestObject('CFR/Payment_Info/button_Process Payment'))
+
+WebUI.click(findTestObject('CFR/Payment_Info/Page_/input_concat(What, , s this)_cancelButton'))
+
+WebUI.click(findTestObject('CFR/Payment_Info/Page_BC Government Online Payment/button_Retry Payment'))
 
 WebUI.setText(findTestObject('CFR/Payment_Info/input_Card Number_trnCardNumber'), '4030000010001234')
 
@@ -463,18 +474,38 @@ WebUI.verifyElementPresent(findTestObject('CFR/CFR_Addcorrespondence/div_usersen
 
 WebUI.click(findTestObject('CFR/div_CFR Form'))
 
-WebUI.setText(findTestObject('Page_foi.flow/form/inputs/request details/Page_ABC-2099-7654195/input_Fee Waiver Amount_feewaiverAmount'), 
-    '100')
+WebUI.doubleClick(findTestObject('CFR/input_Amount Paid_amountPaid'))
 
-WebUI.verifyElementText(findTestObject('CFR/input_Balance Remaining_balanceRemaining'), '184.75')
+WebUI.sendKeys(findTestObject('CFR/input_Amount Paid_amountPaid'), Keys.chord(Keys.BACK_SPACE))
 
-WebUI.scrollToElement(findTestObject('CFR/button_Save'), 0)
+WebUI.sendKeys(findTestObject('CFR/input_Amount Paid_amountPaid'), Keys.chord(Keys.BACK_SPACE))
 
-WebUI.click(findTestObject('CFR/button_Save'))
+WebUI.sendKeys(findTestObject('CFR/input_Amount Paid_amountPaid'), Keys.chord(Keys.BACK_SPACE))
 
-WebUI.refresh()
+WebUI.sendKeys(findTestObject('CFR/input_Amount Paid_amountPaid'), Keys.chord(Keys.BACK_SPACE))
 
+WebUI.sendKeys(findTestObject('CFR/input_Amount Paid_amountPaid'), Keys.chord(Keys.BACK_SPACE))
+
+WebUI.sendKeys(findTestObject('CFR/input_Amount Paid_amountPaid'), Keys.chord(Keys.BACK_SPACE))
+
+WebUI.sendKeys(findTestObject('CFR/input_Amount Paid_amountPaid'), Keys.chord(Keys.BACK_SPACE))
+
+WebUI.delay(4)
+
+WebUI.sendKeys(findTestObject('CFR/input_Amount Paid_amountPaid'), '380')
+
+//WebUI.setText(findTestObject('CFR/input_Amount Paid_amountPaid'), '0')
 WebUI.setText(findTestObject('CFR/input_Amount Paid_amountPaid'), '380')
+
+WebUI.setText(findTestObject('CFR/input_Fee Waiver Amount_feewaiverAmount'), '50')
+
+WebUI.click(findTestObject('CFR/div_270.8'))
+
+println(WebUI.getAttribute(findTestObject('CFR/input_Balance Remaining_balanceRemaining'), 'value').toString())
+
+def _val = WebUI.getAttribute(findTestObject('CFR/input_Balance Remaining_balanceRemaining'), 'value').toString()
+
+WebUI.verifyEqual(_val, '50.00')
 
 WebUI.click(findTestObject('CFR/Payment_Info/div_Select Payment Method'))
 
@@ -488,6 +519,8 @@ WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/div_Statu
 
 WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/li_Call For Records'))
 
+WebUI.click(findTestObject('Page_foi.flow/form/state change dialog/button_Save Change'))
+
 DriverFactory.changeWebDriver(ministryUser)
 
 WebUI.refresh()
@@ -495,6 +528,8 @@ WebUI.refresh()
 WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/div_Status'))
 
 WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/li_Ministry Sign Off'))
+
+WebUI.click(findTestObject('Page_foi.flow/form/state change dialog/button_Save Change'))
 
 DriverFactory.changeWebDriver(IAOuser)
 
@@ -509,6 +544,28 @@ WebUI.click(findTestObject('Page_foi.flow/form/closing modal/div_Closing Reason'
 WebUI.click(findTestObject('Page_foi.flow/form/closing modal/dropdown options/li_Full Disclosure'), FailureHandling.STOP_ON_FAILURE)
 
 WebUI.click(findTestObject('Page_foi.flow/form/state change dialog/button_Save Change'))
+
+WebUI.click(findTestObject('Page_foi.flow/navbar/button_Sign Out'))
+
+WebUI.callTestCase(findTestCase('helper/foi-test-login'), [('password') : findTestData('Login Credentials').getValue('Password', 
+            9), ('username') : findTestData('Login Credentials').getValue('Username', 9)], FailureHandling.STOP_ON_FAILURE)
+
+//WebUI.click(findTestObject('Page_foi.flow/queue/div_Watching Requests'))
+//WebUI.click(findTestObject('Page_foi.flow/queue/div_My Team Requests'))
+//WebUI.setText(findTestObject('Page_foi.flow/queue/input_Dashboard Filter'), requestID)
+WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
+
+//WebUI.click(findTestObject('Page_foi.flow/queue/div_request queue row 1'))
+WebUI.clickOffset(findTestObject('Page_foi.flow/navbar/notification/notification bell'), -2, 4)
+
+WebUI.click(findTestObject('Page_foi.flow/navbar/notification/a_Watching Notifications'))
+
+WebUI.verifyElementText(findTestObject('Page_foi.flow/navbar/notification/div_watching notification list 1 request id'), 
+    requestID)
+
+WebUI.verifyElementText(findTestObject('Page_foi.flow/navbar/notification/div_watching notification list 1 message'), 'Moved to Closed State')
+
+WebUI.clickOffset(findTestObject('Page_foi.flow/navbar/notification/notification bell'), -2, 4)
 
 ministryUser.close()
 

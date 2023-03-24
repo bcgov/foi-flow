@@ -21,45 +21,70 @@ import org.openqa.selenium.WebDriver as WebDriver
 import com.kms.katalon.core.webui.driver.DriverFactory as DriverFactory
 import groovy.json.JsonSlurper as JsonSlurper
 
-WebUI.callTestCase(findTestCase('submit/foi-test-save-request-form'), [('password') : findTestData('Login Credentials').getValue(
-            'Password', 1), ('username') : findTestData('Login Credentials').getValue('Username', 1), ('firstname') : findTestData(
-            'Login Credentials').getValue('First Name', 1), ('lastname') : findTestData('Login Credentials').getValue('Last Name', 
-            6), ('applicantFirstname') : '', ('applicantLastname') : '', ('category') : '', ('email') : findTestData('Sample Applicant').getValue(
-            'email', 1), ('streetAddress') : findTestData('Sample Applicant').getValue('streetAddress', 1), ('streetAddress2') : findTestData(
-            'Sample Applicant').getValue('streetAddress2', 1), ('city') : findTestData('Sample Applicant').getValue('city', 
-            1), ('province') : findTestData('Sample Applicant').getValue('province', 1), ('country') : findTestData('Sample Applicant').getValue(
-            'country', 1), ('postalCode') : findTestData('Sample Applicant').getValue('postalCode', 1), ('homePhone') : findTestData(
-            'Sample Applicant').getValue('homePhone', 1), ('description') : findTestData('Sample Applicant').getValue('description', 
-            1), ('startDate') : '', ('receivedDate') : '', ('receivedMode') : '', ('requestType') : '', ('deliveryMode') : ''], 
-    FailureHandling.STOP_ON_FAILURE)
+WebUI.openBrowser('')
 
-WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/div_Status'))
+WebUI.navigateToUrl('https://dev.foirequests.gov.bc.ca/')
 
-WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/li_Open'))
+WebUI.click(findTestObject('Object Repository/Inputamount_trial/Page_foi.flow/button_Log In'))
 
-WebUI.click(findTestObject('Page_foi.flow/form/state change dialog/button_Save Change'))
+WebUI.setText(findTestObject('Object Repository/Inputamount_trial/Page_Sign in to foi-mod/input_Username_username'), 'foiintakeflex@idir')
+
+WebUI.setEncryptedText(findTestObject('Object Repository/Inputamount_trial/Page_Sign in to foi-mod/input_Password_password'), 
+    '4fqcoPhx3Nk=')
+
+WebUI.sendKeys(findTestObject('Object Repository/Inputamount_trial/Page_Sign in to foi-mod/input_Password_password'), Keys.chord(
+        Keys.ENTER))
+
+WebUI.click(findTestObject('Page_foi.flow/queue/div_Watching Requests'))
+
+WebUI.click(findTestObject('Page_foi.flow/queue/div_My Team Requests'))
+
+WebUI.setText(findTestObject('Page_foi.flow/queue/input_Dashboard Filter'), 'ABC-2099-14138')
 
 WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
 
-WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/div_Status'))
-
-WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/li_Call For Records'))
-
-requestID = WebUI.getText(findTestObject('Page_foi.flow/form/h3_Form Request Title'), FailureHandling.STOP_ON_FAILURE)
-
-WebUI.click(findTestObject('Page_foi.flow/form/state change dialog/button_Save Change'))
+WebUI.click(findTestObject('Page_foi.flow/queue/div_request queue row 1'))
 
 WebUI.click(findTestObject('CFR/div_CFR Form'))
 
+//WebUI.sendKeys(findTestObject(‘CFR/input_Amount Paid_amountPaid'), Keys.chord(Keys.CONTROL, ‘a’))
+//WebUI.sendKeys(findTestObject(‘CFR/input_Amount Paid_amountPaid’), Keys.chord(Keys.BACK_SPACE))
+WebUI.doubleClick(findTestObject('CFR/input_Amount Paid_amountPaid'))
+
+WebUI.sendKeys(findTestObject('CFR/input_Amount Paid_amountPaid'), Keys.chord(Keys.BACK_SPACE))
+
+WebUI.sendKeys(findTestObject('CFR/input_Amount Paid_amountPaid'), Keys.chord(Keys.BACK_SPACE))
+
+WebUI.sendKeys(findTestObject('CFR/input_Amount Paid_amountPaid'), Keys.chord(Keys.BACK_SPACE))
+
+WebUI.sendKeys(findTestObject('CFR/input_Amount Paid_amountPaid'), Keys.chord(Keys.BACK_SPACE))
+
+WebUI.sendKeys(findTestObject('CFR/input_Amount Paid_amountPaid'), Keys.chord(Keys.BACK_SPACE))
+
+WebUI.sendKeys(findTestObject('CFR/input_Amount Paid_amountPaid'), Keys.chord(Keys.BACK_SPACE))
+
+WebUI.sendKeys(findTestObject('CFR/input_Amount Paid_amountPaid'), Keys.chord(Keys.BACK_SPACE))
+
+WebUI.delay(4)
+
+WebUI.sendKeys(findTestObject('CFR/input_Amount Paid_amountPaid'), '380')
+
+//WebUI.setText(findTestObject('CFR/input_Amount Paid_amountPaid'), '0')
+WebUI.setText(findTestObject('CFR/input_Amount Paid_amountPaid'), '380')
+
+WebUI.setText(findTestObject('CFR/input_Fee Waiver Amount_feewaiverAmount'), '50')
+
+WebUI.click(findTestObject('CFR/div_270.8'))
+
+println(WebUI.getAttribute(findTestObject('CFR/input_Balance Remaining_balanceRemaining'), 'value').toString())
+
+def _val = WebUI.getAttribute(findTestObject('CFR/input_Balance Remaining_balanceRemaining'), 'value').toString()
+
+WebUI.verifyEqual(_val, '50.00')
+
+WebUI.click(findTestObject('CFR/Payment_Info/div_Select Payment Method'))
+
+WebUI.click(findTestObject('CFR/Payment_Info/li_Credit Card - Phone'))
+
 WebUI.scrollToElement(findTestObject('CFR/button_Save'), 0)
-
-WebUI.delay(3)
-
-//WebUI.scrollToElement(findTestObject('CFR/CFR_status/div_idapp'), 0)
-
-WebUI.scrollToPosition(1160, 90)
-
-WebUI.click(findTestObject('CFR/CFR_status/div_Select CFR Form Status'))
-
-WebUI.click(findTestObject('CFR/CFR_status/li_In Review with IAO'))
 

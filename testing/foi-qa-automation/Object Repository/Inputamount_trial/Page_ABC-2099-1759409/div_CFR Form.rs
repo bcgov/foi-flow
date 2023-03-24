@@ -1,135 +1,131 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <WebElementEntity>
    <description></description>
-   <name>button_Add Files</name>
+   <name>div_CFR Form</name>
    <tag></tag>
-   <elementGuidId>d1d4134a-8256-4612-affc-d2ded96d6abf</elementGuidId>
+   <elementGuidId>7258332d-f32f-4e05-98ad-d2e77fd88852</elementGuidId>
    <selectorCollection>
       <entry>
          <key>CSS</key>
-         <value>button.btn-add-files</value>
+         <value>div[name=&quot;CFRForm&quot;]</value>
       </entry>
       <entry>
          <key>XPATH</key>
-         <value>(//button[@type='button'])[32]</value>
-      </entry>
-      <entry>
-         <key>BASIC</key>
-         <value>//*[@type = 'button' and (text() = 'Add Files' or . = 'Add Files')]</value>
+         <value>//div[@name='CFRForm']</value>
       </entry>
    </selectorCollection>
-   <selectorMethod>BASIC</selectorMethod>
+   <selectorMethod>XPATH</selectorMethod>
    <useRalativeImagePath>true</useRalativeImagePath>
    <webElementProperties>
       <isSelected>false</isSelected>
       <matchCondition>equals</matchCondition>
       <name>tag</name>
       <type>Main</type>
-      <value>button</value>
-      <webElementGuid>cfcb52fa-77f2-4206-8906-6d93d6ec8dcd</webElementGuid>
+      <value>div</value>
+      <webElementGuid>5d985349-4d3b-4125-a3fc-919fbc3a1b40</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
       <matchCondition>equals</matchCondition>
       <name>class</name>
       <type>Main</type>
-      <value>btn-add-files</value>
-      <webElementGuid>f5330b92-170d-4a61-9f5a-1ac7d9bb755f</webElementGuid>
+      <value>tablinks</value>
+      <webElementGuid>274ba145-b0e0-4c4d-878f-df64dda6bcff</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>true</isSelected>
       <matchCondition>equals</matchCondition>
-      <name>type</name>
+      <name>name</name>
       <type>Main</type>
-      <value>button</value>
-      <webElementGuid>d9d2c65b-73c3-480a-b47b-61f775de6aa8</webElementGuid>
+      <value>CFRForm</value>
+      <webElementGuid>2cb0e3e7-f39d-46f0-ac7b-11f54711ddb1</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>true</isSelected>
       <matchCondition>equals</matchCondition>
       <name>text</name>
       <type>Main</type>
-      <value>Add Files</value>
-      <webElementGuid>0b52ce19-2a1b-451a-8ae4-63e6e41dd420</webElementGuid>
+      <value>CFR Form</value>
+      <webElementGuid>1cd3e8c3-7109-4f86-907b-be22c50c3334</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
       <matchCondition>equals</matchCondition>
       <name>xpath</name>
       <type>Main</type>
-      <value>id(&quot;state-change-dialog-description&quot;)/section[@class=&quot;file-upload-container&quot;]/div[@class=&quot;row file-upload-preview&quot;]/div[@class=&quot;file-upload-column file-upload-column-3&quot;]/button[@class=&quot;btn-add-files&quot;]</value>
-      <webElementGuid>bbe57b14-045a-4564-8de4-a93350de9e34</webElementGuid>
+      <value>id(&quot;app&quot;)/div[1]/div[@class=&quot;foiformcontent&quot;]/div[@class=&quot;foitabbedContainer&quot;]/div[@class=&quot;foitabheadercollection foitabheaderCFRG&quot;]/div[@class=&quot;tab&quot;]/div[@class=&quot;tablinks&quot;]</value>
+      <webElementGuid>85f8ce3e-cb5f-483e-bb63-8d31ea39530e</webElementGuid>
    </webElementProperties>
    <webElementXpaths>
       <isSelected>true</isSelected>
       <matchCondition>equals</matchCondition>
       <name>xpath:attributes</name>
       <type>Main</type>
-      <value>(//button[@type='button'])[32]</value>
-      <webElementGuid>23c5de9c-f513-4d23-9837-d477503d434f</webElementGuid>
+      <value>//div[@name='CFRForm']</value>
+      <webElementGuid>d638cc1d-dbbf-4f33-a3fb-57be4c060f70</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
       <matchCondition>equals</matchCondition>
       <name>xpath:idRelative</name>
       <type>Main</type>
-      <value>//span[@id='state-change-dialog-description']/section/div/div[3]/button</value>
-      <webElementGuid>d596c8c0-594d-46bc-83fd-f946f9920ca8</webElementGuid>
+      <value>//div[@id='app']/div/div[3]/div/div/div[2]/div[2]</value>
+      <webElementGuid>ab32ae4c-8367-45b4-b8e1-b380181d391c</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
       <matchCondition>equals</matchCondition>
       <name>xpath:neighbor</name>
       <type>Main</type>
-      <value>(.//*[normalize-space(text()) and normalize-space(.)='Add Attachment'])[1]/following::button[2]</value>
-      <webElementGuid>3ca73fbd-e9a5-42d3-9194-f4271c3404e9</webElementGuid>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='Request'])[1]/following::div[1]</value>
+      <webElementGuid>93ba6af5-5b1c-4533-8b30-6b747382aa36</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
       <matchCondition>equals</matchCondition>
       <name>xpath:neighbor</name>
       <type>Main</type>
-      <value>(.//*[normalize-space(text()) and normalize-space(.)='`'])[2]/following::button[2]</value>
-      <webElementGuid>80a6d24d-a677-490c-95a3-4178ea92a8fa</webElementGuid>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='Status'])[2]/following::div[3]</value>
+      <webElementGuid>2b588610-2393-4823-8096-140a8b45c319</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
       <matchCondition>equals</matchCondition>
       <name>xpath:neighbor</name>
       <type>Main</type>
-      <value>(.//*[normalize-space(text()) and normalize-space(.)='Save Changes'])[1]/preceding::button[1]</value>
-      <webElementGuid>a4f763e8-5d7a-474f-b743-c42f37c946c7</webElementGuid>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='Attachments'])[1]/preceding::div[1]</value>
+      <webElementGuid>abc3990b-2a98-46b5-9000-ccfbbebd8d23</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
       <matchCondition>equals</matchCondition>
       <name>xpath:neighbor</name>
       <type>Main</type>
-      <value>(.//*[normalize-space(text()) and normalize-space(.)='Cancel'])[1]/preceding::button[2]</value>
-      <webElementGuid>9be26c53-01d9-4ae9-ba5d-93f89a1f388d</webElementGuid>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='Comments (2)'])[1]/preceding::div[2]</value>
+      <webElementGuid>30776974-7621-4684-bed0-dce48290e77e</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
       <matchCondition>equals</matchCondition>
       <name>xpath:neighbor</name>
       <type>Main</type>
-      <value>//*/text()[normalize-space(.)='Add Files']/parent::*</value>
-      <webElementGuid>4aff7b7b-8f51-49b4-a943-480f0cb5f763</webElementGuid>
+      <value>//*/text()[normalize-space(.)='CFR Form']/parent::*</value>
+      <webElementGuid>c368efe7-8d21-4a31-8bfe-4453c6dbd2c9</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
       <matchCondition>equals</matchCondition>
       <name>xpath:position</name>
       <type>Main</type>
-      <value>//section/div/div[3]/button</value>
-      <webElementGuid>e70471fd-f7a8-4840-aa3d-e0583f5cb9bb</webElementGuid>
+      <value>//div[3]/div/div/div[2]/div[2]</value>
+      <webElementGuid>74efebad-a156-4da8-9931-397c7353a914</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
       <matchCondition>equals</matchCondition>
       <name>xpath:customAttributes</name>
       <type>Main</type>
-      <value>//button[@type = 'button' and (text() = 'Add Files' or . = 'Add Files')]</value>
-      <webElementGuid>d7f28c7e-3701-46e5-808f-3a82eb97b18f</webElementGuid>
+      <value>//div[@name = 'CFRForm' and (text() = 'CFR Form' or . = 'CFR Form')]</value>
+      <webElementGuid>4b8f1afb-611c-4f1b-b94e-f6bd34a58f0e</webElementGuid>
    </webElementXpaths>
 </WebElementEntity>
