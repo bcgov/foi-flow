@@ -66,7 +66,7 @@ class recordservicegetter(recordservicebase):
                 _record['attachments'].append(_attachement)                      
             _computingresponse_err = self.__getcomputingerror(_computingresponse)
             if _computingresponse_err is not None:
-                record['failed'] = _computingresponse_err                
+                _record['failed'] = _computingresponse_err                
         return _record
     
     def __formatrecordattributes(self, attributes, divisions):
