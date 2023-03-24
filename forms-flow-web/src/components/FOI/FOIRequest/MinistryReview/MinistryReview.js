@@ -25,7 +25,7 @@ import {
   fetchFOIRequestNotesList
 } from "../../../../apiManager/services/FOI/foiRequestNoteServices";
 
-import { fetchFOIRecords, fetchPDFStitchedRecordForHarms, fetchPDFStitchStatusForHarms } from "../../../../apiManager/services/FOI/foiRecordServices";
+import { fetchFOIRecords, fetchPDFStitchStatusForHarms } from "../../../../apiManager/services/FOI/foiRecordServices";
 
 import {
   fetchCFRForm
@@ -191,7 +191,6 @@ const MinistryReview = React.memo(({ userDetail }) => {
       dispatch(fetchFOIRequestAttachmentsList(requestId, ministryId));
       dispatch(fetchFOIRecords(requestId, ministryId));
       dispatch(fetchPDFStitchStatusForHarms(requestId, ministryId));
-      dispatch(fetchPDFStitchedRecordForHarms(requestId, ministryId));
       fetchCFRForm(ministryId,dispatch);
       if (bcgovcode) dispatch(fetchFOIMinistryAssignedToList(bcgovcode));
     }
@@ -292,7 +291,6 @@ const MinistryReview = React.memo(({ userDetail }) => {
       dispatch(fetchFOIRequestAttachmentsList(requestId, ministryId));
       dispatch(fetchFOIRecords(requestId, ministryId));
       dispatch(fetchPDFStitchStatusForHarms(requestId, ministryId));
-      dispatch(fetchPDFStitchedRecordForHarms(requestId, ministryId));
       fetchCFRForm(ministryId,dispatch);
       setStateChanged(false);
       setcurrentrequestStatus(_state);

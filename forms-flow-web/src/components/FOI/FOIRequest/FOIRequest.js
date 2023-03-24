@@ -41,7 +41,7 @@ import {
   fetchApplicantCorrespondenceTemplates
 } from "../../../apiManager/services/FOI/foiCorrespondenceServices";
 import { fetchFOIRequestNotesList } from "../../../apiManager/services/FOI/foiRequestNoteServices";
-import { fetchFOIRecords, fetchPDFStitchedRecordForHarms, fetchPDFStitchStatusForHarms } from "../../../apiManager/services/FOI/foiRecordServices";
+import { fetchFOIRecords, fetchPDFStitchStatusForHarms } from "../../../apiManager/services/FOI/foiRecordServices";
 import { makeStyles } from '@material-ui/core/styles';
 import FOI_COMPONENT_CONSTANTS from '../../../constants/FOI/foiComponentConstants';
 import { push } from "connected-react-router";
@@ -246,7 +246,6 @@ const FOIRequest = React.memo(({ userDetail }) => {
       dispatch(fetchFOIRequestAttachmentsList(requestId, ministryId));
       dispatch(fetchFOIRecords(requestId, ministryId));
       dispatch(fetchPDFStitchStatusForHarms(requestId, ministryId));
-      dispatch(fetchPDFStitchedRecordForHarms(requestId, ministryId));
       fetchCFRForm(ministryId,dispatch);
       dispatch(fetchApplicantCorrespondence(requestId, ministryId));
       dispatch(fetchApplicantCorrespondenceTemplates());
