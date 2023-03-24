@@ -125,9 +125,26 @@ class recordservicegetter(recordservicebase):
         if filterby == "recordid":
             filtered_response = [x for x in response if x["recordid"] == data["recordid"] and x["filename"] == data["filename"]]
             return filtered_response[0] if len(filtered_response) > 0 else []
+        elif filterby == "parentid":
+            filtered_response = [x for x in response if x["isattachment"] == True]
+            return self.__getattachments(filtered_response, [], data)
         else:
-            filtered_response = [x for x in response if x[filterby] == data]
-            return filtered_response
+            logging.info("not matched")
+        
+    def __getattachments(self, response, result, data):
+        filtered = []
+        matchfound = False
+        for entry in response:
+            if int(entry["parentid"]) == int(data):
+                result.append(entry)
+                matchfound = True
+            else:
+                filtered.append(entry)
+        if matchfound == True:
+            for subentry in result:
+                self.__getattachments(filtered, result, subentry["documentmasterid"])
+        return result
+    
 
     def __getcomputingerror(self, computingresponse):
         if computingresponse['conversionstatus'] == 'error':
