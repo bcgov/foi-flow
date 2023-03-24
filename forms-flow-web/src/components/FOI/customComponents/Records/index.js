@@ -199,6 +199,7 @@ export const RecordsLog = ({
         setIsDownloadFailed(false);
         break;
       case "completed":
+        dispatch(fetchPDFStitchedRecordForHarms(requestId, ministryId));
         setIsDownloadInProgress(false);
         setIsDownloadReady(true);
         setIsDownloadFailed(false);
@@ -214,7 +215,7 @@ export const RecordsLog = ({
         setIsDownloadFailed(false);
         break;
     }
-  }, [pdfStitchStatus])
+  }, [pdfStitchStatus, requestId, ministryId])
 
   const addAttachments = () => {
     setModalFor('add');
@@ -361,14 +362,13 @@ export const RecordsLog = ({
       });
       setIsDownloadInProgress(true);      
       setIsDownloadReady(false);
-      setIsDownloadFailed(false);
-      setCurrentDownload(e.target.value);      
-      downloadLinearHarmsDocuments()
+      setIsDownloadFailed(false);           
+      downloadLinearHarmsDocuments()      
     }
     else if (e.target.value === 1 && pdfStitchStatus === "completed") {
-      const s3filepath = pdfStitchedRecord.finalpackagepath
+      const s3filepath = pdfStitchedRecord?.finalpackagepath
       const filename = requestNumber + ".zip"
-      getFOIS3DocumentPreSignedUrl(s3filepath.split('/').slice(4).join('/'), ministryId, dispatch, (err, res) => {
+      getFOIS3DocumentPreSignedUrl(s3filepath?.split('/').slice(4).join('/'), ministryId, dispatch, (err, res) => {
         if (!err) {
           getFileFromS3({filepath: res}, (_err, response) => {
             let blob = new Blob([response.data], {type: "application/octet-stream"});
@@ -377,6 +377,7 @@ export const RecordsLog = ({
         }
       }, 'records', bcgovcode);
     }
+    setCurrentDownload(e.target.value); 
   }
 
   const downloadLinearHarmsDocuments = () => {
@@ -418,7 +419,7 @@ export const RecordsLog = ({
         let found = acc.find((findval) => val.divisionid === findval.divisionid);
         if (!found) acc.push(val)
         else found.files = found.files.concat(
-          val.files.filter((f) => !found.files.find((findval) => f.recordid === findval.recordid))).sort((a,b) => {
+          val.files.filter((f) => !found.files.find((findval) => f.filename === findval.filename))).sort((a,b) => {
                 return new Date(Date.parse(a.lastmodified)) - new Date(Date.parse(b.lastmodified))
               });
         return acc;
@@ -692,7 +693,7 @@ export const RecordsLog = ({
                 </button>
               </ConditionalComponent>
             </Grid>
-            <Grid item xs={4}>
+            <Grid item xs={3}>
               <ConditionalComponent condition={hasDocumentsToDownload}>
               <TextField
               className="download-dropdown custom-select-wrapper foi-download-button"
@@ -748,7 +749,7 @@ export const RecordsLog = ({
             </TextField>
               </ConditionalComponent>
             </Grid>
-            <Grid item xs={2}>
+            {/* <Grid item xs={2}>
               <ConditionalComponent condition={hasDocumentsToExport}>
                 <button
                   className="btn addAttachment foi-export-button"
@@ -759,7 +760,7 @@ export const RecordsLog = ({
                   Export Shown
                 </button>
               </ConditionalComponent>
-            </Grid>
+            </Grid> */}
             <Grid item xs={2}>
               {isMinistryCoordinator ?
                 <button

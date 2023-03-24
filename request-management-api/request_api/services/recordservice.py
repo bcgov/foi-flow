@@ -162,9 +162,9 @@ class recordservice:
 
     def getpdfstichstatus(self, ministryid, category):
         response, err = self.__makedocreviewerrequest('GET', '/api/pdfstitchjobstatus/{0}/{1}'.format(ministryid, category))
-        if response is not None:
+        if len(response) > 0:
             return response.get("status")
-        return None
+        return ""
 
     def __triggerpdfstitchservice(self, requestid, ministryrequestid, message, userid):
         """Call the BE job for stitching the documents.
