@@ -22,7 +22,7 @@ class recordservice(recordservicebase):
     """
     conversionstreamkey = getenv('EVENT_QUEUE_CONVERSION_STREAMKEY')
     dedupestreamkey = getenv('EVENT_QUEUE_DEDUPE_STREAMKEY')
-    pdfstitchstreamkey = getenv('EVENT_QUEUE_DEDUPE_STREAMKEY')
+    pdfstitchstreamkey = getenv('EVENT_QUEUE_PDFSTITCH_STREAMKEY')
 
 
     def create(self, requestid, ministryrequestid, recordschema, userid):
@@ -43,7 +43,7 @@ class recordservice(recordservicebase):
         response = FOIRequestRecord.create([newrecord])
         if (response.success):
             if (not record['attributes'].get('incompatible', False)):
-                _apiresponse, err = self.makedocreviewerrequest('POST', '/api/document/delete', {'filepaths': [record['s3uripath']]})
+                _apiresponse, err = self.makedocreviewerrequest('POST', '/api/document/delete', {'ministryrequestid': ministryrequestid, 'filepaths': [record['s3uripath']]})
                 if err:
                     return DefaultMethodResult(False,'Error in contacting Doc Reviewer API', -1, recordid)
             return DefaultMethodResult(True,'Record marked as inactive', -1, recordid)
@@ -100,9 +100,9 @@ class recordservice(recordservicebase):
 
     def getpdfstichstatus(self, ministryid, category):
         response, err = self.makedocreviewerrequest('GET', '/api/pdfstitchjobstatus/{0}/{1}'.format(ministryid, category))
-        if response is not None:
+        if len(response) > 0:
             return response.get("status")
-        return None
+        return ""
 
     def __triggerpdfstitchservice(self, requestid, ministryrequestid, message, userid):
         """Call the BE job for stitching the documents.

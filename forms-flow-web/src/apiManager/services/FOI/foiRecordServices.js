@@ -45,7 +45,6 @@ export const fetchPDFStitchedRecordForHarms = (requestId, ministryId, ...rest) =
 };
 
 export const fetchPDFStitchStatusForHarms = (requestId, ministryId, ...rest) => {
-  console.log("fetchPDFStitchStatusForHarms")
   if (!ministryId) {
     return () => {};
   }
@@ -61,13 +60,10 @@ export const fetchPDFStitchStatusForHarms = (requestId, ministryId, ...rest) => 
           dispatch(setFOIPDFStitchStatusForHarms(res.data));
           done(null, res.data);
 
-        } else {
-          console.log("Error in fetching records", res);
-          dispatch(serviceActionError(res));
         }
       })
       .catch((error) => {
-        console.log("Error in fetching records", error);
+        console.log("Error in fetching pdfstitch job status", error);
         dispatch(serviceActionError(error));
         done(error);
       });
