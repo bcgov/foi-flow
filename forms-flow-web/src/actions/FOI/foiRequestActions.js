@@ -303,3 +303,10 @@ export const setRestrictedReqTaglist = (data) => dispatch =>{
         payload:data
     })
 }
+
+export const setRecordFormats = (data) => dispatch =>{
+    dispatch({
+        type:FOI_ACTION_CONSTANTS.RECORD_FORMATS,
+        payload:data
+    })
+}
