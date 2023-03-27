@@ -678,11 +678,11 @@ export const RecordsLog = ({
             spacing={1}
           >
             <Grid item xs={6}>
-              <h1 className="foi-review-request-text foi-ministry-requestheadertext">
+              <h1 className="foi-review-request-text foi-ministry-requestheadertext foi-records-request-text">
                 {getRequestNumber()}
               </h1>
             </Grid>
-          
+          </Grid>
           <Grid
             container
             direction="row"
@@ -690,7 +690,7 @@ export const RecordsLog = ({
             alignItems="flex-start"
             spacing={1}
           >
-            <Grid item xs={2}>
+            <Grid item xs={3}>
               <ConditionalComponent condition={records.filter(record => record.attachments?.length > 0).length > 0}>
                 <button
                   className="btn addAttachment foi-export-button"
@@ -791,7 +791,6 @@ export const RecordsLog = ({
                   </button>
                 </a>
               }
-            </Grid>
             </Grid>
             <Grid
               container
