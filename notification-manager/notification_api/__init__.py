@@ -20,6 +20,6 @@ This module is the API for the Authroization system.
 from notification_api.logging import configure_logging
 
 
-def setup_app(self):
+def setup_app():
     #Setup log
     configure_logging()

@@ -125,10 +125,15 @@ auth = (
 
 
 class AuthHelper:
+
+    @classmethod
+    def getwsuserid(cls, token):
+        return cls.getuserid(token)
     
     @classmethod
-    def getuserid(cls):
-        token = request.headers.get("Authorization", None)
+    def getuserid(cls, token=None):
+        if token is None:
+            token = request.headers.get("Authorization", None)
         unverified_claims = josejwt.get_unverified_claims(token.partition("Bearer")[2].strip())        
         if 'identity_provider' in unverified_claims and unverified_claims['identity_provider'] == "idir":
             claim_name = 'foi_preferred_username' if "foi_preferred_username" in unverified_claims else 'preferred_username'

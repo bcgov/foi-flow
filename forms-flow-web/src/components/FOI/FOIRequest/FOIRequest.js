@@ -233,6 +233,9 @@ const FOIRequest = React.memo(({ userDetail }) => {
     if (window.location.href.indexOf("comments") > -1) {
       tabclick("Comments");
     }
+    else if (window.location.href.indexOf("records") > -1) {
+      tabclick("Records");
+    }
   }, []);
   
    useEffect(async() => {

@@ -22,5 +22,7 @@ class readerbase:
     def log_last_msgid(self, last_id, start_from):
         if last_id:
             logging.debug(f"Resume from ID: {last_id}")
+            print(f"Resume from ID: {last_id}")
         else:
             logging.debug(f"Starting from {start_from.name}")
+            print(f"Starting from {start_from.name}")
