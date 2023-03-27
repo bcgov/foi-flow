@@ -6,12 +6,12 @@
    <elementGuidId>c5f1250e-02f3-46a0-b01f-65e3e569fc21</elementGuidId>
    <selectorCollection>
       <entry>
-         <key>CSS</key>
-         <value>button.btn.btn-link.btn-cfr-history</value>
-      </entry>
-      <entry>
          <key>BASIC</key>
          <value>//*[@type = 'button' and (text() = 'CFR Form History' or . = 'CFR Form History')]</value>
+      </entry>
+      <entry>
+         <key>CSS</key>
+         <value>button.btn.btn-link.btn-cfr-history</value>
       </entry>
       <entry>
          <key>XPATH</key>

@@ -6,12 +6,12 @@
    <elementGuidId>01069ae9-6067-447c-a034-a10c63ea7fc8</elementGuidId>
    <selectorCollection>
       <entry>
-         <key>XPATH</key>
-         <value>(.//*[normalize-space(text()) and normalize-space(.)='Close'])[1]/following::p[1]</value>
-      </entry>
-      <entry>
          <key>CSS</key>
          <value>p.MuiTypography-root.MuiTypography-body1.history-entry-title.css-9l3uo3</value>
+      </entry>
+      <entry>
+         <key>XPATH</key>
+         <value>(.//*[normalize-space(text()) and normalize-space(.)='Close'])[1]/following::p[1]</value>
       </entry>
    </selectorCollection>
    <selectorMethod>XPATH</selectorMethod>

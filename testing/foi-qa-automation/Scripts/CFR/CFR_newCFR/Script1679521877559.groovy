@@ -178,7 +178,7 @@ WebUI.click(findTestObject('CFR/CFR_status/li_In Review with IAO'))
 
 WebUI.click(findTestObject('Page_foi.flow/form/state change dialog/button_Save Change'))
 
-WebUI.verifyElementNotClickable(findTestObject('CFR/NewCFR/Page_ABC-2099-14102/button_Create New CFR Form'))
+WebUI.verifyElementNotClickable(findTestObject('CFR/NewCFR/button_Create New CFR Form'))
 
 DriverFactory.changeWebDriver(IAOuser)
 
@@ -219,9 +219,9 @@ WebUI.refresh()
 
 WebUI.click(findTestObject('CFR/div_CFR Form'))
 
-WebUI.click(findTestObject('CFR/NewCFR/Page_ABC-2099-14102/button_Create New CFR Form'))
+WebUI.click(findTestObject('CFR/NewCFR/button_Create New CFR Form'))
 
-WebUI.click(findTestObject('CFR/NewCFR/Page_ABC-2099-14102/button_Continue'))
+WebUI.click(findTestObject('CFR/NewCFR/button_Continue'))
 
 WebUI.setText(findTestObject('CFR/input_Estimated Hours_locating'), '5')
 
@@ -229,9 +229,9 @@ WebUI.setText(findTestObject('CFR/input_Estimated Hours_producing'), '3')
 
 WebUI.scrollToElement(findTestObject('CFR/CFR_status/div_Select CFR Form Status'), 0)
 
-WebUI.click(findTestObject('CFR/NewCFR/Page_ABC-2099-14102/div_Select Reason'))
+WebUI.click(findTestObject('CFR/NewCFR/div_Select Reason'))
 
-WebUI.click(findTestObject('CFR/NewCFR/Page_ABC-2099-14102/li_Revised Fee Estimate'))
+WebUI.click(findTestObject('CFR/NewCFR/li_Revised Fee Estimate'))
 
 WebUI.scrollToElement(findTestObject('CFR/button_Save'), 0)
 
@@ -262,13 +262,17 @@ WebUI.refresh()
 
 WebUI.click(findTestObject('CFR/div_CFR Form'), FailureHandling.STOP_ON_FAILURE)
 
-WebUI.click(findTestObject('CFR/NewCFR/Page_ABC-2099-14102/button_CFR Form History'))
+WebUI.click(findTestObject('CFR/NewCFR/button_CFR Form History'))
 
-WebUI.click(findTestObject('CFR/NewCFR/Page_ABC-2099-14102/p_CFR Form - Version 1 - Original'))
+WebUI.click(findTestObject('CFR/NewCFR/p_CFR Form - Version 1 - Original'))
 
 WebUI.delay(3)
 
-WebUI.click(findTestObject('CFR/NewCFR/Page_ABC-2099-14102/svg_Close_MuiSvgIcon-root'))
+WebUI.verifyElementText(findTestObject('CFR/CFR_Addcorrespondence/p_CFR Form - Version 1 - Original'), 'CFR Form - Version 1 - Original')
+
+WebUI.verifyElementText(findTestObject('CFR/span_300.80'), '$300.80')
+
+WebUI.click(findTestObject('CFR/NewCFR/svg_Close_MuiSvgIcon-root'))
 
 //WebUI.refresh()
 //WebUI.click(findTestObject('CFR/div_CFR Form'))

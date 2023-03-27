@@ -76,7 +76,9 @@ WebUI.click(findTestObject('Page_foi.flow/ministry view/form/div_ministry assign
 WebUI.click(findTestObject('Page_foi.flow/ministry view/form/ministry assignee/li_ministry assignee foiedu, foiedu'))
 
 //def ldd=WebUI.(findTestObject('Page_foi.flow/queue/div_queue header LDD'))
-WebUI.scrollToElement(findTestObject('Page_foi.flow/form/button_Save'), 0)
+WebUI.delay(3, FailureHandling.STOP_ON_FAILURE)
+
+WebUI.refresh()
 
 WebUI.click(findTestObject('CFR/div_CFR Form'))
 
@@ -355,6 +357,8 @@ WebUI.click(findTestObject('CFR/div_CFR Form'))
 
 WebUI.setText(findTestObject('CFR/input_Actual Hours IAO_iaoPreparing'), '1')
 
+WebUI.scrollToElement(findTestObject('CFR/button_Save'), 0)
+
 WebUI.click(findTestObject('CFR/button_Save'))
 
 //WebUI.verifyElementText(findTestObject('CFR/span_0'), '$210.8')
@@ -369,6 +373,7 @@ WebUI.click(findTestObject('Page_foi.flow/form/closing modal/div_Closing Reason'
 WebUI.click(findTestObject('Page_foi.flow/form/closing modal/dropdown options/li_Full Disclosure'), FailureHandling.STOP_ON_FAILURE)
 
 WebUI.click(findTestObject('Page_foi.flow/form/state change dialog/button_Save Change'))
+
 ministryUser.close()
 
 IAOuser.close()

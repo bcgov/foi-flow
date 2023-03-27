@@ -86,7 +86,9 @@ WebUI.click(findTestObject('Page_foi.flow/ministry view/form/div_ministry assign
 WebUI.click(findTestObject('Page_foi.flow/ministry view/form/ministry assignee/li_ministry assignee foiedu, foiedu'))
 
 //def ldd=WebUI.(findTestObject('Page_foi.flow/queue/div_queue header LDD'))
-WebUI.scrollToElement(findTestObject('Page_foi.flow/form/button_Save'), 0)
+WebUI.delay(3, FailureHandling.STOP_ON_FAILURE)
+
+WebUI.refresh()
 
 WebUI.click(findTestObject('CFR/div_CFR Form'))
 
@@ -427,8 +429,7 @@ WebUI.click(findTestObject('CFR/div_Contact Applicant'))
 WebUI.scrollToPosition(1141, 60)
 
 //WebUI.scrollToElement(findTestObject('CFR/CFR_Addcorrespondence/div_usersendemailmessage'), 0)
-WebUI.scrollToElement(findTestObject('CFR/Payment_Info/Payonline_link'), 
-    0)
+WebUI.scrollToElement(findTestObject('CFR/Payment_Info/Payonline_link'), 0)
 
 WebUI.click(findTestObject('CFR/a_Pay Online'))
 
@@ -459,11 +460,10 @@ WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
 WebUI.click(findTestObject('Page_foi.flow/queue/div_request queue row 1'))
 
 //WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/div_Status'))
-
 WebUI.verifyElementAttributeValue(findTestObject('Page_foi.flow/form/sidebar/status dropdown/input_Status'), 'value', 'Call For Records', 
     0)
-//WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/div_Status'))
 
+//WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/div_Status'))
 WebUI.delay(4)
 
 WebUI.click(findTestObject('CFR/div_Contact Applicant'))
@@ -499,6 +499,7 @@ WebUI.click(findTestObject('Page_foi.flow/form/sidebar/div_Sidebar Comments'))
 WebUI.click(findTestObject('CFR/div_Contact Applicant'))
 
 WebUI.click(findTestObject('Page_foi.flow/form/sidebar/div_Sidebar Comments'))
+
 WebUI.click(findTestObject('Page_foi.flow/comment/span_Request History Comments'))
 
 WebUI.delay(3)

@@ -323,9 +323,9 @@ WebUI.click(findTestObject('CFR/Payment_Info/button_Pay Deposit (12)'))
 
 WebUI.click(findTestObject('CFR/Payment_Info/button_Process Payment'))
 
-WebUI.click(findTestObject('CFR/Payment_Info/Page_/input_concat(What, , s this)_cancelButton'))
+WebUI.click(findTestObject('CFR/Payment_Info/input_concat(What, , s this)_cancelButton'))
 
-WebUI.click(findTestObject('CFR/Payment_Info/Page_BC Government Online Payment/button_Retry Payment'))
+WebUI.click(findTestObject('CFR/Payment_Info/button_Retry Payment'))
 
 WebUI.setText(findTestObject('CFR/Payment_Info/input_Card Number_trnCardNumber'), '4030000010001234')
 
@@ -455,7 +455,7 @@ WebUI.click(findTestObject('CFR/button_Add New Correspondence'))
 
 WebUI.click(findTestObject('CFR/CFR_Addcorrespondence/div_'))
 
-WebUI.click(findTestObject('CFR/CFR_Addcorrespondence/Page_ABC-2099-14064/li_Outstanding Fee'))
+WebUI.click(findTestObject('CFR/CFR_Addcorrespondence/addcorrespondence_outstandingflow/li_Outstanding Fee'))
 
 WebUI.click(findTestObject('CFR/CFR_Addcorrespondence/svg'))
 

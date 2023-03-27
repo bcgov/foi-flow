@@ -6,12 +6,12 @@
    <elementGuidId>14779b70-fb79-437c-822f-9502f04f8228</elementGuidId>
    <selectorCollection>
       <entry>
-         <key>XPATH</key>
-         <value>//input[@name='cancelButton']</value>
-      </entry>
-      <entry>
          <key>CSS</key>
          <value>input[name=&quot;cancelButton&quot;]</value>
+      </entry>
+      <entry>
+         <key>XPATH</key>
+         <value>//input[@name='cancelButton']</value>
       </entry>
    </selectorCollection>
    <selectorMethod>XPATH</selectorMethod>

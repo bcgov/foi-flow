@@ -154,8 +154,7 @@ WebUI.click(findTestObject('CFR/div_CFR Form'))
 
 WebUI.scrollToPosition(1141, 60)
 
-WebUI.scrollToElement(findTestObject('CFR/CFR_status/div_Approved'), 0)
-
+//WebUI.scrollToElement(findTestObject('CFR/CFR_status/div_Approved'), 0)
 WebUI.click(findTestObject('CFR/CFR_status/div_Approved'))
 
 WebUI.click(findTestObject('CFR/CFR_status/li_Needs Clarification with Ministry'))
@@ -198,6 +197,8 @@ WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/li_On Hol
 WebUI.click(findTestObject('Page_foi.flow/form/state change dialog/button_Cancel'))
 
 WebUI.refresh()
+
+WebUI.click(findTestObject('CFR/div_CFR Form'))
 
 WebUI.scrollToPosition(1141, 60)
 
@@ -250,6 +251,12 @@ WebUI.click(findTestObject('CFR/CFR_Addcorrespondence/button_Save Changes'))
 WebUI.click(findTestObject('CFR/button_Preview  Send Email'))
 
 WebUI.click(findTestObject('CFR/button_Send Email'))
+
+WebUI.delay(3)
+
+WebUI.click(findTestObject('CFR/CFR_Addcorrespondence/svg_Pay Online_MuiSvgIcon-root'))
+
+WebUI.click(findTestObject('CFR/CFR_Addcorrespondence/li_Download'))
 
 WebUI.delay(3)
 
