@@ -185,6 +185,7 @@ export const RecordsLog = ({
   const [searchValue, setSearchValue] = useState("");
   const [filterValue, setFilterValue] = useState(-1);
   const [fullnameList, setFullnameList] = useState(getFullnameList);
+  const [recordsDownloadList, setRecordsDownloadList] = useState(RecordsDownloadList);
   const [currentDownload, setCurrentDownload] = useState(0) 
   const [isDownloadInProgress, setIsDownloadInProgress] = useState(false)
   const [isDownloadReady, setIsDownloadReady] = useState(false)
@@ -348,6 +349,7 @@ export const RecordsLog = ({
   }  
 
   const handleDownloadChange = (e) => {
+    //if clicked on harms
     if (e.target.value === 1 && ["not started", "error"].includes(pdfStitchStatus)) {
       toast.info("In progress. You will be notified when the records are ready for download.", {
         position: "top-right",
@@ -362,9 +364,10 @@ export const RecordsLog = ({
       });
       setIsDownloadInProgress(true);      
       setIsDownloadReady(false);
-      setIsDownloadFailed(false);           
+      setIsDownloadFailed(false); 
       downloadLinearHarmsDocuments()      
     }
+    //if clicked on harms and stitching is complete
     else if (e.target.value === 1 && pdfStitchStatus === "completed") {
       const s3filepath = pdfStitchedRecord?.finalpackagepath
       const filename = requestNumber + ".zip"
@@ -431,24 +434,35 @@ export const RecordsLog = ({
       message.category = RecordDownloadCategory.harms
 
       dispatch(triggerDownloadFOIRecordsForHarms(requestId, ministryId, message,(err, _res) => {
+        if (err) {
+          toastError()
+        }
         dispatchRequestAttachment(err);
     }));
 
     } catch (error) {
       console.log(error)
-      toast.error(
-        "Temporarily unable to process your request. Please try again in a few minutes.",
-        {
-          position: "top-right",
-          autoClose: 3000,
-          hideProgressBar: true,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-        }
-      );
+      toastError()
     }
+
+  }
+
+  const toastError = (error) => {
+    toast.error(
+      "Temporarily unable to process your request. Please try again in a few minutes.",
+      {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: true,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      }
+    );
+    setIsDownloadInProgress(false);      
+    setIsDownloadReady(false);
+    setIsDownloadFailed(true);
 
   }
 
@@ -612,11 +626,6 @@ export const RecordsLog = ({
     return `Request #U-00${requestId}`;
   }
 
-  const getCurrentDownload = () => {
-    if (currentDownload === 1 && isDownloadInProgress)
-      return 0;
-    return currentDownload;
-  }
 
   // const onFilterChange = (filterValue) => {
     // let _filteredRecords = filterValue === "" ?
@@ -669,7 +678,7 @@ export const RecordsLog = ({
             spacing={1}
           >
             <Grid item xs={6}>
-              <h1 className="foi-review-request-text foi-ministry-requestheadertext">
+              <h1 className="foi-review-request-text foi-ministry-requestheadertext foi-records-request-text">
                 {getRequestNumber()}
               </h1>
             </Grid>
@@ -681,7 +690,7 @@ export const RecordsLog = ({
             alignItems="flex-start"
             spacing={1}
           >
-            <Grid item xs={2}>
+            <Grid item xs={3}>
               <ConditionalComponent condition={records.filter(record => record.attachments?.length > 0).length > 0}>
                 <button
                   className="btn addAttachment foi-export-button"
@@ -721,7 +730,7 @@ export const RecordsLog = ({
               size="small"
               fullWidth
             >
-              {RecordsDownloadList.map((item, index) => {
+              {recordsDownloadList.map((item, index) => {
 
                 if (item.id !=0) {
                   return (
@@ -733,11 +742,11 @@ export const RecordsLog = ({
                         sx={{ display: 'flex' }}
                       >
                         {
-                          !item.disabled && (isDownloadReady && !item.disabled ?
+                          !item.disabled && (isDownloadReady ?
                           <FontAwesomeIcon icon={faCheckCircle} size='2x' color='#1B8103' className={classes.statusIcons}/>:
-                          isDownloadFailed && !item.disabled ?
+                          isDownloadFailed ?
                           <FontAwesomeIcon icon={faExclamationCircle} size='2x' color='#A0192F' className={classes.statusIcons}/>:
-                          isDownloadInProgress && !item.disabled ? <FontAwesomeIcon icon={faSpinner} size='2x' color='#FAA915' className={classes.statusIcons}/>:null) 
+                          isDownloadInProgress ? <FontAwesomeIcon icon={faSpinner} size='2x' color='#FAA915' className={classes.statusIcons}/>:null) 
                         }
                         {item.label}
                       </MenuItem>
