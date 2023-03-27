@@ -17,7 +17,3 @@ import com.kms.katalon.core.windows.keyword.WindowsBuiltinKeywords as Windows
 import internal.GlobalVariable as GlobalVariable
 import org.openqa.selenium.Keys as Keys
 
-
-def str = "2023-05-22"
-def _date = Date.parse('yyyy-MM-dd', str).format('dd/MM/yyyy')
-System.out.println(_date)
