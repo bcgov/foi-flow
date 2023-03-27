@@ -43,6 +43,8 @@ const initialState = {
     removedfiles:0,
     batchcount:0
   },
+  foiPDFStitchedRecordForHarms: {},
+  foiPDFStitchStatusForHarms:"not started",
   foiRequestCFRForm: {
     overallsuggestions: "",
     status: "init",
@@ -163,6 +165,10 @@ const foiRequests = (state = initialState, action) => {
       return { ...state, foiRequestAttachments: action.payload };
     case FOI_ACTION_CONSTANTS.FOI_REQUEST_RECORDS:
       return { ...state, foiRequestRecords: action.payload };
+    case FOI_ACTION_CONSTANTS.FOI_PDF_STITCHED_RECORD_FOR_HARMS:
+      return { ...state, foiPDFStitchedRecordForHarms: action.payload };
+    case FOI_ACTION_CONSTANTS.FOI_PDF_STITCHED_STATUS_FOR_HARMS:
+      return { ...state, foiPDFStitchStatusForHarms: action.payload };
     case FOI_ACTION_CONSTANTS.FOI_REQUEST_CFR_FORM:
       return {
         ...state,

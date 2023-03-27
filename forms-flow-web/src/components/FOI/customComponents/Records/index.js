@@ -6,8 +6,9 @@ import AttachmentModal from '../Attachments/AttachmentModal';
 import Loading from "../../../../containers/Loading";
 import { getOSSHeaderDetails, saveFilesinS3, getFileFromS3, postFOIS3DocumentPreSignedUrl, getFOIS3DocumentPreSignedUrl } from "../../../../apiManager/services/FOI/foiOSSServices";
 import { saveFOIRequestAttachmentsList, replaceFOIRequestAttachment, saveNewFilename, deleteFOIRequestAttachment } from "../../../../apiManager/services/FOI/foiAttachmentServices";
-import { fetchFOIRecords, saveFOIRecords, deleteFOIRecords, retryFOIRecordProcessing, deleteReviewerRecords, getRecordFormats } from "../../../../apiManager/services/FOI/foiRecordServices";
+import { fetchFOIRecords, saveFOIRecords, deleteFOIRecords, retryFOIRecordProcessing, deleteReviewerRecords, getRecordFormats, triggerDownloadFOIRecordsForHarms, fetchPDFStitchedRecordForHarms } from "../../../../apiManager/services/FOI/foiRecordServices";
 import { StateTransitionCategories, AttachmentCategories } from '../../../../constants/FOI/statusEnum'
+import { RecordsDownloadList, RecordDownloadCategory } from '../../../../constants/FOI/enum';
 import { addToFullnameList, getFullnameList, ConditionalComponent } from '../../../../helper/FOI/helper';
 import Grid from "@material-ui/core/Grid";
 import { makeStyles } from "@material-ui/core/styles";
@@ -19,6 +20,8 @@ import MoreHorizIcon from "@material-ui/icons/MoreHoriz";
 import IconButton from "@material-ui/core/IconButton";
 import MenuList from "@material-ui/core/MenuList";
 import MenuItem from "@material-ui/core/MenuItem";
+import TextField from '@mui/material/TextField';
+import CircularProgress from '@mui/material/CircularProgress';
 import { saveAs } from "file-saver";
 import { downloadZip } from "client-zip";
 import AttachmentFilter from '../Attachments/AttachmentFilter';
@@ -149,9 +152,15 @@ export const RecordsLog = ({
     (state) => state.foiRequests.foiRequestRecords
   );
 
+ let pdfStitchStatus = useSelector(
+    (state) => state.foiRequests.foiPDFStitchStatusForHarms
+  );
+
+  let pdfStitchedRecord = useSelector(
+    (state) => state.foiRequests.foiPDFStitchedRecordForHarms
+  );  
   const classes = useStyles();
   const [records, setRecords] = useState(recordsObj?.records);
-
 
   useEffect(() => {
     setRecords(recordsObj?.records)
@@ -180,6 +189,37 @@ export const RecordsLog = ({
   const [searchValue, setSearchValue] = useState("");
   const [filterValue, setFilterValue] = useState(-1);
   const [fullnameList, setFullnameList] = useState(getFullnameList);
+  const [currentDownload, setCurrentDownload] = useState(0) 
+  const [isDownloadInProgress, setIsDownloadInProgress] = useState(false)
+  const [isDownloadReady, setIsDownloadReady] = useState(false)
+  const [isDownloadFailed, setIsDownloadFailed] = useState(false)
+  
+  useEffect(() => {
+    switch(pdfStitchStatus) {      
+      case "started":
+      case "pushedtostream":
+        setIsDownloadInProgress(true);
+        setIsDownloadReady(false);
+        setIsDownloadFailed(false);
+        break;
+      case "completed":
+        dispatch(fetchPDFStitchedRecordForHarms(requestId, ministryId));
+        setIsDownloadInProgress(false);
+        setIsDownloadReady(true);
+        setIsDownloadFailed(false);
+        break;
+      case "error":
+        setIsDownloadInProgress(false);
+        setIsDownloadReady(false);
+        setIsDownloadFailed(true);
+        break;
+      default:
+        setIsDownloadInProgress(false);
+        setIsDownloadReady(false);
+        setIsDownloadFailed(false);
+        break;
+    }
+  }, [pdfStitchStatus, requestId, ministryId])
 
   const addAttachments = () => {
     setModalFor('add');
@@ -309,6 +349,111 @@ export const RecordsLog = ({
         });
       }
     }, 'records', bcgovcode);
+  }  
+
+  const handleDownloadChange = (e) => {
+    if (e.target.value === 1 && ["not started", "error"].includes(pdfStitchStatus)) {
+      toast.info("In progress. You will be notified when the records are ready for download.", {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: true,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "colored",
+        backgroundColor: "#FFA500"
+      });
+      setIsDownloadInProgress(true);      
+      setIsDownloadReady(false);
+      setIsDownloadFailed(false);           
+      downloadLinearHarmsDocuments()      
+    }
+    else if (e.target.value === 1 && pdfStitchStatus === "completed") {
+      const s3filepath = pdfStitchedRecord?.finalpackagepath
+      const filename = requestNumber + ".zip"
+      getFOIS3DocumentPreSignedUrl(s3filepath?.split('/').slice(4).join('/'), ministryId, dispatch, (err, res) => {
+        if (!err) {
+          getFileFromS3({filepath: res}, (_err, response) => {
+            let blob = new Blob([response.data], {type: "application/octet-stream"});
+            saveAs(blob, filename)
+          });
+        }
+      }, 'records', bcgovcode);
+    }
+    setCurrentDownload(e.target.value); 
+  }
+
+  const downloadLinearHarmsDocuments = () => {
+    let exporting = recordsObj?.records.filter(record => !record.isduplicate)
+    for (let record of exporting) {
+      if (record.attachments) for (let attachment of record.attachments) {
+        if (!attachment.isduplicate) exporting.push(attachment);
+      }
+    }
+    try {
+      let message = {       
+        attributes: []
+      }
+      let attributes = [];      
+      for (let record of exporting) {
+        const fileObj = {}
+        const attributeObj = {files: []}
+        let filepath = record.s3uripath
+        let filename = record.filename
+        if (record.isredactionready && ['.doc','.docx','.xls','.xlsx', '.ics', '.msg'].includes(record.attributes?.extension)) {
+          filepath = filepath.substr(0, filepath.lastIndexOf(".")) + ".pdf";
+          filename += ".pdf";
+        }
+        fileObj.recordid = record.recordid;
+        fileObj.filename = filename;
+        fileObj.s3uripath = filepath;
+        fileObj.lastmodified = record.attributes.lastmodified;
+        for (let division of record.attributes.divisions) {
+          attributeObj.divisionid = division.divisionid
+          attributeObj.divisionname = division.divisionname?.replace("'", "")
+          attributeObj.files.push(fileObj)
+        }
+        //attributes will have unique files array and division combination
+        attributes.push(attributeObj)        
+      }
+
+      //This will return the result by merging the files with same division id (order by lastmodified asc)
+      let result = attributes.reduce((acc, val) => {
+        let found = acc.find((findval) => val.divisionid === findval.divisionid);
+        if (!found) acc.push(val)
+        else found.files = found.files.concat(
+          val.files.filter((f) => !found.files.find((findval) => f.filename === findval.filename))).sort((a,b) => {
+                return new Date(Date.parse(a.lastmodified)) - new Date(Date.parse(b.lastmodified))
+              });
+        return acc;
+      }, []);
+
+      message.requestnumber = requestNumber
+      message.bcgovcode = bcgovcode
+      message.attributes = result
+      message.category = RecordDownloadCategory.harms
+
+      dispatch(triggerDownloadFOIRecordsForHarms(requestId, ministryId, message,(err, _res) => {
+        dispatchRequestAttachment(err);
+    }));
+
+    } catch (error) {
+      console.log(error)
+      toast.error(
+        "Temporarily unable to process your request. Please try again in a few minutes.",
+        {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: true,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+        }
+      );
+    }
+
   }
 
   const downloadAllDocuments = async () => {
@@ -391,6 +536,7 @@ export const RecordsLog = ({
   }
 
   const hasDocumentsToExport = records.filter(record => !(isMinistryCoordinator && record.category == 'personal')).length > 0;
+  const hasDocumentsToDownload = records.filter(record => record.category !== 'personal').length > 0;
 
   const handlePopupButtonClick = (action, _record) => {
     setUpdateAttachment(_record);
@@ -470,6 +616,12 @@ export const RecordsLog = ({
     return `Request #U-00${requestId}`;
   }
 
+  const getCurrentDownload = () => {
+    if (currentDownload === 1 && isDownloadInProgress)
+      return 0;
+    return currentDownload;
+  }
+
   // const onFilterChange = (filterValue) => {
     // let _filteredRecords = filterValue === "" ?
     // records.records :
@@ -525,6 +677,14 @@ export const RecordsLog = ({
                 {getRequestNumber()}
               </h1>
             </Grid>
+          </Grid>
+          <Grid
+            container
+            direction="row"
+            justify="flex-start"
+            alignItems="flex-start"
+            spacing={1}
+          >
             <Grid item xs={2}>
               <ConditionalComponent condition={records.filter(record => record.attachments?.length > 0).length > 0}>
                 <button
@@ -537,7 +697,63 @@ export const RecordsLog = ({
                 </button>
               </ConditionalComponent>
             </Grid>
-            <Grid item xs={2}>
+            <Grid item xs={3}>
+              <ConditionalComponent condition={hasDocumentsToDownload}>
+              <TextField
+              className="download-dropdown custom-select-wrapper foi-download-button"
+              id="download"
+              label={currentDownload === 0 ? "Download" : ""}
+              inputProps={{ "aria-labelledby": "download-label" }}
+            //   InputProps={{
+            //     startAdornment: isDownloadInProgress && <InputAdornment position="start">
+            //       {/* <CircularProgress class="download-progress-adornment"/> */}
+            //       {/* <CircularProgress/> */}
+            //       record.isredactionready ?
+            //       <FontAwesomeIcon icon={faCheckCircle} size='2x' color='#1B8103' className={classes.statusIcons}/>:
+            // record.failed ?
+            // <FontAwesomeIcon icon={faExclamationCircle} size='2x' color='#A0192F' className={classes.statusIcons}/>:
+            // <FontAwesomeIcon icon={faSpinner} size='2x' color='#FAA915' className={classes.statusIcons}/>
+            //       </InputAdornment>
+            //   }}
+              InputLabelProps={{ shrink: false }}
+              select
+              name="download"
+              value={currentDownload}
+              onChange={handleDownloadChange}
+              placeholder="Download"
+              variant="outlined"
+              size="small"
+              fullWidth
+            >
+              {RecordsDownloadList.map((item, index) => {
+
+                if (item.id !=0) {
+                  return (
+                      <MenuItem
+                        className="download-menu-item"
+                        key={item.id}
+                        value={index}
+                        disabled={item.disabled}
+                        sx={{ display: 'flex' }}
+                      >
+                        {
+                          !item.disabled && (isDownloadReady && !item.disabled ?
+                          <FontAwesomeIcon icon={faCheckCircle} size='2x' color='#1B8103' className={classes.statusIcons}/>:
+                          isDownloadFailed && !item.disabled ?
+                          <FontAwesomeIcon icon={faExclamationCircle} size='2x' color='#A0192F' className={classes.statusIcons}/>:
+                          isDownloadInProgress && !item.disabled ? <FontAwesomeIcon icon={faSpinner} size='2x' color='#FAA915' className={classes.statusIcons}/>:null) 
+                        }
+                        {item.label}
+                      </MenuItem>
+                    // </>
+                  )
+                }
+
+              } )}
+            </TextField>
+              </ConditionalComponent>
+            </Grid>
+            {/* <Grid item xs={2}>
               <ConditionalComponent condition={hasDocumentsToExport}>
                 <button
                   className="btn addAttachment foi-export-button"
@@ -548,7 +764,7 @@ export const RecordsLog = ({
                   Export Shown
                 </button>
               </ConditionalComponent>
-            </Grid>
+            </Grid> */}
             <Grid item xs={2}>
               {isMinistryCoordinator ?
                 <button

@@ -83,6 +83,18 @@ export const setFOIMinistryViewRequestDetail = (data) => dispatch =>{
         payload:data
     })
 }
+export const setFOIPDFStitchedRecordForHarms = (data) => dispatch =>{
+    dispatch({
+        type:FOI_ACTION_CONSTANTS.FOI_PDF_STITCHED_RECORD_FOR_HARMS,
+        payload:data
+    })
+}
+export const setFOIPDFStitchStatusForHarms = (data) => dispatch =>{
+    dispatch({
+        type:FOI_ACTION_CONSTANTS.FOI_PDF_STITCHED_STATUS_FOR_HARMS,
+        payload:data
+    })
+}
 export const serviceActionError = (_data) => dispatch => {
    //TODO update to a common file
     dispatch({

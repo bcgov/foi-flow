@@ -10,11 +10,68 @@ import {
     setRequestRecords,
     setRecordFormats,
     setFOILoader,
+    setFOIPDFStitchedRecordForHarms,
+    setFOIPDFStitchStatusForHarms
   } from "../../../actions/FOI/foiRequestActions";
   import {fnDone} from './foiServicesUtil';
   import UserService from "../../../services/UserService";
   import { replaceUrl } from "../../../helper/FOI/helper";
   import { FOI_RECORD_FORMATS } from "../../../constants/constants";
+
+export const fetchPDFStitchedRecordForHarms = (requestId, ministryId, ...rest) => {
+  if (!ministryId) {
+    return () => {};
+  }
+  const done = fnDone(rest);
+  let apiUrl = replaceUrl(replaceUrl(
+    API.FOI_DOWNLOAD_RECORDS_FOR_HARMS,
+    "<ministryrequestid>", ministryId),
+    "<requestid>", requestId);
+  return (dispatch) => {
+    httpGETRequest(apiUrl, {}, UserService.getToken())
+      .then((res) => {
+        if (res.data) {
+          dispatch(setFOIPDFStitchedRecordForHarms(res.data));
+          done(null, res.data);
+
+        } else {
+          console.log("Error in fetching records", res);
+          dispatch(serviceActionError(res));
+        }
+      })
+      .catch((error) => {
+        console.log("Error in fetching records", error);
+        dispatch(serviceActionError(error));
+        done(error);
+      });
+  };
+};
+
+export const fetchPDFStitchStatusForHarms = (requestId, ministryId, ...rest) => {
+  if (!ministryId) {
+    return () => {};
+  }
+  const done = fnDone(rest);
+  let apiUrl = replaceUrl(replaceUrl(
+    API.FOI_PDF_STITCH_STATUS_FOR_HARMS,
+    "<ministryrequestid>", ministryId),
+    "<requestid>", requestId);
+  return (dispatch) => {
+    httpGETRequest(apiUrl, {}, UserService.getToken())
+      .then((res) => {
+        if (res.data) {
+          dispatch(setFOIPDFStitchStatusForHarms(res.data));
+          done(null, res.data);
+
+        }
+      })
+      .catch((error) => {
+        console.log("Error in fetching pdfstitch job status", error);
+        dispatch(serviceActionError(error));
+        done(error);
+      });
+  };
+};
 
 export const fetchFOIRecords = (requestId, ministryId, ...rest) => {
   if (!ministryId) {
@@ -91,12 +148,22 @@ export const deleteReviewerRecords = (filepaths, ...rest) => {
     };
 };
 
-const postRecord = (dispatch, apiUrl, data, errorMessage, rest) => {
+export const triggerDownloadFOIRecordsForHarms = (requestId, ministryId, data, ...rest) => {
+  let apiUrl = replaceUrl(replaceUrl(
+    API.FOI_TRIGGER_DOWNLOAD_RECORDS_FOR_HARMS,
+   "<ministryrequestid>", ministryId),
+   "<requestid>", requestId);
+  return (dispatch) => {
+    postRecord(dispatch, apiUrl, data, "Error in posting records", rest, "download");
+  };
+};
+
+const postRecord = (dispatch, apiUrl, data, errorMessage, rest, type="download") => {
   const done = fnDone(rest);
   httpPOSTRequest(apiUrl, data)
       .then((res) => {
         if (res.data && res.data.status) {
-          dispatch(setFOIAttachmentListLoader(false));
+            dispatch(setFOIAttachmentListLoader(false));
           done(null, res.data);
         } else {
           dispatch(serviceActionError(res));
