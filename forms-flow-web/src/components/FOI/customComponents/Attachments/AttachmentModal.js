@@ -71,7 +71,15 @@ export default function AttachmentModal({
       });
     }
 
-    const mimeTypes = multipleFiles ? (uploadFor === 'attachment' ? MimeTypeList.attachmentLog : MimeTypeList.recordsLog ): MimeTypeList.stateTransition;
+    const recordFormats = useSelector((state) => state.foiRequests.recordFormats)
+    useEffect(() => {
+      setMimeTypes(multipleFiles ?
+        (uploadFor === 'attachment' ? MimeTypeList.attachmentLog : recordFormats)
+        : MimeTypeList.stateTransition);
+    }, [recordFormats])
+    const [mimeTypes, setMimeTypes] = useState(multipleFiles ?
+      (uploadFor === 'attachment' ? MimeTypeList.attachmentLog : recordFormats)
+      : MimeTypeList.stateTransition);
     const maxFileSize = uploadFor === 'record' ? MaxFileSizeInMB.totalFileSize : multipleFiles ? MaxFileSizeInMB.attachmentLog : MaxFileSizeInMB.stateTransition;
     const totalFileSize = multipleFiles ? MaxFileSizeInMB.totalFileSize : MaxFileSizeInMB.stateTransition;
     const classes = useStyles();
