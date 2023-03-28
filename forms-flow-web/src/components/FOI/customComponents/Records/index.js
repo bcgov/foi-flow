@@ -236,7 +236,7 @@ export const RecordsLog = ({
     if (modalFor === 'delete' && value) {
       //const documentId = ministryId ? updateAttachment.foiministrydocumentid : updateAttachment.foidocumentid;
       if (updateAttachment.isattachment) {
-        dispatch(deleteReviewerRecords({filepaths: [updateAttachment]},(err, _res) => {
+        dispatch(deleteReviewerRecords({filepaths: [updateAttachment], ministryrequestid: ministryId },(err, _res) => {
           dispatchRequestAttachment(err);
         }));
       } else {
