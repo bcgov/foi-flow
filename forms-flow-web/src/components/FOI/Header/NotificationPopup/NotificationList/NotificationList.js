@@ -60,6 +60,9 @@ const NotificationList = ({notification, isMinistry, ministryCode}) => {
             getStatusAndRedirect(err, res);
         }));
     }
+    else if (checkPDFStitchType(notificationVal.notificationtype)) {
+      setRecordsUrl();
+    }
     else{
       setRedirectUrl();
     }
@@ -68,6 +71,10 @@ const NotificationList = ({notification, isMinistry, ministryCode}) => {
   const checkCommentType = (type) => {
     return !!(type === 'New User Comments' || type === 'Reply User Comments' ||
       type === 'Tagged User Comments');
+  }
+
+  const checkPDFStitchType = (type) => {
+    return !!(type === 'PDFStitch');
   }
 
   const commentTitle = (type) => {
@@ -123,6 +130,15 @@ const NotificationList = ({notification, isMinistry, ministryCode}) => {
       else
         url = `/foi/foirequests/${notification.foirequestid}/ministryrequest/${notification.requestid}/comments`;
     }
+    window.location.href=url;
+  }
+
+  const setRecordsUrl = () =>{
+    let url = "";    
+    if(isMinistry)
+      url = `/foi/ministryreview/${notification.foirequestid}/ministryrequest/${notification.requestid}/records`;
+    else
+      url = `/foi/foirequests/${notification.foirequestid}/ministryrequest/${notification.requestid}/records`;
     window.location.href=url;
   }
 

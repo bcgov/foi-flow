@@ -34,7 +34,7 @@ class notificationuser:
         return notificationusers    
     
     def __isignorable(self, notificationuser, users, userid, notificationtype):
-        if notificationuser["userid"] == userid and "Records" not in notificationtype:
+        if notificationuser["userid"] == userid and notificationtype not in ["Records", "PDFStitch"]:
             return True
         else: 
             for user in users:
