@@ -21,7 +21,7 @@
    </GlobalVariableEntity>
    <GlobalVariableEntity>
       <description></description>
-      <initValue>'foiIntake'</initValue>
+      <initValue>'Intake'</initValue>
       <name>firstname</name>
    </GlobalVariableEntity>
    <GlobalVariableEntity>

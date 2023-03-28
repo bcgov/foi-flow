@@ -13,8 +13,12 @@
          <key>XPATH</key>
          <value>//div[@id='CFRForm']/div/form/div/div[2]/div[3]/div/div[2]/div/div/div/div/div[2]/div[2]</value>
       </entry>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[(text() = '$270.8' or . = '$270.8')]</value>
+      </entry>
    </selectorCollection>
-   <selectorMethod>BASIC</selectorMethod>
+   <selectorMethod>XPATH</selectorMethod>
    <useRalativeImagePath>true</useRalativeImagePath>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -22,7 +26,7 @@
       <name>tag</name>
       <type>Main</type>
       <value>div</value>
-      <webElementGuid>eb1b0df1-881f-4dd4-ad63-7bb2535a5644</webElementGuid>
+      <webElementGuid>f25f2d02-6451-42c1-a059-ae2236d48b5f</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -30,7 +34,7 @@
       <name>class</name>
       <type>Main</type>
       <value>col-lg-2 foi-details-col</value>
-      <webElementGuid>baeed023-ea51-4bde-a88b-1891f210832e</webElementGuid>
+      <webElementGuid>c0c154b3-d9bd-47d4-a792-cd84a3313acd</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>true</isSelected>
@@ -38,7 +42,7 @@
       <name>text</name>
       <type>Main</type>
       <value>$270.8</value>
-      <webElementGuid>004b406c-b776-4456-81dd-c770a50c3084</webElementGuid>
+      <webElementGuid>33e3c1ce-0b56-4cc8-9344-84e3b6a59cf0</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -46,7 +50,7 @@
       <name>xpath</name>
       <type>Main</type>
       <value>id(&quot;CFRForm&quot;)/div[@class=&quot;foi-review-container&quot;]/form[@class=&quot;MuiBox-root css-1cidgyh&quot;]/div[@class=&quot;foi-request-form&quot;]/div[@class=&quot;container foi-review-request-container cfrform-container&quot;]/div[@class=&quot;request-accordian&quot;]/div[@class=&quot;MuiPaper-root MuiPaper-elevation MuiPaper-rounded MuiPaper-elevation1 MuiAccordion-root MuiAccordion-rounded Mui-expanded MuiAccordion-gutters css-67l5gl&quot;]/div[@class=&quot;MuiCollapse-root MuiCollapse-vertical MuiCollapse-entered css-c4sutr&quot;]/div[@class=&quot;MuiCollapse-wrapper MuiCollapse-vertical css-hboir5&quot;]/div[@class=&quot;MuiCollapse-wrapperInner MuiCollapse-vertical css-8atqhb&quot;]/div[@class=&quot;MuiAccordion-region&quot;]/div[@class=&quot;MuiAccordionDetails-root css-u7qq7e&quot;]/div[@class=&quot;row cfr-fee-totals&quot;]/div[@class=&quot;col-lg-2 foi-details-col&quot;]</value>
-      <webElementGuid>731694d1-66b3-4bd4-abd0-4ac3829ddda4</webElementGuid>
+      <webElementGuid>786eb557-8792-46cd-aa8a-d09b619f2910</webElementGuid>
    </webElementProperties>
    <webElementXpaths>
       <isSelected>true</isSelected>
@@ -54,7 +58,7 @@
       <name>xpath:idRelative</name>
       <type>Main</type>
       <value>//div[@id='CFRForm']/div/form/div/div[2]/div[3]/div/div[2]/div/div/div/div/div[2]/div[2]</value>
-      <webElementGuid>62139c19-bce4-483a-acca-2313f8ff70f2</webElementGuid>
+      <webElementGuid>f041ad9e-6a8d-4cea-9f57-9042ffe04238</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -62,7 +66,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>(.//*[normalize-space(text()) and normalize-space(.)='Estimated Total'])[1]/following::div[1]</value>
-      <webElementGuid>05927546-bd91-463e-93ca-03b44d87d67a</webElementGuid>
+      <webElementGuid>5eccb1bd-724f-49a4-995a-6606e9952500</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -70,7 +74,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>(.//*[normalize-space(text()) and normalize-space(.)='Balance Remaining'])[2]/following::div[3]</value>
-      <webElementGuid>c5ff75f9-2d08-4bf3-b6dd-22b795012b63</webElementGuid>
+      <webElementGuid>aed2f889-2407-47ed-9ac7-365967bdf555</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -78,7 +82,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>(.//*[normalize-space(text()) and normalize-space(.)='Actual Total'])[1]/preceding::div[1]</value>
-      <webElementGuid>fa6eefdf-5be0-4ce3-959d-05f199a24221</webElementGuid>
+      <webElementGuid>3fb14f62-51b2-48e3-b9fb-c5abf0ab024e</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -86,7 +90,7 @@
       <name>xpath:position</name>
       <type>Main</type>
       <value>//div[2]/div[3]/div/div[2]/div/div/div/div/div[2]/div[2]</value>
-      <webElementGuid>b1fff761-95aa-488e-bdf0-9b7ff4dd5d5b</webElementGuid>
+      <webElementGuid>92bf6483-ea38-4455-9fa8-1812fd93c000</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -94,6 +98,6 @@
       <name>xpath:customAttributes</name>
       <type>Main</type>
       <value>//div[(text() = '$270.8' or . = '$270.8')]</value>
-      <webElementGuid>f11fe688-6627-4d23-b4fc-d583189a8af6</webElementGuid>
+      <webElementGuid>981df73d-5e93-4a01-ae7c-5d72daef9b8e</webElementGuid>
    </webElementXpaths>
 </WebElementEntity>

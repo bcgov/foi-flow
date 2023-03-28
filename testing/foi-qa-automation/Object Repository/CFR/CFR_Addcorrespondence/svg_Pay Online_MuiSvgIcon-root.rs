@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>svg_Pay Online_MuiSvgIcon-root</name>
+   <tag></tag>
+   <elementGuidId>ca0f95d6-f3fb-4376-b436-4758ae7aa55e</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>CSS</key>
+         <value>div.userActions > div > #ellipse-icon-0 > span.MuiIconButton-label > svg.MuiSvgIcon-root</value>
+      </entry>
+      <entry>
+         <key>XPATH</key>
+         <value>(.//*[normalize-space(text()) and normalize-space(.)='Pay Online'])[1]/following::*[name()='svg'][1]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>XPATH</selectorMethod>
+   <useRalativeImagePath>true</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>tag</name>
+      <type>Main</type>
+      <value>svg</value>
+      <webElementGuid>e78f1785-dac1-4a15-bb64-1dff8f22560e</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>class</name>
+      <type>Main</type>
+      <value>MuiSvgIcon-root</value>
+      <webElementGuid>1be0e2d8-1ac6-4062-8ed1-6450e62802fc</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>focusable</name>
+      <type>Main</type>
+      <value>false</value>
+      <webElementGuid>ee2a6b70-73bc-433c-af30-8bf0adde2852</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>viewBox</name>
+      <type>Main</type>
+      <value>0 0 24 24</value>
+      <webElementGuid>c747f47f-e4f2-4ffa-81fb-38501bf3d1e8</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>aria-hidden</name>
+      <type>Main</type>
+      <value>true</value>
+      <webElementGuid>06ad26b1-c465-4b5a-a356-ab9450cbeb11</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>id(&quot;ContactApplicant&quot;)/div[@class=&quot;contact-applicant-container&quot;]/div[3]/div[@class=&quot;commentsection&quot;]/div[@class=&quot;halfDiv&quot;]/div[@class=&quot;userActions&quot;]/div[1]/button[@id=&quot;ellipse-icon-0&quot;]/span[@class=&quot;MuiIconButton-label&quot;]/svg[@class=&quot;MuiSvgIcon-root&quot;]</value>
+      <webElementGuid>fe415ebe-a4d2-40e6-9cad-13699300955d</webElementGuid>
+   </webElementProperties>
+   <webElementXpaths>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='Pay Online'])[1]/following::*[name()='svg'][1]</value>
+      <webElementGuid>51b655ed-2791-4633-a2e8-1521b8acd8ef</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='Flex, Intake'])[2]/following::*[name()='svg'][1]</value>
+      <webElementGuid>8074f34f-7218-429a-9282-332bd7253136</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='test2.pdf'])[2]/preceding::*[name()='svg'][1]</value>
+      <webElementGuid>88fa2b90-1265-49ed-ab81-b7d5897aab09</webElementGuid>
+   </webElementXpaths>
+</WebElementEntity>

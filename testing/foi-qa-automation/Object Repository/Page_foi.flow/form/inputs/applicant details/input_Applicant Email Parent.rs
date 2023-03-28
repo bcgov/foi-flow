@@ -6,22 +6,22 @@
    <elementGuidId>7c163dba-0f3b-4730-8404-6204b4a36cb6</elementGuidId>
    <selectorCollection>
       <entry>
-         <key>XPATH</key>
-         <value>//input[@id='email']//ancestor::div[1]</value>
+         <key>CSS</key>
+         <value>input.MuiInputBase-input.MuiOutlinedInput-input</value>
       </entry>
       <entry>
          <key>IMAGE</key>
       </entry>
       <entry>
-         <key>CSS</key>
-         <value>input.MuiInputBase-input.MuiOutlinedInput-input</value>
+         <key>XPATH</key>
+         <value>//input[@id='email']//ancestor::div[1]</value>
       </entry>
       <entry>
          <key>BASIC</key>
          <value>//*[@type = 'text']</value>
       </entry>
    </selectorCollection>
-   <selectorMethod>XPATH</selectorMethod>
+   <selectorMethod>BASIC</selectorMethod>
    <useRalativeImagePath>true</useRalativeImagePath>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -29,6 +29,7 @@
       <name>tag</name>
       <type>Main</type>
       <value>input</value>
+      <webElementGuid>c373e106-c46c-4707-970f-f4cc6b3d47da</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -36,6 +37,7 @@
       <name>aria-invalid</name>
       <type>Main</type>
       <value>true</value>
+      <webElementGuid>473a4a9e-cc64-46ad-ad77-5cbad892302c</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>true</isSelected>
@@ -43,6 +45,7 @@
       <name>type</name>
       <type>Main</type>
       <value>text</value>
+      <webElementGuid>b0624bc3-04d4-4a83-a8b2-ab6128ddbb2b</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -50,6 +53,7 @@
       <name>class</name>
       <type>Main</type>
       <value>MuiInputBase-input MuiOutlinedInput-input</value>
+      <webElementGuid>b8c6adfe-fe58-4391-986f-b05f114cefd4</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -57,6 +61,7 @@
       <name>xpath</name>
       <type>Main</type>
       <value>id(&quot;Request&quot;)/div[@class=&quot;container foi-review-request-container&quot;]/div[@class=&quot;foi-review-container&quot;]/form[@class=&quot;jss5 foi-request-form&quot;]/div[@class=&quot;MuiPaper-root MuiCard-root foi-details-card MuiPaper-elevation1 MuiPaper-rounded&quot;]/div[@class=&quot;MuiCardContent-root&quot;]/div[@class=&quot;row foi-details-row&quot;]/div[@class=&quot;col-lg-6 foi-details-col&quot;]/div[@class=&quot;MuiFormControl-root MuiTextField-root MuiFormControl-fullWidth&quot;]/div[@class=&quot;MuiInputBase-root MuiOutlinedInput-root Mui-error Mui-error MuiInputBase-fullWidth Mui-focused Mui-focused MuiInputBase-formControl&quot;]/input[@class=&quot;MuiInputBase-input MuiOutlinedInput-input&quot;]</value>
+      <webElementGuid>93302f75-4179-4bcf-aee1-f13e9372395b</webElementGuid>
    </webElementProperties>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -64,5 +69,6 @@
       <name>xpath:idRelative</name>
       <type>Main</type>
       <value>//div[@id='Request']/div/div/form/div[3]/div/div/div/div[3]/div/input</value>
+      <webElementGuid>808a1975-721d-43c6-8a79-bd3de73a6b21</webElementGuid>
    </webElementXpaths>
 </WebElementEntity>

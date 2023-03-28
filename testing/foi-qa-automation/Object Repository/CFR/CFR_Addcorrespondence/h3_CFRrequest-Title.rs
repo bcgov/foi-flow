@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>h3_CFRrequest-Title</name>
+   <tag></tag>
+   <elementGuidId>144e1afe-502c-4282-8626-650b9701b3db</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>CSS</key>
+         <value>div.foi-request-number-header > h3.foi-review-request-text</value>
+      </entry>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[(text() = 'ABC-2099-13995' or . = 'ABC-2099-13995')]</value>
+      </entry>
+      <entry>
+         <key>XPATH</key>
+         <value>//div[@id='CFRForm']/div/form/div/div[2]/div/div/div/h3</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>XPATH</selectorMethod>
+   <useRalativeImagePath>true</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>tag</name>
+      <type>Main</type>
+      <value>h3</value>
+      <webElementGuid>25251504-70b0-40e9-ab84-97b23f5f12fd</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>class</name>
+      <type>Main</type>
+      <value>foi-review-request-text</value>
+      <webElementGuid>816de145-e8b7-428d-81b6-b6965f475588</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>text</name>
+      <type>Main</type>
+      <value>ABC-2099-13995</value>
+      <webElementGuid>d7523372-0f3d-49cb-9b49-1cc8a6a93f91</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>id(&quot;CFRForm&quot;)/div[@class=&quot;foi-review-container&quot;]/form[@class=&quot;MuiBox-root css-1cidgyh&quot;]/div[@class=&quot;foi-request-form&quot;]/div[@class=&quot;container foi-review-request-container cfrform-container&quot;]/div[@class=&quot;foi-request-review-header-row1&quot;]/div[@class=&quot;foi-request-review-header-col1&quot;]/div[@class=&quot;foi-request-number-header&quot;]/h3[@class=&quot;foi-review-request-text&quot;]</value>
+      <webElementGuid>e226daa1-05e8-41f3-bd90-5402e28bc8f9</webElementGuid>
+   </webElementProperties>
+   <webElementXpaths>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:idRelative</name>
+      <type>Main</type>
+      <value>//div[@id='CFRForm']/div/form/div/div[2]/div/div/div/h3</value>
+      <webElementGuid>d0592696-54d8-4700-9faa-3441f4f6c50a</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='Flex, Intake'])[1]/following::h3[1]</value>
+      <webElementGuid>f0a68937-958b-4a81-9392-1a1469443cc4</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='Applicant'])[1]/following::h3[1]</value>
+      <webElementGuid>e4f1fea7-40b2-4a7e-9b94-a36e222bbbda</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='Version 1'])[1]/preceding::h3[1]</value>
+      <webElementGuid>b19771ac-4722-4dcf-82d8-935ab5a45c01</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:position</name>
+      <type>Main</type>
+      <value>//div/h3</value>
+      <webElementGuid>c696be1b-f572-4187-8c91-d10ba0ddf3aa</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:customAttributes</name>
+      <type>Main</type>
+      <value>//h3[(text() = 'ABC-2099-13995' or . = 'ABC-2099-13995')]</value>
+      <webElementGuid>84c2bb73-7aa4-4772-a970-3d262e202cbf</webElementGuid>
+   </webElementXpaths>
+</WebElementEntity>

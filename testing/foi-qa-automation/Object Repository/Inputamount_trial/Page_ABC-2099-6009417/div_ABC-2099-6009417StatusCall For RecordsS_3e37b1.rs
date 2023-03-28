@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>div_ABC-2099-6009417StatusCall For RecordsS_3e37b1</name>
+   <tag></tag>
+   <elementGuidId>761edd52-ede3-4a88-8045-c181265213a9</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>CSS</key>
+         <value>div.foitabheadercollection.foitabheaderCFRG</value>
+      </entry>
+      <entry>
+         <key>XPATH</key>
+         <value>//div[@id='app']/div/div[3]/div/div</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>XPATH</selectorMethod>
+   <useRalativeImagePath>true</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>tag</name>
+      <type>Main</type>
+      <value>div</value>
+      <webElementGuid>f7ef2e72-277f-4380-bf5e-5419a9c50919</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>class</name>
+      <type>Main</type>
+      <value>foitabheadercollection foitabheaderCFRG</value>
+      <webElementGuid>07ecd063-f811-4052-8f08-ad59ced8ef11</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>text</name>
+      <type>Main</type>
+      <value>ABC-2099-6009417StatusCall For RecordsStatusRequestCFR FormAttachmentsComments (2)CFR Due in 10 Days283 Days OverdueExtensions 0</value>
+      <webElementGuid>1c1b5b91-58af-45f8-8be8-0237f79808f1</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>id(&quot;app&quot;)/div[1]/div[@class=&quot;foiformcontent&quot;]/div[@class=&quot;foitabbedContainer&quot;]/div[@class=&quot;foitabheadercollection foitabheaderCFRG&quot;]</value>
+      <webElementGuid>3ad3247d-b478-400a-972c-fe2cabfa8e1b</webElementGuid>
+   </webElementProperties>
+   <webElementXpaths>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:idRelative</name>
+      <type>Main</type>
+      <value>//div[@id='app']/div/div[3]/div/div</value>
+      <webElementGuid>56a61fd5-2c6a-4b6a-9743-f80ecf827a5a</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='Sign Out'])[1]/following::div[3]</value>
+      <webElementGuid>84c30a46-961d-4002-9353-9baa5b8803c7</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:position</name>
+      <type>Main</type>
+      <value>//div[3]/div/div</value>
+      <webElementGuid>ef361f39-8d71-46c8-8354-79fed58710b0</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:customAttributes</name>
+      <type>Main</type>
+      <value>//div[(text() = 'ABC-2099-6009417StatusCall For RecordsStatusRequestCFR FormAttachmentsComments (2)CFR Due in 10 Days283 Days OverdueExtensions 0' or . = 'ABC-2099-6009417StatusCall For RecordsStatusRequestCFR FormAttachmentsComments (2)CFR Due in 10 Days283 Days OverdueExtensions 0')]</value>
+      <webElementGuid>14b957f5-09f9-41b5-b5ff-f68cd05c78d8</webElementGuid>
+   </webElementXpaths>
+</WebElementEntity>

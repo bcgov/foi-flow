@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>button_CFR Form History</name>
+   <tag></tag>
+   <elementGuidId>c5f1250e-02f3-46a0-b01f-65e3e569fc21</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@type = 'button' and (text() = 'CFR Form History' or . = 'CFR Form History')]</value>
+      </entry>
+      <entry>
+         <key>CSS</key>
+         <value>button.btn.btn-link.btn-cfr-history</value>
+      </entry>
+      <entry>
+         <key>XPATH</key>
+         <value>(//button[@type='button'])[5]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <useRalativeImagePath>true</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>tag</name>
+      <type>Main</type>
+      <value>button</value>
+      <webElementGuid>e4ffbe5e-62ef-408e-893c-d877091923cd</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>type</name>
+      <type>Main</type>
+      <value>button</value>
+      <webElementGuid>f4946415-2698-4033-848a-26c5d56c08d3</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>class</name>
+      <type>Main</type>
+      <value>btn btn-link btn-cfr-history</value>
+      <webElementGuid>329d104c-bcbf-4fda-a797-54667ee9a09a</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>text</name>
+      <type>Main</type>
+      <value>CFR Form History</value>
+      <webElementGuid>ac7d635a-af18-48ee-8227-b20d0afa93ff</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>id(&quot;CFRForm&quot;)/div[@class=&quot;foi-review-container&quot;]/form[@class=&quot;MuiBox-root css-1cidgyh&quot;]/div[@class=&quot;foi-request-form&quot;]/div[@class=&quot;container foi-review-request-container cfrform-container&quot;]/div[@class=&quot;cfr-history-button&quot;]/button[@class=&quot;btn btn-link btn-cfr-history&quot;]</value>
+      <webElementGuid>6ea68a69-359a-4626-b03e-62eb1b297e68</webElementGuid>
+   </webElementProperties>
+   <webElementXpaths>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:attributes</name>
+      <type>Main</type>
+      <value>(//button[@type='button'])[5]</value>
+      <webElementGuid>c4fe7e9a-4cac-4574-a676-e7c0819a952a</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:idRelative</name>
+      <type>Main</type>
+      <value>//div[@id='CFRForm']/div/form/div/div[2]/div[2]/button</value>
+      <webElementGuid>a4f40cff-4ab7-4e16-b97b-30f5772c9423</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='Revised Fee Estimate'])[1]/following::button[1]</value>
+      <webElementGuid>705e14af-24bd-4769-9658-5e7f11dc9d13</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='Amount Paid'])[1]/preceding::button[1]</value>
+      <webElementGuid>8b7e8ac7-4783-46b0-ba78-500f67cbd005</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='Amount Paid'])[2]/preceding::button[1]</value>
+      <webElementGuid>3a509e79-5d24-4c33-be4c-ae4d9d2bd5b8</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>//*/text()[normalize-space(.)='CFR Form History']/parent::*</value>
+      <webElementGuid>05a782a9-bb74-4b92-9323-7aaf6011640a</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:position</name>
+      <type>Main</type>
+      <value>//div[2]/button</value>
+      <webElementGuid>e13c6089-6507-4195-aebd-ed3fb30c5a6d</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:customAttributes</name>
+      <type>Main</type>
+      <value>//button[@type = 'button' and (text() = 'CFR Form History' or . = 'CFR Form History')]</value>
+      <webElementGuid>7e7125f2-8d41-450f-87c9-ec5637da5a90</webElementGuid>
+   </webElementXpaths>
+</WebElementEntity>

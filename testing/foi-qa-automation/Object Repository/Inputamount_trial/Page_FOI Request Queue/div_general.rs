@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>div_general</name>
+   <tag></tag>
+   <elementGuidId>286235c6-8e0e-4c6f-a04b-76fbd58e1715</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>CSS</key>
+         <value></value>
+      </entry>
+      <entry>
+         <key>XPATH</key>
+         <value>//div[@id='app']/div/div[3]/div/div[2]/div[2]/div/div[2]/div[2]/div/div/div/div[25]/div[4]/div</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>XPATH</selectorMethod>
+   <useRalativeImagePath>true</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>tag</name>
+      <type>Main</type>
+      <value>div</value>
+      <webElementGuid>bd77bf4d-fd16-4af7-9566-d9bec398aaf7</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>class</name>
+      <type>Main</type>
+      <value>MuiDataGrid-cellContent</value>
+      <webElementGuid>53d717c9-5c6e-413e-abc6-d2cb0da6011f</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>text</name>
+      <type>Main</type>
+      <value>general</value>
+      <webElementGuid>6399a317-2d60-480a-882a-775736cb6ba9</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>id(&quot;app&quot;)/div[1]/div[@class=&quot;container foi-container&quot;]/div[@class=&quot;MuiGrid-root MuiGrid-container MuiGrid-spacing-xs-1 foi-grid-container css-tuxzvu&quot;]/div[@class=&quot;MuiGrid-root MuiGrid-container MuiGrid-spacing-xs-1 css-19o37pk&quot;]/div[@class=&quot;MuiGrid-root MuiGrid-item MuiGrid-grid-xs-12 jss4 css-15j76c0&quot;]/div[@class=&quot;foi-data-grid MuiDataGrid-root MuiDataGrid-autoHeight css-1t75zoz&quot;]/div[@class=&quot;MuiDataGrid-main css-opb0c2&quot;]/div[2]/div[@class=&quot;MuiDataGrid-virtualScroller css-3enz1m&quot;]/div[@class=&quot;MuiDataGrid-virtualScrollerContent css-79elbk&quot;]/div[@class=&quot;MuiDataGrid-virtualScrollerRenderZone css-1inm7gi&quot;]/div[@class=&quot;super-app-theme--intakeinprogress MuiDataGrid-row&quot;]/div[@class=&quot;MuiDataGrid-cell MuiDataGrid-cell--textLeft&quot;]/div[@class=&quot;MuiDataGrid-cellContent&quot;]</value>
+      <webElementGuid>033ca147-a8d2-4eb1-8dd0-d3a99f656401</webElementGuid>
+   </webElementProperties>
+   <webElementXpaths>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:idRelative</name>
+      <type>Main</type>
+      <value>//div[@id='app']/div/div[3]/div/div[2]/div[2]/div/div[2]/div[2]/div/div/div/div[25]/div[4]/div</value>
+      <webElementGuid>06213bcb-c3ea-413c-a143-91ed18bc34ed</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='Individual'])[25]/following::div[2]</value>
+      <webElementGuid>f6ddba68-06ab-4f36-be32-be9a6cf6c009</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='Lastname, Firstname'])[24]/following::div[4]</value>
+      <webElementGuid>089c04b3-69ea-40b5-abc7-ac415a55e2cb</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='Intake in Progress'])[24]/preceding::div[1]</value>
+      <webElementGuid>289a79ff-c25a-408b-a297-2e70cc029b4b</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='Flex, Intake'])[25]/preceding::div[3]</value>
+      <webElementGuid>2ca194e0-b1ab-4955-9f4f-13c298e580a9</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:position</name>
+      <type>Main</type>
+      <value>//div[25]/div[4]/div</value>
+      <webElementGuid>39086624-f5ae-4878-a23c-1c495c930352</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:customAttributes</name>
+      <type>Main</type>
+      <value>//div[(text() = 'general' or . = 'general')]</value>
+      <webElementGuid>b58abfbe-f802-45ea-84e8-6e96d9ad5312</webElementGuid>
+   </webElementXpaths>
+</WebElementEntity>

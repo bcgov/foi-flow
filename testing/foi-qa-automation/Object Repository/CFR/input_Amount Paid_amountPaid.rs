@@ -13,8 +13,12 @@
          <key>XPATH</key>
          <value>//input[@id='amountpaid']</value>
       </entry>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@id = 'amountpaid' and @name = 'amountPaid' and @type = 'number']</value>
+      </entry>
    </selectorCollection>
-   <selectorMethod>XPATH</selectorMethod>
+   <selectorMethod>BASIC</selectorMethod>
    <useRalativeImagePath>true</useRalativeImagePath>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -22,7 +26,7 @@
       <name>tag</name>
       <type>Main</type>
       <value>input</value>
-      <webElementGuid>8b4d3547-ee11-48d6-a89e-35ff26735468</webElementGuid>
+      <webElementGuid>cf377506-c338-4b9c-8610-d0f28fca7caa</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -30,7 +34,7 @@
       <name>aria-invalid</name>
       <type>Main</type>
       <value>false</value>
-      <webElementGuid>a9c895e2-efaf-41eb-87b1-7a4360600ef0</webElementGuid>
+      <webElementGuid>ce3d1f64-c32c-44a6-b0a6-826a1e466a22</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>true</isSelected>
@@ -38,7 +42,7 @@
       <name>id</name>
       <type>Main</type>
       <value>amountpaid</value>
-      <webElementGuid>39541569-ce97-4053-b893-36d5633527c6</webElementGuid>
+      <webElementGuid>90b9bdda-8327-4961-b653-3b6d5876f09c</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>true</isSelected>
@@ -46,7 +50,7 @@
       <name>name</name>
       <type>Main</type>
       <value>amountPaid</value>
-      <webElementGuid>66beceaa-65c1-4837-ac45-59c8ad4c6d83</webElementGuid>
+      <webElementGuid>a4df2ecb-25f7-4f40-8d72-12a2ccb1bd76</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>true</isSelected>
@@ -54,7 +58,7 @@
       <name>type</name>
       <type>Main</type>
       <value>number</value>
-      <webElementGuid>975c5d8c-88f3-4104-86c5-181a438ea8ab</webElementGuid>
+      <webElementGuid>00afee30-532e-42df-ba24-afa3c31993f4</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -62,7 +66,7 @@
       <name>aria-labelledby</name>
       <type>Main</type>
       <value>amountpaid-label</value>
-      <webElementGuid>0484c091-e1fc-40af-8140-0c83868c9bc1</webElementGuid>
+      <webElementGuid>dda2b30d-eb7b-46da-86e4-cc83b81bcef5</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -70,7 +74,7 @@
       <name>step</name>
       <type>Main</type>
       <value>0.01</value>
-      <webElementGuid>fe6f915d-6102-470e-9dda-c55dc9e87f61</webElementGuid>
+      <webElementGuid>58af4a21-095e-4b71-bc99-c6e93bdca241</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -78,7 +82,7 @@
       <name>max</name>
       <type>Main</type>
       <value>0</value>
-      <webElementGuid>a17550fe-d6ec-4354-9f4d-25dfbe5296de</webElementGuid>
+      <webElementGuid>36ee133b-1b62-4747-b0d0-b47363a3e8fd</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -86,7 +90,7 @@
       <name>min</name>
       <type>Main</type>
       <value>0</value>
-      <webElementGuid>8ea49bdb-e588-4fb9-9576-f818ec7bc286</webElementGuid>
+      <webElementGuid>613b9ff0-02fc-4724-b3eb-1a48385bf18b</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -94,7 +98,7 @@
       <name>class</name>
       <type>Main</type>
       <value>MuiOutlinedInput-input MuiInputBase-input Mui-disabled MuiInputBase-inputAdornedStart css-1ixds2g</value>
-      <webElementGuid>edd65fe7-c57e-480a-bf4e-35826f691c75</webElementGuid>
+      <webElementGuid>796a376f-d28f-44c0-a09c-4a99be8a41ce</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -102,7 +106,7 @@
       <name>value</name>
       <type>Main</type>
       <value>0</value>
-      <webElementGuid>1236e0e4-9dbc-4003-88a9-f17f386bf9e9</webElementGuid>
+      <webElementGuid>c7ffedf4-d6f6-4693-8db6-e752a454cfbb</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -110,7 +114,7 @@
       <name>xpath</name>
       <type>Main</type>
       <value>id(&quot;amountpaid&quot;)</value>
-      <webElementGuid>5648804b-d8c1-4d97-97bd-e981a862e6a0</webElementGuid>
+      <webElementGuid>b7ee1a3d-38f1-42af-be66-258a90b6fabf</webElementGuid>
    </webElementProperties>
    <webElementXpaths>
       <isSelected>true</isSelected>
@@ -118,7 +122,7 @@
       <name>xpath:attributes</name>
       <type>Main</type>
       <value>//input[@id='amountpaid']</value>
-      <webElementGuid>898d282c-d13c-4ab5-9e2b-ff31796eeb85</webElementGuid>
+      <webElementGuid>3258badd-3067-42c9-bb43-accb1c05be25</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -126,7 +130,7 @@
       <name>xpath:idRelative</name>
       <type>Main</type>
       <value>//div[@id='CFRForm']/div/form/div/div[2]/div[3]/div/div[2]/div/div/div/div/div/div/div/div/input</value>
-      <webElementGuid>ee5c612e-89ba-4f74-871d-ea94a20b63cb</webElementGuid>
+      <webElementGuid>1bca60f3-7ac1-46da-9ca0-211bf40de5cf</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -134,7 +138,7 @@
       <name>xpath:position</name>
       <type>Main</type>
       <value>//div[2]/div[3]/div/div[2]/div/div/div/div/div/div/div/div/input</value>
-      <webElementGuid>7e87b7d2-1eb1-4dc5-a201-c7118016eb6a</webElementGuid>
+      <webElementGuid>16899c66-0b6f-4efe-ba8d-aed07f0d9f68</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -142,6 +146,6 @@
       <name>xpath:customAttributes</name>
       <type>Main</type>
       <value>//input[@id = 'amountpaid' and @name = 'amountPaid' and @type = 'number']</value>
-      <webElementGuid>d966782f-5cea-4794-a587-47b6f5d479a6</webElementGuid>
+      <webElementGuid>df5d2922-8335-4dc3-aa23-65203fe30ab6</webElementGuid>
    </webElementXpaths>
 </WebElementEntity>

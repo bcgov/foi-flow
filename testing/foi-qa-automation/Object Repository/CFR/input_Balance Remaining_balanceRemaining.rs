@@ -11,14 +11,14 @@
       </entry>
       <entry>
          <key>BASIC</key>
-         <value>//*[@id = 'balanceremaining' and @name = 'balanceRemaining' and @placeholder = '0' and @type = 'text']</value>
+         <value>//*[@id = 'balanceremaining']</value>
       </entry>
       <entry>
          <key>XPATH</key>
          <value>//input[@id='balanceremaining']</value>
       </entry>
    </selectorCollection>
-   <selectorMethod>XPATH</selectorMethod>
+   <selectorMethod>BASIC</selectorMethod>
    <useRalativeImagePath>true</useRalativeImagePath>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -26,7 +26,7 @@
       <name>tag</name>
       <type>Main</type>
       <value>input</value>
-      <webElementGuid>5e9e166b-414a-4790-b83b-df6440f1ee6f</webElementGuid>
+      <webElementGuid>071d39e7-a085-40f5-9695-1036174cab29</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -34,7 +34,7 @@
       <name>aria-invalid</name>
       <type>Main</type>
       <value>false</value>
-      <webElementGuid>d836e7ac-9816-4e29-abb1-6855fc9c8304</webElementGuid>
+      <webElementGuid>ec1b0cc5-a6f2-470d-b3df-daa306a8fa56</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>true</isSelected>
@@ -42,31 +42,31 @@
       <name>id</name>
       <type>Main</type>
       <value>balanceremaining</value>
-      <webElementGuid>5ee20b17-cc1c-4df2-a464-043364b483e0</webElementGuid>
+      <webElementGuid>c343a52a-2cce-4838-92aa-f974356334d4</webElementGuid>
    </webElementProperties>
    <webElementProperties>
-      <isSelected>true</isSelected>
+      <isSelected>false</isSelected>
       <matchCondition>equals</matchCondition>
       <name>name</name>
       <type>Main</type>
       <value>balanceRemaining</value>
-      <webElementGuid>37510969-4897-44a0-bccc-08a9543a9166</webElementGuid>
+      <webElementGuid>9c742f72-48c4-4967-93f8-ade816c66816</webElementGuid>
    </webElementProperties>
    <webElementProperties>
-      <isSelected>true</isSelected>
+      <isSelected>false</isSelected>
       <matchCondition>equals</matchCondition>
       <name>placeholder</name>
       <type>Main</type>
       <value>0</value>
-      <webElementGuid>ee7b607b-7cbc-49fb-b73b-4579c5099741</webElementGuid>
+      <webElementGuid>62322f6c-91e8-4c70-b1d8-9cc0b4e23a86</webElementGuid>
    </webElementProperties>
    <webElementProperties>
-      <isSelected>true</isSelected>
+      <isSelected>false</isSelected>
       <matchCondition>equals</matchCondition>
       <name>type</name>
       <type>Main</type>
       <value>text</value>
-      <webElementGuid>bec5ef74-d32a-4066-90cb-c076132d472d</webElementGuid>
+      <webElementGuid>32a27dab-2315-4f2e-b97f-9436c6893e09</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -74,7 +74,7 @@
       <name>aria-labelledby</name>
       <type>Main</type>
       <value>balanceremaining-label</value>
-      <webElementGuid>dfbf0736-c029-4779-ad03-888f4ab2bb15</webElementGuid>
+      <webElementGuid>3e3c4e39-7be3-47fd-ac4d-23408dacb084</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -82,7 +82,7 @@
       <name>class</name>
       <type>Main</type>
       <value>MuiOutlinedInput-input MuiInputBase-input Mui-disabled MuiInputBase-inputAdornedStart css-1ixds2g</value>
-      <webElementGuid>8c48b6e1-404b-42c4-9830-02a63114da7d</webElementGuid>
+      <webElementGuid>a98eb021-989f-4e0a-8165-bef72ce4e7ff</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -90,7 +90,7 @@
       <name>value</name>
       <type>Main</type>
       <value>0.00</value>
-      <webElementGuid>be7ef431-b89b-4194-ac43-3a259c3dbf8d</webElementGuid>
+      <webElementGuid>12f63455-94ec-42b7-832e-fd211e7790e7</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -98,7 +98,7 @@
       <name>xpath</name>
       <type>Main</type>
       <value>id(&quot;balanceremaining&quot;)</value>
-      <webElementGuid>30679c7f-f135-4f5e-a925-ecb4c0f22f87</webElementGuid>
+      <webElementGuid>e1c8582e-7d71-48fb-aac4-081adfba759f</webElementGuid>
    </webElementProperties>
    <webElementXpaths>
       <isSelected>true</isSelected>
@@ -106,7 +106,7 @@
       <name>xpath:attributes</name>
       <type>Main</type>
       <value>//input[@id='balanceremaining']</value>
-      <webElementGuid>9257c5c1-4c55-4da6-80c5-c07ee3b451e6</webElementGuid>
+      <webElementGuid>00d1f707-d2db-4428-978f-b94a119b60e1</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -114,7 +114,7 @@
       <name>xpath:idRelative</name>
       <type>Main</type>
       <value>//div[@id='CFRForm']/div/form/div/div[2]/div[3]/div/div[2]/div/div/div/div/div/div[2]/div/div/input</value>
-      <webElementGuid>66d99df3-725e-44ed-acbe-e3fe5ab4c777</webElementGuid>
+      <webElementGuid>bbc3d7ae-2fdb-4016-a55e-aefbb8dfa9a6</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -122,7 +122,7 @@
       <name>xpath:position</name>
       <type>Main</type>
       <value>//div[2]/div/div/div/div/div/div[2]/div/div/input</value>
-      <webElementGuid>d1c08f71-d404-48a6-a37e-487bcb0bdea1</webElementGuid>
+      <webElementGuid>c005b459-4cda-461d-ad4c-0090a36b3f22</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -130,6 +130,6 @@
       <name>xpath:customAttributes</name>
       <type>Main</type>
       <value>//input[@id = 'balanceremaining' and @name = 'balanceRemaining' and @placeholder = '0' and @type = 'text']</value>
-      <webElementGuid>4b037580-1965-4f72-8d2f-62961a825638</webElementGuid>
+      <webElementGuid>be5cffdf-38dc-41c9-9900-b28221fad652</webElementGuid>
    </webElementXpaths>
 </WebElementEntity>

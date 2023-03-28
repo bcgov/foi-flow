@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>div_FOI  foiedu foiedu 99Sign OutABC-2099-6_860aa9</name>
+   <tag></tag>
+   <elementGuidId>4575529c-4d7f-4123-9ff3-36561a9a5fdb</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>CSS</key>
+         <value>#app > div</value>
+      </entry>
+      <entry>
+         <key>XPATH</key>
+         <value>//div[@id='app']/div</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>XPATH</selectorMethod>
+   <useRalativeImagePath>true</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>tag</name>
+      <type>Main</type>
+      <value>div</value>
+      <webElementGuid>45b079ec-884a-4d7d-b9aa-7dc693611f48</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>text</name>
+      <type>Main</type>
+      <value>FOI  foiedu foiedu 99+Sign OutABC-2099-6009417StatusCall For RecordsStatusRequestCFR FormAttachmentsComments (2)CFR Due in 10 Days283 Days OverdueExtensions 0Request Queue/ABC-2099-6009417ABC-2099-6009417IAO Assigned ToIAO Assigned To  WatchWatchers0TagUnrestricted​Ministry Assigned To *UnassignedMinistry Assigned To *Applicant DetailsApplication TypeIndividualRequest TypeGeneralAuthorizationYYYY MM DDREQUEST DESCRIPTIONDescription HistoryDate Range for Record SearchStart Date: End Date: Request Descriptiontesting 123 descriptionREQUEST DETAILSMinistries CanvassedSelected Ministry: Ministry of Education and ChildcareRequest OpenedDEC 16 2021Records Due DateAPR 06 2023Legislated Due DateFEB 01 2022 EXTENSION DETAILSEXTENSION REASONDAYSNEW DUE DATESTATUSNo extensions taken.DIVISIONAL TRACKINGSelect DivisonSelect DivisionSelect DivisonSelect Divison StageSelect Division StageSelect Divison StageAdd division to trackSaveABC-2099-6009417Version 1 DraftCFR Status *Select CFR Form StatusCFR Status *CFR Form HistoryPAYMENT DETAILSAmount Paid$Amount PaidBalance Remaining$Balance RemainingEstimated Total$60Actual Total$0Fee Waiver Amount$Fee Waiver AmountRefund Amount$Refund AmountInformation6OVERALL FEES ESTIMATELocating/Retrieving - this includes searching all relevant sources.Estimated Hourshr(s)Estimated HoursActual Hourshr(s)Actual HoursProducing - this only applies where you are creating records from other sources* (e.g. developing a program to create new records from a database)Estimated Hourshr(s)Estimated HoursActual Hourshr(s)Actual HoursPreparing - this may include time spent by IAO (for electronic records) or the Ministry (for hardcopy records)Estimated Hours IAOhr(s)Estimated Hours IAOEstimated Hours Ministryhr(s)Estimated Hours MinistryActual Hours IAOhr(s)Actual Hours IAOActual Hours Ministryhr(s)Actual Hours MinistryVolume - for electronic records please provide the estimated number of files and for hardcopy records please continue to provide the number of pagesElectronic Estimated Pagespg(s)Electronic Estimated PagesHardcopy Estimated Pagespg(s)Hardcopy Estimated PagesElectronic Actual Pagespg(s)Electronic Actual PagesHardcopy Actual Pagespg(s)Hardcopy Actual PagesInformation1Information5Information2Information3Information4OVERALL CLARIFICATION SUGGESTIONSCombined suggestions for futher clarificationsCombined suggestions for futher clarificationsSave+ Create New CFR FormRequest #ABC-2099-6009417+ Add AttachmentSearch Attachments​Search AttachmentsGENERALEXTENSIONSALLRequest #ABC-2099-6009417+ Add CommentSearch Comments​Search CommentsUser CommentsRequest History CommentsDivisional TrackingAllNo comments under this filter categoryShow more commentsHelpContactDisclaimerPrivacyAccessibilityCopyright</value>
+      <webElementGuid>eeebf8a4-e59e-4ce9-aee3-4dcf067d64d5</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>id(&quot;app&quot;)/div[1]</value>
+      <webElementGuid>12fabeac-112b-4158-a8ef-db854c5a3079</webElementGuid>
+   </webElementProperties>
+   <webElementXpaths>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:idRelative</name>
+      <type>Main</type>
+      <value>//div[@id='app']/div</value>
+      <webElementGuid>151e18c6-6a18-45b7-8f2a-a3e949ffea94</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:position</name>
+      <type>Main</type>
+      <value>//div/div</value>
+      <webElementGuid>c78ef616-eebe-42d5-bb1b-363e6002eb86</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:customAttributes</name>
+      <type>Main</type>
+      <value>//div[(text() = 'FOI  foiedu foiedu 99+Sign OutABC-2099-6009417StatusCall For RecordsStatusRequestCFR FormAttachmentsComments (2)CFR Due in 10 Days283 Days OverdueExtensions 0Request Queue/ABC-2099-6009417ABC-2099-6009417IAO Assigned ToIAO Assigned To  WatchWatchers0TagUnrestricted​Ministry Assigned To *UnassignedMinistry Assigned To *Applicant DetailsApplication TypeIndividualRequest TypeGeneralAuthorizationYYYY MM DDREQUEST DESCRIPTIONDescription HistoryDate Range for Record SearchStart Date: End Date: Request Descriptiontesting 123 descriptionREQUEST DETAILSMinistries CanvassedSelected Ministry: Ministry of Education and ChildcareRequest OpenedDEC 16 2021Records Due DateAPR 06 2023Legislated Due DateFEB 01 2022 EXTENSION DETAILSEXTENSION REASONDAYSNEW DUE DATESTATUSNo extensions taken.DIVISIONAL TRACKINGSelect DivisonSelect DivisionSelect DivisonSelect Divison StageSelect Division StageSelect Divison StageAdd division to trackSaveABC-2099-6009417Version 1 DraftCFR Status *Select CFR Form StatusCFR Status *CFR Form HistoryPAYMENT DETAILSAmount Paid$Amount PaidBalance Remaining$Balance RemainingEstimated Total$60Actual Total$0Fee Waiver Amount$Fee Waiver AmountRefund Amount$Refund AmountInformation6OVERALL FEES ESTIMATELocating/Retrieving - this includes searching all relevant sources.Estimated Hourshr(s)Estimated HoursActual Hourshr(s)Actual HoursProducing - this only applies where you are creating records from other sources* (e.g. developing a program to create new records from a database)Estimated Hourshr(s)Estimated HoursActual Hourshr(s)Actual HoursPreparing - this may include time spent by IAO (for electronic records) or the Ministry (for hardcopy records)Estimated Hours IAOhr(s)Estimated Hours IAOEstimated Hours Ministryhr(s)Estimated Hours MinistryActual Hours IAOhr(s)Actual Hours IAOActual Hours Ministryhr(s)Actual Hours MinistryVolume - for electronic records please provide the estimated number of files and for hardcopy records please continue to provide the number of pagesElectronic Estimated Pagespg(s)Electronic Estimated PagesHardcopy Estimated Pagespg(s)Hardcopy Estimated PagesElectronic Actual Pagespg(s)Electronic Actual PagesHardcopy Actual Pagespg(s)Hardcopy Actual PagesInformation1Information5Information2Information3Information4OVERALL CLARIFICATION SUGGESTIONSCombined suggestions for futher clarificationsCombined suggestions for futher clarificationsSave+ Create New CFR FormRequest #ABC-2099-6009417+ Add AttachmentSearch Attachments​Search AttachmentsGENERALEXTENSIONSALLRequest #ABC-2099-6009417+ Add CommentSearch Comments​Search CommentsUser CommentsRequest History CommentsDivisional TrackingAllNo comments under this filter categoryShow more commentsHelpContactDisclaimerPrivacyAccessibilityCopyright' or . = 'FOI  foiedu foiedu 99+Sign OutABC-2099-6009417StatusCall For RecordsStatusRequestCFR FormAttachmentsComments (2)CFR Due in 10 Days283 Days OverdueExtensions 0Request Queue/ABC-2099-6009417ABC-2099-6009417IAO Assigned ToIAO Assigned To  WatchWatchers0TagUnrestricted​Ministry Assigned To *UnassignedMinistry Assigned To *Applicant DetailsApplication TypeIndividualRequest TypeGeneralAuthorizationYYYY MM DDREQUEST DESCRIPTIONDescription HistoryDate Range for Record SearchStart Date: End Date: Request Descriptiontesting 123 descriptionREQUEST DETAILSMinistries CanvassedSelected Ministry: Ministry of Education and ChildcareRequest OpenedDEC 16 2021Records Due DateAPR 06 2023Legislated Due DateFEB 01 2022 EXTENSION DETAILSEXTENSION REASONDAYSNEW DUE DATESTATUSNo extensions taken.DIVISIONAL TRACKINGSelect DivisonSelect DivisionSelect DivisonSelect Divison StageSelect Division StageSelect Divison StageAdd division to trackSaveABC-2099-6009417Version 1 DraftCFR Status *Select CFR Form StatusCFR Status *CFR Form HistoryPAYMENT DETAILSAmount Paid$Amount PaidBalance Remaining$Balance RemainingEstimated Total$60Actual Total$0Fee Waiver Amount$Fee Waiver AmountRefund Amount$Refund AmountInformation6OVERALL FEES ESTIMATELocating/Retrieving - this includes searching all relevant sources.Estimated Hourshr(s)Estimated HoursActual Hourshr(s)Actual HoursProducing - this only applies where you are creating records from other sources* (e.g. developing a program to create new records from a database)Estimated Hourshr(s)Estimated HoursActual Hourshr(s)Actual HoursPreparing - this may include time spent by IAO (for electronic records) or the Ministry (for hardcopy records)Estimated Hours IAOhr(s)Estimated Hours IAOEstimated Hours Ministryhr(s)Estimated Hours MinistryActual Hours IAOhr(s)Actual Hours IAOActual Hours Ministryhr(s)Actual Hours MinistryVolume - for electronic records please provide the estimated number of files and for hardcopy records please continue to provide the number of pagesElectronic Estimated Pagespg(s)Electronic Estimated PagesHardcopy Estimated Pagespg(s)Hardcopy Estimated PagesElectronic Actual Pagespg(s)Electronic Actual PagesHardcopy Actual Pagespg(s)Hardcopy Actual PagesInformation1Information5Information2Information3Information4OVERALL CLARIFICATION SUGGESTIONSCombined suggestions for futher clarificationsCombined suggestions for futher clarificationsSave+ Create New CFR FormRequest #ABC-2099-6009417+ Add AttachmentSearch Attachments​Search AttachmentsGENERALEXTENSIONSALLRequest #ABC-2099-6009417+ Add CommentSearch Comments​Search CommentsUser CommentsRequest History CommentsDivisional TrackingAllNo comments under this filter categoryShow more commentsHelpContactDisclaimerPrivacyAccessibilityCopyright')]</value>
+      <webElementGuid>f7f11227-3c50-4610-bda1-18de134e19ac</webElementGuid>
+   </webElementXpaths>
+</WebElementEntity>
