@@ -7,6 +7,7 @@ import UserService from "../../services/UserService";
 import { setUserAuth } from "../../actions/bpmActions";
 import Home from "./Home";
 import Admin from "./Admin";
+import Divisions from "./Admin/Divisions";
 import FOIHeader from "./Header";
 import FOIFooter from "./Footer";
 import { decrypt } from "../../helper/FOI/helper";
@@ -32,6 +33,11 @@ const FOIUnAuthenticateRouting = React.memo((props) => {
 
   return (
     <>
+      <Route path="/admin/divisions">
+        <FOIHeader />
+        <Divisions />
+        <FOIFooter />
+      </Route>
       <Route path="/admin">
         <FOIHeader />
         <Admin />
