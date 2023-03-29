@@ -1,19 +1,19 @@
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { push } from "connected-react-router";
-import SearchBar from "./SearchBar";
-import Button from "@mui/material/Button";
+import SearchBar from "../customComponents";
 import CreateDivisionModal from "./CreateDivisionModal";
 import DisableDivisionModal from "./DisableDivisionModal";
 import EditDivisionModal from "./EditDivisionModal";
-import IconButton from "@mui/material/IconButton";
-import Stack from "@mui/material/Stack";
 import Box from "@mui/material/Box";
-import Typography from "@mui/material/Typography";
-import Grid from "@mui/material/Grid";
+import Button from "@mui/material/Button";
+import { DataGrid } from "@mui/x-data-grid";
 import DeleteIcon from "@material-ui/icons/Delete";
 import EditIcon from "@material-ui/icons/Edit";
-import { DataGrid } from "@mui/x-data-grid";
+import Grid from "@mui/material/Grid";
+import IconButton from "@mui/material/IconButton";
+import Stack from "@mui/material/Stack";
+import Typography from "@mui/material/Typography";
 
 import {
   fetchProgramAreaDivisions,
