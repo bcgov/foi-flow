@@ -526,7 +526,7 @@ export const RecordsLog = ({
   const removeAttachments = () => {
     setDeleteModalOpen(false);
     var attachments = records.reduce((acc, record) => {return record.attachments ? acc.concat(record.attachments.map(a => a.filepath)) : acc}, []);
-    dispatch(deleteReviewerRecords({filepaths: attachments},(err, _res) => {
+    dispatch(deleteReviewerRecords({filepaths: attachments, ministryrequestid :ministryId},(err, _res) => {
       dispatchRequestAttachment(err);
     }));
   }
