@@ -70,6 +70,23 @@ const EditDivisionModal = ({
                 </MenuItem>
               ))}
           </Select>
+          <div class="edit-sortorder-wrapper">
+          <TextField
+            autoFocus
+            type="number"
+            margin="dense"
+            id="sortorder"
+            label="Sort Order"
+            value={division ? division.sortorder : 0}
+            onChange={(event) =>
+              setDivision({ ...division, sortorder: event.target.value })
+            }
+            fullWidth
+            InputLabelProps={{
+              shrink: true,
+            }}
+          />
+          </div>
         </DialogContent>
         <DialogActions>
           <button onClick={handleSave} className="btn-bottom btn-save">
