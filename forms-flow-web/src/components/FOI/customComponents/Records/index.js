@@ -198,7 +198,7 @@ export const RecordsLog = ({
   useEffect(() => {
     switch(pdfStitchStatus) {      
       case "started":
-      case "pushedtostream":
+      // case "pushedtostream":
         setIsDownloadInProgress(true);
         setIsDownloadReady(false);
         setIsDownloadFailed(false);
@@ -241,7 +241,7 @@ export const RecordsLog = ({
     if (modalFor === 'delete' && value) {
       //const documentId = ministryId ? updateAttachment.foiministrydocumentid : updateAttachment.foidocumentid;
       if (updateAttachment.isattachment) {
-        dispatch(deleteReviewerRecords({filepaths: [updateAttachment]},(err, _res) => {
+          dispatch(deleteReviewerRecords({filepaths: [updateAttachment.filepath], ministryrequestid: ministryId},(err, _res) => {
           dispatchRequestAttachment(err);
         }));
       } else {
@@ -354,7 +354,7 @@ export const RecordsLog = ({
 
   const handleDownloadChange = (e) => {
     //if clicked on harms
-    if (e.target.value === 1 && ["not started", "error"].includes(pdfStitchStatus)) {
+    if (e.target.value === 1 && ["not started", "error", "pushedtostream"].includes(pdfStitchStatus)) {
       toast.info("In progress. You will be notified when the records are ready for download.", {
         position: "top-right",
         autoClose: 3000,
@@ -365,10 +365,7 @@ export const RecordsLog = ({
         progress: undefined,
         theme: "colored",
         backgroundColor: "#FFA500"
-      });
-      setIsDownloadInProgress(true);      
-      setIsDownloadReady(false);
-      setIsDownloadFailed(false); 
+      });      
       downloadLinearHarmsDocuments()      
     }
     //if clicked on harms and stitching is complete
@@ -440,6 +437,11 @@ export const RecordsLog = ({
       dispatch(triggerDownloadFOIRecordsForHarms(requestId, ministryId, message,(err, _res) => {
         if (err) {
           toastError()
+        }
+        else {
+          setIsDownloadInProgress(true);      
+          setIsDownloadReady(false);
+          setIsDownloadFailed(false); 
         }
         dispatchRequestAttachment(err);
     }));
@@ -544,7 +546,7 @@ export const RecordsLog = ({
   const removeAttachments = () => {
     setDeleteModalOpen(false);
     var attachments = records.reduce((acc, record) => {return record.attachments ? acc.concat(record.attachments.map(a => a.filepath)) : acc}, []);
-    dispatch(deleteReviewerRecords({filepaths: attachments},(err, _res) => {
+    dispatch(deleteReviewerRecords({filepaths: attachments, ministryrequestid :ministryId},(err, _res) => {
       dispatchRequestAttachment(err);
     }));
   }
@@ -694,8 +696,8 @@ export const RecordsLog = ({
             alignItems="flex-start"
             spacing={1}
           >
-            <Grid item xs={3}>
-              <ConditionalComponent condition={records.filter(record => record.attachments?.length > 0).length > 0}>
+            <ConditionalComponent condition={records.filter(record => record.attachments?.length > 0).length > 0}>
+            <Grid item xs={3}>              
                 <button
                   className="btn addAttachment foi-export-button"
                   variant="contained"
@@ -704,10 +706,12 @@ export const RecordsLog = ({
                 >
                   Remove Attachments
                 </button>
-              </ConditionalComponent>
+              
             </Grid>
+            </ConditionalComponent>
+            <ConditionalComponent condition={hasDocumentsToDownload}>
             <Grid item xs={3}>
-              <ConditionalComponent condition={hasDocumentsToDownload}>
+              
               <TextField
               className="download-dropdown custom-select-wrapper foi-download-button"
               id="download"
@@ -760,8 +764,9 @@ export const RecordsLog = ({
 
               } )}
             </TextField>
-              </ConditionalComponent>
+             
             </Grid>
+            </ConditionalComponent>
             {/* <Grid item xs={2}>
               <ConditionalComponent condition={hasDocumentsToExport}>
                 <button
@@ -784,7 +789,7 @@ export const RecordsLog = ({
                 >
                   + Upload Records
                 </button> :
-                <a href={DOC_REVIEWER_WEB_URL + "/foi/" + ministryId}>
+                (records.length > 0 && <a href={DOC_REVIEWER_WEB_URL + "/foi/" + ministryId}>
                   <button
                     className={clsx("btn", "addAttachment", classes.createButton)}
                     variant="contained"
@@ -793,7 +798,7 @@ export const RecordsLog = ({
                   >
                     Redact Records
                   </button>
-                </a>
+                </a>)
               }
             </Grid>
             <Grid
@@ -1354,7 +1359,7 @@ const AttachmentPopup = React.memo(({indexValue, record, handlePopupButtonClick,
           >
             Download Original
           </MenuItem>
-          <DeleteMenu />
+          {!record.isattachment && <DeleteMenu />}
           {!record.isredactionready && record.failed && <MenuItem
             onClick={() => {
                 handleRetry();
