@@ -3,15 +3,15 @@
    <description></description>
    <name>button_Save Change</name>
    <tag></tag>
-   <elementGuidId>a80aaa1a-6ea6-40f0-91ec-ce0ef91465a1</elementGuidId>
+   <elementGuidId>38d2383c-fe34-48a2-9bba-1e70c56647fa</elementGuidId>
    <selectorCollection>
       <entry>
          <key>CSS</key>
-         <value>button.btn-bottom.btn-save.jss157</value>
+         <value>button.btn-bottom.btn-save.btn</value>
       </entry>
       <entry>
          <key>XPATH</key>
-         <value>//div[@id='state-change-dialog']/div[3]/div/div[3]/button</value>
+         <value>(.//*[normalize-space(text()) and normalize-space(.)='Are you sure you want to remove the restricted file flag on this request?'])[1]/following::button[1]</value>
       </entry>
    </selectorCollection>
    <selectorMethod>XPATH</selectorMethod>
@@ -22,15 +22,15 @@
       <name>tag</name>
       <type>Main</type>
       <value>button</value>
-      <webElementGuid>cd0c95b6-a286-4507-b1d6-91ec608a4379</webElementGuid>
+      <webElementGuid>8a4283a4-a058-4e6d-88d5-f72e0ec763e0</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
       <matchCondition>equals</matchCondition>
       <name>class</name>
       <type>Main</type>
-      <value>btn-bottom btn-save jss157</value>
-      <webElementGuid>711cba2e-162a-4625-859a-073cda2cb3fe</webElementGuid>
+      <value>btn-bottom btn-save btn</value>
+      <webElementGuid>f260c076-ee2b-45f8-b58c-020044b7150f</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>true</isSelected>
@@ -38,39 +38,31 @@
       <name>text</name>
       <type>Main</type>
       <value>Save Change</value>
-      <webElementGuid>b1109a09-be8a-4721-a437-481a0203f19c</webElementGuid>
+      <webElementGuid>b101b40e-6a27-4c07-bd08-383c5310501a</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
       <matchCondition>equals</matchCondition>
       <name>xpath</name>
       <type>Main</type>
-      <value>id(&quot;state-change-dialog&quot;)/div[@class=&quot;MuiDialog-container MuiDialog-scrollPaper&quot;]/div[@class=&quot;MuiPaper-root MuiDialog-paper MuiDialog-paperScrollPaper MuiDialog-paperWidthMd MuiDialog-paperFullWidth MuiPaper-elevation24 MuiPaper-rounded&quot;]/div[@class=&quot;MuiDialogActions-root MuiDialogActions-spacing&quot;]/button[@class=&quot;btn-bottom btn-save jss157&quot;]</value>
-      <webElementGuid>03095a7d-ca44-43cf-af0b-67c1a414dc6b</webElementGuid>
+      <value>/html[1]/body[@class=&quot;no-scroll&quot;]/div[@class=&quot;MuiDialog-root&quot;]/div[@class=&quot;MuiDialog-container MuiDialog-scrollPaper&quot;]/div[@class=&quot;MuiPaper-root MuiDialog-paper MuiDialog-paperScrollPaper MuiDialog-paperWidthMd MuiDialog-paperFullWidth MuiPaper-elevation24 MuiPaper-rounded&quot;]/div[@class=&quot;MuiDialogActions-root MuiDialogActions-spacing&quot;]/button[@class=&quot;btn-bottom btn-save btn&quot;]</value>
+      <webElementGuid>f549d21d-9228-4e33-b6fd-65a7a95fc851</webElementGuid>
    </webElementProperties>
    <webElementXpaths>
       <isSelected>true</isSelected>
       <matchCondition>equals</matchCondition>
-      <name>xpath:idRelative</name>
+      <name>xpath:neighbor</name>
       <type>Main</type>
-      <value>//div[@id='state-change-dialog']/div[3]/div/div[3]/button</value>
-      <webElementGuid>53921d5a-2317-480a-a955-f932e2657026</webElementGuid>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='Are you sure you want to remove the restricted file flag on this request?'])[1]/following::button[1]</value>
+      <webElementGuid>14f55989-5a34-4cbd-aa0d-a16f61f9469f</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
       <matchCondition>equals</matchCondition>
       <name>xpath:neighbor</name>
       <type>Main</type>
-      <value>(.//*[normalize-space(text()) and normalize-space(.)='Flex Team'])[1]/following::button[1]</value>
-      <webElementGuid>1a31b0c9-8956-4678-a79a-d21a0dfe44b3</webElementGuid>
-   </webElementXpaths>
-   <webElementXpaths>
-      <isSelected>false</isSelected>
-      <matchCondition>equals</matchCondition>
-      <name>xpath:neighbor</name>
-      <type>Main</type>
-      <value>(.//*[normalize-space(text()) and normalize-space(.)='IAO Assigned To'])[1]/following::button[1]</value>
-      <webElementGuid>70952072-c4e1-4ad7-a63a-b129aacd9bb4</webElementGuid>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='Close'])[1]/following::button[1]</value>
+      <webElementGuid>969b12e7-9d40-4341-bd81-47303175096d</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -78,7 +70,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>(.//*[normalize-space(text()) and normalize-space(.)='Cancel'])[1]/preceding::button[1]</value>
-      <webElementGuid>2d40faa0-3509-4f54-a15c-4651906f0b22</webElementGuid>
+      <webElementGuid>c4048075-06ce-4c0e-9f15-e5864ffb16ff</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -86,7 +78,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>//*/text()[normalize-space(.)='Save Change']/parent::*</value>
-      <webElementGuid>03f9ff56-82e2-4ea4-9a6a-10683f26352b</webElementGuid>
+      <webElementGuid>b25a1eb7-f30c-4f17-a42e-d529d9efe662</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -94,7 +86,7 @@
       <name>xpath:position</name>
       <type>Main</type>
       <value>//div[3]/div/div[3]/button</value>
-      <webElementGuid>dc4e8a11-e9be-4d07-ac72-43a57fbb6fc6</webElementGuid>
+      <webElementGuid>81b51878-ac8f-44b6-a88e-b157fbd859fa</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -102,6 +94,6 @@
       <name>xpath:customAttributes</name>
       <type>Main</type>
       <value>//button[(text() = 'Save Change' or . = 'Save Change')]</value>
-      <webElementGuid>2c4a7be4-b0cc-44eb-af8a-e5afa68c07cb</webElementGuid>
+      <webElementGuid>1f4879a6-ee49-4d81-b41c-370a4176a505</webElementGuid>
    </webElementXpaths>
 </WebElementEntity>
