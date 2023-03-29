@@ -51,6 +51,9 @@ class recordservicegetter(recordservicebase):
             _record['trigger'] = _computingresponse['trigger']
             _record['documentmasterid'] = _computingresponse["documentmasterid"]
             _record['outputdocumentmasterid'] = documentmasterid 
+            _computingresponse_err = self.__getcomputingerror(_computingresponse)
+            if _computingresponse_err is not None:
+                _record['failed'] = _computingresponse_err
             _record['attachments'] = []
             if _computingresponse['isduplicate']:
                 _record['duplicatemasterid'] = _computingresponse['duplicatemasterid']  
@@ -63,10 +66,11 @@ class recordservicegetter(recordservicebase):
                 _attachement['rootparentid'] = record["recordid"]
                 _attachement['createdby'] = record['createdby']
                 _attachement['attributes'] = self.__formatrecordattributes(attachment['attributes'], divisions)
+                _computingresponse_err = self.__getcomputingerror(attachment)
+                if _computingresponse_err is not None:
+                    _attachement['failed'] = _computingresponse_err
                 _record['attachments'].append(_attachement)                      
-            _computingresponse_err = self.__getcomputingerror(_computingresponse)
-            if _computingresponse_err is not None:
-                _record['failed'] = _computingresponse_err                
+                            
         return _record
     
     def __formatrecordattributes(self, attributes, divisions):

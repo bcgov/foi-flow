@@ -241,7 +241,7 @@ export const RecordsLog = ({
     if (modalFor === 'delete' && value) {
       //const documentId = ministryId ? updateAttachment.foiministrydocumentid : updateAttachment.foidocumentid;
       if (updateAttachment.isattachment) {
-        dispatch(deleteReviewerRecords({filepaths: [updateAttachment], ministryrequestid: ministryId },(err, _res) => {
+          dispatch(deleteReviewerRecords({filepaths: [updateAttachment.filepath], ministryrequestid: ministryId},(err, _res) => {
           dispatchRequestAttachment(err);
         }));
       } else {
@@ -784,7 +784,7 @@ export const RecordsLog = ({
                 >
                   + Upload Records
                 </button> :
-                <a href={DOC_REVIEWER_WEB_URL + "/foi/" + ministryId}>
+                (records.length > 0 && <a href={DOC_REVIEWER_WEB_URL + "/foi/" + ministryId}>
                   <button
                     className={clsx("btn", "addAttachment", classes.createButton)}
                     variant="contained"
@@ -793,7 +793,7 @@ export const RecordsLog = ({
                   >
                     Redact Records
                   </button>
-                </a>
+                </a>)
               }
             </Grid>
             <Grid
@@ -1354,7 +1354,7 @@ const AttachmentPopup = React.memo(({indexValue, record, handlePopupButtonClick,
           >
             Download Original
           </MenuItem>
-          <DeleteMenu />
+          {!record.isattachment && <DeleteMenu />}
           {!record.isredactionready && record.failed && <MenuItem
             onClick={() => {
                 handleRetry();
