@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Autocomplete from "@mui/material/Autocomplete";
 import InputBase from "@mui/material/InputBase";
 import Paper from "@mui/material/Paper";
@@ -8,10 +8,15 @@ import SearchIcon from "@material-ui/icons/Search";
 const SearchBar = ({ autocompleteOptions, items, setSearchResults }) => {
   const [keywords, setKeywords] = useState(null);
 
+  useEffect(async () => {
+    handleSearch();
+  }, [items]);
+
   const handleSubmit = (event) => {
     event.preventDefault();
     handleSearch();
-  }
+  };
+
   const handleSearch = () => {
     let searchKeywords = keywords ? keywords.toLowerCase().split(" ") : [];
 
@@ -37,9 +42,7 @@ const SearchBar = ({ autocompleteOptions, items, setSearchResults }) => {
       return found;
     }, []);
 
-    console.log(items);
-    console.log(results);
-    setSearchResults(results);
+    setSearchResults(results.length != items.length ? results : []);
   };
 
   return (
