@@ -1,4 +1,6 @@
 from request_api.models.ProgramAreaDivisions import ProgramAreaDivision
+from request_api.services.programareaservice import programareaservice
+
 
 class programareadivisionservice:
 
@@ -6,7 +8,7 @@ class programareadivisionservice:
         """ Returns all active program area divisions
         """
         divisions = ProgramAreaDivision.getallprogramareadivisons()
-        return divisions
+        return self.__prepareprogramareas(divisions)
     
     def createprogramareadivision(self, data):
         """ Creates a program area division
@@ -22,3 +24,17 @@ class programareadivisionservice:
         """ Disable a program area division
         """
         return ProgramAreaDivision.disableprogramareadivision(divisionid)
+    
+    def __prepareprogramareas(self, data):
+        """ Join program area name with division on programareaid
+        """
+        divisions = []
+        areas = programareaservice().getprogramareas()
+        for entry in data:
+            area = next((a for a in areas if a["programareaid"] == entry["programareaid"]), None)
+            if (area is not None):
+                entry["programarea"] = area["name"]
+                entry["areabcgovcode"] = area["bcgovcode"]
+                entry["areaiaocode"] = area["iaocode"]
+                divisions.append(entry)
+        return divisions

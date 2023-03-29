@@ -20,7 +20,6 @@ from request_api.auth import auth
 from request_api.tracer import Tracer
 from request_api.utils.util import  cors_preflight, allowedorigins
 from request_api.exceptions import BusinessException, Error
-from request_api.services.programareaservice import programareaservice
 from request_api.services.programareadivisionservice import programareadivisionservice
 from request_api.schemas.foiprogramareadivision import FOIProgramAreaDivisionSchema
 import json
