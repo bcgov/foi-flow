@@ -112,6 +112,8 @@ const Divisions = () => {
       field: "sortorder",
       headerName: "Sort Order",
       width: 100,
+      align: "center",
+      renderCell: (params) => {params.value ? params.value : "-"},
     },
     {
       field: "action",
@@ -147,7 +149,9 @@ const Divisions = () => {
           </Typography>
         </Grid>
         <Grid item xs={12}>
-          <Button variant="text" onClick={() => dispatch(push(`/admin`))}>Back to Admin</Button>
+          <Button variant="text" onClick={() => dispatch(push(`/admin`))}>
+            Back to Admin
+          </Button>
         </Grid>
         <Grid
           item
