@@ -32,12 +32,13 @@ class StartFrom(str, Enum):
 def start(consumer_id: str, start_from: StartFrom = StartFrom.latest):
     rdb = streamdb
     stream = rdb.Stream(NOTIFICATION_STREAM_KEY)
-
+    print("stream connected...")
     last_id = rdb.get(LAST_ID_KEY.format(consumer_id=consumer_id))
     readerbase().log_last_msgid(last_id,start_from)    
 
     while True:
         logging.info("Reading stream...")
+        print("Reading stream...")
         messages = stream.read(last_id=last_id, block=BLOCK_TIME)
         if messages:
             for message_id, message in messages:
@@ -48,12 +49,15 @@ def start(consumer_id: str, start_from: StartFrom = StartFrom.latest):
                 last_id = message_id
                 rdb.set(LAST_ID_KEY.format(consumer_id=consumer_id), last_id)
                 logging.info(f"finished processing {message_id}")
+                print(f"finished processing {message_id}")
         else:
             logging.debug(f"No new messages after ID: {last_id}")
+            print(f"No new messages after ID: {last_id}")
 
 
 def handlemessage(message_id, message):
     logging.info(f"processing {message_id}::{message}")
+    print(f"processing {message_id}::{message}")
     if message is not None:                    
         _message = json.dumps({str(key): str(value) for (key, value) in message.items()})
         _message = _message.replace("b'","'").replace("'",'') 
@@ -61,5 +65,7 @@ def handlemessage(message_id, message):
             notificationprocessor().handlemessage(json.loads(_message))
         except(Exception) as error: 
             logging.exception(error)
+            print("Error in processing message: ",error)
     else:
         logging.info("message is empty")
+        print("message is empty")

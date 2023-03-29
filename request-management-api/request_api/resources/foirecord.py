@@ -129,7 +129,6 @@ class FOIRequestDownloadRecord(Resource):
             response = recordservice().triggerpdfstitchservice(requestid, ministryrequestid, recordschema, AuthHelper.getuserid())
             respcode = 200 if response.success == True else 500
             return {'status': response.success, 'message':response.message,'id':response.identifier}, respcode
-            # return {'status': 'success', 'message':'success','id':1}, 200
         except KeyError as err:
             return {'status': False, 'message':err.messages}, 400
         except BusinessException as exception:
