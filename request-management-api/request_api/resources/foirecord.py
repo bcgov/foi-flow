@@ -129,7 +129,6 @@ class FOIRequestDownloadRecord(Resource):
             response = recordservice().triggerpdfstitchservice(requestid, ministryrequestid, recordschema, AuthHelper.getuserid())
             respcode = 200 if response.success == True else 500
             return {'status': response.success, 'message':response.message,'id':response.identifier}, respcode
-            # return {'status': 'success', 'message':'success','id':1}, 200
         except KeyError as err:
             return {'status': False, 'message':err.messages}, 400
         except BusinessException as exception:
@@ -155,7 +154,7 @@ class FOIRequestDownloadRecord(Resource):
             return {'status': exception.status_code, 'message':exception.message}, 500
 
 @cors_preflight('GET,OPTIONS')
-@API.route('/foirecord/<requestid>/ministryrequest/<ministryrequestid>/pdfstitchjobstatus/<recordstype>')
+@API.route('/foirecord/<requestid>/ministryrequest/<ministryrequestid>/<recordstype>/pdfstitchjobstatus')
 class FOIRequestPDFStitchStatus(Resource):
     """Resource for Creating FOI records."""
 
@@ -167,8 +166,14 @@ class FOIRequestPDFStitchStatus(Resource):
     def get(requestid, ministryrequestid, recordstype):
         try:
             result = recordservice().getpdfstichstatus(ministryrequestid, recordstype.lower())
+            print("getpdfstichstatus result == ", result)
             return result, 200
         except KeyError as err:
+            print("KeyError == ", err.messages)
             return {'status': False, 'message':err.messages}, 400
         except BusinessException as exception:
+            print("BusinessException == ", exception.message)
             return {'status': exception.status_code, 'message':exception.message}, 500
+        except Exception as error:
+            print("Exception error == ", error)
+            return {'status': False, 'message':error.message}, 500

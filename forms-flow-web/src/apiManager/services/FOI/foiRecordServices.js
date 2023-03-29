@@ -1,5 +1,6 @@
 import {
     httpGETRequest,
+    httpGETRequest1,
     httpPOSTRequest,
   } from "../../httpRequestHandler";
   import API from "../../endpoints";
@@ -7,6 +8,7 @@ import {
     serviceActionError,
     setFOIAttachmentListLoader,
     setRequestRecords,
+    setRecordFormats,
     setFOILoader,
     setFOIPDFStitchedRecordForHarms,
     setFOIPDFStitchStatusForHarms
@@ -14,6 +16,7 @@ import {
   import {fnDone} from './foiServicesUtil';
   import UserService from "../../../services/UserService";
   import { replaceUrl } from "../../../helper/FOI/helper";
+  import { FOI_RECORD_FORMATS } from "../../../constants/constants";
 
 export const fetchPDFStitchedRecordForHarms = (requestId, ministryId, ...rest) => {
   if (!ministryId) {
@@ -45,7 +48,6 @@ export const fetchPDFStitchedRecordForHarms = (requestId, ministryId, ...rest) =
 };
 
 export const fetchPDFStitchStatusForHarms = (requestId, ministryId, ...rest) => {
-  console.log("fetchPDFStitchStatusForHarms")
   if (!ministryId) {
     return () => {};
   }
@@ -61,13 +63,10 @@ export const fetchPDFStitchStatusForHarms = (requestId, ministryId, ...rest) => 
           dispatch(setFOIPDFStitchStatusForHarms(res.data));
           done(null, res.data);
 
-        } else {
-          console.log("Error in fetching records", res);
-          dispatch(serviceActionError(res));
         }
       })
       .catch((error) => {
-        console.log("Error in fetching records", error);
+        console.log("Error in fetching pdfstitch job status", error);
         dispatch(serviceActionError(error));
         done(error);
       });
@@ -177,4 +176,22 @@ const postRecord = (dispatch, apiUrl, data, errorMessage, rest, type="download")
       });
 }
 
-
+export const getRecordFormats = (...rest) => {
+  const done = fnDone(rest);
+    return (dispatch) => {
+      httpGETRequest1(FOI_RECORD_FORMATS, null)
+        .then((res) => {
+          if (res.data) {
+            dispatch(setRecordFormats([... new Set([...res.data.conversion, ...res.data.dedupe, ...res.data.nonredactable])]))
+          } else {
+            console.log("Error in fetching records formats", res);
+            dispatch(serviceActionError(res));
+          }
+        })
+        .catch((error) => {
+          console.log("Error in fetching records formats", error);
+          dispatch(serviceActionError(error));
+          done(error);
+        });
+      }
+};

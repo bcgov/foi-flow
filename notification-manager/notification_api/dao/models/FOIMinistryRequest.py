@@ -19,6 +19,7 @@ class FOIMinistryRequest:
             return None
         except(Exception) as error:
             logging.error(error)
+            print("getrequest error: ",error)
             raise   
         finally:
             conn.close()
@@ -40,6 +41,7 @@ class FOIMinistryRequest:
             return watchers
         except(Exception) as error:
             logging.error(error)
+            print("getwatchers error: ",error)
             raise   
         finally:
             conn.close()

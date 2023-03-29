@@ -6,7 +6,7 @@ import AttachmentModal from '../Attachments/AttachmentModal';
 import Loading from "../../../../containers/Loading";
 import { getOSSHeaderDetails, saveFilesinS3, getFileFromS3, postFOIS3DocumentPreSignedUrl, getFOIS3DocumentPreSignedUrl } from "../../../../apiManager/services/FOI/foiOSSServices";
 import { saveFOIRequestAttachmentsList, replaceFOIRequestAttachment, saveNewFilename, deleteFOIRequestAttachment } from "../../../../apiManager/services/FOI/foiAttachmentServices";
-import { fetchFOIRecords, saveFOIRecords, deleteFOIRecords, retryFOIRecordProcessing, deleteReviewerRecords, triggerDownloadFOIRecordsForHarms, fetchPDFStitchedRecordForHarms } from "../../../../apiManager/services/FOI/foiRecordServices";
+import { fetchFOIRecords, saveFOIRecords, deleteFOIRecords, retryFOIRecordProcessing, deleteReviewerRecords, getRecordFormats, triggerDownloadFOIRecordsForHarms, fetchPDFStitchedRecordForHarms } from "../../../../apiManager/services/FOI/foiRecordServices";
 import { StateTransitionCategories, AttachmentCategories } from '../../../../constants/FOI/statusEnum'
 import { RecordsDownloadList, RecordDownloadCategory } from '../../../../constants/FOI/enum';
 import { addToFullnameList, getFullnameList, ConditionalComponent } from '../../../../helper/FOI/helper';
@@ -166,6 +166,10 @@ export const RecordsLog = ({
     setRecords(recordsObj?.records)
   }, [recordsObj])
 
+  useEffect(() => {
+    dispatch(getRecordFormats());
+  }, [])
+
 
   const divisionFilters = [...new Map(recordsObj?.records?.reduce((acc, file) => [...acc, ...new Map(file?.attributes?.divisions?.map(division => [division?.divisionid, division]))], [])).values()]
   if (divisionFilters?.length > 0) divisionFilters?.push(
@@ -185,6 +189,7 @@ export const RecordsLog = ({
   const [searchValue, setSearchValue] = useState("");
   const [filterValue, setFilterValue] = useState(-1);
   const [fullnameList, setFullnameList] = useState(getFullnameList);
+  const [recordsDownloadList, setRecordsDownloadList] = useState(RecordsDownloadList);
   const [currentDownload, setCurrentDownload] = useState(0) 
   const [isDownloadInProgress, setIsDownloadInProgress] = useState(false)
   const [isDownloadReady, setIsDownloadReady] = useState(false)
@@ -199,6 +204,7 @@ export const RecordsLog = ({
         setIsDownloadFailed(false);
         break;
       case "completed":
+        dispatch(fetchPDFStitchedRecordForHarms(requestId, ministryId));
         setIsDownloadInProgress(false);
         setIsDownloadReady(true);
         setIsDownloadFailed(false);
@@ -214,7 +220,7 @@ export const RecordsLog = ({
         setIsDownloadFailed(false);
         break;
     }
-  }, [pdfStitchStatus])
+  }, [pdfStitchStatus, requestId, ministryId])
 
   const addAttachments = () => {
     setModalFor('add');
@@ -235,7 +241,7 @@ export const RecordsLog = ({
     if (modalFor === 'delete' && value) {
       //const documentId = ministryId ? updateAttachment.foiministrydocumentid : updateAttachment.foidocumentid;
       if (updateAttachment.isattachment) {
-        dispatch(deleteReviewerRecords({filepaths: [updateAttachment.filepath], ministryrequestid: ministryId},(err, _res) => {
+          dispatch(deleteReviewerRecords({filepaths: [updateAttachment.filepath], ministryrequestid: ministryId},(err, _res) => {
           dispatchRequestAttachment(err);
         }));
       } else {
@@ -347,6 +353,7 @@ export const RecordsLog = ({
   }  
 
   const handleDownloadChange = (e) => {
+    //if clicked on harms
     if (e.target.value === 1 && ["not started", "error"].includes(pdfStitchStatus)) {
       toast.info("In progress. You will be notified when the records are ready for download.", {
         position: "top-right",
@@ -361,14 +368,14 @@ export const RecordsLog = ({
       });
       setIsDownloadInProgress(true);      
       setIsDownloadReady(false);
-      setIsDownloadFailed(false);
-      setCurrentDownload(e.target.value);      
-      downloadLinearHarmsDocuments()
+      setIsDownloadFailed(false); 
+      downloadLinearHarmsDocuments()      
     }
+    //if clicked on harms and stitching is complete
     else if (e.target.value === 1 && pdfStitchStatus === "completed") {
-      const s3filepath = pdfStitchedRecord.finalpackagepath
+      const s3filepath = pdfStitchedRecord?.finalpackagepath
       const filename = requestNumber + ".zip"
-      getFOIS3DocumentPreSignedUrl(s3filepath.split('/').slice(4).join('/'), ministryId, dispatch, (err, res) => {
+      getFOIS3DocumentPreSignedUrl(s3filepath?.split('/').slice(4).join('/'), ministryId, dispatch, (err, res) => {
         if (!err) {
           getFileFromS3({filepath: res}, (_err, response) => {
             let blob = new Blob([response.data], {type: "application/octet-stream"});
@@ -377,6 +384,7 @@ export const RecordsLog = ({
         }
       }, 'records', bcgovcode);
     }
+    setCurrentDownload(e.target.value); 
   }
 
   const downloadLinearHarmsDocuments = () => {
@@ -418,7 +426,7 @@ export const RecordsLog = ({
         let found = acc.find((findval) => val.divisionid === findval.divisionid);
         if (!found) acc.push(val)
         else found.files = found.files.concat(
-          val.files.filter((f) => !found.files.find((findval) => f.recordid === findval.recordid))).sort((a,b) => {
+          val.files.filter((f) => !found.files.find((findval) => f.filename === findval.filename))).sort((a,b) => {
                 return new Date(Date.parse(a.lastmodified)) - new Date(Date.parse(b.lastmodified))
               });
         return acc;
@@ -430,24 +438,35 @@ export const RecordsLog = ({
       message.category = RecordDownloadCategory.harms
 
       dispatch(triggerDownloadFOIRecordsForHarms(requestId, ministryId, message,(err, _res) => {
+        if (err) {
+          toastError()
+        }
         dispatchRequestAttachment(err);
     }));
 
     } catch (error) {
       console.log(error)
-      toast.error(
-        "Temporarily unable to process your request. Please try again in a few minutes.",
-        {
-          position: "top-right",
-          autoClose: 3000,
-          hideProgressBar: true,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-        }
-      );
+      toastError()
     }
+
+  }
+
+  const toastError = (error) => {
+    toast.error(
+      "Temporarily unable to process your request. Please try again in a few minutes.",
+      {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: true,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      }
+    );
+    setIsDownloadInProgress(false);      
+    setIsDownloadReady(false);
+    setIsDownloadFailed(true);
 
   }
 
@@ -525,7 +544,7 @@ export const RecordsLog = ({
   const removeAttachments = () => {
     setDeleteModalOpen(false);
     var attachments = records.reduce((acc, record) => {return record.attachments ? acc.concat(record.attachments.map(a => a.filepath)) : acc}, []);
-    dispatch(deleteReviewerRecords({filepaths: attachments, ministryrequestid: ministryId},(err, _res) => {
+    dispatch(deleteReviewerRecords({filepaths: attachments, ministryrequestid :ministryId},(err, _res) => {
       dispatchRequestAttachment(err);
     }));
   }
@@ -611,11 +630,6 @@ export const RecordsLog = ({
     return `Request #U-00${requestId}`;
   }
 
-  const getCurrentDownload = () => {
-    if (currentDownload === 1 && isDownloadInProgress)
-      return 0;
-    return currentDownload;
-  }
 
   // const onFilterChange = (filterValue) => {
     // let _filteredRecords = filterValue === "" ?
@@ -668,7 +682,7 @@ export const RecordsLog = ({
             spacing={1}
           >
             <Grid item xs={6}>
-              <h1 className="foi-review-request-text foi-ministry-requestheadertext">
+              <h1 className="foi-review-request-text foi-ministry-requestheadertext foi-records-request-text">
                 {getRequestNumber()}
               </h1>
             </Grid>
@@ -680,7 +694,7 @@ export const RecordsLog = ({
             alignItems="flex-start"
             spacing={1}
           >
-            <Grid item xs={2}>
+            <Grid item xs={3}>
               <ConditionalComponent condition={records.filter(record => record.attachments?.length > 0).length > 0}>
                 <button
                   className="btn addAttachment foi-export-button"
@@ -692,7 +706,7 @@ export const RecordsLog = ({
                 </button>
               </ConditionalComponent>
             </Grid>
-            <Grid item xs={4}>
+            <Grid item xs={3}>
               <ConditionalComponent condition={hasDocumentsToDownload}>
               <TextField
               className="download-dropdown custom-select-wrapper foi-download-button"
@@ -720,7 +734,7 @@ export const RecordsLog = ({
               size="small"
               fullWidth
             >
-              {RecordsDownloadList.map((item, index) => {
+              {recordsDownloadList.map((item, index) => {
 
                 if (item.id !=0) {
                   return (
@@ -732,11 +746,11 @@ export const RecordsLog = ({
                         sx={{ display: 'flex' }}
                       >
                         {
-                          !item.disabled && (isDownloadReady && !item.disabled ?
+                          !item.disabled && (isDownloadReady ?
                           <FontAwesomeIcon icon={faCheckCircle} size='2x' color='#1B8103' className={classes.statusIcons}/>:
-                          isDownloadFailed && !item.disabled ?
+                          isDownloadFailed ?
                           <FontAwesomeIcon icon={faExclamationCircle} size='2x' color='#A0192F' className={classes.statusIcons}/>:
-                          isDownloadInProgress && !item.disabled ? <FontAwesomeIcon icon={faSpinner} size='2x' color='#FAA915' className={classes.statusIcons}/>:null) 
+                          isDownloadInProgress ? <FontAwesomeIcon icon={faSpinner} size='2x' color='#FAA915' className={classes.statusIcons}/>:null) 
                         }
                         {item.label}
                       </MenuItem>
@@ -748,7 +762,7 @@ export const RecordsLog = ({
             </TextField>
               </ConditionalComponent>
             </Grid>
-            <Grid item xs={2}>
+            {/* <Grid item xs={2}>
               <ConditionalComponent condition={hasDocumentsToExport}>
                 <button
                   className="btn addAttachment foi-export-button"
@@ -759,7 +773,7 @@ export const RecordsLog = ({
                   Export Shown
                 </button>
               </ConditionalComponent>
-            </Grid>
+            </Grid> */}
             <Grid item xs={2}>
               {isMinistryCoordinator ?
                 <button
