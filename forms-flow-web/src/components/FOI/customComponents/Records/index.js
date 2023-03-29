@@ -696,8 +696,8 @@ export const RecordsLog = ({
             alignItems="flex-start"
             spacing={1}
           >
-            <Grid item xs={3}>
-              <ConditionalComponent condition={records.filter(record => record.attachments?.length > 0).length > 0}>
+            <ConditionalComponent condition={records.filter(record => record.attachments?.length > 0).length > 0}>
+            <Grid item xs={3}>              
                 <button
                   className="btn addAttachment foi-export-button"
                   variant="contained"
@@ -706,10 +706,12 @@ export const RecordsLog = ({
                 >
                   Remove Attachments
                 </button>
-              </ConditionalComponent>
+              
             </Grid>
+            </ConditionalComponent>
+            <ConditionalComponent condition={hasDocumentsToDownload}>
             <Grid item xs={3}>
-              <ConditionalComponent condition={hasDocumentsToDownload}>
+              
               <TextField
               className="download-dropdown custom-select-wrapper foi-download-button"
               id="download"
@@ -762,8 +764,9 @@ export const RecordsLog = ({
 
               } )}
             </TextField>
-              </ConditionalComponent>
+             
             </Grid>
+            </ConditionalComponent>
             {/* <Grid item xs={2}>
               <ConditionalComponent condition={hasDocumentsToExport}>
                 <button
