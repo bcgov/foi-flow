@@ -14,12 +14,12 @@ import maya
 import uuid
 import requests
 import logging
-class recordservice:
+from request_api.services.records.recordservicegetter import recordservicegetter 
+from request_api.services.records.recordservicebase import recordservicebase 
+
+class recordservice(recordservicebase):
     """ FOI record management service
     """
-    tokenurl =  getenv("BPM_TOKEN_URL")
-    docreviewerapiurl =  getenv("FOI_DOCREVIEWER_BASE_API_URL")
-    docreviewerapitimeout =  getenv("FOI_DOCREVIEWER_BASE_API_TIMEOUT")
     conversionstreamkey = getenv('EVENT_QUEUE_CONVERSION_STREAMKEY')
     dedupestreamkey = getenv('EVENT_QUEUE_DEDUPE_STREAMKEY')
     pdfstitchstreamkey = getenv('EVENT_QUEUE_PDFSTITCH_STREAMKEY')
@@ -31,70 +31,8 @@ class recordservice:
         return self.__bulkcreate(requestid, ministryrequestid, recordschema.get("records"), userid)
 
     def fetch(self, requestid, ministryrequestid):
-        uploadedrecords = FOIRequestRecord.fetch(requestid, ministryrequestid)
-        _ministryversion = FOIMinistryRequest.getversionforrequest(ministryrequestid)
-        divisions = FOIMinistryRequestDivision.getdivisions(ministryrequestid, _ministryversion)
-
-        result = {'dedupedfiles': 0, 'convertedfiles': 0}
-        uploadedrecords = {record['recordid'] : {**record, **{"isredactionready": False, "isduplicate": False}} for record in uploadedrecords}
-        result['removedfiles'] = 0
-        if len(uploadedrecords) > 0:
-            response, err = self.__makedocreviewerrequest('GET', '/api/dedupestatus/{0}'.format(ministryrequestid))
-            if err is None:
-                masterrecords = {record['documentmasterid']: record for record in response}
-                for key in masterrecords:
-                    masterrecord = masterrecords[key]
-                    if masterrecord.get('parentid', False):
-                        record = masterrecord
-                        record['isattachment'] = True
-                        record['s3uripath'] = masterrecord['filepath']
-                        record['rootparentid'] = self.__findrootparentrecordid(record['documentmasterid'], masterrecords)
-                        parentrecord = uploadedrecords[record['rootparentid']]
-                        record['createdby'] = parentrecord['createdby']
-                        # if not record['attributes']:
-                        #     _filename, extension = path.splitext(record['s3uripath'])
-                        #     record['attributes'] = {
-                        #         'divisions': parentrecord['attributes']['divisions'],
-                        #         'batch': parentrecord['attributes']['batch'],
-                        #         'extension': extension,
-                        #         'incompatible': extension not in FILE_CONVERSION_FILE_TYPES + DEDUPE_FILE_TYPES,
-                        #         'isattachment': True
-                        #     }
-                        parentrecord.setdefault('attachments', [])
-                        parentrecord['attachments'].append(record)
-                        if masterrecord['isduplicate']:
-                            originalrecord = masterrecords[masterrecord['duplicatemasterid']]
-                    else:
-                        record = uploadedrecords[masterrecord['recordid']]
-                        record['isduplicate'] = masterrecord['isduplicate']
-                        record['attributes'] = masterrecord['attributes']
-                        record['isredactionready'] = masterrecord['isredactionready']
-                        record['trigger'] = masterrecord['trigger']
-                        record['documentmasterid'] = masterrecord['documentmasterid']
-                        record['outputdocumentmasterid'] = masterrecord['outputdocumentmasterid']
-                        if masterrecord['isduplicate']:
-                            record['duplicateof'] = masterrecord['duplicateof']
-                            originalrecord = uploadedrecords[masterrecord['recordid']]
-                    if masterrecord['conversionstatus'] == 'error':
-                        record['failed'] = 'conversion'
-                    elif masterrecord['conversionstatus'] == 'completed':
-                        result['convertedfiles'] += 1
-                    if masterrecord['deduplicationstatus'] == 'error':
-                        record['failed'] = 'deduplication'
-                    elif masterrecord['deduplicationstatus'] == 'completed':
-                        result['dedupedfiles'] += 1
-                    if masterrecord['isduplicate']:
-                        result['removedfiles'] += 1
-                        # merge duplicate divisions with original
-                        divid = lambda div : div['divisionid']
-                        divobj = lambda divid : {"divisionid" : divid}
-                        originalrecord['attributes']['divisions'] = list(map(divobj, set(map(divid, originalrecord['attributes']['divisions'])).union(set(map(divid, masterrecord['attributes']['divisions'])))))
-                # result['dedupedfiles'] = len(masterrecords)
-        result['records'] = self.__format(list(uploadedrecords.values()), divisions)
-        # result['batchcount'] = len(set(map(lambda record: record['attributes']['batch'], result['records'])))
-        result['batchcount'] = FOIRequestRecord.getbatchcount(ministryrequestid)
-        return result
-
+        return recordservicegetter().fetch(requestid, ministryrequestid)  
+            
     def delete(self, requestid, ministryrequestid, recordid, userid):
         record = FOIRequestRecord.getrecordbyid(recordid)
         record['attributes'] = json.loads(record['attributes'])
@@ -105,7 +43,7 @@ class recordservice:
         response = FOIRequestRecord.create([newrecord])
         if (response.success):
             if (not record['attributes'].get('incompatible', False)):
-                _apiresponse, err = self.__makedocreviewerrequest('POST', '/api/document/delete', {'filepaths': [record['s3uripath']]})
+                _apiresponse, err = self.makedocreviewerrequest('POST', '/api/document/delete', {'ministryrequestid': ministryrequestid, 'filepaths': [record['s3uripath']]})
                 if err:
                     return DefaultMethodResult(False,'Error in contacting Doc Reviewer API', -1, recordid)
             return DefaultMethodResult(True,'Record marked as inactive', -1, recordid)
@@ -126,7 +64,7 @@ class recordservice:
                     return DefaultMethodResult(False,'File Conversion only accepts the following formats: ' + ', '.join(FILE_CONVERSION_FILE_TYPES), -1, record['recordid'])
                 else:
                     streamkey = self.conversionstreamkey
-            jobids, err = self.__makedocreviewerrequest('POST', '/api/jobstatus', {
+            jobids, err = self.makedocreviewerrequest('POST', '/api/jobstatus', {
                 'records': [record],
                 'batch': record['attributes']['batch'],
                 'trigger': record['trigger'],
@@ -157,11 +95,11 @@ class recordservice:
         return self.__triggerpdfstitchservice(requestid, ministryrequestid, recordschema, userid)
     
     def getpdfstitchpackagetodownload(self, ministryid, category):
-        response, err = self.__makedocreviewerrequest('GET', '/api/pdfstitch/{0}/{1}'.format(ministryid, category))
+        response, err = self.makedocreviewerrequest('GET', '/api/pdfstitch/{0}/{1}'.format(ministryid, category))
         return response
 
     def getpdfstichstatus(self, ministryid, category):
-        response, err = self.__makedocreviewerrequest('GET', '/api/pdfstitchjobstatus/{0}/{1}'.format(ministryid, category))
+        response, err = self.makedocreviewerrequest('GET', '/api/pdfstitchjobstatus/{0}/{1}'.format(ministryid, category))
         if response is not None and len(response) > 0:
             return response.get("status")
         return ""
@@ -169,7 +107,7 @@ class recordservice:
     def __triggerpdfstitchservice(self, requestid, ministryrequestid, message, userid):
         """Call the BE job for stitching the documents.
         """
-        job, err = self.__makedocreviewerrequest('POST', '/api/pdfstitchjobstatus', {
+        job, err = self.makedocreviewerrequest('POST', '/api/pdfstitchjobstatus', {
                 "createdby": userid,
                 "ministryrequestid": ministryrequestid,
                 "inputfiles":message["attributes"],
@@ -215,7 +153,7 @@ class recordservice:
            
             print(processingrecords)
             # record all jobs before sending first redis stream message to avoid race condition
-            jobids, err = self.__makedocreviewerrequest('POST', '/api/jobstatus', {
+            jobids, err = self.makedocreviewerrequest('POST', '/api/jobstatus', {
                 'records': processingrecords,
                 'batch': batch,
                 'trigger': 'recordupload',
@@ -249,57 +187,9 @@ class recordservice:
                         eventqueueservice().add(self.dedupestreamkey, streamobject)
         return dbresponse
 
+    
 
-    def __format(self, records, divisions):
-        for record in records:
-            record = self.__pstformat(record)
-            record = self.__attributesformat(record, divisions)
-            if (record.get('attachments', False)):
-                record['attachments'] = self.__format(record['attachments'], divisions)
-        return records
+    
 
-    def __pstformat(self, record):
-        formatedcreateddate = maya.parse(record['created_at']).datetime(to_timezone='America/Vancouver', naive=False)
-        record['created_at'] = formatedcreateddate.strftime('%Y %b %d | %I:%M %p')
-        return record
-
-    def __attributesformat(self, record, divisions):
-        if isinstance(record['attributes'], str):
-            record['attributes'] = json.loads(record.get('attributes'))
-        record['attributes'] = record['attributes'] or {}
-        attribute_divisions = record['attributes'].get('divisions', [])
-        for division in attribute_divisions:
-            _divisionname = self.__getdivisionname(divisions, division['divisionid'])
-            division['divisionname'] = _divisionname.replace(u"’", u"'") if _divisionname is not None else ''
-        return record
-
-    def __getdivisionname(self, divisions, divisionid):
-        for division in divisions:
-            if division['division.divisionid'] == divisionid:
-                return division['division.name']
-        return None
-
-    def __makedocreviewerrequest(self, method, url, payload=None):
-        token = AuthHelper.getauthtoken()
-        try:
-            response = requests.request(
-                method=method,
-                url=self.docreviewerapiurl+url,
-                data=json.dumps(payload),
-                headers={'Authorization': token, 'Content-Type': 'application/json'},
-                timeout=float(self.docreviewerapitimeout)
-            )
-            response.raise_for_status()
-            return response.json(), None
-        except requests.exceptions.HTTPError as err:
-            logging.error("Doc Reviewer API returned the following message: {0} - {1}".format(err.response.status_code, err.response.text))
-            return None, err
-        except requests.exceptions.RequestException as err:
-            logging.error(err)
-            return None, err
-
-    def __findrootparentrecordid(self, masterid, records):
-        while records[masterid]['recordid'] is None:
-            masterid = records[masterid]['parentid']
-        return records[masterid]['recordid']
+    
 
