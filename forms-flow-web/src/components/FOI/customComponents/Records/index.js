@@ -198,7 +198,7 @@ export const RecordsLog = ({
   useEffect(() => {
     switch(pdfStitchStatus) {      
       case "started":
-      case "pushedtostream":
+      // case "pushedtostream":
         setIsDownloadInProgress(true);
         setIsDownloadReady(false);
         setIsDownloadFailed(false);
@@ -354,7 +354,7 @@ export const RecordsLog = ({
 
   const handleDownloadChange = (e) => {
     //if clicked on harms
-    if (e.target.value === 1 && ["not started", "error"].includes(pdfStitchStatus)) {
+    if (e.target.value === 1 && ["not started", "error", "pushedtostream"].includes(pdfStitchStatus)) {
       toast.info("In progress. You will be notified when the records are ready for download.", {
         position: "top-right",
         autoClose: 3000,
@@ -365,10 +365,7 @@ export const RecordsLog = ({
         progress: undefined,
         theme: "colored",
         backgroundColor: "#FFA500"
-      });
-      setIsDownloadInProgress(true);      
-      setIsDownloadReady(false);
-      setIsDownloadFailed(false); 
+      });      
       downloadLinearHarmsDocuments()      
     }
     //if clicked on harms and stitching is complete
@@ -440,6 +437,11 @@ export const RecordsLog = ({
       dispatch(triggerDownloadFOIRecordsForHarms(requestId, ministryId, message,(err, _res) => {
         if (err) {
           toastError()
+        }
+        else {
+          setIsDownloadInProgress(true);      
+          setIsDownloadReady(false);
+          setIsDownloadFailed(false); 
         }
         dispatchRequestAttachment(err);
     }));
@@ -694,8 +696,8 @@ export const RecordsLog = ({
             alignItems="flex-start"
             spacing={1}
           >
-            <Grid item xs={3}>
-              <ConditionalComponent condition={records.filter(record => record.attachments?.length > 0).length > 0}>
+            <ConditionalComponent condition={records.filter(record => record.attachments?.length > 0).length > 0}>
+            <Grid item xs={3}>              
                 <button
                   className="btn addAttachment foi-export-button"
                   variant="contained"
@@ -704,10 +706,12 @@ export const RecordsLog = ({
                 >
                   Remove Attachments
                 </button>
-              </ConditionalComponent>
+              
             </Grid>
+            </ConditionalComponent>
+            <ConditionalComponent condition={hasDocumentsToDownload}>
             <Grid item xs={3}>
-              <ConditionalComponent condition={hasDocumentsToDownload}>
+              
               <TextField
               className="download-dropdown custom-select-wrapper foi-download-button"
               id="download"
@@ -760,8 +764,9 @@ export const RecordsLog = ({
 
               } )}
             </TextField>
-              </ConditionalComponent>
+             
             </Grid>
+            </ConditionalComponent>
             {/* <Grid item xs={2}>
               <ConditionalComponent condition={hasDocumentsToExport}>
                 <button
