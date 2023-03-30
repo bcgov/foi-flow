@@ -652,7 +652,7 @@ export const CFRForm = ({
               </div>
               <div className='request-accordian'>
                 <Accordion defaultExpanded={true}>
-                  <AccordionSummary className="accordionSummary" expandIcon={<ExpandMoreIcon />} id="applicantDetails-header">
+                  <AccordionSummary className="accordionSummary" expandIcon={<ExpandMoreIcon />} id="payment-details">
                     <Typography className="heading">PAYMENT DETAILS</Typography>
                   </AccordionSummary>
                   <AccordionDetails>
@@ -859,7 +859,7 @@ export const CFRForm = ({
                   </AccordionDetails>
                 </Accordion>
                 <Accordion defaultExpanded={true}>
-                  <AccordionSummary className="accordionSummary" expandIcon={<ExpandMoreIcon />} id="applicantDetails-header">
+                  <AccordionSummary className="accordionSummary" expandIcon={<ExpandMoreIcon />} id="overall-fee-estimate">
                     <Typography className="heading">OVERALL FEES ESTIMATE</Typography>
                   </AccordionSummary>
                   <AccordionDetails>
@@ -1240,7 +1240,7 @@ export const CFRForm = ({
               </div>
               <div className='request-accordian'>
                 <Accordion defaultExpanded={true}>
-                  <AccordionSummary className="accordionSummary" expandIcon={<ExpandMoreIcon />} id="applicantDetails-header">
+                  <AccordionSummary className="accordionSummary" expandIcon={<ExpandMoreIcon />} id="clarification-suggestions">
                     <Typography className="heading">OVERALL CLARIFICATION SUGGESTIONS</Typography>
                   </AccordionSummary>
                   <AccordionDetails>
