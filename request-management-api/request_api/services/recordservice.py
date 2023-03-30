@@ -42,10 +42,9 @@ class recordservice(recordservicebase):
         newrecord.__dict__.update(record)
         response = FOIRequestRecord.create([newrecord])
         if (response.success):
-            if (not record['attributes'].get('incompatible', False)):
-                _apiresponse, err = self.makedocreviewerrequest('POST', '/api/document/delete', {'ministryrequestid': ministryrequestid, 'filepaths': [record['s3uripath']]})
-                if err:
-                    return DefaultMethodResult(False,'Error in contacting Doc Reviewer API', -1, recordid)
+            _apiresponse, err = self.makedocreviewerrequest('POST', '/api/document/delete', {'ministryrequestid': ministryrequestid, 'filepaths': [record['s3uripath']]})
+            if err:
+                return DefaultMethodResult(False,'Error in contacting Doc Reviewer API', -1, recordid)
             return DefaultMethodResult(True,'Record marked as inactive', -1, recordid)
         else:
             return DefaultMethodResult(False,'Error in deleting Record', -1, recordid)
