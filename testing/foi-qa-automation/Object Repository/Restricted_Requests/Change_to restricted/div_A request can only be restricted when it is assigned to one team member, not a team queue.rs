@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <WebElementEntity>
    <description></description>
-   <name>div_Only the Intake Manager can remove the restricted flag on a request</name>
+   <name>div_A request can only be restricted when it is assigned to one team member, not a team queue</name>
    <tag></tag>
-   <elementGuidId>b16a1328-74ff-4236-91e9-95261d0c31a0</elementGuidId>
+   <elementGuidId>b73cc165-2d1e-423d-83e7-d3fe5ceca70a</elementGuidId>
    <selectorCollection>
-      <entry>
-         <key>CSS</key>
-         <value>div.confirmation-message</value>
-      </entry>
       <entry>
          <key>XPATH</key>
          <value>//span[@id='restricted-modal-text']/div/div</value>
+      </entry>
+      <entry>
+         <key>CSS</key>
+         <value>div.confirmation-message</value>
       </entry>
    </selectorCollection>
    <selectorMethod>XPATH</selectorMethod>
@@ -22,7 +22,7 @@
       <name>tag</name>
       <type>Main</type>
       <value>div</value>
-      <webElementGuid>2fa32693-da1f-40f3-a90e-78a825002b79</webElementGuid>
+      <webElementGuid>a969153b-af2f-4882-bda6-17665dc3a6a4</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -30,15 +30,15 @@
       <name>class</name>
       <type>Main</type>
       <value>confirmation-message</value>
-      <webElementGuid>1b0aa01b-f2f8-4b7b-8725-c1fe16c1b60f</webElementGuid>
+      <webElementGuid>d8f19ec3-da7e-4632-bda9-8f73d77231a4</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>true</isSelected>
       <matchCondition>equals</matchCondition>
       <name>text</name>
       <type>Main</type>
-      <value>Only the Intake Manager can remove the restricted flag on a request</value>
-      <webElementGuid>36afbd67-d0c4-4945-9a45-5fcb04f16bbc</webElementGuid>
+      <value>A request can only be restricted when it is assigned to one team member, not a team queue.</value>
+      <webElementGuid>6acee9d5-7c8c-40e2-ac14-21072839cf1e</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -46,7 +46,7 @@
       <name>xpath</name>
       <type>Main</type>
       <value>id(&quot;restricted-modal-text&quot;)/div[@class=&quot;modal-msg&quot;]/div[@class=&quot;confirmation-message&quot;]</value>
-      <webElementGuid>e3566fba-7444-4116-8565-3c37e95d7e43</webElementGuid>
+      <webElementGuid>3aa6e404-bf8a-459c-9f0e-4db6933d56a5</webElementGuid>
    </webElementProperties>
    <webElementXpaths>
       <isSelected>true</isSelected>
@@ -54,7 +54,7 @@
       <name>xpath:idRelative</name>
       <type>Main</type>
       <value>//span[@id='restricted-modal-text']/div/div</value>
-      <webElementGuid>da59d24f-96d8-4b5a-85d8-cc34af5d4a76</webElementGuid>
+      <webElementGuid>fe25ffcc-b359-44e4-b56a-be330f33a0d1</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -62,23 +62,15 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>(.//*[normalize-space(text()) and normalize-space(.)='Close'])[1]/following::div[3]</value>
-      <webElementGuid>a12ac669-c918-4ace-be3f-3f4bb573662a</webElementGuid>
+      <webElementGuid>11ce5c97-9a40-4be7-b8d1-0df256517b77</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
       <matchCondition>equals</matchCondition>
       <name>xpath:neighbor</name>
       <type>Main</type>
-      <value>(.//*[normalize-space(text()) and normalize-space(.)='Unrestrict File'])[1]/following::div[3]</value>
-      <webElementGuid>08e202b0-aeb2-4f06-a325-5c43ad245b39</webElementGuid>
-   </webElementXpaths>
-   <webElementXpaths>
-      <isSelected>false</isSelected>
-      <matchCondition>equals</matchCondition>
-      <name>xpath:neighbor</name>
-      <type>Main</type>
-      <value>(.//*[normalize-space(text()) and normalize-space(.)='Intake Manager'])[1]/preceding::div[1]</value>
-      <webElementGuid>05f93942-5521-45d5-8053-12d5277399c0</webElementGuid>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='Restrict File'])[1]/following::div[3]</value>
+      <webElementGuid>c73ebded-54e4-4688-b30f-3f3229638f5b</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -86,15 +78,23 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>(.//*[normalize-space(text()) and normalize-space(.)='Save Change'])[1]/preceding::div[2]</value>
-      <webElementGuid>cf2ead70-8296-4318-8f52-b209666c5190</webElementGuid>
+      <webElementGuid>8f0ac68a-2a0a-4c3f-a80d-138885b0c327</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
       <matchCondition>equals</matchCondition>
       <name>xpath:neighbor</name>
       <type>Main</type>
-      <value>//*/text()[normalize-space(.)='Only the Intake Manager can remove the restricted flag on a request']/parent::*</value>
-      <webElementGuid>0057d059-0feb-4a46-94f4-3304b817a3d2</webElementGuid>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='Cancel'])[1]/preceding::div[2]</value>
+      <webElementGuid>5cf17018-f3c8-4ba3-a47e-00b04f0e1938</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>//*/text()[normalize-space(.)='A request can only be restricted when it is assigned to one team member, not a team queue.']/parent::*</value>
+      <webElementGuid>f1ba8301-9566-4d15-8522-011c18cfb14c</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -102,14 +102,14 @@
       <name>xpath:position</name>
       <type>Main</type>
       <value>//span/div/div</value>
-      <webElementGuid>045a9fb6-a89f-4832-a5aa-e91d7ab53312</webElementGuid>
+      <webElementGuid>db0f9c98-b2cf-41bd-9fd8-5391ccd32de1</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
       <matchCondition>equals</matchCondition>
       <name>xpath:customAttributes</name>
       <type>Main</type>
-      <value>//div[(text() = 'Only the Intake Manager can remove the restricted flag on a request' or . = 'Only the Intake Manager can remove the restricted flag on a request')]</value>
-      <webElementGuid>2e167838-d141-494d-a8ba-2f91bca75319</webElementGuid>
+      <value>//div[(text() = 'A request can only be restricted when it is assigned to one team member, not a team queue.' or . = 'A request can only be restricted when it is assigned to one team member, not a team queue.')]</value>
+      <webElementGuid>897646a3-62fc-4db7-9439-614595a0ad21</webElementGuid>
    </webElementXpaths>
 </WebElementEntity>

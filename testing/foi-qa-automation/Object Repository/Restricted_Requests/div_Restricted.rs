@@ -6,12 +6,12 @@
    <elementGuidId>a2e165b3-3645-41ac-842a-bca0cb9493fc</elementGuidId>
    <selectorCollection>
       <entry>
-         <key>CSS</key>
-         <value>#restrict-dropdown</value>
-      </entry>
-      <entry>
          <key>XPATH</key>
          <value>//div[@id='restrict-dropdown']</value>
+      </entry>
+      <entry>
+         <key>CSS</key>
+         <value>#restrict-dropdown</value>
       </entry>
    </selectorCollection>
    <selectorMethod>XPATH</selectorMethod>

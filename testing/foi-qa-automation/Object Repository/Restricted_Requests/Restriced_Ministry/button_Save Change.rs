@@ -3,22 +3,18 @@
    <description></description>
    <name>button_Save Change</name>
    <tag></tag>
-   <elementGuidId>6407e671-fbbd-477a-b438-953b281b8f78</elementGuidId>
+   <elementGuidId>2bcabb4f-b267-4e98-8322-93edea867a00</elementGuidId>
    <selectorCollection>
       <entry>
-         <key>BASIC</key>
-         <value>//*[(text() = 'Save Change' or . = 'Save Change')]</value>
+         <key>XPATH</key>
+         <value>(.//*[normalize-space(text()) and normalize-space(.)='Watchers'])[2]/following::button[1]</value>
       </entry>
       <entry>
          <key>CSS</key>
-         <value>button.btn-bottom.btn-save.btn</value>
-      </entry>
-      <entry>
-         <key>XPATH</key>
-         <value>(.//*[normalize-space(text()) and normalize-space(.)='This will allow them to have access to this restricted request content.'])[1]/following::button[1]</value>
+         <value>div.MuiDialogActions-root.MuiDialogActions-spacing > button.btn-bottom.btn-save.btn</value>
       </entry>
    </selectorCollection>
-   <selectorMethod>BASIC</selectorMethod>
+   <selectorMethod>XPATH</selectorMethod>
    <useRalativeImagePath>true</useRalativeImagePath>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -26,7 +22,7 @@
       <name>tag</name>
       <type>Main</type>
       <value>button</value>
-      <webElementGuid>fca1d023-ad28-481f-a8ff-f3dffe4a195d</webElementGuid>
+      <webElementGuid>56e92fd8-5dfa-4928-92a9-2e22e0dc6f1d</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -34,7 +30,7 @@
       <name>class</name>
       <type>Main</type>
       <value>btn-bottom btn-save btn</value>
-      <webElementGuid>52a38fc4-373e-4950-a4a0-f2c2a9ca6a7c</webElementGuid>
+      <webElementGuid>be1884fd-f9a0-45d7-959c-33e402bfc04f</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>true</isSelected>
@@ -42,7 +38,7 @@
       <name>text</name>
       <type>Main</type>
       <value>Save Change</value>
-      <webElementGuid>f5db3d12-b74c-44c0-87f0-09425168e775</webElementGuid>
+      <webElementGuid>44e0c41e-f4b0-4956-8270-22848ac9ff52</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -50,31 +46,23 @@
       <name>xpath</name>
       <type>Main</type>
       <value>/html[1]/body[@class=&quot;no-scroll&quot;]/div[@class=&quot;MuiDialog-root&quot;]/div[@class=&quot;MuiDialog-container MuiDialog-scrollPaper&quot;]/div[@class=&quot;MuiPaper-root MuiDialog-paper MuiDialog-paperScrollPaper MuiDialog-paperWidthMd MuiDialog-paperFullWidth MuiPaper-elevation24 MuiPaper-rounded&quot;]/div[@class=&quot;MuiDialogActions-root MuiDialogActions-spacing&quot;]/button[@class=&quot;btn-bottom btn-save btn&quot;]</value>
-      <webElementGuid>37c4c723-bbdb-449d-9c96-275436708710</webElementGuid>
-   </webElementProperties>
-   <webElementProperties>
-      <isSelected>false</isSelected>
-      <matchCondition>equals</matchCondition>
-      <name>disabled</name>
-      <type>Main</type>
-      <value>true</value>
-      <webElementGuid>8395a8bb-731a-4065-a4be-e423ce7e6ca9</webElementGuid>
+      <webElementGuid>c8ae8995-bf7f-489a-aba3-895080d37759</webElementGuid>
    </webElementProperties>
    <webElementXpaths>
       <isSelected>true</isSelected>
       <matchCondition>equals</matchCondition>
       <name>xpath:neighbor</name>
       <type>Main</type>
-      <value>(.//*[normalize-space(text()) and normalize-space(.)='This will allow them to have access to this restricted request content.'])[1]/following::button[1]</value>
-      <webElementGuid>433745fe-788a-4af3-9fe9-6c77cb5b4c5f</webElementGuid>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='Watchers'])[2]/following::button[1]</value>
+      <webElementGuid>2d8cc40f-d6ae-4b53-a0f7-de7d8c285b0b</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
       <matchCondition>equals</matchCondition>
       <name>xpath:neighbor</name>
       <type>Main</type>
-      <value>(.//*[normalize-space(text()) and normalize-space(.)='User, foiSuper'])[8]/following::button[1]</value>
-      <webElementGuid>be753d5d-a1ee-4850-880a-18b411af9ab3</webElementGuid>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='any user assigned'])[1]/following::button[1]</value>
+      <webElementGuid>7be92536-a5a1-4e96-9105-83fc896918ea</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -82,7 +70,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>(.//*[normalize-space(text()) and normalize-space(.)='Cancel'])[1]/preceding::button[1]</value>
-      <webElementGuid>da89c06f-bb37-46cd-a622-dea8f466b827</webElementGuid>
+      <webElementGuid>46f2af53-1798-43ed-80b9-cafa244aaad6</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -90,7 +78,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>//*/text()[normalize-space(.)='Save Change']/parent::*</value>
-      <webElementGuid>b893c150-9666-466f-97b6-489d9664a592</webElementGuid>
+      <webElementGuid>807d744c-9b01-448d-b2b7-e41ca4f89d30</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -98,7 +86,7 @@
       <name>xpath:position</name>
       <type>Main</type>
       <value>//div[3]/div/div[3]/button</value>
-      <webElementGuid>af24154d-a19a-4c78-a603-f072522dbd8f</webElementGuid>
+      <webElementGuid>046f2f72-24aa-4edf-90d5-959f6578bd63</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -106,6 +94,6 @@
       <name>xpath:customAttributes</name>
       <type>Main</type>
       <value>//button[(text() = 'Save Change' or . = 'Save Change')]</value>
-      <webElementGuid>769f36eb-6a92-4d54-88d2-e0b56fbf93ed</webElementGuid>
+      <webElementGuid>d240b80f-31f2-4c64-8db2-6b73f5a0e2a6</webElementGuid>
    </webElementXpaths>
 </WebElementEntity>

@@ -6,12 +6,12 @@
    <elementGuidId>7efe5841-2964-4070-8ba7-5739ec1b003e</elementGuidId>
    <selectorCollection>
       <entry>
-         <key>CSS</key>
-         <value>li[name=&quot;Flex Team|foisuper@idir&quot;] > span.MuiButtonBase-root.MuiIconButton-root.jss127.MuiCheckbox-root.MuiCheckbox-colorSecondary.MuiIconButton-colorSecondary > span.MuiIconButton-label > #watcher</value>
-      </entry>
-      <entry>
          <key>XPATH</key>
          <value>(//input[@id='watcher'])[15]</value>
+      </entry>
+      <entry>
+         <key>CSS</key>
+         <value>li[name=&quot;Flex Team|foisuper@idir&quot;] > span.MuiButtonBase-root.MuiIconButton-root.jss127.MuiCheckbox-root.MuiCheckbox-colorSecondary.MuiIconButton-colorSecondary > span.MuiIconButton-label > #watcher</value>
       </entry>
    </selectorCollection>
    <selectorMethod>XPATH</selectorMethod>
