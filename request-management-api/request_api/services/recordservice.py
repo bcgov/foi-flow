@@ -103,6 +103,10 @@ class recordservice(recordservicebase):
             return response.get("status")
         return ""
 
+    def isrecordschanged(self, ministryid, category):
+        response, err = self.makedocreviewerrequest('GET', '/api/recordschanged/{0}/{1}'.format(ministryid, category))
+        return response
+
     def __triggerpdfstitchservice(self, requestid, ministryrequestid, message, userid):
         """Call the BE job for stitching the documents.
         """
