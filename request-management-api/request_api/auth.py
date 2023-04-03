@@ -132,14 +132,19 @@ class AuthHelper:
     
     @classmethod
     def getuserid(cls, token=None):
-        if token is None:
-            token = request.headers.get("Authorization", None)
-        unverified_claims = josejwt.get_unverified_claims(token.partition("Bearer")[2].strip())        
-        if 'identity_provider' in unverified_claims and unverified_claims['identity_provider'] == "idir":
-            claim_name = 'foi_preferred_username' if "foi_preferred_username" in unverified_claims else 'preferred_username'
-            claim_value = unverified_claims[claim_name].lower()
-            return claim_value+'@idir' if claim_value.endswith("@idir") == False else claim_value
-        return unverified_claims['preferred_username']
+        try:
+            if token is None:
+                token = request.headers.get("Authorization", None)
+            unverified_claims = josejwt.get_unverified_claims(token.partition("Bearer")[2].strip())        
+            if 'identity_provider' in unverified_claims and unverified_claims['identity_provider'] == "idir":
+                claim_name = 'foi_preferred_username' if "foi_preferred_username" in unverified_claims else 'preferred_username'
+                claim_value = unverified_claims[claim_name].lower()
+                return claim_value+'@idir' if claim_value.endswith("@idir") == False else claim_value
+            return unverified_claims['preferred_username']
+        except JWTError as exception:
+            print("JWTError >>> ", str(exception))
+        except Exception as ex:
+            print("Exception >>> ", str(ex))
     
     @classmethod
     def getusername(cls):
