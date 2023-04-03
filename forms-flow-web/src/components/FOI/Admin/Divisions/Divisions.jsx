@@ -8,12 +8,12 @@ import EditDivisionModal from "./EditDivisionModal";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import { DataGrid } from "@mui/x-data-grid";
-import DeleteIcon from "@material-ui/icons/Delete";
-import EditIcon from "@material-ui/icons/Edit";
 import Grid from "@mui/material/Grid";
 import IconButton from "@mui/material/IconButton";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
+import DeleteIcon from "@material-ui/icons/Delete";
+import EditIcon from "@material-ui/icons/Edit";
 
 import {
   fetchProgramAreaDivisions,
@@ -41,7 +41,6 @@ const Divisions = () => {
   }, []);
 
   const createDivision = async (data) => {
-    console.log(data);
     await Promise.all([
       dispatch(
         createProgramAreaDivision({
@@ -53,7 +52,6 @@ const Divisions = () => {
   };
 
   const editDivision = async (data) => {
-    console.log(data);
     await Promise.all([
       dispatch(
         editProgramAreaDivision(
@@ -69,7 +67,6 @@ const Divisions = () => {
   };
 
   const disableDivision = async (data) => {
-    console.log(data);
     await Promise.all([dispatch(disableProgramAreaDivision(data.divisionid))]);
   };
 
@@ -113,7 +110,7 @@ const Divisions = () => {
       headerName: "Sort Order",
       width: 100,
       align: "center",
-      renderCell: (params) => {params.value ? params.value : "-"},
+      renderCell: (params) => <>{params.value ? params.value : "-"}</>,
     },
     {
       field: "action",
@@ -189,17 +186,24 @@ const Divisions = () => {
             autoHeight
             className="divisions-data-grid"
             getRowId={(row) => row.divisionid}
-            rows={
-              searchResults && searchResults.length > 0
-                ? searchResults
-                : divisions
-            }
+            rows={searchResults ? searchResults : divisions}
             columns={columns}
             rowHeight={30}
             headerHeight={50}
             hideFooterSelectedRowCount={true}
             disableColumnMenu={true}
             pagination
+            components={{
+              NoRowsOverlay: () => (
+                <Stack
+                  height="100%"
+                  alignItems="center"
+                  justifyContent="center"
+                >
+                  No divisions found.
+                </Stack>
+              ),
+            }}
           />
         </Grid>
       </Grid>
