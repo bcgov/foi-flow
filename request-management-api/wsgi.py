@@ -48,7 +48,8 @@ def __validatejwt(message):
     if message.get("x-jwt-token") is not None:
         try:
             return AuthHelper.getwsuserid(message.get("x-jwt-token"))            
-        except BusinessException as exception: 
+        except BusinessException as exception:
+            print("BusinessException >> ", str(exception))
             current_app.logger.error("%s,%s" % ('Unable to get user details', exception.message)) 
     return None 
 
