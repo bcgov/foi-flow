@@ -25,43 +25,51 @@ const Admin = () => {
             Admin Dashboard
           </Typography>
         </Grid>
-        <Grid item component={Card} xs={12} sm={6} md={4} lg={3} sx={{ m: 1 }}>
-          <CardActionArea>
-            <CardContent onClick={() => dispatch(push(`/admin/divisions`))}>
-              <Typography gutterBottom variant="h5" component="h2">
-                Manage Divisions
-              </Typography>
-            </CardContent>
-          </CardActionArea>
+        <Grid item xs={12} sm={6} md={4} lg={3} sx={{ m: 1 }}>
+          <Card>
+            <CardActionArea>
+              <CardContent onClick={() => dispatch(push(`/admin/divisions`))}>
+                <Typography variant="h5" component="h2">
+                  Divisions
+                </Typography>
+              </CardContent>
+            </CardActionArea>
+          </Card>
         </Grid>
-        <Grid item component={Card} xs={12} sm={6} md={4} lg={3} sx={{ m: 1 }}>
-          <CardActionArea>
-            <CardContent onClick={() => console.log("manage stages")}>
-              <Typography gutterBottom variant="h5" component="h2">
-                Manage Stages
-              </Typography>
-            </CardContent>
-          </CardActionArea>
+        <Grid item xs={12} sm={6} md={4} lg={3} sx={{ m: 1 }}>
+          <Card>
+            <CardActionArea>
+              <CardContent onClick={() => console.log("manage stages")}>
+                <Typography variant="h5" component="h2">
+                  Stages
+                </Typography>
+              </CardContent>
+            </CardActionArea>
+          </Card>
         </Grid>
-        <Grid item component={Card} xs={12} sm={6} md={4} lg={3} sx={{ m: 1 }}>
-          <CardActionArea>
-            <CardContent
-              onClick={() => console.log("manage applicant categories")}
-            >
-              <Typography gutterBottom variant="h5" component="h2">
-                Manage Applicant Categories
-              </Typography>
-            </CardContent>
-          </CardActionArea>
+        <Grid item xs={12} sm={6} md={4} lg={3} sx={{ m: 1 }}>
+          <Card>
+            <CardActionArea>
+              <CardContent
+                onClick={() => console.log("manage applicant categories")}
+              >
+                <Typography variant="h5" component="h2">
+                  Applicant Categories
+                </Typography>
+              </CardContent>
+            </CardActionArea>
+          </Card>
         </Grid>
-        <Grid item component={Card} xs={12} sm={6} md={4} lg={3} sx={{ m: 1 }}>
-          <CardActionArea>
-            <CardContent onClick={() => console.log("manage program areas")}>
-              <Typography gutterBottom variant="h5" component="h2">
-                Manage Program Areas
-              </Typography>
-            </CardContent>
-          </CardActionArea>
+        <Grid item xs={12} sm={6} md={4} lg={3} sx={{ m: 1 }}>
+          <Card>
+            <CardActionArea>
+              <CardContent onClick={() => console.log("manage program areas")}>
+                <Typography variant="h5" component="h2">
+                  Program Areas
+                </Typography>
+              </CardContent>
+            </CardActionArea>
+          </Card>
         </Grid>
       </Grid>
     </div>
