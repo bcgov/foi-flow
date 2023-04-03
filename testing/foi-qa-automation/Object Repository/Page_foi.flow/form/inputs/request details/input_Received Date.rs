@@ -10,15 +10,14 @@
          <value>//input[@id='receivedDate']</value>
       </entry>
       <entry>
+         <key>CSS</key>
+      </entry>
+      <entry>
          <key>BASIC</key>
          <value>//*[@type = 'date']</value>
       </entry>
-      <entry>
-         <key>CSS</key>
-         <value></value>
-      </entry>
    </selectorCollection>
-   <selectorMethod>BASIC</selectorMethod>
+   <selectorMethod>XPATH</selectorMethod>
    <useRalativeImagePath>true</useRalativeImagePath>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -26,7 +25,7 @@
       <name>tag</name>
       <type>Main</type>
       <value>input</value>
-      <webElementGuid>8a217e46-2529-48f4-ab7c-6db38a90e569</webElementGuid>
+      <webElementGuid>4dddeed0-8225-4445-b36c-a6eb06529c80</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -34,7 +33,7 @@
       <name>aria-invalid</name>
       <type>Main</type>
       <value>true</value>
-      <webElementGuid>54dfd0f1-0a28-4b08-8ee7-1d56a7e0607c</webElementGuid>
+      <webElementGuid>12979fe0-6cb3-4ec3-8493-54140e233fab</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>true</isSelected>
@@ -42,7 +41,7 @@
       <name>type</name>
       <type>Main</type>
       <value>date</value>
-      <webElementGuid>3dec4b63-3cb6-4912-81d3-e4f1ce31c7e3</webElementGuid>
+      <webElementGuid>2da05415-436e-46eb-bc49-2524b34873ba</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -50,7 +49,7 @@
       <name>class</name>
       <type>Main</type>
       <value>MuiInputBase-input MuiOutlinedInput-input</value>
-      <webElementGuid>b3ead906-48be-4bae-9a9b-f0520355f2b3</webElementGuid>
+      <webElementGuid>33fe17b5-274a-42ae-bbb2-e2e5d0715f93</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -58,7 +57,7 @@
       <name>xpath</name>
       <type>Main</type>
       <value>id(&quot;Request&quot;)/div[@class=&quot;container foi-review-request-container&quot;]/div[@class=&quot;foi-review-container&quot;]/form[@class=&quot;jss1 foi-request-form&quot;]/div[@class=&quot;MuiPaper-root MuiCard-root foi-details-card MuiPaper-elevation1 MuiPaper-rounded&quot;]/div[@class=&quot;MuiCardContent-root&quot;]/div[@class=&quot;row foi-details-row&quot;]/div[@class=&quot;col-lg-6 foi-details-col&quot;]/div[@class=&quot;MuiFormControl-root MuiTextField-root MuiFormControl-fullWidth&quot;]/div[@class=&quot;MuiInputBase-root MuiOutlinedInput-root Mui-error Mui-error MuiInputBase-fullWidth MuiInputBase-formControl&quot;]/input[@class=&quot;MuiInputBase-input MuiOutlinedInput-input&quot;]</value>
-      <webElementGuid>31f6c822-c849-4699-b4d2-0527b4aa8be9</webElementGuid>
+      <webElementGuid>3a69a890-cf60-48d8-8e98-2ba4da41f3e0</webElementGuid>
    </webElementProperties>
    <webElementXpaths>
       <isSelected>true</isSelected>
@@ -66,7 +65,7 @@
       <name>xpath:attributes</name>
       <type>Main</type>
       <value>//input[@id='receivedDate']</value>
-      <webElementGuid>e0236358-3ec4-4fe7-bc3a-e22cb6aeddf5</webElementGuid>
+      <webElementGuid>42e86214-2bb4-40a4-9923-866e78f861af</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -74,7 +73,7 @@
       <name>xpath:idRelative</name>
       <type>Main</type>
       <value>//div[@id='Request']/div/div/form/div[5]/div/div/div[2]/div/div/input</value>
-      <webElementGuid>0690af1a-6252-478f-9dd0-bf1af65c78b6</webElementGuid>
+      <webElementGuid>3582a417-9bc1-4fb0-88d1-5bff57ae04d3</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -82,6 +81,6 @@
       <name>xpath:position</name>
       <type>Main</type>
       <value>//div[5]/div/div/div[2]/div/div/input</value>
-      <webElementGuid>1a7ef7f7-046a-4793-9c3a-f8f80d973176</webElementGuid>
+      <webElementGuid>94318312-91dc-4723-8c12-c5dd413c806a</webElementGuid>
    </webElementXpaths>
 </WebElementEntity>

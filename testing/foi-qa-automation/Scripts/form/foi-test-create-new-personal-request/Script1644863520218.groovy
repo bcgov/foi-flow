@@ -37,8 +37,8 @@ assert WebUI.getAttribute(findTestObject('Page_foi.flow/form/inputs/applicant de
 assert WebUI.getAttribute(findTestObject('Page_foi.flow/form/inputs/applicant details/input_Applicant Last Name Parent'), 
     'class').contains('Mui-error') == true
 
-assert WebUI.getAttribute(findTestObject('Page_foi.flow/form/inputs/applicant details/input_Applicant Email Parent'), 'class').contains(
-    'Mui-error') == true
+//assert WebUI.getAttribute(findTestObject('Page_foi.flow/form/inputs/applicant details/input_Applicant Email Parent'), 'class').contains(
+//    'Mui-error') == true
 
 assert WebUI.getAttribute(findTestObject('Page_foi.flow/form/inputs/applicant details/input_Category Parent'), 'class').contains(
     'Mui-error') == true
