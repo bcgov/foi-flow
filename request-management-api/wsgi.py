@@ -50,7 +50,9 @@ def __validatejwt(message):
             return AuthHelper.getwsuserid(message.get("x-jwt-token"))            
         except BusinessException as exception:
             print("BusinessException >> ", str(exception))
-            current_app.logger.error("%s,%s" % ('Unable to get user details', exception.message)) 
+            # current_app.logger.error("%s,%s" % ('Unable to get user details', exception.message))
+        except Exception as ex:
+            print("__validatejwt Exception >>> ", str(ex))
     return None 
 
 @socketio.on_error()
