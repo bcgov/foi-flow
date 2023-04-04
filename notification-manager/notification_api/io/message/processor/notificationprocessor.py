@@ -52,14 +52,19 @@ class notificationprocessor:
         return 'A batch of records has been uploaded by '+self.__formatname(username)
 
     def __createnotificationforharmspdfstitch(self, notification):
-        return notificationservice().createnotification("ministryrequest", notification.ministryrequestid, {"message": self.__createmessage(notification.errorflag)}, "PDFStitch", notification.createdby )
+        return notificationservice().createnotification("ministryrequest", notification.ministryrequestid, {"message": self.__createmessage(notification.errorflag, notification.totalskippedfilecount, notification.totalskippedfiles)}, "PDFStitch", notification.createdby )
 
     def __createcommentforharmspdfstitch(self, notification):
-        comment = {"comment": self.__createmessage(notification.errorflag)}     
+        comment = {"comment": self.__createmessage(notification.errorflag, notification.totalskippedfilecount, notification.totalskippedfiles)}     
         return commentservice().createcomment("ministryrequest", notification.ministryrequestid, comment, notification.createdby, 2)
 
-    def __createmessage(self, errorflag):
-        if errorflag == "YES":
+    def __createmessage(self, errorflag, totalskippedfilecount, totalskippedfiles):
+        if int(totalskippedfilecount) > 0:
+            totalskippedfiles = json.loads(totalskippedfiles)
+            files = ", ".join(file for file in totalskippedfiles)
+            message = files + " file(s) could not be added to package, please check record for errors"
+            return message
+        elif errorflag == "YES":
             return 'Preparing records for harms export failed. Please Try Again'
         return 'Records for harms are ready for export'
 

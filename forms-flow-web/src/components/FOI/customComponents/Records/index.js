@@ -388,7 +388,7 @@ export const RecordsLog = ({
   const downloadLinearHarmsDocuments = () => {
     try{
     
-      const message = formFinalMessage(recordsObj?.records);
+      const message = createMessageForHarms(recordsObj?.records);
       dispatch(triggerDownloadFOIRecordsForHarms(requestId, ministryId, message,(err, _res) => {
         if (err) {
           toastError()
@@ -408,6 +408,84 @@ export const RecordsLog = ({
 
   }
 
+  const createMessageForHarms = (recordList) => {
+    
+    const message = {
+      "category":RecordDownloadCategory.harms,
+      "requestnumber":requestNumber,
+      "bcgovcode":bcgovcode,
+      "attributes":[]
+    };
+
+    let exporting = recordList.filter(record => !record.isduplicate)
+    for (let record of exporting) {
+      if (record.attachments) for (let attachment of record.attachments) {
+        if (!attachment.isduplicate) exporting.push(attachment);
+      }
+    }
+
+    // Create a map to group files by division
+    const divisionMap = new Map();
+ 
+    // Loop through each item in the input array
+    for (const item of exporting) {
+      // Get the division information from the item
+      const divisions = item.attributes ? item.attributes.divisions : null;
+      let filepath = item.s3uripath
+      let filename = item.filename
+      if (item.isredactionready && ['.doc','.docx','.xls','.xlsx', '.ics', '.msg'].includes(item.attributes?.extension)) {
+        filepath = filepath.substr(0, filepath.lastIndexOf(".")) + ".pdf";
+        filename += ".pdf";
+      }
+    
+      // If the item has no division information, skip it
+      if (!divisions) {
+        continue;
+      }
+    
+      // Loop through each division in the item
+      for (const division of divisions) {
+        // Get the division ID and name
+        const divisionId = division.divisionid;
+        const divisionName = division.divisionname.replace("'", "");
+    
+        // If the division is not already in the division map, add it
+        if (!divisionMap.has(divisionId)) {
+          divisionMap.set(divisionId, {
+            divisionid: divisionId,
+            divisionname: divisionName,
+            files: []
+          });
+        }
+    
+        // Add the item to the files array for this division
+        const files = divisionMap.get(divisionId).files;
+        files.push({
+          lastmodified: item.attributes ? item.attributes.lastmodified : null,
+          recordid: item.recordid,
+          s3uripath: filepath,
+          filename: filename
+        });
+      }
+    }
+ 
+    // // Sort the divisions by lastmodified date and add them to the output object
+    // const sortedDivisions = Array.from(divisionMap.values()).sort((a, b) => {
+    //   const aDate = new Date(Date.parse(a.files[0].lastmodified));
+    //   const bDate = new Date(Date.parse(b.files[0].lastmodified));
+    //   return bDate - aDate;
+    // });
+    
+    const sortedDivisions = Array.from(divisionMap.values()).map(({ divisionid, divisionname, files }) => ({
+      divisionid,
+      divisionname,
+      files: files.sort((a, b) => new Date(a.lastmodified) - new Date(b.lastmodified))
+    }));
+    message.attributes = sortedDivisions;
+    return message;
+
+  }
+
   const formFinalMessage = (recordList) => {
     let exporting = recordList.filter(record => !record.isduplicate)
     for (let record of exporting) {
@@ -419,6 +497,7 @@ export const RecordsLog = ({
       attributes: []
     }
     let attributes = [];
+    console.log(`records == ${JSON.stringify(exporting)}`)
     for (let record of exporting) {
       const fileObj = {}
       const attributeObj = {files: []}
