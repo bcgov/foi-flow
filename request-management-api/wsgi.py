@@ -57,7 +57,8 @@ def __validatejwt(message):
 
 @socketio.on_error()
 def error_handler(e):
-    current_app.logger.error("%s,%s" % ('Socket error', e.message))
+    # current_app.logger.error("%s,%s" % ('Socket error', e.message))
+    print('Socket error', str(e))
 
 APP = create_app()
 if __name__ == "__main__":
