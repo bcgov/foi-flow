@@ -1,4 +1,5 @@
 from .db import  db, ma
+from datetime import datetime as datetime2
 from .default_method_result import DefaultMethodResult
 from sqlalchemy.orm import relationship,backref
 from datetime import datetime
@@ -26,6 +27,37 @@ class ProgramAreaDivision(db.Model):
         division_schema = ProgramAreaDivisionSchema(many=True)
         query = db.session.query(ProgramAreaDivision).filter_by(programareaid=programareaid, isactive=True).order_by(ProgramAreaDivision.name.asc())
         return division_schema.dump(query)
+    
+    @classmethod
+    def createprogramareadivision(cls, programareadivision)->DefaultMethodResult:
+        created_at = datetime2.now().isoformat()
+        newprogramareadivision = ProgramAreaDivision(programareaid=programareadivision["programareaid"], name=programareadivision["name"], isactive=True, created_at=created_at)
+        db.session.add(newprogramareadivision)
+        db.session.commit()      
+        return DefaultMethodResult(True,'Division added',newprogramareadivision.divisionid)
+
+    @classmethod
+    def disableprogramareadivision(cls, divisionid):   
+        dbquery = db.session.query(ProgramAreaDivision)
+        division = dbquery.filter_by(divisionid=divisionid)
+        if(division.count() > 0) :             
+            division.update({ProgramAreaDivision.isactive:False}, synchronize_session = False)
+            db.session.commit()
+            return DefaultMethodResult(True,'Division disabled',divisionid)
+        else:
+            return DefaultMethodResult(True,'No Division found',divisionid)  
+    
+    @classmethod
+    def updateprogramareadivision(cls, divisionid, programareadivision):   
+        dbquery = db.session.query(ProgramAreaDivision)
+        division = dbquery.filter_by(divisionid=divisionid)
+        if(division.count() > 0) :             
+            division.update({ProgramAreaDivision.programareaid:programareadivision["programareaid"], ProgramAreaDivision.name:programareadivision["name"], ProgramAreaDivision.isactive:True, ProgramAreaDivision.sortorder:programareadivision["sortorder"]}, synchronize_session = False)
+            db.session.commit()
+            return DefaultMethodResult(True,'Division updated',divisionid)
+        else:
+            return DefaultMethodResult(True,'No Division found',divisionid)  
+
     
              
 

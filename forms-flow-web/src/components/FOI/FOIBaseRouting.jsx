@@ -20,6 +20,9 @@ const FOIBaseRouting = React.memo(({store}) => {
                 <Route path="/foidocument">
                     <FOIDocumentViewRouting store={store} />
                 </Route>
+                <Route path="/admin">
+                    <FOIUnAuthenticateRouting store={store} />
+                </Route>
                 <Route exact path="/">                   
                     <FOIUnAuthenticateRouting store={store}/>
                 </Route>
