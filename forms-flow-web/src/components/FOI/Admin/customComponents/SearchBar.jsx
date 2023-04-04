@@ -20,6 +20,11 @@ const SearchBar = ({ autocompleteOptions, items, setSearchResults }) => {
   const handleSearch = () => {
     let searchKeywords = keywords ? keywords.toLowerCase().split(" ") : [];
 
+    if (searchKeywords.length == 0) {
+      setSearchResults(null);
+      return;
+    }
+
     let results = items.reduce((found, item) => {
       let matches = 0;
       searchKeywords.forEach((keyword) => {
