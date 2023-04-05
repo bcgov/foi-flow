@@ -969,7 +969,7 @@ export const RecordsLog = ({
                 >
                   <label className="hideContent">Filter Records</label>
                   <InputBase
-                    id="foicommentfilter"
+                    id="foirecordsfilter"
                     placeholder="Filter Records ..."
                     defaultValue={""}
                     onChange={(e)=>{setSearchValue(e.target.value.trim())}}
@@ -979,6 +979,7 @@ export const RecordsLog = ({
                     startAdornment={
                       <InputAdornment position="start">
                         <IconButton
+                          aria-label="Search Icon"
                           className="search-icon"
                         >
                           <span className="hideContent">Filter Records ...</span>
