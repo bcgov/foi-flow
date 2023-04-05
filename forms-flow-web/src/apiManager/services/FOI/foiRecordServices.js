@@ -86,10 +86,7 @@ export const checkForRecordsChange = (requestId, ministryId, ...rest) => {
     httpGETRequest(apiUrl, {}, UserService.getToken())
       .then((res) => {
         if (res.data) {
-          console.log(`res.data = ${JSON.stringify(res.data)}`)
-          console.log(`recordchanged = ${res.data.recordchanged}`)
           if (res.data.recordchanged) {
-            console.log("inside if")
             dispatch(setFOIPDFStitchStatusForHarms("not started"));
           }         
           done(null, res.data);
