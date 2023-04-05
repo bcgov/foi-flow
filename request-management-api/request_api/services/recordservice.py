@@ -116,8 +116,6 @@ class recordservice(recordservicebase):
                 "inputfiles":message["attributes"],
                 "category": message["category"]
             })
-        print("job ========== ",job)
-        print("jobid ========== ",job.get("id"))
         if err:
             return DefaultMethodResult(False,'Error in contacting Doc Reviewer API', -1, ministryrequestid)
         streamobject = {

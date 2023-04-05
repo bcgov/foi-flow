@@ -47,6 +47,7 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 import CloseIcon from '@material-ui/icons/Close';
 import _ from 'lodash';
 import { DOC_REVIEWER_WEB_URL } from "../../../../constants/constants";
+import {removeDuplicateFiles, addDeduplicatedAttachmentsToRecords, getPDFFilePath, sortDivisionalFiles} from "./util"
 
 
 const useStyles = makeStyles((_theme) => ({
@@ -417,12 +418,8 @@ export const RecordsLog = ({
       "attributes":[]
     };
 
-    let exporting = recordList.filter(record => !record.isduplicate)
-    for (let record of exporting) {
-      if (record.attachments) for (let attachment of record.attachments) {
-        if (!attachment.isduplicate) exporting.push(attachment);
-      }
-    }
+    let exporting = removeDuplicateFiles(recordList);
+    exporting = addDeduplicatedAttachmentsToRecords(exporting);
 
     // Create a map to group files by division
     const divisionMap = new Map();
@@ -431,12 +428,8 @@ export const RecordsLog = ({
     for (const item of exporting) {
       // Get the division information from the item
       const divisions = item.attributes ? item.attributes.divisions : null;
-      let filepath = item.s3uripath
-      let filename = item.filename
-      if (item.isredactionready && ['.doc','.docx','.xls','.xlsx', '.ics', '.msg'].includes(item.attributes?.extension)) {
-        filepath = filepath.substr(0, filepath.lastIndexOf(".")) + ".pdf";
-        filename += ".pdf";
-      }
+      
+      const [filepath, filename] = getPDFFilePath(item);
     
       // If the item has no division information, skip it
       if (!divisions) {
@@ -469,74 +462,18 @@ export const RecordsLog = ({
       }
     }
  
-    // // Sort the divisions by lastmodified date and add them to the output object
-    // const sortedDivisions = Array.from(divisionMap.values()).sort((a, b) => {
-    //   const aDate = new Date(Date.parse(a.files[0].lastmodified));
-    //   const bDate = new Date(Date.parse(b.files[0].lastmodified));
-    //   return bDate - aDate;
-    // });
-    
-    const sortedDivisions = Array.from(divisionMap.values()).map(({ divisionid, divisionname, files }) => ({
-      divisionid,
-      divisionname,
-      files: files.sort((a, b) => new Date(a.lastmodified) - new Date(b.lastmodified))
-    }));
+    // Sort the divisions by lastmodified date and add them to the output object
+    const sortedDivisions = sortDivisionalFiles(divisionMap);
+
     message.attributes = sortedDivisions;
+    //keeping this for testing purpose.
+    console.log(`message = ${JSON.stringify(message)}`);
+
     return message;
 
   }
 
-  const formFinalMessage = (recordList) => {
-    let exporting = recordList.filter(record => !record.isduplicate)
-    for (let record of exporting) {
-      if (record.attachments) for (let attachment of record.attachments) {
-        if (!attachment.isduplicate) exporting.push(attachment);
-      }
-    }
-    let message = { 
-      attributes: []
-    }
-    let attributes = [];
-    console.log(`records == ${JSON.stringify(exporting)}`)
-    for (let record of exporting) {
-      const fileObj = {}
-      const attributeObj = {files: []}
-      let filepath = record.s3uripath
-      let filename = record.filename
-      if (record.isredactionready && ['.doc','.docx','.xls','.xlsx', '.ics', '.msg'].includes(record.attributes?.extension)) {
-        filepath = filepath.substr(0, filepath.lastIndexOf(".")) + ".pdf";
-        filename += ".pdf";
-      }
-      fileObj.recordid = record.recordid;
-      fileObj.filename = filename;
-      fileObj.s3uripath = filepath;
-      fileObj.lastmodified = record.attributes.lastmodified;
-      for (let division of record.attributes.divisions) {
-        attributeObj.divisionid = division.divisionid
-        attributeObj.divisionname = division.divisionname?.replace("'", "")
-        attributeObj.files.push(fileObj)
-      }
-      //attributes will have unique files array and division combination
-      attributes.push(attributeObj)
-      }
 
-      //This will return the result by merging the files with same division id (order by lastmodified asc)
-      let result = attributes.reduce((acc, val) => {
-        let found = acc.find((findval) => val.divisionid === findval.divisionid);
-        if (!found) acc.push(val)
-        else found.files = found.files.concat(
-          val.files.filter((f) => !found.files.find((findval) => f.filename === findval.filename))).sort((a,b) => {
-                return new Date(Date.parse(a.lastmodified)) - new Date(Date.parse(b.lastmodified))
-              });
-        return acc;
-      }, []);
-
-      message.requestnumber = requestNumber
-      message.bcgovcode = bcgovcode
-      message.attributes = result
-      message.category = RecordDownloadCategory.harms
-      return message;
-  }
   const toastError = (error) => {
     toast.error(
       "Temporarily unable to process your request. Please try again in a few minutes.",
