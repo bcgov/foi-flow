@@ -38,8 +38,9 @@ WebUI.callTestCase(findTestCase('helper/foi-test-advanced-search-by-id'), [('req
 
 WebUI.scrollToElement(findTestObject('Page_foi.flow/form/inputs/address/svg_Category_MuiSvgIcon-root'), 0)
 
-WebUI.waitForElementClickable(findTestObject('Page_foi.flow/form/inputs/address/svg_Category_MuiSvgIcon-root'), 
-    0)
+WebUI.waitForElementClickable(findTestObject('Page_foi.flow/form/inputs/address/svg_Category_MuiSvgIcon-root'), 0)
+
+WebUI.scrollToElement(findTestObject('Page_foi.flow/form/inputs/applicant details/input_Applicant Last Name Parent'), 0)
 
 WebUI.click(findTestObject('Page_foi.flow/form/inputs/address/svg_Category_MuiSvgIcon-root'), FailureHandling.STOP_ON_FAILURE)
 
@@ -62,6 +63,8 @@ WebUI.click(findTestObject('Page_foi.flow/form/button_Return to Queue'), Failure
 WebUI.acceptAlert(FailureHandling.STOP_ON_FAILURE)
 
 WebUI.verifyMatch(WebUI.getUrl(), GlobalVariable.BASE_URL + '/foi/dashboard', false)
+
+WebUI.closeBrowser()
 
 @com.kms.katalon.core.annotation.SetUp
 def setup() {

@@ -67,7 +67,7 @@ WebUI.verifyElementPresent(findTestObject('Page_foi.flow/queue/div_request queue
 
 WebUI.click(findTestObject('Page_foi.flow/queue/div_My Requests'))
 
-WebUI.verifyElementPresent(findTestObject('Page_foi.flow/queue/div_request queue row 1'), 0)
+WebUI.verifyElementNotPresent(findTestObject('Page_foi.flow/queue/div_request queue row 1'), 0)
 
 WebUI.click(findTestObject('Page_foi.flow/queue/div_My Team Requests'))
 
@@ -110,4 +110,6 @@ assert WebUI.getAttribute(findTestObject('Page_foi.flow/queue/div_My Requests'),
 assert WebUI.getAttribute(findTestObject('Page_foi.flow/queue/div_Watching Requests'), 'class').contains('MuiChip-outlinedPrimary')
 
 assert WebUI.getAttribute(findTestObject('Page_foi.flow/queue/div_My Team Requests'), 'class').contains('MuiChip-outlinedPrimary')
+
+WebUI.closeBrowser()
 

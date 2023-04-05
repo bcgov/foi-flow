@@ -24,6 +24,7 @@ WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/div_Statu
 WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/li_Open'))
 
 WebUI.click(findTestObject('Page_foi.flow/form/state change dialog/button_Save Change'))
+//def newid=findTestObject('Page_foi.flow/form/h3_Form Request Title')
 
 WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/div_Status'))
 

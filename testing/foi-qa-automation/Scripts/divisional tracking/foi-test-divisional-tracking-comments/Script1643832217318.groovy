@@ -31,9 +31,11 @@ WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
 
 WebUI.click(findTestObject('Page_foi.flow/queue/div_request queue row 1'))
 
-WebUI.click(findTestObject('Page_foi.flow/ministry view/form/div_ministry assigned to'))
+//WebUI.click(findTestObject('Page_foi.flow/ministry view/form/div_ministry assigned to'))
 
-WebUI.click(findTestObject('Page_foi.flow/ministry view/form/ministry assignee/li_ministry assignee foiedu, foiedu'))
+//WebUI.delay(4)
+
+//WebUI.click(findTestObject('Page_foi.flow/ministry view/form/ministry assignee/li_ministry assignee foiedu, foiedu'))
 
 //requestID = WebUI.getText(findTestObject('null'), FailureHandling.STOP_ON_FAILURE)
 WebUI.scrollToElement(findTestObject('Page_foi.flow/form/button_Save'), 0)
@@ -66,10 +68,6 @@ WebUI.navigateToUrl(GlobalVariable.BASE_URL)
 //           8), ('username') : findTestData('Login Credentials').getValue('Username', 8)], FailureHandling.STOP_ON_FAILURE)
 WebUI.callTestCase(findTestCase('helper/foi-test-login'), [:], FailureHandling.STOP_ON_FAILURE)
 
-WebUI.click(findTestObject('Page_foi.flow/queue/div_queue header ID NUMBER'))
-
-WebUI.click(findTestObject('Page_foi.flow/queue/div_queue header ID NUMBER'))
-
 WebUI.click(findTestObject('Page_foi.flow/queue/div_My Team Requests'))
 
 //WebUI.callTestCase(findTestCase('helper/foi-test-advanced-search-by-id'), [('requestID') : requestID], FailureHandling.STOP_ON_FAILURE)
@@ -77,9 +75,11 @@ WebUI.click(findTestObject('Page_foi.flow/queue/div_My Team Requests'))
 //WebUI.click(findTestObject('Page_foi.flow/queue/advanced search/div_advanced search field selector ID NUMBER'))
 //WebUI.click(findTestObject('null'))
 //WebUI.setText(findTestObject('Page_foi.flow/queue/advanced search/input_advancedSearch'), requestID)
-WebUI.setText(findTestObject('Page_foi.flow/queue/input_Dashboard Filter'), requestID)
+WebUI.setText(findTestObject('Page_foi.flow/queue/input_Dashboard Filter'), 'ABC-2099-' + requestID)
 
 WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
+
+WebUI.delay(4)
 
 //WebUI.scrollToElement(findTestObject('Page_foi.flow/queue/advanced search/button_Apply Search'), 0)
 //WebUI.click(findTestObject('Page_foi.flow/queue/advanced search/button_Apply Search'))
@@ -132,11 +132,21 @@ WebUI.click(findTestObject('Page_foi.flow/form/sidebar/div_Sidebar Comments'), F
 
 WebUI.click(findTestObject('Page_foi.flow/comment/span_Divisional Tracking'))
 
+WebUI.refresh()
+
+WebUI.click(findTestObject('Page_foi.flow/form/sidebar/div_Sidebar Comments'), FailureHandling.STOP_ON_FAILURE)
+
+WebUI.click(findTestObject('Page_foi.flow/comment/span_Divisional Tracking'))
+
 WebUI.verifyElementText(findTestObject('Page_foi.flow/comment/p_comment list 1 text'), 'Deputy Minister’s Office division has been updated to stage Assigned to Division')
 
 WebUI.verifyElementText(findTestObject('Page_foi.flow/comment/div_Comment list 1 user'), 'Request History')
 
 WebUI.verifyElementPresent(findTestObject('Page_foi.flow/comment/div_Comment list 1 date'), 0)
+
+DriverFactory.changeWebDriver(ministryUser)
+
+WebUI.refresh()
 
 WebUI.click(findTestObject('Page_foi.flow/form/sidebar/div_Sidebar Request'), FailureHandling.STOP_ON_FAILURE)
 
@@ -163,13 +173,15 @@ WebUI.verifyElementNotPresent(findTestObject('Page_foi.flow/form/div_divison tra
 
 DriverFactory.changeWebDriver(ministryUser)
 
+WebUI.refresh()
+
 WebUI.click(findTestObject('Page_foi.flow/form/sidebar/div_Sidebar Comments'), FailureHandling.STOP_ON_FAILURE)
 
 WebUI.click(findTestObject('Page_foi.flow/comment/span_Divisional Tracking'))
 
-WebUI.verifyElementText(findTestObject('Page_foi.flow/comment/p_comment list 1 text'), 'Learning and Education Programs division has been added with stage Assigned to Division')
+WebUI.verifyElementText(findTestObject('Page_foi.flow/comment/p_comment reply 1 text'), 'Deputy Minister’s Office division with stage Assigned to Division has been removed')
 
-WebUI.verifyElementText(findTestObject('Page_foi.flow/comment/p_comment list 2 text'), 'Deputy Minister’s Office division with stage Assigned to Division has been removed')
+WebUI.verifyElementText(findTestObject('Page_foi.flow/comment/p_comment list 2 text'), 'Learning and Education Programs division has been added with stage Assigned to Division')
 
 WebUI.click(findTestObject('Page_foi.flow/form/sidebar/div_Sidebar Request'), FailureHandling.STOP_ON_FAILURE)
 
