@@ -6,7 +6,7 @@ import AttachmentModal from '../Attachments/AttachmentModal';
 import Loading from "../../../../containers/Loading";
 import { getOSSHeaderDetails, saveFilesinS3, getFileFromS3, postFOIS3DocumentPreSignedUrl, getFOIS3DocumentPreSignedUrl } from "../../../../apiManager/services/FOI/foiOSSServices";
 import { saveFOIRequestAttachmentsList, replaceFOIRequestAttachment, saveNewFilename, deleteFOIRequestAttachment } from "../../../../apiManager/services/FOI/foiAttachmentServices";
-import { fetchFOIRecords, saveFOIRecords, deleteFOIRecords, retryFOIRecordProcessing, deleteReviewerRecords, getRecordFormats, triggerDownloadFOIRecordsForHarms, fetchPDFStitchedRecordForHarms } from "../../../../apiManager/services/FOI/foiRecordServices";
+import { fetchFOIRecords, saveFOIRecords, deleteFOIRecords, retryFOIRecordProcessing, deleteReviewerRecords, getRecordFormats, triggerDownloadFOIRecordsForHarms, fetchPDFStitchedRecordForHarms, checkForRecordsChange } from "../../../../apiManager/services/FOI/foiRecordServices";
 import { StateTransitionCategories, AttachmentCategories } from '../../../../constants/FOI/statusEnum'
 import { RecordsDownloadList, RecordDownloadCategory } from '../../../../constants/FOI/enum';
 import { addToFullnameList, getFullnameList, ConditionalComponent } from '../../../../helper/FOI/helper';
@@ -47,6 +47,7 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 import CloseIcon from '@material-ui/icons/Close';
 import _ from 'lodash';
 import { DOC_REVIEWER_WEB_URL } from "../../../../constants/constants";
+import {removeDuplicateFiles, addDeduplicatedAttachmentsToRecords, getPDFFilePath, sortDivisionalFiles} from "./util"
 
 
 const useStyles = makeStyles((_theme) => ({
@@ -164,6 +165,7 @@ export const RecordsLog = ({
 
   useEffect(() => {
     setRecords(recordsObj?.records)
+    dispatch(checkForRecordsChange(requestId, ministryId))
   }, [recordsObj])
 
   useEffect(() => {
@@ -196,9 +198,9 @@ export const RecordsLog = ({
   const [isDownloadFailed, setIsDownloadFailed] = useState(false)
   
   useEffect(() => {
-    switch(pdfStitchStatus) {      
+    switch(pdfStitchStatus) {
       case "started":
-      // case "pushedtostream":
+      case "pushedtostream":
         setIsDownloadInProgress(true);
         setIsDownloadReady(false);
         setIsDownloadFailed(false);
@@ -354,7 +356,7 @@ export const RecordsLog = ({
 
   const handleDownloadChange = (e) => {
     //if clicked on harms
-    if (e.target.value === 1 && ["not started", "error", "pushedtostream"].includes(pdfStitchStatus)) {
+    if (e.target.value === 1 && ["not started", "error"].includes(pdfStitchStatus)) {
       toast.info("In progress. You will be notified when the records are ready for download.", {
         position: "top-right",
         autoClose: 3000,
@@ -385,55 +387,9 @@ export const RecordsLog = ({
   }
 
   const downloadLinearHarmsDocuments = () => {
-    let exporting = recordsObj?.records.filter(record => !record.isduplicate)
-    for (let record of exporting) {
-      if (record.attachments) for (let attachment of record.attachments) {
-        if (!attachment.isduplicate) exporting.push(attachment);
-      }
-    }
-    try {
-      let message = {       
-        attributes: []
-      }
-      let attributes = [];      
-      for (let record of exporting) {
-        const fileObj = {}
-        const attributeObj = {files: []}
-        let filepath = record.s3uripath
-        let filename = record.filename
-        if (record.isredactionready && ['.doc','.docx','.xls','.xlsx', '.ics', '.msg'].includes(record.attributes?.extension)) {
-          filepath = filepath.substr(0, filepath.lastIndexOf(".")) + ".pdf";
-          filename += ".pdf";
-        }
-        fileObj.recordid = record.recordid;
-        fileObj.filename = filename;
-        fileObj.s3uripath = filepath;
-        fileObj.lastmodified = record.attributes.lastmodified;
-        for (let division of record.attributes.divisions) {
-          attributeObj.divisionid = division.divisionid
-          attributeObj.divisionname = division.divisionname?.replace("'", "")
-          attributeObj.files.push(fileObj)
-        }
-        //attributes will have unique files array and division combination
-        attributes.push(attributeObj)        
-      }
-
-      //This will return the result by merging the files with same division id (order by lastmodified asc)
-      let result = attributes.reduce((acc, val) => {
-        let found = acc.find((findval) => val.divisionid === findval.divisionid);
-        if (!found) acc.push(val)
-        else found.files = found.files.concat(
-          val.files.filter((f) => !found.files.find((findval) => f.filename === findval.filename))).sort((a,b) => {
-                return new Date(Date.parse(a.lastmodified)) - new Date(Date.parse(b.lastmodified))
-              });
-        return acc;
-      }, []);
-
-      message.requestnumber = requestNumber
-      message.bcgovcode = bcgovcode
-      message.attributes = result
-      message.category = RecordDownloadCategory.harms
-
+    try{
+    
+      const message = createMessageForHarms(recordsObj?.records);
       dispatch(triggerDownloadFOIRecordsForHarms(requestId, ministryId, message,(err, _res) => {
         if (err) {
           toastError()
@@ -452,6 +408,71 @@ export const RecordsLog = ({
     }
 
   }
+
+  const createMessageForHarms = (recordList) => {
+    
+    const message = {
+      "category":RecordDownloadCategory.harms,
+      "requestnumber":requestNumber,
+      "bcgovcode":bcgovcode,
+      "attributes":[]
+    };
+
+    let exporting = removeDuplicateFiles(recordList);
+    exporting = addDeduplicatedAttachmentsToRecords(exporting);
+
+    // Create a map to group files by division
+    const divisionMap = new Map();
+ 
+    // Loop through each item in the input array
+    for (const item of exporting) {
+      // Get the division information from the item
+      const divisions = item.attributes ? item.attributes.divisions : null;
+      
+      const [filepath, filename] = getPDFFilePath(item);
+    
+      // If the item has no division information, skip it
+      if (!divisions) {
+        continue;
+      }
+    
+      // Loop through each division in the item
+      for (const division of divisions) {
+        // Get the division ID and name
+        const divisionId = division.divisionid;
+        const divisionName = division.divisionname.replace("'", "");
+    
+        // If the division is not already in the division map, add it
+        if (!divisionMap.has(divisionId)) {
+          divisionMap.set(divisionId, {
+            divisionid: divisionId,
+            divisionname: divisionName,
+            files: []
+          });
+        }
+    
+        // Add the item to the files array for this division
+        const files = divisionMap.get(divisionId).files;
+        files.push({
+          lastmodified: item.attributes ? item.attributes.lastmodified : null,
+          recordid: item.recordid,
+          s3uripath: filepath,
+          filename: filename
+        });
+      }
+    }
+ 
+    // Sort the divisions by lastmodified date and add them to the output object
+    const sortedDivisions = sortDivisionalFiles(divisionMap);
+
+    message.attributes = sortedDivisions;
+    //keeping this for testing purpose.
+    console.log(`message = ${JSON.stringify(message)}`);
+
+    return message;
+
+  }
+
 
   const toastError = (error) => {
     toast.error(

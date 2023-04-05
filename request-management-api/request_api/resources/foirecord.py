@@ -177,3 +177,28 @@ class FOIRequestPDFStitchStatus(Resource):
         except Exception as error:
             print("Exception error == ", error)
             return {'status': False, 'message':error.message}, 500
+    
+@cors_preflight('GET,OPTIONS')
+@API.route('/foirecord/<requestid>/ministryrequest/<ministryrequestid>/<recordstype>/recrodschanged')
+class FOIRequestRecordsChanged(Resource):
+    """Resource for Creating FOI records."""
+
+
+    @staticmethod
+    @TRACER.trace()
+    @cross_origin(origins=allowedorigins())
+    @auth.require
+    def get(requestid, ministryrequestid, recordstype):
+        try:
+            result = recordservice().isrecordschanged(ministryrequestid, recordstype.lower())
+            print("records changed == ", result)
+            return result, 200
+        except KeyError as err:
+            print("KeyError == ", err.messages)
+            return {'status': False, 'message':err.messages}, 400
+        except BusinessException as exception:
+            print("BusinessException == ", exception.message)
+            return {'status': exception.status_code, 'message':exception.message}, 500
+        except Exception as error:
+            print("Exception error == ", error)
+            return {'status': False, 'message':error.message}, 500
