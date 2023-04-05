@@ -28,7 +28,7 @@ WebUI.callTestCase(findTestCase('helper/foi-test-advanced-search-by-id'), [('req
 
 WebUI.click(findTestObject('Page_foi.flow/form/assignee dropdown/div_Assigned'))
 
-WebUI.click(findTestObject('Page_foi.flow/form/assignee dropdown/li_Flex, foiIntake (1)'))
+WebUI.click(findTestObject('Page_foi.flow/form/assignee dropdown/Page_ABC-2099-14402/li_Intake, FOI'))
 
 //WebUI.click(findTestObject('Page_foi.flow/form/assignee dropdown/li_assignee user option', [('user') : (lastname + ', ') + 
 //           firstname]))

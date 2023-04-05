@@ -28,7 +28,7 @@ def jsonSlurper = new JsonSlurper()
 
 def ministryProcessingMap = jsonSlurper.parseText((((((((((((((((((((((((((((((((('{"AEST" : "Social Education",' + '"AGR" : "Resource Team",') + 
     '"BRD" : "Central Team",') + '"CAS" : "Central Team",') + '"MCF" : "MCFD Personals Team",') + '"CLB" : "Social Education",') + 
-    '"CITZ" : "Central Team",') + '"EAO" : "Resource Team",') + '"EDU" : "Social Education",') + '"EMBC" : "Justice Health Team",') + 
+    '"CITZ" : "Central Team",') + '"EAO" : "Resource Team",') + '"EDU" : "Social Education, Flex Team",') + '"EMBC" : "Justice Health Team",') + 
     '"EMLI" : "Resource Team",') + '"FIN" : "Central Team",') + '"FOR" : "Resource Team",') + '"GCPE" : "Social Education",') + 
     '"HLTH" : "Justice Health Team",') + '"IIO" : "Justice Health Team",') + '"IRR" : "Resource Team",') + '"JERI" : "Business Team",') + 
     '"LBR" : "Business Team",') + '"LDB" : "Justice Health Team",') + '"AG" : "Justice Health Team",') + '"MGC" : "Central Team",') + 

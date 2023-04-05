@@ -94,7 +94,7 @@ WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/li_Record
 
 WebUI.verifyElementPresent(findTestObject('Page_foi.flow/form/state change dialog/div_State Change Dialog'), 0)
 
-WebUI.verifyElementText(findTestObject('Page_foi.flow/form/state change dialog/span_State Change Dialog message'), 'Upload completed Call for Records form to change the state.')
+WebUI.verifyElementText(findTestObject('Page_foi.flow/form/state change dialog/span_State Change Dialog message'), 'Upload completed Call for Records form (if required) to change the state.')
 
 WebUI.callTestCase(findTestCase('helper/foi-test-state-change-attachment-modal'), [('filename') : 'test2.docx'], FailureHandling.STOP_ON_FAILURE)
 
