@@ -301,14 +301,16 @@ export const RecordsLog = ({
                 }
               })
             }
-            if (modalFor === 'replace') {
-              dispatch(retryFOIRecordProcessing(requestId, ministryId, {records: _documents},(err, _res) => {
-                  dispatchRequestAttachment(err);
-              }));
-            } else {
-              dispatch(saveFOIRecords(requestId, ministryId, {records: _documents},(err, _res) => {
-                  dispatchRequestAttachment(err);
-              }));
+            if (_documents.length > 0) {
+              if (modalFor === 'replace') {
+                dispatch(retryFOIRecordProcessing(requestId, ministryId, {records: _documents},(err, _res) => {
+                    dispatchRequestAttachment(err);
+                }));
+              } else {
+                dispatch(saveFOIRecords(requestId, ministryId, {records: _documents},(err, _res) => {
+                    dispatchRequestAttachment(err);
+                }));
+              }
             }
             var toastOptions = {
               render: failed.length > 0 ?
