@@ -13,6 +13,8 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v2
+      with:
+        ref: dev-automationscripts
     - name: set screen resolution
       run: Set-DisplayResolution -Width 1920 -Height 1080 -Force  
     - name: set date format

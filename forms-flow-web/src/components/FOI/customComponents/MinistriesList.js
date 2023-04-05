@@ -73,7 +73,6 @@ const MinistriesList = React.memo(
         </h4>
         <div className="foi-ministries-checkboxes">
           {programAreaList.map((programArea, index) => (
-            
             <label  id={"lbl"+programArea.iaocode}  key={index} className="check-item">
               <input
                 type="checkbox"
