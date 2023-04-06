@@ -33,7 +33,7 @@ const FOIUnAuthenticateRouting = React.memo((props) => {
 
   return (
     <>
-      <Route path="/admin/divisions">
+      {/* <Route path="/admin/divisions">
         <FOIHeader />
         <Divisions />
         <FOIFooter />
@@ -42,7 +42,7 @@ const FOIUnAuthenticateRouting = React.memo((props) => {
         <FOIHeader />
         <Admin />
         <FOIFooter />
-      </Route>
+      </Route> */}
       <Route exact path="/">
         <FOIHeader />
         <Home />

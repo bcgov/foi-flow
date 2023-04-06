@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import Dialog from "@material-ui/core/Dialog";
 import DialogActions from "@material-ui/core/DialogActions";
 import DialogContent from "@material-ui/core/DialogContent";
@@ -8,6 +9,7 @@ import MenuItem from "@material-ui/core/MenuItem";
 import Select from "@material-ui/core/Select";
 import TextField from "@material-ui/core/TextField";
 
+
 const CreateDivisionModal = ({
   divisions,
   saveDivision,
@@ -15,6 +17,7 @@ const CreateDivisionModal = ({
   closeModal,
 }) => {
   const [division, setDivision] = useState(null);
+  let programAreas = useSelector((state) => state.foiRequests.foiAdminProgramAreaList);
 
   const handleSave = () => {
     saveDivision(division);
@@ -58,14 +61,10 @@ const CreateDivisionModal = ({
             }
             fullWidth
           >
-            {divisions &&
-              [
-                ...new Map(
-                  divisions.map((item) => [item["programareaid"], item])
-                ).values(),
-              ].map((area, index) => (
+            {programAreas &&
+              programAreas.map((area, index) => (
                 <MenuItem key={index} value={area.programareaid}>
-                  {area.programarea}
+                  {area.name}
                 </MenuItem>
               ))}
           </Select>

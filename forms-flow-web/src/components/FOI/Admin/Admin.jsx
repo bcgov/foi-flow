@@ -6,13 +6,26 @@ import Card from "@material-ui/core/Card";
 import CardActionArea from "@material-ui/core/CardActionArea";
 import CardContent from "@material-ui/core/CardContent";
 import Typography from "@material-ui/core/Typography";
+import {refreshRedisCacheForAdmin} from "../../../apiManager/services/FOI/foiMasterDataServices";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faSyncAlt } from '@fortawesome/free-solid-svg-icons'; 
+import {isFoiAdmin} from "../../../helper/FOI/helper";
 
 import "./admin.scss";
+import Loading from "../../../containers/Loading";
 
-const Admin = () => {
+const Admin = ({userDetail}) => {
   const dispatch = useDispatch();
 
-  return (
+  const userGroups = userDetail?.groups?.map(group => group.slice(1));
+  let isAdmin = isFoiAdmin(userGroups);
+
+  const refreshRedisCache = () => {
+      dispatch(refreshRedisCacheForAdmin())
+  };
+
+  return (isAdmin ?
+    <>
     <div className="container admin-container">
       <Grid
         container
@@ -25,10 +38,16 @@ const Admin = () => {
             Admin Dashboard
           </Typography>
         </Grid>
+        {/* <Grid item xs={6} sm={6} md={6} lg={6}>
+          <button onClick={() => refreshRedisCache()} className="refresh-cache">
+           Refresh Cache  
+           <FontAwesomeIcon icon={faSyncAlt} size='1x' />
+          </button>
+        </Grid> */}
         <Grid item xs={12} sm={6} md={4} lg={3} sx={{ m: 1 }}>
           <Card>
             <CardActionArea>
-              <CardContent onClick={() => dispatch(push(`/admin/divisions`))}>
+              <CardContent onClick={() => dispatch(push(`/foi/admin/divisions`))}>
                 <Typography variant="h5" component="h2">
                   Divisions
                 </Typography>
@@ -36,10 +55,10 @@ const Admin = () => {
             </CardActionArea>
           </Card>
         </Grid>
-        <Grid item xs={12} sm={6} md={4} lg={3} sx={{ m: 1 }}>
+        <Grid item xs={12} sm={6} md={4} lg={3} sx={{ m: 1 }} className="disable-cursor">
           <Card>
             <CardActionArea>
-              <CardContent onClick={() => console.log("manage stages")}>
+              <CardContent onClick={() => console.log("manage stages")} disabled={true}>
                 <Typography variant="h5" component="h2">
                   Stages
                 </Typography>
@@ -47,10 +66,10 @@ const Admin = () => {
             </CardActionArea>
           </Card>
         </Grid>
-        <Grid item xs={12} sm={6} md={4} lg={3} sx={{ m: 1 }}>
+        <Grid item xs={12} sm={6} md={4} lg={3} sx={{ m: 1 }} className="disable-cursor">
           <Card>
             <CardActionArea>
-              <CardContent
+              <CardContent disabled={true}
                 onClick={() => console.log("manage applicant categories")}
               >
                 <Typography variant="h5" component="h2">
@@ -60,10 +79,10 @@ const Admin = () => {
             </CardActionArea>
           </Card>
         </Grid>
-        <Grid item xs={12} sm={6} md={4} lg={3} sx={{ m: 1 }}>
+        <Grid item xs={12} sm={6} md={4} lg={3} sx={{ m: 1 }} className="disable-cursor">
           <Card>
             <CardActionArea>
-              <CardContent onClick={() => console.log("manage program areas")}>
+              <CardContent onClick={() => console.log("manage program areas")} disabled={true}>
                 <Typography variant="h5" component="h2">
                   Program Areas
                 </Typography>
@@ -73,6 +92,8 @@ const Admin = () => {
         </Grid>
       </Grid>
     </div>
+    </> : 
+    <Loading />
   );
 };
 

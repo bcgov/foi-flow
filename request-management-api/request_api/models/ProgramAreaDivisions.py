@@ -40,6 +40,8 @@ class ProgramAreaDivision(db.Model):
     def disableprogramareadivision(cls, divisionid):   
         dbquery = db.session.query(ProgramAreaDivision)
         division = dbquery.filter_by(divisionid=divisionid)
+        print("\ndivision:",division)
+        print("\ndivisionCount:",division.count())
         if(division.count() > 0) :             
             division.update({ProgramAreaDivision.isactive:False}, synchronize_session = False)
             db.session.commit()
@@ -50,14 +52,20 @@ class ProgramAreaDivision(db.Model):
     @classmethod
     def updateprogramareadivision(cls, divisionid, programareadivision):   
         dbquery = db.session.query(ProgramAreaDivision)
-        division = dbquery.filter_by(divisionid=divisionid)
+        division = dbquery.filter_by(divisionid=divisionid, isactive=True)
         if(division.count() > 0) :             
             division.update({ProgramAreaDivision.programareaid:programareadivision["programareaid"], ProgramAreaDivision.name:programareadivision["name"], ProgramAreaDivision.isactive:True, ProgramAreaDivision.sortorder:programareadivision["sortorder"]}, synchronize_session = False)
             db.session.commit()
             return DefaultMethodResult(True,'Division updated',divisionid)
         else:
             return DefaultMethodResult(True,'No Division found',divisionid)  
-
+        
+    @classmethod
+    def getdivisionbynameandprogramarea(cls, programareadivision):   
+        division_schema = ProgramAreaDivisionSchema(many=True)
+        dbquery = db.session.query(ProgramAreaDivision)
+        division = dbquery.filter_by(programareaid=programareadivision["programareaid"], isactive=True, name=programareadivision["name"])
+        return division_schema.dump(division)
     
              
 

@@ -21,10 +21,13 @@ import {
   editProgramAreaDivision,
   disableProgramAreaDivision,
 } from "../../../../apiManager/services/FOI/foiAdminServices";
-
+import {fetchAllProgramAreasForAdmin} from "../../../../apiManager/services/FOI/foiMasterDataServices";
 import "./divisions.scss";
+import Loading from "../../../../containers/Loading";
+import {isFoiAdmin} from "../../../../helper/FOI/helper";
 
-const Divisions = () => {
+
+const Divisions = ({userDetail}) => {
   const [searchResults, setSearchResults] = useState(null);
   const [selectedDivision, setSelectedDivision] = useState(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -32,12 +35,16 @@ const Divisions = () => {
   const [showEditModal, setShowEditModal] = useState(false);
   const dispatch = useDispatch();
 
+  const userGroups = userDetail?.groups?.map(group => group.slice(1));
+  let isAdmin = isFoiAdmin(userGroups);
+
   let divisions = useSelector(
     (state) => state.foiRequests.foiProgramAreaDivisionList
   );
 
   useEffect(async () => {
-    await Promise.all([dispatch(fetchProgramAreaDivisions())]);
+    await Promise.all([dispatch(fetchProgramAreaDivisions()),
+      dispatch(fetchAllProgramAreasForAdmin())]);
   }, []);
 
   const createDivision = async (data) => {
@@ -132,7 +139,7 @@ const Divisions = () => {
     },
   ];
 
-  return (
+  return (isAdmin ?
     <div className="container divisions-container">
       <Grid
         container
@@ -146,7 +153,7 @@ const Divisions = () => {
           </Typography>
         </Grid>
         <Grid item xs={12}>
-          <Button variant="text" onClick={() => dispatch(push(`/admin`))}>
+          <Button variant="text" onClick={() => dispatch(push(`/foi/admin`))}>
             Back to Admin
           </Button>
         </Grid>
@@ -162,9 +169,9 @@ const Divisions = () => {
         >
           <Grid item xs>
             <SearchBar
-              autocompleteOptions={divisions
-                .map((division) => division.name)
-                .filter((value, index, self) => self.indexOf(value) === index)}
+              // autocompleteOptions={divisions
+              //   .map((division) => division.name)
+              //   .filter((value, index, self) => self.indexOf(value) === index)}
               items={divisions}
               setSearchResults={setSearchResults}
             />
@@ -226,7 +233,8 @@ const Divisions = () => {
         showModal={showEditModal}
         closeModal={() => setShowEditModal(false)}
       />
-    </div>
+    </div>: 
+    <Loading />
   );
 };
 

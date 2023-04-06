@@ -1,5 +1,6 @@
 import {
     httpGETRequest,
+    httpPOSTRequest
   } from "../../httpRequestHandler";
   import API from "../../endpoints";
   import {
@@ -18,6 +19,7 @@ import {
     setClosingReasons,
     setFOISubjectCodeList,  
     setCommentTagListLoader, 
+    setFOIAdminProgramAreaList,
   } from "../../../actions/FOI/foiRequestActions";
   import { fnDone } from "./foiServicesUtil";
   import UserService from "../../../services/UserService";
@@ -382,6 +384,50 @@ import {
           console.log("Error while fetching delivery mode master data", error);
           dispatch(serviceActionError(error));
           dispatch(setFOILoader(false));
+        });
+    };
+  };
+
+  export const fetchAllProgramAreasForAdmin = () => {    
+    return (dispatch) => {
+      httpGETRequest(
+        API.FOI_GET_PROGRAMAREAS_API,
+        {},
+        UserService.getToken()
+      )
+        .then((res) => {
+          if (res.data) {
+            console.log("**FOIAdminProgramAreaList**: ", res.data);
+            dispatch(setFOIAdminProgramAreaList(res.data));
+            dispatch(setFOILoader(false));
+          } else {
+            console.log("Error while fetching program area master data for admin dashboard", res);
+            dispatch(serviceActionError(res));
+            dispatch(setFOILoader(false));
+          }
+        })
+        .catch((error) => {
+          console.log("Error while fetching program area master data for admin dashboard", error);
+          dispatch(serviceActionError(error));
+          dispatch(setFOILoader(false));
+        });
+    };
+  };
+
+  export const refreshRedisCacheForAdmin = () => {
+    return (dispatch) => {
+      httpPOSTRequest(API.FOI_REFRESH_REDIS_CACHE,{}, UserService.getToken())
+        .then((res) => {
+          if (res.data) {
+            console.log("Refreshed Cache successfully!");
+          } else {
+            dispatch(serviceActionError(res));
+            console.log("Error Refreshing Cache");
+          }
+        })
+        .catch((error) => {
+          dispatch(serviceActionError(error));
+          console.log("Error Refreshing Cache");
         });
     };
   };

@@ -20,3 +20,19 @@
 .admin-title {
   margin-bottom: 0.5em;
 }
+
+.disable-cursor {
+  pointer-events: none;
+}
+
+.refresh-cache {
+  background-color: #fff;
+  border: 2px solid #38598a;
+  border-radius: 4px;
+  color: #38598a;
+  margin-top: 10px;
+  // height: 51px;
+  // width: 179px;
+  font-size: 16px;
+  font-weight: 700;
+}

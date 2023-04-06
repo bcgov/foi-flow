@@ -5,7 +5,7 @@ import Paper from "@mui/material/Paper";
 import IconButton from "@mui/material/IconButton";
 import SearchIcon from "@material-ui/icons/Search";
 
-const SearchBar = ({ autocompleteOptions, items, setSearchResults }) => {
+const SearchBar = ({  items, setSearchResults }) => {
   const [keywords, setKeywords] = useState(null);
 
   useEffect(async () => {
@@ -18,6 +18,7 @@ const SearchBar = ({ autocompleteOptions, items, setSearchResults }) => {
   };
 
   const handleSearch = () => {
+    console.log("/nkeywords:",keywords)
     let searchKeywords = keywords ? keywords.toLowerCase().split(" ") : [];
 
     if (searchKeywords.length == 0) {
@@ -46,7 +47,7 @@ const SearchBar = ({ autocompleteOptions, items, setSearchResults }) => {
       }
       return found;
     }, []);
-
+    console.log("RESULTS:",results);
     setSearchResults(results.length != items.length ? results : []);
   };
 
@@ -57,23 +58,43 @@ const SearchBar = ({ autocompleteOptions, items, setSearchResults }) => {
       onSubmit={handleSubmit}
       className="search-bar-wrapper"
     >
-      <Autocomplete
-        freeSolo
+      <InputBase
+        id="filter"
+        placeholder="Search Keywords"
+        value={keywords}
+        onChange={(e) => setKeywords(e?.target?.value)}
+        sx={{
+          color: "#38598A",
+        }}
+        // startAdornment={
+        //   <InputAdornment position="start">
+        //     <IconButton sx={{ color: "#38598A" }}>
+        //       <span className="hideContent">Search with keyword</span>
+        //       <SearchIcon />
+        //     </IconButton>
+        //   </InputAdornment>
+        // }
         fullWidth
-        className="search-bar-autocomplete"
-        options={autocompleteOptions}
-        onChange={(e, value) => setKeywords(value)}
-        renderInput={(params) => (
-          <InputBase
-            {...params}
-            ref={params.InputProps.ref}
-            inputProps={params.inputProps}
-            placeholder="Search Divisions"
-            fullWidth
-            value={keywords}
-          />
-        )}
       />
+      {/* {autocompleteOptions && 
+        <Autocomplete
+          freeSolo
+          fullWidth
+          className="search-bar-autocomplete"
+          options={autocompleteOptions}
+          onChange={(e, value) => setKeywords(value)}
+          renderInput={(params) => (
+            <InputBase
+              {...params}
+              ref={params.InputProps.ref}
+              inputProps={params.inputProps}
+              placeholder="Search Divisions"
+              fullWidth
+              value={keywords}
+            />
+          )}
+        />
+        } */}
       <IconButton
         type="button"
         size="small"

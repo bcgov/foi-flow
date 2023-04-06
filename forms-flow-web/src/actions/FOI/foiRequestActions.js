@@ -164,6 +164,12 @@ export const setFOIProgramAreaDivisionsList = (data) => dispatch =>{
         payload:data
     })
 }
+export const setFOIAdminProgramAreaList = (data) => dispatch =>{
+    dispatch({
+        type:FOI_ACTION_CONSTANTS.FOI_ADMIN_PROGRAM_AREALIST,
+        payload:data
+    })
+}
 export const clearRequestDetails = (data) => dispatch => {
     dispatch({
         type:FOI_ACTION_CONSTANTS.CLEAR_REQUEST_DETAILS,

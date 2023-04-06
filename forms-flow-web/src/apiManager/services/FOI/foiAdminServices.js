@@ -9,12 +9,14 @@ import {
   setFOILoader,
   setFOIProgramAreaDivisionsList,
 } from "../../../actions/FOI/foiRequestActions";
-import { replaceUrl, errorToast } from "../../../helper/FOI/helper";
+import { replaceUrl } from "../../../helper/FOI/helper";
 import { catchError } from "./foiServicesUtil";
+import UserService from "../../../services/UserService";
+
 
 export const fetchProgramAreaDivisions = () => {
   return (dispatch) => {
-    httpGETRequest(API.FOI_GET_PROGRAMAREADIVISIONS)
+    httpGETRequest(API.FOI_GET_PROGRAMAREADIVISIONS, {}, UserService.getToken())
       .then((res) => {
         if (res.data) {
           dispatch(setFOIProgramAreaDivisionsList(res.data));
@@ -33,7 +35,7 @@ export const fetchProgramAreaDivisions = () => {
 
 export const createProgramAreaDivision = (data) => {
   return (dispatch) => {
-    httpPOSTRequest(API.FOI_POST_PROGRAMAREADIVISION, data)
+    httpPOSTRequest(API.FOI_POST_PROGRAMAREADIVISION, data, UserService.getToken())
       .then((res) => {
         dispatch(fetchProgramAreaDivisions());
         if (res.data) {
@@ -57,7 +59,7 @@ export const editProgramAreaDivision = (data, divisionid) => {
     divisionid
   );
   return (dispatch) => {
-    httpPUTRequest(apiUrl, data)
+    httpPUTRequest(apiUrl, data, UserService.getToken())
       .then((res) => {
         dispatch(fetchProgramAreaDivisions());
         if (res.data) {
@@ -81,7 +83,7 @@ export const disableProgramAreaDivision = (divisionid) => {
     divisionid
   );
   return (dispatch) => {
-    httpPUTRequest(apiUrl)
+    httpPUTRequest(apiUrl, {}, UserService.getToken())
       .then((res) => {
         dispatch(fetchProgramAreaDivisions());
         if (res.data) {

@@ -42,8 +42,9 @@ class FOIProgramAreaDivisions(Resource):
 
     @staticmethod
     @TRACER.trace()
+    @auth.require
     @cross_origin(origins=allowedorigins())
-    #@auth.require
+    @auth.isfoiadmin()
     def get():
         try:
             result = programareadivisionservice().getallprogramareadivisions()
@@ -60,8 +61,9 @@ class CreateFOIProgramAreaDivision(Resource):
 
     @staticmethod
     @TRACER.trace()
+    @auth.require
     @cross_origin(origins=allowedorigins())
-    #@auth.require
+    @auth.isfoiadmin()
     def post():
         try:
             requestjson = request.get_json()
@@ -83,8 +85,9 @@ class UpdateFOIProgramAreaDivision(Resource):
 
     @staticmethod
     @TRACER.trace()
+    @auth.require
     @cross_origin(origins=allowedorigins())
-    #@auth.require
+    @auth.isfoiadmin()
     def put(divisionid):
         try:
             requestjson = request.get_json()
@@ -105,8 +108,9 @@ class DisableFOIProgramAreaDivision(Resource):
     """Disables FOI program area division"""
     @staticmethod
     @TRACER.trace()
+    @auth.require
     @cross_origin(origins=allowedorigins())
-    #@auth.require
+    @auth.isfoiadmin()
     def put(divisionid):
         try:
             result = programareadivisionservice().disableprogramareadivision(divisionid)
