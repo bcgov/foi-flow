@@ -42,10 +42,9 @@ class recordservice(recordservicebase):
         newrecord.__dict__.update(record)
         response = FOIRequestRecord.create([newrecord])
         if (response.success):
-            if (not record['attributes'].get('incompatible', False)):
-                _apiresponse, err = self.makedocreviewerrequest('POST', '/api/document/delete', {'ministryrequestid': ministryrequestid, 'filepaths': [record['s3uripath']]})
-                if err:
-                    return DefaultMethodResult(False,'Error in contacting Doc Reviewer API', -1, recordid)
+            _apiresponse, err = self.makedocreviewerrequest('POST', '/api/document/delete', {'ministryrequestid': ministryrequestid, 'filepaths': [record['s3uripath']]})
+            if err:
+                return DefaultMethodResult(False,'Error in contacting Doc Reviewer API', -1, recordid)
             return DefaultMethodResult(True,'Record marked as inactive', -1, recordid)
         else:
             return DefaultMethodResult(False,'Error in deleting Record', -1, recordid)
@@ -104,6 +103,10 @@ class recordservice(recordservicebase):
             return response.get("status")
         return ""
 
+    def isrecordschanged(self, ministryid, category):
+        response, err = self.makedocreviewerrequest('GET', '/api/recordschanged/{0}/{1}'.format(ministryid, category))
+        return response
+
     def __triggerpdfstitchservice(self, requestid, ministryrequestid, message, userid):
         """Call the BE job for stitching the documents.
         """
@@ -113,8 +116,6 @@ class recordservice(recordservicebase):
                 "inputfiles":message["attributes"],
                 "category": message["category"]
             })
-        print("job ========== ",job)
-        print("jobid ========== ",job.get("id"))
         if err:
             return DefaultMethodResult(False,'Error in contacting Doc Reviewer API', -1, ministryrequestid)
         streamobject = {
