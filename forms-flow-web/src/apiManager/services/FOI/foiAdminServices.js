@@ -10,7 +10,7 @@ import {
   setFOIProgramAreaDivisionsList,
 } from "../../../actions/FOI/foiRequestActions";
 import { replaceUrl } from "../../../helper/FOI/helper";
-import { catchError } from "./foiServicesUtil";
+import { catchError, fnDone } from "./foiServicesUtil";
 import UserService from "../../../services/UserService";
 
 
@@ -33,26 +33,30 @@ export const fetchProgramAreaDivisions = () => {
   };
 };
 
-export const createProgramAreaDivision = (data) => {
+export const createProgramAreaDivision = (data, ...rest) => {
+  const done = fnDone(rest);
   return (dispatch) => {
     httpPOSTRequest(API.FOI_POST_PROGRAMAREADIVISION, data, UserService.getToken())
       .then((res) => {
         dispatch(fetchProgramAreaDivisions());
         if (res.data) {
-          console.log("Create program area division successfully!");
+          done(null, res.data);
         } else {
           dispatch(serviceActionError(res));
-          console.log("Error creating program area division");
+          throw new Error(`Error creating program area division`);
         }
       })
       .catch((error) => {
-        dispatch(serviceActionError(error));
+        //dispatch(serviceActionError(error));
+        done(error);
+        catchError(error, dispatch);
         console.log("Error creating program area division");
       });
   };
 };
 
-export const editProgramAreaDivision = (data, divisionid) => {
+export const editProgramAreaDivision = (data, divisionid, ...rest) => {
+  const done = fnDone(rest);
   let apiUrl = replaceUrl(
     replaceUrl(API.FOI_PUT_PROGRAMAREADIVISIONS),
     "<divisionid>",
@@ -63,20 +67,21 @@ export const editProgramAreaDivision = (data, divisionid) => {
       .then((res) => {
         dispatch(fetchProgramAreaDivisions());
         if (res.data) {
-          console.log("Edit program area division successfully!");
+          done(null, res.data);
         } else {
           dispatch(serviceActionError(res));
-          console.log("Error editing program area division");
+          throw new Error(`Error editing program area division`);
         }
       })
       .catch((error) => {
-        dispatch(serviceActionError(error));
-        console.log("Error editing program area division");
+        done(error);
+        catchError(error, dispatch);
       });
   };
 };
 
-export const disableProgramAreaDivision = (divisionid) => {
+export const disableProgramAreaDivision = (divisionid, ...rest) => {
+  const done = fnDone(rest);
   let apiUrl = replaceUrl(
     replaceUrl(API.FOI_DELETE_PROGRAMAREADIVISIONS),
     "<divisionid>",
@@ -87,14 +92,15 @@ export const disableProgramAreaDivision = (divisionid) => {
       .then((res) => {
         dispatch(fetchProgramAreaDivisions());
         if (res.data) {
-          console.log("Disable program area division successfully!");
+          done(null, res.data);
         } else {
           dispatch(serviceActionError(res));
-          console.log("Error disabling program area division");
+          throw new Error("Error disabling program area division");
         }
       })
       .catch((error) => {
-        dispatch(serviceActionError(error));
+        done(error);
+        catchError(error, dispatch);
         console.log("Error disabling program area division");
       });
   };

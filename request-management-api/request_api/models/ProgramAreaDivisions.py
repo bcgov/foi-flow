@@ -36,7 +36,7 @@ class ProgramAreaDivision(db.Model):
         newprogramareadivision = ProgramAreaDivision(programareaid=programareadivision["programareaid"], name=programareadivision["name"], isactive=True, created_at=created_at)
         db.session.add(newprogramareadivision)
         db.session.commit()      
-        return DefaultMethodResult(True,'Division added',newprogramareadivision.divisionid)
+        return DefaultMethodResult(True,'Division added successfully',newprogramareadivision.divisionid)
 
     @classmethod
     def disableprogramareadivision(cls, divisionid, userid):   
@@ -47,7 +47,7 @@ class ProgramAreaDivision(db.Model):
         if(division.count() > 0) :             
             division.update({ProgramAreaDivision.isactive:False,ProgramAreaDivision.updatedby:userid, ProgramAreaDivision.updated_at:datetime2.now()}, synchronize_session = False)
             db.session.commit()
-            return DefaultMethodResult(True,'Division disabled',divisionid)
+            return DefaultMethodResult(True,'Division disabled successfully',divisionid)
         else:
             return DefaultMethodResult(True,'No Division found',divisionid)  
     
@@ -60,7 +60,7 @@ class ProgramAreaDivision(db.Model):
                              ProgramAreaDivision.isactive:True, ProgramAreaDivision.sortorder:programareadivision["sortorder"],
                              ProgramAreaDivision.updatedby:userid, ProgramAreaDivision.updated_at:datetime2.now()}, synchronize_session = False)
             db.session.commit()
-            return DefaultMethodResult(True,'Division updated',divisionid)
+            return DefaultMethodResult(True,'Division updated successfully',divisionid)
         else:
             return DefaultMethodResult(True,'No Division found',divisionid)  
         

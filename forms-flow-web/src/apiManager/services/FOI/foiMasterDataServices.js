@@ -21,7 +21,7 @@ import {
     setCommentTagListLoader, 
     setFOIAdminProgramAreaList,
   } from "../../../actions/FOI/foiRequestActions";
-  import { fnDone } from "./foiServicesUtil";
+  import { fnDone, catchError } from "./foiServicesUtil";
   import UserService from "../../../services/UserService";
   import { replaceUrl, addToFullnameList, getAssignToList, getFullnameTeamList } from "../../../helper/FOI/helper";
   
@@ -413,20 +413,21 @@ import {
     };
   };
 
-  export const refreshRedisCacheForAdmin = () => {
+  export const refreshRedisCacheForAdmin = (...rest) => {
+    const done = fnDone(rest);
     return (dispatch) => {
       httpPOSTRequest(API.FOI_REFRESH_REDIS_CACHE,{}, UserService.getToken())
         .then((res) => {
           if (res.data) {
-            console.log("Refreshed Cache successfully!");
+            done(null, res.data);
           } else {
             dispatch(serviceActionError(res));
-            console.log("Error Refreshing Cache");
+            throw new Error("Error Refreshing Cache");
           }
         })
         .catch((error) => {
-          dispatch(serviceActionError(error));
-          console.log("Error Refreshing Cache");
+          done(error);
+          catchError(error, dispatch);
         });
     };
   };
