@@ -99,12 +99,14 @@ class recordservice(recordservicebase):
 
     def getpdfstichstatus(self, ministryid, category):
         response, err = self.makedocreviewerrequest('GET', '/api/pdfstitchjobstatus/{0}/{1}'.format(ministryid, category))
-        if response is not None and len(response) > 0:
+        if response is not None and "status" in response:
             return response.get("status")
         return ""
 
     def isrecordschanged(self, ministryid, category):
         response, err = self.makedocreviewerrequest('GET', '/api/recordschanged/{0}/{1}'.format(ministryid, category))
+        if response is None:
+                return {"recordchanged": False}
         return response
 
     def __triggerpdfstitchservice(self, requestid, ministryrequestid, message, userid):
