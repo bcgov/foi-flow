@@ -102,12 +102,10 @@ class _Config():  # pylint: disable=too-few-public-methods
         connect_timeout_int = int(connect_timeout_string)
         SQLALCHEMY_ENGINE_OPTIONS['connect_args'] = {'connect_timeout': connect_timeout_int}
 
-    print(SQLALCHEMY_ENGINE_OPTIONS)
     #Logging echo settings
     SQLALCHEMY_ECHO = db_sql_echo 
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
-    print('SQLAlchemy URL (base): {}'.format(SQLALCHEMY_DATABASE_URI))
 
     # JWT_OIDC Settings
     JWT_OIDC_WELL_KNOWN_CONFIG = os.getenv('JWT_OIDC_WELL_KNOWN_CONFIG')
@@ -177,8 +175,6 @@ class TestConfig(_Config):  # pylint: disable=too-few-public-methods
                                             name=DB_NAME,
                                         ))
     
-    print('SQLAlchemy URL (Test): {}'.format(SQLALCHEMY_DATABASE_URI))
-    
     # JWT_OIDC Settings
     JWT_OIDC_WELL_KNOWN_CONFIG = os.getenv('JWT_OIDC_WELL_KNOWN_CONFIG')
     JWT_OIDC_ALGORITHMS = os.getenv('JWT_OIDC_ALGORITHMS')
@@ -199,8 +195,7 @@ class ProdConfig(_Config):  # pylint: disable=too-few-public-methods
 
     if not SECRET_KEY:
         SECRET_KEY = os.urandom(24)
-        print('WARNING: SECRET_KEY being set as a one-shot', file=sys.stderr)
+        print('WARNING: SECRET_KEY being set as a one-shot')
 
-    print('SQLAlchemy URL (prod/base): {}'.format(_Config.SQLALCHEMY_DATABASE_URI))
     TESTING = False
     DEBUG = False

@@ -32,6 +32,8 @@ const initialState = {
   foiFullAssignedToList: [],
   foiMinistryAssignedToList: [],
   foiProgramAreaList: [],
+  foiProgramAreaDivisionList: [],
+  foiAdminProgramAreaList: [],
   foiRequestDescriptionHistoryList: [],
   foiMinistryDivisionalStages: [],
   foiWatcherList: [],
@@ -120,6 +122,10 @@ const foiRequests = (state = initialState, action) => {
       return { ...state, foiCategoryList: action.payload };
     case FOI_ACTION_CONSTANTS.FOI_PROGRAM_AREALIST:
       return { ...state, foiProgramAreaList: action.payload };
+    case FOI_ACTION_CONSTANTS.FOI_PROGRAM_AREA_DIVISIONLIST:
+      return { ...state, foiProgramAreaDivisionList: action.payload };
+    case FOI_ACTION_CONSTANTS.FOI_ADMIN_PROGRAM_AREALIST:
+      return { ...state, foiAdminProgramAreaList: action.payload };
     case FOI_ACTION_CONSTANTS.FOI_RECEIVED_MODELIST:
       return { ...state, foiReceivedModeList: action.payload };
     case FOI_ACTION_CONSTANTS.FOI_DELIVERY_MODELIST:
