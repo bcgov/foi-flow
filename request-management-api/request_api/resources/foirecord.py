@@ -166,7 +166,7 @@ class FOIRequestPDFStitchStatus(Resource):
     def get(requestid, ministryrequestid, recordstype):
         try:
             result = recordservice().getpdfstichstatus(ministryrequestid, recordstype.lower())
-            print("getpdfstichstatus result == ", result)
+            #("getpdfstichstatus result == ", result)
             return result, 200
         except KeyError as err:
             print("KeyError == ", err.messages)
