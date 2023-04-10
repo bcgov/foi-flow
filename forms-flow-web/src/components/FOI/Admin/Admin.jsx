@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useDispatch } from "react-redux";
 import { push } from "connected-react-router";
 import Grid from "@mui/material/Grid";
@@ -10,18 +10,46 @@ import {refreshRedisCacheForAdmin} from "../../../apiManager/services/FOI/foiMas
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSyncAlt } from '@fortawesome/free-solid-svg-icons'; 
 import {isFoiAdmin} from "../../../helper/FOI/helper";
-
+import { toast } from "react-toastify";
 import "./admin.scss";
 import Loading from "../../../containers/Loading";
 
 const Admin = ({userDetail}) => {
-  const dispatch = useDispatch();
 
+  const dispatch = useDispatch();
   const userGroups = userDetail?.groups?.map(group => group.slice(1));
   let isAdmin = isFoiAdmin(userGroups);
+  const [disableCacheRefresh, setDisableCacheRefresh] = useState(false);
 
   const refreshRedisCache = () => {
-      dispatch(refreshRedisCacheForAdmin())
+      setDisableCacheRefresh(true);
+      dispatch(refreshRedisCacheForAdmin((err, res) => {            
+        if (!err && res) {
+          toast.success(res.message?res.message : "Cache refreshed successfully.", {
+            position: "top-right",
+            autoClose: 3000,
+            hideProgressBar: true,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+          });
+        } else {
+          toast.error(
+            "Temporarily unable refresh cache. Please try again in a few minutes.",
+            {
+              position: "top-right",
+              autoClose: 3000,
+              hideProgressBar: true,
+              closeOnClick: true,
+              pauseOnHover: true,
+              draggable: true,
+              progress: undefined,
+            }
+          );
+        }
+        setDisableCacheRefresh(false);
+      }))
   };
 
   return (isAdmin ?
@@ -40,7 +68,8 @@ const Admin = ({userDetail}) => {
           
         </Grid>
         <Grid item xs={4} sm={4} md={4} lg={4}>
-          <button onClick={() => refreshRedisCache()} className="refresh-cache">
+          <button onClick={() => refreshRedisCache()} className="refresh-cache"
+            disabled={disableCacheRefresh}>
           <FontAwesomeIcon icon={faSyncAlt} size='1x' style={{marginRight:'5px'}} />
            Refresh Cache  
           </button>

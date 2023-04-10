@@ -14,6 +14,7 @@ import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import DeleteIcon from "@material-ui/icons/Delete";
 import EditIcon from "@material-ui/icons/Edit";
+import { toast } from "react-toastify";
 
 import {
   fetchProgramAreaDivisions,
@@ -55,7 +56,34 @@ const Divisions = ({userDetail}) => {
         createProgramAreaDivision({
           name: data.name,
           programareaid: data.programareaid,
-        })
+        },
+        (err, res) => {            
+            if (!err && res) {
+              toast.success(res.message?res.message : "Division created successfully.", {
+                position: "top-right",
+                autoClose: 3000,
+                hideProgressBar: true,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+              });
+            } else {
+              toast.error(
+                "Temporarily unable to create division. Please try again in a few minutes.",
+                {
+                  position: "top-right",
+                  autoClose: 3000,
+                  hideProgressBar: true,
+                  closeOnClick: true,
+                  pauseOnHover: true,
+                  draggable: true,
+                  progress: undefined,
+                }
+              );
+            }
+          }
+        )
       ),
     ]);
   };
@@ -69,14 +97,67 @@ const Divisions = ({userDetail}) => {
             programareaid: data.programareaid,
             sortorder: data.sortorder,
           },
-          data.divisionid
+          data.divisionid,
+          (err, res) => {            
+            if (!err && res) {
+              toast.success(res.message?res.message : "Division updated successfully.", {
+                position: "top-right",
+                autoClose: 3000,
+                hideProgressBar: true,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+              });
+            } else {
+              toast.error(
+                "Temporarily unable to update division. Please try again in a few minutes.",
+                {
+                  position: "top-right",
+                  autoClose: 3000,
+                  hideProgressBar: true,
+                  closeOnClick: true,
+                  pauseOnHover: true,
+                  draggable: true,
+                  progress: undefined,
+                }
+              );
+            }
+          }
         )
       ),
     ]);
   };
 
   const disableDivision = async (data) => {
-    await Promise.all([dispatch(disableProgramAreaDivision(data.divisionid))]);
+    await Promise.all([dispatch(disableProgramAreaDivision(data.divisionid ,
+      (err, res) => {            
+        if (!err && res) {
+          toast.success(res.message?res.message : "Division disabled successfully.", {
+            position: "top-right",
+            autoClose: 3000,
+            hideProgressBar: true,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+          });
+        } else {
+          toast.error(
+            "Temporarily unable to disable division. Please try again in a few minutes.",
+            {
+              position: "top-right",
+              autoClose: 3000,
+              hideProgressBar: true,
+              closeOnClick: true,
+              pauseOnHover: true,
+              draggable: true,
+              progress: undefined,
+            }
+          );
+        }
+      }))
+    ]);
   };
 
   const openCreateDivisionModal = () => {
