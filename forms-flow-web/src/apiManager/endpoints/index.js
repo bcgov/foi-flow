@@ -33,6 +33,11 @@ const API = {
   FOI_GET_CLOSING_REASONS: `${FOI_BASE_API_URL}/api/foiflow/closereasons`,
   FOI_POST_OSS_HEADER: `${FOI_BASE_API_URL}/api/foiflow/oss/authheader`,
 
+  FOI_GET_PROGRAMAREADIVISIONS: `${FOI_BASE_API_URL}/api/foiadmin/divisions`,
+  FOI_POST_PROGRAMAREADIVISION: `${FOI_BASE_API_URL}/api/foiadmin/division`,
+  FOI_PUT_PROGRAMAREADIVISIONS: `${FOI_BASE_API_URL}/api/foiadmin/division/<divisionid>`,
+  FOI_DELETE_PROGRAMAREADIVISIONS: `${FOI_BASE_API_URL}/api/foiadmin/division/<divisionid>/disable`,
+
   FOI_POST_COMMENT_RAWREQUEST: `${FOI_BASE_API_URL}/api/foicomment/rawrequest`,
   FOI_GET_COMMENT_RAWREQUEST: `${FOI_BASE_API_URL}/api/foicomment/rawrequest/<requestid>`,
   FOI_PUT_COMMENT_RAWREQUEST: `${FOI_BASE_API_URL}/api/foicomment/rawrequest/<requestid>`,
@@ -93,7 +98,9 @@ const API = {
   FOI_POST_MINISTRYREQUEST_RESTRICTION: `${FOI_BASE_API_URL}/api/foirequests/restricted/<ministryrequestid>/<type>`,
 
   FOI_GET_RESTRICTED_RAWREQUEST_TAG_LIST: `${FOI_BASE_API_URL}/api/foicomment/rawrequest/<requestid>/restricted`,
-  FOI_GET_RESTRICTED_MINISTRYREQUEST_TAG_LIST: `${FOI_BASE_API_URL}/api/foicomment/ministryrequest/<ministryrequestid>/restricted`
+  FOI_GET_RESTRICTED_MINISTRYREQUEST_TAG_LIST: `${FOI_BASE_API_URL}/api/foicomment/ministryrequest/<ministryrequestid>/restricted`,
+  
+  FOI_REFRESH_REDIS_CACHE: `${FOI_BASE_API_URL}/api/foiflow/cache/refresh`
 
 
 };
