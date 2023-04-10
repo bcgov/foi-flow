@@ -14,7 +14,9 @@ class ProgramAreaDivision(db.Model):
     isactive = db.Column(db.Boolean, unique=False, nullable=False)
     sortorder = db.Column(db.Integer, unique=False, nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.now)
-    createdby = db.Column(db.String(120), unique=False, default='System')
+    createdby = db.Column(db.String(120), unique=False, default='system')
+    updated_at = db.Column(db.DateTime, nullable=True)
+    updatedby = db.Column(db.String(120), unique=False, nullable=True)
     
     @classmethod
     def getallprogramareadivisons(cls):
@@ -37,24 +39,26 @@ class ProgramAreaDivision(db.Model):
         return DefaultMethodResult(True,'Division added',newprogramareadivision.divisionid)
 
     @classmethod
-    def disableprogramareadivision(cls, divisionid):   
+    def disableprogramareadivision(cls, divisionid, userid):   
         dbquery = db.session.query(ProgramAreaDivision)
         division = dbquery.filter_by(divisionid=divisionid)
         print("\ndivision:",division)
         print("\ndivisionCount:",division.count())
         if(division.count() > 0) :             
-            division.update({ProgramAreaDivision.isactive:False}, synchronize_session = False)
+            division.update({ProgramAreaDivision.isactive:False,ProgramAreaDivision.updatedby:userid, ProgramAreaDivision.updated_at:datetime2.now()}, synchronize_session = False)
             db.session.commit()
             return DefaultMethodResult(True,'Division disabled',divisionid)
         else:
             return DefaultMethodResult(True,'No Division found',divisionid)  
     
     @classmethod
-    def updateprogramareadivision(cls, divisionid, programareadivision):   
+    def updateprogramareadivision(cls, divisionid, programareadivision, userid):   
         dbquery = db.session.query(ProgramAreaDivision)
         division = dbquery.filter_by(divisionid=divisionid, isactive=True)
         if(division.count() > 0) :             
-            division.update({ProgramAreaDivision.programareaid:programareadivision["programareaid"], ProgramAreaDivision.name:programareadivision["name"], ProgramAreaDivision.isactive:True, ProgramAreaDivision.sortorder:programareadivision["sortorder"]}, synchronize_session = False)
+            division.update({ProgramAreaDivision.programareaid:programareadivision["programareaid"], ProgramAreaDivision.name:programareadivision["name"], 
+                             ProgramAreaDivision.isactive:True, ProgramAreaDivision.sortorder:programareadivision["sortorder"],
+                             ProgramAreaDivision.updatedby:userid, ProgramAreaDivision.updated_at:datetime2.now()}, synchronize_session = False)
             db.session.commit()
             return DefaultMethodResult(True,'Division updated',divisionid)
         else:

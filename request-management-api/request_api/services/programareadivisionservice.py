@@ -15,15 +15,15 @@ class programareadivisionservice:
         """
         return ProgramAreaDivision.createprogramareadivision(data)
 
-    def updateprogramareadivision(self, divisionid, data):
+    def updateprogramareadivision(self, divisionid, data,userid):
         """ Updates an existing program area division
         """
-        return ProgramAreaDivision.updateprogramareadivision(divisionid, data)
+        return ProgramAreaDivision.updateprogramareadivision(divisionid, data,userid)
     
-    def disableprogramareadivision(self, divisionid):
+    def disableprogramareadivision(self, divisionid,userid):
         """ Disable a program area division
         """
-        return ProgramAreaDivision.disableprogramareadivision(divisionid)
+        return ProgramAreaDivision.disableprogramareadivision(divisionid,userid)
     
     def __prepareprogramareas(self, data):
         """ Join program area name with division on programareaid

@@ -33,17 +33,18 @@ const Admin = ({userDetail}) => {
         className="admin-grid-container"
         spacing={3}
       >
-        <Grid item xs={12}>
+        <Grid item xs={8} sm={8} md={8} lg={8}>
           <Typography variant="h4" component="h1" className="admin-title">
             Admin Dashboard
           </Typography>
+          
         </Grid>
-        {/* <Grid item xs={6} sm={6} md={6} lg={6}>
+        <Grid item xs={4} sm={4} md={4} lg={4}>
           <button onClick={() => refreshRedisCache()} className="refresh-cache">
+          <FontAwesomeIcon icon={faSyncAlt} size='1x' style={{marginRight:'5px'}} />
            Refresh Cache  
-           <FontAwesomeIcon icon={faSyncAlt} size='1x' />
           </button>
-        </Grid> */}
+        </Grid>
         <Grid item xs={12} sm={6} md={4} lg={3} sx={{ m: 1 }}>
           <Card>
             <CardActionArea>

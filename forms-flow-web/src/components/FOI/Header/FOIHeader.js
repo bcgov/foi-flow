@@ -102,7 +102,7 @@ const triggerPopup = () => {
 }
 
 const adminDashboard = (_e) => {
-  dispatch(push(`admin`));
+  dispatch(push(`/foi/admin`));
 };
 
 

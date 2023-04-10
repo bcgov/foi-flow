@@ -18,7 +18,6 @@ const SearchBar = ({  items, setSearchResults }) => {
   };
 
   const handleSearch = () => {
-    console.log("/nkeywords:",keywords)
     let searchKeywords = keywords ? keywords.toLowerCase().split(" ") : [];
 
     if (searchKeywords.length == 0) {
@@ -47,7 +46,6 @@ const SearchBar = ({  items, setSearchResults }) => {
       }
       return found;
     }, []);
-    console.log("RESULTS:",results);
     setSearchResults(results.length != items.length ? results : []);
   };
 

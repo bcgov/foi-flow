@@ -16,7 +16,7 @@
 from flask import g, request
 from flask_restx import Namespace, Resource, cors
 from flask_expects_json import expects_json
-from request_api.auth import auth
+from request_api.auth import auth, AuthHelper
 from request_api.tracer import Tracer
 from request_api.utils.util import  cors_preflight, allowedorigins
 from request_api.exceptions import BusinessException, Error
@@ -26,6 +26,7 @@ import json
 from flask_cors import cross_origin
 import request_api
 from request_api.utils.cache import cache_filter, response_filter
+
 
 API = Namespace('FOIAdmin', description='Endpoints for FOI admin management')
 TRACER = Tracer.get_instance()
@@ -92,7 +93,7 @@ class UpdateFOIProgramAreaDivision(Resource):
         try:
             requestjson = request.get_json()
             programareadivisionschema = FOIProgramAreaDivisionSchema().load(requestjson)
-            result = programareadivisionservice().updateprogramareadivision(divisionid, programareadivisionschema)
+            result = programareadivisionservice().updateprogramareadivision(divisionid, programareadivisionschema, AuthHelper.getuserid())
             # if result.success == True:
             #   asyncio.ensure_future();
             return {'status': result.success, 'message':result.message, 'id':result.identifier}, 200 
@@ -113,7 +114,7 @@ class DisableFOIProgramAreaDivision(Resource):
     @auth.isfoiadmin()
     def put(divisionid):
         try:
-            result = programareadivisionservice().disableprogramareadivision(divisionid)
+            result = programareadivisionservice().disableprogramareadivision(divisionid, AuthHelper.getuserid())
             # if result.success == True:
             #   asyncio.ensure_future();
             return {'status': result.success, 'message':result.message, 'id':result.identifier}, 200 

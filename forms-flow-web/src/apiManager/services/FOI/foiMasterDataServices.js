@@ -397,7 +397,6 @@ import {
       )
         .then((res) => {
           if (res.data) {
-            console.log("**FOIAdminProgramAreaList**: ", res.data);
             dispatch(setFOIAdminProgramAreaList(res.data));
             dispatch(setFOILoader(false));
           } else {

@@ -43,8 +43,10 @@ const Divisions = ({userDetail}) => {
   );
 
   useEffect(async () => {
-    await Promise.all([dispatch(fetchProgramAreaDivisions()),
-      dispatch(fetchAllProgramAreasForAdmin())]);
+    if(isAdmin){
+      await Promise.all([dispatch(fetchProgramAreaDivisions()),
+        dispatch(fetchAllProgramAreasForAdmin())]);
+    }
   }, []);
 
   const createDivision = async (data) => {
