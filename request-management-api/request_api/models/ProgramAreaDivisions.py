@@ -42,8 +42,6 @@ class ProgramAreaDivision(db.Model):
     def disableprogramareadivision(cls, divisionid, userid):   
         dbquery = db.session.query(ProgramAreaDivision)
         division = dbquery.filter_by(divisionid=divisionid)
-        print("\ndivision:",division)
-        print("\ndivisionCount:",division.count())
         if(division.count() > 0) :             
             division.update({ProgramAreaDivision.isactive:False,ProgramAreaDivision.updatedby:userid, ProgramAreaDivision.updated_at:datetime2.now()}, synchronize_session = False)
             db.session.commit()

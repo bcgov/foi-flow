@@ -133,7 +133,6 @@ class Auth:
                 unverified_claims = josejwt.get_unverified_claims(token)
                 usergroups = unverified_claims['groups']
                 usergroups = [usergroup.replace('/','',1) if usergroup.startswith('/') else usergroup for usergroup in usergroups]
-                print("\nUSERGROUPS:",usergroups)
                 exists = False
                 if 'FOI Admin' in usergroups:
                     exists = True
