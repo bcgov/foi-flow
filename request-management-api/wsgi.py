@@ -45,7 +45,7 @@ def __isvalidnonce(message):
     return False
 
 def __validatejwt(message):
-    if message.get("x-jwt-token") is not None:
+    if "x-jwt-token" in message and message.get("x-jwt-token") is not None:
         try:
             return AuthHelper.getwsuserid(message.get("x-jwt-token"))            
         except BusinessException as exception:
