@@ -46,7 +46,7 @@ export const isEmailFileType = (_file) => {
 }
 
 export const allowedFileType = (_file, mimeTypes) => {
-  return ((mimeTypes.includes(_file.type?.toLowerCase()) || mimeTypes.includes('.' + _file.filename.split('.').pop())) ||
+  return (((mimeTypes.includes(_file.type) || mimeTypes.includes(_file.type?.toLowerCase())) || mimeTypes.includes('.' + _file.filename.split('.').pop())) ||
     ([".msg", ".eml"].some(mimetype => (mimeTypes.includes(mimetype))) && isEmailFileType(_file)));
 }
 
