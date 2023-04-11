@@ -29,8 +29,13 @@ class recordservicegetter(recordservicebase):
                 print(err)
                 if err is None: 
                     _convertedfiles, _dedupedfiles, _removedfiles = self.__getcomputingsummary(computingresponses)
+                    print(_convertedfiles)
+                    print(_dedupedfiles)
+                    print(_removedfiles)
                     for record in uploadedrecords:
+                        print(record)
                         _computingresponse = self.__getcomputingresponse(computingresponses, "recordid", record)
+                        print(_computingresponse)
                         _record = self.__preparerecord(record,_computingresponse, computingresponses,divisions)
                         resultrecords.append(_record)
                         if record["batchid"] not in batchids:
