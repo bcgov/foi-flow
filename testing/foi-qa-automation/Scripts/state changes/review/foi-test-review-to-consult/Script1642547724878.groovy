@@ -60,11 +60,15 @@ WebUI.callTestCase(findTestCase('helper/foi-test-login'), [('password') : findTe
 
 WebUI.click(findTestObject('Page_foi.flow/queue/div_My Team Requests'))
 
+WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
+
 WebUI.setText(findTestObject('Page_foi.flow/queue/input_Dashboard Filter'), requestID)
 
 WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
 
 WebUI.click(findTestObject('Page_foi.flow/queue/div_request queue row 1'))
+
+WebUI.refresh()
 
 WebUI.click(findTestObject('Page_foi.flow/ministry view/form/div_ministry assigned to'), FailureHandling.STOP_ON_FAILURE)
 
@@ -95,6 +99,8 @@ WebUI.navigateToUrl(GlobalVariable.BASE_URL + '/foi/dashboard')
 
 WebUI.click(findTestObject('Page_foi.flow/queue/div_My Team Requests'))
 
+WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
+
 WebUI.setText(findTestObject('Page_foi.flow/queue/input_Dashboard Filter'), requestID)
 
 WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
@@ -106,6 +112,8 @@ DriverFactory.changeWebDriver(IAOuser)
 WebUI.navigateToUrl(GlobalVariable.BASE_URL + '/foi/dashboard')
 
 WebUI.click(findTestObject('Page_foi.flow/queue/div_My Team Requests'))
+
+WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
 
 WebUI.setText(findTestObject('Page_foi.flow/queue/input_Dashboard Filter'), requestID)
 
@@ -194,6 +202,8 @@ WebUI.navigateToUrl(GlobalVariable.BASE_URL + '/foi/dashboard')
 
 WebUI.click(findTestObject('Page_foi.flow/queue/div_My Team Requests'))
 
+WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
+
 WebUI.setText(findTestObject('Page_foi.flow/queue/input_Dashboard Filter'), requestID)
 
 WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
@@ -205,6 +215,8 @@ DriverFactory.changeWebDriver(ministryUser)
 WebUI.navigateToUrl(GlobalVariable.BASE_URL + '/foi/dashboard')
 
 WebUI.click(findTestObject('Page_foi.flow/queue/div_My Team Requests'))
+
+WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
 
 WebUI.setText(findTestObject('Page_foi.flow/queue/input_Dashboard Filter'), requestID)
 
@@ -239,6 +251,8 @@ WebUI.navigateToUrl(GlobalVariable.BASE_URL + '/foi/dashboard')
 
 WebUI.click(findTestObject('Page_foi.flow/queue/div_My Team Requests'))
 
+WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
+
 WebUI.setText(findTestObject('Page_foi.flow/queue/input_Dashboard Filter'), requestID)
 
 WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
@@ -250,6 +264,8 @@ DriverFactory.changeWebDriver(ministryUser)
 WebUI.navigateToUrl(GlobalVariable.BASE_URL + '/foi/dashboard')
 
 WebUI.click(findTestObject('Page_foi.flow/queue/div_My Team Requests'))
+
+WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
 
 WebUI.setText(findTestObject('Page_foi.flow/queue/input_Dashboard Filter'), requestID)
 

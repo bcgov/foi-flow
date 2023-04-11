@@ -67,11 +67,15 @@ WebUI.callTestCase(findTestCase('helper/foi-test-login'), [('password') : findTe
 
 WebUI.click(findTestObject('Page_foi.flow/queue/div_My Team Requests'))
 
+WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
+
 WebUI.setText(findTestObject('Page_foi.flow/queue/input_Dashboard Filter'), requestID)
 
 WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
 
 WebUI.click(findTestObject('Page_foi.flow/queue/div_request queue row 1'))
+
+WebUI.refresh()
 
 WebUI.click(findTestObject('Page_foi.flow/ministry view/form/div_ministry assigned to'), FailureHandling.STOP_ON_FAILURE)
 
@@ -118,8 +122,6 @@ WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
 
 WebUI.click(findTestObject('Page_foi.flow/form/sidebar/div_Sidebar Comments'))
 
-WebUI.scrollToElement(findTestObject('Page_foi.flow/comment/span_Request History Comments'), 0)
-
 WebUI.click(findTestObject('Page_foi.flow/comment/span_Request History Comments'))
 
 WebUI.delay(3)
@@ -130,6 +132,8 @@ WebUI.verifyElementText(findTestObject('Page_foi.flow/comment/p_comment list 1 t
 WebUI.click(findTestObject('Page_foi.flow/form/sidebar/a_FOI'), FailureHandling.STOP_ON_FAILURE)
 
 WebUI.click(findTestObject('Page_foi.flow/queue/div_My Team Requests'))
+
+WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
 
 WebUI.setText(findTestObject('Page_foi.flow/queue/input_Dashboard Filter'), requestID)
 
@@ -210,6 +214,8 @@ DriverFactory.changeWebDriver(ministryUser)
 WebUI.refresh(FailureHandling.STOP_ON_FAILURE)
 
 WebUI.click(findTestObject('Page_foi.flow/queue/div_My Team Requests'))
+
+WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
 
 WebUI.setText(findTestObject('Page_foi.flow/queue/input_Dashboard Filter'), requestID)
 

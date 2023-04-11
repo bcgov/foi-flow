@@ -66,11 +66,15 @@ WebUI.callTestCase(findTestCase('helper/foi-test-login'), [('password') : findTe
 
 WebUI.click(findTestObject('Page_foi.flow/queue/div_My Team Requests'))
 
+WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
+
 WebUI.setText(findTestObject('Page_foi.flow/queue/input_Dashboard Filter'), requestID)
 
 WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
 
 WebUI.click(findTestObject('Page_foi.flow/queue/div_request queue row 1'))
+
+WebUI.refresh()
 
 WebUI.click(findTestObject('Page_foi.flow/ministry view/form/div_ministry assigned to'), FailureHandling.STOP_ON_FAILURE)
 
@@ -98,6 +102,8 @@ WebUI.callTestCase(findTestCase('helper/foi-test-login'), [('password') : findTe
             7), ('username') : findTestData('Login Credentials').getValue('Username', 7)], FailureHandling.STOP_ON_FAILURE)
 
 WebUI.click(findTestObject('Page_foi.flow/queue/div_My Team Requests'))
+
+WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
 
 WebUI.setText(findTestObject('Page_foi.flow/queue/input_Dashboard Filter'), requestID)
 
@@ -183,8 +189,7 @@ WebUI.click(findTestObject('Page_foi.flow/form/sidebar/div_Sidebar Comments'))
 WebUI.click(findTestObject('Page_foi.flow/comment/span_Request History Comments'))
 
 //WebUI.verifyElementText(findTestObject('Page_foi.flow/comment/p_comment list 1 text'), ((findTestData('Login Credentials').getValue(
- //       'First Name', 7) + ' ') + findTestData('Login Credentials').getValue('Last Name', 7)) + ' changed the state of the request to Harms Assessment')
-
+//       'First Name', 7) + ' ') + findTestData('Login Credentials').getValue('Last Name', 7)) + ' changed the state of the request to Harms Assessment')
 ministryUser.close()
 
 IAOuser.close()
