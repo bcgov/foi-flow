@@ -204,8 +204,10 @@ class recordservicegetter(recordservicebase):
         return _convertedfiles, _dedupedfiles, _removedfiles
     
     def __pstformat(self, record):
-        #formatedcreateddate = maya.parse(record['created_at']).datetime(to_timezone='America/Vancouver', naive=False)
-        #record['created_at'] = formatedcreateddate.strftime('%Y %b %d | %I:%M %p')
+        if type(record["created_at"]) is str and "|" in record["created_at"]:
+            return record
+        formatedcreateddate = maya.parse(record['created_at']).datetime(to_timezone='America/Vancouver', naive=False)
+        record['created_at'] = formatedcreateddate.strftime('%Y %b %d | %I:%M %p')
         return record
 
     
