@@ -25,21 +25,11 @@ class recordservicegetter(recordservicebase):
             resultrecords = []
             if len(uploadedrecords) > 0:
                 computingresponses, err = self.makedocreviewerrequest('GET', '/api/dedupestatus/{0}'.format(ministryrequestid))
-                print(computingresponses)
-                print(err)
                 if err is None: 
                     _convertedfiles, _dedupedfiles, _removedfiles = self.__getcomputingsummary(computingresponses)
-                    print(_convertedfiles)
-                    print(_dedupedfiles)
-                    print(_removedfiles)
                     for record in uploadedrecords:
-                        print(record)
                         _computingresponse = self.__getcomputingresponse(computingresponses, "recordid", record)
-                        print(_computingresponse)
-                        print("before prepare record")
                         _record = self.__preparerecord(record,_computingresponse, computingresponses,divisions)
-                        print("after prepare record")
-                        print(_record)
                         resultrecords.append(_record)
                         if record["batchid"] not in batchids:
                             batchids.append(record["batchid"])  
@@ -51,40 +41,27 @@ class recordservicegetter(recordservicebase):
             result['batchcount'] = len(batchids)
             result["records"] = resultrecords
         except Exception as exp:
-            print(exp)            
             logging.info(exp)
         return result 
 
     def __preparerecord(self, record, _computingresponse, computingresponses, divisions):
-        print(record)
-        print(_computingresponse)
-        print(divisions)
         _record = self.__pstformat(record)
-        print(_record)
         if _computingresponse not in (None, []):
-            print("p1")
             documentmasterid = _computingresponse["documentmasterid"]
             _record['isduplicate'] = _computingresponse['isduplicate']
-            print("p2")
             _record['attributes'] = self.__formatrecordattributes(_computingresponse['attributes'], divisions)
-            print("p3")
             _record['isredactionready'] = _computingresponse['isredactionready']
             _record['trigger'] = _computingresponse['trigger']
             _record['documentmasterid'] = _computingresponse["documentmasterid"]
             _record['outputdocumentmasterid'] = documentmasterid 
-            print("p4")
             _computingresponse_err = self.__getcomputingerror(_computingresponse)
-            print("p5")
             if _computingresponse_err is not None:
                 _record['failed'] = _computingresponse_err
             _record['attachments'] = []
             if _computingresponse['isduplicate']:
                 _record['duplicatemasterid'] = _computingresponse['duplicatemasterid']  
                 _record['duplicateof'] = _computingresponse['duplicateof']    
-            print("before attachment list")
             attachment_list = self.__getcomputingresponse(computingresponses, "parentid", documentmasterid)
-            print("attachment list")
-            print(attachment_list)
             for attachment in attachment_list:
                 _attachement = self.__pstformat(attachment)
                 _attachement['isattachment'] = True
@@ -162,9 +139,6 @@ class recordservicegetter(recordservicebase):
             logging.info("not matched")
         
     def __getattachments(self, response, result, data):
-        print(response)
-        print(result)
-        print(data)
         filtered = []
         matchfound = False
         for entry in response:
@@ -173,15 +147,9 @@ class recordservicegetter(recordservicebase):
                 matchfound = True
             else:
                 filtered.append(entry)
-        print("Q1")
-        print(filtered)
-        print(matchfound)
-        print(result)
         if matchfound == True:
             for subentry in result:
                 return self.__getattachments(filtered, result, subentry["documentmasterid"])
-        print("Q2")
-        print(result)
         return result
     
 
