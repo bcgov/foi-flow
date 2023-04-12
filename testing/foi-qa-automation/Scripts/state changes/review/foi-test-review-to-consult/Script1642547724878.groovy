@@ -88,12 +88,16 @@ WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/div_Statu
 
 WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/li_Records Review'))
 
+WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT, FailureHandling.STOP_ON_FAILURE)
+
 WebUI.uploadFile(findTestObject('Page_foi.flow/attachment/input_Add Files_file-upload-input'), RunConfiguration.getProjectDir() + 
     '/Test Attachments/test.docx')
 
 WebUI.click(findTestObject('Page_foi.flow/form/state change dialog/button_Save Change'))
 
 WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT, FailureHandling.STOP_ON_FAILURE)
+
+WebUI.delay(5)
 
 WebUI.navigateToUrl(GlobalVariable.BASE_URL + '/foi/dashboard')
 

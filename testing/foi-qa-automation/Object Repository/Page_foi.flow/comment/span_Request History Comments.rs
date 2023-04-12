@@ -6,12 +6,12 @@
    <elementGuidId>4e68651a-3886-4321-9d12-c670498ede11</elementGuidId>
    <selectorCollection>
       <entry>
-         <key>CSS</key>
-         <value>#teamRequests > span.MuiChip-label.MuiChip-labelSmall.css-1pjtbja</value>
-      </entry>
-      <entry>
          <key>XPATH</key>
          <value>//span[(text() = 'Request History Comments' or . = 'Request History Comments')]</value>
+      </entry>
+      <entry>
+         <key>CSS</key>
+         <value>#teamRequests > span.MuiChip-label.MuiChip-labelSmall.css-1pjtbja</value>
       </entry>
       <entry>
          <key>BASIC</key>
@@ -26,7 +26,7 @@
       <name>tag</name>
       <type>Main</type>
       <value>span</value>
-      <webElementGuid>5d29acbc-a48f-4daf-bd8a-9230cfe73db4</webElementGuid>
+      <webElementGuid>c6f23de9-32af-496d-af0f-5d327b0171ec</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -34,7 +34,7 @@
       <name>class</name>
       <type>Main</type>
       <value>MuiChip-label MuiChip-labelSmall css-1pjtbja</value>
-      <webElementGuid>9b1845f8-784a-442d-a1b3-6d12755cd209</webElementGuid>
+      <webElementGuid>a92a63fc-5e57-4756-a6b0-aa59ed50e142</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>true</isSelected>
@@ -42,7 +42,7 @@
       <name>text</name>
       <type>Main</type>
       <value>Request History Comments</value>
-      <webElementGuid>bd13632f-1940-467d-81a8-5f2e17c372ab</webElementGuid>
+      <webElementGuid>dbc138fb-f3a1-4369-9623-f793857bf61f</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -50,7 +50,7 @@
       <name>xpath</name>
       <type>Main</type>
       <value>id(&quot;teamRequests&quot;)/span[@class=&quot;MuiChip-label MuiChip-labelSmall css-1pjtbja&quot;]</value>
-      <webElementGuid>37f8f251-57f3-427f-825a-2e2aeef20d6e</webElementGuid>
+      <webElementGuid>7078ee90-7247-4bfe-a9e0-2d1eddb16b7e</webElementGuid>
    </webElementProperties>
    <webElementXpaths>
       <isSelected>true</isSelected>
@@ -58,7 +58,7 @@
       <name>xpath:idRelative</name>
       <type>Main</type>
       <value>//div[@id='teamRequests']/span</value>
-      <webElementGuid>c9ce3216-157e-4aee-b52a-231a7dde15f4</webElementGuid>
+      <webElementGuid>6555f671-c859-4daf-88c9-16cfab5f5e9a</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -66,7 +66,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>(.//*[normalize-space(text()) and normalize-space(.)='User Comments'])[1]/following::span[2]</value>
-      <webElementGuid>6818dcb4-15e0-4cc1-991f-f60b48d5cc74</webElementGuid>
+      <webElementGuid>db13d617-618b-435f-b291-4471e088e97b</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -74,7 +74,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>(.//*[normalize-space(text()) and normalize-space(.)='Search Comments'])[2]/following::span[4]</value>
-      <webElementGuid>adaddaea-9573-48c3-a099-b733748328ab</webElementGuid>
+      <webElementGuid>c38fde3d-3e38-4d88-a087-7cc5aa2779b2</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -82,7 +82,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>(.//*[normalize-space(text()) and normalize-space(.)='Divisional Tracking'])[1]/preceding::span[2]</value>
-      <webElementGuid>c1c398b3-7d3b-4748-a23c-9042c00f178e</webElementGuid>
+      <webElementGuid>6087ed5a-5f5b-447a-8a0d-829c3cbacb65</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -90,7 +90,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>(.//*[normalize-space(text()) and normalize-space(.)='All'])[1]/preceding::span[4]</value>
-      <webElementGuid>c68849e6-b693-423e-95d9-fc1ed645e924</webElementGuid>
+      <webElementGuid>54e4041c-7012-4a74-bafb-865f98947e1c</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -98,7 +98,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>//*/text()[normalize-space(.)='Request History Comments']/parent::*</value>
-      <webElementGuid>170ef4b7-6ba1-4f3f-a82f-1409a4cb0b7f</webElementGuid>
+      <webElementGuid>4041b2e7-3c16-431b-b972-968ea6d63d9b</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -106,7 +106,7 @@
       <name>xpath:position</name>
       <type>Main</type>
       <value>//div[2]/div/div/div/div[2]/div/div[2]/span</value>
-      <webElementGuid>a13785e9-38b6-4a0f-810c-9b9f23eafe02</webElementGuid>
+      <webElementGuid>9723fae8-61c2-45b2-8b8c-07be02d368ab</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -114,6 +114,6 @@
       <name>xpath:customAttributes</name>
       <type>Main</type>
       <value>//span[(text() = 'Request History Comments' or . = 'Request History Comments')]</value>
-      <webElementGuid>eaaae93e-8a4d-46bf-b3b7-0809be39ae5e</webElementGuid>
+      <webElementGuid>3732bfb3-c2f4-46d5-a208-45c9823ea8b9</webElementGuid>
    </webElementXpaths>
 </WebElementEntity>

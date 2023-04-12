@@ -17,9 +17,6 @@ import com.kms.katalon.core.windows.keyword.WindowsBuiltinKeywords as Windows
 import internal.GlobalVariable as GlobalVariable
 import org.openqa.selenium.Keys as Keys
 import com.kms.katalon.core.configuration.RunConfiguration as RunConfiguration
-
-import groovy.json.JsonSlurper as JsonSlurper
-
 import groovy.json.JsonSlurper as JsonSlurper
 
 WebUI.openBrowser(GlobalVariable.BASE_URL)
@@ -165,6 +162,8 @@ WebUI.verifyAlertPresent(0, FailureHandling.STOP_ON_FAILURE)
 WebUI.acceptAlert()
 
 WebUI.verifyElementNotPresent(findTestObject('Page_foi.flow/form/state change dialog/div_State Change Dialog'), 0)
+
+WebUI.closeBrowser()
 
 @com.kms.katalon.core.annotation.SetUp
 def setup() {
