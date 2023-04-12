@@ -74,12 +74,14 @@ class recordservicegetter(recordservicebase):
             _record['outputdocumentmasterid'] = documentmasterid 
             print("p4")
             _computingresponse_err = self.__getcomputingerror(_computingresponse)
+            print("p5")
             if _computingresponse_err is not None:
                 _record['failed'] = _computingresponse_err
             _record['attachments'] = []
             if _computingresponse['isduplicate']:
                 _record['duplicatemasterid'] = _computingresponse['duplicatemasterid']  
                 _record['duplicateof'] = _computingresponse['duplicateof']    
+            print("before attachment list")
             attachment_list = self.__getcomputingresponse(computingresponses, "parentid", documentmasterid)
             print("attachment list")
             print(attachment_list)
@@ -163,7 +165,7 @@ class recordservicegetter(recordservicebase):
         filtered = []
         matchfound = False
         for entry in response:
-            if int(entry["parentid"]) == int(data):
+            if entry["parentid"] not in [None, ""] and int(entry["parentid"]) == int(data):
                 result.append(entry)
                 matchfound = True
             else:
