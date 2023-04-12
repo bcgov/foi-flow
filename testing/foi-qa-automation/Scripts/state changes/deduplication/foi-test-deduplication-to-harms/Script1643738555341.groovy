@@ -120,7 +120,11 @@ WebUI.click(findTestObject('Page_foi.flow/form/state change dialog/button_Save C
 
 WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
 
+WebUI.refresh()
+
 WebUI.click(findTestObject('Page_foi.flow/form/sidebar/div_Sidebar Comments'))
+
+WebUI.delay(4)
 
 WebUI.click(findTestObject('Page_foi.flow/comment/span_Request History Comments'))
 

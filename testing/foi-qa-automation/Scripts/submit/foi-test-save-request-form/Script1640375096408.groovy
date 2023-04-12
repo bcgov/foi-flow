@@ -52,13 +52,15 @@ WebUI.click(findTestObject('Page_foi.flow/form/inputs/request details/input_Deli
 
 WebUI.click(findTestObject('Page_foi.flow/form/inputs/request details/delivery mode options/li_Secure File Transfer'))
 
+WebUI.verifyElementNotPresent(findTestObject('Page_foi.flow/div_The request has been saved successfully'), 0)
+
 WebUI.scrollToElement(findTestObject('Page_foi.flow/form/button_Save'), 0)
 
 WebUI.verifyElementClickable(findTestObject('Page_foi.flow/form/button_Save'), FailureHandling.STOP_ON_FAILURE)
 
-WebUI.verifyElementNotPresent(findTestObject('Page_foi.flow/div_The request has been saved successfully'), 0)
-
 WebUI.click(findTestObject('Page_foi.flow/form/button_Save'))
+
+WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT, FailureHandling.STOP_ON_FAILURE)
 
 WebUI.verifyElementPresent(findTestObject('Page_foi.flow/div_The request has been saved successfully'), 0)
 

@@ -176,6 +176,14 @@ WebUI.click(findTestObject('Page_foi.flow/form/sidebar/div_Sidebar Comments'))
 
 WebUI.click(findTestObject('Page_foi.flow/comment/span_Request History Comments'))
 
+WebUI.refresh()
+
+WebUI.click(findTestObject('Page_foi.flow/form/sidebar/div_Sidebar Comments'))
+
+WebUI.refresh()
+
+WebUI.click(findTestObject('Page_foi.flow/form/sidebar/div_Sidebar Comments'))
+
 WebUI.verifyElementText(findTestObject('Page_foi.flow/comment/p_comment list 1 text'), ((findTestData('Login Credentials').getValue(
         'First Name', 8) + ' ') + findTestData('Login Credentials').getValue('Last Name', 8)) + ' changed the state of the request to Records Review')
 
