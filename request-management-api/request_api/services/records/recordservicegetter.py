@@ -137,21 +137,21 @@ class recordservicegetter(recordservicebase):
             return self.__getattachments(filtered_response, [], data)
         else:
             logging.info("not matched")
-        
+
     def __getattachments(self, response, result, data):
+        filtered, result = self.__attachments2(response, result, data)
+        for subentry in result:
+            filtered, result = self.__attachments2(filtered, result, subentry["documentmasterid"])
+        return result
+    
+    def __attachments2(self, response, result, data):
         filtered = []
-        matchfound = False
         for entry in response:
             if entry["parentid"] not in [None, ""] and int(entry["parentid"]) == int(data):
                 result.append(entry)
-                matchfound = True
             else:
                 filtered.append(entry)
-        if matchfound == True:
-            for subentry in result:
-                return self.__getattachments(filtered, result, subentry["documentmasterid"])
-        return result
-    
+        return filtered, result  
 
     def __getcomputingerror(self, computingresponse):
         if computingresponse['conversionstatus'] == 'error':
