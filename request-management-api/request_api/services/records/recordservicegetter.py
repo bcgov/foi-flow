@@ -162,6 +162,9 @@ class recordservicegetter(recordservicebase):
             logging.info("not matched")
         
     def __getattachments(self, response, result, data):
+        print(response)
+        print(result)
+        print(data)
         filtered = []
         matchfound = False
         for entry in response:
@@ -170,9 +173,15 @@ class recordservicegetter(recordservicebase):
                 matchfound = True
             else:
                 filtered.append(entry)
+        print("Q1")
+        print(filtered)
+        print(matchfound)
+        print(result)
         if matchfound == True:
             for subentry in result:
-                self.__getattachments(filtered, result, subentry["documentmasterid"])
+                return self.__getattachments(filtered, result, subentry["documentmasterid"])
+        print("Q2")
+        print(result)
         return result
     
 
