@@ -32,11 +32,8 @@ WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
 WebUI.click(findTestObject('Page_foi.flow/queue/div_request queue row 1'))
 
 //WebUI.click(findTestObject('Page_foi.flow/ministry view/form/div_ministry assigned to'))
-
 //WebUI.delay(4)
-
 //WebUI.click(findTestObject('Page_foi.flow/ministry view/form/ministry assignee/li_ministry assignee foiedu, foiedu'))
-
 //requestID = WebUI.getText(findTestObject('null'), FailureHandling.STOP_ON_FAILURE)
 WebUI.scrollToElement(findTestObject('Page_foi.flow/form/button_Save'), 0)
 
@@ -100,6 +97,12 @@ DriverFactory.changeWebDriver(ministryUser)
 WebUI.click(findTestObject('Page_foi.flow/form/sidebar/div_Sidebar Comments'), FailureHandling.STOP_ON_FAILURE)
 
 WebUI.click(findTestObject('Page_foi.flow/comment/span_Divisional Tracking'))
+
+WebUI.refresh()
+
+WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
+
+WebUI.click(findTestObject('Page_foi.flow/form/sidebar/div_Sidebar Comments'), FailureHandling.STOP_ON_FAILURE)
 
 WebUI.verifyElementText(findTestObject('Page_foi.flow/comment/p_comment list 1 text'), 'Deputy Minister’s Office division has been added with stage Clarification')
 
