@@ -56,15 +56,23 @@ class recordservicegetter(recordservicebase):
         return result 
 
     def __preparerecord(self, record, _computingresponse, computingresponses, divisions):
+        print(record)
+        print(_computingresponse)
+        print(divisions)
         _record = self.__pstformat(record)
+        print(_record)
         if _computingresponse not in (None, []):
+            print("p1")
             documentmasterid = _computingresponse["documentmasterid"]
             _record['isduplicate'] = _computingresponse['isduplicate']
+            print("p2")
             _record['attributes'] = self.__formatrecordattributes(_computingresponse['attributes'], divisions)
+            print("p3")
             _record['isredactionready'] = _computingresponse['isredactionready']
             _record['trigger'] = _computingresponse['trigger']
             _record['documentmasterid'] = _computingresponse["documentmasterid"]
             _record['outputdocumentmasterid'] = documentmasterid 
+            print("p4")
             _computingresponse_err = self.__getcomputingerror(_computingresponse)
             if _computingresponse_err is not None:
                 _record['failed'] = _computingresponse_err
