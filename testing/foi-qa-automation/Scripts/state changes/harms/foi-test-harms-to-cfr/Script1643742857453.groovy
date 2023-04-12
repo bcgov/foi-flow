@@ -159,6 +159,10 @@ WebUI.click(findTestObject('Page_foi.flow/form/state change dialog/button_Cancel
 
 WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT, FailureHandling.STOP_ON_FAILURE)
 
+WebUI.refresh()
+
+WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT, FailureHandling.STOP_ON_FAILURE)
+
 WebUI.verifyElementAttributeValue(findTestObject('Page_foi.flow/form/sidebar/status dropdown/input_Status'), 'value', 'Harms Assessment', 
     0)
 

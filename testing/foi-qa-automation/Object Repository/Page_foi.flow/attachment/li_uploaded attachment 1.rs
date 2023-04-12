@@ -26,7 +26,7 @@
       <name>tag</name>
       <type>Main</type>
       <value>aside</value>
-      <webElementGuid>fd915caa-dd13-44a4-b5a0-95af38adf89e</webElementGuid>
+      <webElementGuid>5737084a-34b8-4ba3-9ad2-fd9de76cb5a0</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -34,7 +34,7 @@
       <name>text</name>
       <type>Main</type>
       <value>test2.docx</value>
-      <webElementGuid>d9faa26c-ef3a-4622-8a45-03d24556a202</webElementGuid>
+      <webElementGuid>992273b6-a04f-458d-91f4-243a6d1b3bf7</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>true</isSelected>
@@ -42,7 +42,7 @@
       <name>xpath</name>
       <type>Main</type>
       <value>//span[@id='state-change-dialog-description']/section/div/div/article/section/ol/li/section/div/div/aside/span</value>
-      <webElementGuid>aa87a261-59e2-432e-9aa4-3672840772a1</webElementGuid>
+      <webElementGuid>09352ff7-1976-4650-a7df-a5b7d7e13303</webElementGuid>
    </webElementProperties>
    <webElementXpaths>
       <isSelected>true</isSelected>
@@ -50,7 +50,7 @@
       <name>xpath:idRelative</name>
       <type>Main</type>
       <value>//span[@id='state-change-dialog-description']/section/div/div/article/section/ol/li/section/div/div/aside</value>
-      <webElementGuid>9940c734-9418-4145-b72a-f8583199d1fb</webElementGuid>
+      <webElementGuid>552f86aa-40fa-4c54-8425-1f150f45e19b</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -58,7 +58,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>(.//*[normalize-space(text()) and normalize-space(.)='Add Attachment'])[1]/following::aside[1]</value>
-      <webElementGuid>24b45b53-d609-4122-88ba-c0cc79608cca</webElementGuid>
+      <webElementGuid>04af316d-8983-48cf-a52c-c5f61bd588b2</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -66,7 +66,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>(.//*[normalize-space(text()) and normalize-space(.)='Option 4'])[2]/following::aside[1]</value>
-      <webElementGuid>e6e89e1f-225a-4871-b6e2-2c2a7423cd08</webElementGuid>
+      <webElementGuid>6f1d0678-ed7e-4477-bfef-2342b36b1bb0</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -74,7 +74,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>(.//*[normalize-space(text()) and normalize-space(.)='test2.docx'])[1]/preceding::aside[1]</value>
-      <webElementGuid>cfcc0e05-080e-4adf-b0fa-2183094a4220</webElementGuid>
+      <webElementGuid>ca38d583-d00f-4a02-bf0e-e5e2d2ab0b37</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -82,6 +82,6 @@
       <name>xpath:position</name>
       <type>Main</type>
       <value>//aside</value>
-      <webElementGuid>aa680b97-165b-4480-b631-a1c386bb990f</webElementGuid>
+      <webElementGuid>b1de59e4-d39a-483a-a106-93dcab9950c8</webElementGuid>
    </webElementXpaths>
 </WebElementEntity>

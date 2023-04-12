@@ -94,7 +94,7 @@ WebUI.uploadFile(findTestObject('Page_foi.flow/attachment/input_Add Files_file-u
 
 WebUI.click(findTestObject('Page_foi.flow/form/state change dialog/button_Save Change'))
 
-WebUI.delay(5)
+WebUI.delay(8)
 
 //WebUI.click(findTestObject('Page_foi.flow/form/sidebar/Page_FOI Request Queue/h2_FOI'))
 WebUI.navigateToUrl(GlobalVariable.BASE_URL + '/foi/dashboard')
