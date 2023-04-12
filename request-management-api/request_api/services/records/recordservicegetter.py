@@ -17,28 +17,39 @@ class recordservicegetter(recordservicebase):
 
     def fetch(self, requestid, ministryrequestid):
         result = {'dedupedfiles': 0, 'convertedfiles': 0, 'removedfiles': 0}
-        _ministryversion = FOIMinistryRequest.getversionforrequest(ministryrequestid)
-        divisions = FOIMinistryRequestDivision.getdivisions(ministryrequestid, _ministryversion)
-        uploadedrecords = FOIRequestRecord.fetch(requestid, ministryrequestid)
-        batchids = []
-        resultrecords = []
-        if len(uploadedrecords) > 0:
-            computingresponses, err = self.makedocreviewerrequest('GET', '/api/dedupestatus/{0}'.format(ministryrequestid))
-            if err is None: 
-                _convertedfiles, _dedupedfiles, _removedfiles = self.__getcomputingsummary(computingresponses)
-                for record in uploadedrecords:
-                    _computingresponse = self.__getcomputingresponse(computingresponses, "recordid", record)
-                    _record = self.__preparerecord(record,_computingresponse, computingresponses,divisions)
-                    resultrecords.append(_record)
-                    if record["batchid"] not in batchids:
-                        batchids.append(record["batchid"])  
-                if computingresponses not in (None, []) and len(computingresponses) > 0:
-                    resultrecords = self.__handleduplicate(resultrecords)  
-                result["convertedfiles"] =  _convertedfiles
-                result["dedupedfiles"] = _dedupedfiles
-                result["removedfiles"] =  _removedfiles 
-        result['batchcount'] = len(batchids)
-        result["records"] = resultrecords
+        try:
+            _ministryversion = FOIMinistryRequest.getversionforrequest(ministryrequestid)
+            divisions = FOIMinistryRequestDivision.getdivisions(ministryrequestid, _ministryversion)
+            uploadedrecords = FOIRequestRecord.fetch(requestid, ministryrequestid)
+            batchids = []
+            resultrecords = []
+            if len(uploadedrecords) > 0:
+                computingresponses, err = self.makedocreviewerrequest('GET', '/api/dedupestatus/{0}'.format(ministryrequestid))
+                print(computingresponses)
+                print(err)
+                if err is None: 
+                    _convertedfiles, _dedupedfiles, _removedfiles = self.__getcomputingsummary(computingresponses)
+                    print(_convertedfiles)
+                    print(_dedupedfiles)
+                    print(_removedfiles)
+                    for record in uploadedrecords:
+                        print(record)
+                        _computingresponse = self.__getcomputingresponse(computingresponses, "recordid", record)
+                        print(_computingresponse)
+                        _record = self.__preparerecord(record,_computingresponse, computingresponses,divisions)
+                        resultrecords.append(_record)
+                        if record["batchid"] not in batchids:
+                            batchids.append(record["batchid"])  
+                    if computingresponses not in (None, []) and len(computingresponses) > 0:
+                        resultrecords = self.__handleduplicate(resultrecords)  
+                    result["convertedfiles"] =  _convertedfiles
+                    result["dedupedfiles"] = _dedupedfiles
+                    result["removedfiles"] =  _removedfiles 
+            result['batchcount'] = len(batchids)
+            result["records"] = resultrecords
+        except Exception as exp:
+            print(exp)            
+            logging.info(exp)
         return result 
 
     def __preparerecord(self, record, _computingresponse, computingresponses, divisions):
@@ -169,8 +180,8 @@ class recordservicegetter(recordservicebase):
         return _convertedfiles, _dedupedfiles, _removedfiles
     
     def __pstformat(self, record):
-        formatedcreateddate = maya.parse(record['created_at']).datetime(to_timezone='America/Vancouver', naive=False)
-        record['created_at'] = formatedcreateddate.strftime('%Y %b %d | %I:%M %p')
+        #formatedcreateddate = maya.parse(record['created_at']).datetime(to_timezone='America/Vancouver', naive=False)
+        #record['created_at'] = formatedcreateddate.strftime('%Y %b %d | %I:%M %p')
         return record
 
     

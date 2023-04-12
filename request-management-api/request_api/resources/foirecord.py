@@ -47,7 +47,7 @@ class FOIRequestGetRecord(Resource):
             return json.dumps(result), 200
         except KeyError as err:
             return {'status': False, 'message':err.messages}, 400
-        except BusinessException as exception:
+        except Exception as exception:
             return {'status': exception.status_code, 'message':exception.message}, 500
 
 @cors_preflight('POST,OPTIONS')
