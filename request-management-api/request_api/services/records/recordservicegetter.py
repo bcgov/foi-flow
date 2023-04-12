@@ -36,7 +36,10 @@ class recordservicegetter(recordservicebase):
                         print(record)
                         _computingresponse = self.__getcomputingresponse(computingresponses, "recordid", record)
                         print(_computingresponse)
+                        print("before prepare record")
                         _record = self.__preparerecord(record,_computingresponse, computingresponses,divisions)
+                        print("after prepare record")
+                        print(_record)
                         resultrecords.append(_record)
                         if record["batchid"] not in batchids:
                             batchids.append(record["batchid"])  
@@ -70,6 +73,8 @@ class recordservicegetter(recordservicebase):
                 _record['duplicatemasterid'] = _computingresponse['duplicatemasterid']  
                 _record['duplicateof'] = _computingresponse['duplicateof']    
             attachment_list = self.__getcomputingresponse(computingresponses, "parentid", documentmasterid)
+            print("attachment list")
+            print(attachment_list)
             for attachment in attachment_list:
                 _attachement = self.__pstformat(attachment)
                 _attachement['isattachment'] = True
