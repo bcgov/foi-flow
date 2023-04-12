@@ -47,6 +47,8 @@ WebUI.click(findTestObject('Page_foi.flow/ministry view/form/divisional tracking
 WebUI.click(findTestObject('Page_foi.flow/ministry view/form/divisional tracking/stage dropdown options/li_Clarification'), 
     FailureHandling.STOP_ON_FAILURE)
 
+WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
+
 //String url = WebUI.getAttribute(findTestObject('http://foiflow.local:3000'), 'href');
 //String id = url.substring(6, 12);
 //def jsonSlurper = new JsonSlurper()
@@ -140,6 +142,10 @@ WebUI.refresh()
 WebUI.click(findTestObject('Page_foi.flow/form/sidebar/div_Sidebar Comments'), FailureHandling.STOP_ON_FAILURE)
 
 WebUI.click(findTestObject('Page_foi.flow/comment/span_Divisional Tracking'))
+
+WebUI.refresh()
+
+WebUI.click(findTestObject('Page_foi.flow/form/sidebar/div_Sidebar Comments'), FailureHandling.STOP_ON_FAILURE)
 
 WebUI.verifyElementText(findTestObject('Page_foi.flow/comment/p_comment list 1 text'), 'Deputy Minister’s Office division has been updated to stage Assigned to Division')
 
