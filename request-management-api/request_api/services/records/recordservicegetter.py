@@ -169,6 +169,8 @@ class recordservicegetter(recordservicebase):
                 _dedupedfiles += 1 
             if entry["isduplicate"] == True:
                 _removedfiles += 1 
+            if entry["conversionstatus"] == "error" or entry["deduplicationstatus"] == "error":
+                _dedupedfiles += 1
         return _convertedfiles, _dedupedfiles, _removedfiles
     
     def __pstformat(self, record):
