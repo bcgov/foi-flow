@@ -47,7 +47,7 @@ class FOIRequestGetRecord(Resource):
             return json.dumps(result), 200
         except KeyError as err:
             return {'status': False, 'message':err.messages}, 400
-        except BusinessException as exception:
+        except Exception as exception:
             return {'status': exception.status_code, 'message':exception.message}, 500
 
 @cors_preflight('POST,OPTIONS')
@@ -166,7 +166,7 @@ class FOIRequestPDFStitchStatus(Resource):
     def get(requestid, ministryrequestid, recordstype):
         try:
             result = recordservice().getpdfstichstatus(ministryrequestid, recordstype.lower())
-            print("getpdfstichstatus result == ", result)
+            #("getpdfstichstatus result == ", result)
             return result, 200
         except KeyError as err:
             print("KeyError == ", err.messages)
@@ -191,7 +191,7 @@ class FOIRequestRecordsChanged(Resource):
     def get(requestid, ministryrequestid, recordstype):
         try:
             result = recordservice().isrecordschanged(ministryrequestid, recordstype.lower())
-            print("records changed == ", result)
+            #print("records changed == ", result)
             return result, 200
         except KeyError as err:
             print("KeyError == ", err.messages)
