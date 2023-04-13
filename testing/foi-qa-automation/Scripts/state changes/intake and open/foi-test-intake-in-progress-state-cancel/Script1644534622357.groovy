@@ -61,5 +61,8 @@ WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/div_Statu
 
 WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/li_Open'))
 
-WebUI.callTestCase(findTestCase('helper/foi-test-verify-next-assignee'), [('requestType'): 'personal', ('ministryCode') : 'EDU'], FailureHandling.STOP_ON_FAILURE)
+WebUI.callTestCase(findTestCase('helper/foi-test-verify-next-assignee-change-request-type'), [('ministryCode') : 'EDU', ('requestType') : 'personal'], 
+    FailureHandling.STOP_ON_FAILURE)
+
+WebUI.closeBrowser()
 

@@ -32,6 +32,8 @@ WebUI.verifyElementNotClickable(findTestObject('Page_foi.flow/form/button_Save')
 
 WebUI.click(findTestObject('Page_foi.flow/ministry view/form/div_ministry assigned to'))
 
+WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
+
 WebUI.click(findTestObject('Page_foi.flow/ministry view/form/ministry assignee/li_ministry assignee foiedu, foiedu'))
 
 WebUI.verifyElementClickable(findTestObject('Page_foi.flow/form/button_Save'), FailureHandling.STOP_ON_FAILURE)

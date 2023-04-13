@@ -166,6 +166,8 @@ WebUI.click(findTestObject('Page_foi.flow/ministry view/form/divisional tracking
 WebUI.click(findTestObject('Page_foi.flow/ministry view/form/divisional tracking/division dropdown options/educ/li_Education Programs'), 
     FailureHandling.STOP_ON_FAILURE)
 
+WebUI.delay(4)
+
 WebUI.click(findTestObject('Page_foi.flow/form/button_Save'), FailureHandling.STOP_ON_FAILURE)
 
 DriverFactory.changeWebDriver(IAOuser)
@@ -183,6 +185,10 @@ WebUI.verifyElementNotPresent(findTestObject('Page_foi.flow/form/div_divison tra
 DriverFactory.changeWebDriver(ministryUser)
 
 WebUI.refresh()
+
+WebUI.click(findTestObject('Page_foi.flow/form/sidebar/div_Sidebar Comments'), FailureHandling.STOP_ON_FAILURE)
+
+WebUI.click(findTestObject('Page_foi.flow/comment/span_Divisional Tracking'))
 
 WebUI.click(findTestObject('Page_foi.flow/form/sidebar/div_Sidebar Comments'), FailureHandling.STOP_ON_FAILURE)
 

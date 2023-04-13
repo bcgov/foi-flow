@@ -96,7 +96,8 @@ WebUI.verifyElementPresent(findTestObject('Page_foi.flow/form/state change dialo
 
 WebUI.verifyElementText(findTestObject('Page_foi.flow/form/state change dialog/span_State Change Dialog message'), 'Upload completed Call for Records form (if required) to change the state.')
 
-WebUI.callTestCase(findTestCase('helper/foi-test-state-change-attachment-modal-ministryview'), [('filename') : 'test.docx'], FailureHandling.STOP_ON_FAILURE)
+WebUI.callTestCase(findTestCase('helper/foi-test-state-change-attachment-modal-ministryview'), [('filename') : 'test.docx'], 
+    FailureHandling.STOP_ON_FAILURE)
 
 WebUI.click(findTestObject('Page_foi.flow/form/state change dialog/button_Cancel'))
 
@@ -162,4 +163,6 @@ WebUI.verifyElementAttributeValue(findTestObject('Page_foi.flow/form/sidebar/sta
 
 WebUI.verifyMatch(WebUI.getCSSValue(findTestObject('Page_foi.flow/form/sidebar/div_Sidebar'), 'background-color'), 'rgba(4, 89, 108, 1)', 
     false)
+
+WebUI.closeBrowser()
 

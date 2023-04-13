@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>span_I foiintakeidir have completed placed applicant processing fees letter in outbox to be mailed</name>
+   <tag></tag>
+   <elementGuidId>f29cdd57-5ff7-42a8-8f74-f69448c8f57b</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>XPATH</key>
+         <value>//div[@id='state-change-dialog-checkbox']/label/span[2]</value>
+      </entry>
+      <entry>
+         <key>CSS</key>
+         <value>span.MuiTypography-root.MuiTypography-body1.MuiFormControlLabel-label.css-9l3uo3</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>XPATH</selectorMethod>
+   <useRalativeImagePath>true</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>tag</name>
+      <type>Main</type>
+      <value>span</value>
+      <webElementGuid>1e788344-9ee5-4cdb-b5f7-478cf65bf889</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>class</name>
+      <type>Main</type>
+      <value>MuiTypography-root MuiTypography-body1 MuiFormControlLabel-label css-9l3uo3</value>
+      <webElementGuid>e56169f8-406a-47c3-b2ea-356c9ec3d14c</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>text</name>
+      <type>Main</type>
+      <value>I foiintake@idir have completed placed applicant processing fees letter in outbox to be mailed</value>
+      <webElementGuid>80e3c9bc-0888-4996-8c4f-257985500458</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>id(&quot;state-change-dialog-checkbox&quot;)/label[@class=&quot;MuiFormControlLabel-root MuiFormControlLabel-labelPlacementEnd jss200 css-1jaw3da&quot;]/span[@class=&quot;MuiTypography-root MuiTypography-body1 MuiFormControlLabel-label css-9l3uo3&quot;]</value>
+      <webElementGuid>8c1a9fbd-5262-4d3e-afbc-f7b4e129a5b5</webElementGuid>
+   </webElementProperties>
+   <webElementXpaths>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:idRelative</name>
+      <type>Main</type>
+      <value>//div[@id='state-change-dialog-checkbox']/label/span[2]</value>
+      <webElementGuid>b9cd7586-8064-40f8-8374-5ee55d7f2e91</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='Cancel'])[1]/following::span[3]</value>
+      <webElementGuid>78d25f43-ee05-43da-8e8a-0087c6ca478c</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='Save Change'])[1]/following::span[3]</value>
+      <webElementGuid>beb082f6-fe94-4623-b1b1-d5f1e4da2f9b</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>//*/text()[normalize-space(.)='I foiintake@idir have completed placed applicant processing fees letter in outbox to be mailed']/parent::*</value>
+      <webElementGuid>31096e74-03d6-4ef0-9ca2-8981995d5f95</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:position</name>
+      <type>Main</type>
+      <value>//label/span[2]</value>
+      <webElementGuid>c4d53718-7287-4f18-b90c-afb6262c8410</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:customAttributes</name>
+      <type>Main</type>
+      <value>//span[(text() = 'I foiintake@idir have completed placed applicant processing fees letter in outbox to be mailed' or . = 'I foiintake@idir have completed placed applicant processing fees letter in outbox to be mailed')]</value>
+      <webElementGuid>6a26ef82-5548-4aa5-a283-5830a9275db8</webElementGuid>
+   </webElementXpaths>
+</WebElementEntity>

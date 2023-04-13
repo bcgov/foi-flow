@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TestCaseEntity>
+   <description></description>
+   <name>CFR_noemail_worfflow</name>
+   <tag></tag>
+   <comment></comment>
+   <testCaseGuid>f0facce8-2db2-46fb-b19c-1e0aa55c98a7</testCaseGuid>
+   <variableLinks>
+      <testDataLinkId></testDataLinkId>
+      <type>DEFAULT</type>
+      <value></value>
+      <variableId>13125d62-25d4-4bff-a8ab-4b0b65be8f05</variableId>
+   </variableLinks>
+   <variable>
+      <defaultValue>GlobalVariable.BASE_URL</defaultValue>
+      <description></description>
+      <id>13125d62-25d4-4bff-a8ab-4b0b65be8f05</id>
+      <masked>false</masked>
+      <name>url</name>
+   </variable>
+</TestCaseEntity>
