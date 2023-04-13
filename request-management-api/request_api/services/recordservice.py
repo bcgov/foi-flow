@@ -184,9 +184,9 @@ class recordservice(recordservicebase):
                         "createdby": userid,
                         "incompatible": 'true' if extension in NONREDACTABLE_FILE_TYPES else 'false'
                     }
-                    if extension in FILE_CONVERSION_FILE_TYPES:
+                    if extension in FILE_CONVERSION_FILE_TYPES or extension.lower() in FILE_CONVERSION_FILE_TYPES:
                         eventqueueservice().add(self.conversionstreamkey, streamobject)
-                    if extension in DEDUPE_FILE_TYPES:
+                    if extension in DEDUPE_FILE_TYPES or extension.lower() in DEDUPE_FILE_TYPES:
                         eventqueueservice().add(self.dedupestreamkey, streamobject)
         return dbresponse
 
