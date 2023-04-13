@@ -46,4 +46,17 @@
       <testCaseId>Test Cases/CFR/CFR_newCFR</testCaseId>
       <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
    </testCaseLink>
+   <testCaseLink>
+      <guid>21de153a-0aea-4f0c-9214-c3d2ebde0bd8</guid>
+      <isReuseDriver>false</isReuseDriver>
+      <isRun>true</isRun>
+      <testCaseId>Test Cases/CFR/CFR_noemail_worfflow</testCaseId>
+      <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
+      <variableLink>
+         <testDataLinkId></testDataLinkId>
+         <type>DEFAULT</type>
+         <value></value>
+         <variableId>13125d62-25d4-4bff-a8ab-4b0b65be8f05</variableId>
+      </variableLink>
+   </testCaseLink>
 </TestSuiteEntity>
