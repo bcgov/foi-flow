@@ -53,7 +53,7 @@ class notificationuser:
 
     def __gettriggereduser(self, userid, notificationtype):
         notificationusers = []
-        if notificationtype.lower() == 'pdfstitch':
+        if notificationtype in ["Records", "PDFStitch"]:
             notificationusers.append({"userid":userid, "usertype":notificationconfig().getnotificationusertypeid("triggered user")})
         return notificationusers
 

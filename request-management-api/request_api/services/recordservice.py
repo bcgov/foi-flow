@@ -99,12 +99,14 @@ class recordservice(recordservicebase):
 
     def getpdfstichstatus(self, ministryid, category):
         response, err = self.makedocreviewerrequest('GET', '/api/pdfstitchjobstatus/{0}/{1}'.format(ministryid, category))
-        if response is not None and len(response) > 0:
+        if response is not None and "status" in response:
             return response.get("status")
         return ""
 
     def isrecordschanged(self, ministryid, category):
         response, err = self.makedocreviewerrequest('GET', '/api/recordschanged/{0}/{1}'.format(ministryid, category))
+        if response is None:
+                return {"recordchanged": False}
         return response
 
     def __triggerpdfstitchservice(self, requestid, ministryrequestid, message, userid):
@@ -182,9 +184,9 @@ class recordservice(recordservicebase):
                         "createdby": userid,
                         "incompatible": 'true' if extension in NONREDACTABLE_FILE_TYPES else 'false'
                     }
-                    if extension in FILE_CONVERSION_FILE_TYPES:
+                    if extension in FILE_CONVERSION_FILE_TYPES or extension.lower() in FILE_CONVERSION_FILE_TYPES:
                         eventqueueservice().add(self.conversionstreamkey, streamobject)
-                    if extension in DEDUPE_FILE_TYPES:
+                    if extension in DEDUPE_FILE_TYPES or extension.lower() in DEDUPE_FILE_TYPES:
                         eventqueueservice().add(self.dedupestreamkey, streamobject)
         return dbresponse
 
