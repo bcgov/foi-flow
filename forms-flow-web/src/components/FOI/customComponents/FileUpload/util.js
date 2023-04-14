@@ -47,7 +47,7 @@ export const isEmailFileType = (_file) => {
 
 export const allowedFileType = (_file, mimeTypes) => {
   return ((mimeTypes.includes(_file.type) || mimeTypes.includes('.' + _file.filename.split('.').pop())) ||
-    ([".msg", ".eml"].some(mimetype => (mimeTypes.includes(mimetype))) && isEmailFileType(_file)));
+    mimeTypes.includes('.' + _file.name.split('.').pop()));
 }
 
 export const allowedFileSize = (_totalFileSizeInMB, multipleFiles, totalFileSize) => {
