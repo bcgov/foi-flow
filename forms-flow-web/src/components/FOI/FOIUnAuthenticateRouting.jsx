@@ -33,16 +33,6 @@ const FOIUnAuthenticateRouting = React.memo((props) => {
 
   return (
     <>
-      {/* <Route path="/admin/divisions">
-        <FOIHeader />
-        <Divisions />
-        <FOIFooter />
-      </Route>
-      <Route path="/admin">
-        <FOIHeader />
-        <Admin />
-        <FOIFooter />
-      </Route> */}
       <Route exact path="/">
         <FOIHeader />
         <Home />

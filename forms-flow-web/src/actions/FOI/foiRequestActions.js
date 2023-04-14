@@ -83,6 +83,18 @@ export const setFOIMinistryViewRequestDetail = (data) => dispatch =>{
         payload:data
     })
 }
+export const setFOIPDFStitchedRecordForHarms = (data) => dispatch =>{
+    dispatch({
+        type:FOI_ACTION_CONSTANTS.FOI_PDF_STITCHED_RECORD_FOR_HARMS,
+        payload:data
+    })
+}
+export const setFOIPDFStitchStatusForHarms = (data) => dispatch =>{
+    dispatch({
+        type:FOI_ACTION_CONSTANTS.FOI_PDF_STITCHED_STATUS_FOR_HARMS,
+        payload:data
+    })
+}
 export const serviceActionError = (_data) => dispatch => {
    //TODO update to a common file
     dispatch({
@@ -260,6 +272,13 @@ export const setRequestExtensions = (data) => (dispatch) => {
   });
 };
 
+export const setRequestRecords = (data) => (dispatch) => {
+    dispatch({
+      type: FOI_ACTION_CONSTANTS.FOI_REQUEST_RECORDS,
+      payload: data,
+    });
+  };
+
 export const setOpenedMinistries = (data) => (dispatch) => {
     dispatch({
       type: FOI_ACTION_CONSTANTS.FOI_OPENED_MINISTRIES,
@@ -305,6 +324,13 @@ export const setFOISubjectCodeList = (data) => dispatch =>{
 export const setRestrictedReqTaglist = (data) => dispatch =>{
     dispatch({
         type:FOI_ACTION_CONSTANTS.RESTRICTED_COMMENT_TAG_LIST,
+        payload:data
+    })
+}
+
+export const setRecordFormats = (data) => dispatch =>{
+    dispatch({
+        type:FOI_ACTION_CONSTANTS.RECORD_FORMATS,
         payload:data
     })
 }

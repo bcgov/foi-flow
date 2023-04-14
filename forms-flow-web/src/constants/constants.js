@@ -46,3 +46,7 @@ process.env.REACT_APP_OSS_S3_FORMS_BUCKET || "dev-forms-foirequests")
 
 export const FOI_FFA_URL =  (window._env_ && window._env_.FOI_FFA_URL) ||
 process.env.FOI_FFA_URL || "http://localhost:4000";
+
+export const DOC_REVIEWER_WEB_URL = `${(window._env_ && window._env_.REACT_APP_DOCREVIEWER_WEB_URL) || process.env.REACT_APP_DOCREVIEWER_WEB_URL}`;
+
+export const FOI_RECORD_FORMATS = `${(window._env_ && window._env_.REACT_APP_FOI_RECORD_FORMATS) || process.env.REACT_APP_FOI_RECORD_FORMATS}`;
