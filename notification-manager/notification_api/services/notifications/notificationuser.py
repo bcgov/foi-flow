@@ -27,14 +27,14 @@ class notificationuser:
         elif 'Watcher' in notificationtype:
             _users = self.__getwatchers(notificationtype, foirequest, requesttype, requestjson)        
         else:
-            _users = self.__getassignees(foirequest, requesttype, notificationtype) + self.__getwatchers(notificationtype, foirequest, requesttype)
+            _users = self.__getassignees(foirequest, requesttype, notificationtype) + self.__getwatchers(notificationtype, foirequest, requesttype) + self.__gettriggereduser(userid, notificationtype)
         for user in _users:
             if self.__isignorable(user, notificationusers, userid, notificationtype) == False and (("Tagged User Comments" not in notificationtype and self.__istaggeduser(user, requestjson, notificationtype) == False) or "Tagged User Comments" in notificationtype):
                 notificationusers.append(user)
         return notificationusers    
     
     def __isignorable(self, notificationuser, users, userid, notificationtype):
-        if notificationuser["userid"] == userid and "Records" not in notificationtype:
+        if notificationuser["userid"] == userid and notificationtype not in ["Records", "PDFStitch"]:
             return True
         else: 
             for user in users:
@@ -50,6 +50,13 @@ class notificationuser:
                     if notificationuser["userid"] == user["userid"]:
                         return True
         return False
+
+    def __gettriggereduser(self, userid, notificationtype):
+        notificationusers = []
+        if notificationtype in ["Records", "PDFStitch"]:
+            notificationusers.append({"userid":userid, "usertype":notificationconfig().getnotificationusertypeid("triggered user")})
+        return notificationusers
+
         
     def __getwatchers(self, notificationtype, foirequest, requesttype, requestjson=None):
         notificationusers = []

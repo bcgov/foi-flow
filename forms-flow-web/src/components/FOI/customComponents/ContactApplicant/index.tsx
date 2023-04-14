@@ -316,7 +316,7 @@ export const ContactApplicant = ({
             >
               <label className="hideContent">Search Correspondence</label>
               <InputBase
-                id="foicommentfilter"
+                id="foicorrespondencefilter"
                 placeholder="Search Correspondence ..."
                 defaultValue={""}
                 onChange={(e: any) => { onFilterChange(e.target.value.trim()) }}

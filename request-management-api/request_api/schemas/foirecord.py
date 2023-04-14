@@ -33,7 +33,7 @@ class FOIRequestCreateRecordSchema(Schema):
         unknown = EXCLUDE    
     attributes = fields.Nested(CreateRecordAttributeSchema)
     s3uripath = fields.Str(data_key="s3uripath",allow_none=False, validate=[validate.Length(max=1000, error=MAX_EXCEPTION_MESSAGE)])
-    filename = fields.Str(data_key="filename",allow_none=False, validate=[validate.Length(max=120, error=MAX_EXCEPTION_MESSAGE)])
+    filename = fields.Str(data_key="filename",allow_none=False, validate=[validate.Length(max=500, error=MAX_EXCEPTION_MESSAGE)])
 
 
 
@@ -65,7 +65,7 @@ class FOIRequestRetryRecordSchema(Schema):
         unknown = EXCLUDE
     attributes = fields.Nested(RetryRecordAttributeSchema)
     s3uripath = fields.Str(data_key="s3uripath",allow_none=False, validate=[validate.Length(max=1000, error=MAX_EXCEPTION_MESSAGE)])
-    filename = fields.Str(data_key="filename",allow_none=False, validate=[validate.Length(max=120, error=MAX_EXCEPTION_MESSAGE)])
+    filename = fields.Str(data_key="filename",allow_none=False, validate=[validate.Length(max=500, error=MAX_EXCEPTION_MESSAGE)])
     trigger = fields.Str(validate=validate.OneOf(['recordreplace', 'recordretry']), required=True,allow_none=False)
     service = fields.Str(validate=validate.OneOf(['deduplication', 'conversion']), required=True,allow_none=False)
     documentmasterid = fields.Integer(required=True,allow_none=True)
@@ -88,7 +88,7 @@ class FileSchema(Schema):
 
         unknown = EXCLUDE 
     recordid = fields.Int(data_key="recordid",allow_none=True)
-    filename = fields.Str(data_key="filename",allow_none=False, validate=[validate.Length(max=120, error=MAX_EXCEPTION_MESSAGE)])
+    filename = fields.Str(data_key="filename",allow_none=False, validate=[validate.Length(max=500, error=MAX_EXCEPTION_MESSAGE)])
     s3uripath = fields.Str(data_key="s3uripath",allow_none=False, validate=[validate.Length(max=1000, error=MAX_EXCEPTION_MESSAGE)])
     lastmodified = fields.Str(data_key="lastmodified",allow_none=False, validate=[validate.Length(max=120, error=MAX_EXCEPTION_MESSAGE)])
 

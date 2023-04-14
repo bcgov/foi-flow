@@ -6,7 +6,7 @@ import AttachmentModal from '../Attachments/AttachmentModal';
 import Loading from "../../../../containers/Loading";
 import { getOSSHeaderDetails, saveFilesinS3, getFileFromS3, postFOIS3DocumentPreSignedUrl, getFOIS3DocumentPreSignedUrl } from "../../../../apiManager/services/FOI/foiOSSServices";
 import { saveFOIRequestAttachmentsList, replaceFOIRequestAttachment, saveNewFilename, deleteFOIRequestAttachment } from "../../../../apiManager/services/FOI/foiAttachmentServices";
-import { fetchFOIRecords, saveFOIRecords, deleteFOIRecords, retryFOIRecordProcessing, deleteReviewerRecords, getRecordFormats, triggerDownloadFOIRecordsForHarms, fetchPDFStitchedRecordForHarms } from "../../../../apiManager/services/FOI/foiRecordServices";
+import { fetchFOIRecords, saveFOIRecords, deleteFOIRecords, retryFOIRecordProcessing, deleteReviewerRecords, getRecordFormats, triggerDownloadFOIRecordsForHarms, fetchPDFStitchedRecordForHarms, checkForRecordsChange } from "../../../../apiManager/services/FOI/foiRecordServices";
 import { StateTransitionCategories, AttachmentCategories } from '../../../../constants/FOI/statusEnum'
 import { RecordsDownloadList, RecordDownloadCategory } from '../../../../constants/FOI/enum';
 import { addToFullnameList, getFullnameList, ConditionalComponent } from '../../../../helper/FOI/helper';
@@ -47,6 +47,7 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 import CloseIcon from '@material-ui/icons/Close';
 import _ from 'lodash';
 import { DOC_REVIEWER_WEB_URL } from "../../../../constants/constants";
+import {removeDuplicateFiles, addDeduplicatedAttachmentsToRecords, getPDFFilePath, sortDivisionalFiles} from "./util"
 
 
 const useStyles = makeStyles((_theme) => ({
@@ -164,6 +165,7 @@ export const RecordsLog = ({
 
   useEffect(() => {
     setRecords(recordsObj?.records)
+    dispatch(checkForRecordsChange(requestId, ministryId))
   }, [recordsObj])
 
   useEffect(() => {
@@ -189,13 +191,14 @@ export const RecordsLog = ({
   const [searchValue, setSearchValue] = useState("");
   const [filterValue, setFilterValue] = useState(-1);
   const [fullnameList, setFullnameList] = useState(getFullnameList);
+  const [recordsDownloadList, setRecordsDownloadList] = useState(RecordsDownloadList);
   const [currentDownload, setCurrentDownload] = useState(0) 
   const [isDownloadInProgress, setIsDownloadInProgress] = useState(false)
   const [isDownloadReady, setIsDownloadReady] = useState(false)
   const [isDownloadFailed, setIsDownloadFailed] = useState(false)
   
   useEffect(() => {
-    switch(pdfStitchStatus) {      
+    switch(pdfStitchStatus) {
       case "started":
       case "pushedtostream":
         setIsDownloadInProgress(true);
@@ -240,7 +243,7 @@ export const RecordsLog = ({
     if (modalFor === 'delete' && value) {
       //const documentId = ministryId ? updateAttachment.foiministrydocumentid : updateAttachment.foidocumentid;
       if (updateAttachment.isattachment) {
-        dispatch(deleteReviewerRecords({filepaths: [updateAttachment]},(err, _res) => {
+          dispatch(deleteReviewerRecords({filepaths: [updateAttachment.filepath], ministryrequestid: ministryId},(err, _res) => {
           dispatchRequestAttachment(err);
         }));
       } else {
@@ -354,6 +357,7 @@ export const RecordsLog = ({
   }  
 
   const handleDownloadChange = (e) => {
+    //if clicked on harms
     if (e.target.value === 1 && ["not started", "error"].includes(pdfStitchStatus)) {
       toast.info("In progress. You will be notified when the records are ready for download.", {
         position: "top-right",
@@ -365,12 +369,10 @@ export const RecordsLog = ({
         progress: undefined,
         theme: "colored",
         backgroundColor: "#FFA500"
-      });
-      setIsDownloadInProgress(true);      
-      setIsDownloadReady(false);
-      setIsDownloadFailed(false);           
+      });      
       downloadLinearHarmsDocuments()      
     }
+    //if clicked on harms and stitching is complete
     else if (e.target.value === 1 && pdfStitchStatus === "completed") {
       const s3filepath = pdfStitchedRecord?.finalpackagepath
       const filename = requestNumber + ".zip"
@@ -387,74 +389,109 @@ export const RecordsLog = ({
   }
 
   const downloadLinearHarmsDocuments = () => {
-    let exporting = recordsObj?.records.filter(record => !record.isduplicate)
-    for (let record of exporting) {
-      if (record.attachments) for (let attachment of record.attachments) {
-        if (!attachment.isduplicate) exporting.push(attachment);
-      }
-    }
-    try {
-      let message = {       
-        attributes: []
-      }
-      let attributes = [];      
-      for (let record of exporting) {
-        const fileObj = {}
-        const attributeObj = {files: []}
-        let filepath = record.s3uripath
-        let filename = record.filename
-        if (record.isredactionready && ['.doc','.docx','.xls','.xlsx', '.ics', '.msg'].includes(record.attributes?.extension)) {
-          filepath = filepath.substr(0, filepath.lastIndexOf(".")) + ".pdf";
-          filename += ".pdf";
-        }
-        fileObj.recordid = record.recordid;
-        fileObj.filename = filename;
-        fileObj.s3uripath = filepath;
-        fileObj.lastmodified = record.attributes.lastmodified;
-        for (let division of record.attributes.divisions) {
-          attributeObj.divisionid = division.divisionid
-          attributeObj.divisionname = division.divisionname?.replace("'", "")
-          attributeObj.files.push(fileObj)
-        }
-        //attributes will have unique files array and division combination
-        attributes.push(attributeObj)        
-      }
-
-      //This will return the result by merging the files with same division id (order by lastmodified asc)
-      let result = attributes.reduce((acc, val) => {
-        let found = acc.find((findval) => val.divisionid === findval.divisionid);
-        if (!found) acc.push(val)
-        else found.files = found.files.concat(
-          val.files.filter((f) => !found.files.find((findval) => f.filename === findval.filename))).sort((a,b) => {
-                return new Date(Date.parse(a.lastmodified)) - new Date(Date.parse(b.lastmodified))
-              });
-        return acc;
-      }, []);
-
-      message.requestnumber = requestNumber
-      message.bcgovcode = bcgovcode
-      message.attributes = result
-      message.category = RecordDownloadCategory.harms
-
+    try{
+    
+      const message = createMessageForHarms(recordsObj?.records);
       dispatch(triggerDownloadFOIRecordsForHarms(requestId, ministryId, message,(err, _res) => {
+        if (err) {
+          toastError()
+        }
+        else {
+          setIsDownloadInProgress(true);      
+          setIsDownloadReady(false);
+          setIsDownloadFailed(false); 
+        }
         dispatchRequestAttachment(err);
     }));
 
     } catch (error) {
       console.log(error)
-      toast.error(
-        "Temporarily unable to process your request. Please try again in a few minutes.",
-        {
-          position: "top-right",
-          autoClose: 3000,
-          hideProgressBar: true,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-        }
-      );
+      toastError()
     }
+
+  }
+
+  const createMessageForHarms = (recordList) => {
+    
+    const message = {
+      "category":RecordDownloadCategory.harms,
+      "requestnumber":requestNumber,
+      "bcgovcode":bcgovcode,
+      "attributes":[]
+    };
+
+    let exporting = removeDuplicateFiles(recordList);
+    exporting = addDeduplicatedAttachmentsToRecords(exporting);
+
+    // Create a map to group files by division
+    const divisionMap = new Map();
+ 
+    // Loop through each item in the input array
+    for (const item of exporting) {
+      // Get the division information from the item
+      const divisions = item.attributes ? item.attributes.divisions : null;
+      
+      const [filepath, filename] = getPDFFilePath(item);
+    
+      // If the item has no division information, skip it
+      if (!divisions) {
+        continue;
+      }
+    
+      // Loop through each division in the item
+      for (const division of divisions) {
+        // Get the division ID and name
+        const divisionId = division.divisionid;
+        const divisionName = division.divisionname.replace("'", "");
+    
+        // If the division is not already in the division map, add it
+        if (!divisionMap.has(divisionId)) {
+          divisionMap.set(divisionId, {
+            divisionid: divisionId,
+            divisionname: divisionName,
+            files: []
+          });
+        }
+    
+        // Add the item to the files array for this division
+        const files = divisionMap.get(divisionId).files;
+        files.push({
+          lastmodified: item.attributes ? item.attributes.lastmodified : null,
+          recordid: item.recordid,
+          s3uripath: filepath,
+          filename: filename
+        });
+      }
+    }
+ 
+    // Sort the divisions by lastmodified date and add them to the output object
+    const sortedDivisions = sortDivisionalFiles(divisionMap);
+
+    message.attributes = sortedDivisions;
+    //keeping this for testing purpose.
+    console.log(`message = ${JSON.stringify(message)}`);
+
+    return message;
+
+  }
+
+
+  const toastError = (error) => {
+    toast.error(
+      "Temporarily unable to process your request. Please try again in a few minutes.",
+      {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: true,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      }
+    );
+    setIsDownloadInProgress(false);      
+    setIsDownloadReady(false);
+    setIsDownloadFailed(true);
 
   }
 
@@ -532,7 +569,7 @@ export const RecordsLog = ({
   const removeAttachments = () => {
     setDeleteModalOpen(false);
     var attachments = records.reduce((acc, record) => {return record.attachments ? acc.concat(record.attachments.map(a => a.filepath)) : acc}, []);
-    dispatch(deleteReviewerRecords({filepaths: attachments},(err, _res) => {
+    dispatch(deleteReviewerRecords({filepaths: attachments, ministryrequestid :ministryId},(err, _res) => {
       dispatchRequestAttachment(err);
     }));
   }
@@ -618,11 +655,6 @@ export const RecordsLog = ({
     return `Request #U-00${requestId}`;
   }
 
-  const getCurrentDownload = () => {
-    if (currentDownload === 1 && isDownloadInProgress)
-      return 0;
-    return currentDownload;
-  }
 
   // const onFilterChange = (filterValue) => {
     // let _filteredRecords = filterValue === "" ?
@@ -675,7 +707,7 @@ export const RecordsLog = ({
             spacing={1}
           >
             <Grid item xs={6}>
-              <h1 className="foi-review-request-text foi-ministry-requestheadertext">
+              <h1 className="foi-review-request-text foi-ministry-requestheadertext foi-records-request-text">
                 {getRequestNumber()}
               </h1>
             </Grid>
@@ -687,8 +719,8 @@ export const RecordsLog = ({
             alignItems="flex-start"
             spacing={1}
           >
-            <Grid item xs={2}>
-              <ConditionalComponent condition={records.filter(record => record.attachments?.length > 0).length > 0}>
+            <ConditionalComponent condition={records.filter(record => record.attachments?.length > 0).length > 0}>
+            <Grid item xs={3}>              
                 <button
                   className="btn addAttachment foi-export-button"
                   variant="contained"
@@ -697,10 +729,12 @@ export const RecordsLog = ({
                 >
                   Remove Attachments
                 </button>
-              </ConditionalComponent>
+              
             </Grid>
+            </ConditionalComponent>
+            <ConditionalComponent condition={hasDocumentsToDownload}>
             <Grid item xs={3}>
-              <ConditionalComponent condition={hasDocumentsToDownload}>
+              
               <TextField
               className="download-dropdown custom-select-wrapper foi-download-button"
               id="download"
@@ -727,7 +761,7 @@ export const RecordsLog = ({
               size="small"
               fullWidth
             >
-              {RecordsDownloadList.map((item, index) => {
+              {recordsDownloadList.map((item, index) => {
 
                 if (item.id !=0) {
                   return (
@@ -739,11 +773,11 @@ export const RecordsLog = ({
                         sx={{ display: 'flex' }}
                       >
                         {
-                          !item.disabled && (isDownloadReady && !item.disabled ?
+                          !item.disabled && (isDownloadReady ?
                           <FontAwesomeIcon icon={faCheckCircle} size='2x' color='#1B8103' className={classes.statusIcons}/>:
-                          isDownloadFailed && !item.disabled ?
+                          isDownloadFailed ?
                           <FontAwesomeIcon icon={faExclamationCircle} size='2x' color='#A0192F' className={classes.statusIcons}/>:
-                          isDownloadInProgress && !item.disabled ? <FontAwesomeIcon icon={faSpinner} size='2x' color='#FAA915' className={classes.statusIcons}/>:null) 
+                          isDownloadInProgress ? <FontAwesomeIcon icon={faSpinner} size='2x' color='#FAA915' className={classes.statusIcons}/>:null) 
                         }
                         {item.label}
                       </MenuItem>
@@ -753,8 +787,9 @@ export const RecordsLog = ({
 
               } )}
             </TextField>
-              </ConditionalComponent>
+             
             </Grid>
+            </ConditionalComponent>
             {/* <Grid item xs={2}>
               <ConditionalComponent condition={hasDocumentsToExport}>
                 <button
@@ -777,7 +812,7 @@ export const RecordsLog = ({
                 >
                   + Upload Records
                 </button> :
-                <a href={DOC_REVIEWER_WEB_URL + "/foi/" + ministryId}>
+                (records.length > 0 && <a href={DOC_REVIEWER_WEB_URL + "/foi/" + ministryId}>
                   <button
                     className={clsx("btn", "addAttachment", classes.createButton)}
                     variant="contained"
@@ -786,7 +821,7 @@ export const RecordsLog = ({
                   >
                     Redact Records
                   </button>
-                </a>
+                </a>)
               }
             </Grid>
             <Grid
@@ -873,7 +908,7 @@ export const RecordsLog = ({
                 >
                   <label className="hideContent">Filter Records</label>
                   <InputBase
-                    id="foicommentfilter"
+                    id="foirecordsfilter"
                     placeholder="Filter Records ..."
                     defaultValue={""}
                     onChange={(e)=>{setSearchValue(e.target.value.trim())}}
@@ -883,6 +918,7 @@ export const RecordsLog = ({
                     startAdornment={
                       <InputAdornment position="start">
                         <IconButton
+                          aria-label="Search Icon"
                           className="search-icon"
                         >
                           <span className="hideContent">Filter Records ...</span>
@@ -1347,7 +1383,7 @@ const AttachmentPopup = React.memo(({indexValue, record, handlePopupButtonClick,
           >
             Download Original
           </MenuItem>
-          <DeleteMenu />
+          {!record.isattachment && <DeleteMenu />}
           {!record.isredactionready && record.failed && <MenuItem
             onClick={() => {
                 handleRetry();

@@ -73,6 +73,33 @@ export const fetchPDFStitchStatusForHarms = (requestId, ministryId, ...rest) => 
   };
 };
 
+export const checkForRecordsChange = (requestId, ministryId, ...rest) => {
+  if (!ministryId) {
+    return () => {};
+  }
+  const done = fnDone(rest);
+  let apiUrl = replaceUrl(replaceUrl(
+    API.FOI_CHECK_RECORDS_CHANGED,
+    "<ministryrequestid>", ministryId),
+    "<requestid>", requestId);
+  return (dispatch) => {
+    httpGETRequest(apiUrl, {}, UserService.getToken())
+      .then((res) => {
+        if (res.data) {
+          if (res.data.recordchanged) {
+            dispatch(setFOIPDFStitchStatusForHarms("not started"));
+          }         
+          done(null, res.data);
+        }
+      })
+      .catch((error) => {
+        console.log("Error in checking for records change", error);
+        dispatch(serviceActionError(error));
+        done(error);
+      });
+  };
+};
+
 export const fetchFOIRecords = (requestId, ministryId, ...rest) => {
   if (!ministryId) {
     return () => {};

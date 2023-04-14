@@ -21,3 +21,4 @@ class eventqueueservice:
         except Exception as err:
             logging.error("Error in contacting Redis Stream")
             logging.error(err)
+            return DefaultMethodResult(False,err,-1)

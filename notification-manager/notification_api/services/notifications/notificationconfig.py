@@ -27,6 +27,10 @@ class notificationconfig:
             return 1
         elif notificationusertype.lower() == "assignee" or "comment"  or "group members" in notificationusertype.lower():
             return 2
+        elif notificationusertype.lower() == "comment user":
+            return 3
+        elif notificationusertype.lower() == "triggered user":
+            return 4
         return 0
     
     def getnotificationdays(self):
