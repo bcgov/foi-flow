@@ -3,7 +3,7 @@ import './attachments.scss'
 import { useDispatch } from "react-redux";
 import AttachmentModal from './AttachmentModal';
 import Loading from "../../../../containers/Loading";
-import { saveFilesinS3, getFileFromS3, postFOIS3DocumentPreSignedUrl, getFOIS3DocumentPreSignedUrl } from "../../../../apiManager/services/FOI/foiOSSServices";
+import { getOSSHeaderDetails, saveFilesinS3, getFileFromS3 } from "../../../../apiManager/services/FOI/foiOSSServices";
 import { saveFOIRequestAttachmentsList, replaceFOIRequestAttachment, saveNewFilename, deleteFOIRequestAttachment } from "../../../../apiManager/services/FOI/foiAttachmentServices";
 import { StateTransitionCategories, AttachmentCategories, AttachmentLetterCategories } from '../../../../constants/FOI/statusEnum'
 import { addToFullnameList, getFullnameList, ConditionalComponent } from '../../../../helper/FOI/helper';
@@ -159,13 +159,13 @@ export const AttachmentSection = ({
     if (value) {
       if (files.length !== 0) {
         setAttachmentLoading(true);
-        postFOIS3DocumentPreSignedUrl(ministryId, fileInfoList, 'attachments', bcgovcode, dispatch, (err, res) => {
+        getOSSHeaderDetails(fileInfoList, dispatch, (err, res) => {
           let _documents = [];
           if (!err) {
             res.map((header, index) => {
               const _file = files.find(file => file.filename === header.filename);
               const _fileInfo = fileInfoList.find(fileInfo => fileInfo.filename === header.filename);
-              const documentDetails = {documentpath: header.filepathdb, filename: header.filename, category: _fileInfo.filestatustransition};
+              const documentDetails = {documentpath: header.filepath, filename: header.filename, category: _fileInfo.filestatustransition};
               _documents.push(documentDetails);
               setDocuments(_documents);
               saveFilesinS3(header, _file, dispatch, (_err, _res) => {
@@ -184,24 +184,47 @@ export const AttachmentSection = ({
   }
 
   const downloadDocument = (file) => {
-    getFOIS3DocumentPreSignedUrl(file.documentpath.split('/').slice(4).join('/'), ministryId, dispatch, (err, res) => {
+    const fileInfoList = [
+      {
+        ministrycode: "Misc",
+        requestnumber: `U-00${requestId}`,
+        filestatustransition: file.category,
+        filename: file.filename,
+        s3sourceuri: file.documentpath
+      },
+    ];
+    getOSSHeaderDetails(fileInfoList, dispatch, (err, res) => {
       if (!err) {
-        getFileFromS3({filepath: res}, (_err, response) => {
-          let blob = new Blob([response.data], {type: "application/octet-stream"});
-          saveAs(blob, file.filename)
+        res.map(async (header, _index) => {
+          getFileFromS3(header, (_err, response) => {
+            let blob = new Blob([response.data], {type: "application/octet-stream"});
+            saveAs(blob, file.filename)
+          });
         });
       }
-    }, 'attachments', bcgovcode);
+    });
   }
 
   const downloadAllDocuments = async () => {
+    let fileInfoList = []
+    attachmentsForDisplay.forEach(attachment => {
+      if (!(isMinistryCoordinator && attachment.category == 'personal')) {
+        fileInfoList.push({
+            ministrycode: "Misc",
+            requestnumber: `U-00${requestId}`,
+            filestatustransition: attachment.category,
+            filename: attachment.filename,
+            s3sourceuri: attachment.documentpath
+        });
+      }
+    })
     let blobs = [];
     try {
-      for (let attachment of attachmentsForDisplay) {
-        const response = await getFOIS3DocumentPreSignedUrl(attachment.documentpath.split('/').slice(4).join('/'), ministryId, dispatch, null, 'attachments', bcgovcode)
-        await getFileFromS3({filepath: response.data}, (_err, res) => {
+      const response = await getOSSHeaderDetails(fileInfoList, dispatch);
+      for (let header of response.data) {
+        await getFileFromS3(header, (_err, res) => {
           let blob = new Blob([res.data], {type: "application/octet-stream"});
-          blobs.push({name: attachment.filename, lastModified: res.headers['last-modified'], input: blob})
+          blobs.push({name: header.filename, lastModified: res.headers['last-modified'], input: blob})
         });
       }
     } catch (error) {
@@ -379,6 +402,7 @@ export const AttachmentSection = ({
             attachment={updateAttachment}
             attachmentsArray={attachmentsArray}
             handleRename={handleRename}
+            maxNoFiles={10}
             isMinistryCoordinator={isMinistryCoordinator}
           />
         </>
@@ -525,7 +549,7 @@ const Attachment = React.memo(({indexValue, attachment, handlePopupButtonClick, 
 const opendocumentintab =(attachment,ministryId)=>
 {
   let relativedocpath = attachment.documentpath.split('/').slice(4).join('/')
-  let url =`/foidocument?id=${ministryId}&filepath=${relativedocpath}`;
+  let url =`/foidocument?id=${ministryId || -1}&filepath=${relativedocpath}`;
   window.open(url, '_blank').focus();
 }
 
