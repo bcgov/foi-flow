@@ -66,6 +66,8 @@ WebUI.setText(findTestObject('Page_foi.flow/queue/input_Dashboard Filter'), requ
 
 WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
 
+WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
+
 WebUI.click(findTestObject('Page_foi.flow/queue/div_request queue row 1'))
 
 WebUI.refresh()

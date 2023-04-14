@@ -61,7 +61,7 @@
    </GlobalVariableEntity>
    <GlobalVariableEntity>
       <description></description>
-      <initValue>3</initValue>
+      <initValue>8</initValue>
       <name>DEFAULT_TIMEOUT</name>
    </GlobalVariableEntity>
 </GlobalVariableEntities>

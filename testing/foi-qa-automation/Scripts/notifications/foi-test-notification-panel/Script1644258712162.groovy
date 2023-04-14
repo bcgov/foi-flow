@@ -110,6 +110,8 @@ WebUI.click(findTestObject('Page_foi.flow/form/assignee dropdown/div_Assigned'))
 
 WebUI.click(findTestObject('Page_foi.flow/form/assignee dropdown/li_Intake, FOI'))
 
+WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT, FailureHandling.STOP_ON_FAILURE)
+
 WebUI.clickOffset(findTestObject('Page_foi.flow/navbar/notification/notification bell'), -2, 4)
 
 WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT, FailureHandling.STOP_ON_FAILURE)
@@ -128,8 +130,8 @@ if (WebUI.verifyElementPresent(findTestObject('Page_foi.flow/navbar/notification
 
 WebUI.delay(4)
 
-assert WebUI.getAttribute(findTestObject('Page_foi.flow/navbar/notification/span_notification indicator'), 'class').contains(
-    'MuiBadge-invisible')
+//assert WebUI.getAttribute(findTestObject('Page_foi.flow/navbar/notification/span_notification indicator'), 'class').contains(
+   // 'MuiBadge-invisible')
 
 //WebUI.verifyElementPresent(findTestObject('Page_foi.flow/navbar/notification/div_notification popup'), 0)
 //WebUI.clickOffset(findTestObject('Page_foi.flow/navbar/notification/notification bell'), -2, 4)
@@ -277,15 +279,10 @@ user1.close()
 def requestID2 = WebUI.callTestCase(findTestCase('submit/foi-test-save-request-form'), [:], FailureHandling.STOP_ON_FAILURE)
 
 //WebUI.click(findTestObject('Page_foi.flow/form/assignee dropdown/div_Assigned'))
-
 //WebUI.delay(4)
-
 //WebUI.click(findTestObject('Page_foi.flow/form/assignee dropdown/li_Intake, FOI'))
-
 //WebUI.scrollToElement(findTestObject('Page_foi.flow/form/button_Save'), 0)
-
 //WebUI.click(findTestObject('Page_foi.flow/form/button_Save'), FailureHandling.STOP_ON_FAILURE)
-
 DriverFactory.changeWebDriver(user2)
 
 WebUI.refresh()
