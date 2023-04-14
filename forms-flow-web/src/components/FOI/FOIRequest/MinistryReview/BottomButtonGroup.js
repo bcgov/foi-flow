@@ -3,7 +3,7 @@ import "../BottomButtonGroup/bottombuttongroup.scss";
 import { makeStyles } from "@material-ui/core/styles";
 import { useDispatch } from "react-redux";
 import {
-  postFOIS3DocumentPreSignedUrl,
+  getOSSHeaderDetails,
   saveFilesinS3,
 } from "../../../../apiManager/services/FOI/foiOSSServices";
 import { saveMinistryRequestDetails } from "../../../../apiManager/services/FOI/foiRequestServices";
@@ -47,6 +47,7 @@ const BottomButtonGroup = React.memo(
     isValidationError,
     saveMinistryRequestObject,
     unSavedRequest,
+    recordsUploading,
     CFRUnsaved,
     handleSaveRequest,
     currentSelectedStatus,
@@ -68,7 +69,7 @@ const BottomButtonGroup = React.memo(
 
     const returnToQueue = (e) => {
       if (
-        (!unSavedRequest && !CFRUnsaved) ||
+        (!unSavedRequest && !recordsUploading && !CFRUnsaved) ||
         window.confirm(
           "Are you sure you want to leave? Your changes will be lost."
         )
@@ -140,7 +141,7 @@ const BottomButtonGroup = React.memo(
     }, [currentSelectedStatus, stateChanged]);
 
     React.useEffect(() => {
-      if (unSavedRequest || CFRUnsaved) {
+      if (unSavedRequest || recordsUploading || CFRUnsaved) {
         window.history.pushState(null, null, window.location.pathname);
         window.addEventListener("popstate", handleOnHashChange);
         window.addEventListener("beforeunload", alertUser);
@@ -149,7 +150,7 @@ const BottomButtonGroup = React.memo(
         window.removeEventListener("popstate", handleOnHashChange);
         window.removeEventListener("beforeunload", alertUser);
       };
-    }, [unSavedRequest, CFRUnsaved]);
+    }, [unSavedRequest, recordsUploading, CFRUnsaved]);
 
     const saveRequestModal = () => {
       if (currentSelectedStatus !== saveMinistryRequestObject?.currentState)
@@ -221,13 +222,13 @@ const BottomButtonGroup = React.memo(
         return;
       }
 
-      postFOIS3DocumentPreSignedUrl(ministryId, fileInfoList, 'attachments', saveMinistryRequestObject.idNumber.split("-")[0], dispatch, (err, res) => {
+      getOSSHeaderDetails(fileInfoList, dispatch, (err, res) => {
         let _documents = [];
         if (!err) {
           res.map((header, index) => {
-            const _file = files?.find((file) => file.filename === header.filename);
+            const _file = files?.find((file) => file.name === header.filename);
             const documentpath = {
-              documentpath: header.filepathdb,
+              documentpath: header.filepath,
               filename: header.filename,
               category: header.filestatustransition,
             };

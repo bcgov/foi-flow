@@ -3,7 +3,7 @@ import "./bottombuttongroup.scss";
 import { makeStyles } from "@material-ui/core/styles";
 import { useDispatch } from "react-redux";
 import {
-  postFOIS3DocumentPreSignedUrl,
+  getOSSHeaderDetails,
   saveFilesinS3,
 } from "../../../../apiManager/services/FOI/foiOSSServices";
 import {
@@ -61,6 +61,7 @@ const BottomButtonGroup = React.memo(
     urlIndexCreateRequest,
     saveRequestObject,
     unSavedRequest,
+    recordsUploading,
     CFRUnsaved,
     handleSaveRequest,
     handleOpenRequest,
@@ -183,7 +184,7 @@ const BottomButtonGroup = React.memo(
     }, [currentSelectedStatus, stateChanged]);
 
     React.useEffect(() => {
-      if (unSavedRequest || CFRUnsaved) {
+      if (unSavedRequest || recordsUploading || CFRUnsaved) {
         window.history.pushState(null, null, window.location.pathname);
         window.addEventListener("popstate", handleOnHashChange);
         window.addEventListener("beforeunload", handleBeforeUnload);
@@ -192,7 +193,7 @@ const BottomButtonGroup = React.memo(
           window.removeEventListener("beforeunload", handleBeforeUnload);
         };
       }
-    }, [unSavedRequest, CFRUnsaved]);
+    }, [unSavedRequest, recordsUploading, CFRUnsaved]);
 
     const openRequest = () => {
       saveRequestObject.id = saveRequestObject.id
@@ -356,13 +357,13 @@ const BottomButtonGroup = React.memo(
         return;
       }
 
-      postFOIS3DocumentPreSignedUrl(ministryId, fileInfoList, 'attachments', saveRequestObject.idNumber.split("-")[0], dispatch, (err, res) => {
+      getOSSHeaderDetails(fileInfoList, dispatch, (err, res) => {
         let _documents = [];
         if (!err) {
           res.map((header, index) => {
-            const _file = files?.find((file) => file.filename === header.filename);
+            const _file = files?.find((file) => file.name === header.filename);
             const documentpath = {
-              documentpath: header.filepathdb,
+              documentpath: header.filepath,
               filename: header.filename,
               category: header.filestatustransition,
             };
@@ -434,7 +435,7 @@ const BottomButtonGroup = React.memo(
           <button
             type="button"
             className={`btn btn-bottom ${classes.btnsecondaryenabled}`}
-            onClick={(e) => returnToQueue(e, unSavedRequest)}
+            onClick={(e) => returnToQueue(e, unSavedRequest || recordsUploading)}
           >
             Return to Queue
           </button>
