@@ -78,6 +78,8 @@ WebUI.refresh()
 
 WebUI.click(findTestObject('Page_foi.flow/ministry view/form/div_ministry assigned to'), FailureHandling.STOP_ON_FAILURE)
 
+WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
+
 WebUI.click(findTestObject('Page_foi.flow/ministry view/form/ministry assignee/li_ministry assignee foiedu, foiedu'))
 
 WebUI.scrollToElement(findTestObject('Page_foi.flow/form/button_Save'), 0)

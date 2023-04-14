@@ -23,11 +23,9 @@ import groovy.json.JsonSlurper as JsonSlurper
 
 WebUI.openBrowser(GlobalVariable.BASE_URL)
 
-
-
-
 WebUI.callTestCase(findTestCase('helper/foi-test-login'), [('password') : findTestData('Login Credentials').getValue('Password', 
             1), ('username') : findTestData('Login Credentials').getValue('Username', 1)], FailureHandling.STOP_ON_FAILURE)
+
 WebUI.click(findTestObject('Page_foi.flow/queue/button_Add Request'))
 
 WebUI.click(findTestObject('Page_foi.flow/form/assignee dropdown/div_Assigned'))
@@ -37,14 +35,13 @@ WebUI.click(findTestObject('Page_foi.flow/form/assignee dropdown/li_Flex, Intake
 Random random = new Random()
 
 WebUI.setText(findTestObject('Page_foi.flow/form/inputs/input_AXIS ID Number'), 'ABC-2099-' + random.nextInt(10000000 //generate random axis number for sake of test
-		))
+        ))
 
 WebUI.setText(findTestObject('Page_foi.flow/form/inputs/applicant details/input_Applicant First Name_MuiInputBase'), 'Firstname')
 
 WebUI.setText(findTestObject('Page_foi.flow/form/inputs/applicant details/input_Applicant Last Name_MuiInputBase'), 'Lastname')
 
 //WebUI.setText(findTestObject('Page_foi.flow/form/inputs/applicant details/input_Applicant Email_MuiInputBase'), 'a@b.ca')
-
 WebUI.click(findTestObject('Page_foi.flow/form/inputs/applicant details/div_Category'))
 
 WebUI.click(findTestObject('Page_foi.flow/form/inputs/applicant details/category dropdown/li_Individual'))
@@ -78,8 +75,8 @@ WebUI.scrollToElement(findTestObject('Page_foi.flow/form/button_Save'), 0)
 //WebUI.takeScreenshotAsCheckpoint('current_viewport')
 WebUI.setText(findTestObject('Page_foi.flow/form/inputs/request details/input_Start Date'), '2021-12-16')
 
-WebUI.waitForElementClickable(findTestObject('Page_foi.flow/form/inputs/request details/input_Received Date_receivedDate'),
-	0)
+WebUI.waitForElementClickable(findTestObject('Page_foi.flow/form/inputs/request details/input_Received Date_receivedDate'), 
+    0)
 
 WebUI.setText(findTestObject('Page_foi.flow/form/inputs/request details/input_Received Date_receivedDate'), '2021-12-16')
 
@@ -92,13 +89,13 @@ WebUI.click(findTestObject('Page_foi.flow/form/inputs/request details/request ty
 
 WebUI.scrollToElement(findTestObject('Page_foi.flow/form/inputs/request description/textarea_request description'), 0)
 
-WebUI.verifyMatch(WebUI.getCSSValue(findTestObject('Page_foi.flow/form/inputs/request description/span_no PI Checkbox'),
-		'color'), 'rgba(255, 0, 0, 1)', false)
+WebUI.verifyMatch(WebUI.getCSSValue(findTestObject('Page_foi.flow/form/inputs/request description/span_no PI Checkbox'), 
+        'color'), 'rgba(255, 0, 0, 1)', false)
 
 WebUI.click(findTestObject('Page_foi.flow/form/inputs/request description/span_no PI Checkbox'))
 
-WebUI.verifyMatch(WebUI.getCSSValue(findTestObject('Page_foi.flow/form/inputs/request description/span_no PI Checkbox'),
-		'color'), 'rgba(0, 0, 0, 0.87)', false)
+WebUI.verifyMatch(WebUI.getCSSValue(findTestObject('Page_foi.flow/form/inputs/request description/span_no PI Checkbox'), 
+        'color'), 'rgba(0, 0, 0, 0.87)', false)
 
 WebUI.scrollToElement(findTestObject('Page_foi.flow/form/inputs/request details/input_Received Mode'), 0)
 
@@ -119,12 +116,7 @@ WebUI.delay(5)
 //WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
 requestID = WebUI.getText(findTestObject('Page_foi.flow/form/h3_Form Request Title'), FailureHandling.STOP_ON_FAILURE)
 
-
-
-
 WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/div_Status'))
-
-
 
 WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/li_Open'))
 
@@ -142,8 +134,8 @@ WebUI.click(findTestObject('Page_foi.flow/form/sidebar/div_Sidebar Request'))
 
 WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/div_Status'))
 
-WebUI.verifyElementNotPresent(findTestObject('Page_foi.flow/ministry view/form/divisional tracking/stage dropdown options/li_Fee Estimate'),
-	0)
+WebUI.verifyElementNotPresent(findTestObject('Page_foi.flow/ministry view/form/divisional tracking/stage dropdown options/li_Fee Estimate'), 
+    0)
 
 WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/li_Call For Records'))
 
@@ -159,8 +151,8 @@ DriverFactory.changeWebDriver(ministryUser)
 
 WebUI.navigateToUrl(GlobalVariable.BASE_URL)
 
-WebUI.callTestCase(findTestCase('helper/foi-test-login'), [('password') : findTestData('Login Credentials').getValue('Password',
-			8), ('username') : findTestData('Login Credentials').getValue('Username', 8)], FailureHandling.STOP_ON_FAILURE)
+WebUI.callTestCase(findTestCase('helper/foi-test-login'), [('password') : findTestData('Login Credentials').getValue('Password', 
+            8), ('username') : findTestData('Login Credentials').getValue('Username', 8)], FailureHandling.STOP_ON_FAILURE)
 
 WebUI.click(findTestObject('Page_foi.flow/queue/div_My Team Requests'))
 
@@ -175,6 +167,8 @@ WebUI.click(findTestObject('Page_foi.flow/queue/div_request queue row 1'))
 WebUI.refresh()
 
 WebUI.click(findTestObject('Page_foi.flow/ministry view/form/div_ministry assigned to'), FailureHandling.STOP_ON_FAILURE)
+
+WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
 
 WebUI.click(findTestObject('Page_foi.flow/ministry view/form/ministry assignee/li_ministry assignee foiedu, foiedu'))
 
@@ -266,8 +260,8 @@ DriverFactory.changeWebDriver(IAOuser)
 
 WebUI.refresh()
 
-WebUI.verifyElementAttributeValue(findTestObject('Page_foi.flow/form/sidebar/status dropdown/input_Status'), 'value', 'Fee Estimate',
-	0)
+WebUI.verifyElementAttributeValue(findTestObject('Page_foi.flow/form/sidebar/status dropdown/input_Status'), 'value', 'Fee Estimate', 
+    0)
 
 WebUI.verifyElementPresent(findTestObject('CFR/div_Contact Applicant'), 0)
 
@@ -313,7 +307,9 @@ WebUI.click(findTestObject('CFR/button_Save'))
 WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/div_Status'))
 
 WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/li_On Hold'))
+
 WebUI.click(findTestObject('Page_foi.flow/form/state change dialog/button_Cancel'))
+
 WebUI.refresh()
 
 WebUI.click(findTestObject('CFR/div_CFR Form'))
@@ -340,9 +336,9 @@ if (WebUI.verifyElementPresent(findTestObject('CFR/Email_missing/span_I foiintak
 if (WebUI.verifyElementPresent(findTestObject('CFR/Email_missing/span_I foiintakeidir have completed placed applicant processing fees letter in outbox to be mailed'), 
     1, FailureHandling.OPTIONAL)) {
     WebUI.click(findTestObject('CFR/Email_missing/button_Cancel'))
-
-    
 }
+
 ministryUser.close()
 
 IAOuser.close()
+

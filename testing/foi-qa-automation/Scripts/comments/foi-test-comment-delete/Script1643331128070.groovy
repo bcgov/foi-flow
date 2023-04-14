@@ -98,6 +98,8 @@ WebUI.click(findTestObject('Page_foi.flow/form/sidebar/div_Sidebar Comments'), F
 
 WebUI.click(findTestObject('Page_foi.flow/comment/button_comment list 1 Reply button'), FailureHandling.STOP_ON_FAILURE)
 
+WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
+
 WebUI.sendKeys(findTestObject('Page_foi.flow/comment/div_comment reply text area'), 'test reply')
 
 WebUI.click(findTestObject('Page_foi.flow/comment/button_reply 1_postBtn'), FailureHandling.STOP_ON_FAILURE)
