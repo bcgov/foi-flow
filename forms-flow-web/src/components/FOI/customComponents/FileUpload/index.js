@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import FilePreviewContainer from "./FilePreviewContainer";
 import { countOccurrences, 
   generateNewFileName, 
@@ -13,7 +13,6 @@ import {
 import Stack from "@mui/material/Stack";
 import "./FileUpload.scss";
 import clsx from "clsx";
-import { AttachmentCategories } from '../../../../constants/FOI/statusEnum';
 
 const FileUpload = ({
     multipleFiles,
@@ -25,10 +24,11 @@ const FileUpload = ({
     attachment,
     customFormat = {},
     existingDocuments = [],
-    maxNumberOfFiles = 10,
+    maxNumberOfFiles,
     modalFor,
     handleTagChange,
     tagValue,
+    tagList = [],
     isMinistryCoordinator,
     uploadFor="attachment"
 }) => {
@@ -36,6 +36,7 @@ const FileUpload = ({
     const [files, setFiles] = useState({ ...existingDocuments });    
     const [totalFileSizeCalculated, setTotalFileSize] = useState(0);
     const [errorMessage, setErrorMessage] = useState([]); 
+    const [includeAttachments, setIncludeAttachments] = useState(true);
     const handleUploadBtnClick = (e) => {
       e.stopPropagation();
       fileInputField.current.click();
@@ -118,8 +119,8 @@ const FileUpload = ({
     };
 
     const validateFiles = (newFiles, totalFiles) => {
-      if (multipleFiles && (newFiles.length > maxNumberOfFiles  || totalFiles > maxNumberOfFiles)) {
-        setErrorMessage(["A maximum of "+maxNumberOfFiles+ " files can be uploaded at one time. Only "+maxNumberOfFiles+ " files have been added on this upload window, please upload additional files separately"]);
+      if (multipleFiles && maxNumberOfFiles && (newFiles.length > maxNumberOfFiles  || totalFiles > maxNumberOfFiles)) {
+        setErrorMessage([`A maximum of ${maxNumberOfFiles} files can be uploaded at one time. Only ${maxNumberOfFiles} files have been added on this upload window, please upload additional files separately`]);
       } else if (!multipleFiles && totalFiles > 1) {
         return
       } else if (newFiles.length) {
@@ -167,59 +168,28 @@ const FileUpload = ({
     
     const showDragandDrop = () => {
       if (Object.entries(files).length === 0)
-        return "Drag and drop attachments, or"
+        return "Drag and drop attachments, or click Add Files"
     }
-
-    const getCategoriesForTaging = () => {
-      const _tags = AttachmentCategories.categorys.filter(category => category.type.includes("tag"));
-      let _tagList = [];
-      if(modalFor === 'add' && uploadFor === 'attachment') {
-        for(let tag of _tags) {
-          if(!isMinistryCoordinator) {
-            _tagList.push(
-              <ClickableChip
-                id={`${tag.name}Tag`}
-                key={`${tag.name}-tag`}
-                label={tag?.display.toUpperCase()}
-                color="primary"
-                size="small"
-                onClick={()=>{handleTagChange(tag.name)}}
-                clicked={tagValue == tag.name}
-              />
-            );
-          } else {
-            if(tag.name !== "applicant") {
-              _tagList.push(
-                <ClickableChip
-                  id={`${tag.name}Tag`}
-                  key={`${tag.name}-tag`}
-                  label={tag?.display.toUpperCase()}
-                  color="primary"
-                  size="small"
-                  onClick={()=>{handleTagChange(tag.name)}}
-                  clicked={tagValue == tag.name}
-                />
-              );
-            }
-          }
-        }
-      }
-
-      return _tagList;
-    };
-
-    let tagList = getCategoriesForTaging();
 
   return (
     <>
-      {modalFor === 'add' && uploadFor === 'attachment' && (<div>
+      {(modalFor === "add" && (uploadFor === "attachment" || uploadFor === 'record')) && (<div>
         <div className="tagtitle">
-          <span>Select one tag that correspondences to the document you are uploading</span>
+          <span>Select one {uploadFor === 'record' ? "division" : "tag"} that corresponds to the document(s) you are uploading</span>
         </div>
         <div className="taglist">
-          <Stack direction="row" sx={{ overflowX: "hidden" }} spacing={1}>
-            {tagList}
-          </Stack>
+          {tagList.map(tag =>
+            <ClickableChip
+              id={`${tag.name}Tag`}
+              key={`${tag.name}-tag`}
+              label={tag.display.toUpperCase()}
+              sx={{width: "fit-content", marginRight: "8px", marginBottom: "8px"}}
+              color="primary"
+              size="small"
+              onClick={()=>{handleTagChange(tag.name)}}
+              clicked={tagValue == tag.name}
+            />
+          )}
         </div>
       </div>)}
       <section
@@ -266,8 +236,8 @@ const FileUpload = ({
           </div>
         </div>
       </section>
-      {modalFor === 'add' && uploadFor === 'attachment' && (<div className="tag-message-container">
-        <p>When uploading more than one attachment, all attachments will have the save selected tag.</p>
+      {modalFor === "add" && (<div className="tag-message-container">
+        <p>When uploading more than one {uploadFor}, all {uploadFor}s will have the same selected tag.</p>
       </div>)}
       <ul className="error-message-ul">
         {errorMessage
