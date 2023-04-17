@@ -508,7 +508,7 @@ export const RecordsLog = ({
       for (let record of exporting) {
         var filepath = record.s3uripath
         var filename = record.filename
-        if (record.isredactionready && ['.doc','.docx','.xls','.xlsx', '.ics', '.msg'].includes(record.attributes?.extension)) {
+        if (record.isredactionready && ['.doc','.docx','.xls','.xlsx', '.ics', '.msg'].includes(record.attributes?.extension?.toLowerCase())) {
           filepath = filepath.substr(0, filepath.lastIndexOf(".")) + ".pdf";
           filename += ".pdf";
         }
@@ -1365,7 +1365,7 @@ const AttachmentPopup = React.memo(({indexValue, record, handlePopupButtonClick,
           >
             Replace Manually
           </MenuItem>}
-          {record.isredactionready && ['.doc','.docx','.xls','.xlsx', '.ics', '.msg'].includes(record.attributes?.extension) && <MenuItem
+          {record.isredactionready && ['.doc','.docx','.xls','.xlsx', '.ics', '.msg'].includes(record.attributes?.extension?.toLowerCase()) && <MenuItem
             onClick={() => {
                 handleDownloadPDF();
                 setPopoverOpen(false);
