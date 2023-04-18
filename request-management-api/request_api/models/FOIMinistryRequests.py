@@ -97,7 +97,7 @@ class FOIMinistryRequest(db.Model):
 
     @classmethod
     def getrequest(cls,ministryrequestid):
-        request_schema = FOIMinistryRequestSchema(many=False)
+        request_schema = FOIMinistryRequestSchema(many=True)
         query = db.session.query(FOIMinistryRequest).filter_by(foiministryrequestid=ministryrequestid).order_by(FOIMinistryRequest.version.desc()).first()
         return request_schema.dump(query)
 
@@ -1231,7 +1231,6 @@ class FOIMinistryRequest(db.Model):
                     order by version desc limit 1;"""
             rs = db.session.execute(text(sql), {'ministryrequestid': ministryrequestid})
             for row in rs:
-                # print("\nResponse:", row)
                 requestdetails["assignedTo"] = row["assignedto"]
                 requestdetails["assignedToFirstName"] = row["firstname"]
                 requestdetails["assignedToLastName"] = row["lastname"]

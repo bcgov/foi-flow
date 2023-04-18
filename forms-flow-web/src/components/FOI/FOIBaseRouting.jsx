@@ -11,7 +11,7 @@ const FOIBaseRouting = React.memo(({store}) => {
     return (
       <>
               
-              <ToastContainer theme="colored"/>
+              <ToastContainer />
               <Switch>
 
                 <Route path="/foi">
@@ -19,6 +19,9 @@ const FOIBaseRouting = React.memo(({store}) => {
                 </Route>
                 <Route path="/foidocument">
                     <FOIDocumentViewRouting store={store} />
+                </Route>
+                <Route path="/admin">
+                    <FOIUnAuthenticateRouting store={store} />
                 </Route>
                 <Route exact path="/">                   
                     <FOIUnAuthenticateRouting store={store}/>
