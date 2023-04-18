@@ -368,22 +368,40 @@ export const RecordsLog = ({
         theme: "colored",
         backgroundColor: "#FFA500"
       });      
-      downloadLinearHarmsDocuments()      
+      downloadLinearHarmsDocuments()
     }
     //if clicked on harms and stitching is complete
     else if (e.target.value === 1 && pdfStitchStatus === "completed") {
       const s3filepath = pdfStitchedRecord?.finalpackagepath
       const filename = requestNumber + ".zip"
-      getFOIS3DocumentPreSignedUrl(s3filepath?.split('/').slice(4).join('/'), ministryId, dispatch, (err, res) => {
-        if (!err) {
-          getFileFromS3({filepath: res}, (_err, response) => {
-            let blob = new Blob([response.data], {type: "application/octet-stream"});
-            saveAs(blob, filename)
-          });
-        }
-      }, 'records', bcgovcode);
+      try {
+        toast.info("Download In progress. Please check your Download folder after some time.", {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: true,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "colored",
+          backgroundColor: "#FFA500"
+        });  
+        downloadZipFile(s3filepath, filename);
+      }
+      catch (error) {
+        console.log(error)
+        toastError()
+      }
     }
     setCurrentDownload(e.target.value); 
+  }
+
+  const downloadZipFile = async (s3filepath, filename) => {
+      const response = await getFOIS3DocumentPreSignedUrl(s3filepath.split('/').slice(4).join('/'), ministryId, dispatch, null, 'records', bcgovcode)
+      await getFileFromS3({filepath: response.data}, (_err, res) => {
+          let blob = new Blob([res.data], {type: "application/octet-stream"});
+          saveAs(blob, filename)
+        });
   }
 
   const downloadLinearHarmsDocuments = () => {
