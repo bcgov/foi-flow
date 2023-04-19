@@ -32,11 +32,6 @@ const FileUpload = ({
     isMinistryCoordinator,
     uploadFor="attachment"
 }) => {
-    console.log("tagvalue", tagValue);
-    console.log("maxFileSize", maxFileSize);
-    console.log("totalFileSize", totalFileSize);
-    console.log("mimeTypes", mimeTypes);
-
     const fileInputField = useRef(null);
     const [files, setFiles] = useState({ ...existingDocuments });    
     const [totalFileSizeCalculated, setTotalFileSize] = useState(0);
