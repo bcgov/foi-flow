@@ -51,4 +51,4 @@ export const DOC_REVIEWER_WEB_URL = `${(window._env_ && window._env_.REACT_APP_D
 
 export const FOI_RECORD_FORMATS = `${(window._env_ && window._env_.REACT_APP_FOI_RECORD_FORMATS) || process.env.REACT_APP_FOI_RECORD_FORMATS}`;
 
-export const RECORD_PROCESSING_HRS = (window._env_ && window._env_.REACT_APP_RECORD_PROCESSING_HRS) || process.env.REACT_APP_RECORD_PROCESSING_HRS || 50;
+export const RECORD_PROCESSING_HRS = (window._env_ && window._env_.REACT_APP_RECORD_PROCESSING_HRS) || process.env.REACT_APP_RECORD_PROCESSING_HRS || 4;
