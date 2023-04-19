@@ -24,8 +24,8 @@ const MimeTypeList = Object.freeze({
 
 const MaxFileSizeInMB = Object.freeze({
   stateTransition: 50,
-  attachmentLog: 100,
-  totalFileSize: 500,
+  attachmentLog: 2000,
+  totalFileSize: 2000,
   extensionAttachment: 50,
   feeEstimateAttachment: 25,
   totalFeeEstimateFileSize:50

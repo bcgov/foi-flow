@@ -74,7 +74,7 @@ export default function AttachmentModal({
     const recordFormats = useSelector((state) => state.foiRequests.recordFormats)
     useEffect(() => {
       setMimeTypes(multipleFiles ?
-        (uploadFor === 'attachment' ? MimeTypeList.attachmentLog : recordFormats)
+        (uploadFor === 'attachment' ? [...recordFormats, ".zip"] : recordFormats)
         : MimeTypeList.stateTransition);
     }, [recordFormats])
     const [mimeTypes, setMimeTypes] = useState(multipleFiles ?
