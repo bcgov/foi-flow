@@ -306,14 +306,16 @@ export const RecordsLog = ({
                 }
               })
             }
-            if (modalFor === 'replace') {
-              dispatch(retryFOIRecordProcessing(requestId, ministryId, {records: _documents},(err, _res) => {
-                  dispatchRequestAttachment(err);
-              }));
-            } else {
-              dispatch(saveFOIRecords(requestId, ministryId, {records: _documents},(err, _res) => {
-                  dispatchRequestAttachment(err);
-              }));
+            if (_documents.length > 0) {
+              if (modalFor === 'replace') {
+                dispatch(retryFOIRecordProcessing(requestId, ministryId, {records: _documents},(err, _res) => {
+                    dispatchRequestAttachment(err);
+                }));
+              } else {
+                dispatch(saveFOIRecords(requestId, ministryId, {records: _documents},(err, _res) => {
+                    dispatchRequestAttachment(err);
+                }));
+              }
             }
             var toastOptions = {
               render: failed.length > 0 ?
@@ -370,22 +372,40 @@ export const RecordsLog = ({
         theme: "colored",
         backgroundColor: "#FFA500"
       });      
-      downloadLinearHarmsDocuments()      
+      downloadLinearHarmsDocuments()
     }
     //if clicked on harms and stitching is complete
     else if (e.target.value === 1 && pdfStitchStatus === "completed") {
       const s3filepath = pdfStitchedRecord?.finalpackagepath
       const filename = requestNumber + ".zip"
-      getFOIS3DocumentPreSignedUrl(s3filepath?.split('/').slice(4).join('/'), ministryId, dispatch, (err, res) => {
-        if (!err) {
-          getFileFromS3({filepath: res}, (_err, response) => {
-            let blob = new Blob([response.data], {type: "application/octet-stream"});
-            saveAs(blob, filename)
-          });
-        }
-      }, 'records', bcgovcode);
+      try {
+        toast.info("Download In progress. Please check your Download folder after some time.", {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: true,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "colored",
+          backgroundColor: "#FFA500"
+        });  
+        downloadZipFile(s3filepath, filename);
+      }
+      catch (error) {
+        console.log(error)
+        toastError()
+      }
     }
     setCurrentDownload(e.target.value); 
+  }
+
+  const downloadZipFile = async (s3filepath, filename) => {
+      const response = await getFOIS3DocumentPreSignedUrl(s3filepath.split('/').slice(4).join('/'), ministryId, dispatch, null, 'records', bcgovcode)
+      await getFileFromS3({filepath: response.data}, (_err, res) => {
+          let blob = new Blob([res.data], {type: "application/octet-stream"});
+          saveAs(blob, filename)
+        });
   }
 
   const downloadLinearHarmsDocuments = () => {
@@ -510,7 +530,7 @@ export const RecordsLog = ({
       for (let record of exporting) {
         var filepath = record.s3uripath
         var filename = record.filename
-        if (record.isredactionready && ['.doc','.docx','.xls','.xlsx', '.ics', '.msg'].includes(record.attributes?.extension)) {
+        if (record.isredactionready && ['.doc','.docx','.xls','.xlsx', '.ics', '.msg'].includes(record.attributes?.extension?.toLowerCase())) {
           filepath = filepath.substr(0, filepath.lastIndexOf(".")) + ".pdf";
           filename += ".pdf";
         }
@@ -1370,7 +1390,7 @@ const AttachmentPopup = React.memo(({indexValue, record, handlePopupButtonClick,
           >
             Replace Manually
           </MenuItem>}
-          {record.isredactionready && ['.doc','.docx','.xls','.xlsx', '.ics', '.msg'].includes(record.attributes?.extension) && <MenuItem
+          {record.isredactionready && ['.doc','.docx','.xls','.xlsx', '.ics', '.msg'].includes(record.attributes?.extension?.toLowerCase()) && <MenuItem
             onClick={() => {
                 handleDownloadPDF();
                 setPopoverOpen(false);

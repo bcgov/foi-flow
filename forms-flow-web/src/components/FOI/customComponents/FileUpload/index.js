@@ -120,7 +120,7 @@ const FileUpload = ({
 
     const validateFiles = (newFiles, totalFiles) => {
       if (multipleFiles && maxNumberOfFiles && (newFiles.length > maxNumberOfFiles  || totalFiles > maxNumberOfFiles)) {
-        setErrorMessage([`A maximum of ${maxNumberOfFiles} files can be uploaded at one time. Only ${maxNumberOfFiles} files have been added this upload window, please upload additional files separately`]);
+        setErrorMessage([`A maximum of ${maxNumberOfFiles} files can be uploaded at one time. Only ${maxNumberOfFiles} files have been added on this upload window, please upload additional files separately`]);
       } else if (!multipleFiles && totalFiles > 1) {
         return
       } else if (newFiles.length) {

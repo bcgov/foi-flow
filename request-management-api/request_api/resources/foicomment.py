@@ -163,6 +163,8 @@ class FOIUpdateComment(Resource):
             else:
                 commentschema = EditFOIRawRequestCommentSchema().load(requestjson)
                 result = commentservice().updaterawrequestcomment(commentid, commentschema, AuthHelper.getuserid())
+            if result.success == True:
+                asyncio.ensure_future(eventservice().postcommentevent(commentid, requesttype, AuthHelper.getuserid(), existingtaggedusers=result.args[0]))
             return {'status': result.success, 'message':result.message,'id':result.identifier} , 200 
         except KeyError as err:
             return {'status': False, 'message':err.messages}, 400        

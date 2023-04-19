@@ -1,0 +1,118 @@
+#app > div {
+  height: 100% !important;
+}
+
+.divisions-container {
+  width: 100% !important;
+  height: 100vh;
+  padding: 5% 1% 10% 1% !important;
+  background-color: #f1f1f1;
+}
+
+.divisions-grid-container {
+  width: 80% !important;
+  position: relative;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  height: 100%;
+}
+
+.divisions-data-grid-container {
+  overflow: scroll;
+  overflow-y: overlay;
+  height: 100%;
+  min-height: 300px;
+  padding-bottom: 10%;
+}
+
+
+.divisions-data-grid {
+  background-color: white;
+  border: none !important;
+}
+
+.divisions-title {
+  margin-bottom: 0.5em;
+}
+
+.search-bar-wrapper {
+  padding: 2px 4px;
+  display: flex;
+  align-items: center;
+}
+
+.search-bar-autocomplete {
+  margin-left: 10px;
+  flex: 1;
+}
+
+#edit-divisions-areas-label,
+#create-divisions-areas-label {
+  margin-top: 20px;
+}
+
+.edit-sortorder-wrapper {
+  margin-top: 15px;
+}
+
+.btn-save {
+  border-radius: 3px;
+  font-size: small;
+  height: 30px;
+  flex-basis: 50%;
+}
+
+.btn-cancel {
+  border: 1px solid #38598a;
+  background-color: #ffffff;
+  color: #38598a;
+  border-radius: 3px;
+  font-size: small;
+  height: 30px;
+  flex-basis: 50%;
+}
+
+.MuiDataGrid-cell {
+  justify-content: space-between !important;
+  text-transform: capitalize !important;
+}
+
+.MuiDataGrid-columnsContainer,
+.MuiDataGrid-columnHeaders {
+  font-family: "BCSans-Bold", sans-serif !important;
+  border-top: 2px solid;
+  border-bottom: 2px solid !important;
+}
+
+.MuiDataGrid-row {
+  border-bottom: 2px solid #e0e0dc;
+}
+
+.MuiDataGrid-columnHeaderTitleContainer {
+  padding: 0px !important;
+}
+.MuiDataGrid-columnHeaderWrapper {
+  font-weight: bolder !important;
+}
+
+.MuiDataGrid-columnHeaderTitle {
+  overflow: visible !important;
+  text-overflow: unset !important;
+  font-family: "BCSans-Bold", sans-serif !important;
+}
+
+.MuiDataGrid-footerContainer {
+  margin-bottom: 3%;
+}
+
+div.MuiDataGrid-row > div:last-child {
+  width: 1px !important;
+}
+
+div.MuiDataGrid-columnHeaderWrapper > div:last-child {
+  width: 1px !important;
+}
+
+.MuiTablePagination-displayedRows {
+  margin-bottom: 0px;
+}

@@ -71,9 +71,9 @@ class documentservice:
     def createministrydocumentversion(self, ministryrequestid, documentid, documentschema, userid):
         version = self.__getversionforrequest(ministryrequestid, "ministryrequest")        
         document = FOIMinistryRequestDocument.getdocument(documentid)
-        FOIMinistryRequestDocument.deActivateministrydocumentsversion(documentid, document['version']+1, userid)
         if document:
-           return FOIMinistryRequestDocument.createdocumentversion(ministryrequestid, version, self.__copydocumentproperties(document,documentschema,document['version']), userid)          
+            FOIMinistryRequestDocument.deActivateministrydocumentsversion(documentid, document['version']+1, userid)
+            return FOIMinistryRequestDocument.createdocumentversion(ministryrequestid, version, self.__copydocumentproperties(document,documentschema,document['version']), userid)          
         elif isinstance(documentschema, list):            
             return FOIMinistryRequestDocument.createdocuments(ministryrequestid, version, documentschema, userid)
         else:
@@ -120,7 +120,6 @@ class documentservice:
     
     def getlatestdocumentsforemail(self, requestid, requesttype, category, version=None):
         requestversion =  self.__getversionforrequest(requestid,requesttype) if version is None else version
-        print("requestversion = ",requestversion)
         documents = FOIMinistryRequestDocument.getlatestdocumentsforemail(requestid, requestversion, category) if requesttype == "ministryrequest" else FOIRawRequestDocument.getdocuments(requestid, requestversion)
         return self.__formatcreateddate(documents)    
 

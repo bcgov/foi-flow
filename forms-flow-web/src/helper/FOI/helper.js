@@ -188,6 +188,12 @@ const isProcessingTeam = (userGroups) => {
   );
 };
 
+const isFoiAdmin = (userGroups) => {
+  return (
+    userGroups?.map((userGroup) => userGroup.replace("/", "")).indexOf("FOI Admin") !== -1
+  );
+};
+
 const isFlexTeam = (userGroups) => {
   return (
     userGroups?.map((userGroup) => userGroup.replace("/", "")).indexOf("Flex Team") !== -1
@@ -462,5 +468,6 @@ export {
   isRequestRestricted,
   isRequestMinistryRestricted,
   getMinistryRestrictedTagList,
-  isrecordtimeout
+  isrecordtimeout,
+  isFoiAdmin
 };

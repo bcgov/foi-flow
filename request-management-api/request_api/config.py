@@ -175,7 +175,6 @@ class TestConfig(_Config):  # pylint: disable=too-few-public-methods
                                             name=DB_NAME,
                                         ))
     
-    
     # JWT_OIDC Settings
     JWT_OIDC_WELL_KNOWN_CONFIG = os.getenv('JWT_OIDC_WELL_KNOWN_CONFIG')
     JWT_OIDC_ALGORITHMS = os.getenv('JWT_OIDC_ALGORITHMS')
