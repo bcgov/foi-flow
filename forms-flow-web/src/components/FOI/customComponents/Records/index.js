@@ -176,7 +176,7 @@ export const RecordsLog = ({
   const divisionFilters = [...new Map(recordsObj?.records?.reduce((acc, file) => [...acc, ...new Map(file?.attributes?.divisions?.map(division => [division?.divisionid, division]))], [])).values()]
   if (divisionFilters?.length > 0) divisionFilters?.push(
     {divisionid: -1, divisionname: "All"},
-    {divisionid: -2, divisionname: "Errors/Timeout"},
+    {divisionid: -2, divisionname: "Errors"},
     {divisionid: -3, divisionname: "Incompatible"}
   )
 
@@ -1126,7 +1126,7 @@ const Attachment = React.memo(({indexValue, record, handlePopupButtonClick, getF
             record.failed ?
             <FontAwesomeIcon icon={faExclamationCircle} size='2x' color='#A0192F' className={classes.statusIcons}/>:
             isrecordtimeout(record.created_at, RECORD_PROCESSING_HRS) == true ?
-            <FontAwesomeIcon icon={faHistory} size='2x' color='#A0192F' className={classes.statusIcons}/>:
+            <FontAwesomeIcon icon={faExclamationCircle} size='2x' color='#A0192F' className={classes.statusIcons}/>:
             <FontAwesomeIcon icon={faSpinner} size='2x' color='#FAA915' className={classes.statusIcons}/>
           }
           <span className={classes.filename}>{record.filename} </span>
@@ -1150,7 +1150,7 @@ const Attachment = React.memo(({indexValue, record, handlePopupButtonClick, getF
               record.failed ?
               <span>Error during {record.failed}</span>:
               isrecordtimeout(record.created_at, RECORD_PROCESSING_HRS) == true ?
-              <span>Timed-out</span>:
+              <span>Error due to timeout</span>:
               <span>Deduplication & file conversion in progress</span>
             }
             <AttachmentPopup
