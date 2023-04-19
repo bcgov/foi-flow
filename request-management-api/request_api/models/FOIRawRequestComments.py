@@ -59,12 +59,13 @@ class FOIRawRequestComment(db.Model):
         dbquery = db.session.query(FOIRawRequestComment)
         comment = dbquery.filter_by(commentid=commentid)        
         taggedusers = foirequestcomment["taggedusers"] if 'taggedusers' in foirequestcomment  else None
+        existingtaggedusers = comment.first().taggedusers
         if(comment.count() > 0):
             comment.update({FOIRawRequestComment.isactive: True, FOIRawRequestComment.comment: foirequestcomment["comment"], FOIRawRequestComment.updatedby: userid, FOIRawRequestComment.updated_at: datetime.now(),FOIRawRequestComment.taggedusers:taggedusers}, synchronize_session=False)
             db.session.commit()
-            return DefaultMethodResult(True, 'Comment updated', commentid)
+            return DefaultMethodResult(True, 'Comment updated', commentid, existingtaggedusers)
         else:
-            return DefaultMethodResult(True, 'No Comment found', commentid)
+            return DefaultMethodResult(True, 'No Comment found', commentid, existingtaggedusers)
 
     @classmethod
     def getcomments(cls, requestid) -> DefaultMethodResult:
@@ -86,9 +87,9 @@ class FOIRawRequestComment(db.Model):
         users = []
         try:
             sql = """select commentid, createdby, taggedusers from (
-                    select commentid, commenttypeid, createdby, taggedusers from "FOIRawRequestComments" frc   where commentid = (select parentcommentid from "FOIRawRequestComments" frc   where commentid=:commentid)
+                    select commentid, commenttypeid, createdby, taggedusers from "FOIRawRequestComments" frc   where commentid = (select parentcommentid from "FOIRawRequestComments" frc   where commentid=:commentid) and isactive = true
                     union all 
-                    select commentid, commenttypeid, createdby, taggedusers from "FOIRawRequestComments" frc   where commentid <> :commentid and parentcommentid = (select parentcommentid from "FOIRawRequestComments" frc   where commentid=:commentid)
+                    select commentid, commenttypeid, createdby, taggedusers from "FOIRawRequestComments" frc   where commentid <> :commentid and parentcommentid = (select parentcommentid from "FOIRawRequestComments" frc   where commentid=:commentid) and isactive = true
                 ) cmt where commenttypeid =1"""
             rs = db.session.execute(text(sql), {'commentid': commentid})
             for row in rs:

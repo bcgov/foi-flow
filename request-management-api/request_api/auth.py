@@ -119,7 +119,31 @@ class Auth:
             return wrapper
 
         return decorated
-    
+
+
+    @classmethod
+    def isfoiadmin(cls):
+        """Check if token group contains admin group.
+        """
+        def decorated(f):
+            # Token verification is commented here with an expectation to use this decorator in conjuction with require.
+            #@Auth.require
+            @wraps(f)
+            def wrapper(*args, **kwargs):
+                token = jwt.get_token_auth_header()
+                unverified_claims = josejwt.get_unverified_claims(token)
+                usergroups = unverified_claims['groups']
+                usergroups = [usergroup.replace('/','',1) if usergroup.startswith('/') else usergroup for usergroup in usergroups]
+                exists = False
+                if 'FOI Admin' in usergroups:
+                    exists = True
+                retval = "Unauthorized" , 401
+                if exists == True:            
+                    return f(*args, **kwargs)
+                return retval
+            return wrapper
+        return decorated
+
 auth = (
     Auth()
 )
