@@ -43,6 +43,21 @@ class FOIRequestNotification(db.Model):
         except:
             db.session.rollback()
             raise
+
+    @classmethod
+    def updatenotification(cls, foinotification, userid):
+        dbquery = db.session.query(FOIRequestNotification)
+        _notification = dbquery.filter_by(notificationid=foinotification['notificationid'])
+        if(_notification.count() > 0) :
+            _notification.update({
+                FOIRequestNotification.notification:foinotification['notification'],
+                FOIRequestNotification.updatedby:userid,
+                FOIRequestNotification.updated_at:datetime2.now()
+            }, synchronize_session = False)
+            db.session.commit()
+            return DefaultMethodResult(True,'notification updated',foinotification['notificationid'])
+        else:
+            return DefaultMethodResult(True,'No notification found',foinotification['notificationid'])
         
 
     @classmethod 
@@ -70,16 +85,16 @@ class FOIRequestNotification(db.Model):
     def getcommentnotifications(cls, commentid):
         notifications = []
         try:
-            sql = """select idnumber, axisnumber, notificationid, notification , notificationtype, userid, notificationusertype, created_at, createdby, requesttype, requestid, foirequestid from (   
-                    select frn.idnumber, frn.axisnumber, frn.requestid, frns.notificationuserid as notificationid, frn.notification -> 'message' as notification , nty.name as notificationtype, frn.created_at , frns.createdby, frns.userid, ntu.name as notificationusertype, 'ministryrequest' requesttype, frn.foirequestid from "FOIRequestNotifications" frn inner join "FOIRequestNotificationUsers" frns on frn.notificationid = frns.notificationid inner join "NotificationTypes" nty on frn.notificationtypeid = nty.notificationtypeid inner join "NotificationUserTypes" ntu on frns.notificationusertypeid = ntu.notificationusertypeid where frn.notificationtypeid in (3,9,10) and (frn.notification ->> 'commentid')::int = :commentid
+            sql = """select idnumber, axisnumber, notificationid, notificationuserid, notification , notificationtype, userid, notificationusertype, created_at, createdby, requesttype, requestid, foirequestid from (   
+                    select frn.idnumber, frn.axisnumber, frn.requestid, frn.notificationid, frns.notificationuserid, frn.notification -> 'message' as notification , nty.name as notificationtype, frn.created_at , frns.createdby, frns.userid, ntu.name as notificationusertype, 'ministryrequest' requesttype, frn.foirequestid from "FOIRequestNotifications" frn inner join "FOIRequestNotificationUsers" frns on frn.notificationid = frns.notificationid inner join "NotificationTypes" nty on frn.notificationtypeid = nty.notificationtypeid inner join "NotificationUserTypes" ntu on frns.notificationusertypeid = ntu.notificationusertypeid where frn.notificationtypeid in (3,9,10) and (frn.notification ->> 'commentid')::int = :commentid
                     union all
-                    select frn.idnumber, frn.axisnumber, frn.requestid, frns.notificationuserid as notificationid, frn.notification -> 'message' as notification, nty.name as notificationtype, frn.created_at , frns.createdby, frns.userid, ntu.name as notificationusertype, 'rawrequest' requesttype, 0 foirequestid  from "FOIRawRequestNotifications" frn inner join "FOIRawRequestNotificationUsers" frns on frn.notificationid = frns.notificationid inner join "NotificationTypes" nty on frn.notificationtypeid = nty.notificationtypeid inner join "NotificationUserTypes" ntu on frns.notificationusertypeid = ntu.notificationusertypeid where frn.notificationtypeid in (3,9,10) and (frn.notification ->> 'commentid')::int = :commentid
+                    select frn.idnumber, frn.axisnumber, frn.requestid, frn.notificationid, frns.notificationuserid, frn.notification -> 'message' as notification, nty.name as notificationtype, frn.created_at , frns.createdby, frns.userid, ntu.name as notificationusertype, 'rawrequest' requesttype, 0 foirequestid  from "FOIRawRequestNotifications" frn inner join "FOIRawRequestNotificationUsers" frns on frn.notificationid = frns.notificationid inner join "NotificationTypes" nty on frn.notificationtypeid = nty.notificationtypeid inner join "NotificationUserTypes" ntu on frns.notificationusertypeid = ntu.notificationusertypeid where frn.notificationtypeid in (3,9,10) and (frn.notification ->> 'commentid')::int = :commentid
                   ) as notf order by created_at desc"""
             rs = db.session.execute(text(sql), {'commentid': commentid})
             for row in rs:
                 dt = maya.parse(row["created_at"]).datetime(to_timezone='America/Vancouver', naive=False)
                 _createddate = dt
-                notifications.append({"userid": row["userid"],"idnumber": row["idnumber"], "axisnumber": row["axisnumber"], "notificationid": row["notificationid"], "notification": row["notification"], "notificationtype": row["notificationtype"],  "notificationusertype": row["notificationusertype"], "created_at": _createddate.strftime('%Y %b %d | %I:%M %p').upper(), "createdby": row["createdby"], "requesttype":row["requesttype"], "requestid":row["requestid"],"foirequestid":row["foirequestid"]})
+                notifications.append({"userid": row["userid"],"idnumber": row["idnumber"], "axisnumber": row["axisnumber"], "notificationid": row["notificationid"], "notificationuserid": row["notificationuserid"], "notification": row["notification"], "notificationtype": row["notificationtype"],  "notificationusertype": row["notificationusertype"], "created_at": _createddate.strftime('%Y %b %d | %I:%M %p').upper(), "createdby": row["createdby"], "requesttype":row["requesttype"], "requestid":row["requestid"],"foirequestid":row["foirequestid"]})
         except Exception as ex:
             logging.error(ex)
             raise ex

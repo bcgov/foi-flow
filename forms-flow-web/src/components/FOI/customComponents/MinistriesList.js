@@ -73,10 +73,11 @@ const MinistriesList = React.memo(
         </h4>
         <div className="foi-ministries-checkboxes">
           {programAreaList.map((programArea, index) => (
-            <label key={index} className="check-item">
+            <label  id={"lbl"+programArea.iaocode}  key={index} className="check-item">
               <input
                 type="checkbox"
                 className="checkmark"
+                id={"selectchk"+programArea.iaocode}
                 key={programArea.iaocode}
                 data-programareaid={programArea.programareaid}
                 onChange={handleOnChangeProgramArea}
@@ -84,7 +85,7 @@ const MinistriesList = React.memo(
                 required
                 disabled={!!ministryId || disableInput}
               />
-              <span key={index + 1} className="checkmark"></span>
+              <span id={"selectspan"+programArea.iaocode} key={index + 1} className="checkmark"></span>
               {programArea.iaocode}
             </label>
           ))}

@@ -24,12 +24,19 @@ class FOIRequestTeam(db.Model):
     def getteamsbystatusandprogramarea(cls, requesttype, status, bcgovcode):  
         teams = []
         try:              
-            sql = """select ot."name" as name, ot."type" as type from "FOIRequestTeams" ft inner join "FOIRequestStatuses" fs2 on ft.requeststatusid = fs2.requeststatusid 
-                    inner join "OperatingTeams" ot on ft.teamid = ot.teamid 
-                    left join "ProgramAreas" pa on ft.programareaid = pa.programareaid 
-                    where ft.isactive = true and lower(ft.requesttype) = :requesttype 
-                    and replace(lower(fs2."name"),' ','') = :status
-                    and (lower(pa.bcgovcode) = :bcgovcode or ft.programareaid  is null)"""
+            sql = """
+                    with mappedteams as (
+                        select ot."name" as name, ot."type" as type, ft.requestteamid as orderby from "FOIRequestTeams" ft inner join "FOIRequestStatuses" fs2 on ft.requeststatusid = fs2.requeststatusid
+                        inner join "OperatingTeams" ot on ft.teamid = ot.teamid
+                        left join "ProgramAreas" pa on ft.programareaid = pa.programareaid
+                        where ft.isactive = true and lower(ft.requesttype) = :requesttype
+                        and replace(lower(fs2."name"),' ','') = :status
+                        and (lower(pa.bcgovcode) = :bcgovcode or ft.programareaid  is null)
+                    )
+                    -- remove the with statement and below query go back to mapped teams only in assignee drop down
+                    select * from mappedteams union
+	                (select name, type, 1 as orderby from "OperatingTeams" where name not in (select name from mappedteams) and type = 'iao' and isactive = true)
+                    order by orderby desc"""
             rs = db.session.execute(text(sql), {'requesttype': requesttype, 'status': status,'bcgovcode':bcgovcode})
         
             for row in rs:
@@ -71,7 +78,7 @@ class FOIRequestTeam(db.Model):
                     where ft.isactive = true and lower(ft.requesttype) = 'personal' 
                     and replace(lower(fs2."name"),' ','') = 'open'
                     and ot."name" not in ('Intake Team','Flex Team')
-                    and (lower(pa.bcgovcode) = :bcgovcode or ft.programareaid  is null) limit 1"""
+                    and (lower(pa.bcgovcode) = :bcgovcode or ft.programareaid  is null) order by requestteamid desc limit 1"""
             rs = db.session.execute(text(sql), {'bcgovcode':bcgovcode.lower()})
             for row in rs:
                 defaultteam = row["name"]

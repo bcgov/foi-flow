@@ -50,6 +50,21 @@ class FOIRawRequestNotification(db.Model):
         except:
             db.session.rollback()
             raise
+
+    @classmethod
+    def updatenotification(cls, foinotification, userid):
+        dbquery = db.session.query(FOIRawRequestNotification)
+        _notification = dbquery.filter_by(notificationid=foinotification['notificationid'])
+        if(_notification.count() > 0) :
+            _notification.update({
+                FOIRawRequestNotification.notification:foinotification['notification'],
+                FOIRawRequestNotification.updatedby:userid,
+                FOIRawRequestNotification.updated_at:datetime2.now()
+            }, synchronize_session = False)
+            db.session.commit()
+            return DefaultMethodResult(True,'notification updated',foinotification['notificationid'])
+        else:
+            return DefaultMethodResult(True,'No notification found',foinotification['notificationid'])
         
     @classmethod
     def getnotificationidsbynumberandtype(cls, idnumber, notificationtypeid):
