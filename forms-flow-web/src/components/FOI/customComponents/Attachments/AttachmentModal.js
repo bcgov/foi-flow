@@ -74,11 +74,11 @@ export default function AttachmentModal({
     const recordFormats = useSelector((state) => state.foiRequests.recordFormats)
     useEffect(() => {
       setMimeTypes(multipleFiles ?
-        (uploadFor === 'attachment' ? [...recordFormats, ".zip"] : recordFormats)
+        (uploadFor === 'attachment' ? [...recordFormats, ...MimeTypeList.additional] : recordFormats)
         : MimeTypeList.stateTransition);
     }, [recordFormats])
     const [mimeTypes, setMimeTypes] = useState(multipleFiles ?
-      (uploadFor === 'attachment' ? MimeTypeList.attachmentLog : recordFormats)
+      (uploadFor === 'attachment' ? [...recordFormats, ...MimeTypeList.additional] : recordFormats)
       : MimeTypeList.stateTransition);
     const maxFileSize = uploadFor === 'record' ? MaxFileSizeInMB.totalFileSize : multipleFiles ? MaxFileSizeInMB.attachmentLog : MaxFileSizeInMB.stateTransition;
     const totalFileSize = multipleFiles ? MaxFileSizeInMB.totalFileSize : MaxFileSizeInMB.stateTransition;

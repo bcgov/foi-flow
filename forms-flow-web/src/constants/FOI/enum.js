@@ -19,7 +19,8 @@ const MimeTypeList = Object.freeze({
   extensionAttachment: ['application/pdf', 
   'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/vnd.ms-excel',
   'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/msword', '.msg', '.eml', 'image/jpeg',
-  '.xls', '.xlsx', '.doc', '.docx']
+  '.xls', '.xlsx', '.doc', '.docx'],
+  additional: ['.zip']
 });
 
 const MaxFileSizeInMB = Object.freeze({
