@@ -1,7 +1,7 @@
 """PSE additional 2 divisions
 
 Revision ID: e0cdabe946cc
-Revises: 93566cbde728
+Revises: f102be4060ee
 Create Date: 2023-03-13 12:14:05.550786
 
 """
@@ -11,7 +11,7 @@ import sqlalchemy as sa
 
 # revision identifiers, used by Alembic.
 revision = 'e0cdabe946cc'
-down_revision = '93566cbde728'
+down_revision = 'f102be4060ee'
 branch_labels = None
 depends_on = None
 

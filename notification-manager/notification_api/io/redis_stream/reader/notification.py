@@ -38,26 +38,22 @@ def start(consumer_id: str, start_from: StartFrom = StartFrom.latest):
 
     while True:
         logging.info("Reading stream...")
-        print("Reading stream...")
         messages = stream.read(last_id=last_id, block=BLOCK_TIME)
         if messages:
             for message_id, message in messages:
                 handlemessage(message_id, message)   
                                             
                 # simulate processing
-                time.sleep(random.randint(1, 3)) #TODO : todo: remove!
+                # time.sleep(random.randint(1, 3)) #TODO : todo: remove!
                 last_id = message_id
                 rdb.set(LAST_ID_KEY.format(consumer_id=consumer_id), last_id)
                 logging.info(f"finished processing {message_id}")
-                print(f"finished processing {message_id}")
         else:
             logging.debug(f"No new messages after ID: {last_id}")
-            print(f"No new messages after ID: {last_id}")
 
 
 def handlemessage(message_id, message):
     logging.info(f"processing {message_id}::{message}")
-    print(f"processing {message_id}::{message}")
     if message is not None:                    
         _message = json.dumps({str(key): str(value) for (key, value) in message.items()})
         _message = _message.replace("b'","'").replace("'",'') 
@@ -68,4 +64,3 @@ def handlemessage(message_id, message):
             print("Error in processing message: ",error)
     else:
         logging.info("message is empty")
-        print("message is empty")

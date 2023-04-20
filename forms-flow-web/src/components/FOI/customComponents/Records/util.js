@@ -16,7 +16,7 @@ export const getPDFFilePath = (item) => {
     let filepath = item.s3uripath
     let filename = item.filename
 
-    if (item.isredactionready && ['.doc','.docx','.xls','.xlsx', '.ics', '.msg'].includes(item.attributes?.extension)) {
+    if (item.isredactionready && ['.doc','.docx','.xls','.xlsx', '.ics', '.msg'].includes(item.attributes?.extension?.toLowerCase())) {
         filepath = filepath.substr(0, filepath.lastIndexOf(".")) + ".pdf";
         filename += ".pdf";
     }

@@ -9,7 +9,7 @@ import { saveFOIRequestAttachmentsList, replaceFOIRequestAttachment, saveNewFile
 import { fetchFOIRecords, saveFOIRecords, deleteFOIRecords, retryFOIRecordProcessing, deleteReviewerRecords, getRecordFormats, triggerDownloadFOIRecordsForHarms, fetchPDFStitchedRecordForHarms, checkForRecordsChange } from "../../../../apiManager/services/FOI/foiRecordServices";
 import { StateTransitionCategories, AttachmentCategories } from '../../../../constants/FOI/statusEnum'
 import { RecordsDownloadList, RecordDownloadCategory } from '../../../../constants/FOI/enum';
-import { addToFullnameList, getFullnameList, ConditionalComponent } from '../../../../helper/FOI/helper';
+import { addToFullnameList, getFullnameList, ConditionalComponent, isrecordtimeout } from '../../../../helper/FOI/helper';
 import Grid from "@material-ui/core/Grid";
 import { makeStyles } from "@material-ui/core/styles";
 import clsx from "clsx"
@@ -39,14 +39,14 @@ import Paper from "@mui/material/Paper";
 import { toast } from "react-toastify";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCheckCircle, faClone } from '@fortawesome/free-regular-svg-icons';
-import {faSpinner, faExclamationCircle, faBan, faArrowTurnUp } from '@fortawesome/free-solid-svg-icons';import Dialog from '@material-ui/core/Dialog';
+import {faSpinner, faExclamationCircle, faBan, faArrowTurnUp, faHistory } from '@fortawesome/free-solid-svg-icons';import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import CloseIcon from '@material-ui/icons/Close';
 import _ from 'lodash';
-import { DOC_REVIEWER_WEB_URL } from "../../../../constants/constants";
+import { DOC_REVIEWER_WEB_URL, RECORD_PROCESSING_HRS } from "../../../../constants/constants";
 import {removeDuplicateFiles, addDeduplicatedAttachmentsToRecords, getPDFFilePath, sortDivisionalFiles} from "./util"
 
 
@@ -197,6 +197,8 @@ export const RecordsLog = ({
   const [isDownloadReady, setIsDownloadReady] = useState(false)
   const [isDownloadFailed, setIsDownloadFailed] = useState(false)
   
+  
+
   useEffect(() => {
     switch(pdfStitchStatus) {
       case "started":
@@ -304,14 +306,16 @@ export const RecordsLog = ({
                 }
               })
             }
-            if (modalFor === 'replace') {
-              dispatch(retryFOIRecordProcessing(requestId, ministryId, {records: _documents},(err, _res) => {
-                  dispatchRequestAttachment(err);
-              }));
-            } else {
-              dispatch(saveFOIRecords(requestId, ministryId, {records: _documents},(err, _res) => {
-                  dispatchRequestAttachment(err);
-              }));
+            if (_documents.length > 0) {
+              if (modalFor === 'replace') {
+                dispatch(retryFOIRecordProcessing(requestId, ministryId, {records: _documents},(err, _res) => {
+                    dispatchRequestAttachment(err);
+                }));
+              } else {
+                dispatch(saveFOIRecords(requestId, ministryId, {records: _documents},(err, _res) => {
+                    dispatchRequestAttachment(err);
+                }));
+              }
             }
             var toastOptions = {
               render: failed.length > 0 ?
@@ -368,22 +372,40 @@ export const RecordsLog = ({
         theme: "colored",
         backgroundColor: "#FFA500"
       });      
-      downloadLinearHarmsDocuments()      
+      downloadLinearHarmsDocuments()
     }
     //if clicked on harms and stitching is complete
     else if (e.target.value === 1 && pdfStitchStatus === "completed") {
       const s3filepath = pdfStitchedRecord?.finalpackagepath
       const filename = requestNumber + ".zip"
-      getFOIS3DocumentPreSignedUrl(s3filepath?.split('/').slice(4).join('/'), ministryId, dispatch, (err, res) => {
-        if (!err) {
-          getFileFromS3({filepath: res}, (_err, response) => {
-            let blob = new Blob([response.data], {type: "application/octet-stream"});
-            saveAs(blob, filename)
-          });
-        }
-      }, 'records', bcgovcode);
+      try {
+        toast.info("Download In progress. Please check your Download folder after some time.", {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: true,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "colored",
+          backgroundColor: "#FFA500"
+        });  
+        downloadZipFile(s3filepath, filename);
+      }
+      catch (error) {
+        console.log(error)
+        toastError()
+      }
     }
     setCurrentDownload(e.target.value); 
+  }
+
+  const downloadZipFile = async (s3filepath, filename) => {
+      const response = await getFOIS3DocumentPreSignedUrl(s3filepath.split('/').slice(4).join('/'), ministryId, dispatch, null, 'records', bcgovcode)
+      await getFileFromS3({filepath: response.data}, (_err, res) => {
+          let blob = new Blob([res.data], {type: "application/octet-stream"});
+          saveAs(blob, filename)
+        });
   }
 
   const downloadLinearHarmsDocuments = () => {
@@ -508,7 +530,7 @@ export const RecordsLog = ({
       for (let record of exporting) {
         var filepath = record.s3uripath
         var filename = record.filename
-        if (record.isredactionready && ['.doc','.docx','.xls','.xlsx', '.ics', '.msg'].includes(record.attributes?.extension)) {
+        if (record.isredactionready && ['.doc','.docx','.xls','.xlsx', '.ics', '.msg'].includes(record.attributes?.extension?.toLowerCase())) {
           filepath = filepath.substr(0, filepath.lastIndexOf(".")) + ".pdf";
           filename += ".pdf";
         }
@@ -680,7 +702,7 @@ export const RecordsLog = ({
         r.createdby.toLowerCase().includes(_keywordValue?.toLowerCase())) &&
         (
           _filterValue === -3 ? r.attributes?.incompatible :
-          _filterValue === -2 ? r.failed && !r.isredactionready:
+          _filterValue === -2 ? !r.isredactionready && (r.failed || isrecordtimeout(r.created_at, RECORD_PROCESSING_HRS) == true):
           _filterValue > -1 ? r.attributes?.divisions?.findIndex(a => a.divisionid === _filterValue) > -1 :
           true
         )
@@ -1056,7 +1078,6 @@ const Attachment = React.memo(({indexValue, record, handlePopupButtonClick, getF
   //   }
   // }, [record])
 
-
   const getCategory = (category) => {
     return AttachmentCategories.categorys.find(element => element.name === category);
   }
@@ -1124,6 +1145,8 @@ const Attachment = React.memo(({indexValue, record, handlePopupButtonClick, getF
             <FontAwesomeIcon icon={faCheckCircle} size='2x' color='#1B8103' className={classes.statusIcons}/>:
             record.failed ?
             <FontAwesomeIcon icon={faExclamationCircle} size='2x' color='#A0192F' className={classes.statusIcons}/>:
+            isrecordtimeout(record.created_at, RECORD_PROCESSING_HRS) == true ?
+            <FontAwesomeIcon icon={faExclamationCircle} size='2x' color='#A0192F' className={classes.statusIcons}/>:
             <FontAwesomeIcon icon={faSpinner} size='2x' color='#FAA915' className={classes.statusIcons}/>
           }
           <span className={classes.filename}>{record.filename} </span>
@@ -1146,6 +1169,8 @@ const Attachment = React.memo(({indexValue, record, handlePopupButtonClick, getF
               <span>Ready for Redaction</span>:
               record.failed ?
               <span>Error during {record.failed}</span>:
+              isrecordtimeout(record.created_at, RECORD_PROCESSING_HRS) == true ?
+              <span>Error due to timeout</span>:
               <span>Deduplication & file conversion in progress</span>
             }
             <AttachmentPopup
@@ -1365,7 +1390,7 @@ const AttachmentPopup = React.memo(({indexValue, record, handlePopupButtonClick,
           >
             Replace Manually
           </MenuItem>}
-          {record.isredactionready && ['.doc','.docx','.xls','.xlsx', '.ics', '.msg'].includes(record.attributes?.extension) && <MenuItem
+          {record.isredactionready && ['.doc','.docx','.xls','.xlsx', '.ics', '.msg'].includes(record.attributes?.extension?.toLowerCase()) && <MenuItem
             onClick={() => {
                 handleDownloadPDF();
                 setPopoverOpen(false);
@@ -1382,7 +1407,7 @@ const AttachmentPopup = React.memo(({indexValue, record, handlePopupButtonClick,
             Download Original
           </MenuItem>
           {!record.isattachment && <DeleteMenu />}
-          {!record.isredactionready && record.failed && <MenuItem
+          {!record.isredactionready && (record.failed || isrecordtimeout(record.created_at, RECORD_PROCESSING_HRS) == true) && <MenuItem
             onClick={() => {
                 handleRetry();
                 setPopoverOpen(false);
