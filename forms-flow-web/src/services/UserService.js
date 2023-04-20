@@ -54,7 +54,6 @@ const initKeycloak = (store, ...rest) => {
           }  
           //End - Changed for IDIR mapping        
           store.dispatch(setUserDetails(res));
-          
           const userGroups = res.groups.map((group) => group.slice(1));
           const authorized =
             isIntakeTeam(userGroups) ||

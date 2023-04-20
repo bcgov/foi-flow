@@ -1046,6 +1046,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
                         setIsAddRequest={setIsAddRequest}
                         axisSyncedData={axisSyncedData}
                         axisMessage={axisMessage}
+                        attachmentsArray={requestAttachments}
                       />
                     </>
                   </ConditionalComponent>
