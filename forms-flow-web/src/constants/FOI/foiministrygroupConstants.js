@@ -17,7 +17,7 @@ const MINISTRYGROUPS = {
     FIN : "FIN Ministry Team",
     FOR : "FOR Ministry Team",
     GCPE : "GCPE Ministry Team",
-    HLTH : "HLTH Ministry Team",
+    HTH : "HTH Ministry Team",
     IIO : "IIO Ministry Team",
     IRR : "IRR Ministry Team",
     JERI : "JERI Ministry Team",
