@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>span_Pending_MuiButtonBase-root MuiIconButton-root jss159 MuiRadio-root jss160 Mui-checked</name>
+   <tag></tag>
+   <elementGuidId>422c5b3c-bb55-4c64-901f-8b73a4d2d322</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>CSS</key>
+         <value>span.MuiButtonBase-root.MuiIconButton-root.jss159.MuiRadio-root.jss160.Mui-checked</value>
+      </entry>
+      <entry>
+         <key>XPATH</key>
+         <value>//div[@id='status-options']/label[2]/span</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>XPATH</selectorMethod>
+   <useRalativeImagePath>true</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>tag</name>
+      <type>Main</type>
+      <value>span</value>
+      <webElementGuid>e59928d8-0bb4-448f-b1e1-2f1c158e3e10</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>class</name>
+      <type>Main</type>
+      <value>MuiButtonBase-root MuiIconButton-root jss159 MuiRadio-root jss160 Mui-checked</value>
+      <webElementGuid>ed07c1da-d6fa-47f2-a3f4-52c66527ec21</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>aria-disabled</name>
+      <type>Main</type>
+      <value>false</value>
+      <webElementGuid>4747b68f-0718-4b50-bea9-881f2ed1fe1f</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>id(&quot;status-options&quot;)/label[@class=&quot;MuiFormControlLabel-root&quot;]/span[@class=&quot;MuiButtonBase-root MuiIconButton-root jss159 MuiRadio-root jss160 Mui-checked&quot;]</value>
+      <webElementGuid>6d07c03b-5614-4dd3-a00b-254508346e70</webElementGuid>
+   </webElementProperties>
+   <webElementXpaths>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:idRelative</name>
+      <type>Main</type>
+      <value>//div[@id='status-options']/label[2]/span</value>
+      <webElementGuid>c7223672-62d7-4eb0-a1db-5bc730678e5b</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='Pending'])[1]/following::span[1]</value>
+      <webElementGuid>df253afc-1d5a-416d-9895-3aad1f87ab58</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='Extended Due Date'])[2]/following::span[5]</value>
+      <webElementGuid>2bf3a683-4eff-4f31-84a5-1966799c41b3</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='Approved'])[2]/preceding::span[3]</value>
+      <webElementGuid>37351ee5-778c-4a12-81fe-fb8d255bb747</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='Denied'])[1]/preceding::span[7]</value>
+      <webElementGuid>ac201cde-49a9-4d06-95b1-c647c92fb5f3</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:position</name>
+      <type>Main</type>
+      <value>//label[2]/span</value>
+      <webElementGuid>be0ad432-9abd-4c9b-bf5d-3a18b021a5b6</webElementGuid>
+   </webElementXpaths>
+</WebElementEntity>

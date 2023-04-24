@@ -6,16 +6,16 @@
    <elementGuidId>b88dae82-9d29-4473-8c84-d08e3cd6a061</elementGuidId>
    <selectorCollection>
       <entry>
+         <key>XPATH</key>
+         <value>(//input[@value=''])[23]</value>
+      </entry>
+      <entry>
          <key>CSS</key>
          <value>input.file-upload-input</value>
       </entry>
       <entry>
          <key>BASIC</key>
          <value>//input[@type = 'file']</value>
-      </entry>
-      <entry>
-         <key>XPATH</key>
-         <value>(//input[@value=''])[23]</value>
       </entry>
    </selectorCollection>
    <selectorMethod>BASIC</selectorMethod>
@@ -26,7 +26,7 @@
       <name>tag</name>
       <type>Main</type>
       <value>input</value>
-      <webElementGuid>fe424fe8-a5d5-4219-b9d3-b67b94785b94</webElementGuid>
+      <webElementGuid>563c4d0b-5209-49bd-99ce-5ad688223ee2</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -34,7 +34,7 @@
       <name>class</name>
       <type>Main</type>
       <value>file-upload-input</value>
-      <webElementGuid>3b76a43c-61f7-4932-b93b-1e434baee900</webElementGuid>
+      <webElementGuid>04eebeaf-b98c-4ac3-a335-5b3cf77a4e0c</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>true</isSelected>
@@ -42,7 +42,7 @@
       <name>type</name>
       <type>Main</type>
       <value>file</value>
-      <webElementGuid>54e15593-541b-4c9d-8953-131ab7b47649</webElementGuid>
+      <webElementGuid>94f97358-9043-434a-b528-d1a2011cc870</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -50,7 +50,7 @@
       <name>accept</name>
       <type>Main</type>
       <value>application/pdf,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword,image/bmp,image/gif,image/jpeg,image/png,image/svg+xml,image/tiff,image/webp,application/vnd.ms-excel.sheet.macroEnabled.12,.msg</value>
-      <webElementGuid>83d643c9-d4eb-4a42-a52d-0b749ff298c2</webElementGuid>
+      <webElementGuid>a70a8cfc-8e1c-4b59-b232-0f2580a54934</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -58,7 +58,7 @@
       <name>xpath</name>
       <type>Main</type>
       <value>id(&quot;state-change-dialog-description&quot;)/section[@class=&quot;file-upload-container&quot;]/div[@class=&quot;row file-upload-preview&quot;]/div[@class=&quot;file-upload-column file-upload-column-2&quot;]/input[@class=&quot;file-upload-input&quot;]</value>
-      <webElementGuid>0675e8f7-9798-47d7-ba96-062b1ce70533</webElementGuid>
+      <webElementGuid>27ea2a52-4bf9-4d09-8b41-4a654250e961</webElementGuid>
    </webElementProperties>
    <webElementXpaths>
       <isSelected>true</isSelected>
@@ -66,7 +66,7 @@
       <name>xpath:attributes</name>
       <type>Main</type>
       <value>(//input[@value=''])[23]</value>
-      <webElementGuid>7797d739-a7ee-471c-8da1-b49e604a4b92</webElementGuid>
+      <webElementGuid>20be9ef7-e91d-4041-ace9-426253dc77d2</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -74,7 +74,7 @@
       <name>xpath:idRelative</name>
       <type>Main</type>
       <value>//span[@id='state-change-dialog-description']/section/input</value>
-      <webElementGuid>842cd195-4d6b-4319-8972-42f6ee5ace67</webElementGuid>
+      <webElementGuid>d0267b40-d349-4921-88bc-de15753016c9</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -82,6 +82,6 @@
       <name>xpath:position</name>
       <type>Main</type>
       <value>//section/input</value>
-      <webElementGuid>76162361-a01f-4417-b0d1-280029b3d759</webElementGuid>
+      <webElementGuid>36410660-d940-4044-a1f0-2362a3b452d7</webElementGuid>
    </webElementXpaths>
 </WebElementEntity>
