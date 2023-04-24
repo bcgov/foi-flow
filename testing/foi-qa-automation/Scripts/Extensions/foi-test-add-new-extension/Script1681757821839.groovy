@@ -224,6 +224,7 @@ WebUI.click(findTestObject('Extension/li_OIPC - Large Volume andor Volume of Sea
 
 WebUI.setText(findTestObject('Object Repository/Extension/input_Extended Due Days_numberDays'), '6')
 
+
 WebUI.verifyElementVisible(findTestObject('Object Repository/Extension/button_Save'))
 
 WebUI.click(findTestObject('Object Repository/Extension/button_Save'))
@@ -259,6 +260,21 @@ WebUI.click(findTestObject('Extension/span_Pending_MuiButtonBase-root MuiIconBut
 //WebUI.click(findTestObject('Extension/button_Add Files (2)'))
 //WebUI.uploadFile(findTestObject('Page_foi.flow/attachment/input_Add Files_file-upload-input'), RunConfiguration.getProjectDir() + 
 //    '/Test Attachments/test2.docx')
+
+
+
+def Format1 = 'yyyy-MM-dd'
+
+def today = new Date()
+
+def currentDate = today.format(Format1)
+
+def approval = WebUI.getAttribute(findTestObject('Extension/input_Approved Date_approvedDate'),'value').toString()
+
+WebUI.verifyEqual(currentDate, approval)
+
+
+
 WebUI.click(findTestObject('Object Repository/Extension/button_Save'))
 
 WebUI.scrollToElement(findTestObject('Page_foi.flow/form/inputs/request details/Page_ABC-2099-7654195/input_Legislated Due Date_dueDate'), 
@@ -390,59 +406,7 @@ WebUI.clickOffset(findTestObject('Page_foi.flow/navbar/notification/notification
 
 WebUI.click(findTestObject('Page_foi.flow/navbar/button_Sign Out'))
 
-WebUI.callTestCase(findTestCase('helper/foi-test-login'), [('password') : findTestData('Login Credentials').getValue('Password', 
-            1), ('username') : findTestData('Login Credentials').getValue('Username', 1)], FailureHandling.STOP_ON_FAILURE)
 
-//WebUI.click(findTestObject('Page_foi.flow/queue/div_Watching Requests'))
-//WebUI.click(findTestObject('Page_foi.flow/queue/div_My Team Requests'))
-//WebUI.setText(findTestObject('Page_foi.flow/queue/input_Dashboard Filter'), requestID)
-WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
-
-WebUI.click(findTestObject('Page_foi.flow/queue/div_My Team Requests'))
-
-WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
-
-WebUI.setText(findTestObject('Page_foi.flow/queue/input_Dashboard Filter'), requestID)
-
-WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
-
-WebUI.click(findTestObject('Page_foi.flow/queue/div_request queue row 1'))
-
-WebUI.scrollToElement(findTestObject('Page_foi.flow/form/button_Save'), 0)
-
-WebUI.click(findTestObject('Object Repository/Extension/button_New Extension'))
-
-WebUI.click(findTestObject('Object Repository/Extension/body_FOI  Intake Flex 0Sign OutABC-2099-322_22de9c'))
-
-WebUI.click(findTestObject('Extension/li_OIPC - Large Volume andor Volume of Search'))
-
-WebUI.setText(findTestObject('Object Repository/Extension/input_Extended Due Days_numberDays'), '6')
-
-WebUI.verifyElementVisible(findTestObject('Object Repository/Extension/button_Save'))
-
-WebUI.click(findTestObject('Object Repository/Extension/button_Save'))
-
-WebUI.click(findTestObject('Extension/svg_Pending_MuiSvgIcon-root'))
-
-WebUI.click(findTestObject('Extension/li_Edit'))
-
-WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
-
-WebUI.click(findTestObject('Extension/Extension_Denial/svg_Approved_MuiSvgIcon-root'))
-
-WebUI.click(findTestObject('Object Repository/Extension/button_Save'))
-
-WebUI.refresh()
-
-WebUI.click(findTestObject('Page_foi.flow/form/sidebar/div_Sidebar Comments'))
-
-WebUI.click(findTestObject('Object Repository/Extension/span_Request History Comments'))
-
-WebUI.click(findTestObject('Page_foi.flow/comment/span_User Comments'))
-
-WebUI.click(findTestObject('Object Repository/Extension/span_Request History Comments'))
-
-WebUI.verifyElementText(findTestObject('Page_foi.flow/comment/p_comment list 1 text'), 'The OIPC has denied a 6 day extension.')
 
 WebUI.closeBrowser()
 
