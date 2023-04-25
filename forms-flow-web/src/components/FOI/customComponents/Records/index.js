@@ -4,7 +4,7 @@ import './records.scss'
 import { useDispatch, useSelector } from "react-redux";
 import AttachmentModal from '../Attachments/AttachmentModal';
 import Loading from "../../../../containers/Loading";
-import { getOSSHeaderDetails, saveFilesinS3, getFileFromS3, postFOIS3DocumentPreSignedUrl, getFOIS3DocumentPreSignedUrl } from "../../../../apiManager/services/FOI/foiOSSServices";
+import { getOSSHeaderDetails, saveFilesinS3, getFileFromS3, postFOIS3DocumentPreSignedUrl, getFOIS3DocumentPreSignedUrl, completeMultiPartUpload } from "../../../../apiManager/services/FOI/foiOSSServices";
 import { saveFOIRequestAttachmentsList, replaceFOIRequestAttachment, saveNewFilename, deleteFOIRequestAttachment } from "../../../../apiManager/services/FOI/foiAttachmentServices";
 import { fetchFOIRecords, saveFOIRecords, deleteFOIRecords, retryFOIRecordProcessing, deleteReviewerRecords, getRecordFormats, triggerDownloadFOIRecordsForHarms, fetchPDFStitchedRecordForHarms, checkForRecordsChange } from "../../../../apiManager/services/FOI/foiRecordServices";
 import { StateTransitionCategories, AttachmentCategories } from '../../../../constants/FOI/statusEnum'
@@ -46,8 +46,9 @@ import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import CloseIcon from '@material-ui/icons/Close';
 import _ from 'lodash';
-import { DOC_REVIEWER_WEB_URL, RECORD_PROCESSING_HRS } from "../../../../constants/constants";
+import { DOC_REVIEWER_WEB_URL, RECORD_PROCESSING_HRS, OSS_S3_CHUNK_SIZE } from "../../../../constants/constants";
 import {removeDuplicateFiles, addDeduplicatedAttachmentsToRecords, getPDFFilePath, sortDivisionalFiles} from "./util"
+import { readUploadedFileAsBytes } from '../../../../helper/FOI/helper';
 
 
 const useStyles = makeStyles((_theme) => ({
@@ -267,7 +268,7 @@ export const RecordsLog = ({
         if (modalFor === 'replace') {
           fileInfoList[0].filepath = updateAttachment.s3uripath.substr(0, updateAttachment.s3uripath.lastIndexOf(".")) + ".pdf";
         }
-        postFOIS3DocumentPreSignedUrl(ministryId, fileInfoList, 'records', bcgovcode, dispatch, async (err, res) => {
+        postFOIS3DocumentPreSignedUrl(ministryId, fileInfoList.map(file => ({...file, multipart: true})), 'records', bcgovcode, dispatch, async (err, res) => {
           let _documents = [];
           if (!err) {
             var completed = 0;
@@ -292,16 +293,32 @@ export const RecordsLog = ({
                     filesize: _file.size
                   }
                 };
-              await saveFilesinS3(header, _file, dispatch, (_err, _res) => {
-                if (!_err && _res === 200) {
+              let bytes = await readUploadedFileAsBytes(_file)
+              const CHUNK_SIZE = OSS_S3_CHUNK_SIZE;
+              const totalChunks = Math.ceil(bytes.byteLength / CHUNK_SIZE);
+              let parts = [];
+              for (let chunk = 0; chunk < totalChunks; chunk++) {
+                let CHUNK = bytes.slice(chunk * CHUNK_SIZE, (chunk + 1) * CHUNK_SIZE);
+                let response = await saveFilesinS3({filepath: header.filepaths[chunk]}, CHUNK, dispatch, (_err, _res) => {
+                  if (_err) {
+                    failed.push(header.filename);
+                  }
+                })
+                if (response.status === 200) {
+                  parts.push({PartNumber: chunk + 1, ETag: response.headers.etag})
+                } else {
+                  failed.push(header.filename);
+                }
+              }
+              await completeMultiPartUpload({uploadid: header.uploadid, filepath: header.filepathdb, parts: parts}, 'records', bcgovcode, dispatch, (_err, _res) => {
+                if (!_err && _res.ResponseMetadata.HTTPStatusCode === 200) {
                   completed++;
                   toast.update(toastID, {
                     render: "Uploading files (" + completed + "/" + fileInfoList.length + ")",
                     isLoading: true,
                   })
                   _documents.push(documentDetails);
-                }
-                else {
+                } else {
                   failed.push(header.filename);
                 }
               })
