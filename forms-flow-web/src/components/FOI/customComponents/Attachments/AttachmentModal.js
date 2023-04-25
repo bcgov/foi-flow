@@ -191,6 +191,7 @@ export default function AttachmentModal({
               requestnumber: requestNumber ? requestNumber : `U-00${requestId}`,
               filestatustransition: fileStatusTransition,
               filename: file.filename? file.filename : file.name,
+              filesize: file.size,
               ...(uploadFor === "record") && {divisionid: tagValue}
           }
         });

@@ -169,7 +169,7 @@ class recordservicegetter(recordservicebase):
                 _dedupedfiles += 1 
             if entry["isduplicate"] == True:
                 _removedfiles += 1 
-            if entry["conversionstatus"] != "completed" or entry["deduplicationstatus"] != "completed":
+            if entry['isredactionready'] == False and (entry["conversionstatus"] != "completed" or entry["deduplicationstatus"] != "completed"):
                 _dedupedfiles += 1
         return _convertedfiles, _dedupedfiles, _removedfiles
     

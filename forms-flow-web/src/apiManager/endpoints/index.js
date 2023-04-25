@@ -92,6 +92,7 @@ const API = {
 
   FOI_GET_S3DOCUMENT_PRESIGNEDURL:`${FOI_BASE_API_URL}/api/foiflow/oss/presigned`,
   FOI_POST_S3DOCUMENT_PRESIGNEDURL:`${FOI_BASE_API_URL}/api/foiflow/oss/presigned`,
+  FOI_POST_COMPLETE_UPLOAD:`${FOI_BASE_API_URL}/api/foiflow/oss/completemultipart`,
 
   FOI_GET_RECORDS:`${FOI_BASE_API_URL}/api/foirecord/<requestid>/ministryrequest/<ministryrequestid>`,
   FOI_RETRY_RECORDS:`${FOI_BASE_API_URL}/api/foirecord/<requestid>/ministryrequest/<ministryrequestid>/retry`,
