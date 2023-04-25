@@ -146,8 +146,6 @@ export const AttachmentSection = ({
               const _file = files.find(file => file.filename === header.filename);
               const _fileInfo = fileInfoList.find(fileInfo => fileInfo.filename === header.filename);
               const documentDetails = {documentpath: header.filepathdb, filename: header.filename, category: _fileInfo.filestatustransition};
-              _documents.push(documentDetails);
-              setDocuments(_documents);
               let bytes = await readUploadedFileAsBytes(_file)              
               const CHUNK_SIZE = OSS_S3_CHUNK_SIZE;
               const totalChunks = Math.ceil(bytes.byteLength / CHUNK_SIZE);
@@ -165,7 +163,7 @@ export const AttachmentSection = ({
                   failed.push(header.filename);
                 }
               }
-              completeMultiPartUpload({uploadid: header.uploadid, filepath: header.filepathdb, parts: parts}, 'attachments', bcgovcode, dispatch, (_err, _res) => {                
+              await completeMultiPartUpload({uploadid: header.uploadid, filepath: header.filepathdb, parts: parts}, 'attachments', bcgovcode, dispatch, (_err, _res) => {                
                 if (!_err && _res.ResponseMetadata.HTTPStatusCode === 200) {
                   completed++;
                   toast.update(toastID, {
