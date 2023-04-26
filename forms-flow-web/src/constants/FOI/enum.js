@@ -20,7 +20,7 @@ const MimeTypeList = Object.freeze({
   'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/vnd.ms-excel',
   'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/msword', '.msg', '.eml', 'image/jpeg',
   '.xls', '.xlsx', '.doc', '.docx'],
-  additional: ['.zip']
+  additional: ['.zip', '.xlt', '.xla', '.dot', '.bmp', '.gif', '.jpeg', '.svg', '.svgz', '.tiff', '.webp', '.xlsm']
 });
 
 const MaxFileSizeInMB = Object.freeze({
