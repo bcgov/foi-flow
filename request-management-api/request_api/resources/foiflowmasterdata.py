@@ -250,8 +250,8 @@ class FOIFlowS3Presigned(Resource):
     @staticmethod
     @TRACER.trace()
     @cross_origin(origins=allowedorigins())
-    # @auth.require
-    # @auth.documentbelongstosameministry
+    @auth.require
+    @auth.documentbelongstosameministry
     def post(ministryrequestid, category, bcgovcode=None):
         try :
             if storageservice().is_valid_category(category) == False:
