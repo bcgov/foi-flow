@@ -41,6 +41,7 @@ def start(consumer_id: str, start_from: StartFrom = StartFrom.latest):
         messages = stream.read(last_id=last_id, block=BLOCK_TIME)
         if messages:
             for message_id, message in messages:
+                print(f"processing {message_id}::{message}")
                 handlemessage(message_id, message)   
                                             
                 # simulate processing
