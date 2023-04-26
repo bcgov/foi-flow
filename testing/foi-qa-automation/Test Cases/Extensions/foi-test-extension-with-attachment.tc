@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TestCaseEntity>
+   <description></description>
+   <name>foi-test-extension-with-attachment</name>
+   <tag></tag>
+   <comment></comment>
+   <testCaseGuid>30944b66-0f4a-4c96-b726-8a60bd55c3f0</testCaseGuid>
+   <variableLinks>
+      <testDataLinkId></testDataLinkId>
+      <type>DEFAULT</type>
+      <value></value>
+      <variableId>78662508-048c-4718-82a4-57b9e1572602</variableId>
+   </variableLinks>
+   <variable>
+      <defaultValue>''</defaultValue>
+      <description></description>
+      <id>78662508-048c-4718-82a4-57b9e1572602</id>
+      <masked>false</masked>
+      <name>requestID</name>
+   </variable>
+</TestCaseEntity>
