@@ -136,13 +136,13 @@ export const AttachmentSection = ({
     if (value) {
       if (files.length !== 0) {
         // setAttachmentLoading(true);
-        postFOIS3DocumentPreSignedUrl(ministryId, fileInfoList.map(file => ({...file, multipart: true})), 'attachments', bcgovcode, dispatch, (err, res) => {
+        postFOIS3DocumentPreSignedUrl(ministryId, fileInfoList.map(file => ({...file, multipart: true})), 'attachments', bcgovcode, dispatch, async (err, res) => {
           let _documents = [];
           if (!err) {
             let completed = 0;
             let failed = [];
             const toastID = toast.loading("Uploading files (" + completed + "/" + fileInfoList.length + ")")
-            res.map(async (header, index) => {
+            for (let header of res) {
               const _file = files.find(file => file.filename === header.filename);
               const _fileInfo = fileInfoList.find(fileInfo => fileInfo.filename === header.filename);
               const documentDetails = {documentpath: header.filepathdb, filename: header.filename, category: _fileInfo.filestatustransition};
@@ -175,7 +175,7 @@ export const AttachmentSection = ({
                   failed.push(header.filename);
                 }
               })
-            });
+            }
             if (_documents.length > 0) {
               if (modalFor === 'replace' && updateAttachment) {
                 const replaceDocumentObject = {filename: _documents[0].filename, documentpath: _documents[0].documentpath};
