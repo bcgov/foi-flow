@@ -3,19 +3,19 @@
    <description></description>
    <name>button_Save</name>
    <tag></tag>
-   <elementGuidId>6bca0fd3-e297-40c6-91ac-af099bb72de3</elementGuidId>
+   <elementGuidId>e16a8a89-0f14-432e-ba49-d5b27cca282f</elementGuidId>
    <selectorCollection>
-      <entry>
-         <key>XPATH</key>
-         <value>//div[@id='add-extension-dialog']/div[3]/div/div[3]/div/div/button</value>
-      </entry>
       <entry>
          <key>BASIC</key>
          <value>//*[(text() = 'Save' or . = 'Save')]</value>
       </entry>
       <entry>
+         <key>XPATH</key>
+         <value>//div[@id='add-extension-dialog']/div[3]/div/div[3]/div/div/button</value>
+      </entry>
+      <entry>
          <key>CSS</key>
-         <value>button.btn-save.jss324</value>
+         <value>button.btn-save.jss70</value>
       </entry>
    </selectorCollection>
    <selectorMethod>XPATH</selectorMethod>
@@ -26,15 +26,15 @@
       <name>tag</name>
       <type>Main</type>
       <value>button</value>
-      <webElementGuid>5d0ecc3b-5c51-4dd8-9bbb-38c68fbac103</webElementGuid>
+      <webElementGuid>217fccbd-3337-4053-83ea-860f4db5e6b1</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
       <matchCondition>equals</matchCondition>
       <name>class</name>
       <type>Main</type>
-      <value>btn-save jss324</value>
-      <webElementGuid>9e39dadd-23aa-46dc-aa38-0e91120005d2</webElementGuid>
+      <value>btn-save jss70</value>
+      <webElementGuid>4aea0efe-880c-4f64-bbee-eeef9b6ecd0d</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>true</isSelected>
@@ -42,15 +42,15 @@
       <name>text</name>
       <type>Main</type>
       <value>Save</value>
-      <webElementGuid>18a0f20a-85cd-413e-aa22-1996daa0118b</webElementGuid>
+      <webElementGuid>39397c00-a031-4ec2-bb54-a34d895022f2</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
       <matchCondition>equals</matchCondition>
       <name>xpath</name>
       <type>Main</type>
-      <value>id(&quot;add-extension-dialog&quot;)/div[@class=&quot;MuiDialog-container MuiDialog-scrollPaper&quot;]/div[@class=&quot;MuiPaper-root MuiDialog-paper MuiDialog-paperScrollPaper MuiDialog-paperWidthMd MuiDialog-paperFullWidth MuiPaper-elevation24 MuiPaper-rounded&quot;]/div[@class=&quot;MuiDialogActions-root dialog-content-nomargin MuiDialogActions-spacing&quot;]/div[@class=&quot;MuiGrid-root jss325 MuiGrid-container MuiGrid-spacing-xs-2 MuiGrid-align-items-xs-flex-start&quot;]/div[@class=&quot;MuiGrid-root MuiGrid-item MuiGrid-grid-xs-6&quot;]/button[@class=&quot;btn-save jss324&quot;]</value>
-      <webElementGuid>b7ffe3e6-6d12-4e84-811b-32d9c97752a5</webElementGuid>
+      <value>id(&quot;add-extension-dialog&quot;)/div[@class=&quot;MuiDialog-container MuiDialog-scrollPaper&quot;]/div[@class=&quot;MuiPaper-root MuiDialog-paper MuiDialog-paperScrollPaper MuiDialog-paperWidthMd MuiDialog-paperFullWidth MuiPaper-elevation24 MuiPaper-rounded&quot;]/div[@class=&quot;MuiDialogActions-root dialog-content-nomargin MuiDialogActions-spacing&quot;]/div[@class=&quot;MuiGrid-root jss71 MuiGrid-container MuiGrid-spacing-xs-2 MuiGrid-align-items-xs-flex-start&quot;]/div[@class=&quot;MuiGrid-root MuiGrid-item MuiGrid-grid-xs-6&quot;]/button[@class=&quot;btn-save jss70&quot;]</value>
+      <webElementGuid>b9a73195-f5ab-4928-9cdf-b073c9d6f042</webElementGuid>
    </webElementProperties>
    <webElementXpaths>
       <isSelected>true</isSelected>
@@ -58,23 +58,15 @@
       <name>xpath:idRelative</name>
       <type>Main</type>
       <value>//div[@id='add-extension-dialog']/div[3]/div/div[3]/div/div/button</value>
-      <webElementGuid>47be5f44-dc4b-4c62-a7d2-83ae28082478</webElementGuid>
+      <webElementGuid>9e31ab57-a3b7-430b-bb12-82bfea94823d</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
       <matchCondition>equals</matchCondition>
       <name>xpath:neighbor</name>
       <type>Main</type>
-      <value>(.//*[normalize-space(text()) and normalize-space(.)='Extended Due Date'])[2]/following::button[1]</value>
-      <webElementGuid>2f3ea0d4-9006-4915-8dd7-87ef4ebc8583</webElementGuid>
-   </webElementXpaths>
-   <webElementXpaths>
-      <isSelected>false</isSelected>
-      <matchCondition>equals</matchCondition>
-      <name>xpath:neighbor</name>
-      <type>Main</type>
-      <value>(.//*[normalize-space(text()) and normalize-space(.)='Extended Due Date'])[1]/following::button[1]</value>
-      <webElementGuid>015c5739-a5ab-41a6-bf00-da0cf37d7559</webElementGuid>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='Add Files'])[1]/following::button[1]</value>
+      <webElementGuid>acd41f7a-36cc-438d-8c8b-e4340422c79b</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -82,7 +74,15 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>(.//*[normalize-space(text()) and normalize-space(.)='Cancel'])[1]/preceding::button[1]</value>
-      <webElementGuid>9e0a1f78-d966-48f6-a89c-d135c9650356</webElementGuid>
+      <webElementGuid>4eb5f682-0405-45f0-b1f6-9b3a531d83de</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='Capture object:'])[1]/preceding::button[2]</value>
+      <webElementGuid>ee7b7c0e-93e3-4412-8c44-065914b0bb81</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -90,7 +90,7 @@
       <name>xpath:position</name>
       <type>Main</type>
       <value>//div[3]/div/div[3]/div/div/button</value>
-      <webElementGuid>fc98c0ef-5d18-4601-bc99-d5ea83b82b45</webElementGuid>
+      <webElementGuid>c4a25459-fe7f-4521-9046-c8220b0006bc</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -98,6 +98,6 @@
       <name>xpath:customAttributes</name>
       <type>Main</type>
       <value>//button[(text() = 'Save' or . = 'Save')]</value>
-      <webElementGuid>ddb51cb6-b4d2-40c0-aa66-27e21cb37637</webElementGuid>
+      <webElementGuid>bd210551-ac63-46b8-81b4-0b2b2bb720b1</webElementGuid>
    </webElementXpaths>
 </WebElementEntity>

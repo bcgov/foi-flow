@@ -15,6 +15,8 @@ import com.kms.katalon.core.webui.keyword.WebUiBuiltInKeywords as WebUI
 import com.kms.katalon.core.windows.keyword.WindowsBuiltinKeywords as Windows
 import internal.GlobalVariable as GlobalVariable
 import org.openqa.selenium.Keys as Keys
+import com.kms.katalon.core.configuration.RunConfiguration as RunConfiguration
+import groovy.json.JsonSlurper as JsonSlurper
 import static com.kms.katalon.core.checkpoint.CheckpointFactory.findCheckpoint
 
 WebUI.callTestCase(findTestCase('submit/foi-test-save-request-form'), [('password') : findTestData('Login Credentials').getValue(
@@ -110,17 +112,26 @@ WebUI.verifyElementVisible(findTestObject('Object Repository/Extension/button_Sa
 
 WebUI.click(findTestObject('Object Repository/Extension/button_Save'))
 
-WebUI.click(findTestObject('Extension/svg_Pending_MuiSvgIcon-root'))
+//WebUI.click(findTestObject('Extension/svg_Pending_MuiSvgIcon-root'))
+//WebUI.click(findTestObject('Extension/li_Edit'))
+//WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
+//WebUI.click(findTestObject('Extension/Extension_Denial/svg_Approved_MuiSvgIcon-root'))
+//WebUI.delay(5)
+//WebUI.scrollToElement(findTestObject('Extension/button_Add Files (2)'), 0)
+//WebUI.click(findTestObject('Extension/button_Add Files (2)'))
+//WebUI.uploadFile(findTestObject('Page_foi.flow/attachment/input_Add Files_file-upload-input'), RunConfiguration.getProjectDir() + 
+//    '/Test Attachments/test2.docx')
+//WebUI.delay(5)
+//WebUI.verifyElementVisible(findTestObject('Object Repository/Extension/button_Save'))
+//WebUI.verifyElementClickable(findTestObject('Extension/button_Save'))
+//WebUI.click(findTestObject('Extension/Extension_Denial/button_Save'))
+WebUI.click(findTestObject('Page_foi.flow/navbar/button_Sign Out'))
 
-WebUI.click(findTestObject('Extension/li_Edit'))
-
-WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
-
-WebUI.click(findTestObject('Extension/Extension_Denial/svg_Approved_MuiSvgIcon-root'))
-
-WebUI.click(findTestObject('Object Repository/Extension/button_Save'))
+WebUI.callTestCase(findTestCase('Extensions/foi-test-extension-with-attachment'), [('requestID') : requestID], FailureHandling.STOP_ON_FAILURE)
 
 WebUI.refresh()
+
+WebUI.delay(5)
 
 WebUI.click(findTestObject('Page_foi.flow/form/sidebar/div_Sidebar Comments'))
 
@@ -131,6 +142,14 @@ WebUI.click(findTestObject('Page_foi.flow/comment/span_User Comments'))
 WebUI.click(findTestObject('Object Repository/Extension/span_Request History Comments'))
 
 WebUI.verifyElementText(findTestObject('Page_foi.flow/comment/p_comment list 1 text'), 'The OIPC has denied a 6 day extension.')
+
+WebUI.click(findTestObject('Page_foi.flow/form/sidebar/div_Sidebar Attachments'))
+
+WebUI.click(findTestObject('Extension/span_ALL'))
+
+WebUI.verifyElementText(findTestObject('Extension/div_Extension OIPC - Approved.docx'), 'test2.docx')
+
+WebUI.verifyElementText(findTestObject('Extension/span_Extension - Approved'), 'Extension - Denied')
 
 WebUI.closeBrowser()
 

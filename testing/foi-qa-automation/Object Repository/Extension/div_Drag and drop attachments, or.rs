@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>div_Drag and drop attachments, or</name>
+   <tag></tag>
+   <elementGuidId>e9b4f0ae-c4da-4f00-a204-e61705a4b348</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>id(&quot;add-extension-dialog&quot;)/div[@class=&quot;MuiDialog-container MuiDialog-scrollPaper&quot;]/div[@class=&quot;MuiPaper-root MuiDialog-paper MuiDialog-paperScrollPaper MuiDialog-paperWidthMd MuiDialog-paperFullWidth MuiPaper-elevation24 MuiPaper-rounded&quot;]/div[@class=&quot;MuiDialogContent-root dialog-content&quot;]/div[@class=&quot;MuiGrid-root jss71 MuiGrid-container MuiGrid-spacing-xs-3 MuiGrid-align-items-xs-flex-start&quot;]/div[@class=&quot;MuiGrid-root MuiGrid-item MuiGrid-grid-xs-12&quot;]/section[@class=&quot;file-upload-container jss75&quot;]/div[@class=&quot;row file-upload-preview jss76&quot;]/div[@class=&quot;file-upload-column&quot;][count(. | //*[(text() = 'Drag and drop attachments, or' or . = 'Drag and drop attachments, or')]) = count(//*[(text() = 'Drag and drop attachments, or' or . = 'Drag and drop attachments, or')])]</value>
+      </entry>
+      <entry>
+         <key>XPATH</key>
+         <value>//div[@id='add-extension-dialog']/div[3]/div/div[2]/div/div[11]/section/div/div</value>
+      </entry>
+      <entry>
+         <key>CSS</key>
+         <value>div.file-upload-column</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <useRalativeImagePath>true</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>tag</name>
+      <type>Main</type>
+      <value>div</value>
+      <webElementGuid>5de6fbf5-c1b3-4211-8301-c233008f9386</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>class</name>
+      <type>Main</type>
+      <value>file-upload-column</value>
+      <webElementGuid>da5d215c-d14d-437b-b9ec-0dc4183ac696</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>text</name>
+      <type>Main</type>
+      <value>Drag and drop attachments, or</value>
+      <webElementGuid>4a01759e-205b-4eb7-8402-443f4420edd5</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>id(&quot;add-extension-dialog&quot;)/div[@class=&quot;MuiDialog-container MuiDialog-scrollPaper&quot;]/div[@class=&quot;MuiPaper-root MuiDialog-paper MuiDialog-paperScrollPaper MuiDialog-paperWidthMd MuiDialog-paperFullWidth MuiPaper-elevation24 MuiPaper-rounded&quot;]/div[@class=&quot;MuiDialogContent-root dialog-content&quot;]/div[@class=&quot;MuiGrid-root jss71 MuiGrid-container MuiGrid-spacing-xs-3 MuiGrid-align-items-xs-flex-start&quot;]/div[@class=&quot;MuiGrid-root MuiGrid-item MuiGrid-grid-xs-12&quot;]/section[@class=&quot;file-upload-container jss75&quot;]/div[@class=&quot;row file-upload-preview jss76&quot;]/div[@class=&quot;file-upload-column&quot;]</value>
+      <webElementGuid>9e4f2541-5bb2-4f08-a397-10912ca8b117</webElementGuid>
+   </webElementProperties>
+   <webElementXpaths>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:idRelative</name>
+      <type>Main</type>
+      <value>//div[@id='add-extension-dialog']/div[3]/div/div[2]/div/div[11]/section/div/div</value>
+      <webElementGuid>6c0fa651-eee5-422d-9cf4-faa00819904f</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='Add Files'])[1]/preceding::div[3]</value>
+      <webElementGuid>f042a021-9539-4f40-836e-0621c6877f9c</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='Save'])[3]/preceding::div[4]</value>
+      <webElementGuid>04a44c61-37bb-4428-a08c-6ecd6401766b</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:position</name>
+      <type>Main</type>
+      <value>//section/div/div</value>
+      <webElementGuid>a50aa9a6-4af0-473c-bf84-3bc91db39d0b</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:customAttributes</name>
+      <type>Main</type>
+      <value>//div[(text() = 'Drag and drop attachments, or' or . = 'Drag and drop attachments, or')]</value>
+      <webElementGuid>e8875db1-26c4-449e-8436-beed397b8351</webElementGuid>
+   </webElementXpaths>
+</WebElementEntity>
