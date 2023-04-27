@@ -86,7 +86,7 @@ WebUI.uploadFile(findTestObject('Page_foi.flow/attachment/input_Add Files_file-u
 
 WebUI.verifyElementClickable(findTestObject('Page_foi.flow/form/state change dialog/button_Continue'), FailureHandling.STOP_ON_FAILURE)
 
-WebUI.verifyElementPresent(findTestObject('Page_foi.flow/attachment/li_uploaded attachment 1'), 0)
+WebUI.verifyElementPresent(findTestObject('Page_foi.flow/attachment/attachment_uploaded'), 0)
 
 WebUI.verifyElementText(findTestObject('Page_foi.flow/attachment/li_uploaded attachment 1'), 'download.png')
 
@@ -99,7 +99,7 @@ WebUI.verifyElementNotPresent(findTestObject('Page_foi.flow/attachment/li_upload
 WebUI.uploadFileWithDragAndDrop(findTestObject('Page_foi.flow/attachment/div_Add Files'), RunConfiguration.getProjectDir() + 
     '/Test Attachments/test.docx', FailureHandling.STOP_ON_FAILURE)
 
-WebUI.verifyElementPresent(findTestObject('Page_foi.flow/attachment/li_uploaded attachment 1'), 0)
+WebUI.verifyElementPresent(findTestObject('Page_foi.flow/attachment/attachment_uploaded'), 0)
 
 WebUI.verifyElementText(findTestObject('Page_foi.flow/attachment/li_uploaded attachment 1'), 'test.docx')
 
@@ -108,13 +108,13 @@ WebUI.click(findTestObject('Page_foi.flow/attachment/i_remove uploaded attachmen
 WebUI.uploadFile(findTestObject('Page_foi.flow/attachment/input_Add Files_file-upload-input'), ((RunConfiguration.getProjectDir() + 
     '/Test Attachments/test.docx\n') + RunConfiguration.getProjectDir()) + '/Test Attachments/test2.docx')
 
-WebUI.verifyElementPresent(findTestObject('Page_foi.flow/attachment/li_uploaded attachment 1'), 0)
+WebUI.verifyElementPresent(findTestObject('Page_foi.flow/attachment/attachment_uploaded'), 0)
 
 WebUI.verifyElementText(findTestObject('Page_foi.flow/attachment/li_uploaded attachment 1'), 'test.docx')
 
-WebUI.verifyElementPresent(findTestObject('Page_foi.flow/attachment/li_uploaded attachment 2'), 0)
+WebUI.verifyElementPresent(findTestObject('Page_foi.flow/attachment/attachment_uploaded2'), 0)
 
-WebUI.verifyElementText(findTestObject('Page_foi.flow/attachment/li_uploaded attachment 2'), 'test2.docx')
+WebUI.verifyElementText(findTestObject('Page_foi.flow/attachment/attachment_uploaded2'), 'test2.docx')
 
 WebUI.click(findTestObject('Page_foi.flow/attachment/i_remove uploaded attachment 2'), FailureHandling.STOP_ON_FAILURE)
 
@@ -123,13 +123,13 @@ WebUI.click(findTestObject('Page_foi.flow/attachment/i_remove uploaded attachmen
 WebUI.uploadFileWithDragAndDrop(findTestObject('Page_foi.flow/attachment/div_Add Files'), ((RunConfiguration.getProjectDir() + 
     '/Test Attachments/test.docx\n') + RunConfiguration.getProjectDir()) + '/Test Attachments/test2.docx')
 
-WebUI.verifyElementPresent(findTestObject('Page_foi.flow/attachment/li_uploaded attachment 1'), 0)
+WebUI.verifyElementPresent(findTestObject('Page_foi.flow/attachment/attachment_uploaded'), 0)
 
 WebUI.verifyElementText(findTestObject('Page_foi.flow/attachment/li_uploaded attachment 1'), 'test.docx')
 
-WebUI.verifyElementPresent(findTestObject('Page_foi.flow/attachment/li_uploaded attachment 2'), 0)
+WebUI.verifyElementPresent(findTestObject('Page_foi.flow/attachment/attachment_uploaded2'), 0)
 
-WebUI.verifyElementText(findTestObject('Page_foi.flow/attachment/li_uploaded attachment 2'), 'test2.docx')
+WebUI.verifyElementText(findTestObject('Page_foi.flow/attachment/attachment_uploaded2'), 'test2.docx')
 
 WebUI.click(findTestObject('Page_foi.flow/attachment/i_remove uploaded attachment 2'), FailureHandling.STOP_ON_FAILURE)
 

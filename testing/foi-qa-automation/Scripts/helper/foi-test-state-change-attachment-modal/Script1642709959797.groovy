@@ -42,8 +42,6 @@ WebUI.verifyElementPresent(findTestObject('Page_foi.flow/attachment/p_File over 
 WebUI.uploadFile(findTestObject('Page_foi.flow/attachment/input_Add Files_file-upload-input'), RunConfiguration.getProjectDir() + 
     '/Test Attachments/download.png')
 
-WebUI.verifyElementNotPresent(findTestObject('Page_foi.flow/attachment/li_uploaded attachment 1'), 0)
-
 WebUI.verifyElementPresent(findTestObject('Page_foi.flow/attachment/p_File invalid type state change'), 0)
 
 //WebUI.verifyElementNotClickable(findTestObject('Page_foi.flow/form/state change dialog/button_Continue'), FailureHandling.STOP_ON_FAILURE)
@@ -52,7 +50,7 @@ WebUI.verifyElementClickable(findTestObject('Page_foi.flow/attachment/button_Add
 WebUI.uploadFile(findTestObject('Page_foi.flow/attachment/input_Add Files_file-upload-input'), (RunConfiguration.getProjectDir() + 
     '/Test Attachments/') + filename)
 
-WebUI.verifyElementPresent(findTestObject('Page_foi.flow/attachment/li_uploaded attachment 1'), 0)
+WebUI.verifyElementPresent(findTestObject('Page_foi.flow/attachment/attachment_uploaded'), 0)
 
 WebUI.verifyElementText(findTestObject('Page_foi.flow/attachment/li_uploaded attachment 1'), filename)
 

@@ -128,3 +128,5 @@ WebUI.verifyElementNotPresent(findTestObject('Page_foi.flow/attachment/div_Attac
 
 WebUI.verifyElementText(findTestObject('Page_foi.flow/attachment/div_attachment list 1 name'), 'test2.docx')
 
+WebUI.closeBrowser()
+
