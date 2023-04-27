@@ -310,7 +310,7 @@ export const RecordsLog = ({
                   failed.push(header.filename);
                 }
               }
-              await completeMultiPartUpload({uploadid: header.uploadid, filepath: header.filepathdb, parts: parts}, 'records', bcgovcode, dispatch, (_err, _res) => {
+              await completeMultiPartUpload({uploadid: header.uploadid, filepath: header.filepathdb, parts: parts}, ministryId, 'records', bcgovcode, dispatch, (_err, _res) => {
                 if (!_err && _res.ResponseMetadata.HTTPStatusCode === 200) {
                   completed++;
                   toast.update(toastID, {

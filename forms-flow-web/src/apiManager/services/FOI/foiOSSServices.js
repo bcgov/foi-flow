@@ -146,9 +146,9 @@ import {
     return response;
   };
 
-  export const completeMultiPartUpload = (data, category, bcgovcode, dispatch, ...rest) => {
+  export const completeMultiPartUpload = (data, ministryrequestid = -1, category, bcgovcode, dispatch, ...rest) => {
     const done = fnDone(rest);
-    const response = httpPOSTRequest(API.FOI_POST_COMPLETE_UPLOAD + '/' + category + '/' + bcgovcode, data);
+    const response = httpPOSTRequest(API.FOI_POST_COMPLETE_UPLOAD + '/' + ministryrequestid + '/' + category + '/' + bcgovcode, data);
     response.then((res) => {
         if (res.data) {
           done(null, res.data);
