@@ -193,11 +193,16 @@ WebUI.click(findTestObject('Page_foi.flow/comment/span_Divisional Tracking'))
 WebUI.click(findTestObject('Page_foi.flow/form/sidebar/div_Sidebar Comments'), FailureHandling.STOP_ON_FAILURE)
 
 WebUI.click(findTestObject('Page_foi.flow/comment/span_Divisional Tracking'))
+
 WebUI.refresh()
 
 WebUI.click(findTestObject('Page_foi.flow/form/sidebar/div_Sidebar Comments'), FailureHandling.STOP_ON_FAILURE)
 
 WebUI.click(findTestObject('Page_foi.flow/comment/span_Divisional Tracking'))
+
+WebUI.refresh()
+
+WebUI.click(findTestObject('Page_foi.flow/form/sidebar/div_Sidebar Comments'), FailureHandling.STOP_ON_FAILURE)
 
 WebUI.verifyElementText(findTestObject('Page_foi.flow/comment/p_comment reply 1 text'), 'Deputy Minister’s Office division with stage Assigned to Division has been removed')
 

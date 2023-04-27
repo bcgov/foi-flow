@@ -6,16 +6,16 @@
    <elementGuidId>d547f944-b2dc-4ecc-98a6-6f0597d7bc93</elementGuidId>
    <selectorCollection>
       <entry>
+         <key>BASIC</key>
+         <value>//span[@id='state-change-dialog-description']/section/div/div/article/section/ol/li/section/div/div/aside/span</value>
+      </entry>
+      <entry>
          <key>XPATH</key>
          <value>//span[@id='state-change-dialog-description']/div/section/div/div/article/section/ol/li/section/div/div/aside/span</value>
       </entry>
       <entry>
          <key>CSS</key>
          <value>aside</value>
-      </entry>
-      <entry>
-         <key>BASIC</key>
-         <value>//span[@id='state-change-dialog-description']/section/div/div/article/section/ol/li/section/div/div/aside/span</value>
       </entry>
    </selectorCollection>
    <selectorMethod>XPATH</selectorMethod>
@@ -26,7 +26,7 @@
       <name>tag</name>
       <type>Main</type>
       <value>aside</value>
-      <webElementGuid>c2041da6-16ca-4090-ad0e-6f4850d9ecc9</webElementGuid>
+      <webElementGuid>e56cb32c-768e-4f8b-abd0-9e33780dcb76</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -34,7 +34,7 @@
       <name>text</name>
       <type>Main</type>
       <value>test2.docx</value>
-      <webElementGuid>ff2706a2-466a-442b-a9e3-60353f4399ab</webElementGuid>
+      <webElementGuid>a82ff9e6-2ff3-40a3-b3b1-6596372b2ee1</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>true</isSelected>
@@ -42,7 +42,7 @@
       <name>xpath</name>
       <type>Main</type>
       <value>//span[@id='state-change-dialog-description']/section/div/div/article/section/ol/li/section/div/div/aside/span</value>
-      <webElementGuid>b25c8be6-64b2-4e4d-aedb-c2c772a8fe04</webElementGuid>
+      <webElementGuid>4ee85993-1427-4da5-b458-8102ebe304c5</webElementGuid>
    </webElementProperties>
    <webElementXpaths>
       <isSelected>true</isSelected>
@@ -50,7 +50,7 @@
       <name>xpath:idRelative</name>
       <type>Main</type>
       <value>//span[@id='state-change-dialog-description']/section/div/div/article/section/ol/li/section/div/div/aside</value>
-      <webElementGuid>1904dd4d-595e-46ef-ac64-8f169ccf6605</webElementGuid>
+      <webElementGuid>868c6ac3-b3db-4a28-a668-57bac3f726a8</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -58,7 +58,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>(.//*[normalize-space(text()) and normalize-space(.)='Add Attachment'])[1]/following::aside[1]</value>
-      <webElementGuid>ec175bca-e2ed-4fec-9083-b587073a25b2</webElementGuid>
+      <webElementGuid>da7e9031-53f1-450e-9c4a-ed39ab5a4f91</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -66,7 +66,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>(.//*[normalize-space(text()) and normalize-space(.)='Option 4'])[2]/following::aside[1]</value>
-      <webElementGuid>dfd3d4d5-c6ab-4244-8750-d2bb9af6648c</webElementGuid>
+      <webElementGuid>ddd558b7-b62f-4aa4-a590-f5eb70082fe8</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -74,7 +74,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>(.//*[normalize-space(text()) and normalize-space(.)='test2.docx'])[1]/preceding::aside[1]</value>
-      <webElementGuid>32b1548c-33e4-4fed-941e-cdeadf379f3b</webElementGuid>
+      <webElementGuid>7da20083-c9df-4f0e-82fb-069933cc04b1</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -82,6 +82,6 @@
       <name>xpath:position</name>
       <type>Main</type>
       <value>//aside</value>
-      <webElementGuid>77ef7e5a-d6d0-4e21-88ff-69f58ce8e9e1</webElementGuid>
+      <webElementGuid>cab8861d-83bc-4826-8482-09e7871aaab6</webElementGuid>
    </webElementXpaths>
 </WebElementEntity>
