@@ -53,6 +53,7 @@ class recordservice(recordservicebase):
         _ministryrequest = FOIMinistryRequest.getrequestbyministryrequestid(ministryrequestid)
         for record in data['records']:
             _filepath, extension = path.splitext(record['s3uripath'])
+            extension = extension.lower()
             if record['service'] == 'deduplication':
                 if extension not in DEDUPE_FILE_TYPES:
                     return DefaultMethodResult(False,'Dedupe only accepts the following formats: ' + ', '.join(DEDUPE_FILE_TYPES), -1, record['recordid'])
@@ -144,7 +145,7 @@ class recordservice(recordservicebase):
             entry['attributes']['batch'] = batch
             _filepath, extension = path.splitext(entry['filename'])
             entry['attributes']['extension'] = extension
-            entry['attributes']['incompatible'] =  extension in NONREDACTABLE_FILE_TYPES
+            entry['attributes']['incompatible'] =  extension.lower() in NONREDACTABLE_FILE_TYPES
             record = FOIRequestRecord(foirequestid=requestid, ministryrequestid = ministryrequestid, ministryrequestversion=_ministryversion,
                             version = 1, createdby = userid, created_at = datetime.now())
             record.__dict__.update(entry)
@@ -167,6 +168,7 @@ class recordservice(recordservicebase):
             # send message to redis stream for each file
             for entry in processingrecords:
                 _filename, extension = path.splitext(entry['s3uripath'])
+                extension = extension.lower()
                 if 'error' in jobids[entry['s3uripath']]:
                     logging.error("Doc Reviewer API was given an unsupported file type - no job triggered - Record ID: {0} File Name: {1} ".format(entry['recordid'], entry['filename']))
                 else:
@@ -184,9 +186,9 @@ class recordservice(recordservicebase):
                         "createdby": userid,
                         "incompatible": 'true' if extension in NONREDACTABLE_FILE_TYPES else 'false'
                     }
-                    if extension in FILE_CONVERSION_FILE_TYPES or extension.lower() in FILE_CONVERSION_FILE_TYPES:
+                    if extension in FILE_CONVERSION_FILE_TYPES:
                         eventqueueservice().add(self.conversionstreamkey, streamobject)
-                    if extension in DEDUPE_FILE_TYPES or extension.lower() in DEDUPE_FILE_TYPES:
+                    if extension in DEDUPE_FILE_TYPES:
                         eventqueueservice().add(self.dedupestreamkey, streamobject)
         return dbresponse
 
