@@ -186,7 +186,7 @@ export const AttachmentSection = ({
                   setSuccessCount(0);
                 }
               }
-              completeMultiPartUpload({uploadid: header.uploadid, filepath: header.filepathdb, parts: parts}, 'attachments', bcgovcode, dispatch, (_err, _res) => {                
+              completeMultiPartUpload({uploadid: header.uploadid, filepath: header.filepathdb, parts: parts}, ministryId, 'attachments', bcgovcode, dispatch, (_err, _res) => {                
                 if (!_err && _res.ResponseMetadata.HTTPStatusCode === 200) {
                   setSuccessCount(index+1);
                 } else {

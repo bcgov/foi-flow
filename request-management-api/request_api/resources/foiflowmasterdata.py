@@ -262,7 +262,7 @@ class FOIFlowS3Presigned(Resource):
          return {'status': exception.status_code, 'message':exception.message}, 500
 
 @cors_preflight('POST,OPTIONS')
-@API.route('/foiflow/oss/completemultipart/<category>/<bcgovcode>')
+@API.route('/foiflow/oss/completemultipart/<ministryrequestid>/<category>/<bcgovcode>')
 class FOIFlowS3Presigned(Resource):
 
     @staticmethod
@@ -270,7 +270,7 @@ class FOIFlowS3Presigned(Resource):
     @cross_origin(origins=allowedorigins())
     @auth.require
     @auth.documentbelongstosameministry
-    def post(category, bcgovcode=None):
+    def post(ministryrequestid, category, bcgovcode=None):
         try :
             if storageservice().is_valid_category(category) == False:
                 return {'status': 400, 'message':"Bad Request"}, 400
