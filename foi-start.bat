@@ -44,6 +44,7 @@ echo "Starting Notification Manager..."
 	docker-compose -f %NOTIFICATION_DIRECTORY%/docker-compose.yml up --build -d
 )
 )
+
 if /I '%choice%'=='N' (
    
 set /P servicenames="Enter services(s) here (ex: web, api, bpm, ffa) separated by space?"

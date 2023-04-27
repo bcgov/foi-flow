@@ -570,7 +570,7 @@ export const CFRForm = ({
                   />
                 </div>
                 <div className='foi-assigned-to-container'>
-                  <div className='foi-assigned-to-inner-container'>
+                  <div className='foi-assigned-to-inner-container' id="cfrstatuscontainer">
                     <TextField
                       id="cfrStatus"
                       label={"CFR Status"}

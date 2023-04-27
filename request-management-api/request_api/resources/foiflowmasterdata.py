@@ -221,9 +221,9 @@ class FOIFlowDocumentStorage(Resource):
     def post():
         try:
 
-            responsefilejson = storageservice().bulk_upload(request.get_json(), "Attachments")          
-            return json.dumps(responsefilejson),200 
-        except BusinessException as exception:            
+            responsefilejson = storageservice().bulk_upload(request.get_json(), "Attachments")
+            return json.dumps(responsefilejson),200
+        except BusinessException as exception:
             return {'status': exception.status_code, 'message':exception.message}, 500
 
 @cors_preflight('GET,OPTIONS')
@@ -239,26 +239,44 @@ class FOIFlowS3Presigned(Resource):
     def get(ministryrequestid, category="attachments", bcgovcode=None):
         try :
             response = storageservice().retrieve_s3_presigned(request.args.get('filepath'), category, bcgovcode)
-            return json.dumps(response),200        
-        except BusinessException as exception:            
-         return {'status': exception.status_code, 'message':exception.message}, 500 
+            return json.dumps(response),200
+        except BusinessException as exception:
+         return {'status': exception.status_code, 'message':exception.message}, 500
 
 @cors_preflight('POST,OPTIONS')
 @API.route('/foiflow/oss/presigned/<ministryrequestid>/<category>/<bcgovcode>')
 class FOIFlowS3Presigned(Resource):
 
     @staticmethod
-    @TRACER.trace()    
-    @cross_origin(origins=allowedorigins())       
-    # @auth.require
-    # @auth.documentbelongstosameministry
+    @TRACER.trace()
+    @cross_origin(origins=allowedorigins())
+    @auth.require
+    @auth.documentbelongstosameministry
     def post(ministryrequestid, category, bcgovcode=None):
         try :
             if storageservice().is_valid_category(category) == False:
                 return {'status': 400, 'message':"Bad Request"}, 400
             responsefilejson = storageservice().bulk_upload_s3_presigned(ministryrequestid, request.get_json(), category, bcgovcode)
-            return json.dumps(responsefilejson),200        
-        except BusinessException as exception:            
+            return json.dumps(responsefilejson),200
+        except BusinessException as exception:
+         return {'status': exception.status_code, 'message':exception.message}, 500
+
+@cors_preflight('POST,OPTIONS')
+@API.route('/foiflow/oss/completemultipart/<ministryrequestid>/<category>/<bcgovcode>')
+class FOIFlowS3Presigned(Resource):
+
+    @staticmethod
+    @TRACER.trace()
+    @cross_origin(origins=allowedorigins())
+    @auth.require
+    @auth.documentbelongstosameministry
+    def post(ministryrequestid, category, bcgovcode=None):
+        try :
+            if storageservice().is_valid_category(category) == False:
+                return {'status': 400, 'message':"Bad Request"}, 400
+            responsefilejson = storageservice().complete_upload_s3_presigned(request.get_json(), category, bcgovcode)
+            return json.dumps(responsefilejson),200
+        except BusinessException as exception:
          return {'status': exception.status_code, 'message':exception.message}, 500
 
 @cors_preflight('GET,OPTIONS')
@@ -282,7 +300,7 @@ class FOIFlowExtensionReasons(Resource):
             return jsondata , 200
         except BusinessException as exception:
             return {'status': exception.status_code, 'message':exception.message}, 500
-    
+
 @cors_preflight('GET,OPTIONS')
 @API.route('/foiflow/subjectcodes')
 class FOIFlowSubjectCodes(Resource):

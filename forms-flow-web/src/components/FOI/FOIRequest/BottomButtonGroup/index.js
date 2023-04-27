@@ -3,7 +3,7 @@ import "./bottombuttongroup.scss";
 import { makeStyles } from "@material-ui/core/styles";
 import { useDispatch } from "react-redux";
 import {
-  getOSSHeaderDetails,
+  postFOIS3DocumentPreSignedUrl,
   saveFilesinS3,
 } from "../../../../apiManager/services/FOI/foiOSSServices";
 import {
@@ -357,13 +357,13 @@ const BottomButtonGroup = React.memo(
         return;
       }
 
-      getOSSHeaderDetails(fileInfoList, dispatch, (err, res) => {
+      postFOIS3DocumentPreSignedUrl(ministryId, fileInfoList, 'attachments', saveRequestObject.idNumber.split("-")[0], dispatch, (err, res) => {
         let _documents = [];
         if (!err) {
           res.map((header, index) => {
-            const _file = files?.find((file) => file.name === header.filename);
+            const _file = files?.find((file) => file.filename === header.filename);
             const documentpath = {
-              documentpath: header.filepath,
+              documentpath: header.filepathdb,
               filename: header.filename,
               category: header.filestatustransition,
             };
