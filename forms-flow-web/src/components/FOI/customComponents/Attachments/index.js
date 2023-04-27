@@ -20,8 +20,10 @@ import MenuItem from "@material-ui/core/MenuItem";
 import { saveAs } from "file-saver";
 import { downloadZip } from "client-zip";
 import AttachmentFilter from './AttachmentFilter';
-import { getCategory } from './util';import { readUploadedFileAsBytes } from '../../../../helper/FOI/helper';
+import { getCategory } from './util';
+import { readUploadedFileAsBytes } from '../../../../helper/FOI/helper';
 import { OSS_S3_CHUNK_SIZE } from "../../../../constants/constants";
+import { toast } from "react-toastify";
 
 const useStyles = makeStyles((_theme) => ({
   createButton: {
@@ -77,10 +79,8 @@ export const AttachmentSection = ({
   
 
   const [openModal, setModal] = useState(false);
-  const [successCount, setSuccessCount] = useState(0);
   const [fileCount, setFileCount] = useState(0);
   const dispatch = useDispatch();
-  const [documents, setDocuments] = useState([]);
   const [isAttachmentLoading, setAttachmentLoading] = useState(false);
   const [multipleFiles, setMultipleFiles] = useState(true);
   const [modalFor, setModalFor] = useState("add");
@@ -96,21 +96,6 @@ export const AttachmentSection = ({
     setUpdateAttachment({});
     setModal(true);
   }
-
-  React.useEffect(() => {    
-    if (successCount === fileCount && successCount !== 0) {
-        setModal(false);
-        const documentsObject = {documents: documents};
-        if (modalFor === 'replace' && updateAttachment) {
-          replaceAttachment();
-        }
-        else {
-          dispatch(saveFOIRequestAttachmentsList(requestId, ministryId, documentsObject,(err, _res) => {
-            dispatchRequestAttachment(err);
-        }));
-      }
-    }
-  },[successCount])
 
   React.useEffect(() => {
     setAttachmentsForDisplay(searchAttachments(attachments, filterValue, keywordValue));
@@ -129,18 +114,9 @@ export const AttachmentSection = ({
     });
   }
 
-  const replaceAttachment = () => {
-    const replaceDocumentObject = {filename: documents[0].filename, documentpath: documents[0].documentpath};
-    const documentId = ministryId ? updateAttachment.foiministrydocumentid : updateAttachment.foidocumentid;      
-    dispatch(replaceFOIRequestAttachment(requestId, ministryId, documentId, replaceDocumentObject,(err, _res) => {
-      dispatchRequestAttachment(err);
-    }));
-  }
-
   const dispatchRequestAttachment = (err) => {
     if (!err) {
       setAttachmentLoading(false);
-      setSuccessCount(0);
     }
   }
 
@@ -159,16 +135,17 @@ export const AttachmentSection = ({
   const saveDocument = (value, fileInfoList, files) => {
     if (value) {
       if (files.length !== 0) {
-        setAttachmentLoading(true);
-        postFOIS3DocumentPreSignedUrl(ministryId, fileInfoList.map(file => ({...file, multipart: true})), 'attachments', bcgovcode, dispatch, (err, res) => {
+        // setAttachmentLoading(true);
+        postFOIS3DocumentPreSignedUrl(ministryId, fileInfoList.map(file => ({...file, multipart: true})), 'attachments', bcgovcode, dispatch, async (err, res) => {
           let _documents = [];
           if (!err) {
-            res.map(async (header, index) => {
+            let completed = 0;
+            let failed = [];
+            const toastID = toast.loading("Uploading files (" + completed + "/" + fileInfoList.length + ")")
+            for (let header of res) {
               const _file = files.find(file => file.filename === header.filename);
               const _fileInfo = fileInfoList.find(fileInfo => fileInfo.filename === header.filename);
               const documentDetails = {documentpath: header.filepathdb, filename: header.filename, category: _fileInfo.filestatustransition};
-              _documents.push(documentDetails);
-              setDocuments(_documents);
               let bytes = await readUploadedFileAsBytes(_file)              
               const CHUNK_SIZE = OSS_S3_CHUNK_SIZE;
               const totalChunks = Math.ceil(bytes.byteLength / CHUNK_SIZE);
@@ -177,31 +154,60 @@ export const AttachmentSection = ({
                 let CHUNK = bytes.slice(chunk * CHUNK_SIZE, (chunk + 1) * CHUNK_SIZE);
                 let response = await saveFilesinS3({filepath: header.filepaths[chunk]}, CHUNK, dispatch, (_err, _res) => {
                   if (_err) {
-                    setSuccessCount(0);
+                    failed.push(header.filename);
                   }
                 })
                 if (response.status === 200) {
                   parts.push({PartNumber: chunk + 1, ETag: response.headers.etag})
                 } else {
-                  setSuccessCount(0);
+                  failed.push(header.filename);
                 }
               }
-              completeMultiPartUpload({uploadid: header.uploadid, filepath: header.filepathdb, parts: parts}, ministryId, 'attachments', bcgovcode, dispatch, (_err, _res) => {                
+              await completeMultiPartUpload({uploadid: header.uploadid, filepath: header.filepathdb, parts: parts}, ministryId, 'attachments', bcgovcode, dispatch, (_err, _res) => {                
                 if (!_err && _res.ResponseMetadata.HTTPStatusCode === 200) {
-                  setSuccessCount(index+1);
+                  completed++;
+                  toast.update(toastID, {
+                    render: "Uploading files (" + completed + "/" + fileInfoList.length + ")",
+                    isLoading: true,
+                  })
+                  _documents.push(documentDetails);
                 } else {
-                  setSuccessCount(0);
+                  failed.push(header.filename);
                 }
               })
-              // saveFilesinS3(header, _file, dispatch, (_err, _res) => {
-              //   if (_res === 200) {
-              //     setSuccessCount(index+1);
-              //   }
-              //   else {
-              //     setSuccessCount(0);
-              //   }
-              // })
+            }
+            if (_documents.length > 0) {
+              if (modalFor === 'replace' && updateAttachment) {
+                const replaceDocumentObject = {filename: _documents[0].filename, documentpath: _documents[0].documentpath};
+                const documentId = ministryId ? updateAttachment.foiministrydocumentid : updateAttachment.foidocumentid;      
+                dispatch(replaceFOIRequestAttachment(requestId, ministryId, documentId, replaceDocumentObject,(err, _res) => {
+                  dispatchRequestAttachment(err);
+                }));
+              }
+              else {
+                dispatch(saveFOIRequestAttachmentsList(requestId, ministryId, {documents: _documents}, (err, _res) => {
+                  dispatchRequestAttachment(err);
+                }));
+              }
+            }
+            var toastOptions = {
+              render: failed.length > 0 ?
+                "The following " + failed.length + " file uploads failed\n- " + failed.join("\n- ")  :
+                fileInfoList.length + ' Files successfully saved',
+              type: failed.length > 0 ? "error" : "success",
+            }
+            toast.update(toastID, {
+              ...toastOptions,
+              className: "file-upload-toast",
+              isLoading: false,
+              autoClose: 3000,
+              hideProgressBar: true,
+              closeOnClick: true,
+              pauseOnHover: true,
+              draggable: true,
+              closeButton: true
             });
+            setAttachmentLoading(false)
           }
         })
       }             
