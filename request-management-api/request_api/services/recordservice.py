@@ -145,6 +145,7 @@ class recordservice(recordservicebase):
             entry['attributes']['batch'] = batch
             _filepath, extension = path.splitext(entry['filename'])
             entry['attributes']['extension'] = extension
+            print("extension",extension)
             entry['attributes']['incompatible'] =  extension.lower() in NONREDACTABLE_FILE_TYPES
             record = FOIRequestRecord(foirequestid=requestid, ministryrequestid = ministryrequestid, ministryrequestversion=_ministryversion,
                             version = 1, createdby = userid, created_at = datetime.now())
