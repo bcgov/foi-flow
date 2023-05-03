@@ -21,9 +21,14 @@ class recordservice(recordservicebase):
     """ FOI record management service
     """
     conversionstreamkey = getenv('EVENT_QUEUE_CONVERSION_STREAMKEY')
+    largefileconversionstreamkey = getenv('EVENT_QUEUE_CONVERSION_LARGE_FILE_STREAM_KEY')
     dedupestreamkey = getenv('EVENT_QUEUE_DEDUPE_STREAMKEY')
+    largefilededupestreamkey = getenv('EVENT_QUEUE_DEDUPE_LARGE_FILE_STREAMKEY')
     pdfstitchstreamkey = getenv('EVENT_QUEUE_PDFSTITCH_STREAMKEY')
+    largefilesizelimit= getenv('STREAM_SEPARATION_FILE_SIZE_LIMIT')
 
+    
+    
 
     def create(self, requestid, ministryrequestid, recordschema, userid):
         """Creates a record for a user with document details passed in for an opened request.
@@ -145,7 +150,6 @@ class recordservice(recordservicebase):
             entry['attributes']['batch'] = batch
             _filepath, extension = path.splitext(entry['filename'])
             entry['attributes']['extension'] = extension
-            print("extension",extension)
             entry['attributes']['incompatible'] =  extension.lower() in NONREDACTABLE_FILE_TYPES
             record = FOIRequestRecord(foirequestid=requestid, ministryrequestid = ministryrequestid, ministryrequestversion=_ministryversion,
                             version = 1, createdby = userid, created_at = datetime.now())
@@ -188,9 +192,17 @@ class recordservice(recordservicebase):
                         "incompatible": 'true' if extension in NONREDACTABLE_FILE_TYPES else 'false'
                     }
                     if extension in FILE_CONVERSION_FILE_TYPES:
-                        eventqueueservice().add(self.conversionstreamkey, streamobject)
+                        if entry['attributes']['filesize'] < int(self.largefilesizelimit):
+                            assignedstreamkey =self.conversionstreamkey
+                        else:
+                            assignedstreamkey =self.largefileconversionstreamkey
+                        eventqueueservice().add(assignedstreamkey, streamobject)
                     if extension in DEDUPE_FILE_TYPES:
-                        eventqueueservice().add(self.dedupestreamkey, streamobject)
+                        if 'convertedfilesize' in entry['attributes'] and entry['attributes']['convertedfilesize'] < int(self.largefilesizelimit) or 'convertedfilesize' not in entry['attributes'] and entry['attributes']['filesize'] < int(self.largefilesizelimit):
+                            assignedstreamkey= self.dedupestreamkey
+                        else:
+                            assignedstreamkey= self.largefilededupestreamkey
+                        eventqueueservice().add(assignedstreamkey, streamobject)
         return dbresponse
 
     
