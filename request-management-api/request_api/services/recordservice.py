@@ -136,8 +136,10 @@ class recordservice(recordservicebase):
             "totalfilesize": message["totalfilesize"]
         }
         print("final message >>>>>> ", streamobject)
-        if message["totalfilesize"] > self.largefilesizelimit:
+        if message["totalfilesize"] > int(self.largefilesizelimit) and self.pdfstitchstreamkey_largefiles:
+            print("inside if")
             return eventqueueservice().add(self.pdfstitchstreamkey_largefiles, streamobject)
+        print("else")
         return eventqueueservice().add(self.pdfstitchstreamkey, streamobject)
 
     def __bulkcreate(self, requestid, ministryrequestid, records, userid):
