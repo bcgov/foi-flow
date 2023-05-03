@@ -23,6 +23,9 @@ class recordservice(recordservicebase):
     conversionstreamkey = getenv('EVENT_QUEUE_CONVERSION_STREAMKEY')
     dedupestreamkey = getenv('EVENT_QUEUE_DEDUPE_STREAMKEY')
     pdfstitchstreamkey = getenv('EVENT_QUEUE_PDFSTITCH_STREAMKEY')
+    pdfstitchstreamkey_largefiles = getenv('EVENT_QUEUE_PDFSTITCH_LARGE_FILE_STREAMKEY')
+    filesizelimit = getenv('STREAM_SEPARATION_FILE_SIZE_LIMIT')
+    
 
 
     def create(self, requestid, ministryrequestid, recordschema, userid):
@@ -129,9 +132,12 @@ class recordservice(recordservicebase):
             "createdby": userid,
             "requestid": requestid,
             "ministryrequestid": ministryrequestid,
-            "attributes": json.JSONEncoder().encode(message["attributes"])
+            "attributes": json.JSONEncoder().encode(message["attributes"]),
+            "totalfilesize": message["totalfilesize"]
         }
         print("final message >>>>>> ", streamobject)
+        if message["totalfilesize"] > self.filesizelimit:
+            return eventqueueservice().add(self.pdfstitchstreamkey_largefiles, streamobject)
         return eventqueueservice().add(self.pdfstitchstreamkey, streamobject)
 
     def __bulkcreate(self, requestid, ministryrequestid, records, userid):
