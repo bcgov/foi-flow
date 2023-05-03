@@ -47,7 +47,7 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 import CloseIcon from '@material-ui/icons/Close';
 import _ from 'lodash';
 import { DOC_REVIEWER_WEB_URL, RECORD_PROCESSING_HRS, OSS_S3_CHUNK_SIZE } from "../../../../constants/constants";
-import {removeDuplicateFiles, addDeduplicatedAttachmentsToRecords, getPDFFilePath, sortDivisionalFiles} from "./util"
+import {removeDuplicateFiles, addDeduplicatedAttachmentsToRecords, getPDFFilePath, sortDivisionalFiles, calculateTotalFileSize} from "./util"
 import { readUploadedFileAsBytes } from '../../../../helper/FOI/helper';
 
 
@@ -474,7 +474,6 @@ export const RecordsLog = ({
       if (!divisions) {
         continue;
       }
-    
       // Loop through each division in the item
       for (const division of divisions) {
         // Get the division ID and name
@@ -486,18 +485,22 @@ export const RecordsLog = ({
           divisionMap.set(divisionId, {
             divisionid: divisionId,
             divisionname: divisionName,
-            files: []
+            files: [],
+            divisionfilesize: 0
           });
         }
     
         // Add the item to the files array for this division
         const files = divisionMap.get(divisionId).files;
-        files.push({
-          lastmodified: item.attributes ? item.attributes.lastmodified : null,
+        const fileAttrs = {
+          lastmodified: item.attributes?.lastmodified,
           recordid: item.recordid,
           s3uripath: filepath,
-          filename: filename
-        });
+          filename,
+          filesize: item.attributes?.convertedfilesize || item.attributes?.filesize
+        };
+        files.push(fileAttrs);
+        divisionMap.get(divisionId).divisionfilesize += fileAttrs.filesize; // add file size to division total
       }
     }
  
@@ -505,12 +508,13 @@ export const RecordsLog = ({
     const sortedDivisions = sortDivisionalFiles(divisionMap);
 
     message.attributes = sortedDivisions;
+    message.totalfilesize = calculateTotalFileSize(sortedDivisions); // calculate total size for whole message
     //keeping this for testing purpose.
     console.log(`message = ${JSON.stringify(message)}`);
 
     return message;
 
-  }
+  } 
 
 
   const toastError = (error) => {
