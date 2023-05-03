@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useState } from "react";
+import { useSelector } from "react-redux";
 import MenuItem from "@material-ui/core/MenuItem";
 import FormControl from "@mui/material/FormControl";
 import Select from "@mui/material/Select";
@@ -19,6 +20,7 @@ import clsx from "clsx";
 import FOI_COMPONENT_CONSTANTS from "../../../../../constants/FOI/foiComponentConstants";
 import TextField from '@material-ui/core/TextField';
 import { formatDate } from "../../../../../helper/FOI/helper";
+import ConfirmModalDivision from "./ConfirmModalDivision";
 
 const DivisionalStages = React.memo(
   ({
@@ -31,6 +33,14 @@ const DivisionalStages = React.memo(
   }) => {
 
     const today = new Date();
+    const [showModal, setShowModal] = useState(false);
+    const [isRecordsAssociated, setRecordsAssociated] = useState(false);
+    const [modalMessage, setModalMessage] = useState(<></>);    
+    const [modalDescription, setModalDescription] = useState(<></>);  
+
+    let requestRecords = useSelector(
+      (state) => state.foiRequests.foiRequestRecords
+    );
 
     const [minDivStages, setMinDivStages] = React.useState(() =>
       calculateStageCounter(existingDivStages)
@@ -63,14 +73,33 @@ const DivisionalStages = React.memo(
 
     popSelectedDivStages(minDivStages);
 
-    const deleteMinistryDivision = (id) => {
+    const deleteMinistryDivision = (id, divisionid) => {
       let existing = stageIterator;
-      let updatedIterator = existing.filter((i) => i.id !== id);
-
-      setMinDivStages([...updatedIterator]);
-      appendStageIterator([...updatedIterator]);
-      createMinistrySaveRequestObject(FOI_COMPONENT_CONSTANTS.DIVISION, "", "");
+      let ismatchfound = false;
+      requestRecords.records.forEach(element => {
+        element.attributes.divisions.forEach(division => {
+            if(division.divisionid == divisionid) {
+              if (ismatchfound === false) { ismatchfound = true;}                          
+            }
+        });
+      }); 
+      if (ismatchfound === false) {
+        let updatedIterator = existing.filter((i) => i.id !== id);
+        setMinDivStages([...updatedIterator]);
+        appendStageIterator([...updatedIterator]);
+        createMinistrySaveRequestObject(FOI_COMPONENT_CONSTANTS.DIVISION, "", "");
+        setRecordsAssociated(false);
+      }  else {
+          setModalMessage(<span>You cannot delete this division at this time.</span>);
+          setModalDescription(<span><i>All associated records must be removed from the Records Log Prior to you being able to delete a division in order to ensure the Records Package is accurate</i></span>);
+          setShowModal(true);   
+          setRecordsAssociated(true);            
+      }    
     };
+
+    const resetModal = () => {
+      setShowModal(false);
+    }
 
     const [stageIterator, appendStageIterator] = React.useState(() =>
       calculateStageCounter(existingDivStages)
@@ -332,7 +361,7 @@ const DivisionalStages = React.memo(
                 hidebin: index === 0 && stageIterator.length === 1,
               })}
               aria-hidden="true"
-              onClick={() => deleteMinistryDivision(_id)}
+              onClick={() => deleteMinistryDivision(_id, row.divisionid)}
             ></i>
           </div>
         </div>
@@ -364,6 +393,12 @@ const DivisionalStages = React.memo(
             </div>
           </div>
         )}
+        <ConfirmModalDivision 
+        modalMessage= {modalMessage}
+        modalDescription= {modalDescription} 
+        showModal={showModal}
+        isRecordsAssociated = {isRecordsAssociated}
+        resetModal = {resetModal} /> 
       </>
     );
   }
