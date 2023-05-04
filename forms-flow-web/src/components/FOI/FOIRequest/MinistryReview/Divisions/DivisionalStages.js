@@ -272,7 +272,7 @@ const DivisionalStages = React.memo(
                 value={row.divisionid || -1}
                 inputProps={{ "aria-labelledby": "foi-division-dropdown-label"}}
                 input={<OutlinedInput  label="Select Divison" notched />}
-                onChange={(e) => handleDivisionChange(e, _id)}
+                onChange={(e) => handleDivisionChange(e, _id, row.divisionid)}
                 fullWidth
                 renderValue={(value) => {
                   return renderMenuItem(
