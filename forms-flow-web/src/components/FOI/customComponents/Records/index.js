@@ -492,12 +492,14 @@ export const RecordsLog = ({
     
         // Add the item to the files array for this division
         const files = divisionMap.get(divisionId).files;
+        const convertedFileSize = parseFloat(item.attributes?.convertedfilesize) || 0
+        const fileSize = parseFloat(item.attributes?.filesize) || 0
         const fileAttrs = {
           lastmodified: item.attributes?.lastmodified,
           recordid: item.recordid,
           s3uripath: filepath,
           filename,
-          filesize: item.attributes?.convertedfilesize || item.attributes?.filesize
+          filesize: convertedFileSize || fileSize
         };
         files.push(fileAttrs);
         divisionMap.get(divisionId).divisionfilesize += fileAttrs.filesize; // add file size to division total
