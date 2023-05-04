@@ -93,9 +93,8 @@ class DeleteFOIDocument(Resource):
 
 @cors_preflight('POST,OPTIONS')
 @API.route('/foirecord/<requestid>/ministryrequest/<ministryrequestid>/retry')
-class ReplaceFOIDocument(Resource):
+class RetryFOIDocument(Resource):
     """Resource for soft delete FOI requests."""
-
 
     @staticmethod
     @TRACER.trace()
