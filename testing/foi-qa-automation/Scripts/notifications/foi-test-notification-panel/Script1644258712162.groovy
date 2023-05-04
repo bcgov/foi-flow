@@ -120,7 +120,7 @@ if (WebUI.verifyElementPresent(findTestObject('Page_foi.flow/navbar/notification
     WebUI.click(findTestObject('Page_foi.flow/navbar/notification/div_notifiation Dismiss All'))
 }
 
-//WebUI.click(findTestObject('Page_foi.flow/navbar/notification/a_Watching Notifications'))
+WebUI.click(findTestObject('Page_foi.flow/navbar/notification/a_Watching Notifications'))
 WebUI.delay(3)
 
 if (WebUI.verifyElementPresent(findTestObject('Page_foi.flow/navbar/notification/div_watching notification list 1'), 1, 
@@ -134,7 +134,7 @@ WebUI.delay(4)
    // 'MuiBadge-invisible')
 
 //WebUI.verifyElementPresent(findTestObject('Page_foi.flow/navbar/notification/div_notification popup'), 0)
-//WebUI.clickOffset(findTestObject('Page_foi.flow/navbar/notification/notification bell'), -2, 4)
+WebUI.clickOffset(findTestObject('Page_foi.flow/navbar/notification/notification bell'), -2, 4)
 WebUI.scrollToElement(findTestObject('Page_foi.flow/form/button_Save'), 0)
 
 WebUI.click(findTestObject('Page_foi.flow/form/button_Save'), FailureHandling.STOP_ON_FAILURE)
