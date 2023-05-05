@@ -34,9 +34,7 @@ const DivisionalStages = React.memo(
 
     const today = new Date();
     const [showModal, setShowModal] = useState(false);
-    const [isRecordsAssociated, setRecordsAssociated] = useState(false);
     const [modalName, setmodalName] = useState(<></>); 
-    const [actionName, setactionName] = useState(<></>); 
     const [modalMessage, setModalMessage] = useState(<></>);    
     const [modalDescription, setModalDescription] = useState(<></>);  
 
@@ -52,11 +50,9 @@ const DivisionalStages = React.memo(
       let ismatchfound = checkRecordAssociation(divisionid);
       if (ismatchfound === true) {
           setmodalName(<span>Changing Divisions</span>);
-          setactionName(<span>Change</span>)
           setModalMessage(<span>You cannot change this division at this time.</span>);
-          setModalDescription(<span><i>All associated records must be removed from the Records Log Prior to you being able to change a division in order to ensure the Records Package is accurate</i></span>);
+          setModalDescription(<span><i>All associated records must be removed from the Records Log prior to you being able to change a division in order to ensure the Records Package is accurate.</i></span>);
           setShowModal(true);   
-          setRecordsAssociated(true);
       } else {
           updateDivisions(e, id, minDivStages, (newStages) => {
             setMinDivStages([...newStages]);
@@ -90,17 +86,14 @@ const DivisionalStages = React.memo(
       let ismatchfound = checkRecordAssociation(divisionid);      
       if (ismatchfound === true) {
           setmodalName(<span>Deleting Divisions</span>);
-          setactionName(<span>Delete</span>)
           setModalMessage(<span>You cannot delete this division at this time.</span>);
-          setModalDescription(<span><i>All associated records must be removed from the Records Log Prior to you being able to delete a division in order to ensure the Records Package is accurate</i></span>);
+          setModalDescription(<span><i>All associated records must be removed from the Records Log prior to you being able to delete a division in order to ensure the Records Package is accurate.</i></span>);
           setShowModal(true);   
-          setRecordsAssociated(true);        
       }  else {
           let updatedIterator = existing.filter((i) => i.id !== id);
           setMinDivStages([...updatedIterator]);
           appendStageIterator([...updatedIterator]);
           createMinistrySaveRequestObject(FOI_COMPONENT_CONSTANTS.DIVISION, "", "");
-          setRecordsAssociated(false);             
       }    
     };
 
@@ -383,6 +376,7 @@ const DivisionalStages = React.memo(
               onClick={() => deleteMinistryDivision(_id, row.divisionid)}
             ></i>
           </div>
+
         </div>
       );
     };
@@ -414,11 +408,9 @@ const DivisionalStages = React.memo(
         )}
         <ConfirmModalDivision 
         modalName= {modalName}
-        actionName= {actionName}
         modalMessage= {modalMessage}
         modalDescription= {modalDescription} 
         showModal={showModal}
-        isRecordsAssociated = {isRecordsAssociated}
         resetModal = {resetModal} /> 
       </>
     );
