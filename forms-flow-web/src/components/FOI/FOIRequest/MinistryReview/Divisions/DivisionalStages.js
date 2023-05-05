@@ -34,7 +34,7 @@ const DivisionalStages = React.memo(
 
     const today = new Date();
     const [showModal, setShowModal] = useState(false);
-    const [isRecordsAssociated, setRecordsAssociated] = useState(false);
+    const [modalName, setmodalName] = useState(<></>); 
     const [modalMessage, setModalMessage] = useState(<></>);    
     const [modalDescription, setModalDescription] = useState(<></>);  
 
@@ -46,35 +46,58 @@ const DivisionalStages = React.memo(
       calculateStageCounter(existingDivStages)
     );
 
-    const handleDivisionChange = (e, id) => {
-      updateDivisions(e, id, minDivStages, (newStages) => {
-        setMinDivStages([...newStages]);
-        appendStageIterator([...newStages]);
-      });
-      createMinistrySaveRequestObject(
-        FOI_COMPONENT_CONSTANTS.DIVISION,
-        e.target.value,
-        e.target.name
-      );
+    const handleDivisionChange = (e, id, divisionid) => {
+      let ismatchfound = checkRecordAssociation(divisionid);
+      if (ismatchfound === true) {
+          setmodalName(<span>Changing Divisions</span>);
+          setModalMessage(<span>You cannot change this division at this time.</span>);
+          setModalDescription(<span><i>All associated records must be removed from the Records Log prior to you being able to change a division in order to ensure the Records Package is accurate.</i></span>);
+          setShowModal(true);   
+      } else {
+          updateDivisions(e, id, minDivStages, (newStages) => {
+            setMinDivStages([...newStages]);
+            appendStageIterator([...newStages]);
+          });
+          createMinistrySaveRequestObject(
+            FOI_COMPONENT_CONSTANTS.DIVISION,
+            e.target.value,
+            e.target.name
+          );
+      }
     };
 
 
-    const handleDivisionStageChange = (e, id) => {
-      updateDivisionsState(e, id, minDivStages, (newStages) => {
-        setMinDivStages([...newStages]);
-        appendStageIterator([...newStages]);
-      });
-      createMinistrySaveRequestObject(
-        FOI_COMPONENT_CONSTANTS.DIVISION_STAGE,
-        e.target.value,
-        e.target.name
-      );
+    const handleDivisionStageChange = (e, id, ) => {         
+        updateDivisionsState(e, id, minDivStages, (newStages) => {
+          setMinDivStages([...newStages]);
+          appendStageIterator([...newStages]);
+          });
+        createMinistrySaveRequestObject(
+              FOI_COMPONENT_CONSTANTS.DIVISION_STAGE,
+              e.target.value,
+              e.target.name
+            );
     };
 
     popSelectedDivStages(minDivStages);
 
     const deleteMinistryDivision = (id, divisionid) => {
       let existing = stageIterator;
+      let ismatchfound = checkRecordAssociation(divisionid);      
+      if (ismatchfound === true) {
+          setmodalName(<span>Deleting Divisions</span>);
+          setModalMessage(<span>You cannot delete this division at this time.</span>);
+          setModalDescription(<span><i>All associated records must be removed from the Records Log prior to you being able to delete a division in order to ensure the Records Package is accurate.</i></span>);
+          setShowModal(true);   
+      }  else {
+          let updatedIterator = existing.filter((i) => i.id !== id);
+          setMinDivStages([...updatedIterator]);
+          appendStageIterator([...updatedIterator]);
+          createMinistrySaveRequestObject(FOI_COMPONENT_CONSTANTS.DIVISION, "", "");
+      }    
+    };
+
+    const checkRecordAssociation = (divisionid) => {
       let ismatchfound = false;
       requestRecords.records.forEach(element => {
         element.attributes.divisions.forEach(division => {
@@ -83,18 +106,7 @@ const DivisionalStages = React.memo(
             }
         });
       }); 
-      if (ismatchfound === false) {
-        let updatedIterator = existing.filter((i) => i.id !== id);
-        setMinDivStages([...updatedIterator]);
-        appendStageIterator([...updatedIterator]);
-        createMinistrySaveRequestObject(FOI_COMPONENT_CONSTANTS.DIVISION, "", "");
-        setRecordsAssociated(false);
-      }  else {
-          setModalMessage(<span>You cannot delete this division at this time.</span>);
-          setModalDescription(<span><i>All associated records must be removed from the Records Log Prior to you being able to delete a division in order to ensure the Records Package is accurate</i></span>);
-          setShowModal(true);   
-          setRecordsAssociated(true);            
-      }    
+      return ismatchfound
     };
 
     const resetModal = () => {
@@ -253,7 +265,7 @@ const DivisionalStages = React.memo(
                 value={row.divisionid || -1}
                 inputProps={{ "aria-labelledby": "foi-division-dropdown-label"}}
                 input={<OutlinedInput  label="Select Divison" notched />}
-                onChange={(e) => handleDivisionChange(e, _id)}
+                onChange={(e) => handleDivisionChange(e, _id, row.divisionid)}
                 fullWidth
                 renderValue={(value) => {
                   return renderMenuItem(
@@ -364,6 +376,7 @@ const DivisionalStages = React.memo(
               onClick={() => deleteMinistryDivision(_id, row.divisionid)}
             ></i>
           </div>
+
         </div>
       );
     };
@@ -394,10 +407,10 @@ const DivisionalStages = React.memo(
           </div>
         )}
         <ConfirmModalDivision 
+        modalName= {modalName}
         modalMessage= {modalMessage}
         modalDescription= {modalDescription} 
         showModal={showModal}
-        isRecordsAssociated = {isRecordsAssociated}
         resetModal = {resetModal} /> 
       </>
     );
