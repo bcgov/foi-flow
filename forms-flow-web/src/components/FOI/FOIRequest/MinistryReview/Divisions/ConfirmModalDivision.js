@@ -12,20 +12,14 @@ import TextField from '@mui/material/TextField';
 
 const ConfirmModalDivision= ({
     modalName,
-    actionName,
     modalMessage,
     modalDescription,
-    isRecordsAssociated,
     showModal,
     resetModal
 }) =>{ 
 
     const [modalOpen, setModalOpen] = useState(showModal);
 
-    const handleAction = () => {
-        setModalOpen(false);
-        resetModal();
-    };
 
     const handleClose = () => {
         setModalOpen(false);
@@ -67,15 +61,8 @@ const ConfirmModalDivision= ({
             </DialogContentText>
             </DialogContent>
             <DialogActions>
-                <button
-                className={`btn-bottom btn-save btn`}
-                onClick={handleAction}
-                disabled={isRecordsAssociated}
-                >
-                {actionName}
-                </button>
                 <button className="btn-bottom btn-cancel" onClick={handleClose}>
-                Cancel
+                OK
                 </button>
             </DialogActions>
             </Dialog>
