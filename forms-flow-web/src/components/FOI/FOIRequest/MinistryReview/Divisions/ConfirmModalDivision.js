@@ -11,6 +11,8 @@ import TextField from '@mui/material/TextField';
 
 
 const ConfirmModalDivision= ({
+    modalName,
+    actionName,
     modalMessage,
     modalDescription,
     isRecordsAssociated,
@@ -20,7 +22,7 @@ const ConfirmModalDivision= ({
 
     const [modalOpen, setModalOpen] = useState(showModal);
 
-    const handleDelete = () => {
+    const handleAction = () => {
         setModalOpen(false);
         resetModal();
     };
@@ -46,7 +48,7 @@ const ConfirmModalDivision= ({
             fullWidth={true}
             >
             <DialogTitle disableTypography id="state-change-dialog-title">
-                <h2 className="state-change-header">Deleting Divisions</h2>
+                <h2 className="state-change-header">{modalName}</h2>
                 <IconButton className="title-col3" onClick={handleClose}>
                     <i className="dialog-close-button">Close</i>
                     <CloseIcon />
@@ -67,10 +69,10 @@ const ConfirmModalDivision= ({
             <DialogActions>
                 <button
                 className={`btn-bottom btn-save btn`}
-                onClick={handleDelete}
+                onClick={handleAction}
                 disabled={isRecordsAssociated}
                 >
-                Delete
+                {actionName}
                 </button>
                 <button className="btn-bottom btn-cancel" onClick={handleClose}>
                 Cancel
