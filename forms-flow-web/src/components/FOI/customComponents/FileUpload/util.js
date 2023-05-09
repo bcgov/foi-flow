@@ -18,9 +18,14 @@ export const generateNewFileName = (newFileName, uploadFileName, attachedFileNam
   return newFileName;
 }
 
-export const getErrorMessage = (_duplicateFiles, _typeErrorFiles, _overSizedFiles, maxFileSize, multipleFiles, mimeTypes) => {
+export const getErrorMessage = (_duplicateFiles, _typeErrorFiles, _overSizedFiles, maxFileSize, multipleFiles, mimeTypes, recordUploadLimitReached, totalRecordUploadLimit) => {
   let _errorMessage = [];
   let singleFileUploadAllowedFileExtensions = "pdf, xlsx, docx";
+  console.log("recordUploadLimitReached", recordUploadLimitReached)
+  if(recordUploadLimitReached){
+    _errorMessage.push(<>The total size of all records uploaded can not exceed <b>{totalRecordUploadLimit > 1000 ? (totalRecordUploadLimit/ 1024).toFixed(2) +' GB': totalRecordUploadLimit +' MB'}</b>.</>);
+    return _errorMessage;
+  }
   if (mimeTypes.some(mimeType => mimeType === '.msg' || mimeType === '.eml')) {
     singleFileUploadAllowedFileExtensions = "pdf, xlsx, docx, msg, eml";
   }
