@@ -18,7 +18,7 @@ export const catchError = (error, dispatch) => {
 export const fnDone = (rest) => {
   return rest[0] ? rest[0] : () => {
     //This is intentional
-  };
+ };
 }
 
 export const postAttachment = (dispatch, apiUrl, data, requestId, ministryId, errorMessage, rest) => {
