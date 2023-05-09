@@ -88,7 +88,62 @@ class recordservice(recordservicebase):
             if record.get('outputdocumentmasterid', False):
                 streamobject['outputdocumentmasterid'] = record['outputdocumentmasterid']
             return eventqueueservice().add(streamkey, streamobject)
-        
+
+    def replace(self, _requestid, ministryrequestid, recordid, recordschema, userid):
+        _ministryrequest = FOIMinistryRequest.getrequestbyministryrequestid(ministryrequestid)
+        _ministryversion = FOIMinistryRequest.getversionforrequest(ministryrequestid)
+        recordlist = []
+        records = recordschema.get("records")
+        for _record in records:
+            record = FOIRequestRecord(foirequestid=_requestid, replacementof = recordid, ministryrequestid = ministryrequestid, ministryrequestversion=_ministryversion,
+                                version = 1, createdby = userid, created_at = datetime.now())
+            batch = str(uuid.uuid4())
+            _record['attributes']['batch'] = batch
+            _filepath, extension = path.splitext(_record['filename'])
+            _record['attributes']['extension'] = extension
+            print("extension",extension)
+            _record['attributes']['incompatible'] =  extension.lower() in NONREDACTABLE_FILE_TYPES 
+            record.__dict__.update(_record)
+            recordlist.append(record)      
+        dbresponse = FOIRequestRecord.replace(recordid,recordlist)
+        if (dbresponse.success):
+            processingrecords = [{**record, **{"recordid": dbresponse.args[0][record['s3uripath']]['recordid']}} for record in records]                      
+            # record all jobs before sending first redis stream message to avoid race condition
+            jobids, err = self.makedocreviewerrequest('POST', '/api/jobstatus', {
+                'records': processingrecords,
+                'batch': batch,
+                'trigger': 'recordupload',
+                'ministryrequestid': ministryrequestid
+            })
+            if err:
+                return DefaultMethodResult(False,'Error in contacting Doc Reviewer API', -1, ministryrequestid)
+            # send message to redis stream for each file
+            for entry in processingrecords:
+                _filename, extension = path.splitext(entry['s3uripath'])
+                extension = extension.lower()
+                if 'error' in jobids[entry['s3uripath']]:
+                    logging.error("Doc Reviewer API was given an unsupported file type - no job triggered - Record ID: {0} File Name: {1} ".format(entry['recordid'], entry['filename']))
+                else:
+                    streamobject = {
+                        "s3filepath": entry['s3uripath'],
+                        "requestnumber": _ministryrequest['axisrequestid'],
+                        "bcgovcode": _ministryrequest['programarea.bcgovcode'],
+                        "filename": entry['filename'],
+                        "ministryrequestid": ministryrequestid,
+                        "attributes": json.dumps(entry['attributes']),
+                        "batch": batch,
+                        "jobid": jobids[entry['s3uripath']]['jobid'],
+                        "documentmasterid": jobids[entry['s3uripath']]['masterid'],
+                        "trigger": 'recordupload',
+                        "createdby": userid,
+                        "incompatible": 'true' if extension in NONREDACTABLE_FILE_TYPES else 'false'
+                    }
+                    if extension in FILE_CONVERSION_FILE_TYPES:
+                        eventqueueservice().add(self.conversionstreamkey, streamobject)
+                    if extension in DEDUPE_FILE_TYPES:
+                        eventqueueservice().add(self.dedupestreamkey, streamobject)
+        return dbresponse
+
     def triggerpdfstitchservice(self, requestid, ministryrequestid, recordschema, userid):
         """Calls the BE job for stitching the documents.
         """
