@@ -47,7 +47,7 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 import CloseIcon from '@material-ui/icons/Close';
 import _ from 'lodash';
 import { DOC_REVIEWER_WEB_URL, RECORD_PROCESSING_HRS, OSS_S3_CHUNK_SIZE } from "../../../../constants/constants";
-import {removeDuplicateFiles, addDeduplicatedAttachmentsToRecords, getPDFFilePath, sortDivisionalFiles, calculateTotalFileSize, calculateTotalUploadedFileSizeInMB, convertBytesToGBOrMB} from "./util"
+import {removeDuplicateFiles, addDeduplicatedAttachmentsToRecords, getPDFFilePath, sortDivisionalFiles, calculateTotalFileSize, calculateTotalUploadedFileSizeInMB, getReadableFileSize} from "./util"
 import { readUploadedFileAsBytes } from '../../../../helper/FOI/helper';
 import { TOTAL_RECORDS_UPLOAD_LIMIT } from "../../../../constants/constants";
 //import {convertBytesToMB} from "../../../../components/FOI/customComponents/FileUpload/util";
@@ -762,8 +762,8 @@ export const RecordsLog = ({
             </Grid>
             <Grid item xs={7}>
               <span style={{float:'right', fontWeight:'bold'}}>
-              <div style={{paddingBottom: '5px'}}>Total Uploaded Size : {totalUploadedRecordSize > 1000 ? (totalUploadedRecordSize/ 1024).toFixed(2) +' GB': totalUploadedRecordSize +' MB'}</div>
-              <div>Total Upload Limit : {TOTAL_RECORDS_UPLOAD_LIMIT > 1000 ? (TOTAL_RECORDS_UPLOAD_LIMIT/ 1024).toFixed(2) +' GB': TOTAL_RECORDS_UPLOAD_LIMIT +' MB'}</div>
+              <div style={{paddingBottom: '5px'}}>Total Uploaded Size : {getReadableFileSize(totalUploadedRecordSize)}</div>
+              <div>Total Upload Limit : {getReadableFileSize(TOTAL_RECORDS_UPLOAD_LIMIT)}</div>
               </span>
             </Grid>
           </Grid>

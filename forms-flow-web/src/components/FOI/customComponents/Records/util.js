@@ -45,8 +45,12 @@ export const calculateTotalUploadedFileSizeInMB = (records) => {
     }, 0);
 }
 
-export const convertBytesToGBOrMB = (_bytes) => {
-    if((_bytes / (1024 * 1024)).toFixed(2) > 1000)
-        return (_bytes / (1024 * 1024 * 1024)).toFixed(2)+ ' GB';
-    return (_bytes / (1024 * 1024)).toFixed(2)+ ' MB';
+export const getReadableFileSize = (mb) => {
+    if (mb < 1) {
+        return (mb * 1024).toFixed(2) + ' KB'
+    } else if (mb > 1000) {
+        return (mb/ 1024).toFixed(2) + ' GB'
+    } else {
+        return mb.toFixed() + ' MB'
+    }
   }
