@@ -26,7 +26,7 @@ class FOIRequestRecord(db.Model):
     updated_at = db.Column(db.DateTime, nullable=True)
     updatedby = db.Column(db.String(120), unique=False, nullable=True)
     isactive = db.Column(db.Boolean, unique=False, nullable=False,default=True)
-
+    replacementof = db.Column(db.Integer, unique=False, nullable=False)
 
     @classmethod
     def create(cls, records):
@@ -66,7 +66,19 @@ class FOIRequestRecord(db.Model):
         comment_schema = FOIRequestRecordSchema(many=False)
         query = db.session.query(FOIRequestRecord).filter_by(recordid=recordid).order_by(FOIRequestRecord.version.desc()).first()
         return comment_schema.dump(query)
-
+    
+    @classmethod
+    def replace(cls,replacingrecordid,records):
+        replacingrecord = db.session.query(FOIRequestRecord).filter_by(recordid=replacingrecordid).order_by(FOIRequestRecord.version.desc()).first()
+        replacingrecord.isactive=False
+        db.session.commit()
+        db.session.add_all(records)
+        db.session.commit() 
+        _recordids = {}
+        for record in records:
+            _recordids[record.s3uripath] = {"filename": record.filename, "recordid": record.recordid}
+        return DefaultMethodResult(True,'Records replaced', -1, _recordids)
+    
     @classmethod
     def getbatchcount(cls, ministryrequestid):
         batchcount = 0
@@ -90,4 +102,4 @@ class FOIRequestRecord(db.Model):
 
 class FOIRequestRecordSchema(ma.Schema):
     class Meta:
-        fields = ('recordid','version','foirequestid','ministryrequestid','ministryrequestversion','attributes','filename','s3uripath','created_at','createdby','updated_at','updatedby')
+        fields = ('recordid','version','foirequestid','ministryrequestid','ministryrequestversion','attributes','filename','s3uripath','created_at','createdby','updated_at','updatedby','replacementof')
