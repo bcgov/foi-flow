@@ -14,6 +14,7 @@ import FileUpload from '../FileUpload';
 import { makeStyles } from '@material-ui/core/styles';
 import { MimeTypeList, MaxFileSizeInMB } from "../../../../constants/FOI/enum";
 import { StateTransitionCategories, AttachmentCategories } from '../../../../constants/FOI/statusEnum';
+import { TOTAL_RECORDS_UPLOAD_LIMIT } from "../../../../constants/constants";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -53,7 +54,8 @@ export default function AttachmentModal({
   maxNoFiles,
   bcgovcode,
   existingDocuments=[],
-  divisions=[]
+  divisions=[],
+  totalUploadedRecordSize=0
 }) {
 
     let tagList = [];
@@ -89,6 +91,8 @@ export default function AttachmentModal({
     const [errorMessage, setErrorMessage] = useState();
     const [tagValue, setTagValue] = useState(uploadFor === 'record' ? "" : "general");
     const attchmentFileNameList = attachmentsArray.map(_file => _file.filename.toLowerCase());
+    const totalRecordUploadLimit= TOTAL_RECORDS_UPLOAD_LIMIT ;
+    const [recordUploadError, setRecordUploadError] = useState(true);
 
     useEffect(() => {
       parseFileName(attachment);
@@ -150,6 +154,10 @@ export default function AttachmentModal({
 
     const updateFilesCb = (_files, _errorMessage) => {
       setFiles(_files);
+      if(_errorMessage?.length > 0)
+        setRecordUploadError(true);
+      else
+        setRecordUploadError(false);
     }
     const handleClose = () => {
         if ((files.length > 0 && files !== existingDocuments) || (modalFor === 'rename' && attachment.filename !== (newFilename+"."+extension))) {
@@ -255,7 +263,10 @@ export default function AttachmentModal({
       } else if (files.length === 0 && existingDocuments.length === 0) {
         return true;
       } else if (modalFor === 'add') {
-        return tagValue === "";
+        if(recordUploadError)
+          return true;
+        else
+          return tagValue === "";
       } else if (modalFor === 'replace') {
         return false;
       }
@@ -302,6 +313,8 @@ export default function AttachmentModal({
                   maxNumberOfFiles={maxNoFiles}
                   isMinistryCoordinator={isMinistryCoordinator}
                   existingDocuments={existingDocuments}
+                  totalUploadedRecordSize={totalUploadedRecordSize}
+                  totalRecordUploadLimit={totalRecordUploadLimit}
                 /> 
                 :
                 <ModalForRename modalFor={modalFor} newFilename={newFilename} updateFilename={updateFilename} errorMessage={errorMessage} extension={extension} />

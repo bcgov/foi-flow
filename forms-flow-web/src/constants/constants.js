@@ -48,6 +48,10 @@ export const OSS_S3_CHUNK_SIZE =
   (window._env_ && window._env_.REACT_APP_OSS_S3_CHUNK_SIZE) ||
   process.env.REACT_APP_OSS_S3_CHUNK_SIZE || 104857600;
 
+export const TOTAL_RECORDS_UPLOAD_LIMIT =
+  (window._env_ && window._env_.REACT_APP_TOTAL_RECORDS_UPLOAD_LIMIT) ||
+  process.env.REACT_APP_TOTAL_RECORDS_UPLOAD_LIMIT || 2048;
+
 
 export const FOI_FFA_URL =  (window._env_ && window._env_.FOI_FFA_URL) ||
 process.env.FOI_FFA_URL || "http://localhost:4000";

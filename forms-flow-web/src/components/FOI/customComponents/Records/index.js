@@ -47,8 +47,10 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 import CloseIcon from '@material-ui/icons/Close';
 import _ from 'lodash';
 import { DOC_REVIEWER_WEB_URL, RECORD_PROCESSING_HRS, OSS_S3_CHUNK_SIZE } from "../../../../constants/constants";
-import {removeDuplicateFiles, addDeduplicatedAttachmentsToRecords, getPDFFilePath, sortDivisionalFiles, calculateTotalFileSize} from "./util"
+import {removeDuplicateFiles, addDeduplicatedAttachmentsToRecords, getPDFFilePath, sortDivisionalFiles, calculateTotalFileSize, calculateTotalUploadedFileSizeInMB, getReadableFileSize} from "./util"
 import { readUploadedFileAsBytes } from '../../../../helper/FOI/helper';
+import { TOTAL_RECORDS_UPLOAD_LIMIT } from "../../../../constants/constants";
+//import {convertBytesToMB} from "../../../../components/FOI/customComponents/FileUpload/util";
 
 
 const useStyles = makeStyles((_theme) => ({
@@ -163,9 +165,11 @@ export const RecordsLog = ({
   );  
   const classes = useStyles();
   const [records, setRecords] = useState(recordsObj?.records);
-
+  const [totalUploadedRecordSize, setTotalUploadedRecordSize] = useState(0);
   useEffect(() => {
     setRecords(recordsObj?.records)
+    let nonDuplicateRecords = recordsObj?.records.filter(record => !record.isduplicate)
+    setTotalUploadedRecordSize(calculateTotalUploadedFileSizeInMB(nonDuplicateRecords)/ (1024 * 1024).toFixed(4));
     dispatch(checkForRecordsChange(requestId, ministryId))
   }, [recordsObj])
 
@@ -774,10 +778,16 @@ export const RecordsLog = ({
             alignItems="flex-start"
             spacing={1}
           >
-            <Grid item xs={6}>
+            <Grid item xs={5}>
               <h1 className="foi-review-request-text foi-ministry-requestheadertext foi-records-request-text">
                 {getRequestNumber()}
               </h1>
+            </Grid>
+            <Grid item xs={7}>
+              <span style={{float:'right', fontWeight:'bold'}}>
+              <div style={{paddingBottom: '5px'}}>Total Uploaded Size : {getReadableFileSize(totalUploadedRecordSize)}</div>
+              <div>Total Upload Limit : {getReadableFileSize(TOTAL_RECORDS_UPLOAD_LIMIT)}</div>
+              </span>
             </Grid>
           </Grid>
           <Grid
@@ -891,6 +901,8 @@ export const RecordsLog = ({
                   </button>
                 </a>)
               }
+             
+
             </Grid>
             <Grid
               container
@@ -1070,6 +1082,7 @@ export const RecordsLog = ({
             uploadFor={"record"}
             bcgovcode={bcgovcode}
             divisions={divisions.filter(d => d.divisionname.toLowerCase() !== 'communications')}
+            totalUploadedRecordSize={totalUploadedRecordSize}
           />
           <div className="state-change-dialog">
             <Dialog
