@@ -288,6 +288,7 @@ export const RecordsLog = ({
                     lastmodified: _file.lastModifiedDate,
                     filesize: _file.size
                   },
+                  replacementof:replaceRecord['replacementof'] == null || replaceRecord['replacementof']==''? replaceRecord['recordid'] : replaceRecord['replacementof'] ,
                   s3uripath: header.filepathdb,
                   trigger: 'recordreplace',
                   service: 'deduplication'

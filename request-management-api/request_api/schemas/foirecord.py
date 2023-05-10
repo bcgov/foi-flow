@@ -98,7 +98,7 @@ class FOIRequestReplaceRecordSchema(Schema):
     replacementfilename = fields.Str(data_key="replacementfilename",allow_none=False, validate=[validate.Length(max=500, error=MAX_EXCEPTION_MESSAGE)])
     trigger = fields.Str(data_key="trigger",validate=validate.OneOf(['recordreplace', 'recordretry']),allow_none=False)
     service = fields.Str(data_key="service",validate=validate.OneOf(['deduplication', 'conversion']),allow_none=False)
-
+    replacementof = fields.Str(data_key="replacementof",allow_none=True)
     
 
 class FOIRequestBulkRetryRecordSchema(Schema):
