@@ -30,7 +30,9 @@ const FileUpload = ({
     tagValue,
     tagList = [],
     isMinistryCoordinator,
-    uploadFor="attachment"
+    uploadFor="attachment",
+    totalUploadedRecordSize,
+    totalRecordUploadLimit
 }) => {
     const fileInputField = useRef(null);
     const [files, setFiles] = useState({ ...existingDocuments });    
@@ -84,6 +86,7 @@ const FileUpload = ({
       let _typeErrorFiles = [];
       let _overSizedFiles = [];
       let removeFileSize = 0;
+      let recordUploadLimitReached = false;
         for (let file of newFiles) {
           file.filename = file.name;
           const sizeInMB = convertBytesToMB(file.size);
@@ -92,15 +95,21 @@ const FileUpload = ({
           if (allowedFileType(file, mimeTypes)) {
             if (allowedFileSize(_totalFileSizeInMB, multipleFiles, totalFileSize)) {
               if (sizeInMB <= maxFileSize) {
+                if (totalUploadedRecordSize > 0) {
+                  if (_totalFileSizeInMB + totalUploadedRecordSize <= totalRecordUploadLimit) {
+                    recordUploadLimitReached = false;
+                  } else {
+                    recordUploadLimitReached = true;
+                    _totalFileSizeInMB -= parseFloat(sizeInMB);
+                  }
+                }
                 const duplicateFileName = handleDuplicateFiles(file);
-            _duplicateFiles.push(duplicateFileName);
+                _duplicateFiles.push(duplicateFileName);
+              } else {
+                  _totalFileSizeInMB -= parseFloat(sizeInMB);
+                  _overSizedFiles.push(file.name);
               }
-              else {
-                _totalFileSizeInMB -= parseFloat(sizeInMB);
-                _overSizedFiles.push(file.name);
-              }
-            }
-            else {
+            } else {
               removeFileSize = convertBytesToMB(file.size);
             }
           }
@@ -109,7 +118,7 @@ const FileUpload = ({
           }
         }
         setTotalFileSize(_totalFileSizeInMB);
-        setErrorMessage(getErrorMessage(_duplicateFiles, _typeErrorFiles, _overSizedFiles, maxFileSize, multipleFiles, mimeTypes));
+        setErrorMessage(getErrorMessage(_duplicateFiles, _typeErrorFiles, _overSizedFiles, maxFileSize, multipleFiles, mimeTypes, recordUploadLimitReached, totalRecordUploadLimit));
         return [{...files}, _totalFileSizeInMB, removeFileSize];
     };
 
@@ -119,6 +128,7 @@ const FileUpload = ({
     };
 
     const validateFiles = (newFiles, totalFiles) => {
+      
       if (multipleFiles && maxNumberOfFiles && (newFiles.length > maxNumberOfFiles  || totalFiles > maxNumberOfFiles)) {
         setErrorMessage([`A maximum of ${maxNumberOfFiles} files can be uploaded at one time. Only ${maxNumberOfFiles} files have been added on this upload window, please upload additional files separately`]);
       } else if (!multipleFiles && totalFiles > 1) {
