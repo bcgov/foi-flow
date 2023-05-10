@@ -4,7 +4,7 @@ import './records.scss'
 import { useDispatch, useSelector } from "react-redux";
 import AttachmentModal from '../Attachments/AttachmentModal';
 import Loading from "../../../../containers/Loading";
-import { getOSSHeaderDetails, saveFilesinS3, getFileFromS3, postFOIS3DocumentPreSignedUrl, getFOIS3DocumentPreSignedUrl } from "../../../../apiManager/services/FOI/foiOSSServices";
+import { getOSSHeaderDetails, saveFilesinS3, getFileFromS3, postFOIS3DocumentPreSignedUrl, getFOIS3DocumentPreSignedUrl, completeMultiPartUpload } from "../../../../apiManager/services/FOI/foiOSSServices";
 import { saveFOIRequestAttachmentsList, replaceFOIRequestAttachment, saveNewFilename, deleteFOIRequestAttachment } from "../../../../apiManager/services/FOI/foiAttachmentServices";
 import { fetchFOIRecords, saveFOIRecords, deleteFOIRecords, retryFOIRecordProcessing, deleteReviewerRecords, getRecordFormats, triggerDownloadFOIRecordsForHarms, fetchPDFStitchedRecordForHarms, checkForRecordsChange } from "../../../../apiManager/services/FOI/foiRecordServices";
 import { StateTransitionCategories, AttachmentCategories } from '../../../../constants/FOI/statusEnum'
@@ -46,8 +46,9 @@ import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import CloseIcon from '@material-ui/icons/Close';
 import _ from 'lodash';
-import { DOC_REVIEWER_WEB_URL, RECORD_PROCESSING_HRS } from "../../../../constants/constants";
-import {removeDuplicateFiles, addDeduplicatedAttachmentsToRecords, getPDFFilePath, sortDivisionalFiles} from "./util"
+import { DOC_REVIEWER_WEB_URL, RECORD_PROCESSING_HRS, OSS_S3_CHUNK_SIZE } from "../../../../constants/constants";
+import {removeDuplicateFiles, addDeduplicatedAttachmentsToRecords, getPDFFilePath, sortDivisionalFiles, calculateTotalFileSize} from "./util"
+import { readUploadedFileAsBytes } from '../../../../helper/FOI/helper';
 
 
 const useStyles = makeStyles((_theme) => ({
@@ -267,7 +268,7 @@ export const RecordsLog = ({
         if (modalFor === 'replace') {
           fileInfoList[0].filepath = updateAttachment.s3uripath.substr(0, updateAttachment.s3uripath.lastIndexOf(".")) + ".pdf";
         }
-        postFOIS3DocumentPreSignedUrl(ministryId, fileInfoList, 'records', bcgovcode, dispatch, async (err, res) => {
+        postFOIS3DocumentPreSignedUrl(ministryId, fileInfoList.map(file => ({...file, multipart: true})), 'records', bcgovcode, dispatch, async (err, res) => {
           let _documents = [];
           if (!err) {
             var completed = 0;
@@ -292,16 +293,32 @@ export const RecordsLog = ({
                     filesize: _file.size
                   }
                 };
-              await saveFilesinS3(header, _file, dispatch, (_err, _res) => {
-                if (!_err && _res === 200) {
+              let bytes = await readUploadedFileAsBytes(_file)
+              const CHUNK_SIZE = OSS_S3_CHUNK_SIZE;
+              const totalChunks = Math.ceil(bytes.byteLength / CHUNK_SIZE);
+              let parts = [];
+              for (let chunk = 0; chunk < totalChunks; chunk++) {
+                let CHUNK = bytes.slice(chunk * CHUNK_SIZE, (chunk + 1) * CHUNK_SIZE);
+                let response = await saveFilesinS3({filepath: header.filepaths[chunk]}, CHUNK, dispatch, (_err, _res) => {
+                  if (_err) {
+                    failed.push(header.filename);
+                  }
+                })
+                if (response.status === 200) {
+                  parts.push({PartNumber: chunk + 1, ETag: response.headers.etag})
+                } else {
+                  failed.push(header.filename);
+                }
+              }
+              await completeMultiPartUpload({uploadid: header.uploadid, filepath: header.filepathdb, parts: parts}, ministryId, 'records', bcgovcode, dispatch, (_err, _res) => {
+                if (!_err && _res.ResponseMetadata.HTTPStatusCode === 200) {
                   completed++;
                   toast.update(toastID, {
                     render: "Uploading files (" + completed + "/" + fileInfoList.length + ")",
                     isLoading: true,
                   })
                   _documents.push(documentDetails);
-                }
-                else {
+                } else {
                   failed.push(header.filename);
                 }
               })
@@ -348,11 +365,29 @@ export const RecordsLog = ({
       s3filepath = s3filepath.substr(0, s3filepath.lastIndexOf(".")) + ".pdf";
       filename = filename + ".pdf";
     }
+    const toastID = toast.loading("Downloading file (0%)")
     getFOIS3DocumentPreSignedUrl(s3filepath.split('/').slice(4).join('/'), ministryId, dispatch, (err, res) => {
       if (!err) {
         getFileFromS3({filepath: res}, (_err, response) => {
           let blob = new Blob([response.data], {type: "application/octet-stream"});
           saveAs(blob, filename)
+          toast.update(toastID, {
+            render: _err ? "File download failed" : "Download complete",
+            type: _err ? "error" : "success",
+            className: "file-upload-toast",
+            isLoading: false,
+            autoClose: 3000,
+            hideProgressBar: true,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            closeButton: true
+          });
+        }, (progressEvent) => {
+          toast.update(toastID, {
+            render: "Downloading file (" + Math.floor(progressEvent.loaded / progressEvent.total * 100) + "%)",
+            isLoading: true,
+          })
         });
       }
     }, 'records', bcgovcode);
@@ -379,17 +414,6 @@ export const RecordsLog = ({
       const s3filepath = pdfStitchedRecord?.finalpackagepath
       const filename = requestNumber + ".zip"
       try {
-        toast.info("Download In progress. Please check your Download folder after some time.", {
-          position: "top-right",
-          autoClose: 3000,
-          hideProgressBar: true,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "colored",
-          backgroundColor: "#FFA500"
-        });  
         downloadZipFile(s3filepath, filename);
       }
       catch (error) {
@@ -401,10 +425,28 @@ export const RecordsLog = ({
   }
 
   const downloadZipFile = async (s3filepath, filename) => {
+      const toastID = toast.loading("Downloading file (0%)")
       const response = await getFOIS3DocumentPreSignedUrl(s3filepath.split('/').slice(4).join('/'), ministryId, dispatch, null, 'records', bcgovcode)
       await getFileFromS3({filepath: response.data}, (_err, res) => {
           let blob = new Blob([res.data], {type: "application/octet-stream"});
           saveAs(blob, filename)
+          toast.update(toastID, {
+            render: _err ? "File download failed" : "Download complete",
+            type: _err ? "error" : "success",
+            className: "file-upload-toast",
+            isLoading: false,
+            autoClose: 3000,
+            hideProgressBar: true,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            closeButton: true
+          });
+        }, (progressEvent) => {
+          toast.update(toastID, {
+            render: "Downloading file (" + Math.floor(progressEvent.loaded / progressEvent.total * 100) + "%)",
+            isLoading: true,
+          })
         });
   }
 
@@ -457,7 +499,6 @@ export const RecordsLog = ({
       if (!divisions) {
         continue;
       }
-    
       // Loop through each division in the item
       for (const division of divisions) {
         // Get the division ID and name
@@ -469,18 +510,24 @@ export const RecordsLog = ({
           divisionMap.set(divisionId, {
             divisionid: divisionId,
             divisionname: divisionName,
-            files: []
+            files: [],
+            divisionfilesize: 0
           });
         }
     
         // Add the item to the files array for this division
         const files = divisionMap.get(divisionId).files;
-        files.push({
-          lastmodified: item.attributes ? item.attributes.lastmodified : null,
+        const convertedFileSize = parseFloat(item.attributes?.convertedfilesize) || 0
+        const fileSize = parseFloat(item.attributes?.filesize) || 0
+        const fileAttrs = {
+          lastmodified: item.attributes?.lastmodified,
           recordid: item.recordid,
           s3uripath: filepath,
-          filename: filename
-        });
+          filename,
+          filesize: convertedFileSize || fileSize
+        };
+        files.push(fileAttrs);
+        divisionMap.get(divisionId).divisionfilesize += fileAttrs.filesize; // add file size to division total
       }
     }
  
@@ -488,12 +535,13 @@ export const RecordsLog = ({
     const sortedDivisions = sortDivisionalFiles(divisionMap);
 
     message.attributes = sortedDivisions;
+    message.totalfilesize = calculateTotalFileSize(sortedDivisions); // calculate total size for whole message
     //keeping this for testing purpose.
     console.log(`message = ${JSON.stringify(message)}`);
 
     return message;
 
-  }
+  } 
 
 
   const toastError = (error) => {

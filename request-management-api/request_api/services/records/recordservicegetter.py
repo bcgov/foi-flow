@@ -2,7 +2,7 @@
 from os import stat, path,getenv
 from request_api.models.FOIRequestRecords import FOIRequestRecord
 from request_api.models.FOIMinistryRequests import FOIMinistryRequest
-from request_api.models.FOIMinistryRequestDivisions import FOIMinistryRequestDivision
+from request_api.models.ProgramAreaDivisions import ProgramAreaDivision
 import json
 from datetime import datetime
 import maya
@@ -18,8 +18,8 @@ class recordservicegetter(recordservicebase):
     def fetch(self, requestid, ministryrequestid):
         result = {'dedupedfiles': 0, 'convertedfiles': 0, 'removedfiles': 0}
         try:
-            _ministryversion = FOIMinistryRequest.getversionforrequest(ministryrequestid)
-            divisions = FOIMinistryRequestDivision.getdivisions(ministryrequestid, _ministryversion)
+            _metadata = FOIMinistryRequest.getmetadata(ministryrequestid)
+            divisions = ProgramAreaDivision.getprogramareadivisions(_metadata["programareaid"])
             uploadedrecords = FOIRequestRecord.fetch(requestid, ministryrequestid)
             batchids = []
             resultrecords = []
@@ -183,6 +183,6 @@ class recordservicegetter(recordservicebase):
     
     def __getdivisionname(self, divisions, divisionid):
         for division in divisions:
-            if division['division.divisionid'] == divisionid:
-                return division['division.name']
+            if division['divisionid'] == divisionid:
+                return division['name']
         return None

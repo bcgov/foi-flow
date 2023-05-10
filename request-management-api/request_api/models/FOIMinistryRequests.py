@@ -97,7 +97,7 @@ class FOIMinistryRequest(db.Model):
 
     @classmethod
     def getrequest(cls,ministryrequestid):
-        request_schema = FOIMinistryRequestSchema(many=True)
+        request_schema = FOIMinistryRequestSchema(many=False)
         query = db.session.query(FOIMinistryRequest).filter_by(foiministryrequestid=ministryrequestid).order_by(FOIMinistryRequest.version.desc()).first()
         return request_schema.dump(query)
 
@@ -1232,8 +1232,8 @@ class FOIMinistryRequest(db.Model):
     def getmetadata(cls,ministryrequestid):
         requestdetails = {}
         try:
-            sql = """select version, assignedto, fa.firstname, fa.lastname, pa.bcgovcode from "FOIMinistryRequests" fmr 
-                    INNER JOIN "FOIAssignees" fa ON fa.username = fmr.assignedto
+            sql = """select version, assignedto, fa.firstname, fa.lastname, pa.bcgovcode, fmr.programareaid from "FOIMinistryRequests" fmr 
+                    FULL OUTER JOIN "FOIAssignees" fa ON fa.username = fmr.assignedto
                     INNER JOIN "ProgramAreas" pa ON pa.programareaid = fmr.programareaid
                     where foiministryrequestid = :ministryrequestid
                     order by version desc limit 1;"""
@@ -1243,6 +1243,8 @@ class FOIMinistryRequest(db.Model):
                 requestdetails["assignedToFirstName"] = row["firstname"]
                 requestdetails["assignedToLastName"] = row["lastname"]
                 requestdetails["bcgovcode"] = row["bcgovcode"]
+                requestdetails["version"] = row["version"]
+                requestdetails["programareaid"] = row["programareaid"]
         except Exception as ex:
             logging.error(ex)
             raise ex
