@@ -6,7 +6,7 @@ import AttachmentModal from '../Attachments/AttachmentModal';
 import Loading from "../../../../containers/Loading";
 import { getOSSHeaderDetails, saveFilesinS3, getFileFromS3, postFOIS3DocumentPreSignedUrl, getFOIS3DocumentPreSignedUrl, completeMultiPartUpload } from "../../../../apiManager/services/FOI/foiOSSServices";
 import { saveFOIRequestAttachmentsList, replaceFOIRequestAttachment, saveNewFilename, deleteFOIRequestAttachment } from "../../../../apiManager/services/FOI/foiAttachmentServices";
-import { fetchFOIRecords, saveFOIRecords, deleteFOIRecords, retryFOIRecordProcessing, deleteReviewerRecords, getRecordFormats, triggerDownloadFOIRecordsForHarms, fetchPDFStitchedRecordForHarms, checkForRecordsChange } from "../../../../apiManager/services/FOI/foiRecordServices";
+import { fetchFOIRecords, saveFOIRecords, deleteFOIRecords, retryFOIRecordProcessing,replaceFOIRecordProcessing, deleteReviewerRecords, getRecordFormats, triggerDownloadFOIRecordsForHarms, fetchPDFStitchedRecordForHarms, checkForRecordsChange } from "../../../../apiManager/services/FOI/foiRecordServices";
 import { StateTransitionCategories, AttachmentCategories } from '../../../../constants/FOI/statusEnum'
 import { RecordsDownloadList, RecordDownloadCategory } from '../../../../constants/FOI/enum';
 import { addToFullnameList, getFullnameList, ConditionalComponent, isrecordtimeout } from '../../../../helper/FOI/helper';
@@ -188,6 +188,7 @@ export const RecordsLog = ({
   const [isAttachmentLoading, setAttachmentLoading] = useState(false);
   const [multipleFiles, setMultipleFiles] = useState(true);
   const [modalFor, setModalFor] = useState("add");
+  const [replaceRecord, setreplaceRecord] = useState({});
   const [updateAttachment, setUpdateAttachment] = useState({});
   const [searchValue, setSearchValue] = useState("");
   const [filterValue, setFilterValue] = useState(-1);
@@ -262,12 +263,13 @@ export const RecordsLog = ({
   }
 
   const saveDocument = (value, fileInfoList, files) => {
+    
     if (value) {
       if (files.length !== 0) {
         setRecordsUploading(true)
-        if (modalFor === 'replace') {
-          fileInfoList[0].filepath = updateAttachment.s3uripath.substr(0, updateAttachment.s3uripath.lastIndexOf(".")) + ".pdf";
-        }
+        // if (modalFor === 'replace') {
+        //   fileInfoList[0].filepath = updateAttachment.s3uripath.substr(0, updateAttachment.s3uripath.lastIndexOf(".")) + ".pdf";
+        // }
         postFOIS3DocumentPreSignedUrl(ministryId, fileInfoList.map(file => ({...file, multipart: true})), 'records', bcgovcode, dispatch, async (err, res) => {
           let _documents = [];
           if (!err) {
@@ -279,7 +281,13 @@ export const RecordsLog = ({
               const _fileInfo = fileInfoList.find(fileInfo => fileInfo.filename === header.filename);
               const documentDetails = modalFor === 'replace' ?
                 {
-                  ...updateAttachment,
+                  //...updateAttachment,
+                  filename: header.filename,
+                  attributes:{
+                    divisions:replaceRecord['attributes']['divisions'],
+                    lastmodified: _file.lastModifiedDate,
+                    filesize: _file.size
+                  },
                   s3uripath: header.filepathdb,
                   trigger: 'recordreplace',
                   service: 'deduplication'
@@ -325,9 +333,15 @@ export const RecordsLog = ({
             }
             if (_documents.length > 0) {
               if (modalFor === 'replace') {
-                dispatch(retryFOIRecordProcessing(requestId, ministryId, {records: _documents},(err, _res) => {
-                    dispatchRequestAttachment(err);
-                }));
+                
+                // dispatch(retryFOIRecordProcessing(requestId, ministryId, {records: _documents},(err, _res) => {
+                //     dispatchRequestAttachment(err);
+                // }));
+                
+                dispatch(replaceFOIRecordProcessing(requestId, ministryId,replaceRecord.recordid, {records: _documents},(err, _res) => {
+                  dispatchRequestAttachment(err);
+              }));
+
               } else {
                 dispatch(saveFOIRecords(requestId, ministryId, {records: _documents},(err, _res) => {
                     dispatchRequestAttachment(err);
@@ -619,6 +633,7 @@ export const RecordsLog = ({
     setMultipleFiles(false);
     switch (action) {
       case "replace":
+        setreplaceRecord(_record)
         setModalFor("replace");
         setModal(true);
         break;
@@ -1399,7 +1414,7 @@ const AttachmentPopup = React.memo(({indexValue, record, handlePopupButtonClick,
             View
           </MenuItem>
           :""}
-          {!record.isredactionready && record.failed && <MenuItem
+          { <MenuItem
             onClick={() => {
                 handleReplace();
                 setPopoverOpen(false);
