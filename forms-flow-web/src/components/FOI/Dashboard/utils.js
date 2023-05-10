@@ -8,6 +8,8 @@ import { StateEnum } from "../../../constants/FOI/statusEnum";
 import Chip from "@mui/material/Chip";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFlag } from '@fortawesome/free-solid-svg-icons'; 
+import Tooltip, { tooltipClasses } from '@mui/material/Tooltip';
+import { styled } from '@mui/material/styles';
 
 export const debounce = (func, wait) => {
   let timeout;
@@ -208,3 +210,23 @@ export const displayHeaderIcon = (params) => {
   );
 };
 
+export const LightTooltip = styled(({ className, ...props }) => (
+  <Tooltip {...props} classes={{ popper: className }} />
+))(({ theme }) => ({
+  [`& .${tooltipClasses.tooltip}`]: {
+    backgroundColor: theme.palette.common.white,
+    color: 'rgba(0, 0, 0, 0.87)',
+    boxShadow: theme.shadows[1],
+    fontSize: 13,
+  },
+}));
+
+export const cellTooltipRender = (params) => (
+  <LightTooltip placement="bottom-start" title={
+    <div style={{whiteSpace: "pre-line"}}>
+      {params.row.description + "\n(" + (new Date(params.row.fromdate)).toLocaleDateString() + " to " + (new Date(params.row.todate)).toLocaleDateString() + ")"}
+    </div>
+  }>
+    <span className="table-cell-truncate">{params.row.axisRequestId}</span>
+  </LightTooltip>
+);
