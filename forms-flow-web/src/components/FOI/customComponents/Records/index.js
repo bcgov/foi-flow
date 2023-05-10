@@ -365,11 +365,29 @@ export const RecordsLog = ({
       s3filepath = s3filepath.substr(0, s3filepath.lastIndexOf(".")) + ".pdf";
       filename = filename + ".pdf";
     }
+    const toastID = toast.loading("Downloading file (0%)")
     getFOIS3DocumentPreSignedUrl(s3filepath.split('/').slice(4).join('/'), ministryId, dispatch, (err, res) => {
       if (!err) {
         getFileFromS3({filepath: res}, (_err, response) => {
           let blob = new Blob([response.data], {type: "application/octet-stream"});
           saveAs(blob, filename)
+          toast.update(toastID, {
+            render: _err ? "File download failed" : "Download complete",
+            type: _err ? "error" : "success",
+            className: "file-upload-toast",
+            isLoading: false,
+            autoClose: 3000,
+            hideProgressBar: true,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            closeButton: true
+          });
+        }, (progressEvent) => {
+          toast.update(toastID, {
+            render: "Downloading file (" + Math.floor(progressEvent.loaded / progressEvent.total * 100) + "%)",
+            isLoading: true,
+          })
         });
       }
     }, 'records', bcgovcode);
@@ -396,17 +414,6 @@ export const RecordsLog = ({
       const s3filepath = pdfStitchedRecord?.finalpackagepath
       const filename = requestNumber + ".zip"
       try {
-        toast.info("Download In progress. Please check your Download folder after some time.", {
-          position: "top-right",
-          autoClose: 3000,
-          hideProgressBar: true,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "colored",
-          backgroundColor: "#FFA500"
-        });  
         downloadZipFile(s3filepath, filename);
       }
       catch (error) {
@@ -418,10 +425,28 @@ export const RecordsLog = ({
   }
 
   const downloadZipFile = async (s3filepath, filename) => {
+      const toastID = toast.loading("Downloading file (0%)")
       const response = await getFOIS3DocumentPreSignedUrl(s3filepath.split('/').slice(4).join('/'), ministryId, dispatch, null, 'records', bcgovcode)
       await getFileFromS3({filepath: response.data}, (_err, res) => {
           let blob = new Blob([res.data], {type: "application/octet-stream"});
           saveAs(blob, filename)
+          toast.update(toastID, {
+            render: _err ? "File download failed" : "Download complete",
+            type: _err ? "error" : "success",
+            className: "file-upload-toast",
+            isLoading: false,
+            autoClose: 3000,
+            hideProgressBar: true,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            closeButton: true
+          });
+        }, (progressEvent) => {
+          toast.update(toastID, {
+            render: "Downloading file (" + Math.floor(progressEvent.loaded / progressEvent.total * 100) + "%)",
+            isLoading: true,
+          })
         });
   }
 

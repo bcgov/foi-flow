@@ -88,7 +88,8 @@ import {
         "X-Amz-Date": headerDetails.amzdate,
         Authorization: headerDetails.authheader,     
       },
-      responseType: 'blob'
+      responseType: 'blob',
+      onDownloadProgress: rest[1]
     };  
     return httpOSSGETRequest(headerDetails.filepath, requestOptions)
       .then((res, dispatch) => {

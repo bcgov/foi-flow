@@ -215,31 +215,81 @@ export const AttachmentSection = ({
   }
 
   const downloadDocument = (file) => {
+    const toastID = toast.loading("Downloading file (0%)")
     getFOIS3DocumentPreSignedUrl(file.documentpath.split('/').slice(4).join('/'), ministryId, dispatch, (err, res) => {
       if (!err) {
         getFileFromS3({filepath: res}, (_err, response) => {
           let blob = new Blob([response.data], {type: "application/octet-stream"});
           saveAs(blob, file.filename)
+          toast.update(toastID, {
+            render: _err ? "File download failed" : "Download complete",
+            type: _err ? "error" : "success",
+            className: "file-upload-toast",
+            isLoading: false,
+            autoClose: 3000,
+            hideProgressBar: true,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            closeButton: true
+          });
+        }, (progressEvent) => {
+          toast.update(toastID, {
+            render: "Downloading file (" + Math.floor(progressEvent.loaded / progressEvent.total * 100) + "%)",
+            isLoading: true,
+          })
         });
       }
     }, 'attachments', bcgovcode);
   }
 
   const downloadAllDocuments = async () => {
+    const noOfFiles = attachmentsForDisplay.length;
+    const toastID = toast.loading("Downloading file 0% (0/" + noOfFiles + ")");
     let blobs = [];
+    let failed = 0;
     try {
       for (let attachment of attachmentsForDisplay) {
         const response = await getFOIS3DocumentPreSignedUrl(attachment.documentpath.split('/').slice(4).join('/'), ministryId, dispatch, null, 'attachments', bcgovcode)
         await getFileFromS3({filepath: response.data}, (_err, res) => {
-          let blob = new Blob([res.data], {type: "application/octet-stream"});
-          blobs.push({name: attachment.filename, lastModified: res.headers['last-modified'], input: blob})
+          if (_err) {
+            failed++
+          } else {
+            let blob = new Blob([res.data], {type: "application/octet-stream"});
+            blobs.push({name: attachment.filename, lastModified: res.headers['last-modified'], input: blob})
+          }
+          toast.update(toastID, {
+            render: "Downloading file " + 0 + "% (" + blobs.length + "/" + noOfFiles + ")",
+            isLoading: true,
+          })
+        }, (progressEvent) => {
+          toast.update(toastID, {
+            render: "Downloading file " + Math.floor(progressEvent.loaded / progressEvent.total * 100) + "% (" + blobs.length + "/" + noOfFiles + ")",
+            isLoading: true,
+          })
         });
       }
     } catch (error) {
       console.log(error)
     }
+    toast.update(toastID, {
+      render: "Zipping...",
+      isLoading: true,
+    })
     const zipfile = await downloadZip(blobs).blob()
     saveAs(zipfile, requestNumber + ".zip");
+    toast.update(toastID, {
+      render: failed > 0 ? "File download failed" : "Download complete",
+      type: failed > 0 ? "error" : "success",
+      className: "file-upload-toast",
+      isLoading: false,
+      autoClose: 3000,
+      hideProgressBar: true,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      closeButton: true
+    });
   }
 
   const hasDocumentsToExport = attachments.filter(attachment => !(isMinistryCoordinator && attachment.category == 'personal')).length > 0;
