@@ -95,6 +95,12 @@ class recordservice(recordservicebase):
         recordlist = []
         records = recordschema.get("records")
         for _record in records:
+            replacingrecord = FOIRequestRecord.getrecordbyid(recordid)
+            print('Replacing Record Path {0}'.format(replacingrecord['s3uripath']))
+            _delteeapiresponse, err = self.makedocreviewerrequest('POST', '/api/document/delete', {'ministryrequestid': ministryrequestid, 'filepaths': [replacingrecord['s3uripath']]})
+            
+            if err:
+                return DefaultMethodResult(False,'Error in contacting Doc Reviewer API', -1, recordid)
             record = FOIRequestRecord(foirequestid=_requestid, replacementof = recordid, ministryrequestid = ministryrequestid, ministryrequestversion=_ministryversion,
                                 version = 1, createdby = userid, created_at = datetime.now())
             batch = str(uuid.uuid4())

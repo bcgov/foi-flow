@@ -43,7 +43,7 @@ class FOIRequestRecord(db.Model):
         try:
             sql =   """select distinct on (fr1.recordid) recordid, fr1.isactive, fr1.filename, 
                         fr1.s3uripath, fr1."attributes" attributes, json_extract_path_text("attributes" ::json,'batch') as batchid,
-                        fr1.createdby createdby, fr1.created_at
+                        fr1.createdby createdby, fr1.created_at,fr1.replacementof
                         from public."FOIRequestRecords" fr1 
                         where fr1.foirequestid = :foirequestid and fr1.ministryrequestid = :ministryrequestid  
                         order by recordid desc, version desc
