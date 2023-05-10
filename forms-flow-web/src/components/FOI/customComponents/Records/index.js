@@ -168,9 +168,7 @@ export const RecordsLog = ({
   const [totalUploadedRecordSize, setTotalUploadedRecordSize] = useState(0);
   useEffect(() => {
     setRecords(recordsObj?.records)
-    console.log("records:", recordsObj?.records);
     let nonDuplicateRecords = recordsObj?.records.filter(record => !record.isduplicate)
-    console.log("nonDuplicateRecords", nonDuplicateRecords)
     setTotalUploadedRecordSize(calculateTotalUploadedFileSizeInMB(nonDuplicateRecords)/ (1024 * 1024).toFixed(4));
     dispatch(checkForRecordsChange(requestId, ministryId))
   }, [recordsObj])

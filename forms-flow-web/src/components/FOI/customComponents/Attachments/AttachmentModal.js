@@ -92,6 +92,7 @@ export default function AttachmentModal({
     const [tagValue, setTagValue] = useState(uploadFor === 'record' ? "" : "general");
     const attchmentFileNameList = attachmentsArray.map(_file => _file.filename.toLowerCase());
     const totalRecordUploadLimit= TOTAL_RECORDS_UPLOAD_LIMIT ;
+    const [recordUploadError, setRecordUploadError] = useState(true);
 
     useEffect(() => {
       parseFileName(attachment);
@@ -153,6 +154,10 @@ export default function AttachmentModal({
 
     const updateFilesCb = (_files, _errorMessage) => {
       setFiles(_files);
+      if(_errorMessage?.length > 0)
+        setRecordUploadError(true);
+      else
+        setRecordUploadError(false);
     }
     const handleClose = () => {
         if ((files.length > 0 && files !== existingDocuments) || (modalFor === 'rename' && attachment.filename !== (newFilename+"."+extension))) {
@@ -258,7 +263,10 @@ export default function AttachmentModal({
       } else if (files.length === 0 && existingDocuments.length === 0) {
         return true;
       } else if (modalFor === 'add') {
-        return tagValue === "";
+        if(recordUploadError)
+          return true;
+        else
+          return tagValue === "";
       } else if (modalFor === 'replace') {
         return false;
       }
