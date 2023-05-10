@@ -118,13 +118,15 @@ const FileUpload = ({
           }
         }
         setTotalFileSize(_totalFileSizeInMB);
-        setErrorMessage(getErrorMessage(_duplicateFiles, _typeErrorFiles, _overSizedFiles, maxFileSize, multipleFiles, mimeTypes, recordUploadLimitReached, totalRecordUploadLimit));
-        return [{...files}, _totalFileSizeInMB, removeFileSize];
+        let errMsg = getErrorMessage(_duplicateFiles, _typeErrorFiles, _overSizedFiles, maxFileSize, multipleFiles, mimeTypes, recordUploadLimitReached, totalRecordUploadLimit);
+        setErrorMessage(errMsg);
+        
+        return [{...files}, _totalFileSizeInMB, removeFileSize, errMsg];
     };
 
-    const callUpdateFilesCb = (_files) => {
+    const callUpdateFilesCb = (_files, errMsg) => {
         const filesAsArray = convertNestedObjectToArray(_files);
-        updateFilesCb(filesAsArray, errorMessage);
+        updateFilesCb(filesAsArray, errMsg);
     };
 
     const validateFiles = (newFiles, totalFiles) => {
@@ -140,7 +142,7 @@ const FileUpload = ({
           setErrorMessage([`The total size of all files uploaded can not exceed  ${totalFileSize}MB. Please upload additional files separately.`]);
         }
         setFiles(updatedFilesDetails[0]);
-        callUpdateFilesCb(updatedFilesDetails[0]);
+        callUpdateFilesCb(updatedFilesDetails[0], updatedFilesDetails[3]);
       }
     }
    
