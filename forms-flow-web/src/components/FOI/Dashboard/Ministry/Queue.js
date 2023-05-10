@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from "react";
+import React, { useEffect, useMemo } from "react"
 import { DataGrid } from "@mui/x-data-grid";
 import "../dashboard.scss";
 import useStyles from "../CustomStyle";
@@ -6,7 +6,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { push } from "connected-react-router";
 import { fetchFOIMinistryRequestListByPage } from "../../../../apiManager/services/FOI/foiRequestServices";
 import Loading from "../../../../containers/Loading";
-import { debounce, ClickableChip, displayIconMinistry, displayHeaderIcon } from "../utils";
+import { debounce, ClickableChip, displayIconMinistry, displayHeaderIcon, cellTooltipRender } from "../utils";
 import Grid from "@mui/material/Grid";
 import Stack from "@mui/material/Stack";
 import SearchIcon from "@material-ui/icons/Search";
@@ -117,6 +117,7 @@ const Queue = ({ userDetail, tableInfo }) => {
       headerName: "ID NUMBER",
       width: 170,
       headerAlign: "left",
+      renderCell: cellTooltipRender
     },
     {
       field: "applicantcategory",
