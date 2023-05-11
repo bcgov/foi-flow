@@ -53,7 +53,8 @@ export default function AttachmentModal({
   maxNoFiles,
   bcgovcode,
   existingDocuments=[],
-  divisions=[]
+  divisions=[],
+  replacementfiletypes=[]
 }) {
 
     let tagList = [];
@@ -74,11 +75,11 @@ export default function AttachmentModal({
     const recordFormats = useSelector((state) => state.foiRequests.recordFormats)
     useEffect(() => {
       setMimeTypes(multipleFiles ?
-        (uploadFor === 'attachment' ? [...recordFormats, ...MimeTypeList.additional] : recordFormats)
+        (uploadFor === 'attachment' ? [...recordFormats, ...MimeTypeList.additional] : (uploadFor === 'record' && modalFor==="replace" ? replacementfiletypes: recordFormats))
         : MimeTypeList.stateTransition);
     }, [recordFormats])
     const [mimeTypes, setMimeTypes] = useState(multipleFiles ?
-      (uploadFor === 'attachment' ? [...recordFormats, ...MimeTypeList.additional] : recordFormats)
+      (uploadFor === 'attachment' ? [...recordFormats, ...MimeTypeList.additional] : (uploadFor === 'record' && modalFor==="replace" ? replacementfiletypes: recordFormats))
       : MimeTypeList.stateTransition);
     const maxFileSize = uploadFor === 'record' ? MaxFileSizeInMB.totalFileSize : multipleFiles ? MaxFileSizeInMB.attachmentLog : MaxFileSizeInMB.stateTransition;
     const totalFileSize = multipleFiles ? MaxFileSizeInMB.totalFileSize : MaxFileSizeInMB.stateTransition;
@@ -290,7 +291,7 @@ export default function AttachmentModal({
                   attachment={attachment}  
                   attchmentFileNameList={attchmentFileNameList}  
                   multipleFiles={multipleFiles} 
-                  mimeTypes={mimeTypes} 
+                  mimeTypes={uploadFor === 'record' && modalFor==="replace" ? replacementfiletypes : mimeTypes} 
                   maxFileSize={maxFileSize} 
                   totalFileSize={totalFileSize} 
                   updateFilesCb={updateFilesCb}
