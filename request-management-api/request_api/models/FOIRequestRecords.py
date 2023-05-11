@@ -53,7 +53,21 @@ class FOIRequestRecord(db.Model):
 
             for row in rs:
                 if row["isactive"] == True:
-                    records.append({"recordid": row["recordid"], "filename": row["filename"], "s3uripath": row["s3uripath"],  "attributes": row["attributes"], "batchid": row["batchid"], "createdby": row["createdby"], "created_at": row["created_at"],"replacementof":row["replacementof"]})
+                    _originalfile =''
+                    if row["replacementof"] is not None:                       
+                        originalrecord = FOIRequestRecord.getrecordbyid(row["replacementof"])
+                        _originalfile = originalrecord["s3uripath"]                        
+                    records.append({
+                            "recordid": row["recordid"], 
+                            "filename": row["filename"], 
+                            "s3uripath": row["s3uripath"],  
+                            "attributes": row["attributes"], 
+                            "batchid": row["batchid"], 
+                            "createdby": row["createdby"], 
+                            "created_at": row["created_at"],
+                            "replacementof":row["replacementof"],
+                            "originalfile" : _originalfile
+                        })
         except Exception as ex:
             logging.error(ex)
             raise ex

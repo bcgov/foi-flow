@@ -95,9 +95,7 @@ class recordservice(recordservicebase):
         recordlist = []
         records = recordschema.get("records")
         for _record in records:
-            replacingrecord = FOIRequestRecord.getrecordbyid(recordid)
-            print('Replacing Record Path {0}'.format(replacingrecord['s3uripath']))
-            print('replacementof {0}'.format(_record['replacementof']))
+            replacingrecord = FOIRequestRecord.getrecordbyid(recordid)           
             _delteeapiresponse, err = self.makedocreviewerrequest('POST', '/api/document/delete', {'ministryrequestid': ministryrequestid, 'filepaths': [replacingrecord['s3uripath']]})
             
             if err:
@@ -107,8 +105,7 @@ class recordservice(recordservicebase):
             batch = str(uuid.uuid4())
             _record['attributes']['batch'] = batch
             _filepath, extension = path.splitext(_record['filename'])
-            _record['attributes']['extension'] = extension
-            print("extension",extension)
+            _record['attributes']['extension'] = extension            
             _record['attributes']['incompatible'] =  extension.lower() in NONREDACTABLE_FILE_TYPES 
             record.__dict__.update(_record)
             recordlist.append(record)      
