@@ -373,9 +373,9 @@ export const RecordsLog = ({
     }
   }
 
-  const downloadDocument = (file, isPDF = false) => {
-    var s3filepath = file.s3uripath;
-    var filename = file.filename
+  const downloadDocument = (file, isPDF = false,originalfile = false) => {
+    var s3filepath = !originalfile ? file.s3uripath: file.originalfile;
+    var filename = !originalfile ? file.filename:file.originalfilename;
     if (isPDF) {
       s3filepath = s3filepath.substr(0, s3filepath.lastIndexOf(".")) + ".pdf";
       filename = filename + ".pdf";
@@ -649,6 +649,11 @@ export const RecordsLog = ({
         break;
       case "downloadPDF":
         downloadDocument(_record, true);
+        setModalFor("download");
+        setModal(false);
+        break;
+      case "downloadoriginal":
+        downloadDocument(_record, false, true);
         setModalFor("download");
         setModal(false);
         break;
@@ -1319,6 +1324,11 @@ const AttachmentPopup = React.memo(({indexValue, record, handlePopupButtonClick,
     handlePopupButtonClick("downloadPDF", record);
   }
 
+  const handleDownloadoriginal = () =>{
+    closeTooltip();
+    handlePopupButtonClick("downloadoriginal", record);
+  }
+
   const handleView =()=>{
     closeTooltip();
     opendocumentintab(record,ministryId);
@@ -1423,6 +1433,15 @@ const AttachmentPopup = React.memo(({indexValue, record, handlePopupButtonClick,
           >
             Replace Manually
           </MenuItem>}
+          {record.originalfile!='' && <MenuItem
+            onClick={() => {
+                handleDownloadoriginal();
+                setPopoverOpen(false);
+            }}
+          >
+            Download Original
+          </MenuItem>
+          }
           {record.isredactionready && ['.doc','.docx','.xls','.xlsx', '.ics', '.msg'].includes(record.attributes?.extension?.toLowerCase()) && <MenuItem
             onClick={() => {
                 handleDownloadPDF();
@@ -1437,7 +1456,7 @@ const AttachmentPopup = React.memo(({indexValue, record, handlePopupButtonClick,
                 setPopoverOpen(false);
             }}
           >
-            Download Original
+           {record.originalfile!='' ? "Download Replaced" : "Download" } 
           </MenuItem>
           {!record.isattachment && <DeleteMenu />}
           {!record.isredactionready && (record.failed || isrecordtimeout(record.created_at, RECORD_PROCESSING_HRS) == true) && <MenuItem
