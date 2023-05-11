@@ -919,7 +919,7 @@ export const RecordsLog = ({
                   <span className='number-spacing'>{recordsObj.dedupedfiles}</span>
                 </Grid>
                 <Grid item xs={3}>
-                  <span>Deduplicated Files:</span>
+                  <span>Duplicates Removed:</span>
                   <span className='number-spacing'>{recordsObj.removedfiles}</span>
                 </Grid>
                 <Grid item xs={3}>
