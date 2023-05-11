@@ -417,6 +417,16 @@ class FOIRawRequest(db.Model):
                              FOIRawRequest.requestrawdata['descriptionTimeframe']['description'].astext),
                            ],
                            else_ = FOIRawRequest.requestrawdata['description'].astext).label('description')
+        recordsearchfromdate = case([
+                            (FOIRawRequest.status == 'Unopened',
+                             FOIRawRequest.requestrawdata['descriptionTimeframe']['fromDate'].astext),
+                           ],
+                           else_ = FOIRawRequest.requestrawdata['fromDate'].astext).label('recordsearchfromdate')
+        recordsearchtodate = case([
+                            (FOIRawRequest.status == 'Unopened',
+                             FOIRawRequest.requestrawdata['descriptionTimeframe']['toDate'].astext),
+                           ],
+                           else_ = FOIRawRequest.requestrawdata['toDate'].astext).label('recordsearchtodate')
         duedate = case([
                             (FOIRawRequest.status == 'Unopened',
                              literal(None)),
@@ -503,6 +513,8 @@ class FOIRawRequest(db.Model):
             literal(None).label('assignedministrypersonFirstName'),
             literal(None).label('assignedministrypersonLastName'),
             description,
+            recordsearchfromdate,
+            recordsearchtodate,
             literal(None).label('onBehalfFirstName'),
             literal(None).label('onBehalfLastName'),
             literal(None).label('defaultSorting'),
