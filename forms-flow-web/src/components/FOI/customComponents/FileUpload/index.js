@@ -98,13 +98,16 @@ const FileUpload = ({
                 if (totalUploadedRecordSize > 0) {
                   if (_totalFileSizeInMB + totalUploadedRecordSize <= totalRecordUploadLimit) {
                     recordUploadLimitReached = false;
+                    const duplicateFileName = handleDuplicateFiles(file);
+                    _duplicateFiles.push(duplicateFileName);
                   } else {
                     recordUploadLimitReached = true;
                     _totalFileSizeInMB -= parseFloat(sizeInMB);
                   }
+                } else {
+                  const duplicateFileName = handleDuplicateFiles(file);
+                  _duplicateFiles.push(duplicateFileName);
                 }
-                const duplicateFileName = handleDuplicateFiles(file);
-                _duplicateFiles.push(duplicateFileName);
               } else {
                   _totalFileSizeInMB -= parseFloat(sizeInMB);
                   _overSizedFiles.push(file.name);
@@ -120,7 +123,6 @@ const FileUpload = ({
         setTotalFileSize(_totalFileSizeInMB);
         let errMsg = getErrorMessage(_duplicateFiles, _typeErrorFiles, _overSizedFiles, maxFileSize, multipleFiles, mimeTypes, recordUploadLimitReached, totalRecordUploadLimit);
         setErrorMessage(errMsg);
-        
         return [{...files}, _totalFileSizeInMB, removeFileSize, errMsg];
     };
 
