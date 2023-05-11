@@ -118,6 +118,7 @@ class FileSchema(Schema):
     filename = fields.Str(data_key="filename",allow_none=False, validate=[validate.Length(max=500, error=MAX_EXCEPTION_MESSAGE)])
     s3uripath = fields.Str(data_key="s3uripath",allow_none=False, validate=[validate.Length(max=1000, error=MAX_EXCEPTION_MESSAGE)])
     lastmodified = fields.Str(data_key="lastmodified",allow_none=False, validate=[validate.Length(max=120, error=MAX_EXCEPTION_MESSAGE)])
+    filesize = fields.Number(data_key="filesize")
 
 class DownloadRecordAttributeSchema(Schema):
     class Meta:  # pylint: disable=too-few-public-methods
@@ -127,6 +128,7 @@ class DownloadRecordAttributeSchema(Schema):
     files = fields.Nested(FileSchema, many=True, validate=validate.Length(min=1), required=True,allow_none=False)
     divisionname = fields.Str(data_key="divisionname",allow_none=False, validate=[validate.Length(max=120, error=MAX_EXCEPTION_MESSAGE)])
     divisionid = fields.Int(data_key="divisionid", allow_none=False)
+    divisionfilesize = fields.Number(data_key="divisionfilesize")
 
 class FOIRequestRecordDownloadSchema(Schema):
     class Meta:  # pylint: disable=too-few-public-methods
@@ -137,6 +139,7 @@ class FOIRequestRecordDownloadSchema(Schema):
     bcgovcode = fields.Str(data_key="bcgovcode",allow_none=False, validate=[validate.Length(max=20, error=MAX_EXCEPTION_MESSAGE)])
     category = fields.Str(data_key="category",allow_none=False, validate=[validate.Length(max=25, error=MAX_EXCEPTION_MESSAGE)])
     attributes = fields.Nested(DownloadRecordAttributeSchema, many=True, validate=validate.Length(min=1), required=True,allow_none=False)
+    totalfilesize = fields.Number(data_key="totalfilesize")
     
     
 

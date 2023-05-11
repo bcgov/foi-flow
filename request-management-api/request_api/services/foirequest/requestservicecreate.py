@@ -59,9 +59,11 @@ class requestservicecreate:
                activeversion = _foirequest["version"] + 1
             else:
                 return _foirequest  
-            FOIMinistryRequest.deActivateFileNumberVersion(ministryid, filenumber, activeversion, userid)
             self.__disablewatchers(ministryid, foirequestschema, userid)
-            return self.saverequest(foirequestschema, userid, foirequestid,ministryid,filenumber,activeversion,_foirequest["foirawrequestid"],_foirequest["wfinstanceid"])    
+            result = self.saverequest(foirequestschema, userid, foirequestid,ministryid,filenumber,activeversion,_foirequest["foirawrequestid"],_foirequest["wfinstanceid"])    
+            if result.success == True:
+                FOIMinistryRequest.deActivateFileNumberVersion(ministryid, filenumber, userid)
+            return result
     
     def saveministryrequestversion(self,ministryrequestschema, foirequestid , ministryid, userid, usertype = None):        
         _foirequest = FOIRequest().getrequest(foirequestid) 
@@ -77,8 +79,10 @@ class requestservicecreate:
         foirequest.requestApplicants = requestserviceministrybuilder().createfoirequestappplicantfromobject(_foirequestapplicant, foirequestid,  _foirequest['version']+1, userid)
         foirequest.contactInformations = requestserviceministrybuilder().createfoirequestcontactfromobject( _foirequestcontact, foirequestid, _foirequest['version']+1, userid)
         foirequest.personalAttributes = requestserviceministrybuilder().createfoirequestpersonalattributefromobject(_foirequestpersonalattrbs, foirequestid, _foirequest['version']+1, userid)
-        FOIMinistryRequest.deActivateFileNumberVersion(ministryid, _foiministryrequest['filenumber'], _foiministryrequest['version']+1, userid)
-        return FOIRequest.saverequest(foirequest)      
+        result = FOIRequest.saverequest(foirequest)
+        if result.success == True:
+            FOIMinistryRequest.deActivateFileNumberVersion(ministryid, _foiministryrequest['filenumber'], userid)
+        return result       
     
     def __prepareministries(self,foirequestschema, activeversion, filenumber,ministryid, userid):
         foiministryrequestarr = []

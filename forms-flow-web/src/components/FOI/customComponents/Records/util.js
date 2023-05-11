@@ -24,9 +24,17 @@ export const getPDFFilePath = (item) => {
 }
 
 export const sortDivisionalFiles = (divisionMap) => {
-    return Array.from(divisionMap.values()).map(({ divisionid, divisionname, files }) => ({
+    return Array.from(divisionMap.values()).map(({ divisionid, divisionname, files, divisionfilesize }) => ({
         divisionid,
         divisionname,
-        files: files.sort((a, b) => new Date(a.lastmodified) - new Date(b.lastmodified))
+        files: files.sort((a, b) => new Date(a.lastmodified) - new Date(b.lastmodified)),
+        divisionfilesize
     }));
 }
+
+
+export const calculateTotalFileSize = (divisions) => {
+    return divisions.reduce((total, division) => {
+      return total + division.divisionfilesize;
+    }, 0);
+  }
