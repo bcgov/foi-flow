@@ -5,6 +5,7 @@ import {
   // onBehalfFullName,
   displayIcon,
   displayHeaderIcon,
+  cellTooltipRender
 } from "../utils";
 import {
   isProcessingTeam,
@@ -19,6 +20,7 @@ const ProcessingTeamColumns = [
     headerName: "ID NUMBER",
     headerAlign: "left",
     width: 160,
+    renderCell: cellTooltipRender
   },
   {
     field: "applicantName",
@@ -113,6 +115,7 @@ const IntakeTeamColumns = [
     headerName: "ID NUMBER",
     headerAlign: "left",
     flex: 1,
+    renderCell: cellTooltipRender
   },
   {
     field: "currentState",
@@ -156,6 +159,7 @@ const FlexTeamColumns = [
     headerName: "ID NUMBER",
     headerAlign: "left",
     width: 160,
+    renderCell: cellTooltipRender
   },
   {
     field: "applicantName",

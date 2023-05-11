@@ -540,7 +540,7 @@ export const RecordsLog = ({
 
     message.attributes = sortedDivisions;
     message.totalfilesize = calculateTotalFileSize(sortedDivisions); // calculate total size for whole message
-    //keeping this for testing purpose.
+    //keeping this for testing purpose!!
     console.log(`message = ${JSON.stringify(message)}`);
 
     return message;

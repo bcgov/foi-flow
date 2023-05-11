@@ -453,6 +453,8 @@ class FOIMinistryRequest(db.Model):
             ministryassignee.firstname.label('assignedministrypersonFirstName'),
             ministryassignee.lastname.label('assignedministrypersonLastName'),
             FOIMinistryRequest.description,
+            cast(FOIMinistryRequest.recordsearchfromdate, String).label('recordsearchfromdate'),
+            cast(FOIMinistryRequest.recordsearchfromdate, String).label('recordsearchfromdate'),
             onbehalf_applicant.firstname.label('onBehalfFirstName'),
             onbehalf_applicant.lastname.label('onBehalfLastName'),
             defaultsorting,
