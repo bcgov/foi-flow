@@ -91,7 +91,6 @@ const FileUpload = ({
           file.filename = file.name;
           const sizeInMB = convertBytesToMB(file.size);
           _totalFileSizeInMB += parseFloat(sizeInMB);
-          
           if (allowedFileType(file, mimeTypes)) {
             if (allowedFileSize(_totalFileSizeInMB, multipleFiles, totalFileSize)) {
               if (sizeInMB <= maxFileSize) {
