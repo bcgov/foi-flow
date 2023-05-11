@@ -438,6 +438,22 @@ const isrecordtimeout = (createDate, days) => {
   return diffhrs >= days;
 };
 
+const readUploadedFileAsBytes = (inputFile) => {
+  const temporaryFileReader = new FileReader();
+
+  return new Promise((resolve, reject) => {
+    temporaryFileReader.onerror = () => {
+      temporaryFileReader.abort();
+      reject(new DOMException("Problem parsing input file."));
+    };
+
+    temporaryFileReader.onload = () => {
+      resolve(temporaryFileReader.result);
+    };
+    temporaryFileReader.readAsArrayBuffer(inputFile);
+  });
+};
+
 export {
   replaceUrl,
   formatDate,
@@ -469,5 +485,6 @@ export {
   isRequestMinistryRestricted,
   getMinistryRestrictedTagList,
   isrecordtimeout,
-  isFoiAdmin
+  isFoiAdmin,
+  readUploadedFileAsBytes
 };
