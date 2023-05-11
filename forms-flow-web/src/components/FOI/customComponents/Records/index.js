@@ -8,7 +8,7 @@ import { getOSSHeaderDetails, saveFilesinS3, getFileFromS3, postFOIS3DocumentPre
 import { saveFOIRequestAttachmentsList, replaceFOIRequestAttachment, saveNewFilename, deleteFOIRequestAttachment } from "../../../../apiManager/services/FOI/foiAttachmentServices";
 import { fetchFOIRecords, saveFOIRecords, deleteFOIRecords, retryFOIRecordProcessing,replaceFOIRecordProcessing, deleteReviewerRecords, getRecordFormats, triggerDownloadFOIRecordsForHarms, fetchPDFStitchedRecordForHarms, checkForRecordsChange } from "../../../../apiManager/services/FOI/foiRecordServices";
 import { StateTransitionCategories, AttachmentCategories } from '../../../../constants/FOI/statusEnum'
-import { RecordsDownloadList, RecordDownloadCategory } from '../../../../constants/FOI/enum';
+import { RecordsDownloadList, RecordDownloadCategory,MimeTypeList } from '../../../../constants/FOI/enum';
 import { addToFullnameList, getFullnameList, ConditionalComponent, isrecordtimeout } from '../../../../helper/FOI/helper';
 import Grid from "@material-ui/core/Grid";
 import { makeStyles } from "@material-ui/core/styles";
@@ -756,6 +756,35 @@ export const RecordsLog = ({
     // setRecords(_filteredRecords)
   // }
 
+  const getreplacementfiletypes = () => {
+
+    var replacefileextensions = [...MimeTypeList.recordsLog]
+
+    let _filename = replaceRecord?.originalfilename === '' ? replaceRecord.filename : replaceRecord.originalfilename ;
+    let fileextension =  _filename?.split('.').pop();
+    
+    switch(fileextension)
+    {
+      case "docx" || "doc":
+        replacefileextensions = ["application/pdf" ,'application/vnd.openxmlformats-officedocument.wordprocessingml.document', "application/msword",'.doc', '.docx'];
+        break;
+      case "xlsx" || "xls":
+        replacefileextensions = ["application/pdf" ,'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/vnd.ms-excel','.xls', '.xlsx'];
+        break;
+      case "msg" || "eml" :
+        replacefileextensions = ["application/pdf" ,'.msg','.eml'];
+          break;
+      case "pdf" :
+            replacefileextensions = ["application/pdf"];
+              break;      
+      default:
+        replacefileextensions = [...MimeTypeList.recordsLog]
+        break;
+    }
+
+    return replacefileextensions;
+  }
+
 
   React.useEffect(() => {
     setRecords(searchAttachments(_.cloneDeep(recordsObj.records), filterValue, searchValue));
@@ -1091,6 +1120,7 @@ export const RecordsLog = ({
             uploadFor={"record"}
             bcgovcode={bcgovcode}
             divisions={divisions.filter(d => d.divisionname.toLowerCase() !== 'communications')}
+            replacementfiletypes={getreplacementfiletypes()}
           />
           <div className="state-change-dialog">
             <Dialog
