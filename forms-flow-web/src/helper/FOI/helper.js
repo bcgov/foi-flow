@@ -428,14 +428,14 @@ const isRequestMinistryRestricted = (requestDetails) => {
   return requestDetails?.ministryrestricteddetails?.isrestricted;
 }
 
-const isrecordtimeout = (createDate, days) => {
+const isrecordtimeout = (createDate, slaHrs) => {
   let dt1_str = createDate.replace("|", ",");
   let dt1 = new Date(dt1_str);
   let dt2 = new Date();
   let diff =  (dt2.getTime() - dt1.getTime()) / 1000;
   diff = diff/(60*60)
   let diffhrs = Math.abs(Math.round(diff));
-  return diffhrs >= days;
+  return diffhrs >= slaHrs;
 };
 
 const readUploadedFileAsBytes = (inputFile) => {
