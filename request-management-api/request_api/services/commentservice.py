@@ -33,6 +33,9 @@ class commentservice:
         version = FOIRawRequest.getversionforrequest(data["requestid"])    
         return FOIRawRequestComment.savecomment(type, data, version, userid) 
     
+    def createcomments(self, data, userid, type=2):
+        return FOIRequestComment.savecomment(type, data, data['version'], userid) 
+    
     def disableministryrequestcomment(self, commentid, userid):
         return FOIRequestComment.disablecomment(commentid, userid) 
 

@@ -70,7 +70,7 @@ const DisplayComments = ({ comments, bcgovcode, currentUser, iaoassignedToList, 
   const checkcommentlengthforindex = (comment, index) => {
     let commentlenghchecker = new Object()
 
-    commentlenghchecker.totalcharacterCount = comment.text.length
+    commentlenghchecker.totalcharacterCount = comment?.text?.length
     commentlenghchecker.reachedLimit = false
     commentlenghchecker.returnindex = 10
     
@@ -83,7 +83,7 @@ const DisplayComments = ({ comments, bcgovcode, currentUser, iaoassignedToList, 
     if (comment.replies && comment.replies.length > 0) {
       comment.replies.forEach((reply) => {
         if (!commentlenghchecker.reachedLimit) {
-          commentlenghchecker.totalcharacterCount += reply.text.length
+          commentlenghchecker.totalcharacterCount += reply.text?.length
           if (commentlenghchecker.totalcharacterCount > 2000 && index > 10) {
             commentlenghchecker.returnindex = index
             commentlenghchecker.reachedLimit = true
