@@ -58,6 +58,20 @@ class RetryRecordAttributeSchema(Schema):
     extension = fields.Str(validate=validate.Length(min=1, max=10), required=True,allow_none=False)
     isattachment = fields.Boolean(required=False,allow_none=False)
 
+class ReplaceRecordAttributeSchema(Schema):
+    class Meta:  # pylint: disable=too-few-public-methods
+        """Exclude unknown fields in the deserialized output."""
+
+        unknown = EXCLUDE
+    divisions = fields.Nested(DivisionSchema, many=True, validate=validate.Length(min=1), required=True,allow_none=False)
+    lastmodified = fields.Str(data_key="lastmodified",allow_none=False, validate=[validate.Length(max=120, error=MAX_EXCEPTION_MESSAGE)])
+    filesize = fields.Int(data_key="filesize", allow_none=False)
+    batch = fields.Str(data_key="batch", allow_none=False, validate=validate.Length(min=1), required=True)
+    incompatible = fields.Boolean(required=True,allow_none=False)
+    extension = fields.Str(validate=validate.Length(min=1, max=10), required=True,allow_none=False)
+    isattachment = fields.Boolean(required=False,allow_none=False)
+    hasfilereplaced = fields.Boolean(required=False,allow_none=False)    
+
 class FOIRequestRetryRecordSchema(Schema):
     class Meta:  # pylint: disable=too-few-public-methods
         """Exclude unknown fields in the deserialized output."""
@@ -72,7 +86,20 @@ class FOIRequestRetryRecordSchema(Schema):
     outputdocumentmasterid = fields.Integer(required=False,allow_none=True)
     createdby = fields.Str(validate=validate.Length(min=1),required=True,allow_none=False)
 
+class FOIRequestReplaceRecordSchema(Schema):
+    class Meta:  # pylint: disable=too-few-public-methods
+        """Exclude unknown fields in the deserialized output."""
 
+        unknown = EXCLUDE
+    attributes = fields.Nested(ReplaceRecordAttributeSchema)
+    s3uripath = fields.Str(data_key="s3uripath",allow_none=False, validate=[validate.Length(max=1000, error=MAX_EXCEPTION_MESSAGE)])
+    filename = fields.Str(data_key="filename",allow_none=False, validate=[validate.Length(max=500, error=MAX_EXCEPTION_MESSAGE)])
+    replacements3uripath = fields.Str(data_key="replacements3uripath",allow_none=False, validate=[validate.Length(max=1000, error=MAX_EXCEPTION_MESSAGE)])
+    replacementfilename = fields.Str(data_key="replacementfilename",allow_none=False, validate=[validate.Length(max=500, error=MAX_EXCEPTION_MESSAGE)])
+    trigger = fields.Str(data_key="trigger",validate=validate.OneOf(['recordreplace', 'recordretry']),allow_none=False)
+    service = fields.Str(data_key="service",validate=validate.OneOf(['deduplication', 'conversion']),allow_none=False)
+    replacementof = fields.Str(data_key="replacementof",allow_none=True)
+    
 
 class FOIRequestBulkRetryRecordSchema(Schema):
     class Meta:  # pylint: disable=too-few-public-methods

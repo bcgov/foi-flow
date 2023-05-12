@@ -152,6 +152,16 @@ export const retryFOIRecordProcessing = (requestId, ministryId, data, ...rest) =
   };
 };
 
+export const replaceFOIRecordProcessing = (requestId, ministryId,recordid, data, ...rest) => {
+  let apiUrl = replaceUrl(replaceUrl(replaceUrl(
+    API.FOI_REPLACE_RECORDS,
+   "<ministryrequestid>", ministryId),
+   "<requestid>", requestId),"<recordid>",recordid);
+  return (dispatch) => {
+    postRecord(dispatch, apiUrl, data, "Error in triggering job retry", rest);
+  };
+};
+
 export const deleteFOIRecords = (requestId, ministryId, recordId, ...rest) => {
   if (!ministryId) {
     return () => {};

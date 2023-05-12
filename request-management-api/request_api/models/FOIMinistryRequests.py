@@ -137,11 +137,19 @@ class FOIMinistryRequest(db.Model):
         return assignments
     
     @classmethod
-    def deActivateFileNumberVersion(cls, ministryid, idnumber, currentversion, userid)->DefaultMethodResult:
-        db.session.query(FOIMinistryRequest).filter(FOIMinistryRequest.foiministryrequestid == ministryid, FOIMinistryRequest.filenumber == idnumber, FOIMinistryRequest.version != currentversion).update({"isactive": False, "updated_at": datetime.now(),"updatedby": userid}, synchronize_session=False)
-        db.session.commit()
-        return DefaultMethodResult(True,'Request Updated',idnumber)
-            
+    def deActivateFileNumberVersion(cls, ministryid, idnumber, userid)->DefaultMethodResult:
+        try:
+            sql = """update "FOIMinistryRequests" set isactive = false, updatedby = :userid, updated_at = now()  
+                        where foiministryrequestid = :ministryid and isactive = true and filenumber = :idnumber 
+                        and version != (select version from "FOIMinistryRequests" fr where foiministryrequestid = :ministryid order by "version" desc limit 1)"""
+            db.session.execute(text(sql), {'ministryid': ministryid, 'userid':userid, 'idnumber': idnumber})
+            db.session.commit()
+            return DefaultMethodResult(True,'Request Updated',idnumber)
+        except Exception as ex:
+            logging.error(ex)
+            raise ex
+        finally:
+            db.session.close()   
     
     @classmethod
     def getrequests(cls, group = None):

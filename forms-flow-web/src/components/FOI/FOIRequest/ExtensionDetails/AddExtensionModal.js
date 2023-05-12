@@ -507,19 +507,19 @@ const AddExtensionModal = () => {
                         setStatus(Number(e.target.value));
                       }}
                     >
-                      <FormControlLabel
+                      <FormControlLabel 
                         value={extensionStatusId.pending}
-                        control={<Radio color="default" />}
+                        control={<Radio color="default" id="rbextpending" />}
                         label="Pending"
                       />
                       <FormControlLabel
                         value={extensionStatusId.approved}
-                        control={<Radio color="default" />}
+                        control={<Radio color="default" id="rbextapproved" />}
                         label="Approved"
                       />
                       <FormControlLabel
                         value={extensionStatusId.denied}
-                        control={<Radio color="default" />}
+                        control={<Radio color="default" id="rbextdenied" />}
                         label="Denied"
                       />
                     </RadioGroup>

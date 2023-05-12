@@ -22,7 +22,7 @@ from request_api.tracer import Tracer
 from request_api.utils.util import  cors_preflight, allowedorigins
 from request_api.exceptions import BusinessException, Error
 from request_api.services.recordservice import recordservice
-from request_api.schemas.foirecord import  FOIRequestBulkCreateRecordSchema, FOIRequestBulkRetryRecordSchema, FOIRequestRecordDownloadSchema
+from request_api.schemas.foirecord import  FOIRequestBulkCreateRecordSchema, FOIRequestBulkRetryRecordSchema, FOIRequestRecordDownloadSchema, FOIRequestReplaceRecordSchema
 from marshmallow import INCLUDE
 import json
 from flask_cors import cross_origin
@@ -93,9 +93,8 @@ class DeleteFOIDocument(Resource):
 
 @cors_preflight('POST,OPTIONS')
 @API.route('/foirecord/<requestid>/ministryrequest/<ministryrequestid>/retry')
-class ReplaceFOIDocument(Resource):
+class RetryFOIDocument(Resource):
     """Resource for soft delete FOI requests."""
-
 
     @staticmethod
     @TRACER.trace()
@@ -111,7 +110,28 @@ class ReplaceFOIDocument(Resource):
             return {'status': False, 'message':err.messages}, 400
         except BusinessException as exception:
             return {'status': exception.status_code, 'message':exception.message}, 500
+        
+@cors_preflight('POST,OPTIONS')
+@API.route('/foirecord/<requestid>/ministryrequest/<ministryrequestid>/record/<recordid>/replace')
+class ReplaceFOIDocument(Resource):
+    """Resource for replacing records on FOI requests."""
+       
+    @staticmethod
+    @TRACER.trace()
+    @cross_origin(origins=allowedorigins())
+    @auth.require
+    def post(requestid, ministryrequestid,recordid):
+        try:
+            requestjson = request.get_json()            
+            recordschema = FOIRequestReplaceRecordSchema().load(requestjson, unknown=INCLUDE)            
+            result = recordservice().replace(requestid, ministryrequestid,recordid, recordschema,AuthHelper.getuserid())
 
+            return {'status': result.success, 'message':result.message,'id':result.identifier} , 200
+        except KeyError as err:
+            return {'status': False, 'message':err.messages}, 400
+        except BusinessException as exception:
+            return {'status': exception.status_code, 'message':exception.message}, 500
+        
 @cors_preflight('POST,OPTIONS')
 @API.route('/foirecord/<requestid>/ministryrequest/<ministryrequestid>/triggerdownload/<recordstype>')
 class FOIRequestDownloadRecord(Resource):
