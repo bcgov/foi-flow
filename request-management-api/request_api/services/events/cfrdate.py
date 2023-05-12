@@ -27,7 +27,6 @@ class cfrdateevent(duecalculator):
             notificationservice().dismissremindernotification("ministryrequest", self.__notificationtype())            
             ca_holidays = self.getholidays()
             _upcomingdues = FOIMinistryRequest.getupcomingcfrduerecords()
-            print("_upcomingdues:", _upcomingdues)
             for entry in _upcomingdues:
                 _duedate = self.formatduedate(entry['cfrduedate']) 
                 message = None
@@ -36,9 +35,7 @@ class cfrdateevent(duecalculator):
                 elif  self.getpreviousbusinessday(entry['cfrduedate'],ca_holidays) == _today:
                     message = self.__upcomingduemessage(_duedate)
                 self.__createnotification(message,entry['foiministryrequestid'])
-                if message is not None: 
-                    _comment = self.__preparecomment(entry, message)
-                    self.__createcomment(_comment)
+                self.__createcomment(entry, message)
             return DefaultMethodResult(True,'CFR reminder notifications created',_today)
         except BusinessException as exception:            
             current_app.logger.error("%s,%s" % ('CFR reminder Notification Error', exception.message))
@@ -48,8 +45,9 @@ class cfrdateevent(duecalculator):
         if message is not None: 
             return notificationservice().createremindernotification({"message" : message}, requestid, "ministryrequest", self.__notificationtype(), self.__defaultuserid())
         
-    def __createcomment(self, _comment):
-        if _comment is not None: 
+    def __createcomment(self, entry, message):
+        if message is not None: 
+            _comment = self.__preparecomment(entry, message)
             return commentservice().createcomments(_comment, self.__defaultuserid(), 2)
     
     def __preparecomment(self, foirequest, message):

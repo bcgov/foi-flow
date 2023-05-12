@@ -34,9 +34,7 @@ class divisiondateevent(duecalculator):
                 elif  self.getpreviousbusinessday(entry['duedate'],ca_holidays) == _today:
                     message = self.__upcomingduemessage(entry)
                 self.__createnotification(message,entry['foiministryrequestid'])
-                if message is not None:
-                    _comment = self.__preparecomment(entry, message)
-                    self.__createcomment(_comment)
+                self.__createcomment(entry, message)
             return DefaultMethodResult(True,'Division reminder notifications created',_today)
         except BusinessException as exception:            
             current_app.logger.error("%s,%s" % ('Legislative reminder Notification Error', exception.message))
@@ -46,8 +44,9 @@ class divisiondateevent(duecalculator):
         if message is not None: 
             return notificationservice().createnotification({"message" : message}, requestid, "ministryrequest", self.__notificationtype(), self.__defaultuserid(), False)
         
-    def __createcomment(self, _comment):
-        if _comment is not None: 
+    def __createcomment(self, entry, message):
+        if message is not None: 
+            _comment = self.__preparecomment(entry, message)
             return commentservice().createcomments(_comment, self.__defaultuserid(), 2)
 
     
