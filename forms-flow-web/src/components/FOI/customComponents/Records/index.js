@@ -1133,6 +1133,7 @@ export const RecordsLog = ({
             uploadFor={"record"}
             bcgovcode={bcgovcode}
             divisions={divisions.filter(d => d.divisionname.toLowerCase() !== 'communications')}
+            totalUploadedRecordSize={totalUploadedRecordSize}
             replacementfiletypes={getreplacementfiletypes()}
           />
           <div className="state-change-dialog">
