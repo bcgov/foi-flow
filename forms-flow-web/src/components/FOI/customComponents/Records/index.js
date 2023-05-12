@@ -6,9 +6,9 @@ import AttachmentModal from '../Attachments/AttachmentModal';
 import Loading from "../../../../containers/Loading";
 import { getOSSHeaderDetails, saveFilesinS3, getFileFromS3, postFOIS3DocumentPreSignedUrl, getFOIS3DocumentPreSignedUrl, completeMultiPartUpload } from "../../../../apiManager/services/FOI/foiOSSServices";
 import { saveFOIRequestAttachmentsList, replaceFOIRequestAttachment, saveNewFilename, deleteFOIRequestAttachment } from "../../../../apiManager/services/FOI/foiAttachmentServices";
-import { fetchFOIRecords, saveFOIRecords, deleteFOIRecords, retryFOIRecordProcessing, deleteReviewerRecords, getRecordFormats, triggerDownloadFOIRecordsForHarms, fetchPDFStitchedRecordForHarms, checkForRecordsChange } from "../../../../apiManager/services/FOI/foiRecordServices";
+import { fetchFOIRecords, saveFOIRecords, deleteFOIRecords, retryFOIRecordProcessing,replaceFOIRecordProcessing, deleteReviewerRecords, getRecordFormats, triggerDownloadFOIRecordsForHarms, fetchPDFStitchedRecordForHarms, checkForRecordsChange } from "../../../../apiManager/services/FOI/foiRecordServices";
 import { StateTransitionCategories, AttachmentCategories } from '../../../../constants/FOI/statusEnum'
-import { RecordsDownloadList, RecordDownloadCategory } from '../../../../constants/FOI/enum';
+import { RecordsDownloadList, RecordDownloadCategory,MimeTypeList } from '../../../../constants/FOI/enum';
 import { addToFullnameList, getFullnameList, ConditionalComponent, isrecordtimeout } from '../../../../helper/FOI/helper';
 import Grid from "@material-ui/core/Grid";
 import { makeStyles } from "@material-ui/core/styles";
@@ -47,7 +47,7 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 import CloseIcon from '@material-ui/icons/Close';
 import _ from 'lodash';
 import { DOC_REVIEWER_WEB_URL, RECORD_PROCESSING_HRS, OSS_S3_CHUNK_SIZE } from "../../../../constants/constants";
-import {removeDuplicateFiles, addDeduplicatedAttachmentsToRecords, getPDFFilePath, sortDivisionalFiles, calculateTotalFileSize, calculateTotalUploadedFileSizeInMB, getReadableFileSize} from "./util"
+import {removeDuplicateFiles, addDeduplicatedAttachmentsToRecords, getPDFFilePath, sortDivisionalFiles, calculateTotalFileSize,calculateTotalUploadedFileSizeInMB,getReadableFileSize} from "./util"
 import { readUploadedFileAsBytes } from '../../../../helper/FOI/helper';
 import { TOTAL_RECORDS_UPLOAD_LIMIT } from "../../../../constants/constants";
 //import {convertBytesToMB} from "../../../../components/FOI/customComponents/FileUpload/util";
@@ -192,6 +192,7 @@ export const RecordsLog = ({
   const [isAttachmentLoading, setAttachmentLoading] = useState(false);
   const [multipleFiles, setMultipleFiles] = useState(true);
   const [modalFor, setModalFor] = useState("add");
+  const [replaceRecord, setreplaceRecord] = useState({});
   const [updateAttachment, setUpdateAttachment] = useState({});
   const [searchValue, setSearchValue] = useState("");
   const [filterValue, setFilterValue] = useState(-1);
@@ -266,12 +267,13 @@ export const RecordsLog = ({
   }
 
   const saveDocument = (value, fileInfoList, files) => {
+    
     if (value) {
       if (files.length !== 0) {
         setRecordsUploading(true)
-        if (modalFor === 'replace') {
-          fileInfoList[0].filepath = updateAttachment.s3uripath.substr(0, updateAttachment.s3uripath.lastIndexOf(".")) + ".pdf";
-        }
+        // if (modalFor === 'replace') {
+        //   fileInfoList[0].filepath = updateAttachment.s3uripath.substr(0, updateAttachment.s3uripath.lastIndexOf(".")) + ".pdf";
+        // }
         postFOIS3DocumentPreSignedUrl(ministryId, fileInfoList.map(file => ({...file, multipart: true})), 'records', bcgovcode, dispatch, async (err, res) => {
           let _documents = [];
           if (!err) {
@@ -283,7 +285,14 @@ export const RecordsLog = ({
               const _fileInfo = fileInfoList.find(fileInfo => fileInfo.filename === header.filename);
               const documentDetails = modalFor === 'replace' ?
                 {
-                  ...updateAttachment,
+                  //...updateAttachment,
+                  filename: header.filename,
+                  attributes:{
+                    divisions:replaceRecord['attributes']['divisions'],
+                    lastmodified: _file.lastModifiedDate,
+                    filesize: _file.size
+                  },
+                  replacementof:replaceRecord['replacementof'] == null || replaceRecord['replacementof']==''? replaceRecord['recordid'] : replaceRecord['replacementof'] ,
                   s3uripath: header.filepathdb,
                   trigger: 'recordreplace',
                   service: 'deduplication'
@@ -329,9 +338,15 @@ export const RecordsLog = ({
             }
             if (_documents.length > 0) {
               if (modalFor === 'replace') {
-                dispatch(retryFOIRecordProcessing(requestId, ministryId, {records: _documents},(err, _res) => {
-                    dispatchRequestAttachment(err);
-                }));
+                
+                // dispatch(retryFOIRecordProcessing(requestId, ministryId, {records: _documents},(err, _res) => {
+                //     dispatchRequestAttachment(err);
+                // }));
+                
+                dispatch(replaceFOIRecordProcessing(requestId, ministryId,replaceRecord.recordid, {records: _documents},(err, _res) => {
+                  dispatchRequestAttachment(err);
+              }));
+
               } else {
                 dispatch(saveFOIRecords(requestId, ministryId, {records: _documents},(err, _res) => {
                     dispatchRequestAttachment(err);
@@ -362,9 +377,9 @@ export const RecordsLog = ({
     }
   }
 
-  const downloadDocument = (file, isPDF = false) => {
-    var s3filepath = file.s3uripath;
-    var filename = file.filename
+  const downloadDocument = (file, isPDF = false,originalfile = false) => {
+    var s3filepath = !originalfile ? file.s3uripath: file.originalfile;
+    var filename = !originalfile ? file.filename:file.originalfilename;
     if (isPDF) {
       s3filepath = s3filepath.substr(0, s3filepath.lastIndexOf(".")) + ".pdf";
       filename = filename + ".pdf";
@@ -540,7 +555,8 @@ export const RecordsLog = ({
 
     message.attributes = sortedDivisions;
     message.totalfilesize = calculateTotalFileSize(sortedDivisions); // calculate total size for whole message
-    //keeping this for testing purpose!!
+
+    //keeping this for testing purpose.
     console.log(`message = ${JSON.stringify(message)}`);
 
     return message;
@@ -654,6 +670,7 @@ export const RecordsLog = ({
     setMultipleFiles(false);
     switch (action) {
       case "replace":
+        setreplaceRecord(_record)
         setModalFor("replace");
         setModal(true);
         break;
@@ -668,6 +685,11 @@ export const RecordsLog = ({
         break;
       case "downloadPDF":
         downloadDocument(_record, true);
+        setModalFor("download");
+        setModal(false);
+        break;
+      case "downloadoriginal":
+        downloadDocument(_record, false, true);
         setModalFor("download");
         setModal(false);
         break;
@@ -738,6 +760,35 @@ export const RecordsLog = ({
     // );
     // setRecords(_filteredRecords)
   // }
+
+  const getreplacementfiletypes = () => {
+
+    var replacefileextensions = [...MimeTypeList.recordsLog]
+
+    let _filename = replaceRecord?.originalfilename === '' ? replaceRecord.filename : replaceRecord.originalfilename ;
+    let fileextension =  _filename?.split('.').pop();
+    
+    switch(fileextension)
+    {
+      case "docx" || "doc":
+        replacefileextensions = ["application/pdf" ,'application/vnd.openxmlformats-officedocument.wordprocessingml.document', "application/msword",'.doc', '.docx'];
+        break;
+      case "xlsx" || "xls":
+        replacefileextensions = ["application/pdf" ,'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/vnd.ms-excel','.xls', '.xlsx'];
+        break;
+      case "msg" || "eml" :
+        replacefileextensions = ["application/pdf" ,'.msg','.eml'];
+          break;
+      case "pdf" :
+            replacefileextensions = ["application/pdf"];
+              break;      
+      default:
+        replacefileextensions = [...MimeTypeList.recordsLog]
+        break;
+    }
+
+    return replacefileextensions;
+  }
 
 
   React.useEffect(() => {
@@ -1083,6 +1134,7 @@ export const RecordsLog = ({
             bcgovcode={bcgovcode}
             divisions={divisions.filter(d => d.divisionname.toLowerCase() !== 'communications')}
             totalUploadedRecordSize={totalUploadedRecordSize}
+            replacementfiletypes={getreplacementfiletypes()}
           />
           <div className="state-change-dialog">
             <Dialog
@@ -1347,6 +1399,11 @@ const AttachmentPopup = React.memo(({indexValue, record, handlePopupButtonClick,
     handlePopupButtonClick("downloadPDF", record);
   }
 
+  const handleDownloadoriginal = () =>{
+    closeTooltip();
+    handlePopupButtonClick("downloadoriginal", record);
+  }
+
   const handleView =()=>{
     closeTooltip();
     opendocumentintab(record,ministryId);
@@ -1443,7 +1500,7 @@ const AttachmentPopup = React.memo(({indexValue, record, handlePopupButtonClick,
             View
           </MenuItem>
           :""}
-          {!record.isredactionready && record.failed && <MenuItem
+          { <MenuItem
             onClick={() => {
                 handleReplace();
                 setPopoverOpen(false);
@@ -1451,6 +1508,15 @@ const AttachmentPopup = React.memo(({indexValue, record, handlePopupButtonClick,
           >
             Replace Manually
           </MenuItem>}
+          {record.originalfile!='' && <MenuItem
+            onClick={() => {
+                handleDownloadoriginal();
+                setPopoverOpen(false);
+            }}
+          >
+            Download Original
+          </MenuItem>
+          }
           {record.isredactionready && ['.doc','.docx','.xls','.xlsx', '.ics', '.msg'].includes(record.attributes?.extension?.toLowerCase()) && <MenuItem
             onClick={() => {
                 handleDownloadPDF();
@@ -1465,7 +1531,7 @@ const AttachmentPopup = React.memo(({indexValue, record, handlePopupButtonClick,
                 setPopoverOpen(false);
             }}
           >
-            Download Original
+           {record.originalfile!='' ? "Download Replaced" : "Download" } 
           </MenuItem>
           {!record.isattachment && <DeleteMenu />}
           {!record.isredactionready && (record.failed || isrecordtimeout(record.created_at, RECORD_PROCESSING_HRS) == true) && <MenuItem
