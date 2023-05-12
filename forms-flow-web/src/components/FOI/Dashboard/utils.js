@@ -221,12 +221,16 @@ export const LightTooltip = styled(({ className, ...props }) => (
   },
 }));
 
-export const cellTooltipRender = (params) => (
-  <LightTooltip placement="bottom-start" title={
+export const cellTooltipRender = (params) => {
+  var description = params.row.description;
+  if (params.row.fromdate && params.row.todate) {
+    description += "\n(" + (new Date(params.row.fromdate)).toLocaleDateString() + " to " + (new Date(params.row.todate)).toLocaleDateString() + ")"
+  }
+  return <LightTooltip placement="bottom-start" title={
     <div style={{whiteSpace: "pre-line"}}>
-      {params.row.description + "\n(" + (new Date(params.row.fromdate)).toLocaleDateString() + " to " + (new Date(params.row.todate)).toLocaleDateString() + ")"}
+      {description}
     </div>
   }>
     <span className="table-cell-truncate">{params.row.axisRequestId}</span>
   </LightTooltip>
-);
+};
