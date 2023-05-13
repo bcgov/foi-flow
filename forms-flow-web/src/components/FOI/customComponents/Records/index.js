@@ -47,7 +47,7 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 import CloseIcon from '@material-ui/icons/Close';
 import _ from 'lodash';
 import { DOC_REVIEWER_WEB_URL, RECORD_PROCESSING_HRS, OSS_S3_CHUNK_SIZE } from "../../../../constants/constants";
-import {removeDuplicateFiles, addDeduplicatedAttachmentsToRecords, getPDFFilePath, sortDivisionalFiles, calculateTotalFileSize,calculateTotalUploadedFileSizeInMB,getReadableFileSize} from "./util"
+import {removeDuplicateFiles, addDeduplicatedAttachmentsToRecords, getPDFFilePath, sortDivisionalFiles, calculateTotalFileSize,calculateTotalUploadedFileSizeInKB,getReadableFileSize} from "./util"
 import { readUploadedFileAsBytes } from '../../../../helper/FOI/helper';
 import { TOTAL_RECORDS_UPLOAD_LIMIT } from "../../../../constants/constants";
 //import {convertBytesToMB} from "../../../../components/FOI/customComponents/FileUpload/util";
@@ -169,7 +169,8 @@ export const RecordsLog = ({
   useEffect(() => {
     setRecords(recordsObj?.records)
     let nonDuplicateRecords = recordsObj?.records.filter(record => !record.isduplicate)
-    setTotalUploadedRecordSize(calculateTotalUploadedFileSizeInMB(nonDuplicateRecords)/ (1024 * 1024).toFixed(4));
+    let totalUploadedSize= (calculateTotalUploadedFileSizeInKB(nonDuplicateRecords)/ (1024 * 1024))
+    setTotalUploadedRecordSize(parseFloat(totalUploadedSize.toFixed(4)));
     dispatch(checkForRecordsChange(requestId, ministryId))
   }, [recordsObj])
 
