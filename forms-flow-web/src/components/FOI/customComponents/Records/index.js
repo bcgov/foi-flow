@@ -806,7 +806,7 @@ export const RecordsLog = ({
         r.createdby.toLowerCase().includes(_keywordValue?.toLowerCase())) &&
         (
           _filterValue === -3 ? r.attributes?.incompatible :
-          _filterValue === -2 ? !r.isredactionready && (r.failed || isrecordtimeout(r.created_at, RECORD_PROCESSING_HRS) == true):
+          _filterValue === -2 ? !r.isredactionready && !r.attributes?.incompatible && (r.failed || isrecordtimeout(r.created_at, RECORD_PROCESSING_HRS) == true):
           _filterValue > -1 ? r.attributes?.divisions?.findIndex(a => a.divisionid === _filterValue) > -1 :
           true
         )
