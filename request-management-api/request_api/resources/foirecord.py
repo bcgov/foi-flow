@@ -19,7 +19,7 @@ from flask_restx import Namespace, Resource, cors
 from flask_expects_json import expects_json
 from request_api.auth import auth, AuthHelper
 from request_api.tracer import Tracer
-from request_api.utils.util import  cors_preflight, allowedorigins
+from request_api.utils.util import  cors_preflight, allowedorigins, getrequiredmemberships
 from request_api.exceptions import BusinessException, Error
 from request_api.services.recordservice import recordservice
 from request_api.schemas.foirecord import  FOIRequestBulkCreateRecordSchema, FOIRequestBulkRetryRecordSchema, FOIRequestRecordDownloadSchema, FOIRequestReplaceRecordSchema
@@ -41,6 +41,7 @@ class FOIRequestGetRecord(Resource):
     @TRACER.trace()
     @cross_origin(origins=allowedorigins())
     @auth.require
+    @auth.ismemberofgroups(getrequiredmemberships())
     def get(requestid, ministryrequestid):
         try:
             result = recordservice().fetch(requestid, ministryrequestid)
@@ -60,6 +61,7 @@ class FOIRequestBulkCreateRecord(Resource):
     @TRACER.trace()
     @cross_origin(origins=allowedorigins())
     @auth.require
+    @auth.ismemberofgroups(getrequiredmemberships())
     def post(requestid, ministryrequestid):
         try:
             requestjson = request.get_json()
@@ -82,6 +84,7 @@ class DeleteFOIDocument(Resource):
     @TRACER.trace()
     @cross_origin(origins=allowedorigins())
     @auth.require
+    @auth.ismemberofgroups(getrequiredmemberships())
     def post(requestid, ministryrequestid, recordid):
         try:
             result = recordservice().delete(requestid, ministryrequestid, recordid, AuthHelper.getuserid())
@@ -100,6 +103,7 @@ class RetryFOIDocument(Resource):
     @TRACER.trace()
     @cross_origin(origins=allowedorigins())
     @auth.require
+    @auth.ismemberofgroups(getrequiredmemberships())
     def post(requestid, ministryrequestid):
         try:
             requestjson = request.get_json()
@@ -120,6 +124,7 @@ class ReplaceFOIDocument(Resource):
     @TRACER.trace()
     @cross_origin(origins=allowedorigins())
     @auth.require
+    @auth.ismemberofgroups(getrequiredmemberships())
     def post(requestid, ministryrequestid,recordid):
         try:
             requestjson = request.get_json()            
@@ -142,6 +147,7 @@ class FOIRequestDownloadRecord(Resource):
     @TRACER.trace()
     @cross_origin(origins=allowedorigins())
     @auth.require
+    @auth.ismemberofgroups(getrequiredmemberships())
     def post(requestid, ministryrequestid, recordstype):
         try:
             requestjson = request.get_json()
@@ -164,6 +170,7 @@ class FOIRequestDownloadRecord(Resource):
     @TRACER.trace()
     @cross_origin(origins=allowedorigins())
     @auth.require
+    @auth.ismemberofgroups(getrequiredmemberships())
     def get(requestid, ministryrequestid, recordstype):
         try:
             result = recordservice().getpdfstitchpackagetodownload(ministryrequestid, recordstype.lower())
@@ -183,6 +190,7 @@ class FOIRequestPDFStitchStatus(Resource):
     @TRACER.trace()
     @cross_origin(origins=allowedorigins())
     @auth.require
+    @auth.ismemberofgroups(getrequiredmemberships())
     def get(requestid, ministryrequestid, recordstype):
         try:
             result = recordservice().getpdfstichstatus(ministryrequestid, recordstype.lower())
@@ -208,6 +216,7 @@ class FOIRequestRecordsChanged(Resource):
     @TRACER.trace()
     @cross_origin(origins=allowedorigins())
     @auth.require
+    @auth.ismemberofgroups(getrequiredmemberships())
     def get(requestid, ministryrequestid, recordstype):
         try:
             result = recordservice().isrecordschanged(ministryrequestid, recordstype.lower())
