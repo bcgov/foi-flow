@@ -140,6 +140,7 @@ const useStyles = makeStyles((_theme) => ({
   }
 }));
 
+
 export const RecordsLog = ({
   divisions,
   requestNumber,
@@ -201,8 +202,7 @@ export const RecordsLog = ({
   const [isDownloadInProgress, setIsDownloadInProgress] = useState(false)
   const [isDownloadReady, setIsDownloadReady] = useState(false)
   const [isDownloadFailed, setIsDownloadFailed] = useState(false)
-  
-  
+
 
   useEffect(() => {
     switch(pdfStitchStatus) {
@@ -1130,9 +1130,10 @@ export const RecordsLog = ({
 
 
 const Attachment = React.memo(({indexValue, record, handlePopupButtonClick, getFullname, isMinistryCoordinator,ministryId}) => {
-
+  
   const classes = useStyles();
   const [disabled, setDisabled] = useState(false);
+  const [isRetry, setRetry] = useState(false); 
   // useEffect(() => {
   //   if(record && record.filename) {
   //     setDisabled(isMinistryCoordinator && record.category == 'personal')
@@ -1206,7 +1207,7 @@ const Attachment = React.memo(({indexValue, record, handlePopupButtonClick, getF
             <FontAwesomeIcon icon={faCheckCircle} size='2x' color='#1B8103' className={classes.statusIcons}/>:
             record.failed ?
             <FontAwesomeIcon icon={faExclamationCircle} size='2x' color='#A0192F' className={classes.statusIcons}/>:
-            isrecordtimeout(record.created_at, RECORD_PROCESSING_HRS) == true ?
+            isrecordtimeout(record.created_at, RECORD_PROCESSING_HRS) == true && isRetry == false ?
             <FontAwesomeIcon icon={faExclamationCircle} size='2x' color='#A0192F' className={classes.statusIcons}/>:
             <FontAwesomeIcon icon={faSpinner} size='2x' color='#FAA915' className={classes.statusIcons}/>
           }
@@ -1230,7 +1231,7 @@ const Attachment = React.memo(({indexValue, record, handlePopupButtonClick, getF
               <span>Ready for Redaction</span>:
               record.failed ?
               <span>Error during {record.failed}</span>:
-              isrecordtimeout(record.created_at, RECORD_PROCESSING_HRS) == true ?
+              isrecordtimeout(record.created_at, RECORD_PROCESSING_HRS) == true && isRetry == false ?
               <span>Error due to timeout</span>:
               <span>Deduplication & file conversion in progress</span>
             }
@@ -1240,6 +1241,7 @@ const Attachment = React.memo(({indexValue, record, handlePopupButtonClick, getF
             handlePopupButtonClick={handlePopupButtonClick}
             disabled={disabled}
             ministryId={ministryId}
+            setRetry={setRetry}
           />
         </Grid>
       </Grid>
@@ -1323,9 +1325,10 @@ const opendocumentintab =(record,ministryId)=>
   window.open(url, '_blank').focus();
 }
 
-const AttachmentPopup = React.memo(({indexValue, record, handlePopupButtonClick, disabled,ministryId}) => {
+const AttachmentPopup = React.memo(({indexValue, record, handlePopupButtonClick, disabled,ministryId, setRetry}) => {
   const ref = React.useRef();
   const closeTooltip = () => ref.current && ref ? ref.current.close():{};
+  
 
   const handleRename = () => {
     closeTooltip();
@@ -1358,6 +1361,7 @@ const AttachmentPopup = React.memo(({indexValue, record, handlePopupButtonClick,
   };
 
   const handleRetry = () => {
+    setRetry(true)
     closeTooltip();
     handlePopupButtonClick("retry", record);
   };
