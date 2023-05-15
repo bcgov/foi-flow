@@ -58,7 +58,7 @@ class notificationuser:
             notificationusers.append({"userid": requestjson['watchedby'], "usertype":notificationconfig().getnotificationusertypeid("Watcher")})
         else:
             if requesttype == "ministryrequest":
-                watchers =  watcherservice().getallministryrequestwatchers(foirequest["foiministryrequestid"])
+                watchers =  watcherservice().getallministryrequestwatchers(foirequest["foiministryrequestid"], self.__isministryonly(notificationtype))
             else:
                 watchers =  watcherservice().getrawrequestwatchers(foirequest['requestid'])
             for watcher in watchers:
@@ -73,10 +73,13 @@ class notificationuser:
         else:
             if requesttype == "ministryrequest" and foirequest["assignedministryperson"] is not None and (notificationtype == 'Ministry Assignment' or 'Assignment' not in notificationtype):
                 notificationusers.append({"userid":foirequest["assignedministryperson"], "usertype":notificationtypeid})
-            if foirequest["assignedto"] is not None and foirequest["assignedto"] != '' and (notificationtype == 'IAO Assignment' or 'Assignment' not in notificationtype):
+            if self.__isministryonly(notificationtype) == False and foirequest["assignedto"] is not None and foirequest["assignedto"] != '' and (notificationtype == 'IAO Assignment' or 'Assignment' not in notificationtype):
                 notificationusers.append({"userid":foirequest["assignedto"], "usertype":notificationtypeid})
         return notificationusers          
     
+    def __isministryonly(self, notificationtype):
+        return True if notificationtype == "Division Due Reminder" else False 
+
     def __getcommentusers(self, foirequest, comment, requesttype):
         _requestusers = self.getnotificationusers("General", requesttype, "nouser", foirequest)
         commentusers = []
