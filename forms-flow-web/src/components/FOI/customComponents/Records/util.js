@@ -39,7 +39,7 @@ export const calculateTotalFileSize = (divisions) => {
     }, 0);
   }
 
-export const calculateTotalUploadedFileSizeInMB = (records) => {
+export const calculateTotalUploadedFileSizeInKB = (records) => {
     return records.reduce((total, record) => {
         return total + (record.attributes.convertedfilesize ? record.attributes.convertedfilesize : record.attributes.filesize);
     }, 0);
@@ -47,10 +47,10 @@ export const calculateTotalUploadedFileSizeInMB = (records) => {
 
 export const getReadableFileSize = (mb) => {
     if (mb < 1) {
-        return (mb * 1024).toFixed(2) + ' KB'
+        return (mb * 1024).toFixed(4) + ' KB'
     } else if (mb > 1000) {
-        return (mb/ 1024).toFixed(2) + ' GB'
+        return (mb/ 1024).toFixed(4) + ' GB'
     } else {
-        return mb.toFixed() + ' MB'
+        return mb.toFixed(4) + ' MB'
     }
   }

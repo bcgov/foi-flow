@@ -96,7 +96,6 @@ const FileUpload = ({
               if (sizeInMB <= maxFileSize) {
                 console.log("totalUploadedRecordSize:",totalUploadedRecordSize);
                 console.log("_totalFileSizeInMB:",_totalFileSizeInMB);
-                console.log("totalRecordUploadLimit:",totalRecordUploadLimit);
                 if (totalUploadedRecordSize > 0) {
                   if (_totalFileSizeInMB + totalUploadedRecordSize <= totalRecordUploadLimit) {
                     recordUploadLimitReached = false;
