@@ -620,8 +620,8 @@ export const RecordsLog = ({
   }
 
   const retryDocument = (record) => {
-    record.trigger = 'recordretry';
-    record.service = record.failed;
+    record.trigger = 'recordretry';    
+    record.service = record.failed ? record.failed : 'all';
     if (record.isattachment) {
       var parentRecord = recordsObj.records.find(r => r.recordid = record.rootparentid);
       record.attributes.divisions = parentRecord.attributes.divisions;

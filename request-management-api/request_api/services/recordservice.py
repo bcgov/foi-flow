@@ -56,7 +56,7 @@ class recordservice(recordservicebase):
         _ministryrequest = FOIMinistryRequest.getrequestbyministryrequestid(ministryrequestid)
         for record in data['records']:
             _filepath, extension = path.splitext(record['s3uripath'])
-            extension = extension.lower()
+            extension = extension.lower()            
             if record['service'] == 'deduplication':
                 if extension not in DEDUPE_FILE_TYPES:
                     return DefaultMethodResult(False,'Dedupe only accepts the following formats: ' + ', '.join(DEDUPE_FILE_TYPES), -1, record['recordid'])
@@ -67,6 +67,8 @@ class recordservice(recordservicebase):
                     return DefaultMethodResult(False,'File Conversion only accepts the following formats: ' + ', '.join(FILE_CONVERSION_FILE_TYPES), -1, record['recordid'])
                 else:
                     streamkey = self.conversionstreamkey
+            else:
+                streamkey = self.dedupestreamkey if extension in DEDUPE_FILE_TYPES else self.conversionstreamkey
             jobids, err = self.makedocreviewerrequest('POST', '/api/jobstatus', {
                 'records': [record],
                 'batch': record['attributes']['batch'],
