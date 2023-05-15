@@ -24,8 +24,10 @@ class recordservice(recordservicebase):
     largefileconversionstreamkey = getenv('EVENT_QUEUE_CONVERSION_LARGE_FILE_STREAM_KEY')
     dedupestreamkey = getenv('EVENT_QUEUE_DEDUPE_STREAMKEY')
     largefilededupestreamkey = getenv('EVENT_QUEUE_DEDUPE_LARGE_FILE_STREAMKEY')
-    pdfstitchstreamkey = getenv('EVENT_QUEUE_PDFSTITCH_STREAMKEY')
-    largefilesizelimit= getenv('STREAM_SEPARATION_FILE_SIZE_LIMIT')
+    pdfstitchstreamkey = getenv('EVENT_QUEUE_PDFSTITCH_STREAMKEY')    
+    dedupelargefilesizelimit= getenv('DEDUPE_STREAM_SEPARATION_FILE_SIZE_LIMIT',104857600)
+    conversionlargefilesizelimit= getenv('CONVERSION_STREAM_SEPARATION_FILE_SIZE_LIMIT',3145728)
+    stitchinglargefilesizelimit= getenv('STITCHING_STREAM_SEPARATION_FILE_SIZE_LIMIT',524288000)
     pdfstitchstreamkey_largefiles = getenv('EVENT_QUEUE_PDFSTITCH_LARGE_FILE_STREAMKEY')
 
     def create(self, requestid, ministryrequestid, recordschema, userid):
@@ -196,7 +198,7 @@ class recordservice(recordservicebase):
                 "totalfilesize": message["totalfilesize"]
             }
             print("final message >>>>>> ", streamobject)
-            if message["totalfilesize"] > int(self.largefilesizelimit) and self.pdfstitchstreamkey_largefiles:
+            if message["totalfilesize"] > int(self.stitchinglargefilesizelimit) and self.pdfstitchstreamkey_largefiles:
                 print("pdfstitchstreamkey_largefiles = ", self.pdfstitchstreamkey_largefiles)
                 return eventqueueservice().add(self.pdfstitchstreamkey_largefiles, streamobject)
             elif self.pdfstitchstreamkey:
@@ -259,13 +261,13 @@ class recordservice(recordservicebase):
                         "incompatible": 'true' if extension in NONREDACTABLE_FILE_TYPES else 'false'
                     }
                     if extension in FILE_CONVERSION_FILE_TYPES:
-                        if entry['attributes']['filesize'] < int(self.largefilesizelimit):
+                        if entry['attributes']['filesize'] < int(self.conversionlargefilesizelimit):
                             assignedstreamkey =self.conversionstreamkey
                         else:
                             assignedstreamkey =self.largefileconversionstreamkey
                         eventqueueservice().add(assignedstreamkey, streamobject)
                     if extension in DEDUPE_FILE_TYPES:
-                        if 'convertedfilesize' in entry['attributes'] and entry['attributes']['convertedfilesize'] < int(self.largefilesizelimit) or 'convertedfilesize' not in entry['attributes'] and entry['attributes']['filesize'] < int(self.largefilesizelimit):
+                        if 'convertedfilesize' in entry['attributes'] and entry['attributes']['convertedfilesize'] < int(self.dedupelargefilesizelimit) or 'convertedfilesize' not in entry['attributes'] and entry['attributes']['filesize'] < int(self.dedupelargefilesizelimit):
                             assignedstreamkey= self.dedupestreamkey
                         else:
                             assignedstreamkey= self.largefilededupestreamkey
