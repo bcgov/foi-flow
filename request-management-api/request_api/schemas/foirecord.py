@@ -81,7 +81,7 @@ class FOIRequestRetryRecordSchema(Schema):
     s3uripath = fields.Str(data_key="s3uripath",allow_none=False, validate=[validate.Length(max=1000, error=MAX_EXCEPTION_MESSAGE)])
     filename = fields.Str(data_key="filename",allow_none=False, validate=[validate.Length(max=500, error=MAX_EXCEPTION_MESSAGE)])
     trigger = fields.Str(validate=validate.OneOf(['recordreplace', 'recordretry']), required=True,allow_none=False)
-    service = fields.Str(validate=validate.OneOf(['deduplication', 'conversion']), required=True,allow_none=False)
+    service = fields.Str(validate=validate.OneOf(['deduplication', 'conversion',"all"]), required=False,allow_none=False)
     documentmasterid = fields.Integer(required=True,allow_none=True)
     outputdocumentmasterid = fields.Integer(required=False,allow_none=True)
     createdby = fields.Str(validate=validate.Length(min=1),required=True,allow_none=False)
