@@ -294,7 +294,7 @@ export default function AttachmentModal({
                   attachment={attachment}  
                   attchmentFileNameList={attchmentFileNameList}  
                   multipleFiles={multipleFiles} 
-                  mimeTypes={uploadFor === 'record' && modalFor==="replace" ? replacementfiletypes : mimeTypes} 
+                  mimeTypes={mimeTypes} 
                   maxFileSize={maxFileSize} 
                   totalFileSize={totalFileSize} 
                   updateFilesCb={updateFilesCb}
