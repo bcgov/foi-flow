@@ -316,7 +316,7 @@ export const ContactApplicant = ({
             >
               <label className="hideContent">Search Correspondence</label>
               <InputBase
-                id="foicommentfilter"
+                id="foicorrespondencefilter"
                 placeholder="Search Correspondence ..."
                 defaultValue={""}
                 onChange={(e: any) => { onFilterChange(e.target.value.trim()) }}
@@ -408,6 +408,8 @@ export const ContactApplicant = ({
             handleRename={undefined}
             isMinistryCoordinator={false}
             uploadFor={"email"}
+            maxNoFiles={10}
+            bcgovcode={undefined}
           />
         </div>
         <div id="correspondence-editor-ql-toolbar" className="ql-toolbar ql-snow">

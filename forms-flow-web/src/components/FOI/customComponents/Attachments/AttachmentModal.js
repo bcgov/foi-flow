@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useSelector } from "react-redux";
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
@@ -12,7 +13,8 @@ import './attachmentmodal.scss';
 import FileUpload from '../FileUpload';
 import { makeStyles } from '@material-ui/core/styles';
 import { MimeTypeList, MaxFileSizeInMB } from "../../../../constants/FOI/enum";
-import { StateTransitionCategories } from '../../../../constants/FOI/statusEnum';
+import { StateTransitionCategories, AttachmentCategories } from '../../../../constants/FOI/statusEnum';
+import { TOTAL_RECORDS_UPLOAD_LIMIT } from "../../../../constants/constants";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -37,18 +39,60 @@ const useStyles = makeStyles((theme) => ({
 
 }));
 
-export default function AttachmentModal({ modalFor, openModal, handleModal, multipleFiles, requestNumber, requestId, attachment, attachmentsArray, handleRename, isMinistryCoordinator, existingDocuments=[], uploadFor="attachment" }) {
+export default function AttachmentModal({
+  modalFor,
+  openModal,
+  handleModal,
+  multipleFiles,
+  requestNumber,
+  requestId,
+  attachment,
+  attachmentsArray,
+  handleRename,
+  isMinistryCoordinator,
+  uploadFor="attachment",
+  maxNoFiles,
+  bcgovcode,
+  existingDocuments=[],
+  divisions=[],
+  replacementfiletypes=[],
+  totalUploadedRecordSize=0
+}) {
 
-    const mimeTypes = multipleFiles ? MimeTypeList.attachmentLog : MimeTypeList.stateTransition;
-    const maxFileSize = multipleFiles ? MaxFileSizeInMB.attachmentLog : MaxFileSizeInMB.stateTransition;
+    let tagList = [];
+    if(uploadFor === 'attachment') {
+      tagList = AttachmentCategories.categorys.filter(category => category.type.includes("tag"));
+      if (isMinistryCoordinator) {
+        tagList = tagList.filter(tag => tag.name !== "applicant")
+      }
+    } else if (uploadFor === 'record') {
+      tagList = divisions.map(division => {
+        return {
+          name: division.divisionid,
+          display: division.divisionname,
+        }
+      });
+    }
+
+    const recordFormats = useSelector((state) => state.foiRequests.recordFormats)
+    useEffect(() => {
+      setMimeTypes(multipleFiles ?
+        (uploadFor === 'attachment' ? [...recordFormats, ...MimeTypeList.additional] : (uploadFor === 'record' && modalFor==="replace" ? replacementfiletypes: recordFormats))
+        : MimeTypeList.stateTransition);
+    }, [recordFormats])
+    const [mimeTypes, setMimeTypes] = useState(multipleFiles ?
+      (uploadFor === 'attachment' ? [...recordFormats, ...MimeTypeList.additional] : (uploadFor === 'record' && modalFor==="replace" ? replacementfiletypes: recordFormats))
+      : MimeTypeList.stateTransition);
+    const maxFileSize = uploadFor === 'record' ? MaxFileSizeInMB.totalFileSize : multipleFiles ? MaxFileSizeInMB.attachmentLog : MaxFileSizeInMB.stateTransition;
     const totalFileSize = multipleFiles ? MaxFileSizeInMB.totalFileSize : MaxFileSizeInMB.stateTransition;
     const classes = useStyles();
     const [files, setFiles] = useState([]);
     const [newFilename, setNewFilename] = useState("");
     const [extension, setExtension] = useState("");
     const [errorMessage, setErrorMessage] = useState();
-    const [tagValue, setTagValue] = useState("general");
+    const [tagValue, setTagValue] = useState(uploadFor === 'record' ? "" : "general");
     const attchmentFileNameList = attachmentsArray.map(_file => _file.filename.toLowerCase());
+    const totalRecordUploadLimit= TOTAL_RECORDS_UPLOAD_LIMIT ;
 
     useEffect(() => {
       parseFileName(attachment);
@@ -123,6 +167,7 @@ export default function AttachmentModal({ modalFor, openModal, handleModal, mult
             handleModal(false);
             parseFileName(attachment);
         }
+        if (uploadFor === 'record') setTagValue("");
     };
 
     const handleTagChange = (_tagValue) => {
@@ -139,20 +184,25 @@ export default function AttachmentModal({ modalFor, openModal, handleModal, mult
         let fileStatusTransition = "";
         if (modalFor === 'replace') {
           fileStatusTransition = attachment?.category;
-        }
-        else {
-          fileStatusTransition = tagValue;
+        } else if (uploadFor === "record") {
+          fileStatusTransition = divisions.find(division => division.divisionid === tagValue).divisionname;
+        } else {
+          fileStatusTransition = tagValue
         }
         fileInfoList = files?.map(file => {
           return {
-              ministrycode: "Misc",
+              ministrycode: uploadFor === "record" ? bcgovcode : "Misc",
               requestnumber: requestNumber ? requestNumber : `U-00${requestId}`,
               filestatustransition: fileStatusTransition,
               filename: file.filename? file.filename : file.name,
+              filesize: file.size,
+              ...(uploadFor === "record") && {divisionid: tagValue}
           }
         });
         
         handleModal(true, fileInfoList, files);
+        setFiles([]);
+        if (uploadFor === 'record') setTagValue("");
       }
     }  
     const getMessage = () => {
@@ -161,7 +211,9 @@ export default function AttachmentModal({ modalFor, openModal, handleModal, mult
           return {title: "Add Attachment", body: ""};
         case "replace":
           let _message = {};
-            if (attachment) {              
+            if (uploadFor === 'record') {
+              _message = {title: "Replace Records", body:<>Replace the existing record with a reformatted or updated version of the same record.<br></br>The original file that was uploaded will still be available for download.</> }
+            } else if (attachment) {
               switch(attachment.category.toLowerCase()) {
                 case StateTransitionCategories.cfrreview.name: 
                   _message = {title: "Replace Attachment", body: <>This attachment must be replaced as it was uploaded during the state change. Please replace attachment with document from Request #{requestNumber} changing from <b>{StateTransitionCategories.cfrreview.fromState}</b> to <b>{StateTransitionCategories.cfrreview.toState}</b>.</>};
@@ -190,13 +242,28 @@ export default function AttachmentModal({ modalFor, openModal, handleModal, mult
         case "rename":
           return {title: "Rename Attachment", body: ""};
         case "delete":
-          return {title: "Delete Attachment", body: "Are you sure you want to delete the attachment?"};            
+          if (uploadFor === 'record') {
+            return {title: "Delete Record", body: <>Are you sure you want to delete this record?<br></br><i>If you delete this record, the record will not appear in the redaction app for review by IAO.</i></>};
+          } else {
+            return {title: "Delete Attachment", body: "Are you sure you want to delete the attachment?"};
+          }          
         default:
             return {title: "", body: ""};
       }
     }
     let message = getMessage();
-    const btnClass = (files.length === 0 && existingDocuments.length === 0 && modalFor !== 'delete') ? classes.btndisabled : classes.btnenabled
+
+    const isSaveDisabled = () => {
+      if (modalFor === 'delete') {
+        return false;
+      } else if (files.length === 0 && existingDocuments.length === 0) {
+        return true;
+      } else if (modalFor === 'add') {
+        return tagValue === "";
+      } else if (modalFor === 'replace') {
+        return false;
+      }
+    }
   
     return (
       <div className="state-change-dialog">        
@@ -216,7 +283,7 @@ export default function AttachmentModal({ modalFor, openModal, handleModal, mult
             </DialogTitle>
           <DialogContent>
             <DialogContentText id="state-change-dialog-description" component={'span'}>
-              <div className="modal-message">
+              <div className="attachment-modal-message">
                 <span className="confirmation-message">
                   {message.body}                               
                 </span>                
@@ -232,11 +299,15 @@ export default function AttachmentModal({ modalFor, openModal, handleModal, mult
                   totalFileSize={totalFileSize} 
                   updateFilesCb={updateFilesCb}
                   modalFor={modalFor}
+                  uploadFor={uploadFor}
+                  tagList={tagList}
                   handleTagChange={handleTagChange}
                   tagValue={tagValue}
+                  maxNumberOfFiles={maxNoFiles}
                   isMinistryCoordinator={isMinistryCoordinator}
                   existingDocuments={existingDocuments}
-                  uploadFor={uploadFor}
+                  totalUploadedRecordSize={totalUploadedRecordSize}
+                  totalRecordUploadLimit={totalRecordUploadLimit}
                 /> 
                 :
                 <ModalForRename modalFor={modalFor} newFilename={newFilename} updateFilename={updateFilename} errorMessage={errorMessage} extension={extension} />
@@ -250,7 +321,7 @@ export default function AttachmentModal({ modalFor, openModal, handleModal, mult
                 Save
               </button>
               :
-              <button className={`btn-bottom btn-save ${ btnClass }`} disabled={files.length === 0 && existingDocuments.length === 0 && modalFor !== 'delete'} onClick={handleSave}>
+              <button className={`btn-bottom btn-save ${ isSaveDisabled() ? classes.btndisabled : classes.btnenabled }`} disabled={isSaveDisabled()} onClick={handleSave}>
                 {uploadFor === "email" ? "Save Changes" : "Continue"}
               </button>
             }

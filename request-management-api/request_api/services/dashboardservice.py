@@ -34,7 +34,10 @@ class dashboardservice:
             request.assignedTo, 
             idnumberprefix + request.idNumber, 
             idnumber,
-            request.version
+            request.version,
+            request.description,
+            request.recordsearchfromdate,
+            request.recordsearchtodate,
         )
         baserequestinfo.update({'firstName': request.firstName})
         baserequestinfo.update({'lastName': request.lastName})
@@ -49,7 +52,7 @@ class dashboardservice:
         baserequestinfo.update({'requestPageCount': request.requestPageCount})        
         return baserequestinfo
         
-    def __preparebaserequestinfo(self, id, requesttype, status, receiveddate, receiveddateuf, assignedgroup, assignedto, idnumber, axisrequestid, version):
+    def __preparebaserequestinfo(self, id, requesttype, status, receiveddate, receiveddateuf, assignedgroup, assignedto, idnumber, axisrequestid, version, description, fromdate, todate):
         return {'id': id,
             'requestType': requesttype,
             'currentState': status,
@@ -59,7 +62,10 @@ class dashboardservice:
             'assignedTo': assignedto,            
             'idNumber': idnumber,
             'axisRequestId': axisrequestid,
-            'version':version
+            'version':version,
+            'description':description,
+            'fromdate':fromdate,
+            'todate':todate,
         }
 
     def getrequestqueuepagination(self, groups=None, page=1, size=10, sortingitems=[], sortingorders=[], filterfields=[], keyword=None, additionalfilter='All', userid=None):        
@@ -123,7 +129,8 @@ class dashboardservice:
         for request in requests.items:
             _openrequest = self.__preparebaserequestinfo(request.id, request.requestType, request.currentState, 
                                                          request.receivedDate, request.receivedDateUF, request.assignedGroup, 
-                                                         request.assignedTo, request.idNumber, request.axisRequestId, request.version)
+                                                         request.assignedTo, request.idNumber, request.axisRequestId, request.version,
+                                                         request.description, request.recordsearchfromdate, request.recordsearchtodate)
             _openrequest.update({'assignedministrygroup': request.assignedministrygroup})
             _openrequest.update({'assignedministryperson': request.assignedministryperson})
             _openrequest.update({'cfrstatus':'Select Division'})

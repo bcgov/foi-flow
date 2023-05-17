@@ -31,7 +31,7 @@ jobs:
         run: |
           if [ ${{ github.ref_name }} == 'dev' ]; then
             echo "For ${{ github.ref_name }} branch"
-            echo "TOOLS_NAME=${{secrets.OPENSHIFT4_AI_FRONTEND_REPOSITORY}}" >> $GITHUB_ENV
+            echo "TOOLS_NAME=${{secrets.OPENSHIFT4_AI_E2_FRONTEND_REPOSITORY}}" >> $GITHUB_ENV
             echo "TAG_NAME="dev"" >> $GITHUB_ENV
             echo "BRANCH_NAME="dev"" >> $GITHUB_ENV
             echo "ENV_NAME="dev"" >> $GITHUB_ENV

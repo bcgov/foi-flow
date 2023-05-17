@@ -47,6 +47,7 @@ const BottomButtonGroup = React.memo(
     isValidationError,
     saveMinistryRequestObject,
     unSavedRequest,
+    recordsUploading,
     CFRUnsaved,
     handleSaveRequest,
     currentSelectedStatus,
@@ -68,7 +69,7 @@ const BottomButtonGroup = React.memo(
 
     const returnToQueue = (e) => {
       if (
-        (!unSavedRequest && !CFRUnsaved) ||
+        (!unSavedRequest && !recordsUploading && !CFRUnsaved) ||
         window.confirm(
           "Are you sure you want to leave? Your changes will be lost."
         )
@@ -140,7 +141,7 @@ const BottomButtonGroup = React.memo(
     }, [currentSelectedStatus, stateChanged]);
 
     React.useEffect(() => {
-      if (unSavedRequest || CFRUnsaved) {
+      if (unSavedRequest || recordsUploading || CFRUnsaved) {
         window.history.pushState(null, null, window.location.pathname);
         window.addEventListener("popstate", handleOnHashChange);
         window.addEventListener("beforeunload", alertUser);
@@ -149,7 +150,7 @@ const BottomButtonGroup = React.memo(
         window.removeEventListener("popstate", handleOnHashChange);
         window.removeEventListener("beforeunload", alertUser);
       };
-    }, [unSavedRequest, CFRUnsaved]);
+    }, [unSavedRequest, recordsUploading, CFRUnsaved]);
 
     const saveRequestModal = () => {
       if (currentSelectedStatus !== saveMinistryRequestObject?.currentState)
