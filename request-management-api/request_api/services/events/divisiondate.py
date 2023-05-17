@@ -2,7 +2,9 @@ from os import stat
 from re import VERBOSE
 from request_api.services.commons.duecalculator import duecalculator
 from request_api.services.notificationservice import notificationservice
+from request_api.services.commentservice import commentservice
 from request_api.models.FOIMinistryRequests import FOIMinistryRequest
+from request_api.models.FOIRequestComments import FOIRequestComment
 import json
 from request_api.models.default_method_result import DefaultMethodResult
 from enum import Enum
@@ -32,6 +34,7 @@ class divisiondateevent(duecalculator):
                 elif  self.getpreviousbusinessday(entry['duedate'],ca_holidays) == _today:
                     message = self.__upcomingduemessage(entry)
                 self.__createnotification(message,entry['foiministryrequestid'])
+                self.__createcomment(entry, message)
             return DefaultMethodResult(True,'Division reminder notifications created',_today)
         except BusinessException as exception:            
             current_app.logger.error("%s,%s" % ('Legislative reminder Notification Error', exception.message))
@@ -40,6 +43,21 @@ class divisiondateevent(duecalculator):
     def __createnotification(self, message, requestid):
         if message is not None: 
             return notificationservice().createnotification({"message" : message}, requestid, "ministryrequest", self.__notificationtype(), self.__defaultuserid(), False)
+        
+    def __createcomment(self, entry, message):
+        if message is not None: 
+            _comment = self.__preparecomment(entry, message)
+            return commentservice().createcomments(_comment, self.__defaultuserid(), 2)
+
+    
+    def __preparecomment(self, foirequest, message):
+        _comment = dict()
+        _comment['comment'] = message
+        _comment['ministryrequestid'] = foirequest["foiministryrequestid"]
+        _comment['version'] = foirequest["version"]
+        _comment['taggedusers'] = None
+        _comment['parentcommentid'] = None
+        return _comment
 
     def __upcomingduemessage(self, data):
         return self.__getformattedprefix(data)+ ' due on ' + parse(str(data['duedate'])).strftime("%Y %b %d").upper()  

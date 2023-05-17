@@ -50,8 +50,11 @@ class watcherservice:
         else:
             return FOIRequestWatcher.getNonMinistrywatchers(ministryrequestid)
     
-    def getallministryrequestwatchers(self,ministryrequestid):
-        return FOIRequestWatcher.getMinistrywatchers(ministryrequestid) + FOIRequestWatcher.getNonMinistrywatchers(ministryrequestid)
+    def getallministryrequestwatchers(self, ministryrequestid, isministryonly=False):
+        ministrywatchers = FOIRequestWatcher.getMinistrywatchers(ministryrequestid)
+        if isministryonly == False:
+            return ministrywatchers + FOIRequestWatcher.getNonMinistrywatchers(ministryrequestid)
+        return ministrywatchers 
     
         
     def disableministryrequestwatchers(self, ministryrequestid, userid):
