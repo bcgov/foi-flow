@@ -18,9 +18,13 @@ export const generateNewFileName = (newFileName, uploadFileName, attachedFileNam
   return newFileName;
 }
 
-export const getErrorMessage = (_duplicateFiles, _typeErrorFiles, _overSizedFiles, maxFileSize, multipleFiles, mimeTypes) => {
+export const getErrorMessage = (_duplicateFiles, _typeErrorFiles, _overSizedFiles, maxFileSize, multipleFiles, mimeTypes, recordUploadLimitReached, totalRecordUploadLimit) => {
   let _errorMessage = [];
   let singleFileUploadAllowedFileExtensions = "pdf, xlsx, docx";
+  if(recordUploadLimitReached){
+    _errorMessage.push(<>A maximum <b>{totalRecordUploadLimit > 1000 ? (totalRecordUploadLimit/ 1024).toFixed(2) +' GB': totalRecordUploadLimit +' MB'}</b> of records can be uploaded per request. Please load the records for this request onto the LAN and notify IAO by updating the request state to Deduplication and posting a comment in the request.</>);
+    return _errorMessage;
+  }
   if (mimeTypes.some(mimeType => mimeType === '.msg' || mimeType === '.eml')) {
     singleFileUploadAllowedFileExtensions = "pdf, xlsx, docx, msg, eml";
   }
@@ -46,8 +50,8 @@ export const isEmailFileType = (_file) => {
 }
 
 export const allowedFileType = (_file, mimeTypes) => {
-  return ((mimeTypes.includes(_file.type) || mimeTypes.includes('.' + _file.filename.split('.').pop())) ||
-    ([".msg", ".eml"].some(mimetype => (mimeTypes.includes(mimetype))) && isEmailFileType(_file)));
+  return ((mimeTypes.includes(_file.type?.toLowerCase()) || mimeTypes.includes('.' + _file.filename.split('.').pop()?.toLowerCase())) ||
+    mimeTypes.includes('.' + _file.name.split('.').pop()?.toLowerCase()));
 }
 
 export const allowedFileSize = (_totalFileSizeInMB, multipleFiles, totalFileSize) => {

@@ -50,7 +50,8 @@ class FOIMinistryRequestDivision(db.Model):
         divisioninfos = division_schema.dump(_divisions)       
         return divisioninfos
     
-   
+
+    
 class FOIMinistryRequestDivisionSchema(ma.Schema):
     class Meta:
         fields = ('foiministrydivisionid','division.divisionid','division.name','stage.stageid','stage.name','foiministryrequest_id','foiministryrequestversion_id', 'divisionduedate', 'eapproval', 'divisionreceiveddate')

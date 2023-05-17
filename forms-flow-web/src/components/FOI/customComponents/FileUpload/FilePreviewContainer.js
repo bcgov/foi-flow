@@ -8,7 +8,7 @@ function FilePreviewContainer({files, removeFile}) {
           {Object.keys(files).map((fileName, _index) => {
             let file = files[fileName];
             return (
-              <li className={`${Object.keys(files).length === 1 ? "ol-display-none": ""}`}>
+              <li key={_index} className={`${Object.keys(files).length === 1 ? "ol-display-none": ""}`}>
                 <FilePreviewList key={fileName} file={file} fileName={fileName} removeFile={removeFile} />
               </li>
             );

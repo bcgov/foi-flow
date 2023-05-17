@@ -58,10 +58,12 @@ import {
       headers: {
         'X-Amz-Date': headerDetails.amzdate,
         'Authorization': headerDetails.authheader,
-      }
+        'Content-Type': 'application/octet-stream'
+      },
     };
-    return httpOSSPUTRequest(headerDetails.filepath, file, requestOptions)
-      .then((res) => {
+    try {
+    let response = httpOSSPUTRequest(headerDetails.filepath, file, requestOptions)
+    response.then((res) => {
         if (res) {
           done(null, res.status);
         } else {
@@ -73,6 +75,10 @@ import {
         dispatch(serviceActionError(error));
         done("Error in saving files to S3");
       });
+    return response;
+    } catch (error) {
+      console.error("Error:", error);
+    }
   };
   
   export const getFileFromS3 = (headerDetails, ...rest) => {  
@@ -82,7 +88,8 @@ import {
         "X-Amz-Date": headerDetails.amzdate,
         Authorization: headerDetails.authheader,     
       },
-      responseType: 'blob'
+      responseType: 'blob',
+      onDownloadProgress: rest[1]
     };  
     return httpOSSGETRequest(headerDetails.filepath, requestOptions)
       .then((res, dispatch) => {
@@ -99,7 +106,7 @@ import {
         done("Error in getting files from S3");
       });
   };
-  
+
   export const getFOIS3DocumentPreSignedUrl = (filepath,ministryrequestid,dispatch,...rest) => {
     const done = fnDone(rest);
     const type = rest[1] || 'attachments';
@@ -120,8 +127,8 @@ import {
       });
     return response;
   };
-
-  export const postFOIS3DocumentPreSignedUrl = (ministryrequestid = -1, data, category="attachments", bcgovcode="Misc", dispatch, ...rest) => {
+  
+  export const postFOIS3DocumentPreSignedUrl = (ministryrequestid = -1, data, category="attachments", bcgovcode="Misc", dispatch, ...rest) => {	
     const done = fnDone(rest);
     const apiurl = API.FOI_POST_S3DOCUMENT_PRESIGNEDURL+ "/" + ministryrequestid + "/" + category + "/" + bcgovcode;
     const response = httpPOSTRequest(apiurl, data, UserService.getToken());
@@ -139,3 +146,22 @@ import {
       });
     return response;
   };
+
+  export const completeMultiPartUpload = (data, ministryrequestid = -1, category, bcgovcode, dispatch, ...rest) => {
+    const done = fnDone(rest);
+    const response = httpPOSTRequest(API.FOI_POST_COMPLETE_UPLOAD + '/' + ministryrequestid + '/' + category + '/' + bcgovcode, data);
+    response.then((res) => {
+        if (res.data) {
+          done(null, res.data);
+        } else {
+          dispatch(serviceActionError(res));
+          done("Error in getting OSS Header information");
+        }
+      })
+      .catch((error) => {
+        dispatch(serviceActionError(error));
+        done("Error in getting OSS Header information");
+      });
+    return response;
+  };
+  

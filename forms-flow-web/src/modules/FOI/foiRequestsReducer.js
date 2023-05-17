@@ -39,6 +39,14 @@ const initialState = {
   foiWatcherList: [],
   foiRequestComments: [],
   foiRequestAttachments: [],
+  foiRequestRecords: {
+    records: [],
+    dedupedfiles:0,
+    removedfiles:0,
+    batchcount:0
+  },
+  foiPDFStitchedRecordForHarms: {},
+  foiPDFStitchStatusForHarms:"not started",
   foiRequestCFRForm: {
     overallsuggestions: "",
     status: "init",
@@ -70,7 +78,14 @@ const initialState = {
   resumeDefaultSorting: false,
   isCorrespondenceLoading: true,
   foiSubjectCodeList: [],
-  restrictedReqTaglist:[]
+  restrictedReqTaglist:[],
+  recordFormats: ['application/pdf',
+  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/vnd.ms-excel',
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/msword',
+  'image/bmp','image/gif','image/jpeg','image/png','image/svg+xml','image/tiff','image/webp',
+  'application/vnd.ms-excel.sheet.macroEnabled.12','.msg', '.eml', '.xls', '.xlsx', '.doc', '.docx', '.ics','.json',
+   '.shx', '.shp','.dbf','.kml','.kmz','.geojson','.cpg','.prj','.sbn','.sbx','.gml','.gdb','.freelist','.atx','.gpkg','.mbtiles','.mpk','.wkt',
+  '.las','.lasd','.laz','.dwf','.dwg','.dxf','.csv','.txt','.png','.jpg'],
   
 };
 
@@ -154,6 +169,12 @@ const foiRequests = (state = initialState, action) => {
       return { ...state, foiRequestComments: action.payload };
     case FOI_ACTION_CONSTANTS.FOI_REQUEST_ATTACHMENTS:
       return { ...state, foiRequestAttachments: action.payload };
+    case FOI_ACTION_CONSTANTS.FOI_REQUEST_RECORDS:
+      return { ...state, foiRequestRecords: action.payload };
+    case FOI_ACTION_CONSTANTS.FOI_PDF_STITCHED_RECORD_FOR_HARMS:
+      return { ...state, foiPDFStitchedRecordForHarms: action.payload };
+    case FOI_ACTION_CONSTANTS.FOI_PDF_STITCHED_STATUS_FOR_HARMS:
+      return { ...state, foiPDFStitchStatusForHarms: action.payload };
     case FOI_ACTION_CONSTANTS.FOI_REQUEST_CFR_FORM:
       return {
         ...state,
@@ -182,6 +203,8 @@ const foiRequests = (state = initialState, action) => {
       return { ...state, foiSubjectCodeList: action.payload };
     case FOI_ACTION_CONSTANTS.RESTRICTED_COMMENT_TAG_LIST:
       return { ...state, restrictedReqTaglist: action.payload };
+    case FOI_ACTION_CONSTANTS.RECORD_FORMATS:
+      return { ...state, recordFormats: action.payload };
     default:
       return state;
   }

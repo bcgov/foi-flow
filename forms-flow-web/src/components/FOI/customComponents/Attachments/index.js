@@ -3,7 +3,7 @@ import './attachments.scss'
 import { useDispatch } from "react-redux";
 import AttachmentModal from './AttachmentModal';
 import Loading from "../../../../containers/Loading";
-import { saveFilesinS3, getFileFromS3, postFOIS3DocumentPreSignedUrl, getFOIS3DocumentPreSignedUrl } from "../../../../apiManager/services/FOI/foiOSSServices";
+import { saveFilesinS3, getFileFromS3, postFOIS3DocumentPreSignedUrl, getFOIS3DocumentPreSignedUrl, completeMultiPartUpload } from "../../../../apiManager/services/FOI/foiOSSServices";
 import { saveFOIRequestAttachmentsList, replaceFOIRequestAttachment, saveNewFilename, deleteFOIRequestAttachment } from "../../../../apiManager/services/FOI/foiAttachmentServices";
 import { StateTransitionCategories, AttachmentCategories, AttachmentLetterCategories } from '../../../../constants/FOI/statusEnum'
 import { addToFullnameList, getFullnameList, ConditionalComponent } from '../../../../helper/FOI/helper';
@@ -21,6 +21,9 @@ import { saveAs } from "file-saver";
 import { downloadZip } from "client-zip";
 import AttachmentFilter from './AttachmentFilter';
 import { getCategory } from './util';
+import { readUploadedFileAsBytes } from '../../../../helper/FOI/helper';
+import { OSS_S3_CHUNK_SIZE } from "../../../../constants/constants";
+import { toast } from "react-toastify";
 
 const useStyles = makeStyles((_theme) => ({
   createButton: {
@@ -76,10 +79,8 @@ export const AttachmentSection = ({
   
 
   const [openModal, setModal] = useState(false);
-  const [successCount, setSuccessCount] = useState(0);
   const [fileCount, setFileCount] = useState(0);
   const dispatch = useDispatch();
-  const [documents, setDocuments] = useState([]);
   const [isAttachmentLoading, setAttachmentLoading] = useState(false);
   const [multipleFiles, setMultipleFiles] = useState(true);
   const [modalFor, setModalFor] = useState("add");
@@ -95,21 +96,6 @@ export const AttachmentSection = ({
     setUpdateAttachment({});
     setModal(true);
   }
-
-  React.useEffect(() => {    
-    if (successCount === fileCount && successCount !== 0) {
-        setModal(false);
-        const documentsObject = {documents: documents};
-        if (modalFor === 'replace' && updateAttachment) {
-          replaceAttachment();
-        }
-        else {
-          dispatch(saveFOIRequestAttachmentsList(requestId, ministryId, documentsObject,(err, _res) => {
-            dispatchRequestAttachment(err);
-        }));
-      }
-    }
-  },[successCount])
 
   React.useEffect(() => {
     setAttachmentsForDisplay(searchAttachments(attachments, filterValue, keywordValue));
@@ -128,18 +114,9 @@ export const AttachmentSection = ({
     });
   }
 
-  const replaceAttachment = () => {
-    const replaceDocumentObject = {filename: documents[0].filename, documentpath: documents[0].documentpath};
-    const documentId = ministryId ? updateAttachment.foiministrydocumentid : updateAttachment.foidocumentid;      
-    dispatch(replaceFOIRequestAttachment(requestId, ministryId, documentId, replaceDocumentObject,(err, _res) => {
-      dispatchRequestAttachment(err);
-    }));
-  }
-
   const dispatchRequestAttachment = (err) => {
     if (!err) {
       setAttachmentLoading(false);
-      setSuccessCount(0);
     }
   }
 
@@ -158,25 +135,79 @@ export const AttachmentSection = ({
   const saveDocument = (value, fileInfoList, files) => {
     if (value) {
       if (files.length !== 0) {
-        setAttachmentLoading(true);
-        postFOIS3DocumentPreSignedUrl(ministryId, fileInfoList, 'attachments', bcgovcode, dispatch, (err, res) => {
+        // setAttachmentLoading(true);
+        postFOIS3DocumentPreSignedUrl(ministryId, fileInfoList.map(file => ({...file, multipart: true})), 'attachments', bcgovcode, dispatch, async (err, res) => {
           let _documents = [];
           if (!err) {
-            res.map((header, index) => {
+            let completed = 0;
+            let failed = [];
+            const toastID = toast.loading("Uploading files (" + completed + "/" + fileInfoList.length + ")")
+            for (let header of res) {
               const _file = files.find(file => file.filename === header.filename);
               const _fileInfo = fileInfoList.find(fileInfo => fileInfo.filename === header.filename);
               const documentDetails = {documentpath: header.filepathdb, filename: header.filename, category: _fileInfo.filestatustransition};
-              _documents.push(documentDetails);
-              setDocuments(_documents);
-              saveFilesinS3(header, _file, dispatch, (_err, _res) => {
-                if (_res === 200) {
-                  setSuccessCount(index+1);
+              let bytes = await readUploadedFileAsBytes(_file)              
+              const CHUNK_SIZE = OSS_S3_CHUNK_SIZE;
+              const totalChunks = Math.ceil(bytes.byteLength / CHUNK_SIZE);
+              let parts = [];
+              for (let chunk = 0; chunk < totalChunks; chunk++) {
+                let CHUNK = bytes.slice(chunk * CHUNK_SIZE, (chunk + 1) * CHUNK_SIZE);
+                let response = await saveFilesinS3({filepath: header.filepaths[chunk]}, CHUNK, dispatch, (_err, _res) => {
+                  if (_err) {
+                    failed.push(header.filename);
+                  }
+                })
+                if (response.status === 200) {
+                  parts.push({PartNumber: chunk + 1, ETag: response.headers.etag})
+                } else {
+                  failed.push(header.filename);
                 }
-                else {
-                  setSuccessCount(0);
+              }
+              await completeMultiPartUpload({uploadid: header.uploadid, filepath: header.filepathdb, parts: parts}, ministryId, 'attachments', bcgovcode, dispatch, (_err, _res) => {                
+                if (!_err && _res.ResponseMetadata.HTTPStatusCode === 200) {
+                  completed++;
+                  toast.update(toastID, {
+                    render: "Uploading files (" + completed + "/" + fileInfoList.length + ")",
+                    isLoading: true,
+                  })
+                  _documents.push(documentDetails);
+                } else {
+                  failed.push(header.filename);
                 }
               })
+            }
+            if (_documents.length > 0) {
+              if (modalFor === 'replace' && updateAttachment) {
+                const replaceDocumentObject = {filename: _documents[0].filename, documentpath: _documents[0].documentpath};
+                const documentId = ministryId ? updateAttachment.foiministrydocumentid : updateAttachment.foidocumentid;      
+                dispatch(replaceFOIRequestAttachment(requestId, ministryId, documentId, replaceDocumentObject,(err, _res) => {
+                  dispatchRequestAttachment(err);
+                }));
+              }
+              else {
+                dispatch(saveFOIRequestAttachmentsList(requestId, ministryId, {documents: _documents}, (err, _res) => {
+                  dispatchRequestAttachment(err);
+                }));
+              }
+            }
+            var toastOptions = {
+              render: failed.length > 0 ?
+                "The following " + failed.length + " file uploads failed\n- " + failed.join("\n- ")  :
+                fileInfoList.length + ' Files successfully saved',
+              type: failed.length > 0 ? "error" : "success",
+            }
+            toast.update(toastID, {
+              ...toastOptions,
+              className: "file-upload-toast",
+              isLoading: false,
+              autoClose: 3000,
+              hideProgressBar: true,
+              closeOnClick: true,
+              pauseOnHover: true,
+              draggable: true,
+              closeButton: true
             });
+            setAttachmentLoading(false)
           }
         })
       }             
@@ -184,31 +215,81 @@ export const AttachmentSection = ({
   }
 
   const downloadDocument = (file) => {
+    const toastID = toast.loading("Downloading file (0%)")
     getFOIS3DocumentPreSignedUrl(file.documentpath.split('/').slice(4).join('/'), ministryId, dispatch, (err, res) => {
       if (!err) {
         getFileFromS3({filepath: res}, (_err, response) => {
           let blob = new Blob([response.data], {type: "application/octet-stream"});
           saveAs(blob, file.filename)
+          toast.update(toastID, {
+            render: _err ? "File download failed" : "Download complete",
+            type: _err ? "error" : "success",
+            className: "file-upload-toast",
+            isLoading: false,
+            autoClose: 3000,
+            hideProgressBar: true,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            closeButton: true
+          });
+        }, (progressEvent) => {
+          toast.update(toastID, {
+            render: "Downloading file (" + Math.floor(progressEvent.loaded / progressEvent.total * 100) + "%)",
+            isLoading: true,
+          })
         });
       }
     }, 'attachments', bcgovcode);
   }
 
   const downloadAllDocuments = async () => {
+    const noOfFiles = attachmentsForDisplay.length;
+    const toastID = toast.loading("Downloading file 0% (0/" + noOfFiles + ")");
     let blobs = [];
+    let failed = 0;
     try {
       for (let attachment of attachmentsForDisplay) {
         const response = await getFOIS3DocumentPreSignedUrl(attachment.documentpath.split('/').slice(4).join('/'), ministryId, dispatch, null, 'attachments', bcgovcode)
         await getFileFromS3({filepath: response.data}, (_err, res) => {
-          let blob = new Blob([res.data], {type: "application/octet-stream"});
-          blobs.push({name: attachment.filename, lastModified: res.headers['last-modified'], input: blob})
+          if (_err) {
+            failed++
+          } else {
+            let blob = new Blob([res.data], {type: "application/octet-stream"});
+            blobs.push({name: attachment.filename, lastModified: res.headers['last-modified'], input: blob})
+          }
+          toast.update(toastID, {
+            render: "Downloading file " + 0 + "% (" + blobs.length + "/" + noOfFiles + ")",
+            isLoading: true,
+          })
+        }, (progressEvent) => {
+          toast.update(toastID, {
+            render: "Downloading file " + Math.floor(progressEvent.loaded / progressEvent.total * 100) + "% (" + blobs.length + "/" + noOfFiles + ")",
+            isLoading: true,
+          })
         });
       }
     } catch (error) {
       console.log(error)
     }
+    toast.update(toastID, {
+      render: "Zipping...",
+      isLoading: true,
+    })
     const zipfile = await downloadZip(blobs).blob()
     saveAs(zipfile, requestNumber + ".zip");
+    toast.update(toastID, {
+      render: failed > 0 ? "File download failed" : "Download complete",
+      type: failed > 0 ? "error" : "success",
+      className: "file-upload-toast",
+      isLoading: false,
+      autoClose: 3000,
+      hideProgressBar: true,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      closeButton: true
+    });
   }
 
   const hasDocumentsToExport = attachments.filter(attachment => !(isMinistryCoordinator && attachment.category == 'personal')).length > 0;
@@ -379,6 +460,7 @@ export const AttachmentSection = ({
             attachment={updateAttachment}
             attachmentsArray={attachmentsArray}
             handleRename={handleRename}
+            maxNoFiles={10}
             isMinistryCoordinator={isMinistryCoordinator}
           />
         </>
@@ -525,7 +607,7 @@ const Attachment = React.memo(({indexValue, attachment, handlePopupButtonClick, 
 const opendocumentintab =(attachment,ministryId)=>
 {
   let relativedocpath = attachment.documentpath.split('/').slice(4).join('/')
-  let url =`/foidocument?id=${ministryId}&filepath=${relativedocpath}`;
+  let url =`/foidocument?id=${ministryId || -1}&filepath=${relativedocpath}`;
   window.open(url, '_blank').focus();
 }
 

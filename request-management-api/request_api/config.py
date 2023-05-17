@@ -116,7 +116,7 @@ class _Config():  # pylint: disable=too-few-public-methods
     JWT_OIDC_CLIENT_SECRET = os.getenv('JWT_OIDC_CLIENT_SECRET')
     JWT_OIDC_CACHING_ENABLED = os.getenv('JWT_OIDC_CACHING_ENABLED')
     try:
-        JWT_OIDC_JWKS_CACHE_TIMEOUT = int(os.getenv('JWT_OIDC_JWKS_CACHE_TIMEOUT'))
+        JWT_OIDC_JWKS_CACHE_TIMEOUT = int(os.getenv('JWT_OIDC_JWKS_CACHE_TIMEOUT', '300'))
     except ValueError:  # pylint:disable=bare-except # noqa: B901, E722
         JWT_OIDC_JWKS_CACHE_TIMEOUT = 300
 
@@ -184,7 +184,7 @@ class TestConfig(_Config):  # pylint: disable=too-few-public-methods
     JWT_OIDC_CLIENT_SECRET = os.getenv('JWT_OIDC_CLIENT_SECRET')
     JWT_OIDC_CACHING_ENABLED = os.getenv('JWT_OIDC_CACHING_ENABLED')
     try:
-        JWT_OIDC_JWKS_CACHE_TIMEOUT = int(os.getenv('JWT_OIDC_JWKS_CACHE_TIMEOUT'))
+        JWT_OIDC_JWKS_CACHE_TIMEOUT = int(os.getenv('JWT_OIDC_JWKS_CACHE_TIMEOUT', '300'))
     except ValueError:  # pylint:disable=bare-except # noqa: B901, E722
         JWT_OIDC_JWKS_CACHE_TIMEOUT = 300
     
@@ -195,7 +195,7 @@ class ProdConfig(_Config):  # pylint: disable=too-few-public-methods
 
     if not SECRET_KEY:
         SECRET_KEY = os.urandom(24)
-        print('WARNING: SECRET_KEY being set as a one-shot')
+        print('WARNING: SECRET_KEY being set as a one-shot', file=sys.stderr)
 
     TESTING = False
     DEBUG = False

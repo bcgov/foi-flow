@@ -250,3 +250,9 @@ nav.MuiPagination-root {
     font-size: 10px;
     color: #A0192F;
 }
+
+.table-cell-truncate {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}

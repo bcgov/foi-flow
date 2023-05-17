@@ -42,7 +42,7 @@ const AttachmentFilter = ({handleFilterChange, filterValue, handleKeywordChange,
                 >
                     <label className="hideContent">Search Attachments</label>
                     <InputBase
-                        id="foicommentfilter"
+                        id="foiattachmentfilter"
                         placeholder="Search Attachments..."
                         defaultValue={""}
                         onChange={(e)=>{handleKeywordChange(e.target.value.trim())}}

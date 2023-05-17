@@ -270,5 +270,21 @@ class FOIRestrictedMinistryRequest(Resource):
                   return {'status': result.success, 'message':result.message,'id':result.identifier} , 500  
         except ValueError:
             return {'status': 500, 'message':"Invalid Request"}, 400    
+        except BusinessException as exception:
+            return {'status': exception.status_code, 'message':exception.message}, 500
+
+@cors_preflight('GET,POST,OPTIONS')
+@API.route('/foirequests/ministryrequestid/<int:ministryrequestid>', defaults={'usertype':None})
+@API.route('/foirequests/ministryrequestid/<ministryrequestid>/<usertype>')
+class FOIRequestByMinistryId(Resource):
+    """Return request based on ministryrequestid"""
+    @staticmethod
+    @cross_origin(origins=allowedorigins())
+    @auth.require
+    def get(ministryrequestid,usertype=None):
+        try :
+            return FOIRequest.get(requestservice().getrequestid(ministryrequestid), ministryrequestid, usertype)
+        except ValueError:
+            return {'status': 500, 'message':"Invalid Request"}, 400
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500 
