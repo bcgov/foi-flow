@@ -46,7 +46,7 @@ import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import CloseIcon from '@material-ui/icons/Close';
 import _ from 'lodash';
-import { DOC_REVIEWER_WEB_URL, RECORD_PROCESSING_HRS, OSS_S3_CHUNK_SIZE } from "../../../../constants/constants";
+import { DOC_REVIEWER_WEB_URL, RECORD_PROCESSING_HRS, OSS_S3_CHUNK_SIZE, DISABLE_REDACT_WEBLINK } from "../../../../constants/constants";
 import {removeDuplicateFiles, addDeduplicatedAttachmentsToRecords, getPDFFilePath, sortDivisionalFiles, calculateTotalFileSize,calculateTotalUploadedFileSizeInKB,getReadableFileSize} from "./util"
 import { readUploadedFileAsBytes } from '../../../../helper/FOI/helper';
 import { TOTAL_RECORDS_UPLOAD_LIMIT } from "../../../../constants/constants";
@@ -942,7 +942,7 @@ export const RecordsLog = ({
                 >
                   + Upload Records
                 </button> :
-                (records.length > 0 && <a href={DOC_REVIEWER_WEB_URL + "/foi/" + ministryId}>
+                (records.length > 0 && DISABLE_REDACT_WEBLINK?.toLowerCase() =='false' && <a href={DOC_REVIEWER_WEB_URL + "/foi/" + ministryId}>
                   <button
                     className={clsx("btn", "addAttachment", classes.createButton)}
                     variant="contained"

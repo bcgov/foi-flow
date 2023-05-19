@@ -78,6 +78,7 @@ import AxisMessageBanner from "./AxisDetails/AxisMessageBanner";
 import HomeIcon from '@mui/icons-material/Home';
 import { RecordsLog } from '../customComponents/Records';
 import { UnsavedModal } from "../customComponents";
+import {DISABLE_GATHERINGRECORDS_TAB} from '../../../constants/constants';
 import _ from 'lodash';
 
 
@@ -733,7 +734,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
     return (requestState !== StateEnum.intakeinprogress.name &&
       requestState !== StateEnum.unopened.name &&
       requestState !== StateEnum.open.name &&
-      requestDetails?.divisions?.length > 0
+      requestDetails?.divisions?.length > 0 && DISABLE_GATHERINGRECORDS_TAB?.toLowerCase() =='false'
     );
   }
 
