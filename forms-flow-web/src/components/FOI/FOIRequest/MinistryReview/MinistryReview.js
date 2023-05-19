@@ -57,6 +57,7 @@ import DivisionalTracking from "../DivisionalTracking";
 import HomeIcon from '@mui/icons-material/Home';
 import { RecordsLog } from '../../customComponents/Records';
 import { UnsavedModal } from "../../customComponents";
+import {DISABLE_GATHERINGRECORDS_TAB} from "../../../../constants/constants";
 import _ from 'lodash';
 
 
@@ -567,7 +568,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
                 ? `(${requestNotes.length})`
                 : ""}
             </div>
-            {originalDivisions?.length > 0 &&<div
+            {originalDivisions?.length > 0 && DISABLE_GATHERINGRECORDS_TAB?.toLowerCase() =='false' &&<div
               className={clsx("tablinks", {
                 active: tabLinksStatuses.Records.active,
               })}
