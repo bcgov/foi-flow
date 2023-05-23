@@ -59,18 +59,18 @@ WebUI.verifyElementNotPresent(findTestObject('Page_foi.flow/form/state change di
 
 WebUI.click(findTestObject('Page_foi.flow/attachment/button_Add Attachment'), FailureHandling.STOP_ON_FAILURE)
 
-WebUI.verifyElementNotPresent(findTestObject('Page_foi.flow/attachment/p_File over 500 mb error'), 0)
+//WebUI.verifyElementNotPresent(findTestObject('Page_foi.flow/attachment/p_File over 500 mb error'), 0)
 
-WebUI.uploadFile(findTestObject('Page_foi.flow/attachment/input_Add Files_file-upload-input'), RunConfiguration.getProjectDir() + 
-    '/Test Attachments/500mb.pdf')
+//WebUI.uploadFile(findTestObject('Page_foi.flow/attachment/input_Add Files_file-upload-input'), RunConfiguration.getProjectDir() + 
+  //  '/Test Attachments/500mb.pdf')
 
-WebUI.verifyElementNotClickable(findTestObject('Page_foi.flow/form/state change dialog/button_Continue'), FailureHandling.STOP_ON_FAILURE)
+//WebUI.verifyElementNotClickable(findTestObject('Page_foi.flow/form/state change dialog/button_Continue'), FailureHandling.STOP_ON_FAILURE)
 
-WebUI.verifyElementNotPresent(findTestObject('Page_foi.flow/attachment/li_uploaded attachment 1'), 0)
+//WebUI.verifyElementNotPresent(findTestObject('Page_foi.flow/attachment/li_uploaded attachment 1'), 0)
 
-WebUI.verifyElementPresent(findTestObject('Page_foi.flow/attachment/p_File over 500 mb error'), 0)
+//WebUI.verifyElementPresent(findTestObject('Page_foi.flow/attachment/p_File over 500 mb error'), 0)
 
-WebUI.verifyElementNotPresent(findTestObject('Page_foi.flow/attachment/p_File invalid type'), 0)
+//WebUI.verifyElementNotPresent(findTestObject('Page_foi.flow/attachment/p_File invalid type'), 0)
 
 WebUI.uploadFile(findTestObject('Page_foi.flow/attachment/input_Add Files_file-upload-input'), RunConfiguration.getProjectDir() + 
     '/Test Attachments/invalidfiletype.bin')

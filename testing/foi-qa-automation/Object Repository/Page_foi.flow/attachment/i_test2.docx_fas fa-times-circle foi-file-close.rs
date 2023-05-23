@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>i_test2.docx_fas fa-times-circle foi-file-close</name>
+   <tag></tag>
+   <elementGuidId>14c5c04f-c519-4a45-9ea6-4388501354e8</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>CSS</key>
+         <value>i.fas.fa-times-circle.foi-file-close</value>
+      </entry>
+      <entry>
+         <key>XPATH</key>
+         <value>//span[@id='state-change-dialog-description']/section/div/div/article/section/ol/li/section/div/div/aside/i</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>XPATH</selectorMethod>
+   <useRalativeImagePath>true</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>tag</name>
+      <type>Main</type>
+      <value>i</value>
+      <webElementGuid>97ad9303-dc0e-4328-a3db-61a695d5ab61</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>class</name>
+      <type>Main</type>
+      <value>fas fa-times-circle foi-file-close</value>
+      <webElementGuid>ab8b43e4-bff2-4652-a8ba-ae9e89df0a91</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>id(&quot;state-change-dialog-description&quot;)/section[@class=&quot;file-upload-container&quot;]/div[@class=&quot;row file-upload-preview&quot;]/div[@class=&quot;file-upload-column&quot;]/article[@class=&quot;file-preview-container&quot;]/section[1]/ol[@class=&quot;ol-display-none&quot;]/li[@class=&quot;ol-display-none&quot;]/section[1]/div[1]/div[1]/aside[1]/i[@class=&quot;fas fa-times-circle foi-file-close&quot;]</value>
+      <webElementGuid>68b3c709-4b85-48d1-9de0-a407c7695576</webElementGuid>
+   </webElementProperties>
+   <webElementXpaths>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:idRelative</name>
+      <type>Main</type>
+      <value>//span[@id='state-change-dialog-description']/section/div/div/article/section/ol/li/section/div/div/aside/i</value>
+      <webElementGuid>d869a379-e387-4f4f-b388-98398a61bd04</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:position</name>
+      <type>Main</type>
+      <value>//aside/i</value>
+      <webElementGuid>f962521d-570f-47ad-a92b-31a59dc8475e</webElementGuid>
+   </webElementXpaths>
+</WebElementEntity>

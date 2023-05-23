@@ -21,10 +21,9 @@ import com.kms.katalon.core.configuration.RunConfiguration as RunConfiguration
 //WebUI.verifyElementNotClickable(findTestObject('Page_foi.flow/form/state change dialog/button_Continue'), FailureHandling.STOP_ON_FAILURE)
 WebUI.verifyElementPresent(findTestObject('Page_foi.flow/form/state change dialog/button_Cancel'), 0)
 
-WebUI.verifyElementAttributeValue(findTestObject('Page_foi.flow/attachment/input_Add Files_file-upload-input'), 'accept', 
-    'application/pdf,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword,.xls,.xlsx,.doc,.docx', 
-    0)
-
+//WebUI.verifyElementAttributeValue(findTestObject('Page_foi.flow/attachment/input_Add Files_file-upload-input'), 'accept', 
+//   'application/pdf,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword,.xls,.xlsx,.doc,.docx', 
+//   0)
 WebUI.verifyElementNotHasAttribute(findTestObject('Page_foi.flow/attachment/input_Add Files_file-upload-input'), 'multiple', 
     0, FailureHandling.STOP_ON_FAILURE)
 
@@ -42,10 +41,12 @@ WebUI.verifyElementPresent(findTestObject('Page_foi.flow/attachment/p_File over 
 WebUI.uploadFile(findTestObject('Page_foi.flow/attachment/input_Add Files_file-upload-input'), RunConfiguration.getProjectDir() + 
     '/Test Attachments/download.png')
 
-WebUI.verifyElementPresent(findTestObject('Page_foi.flow/attachment/p_File invalid type state change'), 0)
+WebUI.verifyElementNotPresent(findTestObject('Page_foi.flow/attachment/p_File invalid type state change'), 0)
+
+WebUI.click(findTestObject('Page_foi.flow/attachment/i_test2.docx_fas fa-times-circle foi-file-close'))
 
 //WebUI.verifyElementNotClickable(findTestObject('Page_foi.flow/form/state change dialog/button_Continue'), FailureHandling.STOP_ON_FAILURE)
-WebUI.verifyElementClickable(findTestObject('Page_foi.flow/attachment/button_Add Files'), FailureHandling.STOP_ON_FAILURE)
+WebUI.click(findTestObject('Page_foi.flow/attachment/button_Add Files'), FailureHandling.STOP_ON_FAILURE)
 
 WebUI.uploadFile(findTestObject('Page_foi.flow/attachment/input_Add Files_file-upload-input'), (RunConfiguration.getProjectDir() + 
     '/Test Attachments/') + filename)

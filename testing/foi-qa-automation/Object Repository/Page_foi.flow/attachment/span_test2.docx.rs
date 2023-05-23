@@ -6,16 +6,16 @@
    <elementGuidId>c5d1b770-bd2f-485e-9fd6-6c1209b82c18</elementGuidId>
    <selectorCollection>
       <entry>
-         <key>XPATH</key>
-         <value>//span[@id='state-change-dialog-description']/div/section/div/div/article/section/ol/li/section/div/div/aside/span</value>
-      </entry>
-      <entry>
          <key>CSS</key>
          <value>span.file-name</value>
       </entry>
       <entry>
          <key>BASIC</key>
          <value>id(&quot;state-change-dialog-description&quot;)/div[@class=&quot;jss61&quot;]/section[@class=&quot;file-upload-container&quot;]/div[@class=&quot;row file-upload-preview&quot;]/div[@class=&quot;file-upload-column&quot;]/article[@class=&quot;file-preview-container&quot;]/section[1]/ol[@class=&quot;ol-display-none&quot;]/li[@class=&quot;ol-display-none&quot;]/section[1]/div[1]/div[1]/aside[1]/span[@class=&quot;file-name&quot;][count(. | //*[(text() = 'test2.docx' or . = 'test2.docx')]) = count(//*[(text() = 'test2.docx' or . = 'test2.docx')])]</value>
+      </entry>
+      <entry>
+         <key>XPATH</key>
+         <value>//span[@id='state-change-dialog-description']/div/section/div/div/article/section/ol/li/section/div/div/aside/span</value>
       </entry>
    </selectorCollection>
    <selectorMethod>XPATH</selectorMethod>
