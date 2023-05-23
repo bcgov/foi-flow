@@ -52,9 +52,9 @@ WebUI.verifyElementClickable(findTestObject('Page_foi.flow/attachment/button_Add
 WebUI.uploadFile(findTestObject('Page_foi.flow/attachment/input_Add Files_file-upload-input'), (RunConfiguration.getProjectDir() + 
     '/Test Attachments/') + filename)
 
-WebUI.verifyElementPresent(findTestObject('Page_foi.flow/attachment/Page_ABC-2099-3924/span_test2.docx'), 0)
+WebUI.verifyElementPresent(findTestObject('Page_foi.flow/attachment/span_test2.docx'), 0)
 
-WebUI.verifyElementText(findTestObject('Page_foi.flow/attachment/Page_ABC-2099-3924/span_test2.docx'), filename)
+WebUI.verifyElementText(findTestObject('Page_foi.flow/attachment/span_test2.docx'), filename)
 
 //WebUI.uploadFileWithDragAndDrop(findTestObject('Page_foi.flow/attachment/input_Add Files_file-upload-input'), RunConfiguration.getProjectDir() +
 //    '/Test Attachments/test2.docx', FailureHandling.STOP_ON_FAILURE)
