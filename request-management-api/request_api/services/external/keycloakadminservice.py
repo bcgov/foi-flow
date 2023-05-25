@@ -16,7 +16,7 @@ class KeycloakAdminService:
     keycloakadminservicepassword = os.getenv('KEYCLOAK_ADMIN_SRVPASSWORD')
     keycloakadminintakegroupid = os.getenv('KEYCLOAK_ADMIN_INTAKE_GROUPID')
     cache_redis_url = os.getenv('CACHE_REDISURL')
-    kctokenexpiry = os.getenv('KC_SRC_ACC_TOKEN_EXPIRY')
+    kctokenexpiry = os.getenv('KC_SRC_ACC_TOKEN_EXPIRY',1800)
     
         
     def get_token(self):
