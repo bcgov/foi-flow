@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>span_ERRORS</name>
+   <tag></tag>
+   <elementGuidId>8cc21f9a-fbb1-47ee-83e4-471c4ad74408</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>CSS</key>
+         <value>#-2Tag > span.MuiChip-label.MuiChip-labelSmall.css-1pjtbja</value>
+      </entry>
+      <entry>
+         <key>XPATH</key>
+         <value>//div[@id='-2Tag']/span</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>XPATH</selectorMethod>
+   <useRalativeImagePath>true</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>tag</name>
+      <type>Main</type>
+      <value>span</value>
+      <webElementGuid>bd9cd5da-8b29-44eb-ad7c-91c1d59188ac</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>class</name>
+      <type>Main</type>
+      <value>MuiChip-label MuiChip-labelSmall css-1pjtbja</value>
+      <webElementGuid>b049e051-c134-4d8c-ba09-b4e363947009</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>text</name>
+      <type>Main</type>
+      <value>ERRORS</value>
+      <webElementGuid>1274bd37-517c-413d-81f6-06cc976ed326</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>id(&quot;-2Tag&quot;)/span[@class=&quot;MuiChip-label MuiChip-labelSmall css-1pjtbja&quot;]</value>
+      <webElementGuid>48aae985-0aaa-4dab-8b27-c9bea8a1ae9e</webElementGuid>
+   </webElementProperties>
+   <webElementXpaths>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:idRelative</name>
+      <type>Main</type>
+      <value>//div[@id='-2Tag']/span</value>
+      <webElementGuid>31785641-534a-4652-b1d0-6c8b0b1077bd</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='ALL'])[2]/following::span[2]</value>
+      <webElementGuid>dfafbf9b-61b4-43c8-a9d8-613ca2dbd0dc</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)=concat('DEPUTY MINISTER', &quot;'&quot;, 'S OFFICE')])[1]/following::span[4]</value>
+      <webElementGuid>1403b5f7-cf5e-4d3b-b05f-71508c8b5eda</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='INCOMPATIBLE'])[1]/preceding::span[2]</value>
+      <webElementGuid>65d84ac9-22ae-46a7-9b5b-8ad9bab0534f</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='Capture object:'])[1]/preceding::span[4]</value>
+      <webElementGuid>02f93291-d61f-4c51-83f2-59846fcca57a</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>//*/text()[normalize-space(.)='ERRORS']/parent::*</value>
+      <webElementGuid>8d302cec-4243-472b-9f12-f52bd5e6d9d7</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:position</name>
+      <type>Main</type>
+      <value>//div[4]/div[2]/div[4]/span</value>
+      <webElementGuid>e63c27a7-91f3-48fa-ae1a-c500b0daa8fa</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:customAttributes</name>
+      <type>Main</type>
+      <value>//span[(text() = 'ERRORS' or . = 'ERRORS')]</value>
+      <webElementGuid>cd1cc862-e90f-48e4-9058-e30a8d9170d7</webElementGuid>
+   </webElementXpaths>
+</WebElementEntity>

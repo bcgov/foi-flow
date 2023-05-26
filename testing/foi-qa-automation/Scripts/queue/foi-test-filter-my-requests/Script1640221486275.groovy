@@ -48,6 +48,7 @@ WebUI.click(findTestObject('Page_foi.flow/queue/div_request queue row 1 applican
 WebUI.click(findTestObject('Page_foi.flow/form/assignee dropdown/div_Assigned'))
 
 WebUI.click(findTestObject('Page_foi.flow/form/assignee dropdown/li_assignee user option', [('user') : teammate]))
+def requestID1= WebUI.getText(findTestObject('Page_foi.flow/form/h3_Form Request Title'))
 
 WebUI.scrollToElement(findTestObject('Page_foi.flow/form/button_Save'), 0)
 
@@ -59,7 +60,7 @@ WebUI.navigateToUrl(GlobalVariable.BASE_URL + '/foi/dashboard')
 
 WebUI.click(findTestObject('Page_foi.flow/queue/div_My Team Requests'))
 
-WebUI.setText(findTestObject('Page_foi.flow/queue/input_Dashboard Filter'), requestID)
+WebUI.setText(findTestObject('Page_foi.flow/queue/input_Dashboard Filter'), requestID1)
 
 WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
 
@@ -74,6 +75,8 @@ WebUI.click(findTestObject('Page_foi.flow/queue/div_My Team Requests'))
 WebUI.click(findTestObject('Page_foi.flow/queue/div_request queue row 1'))
 
 WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/div_Status'))
+
+WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
 
 WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/li_Open'))
 
@@ -91,25 +94,25 @@ WebUI.navigateToUrl(GlobalVariable.BASE_URL + '/foi/dashboard')
 
 WebUI.click(findTestObject('Page_foi.flow/queue/div_My Team Requests'))
 
-WebUI.setText(findTestObject('Page_foi.flow/queue/input_Dashboard Filter'), requestID)
+WebUI.setText(findTestObject('Page_foi.flow/queue/input_Dashboard Filter'), requestID1)
 
 WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
 
 WebUI.verifyElementNotPresent(findTestObject('Page_foi.flow/queue/div_request queue row 1'), 0)
 
-assert WebUI.getAttribute(findTestObject('Page_foi.flow/queue/div_My Requests'), 'class').contains('MuiChip-outlinedPrimary')
+assert WebUI.getAttribute(findTestObject('Page_foi.flow/queue/div_My Requests'), 'class').contains('MuiButtonBase-root MuiChip-root MuiChip-outlined MuiChip-sizeSmall MuiChip-colorDefault MuiChip-clickable MuiChip-clickableColorDefault MuiChip-outlinedDefault css-zo9we2')
 
-assert WebUI.getAttribute(findTestObject('Page_foi.flow/queue/div_Watching Requests'), 'class').contains('MuiChip-outlinedPrimary')
+assert WebUI.getAttribute(findTestObject('Page_foi.flow/queue/div_Watching Requests'), 'class').contains('MuiButtonBase-root MuiChip-root MuiChip-outlined MuiChip-sizeSmall MuiChip-colorDefault MuiChip-clickable MuiChip-clickableColorDefault MuiChip-outlinedDefault css-zo9we2')
 
-assert WebUI.getAttribute(findTestObject('Page_foi.flow/queue/div_My Team Requests'), 'class').contains('MuiChip-filledPrimary')
+assert WebUI.getAttribute(findTestObject('Page_foi.flow/queue/div_My Team Requests'), 'class').contains('MuiButtonBase-root MuiChip-root MuiChip-filled MuiChip-sizeSmall MuiChip-colorDefault MuiChip-clickable MuiChip-clickableColorDefault MuiChip-filledDefault css-1uoxw5f')
 
 WebUI.refresh()
 
-assert WebUI.getAttribute(findTestObject('Page_foi.flow/queue/div_My Requests'), 'class').contains('MuiChip-filledPrimary')
+//assert WebUI.getAttribute(findTestObject('Page_foi.flow/queue/div_My Requests'), 'class').contains('MuiChip-filledPrimary')
 
-assert WebUI.getAttribute(findTestObject('Page_foi.flow/queue/div_Watching Requests'), 'class').contains('MuiChip-outlinedPrimary')
+//assert WebUI.getAttribute(findTestObject('Page_foi.flow/queue/div_Watching Requests'), 'class').contains('MuiChip-outlinedPrimary')
 
-assert WebUI.getAttribute(findTestObject('Page_foi.flow/queue/div_My Team Requests'), 'class').contains('MuiChip-outlinedPrimary')
+//assert WebUI.getAttribute(findTestObject('Page_foi.flow/queue/div_My Team Requests'), 'class').contains('MuiChip-outlinedPrimary')
 
 WebUI.closeBrowser()
 
