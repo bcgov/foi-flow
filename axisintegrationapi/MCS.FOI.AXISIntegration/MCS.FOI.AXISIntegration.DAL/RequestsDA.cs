@@ -35,6 +35,7 @@ namespace MCS.FOI.AXISIntegration.DAL
         public AXISRequest GetAXISRequest(string request)
         {
             AXISRequest axisRequest = new();
+            axisRequest.LinkedRequests = GetAxisLinkedRequests(request);
             DataTable axisDataTable = GetAxisRequestData(request);
             if (axisDataTable.Rows.Count > 0)
             {
@@ -236,6 +237,63 @@ namespace MCS.FOI.AXISIntegration.DAL
                 }
             }
             return dataTable;
+        }
+
+        private string GetAxisLinkedRequests(string request)
+        {
+            ConnectionString = SettingsManager.ConnectionString;
+
+            string query = @"
+                            SELECT 
+                                CONCAT(
+                                    '[',
+                                    STRING_AGG(
+                                        CONCAT('{""', destin_vcVisibleRequestID, '"":""', ministry, '""}'),
+                                        ','
+                                    ),
+                                    ']'
+                                ) AS linkedRequests
+                            FROM(
+                                SELECT DISTINCT
+                                    destin.vcVisibleRequestID AS destin_vcVisibleRequestID,
+                                    office.OFFICE_CODE AS ministry
+                                FROM tblRequests origin
+                                JOIN tblRequestLinks link ON(origin.IREQUESTID = link.iRequestIDOrigin OR origin.IREQUESTID = link.iRequestIDDestin)
+                                JOIN tblRequests destin ON(link.iRequestIDOrigin = destin.IREQUESTID OR link.iRequestIDDestin = destin.IREQUESTID)
+                                JOIN EC_OFFICE office ON destin.tiOfficeID = office.OFFICE_ID
+                                WHERE origin.vcVisibleRequestID = @vcVisibleRequestID
+                                    AND destin.vcVisibleRequestID != @vcVisibleRequestID
+                            ) AS destination_table";
+
+            string linkedRequestsJson = "";
+            using (sqlConnection = new SqlConnection(ConnectionString))
+            {
+                using SqlDataAdapter sqlSelectCommand = new(query, sqlConnection);
+                sqlSelectCommand.SelectCommand.Parameters.Add("@vcVisibleRequestID", SqlDbType.VarChar, 50).Value = request;
+                try
+                {
+                    sqlConnection.Open();
+                    using DataTable dataTable = new DataTable();
+                    sqlSelectCommand.Fill(dataTable);
+                    if (dataTable.Rows.Count > 0)
+                    {
+                        linkedRequestsJson = dataTable.Rows[0]["linkedRequests"].ToString();
+                        //JArray jsonArray = JArray.Parse(linkedRequestsJson);
+
+                    }
+
+                }
+                catch (SqlException ex)
+                {
+                    Ilogger.Log(LogLevel.Error, ex.Message);
+                }
+                catch (Exception e)
+                {
+                    Ilogger.Log(LogLevel.Error, e.Message);
+                }
+            }
+            return linkedRequestsJson;
+
         }
 
     }    
