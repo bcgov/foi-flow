@@ -97,15 +97,241 @@ WebUI.click(findTestObject('Page_foi.flow/ministry view/form/divisional tracking
 
 WebUI.click(findTestObject('Page_foi.flow/ministry view/form/divisional tracking/button_Add division to track'), FailureHandling.STOP_ON_FAILURE)
 
-WebUI.click(findTestObject('Page_foi.flow/ministry view/form/divisional tracking/div_ministry division dropdown'))
+WebUI.click(findTestObject('Page_foi.flow/ministry view/form/divisional tracking/div_ministry division dropdown row 2'))
 
 WebUI.click(findTestObject('Page_foi.flow/ministry view/form/divisional tracking/division dropdown options/li_Ministers Office'), 
     FailureHandling.STOP_ON_FAILURE)
 
-WebUI.click(findTestObject('Page_foi.flow/ministry view/form/divisional tracking/div_ministry division stage'))
+WebUI.click(findTestObject('Page_foi.flow/ministry view/form/divisional tracking/div_ministry division stage row 2'), FailureHandling.STOP_ON_FAILURE)
 
 WebUI.click(findTestObject('Page_foi.flow/ministry view/form/divisional tracking/stage dropdown options/li_Clarification'), 
     FailureHandling.STOP_ON_FAILURE)
 
 WebUI.click(findTestObject('Page_foi.flow/form/button_Save'), FailureHandling.STOP_ON_FAILURE)
+
+WebUI.click(findTestObject('Records/Page_ABC-2099-4805/div_Records'))
+
+WebUI.click(findTestObject('Records/button_Upload Records'))
+
+WebUI.click(findTestObject('Records/Page_ABC-2099-4805/button_Add Files'))
+
+println(RunConfiguration.getProjectDir() + '/Test Attachments')
+
+WebUI.uploadFile(findTestObject('Page_foi.flow/attachment/input_Add Files_file-upload-input'), RunConfiguration.getProjectDir() + 
+    '/Test Attachments/test.docx')
+
+WebUI.click(findTestObject('Records/Page_ABC-2099-4805/button_Add Files'))
+
+println(RunConfiguration.getProjectDir() + '/Test Attachments')
+
+WebUI.uploadFile(findTestObject('Page_foi.flow/attachment/input_Add Files_file-upload-input'), RunConfiguration.getProjectDir() + 
+    '/Test Attachments/50mb.pdf')
+
+WebUI.click(findTestObject('Records/Page_ABC-2099-4805/button_Add Files'))
+
+println(RunConfiguration.getProjectDir() + '/Test Attachments')
+
+WebUI.uploadFile(findTestObject('Page_foi.flow/attachment/input_Add Files_file-upload-input'), RunConfiguration.getProjectDir() + 
+    '/Test Attachments/Excelattached (1).msg')
+
+WebUI.click(findTestObject('Records/Page_ABC-2099-4805/button_Add Files'))
+
+println(RunConfiguration.getProjectDir() + '/Test Attachments')
+
+WebUI.uploadFile(findTestObject('Page_foi.flow/attachment/input_Add Files_file-upload-input'), RunConfiguration.getProjectDir() + 
+    '/Test Attachments/corrupted.pdf')
+
+WebUI.click(findTestObject('Records/Page_ABC-2099-4805/button_Add Files'))
+
+println(RunConfiguration.getProjectDir() + '/Test Attachments')
+
+WebUI.uploadFile(findTestObject('Page_foi.flow/attachment/input_Add Files_file-upload-input'), RunConfiguration.getProjectDir() + 
+    '/Test Attachments/Book17.pdf')
+
+WebUI.click(findTestObject('Records/Page_ABC-2099-4805/button_Add Files'))
+
+println(RunConfiguration.getProjectDir() + '/Test Attachments')
+
+WebUI.uploadFile(findTestObject('Page_foi.flow/attachment/input_Add Files_file-upload-input'), RunConfiguration.getProjectDir() + 
+    '/Test Attachments/Book20.pdf')
+
+WebUI.click(findTestObject('Records/Page_ABC-2099-4805/button_Add Files'))
+
+println(RunConfiguration.getProjectDir() + '/Test Attachments')
+
+WebUI.uploadFile(findTestObject('Page_foi.flow/attachment/input_Add Files_file-upload-input'), RunConfiguration.getProjectDir() + 
+    '/Test Attachments/download.png')
+
+WebUI.click(findTestObject('Records/Page_ABC-2099-4805/button_Add Files'))
+
+println(RunConfiguration.getProjectDir() + '/Test Attachments')
+
+WebUI.uploadFile(findTestObject('Page_foi.flow/attachment/input_Add Files_file-upload-input'), RunConfiguration.getProjectDir() + 
+    '/Test Attachments/500mb.pdf')
+
+WebUI.click(findTestObject('Records/Page_ABC-2099-4805/button_Add Files'))
+
+println(RunConfiguration.getProjectDir() + '/Test Attachments')
+
+WebUI.uploadFile(findTestObject('Page_foi.flow/attachment/input_Add Files_file-upload-input'), RunConfiguration.getProjectDir() + 
+    '/Test Attachments/file_example_XLS_1000.xls')
+
+WebUI.click(findTestObject('Records/Page_ABC-2099-4805/button_Add Files'))
+
+println(RunConfiguration.getProjectDir() + '/Test Attachments')
+
+WebUI.uploadFile(findTestObject('Page_foi.flow/attachment/input_Add Files_file-upload-input'), RunConfiguration.getProjectDir() + 
+    '/Test Attachments/Free_Test_Data_128KB_JPG.jpg')
+
+WebUI.click(findTestObject('Records/Page_ABC-2099-4805/button_Add Files'))
+
+println(RunConfiguration.getProjectDir() + '/Test Attachments')
+
+WebUI.uploadFile(findTestObject('Page_foi.flow/attachment/input_Add Files_file-upload-input'), RunConfiguration.getProjectDir() + 
+    '/Test Attachments/invite.ics')
+
+WebUI.click(findTestObject('Records/Page_ABC-2099-4805/button_Add Files'))
+
+println(RunConfiguration.getProjectDir() + '/Test Attachments')
+
+WebUI.uploadFile(findTestObject('Page_foi.flow/attachment/input_Add Files_file-upload-input'), RunConfiguration.getProjectDir() + 
+    '/Test Attachments/MOCK_DATA.json')
+
+WebUI.click(findTestObject('Records/Page_ABC-2099-4805/button_Add Files'))
+
+println(RunConfiguration.getProjectDir() + '/Test Attachments')
+
+WebUI.uploadFile(findTestObject('Page_foi.flow/attachment/input_Add Files_file-upload-input'), RunConfiguration.getProjectDir() + 
+    '/Test Attachments/samplepptx.pptx')
+
+WebUI.click(findTestObject('Records/Page_ABC-2099-4805/button_Add Files'))
+
+println(RunConfiguration.getProjectDir() + '/Test Attachments')
+
+WebUI.uploadFile(findTestObject('Page_foi.flow/attachment/input_Add Files_file-upload-input'), RunConfiguration.getProjectDir() + 
+    '/Test Attachments/trials.kml')
+
+WebUI.click(findTestObject('Records/Page_ABC-2099-4805/button_Add Files'))
+
+println(RunConfiguration.getProjectDir() + '/Test Attachments')
+
+WebUI.uploadFile(findTestObject('Page_foi.flow/attachment/input_Add Files_file-upload-input'), RunConfiguration.getProjectDir() + 
+    '/Test Attachments/stitched680MB.pdf')
+
+WebUI.verifyElementNotPresent(findTestObject('Records/Page_ABC-2099-4805/p_The total size of all files uploaded can not exceed  2000MB. Please upload additional files separately'), 
+    0)
+
+WebUI.click(findTestObject('Records/Page_ABC-2099-4805/button_Add Files'))
+
+println(RunConfiguration.getProjectDir() + '/Test Attachments')
+
+WebUI.uploadFile(findTestObject('Page_foi.flow/attachment/input_Add Files_file-upload-input'), RunConfiguration.getProjectDir() + 
+    '/Test Attachments/stitchedpdf911MB.pdf')
+
+WebUI.verifyElementText(findTestObject('Records/Page_ABC-2099-4805/p_The total size of all files uploaded can not exceed  2000MB. Please upload additional files separately'), 
+    'The total size of all files uploaded can not exceed 2000MB. Please upload additional files separately.')
+
+WebUI.click(findTestObject('Records/button_Cancel'))
+
+WebUI.acceptAlert()
+
+WebUI.click(findTestObject('Records/button_Upload Records'))
+
+WebUI.click(findTestObject('Records/Page_ABC-2099-4805/button_Add Files'))
+
+println(RunConfiguration.getProjectDir() + '/Test Attachments')
+
+WebUI.uploadFile(findTestObject('Page_foi.flow/attachment/input_Add Files_file-upload-input'), RunConfiguration.getProjectDir() + 
+    '/Test Attachments/test.docx')
+
+WebUI.click(findTestObject('Records/Page_ABC-2099-4805/button_Add Files'))
+
+println(RunConfiguration.getProjectDir() + '/Test Attachments')
+
+WebUI.uploadFile(findTestObject('Page_foi.flow/attachment/input_Add Files_file-upload-input'), RunConfiguration.getProjectDir() + 
+    '/Test Attachments/50mb.pdf')
+
+WebUI.click(findTestObject('Records/Page_ABC-2099-4805/button_Add Files'))
+
+println(RunConfiguration.getProjectDir() + '/Test Attachments')
+
+WebUI.uploadFile(findTestObject('Page_foi.flow/attachment/input_Add Files_file-upload-input'), RunConfiguration.getProjectDir() + 
+    '/Test Attachments/Excelattached (1).msg')
+
+WebUI.click(findTestObject('Records/Page_ABC-2099-4805/button_Add Files'))
+
+println(RunConfiguration.getProjectDir() + '/Test Attachments')
+
+WebUI.uploadFile(findTestObject('Page_foi.flow/attachment/input_Add Files_file-upload-input'), RunConfiguration.getProjectDir() + 
+    '/Test Attachments/corrupted.pdf')
+
+//WebUI.click(findTestObject('Records/Page_ABC-2099-4805/button_Add Files'))
+//println(RunConfiguration.getProjectDir() + '/Test Attachments')
+//WebUI.uploadFile(findTestObject('Page_foi.flow/attachment/input_Add Files_file-upload-input'), RunConfiguration.getProjectDir() +
+//	'/Test Attachments/Book17.pdf')
+//WebUI.click(findTestObject('Records/Page_ABC-2099-4805/button_Add Files'))
+//println(RunConfiguration.getProjectDir() + '/Test Attachments')
+//WebUI.uploadFile(findTestObject('Page_foi.flow/attachment/input_Add Files_file-upload-input'), RunConfiguration.getProjectDir() +
+//	'/Test Attachments/Book20.pdf')
+WebUI.click(findTestObject('Records/Page_ABC-2099-4805/button_Add Files'))
+
+println(RunConfiguration.getProjectDir() + '/Test Attachments')
+
+WebUI.uploadFile(findTestObject('Page_foi.flow/attachment/input_Add Files_file-upload-input'), RunConfiguration.getProjectDir() + 
+    '/Test Attachments/download.png')
+
+WebUI.click(findTestObject('Records/Page_ABC-2099-4805/button_Add Files'))
+
+println(RunConfiguration.getProjectDir() + '/Test Attachments')
+
+WebUI.uploadFile(findTestObject('Page_foi.flow/attachment/input_Add Files_file-upload-input'), RunConfiguration.getProjectDir() + 
+    '/Test Attachments/500mb.pdf')
+
+WebUI.click(findTestObject('Records/Page_ABC-2099-4805/button_Add Files'))
+
+println(RunConfiguration.getProjectDir() + '/Test Attachments')
+
+WebUI.uploadFile(findTestObject('Page_foi.flow/attachment/input_Add Files_file-upload-input'), RunConfiguration.getProjectDir() + 
+    '/Test Attachments/file_example_XLS_1000.xls')
+
+WebUI.click(findTestObject('Records/Page_ABC-2099-4805/button_Add Files'))
+
+println(RunConfiguration.getProjectDir() + '/Test Attachments')
+
+WebUI.uploadFile(findTestObject('Page_foi.flow/attachment/input_Add Files_file-upload-input'), RunConfiguration.getProjectDir() + 
+    '/Test Attachments/Free_Test_Data_128KB_JPG.jpg')
+
+WebUI.click(findTestObject('Records/Page_ABC-2099-4805/button_Add Files'))
+
+println(RunConfiguration.getProjectDir() + '/Test Attachments')
+
+WebUI.uploadFile(findTestObject('Page_foi.flow/attachment/input_Add Files_file-upload-input'), RunConfiguration.getProjectDir() + 
+    '/Test Attachments/invite.ics')
+
+WebUI.click(findTestObject('Records/Page_ABC-2099-4805/button_Add Files'))
+
+println(RunConfiguration.getProjectDir() + '/Test Attachments')
+
+WebUI.uploadFile(findTestObject('Page_foi.flow/attachment/input_Add Files_file-upload-input'), RunConfiguration.getProjectDir() + 
+    '/Test Attachments/MOCK_DATA.json')
+
+WebUI.click(findTestObject('Records/Page_ABC-2099-4805/button_Add Files'))
+
+println(RunConfiguration.getProjectDir() + '/Test Attachments')
+
+WebUI.uploadFile(findTestObject('Page_foi.flow/attachment/input_Add Files_file-upload-input'), RunConfiguration.getProjectDir() + 
+    '/Test Attachments/samplepptx.pptx')
+
+WebUI.click(findTestObject('Records/Page_ABC-2099-4805/button_Add Files'))
+
+println(RunConfiguration.getProjectDir() + '/Test Attachments')
+
+WebUI.uploadFile(findTestObject('Page_foi.flow/attachment/input_Add Files_file-upload-input'), RunConfiguration.getProjectDir() + 
+    '/Test Attachments/trials.kml')
+
+WebUI.click(findTestObject('Records/span_DEPUTY MINISTERS OFFICE'))
+
+WebUI.click(findTestObject('Records/button_Continue'))
+
+WebUI.delay(300)
 
