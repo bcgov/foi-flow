@@ -16,6 +16,7 @@ class FOIRequestNotificationUser(db.Model):
     notificationuserid = db.Column(db.Integer, primary_key=True,autoincrement=True)
     notificationid = db.Column(db.Integer,ForeignKey('FOIRequestNotifications.notificationid'))
     userid = db.Column(db.String(100), unique=False, nullable=True)
+    isdeleted = db.Column(db.Boolean, unique=False, nullable=True, default=False)
     created_at = db.Column(db.DateTime, default=datetime2.now)
     createdby = db.Column(db.String(120), unique=False, nullable=True)
     updated_at = db.Column(db.DateTime, nullable=True)
@@ -24,29 +25,33 @@ class FOIRequestNotificationUser(db.Model):
     notificationusertypeid = db.Column(db.Integer,nullable=False)
 
     @classmethod
-    def dismissnotification(cls, notificationuserid):
+    def dismissnotification(cls, notificationuserid, userid='system'):
         exists = bool(db.session.query(FOIRequestNotificationUser.notificationuserid).filter_by(notificationuserid=notificationuserid).first())
         if exists == False:
             return DefaultMethodResult(False,'Invalid ID',notificationuserid)
-        db.session.query(FOIRequestNotificationUser).filter(FOIRequestNotificationUser.notificationuserid == notificationuserid).delete()
+        db.session.query(FOIRequestNotificationUser).filter(FOIRequestNotificationUser.notificationuserid == notificationuserid).update({FOIRequestNotificationUser.isdeleted: True, FOIRequestNotificationUser.updatedby: userid,
+                            FOIRequestNotificationUser.updated_at: datetime2.now()})
         db.session.commit()  
         return DefaultMethodResult(True,'Notification deleted',notificationuserid)
     
     @classmethod
     def dismissnotificationbyuser(cls, userid):
-        db.session.query(FOIRequestNotificationUser).filter(FOIRequestNotificationUser.userid == userid).delete()
+        db.session.query(FOIRequestNotificationUser).filter(FOIRequestNotificationUser.userid == userid).update({FOIRequestNotificationUser.isdeleted: True, FOIRequestNotificationUser.updatedby: userid,
+                            FOIRequestNotificationUser.updated_at: datetime2.now()})
         db.session.commit()  
         return DefaultMethodResult(True,'Notifications deleted for user',userid)
 
     @classmethod
     def dismissnotificationbyuserandtype(cls, userid, notificationusertypeid):
-        db.session.query(FOIRequestNotificationUser).filter(FOIRequestNotificationUser.userid == userid, FOIRequestNotificationUser.notificationusertypeid == notificationusertypeid).delete()
+        db.session.query(FOIRequestNotificationUser).filter(FOIRequestNotificationUser.userid == userid, FOIRequestNotificationUser.notificationusertypeid == notificationusertypeid).update({FOIRequestNotificationUser.isdeleted: True, FOIRequestNotificationUser.updatedby: userid,
+                            FOIRequestNotificationUser.updated_at: datetime2.now()})
         db.session.commit()  
         return DefaultMethodResult(True,'Notifications deleted for user',userid)
     
     @classmethod
-    def dismissbynotificationid(cls, notificationids):
-        db.session.query(FOIRequestNotificationUser).filter(FOIRequestNotificationUser.notificationid.in_(notificationids)).delete(synchronize_session=False)
+    def dismissbynotificationid(cls, notificationids, userid='system'):
+        db.session.query(FOIRequestNotificationUser).filter(FOIRequestNotificationUser.notificationid.in_(notificationids)).update({FOIRequestNotificationUser.isdeleted: True, FOIRequestNotificationUser.updatedby: userid,
+                            FOIRequestNotificationUser.updated_at: datetime2.now()}, synchronize_session=False)
         db.session.commit()  
         return DefaultMethodResult(True,'Notifications deleted for id',notificationids)  
     
