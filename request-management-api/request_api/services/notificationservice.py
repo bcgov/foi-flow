@@ -268,6 +268,7 @@ class notificationservice:
         notification.version = foirequest["version"]        
         notification.createdby = userid
         notification.notification = message
+        notification.isdeleted = False
         notificationusers = notificationuser().getnotificationusers(notificationtype, requesttype, userid, foirequest, requestjson)
         users = []
         for _notificationuser in notificationusers:
@@ -283,6 +284,7 @@ class notificationservice:
         user.notificationusertypeid = notificationuser["usertype"]
         user.userid = notificationuser["userid"]
         user.createdby = userid
+        user.isdeleted = False
         return user
            
     def getrequest(self, requestid, requesttype):
