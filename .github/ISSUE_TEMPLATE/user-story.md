@@ -52,6 +52,7 @@ What is NOT in scope?
 7. [ ] Is this user story small enough to be completed in a Sprint? Should it be split?
 8. [ ] Are the dependencies known/ understood? (technical, business, regulatory/policy)
 9. [ ] Has the story been estimated?
+10. [ ] Has the impact on new and existing training videos/content been identified?
 
 **Definition of Done**
 
@@ -68,3 +69,4 @@ What is NOT in scope?
 11.	[ ] Tagged as part of a Release
 12.   [ ] Feature flagged if required
 13.  [ ] Change Management activities done?
+14. [ ] Has the impact on new and existing training videos/content been communicated?
