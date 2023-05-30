@@ -6,16 +6,16 @@
    <elementGuidId>af31618e-89d5-4304-b39c-8245b5b337b0</elementGuidId>
    <selectorCollection>
       <entry>
-         <key>CSS</key>
-         <value>div.error-message-container > p</value>
+         <key>XPATH</key>
+         <value>//span[@id='state-change-dialog-description']/ul/li/div/p</value>
       </entry>
       <entry>
          <key>BASIC</key>
          <value>//*[(text() = 'The total size of all files uploaded can not exceed  2000MB. Please upload additional files separately.' or . = 'The total size of all files uploaded can not exceed  2000MB. Please upload additional files separately.')]</value>
       </entry>
       <entry>
-         <key>XPATH</key>
-         <value>//span[@id='state-change-dialog-description']/ul/li/div/p</value>
+         <key>CSS</key>
+         <value>div.error-message-container > p</value>
       </entry>
    </selectorCollection>
    <selectorMethod>BASIC</selectorMethod>

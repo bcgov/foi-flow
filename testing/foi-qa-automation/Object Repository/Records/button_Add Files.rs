@@ -6,12 +6,12 @@
    <elementGuidId>9f5752f8-4745-474a-92e4-1cfe1dc3dac4</elementGuidId>
    <selectorCollection>
       <entry>
-         <key>CSS</key>
-         <value>button.btn-add-files</value>
-      </entry>
-      <entry>
          <key>XPATH</key>
          <value>(//button[@type='button'])[19]</value>
+      </entry>
+      <entry>
+         <key>CSS</key>
+         <value>button.btn-add-files</value>
       </entry>
    </selectorCollection>
    <selectorMethod>XPATH</selectorMethod>
