@@ -31,6 +31,7 @@ class requestservicebuilder(requestserviceconfigurator):
         foiministryrequest.programareaid = self.getvalueof("programArea",ministry["code"])
         foiministryrequest.description = requestschema.get("description")
         foiministryrequest.duedate = requestschema.get("dueDate")
+        foiministryrequest.linkedrequests = requestschema.get("linkedRequests")
         if requestschema.get("cfrDueDate") is not None and requestschema.get("cfrDueDate")  != "":
             foiministryrequest.cfrduedate = requestschema.get("cfrDueDate")
         startdate = ""

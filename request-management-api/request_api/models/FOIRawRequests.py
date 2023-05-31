@@ -42,6 +42,8 @@ class FOIRawRequest(db.Model):
     
     axissyncdate = db.Column(db.DateTime, nullable=True)    
     axisrequestid = db.Column(db.String(120), nullable=True)
+    linkedrequests = db.Column(JSON, unique=False, nullable=True)
+
 
     isiaorestricted = db.Column(db.Boolean, unique=False, nullable=False,default=False)
 
@@ -51,9 +53,9 @@ class FOIRawRequest(db.Model):
     assignee = relationship('FOIAssignee', foreign_keys="[FOIRawRequest.assignedto]")
 
     @classmethod
-    def saverawrequest(cls, _requestrawdata, sourceofsubmission, ispiiredacted, userid, notes, requirespayment, axisrequestid, axissyncdate, assigneegroup=None, assignee=None, assigneefirstname=None, assigneemiddlename=None, assigneelastname=None)->DefaultMethodResult:        
+    def saverawrequest(cls, _requestrawdata, sourceofsubmission, ispiiredacted, userid, notes, requirespayment, axisrequestid, axissyncdate, linkedrequests, assigneegroup=None, assignee=None, assigneefirstname=None, assigneemiddlename=None, assigneelastname=None)->DefaultMethodResult:        
         version = 1
-        newrawrequest = FOIRawRequest(requestrawdata=_requestrawdata, status = 'Unopened' if sourceofsubmission != "intake" else 'Intake in Progress', createdby=userid, version=version, sourceofsubmission=sourceofsubmission, assignedgroup=assigneegroup, assignedto=assignee, ispiiredacted=ispiiredacted, notes=notes, requirespayment=requirespayment, axisrequestid=axisrequestid, axissyncdate=axissyncdate)
+        newrawrequest = FOIRawRequest(requestrawdata=_requestrawdata, status = 'Unopened' if sourceofsubmission != "intake" else 'Intake in Progress', createdby=userid, version=version, sourceofsubmission=sourceofsubmission, assignedgroup=assigneegroup, assignedto=assignee, ispiiredacted=ispiiredacted, notes=notes, requirespayment=requirespayment, axisrequestid=axisrequestid, axissyncdate=axissyncdate, linkedrequests=linkedrequests)
 
         if assignee is not None:
             FOIAssignee.saveassignee(assignee, assigneefirstname, assigneemiddlename, assigneelastname)
@@ -81,7 +83,8 @@ class FOIRawRequest(db.Model):
             closedate = _requestrawdata["closedate"] if 'closedate' in _requestrawdata  else None
             closereasonid = _requestrawdata["closereasonid"] if 'closereasonid' in _requestrawdata  else None
             axisrequestid = _requestrawdata["axisRequestId"] if 'axisRequestId' in _requestrawdata  else None
-            axissyncdate = _requestrawdata["axisSyncDate"] if 'axisSyncDate' in _requestrawdata  else None            
+            axissyncdate = _requestrawdata["axisSyncDate"] if 'axisSyncDate' in _requestrawdata  else None   
+            linkedrequests = _requestrawdata["linkedRequests"] if 'linkedRequests' in _requestrawdata  else None     
             _version = request.version+1           
             insertstmt =(
                 insert(FOIRawRequest).
@@ -102,6 +105,7 @@ class FOIRawRequest(db.Model):
                     closereasonid=closereasonid,
                     axisrequestid= axisrequestid,
                     axissyncdate=axissyncdate,
+                    linkedrequests=linkedrequests,
                     isiaorestricted = request.isiaorestricted
                    
                 )
@@ -137,6 +141,7 @@ class FOIRawRequest(db.Model):
                     closereasonid=request.closereasonid,
                     axisrequestid= request.axisrequestid,
                     axissyncdate=request.axissyncdate,
+                    linkedrequests=request.linkedrequests,
                     created_at=request.created_at,
                     requirespayment = request.requirespayment,
                     isiaorestricted =_isiaorestricted,
@@ -160,6 +165,7 @@ class FOIRawRequest(db.Model):
             closereasonid = request.closereasonid
             axisrequestid = request.axisrequestid
             axissyncdate = request.axissyncdate
+            linkedrequests=request.linkedrequests
             _version = request.version+1
             rawrequest = request.requestrawdata
             rawrequest["assignedGroup"] = assigneegroup
@@ -185,6 +191,7 @@ class FOIRawRequest(db.Model):
                     closereasonid=closereasonid,
                     axisrequestid= axisrequestid,
                     axissyncdate=axissyncdate,
+                    linkedrequests=linkedrequests,
                     isiaorestricted = request.isiaorestricted
                     
                 )
@@ -960,4 +967,4 @@ class FOIRawRequest(db.Model):
 
 class FOIRawRequestSchema(ma.Schema):
     class Meta:
-        fields = ('requestid', 'requestrawdata', 'status','notes','created_at','wfinstanceid','version','updated_at','assignedgroup','assignedto','updatedby','createdby','sourceofsubmission','ispiiredacted','assignee.firstname','assignee.lastname', 'axisrequestid', 'axissyncdate', 'closedate','isiaorestricted')
+        fields = ('requestid', 'requestrawdata', 'status','notes','created_at','wfinstanceid','version','updated_at','assignedgroup','assignedto','updatedby','createdby','sourceofsubmission','ispiiredacted','assignee.firstname','assignee.lastname', 'axisrequestid', 'axissyncdate', 'linkedrequests', 'closedate','isiaorestricted')
