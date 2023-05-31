@@ -17,6 +17,24 @@ export const setQueueParams = (data) => dispatch =>{
         payload:data
     })
 }
+export const setEventQueueFilter = (data) => dispatch =>{
+    dispatch({
+        type:FOI_ACTION_CONSTANTS.EVENT_QUEUE_FILTER,
+        payload:data
+    })
+}
+export const setEventQueueParams = (data) => dispatch =>{
+    dispatch({
+        type:FOI_ACTION_CONSTANTS.EVENT_QUEUE_PARAMS,
+        payload:data
+    })
+}
+export const setShowEventQueue = (data) => dispatch =>{
+    dispatch({
+        type:FOI_ACTION_CONSTANTS.SHOW_EVENT_QUEUE,
+        payload:data
+    })
+}
 export const setShowAdvancedSearch = (data) => dispatch =>{
     dispatch({
         type:FOI_ACTION_CONSTANTS.SHOW_ADVANCED_SEARCH,

@@ -8,7 +8,14 @@ const initialState = {
     sortModel: false,
     keyword: null,
   },
+  eventQueueFilter: "myRequests",
+  eventQueueParams: {
+    rowsState: { page: 0, pageSize: 100 },
+    sortModel: false,
+    keyword: null,
+  },
   showAdvancedSearch: false,
+  showEventQueue: false,
   foiAdvancedSearchParams: {},
   isAssignedToListLoading: true,
   isAttachmentListLoading: true,
@@ -97,8 +104,14 @@ const foiRequests = (state = initialState, action) => {
       return { ...state, queueFilter: action.payload };
       case FOI_ACTION_CONSTANTS.QUEUE_PARAMS:
         return { ...state, queueParams: action.payload };
+    case FOI_ACTION_CONSTANTS.EVENT_QUEUE_FILTER:
+      return { ...state, eventQueueFilter: action.payload };
+    case FOI_ACTION_CONSTANTS.EVENT_QUEUE_PARAMS:
+      return { ...state, eventQueueParams: action.payload };
     case FOI_ACTION_CONSTANTS.SHOW_ADVANCED_SEARCH:
       return { ...state, showAdvancedSearch: action.payload };
+    case FOI_ACTION_CONSTANTS.SHOW_EVENT_QUEUE:
+      return { ...state, showEventQueue: action.payload };
     case FOI_ACTION_CONSTANTS.FOI_ADVANCED_SEARCH_PARAMS:
       return { 
         ...state, 
