@@ -1472,9 +1472,6 @@ const AttachmentPopup = React.memo(({indexValue, record, handlePopupButtonClick,
   // }
 
   const ActionsPopover = ({RestrictViewInBrowser, record}) => {
-    console.log(record)
-    console.log(`originalfile = ${record.originalfile}`)
-    // console.log(`originalfile = ${record.originalfile}`)
     return (
       <Popover
         anchorReference="anchorPosition"
@@ -1537,7 +1534,7 @@ const AttachmentPopup = React.memo(({indexValue, record, handlePopupButtonClick,
                 setPopoverOpen(false);
             }}
           >
-           {(record.originalfile !== '' && typeof record.originalfile !== 'undefined') ? "Download Replaced" : "Download" } 
+           {record.originalfile != '' ? "Download Replaced" : "Download" } 
           </MenuItem>
           {!record.isattachment && <DeleteMenu />}
           {!record.isredactionready && (record.failed || isrecordtimeout(record.created_at, RECORD_PROCESSING_HRS) == true) && <MenuItem
