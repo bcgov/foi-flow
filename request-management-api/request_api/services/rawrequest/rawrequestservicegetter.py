@@ -146,6 +146,7 @@ class rawrequestservicegetter:
                                'idNumber': 'U-00' + str(request['requestid']),
                                'axisRequestId': request['axisrequestid'],
                                'axisSyncDate': request['axissyncdate'],
+                               'linkedRequests': request['linkedrequests'],
                                'email': contactinfooptions['email'],
                                'phonePrimary': contactinfooptions['phonePrimary'],
                                'phoneSecondary': contactinfooptions['phoneSecondary'],

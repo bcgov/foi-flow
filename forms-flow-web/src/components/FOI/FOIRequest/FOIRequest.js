@@ -277,6 +277,8 @@ const FOIRequest = React.memo(({ userDetail }) => {
       settabStatus(requestStateFromId);
       setcurrentrequestStatus(requestStateFromId);
       setHeaderText(getHeaderText({requestDetails, ministryId, requestState}));
+      requestDetails.linkedRequests =  !!requestDetails.linkedRequests ? 
+        (typeof requestDetails.linkedRequests == 'string' ? JSON.parse(requestDetails.linkedRequests) : requestDetails.linkedRequests): [];
       if(requestDetails.axisRequestId)
         axisBannerCheck();
         setIsIAORestricted(isRequestRestricted(requestDetails,ministryId));
@@ -304,6 +306,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
     dispatch(fetchRequestDataFromAxis(requestDetails.axisRequestId, saveRequestObject ,true, (err, data) => {
       if(!err){
         if(typeof(data) !== "string" && Object.entries(data).length > 0){
+          data['linkedRequests']= typeof data['linkedRequests'] == 'string'? JSON.parse(data['linkedRequests']) : data['linkedRequests'];
           setAxisSyncedData(data);
           let axisDataUpdated = checkIfAxisDataUpdated(data);
           if(axisDataUpdated){
