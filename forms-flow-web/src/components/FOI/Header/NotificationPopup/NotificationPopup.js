@@ -6,12 +6,16 @@ import {
   deleteFOINotifications
 } from "../../../../apiManager/services/FOI/foiNotificationServices";
 import {useDispatch} from "react-redux";
+import Modal from 'react-bootstrap/Modal';
+import Button from 'react-bootstrap/Button';
+import UnsavedModal from '../../customComponents/UnsavedModal';
 
 const NotificationPopup = ({notifications, isMinistry, ministryCode}) => {
 
   const [myRequestTitle, setMyRequestTitle] = useState();
   const [watchingRequestTitle, setWatchingRequestTitle] = useState();
- 
+  const [modalOpen, setModalOpen] = useState(false);
+  const [modalMessage, setModalMessage] = useState("");
 
   useEffect(() => {     
     tabTitle();
@@ -51,10 +55,18 @@ const NotificationPopup = ({notifications, isMinistry, ministryCode}) => {
 
   const dispatch = useDispatch();
   const dismissAllNotifications = (type) => {
-    dispatch(deleteFOINotifications(null, null,type));
+    setModalOpen(true);
+    setModalMessage('Are you sure you want to dismiss all notifications? This is irreversible.');
+    //dispatch(deleteFOINotifications(null, null,type));
+  }
+
+  const handleContinue = () => {
+    setModalOpen(false);
+    //dispatch(deleteFOINotifications(null, null,type));
   }
 
   return (
+    <>
     <Tabs defaultActiveKey="my-request" id="uncontrolled-tab-example" className="notification-tab">
       <Tab eventKey="my-request" title={myRequestTitle} className="popup-background">
         {checkIfNotificationExists('assignee')  && <Row className="list-header">
@@ -89,6 +101,19 @@ const NotificationPopup = ({notifications, isMinistry, ministryCode}) => {
         </ListGroup>}
       </Tab>
     </Tabs>
+    <UnsavedModal modalOpen={modalOpen} handleClose={() => setModalOpen(false)}
+      handleContinue={handleContinue} modalMessage={modalMessage} />
+    {/* <Modal show={modalOpen} style={{zIndex:'1401'}}>
+      <Modal.Header>
+        <Modal.Title className='state-change-header'>Delete Confirmation</Modal.Title>
+      </Modal.Header>
+      <Modal.Body>{'Are you sure you want to dismiss all notifications? This is irreversible.'}</Modal.Body>
+      <Modal.Footer>
+      <Button type="button" className="btn-bottom btn-save btn" onClick={() => setModalOpen(false)}>Continue</Button>
+      <Button type="button" className="btn-bottom btn-cancel" onClick={() => setModalOpen(false)} >Cancel</Button>
+      </Modal.Footer>
+    </Modal> */}
+    </>
   );
 
 }
