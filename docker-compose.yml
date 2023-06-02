@@ -194,7 +194,7 @@ services:
       dockerfile: Dockerfile.local
       args:
         - NODE_ENV=${NODE_ENV:-development}
-        - GENERATE_SOURCEMAP=false                
+        - GENERATE_SOURCEMAP=${GENERATE_SOURCEMAP}                
         - REACT_APP_KEYCLOAK_CLIENT=${KEYCLOAK_WEB_CLIENTID:-forms-flow-web}       
         - REACT_APP_WEB_BASE_URL=${FORMSFLOW_API_URL}                
         - REACT_APP_KEYCLOAK_URL_REALM=${KEYCLOAK_URL_REALM:-forms-flow-ai}
