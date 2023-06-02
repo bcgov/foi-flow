@@ -1566,7 +1566,7 @@ const AttachmentPopup = React.memo(({indexValue, record, handlePopupButtonClick,
                 setPopoverOpen(false);
             }}
           >
-           {record.originalfile!='' && record.originalfile!=undefined ? "Download Replaced" : "Download" } 
+           {record.originalfile!='' && record.originalfile!=undefined ? "Download Replaced" : record.attributes?.isattachment ? "Download Original" : "Download" }
           </MenuItem>
           {!record.isattachment && <DeleteMenu />}
           {!record.isredactionready && (record.failed || isrecordtimeout(record.created_at, RECORD_PROCESSING_HRS) == true) && <MenuItem
