@@ -272,9 +272,9 @@ export const RecordsLog = ({
     if (value) {
       if (files.length !== 0) {
         setRecordsUploading(true)
-        // if (modalFor === 'replace') {
-        //   fileInfoList[0].filepath = updateAttachment.s3uripath.substr(0, updateAttachment.s3uripath.lastIndexOf(".")) + ".pdf";
-        // }
+        if (modalFor === 'replaceattachment') {
+          fileInfoList[0].filepath = updateAttachment.s3uripath.substr(0, updateAttachment.s3uripath.lastIndexOf(".")) + ".pdf";
+        }
         postFOIS3DocumentPreSignedUrl(ministryId, fileInfoList.map(file => ({...file, multipart: true})), 'records', bcgovcode, dispatch, async (err, res) => {
           let _documents = [];
           if (!err) {
@@ -284,9 +284,9 @@ export const RecordsLog = ({
             for (let header of res) {
               const _file = files.find(file => file.filename === header.filename);
               const _fileInfo = fileInfoList.find(fileInfo => fileInfo.filename === header.filename);
-              const documentDetails = modalFor === 'replace' ?
-                {
-                  //...updateAttachment,
+              var documentDetails;
+              if (modalFor === 'replace') {
+                documentDetails = {
                   filename: header.filename,
                   attributes:{
                     divisions:replaceRecord['attributes']['divisions'],
@@ -297,8 +297,16 @@ export const RecordsLog = ({
                   s3uripath: header.filepathdb,
                   trigger: 'recordreplace',
                   service: 'deduplication'
-                }:
-                {
+                }
+              } else if (modalFor === 'replaceattachment') {
+                documentDetails = {
+                  ...updateAttachment,
+                  s3uripath: header.filepathdb,
+                  trigger: 'recordreplace',
+                  service: 'deduplication'
+                }
+              } else {
+                documentDetails = {
                   s3uripath: header.filepathdb,
                   filename: header.filename,
                   attributes:{
@@ -306,7 +314,8 @@ export const RecordsLog = ({
                     lastmodified: _file.lastModifiedDate,
                     filesize: _file.size
                   }
-                };
+                }
+              }
               let bytes = await readUploadedFileAsBytes(_file)
               const CHUNK_SIZE = OSS_S3_CHUNK_SIZE;
               const totalChunks = Math.ceil(bytes.byteLength / CHUNK_SIZE);
@@ -338,17 +347,20 @@ export const RecordsLog = ({
               })
             }
             if (_documents.length > 0) {
-              if (modalFor === 'replace') {
+              if (modalFor === 'replace' || modalFor == 'replaceattachment') {
                 
-                // dispatch(retryFOIRecordProcessing(requestId, ministryId, {records: _documents},(err, _res) => {
-                //     dispatchRequestAttachment(err);
-                // }));
-                
+                 if (modalFor === 'replaceattachment'){
+                dispatch(retryFOIRecordProcessing(requestId, ministryId, {records: _documents},(err, _res) => {
+                    dispatchRequestAttachment(err);
+                })); }
+
+                 if (modalFor === 'replace'){
                 dispatch(replaceFOIRecordProcessing(requestId, ministryId,replaceRecord.recordid, {records: _documents},(err, _res) => {
                   dispatchRequestAttachment(err);
-              }));
+              })); }
 
-              } else {
+              }                             
+              else {
                 dispatch(saveFOIRecords(requestId, ministryId, {records: _documents},(err, _res) => {
                     dispatchRequestAttachment(err);
                 }));
@@ -675,6 +687,11 @@ export const RecordsLog = ({
         setModalFor("replace");
         setModal(true);
         break;
+      case "replaceattachment":
+        setreplaceRecord(_record)
+        setModalFor("replaceattachment");
+        setModal(true);
+        break;  
       case "rename":
         setModalFor("rename");
         setModal(true);
@@ -1276,7 +1293,7 @@ const Attachment = React.memo(({indexValue, record, handlePopupButtonClick, getF
               <span>Duplicate of {record.duplicateof}</span>:
               record.attributes?.incompatible ?
               <span>Incompatible File Type</span>:
-              record.trigger === 'recordreplace' ?
+              record.failed && record.isredactionready ?
               <span>Record Manually Replaced Due to Error</span>:
               record.isduplicate ?
               <span>Duplicate of {record.duplicateof}</span>:
@@ -1393,6 +1410,11 @@ const AttachmentPopup = React.memo(({indexValue, record, handlePopupButtonClick,
     handlePopupButtonClick("replace", record);
   }
 
+  const handleReplaceAttachment = () => {
+    closeTooltip();
+    handlePopupButtonClick("replaceattachment", record);
+  }
+
   const handleDownload = () =>{
     closeTooltip();
     handlePopupButtonClick("download", record);
@@ -1505,13 +1527,21 @@ const AttachmentPopup = React.memo(({indexValue, record, handlePopupButtonClick,
             View
           </MenuItem>
           :""}
-          {!record.isattachment && <MenuItem
+          { (!record.attributes?.isattachment || record.attributes?.isattachment  === undefined) && <MenuItem
             onClick={() => {
                 handleReplace();
                 setPopoverOpen(false);
             }}
           >
             Replace Manually
+          </MenuItem>}
+          { record.attributes?.isattachment && <MenuItem
+            onClick={() => {
+                 handleReplaceAttachment() 
+                setPopoverOpen(false);
+            }}
+          >
+            Replace Attachment
           </MenuItem>}
           {record.originalfile!=''  && record.originalfile!=undefined  && <MenuItem
             onClick={() => {
