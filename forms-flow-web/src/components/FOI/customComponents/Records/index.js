@@ -502,9 +502,8 @@ export const RecordsLog = ({
       "attributes":[]
     };
 
-    let exporting = removeDuplicateFiles(recordList);
-    exporting = addDeduplicatedAttachmentsToRecords(exporting);
-
+    let exporting = addDeduplicatedAttachmentsToRecords(recordList);
+    exporting = removeDuplicateFiles(exporting);
     // Create a map to group files by division
     const divisionMap = new Map();
  
@@ -1473,7 +1472,6 @@ const AttachmentPopup = React.memo(({indexValue, record, handlePopupButtonClick,
   // }
 
   const ActionsPopover = ({RestrictViewInBrowser, record}) => {
-
     return (
       <Popover
         anchorReference="anchorPosition"
@@ -1536,7 +1534,7 @@ const AttachmentPopup = React.memo(({indexValue, record, handlePopupButtonClick,
                 setPopoverOpen(false);
             }}
           >
-           {record.originalfile!='' ? "Download Replaced" : "Download" } 
+           {record.originalfile != '' ? "Download Replaced" : "Download" } 
           </MenuItem>
           {!record.isattachment && <DeleteMenu />}
           {!record.isredactionready && (record.failed || isrecordtimeout(record.created_at, RECORD_PROCESSING_HRS) == true) && <MenuItem
