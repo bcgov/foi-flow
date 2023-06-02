@@ -235,7 +235,8 @@ export default function ConfirmationModal({requestId, openModal, handleModal, st
               <tbody>
                 <tr>
                   <th scope="row">IAO Assigned To</th>
-                  <td>{updatedAssignedTo}</td>
+                  <td>{assignedTo}</td>
+                  {/* <td>{updatedAssignedTo}</td> */}
                 </tr>
               </tbody>
           </table> : null }

@@ -31,6 +31,7 @@ class requestservicebuilder(requestserviceconfigurator):
         foiministryrequest.programareaid = self.getvalueof("programArea",ministry["code"])
         foiministryrequest.description = requestschema.get("description")
         foiministryrequest.duedate = requestschema.get("dueDate")
+        foiministryrequest.linkedrequests = requestschema.get("linkedRequests")
         if requestschema.get("cfrDueDate") is not None and requestschema.get("cfrDueDate")  != "":
             foiministryrequest.cfrduedate = requestschema.get("cfrDueDate")
         startdate = ""
@@ -84,9 +85,6 @@ class requestservicebuilder(requestserviceconfigurator):
             requestserviceministrybuilder().createfoiassigneefromobject(requestschema.get("assignedTo"), requestschema.get("assignedToFirstName"), requestschema.get("assignedToMiddleName"), requestschema.get("assignedToLastName"))
         else:
             foiministryrequest.assignedto = None
-        if(ministryid is None and filenumber is None and status == "Open" and requestschema.get("isiaorestricted") == False):
-            foiministryrequest.assignedto = None
-            foiministryrequest.assignedgroup = self.__getgroupname(requestschema.get("requestType"), ministry["code"])
 
     def __isgrouprequired(self,status):
         if status == "Call For Records" or status == "Review" or status == "Consult" or status == "Fee Assessed" or status == "Ministry Sign Off" or status == "Response":
