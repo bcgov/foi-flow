@@ -258,7 +258,7 @@ export const createRequestDetailsObjectFunc = (
       requestObject.selectedMinistries = filteredData;
       break;
     case FOI_COMPONENT_CONSTANTS.LINKED_REQUESTS:
-      requestObject.linkedRequests = JSON.parse(value)
+      requestObject.linkedRequests = typeof value == 'string' ? JSON.parse(value) :value;
       break;
     case FOI_COMPONENT_CONSTANTS.PERSONAL_HEALTH_NUMBER:
     case FOI_COMPONENT_CONSTANTS.IDENTITY_VERIFIED:
