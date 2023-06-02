@@ -37,7 +37,7 @@ class requestserviceconfigurator:
             return pgarea["programareaid"]
         elif name == "subjectCode":
             subjectcode = SubjectCode().getsubjectcodebyname(key)
-            return subjectcode["subjectcodeid"]
+            return subjectcode["subjectcodeid"] if subjectcode is not None else None
 
     def getpropertyvaluefromschema(self,requestschema,property):
         return requestschema.get(property) if property in requestschema  else None
