@@ -502,8 +502,8 @@ export const RecordsLog = ({
       "attributes":[]
     };
 
-    let exporting = addDeduplicatedAttachmentsToRecords(recordList);
-    exporting = removeDuplicateFiles(exporting);
+    let exporting = removeDuplicateFiles(recordList);
+    exporting =  addDeduplicatedAttachmentsToRecords(exporting);
     // Create a map to group files by division
     const divisionMap = new Map();
  
