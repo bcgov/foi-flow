@@ -111,6 +111,8 @@ WebUI.click(findTestObject('Page_foi.flow/form/button_Save'), FailureHandling.ST
 
 WebUI.click(findTestObject('Records/div_Records'))
 
+WebUI.delay(4)
+
 WebUI.click(findTestObject('Records/button_Upload Records'))
 
 WebUI.click(findTestObject('Records/button_Add Files'))
@@ -259,6 +261,7 @@ WebUI.click(findTestObject('Records/span_INCOMPATIBLE'))
 WebUI.verifyElementText(findTestObject('Records/span_samplepptx.pptx'), 'samplepptx.pptx')
 
 WebUI.verifyElementText(findTestObject('Records/span_Deputy Ministers Office (1)'), 'Deputy Minister\'s Office')
+
 ministryUser.close()
 
 IAOuser.close()

@@ -111,6 +111,8 @@ WebUI.click(findTestObject('Page_foi.flow/form/button_Save'), FailureHandling.ST
 
 WebUI.click(findTestObject('Records/div_Records'))
 
+WebUI.delay(4)
+
 WebUI.click(findTestObject('Records/button_Upload Records'))
 
 WebUI.click(findTestObject('Records/button_Add Files'))

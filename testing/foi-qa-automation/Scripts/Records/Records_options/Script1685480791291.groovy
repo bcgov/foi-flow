@@ -268,6 +268,12 @@ WebUI.click(findTestObject('Records/div_Records'))
 
 WebUI.click(findTestObject('Records/svg_Error duringdeduplication_MuiSvgIcon-root'))
 
+WebUI.verifyElementPresent(findTestObject('Records/Page_ABC-2099-18266/li_Download Replaced'), 0)
+
+WebUI.verifyElementPresent(findTestObject('Records/Page_ABC-2099-18266/li_Download Original'), 0)
+
+WebUI.verifyElementPresent(findTestObject('Records/li_Replace Manually (1)'), 0)
+
 WebUI.click(findTestObject('Records/li_Delete (1)'))
 
 WebUI.click(findTestObject('Page_Log in to FOI/button_Continue'))
