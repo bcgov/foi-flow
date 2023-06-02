@@ -1,7 +1,7 @@
 """Add missing Subject Codes
 
 Revision ID: 0aa14fe79387
-Revises: b863a277c491
+Revises: beb310568ee4
 Create Date: 2023-06-02 12:31:21.787571
 
 """
@@ -13,7 +13,7 @@ from sqlalchemy.sql.sqltypes import Boolean, String
 
 # revision identifiers, used by Alembic.
 revision = '0aa14fe79387'
-down_revision = 'b863a277c491'
+down_revision = 'beb310568ee4'
 branch_labels = None
 depends_on = None
 
