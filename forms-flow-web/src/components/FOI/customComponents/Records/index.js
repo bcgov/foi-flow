@@ -284,9 +284,9 @@ export const RecordsLog = ({
             for (let header of res) {
               const _file = files.find(file => file.filename === header.filename);
               const _fileInfo = fileInfoList.find(fileInfo => fileInfo.filename === header.filename);
-              const documentDetails = modalFor === 'replace' ?
-                {
-                  //...updateAttachment,
+              var documentDetails;
+              if (modalFor === 'replace') {
+                documentDetails = {
                   filename: header.filename,
                   attributes:{
                     divisions:replaceRecord['attributes']['divisions'],
@@ -297,8 +297,16 @@ export const RecordsLog = ({
                   s3uripath: header.filepathdb,
                   trigger: 'recordreplace',
                   service: 'deduplication'
-                }:
-                {
+                }
+              } else if (modalFor === 'replaceattachment') {
+                documentDetails = {
+                  ...updateAttachment,
+                  s3uripath: header.filepathdb,
+                  trigger: 'recordreplace',
+                  service: 'deduplication'
+                }
+              } else {
+                documentDetails = {
                   s3uripath: header.filepathdb,
                   filename: header.filename,
                   attributes:{
@@ -306,7 +314,8 @@ export const RecordsLog = ({
                     lastmodified: _file.lastModifiedDate,
                     filesize: _file.size
                   }
-                };
+                }
+              }
               let bytes = await readUploadedFileAsBytes(_file)
               const CHUNK_SIZE = OSS_S3_CHUNK_SIZE;
               const totalChunks = Math.ceil(bytes.byteLength / CHUNK_SIZE);
@@ -1284,7 +1293,7 @@ const Attachment = React.memo(({indexValue, record, handlePopupButtonClick, getF
               <span>Duplicate of {record.duplicateof}</span>:
               record.attributes?.incompatible ?
               <span>Incompatible File Type</span>:
-              record.trigger === 'recordreplace' ?
+              record.failed && record.isredactionready ?
               <span>Record Manually Replaced Due to Error</span>:
               record.isduplicate ?
               <span>Duplicate of {record.duplicateof}</span>:
@@ -1520,7 +1529,7 @@ const AttachmentPopup = React.memo(({indexValue, record, handlePopupButtonClick,
           :""}
           { (!record.attributes?.isattachment || record.attributes?.isattachment  === undefined) && <MenuItem
             onClick={() => {
-                 handleReplace() 
+                handleReplace();
                 setPopoverOpen(false);
             }}
           >
