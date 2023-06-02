@@ -130,7 +130,7 @@ const AxisSyncModal = ({ axisSyncModalOpen, setAxisSyncModalOpen, saveRequestObj
         case 'linkedRequests':
           let linkedRequestsDiff= comparelinkedRequests(key);
           if(linkedRequestsDiff.length > 0)
-            updatedObj[updatedField] =linkedRequestsDiff.toString()?.split(',').join(', ');
+            updatedObj[updatedField] =linkedRequestsDiff.toString()?.split(',')?.join(', ');
           break;
         case 'compareReceivedDate':
           updatedObj[updatedField] =formatDate(requestDetailsFromAxis['receivedDate'], "MMM dd yyyy");
