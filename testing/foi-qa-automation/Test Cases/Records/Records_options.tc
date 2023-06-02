@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <TestCaseEntity>
    <description></description>
-   <name>Records_upload documents</name>
+   <name>Records_options</name>
    <tag></tag>
    <comment></comment>
-   <testCaseGuid>d84bdab6-3d2b-4a17-a868-5d3345432d72</testCaseGuid>
+   <testCaseGuid>2a1f1f85-b6f0-44e2-bfd9-d5d28ccc5bdf</testCaseGuid>
 </TestCaseEntity>
