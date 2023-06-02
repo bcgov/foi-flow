@@ -130,7 +130,7 @@ const AxisSyncModal = ({ axisSyncModalOpen, setAxisSyncModalOpen, saveRequestObj
         case 'linkedRequests':
           let linkedRequestsDiff= comparelinkedRequests(key);
           if(linkedRequestsDiff.length > 0)
-            updatedObj[updatedField] =linkedRequestsDiff.toString()
+            updatedObj[updatedField] =linkedRequestsDiff.toString()?.split(',')?.join(', ');
           break;
         case 'compareReceivedDate':
           updatedObj[updatedField] =formatDate(requestDetailsFromAxis['receivedDate'], "MMM dd yyyy");
@@ -280,8 +280,17 @@ const AxisSyncModal = ({ axisSyncModalOpen, setAxisSyncModalOpen, saveRequestObj
       let dblinkedRequests= saveRequestObject[key]?.map((val => Object.keys(val).toString()));
       let axislinkedRequests = typeof requestDetailsFromAxis[key] == 'string' ? JSON.parse(requestDetailsFromAxis[key]) : requestDetailsFromAxis[key];
       let linkedRequestsJson = axislinkedRequests.map((val => Object.keys(val).toString()));
-      let difference = linkedRequestsJson.filter(x => !dblinkedRequests?.includes(x));
-      return difference;
+      let isUpdatedInAxis = false;
+      if(linkedRequestsJson?.length != dblinkedRequests?.length)
+        isUpdatedInAxis = true;
+      else if(linkedRequestsJson.filter(x => !dblinkedRequests?.includes(x))?.length > 0)
+        isUpdatedInAxis = true;
+      else if(dblinkedRequests.filter(x => !linkedRequestsJson?.includes(x))?.length > 0)
+        isUpdatedInAxis = true;
+      if(isUpdatedInAxis)
+        return linkedRequestsJson;
+      else
+        return [];
     }
 
     const handleClose = () => {
