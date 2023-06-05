@@ -47,7 +47,7 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 import CloseIcon from '@material-ui/icons/Close';
 import _ from 'lodash';
 import { DOC_REVIEWER_WEB_URL, RECORD_PROCESSING_HRS, OSS_S3_CHUNK_SIZE, DISABLE_REDACT_WEBLINK } from "../../../../constants/constants";
-import {removeDuplicateFiles, addDeduplicatedAttachmentsToRecords, getPDFFilePath, sortDivisionalFiles, calculateTotalFileSize,calculateTotalUploadedFileSizeInKB,getReadableFileSize} from "./util"
+import {removeDuplicateFiles, getUpdatedRecords, sortByLastModified, getFiles, calculateDivisionFileSize, calculateTotalFileSize,calculateTotalUploadedFileSizeInKB,getReadableFileSize} from "./util"
 import { readUploadedFileAsBytes } from '../../../../helper/FOI/helper';
 import { TOTAL_RECORDS_UPLOAD_LIMIT } from "../../../../constants/constants";
 //import {convertBytesToMB} from "../../../../components/FOI/customComponents/FileUpload/util";
@@ -514,59 +514,45 @@ export const RecordsLog = ({
       "attributes":[]
     };
 
-    let exporting = removeDuplicateFiles(recordList);
-    exporting =  addDeduplicatedAttachmentsToRecords(exporting);
-    // Create a map to group files by division
-    const divisionMap = new Map();
- 
-    // Loop through each item in the input array
-    for (const item of exporting) {
-      // Get the division information from the item
-      const divisions = item.attributes ? item.attributes.divisions : null;
-      
-      const [filepath, filename] = getPDFFilePath(item);
+    //remove duplicate records(except duplicate attachments)
+    const deduplicatedRecords = removeDuplicateFiles(recordList);
+    //get only relevent fields
+    const updatedrecords = getUpdatedRecords(deduplicatedRecords);
+    //sort records and attachments based on lastmodified asc
+    let sortedRecords = sortByLastModified(updatedrecords);
     
-      // If the item has no division information, skip it
-      if (!divisions) {
-        continue;
-      }
-      // Loop through each division in the item
-      for (const division of divisions) {
-        // Get the division ID and name
-        const divisionId = division.divisionid;
-        const divisionName = division.divisionname.replace("'", "");
-    
-        // If the division is not already in the division map, add it
-        if (!divisionMap.has(divisionId)) {
-          divisionMap.set(divisionId, {
-            divisionid: divisionId,
-            divisionname: divisionName,
-            files: [],
-            divisionfilesize: 0
-          });
-        }
-    
-        // Add the item to the files array for this division
-        const files = divisionMap.get(divisionId).files;
-        const convertedFileSize = parseFloat(item.attributes?.convertedfilesize) || 0
-        const fileSize = parseFloat(item.attributes?.filesize) || 0
-        const fileAttrs = {
-          lastmodified: item.attributes?.lastmodified,
-          recordid: item.recordid,
-          s3uripath: filepath,
-          filename,
-          filesize: convertedFileSize || fileSize
-        };
-        files.push(fileAttrs);
-        divisionMap.get(divisionId).divisionfilesize += fileAttrs.filesize; // add file size to division total
-      }
+    //get all the divisions in the records
+    const divisionObj= {}
+    for (const _record of sortedRecords) {
+        for (const _division of _record.divisions) {
+            divisionObj[_division.divisionid] = _division.divisionname
+        }        
     }
- 
-    // Sort the divisions by lastmodified date and add them to the output object
-    const sortedDivisions = sortDivisionalFiles(divisionMap);
 
-    message.attributes = sortedDivisions;
-    message.totalfilesize = calculateTotalFileSize(sortedDivisions); // calculate total size for whole message
+    // arrange the records and its attachments. 
+    const recordsArray = []
+    for (const _record of sortedRecords) {
+        recordsArray.push(_record)
+        if (_record.attachments) {
+          const _filteredAttachments = _record.attachments.filter(r => !r.isduplicate)
+          recordsArray.push(..._filteredAttachments)   
+        }         
+    }
+    
+    //form the final attributes for the message
+    const attributes = []
+    for (const _key in divisionObj) {
+        const files =  getFiles(recordsArray, +_key)
+        const attribute = {
+            divisionid: +_key,
+            divisionname: divisionObj[_key],
+            files: files,
+            divisionfilesize: calculateDivisionFileSize(files)
+        }
+        attributes.push(attribute)
+    }
+    message.attributes = attributes;
+    message.totalfilesize = calculateTotalFileSize(attributes);
 
     //keeping this for testing purpose.
     console.log(`message = ${JSON.stringify(message)}`);
