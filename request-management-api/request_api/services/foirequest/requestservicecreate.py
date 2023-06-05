@@ -45,7 +45,7 @@ class requestservicecreate:
         if foirequestid is not None:         
            openfoirequest.foirequestid = foirequestid
         openfoirequest.wfinstanceid = wfinstanceid if wfinstanceid is not None else None
-        openfoirequest.createdby = userid          
+        openfoirequest.createdby = userid  
         return FOIRequest.saverequest(openfoirequest) 
     
     
