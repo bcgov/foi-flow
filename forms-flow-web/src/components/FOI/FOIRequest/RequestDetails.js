@@ -222,7 +222,8 @@ const RequestDetails = React.memo(
         </AccordionSummary>
         <AccordionDetails>
           <div>
-              <button type="button" className={`btn btn-link btn-description-history`} onClick={() => setModal(true)} disabled={!(!!requestDetails.linkedRequests)}>
+              <button type="button" className={`btn btn-link btn-description-history`} onClick={() => setModal(true)} 
+                disabled={!(!!requestDetails.linkedRequests) || (!!requestDetails.linkedRequests && !requestDetails.linkedRequests?.length >0)}>
                 Linked Requests
               </button>
               <MinistriesCanvassed  openModal={openModal} selectedMinistries={(typeof requestDetails.linkedRequests == 'string' ? JSON.parse(requestDetails.linkedRequests) : requestDetails.linkedRequests)} 
