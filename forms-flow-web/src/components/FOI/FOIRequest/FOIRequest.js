@@ -1084,9 +1084,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
               [classes.hidden]: !tabLinksStatuses.Attachments?.display,
             })}
           >
-            {!isAttachmentListLoading &&
-            (iaoassignedToList?.length > 0 ||
-              ministryAssignedToList?.length > 0) ? (
+            {!isAttachmentListLoading ? (
               <>
                 <AttachmentSection
                   currentUser={userId}
@@ -1131,9 +1129,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
             })}
           >
             {!isLoading &&
-            requestNotes &&
-            (iaoassignedToList?.length > 0 ||
-              ministryAssignedToList?.length > 0) ? (
+            requestNotes ? (
               <>
                 <CommentSection
                   currentUser={
@@ -1175,9 +1171,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
               [classes.hidden]: !tabLinksStatuses.Records.display,
             })}
           >
-            {showRecordsTab() && !isAttachmentListLoading &&
-            (iaoassignedToList?.length > 0 ||
-              ministryAssignedToList?.length > 0) ? (
+            {showRecordsTab() &&
               <>
                 <RecordsLog
                   //recordsObj={requestRecords}
@@ -1192,9 +1186,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
                   divisions={requestDetails.divisions}
                 />
               </>
-            ) : (
-              <Loading />
-            )}
+            }
           </div>
           {showContactApplicantTab() && <div
             id="ContactApplicant"

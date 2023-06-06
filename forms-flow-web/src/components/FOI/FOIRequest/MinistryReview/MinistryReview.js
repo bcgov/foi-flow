@@ -698,11 +698,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
               [classes.hidden]: !tabLinksStatuses.Attachments?.display,
             })}
           >
-            {!isAttachmentListLoading &&
-            iaoassignedToList &&
-            iaoassignedToList.length > 0 &&
-            ministryAssignedToList &&
-            ministryAssignedToList.length > 0 ? (
+            {!isAttachmentListLoading ? (
               <>
                 <AttachmentSection
                   currentUser={userId}
@@ -730,9 +726,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
             })}
           >
             {!isLoading &&
-            requestNotes &&
-            iaoassignedToList?.length > 0 ||
-            ministryAssignedToList?.length > 0 ? (
+            requestNotes ? (
               <>
                 <CommentSection
                   currentUser={
@@ -774,9 +768,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
               [classes.hidden]: !tabLinksStatuses.Records.display,
             })}
           >
-            {!isAttachmentListLoading && originalDivisions?.length > 0 &&
-            (iaoassignedToList?.length > 0 ||
-              ministryAssignedToList?.length > 0) ? (
+            {!isAttachmentListLoading && originalDivisions?.length > 0 ? (
               <>
                 <RecordsLog
                   divisions={originalDivisions}
