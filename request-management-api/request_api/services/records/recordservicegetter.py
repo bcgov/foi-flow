@@ -60,19 +60,6 @@ class recordservicegetter(recordservicebase):
             _record['attachments'] = []
             for attachment in _computingresponse["attachments"]:
                 _attachement = self.__pstformat(attachment)
-                _attachement['attributes'] = self.__formatrecordattributes(attachment['attributes'], divisions)
-                _computingresponse_err = self.__getcomputingerror(attachment)
-                if _computingresponse_err is not None:
-                    _attachement['failed'] = _computingresponse_err
-                _record['attachments'].append(_attachement) 
-            """
-           _record['attachments'] = []
-            if _computingresponse['isduplicate']:
-                _record['duplicatemasterid'] = _computingresponse['duplicatemasterid']  
-                _record['duplicateof'] = _computingresponse['duplicateof']    
-            attachment_list = self.__getcomputingresponse(computingresponses, "parentid", documentmasterid)
-            for attachment in attachment_list:
-                _attachement = self.__pstformat(attachment)
                 _attachement['isattachment'] = True
                 _attachement['s3uripath'] = attachment['filepath']
                 _attachement['rootparentid'] = record["recordid"]
@@ -81,8 +68,8 @@ class recordservicegetter(recordservicebase):
                 _computingresponse_err = self.__getcomputingerror(attachment)
                 if _computingresponse_err is not None:
                     _attachement['failed'] = _computingresponse_err
-                _record['attachments'].append(_attachement)                      
-            """                
+                _record['attachments'].append(_attachement) 
+                          
         return _record
     
     def __formatrecordattributes(self, attributes, divisions):
