@@ -58,6 +58,15 @@ class recordservicegetter(recordservicebase):
             if _computingresponse_err is not None:
                 _record['failed'] = _computingresponse_err
             _record['attachments'] = []
+            for attachment in _computingresponse["attachments"]:
+                _attachement = self.__pstformat(attachment)
+                _attachement['attributes'] = self.__formatrecordattributes(attachment['attributes'], divisions)
+                _computingresponse_err = self.__getcomputingerror(attachment)
+                if _computingresponse_err is not None:
+                    _attachement['failed'] = _computingresponse_err
+                _record['attachments'].append(_attachement) 
+            """
+           _record['attachments'] = []
             if _computingresponse['isduplicate']:
                 _record['duplicatemasterid'] = _computingresponse['duplicatemasterid']  
                 _record['duplicateof'] = _computingresponse['duplicateof']    
@@ -73,7 +82,7 @@ class recordservicegetter(recordservicebase):
                 if _computingresponse_err is not None:
                     _attachement['failed'] = _computingresponse_err
                 _record['attachments'].append(_attachement)                      
-                            
+            """                
         return _record
     
     def __formatrecordattributes(self, attributes, divisions):
@@ -132,27 +141,9 @@ class recordservicegetter(recordservicebase):
         if filterby == "recordid":
             filtered_response = [x for x in response if x["recordid"] == data["recordid"] and x["filename"] == data["filename"]]
             return filtered_response[0] if len(filtered_response) > 0 else []
-        elif filterby == "parentid":
-            filtered_response = [x for x in response if x["isattachment"] == True]
-            return self.__getattachments(filtered_response, [], data)
         else:
             logging.info("not matched")
-
-    def __getattachments(self, response, result, data):
-        filtered, result = self.__attachments2(response, result, data)
-        for subentry in result:
-            filtered, result = self.__attachments2(filtered, result, subentry["documentmasterid"])
-        return result
     
-    def __attachments2(self, response, result, data):
-        filtered = []
-        for entry in response:
-            if entry["parentid"] not in [None, ""] and int(entry["parentid"]) == int(data):
-                result.append(entry)
-            else:
-                filtered.append(entry)
-        return filtered, result  
-
     def __getcomputingerror(self, computingresponse):
         if computingresponse['conversionstatus'] == 'error':
             return 'conversion' 
