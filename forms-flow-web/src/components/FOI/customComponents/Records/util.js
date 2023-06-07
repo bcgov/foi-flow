@@ -115,7 +115,6 @@ export const addDeduplicatedAttachmentsToRecords = (exporting) => {
     return exporting;
 }
 
-
 export const sortDivisionalFiles = (divisionMap) => {
     return Array.from(divisionMap.values()).map(({ divisionid, divisionname, files, divisionfilesize }) => ({
         divisionid,
@@ -124,7 +123,6 @@ export const sortDivisionalFiles = (divisionMap) => {
         divisionfilesize
     }));
 }
-
 
 export const calculateTotalUploadedFileSizeInKB = (records) => {
     return records.reduce((total, record) => {
