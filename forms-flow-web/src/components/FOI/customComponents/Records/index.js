@@ -574,7 +574,7 @@ export const RecordsLog = ({
 
     return message;
 
-  } 
+  }  
 
 
   const toastError = (error) => {
@@ -1495,7 +1495,6 @@ const AttachmentPopup = React.memo(({indexValue, record, handlePopupButtonClick,
   // }
 
   const ActionsPopover = ({RestrictViewInBrowser, record}) => {
-
     return (
       <Popover
         anchorReference="anchorPosition"

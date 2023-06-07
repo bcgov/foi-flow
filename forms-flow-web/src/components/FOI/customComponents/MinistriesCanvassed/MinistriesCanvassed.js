@@ -16,7 +16,7 @@ const useStyles = makeStyles({
 });
 
 
-const MinistriesCanvassed = ({openModal,selectedMinistries, setModal} ) => {
+const MinistriesCanvassed = ({openModal,selectedMinistries, setModal, isLinkedRequest=false} ) => {
 
   const classes = useStyles();
 
@@ -32,8 +32,13 @@ const MinistriesCanvassed = ({openModal,selectedMinistries, setModal} ) => {
   const tableData = selectedMinistries?.map(function(ministry,index) {
     return (
       <tr key ={index}>
-        <td className='ministry-name'>{ministry.name}</td>
-       <td className='ministry-requestid' onClick={() => redirectUrl(ministry)} >{(ministry.axisrequestid?ministry.axisrequestid:ministry.filenumber)}</td>
+        <td className='ministry-name'>{ministry.name? ministry.name: Object.values(ministry)?.toString() }</td>
+        { !!ministry.axisrequestid || !!ministry.filenumber ?
+          <td className='ministry-requestid' onClick={() => redirectUrl(ministry)} >{(ministry.axisrequestid?ministry.axisrequestid: ministry.filenumber)}</td>
+          :
+          <td>{Object.keys(ministry)?.toString()}</td>
+        }
+       
       </tr>
     )
    });
@@ -46,7 +51,7 @@ const MinistriesCanvassed = ({openModal,selectedMinistries, setModal} ) => {
       maxWidth={'md'}
       fullWidth={true}>
       <DialogTitle disableTypography id="state-change-dialog-title">
-          <h2 className="state-change-header">Ministries Canvassed</h2>
+          <h2 className="state-change-header">{isLinkedRequest ? "Linked Requests" : "Ministries Canvassed"}</h2>
           <IconButton aria-label= "close"
               className="title-col3"
               onClick={handleClose}>

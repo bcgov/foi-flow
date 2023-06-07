@@ -133,7 +133,7 @@ class FOIRequestsById(Resource):
     def post(foirequestid,foiministryrequestid):
         """ POST Method for capturing FOI requests before processing"""
         try:
-            request_json = request.get_json()            
+            request_json = request.get_json()   
             foirequestschema = FOIRequestWrapperSchema().load(request_json)  
             result = requestservice().saverequestversion(foirequestschema, foirequestid, foiministryrequestid,AuthHelper.getuserid())
             if result.success == True:
