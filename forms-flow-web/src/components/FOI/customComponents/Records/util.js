@@ -24,6 +24,37 @@ export const getPDFFilePath = (item) => {
     }
     return [pdffilepath, pdffilename];
  }
+
+ function arrangeAttachments(attachments, parentDocumentMasterId) {
+    const attachmentsMap = {};
+    const arrangedAttachments = [];
+  
+    // Create a map of attachments based on parentid
+    for (const attachment of attachments) {
+      const parentid = attachment.parentid;
+      if (!attachmentsMap[parentid]) {
+        attachmentsMap[parentid] = [];
+      }
+      attachmentsMap[parentid].push(attachment);
+    }
+  
+    // Recursive function to arrange attachments
+    function arrangeChildren(parentid) {
+      const children = attachmentsMap[parentid];
+      if (children) {
+        for (const child of children) {
+          arrangedAttachments.push(child);
+          arrangeChildren(child.documentmasterid);
+        }
+      }
+    }
+  
+    // Start arranging attachments from the root level
+    arrangeChildren(parentDocumentMasterId);
+    getUpdatedRecords(arrangedAttachments, true)
+    return getUpdatedRecords(arrangedAttachments, true)
+  
+  }
  
  // Get records with only necessary fields
  export const getUpdatedRecords = (_records, isattachment=false) =>{
