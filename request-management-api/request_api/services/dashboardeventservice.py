@@ -11,7 +11,7 @@ from request_api.auth import AuthHelper
 from dateutil import tz, parser
 from flask import jsonify
 
-class eventdashboardservice:
+class dashboardeventservice:
     """ FOI Event Dashboard
     """
     
@@ -45,4 +45,13 @@ class eventdashboardservice:
             'from': notification.createdby,            
             'to': notification.userid,
             'event': notification.event,
+            'assignedGroup': notification.assignedGroup,
+            'assignedTo': notification.assignedTo,            
+            'assignedToFirstName':notification.assignedToFirstName,       
+            'assignedToLastName':notification.assignedToLastName,  
+            'assignedministrygroup': notification.assignedministrygroup,
+            'assignedministryperson': notification.assignedministryperson,
+            'assignedministrypersonFirstName':notification.assignedministrypersonFirstName,
+            'assignedministrypersonLastName': notification.assignedministrypersonLastName
+
         }

@@ -153,7 +153,15 @@ class FOIRawRequestNotificationUser(db.Model):
             FOIRawRequestNotification.notification.label('event'),
             FOIRawRequestNotificationUser.userid.label('userid'),
             FOIRawRequestNotificationUser.createdby.label('createdby'),
-            FOIRawRequestNotificationUser.created_at.label('event_created_at')
+            FOIRawRequestNotificationUser.created_at.label('event_created_at'),
+            FOIRawRequest.assignedgroup.label('assignedGroup'),
+            FOIRawRequest.assignedto.label('assignedTo'),
+            FOIAssignee.firstname.label('assignedToFirstName'),
+            FOIAssignee.lastname.label('assignedToLastName'),
+            literal(None).label('assignedministrygroup'),
+            literal(None).label('assignedministryperson'),
+            literal(None).label('assignedministrypersonFirstName'),
+            literal(None).label('assignedministrypersonLastName'),
         ]
 
         basequery = _session.query(
@@ -247,7 +255,10 @@ class FOIRawRequestNotificationUser(db.Model):
             'datetime' : FOIRawRequestNotificationUser.created_at,
             'from' : FOIRawRequestNotificationUser.createdby,
             'axisRequestId' : cast(FOIRawRequest.axisrequestid, String),
-            'event' : FOIRawRequestNotification.notification
+            'event' : FOIRawRequestNotification.notification,
+            'assignedTo': FOIRawRequest.assignedto,
+            'assignedToFirstName': FOIAssignee.firstname,
+            'assignedToLastName': FOIAssignee.lastname
         }.get(x, cast(FOIRawRequest.requestid, String))
     
     @classmethod

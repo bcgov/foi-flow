@@ -25,7 +25,7 @@ from request_api.utils.enums import MinistryTeamWithKeycloackGroup, UserGroup
 from request_api.auth import AuthHelper, auth
 from request_api.tracer import Tracer
 from request_api.exceptions import BusinessException
-from request_api.services.eventdashboardservice import eventdashboardservice
+from request_api.services.dashboardeventservice import dashboardeventservice
 
 
 API = Namespace('FOIEvent', description='Endpoints for FOI event management')
@@ -78,7 +78,7 @@ class EventPagination(Resource):
             statuscode = 200
             if AuthHelper.getusertype() == "iao" or AuthHelper.getusertype() == "ministry":  
                 groups =  AuthHelper.getusergroups() if AuthHelper.getusertype() == "iao" else AuthHelper.getministrygroups()                                                                                       
-                events = eventdashboardservice().geteventqueuepagination(queuetype, groups, _page, _size, _sortingitems, _sortingorders, _filterfields, _keyword, _additionalfilter, _userid)
+                events = dashboardeventservice().geteventqueuepagination(queuetype, groups, _page, _size, _sortingitems, _sortingorders, _filterfields, _keyword, _additionalfilter, _userid)
             else:
                 statuscode = 401  
 

@@ -179,7 +179,15 @@ class FOIRequestNotificationUser(db.Model):
             FOIRequestNotification.notification.label('event'),
             FOIRequestNotificationUser.userid.label('userid'),
             FOIRequestNotificationUser.createdby.label('createdby'),
-            FOIRequestNotificationUser.created_at.label('event_created_at')
+            FOIRequestNotificationUser.created_at.label('event_created_at'),
+            FOIMinistryRequest.assignedgroup.label('assignedGroup'),
+            FOIMinistryRequest.assignedto.label('assignedTo'),
+            FOIMinistryRequest.assignedministrygroup.label('assignedministrygroup'),
+            FOIMinistryRequest.assignedministryperson.label('assignedministryperson'),
+            iaoassignee.firstname.label('assignedToFirstName'),
+            iaoassignee.lastname.label('assignedToLastName'),
+            ministryassignee.firstname.label('assignedministrypersonFirstName'),
+            ministryassignee.lastname.label('assignedministrypersonLastName'),
         ]
 
         basequery = _session.query(
@@ -272,7 +280,7 @@ class FOIRequestNotificationUser(db.Model):
 
         #default sorting
         if(len(sortingcondition) == 0):
-            sortingcondition.append(FOIRequestNotificationUser.findfield('datetime').desc())
+            sortingcondition.append(FOIRequestNotificationUser.findfield('datetime', iaoassignee, ministryassignee).desc())
 
         #always sort by created_at last to prevent pagination collisions
         sortingcondition.append(asc('created_at'))
@@ -295,7 +303,7 @@ class FOIRequestNotificationUser(db.Model):
                 return nullsfirst(FOIMinistryRequest.findfield(field, iaoassignee, ministryassignee).asc())
 
     @classmethod
-    def findfield(cls, x):
+    def findfield(cls, x, iaoassignee, ministryassignee):
         #add more fields here if need sort/filter/search more columns
 
         return {
@@ -303,7 +311,13 @@ class FOIRequestNotificationUser(db.Model):
             'datetime' : FOIRequestNotificationUser.created_at,
             'from' : FOIRequestNotificationUser.createdby,
             'axisRequestId' : FOIMinistryRequest.axisrequestid,
-            'event' : FOIRequestNotification.notification
+            'event' : FOIRequestNotification.notification,
+            'assignedTo': FOIMinistryRequest.assignedto,
+            'assignedministryperson': FOIMinistryRequest.assignedministryperson,
+            'assignedToFirstName': iaoassignee.firstname,
+            'assignedToLastName': iaoassignee.lastname,
+            'assignedministrypersonFirstName': ministryassignee.firstname,
+            'assignedministrypersonLastName': ministryassignee.lastname
         }.get(x, FOIRequestNotificationUser.created_at)
     
     # End of Dashboard functions
