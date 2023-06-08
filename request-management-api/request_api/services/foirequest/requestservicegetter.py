@@ -174,12 +174,9 @@ class requestservicegetter:
     
     def __assignministrynames(self, linkedrequests):
         areas = programareaservice().getprogramareas()
-        print("linkedrequests:",linkedrequests)
         if linkedrequests is not None:
             for entry in linkedrequests:
-                print("entry:",list(entry.values())[0])
                 area = next((a for a in areas if a["programareaid"] == list(entry.values())[0]), None)
-                print("!!",area)
                 if (area is not None):
                     entry = area["name"]
         return linkedrequests
