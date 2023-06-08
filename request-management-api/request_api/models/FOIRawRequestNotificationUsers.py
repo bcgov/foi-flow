@@ -241,8 +241,8 @@ class FOIRawRequestNotificationUser(db.Model):
                     filtercondition.append(FOIRawRequestNotificationUser.findfield('contactFirstName').ilike('%'+keyword+'%'))
                 if(field == 'lastName'):
                     filtercondition.append(FOIRawRequestNotificationUser.findfield('contactLastName').ilike('%'+keyword+'%'))
-                if(field == 'requestType'):
-                    filtercondition.append(FOIRawRequestNotificationUser.findfield('requestTypeRequestType').ilike('%'+keyword+'%'))
+                if(field == 'event'):
+                    filtercondition.append(FOIRawRequestNotification.notification["message"].astext.cast(String).ilike('%'+keyword+'%'))
         else:
             filtercondition.append(FOIRawRequest.isiaorestricted == True)
 

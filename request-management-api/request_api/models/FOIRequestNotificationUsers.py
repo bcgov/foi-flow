@@ -166,7 +166,10 @@ class FOIRequestNotificationUser(db.Model):
 
             if(keyword != "restricted"):
                 for field in filterfields:
-                    filtercondition.append(FOIRequestNotificationUser.findfield(field, iaoassignee, ministryassignee).ilike('%'+keyword+'%'))
+                    if field == "event":
+                        filtercondition.append(FOIRequestNotification.notification["message"].astext.cast(String).ilike('%'+keyword+'%'))
+                    else:
+                        filtercondition.append(FOIRequestNotificationUser.findfield(field, iaoassignee, ministryassignee).ilike('%'+keyword+'%'))
             else:
                 if(requestby == 'IAO'):
                     filtercondition.append(FOIRestrictedMinistryRequest.isrestricted == True)
