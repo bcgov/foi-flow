@@ -235,14 +235,16 @@ class FOIRawRequestNotificationUser(db.Model):
             for field in filterfields:
                 if(field == 'idNumber'):
                     keyword = keyword.replace('u-00', '')
-                
-                filtercondition.append(FOIRawRequestNotificationUser.findfield(field).ilike('%'+keyword+'%'))
+                if(field == 'event'):
+                    filtercondition.append(FOIRawRequestNotification.notification["message"].astext.cast(String).ilike('%'+keyword+'%'))
+                elif(field == 'datetime'):
+                    filtercondition.append(func.DATE(FOIRawRequestNotification.created_at) == keyword)
+                else:
+                    filtercondition.append(FOIRawRequestNotificationUser.findfield(field).ilike('%'+keyword+'%'))
                 if(field == 'firstName'):
                     filtercondition.append(FOIRawRequestNotificationUser.findfield('contactFirstName').ilike('%'+keyword+'%'))
                 if(field == 'lastName'):
                     filtercondition.append(FOIRawRequestNotificationUser.findfield('contactLastName').ilike('%'+keyword+'%'))
-                if(field == 'event'):
-                    filtercondition.append(FOIRawRequestNotification.notification["message"].astext.cast(String).ilike('%'+keyword+'%'))
         else:
             filtercondition.append(FOIRawRequest.isiaorestricted == True)
 
@@ -252,10 +254,10 @@ class FOIRawRequestNotificationUser(db.Model):
     def findfield(cls, x):
         return {
             'to': FOIRawRequestNotificationUser.userid,
-            'datetime' : FOIRawRequestNotificationUser.created_at,
+            #'datetime' : FOIRawRequestNotificationUser.created_at,
             'from' : FOIRawRequestNotificationUser.createdby,
             'axisRequestId' : cast(FOIRawRequest.axisrequestid, String),
-            'event' : FOIRawRequestNotification.notification,
+            #'event' : FOIRawRequestNotification.notification,
             'assignedTo': FOIRawRequest.assignedto,
             'assignedToFirstName': FOIAssignee.firstname,
             'assignedToLastName': FOIAssignee.lastname

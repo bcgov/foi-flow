@@ -27,7 +27,6 @@ from request_api.tracer import Tracer
 from request_api.exceptions import BusinessException
 from request_api.services.dashboardeventservice import dashboardeventservice
 
-
 API = Namespace('FOIEvent', description='Endpoints for FOI event management')
 TRACER = Tracer.get_instance()
 """Custom exception messages
@@ -56,7 +55,12 @@ class EventPagination(Resource):
                                         'axisRequestId',
                                         'from',
                                         'to',
-                                        'event'
+                                        'event',
+                                        'assignedToFirstName',
+                                        'assignedToLastName',
+                                        'assignedministrypersonFirstName',
+                                        'assignedministrypersonLastName',
+                                        'datetime'
                                     ]
             DEFAULT_ADDITIONAL_FILTER = 'All'
             _page = flask.request.args.get('page', DEFAULT_PAGE, type=int)
@@ -77,7 +81,8 @@ class EventPagination(Resource):
             events = []
             statuscode = 200
             if AuthHelper.getusertype() == "iao" or AuthHelper.getusertype() == "ministry":  
-                groups =  AuthHelper.getusergroups() if AuthHelper.getusertype() == "iao" else AuthHelper.getministrygroups()                                                                                       
+                groups =  AuthHelper.getusergroups() if AuthHelper.getusertype() == "iao" else AuthHelper.getministrygroups()      
+                                                                                              
                 events = dashboardeventservice().geteventqueuepagination(queuetype, groups, _page, _size, _sortingitems, _sortingorders, _filterfields, _keyword, _additionalfilter, _userid)
             else:
                 statuscode = 401  
@@ -85,3 +90,6 @@ class EventPagination(Resource):
             return events, statuscode
         except BusinessException as exception:
             return {'status': exception.status_code, 'message':exception.message}, 500
+
+
+

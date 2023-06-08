@@ -168,6 +168,8 @@ class FOIRequestNotificationUser(db.Model):
                 for field in filterfields:
                     if field == "event":
                         filtercondition.append(FOIRequestNotification.notification["message"].astext.cast(String).ilike('%'+keyword+'%'))
+                    elif field == "datetime":
+                        filtercondition.append(func.DATE(FOIRequestNotification.created_at) == keyword)
                     else:
                         filtercondition.append(FOIRequestNotificationUser.findfield(field, iaoassignee, ministryassignee).ilike('%'+keyword+'%'))
             else:
@@ -258,7 +260,7 @@ class FOIRequestNotificationUser(db.Model):
         if(keyword is None):
             return dbquery
         else:
-            return dbquery.filter(or_(*filtercondition))
+            return dbquery.filter(or_(*filtercondition)) if(len(filterfields) > 0 and keyword is not None) else  dbquery
 
 
     @classmethod
@@ -311,10 +313,10 @@ class FOIRequestNotificationUser(db.Model):
 
         return {
             'to': FOIRequestNotificationUser.userid,
-            'datetime' : FOIRequestNotificationUser.created_at,
+            #'datetime' : FOIRequestNotificationUser.created_at,
             'from' : FOIRequestNotificationUser.createdby,
             'axisRequestId' : FOIMinistryRequest.axisrequestid,
-            'event' : FOIRequestNotification.notification,
+            #'event' : FOIRequestNotification.notification,
             'assignedTo': FOIMinistryRequest.assignedto,
             'assignedministryperson': FOIMinistryRequest.assignedministryperson,
             'assignedToFirstName': iaoassignee.firstname,
