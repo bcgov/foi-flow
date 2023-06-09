@@ -166,7 +166,7 @@ class FOIRequestNotificationUser(db.Model):
 
             if(keyword != "restricted"):
                 for field in filterfields:
-                    if field == "event":
+                    if field == "notification":
                         filtercondition.append(FOIRequestNotification.notification["message"].astext.cast(String).ilike('%'+keyword+'%'))
                     elif field == "createdat":
                         filtercondition.append(func.DATE(FOIRequestNotification.created_at) == keyword)
@@ -334,10 +334,8 @@ class FOIRequestNotificationUser(db.Model):
 
         return {
             'to': FOIRequestNotificationUser.userid,
-            #'createdat' : FOIRequestNotificationUser.created_at,
             'createdby' : FOIRequestNotificationUser.createdby,
             'axisRequestId' : FOIMinistryRequest.axisrequestid,
-            #'event' : FOIRequestNotification.notification,
             'assignedTo': FOIMinistryRequest.assignedto,
             'assignedministryperson': FOIMinistryRequest.assignedministryperson,
             'assignedToFirstName': iaoassignee.firstname,

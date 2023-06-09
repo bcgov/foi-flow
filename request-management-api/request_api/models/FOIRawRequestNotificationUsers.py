@@ -255,13 +255,13 @@ class FOIRawRequestNotificationUser(db.Model):
                     filtercondition.append(FOIRawRequestNotification.notification["message"].astext.cast(String).ilike('%'+keyword+'%'))
                 elif(field == 'createdat'):
                     filtercondition.append(func.DATE(FOIRawRequestNotification.created_at) == keyword)
+                elif(field == 'firstName'):
+                    filtercondition.append(FOIRawRequestNotificationUser.findfield('contactFirstName').ilike('%'+keyword+'%'))
+                elif(field == 'lastName'):
+                    filtercondition.append(FOIRawRequestNotificationUser.findfield('contactLastName').ilike('%'+keyword+'%'))
                 else:
                     filtercondition.append(FOIRawRequestNotificationUser.findfield(field).ilike('%'+keyword+'%'))
-                if(field == 'firstName'):
-                    filtercondition.append(FOIRawRequestNotificationUser.findfield('contactFirstName').ilike('%'+keyword+'%'))
-                if(field == 'lastName'):
-                    filtercondition.append(FOIRawRequestNotificationUser.findfield('contactLastName').ilike('%'+keyword+'%'))
-        else:
+                
             filtercondition.append(FOIRawRequest.isiaorestricted == True)
 
         return or_(*filtercondition)
