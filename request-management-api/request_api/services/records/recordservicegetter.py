@@ -60,9 +60,8 @@ class recordservicegetter(recordservicebase):
             _record['attachments'] = []
             if _computingresponse['isduplicate']:
                 _record['duplicatemasterid'] = _computingresponse['duplicatemasterid']  
-                _record['duplicateof'] = _computingresponse['duplicateof']    
-            attachment_list = self.__getcomputingresponse(computingresponses, "parentid", documentmasterid)
-            for attachment in attachment_list:
+                _record['duplicateof'] = _computingresponse['duplicateof']
+            for attachment in _computingresponse["attachments"]:
                 _attachement = self.__pstformat(attachment)
                 _attachement['isattachment'] = True
                 _attachement['s3uripath'] = attachment['filepath']
