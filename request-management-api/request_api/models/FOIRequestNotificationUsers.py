@@ -178,6 +178,25 @@ class FOIRequestNotificationUser(db.Model):
                 else:
                     filtercondition.append(ministry_restricted_requests.isrestricted == True)
 
+        assignedtoformatted = case([
+                            (and_(iaoassignee.lastname.isnot(None), iaoassignee.firstname.isnot(None)),
+                             func.concat(iaoassignee.lastname, ', ', iaoassignee.firstname)),
+                            (and_(iaoassignee.lastname.isnot(None), iaoassignee.firstname.is_(None)),
+                             iaoassignee.lastname),
+                            (and_(iaoassignee.lastname.is_(None), iaoassignee.firstname.isnot(None)),
+                             iaoassignee.firstname),
+                           ],
+                           else_ = FOIMinistryRequest.assignedgroup).label('assignedToFormatted')
+
+        ministryassignedtoformatted = case([
+                            (and_(ministryassignee.lastname.isnot(None), ministryassignee.firstname.isnot(None)),
+                             func.concat(ministryassignee.lastname, ', ', ministryassignee.firstname)),
+                            (and_(ministryassignee.lastname.isnot(None), ministryassignee.firstname.is_(None)),
+                             ministryassignee.lastname),
+                            (and_(ministryassignee.lastname.is_(None), ministryassignee.firstname.isnot(None)),
+                             ministryassignee.firstname),
+                           ],
+                           else_ = FOIMinistryRequest.assignedministrygroup).label('ministryAssignedToFormatted')
         
         selectedcolumns = [
             cast(FOIMinistryRequest.axisrequestid, String).label('axisRequestId'),
@@ -193,6 +212,8 @@ class FOIRequestNotificationUser(db.Model):
             iaoassignee.lastname.label('assignedToLastName'),
             ministryassignee.firstname.label('assignedministrypersonFirstName'),
             ministryassignee.lastname.label('assignedministrypersonLastName'),
+            assignedtoformatted,
+            ministryassignedtoformatted
         ]
 
         basequery = _session.query(

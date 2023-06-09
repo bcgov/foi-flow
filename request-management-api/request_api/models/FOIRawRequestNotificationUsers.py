@@ -148,6 +148,18 @@ class FOIRawRequestNotificationUser(db.Model):
             ],
             else_ = cast(FOIRawRequest.axisrequestid, String)).label('axisRequestId')
 
+        assignedtoformatted = case([
+                            (and_(FOIAssignee.lastname.isnot(None), FOIAssignee.firstname.isnot(None)),
+                             func.concat(FOIAssignee.lastname, ', ', FOIAssignee.firstname)),
+                            (and_(FOIAssignee.lastname.isnot(None), FOIAssignee.firstname.is_(None)),
+                             FOIAssignee.lastname),
+                            (and_(FOIAssignee.lastname.is_(None), FOIAssignee.firstname.isnot(None)),
+                             FOIAssignee.firstname),
+                            (and_(FOIAssignee.lastname.is_(None), FOIAssignee.firstname.is_(None), FOIRawRequest.assignedgroup.is_(None)),
+                             'Unassigned'),
+                           ],
+                           else_ = FOIRawRequest.assignedgroup).label('assignedToFormatted')
+
         selectedcolumns = [
             axisrequestid,            
             FOIRawRequestNotification.notification["message"].label('notification'),
@@ -162,7 +174,11 @@ class FOIRawRequestNotificationUser(db.Model):
             literal(None).label('assignedministryperson'),
             literal(None).label('assignedministrypersonFirstName'),
             literal(None).label('assignedministrypersonLastName'),
+            assignedtoformatted,
+            literal(None).label('ministryAssignedToFormatted'),
         ]
+
+        
 
         basequery = _session.query(
                                         *selectedcolumns
