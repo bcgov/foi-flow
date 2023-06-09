@@ -290,7 +290,7 @@ export const RecordsLog = ({
                   filename: header.filename,
                   attributes:{
                     divisions:replaceRecord['attributes']['divisions'],
-                    lastmodified: _file.lastModifiedDate,
+                    lastmodified: _file.lastModifiedDate ? _file.lastModifiedDate : new Date(_file.lastModified),
                     filesize: _file.size
                   },
                   replacementof:replaceRecord['replacementof'] == null || replaceRecord['replacementof']==''? replaceRecord['recordid'] : replaceRecord['replacementof'] ,
@@ -311,7 +311,7 @@ export const RecordsLog = ({
                   filename: header.filename,
                   attributes:{
                     divisions:[{divisionid: _fileInfo.divisionid}],
-                    lastmodified: _file.lastModifiedDate,
+                    lastmodified: _file.lastModifiedDate ? _file.lastModifiedDate : new Date(_file.lastModified),
                     filesize: _file.size
                   }
                 }
