@@ -1507,7 +1507,7 @@ const AttachmentPopup = React.memo(({indexValue, record, handlePopupButtonClick,
             Download Original
           </MenuItem>
           }
-          {record.isredactionready && ['.doc','.docx','.xls','.xlsx', '.ics', '.msg'].includes(record.attributes?.extension?.toLowerCase()) && <MenuItem
+          {record.isredactionready && ['.doc','.docx','.xls','.xlsx', '.ics', '.msg', '.pptx'].includes(record.attributes?.extension?.toLowerCase()) && <MenuItem
             onClick={() => {
                 handleDownloadPDF();
                 setPopoverOpen(false);
