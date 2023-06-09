@@ -8,6 +8,7 @@ import {
     serviceActionError,
     setRequestRecords,
     setRecordFormats,
+    setConversionFormats,
     setFOILoader,
     setFOIPDFStitchedRecordForHarms,
     setFOIPDFStitchStatusForHarms
@@ -215,6 +216,7 @@ export const getRecordFormats = (...rest) => {
         .then((res) => {
           if (res.data) {
             dispatch(setRecordFormats([... new Set([...res.data.conversion, ...res.data.dedupe, ...res.data.nonredactable])]))
+            dispatch(setConversionFormats(res.data.conversion))
           } else {
             console.log("Error in fetching records formats", res);
             dispatch(serviceActionError(res));

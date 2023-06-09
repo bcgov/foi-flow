@@ -94,6 +94,8 @@ class recordservice(recordservicebase):
             }
             if record.get('outputdocumentmasterid', False):
                 streamobject['outputdocumentmasterid'] = record['outputdocumentmasterid']
+            if record['trigger'] == 'recordreplace' and record['attributes']['isattachment'] == True:
+                streamobject['originaldocumentmasterid'] = record['documentmasterid']
             return eventqueueservice().add(streamkey, streamobject)
 
     def replace(self, _requestid, ministryrequestid, recordid, recordschema, userid):
