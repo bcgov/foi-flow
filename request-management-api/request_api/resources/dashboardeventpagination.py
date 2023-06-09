@@ -53,7 +53,7 @@ class EventPagination(Resource):
             DEFAULT_SORT_ORDERS = ['desc']
             DEFAULT_FILTER_FIELDS = [
                                         'axisRequestId',
-                                        'from',
+                                        'createdby',
                                         'to',
                                         'event',
                                         'assignedToFirstName',

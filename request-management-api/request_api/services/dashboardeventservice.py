@@ -44,7 +44,8 @@ class dashboardeventservice:
         _newvalue = keyword
         _newfilterfields = filterfields
         try:
-            _newvalue = datetime2.strptime(keyword, '%d %b %Y').strftime('%y-%m-%d')
+            if keyword not in [None, ""] and len(filterfields) > 0:
+                _newvalue = datetime2.strptime(keyword, '%d %b %Y').strftime('%y-%m-%d')
         except ValueError as ex:
             if "datetime" in _newfilterfields:
                 _newfilterfields.remove("datetime")
@@ -54,8 +55,8 @@ class dashboardeventservice:
         return {
             'datetime' : maya.parse(notification.event_created_at).datetime(to_timezone='America/Vancouver', naive=False),
             'axisRequestId': notification.axisRequestId,
-            'from': notification.createdby,            
-            'to': notification.userid,
+            'createdby': notification.createdby,            
+            'to': notification.to,
             'event': notification.event,
             'assignedGroup': notification.assignedGroup,
             'assignedTo': notification.assignedTo,            

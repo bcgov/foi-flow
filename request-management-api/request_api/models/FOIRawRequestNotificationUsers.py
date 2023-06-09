@@ -151,7 +151,7 @@ class FOIRawRequestNotificationUser(db.Model):
         selectedcolumns = [
             axisrequestid,            
             FOIRawRequestNotification.notification.label('event'),
-            FOIRawRequestNotificationUser.userid.label('userid'),
+            FOIRawRequestNotificationUser.userid.label('to'),
             FOIRawRequestNotificationUser.createdby.label('createdby'),
             FOIRawRequestNotificationUser.created_at.label('event_created_at'),
             FOIRawRequest.assignedgroup.label('assignedGroup'),
@@ -255,7 +255,7 @@ class FOIRawRequestNotificationUser(db.Model):
         return {
             'to': FOIRawRequestNotificationUser.userid,
             #'datetime' : FOIRawRequestNotificationUser.created_at,
-            'from' : FOIRawRequestNotificationUser.createdby,
+            'createdby' : FOIRawRequestNotificationUser.createdby,
             'axisRequestId' : cast(FOIRawRequest.axisrequestid, String),
             #'event' : FOIRawRequestNotification.notification,
             'assignedTo': FOIRawRequest.assignedto,
@@ -305,9 +305,12 @@ class FOIRawRequestNotificationUser(db.Model):
     def validatefield(cls, x):
         validfields = [
             'event',
-            'userid',
             'createdby',
-            'event_created_at'            
+            'to',
+            'axisRequestId',
+            'datetime',
+            'assignedToFormatted',
+            'ministryAssignedToFormatted'           
         ]
         if x in validfields:
             return True

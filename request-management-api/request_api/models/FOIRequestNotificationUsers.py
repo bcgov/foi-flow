@@ -314,7 +314,7 @@ class FOIRequestNotificationUser(db.Model):
         return {
             'to': FOIRequestNotificationUser.userid,
             #'datetime' : FOIRequestNotificationUser.created_at,
-            'from' : FOIRequestNotificationUser.createdby,
+            'createdby' : FOIRequestNotificationUser.createdby,
             'axisRequestId' : FOIMinistryRequest.axisrequestid,
             #'event' : FOIRequestNotification.notification,
             'assignedTo': FOIMinistryRequest.assignedto,
