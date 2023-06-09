@@ -47,17 +47,17 @@ class dashboardeventservice:
             if keyword not in [None, ""] and len(filterfields) > 0:
                 _newvalue = datetime2.strptime(keyword, '%d %b %Y').strftime('%y-%m-%d')
         except ValueError as ex:
-            if "datetime" in _newfilterfields:
-                _newfilterfields.remove("datetime")
+            if "createdat" in _newfilterfields:
+                _newfilterfields.remove("createdat")
         return _newvalue, _newfilterfields
 
     def __prepareevent(self, notification):
         return {
-            'datetime' : maya.parse(notification.event_created_at).datetime(to_timezone='America/Vancouver', naive=False),
+            'createdat' : maya.parse(notification.createdat).datetime(to_timezone='America/Vancouver', naive=False),
             'axisRequestId': notification.axisRequestId,
             'createdby': notification.createdby,            
             'to': notification.to,
-            'event': notification.event,
+            'notification': notification.notification,
             'assignedGroup': notification.assignedGroup,
             'assignedTo': notification.assignedTo,            
             'assignedToFirstName':notification.assignedToFirstName,       

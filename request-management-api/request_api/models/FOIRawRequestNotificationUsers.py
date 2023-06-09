@@ -150,10 +150,10 @@ class FOIRawRequestNotificationUser(db.Model):
 
         selectedcolumns = [
             axisrequestid,            
-            FOIRawRequestNotification.notification.label('event'),
+            FOIRawRequestNotification.notification["message"].label('notification'),
             FOIRawRequestNotificationUser.userid.label('to'),
             FOIRawRequestNotificationUser.createdby.label('createdby'),
-            FOIRawRequestNotificationUser.created_at.label('event_created_at'),
+            FOIRawRequestNotificationUser.created_at.label('createdat'),
             FOIRawRequest.assignedgroup.label('assignedGroup'),
             FOIRawRequest.assignedto.label('assignedTo'),
             FOIAssignee.firstname.label('assignedToFirstName'),
@@ -235,9 +235,9 @@ class FOIRawRequestNotificationUser(db.Model):
             for field in filterfields:
                 if(field == 'idNumber'):
                     keyword = keyword.replace('u-00', '')
-                if(field == 'event'):
+                if(field == 'notification'):
                     filtercondition.append(FOIRawRequestNotification.notification["message"].astext.cast(String).ilike('%'+keyword+'%'))
-                elif(field == 'datetime'):
+                elif(field == 'createdat'):
                     filtercondition.append(func.DATE(FOIRawRequestNotification.created_at) == keyword)
                 else:
                     filtercondition.append(FOIRawRequestNotificationUser.findfield(field).ilike('%'+keyword+'%'))
@@ -254,10 +254,8 @@ class FOIRawRequestNotificationUser(db.Model):
     def findfield(cls, x):
         return {
             'to': FOIRawRequestNotificationUser.userid,
-            #'datetime' : FOIRawRequestNotificationUser.created_at,
             'createdby' : FOIRawRequestNotificationUser.createdby,
             'axisRequestId' : cast(FOIRawRequest.axisrequestid, String),
-            #'event' : FOIRawRequestNotification.notification,
             'assignedTo': FOIRawRequest.assignedto,
             'assignedToFirstName': FOIAssignee.firstname,
             'assignedToLastName': FOIAssignee.lastname
@@ -294,21 +292,21 @@ class FOIRawRequestNotificationUser(db.Model):
                         sortingcondition.append(nullsfirst(asc(field)))
         #default sorting
         if(len(sortingcondition) == 0):
-            sortingcondition.append(desc('event_created_at'))
+            sortingcondition.append(desc('createdat'))
 
         #always sort by created_at last to prevent pagination collisions
-        sortingcondition.append(desc('event_created_at'))
+        sortingcondition.append(desc('createdat'))
         
         return sortingcondition
     
     @classmethod
     def validatefield(cls, x):
         validfields = [
-            'event',
+            'notification',
             'createdby',
             'to',
             'axisRequestId',
-            'datetime',
+            'createdat',
             'assignedToFormatted',
             'ministryAssignedToFormatted'           
         ]

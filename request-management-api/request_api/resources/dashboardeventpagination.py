@@ -55,12 +55,12 @@ class EventPagination(Resource):
                                         'axisRequestId',
                                         'createdby',
                                         'to',
-                                        'event',
+                                        'notification',
                                         'assignedToFirstName',
                                         'assignedToLastName',
                                         'assignedministrypersonFirstName',
                                         'assignedministrypersonLastName',
-                                        'datetime'
+                                        'createdat'
                                     ]
             DEFAULT_ADDITIONAL_FILTER = 'All'
             _page = flask.request.args.get('page', DEFAULT_PAGE, type=int)

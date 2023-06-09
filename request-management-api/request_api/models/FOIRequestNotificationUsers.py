@@ -168,7 +168,7 @@ class FOIRequestNotificationUser(db.Model):
                 for field in filterfields:
                     if field == "event":
                         filtercondition.append(FOIRequestNotification.notification["message"].astext.cast(String).ilike('%'+keyword+'%'))
-                    elif field == "datetime":
+                    elif field == "createdat":
                         filtercondition.append(func.DATE(FOIRequestNotification.created_at) == keyword)
                     else:
                         filtercondition.append(FOIRequestNotificationUser.findfield(field, iaoassignee, ministryassignee).ilike('%'+keyword+'%'))
@@ -181,10 +181,10 @@ class FOIRequestNotificationUser(db.Model):
         
         selectedcolumns = [
             cast(FOIMinistryRequest.axisrequestid, String).label('axisRequestId'),
-            FOIRequestNotification.notification.label('event'),
-            FOIRequestNotificationUser.userid.label('userid'),
+            FOIRequestNotification.notification["message"].label('notification'),
+            FOIRequestNotificationUser.userid.label('to'),
             FOIRequestNotificationUser.createdby.label('createdby'),
-            FOIRequestNotificationUser.created_at.label('event_created_at'),
+            FOIRequestNotificationUser.created_at.label('createdat'),
             FOIMinistryRequest.assignedgroup.label('assignedGroup'),
             FOIMinistryRequest.assignedto.label('assignedTo'),
             FOIMinistryRequest.assignedministrygroup.label('assignedministrygroup'),
@@ -285,7 +285,7 @@ class FOIRequestNotificationUser(db.Model):
 
         #default sorting
         if(len(sortingcondition) == 0):
-            sortingcondition.append(FOIRequestNotificationUser.findfield('datetime', iaoassignee, ministryassignee).desc())
+            sortingcondition.append(FOIRequestNotificationUser.findfield('createdat', iaoassignee, ministryassignee).desc())
 
         #always sort by created_at last to prevent pagination collisions
         sortingcondition.append(asc('created_at'))
@@ -295,7 +295,7 @@ class FOIRequestNotificationUser(db.Model):
     @classmethod
     def getfieldforsorting(cls, field, order, iaoassignee, ministryassignee):
         #get one field
-        customizedfields = ['assignee', 'datetime', 'from', 'idNumber', 'notification']
+        customizedfields = ['assignee', 'createdat', 'createdby', 'idNumber', 'notification']
         if(field in customizedfields):
             if(order == 'desc'):
                 return nullslast(desc(field))
@@ -313,7 +313,7 @@ class FOIRequestNotificationUser(db.Model):
 
         return {
             'to': FOIRequestNotificationUser.userid,
-            #'datetime' : FOIRequestNotificationUser.created_at,
+            #'createdat' : FOIRequestNotificationUser.created_at,
             'createdby' : FOIRequestNotificationUser.createdby,
             'axisRequestId' : FOIMinistryRequest.axisrequestid,
             #'event' : FOIRequestNotification.notification,
