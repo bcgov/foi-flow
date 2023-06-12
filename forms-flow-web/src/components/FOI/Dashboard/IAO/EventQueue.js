@@ -210,7 +210,7 @@ const EventQueue = ({ userDetail, eventQueueTableInfo }) => {
         <DataGrid
           autoHeight
           className="foi-data-grid"
-          getRowId={(row, index) => index}
+          getRowId={(row) => row.id}
           rows={rows}
           columns={eventQueueTableInfo?.columns || []}
           rowHeight={30}
