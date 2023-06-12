@@ -176,6 +176,7 @@ class FOIRawRequestNotificationUser(db.Model):
             literal(None).label('assignedministrypersonLastName'),
             assignedtoformatted,
             literal(None).label('ministryAssignedToFormatted'),
+            FOIRawRequestNotificationUser.notificationuserid.label('id')
         ]
 
         

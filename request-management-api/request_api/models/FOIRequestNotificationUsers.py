@@ -213,7 +213,8 @@ class FOIRequestNotificationUser(db.Model):
             ministryassignee.firstname.label('assignedministrypersonFirstName'),
             ministryassignee.lastname.label('assignedministrypersonLastName'),
             assignedtoformatted,
-            ministryassignedtoformatted
+            ministryassignedtoformatted,
+            FOIRequestNotificationUser.notificationuserid.label('id')
         ]
 
         basequery = _session.query(
