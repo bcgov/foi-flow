@@ -11,7 +11,8 @@ from request_api.auth import AuthHelper
 from dateutil import tz, parser
 from flask import jsonify
 from datetime import datetime as datetime2
-
+from request_api.utils.commons.datetimehandler import datetimehandler
+ 
 class dashboardeventservice:
     """ FOI Event Dashboard
     """
@@ -53,7 +54,7 @@ class dashboardeventservice:
 
     def __prepareevent(self, notification):
         return {
-            'createdat' : maya.parse(notification.createdat).datetime(to_timezone='America/Vancouver', naive=False),
+            'createdat' : self.__formatedate(notification.createdat),
             'axisRequestId': notification.axisRequestId,
             'createdby': notification.createdby,            
             'to': notification.to,
@@ -69,3 +70,6 @@ class dashboardeventservice:
             'id': notification.id
 
         }
+
+    def __formatedate(self, input):
+        return datetimehandler().convert_to_pst(input,'%Y %b %d | %I:%M %p')
