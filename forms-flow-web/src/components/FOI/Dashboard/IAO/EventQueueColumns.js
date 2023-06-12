@@ -11,7 +11,8 @@ import {
   isFlexTeam,
   isIntakeTeam,
   formatDateAndTimeStamp,
-  formatDate
+  formatDate,
+  getUserFullName
 } from "../../../../helper/FOI/helper";
 
 const EventQueueColumns = [
@@ -35,12 +36,14 @@ const EventQueueColumns = [
     headerName: "FROM",
     headerAlign: "left",
     width: 200,
+    valueGetter: (params) => getUserFullName(params.row.createdby),
   },
   {
     field: "assignedTo",
     headerName: "ASSIGNEE",
     headerAlign: "left",
     width: 200,
+    valueGetter: (params) => getUserFullName(params.row.assignedTo, params.row.assignedGroup),
   },
 
   {
