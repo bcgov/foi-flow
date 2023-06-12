@@ -96,6 +96,50 @@ export const updateSortModel = (sortModel) => {
   return smodel;
 };
 
+export const updateEventSortModel = (sortModel) => {
+  let smodel = JSON.parse(JSON.stringify(sortModel));
+  if (smodel) {
+    let field = smodel[0]?.field;
+    let order = smodel[0]?.sort;
+
+    // if (field == "applicantName") {
+    //   smodel.shift();
+    //   smodel.unshift(
+    //     { field: "lastName", sort: order },
+    //     { field: "firstName", sort: order }
+    //   );
+    // }
+
+    // if (field == "DueDateValue") {
+    //   smodel.shift();
+    //   smodel.unshift(
+    //     { field: "duedate", sort: order },
+    //   );
+    // }
+
+    // if (field == "DaysLeftValue") {
+    //   smodel.shift();
+    //   smodel.unshift(
+    //     { field: "duedate", sort: order },
+    //   );
+    // }
+
+    //add duedate to default sorting
+    if (smodel.length == 1 && (field == "defaultSorting" || field == "intakeSorting")) {
+      smodel.push(
+        { field: "cfrduedate", sort: order },
+      );
+    }
+    // if (smodel.length == 1 && field == "currentState") {
+    //   smodel.push(
+    //     { field: "receivedDateUF", sort: "desc" },
+    //   );
+    // }
+  }
+
+  return smodel;
+};
+
 export const getFullName = (firstName, lastName) => {
   if (!firstName && !lastName) {
     return "";
@@ -233,4 +277,18 @@ export const cellTooltipRender = (params) => {
   }>
     <span className="table-cell-truncate">{params.row.axisRequestId}</span>
   </LightTooltip>
+};
+
+export const eventCellTooltipRender = (params) => {
+
+  let description = params.row.description;
+
+  const truncatedDescription = description.length > 100 ? description.slice(0, 100) + '...' : description;
+
+  return (
+    <LightTooltip placement="bottom-start" title={<div style={{ whiteSpace: 'pre-line' }}>{description}</div>}>
+      <span className="table-cell-truncate">{truncatedDescription}</span>
+    </LightTooltip>
+  );
+  
 };
