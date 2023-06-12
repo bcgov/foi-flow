@@ -122,6 +122,9 @@ namespace MCS.FOI.AXISIntegration.DataModels
 
         [DataMember(Name = "subjectCode")]
         public string SubjectCode { get; set; }
+        
+        [DataMember(Name = "linkedRequests")]
+        public string LinkedRequests { get; set; }
 
         [DataMember(Name = "selectedMinistries")]
         public List<Ministry> SelectedMinistries { get; set; }

@@ -40,7 +40,8 @@ const AXIS_SYNC_DISPLAY_FIELDS = {
 
     cfrDueDate: "CFR Due Date",
     requestPageCount: "Total number of pages",
-    subjectCode: "Subject Code"
+    subjectCode: "Subject Code",
+    linkedRequests: "Linked Requests"
   };
   
   export default AXIS_SYNC_DISPLAY_FIELDS;

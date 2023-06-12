@@ -277,6 +277,8 @@ const FOIRequest = React.memo(({ userDetail }) => {
       settabStatus(requestStateFromId);
       setcurrentrequestStatus(requestStateFromId);
       setHeaderText(getHeaderText({requestDetails, ministryId, requestState}));
+      requestDetails.linkedRequests =  !!requestDetails.linkedRequests ? 
+        (typeof requestDetails.linkedRequests == 'string' ? JSON.parse(requestDetails.linkedRequests) : requestDetails.linkedRequests): [];
       if(requestDetails.axisRequestId)
         axisBannerCheck();
         setIsIAORestricted(isRequestRestricted(requestDetails,ministryId));
@@ -304,6 +306,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
     dispatch(fetchRequestDataFromAxis(requestDetails.axisRequestId, saveRequestObject ,true, (err, data) => {
       if(!err){
         if(typeof(data) !== "string" && Object.entries(data).length > 0){
+          data['linkedRequests']= typeof data['linkedRequests'] == 'string'? JSON.parse(data['linkedRequests']) : data['linkedRequests'];
           setAxisSyncedData(data);
           let axisDataUpdated = checkIfAxisDataUpdated(data);
           if(axisDataUpdated){
@@ -361,10 +364,28 @@ const FOIRequest = React.memo(({ userDetail }) => {
         (requestDetails['receivedDate'] !== axisData[key] && requestDetails['receivedDate'] !== axisData['receivedDate'])){
         return true;
     }
+    else if(key === 'linkedRequests'){
+      if(linkedRequestsChanged(axisData,key) > 0){
+        return true;
+      }
+    }
     else if(key !== 'compareReceivedDate' && (mandatoryField && axisData[key] || !mandatoryField)){
       if((requestDetails[key] || axisData[key]) && requestDetails[key] != axisData[key])
         return true;
     }
+    return false;
+  }
+
+  const linkedRequestsChanged = (axisData, key) => {
+    let dblinkedRequests= requestDetails[key]?.map((val => Object.keys(val).toString()));
+    let axislinkedRequests = typeof axisData[key] == 'string' ? JSON.parse(axisData[key]) : axisData[key];
+    let linkedRequestsJson = axislinkedRequests.map((val => Object.keys(val).toString()));
+    if(linkedRequestsJson?.length != dblinkedRequests?.length)
+      return true;
+    if(linkedRequestsJson.filter(x => !dblinkedRequests?.includes(x))?.length > 0)
+      return true;
+    if(dblinkedRequests.filter(x => !linkedRequestsJson?.includes(x))?.length > 0)
+      return true;
     return false;
   }
 
@@ -1063,9 +1084,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
               [classes.hidden]: !tabLinksStatuses.Attachments?.display,
             })}
           >
-            {!isAttachmentListLoading &&
-            (iaoassignedToList?.length > 0 ||
-              ministryAssignedToList?.length > 0) ? (
+            {!isAttachmentListLoading ? (
               <>
                 <AttachmentSection
                   currentUser={userId}
@@ -1110,9 +1129,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
             })}
           >
             {!isLoading &&
-            requestNotes &&
-            (iaoassignedToList?.length > 0 ||
-              ministryAssignedToList?.length > 0) ? (
+            requestNotes ? (
               <>
                 <CommentSection
                   currentUser={
@@ -1154,9 +1171,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
               [classes.hidden]: !tabLinksStatuses.Records.display,
             })}
           >
-            {showRecordsTab() && !isAttachmentListLoading &&
-            (iaoassignedToList?.length > 0 ||
-              ministryAssignedToList?.length > 0) ? (
+            {showRecordsTab() &&
               <>
                 <RecordsLog
                   //recordsObj={requestRecords}
@@ -1171,9 +1186,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
                   divisions={requestDetails.divisions}
                 />
               </>
-            ) : (
-              <Loading />
-            )}
+            }
           </div>
           {showContactApplicantTab() && <div
             id="ContactApplicant"

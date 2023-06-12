@@ -1,4 +1,5 @@
 import React, { useContext, useState, useEffect } from 'react'
+import { useSelector } from "react-redux"
 import './comments.scss'
 import { ActionContext } from './ActionContext'
 import { setFOILoader } from '../../../../actions/FOI/foiRequestActions'
@@ -30,9 +31,10 @@ const AddCommentField = ({ cancellor, parentId, add, fullnameList , restrictedRe
   const [uftext, setuftext] = useState('')
   const [textlength, setTextLength] = useState(1000)
   const [open, setOpen] = useState(false);
+  const isCommentTagListLoading = useSelector((state) => state.foiRequests.isCommentTagListLoading);
   let fulluserlist = suggestionList([...fullnameList]).sort(namesort)
   const mentionList = isRestricted ? restrictedReqTaglist :fulluserlist;
-  const [suggestions, setSuggestions] = useState(mentionList);
+  const [suggestions, setSuggestions] = useState(isCommentTagListLoading ? [{name: 'Loading...'}] : mentionList);
   const [editorState, setEditorState] = useState(EditorState.createEmpty())
   const onOpenChange = (_open) => {
     setOpen(_open);
@@ -178,6 +180,10 @@ const AddCommentField = ({ cancellor, parentId, add, fullnameList , restrictedRe
       setRemoveComment(false);
     }
   })
+
+  useEffect(() => {
+    setSuggestions(isCommentTagListLoading ? [{name: 'Loading...'}] : mentionList);
+  }, [isCommentTagListLoading, mentionList])
 
   let formclass = !parentId ? "parentform form" : "form"
   formclass = add ? `${formclass} addform` : formclass
