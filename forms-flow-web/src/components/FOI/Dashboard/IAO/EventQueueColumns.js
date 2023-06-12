@@ -17,8 +17,8 @@ import {
 const EventQueueColumns = [
 
   {
-    field: "receivedDate",
-    headerName: "DATE TIME STAMP",
+    field: "createdat",
+    headerName: "DATE | TIME STAMP",
     width: 200,
     headerAlign: "left",
     //valueGetter: (params) => formatDate(params.row.cfrduedate, "MM/dd/yyyy"),
@@ -31,20 +31,20 @@ const EventQueueColumns = [
     //renderCell: cellTooltipRender
   },
   {
-    field: "assignedToFormatted",
+    field: "createdby",
     headerName: "FROM",
     headerAlign: "left",
     width: 200,
   },
   {
-    field: "assignedToFormatted",
+    field: "assignedTo",
     headerName: "ASSIGNEE",
     headerAlign: "left",
     width: 200,
   },
 
   {
-    field: "description",
+    field: "notification",
     headerName: "CONTENT",
     headerAlign: "left",
     width: 300,

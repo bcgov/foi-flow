@@ -22,6 +22,8 @@ const initialState = {
   isCommentTagListLoading: true,
   foiRequestsList: null,
   foiMinistryRequestsList: [],
+  foiEventsList: null,
+  foiMinistryEventsList: [],
   foiRequestsCount: 0,
   foiRequestDetail: {},
   foiMinistryViewRequestDetail: {},
@@ -126,6 +128,10 @@ const foiRequests = (state = initialState, action) => {
       return { ...state, isAttachmentListLoading: action.payload };
     case FOI_ACTION_CONSTANTS.IS_COMMENTTAGLIST_LOADING:
       return { ...state, isCommentTagListLoading: action.payload };
+    case FOI_ACTION_CONSTANTS.FOI_LIST_EVENTS:
+        return { ...state, foiEventsList: action.payload, isLoading: false };
+    case FOI_ACTION_CONSTANTS.FOI_MINISTRY_EVENTLIST:
+        return { ...state, foiMinistryEventsList: action.payload };
     case FOI_ACTION_CONSTANTS.FOI_LIST_REQUESTS:
       return { ...state, foiRequestsList: action.payload, isLoading: false };
     case FOI_ACTION_CONSTANTS.FOI_MINISTRY_REQUESTSLIST:
