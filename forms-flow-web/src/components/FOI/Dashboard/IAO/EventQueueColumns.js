@@ -65,7 +65,7 @@ const EventQueueColumns = [
 
 const defaultTableInfo = {
   sort: [
-    { field: "defaultSorting", sort: "asc" },
+    // { field: "defaultSorting", sort: "asc" },
     { field: "createdat", sort: "desc" }
   ],
   noAssignedClassName: "not-assigned"
