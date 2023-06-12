@@ -71,6 +71,18 @@ export const setFOIUpdateLoader = (data) => dispatch =>{
         payload:data
     })
 }
+export const setFOIEventList = (data) => dispatch =>{
+    dispatch({
+        type:FOI_ACTION_CONSTANTS.FOI_LIST_EVENTS,
+        payload:data
+    })
+}
+export const setFOIMinistryEventList = (data) => dispatch =>{
+    dispatch({
+        type:FOI_ACTION_CONSTANTS.FOI_MINISTRY_EVENTLIST,
+        payload:data
+    })
+}
 export const setFOIRequestList = (data) => dispatch =>{
     dispatch({
         type:FOI_ACTION_CONSTANTS.FOI_LIST_REQUESTS,

@@ -281,13 +281,13 @@ export const cellTooltipRender = (params) => {
 
 export const eventCellTooltipRender = (params) => {
 
-  let description = params.row.description;
+  let notification = params.row?.notification;
 
-  const truncatedDescription = description.length > 100 ? description.slice(0, 100) + '...' : description;
+  const truncatedNotification = notification.length > 100 ? notification.slice(0, 100) + '...' : notification;
 
   return (
-    <LightTooltip placement="bottom-start" title={<div style={{ whiteSpace: 'pre-line' }}>{description}</div>}>
-      <span className="table-cell-truncate">{truncatedDescription}</span>
+    <LightTooltip placement="bottom-start" title={<div style={{ whiteSpace: 'pre-line' }}>{notification}</div>}>
+      <span className="table-cell-truncate">{truncatedNotification}</span>
     </LightTooltip>
   );
   

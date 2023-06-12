@@ -4,7 +4,7 @@ import "../dashboard.scss";
 import useStyles from "../CustomStyle";
 import { useDispatch, useSelector } from "react-redux";
 import { push } from "connected-react-router";
-import { fetchFOIRequestListByPage } from "../../../../apiManager/services/FOI/foiRequestServices";
+import { fetchFOIEventListByPage } from "../../../../apiManager/services/FOI/foiEventDashboardServices";
 import Loading from "../../../../containers/Loading";
 import { setEventQueueFilter, setEventQueueParams } from "../../../../actions/FOI/foiRequestActions";
 import {
@@ -25,16 +25,18 @@ import { CustomFooter } from "../CustomFooter"
 const EventQueue = ({ userDetail, eventQueueTableInfo }) => {
   const dispatch = useDispatch();
 
-  const requestQueue = useSelector((state) => state.foiRequests.foiRequestsList);
+  const eventQueue = useSelector((state) => state.foiRequests.foiEventsList);
   const isLoading = useSelector((state) => state.foiRequests.isLoading);
-
+  console.log(`eventQueue == ${JSON.stringify(eventQueue)}`)
   const classes = useStyles();
 
-  const filterFields = [    
-    "idNumber",
-    "axisRequestId",    
+  const filterFields = [
+    "axisRequestId",
+    "createdby",
+    "assignedTo",
     "assignedToLastName",
     "assignedToFirstName",
+    "notification"
   ];
 
   const eventQueueParams = useSelector((state) => state.foiRequests.eventQueueParams);
@@ -53,7 +55,7 @@ const EventQueue = ({ userDetail, eventQueueTableInfo }) => {
     serverSortModel = updateSortModel(sortModel);
     // page+1 here, because initial page value is 0 for mui-data-grid
     dispatch(
-      fetchFOIRequestListByPage(
+      fetchFOIEventListByPage(
         rowsState.page + 1,
         rowsState.pageSize,
         serverSortModel,
@@ -84,9 +86,10 @@ const EventQueue = ({ userDetail, eventQueueTableInfo }) => {
   }, 500);
 
   const rows = useMemo(() => {
-    return requestQueue?.data || [];
-  }, [JSON.stringify(requestQueue)]);
+    return eventQueue?.data || [];
+  }, [JSON.stringify(eventQueue)]);
 
+  console.log(`rows == ${JSON.stringify(rows)}`)
 
   const renderReviewRequest = (e) => {
     if (e.row.ministryrequestid) {
@@ -100,7 +103,7 @@ const EventQueue = ({ userDetail, eventQueueTableInfo }) => {
     }
   };
 
-  if (requestQueue === null) {
+  if (eventQueue === null) {
     return (
       <Grid item xs={12} container alignItems="center">
         <Loading costumStyle={{ position: "relative", marginTop: "4em" }} />
@@ -207,12 +210,12 @@ const EventQueue = ({ userDetail, eventQueueTableInfo }) => {
         <DataGrid
           autoHeight
           className="foi-data-grid"
-          getRowId={(row) => row.idNumber}
+          getRowId={(row) => row.id}
           rows={rows}
           columns={eventQueueTableInfo?.columns || []}
           rowHeight={30}
           headerHeight={50}
-          rowCount={requestQueue?.meta?.total || 0}
+          rowCount={eventQueue?.meta?.total || 0}
           pageSize={rowsState?.pageSize}
           // rowsPerPageOptions={[10]}
           hideFooterSelectedRowCount={true}
@@ -225,7 +228,7 @@ const EventQueue = ({ userDetail, eventQueueTableInfo }) => {
             dispatch(setEventQueueParams({...eventQueueParams, rowsState: {...rowsState, pageSize: newpageSize}}))
           }
           components={{
-            Footer: ()=> <CustomFooter rowCount={requestQueue?.meta?.total || 0} defaultSortModel={eventQueueTableInfo.sort} footerFor={"queue"}></CustomFooter>
+            Footer: ()=> <CustomFooter rowCount={eventQueue?.meta?.total || 0} defaultSortModel={eventQueueTableInfo.sort} footerFor={"queue"}></CustomFooter>
           }}
           sortingOrder={["desc", "asc"]}
           sortModel={[sortModel[0]]}

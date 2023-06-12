@@ -114,7 +114,10 @@ const API = {
   FOI_GET_RESTRICTED_RAWREQUEST_TAG_LIST: `${FOI_BASE_API_URL}/api/foicomment/rawrequest/<requestid>/restricted`,
   FOI_GET_RESTRICTED_MINISTRYREQUEST_TAG_LIST: `${FOI_BASE_API_URL}/api/foicomment/ministryrequest/<ministryrequestid>/restricted`,
   
-  FOI_REFRESH_REDIS_CACHE: `${FOI_BASE_API_URL}/api/foiflow/cache/refresh`
+  FOI_REFRESH_REDIS_CACHE: `${FOI_BASE_API_URL}/api/foiflow/cache/refresh`,
+
+  FOI_GET_EVENTS_PAGE_API: `${FOI_BASE_API_URL}/api/eventpagination`,
+  FOI_GET_MINISTRY_EVENTS_PAGE_API: `${FOI_BASE_API_URL}/api/eventpagination/ministry`
 
 
 };
