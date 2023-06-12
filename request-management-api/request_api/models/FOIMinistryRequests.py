@@ -8,6 +8,7 @@ from .FOIRequests import FOIRequest, FOIRequestsSchema
 from sqlalchemy.sql.expression import distinct
 from sqlalchemy import or_, and_, text, func, literal, cast, case, nullslast, nullsfirst, desc, asc
 from sqlalchemy.sql.sqltypes import String
+from sqlalchemy.dialects.postgresql import JSON
 
 from .FOIRequestApplicantMappings import FOIRequestApplicantMapping
 from .FOIRequestApplicants import FOIRequestApplicant
@@ -63,7 +64,7 @@ class FOIMinistryRequest(db.Model):
     axissyncdate = db.Column(db.DateTime, nullable=True)    
     axisrequestid = db.Column(db.String(120), nullable=True)
     requestpagecount = db.Column(db.String(20), nullable=True)
-
+    linkedrequests = db.Column(JSON, unique=False, nullable=True)
     
 
     #ForeignKey References
@@ -179,6 +180,7 @@ class FOIMinistryRequest(db.Model):
            _request["requestType"] = parentrequest.requesttype
            _request["idNumber"] = ministryrequest['filenumber']
            _request["axisRequestId"] = ministryrequest['axisrequestid']
+           _request["linkedrequests"] = ministryrequest['linkedrequests']
            _request["currentState"] = ministryrequest["requeststatus.name"]
            _request["dueDate"] = ministryrequest["duedate"]
            _request["cfrDueDate"] = ministryrequest["cfrduedate"]
@@ -1280,5 +1282,5 @@ class FOIMinistryRequestSchema(ma.Schema):
                 'foirequest.receivedmodeid','requeststatus.requeststatusid','requeststatus.name','programarea.bcgovcode',
                 'programarea.name','foirequest_id','foirequestversion_id','created_at','updated_at','createdby','assignedministryperson',
                 'assignedministrygroup','cfrduedate','closedate','closereasonid','closereason.name',
-                'assignee.firstname','assignee.lastname','ministryassignee.firstname','ministryassignee.lastname', 'axisrequestid', 'axissyncdate', 'requestpagecount')
+                'assignee.firstname','assignee.lastname','ministryassignee.firstname','ministryassignee.lastname', 'axisrequestid', 'axissyncdate', 'requestpagecount', 'linkedrequests')
     

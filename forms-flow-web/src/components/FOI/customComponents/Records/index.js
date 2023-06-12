@@ -47,7 +47,7 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 import CloseIcon from '@material-ui/icons/Close';
 import _ from 'lodash';
 import { DOC_REVIEWER_WEB_URL, RECORD_PROCESSING_HRS, OSS_S3_CHUNK_SIZE, DISABLE_REDACT_WEBLINK } from "../../../../constants/constants";
-import {removeDuplicateFiles, addDeduplicatedAttachmentsToRecords, getPDFFilePath, sortDivisionalFiles, calculateTotalFileSize,calculateTotalUploadedFileSizeInKB,getReadableFileSize} from "./util"
+import {removeDuplicateFiles, getUpdatedRecords, sortByLastModified, getFiles, calculateDivisionFileSize, calculateTotalFileSize,calculateTotalUploadedFileSizeInKB,getReadableFileSize} from "./util"
 import { readUploadedFileAsBytes } from '../../../../helper/FOI/helper';
 import { TOTAL_RECORDS_UPLOAD_LIMIT } from "../../../../constants/constants";
 //import {convertBytesToMB} from "../../../../components/FOI/customComponents/FileUpload/util";
@@ -272,9 +272,9 @@ export const RecordsLog = ({
     if (value) {
       if (files.length !== 0) {
         setRecordsUploading(true)
-        // if (modalFor === 'replace') {
-        //   fileInfoList[0].filepath = updateAttachment.s3uripath.substr(0, updateAttachment.s3uripath.lastIndexOf(".")) + ".pdf";
-        // }
+        if (modalFor === 'replaceattachment') {
+          fileInfoList[0].filepath = updateAttachment.s3uripath.substr(0, updateAttachment.s3uripath.lastIndexOf(".")) + ".pdf";
+        }
         postFOIS3DocumentPreSignedUrl(ministryId, fileInfoList.map(file => ({...file, multipart: true})), 'records', bcgovcode, dispatch, async (err, res) => {
           let _documents = [];
           if (!err) {
@@ -284,29 +284,38 @@ export const RecordsLog = ({
             for (let header of res) {
               const _file = files.find(file => file.filename === header.filename);
               const _fileInfo = fileInfoList.find(fileInfo => fileInfo.filename === header.filename);
-              const documentDetails = modalFor === 'replace' ?
-                {
-                  //...updateAttachment,
+              var documentDetails;
+              if (modalFor === 'replace') {
+                documentDetails = {
                   filename: header.filename,
                   attributes:{
                     divisions:replaceRecord['attributes']['divisions'],
-                    lastmodified: _file.lastModifiedDate,
+                    lastmodified: _file.lastModifiedDate ? _file.lastModifiedDate : new Date(_file.lastModified),
                     filesize: _file.size
                   },
                   replacementof:replaceRecord['replacementof'] == null || replaceRecord['replacementof']==''? replaceRecord['recordid'] : replaceRecord['replacementof'] ,
                   s3uripath: header.filepathdb,
                   trigger: 'recordreplace',
                   service: 'deduplication'
-                }:
-                {
+                }
+              } else if (modalFor === 'replaceattachment') {
+                documentDetails = {
+                  ...updateAttachment,
+                  s3uripath: header.filepathdb,
+                  trigger: 'recordreplace',
+                  service: 'deduplication'
+                }
+              } else {
+                documentDetails = {
                   s3uripath: header.filepathdb,
                   filename: header.filename,
                   attributes:{
                     divisions:[{divisionid: _fileInfo.divisionid}],
-                    lastmodified: _file.lastModifiedDate,
+                    lastmodified: _file.lastModifiedDate ? _file.lastModifiedDate : new Date(_file.lastModified),
                     filesize: _file.size
                   }
-                };
+                }
+              }
               let bytes = await readUploadedFileAsBytes(_file)
               const CHUNK_SIZE = OSS_S3_CHUNK_SIZE;
               const totalChunks = Math.ceil(bytes.byteLength / CHUNK_SIZE);
@@ -338,17 +347,20 @@ export const RecordsLog = ({
               })
             }
             if (_documents.length > 0) {
-              if (modalFor === 'replace') {
+              if (modalFor === 'replace' || modalFor == 'replaceattachment') {
                 
-                // dispatch(retryFOIRecordProcessing(requestId, ministryId, {records: _documents},(err, _res) => {
-                //     dispatchRequestAttachment(err);
-                // }));
-                
+                 if (modalFor === 'replaceattachment'){
+                dispatch(retryFOIRecordProcessing(requestId, ministryId, {records: _documents},(err, _res) => {
+                    dispatchRequestAttachment(err);
+                })); }
+
+                 if (modalFor === 'replace'){
                 dispatch(replaceFOIRecordProcessing(requestId, ministryId,replaceRecord.recordid, {records: _documents},(err, _res) => {
                   dispatchRequestAttachment(err);
-              }));
+              })); }
 
-              } else {
+              }                             
+              else {
                 dispatch(saveFOIRecords(requestId, ministryId, {records: _documents},(err, _res) => {
                     dispatchRequestAttachment(err);
                 }));
@@ -379,8 +391,8 @@ export const RecordsLog = ({
   }
 
   const downloadDocument = (file, isPDF = false,originalfile = false) => {
-    var s3filepath = !originalfile ? file.s3uripath: file.originalfile;
-    var filename = !originalfile ? file.filename:file.originalfilename;
+    var s3filepath = !originalfile ? file.s3uripath: (!file.isattachment ? file.originalfile:file.s3uripath);
+    var filename = !originalfile ? file.filename:(!file.isattachment ?file.originalfilename: file.filename);
     if (isPDF) {
       s3filepath = s3filepath.substr(0, s3filepath.lastIndexOf(".")) + ".pdf";
       filename = filename + ".pdf";
@@ -502,67 +514,50 @@ export const RecordsLog = ({
       "attributes":[]
     };
 
-    let exporting = removeDuplicateFiles(recordList);
-    exporting = addDeduplicatedAttachmentsToRecords(exporting);
+    //remove duplicate records(except duplicate attachments)
+    const deduplicatedRecords = removeDuplicateFiles(recordList);
+    //get only relevent fields
+    const updatedrecords = getUpdatedRecords(deduplicatedRecords);
+    //sort records and attachments based on lastmodified asc
+    let sortedRecords = sortByLastModified(updatedrecords);
 
-    // Create a map to group files by division
-    const divisionMap = new Map();
- 
-    // Loop through each item in the input array
-    for (const item of exporting) {
-      // Get the division information from the item
-      const divisions = item.attributes ? item.attributes.divisions : null;
-      
-      const [filepath, filename] = getPDFFilePath(item);
-    
-      // If the item has no division information, skip it
-      if (!divisions) {
-        continue;
-      }
-      // Loop through each division in the item
-      for (const division of divisions) {
-        // Get the division ID and name
-        const divisionId = division.divisionid;
-        const divisionName = division.divisionname.replace("'", "");
-    
-        // If the division is not already in the division map, add it
-        if (!divisionMap.has(divisionId)) {
-          divisionMap.set(divisionId, {
-            divisionid: divisionId,
-            divisionname: divisionName,
-            files: [],
-            divisionfilesize: 0
-          });
-        }
-    
-        // Add the item to the files array for this division
-        const files = divisionMap.get(divisionId).files;
-        const convertedFileSize = parseFloat(item.attributes?.convertedfilesize) || 0
-        const fileSize = parseFloat(item.attributes?.filesize) || 0
-        const fileAttrs = {
-          lastmodified: item.attributes?.lastmodified,
-          recordid: item.recordid,
-          s3uripath: filepath,
-          filename,
-          filesize: convertedFileSize || fileSize
-        };
-        files.push(fileAttrs);
-        divisionMap.get(divisionId).divisionfilesize += fileAttrs.filesize; // add file size to division total
-      }
+    //get all the divisions in the records
+    const divisionObj= {}
+    for (const _record of sortedRecords) {
+        for (const _division of _record.divisions) {
+            divisionObj[_division.divisionid] = _division.divisionname
+        }        
     }
- 
-    // Sort the divisions by lastmodified date and add them to the output object
-    const sortedDivisions = sortDivisionalFiles(divisionMap);
 
-    message.attributes = sortedDivisions;
-    message.totalfilesize = calculateTotalFileSize(sortedDivisions); // calculate total size for whole message
+    // arrange the records and its attachments. 
+    const recordsArray = []
+    for (const _record of sortedRecords) {
+        recordsArray.push(_record)
+        if (_record.attachments) {
+          const _filteredAttachments = _record.attachments.filter(r => !r.isduplicate)
+          recordsArray.push(..._filteredAttachments)   
+        }         
+    }
+
+    //form the final attributes for the message
+    const attributes = []
+    for (const _key in divisionObj) {
+        const files =  getFiles(recordsArray, +_key)
+        const attribute = {
+            divisionid: +_key,
+            divisionname: divisionObj[_key],
+            files: files,
+            divisionfilesize: calculateDivisionFileSize(files)
+        }
+        attributes.push(attribute)
+    }
+    message.attributes = attributes;
+    message.totalfilesize = calculateTotalFileSize(attributes);
 
     //keeping this for testing purpose.
     console.log(`message = ${JSON.stringify(message)}`);
-
     return message;
-
-  } 
+  }  
 
 
   const toastError = (error) => {
@@ -675,6 +670,11 @@ export const RecordsLog = ({
         setModalFor("replace");
         setModal(true);
         break;
+      case "replaceattachment":
+        setreplaceRecord(_record)
+        setModalFor("replaceattachment");
+        setModal(true);
+        break;  
       case "rename":
         setModalFor("rename");
         setModal(true);
@@ -1276,7 +1276,7 @@ const Attachment = React.memo(({indexValue, record, handlePopupButtonClick, getF
               <span>Duplicate of {record.duplicateof}</span>:
               record.attributes?.incompatible ?
               <span>Incompatible File Type</span>:
-              record.trigger === 'recordreplace' ?
+              record.failed && record.isredactionready ?
               <span>Record Manually Replaced Due to Error</span>:
               record.isduplicate ?
               <span>Duplicate of {record.duplicateof}</span>:
@@ -1393,6 +1393,11 @@ const AttachmentPopup = React.memo(({indexValue, record, handlePopupButtonClick,
     handlePopupButtonClick("replace", record);
   }
 
+  const handleReplaceAttachment = () => {
+    closeTooltip();
+    handlePopupButtonClick("replaceattachment", record);
+  }
+
   const handleDownload = () =>{
     closeTooltip();
     handlePopupButtonClick("download", record);
@@ -1473,7 +1478,6 @@ const AttachmentPopup = React.memo(({indexValue, record, handlePopupButtonClick,
   // }
 
   const ActionsPopover = ({RestrictViewInBrowser, record}) => {
-
     return (
       <Popover
         anchorReference="anchorPosition"
@@ -1505,7 +1509,7 @@ const AttachmentPopup = React.memo(({indexValue, record, handlePopupButtonClick,
             View
           </MenuItem>
           :""}
-          { <MenuItem
+          { (!record.attributes?.isattachment || record.attributes?.isattachment  === undefined) && <MenuItem
             onClick={() => {
                 handleReplace();
                 setPopoverOpen(false);
@@ -1513,7 +1517,15 @@ const AttachmentPopup = React.memo(({indexValue, record, handlePopupButtonClick,
           >
             Replace Manually
           </MenuItem>}
-          {record.originalfile!='' && <MenuItem
+          { record.attributes?.isattachment && <MenuItem
+            onClick={() => {
+                 handleReplaceAttachment() 
+                setPopoverOpen(false);
+            }}
+          >
+            Replace Attachment
+          </MenuItem>}
+          {record.originalfile!=''  && record.originalfile!=undefined  && <MenuItem
             onClick={() => {
                 handleDownloadoriginal();
                 setPopoverOpen(false);
@@ -1536,7 +1548,7 @@ const AttachmentPopup = React.memo(({indexValue, record, handlePopupButtonClick,
                 setPopoverOpen(false);
             }}
           >
-           {record.originalfile!='' ? "Download Replaced" : "Download" } 
+           {record.originalfile!='' && record.originalfile!=undefined ? "Download Replaced" : record.attributes?.isattachment ? "Download Original" : "Download" }
           </MenuItem>
           {!record.isattachment && <DeleteMenu />}
           {!record.isredactionready && (record.failed || isrecordtimeout(record.created_at, RECORD_PROCESSING_HRS) == true) && <MenuItem
