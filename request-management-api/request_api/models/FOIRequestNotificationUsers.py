@@ -267,9 +267,9 @@ class FOIRequestNotificationUser(db.Model):
         elif(additionalfilter == 'myRequests'):
             #myrequest
             if(requestby == 'IAO'):
-                dbquery = basequery.filter(FOIMinistryRequest.assignedto == userid).filter(ministryfilter).filter(FOIRequestNotificationUser.userid == userid)
+                dbquery = basequery.filter(FOIMinistryRequest.assignedto == userid).filter(ministryfilter)
             else:
-                dbquery = basequery.filter(FOIMinistryRequest.assignedministryperson == userid).filter(ministryfilter).filter(FOIRequestNotificationUser.userid == userid)
+                dbquery = basequery.filter(FOIMinistryRequest.assignedministryperson == userid).filter(ministryfilter)
         else:
             if(isiaorestrictedfilemanager == True or isministryrestrictedfilemanager == True):
                 dbquery = basequery.filter(ministryfilter)
