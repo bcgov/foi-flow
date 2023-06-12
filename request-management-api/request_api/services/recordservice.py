@@ -38,21 +38,29 @@ class recordservice(recordservicebase):
     def fetch(self, requestid, ministryrequestid):
         return recordservicegetter().fetch(requestid, ministryrequestid)  
             
-    def delete(self, requestid, ministryrequestid, recordid, userid):
-        record = FOIRequestRecord.getrecordbyid(recordid)
-        record['attributes'] = json.loads(record['attributes'])
-        record.update({'updated_at': datetime.now(), 'updatedby': userid, 'isactive': False})
-        record['version'] += 1
-        newrecord = FOIRequestRecord()
-        newrecord.__dict__.update(record)
-        response = FOIRequestRecord.create([newrecord])
+    def update(self, requestid, ministryrequestid, requestdata, userid):
+        newrecords = []
+        for recordid in requestdata['recordids']:
+            record = FOIRequestRecord.getrecordbyid(recordid)
+            record['attributes'] = json.loads(record['attributes'])
+            if not requestdata['isdelete']:
+                record['attributes']['divisions'] = requestdata['divisions']
+            record.update({'updated_at': datetime.now(), 'updatedby': userid, 'isactive': not requestdata['isdelete']})
+            record['version'] += 1
+            newrecord = FOIRequestRecord()
+            newrecord.__dict__.update(record)
+            newrecords.append(newrecord)
+        response = FOIRequestRecord.create(newrecords)
         if (response.success):
-            _apiresponse, err = self.makedocreviewerrequest('POST', '/api/document/delete', {'ministryrequestid': ministryrequestid, 'filepaths': [record['s3uripath']]})
+            if requestdata['isdelete']:
+                _apiresponse, err = self.makedocreviewerrequest('POST', '/api/document/delete', {'ministryrequestid': ministryrequestid, 'filepaths': [record.__dict__['s3uripath'] for record in newrecords]})
+            # else:
+                # add call to doc reviewer api update function
             if err:
-                return DefaultMethodResult(False,'Error in contacting Doc Reviewer API', -1, recordid)
-            return DefaultMethodResult(True,'Record marked as inactive', -1, recordid)
+                return DefaultMethodResult(False,'Error in contacting Doc Reviewer API', -1,  [recordid for recordid in requestdata['recordids']])
+            return DefaultMethodResult(True,'Record updated in Doc Reviewer DB', -1, [recordid for recordid in requestdata['recordids']])
         else:
-            return DefaultMethodResult(False,'Error in deleting Record', -1, recordid)
+            return DefaultMethodResult(False,'Error in updating Record', -1, [recordid for recordid in requestdata['recordids']])
 
     def retry(self, _requestid, ministryrequestid, data):
         _ministryrequest = FOIMinistryRequest.getrequestbyministryrequestid(ministryrequestid)
