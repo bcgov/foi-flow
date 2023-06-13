@@ -54,10 +54,17 @@ class dashboardeventservice:
 
     def __prepareevent(self, notification):
         return {
+            'id': notification.id,
+            'requestid': notification.requestid,
+            'ministryrequestid': notification.ministryrequestid,
             'createdat' : self.__formatedate(notification.createdat),
             'axisRequestId': notification.axisRequestId,
-            'createdby': notification.createdby,            
+            'createdby': notification.createdby,      
+            'userFirstName': notification.userFirstName,
+            'userLastName': notification.userLastName,
             'to': notification.to,
+            'creatorFirstName': notification.creatorFirstName,
+            'creatorLastName': notification.creatorLastName,
             'notification': notification.notification,
             'assignedGroup': notification.assignedGroup,
             'assignedTo': notification.assignedTo,            
@@ -66,11 +73,7 @@ class dashboardeventservice:
             'assignedministrygroup': notification.assignedministrygroup,
             'assignedministryperson': notification.assignedministryperson,
             'assignedministrypersonFirstName':notification.assignedministrypersonFirstName,
-            'assignedministrypersonLastName': notification.assignedministrypersonLastName,
-            'id': notification.id,
-            'requestid': notification.requestid,
-            'ministryrequestid': notification.ministryrequestid
-
+            'assignedministrypersonLastName': notification.assignedministrypersonLastName
         }
 
     def __formatedate(self, input):

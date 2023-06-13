@@ -30,6 +30,7 @@ from request_api.utils.enums import StateName
 from .FOIMinistryRequestSubjectCodes import FOIMinistryRequestSubjectCode
 from .SubjectCodes import SubjectCode
 from .FOIRequestNotifications import FOIRequestNotification
+from .FOIUsers import FOIUser
 
 class FOIRequestNotificationUser(db.Model):
     # Name of the table in our database
@@ -178,25 +179,10 @@ class FOIRequestNotificationUser(db.Model):
                 else:
                     filtercondition.append(ministry_restricted_requests.isrestricted == True)
 
-        assignedtoformatted = case([
-                            (and_(iaoassignee.lastname.isnot(None), iaoassignee.firstname.isnot(None)),
-                             func.concat(iaoassignee.lastname, ', ', iaoassignee.firstname)),
-                            (and_(iaoassignee.lastname.isnot(None), iaoassignee.firstname.is_(None)),
-                             iaoassignee.lastname),
-                            (and_(iaoassignee.lastname.is_(None), iaoassignee.firstname.isnot(None)),
-                             iaoassignee.firstname),
-                           ],
-                           else_ = FOIMinistryRequest.assignedgroup).label('assignedToFormatted')
 
-        ministryassignedtoformatted = case([
-                            (and_(ministryassignee.lastname.isnot(None), ministryassignee.firstname.isnot(None)),
-                             func.concat(ministryassignee.lastname, ', ', ministryassignee.firstname)),
-                            (and_(ministryassignee.lastname.isnot(None), ministryassignee.firstname.is_(None)),
-                             ministryassignee.lastname),
-                            (and_(ministryassignee.lastname.is_(None), ministryassignee.firstname.isnot(None)),
-                             ministryassignee.firstname),
-                           ],
-                           else_ = FOIMinistryRequest.assignedministrygroup).label('ministryAssignedToFormatted')
+        foiuser = aliased(FOIUser)
+        foicreator = aliased(FOIUser)
+
         
         selectedcolumns = [
             cast(FOIMinistryRequest.axisrequestid, String).label('axisRequestId'),
@@ -212,11 +198,13 @@ class FOIRequestNotificationUser(db.Model):
             iaoassignee.lastname.label('assignedToLastName'),
             ministryassignee.firstname.label('assignedministrypersonFirstName'),
             ministryassignee.lastname.label('assignedministrypersonLastName'),
-            assignedtoformatted,
-            ministryassignedtoformatted,
             FOIRequestNotificationUser.notificationuserid.label('id'),
             FOIRequest.foirequestid.label('requestid'),
-            FOIMinistryRequest.foiministryrequestid.label('ministryrequestid')
+            FOIMinistryRequest.foiministryrequestid.label('ministryrequestid'),
+            foiuser.firstname.label('userFirstName'),
+            foiuser.lastname.label('userLastName'),
+            foicreator.firstname.label('creatorFirstName'),
+            foicreator.lastname.label('creatorLastName')
         ]
 
         basequery = _session.query(
@@ -258,6 +246,10 @@ class FOIRequestNotificationUser(db.Model):
                             ).join(
                                 FOIRequestNotificationUser,
                                 and_(FOIRequestNotificationUser.notificationid == FOIRequestNotification.notificationid),
+                            ).join(
+                                foiuser, foiuser.preferred_username == FOIRequestNotificationUser.userid, isouter=True  
+                            ).join(
+                                foicreator, foicreator.preferred_username == FOIRequestNotificationUser.createdby, isouter=True  
                             ).filter(FOIMinistryRequest.requeststatusid != 3)
         
         if(additionalfilter == 'watchingRequests'):

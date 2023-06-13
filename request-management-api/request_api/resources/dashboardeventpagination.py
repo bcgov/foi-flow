@@ -60,7 +60,11 @@ class EventPagination(Resource):
                                         'assignedToLastName',
                                         'assignedministrypersonFirstName',
                                         'assignedministrypersonLastName',
-                                        'createdat'
+                                        'createdat',
+                                        'creatorFirstName',
+                                        'creatorLastName',
+                                        'userFirstName',
+                                        'userLastName'
                                     ]
             DEFAULT_ADDITIONAL_FILTER = 'All'
             _page = flask.request.args.get('page', DEFAULT_PAGE, type=int)
