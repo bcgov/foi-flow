@@ -11,7 +11,8 @@ import {
   isFlexTeam,
   isIntakeTeam,
   formatDateAndTimeStamp,
-  formatDate
+  formatDate,
+  getUserFullName
 } from "../../../../helper/FOI/helper";
 
 const EventQueueColumns = [
@@ -34,13 +35,22 @@ const EventQueueColumns = [
     field: "createdby",
     headerName: "FROM",
     headerAlign: "left",
-    width: 200,
+    width: 160,
+    valueGetter: (params) => getUserFullName(params.row.createdby),
+  },
+  {
+    field: "to",
+    headerName: "TO",
+    headerAlign: "left",
+    width: 160,
+    valueGetter: (params) => getUserFullName(params.row.createdby),
   },
   {
     field: "assignedTo",
     headerName: "ASSIGNEE",
     headerAlign: "left",
-    width: 200,
+    width: 160,
+    valueGetter: (params) => getUserFullName(params.row.assignedTo, params.row.assignedGroup),
   },
 
   {
@@ -55,8 +65,8 @@ const EventQueueColumns = [
 
 const defaultTableInfo = {
   sort: [
-    { field: "defaultSorting", sort: "asc" },
-    // { field: "duedate", sort: "asc" }
+    // { field: "defaultSorting", sort: "asc" },
+    { field: "createdat", sort: "desc" }
   ],
   noAssignedClassName: "not-assigned"
 };

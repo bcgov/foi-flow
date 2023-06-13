@@ -282,7 +282,7 @@ export const cellTooltipRender = (params) => {
 export const eventCellTooltipRender = (params) => {
 
   let notification = params.row?.notification;
-
+  if (notification.length > 100) {
   const truncatedNotification = notification.length > 100 ? notification.slice(0, 100) + '...' : notification;
 
   return (
@@ -290,5 +290,5 @@ export const eventCellTooltipRender = (params) => {
       <span className="table-cell-truncate">{truncatedNotification}</span>
     </LightTooltip>
   );
-  
+  }
 };
