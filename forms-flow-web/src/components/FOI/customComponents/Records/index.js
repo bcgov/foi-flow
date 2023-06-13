@@ -519,7 +519,7 @@ export const RecordsLog = ({
     //remove duplicate records(except duplicate attachments)
     const deduplicatedRecords = removeDuplicateFiles(recordList);
     //get only relevent fields
-    const updatedrecords = getUpdatedRecords(deduplicatedRecords);
+    const updatedrecords = getUpdatedRecords(deduplicatedRecords, conversionFormats);
     //sort records and attachments based on lastmodified asc
     let sortedRecords = sortByLastModified(updatedrecords);
 
