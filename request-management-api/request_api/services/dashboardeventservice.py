@@ -67,7 +67,9 @@ class dashboardeventservice:
             'assignedministryperson': notification.assignedministryperson,
             'assignedministrypersonFirstName':notification.assignedministrypersonFirstName,
             'assignedministrypersonLastName': notification.assignedministrypersonLastName,
-            'id': notification.id
+            'id': notification.id,
+            'requestid': notification.requestid,
+            'ministryrequestid': notification.ministryrequestid
 
         }
 
