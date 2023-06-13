@@ -34,6 +34,7 @@ class FOIRawRequestNotificationUser(db.Model):
 
     notificationusertypeid = db.Column(db.Integer,nullable=False)
 
+
     @classmethod
     def dismissnotification(cls, notificationuserid, userid='system'):
         exists = bool(db.session.query(FOIRawRequestNotificationUser.notificationuserid).filter_by(notificationuserid=notificationuserid).first())
@@ -176,7 +177,9 @@ class FOIRawRequestNotificationUser(db.Model):
             literal(None).label('assignedministrypersonLastName'),
             assignedtoformatted,
             literal(None).label('ministryAssignedToFormatted'),
-            FOIRawRequestNotificationUser.notificationuserid.label('id')
+            FOIRawRequestNotificationUser.notificationuserid.label('id'),
+            FOIRawRequest.requestid.label('requestid'),
+            literal(None).label('ministryrequestid')
         ]
 
         
