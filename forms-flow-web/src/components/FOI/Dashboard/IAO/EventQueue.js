@@ -31,11 +31,17 @@ const EventQueue = ({ userDetail, eventQueueTableInfo }) => {
   const classes = useStyles();
 
   const filterFields = [
+    "createdat",
     "axisRequestId",
-    "createdby",
+    "createdby",    
     "assignedTo",
     "assignedToLastName",
     "assignedToFirstName",
+    "assignedGroup",
+    "assignedministrygroup",
+    "assignedministrypersonFirstName",
+    "assignedministrypersonLastName",
+    "to",
     "notification"
   ];
 
