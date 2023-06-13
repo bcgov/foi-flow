@@ -163,7 +163,6 @@ class FOIRequestNotificationUser(db.Model):
         #filter/search
         if(len(filterfields) > 0 and keyword is not None):
             filtercondition = []
-
             if(keyword != "restricted"):
                 for field in filterfields:
                     if field == "notification":
@@ -343,7 +342,7 @@ class FOIRequestNotificationUser(db.Model):
             'assignedToLastName': iaoassignee.lastname,
             'assignedministrypersonFirstName': ministryassignee.firstname,
             'assignedministrypersonLastName': ministryassignee.lastname
-        }.get(x, FOIRequestNotificationUser.created_at)
+        }.get(x,  cast(FOIMinistryRequest.axisrequestid, String))
     
     # End of Dashboard functions
         
