@@ -1,17 +1,18 @@
 import React, { useEffect, useMemo } from "react";
 import { DataGrid } from "@mui/x-data-grid";
-import "../dashboard.scss";
-import useStyles from "../CustomStyle";
+import "./dashboard.scss";
+import useStyles from "./CustomStyle";
 import { useDispatch, useSelector } from "react-redux";
 import { push } from "connected-react-router";
-import { fetchFOIEventListByPage } from "../../../../apiManager/services/FOI/foiEventDashboardServices";
-import Loading from "../../../../containers/Loading";
-import { setEventQueueFilter, setEventQueueParams } from "../../../../actions/FOI/foiRequestActions";
+import { fetchFOIEventListByPage, fetchFOIMinistryRequestListByPage } from "../../../apiManager/services/FOI/foiEventDashboardServices";
+import Loading from "../../../containers/Loading";
+import { setEventQueueFilter, setEventQueueParams } from "../../../actions/FOI/foiRequestActions";
 import {
   debounce,
   ClickableChip,
   updateSortModel,
-} from "../utils";
+} from "./utils";
+import { isMinistryLogin } from "../../../helper/FOI/helper";
 import Grid from "@mui/material/Grid";
 import Stack from "@mui/material/Stack";
 import SearchIcon from "@material-ui/icons/Search";
@@ -19,12 +20,14 @@ import InputAdornment from "@mui/material/InputAdornment";
 import InputBase from "@mui/material/InputBase";
 import IconButton from "@mui/material/IconButton";
 import Paper from "@mui/material/Paper";
-import clsx from "clsx";
-import { CustomFooter } from "../CustomFooter"
+import { CustomFooter } from "./CustomFooter"
 
 const EventQueue = ({ userDetail, eventQueueTableInfo }) => {
   const dispatch = useDispatch();
 
+  const userGroups = userDetail && userDetail?.groups?.map(group => group.slice(1));
+  const isMinistry = isMinistryLogin(userGroups);
+  console.log(`isMinistry == ${isMinistry}`)
   const eventQueue = useSelector((state) => state.foiRequests.foiEventsList);
   const isLoading = useSelector((state) => state.foiRequests.isLoading);
   console.log(`eventQueue == ${JSON.stringify(eventQueue)}`)
@@ -59,18 +62,36 @@ const EventQueue = ({ userDetail, eventQueueTableInfo }) => {
 
   useEffect(() => {
     serverSortModel = updateSortModel(sortModel);
-    // page+1 here, because initial page value is 0 for mui-data-grid
-    dispatch(
-      fetchFOIEventListByPage(
-        rowsState.page + 1,
-        rowsState.pageSize,
-        serverSortModel,
-        filterFields,
-        keyword,
-        eventFilter,
-        userDetail.preferred_username
-      )
-    );
+    console.log(`isMinistry UE == ${isMinistry}`)
+    if (isMinistry)
+    {
+      // page+1 here, because initial page value is 0 for mui-data-grid
+      dispatch(
+        fetchFOIMinistryRequestListByPage(
+          rowsState.page + 1,
+          rowsState.pageSize,
+          serverSortModel,
+          filterFields,
+          keyword,
+          eventFilter,
+          userDetail.preferred_username
+        )
+      );
+
+    } else {
+      // page+1 here, because initial page value is 0 for mui-data-grid
+      dispatch(
+        fetchFOIEventListByPage(
+          rowsState.page + 1,
+          rowsState.pageSize,
+          serverSortModel,
+          filterFields,
+          keyword,
+          eventFilter,
+          userDetail.preferred_username
+        )
+      );
+      }
   }, [rowsState, sortModel, keyword, eventFilter]);
 
   const eventColumnsRef = React.useRef(eventQueueTableInfo?.columns || []);
