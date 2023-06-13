@@ -10,12 +10,11 @@
          <value>(.//*[normalize-space(text()) and normalize-space(.)='Approved'])[1]/following::*[name()='svg'][1]</value>
       </entry>
       <entry>
-         <key>CSS</key>
-         <value></value>
+         <key>BASIC</key>
+         <value>//*[@id = 'rbextdenied']</value>
       </entry>
       <entry>
-         <key>BASIC</key>
-         <value>id(&quot;rbextdenied&quot;)/label[@class=&quot;MuiFormControlLabel-root&quot;]/span[@class=&quot;MuiButtonBase-root MuiIconButton-root jss452 MuiRadio-root&quot;]/span[@class=&quot;MuiIconButton-label&quot;]/div[@class=&quot;jss456&quot;]/svg[@class=&quot;MuiSvgIcon-root&quot;]</value>
+         <key>CSS</key>
       </entry>
    </selectorCollection>
    <selectorMethod>BASIC</selectorMethod>
@@ -26,7 +25,7 @@
       <name>tag</name>
       <type>Main</type>
       <value>svg</value>
-      <webElementGuid>11d8175d-27f1-49ee-b5f3-058594eab8ce</webElementGuid>
+      <webElementGuid>e73854f6-85b2-4c11-9fc9-9eaf284c2696</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -34,7 +33,7 @@
       <name>class</name>
       <type>Main</type>
       <value>MuiSvgIcon-root</value>
-      <webElementGuid>2a516b4d-7d5f-41d1-b7a1-73260a193fa9</webElementGuid>
+      <webElementGuid>d39aa8a2-629a-4bd1-81a8-afe3ffa95243</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -42,7 +41,7 @@
       <name>focusable</name>
       <type>Main</type>
       <value>false</value>
-      <webElementGuid>74cea220-8ad2-492f-9bdb-dd4dd3566652</webElementGuid>
+      <webElementGuid>e090b512-4561-4695-b302-2fa5f9f50b9b</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -50,7 +49,7 @@
       <name>viewBox</name>
       <type>Main</type>
       <value>0 0 24 24</value>
-      <webElementGuid>85c9defb-430f-44af-a4f0-9775ad808946</webElementGuid>
+      <webElementGuid>1ebc3393-1110-45fd-97b5-7548232a518c</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -58,15 +57,15 @@
       <name>aria-hidden</name>
       <type>Main</type>
       <value>true</value>
-      <webElementGuid>8db29846-c0ee-46dc-a52d-53f886098fd8</webElementGuid>
+      <webElementGuid>fb9d16eb-daaa-466e-856f-ed5e16eb0e95</webElementGuid>
    </webElementProperties>
    <webElementProperties>
-      <isSelected>true</isSelected>
+      <isSelected>false</isSelected>
       <matchCondition>equals</matchCondition>
       <name>xpath</name>
       <type>Main</type>
       <value>id(&quot;rbextdenied&quot;)/label[@class=&quot;MuiFormControlLabel-root&quot;]/span[@class=&quot;MuiButtonBase-root MuiIconButton-root jss452 MuiRadio-root&quot;]/span[@class=&quot;MuiIconButton-label&quot;]/div[@class=&quot;jss456&quot;]/svg[@class=&quot;MuiSvgIcon-root&quot;]</value>
-      <webElementGuid>5ca261cb-f62d-486f-8eb5-c8cedd33365d</webElementGuid>
+      <webElementGuid>9489d784-bcaa-48c3-ae0d-f2d99078cf71</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -74,7 +73,15 @@
       <name>value</name>
       <type>Main</type>
       <value>extensionStatusId.denied</value>
-      <webElementGuid>fe410949-30dc-4e14-9fdc-30d4219da595</webElementGuid>
+      <webElementGuid>8de7ed30-ac17-4707-95ee-f15f29a3a055</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>id</name>
+      <type>Main</type>
+      <value>rbextdenied</value>
+      <webElementGuid>143f7dea-f922-4f40-87c6-2ae06312e4ea</webElementGuid>
    </webElementProperties>
    <webElementXpaths>
       <isSelected>true</isSelected>
@@ -82,7 +89,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>(.//*[normalize-space(text()) and normalize-space(.)='Approved'])[1]/following::*[name()='svg'][1]</value>
-      <webElementGuid>e0dd1cd8-45aa-467b-a375-060755f428d1</webElementGuid>
+      <webElementGuid>670174f9-3689-490c-828a-cd85922ca1ac</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -90,7 +97,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>(.//*[normalize-space(text()) and normalize-space(.)='Pending'])[2]/following::*[name()='svg'][3]</value>
-      <webElementGuid>4ce34510-96f1-43c3-bce6-49101bd4c279</webElementGuid>
+      <webElementGuid>901b71ef-4816-41fc-8e03-2dcefa1f3558</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -98,7 +105,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>(.//*[normalize-space(text()) and normalize-space(.)='Denied'])[1]/preceding::*[name()='svg'][2]</value>
-      <webElementGuid>3a18ec24-f43a-49fa-b368-878599de7dec</webElementGuid>
+      <webElementGuid>72d7ac93-530d-455e-9cdc-ac953572906b</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -106,6 +113,6 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>(.//*[normalize-space(text()) and normalize-space(.)='Save'])[2]/preceding::*[name()='svg'][2]</value>
-      <webElementGuid>bec236f4-cb52-4e3f-a186-533f6f77c545</webElementGuid>
+      <webElementGuid>766017e8-07b0-46f7-b725-5b0734449a2c</webElementGuid>
    </webElementXpaths>
 </WebElementEntity>

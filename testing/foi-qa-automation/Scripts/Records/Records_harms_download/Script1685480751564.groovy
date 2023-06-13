@@ -224,6 +224,18 @@ WebUI.verifyElementText(findTestObject('Records/span_pdf'), '4')
 
 WebUI.verifyElementText(findTestObject('Records/span_uploaded'), '5')
 
+WebUI.click(findTestObject('Records/options_converted_file/svg_Ready for Redaction_MuiSvgIcon-root'), FailureHandling.STOP_ON_FAILURE)
+
+WebUI.verifyElementNotPresent(findTestObject('Records/options_converted_file/li_Download Replaced'), 0)
+
+WebUI.verifyElementPresent(findTestObject('Records/options_converted_file/li_Download Converted'), 0)
+
+WebUI.verifyElementPresent(findTestObject('Records/options_converted_file/li_Replace Manually'), 0)
+
+WebUI.verifyElementPresent(findTestObject('Records/options_converted_file/li_Download'), 0)
+
+WebUI.verifyElementPresent(findTestObject('Records/options_converted_file/li_Delete'), 0)
+
 ministryUser.close()
 
 IAOuser.close()

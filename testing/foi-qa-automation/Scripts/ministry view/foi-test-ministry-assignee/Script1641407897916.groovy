@@ -124,7 +124,7 @@ WebUI.verifyElementText(findTestObject('Page_foi.flow/queue/div_request queue ro
 WebUI.click(findTestObject('Page_foi.flow/navbar/button_Sign Out'))
 
 WebUI.callTestCase(findTestCase('helper/foi-test-login'), [('password') : findTestData('Login Credentials').getValue('Password', 
-            7), ('username') : findTestData('Login Credentials').getValue('Username', 7)], FailureHandling.STOP_ON_FAILURE)
+            6), ('username') : findTestData('Login Credentials').getValue('Username', 6)], FailureHandling.STOP_ON_FAILURE)
 
 WebUI.click(findTestObject('Page_foi.flow/queue/div_My Team Requests'))
 
@@ -136,6 +136,8 @@ WebUI.click(findTestObject('Page_foi.flow/queue/div_request queue row 1'))
 
 WebUI.verifyElementAttributeValue(findTestObject('Page_foi.flow/form/assignee dropdown/input_ministry assigned to iao view'), 
     'value', 'foiedu, foiedu', 0)
+
+WebUI.closeBrowser()
 
 WebUI.verifyElementHasAttribute(findTestObject('Page_foi.flow/form/assignee dropdown/input_ministry assigned to iao view'), 
     'disabled', 0, FailureHandling.STOP_ON_FAILURE)

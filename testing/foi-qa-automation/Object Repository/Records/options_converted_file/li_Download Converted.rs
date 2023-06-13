@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <WebElementEntity>
    <description></description>
-   <name>li_Replace Manually</name>
+   <name>li_Download Converted</name>
    <tag></tag>
-   <elementGuidId>7420efbf-da73-442e-ad65-c2049de6a899</elementGuidId>
+   <elementGuidId>cace4d04-7ab2-4aa9-b4aa-36de140a8f4e</elementGuidId>
    <selectorCollection>
       <entry>
          <key>XPATH</key>
-         <value>(.//*[normalize-space(text()) and normalize-space(.)='`'])[2]/following::li[1]</value>
+         <value>(.//*[normalize-space(text()) and normalize-space(.)='Replace Manually'])[1]/following::li[1]</value>
       </entry>
       <entry>
          <key>CSS</key>
-         <value>li.MuiButtonBase-root.MuiListItem-root.MuiMenuItem-root.MuiMenuItem-gutters.MuiListItem-gutters.MuiListItem-button</value>
+         <value></value>
       </entry>
    </selectorCollection>
    <selectorMethod>XPATH</selectorMethod>
@@ -22,7 +22,7 @@
       <name>tag</name>
       <type>Main</type>
       <value>li</value>
-      <webElementGuid>e26bdda2-3665-43c6-bbf5-de5853a9b88c</webElementGuid>
+      <webElementGuid>f5eecbdb-6bbf-4b02-b28d-1265fb171654</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -30,15 +30,15 @@
       <name>class</name>
       <type>Main</type>
       <value>MuiButtonBase-root MuiListItem-root MuiMenuItem-root MuiMenuItem-gutters MuiListItem-gutters MuiListItem-button</value>
-      <webElementGuid>9c2276f9-37be-4c6e-9f52-bf9fa11b88aa</webElementGuid>
+      <webElementGuid>eed0612a-14e3-4b83-b81b-14643f5b5535</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
       <matchCondition>equals</matchCondition>
       <name>tabindex</name>
       <type>Main</type>
-      <value>0</value>
-      <webElementGuid>e9117572-8197-4048-a5de-dea5d4b7238f</webElementGuid>
+      <value>-1</value>
+      <webElementGuid>9be2a036-d932-4f96-8835-1c7b02910e85</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -46,7 +46,7 @@
       <name>role</name>
       <type>Main</type>
       <value>menuitem</value>
-      <webElementGuid>d0e37628-a445-4ffa-bd43-af255561d2ce</webElementGuid>
+      <webElementGuid>deb42b0f-0af4-4e77-bdd8-e39174e65254</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -54,15 +54,15 @@
       <name>aria-disabled</name>
       <type>Main</type>
       <value>false</value>
-      <webElementGuid>303dbeda-bdbb-43d8-8072-2a42b99630e5</webElementGuid>
+      <webElementGuid>dc9935fd-4578-412f-8c0f-5b93dfec61a1</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>true</isSelected>
       <matchCondition>equals</matchCondition>
       <name>text</name>
       <type>Main</type>
-      <value>Replace Manually</value>
-      <webElementGuid>14e9bfc8-d574-4548-aeee-f92a1620014b</webElementGuid>
+      <value>Download Converted</value>
+      <webElementGuid>99da45d1-8394-4bba-a020-9f066de85059</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -70,62 +70,62 @@
       <name>xpath</name>
       <type>Main</type>
       <value>/html[1]/body[@class=&quot;no-scroll&quot;]/div[@class=&quot;MuiPopover-root&quot;]/div[@class=&quot;MuiPaper-root MuiPopover-paper MuiPaper-elevation8 MuiPaper-rounded&quot;]/ul[@class=&quot;MuiList-root MuiList-padding&quot;]/li[@class=&quot;MuiButtonBase-root MuiListItem-root MuiMenuItem-root MuiMenuItem-gutters MuiListItem-gutters MuiListItem-button&quot;]</value>
-      <webElementGuid>5f0a4b71-e8c9-4731-abe9-f72a06fbad17</webElementGuid>
+      <webElementGuid>69cb9669-d594-4d7a-82e9-b6c82793cb29</webElementGuid>
    </webElementProperties>
    <webElementXpaths>
       <isSelected>true</isSelected>
       <matchCondition>equals</matchCondition>
       <name>xpath:neighbor</name>
       <type>Main</type>
-      <value>(.//*[normalize-space(text()) and normalize-space(.)='`'])[2]/following::li[1]</value>
-      <webElementGuid>9fe8e01d-1882-4b63-9106-c26167b271e9</webElementGuid>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='Replace Manually'])[1]/following::li[1]</value>
+      <webElementGuid>f3c3ee0f-6ff5-495a-811d-59d53ec7cf1f</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
       <matchCondition>equals</matchCondition>
       <name>xpath:neighbor</name>
       <type>Main</type>
-      <value>(.//*[normalize-space(text()) and normalize-space(.)='Alt'])[2]/following::li[1]</value>
-      <webElementGuid>3b93cadc-d882-4eba-b9cd-b18982ff993b</webElementGuid>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='`'])[2]/following::li[2]</value>
+      <webElementGuid>13aedb41-c04d-4c44-999a-9ae78cc66c1f</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
       <matchCondition>equals</matchCondition>
       <name>xpath:neighbor</name>
       <type>Main</type>
-      <value>(.//*[normalize-space(text()) and normalize-space(.)='Download Original'])[1]/preceding::li[1]</value>
-      <webElementGuid>3b6c51f2-a737-43ca-8b74-6a73ca42d8f1</webElementGuid>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='Download'])[3]/preceding::li[1]</value>
+      <webElementGuid>f9000e08-7a6e-4c13-a1d0-9b20fab5cc62</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
       <matchCondition>equals</matchCondition>
       <name>xpath:neighbor</name>
       <type>Main</type>
-      <value>(.//*[normalize-space(text()) and normalize-space(.)='Download Replaced'])[1]/preceding::li[2]</value>
-      <webElementGuid>cc5abda9-b9f3-49d6-b153-2c574ef531bf</webElementGuid>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='Delete'])[1]/preceding::li[2]</value>
+      <webElementGuid>03c705e0-1e75-45a3-8e34-a729bef77aac</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
       <matchCondition>equals</matchCondition>
       <name>xpath:neighbor</name>
       <type>Main</type>
-      <value>//*/text()[normalize-space(.)='Replace Manually']/parent::*</value>
-      <webElementGuid>eb63c9c7-6821-4f96-9262-acef688b8550</webElementGuid>
+      <value>//*/text()[normalize-space(.)='Download Converted']/parent::*</value>
+      <webElementGuid>e4e5e5b8-f85c-4502-95d7-348ed6157046</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
       <matchCondition>equals</matchCondition>
       <name>xpath:position</name>
       <type>Main</type>
-      <value>//div[3]/div[3]/ul/li</value>
-      <webElementGuid>b99e871f-248f-4601-911a-17eb54f9d69f</webElementGuid>
+      <value>//div[3]/div[3]/ul/li[2]</value>
+      <webElementGuid>e894535a-ce4d-4568-9729-d2eba05c4a8a</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
       <matchCondition>equals</matchCondition>
       <name>xpath:customAttributes</name>
       <type>Main</type>
-      <value>//li[(text() = 'Replace Manually' or . = 'Replace Manually')]</value>
-      <webElementGuid>24a8a1d0-e2b9-4967-a037-50ddb10adf27</webElementGuid>
+      <value>//li[(text() = 'Download Converted' or . = 'Download Converted')]</value>
+      <webElementGuid>7fb2b0ff-07d6-44b7-8a17-b330cf4719ec</webElementGuid>
    </webElementXpaths>
 </WebElementEntity>

@@ -45,11 +45,11 @@ WebUI.verifyElementPresent(findTestObject('Page_foi.flow/queue/div_My Requests')
 
 WebUI.verifyElementPresent(findTestObject('Page_foi.flow/queue/div_My Team Requests'), 0)
 
-assert WebUI.getAttribute(findTestObject('Page_foi.flow/queue/div_My Requests'), 'class').contains('MuiChip-filledPrimary')
+assert WebUI.getAttribute(findTestObject('Page_foi.flow/queue/div_My Requests'), 'class').contains('MuiChip-filled')
 
-assert WebUI.getAttribute(findTestObject('Page_foi.flow/queue/div_Watching Requests'), 'class').contains('MuiChip-outlinedPrimary')
+assert WebUI.getAttribute(findTestObject('Page_foi.flow/queue/div_Watching Requests'), 'class').contains('MuiChip-outlined')
 
-assert WebUI.getAttribute(findTestObject('Page_foi.flow/queue/div_My Team Requests'), 'class').contains('MuiChip-outlinedPrimary')
+assert WebUI.getAttribute(findTestObject('Page_foi.flow/queue/div_My Team Requests'), 'class').contains('MuiChip-outlined')
 
 WebUI.verifyElementPresent(findTestObject('Page_foi.flow/queue/input_Dashboard Filter'), 0)
 
@@ -72,8 +72,9 @@ WebUI.click(findTestObject('Page_foi.flow/navbar/svg_FOI Intake_bi bi-bar-chart-
 WebUI.switchToWindowIndex(1, FailureHandling.STOP_ON_FAILURE)
 
 //assert WebUI.getUrl() == 'https://dev.reports.foirequests.gov.bc.ca/'
-
 WebUI.navigateToUrl(GlobalVariable.BASE_URL)
 
 WebUI.verifyElementVisible(findTestObject('Page_foi.flow/queue/h3_Your FOI Request Queue'))
+
+WebUI.closeBrowser()
 

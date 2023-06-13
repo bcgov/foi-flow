@@ -6,14 +6,18 @@
    <elementGuidId>60e64471-439e-43f6-a68b-4d05ab0f01a2</elementGuidId>
    <selectorCollection>
       <entry>
-         <key>CSS</key>
-      </entry>
-      <entry>
          <key>XPATH</key>
          <value>//div[@id='menu-reason']/div[3]/ul/li[10]</value>
       </entry>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[(text() = 'OIPC - Large Volume and/or Volume of Search' or . = 'OIPC - Large Volume and/or Volume of Search')]</value>
+      </entry>
+      <entry>
+         <key>CSS</key>
+      </entry>
    </selectorCollection>
-   <selectorMethod>XPATH</selectorMethod>
+   <selectorMethod>BASIC</selectorMethod>
    <useRalativeImagePath>true</useRalativeImagePath>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -21,7 +25,7 @@
       <name>tag</name>
       <type>Main</type>
       <value>li</value>
-      <webElementGuid>abab0226-867e-4841-a655-7c47e8199f04</webElementGuid>
+      <webElementGuid>3d5e4931-386c-4e5d-9308-400756afbf7f</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -29,7 +33,7 @@
       <name>class</name>
       <type>Main</type>
       <value>MuiButtonBase-root MuiListItem-root MuiMenuItem-root MuiMenuItem-gutters MuiListItem-gutters MuiListItem-button</value>
-      <webElementGuid>03e7373b-9874-4187-9315-379e76768719</webElementGuid>
+      <webElementGuid>385859f6-7e9e-47ab-809b-fffaeb3fb741</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -37,7 +41,7 @@
       <name>tabindex</name>
       <type>Main</type>
       <value>-1</value>
-      <webElementGuid>d19eaa5e-aa35-41a9-8518-fad0006144ca</webElementGuid>
+      <webElementGuid>794cce8e-75ea-4d5a-92cd-915bc99adf8d</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -45,7 +49,7 @@
       <name>role</name>
       <type>Main</type>
       <value>option</value>
-      <webElementGuid>c2e099b7-ac83-4217-b70b-59cb94eafc21</webElementGuid>
+      <webElementGuid>53b9007f-9c94-4849-a52e-bae619dc40ed</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -53,7 +57,7 @@
       <name>aria-disabled</name>
       <type>Main</type>
       <value>false</value>
-      <webElementGuid>27c6105c-4ed8-4716-b1be-f2c98061ca9d</webElementGuid>
+      <webElementGuid>da2705bc-b181-463d-91d9-2251ffc49756</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -61,7 +65,7 @@
       <name>data-value</name>
       <type>Main</type>
       <value>9</value>
-      <webElementGuid>cf964251-49c2-4c41-9d4b-f7c4802cb341</webElementGuid>
+      <webElementGuid>c6bad8b1-e59f-4d88-adc5-9905155ac253</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>true</isSelected>
@@ -69,7 +73,7 @@
       <name>text</name>
       <type>Main</type>
       <value>OIPC - Large Volume and/or Volume of Search</value>
-      <webElementGuid>012be981-249c-4539-b4fd-16bf64403298</webElementGuid>
+      <webElementGuid>d76a201d-4b20-47c1-a0b6-8a0aea3b3bd2</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -77,7 +81,7 @@
       <name>xpath</name>
       <type>Main</type>
       <value>id(&quot;menu-reason&quot;)/div[@class=&quot;MuiPaper-root MuiMenu-paper MuiPopover-paper MuiPaper-elevation8 MuiPaper-rounded&quot;]/ul[@class=&quot;MuiList-root MuiMenu-list MuiList-padding&quot;]/li[@class=&quot;MuiButtonBase-root MuiListItem-root MuiMenuItem-root MuiMenuItem-gutters MuiListItem-gutters MuiListItem-button&quot;]</value>
-      <webElementGuid>60ac9d85-4bfe-4c5b-a688-e31436c435b9</webElementGuid>
+      <webElementGuid>931e4e1d-c4df-464b-8007-2fb76f061ec1</webElementGuid>
    </webElementProperties>
    <webElementXpaths>
       <isSelected>true</isSelected>
@@ -85,7 +89,7 @@
       <name>xpath:idRelative</name>
       <type>Main</type>
       <value>//div[@id='menu-reason']/div[3]/ul/li[10]</value>
-      <webElementGuid>2a2f3d29-d9db-4f3c-b392-70c1b9f59c9d</webElementGuid>
+      <webElementGuid>ba07f51a-811a-4e29-97cf-9d2ec7b4e8b7</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -93,7 +97,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>(.//*[normalize-space(text()) and normalize-space(.)='OIPC - Further Detail from Applicant Required'])[1]/following::li[1]</value>
-      <webElementGuid>c78dd493-d602-4e49-a645-eb4ba6bd79fb</webElementGuid>
+      <webElementGuid>cce6ce9b-be68-46e1-87bb-825e83529056</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -101,7 +105,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>(.//*[normalize-space(text()) and normalize-space(.)='OIPC - Consultation'])[1]/following::li[2]</value>
-      <webElementGuid>db546d8f-3782-4887-b341-5e7a06de967e</webElementGuid>
+      <webElementGuid>81db8fd8-8904-45fc-8386-176042ed036d</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -109,7 +113,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>(.//*[normalize-space(text()) and normalize-space(.)='OIPC - Large Volume and/or Volume of Search and Consultation'])[1]/preceding::li[1]</value>
-      <webElementGuid>0a16f21a-6c38-4e1b-81da-ad46c3835554</webElementGuid>
+      <webElementGuid>1bc1efc7-26d0-4d0e-833d-4d1b32fe5d07</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -117,7 +121,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>(.//*[normalize-space(text()) and normalize-space(.)='OIPC - Fair and Reasonable'])[1]/preceding::li[2]</value>
-      <webElementGuid>e7f3af58-a13a-427f-a181-4149dda3073d</webElementGuid>
+      <webElementGuid>ae86871a-2910-42db-8a14-a3ec53402b0d</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -125,7 +129,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>//*/text()[normalize-space(.)='OIPC - Large Volume and/or Volume of Search']/parent::*</value>
-      <webElementGuid>587c2771-4f7b-48aa-99b3-2d7c2100165e</webElementGuid>
+      <webElementGuid>e22511e0-509b-498a-8d8d-943c844e4120</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -133,7 +137,7 @@
       <name>xpath:position</name>
       <type>Main</type>
       <value>//li[10]</value>
-      <webElementGuid>596f6415-a215-40bd-bcc2-b2a636ac6fc8</webElementGuid>
+      <webElementGuid>351a763b-0622-445c-99e3-ecdb3856d9a4</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -141,6 +145,6 @@
       <name>xpath:customAttributes</name>
       <type>Main</type>
       <value>//li[(text() = 'OIPC - Large Volume and/or Volume of Search' or . = 'OIPC - Large Volume and/or Volume of Search')]</value>
-      <webElementGuid>9c37c8a9-fd67-4673-aef7-efc799244e8f</webElementGuid>
+      <webElementGuid>fd3abe6c-9e43-4861-9857-44f1cc6f20dc</webElementGuid>
    </webElementXpaths>
 </WebElementEntity>

@@ -117,9 +117,8 @@ WebUI.click(findTestObject('Page_foi.flow/comment/span_All'))
 
 WebUI.verifyElementPresent(findTestObject('Page_foi.flow/comment/div_Comment list 2'), 0)
 
-WebUI.verifyElementText(findTestObject('Page_foi.flow/comment/p_commentlist3'), ((findTestData(
-        'Login Credentials').getValue('First Name', 8) + ' ') + findTestData('Login Credentials').getValue('Last Name', 
-        8)) + ' changed the state of the request to Ministry Sign Off')
+WebUI.verifyElementText(findTestObject('Page_foi.flow/comment/p_commentlist3'), ((findTestData('Login Credentials').getValue(
+        'First Name', 8) + ' ') + findTestData('Login Credentials').getValue('Last Name', 8)) + ' changed the state of the request to Ministry Sign Off')
 
 WebUI.click(findTestObject('Page_foi.flow/form/sidebar/a_FOI'), FailureHandling.STOP_ON_FAILURE)
 
@@ -148,4 +147,6 @@ WebUI.click(findTestObject('Page_foi.flow/queue/div_request queue row 1'))
 
 WebUI.verifyElementAttributeValue(findTestObject('Page_foi.flow/form/sidebar/status dropdown/input_Status'), 'value', 'Ministry Sign Off', 
     0)
+
+WebUI.closeBrowser()
 
