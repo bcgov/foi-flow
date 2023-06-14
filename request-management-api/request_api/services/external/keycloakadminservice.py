@@ -3,7 +3,8 @@ import os
 import ast
 import request_api
 from request_api.models.OperatingTeams import OperatingTeam
-
+from request_api.exceptions import BusinessException, Error
+import redis
 
 class KeycloakAdminService:
 
@@ -14,21 +15,33 @@ class KeycloakAdminService:
     keycloakadminserviceaccount = os.getenv('KEYCLOAK_ADMIN_SRVACCOUNT')
     keycloakadminservicepassword = os.getenv('KEYCLOAK_ADMIN_SRVPASSWORD')
     keycloakadminintakegroupid = os.getenv('KEYCLOAK_ADMIN_INTAKE_GROUPID')
+    cache_redis_url = os.getenv('CACHE_REDISURL')
+    kctokenexpiry = os.getenv('KC_SRC_ACC_TOKEN_EXPIRY',1800)
     
         
     def get_token(self):
-        
-        url = '{0}/auth/realms/{1}/protocol/openid-connect/token'.format(self.keycloakhost,self.keycloakrealm)        
-        params = {
+        _accesstoken=None
+        try:
+            cache_client = redis.from_url(self.cache_redis_url,decode_responses=True)
+            _accesstoken = cache_client.get("foi:kcsrcacnttoken")            
+            if _accesstoken is None:
+                url = '{0}/auth/realms/{1}/protocol/openid-connect/token'.format(self.keycloakhost,self.keycloakrealm)        
+                params = {
 
-            'client_id': self.keycloakclientid,
-            'grant_type': 'password',
-            'username' : self.keycloakadminserviceaccount,
-            'password': self.keycloakadminservicepassword,
-            'client_secret':self.keycloakclientsecret
-        }
-        x = requests.post(url, params, verify=True).content.decode('utf-8')       
-        return str(ast.literal_eval(x)['access_token'])        
+                    'client_id': self.keycloakclientid,
+                    'grant_type': 'password',
+                    'username' : self.keycloakadminserviceaccount,
+                    'password': self.keycloakadminservicepassword,
+                    'client_secret':self.keycloakclientsecret
+                }
+                x = requests.post(url, params, verify=True).content.decode('utf-8')
+                _accesstoken = str(ast.literal_eval(x)['access_token'])                
+                cache_client.set("foi:kcsrcacnttoken",_accesstoken,ex=int(self.kctokenexpiry))
+        except BusinessException as exception:
+            print("Error happened while accessing token on KeycloakAdminService {0}".format(exception.message))
+        finally:
+            cache_client = None    
+        return _accesstoken        
 
    
     def getgroups(self, allowedgroups = None):

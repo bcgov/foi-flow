@@ -81,10 +81,11 @@ const AxisSyncModal = ({ axisSyncModalOpen, setAxisSyncModalOpen, saveRequestObj
           let updateNeeded= checkValidation(key);
           if(updateNeeded){
             assignDisplayedReqObj(key, updatedObj, updatedField);
-          if(key !== 'Extensions' && key !== 'compareReceivedDate' && key !== 'cfrDueDate' ||
-              (key === 'cfrDueDate' && requestDetailsFromAxis[key]) ){
-              saveReqCopy= createRequestDetailsObjectFunc(saveReqCopy, requestDetailsFromAxis, requestId, 
-                key, requestDetailsFromAxis[key], "");
+            ///To Do : update to ENUM/constant
+            if(key !== 'Extensions' && key !== 'compareReceivedDate' && key !== 'cfrDueDate'  ||
+             (key === 'cfrDueDate' && requestDetailsFromAxis[key]) ){
+                saveReqCopy= createRequestDetailsObjectFunc(saveReqCopy, requestDetailsFromAxis, requestId, 
+                  key, requestDetailsFromAxis[key], "");
             }
             else if(key === 'compareReceivedDate') 
               saveReqCopy= createRequestDetailsObjectFunc(saveReqCopy, requestDetailsFromAxis, requestId, 
@@ -102,7 +103,7 @@ const AxisSyncModal = ({ axisSyncModalOpen, setAxisSyncModalOpen, saveRequestObj
       if(mandatoryField && !requestDetailsFromAxis[key])
         return false;
       else{
-        if(key === 'Extensions' || key === 'additionalPersonalInfo')
+        if(key === 'Extensions' || key === 'additionalPersonalInfo' || key === 'linkedRequests')
           return true;
         else if(key === 'compareReceivedDate' && (saveRequestObject['receivedDate'] !== requestDetailsFromAxis[key] && 
                 saveRequestObject['receivedDate'] !== requestDetailsFromAxis['receivedDate'])){
@@ -126,6 +127,10 @@ const AxisSyncModal = ({ axisSyncModalOpen, setAxisSyncModalOpen, saveRequestObj
           updatedObj[updatedField] =formatDate(requestDetailsFromAxis[key], "MMM dd yyyy");
           break;
         }
+        case 'linkedRequests':
+          let linkedRequestsDiff= comparelinkedRequests(key);
+          updatedObj[updatedField] = linkedRequestsDiff.length > 0 ? linkedRequestsDiff.toString()?.split(',')?.join(', '): [];
+          break;
         case 'compareReceivedDate':
           updatedObj[updatedField] =formatDate(requestDetailsFromAxis['receivedDate'], "MMM dd yyyy");
           break;
@@ -268,6 +273,23 @@ const AxisSyncModal = ({ axisSyncModalOpen, setAxisSyncModalOpen, saveRequestObj
         });
       }
       return extensionsArr;
+    }
+
+    const comparelinkedRequests = (key) => {
+      let dblinkedRequests= saveRequestObject[key]?.map((val => Object.keys(val).toString()));
+      let axislinkedRequests = typeof requestDetailsFromAxis[key] == 'string' ? JSON.parse(requestDetailsFromAxis[key]) : requestDetailsFromAxis[key];
+      let linkedRequestsJson = axislinkedRequests.map((val => Object.keys(val).toString()));
+      let isUpdatedInAxis = false;
+      if(linkedRequestsJson?.length != dblinkedRequests?.length)
+        isUpdatedInAxis = true;
+      else if(linkedRequestsJson.filter(x => !dblinkedRequests?.includes(x))?.length > 0)
+        isUpdatedInAxis = true;
+      else if(dblinkedRequests.filter(x => !linkedRequestsJson?.includes(x))?.length > 0)
+        isUpdatedInAxis = true;
+      if(isUpdatedInAxis)
+        return linkedRequestsJson;
+      else
+        return [];
     }
 
     const handleClose = () => {

@@ -76,7 +76,8 @@ const FOI_COMPONENT_CONSTANTS = {
     DIVISION_DUE_DATE: "divisionDueDate",
     DIVISION_RECEIVED_DATE: "divisionReceivedDate",
 
-    SUBJECT_CODE: "subjectCode"
+    SUBJECT_CODE: "subjectCode",
+    LINKED_REQUESTS: "linkedRequests"
   };
   
   export default FOI_COMPONENT_CONSTANTS;

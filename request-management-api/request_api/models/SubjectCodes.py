@@ -12,7 +12,7 @@ class SubjectCode(db.Model):
     @classmethod
     def getsubjectcodes(cls):
         subjectcode_schema = SubjectCodeSchema(many=True)
-        query = db.session.query(SubjectCode).filter_by(isactive=True).all()
+        query = db.session.query(SubjectCode).filter_by(isactive=True).order_by(SubjectCode.name.asc()).all()
         return subjectcode_schema.dump(query)
     
     @classmethod

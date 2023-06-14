@@ -12,6 +12,7 @@ from dateutil.parser import parse
 from request_api.services.cfrfeeservice import cfrfeeservice
 from request_api.services.paymentservice import paymentservice
 from request_api.services.subjectcodeservice import subjectcodeservice
+from request_api.services.programareaservice import programareaservice
 from request_api.utils.commons.datetimehandler import datetimehandler
 
 class requestservicegetter:
@@ -123,6 +124,9 @@ class requestservicegetter:
     def __preparebaseinfo(self,request,foiministryrequestid,requestministry,requestministrydivisions):
         _receiveddate = parse(request['receiveddate'])
         axissyncdatenoneorempty =  self.__noneorempty(requestministry["axissyncdate"]) 
+        linkedministryrequests= []
+        if "linkedrequests" in requestministry and requestministry["linkedrequests"] is not None:
+            linkedministryrequests = self.__assignministrynames(requestministry["linkedrequests"])
         baserequestinfo = {
             'id': request['foirequestid'],
             'requestType': request['requesttype'],
@@ -161,11 +165,21 @@ class requestservicegetter:
             'assignedministrypersonLastName': requestministry["ministryassignee.lastname"] if requestministry["assignedministryperson"] != None else None,
             'closedate': parse(requestministry['closedate']).strftime(self.__genericdateformat()) if requestministry['closedate'] is not None else None,
             'subjectCode': subjectcodeservice().getministrysubjectcodename(foiministryrequestid),
-            'isofflinepayment': FOIMinistryRequest.getofflinepaymentflag(foiministryrequestid)
+            'isofflinepayment': FOIMinistryRequest.getofflinepaymentflag(foiministryrequestid),
+            'linkedRequests' : linkedministryrequests
         }
         if requestministry['cfrduedate'] is not None:
             baserequestinfo.update({'cfrDueDate':parse(requestministry['cfrduedate']).strftime(self.__genericdateformat())})
         return baserequestinfo
+    
+    def __assignministrynames(self, linkedrequests):
+        areas = programareaservice().getprogramareas()
+        if linkedrequests is not None:
+            for entry in linkedrequests:
+                area = next((a for a in areas if a["programareaid"] == list(entry.values())[0]), None)
+                if (area is not None):
+                    entry = area["name"]
+        return linkedrequests
     
     def getdivisions(self, ministrydivisions):
         divisions = []

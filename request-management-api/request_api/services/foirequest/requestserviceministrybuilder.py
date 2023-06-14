@@ -48,6 +48,7 @@ class requestserviceministrybuilder(requestserviceconfigurator):
         foiministryrequest.filenumber = ministryschema["filenumber"]
         foiministryrequest.axissyncdate = ministryschema["axissyncdate"]
         foiministryrequest.axisrequestid = ministryschema["axisrequestid"]
+        foiministryrequest.linkedrequests = ministryschema['linkedrequests']
         foiministryrequest.requestpagecount = ministryschema["requestpagecount"]
         foiministryrequest.cfrduedate = requestdict['cfrduedate']
         foiministryrequest.startdate = requestdict['startdate']
@@ -110,7 +111,8 @@ class requestserviceministrybuilder(requestserviceconfigurator):
             'requeststatusid': requestschema['requeststatusid'] if  'requeststatusid' in requestschema  else  ministryschema["requeststatus.requeststatusid"],
             'programareaid': ministryschema["programarea.programareaid"] if 'programarea.programareaid' in ministryschema  else None,
             'closedate': requestschema['closedate'] if 'closedate' in requestschema  else None,
-            'closereasonid': requestschema['closereasonid'] if 'closereasonid' in requestschema  else None
+            'closereasonid': requestschema['closereasonid'] if 'closereasonid' in requestschema  else None,
+            'linkedrequests': ministryschema['linkedrequests'] if 'linkedrequests' in ministryschema  else None
         }
     
     def createfoirequestdocuments(self,requestschema, ministryrequestid, activeversion, userid):
