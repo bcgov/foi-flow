@@ -5,7 +5,7 @@ import {
     getUserFullName
   } from "../../../helper/FOI/helper";
   
-  const EventQueueColumns = [
+  const EventQueueIAOColumns = [
   
     {
       field: "createdat",
@@ -26,21 +26,69 @@ import {
       headerName: "FROM",
       headerAlign: "left",
       width: 160,
-      valueGetter: (params) => getUserFullName(params.row.createdby),
+      valueGetter: (params) => getUserFullName(params.row.creatorFirstName, params.row.creatorFirstName, params.row.createdby),
     },
     {
       field: "to",
       headerName: "TO",
       headerAlign: "left",
       width: 160,
-      valueGetter: (params) => getUserFullName(params.row.createdby),
+      valueGetter: (params) => getUserFullName(params.row.userFirstName, params.row.userLastName, params.row.to),
     },
     {
       field: "assignedTo",
       headerName: "ASSIGNEE",
       headerAlign: "left",
       width: 160,
-      valueGetter: (params) => getUserFullName(params.row.assignedTo, params.row.assignedGroup),
+      valueGetter: (params) => getUserFullName(params.row.assignedToFirstName, params.row.assignedToLastName, params.row.assignedTo, params.row.assignedGroup),
+    },
+  
+    {
+      field: "notification",
+      headerName: "CONTENT",
+      headerAlign: "left",
+      width: 300,
+     renderCell: eventCellTooltipRender
+    }
+    
+  ];
+
+  const EventQueueMinistryColumns = [
+  
+    {
+      field: "createdat",
+      headerName: "DATE | TIME STAMP",
+      width: 200,
+      headerAlign: "left",
+      //valueGetter: (params) => formatDate(params.row.cfrduedate, "MM/dd/yyyy"),
+    },
+    {
+      field: "axisRequestId",
+      headerName: "ID NUMBER",
+      headerAlign: "left",
+      width: 200,
+      //renderCell: cellTooltipRender
+    },
+    {
+      field: "createdby",
+      headerName: "FROM",
+      headerAlign: "left",
+      width: 160,
+      valueGetter: (params) => getUserFullName(params.row.creatorFirstName, params.row.creatorLastName, params.row.createdby),
+    },
+    {
+      field: "to",
+      headerName: "TO",
+      headerAlign: "left",
+      width: 160,
+      valueGetter: (params) => getUserFullName(params.row.userFirstName, params.row.userLastName, params.row.to),
+    },
+    {
+      field: "assignedTo",
+      headerName: "ASSIGNEE",
+      headerAlign: "left",
+      width: 160,
+      valueGetter: (params) => getUserFullName(params.row.assignedministrypersonFirstName, params.row.assignedministrypersonLastName, params.row.assignedministryperson, params.row.assignedministrygroup),
     },
   
     {
@@ -61,11 +109,17 @@ import {
     noAssignedClassName: "not-assigned"
   };
   
-  const getEventQueueTableInfo = () => {
+  const getIAOEventQueueTableInfo = () => {
     
-    defaultTableInfo.columns = EventQueueColumns;
+    defaultTableInfo.columns = EventQueueIAOColumns;
+    return defaultTableInfo;
+  };
+
+  const getMinistryEventQueueTableInfo = () => {
+    
+    defaultTableInfo.columns = EventQueueMinistryColumns;
     return defaultTableInfo;
   };
   
-  export { getEventQueueTableInfo };
+  export { getIAOEventQueueTableInfo, getMinistryEventQueueTableInfo };
   

@@ -11,7 +11,7 @@ import { makeStyles } from "@material-ui/core/styles";
 import Divider from "@mui/material/Divider";
 import { ButtonBase } from "@mui/material";
 import { getTableInfo } from "./columns";
-import { getEventQueueTableInfo } from "../EventQueueColumns"
+import { getIAOEventQueueTableInfo } from "../EventQueueColumns"
 import { setShowAdvancedSearch, setResumeDefaultSorting, setShowEventQueue } from "../../../../actions/FOI/foiRequestActions";
 
 const useStyles = makeStyles(() => ({
@@ -30,7 +30,7 @@ const useStyles = makeStyles(() => ({
 const Dashboard = ({ userDetail }) => {
   const user = useSelector((state) => state.user.userDetail);
   const tableInfo = getTableInfo(user.groups);
-  const eventQueueTableInfo = getEventQueueTableInfo();
+  const eventQueueTableInfo = getIAOEventQueueTableInfo();
   const classes = useStyles();
   const dispatch = useDispatch();
 

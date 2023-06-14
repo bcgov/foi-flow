@@ -119,14 +119,23 @@ const EventQueue = ({ userDetail, eventQueueTableInfo }) => {
   console.log(`rows == ${JSON.stringify(rows)}`)
 
   const renderReviewRequest = (e) => {
-    if (e.row.ministryrequestid) {
+    if (isMinistry) {
       dispatch(
         push(
-          `/foi/foirequests/${e.row.id}/ministryrequest/${e.row.ministryrequestid}`
+          `/foi/ministryreview/${e.row.requestid}/ministryrequest/${e.row.ministryrequestid}`
         )
       );
-    } else {
-      dispatch(push(`/foi/reviewrequest/${e.row.id}`));
+    }
+    else {
+      if (e.row.ministryrequestid) {
+        dispatch(
+          push(
+            `/foi/foirequests/${e.row.requestid}/ministryrequest/${e.row.ministryrequestid}`
+          )
+        );
+      } else {
+        dispatch(push(`/foi/reviewrequest/${e.row.requestid}`));
+      }
     }
   };
 

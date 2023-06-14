@@ -321,13 +321,21 @@ const getMinistryRestrictedTagList = () => {
   return getSessionData("ministryRestrictedTagList");
 };
 
-const getUserFullName = (userName, groupName = "") => {
-  let users = getSessionData("fullnameList");
-  if (userName) {
-    const user = users?.find((user) => user.username === userName);
-    return user ? user?.fullname : null;
+const getUserFullName = (firstName, lastName, userName, groupName = "") => {
+  // let users = getSessionData("fullnameList");
+  // if (userName) {
+  //   const user = users?.find((user) => user.username === userName);
+  //   return user ? user?.fullname : null;
+  // }
+  // return groupName;
+
+  if (firstName && lastName) {
+    return `${lastName}, ${firstName}`;
+  } else if (userName) {
+    return userName;
+  } else {
+    return groupName;
   }
-  return groupName;
   
 }
 const ConditionalComponent = ({ condition, children }) => {

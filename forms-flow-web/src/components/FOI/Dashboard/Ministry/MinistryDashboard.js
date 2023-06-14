@@ -6,7 +6,7 @@ import Grid from "@mui/material/Grid";
 import { makeStyles } from "@material-ui/core/styles";
 import Queue from "./Queue";
 import EventQueue from "../EventQueue"
-import { getEventQueueTableInfo } from "../EventQueueColumns"
+import { getMinistryEventQueueTableInfo } from "../EventQueueColumns"
 import AdvancedSearch from "./AdvancedSearch";
 import clsx from "clsx";
 import Divider from "@mui/material/Divider";
@@ -28,7 +28,7 @@ const useStyles = makeStyles(() => ({
 
 const MinistryDashboard = ({ userDetail }) => {
   const classes = useStyles();
-  const eventQueueTableInfo = getEventQueueTableInfo();
+  const eventQueueTableInfo = getMinistryEventQueueTableInfo();
   const showAdvancedSearch = useSelector((state) => state.foiRequests.showAdvancedSearch)
   const showEventQueue = useSelector((state) => state.foiRequests.showEventQueue);
   const tableInfo = {
