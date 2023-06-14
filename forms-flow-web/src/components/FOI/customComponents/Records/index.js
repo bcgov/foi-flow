@@ -1540,7 +1540,7 @@ const AttachmentPopup = React.memo(({indexValue, record, handlePopupButtonClick,
                 setPopoverOpen(false);
             }}
           >
-            {record.attributes?.isattachment ? 'Download Replaced' : 'Download Converted'}
+            {(record.attributes?.isattachment && record.attributes?.trigger === 'recordreplace') ? 'Download Replaced' : 'Download Converted'}
           </MenuItem>}
           <MenuItem
             onClick={() => {
