@@ -47,6 +47,8 @@ class dashboardeventservice:
         try:
             if keyword not in [None, ""] and len(filterfields) > 0:
                 _newvalue = datetime2.strptime(keyword, '%Y %b %d').strftime('%y-%m-%d')
+            if  keyword in [None, ""] and "createdat" in _newfilterfields:
+                _newfilterfields.remove("createdat")     
         except ValueError as ex:
             if "createdat" in _newfilterfields:
                 _newfilterfields.remove("createdat")
@@ -54,10 +56,17 @@ class dashboardeventservice:
 
     def __prepareevent(self, notification):
         return {
+            'id': notification.id,
+            'requestid': notification.requestid,
+            'ministryrequestid': notification.ministryrequestid,
             'createdat' : self.__formatedate(notification.createdat),
             'axisRequestId': notification.axisRequestId,
-            'createdby': notification.createdby,            
+            'createdby': notification.createdby,      
+            'userFirstName': notification.userFirstName,
+            'userLastName': notification.userLastName,
             'to': notification.to,
+            'creatorFirstName': notification.creatorFirstName,
+            'creatorLastName': notification.creatorLastName,
             'notification': notification.notification,
             'assignedGroup': notification.assignedGroup,
             'assignedTo': notification.assignedTo,            
@@ -66,11 +75,7 @@ class dashboardeventservice:
             'assignedministrygroup': notification.assignedministrygroup,
             'assignedministryperson': notification.assignedministryperson,
             'assignedministrypersonFirstName':notification.assignedministrypersonFirstName,
-            'assignedministrypersonLastName': notification.assignedministrypersonLastName,
-            'id': notification.id,
-            'requestid': notification.requestid,
-            'ministryrequestid': notification.ministryrequestid
-
+            'assignedministrypersonLastName': notification.assignedministrypersonLastName
         }
 
     def __formatedate(self, input):

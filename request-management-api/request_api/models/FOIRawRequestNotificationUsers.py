@@ -18,6 +18,7 @@ from .FOIMinistryRequests import FOIMinistryRequest
 from .FOIRequestNotificationUsers import FOIRequestNotificationUser
 from .FOIRawRequestNotifications import FOIRawRequestNotification
 from .FOIRawRequestWatchers import FOIRawRequestWatcher
+from .FOIUsers import FOIUser
 
 class FOIRawRequestNotificationUser(db.Model):
     # Name of the table in our database
@@ -149,17 +150,9 @@ class FOIRawRequestNotificationUser(db.Model):
             ],
             else_ = cast(FOIRawRequest.axisrequestid, String)).label('axisRequestId')
 
-        assignedtoformatted = case([
-                            (and_(FOIAssignee.lastname.isnot(None), FOIAssignee.firstname.isnot(None)),
-                             func.concat(FOIAssignee.lastname, ', ', FOIAssignee.firstname)),
-                            (and_(FOIAssignee.lastname.isnot(None), FOIAssignee.firstname.is_(None)),
-                             FOIAssignee.lastname),
-                            (and_(FOIAssignee.lastname.is_(None), FOIAssignee.firstname.isnot(None)),
-                             FOIAssignee.firstname),
-                            (and_(FOIAssignee.lastname.is_(None), FOIAssignee.firstname.is_(None), FOIRawRequest.assignedgroup.is_(None)),
-                             'Unassigned'),
-                           ],
-                           else_ = FOIRawRequest.assignedgroup).label('assignedToFormatted')
+        
+        foiuser = aliased(FOIUser)
+        foicreator = aliased(FOIUser)
 
         selectedcolumns = [
             axisrequestid,            
@@ -169,17 +162,19 @@ class FOIRawRequestNotificationUser(db.Model):
             FOIRawRequestNotificationUser.created_at.label('createdat'),
             FOIRawRequest.assignedgroup.label('assignedGroup'),
             FOIRawRequest.assignedto.label('assignedTo'),
-            FOIAssignee.firstname.label('assignedToFirstName'),
-            FOIAssignee.lastname.label('assignedToLastName'),
             literal(None).label('assignedministrygroup'),
             literal(None).label('assignedministryperson'),
+            FOIAssignee.firstname.label('assignedToFirstName'),
+            FOIAssignee.lastname.label('assignedToLastName'),            
             literal(None).label('assignedministrypersonFirstName'),
             literal(None).label('assignedministrypersonLastName'),
-            assignedtoformatted,
-            literal(None).label('ministryAssignedToFormatted'),
             FOIRawRequestNotificationUser.notificationuserid.label('id'),
             FOIRawRequest.requestid.label('requestid'),
-            literal(None).label('ministryrequestid')
+            literal(None).label('ministryrequestid'),
+            foiuser.firstname.label('userFirstName'),
+            foiuser.lastname.label('userLastName'),
+            foicreator.firstname.label('creatorFirstName'),
+            foicreator.lastname.label('creatorLastName')
         ]
 
         
@@ -196,6 +191,10 @@ class FOIRawRequestNotificationUser(db.Model):
                                 ).join(
                                         FOIRawRequestNotificationUser,
                                         and_(FOIRawRequestNotificationUser.notificationid == FOIRawRequestNotification.notificationid)
+                                ).join(
+                                        foiuser, foiuser.preferred_username == FOIRawRequestNotificationUser.userid, isouter=True  
+                                ).join(
+                                        foicreator, foicreator.preferred_username == FOIRawRequestNotificationUser.createdby, isouter=True  
                                 )
                             
 
@@ -326,9 +325,7 @@ class FOIRawRequestNotificationUser(db.Model):
             'createdby',
             'to',
             'axisRequestId',
-            'createdat',
-            'assignedToFormatted',
-            'ministryAssignedToFormatted'           
+            'createdat'          
         ]
         if x in validfields:
             return True

@@ -41,7 +41,7 @@ class KeycloakAdminService:
             print("Error happened while accessing token on KeycloakAdminService {0}".format(exception.message))
         finally:
             cache_client = None    
-        return _accesstoken        
+        return _accesstoken       
 
    
     def getgroups(self, allowedgroups = None):
@@ -87,13 +87,35 @@ class KeycloakAdminService:
             return sorted(users, key=lambda k: str(k['lastname']), reverse = False)
         return users 
     
+    def getallusercount(self):
+        userurl ='{0}/auth/admin/realms/{1}/users/count'.format(self.keycloakhost,self.keycloakrealm)
+        userresponse = requests.get(userurl, headers=self.getheaders())
+        if userresponse.status_code == 200 and userresponse.content != '':
+            return int(userresponse.content)
+        return 100
+   
+    def getallusers(self):
+        usercount = self.getallusercount()
+        userurl ='{0}/auth/admin/realms/{1}/users?max={2}'.format(self.keycloakhost,self.keycloakrealm,usercount)
+        userresponse = requests.get(userurl, headers=self.getheaders())
+        users = []
+        if userresponse.status_code == 200 and userresponse.content != '': 
+            for user in userresponse.json():           
+                _user =  self.__createuser(user)
+                users.append(_user)
+        if users not in (None, []):
+            return sorted(users, key=lambda k: str(k['lastname']), reverse = False)
+        return users     
+    
     def __createuser(self, user):
         return {
                 'id':user['id'],
                 'username': self.__formatusername(user),                       
                 'email': user['email'] if 'email' in user is not None else None,
                 'firstname':user['firstName'] if 'firstName' in user is not None else None,
-                'lastname': user['lastName'] if 'lastName' in user is not None else None                        
+                'lastname': user['lastName'] if 'lastName' in user is not None else None ,
+                'enabled': user['enabled'],         
+                'origusername': user['username']             
             } 
 
     def __formatusername(self,user):
