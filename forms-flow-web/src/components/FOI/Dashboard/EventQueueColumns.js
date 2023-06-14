@@ -10,7 +10,7 @@ import {
     {
       field: "createdat",
       headerName: "DATE | TIME STAMP",
-      width: 200,
+      width: 160,
       headerAlign: "left",
       //valueGetter: (params) => formatDate(params.row.cfrduedate, "MM/dd/yyyy"),
     },
@@ -18,7 +18,7 @@ import {
       field: "axisRequestId",
       headerName: "ID NUMBER",
       headerAlign: "left",
-      width: 200,
+      width: 160,
       //renderCell: cellTooltipRender
     },
     {
@@ -26,7 +26,7 @@ import {
       headerName: "FROM",
       headerAlign: "left",
       width: 160,
-      valueGetter: (params) => getUserFullName(params.row.creatorFirstName, params.row.creatorFirstName, params.row.createdby),
+      valueGetter: (params) => getUserFullName(params.row.creatorFirstName, params.row.creatorLastName, params.row.createdby),
     },
     {
       field: "to",
@@ -47,7 +47,7 @@ import {
       field: "notification",
       headerName: "CONTENT",
       headerAlign: "left",
-      width: 300,
+      width: 400,
      renderCell: eventCellTooltipRender
     }
     
@@ -58,7 +58,7 @@ import {
     {
       field: "createdat",
       headerName: "DATE | TIME STAMP",
-      width: 200,
+      width: 160,
       headerAlign: "left",
       //valueGetter: (params) => formatDate(params.row.cfrduedate, "MM/dd/yyyy"),
     },
@@ -66,7 +66,7 @@ import {
       field: "axisRequestId",
       headerName: "ID NUMBER",
       headerAlign: "left",
-      width: 200,
+      width: 160,
       //renderCell: cellTooltipRender
     },
     {
@@ -95,7 +95,7 @@ import {
       field: "notification",
       headerName: "CONTENT",
       headerAlign: "left",
-      width: 300,
+      width: 400,
      renderCell: eventCellTooltipRender
     }
     
