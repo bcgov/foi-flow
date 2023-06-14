@@ -154,7 +154,6 @@ class FOIRawRequestNotificationUser(db.Model):
         foiuser = aliased(FOIUser)
         foicreator = aliased(FOIUser)
 
-        
         selectedcolumns = [
             axisrequestid,            
             FOIRawRequestNotification.notification["message"].label('notification'),
@@ -163,10 +162,10 @@ class FOIRawRequestNotificationUser(db.Model):
             FOIRawRequestNotificationUser.created_at.label('createdat'),
             FOIRawRequest.assignedgroup.label('assignedGroup'),
             FOIRawRequest.assignedto.label('assignedTo'),
-            FOIAssignee.firstname.label('assignedToFirstName'),
-            FOIAssignee.lastname.label('assignedToLastName'),
             literal(None).label('assignedministrygroup'),
             literal(None).label('assignedministryperson'),
+            FOIAssignee.firstname.label('assignedToFirstName'),
+            FOIAssignee.lastname.label('assignedToLastName'),            
             literal(None).label('assignedministrypersonFirstName'),
             literal(None).label('assignedministrypersonLastName'),
             FOIRawRequestNotificationUser.notificationuserid.label('id'),

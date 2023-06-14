@@ -183,7 +183,6 @@ class FOIRequestNotificationUser(db.Model):
         foiuser = aliased(FOIUser)
         foicreator = aliased(FOIUser)
 
-        
         selectedcolumns = [
             cast(FOIMinistryRequest.axisrequestid, String).label('axisRequestId'),
             FOIRequestNotification.notification["message"].label('notification'),
