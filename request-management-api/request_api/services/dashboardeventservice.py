@@ -46,7 +46,7 @@ class dashboardeventservice:
         _newfilterfields = filterfields
         try:
             if keyword not in [None, ""] and len(filterfields) > 0:
-                _newvalue = datetime2.strptime(keyword, '%Y %b %d').strftime('%y-%m-%d')
+                _newvalue = datetime2.strptime(keyword, '%Y %b %d').strftime('%Y-%m-%d')
             if  keyword in [None, ""] and "createdat" in _newfilterfields:
                 _newfilterfields.remove("createdat")     
         except ValueError as ex:
