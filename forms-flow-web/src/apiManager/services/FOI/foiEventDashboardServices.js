@@ -68,7 +68,7 @@ export const fetchFOIMinistryRequestListByPage = (page = 1, size = 10, sort = [{
 
   return (dispatch) => {
     httpGETRequest(
-          API.FOI_GET_MINISTRY_REQUESTS_PAGE_API,
+          API.FOI_GET_MINISTRY_EVENTS_PAGE_API,
           {
             "page": page,
             "size": size,
@@ -82,7 +82,8 @@ export const fetchFOIMinistryRequestListByPage = (page = 1, size = 10, sort = [{
           UserService.getToken())
       .then((res) => {
         if (res.data) {
-          dispatch(setFOIMinistryEventList(res.data));
+          // dispatch(setFOIMinistryEventList(res.data));
+          dispatch(setFOIEventList(res.data));
           dispatch(setFOILoader(false));
           if (res.data?.data[0]?.bcgovcode)
             dispatch(fetchFOIMinistryAssignedToList(res.data.data[0].bcgovcode));     

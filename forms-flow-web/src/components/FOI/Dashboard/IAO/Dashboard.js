@@ -4,14 +4,14 @@ import { push } from "connected-react-router";
 import FOI_COMPONENT_CONSTANTS from "../../../../constants/FOI/foiComponentConstants";
 import Grid from "@mui/material/Grid";
 import Queue from "./Queue";
-import EventQueue from "./EventQueue"
+import EventQueue from "../EventQueue"
 import AdvancedSearch from "./AdvancedSearch";
 import clsx from "clsx";
 import { makeStyles } from "@material-ui/core/styles";
 import Divider from "@mui/material/Divider";
 import { ButtonBase } from "@mui/material";
 import { getTableInfo } from "./columns";
-import { getEventQueueTableInfo } from "./EventQueueColumns"
+import { getIAOEventQueueTableInfo } from "../EventQueueColumns"
 import { setShowAdvancedSearch, setResumeDefaultSorting, setShowEventQueue } from "../../../../actions/FOI/foiRequestActions";
 
 const useStyles = makeStyles(() => ({
@@ -30,7 +30,7 @@ const useStyles = makeStyles(() => ({
 const Dashboard = ({ userDetail }) => {
   const user = useSelector((state) => state.user.userDetail);
   const tableInfo = getTableInfo(user.groups);
-  const eventQueueTableInfo = getEventQueueTableInfo();
+  const eventQueueTableInfo = getIAOEventQueueTableInfo();
   const classes = useStyles();
   const dispatch = useDispatch();
 
