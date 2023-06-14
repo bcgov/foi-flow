@@ -75,7 +75,8 @@ class dashboardeventservice:
             'assignedministrygroup': notification.assignedministrygroup,
             'assignedministryperson': notification.assignedministryperson,
             'assignedministrypersonFirstName':notification.assignedministrypersonFirstName,
-            'assignedministrypersonLastName': notification.assignedministrypersonLastName
+            'assignedministrypersonLastName': notification.assignedministrypersonLastName,
+            'notificationType': notification.notificationtype
         }
 
     def __formatedate(self, input):

@@ -31,6 +31,7 @@ from .FOIMinistryRequestSubjectCodes import FOIMinistryRequestSubjectCode
 from .SubjectCodes import SubjectCode
 from .FOIRequestNotifications import FOIRequestNotification
 from .FOIUsers import FOIUser
+from .NotificationTypes import NotificationType
 
 class FOIRequestNotificationUser(db.Model):
     # Name of the table in our database
@@ -203,7 +204,8 @@ class FOIRequestNotificationUser(db.Model):
             foiuser.firstname.label('userFirstName'),
             foiuser.lastname.label('userLastName'),
             foicreator.firstname.label('creatorFirstName'),
-            foicreator.lastname.label('creatorLastName')
+            foicreator.lastname.label('creatorLastName'),
+            NotificationType.name.label('notificationtype')
         ]
 
         basequery = _session.query(
@@ -245,6 +247,9 @@ class FOIRequestNotificationUser(db.Model):
                             ).join(
                                 FOIRequestNotificationUser,
                                 and_(FOIRequestNotificationUser.notificationid == FOIRequestNotification.notificationid),
+                            ).join(
+                                NotificationType,
+                                and_(FOIRequestNotification.notificationtypeid == NotificationType.notificationtypeid),
                             ).join(
                                 foiuser, foiuser.preferred_username == FOIRequestNotificationUser.userid, isouter=True  
                             ).join(

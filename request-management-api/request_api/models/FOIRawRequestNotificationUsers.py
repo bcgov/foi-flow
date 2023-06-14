@@ -19,6 +19,7 @@ from .FOIRequestNotificationUsers import FOIRequestNotificationUser
 from .FOIRawRequestNotifications import FOIRawRequestNotification
 from .FOIRawRequestWatchers import FOIRawRequestWatcher
 from .FOIUsers import FOIUser
+from .NotificationTypes import NotificationType
 
 class FOIRawRequestNotificationUser(db.Model):
     # Name of the table in our database
@@ -174,7 +175,8 @@ class FOIRawRequestNotificationUser(db.Model):
             foiuser.firstname.label('userFirstName'),
             foiuser.lastname.label('userLastName'),
             foicreator.firstname.label('creatorFirstName'),
-            foicreator.lastname.label('creatorLastName')
+            foicreator.lastname.label('creatorLastName'),
+            NotificationType.name.label('notificationtype')
         ]
 
         
@@ -191,6 +193,9 @@ class FOIRawRequestNotificationUser(db.Model):
                                 ).join(
                                         FOIRawRequestNotificationUser,
                                         and_(FOIRawRequestNotificationUser.notificationid == FOIRawRequestNotification.notificationid)
+                                ).join(
+                                        NotificationType,
+                                        and_(FOIRawRequestNotification.notificationtypeid == NotificationType.notificationtypeid),
                                 ).join(
                                         foiuser, foiuser.preferred_username == FOIRawRequestNotificationUser.userid, isouter=True  
                                 ).join(
