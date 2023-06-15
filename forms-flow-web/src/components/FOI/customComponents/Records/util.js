@@ -126,7 +126,7 @@ export const sortDivisionalFiles = (divisionMap) => {
 }
 
 export const calculateTotalUploadedFileSizeInKB = (records) => {
-    return records.reduce((total, record) => {
+    return records?.reduce((total, record) => {
         return total + (record.attributes.convertedfilesize ? record.attributes.convertedfilesize : record.attributes.filesize);
     }, 0);
 }
