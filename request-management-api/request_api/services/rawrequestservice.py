@@ -36,7 +36,7 @@ class rawrequestservice:
         if axisrequestid is not None:
             isaxisrequestidpresent = self.isaxisrequestidpresent(axisrequestid)
         axissyncdate = requestdatajson["axisSyncDate"] if 'axisSyncDate' in requestdatajson  else None
-
+        linkedrequests = requestdatajson["linkedRequests"] if 'linkedRequests' in requestdatajson  else None
         requirespayment =  rawrequestservice.doesrequirepayment(requestdatajson) if sourceofsubmission == "onlineform"  else False 
         if axisrequestid is None or isaxisrequestidpresent == False:
             result = FOIRawRequest.saverawrequest(
@@ -52,7 +52,8 @@ class rawrequestservice:
                                                     assigneemiddlename=assigneemiddlename,
                                                     assigneelastname=assigneelastname,
                                                     axisrequestid=axisrequestid,
-                                                    axissyncdate=axissyncdate                                                    
+                                                    axissyncdate=axissyncdate,
+                                                    linkedrequests=linkedrequests                                                    
                                                 )
         else:            
             raise ValueError("Duplicate AXIS Request ID")

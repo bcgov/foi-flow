@@ -6,12 +6,17 @@ import {
   deleteFOINotifications
 } from "../../../../apiManager/services/FOI/foiNotificationServices";
 import {useDispatch} from "react-redux";
+import Modal from 'react-bootstrap/Modal';
+import Button from 'react-bootstrap/Button';
+import UnsavedModal from '../../customComponents/UnsavedModal';
 
 const NotificationPopup = ({notifications, isMinistry, ministryCode}) => {
 
   const [myRequestTitle, setMyRequestTitle] = useState();
   const [watchingRequestTitle, setWatchingRequestTitle] = useState();
- 
+  const [modalOpen, setModalOpen] = useState(false);
+  const [modalMessage, setModalMessage] = useState("");
+  const [dismissType, setDismissType] = useState("");
 
   useEffect(() => {     
     tabTitle();
@@ -51,10 +56,20 @@ const NotificationPopup = ({notifications, isMinistry, ministryCode}) => {
 
   const dispatch = useDispatch();
   const dismissAllNotifications = (type) => {
-    dispatch(deleteFOINotifications(null, null,type));
+    setModalOpen(true);
+    setModalMessage('Are you sure you want to dismiss all notifications? This is irreversible.');
+    setDismissType(type);
+    //dispatch(deleteFOINotifications(null, null,type));
+  }
+
+  const handleContinue = () => {
+    setModalOpen(false);
+    console.log("dismissType", dismissType);
+    dispatch(deleteFOINotifications(null, null,dismissType));
   }
 
   return (
+    <>
     <Tabs defaultActiveKey="my-request" id="uncontrolled-tab-example" className="notification-tab">
       <Tab eventKey="my-request" title={myRequestTitle} className="popup-background">
         {checkIfNotificationExists('assignee')  && <Row className="list-header">
@@ -89,6 +104,9 @@ const NotificationPopup = ({notifications, isMinistry, ministryCode}) => {
         </ListGroup>}
       </Tab>
     </Tabs>
+    <UnsavedModal modalOpen={modalOpen} handleClose={() => setModalOpen(false)}
+      handleContinue={handleContinue} modalMessage={modalMessage} />
+    </>
   );
 
 }

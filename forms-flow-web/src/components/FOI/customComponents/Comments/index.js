@@ -42,7 +42,6 @@ export const CommentSection = ({
     setcomments(filteredcomments)         
   }, [filterValue,commentsArray ,filterkeyValue])
   let restrictedReqTaglist = useSelector((state) => state.foiRequests.restrictedReqTaglist);
-  const isCommentTagListLoading = useSelector((state) => state.foiRequests.isCommentTagListLoading);
 
   const onfilterchange = (_filterValue) => { 
     sessionStorage.setItem('foicommentcategory',_filterValue)   
@@ -78,7 +77,6 @@ export const CommentSection = ({
   }
 
   return (
-    !isCommentTagListLoading ? 
     <>
     <ActionProvider
       currentUser={currentUser}
@@ -121,7 +119,7 @@ export const CommentSection = ({
 
       </div>
     </ActionProvider>
-    </> : <Loading />
+    </>
   )
 }
 

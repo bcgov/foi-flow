@@ -77,11 +77,11 @@ export default function AttachmentModal({
     const recordFormats = useSelector((state) => state.foiRequests.recordFormats)
     useEffect(() => {
       setMimeTypes(multipleFiles ?
-        (uploadFor === 'attachment' ? [...recordFormats, ...MimeTypeList.additional] : (uploadFor === 'record' && modalFor==="replace" ? replacementfiletypes: recordFormats))
+        (uploadFor === 'attachment' ? [...recordFormats, ...MimeTypeList.additional] : (uploadFor === 'record' && (modalFor==="replace" || modalFor === "replaceattachment") ? replacementfiletypes: recordFormats))
         : MimeTypeList.stateTransition);
     }, [recordFormats])
     const [mimeTypes, setMimeTypes] = useState(multipleFiles ?
-      (uploadFor === 'attachment' ? [...recordFormats, ...MimeTypeList.additional] : (uploadFor === 'record' && modalFor==="replace" ? replacementfiletypes: recordFormats))
+      (uploadFor === 'attachment' ? [...recordFormats, ...MimeTypeList.additional] : (uploadFor === 'record' && (modalFor==="replace" || modalFor === "replaceattachment") ? replacementfiletypes: recordFormats))
       : MimeTypeList.stateTransition);
     const maxFileSize = uploadFor === 'record' ? MaxFileSizeInMB.totalFileSize : multipleFiles ? MaxFileSizeInMB.attachmentLog : MaxFileSizeInMB.stateTransition;
     const totalFileSize = multipleFiles ? MaxFileSizeInMB.totalFileSize : MaxFileSizeInMB.stateTransition;
@@ -182,7 +182,7 @@ export default function AttachmentModal({
         let fileInfoList = [];
 
         let fileStatusTransition = "";
-        if (modalFor === 'replace') {
+        if (modalFor === 'replace' || modalFor === "replaceattachment") {
           fileStatusTransition = attachment?.category;
         } else if (uploadFor === "record") {
           fileStatusTransition = divisions.find(division => division.divisionid === tagValue).divisionname;
@@ -209,6 +209,12 @@ export default function AttachmentModal({
       switch(modalFor.toLowerCase()) { 
         case "add":
           return {title: "Add Attachment", body: ""};
+
+        case "replaceattachment":
+          if (uploadFor === 'record') {
+            _message = {title: "Replace Records", body:<>Replace the existing record with a reformatted or updated version of the same record.<br></br>The original file that was uploaded will still be available for download.</> }
+          }
+          return _message;
         case "replace":
           let _message = {};
             if (uploadFor === 'record') {
@@ -260,7 +266,7 @@ export default function AttachmentModal({
         return true;
       } else if (modalFor === 'add') {
         return tagValue === "";
-      } else if (modalFor === 'replace') {
+      } else if (modalFor === 'replace' || modalFor === 'replaceattachment') {
         return false;
       }
     }
@@ -289,12 +295,12 @@ export default function AttachmentModal({
                 </span>                
               </div>
               {
-                (['replace','add'].includes(modalFor)) ?
+                (['replaceattachment','replace','add'].includes(modalFor)) ?
                 <FileUpload 
                   attachment={attachment}  
                   attchmentFileNameList={attchmentFileNameList}  
                   multipleFiles={multipleFiles} 
-                  mimeTypes={mimeTypes} 
+                  mimeTypes={modalFor === "replaceattachment"? ['application/pdf','.pdf']: mimeTypes} 
                   maxFileSize={maxFileSize} 
                   totalFileSize={totalFileSize} 
                   updateFilesCb={updateFilesCb}

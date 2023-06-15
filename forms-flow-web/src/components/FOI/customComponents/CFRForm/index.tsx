@@ -1268,6 +1268,7 @@ export const CFRForm = ({
                 <button
                   type="button"
                   className="col-lg-4 btn btn-bottom btn-save"
+                  id="btncfrsave"
                   onClick={save}
                   color="primary"
                   disabled={!validateFields() || (formData?.reason === 'init' && isNewCFRForm)}

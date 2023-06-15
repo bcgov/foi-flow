@@ -46,7 +46,7 @@ import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import CloseIcon from '@material-ui/icons/Close';
 import _ from 'lodash';
-import { DOC_REVIEWER_WEB_URL, RECORD_PROCESSING_HRS, OSS_S3_CHUNK_SIZE } from "../../../../constants/constants";
+import { DOC_REVIEWER_WEB_URL, RECORD_PROCESSING_HRS, OSS_S3_CHUNK_SIZE, DISABLE_REDACT_WEBLINK } from "../../../../constants/constants";
 import {removeDuplicateFiles, getUpdatedRecords, sortByLastModified, getFiles, calculateDivisionFileSize, calculateTotalFileSize,calculateTotalUploadedFileSizeInKB,getReadableFileSize} from "./util"
 import { readUploadedFileAsBytes } from '../../../../helper/FOI/helper';
 import { TOTAL_RECORDS_UPLOAD_LIMIT } from "../../../../constants/constants";
@@ -163,13 +163,13 @@ export const RecordsLog = ({
 
   let pdfStitchedRecord = useSelector(
     (state) => state.foiRequests.foiPDFStitchedRecordForHarms
-  );  
+  );
   const classes = useStyles();
   const [records, setRecords] = useState(recordsObj?.records);
   const [totalUploadedRecordSize, setTotalUploadedRecordSize] = useState(0);
   useEffect(() => {
     setRecords(recordsObj?.records)
-    let nonDuplicateRecords = recordsObj?.records.filter(record => !record.isduplicate)
+    let nonDuplicateRecords = recordsObj?.records?.filter(record => !record.isduplicate)
     let totalUploadedSize= (calculateTotalUploadedFileSizeInKB(nonDuplicateRecords)/ (1024 * 1024))
     setTotalUploadedRecordSize(parseFloat(totalUploadedSize.toFixed(4)));
     dispatch(checkForRecordsChange(requestId, ministryId))
@@ -179,7 +179,7 @@ export const RecordsLog = ({
     dispatch(getRecordFormats());
   }, [])
 
-
+  const conversionFormats = useSelector((state) => state.foiRequests.conversionFormats)
   const divisionFilters = [...new Map(recordsObj?.records?.reduce((acc, file) => [...acc, ...new Map(file?.attributes?.divisions?.map(division => [division?.divisionid, division]))], [])).values()]
   if (divisionFilters?.length > 0) divisionFilters?.push(
     {divisionid: -1, divisionname: "All"},
@@ -200,7 +200,7 @@ export const RecordsLog = ({
   const [filterValue, setFilterValue] = useState(-1);
   const [fullnameList, setFullnameList] = useState(getFullnameList);
   const [recordsDownloadList, setRecordsDownloadList] = useState(RecordsDownloadList);
-  const [currentDownload, setCurrentDownload] = useState(0) 
+  const [currentDownload, setCurrentDownload] = useState(0)
   const [isDownloadInProgress, setIsDownloadInProgress] = useState(false)
   const [isDownloadReady, setIsDownloadReady] = useState(false)
   const [isDownloadFailed, setIsDownloadFailed] = useState(false)
@@ -268,13 +268,13 @@ export const RecordsLog = ({
   }
 
   const saveDocument = (value, fileInfoList, files) => {
-    
+
     if (value) {
       if (files.length !== 0) {
         setRecordsUploading(true)
-        // if (modalFor === 'replace') {
-        //   fileInfoList[0].filepath = updateAttachment.s3uripath.substr(0, updateAttachment.s3uripath.lastIndexOf(".")) + ".pdf";
-        // }
+        if (modalFor === 'replaceattachment') {
+          fileInfoList[0].filepath = updateAttachment.s3uripath.substr(0, updateAttachment.s3uripath.lastIndexOf(".")) + ".pdf";
+        }
         postFOIS3DocumentPreSignedUrl(ministryId, fileInfoList.map(file => ({...file, multipart: true})), 'records', bcgovcode, dispatch, async (err, res) => {
           let _documents = [];
           if (!err) {
@@ -284,29 +284,40 @@ export const RecordsLog = ({
             for (let header of res) {
               const _file = files.find(file => file.filename === header.filename);
               const _fileInfo = fileInfoList.find(fileInfo => fileInfo.filename === header.filename);
-              const documentDetails = modalFor === 'replace' ?
-                {
-                  //...updateAttachment,
+              var documentDetails;
+              if (modalFor === 'replace') {
+                documentDetails = {
                   filename: header.filename,
                   attributes:{
                     divisions:replaceRecord['attributes']['divisions'],
-                    lastmodified: _file.lastModifiedDate,
+                    lastmodified: _file.lastModifiedDate ? _file.lastModifiedDate : new Date(_file.lastModified),
                     filesize: _file.size
                   },
                   replacementof:replaceRecord['replacementof'] == null || replaceRecord['replacementof']==''? replaceRecord['recordid'] : replaceRecord['replacementof'] ,
                   s3uripath: header.filepathdb,
                   trigger: 'recordreplace',
                   service: 'deduplication'
-                }:
-                {
+                }
+              } else if (modalFor === 'replaceattachment') {
+                documentDetails = {
+                  ...updateAttachment,
+                  s3uripath: header.filepathdb,
+                  trigger: 'recordreplace',
+                  service: 'deduplication'
+                }
+                documentDetails.attributes.convertedfilesize = _file.size
+                documentDetails.attributes.trigger = 'recordreplace'
+              } else {
+                documentDetails = {
                   s3uripath: header.filepathdb,
                   filename: header.filename,
                   attributes:{
                     divisions:[{divisionid: _fileInfo.divisionid}],
-                    lastmodified: _file.lastModifiedDate,
+                    lastmodified: _file.lastModifiedDate ? _file.lastModifiedDate : new Date(_file.lastModified),
                     filesize: _file.size
                   }
-                };
+                }
+              }
               let bytes = await readUploadedFileAsBytes(_file)
               const CHUNK_SIZE = OSS_S3_CHUNK_SIZE;
               const totalChunks = Math.ceil(bytes.byteLength / CHUNK_SIZE);
@@ -338,17 +349,20 @@ export const RecordsLog = ({
               })
             }
             if (_documents.length > 0) {
-              if (modalFor === 'replace') {
-                
-                // dispatch(retryFOIRecordProcessing(requestId, ministryId, {records: _documents},(err, _res) => {
-                //     dispatchRequestAttachment(err);
-                // }));
-                
+              if (modalFor === 'replace' || modalFor == 'replaceattachment') {
+
+                 if (modalFor === 'replaceattachment'){
+                dispatch(retryFOIRecordProcessing(requestId, ministryId, {records: _documents},(err, _res) => {
+                    dispatchRequestAttachment(err);
+                })); }
+
+                 if (modalFor === 'replace'){
                 dispatch(replaceFOIRecordProcessing(requestId, ministryId,replaceRecord.recordid, {records: _documents},(err, _res) => {
                   dispatchRequestAttachment(err);
-              }));
+              })); }
 
-              } else {
+              }
+              else {
                 dispatch(saveFOIRecords(requestId, ministryId, {records: _documents},(err, _res) => {
                     dispatchRequestAttachment(err);
                 }));
@@ -379,8 +393,8 @@ export const RecordsLog = ({
   }
 
   const downloadDocument = (file, isPDF = false,originalfile = false) => {
-    var s3filepath = !originalfile ? file.s3uripath: file.originalfile;
-    var filename = !originalfile ? file.filename:file.originalfilename;
+    var s3filepath = !originalfile ? file.s3uripath: (!file.isattachment ? file.originalfile:file.s3uripath);
+    var filename = !originalfile ? file.filename:(!file.isattachment ?file.originalfilename: file.filename);
     if (isPDF) {
       s3filepath = s3filepath.substr(0, s3filepath.lastIndexOf(".")) + ".pdf";
       filename = filename + ".pdf";
@@ -411,7 +425,7 @@ export const RecordsLog = ({
         });
       }
     }, 'records', bcgovcode);
-  }  
+  }
 
   const handleDownloadChange = (e) => {
     //if clicked on harms
@@ -426,7 +440,7 @@ export const RecordsLog = ({
         progress: undefined,
         theme: "colored",
         backgroundColor: "#FFA500"
-      });      
+      });
       downloadLinearHarmsDocuments()
     }
     //if clicked on harms and stitching is complete
@@ -441,7 +455,7 @@ export const RecordsLog = ({
         toastError()
       }
     }
-    setCurrentDownload(e.target.value); 
+    setCurrentDownload(e.target.value);
   }
 
   const downloadZipFile = async (s3filepath, filename) => {
@@ -472,16 +486,16 @@ export const RecordsLog = ({
 
   const downloadLinearHarmsDocuments = () => {
     try{
-    
+
       const message = createMessageForHarms(recordsObj?.records);
       dispatch(triggerDownloadFOIRecordsForHarms(requestId, ministryId, message,(err, _res) => {
         if (err) {
           toastError()
         }
         else {
-          setIsDownloadInProgress(true);      
+          setIsDownloadInProgress(true);
           setIsDownloadReady(false);
-          setIsDownloadFailed(false); 
+          setIsDownloadFailed(false);
         }
         dispatchRequestAttachment(err);
     }));
@@ -494,7 +508,7 @@ export const RecordsLog = ({
   }
 
   const createMessageForHarms = (recordList) => {
-    
+
     const message = {
       "category":RecordDownloadCategory.harms,
       "requestnumber":requestNumber,
@@ -505,10 +519,10 @@ export const RecordsLog = ({
     //remove duplicate records(except duplicate attachments)
     const deduplicatedRecords = removeDuplicateFiles(recordList);
     //get only relevent fields
-    const updatedrecords = getUpdatedRecords(deduplicatedRecords);
+    const updatedrecords = getUpdatedRecords(deduplicatedRecords, conversionFormats);
     //sort records and attachments based on lastmodified asc
     let sortedRecords = sortByLastModified(updatedrecords);
-    
+
     //get all the divisions in the records
     const divisionObj= {}
     for (const _record of sortedRecords) {
@@ -526,7 +540,6 @@ export const RecordsLog = ({
           recordsArray.push(..._filteredAttachments)   
         }         
     }
-    
     //form the final attributes for the message
     const attributes = []
     for (const _key in divisionObj) {
@@ -544,10 +557,8 @@ export const RecordsLog = ({
 
     //keeping this for testing purpose.
     console.log(`message = ${JSON.stringify(message)}`);
-
     return message;
-
-  } 
+  }  
 
 
   const toastError = (error) => {
@@ -563,7 +574,7 @@ export const RecordsLog = ({
         progress: undefined,
       }
     );
-    setIsDownloadInProgress(false);      
+    setIsDownloadInProgress(false);
     setIsDownloadReady(false);
     setIsDownloadFailed(true);
 
@@ -584,7 +595,7 @@ export const RecordsLog = ({
       for (let record of exporting) {
         var filepath = record.s3uripath
         var filename = record.filename
-        if (record.isredactionready && ['.doc','.docx','.xls','.xlsx', '.ics', '.msg', '.pptx'].includes(record.attributes?.extension?.toLowerCase())) {
+        if (record.isredactionready && conversionFormats.includes(record.attributes?.extension?.toLowerCase())) {
           filepath = filepath.substr(0, filepath.lastIndexOf(".")) + ".pdf";
           filename += ".pdf";
         }
@@ -622,10 +633,10 @@ export const RecordsLog = ({
   }
 
   const retryDocument = (record) => {
-    record.trigger = 'recordretry';    
+    record.trigger = 'recordretry';
     record.service = record.failed ? record.failed : 'all';
     if (record.isattachment) {
-      var parentRecord = recordsObj.records.find(r => r.recordid = record.rootparentid);
+      var parentRecord = recordsObj?.records?.find(r => r.recordid = record.rootparentid);
       record.attributes.divisions = parentRecord.attributes.divisions;
       record.attributes.batch = parentRecord.attributes.batch;
       record.attributes.extension = record['s3uripath'].substr(record['s3uripath'].lastIndexOf("."), record['s3uripath'].length);
@@ -642,14 +653,14 @@ export const RecordsLog = ({
 
   const removeAttachments = () => {
     setDeleteModalOpen(false);
-    var attachments = records.reduce((acc, record) => {return record.attachments ? acc.concat(record.attachments.map(a => a.filepath)) : acc}, []);
+    var attachments = records?.reduce((acc, record) => {return record.attachments ? acc.concat(record.attachments.map(a => a.filepath)) : acc}, []);
     dispatch(deleteReviewerRecords({filepaths: attachments, ministryrequestid :ministryId},(err, _res) => {
       dispatchRequestAttachment(err);
     }));
   }
 
-  const hasDocumentsToExport = records.filter(record => !(isMinistryCoordinator && record.category == 'personal')).length > 0;
-  const hasDocumentsToDownload = records.filter(record => record.category !== 'personal').length > 0;
+  const hasDocumentsToExport = records?.filter(record => !(isMinistryCoordinator && record.category == 'personal')).length > 0;
+  const hasDocumentsToDownload = records?.filter(record => record.category !== 'personal').length > 0;
 
   const handlePopupButtonClick = (action, _record) => {
     setUpdateAttachment(_record);
@@ -658,6 +669,11 @@ export const RecordsLog = ({
       case "replace":
         setreplaceRecord(_record)
         setModalFor("replace");
+        setModal(true);
+        break;
+      case "replaceattachment":
+        setreplaceRecord(_record)
+        setModalFor("replaceattachment");
         setModal(true);
         break;
       case "rename":
@@ -753,7 +769,7 @@ export const RecordsLog = ({
 
     let _filename = replaceRecord?.originalfilename === '' ? replaceRecord.filename : replaceRecord.originalfilename ;
     let fileextension =  _filename?.split('.').pop();
-    
+
     switch(fileextension)
     {
       case "docx" || "doc":
@@ -767,7 +783,7 @@ export const RecordsLog = ({
           break;
       case "pdf" :
             replacefileextensions = ["application/pdf"];
-              break;      
+              break;
       default:
         replacefileextensions = [...MimeTypeList.recordsLog]
         break;
@@ -797,7 +813,7 @@ export const RecordsLog = ({
         )
       }
     }
-    return _recordsArray.filter(filterFunction)
+    return _recordsArray?.filter(filterFunction)
     }
 
   return (
@@ -834,8 +850,8 @@ export const RecordsLog = ({
             alignItems="flex-start"
             spacing={1}
           >
-            <ConditionalComponent condition={records.filter(record => record.attachments?.length > 0).length > 0}>
-            <Grid item xs={3}>              
+            <ConditionalComponent condition={records?.filter(record => record.attachments?.length > 0).length > 0}>
+            <Grid item xs={3}>
                 <button
                   className="btn addAttachment foi-export-button"
                   variant="contained"
@@ -844,12 +860,12 @@ export const RecordsLog = ({
                 >
                   Remove Attachments
                 </button>
-              
+
             </Grid>
             </ConditionalComponent>
             <ConditionalComponent condition={hasDocumentsToDownload}>
             <Grid item xs={3}>
-              
+
               <TextField
               className="download-dropdown custom-select-wrapper foi-download-button"
               id="download"
@@ -892,7 +908,7 @@ export const RecordsLog = ({
                           <FontAwesomeIcon icon={faCheckCircle} size='2x' color='#1B8103' className={classes.statusIcons}/>:
                           isDownloadFailed ?
                           <FontAwesomeIcon icon={faExclamationCircle} size='2x' color='#A0192F' className={classes.statusIcons}/>:
-                          isDownloadInProgress ? <FontAwesomeIcon icon={faSpinner} size='2x' color='#FAA915' className={classes.statusIcons}/>:null) 
+                          isDownloadInProgress ? <FontAwesomeIcon icon={faSpinner} size='2x' color='#FAA915' className={classes.statusIcons}/>:null)
                         }
                         {item.label}
                       </MenuItem>
@@ -902,7 +918,7 @@ export const RecordsLog = ({
 
               } )}
             </TextField>
-             
+
             </Grid>
             </ConditionalComponent>
             {/* <Grid item xs={2}>
@@ -927,7 +943,7 @@ export const RecordsLog = ({
                 >
                   + Upload Records
                 </button> :
-                (records.length > 0 && <a href={DOC_REVIEWER_WEB_URL + "/foi/" + ministryId}>
+                (records?.length > 0 && DISABLE_REDACT_WEBLINK?.toLowerCase() =='false' && <a href={DOC_REVIEWER_WEB_URL + "/foi/" + ministryId}>
                   <button
                     className={clsx("btn", "addAttachment", classes.createButton)}
                     variant="contained"
@@ -938,7 +954,7 @@ export const RecordsLog = ({
                   </button>
                 </a>)
               }
-             
+
 
             </Grid>
             <Grid
@@ -1090,7 +1106,7 @@ export const RecordsLog = ({
               alignItems="flex-start"
               className={classes.recordLog}
             >
-              {records.map((record, i) =>
+              {records?.map((record, i) =>
                 <Attachment
                   key={i}
                   indexValue={i}
@@ -1168,10 +1184,10 @@ export const RecordsLog = ({
 
 
 const Attachment = React.memo(({indexValue, record, handlePopupButtonClick, getFullname, isMinistryCoordinator,ministryId}) => {
-  
+
   const classes = useStyles();
   const [disabled, setDisabled] = useState(false);
-  const [isRetry, setRetry] = useState(false); 
+  const [isRetry, setRetry] = useState(false);
   // useEffect(() => {
   //   if(record && record.filename) {
   //     setDisabled(isMinistryCoordinator && record.category == 'personal')
@@ -1235,12 +1251,10 @@ const Attachment = React.memo(({indexValue, record, handlePopupButtonClick, getF
         <Grid item xs={6}>
           {record.isattachment && <FontAwesomeIcon icon={faArrowTurnUp} size='2x' className={classes.attachmentIcon}/>}
           {
-            record.isduplicate && record.attributes?.incompatible ?
-            <FontAwesomeIcon icon={faClone} size='2x' color='#FF873D' className={classes.statusIcons}/>:
-            record.attributes?.incompatible ?
-            <FontAwesomeIcon icon={faBan} size='2x' color='#FAA915' className={classes.statusIcons}/>:
             record.isduplicate ?
             <FontAwesomeIcon icon={faClone} size='2x' color='#FF873D' className={classes.statusIcons}/>:
+            record.attributes?.incompatible && record.attributes?.trigger !== 'recordreplace' ?
+            <FontAwesomeIcon icon={faBan} size='2x' color='#FAA915' className={classes.statusIcons}/>:
             record.isredactionready ?
             <FontAwesomeIcon icon={faCheckCircle} size='2x' color='#1B8103' className={classes.statusIcons}/>:
             record.failed ?
@@ -1257,14 +1271,12 @@ const Attachment = React.memo(({indexValue, record, handlePopupButtonClick, getF
             alignItems="flex-end"
             className={classes.recordStatus}>
             {
-              record.isduplicate && record.attributes?.incompatible ?
-              <span>Duplicate of {record.duplicateof}</span>:
-              record.attributes?.incompatible ?
-              <span>Incompatible File Type</span>:
-              record.trigger === 'recordreplace' ?
-              <span>Record Manually Replaced Due to Error</span>:
               record.isduplicate ?
               <span>Duplicate of {record.duplicateof}</span>:
+              record.attributes?.incompatible && record.attributes?.trigger !== 'recordreplace' ?
+              <span>Incompatible File Type</span>:
+              (record.failed && record.isredactionready) || (record.attributes?.trigger === 'recordreplace' && record.attributes?.isattachment) ?
+              <span>Record Manually Replaced Due to Error</span>:
               record.isredactionready ?
               <span>Ready for Redaction</span>:
               record.failed ?
@@ -1366,7 +1378,7 @@ const opendocumentintab =(record,ministryId)=>
 const AttachmentPopup = React.memo(({indexValue, record, handlePopupButtonClick, disabled,ministryId, setRetry}) => {
   const ref = React.useRef();
   const closeTooltip = () => ref.current && ref ? ref.current.close():{};
-  
+
 
   const handleRename = () => {
     closeTooltip();
@@ -1376,6 +1388,11 @@ const AttachmentPopup = React.memo(({indexValue, record, handlePopupButtonClick,
   const handleReplace = () => {
     closeTooltip();
     handlePopupButtonClick("replace", record);
+  }
+
+  const handleReplaceAttachment = () => {
+    closeTooltip();
+    handlePopupButtonClick("replaceattachment", record);
   }
 
   const handleDownload = () =>{
@@ -1458,7 +1475,7 @@ const AttachmentPopup = React.memo(({indexValue, record, handlePopupButtonClick,
   // }
 
   const ActionsPopover = ({RestrictViewInBrowser, record}) => {
-
+    const conversionFormats = useSelector((state) => state.foiRequests.conversionFormats)
     return (
       <Popover
         anchorReference="anchorPosition"
@@ -1490,7 +1507,7 @@ const AttachmentPopup = React.memo(({indexValue, record, handlePopupButtonClick,
             View
           </MenuItem>
           :""}
-          { <MenuItem
+          { (!record.attributes?.isattachment || record.attributes?.isattachment  === undefined) && <MenuItem
             onClick={() => {
                 handleReplace();
                 setPopoverOpen(false);
@@ -1498,7 +1515,15 @@ const AttachmentPopup = React.memo(({indexValue, record, handlePopupButtonClick,
           >
             Replace Manually
           </MenuItem>}
-          {record.originalfile!='' && <MenuItem
+          { record.attributes?.isattachment && <MenuItem
+            onClick={() => {
+                 handleReplaceAttachment()
+                setPopoverOpen(false);
+            }}
+          >
+            Replace Attachment
+          </MenuItem>}
+          {record.originalfile!=''  && record.originalfile!=undefined  && <MenuItem
             onClick={() => {
                 handleDownloadoriginal();
                 setPopoverOpen(false);
@@ -1507,13 +1532,14 @@ const AttachmentPopup = React.memo(({indexValue, record, handlePopupButtonClick,
             Download Original
           </MenuItem>
           }
-          {record.isredactionready && ['.doc','.docx','.xls','.xlsx', '.ics', '.msg', '.pptx'].includes(record.attributes?.extension?.toLowerCase()) && <MenuItem
+          {((record.isredactionready && conversionFormats.includes(record.attributes?.extension?.toLowerCase())) ||
+          (record.attributes?.isattachment && record.attributes?.trigger === 'recordreplace')) && <MenuItem
             onClick={() => {
                 handleDownloadPDF();
                 setPopoverOpen(false);
             }}
           >
-            Download Converted
+            {(record.attributes?.isattachment && record.attributes?.trigger === 'recordreplace') ? 'Download Replaced' : 'Download Converted'}
           </MenuItem>}
           <MenuItem
             onClick={() => {
@@ -1521,7 +1547,7 @@ const AttachmentPopup = React.memo(({indexValue, record, handlePopupButtonClick,
                 setPopoverOpen(false);
             }}
           >
-           {record.originalfile!='' ? "Download Replaced" : "Download" } 
+           {record.originalfile!='' && record.originalfile!=undefined ? "Download Replaced" : record.attributes?.isattachment ? "Download Original" : "Download" }
           </MenuItem>
           {!record.isattachment && <DeleteMenu />}
           {!record.isredactionready && (record.failed || isrecordtimeout(record.created_at, RECORD_PROCESSING_HRS) == true) && <MenuItem
