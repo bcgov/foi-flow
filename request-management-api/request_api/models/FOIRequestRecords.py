@@ -96,12 +96,12 @@ class FOIRequestRecord(db.Model):
                         inner join (
                             select fr2.recordid, max(fr2.version) as maxversion
                             from public."FOIRequestRecords" fr2
-                            where fr2.recordid in (:recordids)
+                            where fr2.recordid in ("""+ ','.join([str(id) for id in recordids]) +""")
                             group by fr2.recordid
                         ) fr3 on fr3.recordid = fr1.recordid and fr3.maxversion = fr1.version
                         order by fr1.recordid desc
                     """
-            rs = db.session.execute(text(sql), {'recordids': recordids})
+            rs = db.session.execute(text(sql))
 
             for row in rs:
                 records.append({
@@ -109,10 +109,10 @@ class FOIRequestRecord(db.Model):
                     "version": row["version"],
                     "foirequestid": row["foirequestid"],
                     "ministryrequestid": row["ministryrequestid"],
-                    "recordid": row["ministryrequestversion"],
-                    "recordid": row["attributes"],
-                    "recordid": row["filename"],
-                    "recordid": row["s3uripath"],
+                    "ministryrequestversion": row["ministryrequestversion"],
+                    "attributes": row["attributes"],
+                    "filename": row["filename"],
+                    "s3uripath": row["s3uripath"],
                     "created_at": row["created_at"],
                     "createdby": row["createdby"],
                     "updated_at":row["updated_at"],

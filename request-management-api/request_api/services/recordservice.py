@@ -40,7 +40,8 @@ class recordservice(recordservicebase):
             
     def update(self, requestid, ministryrequestid, requestdata, userid):
         newrecords = []
-        records = FOIRequestRecord.getrecordsbyid(requestdata['recordids'])
+        recordids = [r['recordid'] for r in requestdata['records'] if r.get('recordid') is not None]
+        records = FOIRequestRecord.getrecordsbyid(recordids)
         for record in records:
             record['attributes'] = json.loads(record['attributes'])
             if not requestdata['isdelete']:
@@ -50,12 +51,15 @@ class recordservice(recordservicebase):
             newrecord = FOIRequestRecord()
             newrecord.__dict__.update(record)
             newrecords.append(newrecord)
-        response = FOIRequestRecord.create(newrecords)
-        if (response.success):
+        response = {}
+        if(len(newrecords) > 0):
+            response = FOIRequestRecord.create(newrecords)
+        print('response', response)
+        if (response.get('success') or len(recordids) == 0):
             if requestdata['isdelete']:
-                _apiresponse, err = self.makedocreviewerrequest('POST', '/api/document/delete', {'ministryrequestid': ministryrequestid, 'filepaths': [record.__dict__['s3uripath'] for record in newrecords]})
-            # else:
-                # add call to doc reviewer api update function
+                _apiresponse, err = self.makedocreviewerrequest('POST', '/api/document/delete', {'ministryrequestid': ministryrequestid, 'filepaths': [record['filepath'] for record in requestdata['records']]})
+            else:
+                _apiresponse, err = self.makedocreviewerrequest('POST', '/api/document/update', {'ministryrequestid': ministryrequestid, 'documentmasterids': [record['documentmasterid'] for record in requestdata['records']], 'divisions': requestdata['divisions']})
             if err:
                 return DefaultMethodResult(False,'Error in contacting Doc Reviewer API', -1,  [recordid for recordid in requestdata['recordids']])
             return DefaultMethodResult(True,'Record updated in Doc Reviewer DB', -1, [recordid for recordid in requestdata['recordids']])
