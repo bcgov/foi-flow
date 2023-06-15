@@ -50,6 +50,7 @@ services:
       - JWT_OIDC_CACHING_ENABLED=True
       - JWT_OIDC_JWKS_CACHE_TIMEOUT=300
       - CACHE_TIMEOUT=${CACHE_TIMEOUT}
+      - KC_SRC_ACC_TOKEN_EXPIRY=${KC_SRC_ACC_TOKEN_EXPIRY}
       - FOI_REQUESTQUEUE_REDISURL=${FOI_REQUESTQUEUE_REDISURL}
       - CACHE_ENABLED=${CACHE_ENABLED}
       - CACHE_TYPE=${CACHE_TYPE}
@@ -193,7 +194,7 @@ services:
       dockerfile: Dockerfile.local
       args:
         - NODE_ENV=${NODE_ENV:-development}
-        - GENERATE_SOURCEMAP=false                
+        - GENERATE_SOURCEMAP=${GENERATE_SOURCEMAP}                
         - REACT_APP_KEYCLOAK_CLIENT=${KEYCLOAK_WEB_CLIENTID:-forms-flow-web}       
         - REACT_APP_WEB_BASE_URL=${FORMSFLOW_API_URL}                
         - REACT_APP_KEYCLOAK_URL_REALM=${KEYCLOAK_URL_REALM:-forms-flow-ai}
@@ -216,6 +217,8 @@ services:
         - FOI_FFA_URL=${FOI_FFA_URL}
         - REACT_APP_FOI_RECORD_FORMATS=${FOI_RECORD_FORMATS}
         - REACT_APP_RECORD_PROCESSING_HRS=${RECORD_PROCESSING_HRS}
+        - REACT_APP_DISABLE_REDACT_WEBLINK=${DISABLE_REDACT_WEBLINK}
+        - REACT_APP_DISABLE_GATHERINGRECORDS_TAB=${DISABLE_GATHERINGRECORDS_TAB}
     volumes:
       - ".:/app"
       - "/app/node_modules"

@@ -6,9 +6,9 @@ import {
   import API from "../../endpoints";
   import {
     serviceActionError,
-    setFOIAttachmentListLoader,
     setRequestRecords,
     setRecordFormats,
+    setConversionFormats,
     setFOILoader,
     setFOIPDFStitchedRecordForHarms,
     setFOIPDFStitchStatusForHarms
@@ -114,19 +114,16 @@ export const fetchFOIRecords = (requestId, ministryId, ...rest) => {
       .then((res) => {
         if (res.data) {
           dispatch(setRequestRecords(res.data));
-          dispatch(setFOIAttachmentListLoader(false));
           done(null, res.data);
 
         } else {
           console.log("Error in fetching records", res);
           dispatch(serviceActionError(res));
-          dispatch(setFOIAttachmentListLoader(false));
         }
       })
       .catch((error) => {
         console.log("Error in fetching records", error);
         dispatch(serviceActionError(error));
-        dispatch(setFOIAttachmentListLoader(false));
         done(error);
       });
   };
@@ -200,7 +197,6 @@ const postRecord = (dispatch, apiUrl, data, errorMessage, rest, type="download")
   httpPOSTRequest(apiUrl, data)
       .then((res) => {
         if (res.data && res.data.status) {
-            dispatch(setFOIAttachmentListLoader(false));
           done(null, res.data);
         } else {
           dispatch(serviceActionError(res));
@@ -220,6 +216,7 @@ export const getRecordFormats = (...rest) => {
         .then((res) => {
           if (res.data) {
             dispatch(setRecordFormats([... new Set([...res.data.conversion, ...res.data.dedupe, ...res.data.nonredactable])]))
+            dispatch(setConversionFormats(res.data.conversion))
           } else {
             console.log("Error in fetching records formats", res);
             dispatch(serviceActionError(res));

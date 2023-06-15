@@ -57,6 +57,7 @@ import DivisionalTracking from "../DivisionalTracking";
 import HomeIcon from '@mui/icons-material/Home';
 import { RecordsLog } from '../../customComponents/Records';
 import { UnsavedModal } from "../../customComponents";
+import {DISABLE_GATHERINGRECORDS_TAB} from "../../../../constants/constants";
 import _ from 'lodash';
 
 
@@ -567,7 +568,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
                 ? `(${requestNotes.length})`
                 : ""}
             </div>
-            {originalDivisions?.length > 0 &&<div
+            {originalDivisions?.length > 0 && DISABLE_GATHERINGRECORDS_TAB?.toLowerCase() =='false' &&<div
               className={clsx("tablinks", {
                 active: tabLinksStatuses.Records.active,
               })}
@@ -697,11 +698,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
               [classes.hidden]: !tabLinksStatuses.Attachments?.display,
             })}
           >
-            {!isAttachmentListLoading &&
-            iaoassignedToList &&
-            iaoassignedToList.length > 0 &&
-            ministryAssignedToList &&
-            ministryAssignedToList.length > 0 ? (
+            {!isAttachmentListLoading ? (
               <>
                 <AttachmentSection
                   currentUser={userId}
@@ -729,9 +726,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
             })}
           >
             {!isLoading &&
-            requestNotes &&
-            iaoassignedToList?.length > 0 ||
-            ministryAssignedToList?.length > 0 ? (
+            requestNotes ? (
               <>
                 <CommentSection
                   currentUser={
@@ -773,9 +768,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
               [classes.hidden]: !tabLinksStatuses.Records.display,
             })}
           >
-            {!isAttachmentListLoading && originalDivisions?.length > 0 &&
-            (iaoassignedToList?.length > 0 ||
-              ministryAssignedToList?.length > 0) ? (
+            {!isAttachmentListLoading && originalDivisions?.length > 0 ? (
               <>
                 <RecordsLog
                   divisions={originalDivisions}

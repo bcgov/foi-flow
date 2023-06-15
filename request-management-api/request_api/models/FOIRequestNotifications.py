@@ -24,6 +24,7 @@ class FOIRequestNotification(db.Model):
     idnumber = db.Column(db.String(50), unique=False, nullable=True)
     axisnumber = db.Column(db.String(50), unique=False, nullable=True)
     notification = db.Column(JSON, unique=False, nullable=True)
+    isdeleted = db.Column(db.Boolean, unique=False, nullable=True, default=False)
     created_at = db.Column(db.DateTime, default=datetime2.now)
     createdby = db.Column(db.String(120), unique=False, nullable=True)
     updated_at = db.Column(db.DateTime, nullable=True)
@@ -65,9 +66,9 @@ class FOIRequestNotification(db.Model):
         notifications = []
         try:
             sql = """select idnumber, axisnumber, notificationid, notification , notificationtype, userid, notificationusertype, created_at, createdby, requesttype, requestid, foirequestid from (   
-                    select frn.idnumber, frn.axisnumber, frn.requestid, frns.notificationuserid as notificationid, frn.notification -> 'message' as notification , nty.name as notificationtype, frn.created_at , frns.createdby, frns.userid, ntu.name as notificationusertype, 'ministryrequest' requesttype, frn.foirequestid from "FOIRequestNotifications" frn inner join "FOIRequestNotificationUsers" frns on frn.notificationid = frns.notificationid inner join "NotificationTypes" nty on frn.notificationtypeid = nty.notificationtypeid inner join "NotificationUserTypes" ntu on frns.notificationusertypeid = ntu.notificationusertypeid where frns.userid=:userid and frn.created_at  >= current_date - interval :days day
+                    select frn.idnumber, frn.axisnumber, frn.requestid, frns.notificationuserid as notificationid, frn.notification -> 'message' as notification , nty.name as notificationtype, frn.created_at , frns.createdby, frns.userid, ntu.name as notificationusertype, 'ministryrequest' requesttype, frn.foirequestid from "FOIRequestNotifications" frn inner join "FOIRequestNotificationUsers" frns on frn.notificationid = frns.notificationid inner join "NotificationTypes" nty on frn.notificationtypeid = nty.notificationtypeid inner join "NotificationUserTypes" ntu on frns.notificationusertypeid = ntu.notificationusertypeid where frns.userid=:userid and frns.isdeleted = false and frn.created_at  >= current_date - interval :days day
                     union all
-                    select frn.idnumber, frn.axisnumber, frn.requestid, frns.notificationuserid as notificationid, frn.notification -> 'message' as notification, nty.name as notificationtype, frn.created_at , frns.createdby, frns.userid, ntu.name as notificationusertype, 'rawrequest' requesttype, 0 foirequestid  from "FOIRawRequestNotifications" frn inner join "FOIRawRequestNotificationUsers" frns on frn.notificationid = frns.notificationid inner join "NotificationTypes" nty on frn.notificationtypeid = nty.notificationtypeid inner join "NotificationUserTypes" ntu on frns.notificationusertypeid = ntu.notificationusertypeid where frns.userid=:userid and frn.created_at  >= current_date - interval :days day
+                    select frn.idnumber, frn.axisnumber, frn.requestid, frns.notificationuserid as notificationid, frn.notification -> 'message' as notification, nty.name as notificationtype, frn.created_at , frns.createdby, frns.userid, ntu.name as notificationusertype, 'rawrequest' requesttype, 0 foirequestid  from "FOIRawRequestNotifications" frn inner join "FOIRawRequestNotificationUsers" frns on frn.notificationid = frns.notificationid inner join "NotificationTypes" nty on frn.notificationtypeid = nty.notificationtypeid inner join "NotificationUserTypes" ntu on frns.notificationusertypeid = ntu.notificationusertypeid where frns.userid=:userid and frns.isdeleted = false and frn.created_at  >= current_date - interval :days day
                   ) as notf order by created_at desc"""
             rs = db.session.execute(text(sql), {'userid': userid, 'days': days})
             for row in rs:
@@ -118,9 +119,10 @@ class FOIRequestNotification(db.Model):
         return notifications
 
     @classmethod
-    def dismissnotification(cls, notificationids):
+    def dismissnotification(cls, notificationids, userid='system'):
         try:
-            db.session.query(FOIRequestNotification).filter(FOIRequestNotification.notificationid.in_(notificationids)).delete(synchronize_session=False)
+            db.session.query(FOIRequestNotification).filter(FOIRequestNotification.notificationid.in_(notificationids)).update({FOIRequestNotification.isdeleted: True, FOIRequestNotification.updatedby: userid,
+                            FOIRequestNotification.updated_at: datetime2.now()}, synchronize_session=False)
             db.session.commit()  
             return DefaultMethodResult(True,'Notifications deleted ', notificationids)       
         except:
