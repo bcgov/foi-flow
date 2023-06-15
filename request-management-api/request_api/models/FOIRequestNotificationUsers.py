@@ -32,7 +32,7 @@ from .SubjectCodes import SubjectCode
 from .FOIRequestNotifications import FOIRequestNotification
 from .FOIUsers import FOIUser
 from .NotificationTypes import NotificationType
-
+from .FOIRequestStatus import FOIRequestStatus
 class FOIRequestNotificationUser(db.Model):
     # Name of the table in our database
     __tablename__ = 'FOIRequestNotificationUsers' 
@@ -200,6 +200,7 @@ class FOIRequestNotificationUser(db.Model):
 
         selectedcolumns = [
             cast(FOIMinistryRequest.axisrequestid, String).label('axisRequestId'),
+            FOIRequestStatus.name.label('status'),
             FOIRequestNotification.notification["message"].label('notification'),
             FOIRequestNotificationUser.userid.label('to'),
             FOIRequestNotificationUser.createdby.label('createdby'),

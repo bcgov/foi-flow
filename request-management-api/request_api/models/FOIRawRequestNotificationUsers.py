@@ -156,7 +156,8 @@ class FOIRawRequestNotificationUser(db.Model):
         foicreator = aliased(FOIUser)
 
         selectedcolumns = [
-            axisrequestid,            
+            axisrequestid,  
+            FOIRawRequest.status.label('status'),          
             FOIRawRequestNotification.notification["message"].label('notification'),
             FOIRawRequestNotificationUser.userid.label('to'),
             FOIRawRequestNotificationUser.createdby.label('createdby'),
