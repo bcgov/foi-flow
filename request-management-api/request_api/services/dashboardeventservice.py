@@ -44,15 +44,32 @@ class dashboardeventservice:
     def __validateandtransform(self, filterfields, keyword):
         _newvalue = keyword
         _newfilterfields = filterfields
-        try:
-            if keyword not in [None, ""] and len(filterfields) > 0:
-                _newvalue = datetime2.strptime(keyword, '%Y %b %d').strftime('%Y-%m-%d')
-            if  keyword in [None, ""] and "createdat" in _newfilterfields:
-                _newfilterfields.remove("createdat")     
-        except ValueError as ex:
-            if "createdat" in _newfilterfields:
-                _newfilterfields.remove("createdat")
+        dtformats = ['%Y %b %d','%Y %b','%Y']
+        issupportedformat = False
+        if keyword not in [None, ""] and len(filterfields) > 0:
+            for dtformat in dtformats:                    
+                _newvalue, issupportedformat = self.__validatedateinput(_newvalue, dtformat)
+                if issupportedformat == True:
+                    _newvalue=_newvalue+'@'+dtformat
+                    break
+        if  (keyword in [None, ""] or issupportedformat == False) and "createdat" in _newfilterfields:
+            _newfilterfields.remove("createdat")     
         return _newvalue, _newfilterfields
+
+    def __validatedateinput(self, keyword, format):
+        try:
+            newvalue = datetime2.strptime(keyword, format).strftime(self.__getdateformat(format))
+            return newvalue, True
+        except ValueError as ex:
+            return keyword, False  
+
+    def __getdateformat(self, format):
+        if format == '%Y %b %d':
+            return '%Y-%m-%d'
+        elif format == '%Y %b':
+            return '%Y-%m'
+        else:
+            return '%Y'  
 
     def __prepareevent(self, notification):
         return {

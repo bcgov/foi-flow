@@ -11,7 +11,7 @@ import logging
 import json
 from sqlalchemy.sql.sqltypes import DateTime, String, Date
 from sqlalchemy.orm import relationship, backref, aliased
-from sqlalchemy import insert, and_, or_, text, func, literal, cast, asc, desc, case, nullsfirst, nullslast, TIMESTAMP
+from sqlalchemy import insert, and_, or_, text, func, literal, cast, asc, desc, case, nullsfirst, nullslast, TIMESTAMP, extract
 from .FOIAssignees import FOIAssignee
 from .FOIRawRequests import FOIRawRequest
 from .FOIMinistryRequests import FOIMinistryRequest
@@ -257,22 +257,48 @@ class FOIRawRequestNotificationUser(db.Model):
         filtercondition = []
         if(keyword != 'restricted'):
             for field in filterfields:
-                if(field == 'idNumber'):
-                    keyword = keyword.replace('u-00', '')
+                _keyword = FOIRawRequestNotificationUser.getfilterkeyword(keyword, field)
+                #if(field == 'idNumber'):
+                    #keyword = keyword.replace('u-00', '')
                 if(field == 'notification'):
-                    filtercondition.append(FOIRawRequestNotification.notification["message"].astext.cast(String).ilike('%'+keyword+'%'))
+                    filtercondition.append(FOIRawRequestNotification.notification["message"].astext.cast(String).ilike('%'+_keyword+'%'))
                 elif(field == 'createdat'):
-                    filtercondition.append(func.DATE(FOIRawRequestNotification.created_at) == keyword)
+                    vkeyword = keyword.split('@')
+                    _keyword = FOIRawRequestNotificationUser.getfilterkeyword(vkeyword[0], field)
+                    _datevalue = _keyword.split('-')
+                    if vkeyword[1] == '%Y %b %d':
+                        filtercondition.append(and_(
+                            extract('year', FOIRawRequestNotificationUser.created_at) == _datevalue[0],
+                            extract('month', FOIRawRequestNotificationUser.created_at)== _datevalue[1],
+                            extract('day', FOIRawRequestNotificationUser.created_at)== _datevalue[2]))
+                    elif vkeyword[1] == '%Y %b':
+                            filtercondition.append(and_(extract('year', FOIRawRequestNotificationUser.created_at) == _datevalue[0],
+                            extract('month', FOIRawRequestNotificationUser.created_at)== _datevalue[1]))
+                    elif vkeyword[1] == '%Y':
+                            filtercondition.append(extract('year', FOIRawRequestNotificationUser.created_at) == _datevalue[0])
+                    else:
+                        logging.info("unknown format")
                 elif(field == 'firstName'):
-                    filtercondition.append(FOIRawRequestNotificationUser.findfield('contactFirstName').ilike('%'+keyword+'%'))
+                    filtercondition.append(FOIRawRequestNotificationUser.findfield('contactFirstName').ilike('%'+_keyword+'%'))
                 elif(field == 'lastName'):
-                    filtercondition.append(FOIRawRequestNotificationUser.findfield('contactLastName').ilike('%'+keyword+'%'))
+                    filtercondition.append(FOIRawRequestNotificationUser.findfield('contactLastName').ilike('%'+_keyword+'%'))
                 else:
-                    filtercondition.append(FOIRawRequestNotificationUser.findfield(field).ilike('%'+keyword+'%'))
+                    filtercondition.append(FOIRawRequestNotificationUser.findfield(field).ilike('%'+_keyword+'%'))
                 
             filtercondition.append(FOIRawRequest.isiaorestricted == True)
 
         return or_(*filtercondition)
+    
+    @classmethod
+    def getfilterkeyword(cls, keyword, field):
+        _newkeyword = keyword
+        if field != 'createdat':
+            _newkeyword = _newkeyword.replace('@%Y %b %d','')
+            _newkeyword = _newkeyword.replace('@%Y %b','')
+            _newkeyword = _newkeyword.replace('@%Y','')
+        if(field == 'idNumber'):
+            _newkeyword = _newkeyword.replace('u-00', '')
+        return _newkeyword
         
     @classmethod
     def findfield(cls, x):

@@ -5,7 +5,7 @@ from datetime import datetime as datetime2
 from sqlalchemy.orm import relationship,backref, aliased
 from .default_method_result import DefaultMethodResult
 from sqlalchemy.dialects.postgresql import JSON, UUID
-from sqlalchemy import or_, and_, text, func, literal, cast, case, nullslast, nullsfirst, desc, asc
+from sqlalchemy import or_, and_, text, func, literal, cast, case, nullslast, nullsfirst, desc, asc, extract
 from sqlalchemy.sql.sqltypes import String
 from sqlalchemy.sql.expression import distinct
 from sqlalchemy import text
@@ -168,12 +168,27 @@ class FOIRequestNotificationUser(db.Model):
             filtercondition = []
             if(keyword != "restricted"):
                 for field in filterfields:
+                    _keyword = FOIRequestNotificationUser.getfilterkeyword(keyword, field)       
                     if field == "notification":
-                        filtercondition.append(FOIRequestNotification.notification["message"].astext.cast(String).ilike('%'+keyword+'%'))
+                        filtercondition.append(FOIRequestNotification.notification["message"].astext.cast(String).ilike('%'+_keyword+'%'))
                     elif field == "createdat":
-                        filtercondition.append(func.DATE(FOIRequestNotification.created_at) == keyword)
+                        vkeyword = keyword.split('@')
+                        _keyword = FOIRequestNotificationUser.getfilterkeyword(vkeyword[0], field)
+                        _datevalue = _keyword.split('-')
+                        if vkeyword[1] == '%Y %b %d':                            
+                            filtercondition.append(and_(
+                                 extract('year', FOIRequestNotificationUser.created_at) == _datevalue[0],
+                                 extract('month', FOIRequestNotificationUser.created_at)== _datevalue[1],
+                                 extract('day', FOIRequestNotificationUser.created_at)== _datevalue[2]))
+                        elif vkeyword[1] == '%Y %b':
+                            filtercondition.append(and_(extract('year', FOIRequestNotificationUser.created_at) == _datevalue[0],
+                                 extract('month', FOIRequestNotificationUser.created_at)== _datevalue[1]))
+                        elif vkeyword[1] == '%Y':
+                            filtercondition.append(extract('year', FOIRequestNotificationUser.created_at) == _datevalue[0])
+                        else:
+                            logging.info("unknown format")
                     else:
-                        filtercondition.append(FOIRequestNotificationUser.findfield(field, iaoassignee, ministryassignee).ilike('%'+keyword+'%'))
+                        filtercondition.append(FOIRequestNotificationUser.findfield(field, iaoassignee, ministryassignee).ilike('%'+_keyword+'%'))
             else:
                 if(requestby == 'IAO'):
                     filtercondition.append(FOIRestrictedMinistryRequest.isrestricted == True)
@@ -282,6 +297,16 @@ class FOIRequestNotificationUser(db.Model):
         else:
             return dbquery.filter(or_(*filtercondition)) if(len(filterfields) > 0 and keyword is not None) else  dbquery
 
+    @classmethod
+    def getfilterkeyword(cls, keyword, field):
+        _newkeyword = keyword
+        if field != 'createdat':
+            _newkeyword = _newkeyword.replace('@%Y %b %d','')
+            _newkeyword = _newkeyword.replace('@%Y %b','')
+            _newkeyword = _newkeyword.replace('@%Y','')
+        if(field == 'idNumber'):
+            _newkeyword = _newkeyword.replace('u-00', '')
+        return _newkeyword
 
     @classmethod
     def geteventpagination(cls, group, page, size, sortingitems, sortingorders, filterfields, keyword, additionalfilter, userid,isiaorestrictedfilemanager, isministryrestrictedfilemanager):
