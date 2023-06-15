@@ -205,7 +205,8 @@ class FOIRawRequestNotificationUser(db.Model):
 
         if additionalfilter is None:
             if(isiaorestrictedfilemanager == True):
-                return basequery.filter(FOIRawRequest.status.notin_(['Archived']))
+                return basequery
+                #return basequery.filter(FOIRawRequest.status.notin_(['Archived']))
             else:
                 subquery_watchby = FOIRawRequestWatcher.getrequestidsbyuserid(userid)
 
@@ -214,28 +215,33 @@ class FOIRawRequestNotificationUser(db.Model):
                                     subquery_watchby.c.requestid == FOIRawRequest.requestid,
                                     isouter=True
                                 ).filter(
-                                    and_(
-                                        FOIRawRequest.status.notin_(['Archived']),
+                                    #and_(
+                                        #FOIRawRequest.status.notin_(['Archived']),
                                         or_(
                                             FOIRawRequest.isiaorestricted == False,
                                             and_(FOIRawRequest.isiaorestricted == True, FOIRawRequest.assignedto == userid),
-                                            and_(FOIRawRequest.isiaorestricted == True, subquery_watchby.c.watchedby == userid))))
+                                            and_(FOIRawRequest.isiaorestricted == True, subquery_watchby.c.watchedby == userid)))
+                #)
         else:
             if(additionalfilter == 'watchingRequests' and userid is not None):
                 #watchby
                 subquery_watchby = FOIRawRequestWatcher.getrequestidsbyuserid(userid)
-                return basequery.join(subquery_watchby, subquery_watchby.c.requestid == FOIRawRequest.requestid).filter(FOIRawRequest.status.notin_(['Archived']))
+                return basequery.join(subquery_watchby, subquery_watchby.c.requestid == FOIRawRequest.requestid)
+                #return basequery.join(subquery_watchby, subquery_watchby.c.requestid == FOIRawRequest.requestid).filter(FOIRawRequest.status.notin_(['Archived']))
             elif(additionalfilter == 'myRequests'):
                 #myrequest
-                return basequery.filter(and_(FOIRawRequest.status.notin_(['Archived']), FOIRawRequest.assignedto == userid))
+                return basequery.filter(FOIRawRequest.assignedto == userid)
+                #return basequery.filter(and_(FOIRawRequest.status.notin_(['Archived']), FOIRawRequest.assignedto == userid))
             else:
                 if(isiaorestrictedfilemanager == True):
-                    return basequery.filter(FOIRawRequest.status.notin_(['Archived']))
+                    #return basequery.filter(FOIRawRequest.status.notin_(['Archived']))
+                    return basequery
                 else:
                     return basequery.filter(
-                        and_(
-                            FOIRawRequest.status.notin_(['Archived']),
-                            or_(FOIRawRequest.isiaorestricted == False, and_(FOIRawRequest.isiaorestricted == True, FOIRawRequest.assignedto == userid))))
+                        #and_(
+                            #FOIRawRequest.status.notin_(['Archived']),
+                            or_(FOIRawRequest.isiaorestricted == False, and_(FOIRawRequest.isiaorestricted == True, FOIRawRequest.assignedto == userid)))
+                    #)
 
 
     @classmethod
