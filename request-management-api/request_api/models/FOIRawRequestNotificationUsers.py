@@ -266,18 +266,17 @@ class FOIRawRequestNotificationUser(db.Model):
                     vkeyword = keyword.split('@')
                     _keyword = FOIRawRequestNotificationUser.getfilterkeyword(vkeyword[0], field)
                     _datevalue = _keyword.split('-')
-                    if vkeyword[1] == '%Y %b %d':
-                        filtercondition.append(and_(
-                            extract('year', FOIRawRequestNotificationUser.created_at) == _datevalue[0],
-                            extract('month', FOIRawRequestNotificationUser.created_at)== _datevalue[1],
-                            extract('day', FOIRawRequestNotificationUser.created_at)== _datevalue[2]))
-                    elif vkeyword[1] == '%Y %b':
-                            filtercondition.append(and_(extract('year', FOIRawRequestNotificationUser.created_at) == _datevalue[0],
-                            extract('month', FOIRawRequestNotificationUser.created_at)== _datevalue[1]))
-                    elif vkeyword[1] == '%Y':
-                            filtercondition.append(extract('year', FOIRawRequestNotificationUser.created_at) == _datevalue[0])
-                    else:
-                        logging.info("unknown format")
+                    _vkeyword = vkeyword[1].split(' ')
+                    datecriteria = []
+                    for n  in range(len(_datevalue)):
+                        if '%Y' in _vkeyword[n]:
+                            datecriteria.append(extract('year', FOIRawRequestNotificationUser.created_at) == _datevalue[n])
+                        if '%b' in _vkeyword[n]:
+                            datecriteria.append(extract('month', FOIRawRequestNotificationUser.created_at) == _datevalue[n])
+                        if '%d' in _vkeyword[n]:
+                            datecriteria.append(extract('day', FOIRawRequestNotificationUser.created_at) == _datevalue[n])
+                    if len(datecriteria) > 0:
+                        filtercondition.append(and_(*datecriteria))   
                 elif(field == 'firstName'):
                     filtercondition.append(FOIRawRequestNotificationUser.findfield('contactFirstName').ilike('%'+_keyword+'%'))
                 elif(field == 'lastName'):

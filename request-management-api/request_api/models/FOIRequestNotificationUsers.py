@@ -175,18 +175,17 @@ class FOIRequestNotificationUser(db.Model):
                         vkeyword = keyword.split('@')
                         _keyword = FOIRequestNotificationUser.getfilterkeyword(vkeyword[0], field)
                         _datevalue = _keyword.split('-')
-                        if vkeyword[1] == '%Y %b %d':                            
-                            filtercondition.append(and_(
-                                 extract('year', FOIRequestNotificationUser.created_at) == _datevalue[0],
-                                 extract('month', FOIRequestNotificationUser.created_at)== _datevalue[1],
-                                 extract('day', FOIRequestNotificationUser.created_at)== _datevalue[2]))
-                        elif vkeyword[1] == '%Y %b':
-                            filtercondition.append(and_(extract('year', FOIRequestNotificationUser.created_at) == _datevalue[0],
-                                 extract('month', FOIRequestNotificationUser.created_at)== _datevalue[1]))
-                        elif vkeyword[1] == '%Y':
-                            filtercondition.append(extract('year', FOIRequestNotificationUser.created_at) == _datevalue[0])
-                        else:
-                            logging.info("unknown format")
+                        datecriteria = []
+                        _vkeyword = vkeyword[1].split(' ')
+                        for n  in range(len(_datevalue)):
+                            if '%Y' in _vkeyword[n]:
+                                datecriteria.append(extract('year', FOIRequestNotificationUser.created_at) == _datevalue[n])
+                            if '%b' in _vkeyword[n]:
+                                datecriteria.append(extract('month', FOIRequestNotificationUser.created_at) == _datevalue[n])
+                            if '%d' in _vkeyword[n]:
+                                datecriteria.append(extract('day', FOIRequestNotificationUser.created_at) == _datevalue[n])
+                        if len(datecriteria) > 0:
+                            filtercondition.append(and_(*datecriteria)) 
                     else:
                         filtercondition.append(FOIRequestNotificationUser.findfield(field, iaoassignee, ministryassignee).ilike('%'+_keyword+'%'))
             else:

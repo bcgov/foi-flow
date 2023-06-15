@@ -4,9 +4,6 @@ from re import VERBOSE
 from request_api.models.FOIRequestNotificationUsers import FOIRequestNotificationUser
 from request_api.models.FOIRawRequestNotificationUsers import FOIRawRequestNotificationUser
 
-import json
-import base64
-import maya
 from request_api.auth import AuthHelper
 from dateutil import tz, parser
 from flask import jsonify
@@ -44,10 +41,10 @@ class dashboardeventservice:
     def __validateandtransform(self, filterfields, keyword):
         _newvalue = keyword
         _newfilterfields = filterfields
-        dtformats = ['%Y %b %d','%Y %b','%Y']
+        dtformats = ['%Y %b %d','%Y %b','%b %d','%d','%b','%Y']
         issupportedformat = False
         if keyword not in [None, ""] and len(filterfields) > 0:
-            for dtformat in dtformats:                    
+            for dtformat in dtformats:  
                 _newvalue, issupportedformat = self.__validatedateinput(_newvalue, dtformat)
                 if issupportedformat == True:
                     _newvalue=_newvalue+'@'+dtformat
@@ -58,18 +55,37 @@ class dashboardeventservice:
 
     def __validatedateinput(self, keyword, format):
         try:
-            newvalue = datetime2.strptime(keyword, format).strftime(self.__getdateformat(format))
+            _toformat = self.__getdateformat(format)
+            if _toformat is not None:
+                newvalue = datetime2.strptime(keyword, format).strftime(_toformat)
             return newvalue, True
         except ValueError as ex:
             return keyword, False  
 
     def __getdateformat(self, format):
+        """_summary_
+        Supported Formats: 
+        2023 Jun 15
+        2023 Jun
+        Jun 15
+        2023
+        Jun
+        15     
+        """
         if format == '%Y %b %d':
             return '%Y-%m-%d'
         elif format == '%Y %b':
             return '%Y-%m'
+        elif format == '%b %d':
+            return '%m-%d'
+        elif format == '%d':
+            return '%d'
+        elif format == '%b':
+            return '%m'
+        elif format == '%Y':
+            return '%Y'
         else:
-            return '%Y'  
+            return None  
 
     def __prepareevent(self, notification):
         return {
