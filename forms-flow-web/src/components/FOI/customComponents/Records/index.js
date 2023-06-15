@@ -169,7 +169,7 @@ export const RecordsLog = ({
   const [totalUploadedRecordSize, setTotalUploadedRecordSize] = useState(0);
   useEffect(() => {
     setRecords(recordsObj?.records)
-    let nonDuplicateRecords = recordsObj?.records.filter(record => !record.isduplicate)
+    let nonDuplicateRecords = recordsObj?.records?.filter(record => !record.isduplicate)
     let totalUploadedSize= (calculateTotalUploadedFileSizeInKB(nonDuplicateRecords)/ (1024 * 1024))
     setTotalUploadedRecordSize(parseFloat(totalUploadedSize.toFixed(4)));
     dispatch(checkForRecordsChange(requestId, ministryId))
@@ -540,7 +540,6 @@ export const RecordsLog = ({
           recordsArray.push(..._filteredAttachments)   
         }         
     }
-
     //form the final attributes for the message
     const attributes = []
     for (const _key in divisionObj) {
@@ -637,7 +636,7 @@ export const RecordsLog = ({
     record.trigger = 'recordretry';
     record.service = record.failed ? record.failed : 'all';
     if (record.isattachment) {
-      var parentRecord = recordsObj.records.find(r => r.recordid = record.rootparentid);
+      var parentRecord = recordsObj?.records?.find(r => r.recordid = record.rootparentid);
       record.attributes.divisions = parentRecord.attributes.divisions;
       record.attributes.batch = parentRecord.attributes.batch;
       record.attributes.extension = record['s3uripath'].substr(record['s3uripath'].lastIndexOf("."), record['s3uripath'].length);
@@ -654,14 +653,14 @@ export const RecordsLog = ({
 
   const removeAttachments = () => {
     setDeleteModalOpen(false);
-    var attachments = records.reduce((acc, record) => {return record.attachments ? acc.concat(record.attachments.map(a => a.filepath)) : acc}, []);
+    var attachments = records?.reduce((acc, record) => {return record.attachments ? acc.concat(record.attachments.map(a => a.filepath)) : acc}, []);
     dispatch(deleteReviewerRecords({filepaths: attachments, ministryrequestid :ministryId},(err, _res) => {
       dispatchRequestAttachment(err);
     }));
   }
 
-  const hasDocumentsToExport = records.filter(record => !(isMinistryCoordinator && record.category == 'personal')).length > 0;
-  const hasDocumentsToDownload = records.filter(record => record.category !== 'personal').length > 0;
+  const hasDocumentsToExport = records?.filter(record => !(isMinistryCoordinator && record.category == 'personal')).length > 0;
+  const hasDocumentsToDownload = records?.filter(record => record.category !== 'personal').length > 0;
 
   const handlePopupButtonClick = (action, _record) => {
     setUpdateAttachment(_record);
@@ -814,7 +813,7 @@ export const RecordsLog = ({
         )
       }
     }
-    return _recordsArray.filter(filterFunction)
+    return _recordsArray?.filter(filterFunction)
     }
 
   return (
@@ -851,7 +850,7 @@ export const RecordsLog = ({
             alignItems="flex-start"
             spacing={1}
           >
-            <ConditionalComponent condition={records.filter(record => record.attachments?.length > 0).length > 0}>
+            <ConditionalComponent condition={records?.filter(record => record.attachments?.length > 0).length > 0}>
             <Grid item xs={3}>
                 <button
                   className="btn addAttachment foi-export-button"
@@ -944,7 +943,7 @@ export const RecordsLog = ({
                 >
                   + Upload Records
                 </button> :
-                (records.length > 0 && DISABLE_REDACT_WEBLINK?.toLowerCase() =='false' && <a href={DOC_REVIEWER_WEB_URL + "/foi/" + ministryId}>
+                (records?.length > 0 && DISABLE_REDACT_WEBLINK?.toLowerCase() =='false' && <a href={DOC_REVIEWER_WEB_URL + "/foi/" + ministryId}>
                   <button
                     className={clsx("btn", "addAttachment", classes.createButton)}
                     variant="contained"
@@ -1107,7 +1106,7 @@ export const RecordsLog = ({
               alignItems="flex-start"
               className={classes.recordLog}
             >
-              {records.map((record, i) =>
+              {records?.map((record, i) =>
                 <Attachment
                   key={i}
                   indexValue={i}
@@ -1540,7 +1539,7 @@ const AttachmentPopup = React.memo(({indexValue, record, handlePopupButtonClick,
                 setPopoverOpen(false);
             }}
           >
-            Download Converted
+            {(record.attributes?.isattachment && record.attributes?.trigger === 'recordreplace') ? 'Download Replaced' : 'Download Converted'}
           </MenuItem>}
           <MenuItem
             onClick={() => {
