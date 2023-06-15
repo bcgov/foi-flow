@@ -41,7 +41,7 @@ class recordservice(recordservicebase):
     def update(self, requestid, ministryrequestid, requestdata, userid):
         newrecords = []
         recordids = [r['recordid'] for r in requestdata['records'] if r.get('recordid') is not None]
-        response = {}
+        response = DefaultMethodResult(True, 'No recordids')
         if(len(recordids) > 0):
             records = FOIRequestRecord.getrecordsbyid(recordids)
             for record in records:
@@ -55,7 +55,7 @@ class recordservice(recordservicebase):
                 newrecords.append(newrecord)
             response = FOIRequestRecord.create(newrecords)
             print('response', response)
-        if (response.get('success') or len(recordids) == 0):
+        if response.success:
             if requestdata['isdelete']:
                 _apiresponse, err = self.makedocreviewerrequest('POST', '/api/document/delete', {'ministryrequestid': ministryrequestid, 'filepaths': [record['filepath'] for record in requestdata['records']]})
             else:
