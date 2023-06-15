@@ -54,7 +54,6 @@ class recordservice(recordservicebase):
                 newrecord.__dict__.update(record)
                 newrecords.append(newrecord)
             response = FOIRequestRecord.create(newrecords)
-            print('response', response)
         if response.success:
             if requestdata['isdelete']:
                 _apiresponse, err = self.makedocreviewerrequest('POST', '/api/document/delete', {'ministryrequestid': ministryrequestid, 'filepaths': [record['filepath'] for record in requestdata['records']]})
