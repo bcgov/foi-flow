@@ -307,6 +307,7 @@ export const RecordsLog = ({
                 }
                 documentDetails.attributes.convertedfilesize = _file.size
                 documentDetails.attributes.trigger = 'recordreplace'
+                delete documentDetails.outputdocumentmasterid
               } else {
                 documentDetails = {
                   s3uripath: header.filepathdb,
