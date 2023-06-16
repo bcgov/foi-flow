@@ -71,7 +71,7 @@ class applicantcorrespondenceservice:
             "applicantcorrespondenceid":_correpondencelog['applicantcorrespondenceid'],
             "parentapplicantcorrespondenceid":_correpondencelog['parentapplicantcorrespondenceid'],
             "templateid":_correpondencelog['templateid'],
-            "text": self.__getvaluefromschema(_sentcorrespondencemessagejson, 'message') if _sentcorrespondencemessagejson is not None else self.__getvaluefromjson(_correspondencemessagejson, 'emailhtml') ,
+            "text": self.__getvaluefromschema(_sentcorrespondencemessagejson, 'message') if _sentcorrespondencemessagejson is not None else self.__getvaluefromjson(_correspondencemessagejson, 'emailhtml') if _isjson else None,
             "id": self.__getvaluefromjson(_correspondencemessagejson, 'id') if _isjson else None,
             "type": self.__getvaluefromjson(_correspondencemessagejson, 'type') if _isjson else None,
             "created_at":_correpondencelog['sent_at'] if _sentcorrespondencemessagejson is not None else _correpondencelog['created_at'],
