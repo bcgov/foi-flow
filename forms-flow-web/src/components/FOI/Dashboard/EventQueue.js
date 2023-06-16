@@ -116,30 +116,56 @@ const EventQueue = ({ userDetail, eventQueueTableInfo }) => {
     let url = ''
     if (e.row?.status?.toLowerCase() !== 'archived') {
       if (e.row?.notificationType?.toLowerCase()?.includes('comments')) {
-        if (isMinistry) {
-          url = `/foi/ministryreview/${e.row.requestid}/ministryrequest/${e.row.ministryrequestid}/commnets`
-        }
-        else if (e.row.ministryrequestid) {
-          url = `/foi/foirequests/${e.row.requestid}/ministryrequest/${e.row.ministryrequestid}/commnets`
-        }
-        else {
-          url = `/foi/reviewrequest/${e.row.requestid}/commnets`
-        }
+        url = redirectToComments(isMinistry, e.row.requestid, e.row.ministryrequestid)
+      }
+      else if (e.row?.notificationType?.toLowerCase()?.includes('pdfstitch')) {
+        url = redirectToRecords(isMinistry, e.row.requestid, e.row.ministryrequestid)
       }
       else {
-        if (isMinistry) {
-          url = `/foi/ministryreview/${e.row.requestid}/ministryrequest/${e.row.ministryrequestid}`
-        }
-        else if (e.row.ministryrequestid) {
-          url = `/foi/foirequests/${e.row.requestid}/ministryrequest/${e.row.ministryrequestid}`
-        }
-        else {
-          url = `/foi/reviewrequest/${e.row.requestid}`
-        }
+        url = redirectToRequestView(isMinistry, e.row.requestid, e.row.ministryrequestid)
       }    
       dispatch(push(url));
     }
   };
+
+  const redirectToRequestView = (isMinistry, requestid,  ministryrequestid) => {
+    let url = "";
+    if (isMinistry) {
+      url = `/foi/ministryreview/${requestid}/ministryrequest/${ministryrequestid}`
+    }
+    else if (ministryrequestid) {
+      url = `/foi/foirequests/${requestid}/ministryrequest/${ministryrequestid}`
+    }
+    else {
+      url = `/foi/reviewrequest/${requestid}`
+    }
+    return url;
+  }
+
+  const redirectToComments = (isMinistry, requestid,  ministryrequestid) => {
+    let url = "";
+    if (isMinistry) {
+      url = `/foi/ministryreview/${requestid}/ministryrequest/${ministryrequestid}/comments`
+    }
+    else if (ministryrequestid) {
+      url = `/foi/foirequests/${requestid}/ministryrequest/${ministryrequestid}/comments`
+    }
+    else {
+      url = `/foi/reviewrequest/${requestid}/comments`
+    }
+    return url;
+  }
+
+  const redirectToRecords = (isMinistry, requestid,  ministryrequestid) => {
+    let url = "";
+    if (isMinistry) {
+      url = `/foi/ministryreview/${requestid}/ministryrequest/${ministryrequestid}/records`
+    }
+    else {
+      url = `/foi/foirequests/${requestid}/ministryrequest/${ministryrequestid}/records`
+    }   
+    return url;
+  }
 
   if (eventQueue === null) {
     return (
