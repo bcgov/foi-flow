@@ -120,30 +120,31 @@ const EventQueue = ({ userDetail, eventQueueTableInfo }) => {
 
   const renderReviewRequest = (e) => {
     let url = ''
-
-    if (e.row?.notificationType?.toLowerCase()?.includes('comments')) {
-      if (isMinistry) {
-        url = `/foi/ministryreview/${e.row.requestid}/ministryrequest/${e.row.ministryrequestid}/commnets`
-      }
-      else if (e.row.ministryrequestid) {
-        url = `/foi/foirequests/${e.row.requestid}/ministryrequest/${e.row.ministryrequestid}/commnets`
+    if (e.row?.status?.toLowerCase() !== 'archived') {
+      if (e.row?.notificationType?.toLowerCase()?.includes('comments')) {
+        if (isMinistry) {
+          url = `/foi/ministryreview/${e.row.requestid}/ministryrequest/${e.row.ministryrequestid}/commnets`
+        }
+        else if (e.row.ministryrequestid) {
+          url = `/foi/foirequests/${e.row.requestid}/ministryrequest/${e.row.ministryrequestid}/commnets`
+        }
+        else {
+          url = `/foi/reviewrequest/${e.row.requestid}/commnets`
+        }
       }
       else {
-        url = `/foi/reviewrequest/${e.row.requestid}/commnets`
-      }
+        if (isMinistry) {
+          url = `/foi/ministryreview/${e.row.requestid}/ministryrequest/${e.row.ministryrequestid}`
+        }
+        else if (e.row.ministryrequestid) {
+          url = `/foi/foirequests/${e.row.requestid}/ministryrequest/${e.row.ministryrequestid}`
+        }
+        else {
+          url = `/foi/reviewrequest/${e.row.requestid}`
+        }
+      }    
+      dispatch(push(url));
     }
-    else {
-      if (isMinistry) {
-        url = `/foi/ministryreview/${e.row.requestid}/ministryrequest/${e.row.ministryrequestid}`
-      }
-      else if (e.row.ministryrequestid) {
-        url = `/foi/foirequests/${e.row.requestid}/ministryrequest/${e.row.ministryrequestid}`
-      }
-      else {
-        url = `/foi/reviewrequest/${e.row.requestid}`
-      }
-    }    
-    dispatch(push(url));
   };
 
   if (eventQueue === null) {
