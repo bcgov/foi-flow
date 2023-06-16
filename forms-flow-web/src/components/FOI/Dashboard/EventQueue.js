@@ -10,7 +10,7 @@ import { setEventQueueFilter, setEventQueueParams } from "../../../actions/FOI/f
 import {
   debounce,
   ClickableChip,
-  updateSortModel,
+  updateEventSortModel,
 } from "./utils";
 import { isMinistryLogin } from "../../../helper/FOI/helper";
 import Grid from "@mui/material/Grid";
@@ -27,10 +27,8 @@ const EventQueue = ({ userDetail, eventQueueTableInfo }) => {
 
   const userGroups = userDetail && userDetail?.groups?.map(group => group.slice(1));
   const isMinistry = isMinistryLogin(userGroups);
-  console.log(`isMinistry == ${isMinistry}`)
   const eventQueue = useSelector((state) => state.foiRequests.foiEventsList);
   const isLoading = useSelector((state) => state.foiRequests.isLoading);
-  console.log(`eventQueue == ${JSON.stringify(eventQueue)}`)
   const classes = useStyles();
 
   const filterFields = [
@@ -58,11 +56,8 @@ const EventQueue = ({ userDetail, eventQueueTableInfo }) => {
   const keyword = useSelector((state) => state.foiRequests.eventQueueParams?.keyword);
   const eventFilter = useSelector((state) => state.foiRequests.eventQueueFilter);
 
-  console.log(`eventFilter = ${JSON.stringify(eventFilter)}`)
-
   useEffect(() => {
-    serverSortModel = updateSortModel(sortModel);
-    console.log(`isMinistry UE == ${isMinistry}`)
+    serverSortModel = updateEventSortModel(sortModel, isMinistry);
     if (isMinistry)
     {
       // page+1 here, because initial page value is 0 for mui-data-grid
@@ -116,35 +111,61 @@ const EventQueue = ({ userDetail, eventQueueTableInfo }) => {
     return eventQueue?.data || [];
   }, [JSON.stringify(eventQueue)]);
 
-  console.log(`rows == ${JSON.stringify(rows)}`)
 
   const renderReviewRequest = (e) => {
     let url = ''
-
-    if (e.row?.notificationType?.toLowerCase()?.includes('comments')) {
-      if (isMinistry) {
-        url = `/foi/ministryreview/${e.row.requestid}/ministryrequest/${e.row.ministryrequestid}/commnets`
+    if (e.row?.status?.toLowerCase() !== 'archived') {
+      if (e.row?.notificationType?.toLowerCase()?.includes('comments')) {
+        url = redirectToComments(isMinistry, e.row.requestid, e.row.ministryrequestid)
       }
-      else if (e.row.ministryrequestid) {
-        url = `/foi/foirequests/${e.row.requestid}/ministryrequest/${e.row.ministryrequestid}/commnets`
+      else if (e.row?.notificationType?.toLowerCase()?.includes('pdfstitch')) {
+        url = redirectToRecords(isMinistry, e.row.requestid, e.row.ministryrequestid)
       }
       else {
-        url = `/foi/reviewrequest/${e.row.requestid}/commnets`
-      }
+        url = redirectToRequestView(isMinistry, e.row.requestid, e.row.ministryrequestid)
+      }    
+      dispatch(push(url));
+    }
+  };
+
+  const redirectToRequestView = (isMinistry, requestid,  ministryrequestid) => {
+    let url = "";
+    if (isMinistry) {
+      url = `/foi/ministryreview/${requestid}/ministryrequest/${ministryrequestid}`
+    }
+    else if (ministryrequestid) {
+      url = `/foi/foirequests/${requestid}/ministryrequest/${ministryrequestid}`
     }
     else {
-      if (isMinistry) {
-        url = `/foi/ministryreview/${e.row.requestid}/ministryrequest/${e.row.ministryrequestid}`
-      }
-      else if (e.row.ministryrequestid) {
-        url = `/foi/foirequests/${e.row.requestid}/ministryrequest/${e.row.ministryrequestid}`
-      }
-      else {
-        url = `/foi/reviewrequest/${e.row.requestid}`
-      }
-    }    
-    dispatch(push(url));
-  };
+      url = `/foi/reviewrequest/${requestid}`
+    }
+    return url;
+  }
+
+  const redirectToComments = (isMinistry, requestid,  ministryrequestid) => {
+    let url = "";
+    if (isMinistry) {
+      url = `/foi/ministryreview/${requestid}/ministryrequest/${ministryrequestid}/comments`
+    }
+    else if (ministryrequestid) {
+      url = `/foi/foirequests/${requestid}/ministryrequest/${ministryrequestid}/comments`
+    }
+    else {
+      url = `/foi/reviewrequest/${requestid}/comments`
+    }
+    return url;
+  }
+
+  const redirectToRecords = (isMinistry, requestid,  ministryrequestid) => {
+    let url = "";
+    if (isMinistry) {
+      url = `/foi/ministryreview/${requestid}/ministryrequest/${ministryrequestid}/records`
+    }
+    else {
+      url = `/foi/foirequests/${requestid}/ministryrequest/${ministryrequestid}/records`
+    }   
+    return url;
+  }
 
   if (eventQueue === null) {
     return (
@@ -260,7 +281,6 @@ const EventQueue = ({ userDetail, eventQueueTableInfo }) => {
           headerHeight={50}
           rowCount={eventQueue?.meta?.total || 0}
           pageSize={rowsState?.pageSize}
-          // rowsPerPageOptions={[10]}
           hideFooterSelectedRowCount={true}
           disableColumnMenu={true}
           pagination
@@ -273,7 +293,7 @@ const EventQueue = ({ userDetail, eventQueueTableInfo }) => {
           components={{
             Footer: ()=> <CustomFooter rowCount={eventQueue?.meta?.total || 0} defaultSortModel={eventQueueTableInfo.sort} footerFor={"queue"}></CustomFooter>
           }}
-          sortingOrder={["desc", "asc"]}
+          sortingOrder={["asc", "desc"]}
           sortModel={[sortModel[0]]}
           sortingMode={"server"}
           onSortModelChange={(model) => {
@@ -281,18 +301,6 @@ const EventQueue = ({ userDetail, eventQueueTableInfo }) => {
               handleSortChange(model);
             }
           }}
-          // getRowClassName={(params) =>
-          //   clsx(
-          //     `super-app-theme--${params.row.currentState
-          //       .toLowerCase()
-          //       .replace(/ +/g, "")}`,
-          //       eventQueueTableInfo?.stateClassName?.[
-          //       params.row.currentState.toLowerCase().replace(/ +/g, "")
-          //     ],
-          //     (params.row.assignedTo == null && userDetail?.groups?.indexOf("/" + params.row.assignedGroup) > -1)
-          //     && eventQueueTableInfo?.noAssignedClassName
-          //   )
-          // }
           onRowClick={renderReviewRequest}
           loading={isLoading}
         />

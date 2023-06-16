@@ -19,6 +19,8 @@ import {
 } from '@draft-js-plugins/buttons';
 import {namesort,suggestionList } from './commentutils'
 
+import { getFullnameList } from '../../../../helper/FOI/helper'
+
 
 const staticToolbarPlugin = createToolbarPlugin();
 const mentionPlugin = createMentionPlugin();
@@ -33,8 +35,8 @@ const AddCommentField = ({ cancellor, parentId, add, fullnameList , restrictedRe
   const [open, setOpen] = useState(false);
   const isCommentTagListLoading = useSelector((state) => state.foiRequests.isCommentTagListLoading);
   let fulluserlist = suggestionList([...fullnameList]).sort(namesort)
-  const mentionList = isRestricted ? restrictedReqTaglist :fulluserlist;
-  const [suggestions, setSuggestions] = useState(isCommentTagListLoading ? [{name: 'Loading...'}] : mentionList);
+  const [mentionList, setMentionList] = useState(isCommentTagListLoading ? [{name: 'Loading...'}] : isRestricted ? restrictedReqTaglist :fulluserlist);
+  const [suggestions, setSuggestions] = useState(mentionList);
   const [editorState, setEditorState] = useState(EditorState.createEmpty())
   const onOpenChange = (_open) => {
     setOpen(_open);
@@ -42,7 +44,7 @@ const AddCommentField = ({ cancellor, parentId, add, fullnameList , restrictedRe
 
   // Check editor text for mentions
   const onSearchChange = ({ value }) => {
-    let filterlist = mentionList.filter(function(item){
+    let filterlist = isCommentTagListLoading ? mentionList : mentionList.filter(function(item){
       return (item.firstname?.toLowerCase()?.indexOf(value.toLowerCase()) === 0 || item.lastname?.toLowerCase()?.indexOf(value.toLowerCase()) === 0)
     }).sort(namesort)  
     setSuggestions(defaultSuggestionsFilter(value, filterlist))
@@ -182,8 +184,9 @@ const AddCommentField = ({ cancellor, parentId, add, fullnameList , restrictedRe
   })
 
   useEffect(() => {
-    setSuggestions(isCommentTagListLoading ? [{name: 'Loading...'}] : mentionList);
-  }, [isCommentTagListLoading, mentionList])
+    setMentionList(isCommentTagListLoading ? [{name: 'Loading...'}] : isRestricted ? restrictedReqTaglist :suggestionList([...getFullnameList()]).sort(namesort));
+    setSuggestions(isCommentTagListLoading ? [{name: 'Loading...'}] : isRestricted ? restrictedReqTaglist :suggestionList([...getFullnameList()]).sort(namesort));
+  }, [isCommentTagListLoading, restrictedReqTaglist])
 
   let formclass = !parentId ? "parentform form" : "form"
   formclass = add ? `${formclass} addform` : formclass

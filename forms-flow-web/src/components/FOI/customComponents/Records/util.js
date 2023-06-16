@@ -13,19 +13,20 @@ const sortAttachmentsByLastModified = (attachments) => (
     attachments.sort((a, b) => new Date(a?.attributes?.lastmodified) - new Date(b?.attributes?.lastmodified))
   );
   
-export const getPDFFilePath = (item) => {
+export const getPDFFilePath = (item, conversionFormats) => {
  
     let pdffilepath = item.s3uripath
     let pdffilename = item.filename
  
-    if (item.isredactionready && ['.doc','.docx','.xls','.xlsx', '.ics', '.msg'].includes(item.attributes?.extension?.toLowerCase())) {
+    if (((item.isredactionready && conversionFormats.includes(item.attributes?.extension?.toLowerCase())) ||
+    (item.attributes?.isattachment && item.attributes?.trigger === 'recordreplace'))) {
         pdffilepath = pdffilepath.substr(0, pdffilepath.lastIndexOf(".")) + ".pdf";
         pdffilename += ".pdf";
     }
     return [pdffilepath, pdffilename];
  }
 
- function arrangeAttachments(attachments, parentDocumentMasterId) {
+ function arrangeAttachments(attachments, parentDocumentMasterId, conversionFormats) {
     const attachmentsMap = {};
     const arrangedAttachments = [];
   
@@ -51,15 +52,15 @@ export const getPDFFilePath = (item) => {
   
     // Start arranging attachments from the root level
     arrangeChildren(parentDocumentMasterId);
-    getUpdatedRecords(arrangedAttachments, true)
-    return getUpdatedRecords(arrangedAttachments, true)
+    getUpdatedRecords(arrangedAttachments, conversionFormats, true)
+    return getUpdatedRecords(arrangedAttachments, conversionFormats, true)
   
   }
  
  // Get records with only necessary fields
- export const getUpdatedRecords = (_records, isattachment=false) =>{
+ export const getUpdatedRecords = (_records, conversionFormats, isattachment=false) =>{
     return _records.map(_record => {
-        const [filepath, filename] = getPDFFilePath(_record)
+        const [filepath, filename] = getPDFFilePath(_record, conversionFormats)
         const deduplicatedAttachments = _record?.attachments?.length > 0 ? removeDuplicateFiles(_record.attachments): []
         const sortedAttachments = sortAttachmentsByLastModified(deduplicatedAttachments)
         const _recordObj =
@@ -72,7 +73,7 @@ export const getPDFFilePath = (item) => {
                 isduplicate: _record.isduplicate,
                 divisions: _record.attributes.divisions,
                 divisionids: _record.attributes.divisions.map(d => d.divisionid),
-                attachments: !isattachment ? arrangeAttachments(sortedAttachments, _record.documentmasterid) : undefined
+                attachments: !isattachment ? arrangeAttachments(sortedAttachments, _record.documentmasterid, conversionFormats) : undefined
             }
         return _recordObj
         
@@ -125,7 +126,7 @@ export const sortDivisionalFiles = (divisionMap) => {
 }
 
 export const calculateTotalUploadedFileSizeInKB = (records) => {
-    return records.reduce((total, record) => {
+    return records?.reduce((total, record) => {
         return total + (record.attributes.convertedfilesize ? record.attributes.convertedfilesize : record.attributes.filesize);
     }, 0);
 }

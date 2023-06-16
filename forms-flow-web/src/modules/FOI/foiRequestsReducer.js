@@ -95,6 +95,7 @@ const initialState = {
   'application/vnd.ms-excel.sheet.macroEnabled.12','.msg', '.eml', '.xls', '.xlsx', '.doc', '.docx', '.ics','.json',
    '.shx', '.shp','.dbf','.kml','.kmz','.geojson','.cpg','.prj','.sbn','.sbx','.gml','.gdb','.freelist','.atx','.gpkg','.mbtiles','.mpk','.wkt',
   '.las','.lasd','.laz','.dwf','.dwg','.dxf','.csv','.txt','.png','.jpg'],
+  conversionFormats: [],
   
 };
 
@@ -224,6 +225,8 @@ const foiRequests = (state = initialState, action) => {
       return { ...state, restrictedReqTaglist: action.payload };
     case FOI_ACTION_CONSTANTS.RECORD_FORMATS:
       return { ...state, recordFormats: action.payload };
+    case FOI_ACTION_CONSTANTS.CONVERSION_FORMATS:
+      return { ...state, conversionFormats: action.payload };
     default:
       return state;
   }
