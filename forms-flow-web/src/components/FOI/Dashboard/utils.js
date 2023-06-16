@@ -96,6 +96,57 @@ export const updateSortModel = (sortModel) => {
   return smodel;
 };
 
+export const updateEventSortModel = (sortModel, isMinistry) => {
+  let smodel = JSON.parse(JSON.stringify(sortModel));
+  if (smodel) {
+    let field = smodel[0]?.field;
+    let order = smodel[0]?.sort;
+    console.log(`field = ${field}`)
+    // if (field == "createdby") {
+    //   smodel.shift();
+    //   smodel.unshift(
+    //     { field: "creatorLastName", sort: order },
+    //     { field: "creatorFirstName", sort: order }
+    //   );
+    // }
+
+    // if (field == "to") {
+    //   smodel.shift();
+    //   smodel.unshift(
+    //     { field: "userLastName", sort: order },
+    //     { field: "userFirstName", sort: order }
+    //   );
+    // }
+
+    // if (field == "assignedTo" && !isMinistry) {
+    //   smodel.shift();
+    //   smodel.unshift(
+    //     { field: "assignedToLastName", sort: order },
+    //     { field: "assignedToFirstName", sort: order },
+    //     { field: "assignedGroup", sort: order }
+    //   );
+    // }
+
+    // if (field == "assignedTo" && isMinistry) {
+    //   smodel.shift();
+    //   smodel.unshift(
+    //     { field: "assignedministrypersonLastName", sort: order },
+    //     { field: "assignedministrypersonFirstName", sort: order },
+    //     { field: "assignedministrygroup", sort: order } 
+    //   );
+    // }
+
+    //add createdat to default sorting
+    if (smodel.length == 1 && field == "defaultSorting") {
+      smodel.push(
+        { field: "createdat", sort: order },
+      );
+    }
+  }
+
+  return smodel;
+};
+
 export const getFullName = (firstName, lastName) => {
   if (!firstName && !lastName) {
     return "";
@@ -233,4 +284,18 @@ export const cellTooltipRender = (params) => {
   }>
     <span className="table-cell-truncate">{params.row.axisRequestId}</span>
   </LightTooltip>
+};
+
+export const eventCellTooltipRender = (params) => {
+
+  let notification = params.row?.notification;
+  if (notification?.length > 55) {
+  const truncatedNotification = notification?.length > 55 ? notification?.slice(0, 55) + '...' : notification;
+
+  return (
+    <LightTooltip placement="bottom-start" title={<div style={{ whiteSpace: 'pre-line' }}>{notification}</div>}>
+      <span className="table-cell-truncate">{truncatedNotification}</span>
+    </LightTooltip>
+  );
+  }
 };
