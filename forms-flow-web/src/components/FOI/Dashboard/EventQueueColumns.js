@@ -34,11 +34,11 @@ import {
       valueGetter: (params) => getUserFullName(params.row.userFirstName, params.row.userLastName, params.row.to),
     },
     {
-      field: "assignedTo",
+      field: "assignedToFormatted",
       headerName: "ASSIGNEE",
       headerAlign: "left",
       width: 160,
-      valueGetter: (params) => getUserFullName(params.row.assignedToFirstName, params.row.assignedToLastName, params.row.assignedTo, params.row.assignedGroup),
+      // valueGetter: (params) => getUserFullName(params.row.assignedToFirstName, params.row.assignedToLastName, params.row.assignedTo, params.row.assignedGroup),
     },
   
     {
@@ -80,11 +80,11 @@ import {
       valueGetter: (params) => getUserFullName(params.row.userFirstName, params.row.userLastName, params.row.to),
     },
     {
-      field: "assignedTo",
+      field: "ministryAssignedToFormatted",
       headerName: "ASSIGNEE",
       headerAlign: "left",
       width: 160,
-      valueGetter: (params) => getUserFullName(params.row.assignedministrypersonFirstName, params.row.assignedministrypersonLastName, params.row.assignedministryperson, params.row.assignedministrygroup),
+      // valueGetter: (params) => getUserFullName(params.row.assignedministrypersonFirstName, params.row.assignedministrypersonLastName, params.row.assignedministryperson, params.row.assignedministrygroup),
     },
   
     {

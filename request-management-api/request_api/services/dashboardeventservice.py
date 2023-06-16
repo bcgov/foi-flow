@@ -91,8 +91,10 @@ class dashboardeventservice:
         return {
             'id': str(notification.id)+self.__formatedate(notification.createdat).replace(' ','')+notification.to,
             'status': notification.status,
+            'rawrequestid': notification.rawrequestid,
             'requestid': notification.requestid,
             'ministryrequestid': notification.ministryrequestid,
+            'idnumber': notification.idnumber,
             'createdat' : self.__formatedate(notification.createdat),
             'axisRequestId': notification.axisRequestId,
             'createdby': notification.createdby,      
@@ -110,6 +112,8 @@ class dashboardeventservice:
             'assignedministryperson': notification.assignedministryperson,
             'assignedministrypersonFirstName':notification.assignedministrypersonFirstName,
             'assignedministrypersonLastName': notification.assignedministrypersonLastName,
+            'assignedToFormatted': notification.assignedToFormatted,
+            'ministryAssignedToFormatted': notification.ministryAssignedToFormatted,
             'notificationType': notification.notificationtype
         }
 

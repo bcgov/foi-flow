@@ -163,6 +163,27 @@ class FOIRequestNotificationUser(db.Model):
         #aliase for getting ministry restricted flag from FOIRestrictedMinistryRequest
         ministry_restricted_requests = aliased(FOIRestrictedMinistryRequest)
 
+        assignedtoformatted = case([
+                            (and_(iaoassignee.lastname.isnot(None), iaoassignee.firstname.isnot(None)),
+                             func.concat(iaoassignee.lastname, ', ', iaoassignee.firstname)),
+                            (and_(iaoassignee.lastname.isnot(None), iaoassignee.firstname.is_(None)),
+                             iaoassignee.lastname),
+                            (and_(iaoassignee.lastname.is_(None), iaoassignee.firstname.isnot(None)),
+                             iaoassignee.firstname),
+                           ],
+                           else_ = FOIMinistryRequest.assignedgroup).label('assignedToFormatted')
+
+        ministryassignedtoformatted = case([
+                            (and_(ministryassignee.lastname.isnot(None), ministryassignee.firstname.isnot(None)),
+                             func.concat(ministryassignee.lastname, ', ', ministryassignee.firstname)),
+                            (and_(ministryassignee.lastname.isnot(None), ministryassignee.firstname.is_(None)),
+                             ministryassignee.lastname),
+                            (and_(ministryassignee.lastname.is_(None), ministryassignee.firstname.isnot(None)),
+                             ministryassignee.firstname),
+                           ],
+                           else_ = FOIMinistryRequest.assignedministrygroup).label('ministryAssignedToFormatted')
+        
+
         #filter/search
         if(len(filterfields) > 0 and keyword is not None):
             filtercondition = []
@@ -213,9 +234,13 @@ class FOIRequestNotificationUser(db.Model):
             iaoassignee.lastname.label('assignedToLastName'),
             ministryassignee.firstname.label('assignedministrypersonFirstName'),
             ministryassignee.lastname.label('assignedministrypersonLastName'),
+            assignedtoformatted,
+            ministryassignedtoformatted,
             FOIRequestNotificationUser.notificationuserid.label('id'),
+            FOIRequest.foirawrequestid.label('rawrequestid'),
             FOIRequest.foirequestid.label('requestid'),
             FOIMinistryRequest.foiministryrequestid.label('ministryrequestid'),
+            FOIRequestNotification.idnumber.label('idnumber'),
             foiuser.firstname.label('userFirstName'),
             foiuser.lastname.label('userLastName'),
             foicreator.firstname.label('creatorFirstName'),
