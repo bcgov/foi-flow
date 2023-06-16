@@ -145,6 +145,17 @@ class FOIRawRequestNotificationUser(db.Model):
             subquery_maxversion.c.max_version == FOIRawRequest.version,
         ]
 
+        subquery_ministry_maxversion = _session.query(FOIMinistryRequest.foiministryrequestid, FOIMinistryRequest.axisrequestid, func.max(FOIMinistryRequest.version).label('max_version')).group_by(FOIMinistryRequest.foiministryrequestid, FOIMinistryRequest.axisrequestid).subquery()
+        joincondition_ministry = [
+            subquery_ministry_maxversion.c.foiministryrequestid == FOIMinistryRequest.foiministryrequestid,
+            subquery_ministry_maxversion.c.max_version == FOIMinistryRequest.version
+        ]
+
+        ministry_closed_query = _session.query(
+                                   FOIMinistryRequest.axisrequestid
+                                ).join(
+                                        subquery_ministry_maxversion, and_(*joincondition_ministry)
+                                ).filter(FOIMinistryRequest.requeststatusid == 3)
         axisrequestid = case([
             (FOIRawRequest.axisrequestid.is_(None),
             'U-00' + cast(FOIRawRequest.requestid, String)),
@@ -190,7 +201,7 @@ class FOIRawRequestNotificationUser(db.Model):
                                         FOIAssignee, FOIAssignee.username == FOIRawRequest.assignedto, isouter=True
                                 ).join(
                                         FOIRawRequestNotification,
-                                        and_(FOIRawRequestNotification.idnumber == 'U-00' + cast(FOIRawRequest.requestid, String)),
+                                        and_(FOIRawRequestNotification.idnumber == 'U-00' + cast(FOIRawRequest.requestid, String), FOIRawRequestNotification.axisnumber.notin_(ministry_closed_query))
                                 ).join(
                                         FOIRawRequestNotificationUser,
                                         and_(FOIRawRequestNotificationUser.notificationid == FOIRawRequestNotification.notificationid)
@@ -202,8 +213,7 @@ class FOIRawRequestNotificationUser(db.Model):
                                 ).join(
                                         foicreator, foicreator.preferred_username == FOIRawRequestNotificationUser.createdby, isouter=True  
                                 )
-                            
-
+       
         if additionalfilter is None:
             if(isiaorestrictedfilemanager == True):
                 return basequery
