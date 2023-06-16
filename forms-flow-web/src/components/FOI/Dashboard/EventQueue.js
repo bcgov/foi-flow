@@ -27,10 +27,8 @@ const EventQueue = ({ userDetail, eventQueueTableInfo }) => {
 
   const userGroups = userDetail && userDetail?.groups?.map(group => group.slice(1));
   const isMinistry = isMinistryLogin(userGroups);
-  console.log(`isMinistry == ${isMinistry}`)
   const eventQueue = useSelector((state) => state.foiRequests.foiEventsList);
   const isLoading = useSelector((state) => state.foiRequests.isLoading);
-  console.log(`eventQueue == ${JSON.stringify(eventQueue)}`)
   const classes = useStyles();
 
   const filterFields = [
@@ -58,11 +56,8 @@ const EventQueue = ({ userDetail, eventQueueTableInfo }) => {
   const keyword = useSelector((state) => state.foiRequests.eventQueueParams?.keyword);
   const eventFilter = useSelector((state) => state.foiRequests.eventQueueFilter);
 
-  console.log(`eventFilter = ${JSON.stringify(eventFilter)}`)
-
   useEffect(() => {
     serverSortModel = updateSortModel(sortModel);
-    console.log(`isMinistry UE == ${isMinistry}`)
     if (isMinistry)
     {
       // page+1 here, because initial page value is 0 for mui-data-grid
@@ -116,7 +111,6 @@ const EventQueue = ({ userDetail, eventQueueTableInfo }) => {
     return eventQueue?.data || [];
   }, [JSON.stringify(eventQueue)]);
 
-  console.log(`rows == ${JSON.stringify(rows)}`)
 
   const renderReviewRequest = (e) => {
     let url = ''
@@ -261,7 +255,6 @@ const EventQueue = ({ userDetail, eventQueueTableInfo }) => {
           headerHeight={50}
           rowCount={eventQueue?.meta?.total || 0}
           pageSize={rowsState?.pageSize}
-          // rowsPerPageOptions={[10]}
           hideFooterSelectedRowCount={true}
           disableColumnMenu={true}
           pagination
@@ -282,18 +275,6 @@ const EventQueue = ({ userDetail, eventQueueTableInfo }) => {
               handleSortChange(model);
             }
           }}
-          // getRowClassName={(params) =>
-          //   clsx(
-          //     `super-app-theme--${params.row.currentState
-          //       .toLowerCase()
-          //       .replace(/ +/g, "")}`,
-          //       eventQueueTableInfo?.stateClassName?.[
-          //       params.row.currentState.toLowerCase().replace(/ +/g, "")
-          //     ],
-          //     (params.row.assignedTo == null && userDetail?.groups?.indexOf("/" + params.row.assignedGroup) > -1)
-          //     && eventQueueTableInfo?.noAssignedClassName
-          //   )
-          // }
           onRowClick={renderReviewRequest}
           loading={isLoading}
         />
