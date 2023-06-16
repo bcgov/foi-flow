@@ -96,45 +96,52 @@ export const updateSortModel = (sortModel) => {
   return smodel;
 };
 
-export const updateEventSortModel = (sortModel) => {
+export const updateEventSortModel = (sortModel, isMinistry) => {
   let smodel = JSON.parse(JSON.stringify(sortModel));
   if (smodel) {
     let field = smodel[0]?.field;
     let order = smodel[0]?.sort;
-
-    // if (field == "applicantName") {
+    console.log(`field = ${field}`)
+    // if (field == "createdby") {
     //   smodel.shift();
     //   smodel.unshift(
-    //     { field: "lastName", sort: order },
-    //     { field: "firstName", sort: order }
+    //     { field: "creatorLastName", sort: order },
+    //     { field: "creatorFirstName", sort: order }
     //   );
     // }
 
-    // if (field == "DueDateValue") {
+    // if (field == "to") {
     //   smodel.shift();
     //   smodel.unshift(
-    //     { field: "duedate", sort: order },
+    //     { field: "userLastName", sort: order },
+    //     { field: "userFirstName", sort: order }
     //   );
     // }
 
-    // if (field == "DaysLeftValue") {
+    // if (field == "assignedTo" && !isMinistry) {
     //   smodel.shift();
     //   smodel.unshift(
-    //     { field: "duedate", sort: order },
+    //     { field: "assignedToLastName", sort: order },
+    //     { field: "assignedToFirstName", sort: order },
+    //     { field: "assignedGroup", sort: order }
     //   );
     // }
 
-    //add duedate to default sorting
-    if (smodel.length == 1 && (field == "defaultSorting" || field == "intakeSorting")) {
+    // if (field == "assignedTo" && isMinistry) {
+    //   smodel.shift();
+    //   smodel.unshift(
+    //     { field: "assignedministrypersonLastName", sort: order },
+    //     { field: "assignedministrypersonFirstName", sort: order },
+    //     { field: "assignedministrygroup", sort: order } 
+    //   );
+    // }
+
+    //add createdat to default sorting
+    if (smodel.length == 1 && field == "defaultSorting") {
       smodel.push(
-        { field: "cfrduedate", sort: order },
+        { field: "createdat", sort: order },
       );
     }
-    // if (smodel.length == 1 && field == "currentState") {
-    //   smodel.push(
-    //     { field: "receivedDateUF", sort: "desc" },
-    //   );
-    // }
   }
 
   return smodel;
@@ -282,8 +289,8 @@ export const cellTooltipRender = (params) => {
 export const eventCellTooltipRender = (params) => {
 
   let notification = params.row?.notification;
-  if (notification?.length > 55) {
-  const truncatedNotification = notification?.length > 55 ? notification?.slice(0, 55) + '...' : notification;
+  if (notification?.length > 50) {
+  const truncatedNotification = notification?.length > 50 ? notification?.slice(0, 50) + '...' : notification;
 
   return (
     <LightTooltip placement="bottom-start" title={<div style={{ whiteSpace: 'pre-line' }}>{notification}</div>}>

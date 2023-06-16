@@ -364,3 +364,10 @@ export const setRecordFormats = (data) => dispatch =>{
         payload:data
     })
 }
+
+export const setConversionFormats = (data) => dispatch =>{
+    dispatch({
+        type:FOI_ACTION_CONSTANTS.CONVERSION_FORMATS,
+        payload:data
+    })
+}
