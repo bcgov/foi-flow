@@ -114,21 +114,22 @@ const EventQueue = ({ userDetail, eventQueueTableInfo }) => {
 
   const renderReviewRequest = (e) => {
     let url = ''
-    if (e.row?.status?.toLowerCase() !== 'archived') {
-      if (e.row?.notificationType?.toLowerCase()?.includes('comments')) {
-        url = redirectToComments(isMinistry, e.row.requestid, e.row.ministryrequestid)
-      }
-      else if (e.row?.notificationType?.toLowerCase()?.includes('pdfstitch')) {
-        url = redirectToRecords(isMinistry, e.row.requestid, e.row.ministryrequestid)
-      }
-      else {
-        url = redirectToRequestView(isMinistry, e.row.requestid, e.row.ministryrequestid)
-      }    
-      dispatch(push(url));
+    
+    if (e.row?.notificationType?.toLowerCase()?.includes('comments')) {
+      url = redirectToComments(isMinistry, e.row.rawrequestid, e.row.requestid, e.row.ministryrequestid)
     }
-  };
+    else if (e.row?.notificationType?.toLowerCase()?.includes('pdfstitch')) {
+      url = redirectToRecords(isMinistry, e.row.requestid, e.row.ministryrequestid)
+    }
+    else {
+      url = redirectToRequestView(isMinistry, e.row.rawrequestid, e.row.requestid, e.row.ministryrequestid)
+    }    
+    dispatch(push(url));
 
-  const redirectToRequestView = (isMinistry, requestid,  ministryrequestid) => {
+  }
+
+
+  const redirectToRequestView = (isMinistry, rawrequestid, requestid,  ministryrequestid) => {
     let url = "";
     if (isMinistry) {
       url = `/foi/ministryreview/${requestid}/ministryrequest/${ministryrequestid}`
@@ -137,12 +138,12 @@ const EventQueue = ({ userDetail, eventQueueTableInfo }) => {
       url = `/foi/foirequests/${requestid}/ministryrequest/${ministryrequestid}`
     }
     else {
-      url = `/foi/reviewrequest/${requestid}`
+      url = `/foi/reviewrequest/${rawrequestid}`
     }
     return url;
   }
 
-  const redirectToComments = (isMinistry, requestid,  ministryrequestid) => {
+  const redirectToComments = (isMinistry, rawrequestid, requestid,  ministryrequestid) => {
     let url = "";
     if (isMinistry) {
       url = `/foi/ministryreview/${requestid}/ministryrequest/${ministryrequestid}/comments`
@@ -151,7 +152,7 @@ const EventQueue = ({ userDetail, eventQueueTableInfo }) => {
       url = `/foi/foirequests/${requestid}/ministryrequest/${ministryrequestid}/comments`
     }
     else {
-      url = `/foi/reviewrequest/${requestid}/comments`
+      url = `/foi/reviewrequest/${rawrequestid}/comments`
     }
     return url;
   }
