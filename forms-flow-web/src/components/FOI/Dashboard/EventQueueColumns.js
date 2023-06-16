@@ -10,7 +10,7 @@ import {
     {
       field: "createdat",
       headerName: "DATE | TIME STAMP",
-      width: 160,
+      width: 200,
       headerAlign: "left",
     },
     {
@@ -45,7 +45,7 @@ import {
       field: "notification",
       headerName: "CONTENT",
       headerAlign: "left",
-      width: 400,
+      width: 300,
      renderCell: eventCellTooltipRender
     }
     
@@ -56,7 +56,7 @@ import {
     {
       field: "createdat",
       headerName: "DATE | TIME STAMP",
-      width: 160,
+      width: 200,
       headerAlign: "left",
     },
     {
@@ -91,7 +91,7 @@ import {
       field: "notification",
       headerName: "CONTENT",
       headerAlign: "left",
-      width: 400,
+      width: 300,
      renderCell: eventCellTooltipRender
     }
     

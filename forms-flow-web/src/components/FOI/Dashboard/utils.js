@@ -289,8 +289,8 @@ export const cellTooltipRender = (params) => {
 export const eventCellTooltipRender = (params) => {
 
   let notification = params.row?.notification;
-  if (notification?.length > 55) {
-  const truncatedNotification = notification?.length > 55 ? notification?.slice(0, 55) + '...' : notification;
+  if (notification?.length > 50) {
+  const truncatedNotification = notification?.length > 50 ? notification?.slice(0, 50) + '...' : notification;
 
   return (
     <LightTooltip placement="bottom-start" title={<div style={{ whiteSpace: 'pre-line' }}>{notification}</div>}>
