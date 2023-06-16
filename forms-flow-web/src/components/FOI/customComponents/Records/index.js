@@ -163,13 +163,13 @@ export const RecordsLog = ({
 
   let pdfStitchedRecord = useSelector(
     (state) => state.foiRequests.foiPDFStitchedRecordForHarms
-  );  
+  );
   const classes = useStyles();
   const [records, setRecords] = useState(recordsObj?.records);
   const [totalUploadedRecordSize, setTotalUploadedRecordSize] = useState(0);
   useEffect(() => {
     setRecords(recordsObj?.records)
-    let nonDuplicateRecords = recordsObj?.records.filter(record => !record.isduplicate)
+    let nonDuplicateRecords = recordsObj?.records?.filter(record => !record.isduplicate)
     let totalUploadedSize= (calculateTotalUploadedFileSizeInKB(nonDuplicateRecords)/ (1024 * 1024))
     setTotalUploadedRecordSize(parseFloat(totalUploadedSize.toFixed(4)));
     dispatch(checkForRecordsChange(requestId, ministryId))
@@ -179,7 +179,7 @@ export const RecordsLog = ({
     dispatch(getRecordFormats());
   }, [])
 
-
+  const conversionFormats = useSelector((state) => state.foiRequests.conversionFormats)
   const divisionFilters = [...new Map(recordsObj?.records?.reduce((acc, file) => [...acc, ...new Map(file?.attributes?.divisions?.map(division => [division?.divisionid, division]))], [])).values()]
   if (divisionFilters?.length > 0) divisionFilters?.push(
     {divisionid: -1, divisionname: "All"},
@@ -200,7 +200,7 @@ export const RecordsLog = ({
   const [filterValue, setFilterValue] = useState(-1);
   const [fullnameList, setFullnameList] = useState(getFullnameList);
   const [recordsDownloadList, setRecordsDownloadList] = useState(RecordsDownloadList);
-  const [currentDownload, setCurrentDownload] = useState(0) 
+  const [currentDownload, setCurrentDownload] = useState(0)
   const [isDownloadInProgress, setIsDownloadInProgress] = useState(false)
   const [isDownloadReady, setIsDownloadReady] = useState(false)
   const [isDownloadFailed, setIsDownloadFailed] = useState(false)
@@ -268,7 +268,7 @@ export const RecordsLog = ({
   }
 
   const saveDocument = (value, fileInfoList, files) => {
-    
+
     if (value) {
       if (files.length !== 0) {
         setRecordsUploading(true)
@@ -305,6 +305,9 @@ export const RecordsLog = ({
                   trigger: 'recordreplace',
                   service: 'deduplication'
                 }
+                documentDetails.attributes.convertedfilesize = _file.size
+                documentDetails.attributes.trigger = 'recordreplace'
+                delete documentDetails.outputdocumentmasterid
               } else {
                 documentDetails = {
                   s3uripath: header.filepathdb,
@@ -348,7 +351,7 @@ export const RecordsLog = ({
             }
             if (_documents.length > 0) {
               if (modalFor === 'replace' || modalFor == 'replaceattachment') {
-                
+
                  if (modalFor === 'replaceattachment'){
                 dispatch(retryFOIRecordProcessing(requestId, ministryId, {records: _documents},(err, _res) => {
                     dispatchRequestAttachment(err);
@@ -359,7 +362,7 @@ export const RecordsLog = ({
                   dispatchRequestAttachment(err);
               })); }
 
-              }                             
+              }
               else {
                 dispatch(saveFOIRecords(requestId, ministryId, {records: _documents},(err, _res) => {
                     dispatchRequestAttachment(err);
@@ -423,7 +426,7 @@ export const RecordsLog = ({
         });
       }
     }, 'records', bcgovcode);
-  }  
+  }
 
   const handleDownloadChange = (e) => {
     //if clicked on harms
@@ -438,7 +441,7 @@ export const RecordsLog = ({
         progress: undefined,
         theme: "colored",
         backgroundColor: "#FFA500"
-      });      
+      });
       downloadLinearHarmsDocuments()
     }
     //if clicked on harms and stitching is complete
@@ -453,7 +456,7 @@ export const RecordsLog = ({
         toastError()
       }
     }
-    setCurrentDownload(e.target.value); 
+    setCurrentDownload(e.target.value);
   }
 
   const downloadZipFile = async (s3filepath, filename) => {
@@ -484,16 +487,16 @@ export const RecordsLog = ({
 
   const downloadLinearHarmsDocuments = () => {
     try{
-    
+
       const message = createMessageForHarms(recordsObj?.records);
       dispatch(triggerDownloadFOIRecordsForHarms(requestId, ministryId, message,(err, _res) => {
         if (err) {
           toastError()
         }
         else {
-          setIsDownloadInProgress(true);      
+          setIsDownloadInProgress(true);
           setIsDownloadReady(false);
-          setIsDownloadFailed(false); 
+          setIsDownloadFailed(false);
         }
         dispatchRequestAttachment(err);
     }));
@@ -506,7 +509,7 @@ export const RecordsLog = ({
   }
 
   const createMessageForHarms = (recordList) => {
-    
+
     const message = {
       "category":RecordDownloadCategory.harms,
       "requestnumber":requestNumber,
@@ -517,7 +520,7 @@ export const RecordsLog = ({
     //remove duplicate records(except duplicate attachments)
     const deduplicatedRecords = removeDuplicateFiles(recordList);
     //get only relevent fields
-    const updatedrecords = getUpdatedRecords(deduplicatedRecords);
+    const updatedrecords = getUpdatedRecords(deduplicatedRecords, conversionFormats);
     //sort records and attachments based on lastmodified asc
     let sortedRecords = sortByLastModified(updatedrecords);
 
@@ -538,7 +541,6 @@ export const RecordsLog = ({
           recordsArray.push(..._filteredAttachments)   
         }         
     }
-
     //form the final attributes for the message
     const attributes = []
     for (const _key in divisionObj) {
@@ -573,7 +575,7 @@ export const RecordsLog = ({
         progress: undefined,
       }
     );
-    setIsDownloadInProgress(false);      
+    setIsDownloadInProgress(false);
     setIsDownloadReady(false);
     setIsDownloadFailed(true);
 
@@ -594,7 +596,7 @@ export const RecordsLog = ({
       for (let record of exporting) {
         var filepath = record.s3uripath
         var filename = record.filename
-        if (record.isredactionready && ['.doc','.docx','.xls','.xlsx', '.ics', '.msg'].includes(record.attributes?.extension?.toLowerCase())) {
+        if (record.isredactionready && conversionFormats.includes(record.attributes?.extension?.toLowerCase())) {
           filepath = filepath.substr(0, filepath.lastIndexOf(".")) + ".pdf";
           filename += ".pdf";
         }
@@ -632,10 +634,10 @@ export const RecordsLog = ({
   }
 
   const retryDocument = (record) => {
-    record.trigger = 'recordretry';    
+    record.trigger = 'recordretry';
     record.service = record.failed ? record.failed : 'all';
     if (record.isattachment) {
-      var parentRecord = recordsObj.records.find(r => r.recordid = record.rootparentid);
+      var parentRecord = recordsObj?.records?.find(r => r.recordid = record.rootparentid);
       record.attributes.divisions = parentRecord.attributes.divisions;
       record.attributes.batch = parentRecord.attributes.batch;
       record.attributes.extension = record['s3uripath'].substr(record['s3uripath'].lastIndexOf("."), record['s3uripath'].length);
@@ -652,14 +654,14 @@ export const RecordsLog = ({
 
   const removeAttachments = () => {
     setDeleteModalOpen(false);
-    var attachments = records.reduce((acc, record) => {return record.attachments ? acc.concat(record.attachments.map(a => a.filepath)) : acc}, []);
+    var attachments = records?.reduce((acc, record) => {return record.attachments ? acc.concat(record.attachments.map(a => a.filepath)) : acc}, []);
     dispatch(deleteReviewerRecords({filepaths: attachments, ministryrequestid :ministryId},(err, _res) => {
       dispatchRequestAttachment(err);
     }));
   }
 
-  const hasDocumentsToExport = records.filter(record => !(isMinistryCoordinator && record.category == 'personal')).length > 0;
-  const hasDocumentsToDownload = records.filter(record => record.category !== 'personal').length > 0;
+  const hasDocumentsToExport = records?.filter(record => !(isMinistryCoordinator && record.category == 'personal')).length > 0;
+  const hasDocumentsToDownload = records?.filter(record => record.category !== 'personal').length > 0;
 
   const handlePopupButtonClick = (action, _record) => {
     setUpdateAttachment(_record);
@@ -674,7 +676,7 @@ export const RecordsLog = ({
         setreplaceRecord(_record)
         setModalFor("replaceattachment");
         setModal(true);
-        break;  
+        break;
       case "rename":
         setModalFor("rename");
         setModal(true);
@@ -768,7 +770,7 @@ export const RecordsLog = ({
 
     let _filename = replaceRecord?.originalfilename === '' ? replaceRecord.filename : replaceRecord.originalfilename ;
     let fileextension =  _filename?.split('.').pop();
-    
+
     switch(fileextension)
     {
       case "docx" || "doc":
@@ -782,7 +784,7 @@ export const RecordsLog = ({
           break;
       case "pdf" :
             replacefileextensions = ["application/pdf"];
-              break;      
+              break;
       default:
         replacefileextensions = [...MimeTypeList.recordsLog]
         break;
@@ -812,7 +814,7 @@ export const RecordsLog = ({
         )
       }
     }
-    return _recordsArray.filter(filterFunction)
+    return _recordsArray?.filter(filterFunction)
     }
 
   return (
@@ -849,8 +851,8 @@ export const RecordsLog = ({
             alignItems="flex-start"
             spacing={1}
           >
-            <ConditionalComponent condition={records.filter(record => record.attachments?.length > 0).length > 0}>
-            <Grid item xs={3}>              
+            <ConditionalComponent condition={records?.filter(record => record.attachments?.length > 0).length > 0}>
+            <Grid item xs={3}>
                 <button
                   className="btn addAttachment foi-export-button"
                   variant="contained"
@@ -859,12 +861,12 @@ export const RecordsLog = ({
                 >
                   Remove Attachments
                 </button>
-              
+
             </Grid>
             </ConditionalComponent>
             <ConditionalComponent condition={hasDocumentsToDownload}>
             <Grid item xs={3}>
-              
+
               <TextField
               className="download-dropdown custom-select-wrapper foi-download-button"
               id="download"
@@ -907,7 +909,7 @@ export const RecordsLog = ({
                           <FontAwesomeIcon icon={faCheckCircle} size='2x' color='#1B8103' className={classes.statusIcons}/>:
                           isDownloadFailed ?
                           <FontAwesomeIcon icon={faExclamationCircle} size='2x' color='#A0192F' className={classes.statusIcons}/>:
-                          isDownloadInProgress ? <FontAwesomeIcon icon={faSpinner} size='2x' color='#FAA915' className={classes.statusIcons}/>:null) 
+                          isDownloadInProgress ? <FontAwesomeIcon icon={faSpinner} size='2x' color='#FAA915' className={classes.statusIcons}/>:null)
                         }
                         {item.label}
                       </MenuItem>
@@ -917,7 +919,7 @@ export const RecordsLog = ({
 
               } )}
             </TextField>
-             
+
             </Grid>
             </ConditionalComponent>
             {/* <Grid item xs={2}>
@@ -942,7 +944,7 @@ export const RecordsLog = ({
                 >
                   + Upload Records
                 </button> :
-                (records.length > 0 && DISABLE_REDACT_WEBLINK?.toLowerCase() =='false' && <a href={DOC_REVIEWER_WEB_URL + "/foi/" + ministryId}>
+                (records?.length > 0 && DISABLE_REDACT_WEBLINK?.toLowerCase() =='false' && <a href={DOC_REVIEWER_WEB_URL + "/foi/" + ministryId}>
                   <button
                     className={clsx("btn", "addAttachment", classes.createButton)}
                     variant="contained"
@@ -953,7 +955,7 @@ export const RecordsLog = ({
                   </button>
                 </a>)
               }
-             
+
 
             </Grid>
             <Grid
@@ -1105,7 +1107,7 @@ export const RecordsLog = ({
               alignItems="flex-start"
               className={classes.recordLog}
             >
-              {records.map((record, i) =>
+              {records?.map((record, i) =>
                 <Attachment
                   key={i}
                   indexValue={i}
@@ -1183,10 +1185,10 @@ export const RecordsLog = ({
 
 
 const Attachment = React.memo(({indexValue, record, handlePopupButtonClick, getFullname, isMinistryCoordinator,ministryId}) => {
-  
+
   const classes = useStyles();
   const [disabled, setDisabled] = useState(false);
-  const [isRetry, setRetry] = useState(false); 
+  const [isRetry, setRetry] = useState(false);
   // useEffect(() => {
   //   if(record && record.filename) {
   //     setDisabled(isMinistryCoordinator && record.category == 'personal')
@@ -1250,12 +1252,10 @@ const Attachment = React.memo(({indexValue, record, handlePopupButtonClick, getF
         <Grid item xs={6}>
           {record.isattachment && <FontAwesomeIcon icon={faArrowTurnUp} size='2x' className={classes.attachmentIcon}/>}
           {
-            record.isduplicate && record.attributes?.incompatible ?
-            <FontAwesomeIcon icon={faClone} size='2x' color='#FF873D' className={classes.statusIcons}/>:
-            record.attributes?.incompatible ?
-            <FontAwesomeIcon icon={faBan} size='2x' color='#FAA915' className={classes.statusIcons}/>:
             record.isduplicate ?
             <FontAwesomeIcon icon={faClone} size='2x' color='#FF873D' className={classes.statusIcons}/>:
+            record.attributes?.incompatible && record.attributes?.trigger !== 'recordreplace' ?
+            <FontAwesomeIcon icon={faBan} size='2x' color='#FAA915' className={classes.statusIcons}/>:
             record.isredactionready ?
             <FontAwesomeIcon icon={faCheckCircle} size='2x' color='#1B8103' className={classes.statusIcons}/>:
             record.failed ?
@@ -1272,14 +1272,12 @@ const Attachment = React.memo(({indexValue, record, handlePopupButtonClick, getF
             alignItems="flex-end"
             className={classes.recordStatus}>
             {
-              record.isduplicate && record.attributes?.incompatible ?
-              <span>Duplicate of {record.duplicateof}</span>:
-              record.attributes?.incompatible ?
-              <span>Incompatible File Type</span>:
-              record.failed && record.isredactionready ?
-              <span>Record Manually Replaced Due to Error</span>:
               record.isduplicate ?
               <span>Duplicate of {record.duplicateof}</span>:
+              record.attributes?.incompatible && record.attributes?.trigger !== 'recordreplace' ?
+              <span>Incompatible File Type</span>:
+              (record.failed && record.isredactionready) || (record.attributes?.trigger === 'recordreplace' && record.attributes?.isattachment) ?
+              <span>Record Manually Replaced Due to Error</span>:
               record.isredactionready ?
               <span>Ready for Redaction</span>:
               record.failed ?
@@ -1381,7 +1379,7 @@ const opendocumentintab =(record,ministryId)=>
 const AttachmentPopup = React.memo(({indexValue, record, handlePopupButtonClick, disabled,ministryId, setRetry}) => {
   const ref = React.useRef();
   const closeTooltip = () => ref.current && ref ? ref.current.close():{};
-  
+
 
   const handleRename = () => {
     closeTooltip();
@@ -1478,6 +1476,7 @@ const AttachmentPopup = React.memo(({indexValue, record, handlePopupButtonClick,
   // }
 
   const ActionsPopover = ({RestrictViewInBrowser, record}) => {
+    const conversionFormats = useSelector((state) => state.foiRequests.conversionFormats)
     return (
       <Popover
         anchorReference="anchorPosition"
@@ -1519,7 +1518,7 @@ const AttachmentPopup = React.memo(({indexValue, record, handlePopupButtonClick,
           </MenuItem>}
           { record.attributes?.isattachment && <MenuItem
             onClick={() => {
-                 handleReplaceAttachment() 
+                 handleReplaceAttachment()
                 setPopoverOpen(false);
             }}
           >
@@ -1534,13 +1533,14 @@ const AttachmentPopup = React.memo(({indexValue, record, handlePopupButtonClick,
             Download Original
           </MenuItem>
           }
-          {record.isredactionready && ['.doc','.docx','.xls','.xlsx', '.ics', '.msg'].includes(record.attributes?.extension?.toLowerCase()) && <MenuItem
+          {((record.isredactionready && conversionFormats.includes(record.attributes?.extension?.toLowerCase())) ||
+          (record.attributes?.isattachment && record.attributes?.trigger === 'recordreplace')) && <MenuItem
             onClick={() => {
                 handleDownloadPDF();
                 setPopoverOpen(false);
             }}
           >
-            Download Converted
+            {(record.attributes?.isattachment && record.attributes?.trigger === 'recordreplace') ? 'Download Replaced' : 'Download Converted'}
           </MenuItem>}
           <MenuItem
             onClick={() => {
