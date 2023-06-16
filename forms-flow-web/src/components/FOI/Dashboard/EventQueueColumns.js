@@ -12,14 +12,12 @@ import {
       headerName: "DATE | TIME STAMP",
       width: 160,
       headerAlign: "left",
-      //valueGetter: (params) => formatDate(params.row.cfrduedate, "MM/dd/yyyy"),
     },
     {
       field: "axisRequestId",
       headerName: "ID NUMBER",
       headerAlign: "left",
       width: 160,
-      //renderCell: cellTooltipRender
     },
     {
       field: "createdby",
