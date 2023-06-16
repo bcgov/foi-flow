@@ -112,6 +112,8 @@ class dashboardeventservice:
             'assignedministryperson': notification.assignedministryperson,
             'assignedministrypersonFirstName':notification.assignedministrypersonFirstName,
             'assignedministrypersonLastName': notification.assignedministrypersonLastName,
+            'assignedToFormatted': notification.assignedToFormatted,
+            'ministryAssignedToFormatted': notification.ministryAssignedToFormatted,
             'notificationType': notification.notificationtype
         }
 

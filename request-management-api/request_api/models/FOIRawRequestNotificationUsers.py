@@ -172,6 +172,17 @@ class FOIRawRequestNotificationUser(db.Model):
             ],
             else_ = cast(FOIRawRequest.axisrequestid, String)).label('axisRequestId')
 
+        assignedtoformatted = case([
+                            (and_(FOIAssignee.lastname.isnot(None), FOIAssignee.firstname.isnot(None)),
+                             func.concat(FOIAssignee.lastname, ', ', FOIAssignee.firstname)),
+                            (and_(FOIAssignee.lastname.isnot(None), FOIAssignee.firstname.is_(None)),
+                             FOIAssignee.lastname),
+                            (and_(FOIAssignee.lastname.is_(None), FOIAssignee.firstname.isnot(None)),
+                             FOIAssignee.firstname),
+                            (and_(FOIAssignee.lastname.is_(None), FOIAssignee.firstname.is_(None), FOIRawRequest.assignedgroup.is_(None)),
+                             'Unassigned'),
+                           ],
+                           else_ = FOIRawRequest.assignedgroup).label('assignedToFormatted')
         
         foiuser = aliased(FOIUser)
         foicreator = aliased(FOIUser)
@@ -191,6 +202,8 @@ class FOIRawRequestNotificationUser(db.Model):
             FOIAssignee.lastname.label('assignedToLastName'),            
             literal(None).label('assignedministrypersonFirstName'),
             literal(None).label('assignedministrypersonLastName'),
+            assignedtoformatted,
+            literal(None).label('ministryAssignedToFormatted'),
             FOIRawRequestNotificationUser.notificationuserid.label('id'),
             FOIRawRequest.requestid.label('rawrequestid'),
             ministry_opened_query.c.foirequest_id.label('requestid'),
@@ -202,8 +215,6 @@ class FOIRawRequestNotificationUser(db.Model):
             foicreator.lastname.label('creatorLastName'),
             NotificationType.name.label('notificationtype')
         ]
-
-        
 
         basequery = _session.query(
                                         *selectedcolumns
