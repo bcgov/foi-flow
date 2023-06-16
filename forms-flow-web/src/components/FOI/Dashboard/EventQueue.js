@@ -10,7 +10,7 @@ import { setEventQueueFilter, setEventQueueParams } from "../../../actions/FOI/f
 import {
   debounce,
   ClickableChip,
-  updateSortModel,
+  updateEventSortModel,
 } from "./utils";
 import { isMinistryLogin } from "../../../helper/FOI/helper";
 import Grid from "@mui/material/Grid";
@@ -57,7 +57,7 @@ const EventQueue = ({ userDetail, eventQueueTableInfo }) => {
   const eventFilter = useSelector((state) => state.foiRequests.eventQueueFilter);
 
   useEffect(() => {
-    serverSortModel = updateSortModel(sortModel);
+    serverSortModel = updateEventSortModel(sortModel, isMinistry);
     if (isMinistry)
     {
       // page+1 here, because initial page value is 0 for mui-data-grid
@@ -267,7 +267,7 @@ const EventQueue = ({ userDetail, eventQueueTableInfo }) => {
           components={{
             Footer: ()=> <CustomFooter rowCount={eventQueue?.meta?.total || 0} defaultSortModel={eventQueueTableInfo.sort} footerFor={"queue"}></CustomFooter>
           }}
-          sortingOrder={["desc", "asc"]}
+          sortingOrder={["asc", "desc"]}
           sortModel={[sortModel[0]]}
           sortingMode={"server"}
           onSortModelChange={(model) => {
