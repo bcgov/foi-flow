@@ -156,6 +156,16 @@ class FOIRawRequestNotificationUser(db.Model):
                                 ).join(
                                         subquery_ministry_maxversion, and_(*joincondition_ministry)
                                 ).filter(FOIMinistryRequest.requeststatusid == 3)
+        
+        ministry_opened_query = _session.query(
+                                   FOIMinistryRequest.version,
+                                   FOIMinistryRequest.foirequest_id,
+                                   FOIMinistryRequest.foiministryrequestid,
+                                   FOIMinistryRequest.axisrequestid
+                                ).join(
+                                        subquery_ministry_maxversion, and_(*joincondition_ministry)
+                                ).filter(FOIMinistryRequest.requeststatusid != 3).subquery()
+        
         axisrequestid = case([
             (FOIRawRequest.axisrequestid.is_(None),
             'U-00' + cast(FOIRawRequest.requestid, String)),
@@ -182,8 +192,10 @@ class FOIRawRequestNotificationUser(db.Model):
             literal(None).label('assignedministrypersonFirstName'),
             literal(None).label('assignedministrypersonLastName'),
             FOIRawRequestNotificationUser.notificationuserid.label('id'),
-            FOIRawRequest.requestid.label('requestid'),
-            literal(None).label('ministryrequestid'),
+            FOIRawRequest.requestid.label('rawrequestid'),
+            ministry_opened_query.c.foirequest_id.label('requestid'),
+            ministry_opened_query.c.foiministryrequestid.label('ministryrequestid'),
+            FOIRawRequestNotification.idnumber.label('idnumber'),
             foiuser.firstname.label('userFirstName'),
             foiuser.lastname.label('userLastName'),
             foicreator.firstname.label('creatorFirstName'),
@@ -212,6 +224,10 @@ class FOIRawRequestNotificationUser(db.Model):
                                         foiuser, foiuser.preferred_username == FOIRawRequestNotificationUser.userid, isouter=True  
                                 ).join(
                                         foicreator, foicreator.preferred_username == FOIRawRequestNotificationUser.createdby, isouter=True  
+                                ).join (
+                                        ministry_opened_query,
+                                        ministry_opened_query.c.axisrequestid == FOIRawRequestNotification.axisnumber,
+                                        isouter = True
                                 )
        
         if additionalfilter is None:
