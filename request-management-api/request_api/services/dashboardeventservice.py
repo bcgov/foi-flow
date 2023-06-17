@@ -114,7 +114,9 @@ class dashboardeventservice:
             'assignedministrypersonLastName': notification.assignedministrypersonLastName,
             'assignedToFormatted': notification.assignedToFormatted,
             'ministryAssignedToFormatted': notification.ministryAssignedToFormatted,
-            'notificationType': notification.notificationtype
+            'notificationType': notification.notificationtype,
+            'userFormatted': notification.userFormatted,
+            'creatorFormatted': notification.creatorFormatted
         }
 
     def __formatedate(self, input):
