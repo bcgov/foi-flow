@@ -47,6 +47,7 @@ export const fetchFOIEventListByPage = (
       .then((res) => {
         if (res.data) {
           dispatch(setFOIEventList(res.data));
+          dispatch(setFOILoader(false));
         } else {
           dispatch(serviceActionError(res));
           throw new Error("Error in fetching dashboard data for IAO");
