@@ -274,7 +274,7 @@ const EventQueue = ({ userDetail, eventQueueTableInfo }) => {
           className="foi-data-grid"
           getRowId={(row) => row.id}
           rows={rows}
-          columns={eventQueueTableInfo?.columns || []}
+          columns={eventColumnsRef.current}
           rowHeight={30}
           headerHeight={50}
           rowCount={eventQueue?.meta?.total || 0}
