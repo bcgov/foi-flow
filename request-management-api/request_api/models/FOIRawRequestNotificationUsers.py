@@ -1,7 +1,7 @@
 from flask.app import Flask
 from sqlalchemy.sql.schema import ForeignKey
 from .db import  db, ma
-from datetime import datetime as datetime2
+from datetime import datetime as datetime2, timezone
 from sqlalchemy.orm import relationship,backref
 from .default_method_result import DefaultMethodResult
 from sqlalchemy.dialects.postgresql import JSON, UUID
@@ -134,7 +134,7 @@ class FOIRawRequestNotificationUser(db.Model):
     # Begin of Dashboard functions
 
     @classmethod
-    def getbasequery(cls, additionalfilter=None, userid=None, isiaorestrictedfilemanager=False):
+    def getbasequery(cls, foiuser, foicreator, additionalfilter=None, userid=None, isiaorestrictedfilemanager=False):
         _session = db.session
 
         #rawrequests
@@ -150,6 +150,8 @@ class FOIRawRequestNotificationUser(db.Model):
             subquery_ministry_maxversion.c.foiministryrequestid == FOIMinistryRequest.foiministryrequestid,
             subquery_ministry_maxversion.c.max_version == FOIMinistryRequest.version
         ]
+
+        
 
         ministry_closed_query = _session.query(
                                    FOIMinistryRequest.axisrequestid
@@ -184,8 +186,29 @@ class FOIRawRequestNotificationUser(db.Model):
                            ],
                            else_ = FOIRawRequest.assignedgroup).label('assignedToFormatted')
         
-        foiuser = aliased(FOIUser)
-        foicreator = aliased(FOIUser)
+        userformatted = case([
+                            (and_(foiuser.lastname.isnot(None), foiuser.firstname.isnot(None)),
+                             func.concat(foiuser.lastname, ', ', foiuser.firstname)),
+                            (and_(foiuser.lastname.isnot(None), foiuser.firstname.is_(None)),
+                             foiuser.lastname),
+                            (and_(foiuser.lastname.is_(None), foiuser.firstname.isnot(None)),
+                             foiuser.firstname),
+                           ],
+                           else_ = FOIRawRequestNotificationUser.userid).label('userformatted')
+
+
+        creatorformatted = case([
+                            (and_(foicreator.lastname.isnot(None), foicreator.firstname.isnot(None)),
+                             func.concat(foicreator.lastname, ', ', foicreator.firstname)),
+                            (and_(foicreator.lastname.isnot(None), foicreator.firstname.is_(None)),
+                             foicreator.lastname),
+                            (and_(foicreator.lastname.is_(None), foicreator.firstname.isnot(None)),
+                             foicreator.firstname),                          ],
+                           else_ = FOIRawRequestNotificationUser.createdby).label('creatorformatted')
+
+
+
+        
 
         selectedcolumns = [
             axisrequestid,  
@@ -213,7 +236,9 @@ class FOIRawRequestNotificationUser(db.Model):
             foiuser.lastname.label('userLastName'),
             foicreator.firstname.label('creatorFirstName'),
             foicreator.lastname.label('creatorLastName'),
-            NotificationType.name.label('notificationtype')
+            NotificationType.name.label('notificationtype'),
+            userformatted.label('userFormatted'),
+            creatorformatted.label('creatorFormatted')
         ]
 
         basequery = _session.query(
@@ -283,8 +308,8 @@ class FOIRawRequestNotificationUser(db.Model):
 
 
     @classmethod
-    def getrequestssubquery(cls, filterfields, keyword, additionalfilter, userid, isiaorestrictedfilemanager):
-        basequery = FOIRawRequestNotificationUser.getbasequery(additionalfilter, userid, isiaorestrictedfilemanager)
+    def getrequestssubquery(cls, foiuser, foicreator, filterfields, keyword, additionalfilter, userid, isiaorestrictedfilemanager):
+        basequery = FOIRawRequestNotificationUser.getbasequery(foiuser, foicreator, additionalfilter, userid, isiaorestrictedfilemanager)
         basequery = basequery.filter(FOIRawRequest.status != 'Unopened').filter(FOIRawRequest.status != 'Closed')
         #filter/search
         if(len(filterfields) > 0 and keyword is not None):
@@ -314,17 +339,13 @@ class FOIRawRequestNotificationUser(db.Model):
                     datecriteria = []
                     for n  in range(len(_datevalue)):
                         if '%Y' in _vkeyword[n]:
-                            datecriteria.append(extract('year', FOIRawRequestNotificationUser.created_at) == _datevalue[n])
+                            datecriteria.append(extract('year', func.timezone("PDT", FOIRawRequestNotificationUser.created_at)) == _datevalue[n])
                         if '%b' in _vkeyword[n]:
-                            datecriteria.append(extract('month', FOIRawRequestNotificationUser.created_at) == _datevalue[n])
+                            datecriteria.append(extract('month', func.timezone("PDT",FOIRawRequestNotificationUser.created_at)) == _datevalue[n])
                         if '%d' in _vkeyword[n]:
-                            datecriteria.append(extract('day', FOIRawRequestNotificationUser.created_at) == _datevalue[n])
+                            datecriteria.append(extract('day', func.timezone("PDT", FOIRawRequestNotificationUser.created_at)) == _datevalue[n])
                     if len(datecriteria) > 0:
                         filtercondition.append(and_(*datecriteria))   
-                elif(field == 'firstName'):
-                    filtercondition.append(FOIRawRequestNotificationUser.findfield('contactFirstName').ilike('%'+_keyword+'%'))
-                elif(field == 'lastName'):
-                    filtercondition.append(FOIRawRequestNotificationUser.findfield('contactLastName').ilike('%'+_keyword+'%'))
                 else:
                     filtercondition.append(FOIRawRequestNotificationUser.findfield(field).ilike('%'+_keyword+'%'))
                 
@@ -359,14 +380,16 @@ class FOIRawRequestNotificationUser(db.Model):
         #ministry requests
         iaoassignee = aliased(FOIAssignee)
         ministryassignee = aliased(FOIAssignee)
-        subquery_ministry_queue = FOIRequestNotificationUser.geteventsubquery(groups, filterfields, keyword, additionalfilter, userid, iaoassignee, ministryassignee, 'IAO', isiaorestrictedfilemanager, isministryrestrictedfilemanager)
+        foiuser = aliased(FOIUser)
+        foicreator = aliased(FOIUser)
+
+        subquery_ministry_queue = FOIRequestNotificationUser.geteventsubquery(groups, filterfields, keyword, additionalfilter, userid, iaoassignee, ministryassignee, foiuser, foicreator, 'IAO', isiaorestrictedfilemanager, isministryrestrictedfilemanager)
 
         #sorting
         sortingcondition = FOIRawRequestNotificationUser.getsorting(sortingitems, sortingorders)
-
         #rawrequests
         if "Intake Team" in groups or groups is None:                
-            subquery_rawrequest_queue = FOIRawRequestNotificationUser.getrequestssubquery(filterfields, keyword, additionalfilter, userid, isiaorestrictedfilemanager)
+            subquery_rawrequest_queue = FOIRawRequestNotificationUser.getrequestssubquery(foiuser, foicreator, filterfields, keyword, additionalfilter, userid, isiaorestrictedfilemanager)
             query_full_queue = subquery_rawrequest_queue.union(subquery_ministry_queue)
             return query_full_queue.order_by(*sortingcondition).paginate(page=page, per_page=size)
         else:
@@ -399,7 +422,18 @@ class FOIRawRequestNotificationUser(db.Model):
             'createdby',
             'to',
             'axisRequestId',
-            'createdat'          
+            'createdat',
+            'assignedTo',
+            'assignedToFirstName',
+            'assignedToLastName',
+            'assignedToFormatted',
+            'ministryAssignedToFormatted',
+            'userFirstName',
+            'userLastName',
+            'userFormatted',
+            'creatorFirstName',
+            'creatorLastName',
+            'creatorFormatted'      
         ]
         if x in validfields:
             return True

@@ -147,7 +147,7 @@ class FOIRequestNotificationUser(db.Model):
 
     # Begin of Dashboard functions
     @classmethod
-    def geteventsubquery(cls, groups, filterfields, keyword, additionalfilter, userid, iaoassignee, ministryassignee, requestby='IAO', isiaorestrictedfilemanager=False, isministryrestrictedfilemanager=False):
+    def geteventsubquery(cls, groups, filterfields, keyword, additionalfilter, userid, iaoassignee, ministryassignee, foiuser, foicreator, requestby='IAO', isiaorestrictedfilemanager=False, isministryrestrictedfilemanager=False):
         #for queue/dashboard
         _session = db.session
 
@@ -162,6 +162,8 @@ class FOIRequestNotificationUser(db.Model):
 
         #aliase for getting ministry restricted flag from FOIRestrictedMinistryRequest
         ministry_restricted_requests = aliased(FOIRestrictedMinistryRequest)
+        
+
 
         assignedtoformatted = case([
                             (and_(iaoassignee.lastname.isnot(None), iaoassignee.firstname.isnot(None)),
@@ -183,6 +185,27 @@ class FOIRequestNotificationUser(db.Model):
                            ],
                            else_ = FOIMinistryRequest.assignedministrygroup).label('ministryAssignedToFormatted')
         
+        userformatted = case([
+                            (and_(foiuser.lastname.isnot(None), foiuser.firstname.isnot(None)),
+                             func.concat(foiuser.lastname, ', ', foiuser.firstname)),
+                            (and_(foiuser.lastname.isnot(None), foiuser.firstname.is_(None)),
+                             foiuser.lastname),
+                            (and_(foiuser.lastname.is_(None), foiuser.firstname.isnot(None)),
+                             foiuser.firstname),
+                           ],
+                           else_ = FOIRequestNotificationUser.userid).label('userformatted')
+
+
+        creatorformatted = case([
+                            (and_(foicreator.lastname.isnot(None), foicreator.firstname.isnot(None)),
+                             func.concat(foicreator.lastname, ', ', foicreator.firstname)),
+                            (and_(foicreator.lastname.isnot(None), foicreator.firstname.is_(None)),
+                             foicreator.lastname),
+                            (and_(foicreator.lastname.is_(None), foicreator.firstname.isnot(None)),
+                             foicreator.firstname),
+                           ],
+                           else_ = FOIRequestNotificationUser.createdby).label('creatorformatted')
+
 
         #filter/search
         if(len(filterfields) > 0 and keyword is not None):
@@ -200,15 +223,15 @@ class FOIRequestNotificationUser(db.Model):
                         _vkeyword = vkeyword[1].split(' ')
                         for n  in range(len(_datevalue)):
                             if '%Y' in _vkeyword[n]:
-                                datecriteria.append(extract('year', FOIRequestNotificationUser.created_at) == _datevalue[n])
+                                datecriteria.append(extract('year', func.timezone("PDT",FOIRequestNotificationUser.created_at)) == _datevalue[n])
                             if '%b' in _vkeyword[n]:
-                                datecriteria.append(extract('month', FOIRequestNotificationUser.created_at) == _datevalue[n])
+                                datecriteria.append(extract('month', func.timezone("PDT",FOIRequestNotificationUser.created_at)) == _datevalue[n])
                             if '%d' in _vkeyword[n]:
-                                datecriteria.append(extract('day', FOIRequestNotificationUser.created_at) == _datevalue[n])
+                                datecriteria.append(extract('day', func.timezone("PDT",FOIRequestNotificationUser.created_at)) == _datevalue[n])
                         if len(datecriteria) > 0:
                             filtercondition.append(and_(*datecriteria)) 
                     else:
-                        filtercondition.append(FOIRequestNotificationUser.findfield(field, iaoassignee, ministryassignee).ilike('%'+_keyword+'%'))
+                        filtercondition.append(FOIRequestNotificationUser.findfield(field, iaoassignee, ministryassignee, foiuser, foicreator).ilike('%'+_keyword+'%'))
             else:
                 if(requestby == 'IAO'):
                     filtercondition.append(FOIRestrictedMinistryRequest.isrestricted == True)
@@ -216,8 +239,7 @@ class FOIRequestNotificationUser(db.Model):
                     filtercondition.append(ministry_restricted_requests.isrestricted == True)
 
 
-        foiuser = aliased(FOIUser)
-        foicreator = aliased(FOIUser)
+        
 
         selectedcolumns = [
             cast(FOIMinistryRequest.axisrequestid, String).label('axisRequestId'),
@@ -245,7 +267,9 @@ class FOIRequestNotificationUser(db.Model):
             foiuser.lastname.label('userLastName'),
             foicreator.firstname.label('creatorFirstName'),
             foicreator.lastname.label('creatorLastName'),
-            NotificationType.name.label('notificationtype')
+            NotificationType.name.label('notificationtype'),
+            userformatted.label('userFormatted'),
+            creatorformatted.label('creatorFormatted')
         ]
 
         basequery = _session.query(
@@ -337,25 +361,28 @@ class FOIRequestNotificationUser(db.Model):
     def geteventpagination(cls, group, page, size, sortingitems, sortingorders, filterfields, keyword, additionalfilter, userid,isiaorestrictedfilemanager, isministryrestrictedfilemanager):
         iaoassignee = aliased(FOIAssignee)
         ministryassignee = aliased(FOIAssignee)
+        foiuser = aliased(FOIUser)
+        foicreator = aliased(FOIUser)
+
         requestby = 'Ministry'
 
-        subquery = FOIRequestNotificationUser.geteventsubquery(group, filterfields, keyword, additionalfilter, userid, iaoassignee, ministryassignee, requestby, isiaorestrictedfilemanager, isministryrestrictedfilemanager)
-        sortingcondition = FOIRequestNotificationUser.getsorting(sortingitems, sortingorders, iaoassignee, ministryassignee)
+        subquery = FOIRequestNotificationUser.geteventsubquery(group, filterfields, keyword, additionalfilter, userid, iaoassignee, ministryassignee, foiuser, foicreator, requestby, isiaorestrictedfilemanager, isministryrestrictedfilemanager)
+        sortingcondition = FOIRequestNotificationUser.getsorting(sortingitems, sortingorders, iaoassignee, ministryassignee, foiuser, foicreator)
 
         return subquery.order_by(*sortingcondition).paginate(page=page, per_page=size)
       
     @classmethod
-    def getsorting(cls, sortingitems, sortingorders, iaoassignee, ministryassignee):
+    def getsorting(cls, sortingitems, sortingorders, iaoassignee, ministryassignee, foiuser, foicreator):
         #sorting
         sortingcondition = []
         if(len(sortingitems) > 0 and len(sortingorders) > 0 and len(sortingitems) == len(sortingorders)):
             for field in sortingitems:
                 order = sortingorders.pop(0)
-                sortingcondition.append(FOIRequestNotificationUser.getfieldforsorting(field, order, iaoassignee, ministryassignee))
+                sortingcondition.append(FOIRequestNotificationUser.getfieldforsorting(field, order, iaoassignee, ministryassignee, foiuser, foicreator))
 
         #default sorting
         if(len(sortingcondition) == 0):
-            sortingcondition.append(FOIRequestNotificationUser.findfield('createdat', iaoassignee, ministryassignee).desc())
+            sortingcondition.append(FOIRequestNotificationUser.findfield('createdat', iaoassignee, ministryassignee, foiuser, foicreator).desc())
 
         #always sort by created_at last to prevent pagination collisions
         sortingcondition.append(asc('created_at'))
@@ -363,9 +390,9 @@ class FOIRequestNotificationUser(db.Model):
         return sortingcondition
     
     @classmethod
-    def getfieldforsorting(cls, field, order, iaoassignee, ministryassignee):
+    def getfieldforsorting(cls, field, order, iaoassignee, ministryassignee, foiuser, foicreator):
         #get one field
-        customizedfields = ['assignee', 'createdat', 'createdby', 'idNumber', 'notification']
+        customizedfields = ['assignedToFormatted', 'ministryAssignedToFormatted', 'userFormatted','creatorFormatted', 'createdat', 'createdby', 'idNumber', 'notification']
         if(field in customizedfields):
             if(order == 'desc'):
                 return nullslast(desc(field))
@@ -373,12 +400,12 @@ class FOIRequestNotificationUser(db.Model):
                 return nullsfirst(asc(field))
         else:
             if(order == 'desc'):
-                return nullslast(FOIMinistryRequest.findfield(field, iaoassignee, ministryassignee).desc())
+                return nullslast(FOIMinistryRequest.findfield(field, iaoassignee, ministryassignee, foiuser, foicreator).desc())
             else:
-                return nullsfirst(FOIMinistryRequest.findfield(field, iaoassignee, ministryassignee).asc())
+                return nullsfirst(FOIMinistryRequest.findfield(field, iaoassignee, ministryassignee, foiuser, foicreator).asc())
 
     @classmethod
-    def findfield(cls, x, iaoassignee, ministryassignee):
+    def findfield(cls, x, iaoassignee, ministryassignee, foiuser, foicreator):
         #add more fields here if need sort/filter/search more columns
 
         return {
@@ -390,7 +417,11 @@ class FOIRequestNotificationUser(db.Model):
             'assignedToFirstName': iaoassignee.firstname,
             'assignedToLastName': iaoassignee.lastname,
             'assignedministrypersonFirstName': ministryassignee.firstname,
-            'assignedministrypersonLastName': ministryassignee.lastname
+            'assignedministrypersonLastName': ministryassignee.lastname,
+            'userFirstName':foiuser.firstname,
+            'userLastName':foiuser.lastname,
+            'creatorFirstName':foicreator.firstname,
+            'creatorLastName':foicreator.lastname
         }.get(x,  cast(FOIMinistryRequest.axisrequestid, String))
     
     # End of Dashboard functions
