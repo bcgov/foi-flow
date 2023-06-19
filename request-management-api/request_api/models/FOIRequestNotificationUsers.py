@@ -223,11 +223,11 @@ class FOIRequestNotificationUser(db.Model):
                         _vkeyword = vkeyword[1].split(' ')
                         for n  in range(len(_datevalue)):
                             if '%Y' in _vkeyword[n]:
-                                datecriteria.append(extract('year', func.timezone("PDT",FOIRequestNotificationUser.created_at)) == _datevalue[n])
+                                datecriteria.append(extract('year',FOIRequestNotificationUser.created_at) == _datevalue[n])
                             if '%b' in _vkeyword[n]:
-                                datecriteria.append(extract('month', func.timezone("PDT",FOIRequestNotificationUser.created_at)) == _datevalue[n])
+                                datecriteria.append(extract('month', FOIRequestNotificationUser.created_at) == _datevalue[n])
                             if '%d' in _vkeyword[n]:
-                                datecriteria.append(extract('day', func.timezone("PDT",FOIRequestNotificationUser.created_at)) == _datevalue[n])
+                                datecriteria.append(extract('day', FOIRequestNotificationUser.created_at) == _datevalue[n])
                         if len(datecriteria) > 0:
                             filtercondition.append(and_(*datecriteria)) 
                     else:
