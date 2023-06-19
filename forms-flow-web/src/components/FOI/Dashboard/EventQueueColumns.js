@@ -20,25 +20,22 @@ import {
       width: 160,
     },
     {
-      field: "createdby",
+      field: "creatorFormatted",
       headerName: "FROM",
       headerAlign: "left",
       width: 160,
-      valueGetter: (params) => getUserFullName(params.row.creatorFirstName, params.row.creatorLastName, params.row.createdby),
     },
     {
-      field: "to",
+      field: "userFormatted",
       headerName: "TO",
       headerAlign: "left",
       width: 160,
-      valueGetter: (params) => getUserFullName(params.row.userFirstName, params.row.userLastName, params.row.to),
     },
     {
       field: "assignedToFormatted",
       headerName: "ASSIGNEE",
       headerAlign: "left",
       width: 160,
-      // valueGetter: (params) => getUserFullName(params.row.assignedToFirstName, params.row.assignedToLastName, params.row.assignedTo, params.row.assignedGroup),
     },
   
     {
@@ -66,25 +63,22 @@ import {
       width: 160,
     },
     {
-      field: "createdby",
+      field: "creatorFormatted",
       headerName: "FROM",
       headerAlign: "left",
       width: 160,
-      valueGetter: (params) => getUserFullName(params.row.creatorFirstName, params.row.creatorLastName, params.row.createdby),
     },
     {
-      field: "to",
+      field: "userFormatted",
       headerName: "TO",
       headerAlign: "left",
       width: 160,
-      valueGetter: (params) => getUserFullName(params.row.userFirstName, params.row.userLastName, params.row.to),
     },
     {
       field: "ministryAssignedToFormatted",
       headerName: "ASSIGNEE",
       headerAlign: "left",
       width: 160,
-      // valueGetter: (params) => getUserFullName(params.row.assignedministrypersonFirstName, params.row.assignedministrypersonLastName, params.row.assignedministryperson, params.row.assignedministrygroup),
     },
   
     {
