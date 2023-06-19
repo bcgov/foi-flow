@@ -203,9 +203,8 @@ class FOIRawRequestNotificationUser(db.Model):
                             (and_(foicreator.lastname.isnot(None), foicreator.firstname.is_(None)),
                              foicreator.lastname),
                             (and_(foicreator.lastname.is_(None), foicreator.firstname.isnot(None)),
-                             foicreator.firstname),
-                           ],
-                           else_ = FOIRawRequestNotificationUser.userid).label('creatorformatted')
+                             foicreator.firstname),                          ],
+                           else_ = FOIRawRequestNotificationUser.createdby).label('creatorformatted')
 
 
 

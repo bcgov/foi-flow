@@ -204,7 +204,7 @@ class FOIRequestNotificationUser(db.Model):
                             (and_(foicreator.lastname.is_(None), foicreator.firstname.isnot(None)),
                              foicreator.firstname),
                            ],
-                           else_ = FOIRequestNotificationUser.userid).label('creatorformatted')
+                           else_ = FOIRequestNotificationUser.createdby).label('creatorformatted')
 
 
         #filter/search
