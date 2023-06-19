@@ -750,6 +750,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
   const stateTransition = requestDetails?.stateTransition;
   
   const showAdvancedSearch = useSelector((state) => state.foiRequests.showAdvancedSearch)
+  const showEventQueue = useSelector((state) => state.foiRequests.showEventQueue);
 
   const showRecordsTab = () => {
     return (requestState !== StateEnum.intakeinprogress.name &&
@@ -906,14 +907,22 @@ const FOIRequest = React.memo(({ userDetail }) => {
                     }
                   >
                     <Breadcrumbs aria-label="breadcrumb" className="foi-breadcrumb">
-                      {showAdvancedSearch &&
+                    {showEventQueue && !showAdvancedSearch &&
+                        <Chip
+                          label={"Event Queue"}
+                          sx={{ backgroundColor: '#fff', border:'1px solid #038', color: '#038', height: 19, cursor: 'pointer' }}
+                          onClick={returnToQueue}
+                        />
+                      }
+                      {showAdvancedSearch && !showEventQueue &&
                         <Chip
                           label={"Advanced Search"}
                           sx={{ backgroundColor: '#fff', border:'1px solid #038', color: '#038', height: 19, cursor: 'pointer' }}
                           onClick={returnToQueue}
                         />
                       }
-                      {!showAdvancedSearch &&
+                      
+                      {!showAdvancedSearch && !showEventQueue &&
                         <Chip
                           icon={<HomeIcon fontSize="small" sx={{color: '#038 !important'}}/>}
                           label={"Request Queue"}
@@ -1130,7 +1139,21 @@ const FOIRequest = React.memo(({ userDetail }) => {
           >
             {!isLoading &&
             requestNotes ? (
+              
               <>
+                <Breadcrumbs aria-label="breadcrumb" className="foi-breadcrumb foi-breadcrumb-comments">
+                    {showEventQueue && !showAdvancedSearch &&
+                        <Chip
+                          label={"Event Queue"}
+                          sx={{ backgroundColor: '#fff', border:'1px solid #038', color: '#038', height: 19, cursor: 'pointer' }}
+                          onClick={returnToQueue}
+                        />
+                      }
+                      <Chip
+                        label={headerText}
+                        sx={{ backgroundColor: '#fff', border:'1px solid #038', color: '#038', height: 19 }}
+                      />
+                </Breadcrumbs>
                 <CommentSection
                   currentUser={
                     userId && {
@@ -1173,6 +1196,19 @@ const FOIRequest = React.memo(({ userDetail }) => {
           >
             {showRecordsTab() &&
               <>
+                <Breadcrumbs aria-label="breadcrumb" className="foi-breadcrumb foi-breadcrumb-comments">
+                    {showEventQueue && !showAdvancedSearch &&
+                        <Chip
+                          label={"Event Queue"}
+                          sx={{ backgroundColor: '#fff', border:'1px solid #038', color: '#038', height: 19, cursor: 'pointer' }}
+                          onClick={returnToQueue}
+                        />
+                      }
+                      <Chip
+                        label={headerText}
+                        sx={{ backgroundColor: '#fff', border:'1px solid #038', color: '#038', height: 19 }}
+                      />
+                </Breadcrumbs>
                 <RecordsLog
                   //recordsObj={requestRecords}
                   requestId={requestId}
