@@ -6,16 +6,16 @@
    <elementGuidId>0f943f1d-f731-4ebd-a5b5-7c08b5c05184</elementGuidId>
    <selectorCollection>
       <entry>
-         <key>CSS</key>
-         <value></value>
-      </entry>
-      <entry>
          <key>XPATH</key>
-         <value>//div[@id='status-options']/label[2]/span</value>
+         <value>(.//*[normalize-space(text()) and normalize-space(.)='Pending'])[1]/following::*[name()='svg'][1]</value>
       </entry>
       <entry>
          <key>BASIC</key>
-         <value>id(&quot;status-options&quot;)/label[@class=&quot;MuiFormControlLabel-root&quot;]/span[@class=&quot;MuiButtonBase-root MuiIconButton-root jss166 MuiRadio-root&quot;][count(. | //*[@class = 'MuiButtonBase-root MuiIconButton-root jss166 MuiRadio-root']) = count(//*[@class = 'MuiButtonBase-root MuiIconButton-root jss166 MuiRadio-root'])]</value>
+         <value>//*[@id = 'rbextapproved']</value>
+      </entry>
+      <entry>
+         <key>CSS</key>
+         <value></value>
       </entry>
    </selectorCollection>
    <selectorMethod>BASIC</selectorMethod>
@@ -26,15 +26,15 @@
       <name>tag</name>
       <type>Main</type>
       <value>span</value>
-      <webElementGuid>f2e9a105-f019-48eb-be9f-4946fcc54816</webElementGuid>
+      <webElementGuid>9c46092f-6e4c-455c-b4ac-330bb806211e</webElementGuid>
    </webElementProperties>
    <webElementProperties>
-      <isSelected>true</isSelected>
+      <isSelected>false</isSelected>
       <matchCondition>equals</matchCondition>
       <name>class</name>
       <type>Main</type>
-      <value>MuiButtonBase-root MuiIconButton-root jss166 MuiRadio-root</value>
-      <webElementGuid>997ba327-2e9e-4ffa-9b7d-c2af245d0d0b</webElementGuid>
+      <value>MuiButtonBase-root MuiIconButton-root jss146 MuiRadio-root</value>
+      <webElementGuid>a8bf0182-1823-422b-92bf-46e86272b395</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -42,15 +42,23 @@
       <name>aria-disabled</name>
       <type>Main</type>
       <value>false</value>
-      <webElementGuid>9aa1d315-13f8-4466-9df4-578f7b025b62</webElementGuid>
+      <webElementGuid>f354ade6-572b-4250-9162-1869ddb7acd7</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>id(&quot;ellipse-icon-0&quot;)/span[@class=&quot;MuiIconButton-label&quot;]/svg[@class=&quot;MuiSvgIcon-root&quot;]</value>
+      <webElementGuid>aa213d72-347a-45c8-ad0c-97b91217378d</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>true</isSelected>
       <matchCondition>equals</matchCondition>
-      <name>xpath</name>
+      <name>id</name>
       <type>Main</type>
-      <value>id(&quot;status-options&quot;)/label[@class=&quot;MuiFormControlLabel-root&quot;]/span[@class=&quot;MuiButtonBase-root MuiIconButton-root jss166 MuiRadio-root&quot;]</value>
-      <webElementGuid>7de9a345-cd7e-4b4b-b9a7-105a72dad596</webElementGuid>
+      <value>rbextapproved</value>
+      <webElementGuid>b98edaf5-5dbf-4617-8a57-dde82a9c6c6b</webElementGuid>
    </webElementProperties>
    <webElementXpaths>
       <isSelected>true</isSelected>
@@ -58,7 +66,7 @@
       <name>xpath:idRelative</name>
       <type>Main</type>
       <value>//div[@id='status-options']/label[2]/span</value>
-      <webElementGuid>af5f1663-d775-491b-a097-e1af0d77c50d</webElementGuid>
+      <webElementGuid>4211b6c6-e510-4eac-bcd0-df8c7a6670b8</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -66,7 +74,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>(.//*[normalize-space(text()) and normalize-space(.)='Pending'])[1]/following::span[1]</value>
-      <webElementGuid>e53450df-1dce-466f-acc4-52bfd075e232</webElementGuid>
+      <webElementGuid>7f4c32ab-7b85-45e9-a12a-76405de2944d</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -74,7 +82,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>(.//*[normalize-space(text()) and normalize-space(.)='Extended Due Date'])[2]/following::span[5]</value>
-      <webElementGuid>1497cbcf-366b-4441-827f-baa3303eea9f</webElementGuid>
+      <webElementGuid>d8e7b094-35df-4473-9083-5d395a0cf412</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -82,7 +90,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>(.//*[normalize-space(text()) and normalize-space(.)='Approved'])[2]/preceding::span[3]</value>
-      <webElementGuid>3aca3177-ca1c-496c-926c-68711fac86e9</webElementGuid>
+      <webElementGuid>562e1885-034f-404e-855e-017921b0b425</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -90,7 +98,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>(.//*[normalize-space(text()) and normalize-space(.)='Denied'])[1]/preceding::span[7]</value>
-      <webElementGuid>5ff83ec1-d4b8-4ab7-80a2-0fea145126e3</webElementGuid>
+      <webElementGuid>b242fca8-7208-43dc-91e9-6131ae80f7cb</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -98,6 +106,6 @@
       <name>xpath:position</name>
       <type>Main</type>
       <value>//label[2]/span</value>
-      <webElementGuid>5bdca6b6-25e1-418d-a047-23f435ea2103</webElementGuid>
+      <webElementGuid>46df2009-d788-4751-8cf6-b1337c425093</webElementGuid>
    </webElementXpaths>
 </WebElementEntity>

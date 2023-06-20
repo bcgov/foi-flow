@@ -189,6 +189,15 @@ if (mon == '08') {
 if (mon == '09') {
     month = 'Sep'
 }
+if (mon == '10') {
+	month = 'Oct'
+}
+if (mon == '11') {
+	month = 'Nov'
+}
+if (mon == '12') {
+	month = 'Dec'
+}
 
 //println(month)
 def newldddate1 = Date.parse('yyyy-MM-dd', ldd).format('MM/dd/yyyy')
@@ -224,7 +233,6 @@ WebUI.click(findTestObject('Extension/li_OIPC - Large Volume andor Volume of Sea
 
 WebUI.setText(findTestObject('Object Repository/Extension/input_Extended Due Days_numberDays'), '6')
 
-
 WebUI.verifyElementVisible(findTestObject('Object Repository/Extension/button_Save'))
 
 WebUI.click(findTestObject('Object Repository/Extension/button_Save'))
@@ -255,25 +263,22 @@ WebUI.sendKeys(findTestObject('Object Repository/Extension/input_Extended Due Da
 
 WebUI.setText(findTestObject('Object Repository/Extension/input_Extended Due Days_numberDays'), '20')
 
+WebUI.delay(4)
+
 WebUI.click(findTestObject('Extension/span_Pending_MuiButtonBase-root MuiIconButton-root jss166 MuiRadio-root'))
 
 //WebUI.click(findTestObject('Extension/button_Add Files (2)'))
 //WebUI.uploadFile(findTestObject('Page_foi.flow/attachment/input_Add Files_file-upload-input'), RunConfiguration.getProjectDir() + 
 //    '/Test Attachments/test2.docx')
-
-
-
 def Format1 = 'yyyy-MM-dd'
 
 def today = new Date()
 
 def currentDate = today.format(Format1)
 
-def approval = WebUI.getAttribute(findTestObject('Extension/input_Approved Date_approvedDate'),'value').toString()
+def approval = WebUI.getAttribute(findTestObject('Extension/input_Approved Date_approvedDate'), 'value').toString()
 
 WebUI.verifyEqual(currentDate, approval)
-
-
 
 WebUI.click(findTestObject('Object Repository/Extension/button_Save'))
 
@@ -324,6 +329,15 @@ if (mons == '08') {
 
 if (mons == '09') {
     months = 'Sep'
+}
+if (mons == '10') {
+	months = 'Oct'
+}
+if (mons == '11') {
+	months = 'Nov'
+}
+if (mons == '12') {
+	months = 'Dec'
 }
 
 //println(month)
@@ -405,8 +419,6 @@ WebUI.verifyElementText(findTestObject('Page_foi.flow/navbar/notification/div_no
 WebUI.clickOffset(findTestObject('Page_foi.flow/navbar/notification/notification bell'), -2, 4)
 
 WebUI.click(findTestObject('Page_foi.flow/navbar/button_Sign Out'))
-
-
 
 WebUI.closeBrowser()
 

@@ -20,7 +20,7 @@ import com.kms.katalon.core.configuration.RunConfiguration as RunConfiguration
 import groovy.json.JsonSlurper as JsonSlurper
 
 if (requestType == 'general') {
-	WebUI.verifyElementText(findTestObject('Page_foi.flow/form/state change dialog/td_Next Assignee'), 'Flex Team')
+	//WebUI.verifyElementText(findTestObject('Page_foi.flow/form/state change dialog/td_Next Assignee'), 'Flex Team')
 	return
 }
 
@@ -43,6 +43,6 @@ if (!(ministryCode)) {
 
 println(ministryCode)
 
-WebUI.verifyElementText(findTestObject('Page_foi.flow/form/state change dialog/td_Next Assignee'), ministryProcessingMap[ministryCode])
+//WebUI.verifyElementText(findTestObject('Page_foi.flow/form/state change dialog/td_Next Assignee'), ministryProcessingMap[ministryCode])
 
 

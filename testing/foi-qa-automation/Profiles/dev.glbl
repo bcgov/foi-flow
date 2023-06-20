@@ -11,7 +11,7 @@
    </GlobalVariableEntity>
    <GlobalVariableEntity>
       <description></description>
-      <initValue>'foiintakeflex@idir'</initValue>
+      <initValue>'foiintake@idir'</initValue>
       <name>username</name>
    </GlobalVariableEntity>
    <GlobalVariableEntity>

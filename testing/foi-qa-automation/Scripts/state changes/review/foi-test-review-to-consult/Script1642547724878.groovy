@@ -202,7 +202,7 @@ WebUI.verifyElementPresent(findTestObject('Page_foi.flow/comment/div_Comment lis
 WebUI.delay(8)
 
 WebUI.verifyElementText(findTestObject('Page_foi.flow/comment/p_comment list 1 text'), ((findTestData('Login Credentials').getValue(
-        'First Name', 1) + ' ') + findTestData('Login Credentials').getValue('Last Name', 1)) + ' changed the state of the request to Consult')
+        'First Name', 6) + ' ') + findTestData('Login Credentials').getValue('Last Name', 6)) + ' changed the state of the request to Consult')
 
 WebUI.navigateToUrl(GlobalVariable.BASE_URL + '/foi/dashboard')
 

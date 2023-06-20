@@ -25,7 +25,7 @@ WebUI.callTestCase(findTestCase('helper/foi-test-login'), [('password') : findTe
 
 WebUI.click(findTestObject('Page_foi.flow/queue/div_My Team Requests'))
 
-WebUI.setText(findTestObject('Page_foi.flow/queue/input_Dashboard Filter'), requestID)
+WebUI.setText(findTestObject('Page_foi.flow/queue/input_Dashboard Filter'), 'ABC-2099-' + requestID)
 
 WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
 
@@ -204,7 +204,7 @@ WebUI.refresh()
 
 WebUI.click(findTestObject('Page_foi.flow/form/sidebar/div_Sidebar Comments'), FailureHandling.STOP_ON_FAILURE)
 
-WebUI.verifyElementText(findTestObject('Page_foi.flow/comment/p_comment reply 1 text'), 'Deputy Minister’s Office division with stage Assigned to Division has been removed')
+WebUI.verifyElementText(findTestObject('Page_foi.flow/comment/p_comment list 1 text'), 'Deputy Minister’s Office division with stage Assigned to Division has been removed')
 
 WebUI.verifyElementText(findTestObject('Page_foi.flow/comment/p_comment list 2 text'), 'Learning and Education Programs division has been added with stage Assigned to Division')
 

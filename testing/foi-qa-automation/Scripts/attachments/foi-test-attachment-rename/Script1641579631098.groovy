@@ -17,9 +17,6 @@ import com.kms.katalon.core.windows.keyword.WindowsBuiltinKeywords as Windows
 import internal.GlobalVariable as GlobalVariable
 import org.openqa.selenium.Keys as Keys
 import com.kms.katalon.core.configuration.RunConfiguration as RunConfiguration
-
-import groovy.json.JsonSlurper as JsonSlurper
-
 import groovy.json.JsonSlurper as JsonSlurper
 
 WebUI.openBrowser(GlobalVariable.BASE_URL)
@@ -104,6 +101,8 @@ WebUI.setText(findTestObject('Page_foi.flow/attachment/input_Rename Attachment')
 WebUI.click(findTestObject('Page_foi.flow/attachment/button_attachment rename Save'), FailureHandling.STOP_ON_FAILURE)
 
 WebUI.verifyElementText(findTestObject('Page_foi.flow/attachment/div_attachment list 1 name'), 'test3.docx')
+
+WebUI.closeBrowser()
 
 @com.kms.katalon.core.annotation.SetUp
 def setup() {

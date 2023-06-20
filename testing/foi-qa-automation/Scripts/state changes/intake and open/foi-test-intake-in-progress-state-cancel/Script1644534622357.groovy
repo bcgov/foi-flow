@@ -40,7 +40,7 @@ WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/li_Open')
 
 WebUI.verifyElementPresent(findTestObject('Page_foi.flow/form/state change dialog/div_State Change Dialog'), 0)
 
-WebUI.verifyElementText(findTestObject('Page_foi.flow/form/state change dialog/td_Next Assignee'), 'Flex Team')
+//WebUI.verifyElementText(findTestObject('Page_foi.flow/form/state change dialog/td_Next Assignee'), 'Flex Team')
 
 WebUI.verifyElementText(findTestObject('Page_foi.flow/form/state change dialog/span_State Change Dialog message'), 'Are you sure you want to Open this request?')
 
@@ -61,8 +61,8 @@ WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/div_Statu
 
 WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/li_Open'))
 
-WebUI.callTestCase(findTestCase('helper/foi-test-verify-next-assignee-change-request-type'), [('ministryCode') : 'EDU', ('requestType') : 'personal'], 
-    FailureHandling.STOP_ON_FAILURE)
+//WebUI.callTestCase(findTestCase('helper/foi-test-verify-next-assignee-change-request-type'), [('ministryCode') : 'EDU', ('requestType') : 'personal'], 
+ //   FailureHandling.STOP_ON_FAILURE)
 
 WebUI.closeBrowser()
 

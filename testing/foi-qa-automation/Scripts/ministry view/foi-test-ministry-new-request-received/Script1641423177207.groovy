@@ -162,3 +162,5 @@ WebUI.verifyElementText(findTestObject('Page_foi.flow/ministry view/form/b_minis
 
 WebUI.verifyElementText(findTestObject('Page_foi.flow/ministry view/form/b_ministry form Legislated Due Date'), 'Legislated Due Date')
 
+WebUI.closeBrowser()
+
