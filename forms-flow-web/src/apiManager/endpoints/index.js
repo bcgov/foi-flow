@@ -98,7 +98,7 @@ const API = {
   FOI_RETRY_RECORDS:`${FOI_BASE_API_URL}/api/foirecord/<requestid>/ministryrequest/<ministryrequestid>/retry`,
   FOI_REPLACE_RECORDS:`${FOI_BASE_API_URL}/api/foirecord/<requestid>/ministryrequest/<ministryrequestid>/record/<recordid>/replace`,
   FOI_POST_RECORDS:`${FOI_BASE_API_URL}/api/foirecord/<requestid>/ministryrequest/<ministryrequestid>`,
-  FOI_DELETE_RECORDS:`${FOI_BASE_API_URL}/api/foirecord/<requestid>/ministryrequest/<ministryrequestid>/recordid/<recordid>/delete`,
+  FOI_UPDATE_RECORDS:`${FOI_BASE_API_URL}/api/foirecord/<requestid>/ministryrequest/<ministryrequestid>/update`,
   DOC_REVIEWER_DELETE_RECORDS:`${DOC_REVIEWER_BASE_API_URL}/api/document/delete`,
   
   FOI_TRIGGER_DOWNLOAD_RECORDS_FOR_HARMS:`${FOI_BASE_API_URL}/api/foirecord/<requestid>/ministryrequest/<ministryrequestid>/triggerdownload/harms`,
