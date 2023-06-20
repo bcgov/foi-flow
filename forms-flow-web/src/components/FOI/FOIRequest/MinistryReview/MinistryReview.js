@@ -99,6 +99,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const MinistryReview = React.memo(({ userDetail }) => {
+  const url = window.location.href;
   const { requestId, ministryId } = useParams();
   const [requestState, setRequestState] = useState();
   const [_requestStatus, setRequestStatus] = React.useState(requestState);
@@ -736,6 +737,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
             {!isLoading &&
             requestNotes ? (
               <>
+              {url.indexOf("comments") > -1 ? (
                 <Breadcrumbs aria-label="breadcrumb" className="foi-breadcrumb foi-breadcrumb-comments">
                       {showEventQueue && !showAdvancedSearch &&
                         <Chip
@@ -763,7 +765,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
                         label={getHeaderText(requestDetails)}
                         sx={{ backgroundColor: '#fff', border:'1px solid #038', color: '#038', height: 19 }}
                       />
-                  </Breadcrumbs>
+                  </Breadcrumbs> ) : null }
                 <CommentSection
                   currentUser={
                     userId && {
@@ -806,6 +808,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
           >
             {!isAttachmentListLoading && originalDivisions?.length > 0 ? (
               <>
+              {url.indexOf("records") > -1 ? (
                 <Breadcrumbs aria-label="breadcrumb" className="foi-breadcrumb foi-breadcrumb-comments">
                       {showEventQueue && !showAdvancedSearch &&
                         <Chip
@@ -833,7 +836,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
                         label={getHeaderText(requestDetails)}
                         sx={{ backgroundColor: '#fff', border:'1px solid #038', color: '#038', height: 19 }}
                       />
-                </Breadcrumbs>
+                </Breadcrumbs> ) : null }
                 <RecordsLog
                   divisions={originalDivisions}
                   //recordsObj={requestRecords}

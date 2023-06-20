@@ -1141,6 +1141,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
             requestNotes ? (
               
               <>
+              {url.indexOf("comments") > -1 ? (
               <Breadcrumbs aria-label="breadcrumb" className="foi-breadcrumb foi-breadcrumb-comments">
                     {showEventQueue && !showAdvancedSearch &&
                         <Chip
@@ -1169,7 +1170,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
                         label={headerText}
                         sx={{ backgroundColor: '#fff', border:'1px solid #038', color: '#038', height: 19 }}
                       />
-                    </Breadcrumbs>
+                    </Breadcrumbs> ) : null }
                 <CommentSection
                   currentUser={
                     userId && {
@@ -1212,6 +1213,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
           >
             {showRecordsTab() &&
               <>
+              {url.indexOf("records") > -1 ? (
                 <Breadcrumbs aria-label="breadcrumb" className="foi-breadcrumb foi-breadcrumb-comments">
                     {showEventQueue && !showAdvancedSearch &&
                         <Chip
@@ -1240,7 +1242,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
                         label={headerText}
                         sx={{ backgroundColor: '#fff', border:'1px solid #038', color: '#038', height: 19 }}
                       />
-                  </Breadcrumbs>
+                  </Breadcrumbs> ) : null }
                 <RecordsLog
                   //recordsObj={requestRecords}
                   requestId={requestId}
