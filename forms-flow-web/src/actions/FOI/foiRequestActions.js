@@ -1,10 +1,19 @@
 import FOI_ACTION_CONSTANTS from './foiActionConstants'
+
 export const setFOILoader = (data) => dispatch =>{
     dispatch({
         type:FOI_ACTION_CONSTANTS.IS_LOADING,
         payload:data
     })
 }
+
+export const setRecordsLoader = (data) => dispatch =>{
+    dispatch({
+        type:FOI_ACTION_CONSTANTS.IS_RECORDS_LOADING,
+        payload:data
+    })
+}
+
 export const setQueueFilter = (data) => dispatch =>{
     dispatch({
         type:FOI_ACTION_CONSTANTS.QUEUE_FILTER,
