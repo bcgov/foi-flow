@@ -1141,10 +1141,26 @@ const FOIRequest = React.memo(({ userDetail }) => {
             requestNotes ? (
               
               <>
-                <Breadcrumbs aria-label="breadcrumb" className="foi-breadcrumb foi-breadcrumb-comments">
+              <Breadcrumbs aria-label="breadcrumb" className="foi-breadcrumb foi-breadcrumb-comments">
                     {showEventQueue && !showAdvancedSearch &&
                         <Chip
                           label={"Event Queue"}
+                          sx={{ backgroundColor: '#fff', border:'1px solid #038', color: '#038', height: 19, cursor: 'pointer' }}
+                          onClick={returnToQueue}
+                        />
+                      }
+                      {showAdvancedSearch && !showEventQueue &&
+                        <Chip
+                          label={"Advanced Search"}
+                          sx={{ backgroundColor: '#fff', border:'1px solid #038', color: '#038', height: 19, cursor: 'pointer' }}
+                          onClick={returnToQueue}
+                        />
+                      }
+                      
+                      {!showAdvancedSearch && !showEventQueue &&
+                        <Chip
+                          icon={<HomeIcon fontSize="small" sx={{color: '#038 !important'}}/>}
+                          label={"Request Queue"}
                           sx={{ backgroundColor: '#fff', border:'1px solid #038', color: '#038', height: 19, cursor: 'pointer' }}
                           onClick={returnToQueue}
                         />
@@ -1153,7 +1169,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
                         label={headerText}
                         sx={{ backgroundColor: '#fff', border:'1px solid #038', color: '#038', height: 19 }}
                       />
-                </Breadcrumbs>
+                    </Breadcrumbs>
                 <CommentSection
                   currentUser={
                     userId && {
@@ -1204,11 +1220,27 @@ const FOIRequest = React.memo(({ userDetail }) => {
                           onClick={returnToQueue}
                         />
                       }
+                      {showAdvancedSearch && !showEventQueue &&
+                        <Chip
+                          label={"Advanced Search"}
+                          sx={{ backgroundColor: '#fff', border:'1px solid #038', color: '#038', height: 19, cursor: 'pointer' }}
+                          onClick={returnToQueue}
+                        />
+                      }
+                      
+                      {!showAdvancedSearch && !showEventQueue &&
+                        <Chip
+                          icon={<HomeIcon fontSize="small" sx={{color: '#038 !important'}}/>}
+                          label={"Request Queue"}
+                          sx={{ backgroundColor: '#fff', border:'1px solid #038', color: '#038', height: 19, cursor: 'pointer' }}
+                          onClick={returnToQueue}
+                        />
+                      }
                       <Chip
                         label={headerText}
                         sx={{ backgroundColor: '#fff', border:'1px solid #038', color: '#038', height: 19 }}
                       />
-                </Breadcrumbs>
+                  </Breadcrumbs>
                 <RecordsLog
                   //recordsObj={requestRecords}
                   requestId={requestId}

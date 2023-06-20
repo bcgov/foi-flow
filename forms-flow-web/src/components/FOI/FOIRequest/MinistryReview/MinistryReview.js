@@ -514,6 +514,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
 
   
   const showAdvancedSearch = useSelector((state) => state.foiRequests.showAdvancedSearch)
+  const showEventQueue = useSelector((state) => state.foiRequests.showEventQueue);
 
   return !isLoading &&
     requestDetails &&
@@ -606,14 +607,21 @@ const MinistryReview = React.memo(({ userDetail }) => {
                 >
 
                     <Breadcrumbs aria-label="breadcrumb" className="foi-breadcrumb">
-                      {showAdvancedSearch &&
+                      {showEventQueue && !showAdvancedSearch &&
+                        <Chip
+                          label={"Event Queue"}
+                          sx={{ backgroundColor: '#fff', border:'1px solid #038', color: '#038', height: 19, cursor: 'pointer' }}
+                          onClick={returnToQueue}
+                        />
+                      }
+                      {showAdvancedSearch && !showEventQueue &&
                         <Chip
                           label={"Advanced Search"}
                           sx={{ backgroundColor: '#fff', border:'1px solid #038', color: '#038', height: 19, cursor: 'pointer' }}
                           onClick={returnToQueue}
                         />
                       }
-                      {!showAdvancedSearch &&
+                      {!showAdvancedSearch && !showEventQueue &&
                         <Chip
                           icon={<HomeIcon fontSize="small" sx={{color: '#038 !important'}}/>}
                           label={"Request Queue"}
@@ -728,6 +736,34 @@ const MinistryReview = React.memo(({ userDetail }) => {
             {!isLoading &&
             requestNotes ? (
               <>
+                <Breadcrumbs aria-label="breadcrumb" className="foi-breadcrumb foi-breadcrumb-comments">
+                      {showEventQueue && !showAdvancedSearch &&
+                        <Chip
+                          label={"Event Queue"}
+                          sx={{ backgroundColor: '#fff', border:'1px solid #038', color: '#038', height: 19, cursor: 'pointer' }}
+                          onClick={returnToQueue}
+                        />
+                      }
+                      {showAdvancedSearch && !showEventQueue &&
+                        <Chip
+                          label={"Advanced Search"}
+                          sx={{ backgroundColor: '#fff', border:'1px solid #038', color: '#038', height: 19, cursor: 'pointer' }}
+                          onClick={returnToQueue}
+                        />
+                      }
+                      {!showAdvancedSearch && !showEventQueue &&
+                        <Chip
+                          icon={<HomeIcon fontSize="small" sx={{color: '#038 !important'}}/>}
+                          label={"Request Queue"}
+                          sx={{ backgroundColor: '#fff', border:'1px solid #038', color: '#038', height: 19, cursor: 'pointer' }}
+                          onClick={returnToQueue}
+                        />
+                      }
+                      <Chip
+                        label={getHeaderText(requestDetails)}
+                        sx={{ backgroundColor: '#fff', border:'1px solid #038', color: '#038', height: 19 }}
+                      />
+                  </Breadcrumbs>
                 <CommentSection
                   currentUser={
                     userId && {
@@ -770,6 +806,34 @@ const MinistryReview = React.memo(({ userDetail }) => {
           >
             {!isAttachmentListLoading && originalDivisions?.length > 0 ? (
               <>
+                <Breadcrumbs aria-label="breadcrumb" className="foi-breadcrumb foi-breadcrumb-comments">
+                      {showEventQueue && !showAdvancedSearch &&
+                        <Chip
+                          label={"Event Queue"}
+                          sx={{ backgroundColor: '#fff', border:'1px solid #038', color: '#038', height: 19, cursor: 'pointer' }}
+                          onClick={returnToQueue}
+                        />
+                      }
+                      {showAdvancedSearch && !showEventQueue &&
+                        <Chip
+                          label={"Advanced Search"}
+                          sx={{ backgroundColor: '#fff', border:'1px solid #038', color: '#038', height: 19, cursor: 'pointer' }}
+                          onClick={returnToQueue}
+                        />
+                      }
+                      {!showAdvancedSearch && !showEventQueue &&
+                        <Chip
+                          icon={<HomeIcon fontSize="small" sx={{color: '#038 !important'}}/>}
+                          label={"Request Queue"}
+                          sx={{ backgroundColor: '#fff', border:'1px solid #038', color: '#038', height: 19, cursor: 'pointer' }}
+                          onClick={returnToQueue}
+                        />
+                      }
+                      <Chip
+                        label={getHeaderText(requestDetails)}
+                        sx={{ backgroundColor: '#fff', border:'1px solid #038', color: '#038', height: 19 }}
+                      />
+                </Breadcrumbs>
                 <RecordsLog
                   divisions={originalDivisions}
                   //recordsObj={requestRecords}
