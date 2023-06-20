@@ -189,6 +189,15 @@ if (mon == '08') {
 if (mon == '09') {
     month = 'Sep'
 }
+if (mon == '10') {
+	month = 'Oct'
+}
+if (mon == '11') {
+	month = 'Nov'
+}
+if (mon == '12') {
+	month = 'Dec'
+}
 
 //println(month)
 def newldddate1 = Date.parse('yyyy-MM-dd', ldd).format('MM/dd/yyyy')
@@ -320,6 +329,15 @@ if (mons == '08') {
 
 if (mons == '09') {
     months = 'Sep'
+}
+if (mons == '10') {
+	months = 'Oct'
+}
+if (mons == '11') {
+	months = 'Nov'
+}
+if (mons == '12') {
+	months = 'Dec'
 }
 
 //println(month)

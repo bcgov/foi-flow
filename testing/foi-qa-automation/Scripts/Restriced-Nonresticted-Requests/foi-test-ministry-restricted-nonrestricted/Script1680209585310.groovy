@@ -42,7 +42,7 @@ WebUI.click(findTestObject('Restricted_Requests/div_Unrestricted'))
 WebUI.click(findTestObject('Restricted_Requests/li_Restricted'))
 
 WebUI.verifyElementText(findTestObject('Restricted_Requests/Change_to restricted/div_A request can only be restricted when it is assigned to one team member, not a team queue'), 
-    'A request can only be restricted when it is assigned to one team member, not a team queue.')
+    'Are you sure you want to flag this as a restricted file?')
 
 WebUI.click(findTestObject('Restricted_Requests/button_Cancel'))
 

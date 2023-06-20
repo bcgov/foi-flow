@@ -4,23 +4,21 @@
    <name>svg_MAY 16 2023_svg-inline--fa fa-flag fa-w-16 fa-2x restrict-icon</name>
    <tag></tag>
    <elementGuidId>dec1eae6-ba83-46a7-9ee1-be03110cb9bf</elementGuidId>
-   <imagePath></imagePath>
    <selectorCollection>
       <entry>
          <key>XPATH</key>
          <value>(.//*[normalize-space(text()) and normalize-space(.)='MAY 16 2023'])[1]/following::*[name()='svg'][1]</value>
       </entry>
       <entry>
-         <key>CSS</key>
-         <value>div.foi-dashboard-restricted.MuiDataGrid-cell--withRenderer.MuiDataGrid-cell.MuiDataGrid-cell--textLeft > svg.svg-inline--fa.fa-flag.fa-w-16.fa-2x.restrict-icon</value>
-      </entry>
-      <entry>
          <key>BASIC</key>
          <value>id(&quot;app&quot;)/div[1]/div[@class=&quot;container foi-container&quot;]/div[@class=&quot;MuiGrid-root MuiGrid-container MuiGrid-spacing-xs-1 foi-grid-container css-tuxzvu&quot;]/div[@class=&quot;MuiGrid-root MuiGrid-container MuiGrid-spacing-xs-1 css-19o37pk&quot;]/div[@class=&quot;MuiGrid-root MuiGrid-item MuiGrid-grid-xs-12 jss4 css-15j76c0&quot;]/div[@class=&quot;foi-data-grid MuiDataGrid-root MuiDataGrid-autoHeight css-1t75zoz&quot;]/div[@class=&quot;MuiDataGrid-main css-opb0c2&quot;]/div[2]/div[@class=&quot;MuiDataGrid-virtualScroller css-3enz1m&quot;]/div[@class=&quot;MuiDataGrid-virtualScrollerContent css-79elbk&quot;]/div[@class=&quot;MuiDataGrid-virtualScrollerRenderZone css-1inm7gi&quot;]/div[@class=&quot;MuiDataGrid-row MuiDataGrid-row--lastVisible&quot;]/div[@class=&quot;foi-dashboard-restricted MuiDataGrid-cell--withRenderer MuiDataGrid-cell MuiDataGrid-cell--textLeft&quot;]/svg[@class=&quot;svg-inline--fa fa-flag fa-w-16 fa-2x restrict-icon&quot;][count(. | //svg[@class = 'svg-inline--fa fa-flag fa-w-16 fa-2x restrict-icon']) = count(//svg[@class = 'svg-inline--fa fa-flag fa-w-16 fa-2x restrict-icon'])]</value>
       </entry>
       <entry>
+         <key>CSS</key>
+         <value>div.foi-dashboard-restricted.MuiDataGrid-cell--withRenderer.MuiDataGrid-cell.MuiDataGrid-cell--textLeft > svg.svg-inline--fa.fa-flag.fa-w-14.fa-2x.restrict-icon</value>
+      </entry>
+      <entry>
          <key>IMAGE</key>
-         <value></value>
       </entry>
    </selectorCollection>
    <selectorMethod>CSS</selectorMethod>
@@ -31,7 +29,7 @@
       <name>tag</name>
       <type>Main</type>
       <value>svg</value>
-      <webElementGuid>2206047d-9b4c-469a-904a-1d891238355b</webElementGuid>
+      <webElementGuid>dbba073e-a7cc-4b74-bc43-da77c5354bd0</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -39,7 +37,7 @@
       <name>aria-hidden</name>
       <type>Main</type>
       <value>true</value>
-      <webElementGuid>05e5a0c6-1fa1-420e-bd23-88fb60a49bbb</webElementGuid>
+      <webElementGuid>23b06156-6e62-42d7-b263-cbba8d86cbf1</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -47,7 +45,7 @@
       <name>focusable</name>
       <type>Main</type>
       <value>false</value>
-      <webElementGuid>0203d1f1-1164-4ab8-9db8-34fe77c92ff6</webElementGuid>
+      <webElementGuid>d211aa26-7d8c-4258-9905-02b68a2a45a3</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -55,7 +53,7 @@
       <name>data-prefix</name>
       <type>Main</type>
       <value>fas</value>
-      <webElementGuid>940b6a70-72cb-4d38-a0e6-b51f7fe313a3</webElementGuid>
+      <webElementGuid>37f46f63-c0b6-44e5-9186-edff6a8d5a14</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -63,7 +61,7 @@
       <name>data-icon</name>
       <type>Main</type>
       <value>flag</value>
-      <webElementGuid>83772dde-c9d3-4b1b-91d5-8d27e4641da8</webElementGuid>
+      <webElementGuid>7d07e06b-bc54-46cc-b44d-5faec521a2a8</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>true</isSelected>
@@ -71,7 +69,7 @@
       <name>class</name>
       <type>Main</type>
       <value>svg-inline--fa fa-flag fa-w-16 fa-2x restrict-icon</value>
-      <webElementGuid>c8d323b8-cb6b-4364-8396-9b0a50ba4a6c</webElementGuid>
+      <webElementGuid>a712eb0e-831b-40f3-b114-64ef03e17a2d</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -79,7 +77,7 @@
       <name>role</name>
       <type>Main</type>
       <value>img</value>
-      <webElementGuid>bb417a5e-096a-46cd-939c-2faabd855852</webElementGuid>
+      <webElementGuid>00853e71-c2b9-468b-8d8b-aa8d9f9508b7</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -87,7 +85,7 @@
       <name>xmlns</name>
       <type>Main</type>
       <value>http://www.w3.org/2000/svg</value>
-      <webElementGuid>31c14a67-2495-4f44-947a-3e21ec74bf45</webElementGuid>
+      <webElementGuid>800b7827-bcc2-4d9d-95ea-842a155e3ed6</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -95,7 +93,7 @@
       <name>viewBox</name>
       <type>Main</type>
       <value>0 0 512 512</value>
-      <webElementGuid>93e24b55-75a4-42cd-ad2a-93d856af751d</webElementGuid>
+      <webElementGuid>26759403-774d-4710-9acb-d50c4798e9cb</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>true</isSelected>
@@ -103,7 +101,7 @@
       <name>xpath</name>
       <type>Main</type>
       <value>id(&quot;app&quot;)/div[1]/div[@class=&quot;container foi-container&quot;]/div[@class=&quot;MuiGrid-root MuiGrid-container MuiGrid-spacing-xs-1 foi-grid-container css-tuxzvu&quot;]/div[@class=&quot;MuiGrid-root MuiGrid-container MuiGrid-spacing-xs-1 css-19o37pk&quot;]/div[@class=&quot;MuiGrid-root MuiGrid-item MuiGrid-grid-xs-12 jss4 css-15j76c0&quot;]/div[@class=&quot;foi-data-grid MuiDataGrid-root MuiDataGrid-autoHeight css-1t75zoz&quot;]/div[@class=&quot;MuiDataGrid-main css-opb0c2&quot;]/div[2]/div[@class=&quot;MuiDataGrid-virtualScroller css-3enz1m&quot;]/div[@class=&quot;MuiDataGrid-virtualScrollerContent css-79elbk&quot;]/div[@class=&quot;MuiDataGrid-virtualScrollerRenderZone css-1inm7gi&quot;]/div[@class=&quot;MuiDataGrid-row MuiDataGrid-row--lastVisible&quot;]/div[@class=&quot;foi-dashboard-restricted MuiDataGrid-cell--withRenderer MuiDataGrid-cell MuiDataGrid-cell--textLeft&quot;]/svg[@class=&quot;svg-inline--fa fa-flag fa-w-16 fa-2x restrict-icon&quot;]</value>
-      <webElementGuid>6ec17493-48b1-4734-8cb8-19ef363b6880</webElementGuid>
+      <webElementGuid>dd0eab43-93e9-4c46-a1fb-c26efa89dce3</webElementGuid>
    </webElementProperties>
    <webElementXpaths>
       <isSelected>true</isSelected>
@@ -111,7 +109,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>(.//*[normalize-space(text()) and normalize-space(.)='MAY 16 2023'])[1]/following::*[name()='svg'][1]</value>
-      <webElementGuid>ed708742-2c51-4c7a-b291-9f465fd3bf7f</webElementGuid>
+      <webElementGuid>48236970-ef51-44ae-8565-a2f9d16f20d6</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -119,7 +117,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>(.//*[normalize-space(text()) and normalize-space(.)='APR 18 2023'])[1]/following::*[name()='svg'][1]</value>
-      <webElementGuid>bde8418a-73cd-43d3-b3d2-7d436e0122de</webElementGuid>
+      <webElementGuid>e36f6f3d-e9a5-46ee-a986-4ffe6114170a</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -127,6 +125,6 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>(.//*[normalize-space(text()) and normalize-space(.)='Search'])[1]/preceding::*[name()='svg'][4]</value>
-      <webElementGuid>50bfe1db-3fc1-44e3-be4c-707a43ab6107</webElementGuid>
+      <webElementGuid>083390f6-9761-476c-a24e-e11275fa0e43</webElementGuid>
    </webElementXpaths>
 </WebElementEntity>

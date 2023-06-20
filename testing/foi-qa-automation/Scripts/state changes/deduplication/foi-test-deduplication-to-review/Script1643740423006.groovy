@@ -100,7 +100,7 @@ WebUI.click(findTestObject('Page_foi.flow/form/state change dialog/button_Save C
 DriverFactory.changeWebDriver(IAOuser)
 
 WebUI.callTestCase(findTestCase('helper/foi-test-login'), [('password') : findTestData('Login Credentials').getValue('Password', 
-            7), ('username') : findTestData('Login Credentials').getValue('Username', 7)], FailureHandling.STOP_ON_FAILURE)
+            6), ('username') : findTestData('Login Credentials').getValue('Username', 6)], FailureHandling.STOP_ON_FAILURE)
 
 WebUI.click(findTestObject('Page_foi.flow/queue/div_My Team Requests'))
 
@@ -147,7 +147,7 @@ WebUI.click(findTestObject('Page_foi.flow/form/sidebar/div_Sidebar Comments'))
 WebUI.click(findTestObject('Page_foi.flow/comment/span_Request History Comments'))
 
 WebUI.verifyElementText(findTestObject('Page_foi.flow/comment/p_comment list 1 text'), ((findTestData('Login Credentials').getValue(
-        'First Name', 7) + ' ') + findTestData('Login Credentials').getValue('Last Name', 7)) + ' changed the state of the request to Records Review')
+        'First Name', 6) + ' ') + findTestData('Login Credentials').getValue('Last Name', 6)) + ' changed the state of the request to Records Review')
 
 WebUI.click(findTestObject('Page_foi.flow/form/sidebar/a_FOI'), FailureHandling.STOP_ON_FAILURE)
 

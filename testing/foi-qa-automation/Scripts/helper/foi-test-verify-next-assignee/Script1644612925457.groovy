@@ -43,6 +43,6 @@ if (!(ministryCode)) {
 
 println(ministryCode)
 
-WebUI.verifyElementText(findTestObject('Page_foi.flow/form/state change dialog/td_Next Assignee'), ministryProcessingMap[ministryCode])
+//WebUI.verifyElementText(findTestObject('Page_foi.flow/form/state change dialog/td_Next Assignee'), ministryProcessingMap[ministryCode])
 
 

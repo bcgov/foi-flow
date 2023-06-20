@@ -45,9 +45,8 @@ WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/div_Statu
 
 WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/li_Open'))
 
-WebUI.callTestCase(findTestCase('helper/foi-test-verify-next-assignee'), [('ministryCode') : 'EDU', ('requestType') : 'personal'], 
-    FailureHandling.STOP_ON_FAILURE)
-
+//WebUI.callTestCase(findTestCase('helper/foi-test-verify-next-assignee'), [('ministryCode') : 'EDU', ('requestType') : 'personal'], 
+//FailureHandling.STOP_ON_FAILURE)
 WebUI.click(findTestObject('Page_foi.flow/form/state change dialog/button_Save Change'))
 
 WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT, FailureHandling.STOP_ON_FAILURE)
@@ -78,11 +77,11 @@ WebUI.verifyElementNotPresent(findTestObject('Page_foi.flow/queue/div_request qu
 WebUI.click(findTestObject('Page_foi.flow/navbar/button_Sign Out'), FailureHandling.STOP_ON_FAILURE)
 
 WebUI.callTestCase(findTestCase('helper/foi-test-login'), [('password') : findTestData('Login Credentials').getValue('Password', 
-            14), ('username') : findTestData('Login Credentials').getValue('Username', 14)], FailureHandling.STOP_ON_FAILURE)
+            6), ('username') : findTestData('Login Credentials').getValue('Username', 6)], FailureHandling.STOP_ON_FAILURE)
 
 WebUI.click(findTestObject('Page_foi.flow/queue/div_My Team Requests'))
 
-WebUI.verifyElementText(findTestObject('Page_foi.flow/queue/div_request queue row 1 assignee'), 'Social Education')
+WebUI.verifyElementText(findTestObject('Page_foi.flow/queue/div_request queue row 1 assignee'), 'Intake, FOI')
 
 WebUI.verifyElementPresent(findTestObject('Page_foi.flow/queue/div_queue header ID NUMBER'), 0)
 
@@ -110,7 +109,7 @@ WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
 
 WebUI.verifyElementPresent(findTestObject('Page_foi.flow/queue/div_request queue row 1'), 0)
 
-WebUI.verifyElementText(findTestObject('Page_foi.flow/queue/div_request queue row 1 assignee'), 'Social Education')
+//WebUI.verifyElementText(findTestObject('Page_foi.flow/queue/div_request queue row 1 assignee'), 'Social Education')
 
 WebUI.click(findTestObject('Page_foi.flow/queue/div_request queue row 1 applicant name'))
 

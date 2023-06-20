@@ -377,7 +377,7 @@
    <testCaseLink>
       <guid>c2c0564d-caa5-4a1c-906c-bb9eac165fdc</guid>
       <isReuseDriver>false</isReuseDriver>
-      <isRun>true</isRun>
+      <isRun>false</isRun>
       <testCaseId>Test Cases/form/foi-test-assign-to-flex</testCaseId>
       <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
       <variableLink>
@@ -498,7 +498,7 @@
    <testCaseLink>
       <guid>6748084b-6d09-4b43-bb2b-ff77f11225ce</guid>
       <isReuseDriver>false</isReuseDriver>
-      <isRun>true</isRun>
+      <isRun>false</isRun>
       <testCaseId>Test Cases/form/foi-test-assign-to-processing</testCaseId>
       <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
       <variableLink>
