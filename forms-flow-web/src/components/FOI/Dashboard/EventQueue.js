@@ -34,12 +34,29 @@ const EventQueue = ({ userDetail, eventQueueTableInfo }) => {
   const filterFields = [
     "createdat",
     "axisRequestId",
-    "creatorFormatted",    
+
+    "createdby",   
+    "creatorFirstName",
+    "creatorLastName",
+    "creatorFormatted",
+
     "assignedTo",
+    "assignedGroup",
+    "assignedToFirstName",
+    "assignedToLastName",    
     "assignedToFormatted",
-    "ministryAssignedToFormatted",
+
+    "assignedministryperson",
     "assignedministrygroup",
+    "assignedministrypersonFirstName",
+    "assignedministrypersonLastName",    
+    "ministryAssignedToFormatted",
+
+    "to",
+    "userFirstName",
+    "userLastName",
     "userFormatted",
+    
     "notification"
   ];
 
@@ -274,7 +291,7 @@ const EventQueue = ({ userDetail, eventQueueTableInfo }) => {
           className="foi-data-grid"
           getRowId={(row) => row.id}
           rows={rows}
-          columns={eventQueueTableInfo?.columns || []}
+          columns={eventColumnsRef.current}
           rowHeight={30}
           headerHeight={50}
           rowCount={eventQueue?.meta?.total || 0}
