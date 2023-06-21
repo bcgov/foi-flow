@@ -3,7 +3,7 @@ from os import stat
 from re import VERBOSE
 from request_api.models.FOIRequestNotificationUsers import FOIRequestNotificationUser
 from request_api.models.FOIRawRequestNotificationUsers import FOIRawRequestNotificationUser
-
+from request_api.models.FOIRequestNotificationDashboard import FOIRequestNotificationDashboard
 from request_api.auth import AuthHelper
 from dateutil import tz, parser
 from flask import jsonify
@@ -18,7 +18,7 @@ class dashboardeventservice:
         _keyword, _filterfields = self.__validateandtransform(filterfields, keyword)
         notifications = None
         if AuthHelper.getusertype() == "iao" and (queuetype is None or queuetype == "all"):                                                                                           
-                notifications = FOIRawRequestNotificationUser.geteventpagination(groups, page, size, sortingitems, sortingorders, _filterfields, _keyword, additionalfilter, userid, AuthHelper.isiaorestrictedfilemanager())
+                notifications = FOIRequestNotificationDashboard.geteventpagination(groups, page, size, sortingitems, sortingorders, _filterfields, _keyword, additionalfilter, userid, AuthHelper.isiaorestrictedfilemanager())
         elif  AuthHelper.getusertype() == "ministry" and (queuetype is not None and queuetype == "ministry"):
                 notifications = FOIRequestNotificationUser.geteventpagination(groups, page, size, sortingitems, sortingorders, _filterfields, _keyword, additionalfilter, userid, AuthHelper.isiaorestrictedfilemanager(), AuthHelper.isministryrestrictedfilemanager())
         if notifications is not None:
@@ -89,7 +89,7 @@ class dashboardeventservice:
 
     def __prepareevent(self, notification):
         return {
-            'id': str(notification.id)+notification.idnumber+notification.axisRequestId+notification.to+notification.createdby,
+            'id': notification.idnumber+self.__formatedate(notification.createdat).replace(' ','')+notification.axisRequestId+notification.to+notification.createdby,
             'status': notification.status,
             'rawrequestid': notification.rawrequestid,
             'requestid': notification.requestid,
@@ -116,7 +116,8 @@ class dashboardeventservice:
             'ministryAssignedToFormatted': notification.ministryAssignedToFormatted,
             'notificationType': notification.notificationtype,
             'userFormatted': notification.userFormatted,
-            'creatorFormatted': notification.creatorFormatted
+            'creatorFormatted': notification.creatorFormatted,
+            'description':notification.description
         }
 
     def __formatedate(self, input):

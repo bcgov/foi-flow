@@ -5,6 +5,7 @@ from datetime import datetime as datetime2
 from sqlalchemy.orm import relationship,backref, aliased
 from .default_method_result import DefaultMethodResult
 from sqlalchemy.dialects.postgresql import JSON, UUID
+from sqlalchemy.sql.functions import coalesce
 from sqlalchemy import or_, and_, text, func, literal, cast, case, nullslast, nullsfirst, desc, asc, extract
 from sqlalchemy.sql.sqltypes import String
 from sqlalchemy.sql.expression import distinct
@@ -33,6 +34,11 @@ from .FOIRequestNotifications import FOIRequestNotification
 from .FOIUsers import FOIUser
 from .NotificationTypes import NotificationType
 from .FOIRequestStatus import FOIRequestStatus
+
+from .FOIRawRequestNotifications import FOIRawRequestNotification
+from .FOIRawRequestNotificationUsers import FOIRawRequestNotificationUser
+
+
 class FOIRequestNotificationUser(db.Model):
     # Name of the table in our database
     __tablename__ = 'FOIRequestNotificationUsers' 
@@ -153,6 +159,7 @@ class FOIRequestNotificationUser(db.Model):
 
         #ministry filter for group/team
         ministryfilter = FOIMinistryRequest.getgroupfilters(groups)
+        
         #subquery for getting latest version & proper group/team for FOIMinistryRequest
         subquery_ministry_maxversion = _session.query(FOIMinistryRequest.foiministryrequestid, func.max(FOIMinistryRequest.version).label('max_version')).group_by(FOIMinistryRequest.foiministryrequestid).subquery()
         joincondition_ministry = [
@@ -162,8 +169,8 @@ class FOIRequestNotificationUser(db.Model):
 
         #aliase for getting ministry restricted flag from FOIRestrictedMinistryRequest
         ministry_restricted_requests = aliased(FOIRestrictedMinistryRequest)
-        
-
+        requestnotytype = aliased(NotificationType)
+        rawrequestnotytype = aliased(NotificationType)
 
         assignedtoformatted = case([
                             (and_(iaoassignee.lastname.isnot(None), iaoassignee.firstname.isnot(None)),
@@ -205,8 +212,8 @@ class FOIRequestNotificationUser(db.Model):
                              foicreator.firstname),
                            ],
                            else_ = FOIRequestNotificationUser.createdby).label('creatorformatted')
-
-
+        
+        
         #filter/search
         if(len(filterfields) > 0 and keyword is not None):
             filtercondition = []
@@ -242,12 +249,13 @@ class FOIRequestNotificationUser(db.Model):
         
 
         selectedcolumns = [
-            cast(FOIMinistryRequest.axisrequestid, String).label('axisRequestId'),
+            coalesce(FOIRequestNotification.axisnumber,FOIRawRequestNotification.axisnumber).label('axisRequestId'),
             FOIRequestStatus.name.label('status'),
-            FOIRequestNotification.notification["message"].label('notification'),
-            FOIRequestNotificationUser.userid.label('to'),
-            FOIRequestNotificationUser.createdby.label('createdby'),
-            FOIRequestNotificationUser.created_at.label('createdat'),
+            #messageformatted,  
+            coalesce(FOIRawRequestNotification.notification["message"].astext.cast(String),FOIRequestNotification.notification["message"].astext.cast(String)).label('notification'),     
+            coalesce(FOIRequestNotificationUser.userid,FOIRawRequestNotificationUser.userid).label('to'),
+            coalesce(FOIRequestNotificationUser.createdby,FOIRawRequestNotificationUser.createdby).label('createdby'),
+            coalesce(FOIRequestNotificationUser.created_at,FOIRawRequestNotificationUser.created_at).label('createdat'),
             FOIMinistryRequest.assignedgroup.label('assignedGroup'),
             FOIMinistryRequest.assignedto.label('assignedTo'),
             FOIMinistryRequest.assignedministrygroup.label('assignedministrygroup'),
@@ -258,18 +266,22 @@ class FOIRequestNotificationUser(db.Model):
             ministryassignee.lastname.label('assignedministrypersonLastName'),
             assignedtoformatted,
             ministryassignedtoformatted,
-            FOIRequestNotificationUser.notificationuserid.label('id'),
+            coalesce(FOIRequestNotificationUser.notificationuserid,FOIRawRequestNotificationUser.notificationuserid).label('id'),
             FOIRequest.foirawrequestid.label('rawrequestid'),
             FOIRequest.foirequestid.label('requestid'),
             FOIMinistryRequest.foiministryrequestid.label('ministryrequestid'),
-            FOIRequestNotification.idnumber.label('idnumber'),
+            #FOIRequestNotification.idnumber.label('idnumber'),
+            coalesce(FOIRequestNotification.idnumber,FOIRawRequestNotification.idnumber).label('idnumber'),
             foiuser.firstname.label('userFirstName'),
             foiuser.lastname.label('userLastName'),
             foicreator.firstname.label('creatorFirstName'),
             foicreator.lastname.label('creatorLastName'),
-            NotificationType.name.label('notificationtype'),
+            #NotificationType.name.label('notificationtype'),
+            #typeformatted,
+            coalesce(rawrequestnotytype.name,requestnotytype.name).label('notificationtype'),
             userformatted.label('userFormatted'),
-            creatorformatted.label('creatorFormatted')
+            creatorformatted.label('creatorFormatted'),
+            FOIMinistryRequest.description,
         ]
 
         basequery = _session.query(
@@ -308,16 +320,31 @@ class FOIRequestNotificationUser(db.Model):
                             ).join(
                                 FOIRequestNotification,
                                 and_(FOIRequestNotification.axisnumber == FOIMinistryRequest.axisrequestid),
+                                isouter=True
                             ).join(
                                 FOIRequestNotificationUser,
                                 and_(FOIRequestNotificationUser.notificationid == FOIRequestNotification.notificationid),
+                                isouter=True
                             ).join(
-                                NotificationType,
-                                and_(FOIRequestNotification.notificationtypeid == NotificationType.notificationtypeid),
+                                FOIRawRequestNotification,
+                                and_(FOIRawRequestNotification.axisnumber == FOIMinistryRequest.axisrequestid),
+                                isouter=True
                             ).join(
-                                foiuser, foiuser.preferred_username == FOIRequestNotificationUser.userid, isouter=True  
+                                FOIRawRequestNotificationUser,
+                                and_(FOIRawRequestNotificationUser.notificationid == FOIRawRequestNotification.notificationid),
+                                #isouter=True
                             ).join(
-                                foicreator, foicreator.preferred_username == FOIRequestNotificationUser.createdby, isouter=True  
+                                requestnotytype,
+                                and_(FOIRequestNotification.notificationtypeid == requestnotytype.notificationtypeid),
+                                isouter=True
+                            ).join(
+                                rawrequestnotytype,
+                                and_(FOIRawRequestNotification.notificationtypeid == rawrequestnotytype.notificationtypeid),
+                                isouter=True
+                            ).join(
+                                foiuser, foiuser.preferred_username == coalesce(FOIRequestNotificationUser.userid,FOIRawRequestNotificationUser.userid), isouter=True  
+                            ).join(
+                                foicreator, foicreator.preferred_username == coalesce(FOIRequestNotificationUser.createdby,FOIRawRequestNotificationUser.createdby), isouter=True  
                             ).filter(FOIMinistryRequest.requeststatusid != 3)
         
         if(additionalfilter == 'watchingRequests'):
@@ -325,7 +352,7 @@ class FOIRequestNotificationUser(db.Model):
             activefilter = and_(FOIMinistryRequest.isactive == True, FOIRequestStatus.isactive == True)
 
             subquery_watchby = FOIRequestWatcher.getrequestidsbyuserid(userid)
-            dbquery = basequery.join(subquery_watchby, subquery_watchby.c.ministryrequestid == FOIMinistryRequest.foiministryrequestid).filter(activefilter).filter(FOIRequestNotificationUser.userid == userid)
+            dbquery = basequery.join(subquery_watchby, subquery_watchby.c.ministryrequestid == FOIMinistryRequest.foiministryrequestid).filter(activefilter)
         elif(additionalfilter == 'myRequests'):
             #myrequest
             if(requestby == 'IAO'):
@@ -340,12 +367,13 @@ class FOIRequestNotificationUser(db.Model):
                     dbquery = basequery.filter(or_(or_(FOIRestrictedMinistryRequest.isrestricted == False, FOIRestrictedMinistryRequest.isrestricted == None), and_(FOIRestrictedMinistryRequest.isrestricted == True, FOIMinistryRequest.assignedto == userid))).filter(ministryfilter)
                 else:
                     dbquery = basequery.filter(or_(or_(ministry_restricted_requests.isrestricted == False, ministry_restricted_requests.isrestricted == None), and_(ministry_restricted_requests.isrestricted == True, FOIMinistryRequest.assignedministryperson == userid))).filter(ministryfilter)
-        
+
+
         if(keyword is None):
             return dbquery
         else:
-            return dbquery.filter(or_(*filtercondition)) if(len(filterfields) > 0 and keyword is not None) else  dbquery
-
+            return dbquery.filter(or_(*filtercondition))
+    
     @classmethod
     def getfilterkeyword(cls, keyword, field):
         _newkeyword = keyword
@@ -421,7 +449,8 @@ class FOIRequestNotificationUser(db.Model):
             'userFirstName':foiuser.firstname,
             'userLastName':foiuser.lastname,
             'creatorFirstName':foicreator.firstname,
-            'creatorLastName':foicreator.lastname
+            'creatorLastName':foicreator.lastname,
+            'description': FOIMinistryRequest.description,
         }.get(x,  cast(FOIMinistryRequest.axisrequestid, String))
     
     # End of Dashboard functions
