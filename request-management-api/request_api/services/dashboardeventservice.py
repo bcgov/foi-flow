@@ -89,7 +89,7 @@ class dashboardeventservice:
 
     def __prepareevent(self, notification):
         return {
-            'id': notification.idnumber+self.__formatedate(notification.createdat).replace(' ','')+notification.axisRequestId+notification.to+notification.createdby,
+            'testid': str(notification.id)+notification.idnumber+notification.axisRequestId+notification.to+notification.createdby,
             'status': notification.status,
             'rawrequestid': notification.rawrequestid,
             'requestid': notification.requestid,
