@@ -15,7 +15,7 @@ from sqlalchemy import insert, and_, or_, text, func, literal, cast, asc, desc, 
 from .FOIAssignees import FOIAssignee
 from .FOIRawRequests import FOIRawRequest
 from .FOIMinistryRequests import FOIMinistryRequest
-from .FOIRequestNotificationUsers import FOIRequestNotificationUser
+#from .FOIRequestNotificationUsers import FOIRequestNotificationUser
 from .FOIRawRequestNotifications import FOIRawRequestNotification
 from .FOIRawRequestWatchers import FOIRawRequestWatcher
 from .FOIUsers import FOIUser
@@ -206,14 +206,30 @@ class FOIRawRequestNotificationUser(db.Model):
                              foicreator.firstname),                          ],
                            else_ = FOIRawRequestNotificationUser.createdby).label('creatorformatted')
 
+        messageformatted = case([
+                            (FOIRawRequestNotification.notification["message"].astext.cast(String).isnot(None),
+                             FOIRawRequestNotification.notification["message"].astext.cast(String)),                            
+                           ],
+                           else_ = None).label('notification')
 
+        typeformatted = case([
+                            ( NotificationType.name.isnot(None),
+                             NotificationType.name),                            
+                           ],
+                           else_ = None).label('notificationtype')
 
+        description = case([
+                            (FOIRawRequest.status == 'Unopened',
+                             FOIRawRequest.requestrawdata['descriptionTimeframe']['description'].astext),
+                           ],
+                           else_ = FOIRawRequest.requestrawdata['description'].astext).label('description')
         
 
         selectedcolumns = [
             axisrequestid,  
             FOIRawRequest.status.label('status'),          
-            FOIRawRequestNotification.notification["message"].label('notification'),
+            #FOIRawRequestNotification.notification["message"].label('notification'),
+            messageformatted,
             FOIRawRequestNotificationUser.userid.label('to'),
             FOIRawRequestNotificationUser.createdby.label('createdby'),
             FOIRawRequestNotificationUser.created_at.label('createdat'),
@@ -229,16 +245,18 @@ class FOIRawRequestNotificationUser(db.Model):
             literal(None).label('ministryAssignedToFormatted'),
             FOIRawRequestNotificationUser.notificationuserid.label('id'),
             FOIRawRequest.requestid.label('rawrequestid'),
-            ministry_opened_query.c.foirequest_id.label('requestid'),
-            ministry_opened_query.c.foiministryrequestid.label('ministryrequestid'),
+            literal(None).label('requestid'),
+            literal(None).label('ministryrequestid'),
             FOIRawRequestNotification.idnumber.label('idnumber'),
             foiuser.firstname.label('userFirstName'),
             foiuser.lastname.label('userLastName'),
             foicreator.firstname.label('creatorFirstName'),
             foicreator.lastname.label('creatorLastName'),
-            NotificationType.name.label('notificationtype'),
+            #NotificationType.name.label('notificationtype'),
+            typeformatted,
             userformatted.label('userFormatted'),
-            creatorformatted.label('creatorFormatted')
+            creatorformatted.label('creatorFormatted'),
+            description
         ]
 
         basequery = _session.query(
@@ -249,7 +267,8 @@ class FOIRawRequestNotificationUser(db.Model):
                                         FOIAssignee, FOIAssignee.username == FOIRawRequest.assignedto, isouter=True
                                 ).join(
                                         FOIRawRequestNotification,
-                                        and_(FOIRawRequestNotification.idnumber == 'U-00' + cast(FOIRawRequest.requestid, String), FOIRawRequestNotification.axisnumber.notin_(ministry_closed_query))
+                                        and_(FOIRawRequestNotification.idnumber == 'U-00' + cast(FOIRawRequest.requestid, String), 
+                                             FOIRawRequestNotification.axisnumber.notin_(ministry_closed_query)),
                                 ).join(
                                         FOIRawRequestNotificationUser,
                                         and_(FOIRawRequestNotificationUser.notificationid == FOIRawRequestNotification.notificationid)
@@ -260,16 +279,11 @@ class FOIRawRequestNotificationUser(db.Model):
                                         foiuser, foiuser.preferred_username == FOIRawRequestNotificationUser.userid, isouter=True  
                                 ).join(
                                         foicreator, foicreator.preferred_username == FOIRawRequestNotificationUser.createdby, isouter=True  
-                                ).join (
-                                        ministry_opened_query,
-                                        ministry_opened_query.c.axisrequestid == FOIRawRequestNotification.axisnumber,
-                                        isouter = True
                                 )
-       
+        
         if additionalfilter is None:
             if(isiaorestrictedfilemanager == True):
-                return basequery
-                #return basequery.filter(FOIRawRequest.status.notin_(['Archived']))
+                return basequery.filter(FOIRawRequest.status.notin_(['Archived']))
             else:
                 subquery_watchby = FOIRawRequestWatcher.getrequestidsbyuserid(userid)
 
@@ -278,33 +292,28 @@ class FOIRawRequestNotificationUser(db.Model):
                                     subquery_watchby.c.requestid == FOIRawRequest.requestid,
                                     isouter=True
                                 ).filter(
-                                    #and_(
-                                        #FOIRawRequest.status.notin_(['Archived']),
+                                    and_(
+                                        FOIRawRequest.status.notin_(['Archived']),
                                         or_(
                                             FOIRawRequest.isiaorestricted == False,
                                             and_(FOIRawRequest.isiaorestricted == True, FOIRawRequest.assignedto == userid),
-                                            and_(FOIRawRequest.isiaorestricted == True, subquery_watchby.c.watchedby == userid)))
-                #)
+                                            and_(FOIRawRequest.isiaorestricted == True, subquery_watchby.c.watchedby == userid))))
         else:
             if(additionalfilter == 'watchingRequests' and userid is not None):
                 #watchby
                 subquery_watchby = FOIRawRequestWatcher.getrequestidsbyuserid(userid)
-                return basequery.join(subquery_watchby, subquery_watchby.c.requestid == FOIRawRequest.requestid)
-                #return basequery.join(subquery_watchby, subquery_watchby.c.requestid == FOIRawRequest.requestid).filter(FOIRawRequest.status.notin_(['Archived']))
+                return basequery.join(subquery_watchby, subquery_watchby.c.requestid == FOIRawRequest.requestid).filter(FOIRawRequest.status.notin_(['Archived']))
             elif(additionalfilter == 'myRequests'):
                 #myrequest
-                return basequery.filter(FOIRawRequest.assignedto == userid)
-                #return basequery.filter(and_(FOIRawRequest.status.notin_(['Archived']), FOIRawRequest.assignedto == userid))
+                return basequery.filter(and_(FOIRawRequest.status.notin_(['Archived']), FOIRawRequest.assignedto == userid))
             else:
                 if(isiaorestrictedfilemanager == True):
-                    #return basequery.filter(FOIRawRequest.status.notin_(['Archived']))
-                    return basequery
+                    return basequery.filter(FOIRawRequest.status.notin_(['Archived']))
                 else:
                     return basequery.filter(
-                        #and_(
-                            #FOIRawRequest.status.notin_(['Archived']),
-                            or_(FOIRawRequest.isiaorestricted == False, and_(FOIRawRequest.isiaorestricted == True, FOIRawRequest.assignedto == userid)))
-                    #)
+                        and_(
+                            FOIRawRequest.status.notin_(['Archived']),
+                            or_(FOIRawRequest.isiaorestricted == False, and_(FOIRawRequest.isiaorestricted == True, FOIRawRequest.assignedto == userid))))
 
 
     @classmethod
@@ -372,9 +381,11 @@ class FOIRawRequestNotificationUser(db.Model):
             'axisRequestId' : cast(FOIRawRequest.axisrequestid, String),
             'assignedTo': FOIRawRequest.assignedto,
             'assignedToFirstName': FOIAssignee.firstname,
-            'assignedToLastName': FOIAssignee.lastname
+            'assignedToLastName': FOIAssignee.lastname,
+            'description': FOIRawRequest.requestrawdata['description'].astext,
         }.get(x, cast(FOIRawRequest.requestid, String))
     
+    """
     @classmethod
     def geteventpagination(cls, groups, page, size, sortingitems, sortingorders, filterfields, keyword, additionalfilter, userid, isiaorestrictedfilemanager, isministryrestrictedfilemanager=False):
         #ministry requests
@@ -394,7 +405,7 @@ class FOIRawRequestNotificationUser(db.Model):
             return query_full_queue.order_by(*sortingcondition).paginate(page=page, per_page=size)
         else:
             return subquery_ministry_queue.order_by(*sortingcondition).paginate(page=page, per_page=size)
-
+    """
     @classmethod
     def getsorting(cls, sortingitems, sortingorders):
         sortingcondition = []

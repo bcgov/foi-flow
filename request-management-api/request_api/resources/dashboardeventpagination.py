@@ -70,6 +70,7 @@ class EventPagination(Resource):
                                         'creatorLastName',
                                         'userFirstName',
                                         'userLastName',
+                                        'description'
 
                                     ]
             DEFAULT_ADDITIONAL_FILTER = 'All'
