@@ -6,7 +6,6 @@ import { ActionProvider } from './ActionContext'
 import Input from './Input'
 import CommentFilter from './CommentFilter'
 import { getMinistryRestrictedTagList } from "../../../../helper/FOI/helper";
-import { fetchFOIRequestNotesList } from '../../../../apiManager/services/FOI/foiRequestNoteServices'
 import Loading from "../../../../containers/Loading";
 
 
@@ -36,16 +35,11 @@ export const CommentSection = ({
   let _commentcategory = sessionStorage.getItem('foicommentcategory')
   const [filterValue, setfilterValue] = useState(_commentcategory === '' || _commentcategory === undefined || _commentcategory === null  ? 1 : parseInt(_commentcategory))
   const [filterkeyValue, setfilterkeyValue] = useState("")
-  const dispatch = useDispatch();
   useEffect(() => {
-    if(commentsArray) {
     let _commentsbyCategory = parseInt(filterValue) === -1 ? commentsArray :  commentsArray.filter(c => c.commentTypeId === parseInt(filterValue))
     let _filteredcomments = filterkeyValue === "" ? _commentsbyCategory : _commentsbyCategory.filter(c => c.text.toLowerCase().indexOf(filterkeyValue.toLowerCase()) > -1)
     let filteredcomments = filterkeyinCommentsandReplies(_commentsbyCategory,_filteredcomments)        
     setcomments(filteredcomments)
-    } else {
-      dispatch(fetchFOIRequestNotesList(requestid, ministryId));
-    }      
   }, [filterValue,commentsArray ,filterkeyValue])
   let restrictedReqTaglist = useSelector((state) => state.foiRequests.restrictedReqTaglist);
 
