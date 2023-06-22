@@ -1,10 +1,7 @@
-import {   
+import {   cellTooltipRender,
     eventCellTooltipRender
   } from "./utils";
-  import {  
-    getUserFullName
-  } from "../../../helper/FOI/helper";
-  
+   
   const EventQueueIAOColumns = [
   
     {
@@ -18,6 +15,7 @@ import {
       headerName: "ID NUMBER",
       headerAlign: "left",
       width: 160,
+      renderCell: cellTooltipRender
     },
     {
       field: "creatorFormatted",
