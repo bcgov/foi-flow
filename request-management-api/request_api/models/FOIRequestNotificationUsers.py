@@ -245,14 +245,10 @@ class FOIRequestNotificationUser(db.Model):
                 else:
                     filtercondition.append(ministry_restricted_requests.isrestricted == True)
 
-
-        
-
         selectedcolumns = [
-            coalesce(FOIRequestNotification.axisnumber,FOIRawRequestNotification.axisnumber).label('axisRequestId'),
+            FOIMinistryRequest.axisrequestid.label('axisRequestId'),
             FOIRequestStatus.name.label('status'),
-            #messageformatted,  
-            coalesce(FOIRawRequestNotification.notification["message"].astext.cast(String),FOIRequestNotification.notification["message"].astext.cast(String)).label('notification'),     
+            coalesce(FOIRequestNotification.notification["message"].astext.cast(String),FOIRawRequestNotification.notification["message"].astext.cast(String)).label('notification'),     
             coalesce(FOIRequestNotificationUser.userid,FOIRawRequestNotificationUser.userid).label('to'),
             coalesce(FOIRequestNotificationUser.createdby,FOIRawRequestNotificationUser.createdby).label('createdby'),
             coalesce(FOIRequestNotificationUser.created_at,FOIRawRequestNotificationUser.created_at).label('createdat'),
@@ -270,15 +266,12 @@ class FOIRequestNotificationUser(db.Model):
             FOIRequest.foirawrequestid.label('rawrequestid'),
             FOIRequest.foirequestid.label('requestid'),
             FOIMinistryRequest.foiministryrequestid.label('ministryrequestid'),
-            #FOIRequestNotification.idnumber.label('idnumber'),
             coalesce(FOIRequestNotification.idnumber,FOIRawRequestNotification.idnumber).label('idnumber'),
             foiuser.firstname.label('userFirstName'),
             foiuser.lastname.label('userLastName'),
             foicreator.firstname.label('creatorFirstName'),
             foicreator.lastname.label('creatorLastName'),
-            #NotificationType.name.label('notificationtype'),
-            #typeformatted,
-            coalesce(rawrequestnotytype.name,requestnotytype.name).label('notificationtype'),
+            coalesce(requestnotytype.name,rawrequestnotytype.name).label('notificationtype'),
             userformatted.label('userFormatted'),
             creatorformatted.label('creatorFormatted'),
             FOIMinistryRequest.description,
@@ -332,7 +325,7 @@ class FOIRequestNotificationUser(db.Model):
                             ).join(
                                 FOIRawRequestNotificationUser,
                                 and_(FOIRawRequestNotificationUser.notificationid == FOIRawRequestNotification.notificationid),
-                                #isouter=True
+                                isouter=True
                             ).join(
                                 requestnotytype,
                                 and_(FOIRequestNotification.notificationtypeid == requestnotytype.notificationtypeid),
@@ -345,7 +338,9 @@ class FOIRequestNotificationUser(db.Model):
                                 foiuser, foiuser.preferred_username == coalesce(FOIRequestNotificationUser.userid,FOIRawRequestNotificationUser.userid), isouter=True  
                             ).join(
                                 foicreator, foicreator.preferred_username == coalesce(FOIRequestNotificationUser.createdby,FOIRawRequestNotificationUser.createdby), isouter=True  
-                            ).filter(FOIMinistryRequest.requeststatusid != 3)
+                            ).filter(FOIMinistryRequest.requeststatusid != 3
+                            ).filter(or_(FOIRequestNotification.notification.isnot(None),FOIRawRequestNotification.notification.isnot(None)))
+
         
         if(additionalfilter == 'watchingRequests'):
             #watchby
@@ -368,7 +363,6 @@ class FOIRequestNotificationUser(db.Model):
                 else:
                     dbquery = basequery.filter(or_(or_(ministry_restricted_requests.isrestricted == False, ministry_restricted_requests.isrestricted == None), and_(ministry_restricted_requests.isrestricted == True, FOIMinistryRequest.assignedministryperson == userid))).filter(ministryfilter)
 
-
         if(keyword is None):
             return dbquery
         else:
@@ -385,20 +379,7 @@ class FOIRequestNotificationUser(db.Model):
             _newkeyword = _newkeyword.replace('u-00', '')
         return _newkeyword
 
-    @classmethod
-    def geteventpagination(cls, group, page, size, sortingitems, sortingorders, filterfields, keyword, additionalfilter, userid,isiaorestrictedfilemanager, isministryrestrictedfilemanager):
-        iaoassignee = aliased(FOIAssignee)
-        ministryassignee = aliased(FOIAssignee)
-        foiuser = aliased(FOIUser)
-        foicreator = aliased(FOIUser)
-
-        requestby = 'Ministry'
-
-        subquery = FOIRequestNotificationUser.geteventsubquery(group, filterfields, keyword, additionalfilter, userid, iaoassignee, ministryassignee, foiuser, foicreator, requestby, isiaorestrictedfilemanager, isministryrestrictedfilemanager)
-        sortingcondition = FOIRequestNotificationUser.getsorting(sortingitems, sortingorders, iaoassignee, ministryassignee, foiuser, foicreator)
-
-        return subquery.order_by(*sortingcondition).paginate(page=page, per_page=size)
-      
+    
     @classmethod
     def getsorting(cls, sortingitems, sortingorders, iaoassignee, ministryassignee, foiuser, foicreator):
         #sorting

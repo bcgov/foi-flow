@@ -9,7 +9,8 @@ from dateutil import tz, parser
 from flask import jsonify
 from datetime import datetime as datetime2
 from request_api.utils.commons.datetimehandler import datetimehandler
- 
+import re
+
 class dashboardeventservice:
     """ FOI Event Dashboard
     """
@@ -18,9 +19,9 @@ class dashboardeventservice:
         _keyword, _filterfields = self.__validateandtransform(filterfields, keyword)
         notifications = None
         if AuthHelper.getusertype() == "iao" and (queuetype is None or queuetype == "all"):                                                                                           
-                notifications = FOIRequestNotificationDashboard.geteventpagination(groups, page, size, sortingitems, sortingorders, _filterfields, _keyword, additionalfilter, userid, AuthHelper.isiaorestrictedfilemanager())
+                notifications = FOIRequestNotificationDashboard.getiaoeventpagination(groups, page, size, sortingitems, sortingorders, _filterfields, _keyword, additionalfilter, userid, AuthHelper.isiaorestrictedfilemanager())
         elif  AuthHelper.getusertype() == "ministry" and (queuetype is not None and queuetype == "ministry"):
-                notifications = FOIRequestNotificationUser.geteventpagination(groups, page, size, sortingitems, sortingorders, _filterfields, _keyword, additionalfilter, userid, AuthHelper.isiaorestrictedfilemanager(), AuthHelper.isministryrestrictedfilemanager())
+                notifications = FOIRequestNotificationDashboard.getministryeventpagination(groups, page, size, sortingitems, sortingorders, _filterfields, _keyword, additionalfilter, userid, AuthHelper.isiaorestrictedfilemanager(), AuthHelper.isministryrestrictedfilemanager())
         if notifications is not None:
             eventqueue = []
             for notification in notifications.items:
@@ -89,7 +90,7 @@ class dashboardeventservice:
 
     def __prepareevent(self, notification):
         return {
-            'id': notification.idnumber+self.__formatedate(notification.createdat).replace(' ','')+notification.axisRequestId+notification.to+notification.createdby,
+            'id': self.__getid(notification),
             'status': notification.status,
             'rawrequestid': notification.rawrequestid,
             'requestid': notification.requestid,
@@ -122,3 +123,7 @@ class dashboardeventservice:
 
     def __formatedate(self, input):
         return datetimehandler().convert_to_pst(input,'%Y %b %d | %I:%M %p')
+    
+    def __getid(self, notification):
+        _id = notification.idnumber+str(notification.createdat)+notification.axisRequestId+notification.to+notification.createdby
+        return re.sub(r"[^a-zA-Z0-9 ]", "", _id).replace(" ","")
