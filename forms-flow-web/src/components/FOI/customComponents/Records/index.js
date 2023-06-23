@@ -165,10 +165,14 @@ export const RecordsLog = ({
   let pdfStitchedRecord = useSelector(
     (state) => state.foiRequests.foiPDFStitchedRecordForHarms
   );
+
+  let isRecordsfetching = useSelector(
+    (state) => state.foiRequests.isRecordsLoading
+  );
   const classes = useStyles();
   const [records, setRecords] = useState(recordsObj?.records);
   const [totalUploadedRecordSize, setTotalUploadedRecordSize] = useState(0);
-  useEffect(() => {
+  useEffect(() => {    
     setRecords(recordsObj?.records)
     let nonDuplicateRecords = recordsObj?.records?.filter(record => !record.isduplicate)
     let totalUploadedSize= (calculateTotalUploadedFileSizeInKB(nonDuplicateRecords)/ (1024 * 1024))
@@ -195,6 +199,7 @@ export const RecordsLog = ({
   const [divisionModalTagValue, setDivisionModalTagValue] = useState(-1)
   const dispatch = useDispatch();
   const [isAttachmentLoading, setAttachmentLoading] = useState(false);
+  const [isRecordsLoading, setRecordsLoading] = useState(false);
   const [multipleFiles, setMultipleFiles] = useState(true);
   const [modalFor, setModalFor] = useState("add");
   const [replaceRecord, setreplaceRecord] = useState({});
@@ -245,9 +250,10 @@ export const RecordsLog = ({
   }
 
   const dispatchRequestAttachment = (err) => {
-    if (!err) {
+    if (!err) {      
       setAttachmentLoading(false);
       dispatch(fetchFOIRecords(requestId, ministryId))
+      
     }
   }
 
@@ -1352,8 +1358,10 @@ export const RecordsLog = ({
               justify="flex-start"
               alignItems="flex-start"
               className={classes.recordLog}
-            >
-              {records?.map((record, i) =>
+            >              
+              {
+              isRecordsfetching === "completed" && records?.length > 0 ?
+              records?.map((record, i) =>
                 <Attachment
                   key={i}
                   indexValue={i}
@@ -1365,7 +1373,9 @@ export const RecordsLog = ({
                   classes={classes}
                   handleSelectRecord={handleSelectRecord}
                 />
-              )}
+              ) : <div className="recordsstatus">{isRecordsfetching === "inprogress" ? "Records loading is in progress, please wait!" : (isRecordsfetching === "completed" && ( records?.length === 0 || records === null || records === undefined) ? "No records are available to list, please confirm whether records are uploaded or not" : (isRecordsfetching === "error" ? "Error fetching records, please try again.": {isRecordsfetching}) )}</div>
+              
+              }
             </Grid>
           </Grid>
 
