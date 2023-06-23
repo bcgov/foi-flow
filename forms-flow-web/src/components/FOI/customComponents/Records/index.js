@@ -1619,6 +1619,8 @@ const Attachment = React.memo(({indexValue, record, handlePopupButtonClick, getF
               <span>Incompatible File Type</span>:
               (record.failed && record.isredactionready) || (record.attributes?.trigger === 'recordreplace' && record.attributes?.isattachment) ?
               <span>Record Manually Replaced Due to Error</span>:
+              record.attributes?.isattachment ? 
+              <span>Attachment of {record.attachmentof}</span>:
               record.isredactionready ?
               <span>Ready for Redaction</span>:
               record.failed ?
