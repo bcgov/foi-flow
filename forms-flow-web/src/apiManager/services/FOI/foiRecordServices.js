@@ -11,7 +11,8 @@ import {
     setConversionFormats,
     setFOILoader,
     setFOIPDFStitchedRecordForHarms,
-    setFOIPDFStitchStatusForHarms
+    setFOIPDFStitchStatusForHarms,
+    setRecordsLoader
   } from "../../../actions/FOI/foiRequestActions";
   import {fnDone} from './foiServicesUtil';
   import UserService from "../../../services/UserService";
@@ -110,20 +111,24 @@ export const fetchFOIRecords = (requestId, ministryId, ...rest) => {
     "<ministryrequestid>", ministryId),
     "<requestid>", requestId);
   return (dispatch) => {
+    dispatch(setRecordsLoader('inprogress'))
     httpGETRequest(apiUrl, {}, UserService.getToken())
       .then((res) => {
         if (res.data) {
           dispatch(setRequestRecords(res.data));
+          dispatch(setRecordsLoader('completed'))
           done(null, res.data);
 
         } else {
           console.log("Error in fetching records", res);
           dispatch(serviceActionError(res));
+          dispatch(setRecordsLoader('error'))
         }
       })
       .catch((error) => {
         console.log("Error in fetching records", error);
         dispatch(serviceActionError(error));
+        dispatch(setRecordsLoader('error'))
         done(error);
       });
   };

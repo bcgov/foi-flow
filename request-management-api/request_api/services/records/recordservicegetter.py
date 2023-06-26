@@ -17,14 +17,14 @@ class recordservicegetter(recordservicebase):
 
     def fetch(self, requestid, ministryrequestid):
         result = {'dedupedfiles': 0, 'convertedfiles': 0, 'removedfiles': 0}
-        try:
+        try:            
             _metadata = FOIMinistryRequest.getmetadata(ministryrequestid)
             divisions = ProgramAreaDivision.getprogramareadivisions(_metadata["programareaid"])
-            uploadedrecords = FOIRequestRecord.fetch(requestid, ministryrequestid)
+            uploadedrecords = FOIRequestRecord.fetch(requestid, ministryrequestid)            
             batchids = []
             resultrecords = []
-            if len(uploadedrecords) > 0:
-                computingresponses, err = self.makedocreviewerrequest('GET', '/api/dedupestatus/{0}'.format(ministryrequestid))
+            if len(uploadedrecords) > 0:                
+                computingresponses, err = self.makedocreviewerrequest('GET', '/api/dedupestatus/{0}'.format(ministryrequestid))                                
                 if err is None: 
                     _convertedfiles, _dedupedfiles, _removedfiles = self.__getcomputingsummary(computingresponses)
                     for record in uploadedrecords:
@@ -41,7 +41,9 @@ class recordservicegetter(recordservicebase):
             result['batchcount'] = len(batchids)
             result["records"] = resultrecords
         except Exception as exp:
+            print("ERROR Happened while fetching records :.{0}".format(exp))            
             logging.info(exp)
+            raise exp
         return result 
 
     def __preparerecord(self, record, _computingresponse, computingresponses, divisions):
