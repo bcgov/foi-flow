@@ -290,7 +290,7 @@ const EventQueue = ({ userDetail, eventQueueTableInfo }) => {
           autoHeight
           className="foi-data-grid"
           getRowId={(row) => row.id}
-          rows={rows.map((row, index) => ({ ...row, id: index + 1 }))}
+          rows={rows}
           columns={eventColumnsRef.current}
           rowHeight={30}
           headerHeight={50}
