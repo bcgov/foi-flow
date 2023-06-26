@@ -157,8 +157,7 @@ class FOIRequestNotificationUser(db.Model):
         #for queue/dashboard
         _session = db.session
 
-        #ministry filter for group/team
-        ministryfilter = FOIMinistryRequest.getgroupfilters(groups)
+        
         
         #subquery for getting latest version & proper group/team for FOIMinistryRequest
         subquery_ministry_maxversion = _session.query(FOIMinistryRequest.foiministryrequestid, func.max(FOIMinistryRequest.version).label('max_version')).group_by(FOIMinistryRequest.foiministryrequestid).subquery()
@@ -213,7 +212,29 @@ class FOIRequestNotificationUser(db.Model):
                            ],
                            else_ = FOIRequestNotificationUser.createdby).label('creatorformatted')
         
+        subquery_tag_notification = _session.query(
+                                        FOIRequestNotification.axisnumber,
+                                        FOIRequestNotification.notificationid, 
+                                        FOIRequestNotification.notification, 
+                                        FOIRequestNotificationUser.created_at,
+                                        FOIRequestNotificationUser.createdby,
+                                        FOIRequestNotificationUser.userid
+                                        ).join(
+                                        FOIRequestNotificationUser,
+                                        and_(FOIRequestNotificationUser.notificationid == FOIRequestNotification.notificationid, 
+                                             FOIRequestNotificationUser.userid == userid),
+                                        ).join(
+                                        NotificationType,
+                                        and_(FOIRequestNotification.notificationtypeid == NotificationType.notificationtypeid, NotificationType.name == 'Tagged User Comments'),
+                                        ).subquery()
         
+        #ministry filter for group/team
+        ministryfilter = FOIRequestNotificationUser.getgroupfilters(groups, additionalfilter, subquery_tag_notification, userid)
+        
+        print('*************************************************')
+        print(subquery_tag_notification)
+        print('*************************************************')
+
         #filter/search
         if(len(filterfields) > 0 and keyword is not None):
             filtercondition = []
@@ -277,6 +298,10 @@ class FOIRequestNotificationUser(db.Model):
             FOIMinistryRequest.description,
         ]
 
+        foinotification = aliased(FOIRequestNotification)
+        foitagnotication = aliased(FOIRequestNotification)
+
+
         basequery = _session.query(
                                 *selectedcolumns
                             ).join(
@@ -328,20 +353,24 @@ class FOIRequestNotificationUser(db.Model):
                                 isouter=True
                             ).join(
                                 requestnotytype,
-                                and_(FOIRequestNotification.notificationtypeid == requestnotytype.notificationtypeid),
+                                and_(FOIRequestNotification.notificationtypeid == requestnotytype.notificationtypeid, requestnotytype.name != 'Tagged User Comments'),
                                 isouter=True
                             ).join(
                                 rawrequestnotytype,
-                                and_(FOIRawRequestNotification.notificationtypeid == rawrequestnotytype.notificationtypeid),
+                                and_(FOIRawRequestNotification.notificationtypeid == rawrequestnotytype.notificationtypeid, rawrequestnotytype.name != 'Tagged User Comments'),
                                 isouter=True
                             ).join(
                                 foiuser, foiuser.preferred_username == coalesce(FOIRequestNotificationUser.userid,FOIRawRequestNotificationUser.userid), isouter=True  
                             ).join(
                                 foicreator, foicreator.preferred_username == coalesce(FOIRequestNotificationUser.createdby,FOIRawRequestNotificationUser.createdby), isouter=True  
+                            ).join(
+                                subquery_tag_notification, 
+                                and_(subquery_tag_notification.c.userid == coalesce(FOIRequestNotificationUser.userid,FOIRawRequestNotificationUser.userid)), 
+                                isouter=True  
                             ).filter(FOIMinistryRequest.requeststatusid != 3
                             ).filter(or_(FOIRequestNotification.notification.isnot(None),FOIRawRequestNotification.notification.isnot(None)))
 
-        
+
         if(additionalfilter == 'watchingRequests'):
             #watchby
             activefilter = and_(FOIMinistryRequest.isactive == True, FOIRequestStatus.isactive == True)
@@ -351,9 +380,9 @@ class FOIRequestNotificationUser(db.Model):
         elif(additionalfilter == 'myRequests'):
             #myrequest
             if(requestby == 'IAO'):
-                dbquery = basequery.filter(FOIMinistryRequest.assignedto == userid).filter(ministryfilter)
+                dbquery = basequery.filter(or_(FOIMinistryRequest.assignedto == userid, subquery_tag_notification.c.userid == userid)).filter(ministryfilter)
             else:
-                dbquery = basequery.filter(FOIMinistryRequest.assignedministryperson == userid).filter(ministryfilter)
+                dbquery = basequery.filter(or_(FOIMinistryRequest.assignedministryperson == userid, subquery_tag_notification.c.userid == userid)).filter(ministryfilter)
         else:
             if(isiaorestrictedfilemanager == True or isministryrestrictedfilemanager == True):
                 dbquery = basequery.filter(ministryfilter)
@@ -367,6 +396,54 @@ class FOIRequestNotificationUser(db.Model):
             return dbquery
         else:
             return dbquery.filter(or_(*filtercondition))
+        
+    @classmethod
+    def getgroupfilters(cls, groups, additionalfilter, subquery_tag_notification, userid):
+        #ministry filter for group/team
+        if groups is None:
+            ministryfilter = FOIMinistryRequest.isactive == True
+        else:
+            groupfilter = []
+            for group in groups:
+                if (group == IAOTeamWithKeycloackGroup.flex.value or group in ProcessingTeamWithKeycloackGroup.list()):
+                    groupfilter.append(
+                        and_(
+                            FOIMinistryRequest.assignedgroup == group
+                        )
+                    )
+                elif (group == IAOTeamWithKeycloackGroup.intake.value):
+                    groupfilter.append(
+                        or_(
+                            FOIMinistryRequest.assignedgroup == group,
+                            and_(
+                                FOIMinistryRequest.assignedgroup == IAOTeamWithKeycloackGroup.flex.value,
+                                FOIMinistryRequest.requeststatusid.in_([1])
+                            )
+                        )
+                    )
+                else:
+                    groupfilter.append(
+                        or_(
+                            FOIMinistryRequest.assignedgroup == group,
+                            and_(
+                                FOIMinistryRequest.assignedministrygroup == group,
+                                FOIMinistryRequest.requeststatusid.in_([2,7,9,8,10,11,12,13,14])
+                            )
+                        )
+                    )
+
+            if additionalfilter == "myRequests":
+                ministryfilter = and_(
+                                    FOIMinistryRequest.isactive == True, FOIRequestStatus.isactive == True,
+                                    or_(*groupfilter, subquery_tag_notification.c.userid == userid)
+                                )
+            else:            
+                ministryfilter = and_(
+                                    FOIMinistryRequest.isactive == True, FOIRequestStatus.isactive == True,
+                                    or_(*groupfilter)
+                                )
+        
+        return ministryfilter
     
     @classmethod
     def getfilterkeyword(cls, keyword, field):
