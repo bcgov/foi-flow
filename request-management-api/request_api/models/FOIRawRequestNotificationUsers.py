@@ -326,7 +326,7 @@ class FOIRawRequestNotificationUser(db.Model):
                     return basequery.filter(
                         and_(
                             FOIRawRequest.status.notin_(['Archived']),
-                            or_(FOIRawRequest.isiaorestricted == False, and_(FOIRawRequest.isiaorestricted == True, FOIRawRequest.assignedto == userid))))
+                            or_(FOIRawRequest.isiaorestricted.is_(None), FOIRawRequest.isiaorestricted == False, and_(FOIRawRequest.isiaorestricted == True, FOIRawRequest.assignedto == userid))))
 
 
     @classmethod

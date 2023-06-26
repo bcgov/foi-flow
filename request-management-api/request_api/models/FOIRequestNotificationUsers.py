@@ -298,10 +298,7 @@ class FOIRequestNotificationUser(db.Model):
             FOIMinistryRequest.description,
         ]
 
-        foinotification = aliased(FOIRequestNotification)
-        foitagnotication = aliased(FOIRequestNotification)
-
-
+        
         basequery = _session.query(
                                 *selectedcolumns
                             ).join(
