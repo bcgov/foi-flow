@@ -231,10 +231,7 @@ class FOIRequestNotificationUser(db.Model):
         #ministry filter for group/team
         ministryfilter = FOIRequestNotificationUser.getgroupfilters(groups, additionalfilter, subquery_tag_notification, userid)
         
-        print('*************************************************')
-        print(subquery_tag_notification)
-        print('*************************************************')
-
+        
         #filter/search
         if(len(filterfields) > 0 and keyword is not None):
             filtercondition = []
@@ -298,10 +295,7 @@ class FOIRequestNotificationUser(db.Model):
             FOIMinistryRequest.description,
         ]
 
-        foinotification = aliased(FOIRequestNotification)
-        foitagnotication = aliased(FOIRequestNotification)
-
-
+        
         basequery = _session.query(
                                 *selectedcolumns
                             ).join(
