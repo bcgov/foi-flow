@@ -103,7 +103,11 @@ const useStyles = makeStyles((_theme) => ({
     display: "flex"
   },
   filename: {
-    fontWeight: "bold"
+    fontWeight: "bold",
+    overflow: "hidden",
+    textOverflow: "ellipsis",
+    whiteSpace: "nowrap",
+    maxWidth: "79%"
   },
   divider: {
     marginTop: "-2px",
@@ -1010,96 +1014,69 @@ export const RecordsLog = ({
             alignItems="flex-start"
             spacing={1}
           >
-            <Grid item xs={5}>
+            <Grid item xs={6}>
               <h1 className="foi-review-request-text foi-ministry-requestheadertext foi-records-request-text">
                 {getRequestNumber()}
               </h1>
             </Grid>
-            <Grid item xs={7}>
-              <span style={{float:'right', fontWeight:'bold'}}>
-              <div style={{paddingBottom: '5px'}}>Total Uploaded Size : {getReadableFileSize(totalUploadedRecordSize)}</div>
-              <div>Total Upload Limit : {getReadableFileSize(TOTAL_RECORDS_UPLOAD_LIMIT)}</div>
-              </span>
-            </Grid>
-          </Grid>
-          <Grid
-            container
-            direction="row"
-            justify="flex-start"
-            alignItems="flex-start"
-            spacing={1}
-          >
-            <ConditionalComponent condition={records?.filter(record => record.attachments?.length > 0).length > 0}>
+            
             <Grid item xs={3}>
-                <button
-                  className="btn addAttachment foi-export-button"
-                  variant="contained"
-                  onClick={() => setDeleteModalOpen(true)}
-                  color="primary"
-                >
-                  Remove Attachments
-                </button>
+              {hasDocumentsToDownload &&
+                <TextField
+                className="download-dropdown custom-select-wrapper foi-download-button"
+                id="download"
+                label={currentDownload === 0 ? "Download" : ""}
+                inputProps={{ "aria-labelledby": "download-label" }}
+              //   InputProps={{
+              //     startAdornment: isDownloadInProgress && <InputAdornment position="start">
+              //       {/* <CircularProgress class="download-progress-adornment"/> */}
+              //       {/* <CircularProgress/> */}
+              //       record.isredactionready ?
+              //       <FontAwesomeIcon icon={faCheckCircle} size='2x' color='#1B8103' className={classes.statusIcons}/>:
+              // record.failed ?
+              // <FontAwesomeIcon icon={faExclamationCircle} size='2x' color='#A0192F' className={classes.statusIcons}/>:
+              // <FontAwesomeIcon icon={faSpinner} size='2x' color='#FAA915' className={classes.statusIcons}/>
+              //       </InputAdornment>
+              //   }}
+                InputLabelProps={{ shrink: false }}
+                select
+                name="download"
+                value={currentDownload}
+                onChange={handleDownloadChange}
+                placeholder="Download"
+                variant="outlined"
+                size="small"
+                fullWidth
+              >
+                {recordsDownloadList.map((item, index) => {
+
+                  if (item.id !=0) {
+                    return (
+                        <MenuItem
+                          className="download-menu-item"
+                          key={item.id}
+                          value={index}
+                          disabled={item.disabled}
+                          sx={{ display: 'flex' }}
+                        >
+                          {
+                            !item.disabled && (isDownloadReady ?
+                            <FontAwesomeIcon icon={faCheckCircle} size='2x' color='#1B8103' className={classes.statusIcons}/>:
+                            isDownloadFailed ?
+                            <FontAwesomeIcon icon={faExclamationCircle} size='2x' color='#A0192F' className={classes.statusIcons}/>:
+                            isDownloadInProgress ? <FontAwesomeIcon icon={faSpinner} size='2x' color='#FAA915' className={classes.statusIcons}/>:null)
+                          }
+                          {item.label}
+                        </MenuItem>
+                      // </>
+                    )
+                  }
+
+                } )}
+                </TextField>
+              }
 
             </Grid>
-            </ConditionalComponent>
-            <ConditionalComponent condition={hasDocumentsToDownload}>
-            <Grid item xs={3}>
-
-              <TextField
-              className="download-dropdown custom-select-wrapper foi-download-button"
-              id="download"
-              label={currentDownload === 0 ? "Download" : ""}
-              inputProps={{ "aria-labelledby": "download-label" }}
-            //   InputProps={{
-            //     startAdornment: isDownloadInProgress && <InputAdornment position="start">
-            //       {/* <CircularProgress class="download-progress-adornment"/> */}
-            //       {/* <CircularProgress/> */}
-            //       record.isredactionready ?
-            //       <FontAwesomeIcon icon={faCheckCircle} size='2x' color='#1B8103' className={classes.statusIcons}/>:
-            // record.failed ?
-            // <FontAwesomeIcon icon={faExclamationCircle} size='2x' color='#A0192F' className={classes.statusIcons}/>:
-            // <FontAwesomeIcon icon={faSpinner} size='2x' color='#FAA915' className={classes.statusIcons}/>
-            //       </InputAdornment>
-            //   }}
-              InputLabelProps={{ shrink: false }}
-              select
-              name="download"
-              value={currentDownload}
-              onChange={handleDownloadChange}
-              placeholder="Download"
-              variant="outlined"
-              size="small"
-              fullWidth
-            >
-              {recordsDownloadList.map((item, index) => {
-
-                if (item.id !=0) {
-                  return (
-                      <MenuItem
-                        className="download-menu-item"
-                        key={item.id}
-                        value={index}
-                        disabled={item.disabled}
-                        sx={{ display: 'flex' }}
-                      >
-                        {
-                          !item.disabled && (isDownloadReady ?
-                          <FontAwesomeIcon icon={faCheckCircle} size='2x' color='#1B8103' className={classes.statusIcons}/>:
-                          isDownloadFailed ?
-                          <FontAwesomeIcon icon={faExclamationCircle} size='2x' color='#A0192F' className={classes.statusIcons}/>:
-                          isDownloadInProgress ? <FontAwesomeIcon icon={faSpinner} size='2x' color='#FAA915' className={classes.statusIcons}/>:null)
-                        }
-                        {item.label}
-                      </MenuItem>
-                    // </>
-                  )
-                }
-
-              } )}
-            </TextField>
-
-            </Grid>
-            </ConditionalComponent>
             {/* <Grid item xs={2}>
               <ConditionalComponent condition={hasDocumentsToExport}>
                 <button
@@ -1112,7 +1089,7 @@ export const RecordsLog = ({
                 </button>
               </ConditionalComponent>
             </Grid> */}
-            <Grid item xs={2}>
+            <Grid item xs={3}>
               {isMinistryCoordinator ?
                 <button
                   className={clsx("btn", "addAttachment", classes.createButton)}
@@ -1135,6 +1112,20 @@ export const RecordsLog = ({
               }
 
 
+            </Grid>
+          </Grid>
+          <Grid
+            container
+            direction="row"
+            justify="flex-start"
+            alignItems="flex-start"
+            spacing={1}
+          >            
+            <Grid item xs={7}>
+              <span style={{fontWeight:'bold'}}>
+              <div style={{paddingBottom: '5px'}}>Total Uploaded Size : {getReadableFileSize(totalUploadedRecordSize)}</div>
+              <div>Total Upload Limit : {getReadableFileSize(TOTAL_RECORDS_UPLOAD_LIMIT)}</div>
+              </span>
             </Grid>
             <Grid
               container
@@ -1578,7 +1569,7 @@ const Attachment = React.memo(({indexValue, record, handlePopupButtonClick, getF
         alignItems="flex-start"
       >
 
-        <Grid item xs={6}>
+        <Grid item container xs={9} direction="row" alignItems="flex-start">
           <input
             type="checkbox"
             style={{position: "relative", top: 18, marginRight: 15}}
@@ -1605,10 +1596,10 @@ const Attachment = React.memo(({indexValue, record, handlePopupButtonClick, getF
             <FontAwesomeIcon icon={faExclamationCircle} size='2x' color='#A0192F' className={classes.statusIcons}/>:
             <FontAwesomeIcon icon={faSpinner} size='2x' color='#FAA915' className={classes.statusIcons}/>
           }
-          <span className={classes.filename}>{record.filename} </span>
+          <span title={record.filename} className={classes.filename}>{record.filename} </span>
           <span className={classes.fileSize}>{record?.attributes?.filesize > 0 ? (record?.attributes?.filesize / 1024).toFixed(2) : 0} KB</span>
         </Grid>
-        <Grid item xs={6} direction="row"
+        <Grid item xs={3} direction="row"
             justifyContent="flex-end"
             alignItems="flex-end"
             className={classes.recordStatus}>
@@ -1620,7 +1611,11 @@ const Attachment = React.memo(({indexValue, record, handlePopupButtonClick, getF
               (record.failed && record.isredactionready) || (record.attributes?.trigger === 'recordreplace' && record.attributes?.isattachment) ?
               <span>Record Manually Replaced Due to Error</span>:
               record.attributes?.isattachment ? 
-              <span>Attachment of {record.attachmentof}</span>:
+              <span style={{
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                whiteSpace: "nowrap"
+              }} title={`Attachment of ${record.attachmentof}`}>Attachment of {record.attachmentof}</span>:
               record.isredactionready ?
               <span>Ready for Redaction</span>:
               record.failed ?
