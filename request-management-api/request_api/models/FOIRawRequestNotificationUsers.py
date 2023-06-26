@@ -159,14 +159,21 @@ class FOIRawRequestNotificationUser(db.Model):
                                         subquery_ministry_maxversion, and_(*joincondition_ministry)
                                 ).filter(FOIMinistryRequest.requeststatusid == 3)
         
-        ministry_opened_query = _session.query(
-                                   FOIMinistryRequest.version,
-                                   FOIMinistryRequest.foirequest_id,
-                                   FOIMinistryRequest.foiministryrequestid,
-                                   FOIMinistryRequest.axisrequestid
-                                ).join(
-                                        subquery_ministry_maxversion, and_(*joincondition_ministry)
-                                ).filter(FOIMinistryRequest.requeststatusid != 3).subquery()
+        subquery_tag_notification = _session.query(
+                                        FOIRawRequestNotification.axisnumber,
+                                        FOIRawRequestNotification.notificationid, 
+                                        FOIRawRequestNotification.notification, 
+                                        FOIRawRequestNotificationUser.created_at,
+                                        FOIRawRequestNotificationUser.createdby,
+                                        FOIRawRequestNotificationUser.userid
+                                        ).join(
+                                        FOIRawRequestNotificationUser,
+                                        and_(FOIRawRequestNotificationUser.notificationid == FOIRawRequestNotification.notificationid, 
+                                             FOIRawRequestNotificationUser.userid == userid),
+                                        ).join(
+                                        NotificationType,
+                                        and_(FOIRawRequestNotification.notificationtypeid == NotificationType.notificationtypeid, NotificationType.name == 'Tagged User Comments'),
+                                        ).subquery()
         
         axisrequestid = case([
             (FOIRawRequest.axisrequestid.is_(None),
@@ -269,17 +276,23 @@ class FOIRawRequestNotificationUser(db.Model):
                                         FOIRawRequestNotification,
                                         and_(FOIRawRequestNotification.idnumber == 'U-00' + cast(FOIRawRequest.requestid, String), 
                                              FOIRawRequestNotification.axisnumber.notin_(ministry_closed_query)),
+                                    isouter=True  
                                 ).join(
                                         FOIRawRequestNotificationUser,
-                                        and_(FOIRawRequestNotificationUser.notificationid == FOIRawRequestNotification.notificationid)
+                                        and_(FOIRawRequestNotificationUser.notificationid == FOIRawRequestNotification.notificationid),
+                                    isouter=True  
                                 ).join(
                                         NotificationType,
-                                        and_(FOIRawRequestNotification.notificationtypeid == NotificationType.notificationtypeid),
+                                        and_(FOIRawRequestNotification.notificationtypeid == NotificationType.notificationtypeid, NotificationType.name != 'Tagged User Comments'),
                                 ).join(
                                         foiuser, foiuser.preferred_username == FOIRawRequestNotificationUser.userid, isouter=True  
                                 ).join(
                                         foicreator, foicreator.preferred_username == FOIRawRequestNotificationUser.createdby, isouter=True  
-                                )
+                                ).join(
+                                subquery_tag_notification, 
+                                and_(subquery_tag_notification.c.userid == FOIRawRequestNotificationUser.userid), 
+                                isouter=True  
+                            )
         
         if additionalfilter is None:
             if(isiaorestrictedfilemanager == True):
@@ -305,7 +318,7 @@ class FOIRawRequestNotificationUser(db.Model):
                 return basequery.join(subquery_watchby, subquery_watchby.c.requestid == FOIRawRequest.requestid).filter(FOIRawRequest.status.notin_(['Archived']))
             elif(additionalfilter == 'myRequests'):
                 #myrequest
-                return basequery.filter(and_(FOIRawRequest.status.notin_(['Archived']), FOIRawRequest.assignedto == userid))
+                return basequery.filter(and_(FOIRawRequest.status.notin_(['Archived']), or_(FOIRawRequest.assignedto == userid, subquery_tag_notification.c.userid == userid)))
             else:
                 if(isiaorestrictedfilemanager == True):
                     return basequery.filter(FOIRawRequest.status.notin_(['Archived']))
@@ -361,6 +374,8 @@ class FOIRawRequestNotificationUser(db.Model):
             filtercondition.append(FOIRawRequest.isiaorestricted == True)
 
         return or_(*filtercondition)
+    
+    
     
     @classmethod
     def getfilterkeyword(cls, keyword, field):
