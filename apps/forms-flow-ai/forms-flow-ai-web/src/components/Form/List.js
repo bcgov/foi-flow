@@ -266,7 +266,7 @@ const List = React.memo((props) => {
                     style={{
                     maxWidth:"900px",
                     margin:"auto",
-                    height:"80%",
+                    height:"60vh",
                     display:"flex",
                     flexDirection:"column",
                     alignItems:"center",

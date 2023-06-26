@@ -12,10 +12,13 @@ import NotificationPopup from "./NotificationPopup/NotificationPopup";
 import {
   fetchFOINotifications
 } from "../../../apiManager/services/FOI/foiNotificationServices";
-import {isMinistryLogin, getMinistryCode} from "../../../helper/FOI/helper";
+import {isMinistryLogin, getMinistryCode, isFoiAdmin} from "../../../helper/FOI/helper";
 import io from "socket.io-client";
 import {SOCKETIO_CONNECT_URL, SOCKETIO_RECONNECTION_DELAY, SOCKETIO_RECONNECTION_DELAY_MAX, FOI_FLOW_REPORTING_URL, SOCKETIO_CONNECT_NONCE} from "../../../constants/constants";
 import { fetchFOIFullAssignedToList } from "../../../apiManager/services/FOI/foiMasterDataServices";
+import {setFOIAssignedToListLoader} from "../../../actions/FOI/foiRequestActions";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCog } from '@fortawesome/free-solid-svg-icons'; 
 
 
 const FOIHeader = React.memo(({unauthorized=false}) => { 
@@ -25,6 +28,7 @@ const isAuthenticated = useSelector((state) => state.user.isAuthenticated);
 const user = useSelector((state) => state.user.userDetail);
 let isMinistry = false;
 let ministryCode ="";
+let isAdmin = false;
 const [screenPosition, setScreenPosition] = useState(0);
 const [open, setOpen] = useState(false);
 const closeModal = () => setOpen(false);
@@ -40,9 +44,11 @@ const [socket, setSocket] = useState(null);
 const userGroups = user?.groups?.map(group => group.slice(1));
 isMinistry = isMinistryLogin(userGroups);
 ministryCode = getMinistryCode(userGroups);
+isAdmin = isFoiAdmin(userGroups);
 
-useEffect(() => {     
+useEffect(() => {   
   if(!unauthorized && isAuthenticated){
+    setFOIAssignedToListLoader(true);
     dispatch(fetchFOIFullAssignedToList());
     dispatch(fetchFOINotifications());  
 	const options = {
@@ -95,6 +101,11 @@ const triggerPopup = () => {
   )
 }
 
+const adminDashboard = (_e) => {
+  dispatch(push(`/foi/admin`));
+};
+
+
   return (
     <div>
     <div className="row ">
@@ -108,7 +119,10 @@ const triggerPopup = () => {
             </a>
           </div>
           <div className="col-md-3 col-sm-4 foiheaderAppNamesection">
-          <h2>FOI</h2>
+          <a href="/foi/dashboard" aria-label="dashboard link">
+              <i className='fa fa-home foihomebtn'><h2>FOI</h2></i>
+          </a>
+          {/* <h2>FOI</h2> */}
           </div>
             <div className="col-md-6 col-sm-4 foiheaderUserStatusSection">
           { isAuthenticated &&
@@ -121,6 +135,11 @@ const triggerPopup = () => {
                       <li className="nav-item username foinavitem">
                           <span className="navbar-text">  {user.name || user.preferred_username || ""} </span>
                       </li>
+                      {isAdmin &&
+                        <li className="admin-icon foinavitem">
+                          <FontAwesomeIcon icon={faCog} size='1x' onClick={adminDashboard} />
+                        </li>
+                      }
                       <li className="report-icon foinavitem">
                         <a href={FOI_FLOW_REPORTING_URL} target="_blank" aria-label="dashboard link">
                           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-bar-chart-line" viewBox="0 0 16 16">

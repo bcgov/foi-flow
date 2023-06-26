@@ -62,7 +62,12 @@ describe('FOI ConfirmationModal component', () => {
                 selectedMinistries: [
                     {code:"AEST",name:"Ministry of Advanced Education and Skills Training",selected:"true"}
                 ]
-            }
+            },
+            foiRequests: {
+              foiProcessingTeamList: [],
+              foiRequestCFRForm: { status: "", feedata: {} }
+            },
+            user: { userDetail: {} }
         }
         useSelector.mockImplementation(callback => {
             return callback(localState);

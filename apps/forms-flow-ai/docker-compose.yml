@@ -78,6 +78,7 @@ services:
         - REACT_APP_USER_ACCESS_PERMISSIONS=${USER_ACCESS_PERMISSIONS}
         - REACT_APP_WEB_BASE_CUSTOM_URL=${WEB_BASE_CUSTOM_URL:-}
         - REACT_APP_FORMIO_JWT_SECRET=${FORMIO_JWT_SECRET:---- change me now ---}
+        - REACT_APP_FOI_BASE_API_URL=${FOI_REQ_MANAGEMENT_API_URL}
     ports:
       - '4000:8080'
     tty: true
@@ -109,7 +110,7 @@ services:
     links:
       - forms-flow-webapi-db
     ports:
-      - '5000:5000'
+      - '16000:5000'
     volumes:
       - ./:/app:rw
     environment:

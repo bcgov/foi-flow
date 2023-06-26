@@ -36,7 +36,7 @@ export const ActionProvider = ({
       setEdit([...editArr, id])
     }
     else {
-      var btnreply = document.getElementById(`btncomment${id}`)
+      let btnreply = document.getElementById(`btncomment${id}`)
       if (btnreply) { btnreply.style.display = 'none' }
       setReplies([...replies, id])
     }
@@ -48,7 +48,7 @@ export const ActionProvider = ({
       const newList = list.filter((i) => i !== id)
       setEdit(newList)
     } else if (!edit) {
-      var btnreply = document.getElementById(`btncomment${id}`)
+      let btnreply = document.getElementById(`btncomment${id}`)
       if (btnreply)
         btnreply.style.display = 'block'
       const list = [...replies]

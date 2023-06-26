@@ -44,6 +44,9 @@
     margin-top: 15px !important;
     background-color: white !important;
 }
+.foi-breadcrumb-comments {
+    padding-left: 2% !important;
+}
 
 .foi-details-card {
     margin-top: 50px;
@@ -119,7 +122,7 @@ height: fit-content;
 .remaining-days-alert {
     font-size: 15px;
     font-weight: bolder;
-    padding-bottom: 1rem;
+    // padding-bottom: 1rem;
 }
 
 .request-accordian {
@@ -157,4 +160,8 @@ height: fit-content;
     &::-webkit-scrollbar-track {
         margin-top: 105px !important;
     }
+}
+
+.foi-details-row-break {
+    margin-bottom: 2em;
 }

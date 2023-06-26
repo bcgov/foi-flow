@@ -83,7 +83,9 @@ describe('FOI AddressContanctInfo component', () => {
                 postal: 'Q1E3A2',
                 province: 'Ontario',
                 country: 'Canada',
-                
+            },
+            userDetail: {
+                groups: ['/Flex Team', '/Intake Team']
             }
         }
         useSelector.mockImplementation(callback => {

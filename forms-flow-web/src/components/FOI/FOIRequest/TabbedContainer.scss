@@ -7,50 +7,16 @@
   padding-top: 65px;
   position: relative;
   overflow-y: scroll;
-
   margin-left: 10%;
   margin-right: 10%;
-  margin-bottom: 5%;
-
   height: 90%;
   min-width: 80%;
 }
 
-@media (min-width: 1000px) and (max-width: 1230px) {
-  .foiformcontent {
-    margin-left: calc(51.68vw - 512px);
-    margin-right: calc(51.68vw - 512px);
-    .foitabbedContainer {
-      .foitabpanelcollection{
-        min-width: calc(824px - 3.36vw);
-        max-width: calc(824px - 3.36vw);
-      }
-    }
-  }
-}
-
-@media (min-width: 768px) and (max-width: 1000px) {
-  .foiformcontent {
-    margin-left: 5px;
-    margin-right: 5px;
-    max-width: calc(100vw - 10px);
-    .foitabbedContainer {
-      .foitabpanelcollection{
-        min-width: calc(100vw - 210px);
-        max-width: calc(100vw - 210px);
-      }
-    }
-  }
-}
-
-
-
-
 .foitabbedContainer{
   display: inline-flex;  
   background-color: white;  
-  // min-width: 100%;
-  width: 89vw;
+  min-width: 100%;
 }
 
   
@@ -84,10 +50,11 @@
 
   .foitabheadercollection {
     width: fit-content;
-    height: calc(100% - 96px - 67px);
+    // height: calc(100% - 96px - 67px);
+    // height: 100%;
     border-radius: 0px 30px 30px 0px!important;
     margin-bottom: auto;
-    padding-bottom: 2%;
+    padding-bottom: 8%;
     min-width: 200px;
     position: fixed;
     z-index: 10;
@@ -163,7 +130,7 @@
   {
       padding-left: 12%;
       padding-top: 20%;
-      padding-bottom: 20%;
+      padding-bottom: 10%;
   }
 
   .foileftpanelheader h1 {
@@ -173,6 +140,13 @@
 .foileftpanelheader h1 > a {
     text-decoration: none!important;
     color: white;
+}
+.foileftpanelrequestno {
+  color: white;
+  font-weight: bold;
+  // margin-left: 10px;
+  padding-left: 6%;
+  margin-top: 20px !important;
 }
 
 .foileftpaneldropdown {
@@ -237,7 +211,8 @@
 
 /* Style the tab */
 .tab {
-  overflow: hidden;
+  // overflow: hidden;
+  // margin-bottom: 50px;
  
 }
 
@@ -250,7 +225,7 @@
   cursor: pointer;
   
   transition: 0.3s;
-  font-size: 17px;
+  // font-size: 17px;
   height: 48px;
   padding:8px;
   align-items: center;
@@ -325,3 +300,75 @@ span.circle
   display: inline-block;
 }
 
+
+
+@media screen and (min-width: 1000px) and (max-width: 1230px) {
+  .foiformcontent {
+    margin-left: calc(51.68vw - 512px);
+    margin-right: calc(51.68vw - 512px);
+    .foitabbedContainer {
+      .foitabpanelcollection{
+        min-width: calc(824px - 3.36vw);
+        max-width: calc(824px - 3.36vw);
+      }
+    }
+  }
+}
+
+@media screen and (min-width: 768px) and (max-width: 1000px) {
+  .foiformcontent {
+    margin-left: 5px;
+    margin-right: 5px;
+    max-width: calc(100vw - 10px);
+    .foitabbedContainer {
+      .foitabpanelcollection{
+        min-width: calc(100vw - 210px);
+        max-width: calc(100vw - 210px);
+      }
+    }
+  }
+  .foileftpanelstatus, .remaining-days-alert, .foileftpanelrequestno {
+    font-size: 15px;
+    font-weight: bolder;
+  }  
+
+}
+
+@media screen and (min-width: 651px) and (max-width: 767px) {
+
+  .foileftpanelstatus, .remaining-days-alert, .foileftpanelrequestno {
+    font-size: 12px !important;
+    font-weight: bolder !important;
+  }
+
+  div.tab {
+    margin-bottom: 50px;
+  }
+
+  div.tab div.tablinks {
+    font-size: 12px !important;
+    height: 28px !important;
+  }
+
+  div.foi-state-dropdown .MuiInputBase-root {
+    font-size: 12px !important;
+  }
+}
+
+
+@media screen and (min-width: 500px) and (max-width: 650px) {
+
+  .foileftpanelstatus, .remaining-days-alert, .foileftpanelrequestno {
+    font-size: 10px !important;
+    font-weight: bolder !important;
+  }
+
+  div.tab div.tablinks {
+    font-size: 10px !important;
+    height: 25px !important;
+  }
+ 
+  div.foi-state-dropdown .MuiInputBase-root {
+    font-size: 10px !important;
+  }
+}

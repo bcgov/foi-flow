@@ -1,0 +1,38 @@
+version: '3'
+services: 
+  notification-manager:
+    build:
+      context: ./notification-manager  
+      dockerfile: dockerfile.local
+    image: foinotificationmanager
+    container_name: aot_foi_notification_manager     
+    networks:
+      services-network:
+        aliases:
+          - notificationnw
+    ports:
+      - 15550:5000
+    environment:
+      - DATABASE_USERNAME=${DATABASE_USERNAME}
+      - DATABASE_PASSWORD=${DATABASE_PASSWORD}
+      - DATABASE_NAME=${DATABASE_NAME}
+      - DATABASE_HOST=${DATABASE_HOST}
+      - DATABASE_PORT=${DATABASE_PORT}
+      - KEYCLOAK_ADMIN_HOST=${KEYCLOAK_URL}
+      - KEYCLOAK_ADMIN_REALM=${KEYCLOAK_URL_REALM}
+      - KEYCLOAK_ADMIN_CLIENT_ID=foi-lob-api
+      - KEYCLOAK_ADMIN_CLIENT_SECRET=${KEYCLOAK_ADMIN_CLIENT_SECRET}
+      - KEYCLOAK_ADMIN_SRVACCOUNT=foisrcaccount
+      - KEYCLOAK_ADMIN_SRVPASSWORD=${KEYCLOAK_ADMIN_SRVPASSWORD}
+      - NOTIFICATION_REDIS_HOST=${NOTIFICATION_REDIS_HOST}
+      - NOTIFICATION_REDIS_PASSWORD=${NOTIFICATION_REDIS_PASSWORD}
+      - NOTIFICATION_REDIS_PORT=${NOTIFICATION_REDIS_PORT}
+      - NOTIFICATION_REDIS_HEALTHCHECK_INT=${NOTIFICATION_REDIS_HEALTHCHECK_INT}
+      - NOTIFICATION_STREAM_KEY=${NOTIFICATION_STREAM_KEY}
+      - DIVISION_PDF_STITCH_SERVICE_KEY=${DIVISION_PDF_STITCH_SERVICE_KEY}
+volumes:
+  dbdata:
+networks:
+  notificationnw:
+  services-network:    
+    driver: bridge

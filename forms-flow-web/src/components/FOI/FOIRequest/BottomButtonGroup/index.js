@@ -3,7 +3,7 @@ import "./bottombuttongroup.scss";
 import { makeStyles } from "@material-ui/core/styles";
 import { useDispatch } from "react-redux";
 import {
-  getOSSHeaderDetails,
+  postFOIS3DocumentPreSignedUrl,
   saveFilesinS3,
 } from "../../../../apiManager/services/FOI/foiOSSServices";
 import {
@@ -25,6 +25,8 @@ import { handleBeforeUnload } from "../utils";
 import { setFOILoader } from '../../../../actions/FOI/foiRequestActions'
 import clsx from "clsx";
 import AxisSyncModal from "../AxisDetails/AxisSyncModal";
+
+import { PAYMENT_EXPIRY_DAYS} from "../../../../constants/FOI/constants";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -59,6 +61,8 @@ const BottomButtonGroup = React.memo(
     urlIndexCreateRequest,
     saveRequestObject,
     unSavedRequest,
+    recordsUploading,
+    CFRUnsaved,
     handleSaveRequest,
     handleOpenRequest,
     currentSelectedStatus,
@@ -154,7 +158,7 @@ const BottomButtonGroup = React.memo(
     };
 
     const handleOnHashChange = (e) => {
-      returnToQueue(e, unSavedRequest);
+      returnToQueue(e, unSavedRequest || CFRUnsaved);
     };
 
     React.useEffect(() => {
@@ -180,7 +184,7 @@ const BottomButtonGroup = React.memo(
     }, [currentSelectedStatus, stateChanged]);
 
     React.useEffect(() => {
-      if (unSavedRequest) {
+      if (unSavedRequest || recordsUploading || CFRUnsaved) {
         window.history.pushState(null, null, window.location.pathname);
         window.addEventListener("popstate", handleOnHashChange);
         window.addEventListener("beforeunload", handleBeforeUnload);
@@ -189,7 +193,7 @@ const BottomButtonGroup = React.memo(
           window.removeEventListener("beforeunload", handleBeforeUnload);
         };
       }
-    }, [unSavedRequest]);
+    }, [unSavedRequest, recordsUploading, CFRUnsaved]);
 
     const openRequest = () => {
       saveRequestObject.id = saveRequestObject.id
@@ -262,6 +266,7 @@ const BottomButtonGroup = React.memo(
             break;
   
           case StateEnum.callforrecords.name:
+            saveRequestObject.paymentExpiryDate = ""
             saveRequestObject.requeststatusid = StateEnum.callforrecords.id;
             if (
               !("cfrDueDate" in saveRequestObject) ||
@@ -270,7 +275,7 @@ const BottomButtonGroup = React.memo(
               const calculatedCFRDueDate = dueDateCalculation(new Date(), 10);
               saveRequestObject.cfrDueDate = calculatedCFRDueDate;
             }
-            if (
+            /*if (
               ![StateEnum.closed.name, StateEnum.onhold.name].includes(
                 currentSelectedStatus
               ) &&
@@ -295,7 +300,7 @@ const BottomButtonGroup = React.memo(
               );
               saveRequestObject.cfrDueDate = calculatedCFRDueDate;
               saveRequestObject.dueDate = calculatedRequestDueDate;
-            }
+            }*/
             break;
   
           case StateEnum.redirect.name:
@@ -314,6 +319,9 @@ const BottomButtonGroup = React.memo(
             );
   
             saveRequestObject.requeststatusid = status.id;
+            if (currentSelectedStatus === StateEnum.onhold.name && !saveRequestObject.paymentExpiryDate) {
+              saveRequestObject.paymentExpiryDate = dueDateCalculation(new Date(), PAYMENT_EXPIRY_DAYS);
+            }
             break;
         }
       }
@@ -349,13 +357,13 @@ const BottomButtonGroup = React.memo(
         return;
       }
 
-      getOSSHeaderDetails(fileInfoList, dispatch, (err, res) => {
+      postFOIS3DocumentPreSignedUrl(ministryId, fileInfoList, 'attachments', saveRequestObject.idNumber.split("-")[0], dispatch, (err, res) => {
         let _documents = [];
         if (!err) {
           res.map((header, index) => {
-            const _file = files?.find((file) => file.name === header.filename);
+            const _file = files?.find((file) => file.filename === header.filename);
             const documentpath = {
-              documentpath: header.filepath,
+              documentpath: header.filepathdb,
               filename: header.filename,
               category: header.filestatustransition,
             };
@@ -427,7 +435,7 @@ const BottomButtonGroup = React.memo(
           <button
             type="button"
             className={`btn btn-bottom ${classes.btnsecondaryenabled}`}
-            onClick={(e) => returnToQueue(e, unSavedRequest)}
+            onClick={(e) => returnToQueue(e, unSavedRequest || recordsUploading)}
           >
             Return to Queue
           </button>

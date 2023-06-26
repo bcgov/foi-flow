@@ -1,15 +1,18 @@
-import React from 'react';
+import React, {useState} from 'react';
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import { formatDate } from "../../../../helper/FOI/helper";
 import { StateEnum } from '../../../../constants/FOI/statusEnum';
+import MinistriesCanvassed from '../../customComponents/MinistriesCanvassed/MinistriesCanvassed';
+
 
 const RequestDetails = React.memo((requestDetails) => {
 
     const _requestDetails = requestDetails.requestDetails;    
+    const [openModal, setModal] = useState(false);
 
     return Object.entries(_requestDetails).length > 0 &&
-      _requestDetails != undefined ? (
+      _requestDetails != undefined && (
       <>
         <Card id="requestDetailsMinistry" className="foi-details-card">
           <div className="row foi-details-row">
@@ -17,9 +20,13 @@ const RequestDetails = React.memo((requestDetails) => {
               <label className="foi-details-label">REQUEST DETAILS</label>
             </div>
             <div className="col-lg-4 foi-details-col ">
-              <a href="#" className="foi-floatright foi-link">
+              <button type="button" className={`btn btn-link btn-description-history`} onClick={() => setModal(true)} disabled={!(!!_requestDetails.linkedRequests) || (!!_requestDetails.linkedRequests &&!_requestDetails.linkedRequests.length >0)}>
+                Linked Requests
+              </button>
+              {/* <a href="#" className="foi-floatright foi-link" onClick={() => setModal(true)} disabled={!(!!_requestDetails.linkedRequests)}>
                 Ministries Canvassed
-              </a>
+              </a> */}
+              <MinistriesCanvassed openModal={openModal} selectedMinistries={_requestDetails?.linkedRequests} setModal={setModal} isLinkedRequest={true}/>
             </div>
           </div>
           <CardContent>
@@ -50,8 +57,7 @@ const RequestDetails = React.memo((requestDetails) => {
                   <b>Records Due Date</b>
                 </span>
                 <span className="foi-rowtoppadding">
-                  {_requestDetails.currentState &&
-                  _requestDetails.currentState.toLowerCase() !==
+                  {_requestDetails?.currentState?.toLowerCase() !==
                     StateEnum.onhold.name.toLowerCase()
                     ? formatDate(
                         _requestDetails.cfrDueDate,
@@ -65,8 +71,7 @@ const RequestDetails = React.memo((requestDetails) => {
                   <b>Legislated Due Date</b>
                 </span>
                 <span className="foi-rowtoppadding">
-                  {_requestDetails.currentState &&
-                  _requestDetails.currentState.toLowerCase() !==
+                  {_requestDetails?.currentState?.toLowerCase() !==
                     StateEnum.onhold.name.toLowerCase()
                     ? formatDate(
                         _requestDetails.dueDate,
@@ -79,7 +84,7 @@ const RequestDetails = React.memo((requestDetails) => {
           </CardContent>
         </Card>{" "}
       </>
-    ) : null;
+    );
 
 
 })

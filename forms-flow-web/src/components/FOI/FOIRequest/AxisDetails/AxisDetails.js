@@ -14,7 +14,6 @@ import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 const AxisDetails = React.memo(({  
     requestDetails,
     createSaveRequestObject,
-    foiAxisRequestIds,
     handleAxisDetailsInitialValue,
     handleAxisDetailsValue,
     handleAxisIdValidation,
@@ -36,7 +35,7 @@ const AxisDetails = React.memo(({
     const dispatch = useDispatch();
     const [axisRequestId, setAxisRequestId] = React.useState("");
     const [validation, setValidation] = React.useState({});
-    var axisIdValidation = {};
+    let axisIdValidation = {};
 
 
     useEffect(() => {
@@ -71,7 +70,6 @@ const AxisDetails = React.memo(({
     const syncWithAxis = () => {
         dispatch(checkDuplicateAndFetchRequestDataFromAxis(axisRequestId, false, saveRequestObject,(err, data) => {
             if(!err){
-                console.log(Object.entries(data).length);
                 if(Object.entries(data).length === 0){
                     axisIdValidation = {field: "AxisId", helperTextValue: "Invalid AXIS ID Number"}
                     setValidation(axisIdValidation);  
@@ -79,7 +77,9 @@ const AxisDetails = React.memo(({
                 else if(data){
                     let responseMsg = data;
                     responseMsg+='';
-                    if(responseMsg.indexOf("Exception happened while GET operations of request") >= 0)
+                    if(responseMsg.indexOf("Unauthorized-RestrictedAxisRequest") >= 0)
+                      setAxisMessage("UNAUTHORIZED");
+                    else if(responseMsg.indexOf("Exception happened while GET operations of request") >= 0)
                       setAxisMessage("ERROR");
                     else if(responseMsg.indexOf("Axis Id exists") >= 0){
                         axisIdValidation = {field: "AxisId", helperTextValue: "AXIS ID Number already exists"};

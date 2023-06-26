@@ -32,9 +32,10 @@ namespace MCS.FOI.AXISIntegration.DAL
             return "{}";
         }
 
-        private AXISRequest GetAXISRequest(string request)
+        public AXISRequest GetAXISRequest(string request)
         {
             AXISRequest axisRequest = new();
+            axisRequest.LinkedRequests = GetAxisLinkedRequests(request);
             DataTable axisDataTable = GetAxisRequestData(request);
             if (axisDataTable.Rows.Count > 0)
             {
@@ -43,6 +44,7 @@ namespace MCS.FOI.AXISIntegration.DAL
                 {
                     axisRequest.AXISRequestID = request;
                     axisRequest.Category = Convert.ToString(row["category"]);
+                    axisRequest.IsRestricted = Convert.ToString(row["requestType"]).ToLower().Contains("restricted");
                     axisRequest.RequestType = RequestsHelper.GetRequestType(Convert.ToString(row["requestType"]));
 
                     axisRequest.ReceivedDate = RequestsHelper.ConvertDateToString(row, "receivedDate", "yyyy-MM-dd");
@@ -80,6 +82,7 @@ namespace MCS.FOI.AXISIntegration.DAL
                     axisRequest.RequestDescriptionToDate = RequestsHelper.ConvertDateToString(row, "reqDescriptionToDate", "yyyy-MM-dd");
                     axisRequest.Ispiiredacted = true;
                     axisRequest.RequestPageCount = Convert.ToInt32(row["requestPageCount"]);
+                    axisRequest.SubjectCode = Convert.ToString(row["subjectCode"]);
                     List<Ministry> ministryList = new()
                     {
                         new Ministry(RequestsHelper.GetMinistryCode(Convert.ToString(row["selectedMinistry"])))
@@ -137,7 +140,7 @@ namespace MCS.FOI.AXISIntegration.DAL
                 requesters.vcFirstName as firstName,
                 requesters.vcLastName as lastName,
                 requesters.vcMiddleName as middleName,
-                [dbo].[cst_GetRqstCustFieldValue](requests.iRequestID, 'DOB') as birthDate,
+                requestorfields.CUSTOMFIELD35 as birthDate,
                 requesters.vcCompany as businessName,
                 requesters.vcEmailID as email,
                 onbehalf.vcFirstName as onbehalfFirstName,
@@ -147,6 +150,7 @@ namespace MCS.FOI.AXISIntegration.DAL
                 sum(distinct case when requests.IREQUESTID = reviewlog.IREQUESTID and reviewlog.IDOCID = documents.IDOCID then documents.SIPAGECOUNT 
                 when requests.IREQUESTID = redaction.IREQUESTID and redaction.IDOCID = ldocuments.IDOCID then ldocuments.SIPAGECOUNT 
                 else 0 end) as requestPageCount,
+                REPLACE(requestfields.CUSTOMFIELD33, CHAR(160), ' ') as subjectCode,
                 (SELECT TOP 1 cfr.sdtDueDate FROM tblRequestForDocuments cfr WITH (NOLOCK) 
                 INNER JOIN tblProgramOffices programoffice WITH (NOLOCK) ON programoffice.tiProgramOfficeID = cfr.tiProgramOfficeID 
                 WHERE requests.iRequestID = cfr.iRequestID 
@@ -168,6 +172,8 @@ namespace MCS.FOI.AXISIntegration.DAL
                 LEFT OUTER JOIN dbo.TBLDOCUMENTS documents WITH (NOLOCK) ON reviewlog.IDOCID = documents.IDOCID
                 LEFT OUTER JOIN dbo.TBLRedactionlayers redaction WITH (NOLOCK) ON requests.IREQUESTID = redaction.IREQUESTID
                 LEFT OUTER JOIN dbo.TBLDOCUMENTS ldocuments WITH (NOLOCK) ON redaction.IDOCID = ldocuments.IDOCID
+                LEFT OUTER JOIN dbo.TBLREQUESTERCUSTOMFIELDS requestorfields WITH (NOLOCK) ON requesters.iRequesterID = requestorfields.IREQUESTERID
+                LEFT OUTER JOIN dbo.TBLREQUESTCUSTOMFIELDS requestfields WITH (NOLOCK) ON requests.iRequestID = requestfields.iRequestID
                 WHERE 
                 vcVisibleRequestID = @vcVisibleRequestID
                 GROUP BY requests.sdtReceivedDate, requests.sdtTargetDate, requests.sdtOriginalTargetDate, requests.vcDescription,
@@ -176,7 +182,7 @@ namespace MCS.FOI.AXISIntegration.DAL
                 requesters.vcAddress1, requesters.vcAddress2, requesters.vcCity, requesters.vcZipCode,
                 requesters.vcHome, requesters.vcMobile, requesters.vcWork1, requesters.vcWork2, requesters.vcFirstName, requesters.vcLastName, requesters.vcMiddleName,
                 requests.iRequestID, requesters.vcCompany, requesters.vcEmailID, onbehalf.vcFirstName, onbehalf.vcLastName, onbehalf.vcMiddleName,
-                requestTypes.iLabelID, requests.vcVisibleRequestID, requests.tiOfficeID, office.OFFICE_ID";
+                requestTypes.iLabelID, requests.vcVisibleRequestID, requests.tiOfficeID, office.OFFICE_ID,requestorfields.CUSTOMFIELD35, REPLACE(requestfields.CUSTOMFIELD33, CHAR(160), ' ')";
             DataTable dataTable = new();
             using (sqlConnection = new SqlConnection(ConnectionString))
             {
@@ -231,6 +237,63 @@ namespace MCS.FOI.AXISIntegration.DAL
                 }
             }
             return dataTable;
+        }
+
+        private string GetAxisLinkedRequests(string request)
+        {
+            ConnectionString = SettingsManager.ConnectionString;
+
+            string query = @"
+                            SELECT 
+                                CONCAT(
+                                    '[',
+                                    STRING_AGG(
+                                        CONCAT('{""', destin_vcVisibleRequestID, '"":""', ministry, '""}'),
+                                        ','
+                                    ),
+                                    ']'
+                                ) AS linkedRequests
+                            FROM(
+                                SELECT DISTINCT
+                                    destin.vcVisibleRequestID AS destin_vcVisibleRequestID,
+                                    office.OFFICE_CODE AS ministry
+                                FROM tblRequests origin
+                                JOIN tblRequestLinks link ON(origin.IREQUESTID = link.iRequestIDOrigin OR origin.IREQUESTID = link.iRequestIDDestin)
+                                JOIN tblRequests destin ON(link.iRequestIDOrigin = destin.IREQUESTID OR link.iRequestIDDestin = destin.IREQUESTID)
+                                JOIN EC_OFFICE office ON destin.tiOfficeID = office.OFFICE_ID
+                                WHERE origin.vcVisibleRequestID = @vcVisibleRequestID
+                                    AND destin.vcVisibleRequestID != @vcVisibleRequestID
+                            ) AS destination_table";
+
+            string linkedRequestsJson = "";
+            using (sqlConnection = new SqlConnection(ConnectionString))
+            {
+                using SqlDataAdapter sqlSelectCommand = new(query, sqlConnection);
+                sqlSelectCommand.SelectCommand.Parameters.Add("@vcVisibleRequestID", SqlDbType.VarChar, 50).Value = request;
+                try
+                {
+                    sqlConnection.Open();
+                    using DataTable dataTable = new DataTable();
+                    sqlSelectCommand.Fill(dataTable);
+                    if (dataTable.Rows.Count > 0)
+                    {
+                        linkedRequestsJson = dataTable.Rows[0]["linkedRequests"].ToString();
+                        //JArray jsonArray = JArray.Parse(linkedRequestsJson);
+
+                    }
+
+                }
+                catch (SqlException ex)
+                {
+                    Ilogger.Log(LogLevel.Error, ex.Message);
+                }
+                catch (Exception e)
+                {
+                    Ilogger.Log(LogLevel.Error, e.Message);
+                }
+            }
+            return linkedRequestsJson;
+
         }
 
     }    

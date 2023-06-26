@@ -133,7 +133,7 @@ export const getTabBG = (_tabStatus, _requestState) => {
 };
 
 export const assignValue = (jsonObj, value, name) => {
-  var _obj = { ...jsonObj };
+  let _obj = { ...jsonObj };
   if (_obj[name] !== undefined) {
     _obj[name] = value;
   }
@@ -194,7 +194,8 @@ export const createAssigneeDetails = (value, value2) => {
         assigneeObject.assignedGroup = "Unassigned";
         assigneeObject.assignedTo = assignedTo[0];
       }
-      assigneeObject.assignedToName = value2;
+        //assigneeObject.assignedToName = value2;
+        assigneeObject.assignedToName = value2 ? value2 : `${assigneeObject.assignedToFirstName}, ${assigneeObject.assignedToFirstName}`;
       return assigneeObject;
 }
 
@@ -217,7 +218,7 @@ export const createRequestDetailsObjectFunc = (
     case FOI_COMPONENT_CONSTANTS.RQUESTDETAILS_INITIALVALUES:
       requestObject.receivedDate = value.receivedDate?formatDate(value.receivedDate, "yyyy MMM, dd"): "";
       requestObject.receivedDateUF = value.receivedDate
-        ? new Date(value.receivedDate).toISOString()
+        ? new Date(value.receivedDate)?.toISOString()
         : "";
       requestObject.requestProcessStart = value.requestStartDate;
       requestObject.dueDate = value.dueDate;
@@ -233,9 +234,11 @@ export const createRequestDetailsObjectFunc = (
       requestObject.assignedToName = assigneeDetails.assignedToName
       break;
     case FOI_COMPONENT_CONSTANTS.RECEIVED_DATE:
-      requestObject.receivedDate = formatDate(value, "yyyy MMM, dd");
-      const receivedDateUTC = new Date(value).toISOString();
-      requestObject.receivedDateUF = receivedDateUTC;
+      if(!!value){
+        requestObject.receivedDate = formatDate(value, "yyyy MMM, dd");
+        const receivedDateUTC = new Date(value)?.toISOString();
+        requestObject.receivedDateUF = receivedDateUTC;
+      }
       break;
     case FOI_COMPONENT_CONSTANTS.REQUEST_START_DATE:
       requestObject.requestProcessStart = value;
@@ -253,6 +256,9 @@ export const createRequestDetailsObjectFunc = (
           };
         });
       requestObject.selectedMinistries = filteredData;
+      break;
+    case FOI_COMPONENT_CONSTANTS.LINKED_REQUESTS:
+      requestObject.linkedRequests = typeof value == 'string' ? JSON.parse(value) :value;
       break;
     case FOI_COMPONENT_CONSTANTS.PERSONAL_HEALTH_NUMBER:
     case FOI_COMPONENT_CONSTANTS.IDENTITY_VERIFIED:
@@ -300,15 +306,19 @@ export const checkValidationError = (
   validation,
   assignedToValue,
   requiredRequestDetailsValues,
-  requiredAxisDetails
+  requiredAxisDetails,
+  isAddRequest,
+  currentrequestStatus
 ) => {
+
   return (
     requiredApplicantDetails.firstName === "" ||
     requiredApplicantDetails.lastName === "" ||
     requiredApplicantDetails.category.toLowerCase().includes("select") ||
     contactDetailsNotGiven ||
     requiredRequestDescriptionValues.description === "" ||
-    !requiredRequestDescriptionValues.isProgramAreaSelected ||
+    (!requiredRequestDescriptionValues.isProgramAreaSelected 
+      && ([StateEnum.unopened.name.toLowerCase(), StateEnum.intakeinprogress.name.toLowerCase()].includes(currentrequestStatus?.toLowerCase()) || isAddRequest)) ||
     (requiredRequestDetailsValues.requestType.toLowerCase() ===
       FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_GENERAL &&
       !requiredRequestDescriptionValues.ispiiredacted) ||
@@ -338,7 +348,7 @@ export const alertUser = (e) => {
 
 export const findRequestState = (requestStatusId) => {
   if (requestStatusId != undefined) {
-    var stateArray = Object.entries(StateEnum).find(
+    let stateArray = Object.entries(StateEnum).find(
       (value) => value[1].id === requestStatusId
     );
     return stateArray[1].name;
@@ -394,3 +404,30 @@ export const countOfMinistrySelected = (selectedMinistryList) => {
     return n + (ministry.isChecked);
   }, 0);
 }
+
+export const persistRequestFieldsNotInAxis = (newRequestDetails, existingRequestDetails) => {
+  newRequestDetails.assignedGroup = existingRequestDetails.assignedGroup;
+  newRequestDetails.assignedTo= existingRequestDetails.assignedTo;
+  newRequestDetails.assignedToFirstName= existingRequestDetails.assignedToFirstName;
+  newRequestDetails.assignedToLastName= existingRequestDetails.assignedToLastName;
+  newRequestDetails.assignedToName= existingRequestDetails.assignedToName;
+  let foiReqAdditionalPersonalInfo = existingRequestDetails.additionalPersonalInfo;
+  let axisAdditionalPersonalInfo = newRequestDetails.additionalPersonalInfo;
+  if(newRequestDetails.requestType === 'personal'){
+    for(let key of Object.keys(existingRequestDetails)){
+      if((key == 'correctionalServiceNumber' || key == 'publicServiceEmployeeNumber' ) && !isAxisSyncDisplayField(key))
+        newRequestDetails[key] = existingRequestDetails[key];
+    }
+    for(let key of Object.keys(foiReqAdditionalPersonalInfo)){
+      if(!isAxisSyncDisplayField(key)){
+        axisAdditionalPersonalInfo[key] = foiReqAdditionalPersonalInfo[key];
+      }
+    }
+  }
+  return newRequestDetails;
+}
+
+export const getUniqueIdentifier = (obj) => {
+  return (obj.extensionstatusid+formatDate(obj.extendedduedate, "MMM dd yyyy")+obj.extensionreasonid).replace(/\s+/g, '');
+}
+

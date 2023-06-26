@@ -1,5 +1,5 @@
 # base image
-FROM docker-remote.artifacts.developer.gov.bc.ca/node:14.17.0-alpine as build-stage
+FROM artifacts.developer.gov.bc.ca/docker-remote/node:14.17.0-alpine as build-stage
 
 # set working directory
 WORKDIR /app
@@ -22,13 +22,17 @@ ARG CUSTOM_SRC_DIR=src
 # Override these files they have custom changes in the sbc_divapps directory
 COPY ./${CUSTOM_SRC_DIR}/  /app/${CUSTOM_SRC_DIR}/
 
-ARG CUSTOM_SVG_DIR=public/webfonts
+#ARG CUSTOM_SVG_DIR=public
 COPY ./${CUSTOM_SVG_DIR}/ /app/${CUSTOM_SVG_DIR}/
 
+
+
 RUN npm install
+#Patching for KC upgrate v7.16.x
+RUN npm install keycloak-js@20.0.2
 RUN npm run build
 
-FROM docker-remote.artifacts.developer.gov.bc.ca/nginx:1.17 as production-stage
+FROM artifacts.developer.gov.bc.ca/docker-remote/nginx:1.17 as production-stage
 RUN mkdir /app
 COPY --from=build-stage /app/build /usr/share/nginx/html
 COPY nginx.conf /etc/nginx/nginx.conf

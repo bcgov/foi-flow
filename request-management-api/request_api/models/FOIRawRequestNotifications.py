@@ -21,6 +21,7 @@ class FOIRawRequestNotification(db.Model):
     idnumber = db.Column(db.String(50), unique=False, nullable=True)
     axisnumber = db.Column(db.String(50), unique=False, nullable=True)
     notification = db.Column(JSON, unique=False, nullable=True)
+    isdeleted = db.Column(db.Boolean, unique=False, nullable=True, default=False)
     created_at = db.Column(db.DateTime, default=datetime2.now)
     createdby = db.Column(db.String(120), unique=False, nullable=True)
     updated_at = db.Column(db.DateTime, nullable=True)
@@ -42,14 +43,30 @@ class FOIRawRequestNotification(db.Model):
             raise
       
     @classmethod
-    def dismissnotification(cls, notificationids):
+    def dismissnotification(cls, notificationids, userid='system'):
         try:
-            db.session.query(FOIRawRequestNotification).filter(FOIRawRequestNotification.notificationid.in_(notificationids)).delete(synchronize_session=False)
+            db.session.query(FOIRawRequestNotification).filter(FOIRawRequestNotification.notificationid.in_(notificationids)).update({FOIRawRequestNotification.isdeleted: True, FOIRawRequestNotification.updatedby: userid,
+                            FOIRawRequestNotification.updated_at: datetime2.now()}, synchronize_session=False)
             db.session.commit()  
             return DefaultMethodResult(True,'Notifications deleted ', notificationids)
         except:
             db.session.rollback()
             raise
+
+    @classmethod
+    def updatenotification(cls, foinotification, userid):
+        dbquery = db.session.query(FOIRawRequestNotification)
+        _notification = dbquery.filter_by(notificationid=foinotification['notificationid'])
+        if(_notification.count() > 0) :
+            _notification.update({
+                FOIRawRequestNotification.notification:foinotification['notification'],
+                FOIRawRequestNotification.updatedby:userid,
+                FOIRawRequestNotification.updated_at:datetime2.now()
+            }, synchronize_session = False)
+            db.session.commit()
+            return DefaultMethodResult(True,'notification updated',foinotification['notificationid'])
+        else:
+            return DefaultMethodResult(True,'No notification found',foinotification['notificationid'])
         
     @classmethod
     def getnotificationidsbynumberandtype(cls, idnumber, notificationtypeid):

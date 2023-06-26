@@ -6,6 +6,7 @@ from request_api.models.DeliveryModes import DeliveryMode
 from request_api.models.ReceivedModes import ReceivedMode
 from request_api.models.ApplicantCategories import ApplicantCategory
 from request_api.models.FOIRequestStatus import FOIRequestStatus
+from request_api.models.SubjectCodes import SubjectCode
 from enum import Enum
 import datetime 
 import secrets
@@ -34,6 +35,9 @@ class requestserviceconfigurator:
         elif name == "programArea":
             pgarea = ProgramArea().getprogramarea(key)
             return pgarea["programareaid"]
+        elif name == "subjectCode":
+            subjectcode = SubjectCode().getsubjectcodebyname(key)
+            return subjectcode["subjectcodeid"] if subjectcode is not None else None
 
     def getpropertyvaluefromschema(self,requestschema,property):
         return requestschema.get(property) if property in requestschema  else None

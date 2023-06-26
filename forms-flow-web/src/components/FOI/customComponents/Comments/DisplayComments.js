@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import './comments.scss'
 import InputField from './InputField'
 import { ActionContext } from './ActionContext'
@@ -7,18 +7,17 @@ import CommentStructure from './CommentStructure'
 import { addToFullnameList, getFullnameList } from '../../../../helper/FOI/helper'
 
 
-const DisplayComments = ({ comments, bcgovcode, currentUser, iaoassignedToList, ministryAssignedToList, setEditorChange, removeComment, setRemoveComment }) => {
+const DisplayComments = ({ comments, bcgovcode, currentUser, iaoassignedToList, ministryAssignedToList, restrictedReqTaglist, isRestricted,
+  setEditorChange, removeComment, setRemoveComment }) => {
 
   const [fullnameList, setFullnameList] = useState(getFullnameList);
 
   const finduserbyuserid = (userId) => {
     let user = fullnameList.find(u => u.username === userId);
     return user && user.fullname ? user.fullname : userId;
-
   }
 
   const getfullName = (commenttypeid, userId) => {
-
     if (commenttypeid === 1) {
       if (fullnameList) {
         return finduserbyuserid(userId)
@@ -42,9 +41,9 @@ const DisplayComments = ({ comments, bcgovcode, currentUser, iaoassignedToList, 
   }
 
   const showhiddencomments = (_e, count) => {
-    var hiddencomments = document.getElementsByName('commentsectionhidden')
+    let hiddencomments = document.getElementsByName('commentsectionhidden')
     if (hiddencomments && Array.from(hiddencomments).filter((_c) => _c.style.display === 'none').length > 0) {
-      var cnt = 0
+      let cnt = 0
       hiddencomments.forEach(_com => {
 
         if (cnt < count && _com.style.display === 'none') {
@@ -69,9 +68,9 @@ const DisplayComments = ({ comments, bcgovcode, currentUser, iaoassignedToList, 
   const [showmorehidden, setshowmorehidden] = useState(false)
 
   const checkcommentlengthforindex = (comment, index) => {
-    var commentlenghchecker = new Object()
+    let commentlenghchecker = new Object()
 
-    commentlenghchecker.totalcharacterCount = comment.text.length
+    commentlenghchecker.totalcharacterCount = comment?.text?.length
     commentlenghchecker.reachedLimit = false
     commentlenghchecker.returnindex = 10
     
@@ -84,7 +83,7 @@ const DisplayComments = ({ comments, bcgovcode, currentUser, iaoassignedToList, 
     if (comment.replies && comment.replies.length > 0) {
       comment.replies.forEach((reply) => {
         if (!commentlenghchecker.reachedLimit) {
-          commentlenghchecker.totalcharacterCount += reply.text.length
+          commentlenghchecker.totalcharacterCount += reply.text?.length
           if (commentlenghchecker.totalcharacterCount > 2000 && index > 10) {
             commentlenghchecker.returnindex = index
             commentlenghchecker.reachedLimit = true
@@ -98,15 +97,15 @@ const DisplayComments = ({ comments, bcgovcode, currentUser, iaoassignedToList, 
   }
 
   const dynamicIndexFinder = () => {
-    var _commentscopy = [...comments]
-    var returnindex = 10
-    var totalcharacterCount = 0
-    var reachedLimit = false;
+    let _commentscopy = [...comments]
+    let returnindex = 10
+    let totalcharacterCount = 0
+    let reachedLimit = false;
 
     _commentscopy.forEach((comment, index) => {
 
       if (!reachedLimit) {
-        var commentlenghchecker = checkcommentlengthforindex(comment, index)
+        let commentlenghchecker = checkcommentlengthforindex(comment, index)
         totalcharacterCount += commentlenghchecker.totalcharacterCount
         reachedLimit = commentlenghchecker.reachedLimit
         returnindex = commentlenghchecker.returnindex
@@ -137,6 +136,8 @@ const DisplayComments = ({ comments, bcgovcode, currentUser, iaoassignedToList, 
               edit
               parentId={i.commentId}
               fullnameList={fullnameList}
+              restrictedReqTaglist={restrictedReqTaglist}
+              isRestricted = {isRestricted}
               //Handles Navigate Away
               setEditorChange={setEditorChange} removeComment={removeComment} setRemoveComment={setRemoveComment}
             />
@@ -145,7 +146,7 @@ const DisplayComments = ({ comments, bcgovcode, currentUser, iaoassignedToList, 
               i={a}
               reply
               parentId={i.commentId}
-              handleEdit={() => actions.handleAction} totalcommentCount={i.replies.length} currentIndex={replyindex} isreplysection={true} bcgovcode={bcgovcode} hasAnotherUserComment={false} fullName={getfullName(a.commentTypeId, a.userId)}
+              handleEdit={() => actions.handleAction} totalcommentCount={i.replies.length} currentIndex={replyindex} isreplysection={true} hasAnotherUserComment={false} fullName={getfullName(a.commentTypeId, a.userId)}
             />
           )}
           {actions.replies.filter((id) => id === a.commentId).length !==
@@ -165,6 +166,8 @@ const DisplayComments = ({ comments, bcgovcode, currentUser, iaoassignedToList, 
                 parentId={i.commentId}
                 child
                 fullnameList={fullnameList}
+                restrictedReqTaglist={restrictedReqTaglist}
+                isRestricted={isRestricted}
                 //Handles Navigate Away
                 setEditorChange={setEditorChange} removeComment={removeComment} setRemoveComment={setRemoveComment}
               />
@@ -181,15 +184,15 @@ const DisplayComments = ({ comments, bcgovcode, currentUser, iaoassignedToList, 
           comments.map((i, index) => (
             <div key={i.commentId} className="commentsection" data-comid={i.commentId} name={index >= limit ? 'commentsectionhidden' : ""} style={index >= limit && !showmorehidden ? { display: 'none' } : { display: 'block' }}>
               {actions.editArr.filter((id) => id === i.commentId).length !== 0 ? (
-                <InputField cancellor={i.commentId} inputvalue={i.text} edit fullnameList={fullnameList} //Handles Navigate Away
+                <InputField cancellor={i.commentId} inputvalue={i.text} edit fullnameList={fullnameList} restrictedReqTaglist={restrictedReqTaglist} isRestricted={isRestricted} //Handles Navigate Away
                   setEditorChange={setEditorChange} removeComment={removeComment} setRemoveComment={setRemoveComment} />
               ) : (
-                <CommentStructure i={i} handleEdit={() => actions.handleAction} totalcommentCount={gettotalcommentflag(i)} currentIndex={index} c={false} bcgovcode={bcgovcode} hasAnotherUserComment={(i.replies && i.replies.filter(r => r.userId !== currentUser.userId).length > 0)} fullName={getfullName(i.commentTypeId, i.userId)} />
+                <CommentStructure i={i} handleEdit={() => actions.handleAction} totalcommentCount={gettotalcommentflag(i)} currentIndex={index} c={false} hasAnotherUserComment={(i.replies && i.replies.filter(r => r.userId !== currentUser.userId).length > 0)} fullName={getfullName(i.commentTypeId, i.userId)} />
               )}
               {
                 actions.replies.filter((id) => id === i.commentId).length !== 0 &&
                 (
-                  <InputField cancellor={i.commentId} parentId={i.commentId} fullnameList={fullnameList} //Handles Navigate Away
+                  <InputField cancellor={i.commentId} parentId={i.commentId} fullnameList={fullnameList} restrictedReqTaglist={restrictedReqTaglist} isRestricted={isRestricted} //Handles Navigate Away
                     setEditorChange={setEditorChange} removeComment={removeComment} setRemoveComment={setRemoveComment} />
                 )
               }

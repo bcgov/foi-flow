@@ -60,17 +60,21 @@ const NotificationList = ({notification, isMinistry, ministryCode}) => {
             getStatusAndRedirect(err, res);
         }));
     }
+    else if (checkPDFStitchType(notificationVal.notificationtype)) {
+      setRecordsUrl();
+    }
     else{
       setRedirectUrl();
     }
   }
 
   const checkCommentType = (type) => {
-    if(type === 'New User Comments' || type === 'Reply User Comments' ||
-      type === 'Tagged User Comments'){
-      return true;
-    }
-    return false;
+    return !!(type === 'New User Comments' || type === 'Reply User Comments' ||
+      type === 'Tagged User Comments');
+  }
+
+  const checkPDFStitchType = (type) => {
+    return !!(type === 'PDFStitch');
   }
 
   const commentTitle = (type) => {
@@ -79,7 +83,7 @@ const NotificationList = ({notification, isMinistry, ministryCode}) => {
     else if(type === "Tagged User Comments")
       return "You've been tagged in a comment:";
     else
-      return "New Reply to Your comment:";
+      return "New Reply to a comment:";
   }
 
   const commentText = (message) => {
@@ -126,6 +130,15 @@ const NotificationList = ({notification, isMinistry, ministryCode}) => {
       else
         url = `/foi/foirequests/${notification.foirequestid}/ministryrequest/${notification.requestid}/comments`;
     }
+    window.location.href=url;
+  }
+
+  const setRecordsUrl = () =>{
+    let url = "";    
+    if(isMinistry)
+      url = `/foi/ministryreview/${notification.foirequestid}/ministryrequest/${notification.requestid}/records`;
+    else
+      url = `/foi/foirequests/${notification.foirequestid}/ministryrequest/${notification.requestid}/records`;
     window.location.href=url;
   }
 

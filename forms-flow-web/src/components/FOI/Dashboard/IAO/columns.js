@@ -3,6 +3,9 @@ import {
   getDaysLeft,
   getReceivedDate,
   // onBehalfFullName,
+  displayIcon,
+  displayHeaderIcon,
+  cellTooltipRender
 } from "../utils";
 import {
   isProcessingTeam,
@@ -17,6 +20,7 @@ const ProcessingTeamColumns = [
     headerName: "ID NUMBER",
     headerAlign: "left",
     width: 160,
+    renderCell: cellTooltipRender
   },
   {
     field: "applicantName",
@@ -71,7 +75,7 @@ const ProcessingTeamColumns = [
     headerName: "EXT.",
     headerAlign: "left",
     flex: 0.5,
-    sortable: false,
+    // sortable: false,
     valueGetter: (params) =>
       params.row.extensions === undefined ? "N/A" : params.row.extensions,
   },
@@ -80,64 +84,24 @@ const ProcessingTeamColumns = [
     headerName: "PAGES",
     headerAlign: "left",
     flex: 0.5,
-  },
+  }
 ];
 
 const IntakeTeamColumns = [
   {
-    field: "applicantName",
-    headerName: "APPLICANT NAME",
+    field: "isiaorestricted",
+    renderHeader: displayHeaderIcon,
     headerAlign: "left",
-    valueGetter: (params) =>
-      getFullName(params.row.firstName, params.row.lastName),
-    width: 180,
+    renderCell:displayIcon,
+    cellClassName: 'foi-dashboard-restricted',
+    width: 60,
   },
-  {
-    field: "requestType",
-    headerName: "REQUEST TYPE",
-    headerAlign: "left",
-    flex: 1,
-  },
-  {
-    field: "axisRequestId",
-    headerName: "ID NUMBER",
-    headerAlign: "left",
-    flex: 1,
-  },
-  {
-    field: "currentState",
-    headerName: "CURRENT STATE",
-    headerAlign: "left",
-    flex: 1,
-  },
-  {
-    field: "assignedToFormatted",
-    headerName: "ASSIGNED TO",
-    headerAlign: "left",
-    flex: 1,
-  },
-  {
-    field: "receivedDate",
-    headerName: "RECEIVED DATE",
-    headerAlign: "left",
-    valueGetter: getReceivedDate,
-    flex: 1,
-  },
-  {
-    field: "receivedDateUF",
-    headerName: "",
-    width: 0,
-    hide: true,
-    renderCell: (_params) => <span></span>,
-  },
-];
-
-const FlexTeamColumns = [
   {
     field: "axisRequestId",
     headerName: "ID NUMBER",
     headerAlign: "left",
     width: 160,
+    renderCell: cellTooltipRender
   },
   {
     field: "applicantName",
@@ -186,6 +150,85 @@ const FlexTeamColumns = [
     flex: 0.75,
     // sortable: false,
   },
+  {
+    field: "receivedDate",
+    headerName: "RECEIVED DATE",
+    headerAlign: "left",
+    valueGetter: getReceivedDate,
+    flex: 1,
+  }
+];
+
+const FlexTeamColumns = [
+  {
+    field: "isiaorestricted",
+    renderHeader: displayHeaderIcon,
+    headerAlign: "left",
+    renderCell:displayIcon,
+    cellClassName: 'foi-dashboard-restricted',
+    width: 60,
+  },
+  {
+    field: "axisRequestId",
+    headerName: "ID NUMBER",
+    headerAlign: "left",
+    width: 160,
+    renderCell: cellTooltipRender
+  },
+  {
+    field: "applicantName",
+    headerName: "APPLICANT NAME",
+    headerAlign: "left",
+    valueGetter: (params) =>
+      getFullName(params.row.firstName, params.row.lastName),
+    width: 180,
+  },
+  {
+    field: "applicantcategory",
+    headerName: "CATEGORY",
+    headerAlign: "left",
+    flex: 1,
+  },
+  {
+    field: "requestType",
+    headerName: "TYPE",
+    headerAlign: "left",
+    flex: 1,
+  },
+  {
+    field: "currentState",
+    headerName: "CURRENT STATE",
+    headerAlign: "left",
+    flex: 1,
+  },
+  {
+    field: "assignedToFormatted",
+    headerName: "ASSIGNED TO",
+    headerAlign: "left",
+    flex: 1,
+  },
+  {
+    field: "cfrduedate",
+    headerName: "CFR DUE",
+    flex: 1,
+    headerAlign: "left",
+    valueGetter: (params) => formatDate(params.row.cfrduedate, "MM/dd/yyyy"),
+  },
+  {
+    field: "DaysLeftValue",
+    headerName: "DAYS LEFT",
+    headerAlign: "left",
+    valueGetter: getDaysLeft,
+    flex: 0.75,
+    // sortable: false,
+  },
+  {
+    field: "receivedDate",
+    headerName: "RECEIVED DATE",
+    headerAlign: "left",
+    valueGetter: getReceivedDate,
+    flex: 1,
+  }
 ];
 
 const defaultTableInfo = {

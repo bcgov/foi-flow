@@ -11,5 +11,7 @@ namespace MCS.FOI.AXISIntegration.DAL.Interfaces
     {
         public string GetAXISRequestString(string requestNumber);
 
+        public AXISRequest GetAXISRequest(string request);
+
     }
 }

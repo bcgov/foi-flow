@@ -245,3 +245,21 @@ nav.MuiPagination-root {
 .MuiNativeSelect-standard {
     padding-right: 15px !important;
 }
+
+.foi-dashboard-restricted {
+    font-size: 10px;
+    color: #A0192F;
+}
+
+.table-cell-truncate {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+div.MuiDataGrid-columnHeader[data-field="isiaorestricted"] {
+    padding-right: 0px;
+    button {
+        left: 5px;
+    }
+}

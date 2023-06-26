@@ -18,7 +18,8 @@ const MANDATORY_FOI_REQUEST_FIELDS = {
     SELECTED_MINISTRIES: "selectedMinistries",
 
     AXIS_REQUEST_ID:"axisRequestId",
-    TOTAL_NO_OF_PAGES: "requestPageCount"
+    TOTAL_NO_OF_PAGES: "requestPageCount",
+    SUBJECT_CODE: "subjectCode"
   };
   
   export default MANDATORY_FOI_REQUEST_FIELDS;

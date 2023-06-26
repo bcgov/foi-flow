@@ -10,7 +10,8 @@ from request_api.models.FOIMinistryRequestDocuments import FOIMinistryRequestDoc
 from request_api.models.FOIRequestExtensions import FOIRequestExtension
 from request_api.models.FOIRequestExtensionDocumentMappings import FOIRequestExtensionDocumentMapping
 from request_api.models.FOIAssignees import FOIAssignee
-from request_api.services.foirequest.requestserviceconfigurator import requestserviceconfigurator 
+from request_api.models.FOIMinistryRequestSubjectCodes import FOIMinistryRequestSubjectCode
+from request_api.services.foirequest.requestserviceconfigurator import requestserviceconfigurator
 from datetime import datetime as datetime2
 
 class requestserviceministrybuilder(requestserviceconfigurator):
@@ -47,6 +48,7 @@ class requestserviceministrybuilder(requestserviceconfigurator):
         foiministryrequest.filenumber = ministryschema["filenumber"]
         foiministryrequest.axissyncdate = ministryschema["axissyncdate"]
         foiministryrequest.axisrequestid = ministryschema["axisrequestid"]
+        foiministryrequest.linkedrequests = ministryschema['linkedrequests']
         foiministryrequest.requestpagecount = ministryschema["requestpagecount"]
         foiministryrequest.cfrduedate = requestdict['cfrduedate']
         foiministryrequest.startdate = requestdict['startdate']
@@ -74,16 +76,28 @@ class requestserviceministrybuilder(requestserviceconfigurator):
         foiministryrequest.requeststatusid = requestdict['requeststatusid']
         foiministryrequest.programareaid = requestdict['programareaid']
         foiministryrequest.createdby = userid
-        if 'divisions' in requestschema:
-            foiministryrequest.divisions = self.createfoirequestdivision(requestschema,ministryschema["foiministryrequestid"] ,ministryschema["version"] + 1, userid)  
-        else:
-            divisions = FOIMinistryRequestDivision().getdivisions(ministryschema["foiministryrequestid"] ,ministryschema["version"])
-            foiministryrequest.divisions = self.createfoirequestdivisionfromobject(divisions,ministryschema["foiministryrequestid"] ,ministryschema["version"] + 1, userid)  
+        
+        foiministryrequest.divisions = self.__createministrydivisions(requestschema, ministryschema["foiministryrequestid"] ,ministryschema["version"], userid)
         foiministryrequest.documents = self.createfoirequestdocuments(requestschema,ministryschema["foiministryrequestid"] ,ministryschema["version"] +1 , userid)
-        foiministryrequest.extensions = self.createfoirequestextensions(ministryschema["foiministryrequestid"] ,ministryschema["version"] +1 , userid)       
+        foiministryrequest.extensions = self.createfoirequestextensions(ministryschema["foiministryrequestid"] ,ministryschema["version"] +1 , userid)
+        foiministryrequest.subjectcode = self.__createministrysubjectcode(requestschema, ministryschema["foiministryrequestid"], ministryschema["version"], userid)
         foiministryrequest.closedate = requestdict['closedate']
         foiministryrequest.closereasonid = requestdict['closereasonid']
         return foiministryrequest
+
+    def __createministrydivisions(self, requestschema, foiministryrequestid, foiministryrequestversion, userid):
+        if 'divisions' in requestschema:
+            return self.createfoirequestdivision(requestschema,foiministryrequestid ,foiministryrequestversion + 1, userid)  
+        else:
+            divisions = FOIMinistryRequestDivision().getdivisions(foiministryrequestid, foiministryrequestversion)
+            return self.createfoirequestdivisionfromobject(divisions,foiministryrequestid, foiministryrequestversion + 1, userid)  
+
+    def __createministrysubjectcode(self, requestschema, foiministryrequestid, foiministryrequestversion, userid):
+        subjectcode = FOIMinistryRequestSubjectCode().getministrysubjectcode(foiministryrequestid, foiministryrequestversion)
+        if subjectcode:
+            return self.createfoirequestsubjectcodefromobject(subjectcode, foiministryrequestid, foiministryrequestversion + 1, userid)
+        else:
+            return []
 
     def createfoiministryrequestfromobject1(self, ministryschema, requestschema):  
         return {
@@ -97,18 +111,24 @@ class requestserviceministrybuilder(requestserviceconfigurator):
             'requeststatusid': requestschema['requeststatusid'] if  'requeststatusid' in requestschema  else  ministryschema["requeststatus.requeststatusid"],
             'programareaid': ministryschema["programarea.programareaid"] if 'programarea.programareaid' in ministryschema  else None,
             'closedate': requestschema['closedate'] if 'closedate' in requestschema  else None,
-            'closereasonid': requestschema['closereasonid'] if 'closereasonid' in requestschema  else None
+            'closereasonid': requestschema['closereasonid'] if 'closereasonid' in requestschema  else None,
+            'linkedrequests': ministryschema['linkedrequests'] if 'linkedrequests' in ministryschema  else None
         }
     
     def createfoirequestdocuments(self,requestschema, ministryrequestid, activeversion, userid):
-        documentarr = []
-        documents = FOIMinistryRequestDocument().getdocuments(ministryrequestid, activeversion-1)
-        existingdocuments = self.createfoirequestdocumentfromobject(documents,ministryrequestid ,activeversion, userid)       
-        documentarr = existingdocuments
+        # documents = FOIMinistryRequestDocument().getdocuments(ministryrequestid, activeversion-1)
+        # make isactive = False for all ministryRequestId and prev ministryVersion
+        # FOIMinistryRequestDocument.deActivateministrydocumentsversionbyministry(ministryrequestid, activeversion, userid)
+        
+        # existingdocuments = self.createfoirequestdocumentfromobject(documents,ministryrequestid ,activeversion, userid)       
+        # documentarr = existingdocuments
         if 'documents' in requestschema:
-            newdocuments = self.createfoirequestdocument(requestschema,ministryrequestid ,activeversion, userid)  
-            documentarr = newdocuments + existingdocuments
-        return documentarr
+            return self.createfoirequestdocument(requestschema,ministryrequestid ,activeversion, userid)  
+            # documentarr = newdocuments #+ existingdocuments
+        return []
+    
+    def createfoirequestsubjectcode(self,requestschema, ministryrequestid, activeversion, userid):        
+        return self.createsubjectcode(requestschema,ministryrequestid ,activeversion, userid)  
 
     def createfoirequestextensions(self, ministryrequestid, activeversion, userid):
         extensions = FOIRequestExtension().getextensions(ministryrequestid, activeversion-1)
@@ -116,8 +136,7 @@ class requestserviceministrybuilder(requestserviceconfigurator):
         existingextensions = self.createfoirequestextensionfromobject(extensions,ministryrequestid ,activeversion, userid)
         if existingextensions is not None:
             return existingextensions
-        else:
-            return []
+        return []
     
     def createfoirequestappplicantfromobject(self, requestapplicants, requestid, version, userid): 
         requestapplicantarr = []
@@ -164,6 +183,7 @@ class requestserviceministrybuilder(requestserviceconfigurator):
             ministrydivision.stageid = division["stage.stageid"]
             ministrydivision.divisionduedate = division["divisionduedate"]
             ministrydivision.eapproval = division["eapproval"]
+            ministrydivision.divisionreceiveddate = division["divisionreceiveddate"]
             ministrydivision.foiministryrequest_id = requestid
             ministrydivision.foiministryrequestversion_id = version
             ministrydivision.createdby = userid
@@ -243,7 +263,29 @@ class requestserviceministrybuilder(requestserviceconfigurator):
                 ministrydocument.createdby = userid
                 ministrydocument.created_at = datetime2.now().isoformat()
                 documentarr.append(ministrydocument)
-            return documentarr    
+        return documentarr
+    
+    def createsubjectcode(self, requestschema, requestid, version, userid):
+        subjectcodearr = []
+        ministrysubjectcode = FOIMinistryRequestSubjectCode()
+        ministrysubjectcode.subjectcodeid = requestserviceconfigurator().getvalueof("subjectCode",requestschema['subjectCode'])
+        ministrysubjectcode.foiministryrequestid = requestid
+        ministrysubjectcode.foiministryrequestversion = version
+        ministrysubjectcode.createdby = userid
+        ministrysubjectcode.created_at = datetime2.now().isoformat()
+        subjectcodearr.append(ministrysubjectcode)              
+        return subjectcodearr
+    
+    def createfoirequestsubjectcodefromobject(self, subjectcode, requestid, activeversion, userid):
+        subjectcodearr = []
+        ministrysubjectcode = FOIMinistryRequestSubjectCode()
+        ministrysubjectcode.subjectcodeid = subjectcode['subjectcodeid']
+        ministrysubjectcode.foiministryrequestid = requestid
+        ministrysubjectcode.foiministryrequestversion = activeversion
+        ministrysubjectcode.createdby = userid
+        ministrysubjectcode.created_at = datetime2.now().isoformat()
+        subjectcodearr.append(ministrysubjectcode)              
+        return subjectcodearr
     
     def createfoirequestdivision(self, requestschema, requestid, version, userid):
         divisionarr = []
@@ -254,6 +296,7 @@ class requestserviceministrybuilder(requestserviceconfigurator):
                 ministrydivision.stageid = division["stageid"]
                 ministrydivision.divisionduedate = division["divisionDueDate"] if "divisionDueDate" in division and division["divisionDueDate"] != '' else None
                 ministrydivision.eapproval = division["eApproval"] if "eApproval" in division else None
+                ministrydivision.divisionreceiveddate = division["divisionReceivedDate"] if "divisionReceivedDate" in division and division["divisionReceivedDate"] != '' else None
                 ministrydivision.foiministryrequest_id = requestid
                 ministrydivision.foiministryrequestversion_id = version
                 ministrydivision.createdby = userid

@@ -27,7 +27,10 @@ namespace MCS.FOI.AXISIntegration.DataModels
        
         [DataMember(Name = "requestType")]
         public string RequestType { get; set; }
-       
+
+        [DataMember(Name = "isRestricted")]
+        public bool IsRestricted { get; set; }
+
         [DataMember(Name = "receivedDate")]
         public string ReceivedDate { get; set; }
 
@@ -117,6 +120,12 @@ namespace MCS.FOI.AXISIntegration.DataModels
         [DataMember(Name = "requestPageCount")]
         public int RequestPageCount { get; set; }
 
+        [DataMember(Name = "subjectCode")]
+        public string SubjectCode { get; set; }
+        
+        [DataMember(Name = "linkedRequests")]
+        public string LinkedRequests { get; set; }
+
         [DataMember(Name = "selectedMinistries")]
         public List<Ministry> SelectedMinistries { get; set; }
         
@@ -143,16 +152,12 @@ namespace MCS.FOI.AXISIntegration.DataModels
         [DataMember(Name = "anotherLastName")]
         public string OnBehalfLastName { get; set; }
         
-        [DataMember(Name = "personalHealthNumber")]
-        public string PersonalHealthNumber { get; set; }
-
-        public AdditionalPersonalInformation(string birthDate, string anotherFirstName, string anotherMiddleName, string anotherLastName, string personalHealthNumber="")
+        public AdditionalPersonalInformation(string birthDate, string anotherFirstName, string anotherMiddleName, string anotherLastName)
         {
             ApplicantDOB = birthDate;
             OnBehalfFirstName = anotherFirstName;
             OnBehalfMiddleName = anotherMiddleName;
             OnBehalfLastName = anotherLastName;
-            PersonalHealthNumber = personalHealthNumber;
         }
 
     }

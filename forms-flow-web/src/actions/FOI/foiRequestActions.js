@@ -1,13 +1,46 @@
 import FOI_ACTION_CONSTANTS from './foiActionConstants'
+
 export const setFOILoader = (data) => dispatch =>{
     dispatch({
         type:FOI_ACTION_CONSTANTS.IS_LOADING,
         payload:data
     })
 }
+
+export const setRecordsLoader = (data) => dispatch =>{
+    dispatch({
+        type:FOI_ACTION_CONSTANTS.IS_RECORDS_LOADING,
+        payload:data
+    })
+}
+
 export const setQueueFilter = (data) => dispatch =>{
     dispatch({
         type:FOI_ACTION_CONSTANTS.QUEUE_FILTER,
+        payload:data
+    })
+}
+export const setQueueParams = (data) => dispatch =>{
+    dispatch({
+        type:FOI_ACTION_CONSTANTS.QUEUE_PARAMS,
+        payload:data
+    })
+}
+export const setEventQueueFilter = (data) => dispatch =>{
+    dispatch({
+        type:FOI_ACTION_CONSTANTS.EVENT_QUEUE_FILTER,
+        payload:data
+    })
+}
+export const setEventQueueParams = (data) => dispatch =>{
+    dispatch({
+        type:FOI_ACTION_CONSTANTS.EVENT_QUEUE_PARAMS,
+        payload:data
+    })
+}
+export const setShowEventQueue = (data) => dispatch =>{
+    dispatch({
+        type:FOI_ACTION_CONSTANTS.SHOW_EVENT_QUEUE,
         payload:data
     })
 }
@@ -35,9 +68,27 @@ export const setFOIAttachmentListLoader = (data) => dispatch =>{
         payload:data
     })
 }
+export const setCommentTagListLoader = (data) => dispatch =>{
+    dispatch({
+        type:FOI_ACTION_CONSTANTS.IS_COMMENTTAGLIST_LOADING,
+        payload:data
+    })
+}
 export const setFOIUpdateLoader = (data) => dispatch =>{
     dispatch({
         type:FOI_ACTION_CONSTANTS.FOI_IS_REQUEST_UPDATED,
+        payload:data
+    })
+}
+export const setFOIEventList = (data) => dispatch =>{
+    dispatch({
+        type:FOI_ACTION_CONSTANTS.FOI_LIST_EVENTS,
+        payload:data
+    })
+}
+export const setFOIMinistryEventList = (data) => dispatch =>{
+    dispatch({
+        type:FOI_ACTION_CONSTANTS.FOI_MINISTRY_EVENTLIST,
         payload:data
     })
 }
@@ -71,7 +122,19 @@ export const setFOIMinistryViewRequestDetail = (data) => dispatch =>{
         payload:data
     })
 }
-export const serviceActionError = (data) => dispatch => {
+export const setFOIPDFStitchedRecordForHarms = (data) => dispatch =>{
+    dispatch({
+        type:FOI_ACTION_CONSTANTS.FOI_PDF_STITCHED_RECORD_FOR_HARMS,
+        payload:data
+    })
+}
+export const setFOIPDFStitchStatusForHarms = (data) => dispatch =>{
+    dispatch({
+        type:FOI_ACTION_CONSTANTS.FOI_PDF_STITCHED_STATUS_FOR_HARMS,
+        payload:data
+    })
+}
+export const serviceActionError = (_data) => dispatch => {
    //TODO update to a common file
     dispatch({
       type: FOI_ACTION_CONSTANTS.ERROR,
@@ -146,53 +209,65 @@ export const setFOIProgramAreaList = (data) => dispatch =>{
         payload:data
     })
 }
+export const setFOIProgramAreaDivisionsList = (data) => dispatch =>{
+    dispatch({
+        type:FOI_ACTION_CONSTANTS.FOI_PROGRAM_AREA_DIVISIONLIST,
+        payload:data
+    })
+}
+export const setFOIAdminProgramAreaList = (data) => dispatch =>{
+    dispatch({
+        type:FOI_ACTION_CONSTANTS.FOI_ADMIN_PROGRAM_AREALIST,
+        payload:data
+    })
+}
 export const clearRequestDetails = (data) => dispatch => {
     dispatch({
         type:FOI_ACTION_CONSTANTS.CLEAR_REQUEST_DETAILS,
-        payload:data
+        payload:data      
     })
 }
 
 export const clearMinistryViewRequestDetails = (data) => dispatch => {
     dispatch({
         type:FOI_ACTION_CONSTANTS.CLEAR_MINISTRYVIEWREQUEST_DETAILS,
-        payload:data
+        payload:data      
     })
 }
 export const setFOIRequestDescriptionHistory = (data) => dispatch => {
     dispatch({
         type:FOI_ACTION_CONSTANTS.FOI_REQUEST_DESCRIPTION_HISTORY,
-        payload:data
+        payload:data      
     })
 }
 export const setFOIMinistryDivisionalStages = (data) => dispatch => {
     dispatch({
         type:FOI_ACTION_CONSTANTS.FOI_MINISTRY_DIVISIONALSTAGES,
-        payload:data
+        payload:data      
     })
 }
 export const setFOIWatcherList = (data) => dispatch => {
     dispatch({
         type:FOI_ACTION_CONSTANTS.FOI_WATCHER_LIST,
-        payload:data
+        payload:data      
     })
 }
 export const setClosingReasons = (data) => dispatch => {
     dispatch({
         type:FOI_ACTION_CONSTANTS.CLOSING_REASONS,
-        payload:data
+        payload:data      
     })
 }
-export const clearRawRequestComments = (data) => dispatch => {
+export const clearRawRequestComments = (_data) => dispatch => {
     dispatch({
         type:FOI_ACTION_CONSTANTS.FOI_RAWREQUEST_COMMENTS,
-        payload:{}
+        payload:{}      
     })
 }
 export const setRequestComments = (data) => dispatch => {
     dispatch({
         type:FOI_ACTION_CONSTANTS.FOI_REQUEST_COMMENTS,
-        payload:data
+        payload:data      
     })
 }
 export const setRequestAttachments = (data) => dispatch => {
@@ -208,12 +283,40 @@ export const setRequestCFRForm = (data) => dispatch => {
     })
 }
 
+export const setRequestCFRFormHistory = (data) => dispatch => {
+    dispatch({
+        type:FOI_ACTION_CONSTANTS.FOI_REQUEST_CFR_FORM_HISTORY,
+        payload:data
+    })
+}
+
+export const setApplicantCorrespondence = (data) => dispatch => {
+    dispatch({
+        type:FOI_ACTION_CONSTANTS.FOI_REQUEST_APPLICANT_CORRESPONDENCE,
+        payload:data
+    })
+}
+
+export const setApplicantCorrespondenceTemplates = (data) => dispatch => {
+    dispatch({
+        type:FOI_ACTION_CONSTANTS.FOI_REQUEST_APPLICANT_CORRESPONDENCE_TEMPLATES,
+        payload:data
+    })
+}
+
 export const setRequestExtensions = (data) => (dispatch) => {
   dispatch({
     type: FOI_ACTION_CONSTANTS.FOI_REQUEST_EXTENSIONS,
     payload: data,
   });
 };
+
+export const setRequestRecords = (data) => (dispatch) => {
+    dispatch({
+      type: FOI_ACTION_CONSTANTS.FOI_REQUEST_RECORDS,
+      payload: data,
+    });
+  };
 
 export const setOpenedMinistries = (data) => (dispatch) => {
     dispatch({
@@ -242,3 +345,38 @@ export const setResumeDefaultSorting = (data) => (dispatch) => {
         payload: data,
     });
 };
+
+export const setFOICorrespondenceLoader = (data) => dispatch =>{
+    dispatch({
+        type:FOI_ACTION_CONSTANTS.IS_CORRESPONDENCE_LOADING,
+        payload:data
+    })
+}
+
+export const setFOISubjectCodeList = (data) => dispatch =>{
+    dispatch({
+        type:FOI_ACTION_CONSTANTS.FOI_SUBJECT_CODELIST,
+        payload:data
+    })
+}
+
+export const setRestrictedReqTaglist = (data) => dispatch =>{
+    dispatch({
+        type:FOI_ACTION_CONSTANTS.RESTRICTED_COMMENT_TAG_LIST,
+        payload:data
+    })
+}
+
+export const setRecordFormats = (data) => dispatch =>{
+    dispatch({
+        type:FOI_ACTION_CONSTANTS.RECORD_FORMATS,
+        payload:data
+    })
+}
+
+export const setConversionFormats = (data) => dispatch =>{
+    dispatch({
+        type:FOI_ACTION_CONSTANTS.CONVERSION_FORMATS,
+        payload:data
+    })
+}

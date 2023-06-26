@@ -102,12 +102,10 @@ class _Config():  # pylint: disable=too-few-public-methods
         connect_timeout_int = int(connect_timeout_string)
         SQLALCHEMY_ENGINE_OPTIONS['connect_args'] = {'connect_timeout': connect_timeout_int}
 
-    print(SQLALCHEMY_ENGINE_OPTIONS)
     #Logging echo settings
     SQLALCHEMY_ECHO = db_sql_echo 
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
-    print('SQLAlchemy URL (base): {}'.format(SQLALCHEMY_DATABASE_URI))
 
     # JWT_OIDC Settings
     JWT_OIDC_WELL_KNOWN_CONFIG = os.getenv('JWT_OIDC_WELL_KNOWN_CONFIG')
@@ -118,7 +116,7 @@ class _Config():  # pylint: disable=too-few-public-methods
     JWT_OIDC_CLIENT_SECRET = os.getenv('JWT_OIDC_CLIENT_SECRET')
     JWT_OIDC_CACHING_ENABLED = os.getenv('JWT_OIDC_CACHING_ENABLED')
     try:
-        JWT_OIDC_JWKS_CACHE_TIMEOUT = int(os.getenv('JWT_OIDC_JWKS_CACHE_TIMEOUT'))
+        JWT_OIDC_JWKS_CACHE_TIMEOUT = int(os.getenv('JWT_OIDC_JWKS_CACHE_TIMEOUT', '300'))
     except ValueError:  # pylint:disable=bare-except # noqa: B901, E722
         JWT_OIDC_JWKS_CACHE_TIMEOUT = 300
 
@@ -129,6 +127,7 @@ class _Config():  # pylint: disable=too-few-public-methods
     # Fees
     LEGISLATIVE_TIMEZONE = 'America/Vancouver'
     FOI_WEB_PAY_URL = os.getenv('FOI_WEB_PAY_URL')
+    FOI_FFA_URL = os.getenv('FOI_FFA_URL')
     PAYBC_REF_NUMBER = os.getenv('PAYBC_REF_NUMBER')
     PAYBC_PORTAL_URL = os.getenv('PAYBC_PORTAL_URL')
     PAYBC_TXN_PREFIX = os.getenv('PAYBC_TXN_PREFIX', 'FOI')
@@ -176,8 +175,6 @@ class TestConfig(_Config):  # pylint: disable=too-few-public-methods
                                             name=DB_NAME,
                                         ))
     
-    print('SQLAlchemy URL (Test): {}'.format(SQLALCHEMY_DATABASE_URI))
-    
     # JWT_OIDC Settings
     JWT_OIDC_WELL_KNOWN_CONFIG = os.getenv('JWT_OIDC_WELL_KNOWN_CONFIG')
     JWT_OIDC_ALGORITHMS = os.getenv('JWT_OIDC_ALGORITHMS')
@@ -187,7 +184,7 @@ class TestConfig(_Config):  # pylint: disable=too-few-public-methods
     JWT_OIDC_CLIENT_SECRET = os.getenv('JWT_OIDC_CLIENT_SECRET')
     JWT_OIDC_CACHING_ENABLED = os.getenv('JWT_OIDC_CACHING_ENABLED')
     try:
-        JWT_OIDC_JWKS_CACHE_TIMEOUT = int(os.getenv('JWT_OIDC_JWKS_CACHE_TIMEOUT'))
+        JWT_OIDC_JWKS_CACHE_TIMEOUT = int(os.getenv('JWT_OIDC_JWKS_CACHE_TIMEOUT', '300'))
     except ValueError:  # pylint:disable=bare-except # noqa: B901, E722
         JWT_OIDC_JWKS_CACHE_TIMEOUT = 300
     
@@ -200,6 +197,5 @@ class ProdConfig(_Config):  # pylint: disable=too-few-public-methods
         SECRET_KEY = os.urandom(24)
         print('WARNING: SECRET_KEY being set as a one-shot', file=sys.stderr)
 
-    print('SQLAlchemy URL (prod/base): {}'.format(_Config.SQLALCHEMY_DATABASE_URI))
     TESTING = False
     DEBUG = False

@@ -42,10 +42,27 @@
       //padding: 5%!important;
       text-align: center;
       
+     
 
   }
   .footerstyle a {
     font-size: 15px;
+  }
+
+}
+
+@media only screen and (min-width:500px) and (max-width:1200px) {
+
+  .footerstyle li {
+    padding-top:0px;
+    padding-bottom: 0px;
+  }
+  
+  .footerstyle ul {
+    margin-bottom: 5px;
+  }
+  .footerstyle a {
+    font-size: 12px;
   }
 
 }

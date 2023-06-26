@@ -1,0 +1,114 @@
+.records-accordion {
+    width:100%;
+    .MuiAccordion-root {
+        margin: 10px 0 !important;
+        border: #003366 1px solid;
+        background-color: #FFFFFF !important;
+    }
+
+    .MuiAccordionSummary-root {
+        min-height: 35px;
+        height: 35px;
+    }
+}
+
+.records-actions-btn {
+    padding: 0 0 0 40px !important;
+}
+
+.file-upload-toast {
+    .Toastify__toast-body {
+        > div:last-child {
+            white-space: pre-line;
+        }
+    }
+}
+
+.number-spacing{
+    margin-left: 21px;
+    padding: 3px 9px;
+    background-color: #808080;
+    color: white;
+}
+
+.record-time {
+    text-align: right;
+    margin-right: 62px;
+}
+
+
+.download-dropdown{
+    > div {
+      > fieldset {
+        > legend {
+          width: 0;
+        }
+      }
+    }
+  }
+
+  .download-dropdown{
+    > div {
+      > svg {
+        color: #003366 !important;
+      }
+    }
+  }
+
+//   .custom-select-wrapper {
+//     position: relative !important
+//    }
+//    .custom-select-wrapper:after {
+//      border-left: 2px solid  #38598A ;
+//      content:"\00a0";
+//      position: absolute !important;
+//      top: 0;
+//      right: 46px;
+//      z-index: 2;
+//      display:block;
+//      height: 38px;
+//    }
+
+
+   .foi-download-button {
+    margin: 0;
+    width: 100%;
+    background-color: #FFFFFF;
+    color: #38598A !important;
+    outline-color: #38598A;
+    outline-style: solid;
+    outline-offset: -3px;
+    font-family: BCSans-Bold, sans-serif !important;
+    border-radius: 0.25rem;
+  }
+  #download-label {
+    color: #38598A !important;
+  }
+  #download {
+    padding: .475rem .75rem !important;
+  }
+
+  .download-menu-item {
+    color: #38598A !important;
+    font-family: BCSans-Regular, sans-serif !important;
+  }
+
+  .download-progress {
+    width: 20px !important;
+    height: 20px !important;
+    margin-right: 10px;
+  }
+  .download-progress-adornment {
+    width: 15px !important;
+    height: 15px !important;
+  }
+
+  .foi-records-request-text {
+    margin-bottom: 4% !important;
+  }
+
+  .recordsstatus {
+    font-size: 16px;
+    font-family: BCSans-Regular, sans-serif !important;
+    padding: 2%;
+  }

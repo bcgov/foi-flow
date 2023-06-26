@@ -76,6 +76,7 @@ class FOIRequestWrapperSchema(Schema):
     fromDate = fields.Str(data_key="fromDate",allow_none=True)
     toDate = fields.Str(data_key="toDate",allow_none=True)
     dueDate = fields.Str(data_key="dueDate", required=True,validate=[validate.Length(min=1, error=BLANK_EXCEPTION_MESSAGE)])
+    paymentExpiryDate = fields.Str(data_key="paymentExpiryDate", required=False,allow_none=True)
     cfrDueDate = fields.Date(data_key="cfrDueDate", required=False,allow_none=True)
     deliveryMode = fields.Str(data_key="deliveryMode", required=True,validate=[validate.Length(min=1, error=BLANK_EXCEPTION_MESSAGE)])   
     receivedMode = fields.Str(data_key="receivedMode", required=True,validate=[validate.Length(min=1, error=BLANK_EXCEPTION_MESSAGE)])   
@@ -107,11 +108,15 @@ class FOIRequestWrapperSchema(Schema):
     closereasonid = fields.Int(data_key="closereasonid",allow_none=True)
     correctionalServiceNumber = fields.Str(data_key="correctionalServiceNumber",allow_none=True, validate=[validate.Length(max=50, error=MAX_EXCEPTION_MESSAGE)]) 
     publicServiceEmployeeNumber = fields.Str(data_key="publicServiceEmployeeNumber",allow_none=True, validate=[validate.Length(max=50, error=MAX_EXCEPTION_MESSAGE)]) 
-  
+    isiaorestricted =   fields.Bool(data_key="isiaorestricted")
+    
     selectedMinistries = fields.Nested(FOIMinistryRequestWrapperSchema, many=True)
     additionalPersonalInfo = fields.Nested(FOIAdditionallPersonalInfoWrapperSchema,required=False,allow_none=True)
     documents = fields.Nested(FOIMinistryRequestDocumentSchema, many=True,allow_none=True)
     idNumber = fields.Str(data_key="idNumber",allow_none=True, validate=[validate.Length(max=120, error=MAX_EXCEPTION_MESSAGE)]) 
+    subjectCode = fields.Str(data_key="subjectCode",allow_none=True, validate=[validate.Length(max=120, error=MAX_EXCEPTION_MESSAGE)])   
+    isofflinepayment =   fields.Bool(data_key="isofflinepayment")
+    linkedRequests = fields.List(fields.Dict(data_key="linkedRequests", required=False))
 
 class EditableFOIMinistryRequestWrapperSchema(Schema):
     class Meta:  # pylint: disable=too-few-public-methods
@@ -123,7 +128,10 @@ class EditableFOIMinistryRequestWrapperSchema(Schema):
 
 class EditableFOIRequestWrapperSchema(Schema):
     wfinstanceid = fields.Str(data_key="wfinstanceId",allow_none=True)
-    selectedMinistries = fields.Nested(EditableFOIMinistryRequestWrapperSchema, many=True)  
+    selectedMinistries = fields.Nested(EditableFOIMinistryRequestWrapperSchema, many=True)
+
+class FOIRequestStatusSchema(Schema):
+    nextstatename = fields.Str(data_key="nextStateName",allow_none=True) 
 
 class FOIMinistryRequestDivisionSchema(Schema):
     class Meta:  # pylint: disable=too-few-public-methods
@@ -134,6 +142,7 @@ class FOIMinistryRequestDivisionSchema(Schema):
     stageid = fields.Int(data_key="stageid")
     divisionDueDate = fields.Str(data_key="divisionDueDate",allow_none=True)
     eApproval = fields.Str(data_key="eApproval",allow_none=True, validate=[validate.Length(max=12, error=MAX_EXCEPTION_MESSAGE)])
+    divisionReceivedDate = fields.Str(data_key="divisionReceivedDate",allow_none=True)
 
   
 class FOIRequestMinistrySchema(Schema):

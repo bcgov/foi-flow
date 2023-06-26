@@ -43,7 +43,7 @@ objects:
     spec:
       storageClassName: ${BACKUP_VOLUME_CLASS}
       accessModes:
-        - ReadWriteOnce
+        - ReadWriteMany
       resources:
         requests:
           storage: ${BACKUP_VOLUME_SIZE}

@@ -1,13 +1,29 @@
 import FOI_ACTION_CONSTANTS from "../../actions/FOI/foiActionConstants";
+import _ from 'lodash';
 const initialState = {
   isLoading: true,
   queueFilter: "myRequests",
+  queueParams: {
+    rowsState: { page: 0, pageSize: 100 },
+    sortModel: false,
+    keyword: null,
+  },
+  eventQueueFilter: "myRequests",
+  eventQueueParams: {
+    rowsState: { page: 0, pageSize: 100 },
+    sortModel: false,
+    keyword: null,
+  },
   showAdvancedSearch: false,
+  showEventQueue: false,
   foiAdvancedSearchParams: {},
   isAssignedToListLoading: true,
   isAttachmentListLoading: true,
+  isCommentTagListLoading: true,
   foiRequestsList: null,
   foiMinistryRequestsList: [],
+  foiEventsList: null,
+  foiMinistryEventsList: [],
   foiRequestsCount: 0,
   foiRequestDetail: {},
   foiMinistryViewRequestDetail: {},
@@ -25,42 +41,82 @@ const initialState = {
   foiFullAssignedToList: [],
   foiMinistryAssignedToList: [],
   foiProgramAreaList: [],
+  foiProgramAreaDivisionList: [],
+  foiAdminProgramAreaList: [],
   foiRequestDescriptionHistoryList: [],
   foiMinistryDivisionalStages: [],
   foiWatcherList: [],
   foiRequestComments: [],
   foiRequestAttachments: [],
+  foiRequestRecords: {
+    records: [],
+    dedupedfiles:0,
+    removedfiles:0,
+    batchcount:0
+  },
+  foiPDFStitchedRecordForHarms: {},
+  foiPDFStitchStatusForHarms:"not started",
   foiRequestCFRForm: {
     overallsuggestions: "",
     status: "init",
     feedata: {
-       totalamountdue: 0,
-       actualhardcopypages: 0,
-       actualproducinghrs: 0,
-       actuallocatinghrs: 0,
-       estimatedlocatinghrs: 0,
-       estimatedproducinghrs: 0,
-       estimatedelectronicpages: 0,
-       actualelectronicpages: 0,
-       estimatedpreparinghrs: 0,
-       amountpaid: 0,
-       estimatedhardcopypages: 0,
-       actualpreparinghrs: 0,
+      estimatedtotaldue: 0,
+      actualtotaldue: 0,
+      actualhardcopypages: 0,
+      actualproducinghrs: 0,
+      actuallocatinghrs: 0,
+      estimatedlocatinghrs: 0,
+      estimatedproducinghrs: 0,
+      estimatedelectronicpages: 0,
+      actualelectronicpages: 0,
+      estimatedministrypreparinghrs: 0,
+      estimatediaopreparinghrs: 0,
+      amountpaid: 0,
+      feewaiveramount: 0,
+      refundamount: 0,
+      estimatedhardcopypages: 0,
+      actualministrypreparinghrs: 0,
+      actualiaopreparinghrs: 0,
     }
- },
+  },
+  foiRequestCFRFormHistory: [],
+  foiRequestApplicantCorrespondence: [],
+  foiRequestApplicantCorrespondenceTemplates: [],
   foiRequestExtesions: [],
   foiOpenedMinistries: [],
   resumeDefaultSorting: false,
+  isCorrespondenceLoading: true,
+  foiSubjectCodeList: [],
+  restrictedReqTaglist:[],
+  recordFormats: ['application/pdf',
+  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/vnd.ms-excel',
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/msword',
+  'image/bmp','image/gif','image/jpeg','image/png','image/svg+xml','image/tiff','image/webp',
+  'application/vnd.ms-excel.sheet.macroEnabled.12','.msg', '.eml', '.xls', '.xlsx', '.doc', '.docx', '.ics','.json',
+   '.shx', '.shp','.dbf','.kml','.kmz','.geojson','.cpg','.prj','.sbn','.sbx','.gml','.gdb','.freelist','.atx','.gpkg','.mbtiles','.mpk','.wkt',
+  '.las','.lasd','.laz','.dwf','.dwg','.dxf','.csv','.txt','.png','.jpg'],
+  conversionFormats: [],
+  
 };
 
 const foiRequests = (state = initialState, action) => {
   switch (action.type) {
     case FOI_ACTION_CONSTANTS.IS_LOADING:
       return { ...state, isLoading: action.payload };
+    case FOI_ACTION_CONSTANTS.IS_RECORDS_LOADING:
+        return { ...state, isRecordsLoading: action.payload };  
     case FOI_ACTION_CONSTANTS.QUEUE_FILTER:
       return { ...state, queueFilter: action.payload };
+      case FOI_ACTION_CONSTANTS.QUEUE_PARAMS:
+        return { ...state, queueParams: action.payload };
+    case FOI_ACTION_CONSTANTS.EVENT_QUEUE_FILTER:
+      return { ...state, eventQueueFilter: action.payload };
+    case FOI_ACTION_CONSTANTS.EVENT_QUEUE_PARAMS:
+      return { ...state, eventQueueParams: action.payload };
     case FOI_ACTION_CONSTANTS.SHOW_ADVANCED_SEARCH:
       return { ...state, showAdvancedSearch: action.payload };
+    case FOI_ACTION_CONSTANTS.SHOW_EVENT_QUEUE:
+      return { ...state, showEventQueue: action.payload };
     case FOI_ACTION_CONSTANTS.FOI_ADVANCED_SEARCH_PARAMS:
       return { 
         ...state, 
@@ -73,6 +129,12 @@ const foiRequests = (state = initialState, action) => {
       return { ...state, isAssignedToListLoading: action.payload };
     case FOI_ACTION_CONSTANTS.IS_ATTACHMENTLIST_LOADING:
       return { ...state, isAttachmentListLoading: action.payload };
+    case FOI_ACTION_CONSTANTS.IS_COMMENTTAGLIST_LOADING:
+      return { ...state, isCommentTagListLoading: action.payload };
+    case FOI_ACTION_CONSTANTS.FOI_LIST_EVENTS:
+        return { ...state, foiEventsList: action.payload, isLoading: false };
+    case FOI_ACTION_CONSTANTS.FOI_MINISTRY_EVENTLIST:
+        return { ...state, foiMinistryEventsList: action.payload };
     case FOI_ACTION_CONSTANTS.FOI_LIST_REQUESTS:
       return { ...state, foiRequestsList: action.payload, isLoading: false };
     case FOI_ACTION_CONSTANTS.FOI_MINISTRY_REQUESTSLIST:
@@ -97,6 +159,10 @@ const foiRequests = (state = initialState, action) => {
       return { ...state, foiCategoryList: action.payload };
     case FOI_ACTION_CONSTANTS.FOI_PROGRAM_AREALIST:
       return { ...state, foiProgramAreaList: action.payload };
+    case FOI_ACTION_CONSTANTS.FOI_PROGRAM_AREA_DIVISIONLIST:
+      return { ...state, foiProgramAreaDivisionList: action.payload };
+    case FOI_ACTION_CONSTANTS.FOI_ADMIN_PROGRAM_AREALIST:
+      return { ...state, foiAdminProgramAreaList: action.payload };
     case FOI_ACTION_CONSTANTS.FOI_RECEIVED_MODELIST:
       return { ...state, foiReceivedModeList: action.payload };
     case FOI_ACTION_CONSTANTS.FOI_DELIVERY_MODELIST:
@@ -125,14 +191,26 @@ const foiRequests = (state = initialState, action) => {
       return { ...state, foiRequestComments: action.payload };
     case FOI_ACTION_CONSTANTS.FOI_REQUEST_ATTACHMENTS:
       return { ...state, foiRequestAttachments: action.payload };
+    case FOI_ACTION_CONSTANTS.FOI_REQUEST_RECORDS:
+      return { ...state, foiRequestRecords: action.payload };
+    case FOI_ACTION_CONSTANTS.FOI_PDF_STITCHED_RECORD_FOR_HARMS:
+      return { ...state, foiPDFStitchedRecordForHarms: action.payload };
+    case FOI_ACTION_CONSTANTS.FOI_PDF_STITCHED_STATUS_FOR_HARMS:
+      return { ...state, foiPDFStitchStatusForHarms: action.payload };
     case FOI_ACTION_CONSTANTS.FOI_REQUEST_CFR_FORM:
-      return { 
+      return {
         ...state,
-        foiRequestCFRForm:{
+        foiRequestCFRForm: _.isEmpty(action.payload) ? initialState.foiRequestCFRForm : {
           ...state.foiRequestCFRForm,
           ...action.payload
         }
       };
+    case FOI_ACTION_CONSTANTS.FOI_REQUEST_CFR_FORM_HISTORY:
+      return { ...state, foiRequestCFRFormHistory: action.payload };
+    case FOI_ACTION_CONSTANTS.FOI_REQUEST_APPLICANT_CORRESPONDENCE:
+      return { ...state, foiRequestApplicantCorrespondence: action.payload };
+    case FOI_ACTION_CONSTANTS.FOI_REQUEST_APPLICANT_CORRESPONDENCE_TEMPLATES:
+      return { ...state, foiRequestApplicantCorrespondenceTemplates: action.payload };
     case FOI_ACTION_CONSTANTS.FOI_REQUEST_EXTENSIONS:
       return { ...state, foiRequestExtesions: action.payload };
     case FOI_ACTION_CONSTANTS.FOI_OPENED_MINISTRIES:
@@ -141,6 +219,16 @@ const foiRequests = (state = initialState, action) => {
       return { ...state, foiAxisRequestIds: action.payload };
     case FOI_ACTION_CONSTANTS.RESUME_DEFAULT_SORTING:
       return { ...state, resumeDefaultSorting: action.payload };
+    case FOI_ACTION_CONSTANTS.IS_CORRESPONDENCE_LOADING:
+      return { ...state, isCorrespondenceLoading: action.payload };
+    case FOI_ACTION_CONSTANTS.FOI_SUBJECT_CODELIST:
+      return { ...state, foiSubjectCodeList: action.payload };
+    case FOI_ACTION_CONSTANTS.RESTRICTED_COMMENT_TAG_LIST:
+      return { ...state, restrictedReqTaglist: action.payload };
+    case FOI_ACTION_CONSTANTS.RECORD_FORMATS:
+      return { ...state, recordFormats: action.payload };
+    case FOI_ACTION_CONSTANTS.CONVERSION_FORMATS:
+      return { ...state, conversionFormats: action.payload };
     default:
       return state;
   }

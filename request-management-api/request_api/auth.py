@@ -17,7 +17,8 @@ from http import HTTPStatus
 
 from flask import g, request
 from flask_jwt_oidc import JwtManager
-from jose import jwt as josejwt
+# from jose import jwt as josejwt
+from jose import JWTError, jwt as josejwt
 from request_api.utils.enums import MinistryTeamWithKeycloackGroup, ProcessingTeamWithKeycloackGroup, IAOTeamWithKeycloackGroup
 from request_api.models.FOIMinistryRequests import FOIMinistryRequest
 jwt = (
@@ -41,7 +42,16 @@ class Auth:
 
         return decorated
 
-
+    @classmethod
+    def hasusertype(cls,usertype):
+        def decorated(f):
+            @wraps(f)
+            def wrapper(*args, **kwargs):
+                if(usertype == AuthHelper.getusertype()):
+                    return f(*args, **kwargs)
+                return "Unauthorized" , 401
+            return wrapper
+        return decorated
 
     @classmethod
     def belongstosameministry(cls,func):
@@ -61,6 +71,23 @@ class Auth:
                     return func(type, id, field,*args, **kwargs)            
         return decorated           
            
+    @classmethod
+    def documentbelongstosameministry(cls,func):
+        @wraps(func)
+        def decorated( ministryrequestid, *args, **kwargs):           
+            usertype = AuthHelper.getusertype()
+            if(usertype == "iao"):
+                return func( ministryrequestid,*args, **kwargs)
+            elif(usertype == "ministry"):    
+                requestministry = FOIMinistryRequest.getrequestbyministryrequestid(ministryrequestid)
+                ministrygroups = AuthHelper.getministrygroups()
+                expectedministrygroup = MinistryTeamWithKeycloackGroup[requestministry['programarea.bcgovcode']].value
+                retval = "Unauthorized" , 401
+                if(expectedministrygroup not in ministrygroups):
+                    return retval
+                else:
+                    return func(id, *args, **kwargs)            
+        return decorated 
              
     
     @classmethod
@@ -92,25 +119,58 @@ class Auth:
             return wrapper
 
         return decorated
-    
+
+
+    @classmethod
+    def isfoiadmin(cls):
+        """Check if token group contains admin group.
+        """
+        def decorated(f):
+            # Token verification is commented here with an expectation to use this decorator in conjuction with require.
+            #@Auth.require
+            @wraps(f)
+            def wrapper(*args, **kwargs):
+                token = jwt.get_token_auth_header()
+                unverified_claims = josejwt.get_unverified_claims(token)
+                usergroups = unverified_claims['groups']
+                usergroups = [usergroup.replace('/','',1) if usergroup.startswith('/') else usergroup for usergroup in usergroups]
+                exists = False
+                if 'FOI Admin' in usergroups:
+                    exists = True
+                retval = "Unauthorized" , 401
+                if exists == True:            
+                    return f(*args, **kwargs)
+                return retval
+            return wrapper
+        return decorated
+
 auth = (
     Auth()
 )
 
 
 class AuthHelper:
-    
-    @classmethod
-    def getuserid(cls):
-        token = request.headers.get("Authorization", None)
-        unverified_claims = josejwt.get_unverified_claims(token.partition("Bearer")[2].strip())
-        return unverified_claims['preferred_username']
-    
+
     @classmethod
     def getwsuserid(cls, token):
-        unverified_claims = josejwt.get_unverified_claims(token.strip())
-        return unverified_claims['preferred_username']  
-
+        return cls.getuserid(token)
+    
+    @classmethod
+    def getuserid(cls, token=None):
+        try:
+            if token is None:
+                token = request.headers.get("Authorization", None)
+            unverified_claims = josejwt.get_unverified_claims(token.partition("Bearer")[2].strip())        
+            if 'identity_provider' in unverified_claims and unverified_claims['identity_provider'] == "idir":
+                claim_name = 'foi_preferred_username' if "foi_preferred_username" in unverified_claims else 'preferred_username'
+                claim_value = unverified_claims[claim_name].lower()
+                return claim_value+'@idir' if claim_value.endswith("@idir") == False else claim_value
+            return unverified_claims['preferred_username']
+        except JWTError as exception:
+            print("JWTError >>> ", str(exception))
+        except Exception as ex:
+            print("Exception >>> ", str(ex))
+    
     @classmethod
     def getusername(cls):
         token = request.headers.get("Authorization", None)
@@ -136,6 +196,31 @@ class AuthHelper:
             if len(processinggroups) > 0:
                 return True
         return False
+
+    @classmethod
+    def isiaorestrictedfilemanager(cls):
+        #roles is an array of strings
+        roles = cls.getuserroles()        
+        try:      
+            if 'IAORestrictedFilesManager' in roles:
+                return True    
+            else:            
+                return False
+        except ValueError:
+            return False
+
+    @classmethod
+    def isministryrestrictedfilemanager(cls):
+        #roles is an array of strings
+        roles = cls.getuserroles()        
+        try:      
+            if 'MinistryRestrictedFilesManager' in roles:
+                return True    
+            else:            
+                return False
+        except ValueError:
+            return False
+
     
     @classmethod        
     def getusergroups(cls):
@@ -144,6 +229,14 @@ class AuthHelper:
         usergroups = unverified_claims['groups']
         usergroups = [usergroup.replace('/','',1) if usergroup.startswith('/') else usergroup for usergroup in usergroups]
         return usergroups
+
+    @classmethod        
+    def getuserroles(cls):
+        token = request.headers.get("Authorization", None)
+        unverified_claims = josejwt.get_unverified_claims(token.partition("Bearer")[2].strip())
+        roles = unverified_claims['role']
+        roles = [role.replace('/','',1) if role.startswith('/') else role for role in roles]
+        return roles 
     
     @classmethod        
     def getusertype(cls): 
@@ -179,6 +272,9 @@ class AuthHelper:
     def getministrygroups(cls): 
         usergroups = cls.getusergroups()
         return list(set(usergroups).intersection(MinistryTeamWithKeycloackGroup.list()))   
-      
 
+    @classmethod        
+    def getauthtoken(cls): 
+        return request.headers.get("Authorization", None)
+      
         

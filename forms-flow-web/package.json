@@ -25,7 +25,7 @@
     "enzyme": "^3.11.0",
     "react-test-renderer": "^17.0.2",
     "redux-mock-store": "^1.5.4",
-    "underscore": "^1.12.1",
+    "underscore": "1.12.1",
     "xmldom": "^0.6.0"
   },
   "dependencies": {
@@ -36,7 +36,8 @@
     "@emotion/react": "^11.7.1",
     "@emotion/styled": "^11.6.0",
     "@fortawesome/fontawesome-svg-core": "^1.2.34",
-    "@fortawesome/free-solid-svg-icons": "^5.15.2",
+    "@fortawesome/free-solid-svg-icons": "^6.2.1",
+    "@fortawesome/free-regular-svg-icons": "^6.2.1",
     "@fortawesome/react-fontawesome": "^0.1.14",
     "@material-ui/core": "^4.11.4",
     "@material-ui/data-grid": "4.0.0-alpha.35",
@@ -69,9 +70,10 @@
     "file-saver": "^2.0.2",
     "font-awesome": "^4.7.0",
     "html-to-draftjs": "1.5.0",
+    "html-to-pdf-js": "^0.9.3",
     "jquery": "^3.5.1",
     "jsonwebtoken": "^8.5.1",
-    "keycloak-js": "^10.0.2",
+    "keycloak-js": "^20.0.2",
     "popper.js": "^1.16.1",
     "prop-types": "^15.7.2",
     "querystring": "^0.2.1",
@@ -95,7 +97,7 @@
     "react-scripts": "^4.0.3",
     "react-select": "^3.2.0",
     "react-test-renderer": "^17.0.2",
-    "react-toastify": "^7.0.4",
+    "react-toastify": "9.0.3",
     "react-uuid": "^1.0.2",
     "reactjs-popup": "^2.0.4",
     "redux": "^4.1.0",
@@ -109,7 +111,7 @@
   },
   "resolutions": {
     "xmldom": "^0.6.0",
-    "underscore": "^1.12.1",
+    "underscore": "1.12.1",
     "jspdf": "^2.3.1",
     "react-dom": "^17.0.2",
     "react": "^17.0.2",
@@ -121,5 +123,10 @@
     "not dead",
     "not ie <= 11",
     "not op_mini all"
-  ]
+  ],
+  "jest": {
+    "transformIgnorePatterns": [
+      "node_modules/(?!(astronomia|client-zip|reactjs-popup|react-quill)/)"
+    ]
+  }
 }

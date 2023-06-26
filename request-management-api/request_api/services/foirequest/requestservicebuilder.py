@@ -31,9 +31,15 @@ class requestservicebuilder(requestserviceconfigurator):
         foiministryrequest.programareaid = self.getvalueof("programArea",ministry["code"])
         foiministryrequest.description = requestschema.get("description")
         foiministryrequest.duedate = requestschema.get("dueDate")
+        foiministryrequest.linkedrequests = requestschema.get("linkedRequests")
         if requestschema.get("cfrDueDate") is not None and requestschema.get("cfrDueDate")  != "":
-            foiministryrequest.cfrduedate = requestschema.get("cfrDueDate")        
-        foiministryrequest.startdate = requestschema.get("startDate")
+            foiministryrequest.cfrduedate = requestschema.get("cfrDueDate")
+        startdate = ""
+        if (requestschema.get("startDate") is not None):
+            startdate = requestschema.get("startDate")
+        elif (requestschema.get("requestProcessStart") is not None):
+            startdate = requestschema.get("requestProcessStart")
+        foiministryrequest.startdate = startdate
         foiministryrequest.createdby = userid
         requeststatusid =  self.getpropertyvaluefromschema(requestschema, 'requeststatusid')
         if requeststatusid is not None:
@@ -42,7 +48,6 @@ class requestservicebuilder(requestserviceconfigurator):
             foiministryrequest.recordsearchfromdate = requestschema.get("fromDate")
         if self.isNotBlankorNone(requestschema,"toDate","main") == True:
             foiministryrequest.recordsearchtodate = requestschema.get("toDate")
-        
         self.__updateassignedtoandgroup(foiministryrequest, requestschema, ministry, status, filenumber, ministryid)
         self.__updateministryassignedtoandgroup(foiministryrequest, requestschema, ministry, status)
 
@@ -53,9 +58,13 @@ class requestservicebuilder(requestserviceconfigurator):
             foiministryrequest.divisions = requestserviceministrybuilder().createfoirequestdivisionfromobject(divisions, ministryid, activeversion, userid)  
             foiministryrequest.documents = requestserviceministrybuilder().createfoirequestdocuments(requestschema,ministryid , activeversion , userid)
             foiministryrequest.extensions = requestserviceministrybuilder().createfoirequestextensions(ministryid, activeversion, userid)
+            if 'subjectCode' in requestschema and requestschema['subjectCode'] is not None and requestschema['subjectCode'] != '':
+                foiministryrequest.subjectcode = requestserviceministrybuilder().createfoirequestsubjectcode(requestschema, ministryid, activeversion, userid)
         foiministryrequest.version = activeversion
         foiministryrequest.closedate = self.getpropertyvaluefromschema(requestschema, 'closedate')
         foiministryrequest.closereasonid = self.getpropertyvaluefromschema(requestschema, 'closereasonid')
+        if self.getpropertyvaluefromschema(requestschema, 'isofflinepayment') is not None:
+            foiministryrequest.isofflinepayment =  self.getpropertyvaluefromschema(requestschema, 'isofflinepayment')    
         return foiministryrequest
 
     def __updateministryassignedtoandgroup(self, foiministryrequest, requestschema, ministry, status):
@@ -76,9 +85,6 @@ class requestservicebuilder(requestserviceconfigurator):
             requestserviceministrybuilder().createfoiassigneefromobject(requestschema.get("assignedTo"), requestschema.get("assignedToFirstName"), requestschema.get("assignedToMiddleName"), requestschema.get("assignedToLastName"))
         else:
             foiministryrequest.assignedto = None
-        if(ministryid is None and filenumber is None and status == "Open"):
-            foiministryrequest.assignedto = None
-            foiministryrequest.assignedgroup = self.__getgroupname(requestschema.get("requestType"), ministry["code"])
 
     def __isgrouprequired(self,status):
         if status == "Call For Records" or status == "Review" or status == "Consult" or status == "Fee Assessed" or status == "Ministry Sign Off" or status == "Response":
@@ -124,7 +130,7 @@ class requestservicebuilder(requestserviceconfigurator):
             if key in dataschema and  dataschema.get(key) is not None and dataschema.get(key)  and dataschema.get(key)  != "":
                 return True
         else:
-            if dataschema.get(location) is not None and key in dataschema.get(location) and dataschema.get(location)[key] and dataschema.get(location)[key] is not None and dataschema.get(location)[key] !="":     
+            if dataschema.get(location) is not None and key in dataschema.get(location) and dataschema.get(location)[key] and dataschema.get(location)[key] is not None and dataschema.get(location)[key] !="":
                 return True
         return False          
     

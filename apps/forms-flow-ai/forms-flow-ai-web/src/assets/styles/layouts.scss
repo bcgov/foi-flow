@@ -6,12 +6,8 @@
 }
 
 .main-container{
-  height:100%;
-  min-height: 90vh;
-  background-image: url('../FOI/images/BC.bmp');
-  padding: 8% 5% 12% 5%
-  //position: fixed;
-/*  margin-left:250px !important;*/
+  height:100vh;
+  padding-top: 5%;
 }
 
 .react-bootstrap-table table {
@@ -31,5 +27,5 @@
 }
 
 #app {
-  background: $white;
+  background-image: url('../FOI/images/BC.bmp');
 }

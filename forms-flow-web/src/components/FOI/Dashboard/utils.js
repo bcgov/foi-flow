@@ -6,6 +6,10 @@ import {
 } from "../../../helper/FOI/helper";
 import { StateEnum } from "../../../constants/FOI/statusEnum";
 import Chip from "@mui/material/Chip";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faFlag } from '@fortawesome/free-solid-svg-icons'; 
+import Tooltip, { tooltipClasses } from '@mui/material/Tooltip';
+import { styled } from '@mui/material/styles';
 
 export const debounce = (func, wait) => {
   let timeout;
@@ -92,6 +96,57 @@ export const updateSortModel = (sortModel) => {
   return smodel;
 };
 
+export const updateEventSortModel = (sortModel, isMinistry) => {
+  let smodel = JSON.parse(JSON.stringify(sortModel));
+  if (smodel) {
+    let field = smodel[0]?.field;
+    let order = smodel[0]?.sort;
+    console.log(`field = ${field}`)
+    // if (field == "createdby") {
+    //   smodel.shift();
+    //   smodel.unshift(
+    //     { field: "creatorLastName", sort: order },
+    //     { field: "creatorFirstName", sort: order }
+    //   );
+    // }
+
+    // if (field == "to") {
+    //   smodel.shift();
+    //   smodel.unshift(
+    //     { field: "userLastName", sort: order },
+    //     { field: "userFirstName", sort: order }
+    //   );
+    // }
+
+    // if (field == "assignedTo" && !isMinistry) {
+    //   smodel.shift();
+    //   smodel.unshift(
+    //     { field: "assignedToLastName", sort: order },
+    //     { field: "assignedToFirstName", sort: order },
+    //     { field: "assignedGroup", sort: order }
+    //   );
+    // }
+
+    // if (field == "assignedTo" && isMinistry) {
+    //   smodel.shift();
+    //   smodel.unshift(
+    //     { field: "assignedministrypersonLastName", sort: order },
+    //     { field: "assignedministrypersonFirstName", sort: order },
+    //     { field: "assignedministrygroup", sort: order } 
+    //   );
+    // }
+
+    //add createdat to default sorting
+    if (smodel.length == 1 && field == "defaultSorting") {
+      smodel.push(
+        { field: "createdat", sort: order },
+      );
+    }
+  }
+
+  return smodel;
+};
+
 export const getFullName = (firstName, lastName) => {
   if (!firstName && !lastName) {
     return "";
@@ -147,21 +202,31 @@ export const getDaysLeft = (params) => {
   }
 };
 
-export const ClickableChip = ({ clicked, ...rest }) => {
+export const ClickableChip = ({ clicked, sx={}, color, ...rest }) => {
   return (
     <Chip
-      sx={{
+      sx={[
+        {
         ...(clicked
           ? {
-              backgroundColor: "#38598A",
+              backgroundColor: (color === 'primary' ? "#38598A" : color),
+              color: "white",
               width: "100%",
             }
           : {
-              color: "#38598A",
-              border: "1px solid #38598A",
+              color: (color === 'primary' ? "#38598A" : color),
+              border: ("1px solid " + (color === 'primary' ? "#38598A" : color)),
               width: "100%",
             }),
-      }}
+          ...sx
+        },
+        {
+          '&:focus': {
+            backgroundColor: (color === 'primary' ? "#38598A" : color),
+            color: "white",
+          }
+        },
+      ]}
       variant={clicked ? "filled" : "outlined"}
       {...rest}
     />
@@ -171,4 +236,66 @@ export const ClickableChip = ({ clicked, ...rest }) => {
 export const addYears = (n) => {
   const currentDate = new Date();
   return currentDate.setFullYear(currentDate.getFullYear() + n);
+};
+
+export const displayIcon = (params) => {
+  return (
+    params?.row?.isiaorestricted ? 
+    <><FontAwesomeIcon icon={faFlag} size='2x' className='restrict-icon' />
+    </> : ""
+  );
+};
+
+export const displayIconMinistry = (params) => {
+  return (
+    params?.row?.isministryrestricted ? 
+    <><FontAwesomeIcon icon={faFlag} size='2x' className='restrict-icon' />
+    </> : ""
+  );
+};
+
+export const displayHeaderIcon = (params) => {
+  return (
+    <span className="foi-dashboard-restricted"><FontAwesomeIcon icon={faFlag} size='2x' className='restrict-icon' />
+    </span> 
+  );
+};
+
+export const LightTooltip = styled(({ className, ...props }) => (
+  <Tooltip {...props} classes={{ popper: className }} />
+))(({ theme }) => ({
+  [`& .${tooltipClasses.tooltip}`]: {
+    backgroundColor: theme.palette.common.white,
+    color: 'rgba(0, 0, 0, 0.87)',
+    boxShadow: theme.shadows[1],
+    fontSize: 13,
+  },
+}));
+
+export const cellTooltipRender = (params) => {
+  var description = params.row.description;
+  if (params.row.fromdate && params.row.todate) {
+    description += "\n(" + (new Date(params.row.fromdate)).toLocaleDateString() + " to " + (new Date(params.row.todate)).toLocaleDateString() + ")"
+  }
+  return <LightTooltip placement="bottom-start" title={
+    <div style={{whiteSpace: "pre-line"}}>
+      {description}
+    </div>
+  }>
+    <span className="table-cell-truncate">{params.row.axisRequestId}</span>
+  </LightTooltip>
+};
+
+export const eventCellTooltipRender = (params) => {
+
+  let notification = params.row?.notification;
+  if (notification?.length > 50) {
+  const truncatedNotification = notification?.length > 50 ? notification?.slice(0, 50) + '...' : notification;
+
+  return (
+    <LightTooltip placement="bottom-start" title={<div style={{ whiteSpace: 'pre-line' }}>{notification}</div>}>
+      <span className="table-cell-truncate">{truncatedNotification}</span>
+    </LightTooltip>
+  );
+  }
 };

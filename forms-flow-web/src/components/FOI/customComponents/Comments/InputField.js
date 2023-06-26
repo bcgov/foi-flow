@@ -1,4 +1,5 @@
 import React, { useContext, useState, useEffect} from 'react'
+import { useSelector } from "react-redux"
 import './comments.scss'
 import { ActionContext } from './ActionContext'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
@@ -19,23 +20,24 @@ import {
   OrderedListButton,
 
 } from '@draft-js-plugins/buttons';
+import { getFullnameList } from '../../../../helper/FOI/helper'
 
 const staticToolbarPlugin = createToolbarPlugin();
 const mentionPlugin = createMentionPlugin();
 const { Toolbar } = staticToolbarPlugin;
 const { MentionSuggestions } = mentionPlugin
 const plugins = [staticToolbarPlugin, mentionPlugin];
-const InputField = ({ cancellor, parentId, child, inputvalue, edit, main, add, fullnameList,
+const InputField = ({ cancellor, parentId, child, inputvalue, edit, main, add, fullnameList, restrictedReqTaglist,
   //setEditorChange, removeComment and setRemoveComment added to handle Navigate away from Comments tabs 
-  setEditorChange, removeComment, setRemoveComment
+  isRestricted, setEditorChange, removeComment, setRemoveComment
 }) => {
   let maxcharacterlimit = 1000
   const [uftext, setuftext] = useState('')
   const [textlength, setTextLength] = useState(1000)
   const [open, setOpen] = useState(false);
-
+  const isCommentTagListLoading = useSelector((state) => state.foiRequests.isCommentTagListLoading);
   let fulluserlist = suggestionList([...fullnameList]).sort(namesort)
-  const mentionList = fulluserlist;
+  const [mentionList, setMentionList] = useState(isCommentTagListLoading ? [{name: 'Loading...'}] : isRestricted ? restrictedReqTaglist :fulluserlist)
 
   const [suggestions, setSuggestions] = useState(mentionList);
 
@@ -43,10 +45,15 @@ const InputField = ({ cancellor, parentId, child, inputvalue, edit, main, add, f
     setOpen(_open);
   }
 
+  useEffect(() => {
+    setMentionList(isCommentTagListLoading ? [{name: 'Loading...'}] : isRestricted ? restrictedReqTaglist :suggestionList([...getFullnameList()]).sort(namesort));
+    setSuggestions(isCommentTagListLoading ? [{name: 'Loading...'}] : isRestricted ? restrictedReqTaglist :suggestionList([...getFullnameList()]).sort(namesort));
+  }, [isCommentTagListLoading, restrictedReqTaglist])
+
   // Check editor text for mentions
   const onSearchChange = ({ value }) => {      
-    var filterlist = mentionList.filter(function(item){      
-      return (item.firstname?.indexOf(value?.toLowerCase()) === 0 || item.lastname?.indexOf(value?.toLowerCase()) === 0)
+    let filterlist = isCommentTagListLoading ? mentionList : mentionList.filter(function(item){
+      return (item.firstname?.toLowerCase()?.indexOf(value?.toLowerCase()) === 0 || item.lastname?.toLowerCase()?.indexOf(value?.toLowerCase()) === 0)
     }).sort(namesort)        
     if(filterlist?.length >0 )    
       setSuggestions(defaultSuggestionsFilter(value, filterlist))

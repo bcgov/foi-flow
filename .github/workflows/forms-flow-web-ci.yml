@@ -6,18 +6,15 @@ on:
     branches:
       - main
       - dev
+      - dev-marshal
+      - test-marshal
     paths:
-      - "apps/forms-flow-ai/forms-flow-web/**"
-  # Todo - Remove before merging in.
-  push:
-    branches:
-      - dev-AC-212d
-
+      - "forms-flow-web/**"
 
 defaults:
   run:
     shell: bash
-    working-directory: ./apps/forms-flow-ai/forms-flow-web
+    working-directory: ./forms-flow-web
 
 jobs:
   forms-flow-web-docker-build-check:

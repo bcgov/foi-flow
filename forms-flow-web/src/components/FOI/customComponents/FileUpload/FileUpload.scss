@@ -1,6 +1,6 @@
 .file-upload-container {
     position: relative;   
-    padding: 0px 20px 0px 0px;
+    padding: 0px 20px 0px 35px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -91,6 +91,8 @@
     margin-left: 5%;
     width: 80%;
     height: 100%;
+    max-height: 250px;
+    overflow-y: scroll;
 
   span {
     font-size: 14px;
@@ -106,7 +108,7 @@
   font: normal normal normal 14px/1 FontAwesome, sans-serif !important;
 }
 .error-message-ul {
-  margin-left: 10%;
+  margin-left: 6%;
   color: red;
 }
 .error-message-container {
@@ -116,10 +118,26 @@
       color:red;
       line-height: 1rem;
       font-size: 12px;
+      width: 90%;
     }
     
 }
 
 .ol-display-none {
   list-style-type: none;
+}
+
+.taglist {
+  margin: 15px 9% 25px 9%;
+}
+.tagtitle {
+  margin-left: 9%;
+}
+.tag-message-container {
+  margin: 5px 0px 0px 9%;
+  display: block;
+  p {
+    line-height: 1rem;
+    font-size: 12px;
+  }
 }

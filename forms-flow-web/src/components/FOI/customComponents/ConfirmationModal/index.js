@@ -17,8 +17,8 @@ import { useSelector } from "react-redux";
 import './confirmationmodal.scss';
 import { StateEnum, StateTransitionCategories } from '../../../../constants/FOI/statusEnum';
 import FileUpload from '../FileUpload'
-import { formatDate, calculateDaysRemaining, ConditionalComponent } from "../../../../helper/FOI/helper";
-import { MimeTypeList, MaxFileSizeInMB } from "../../../../constants/FOI/enum";
+import { formatDate, calculateDaysRemaining, ConditionalComponent, isMinistryLogin } from "../../../../helper/FOI/helper";
+import { MimeTypeList, MaxFileSizeInMB, MaxNumberOfFiles } from "../../../../constants/FOI/enum";
 import { getMessage, getAssignedTo, getMinistryGroup, getSelectedMinistry, getSelectedMinistryAssignedTo, getProcessingTeams, getUpdatedAssignedTo } from './util';
 
 const useStyles = makeStyles((theme) => ({
@@ -61,7 +61,7 @@ export default function ConfirmationModal({requestId, openModal, handleModal, st
     const selectedMinistries = saveRequestObject?.selectedMinistries?.map(ministry => ministry.code);
     const updatedProcessingTeamList = getProcessingTeams(processingTeamList, selectedMinistries);
     const assignedTo= getAssignedTo(saveRequestObject);
-    const updatedAssignedTo = getUpdatedAssignedTo(assignedTo, updatedProcessingTeamList, state, saveRequestObject?.requestType)
+    const updatedAssignedTo = getUpdatedAssignedTo(assignedTo, updatedProcessingTeamList, state, saveRequestObject?.requestType, saveRequestObject?.isiaorestricted)
     const ministryGroup = getMinistryGroup(saveRequestObject);
     const selectedMinistry = getSelectedMinistry(saveRequestObject, ministryGroup);
     const selectedMinistryAssignedTo = getSelectedMinistryAssignedTo(saveRequestObject, selectedMinistry);
@@ -69,21 +69,44 @@ export default function ConfirmationModal({requestId, openModal, handleModal, st
     const axisRequestId = saveRequestObject?.axisRequestId;
     const currentState = saveRequestObject?.currentState;
     const daysRemainingLDD = calculateDaysRemaining(saveRequestObject?.dueDate);
-    const multipleFiles = false;
+    const multipleFiles = state.toLowerCase() === StateEnum.onhold.name.toLowerCase()?true:false;
     const reOpenRequest = currentState?.toLowerCase() === StateEnum.closed.name.toLowerCase();
     const [files, setFiles] = useState([]);
     const updateFilesCb = (_files) => {
       setFiles(_files);
     }
     const [disableSaveBtn, setDisableSaveBtn] = React.useState( true );
+    const user = useSelector((reduxState) => reduxState.user.userDetail);
+    const userGroups = user?.groups?.map(group => group.slice(1));
+    let isMinistry = isMinistryLogin(userGroups);
 
     const cfrStatus = useSelector((reduxState) => reduxState.foiRequests.foiRequestCFRForm.status);
+    const cfrFeeData = useSelector((reduxState) => reduxState.foiRequests.foiRequestCFRForm.feedata);
+    const actualsFeeDataFields = [
+      "actualelectronicpages",
+      "actualhardcopypages",
+      "actualiaopreparinghrs",
+      "actuallocatinghrs",
+      "actualministrypreparinghrs",
+      "actualproducinghrs"
+    ];
+    let allowStateChange = true;
+    let isAnyAmountPaid = false;
+    if(cfrFeeData?.amountpaid > 0 && isMinistry){
+      isAnyAmountPaid = true;
+      allowStateChange = Object.keys(cfrFeeData).some(function(k) {
+          return actualsFeeDataFields.includes(k) && cfrFeeData[k] > 0
+      });
+    } 
+
+    const amountDue = cfrFeeData?.totalamountdue;
     const [mailed, setMailed] = useState(false);
     const handleMailedChange = (event) => {
       setMailed(event.target.checked);
       setDisableSaveBtn(!event.target.checked);
+      saveRequestObject.isofflinepayment=event.target.checked;
     };
-    const user = useSelector((state) => state.user.userDetail);
+   
 
     React.useEffect(() => {
       setDisableSaveBtn(state.toLowerCase() === StateEnum.closed.name.toLowerCase());
@@ -95,16 +118,23 @@ export default function ConfirmationModal({requestId, openModal, handleModal, st
 
     const isBtnDisabled = () => {
       if ((state.toLowerCase() === StateEnum.feeassessed.name.toLowerCase() && cfrStatus === 'init')
+            || (state.toLowerCase() === StateEnum.onhold.name.toLowerCase() && amountDue === 0)
             || (state.toLowerCase() === StateEnum.onhold.name.toLowerCase() && cfrStatus !== 'approved')
-            || (state.toLowerCase() === StateEnum.onhold.name.toLowerCase() && cfrStatus === 'approved' && !saveRequestObject.email && !mailed)) {
+            || (state.toLowerCase() === StateEnum.onhold.name.toLowerCase() && cfrStatus === 'approved' && !saveRequestObject.email && !mailed)
+            || ((state.toLowerCase() === StateEnum.deduplication.name.toLowerCase() || 
+                  state.toLowerCase() === StateEnum.review.name.toLowerCase()) && !allowStateChange)) {
         return true;
       }
       return files.length === 0 
-        && ((state.toLowerCase() === StateEnum.review.name.toLowerCase() && saveRequestObject.requeststatusid === StateEnum.callforrecords.id)
-            || (state.toLowerCase() === StateEnum.response.name.toLowerCase() && saveRequestObject.requeststatusid === StateEnum.signoff.id)
-            || (state.toLowerCase() === StateEnum.review.name.toLowerCase() && saveRequestObject.requeststatusid === StateEnum.harms.id)
-            || (state.toLowerCase() === StateEnum.onhold.name.toLowerCase() && saveRequestObject.requeststatusid === StateEnum.feeassessed.id && saveRequestObject.email)
-          )
+            && (
+                   (
+                      state.toLowerCase() === StateEnum.onhold.name.toLowerCase()
+                      && (
+                          saveRequestObject.requeststatusid === StateEnum.feeassessed.id
+                          || saveRequestObject.requeststatusid === StateEnum.response.id
+                         )
+                      && saveRequestObject.email)
+            )
     }
 
     const handleClose = () => {
@@ -126,6 +156,15 @@ export default function ConfirmationModal({requestId, openModal, handleModal, st
         else if (saveRequestObject.requeststatusid === StateEnum.feeassessed.id
           && state.toLowerCase() === StateEnum.onhold.name.toLowerCase())
           fileStatusTransition = StateTransitionCategories.feeonhold.name;
+        else if (saveRequestObject.requeststatusid === StateEnum.response.id
+          && state.toLowerCase() === StateEnum.onhold.name.toLowerCase())
+          fileStatusTransition = StateTransitionCategories.responseonhold.name;
+        else if (saveRequestObject.requeststatusid === StateEnum.response.id
+          && state.toLowerCase() === StateEnum.review.name.toLowerCase())
+          fileStatusTransition = StateTransitionCategories.responsereview.name;
+        else if (saveRequestObject.requeststatusid === StateEnum.signoff.id
+          && state.toLowerCase() === StateEnum.review.name.toLowerCase())
+          fileStatusTransition = StateTransitionCategories.signoffreview.name;
 
         fileInfoList = files.map(file => {
           return {
@@ -139,7 +178,7 @@ export default function ConfirmationModal({requestId, openModal, handleModal, st
       handleModal(true, fileInfoList, files);
     }
 
-    let message = getMessage(saveRequestObject, state, axisRequestId, currentState, requestId, cfrStatus);
+    let message = getMessage(saveRequestObject, state, axisRequestId, currentState, requestId, cfrStatus,allowStateChange,isAnyAmountPaid);
     const attchmentFileNameList = attachmentsArray?.map(_file => _file.filename);
 
     const getDaysRemaining = () => {
@@ -151,7 +190,8 @@ export default function ConfirmationModal({requestId, openModal, handleModal, st
     }
 
     const addorUpdateConfirmationModal = () => {
-      if (state.toLowerCase() === StateEnum.closed.name.toLowerCase() && currentState?.toLowerCase() !== StateEnum.closed.name.toLowerCase()) {
+      if (state.toLowerCase() === StateEnum.closed.name.toLowerCase() && 
+          currentState?.toLowerCase() !== StateEnum.closed.name.toLowerCase()) {
         return (
           <CloseForm saveRequestObject={saveRequestObject} handleClosingDateChange={handleClosingDateChange} handleClosingReasonChange={handleClosingReasonChange} enableSaveBtn={enableSaveBtn} />
         );
@@ -160,16 +200,16 @@ export default function ConfirmationModal({requestId, openModal, handleModal, st
         (currentState?.toLowerCase() !== StateEnum.closed.name.toLowerCase())
         && 
         (
-          (state.toLowerCase() === StateEnum.review.name.toLowerCase() 
-            && [StateEnum.callforrecords.id, StateEnum.harms.id].includes(saveRequestObject.requeststatusid))
+          (state.toLowerCase() === StateEnum.review.name.toLowerCase() && (!isAnyAmountPaid || !isMinistry))
           ||
           (state.toLowerCase() === StateEnum.response.name.toLowerCase()
             && saveRequestObject.requeststatusid === StateEnum.signoff.id)
           ||
           (state.toLowerCase() === StateEnum.onhold.name.toLowerCase()
-            && saveRequestObject.requeststatusid === StateEnum.feeassessed.id
+            && (saveRequestObject.requeststatusid === StateEnum.feeassessed.id || saveRequestObject.requeststatusid === StateEnum.response.id)
             && saveRequestObject.email
-            && cfrStatus == 'approved')
+            && cfrStatus == 'approved'
+            && amountDue !== 0)
         )) {
         return (
           <div className={classes.fileUploadBox}>
@@ -177,8 +217,11 @@ export default function ConfirmationModal({requestId, openModal, handleModal, st
               attchmentFileNameList={attchmentFileNameList}
               multipleFiles={multipleFiles}
               mimeTypes={state.toLowerCase() === StateEnum.onhold.name.toLowerCase()?MimeTypeList.stateTransitionFees:MimeTypeList.stateTransition}
-              maxFileSize={MaxFileSizeInMB.stateTransition}
+              maxFileSize={state.toLowerCase() === StateEnum.onhold.name.toLowerCase()?MaxFileSizeInMB.feeEstimateAttachment:MaxFileSizeInMB.stateTransition}
               updateFilesCb={updateFilesCb}
+              totalFileSize={state.toLowerCase() === StateEnum.onhold.name.toLowerCase()?MaxFileSizeInMB.totalFeeEstimateFileSize:MaxFileSizeInMB.totalFileSize}
+              maxNumberOfFiles={state.toLowerCase() === StateEnum.onhold.name.toLowerCase()?MaxNumberOfFiles.feeEstimateFiles:MaxNumberOfFiles.attachments}              
+              className={classes.fileUploadBox}
             />
           </div>
         );
@@ -192,7 +235,8 @@ export default function ConfirmationModal({requestId, openModal, handleModal, st
               <tbody>
                 <tr>
                   <th scope="row">IAO Assigned To</th>
-                  <td>{updatedAssignedTo}</td>
+                  <td>{assignedTo}</td>
+                  {/* <td>{updatedAssignedTo}</td> */}
                 </tr>
               </tbody>
           </table> : null }
@@ -210,7 +254,6 @@ export default function ConfirmationModal({requestId, openModal, handleModal, st
 
       }
     }
-
 
     return (
       <div className="state-change-dialog">
@@ -250,7 +293,7 @@ export default function ConfirmationModal({requestId, openModal, handleModal, st
             </button>
           </DialogActions>
           <ConditionalComponent condition={state.toLowerCase() === StateEnum.onhold.name.toLowerCase()
-                                            && saveRequestObject.requeststatusid === StateEnum.feeassessed.id
+                                            && (saveRequestObject.requeststatusid === StateEnum.feeassessed.id || saveRequestObject.requeststatusid === StateEnum.response.id)
                                             && cfrStatus === 'approved'
                                             && !saveRequestObject.email}>
             <div id="state-change-dialog-checkbox">
@@ -266,6 +309,17 @@ export default function ConfirmationModal({requestId, openModal, handleModal, st
                 }
                 label={"I " + user?.preferred_username + " have completed placed applicant processing fees letter in outbox to be mailed"}
               />
+            </div>
+          </ConditionalComponent>
+          <ConditionalComponent condition={state.toLowerCase() === StateEnum.onhold.name.toLowerCase()
+                                            && saveRequestObject.requeststatusid === StateEnum.feeassessed.id
+                                            && cfrStatus === 'approved'
+                                            && amountDue === 0}>
+            <div class="state-change-dialog-error">
+              <span>
+                There are $0 in fees for this request.
+                There must be fees in the CFR form in order to be able to put the request on hold.
+              </span>
             </div>
           </ConditionalComponent>
         </Dialog>

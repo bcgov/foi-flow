@@ -6,11 +6,12 @@ import MINISTRYGROUPS from '../../constants/FOI/foiministrygroupConstants';
 import { SESSION_SECURITY_KEY, SESSION_LIFETIME } from "../../constants/constants";
 import { toast } from "react-toastify";
 import { KCProcessingTeams } from "../../constants/FOI/enum";
+import _ from 'lodash';
 
-var isBetween = require("dayjs/plugin/isBetween");
-var utc = require("dayjs/plugin/utc");
-var timezone = require("dayjs/plugin/timezone");
-var CryptoJS = require("crypto-js");
+let isBetween = require("dayjs/plugin/isBetween");
+let utc = require("dayjs/plugin/utc");
+let timezone = require("dayjs/plugin/timezone");
+let CryptoJS = require("crypto-js");
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -48,7 +49,7 @@ const businessDay = (date) => {
 const getHolidayList = (startYear, endYear) => {
   let holidays = [];
   if (startYear > endYear) {
-    var temp = startYear;
+    let temp = startYear;
     startYear = endYear;
     endYear = temp;
   }
@@ -113,15 +114,15 @@ const removeBusinessDays = (dateText, days) => {
 };
 
 const countWeekendDays = (startDate, endDate) => {
-  var ndays =
+  let ndays =
     1 +
     Math.round((endDate.getTime() - startDate.getTime()) / (24 * 3600 * 1000));
-  var nsaturdays = Math.floor((startDate.getDay() + ndays) / 7);
+  let nsaturdays = Math.floor((startDate.getDay() + ndays) / 7);
   return 2 * nsaturdays + (startDate.getDay() === 0) - (endDate.getDay() === 6);
 };
 
 const daysBetween = (startDate, endDate) => {
-  var millisecondsPerDay = 24 * 60 * 60 * 1000;
+  let millisecondsPerDay = 24 * 60 * 60 * 1000;
   return (endDate - startDate) / millisecondsPerDay;
 };
 const calculateDaysRemaining = (endDate, startDate) => {
@@ -182,24 +183,26 @@ const isMinistryLogin = (userGroups) => {
   );
 };
 const isProcessingTeam = (userGroups) => {
-  return userGroups.some((userGroup) =>
+  return userGroups?.some((userGroup) =>
     KCProcessingTeams.includes(userGroup.replace("/", ""))
+  );
+};
+
+const isFoiAdmin = (userGroups) => {
+  return (
+    userGroups?.map((userGroup) => userGroup.replace("/", "")).indexOf("FOI Admin") !== -1
   );
 };
 
 const isFlexTeam = (userGroups) => {
   return (
-    userGroups
-      .map((userGroup) => userGroup.replace("/", ""))
-      .indexOf("Flex Team") !== -1
+    userGroups?.map((userGroup) => userGroup.replace("/", "")).indexOf("Flex Team") !== -1
   );
 };
 
 const isIntakeTeam = (userGroups) => {
   return (
-    userGroups
-      .map((userGroup) => userGroup.replace("/", ""))
-      .indexOf("Intake Team") !== -1
+    userGroups?.map((userGroup) => userGroup.replace("/", "")).indexOf("Intake Team") !== -1
   );
 };
 
@@ -221,7 +224,7 @@ const encrypt = (obj) => {
 
 const decrypt = (encrypted) => {
   if (encrypted) {
-    var bytes = CryptoJS.AES.decrypt(encrypted, SESSION_SECURITY_KEY);
+    let bytes = CryptoJS.AES.decrypt(encrypted, SESSION_SECURITY_KEY);
     return JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
   } else {
     return {};
@@ -229,8 +232,8 @@ const decrypt = (encrypted) => {
 };
 
 const saveSessionData = (key, data) => {
-  var expiresInMilliseconds = Date.now() + SESSION_LIFETIME;
-  var sessionObject = {
+  let expiresInMilliseconds = Date.now() + SESSION_LIFETIME;
+  let sessionObject = {
     expiresAt: new Date(expiresInMilliseconds),
     sessionData: data,
   };
@@ -239,11 +242,10 @@ const saveSessionData = (key, data) => {
 };
 
 const getSessionData = (key) => {
-  var sessionObject = decrypt(sessionStorage.getItem(key));
-
+  let sessionObject = decrypt(sessionStorage.getItem(key));
   if (sessionObject && sessionObject.sessionData && sessionObject.expiresAt) {
-    var currentDate = new Date();
-    var expirationDate = sessionObject.expiresAt;
+    let currentDate = new Date();
+    let expirationDate = sessionObject.expiresAt;
 
     if (Date.parse(currentDate) < Date.parse(expirationDate)) {
       return sessionObject.sessionData;
@@ -308,13 +310,34 @@ const getFullnameList = () => {
 };
 
 const getAssignToList = (team) => {
-  return getSessionData(`${team.toLowerCase()}AssignToList`);
+  return getSessionData((`${team.toLowerCase()}AssignToList`).replaceAll('"',''));
 };
 
 const getFullnameTeamList = () => {
   return getSessionData("fullnameTeamList");
 };
 
+const getMinistryRestrictedTagList = () => {
+  return getSessionData("ministryRestrictedTagList");
+};
+
+const getUserFullName = (firstName, lastName, userName, groupName = "") => {
+  // let users = getSessionData("fullnameList");
+  // if (userName) {
+  //   const user = users?.find((user) => user.username === userName);
+  //   return user ? user?.fullname : null;
+  // }
+  // return groupName;
+
+  if (firstName && lastName) {
+    return `${lastName}, ${firstName}`;
+  } else if (userName) {
+    return userName;
+  } else {
+    return groupName;
+  }
+  
+}
 const ConditionalComponent = ({ condition, children }) => {
   if (!condition) {
     return null;
@@ -344,6 +367,110 @@ const errorToast = (errorMessage) => {
   });
 };
 
+const isRequestWatcherOrAssignee = (requestWatchers,requestAssignees,userId) => {
+  return (_.map(requestWatchers, "watchedby").includes(userId) || (requestAssignees.assignedTo == userId));
+}
+
+const isRequestWatcherOrMinistryAssignee = (requestWatchers,ministryAssigneeValue,userId) => {
+  return (_.map(requestWatchers, "watchedby").includes(userId) || (ministryAssigneeValue.includes(userId)));
+}
+
+const addToRestrictedRequestTagList = (requestWatchers, assigneeDetails) => {
+  let fullnameList = getFullnameList();
+  let fullnameArray = [];
+  let fullnameSet = new Set();
+  let currentMember;
+  if(assigneeDetails){
+    currentMember = {
+      username: assigneeDetails?.assignedministryperson,
+      firstname: assigneeDetails?.assignedministrypersonFirstName,
+      lastname: assigneeDetails?.assignedministrypersonLastName,
+      fullname: `${assigneeDetails?.assignedministrypersonLastName}, ${assigneeDetails?.assignedministrypersonFirstName}`,
+      name: `${assigneeDetails?.assignedministrypersonLastName}, ${assigneeDetails?.assignedministrypersonFirstName}`,
+    };
+    fullnameArray.push(currentMember);
+    fullnameSet.add(currentMember);
+  }
+  if(requestWatchers){
+    requestWatchers?.forEach((watcher) => {
+      let fullNameArray = fullnameList?.filter((e) => e.username === watcher?.watchedby);
+      let fullName= fullNameArray[0].fullname;
+      currentMember = {
+        username: watcher?.watchedby,
+        firstname: fullName?.split(",")[1],
+        lastname: fullName?.split(",")[0],
+        fullname: fullName,
+        name: fullName,
+      };
+      if(!fullnameArray?.some((e) => e.username === watcher?.watchedby))
+        fullnameArray.push(currentMember);
+      fullnameSet.add(currentMember);
+
+    });
+  }
+  let IAOList = getAssignToList('iao')?.filter((e) => e.type === 'iao');
+  if(IAOList && IAOList?.length > 0){
+    IAOList.forEach((team) => {
+      team?.members.forEach((ministryUser) => {
+        currentMember = {
+          username: ministryUser?.username,
+          firstname: ministryUser?.firstname,
+          lastname: ministryUser?.lastname,
+          fullname: `${ministryUser?.lastname}, ${ministryUser?.firstname}`,
+          name: `${ministryUser?.lastname}, ${ministryUser?.firstname}`
+        };
+        if(!fullnameArray?.some((e) => e.username === ministryUser?.username))
+          fullnameArray.push(currentMember);
+        fullnameSet.add(currentMember);
+
+      });
+    });
+  }
+  saveSessionData("ministryRestrictedTagList", fullnameArray);
+};
+
+const getRestrictedRequestTagList = () => {
+  return getSessionData("restrictedrequesttagList") || [];
+};
+
+const isRequestRestricted = (requestDetails, ministryId) => {
+  if(ministryId){
+    return requestDetails?.iaorestricteddetails?.isrestricted;
+  } 
+  else
+    return requestDetails?.isiaorestricted;
+}
+
+const isRequestMinistryRestricted = (requestDetails) => {
+  return requestDetails?.ministryrestricteddetails?.isrestricted;
+}
+
+const isrecordtimeout = (createDate, slaHrs) => {
+  let dt1_str = createDate.replace("|", ",");
+  let dt1 = new Date(dt1_str);
+  let dt2 = new Date();
+  let diff =  (dt2.getTime() - dt1.getTime()) / 1000;
+  diff = diff/(60*60)
+  let diffhrs = Math.abs(Math.round(diff));
+  return diffhrs >= slaHrs;
+};
+
+const readUploadedFileAsBytes = (inputFile) => {
+  const temporaryFileReader = new FileReader();
+
+  return new Promise((resolve, reject) => {
+    temporaryFileReader.onerror = () => {
+      temporaryFileReader.abort();
+      reject(new DOMException("Problem parsing input file."));
+    };
+
+    temporaryFileReader.onload = () => {
+      resolve(temporaryFileReader.result);
+    };
+    temporaryFileReader.readAsArrayBuffer(inputFile);
+  });
+};
+
 export {
   replaceUrl,
   formatDate,
@@ -361,10 +488,21 @@ export {
   removeBusinessDays,
   getMinistryCode,
   errorToast,
+  isRequestWatcherOrAssignee,
+  isRequestWatcherOrMinistryAssignee,
   formatDateInPst,
   isProcessingTeam,
   isFlexTeam,
   isIntakeTeam,
   encrypt,
   decrypt,
+  addToRestrictedRequestTagList,
+  getRestrictedRequestTagList,
+  isRequestRestricted,
+  isRequestMinistryRestricted,
+  getMinistryRestrictedTagList,
+  isrecordtimeout,
+  isFoiAdmin,
+  readUploadedFileAsBytes,
+  getUserFullName
 };

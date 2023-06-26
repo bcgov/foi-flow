@@ -29,6 +29,7 @@ import logging
 from marshmallow import Schema, fields, validate, ValidationError
 import asyncio
 from request_api.services.eventservice import eventservice
+from request_api.services.requestservice import requestservice
 
 API = Namespace('FOICFRFee', description='Endpoints for FOI CFR Fee Form management')
 TRACER = Tracer.get_instance()
@@ -37,7 +38,7 @@ TRACER = Tracer.get_instance()
 EXCEPTION_MESSAGE_BAD_REQUEST='Bad Request'
         
 @cors_preflight('POST,OPTIONS')
-@API.route('/foicfrfee/ministryrequest/<ministryrequestid>')
+@API.route('/foicfrfee/foirequest/<requestid>/ministryrequest/<ministryrequestid>')
 class CreateFOICFRFee(Resource):
     """Creates CFR Fee for ministry request."""
        
@@ -45,14 +46,14 @@ class CreateFOICFRFee(Resource):
     @TRACER.trace()
     @cross_origin(origins=allowedorigins())
     @auth.require
-    def post(ministryrequestid):      
+    def post(requestid, ministryrequestid):      
         try:
             if AuthHelper.getusertype() != "ministry":
                 return {'status': False, 'message':'UnAuthorized'}, 403
             requestjson = request.get_json() 
-            foicfrfeeschema = FOICFRFeeSchema().load(requestjson)  
+            foicfrfeeschema = FOICFRFeeSchema().load(requestjson)
             result = cfrfeeservice().createcfrfee(ministryrequestid, foicfrfeeschema,AuthHelper.getuserid())
-            asyncio.ensure_future(eventservice().posteventforcfrfeeform(ministryrequestid, AuthHelper.getuserid(), AuthHelper.getusername()))
+            asyncio.ensure_future(eventservice().posteventforsanctioncfrfeeform(ministryrequestid, AuthHelper.getuserid(), AuthHelper.getusername()))
             return {'status': result.success, 'message':result.message,'id':result.identifier} , 200 
         except ValidationError as verr:
             logging.error(verr)
@@ -64,23 +65,25 @@ class CreateFOICFRFee(Resource):
             return {'status': exception.status_code, 'message':exception.message}, 500 
 
 @cors_preflight('POST,OPTIONS')
-@API.route('/foicfrfee/ministryrequest/<ministryrequestid>/sanction')
+@API.route('/foicfrfee/foirequest/<requestid>/ministryrequest/<ministryrequestid>/sanction')
 class SanctionFOICFRFee(Resource):
-    """Updates CFR Fee for status."""
+    """Updates CFR Fee status and iao preparing field."""
        
     @staticmethod
     @TRACER.trace()
     @cross_origin(origins=allowedorigins())
     @auth.require
-    def post(ministryrequestid):      
+    def post(requestid, ministryrequestid):      
         try:
             if AuthHelper.getusertype() != "iao":
                 return {'status': False, 'message':'UnAuthorized'}, 403
             requestjson = request.get_json() 
-            foicfrfeeschema = FOICFRFeeSanctionSchema().load(requestjson)  
+            foicfrfeeschema = FOICFRFeeSanctionSchema().load(requestjson)
             result = cfrfeeservice().sanctioncfrfee(ministryrequestid, foicfrfeeschema,AuthHelper.getuserid())
-            
+            asyncio.ensure_future(eventservice().posteventforsanctioncfrfeeform(ministryrequestid, AuthHelper.getuserid(), AuthHelper.getusername()))
             asyncio.ensure_future(eventservice().posteventforcfrfeeform(ministryrequestid, AuthHelper.getuserid(), AuthHelper.getusername()))
+            if (foicfrfeeschema["status"] == "approved") and cfrfeeservice().getactivepayment(requestid, ministryrequestid) != None:
+                requestservice().postfeeeventtoworkflow(requestid, ministryrequestid, "CANCELLED")
             return {'status': result.success, 'message':result.message,'id':result.identifier} , 200 
         except ValidationError as verr:
             logging.error(verr)
@@ -104,28 +107,9 @@ class FOICFRFee(Resource):
     @auth.require
     def get(requestid):      
         try:
-            result = cfrfeeservice().getcfrfee(requestid)
+            result = {"current": cfrfeeservice().getcfrfee(requestid), "history": cfrfeeservice().getcfrfeehistory(requestid)}
             return json.dumps(result), 200
         except KeyError as err:
             return {'status': False, 'message':err.messages}, 400        
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500   
-        
-@cors_preflight('GET,OPTIONS')
-@API.route('/foicfrfee/ministryrequest/<requestid>/history')
-class FOICFRFee(Resource):
-    """Retrieves cfr fee form based on ministry id."""
-
-       
-    @staticmethod
-    @TRACER.trace()
-    @cross_origin(origins=allowedorigins())
-    @auth.require
-    def get(requestid):      
-        try:
-            result = cfrfeeservice().getcfrfeehistory(requestid)
-            return json.dumps(result), 200
-        except KeyError as err:
-            return {'status': False, 'message':err.messages}, 400        
-        except BusinessException as exception:            
-            return {'status': exception.status_code, 'message':exception.message}, 500  

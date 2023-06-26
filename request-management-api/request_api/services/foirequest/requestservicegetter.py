@@ -6,8 +6,14 @@ from request_api.models.FOIMinistryRequestDivisions import FOIMinistryRequestDiv
 from request_api.models.FOIRequestContactInformation import FOIRequestContactInformation
 from request_api.models.FOIRequestPersonalAttributes import FOIRequestPersonalAttribute
 from request_api.models.FOIRequestApplicantMappings import FOIRequestApplicantMapping
+from request_api.models.FOIMinistryRequestSubjectCodes import FOIMinistryRequestSubjectCode
+from request_api.models.FOIRestrictedMinistryRequests import FOIRestrictedMinistryRequest
 from dateutil.parser import parse
-
+from request_api.services.cfrfeeservice import cfrfeeservice
+from request_api.services.paymentservice import paymentservice
+from request_api.services.subjectcodeservice import subjectcodeservice
+from request_api.services.programareaservice import programareaservice
+from request_api.utils.commons.datetimehandler import datetimehandler
 
 class requestservicegetter:
     """ This class consolidates retrival of FOI request for actors: iao and ministry. 
@@ -19,7 +25,8 @@ class requestservicegetter:
         requestcontactinformation = FOIRequestContactInformation.getrequestcontactinformation(foirequestid,request['version'])
         requestapplicants = FOIRequestApplicantMapping.getrequestapplicants(foirequestid,request['version'])
         requestministrydivisions = FOIMinistryRequestDivision.getdivisions(foiministryrequestid,requestministry['version'])
-        
+        iaorestrictrequestdetails = FOIRestrictedMinistryRequest.getrestricteddetails(ministryrequestid=foiministryrequestid,type='iao')
+
         baserequestinfo = self.__preparebaseinfo(request,foiministryrequestid,requestministry,requestministrydivisions)
         baserequestinfo['lastStatusUpdateDate'] = FOIMinistryRequest.getLastStatusUpdateDate(foiministryrequestid, requestministry['requeststatus.requeststatusid']).strftime(self.__genericdateformat()),
         for contactinfo in requestcontactinformation:
@@ -49,6 +56,7 @@ class requestservicegetter:
         baserequestinfo['additionalPersonalInfo'] = additionalpersonalinfo
         originalduedate = FOIMinistryRequest.getrequestoriginalduedate(foiministryrequestid)       
         baserequestinfo['originalDueDate'] = originalduedate.strftime(self.__genericdateformat())
+        baserequestinfo['iaorestricteddetails'] = iaorestrictrequestdetails
         return baserequestinfo
     
     def preparepersonalattributes(self, foirequestid, version):
@@ -67,8 +75,8 @@ class requestservicegetter:
     def getrequestdetailsforministry(self,foirequestid,foiministryrequestid, authmembershipgroups):
         request = FOIRequest.getrequest(foirequestid)
         requestministry = FOIMinistryRequest.getrequestbyministryrequestid(foiministryrequestid)
-        requestministrydivisions = FOIMinistryRequestDivision.getdivisions(foiministryrequestid,requestministry['version'])        
-        
+        requestministrydivisions = FOIMinistryRequestDivision.getdivisions(foiministryrequestid,requestministry['version'])
+        ministryrestrictrequestdetails = FOIRestrictedMinistryRequest.getrestricteddetails(foiministryrequestid,type='ministry')
         baserequestinfo = {}
         if requestministry["assignedministrygroup"] in authmembershipgroups:
             baserequestinfo = self.__preparebaseinfo(request,foiministryrequestid,requestministry,requestministrydivisions)
@@ -88,13 +96,37 @@ class requestservicegetter:
                 additionalpersonalinfo.update(self.__prepareadditionalpersonalinfo(requestortypeid, firstname, middlename, lastname, dob))
             baserequestdetails, additionalpersonalinfodetails = self.preparepersonalattributes(foirequestid, request['version'])
             baserequestinfo.update(baserequestdetails)
-            additionalpersonalinfo.update(additionalpersonalinfodetails)                
-            baserequestinfo['additionalPersonalInfo'] = additionalpersonalinfo 
+            additionalpersonalinfo.update(additionalpersonalinfodetails)
+            baserequestinfo['additionalPersonalInfo'] = additionalpersonalinfo
+        baserequestinfo['ministryrestricteddetails'] = ministryrestrictrequestdetails
         return baserequestinfo
+    
+    def getrequestdetails(self,foirequestid, foiministryrequestid):
+        requestdetails = self.getrequest(foirequestid, foiministryrequestid)
+        cfrfee = cfrfeeservice().getapprovedcfrfee(foiministryrequestid)
+        payment = paymentservice().getpayment(foirequestid, foiministryrequestid)
+        if cfrfee is not None and cfrfee != {}:
+            requestdetails['cfrfee'] = cfrfee
+            _balancedue = cfrfee['feedata']['balanceremaining']
+            requestdetails['cfrfee']['feedata']["balanceDue"] = '{:.2f}'.format(_balancedue)
+            if cfrfee['feedata']['actualtotaldue']:
+                requestdetails['cfrfee']['feedata']["totalamountdue"] = '{:.2f}'.format(requestdetails['cfrfee']['feedata']["actualtotaldue"])
+            else:
+                requestdetails['cfrfee']['feedata']["totalamountdue"] = '{:.2f}'.format(requestdetails['cfrfee']['feedata']["estimatedtotaldue"])
+            
+        if payment is not None and payment != {}:
+            paidamount = float(payment['paidamount']) if payment['paidamount'] != None else 0
+            requestdetails['cfrfee']['feedata']['paidamount'] = '{:.2f}'.format(paidamount)
+            requestdetails['cfrfee']['feedata']['depositpaid'] = '{:.2f}'.format(float(cfrfee['feedata']['amountpaid']) - paidamount)
+            requestdetails['cfrfee']['feedata']['paymenturl'] = payment['paymenturl']            
+        return requestdetails
 
     def __preparebaseinfo(self,request,foiministryrequestid,requestministry,requestministrydivisions):
         _receiveddate = parse(request['receiveddate'])
         axissyncdatenoneorempty =  self.__noneorempty(requestministry["axissyncdate"]) 
+        linkedministryrequests= []
+        if "linkedrequests" in requestministry and requestministry["linkedrequests"] is not None:
+            linkedministryrequests = self.__assignministrynames(requestministry["linkedrequests"])
         baserequestinfo = {
             'id': request['foirequestid'],
             'requestType': request['requesttype'],
@@ -118,6 +150,7 @@ class requestservicegetter:
             'requestProcessStart': parse(requestministry['startdate']).strftime(self.__genericdateformat()) if requestministry['startdate'] is not None else '',
             'dueDate':parse(requestministry['duedate']).strftime(self.__genericdateformat()),            
             'programareaid':requestministry['programarea.programareaid'],
+            'bcgovcode':requestministry['programarea.bcgovcode'],
             'category':request['applicantcategory.name'],
             'categoryid':request['applicantcategory.applicantcategoryid'],
             'assignedministrygroup':requestministry["assignedministrygroup"],
@@ -130,10 +163,23 @@ class requestservicegetter:
             'assignedToLastName': requestministry["assignee.lastname"] if requestministry["assignedto"] != None else None,
             'assignedministrypersonFirstName': requestministry["ministryassignee.firstname"] if requestministry["assignedministryperson"] != None else None,
             'assignedministrypersonLastName': requestministry["ministryassignee.lastname"] if requestministry["assignedministryperson"] != None else None,
+            'closedate': parse(requestministry['closedate']).strftime(self.__genericdateformat()) if requestministry['closedate'] is not None else None,
+            'subjectCode': subjectcodeservice().getministrysubjectcodename(foiministryrequestid),
+            'isofflinepayment': FOIMinistryRequest.getofflinepaymentflag(foiministryrequestid),
+            'linkedRequests' : linkedministryrequests
         }
         if requestministry['cfrduedate'] is not None:
             baserequestinfo.update({'cfrDueDate':parse(requestministry['cfrduedate']).strftime(self.__genericdateformat())})
         return baserequestinfo
+    
+    def __assignministrynames(self, linkedrequests):
+        areas = programareaservice().getprogramareas()
+        if linkedrequests is not None:
+            for entry in linkedrequests:
+                area = next((a for a in areas if a["programareaid"] == list(entry.values())[0]), None)
+                if (area is not None):
+                    entry = area["name"]
+        return linkedrequests
     
     def getdivisions(self, ministrydivisions):
         divisions = []
@@ -146,7 +192,8 @@ class requestservicegetter:
                     "stageid": ministrydivision["stage.stageid"],
                     "stagename": ministrydivision["stage.name"],
                     "divisionDueDate": parse(ministrydivision['divisionduedate']).strftime(self.__genericdateformat()) if ministrydivision['divisionduedate'] is not None else None,
-                    "eApproval": ministrydivision["eapproval"]
+                    "eApproval": ministrydivision["eapproval"],
+                    "divisionReceivedDate": parse(ministrydivision['divisionreceiveddate']).strftime(self.__genericdateformat()) if ministrydivision['divisionreceiveddate'] is not None else None,
                     } 
                 divisions.append(division) 
         return divisions
@@ -157,11 +204,15 @@ class requestservicegetter:
         transitions = FOIMinistryRequest.getrequeststatusById(foiministryrequestid)
         for entry in transitions:
             if entry['requeststatusid'] == 11:
-                onholddate = parse(str(entry['created_at'])).strftime("%Y-%m-%d")
+                onholddate = datetimehandler().convert_to_pst(entry['created_at'],'%Y-%m-%d')
             else:
                 if onholddate is not None:
-                    break;
-        return onholddate;
+                    break
+        return onholddate
+
+    def getministryrequest(self, foiministryrequestid):
+        requestministry = FOIMinistryRequest.getrequestbyministryrequestid(foiministryrequestid)
+        return requestministry
     
     def __genericdateformat(self):
         return '%Y-%m-%d'

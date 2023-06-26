@@ -42,6 +42,9 @@ request-management-api/request_api/__pycache__/__init__.cpython-38.pyc
 
 apps/forms-flow-ai/forms-flow-web/node_modules
 apps/forms-flow-ai/forms-flow-web/package-lock.json
+forms-flow-web/node_modules
+forms-flow-web/build
+forms-flow-web/package-lock.json
 request-management-api/request_api/__pycache__/__init__.cpython-38.pyc
 request-management-api/request_api/__pycache__/__init__.cpython-38.pyc
 
@@ -85,3 +88,6 @@ axisintegrationapi/MCS.FOI.AXISIntegration/MCS.FOI.AXISIntegrationWebAPI/*.user
 
 
 
+axisintegrationapi/MCS.FOI.AXISIntegration/MCS.FOI.AXISIntegrationWebAPI/Properties/PublishProfiles/FolderProfile.pubxml
+axisintegrationapi/MCS.FOI.AXISIntegration/MCS.FOI.AXISIntegrationWebAPI/Properties/PublishProfiles/FolderProfile.pubxml.user
+apps/

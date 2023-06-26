@@ -1,5 +1,5 @@
 
-import { FOI_BASE_API_URL, AXIS_API_URL } from "./config";
+import { FOI_BASE_API_URL, AXIS_API_URL, DOC_REVIEWER_BASE_API_URL } from "./config";
 
 const API = {
   FOI_GET_REQUESTS_API: `${FOI_BASE_API_URL}/api/dashboard`,
@@ -32,6 +32,11 @@ const API = {
   FOI_GET_MINISTRY_REQUEST_WATCHERS: `${FOI_BASE_API_URL}/api/foiwatcher/ministryrequest/<ministryid>`,
   FOI_GET_CLOSING_REASONS: `${FOI_BASE_API_URL}/api/foiflow/closereasons`,
   FOI_POST_OSS_HEADER: `${FOI_BASE_API_URL}/api/foiflow/oss/authheader`,
+
+  FOI_GET_PROGRAMAREADIVISIONS: `${FOI_BASE_API_URL}/api/foiadmin/divisions`,
+  FOI_POST_PROGRAMAREADIVISION: `${FOI_BASE_API_URL}/api/foiadmin/division`,
+  FOI_PUT_PROGRAMAREADIVISIONS: `${FOI_BASE_API_URL}/api/foiadmin/division/<divisionid>`,
+  FOI_DELETE_PROGRAMAREADIVISIONS: `${FOI_BASE_API_URL}/api/foiadmin/division/<divisionid>/disable`,
 
   FOI_POST_COMMENT_RAWREQUEST: `${FOI_BASE_API_URL}/api/foicomment/rawrequest`,
   FOI_GET_COMMENT_RAWREQUEST: `${FOI_BASE_API_URL}/api/foicomment/rawrequest/<requestid>`,
@@ -67,8 +72,12 @@ const API = {
   FOI_GET_EXTENSION: `${FOI_BASE_API_URL}/api/foiextension/<extensionId>`,
 
   FOI_GET_CFR_FORM: `${FOI_BASE_API_URL}/api/foicfrfee/ministryrequest/<ministryrequestid>`,
-  FOI_POST_CFR_FORM: `${FOI_BASE_API_URL}/api/foicfrfee/ministryrequest/<ministryrequestid>`,
-  FOI_POST_CFR_FORM_IAO: `${FOI_BASE_API_URL}/api/foicfrfee/ministryrequest/<ministryrequestid>/sanction`,
+  FOI_POST_CFR_FORM: `${FOI_BASE_API_URL}/api/foicfrfee/foirequest/<requestid>/ministryrequest/<ministryrequestid>`,
+  FOI_POST_CFR_FORM_IAO: `${FOI_BASE_API_URL}/api/foicfrfee/foirequest/<requestid>/ministryrequest/<ministryrequestid>/sanction`,
+
+  FOI_POST_EMAIL_CORRESPONDENCE: `${FOI_BASE_API_URL}/api/foiflow/applicantcorrespondence/<requestid>/<ministryrequestid>`,
+  FOI_GET_EMAIL_CORRESPONDENCE: `${FOI_BASE_API_URL}/api/foiflow/applicantcorrespondence/<requestid>/<ministryrequestid>`,
+  FOI_GET_EMAIL_CORRESPONDENCE_TEMPLATES: `${FOI_BASE_API_URL}/api/foiflow/applicantcorrespondence/templates`,
 
   FOI_GET_OPENED_MINISTRIES: `${FOI_BASE_API_URL}/api/foirawrequest/<requestid>/fields?names=ministries`,
 
@@ -80,5 +89,36 @@ const API = {
 
   FOI_REQUEST_ASSIGNEE_API: `${FOI_BASE_API_URL}/api/foirequests/<requestid>/ministryrequest/<ministryid>/<usertype>/assignee`,
   FOI_RAWREQUEST_ASSIGNEE_API:  `${FOI_BASE_API_URL}/api/foirawrequest/<requestid>/assignee`,
+
+  FOI_GET_S3DOCUMENT_PRESIGNEDURL:`${FOI_BASE_API_URL}/api/foiflow/oss/presigned`,
+  FOI_POST_S3DOCUMENT_PRESIGNEDURL:`${FOI_BASE_API_URL}/api/foiflow/oss/presigned`,
+  FOI_POST_COMPLETE_UPLOAD:`${FOI_BASE_API_URL}/api/foiflow/oss/completemultipart`,
+
+  FOI_GET_RECORDS:`${FOI_BASE_API_URL}/api/foirecord/<requestid>/ministryrequest/<ministryrequestid>`,
+  FOI_RETRY_RECORDS:`${FOI_BASE_API_URL}/api/foirecord/<requestid>/ministryrequest/<ministryrequestid>/retry`,
+  FOI_REPLACE_RECORDS:`${FOI_BASE_API_URL}/api/foirecord/<requestid>/ministryrequest/<ministryrequestid>/record/<recordid>/replace`,
+  FOI_POST_RECORDS:`${FOI_BASE_API_URL}/api/foirecord/<requestid>/ministryrequest/<ministryrequestid>`,
+  FOI_UPDATE_RECORDS:`${FOI_BASE_API_URL}/api/foirecord/<requestid>/ministryrequest/<ministryrequestid>/update`,
+  DOC_REVIEWER_DELETE_RECORDS:`${DOC_REVIEWER_BASE_API_URL}/api/document/delete`,
+  
+  FOI_TRIGGER_DOWNLOAD_RECORDS_FOR_HARMS:`${FOI_BASE_API_URL}/api/foirecord/<requestid>/ministryrequest/<ministryrequestid>/triggerdownload/harms`,
+
+  FOI_DOWNLOAD_RECORDS_FOR_HARMS:`${FOI_BASE_API_URL}/api/foirecord/<requestid>/ministryrequest/<ministryrequestid>/download/harms`,
+  FOI_PDF_STITCH_STATUS_FOR_HARMS:`${FOI_BASE_API_URL}/api/foirecord/<requestid>/ministryrequest/<ministryrequestid>/harms/pdfstitchjobstatus`,
+  FOI_CHECK_RECORDS_CHANGED:`${FOI_BASE_API_URL}/api/foirecord/<requestid>/ministryrequest/<ministryrequestid>/harms/recrodschanged`,
+
+  FOI_GET_SUBJECT_CODELIST: `${FOI_BASE_API_URL}/api/foiflow/subjectcodes`,
+  FOI_POST_RAWREQUEST_RESTRICTION: `${FOI_BASE_API_URL}/api/foirawrequest/restricted/<requestid>`,
+  FOI_POST_MINISTRYREQUEST_RESTRICTION: `${FOI_BASE_API_URL}/api/foirequests/restricted/<ministryrequestid>/<type>`,
+
+  FOI_GET_RESTRICTED_RAWREQUEST_TAG_LIST: `${FOI_BASE_API_URL}/api/foicomment/rawrequest/<requestid>/restricted`,
+  FOI_GET_RESTRICTED_MINISTRYREQUEST_TAG_LIST: `${FOI_BASE_API_URL}/api/foicomment/ministryrequest/<ministryrequestid>/restricted`,
+  
+  FOI_REFRESH_REDIS_CACHE: `${FOI_BASE_API_URL}/api/foiflow/cache/refresh`,
+
+  FOI_GET_EVENTS_PAGE_API: `${FOI_BASE_API_URL}/api/eventpagination`,
+  FOI_GET_MINISTRY_EVENTS_PAGE_API: `${FOI_BASE_API_URL}/api/eventpagination/ministry`
+
+
 };
 export default API;

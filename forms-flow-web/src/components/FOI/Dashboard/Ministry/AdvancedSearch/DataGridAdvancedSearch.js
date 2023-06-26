@@ -31,7 +31,7 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
 
   const classes = useStyles();
 
-  const defaultRowsState = { page: 0, pageSize: 10 };
+  const defaultRowsState = { page: 0, pageSize: 100 };
   const [rowsState, setRowsState] = React.useState(
     Object.keys(advancedSearchParams).length > 0 ? 
       {page: advancedSearchParams.page - 1, pageSize: advancedSearchParams.size} : 

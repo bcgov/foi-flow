@@ -36,3 +36,31 @@ process.env.REACT_APP_FOI_FLOW_REPORTING_URL;
 export const SOCKETIO_CONNECT_NONCE =
   (window._env_ && window._env_.REACT_APP_SOCKETIO_CONNECT_NONCE) ||
   process.env.REACT_APP_SOCKETIO_CONNECT_NONCE;
+
+  export const FOI_FLOW_NEW_COMMENT_EXPIRY_IN_DAYS =  (window._env_ && window._env_.REACT_APP_FOI_FLOW_NEW_COMMENT_EXPIRY_IN_DAYS) ||
+process.env.REACT_APP_FOI_FLOW_NEW_COMMENT_EXPIRY_IN_DAYS || 2;
+
+export const OSS_S3_BUCKET_FULL_PATH = "https://" + ((window._env_ && window._env_.REACT_APP_OSS_S3_HOST) ||
+process.env.REACT_APP_OSS_S3_HOST || "citz-foi-prod.objectstore.gov.bc.ca")+ "/" + ((window._env_ && window._env_.REACT_APP_OSS_S3_FORMS_BUCKET) ||
+process.env.REACT_APP_OSS_S3_FORMS_BUCKET || "dev-forms-foirequests")
+
+export const OSS_S3_CHUNK_SIZE =
+  (window._env_ && window._env_.REACT_APP_OSS_S3_CHUNK_SIZE) ||
+  process.env.REACT_APP_OSS_S3_CHUNK_SIZE || 104857600;
+
+export const TOTAL_RECORDS_UPLOAD_LIMIT =
+  (window._env_ && window._env_.REACT_APP_TOTAL_RECORDS_UPLOAD_LIMIT) ||
+  process.env.REACT_APP_TOTAL_RECORDS_UPLOAD_LIMIT || 2048;
+
+
+export const FOI_FFA_URL =  (window._env_ && window._env_.FOI_FFA_URL) ||
+process.env.FOI_FFA_URL || "http://localhost:4000";
+
+export const DOC_REVIEWER_WEB_URL = `${(window._env_ && window._env_.REACT_APP_DOCREVIEWER_WEB_URL) || process.env.REACT_APP_DOCREVIEWER_WEB_URL}`;
+
+export const FOI_RECORD_FORMATS = `${(window._env_ && window._env_.REACT_APP_FOI_RECORD_FORMATS) || process.env.REACT_APP_FOI_RECORD_FORMATS || 'https://citz-foi-prod.objectstore.gov.bc.ca/records-upload-formats/dev/recordsuploadformats.json'}`;
+
+export const RECORD_PROCESSING_HRS = (window._env_ && window._env_.REACT_APP_RECORD_PROCESSING_HRS) || process.env.REACT_APP_RECORD_PROCESSING_HRS || 4;
+
+export const DISABLE_REDACT_WEBLINK = (window._env_ && window._env_.REACT_APP_DISABLE_REDACT_WEBLINK) || process.env.REACT_APP_DISABLE_REDACT_WEBLINK || false;
+export const DISABLE_GATHERINGRECORDS_TAB = (window._env_ && window._env_.REACT_APP_DISABLE_GATHERINGRECORDS_TAB) || process.env.REACT_APP_DISABLE_GATHERINGRECORDS_TAB || 'false';

@@ -6,13 +6,10 @@
   display: inline-flex;  
   padding-top: 65px;
   position: relative;
-  overflow-y: scroll;
 
   margin-left: 10%;
   margin-right: 10%;
-  margin-bottom: 5%;
 
-  height: 90%;
 }
 
 
@@ -30,21 +27,91 @@
   }
 }
 
-@media screen and (max-height: 655px) {
-  .foileftpanelstatus {
-    padding-top: 0px !important;
-    padding-bottom:0px !important;
+@media screen and (max-height: 1024px) {
+  div.tab{
+    margin-bottom: 160px;
+  }
+  .foitabheadercollection {
+    padding-bottom: 1% !important;
   }
 }
 
-@media screen and (max-height: 595px) {
-  .tab div.tablinks{
+@media screen and (min-height: 680px) and (max-height: 800px) {
+  div.tab{
+    margin-bottom: 50%;
+    height: 38%;
+  }
+  div.tab div.tablinks {
+    font-size: 15px !important;    
     height: 35px !important;
+  }
+  .foitabheadercollection {
+    padding-bottom: 6% !important;
+  }
+ 
+}
+
+@media screen and (min-height: 544px) and (max-height: 680px) {
+  div.tab{
+    margin-bottom: 20%;
+    height: 35%;
+  }
+  div.tab div.tablinks {
+    font-size: 15px !important;    
+    height: 30px !important;
+  }
+  .foitabheadercollection {
+    padding-bottom: 5% !important;
+  }
+}
+
+
+@media screen and (max-height: 800px) {
+  .foileftpanelstatus {
+    padding-top: 5% !important;
+    padding-bottom:0px !important;
+    font-size: 15px !important;
+    font-weight: bolder !important;
+    height: 28px !important;
+  }
+
+  .remaining-days-alert {
+    font-size: 15px !important;
+    font-weight: bolder !important;
+    // padding-bottom: 0.5rem !important;
+  }
+  .foileftpanelrequestno {
+    font-size: 15px !important;
+    font-weight: bolder !important;
+  }
+  div.foi-state-dropdown .MuiInputBase-root {
+    font-size: 15px !important;
+  }
+}
+
+@media screen and (max-height: 544px) {
+  .tab div.tablinks{
+    height: 25px !important;
     padding: 2px 8px 2px 15px !important;
+    font-size: 15px!important;
   }
   .foileftpanelheader {
     padding-top: 10px !important;
     padding-bottom: 10px !important;
+  }
+  // .foileftpaneldropdown{
+  //   padding-bottom: 5%!important;
+  // }
+ 
+  // .foitabheadercollection {
+  //   height: calc(100% - 80px - 67px)!important;
+  // }
+  .foileftpanelstatus, .remaining-days-alert, .foileftpanelrequestno {
+    font-size: 15px !important;
+    font-weight: bolder !important;
+  }
+  div.foi-state-dropdown .MuiInputBase-root {
+    font-size: 15px !important;
   }
 }
 
@@ -83,10 +150,11 @@
 
   .foitabheadercollection {
     width: fit-content;
-    height: calc(100% - 96px - 67px);
+    // height: calc(100% - 96px - 67px);
+    // height: 100%;
     border-radius: 0px 30px 30px 0px!important;
     margin-bottom: auto;
-    padding-bottom: 2%;
+    padding-bottom: 8%;
     min-width: 200px;
     position: fixed;
     z-index: 10;
@@ -148,7 +216,7 @@
   {
       padding-left: 12%;
       padding-top: 20%;
-      padding-bottom: 20%;
+      padding-bottom: 10%;
   }
 
   .foileftpanelheader h1 {
@@ -174,10 +242,10 @@
 
   .foileftpanelstatus
   {
-    position: absolute;
+    position: relative;
     bottom: 0;
     padding-bottom: 20%;
-    padding-top: 30%;
+    padding-top: 10%;
     padding-left: 10%;
     color: white;
     font-size: 15px;
@@ -223,8 +291,9 @@
 
 /* Style the tab */
 .tab {
-  overflow: hidden;
- 
+  // overflow: hidden;
+  height: 35%;
+ position: relative;
 }
 
 /* Style the buttons inside the tab */
@@ -236,7 +305,7 @@
   cursor: pointer;
   
   transition: 0.3s;
-  font-size: 17px;
+  // font-size: 17px;
   height: 48px;
   padding:8px;
   align-items: center;
@@ -295,3 +364,5 @@ span.circle
   display: inline-block;
   width: 100%;
 }
+
+
