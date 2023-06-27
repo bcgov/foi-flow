@@ -993,10 +993,16 @@ export const RecordsLog = ({
             if (record.attributes.divisions[i].divisionid === filterValue) {
               let updateRecord = records.find(r => r.documentmasterid === record.attributes.divisions[i].duplicatemasterid);
               updateRecords.push((({ recordid, documentmasterid, s3uripath }) => ({ recordid, documentmasterid, filepath: s3uripath }))(updateRecord));
+              updateRecords = updateRecords.concat(updateRecord.attachments?.map(a =>
+                (({ documentmasterid, s3uripath }) => ({ documentmasterid, filepath: s3uripath }))(a)
+              ));
             }
           }
         } else {
           updateRecords.push((({ recordid, documentmasterid, s3uripath }) => ({ recordid, documentmasterid, filepath: s3uripath }))(record));
+          updateRecords = updateRecords.concat(record.attachments?.map(a =>
+            (({ documentmasterid, s3uripath }) => ({ documentmasterid, filepath: s3uripath }))(a)
+          ));
         }
       }
     }
