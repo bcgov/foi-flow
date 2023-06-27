@@ -168,8 +168,8 @@ class FOIRequestNotificationUser(db.Model):
 
         #aliase for getting ministry restricted flag from FOIRestrictedMinistryRequest
         ministry_restricted_requests = aliased(FOIRestrictedMinistryRequest)
-        requestnotytype = aliased(NotificationType)
-        rawrequestnotytype = aliased(NotificationType)
+        #requestnotytype = aliased(NotificationType)
+        #rawrequestnotytype = aliased(NotificationType)
 
         assignedtoformatted = case([
                             (and_(iaoassignee.lastname.isnot(None), iaoassignee.firstname.isnot(None)),
@@ -289,7 +289,8 @@ class FOIRequestNotificationUser(db.Model):
             foiuser.lastname.label('userLastName'),
             foicreator.firstname.label('creatorFirstName'),
             foicreator.lastname.label('creatorLastName'),
-            coalesce(requestnotytype.name,rawrequestnotytype.name).label('notificationtype'),
+            #coalesce(requestnotytype.name,rawrequestnotytype.name).label('notificationtype'),
+            NotificationType.name.label('notificationtype'),
             userformatted.label('userFormatted'),
             creatorformatted.label('creatorFormatted'),
             FOIMinistryRequest.description,
@@ -346,20 +347,15 @@ class FOIRequestNotificationUser(db.Model):
                                 and_(FOIRawRequestNotificationUser.notificationid == FOIRawRequestNotification.notificationid),
                                 isouter=True
                             ).join(
-                                requestnotytype,
-                                and_(FOIRequestNotification.notificationtypeid == requestnotytype.notificationtypeid, requestnotytype.name != 'Tagged User Comments'),
-                                isouter=True
-                            ).join(
-                                rawrequestnotytype,
-                                and_(FOIRawRequestNotification.notificationtypeid == rawrequestnotytype.notificationtypeid, rawrequestnotytype.name != 'Tagged User Comments'),
-                                isouter=True
+                                NotificationType,
+                                NotificationType.notificationtypeid == coalesce(FOIRequestNotification.notificationtypeid,FOIRawRequestNotification.notificationtypeid) 
                             ).join(
                                 foiuser, foiuser.preferred_username == coalesce(FOIRequestNotificationUser.userid,FOIRawRequestNotificationUser.userid), isouter=True  
                             ).join(
                                 foicreator, foicreator.preferred_username == coalesce(FOIRequestNotificationUser.createdby,FOIRawRequestNotificationUser.createdby), isouter=True  
                             ).join(
                                 subquery_tag_notification, 
-                                and_(subquery_tag_notification.c.userid == coalesce(FOIRequestNotificationUser.userid,FOIRawRequestNotificationUser.userid)), 
+                                and_(subquery_tag_notification.c.userid == coalesce(FOIRequestNotificationUser.userid,FOIRawRequestNotificationUser.userid), subquery_tag_notification.c.axisnumber == FOIMinistryRequest.axisrequestid), 
                                 isouter=True  
                             ).filter(FOIMinistryRequest.requeststatusid != 3
                             ).filter(or_(FOIRequestNotification.notification.isnot(None),FOIRawRequestNotification.notification.isnot(None)))
