@@ -1478,7 +1478,17 @@ export const RecordsLog = ({
                       xs={12}
                       elevation={0}
                     >
-                      {divisions.map(division =>
+                      {divisions.filter(division => {
+                        if (division.divisionname.toLowerCase() === 'communications') {
+                          return false;
+                        } else if (filterValue > -1 && filterValue !== division.divisionid) {
+                          return true;
+                        } else if (records.filter(r => r.isselected)[0]?.attributes.divisions[0].divisionid !== division.divisionid) {
+                          return true;
+                        } else {
+                          return false;
+                        }
+                      }).map(division =>
                         <ClickableChip
                           item
                           id={`${division.divisionid}updateTag`}
