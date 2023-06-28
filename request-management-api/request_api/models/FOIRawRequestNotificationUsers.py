@@ -15,11 +15,11 @@ from sqlalchemy import insert, and_, or_, text, func, literal, cast, asc, desc, 
 from .FOIAssignees import FOIAssignee
 from .FOIRawRequests import FOIRawRequest
 from .FOIMinistryRequests import FOIMinistryRequest
-#from .FOIRequestNotificationUsers import FOIRequestNotificationUser
 from .FOIRawRequestNotifications import FOIRawRequestNotification
 from .FOIRawRequestWatchers import FOIRawRequestWatcher
 from .FOIUsers import FOIUser
 from .NotificationTypes import NotificationType
+from request_api.utils.enums import ProcessingTeamWithKeycloackGroup, IAOTeamWithKeycloackGroup
 
 class FOIRawRequestNotificationUser(db.Model):
     # Name of the table in our database
@@ -134,7 +134,7 @@ class FOIRawRequestNotificationUser(db.Model):
     # Begin of Dashboard functions
 
     @classmethod
-    def getbasequery(cls, foiuser, foicreator, additionalfilter=None, userid=None, isiaorestrictedfilemanager=False):
+    def getbasequery(cls, groups, foiuser, foicreator, additionalfilter=None, userid=None, isiaorestrictedfilemanager=False):
         _session = db.session
 
         #rawrequests
@@ -145,13 +145,11 @@ class FOIRawRequestNotificationUser(db.Model):
             subquery_maxversion.c.max_version == FOIRawRequest.version,
         ]
 
-        subquery_ministry_maxversion = _session.query(FOIMinistryRequest.foiministryrequestid, FOIMinistryRequest.axisrequestid, func.max(FOIMinistryRequest.version).label('max_version')).group_by(FOIMinistryRequest.foiministryrequestid, FOIMinistryRequest.axisrequestid).subquery()
+        subquery_ministry_maxversion = _session.query( FOIMinistryRequest.foiministryrequestid, FOIMinistryRequest.axisrequestid, func.max(FOIMinistryRequest.version).label('max_version')).group_by(FOIMinistryRequest.foiministryrequestid, FOIMinistryRequest.axisrequestid).subquery()
         joincondition_ministry = [
             subquery_ministry_maxversion.c.foiministryrequestid == FOIMinistryRequest.foiministryrequestid,
             subquery_ministry_maxversion.c.max_version == FOIMinistryRequest.version
         ]
-
-        
 
         ministry_closed_query = _session.query(
                                    FOIMinistryRequest.axisrequestid
@@ -159,14 +157,7 @@ class FOIRawRequestNotificationUser(db.Model):
                                         subquery_ministry_maxversion, and_(*joincondition_ministry)
                                 ).filter(FOIMinistryRequest.requeststatusid == 3)
         
-        ministry_opened_query = _session.query(
-                                   FOIMinistryRequest.version,
-                                   FOIMinistryRequest.foirequest_id,
-                                   FOIMinistryRequest.foiministryrequestid,
-                                   FOIMinistryRequest.axisrequestid
-                                ).join(
-                                        subquery_ministry_maxversion, and_(*joincondition_ministry)
-                                ).filter(FOIMinistryRequest.requeststatusid != 3).subquery()
+        
         
         axisrequestid = case([
             (FOIRawRequest.axisrequestid.is_(None),
@@ -206,18 +197,6 @@ class FOIRawRequestNotificationUser(db.Model):
                              foicreator.firstname),                          ],
                            else_ = FOIRawRequestNotificationUser.createdby).label('creatorformatted')
 
-        messageformatted = case([
-                            (FOIRawRequestNotification.notification["message"].astext.cast(String).isnot(None),
-                             FOIRawRequestNotification.notification["message"].astext.cast(String)),                            
-                           ],
-                           else_ = None).label('notification')
-
-        typeformatted = case([
-                            ( NotificationType.name.isnot(None),
-                             NotificationType.name),                            
-                           ],
-                           else_ = None).label('notificationtype')
-
         description = case([
                             (FOIRawRequest.status == 'Unopened',
                              FOIRawRequest.requestrawdata['descriptionTimeframe']['description'].astext),
@@ -228,8 +207,7 @@ class FOIRawRequestNotificationUser(db.Model):
         selectedcolumns = [
             axisrequestid,  
             FOIRawRequest.status.label('status'),          
-            #FOIRawRequestNotification.notification["message"].label('notification'),
-            messageformatted,
+            FOIRawRequestNotification.notification["message"].astext.cast(String).label('notification'),
             FOIRawRequestNotificationUser.userid.label('to'),
             FOIRawRequestNotificationUser.createdby.label('createdby'),
             FOIRawRequestNotificationUser.created_at.label('createdat'),
@@ -243,7 +221,7 @@ class FOIRawRequestNotificationUser(db.Model):
             literal(None).label('assignedministrypersonLastName'),
             assignedtoformatted,
             literal(None).label('ministryAssignedToFormatted'),
-            FOIRawRequestNotificationUser.notificationuserid.label('id'),
+            FOIRawRequestNotification.idnumber.label('id'),
             FOIRawRequest.requestid.label('rawrequestid'),
             literal(None).label('requestid'),
             literal(None).label('ministryrequestid'),
@@ -252,8 +230,7 @@ class FOIRawRequestNotificationUser(db.Model):
             foiuser.lastname.label('userLastName'),
             foicreator.firstname.label('creatorFirstName'),
             foicreator.lastname.label('creatorLastName'),
-            #NotificationType.name.label('notificationtype'),
-            typeformatted,
+            NotificationType.name.label('notificationtype'),
             userformatted.label('userFormatted'),
             creatorformatted.label('creatorFormatted'),
             description
@@ -271,7 +248,8 @@ class FOIRawRequestNotificationUser(db.Model):
                                              FOIRawRequestNotification.axisnumber.notin_(ministry_closed_query)),
                                 ).join(
                                         FOIRawRequestNotificationUser,
-                                        and_(FOIRawRequestNotificationUser.notificationid == FOIRawRequestNotification.notificationid)
+                                        and_(FOIRawRequestNotificationUser.notificationid == FOIRawRequestNotification.notificationid),
+                                    isouter=True  
                                 ).join(
                                         NotificationType,
                                         and_(FOIRawRequestNotification.notificationtypeid == NotificationType.notificationtypeid),
@@ -305,20 +283,22 @@ class FOIRawRequestNotificationUser(db.Model):
                 return basequery.join(subquery_watchby, subquery_watchby.c.requestid == FOIRawRequest.requestid).filter(FOIRawRequest.status.notin_(['Archived']))
             elif(additionalfilter == 'myRequests'):
                 #myrequest
-                return basequery.filter(and_(FOIRawRequest.status.notin_(['Archived']), FOIRawRequest.assignedto == userid))
+                return basequery.filter(and_(FOIRawRequest.status.notin_(['Archived']), or_(FOIRawRequest.assignedto == userid, and_(FOIRawRequestNotificationUser.userid == userid, FOIRawRequestNotification.notificationtypeid == 10))))
             else:
                 if(isiaorestrictedfilemanager == True):
-                    return basequery.filter(FOIRawRequest.status.notin_(['Archived']))
+                    return basequery.filter(FOIRawRequest.status.notin_(['Archived'])).filter(FOIRawRequest.assignedgroup.in_(groups))
                 else:
                     return basequery.filter(
                         and_(
                             FOIRawRequest.status.notin_(['Archived']),
-                            or_(FOIRawRequest.isiaorestricted == False, and_(FOIRawRequest.isiaorestricted == True, FOIRawRequest.assignedto == userid))))
+                            or_(FOIRawRequest.isiaorestricted.is_(None), FOIRawRequest.isiaorestricted == False, and_(FOIRawRequest.isiaorestricted == True, FOIRawRequest.assignedto == userid)))).filter(FOIRawRequest.assignedgroup.in_(groups))
 
 
+    
+    
     @classmethod
-    def getrequestssubquery(cls, foiuser, foicreator, filterfields, keyword, additionalfilter, userid, isiaorestrictedfilemanager):
-        basequery = FOIRawRequestNotificationUser.getbasequery(foiuser, foicreator, additionalfilter, userid, isiaorestrictedfilemanager)
+    def getrequestssubquery(cls, groups, foiuser, foicreator, filterfields, keyword, additionalfilter, userid, isiaorestrictedfilemanager):
+        basequery = FOIRawRequestNotificationUser.getbasequery(groups, foiuser, foicreator, additionalfilter, userid, isiaorestrictedfilemanager)
         basequery = basequery.filter(FOIRawRequest.status != 'Unopened').filter(FOIRawRequest.status != 'Closed')
         #filter/search
         if(len(filterfields) > 0 and keyword is not None):
@@ -336,8 +316,6 @@ class FOIRawRequestNotificationUser(db.Model):
         if(keyword != 'restricted'):
             for field in filterfields:
                 _keyword = FOIRawRequestNotificationUser.getfilterkeyword(keyword, field)
-                #if(field == 'idNumber'):
-                    #keyword = keyword.replace('u-00', '')
                 if(field == 'notification'):
                     filtercondition.append(FOIRawRequestNotification.notification["message"].astext.cast(String).ilike('%'+_keyword+'%'))
                 elif(field == 'createdat'):
@@ -362,6 +340,8 @@ class FOIRawRequestNotificationUser(db.Model):
 
         return or_(*filtercondition)
     
+    
+    
     @classmethod
     def getfilterkeyword(cls, keyword, field):
         _newkeyword = keyword
@@ -385,27 +365,7 @@ class FOIRawRequestNotificationUser(db.Model):
             'description': FOIRawRequest.requestrawdata['description'].astext,
         }.get(x, cast(FOIRawRequest.requestid, String))
     
-    """
-    @classmethod
-    def geteventpagination(cls, groups, page, size, sortingitems, sortingorders, filterfields, keyword, additionalfilter, userid, isiaorestrictedfilemanager, isministryrestrictedfilemanager=False):
-        #ministry requests
-        iaoassignee = aliased(FOIAssignee)
-        ministryassignee = aliased(FOIAssignee)
-        foiuser = aliased(FOIUser)
-        foicreator = aliased(FOIUser)
-
-        subquery_ministry_queue = FOIRequestNotificationUser.geteventsubquery(groups, filterfields, keyword, additionalfilter, userid, iaoassignee, ministryassignee, foiuser, foicreator, 'IAO', isiaorestrictedfilemanager, isministryrestrictedfilemanager)
-
-        #sorting
-        sortingcondition = FOIRawRequestNotificationUser.getsorting(sortingitems, sortingorders)
-        #rawrequests
-        if "Intake Team" in groups or groups is None:                
-            subquery_rawrequest_queue = FOIRawRequestNotificationUser.getrequestssubquery(foiuser, foicreator, filterfields, keyword, additionalfilter, userid, isiaorestrictedfilemanager)
-            query_full_queue = subquery_rawrequest_queue.union(subquery_ministry_queue)
-            return query_full_queue.order_by(*sortingcondition).paginate(page=page, per_page=size)
-        else:
-            return subquery_ministry_queue.order_by(*sortingcondition).paginate(page=page, per_page=size)
-    """
+    
     @classmethod
     def getsorting(cls, sortingitems, sortingorders):
         sortingcondition = []
