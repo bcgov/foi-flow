@@ -221,7 +221,7 @@ class FOIRequestNotificationUser(db.Model):
                 for field in filterfields:
                     _keyword = FOIRequestNotificationUser.getfilterkeyword(keyword, field)       
                     if field == "notification":
-                        filtercondition.append(FOIRequestNotification.notification["message"].astext.cast(String).ilike('%'+_keyword+'%'))
+                        filtercondition.append(notificationquery.c.notification["message"].astext.cast(String).ilike('%'+_keyword+'%'))
                     elif field == "createdat":
                         vkeyword = keyword.split('@')
                         _keyword = FOIRequestNotificationUser.getfilterkeyword(vkeyword[0], field)
@@ -230,15 +230,15 @@ class FOIRequestNotificationUser(db.Model):
                         _vkeyword = vkeyword[1].split(' ')
                         for n  in range(len(_datevalue)):
                             if '%Y' in _vkeyword[n]:
-                                datecriteria.append(extract('year',FOIRequestNotificationUser.created_at) == _datevalue[n])
+                                datecriteria.append(extract('year',notificationquery.c.created_at) == _datevalue[n])
                             if '%b' in _vkeyword[n]:
-                                datecriteria.append(extract('month', FOIRequestNotificationUser.created_at) == _datevalue[n])
+                                datecriteria.append(extract('month', notificationquery.c.created_at) == _datevalue[n])
                             if '%d' in _vkeyword[n]:
-                                datecriteria.append(extract('day', FOIRequestNotificationUser.created_at) == _datevalue[n])
+                                datecriteria.append(extract('day', notificationquery.c.created_at) == _datevalue[n])
                         if len(datecriteria) > 0:
                             filtercondition.append(and_(*datecriteria)) 
                     else:
-                        filtercondition.append(FOIRequestNotificationUser.findfield(field, iaoassignee, ministryassignee, foiuser, foicreator).ilike('%'+_keyword+'%'))
+                        filtercondition.append(FOIRequestNotificationUser.findfield(field, iaoassignee, ministryassignee, foiuser, foicreator, notificationquery).ilike('%'+_keyword+'%'))
             else:
                 if(requestby == 'IAO'):
                     filtercondition.append(FOIRestrictedMinistryRequest.isrestricted == True)
@@ -263,8 +263,8 @@ class FOIRequestNotificationUser(db.Model):
             assignedtoformatted,
             ministryassignedtoformatted,
             notificationquery.c.idnumber.label('id'),
-            FOIRequest.foirawrequestid.label('rawrequestid'),
-            FOIRequest.foirequestid.label('requestid'),
+            literal(None).label('rawrequestid'),
+            FOIMinistryRequest.foirequest_id.label('requestid'),
             FOIMinistryRequest.foiministryrequestid.label('ministryrequestid'),
             notificationquery.c.idnumber.label('idnumber'),
             foiuser.firstname.label('userFirstName'),
@@ -282,9 +282,6 @@ class FOIRequestNotificationUser(db.Model):
                             ).join(
                                 subquery_ministry_maxversion,
                                 and_(*joincondition_ministry)
-                            ).join(
-                                FOIRequest,
-                                and_(FOIRequest.foirequestid == FOIMinistryRequest.foirequest_id, FOIRequest.version == FOIMinistryRequest.foirequestversion_id)
                             ).join(
                                 FOIRequestStatus,
                                 FOIRequestStatus.requeststatusid == FOIMinistryRequest.requeststatusid
@@ -384,11 +381,11 @@ class FOIRequestNotificationUser(db.Model):
         
         if additionalfilter == 'watchingRequests':
             axis_ids = FOIRequestNotificationUser.getaxisnumbersbywatcher(userid)    
-            query1 = query1.filter(or_(FOIRequestNotification.axisnumber.in_(axis_ids),FOIRequestNotificationUser.userid == userid))
-            query2 = query2.filter(or_(FOIRawRequestNotification.axisnumber.in_(axis_ids),FOIRawRequestNotificationUser.userid == userid))
+            query1 = query1.filter(or_(FOIRequestNotification.axisnumber.in_(axis_ids), and_(FOIRequestNotificationUser.userid == userid, FOIRequestNotification.notificationtypeid == 10)))
+            query2 = query2.filter(or_(FOIRawRequestNotification.axisnumber.in_(axis_ids), and_(FOIRequestNotificationUser.userid == userid, FOIRequestNotification.notificationtypeid == 10)))
         else:
-            query1 = query1.filter(or_(FOIRequestNotification.axisnumber.in_(axisquery), FOIRequestNotificationUser.userid == userid))
-            query2 = query2.filter(or_(FOIRawRequestNotification.axisnumber.in_(axisquery), FOIRawRequestNotificationUser.userid == userid))
+            query1 = query1.filter(or_(FOIRequestNotification.axisnumber.in_(axisquery), and_(FOIRawRequestNotificationUser.userid == userid, FOIRawRequestNotification.notificationtypeid == 10)))
+            query2 = query2.filter(or_(FOIRawRequestNotification.axisnumber.in_(axisquery), and_(FOIRawRequestNotificationUser.userid == userid, FOIRawRequestNotification.notificationtypeid == 10)))
         
         return query1.union(query2).subquery()          
 
@@ -500,12 +497,12 @@ class FOIRequestNotificationUser(db.Model):
                 return nullsfirst(FOIMinistryRequest.findfield(field, iaoassignee, ministryassignee, foiuser, foicreator).asc())
 
     @classmethod
-    def findfield(cls, x, iaoassignee, ministryassignee, foiuser, foicreator):
+    def findfield(cls, x, iaoassignee, ministryassignee, foiuser, foicreator, notificationquery):
         #add more fields here if need sort/filter/search more columns
 
         return {
-            'to': FOIRequestNotificationUser.userid,
-            'createdby' : FOIRequestNotificationUser.createdby,
+            'to': notificationquery.c.userid,
+            'createdby' : notificationquery.c.createdby,
             'axisRequestId' : FOIMinistryRequest.axisrequestid,
             'assignedTo': FOIMinistryRequest.assignedto,
             'assignedministryperson': FOIMinistryRequest.assignedministryperson,

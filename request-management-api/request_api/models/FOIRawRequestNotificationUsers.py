@@ -145,18 +145,9 @@ class FOIRawRequestNotificationUser(db.Model):
             subquery_maxversion.c.max_version == FOIRawRequest.version,
         ]
 
-        subquery_ministry_maxversion = _session.query( FOIMinistryRequest.foiministryrequestid, FOIMinistryRequest.axisrequestid, func.max(FOIMinistryRequest.version).label('max_version')).group_by(FOIMinistryRequest.foiministryrequestid, FOIMinistryRequest.axisrequestid).subquery()
-        joincondition_ministry = [
-            subquery_ministry_maxversion.c.foiministryrequestid == FOIMinistryRequest.foiministryrequestid,
-            subquery_ministry_maxversion.c.max_version == FOIMinistryRequest.version
-        ]
-
-        ministry_closed_query = _session.query(
-                                   FOIMinistryRequest.axisrequestid
-                                ).join(
-                                        subquery_ministry_maxversion, and_(*joincondition_ministry)
-                                ).filter(FOIMinistryRequest.requeststatusid == 3)
-        
+        #Begin : Closed request after open
+        ministry_closed_axisids = FOIMinistryRequest.getclosedaxisids()
+        #End : Closed request after open
         
         
         axisrequestid = case([
@@ -244,8 +235,8 @@ class FOIRawRequestNotificationUser(db.Model):
                                         FOIAssignee, FOIAssignee.username == FOIRawRequest.assignedto, isouter=True
                                 ).join(
                                         FOIRawRequestNotification,
-                                        and_(FOIRawRequestNotification.idnumber == 'U-00' + cast(FOIRawRequest.requestid, String), 
-                                             FOIRawRequestNotification.axisnumber.notin_(ministry_closed_query)),
+                                        and_(FOIRawRequestNotification.axisnumber == FOIRawRequest.axisrequestid, 
+                                             FOIRawRequestNotification.axisnumber.notin_(ministry_closed_axisids)),
                                 ).join(
                                         FOIRawRequestNotificationUser,
                                         and_(FOIRawRequestNotificationUser.notificationid == FOIRawRequestNotification.notificationid),
@@ -259,58 +250,37 @@ class FOIRawRequestNotificationUser(db.Model):
                                         foicreator, foicreator.preferred_username == FOIRawRequestNotificationUser.createdby, isouter=True  
                                 )
         
-        if additionalfilter is None:
-            if(isiaorestrictedfilemanager == True):
-                return basequery.filter(FOIRawRequest.status.notin_(['Archived']))
-            else:
-                subquery_watchby = FOIRawRequestWatcher.getrequestidsbyuserid(userid)
-
-                return basequery.join(
-                                    subquery_watchby,
-                                    subquery_watchby.c.requestid == FOIRawRequest.requestid,
-                                    isouter=True
-                                ).filter(
-                                    and_(
-                                        FOIRawRequest.status.notin_(['Archived']),
-                                        or_(
-                                            FOIRawRequest.isiaorestricted == False,
-                                            and_(FOIRawRequest.isiaorestricted == True, FOIRawRequest.assignedto == userid),
-                                            and_(FOIRawRequest.isiaorestricted == True, subquery_watchby.c.watchedby == userid))))
-        else:
+        if additionalfilter is not None:
             if(additionalfilter == 'watchingRequests' and userid is not None):
                 #watchby
                 subquery_watchby = FOIRawRequestWatcher.getrequestidsbyuserid(userid)
-                return basequery.join(subquery_watchby, subquery_watchby.c.requestid == FOIRawRequest.requestid).filter(FOIRawRequest.status.notin_(['Archived']))
+                return basequery.join(subquery_watchby, subquery_watchby.c.requestid == FOIRawRequest.requestid)
             elif(additionalfilter == 'myRequests'):
                 #myrequest
-                return basequery.filter(and_(FOIRawRequest.status.notin_(['Archived']), or_(FOIRawRequest.assignedto == userid, and_(FOIRawRequestNotificationUser.userid == userid, FOIRawRequestNotification.notificationtypeid == 10))))
+                return basequery.filter(or_(FOIRawRequest.assignedto == userid, and_(FOIRawRequestNotificationUser.userid == userid, FOIRawRequestNotification.notificationtypeid == 10)))
             else:
                 if(isiaorestrictedfilemanager == True):
-                    return basequery.filter(FOIRawRequest.status.notin_(['Archived'])).filter(FOIRawRequest.assignedgroup.in_(groups))
+                    return basequery.filter(FOIRawRequest.assignedgroup.in_(groups))
                 else:
                     return basequery.filter(
                         and_(
-                            FOIRawRequest.status.notin_(['Archived']),
                             or_(FOIRawRequest.isiaorestricted.is_(None), FOIRawRequest.isiaorestricted == False, and_(FOIRawRequest.isiaorestricted == True, FOIRawRequest.assignedto == userid)))).filter(FOIRawRequest.assignedgroup.in_(groups))
 
 
-    
-    
     @classmethod
     def getrequestssubquery(cls, groups, foiuser, foicreator, filterfields, keyword, additionalfilter, userid, isiaorestrictedfilemanager):
         basequery = FOIRawRequestNotificationUser.getbasequery(groups, foiuser, foicreator, additionalfilter, userid, isiaorestrictedfilemanager)
-        basequery = basequery.filter(FOIRawRequest.status != 'Unopened').filter(FOIRawRequest.status != 'Closed')
+        basequery = basequery.filter(FOIRawRequest.status.notin_(['Archived','Unopened','Closed']))
         #filter/search
         if(len(filterfields) > 0 and keyword is not None):
-            filtercondition = FOIRawRequestNotificationUser.getfilterforrequestssubquery(filterfields, keyword)
+            filtercondition = FOIRawRequestNotificationUser.getfilterforrequestssubquery(filterfields, keyword, foiuser, foicreator)
             return basequery.filter(filtercondition)
         else:
             return basequery
         
     @classmethod
-    def getfilterforrequestssubquery(cls, filterfields, keyword):
+    def getfilterforrequestssubquery(cls, filterfields, keyword, foiuser, foicreator):
         keyword = keyword.lower()
-
         #filter/search
         filtercondition = []
         if(keyword != 'restricted'):
@@ -334,7 +304,7 @@ class FOIRawRequestNotificationUser(db.Model):
                     if len(datecriteria) > 0:
                         filtercondition.append(and_(*datecriteria))   
                 else:
-                    filtercondition.append(FOIRawRequestNotificationUser.findfield(field).ilike('%'+_keyword+'%'))
+                    filtercondition.append(FOIRawRequestNotificationUser.findfield(field, foiuser, foicreator).ilike('%'+_keyword+'%'))
                 
             filtercondition.append(FOIRawRequest.isiaorestricted == True)
 
@@ -354,7 +324,7 @@ class FOIRawRequestNotificationUser(db.Model):
         return _newkeyword
         
     @classmethod
-    def findfield(cls, x):
+    def findfield(cls, x, foiuser, foicreator):
         return {
             'to': FOIRawRequestNotificationUser.userid,
             'createdby' : FOIRawRequestNotificationUser.createdby,
@@ -362,7 +332,10 @@ class FOIRawRequestNotificationUser(db.Model):
             'assignedTo': FOIRawRequest.assignedto,
             'assignedToFirstName': FOIAssignee.firstname,
             'assignedToLastName': FOIAssignee.lastname,
-            'description': FOIRawRequest.requestrawdata['description'].astext,
+            'userFirstName':foiuser.firstname,
+            'userLastName':foiuser.lastname,
+            'creatorFirstName':foicreator.firstname,
+            'creatorLastName':foicreator.lastname,
         }.get(x, cast(FOIRawRequest.requestid, String))
     
     
