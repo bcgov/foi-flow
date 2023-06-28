@@ -25,7 +25,7 @@ import { CustomFooter } from "./CustomFooter"
 const EventQueue = ({ userDetail, eventQueueTableInfo }) => {
   const dispatch = useDispatch();
 
-  const userGroups = userDetail && userDetail?.groups?.map(group => group.slice(1));
+  const userGroups = userDetail?.groups?.map(group => group.slice(1));
   const isMinistry = isMinistryLogin(userGroups);
   const eventQueue = useSelector((state) => state.foiRequests.foiEventsList);
   const isLoading = useSelector((state) => state.foiRequests.isLoading);
