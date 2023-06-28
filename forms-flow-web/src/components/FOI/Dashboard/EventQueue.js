@@ -46,6 +46,23 @@ const EventQueue = ({ userDetail, eventQueueTableInfo }) => {
     "assignedToLastName",    
     "assignedToFormatted",
 
+    "to",
+    "userFirstName",
+    "userLastName",
+    "userFormatted",
+    
+    "notification"
+  ];
+
+  const ministryFilterFields = [
+    "createdat",
+    "axisRequestId",
+
+    "createdby",   
+    "creatorFirstName",
+    "creatorLastName",
+    "creatorFormatted",
+
     "assignedministryperson",
     "assignedministrygroup",
     "assignedministrypersonFirstName",
@@ -80,7 +97,7 @@ const EventQueue = ({ userDetail, eventQueueTableInfo }) => {
           rowsState.page + 1,
           rowsState.pageSize,
           serverSortModel,
-          filterFields,
+          ministryFilterFields,
           keyword,
           eventFilter,
           userDetail.preferred_username
