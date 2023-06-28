@@ -157,10 +157,8 @@ class FOIRequestNotificationUser(db.Model):
         #for queue/dashboard
         _session = db.session
 
-        
-        
         #subquery for getting latest version & proper group/team for FOIMinistryRequest
-        subquery_ministry_maxversion = _session.query(FOIMinistryRequest.foiministryrequestid, func.max(FOIMinistryRequest.version).label('max_version')).group_by(FOIMinistryRequest.foiministryrequestid).subquery()
+        subquery_ministry_maxversion = _session.query(FOIMinistryRequest.axisrequestid, FOIMinistryRequest.foiministryrequestid, func.max(FOIMinistryRequest.version).label('max_version')).group_by(FOIMinistryRequest.foiministryrequestid,FOIMinistryRequest.axisrequestid).subquery()
         joincondition_ministry = [
             subquery_ministry_maxversion.c.foiministryrequestid == FOIMinistryRequest.foiministryrequestid,
             subquery_ministry_maxversion.c.max_version == FOIMinistryRequest.version,
@@ -168,8 +166,11 @@ class FOIRequestNotificationUser(db.Model):
 
         #aliase for getting ministry restricted flag from FOIRestrictedMinistryRequest
         ministry_restricted_requests = aliased(FOIRestrictedMinistryRequest)
-        #requestnotytype = aliased(NotificationType)
-        #rawrequestnotytype = aliased(NotificationType)
+        
+         #ministry filter for group/team
+        ministryfilter = FOIRequestNotificationUser.getgroupfilters(groups)
+
+        notificationquery = FOIRequestNotificationUser.getnotificationquery(subquery_ministry_maxversion, joincondition_ministry, ministryfilter, additionalfilter, requestby, userid)
 
         assignedtoformatted = case([
                             (and_(iaoassignee.lastname.isnot(None), iaoassignee.firstname.isnot(None)),
@@ -199,7 +200,7 @@ class FOIRequestNotificationUser(db.Model):
                             (and_(foiuser.lastname.is_(None), foiuser.firstname.isnot(None)),
                              foiuser.firstname),
                            ],
-                           else_ = FOIRequestNotificationUser.userid).label('userformatted')
+                           else_ = notificationquery.c.userid).label('userformatted')
 
 
         creatorformatted = case([
@@ -210,26 +211,7 @@ class FOIRequestNotificationUser(db.Model):
                             (and_(foicreator.lastname.is_(None), foicreator.firstname.isnot(None)),
                              foicreator.firstname),
                            ],
-                           else_ = FOIRequestNotificationUser.createdby).label('creatorformatted')
-        
-        subquery_tag_notification = _session.query(
-                                        FOIRequestNotification.axisnumber,
-                                        FOIRequestNotification.notificationid, 
-                                        FOIRequestNotification.notification, 
-                                        FOIRequestNotificationUser.created_at,
-                                        FOIRequestNotificationUser.createdby,
-                                        FOIRequestNotificationUser.userid
-                                        ).join(
-                                        FOIRequestNotificationUser,
-                                        and_(FOIRequestNotificationUser.notificationid == FOIRequestNotification.notificationid, 
-                                             FOIRequestNotificationUser.userid == userid),
-                                        ).join(
-                                        NotificationType,
-                                        and_(FOIRequestNotification.notificationtypeid == NotificationType.notificationtypeid, NotificationType.name == 'Tagged User Comments'),
-                                        ).subquery()
-        
-        #ministry filter for group/team
-        ministryfilter = FOIRequestNotificationUser.getgroupfilters(groups, additionalfilter, subquery_tag_notification, userid)
+                           else_ =  notificationquery.c.createdby).label('creatorformatted')
         
         
         #filter/search
@@ -266,10 +248,10 @@ class FOIRequestNotificationUser(db.Model):
         selectedcolumns = [
             FOIMinistryRequest.axisrequestid.label('axisRequestId'),
             FOIRequestStatus.name.label('status'),
-            coalesce(FOIRequestNotification.notification["message"].astext.cast(String),FOIRawRequestNotification.notification["message"].astext.cast(String)).label('notification'),     
-            coalesce(FOIRequestNotificationUser.userid,FOIRawRequestNotificationUser.userid).label('to'),
-            coalesce(FOIRequestNotificationUser.createdby,FOIRawRequestNotificationUser.createdby).label('createdby'),
-            coalesce(FOIRequestNotificationUser.created_at,FOIRawRequestNotificationUser.created_at).label('createdat'),
+            notificationquery.c.notification["message"].astext.cast(String).label('notification'),     
+            notificationquery.c.userid.label('to'),
+            notificationquery.c.createdby.label('createdby'),
+            notificationquery.c.created_at.label('createdat'),
             FOIMinistryRequest.assignedgroup.label('assignedGroup'),
             FOIMinistryRequest.assignedto.label('assignedTo'),
             FOIMinistryRequest.assignedministrygroup.label('assignedministrygroup'),
@@ -280,23 +262,21 @@ class FOIRequestNotificationUser(db.Model):
             ministryassignee.lastname.label('assignedministrypersonLastName'),
             assignedtoformatted,
             ministryassignedtoformatted,
-            coalesce(FOIRequestNotificationUser.notificationuserid,FOIRawRequestNotificationUser.notificationuserid).label('id'),
+            notificationquery.c.idnumber.label('id'),
             FOIRequest.foirawrequestid.label('rawrequestid'),
             FOIRequest.foirequestid.label('requestid'),
             FOIMinistryRequest.foiministryrequestid.label('ministryrequestid'),
-            coalesce(FOIRequestNotification.idnumber,FOIRawRequestNotification.idnumber).label('idnumber'),
+            notificationquery.c.idnumber.label('idnumber'),
             foiuser.firstname.label('userFirstName'),
             foiuser.lastname.label('userLastName'),
             foicreator.firstname.label('creatorFirstName'),
             foicreator.lastname.label('creatorLastName'),
-            #coalesce(requestnotytype.name,rawrequestnotytype.name).label('notificationtype'),
             NotificationType.name.label('notificationtype'),
             userformatted.label('userFormatted'),
             creatorformatted.label('creatorFormatted'),
             FOIMinistryRequest.description,
         ]
 
-        
         basequery = _session.query(
                                 *selectedcolumns
                             ).join(
@@ -331,36 +311,17 @@ class FOIRequestNotificationUser(db.Model):
                                     ministry_restricted_requests.isactive == True),
                                 isouter=True
                             ).join(
-                                FOIRequestNotification,
-                                and_(FOIRequestNotification.axisnumber == FOIMinistryRequest.axisrequestid),
-                                isouter=True
-                            ).join(
-                                FOIRequestNotificationUser,
-                                and_(FOIRequestNotificationUser.notificationid == FOIRequestNotification.notificationid),
-                                isouter=True
-                            ).join(
-                                FOIRawRequestNotification,
-                                and_(FOIRawRequestNotification.axisnumber == FOIMinistryRequest.axisrequestid),
-                                isouter=True
-                            ).join(
-                                FOIRawRequestNotificationUser,
-                                and_(FOIRawRequestNotificationUser.notificationid == FOIRawRequestNotification.notificationid),
-                                isouter=True
+                                notificationquery,
+                                and_(notificationquery.c.axisnumber == FOIMinistryRequest.axisrequestid),
                             ).join(
                                 NotificationType,
-                                NotificationType.notificationtypeid == coalesce(FOIRequestNotification.notificationtypeid,FOIRawRequestNotification.notificationtypeid) 
+                                NotificationType.notificationtypeid == notificationquery.c.notificationtypeid 
                             ).join(
-                                foiuser, foiuser.preferred_username == coalesce(FOIRequestNotificationUser.userid,FOIRawRequestNotificationUser.userid), isouter=True  
+                                foiuser, foiuser.preferred_username == notificationquery.c.userid, isouter=True  
                             ).join(
-                                foicreator, foicreator.preferred_username == coalesce(FOIRequestNotificationUser.createdby,FOIRawRequestNotificationUser.createdby), isouter=True  
-                            ).join(
-                                subquery_tag_notification, 
-                                and_(subquery_tag_notification.c.userid == coalesce(FOIRequestNotificationUser.userid,FOIRawRequestNotificationUser.userid), subquery_tag_notification.c.axisnumber == FOIMinistryRequest.axisrequestid), 
-                                isouter=True  
-                            ).filter(FOIMinistryRequest.requeststatusid != 3
-                            ).filter(or_(FOIRequestNotification.notification.isnot(None),FOIRawRequestNotification.notification.isnot(None)))
-
-
+                                foicreator, foicreator.preferred_username == notificationquery.c.createdby, isouter=True  
+                            ).filter(FOIMinistryRequest.requeststatusid != 3)
+                            
         if(additionalfilter == 'watchingRequests'):
             #watchby
             activefilter = and_(FOIMinistryRequest.isactive == True, FOIRequestStatus.isactive == True)
@@ -370,25 +331,69 @@ class FOIRequestNotificationUser(db.Model):
         elif(additionalfilter == 'myRequests'):
             #myrequest
             if(requestby == 'IAO'):
-                dbquery = basequery.filter(or_(FOIMinistryRequest.assignedto == userid, subquery_tag_notification.c.userid == userid)).filter(ministryfilter)
+                dbquery = basequery.filter(or_(FOIMinistryRequest.assignedto == userid)).filter(ministryfilter)
             else:
-                dbquery = basequery.filter(or_(FOIMinistryRequest.assignedministryperson == userid, subquery_tag_notification.c.userid == userid)).filter(ministryfilter)
+                dbquery = basequery.filter(or_(FOIMinistryRequest.assignedministryperson == userid)).filter(ministryfilter)
         else:
             if(isiaorestrictedfilemanager == True or isministryrestrictedfilemanager == True):
-                dbquery = basequery.filter(ministryfilter)
+                dbquery = basequery
             else:
                 if(requestby == 'IAO'):
                     dbquery = basequery.filter(or_(or_(FOIRestrictedMinistryRequest.isrestricted == False, FOIRestrictedMinistryRequest.isrestricted == None), and_(FOIRestrictedMinistryRequest.isrestricted == True, FOIMinistryRequest.assignedto == userid))).filter(ministryfilter)
                 else:
                     dbquery = basequery.filter(or_(or_(ministry_restricted_requests.isrestricted == False, ministry_restricted_requests.isrestricted == None), and_(ministry_restricted_requests.isrestricted == True, FOIMinistryRequest.assignedministryperson == userid))).filter(ministryfilter)
-
+                
         if(keyword is None):
             return dbquery
         else:
             return dbquery.filter(or_(*filtercondition))
-        
+
     @classmethod
-    def getgroupfilters(cls, groups, additionalfilter, subquery_tag_notification, userid):
+    def getnotificationquery(cls, subquery_ministry_maxversion, joincondition_ministry, ministryfilter, additionalfilter, requestby, userid):      
+        axisquery = db.session.query(
+                        FOIMinistryRequest.axisrequestid             
+                        ).join(
+                         subquery_ministry_maxversion, and_(*joincondition_ministry)
+                        ).filter(FOIMinistryRequest.requeststatusid != 3
+                        ).filter(ministryfilter)
+        
+        query1 = db.session.query(
+                                   FOIRequestNotification.idnumber.label('idnumber'),
+                                   FOIRequestNotification.axisnumber.label('axisnumber'), 
+                                   FOIRequestNotification.notification.label('notification'),
+                                   FOIRequestNotificationUser.userid.label('userid'),
+                                   FOIRequestNotificationUser.createdby.label('createdby'),
+                                   FOIRequestNotificationUser.created_at.label('created_at'),
+                                   FOIRequestNotification.notificationtypeid.label('notificationtypeid')
+                                 ).join(
+                                    FOIRequestNotificationUser,
+                                    and_(FOIRequestNotification.notificationid == FOIRequestNotificationUser.notificationid), 
+                                )
+        query2 = db.session.query(
+                                   FOIRawRequestNotification.idnumber.label('idnumber'),
+                                   FOIRawRequestNotification.axisnumber.label('axisnumber'),
+                                   FOIRawRequestNotification.notification.label('notification'),
+                                   FOIRawRequestNotificationUser.userid.label('userid'),
+                                   FOIRawRequestNotificationUser.createdby.label('createdby'),
+                                   FOIRawRequestNotificationUser.created_at.label('created_at'),
+                                   FOIRawRequestNotification.notificationtypeid.label('notificationtypeid')
+                                 ).join(
+                                    FOIRawRequestNotificationUser,
+                                    and_(FOIRawRequestNotificationUser.notificationid == FOIRawRequestNotification.notificationid), 
+                                )
+        
+        if additionalfilter == 'watchingRequests':
+            axis_ids = FOIRequestNotificationUser.getaxisnumbersbywatcher(userid)    
+            query1 = query1.filter(or_(FOIRequestNotification.axisnumber.in_(axis_ids),FOIRequestNotificationUser.userid == userid))
+            query2 = query2.filter(or_(FOIRawRequestNotification.axisnumber.in_(axis_ids),FOIRawRequestNotificationUser.userid == userid))
+        else:
+            query1 = query1.filter(or_(FOIRequestNotification.axisnumber.in_(axisquery), FOIRequestNotificationUser.userid == userid))
+            query2 = query2.filter(or_(FOIRawRequestNotification.axisnumber.in_(axisquery), FOIRawRequestNotificationUser.userid == userid))
+        
+        return query1.union(query2).subquery()          
+
+    @classmethod
+    def getgroupfilters(cls, groups):
         #ministry filter for group/team
         if groups is None:
             ministryfilter = FOIMinistryRequest.isactive == True
@@ -422,13 +427,7 @@ class FOIRequestNotificationUser(db.Model):
                         )
                     )
 
-            if additionalfilter == "myRequests":
-                ministryfilter = and_(
-                                    FOIMinistryRequest.isactive == True, FOIRequestStatus.isactive == True,
-                                    or_(*groupfilter, subquery_tag_notification.c.userid == userid)
-                                )
-            else:            
-                ministryfilter = and_(
+            ministryfilter = and_(
                                     FOIMinistryRequest.isactive == True, FOIRequestStatus.isactive == True,
                                     or_(*groupfilter)
                                 )
@@ -446,6 +445,26 @@ class FOIRequestNotificationUser(db.Model):
             _newkeyword = _newkeyword.replace('u-00', '')
         return _newkeyword
 
+    @classmethod
+    def getaxisnumbersbywatcher(cls, userid):
+        watchers = []                
+        try:
+            sql = """ select fr.axisrequestid  from "FOIRequestWatchers" fw, 
+                    ( select foiministryrequestid, axisrequestid, max(version) max_version from "FOIMinistryRequests" fr group by foiministryrequestid, axisrequestid
+                    ) fr  where fw.watchedby = :userid and fw.ministryrequestid=fr.foiministryrequestid 
+                    union
+                    select fr.axisrequestid  from "FOIRawRequestWatchers" fw, ( 
+                    select requestid, axisrequestid, max(version) max_version from "FOIRawRequests" fr group by requestid, axisrequestid
+                    ) fr where fw.watchedby = :userid and fw.requestid=fr.requestid ;"""
+            rs = db.session.execute(text(sql), {'userid': userid})        
+            for row in rs:
+                watchers.append(row["axisrequestid"])
+        except Exception as ex:
+            logging.error(ex)
+            raise ex
+        finally:
+            db.session.close()
+        return watchers 
     
     @classmethod
     def getsorting(cls, sortingitems, sortingorders, iaoassignee, ministryassignee, foiuser, foicreator):
