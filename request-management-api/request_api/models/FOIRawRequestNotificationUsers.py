@@ -146,7 +146,20 @@ class FOIRawRequestNotificationUser(db.Model):
         ]
 
         #Begin : Closed request after open
-        ministry_closed_axisids = FOIMinistryRequest.getclosedaxisids()
+        subquery_ministry_maxversion = _session.query( FOIMinistryRequest.foiministryrequestid, FOIMinistryRequest.axisrequestid, func.max(FOIMinistryRequest.version).label('max_version')).group_by(FOIMinistryRequest.foiministryrequestid, FOIMinistryRequest.axisrequestid).subquery()
+        joincondition_ministry = [
+            subquery_ministry_maxversion.c.foiministryrequestid == FOIMinistryRequest.foiministryrequestid,
+            subquery_ministry_maxversion.c.max_version == FOIMinistryRequest.version
+        ]
+        ministry_closed_query = _session.query(
+                                   FOIMinistryRequest.axisrequestid
+                                ).join(
+                                        subquery_ministry_maxversion, and_(*joincondition_ministry)
+                                ).filter(FOIMinistryRequest.requeststatusid == 3)
+        
+        #ministry_closed_axisids = FOIMinistryRequest.getclosedaxisids()
+        
+
         #End : Closed request after open
         
         
@@ -236,7 +249,7 @@ class FOIRawRequestNotificationUser(db.Model):
                                 ).join(
                                         FOIRawRequestNotification,
                                         and_(FOIRawRequestNotification.axisnumber == FOIRawRequest.axisrequestid, 
-                                             FOIRawRequestNotification.axisnumber.notin_(ministry_closed_axisids)),
+                                             FOIRawRequestNotification.axisnumber.notin_(ministry_closed_query)),
                                 ).join(
                                         FOIRawRequestNotificationUser,
                                         and_(FOIRawRequestNotificationUser.notificationid == FOIRawRequestNotification.notificationid),
