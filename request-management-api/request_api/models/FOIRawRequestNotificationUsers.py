@@ -136,7 +136,7 @@ class FOIRawRequestNotificationUser(db.Model):
         _session = db.session
 
         
-        selectedcolumns = [
+        selectedcolumns = [            
             FOIRawRequests.axisrequestid.label('axisRequestId'),  
             FOIRawRequests.rawrequestid.label('rawrequestid'),
             FOIRawRequests.foirequest_id.label('requestid'),
@@ -152,7 +152,7 @@ class FOIRawRequestNotificationUser(db.Model):
             FOINotifications.userformatted.label('userFormatted'),
             FOINotifications.creatorformatted.label('creatorFormatted'),
             FOINotifications.userid.label('userid'),
-            FOINotifications.createdby.label('createdby')
+            FOINotifications.createdby.label('createdby')            
         ]
 
         basequery = _session.query(
@@ -169,7 +169,7 @@ class FOIRawRequestNotificationUser(db.Model):
                 return basequery.join(subquery_watchby, subquery_watchby.c.requestid == cast(FOIRawRequests.rawrequestid, Integer))
             elif(additionalfilter == 'myRequests'):
                 #myrequest
-                return basequery.filter(or_(FOIRawRequests.assignedto == userid, and_(FOIRawRequestNotificationUser.userid == userid, FOIRawRequestNotification.notificationtypeid == 10)))
+                return basequery.filter(or_(FOIRawRequests.assignedto == userid, and_(FOINotifications.userid == userid, FOINotifications.notificationtypeid == 10)))
             else:
                 if(isiaorestrictedfilemanager == True):
                     return basequery.filter(FOIRawRequests.assignedgroup.in_(groups))
