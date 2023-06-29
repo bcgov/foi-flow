@@ -146,20 +146,22 @@ const MinistryDashboard = ({ userDetail }) => {
             </ButtonBase>
           </Grid>
         </Grid>
+        { (!showAdvancedSearch && !showEventQueue) &&
         <Grid
           container
           direction="row"
           spacing={1}
-          className={clsx({
-            [classes.hidden]: showAdvancedSearch || showEventQueue,
-          })}
+          // className={clsx({
+          //   [classes.hidden]: showAdvancedSearch || showEventQueue,
+          // })}
           sx={{
             marginTop: "2em",
           }}
         >
           <Queue userDetail={userDetail} tableInfo={tableInfo}/>
         </Grid>
-
+        }
+        { showEventQueue &&
         <Grid
           container
           direction="row"
@@ -173,7 +175,8 @@ const MinistryDashboard = ({ userDetail }) => {
         >
           <EventQueue userDetail={userDetail} eventQueueTableInfo={eventQueueTableInfo} />
         </Grid>
-
+        }
+        { showAdvancedSearch &&
         <Grid
           container
           direction="row"
@@ -187,6 +190,7 @@ const MinistryDashboard = ({ userDetail }) => {
         >
           <AdvancedSearch userDetail={userDetail} />
         </Grid>
+        }
       </Grid>
     </div>
   );

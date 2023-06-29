@@ -25,7 +25,7 @@ import { CustomFooter } from "./CustomFooter"
 const EventQueue = ({ userDetail, eventQueueTableInfo }) => {
   const dispatch = useDispatch();
 
-  const userGroups = userDetail && userDetail?.groups?.map(group => group.slice(1));
+  const userGroups = userDetail?.groups?.map(group => group.slice(1));
   const isMinistry = isMinistryLogin(userGroups);
   const eventQueue = useSelector((state) => state.foiRequests.foiEventsList);
   const isLoading = useSelector((state) => state.foiRequests.isLoading);
@@ -34,29 +34,18 @@ const EventQueue = ({ userDetail, eventQueueTableInfo }) => {
   const filterFields = [
     "createdat",
     "axisRequestId",
-
-    "createdby",   
-    "creatorFirstName",
-    "creatorLastName",
     "creatorFormatted",
-
-    "assignedTo",
-    "assignedGroup",
-    "assignedToFirstName",
-    "assignedToLastName",    
     "assignedToFormatted",
+    "userFormatted",    
+    "notification"
+  ];
 
-    "assignedministryperson",
-    "assignedministrygroup",
-    "assignedministrypersonFirstName",
-    "assignedministrypersonLastName",    
+  const ministryFilterFields = [
+    "createdat",
+    "axisRequestId",
+    "creatorFormatted",
     "ministryAssignedToFormatted",
-
-    "to",
-    "userFirstName",
-    "userLastName",
-    "userFormatted",
-    
+    "userFormatted",    
     "notification"
   ];
 
@@ -80,7 +69,7 @@ const EventQueue = ({ userDetail, eventQueueTableInfo }) => {
           rowsState.page + 1,
           rowsState.pageSize,
           serverSortModel,
-          filterFields,
+          ministryFilterFields,
           keyword,
           eventFilter,
           userDetail.preferred_username

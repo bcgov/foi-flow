@@ -101,41 +101,7 @@ export const updateEventSortModel = (sortModel, isMinistry) => {
   if (smodel) {
     let field = smodel[0]?.field;
     let order = smodel[0]?.sort;
-    console.log(`field = ${field}`)
-    // if (field == "createdby") {
-    //   smodel.shift();
-    //   smodel.unshift(
-    //     { field: "creatorLastName", sort: order },
-    //     { field: "creatorFirstName", sort: order }
-    //   );
-    // }
-
-    // if (field == "to") {
-    //   smodel.shift();
-    //   smodel.unshift(
-    //     { field: "userLastName", sort: order },
-    //     { field: "userFirstName", sort: order }
-    //   );
-    // }
-
-    // if (field == "assignedTo" && !isMinistry) {
-    //   smodel.shift();
-    //   smodel.unshift(
-    //     { field: "assignedToLastName", sort: order },
-    //     { field: "assignedToFirstName", sort: order },
-    //     { field: "assignedGroup", sort: order }
-    //   );
-    // }
-
-    // if (field == "assignedTo" && isMinistry) {
-    //   smodel.shift();
-    //   smodel.unshift(
-    //     { field: "assignedministrypersonLastName", sort: order },
-    //     { field: "assignedministrypersonFirstName", sort: order },
-    //     { field: "assignedministrygroup", sort: order } 
-    //   );
-    // }
-
+    
     //add createdat to default sorting
     if (smodel.length == 1 && field == "defaultSorting") {
       smodel.push(
