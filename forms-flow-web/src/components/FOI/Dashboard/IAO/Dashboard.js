@@ -107,7 +107,7 @@ const Dashboard = ({ userDetail }) => {
               onClick={() => {
                 dispatch(setShowEventQueue(true));
                 dispatch(setShowAdvancedSearch(false));
-                //dispatch(setResumeDefaultSorting(true));
+                dispatch(setResumeDefaultSorting(true));
               }}
               disableRipple
             >
@@ -157,20 +157,22 @@ const Dashboard = ({ userDetail }) => {
             </button>
           </Grid>
         </Grid>
+        { (!showAdvancedSearch && !showEventQueue) &&
         <Grid
           container
           direction="row"
           spacing={1}
-          className={clsx({
-            [classes.hidden]: showAdvancedSearch || showEventQueue,
-          })}
+          // className={clsx({
+          //   [classes.hidden]: showAdvancedSearch || showEventQueue,
+          // })}
           sx={{
             marginTop: "2em",
           }}
         >
           <Queue userDetail={userDetail} tableInfo={tableInfo} />
         </Grid>
-
+        }
+        { showEventQueue &&
         <Grid
           container
           direction="row"
@@ -178,13 +180,14 @@ const Dashboard = ({ userDetail }) => {
           sx={{
             marginTop: "2em",
           }}
-          className={clsx({
-            [classes.hidden]: !showEventQueue,
-          })}
+          // className={clsx({
+          //   [classes.hidden]: !showEventQueue,
+          // })}
         >
           <EventQueue userDetail={userDetail} eventQueueTableInfo={eventQueueTableInfo} />
         </Grid>
-
+        }
+        { showAdvancedSearch &&
         <Grid
           container
           direction="row"
@@ -192,12 +195,13 @@ const Dashboard = ({ userDetail }) => {
           sx={{
             marginTop: "2em",
           }}
-          className={clsx({
-            [classes.hidden]: !showAdvancedSearch,
-          })}
+          // className={clsx({
+          //   [classes.hidden]: !showAdvancedSearch,
+          // })}
         >
           <AdvancedSearch userDetail={userDetail} />
         </Grid>
+        }
       </Grid>
     </div>
   );
