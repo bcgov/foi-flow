@@ -158,20 +158,16 @@ class FOIRequestNotificationUser(db.Model):
         #aliase for getting ministry restricted flag from FOIRestrictedMinistryRequest
         ministry_restricted_requests = aliased(FOIRestrictedMinistryRequest)
         
-         #ministry filter for group/team
+        #ministry filter for group/team
         ministryfilter = FOIRequestNotificationUser.getgroupfilters(groups)
 
-        
-        
         #filter/search
         if(len(filterfields) > 0 and keyword is not None):
             filtercondition = []
             if(keyword != "restricted"):
                 for field in filterfields:
                     _keyword = FOIRequestNotificationUser.getfilterkeyword(keyword, field)       
-                    if field == "notification":
-                        filtercondition.append(FOINotifications.notification["message"].astext.cast(String).ilike('%'+_keyword+'%'))
-                    elif field == "createdat":
+                    if field == "createdat":
                         vkeyword = keyword.split('@')
                         _keyword = FOIRequestNotificationUser.getfilterkeyword(vkeyword[0], field)
                         _datevalue = _keyword.split('-')
@@ -187,7 +183,7 @@ class FOIRequestNotificationUser(db.Model):
                         if len(datecriteria) > 0:
                             filtercondition.append(and_(*datecriteria)) 
                     else:
-                        filtercondition.append(FOIRequestNotificationUser.findfield(field, iaoassignee, ministryassignee, foiuser, foicreator, notificationquery).ilike('%'+_keyword+'%'))
+                        filtercondition.append(FOIRequestNotificationUser.findfield(field).ilike('%'+_keyword+'%'))
             else:
                 if(requestby == 'IAO'):
                     filtercondition.append(FOIRestrictedMinistryRequest.isrestricted == True)
@@ -196,26 +192,21 @@ class FOIRequestNotificationUser(db.Model):
 
         selectedcolumns = [
             FOIRequests.axisrequestid.label('axisRequestId'),
-            FOIRequests.status.label('status'),
-            FOINotifications.notification.label('notification'),     
-            FOINotifications.userid.label('to'),
-            FOINotifications.createdby.label('createdby'),
-            FOINotifications.created_at.label('createdat'),
-            FOIRequests.assignedgroup.label('assignedGroup'),
-            FOIRequests.assignedto.label('assignedTo'),
-            FOIRequests.assignedministrygroup.label('assignedministrygroup'),
-            FOIRequests.assignedministryperson.label('assignedministryperson'),
-            FOIRequests.assignedtoformatted.label('assignedToFormatted'),
-            FOIRequests.ministryassignedtoformatted.label('ministryAssignedToFormatted'),
-            FOINotifications.idnumber.label('id'),
             FOIRequests.rawrequestid.label('rawrequestid'),
             FOIRequests.foirequest_id.label('requestid'),
             FOIRequests.foiministryrequestid.label('ministryrequestid'),
+            FOIRequests.status.label('status'),
+            FOIRequests.assignedtoformatted.label('assignedToFormatted'),
+            FOIRequests.ministryassignedtoformatted.label('ministryAssignedToFormatted'),          
+            FOIRequests.description,
             FOINotifications.idnumber.label('idnumber'),
             FOINotifications.notificationtype.label('notificationtype'),
+            FOINotifications.notification.label('notification'),                 
+            FOINotifications.created_at.label('createdat'),    
             FOINotifications.userformatted.label('userFormatted'),
             FOINotifications.creatorformatted.label('creatorFormatted'),
-            FOIRequests.description,
+            FOINotifications.userid.label('userid'),
+            FOINotifications.createdby.label('createdby')
         ]
 
         basequery = _session.query(
@@ -256,9 +247,9 @@ class FOIRequestNotificationUser(db.Model):
                 dbquery = basequery
             else:
                 if(requestby == 'IAO'):
-                    dbquery = basequery.filter(or_(or_(FOIRestrictedMinistryRequest.isrestricted == False, FOIRestrictedMinistryRequest.isrestricted == None), and_(FOIRestrictedMinistryRequest.isrestricted == True, FOIMinistryRequest.assignedto == userid))).filter(ministryfilter)
+                    dbquery = basequery.filter(or_(or_(FOIRestrictedMinistryRequest.isrestricted == False, FOIRestrictedMinistryRequest.isrestricted == None), and_(FOIRestrictedMinistryRequest.isrestricted == True, FOIRequests.assignedto == userid))).filter(ministryfilter)
                 else:
-                    dbquery = basequery.filter(or_(or_(ministry_restricted_requests.isrestricted == False, ministry_restricted_requests.isrestricted == None), and_(ministry_restricted_requests.isrestricted == True, FOIMinistryRequest.assignedministryperson == userid))).filter(ministryfilter)
+                    dbquery = basequery.filter(or_(or_(ministry_restricted_requests.isrestricted == False, ministry_restricted_requests.isrestricted == None), and_(ministry_restricted_requests.isrestricted == True, FOIRequests.assignedministryperson == userid))).filter(ministryfilter)
                 
         if(keyword is None):
             return dbquery
@@ -320,34 +311,13 @@ class FOIRequestNotificationUser(db.Model):
         return _newkeyword
 
     @classmethod
-    def getaxisnumbersbywatcher(cls, userid):
-        watchers = []                
-        try:
-            sql = """ select fr.axisrequestid  from "FOIRequestWatchers" fw, 
-                    ( select foiministryrequestid, axisrequestid, max(version) max_version from "FOIMinistryRequests" fr group by foiministryrequestid, axisrequestid
-                    ) fr  where fw.watchedby = :userid and fw.ministryrequestid=fr.foiministryrequestid 
-                    union
-                    select fr.axisrequestid  from "FOIRawRequestWatchers" fw, ( 
-                    select requestid, axisrequestid, max(version) max_version from "FOIRawRequests" fr group by requestid, axisrequestid
-                    ) fr where fw.watchedby = :userid and fw.requestid=fr.requestid ;"""
-            rs = db.session.execute(text(sql), {'userid': userid})        
-            for row in rs:
-                watchers.append(row["axisrequestid"])
-        except Exception as ex:
-            logging.error(ex)
-            raise ex
-        finally:
-            db.session.close()
-        return watchers 
-    
-    @classmethod
     def getsorting(cls, sortingitems, sortingorders, iaoassignee, ministryassignee, foiuser, foicreator):
         #sorting
         sortingcondition = []
         if(len(sortingitems) > 0 and len(sortingorders) > 0 and len(sortingitems) == len(sortingorders)):
             for field in sortingitems:
                 order = sortingorders.pop(0)
-                sortingcondition.append(FOIRequestNotificationUser.getfieldforsorting(field, order, iaoassignee, ministryassignee, foiuser, foicreator))
+                sortingcondition.append(FOIRequestNotificationUser.getfieldforsorting(field, order))
 
         #default sorting
         if(len(sortingcondition) == 0):
@@ -359,39 +329,24 @@ class FOIRequestNotificationUser(db.Model):
         return sortingcondition
     
     @classmethod
-    def getfieldforsorting(cls, field, order, iaoassignee, ministryassignee, foiuser, foicreator):
-        #get one field
-        customizedfields = ['assignedToFormatted', 'ministryAssignedToFormatted', 'userFormatted','creatorFormatted', 'createdat', 'createdby', 'idNumber', 'notification']
-        if(field in customizedfields):
-            if(order == 'desc'):
-                return nullslast(desc(field))
-            else:
-                return nullsfirst(asc(field))
-        #else:
-            #if(order == 'desc'):
-                #return nullslast(FOIMinistryRequest.findfield(field, iaoassignee, ministryassignee, foiuser, foicreator).desc())
-            #else:
-                #return nullsfirst(FOIMinistryRequest.findfield(field, iaoassignee, ministryassignee, foiuser, foicreator).asc())
+    def getfieldforsorting(cls, field, order):
+        if(order == 'desc'):
+            return nullslast(FOIRequestNotificationUser.findfield(field).desc())
+        else:
+            return nullsfirst(FOIRequestNotificationUser.findfield(field).asc())
 
     @classmethod
-    def findfield(cls, x, iaoassignee, ministryassignee, foiuser, foicreator):
+    def findfield(cls, x):
         #add more fields here if need sort/filter/search more columns
 
         return {
-            'to': FOINotifications.userid,
-            'createdby' : FOINotifications.createdby,
             'axisRequestId' : FOIRequests.axisrequestid,
-            'assignedTo': FOIRequests.assignedto,
-            'assignedministryperson': FOIRequests.assignedministryperson,
-            'assignedToFirstName': iaoassignee.firstname,
-            'assignedToLastName': iaoassignee.lastname,
-            'assignedministrypersonFirstName': ministryassignee.firstname,
-            'assignedministrypersonLastName': ministryassignee.lastname,
-            'userFirstName':foiuser.firstname,
-            'userLastName':foiuser.lastname,
-            'creatorFirstName':foicreator.firstname,
-            'creatorLastName':foicreator.lastname,
-            'description': FOIRequests.description,
+            'createdat': FOINotifications.created_at,
+            'notification': FOINotifications.notification,
+            'assignedToFormatted': FOIRequests.assignedtoformatted,
+            'ministryAssignedToFormatted': FOIRequests.ministryassignedtoformatted,
+            'userFormatted': FOINotifications.userformatted,
+            'creatorFormatted': FOINotifications.creatorformatted
         }.get(x,  cast(FOIRequests.axisrequestid, String))
     
     # End of Dashboard functions

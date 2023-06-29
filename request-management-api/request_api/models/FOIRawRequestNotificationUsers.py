@@ -9,7 +9,7 @@ from sqlalchemy.sql.expression import distinct
 from sqlalchemy import text
 import logging
 import json
-from sqlalchemy.sql.sqltypes import DateTime, String, Date
+from sqlalchemy.sql.sqltypes import DateTime, String, Date, Integer
 from sqlalchemy.orm import relationship, backref, aliased
 from sqlalchemy import insert, and_, or_, text, func, literal, cast, asc, desc, case, nullsfirst, nullslast, TIMESTAMP, extract
 from .FOIRawRequestNotifications import FOIRawRequestNotification
@@ -136,28 +136,23 @@ class FOIRawRequestNotificationUser(db.Model):
         _session = db.session
 
         
-        selectedcolumns = [
-            FOIRawRequests.axisrequestid.label('axisrequestid'),  
-            FOIRawRequests.status.label('status'),          
-            FOINotifications.notification.label('notification'),
-            FOINotifications.userid.label('to'),
-            FOINotifications.createdby.label('createdby'),
-            FOINotifications.created_at.label('createdat'),
-            FOIRawRequests.assignedgroup.label('assignedGroup'),
-            FOIRawRequests.assignedto.label('assignedTo'),
-            FOIRawRequests.assignedministrygroup.label('assignedministrygroup'),
-            FOIRawRequests.assignedministryperson.label('assignedministryperson'),
-            FOIRawRequests.assignedtoformatted.label('assignedToFormatted'), 
-            FOIRawRequests.ministryassignedtoformatted.label('ministryAssignedToFormatted'),
-            FOINotifications.idnumber.label('id'),
+        selectedcolumns = [            
+            FOIRawRequests.axisrequestid.label('axisRequestId'),  
             FOIRawRequests.rawrequestid.label('rawrequestid'),
             FOIRawRequests.foirequest_id.label('requestid'),
-            FOIRawRequests.ministryrequestid.label('ministryrequestid'),
+            FOIRawRequests.ministryrequestid.label('ministryrequestid'),            
+            FOIRawRequests.status.label('status'),        
+            FOIRawRequests.assignedtoformatted.label('assignedToFormatted'), 
+            FOIRawRequests.ministryassignedtoformatted.label('ministryAssignedToFormatted'),
+            FOIRawRequests.description.label('description'),
             FOINotifications.idnumber.label('idnumber'),
             FOINotifications.notificationtype.label('notificationtype'),
+            FOINotifications.notification.label('notification'),
+            FOINotifications.created_at.label('createdat'),
             FOINotifications.userformatted.label('userFormatted'),
             FOINotifications.creatorformatted.label('creatorFormatted'),
-            FOIRawRequests.description.label('description'),
+            FOINotifications.userid.label('userid'),
+            FOINotifications.createdby.label('createdby')            
         ]
 
         basequery = _session.query(
@@ -171,17 +166,17 @@ class FOIRawRequestNotificationUser(db.Model):
             if(additionalfilter == 'watchingRequests' and userid is not None):
                 #watchby
                 subquery_watchby = FOIRawRequestWatcher.getrequestidsbyuserid(userid)
-                return basequery.join(subquery_watchby, subquery_watchby.c.requestid == FOIRawRequests.requestid)
+                return basequery.join(subquery_watchby, subquery_watchby.c.requestid == cast(FOIRawRequests.rawrequestid, Integer))
             elif(additionalfilter == 'myRequests'):
                 #myrequest
-                return basequery.filter(or_(FOIRawRequests.assignedto == userid, and_(FOIRawRequestNotificationUser.userid == userid, FOIRawRequestNotification.notificationtypeid == 10)))
+                return basequery.filter(or_(FOIRawRequests.assignedto == userid, and_(FOINotifications.userid == userid, FOINotifications.notificationtypeid == 10)))
             else:
                 if(isiaorestrictedfilemanager == True):
                     return basequery.filter(FOIRawRequests.assignedgroup.in_(groups))
                 else:
                     return basequery.filter(
                         and_(
-                            or_(FOIRawRequest.isiaorestricted.is_(None), FOIRawRequests.isiaorestricted == False, and_(FOIRawRequest.isiaorestricted == True, FOIRawRequests.assignedto == userid)))).filter(FOIRawRequests.assignedgroup.in_(groups))
+                            or_(FOIRawRequests.isiaorestricted.is_(None), FOIRawRequests.isiaorestricted == False, and_(FOIRawRequests.isiaorestricted == True, FOIRawRequests.assignedto == userid)))).filter(FOIRawRequests.assignedgroup.in_(groups))
 
 
     @classmethod
@@ -202,9 +197,7 @@ class FOIRawRequestNotificationUser(db.Model):
         if(keyword != 'restricted'):
             for field in filterfields:
                 _keyword = FOIRawRequestNotificationUser.getfilterkeyword(keyword, field)
-                if(field == 'notification'):
-                    filtercondition.append(FOINotifications.notification.ilike('%'+_keyword+'%'))
-                elif(field == 'createdat'):
+                if(field == 'createdat'):
                     vkeyword = keyword.split('@')
                     _keyword = FOIRawRequestNotificationUser.getfilterkeyword(vkeyword[0], field)
                     _datevalue = _keyword.split('-')
@@ -222,7 +215,7 @@ class FOIRawRequestNotificationUser(db.Model):
                 else:
                     filtercondition.append(FOIRawRequestNotificationUser.findfield(field).ilike('%'+_keyword+'%'))
                 
-            filtercondition.append(FOIRawRequest.isiaorestricted == True)
+            filtercondition.append(FOIRawRequests.isiaorestricted == True)
 
         return or_(*filtercondition)
     
@@ -242,10 +235,13 @@ class FOIRawRequestNotificationUser(db.Model):
     @classmethod
     def findfield(cls, x):
         return {
-            'to': FOINotifications.userformatted,
-            'createdby' : FOINotifications.creatorformatted,
-            'axisRequestId' : FOINotifications.axisnumber,
-            'assignedTo': FOIRawRequests.assignedtoformatted
+            'axisRequestId' : FOIRawRequests.axisrequestid,
+            'createdat': FOINotifications.created_at,
+            'notification': FOINotifications.notification,
+            'assignedToFormatted': FOIRawRequests.assignedtoformatted,
+            'ministryAssignedToFormatted': FOIRawRequests.ministryassignedtoformatted,
+            'userFormatted': FOINotifications.userformatted,
+            'creatorFormatted': FOINotifications.creatorformatted
         }.get(x, cast(FOINotifications.axisnumber, String))
     
     
@@ -272,21 +268,12 @@ class FOIRawRequestNotificationUser(db.Model):
     @classmethod
     def validatefield(cls, x):
         validfields = [
-            'notification',
-            'createdby',
-            'to',
+            'notification',            
             'axisRequestId',
             'createdat',
-            'assignedTo',
-            'assignedToFirstName',
-            'assignedToLastName',
             'assignedToFormatted',
             'ministryAssignedToFormatted',
-            'userFirstName',
-            'userLastName',
             'userFormatted',
-            'creatorFirstName',
-            'creatorLastName',
             'creatorFormatted'      
         ]
         if x in validfields:

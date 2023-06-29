@@ -16,8 +16,7 @@ from .FOIUsers import FOIUser
 from .FOIRawRequestNotificationUsers import FOIRawRequestNotificationUser
 
 
-class FOIRequestNotificationDashboard:
-   
+class FOIRequestNotificationDashboard:   
    
     @classmethod
     def getiaoeventpagination(cls, groups, page, size, sortingitems, sortingorders, filterfields, keyword, additionalfilter, userid, isiaorestrictedfilemanager, isministryrestrictedfilemanager=False):
@@ -32,12 +31,12 @@ class FOIRequestNotificationDashboard:
         #sorting
         sortingcondition = FOIRawRequestNotificationUser.getsorting(sortingitems, sortingorders)
         #rawrequests
-        #if "Intake Team" in groups or groups is None:                
-        subquery_rawrequest_queue = FOIRawRequestNotificationUser.getrequestssubquery(groups, foiuser, foicreator, filterfields, keyword, additionalfilter, userid, isiaorestrictedfilemanager)
-        query_full_queue = subquery_rawrequest_queue.union(subquery_ministry_queue)
-        return query_full_queue.order_by(*sortingcondition).paginate(page=page, per_page=size)
-        #else:
-        #    return subquery_ministry_queue.order_by(*sortingcondition).paginate(page=page, per_page=size)
+        if "Intake Team" in groups or groups is None:                
+            subquery_rawrequest_queue = FOIRawRequestNotificationUser.getrequestssubquery(groups, foiuser, foicreator, filterfields, keyword, additionalfilter, userid, isiaorestrictedfilemanager)
+            query_full_queue = subquery_rawrequest_queue.union(subquery_ministry_queue)
+            return query_full_queue.order_by(*sortingcondition).paginate(page=page, per_page=size)
+        else:
+            return subquery_ministry_queue.order_by(*sortingcondition).paginate(page=page, per_page=size)
 
     @classmethod
     def getministryeventpagination(cls, group, page, size, sortingitems, sortingorders, filterfields, keyword, additionalfilter, userid,isiaorestrictedfilemanager, isministryrestrictedfilemanager):

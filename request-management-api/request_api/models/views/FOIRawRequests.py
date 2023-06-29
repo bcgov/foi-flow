@@ -18,4 +18,5 @@ class FOIRawRequests(db.Model):
     assignedtoformatted = db.Column(db.Text)
     ministryassignedtoformatted = db.Column(db.String(500))
     description = db.Column(db.Text)
+    isiaorestricted = db.Column(db.Boolean)
     
