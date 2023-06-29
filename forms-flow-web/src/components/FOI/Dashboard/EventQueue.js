@@ -34,46 +34,18 @@ const EventQueue = ({ userDetail, eventQueueTableInfo }) => {
   const filterFields = [
     "createdat",
     "axisRequestId",
-
-    "createdby",   
-    "creatorFirstName",
-    "creatorLastName",
     "creatorFormatted",
-
-    "assignedTo",
-    "assignedGroup",
-    "assignedToFirstName",
-    "assignedToLastName",    
     "assignedToFormatted",
-
-    "to",
-    "userFirstName",
-    "userLastName",
-    "userFormatted",
-    
+    "userFormatted",    
     "notification"
   ];
 
   const ministryFilterFields = [
     "createdat",
     "axisRequestId",
-
-    "createdby",   
-    "creatorFirstName",
-    "creatorLastName",
     "creatorFormatted",
-
-    "assignedministryperson",
-    "assignedministrygroup",
-    "assignedministrypersonFirstName",
-    "assignedministrypersonLastName",    
     "ministryAssignedToFormatted",
-
-    "to",
-    "userFirstName",
-    "userLastName",
-    "userFormatted",
-    
+    "userFormatted",    
     "notification"
   ];
 
