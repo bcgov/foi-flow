@@ -32,7 +32,7 @@ WebUI.click(findTestObject('Page_foi.flow/form/assignee dropdown/Page_ABC-2099-1
 
 //WebUI.click(findTestObject('Page_foi.flow/form/assignee dropdown/li_assignee user option', [('user') : (lastname + ', ') + 
 //           firstname]))
-WebUI.setText(findTestObject('Page_foi.flow/form/inputs/input_AXIS ID Number'), 'ABC-2099-' + requestID)
+WebUI.setText(findTestObject('Page_foi.flow/form/inputs/input_AXIS ID Number'), 'EDU-2099-' + requestID)
 
 WebUI.click(findTestObject('Page_foi.flow/form/inputs/applicant details/div_Category'))
 
@@ -61,7 +61,6 @@ WebUI.verifyElementNotPresent(findTestObject('Page_foi.flow/div_The request has 
 WebUI.click(findTestObject('Page_foi.flow/form/button_Save'))
 
 //WebUI.verifyElementPresent(findTestObject('Page_foi.flow/div_The request has been saved successfully'), 0)
-
 WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT, FailureHandling.STOP_ON_FAILURE)
 
 return requestID

@@ -242,6 +242,13 @@ println(RunConfiguration.getProjectDir() + '/Test Attachments')
 WebUI.uploadFile(findTestObject('Page_foi.flow/attachment/input_Add Files_file-upload-input'), RunConfiguration.getProjectDir() + 
     '/Test Attachments/samplepptx.pptx')
 
+WebUI.click(findTestObject('Records/button_Add Files1'))
+
+println(RunConfiguration.getProjectDir() + '/Test Attachments')
+
+WebUI.uploadFile(findTestObject('Page_foi.flow/attachment/input_Add Files_file-upload-input'), RunConfiguration.getProjectDir() +
+	'/Test Attachments/trials.kml')
+
 WebUI.click(findTestObject('Records/button_Continue'))
 
 WebUI.delay(100)
@@ -258,7 +265,7 @@ WebUI.verifyElementText(findTestObject('Records/span_Deputy Ministers Office (1)
 
 WebUI.click(findTestObject('Records/span_INCOMPATIBLE'))
 
-WebUI.verifyElementText(findTestObject('Records/span_samplepptx.pptx'), 'samplepptx.pptx')
+WebUI.verifyElementText(findTestObject('Records/span_samplepptx.pptx'), 'trials.kml')
 
 WebUI.verifyElementText(findTestObject('Records/span_Deputy Ministers Office (1)'), 'Deputy Minister\'s Office')
 

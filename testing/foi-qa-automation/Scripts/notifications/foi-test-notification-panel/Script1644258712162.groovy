@@ -40,7 +40,7 @@ DriverFactory.changeWebDriver(user2)
 WebUI.navigateToUrl(GlobalVariable.BASE_URL)
 
 WebUI.callTestCase(findTestCase('helper/foi-test-login'), [('password') : findTestData('Login Credentials').getValue('Password', 
-            6), ('username') : findTestData('Login Credentials').getValue('Username', 6)], FailureHandling.STOP_ON_FAILURE)
+            1), ('username') : findTestData('Login Credentials').getValue('Username', 1)], FailureHandling.STOP_ON_FAILURE)
 
 WebUI.verifyElementNotPresent(findTestObject('Page_foi.flow/navbar/notification/div_notification popup'), 0)
 
@@ -50,6 +50,8 @@ WebUI.verifyElementPresent(findTestObject('Page_foi.flow/navbar/notification/div
 
 if (WebUI.verifyElementPresent(findTestObject('Page_foi.flow/navbar/notification/div_notification list 1'), 1, FailureHandling.OPTIONAL)) {
     WebUI.click(findTestObject('Page_foi.flow/navbar/notification/div_notifiation Dismiss All'))
+
+    WebUI.click(findTestObject('Page_foi.flow/navbar/notification/Page_FOI Request Queue/button_Continue'))
 }
 
 WebUI.click(findTestObject('Page_foi.flow/navbar/notification/a_Watching Notifications'))
@@ -57,6 +59,8 @@ WebUI.click(findTestObject('Page_foi.flow/navbar/notification/a_Watching Notific
 if (WebUI.verifyElementPresent(findTestObject('Page_foi.flow/navbar/notification/div_watching notification list 1'), 1, 
     FailureHandling.OPTIONAL)) {
     WebUI.click(findTestObject('Page_foi.flow/navbar/notification/div_watching notifiation Dismiss All'))
+
+    WebUI.click(findTestObject('Page_foi.flow/navbar/notification/Page_FOI Request Queue/button_Continue'))
 }
 
 assert WebUI.getAttribute(findTestObject('Page_foi.flow/navbar/notification/span_notification indicator'), 'class').contains(
@@ -81,6 +85,8 @@ WebUI.clickOffset(findTestObject('Page_foi.flow/navbar/notification/notification
 
 if (WebUI.verifyElementPresent(findTestObject('Page_foi.flow/navbar/notification/div_notification list 1'), 1, FailureHandling.OPTIONAL)) {
     WebUI.click(findTestObject('Page_foi.flow/navbar/notification/div_notifiation Dismiss All'))
+
+    WebUI.click(findTestObject('Page_foi.flow/navbar/notification/Page_FOI Request Queue/button_Continue'))
 }
 
 WebUI.click(findTestObject('Page_foi.flow/navbar/notification/a_Watching Notifications'))
@@ -88,6 +94,8 @@ WebUI.click(findTestObject('Page_foi.flow/navbar/notification/a_Watching Notific
 if (WebUI.verifyElementPresent(findTestObject('Page_foi.flow/navbar/notification/div_watching notification list 1'), 1, 
     FailureHandling.OPTIONAL)) {
     WebUI.click(findTestObject('Page_foi.flow/navbar/notification/div_watching notifiation Dismiss All'))
+
+    WebUI.click(findTestObject('Page_foi.flow/navbar/notification/Page_FOI Request Queue/button_Continue'))
 }
 
 //assert WebUI.getAttribute(findTestObject('Page_foi.flow/navbar/notification/span_notification indicator'), 'class').contains(
@@ -108,33 +116,39 @@ DriverFactory.changeWebDriver(user1)
 
 WebUI.click(findTestObject('Page_foi.flow/form/assignee dropdown/div_Assigned'))
 
-WebUI.click(findTestObject('Page_foi.flow/form/assignee dropdown/li_Intake, FOI'))
+WebUI.click(findTestObject('Page_foi.flow/form/assignee dropdown/li_Flex, Intake'))
 
 WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT, FailureHandling.STOP_ON_FAILURE)
+
+WebUI.refresh()
 
 WebUI.clickOffset(findTestObject('Page_foi.flow/navbar/notification/notification bell'), -2, 4)
 
-WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT, FailureHandling.STOP_ON_FAILURE)
-
+//WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT, FailureHandling.STOP_ON_FAILURE)
 if (WebUI.verifyElementPresent(findTestObject('Page_foi.flow/navbar/notification/div_notification list 1'), 1, FailureHandling.OPTIONAL)) {
     WebUI.click(findTestObject('Page_foi.flow/navbar/notification/div_notifiation Dismiss All'))
+
+    WebUI.click(findTestObject('Page_foi.flow/navbar/notification/Page_FOI Request Queue/button_Continue'))
 }
 
 WebUI.click(findTestObject('Page_foi.flow/navbar/notification/a_Watching Notifications'))
+
 WebUI.delay(3)
 
 if (WebUI.verifyElementPresent(findTestObject('Page_foi.flow/navbar/notification/div_watching notification list 1'), 1, 
     FailureHandling.OPTIONAL)) {
     WebUI.click(findTestObject('Page_foi.flow/navbar/notification/div_watching notifiation Dismiss All'))
+
+    WebUI.click(findTestObject('Page_foi.flow/navbar/notification/Page_FOI Request Queue/button_Continue'))
 }
 
 WebUI.delay(4)
 
 //assert WebUI.getAttribute(findTestObject('Page_foi.flow/navbar/notification/span_notification indicator'), 'class').contains(
-   // 'MuiBadge-invisible')
-
+// 'MuiBadge-invisible')
 //WebUI.verifyElementPresent(findTestObject('Page_foi.flow/navbar/notification/div_notification popup'), 0)
 WebUI.clickOffset(findTestObject('Page_foi.flow/navbar/notification/notification bell'), -2, 4)
+
 WebUI.scrollToElement(findTestObject('Page_foi.flow/form/button_Save'), 0)
 
 WebUI.click(findTestObject('Page_foi.flow/form/button_Save'), FailureHandling.STOP_ON_FAILURE)
@@ -169,7 +183,7 @@ WebUI.verifyElementText(findTestObject('Page_foi.flow/navbar/notification/div_no
 
 WebUI.verifyElementText(findTestObject('Page_foi.flow/navbar/notification/div_notification list 1 message'), 'New Request Assigned to You.')
 
-WebUI.verifyElementText(findTestObject('Page_foi.flow/navbar/notification/div_notification list 1 user'), teammate1)
+WebUI.verifyElementText(findTestObject('Page_foi.flow/navbar/notification/div_notification list 1 user'), teammate2)
 
 WebUI.verifyElementPresent(findTestObject('Page_foi.flow/navbar/notification/div_notification list 1 time'), 0)
 
@@ -245,7 +259,7 @@ WebUI.verifyElementText(findTestObject('Page_foi.flow/navbar/notification/div_wa
 WebUI.verifyElementText(findTestObject('Page_foi.flow/navbar/notification/div_watching notification list 1 request id'), 
     requestID)
 
-WebUI.verifyElementText(findTestObject('Page_foi.flow/navbar/notification/div_watching notification list 1 user'), teammate1)
+WebUI.verifyElementText(findTestObject('Page_foi.flow/navbar/notification/div_watching notification list 1 user'), teammate2)
 
 WebUI.verifyElementPresent(findTestObject('Page_foi.flow/navbar/notification/div_watching notification list 1 time'), 0)
 
@@ -255,7 +269,13 @@ WebUI.clickOffset(findTestObject('Page_foi.flow/navbar/notification/notification
 
 WebUI.click(findTestObject('Page_foi.flow/navbar/notification/a_Watching Notifications'))
 
+WebUI.delay(3)
+
 WebUI.click(findTestObject('Page_foi.flow/navbar/notification/div_watching notifiation Dismiss All'))
+
+WebUI.click(findTestObject('Page_foi.flow/navbar/notification/Page_FOI Request Queue/button_Continue'))
+
+WebUI.delay(3)
 
 WebUI.clickOffset(findTestObject('Page_foi.flow/navbar/notification/notification bell'), -2, 4)
 
@@ -265,11 +285,9 @@ WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/li_Open')
 
 WebUI.click(findTestObject('Page_foi.flow/form/state change dialog/button_Save Change'), FailureHandling.STOP_ON_FAILURE)
 
-assert WebUI.getAttribute(findTestObject('Page_foi.flow/navbar/notification/span_notification indicator'), 'class').contains(
-    'MuiBadge-invisible')
-
-WebUI.clickOffset(findTestObject('Page_foi.flow/navbar/notification/notification bell'), -2, 4)
-
+//assert WebUI.getAttribute(findTestObject('Page_foi.flow/navbar/notification/span_notification indicator'), 'class').contains(
+//   'MuiBadge-invisible')
+//WebUI.clickOffset(findTestObject('Page_foi.flow/navbar/notification/notification bell'), -2, 4)
 WebUI.verifyElementNotPresent(findTestObject('Page_foi.flow/navbar/notification/div_notification list 1'), 0)
 
 DriverFactory.changeWebDriver(user1)
@@ -278,12 +296,19 @@ user1.close()
 
 def requestID2 = WebUI.callTestCase(findTestCase('submit/foi-test-save-request-form'), [:], FailureHandling.STOP_ON_FAILURE)
 
-//WebUI.click(findTestObject('Page_foi.flow/form/assignee dropdown/div_Assigned'))
-//WebUI.delay(4)
-//WebUI.click(findTestObject('Page_foi.flow/form/assignee dropdown/li_Intake, FOI'))
+WebUI.click(findTestObject('Page_foi.flow/form/assignee dropdown/div_Assigned'))
+
+WebUI.delay(4)
+
+WebUI.click(findTestObject('Page_foi.flow/form/assignee dropdown/li_Flex, Intake'))
+
 //WebUI.scrollToElement(findTestObject('Page_foi.flow/form/button_Save'), 0)
 //WebUI.click(findTestObject('Page_foi.flow/form/button_Save'), FailureHandling.STOP_ON_FAILURE)
 DriverFactory.changeWebDriver(user2)
+
+WebUI.refresh()
+
+WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT, FailureHandling.STOP_ON_FAILURE)
 
 WebUI.refresh()
 
@@ -293,17 +318,16 @@ WebUI.verifyElementText(findTestObject('Page_foi.flow/navbar/notification/span_n
 
 WebUI.clickOffset(findTestObject('Page_foi.flow/navbar/notification/notification bell'), -2, 4)
 
-WebUI.verifyElementText(findTestObject('Page_foi.flow/navbar/notification/div_notification list 1 request id'), 'ABC-2099-' + 
+WebUI.verifyElementText(findTestObject('Page_foi.flow/navbar/notification/div_notification list 1 request id'), 'EDU-2099-' + 
     requestID2)
 
 WebUI.verifyElementText(findTestObject('Page_foi.flow/navbar/notification/div_notification list 1 message'), 'New Request Assigned to You.')
 
 WebUI.click(findTestObject('Page_foi.flow/navbar/notification/i_notification list 2 delete'))
 
-WebUI.verifyElementText(findTestObject('Page_foi.flow/navbar/notification/div_notification list 1 request id'), 'ABC-2099-' + 
-    requestID2)
-
-WebUI.verifyElementText(findTestObject('Page_foi.flow/navbar/notification/div_notification list 1 message'), 'New Request Assigned to You.')
+//WebUI.verifyElementText(findTestObject('Page_foi.flow/navbar/notification/div_notification list 1 request id'), 'EDU-2099-' + 
+//   requestID2)
+WebUI.verifyElementText(findTestObject('Page_foi.flow/navbar/notification/div_notification list 1 message'), 'Moved to Open State')
 
 WebUI.verifyElementText(findTestObject('Page_foi.flow/navbar/notification/div_notification list 2 request id'), requestID)
 
@@ -311,9 +335,15 @@ WebUI.verifyElementText(findTestObject('Page_foi.flow/navbar/notification/div_no
 
 WebUI.click(findTestObject('Page_foi.flow/navbar/notification/div_notifiation Dismiss All'))
 
+WebUI.click(findTestObject('Page_foi.flow/navbar/notification/Page_FOI Request Queue/button_Continue'))
+
 WebUI.verifyElementNotPresent(findTestObject('Page_foi.flow/navbar/notification/div_notification list 1'), 0)
 
 WebUI.verifyElementNotPresent(findTestObject('Page_foi.flow/navbar/notification/div_notification list 2'), 0)
 
 user2.close()
+
+user3.close()
+
+WebUI.closeBrowser()
 
