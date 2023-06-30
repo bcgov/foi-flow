@@ -190,7 +190,7 @@ class FOIRequestNotificationUser(db.Model):
                 else:
                     filtercondition.append(ministry_restricted_requests.isrestricted == True)
 
-        selectedcolumns = [
+        selectedcolumns = [            
             FOIRequests.axisrequestid.label('axisRequestId'),
             FOIRequests.rawrequestid.label('rawrequestid'),
             FOIRequests.foirequest_id.label('requestid'),
@@ -206,7 +206,7 @@ class FOIRequestNotificationUser(db.Model):
             FOINotifications.userformatted.label('userFormatted'),
             FOINotifications.creatorformatted.label('creatorFormatted'),
             FOINotifications.userid.label('userid'),
-            FOINotifications.createdby.label('createdby')
+            FOINotifications.createdby.label('createdby'),         
         ]
 
         basequery = _session.query(
@@ -239,9 +239,9 @@ class FOIRequestNotificationUser(db.Model):
         elif(additionalfilter == 'myRequests'):
             #myrequest
             if(requestby == 'IAO'):
-                dbquery = basequery.filter(or_(FOIRequests.assignedto == userid)).filter(ministryfilter)
+                dbquery = basequery.filter(or_(and_(FOIRequests.assignedto == userid, ministryfilter),and_(FOINotifications.userid == userid, FOINotifications.notificationtypeid == 10)))
             else:
-                dbquery = basequery.filter(or_(FOIRequests.assignedministryperson == userid)).filter(ministryfilter)
+                dbquery = basequery.filter(or_(and_(FOIRequests.assignedministryperson == userid, ministryfilter),and_(FOINotifications.userid == userid, FOINotifications.notificationtypeid == 10)))
         else:
             if(isiaorestrictedfilemanager == True or isministryrestrictedfilemanager == True):
                 dbquery = basequery

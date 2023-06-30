@@ -158,8 +158,8 @@ class FOIRawRequestNotificationUser(db.Model):
         basequery = _session.query(
                                         *selectedcolumns
                                 ).join(
-                                        FOINotifications,
-                                        and_(FOINotifications.axisnumber == FOIRawRequests.axisrequestid),
+                                        FOIRawRequests,
+                                        and_(FOIRawRequests.axisrequestid == FOINotifications.axisnumber),
                                 )
         
         if additionalfilter is not None:
