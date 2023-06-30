@@ -50,7 +50,7 @@ const CustomPageSize = ({apiRef, pageSize}) => {
           <option value={50}>50</option>
           <option value={100}>100</option>
           <option value={200}>200</option>
-          <option value={200}>200</option>
+          <option value={300}>300</option>
         </NativeSelect>
       </Grid>
     );
