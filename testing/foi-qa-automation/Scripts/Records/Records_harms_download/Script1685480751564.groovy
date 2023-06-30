@@ -220,9 +220,9 @@ WebUI.verifyElementText(findTestObject('Records/span_batches'), '1')
 
 WebUI.verifyElementText(findTestObject('Records/span_2'), '1')
 
-WebUI.verifyElementText(findTestObject('Records/span_pdf'), '4')
+WebUI.verifyElementText(findTestObject('Records/span_pdf'), '3')
 
-WebUI.verifyElementText(findTestObject('Records/span_uploaded'), '5')
+WebUI.verifyElementText(findTestObject('Records/span_uploaded'), '4')
 
 WebUI.click(findTestObject('Records/options_converted_file/svg_Ready for Redaction_MuiSvgIcon-root'), FailureHandling.STOP_ON_FAILURE)
 
