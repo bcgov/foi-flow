@@ -104,6 +104,8 @@ const foiRequests = (state = initialState, action) => {
   switch (action.type) {
     case FOI_ACTION_CONSTANTS.IS_LOADING:
       return { ...state, isLoading: action.payload };
+    case FOI_ACTION_CONSTANTS.IS_RECORDS_LOADING:
+        return { ...state, isRecordsLoading: action.payload };  
     case FOI_ACTION_CONSTANTS.IS_EVENTS_LOADING:
       return { ...state, isEventsLoading: action.payload };
     case FOI_ACTION_CONSTANTS.QUEUE_FILTER:
