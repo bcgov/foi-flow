@@ -848,6 +848,7 @@ export const RecordsLog = ({
         )
       }
     }
+    setIsAllSelected(false)
     return _recordsArray?.filter(filterFunction)
     }
   
