@@ -2,6 +2,7 @@ import FOI_ACTION_CONSTANTS from "../../actions/FOI/foiActionConstants";
 import _ from 'lodash';
 const initialState = {
   isLoading: true,
+  isEventsLoading: true,
   queueFilter: "myRequests",
   queueParams: {
     rowsState: { page: 0, pageSize: 100 },
@@ -105,6 +106,8 @@ const foiRequests = (state = initialState, action) => {
       return { ...state, isLoading: action.payload };
     case FOI_ACTION_CONSTANTS.IS_RECORDS_LOADING:
         return { ...state, isRecordsLoading: action.payload };  
+    case FOI_ACTION_CONSTANTS.IS_EVENTS_LOADING:
+      return { ...state, isEventsLoading: action.payload };
     case FOI_ACTION_CONSTANTS.QUEUE_FILTER:
       return { ...state, queueFilter: action.payload };
       case FOI_ACTION_CONSTANTS.QUEUE_PARAMS:

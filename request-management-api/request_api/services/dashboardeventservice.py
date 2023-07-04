@@ -95,29 +95,14 @@ class dashboardeventservice:
             'rawrequestid': notification.rawrequestid,
             'requestid': notification.requestid,
             'ministryrequestid': notification.ministryrequestid,
-            'idnumber': notification.idnumber,
             'createdat' : self.__formatedate(notification.createdat),
             'axisRequestId': notification.axisRequestId,
-            'createdby': notification.createdby,      
-            'userFirstName': notification.userFirstName,
-            'userLastName': notification.userLastName,
-            'to': notification.to,
-            'creatorFirstName': notification.creatorFirstName,
-            'creatorLastName': notification.creatorLastName,
             'notification': notification.notification,
-            'assignedGroup': notification.assignedGroup,
-            'assignedTo': notification.assignedTo,            
-            'assignedToFirstName':notification.assignedToFirstName,       
-            'assignedToLastName':notification.assignedToLastName,  
-            'assignedministrygroup': notification.assignedministrygroup,
-            'assignedministryperson': notification.assignedministryperson,
-            'assignedministrypersonFirstName':notification.assignedministrypersonFirstName,
-            'assignedministrypersonLastName': notification.assignedministrypersonLastName,
             'assignedToFormatted': notification.assignedToFormatted,
             'ministryAssignedToFormatted': notification.ministryAssignedToFormatted,
-            'notificationType': notification.notificationtype,
             'userFormatted': notification.userFormatted,
             'creatorFormatted': notification.creatorFormatted,
+            'notificationType': notification.notificationtype,           
             'description':notification.description
         }
 
@@ -125,5 +110,5 @@ class dashboardeventservice:
         return datetimehandler().convert_to_pst(input,'%Y %b %d | %I:%M %p')
     
     def __getid(self, notification):
-        _id = notification.idnumber+str(notification.createdat)+notification.axisRequestId+notification.to+notification.createdby
+        _id = notification.idnumber+str(notification.createdat)+notification.axisRequestId+notification.userid+notification.createdby
         return re.sub(r"[^a-zA-Z0-9 ]", "", _id).replace(" ","")

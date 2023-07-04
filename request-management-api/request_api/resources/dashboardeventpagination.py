@@ -53,26 +53,12 @@ class EventPagination(Resource):
             DEFAULT_SORT_ORDERS = ['desc']
             DEFAULT_FILTER_FIELDS = [
                                         'axisRequestId',
-                                        'createdby',
-                                        'to',
                                         'notification',
-                                        'assignedTo',
-                                        'assignedGroup',
                                         'assignedToFormatted',
-                                        'assignedToFirstName',
-                                        'assignedToLastName',
                                         'ministryAssignedToFormatted',
-                                        'assignedministrygroup',
-                                        'assignedministrypersonFirstName',
-                                        'assignedministrypersonLastName',
-                                        'createdat',
-                                        'creatorFirstName',
-                                        'creatorLastName',
-                                        'userFirstName',
-                                        'userLastName',
-                                        'description'
-
-                                    ]
+                                        'userFormatted',
+                                        'creatorFormatted',
+                                        'createdat'                                    ]
             DEFAULT_ADDITIONAL_FILTER = 'All'
             _page = flask.request.args.get('page', DEFAULT_PAGE, type=int)
             _size = flask.request.args.get('size', DEFAULT_SIZE, type=int)

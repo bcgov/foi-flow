@@ -4,7 +4,7 @@ import "./dashboard.scss";
 import useStyles from "./CustomStyle";
 import { useDispatch, useSelector } from "react-redux";
 import { push } from "connected-react-router";
-import { fetchFOIEventListByPage, fetchFOIMinistryRequestListByPage } from "../../../apiManager/services/FOI/foiEventDashboardServices";
+import { fetchFOIEventListByPage, fetchFOIMinistryEventListByPage } from "../../../apiManager/services/FOI/foiEventDashboardServices";
 import Loading from "../../../containers/Loading";
 import { setEventQueueFilter, setEventQueueParams } from "../../../actions/FOI/foiRequestActions";
 import {
@@ -25,38 +25,27 @@ import { CustomFooter } from "./CustomFooter"
 const EventQueue = ({ userDetail, eventQueueTableInfo }) => {
   const dispatch = useDispatch();
 
-  const userGroups = userDetail && userDetail?.groups?.map(group => group.slice(1));
+  const userGroups = userDetail?.groups?.map(group => group.slice(1));
   const isMinistry = isMinistryLogin(userGroups);
   const eventQueue = useSelector((state) => state.foiRequests.foiEventsList);
-  const isLoading = useSelector((state) => state.foiRequests.isLoading);
+  const isEventsLoading = useSelector((state) => state.foiRequests.isEventsLoading);
   const classes = useStyles();
 
   const filterFields = [
     "createdat",
     "axisRequestId",
-
-    "createdby",   
-    "creatorFirstName",
-    "creatorLastName",
     "creatorFormatted",
-
-    "assignedTo",
-    "assignedGroup",
-    "assignedToFirstName",
-    "assignedToLastName",    
     "assignedToFormatted",
+    "userFormatted",    
+    "notification"
+  ];
 
-    "assignedministryperson",
-    "assignedministrygroup",
-    "assignedministrypersonFirstName",
-    "assignedministrypersonLastName",    
+  const ministryFilterFields = [
+    "createdat",
+    "axisRequestId",
+    "creatorFormatted",
     "ministryAssignedToFormatted",
-
-    "to",
-    "userFirstName",
-    "userLastName",
-    "userFormatted",
-    
+    "userFormatted",    
     "notification"
   ];
 
@@ -76,11 +65,11 @@ const EventQueue = ({ userDetail, eventQueueTableInfo }) => {
     {
       // page+1 here, because initial page value is 0 for mui-data-grid
       dispatch(
-        fetchFOIMinistryRequestListByPage(
+        fetchFOIMinistryEventListByPage(
           rowsState.page + 1,
           rowsState.pageSize,
           serverSortModel,
-          filterFields,
+          ministryFilterFields,
           keyword,
           eventFilter,
           userDetail.preferred_username
@@ -317,7 +306,7 @@ const EventQueue = ({ userDetail, eventQueueTableInfo }) => {
             }
           }}
           onRowClick={renderReviewRequest}
-          loading={isLoading}
+          loading={isEventsLoading}
         />
       </Grid>
     </>
