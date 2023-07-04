@@ -5,6 +5,14 @@ export const setFOILoader = (data) => dispatch =>{
         payload:data
     })
 }
+
+export const setFOIEventsLoader = (data) => dispatch =>{
+    dispatch({
+        type:FOI_ACTION_CONSTANTS.IS_EVENTS_LOADING,
+        payload:data
+    })
+}
+
 export const setQueueFilter = (data) => dispatch =>{
     dispatch({
         type:FOI_ACTION_CONSTANTS.QUEUE_FILTER,

@@ -5,7 +5,7 @@ import API from "../../endpoints";
 import {
   setFOIEventList,
   serviceActionError,
-  setFOILoader,
+  setFOIEventsLoader,
   setFOIMinistryEventList
 } from "../../../actions/FOI/foiRequestActions";
 import { fetchFOIAssignedToList, fetchFOIMinistryAssignedToList, fetchFOIProcessingTeamList } from "./foiMasterDataServices";
@@ -29,7 +29,7 @@ export const fetchFOIEventListByPage = (
   });
 
   return (dispatch) => {
-    dispatch(setFOILoader(true));
+    dispatch(setFOIEventsLoader(true));
     httpGETRequest(
       API.FOI_GET_EVENTS_PAGE_API,
       {
@@ -47,7 +47,7 @@ export const fetchFOIEventListByPage = (
       .then((res) => {
         if (res.data) {
           dispatch(setFOIEventList(res.data));
-          dispatch(setFOILoader(false));
+          dispatch(setFOIEventsLoader(false));
         } else {
           dispatch(serviceActionError(res));
           throw new Error("Error in fetching dashboard data for IAO");
@@ -59,7 +59,7 @@ export const fetchFOIEventListByPage = (
   };
 };
 
-export const fetchFOIMinistryRequestListByPage = (page = 1, size = 10, sort = [{field:'defaultSorting', sort:'asc'}], filters = null, keyword = null, additionalFilter = 'All', userID = null) => {
+export const fetchFOIMinistryEventListByPage = (page = 1, size = 10, sort = [{field:'defaultSorting', sort:'asc'}], filters = null, keyword = null, additionalFilter = 'All', userID = null) => {
   let sortingItems = [];
   let sortingOrders = [];
   sort.forEach((item)=>{
@@ -68,6 +68,7 @@ export const fetchFOIMinistryRequestListByPage = (page = 1, size = 10, sort = [{
   });
 
   return (dispatch) => {
+    dispatch(setFOIEventsLoader(true));    
     httpGETRequest(
           API.FOI_GET_MINISTRY_EVENTS_PAGE_API,
           {
@@ -85,7 +86,7 @@ export const fetchFOIMinistryRequestListByPage = (page = 1, size = 10, sort = [{
         if (res.data) {
           // dispatch(setFOIMinistryEventList(res.data));
           dispatch(setFOIEventList(res.data));
-          dispatch(setFOILoader(false));
+          dispatch(setFOIEventsLoader(false));
           if (res.data?.data[0]?.bcgovcode)
             dispatch(fetchFOIMinistryAssignedToList(res.data.data[0].bcgovcode));     
         } else {

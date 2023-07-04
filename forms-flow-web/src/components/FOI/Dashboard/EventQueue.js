@@ -4,7 +4,7 @@ import "./dashboard.scss";
 import useStyles from "./CustomStyle";
 import { useDispatch, useSelector } from "react-redux";
 import { push } from "connected-react-router";
-import { fetchFOIEventListByPage, fetchFOIMinistryRequestListByPage } from "../../../apiManager/services/FOI/foiEventDashboardServices";
+import { fetchFOIEventListByPage, fetchFOIMinistryEventListByPage } from "../../../apiManager/services/FOI/foiEventDashboardServices";
 import Loading from "../../../containers/Loading";
 import { setEventQueueFilter, setEventQueueParams } from "../../../actions/FOI/foiRequestActions";
 import {
@@ -28,7 +28,7 @@ const EventQueue = ({ userDetail, eventQueueTableInfo }) => {
   const userGroups = userDetail?.groups?.map(group => group.slice(1));
   const isMinistry = isMinistryLogin(userGroups);
   const eventQueue = useSelector((state) => state.foiRequests.foiEventsList);
-  const isLoading = useSelector((state) => state.foiRequests.isLoading);
+  const isEventsLoading = useSelector((state) => state.foiRequests.isEventsLoading);
   const classes = useStyles();
 
   const filterFields = [
@@ -65,7 +65,7 @@ const EventQueue = ({ userDetail, eventQueueTableInfo }) => {
     {
       // page+1 here, because initial page value is 0 for mui-data-grid
       dispatch(
-        fetchFOIMinistryRequestListByPage(
+        fetchFOIMinistryEventListByPage(
           rowsState.page + 1,
           rowsState.pageSize,
           serverSortModel,
@@ -306,7 +306,7 @@ const EventQueue = ({ userDetail, eventQueueTableInfo }) => {
             }
           }}
           onRowClick={renderReviewRequest}
-          loading={isLoading}
+          loading={isEventsLoading}
         />
       </Grid>
     </>
