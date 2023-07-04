@@ -135,9 +135,9 @@ const foiRequests = (state = initialState, action) => {
     case FOI_ACTION_CONSTANTS.IS_COMMENTTAGLIST_LOADING:
       return { ...state, isCommentTagListLoading: action.payload };
     case FOI_ACTION_CONSTANTS.FOI_LIST_EVENTS:
-        return { ...state, foiEventsList: action.payload, isLoading: false };
+        return { ...state, foiEventsList: action.payload, isEventsLoading: false };
     case FOI_ACTION_CONSTANTS.FOI_MINISTRY_EVENTLIST:
-        return { ...state, foiMinistryEventsList: action.payload };
+        return { ...state, foiMinistryEventsList: action.payload, isEventsLoading: false };
     case FOI_ACTION_CONSTANTS.FOI_LIST_REQUESTS:
       return { ...state, foiRequestsList: action.payload, isLoading: false };
     case FOI_ACTION_CONSTANTS.FOI_MINISTRY_REQUESTSLIST:
