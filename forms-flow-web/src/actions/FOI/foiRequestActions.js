@@ -1,4 +1,5 @@
 import FOI_ACTION_CONSTANTS from './foiActionConstants'
+
 export const setFOILoader = (data) => dispatch =>{
     dispatch({
         type:FOI_ACTION_CONSTANTS.IS_LOADING,
@@ -6,6 +7,12 @@ export const setFOILoader = (data) => dispatch =>{
     })
 }
 
+export const setRecordsLoader = (data) => dispatch =>{
+    dispatch({
+        type:FOI_ACTION_CONSTANTS.IS_RECORDS_LOADING,
+        payload:data
+    })
+}
 export const setFOIEventsLoader = (data) => dispatch =>{
     dispatch({
         type:FOI_ACTION_CONSTANTS.IS_EVENTS_LOADING,
