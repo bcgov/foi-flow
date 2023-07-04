@@ -29,6 +29,7 @@ export const fetchFOIEventListByPage = (
   });
 
   return (dispatch) => {
+    dispatch(setFOIEventList(null));
     dispatch(setFOIEventsLoader(true));
     httpGETRequest(
       API.FOI_GET_EVENTS_PAGE_API,
@@ -68,6 +69,7 @@ export const fetchFOIMinistryEventListByPage = (page = 1, size = 10, sort = [{fi
   });
 
   return (dispatch) => {
+    dispatch(setFOIEventList(null));
     dispatch(setFOIEventsLoader(true));    
     httpGETRequest(
           API.FOI_GET_MINISTRY_EVENTS_PAGE_API,
