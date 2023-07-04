@@ -26,6 +26,24 @@ export const setQueueParams = (data) => dispatch =>{
         payload:data
     })
 }
+export const setEventQueueFilter = (data) => dispatch =>{
+    dispatch({
+        type:FOI_ACTION_CONSTANTS.EVENT_QUEUE_FILTER,
+        payload:data
+    })
+}
+export const setEventQueueParams = (data) => dispatch =>{
+    dispatch({
+        type:FOI_ACTION_CONSTANTS.EVENT_QUEUE_PARAMS,
+        payload:data
+    })
+}
+export const setShowEventQueue = (data) => dispatch =>{
+    dispatch({
+        type:FOI_ACTION_CONSTANTS.SHOW_EVENT_QUEUE,
+        payload:data
+    })
+}
 export const setShowAdvancedSearch = (data) => dispatch =>{
     dispatch({
         type:FOI_ACTION_CONSTANTS.SHOW_ADVANCED_SEARCH,
@@ -59,6 +77,18 @@ export const setCommentTagListLoader = (data) => dispatch =>{
 export const setFOIUpdateLoader = (data) => dispatch =>{
     dispatch({
         type:FOI_ACTION_CONSTANTS.FOI_IS_REQUEST_UPDATED,
+        payload:data
+    })
+}
+export const setFOIEventList = (data) => dispatch =>{
+    dispatch({
+        type:FOI_ACTION_CONSTANTS.FOI_LIST_EVENTS,
+        payload:data
+    })
+}
+export const setFOIMinistryEventList = (data) => dispatch =>{
+    dispatch({
+        type:FOI_ACTION_CONSTANTS.FOI_MINISTRY_EVENTLIST,
         payload:data
     })
 }

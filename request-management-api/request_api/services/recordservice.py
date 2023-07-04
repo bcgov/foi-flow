@@ -38,22 +38,33 @@ class recordservice(recordservicebase):
     def fetch(self, requestid, ministryrequestid):
         return recordservicegetter().fetch(requestid, ministryrequestid)  
             
-    def delete(self, requestid, ministryrequestid, recordid, userid):
-        record = FOIRequestRecord.getrecordbyid(recordid)
-        record['attributes'] = json.loads(record['attributes'])
-        record.update({'updated_at': datetime.now(), 'updatedby': userid, 'isactive': False})
-        record['version'] += 1
-        newrecord = FOIRequestRecord()
-        newrecord.__dict__.update(record)
-        response = FOIRequestRecord.create([newrecord])
-        if (response.success):
-            _apiresponse, err = self.makedocreviewerrequest('POST', '/api/document/delete', {'ministryrequestid': ministryrequestid, 'filepaths': [record['s3uripath']]})
+    def update(self, requestid, ministryrequestid, requestdata, userid):
+        newrecords = []
+        recordids = [r['recordid'] for r in requestdata['records'] if r.get('recordid') is not None]
+        response = DefaultMethodResult(True, 'No recordids')
+        if(len(recordids) > 0):
+            records = FOIRequestRecord.getrecordsbyid(recordids)
+            for record in records:
+                record['attributes'] = json.loads(record['attributes'])
+                if not requestdata['isdelete']:
+                    record['attributes']['divisions'] = requestdata['divisions']
+                record.update({'updated_at': datetime.now(), 'updatedby': userid, 'isactive': not requestdata['isdelete']})
+                record['version'] += 1
+                newrecord = FOIRequestRecord()
+                newrecord.__dict__.update(record)
+                newrecords.append(newrecord)
+            response = FOIRequestRecord.create(newrecords)
+        if response.success:
+            if requestdata['isdelete']:
+                _apiresponse, err = self.makedocreviewerrequest('POST', '/api/document/delete', {'ministryrequestid': ministryrequestid, 'filepaths': [record['filepath'] for record in requestdata['records']]})
+            else:
+                _apiresponse, err = self.makedocreviewerrequest('POST', '/api/document/update', {'ministryrequestid': ministryrequestid, 'documentmasterids': [record['documentmasterid'] for record in requestdata['records']], 'divisions': requestdata['divisions']})
             if err:
-                return DefaultMethodResult(False,'Error in contacting Doc Reviewer API', -1, recordid)
-            return DefaultMethodResult(True,'Record marked as inactive', -1, recordid)
+                return DefaultMethodResult(False,'Error in contacting Doc Reviewer API', -1,  [record['documentmasterid'] for record in requestdata['records']])
+            return DefaultMethodResult(True,'Record updated in Doc Reviewer DB', -1, [record['documentmasterid'] for record in requestdata['records']])
         else:
-            return DefaultMethodResult(False,'Error in deleting Record', -1, recordid)
-
+            return DefaultMethodResult(False,'Error in updating Record', -1, [record['documentmasterid'] for record in requestdata['records']])
+            
     def retry(self, _requestid, ministryrequestid, data):
         _ministryrequest = FOIMinistryRequest.getrequestbyministryrequestid(ministryrequestid)
         for record in data['records']:
