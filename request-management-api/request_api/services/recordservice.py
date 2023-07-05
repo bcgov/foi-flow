@@ -90,7 +90,8 @@ class recordservice(recordservicebase):
                 "jobid": jobids[record['s3uripath']]['jobid'],
                 "documentmasterid": jobids[record['s3uripath']]['masterid'],
                 "trigger": record['trigger'],
-                "createdby": record['createdby']
+                "createdby": record['createdby'],
+                "usertoken": AuthHelper.getauthtoken()
             }
             if record.get('outputdocumentmasterid', False):
                 streamobject['outputdocumentmasterid'] = record['outputdocumentmasterid']
@@ -149,7 +150,8 @@ class recordservice(recordservicebase):
                         "documentmasterid": jobids[entry['s3uripath']]['masterid'],
                         "trigger": 'recordupload',
                         "createdby": userid,
-                        "incompatible": 'true' if extension in NONREDACTABLE_FILE_TYPES else 'false'
+                        "incompatible": 'true' if extension in NONREDACTABLE_FILE_TYPES else 'false',
+                        "usertoken": AuthHelper.getauthtoken()
                     }
                     if extension in FILE_CONVERSION_FILE_TYPES:
                         eventqueueservice().add(self.conversionstreamkey, streamobject)
@@ -224,7 +226,7 @@ class recordservice(recordservicebase):
             _filepath, extension = path.splitext(entry['filename'])
             entry['attributes']['extension'] = extension
             entry['attributes']['incompatible'] =  extension.lower() in NONREDACTABLE_FILE_TYPES
-            record = FOIRequestRecord(foirequestid=requestid, ministryrequestid = ministryrequestid, ministryrequestversion=_ministryversion,
+            record = FOIRequestRecord(foirequestid=_ministryrequest['foirequest_id'], ministryrequestid = ministryrequestid, ministryrequestversion=_ministryversion,
                             version = 1, createdby = userid, created_at = datetime.now())
             record.__dict__.update(entry)
             recordlist.append(record)
@@ -262,7 +264,8 @@ class recordservice(recordservicebase):
                         "documentmasterid": jobids[entry['s3uripath']]['masterid'],
                         "trigger": 'recordupload',
                         "createdby": userid,
-                        "incompatible": 'true' if extension in NONREDACTABLE_FILE_TYPES else 'false'
+                        "incompatible": 'true' if extension in NONREDACTABLE_FILE_TYPES else 'false',
+                        "usertoken": AuthHelper.getauthtoken()
                     }
                     if extension in FILE_CONVERSION_FILE_TYPES:
                         if entry['attributes']['filesize'] < int(self.conversionlargefilesizelimit):

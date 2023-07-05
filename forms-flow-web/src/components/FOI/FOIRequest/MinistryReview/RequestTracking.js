@@ -27,7 +27,7 @@ const RequestTracking = React.memo(({pubmindivstagestomain,existingDivStages,min
 
     return(
 
-        <Card className="foi-details-card" id="divisionalTracking">            
+        <Card style={{overflow: "visible"}} className="foi-details-card" id="divisionalTracking">
         <label className="foi-details-label">DIVISIONAL TRACKING</label>
         <CardContent>                       
                 <div className="row foi-details-row">

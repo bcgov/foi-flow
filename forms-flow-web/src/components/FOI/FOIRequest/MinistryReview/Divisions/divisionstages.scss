@@ -13,13 +13,21 @@
 }
 
 .foi-division-dropdown .MuiOutlinedInput-root {
-    color: gray;
+    color: black;
+}
+
+.foi-division-dropdown .MuiFormControl-root {
+    bottom: 8px;
+    .MuiInputBase-input {
+        height: 7.125px;
+    }
 } 
+
 .foi-divisionstage-dropdown .MuiOutlinedInput-root {
-    color: gray;
+    color: black;
 } 
 .foi-division-dropdown .MuiOutlinedInput-root .MuiSvgIcon-root {
-    color: gray;
+    color: black;
 } 
 
 .foi-divisionstage-dropdown .MuiOutlinedInput-root .MuiSvgIcon-root {
