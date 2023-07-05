@@ -29,7 +29,7 @@ AS select fn.idnumber::text || to_char(fnu.created_at,'YYYYMMDDHH24MMSSMSUS') ||
      LEFT JOIN "FOIUsers" ctr ON fnu.createdby::text = ctr.preferred_username
      JOIN "NotificationTypes" nt ON fn.notificationtypeid = nt.notificationtypeid
 UNION ALL
- SELECT select fn.idnumber::text || to_char(fnu.created_at,'YYYYMMDDHH24MMSSMSUS') || fn.axisnumber::text||fnu.userid||fnu.createdby  AS id,
+ SELECT fn.idnumber::text || to_char(fnu.created_at,'YYYYMMDDHH24MMSSMSUS') || fn.axisnumber::text||fnu.userid||fnu.createdby  AS id,
     fn.idnumber,
     fn.axisnumber,
     fn.notification ->> 'message'::text AS notification,
