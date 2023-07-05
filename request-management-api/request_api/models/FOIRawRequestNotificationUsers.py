@@ -132,10 +132,9 @@ class FOIRawRequestNotificationUser(db.Model):
     # Begin of Dashboard functions
 
     @classmethod
-    def getbasequery(cls, groups, foiuser, foicreator, additionalfilter=None, userid=None, isiaorestrictedfilemanager=False):
+    def getbasequery(cls, groups, additionalfilter=None, userid=None, isiaorestrictedfilemanager=False):
         _session = db.session
 
-        
         selectedcolumns = [            
             FOIRawRequests.axisrequestid.label('axisRequestId'),  
             FOIRawRequests.rawrequestid.label('rawrequestid'),
@@ -145,14 +144,13 @@ class FOIRawRequestNotificationUser(db.Model):
             FOIRawRequests.assignedtoformatted.label('assignedToFormatted'), 
             FOIRawRequests.ministryassignedtoformatted.label('ministryAssignedToFormatted'),
             FOIRawRequests.description.label('description'),
-            FOINotifications.idnumber.label('idnumber'),
             FOINotifications.notificationtype.label('notificationtype'),
             FOINotifications.notification.label('notification'),
             FOINotifications.created_at.label('createdat'),
+            FOINotifications.createdatformatted.label('createdatformatted'),
             FOINotifications.userformatted.label('userFormatted'),
             FOINotifications.creatorformatted.label('creatorFormatted'),
-            FOINotifications.userid.label('userid'),
-            FOINotifications.createdby.label('createdby')            
+            FOINotifications.id.label('id')          
         ]
 
         basequery = _session.query(
@@ -180,8 +178,8 @@ class FOIRawRequestNotificationUser(db.Model):
 
 
     @classmethod
-    def getrequestssubquery(cls, groups, foiuser, foicreator, filterfields, keyword, additionalfilter, userid, isiaorestrictedfilemanager):
-        basequery = FOIRawRequestNotificationUser.getbasequery(groups, foiuser, foicreator, additionalfilter, userid, isiaorestrictedfilemanager)
+    def getrequestssubquery(cls, groups, filterfields, keyword, additionalfilter, userid, isiaorestrictedfilemanager):
+        basequery = FOIRawRequestNotificationUser.getbasequery(groups, additionalfilter, userid, isiaorestrictedfilemanager)
         #filter/search
         if(len(filterfields) > 0 and keyword is not None):
             filtercondition = FOIRawRequestNotificationUser.getfilterforrequestssubquery(filterfields, keyword)
@@ -197,25 +195,8 @@ class FOIRawRequestNotificationUser(db.Model):
         if(keyword != 'restricted'):
             for field in filterfields:
                 _keyword = FOIRawRequestNotificationUser.getfilterkeyword(keyword, field)
-                if(field == 'createdat'):
-                    vkeyword = keyword.split('@')
-                    _keyword = FOIRawRequestNotificationUser.getfilterkeyword(vkeyword[0], field)
-                    _datevalue = _keyword.split('-')
-                    _vkeyword = vkeyword[1].split(' ')
-                    datecriteria = []
-                    for n  in range(len(_datevalue)):
-                        if '%Y' in _vkeyword[n]:
-                            datecriteria.append(extract('year', FOINotifications.created_at) == _datevalue[n])
-                        if '%b' in _vkeyword[n]:
-                            datecriteria.append(extract('month', FOINotifications.created_at) == _datevalue[n])
-                        if '%d' in _vkeyword[n]:
-                            datecriteria.append(extract('day', FOINotifications.created_at) == _datevalue[n])
-                    if len(datecriteria) > 0:
-                        filtercondition.append(and_(*datecriteria))   
-                else:
-                    filtercondition.append(FOIRawRequestNotificationUser.findfield(field).ilike('%'+_keyword+'%'))
-                
-            filtercondition.append(FOIRawRequests.isiaorestricted == True)
+                filtercondition.append(FOIRawRequestNotificationUser.findfield(field).ilike('%'+_keyword+'%'))
+                filtercondition.append(FOIRawRequests.isiaorestricted == True)
 
         return or_(*filtercondition)
     
@@ -224,10 +205,6 @@ class FOIRawRequestNotificationUser(db.Model):
     @classmethod
     def getfilterkeyword(cls, keyword, field):
         _newkeyword = keyword
-        if field != 'createdat':
-            _newkeyword = _newkeyword.replace('@%Y %b %d','')
-            _newkeyword = _newkeyword.replace('@%Y %b','')
-            _newkeyword = _newkeyword.replace('@%Y','')
         if(field == 'idNumber'):
             _newkeyword = _newkeyword.replace('u-00', '')
         return _newkeyword
@@ -237,6 +214,7 @@ class FOIRawRequestNotificationUser(db.Model):
         return {
             'axisRequestId' : FOIRawRequests.axisrequestid,
             'createdat': FOINotifications.created_at,
+            'createdatformatted': FOINotifications.createdatformatted,
             'notification': FOINotifications.notification,
             'assignedToFormatted': FOIRawRequests.assignedtoformatted,
             'ministryAssignedToFormatted': FOIRawRequests.ministryassignedtoformatted,
