@@ -53,9 +53,14 @@ class stateevent:
         notification = self.__preparenotification(state)
         if state == 'Closed' or state == 'Archived' :
             notificationservice().dismissnotificationsbyrequestid(requestid, requesttype)
+        print('************************************')
+        print(state)
+        print('************************************')
         if state == 'Archived':
             _openedministries = FOIMinistryRequest.getministriesopenedbyuid(requestid)
+            print(_openedministries)
             for ministry in _openedministries:
+                print('here')
                 response = notificationservice().createnotification({"message" : notification}, ministry["ministryrequestid"], 'ministryrequest', "State", userid)
         else:
             response = notificationservice().createnotification({"message" : notification}, requestid, requesttype, "State", userid)

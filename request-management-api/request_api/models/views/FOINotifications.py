@@ -13,6 +13,7 @@ class FOINotifications(db.Model):
     userid = db.Column(db.String(500))
     createdby = db.Column(db.String(500))
     created_at = db.Column(db.DateTime)
+    createdatformatted = db.Column(db.DateTime)
     userformatted = db.Column(db.Text)
     creatorformatted = db.Column(db.Text)
     notificationtype = db.Column(db.String(500))

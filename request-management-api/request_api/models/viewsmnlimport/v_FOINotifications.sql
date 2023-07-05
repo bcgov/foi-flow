@@ -1,7 +1,7 @@
 -- public."v_FOINotifications" source
 
 CREATE OR REPLACE VIEW public."v_FOINotifications"
-AS SELECT (fn.idnumber::text || fn.axisnumber::text) || fnu.created_at AS id,
+AS select fn.idnumber::text || to_char(fnu.created_at,'YYYYMMDDHH24MMSSMSUS') || fn.axisnumber::text||fnu.userid||fnu.createdby  AS id,
     fn.idnumber,
     fn.axisnumber,
     fn.notification ->> 'message'::text AS notification,
@@ -21,14 +21,15 @@ AS SELECT (fn.idnumber::text || fn.axisnumber::text) || fnu.created_at AS id,
             WHEN ctr.lastname IS NULL AND ctr.firstname IS NOT NULL THEN ctr.firstname::character varying
             ELSE fnu.createdby
         END AS creatorformatted,
-    nt.name AS notificationtype
+    nt.name AS notificationtype,
+    to_char(fnu.created_at  at time zone 'utc' at time zone 'pdt', 'YYYY Mon DD | HH12:MI AM') as createdatformatted
    FROM "FOIRequestNotifications" fn
      JOIN "FOIRequestNotificationUsers" fnu ON fn.notificationid = fnu.notificationid
      LEFT JOIN "FOIUsers" usr ON fnu.userid::text = usr.preferred_username
      LEFT JOIN "FOIUsers" ctr ON fnu.createdby::text = ctr.preferred_username
      JOIN "NotificationTypes" nt ON fn.notificationtypeid = nt.notificationtypeid
 UNION ALL
- SELECT (fn.idnumber::text || fn.axisnumber::text) || fnu.created_at AS id,
+ SELECT select fn.idnumber::text || to_char(fnu.created_at,'YYYYMMDDHH24MMSSMSUS') || fn.axisnumber::text||fnu.userid||fnu.createdby  AS id,
     fn.idnumber,
     fn.axisnumber,
     fn.notification ->> 'message'::text AS notification,
@@ -48,7 +49,8 @@ UNION ALL
             WHEN ctr.lastname IS NULL AND ctr.firstname IS NOT NULL THEN ctr.firstname::character varying
             ELSE fnu.createdby
         END AS creatorformatted,
-    nt.name AS notificationtype
+    nt.name AS notificationtype,
+    to_char(fnu.created_at  at time zone 'utc' at time zone 'pdt', 'YYYY Mon DD | HH12:MI AM') as createdatformatted
    FROM "FOIRawRequestNotifications" fn
      JOIN "FOIRawRequestNotificationUsers" fnu ON fn.notificationid = fnu.notificationid
      LEFT JOIN "FOIUsers" usr ON fnu.userid::text = usr.preferred_username
