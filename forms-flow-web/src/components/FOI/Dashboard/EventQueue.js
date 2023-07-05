@@ -171,15 +171,16 @@ const EventQueue = ({ userDetail, eventQueueTableInfo }) => {
     return url;
   }
 
-  // if (eventQueue === null) {
-  //   return (
-  //     <Grid item xs={12} container alignItems="center">
-  //       <Loading costumStyle={{ position: "relative", marginTop: "4em" }} />
-  //     </Grid>
-  //   );
-  // }
+  if (eventQueue === null) {
+    return (
+      <Grid item xs={12} container alignItems="center">
+        <Loading costumStyle={{ position: "relative", marginTop: "4em" }} />
+      </Grid>
+    );
+  }
 
   const handleSortChange = (model) => {
+    console.log(model)
     if (model.length === 0) {
       return;
     }
@@ -274,18 +275,12 @@ const EventQueue = ({ userDetail, eventQueueTableInfo }) => {
           </Grid>
         </Paper>
       </Grid>
-      <Grid item xs={12} style={{ minHeight: 300 }} className={classes.root}>
-       { eventQueue === null ?
-   
-      <Grid item xs={12} container alignItems="center">
-        <Loading costumStyle={{ position: "relative", marginTop: "4em" }} />
-      </Grid> :  
-      
+      <Grid item xs={12} style={{ minHeight: 300 }} className={classes.root}>      
         <DataGrid
           autoHeight
           className="foi-data-grid"
           getRowId={(row) => row.id}
-          rows={rows}
+          rows={isEventsLoading ? [] : rows}
           columns={eventColumnsRef.current}
           rowHeight={30}
           headerHeight={50}
@@ -314,7 +309,6 @@ const EventQueue = ({ userDetail, eventQueueTableInfo }) => {
           onRowClick={renderReviewRequest}
           loading={isEventsLoading}
         />
-      }
       </Grid>
     </>
   );
