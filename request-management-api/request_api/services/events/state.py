@@ -53,9 +53,6 @@ class stateevent:
         notification = self.__preparenotification(state)
         if state == 'Closed' or state == 'Archived' :
             notificationservice().dismissnotificationsbyrequestid(requestid, requesttype)
-        print('************************************')
-        print(state)
-        print('************************************')
         if state == 'Archived':
             _openedministries = FOIMinistryRequest.getministriesopenedbyuid(requestid)
             print(_openedministries)
