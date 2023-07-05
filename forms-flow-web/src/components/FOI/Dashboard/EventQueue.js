@@ -171,13 +171,13 @@ const EventQueue = ({ userDetail, eventQueueTableInfo }) => {
     return url;
   }
 
-  if (eventQueue === null) {
-    return (
-      <Grid item xs={12} container alignItems="center">
-        <Loading costumStyle={{ position: "relative", marginTop: "4em" }} />
-      </Grid>
-    );
-  }
+  // if (eventQueue === null) {
+  //   return (
+  //     <Grid item xs={12} container alignItems="center">
+  //       <Loading costumStyle={{ position: "relative", marginTop: "4em" }} />
+  //     </Grid>
+  //   );
+  // }
 
   const handleSortChange = (model) => {
     if (model.length === 0) {
