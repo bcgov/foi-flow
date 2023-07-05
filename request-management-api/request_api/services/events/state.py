@@ -55,9 +55,7 @@ class stateevent:
             notificationservice().dismissnotificationsbyrequestid(requestid, requesttype)
         if state == 'Archived':
             _openedministries = FOIMinistryRequest.getministriesopenedbyuid(requestid)
-            print(_openedministries)
             for ministry in _openedministries:
-                print('here')
                 response = notificationservice().createnotification({"message" : notification}, ministry["ministryrequestid"], 'ministryrequest', "State", userid)
         else:
             response = notificationservice().createnotification({"message" : notification}, requestid, requesttype, "State", userid)
