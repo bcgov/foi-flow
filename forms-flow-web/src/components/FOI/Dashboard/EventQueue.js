@@ -275,6 +275,12 @@ const EventQueue = ({ userDetail, eventQueueTableInfo }) => {
         </Paper>
       </Grid>
       <Grid item xs={12} style={{ minHeight: 300 }} className={classes.root}>
+       { eventQueue === null ?
+   
+      <Grid item xs={12} container alignItems="center">
+        <Loading costumStyle={{ position: "relative", marginTop: "4em" }} />
+      </Grid> :  
+      
         <DataGrid
           autoHeight
           className="foi-data-grid"
@@ -308,6 +314,7 @@ const EventQueue = ({ userDetail, eventQueueTableInfo }) => {
           onRowClick={renderReviewRequest}
           loading={isEventsLoading}
         />
+      }
       </Grid>
     </>
   );
