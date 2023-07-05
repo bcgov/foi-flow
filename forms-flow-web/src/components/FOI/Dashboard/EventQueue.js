@@ -180,7 +180,6 @@ const EventQueue = ({ userDetail, eventQueueTableInfo }) => {
   }
 
   const handleSortChange = (model) => {
-    console.log(model)
     if (model.length === 0) {
       return;
     }
