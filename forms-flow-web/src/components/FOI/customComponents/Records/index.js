@@ -1112,7 +1112,7 @@ export const RecordsLog = ({
                 >
                   + Upload Records
                 </button> :
-                (records?.length > 0 && DISABLE_REDACT_WEBLINK?.toLowerCase() =='false' && <a href={DOC_REVIEWER_WEB_URL + "/foi/" + ministryId}>
+                (records?.length > 0 && DISABLE_REDACT_WEBLINK?.toLowerCase() =='false' && <a href={DOC_REVIEWER_WEB_URL + "/foi/" + ministryId} target='_blank'>
                   <button
                     className={clsx("btn", "addAttachment", classes.createButton)}
                     variant="contained"
