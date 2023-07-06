@@ -16,12 +16,12 @@ class dashboardeventservice:
     """
     
     def geteventqueuepagination(self, queuetype, groups=None, page=1, size=10, sortingitems=[], sortingorders=[], filterfields=[], keyword=None, additionalfilter='All', userid=None):
-        _keyword, _filterfields = self.__validateandtransform(filterfields, keyword)
+        _filterfields = self.__validateandtransform(filterfields)
         notifications = None
         if AuthHelper.getusertype() == "iao" and (queuetype is None or queuetype == "all"):                                                                                           
-                notifications = FOIRequestNotificationDashboard.getiaoeventpagination(groups, page, size, sortingitems, sortingorders, _filterfields, _keyword, additionalfilter, userid, AuthHelper.isiaorestrictedfilemanager())
+                notifications = FOIRequestNotificationDashboard.getiaoeventpagination(groups, page, size, sortingitems, sortingorders, _filterfields, keyword, additionalfilter, userid, AuthHelper.isiaorestrictedfilemanager())
         elif  AuthHelper.getusertype() == "ministry" and (queuetype is not None and queuetype == "ministry"):
-                notifications = FOIRequestNotificationDashboard.getministryeventpagination(groups, page, size, sortingitems, sortingorders, _filterfields, _keyword, additionalfilter, userid, AuthHelper.isiaorestrictedfilemanager(), AuthHelper.isministryrestrictedfilemanager())
+                notifications = FOIRequestNotificationDashboard.getministryeventpagination(groups, page, size, sortingitems, sortingorders, _filterfields, keyword, additionalfilter, userid, AuthHelper.isiaorestrictedfilemanager(), AuthHelper.isministryrestrictedfilemanager())
         if notifications is not None:
             eventqueue = []
             for notification in notifications.items:
@@ -39,63 +39,24 @@ class dashboardeventservice:
             return jsonify({'data': eventqueue, 'meta': meta})
         return jsonify({'data': [], 'meta': None})
     
-    def __validateandtransform(self, filterfields, keyword):
-        _newvalue = keyword
-        _newfilterfields = filterfields
-        dtformats = ['%Y %b %d','%Y %b','%b %d','%d','%b','%Y']
-        issupportedformat = False
-        if keyword not in [None, ""] and len(filterfields) > 0:
-            for dtformat in dtformats:  
-                _newvalue, issupportedformat = self.__validatedateinput(_newvalue, dtformat)
-                if issupportedformat == True:
-                    _newvalue=_newvalue+'@'+dtformat
-                    break
-        if  (keyword in [None, ""] or issupportedformat == False) and "createdat" in _newfilterfields:
-            _newfilterfields.remove("createdat")     
-        return _newvalue, _newfilterfields
+    def __validateandtransform(self, filterfields):
+        return self.__transformfilteringfields(filterfields)
+    
+    def __transformfilteringfields(self, filterfields):
+        return list(map(lambda x: x.replace('createdat', 'createdatformatted'), filterfields))
 
-    def __validatedateinput(self, keyword, format):
-        try:
-            _toformat = self.__getdateformat(format)
-            if _toformat is not None:
-                newvalue = datetime2.strptime(keyword, format).strftime(_toformat)
-            return newvalue, True
-        except ValueError as ex:
-            return keyword, False  
-
-    def __getdateformat(self, format):
-        """_summary_
-        Supported Formats: 
-        2023 Jun 15
-        2023 Jun
-        Jun 15
-        2023
-        Jun
-        15     
-        """
-        if format == '%Y %b %d':
-            return '%Y-%m-%d'
-        elif format == '%Y %b':
-            return '%Y-%m'
-        elif format == '%b %d':
-            return '%m-%d'
-        elif format == '%d':
-            return '%d'
-        elif format == '%b':
-            return '%m'
-        elif format == '%Y':
-            return '%Y'
-        else:
-            return None  
+    
 
     def __prepareevent(self, notification):
+        print(notification)
         return {
-            'id': self.__getid(notification),
+            'id': notification.id,
             'status': notification.status,
             'rawrequestid': notification.rawrequestid,
             'requestid': notification.requestid,
             'ministryrequestid': notification.ministryrequestid,
-            'createdat' : self.__formatedate(notification.createdat),
+            'createdat' : notification.createdatformatted,
+            #'createdat' : self.__formatedate(notification.createdat),
             'axisRequestId': notification.axisRequestId,
             'notification': notification.notification,
             'assignedToFormatted': notification.assignedToFormatted,
@@ -106,9 +67,4 @@ class dashboardeventservice:
             'description':notification.description
         }
 
-    def __formatedate(self, input):
-        return datetimehandler().convert_to_pst(input,'%Y %b %d | %I:%M %p')
     
-    def __getid(self, notification):
-        _id = notification.idnumber+str(notification.createdat)+notification.axisRequestId+notification.userid+notification.createdby
-        return re.sub(r"[^a-zA-Z0-9 ]", "", _id).replace(" ","")
