@@ -274,7 +274,7 @@ const EventQueue = ({ userDetail, eventQueueTableInfo }) => {
           </Grid>
         </Paper>
       </Grid>
-      <Grid item xs={12} style={{ minHeight: 300 }} className={classes.root}>
+      <Grid item xs={12} style={{ minHeight: 300 }} className={classes.root}>      
         <DataGrid
           autoHeight
           className="foi-data-grid"

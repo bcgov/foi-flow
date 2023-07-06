@@ -29,6 +29,7 @@ export const fetchFOIEventListByPage = (
   });
 
   return (dispatch) => {
+    // dispatch(setFOIEventList(null));
     dispatch(setFOIEventsLoader(true));
     httpGETRequest(
       API.FOI_GET_EVENTS_PAGE_API,
@@ -47,7 +48,7 @@ export const fetchFOIEventListByPage = (
       .then((res) => {
         if (res.data) {
           dispatch(setFOIEventList(res.data));
-          dispatch(setFOIEventsLoader(false));
+          // dispatch(setFOIEventsLoader(false));
         } else {
           dispatch(serviceActionError(res));
           throw new Error("Error in fetching dashboard data for IAO");
@@ -68,6 +69,7 @@ export const fetchFOIMinistryEventListByPage = (page = 1, size = 10, sort = [{fi
   });
 
   return (dispatch) => {
+    // dispatch(setFOIEventList(null));
     dispatch(setFOIEventsLoader(true));    
     httpGETRequest(
           API.FOI_GET_MINISTRY_EVENTS_PAGE_API,
@@ -86,9 +88,9 @@ export const fetchFOIMinistryEventListByPage = (page = 1, size = 10, sort = [{fi
         if (res.data) {
           // dispatch(setFOIMinistryEventList(res.data));
           dispatch(setFOIEventList(res.data));
-          dispatch(setFOIEventsLoader(false));
-          if (res.data?.data[0]?.bcgovcode)
-            dispatch(fetchFOIMinistryAssignedToList(res.data.data[0].bcgovcode));     
+          // dispatch(setFOIEventsLoader(false));
+          // if (res.data?.data[0]?.bcgovcode)
+          //   dispatch(fetchFOIMinistryAssignedToList(res.data.data[0].bcgovcode));     
         } else {
           dispatch(serviceActionError(res));
           throw new Error("Error in fetching dashboard data for IAO");

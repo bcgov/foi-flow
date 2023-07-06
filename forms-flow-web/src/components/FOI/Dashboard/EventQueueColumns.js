@@ -7,40 +7,46 @@ import {   cellTooltipRender,
     {
       field: "createdat",
       headerName: "DATE | TIME STAMP",
-      width: 200,
+      // width: 200,
+      flex: 1,
       headerAlign: "left",
     },
     {
       field: "axisRequestId",
       headerName: "ID NUMBER",
       headerAlign: "left",
-      width: 160,
+      // width: 160,
+      flex: 1,
       renderCell: cellTooltipRender
     },
     {
       field: "creatorFormatted",
       headerName: "FROM",
       headerAlign: "left",
-      width: 160,
+      // width: 160,
+      flex: 1,
     },
     {
       field: "userFormatted",
       headerName: "TO",
       headerAlign: "left",
-      width: 160,
+      // width: 160,
+      flex: 1,
     },
     {
       field: "assignedToFormatted",
       headerName: "ASSIGNEE",
       headerAlign: "left",
-      width: 160,
+      // width: 160,
+      flex: 1,
     },
   
     {
       field: "notification",
       headerName: "CONTENT",
       headerAlign: "left",
-      width: 300,
+      // width: 300,
+      flex: 1,
      renderCell: eventCellTooltipRender
     }
     

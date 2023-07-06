@@ -151,7 +151,7 @@ class FOIRequestNotificationUser(db.Model):
 
     # Begin of Dashboard functions
     @classmethod
-    def geteventsubquery(cls, groups, filterfields, keyword, additionalfilter, userid, iaoassignee, ministryassignee, foiuser, foicreator, requestby='IAO', isiaorestrictedfilemanager=False, isministryrestrictedfilemanager=False):
+    def geteventsubquery(cls, groups, filterfields, keyword, additionalfilter, userid, requestby='IAO', isiaorestrictedfilemanager=False, isministryrestrictedfilemanager=False):
         #for queue/dashboard
         _session = db.session
 
@@ -167,30 +167,14 @@ class FOIRequestNotificationUser(db.Model):
             if(keyword != "restricted"):
                 for field in filterfields:
                     _keyword = FOIRequestNotificationUser.getfilterkeyword(keyword, field)       
-                    if field == "createdat":
-                        vkeyword = keyword.split('@')
-                        _keyword = FOIRequestNotificationUser.getfilterkeyword(vkeyword[0], field)
-                        _datevalue = _keyword.split('-')
-                        datecriteria = []
-                        _vkeyword = vkeyword[1].split(' ')
-                        for n  in range(len(_datevalue)):
-                            if '%Y' in _vkeyword[n]:
-                                datecriteria.append(extract('year',FOINotifications.created_at) == _datevalue[n])
-                            if '%b' in _vkeyword[n]:
-                                datecriteria.append(extract('month', FOINotifications.created_at) == _datevalue[n])
-                            if '%d' in _vkeyword[n]:
-                                datecriteria.append(extract('day', FOINotifications.created_at) == _datevalue[n])
-                        if len(datecriteria) > 0:
-                            filtercondition.append(and_(*datecriteria)) 
-                    else:
-                        filtercondition.append(FOIRequestNotificationUser.findfield(field).ilike('%'+_keyword+'%'))
+                    filtercondition.append(FOIRequestNotificationUser.findfield(field).ilike('%'+_keyword+'%'))
             else:
                 if(requestby == 'IAO'):
                     filtercondition.append(FOIRestrictedMinistryRequest.isrestricted == True)
                 else:
                     filtercondition.append(ministry_restricted_requests.isrestricted == True)
 
-        selectedcolumns = [            
+        selectedcolumns = [                       
             FOIRequests.axisrequestid.label('axisRequestId'),
             FOIRequests.rawrequestid.label('rawrequestid'),
             FOIRequests.foirequest_id.label('requestid'),
@@ -199,14 +183,13 @@ class FOIRequestNotificationUser(db.Model):
             FOIRequests.assignedtoformatted.label('assignedToFormatted'),
             FOIRequests.ministryassignedtoformatted.label('ministryAssignedToFormatted'),          
             FOIRequests.description,
-            FOINotifications.idnumber.label('idnumber'),
             FOINotifications.notificationtype.label('notificationtype'),
             FOINotifications.notification.label('notification'),                 
-            FOINotifications.created_at.label('createdat'),    
+            FOINotifications.created_at.label('createdat'),  
+            FOINotifications.createdatformatted.label('createdatformatted'),  
             FOINotifications.userformatted.label('userFormatted'),
             FOINotifications.creatorformatted.label('creatorFormatted'),
-            FOINotifications.userid.label('userid'),
-            FOINotifications.createdby.label('createdby'),         
+            FOINotifications.id.label('id')        
         ]
 
         basequery = _session.query(
@@ -302,16 +285,12 @@ class FOIRequestNotificationUser(db.Model):
     @classmethod
     def getfilterkeyword(cls, keyword, field):
         _newkeyword = keyword
-        if field != 'createdat':
-            _newkeyword = _newkeyword.replace('@%Y %b %d','')
-            _newkeyword = _newkeyword.replace('@%Y %b','')
-            _newkeyword = _newkeyword.replace('@%Y','')
         if(field == 'idNumber'):
             _newkeyword = _newkeyword.replace('u-00', '')
         return _newkeyword
 
     @classmethod
-    def getsorting(cls, sortingitems, sortingorders, iaoassignee, ministryassignee, foiuser, foicreator):
+    def getsorting(cls, sortingitems, sortingorders):
         #sorting
         sortingcondition = []
         if(len(sortingitems) > 0 and len(sortingorders) > 0 and len(sortingitems) == len(sortingorders)):
@@ -321,7 +300,7 @@ class FOIRequestNotificationUser(db.Model):
 
         #default sorting
         if(len(sortingcondition) == 0):
-            sortingcondition.append(FOIRequestNotificationUser.findfield('createdat', iaoassignee, ministryassignee, foiuser, foicreator).desc())
+            sortingcondition.append(FOIRequestNotificationUser.findfield('createdat').desc())
 
         #always sort by created_at last to prevent pagination collisions
         sortingcondition.append(asc('created_at'))
@@ -338,10 +317,10 @@ class FOIRequestNotificationUser(db.Model):
     @classmethod
     def findfield(cls, x):
         #add more fields here if need sort/filter/search more columns
-
         return {
             'axisRequestId' : FOIRequests.axisrequestid,
             'createdat': FOINotifications.created_at,
+            'createdatformatted': FOINotifications.createdatformatted,
             'notification': FOINotifications.notification,
             'assignedToFormatted': FOIRequests.assignedtoformatted,
             'ministryAssignedToFormatted': FOIRequests.ministryassignedtoformatted,
