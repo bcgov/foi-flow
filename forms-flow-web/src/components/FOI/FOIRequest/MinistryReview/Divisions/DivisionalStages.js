@@ -133,7 +133,7 @@ const DivisionalStages = React.memo(
 
     const divisionList = divisionalstages.divisions;
     const divisionItems = [{label: "Select Division", divisionid: -1}].concat(divisionList.map(d=> ({label: d.name, divisionid: d.divisionid})))
-    console.log(divisionItems)
+
 
     const handleEApprovalChange = (e,id) => {
       updateEApproval(e, id, minDivStages, (newStages) => {

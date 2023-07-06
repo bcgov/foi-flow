@@ -33,7 +33,7 @@ class legislativedateevent(duecalculator):
                 message = None
                 if  _duedate == _today:                
                     message = self.__todayduemessage()     
-                elif  self.getpreviousbusinessday(entry['duedate'],ca_holidays) == _today:
+                elif  self.getpreviousbusinessday(entry['duedate'],ca_holidays) == _today or self.getbusinessdaysbetween(entry['duedate'],_today) == 5:
                     message = self.__upcomingduemessage(_duedate)
                 self.__createnotification(message,entry['foiministryrequestid'])
                 self.__createcomment(entry, message)

@@ -114,6 +114,7 @@ class recordservice(recordservicebase):
                                 version = 1, createdby = userid, created_at = datetime.now())
             batch = str(uuid.uuid4())
             _record['attributes']['batch'] = batch
+            _record['attributes']['lastmodified'] = json.loads(replacingrecord['attributes'])['lastmodified']
             _filepath, extension = path.splitext(_record['filename'])
             _record['attributes']['extension'] = extension            
             _record['attributes']['incompatible'] =  extension.lower() in NONREDACTABLE_FILE_TYPES 
