@@ -181,7 +181,7 @@ class FOIRawRequestNotificationUser(db.Model):
     def getrequestssubquery(cls, groups, filterfields, keyword, additionalfilter, userid, isiaorestrictedfilemanager):
         basequery = FOIRawRequestNotificationUser.getbasequery(groups, additionalfilter, userid, isiaorestrictedfilemanager)
         #filter/search
-        if(len(filterfields) > 0 and keyword is not None):
+        if(len(filterfields) > 0 and keyword not in(None, "")):
             filtercondition = FOIRawRequestNotificationUser.getfilterforrequestssubquery(filterfields, keyword)
             return basequery.filter(filtercondition)
         else:

@@ -162,7 +162,7 @@ class FOIRequestNotificationUser(db.Model):
         ministryfilter = FOIRequestNotificationUser.getgroupfilters(groups)
 
         #filter/search
-        if(len(filterfields) > 0 and keyword is not None):
+        if(len(filterfields) > 0 and keyword not in (None,"")):
             filtercondition = []
             if(keyword != "restricted"):
                 for field in filterfields:
