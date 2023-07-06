@@ -117,9 +117,9 @@ export default function AttachmentModal({
     const validateFilename = (fname) => {
       let rg1 = /^[^\/:*?"<>|]+$/; // forbidden characters  / : * ? " < > |
       let rg2 = /^\./; // cannot start with dot (.)
-      let rg3 = /^(nul|prn|con|lpt\d|com\d)(.|$)/i; // forbidden file names
+      //let rg3 = /^(nul|prn|con|lpt\d|com\d)(.|$)/i; // forbidden file names
 
-      return fname && rg1.test(fname) && !rg2.test(fname) && !rg3.test(fname);
+      return fname && rg1.test(fname) && !rg2.test(fname);
     };
 
     const containDuplicate = (fname) => {
