@@ -8,6 +8,7 @@ from request_api.models.FOIRawRequests import FOIRawRequest
 from request_api.schemas.foidocument import CreateDocumentSchema
 from request_api.services.external.storageservice import storageservice
 from request_api.models.FOIApplicantCorrespondenceAttachments import FOIApplicantCorrespondenceAttachment
+from request_api.utils.enums import RequestType
 
 import json
 import base64
@@ -30,9 +31,12 @@ class documentservice:
     def getrequestdocumentsbyrole(self, requestid, requesttype, isministrymember):
         documents = self.getactiverequestdocuments(requestid, requesttype)
         if isministrymember:
+            type = FOIMinistryRequest.getrequest(requestid)['foirequest.requesttype']
             for document in documents:
                 if document["category"] == "personal":
-                    document["documentpath"] = ""        
+                    document["documentpath"] = ""
+                if type.lower() == RequestType.GENERAL.value.lower() and document["category"] == 'applicant':
+                    documents.remove(document)
         return documents
 
     def createrequestdocument(self, requestid, documentschema, userid, requesttype):

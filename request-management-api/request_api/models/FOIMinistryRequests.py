@@ -80,6 +80,7 @@ class FOIMinistryRequest(db.Model):
 
     foirequest_id =db.Column(db.Integer, db.ForeignKey('FOIRequests.foirequestid'))
     foirequestversion_id = db.Column(db.Integer, db.ForeignKey('FOIRequests.version'))    
+    foirequest =  relationship("FOIRequest",backref=backref("FOIRequests"),uselist=False,foreign_keys="[FOIMinistryRequest.foirequest_id, FOIMinistryRequest.foirequestversion_id]")
     foirequestkey = relationship("FOIRequest",foreign_keys="[FOIMinistryRequest.foirequest_id]")
     foirequestversion = relationship("FOIRequest",foreign_keys="[FOIMinistryRequest.foirequestversion_id]")
 
