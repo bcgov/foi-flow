@@ -1238,11 +1238,12 @@ class FOIMinistryRequest(db.Model):
     def getmetadata(cls,ministryrequestid):
         requestdetails = {}
         try:
-            sql = """select version, assignedto, fa.firstname, fa.lastname, pa.bcgovcode, fmr.programareaid from "FOIMinistryRequests" fmr 
+            sql = """select fmr.version, assignedto, fa.firstname, fa.lastname, pa.bcgovcode, fmr.programareaid, f.requesttype  
+                from "FOIMinistryRequests" fmr join "FOIRequests" f on fmr.foirequest_id = f.foirequestid and fmr.foirequestversion_id = f."version" 
                     FULL OUTER JOIN "FOIAssignees" fa ON fa.username = fmr.assignedto
                     INNER JOIN "ProgramAreas" pa ON pa.programareaid = fmr.programareaid
                     where foiministryrequestid = :ministryrequestid
-                    order by version desc limit 1;"""
+                    order by fmr.version desc limit 1;"""
             rs = db.session.execute(text(sql), {'ministryrequestid': ministryrequestid})
             for row in rs:
                 requestdetails["assignedTo"] = row["assignedto"]
@@ -1251,6 +1252,7 @@ class FOIMinistryRequest(db.Model):
                 requestdetails["bcgovcode"] = row["bcgovcode"]
                 requestdetails["version"] = row["version"]
                 requestdetails["programareaid"] = row["programareaid"]
+                requestdetails["requesttype"] = row["requesttype"]
         except Exception as ex:
             logging.error(ex)
             raise ex
