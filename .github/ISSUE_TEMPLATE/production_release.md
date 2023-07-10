@@ -52,6 +52,7 @@ Capture the image details
 #### Step-4: Signoff from business
 - [ ] Yes
 - [ ] No
+- [ ] Not Applicable
 
 #### Step-5: Healthcheck (Check the desired components)
 - [ ] FOI DB
