@@ -31,11 +31,11 @@ class documentservice:
     def getrequestdocumentsbyrole(self, requestid, requesttype, isministrymember):
         documents = self.getactiverequestdocuments(requestid, requesttype)
         if isministrymember:
-            type = FOIMinistryRequest.getrequest(requestid)['foirequest.requesttype']
+            metaobj = FOIMinistryRequest.getmetadata(requestid)
             for document in documents:
                 if document["category"] == "personal":
                     document["documentpath"] = ""
-                if type.lower() == RequestType.GENERAL.value.lower() and document["category"] == 'applicant':
+                if metaobj["requesttype"].lower() == RequestType.GENERAL.value.lower() and document["category"] == 'applicant':
                     documents.remove(document)
         return documents
 
