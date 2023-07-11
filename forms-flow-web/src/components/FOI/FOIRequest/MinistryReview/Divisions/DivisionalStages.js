@@ -5,6 +5,7 @@ import FormControl from "@mui/material/FormControl";
 import Select from "@mui/material/Select";
 import InputLabel from "@mui/material/InputLabel";
 import OutlinedInput from "@mui/material/OutlinedInput";
+import Autocomplete from "@mui/material/Autocomplete";
 import "./divisionstages.scss";
 import {
   calculateStageCounter,
@@ -46,7 +47,7 @@ const DivisionalStages = React.memo(
       calculateStageCounter(existingDivStages)
     );
 
-    const handleDivisionChange = (e, id, divisionid) => {
+    const handleDivisionChange = (newValue, id, divisionid) => {
       let ismatchfound = checkRecordAssociation(divisionid);
       if (ismatchfound === true) {
           setmodalName(<span>Changing Divisions</span>);
@@ -54,14 +55,14 @@ const DivisionalStages = React.memo(
           setModalDescription(<span><i>All associated records must be removed from the Records Log prior to you being able to change a division in order to ensure the Records Package is accurate.</i></span>);
           setShowModal(true);   
       } else {
-          updateDivisions(e, id, minDivStages, (newStages) => {
+          updateDivisions(newValue, id, minDivStages, (newStages) => {
             setMinDivStages([...newStages]);
             appendStageIterator([...newStages]);
           });
           createMinistrySaveRequestObject(
             FOI_COMPONENT_CONSTANTS.DIVISION,
-            e.target.value,
-            e.target.name
+            newValue.divisionid,
+            newValue.label
           );
       }
     };
@@ -131,6 +132,8 @@ const DivisionalStages = React.memo(
     };
 
     const divisionList = divisionalstages.divisions;
+    const divisionItems = [{label: "Select Division", divisionid: -1}].concat(divisionList.map(d=> ({label: d.name, divisionid: d.divisionid})))
+
 
     const handleEApprovalChange = (e,id) => {
       updateEApproval(e, id, minDivStages, (newStages) => {
@@ -155,40 +158,6 @@ const DivisionalStages = React.memo(
       createMinistrySaveRequestObject();
     };
 
-
-    const getdivisionMenuList = () => {
-      let _divisionItems = [];
-      _divisionItems.push(
-        <MenuItem key={0} name="selectmenuitem" value={-1}>
-          <em>Select Division</em>
-        </MenuItem>
-      );
-
-      const divisionItems =
-        divisionList &&
-        divisionList.map((item) => {
-          let _mindivtem = minDivStages.filter(
-            (d) => d.divisionid === item.divisionid
-          );
-          return (
-            <MenuItem
-              disabled={_mindivtem.length > 0}
-              className="foi-division-menuitem"
-              key={item.divisionid}
-              value={item.divisionid}
-            >
-              <span
-                className={`foi-menuitem-span ${item.name
-                  .toLowerCase()
-                  .replace(/\s/g, "")}`}
-              ></span>
-              {item.name}
-            </MenuItem>
-          );
-        });
-      _divisionItems.push(divisionItems);
-      return _divisionItems;
-    };
 
     const divisionstageList = divisionalstages.stages;
 
@@ -252,33 +221,27 @@ const DivisionalStages = React.memo(
       return (
         <div className="row foi-details-row" id={`foi-division-row${_id}`}>
           <div className="col-lg-3 foi-details-col">
-            <FormControl
-              fullWidth
-              error={row.divisionid === -1 && row.stageid !== -1}>
-              <InputLabel id="foi-division-dropdown-label">
-                Select Divison
-              </InputLabel>
-              <Select
-                labelId="foi-division-dropdown-label"
+              <Autocomplete
                 className="foi-division-dropdown"
-                id="foi-division-dropdown"
-                value={row.divisionid || -1}
-                inputProps={{ "aria-labelledby": "foi-division-dropdown-label"}}
-                input={<OutlinedInput  label="Select Divison" notched />}
-                onChange={(e) => handleDivisionChange(e, _id, row.divisionid)}
-                fullWidth
-                renderValue={(value) => {
-                  return renderMenuItem(
-                    value,
-                    divisionList,
-                    "divisionid",
-                    "Select Division"
-                  );
-                }}
-              >
-                {getdivisionMenuList()}
-              </Select>
-            </FormControl>
+                disableClearable
+                onChange={(e, newValue) => handleDivisionChange(newValue, _id, row.divisionid)}
+                value={row.divisionid > 0 ? {label: row.divisionname, divisionid: row.divisionid} : {label: "Select Division", divisionid: -1}}
+                disablePortal
+                // id="combo-box-demo"
+                options={divisionItems}
+                getOptionDisabled={option => existingDivStages.findIndex(d => d.divisionid === option.divisionid) > -1 || option.divisionid === -1}
+                isOptionEqualToValue={(option, value) => (option.divisionid === value.divisionid)}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    label="Select Division"
+                    InputLabelProps={{ shrink: true }}
+                    variant="outlined"
+                    error={row.divisionid === -1 && row.stageid !== -1}
+                    style={{color: "black"}}
+                  />
+                )}
+              />
           </div>
           <div className="col-lg-3 foi-details-col">
             <FormControl
