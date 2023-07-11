@@ -64,3 +64,4 @@ export const RECORD_PROCESSING_HRS = (window._env_ && window._env_.REACT_APP_REC
 
 export const DISABLE_REDACT_WEBLINK = (window._env_ && window._env_.REACT_APP_DISABLE_REDACT_WEBLINK) || process.env.REACT_APP_DISABLE_REDACT_WEBLINK || false;
 export const DISABLE_GATHERINGRECORDS_TAB = (window._env_ && window._env_.REACT_APP_DISABLE_GATHERINGRECORDS_TAB) || process.env.REACT_APP_DISABLE_GATHERINGRECORDS_TAB || 'false';
+

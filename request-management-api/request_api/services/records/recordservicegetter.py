@@ -30,7 +30,8 @@ class recordservicegetter(recordservicebase):
                     for record in uploadedrecords:
                         _computingresponse = self.__getcomputingresponse(computingresponses, "recordid", record)
                         _record = self.__preparerecord(record,_computingresponse, computingresponses,divisions)
-                        resultrecords.append(_record)
+                        if not _record['attributes'].get('isportfolio', False):
+                            resultrecords.append(_record)
                         if record["batchid"] not in batchids:
                             batchids.append(record["batchid"])  
                     if computingresponses not in (None, []) and len(computingresponses) > 0:
