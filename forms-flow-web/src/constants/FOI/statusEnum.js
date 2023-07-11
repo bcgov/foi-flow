@@ -217,6 +217,13 @@ const AttachmentCategories = Object.freeze({
       bgcolor: "#1A1A1A",
       type: ["tag"],
     },
+	{
+      name: "ministrysignoff",
+      tags: ["ministrysignoff"],
+      display: "Ministry Sign Off",
+      bgcolor: "#4B296B",
+      type: ["tag"],
+    },
     { // transition: Response -> On hold
       name: "response-onhold",
       tags: ["response-onhold"],
