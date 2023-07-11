@@ -837,6 +837,24 @@ class FOIMinistryRequest(db.Model):
         finally:
             db.session.close()
         return ministries 
+    
+    @classmethod
+    def getclosedaxisids(cls):
+        axisids = []                
+        try:
+            sql = """ select distinct on (foiministryrequestid) foiministryrequestid, version, axisrequestid  
+                        from "FOIMinistryRequests" fr 
+                        where requeststatusid = 3
+                        order by  foiministryrequestid , version desc, axisrequestid"""
+            rs = db.session.execute(text(sql))        
+            for row in rs:
+                axisids.append(row["axisrequestid"])
+        except Exception as ex:
+            logging.error(ex)
+            raise ex
+        finally:
+            db.session.close()
+        return axisids 
 
     @classmethod
     def getbasequery(cls, iaoassignee, ministryassignee, userid=None, requestby='IAO', isiaorestrictedfilemanager=False, isministryrestrictedfilemanager=False):

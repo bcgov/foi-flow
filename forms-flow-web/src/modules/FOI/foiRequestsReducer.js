@@ -2,19 +2,29 @@ import FOI_ACTION_CONSTANTS from "../../actions/FOI/foiActionConstants";
 import _ from 'lodash';
 const initialState = {
   isLoading: true,
+  isEventsLoading: true,
   queueFilter: "myRequests",
   queueParams: {
     rowsState: { page: 0, pageSize: 100 },
     sortModel: false,
     keyword: null,
   },
+  eventQueueFilter: "myRequests",
+  eventQueueParams: {
+    rowsState: { page: 0, pageSize: 100 },
+    sortModel: false,
+    keyword: null,
+  },
   showAdvancedSearch: false,
+  showEventQueue: false,
   foiAdvancedSearchParams: {},
   isAssignedToListLoading: true,
   isAttachmentListLoading: true,
   isCommentTagListLoading: true,
   foiRequestsList: null,
   foiMinistryRequestsList: [],
+  foiEventsList: null,
+  foiMinistryEventsList: [],
   foiRequestsCount: 0,
   foiRequestDetail: {},
   foiMinistryViewRequestDetail: {},
@@ -96,12 +106,20 @@ const foiRequests = (state = initialState, action) => {
       return { ...state, isLoading: action.payload };
     case FOI_ACTION_CONSTANTS.IS_RECORDS_LOADING:
         return { ...state, isRecordsLoading: action.payload };  
+    case FOI_ACTION_CONSTANTS.IS_EVENTS_LOADING:
+      return { ...state, isEventsLoading: action.payload };
     case FOI_ACTION_CONSTANTS.QUEUE_FILTER:
       return { ...state, queueFilter: action.payload };
       case FOI_ACTION_CONSTANTS.QUEUE_PARAMS:
         return { ...state, queueParams: action.payload };
+    case FOI_ACTION_CONSTANTS.EVENT_QUEUE_FILTER:
+      return { ...state, eventQueueFilter: action.payload };
+    case FOI_ACTION_CONSTANTS.EVENT_QUEUE_PARAMS:
+      return { ...state, eventQueueParams: action.payload };
     case FOI_ACTION_CONSTANTS.SHOW_ADVANCED_SEARCH:
       return { ...state, showAdvancedSearch: action.payload };
+    case FOI_ACTION_CONSTANTS.SHOW_EVENT_QUEUE:
+      return { ...state, showEventQueue: action.payload };
     case FOI_ACTION_CONSTANTS.FOI_ADVANCED_SEARCH_PARAMS:
       return { 
         ...state, 
@@ -116,6 +134,10 @@ const foiRequests = (state = initialState, action) => {
       return { ...state, isAttachmentListLoading: action.payload };
     case FOI_ACTION_CONSTANTS.IS_COMMENTTAGLIST_LOADING:
       return { ...state, isCommentTagListLoading: action.payload };
+    case FOI_ACTION_CONSTANTS.FOI_LIST_EVENTS:
+        return { ...state, foiEventsList: action.payload, isEventsLoading: false };
+    case FOI_ACTION_CONSTANTS.FOI_MINISTRY_EVENTLIST:
+        return { ...state, foiMinistryEventsList: action.payload, isEventsLoading: false };
     case FOI_ACTION_CONSTANTS.FOI_LIST_REQUESTS:
       return { ...state, foiRequestsList: action.payload, isLoading: false };
     case FOI_ACTION_CONSTANTS.FOI_MINISTRY_REQUESTSLIST:
