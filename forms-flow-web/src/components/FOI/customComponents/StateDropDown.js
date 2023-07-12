@@ -20,7 +20,8 @@ const StateDropDown = ({
   isValidationError,
   stateTransition,
   updateStateDropDown,
-  requestType
+  requestType,
+  isDivisionalCoordinator
 }) => {
   const _isMinistryCoordinator = isMinistryCoordinator;
 
@@ -179,6 +180,7 @@ const StateDropDown = ({
       input={<Input />}
       variant="outlined"
       fullWidth
+      disabled={isDivisionalCoordinator}
     >
       {menuItems}
     </TextField>
