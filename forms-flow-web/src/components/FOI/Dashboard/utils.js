@@ -157,8 +157,7 @@ export const getDaysLeft = (params) => {
   const receivedDateString = params.row.duedate;
 
   if (
-    params.row.currentState.toLowerCase() ===
-    StateEnum.onhold.name.toLowerCase()
+    params.row.currentState.toLowerCase() === StateEnum.onhold.name.toLowerCase() || StateEnum.closed.name.toLowerCase()
   ) {
     return "N/A";
   } else if(!receivedDateString) {
