@@ -77,6 +77,8 @@ WebUI.verifyElementText(findTestObject('Page_foi.flow/attachment/div_attachment 
 
 WebUI.verifyElementNotClickable(findTestObject('Page_foi.flow/attachment/button_attachments row 1 actions'), FailureHandling.STOP_ON_FAILURE)
 
+WebUI.closeBrowser()
+
 @com.kms.katalon.core.annotation.SetUp
 def setup() {
     def response = WS.sendRequest(findTestObject('FoiRawRequestWithAttachment'))

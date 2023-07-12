@@ -7,18 +7,18 @@
    <selectorCollection>
       <entry>
          <key>XPATH</key>
-         <value>//div[@id='app']/div/div[3]/div/div[3]/div/div/div/div[3]/div[3]/div</value>
-      </entry>
-      <entry>
-         <key>BASIC</key>
-         <value>//*[@role = 'button' and (text() = 'ID NUMBER' or . = 'ID NUMBER')]</value>
+         <value>//div[@id='app']/div/div[3]/div/div/div/button[3]/h3</value>
       </entry>
       <entry>
          <key>CSS</key>
          <value>div.MuiButtonBase-root.MuiChip-root.MuiChip-outlined.MuiChip-sizeMedium.MuiChip-colorPrimary.MuiChip-clickable.MuiChip-clickableColorPrimary.MuiChip-outlinedPrimary.css-1lbhsfq</value>
       </entry>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@role = 'button' and (text() = 'ID NUMBER' or . = 'ID NUMBER')]</value>
+      </entry>
    </selectorCollection>
-   <selectorMethod>BASIC</selectorMethod>
+   <selectorMethod>XPATH</selectorMethod>
    <useRalativeImagePath>true</useRalativeImagePath>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -26,6 +26,7 @@
       <name>tag</name>
       <type>Main</type>
       <value>div</value>
+      <webElementGuid>cee6786b-098c-4914-b2e3-32e6e75fdc78</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -33,6 +34,7 @@
       <name>class</name>
       <type>Main</type>
       <value>MuiButtonBase-root MuiChip-root MuiChip-outlined MuiChip-sizeMedium MuiChip-colorPrimary MuiChip-clickable MuiChip-clickableColorPrimary MuiChip-outlinedPrimary css-1lbhsfq</value>
+      <webElementGuid>efad8941-70ba-4861-9094-5cea38776052</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -40,6 +42,7 @@
       <name>tabindex</name>
       <type>Main</type>
       <value>0</value>
+      <webElementGuid>b6d13459-3a5c-47ce-a870-e7153fdb17fd</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>true</isSelected>
@@ -47,6 +50,7 @@
       <name>role</name>
       <type>Main</type>
       <value>button</value>
+      <webElementGuid>a61813ae-d05c-4c6a-bd22-86d698fea536</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>true</isSelected>
@@ -54,6 +58,7 @@
       <name>text</name>
       <type>Main</type>
       <value>ID NUMBER</value>
+      <webElementGuid>e0727bbb-a9a5-44ea-8b93-2923861c73d7</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -61,6 +66,7 @@
       <name>xpath</name>
       <type>Main</type>
       <value>id(&quot;app&quot;)/div[1]/div[@class=&quot;container foi-container&quot;]/div[@class=&quot;MuiGrid-root MuiGrid-container MuiGrid-spacing-xs-1 foi-grid-container css-tuxzvu&quot;]/div[@class=&quot;MuiGrid-root MuiGrid-container MuiGrid-spacing-xs-2 css-p4ki1t&quot;]/div[@class=&quot;MuiGrid-root MuiGrid-container MuiGrid-item MuiGrid-grid-xs-12 css-obit8q&quot;]/div[@class=&quot;MuiGrid-root MuiGrid-item MuiGrid-grid-xs-12 css-15j76c0&quot;]/div[@class=&quot;MuiGrid-root MuiGrid-container MuiPaper-root MuiPaper-elevation MuiPaper-rounded MuiPaper-elevation1 css-1kvg8j5&quot;]/div[@class=&quot;MuiGrid-root MuiGrid-container MuiGrid-item MuiGrid-grid-xs-12 jss6 css-15jjeey&quot;]/div[@class=&quot;MuiGrid-root MuiGrid-item MuiGrid-grid-xs-2 css-o0rlmm&quot;]/div[@class=&quot;MuiButtonBase-root MuiChip-root MuiChip-outlined MuiChip-sizeMedium MuiChip-colorPrimary MuiChip-clickable MuiChip-clickableColorPrimary MuiChip-outlinedPrimary css-1lbhsfq&quot;]</value>
+      <webElementGuid>044a0383-532e-4c61-9cf0-61b989b174eb</webElementGuid>
    </webElementProperties>
    <webElementXpaths>
       <isSelected>true</isSelected>
@@ -68,6 +74,7 @@
       <name>xpath:idRelative</name>
       <type>Main</type>
       <value>//div[@id='app']/div/div[3]/div/div[3]/div/div/div/div[3]/div[3]/div</value>
+      <webElementGuid>8e6a3ba2-3ecc-4dcd-bd67-36a638ee8093</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -75,6 +82,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>(.//*[normalize-space(text()) and normalize-space(.)='REQUEST DESCRIPTION'])[1]/following::div[2]</value>
+      <webElementGuid>154cd88e-7d52-4eaf-8100-343eb98a5742</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -82,6 +90,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>(.//*[normalize-space(text()) and normalize-space(.)='​'])[2]/following::div[8]</value>
+      <webElementGuid>bb3334fa-63f9-4390-b67f-2b77c4fe7927</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -89,6 +98,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>(.//*[normalize-space(text()) and normalize-space(.)='AXIS REQUEST #'])[1]/preceding::div[1]</value>
+      <webElementGuid>0d71a384-2d08-4cbb-9481-5da623dabe82</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -96,6 +106,7 @@
       <name>xpath:position</name>
       <type>Main</type>
       <value>//div[3]/div[3]/div</value>
+      <webElementGuid>70ab7144-d3c7-4a6a-88da-74d17b24b129</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -103,5 +114,6 @@
       <name>xpath:customAttributes</name>
       <type>Main</type>
       <value>//div[(text() = 'RAW REQUEST #' or . = 'RAW REQUEST #')]</value>
+      <webElementGuid>7fcfe166-b321-4c2b-8a55-f3ad0aa5b56f</webElementGuid>
    </webElementXpaths>
 </WebElementEntity>
