@@ -39,7 +39,7 @@ export const CommentSection = ({
     let _commentsbyCategory = parseInt(filterValue) === -1 ? commentsArray :  commentsArray.filter(c => c.commentTypeId === parseInt(filterValue))
     let _filteredcomments = filterkeyValue === "" ? _commentsbyCategory : _commentsbyCategory.filter(c => c.text.toLowerCase().indexOf(filterkeyValue.toLowerCase()) > -1)
     let filteredcomments = filterkeyinCommentsandReplies(_commentsbyCategory,_filteredcomments)        
-    setcomments(filteredcomments)         
+    setcomments(filteredcomments)
   }, [filterValue,commentsArray ,filterkeyValue])
   let restrictedReqTaglist = useSelector((state) => state.foiRequests.restrictedReqTaglist);
 

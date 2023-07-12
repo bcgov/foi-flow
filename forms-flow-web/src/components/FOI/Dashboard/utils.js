@@ -96,6 +96,23 @@ export const updateSortModel = (sortModel) => {
   return smodel;
 };
 
+export const updateEventSortModel = (sortModel, isMinistry) => {
+  let smodel = JSON.parse(JSON.stringify(sortModel));
+  if (smodel) {
+    let field = smodel[0]?.field;
+    let order = smodel[0]?.sort;
+    
+    //add createdat to default sorting
+    if (smodel.length == 1 && field == "defaultSorting") {
+      smodel.push(
+        { field: "createdat", sort: order },
+      );
+    }
+  }
+
+  return smodel;
+};
+
 export const getFullName = (firstName, lastName) => {
   if (!firstName && !lastName) {
     return "";
@@ -233,4 +250,18 @@ export const cellTooltipRender = (params) => {
   }>
     <span className="table-cell-truncate">{params.row.axisRequestId}</span>
   </LightTooltip>
+};
+
+export const eventCellTooltipRender = (params) => {
+
+  let notification = params.row?.notification;
+  if (notification?.length > 25) {
+  const truncatedNotification = notification?.length > 25 ? notification?.slice(0, 25) + '...' : notification;
+
+  return (
+    <LightTooltip placement="bottom-start" title={<div style={{ whiteSpace: 'pre-line' }}>{notification}</div>}>
+      <span className="table-cell-truncate">{truncatedNotification}</span>
+    </LightTooltip>
+  );
+  }
 };

@@ -13,6 +13,12 @@ export const setRecordsLoader = (data) => dispatch =>{
         payload:data
     })
 }
+export const setFOIEventsLoader = (data) => dispatch =>{
+    dispatch({
+        type:FOI_ACTION_CONSTANTS.IS_EVENTS_LOADING,
+        payload:data
+    })
+}
 
 export const setQueueFilter = (data) => dispatch =>{
     dispatch({
@@ -23,6 +29,24 @@ export const setQueueFilter = (data) => dispatch =>{
 export const setQueueParams = (data) => dispatch =>{
     dispatch({
         type:FOI_ACTION_CONSTANTS.QUEUE_PARAMS,
+        payload:data
+    })
+}
+export const setEventQueueFilter = (data) => dispatch =>{
+    dispatch({
+        type:FOI_ACTION_CONSTANTS.EVENT_QUEUE_FILTER,
+        payload:data
+    })
+}
+export const setEventQueueParams = (data) => dispatch =>{
+    dispatch({
+        type:FOI_ACTION_CONSTANTS.EVENT_QUEUE_PARAMS,
+        payload:data
+    })
+}
+export const setShowEventQueue = (data) => dispatch =>{
+    dispatch({
+        type:FOI_ACTION_CONSTANTS.SHOW_EVENT_QUEUE,
         payload:data
     })
 }
@@ -59,6 +83,18 @@ export const setCommentTagListLoader = (data) => dispatch =>{
 export const setFOIUpdateLoader = (data) => dispatch =>{
     dispatch({
         type:FOI_ACTION_CONSTANTS.FOI_IS_REQUEST_UPDATED,
+        payload:data
+    })
+}
+export const setFOIEventList = (data) => dispatch =>{
+    dispatch({
+        type:FOI_ACTION_CONSTANTS.FOI_LIST_EVENTS,
+        payload:data
+    })
+}
+export const setFOIMinistryEventList = (data) => dispatch =>{
+    dispatch({
+        type:FOI_ACTION_CONSTANTS.FOI_MINISTRY_EVENTLIST,
         payload:data
     })
 }
