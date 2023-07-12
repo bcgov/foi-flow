@@ -160,7 +160,6 @@ const DivisionalStages = React.memo(
 
 
     const divisionstageList = [{name: "Select Division Stage", label: "Select Division Stage", stageid: -1}].concat(divisionalstages.stages.map(d=> ({name: d.name, label: d.name, stageid: d.stageid})));
-    console.log(divisionstageList)
 
     const isReceivedDateEmpty = () => {
       if(minDivStages?.length > 0){
