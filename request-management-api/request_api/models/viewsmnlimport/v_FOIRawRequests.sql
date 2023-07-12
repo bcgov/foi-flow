@@ -30,7 +30,7 @@ AS SELECT tmp.requestid::text AS rawrequestid,
                     WHEN asg.lastname IS NOT NULL AND asg.firstname IS NOT NULL THEN ((asg.lastname::text || ', '::text) || asg.firstname::text)::character varying
                     WHEN asg.lastname IS NOT NULL AND asg.firstname IS NULL THEN asg.lastname
                     WHEN asg.lastname IS NULL AND asg.firstname IS NOT NULL THEN asg.firstname
-                    ELSE fr.assignedto
+                    ELSE coalesce(fr.assignedto, fr.assignedgroup)
                 END AS assignedtoformatted,
             NULL::text AS ministryassignedtoformatted,
             fr.status,
