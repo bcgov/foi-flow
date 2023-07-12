@@ -1,0 +1,119 @@
+kind: CronJob
+apiVersion: batch/v1
+metadata:
+  name: synckeycloakusers
+  namespace: ${NAME}
+  managedFields:
+    - manager: kubectl-create
+      operation: Update
+      apiVersion: batch/v1
+      time: '2023-06-19T17:57:21Z'
+      fieldsType: FieldsV1
+      fieldsV1:
+        'f:spec':
+          'f:concurrencyPolicy': {}
+          'f:jobTemplate':
+            'f:metadata':
+              'f:name': {}
+            'f:spec':
+              'f:template':
+                'f:spec':
+                  'f:containers':
+                    'k:{"name":"synckeycloakusers"}':
+                      .: {}
+                      'f:imagePullPolicy': {}
+                      'f:name': {}
+                      'f:resources': {}
+                      'f:terminationMessagePath': {}
+                      'f:terminationMessagePolicy': {}
+                  'f:dnsPolicy': {}
+                  'f:restartPolicy': {}
+                  'f:schedulerName': {}
+                  'f:securityContext': {}
+                  'f:terminationGracePeriodSeconds': {}
+          'f:suspend': {}
+    - manager: Mozilla
+      operation: Update
+      apiVersion: batch/v1
+      time: '2023-06-21T21:54:57Z'
+      fieldsType: FieldsV1
+      fieldsV1:
+        'f:spec':
+          'f:failedJobsHistoryLimit': {}
+          'f:jobTemplate':
+            'f:spec':
+              'f:template':
+                'f:spec':
+                  'f:containers':
+                    'k:{"name":"synckeycloakusers"}':
+                      'f:args': {}
+                      'f:command': {}
+                      'f:env':
+                        .: {}
+                        'k:{"name":"KEYCLOAK_ADMIN_CLIENT_SECRET"}':
+                          .: {}
+                          'f:name': {}
+                          'f:valueFrom':
+                            .: {}
+                            'f:secretKeyRef': {}
+                      'f:image': {}
+          'f:schedule': {}
+          'f:successfulJobsHistoryLimit': {}
+    - manager: kube-controller-manager
+      operation: Update
+      apiVersion: batch/v1
+      time: '2023-07-12T13:00:18Z'
+      fieldsType: FieldsV1
+      fieldsV1:
+        'f:status':
+          'f:lastScheduleTime': {}
+          'f:lastSuccessfulTime': {}
+      subresource: status
+spec:
+  schedule: 0 13 * * *
+  concurrencyPolicy: Allow
+  suspend: false
+  jobTemplate:
+    metadata:
+      name: synckeycloakusers
+      creationTimestamp: null
+    spec:
+      template:
+        metadata:
+          creationTimestamp: null
+        spec:
+          containers:
+            - resources: {}
+              terminationMessagePath: /dev/termination-log
+              name: synckeycloakusers
+              command:
+                - /bin/sh
+                - '-c'
+              env:
+                - name: KEYCLOAK_ADMIN_CLIENT_SECRET
+                  valueFrom:
+                    secretKeyRef:
+                      name: ${SECRET NAME}
+                      key: KEYCLOAK_ADMIN_CLIENT_SECRET
+              imagePullPolicy: Always
+              terminationMessagePolicy: File
+              image: busybox
+              args:
+                - >
+                  token=$(echo "$a" | wget -qO- --header="Content-Type:
+                  application/x-www-form-urlencoded" --post-data
+                  "grant_type=client_credentials&client_id=foi-lob-api&client_secret=${KEYCLOAK_ADMIN_CLIENT_SECRET}"
+                  ${KEYCLOAK URL}
+                  | sed -n 's/.*"access_token":"\([^"]*\).*/\1/p' ) && wget -O-
+                  --post-data '' --header "Authorization: Bearer ${token}"
+                  ${REQUEST MANAGEMENT API URL}/api/foiuser/refresh
+          restartPolicy: OnFailure
+          terminationGracePeriodSeconds: 30
+          dnsPolicy: ClusterFirst
+          securityContext: {}
+          schedulerName: default-scheduler
+  successfulJobsHistoryLimit: 10
+  failedJobsHistoryLimit: 10
+status:
+  lastScheduleTime: '2023-07-12T13:00:00Z'
+  lastSuccessfulTime: '2023-07-12T13:00:18Z'
