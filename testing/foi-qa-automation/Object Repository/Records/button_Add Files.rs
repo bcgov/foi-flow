@@ -13,8 +13,12 @@
          <key>CSS</key>
          <value>button.btn-add-files</value>
       </entry>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@type = 'button' and (text() = 'Add Files' or . = 'Add Files')]</value>
+      </entry>
    </selectorCollection>
-   <selectorMethod>XPATH</selectorMethod>
+   <selectorMethod>BASIC</selectorMethod>
    <useRalativeImagePath>true</useRalativeImagePath>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -22,7 +26,7 @@
       <name>tag</name>
       <type>Main</type>
       <value>button</value>
-      <webElementGuid>67c32e81-812e-4620-8b3e-76fbc837307d</webElementGuid>
+      <webElementGuid>75a67821-b51b-4421-8bb5-d320ea02c304</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -30,7 +34,7 @@
       <name>class</name>
       <type>Main</type>
       <value>btn-add-files</value>
-      <webElementGuid>b93ac59e-e018-4a16-b5f2-5c45ac2ff94c</webElementGuid>
+      <webElementGuid>1787523c-72f8-4193-8376-baaab73ddf05</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>true</isSelected>
@@ -38,7 +42,7 @@
       <name>type</name>
       <type>Main</type>
       <value>button</value>
-      <webElementGuid>6964f9a9-48d7-4645-8643-6dcdcb91d7a9</webElementGuid>
+      <webElementGuid>c17583ad-f4f5-4d05-801e-dbd3cafee1a7</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>true</isSelected>
@@ -46,7 +50,7 @@
       <name>text</name>
       <type>Main</type>
       <value>Add Files</value>
-      <webElementGuid>25c6518b-3b83-4c12-9c6c-dc3be17f368f</webElementGuid>
+      <webElementGuid>7567ec4f-504a-4493-836c-6302569e8d54</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -54,7 +58,7 @@
       <name>xpath</name>
       <type>Main</type>
       <value>id(&quot;state-change-dialog-description&quot;)/section[@class=&quot;file-upload-container&quot;]/div[@class=&quot;row file-upload-preview&quot;]/div[@class=&quot;file-upload-column file-upload-column-3&quot;]/button[@class=&quot;btn-add-files&quot;]</value>
-      <webElementGuid>62b9c399-913c-4def-be1b-e972f1c24982</webElementGuid>
+      <webElementGuid>621b8693-a050-45a0-b7e1-9dc9078ef8bc</webElementGuid>
    </webElementProperties>
    <webElementXpaths>
       <isSelected>true</isSelected>
@@ -62,7 +66,7 @@
       <name>xpath:attributes</name>
       <type>Main</type>
       <value>(//button[@type='button'])[19]</value>
-      <webElementGuid>fee470be-7201-4bbb-884f-87b8c6b0b5f8</webElementGuid>
+      <webElementGuid>f073e123-401f-4b9c-98d8-5a4b9399be24</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -70,7 +74,7 @@
       <name>xpath:idRelative</name>
       <type>Main</type>
       <value>//span[@id='state-change-dialog-description']/section/div/div[3]/button</value>
-      <webElementGuid>dbfe93e8-6395-4747-a556-db61a1e075f2</webElementGuid>
+      <webElementGuid>3801828d-81ba-4e06-a338-c0085c2e1260</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -78,7 +82,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>(.//*[normalize-space(text()) and normalize-space(.)='LEARNING AND EDUCATION PROGRAMS'])[1]/following::button[1]</value>
-      <webElementGuid>468a7043-06ef-4012-b15a-c690b3ade46d</webElementGuid>
+      <webElementGuid>1e18a7e0-79f5-4932-ab0f-b8bcab31373c</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -86,7 +90,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>(.//*[normalize-space(text()) and normalize-space(.)='Continue'])[1]/preceding::button[1]</value>
-      <webElementGuid>52c05a9c-d840-4556-b096-90d8ad04d5bf</webElementGuid>
+      <webElementGuid>c118d26a-0406-4d60-a4cc-acf306aab184</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -94,7 +98,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>(.//*[normalize-space(text()) and normalize-space(.)='Cancel'])[1]/preceding::button[2]</value>
-      <webElementGuid>687aa5c1-0029-41d8-8d65-6f09a1079b5b</webElementGuid>
+      <webElementGuid>2b80413d-3992-485a-bc2e-f949e0863ffb</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -102,7 +106,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>//*/text()[normalize-space(.)='Add Files']/parent::*</value>
-      <webElementGuid>5a8cdd23-e1b2-480d-ba02-7db9d8bde70d</webElementGuid>
+      <webElementGuid>ddcf7524-bb8c-4aea-9bdb-07679eec66c6</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -110,7 +114,7 @@
       <name>xpath:position</name>
       <type>Main</type>
       <value>//section/div/div[3]/button</value>
-      <webElementGuid>894cd318-15b1-480d-b104-d2aa3c485099</webElementGuid>
+      <webElementGuid>a7e738ee-db52-45db-97bf-0f9b49adaf92</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -118,6 +122,6 @@
       <name>xpath:customAttributes</name>
       <type>Main</type>
       <value>//button[@type = 'button' and (text() = 'Add Files' or . = 'Add Files')]</value>
-      <webElementGuid>74eb76ea-246a-472e-be5e-56a82e732c5c</webElementGuid>
+      <webElementGuid>fb4117ff-f941-4810-8254-e794b58cb147</webElementGuid>
    </webElementXpaths>
 </WebElementEntity>

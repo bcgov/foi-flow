@@ -7,7 +7,7 @@
    <selectorCollection>
       <entry>
          <key>XPATH</key>
-         <value>//div[@id='foi-division-row0']/div/div/div/div[@id='foi-division-dropdown']</value>
+         <value>(.//*[normalize-space(text()) and normalize-space(.)='Select Division'])[1]/following::*[name()='svg'][1]</value>
       </entry>
       <entry>
          <key>BASIC</key>

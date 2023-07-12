@@ -249,8 +249,6 @@ WebUI.click(findTestObject('CFR/CFR_Addcorrespondence/svg'))
 
 WebUI.click(findTestObject('CFR/CFR_Addcorrespondence/button_Add Files'))
 
-WebUI.delay(3)
-
 WebUI.uploadFile(findTestObject('Page_foi.flow/attachment/file_input'), RunConfiguration.getProjectDir() + '/Test Attachments/test2.pdf')
 
 WebUI.click(findTestObject('CFR/CFR_Addcorrespondence/button_Save Changes'))

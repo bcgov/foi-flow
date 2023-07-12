@@ -113,6 +113,8 @@ WebUI.verifyElementText(findTestObject('Page_foi.flow/form/sidebar/div_Sidebar A
 
 WebUI.verifyElementNotPresent(findTestObject('Page_foi.flow/attachment/div_attachments list row 1'), 0)
 
+WebUI.closeBrowser()
+
 @com.kms.katalon.core.annotation.SetUp
 def setup() {
     def response = WS.sendRequest(findTestObject('FoiRawRequest'))

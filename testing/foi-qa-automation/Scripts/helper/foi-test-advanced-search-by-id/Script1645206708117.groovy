@@ -23,9 +23,11 @@ WebUI.click(findTestObject('Page_foi.flow/queue/h3_Advanced Search'))
 
 WebUI.click(findTestObject('Page_foi.flow/queue/advanced search/div_advanced search field selector ID NUMBER'))
 
+WebUI.setText(findTestObject('Page_foi.flow/queue/advanced search/input_advancedSearch'), requestID)
+
 WebUI.click(findTestObject('Page_foi.flow/queue/advanced search/input_Request State_unopened'))
 
-WebUI.setText(findTestObject('Page_foi.flow/queue/advanced search/input_advancedSearch'), requestID)
+WebUI.click(findTestObject('Page_foi.flow/queue/advanced search/Page_FOI Advanced Search/div_ID NUMBER'))
 
 WebUI.scrollToElement(findTestObject('Page_foi.flow/queue/advanced search/button_Apply Search'), 0)
 

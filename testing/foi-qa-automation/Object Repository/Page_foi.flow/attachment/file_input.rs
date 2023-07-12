@@ -6,19 +6,27 @@
    <elementGuidId>560d3f0b-30cc-41ee-ba96-eea6154c3665</elementGuidId>
    <selectorCollection>
       <entry>
+         <key>XPATH</key>
+         <value></value>
+      </entry>
+      <entry>
+         <key>CSS</key>
+         <value></value>
+      </entry>
+      <entry>
          <key>BASIC</key>
-         <value>//*[@id = 'fileupload' and @class = 'file-upload-input-multiple']</value>
+         <value>//input[@id = 'fileupload' and @type = 'file']</value>
       </entry>
    </selectorCollection>
    <selectorMethod>BASIC</selectorMethod>
    <useRalativeImagePath>false</useRalativeImagePath>
    <webElementProperties>
-      <isSelected>false</isSelected>
+      <isSelected>true</isSelected>
       <matchCondition>equals</matchCondition>
       <name>tag</name>
       <type>Main</type>
       <value>input</value>
-      <webElementGuid>088a98d0-b12c-4231-8115-03ecc167b0d4</webElementGuid>
+      <webElementGuid>e93d5bd9-2e1e-4f05-9b4e-9c4e3f96d159</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>true</isSelected>
@@ -26,7 +34,7 @@
       <name>id</name>
       <type>Main</type>
       <value>fileupload</value>
-      <webElementGuid>fca54795-f135-4fca-9b33-6d7b13bb95b6</webElementGuid>
+      <webElementGuid>b1cedfbb-4e01-43a9-8ddd-7c6c71fdd6e2</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -34,14 +42,22 @@
       <name>multiple accept</name>
       <type>Main</type>
       <value>application/pdf,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword,image/bmp,image/gif,image/jpeg,image/png,image/svg+xml,image/tiff,image/webp,application/vnd.ms-excel.sheet.macroEnabled.12,.msg,.eml,.xls,.xlsx,.doc,.docx,.ics,.json,.shx,.shp,.dbf,.kml,.kmz,.geojson,.cpg,.prj,.sbn,.sbx,.gml,.gdb,.freelist,.atx,.gpkg,.mbtiles,.mpk,.wkt,.las,.lasd,.laz,.dwf,.dwg,.dxf,.csv,.txt,.png,.jpg</value>
-      <webElementGuid>4e92858f-d56e-47db-aaab-7caaec1ef7aa</webElementGuid>
+      <webElementGuid>4c21bcce-eb17-4f0b-8eb8-247db6bb4c2e</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>class</name>
+      <type>Main</type>
+      <value>file-upload-container</value>
+      <webElementGuid>e4bbc6ba-78e9-42bf-876a-460b85b74897</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>true</isSelected>
       <matchCondition>equals</matchCondition>
-      <name>class</name>
+      <name>type</name>
       <type>Main</type>
-      <value>file-upload-input-multiple</value>
-      <webElementGuid>04905c58-6ef8-4f31-acb9-26de73812658</webElementGuid>
+      <value>file</value>
+      <webElementGuid>fad23c58-5ceb-48e5-83bb-3e3be49890aa</webElementGuid>
    </webElementProperties>
 </WebElementEntity>

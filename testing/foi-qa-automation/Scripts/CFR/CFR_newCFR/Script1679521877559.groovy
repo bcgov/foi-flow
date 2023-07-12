@@ -184,6 +184,8 @@ WebUI.click(findTestObject('CFR/CFR_status/li_In Review with IAO'))
 
 WebUI.click(findTestObject('Page_foi.flow/form/state change dialog/button_Save Change'))
 
+WebUI.delay(6)
+
 WebUI.verifyElementNotClickable(findTestObject('CFR/NewCFR/button_Create New CFR Form'))
 
 DriverFactory.changeWebDriver(IAOuser)

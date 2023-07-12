@@ -85,6 +85,8 @@ WebUI.refresh()
 
 WebUI.scrollToElement(findTestObject('Page_foi.flow/form/button_Save'), 0)
 
+WebUI.delay(3)
+
 WebUI.click(findTestObject('Page_foi.flow/ministry view/form/divisional tracking/div_ministry division dropdown'))
 
 WebUI.click(findTestObject('Page_foi.flow/ministry view/form/divisional tracking/division dropdown options/li_Deputy Ministers Office'), 
@@ -246,8 +248,8 @@ WebUI.click(findTestObject('Records/button_Add Files1'))
 
 println(RunConfiguration.getProjectDir() + '/Test Attachments')
 
-WebUI.uploadFile(findTestObject('Page_foi.flow/attachment/input_Add Files_file-upload-input'), RunConfiguration.getProjectDir() +
-	'/Test Attachments/trials.kml')
+WebUI.uploadFile(findTestObject('Page_foi.flow/attachment/input_Add Files_file-upload-input'), RunConfiguration.getProjectDir() + 
+    '/Test Attachments/trials.kml')
 
 WebUI.click(findTestObject('Records/button_Continue'))
 

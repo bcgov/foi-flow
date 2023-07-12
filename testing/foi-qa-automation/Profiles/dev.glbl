@@ -21,12 +21,12 @@
    </GlobalVariableEntity>
    <GlobalVariableEntity>
       <description></description>
-      <initValue>'Intake'</initValue>
+      <initValue>'FOI'</initValue>
       <name>firstname</name>
    </GlobalVariableEntity>
    <GlobalVariableEntity>
       <description></description>
-      <initValue>'Flex'</initValue>
+      <initValue>'Intake'</initValue>
       <name>lastname</name>
    </GlobalVariableEntity>
    <GlobalVariableEntity>
