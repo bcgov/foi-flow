@@ -28,6 +28,10 @@ jobs:
             fsutil file createnew 50mb.pdf 53428800
             fsutil file createnew 500mb.pdf 534288000
             fsutil file createnew invalidfiletype.bin 5242880
+            fsutil file createnew Book17.pdf 207955000
+            fsutil file createnew Book20.pdf 212473000
+            fsutil file createnew stitched680MB.pdf 700994000
+            fsutil file createnew stitched911MB.pdf 933180000
             dir
       shell: cmd
     - name: Katalon Studio Github Action
