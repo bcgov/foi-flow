@@ -24,7 +24,7 @@ AS SELECT DISTINCT ON (fr.foiministryrequestid) fr.foiministryrequestid,
         END AS ministryassignedtoformatted,
     fr.requeststatusid,
     fs2.name AS status,
-    fr.description
+    fr.description, to_char(fr.created_at,'YYYYMMDDHH24MMSSMSUS') crtid
    FROM "FOIMinistryRequests" fr
      JOIN "FOIRequestStatuses" fs2 ON fr.requeststatusid = fs2.requeststatusid
      LEFT JOIN "FOIAssignees" asg ON fr.assignedto::text = asg.username::text
