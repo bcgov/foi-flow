@@ -1,13 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <WebElementEntity>
    <description></description>
-   <name>li_Flex, Intake</name>
+   <name>li_Flex, Intake (1)</name>
    <tag></tag>
    <elementGuidId>ed4bf2b4-a60d-499d-84dc-3648bfb6ff31</elementGuidId>
    <selectorCollection>
       <entry>
          <key>CSS</key>
-         <value></value>
       </entry>
       <entry>
          <key>XPATH</key>

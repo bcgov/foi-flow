@@ -31,7 +31,7 @@ def requestID = WebUI.callTestCase(findTestCase('submit/foi-test-save-request-fo
 WebUI.verifyElementAttributeValue(findTestObject('Page_foi.flow/form/sidebar/status dropdown/input_Status'), 'value', 'Intake in Progress', 
     0)
 
-WebUI.verifyElementText(findTestObject('Page_foi.flow/form/h3_Form Request Title'), 'ABC-2099-' + requestID)
+WebUI.verifyElementText(findTestObject('Page_foi.flow/form/h3_Form Request Title'), 'EDU-2099-' + requestID)
 
 WebUI.click(findTestObject('Page_foi.flow/form/sidebar/div_Sidebar Comments'))
 
@@ -76,10 +76,8 @@ WebUI.verifyElementText(findTestObject('Page_foi.flow/form/sidebar/div_Sidebar C
 WebUI.verifyElementNotPresent(findTestObject('Page_foi.flow/comment/div_Comment list 1'), 0)
 
 //WebUI.verifyElementText(findTestObject('Page_foi.flow/comment/p_comment list 1 text'), ((firstname + ' ') + lastname) + 
-  //  ' changed the state of the request to Open')
-
+//  ' changed the state of the request to Open')
 //WebUI.verifyElementPresent(findTestObject('Page_foi.flow/form/sidebar/h4_30 Days Remaining'), 0)
-
 WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/div_Status'))
 
 WebUI.verifyElementPresent(findTestObject('Page_foi.flow/form/sidebar/status dropdown/li_Open'), 0)

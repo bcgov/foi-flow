@@ -27,7 +27,7 @@ WebUI.setText(findTestObject('Page_foi.flow/queue/advanced search/input_advanced
 
 WebUI.click(findTestObject('Page_foi.flow/queue/advanced search/input_Request State_unopened'))
 
-WebUI.click(findTestObject('Page_foi.flow/queue/advanced search/Page_FOI Advanced Search/div_ID NUMBER'))
+WebUI.click(findTestObject('Page_foi.flow/queue/advanced search/div_ID NUMBER'))
 
 WebUI.scrollToElement(findTestObject('Page_foi.flow/queue/advanced search/button_Apply Search'), 0)
 
