@@ -135,7 +135,8 @@ class FOIRawRequestNotificationUser(db.Model):
     def getbasequery(cls, groups, additionalfilter=None, userid=None, isiaorestrictedfilemanager=False):
         _session = db.session
 
-        selectedcolumns = [            
+        selectedcolumns = [      
+            FOIRawRequests.crtid.label('crtid'),        
             FOIRawRequests.axisrequestid.label('axisRequestId'),  
             FOIRawRequests.rawrequestid.label('rawrequestid'),
             FOIRawRequests.foirequest_id.label('requestid'),

@@ -13,7 +13,8 @@ AS SELECT tmp.requestid::text AS rawrequestid,
     tmp.ministryassignedtoformatted,
     tmp.status,
     tmp.description,
-    tmp.isiaorestricted
+    tmp.isiaorestricted,
+    tmp.crtid
    FROM ( SELECT DISTINCT ON (fr.requestid) fr.requestid,
             fr.version,
                 CASE
@@ -30,7 +31,7 @@ AS SELECT tmp.requestid::text AS rawrequestid,
                     WHEN asg.lastname IS NOT NULL AND asg.firstname IS NOT NULL THEN ((asg.lastname::text || ', '::text) || asg.firstname::text)::character varying
                     WHEN asg.lastname IS NOT NULL AND asg.firstname IS NULL THEN asg.lastname
                     WHEN asg.lastname IS NULL AND asg.firstname IS NOT NULL THEN asg.firstname
-                    ELSE fr.assignedto
+                    ELSE coalesce(fr.assignedto, fr.assignedgroup)
                 END AS assignedtoformatted,
             NULL::text AS ministryassignedtoformatted,
             fr.status,
@@ -38,7 +39,7 @@ AS SELECT tmp.requestid::text AS rawrequestid,
                     WHEN fr.status::text = 'Unopened'::text THEN (fr.requestrawdata -> 'descriptionTimeframe'::text) ->> 'description'::text
                     ELSE fr.requestrawdata ->> 'description'::text
                 END AS description,
-            fr.isiaorestricted
+            fr.isiaorestricted, to_char(fr.created_at,'YYYYMMDDHH24MMSSMSUS') crtid
            FROM "FOIRawRequests" fr
              LEFT JOIN "FOIAssignees" asg ON fr.assignedto::text = asg.username::text
           WHERE NOT (fr.axisrequestid::text IN ( SELECT "v_FOIRequests".axisrequestid

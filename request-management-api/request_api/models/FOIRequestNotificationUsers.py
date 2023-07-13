@@ -174,7 +174,8 @@ class FOIRequestNotificationUser(db.Model):
                 else:
                     filtercondition.append(ministry_restricted_requests.isrestricted == True)
 
-        selectedcolumns = [                       
+        selectedcolumns = [  
+            FOIRequests.crtid.label('crtid'),                          
             FOIRequests.axisrequestid.label('axisRequestId'),
             FOIRequests.rawrequestid.label('rawrequestid'),
             FOIRequests.foirequest_id.label('requestid'),
