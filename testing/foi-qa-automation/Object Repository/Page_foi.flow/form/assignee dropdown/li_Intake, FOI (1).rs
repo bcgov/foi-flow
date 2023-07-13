@@ -1,17 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <WebElementEntity>
    <description></description>
-   <name>li_Intake, FOI</name>
+   <name>li_Intake, FOI (1)</name>
    <tag></tag>
    <elementGuidId>dbd40363-a10a-4bda-a752-6ca854e72f48</elementGuidId>
    <selectorCollection>
       <entry>
-         <key>XPATH</key>
-         <value>//div[@id='menu-']/div[3]/ul/li[11]</value>
+         <key>CSS</key>
       </entry>
       <entry>
-         <key>CSS</key>
-         <value></value>
+         <key>XPATH</key>
+         <value>//div[@id='menu-']/div[3]/ul/li[11]</value>
       </entry>
    </selectorCollection>
    <selectorMethod>BASIC</selectorMethod>

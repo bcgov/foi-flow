@@ -463,7 +463,7 @@ WebUI.click(findTestObject('CFR/CFR_Addcorrespondence/addcorrespondence_outstand
 
 WebUI.click(findTestObject('CFR/CFR_Addcorrespondence/svg'))
 
-WebUI.click(findTestObject('CFR/CFR_status/Page_ABC-2099-14083/button_Add Files'))
+WebUI.click(findTestObject('CFR/CFR_status/button_Add Files'))
 
 WebUI.uploadFile(findTestObject('Page_foi.flow/attachment/input_Add Files_file-upload-input'), RunConfiguration.getProjectDir() + 
     '/Test Attachments/test2.pdf')
