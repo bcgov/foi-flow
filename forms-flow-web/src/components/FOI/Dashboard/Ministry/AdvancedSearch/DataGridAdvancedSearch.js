@@ -7,12 +7,12 @@ import Grid from "@mui/material/Grid";
 import {
   updateSortModel,
   getLDD,
-  getRecordsDue
+  getRecordsDue,
+  cellTooltipRender
 } from "../../utils";
 import { ActionContext } from "./ActionContext";
 import { ConditionalComponent } from "../../../../../helper/FOI/helper";
 import { useDispatch } from "react-redux";
-import Link from "@mui/material/Link";
 import { push } from "connected-react-router";
 import { CustomFooter } from "../../CustomFooter"
 
@@ -57,19 +57,10 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
     }
   }, [rowsState, sortModel]);
 
-  const hyperlinkRenderCellforMinistry = (params) => {
-    var link;
-    link = "./ministryreview/" + params.row.id + "/ministryrequest/" + params.row.ministryrequestid;
-    return (
-      <Link href={link} onClick={e => renderReviewRequestforMinistry(e, params.row)}>
-        <div className="MuiDataGrid-cellContent">{params.value}</div>
-      </Link>
-    )
-  };
   
-  const renderReviewRequestforMinistry = (e, row) => {
-    e.preventDefault()
-    dispatch(push(`/foi/ministryreview/${row.id}/ministryrequest/${row.ministryrequestid}`));
+  
+  const renderReviewRequestforMinistry = (e) => {
+    dispatch(push(`/foi/ministryreview/${e.row.id}/ministryrequest/${e.row.ministryrequestid}`));
   };
 
   const columns = React.useRef([
@@ -78,7 +69,7 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
       headerName: "ID NUMBER",
       width: 170,
       headerAlign: "left",
-      renderCell: hyperlinkRenderCellforMinistry,
+      renderCell: cellTooltipRender,
       cellClassName: 'foi-advanced-search-result-cell',
     },
     {
@@ -86,7 +77,6 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
       headerName: "CATEGORY",
       flex: 1,
       headerAlign: "left",
-      renderCell: hyperlinkRenderCellforMinistry,
       cellClassName: 'foi-advanced-search-result-cell',
     },
     {
@@ -94,7 +84,6 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
       headerName: "TYPE",
       flex: 1,
       headerAlign: "left",
-      renderCell: hyperlinkRenderCellforMinistry,
       cellClassName: 'foi-advanced-search-result-cell',
     },
 
@@ -103,7 +92,6 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
       headerName: "REQUEST STATE",
       flex: 1,
       headerAlign: "left",
-      renderCell: hyperlinkRenderCellforMinistry,
       cellClassName: 'foi-advanced-search-result-cell',
     },
 
@@ -112,7 +100,6 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
       headerName: "ASSIGNED TO",
       flex: 1,
       headerAlign: "left",
-      renderCell: hyperlinkRenderCellforMinistry,
       cellClassName: 'foi-advanced-search-result-cell',
     },
     {
@@ -120,7 +107,6 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
       headerName: "RECORDS DUE",
       flex: 1,
       headerAlign: "left",
-      renderCell: hyperlinkRenderCellforMinistry,
       cellClassName: 'foi-advanced-search-result-cell',
       valueGetter: getRecordsDue,
     },
@@ -129,7 +115,6 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
       headerName: "LDD",
       flex: 1,
       headerAlign: "left",
-      renderCell: hyperlinkRenderCellforMinistry,
       cellClassName: 'foi-advanced-search-result-cell',
       valueGetter: getLDD,
     },
@@ -199,6 +184,7 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
                 .replace(/ +/g, "")}`
             }
             loading={searchLoading}
+            onRowClick={renderReviewRequestforMinistry}
           />
         </Grid>
       </Grid>
