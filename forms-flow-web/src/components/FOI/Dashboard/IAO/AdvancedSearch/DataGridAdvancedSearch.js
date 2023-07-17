@@ -12,7 +12,7 @@ import {
   getReceivedDate,
   // onBehalfFullName,
   getRecordsDue,
-  cellTooltipRender,  
+  LightTooltip,  
 } from "../../utils";
 import { ActionContext } from "./ActionContext";
 import {
@@ -24,6 +24,7 @@ import {
 import clsx from "clsx";
 import { push } from "connected-react-router";
 import { CustomFooter } from "../../CustomFooter"
+import Link from "@mui/material/Link";
 
 const DataGridAdvancedSearch = ({ userDetail }) => {
   const dispatch = useDispatch();
@@ -40,25 +41,67 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
 
   const user = useSelector((state) => state.user.userDetail);
 
-   
-  const renderReviewRequest = (e) => {
-    if (e.row.ministryrequestid) {      
+
+
+  const renderReviewRequest = (e, row) => {
+    e.preventDefault()
+    if (row.ministryrequestid) {
       dispatch(
         push(
-          `/foi/foirequests/${e.row.id}/ministryrequest/${e.row.ministryrequestid}`
+          `/foi/foirequests/${row.id}/ministryrequest/${row.ministryrequestid}`
         )
       );
     } else {
-      dispatch(push(`/foi/reviewrequest/${e.row.id}`));
+      dispatch(push(`/foi/reviewrequest/${row.id}`));
     }
   };
+  
+  const hyperlinkTooltipRenderCell = (params) => {
+    let link;
+    if (params.row.ministryrequestid) { 
+      link = "./foirequests/" + params.row.id + "/ministryrequest/" + params.row.ministryrequestid;
+    } else {
+      link = "./reviewrequest/" + params.row.id;
+    }
+    let description = params.row.description;
+    if (params.row.fromdate && params.row.todate) {
+      description += "\n(" + (new Date(params.row.fromdate)).toLocaleDateString() + " to " + (new Date(params.row.todate)).toLocaleDateString() + ")"
+    }
+    return (<LightTooltip placement="bottom-start" title={
+      <div style={{whiteSpace: "pre-line"}}>
+        {description}
+      </div>
+    }>
+      <span className="table-cell-truncate">
+        <Link href={link} target="_blank" onClick={(e) => renderReviewRequest(e, params.row)}>
+        <div className="MuiDataGrid-cellContent">{params.value}</div>
+      </Link></span>
+    </LightTooltip>
+    )
+  };
+
+  const hyperlinkRenderCell = (params) => {
+    let link;
+    if (params.row.ministryrequestid) { 
+      link = "./foirequests/" + params.row.id + "/ministryrequest/" + params.row.ministryrequestid;
+    } else {
+      link = "./reviewrequest/" + params.row.id;
+    }
+    return (
+      <Link href={link} onClick={e => renderReviewRequest(e, params.row)}>
+        <div className="MuiDataGrid-cellContent">{params.value}</div>
+      </Link>
+    )
+  };
+
+  
 
   const ProcessingTeamColumns = [
     {
       field: "axisRequestId",
       headerName: "ID NUMBER",
       headerAlign: "left",
-      renderCell: cellTooltipRender,
+      renderCell: hyperlinkTooltipRenderCell,
       cellClassName: 'foi-advanced-search-result-cell',
       width: 160,
     },
@@ -66,6 +109,7 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
       field: "applicantName",
       headerName: "APPLICANT NAME",
       headerAlign: "left",
+      renderCell: hyperlinkRenderCell,
       cellClassName: 'foi-advanced-search-result-cell',
       valueGetter: (params) =>
         getFullName(params.row.firstName, params.row.lastName),
@@ -75,6 +119,7 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
       field: "onBehalfFormatted",
       headerName: "ON BEHALF",
       headerAlign: "left",
+      renderCell: hyperlinkRenderCell,
       cellClassName: 'foi-advanced-search-result-cell',
       // valueGetter: onBehalfFullName,
       // sortable: false,
@@ -84,6 +129,7 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
       field: "requestType",
       headerName: "TYPE",
       headerAlign: "left",
+      renderCell: hyperlinkRenderCell,
       cellClassName: 'foi-advanced-search-result-cell',
       flex: 0.75,
     },
@@ -91,6 +137,7 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
       field: "applicantcategory",
       headerName: "CATEGORY",
       headerAlign: "left",
+      renderCell: hyperlinkRenderCell,
       cellClassName: 'foi-advanced-search-result-cell',
       flex: 1,
     },
@@ -98,6 +145,7 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
       field: "currentState",
       headerName: "CURRENT STATE",
       headerAlign: "left",
+      renderCell: hyperlinkRenderCell,
       cellClassName: 'foi-advanced-search-result-cell',
       flex: 1,
     },
@@ -105,6 +153,7 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
       field: "assignedToFormatted",
       headerName: "ASSIGNED TO",
       headerAlign: "left",
+      renderCell: hyperlinkRenderCell,
       cellClassName: 'foi-advanced-search-result-cell',
       flex: 1,
     },
@@ -112,6 +161,7 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
       field: "DaysLeftValue",
       headerName: "DAYS LEFT",
       headerAlign: "left",
+      renderCell: hyperlinkRenderCell,
       cellClassName: 'foi-advanced-search-result-cell',
       valueGetter: getDaysLeft,
       flex: 0.75,
@@ -121,6 +171,7 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
       field: "extensions",
       headerName: "EXT.",
       headerAlign: "left",
+      renderCell: hyperlinkRenderCell,
       cellClassName: 'foi-advanced-search-result-cell',
       flex: 0.5,
       // sortable: false,
@@ -131,6 +182,7 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
       field: "requestPageCount",
       headerName: "PAGES",
       headerAlign: "left",
+      renderCell: hyperlinkRenderCell,
       cellClassName: 'foi-advanced-search-result-cell',
       flex: 0.5,
     },
@@ -141,6 +193,7 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
       field: "applicantName",
       headerName: "APPLICANT NAME",
       headerAlign: "left",
+      renderCell: hyperlinkRenderCell,
       cellClassName: 'foi-advanced-search-result-cell',
       valueGetter: (params) =>
         getFullName(params.row.firstName, params.row.lastName),
@@ -150,6 +203,7 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
       field: "requestType",
       headerName: "REQUEST TYPE",
       headerAlign: "left",
+      renderCell: hyperlinkRenderCell,
       cellClassName: 'foi-advanced-search-result-cell',
       flex: 1,
     },
@@ -157,7 +211,7 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
       field: "axisRequestId",
       headerName: "ID NUMBER",
       headerAlign: "left",
-      renderCell: cellTooltipRender,
+      renderCell: hyperlinkTooltipRenderCell,
       cellClassName: 'foi-advanced-search-result-cell',
       flex: 1,
     },
@@ -165,6 +219,7 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
       field: "currentState",
       headerName: "CURRENT STATE",
       headerAlign: "left",
+      renderCell: hyperlinkRenderCell,
       cellClassName: 'foi-advanced-search-result-cell',
       flex: 1,
     },
@@ -172,6 +227,7 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
       field: "assignedToFormatted",
       headerName: "ASSIGNED TO",
       headerAlign: "left",
+      renderCell: hyperlinkRenderCell,
       cellClassName: 'foi-advanced-search-result-cell',
       flex: 1,
     },
@@ -179,6 +235,7 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
       field: "receivedDate",
       headerName: "RECEIVED DATE",
       headerAlign: "left",
+      renderCell: hyperlinkRenderCell,
       cellClassName: 'foi-advanced-search-result-cell',
       valueGetter: getReceivedDate,
       flex: 1,
@@ -197,7 +254,7 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
       field: "axisRequestId",
       headerName: "ID NUMBER",
       headerAlign: "left",
-      renderCell: cellTooltipRender,
+      renderCell: hyperlinkTooltipRenderCell,
       cellClassName: 'foi-advanced-search-result-cell',
       width: 160,
     },
@@ -205,6 +262,7 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
       field: "applicantName",
       headerName: "APPLICANT NAME",
       headerAlign: "left",
+      renderCell: hyperlinkRenderCell,
       cellClassName: 'foi-advanced-search-result-cell',
       valueGetter: (params) =>
         getFullName(params.row.firstName, params.row.lastName),
@@ -214,6 +272,7 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
       field: "applicantcategory",
       headerName: "CATEGORY",
       headerAlign: "left",
+      renderCell: hyperlinkRenderCell,
       cellClassName: 'foi-advanced-search-result-cell',
       flex: 1,
     },
@@ -221,6 +280,7 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
       field: "requestType",
       headerName: "TYPE",
       headerAlign: "left",
+      renderCell: hyperlinkRenderCell,
       cellClassName: 'foi-advanced-search-result-cell',
       flex: 1,
     },
@@ -228,6 +288,7 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
       field: "currentState",
       headerName: "CURRENT STATE",
       headerAlign: "left",
+      renderCell: hyperlinkRenderCell,
       cellClassName: 'foi-advanced-search-result-cell',
       flex: 1,
     },
@@ -235,6 +296,7 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
       field: "assignedToFormatted",
       headerName: "ASSIGNED TO",
       headerAlign: "left",
+      renderCell: hyperlinkRenderCell,
       cellClassName: 'foi-advanced-search-result-cell',
       flex: 1,
     },
@@ -243,6 +305,7 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
       headerName: "CFR DUE",
       flex: 1,
       headerAlign: "left",
+      renderCell: hyperlinkRenderCell,
       cellClassName: 'foi-advanced-search-result-cell',
       valueGetter: getRecordsDue,
     },
@@ -250,6 +313,7 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
       field: "DaysLeftValue",
       headerName: "DAYS LEFT",
       headerAlign: "left",
+      renderCell: hyperlinkRenderCell,
       cellClassName: 'foi-advanced-search-result-cell',
       valueGetter: getDaysLeft,
       flex: 0.75,
@@ -392,7 +456,6 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
               )
             }
             loading={searchLoading}
-            onRowClick={renderReviewRequest}
           />
         </Grid>
       </Grid>
