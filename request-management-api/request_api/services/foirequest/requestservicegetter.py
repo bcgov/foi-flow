@@ -122,7 +122,7 @@ class requestservicegetter:
             # depositpaid field is only accurate and used for outstanding email and receipts
             requestdetails['cfrfee']['feedata']['depositpaid'] = '{:.2f}'.format(float(cfrfee['feedata']['amountpaid']) - paidamount)
             requestdetails['cfrfee']['feedata']['paymenturl'] = payment['paymenturl']            
-            requestdetails['cfrfee']['feedata']['paymentdate'] = payment['created_at']
+            requestdetails['cfrfee']['feedata']['paymentdate'] = payment['created_at'][:10]
         return requestdetails
 
     def __preparebaseinfo(self,request,foiministryrequestid,requestministry,requestministrydivisions):
