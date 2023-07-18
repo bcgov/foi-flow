@@ -7,7 +7,8 @@ import Grid from "@mui/material/Grid";
 import {
   updateSortModel,
   getLDD,
-  getRecordsDue
+  getRecordsDue,
+  LightTooltip
 } from "../../utils";
 import { ActionContext } from "./ActionContext";
 import { ConditionalComponent } from "../../../../../helper/FOI/helper";
@@ -57,8 +58,28 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
     }
   }, [rowsState, sortModel]);
 
+  const hyperlinkTooltipRenderCellforMinistry = (params) => {    
+    let link;
+    link = "./ministryreview/" + params.row.id + "/ministryrequest/" + params.row.ministryrequestid;
+    let description = params.row.description;
+    if (params.row.fromdate && params.row.todate) {
+      description += "\n(" + (new Date(params.row.fromdate)).toLocaleDateString() + " to " + (new Date(params.row.todate)).toLocaleDateString() + ")"
+    }
+    return (<LightTooltip placement="bottom-start" title={
+      <div style={{whiteSpace: "pre-line"}}>
+        {description}
+      </div>
+    }>
+      <span className="table-cell-truncate">
+      <Link href={link} onClick={(e) => renderReviewRequestforMinistry(e, params.row)}>
+        <div className="MuiDataGrid-cellContent">{params.value}</div>
+      </Link></span>
+    </LightTooltip>
+    )
+  };
+
   const hyperlinkRenderCellforMinistry = (params) => {
-    var link;
+    let link;
     link = "./ministryreview/" + params.row.id + "/ministryrequest/" + params.row.ministryrequestid;
     return (
       <Link href={link} onClick={e => renderReviewRequestforMinistry(e, params.row)}>
@@ -66,7 +87,7 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
       </Link>
     )
   };
-  
+
   const renderReviewRequestforMinistry = (e, row) => {
     e.preventDefault()
     dispatch(push(`/foi/ministryreview/${row.id}/ministryrequest/${row.ministryrequestid}`));
@@ -78,7 +99,7 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
       headerName: "ID NUMBER",
       width: 170,
       headerAlign: "left",
-      renderCell: hyperlinkRenderCellforMinistry,
+      renderCell: hyperlinkTooltipRenderCellforMinistry,
       cellClassName: 'foi-advanced-search-result-cell',
     },
     {
