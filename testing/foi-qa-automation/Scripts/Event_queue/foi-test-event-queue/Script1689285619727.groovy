@@ -124,154 +124,116 @@ println(RunConfiguration.getProjectDir() + '/Test Attachments')
 WebUI.uploadFile(findTestObject('Page_foi.flow/attachment/input_Add Files_file-upload-input'), RunConfiguration.getProjectDir() + 
     '/Test Attachments/test.docx')
 
-WebUI.click(findTestObject('Records/button_Add Files'))
-
-println(RunConfiguration.getProjectDir() + '/Test Attachments')
-
-WebUI.uploadFile(findTestObject('Page_foi.flow/attachment/input_Add Files_file-upload-input'), RunConfiguration.getProjectDir() + 
-    '/Test Attachments/50mb.pdf')
-
-WebUI.click(findTestObject('Records/button_Add Files'))
-
-println(RunConfiguration.getProjectDir() + '/Test Attachments')
-
-WebUI.uploadFile(findTestObject('Page_foi.flow/attachment/input_Add Files_file-upload-input'), RunConfiguration.getProjectDir() + 
-    '/Test Attachments/Excelattached (1).msg')
-
-WebUI.click(findTestObject('Records/button_Add Files'))
-
-println(RunConfiguration.getProjectDir() + '/Test Attachments')
-
-WebUI.uploadFile(findTestObject('Page_foi.flow/attachment/input_Add Files_file-upload-input'), RunConfiguration.getProjectDir() + 
-    '/Test Attachments/corrupted.pdf')
-
-WebUI.click(findTestObject('Records/button_Add Files'))
-
-println(RunConfiguration.getProjectDir() + '/Test Attachments')
-
-WebUI.uploadFile(findTestObject('Page_foi.flow/attachment/input_Add Files_file-upload-input'), RunConfiguration.getProjectDir() + 
-    '/Test Attachments/Book17.pdf')
-
-WebUI.click(findTestObject('Records/button_Add Files'))
-
-println(RunConfiguration.getProjectDir() + '/Test Attachments')
-
-WebUI.uploadFile(findTestObject('Page_foi.flow/attachment/input_Add Files_file-upload-input'), RunConfiguration.getProjectDir() + 
-    '/Test Attachments/Book20.pdf')
-
-WebUI.click(findTestObject('Records/button_Add Files'))
-
-println(RunConfiguration.getProjectDir() + '/Test Attachments')
-
-WebUI.uploadFile(findTestObject('Page_foi.flow/attachment/input_Add Files_file-upload-input'), RunConfiguration.getProjectDir() + 
-    '/Test Attachments/download.png')
-
-WebUI.click(findTestObject('Records/button_Add Files'))
-
-println(RunConfiguration.getProjectDir() + '/Test Attachments')
-
-WebUI.uploadFile(findTestObject('Page_foi.flow/attachment/input_Add Files_file-upload-input'), RunConfiguration.getProjectDir() + 
-    '/Test Attachments/500mb.pdf')
-
-WebUI.click(findTestObject('Records/button_Add Files'))
-
-println(RunConfiguration.getProjectDir() + '/Test Attachments')
-
-WebUI.uploadFile(findTestObject('Page_foi.flow/attachment/input_Add Files_file-upload-input'), RunConfiguration.getProjectDir() + 
-    '/Test Attachments/stitched680MB.pdf')
-
-//WebUI.verifyElementNotPresent(findTestObject('Records/p_The total size of all files uploaded can not exceed  2000MB. Please upload additional files separately'),
-//  0)
-//WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT, FailureHandling.STOP_ON_FAILURE)
-WebUI.click(findTestObject('Records/button_Add Files'))
-
-println(RunConfiguration.getProjectDir() + '/Test Attachments')
-
-WebUI.uploadFile(findTestObject('Page_foi.flow/attachment/input_Add Files_file-upload-input'), RunConfiguration.getProjectDir() + 
-    '/Test Attachments/stitchedpdf911MB.pdf')
-
-WebUI.verifyElementText(findTestObject('Records/p_The total size of all files uploaded can not exceed  2000MB. Please upload additional files separately'), 
-    'The total size of all files uploaded can not exceed 2000MB. Please upload additional files separately.')
-
-WebUI.click(findTestObject('Records/button_Cancel'))
-
-WebUI.acceptAlert()
-
-WebUI.click(findTestObject('Records/button_Upload Records'))
-
 WebUI.click(findTestObject('Records/span_DEPUTY MINISTERS OFFICE'))
-
-WebUI.click(findTestObject('Records/button_Add Files'))
-
-println(RunConfiguration.getProjectDir() + '/Test Attachments')
-
-WebUI.uploadFile(findTestObject('Page_foi.flow/attachment/input_Add Files_file-upload-input'), RunConfiguration.getProjectDir() + 
-    '/Test Attachments/test.docx')
-
-WebUI.click(findTestObject('Records/button_Add Files1'))
-
-println(RunConfiguration.getProjectDir() + '/Test Attachments')
-
-WebUI.uploadFile(findTestObject('Page_foi.flow/attachment/input_Add Files_file-upload-input'), RunConfiguration.getProjectDir() + 
-    '/Test Attachments/50mb.pdf')
-
-WebUI.click(findTestObject('Records/button_Add Files1'))
-
-println(RunConfiguration.getProjectDir() + '/Test Attachments')
-
-WebUI.uploadFile(findTestObject('Page_foi.flow/attachment/input_Add Files_file-upload-input'), RunConfiguration.getProjectDir() + 
-    '/Test Attachments/Excelattached (1).msg')
 
 WebUI.click(findTestObject('Records/button_Continue'))
 
-WebUI.click(findTestObject('Records/button_Upload Records'))
-
-WebUI.click(findTestObject('Records/span_DEPUTY MINISTERS OFFICE'))
-
-WebUI.click(findTestObject('Records/button_Add Files1'))
-
-println(RunConfiguration.getProjectDir() + '/Test Attachments')
-
-WebUI.uploadFile(findTestObject('Page_foi.flow/attachment/input_Add Files_file-upload-input'), RunConfiguration.getProjectDir() + 
-    '/Test Attachments/corrupted.pdf')
-
-WebUI.delay(8)
-
-WebUI.click(findTestObject('Records/button_Add Files1'))
-
-println(RunConfiguration.getProjectDir() + '/Test Attachments')
-
-WebUI.uploadFile(findTestObject('Page_foi.flow/attachment/input_Add Files_file-upload-input'), RunConfiguration.getProjectDir() + 
-    '/Test Attachments/samplepptx.pptx')
-
-WebUI.click(findTestObject('Records/button_Add Files1'))
-
-println(RunConfiguration.getProjectDir() + '/Test Attachments')
-
-WebUI.uploadFile(findTestObject('Page_foi.flow/attachment/input_Add Files_file-upload-input'), RunConfiguration.getProjectDir() + 
-    '/Test Attachments/trials.kml')
-
-WebUI.click(findTestObject('Records/button_Continue'))
-
-WebUI.delay(100)
+WebUI.delay(40)
 
 WebUI.refresh()
 
-WebUI.click(findTestObject('Records/div_Records'))
+WebUI.navigateToUrl(GlobalVariable.BASE_URL)
 
-WebUI.click(findTestObject('Records/span_ERRORS'))
+WebUI.click(findTestObject('Event/h3_Event Queue'))
 
-WebUI.verifyElementText(findTestObject('Records/span_50mb.pdf'), '50mb.pdf')
+WebUI.verifyElementText(findTestObject('Event/div_foimma, foimma'), 'Foiedu, Foiedu')
 
-WebUI.verifyElementText(findTestObject('Records/span_Deputy Ministers Office (1)'), 'Deputy Minister\'s Office')
+def Format1 = 'yyyy-MM-dd'
 
-WebUI.click(findTestObject('Records/span_INCOMPATIBLE'))
+def today = new Date()
 
-WebUI.verifyElementText(findTestObject('Records/span_samplepptx.pptx'), 'trials.kml')
+def currentDate = today.format(Format1)
 
-WebUI.verifyElementText(findTestObject('Records/span_Deputy Ministers Office (1)'), 'Deputy Minister\'s Office')
+WebUI.verifyElementAttributeValue(findTestObject('Event/svg_DATE  TIME STAMP_MuiSvgIcon-root MuiSvgIcon-fontSizeSmall MuiDataGrid-sortIcon css-1k33q06'), 
+    'data-testid', 'ArrowDownwardIcon', 0)
 
-ministryUser.close()
 
-IAOuser.close()
+
+
+
+//WebUI.verifyElementText(findTestObject('Event/div_2023 Jul 11  0602 AM'), '')
+WebUI.verifyElementText(findTestObject('Event/div_MMA-2023-0953'), requestID)
+
+WebUI.verifyElementText(findTestObject('Event/div_System'), 'Foiedu, Foiedu')
+
+WebUI.verifyElementText(findTestObject('Event/span_Legislative Due Date due'), 'A batch of records Has Be...')
+
+WebUI.click(findTestObject('Event/svg_DATE  TIME STAMP_MuiSvgIcon-root MuiSvgIcon-fontSizeSmall MuiDataGrid-sortIcon css-1k33q06'))
+
+WebUI.verifyElementAttributeValue(findTestObject('Event/svg_DATE  TIME STAMP_MuiSvgIcon-root MuiSvgIcon-fontSizeSmall MuiDataGrid-sortIcon css-1k33q06'),
+	'data-testid', 'ArrowUpwardIcon', 0)
+
+WebUI.click(findTestObject('Page_foi.flow/navbar/button_Sign Out'))
+
+WebUI.navigateToUrl(GlobalVariable.BASE_URL)
+
+WebUI.callTestCase(findTestCase('helper/foi-test-login'), [('password') : findTestData('Login Credentials').getValue('Password', 
+            1), ('username') : findTestData('Login Credentials').getValue('Username', 1)], FailureHandling.STOP_ON_FAILURE)
+
+WebUI.click(findTestObject('Event/h3_Event Queue'))
+
+WebUI.verifyElementText(findTestObject('Event/div_Intake, FOI'), 'Intake, FOI')
+
+WebUI.verifyElementText(findTestObject('Event/div_foiedu, foiedu'), 'Foiedu, Foiedu')
+
+WebUI.verifyElementAttributeValue(findTestObject('Event/svg_DATE  TIME STAMP_MuiSvgIcon-root MuiSvgIcon-fontSizeSmall MuiDataGrid-sortIcon css-1k33q06'), 
+    'data-testid', 'ArrowDownwardIcon', 0)
+
+
+
+WebUI.click(findTestObject('Event/div_Intake, FOI'))
+
+WebUI.click(findTestObject('Page_foi.flow/form/sidebar/div_Sidebar Comments'), FailureHandling.STOP_ON_FAILURE)
+
+WebUI.verifyElementNotPresent(findTestObject('Page_foi.flow/comment/div_Comment list 1'), 0)
+
+WebUI.click(findTestObject('Page_foi.flow/comment/button_Add Comment'), FailureHandling.STOP_ON_FAILURE)
+
+WebUI.sendKeys(findTestObject('Page_foi.flow/comment/div_Comment textbox'), 'test few')
+
+WebUI.click(findTestObject('Page_foi.flow/comment/button_Post comment'), FailureHandling.STOP_ON_FAILURE)
+
+WebUI.navigateToUrl(GlobalVariable.BASE_URL)
+
+WebUI.click(findTestObject('Event/h3_Event Queue'))
+
+WebUI.verifyElementText(findTestObject('Event/div_Intake, FOI'), 'Intake, FOI')
+
+WebUI.verifyElementText(findTestObject('Event/div_foiedu, foiedu'), 'Foiedu, Foiedu')
+
+WebUI.verifyElementText(findTestObject('Event/div_MMA-2023-0953'), requestID)
+
+WebUI.verifyElementText(findTestObject('Event/span_Legislative Due Date due'), 'test few')
+
+WebUI.click(findTestObject('Event/span_Legislative Due Date due'))
+
+WebUI.verifyElementText(findTestObject('Page_foi.flow/comment/p_comment list 1 text'), 'test few')
+
+WebUI.click(findTestObject('Page_foi.flow/form/sidebar/div_Sidebar Request'))
+
+WebUI.click(findTestObject('Page_foi.flow/form/watch/div_add other watchers'), FailureHandling.STOP_ON_FAILURE)
+
+WebUI.click(findTestObject('Event/li_User, Super'))
+
+WebUI.click(findTestObject('Page_foi.flow/navbar/button_Sign Out'))
+
+WebUI.navigateToUrl(GlobalVariable.BASE_URL)
+
+WebUI.callTestCase(findTestCase('helper/foi-test-login'), [('password') : findTestData('Login Credentials').getValue('Password', 
+            4), ('username') : findTestData('Login Credentials').getValue('Username', 4)], FailureHandling.STOP_ON_FAILURE)
+
+WebUI.click(findTestObject('Event/h3_Event Queue'))
+
+WebUI.click(findTestObject('Event/span_WATCHING REQUESTS'))
+
+WebUI.verifyElementText(findTestObject('Event/div_MMA-2023-0953'), requestID)
+
+WebUI.verifyElementText(findTestObject('Event/span_Legislative Due Date due'), 'test few')
+
+WebUI.click(findTestObject('Event/svg_DATE  TIME STAMP_MuiSvgIcon-root MuiSvgIcon-fontSizeSmall MuiDataGrid-sortIcon css-1k33q06'))
+
+WebUI.verifyElementAttributeValue(findTestObject('Event/svg_DATE  TIME STAMP_MuiSvgIcon-root MuiSvgIcon-fontSizeSmall MuiDataGrid-sortIcon css-1k33q06'),
+	'data-testid', 'ArrowUpwardIcon', 0)
+
+
 

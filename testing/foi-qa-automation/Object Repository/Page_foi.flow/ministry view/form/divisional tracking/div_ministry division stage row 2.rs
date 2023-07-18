@@ -7,7 +7,7 @@
    <selectorCollection>
       <entry>
          <key>XPATH</key>
-         <value>//div[@id='foi-division-row1']/div[2]/div/div/div[@id='foi-divisionstage-dropdown']</value>
+         <value>//div[@id='foi-division-row1']/div[2]/div/div/div</value>
       </entry>
       <entry>
          <key>BASIC</key>
