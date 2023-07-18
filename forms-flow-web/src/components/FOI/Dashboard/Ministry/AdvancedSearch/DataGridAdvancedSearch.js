@@ -8,11 +8,12 @@ import {
   updateSortModel,
   getLDD,
   getRecordsDue,
-  cellTooltipRender
+  LightTooltip
 } from "../../utils";
 import { ActionContext } from "./ActionContext";
 import { ConditionalComponent } from "../../../../../helper/FOI/helper";
 import { useDispatch } from "react-redux";
+import Link from "@mui/material/Link";
 import { push } from "connected-react-router";
 import { CustomFooter } from "../../CustomFooter"
 
@@ -57,10 +58,39 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
     }
   }, [rowsState, sortModel]);
 
-  
-  
-  const renderReviewRequestforMinistry = (e) => {
-    dispatch(push(`/foi/ministryreview/${e.row.id}/ministryrequest/${e.row.ministryrequestid}`));
+  const hyperlinkTooltipRenderCellforMinistry = (params) => {    
+    let link;
+    link = "./ministryreview/" + params.row.id + "/ministryrequest/" + params.row.ministryrequestid;
+    let description = params.row.description;
+    if (params.row.fromdate && params.row.todate) {
+      description += "\n(" + (new Date(params.row.fromdate)).toLocaleDateString() + " to " + (new Date(params.row.todate)).toLocaleDateString() + ")"
+    }
+    return (<LightTooltip placement="bottom-start" title={
+      <div style={{whiteSpace: "pre-line"}}>
+        {description}
+      </div>
+    }>
+      <span className="table-cell-truncate">
+      <Link href={link} onClick={(e) => renderReviewRequestforMinistry(e, params.row)}>
+        <div className="MuiDataGrid-cellContent">{params.value}</div>
+      </Link></span>
+    </LightTooltip>
+    )
+  };
+
+  const hyperlinkRenderCellforMinistry = (params) => {
+    let link;
+    link = "./ministryreview/" + params.row.id + "/ministryrequest/" + params.row.ministryrequestid;
+    return (
+      <Link href={link} onClick={e => renderReviewRequestforMinistry(e, params.row)}>
+        <div className="MuiDataGrid-cellContent">{params.value}</div>
+      </Link>
+    )
+  };
+
+  const renderReviewRequestforMinistry = (e, row) => {
+    e.preventDefault()
+    dispatch(push(`/foi/ministryreview/${row.id}/ministryrequest/${row.ministryrequestid}`));
   };
 
   const columns = React.useRef([
@@ -69,7 +99,7 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
       headerName: "ID NUMBER",
       width: 170,
       headerAlign: "left",
-      renderCell: cellTooltipRender,
+      renderCell: hyperlinkTooltipRenderCellforMinistry,
       cellClassName: 'foi-advanced-search-result-cell',
     },
     {
@@ -77,6 +107,7 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
       headerName: "CATEGORY",
       flex: 1,
       headerAlign: "left",
+      renderCell: hyperlinkRenderCellforMinistry,
       cellClassName: 'foi-advanced-search-result-cell',
     },
     {
@@ -84,6 +115,7 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
       headerName: "TYPE",
       flex: 1,
       headerAlign: "left",
+      renderCell: hyperlinkRenderCellforMinistry,
       cellClassName: 'foi-advanced-search-result-cell',
     },
 
@@ -92,6 +124,7 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
       headerName: "REQUEST STATE",
       flex: 1,
       headerAlign: "left",
+      renderCell: hyperlinkRenderCellforMinistry,
       cellClassName: 'foi-advanced-search-result-cell',
     },
 
@@ -100,6 +133,7 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
       headerName: "ASSIGNED TO",
       flex: 1,
       headerAlign: "left",
+      renderCell: hyperlinkRenderCellforMinistry,
       cellClassName: 'foi-advanced-search-result-cell',
     },
     {
@@ -107,6 +141,7 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
       headerName: "RECORDS DUE",
       flex: 1,
       headerAlign: "left",
+      renderCell: hyperlinkRenderCellforMinistry,
       cellClassName: 'foi-advanced-search-result-cell',
       valueGetter: getRecordsDue,
     },
@@ -115,6 +150,7 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
       headerName: "LDD",
       flex: 1,
       headerAlign: "left",
+      renderCell: hyperlinkRenderCellforMinistry,
       cellClassName: 'foi-advanced-search-result-cell',
       valueGetter: getLDD,
     },
@@ -184,7 +220,6 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
                 .replace(/ +/g, "")}`
             }
             loading={searchLoading}
-            onRowClick={renderReviewRequestforMinistry}
           />
         </Grid>
       </Grid>
