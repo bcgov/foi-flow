@@ -1,8 +1,8 @@
 ---
-name: Task
+name: Production Release
 about: Capture the activities associated with FOI release.
 title: ''
-labels: Task
+labels: Production Release
 assignees: ''
 
 ---
