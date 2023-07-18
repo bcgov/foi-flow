@@ -48,7 +48,6 @@ class dashboardeventservice:
     
 
     def __prepareevent(self, notification):
-        print(notification)
         return {
             'id': notification.id+notification.crtid,
             'status': notification.status,
