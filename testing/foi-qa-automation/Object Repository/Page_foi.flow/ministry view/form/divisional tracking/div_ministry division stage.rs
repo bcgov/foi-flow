@@ -7,7 +7,7 @@
    <selectorCollection>
       <entry>
          <key>XPATH</key>
-         <value>//div[@id='foi-divisionstage-dropdown']</value>
+         <value>(.//*[normalize-space(text()) and normalize-space(.)='Select Division Stage'])[3]/following::*[name()='svg'][1]</value>
       </entry>
       <entry>
          <key>BASIC</key>

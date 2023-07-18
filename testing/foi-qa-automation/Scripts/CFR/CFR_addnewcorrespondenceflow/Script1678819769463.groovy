@@ -233,6 +233,27 @@ WebUI.delay(3)
 WebUI.verifyElementText(findTestObject('Page_foi.flow/comment/p_comment list 1 text'), ((findTestData('Login Credentials').getValue(
         'First Name', 1) + ' ') + findTestData('Login Credentials').getValue('Last Name', 1)) + ' changed the state of the request to On Hold')
 
+ministryUser.close()
+
+IAOuser.close()
+
+WebUI.openBrowser(GlobalVariable.BASE_URL)
+
+WebUI.callTestCase(findTestCase('helper/foi-test-login'), [('password') : findTestData('Login Credentials').getValue('Password', 
+            1), ('username') : findTestData('Login Credentials').getValue('Username', 1)], FailureHandling.STOP_ON_FAILURE)
+
+WebUI.click(findTestObject('Page_foi.flow/queue/div_My Team Requests'))
+
+WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
+
+WebUI.setText(findTestObject('Page_foi.flow/queue/input_Dashboard Filter'), requestID)
+
+WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
+
+WebUI.click(findTestObject('Page_foi.flow/queue/div_request queue row 1'))
+
+WebUI.refresh()
+
 WebUI.click(findTestObject('CFR/div_Contact Applicant'))
 
 WebUI.verifyElementPresent(findTestObject('CFR/Payment_Info/Payment_received_notification'), 0)
@@ -247,10 +268,8 @@ WebUI.delay(3)
 
 WebUI.click(findTestObject('CFR/CFR_Addcorrespondence/svg'))
 
-WebUI.click(findTestObject('CFR/CFR_Addcorrespondence/button_Cancel'))
-
-WebUI.click(findTestObject('CFR/CFR_Addcorrespondence/svg'))
-
+//WebUI.click(findTestObject('CFR/CFR_Addcorrespondence/button_Cancel'))
+//WebUI.click(findTestObject('CFR/CFR_Addcorrespondence/svg'))
 WebUI.click(findTestObject('CFR/CFR_Addcorrespondence/button_Add Files'))
 
 WebUI.uploadFile(findTestObject('Page_foi.flow/attachment/input_Add Files_file-upload-input'), RunConfiguration.getProjectDir() + 
@@ -270,7 +289,5 @@ WebUI.click(findTestObject('CFR/CFR_Addcorrespondence/li_Download'))
 
 WebUI.delay(3)
 
-ministryUser.close()
-
-IAOuser.close()
+WebUI.closeBrowser()
 
