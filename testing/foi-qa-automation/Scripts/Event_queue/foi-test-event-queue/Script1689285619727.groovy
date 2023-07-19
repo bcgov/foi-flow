@@ -22,8 +22,8 @@ import com.kms.katalon.core.webui.driver.DriverFactory as DriverFactory
 import groovy.json.JsonSlurper as JsonSlurper
 
 WebUI.callTestCase(findTestCase('submit/foi-test-save-request-form'), [('password') : findTestData('Login Credentials').getValue(
-            'Password', 1), ('username') : findTestData('Login Credentials').getValue('Username', 1), ('firstname') : findTestData(
-            'Login Credentials').getValue('First Name', 1), ('lastname') : findTestData('Login Credentials').getValue('Last Name', 
+            'Password', 6), ('username') : findTestData('Login Credentials').getValue('Username', 6), ('firstname') : findTestData(
+            'Login Credentials').getValue('First Name', 6), ('lastname') : findTestData('Login Credentials').getValue('Last Name', 
             6), ('applicantFirstname') : '', ('applicantLastname') : '', ('category') : '', ('email') : findTestData('Sample Applicant').getValue(
             'email', 1), ('streetAddress') : findTestData('Sample Applicant').getValue('streetAddress', 1), ('streetAddress2') : findTestData(
             'Sample Applicant').getValue('streetAddress2', 1), ('city') : findTestData('Sample Applicant').getValue('city', 
@@ -70,6 +70,8 @@ WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
 WebUI.setText(findTestObject('Page_foi.flow/queue/input_Dashboard Filter'), requestID)
 
 WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
+
+WebUI.delay(5)
 
 WebUI.click(findTestObject('Page_foi.flow/queue/div_request queue row 1'))
 
@@ -147,29 +149,25 @@ def currentDate = today.format(Format1)
 WebUI.verifyElementAttributeValue(findTestObject('Event/svg_DATE  TIME STAMP_MuiSvgIcon-root MuiSvgIcon-fontSizeSmall MuiDataGrid-sortIcon css-1k33q06'), 
     'data-testid', 'ArrowDownwardIcon', 0)
 
-
-
-
-
 //WebUI.verifyElementText(findTestObject('Event/div_2023 Jul 11  0602 AM'), '')
 WebUI.verifyElementText(findTestObject('Event/div_MMA-2023-0953'), requestID)
 
 WebUI.verifyElementText(findTestObject('Event/div_System'), 'Foiedu, Foiedu')
 
-WebUI.verifyElementText(findTestObject('Event/span_Legislative Due Date due'), 'A batch of records Has Be...')
+WebUI.verifyElementText(findTestObject('Event/span_Legislative Due Date due'), 'A Batch Of Records Has Be...')
 
 WebUI.click(findTestObject('Event/svg_DATE  TIME STAMP_MuiSvgIcon-root MuiSvgIcon-fontSizeSmall MuiDataGrid-sortIcon css-1k33q06'))
 
-WebUI.verifyElementAttributeValue(findTestObject('Event/svg_DATE  TIME STAMP_MuiSvgIcon-root MuiSvgIcon-fontSizeSmall MuiDataGrid-sortIcon css-1k33q06'),
-	'data-testid', 'ArrowUpwardIcon', 0)
+WebUI.verifyElementAttributeValue(findTestObject('Event/svg_DATE  TIME STAMP_MuiSvgIcon-root MuiSvgIcon-fontSizeSmall MuiDataGrid-sortIcon css-1k33q06'), 
+    'data-testid', 'ArrowUpwardIcon', 0)
 
-WebUI.click(findTestObject('Page_foi.flow/navbar/button_Sign Out'))
+//WebUI.click(findTestObject('Page_foi.flow/navbar/button_Sign Out'))
+DriverFactory.changeWebDriver(IAOuser)
 
 WebUI.navigateToUrl(GlobalVariable.BASE_URL)
 
-WebUI.callTestCase(findTestCase('helper/foi-test-login'), [('password') : findTestData('Login Credentials').getValue('Password', 
-            1), ('username') : findTestData('Login Credentials').getValue('Username', 1)], FailureHandling.STOP_ON_FAILURE)
-
+//WebUI.callTestCase(findTestCase('helper/foi-test-login'), [('password') : findTestData('Login Credentials').getValue('Password', 
+//          1), ('username') : findTestData('Login Credentials').getValue('Username', 1)], FailureHandling.STOP_ON_FAILURE)
 WebUI.click(findTestObject('Event/h3_Event Queue'))
 
 WebUI.verifyElementText(findTestObject('Event/div_Intake, FOI'), 'Intake, FOI')
@@ -178,8 +176,6 @@ WebUI.verifyElementText(findTestObject('Event/div_foiedu, foiedu'), 'Foiedu, Foi
 
 WebUI.verifyElementAttributeValue(findTestObject('Event/svg_DATE  TIME STAMP_MuiSvgIcon-root MuiSvgIcon-fontSizeSmall MuiDataGrid-sortIcon css-1k33q06'), 
     'data-testid', 'ArrowDownwardIcon', 0)
-
-
 
 WebUI.click(findTestObject('Event/div_Intake, FOI'))
 
@@ -203,7 +199,7 @@ WebUI.verifyElementText(findTestObject('Event/div_foiedu, foiedu'), 'Foiedu, Foi
 
 WebUI.verifyElementText(findTestObject('Event/div_MMA-2023-0953'), requestID)
 
-WebUI.verifyElementText(findTestObject('Event/span_Legislative Due Date due'), 'test few')
+WebUI.verifyElementText(findTestObject('Event/span_Legislative Due Date due'), 'Test few')
 
 WebUI.click(findTestObject('Event/span_Legislative Due Date due'))
 
@@ -228,12 +224,20 @@ WebUI.click(findTestObject('Event/span_WATCHING REQUESTS'))
 
 WebUI.verifyElementText(findTestObject('Event/div_MMA-2023-0953'), requestID)
 
-WebUI.verifyElementText(findTestObject('Event/span_Legislative Due Date due'), 'test few')
+WebUI.verifyElementText(findTestObject('Event/span_Legislative Due Date due'), 'Test few')
 
 WebUI.click(findTestObject('Event/svg_DATE  TIME STAMP_MuiSvgIcon-root MuiSvgIcon-fontSizeSmall MuiDataGrid-sortIcon css-1k33q06'))
 
-WebUI.verifyElementAttributeValue(findTestObject('Event/svg_DATE  TIME STAMP_MuiSvgIcon-root MuiSvgIcon-fontSizeSmall MuiDataGrid-sortIcon css-1k33q06'),
-	'data-testid', 'ArrowUpwardIcon', 0)
+WebUI.verifyElementAttributeValue(findTestObject('Event/svg_DATE  TIME STAMP_MuiSvgIcon-root MuiSvgIcon-fontSizeSmall MuiDataGrid-sortIcon css-1k33q06'), 
+    'data-testid', 'ArrowUpwardIcon', 0)
 
+WebUI.verifyElementAttributeValue(findTestObject('Event/Page_Event Queue/select_102050100'), 'value', '100', 0)
 
+WebUI.verifyElementAttributeValue(findTestObject('Event/Page_Event Queue/select_102050100'), 'value', '10', 0)
+
+WebUI.verifyElementAttributeValue(findTestObject('Event/Page_Event Queue/select_102050100'), 'value', '20', 0)
+
+WebUI.verifyElementAttributeValue(findTestObject('Event/Page_Event Queue/select_102050100'), 'value', '50', 0)
+
+WebUI.verifyElementHasAttribute(findTestObject('Event/Page_Event Queue/select_102050100'), 'selected', 0, FailureHandling.STOP_ON_FAILURE)
 

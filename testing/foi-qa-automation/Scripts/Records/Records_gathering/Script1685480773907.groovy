@@ -188,7 +188,7 @@ WebUI.click(findTestObject('Records/button_Add Files'))
 println(RunConfiguration.getProjectDir() + '/Test Attachments')
 
 WebUI.uploadFile(findTestObject('Page_foi.flow/attachment/input_Add Files_file-upload-input'), RunConfiguration.getProjectDir() + 
-    '/Test Attachments/stitchedpdf911MB.pdf')
+    '/Test Attachments/stitchedpdf690MB.pdf')
 
 WebUI.verifyElementText(findTestObject('Records/p_The total size of all files uploaded can not exceed  2000MB. Please upload additional files separately'), 
     'The total size of all files uploaded can not exceed 2000MB. Please upload additional files separately.')
