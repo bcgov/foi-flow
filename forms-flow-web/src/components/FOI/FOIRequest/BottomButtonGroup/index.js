@@ -107,8 +107,10 @@ const BottomButtonGroup = React.memo(
     }, [stateChanged]);
 
     const saveRequest = async (setLoader = false) => {
+      console.log("saveRequestObject::",saveRequestObject)
       if (urlIndexCreateRequest > -1) {
         saveRequestObject.requeststatusid = StateEnum.intakeinprogress.id;
+        console.log("-----",saveRequestObject.requeststatusid)
         setIsAddRequest(false);
       }      
       dispatch(setFOILoader(setLoader))
@@ -162,6 +164,8 @@ const BottomButtonGroup = React.memo(
     };
 
     React.useEffect(() => {
+      console.log("#######",currentSelectedStatus)
+
       if (isValidationError || !stateChanged) {
         return;
       }
@@ -172,14 +176,23 @@ const BottomButtonGroup = React.memo(
         saveRequestObject.requeststatusid &&
         saveRequestObject.currentState
       ) {
+        console.log("saveRequestModal----",saveRequestObject)
         saveRequestModal();
       } else {
         saveRequestObject.requeststatusid = StateEnum.open.id;
         if (currentSelectedStatus === StateEnum.open.name && ministryId) {
           saveRequestModal();
-        } else if(saveRequestObject.currentState === StateEnum.intakeinprogress.name) { //open a request
+        } 
+        // else if(saveRequestObject.currentState === StateEnum.intakeinprogress.name) { //open a request
+        //   const previousState = saveRequestObject.stateTransition[0].status;  
+
+        //   console.log("currentSelectedStatus----",currentSelectedStatus)
+        //   console.log("stateChanged----",previousState)
+        //   openRequest();
+        // }
+        else if(currentSelectedStatus &&
+          currentSelectedStatus === StateEnum.open.name)
           openRequest();
-        }
       }
     }, [currentSelectedStatus, stateChanged]);
 
@@ -209,6 +222,7 @@ const BottomButtonGroup = React.memo(
     };
 
     const handleModal = (value) => {
+      console.log("Inside handle modal??",value)
       setOpenModal(false);
       if (!value) {
         handleOpenRequest("", "", true);
@@ -257,6 +271,7 @@ const BottomButtonGroup = React.memo(
     const [documents, setDocuments] = useState([]);
 
     const saveStatusId = () => {
+      console.log("currentSelectedStatus in bottombuttongrp:",currentSelectedStatus)
       if (currentSelectedStatus) {
         switch (currentSelectedStatus) {
           case StateEnum.closed.name:
@@ -314,10 +329,11 @@ const BottomButtonGroup = React.memo(
           case StateEnum.deduplication.name:
           case StateEnum.harms.name:
           case StateEnum.response.name:
+          case StateEnum.peerreview.name:
             const status = Object.values(StateEnum).find(
               (statusValue) => statusValue.name === currentSelectedStatus
             );
-  
+            console.log("status in bottombuttongrp:",status)
             saveRequestObject.requeststatusid = status.id;
             if (currentSelectedStatus === StateEnum.onhold.name && !saveRequestObject.paymentExpiryDate) {
               saveRequestObject.paymentExpiryDate = dueDateCalculation(new Date(), PAYMENT_EXPIRY_DAYS);
@@ -338,19 +354,23 @@ const BottomButtonGroup = React.memo(
     }, [successCount]);
 
     const handleSaveModal = (value, fileInfoList, files) => {
+      console.log("handleSaveModal:",value)
       setsaveModal(false);
       setFileCount(files?.length);
 
       if (!value) {
+        console.log("handleSaveRequest called",requestState)
         handleSaveRequest(requestState, true, "");
         return;
       }
 
       if (isValidationError) {
+        console.log("!!",isValidationError)
         return;
       }
 
       if (!files || files.length < 1) {
+        console.log("currentSelectedStatus:",currentSelectedStatus)
         saveStatusId();
         saveRequest();
         hasStatusRequestSaved(currentSelectedStatus);
