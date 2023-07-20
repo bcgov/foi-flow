@@ -6,12 +6,15 @@
    <elementGuidId>13c805b6-aa31-4028-85e3-936ab096f127</elementGuidId>
    <selectorCollection>
       <entry>
-         <key>CSS</key>
-         <value></value>
+         <key>BASIC</key>
+         <value>//*[(text() = 'MMA-2023-0953' or . = 'MMA-2023-0953')]</value>
       </entry>
       <entry>
          <key>XPATH</key>
          <value>//div[@id='app']/div/div[3]/div/div[2]/div[2]/div/div[2]/div[2]/div/div/div/div/div[2]/div</value>
+      </entry>
+      <entry>
+         <key>CSS</key>
       </entry>
    </selectorCollection>
    <selectorMethod>XPATH</selectorMethod>
@@ -22,7 +25,7 @@
       <name>tag</name>
       <type>Main</type>
       <value>div</value>
-      <webElementGuid>0fe57e47-a634-4ad6-a2c2-65fe465b6fa8</webElementGuid>
+      <webElementGuid>d7daaf23-02b2-45b4-996d-0358907482d1</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -30,7 +33,7 @@
       <name>class</name>
       <type>Main</type>
       <value>MuiDataGrid-cellContent</value>
-      <webElementGuid>284362ea-7553-4061-9cb3-4d120c26f7a6</webElementGuid>
+      <webElementGuid>a6618cce-e8c1-413a-8da4-b264ece03d55</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>true</isSelected>
@@ -38,7 +41,7 @@
       <name>text</name>
       <type>Main</type>
       <value>MMA-2023-0953</value>
-      <webElementGuid>1c48de20-0d52-4a1e-918d-9a19f849198a</webElementGuid>
+      <webElementGuid>6a04d501-8aa1-4cd5-a4cb-df9a6b78c505</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -46,7 +49,7 @@
       <name>xpath</name>
       <type>Main</type>
       <value>id(&quot;app&quot;)/div[1]/div[@class=&quot;container foi-container&quot;]/div[@class=&quot;MuiGrid-root MuiGrid-container MuiGrid-spacing-xs-1 foi-grid-container css-tuxzvu&quot;]/div[@class=&quot;MuiGrid-root MuiGrid-container MuiGrid-spacing-xs-2 css-p4ki1t&quot;]/div[@class=&quot;MuiGrid-root MuiGrid-item MuiGrid-grid-xs-12 jss4 css-15j76c0&quot;]/div[@class=&quot;foi-data-grid MuiDataGrid-root MuiDataGrid-autoHeight css-1t75zoz&quot;]/div[@class=&quot;MuiDataGrid-main css-opb0c2&quot;]/div[2]/div[@class=&quot;MuiDataGrid-virtualScroller css-3enz1m&quot;]/div[@class=&quot;MuiDataGrid-virtualScrollerContent css-79elbk&quot;]/div[@class=&quot;MuiDataGrid-virtualScrollerRenderZone css-1inm7gi&quot;]/div[@class=&quot;MuiDataGrid-row&quot;]/div[@class=&quot;MuiDataGrid-cell MuiDataGrid-cell--textLeft&quot;]/div[@class=&quot;MuiDataGrid-cellContent&quot;]</value>
-      <webElementGuid>ef272a19-07c5-46f9-b1e5-7d548a4c9e71</webElementGuid>
+      <webElementGuid>16300c09-073a-462f-9e92-181c817ee6bb</webElementGuid>
    </webElementProperties>
    <webElementXpaths>
       <isSelected>true</isSelected>
@@ -54,7 +57,7 @@
       <name>xpath:idRelative</name>
       <type>Main</type>
       <value>//div[@id='app']/div/div[3]/div/div[2]/div[2]/div/div[2]/div[2]/div/div/div/div/div[2]/div</value>
-      <webElementGuid>41dd1d29-428b-4eaa-ab37-c13a188dc75e</webElementGuid>
+      <webElementGuid>7cc08f11-4c31-4013-a2e6-a5dc1b317f66</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -62,7 +65,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>(.//*[normalize-space(text()) and normalize-space(.)='CONTENT'])[1]/following::div[11]</value>
-      <webElementGuid>9ad6c60c-e9c2-4762-9af7-050c951841dc</webElementGuid>
+      <webElementGuid>5fa885b2-7920-4db7-9cce-6080c9fa8b99</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -70,7 +73,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>(.//*[normalize-space(text()) and normalize-space(.)='ASSIGNEE'])[1]/following::div[18]</value>
-      <webElementGuid>7d07f3d2-87c3-4f35-bb5d-7ae230756a1b</webElementGuid>
+      <webElementGuid>eaf28fd1-f830-4af3-916e-2bf0e0d13b45</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -78,7 +81,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>(.//*[normalize-space(text()) and normalize-space(.)='System'])[1]/preceding::div[1]</value>
-      <webElementGuid>24bd1a5f-6403-44d1-8556-dba34278eef2</webElementGuid>
+      <webElementGuid>4d7c9994-fa69-4566-bd50-54e354f5e611</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -86,7 +89,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>(.//*[normalize-space(text()) and normalize-space(.)='John, Nimya'])[1]/preceding::div[3]</value>
-      <webElementGuid>48496826-7f90-47c7-8cf8-99b79e539b1d</webElementGuid>
+      <webElementGuid>63cfdd27-3851-4ab0-89ac-639e4c3e80d3</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -94,7 +97,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>//*/text()[normalize-space(.)='MMA-2023-0953']/parent::*</value>
-      <webElementGuid>d06cd3c0-a47d-4242-8dfe-c14a426aa32a</webElementGuid>
+      <webElementGuid>8dbdf727-1069-4178-b95f-8da71e1426f3</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -102,7 +105,7 @@
       <name>xpath:position</name>
       <type>Main</type>
       <value>//div[2]/div/div[2]/div[2]/div/div/div/div/div[2]/div</value>
-      <webElementGuid>670e32ed-98af-48e5-ad83-42d19023abc9</webElementGuid>
+      <webElementGuid>eff92dfa-9ba0-48ca-abb5-2ce121da8fc7</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -110,6 +113,6 @@
       <name>xpath:customAttributes</name>
       <type>Main</type>
       <value>//div[(text() = 'MMA-2023-0953' or . = 'MMA-2023-0953')]</value>
-      <webElementGuid>773afa89-0244-4216-b828-59e73b8d9384</webElementGuid>
+      <webElementGuid>af6e80cf-b155-41d5-a4bb-89b2a256c13d</webElementGuid>
    </webElementXpaths>
 </WebElementEntity>

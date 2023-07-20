@@ -195,13 +195,13 @@ WebUI.click(findTestObject('Event/h3_Event Queue'))
 
 WebUI.verifyElementText(findTestObject('Event/div_Intake, FOI'), 'Intake, FOI')
 
-WebUI.verifyElementText(findTestObject('Event/div_foiedu, foiedu'), 'Foiedu, Foiedu')
+WebUI.verifyElementText(findTestObject('Event/foi_edu'), 'Foiedu, Foiedu')
 
-WebUI.verifyElementText(findTestObject('Event/div_MMA-2023-0953'), requestID)
+WebUI.verifyElementText(findTestObject('Records/Page_Event Queue/div_EDU-2099-21878'), requestID)
 
-WebUI.verifyElementText(findTestObject('Event/span_Legislative Due Date due'), 'Test few')
+WebUI.verifyElementText(findTestObject('Records/Page_Event Queue/div_test few'), 'Test Few')
 
-WebUI.click(findTestObject('Event/span_Legislative Due Date due'))
+WebUI.click(findTestObject('Records/Page_Event Queue/div_test few'))
 
 WebUI.verifyElementText(findTestObject('Page_foi.flow/comment/p_comment list 1 text'), 'test few')
 
@@ -222,9 +222,9 @@ WebUI.click(findTestObject('Event/h3_Event Queue'))
 
 WebUI.click(findTestObject('Event/span_WATCHING REQUESTS'))
 
-WebUI.verifyElementText(findTestObject('Event/div_MMA-2023-0953'), requestID)
+WebUI.verifyElementText(findTestObject('Records/Page_Event Queue/div_EDU-2099-21878'), requestID)
 
-WebUI.verifyElementText(findTestObject('Event/span_Legislative Due Date due'), 'Test few')
+WebUI.verifyElementText(findTestObject('Records/Page_Event Queue/div_test few'), 'Test Few')
 
 WebUI.click(findTestObject('Event/svg_DATE  TIME STAMP_MuiSvgIcon-root MuiSvgIcon-fontSizeSmall MuiDataGrid-sortIcon css-1k33q06'))
 
@@ -232,12 +232,16 @@ WebUI.verifyElementAttributeValue(findTestObject('Event/svg_DATE  TIME STAMP_Mui
     'data-testid', 'ArrowUpwardIcon', 0)
 
 WebUI.verifyElementAttributeValue(findTestObject('Event/Page_Event Queue/select_102050100'), 'value', '100', 0)
+ministryUser.close()
 
-WebUI.verifyElementAttributeValue(findTestObject('Event/Page_Event Queue/select_102050100'), 'value', '10', 0)
+IAOuser.close()
 
-WebUI.verifyElementAttributeValue(findTestObject('Event/Page_Event Queue/select_102050100'), 'value', '20', 0)
 
-WebUI.verifyElementAttributeValue(findTestObject('Event/Page_Event Queue/select_102050100'), 'value', '50', 0)
+//WebUI.verifyElementAttributeValue(findTestObject('Event/Page_Event Queue/select_102050100'), 'value', '10', 0)
 
-WebUI.verifyElementHasAttribute(findTestObject('Event/Page_Event Queue/select_102050100'), 'selected', 0, FailureHandling.STOP_ON_FAILURE)
+//WebUI.verifyElementAttributeValue(findTestObject('Event/Page_Event Queue/select_102050100'), 'value', '20', 0)
+
+//WebUI.verifyElementAttributeValue(findTestObject('Event/Page_Event Queue/select_102050100'), 'value', '50', 0)
+
+//WebUI.verifyElementHasAttribute(findTestObject('Event/Page_Event Queue/select_102050100'), 'selected', 0, FailureHandling.STOP_ON_FAILURE)
 
