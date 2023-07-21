@@ -29,7 +29,6 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 import CloseIcon from '@material-ui/icons/Close';
 import IconButton from '@material-ui/core/IconButton';
 import { CFRFormHistoryModal } from './CFRFormHistoryModal';
-import Grid from "@material-ui/core/Grid";
 import Tooltip from '../../customComponents/Tooltip/Tooltip';
 
 export const CFRForm = ({
@@ -120,6 +119,7 @@ export const CFRForm = ({
       <div className="toolTipContent">
         <strong>Areas to consider searching:</strong>
         <ul>
+          <li>Includes gathering and providing records, not creating records</li>
           <li>Outlook (including 'deleted' and 'sent' folders)</li>
           <li>Records management systems (ex. EDRMS)</li>
           <li>LAN, shared drives, SharePoint, databases</li>
@@ -133,7 +133,6 @@ export const CFRForm = ({
       <div className="toolTipContent">
         <strong>Tasks include:</strong>
         <ul>
-          <li>Includes gathering and providing records, not creating records</li>
           <li>Identifying relevant sources of data/information</li>
           <li>Manual time spent creating and producing records</li>
           <li>Ex: generating a custom report from a database using existing data</li>
@@ -1113,14 +1112,14 @@ export const CFRForm = ({
                       <div className="col-lg-6 foi-details-col">
                         <TextField
                           id="estimatedelectronic"
-                          label="Electronic Estimated Pages"
+                          label="Electronic Estimated Files"
                           inputProps={{
                             "aria-labelledby": "estimatedelectronic-label",
                             step: foiFees.electronicPages.unit,
                             min: 0,
                           }}
                           InputProps={{
-                            endAdornment: <InputAdornment position="end">pg(s)</InputAdornment>
+                            endAdornment: <InputAdornment position="end">file(s)</InputAdornment>
                           }}
                           InputLabelProps={{ shrink: true }}
                           name="electronicPages"
@@ -1166,14 +1165,14 @@ export const CFRForm = ({
                       <div className="col-lg-6 foi-details-col">
                         <TextField
                           id="actualelectronic"
-                          label="Electronic Actual Pages"
+                          label="Electronic Actual Files"
                           inputProps={{
                             "aria-labelledby": "estimatedelectronic-label",
                             step: foiFees.electronicPages.unit,
                             min: 0,
                           }}
                           InputProps={{
-                            endAdornment: <InputAdornment position="end">pg(s)</InputAdornment>
+                            endAdornment: <InputAdornment position="end">file(s)</InputAdornment>
                           }}
                           InputLabelProps={{ shrink: true }}
                           name="electronicPages"
