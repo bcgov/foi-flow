@@ -234,7 +234,7 @@ class FeeService:
         if pay_request.get('retry', False):
             return Payment.find_failed_transaction(pay_request['transaction_number']).total
         else:
-            fee = cfrfeeservice().getcfrfee(ministry_request_id)['feedata']['balanceremaining']
+            fee = cfrfeeservice().getapprovedcfrfee(ministry_request_id)['feedata']['balanceremaining']
             if pay_request.get('half', False):
                 return fee/2
             else:
