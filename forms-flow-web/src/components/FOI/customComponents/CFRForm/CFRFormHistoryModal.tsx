@@ -412,12 +412,12 @@ export const CFRFormHistoryModal = React.memo(({
                     <div className="col-lg-6 foi-details-col">
                       <TextField
                         id="estimatedelectronic"
-                        label="Electronic Estimated Pages"
+                        label="Electronic Estimated Files"
                         inputProps={{
                           "aria-labelledby": "estimatedelectronic-label"
                         }}
                         InputProps={{
-                          endAdornment: <InputAdornment position="end">pg(s)</InputAdornment>
+                          endAdornment: <InputAdornment position="end">file(s)</InputAdornment>
                         }}
                         InputLabelProps={{ shrink: true }}
                         name="electronicPages"
@@ -450,12 +450,12 @@ export const CFRFormHistoryModal = React.memo(({
                     <div className="col-lg-6 foi-details-col">
                       <TextField
                         id="actualelectronic"
-                        label="Electronic Actual Pages"
+                        label="Electronic Actual Files"
                         inputProps={{
                           "aria-labelledby": "estimatedelectronic-label"
                         }}
                         InputProps={{
-                          endAdornment: <InputAdornment position="end">pg(s)</InputAdornment>
+                          endAdornment: <InputAdornment position="end">file(s)</InputAdornment>
                         }}
                         InputLabelProps={{ shrink: true }}
                         name="electronicPages"
