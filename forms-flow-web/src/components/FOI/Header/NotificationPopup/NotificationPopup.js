@@ -64,7 +64,6 @@ const NotificationPopup = ({notifications, isMinistry, ministryCode}) => {
 
   const handleContinue = () => {
     setModalOpen(false);
-    console.log("dismissType", dismissType);
     dispatch(deleteFOINotifications(null, null,dismissType));
   }
 
