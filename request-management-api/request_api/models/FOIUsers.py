@@ -20,14 +20,14 @@ class FOIUser(db.Model):
     updatedby = db.Column(db.String(120), unique=False, nullable=True)
     
     @classmethod
-    def saveuser(cls, foiuser):
+    def createuser(cls, foiuser):
         db.session.add(foiuser)
         db.session.commit()
         return DefaultMethodResult(True,'User added',foiuser.preferred_username)
 
 
     @classmethod
-    def updateeuser(cls, foiuser):
+    def saveuser(cls, foiuser):
         try:
             dbquery = db.session.query(FOIUser)
             _user = dbquery.filter_by(username=foiuser.username)
@@ -40,6 +40,8 @@ class FOIUser(db.Model):
                               FOIUser.updated_at:datetime.now(), FOIUser.updatedby:"System"}, synchronize_session = False)
                 db.session.commit()
                 return DefaultMethodResult(True,'User updated for Id',FOIUser.preferred_username)
+            else:
+                cls.createuser(foiuser)
         except:
             db.session.rollback()
             raise
