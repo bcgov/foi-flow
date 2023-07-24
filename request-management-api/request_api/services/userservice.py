@@ -16,7 +16,7 @@ class userservice:
         operatingteams = OperatingTeam().getalloperatingteams()
         for operatingteam in operatingteams:
             groupmembers = KeycloakAdminService().getmembersbygroupnameandtype(operatingteam['name'], operatingteam['type'])
-            if groupmembers not in (None, '',[],) and len(groupmembers) > 0: 
+            if groupmembers not in (None, '',[]) and len(groupmembers) > 0: 
                 groupdata = groupmembers[0]
                 if 'members' in groupdata and len(groupdata['members']) > 0:
                     kcusers = groupdata['members']
