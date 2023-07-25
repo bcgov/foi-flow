@@ -64,19 +64,19 @@
 }
 
 .cfrform-locating {
-  top: 200px;
+  top: 80px;
 }
 
 .cfrform-producing {
-  top: 325px;
+  top: 210px;
 }
 
 .cfrform-preparing {
-  top: 465px;
+  top: 335px;
 }
 
 .cfrform-volume {
-  top: 590px;
+  top: 455px;
 }
 
 .hideContent {
@@ -172,4 +172,42 @@
   .cfrform-floatRightRight {
     display: none;
   }
+}
+
+@media (max-width: 1405px) {
+  .cfrform-preparing {
+    top: 345px;
+  }
+
+  .cfrform-volume {
+    top: 490px;
+  }
+}
+
+@media (max-width: 992px) {
+  .cfrform-producing {
+    top: 275px;
+  }
+
+  .cfrform-preparing {
+    top: 490px;
+  }
+
+  .cfrform-volume {
+    top: 850px;
+  } 
+}
+
+@media (max-width: 796px) {
+  .cfrform-producing {
+    top: 290px;
+  }
+
+  .cfrform-preparing {
+    top: 540px;
+  }
+
+  .cfrform-volume {
+    top: 890px;
+  } 
 }
