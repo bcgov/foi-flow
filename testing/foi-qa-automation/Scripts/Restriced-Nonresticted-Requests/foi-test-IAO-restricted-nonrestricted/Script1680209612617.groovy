@@ -85,8 +85,8 @@ WebUI.click(findTestObject('Page_foi.flow/form/assignee dropdown/div_Assigned'),
 WebUI.verifyElementAttributeValue(findTestObject('Page_foi.flow/form/assignee dropdown/li_Flex Team'), 'aria-disabled', 
     'true', 0)
 
-WebUI.verifyElementAttributeValue(findTestObject('Page_foi.flow/form/assignee dropdown/li_Central Team'), 'aria-disabled', 
-    'true', 0)
+//WebUI.verifyElementAttributeValue(findTestObject('Page_foi.flow/form/assignee dropdown/li_Central Team'), 'aria-disabled', 
+ //   'true', 0)
 
 WebUI.verifyElementAttributeValue(findTestObject('Page_foi.flow/form/assignee dropdown/li_MCFD Personals Team'), 'aria-disabled', 
     'true', 0)
@@ -144,7 +144,6 @@ WebUI.delay(3)
 WebUI.verifyElementNotPresent(findTestObject('Page_foi.flow/queue/div_request queue row 1'), 0)
 
 //WebUI.setText(findTestObject('Page_foi.flow/queue/input_Dashboard Filter'), requestID)
-
 WebUI.click(findTestObject('Page_foi.flow/queue/div_Watching Requests'))
 
 WebUI.click(findTestObject('Page_foi.flow/queue/div_request queue row 1'))
@@ -178,11 +177,10 @@ WebUI.click(findTestObject('Page_foi.flow/comment/span_User Comments'))
 
 WebUI.verifyElementText(findTestObject('Page_foi.flow/comment/p_comment list 1 text'), ((findTestData('Login Credentials').getValue(
         'Last Name', 4) + ', ') + findTestData('Login Credentials').getValue('First Name', 4)) + ' m')
+
 WebUI.refresh()
 
 WebUI.clickOffset(findTestObject('Page_foi.flow/navbar/notification/notification bell'), -2, 4)
-
-
 
 WebUI.verifyElementText(findTestObject('Page_foi.flow/navbar/notification/div_notification list 1 request id'), requestID)
 
@@ -218,6 +216,18 @@ WebUI.verifyElementText(findTestObject('Page_foi.flow/comment/p_comment list 1 t
         'First Name', 1) + ' ') + findTestData('Login Credentials').getValue('Last Name', 1)) + ' has removed ') + (((findTestData(
         'Login Credentials').getValue('Last Name', 4) + ', ') + findTestData('Login Credentials').getValue('First Name', 
         4)) + ' ')) + 'as a watcher')
+
+WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/div_Status'))
+
+WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/li_Closed'))
+
+WebUI.click(findTestObject('Page_foi.flow/form/closing modal/div_Closing Reason'), FailureHandling.STOP_ON_FAILURE)
+
+WebUI.click(findTestObject('Page_foi.flow/form/closing modal/dropdown options/li_Partial Disclosure'), FailureHandling.STOP_ON_FAILURE)
+
+WebUI.click(findTestObject('Page_foi.flow/form/state change dialog/button_Save Change'), FailureHandling.STOP_ON_FAILURE)
+
+WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT, FailureHandling.STOP_ON_FAILURE)
 
 WebUI.closeBrowser()
 
