@@ -12,6 +12,19 @@ Freedom of Information modernization.
 
 ## Installation
 
+### For mac
+1. Clone this repo
+2. Copy the .env file to the root folder of entire repo
+3. Change docker-compose.yml line 152 from windows.Dockerfile to mac.Dockerfile
+
+#### Add IP address to hosts on local system if accessing remotely
+1. Log into vpn
+2. Click statistics icon (bottom left of AnyConnect, the graph icon)
+3. Note down client address (IPv4)
+4. In your terminal run the command ``` sudo nano /etc/hosts ```
+5. Add the ip address from above to the list, with alias value ``` foiflow.local ```
+6. Save and exit
+
 ## Project Status
 The project is in the very early stages of development. The codebase will be changing frequently.
 
