@@ -19,7 +19,6 @@ class stateevent:
         if state is not None:
             #_commentresponse = self.__createcomment(requestid, state, requesttype, userid, username)
             _commentresponse = self.__createcommentwrapper(requestid, state, requesttype, userid, username)
-            print("_commentresponse:",_commentresponse)
             _notificationresponse = self.__createnotification(requestid, state, requesttype, userid)
             _cfrresponse = self.__createcfrentry(state, requestid, userid)
             if _commentresponse.success == True and _notificationresponse.success == True and _cfrresponse.success == True:
