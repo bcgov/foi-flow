@@ -110,13 +110,9 @@ def earlierDate = new Date().plus(10)
 //WebUI.waitForElementClickable(findTestObject('null'), 0)
 //WebUI.verifyElementHasAttribute(findTestObject('Page_foi.flow/form/inputs/request description/input_EDU checkbox'), 'checked', 
 //   0)
-
-
 WebUI.setText(findTestObject('Page_foi.flow/form/inputs/request description/textarea_request description'), 'TEST DESCRIPT')
 
 WebUI.scrollToElement(findTestObject('Page_foi.flow/form/inputs/request description/textarea_request description'), 0)
-
-
 
 //WebUI.scrollToElement(findTestObject('Page_foi.flow/form/inputs/request description/input_EDU checkbox'), 0)
 //WebUI.waitForElementClickable(findTestObject('Page_foi.flow/form/inputs/request description/input_EDU checkbox'), 0)
@@ -125,8 +121,6 @@ WebUI.scrollToElement(findTestObject('Page_foi.flow/form/inputs/request descript
 //WebUI.verifyElementNotHasAttribute(findTestObject('Page_foi.flow/form/inputs/request description/input_EDU checkbox'), 'checked', 
 // 0)
 WebUI.click(findTestObject('Page_foi.flow/form/inputs/request description/span_EDU_selectspanEDU'))
-
-
 
 //WebUI.verifyElementHasAttribute(findTestObject('Page_foi.flow/form/inputs/request description/input_EDU checkbox'), 'checked', 
 // 0)
@@ -157,8 +151,8 @@ WebUI.verifyElementPresent(findTestObject('Page_foi.flow/comment/span_User Comme
 
 WebUI.verifyElementPresent(findTestObject('Page_foi.flow/form/sidebar/a_FOI'), 0 //WebUI.verifyElementPresent(findTestObject('Page_foi.flow/form/sidebar/i_Home logo'), 0)
     //WebUI.verifyElementAttributeValue(findTestObject('Page_foi.flow/form/sidebar/a_FOI'), 'href', GlobalVariable.BASE_URL + 
-    ) //'/foi/dashboard', 0 
-//@Keyword
+    //'/foi/dashboard', 0 
+    ) //@Keyword
 //) //def clickUsingJS(TestObject to, int timeout)
 //{
 //WebDriver driver = DriverFactory.getWebDriver()
@@ -166,6 +160,8 @@ WebUI.verifyElementPresent(findTestObject('Page_foi.flow/form/sidebar/a_FOI'), 0
 //JavascriptExecutor executor = ((driver) as JavascriptExecutor)
 //executor.executeScript('arguments[0].click()', element)
 //}
+
+WebUI.closeBrowser()
 
 @com.kms.katalon.core.annotation.SetUp
 def setup() {

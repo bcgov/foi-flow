@@ -58,6 +58,8 @@ WebUI.verifyElementPresent(findTestObject('Page_foi.flow/form/div_CHILD DETAILS 
 
 WebUI.verifyElementPresent(findTestObject('Page_foi.flow/form/div_ON BEHALF OF DETAILS section'), 0)
 
+WebUI.closeBrowser()
+
 @com.kms.katalon.core.annotation.SetUp
 def setup() {
     WebUI.openBrowser(GlobalVariable.BASE_URL)
