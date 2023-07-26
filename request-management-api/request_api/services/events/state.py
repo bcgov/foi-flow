@@ -17,7 +17,9 @@ class stateevent:
     def createstatetransitionevent(self, requestid, requesttype, userid, username):
         state = self.__haschanged(requestid, requesttype)
         if state is not None:
-            _commentresponse = self.__createcomment(requestid, state, requesttype, userid, username)
+            #_commentresponse = self.__createcomment(requestid, state, requesttype, userid, username)
+            _commentresponse = self.__createcommentwrapper(requestid, state, requesttype, userid, username)
+            print("_commentresponse:",_commentresponse)
             _notificationresponse = self.__createnotification(requestid, state, requesttype, userid)
             _cfrresponse = self.__createcfrentry(state, requestid, userid)
             if _commentresponse.success == True and _notificationresponse.success == True and _cfrresponse.success == True:
@@ -38,12 +40,23 @@ class stateevent:
                 return newstate
         return None 
     
+    def __createcommentwrapper(self, requestid, state, requesttype, userid, username):
+        if state == 'Archived':
+            _openedministries = FOIMinistryRequest.getministriesopenedbyuid(requestid)
+            for ministry in _openedministries:
+                response=self.__createcomment(ministry["ministryrequestid"], state, 'ministryrequest', userid, username)
+        else:
+            response=self.__createcomment(requestid, state, requesttype, userid, username)
+        return response
+        
+    
     def __createcomment(self, requestid, state, requesttype, userid, username):
         comment = self.__preparecomment(requestid, state, requesttype, username)
         if requesttype == "ministryrequest":
             return commentservice().createministryrequestcomment(comment, userid, 2)
         else:
             return commentservice().createrawrequestcomment(comment, userid,2)
+
 
     def __createnotification(self, requestid, state, requesttype, userid):
         _notificationtype = "State"
