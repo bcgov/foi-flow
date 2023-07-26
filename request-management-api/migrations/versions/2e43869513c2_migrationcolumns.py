@@ -21,7 +21,8 @@ def upgrade():
     op.add_column('FOIRequests', sa.Column('migrationreference', sa.Text, nullable=True))
     op.add_column('FOIMinistryRequests', sa.Column('migrationreference', sa.Text, nullable=True))
     op.add_column('FOIRequestApplicantMappings', sa.Column('migrationreference', sa.Text, nullable=True))
-    op.add_column('FOIRequestContactInformation', sa.Column('migrationreference', sa.Text, nullable=True))    
+    op.add_column('FOIRequestContactInformation', sa.Column('migrationreference', sa.Text, nullable=True))
+    op.add_column('FOIRequestExtensions', sa.Column('migrationreference', sa.Text, nullable=True))    
     
 
 def downgrade():
@@ -30,3 +31,4 @@ def downgrade():
     op.drop_column('FOIMinistryRequests', 'migrationreference')
     op.drop_column('FOIRequestApplicantMappings', 'migrationreference')
     op.drop_column('FOIRequestContactInformation', 'migrationreference')
+    op.drop_column('FOIRequestExtensions', 'migrationreference')
