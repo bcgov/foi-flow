@@ -376,6 +376,9 @@ export const CFRForm = ({
   }
 
   const cfrStatusDisabled = () => {
+    if(requestState === StateEnum.peerreview.name){
+      return true;
+    }
     if (formHistory.length > 0 && [StateEnum.feeassessed.name, StateEnum.onhold.name, StateEnum.callforrecords.name].includes(requestState)) {
       if (isMinistry) {
         return ['review', 'approved'].includes(initialFormData.formStatus) || isNewCFRForm;
@@ -505,11 +508,12 @@ export const CFRForm = ({
   };
 
   const cfrActualsDisabled = () => {
-    return !isMinistry || formData?.formStatus !== 'approved' || requestState !== StateEnum.callforrecords.name || formData?.amountPaid === 0;
+    return !isMinistry || formData?.formStatus !== 'approved' || requestState !== StateEnum.callforrecords.name || formData?.amountPaid === 0 || 
+    requestState === StateEnum.peerreview.name;
   }
 
   const cfrEstimatedDisabled = () => {
-    return !isMinistry || initialFormData?.formStatus === 'approved' || initialFormData?.formStatus === 'review';
+    return !isMinistry || initialFormData?.formStatus === 'approved' || initialFormData?.formStatus === 'review' || requestState === StateEnum.peerreview.name;
   }
 
   const [historyModalOpen, setHistoryModal] = useState(false);
@@ -518,12 +522,12 @@ export const CFRForm = ({
   }
 
   const disableNewCfrFormBtn = () => {
-    return(formData?.formStatus !== 'approved' || (requestState !== StateEnum.callforrecords.name &&
+    return(formData?.formStatus !== 'approved' || requestState === StateEnum.peerreview.name || (requestState !== StateEnum.callforrecords.name &&
       requestState !== StateEnum.feeassessed.name && requestState !== StateEnum.onhold.name) || (requestState === StateEnum.onhold.name && formData?.actualTotalDue > 0));
   }
 
   const disableAmountPaid = () => {
-    return (isMinistry || requestState === StateEnum.feeassessed.name || formData?.formStatus !== 'approved' || ('balancePaymentMethod' in formData && formData?.balancePaymentMethod !== "init"))
+    return (isMinistry || requestState === StateEnum.peerreview.name || requestState === StateEnum.peerreview.name|| requestState === StateEnum.feeassessed.name || formData?.formStatus !== 'approved' || ('balancePaymentMethod' in formData && formData?.balancePaymentMethod !== "init"))
   }
 
   const [isNewCFRForm, setIsNewCFRForm] = useState(false)
@@ -540,7 +544,7 @@ export const CFRForm = ({
   }
 
   const isFeeWaiverDisabled = () => {
-    if(isMinistry || (!isMinistry && (requestState !== StateEnum.onhold.name || formData?.formStatus !== 'approved')))
+    if(isMinistry || requestState === StateEnum.peerreview.name || (!isMinistry && (requestState !== StateEnum.onhold.name || formData?.formStatus !== 'approved')))
       return true;
     else
       return false;
@@ -612,7 +616,7 @@ export const CFRForm = ({
                         fullWidth
                         required
                         error={formData?.reason === 'init'}
-                        disabled={!isMinistry || formData?.formStatus === 'approved'}
+                        disabled={!isMinistry || requestState === StateEnum.peerreview.name || formData?.formStatus === 'approved'}
                       >
                         {reasons.map((option) => (
                         <MenuItem
@@ -669,7 +673,7 @@ export const CFRForm = ({
                           variant="outlined"
                           fullWidth
                           required
-                          disabled={initialFormData?.formStatus !== 'approved' || initialFormData?.amountPaid !== 0 || formData?.amountPaid === initialFormData?.amountPaid}
+                          disabled={requestState === StateEnum.peerreview.name|| initialFormData?.formStatus !== 'approved' || initialFormData?.amountPaid !== 0 || formData?.amountPaid === initialFormData?.amountPaid}
                           error={validateEstimatePaymentMethod()}
                           helperText={validateEstimatePaymentMethod() &&
                             "Estimate payment method must be specified if amount paid is manually added"
@@ -699,7 +703,7 @@ export const CFRForm = ({
                           variant="outlined"
                           fullWidth
                           required
-                          disabled={initialFormData?.formStatus !== 'approved' || initialFormData?.amountPaid === 0 || formData?.amountPaid <= initialFormData?.amountPaid}
+                          disabled={requestState === StateEnum.peerreview.name|| initialFormData?.formStatus !== 'approved' || initialFormData?.amountPaid === 0 || formData?.amountPaid <= initialFormData?.amountPaid}
                           error={validateBalancePaymentMethod()}
                           helperText={validateBalancePaymentMethod() &&
                             "Balance payment method must be specified if amount paid is manually updated"
@@ -847,7 +851,7 @@ export const CFRForm = ({
                             e.target.value = parseFloat(e.target.value).toFixed(2);
                           }}
                           fullWidth
-                          disabled={isMinistry || (!isMinistry && formData?.formStatus !== 'approved')}
+                          disabled={isMinistry || requestState === StateEnum.peerreview.name|| (!isMinistry && formData?.formStatus !== 'approved')}
                         />
                       </div>
                     </div>
@@ -1014,7 +1018,7 @@ export const CFRForm = ({
                           helperText={validateField(formData?.estimates?.iaoPreparing, foiFees.iaoPreparing.unit) &&
                             "Hours must be entered in increments of " + foiFees.iaoPreparing.unit
                           }
-                          disabled={isMinistry || initialFormData?.formStatus !== 'review'}
+                          disabled={isMinistry || requestState === StateEnum.peerreview.name || initialFormData?.formStatus !== 'review'}
                         >
                           {/* {menuItems} */}
                         </TextField>
@@ -1070,7 +1074,7 @@ export const CFRForm = ({
                           helperText={validateField(formData?.actual?.iaoPreparing, foiFees.iaoPreparing.unit) &&
                             "Hours must be entered in increments of " + foiFees.iaoPreparing.unit
                           }
-                          disabled={isMinistry || formData?.formStatus !== 'approved'
+                          disabled={isMinistry || requestState === StateEnum.peerreview.name || formData?.formStatus !== 'approved'
                           || (requestState !== StateEnum.deduplication.name && requestState !== StateEnum.review.name)}
                         />
                       </div>
@@ -1270,7 +1274,7 @@ export const CFRForm = ({
                   id="btncfrsave"
                   onClick={save}
                   color="primary"
-                  disabled={!validateFields() || (formData?.reason === 'init' && isNewCFRForm)}
+                  disabled={!validateFields() || requestState === StateEnum.peerreview.name || (formData?.reason === 'init' && isNewCFRForm)}
                 >
                   Save
                 </button>
