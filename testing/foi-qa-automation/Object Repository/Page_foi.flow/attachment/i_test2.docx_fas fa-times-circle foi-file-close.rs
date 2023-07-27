@@ -13,8 +13,12 @@
          <key>XPATH</key>
          <value>//span[@id='state-change-dialog-description']/section/div/div/article/section/ol/li/section/div/div/aside/i</value>
       </entry>
+      <entry>
+         <key>BASIC</key>
+         <value>id(&quot;state-change-dialog-description&quot;)/section[@class=&quot;file-upload-container&quot;]/div[@class=&quot;row file-upload-preview&quot;]/div[@class=&quot;file-upload-column&quot;]/article[@class=&quot;file-preview-container&quot;]/section[1]/ol[@class=&quot;ol-display-none&quot;]/li[@class=&quot;ol-display-none&quot;]/section[1]/div[1]/div[1]/aside[1]/i[@class=&quot;fas fa-times-circle foi-file-close&quot;]</value>
+      </entry>
    </selectorCollection>
-   <selectorMethod>XPATH</selectorMethod>
+   <selectorMethod>CSS</selectorMethod>
    <useRalativeImagePath>true</useRalativeImagePath>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -22,7 +26,7 @@
       <name>tag</name>
       <type>Main</type>
       <value>i</value>
-      <webElementGuid>97ad9303-dc0e-4328-a3db-61a695d5ab61</webElementGuid>
+      <webElementGuid>53d1e141-3b66-43f0-9770-9ef7311385b8</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -30,7 +34,7 @@
       <name>class</name>
       <type>Main</type>
       <value>fas fa-times-circle foi-file-close</value>
-      <webElementGuid>ab8b43e4-bff2-4652-a8ba-ae9e89df0a91</webElementGuid>
+      <webElementGuid>93b7c707-0f38-4a6b-8c35-095c99a57ffb</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>true</isSelected>
@@ -38,7 +42,7 @@
       <name>xpath</name>
       <type>Main</type>
       <value>id(&quot;state-change-dialog-description&quot;)/section[@class=&quot;file-upload-container&quot;]/div[@class=&quot;row file-upload-preview&quot;]/div[@class=&quot;file-upload-column&quot;]/article[@class=&quot;file-preview-container&quot;]/section[1]/ol[@class=&quot;ol-display-none&quot;]/li[@class=&quot;ol-display-none&quot;]/section[1]/div[1]/div[1]/aside[1]/i[@class=&quot;fas fa-times-circle foi-file-close&quot;]</value>
-      <webElementGuid>68b3c709-4b85-48d1-9de0-a407c7695576</webElementGuid>
+      <webElementGuid>87ee4623-5ceb-4ef7-a1f0-77e971e7edac</webElementGuid>
    </webElementProperties>
    <webElementXpaths>
       <isSelected>true</isSelected>
@@ -46,7 +50,7 @@
       <name>xpath:idRelative</name>
       <type>Main</type>
       <value>//span[@id='state-change-dialog-description']/section/div/div/article/section/ol/li/section/div/div/aside/i</value>
-      <webElementGuid>d869a379-e387-4f4f-b388-98398a61bd04</webElementGuid>
+      <webElementGuid>ffe9e2c4-df79-4927-a11d-4f27b382125c</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -54,6 +58,6 @@
       <name>xpath:position</name>
       <type>Main</type>
       <value>//aside/i</value>
-      <webElementGuid>f962521d-570f-47ad-a92b-31a59dc8475e</webElementGuid>
+      <webElementGuid>b0c58bae-13ec-46b0-95c9-48f41f77a1b8</webElementGuid>
    </webElementXpaths>
 </WebElementEntity>

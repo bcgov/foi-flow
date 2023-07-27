@@ -235,6 +235,18 @@ WebUI.verifyElementPresent(findTestObject('Records/options_converted_file/li_Rep
 WebUI.verifyElementPresent(findTestObject('Records/options_converted_file/li_Download'), 0)
 
 WebUI.verifyElementPresent(findTestObject('Records/options_converted_file/li_Delete'), 0)
+DriverFactory.changeWebDriver(IAOuser)
+
+WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/div_Status'))
+
+WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/li_Closed'))
+
+WebUI.click(findTestObject('Page_foi.flow/form/closing modal/div_Closing Reason'), FailureHandling.STOP_ON_FAILURE)
+
+WebUI.click(findTestObject('Page_foi.flow/form/closing modal/dropdown options/li_Partial Disclosure'), FailureHandling.STOP_ON_FAILURE)
+
+WebUI.click(findTestObject('Page_foi.flow/form/state change dialog/button_Save Change'), FailureHandling.STOP_ON_FAILURE)
+
 
 ministryUser.close()
 

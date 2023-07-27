@@ -13,6 +13,10 @@
          <key>XPATH</key>
          <value>//div[@id='Comments']/div/div[2]/form/div[3]/div[3]/div</value>
       </entry>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[@id = 'mention-option-fv8ok-1' and (text() = 'Andrews, Arielle' or . = 'Andrews, Arielle')]</value>
+      </entry>
    </selectorCollection>
    <selectorMethod>XPATH</selectorMethod>
    <useRalativeImagePath>true</useRalativeImagePath>
@@ -22,6 +26,7 @@
       <name>tag</name>
       <type>Main</type>
       <value>div</value>
+      <webElementGuid>2facb835-8e67-485b-a8ae-905d59b8c03a</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -29,6 +34,7 @@
       <name>class</name>
       <type>Main</type>
       <value>myz2dw1</value>
+      <webElementGuid>414ad087-5299-4c1e-b872-434a188214fe</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -36,6 +42,7 @@
       <name>role</name>
       <type>Main</type>
       <value>option</value>
+      <webElementGuid>73bed445-0a4c-42fe-9af4-b9fd7c8a0d0c</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>true</isSelected>
@@ -43,6 +50,7 @@
       <name>id</name>
       <type>Main</type>
       <value>mention-option-fv8ok-1</value>
+      <webElementGuid>6ef19dcd-d293-4b56-a9fc-ce8d70b96248</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -50,6 +58,7 @@
       <name>aria-selected</name>
       <type>Main</type>
       <value>true</value>
+      <webElementGuid>b4619544-ffca-46bd-bf8c-2e7a3139e7cf</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>true</isSelected>
@@ -57,6 +66,7 @@
       <name>text</name>
       <type>Main</type>
       <value>Andrews, Arielle</value>
+      <webElementGuid>eba6b2f3-a9bf-4eb3-a6d3-685dff93c802</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -64,6 +74,7 @@
       <name>xpath</name>
       <type>Main</type>
       <value>id(&quot;mention-option-fv8ok-1&quot;)</value>
+      <webElementGuid>49bcfddb-53e5-4272-9e74-bfba08239951</webElementGuid>
    </webElementProperties>
    <webElementXpaths>
       <isSelected>true</isSelected>
@@ -71,6 +82,7 @@
       <name>xpath:attributes</name>
       <type>Main</type>
       <value>//div[@id='mention-option-fv8ok-1']</value>
+      <webElementGuid>b52a0aa0-fbc3-47d4-9cd6-76783cb33485</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -78,6 +90,7 @@
       <name>xpath:idRelative</name>
       <type>Main</type>
       <value>//div[@id='Comments']/div/div[3]/form/div[3]/div[2]/div</value>
+      <webElementGuid>375a6e24-2977-4afa-ae4f-a2b0757d885c</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -85,6 +98,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>(.//*[normalize-space(text()) and normalize-space(.)='Antony, Abin'])[1]/following::div[2]</value>
+      <webElementGuid>39fbdd4c-ac28-4a6b-b09d-330945e72378</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -92,6 +106,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>(.//*[normalize-space(text()) and normalize-space(.)='@'])[1]/following::div[5]</value>
+      <webElementGuid>e4ed1c8d-3161-4444-b8e4-de1c641231d4</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -99,6 +114,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>(.//*[normalize-space(text()) and normalize-space(.)='Viswanath, Divya'])[1]/preceding::div[1]</value>
+      <webElementGuid>e2703ce1-ccd2-4c33-94d4-517e638dbb06</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -106,6 +122,7 @@
       <name>xpath:position</name>
       <type>Main</type>
       <value>//div[3]/div[2]/div</value>
+      <webElementGuid>d0c7e4e7-7d32-42de-9638-68bfa1121378</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -113,5 +130,6 @@
       <name>xpath:customAttributes</name>
       <type>Main</type>
       <value>//div[@id = 'mention-option-fv8ok-1' and (text() = 'Andrews, Arielle' or . = 'Andrews, Arielle')]</value>
+      <webElementGuid>401faee0-7e67-4794-9dd8-96a411117627</webElementGuid>
    </webElementXpaths>
 </WebElementEntity>

@@ -6,10 +6,6 @@
    <elementGuidId>d547f944-b2dc-4ecc-98a6-6f0597d7bc93</elementGuidId>
    <selectorCollection>
       <entry>
-         <key>BASIC</key>
-         <value>//span[@id='state-change-dialog-description']/section/div/div/article/section/ol/li/section/div/div/aside/span</value>
-      </entry>
-      <entry>
          <key>CSS</key>
          <value>aside</value>
       </entry>
@@ -17,8 +13,12 @@
          <key>XPATH</key>
          <value>//span[@id='state-change-dialog-description']/section/div/div/article/section/ol/li/section/div/div/aside/span</value>
       </entry>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[(text() = 'test2.docx' or . = 'test2.docx')]</value>
+      </entry>
    </selectorCollection>
-   <selectorMethod>XPATH</selectorMethod>
+   <selectorMethod>BASIC</selectorMethod>
    <useRalativeImagePath>true</useRalativeImagePath>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -26,23 +26,23 @@
       <name>tag</name>
       <type>Main</type>
       <value>aside</value>
-      <webElementGuid>89d224b1-489c-4ca3-8526-2cfd84fa4188</webElementGuid>
-   </webElementProperties>
-   <webElementProperties>
-      <isSelected>false</isSelected>
-      <matchCondition>equals</matchCondition>
-      <name>text</name>
-      <type>Main</type>
-      <value>test2.docx</value>
-      <webElementGuid>42e6efd5-bb6d-478d-ba40-c86f8eeda50d</webElementGuid>
+      <webElementGuid>0a6b6771-628a-420d-a935-2d78abb83c1c</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>true</isSelected>
       <matchCondition>equals</matchCondition>
+      <name>text</name>
+      <type>Main</type>
+      <value>test2.docx</value>
+      <webElementGuid>2f8f6e15-4f12-49f0-931b-42aa9e2d7a9b</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
       <name>xpath</name>
       <type>Main</type>
       <value>//span[@id='state-change-dialog-description']/section/div/div/article/section/ol/li/section/div/div/aside/span</value>
-      <webElementGuid>024a74aa-f205-459a-8db3-03f08f02a96f</webElementGuid>
+      <webElementGuid>4263771a-6ff1-4f7b-82a7-56ece04f8a2d</webElementGuid>
    </webElementProperties>
    <webElementXpaths>
       <isSelected>true</isSelected>
@@ -50,7 +50,7 @@
       <name>xpath:idRelative</name>
       <type>Main</type>
       <value>//span[@id='state-change-dialog-description']/section/div/div/article/section/ol/li/section/div/div/aside</value>
-      <webElementGuid>00d968a8-fb3a-49ba-b0fe-45d65c8a9077</webElementGuid>
+      <webElementGuid>bb83eddd-6ffb-4c11-b1d1-f78bab93d78e</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -58,7 +58,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>(.//*[normalize-space(text()) and normalize-space(.)='Add Attachment'])[1]/following::aside[1]</value>
-      <webElementGuid>bfa6aa25-f05b-44f0-9b6d-bc8d5943810c</webElementGuid>
+      <webElementGuid>05134901-49c6-4bd0-bb39-6be2ab226b0a</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -66,7 +66,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>(.//*[normalize-space(text()) and normalize-space(.)='Option 4'])[2]/following::aside[1]</value>
-      <webElementGuid>a7eb0a78-e63a-43b6-96a5-1ff53798b1b7</webElementGuid>
+      <webElementGuid>936bb81d-69e8-43ac-bc08-1ec2deab51c9</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -74,7 +74,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>(.//*[normalize-space(text()) and normalize-space(.)='test2.docx'])[1]/preceding::aside[1]</value>
-      <webElementGuid>3775a0ba-8a2b-4f35-acb1-c512d0b424bd</webElementGuid>
+      <webElementGuid>2bf440d3-5ffc-4bd3-b5be-93e35e0b8686</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -82,6 +82,6 @@
       <name>xpath:position</name>
       <type>Main</type>
       <value>//aside</value>
-      <webElementGuid>fecdd35d-563c-447b-b404-6be80d3188f2</webElementGuid>
+      <webElementGuid>366f5cf8-0369-41c7-be93-7c9a2d19a82d</webElementGuid>
    </webElementXpaths>
 </WebElementEntity>

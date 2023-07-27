@@ -284,6 +284,19 @@ WebUI.verifyElementNotPresent(findTestObject('Records/span_sample.pdf'), 0)
 
 //WebUI.verifyElementPresent(findTestObject('Records/svg_foiedu, foiedu_svg-inline--fa fa-clone fa-w-16 fa-2x jss60 (1)'), 
 //   0)
+
+DriverFactory.changeWebDriver(IAOuser)
+
+WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/div_Status'))
+
+WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/li_Closed'))
+
+WebUI.click(findTestObject('Page_foi.flow/form/closing modal/div_Closing Reason'), FailureHandling.STOP_ON_FAILURE)
+
+WebUI.click(findTestObject('Page_foi.flow/form/closing modal/dropdown options/li_Partial Disclosure'), FailureHandling.STOP_ON_FAILURE)
+
+WebUI.click(findTestObject('Page_foi.flow/form/state change dialog/button_Save Change'), FailureHandling.STOP_ON_FAILURE)
+
 ministryUser.close()
 
 IAOuser.close()
