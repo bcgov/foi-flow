@@ -211,6 +211,10 @@ WebUI.click(findTestObject('Page_foi.flow/form/watch/div_add other watchers'), F
 
 WebUI.click(findTestObject('Event/li_User, Super'))
 
+WebUI.refresh()
+
+WebUI.delay(6)
+
 WebUI.click(findTestObject('Page_foi.flow/navbar/button_Sign Out'))
 
 WebUI.navigateToUrl(GlobalVariable.BASE_URL)
@@ -232,16 +236,8 @@ WebUI.verifyElementAttributeValue(findTestObject('Event/svg_DATE  TIME STAMP_Mui
     'data-testid', 'ArrowUpwardIcon', 0)
 
 WebUI.verifyElementAttributeValue(findTestObject('Event/Page_Event Queue/select_102050100'), 'value', '100', 0)
+
 ministryUser.close()
 
 IAOuser.close()
-
-
-//WebUI.verifyElementAttributeValue(findTestObject('Event/Page_Event Queue/select_102050100'), 'value', '10', 0)
-
-//WebUI.verifyElementAttributeValue(findTestObject('Event/Page_Event Queue/select_102050100'), 'value', '20', 0)
-
-//WebUI.verifyElementAttributeValue(findTestObject('Event/Page_Event Queue/select_102050100'), 'value', '50', 0)
-
-//WebUI.verifyElementHasAttribute(findTestObject('Event/Page_Event Queue/select_102050100'), 'selected', 0, FailureHandling.STOP_ON_FAILURE)
 

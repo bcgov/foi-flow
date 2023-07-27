@@ -39,7 +39,7 @@ WebUI.verifyElementPresent(findTestObject('Page_foi.flow/attachment/p_File over 
 
 //WebUI.verifyElementNotClickable(findTestObject('Page_foi.flow/form/state change dialog/button_Continue'), FailureHandling.STOP_ON_FAILURE)
 WebUI.uploadFile(findTestObject('Page_foi.flow/attachment/input_Add Files_file-upload-input'), RunConfiguration.getProjectDir() + 
-    '/Test Attachments/download.png')
+    '/Test Attachments/cat1.docx')
 
 WebUI.verifyElementNotPresent(findTestObject('Page_foi.flow/attachment/p_File invalid type state change'), 0)
 

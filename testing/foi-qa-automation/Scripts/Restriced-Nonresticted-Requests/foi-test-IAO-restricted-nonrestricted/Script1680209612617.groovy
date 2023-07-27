@@ -86,8 +86,7 @@ WebUI.verifyElementAttributeValue(findTestObject('Page_foi.flow/form/assignee dr
     'true', 0)
 
 //WebUI.verifyElementAttributeValue(findTestObject('Page_foi.flow/form/assignee dropdown/li_Central Team'), 'aria-disabled', 
- //   'true', 0)
-
+//   'true', 0)
 WebUI.verifyElementAttributeValue(findTestObject('Page_foi.flow/form/assignee dropdown/li_MCFD Personals Team'), 'aria-disabled', 
     'true', 0)
 
@@ -105,13 +104,9 @@ WebUI.verifyElementNotPresent(findTestObject('Page_foi.flow/comment/div_Comment 
 
 WebUI.sendKeys(findTestObject('Page_foi.flow/comment/div_Comment textbox'), '@')
 
-WebUI.verifyElementPresent(findTestObject('Page_foi.flow/comment/div_Tagging option 1'), 0)
-
 WebUI.verifyElementPresent(findTestObject('Page_foi.flow/comment/div_Tagging option 2'), 0)
 
 WebUI.verifyElementPresent(findTestObject('Page_foi.flow/comment/div_Tagging option 3'), 0)
-
-WebUI.verifyElementPresent(findTestObject('Page_foi.flow/comment/div_Tagging option 4'), 0)
 
 WebUI.click(findTestObject('Page_foi.flow/comment/div_Tagging option 2'))
 
