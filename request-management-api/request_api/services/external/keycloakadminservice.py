@@ -67,6 +67,13 @@ class KeycloakAdminService:
                 groups.append({'id': group['id'],'name':group['name'], 'type':None})
         return groups      
     
+    def getgroup(self, groupname, type=None):
+        groups = []
+        allgroups = self.getallgroups()
+        for entry in allgroups:
+            if entry["name"] == groupname:
+                groups.append({'id': entry['id'],'name':entry['name'], 'type': type})         
+        return groups
  
     def getgroupsandmembers(self, allowedgroups = None):
         allowedgroups = self.getgroups(allowedgroups)
@@ -74,7 +81,6 @@ class KeycloakAdminService:
             group["members"] = self.getgroupmembersbyid(group["id"])
         return allowedgroups  
     
-
     def getgroupmembersbyid(self, groupid):
         groupurl ='{0}/auth/admin/realms/{1}/groups/{2}/members'.format(self.keycloakhost,self.keycloakrealm,groupid)
         groupresponse = requests.get(groupurl, headers=self.getheaders())
@@ -134,13 +140,18 @@ class KeycloakAdminService:
         return input.lower().replace(' ', '')  
 
     def getmembersbygroupname(self, groupname):
-        _groups = []
-        _groups.append({"name":groupname, "type": OperatingTeam.gettype(groupname)})
-        allowedgroups = self.getgroups(_groups)
+        operatingteam =  OperatingTeam.getteam(groupname)
+        if operatingteam is not None:
+            return self.getmembersbygroupnameandtype(operatingteam['name'], operatingteam['type'])
+        return []
+    
+
+    def getmembersbygroupnameandtype(self, groupname, type):
+        allowedgroups = self.getgroup(groupname, type)
         for group in allowedgroups:
-            if(group["name"] == groupname):
-                group["members"] = self.getgroupmembersbyid(group["id"])
+            group["members"] = self.getgroupmembersbyid(group["id"])
         return allowedgroups
+
         
 
     

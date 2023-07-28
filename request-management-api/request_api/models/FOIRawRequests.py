@@ -56,7 +56,6 @@ class FOIRawRequest(db.Model):
     def saverawrequest(cls, _requestrawdata, sourceofsubmission, ispiiredacted, userid, notes, requirespayment, axisrequestid, axissyncdate, linkedrequests, assigneegroup=None, assignee=None, assigneefirstname=None, assigneemiddlename=None, assigneelastname=None)->DefaultMethodResult:        
         version = 1
         newrawrequest = FOIRawRequest(requestrawdata=_requestrawdata, status = 'Unopened' if sourceofsubmission != "intake" else 'Intake in Progress', createdby=userid, version=version, sourceofsubmission=sourceofsubmission, assignedgroup=assigneegroup, assignedto=assignee, ispiiredacted=ispiiredacted, notes=notes, requirespayment=requirespayment, axisrequestid=axisrequestid, axissyncdate=axissyncdate, linkedrequests=linkedrequests)
-
         if assignee is not None:
             FOIAssignee.saveassignee(assignee, assigneefirstname, assigneemiddlename, assigneelastname)
 
@@ -366,16 +365,34 @@ class FOIRawRequest(db.Model):
     def getversionforrequest(cls,requestid):   
         return db.session.query(FOIRawRequest.version).filter_by(requestid=requestid).order_by(FOIRawRequest.version.desc()).first()
     
-    @classmethod
-    def getstatesummary(cls, requestid):     
-        transitions = []
-        try:           
-            sql = """select status, version from (select distinct on (status) status, version from "FOIRawRequests" 
-            where requestid=:requestid order by status, version asc) as fs3 order by version desc"""
-            rs = db.session.execute(text(sql), {'requestid': requestid})
+    # @classmethod
+    # def getstatesummary(cls, requestid):     
+    #     transitions = []
+    #     try:           
+    #         sql = """select status, version from (select distinct on (status) status, version from "FOIRawRequests" 
+    #         where requestid=:requestid order by status, version asc) as fs3 order by version desc"""
+    #         rs = db.session.execute(text(sql), {'requestid': requestid})
             
+    #         for row in rs:
+    #             transitions.append({"status": row["status"], "version": row["version"]})
+    #     except Exception as ex:
+    #         logging.error(ex)
+    #         raise ex
+    #     finally:
+    #         db.session.close()
+    #     return transitions
+
+    @classmethod
+    def getstatesummary(cls, requestid):  
+        transitions = []
+        try:
+            sql = """select status, version from "FOIRawRequests" where requestid=:requestid order by version desc"""
+            rs = db.session.execute(text(sql), {'requestid': requestid})  
+            _tmp_state = None       
             for row in rs:
-                transitions.append({"status": row["status"], "version": row["version"]})
+                if row["status"] != _tmp_state:
+                    transitions.append({"status": row["status"], "version": row["version"]})
+                    _tmp_state = row["status"]
         except Exception as ex:
             logging.error(ex)
             raise ex

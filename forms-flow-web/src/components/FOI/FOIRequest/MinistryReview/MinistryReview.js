@@ -107,6 +107,9 @@ const MinistryReview = React.memo(({ userDetail }) => {
   const [_currentrequestStatus, setcurrentrequestStatus] = React.useState("");
   const [_tabStatus, settabStatus] = React.useState(requestState);
   //gets the request detail from the store
+  const IsDivisionalCoordinator = () => {
+    return userDetail?.role?.includes("DivisionalCoordinator");
+  }
 
   let requestDetails = useSelector(
     (state) => state.foiRequests.foiMinistryViewRequestDetail
@@ -380,6 +383,9 @@ const MinistryReview = React.memo(({ userDetail }) => {
     case StateEnum.response.name:
       foitabheaderBG = "foitabheadercollection foitabheaderResponseBG";
       break;
+    case StateEnum.peerreview.name:
+      foitabheaderBG = "foitabheadercollection foitabheaderPeerreviewBG";
+      break;
     default:
       foitabheaderBG = "foitabheadercollection foitabheaderdefaultBG";
       break;
@@ -490,6 +496,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
         isMinistryCoordinator={true}
         isValidationError={isValidationError}
         requestType={requestDetails?.requestType}
+        isDivisionalCoordinator={IsDivisionalCoordinator()}
       />
     );
 

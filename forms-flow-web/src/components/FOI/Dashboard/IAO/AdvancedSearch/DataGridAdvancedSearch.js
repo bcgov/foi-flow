@@ -11,7 +11,8 @@ import {
   getDaysLeft,
   getReceivedDate,
   // onBehalfFullName,
-  getRecordsDue
+  getRecordsDue,
+  LightTooltip,  
 } from "../../utils";
 import { ActionContext } from "./ActionContext";
 import {
@@ -21,9 +22,9 @@ import {
   isIntakeTeam,
 } from "../../../../../helper/FOI/helper";
 import clsx from "clsx";
-import Link from "@mui/material/Link";
 import { push } from "connected-react-router";
 import { CustomFooter } from "../../CustomFooter"
+import Link from "@mui/material/Link";
 
 const DataGridAdvancedSearch = ({ userDetail }) => {
   const dispatch = useDispatch();
@@ -40,6 +41,45 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
 
   const user = useSelector((state) => state.user.userDetail);
 
+
+
+  const renderReviewRequest = (e, row) => {
+    e.preventDefault()
+    if (row.ministryrequestid) {
+      dispatch(
+        push(
+          `/foi/foirequests/${row.id}/ministryrequest/${row.ministryrequestid}`
+        )
+      );
+    } else {
+      dispatch(push(`/foi/reviewrequest/${row.id}`));
+    }
+  };
+  
+  const hyperlinkTooltipRenderCell = (params) => {
+    let link;
+    if (params.row.ministryrequestid) { 
+      link = "./foirequests/" + params.row.id + "/ministryrequest/" + params.row.ministryrequestid;
+    } else {
+      link = "./reviewrequest/" + params.row.id;
+    }
+    let description = params.row.description;
+    if (params.row.fromdate && params.row.todate) {
+      description += "\n(" + (new Date(params.row.fromdate)).toLocaleDateString() + " to " + (new Date(params.row.todate)).toLocaleDateString() + ")"
+    }
+    return (<LightTooltip placement="bottom-start" title={
+      <div style={{whiteSpace: "pre-line"}}>
+        {description}
+      </div>
+    }>
+      <span className="table-cell-truncate">
+        <Link href={link} target="_blank" onClick={(e) => renderReviewRequest(e, params.row)}>
+        <div className="MuiDataGrid-cellContent">{params.value}</div>
+      </Link></span>
+    </LightTooltip>
+    )
+  };
+
   const hyperlinkRenderCell = (params) => {
     let link;
     if (params.row.ministryrequestid) { 
@@ -53,26 +93,15 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
       </Link>
     )
   };
+
   
-  const renderReviewRequest = (e, row) => {
-    e.preventDefault()
-    if (row.ministryrequestid) {
-      dispatch(
-        push(
-          `/foi/foirequests/${row.id}/ministryrequest/${row.ministryrequestid}`
-        )
-      );
-    } else {
-      dispatch(push(`/foi/reviewrequest/${row.id}`));
-    }
-  };
 
   const ProcessingTeamColumns = [
     {
       field: "axisRequestId",
       headerName: "ID NUMBER",
       headerAlign: "left",
-      renderCell: hyperlinkRenderCell,
+      renderCell: hyperlinkTooltipRenderCell,
       cellClassName: 'foi-advanced-search-result-cell',
       width: 160,
     },
@@ -182,7 +211,7 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
       field: "axisRequestId",
       headerName: "ID NUMBER",
       headerAlign: "left",
-      renderCell: hyperlinkRenderCell,
+      renderCell: hyperlinkTooltipRenderCell,
       cellClassName: 'foi-advanced-search-result-cell',
       flex: 1,
     },
@@ -225,7 +254,7 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
       field: "axisRequestId",
       headerName: "ID NUMBER",
       headerAlign: "left",
-      renderCell: hyperlinkRenderCell,
+      renderCell: hyperlinkTooltipRenderCell,
       cellClassName: 'foi-advanced-search-result-cell',
       width: 160,
     },
