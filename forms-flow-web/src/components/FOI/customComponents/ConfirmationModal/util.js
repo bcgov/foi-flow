@@ -48,6 +48,8 @@ import { getFullnameList } from "../../../../helper/FOI/helper";
     switch(_state.toLowerCase()) {
       case StateEnum.intakeinprogress.name.toLowerCase():
           return {title: "Changing the state", body: "Are you sure you want to change the state to Intake in Progress?"};
+      case StateEnum.peerreview.name.toLowerCase():
+          return {title: "Changing the state", body: "Are you sure you want to change the state to Peer Review?"};
       case StateEnum.open.name.toLowerCase():
           return {title: "Changing the state", body: "Are you sure you want to Open this request?"};
       case StateEnum.closed.name.toLowerCase():
