@@ -83,7 +83,50 @@ class FOIRequestRecord(db.Model):
         comment_schema = FOIRequestRecordSchema(many=False)
         query = db.session.query(FOIRequestRecord).filter_by(recordid=recordid).order_by(FOIRequestRecord.version.desc()).first()
         return comment_schema.dump(query)
-    
+
+    @classmethod
+    def getrecordsbyid(cls, recordids):
+        records = []
+        try:
+            sql =   """select
+                            fr1.recordid, fr1.version, fr1.foirequestid, fr1.ministryrequestid,
+                            fr1.ministryrequestversion, fr1.attributes, fr1.filename, fr1.s3uripath,
+                            fr1.created_at, fr1.createdby, fr1.updated_at, fr1.updatedby, fr1.replacementof
+                        from public."FOIRequestRecords" fr1
+                        inner join (
+                            select fr2.recordid, max(fr2.version) as maxversion
+                            from public."FOIRequestRecords" fr2
+                            where fr2.recordid in ("""+ ','.join([str(id) for id in recordids]) +""")
+                            group by fr2.recordid
+                        ) fr3 on fr3.recordid = fr1.recordid and fr3.maxversion = fr1.version
+                        order by fr1.recordid desc
+                    """
+            rs = db.session.execute(text(sql))
+
+            for row in rs:
+                records.append({
+                    "recordid": row["recordid"],
+                    "version": row["version"],
+                    "foirequestid": row["foirequestid"],
+                    "ministryrequestid": row["ministryrequestid"],
+                    "ministryrequestversion": row["ministryrequestversion"],
+                    "attributes": row["attributes"],
+                    "filename": row["filename"],
+                    "s3uripath": row["s3uripath"],
+                    "created_at": row["created_at"],
+                    "createdby": row["createdby"],
+                    "updated_at":row["updated_at"],
+                    "updatedby":row["updatedby"],
+                    "updated_at":row["updated_at"],
+                    "replacementof":row["replacementof"]
+                })
+        except Exception as ex:
+            logging.error(ex)
+            raise ex
+        finally:
+            db.session.close()
+        return records
+
     @classmethod
     def replace(cls,replacingrecordid,records):
         replacingrecord = db.session.query(FOIRequestRecord).filter_by(recordid=replacingrecordid).order_by(FOIRequestRecord.version.desc()).first()
