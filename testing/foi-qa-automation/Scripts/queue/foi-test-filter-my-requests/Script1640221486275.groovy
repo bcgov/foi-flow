@@ -47,8 +47,9 @@ WebUI.click(findTestObject('Page_foi.flow/queue/div_request queue row 1 applican
 
 WebUI.click(findTestObject('Page_foi.flow/form/assignee dropdown/div_Assigned'))
 
-WebUI.click(findTestObject('Page_foi.flow/form/assignee dropdown/li_assignee user option', [('user') : teammate]))
-def requestID1= WebUI.getText(findTestObject('Page_foi.flow/form/h3_Form Request Title'))
+WebUI.click(findTestObject('Page_foi.flow/form/assignee dropdown/li_User, Super'))
+
+def requestID1 = WebUI.getText(findTestObject('Page_foi.flow/form/h3_Form Request Title'))
 
 WebUI.scrollToElement(findTestObject('Page_foi.flow/form/button_Save'), 0)
 
@@ -98,7 +99,7 @@ WebUI.setText(findTestObject('Page_foi.flow/queue/input_Dashboard Filter'), requ
 
 WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
 
-WebUI.verifyElementNotPresent(findTestObject('Page_foi.flow/queue/div_request queue row 1'), 0)
+WebUI.verifyElementPresent(findTestObject('Page_foi.flow/queue/div_request queue row 1'), 0)
 
 assert WebUI.getAttribute(findTestObject('Page_foi.flow/queue/div_My Requests'), 'class').contains('MuiButtonBase-root MuiChip-root MuiChip-outlined MuiChip-sizeSmall MuiChip-colorDefault MuiChip-clickable MuiChip-clickableColorDefault MuiChip-outlinedDefault css-zo9we2')
 
@@ -108,11 +109,35 @@ assert WebUI.getAttribute(findTestObject('Page_foi.flow/queue/div_My Team Reques
 
 WebUI.refresh()
 
+WebUI.click(findTestObject('Page_foi.flow/navbar/button_Sign Out'))
+
+WebUI.navigateToUrl(GlobalVariable.BASE_URL)
+
+WebUI.callTestCase(findTestCase('helper/foi-test-login'), [('password') : findTestData('Login Credentials').getValue('Password', 
+            4), ('username') : findTestData('Login Credentials').getValue('Username', 4)], FailureHandling.STOP_ON_FAILURE)
+
+WebUI.click(findTestObject('Page_foi.flow/queue/div_My Requests'))
+
+WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
+
+WebUI.setText(findTestObject('Page_foi.flow/queue/input_Dashboard Filter'), requestID)
+
+WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
+
+WebUI.click(findTestObject('Page_foi.flow/queue/div_request queue row 1'))
+
+WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/div_Status'))
+
+WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/li_Closed'))
+
+WebUI.click(findTestObject('Page_foi.flow/form/closing modal/div_Closing Reason'), FailureHandling.STOP_ON_FAILURE)
+
+WebUI.click(findTestObject('Page_foi.flow/form/closing modal/dropdown options/li_Partial Disclosure'), FailureHandling.STOP_ON_FAILURE)
+
+WebUI.click(findTestObject('Page_foi.flow/form/state change dialog/button_Save Change'), FailureHandling.STOP_ON_FAILURE)
+
 //assert WebUI.getAttribute(findTestObject('Page_foi.flow/queue/div_My Requests'), 'class').contains('MuiChip-filledPrimary')
-
 //assert WebUI.getAttribute(findTestObject('Page_foi.flow/queue/div_Watching Requests'), 'class').contains('MuiChip-outlinedPrimary')
-
 //assert WebUI.getAttribute(findTestObject('Page_foi.flow/queue/div_My Team Requests'), 'class').contains('MuiChip-outlinedPrimary')
-
 WebUI.closeBrowser()
 
