@@ -68,15 +68,15 @@ const DivisionalStages = React.memo(
     };
 
 
-    const handleDivisionStageChange = (e, id, ) => {         
-        updateDivisionsState(e, id, minDivStages, (newStages) => {
+    const handleDivisionStageChange = (newValue, id, ) => {
+        updateDivisionsState(newValue, id, minDivStages, (newStages) => {
           setMinDivStages([...newStages]);
           appendStageIterator([...newStages]);
           });
         createMinistrySaveRequestObject(
               FOI_COMPONENT_CONSTANTS.DIVISION_STAGE,
-              e.target.value,
-              e.target.name
+              newValue.stageid,
+              newValue.label
             );
     };
 
@@ -159,7 +159,7 @@ const DivisionalStages = React.memo(
     };
 
 
-    const divisionstageList = divisionalstages.stages;
+    const divisionstageList = [{name: "Select Division Stage", label: "Select Division Stage", stageid: -1}].concat(divisionalstages.stages.map(d=> ({name: d.name, label: d.name, stageid: d.stageid})));
 
     const isReceivedDateEmpty = () => {
       if(minDivStages?.length > 0){
@@ -227,7 +227,6 @@ const DivisionalStages = React.memo(
                 onChange={(e, newValue) => handleDivisionChange(newValue, _id, row.divisionid)}
                 value={row.divisionid > 0 ? {label: row.divisionname, divisionid: row.divisionid} : {label: "Select Division", divisionid: -1}}
                 disablePortal
-                // id="combo-box-demo"
                 options={divisionItems}
                 getOptionDisabled={option => existingDivStages.findIndex(d => d.divisionid === option.divisionid) > -1 || option.divisionid === -1}
                 isOptionEqualToValue={(option, value) => (option.divisionid === value.divisionid)}
@@ -244,33 +243,26 @@ const DivisionalStages = React.memo(
               />
           </div>
           <div className="col-lg-3 foi-details-col">
-            <FormControl
-              fullWidth
-              error={row.divisionid !== -1 && row.stageid === -1}>
-              <InputLabel id="foi-divisionstage-dropdown-label">
-                Select Divison Stage
-              </InputLabel>
-              <Select
-                labelId="foi-divisionstage-dropdown-label"
-                className="foi-divisionstage-dropdown"
-                id="foi-divisionstage-dropdown"
-                value={row.stageid || -1}
-                inputProps={{ "aria-labelledby": "foi-divisionstage-dropdown-label"}}
-                input={<OutlinedInput label="Select Divison Stage" notched />}
-                onChange={(e) => handleDivisionStageChange(e, _id)}
-                fullWidth
-                renderValue={(value) => {
-                  return renderMenuItem(
-                    value,
-                    divisionstageList,
-                    "stageid",
-                    "Select Division Stage"
-                  );
-                }}
-              >
-                {getDivisionalStages()}
-              </Select>
-            </FormControl>
+            <Autocomplete
+              className="foi-division-dropdown"
+              disableClearable
+              onChange={(e, newValue) => handleDivisionStageChange(newValue, _id, row.stageid)}
+              value={row.stageid > 0 ? {name: row.stagename, label: row.stagename, stageid: row.stageid} : {name: "Select Division Stage", label: "Select Division Stage", stageid: -1}}
+              disablePortal
+              options={divisionstageList}
+              getOptionDisabled={option => option.stageid === -1}
+              isOptionEqualToValue={(option, value) => (option.stageid === value.stageid)}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="Select Division Stage"
+                  InputLabelProps={{ shrink: true }}
+                  variant="outlined"
+                  error={row.divisionid !== -1 && row.stageid === -1}
+                  style={{color: "black"}}
+                />
+              )}
+            />
           </div>
           {stageForDueDateExists(divisionstageList, row.stageid) && 
             <>

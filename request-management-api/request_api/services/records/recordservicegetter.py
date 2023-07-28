@@ -78,6 +78,8 @@ class recordservicegetter(recordservicebase):
                 if _computingresponse_err is not None:
                     _attachement['failed'] = _computingresponse_err
                 _record['attachments'].append(_attachement)                      
+        else:
+            _record['attributes'] = self.__formatrecordattributes(_record['attributes'], divisions)
                             
         return _record
     

@@ -103,13 +103,16 @@ class requestservicegetter:
     
     def getrequestdetails(self,foirequestid, foiministryrequestid):
         requestdetails = self.getrequest(foirequestid, foiministryrequestid)
-        cfrfee = cfrfeeservice().getapprovedcfrfee(foiministryrequestid)
+        approvedcfrfee = cfrfeeservice().getapprovedcfrfee(foiministryrequestid)
+        cfrfee = cfrfeeservice().getcfrfee(foiministryrequestid)
         payment = paymentservice().getpayment(foirequestid, foiministryrequestid)
-        if cfrfee is not None and cfrfee != {}:
-            requestdetails['cfrfee'] = cfrfee
-            _balancedue = cfrfee['feedata']['balanceremaining']
+        if approvedcfrfee is not None and approvedcfrfee != {}:
+            requestdetails['cfrfee'] = approvedcfrfee
+            _totaldue = float(approvedcfrfee['feedata']['actualtotaldue']) if float(approvedcfrfee['feedata']['actualtotaldue']) > 0 else float(approvedcfrfee['feedata']['estimatedtotaldue']) 
+            _balancedue = _totaldue - float(cfrfee['feedata']['amountpaid'])
+            requestdetails['cfrfee']['feedata']['amountpaid'] = cfrfee['feedata']['amountpaid']
             requestdetails['cfrfee']['feedata']["balanceDue"] = '{:.2f}'.format(_balancedue)
-            if cfrfee['feedata']['actualtotaldue']:
+            if approvedcfrfee['feedata']['actualtotaldue']:
                 requestdetails['cfrfee']['feedata']["totalamountdue"] = '{:.2f}'.format(requestdetails['cfrfee']['feedata']["actualtotaldue"])
             else:
                 requestdetails['cfrfee']['feedata']["totalamountdue"] = '{:.2f}'.format(requestdetails['cfrfee']['feedata']["estimatedtotaldue"])
@@ -117,8 +120,10 @@ class requestservicegetter:
         if payment is not None and payment != {}:
             paidamount = float(payment['paidamount']) if payment['paidamount'] != None else 0
             requestdetails['cfrfee']['feedata']['paidamount'] = '{:.2f}'.format(paidamount)
+            # depositpaid field is only accurate and used for outstanding email and receipts
             requestdetails['cfrfee']['feedata']['depositpaid'] = '{:.2f}'.format(float(cfrfee['feedata']['amountpaid']) - paidamount)
             requestdetails['cfrfee']['feedata']['paymenturl'] = payment['paymenturl']            
+            requestdetails['cfrfee']['feedata']['paymentdate'] = payment['created_at'][:10]
         return requestdetails
 
     def __preparebaseinfo(self,request,foiministryrequestid,requestministry,requestministrydivisions):
