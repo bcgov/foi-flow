@@ -1,0 +1,24 @@
+﻿<?xml version="1.0"?>
+<SSIS:Parameters xmlns:SSIS="www.microsoft.com/SqlServer/SSIS">
+  <SSIS:Parameter
+    SSIS:Name="applicantsqlquery">
+    <SSIS:Properties>
+      <SSIS:Property
+        SSIS:Name="ID">{ed0ced49-9631-4b81-8877-2fbb3b5a9c50}</SSIS:Property>
+      <SSIS:Property
+        SSIS:Name="CreationName"></SSIS:Property>
+      <SSIS:Property
+        SSIS:Name="Description"></SSIS:Property>
+      <SSIS:Property
+        SSIS:Name="IncludeInDebugDump">0</SSIS:Property>
+      <SSIS:Property
+        SSIS:Name="Required">0</SSIS:Property>
+      <SSIS:Property
+        SSIS:Name="Sensitive">0</SSIS:Property>
+      <SSIS:Property
+        SSIS:Name="Value">SELECT email,firstname,lastname,middleName,requesterid,birthDate,businessName, STRING_AGG(CAST(requestid as nvarchar(max)),', ') as requests FROM  ( SELECT			 				requesters.vcEmailID as email, 				requesters.iRequesterID as requesterid,                  requesters.vcFirstName as firstName,                 requesters.vcLastName as lastName,                 requesters.vcMiddleName as middleName,                 requestorfields.CUSTOMFIELD35 as birthDate,                 requesters.vcCompany as businessName,				 				requests.vcVisibleRequestID as requestid                  FROM                 tblRequests requests WITH (NOLOCK) LEFT OUTER JOIN EC_OFFICE office WITH (NOLOCK) ON requests.tiOfficeID = office.OFFICE_ID                  LEFT OUTER JOIN tblRequesters requesters WITH (NOLOCK) ON requests.iRequesterID = requesters.iRequesterID                  LEFT OUTER JOIN dbo.TBLREQUESTERCUSTOMFIELDS requestorfields WITH (NOLOCK) ON requesters.iRequesterID = requestorfields.IREQUESTERID                  WHERE                 office.OFFICE_CODE = 'CFD' AND  requests.vcRequestStatus NOT IN ('Closed')  			 ) AS T  			   			 GROUP BY T.email,T.requesterid,T.firstname,T.lastname,T.middleName,T.requesterid,T.birthDate,T.businessName  			 ORDER BY T.firstname ASC</SSIS:Property>
+      <SSIS:Property
+        SSIS:Name="DataType">18</SSIS:Property>
+    </SSIS:Properties>
+  </SSIS:Parameter>
+</SSIS:Parameters>
