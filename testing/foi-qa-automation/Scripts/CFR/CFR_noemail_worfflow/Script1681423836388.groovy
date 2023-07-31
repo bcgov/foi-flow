@@ -338,6 +338,16 @@ if (WebUI.verifyElementPresent(findTestObject('CFR/Email_missing/span_I foiintak
     WebUI.click(findTestObject('CFR/Email_missing/button_Cancel'))
 }
 
+WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/div_Status'))
+
+WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/li_Closed'))
+
+WebUI.click(findTestObject('Page_foi.flow/form/closing modal/div_Closing Reason'), FailureHandling.STOP_ON_FAILURE)
+
+WebUI.click(findTestObject('Page_foi.flow/form/closing modal/dropdown options/li_Full Disclosure'), FailureHandling.STOP_ON_FAILURE)
+
+WebUI.click(findTestObject('Page_foi.flow/form/state change dialog/button_Save Change'))
+
 ministryUser.close()
 
 IAOuser.close()

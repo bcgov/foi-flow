@@ -268,6 +268,19 @@ WebUI.verifyElementNotPresent(findTestObject('Page_foi.flow/form/div_divison tra
 
 WebUI.verifyElementNotPresent(findTestObject('Page_foi.flow/form/div_divison tracking iao view row 2 stage'), 0)
 
+
+WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/div_Status'))
+
+WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/li_Closed'))
+
+WebUI.click(findTestObject('Page_foi.flow/form/closing modal/div_Closing Reason'), FailureHandling.STOP_ON_FAILURE)
+
+WebUI.click(findTestObject('Page_foi.flow/form/closing modal/dropdown options/li_Partial Disclosure'), FailureHandling.STOP_ON_FAILURE)
+
+WebUI.click(findTestObject('Page_foi.flow/form/state change dialog/button_Save Change'), FailureHandling.STOP_ON_FAILURE)
+
+
+
 ministryUser.close()
 
 IAOuser.close()
