@@ -15,7 +15,7 @@
       </entry>
       <entry>
          <key>BASIC</key>
-         <value>id(&quot;mui-7&quot;)[count(. | //*[@type = 'text' and @role = 'combobox' and @value = 'Select Division Stage' and @id = 'mui-7']) = count(//*[@type = 'text' and @role = 'combobox' and @value = 'Select Division Stage' and @id = 'mui-7'])]</value>
+         <value>//*[@type = 'text' and @role = 'combobox' and @value = 'Select Division Stage']</value>
       </entry>
    </selectorCollection>
    <selectorMethod>BASIC</selectorMethod>
@@ -26,7 +26,7 @@
       <name>tag</name>
       <type>Main</type>
       <value>input</value>
-      <webElementGuid>4bcf5f10-8346-4b14-b6bb-2f751417f7a7</webElementGuid>
+      <webElementGuid>2a256bde-bf9f-49b6-a63e-b5a881105677</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -34,7 +34,7 @@
       <name>aria-invalid</name>
       <type>Main</type>
       <value>false</value>
-      <webElementGuid>4412e661-2c18-4fcc-a0b2-3a5f3fbeee95</webElementGuid>
+      <webElementGuid>16d2f9ea-ff8b-42b9-96bd-7db1b51d68ca</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -42,7 +42,7 @@
       <name>autocomplete</name>
       <type>Main</type>
       <value>off</value>
-      <webElementGuid>2529f075-4e1a-4564-84f7-12f784bf9f2f</webElementGuid>
+      <webElementGuid>59e68ca0-e4d6-408c-b37a-ee463bbd75b5</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>true</isSelected>
@@ -50,7 +50,7 @@
       <name>type</name>
       <type>Main</type>
       <value>text</value>
-      <webElementGuid>d9017d05-db46-4c7e-9610-b2a835b80bb2</webElementGuid>
+      <webElementGuid>a08764a5-ded0-4cfb-af97-6e30eeaaedef</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -58,7 +58,7 @@
       <name>class</name>
       <type>Main</type>
       <value>MuiInputBase-input MuiOutlinedInput-input MuiAutocomplete-input MuiAutocomplete-inputFocused MuiInputBase-inputAdornedEnd MuiOutlinedInput-inputAdornedEnd</value>
-      <webElementGuid>2a12931c-30a1-4b32-be48-372b6d60c395</webElementGuid>
+      <webElementGuid>3a7ea177-88f4-4fc9-b03c-7ff9190655fa</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -66,7 +66,7 @@
       <name>aria-autocomplete</name>
       <type>Main</type>
       <value>list</value>
-      <webElementGuid>3b56835e-5d48-4f01-ab9e-41f9eb8fe955</webElementGuid>
+      <webElementGuid>9aa0e444-ad01-4456-a703-9202099cf075</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -74,7 +74,7 @@
       <name>aria-expanded</name>
       <type>Main</type>
       <value>false</value>
-      <webElementGuid>0f0bc74d-1875-4a68-a718-230dbbd84872</webElementGuid>
+      <webElementGuid>c64c7b42-b339-4156-84ed-303ec306f713</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -82,7 +82,7 @@
       <name>autocapitalize</name>
       <type>Main</type>
       <value>none</value>
-      <webElementGuid>738d57a6-767f-4727-867a-fb58a0ba02bb</webElementGuid>
+      <webElementGuid>b29bddff-fb4c-4f40-9d1e-4409fdcde36a</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -90,7 +90,7 @@
       <name>spellcheck</name>
       <type>Main</type>
       <value>false</value>
-      <webElementGuid>d9a4fc37-beb6-4fd0-bc72-c778e5f8f3d6</webElementGuid>
+      <webElementGuid>05b02c0f-2c53-42c5-96f2-127e42121852</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>true</isSelected>
@@ -98,7 +98,7 @@
       <name>role</name>
       <type>Main</type>
       <value>combobox</value>
-      <webElementGuid>f1bda9d5-1550-4f42-afff-1ffae63f8cba</webElementGuid>
+      <webElementGuid>df8dcedb-4a8e-4456-b4c9-8b3b29168042</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>true</isSelected>
@@ -106,23 +106,23 @@
       <name>value</name>
       <type>Main</type>
       <value>Select Division Stage</value>
-      <webElementGuid>d919009a-ef36-485e-a1a8-3c5b72e6cf2e</webElementGuid>
+      <webElementGuid>98d28393-4d54-447d-9710-83a64c5126fb</webElementGuid>
    </webElementProperties>
    <webElementProperties>
-      <isSelected>true</isSelected>
+      <isSelected>false</isSelected>
       <matchCondition>equals</matchCondition>
       <name>id</name>
       <type>Main</type>
-      <value>mui-7</value>
-      <webElementGuid>2b1d29f3-6d92-45da-a6b1-e02e9bf987a8</webElementGuid>
+      <value>mui-229</value>
+      <webElementGuid>30414a0e-99b3-4e7c-b7f0-0508959d76c7</webElementGuid>
    </webElementProperties>
    <webElementProperties>
-      <isSelected>true</isSelected>
+      <isSelected>false</isSelected>
       <matchCondition>equals</matchCondition>
       <name>xpath</name>
       <type>Main</type>
-      <value>id(&quot;mui-7&quot;)</value>
-      <webElementGuid>a5cfce82-b7d9-436f-b18a-99ce6c55a90f</webElementGuid>
+      <value>id(&quot;mui-229&quot;)</value>
+      <webElementGuid>7c7a8055-445a-49e7-8707-9f61b66ed75f</webElementGuid>
    </webElementProperties>
    <webElementXpaths>
       <isSelected>true</isSelected>
@@ -130,7 +130,7 @@
       <name>xpath:attributes</name>
       <type>Main</type>
       <value>//input[@id='mui-53']</value>
-      <webElementGuid>6576686e-05c2-4129-9706-06ca6d0ab04a</webElementGuid>
+      <webElementGuid>cd0b879b-66d9-4245-8657-f630beafcc03</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -138,7 +138,7 @@
       <name>xpath:idRelative</name>
       <type>Main</type>
       <value>//div[@id='foi-division-row0']/div[2]/div/div/div/input</value>
-      <webElementGuid>49ea9da0-fba3-4041-ad1c-3788b17b33d0</webElementGuid>
+      <webElementGuid>3ea32292-4cc6-4d33-a0ee-65ee198684a5</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -146,7 +146,7 @@
       <name>xpath:position</name>
       <type>Main</type>
       <value>//div/div/div[2]/div/div/div/input</value>
-      <webElementGuid>4a47a566-291a-4788-a75c-1be64e09fb44</webElementGuid>
+      <webElementGuid>cef1e8d1-e755-4498-8a5b-e138222075d9</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -154,6 +154,6 @@
       <name>xpath:customAttributes</name>
       <type>Main</type>
       <value>//input[@type = 'text' and @id = 'mui-53']</value>
-      <webElementGuid>f6dab91d-a3ae-4c4e-9e2b-040777c74f00</webElementGuid>
+      <webElementGuid>fb8b8923-7b10-476d-8135-83a5d5f97642</webElementGuid>
    </webElementXpaths>
 </WebElementEntity>

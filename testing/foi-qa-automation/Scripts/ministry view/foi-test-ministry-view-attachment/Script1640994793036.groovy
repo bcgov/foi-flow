@@ -7,6 +7,16 @@ import com.kms.katalon.core.model.FailureHandling as FailureHandling
 import com.kms.katalon.core.util.KeywordUtil as KeywordUtil
 import com.kms.katalon.core.webui.keyword.WebUiBuiltInKeywords as WebUI
 import internal.GlobalVariable as GlobalVariable
+import com.kms.katalon.core.mobile.keyword.MobileBuiltInKeywords as Mobile
+import com.kms.katalon.core.cucumber.keyword.CucumberBuiltinKeywords as CucumberKW
+import com.kms.katalon.core.webservice.keyword.WSBuiltInKeywords as WS
+import com.kms.katalon.core.windows.keyword.WindowsBuiltinKeywords as Windows
+import static com.kms.katalon.core.testobject.ObjectRepository.findWindowsObject
+import static com.kms.katalon.core.checkpoint.CheckpointFactory.findCheckpoint
+import com.kms.katalon.core.testcase.TestCase as TestCase
+import com.kms.katalon.core.testdata.TestData as TestData
+import com.kms.katalon.core.testobject.TestObject as TestObject
+import com.kms.katalon.core.checkpoint.Checkpoint as Checkpoint
 
 WebUI.callTestCase(findTestCase('submit/foi-test-save-request-form'), [('password') : GlobalVariable.password, ('username') : GlobalVariable.username
         , ('firstname') : GlobalVariable.firstname, ('lastname') : GlobalVariable.lastname, ('applicantFirstname') : '', ('applicantLastname') : ''
@@ -66,4 +76,33 @@ WebUI.verifyElementPresent(findTestObject('Page_foi.flow/attachment/div_attachme
 WebUI.click(findTestObject('Page_foi.flow/attachment/button_attachments row 1 actions'), FailureHandling.STOP_ON_FAILURE)
 
 WebUI.verifyElementClickable(findTestObject('Page_foi.flow/attachment/button_Attachments Download'), FailureHandling.STOP_ON_FAILURE)
+
+WebUI.refresh()
+
+WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
+
+WebUI.click(findTestObject('Page_foi.flow/navbar/button_Sign Out'))
+
+WebUI.callTestCase(findTestCase('helper/foi-test-login'), [('password') : findTestData('Login Credentials').getValue('Password', 
+            1), ('username') : findTestData('Login Credentials').getValue('Username', 1)], FailureHandling.STOP_ON_FAILURE)
+
+WebUI.click(findTestObject('Page_foi.flow/queue/div_My Team Requests'))
+
+WebUI.setText(findTestObject('Page_foi.flow/queue/input_Dashboard Filter'), requestID)
+
+WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
+
+WebUI.click(findTestObject('Page_foi.flow/queue/div_request queue row 1'))
+
+WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/div_Status'))
+
+WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/li_Closed'))
+
+WebUI.click(findTestObject('Page_foi.flow/form/closing modal/div_Closing Reason'), FailureHandling.STOP_ON_FAILURE)
+
+WebUI.click(findTestObject('Page_foi.flow/form/closing modal/dropdown options/li_Partial Disclosure'), FailureHandling.STOP_ON_FAILURE)
+
+WebUI.click(findTestObject('Page_foi.flow/form/state change dialog/button_Save Change'), FailureHandling.STOP_ON_FAILURE)
+
+WebUI.closeBrowser()
 

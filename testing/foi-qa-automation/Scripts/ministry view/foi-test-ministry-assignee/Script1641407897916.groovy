@@ -98,9 +98,9 @@ WebUI.scrollToElement(findTestObject('Page_foi.flow/form/button_Save'), 0)
 
 WebUI.click(findTestObject('Page_foi.flow/ministry view/form/divisional tracking/div_ministry division dropdown'))
 
-WebUI.click(findTestObject('Page_foi.flow/ministry view/form/divisional tracking/division dropdown options/educ/li_Education Programs'))
+WebUI.click(findTestObject('Page_foi.flow/ministry view/form/divisional tracking/division dropdown options/li_Deputy Ministers Office'))
 
-WebUI.click(findTestObject('Page_foi.flow/ministry view/form/divisional tracking/div_ministry division stage'))
+WebUI.click(findTestObject('Records/input_Select Division Stage_mui-53'))
 
 WebUI.click(findTestObject('Page_foi.flow/ministry view/form/divisional tracking/stage dropdown options/li_Assigned to Division'))
 
@@ -137,8 +137,18 @@ WebUI.click(findTestObject('Page_foi.flow/queue/div_request queue row 1'))
 WebUI.verifyElementAttributeValue(findTestObject('Page_foi.flow/form/assignee dropdown/input_ministry assigned to iao view'), 
     'value', 'foiedu, foiedu', 0)
 
-WebUI.closeBrowser()
-
 WebUI.verifyElementHasAttribute(findTestObject('Page_foi.flow/form/assignee dropdown/input_ministry assigned to iao view'), 
     'disabled', 0, FailureHandling.STOP_ON_FAILURE)
+
+WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/div_Status'))
+
+WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/li_Closed'))
+
+WebUI.click(findTestObject('Page_foi.flow/form/closing modal/div_Closing Reason'), FailureHandling.STOP_ON_FAILURE)
+
+WebUI.click(findTestObject('Page_foi.flow/form/closing modal/dropdown options/li_Partial Disclosure'), FailureHandling.STOP_ON_FAILURE)
+
+WebUI.click(findTestObject('Page_foi.flow/form/state change dialog/button_Save Change'), FailureHandling.STOP_ON_FAILURE)
+
+WebUI.closeBrowser()
 
