@@ -143,6 +143,24 @@ class FOIRequestRecordDownloadSchema(Schema):
     category = fields.Str(data_key="category",allow_none=False, validate=[validate.Length(max=25, error=MAX_EXCEPTION_MESSAGE)])
     attributes = fields.Nested(DownloadRecordAttributeSchema, many=True, validate=validate.Length(min=1), required=True,allow_none=False)
     totalfilesize = fields.Number(data_key="totalfilesize")
-    
+
+class RecordSchema(Schema):
+    class Meta:  # pylint: disable=too-few-public-methods
+        """Exclude unknown fields in the deserialized output."""
+
+        unknown = EXCLUDE 
+    recordid = fields.Int(data_key="recordid",allow_none=True)
+    documentmasterid = fields.Int(data_key="documentmasterid",allow_none=False)
+    filepath = fields.String(data_key="filepath",allow_none=False,validate=[validate.Length(max=1000, error=MAX_EXCEPTION_MESSAGE)])
+
+class FOIRequestRecordUpdateSchema(Schema):
+    class Meta:  # pylint: disable=too-few-public-methods
+        """Exclude unknown fields in the deserialized output."""
+
+        unknown = EXCLUDE
+    records = fields.Nested(RecordSchema,many=True,data_key="records",required=True)
+    divisions = fields.Nested(DivisionSchema,many=True,validate=validate.Length(min=1),required=False,allow_none=True)
+    isdelete = fields.Boolean(required=True,allow_none=False)
+
     
 

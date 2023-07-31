@@ -57,6 +57,7 @@ class recordservicegetter(recordservicebase):
             _record['trigger'] = _computingresponse['trigger']
             _record['documentmasterid'] = _computingresponse["documentmasterid"]
             _record['outputdocumentmasterid'] = documentmasterid 
+            _record['isselected'] = False
             _computingresponse_err = self.__getcomputingerror(_computingresponse)
             if _computingresponse_err is not None:
                 _record['failed'] = _computingresponse_err
@@ -69,7 +70,9 @@ class recordservicegetter(recordservicebase):
                 _attachement['isattachment'] = True
                 _attachement['s3uripath'] = attachment['filepath']
                 _attachement['rootparentid'] = record["recordid"]
+                _attachement['rootdocumentmasterid'] = record["documentmasterid"]
                 _attachement['createdby'] = record['createdby']
+                _attachement['isselected'] = False
                 _attachement['attributes'] = self.__formatrecordattributes(attachment['attributes'], divisions)
                 _computingresponse_err = self.__getcomputingerror(attachment)
                 if _computingresponse_err is not None:
@@ -93,23 +96,23 @@ class recordservicegetter(recordservicebase):
         _resultrecords = copy.deepcopy(resultrecords)
         for result in resultrecords:            
             if self.isvalid("isduplicate",result) and result["isduplicate"] == True and self.isvalid("duplicatemasterid",result):
-                _resultrecords = self.__mergeduplicatedivisions(resultrecords, result["duplicatemasterid"], self.__getrecorddivisions(result["attributes"]))
+                _resultrecords = self.__mergeduplicatedivisions(resultrecords, result["duplicatemasterid"], result["documentmasterid"], self.__getrecorddivisions(result["attributes"]))
             if "attachments" in result:
                 for attachment in result["attachments"]:
                     if self.isvalid("isduplicate",attachment) and attachment["isduplicate"] == True and self.isvalid("duplicatemasterid", attachment):
-                        _resultrecords = self.__mergeduplicatedivisions(resultrecords, attachment["duplicatemasterid"], self.__getrecorddivisions(attachment["attributes"]))
+                        _resultrecords = self.__mergeduplicatedivisions(resultrecords, attachment["duplicatemasterid"], attachment["documentmasterid"], self.__getrecorddivisions(attachment["attributes"]))
         return _resultrecords              
 
 
-    def __mergeduplicatedivisions(self, _resultrecords, duplicatemasterid, divisions):
+    def __mergeduplicatedivisions(self, _resultrecords, duplicatemasterid, resultmasterid, divisions):
         for entry in _resultrecords:
             if "documentmasterid" in entry and int(entry["documentmasterid"]) == int(duplicatemasterid):
                 entattributes = entry["attributes"]
-                entattributes["divisions"] = self.__mergedivisions(entattributes, divisions) 
+                entattributes["divisions"] = self.__mergedivisions(entattributes, divisions, resultmasterid)
                 entry["attributes"] = entattributes
             if "attachments" in entry:
                 for attachment in entry["attachments"]:
-                    if "documentmasterid" in attachment and int(attachment["documentmasterid"]) == int(duplicatemasterid): 
+                    if "documentmasterid" in attachment and int(attachment["documentmasterid"]) == int(duplicatemasterid):
                         attattributes = attachment["attributes"]
                         attattributes["divisions"] = self.__mergedivisions(attachment["attributes"], divisions)    
                         attachment["attributes"] = attattributes
@@ -120,11 +123,13 @@ class recordservicegetter(recordservicebase):
             _attributes = json.loads(_attributes)  
         return _attributes.get('divisions', [])  
     
-    def __mergedivisions(self, _attributes, divisions):
+    def __mergedivisions(self, _attributes, divisions, resultmasterid=False):
         srcdivisions = self.__getrecorddivisions(_attributes)
         merged = srcdivisions
         for entry in divisions:
             isduplicate = False
+            if resultmasterid:
+                entry["duplicatemasterid"] = resultmasterid
             for srcdivision in srcdivisions:
                 if entry["divisionid"] == srcdivision["divisionid"]:
                     isduplicate = True
