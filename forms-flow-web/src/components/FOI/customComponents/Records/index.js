@@ -1291,7 +1291,7 @@ export const RecordsLog = ({
               <input
                 type="checkbox"
                 style={{position: "relative", top: 7, marginRight: 15}}
-                className="checkmark"
+                className="checkmark record-checkmark"
                 key={"selectallchk" + isAllSelected}
                 id={"selectallchk"}
                 onChange={handleSelectAll}
@@ -1600,7 +1600,7 @@ const Attachment = React.memo(({indexValue, record, handlePopupButtonClick, getF
           <input
             type="checkbox"
             style={{position: "relative", top: 18, marginRight: 15}}
-            className="checkmark"
+            className="checkmark record-checkmark"
             id={"selectchk"+record.documentmasterid}
             key={record.recordid + indexValue}
             data-iaocode={record.recordid}
