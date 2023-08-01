@@ -41,7 +41,7 @@ import {
   fetchApplicantCorrespondenceTemplates
 } from "../../../apiManager/services/FOI/foiCorrespondenceServices";
 import { fetchFOIRequestNotesList } from "../../../apiManager/services/FOI/foiRequestNoteServices";
-import { fetchFOIRecords, fetchPDFStitchStatusForHarms } from "../../../apiManager/services/FOI/foiRecordServices";
+import { fetchFOIRecords, fetchPDFStitchStatusForHarms, fetchRedactedSections } from "../../../apiManager/services/FOI/foiRecordServices";
 import { makeStyles } from '@material-ui/core/styles';
 import FOI_COMPONENT_CONSTANTS from '../../../constants/FOI/foiComponentConstants';
 import { push } from "connected-react-router";
@@ -73,6 +73,7 @@ import {
 } from "./utils";
 import { ConditionalComponent, formatDate, isRequestRestricted } from '../../../helper/FOI/helper';
 import DivisionalTracking from './DivisionalTracking';
+import RedactionSummary from './RedactionSummary';
 import AxisDetails from './AxisDetails/AxisDetails';
 import AxisMessageBanner from "./AxisDetails/AxisMessageBanner";
 import HomeIcon from '@mui/icons-material/Home';
@@ -229,6 +230,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
   document.title = requestDetails.axisRequestId || requestDetails.idNumber || headerText;
   const dispatch = useDispatch();
   const [isIAORestricted, setIsIAORestricted] = useState(false);
+  const [redactedSections, setRedactedSections] = useState("");
 
   useEffect(() => {
     if (window.location.href.indexOf("comments") > -1) {
@@ -253,6 +255,9 @@ const FOIRequest = React.memo(({ userDetail }) => {
       fetchCFRForm(ministryId,dispatch);
       dispatch(fetchApplicantCorrespondence(requestId, ministryId));
       dispatch(fetchApplicantCorrespondenceTemplates());
+      dispatch(fetchRedactedSections(ministryId, (_err, res) => {
+        setRedactedSections(res.sections);
+      }));
     }
 
     dispatch(fetchFOICategoryList());    
@@ -1041,6 +1046,10 @@ const FOIRequest = React.memo(({ userDetail }) => {
                         createSaveRequestObject={createSaveRequestObject}
                         disableInput={disableInput}
                       />
+
+                      {redactedSections.length > 0 && <RedactionSummary
+                        sections={redactedSections}
+                      />}
 
                       <ExtensionDetails
                         requestDetails={requestDetails}
