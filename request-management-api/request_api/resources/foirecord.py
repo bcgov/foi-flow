@@ -22,7 +22,7 @@ from request_api.tracer import Tracer
 from request_api.utils.util import  cors_preflight, allowedorigins, getrequiredmemberships
 from request_api.exceptions import BusinessException, Error
 from request_api.services.recordservice import recordservice
-from request_api.schemas.foirecord import  FOIRequestBulkCreateRecordSchema, FOIRequestBulkRetryRecordSchema, FOIRequestRecordDownloadSchema, FOIRequestReplaceRecordSchema
+from request_api.schemas.foirecord import  FOIRequestBulkCreateRecordSchema, FOIRequestBulkRetryRecordSchema, FOIRequestRecordDownloadSchema, FOIRequestReplaceRecordSchema, FOIRequestRecordUpdateSchema
 from marshmallow import INCLUDE
 import json
 from flask_cors import cross_origin
@@ -75,8 +75,8 @@ class FOIRequestBulkCreateRecord(Resource):
             return {'status': exception.status_code, 'message':exception.message}, 500
 
 @cors_preflight('POST,OPTIONS')
-@API.route('/foirecord/<requestid>/ministryrequest/<ministryrequestid>/recordid/<recordid>/delete')
-class DeleteFOIDocument(Resource):
+@API.route('/foirecord/<requestid>/ministryrequest/<ministryrequestid>/update')
+class UpdateFOIDocument(Resource):
     """Resource for soft delete FOI requests."""
 
 
@@ -85,12 +85,14 @@ class DeleteFOIDocument(Resource):
     @cross_origin(origins=allowedorigins())
     @auth.require
     @auth.ismemberofgroups(getrequiredmemberships())
-    def post(requestid, ministryrequestid, recordid):
+    def post(requestid, ministryrequestid):
         try:
-            result = recordservice().delete(requestid, ministryrequestid, recordid, AuthHelper.getuserid())
+            requestjson = request.get_json()
+            data = FOIRequestRecordUpdateSchema().load(requestjson)
+            result = recordservice().update(requestid, ministryrequestid, data, AuthHelper.getuserid())
             return {'status': result.success, 'message':result.message,'id':result.identifier} , 200
         except KeyError as err:
-            return {'status': False, 'message':err.messages}, 400
+            return {'status': False, 'message':err['messages']}, 400
         except BusinessException as exception:
             return {'status': exception.status_code, 'message':exception.message}, 500
 
