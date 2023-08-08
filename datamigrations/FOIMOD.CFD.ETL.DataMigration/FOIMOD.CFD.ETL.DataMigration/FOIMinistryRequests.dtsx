@@ -1,0 +1,518 @@
+﻿<?xml version="1.0"?>
+<DTS:Executable xmlns:DTS="www.microsoft.com/SqlServer/Dts"
+  DTS:refId="Package"
+  DTS:CreationDate="7/31/2023 1:54:22 PM"
+  DTS:CreationName="Microsoft.Package"
+  DTS:CreatorComputerName="WALTZ"
+  DTS:CreatorName="IDIR\AANTON_A"
+  DTS:DTSID="{2A065F0D-C74A-4625-A968-B48E416F3285}"
+  DTS:ExecutableType="Microsoft.Package"
+  DTS:LastModifiedProductVersion="15.0.2000.180"
+  DTS:LocaleID="1033"
+  DTS:ObjectName="Package1"
+  DTS:PackageType="5"
+  DTS:VersionBuild="12"
+  DTS:VersionGUID="{7AFB3826-7143-4167-8101-43C21A36278A}">
+  <DTS:Property
+    DTS:Name="PackageFormatVersion">8</DTS:Property>
+  <DTS:Variables>
+    <DTS:Variable
+      DTS:CreationName=""
+      DTS:DTSID="{E6EE82AA-FD46-4769-B856-2263D18D22B3}"
+      DTS:IncludeInDebugDump="2345"
+      DTS:Namespace="User"
+      DTS:ObjectName="cfrduedate">
+      <DTS:VariableValue
+        DTS:DataType="8"
+        xml:space="preserve"></DTS:VariableValue>
+    </DTS:Variable>
+    <DTS:Variable
+      DTS:CreationName=""
+      DTS:DTSID="{AE13244F-3698-407B-A010-0B88AAE3CB84}"
+      DTS:IncludeInDebugDump="2345"
+      DTS:Namespace="User"
+      DTS:ObjectName="description">
+      <DTS:VariableValue
+        DTS:DataType="8"
+        xml:space="preserve"></DTS:VariableValue>
+    </DTS:Variable>
+    <DTS:Variable
+      DTS:CreationName=""
+      DTS:DTSID="{502E7D9D-F9E9-45A8-8F0B-D216EC68BEAF}"
+      DTS:IncludeInDebugDump="2345"
+      DTS:Namespace="User"
+      DTS:ObjectName="duedate">
+      <DTS:VariableValue
+        DTS:DataType="8"
+        xml:space="preserve"></DTS:VariableValue>
+    </DTS:Variable>
+    <DTS:Variable
+      DTS:CreationName=""
+      DTS:DTSID="{0EC590D4-EE9F-4079-A409-B0246BE884C1}"
+      DTS:IncludeInDebugDump="2345"
+      DTS:Namespace="User"
+      DTS:ObjectName="filenumber">
+      <DTS:VariableValue
+        DTS:DataType="8"
+        xml:space="preserve"></DTS:VariableValue>
+    </DTS:Variable>
+    <DTS:Variable
+      DTS:CreationName=""
+      DTS:DTSID="{B4D5DC6D-2DDA-423C-8FE9-A30924444718}"
+      DTS:IncludeInDebugDump="6789"
+      DTS:Namespace="User"
+      DTS:ObjectName="foiministryrequestsresultset">
+      <DTS:VariableValue
+        DTS:DataSubType="ManagedSerializable"
+        DTS:DataType="13">
+        <SOAP-ENV:Envelope xmlns:clr="http://schemas.microsoft.com/soap/encoding/clr/1.0" xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          SOAP-ENV:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
+          <SOAP-ENV:Body>
+            <xsd:anyType
+              id="ref-1"></xsd:anyType>
+          </SOAP-ENV:Body>
+        </SOAP-ENV:Envelope>
+      </DTS:VariableValue>
+    </DTS:Variable>
+    <DTS:Variable
+      DTS:CreationName=""
+      DTS:DTSID="{8AC6E75C-8BB2-4125-BBB4-A50F7A30854A}"
+      DTS:IncludeInDebugDump="2345"
+      DTS:Namespace="User"
+      DTS:ObjectName="fromdate">
+      <DTS:VariableValue
+        DTS:DataType="8"
+        xml:space="preserve"></DTS:VariableValue>
+    </DTS:Variable>
+    <DTS:Variable
+      DTS:CreationName=""
+      DTS:DTSID="{63091779-FB93-41EB-85F1-45B9557EDBEB}"
+      DTS:IncludeInDebugDump="2345"
+      DTS:Namespace="User"
+      DTS:ObjectName="reqpagecount">
+      <DTS:VariableValue
+        DTS:DataType="8"
+        xml:space="preserve"></DTS:VariableValue>
+    </DTS:Variable>
+    <DTS:Variable
+      DTS:CreationName=""
+      DTS:DTSID="{4449C038-1F8E-429D-9C80-59F87E18C960}"
+      DTS:IncludeInDebugDump="2345"
+      DTS:Namespace="User"
+      DTS:ObjectName="startdate">
+      <DTS:VariableValue
+        DTS:DataType="8"
+        xml:space="preserve"></DTS:VariableValue>
+    </DTS:Variable>
+    <DTS:Variable
+      DTS:CreationName=""
+      DTS:DTSID="{DD343894-58F8-4DBB-9ACE-FCB1B70AD22F}"
+      DTS:IncludeInDebugDump="2345"
+      DTS:Namespace="User"
+      DTS:ObjectName="todate">
+      <DTS:VariableValue
+        DTS:DataType="8"
+        xml:space="preserve"></DTS:VariableValue>
+    </DTS:Variable>
+  </DTS:Variables>
+  <DTS:Executables>
+    <DTS:Executable
+      DTS:refId="Package\EST_FetchInfoAXIS"
+      DTS:CreationName="Microsoft.ExecuteSQLTask"
+      DTS:Description="Execute SQL Task"
+      DTS:DTSID="{D11E35A6-7060-4578-9A44-4F3ACAA8B5D5}"
+      DTS:ExecutableType="Microsoft.ExecuteSQLTask"
+      DTS:LocaleID="-1"
+      DTS:ObjectName="EST_FetchInfoAXIS"
+      DTS:TaskContact="Execute SQL Task; Microsoft Corporation; SQL Server 2019; © 2019 Microsoft Corporation; All Rights Reserved;http://www.microsoft.com/sql/support/default.asp;1"
+      DTS:ThreadHint="0">
+      <DTS:Variables />
+      <DTS:ObjectData>
+        <SQLTask:SqlTaskData
+          SQLTask:Connection="{FA877C17-9970-459F-BFAC-AC1E9E4433B6}"
+          SQLTask:SqlStmtSourceType="Variable"
+          SQLTask:SqlStatementSource="$Project::foiministryrequestquery"
+          SQLTask:ResultType="ResultSetType_Rowset" xmlns:SQLTask="www.microsoft.com/sqlserver/dts/tasks/sqltask">
+          <SQLTask:ResultBinding
+            SQLTask:ResultName="0"
+            SQLTask:DtsVariableName="User::foiministryrequestsresultset" />
+        </SQLTask:SqlTaskData>
+      </DTS:ObjectData>
+    </DTS:Executable>
+    <DTS:Executable
+      DTS:refId="Package\Foreach Loop Container"
+      DTS:CreationName="STOCK:FOREACHLOOP"
+      DTS:Description="Foreach Loop Container"
+      DTS:DTSID="{AC4E1D0D-B3E5-40E6-94FC-AF46F68F2FB5}"
+      DTS:ExecutableType="STOCK:FOREACHLOOP"
+      DTS:LocaleID="-1"
+      DTS:ObjectName="Foreach Loop Container">
+      <DTS:ForEachEnumerator
+        DTS:CreationName="Microsoft.ForEachADOEnumerator"
+        DTS:DTSID="{ED09AF64-8681-4C79-AB45-AAF21284C766}"
+        DTS:ObjectName="{ED09AF64-8681-4C79-AB45-AAF21284C766}">
+        <DTS:ObjectData>
+          <FEEADO
+            EnumType="EnumerateRowsInFirstTable"
+            VarName="User::foiministryrequestsresultset" />
+        </DTS:ObjectData>
+      </DTS:ForEachEnumerator>
+      <DTS:Variables />
+      <DTS:Executables>
+        <DTS:Executable
+          DTS:refId="Package\Foreach Loop Container\EST_InsertV1Open"
+          DTS:CreationName="Microsoft.ExecuteSQLTask"
+          DTS:Description="Execute SQL Task"
+          DTS:DTSID="{1EF8A828-BE5A-49A3-81E8-0D2EDAFA2B64}"
+          DTS:ExecutableType="Microsoft.ExecuteSQLTask"
+          DTS:LocaleID="-1"
+          DTS:ObjectName="EST_InsertV1Open"
+          DTS:TaskContact="Execute SQL Task; Microsoft Corporation; SQL Server 2019; © 2019 Microsoft Corporation; All Rights Reserved;http://www.microsoft.com/sql/support/default.asp;1"
+          DTS:ThreadHint="0">
+          <DTS:Variables />
+          <DTS:ObjectData>
+            <SQLTask:SqlTaskData
+              SQLTask:Connection="{18EF9DFD-37E1-484D-9BC1-BFE418845E48}"
+              SQLTask:SqlStatementSource="INSERT INTO public.&quot;FOIMinistryRequests&quot;(&#x9; &#xA;&#x9;version, &#xA;&#x9;isactive, &#xA;&#x9;filenumber, &#xA;&#x9;description, &#xA;&#x9;recordsearchfromdate, &#xA;&#x9;recordsearchtodate, &#xA;&#x9;startdate, &#xA;&#x9;duedate, &#xA;&#x9;assignedto, &#xA;&#x9;created_at, &#xA;&#x9;updated_at, &#xA;&#x9;createdby, &#xA;&#x9;updatedby, &#xA;&#x9;programareaid, &#xA;&#x9;requeststatusid, &#xA;&#x9;foirequest_id, &#xA;&#x9;foirequestversion_id, &#x9;&#xA;&#x9;cfrduedate, &#x9;&#xA;&#x9;axisrequestid, &#x9;&#xA;&#x9;requestpagecount, &#x9; &#xA;&#x9;linkedrequests, &#xA;&#x9;migrationreference,assignedgroup)&#xA;&#x9;VALUES ( &#xA;&#x9;&#x9;1, &#xA;&#x9;&#x9;True, &#xA;&#x9;&#x9;?, &#xA;&#x9;&#x9;?, &#xA;&#x9;&#x9;to_timestamp(?,'YYYY-MM-DD hh24:mi:ss'), &#xA;&#x9;&#x9;to_timestamp(?,'YYYY-MM-DD hh24:mi:ss'), &#xA;&#x9;&#x9;to_timestamp(?,'YYYY-MM-DD hh24:mi:ss'),&#xA;&#x9;&#x9;to_timestamp(?,'YYYY-MM-DD hh24:mi:ss'),&#xA;&#x9;&#x9;NULL, &#xA;&#x9;&#x9;NOW(), &#xA;&#x9;&#x9;NOW(), &#xA;&#x9;&#x9;'cfdmigration', &#xA;&#x9;&#x9;'cfdmigration',&#xA;(SELECT programareaid FROM public.&quot;ProgramAreas&quot; PA WHERE PA.iaocode='CFD' and PA.isactive=True), &#xA;(SELECT requeststatusid FROM public.&quot;FOIRequestStatuses&quot; RS WHERE RS.name='Open' and RS.isactive=True), &#xA;(SELECT foirequestid FROM public.&quot;FOIRequests&quot; R WHERE R.migrationreference=? ORDER BY R.created_at DESC LIMIT 1), &#xA;(SELECT version FROM public.&quot;FOIRequests&quot; R WHERE R.migrationreference=? ORDER BY R.created_at DESC LIMIT 1),  &#xA;&#x9;&#x9;to_timestamp(?,'YYYY-MM-DD hh24:mi:ss'),  &#xA;&#x9;&#x9;?,  &#xA;&#x9;&#x9;?,  &#xA;&#x9;&#x9;NULL, &#xA;&#x9;&#x9;?,'MCFD Personals Team');" xmlns:SQLTask="www.microsoft.com/sqlserver/dts/tasks/sqltask">
+              <SQLTask:ParameterBinding
+                SQLTask:ParameterName="1"
+                SQLTask:DtsVariableName="User::filenumber"
+                SQLTask:ParameterDirection="Input"
+                SQLTask:DataType="-9"
+                SQLTask:ParameterSize="-1" />
+              <SQLTask:ParameterBinding
+                SQLTask:ParameterName="2"
+                SQLTask:DtsVariableName="User::description"
+                SQLTask:ParameterDirection="Input"
+                SQLTask:DataType="-9"
+                SQLTask:ParameterSize="-1" />
+              <SQLTask:ParameterBinding
+                SQLTask:ParameterName="3"
+                SQLTask:DtsVariableName="User::fromdate"
+                SQLTask:ParameterDirection="Input"
+                SQLTask:DataType="-9"
+                SQLTask:ParameterSize="-1" />
+              <SQLTask:ParameterBinding
+                SQLTask:ParameterName="4"
+                SQLTask:DtsVariableName="User::todate"
+                SQLTask:ParameterDirection="Input"
+                SQLTask:DataType="-9"
+                SQLTask:ParameterSize="-1" />
+              <SQLTask:ParameterBinding
+                SQLTask:ParameterName="5"
+                SQLTask:DtsVariableName="User::startdate"
+                SQLTask:ParameterDirection="Input"
+                SQLTask:DataType="-9"
+                SQLTask:ParameterSize="-1" />
+              <SQLTask:ParameterBinding
+                SQLTask:ParameterName="6"
+                SQLTask:DtsVariableName="User::duedate"
+                SQLTask:ParameterDirection="Input"
+                SQLTask:DataType="-9"
+                SQLTask:ParameterSize="-1" />
+              <SQLTask:ParameterBinding
+                SQLTask:ParameterName="7"
+                SQLTask:DtsVariableName="User::filenumber"
+                SQLTask:ParameterDirection="Input"
+                SQLTask:DataType="-9"
+                SQLTask:ParameterSize="-1" />
+              <SQLTask:ParameterBinding
+                SQLTask:ParameterName="8"
+                SQLTask:DtsVariableName="User::filenumber"
+                SQLTask:ParameterDirection="Input"
+                SQLTask:DataType="-9"
+                SQLTask:ParameterSize="-1" />
+              <SQLTask:ParameterBinding
+                SQLTask:ParameterName="9"
+                SQLTask:DtsVariableName="User::cfrduedate"
+                SQLTask:ParameterDirection="Input"
+                SQLTask:DataType="-9"
+                SQLTask:ParameterSize="-1" />
+              <SQLTask:ParameterBinding
+                SQLTask:ParameterName="10"
+                SQLTask:DtsVariableName="User::filenumber"
+                SQLTask:ParameterDirection="Input"
+                SQLTask:DataType="-9"
+                SQLTask:ParameterSize="-1" />
+              <SQLTask:ParameterBinding
+                SQLTask:ParameterName="11"
+                SQLTask:DtsVariableName="User::reqpagecount"
+                SQLTask:ParameterDirection="Input"
+                SQLTask:DataType="-9"
+                SQLTask:ParameterSize="-1" />
+              <SQLTask:ParameterBinding
+                SQLTask:ParameterName="12"
+                SQLTask:DtsVariableName="User::filenumber"
+                SQLTask:ParameterDirection="Input"
+                SQLTask:DataType="-9"
+                SQLTask:ParameterSize="-1" />
+            </SQLTask:SqlTaskData>
+          </DTS:ObjectData>
+        </DTS:Executable>
+        <DTS:Executable
+          DTS:refId="Package\Foreach Loop Container\EST_InsertV2  Records Review"
+          DTS:CreationName="Microsoft.ExecuteSQLTask"
+          DTS:Description="Execute SQL Task"
+          DTS:DTSID="{d8da78bb-03e2-4a41-a12f-5776f84afc2f}"
+          DTS:ExecutableType="Microsoft.ExecuteSQLTask"
+          DTS:LocaleID="-1"
+          DTS:ObjectName="EST_InsertV2  Records Review"
+          DTS:TaskContact="Execute SQL Task; Microsoft Corporation; SQL Server 2019; © 2019 Microsoft Corporation; All Rights Reserved;http://www.microsoft.com/sql/support/default.asp;1"
+          DTS:ThreadHint="0">
+          <DTS:Variables />
+          <DTS:ObjectData>
+            <SQLTask:SqlTaskData
+              SQLTask:Connection="{18EF9DFD-37E1-484D-9BC1-BFE418845E48}"
+              SQLTask:SqlStatementSource="INSERT INTO public.&quot;FOIMinistryRequests&quot;(  &#xA; version, &#xA; isactive, &#xA; filenumber, &#xA; description, &#xA; recordsearchfromdate, &#xA; recordsearchtodate, &#xA; startdate, &#xA; duedate, &#xA; assignedto, &#xA; created_at, &#xA; updated_at, &#xA; createdby, &#xA; updatedby, &#xA; programareaid, &#xA; requeststatusid, &#xA; foirequest_id, &#xA; foirequestversion_id,  &#xA; cfrduedate,  &#xA; axisrequestid,  &#xA; requestpagecount,   &#xA; linkedrequests, &#xA; migrationreference,assignedgroup)&#xA; VALUES ( &#xA;  2, &#xA;  True, &#xA;  ?, &#xA;  ?, &#xA;  to_timestamp(?,'YYYY-MM-DD hh24:mi:ss'), &#xA;  to_timestamp(?,'YYYY-MM-DD hh24:mi:ss'), &#xA;  to_timestamp(?,'YYYY-MM-DD hh24:mi:ss'),&#xA;  to_timestamp(?,'YYYY-MM-DD hh24:mi:ss'),&#xA;  NULL, &#xA;  NOW(), &#xA;  NOW(), &#xA;  'cfdmigration', &#xA;  'cfdmigration',&#xA;(SELECT programareaid FROM public.&quot;ProgramAreas&quot; PA WHERE PA.iaocode='CFD' and PA.isactive=True), &#xA;(SELECT requeststatusid FROM public.&quot;FOIRequestStatuses&quot; RS WHERE RS.name='Records Review' and RS.isactive=True), &#xA;(SELECT foirequestid FROM public.&quot;FOIRequests&quot; R WHERE R.migrationreference=? ORDER BY R.created_at DESC LIMIT 1), &#xA;(SELECT version FROM public.&quot;FOIRequests&quot; R WHERE R.migrationreference=? ORDER BY R.created_at DESC LIMIT 1),  &#xA;  to_timestamp(?,'YYYY-MM-DD hh24:mi:ss'),  &#xA;  ?,  &#xA;  ?,  &#xA;  NULL, &#xA;  ?,'MCFD Personals Team');" xmlns:SQLTask="www.microsoft.com/sqlserver/dts/tasks/sqltask">
+              <SQLTask:ParameterBinding
+                SQLTask:ParameterName="1"
+                SQLTask:DtsVariableName="User::filenumber"
+                SQLTask:ParameterDirection="Input"
+                SQLTask:DataType="-9"
+                SQLTask:ParameterSize="-1" />
+              <SQLTask:ParameterBinding
+                SQLTask:ParameterName="2"
+                SQLTask:DtsVariableName="User::description"
+                SQLTask:ParameterDirection="Input"
+                SQLTask:DataType="-9"
+                SQLTask:ParameterSize="-1" />
+              <SQLTask:ParameterBinding
+                SQLTask:ParameterName="3"
+                SQLTask:DtsVariableName="User::fromdate"
+                SQLTask:ParameterDirection="Input"
+                SQLTask:DataType="-9"
+                SQLTask:ParameterSize="-1" />
+              <SQLTask:ParameterBinding
+                SQLTask:ParameterName="4"
+                SQLTask:DtsVariableName="User::todate"
+                SQLTask:ParameterDirection="Input"
+                SQLTask:DataType="-9"
+                SQLTask:ParameterSize="-1" />
+              <SQLTask:ParameterBinding
+                SQLTask:ParameterName="5"
+                SQLTask:DtsVariableName="User::startdate"
+                SQLTask:ParameterDirection="Input"
+                SQLTask:DataType="-9"
+                SQLTask:ParameterSize="-1" />
+              <SQLTask:ParameterBinding
+                SQLTask:ParameterName="6"
+                SQLTask:DtsVariableName="User::duedate"
+                SQLTask:ParameterDirection="Input"
+                SQLTask:DataType="-9"
+                SQLTask:ParameterSize="-1" />
+              <SQLTask:ParameterBinding
+                SQLTask:ParameterName="7"
+                SQLTask:DtsVariableName="User::filenumber"
+                SQLTask:ParameterDirection="Input"
+                SQLTask:DataType="-9"
+                SQLTask:ParameterSize="-1" />
+              <SQLTask:ParameterBinding
+                SQLTask:ParameterName="8"
+                SQLTask:DtsVariableName="User::filenumber"
+                SQLTask:ParameterDirection="Input"
+                SQLTask:DataType="-9"
+                SQLTask:ParameterSize="-1" />
+              <SQLTask:ParameterBinding
+                SQLTask:ParameterName="9"
+                SQLTask:DtsVariableName="User::cfrduedate"
+                SQLTask:ParameterDirection="Input"
+                SQLTask:DataType="-9"
+                SQLTask:ParameterSize="-1" />
+              <SQLTask:ParameterBinding
+                SQLTask:ParameterName="10"
+                SQLTask:DtsVariableName="User::filenumber"
+                SQLTask:ParameterDirection="Input"
+                SQLTask:DataType="-9"
+                SQLTask:ParameterSize="-1" />
+              <SQLTask:ParameterBinding
+                SQLTask:ParameterName="11"
+                SQLTask:DtsVariableName="User::reqpagecount"
+                SQLTask:ParameterDirection="Input"
+                SQLTask:DataType="-9"
+                SQLTask:ParameterSize="-1" />
+              <SQLTask:ParameterBinding
+                SQLTask:ParameterName="12"
+                SQLTask:DtsVariableName="User::filenumber"
+                SQLTask:ParameterDirection="Input"
+                SQLTask:DataType="-9"
+                SQLTask:ParameterSize="-1" />
+            </SQLTask:SqlTaskData>
+          </DTS:ObjectData>
+        </DTS:Executable>
+      </DTS:Executables>
+      <DTS:PrecedenceConstraints>
+        <DTS:PrecedenceConstraint
+          DTS:refId="Package\Foreach Loop Container.PrecedenceConstraints[Constraint]"
+          DTS:CreationName=""
+          DTS:DTSID="{66553A64-F203-471D-A6F3-5DA89E3CD142}"
+          DTS:From="Package\Foreach Loop Container\EST_InsertV1Open"
+          DTS:LogicalAnd="True"
+          DTS:ObjectName="Constraint"
+          DTS:To="Package\Foreach Loop Container\EST_InsertV2  Records Review" />
+      </DTS:PrecedenceConstraints>
+      <DTS:ForEachVariableMappings>
+        <DTS:ForEachVariableMapping
+          DTS:CreationName=""
+          DTS:DTSID="{17B05AE9-703B-465D-AF96-F3061B4DFE72}"
+          DTS:ObjectName="{17B05AE9-703B-465D-AF96-F3061B4DFE72}"
+          DTS:ValueIndex="0"
+          DTS:VariableName="User::filenumber" />
+        <DTS:ForEachVariableMapping
+          DTS:CreationName=""
+          DTS:DTSID="{64BA61F6-F1FC-4D19-869E-632097C36817}"
+          DTS:ObjectName="{64BA61F6-F1FC-4D19-869E-632097C36817}"
+          DTS:ValueIndex="1"
+          DTS:VariableName="User::description" />
+        <DTS:ForEachVariableMapping
+          DTS:CreationName=""
+          DTS:DTSID="{FBD76B63-3CA5-4618-AEE6-915F26C7C5D5}"
+          DTS:ObjectName="{FBD76B63-3CA5-4618-AEE6-915F26C7C5D5}"
+          DTS:ValueIndex="2"
+          DTS:VariableName="User::fromdate" />
+        <DTS:ForEachVariableMapping
+          DTS:CreationName=""
+          DTS:DTSID="{DC73C5D6-F330-4D64-A2F7-04B39EB7DE02}"
+          DTS:ObjectName="{DC73C5D6-F330-4D64-A2F7-04B39EB7DE02}"
+          DTS:ValueIndex="3"
+          DTS:VariableName="User::todate" />
+        <DTS:ForEachVariableMapping
+          DTS:CreationName=""
+          DTS:DTSID="{EE9036E2-C294-4729-92AE-6D46DD65B7FF}"
+          DTS:ObjectName="{EE9036E2-C294-4729-92AE-6D46DD65B7FF}"
+          DTS:ValueIndex="4"
+          DTS:VariableName="User::startdate" />
+        <DTS:ForEachVariableMapping
+          DTS:CreationName=""
+          DTS:DTSID="{DBBB2356-4248-4576-B6BA-AAE8DCA10265}"
+          DTS:ObjectName="{DBBB2356-4248-4576-B6BA-AAE8DCA10265}"
+          DTS:ValueIndex="5"
+          DTS:VariableName="User::duedate" />
+        <DTS:ForEachVariableMapping
+          DTS:CreationName=""
+          DTS:DTSID="{EBB7A071-36D3-41D7-B24A-DFF883143EAA}"
+          DTS:ObjectName="{EBB7A071-36D3-41D7-B24A-DFF883143EAA}"
+          DTS:ValueIndex="6"
+          DTS:VariableName="User::cfrduedate" />
+        <DTS:ForEachVariableMapping
+          DTS:CreationName=""
+          DTS:DTSID="{3229131F-4F01-4138-8952-E47389E3CBB0}"
+          DTS:ObjectName="{3229131F-4F01-4138-8952-E47389E3CBB0}"
+          DTS:ValueIndex="7"
+          DTS:VariableName="User::reqpagecount" />
+      </DTS:ForEachVariableMappings>
+    </DTS:Executable>
+  </DTS:Executables>
+  <DTS:PrecedenceConstraints>
+    <DTS:PrecedenceConstraint
+      DTS:refId="Package.PrecedenceConstraints[Constraint]"
+      DTS:CreationName=""
+      DTS:DTSID="{E7E20A3D-D95C-4E78-9E6E-D7F5A49A3927}"
+      DTS:From="Package\EST_FetchInfoAXIS"
+      DTS:LogicalAnd="True"
+      DTS:ObjectName="Constraint"
+      DTS:To="Package\Foreach Loop Container" />
+  </DTS:PrecedenceConstraints>
+  <DTS:DesignTimeProperties><![CDATA[<?xml version="1.0"?>
+<!--This CDATA section contains the layout information of the package. The section includes information such as (x,y) coordinates, width, and height.-->
+<!--If you manually edit this section and make a mistake, you can delete it. -->
+<!--The package will still be able to load normally but the previous layout information will be lost and the designer will automatically re-arrange the elements on the design surface.-->
+<Objects
+  Version="8">
+  <!--Each node below will contain properties that do not affect runtime behavior.-->
+  <Package
+    design-time-name="Package">
+    <LayoutInfo>
+      <GraphLayout
+        Capacity="8" xmlns="clr-namespace:Microsoft.SqlServer.IntegrationServices.Designer.Model.Serialization;assembly=Microsoft.SqlServer.IntegrationServices.Graph" xmlns:mssgle="clr-namespace:Microsoft.SqlServer.Graph.LayoutEngine;assembly=Microsoft.SqlServer.Graph" xmlns:assembly="http://schemas.microsoft.com/winfx/2006/xaml">
+        <NodeLayout
+          Size="177,42"
+          Id="Package\EST_FetchInfoAXIS"
+          TopLeft="551,132" />
+        <NodeLayout
+          Size="174,42"
+          Id="Package\Foreach Loop Container\EST_InsertV1Open"
+          TopLeft="86,42" />
+        <NodeLayout
+          Size="233,42"
+          Id="Package\Foreach Loop Container\EST_InsertV2  Records Review"
+          TopLeft="125,135" />
+        <EdgeLayout
+          Id="Package\Foreach Loop Container.PrecedenceConstraints[Constraint]"
+          TopLeft="173,84">
+          <EdgeLayout.Curve>
+            <mssgle:Curve
+              StartConnector="{assembly:Null}"
+              EndConnector="68.5,51"
+              Start="0,0"
+              End="68.5,43.5">
+              <mssgle:Curve.Segments>
+                <mssgle:SegmentCollection
+                  Capacity="5">
+                  <mssgle:LineSegment
+                    End="0,21.5" />
+                  <mssgle:CubicBezierSegment
+                    Point1="0,21.5"
+                    Point2="0,25.5"
+                    Point3="4,25.5" />
+                  <mssgle:LineSegment
+                    End="64.5,25.5" />
+                  <mssgle:CubicBezierSegment
+                    Point1="64.5,25.5"
+                    Point2="68.5,25.5"
+                    Point3="68.5,29.5" />
+                  <mssgle:LineSegment
+                    End="68.5,43.5" />
+                </mssgle:SegmentCollection>
+              </mssgle:Curve.Segments>
+            </mssgle:Curve>
+          </EdgeLayout.Curve>
+          <EdgeLayout.Labels>
+            <EdgeLabelCollection />
+          </EdgeLayout.Labels>
+        </EdgeLayout>
+        <ContainerLayout
+          HeaderHeight="43"
+          IsExpanded="True"
+          PanelSize="573,232"
+          Size="573,275"
+          Id="Package\Foreach Loop Container"
+          TopLeft="425,288" />
+        <EdgeLayout
+          Id="Package.PrecedenceConstraints[Constraint]"
+          TopLeft="639.5,174">
+          <EdgeLayout.Curve>
+            <mssgle:Curve
+              StartConnector="{assembly:Null}"
+              EndConnector="72,114"
+              Start="0,0"
+              End="72,106.5">
+              <mssgle:Curve.Segments>
+                <mssgle:SegmentCollection
+                  Capacity="5">
+                  <mssgle:LineSegment
+                    End="0,53" />
+                  <mssgle:CubicBezierSegment
+                    Point1="0,53"
+                    Point2="0,57"
+                    Point3="4,57" />
+                  <mssgle:LineSegment
+                    End="68,57" />
+                  <mssgle:CubicBezierSegment
+                    Point1="68,57"
+                    Point2="72,57"
+                    Point3="72,61" />
+                  <mssgle:LineSegment
+                    End="72,106.5" />
+                </mssgle:SegmentCollection>
+              </mssgle:Curve.Segments>
+            </mssgle:Curve>
+          </EdgeLayout.Curve>
+          <EdgeLayout.Labels>
+            <EdgeLabelCollection />
+          </EdgeLayout.Labels>
+        </EdgeLayout>
+      </GraphLayout>
+    </LayoutInfo>
+  </Package>
+</Objects>]]></DTS:DesignTimeProperties>
+</DTS:Executable>

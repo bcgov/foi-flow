@@ -1,0 +1,364 @@
+﻿<?xml version="1.0"?>
+<DTS:Executable xmlns:DTS="www.microsoft.com/SqlServer/Dts"
+  DTS:refId="Package"
+  DTS:CreationDate="7/26/2023 3:32:58 PM"
+  DTS:CreationName="Microsoft.Package"
+  DTS:CreatorComputerName="WALTZ"
+  DTS:CreatorName="IDIR\AANTON_A"
+  DTS:DTSID="{A8051341-9A9E-4D11-BEB5-AF0259A25F9F}"
+  DTS:ExecutableType="Microsoft.Package"
+  DTS:LastModifiedProductVersion="15.0.2000.180"
+  DTS:LocaleID="1033"
+  DTS:ObjectName="Package"
+  DTS:PackageType="5"
+  DTS:VersionBuild="3"
+  DTS:VersionGUID="{7E49DCB1-E15B-4DF3-A59B-DC1F6ADA1C42}">
+  <DTS:Property
+    DTS:Name="PackageFormatVersion">8</DTS:Property>
+  <DTS:Variables />
+  <DTS:Executables>
+    <DTS:Executable
+      DTS:refId="Package\DFT_Applicants Load"
+      DTS:CreationName="Microsoft.Pipeline"
+      DTS:Description="Data Flow Task"
+      DTS:DTSID="{FF448575-B6C6-4D9F-936C-CF474F24A03D}"
+      DTS:ExecutableType="Microsoft.Pipeline"
+      DTS:LocaleID="-1"
+      DTS:ObjectName="DFT_Applicants Load"
+      DTS:TaskContact="Performs high-performance data extraction, transformation and loading;Microsoft Corporation; Microsoft SQL Server; (C) Microsoft Corporation; All Rights Reserved;http://www.microsoft.com/sql/support/default.asp;1">
+      <DTS:Variables />
+      <DTS:ObjectData>
+        <pipeline
+          version="1">
+          <components>
+            <component
+              refId="Package\DFT_Applicants Load\AXIS_OLEDB_CFD_applicantinfo"
+              componentClassID="Microsoft.OLEDBSource"
+              contactInfo="OLE DB Source;Microsoft Corporation; Microsoft SQL Server; (C) Microsoft Corporation; All Rights Reserved; http://www.microsoft.com/sql/support;7"
+              description="OLE DB Source"
+              name="AXIS_OLEDB_CFD_applicantinfo"
+              usesDispositions="true"
+              version="7">
+              <properties>
+                <property
+                  dataType="System.Int32"
+                  description="The number of seconds before a command times out.  A value of 0 indicates an infinite time-out."
+                  name="CommandTimeout">0</property>
+                <property
+                  dataType="System.String"
+                  description="Specifies the name of the database object used to open a rowset."
+                  name="OpenRowset"></property>
+                <property
+                  dataType="System.String"
+                  description="Specifies the variable that contains the name of the database object used to open a rowset."
+                  name="OpenRowsetVariable"></property>
+                <property
+                  dataType="System.String"
+                  description="The SQL command to be executed."
+                  name="SqlCommand"
+                  UITypeEditor="Microsoft.DataTransformationServices.Controls.ModalMultilineStringEditor">SELECT email,firstname,lastname,middleName,birthDate,businessName, STRING_AGG(CAST(requestid as nvarchar(max)),', ') as requests FROM  (
+SELECT			
+				requesters.vcEmailID as email,
+				 
+                requesters.vcFirstName as firstName,
+                requesters.vcLastName as lastName,
+                requesters.vcMiddleName as middleName,
+                requestorfields.CUSTOMFIELD35 as birthDate,
+                requesters.vcCompany as businessName,				
+				requests.vcVisibleRequestID as requestid
+
+                FROM
+                tblRequests requests WITH (NOLOCK) LEFT OUTER JOIN EC_OFFICE office WITH (NOLOCK) ON requests.tiOfficeID = office.OFFICE_ID
+
+                LEFT OUTER JOIN tblRequesters requesters WITH (NOLOCK) ON requests.iRequesterID = requesters.iRequesterID
+
+                LEFT OUTER JOIN dbo.TBLREQUESTERCUSTOMFIELDS requestorfields WITH (NOLOCK) ON requesters.iRequesterID = requestorfields.IREQUESTERID
+
+                WHERE 
+               office.OFFICE_CODE = 'CFD' AND requests.iRequestStatusID NOT IN (  SELECT iRequestStatusID FROM tblRequestStatuses WHERE vcRequestStatus in ('Closed','Canceled','CWithheld'))
+
+			 ) AS T
+
+			 GROUP BY email,firstname,lastname,middleName,birthDate,businessName</property>
+                <property
+                  dataType="System.String"
+                  description="The variable that contains the SQL command to be executed."
+                  name="SqlCommandVariable">$Project::applicantsqlquery</property>
+                <property
+                  dataType="System.Int32"
+                  description="Specifies the column code page to use when code page information is unavailable from the data source."
+                  name="DefaultCodePage">1252</property>
+                <property
+                  dataType="System.Boolean"
+                  description="Forces the use of the DefaultCodePage property value when describing character data."
+                  name="AlwaysUseDefaultCodePage">false</property>
+                <property
+                  dataType="System.Int32"
+                  description="Specifies the mode used to access the database."
+                  name="AccessMode"
+                  typeConverter="AccessMode">3</property>
+                <property
+                  dataType="System.String"
+                  description="The mappings between the parameters in the SQL command and variables."
+                  name="ParameterMapping"></property>
+              </properties>
+              <connections>
+                <connection
+                  refId="Package\DFT_Applicants Load\AXIS_OLEDB_CFD_applicantinfo.Connections[OleDbConnection]"
+                  connectionManagerID="{FA877C17-9970-459F-BFAC-AC1E9E4433B6}:external"
+                  connectionManagerRefId="Project.ConnectionManagers[IXIAS_CIRMOTST , 1435.ATIPITEST]"
+                  description="The OLE DB runtime connection used to access the database."
+                  name="OleDbConnection" />
+              </connections>
+              <outputs>
+                <output
+                  refId="Package\DFT_Applicants Load\AXIS_OLEDB_CFD_applicantinfo.Outputs[OLE DB Source Output]"
+                  name="OLE DB Source Output">
+                  <outputColumns>
+                    <outputColumn
+                      refId="Package\DFT_Applicants Load\AXIS_OLEDB_CFD_applicantinfo.Outputs[OLE DB Source Output].Columns[email]"
+                      codePage="1252"
+                      dataType="str"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\DFT_Applicants Load\AXIS_OLEDB_CFD_applicantinfo.Outputs[OLE DB Source Output].ExternalColumns[email]"
+                      length="500"
+                      lineageId="Package\DFT_Applicants Load\AXIS_OLEDB_CFD_applicantinfo.Outputs[OLE DB Source Output].Columns[email]"
+                      name="email"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\DFT_Applicants Load\AXIS_OLEDB_CFD_applicantinfo.Outputs[OLE DB Source Output].Columns[firstname]"
+                      codePage="1252"
+                      dataType="str"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\DFT_Applicants Load\AXIS_OLEDB_CFD_applicantinfo.Outputs[OLE DB Source Output].ExternalColumns[firstname]"
+                      length="50"
+                      lineageId="Package\DFT_Applicants Load\AXIS_OLEDB_CFD_applicantinfo.Outputs[OLE DB Source Output].Columns[firstname]"
+                      name="firstname"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\DFT_Applicants Load\AXIS_OLEDB_CFD_applicantinfo.Outputs[OLE DB Source Output].Columns[lastname]"
+                      codePage="1252"
+                      dataType="str"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\DFT_Applicants Load\AXIS_OLEDB_CFD_applicantinfo.Outputs[OLE DB Source Output].ExternalColumns[lastname]"
+                      length="50"
+                      lineageId="Package\DFT_Applicants Load\AXIS_OLEDB_CFD_applicantinfo.Outputs[OLE DB Source Output].Columns[lastname]"
+                      name="lastname"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\DFT_Applicants Load\AXIS_OLEDB_CFD_applicantinfo.Outputs[OLE DB Source Output].Columns[middleName]"
+                      codePage="1252"
+                      dataType="str"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\DFT_Applicants Load\AXIS_OLEDB_CFD_applicantinfo.Outputs[OLE DB Source Output].ExternalColumns[middleName]"
+                      length="40"
+                      lineageId="Package\DFT_Applicants Load\AXIS_OLEDB_CFD_applicantinfo.Outputs[OLE DB Source Output].Columns[middleName]"
+                      name="middleName"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\DFT_Applicants Load\AXIS_OLEDB_CFD_applicantinfo.Outputs[OLE DB Source Output].Columns[birthDate]"
+                      dataType="dbTimeStamp"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\DFT_Applicants Load\AXIS_OLEDB_CFD_applicantinfo.Outputs[OLE DB Source Output].ExternalColumns[birthDate]"
+                      lineageId="Package\DFT_Applicants Load\AXIS_OLEDB_CFD_applicantinfo.Outputs[OLE DB Source Output].Columns[birthDate]"
+                      name="birthDate"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\DFT_Applicants Load\AXIS_OLEDB_CFD_applicantinfo.Outputs[OLE DB Source Output].Columns[businessName]"
+                      codePage="1252"
+                      dataType="str"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\DFT_Applicants Load\AXIS_OLEDB_CFD_applicantinfo.Outputs[OLE DB Source Output].ExternalColumns[businessName]"
+                      length="200"
+                      lineageId="Package\DFT_Applicants Load\AXIS_OLEDB_CFD_applicantinfo.Outputs[OLE DB Source Output].Columns[businessName]"
+                      name="businessName"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\DFT_Applicants Load\AXIS_OLEDB_CFD_applicantinfo.Outputs[OLE DB Source Output].Columns[requests]"
+                      dataType="nText"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\DFT_Applicants Load\AXIS_OLEDB_CFD_applicantinfo.Outputs[OLE DB Source Output].ExternalColumns[requests]"
+                      lineageId="Package\DFT_Applicants Load\AXIS_OLEDB_CFD_applicantinfo.Outputs[OLE DB Source Output].Columns[requests]"
+                      name="requests"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\DFT_Applicants Load\AXIS_OLEDB_CFD_applicantinfo.Outputs[OLE DB Source Output].Columns[requesterid]"
+                      dataType="i4"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\DFT_Applicants Load\AXIS_OLEDB_CFD_applicantinfo.Outputs[OLE DB Source Output].ExternalColumns[requesterid]"
+                      lineageId="Package\DFT_Applicants Load\AXIS_OLEDB_CFD_applicantinfo.Outputs[OLE DB Source Output].Columns[requesterid]"
+                      name="requesterid"
+                      truncationRowDisposition="FailComponent" />
+                  </outputColumns>
+                  <externalMetadataColumns
+                    isUsed="True">
+                    <externalMetadataColumn
+                      refId="Package\DFT_Applicants Load\AXIS_OLEDB_CFD_applicantinfo.Outputs[OLE DB Source Output].ExternalColumns[email]"
+                      codePage="1252"
+                      dataType="str"
+                      length="500"
+                      name="email" />
+                    <externalMetadataColumn
+                      refId="Package\DFT_Applicants Load\AXIS_OLEDB_CFD_applicantinfo.Outputs[OLE DB Source Output].ExternalColumns[firstname]"
+                      codePage="1252"
+                      dataType="str"
+                      length="50"
+                      name="firstname" />
+                    <externalMetadataColumn
+                      refId="Package\DFT_Applicants Load\AXIS_OLEDB_CFD_applicantinfo.Outputs[OLE DB Source Output].ExternalColumns[lastname]"
+                      codePage="1252"
+                      dataType="str"
+                      length="50"
+                      name="lastname" />
+                    <externalMetadataColumn
+                      refId="Package\DFT_Applicants Load\AXIS_OLEDB_CFD_applicantinfo.Outputs[OLE DB Source Output].ExternalColumns[middleName]"
+                      codePage="1252"
+                      dataType="str"
+                      length="40"
+                      name="middleName" />
+                    <externalMetadataColumn
+                      refId="Package\DFT_Applicants Load\AXIS_OLEDB_CFD_applicantinfo.Outputs[OLE DB Source Output].ExternalColumns[birthDate]"
+                      dataType="dbTimeStamp"
+                      name="birthDate" />
+                    <externalMetadataColumn
+                      refId="Package\DFT_Applicants Load\AXIS_OLEDB_CFD_applicantinfo.Outputs[OLE DB Source Output].ExternalColumns[businessName]"
+                      codePage="1252"
+                      dataType="str"
+                      length="200"
+                      name="businessName" />
+                    <externalMetadataColumn
+                      refId="Package\DFT_Applicants Load\AXIS_OLEDB_CFD_applicantinfo.Outputs[OLE DB Source Output].ExternalColumns[requests]"
+                      dataType="nText"
+                      name="requests" />
+                    <externalMetadataColumn
+                      refId="Package\DFT_Applicants Load\AXIS_OLEDB_CFD_applicantinfo.Outputs[OLE DB Source Output].ExternalColumns[requesterid]"
+                      dataType="i4"
+                      name="requesterid" />
+                  </externalMetadataColumns>
+                </output>
+                <output
+                  refId="Package\DFT_Applicants Load\AXIS_OLEDB_CFD_applicantinfo.Outputs[OLE DB Source Error Output]"
+                  isErrorOut="true"
+                  name="OLE DB Source Error Output">
+                  <outputColumns>
+                    <outputColumn
+                      refId="Package\DFT_Applicants Load\AXIS_OLEDB_CFD_applicantinfo.Outputs[OLE DB Source Error Output].Columns[email]"
+                      codePage="1252"
+                      dataType="str"
+                      length="500"
+                      lineageId="Package\DFT_Applicants Load\AXIS_OLEDB_CFD_applicantinfo.Outputs[OLE DB Source Error Output].Columns[email]"
+                      name="email" />
+                    <outputColumn
+                      refId="Package\DFT_Applicants Load\AXIS_OLEDB_CFD_applicantinfo.Outputs[OLE DB Source Error Output].Columns[firstname]"
+                      codePage="1252"
+                      dataType="str"
+                      length="50"
+                      lineageId="Package\DFT_Applicants Load\AXIS_OLEDB_CFD_applicantinfo.Outputs[OLE DB Source Error Output].Columns[firstname]"
+                      name="firstname" />
+                    <outputColumn
+                      refId="Package\DFT_Applicants Load\AXIS_OLEDB_CFD_applicantinfo.Outputs[OLE DB Source Error Output].Columns[lastname]"
+                      codePage="1252"
+                      dataType="str"
+                      length="50"
+                      lineageId="Package\DFT_Applicants Load\AXIS_OLEDB_CFD_applicantinfo.Outputs[OLE DB Source Error Output].Columns[lastname]"
+                      name="lastname" />
+                    <outputColumn
+                      refId="Package\DFT_Applicants Load\AXIS_OLEDB_CFD_applicantinfo.Outputs[OLE DB Source Error Output].Columns[middleName]"
+                      codePage="1252"
+                      dataType="str"
+                      length="40"
+                      lineageId="Package\DFT_Applicants Load\AXIS_OLEDB_CFD_applicantinfo.Outputs[OLE DB Source Error Output].Columns[middleName]"
+                      name="middleName" />
+                    <outputColumn
+                      refId="Package\DFT_Applicants Load\AXIS_OLEDB_CFD_applicantinfo.Outputs[OLE DB Source Error Output].Columns[requesterid]"
+                      dataType="i4"
+                      lineageId="Package\DFT_Applicants Load\AXIS_OLEDB_CFD_applicantinfo.Outputs[OLE DB Source Error Output].Columns[requesterid]"
+                      name="requesterid" />
+                    <outputColumn
+                      refId="Package\DFT_Applicants Load\AXIS_OLEDB_CFD_applicantinfo.Outputs[OLE DB Source Error Output].Columns[birthDate]"
+                      dataType="dbTimeStamp"
+                      lineageId="Package\DFT_Applicants Load\AXIS_OLEDB_CFD_applicantinfo.Outputs[OLE DB Source Error Output].Columns[birthDate]"
+                      name="birthDate" />
+                    <outputColumn
+                      refId="Package\DFT_Applicants Load\AXIS_OLEDB_CFD_applicantinfo.Outputs[OLE DB Source Error Output].Columns[businessName]"
+                      codePage="1252"
+                      dataType="str"
+                      length="200"
+                      lineageId="Package\DFT_Applicants Load\AXIS_OLEDB_CFD_applicantinfo.Outputs[OLE DB Source Error Output].Columns[businessName]"
+                      name="businessName" />
+                    <outputColumn
+                      refId="Package\DFT_Applicants Load\AXIS_OLEDB_CFD_applicantinfo.Outputs[OLE DB Source Error Output].Columns[requests]"
+                      dataType="nText"
+                      lineageId="Package\DFT_Applicants Load\AXIS_OLEDB_CFD_applicantinfo.Outputs[OLE DB Source Error Output].Columns[requests]"
+                      name="requests" />
+                    <outputColumn
+                      refId="Package\DFT_Applicants Load\AXIS_OLEDB_CFD_applicantinfo.Outputs[OLE DB Source Error Output].Columns[ErrorCode]"
+                      dataType="i4"
+                      lineageId="Package\DFT_Applicants Load\AXIS_OLEDB_CFD_applicantinfo.Outputs[OLE DB Source Error Output].Columns[ErrorCode]"
+                      name="ErrorCode"
+                      specialFlags="1" />
+                    <outputColumn
+                      refId="Package\DFT_Applicants Load\AXIS_OLEDB_CFD_applicantinfo.Outputs[OLE DB Source Error Output].Columns[ErrorColumn]"
+                      dataType="i4"
+                      lineageId="Package\DFT_Applicants Load\AXIS_OLEDB_CFD_applicantinfo.Outputs[OLE DB Source Error Output].Columns[ErrorColumn]"
+                      name="ErrorColumn"
+                      specialFlags="2" />
+                  </outputColumns>
+                  <externalMetadataColumns />
+                </output>
+              </outputs>
+            </component>
+          </components>
+        </pipeline>
+      </DTS:ObjectData>
+    </DTS:Executable>
+  </DTS:Executables>
+  <DTS:DesignTimeProperties><![CDATA[<?xml version="1.0"?>
+<!--This CDATA section contains the layout information of the package. The section includes information such as (x,y) coordinates, width, and height.-->
+<!--If you manually edit this section and make a mistake, you can delete it. -->
+<!--The package will still be able to load normally but the previous layout information will be lost and the designer will automatically re-arrange the elements on the design surface.-->
+<Objects
+  Version="8">
+  <!--Each node below will contain properties that do not affect runtime behavior.-->
+  <Package
+    design-time-name="Package">
+    <LayoutInfo>
+      <GraphLayout
+        Capacity="4" xmlns="clr-namespace:Microsoft.SqlServer.IntegrationServices.Designer.Model.Serialization;assembly=Microsoft.SqlServer.IntegrationServices.Graph">
+        <NodeLayout
+          Size="185,42"
+          Id="Package\DFT_Applicants Load"
+          TopLeft="390,131" />
+      </GraphLayout>
+    </LayoutInfo>
+  </Package>
+  <TaskHost
+    design-time-name="Package\DFT_Applicants Load">
+    <LayoutInfo>
+      <GraphLayout
+        Capacity="4" xmlns="clr-namespace:Microsoft.SqlServer.IntegrationServices.Designer.Model.Serialization;assembly=Microsoft.SqlServer.IntegrationServices.Graph">
+        <NodeLayout
+          Size="244,42"
+          Id="Package\DFT_Applicants Load\AXIS_OLEDB_CFD_applicantinfo"
+          TopLeft="332,137" />
+      </GraphLayout>
+    </LayoutInfo>
+  </TaskHost>
+  <PipelineComponentMetadata
+    design-time-name="Package\DFT_Applicants Load\AXIS_OLEDB_CFD_applicantinfo">
+    <Properties>
+      <Property>
+        <Name>DataSourceViewID</Name>
+      </Property>
+    </Properties>
+  </PipelineComponentMetadata>
+</Objects>]]></DTS:DesignTimeProperties>
+</DTS:Executable>
