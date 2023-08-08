@@ -34,7 +34,7 @@ def downgrade():
     op.execute('Update public."ProgramAreas" set bcgovcode = \'PREM\' where iaocode = \'OOP\';commit;')
     
 
-    op.execute('UPDATE public."OperatingTeams" SET  name=\'SDPR Ministry Team\', description=\'SDPR Ministry Team\' WHERE name =\'SDPR Ministry Team\';commit;')  
-    op.execute('UPDATE public."OperatingTeams" SET  name=\'GCPE Ministry Team\', description=\'GCPE Ministry Team\' WHERE name =\'GCPE Ministry Team\';commit;') 
-    op.execute('UPDATE public."OperatingTeams" SET  name=\'PREM Ministry Team\', description=\'PREM Ministry Team\' WHERE name =\'PREM Ministry Team\';commit;') 
+    op.execute('UPDATE public."OperatingTeams" SET  name=\'SDPR Ministry Team\', description=\'SDPR Ministry Team\' WHERE name =\'MSD Ministry Team\';commit;')  
+    op.execute('UPDATE public."OperatingTeams" SET  name=\'GCPE Ministry Team\', description=\'GCPE Ministry Team\' WHERE name =\'GCP Ministry Team\';commit;') 
+    op.execute('UPDATE public."OperatingTeams" SET  name=\'PREM Ministry Team\', description=\'PREM Ministry Team\' WHERE name =\'OOP Ministry Team\';commit;') 
    
