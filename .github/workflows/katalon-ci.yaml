@@ -12,7 +12,7 @@ jobs:
     runs-on: windows-latest
     steps:
     - name: Checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3.0
       with:
         ref: dev-NK-automationscripts
     - name: set screen resolution
@@ -31,7 +31,7 @@ jobs:
             dir
       shell: cmd
     - name: Katalon Studio Github Action
-      uses: katalon-studio/katalon-studio-github-action@v2
+      uses: katalon-studio/katalon-studio-github-action@v3.0
       with:
           version: '8.2.0'
           projectPath: '${{ github.workspace }}/testing/foi-qa-automation/foi-qa-automation.prj'
@@ -46,7 +46,7 @@ jobs:
             dir
       shell: cmd
     - name: Setup Node.js
-      uses: actions/setup-node@v2
+      uses: actions/setup-node@v3.0
       with:
         node-version: '14'
     - name: Create collection report    
@@ -54,7 +54,7 @@ jobs:
             npm i -g xunit-viewer
             xunit-viewer -r  artifacts\JUnit_Report.xml -o artifacts\foi-test.html
     - name: Archive Katalon report
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3.0
       with:
         name: katalon-report
         path: artifacts
