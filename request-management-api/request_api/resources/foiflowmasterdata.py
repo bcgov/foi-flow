@@ -71,7 +71,7 @@ class FOIFlowApplicantCategories(Resource):
         except BusinessException:
             return "Error happened while accessing applicant categories" , 500
 
-
+## USE THIS API CALL TO GET ALL PROGRAM AREAS
 @cors_preflight('GET,OPTIONS')
 @API.route('/foiflow/programareas')
 class FOIFlowProgramAreas(Resource):
@@ -185,6 +185,24 @@ class FOIFlowDivisions(Resource):
             return jsondata , 200
         except BusinessException:
             return "Error happened while accessing divisions" , 500
+        
+#MAKE API CALL HERE TO GATHER ALL PROGRAM AREA DIVISIONS
+@cors_preflight('GET,OPTIONS')
+@API.route('/foiflow/divisions')
+class FOIFlowDivisions(Resource):
+    """Retrieves all active divisions.
+    """
+    def get():
+        pass
+
+#MAKE API CALL HERE TO GATHER ASSOCIATED PROGRAM AREA DIVISIONS FOR RECORDS/DOCUMENTS BASED ON MINISTRY ID / BC GOV CODE / PROGRAM ID
+@cors_preflight('GET,OPTIONS')
+@API.route('/foiflow/divisions/<id>')
+class FOIFlowDivisions(Resource):
+    """Retrieves all active divisions.
+    """
+    def get():
+        pass
 
 @cors_preflight('GET,OPTIONS')
 @API.route('/foiflow/closereasons')
