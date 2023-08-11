@@ -33,6 +33,7 @@ from request_api.schemas.foirequestsformslist import  FOIRequestsFormsList
 from request_api.services.extensionreasonservice import extensionreasonservice
 from request_api.services.cacheservice import cacheservice
 from request_api.services.subjectcodeservice import subjectcodeservice
+from request_api.services.programareadivisionservice import programareadivisionservice
 import json
 import request_api
 import requests
@@ -192,15 +193,30 @@ class FOIFlowDivisions(Resource):
 class FOIFlowDivisions(Resource):
     """Retrieves all active divisions.
     """
+    @staticmethod
+    @TRACER.trace()
+    @cross_origin(origins=allowedorigins())
+    @auth.require
+    @auth.ismemberofgroups(getrequiredmemberships())
     def get():
-        pass
+        try:
+            division_data = programareadivisionservice.getallprogramareadivisions()
+            json_response= json.dumps(division_data)
+            return json_response, 200
+        except BusinessException:
+            return "Error occured while accessing divisions", 500
 
 #MAKE API CALL HERE TO GATHER ASSOCIATED PROGRAM AREA DIVISIONS FOR RECORDS/DOCUMENTS BASED ON MINISTRY ID / BC GOV CODE / PROGRAM ID
 @cors_preflight('GET,OPTIONS')
-@API.route('/foiflow/divisions/<id>')
+@API.route('/foiflow/divisions/<int:foiministryrequestid>')
 class FOIFlowDivisions(Resource):
-    """Retrieves all active divisions.
+    """Retrieves divisions associated with records based on ministry request id.
     """
+    @staticmethod
+    @TRACER.trace()
+    @cross_origin(origins=allowedorigins())
+    @auth.require
+    @auth.ismemberofgroups(getrequiredmemberships())
     def get():
         pass
 
