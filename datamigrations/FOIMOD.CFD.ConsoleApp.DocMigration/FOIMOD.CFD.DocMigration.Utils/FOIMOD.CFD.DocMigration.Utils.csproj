@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AWSSDK.S3" Version="3.7.201.12" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\FOIMOD.CFD.DocMigration.Models\FOIMOD.CFD.DocMigration.Models.csproj" />
+  </ItemGroup>
+
+</Project>
