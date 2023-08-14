@@ -34,6 +34,7 @@ from request_api.services.extensionreasonservice import extensionreasonservice
 from request_api.services.cacheservice import cacheservice
 from request_api.services.subjectcodeservice import subjectcodeservice
 from request_api.services.programareadivisionservice import programareadivisionservice
+from request_api.services.recordservice import recordservice
 import json
 import request_api
 import requests
@@ -72,7 +73,7 @@ class FOIFlowApplicantCategories(Resource):
         except BusinessException:
             return "Error happened while accessing applicant categories" , 500
 
-## USE THIS API CALL TO GET ALL PROGRAM AREAS
+## USE THIS API CALL TO GET ALL PROGRAM AREAS - TEST WIP
 @cors_preflight('GET,OPTIONS')
 @API.route('/foiflow/programareas')
 class FOIFlowProgramAreas(Resource):
@@ -187,7 +188,7 @@ class FOIFlowDivisions(Resource):
         except BusinessException:
             return "Error happened while accessing divisions" , 500
         
-#MAKE API CALL HERE TO GATHER ALL PROGRAM AREA DIVISIONS
+#MAKE API CALL HERE TO GATHER ALL PROGRAM AREA DIVISIONS - TEST WIP
 @cors_preflight('GET,OPTIONS')
 @API.route('/foiflow/divisions')
 class FOIFlowDivisions(Resource):
@@ -204,21 +205,35 @@ class FOIFlowDivisions(Resource):
             json_response= json.dumps(division_data)
             return json_response, 200
         except BusinessException:
-            return "Error occured while accessing divisions", 500
+            return "Error happened while accessing divisions", 500
 
-#MAKE API CALL HERE TO GATHER ASSOCIATED PROGRAM AREA DIVISIONS FOR RECORDS/DOCUMENTS BASED ON MINISTRY ID / BC GOV CODE / PROGRAM ID
+#MAKE API CALL HERE TO GATHER ASSOCIATED PROGRAM AREA DIVISIONS FOR RECORDS BASED ON REQUEST ID - TEST WIP
 @cors_preflight('GET,OPTIONS')
-@API.route('/foiflow/divisions/<int:foiministryrequestid>')
-class FOIFlowDivisions(Resource):
-    """Retrieves divisions associated with records based on ministry request id.
+@API.route('/foiflow/divisions/<int:foirequestid>')
+class FOIFlowDivisionsForFOIRequestRecords(Resource):
+    """Retrieves all active divisions associated with foi request records based on foi request id.
     """
     @staticmethod
     @TRACER.trace()
     @cross_origin(origins=allowedorigins())
     @auth.require
     @auth.ismemberofgroups(getrequiredmemberships())
-    def get():
-        pass
+    def get(foirequestid):
+        try:
+            divisions = {div['divisionid']: div for div in programareadivisionservice.getallprogramareadivisions()}
+            # {1: Divobj, 2: divobj... }
+            records = {record['recordid']: record for record in recordservice.fetch(foirequestid)}
+
+            for recordid in records:
+                record = records[recordid]
+                record_divisions = set(map(lambda d: d['divisionid'], record['attributes']['divisions']))
+                record['divisions'] = list(map(lambda d: divisions[d], record_divisions))
+
+            response = [records[recordid] for recordid in records]
+            json_response = json.dumps(response)
+            return json_response, 200
+        except BusinessException:
+            return "Error happened while accessing records", 500
 
 @cors_preflight('GET,OPTIONS')
 @API.route('/foiflow/closereasons')
