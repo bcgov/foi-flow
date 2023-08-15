@@ -201,7 +201,7 @@ class FOIFlowDivisions(Resource):
     @auth.ismemberofgroups(getrequiredmemberships())
     def get():
         try:
-            division_data = programareadivisionservice.getallprogramareadivisions()
+            division_data = programareadivisionservice().getallprogramareadivisions()
             json_response= json.dumps(division_data)
             return json_response, 200
         except BusinessException:
@@ -220,8 +220,7 @@ class FOIFlowDivisionsForFOIRequestRecords(Resource):
     @auth.ismemberofgroups(getrequiredmemberships())
     def get(foirequestid):
         try:
-            divisions = {div['divisionid']: div for div in programareadivisionservice.getallprogramareadivisions()}
-            # {1: Divobj, 2: divobj... }
+            divisions = {div['divisionid']: div for div in programareadivisionservice().getallprogramareadivisions()}
             records = {record['recordid']: record for record in recordservice.fetch(foirequestid)}
 
             for recordid in records:
