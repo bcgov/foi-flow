@@ -167,7 +167,6 @@ const StateDropDown = ({
     return isValidationError || requestState === StateEnum.unopened.name;
   };
   const statusList = getStatusList();
-  console.log("statusList",statusList)
   const menuItems =
     statusList.length > 0 &&
     statusList.map((item, index) => {
