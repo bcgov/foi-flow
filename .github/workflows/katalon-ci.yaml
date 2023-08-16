@@ -4,6 +4,8 @@ on:
     - cron: "0 13 * * *"
   # push:
   #   branches: [ dev-NK-automationscripts ]
+  push:
+      branches: [ dev-automationscripts ]
   # pull_request:
     # branches: [ dev ]
 
@@ -50,7 +52,7 @@ jobs:
             dir
       shell: cmd
     - name: Setup Node.js
-      uses: actions/setup-node@v2
+      uses: actions/setup-node@v3
       with:
         node-version: '14'
     - name: Create collection report    
@@ -58,7 +60,7 @@ jobs:
             npm i -g xunit-viewer
             xunit-viewer -r  artifacts\JUnit_Report.xml -o artifacts\foi-test.html
     - name: Archive Katalon report
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: katalon-report
         path: artifacts
