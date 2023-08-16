@@ -4,6 +4,7 @@ on:
     - cron: "0 13 * * *"
   # push:
   #   branches: [ dev-NK-automationscripts ]
+  #changes_run
   push:
       branches: [ dev-automationscripts ]
   # pull_request:
