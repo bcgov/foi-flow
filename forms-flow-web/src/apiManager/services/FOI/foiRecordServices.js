@@ -1,6 +1,6 @@
 import {
     httpGETRequest,
-    httpGETRequest1,
+    httpOpenGETRequest,
     httpPOSTRequest,
   } from "../../httpRequestHandler";
   import API from "../../endpoints";
@@ -216,7 +216,7 @@ const postRecord = (dispatch, apiUrl, data, errorMessage, rest, type="download")
 export const getRecordFormats = (...rest) => {
   const done = fnDone(rest);
     return (dispatch) => {
-      httpGETRequest1(FOI_RECORD_FORMATS, null)
+      httpOpenGETRequest(FOI_RECORD_FORMATS)
         .then((res) => {
           if (res.data) {
             dispatch(setRecordFormats([... new Set([...res.data.conversion, ...res.data.dedupe, ...res.data.nonredactable])]))
