@@ -156,7 +156,7 @@ export const RecordsLog = ({
   ministryAssignedToList,
   isMinistryCoordinator,
   setRecordsUploading,
-  tabStatus
+  recordsTabSelect
 }) => {
 
   let recordsObj = useSelector(
@@ -193,9 +193,9 @@ export const RecordsLog = ({
 
 
   useEffect(() => {
-    console.log(tabStatus);
+    console.log(recordsTabSelect);
     console.log(conversionFormats?.length);
-    if (tabStatus?.Records.isactive && conversionFormats?.length < 1) {
+    if (recordsTabSelect && conversionFormats?.length < 1) {
       console.log("match");
       toast.error(
         "Temporarily unable to save your request. Please try again in a few minutes.",
@@ -211,7 +211,7 @@ export const RecordsLog = ({
       );
 
      }
-  }, [tabStatus, conversionFormats])
+  }, [recordsTabSelect, conversionFormats])
 
  
 

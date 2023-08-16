@@ -855,7 +855,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
                   isMinistryCoordinator={true}
                   bcgovcode={JSON.parse(bcgovcode)}
                   setRecordsUploading={setRecordsUploading}
-                  tabStatus={tabLinksStatuses}
+                  recordsTabSelect={tabLinksStatuses.Records.active}
                 />
               </>
             ) : (

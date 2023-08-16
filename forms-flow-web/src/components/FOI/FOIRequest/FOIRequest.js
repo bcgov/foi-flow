@@ -1255,7 +1255,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
                   bcgovcode={JSON.parse(bcgovcode)}
                   setRecordsUploading={setRecordsUploading}
                   divisions={requestDetails.divisions}
-                  tabStatus={tabLinksStatuses}
+                  recordsTabSelect={tabLinksStatuses.Records.active}
                 />
               </>
             }
