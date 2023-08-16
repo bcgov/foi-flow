@@ -16,6 +16,7 @@ const AdditionalApplicantDetails = React.memo(({requestDetails, createSaveReques
      *  No mandatory fields here
      */ 
 
+    console.log(requestDetails);
      const useStyles = makeStyles({
       heading: {
         color: '#FFF',
@@ -53,7 +54,7 @@ const AdditionalApplicantDetails = React.memo(({requestDetails, createSaveReques
     );
     const [identityVerifiedText, setIdentityVerified] = React.useState(
       validateField(
-        requestDetails?.additionalPersonalInfo,
+        requestDetails,
         FOI_COMPONENT_CONSTANTS.IDENTITY_VERIFIED
       )
     );
@@ -81,7 +82,7 @@ const AdditionalApplicantDetails = React.memo(({requestDetails, createSaveReques
         FOI_COMPONENT_CONSTANTS.PERSONAL_HEALTH_NUMBER
       ));
       setIdentityVerified(validateField(
-        requestDetails?.additionalPersonalInfo,
+        requestDetails,
         FOI_COMPONENT_CONSTANTS.IDENTITY_VERIFIED
       ));
       setCorrectionsNumber(validateField(requestDetails, FOI_COMPONENT_CONSTANTS.CORRECTIONS_NUMBER));
@@ -105,6 +106,7 @@ const AdditionalApplicantDetails = React.memo(({requestDetails, createSaveReques
   }
 
   const handleIdentityVerified = (e) => {
+    console.log("IdentityVerified:",e.target.value)
     setIdentityVerified(e.target.value);
     createSaveRequestObject(FOI_COMPONENT_CONSTANTS.IDENTITY_VERIFIED, e.target.value);
   }
@@ -169,7 +171,7 @@ const AdditionalApplicantDetails = React.memo(({requestDetails, createSaveReques
                     value={identityVerifiedText}
                     onChange={handleIdentityVerified}
                     fullWidth
-                    disabled={disableInput}
+                    disabled
                   />                                                
               </div>
               <div className="col-lg-6 foi-details-col">

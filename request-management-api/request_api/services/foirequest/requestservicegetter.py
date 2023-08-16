@@ -54,8 +54,9 @@ class requestservicegetter:
         additionalpersonalinfo.update(additionalpersonalinfodetails)
         
         baserequestinfo['additionalPersonalInfo'] = additionalpersonalinfo
-        originalduedate = FOIMinistryRequest.getrequestoriginalduedate(foiministryrequestid)       
-        baserequestinfo['originalDueDate'] = originalduedate.strftime(self.__genericdateformat())
+        legislativeDueDate = FOIMinistryRequest.getrequestoriginalduedate(foiministryrequestid)       
+        baserequestinfo['legislativeDueDate'] = legislativeDueDate.strftime(self.__genericdateformat())
+        baserequestinfo['originalDueDate'] = parse(requestministry['originalldd']).strftime(self.__genericdateformat()) if requestministry['originalldd'] is not None else ''
         baserequestinfo['iaorestricteddetails'] = iaorestrictrequestdetails
         return baserequestinfo
     
@@ -127,6 +128,7 @@ class requestservicegetter:
         return requestdetails
 
     def __preparebaseinfo(self,request,foiministryrequestid,requestministry,requestministrydivisions):
+        print("requestministry-:",requestministry['originalldd'])
         _receiveddate = parse(request['receiveddate'])
         axissyncdatenoneorempty =  self.__noneorempty(requestministry["axissyncdate"]) 
         linkedministryrequests= []
@@ -153,7 +155,8 @@ class requestservicegetter:
             'currentState':requestministry['requeststatus.name'],            
             'requeststatusid':requestministry['requeststatus.requeststatusid'],
             'requestProcessStart': parse(requestministry['startdate']).strftime(self.__genericdateformat()) if requestministry['startdate'] is not None else '',
-            'dueDate':parse(requestministry['duedate']).strftime(self.__genericdateformat()),            
+            'dueDate':parse(requestministry['duedate']).strftime(self.__genericdateformat()),  
+            'originalDueDate':  parse(requestministry['originalldd']).strftime(self.__genericdateformat()) if requestministry['originalldd'] is not None else '',            
             'programareaid':requestministry['programarea.programareaid'],
             'bcgovcode':requestministry['programarea.bcgovcode'],
             'category':request['applicantcategory.name'],
@@ -171,7 +174,9 @@ class requestservicegetter:
             'closedate': parse(requestministry['closedate']).strftime(self.__genericdateformat()) if requestministry['closedate'] is not None else None,
             'subjectCode': subjectcodeservice().getministrysubjectcodename(foiministryrequestid),
             'isofflinepayment': FOIMinistryRequest.getofflinepaymentflag(foiministryrequestid),
-            'linkedRequests' : linkedministryrequests
+            'linkedRequests' : linkedministryrequests,
+            'identityVerified':requestministry['identityverified'],
+            
         }
         if requestministry['cfrduedate'] is not None:
             baserequestinfo.update({'cfrDueDate':parse(requestministry['cfrduedate']).strftime(self.__genericdateformat())})

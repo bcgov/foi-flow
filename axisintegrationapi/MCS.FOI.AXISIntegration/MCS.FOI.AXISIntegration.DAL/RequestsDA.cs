@@ -53,6 +53,7 @@ namespace MCS.FOI.AXISIntegration.DAL
                     axisRequest.StartDate = RequestsHelper.ConvertDateToString(row, "requestProcessStart", "yyyy-MM-dd");
                     axisRequest.DueDate = RequestsHelper.ConvertDateToString(row, "dueDate", "yyyy-MM-dd");
                     axisRequest.CFRDueDate = RequestsHelper.ConvertDateToString(row, "cfrDueDate", "yyyy-MM-dd");
+                    axisRequest.OriginalDueDate = RequestsHelper.ConvertDateToString(row, "originalDueDate", "yyyy-MM-dd");
 
                     axisRequest.DeliveryMode = RequestsHelper.GetDeliveryMode(Convert.ToString(row["deliveryMode"]));
                     axisRequest.ReceivedMode = RequestsHelper.GetReceivedMode(Convert.ToString(row["receivedMode"]));
@@ -83,6 +84,7 @@ namespace MCS.FOI.AXISIntegration.DAL
                     axisRequest.Ispiiredacted = true;
                     axisRequest.RequestPageCount = Convert.ToInt32(row["requestPageCount"]);
                     axisRequest.SubjectCode = Convert.ToString(row["subjectCode"]);
+                    axisRequest.IdentityVerified = Convert.ToString(row["identityVerified"]);
                     List<Ministry> ministryList = new()
                     {
                         new Ministry(RequestsHelper.GetMinistryCode(Convert.ToString(row["selectedMinistry"])))
@@ -151,6 +153,7 @@ namespace MCS.FOI.AXISIntegration.DAL
                 when requests.IREQUESTID = redaction.IREQUESTID and redaction.IDOCID = ldocuments.IDOCID then ldocuments.SIPAGECOUNT 
                 else 0 end) as requestPageCount,
                 REPLACE(requestfields.CUSTOMFIELD33, CHAR(160), ' ') as subjectCode,
+                requestfields.CUSTOMFIELD75 as identityVerified,
                 (SELECT TOP 1 cfr.sdtDueDate FROM tblRequestForDocuments cfr WITH (NOLOCK) 
                 INNER JOIN tblProgramOffices programoffice WITH (NOLOCK) ON programoffice.tiProgramOfficeID = cfr.tiProgramOfficeID 
                 WHERE requests.iRequestID = cfr.iRequestID 
@@ -182,7 +185,7 @@ namespace MCS.FOI.AXISIntegration.DAL
                 requesters.vcAddress1, requesters.vcAddress2, requesters.vcCity, requesters.vcZipCode,
                 requesters.vcHome, requesters.vcMobile, requesters.vcWork1, requesters.vcWork2, requesters.vcFirstName, requesters.vcLastName, requesters.vcMiddleName,
                 requests.iRequestID, requesters.vcCompany, requesters.vcEmailID, onbehalf.vcFirstName, onbehalf.vcLastName, onbehalf.vcMiddleName,
-                requestTypes.iLabelID, requests.vcVisibleRequestID, requests.tiOfficeID, office.OFFICE_ID,requestorfields.CUSTOMFIELD35, REPLACE(requestfields.CUSTOMFIELD33, CHAR(160), ' ')";
+                requestTypes.iLabelID, requests.vcVisibleRequestID, requests.tiOfficeID, office.OFFICE_ID,requestorfields.CUSTOMFIELD35, REPLACE(requestfields.CUSTOMFIELD33, CHAR(160), ' '),requestfields.CUSTOMFIELD75";
             DataTable dataTable = new();
             using (sqlConnection = new SqlConnection(ConnectionString))
             {

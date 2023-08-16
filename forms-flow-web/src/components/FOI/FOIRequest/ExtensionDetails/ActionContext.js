@@ -28,7 +28,7 @@ export const ActionProvider = ({ children, requestDetails, requestState }) => {
 
   const currentDueDate = formatDate(requestDetails.dueDate);
   const startDate = formatDate(requestDetails.requestProcessStart);
-  const originalDueDate = formatDate(requestDetails.originalDueDate);
+  const originalDueDate = formatDate(requestDetails.legislativeDueDate);
   const extensions = useSelector(
     (state) => state.foiRequests.foiRequestExtesions
   );
