@@ -30,7 +30,7 @@ class OperatingTeam(db.Model):
     def getteam(cls, team):    
         try:            
             sql = """select type, name from "OperatingTeams" ot 
-                    where replace(lower(name),' ','') = replace(:team,' ','')"""
+                    where replace(lower(name),' ','') = replace(lower(:team),' ','')"""
             rs = db.session.execute(text(sql), {'team': team})
             for row in rs:
                 return {'type': row["type"], 'name': row['name']}
