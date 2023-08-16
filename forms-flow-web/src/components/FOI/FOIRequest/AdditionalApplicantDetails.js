@@ -16,7 +16,6 @@ const AdditionalApplicantDetails = React.memo(({requestDetails, createSaveReques
      *  No mandatory fields here
      */ 
 
-    console.log(requestDetails);
      const useStyles = makeStyles({
       heading: {
         color: '#FFF',
@@ -106,7 +105,6 @@ const AdditionalApplicantDetails = React.memo(({requestDetails, createSaveReques
   }
 
   const handleIdentityVerified = (e) => {
-    console.log("IdentityVerified:",e.target.value)
     setIdentityVerified(e.target.value);
     createSaveRequestObject(FOI_COMPONENT_CONSTANTS.IDENTITY_VERIFIED, e.target.value);
   }

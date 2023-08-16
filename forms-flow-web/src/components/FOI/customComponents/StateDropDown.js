@@ -100,8 +100,8 @@ const StateDropDown = ({
         return _stateList.intakeinprogress;
       case StateEnum.peerreview.name.toLowerCase():
         if(!isMinistryCoordinator){
-          const currentStatusVersion = stateTransition[0]?.version; 
-          const previousState = stateTransition?.find((state)=>state?.version == (currentStatusVersion-1) )?.status; 
+          //const currentStatusVersion = stateTransition[0]?.version; 
+          const previousState = stateTransition?.length > 0 && stateTransition[1]?.status; 
           if(previousState === StateEnum.intakeinprogress.name){
             return _stateList.intakeinprogress;
           }
@@ -167,7 +167,7 @@ const StateDropDown = ({
     return isValidationError || requestState === StateEnum.unopened.name;
   };
   const statusList = getStatusList();
-
+  console.log("statusList",statusList)
   const menuItems =
     statusList.length > 0 &&
     statusList.map((item, index) => {
