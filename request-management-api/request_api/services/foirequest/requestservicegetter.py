@@ -54,9 +54,8 @@ class requestservicegetter:
         additionalpersonalinfo.update(additionalpersonalinfodetails)
         
         baserequestinfo['additionalPersonalInfo'] = additionalpersonalinfo
-        legislativeDueDate = FOIMinistryRequest.getrequestoriginalduedate(foiministryrequestid)       
-        baserequestinfo['legislativeDueDate'] = legislativeDueDate.strftime(self.__genericdateformat())
-        baserequestinfo['originalDueDate'] = parse(requestministry['originalldd']).strftime(self.__genericdateformat()) if requestministry['originalldd'] is not None else ''
+        originalLdd= FOIMinistryRequest.getrequestoriginalduedate(foiministryrequestid).strftime(self.__genericdateformat())
+        baserequestinfo['originalDueDate'] = parse(requestministry['originalldd']).strftime(self.__genericdateformat()) if requestministry['originalldd'] is not None else originalLdd
         baserequestinfo['iaorestricteddetails'] = iaorestrictrequestdetails
         return baserequestinfo
     
