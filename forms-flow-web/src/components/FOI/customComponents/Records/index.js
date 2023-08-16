@@ -193,8 +193,6 @@ export const RecordsLog = ({
 
 
   useEffect(() => {
-    console.log(recordsTabSelect);
-    console.log(conversionFormats?.length);
     if (recordsTabSelect && conversionFormats?.length < 1) {
       console.log("match");
       toast.error(
