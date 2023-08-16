@@ -134,36 +134,6 @@ export const fetchFOIRecords = (requestId, ministryId, ...rest) => {
   };
 };
 
-export const fetchRedactedSections = (ministryId, ...rest) => {
-  if (!ministryId) {
-    return () => {};
-  }
-  const done = fnDone(rest);
-  let apiUrl = replaceUrl(
-    API.DOC_REVIEWER_REDACTED_SECTIONS,
-    "<ministryrequestid>", ministryId);
-  return (dispatch) => {
-    dispatch(setRecordsLoader('inprogress'))
-    httpGETRequest(apiUrl, {}, UserService.getToken())
-      .then((res) => {
-        if (res.data) {
-          dispatch(setRecordsLoader('completed'))
-          done(null, res.data);
-        } else {
-          console.log("Error in fetching redacted sections", res);
-          dispatch(serviceActionError(res));
-          dispatch(setRecordsLoader('error'))
-        }
-      })
-      .catch((error) => {
-        console.log("Error in fetching redacted section", error);
-        dispatch(serviceActionError(error));
-        dispatch(setRecordsLoader('error'))
-        done(error);
-      });
-  };
-}
-
 export const saveFOIRecords = (requestId, ministryId, data, ...rest) => {
     let apiUrl = replaceUrl(replaceUrl(
       API.FOI_GET_RECORDS,
