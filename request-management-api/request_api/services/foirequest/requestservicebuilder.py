@@ -32,6 +32,8 @@ class requestservicebuilder(requestserviceconfigurator):
         foiministryrequest.description = requestschema.get("description")
         foiministryrequest.duedate = requestschema.get("dueDate")
         foiministryrequest.linkedrequests = requestschema.get("linkedRequests")
+        foiministryrequest.identityverified = requestschema.get("identityVerified")
+        foiministryrequest.originalldd = requestschema.get("originalDueDate")
         if requestschema.get("cfrDueDate") is not None and requestschema.get("cfrDueDate")  != "":
             foiministryrequest.cfrduedate = requestschema.get("cfrDueDate")
         startdate = ""
