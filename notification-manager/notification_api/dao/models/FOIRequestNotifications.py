@@ -21,6 +21,7 @@ class FOIRequestNotification(object):
     created_at = fields.Str(data_key="created_at")
     
     def savenotification(self, notificationschema):
+        conn = None
         try:
             id_of_new_row = None
             conn = getconnection()
@@ -36,8 +37,8 @@ class FOIRequestNotification(object):
             return id_of_new_row            
         except(Exception) as error:
             logging.error(error)
-            raise   
         finally:
-            conn.close()
+            if conn:
+                conn.close()
             
     

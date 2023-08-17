@@ -5,7 +5,8 @@ class OperatingTeam:
 
 
     @classmethod
-    def gettype(cls, team):    
+    def gettype(cls, team):   
+        conn = None 
         try:
             _notificationtypes = []
             conn = getconnection()
@@ -19,8 +20,8 @@ class OperatingTeam:
             return _notificationtypes
         except(Exception) as error:
             logging.error(error)
-            raise   
         finally:
-            conn.close()
+            if conn:
+                conn.close()
 
     
