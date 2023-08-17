@@ -50,15 +50,15 @@ jobs:
             dir
       shell: cmd
     - name: Setup Node.js
-      uses: actions/setup-node@v3
+      uses: actions/setup-node@v3.0
       with:
-        node-version: '14'
+        node-version: '16'
     - name: Create collection report    
       run: |
             npm i -g xunit-viewer
             xunit-viewer -r  artifacts\JUnit_Report.xml -o artifacts\foi-test.html
     - name: Archive Katalon report
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v3.0
       with:
         name: katalon-report
         path: artifacts
