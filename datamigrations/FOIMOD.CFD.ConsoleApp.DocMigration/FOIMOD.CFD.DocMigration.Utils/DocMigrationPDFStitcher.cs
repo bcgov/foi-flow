@@ -1,40 +1,37 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Amazon;
-using FOIMOD.CFD.DocMigration.Models.Document;
+﻿using FOIMOD.CFD.DocMigration.Models.Document;
 using PdfSharpCore;
 using PdfSharpCore.Pdf;
 using PdfSharpCore.Pdf.IO;
+using TheArtOfDev.HtmlRenderer.PdfSharp;
 
 namespace FOIMOD.CFD.DocMigration.Utils
 {
-    public class DocMigrationPDFStitcher :IDisposable
+    public class DocMigrationPDFStitcher : IDisposable
     {
-        
-        private  Stream mergeddocstream = null;
+
+        private Stream mergeddocstream = null;
+        private Stream createemailpdfmemorystream = null;
         public DocMigrationPDFStitcher()
         {
-           
+
         }
 
         public void Dispose()
         {
-            
+
             mergeddocstream.Close();
             mergeddocstream.Dispose();
         }
 
-        public Stream  MergePDFs(PDFDocToMerge[] pdfpages)
+        public Stream MergePDFs(DocumentToMigrate[] pdfpages)
         {
-            var _pdfpages = pdfpages.OrderBy(p => p.PageSequenceNumber).ToArray<PDFDocToMerge>();
+            var _pdfpages = pdfpages.OrderBy(p => p.PageSequenceNumber).ToArray<DocumentToMigrate>();
             using (PdfDocument pdfdocument = new PdfDocument())
             {
-                foreach (PDFDocToMerge pDFDocToMerge in _pdfpages)
+                foreach (DocumentToMigrate pDFDocToMerge in _pdfpages)
                 {
-                    using PdfDocument inputPDFDocument = PdfReader.Open(pDFDocToMerge.PageFilePath, PdfDocumentOpenMode.Import);
+                    using PdfDocument inputPDFDocument = !pDFDocToMerge.HasStreamForDocument ? PdfReader.Open(pDFDocToMerge.PageFilePath, PdfDocumentOpenMode.Import) : PdfReader.Open(pDFDocToMerge.FileStream, PdfDocumentOpenMode.Import);
+
                     pdfdocument.Version = inputPDFDocument.Version;
                     foreach (PdfPage page in inputPDFDocument.Pages)
                     {
@@ -45,6 +42,56 @@ namespace FOIMOD.CFD.DocMigration.Utils
                 pdfdocument.Save(mergeddocstream);
             }
             return mergeddocstream;
+        }
+
+
+
+
+        public Stream CreatePDFDocument(string emailcontent, string emailsubject, string emaildate, string emailTo)
+        {
+            try
+            {
+
+
+                var htmlofpdf = string.Format(@"<table border=""1"" cellpadding=""1"" cellspacing=""1"" style=""width:100%"">
+	                            <tbody>
+		                            <tr>
+			                            <td>Emailed To</td>
+			                            <td>{0}</td>
+		                            </tr>
+		                            <tr>
+			                            <td>Date</td>
+			                            <td>{1}</td>
+		                            </tr>
+		                            <tr>
+			                            <td>Subject</td>
+			                            <td>{2}</td>
+		                            </tr>
+		                            <tr>
+			                            <td>Message</td>
+			                            <td>{3}</td>
+		                            </tr>
+	                            </tbody>
+                            </table>", emailTo, emaildate, emailsubject, emailcontent);
+
+                using (PdfDocument pdfdocument = new PdfDocument())
+                {
+                    PdfGenerator.AddPdfPages(pdfdocument, htmlofpdf, PageSize.A4);
+                    createemailpdfmemorystream = new MemoryStream();
+                    pdfdocument.Save(createemailpdfmemorystream);
+                }
+            }
+            catch (Exception ex)
+            {
+                createemailpdfmemorystream.Close();
+                createemailpdfmemorystream.Dispose();
+                Console.WriteLine(ex.Message);
+                throw;
+            }
+
+
+            return createemailpdfmemorystream;
+
         }
     }
 }

@@ -9,6 +9,7 @@
   <ItemGroup>
     <PackageReference Include="AWSSDK.S3" Version="3.7.201.12" />
     <PackageReference Include="PdfSharpCore" Version="1.3.57" />
+    <PackageReference Include="Polybioz.HtmlRenderer.PdfSharp.Core" Version="1.0.0" />
   </ItemGroup>
 
   <ItemGroup>
