@@ -19,7 +19,7 @@ namespace FOIMOD.CFD.DocMigration.DAL
             sqlConnection = _sqlConnection;
         }
 
-        private string correspondencelog = string.Format(@"SELECT 
+        private string correspondencelog = @"SELECT 
 
                                             R.vcVisibleRequestID
                                             , C.vcSubject
@@ -32,7 +32,7 @@ namespace FOIMOD.CFD.DocMigration.DAL
                                             FROM tblCorrespondence C JOIN tblRequests R on C.iRequestID = R.iRequestID
                                             WHERE R.vcVisibleRequestID in ({0})
 
-                                            GROUP BY R.vcVisibleRequestID,C.vcSubject,C.sdtMailedDate,C.vcEmail,C.vcFromEmail,CAST(C.vcBody as NVARCHAR(max))", "'CFD-2015-50011','CFD-2014-50119','CLB-2017-70004'");
+                                            GROUP BY R.vcVisibleRequestID,C.vcSubject,C.sdtMailedDate,C.vcEmail,C.vcFromEmail,CAST(C.vcBody as NVARCHAR(max))";
 
 
         private string recordsbyrequestid = @"
@@ -62,7 +62,7 @@ namespace FOIMOD.CFD.DocMigration.DAL
             switch (documentTypeFromAXIS) {
 
                 case DocumentTypeFromAXIS.CorrespondenceLog:
-                    query = correspondencelog;
+                    query =string.Format(correspondencelog,requestnumber);
                     break;
                 case DocumentTypeFromAXIS.RequestRecords:
                     query = string.Format(recordsbyrequestid, requestnumber);
@@ -76,10 +76,10 @@ namespace FOIMOD.CFD.DocMigration.DAL
             return query;
         }
 
-        public List<DocumentToMigrate>? GetCorrespondenceLogDocuments()
+        public List<DocumentToMigrate>? GetCorrespondenceLogDocuments(string cs_requestnumbers)
         {
             List<DocumentToMigrate> documentToMigrates = null;
-            using (SqlDataAdapter sqlSelectCommand = new(getQueryByType(DocumentTypeFromAXIS.CorrespondenceLog), sqlConnection))
+            using (SqlDataAdapter sqlSelectCommand = new(getQueryByType(DocumentTypeFromAXIS.CorrespondenceLog, cs_requestnumbers), sqlConnection))
             {                
                 try
                 {

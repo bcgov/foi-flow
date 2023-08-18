@@ -13,7 +13,7 @@ namespace FOIMOD.CFD.DocMigration.AXIS.DAL.UnitTests
         {
             
             DocumentsDAL documentsDAL = new DocumentsDAL(conn);
-            var correspondencelogs = documentsDAL.GetCorrespondenceLogDocuments();
+            var correspondencelogs = documentsDAL.GetCorrespondenceLogDocuments("'CFD-2015-50011','CFD-2014-50119','CLB-2017-70004'");
             Assert.IsNotNull(correspondencelogs);
             
         }
