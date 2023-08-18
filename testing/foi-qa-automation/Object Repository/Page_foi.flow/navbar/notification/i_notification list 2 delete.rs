@@ -10,6 +10,10 @@
          <value>//div[@id='uncontrolled-tab-example-tabpane-my-request']/div[2]/div[2]/div/div[2]/i</value>
       </entry>
       <entry>
+         <key>BASIC</key>
+         <value>id(&quot;uncontrolled-tab-example-tabpane-my-request&quot;)/div[@class=&quot;notification-list list-group&quot;]/div[@class=&quot;list-group-item&quot;]/div[@class=&quot;row&quot;]/div[@class=&quot;close-btn-align col&quot;]/i[@class=&quot;fa fa-times&quot;]</value>
+      </entry>
+      <entry>
          <key>CSS</key>
       </entry>
    </selectorCollection>
@@ -21,6 +25,7 @@
       <name>tag</name>
       <type>Main</type>
       <value>i</value>
+      <webElementGuid>bdf2d47c-f71b-4c23-ad5b-6aac01d74509</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -28,6 +33,7 @@
       <name>class</name>
       <type>Main</type>
       <value>fa fa-times</value>
+      <webElementGuid>891bfab0-9b28-4969-91ae-6e5f34d78e05</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>true</isSelected>
@@ -35,6 +41,7 @@
       <name>xpath</name>
       <type>Main</type>
       <value>id(&quot;uncontrolled-tab-example-tabpane-my-request&quot;)/div[@class=&quot;notification-list list-group&quot;]/div[@class=&quot;list-group-item&quot;]/div[@class=&quot;row&quot;]/div[@class=&quot;close-btn-align col&quot;]/i[@class=&quot;fa fa-times&quot;]</value>
+      <webElementGuid>0a0216e4-dc97-4657-ac7e-2885644b318d</webElementGuid>
    </webElementProperties>
    <webElementXpaths>
       <isSelected>true</isSelected>
@@ -42,6 +49,7 @@
       <name>xpath:idRelative</name>
       <type>Main</type>
       <value>//div[@id='uncontrolled-tab-example-tabpane-my-request']/div[2]/div[2]/div/div[2]/i</value>
+      <webElementGuid>1ab8ba57-72aa-49c6-ab85-9582768dac14</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -49,5 +57,6 @@
       <name>xpath:position</name>
       <type>Main</type>
       <value>//div[2]/div/div[2]/i</value>
+      <webElementGuid>8a00c224-bb05-4c09-b41f-8f743b70e65b</webElementGuid>
    </webElementXpaths>
 </WebElementEntity>

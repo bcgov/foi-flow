@@ -65,7 +65,7 @@ WebUI.verifyElementPresent(findTestObject('Page_foi.flow/ministry view/form/divi
 
 WebUI.click(findTestObject('Page_foi.flow/form/closing modal/div_close dropdown'), FailureHandling.STOP_ON_FAILURE)
 
-WebUI.click(findTestObject('Page_foi.flow/ministry view/form/divisional tracking/div_ministry division stage'))
+WebUI.click(findTestObject('Records/input_Select Division Stage_mui-53'))
 
 WebUI.verifyElementPresent(findTestObject('Page_foi.flow/ministry view/form/divisional tracking/stage dropdown options/li_Clarification'), 
     0)
@@ -113,8 +113,7 @@ WebUI.click(findTestObject('Page_foi.flow/ministry view/form/divisional tracking
 WebUI.verifyElementText(findTestObject('Page_foi.flow/ministry view/form/divisional tracking/div_ministry division dropdown'), 
     'Deputy Minister\'s Office')
 
-WebUI.verifyElementText(findTestObject('Page_foi.flow/ministry view/form/divisional tracking/div_ministry division stage'), 
-    'Clarification')
+WebUI.verifyElementText(findTestObject('Records/input_Select Division Stage_mui-53'), 'Clarification')
 
 //WebUI.verifyElementClickable(findTestObject('Page_foi.flow/form/button_Save'), FailureHandling.STOP_ON_FAILURE)
 WebUI.verifyElementNotVisible(findTestObject('Page_foi.flow/ministry view/form/divisional tracking/i_Division stage row 1 delete'))

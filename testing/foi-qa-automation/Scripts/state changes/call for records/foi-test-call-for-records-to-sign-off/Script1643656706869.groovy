@@ -71,7 +71,7 @@ WebUI.click(findTestObject('Page_foi.flow/ministry view/form/divisional tracking
 
 WebUI.click(findTestObject('Page_foi.flow/ministry view/form/divisional tracking/division dropdown options/educ/li_Education Programs'))
 
-WebUI.click(findTestObject('Page_foi.flow/ministry view/form/divisional tracking/div_ministry division stage'))
+WebUI.click(findTestObject('Records/input_Select Division Stage_mui-53'))
 
 WebUI.click(findTestObject('Page_foi.flow/ministry view/form/divisional tracking/stage dropdown options/li_Assigned to Division'))
 
@@ -148,11 +148,10 @@ WebUI.click(findTestObject('Page_foi.flow/queue/div_request queue row 1'))
 WebUI.verifyElementAttributeValue(findTestObject('Page_foi.flow/form/sidebar/status dropdown/input_Status'), 'value', 'Ministry Sign Off', 
     0)
 
-
 WebUI.click(findTestObject('Page_foi.flow/navbar/button_Sign Out'))
 
-WebUI.callTestCase(findTestCase('helper/foi-test-login'), [('password') : findTestData('Login Credentials').getValue('Password',
-			1), ('username') : findTestData('Login Credentials').getValue('Username', 1)], FailureHandling.STOP_ON_FAILURE)
+WebUI.callTestCase(findTestCase('helper/foi-test-login'), [('password') : findTestData('Login Credentials').getValue('Password', 
+            1), ('username') : findTestData('Login Credentials').getValue('Username', 1)], FailureHandling.STOP_ON_FAILURE)
 
 WebUI.click(findTestObject('Page_foi.flow/queue/div_My Team Requests'))
 
@@ -173,5 +172,4 @@ WebUI.click(findTestObject('Page_foi.flow/form/closing modal/dropdown options/li
 WebUI.click(findTestObject('Page_foi.flow/form/state change dialog/button_Save Change'), FailureHandling.STOP_ON_FAILURE)
 
 WebUI.closeBrowser()
-
 
