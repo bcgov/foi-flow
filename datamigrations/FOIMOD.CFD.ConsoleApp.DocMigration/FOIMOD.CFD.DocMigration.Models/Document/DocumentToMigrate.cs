@@ -6,7 +6,7 @@ namespace FOIMOD.CFD.DocMigration.Models.Document
     {
         public int PageSequenceNumber { get; set; }
 
-        public string PageFilePath { get; set; }
+        public string? PageFilePath { get; set; }
 
         public Stream FileStream { get; set; }
 

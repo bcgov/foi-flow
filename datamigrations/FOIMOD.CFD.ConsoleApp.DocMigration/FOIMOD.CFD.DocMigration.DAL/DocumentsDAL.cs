@@ -34,7 +34,29 @@ namespace FOIMOD.CFD.DocMigration.DAL
 
                                             GROUP BY R.vcVisibleRequestID,C.vcSubject,C.sdtMailedDate,C.vcEmail,C.vcFromEmail,CAST(C.vcBody as NVARCHAR(max))", "'CFD-2015-50011','CFD-2014-50119','CLB-2017-70004'");
 
-        private string getQueryByType(DocumentTypeFromAXIS documentTypeFromAXIS)
+
+        private string recordsbyrequestid = @"
+                        DECLARE @SectionList VARCHAR(MAX);
+                        DECLARE @irequestid INT
+                        SET @irequestid=(SELECT TOP 1 iRequestID FROM tblRequests WHERE vcVisibleRequestID = '{0}')
+                    SET @SectionList = NULL;
+                    SELECT
+                        @SectionList = COALESCE(@SectionList+':', '')+vcSectionList
+                    FROM [dbo].[tblDocumentReviewLog] WHERE iRequestID =@irequestid
+
+                    SELECT D.iDocID,D.tiSections,vcFileName as FilePath,D.siFolderID,D.siPageCount ,p.siPageNum FROM tblPages P inner join tblDocuments D on P.iDocID=D.iDocID 
+					
+					WHERE  D.iDocID in(
+                    --- Review Log Documents
+                    SELECT iDocID FROM [dbo].[tblDocumentReviewLog] WHERE iRequestID = @irequestid
+                    union
+                    SELECT iDocID FROM tblDocuments d with(nolock) where iDocID IN (SELECT Data FROM [dbo].[AFX_Splitter](@SectionList, ':'))
+                    union
+                    --- Request Folder Documents    
+                    select iDocID from tblRedactionLayers where irequestid=@irequestid AND iDeliveryID is NULL
+                    )";
+
+        private string getQueryByType(DocumentTypeFromAXIS documentTypeFromAXIS, string requestnumber="")
         {
             var query = string.Empty;
             switch (documentTypeFromAXIS) {
@@ -42,7 +64,9 @@ namespace FOIMOD.CFD.DocMigration.DAL
                 case DocumentTypeFromAXIS.CorrespondenceLog:
                     query = correspondencelog;
                     break;
-
+                case DocumentTypeFromAXIS.RequestRecords:
+                    query = string.Format(recordsbyrequestid, requestnumber);
+                    break;
                 default:
                     break;
             
@@ -98,5 +122,60 @@ namespace FOIMOD.CFD.DocMigration.DAL
             }
             return documentToMigrates;
         }
+
+
+        public List<DocumentToMigrate>? GetRecordsByRequest(string requestnumber)
+        {
+            List<DocumentToMigrate> documentToMigrates = null;
+            using (SqlDataAdapter sqlSelectCommand = new(getQueryByType(DocumentTypeFromAXIS.RequestRecords,requestnumber), sqlConnection))
+            {
+                try
+                {
+                    sqlConnection.Open();
+                    using DataTable dataTable = new();
+                    sqlSelectCommand.Fill(dataTable);
+                    if (!dataTable.HasErrors && dataTable.Rows.Count > 0)
+                    {
+                        documentToMigrates = new();
+                        foreach (DataRow row in dataTable.Rows)
+                        {
+                            documentToMigrates.Add(new DocumentToMigrate()
+                            {
+                                IDocID= Convert.ToInt32(row["iDocID"]),                                
+                                PageFilePath = Convert.ToString(row["FilePath"]),
+                                SiFolderID = Convert.ToString(row["siFolderID"]),
+                                TotalPageCount = Convert.ToString(row["siPageCount"]),
+                                PageSequenceNumber = Convert.ToInt32(row["siPageNum"]),
+                                AXISRequestNumber = requestnumber.ToUpper(),
+                                DocumentType = DocumentTypeFromAXIS.RequestRecords
+                            });
+
+                        }
+                    }
+                }
+                catch (SqlException ex)
+                {
+
+                    throw ex;
+                }
+                catch (Exception e)
+                {
+                    throw;
+                }
+                finally
+                {
+                    sqlConnection.Close();
+                }
+
+            }
+            return documentToMigrates;
+        }
+
+
+
+
+
     }
+
+
 }
