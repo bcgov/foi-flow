@@ -2,34 +2,43 @@
 
 using Amazon.Runtime;
 using Amazon.S3;
-using Amazon.S3.Model;
+using FOIMOD.CFD.DocMigration.Models;
 using FOIMOD.CFD.DocMigration.Models.Document;
-using Microsoft.VisualStudio.TestPlatform.Utilities;
-using PdfSharpCore.Pdf;
-using System.Buffers.Text;
+using Microsoft.Extensions.Configuration;
 
 namespace FOIMOD.CFD.DocMigration.Utils.UnitTests
 {
     [TestClass]
     public class S3UploadTest
     {
-        
-        public AWSCredentials s3credentials = new BasicAWSCredentials("", "");
-        public AmazonS3Config config = new()
+        public AWSCredentials s3credentials = null;
+        public AmazonS3Config config = null;
+        [TestInitialize]
+        public void S3UploadTestInit()
         {
-            ServiceURL = "https://citz-foi-prod.objectstore.gov.bc.ca/"
-        };
+            var configurationbuilder = new ConfigurationBuilder()
+                        .AddJsonFile($"appsettings.json", true, true)
+                        .AddEnvironmentVariables().Build();
+
+            SystemSettings.S3_AccessKey = configurationbuilder.GetSection("S3Configuration:AWS_accesskey").Value;
+            SystemSettings.S3_SecretKey = configurationbuilder.GetSection("S3Configuration:AWS_secret").Value;
+            SystemSettings.S3_EndPoint = configurationbuilder.GetSection("S3Configuration:AWS_S3_Url").Value;
+
+            s3credentials = new BasicAWSCredentials(SystemSettings.S3_AccessKey, SystemSettings.S3_SecretKey);
+
+            config = new()
+            {
+                ServiceURL = SystemSettings.S3_EndPoint
+
+            };
+        }
+
+
         [TestMethod]
         public void S3Upload_UploadFileAsync()
         {
-
-
-
-
             AmazonS3Client amazonS3Client = new AmazonS3Client(s3credentials, config);
-
-             DocMigrationS3Client docMigrationS3Client = new DocMigrationS3Client(amazonS3Client);
-
+            DocMigrationS3Client docMigrationS3Client = new DocMigrationS3Client(amazonS3Client);
 
             using var client = new HttpClient();
             using (FileStream fs = File.Open(Path.Combine(getSourceFolder(), "DOCX1.pdf"), FileMode.Open))
@@ -104,12 +113,12 @@ namespace FOIMOD.CFD.DocMigration.Utils.UnitTests
             {
                 using Stream emaildocstream = docMigrationPDFStitcher.CreatePDFDocument("<p><h1>THIS IS AN EMAIL HTML content</h1></p>", "My email subject line!!!!", DateTime.Now.AddYears(-10).ToLongDateString(), "abinajik@gmail.com");
                 emaildocstream.Position = 0;
-               
+
 
                 DocumentToMigrate[] pDFDocToMerges = new DocumentToMigrate[3];
                 pDFDocToMerges[0] = new DocumentToMigrate() { PageFilePath = Path.Combine(getSourceFolder(), "DOCX1.pdf"), PageSequenceNumber = 3 };
                 pDFDocToMerges[1] = new DocumentToMigrate() { PageFilePath = Path.Combine(getSourceFolder(), "cat1.pdf"), PageSequenceNumber = 2 };
-                pDFDocToMerges[2] = new DocumentToMigrate() { FileStream = emaildocstream, PageSequenceNumber = 1, HasStreamForDocument=true  };
+                pDFDocToMerges[2] = new DocumentToMigrate() { FileStream = emaildocstream, PageSequenceNumber = 1, HasStreamForDocument = true };
 
                 using Stream fs = docMigrationPDFStitcher.MergePDFs(pDFDocToMerges);
 

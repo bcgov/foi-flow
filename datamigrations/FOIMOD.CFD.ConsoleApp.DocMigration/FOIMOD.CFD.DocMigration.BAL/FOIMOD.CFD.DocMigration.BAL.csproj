@@ -6,4 +6,8 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\FOIMOD.CFD.DocMigration.DAL\FOIMOD.CFD.DocMigration.AXIS.DAL.csproj" />
+  </ItemGroup>
+
 </Project>
