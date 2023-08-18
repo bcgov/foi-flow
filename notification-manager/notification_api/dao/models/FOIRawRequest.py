@@ -6,6 +6,7 @@ class FOIRawRequest:
 
     @classmethod 
     def getrequest(cls, requestid):
+        conn = None
         try:
             conn = getconnection()
             cursor = conn.cursor()
@@ -19,10 +20,12 @@ class FOIRawRequest:
             logging.error(error)
             raise   
         finally:
-            conn.close()
+            if conn:
+                conn.close()
 
     @classmethod 
     def getwatchers(cls, requestid):
+        conn = None
         try:
             watchers = []
             conn = getconnection()
@@ -32,21 +35,22 @@ class FOIRawRequest:
                                 order by watchedby, watchedbygroup, created_at desc""".format(requestid))
             data = cursor.fetchall()
             for row in data:
-               watchers.append({"watchedby": str(row[0]), "watchedbygroup": str(row[1])}) 
+               if bool(row[2]) == True:
+                    watchers.append({"watchedby": str(row[0]), "watchedbygroup": str(row[1])}) 
 
             cursor.close()
             return watchers
         except(Exception) as error:
             logging.error(error)
-            raise   
         finally:
-            conn.close()
-            watchers = []
+            if conn:
+                conn.close()
 
         
     @classmethod 
     def getcommentusers(cls, commentid):
         users = []
+        conn = None
         try:
             users = []
             conn = getconnection()
@@ -63,6 +67,6 @@ class FOIRawRequest:
             return users
         except(Exception) as error:
             logging.error(error)
-            raise   
         finally:
-            conn.close()
+            if conn:
+                conn.close()

@@ -40,7 +40,7 @@ import { getFullnameList } from "../../../../helper/FOI/helper";
     return _selectedMinistry;
   }
 
-  export const getMessage = (_saveRequestObject, _state, _requestNumber, _currentState, _requestId, _cfrStatus,allowStateChange,isAnyAmountPaid) => {
+  export const getMessage = (_saveRequestObject, _state, _requestNumber, _currentState, _requestId, _cfrStatus,allowStateChange,isAnyAmountPaid, estimatedTotalFeesDue) => {
     if ((_currentState?.toLowerCase() === StateEnum.closed.name.toLowerCase() && _state.toLowerCase() !== StateEnum.closed.name.toLowerCase())) {
       _saveRequestObject.reopen = true;
       return {title: "Re-Open Request", body: <>Are you sure you want to re-open Request # {_requestNumber ? _requestNumber : `U-00${_requestId}`}? <br/> The request will be re-opened to the previous state: {_state} </>};
@@ -77,7 +77,13 @@ import { getFullnameList } from "../../../../helper/FOI/helper";
               title: "Fee Estimate",
               body: "To update the state you must first complete the estimated hours in the CFR Form so that Total Fees are due."
             };
-          } else {
+          } else if (estimatedTotalFeesDue <= 0) {
+            return {
+              title: "Fee Estimate",
+              body: "To update state to Fee Estimate, Estimated Total must be greater than $0."
+            }
+          }
+          else {
             return {title: "Fee Estimate", body: `Are you sure you want to change Request #${_requestNumber} to ${StateEnum.feeassessed.name}? The CFR Form will be locked for editing and sent to IAO for review.`};
           }
       case StateEnum.deduplication.name.toLowerCase():

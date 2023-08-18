@@ -24,6 +24,7 @@ class FOIRequestComment(object):
     
     @classmethod
     def savecomment(cls, commenttypeid, foirequestcomment, userid): 
+        conn = None
         try:
             id_of_new_row = None
             data = foirequestcomment.__dict__
@@ -44,8 +45,8 @@ class FOIRequestComment(object):
             return id_of_new_row            
         except(Exception) as error:
             logging.error(error)
-            raise   
         finally:
-            conn.close()
+            if conn:
+                conn.close()
 
     

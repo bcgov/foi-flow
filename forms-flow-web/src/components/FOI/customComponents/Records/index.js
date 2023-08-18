@@ -155,7 +155,8 @@ export const RecordsLog = ({
   iaoassignedToList,
   ministryAssignedToList,
   isMinistryCoordinator,
-  setRecordsUploading
+  setRecordsUploading,
+  recordsTabSelect
 }) => {
 
   let recordsObj = useSelector(
@@ -189,6 +190,30 @@ export const RecordsLog = ({
   }, [])
 
   const conversionFormats = useSelector((state) => state.foiRequests.conversionFormats)
+
+
+  useEffect(() => {
+    if (recordsTabSelect && conversionFormats?.length < 1) {
+      console.log("match");
+      toast.error(
+        "Temporarily unable to save your request. Please try again in a few minutes.",
+        {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: true,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+        }
+      );
+
+     }
+  }, [recordsTabSelect, conversionFormats])
+
+ 
+
+
   const divisionFilters = [...new Map(recordsObj?.records?.reduce((acc, file) => [...acc, ...new Map(file?.attributes?.divisions?.map(division => [division?.divisionid, division]))], [])).values()]
   if (divisionFilters?.length > 0) divisionFilters?.push(
     {divisionid: -1, divisionname: "All"},
@@ -1069,7 +1094,7 @@ export const RecordsLog = ({
                           className="download-menu-item"
                           key={item.id}
                           value={index}
-                          disabled={item.disabled}
+                          disabled={item.disabled || conversionFormats?.length < 1}
                           sx={{ display: 'flex' }}
                         >
                           {
@@ -1109,6 +1134,7 @@ export const RecordsLog = ({
                   variant="contained"
                   onClick={addAttachments}
                   color="primary"
+                  disabled = {conversionFormats?.length < 1}
                 >
                   + Upload Records
                 </button> :
