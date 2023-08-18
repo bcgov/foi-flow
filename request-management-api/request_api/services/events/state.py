@@ -62,7 +62,7 @@ class stateevent:
         if state == 'Call For Records' and requesttype == "ministryrequest":
             foirequest = notificationservice().getrequest(requestid, requesttype)
             _notificationtype = "Group Members" if foirequest['assignedministryperson'] is None else "State"
-        notification = self.__preparenotification(state, requestid)
+        notification = self.__preparenotification(state)
         if state == 'Closed' or state == 'Archived' :
             notificationservice().dismissnotificationsbyrequestid(requestid, requesttype)
         if state == 'Archived':
@@ -82,9 +82,7 @@ class stateevent:
             return DefaultMethodResult(True,'Notification added',requestid)
         return  DefaultMethodResult(True,'No change',requestid)
             
-    def __preparenotification(self, state, requestid):
-        if state == 'Call For Records':
-            return self.__notificationcfrmessage(requestid)  
+    def __preparenotification(self, state):
         return self.__notificationmessage(state)
 
     def __preparegroupmembernotification(self, state, requestid):
