@@ -7,8 +7,9 @@ class FOIMinistryRequest:
     
     @classmethod 
     def getrequest(cls, ministryrequestid):
-        try:
-            conn = getconnection()
+        conn = None
+        try:   
+            conn = getconnection()         
             cursor = conn.cursor()
             cursor.execute("""select foiministryrequestid, filenumber, foirequest_id, "version" , axisrequestid, assignedministryperson, assignedto 
                                 from "FOIMinistryRequests" fr where foiministryrequestid  = {0} order by "version" desc limit  1""".format(ministryrequestid))
@@ -20,12 +21,13 @@ class FOIMinistryRequest:
         except(Exception) as error:
             logging.error(error)
             print("getrequest error: ",error)
-            raise   
         finally:
-            conn.close()
+            if conn:
+                conn.close()
 
     @classmethod 
     def getwatchers(cls, ministryrequestid, query=None):
+        conn = None
         try:
             watchers = []
             conn = getconnection()
@@ -35,20 +37,20 @@ class FOIMinistryRequest:
                                 order by watchedby, watchedbygroup, created_at desc""".format(ministryrequestid))
             data = cursor.fetchall()
             for row in data:
-                if ((query == "ministry" and "Ministry Team" in row["watchedbygroup"]) or (query == "non-ministry" and "Ministry Team" not in row["watchedbygroup"]) or query is None):
+                if (bool(row[2]) == True and ((query == "ministry" and "Ministry Team" in row["watchedbygroup"]) or (query == "non-ministry" and "Ministry Team" not in row["watchedbygroup"]) or query is None)):
                     watchers.append({"watchedby": str(row[0]), "watchedbygroup": str(row[1])}) 
             cursor.close()
             return watchers
         except(Exception) as error:
             logging.error(error)
-            print("getwatchers error: ",error)
-            raise   
         finally:
-            conn.close()
+            if conn:
+                conn.close()
 
     @classmethod 
     def getcommentusers(cls, commentid):
         users = []
+        conn = None
         try:
             users = []
             conn = getconnection()
@@ -65,6 +67,6 @@ class FOIMinistryRequest:
             return users
         except(Exception) as error:
             logging.error(error)
-            raise   
         finally:
-            conn.close()
+            if conn:
+                conn.close()
