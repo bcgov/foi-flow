@@ -73,7 +73,6 @@ class FOIFlowApplicantCategories(Resource):
         except BusinessException:
             return "Error happened while accessing applicant categories" , 500
 
-## USE THIS API CALL TO GET ALL PROGRAM AREAS - TEST WIP
 @cors_preflight('GET,OPTIONS')
 @API.route('/foiflow/programareas')
 class FOIFlowProgramAreas(Resource):
@@ -188,7 +187,6 @@ class FOIFlowDivisions(Resource):
         except BusinessException:
             return "Error happened while accessing divisions" , 500
         
-#MAKE API CALL HERE TO GATHER ALL PROGRAM AREA DIVISIONS - TEST WIP
 @cors_preflight('GET,OPTIONS')
 @API.route('/foiflow/divisions')
 class FOIFlowDivisions(Resource):
@@ -206,33 +204,6 @@ class FOIFlowDivisions(Resource):
             return json_response, 200
         except BusinessException:
             return "Error happened while accessing divisions", 500
-
-#MAKE API CALL HERE TO GATHER ASSOCIATED PROGRAM AREA DIVISIONS FOR RECORDS BASED ON REQUEST ID - TEST WIP
-@cors_preflight('GET,OPTIONS')
-@API.route('/foiflow/divisions/<int:foirequestid>')
-class FOIFlowDivisionsForFOIRequestRecords(Resource):
-    """Retrieves all active divisions associated with foi request records based on foi request id.
-    """
-    @staticmethod
-    @TRACER.trace()
-    @cross_origin(origins=allowedorigins())
-    @auth.require
-    @auth.ismemberofgroups(getrequiredmemberships())
-    def get(foirequestid):
-        try:
-            divisions = {div['divisionid']: div for div in programareadivisionservice().getallprogramareadivisions()}
-            records = {record['recordid']: record for record in recordservice.fetch(foirequestid)}
-
-            for recordid in records:
-                record = records[recordid]
-                record_divisions = set(map(lambda d: d['divisionid'], record['attributes']['divisions']))
-                record['divisions'] = list(map(lambda d: divisions[d], record_divisions))
-
-            response = [records[recordid] for recordid in records]
-            json_response = json.dumps(response)
-            return json_response, 200
-        except BusinessException:
-            return "Error happened while accessing records", 500
 
 @cors_preflight('GET,OPTIONS')
 @API.route('/foiflow/closereasons')
