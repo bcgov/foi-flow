@@ -12,5 +12,7 @@ namespace FOIMOD.CFD.DocMigration.Models.Document
 
         public bool HasStreamForDocument { get; set; }
 
+        public string? EmailAttachmentDelimitedString { get; set; }
+
     }
 }
