@@ -71,7 +71,7 @@ WebUI.click(findTestObject('Page_foi.flow/ministry view/form/divisional tracking
 
 WebUI.click(findTestObject('Page_foi.flow/ministry view/form/divisional tracking/division dropdown options/educ/li_Education Programs'))
 
-WebUI.click(findTestObject('Page_foi.flow/ministry view/form/divisional tracking/div_ministry division stage'))
+WebUI.click(findTestObject('Records/input_Select Division Stage_mui-53'))
 
 WebUI.click(findTestObject('Page_foi.flow/ministry view/form/divisional tracking/stage dropdown options/li_Assigned to Division'))
 
@@ -164,8 +164,6 @@ WebUI.verifyElementAttributeValue(findTestObject('Page_foi.flow/form/sidebar/sta
 WebUI.verifyMatch(WebUI.getCSSValue(findTestObject('Page_foi.flow/form/sidebar/div_Sidebar'), 'background-color'), 'rgba(4, 89, 108, 1)', 
     false)
 
-
-
 WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/div_Status'))
 
 WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/li_Closed'))
@@ -175,7 +173,6 @@ WebUI.click(findTestObject('Page_foi.flow/form/closing modal/div_Closing Reason'
 WebUI.click(findTestObject('Page_foi.flow/form/closing modal/dropdown options/li_Partial Disclosure'), FailureHandling.STOP_ON_FAILURE)
 
 WebUI.click(findTestObject('Page_foi.flow/form/state change dialog/button_Save Change'), FailureHandling.STOP_ON_FAILURE)
-
 
 WebUI.closeBrowser()
 

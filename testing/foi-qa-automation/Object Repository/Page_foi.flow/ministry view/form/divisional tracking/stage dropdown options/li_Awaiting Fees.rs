@@ -6,12 +6,12 @@
    <elementGuidId>15cafb68-3009-41d2-b588-67c22ffac60c</elementGuidId>
    <selectorCollection>
       <entry>
-         <key>XPATH</key>
-         <value>//div[@id='menu-']/div[3]/ul/li[11]</value>
-      </entry>
-      <entry>
          <key>BASIC</key>
          <value>id(&quot;menu-&quot;)/div[@class=&quot;MuiPaper-root MuiPaper-elevation MuiPaper-rounded MuiPaper-elevation1 MuiMenu-paper MuiPaper-root MuiPaper-elevation MuiPaper-rounded MuiPaper-elevation8 MuiPopover-paper css-177ic5c&quot;]/ul[@class=&quot;MuiList-root MuiList-padding MuiMenu-list css-r8u8y9&quot;]/li[@class=&quot;MuiButtonBase-root MuiListItem-root MuiMenuItem-root foi-divisionstage-menuitem MuiMenuItem-gutters MuiListItem-gutters MuiListItem-button&quot;][count(. | //*[(text() = 'Awaiting Fee estimate' or . = 'Awaiting Fee estimate')]) = count(//*[(text() = 'Awaiting Fee estimate' or . = 'Awaiting Fee estimate')])]</value>
+      </entry>
+      <entry>
+         <key>XPATH</key>
+         <value>//li[@id='mui-125-option-10']</value>
       </entry>
       <entry>
          <key>CSS</key>
@@ -25,7 +25,7 @@
       <name>tag</name>
       <type>Main</type>
       <value>li</value>
-      <webElementGuid>84c3e0e4-3469-496a-8e4d-2e0856819f81</webElementGuid>
+      <webElementGuid>5de07982-2419-4ace-b88f-df586e7c48c8</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -33,7 +33,7 @@
       <name>class</name>
       <type>Main</type>
       <value>MuiButtonBase-root MuiListItem-root MuiMenuItem-root foi-divisionstage-menuitem MuiMenuItem-gutters MuiListItem-gutters MuiListItem-button</value>
-      <webElementGuid>a22c3f22-a0a4-4144-a437-5134ea255254</webElementGuid>
+      <webElementGuid>af54acd7-81ab-4571-b488-5c871f19e5af</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -41,7 +41,7 @@
       <name>tabindex</name>
       <type>Main</type>
       <value>-1</value>
-      <webElementGuid>1dbdd905-1601-4662-9cd2-8cf488b2d226</webElementGuid>
+      <webElementGuid>ff06c1d8-374d-43de-9585-2003e53bf615</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -49,7 +49,7 @@
       <name>role</name>
       <type>Main</type>
       <value>option</value>
-      <webElementGuid>9bc281a2-456f-4131-89c2-bbdfdaff2a0c</webElementGuid>
+      <webElementGuid>d9a747ca-8a38-4838-bf48-6f93ce223e97</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -57,7 +57,7 @@
       <name>aria-disabled</name>
       <type>Main</type>
       <value>false</value>
-      <webElementGuid>caeca502-15aa-4ed4-b993-e436cfa45fe9</webElementGuid>
+      <webElementGuid>64eab32b-76cf-4198-a34f-b4652f6b67c8</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -65,7 +65,7 @@
       <name>data-value</name>
       <type>Main</type>
       <value>3</value>
-      <webElementGuid>21ed561f-6ede-492a-b075-89a9d7bf0090</webElementGuid>
+      <webElementGuid>c37e8d9f-9f0a-4749-9745-aafe99799106</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>true</isSelected>
@@ -73,7 +73,7 @@
       <name>text</name>
       <type>Main</type>
       <value>Awaiting Fee estimate</value>
-      <webElementGuid>71e25b4a-254e-4976-98f4-0a9afd3713bf</webElementGuid>
+      <webElementGuid>e4b478a2-d0ed-427b-b6cf-7881274adbb0</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>true</isSelected>
@@ -81,7 +81,7 @@
       <name>xpath</name>
       <type>Main</type>
       <value>id(&quot;menu-&quot;)/div[@class=&quot;MuiPaper-root MuiPaper-elevation MuiPaper-rounded MuiPaper-elevation1 MuiMenu-paper MuiPaper-root MuiPaper-elevation MuiPaper-rounded MuiPaper-elevation8 MuiPopover-paper css-177ic5c&quot;]/ul[@class=&quot;MuiList-root MuiList-padding MuiMenu-list css-r8u8y9&quot;]/li[@class=&quot;MuiButtonBase-root MuiListItem-root MuiMenuItem-root foi-divisionstage-menuitem MuiMenuItem-gutters MuiListItem-gutters MuiListItem-button&quot;]</value>
-      <webElementGuid>547b4a56-1b4a-424b-8404-c695bd7a4a3d</webElementGuid>
+      <webElementGuid>d8a0684a-d2cc-4b7a-bc3c-a4539949709d</webElementGuid>
    </webElementProperties>
    <webElementXpaths>
       <isSelected>true</isSelected>
@@ -89,7 +89,7 @@
       <name>xpath:idRelative</name>
       <type>Main</type>
       <value>//div[@id='menu-']/div[3]/ul/li[4]</value>
-      <webElementGuid>cc5fc3a9-ba3a-49ec-bbed-25c521a8c272</webElementGuid>
+      <webElementGuid>a73ab93e-40a6-47e9-b4d3-bdea2ea3d30a</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -97,7 +97,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>(.//*[normalize-space(text()) and normalize-space(.)='Assigned to Division'])[1]/following::li[1]</value>
-      <webElementGuid>de9e3622-7bb7-4e9a-b441-786f0d94ba11</webElementGuid>
+      <webElementGuid>495b4852-4992-4de1-be5a-ab3f1e1a1e95</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -105,7 +105,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>(.//*[normalize-space(text()) and normalize-space(.)='Clarification'])[1]/following::li[2]</value>
-      <webElementGuid>9a6abe31-0f85-40c7-a333-b5818c5d41a5</webElementGuid>
+      <webElementGuid>39631e9f-fc3a-4c13-bc55-2d88cd623dcb</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -113,7 +113,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>(.//*[normalize-space(text()) and normalize-space(.)='Fees Received'])[1]/preceding::li[1]</value>
-      <webElementGuid>51a11599-2774-413b-b61e-6c77de136700</webElementGuid>
+      <webElementGuid>e10838e2-4315-4b83-909a-04a2b02b242c</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -121,7 +121,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>(.//*[normalize-space(text()) and normalize-space(.)='Gathering Records'])[1]/preceding::li[2]</value>
-      <webElementGuid>cd39a2e5-3d0b-4d3f-9a7d-7b9cdaf3d290</webElementGuid>
+      <webElementGuid>e3919989-123d-440e-a355-e98c06c7a96d</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -129,7 +129,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>//*/text()[normalize-space(.)='Awaiting Fees']/parent::*</value>
-      <webElementGuid>7bff1a5d-5a93-4cf9-ad83-d2994d0e3597</webElementGuid>
+      <webElementGuid>ba37e7fc-bd2f-42cf-a08d-484de861b54a</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -137,6 +137,6 @@
       <name>xpath:position</name>
       <type>Main</type>
       <value>//li[4]</value>
-      <webElementGuid>2ad47752-9779-425b-bf35-f63db5371d11</webElementGuid>
+      <webElementGuid>e446a807-9984-43be-a880-3d51631e4c40</webElementGuid>
    </webElementXpaths>
 </WebElementEntity>

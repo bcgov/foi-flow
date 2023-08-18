@@ -322,10 +322,11 @@ WebUI.verifyElementText(findTestObject('Page_foi.flow/navbar/notification/div_no
 
 WebUI.verifyElementText(findTestObject('Page_foi.flow/navbar/notification/div_notification list 1 message'), 'New Request Assigned to You.')
 
-WebUI.click(findTestObject('Page_foi.flow/navbar/notification/i_notification list 2 delete'))
+//
 
-//WebUI.verifyElementText(findTestObject('Page_foi.flow/navbar/notification/div_notification list 1 request id'), 'EDU-2099-' + 
-//   requestID2)
+WebUI.verifyElementText(findTestObject('Page_foi.flow/navbar/notification/div_notification list 1 request id'), 'EDU-2099-' + 
+  requestID2)
+WebUI.click(findTestObject('Page_foi.flow/navbar/notification/i_notification list 1 delete'))
 WebUI.verifyElementText(findTestObject('Page_foi.flow/navbar/notification/div_notification list 1 message'), 'Moved to Open State')
 
 WebUI.verifyElementText(findTestObject('Page_foi.flow/navbar/notification/div_notification list 2 message'), 'New Request Assigned to You.')
