@@ -323,10 +323,13 @@ WebUI.verifyElementText(findTestObject('Page_foi.flow/navbar/notification/div_no
 WebUI.verifyElementText(findTestObject('Page_foi.flow/navbar/notification/div_notification list 1 message'), 'New Request Assigned to You.')
 
 //
-
 WebUI.verifyElementText(findTestObject('Page_foi.flow/navbar/notification/div_notification list 1 request id'), 'EDU-2099-' + 
-  requestID2)
+    requestID2)
+
 WebUI.click(findTestObject('Page_foi.flow/navbar/notification/i_notification list 1 delete'))
+
+WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
+
 WebUI.verifyElementText(findTestObject('Page_foi.flow/navbar/notification/div_notification list 1 message'), 'Moved to Open State')
 
 WebUI.verifyElementText(findTestObject('Page_foi.flow/navbar/notification/div_notification list 2 message'), 'New Request Assigned to You.')
@@ -341,24 +344,10 @@ WebUI.verifyElementNotPresent(findTestObject('Page_foi.flow/navbar/notification/
 
 WebUI.verifyElementNotPresent(findTestObject('Page_foi.flow/navbar/notification/div_notification list 2'), 0)
 
-user2.close()
+WebUI.clickOffset(findTestObject('Page_foi.flow/navbar/notification/notification bell'), -2, 4)
 
 user3.close()
 
-WebUI.navigateToUrl(GlobalVariable.BASE_URL)
-
-WebUI.callTestCase(findTestCase('helper/foi-test-login'), [('password') : findTestData('Login Credentials').getValue('Password', 
-            1), ('username') : findTestData('Login Credentials').getValue('Username', 1)], FailureHandling.STOP_ON_FAILURE)
-
-WebUI.click(findTestObject('Page_foi.flow/queue/div_My Team Requests'))
-
-WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
-
-WebUI.setText(findTestObject('Page_foi.flow/queue/input_Dashboard Filter'), requestID)
-
-WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
-
-WebUI.click(findTestObject('Page_foi.flow/queue/div_request queue row 1'))
 
 WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/div_Status'))
 
@@ -392,7 +381,7 @@ WebUI.click(findTestObject('Page_foi.flow/form/closing modal/dropdown options/li
 
 WebUI.click(findTestObject('Page_foi.flow/form/state change dialog/button_Save Change'), FailureHandling.STOP_ON_FAILURE)
 
-WebUI.navigateToUrl(GlobalVariable.BASE_URL)
+user2.close()
 
 WebUI.closeBrowser()
 
