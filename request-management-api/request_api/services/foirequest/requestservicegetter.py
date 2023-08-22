@@ -127,7 +127,6 @@ class requestservicegetter:
         return requestdetails
 
     def __preparebaseinfo(self,request,foiministryrequestid,requestministry,requestministrydivisions):
-        print("requestministry-:",requestministry['originalldd'])
         _receiveddate = parse(request['receiveddate'])
         axissyncdatenoneorempty =  self.__noneorempty(requestministry["axissyncdate"]) 
         linkedministryrequests= []
