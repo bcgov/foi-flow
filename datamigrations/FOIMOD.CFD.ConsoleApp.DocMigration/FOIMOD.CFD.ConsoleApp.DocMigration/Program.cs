@@ -1,5 +1,7 @@
 ﻿// See https://aka.ms/new-console-template for more information
+using FOIMOD.CFD.DocMigration.BAL;
 using FOIMOD.CFD.DocMigration.Models;
+using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 
 Console.WriteLine("Starting, CFD Document Migration!");
@@ -12,3 +14,9 @@ SystemSettings.S3_SecretKey = configurationbuilder.GetSection("S3Configuration:A
 SystemSettings.S3_EndPoint = configurationbuilder.GetSection("S3Configuration:AWS_S3_Url").Value;
 SystemSettings.AXISConnectionString = configurationbuilder.GetSection("AXISConfiguration:SQLConnectionString").Value;
 SystemSettings.RequestToMigrate = configurationbuilder.GetSection("AXISConfiguration:RequestToMigrate").Value;
+
+SqlConnection axissqlConnection = new SqlConnection(SystemSettings.AXISConnectionString);
+
+CorrespondenceLogMigration correspondenceLogMigration = new CorrespondenceLogMigration(axissqlConnection, null, null);
+correspondenceLogMigration.RequestsToMigrate = SystemSettings.RequestToMigrate;
+await correspondenceLogMigration.RunMigration();

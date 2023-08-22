@@ -7,7 +7,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="AWSSDK.S3" Version="3.7.201.12" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\FOIMOD.CFD.DocMigration.DAL\FOIMOD.CFD.DocMigration.AXIS.DAL.csproj" />
+    <ProjectReference Include="..\FOIMOD.CFD.DocMigration.Models\FOIMOD.CFD.DocMigration.Models.csproj" />
+    <ProjectReference Include="..\FOIMOD.CFD.DocMigration.Utils\FOIMOD.CFD.DocMigration.Utils.csproj" />
   </ItemGroup>
 
 </Project>

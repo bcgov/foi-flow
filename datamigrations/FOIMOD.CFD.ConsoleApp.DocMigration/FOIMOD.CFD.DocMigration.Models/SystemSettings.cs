@@ -19,5 +19,11 @@ namespace FOIMOD.CFD.DocMigration.Models
 
         public static string RequestToMigrate { get; set; }
 
+        public static string FileServerRoot { get; set; }
+
+        public static string CorrespondenceLogBaseFolder { get; set; }
+
+        public static string RecordsbaseFolder { get; set; }
+
     }
 }
