@@ -12,7 +12,6 @@ namespace FOIMOD.CFD.DocMigration.Models
 
        public static string S3_SecretKey { get; set; }
 
-
         public static string S3_EndPoint { get; set; }
 
         public static string AXISConnectionString{ get; set; }
@@ -24,6 +23,13 @@ namespace FOIMOD.CFD.DocMigration.Models
         public static string CorrespondenceLogBaseFolder { get; set; }
 
         public static string RecordsbaseFolder { get; set; }
+
+        public static string S3_Attachements_BasePath { get; set; }
+
+        public static string AttachmentTag { get; set; }
+
+        public static string S3_Attachements_Bucket { get; set; }
+
 
     }
 }
