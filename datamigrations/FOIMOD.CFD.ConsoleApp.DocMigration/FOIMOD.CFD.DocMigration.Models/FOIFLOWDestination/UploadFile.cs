@@ -21,7 +21,7 @@ namespace FOIMOD.CFD.DocMigration.Models.FOIFLOWDestination
 
         public string S3BucketName { get; set; }
 
-        public string ContentType { get; set; }
+      
 
         public Stream FileStream { get; set; }
     }

@@ -46,7 +46,7 @@ namespace FOIMOD.CFD.DocMigration.Utils.UnitTests
                 fs.Position = 0;
                 var destinationfilename = string.Format("{0}.pdf", Guid.NewGuid().ToString());
 
-                UploadFile uploadFile = new UploadFile() { ContentType = "application/pdf", AXISRequestID = "TEST-10001-12342", DestinationFileName = destinationfilename, S3BucketName = "test123-protected", SubFolderPath = "test123-protected/Abintest/unittestmigration", UploadType = UploadType.Attachments, SourceFileName = "DOC1.pdf", FileStream = fs };
+                UploadFile uploadFile = new UploadFile() {  AXISRequestID = "TEST-10001-12342", DestinationFileName = destinationfilename, S3BucketName = "test123-protected", SubFolderPath = "test123-protected/Abintest/unittestmigration", UploadType = UploadType.Attachments, SourceFileName = "DOC1.pdf", FileStream = fs };
                 var result = docMigrationS3Client.UploadFileAsync(uploadFile).Result;
                 Assert.IsNotNull(result);
                 Assert.IsTrue(result.IsSuccessStatusCode);
@@ -75,7 +75,7 @@ namespace FOIMOD.CFD.DocMigration.Utils.UnitTests
                 fs.Position = 0;
                 var destinationfilename = string.Format("{0}.pdf", Guid.NewGuid().ToString());
 
-                UploadFile uploadFile = new UploadFile() { ContentType = "application/pdf", AXISRequestID = "TEST-10001-12342", DestinationFileName = destinationfilename, S3BucketName = "test123-protected", SubFolderPath = "test123-protected/Abintest/unittestmigration", UploadType = UploadType.Attachments, SourceFileName = "DOC1.pdf", FileStream = fs };
+                UploadFile uploadFile = new UploadFile() {  AXISRequestID = "TEST-10001-12342", DestinationFileName = destinationfilename, S3BucketName = "test123-protected", SubFolderPath = "test123-protected/Abintest/unittestmigration", UploadType = UploadType.Attachments, SourceFileName = "DOC1.pdf", FileStream = fs };
                 var result = docMigrationS3Client.UploadFileAsync(uploadFile).Result;
                 Assert.IsNotNull(result);
                 Assert.IsTrue(result.IsSuccessStatusCode);
@@ -93,7 +93,7 @@ namespace FOIMOD.CFD.DocMigration.Utils.UnitTests
                 using Stream emaildocstream = docMigrationPDFStitcher.CreatePDFDocument("<p><h1>THIS IS AN EMAIL HTML content</h1></p>", "My email subject line!!!!", DateTime.Now.AddYears(-10).ToLongDateString(), "abinajik@gmail.com");
                 emaildocstream.Position = 0;
                 var destinationfilename = string.Format("{0}.pdf", Guid.NewGuid().ToString());
-                UploadFile uploadFile = new UploadFile() { ContentType = "application/pdf", AXISRequestID = "TEST-10001-12342", DestinationFileName = destinationfilename, S3BucketName = "test123-protected", SubFolderPath = "test123-protected/Abintest/unittestmigration", UploadType = UploadType.Attachments, SourceFileName = "DOC1.pdf", FileStream = emaildocstream };
+                UploadFile uploadFile = new UploadFile() {  AXISRequestID = "TEST-10001-12342", DestinationFileName = destinationfilename, S3BucketName = "test123-protected", SubFolderPath = "test123-protected/Abintest/unittestmigration", UploadType = UploadType.Attachments, SourceFileName = "DOC1.pdf", FileStream = emaildocstream };
                 var result = docMigrationS3Client.UploadFileAsync(uploadFile).Result;
                 Assert.IsNotNull(result);
                 Assert.IsTrue(result.IsSuccessStatusCode);
@@ -127,7 +127,7 @@ namespace FOIMOD.CFD.DocMigration.Utils.UnitTests
                 fs.Position = 0;
                 var destinationfilename = string.Format("{0}.pdf", Guid.NewGuid().ToString());
 
-                UploadFile uploadFile = new UploadFile() { ContentType = "application/pdf", AXISRequestID = "TEST-10001-12342", DestinationFileName = destinationfilename, S3BucketName = "test123-protected", SubFolderPath = "test123-protected/Abintest/unittestmigration", UploadType = UploadType.Attachments, SourceFileName = "DOC1.pdf", FileStream = fs };
+                UploadFile uploadFile = new UploadFile() {  AXISRequestID = "TEST-10001-12342", DestinationFileName = destinationfilename, S3BucketName = "test123-protected", SubFolderPath = "test123-protected/Abintest/unittestmigration", UploadType = UploadType.Attachments, SourceFileName = "DOC1.pdf", FileStream = fs };
                 var result = docMigrationS3Client.UploadFileAsync(uploadFile).Result;
                 Assert.IsNotNull(result);
                 Assert.IsTrue(result.IsSuccessStatusCode);
