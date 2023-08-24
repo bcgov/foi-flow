@@ -144,10 +144,10 @@ const Divisions = ({userDetail}) => {
           });
         } else {
           toast.error(
-            "Temporarily unable to disable division. Please try again in a few minutes.",
+            "Unable to disable division. Please try again in a few minutes and ensure that the division is not tagged to any FOI Request records.",
             {
               position: "top-right",
-              autoClose: 3000,
+              autoClose: 4500,
               hideProgressBar: true,
               closeOnClick: true,
               pauseOnHover: true,

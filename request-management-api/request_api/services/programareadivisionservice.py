@@ -31,7 +31,7 @@ class programareadivisionservice:
         for record in records:
             attributes = json.loads(record['attributes'])
             if any(int(divisionid) in division.values() for division in attributes["divisions"]):
-                return DefaultMethodResult(False,'Division is currently tagged to various records and cannot be disabled at this time', divisionid)
+                return DefaultMethodResult(False,'Division is currently tagged to various records and cannot be disabled', divisionid)
 
         return ProgramAreaDivision.disableprogramareadivision(divisionid,userid)
     
