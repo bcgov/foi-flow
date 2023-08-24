@@ -126,6 +126,20 @@ class FOIRequestRecord(db.Model):
         finally:
             db.session.close()
         return records
+    
+    @classmethod
+    def get_all_records(cls):
+        records_schema = FOIRequestRecordSchema(many=True)
+        # sql =   """select
+        #                 (to_json(attributes)->>'divisions\')::json as divisions
+        #             from public. "FOIRequestRecords"
+        # """
+        # search_value = {"divisions": [{"divisionid": divisionid}]}
+        # query = db.session.query(FOIRequestRecord).filter(FOIRequestRecord.isactive==True).filter(FOIRequestRecord.attributes.contains(search_value)).all()
+        # query = db.session.query(FOIRequestRecord).filter(FOIRequestRecord.isactive==True).filter(FOIRequestRecord.attributes['divisions'].astext.ilike(divisionid)).all()
+        # DocumentAttributes.attributes['isattachment'].astext.cast(db.Boolean).label('isattachment')
+        query = db.session.query(FOIRequestRecord).filter_by(isactive=True).all()
+        return records_schema.dump(query)
 
     @classmethod
     def replace(cls,replacingrecordid,records):

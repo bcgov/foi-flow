@@ -116,7 +116,7 @@ class DisableFOIProgramAreaDivision(Resource):
         try:
             result = programareadivisionservice().disableprogramareadivision(divisionid, AuthHelper.getuserid())
             if result.success != True:
-                return {'status': result.success, 'message': result.message,}, 400  
+                return {'status': result.success, 'message': result.message, 'id':result.identifier}, 400  
             return {'status': result.success, 'message':result.message, 'id':result.identifier}, 200 
         except KeyError as err:
             return {'status': False, 'message':err.messages}, 400        
