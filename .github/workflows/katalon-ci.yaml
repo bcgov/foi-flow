@@ -37,7 +37,7 @@ jobs:
     - name: Katalon Studio Github Action
       uses: katalon-studio/katalon-studio-github-action@v2
       with:
-          version: '8.2.0'
+          version: '7.2.10'
           projectPath: '${{ github.workspace }}/testing/foi-qa-automation/foi-qa-automation.prj'
           args: '-noSplash -retry=0  -testSuiteCollectionPath="Test Suites/foi-test" -apiKey=${{ secrets.KATALON_API_KEY }} --config -webui.autoUpdateDrivers=true -licenseRelease=true -browserType="Chrome" -proxy.auth.option=NO_PROXY -proxy.system.option=NO_PROXY -proxy.system.applyToDesiredCapabilities=true -executionProfile="dev" '
     - name: copy reports to one folder
