@@ -32,6 +32,7 @@ namespace FOIMOD.CFD.DocMigration.FOIFLOW.DAL
             catch (Exception ex) {
                 dbConnection.Close();
                 result = false;
+                throw;
             }
             return result;
         }

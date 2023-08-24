@@ -5,12 +5,21 @@ using FOIMOD.CFD.DocMigration.BAL;
 using FOIMOD.CFD.DocMigration.Models;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
+using System.Data.Odbc;
 using System.Net;
 
 Console.WriteLine("Starting, CFD Document Migration!");
+
+#if DEBUG
+var configurationbuilder = new ConfigurationBuilder()
+                       .AddJsonFile($"appsettings.dev.json", true, true)
+                       .AddEnvironmentVariables().Build();
+#else
 var configurationbuilder = new ConfigurationBuilder()
                        .AddJsonFile($"appsettings.json", true, true)
                        .AddEnvironmentVariables().Build();
+
+#endif
 
 
 SystemSettings.FileServerRoot = configurationbuilder.GetSection("S3Configuration:FileServerRoot").Value;
@@ -26,10 +35,12 @@ SystemSettings.AttachmentTag = configurationbuilder.GetSection("S3Configuration:
 SystemSettings.AXISConnectionString = configurationbuilder.GetSection("AXISConfiguration:SQLConnectionString").Value;
 SystemSettings.RequestToMigrate = configurationbuilder.GetSection("AXISConfiguration:RequestToMigrate").Value;
 
+SystemSettings.FOIFLOWConnectionString = configurationbuilder.GetSection("FOIFLOWConfiguration:FOIFLOWConnectionString").Value;
+
 
 
 SqlConnection axissqlConnection = new SqlConnection(SystemSettings.AXISConnectionString);
-
+OdbcConnection odbcConnection = new OdbcConnection(SystemSettings.FOIFLOWConnectionString);
 
 AWSCredentials s3credentials = new BasicAWSCredentials(SystemSettings.S3_AccessKey, SystemSettings.S3_SecretKey);
 
@@ -41,6 +52,6 @@ AmazonS3Config config = new()
 
 AmazonS3Client amazonS3Client = new AmazonS3Client(s3credentials, config);
 
-CorrespondenceLogMigration correspondenceLogMigration = new CorrespondenceLogMigration(axissqlConnection, null, amazonS3Client);
+CorrespondenceLogMigration correspondenceLogMigration = new CorrespondenceLogMigration(axissqlConnection, odbcConnection, amazonS3Client);
 correspondenceLogMigration.RequestsToMigrate = SystemSettings.RequestToMigrate;
 await correspondenceLogMigration.RunMigration();

@@ -109,3 +109,4 @@ datamigrations/FOIMOD.CFD.ConsoleApp.DocMigration/FOIMOD.CFD.ConsoleApp.DocMigra
 datamigrations/FOIMOD.CFD.ConsoleApp.DocMigration/FOIMOD.CFD.DocMigration.AXIS.DAL.UnitTests/obj/*
 datamigrations/FOIMOD.CFD.ConsoleApp.DocMigration/FOIMOD.CFD.DocMigration.AXIS.DAL.UnitTests/Debug/*
 datamigrations/FOIMOD.CFD.ConsoleApp.DocMigration/FOIMOD.CFD.DocMigration.FOIFLOW.DAL.Tests/obj/*
+datamigrations/FOIMOD.CFD.ConsoleApp.DocMigration/FOIMOD.CFD.ConsoleApp.DocMigration/appsettings.dev.json
