@@ -23,7 +23,7 @@ namespace FOIMOD.CFD.DocMigration.Utils
             mergeddocstream.Dispose();
         }
 
-        public Stream MergePDFs(DocumentToMigrate[] pdfpages)
+        public Stream MergePDFs(List<DocumentToMigrate> pdfpages)
         {
             var _pdfpages = pdfpages.OrderBy(p => p.PageSequenceNumber).ToArray<DocumentToMigrate>();
             using (PdfDocument pdfdocument = new PdfDocument())

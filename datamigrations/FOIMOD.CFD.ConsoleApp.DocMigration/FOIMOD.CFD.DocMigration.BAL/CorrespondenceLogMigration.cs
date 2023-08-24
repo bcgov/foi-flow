@@ -31,6 +31,7 @@ namespace FOIMOD.CFD.DocMigration.BAL
 
             DocumentsDAL documentsDAL = new DocumentsDAL((SqlConnection)sourceaxisSQLConnection);
             AttachmentsDAL attachmentsDAL = new AttachmentsDAL((OdbcConnection)destinationfoiflowQLConnection);
+            DocMigrationPDFStitcher docMigrationPDFStitcher = new DocMigrationPDFStitcher();
             List<DocumentToMigrate>? correspondencelogs = documentsDAL.GetCorrespondenceLogDocuments(this.RequestsToMigrate);
             foreach (DocumentToMigrate attachment in correspondencelogs)
             {
@@ -49,7 +50,7 @@ namespace FOIMOD.CFD.DocMigration.BAL
                             var s3filesubpath = string.Format("{0}/{1}/{2}", SystemSettings.S3_Attachements_BasePath, attachment.AXISRequestNumber, SystemSettings.AttachmentTag);
                             var destinationfilename = string.Format("{0}.{1}", Guid.NewGuid().ToString(), file.FileExtension);
                             var uploadresponse = await docMigrationS3Client.UploadFileAsync(new UploadFile() { AXISRequestID = attachment.AXISRequestNumber.ToUpper(), SubFolderPath = s3filesubpath, DestinationFileName = destinationfilename, FileStream = fs });
-                            var fullfileurl = string.Format("{0}/{1}/{2}", SystemSettings.S3_EndPoint, s3filesubpath,destinationfilename);
+                            var fullfileurl = string.Format("{0}/{1}/{2}", SystemSettings.S3_EndPoint, s3filesubpath, destinationfilename);
                             if (uploadresponse.IsSuccessStatusCode)
                             {
                                 //INSERT INTO TABLE - FOIMinistryRequestDocuments
@@ -65,6 +66,60 @@ namespace FOIMOD.CFD.DocMigration.BAL
                 else
                 {
                     //Create EMAIL MSG PDF and sticth with the attachment documents
+                    List<DocumentToMigrate> documentToMigrateEmail = new List<DocumentToMigrate>();
+                    using var emaildocstream = docMigrationPDFStitcher.CreatePDFDocument(attachment.EmailContent, attachment.EmailSubject, attachment.EmailDate, attachment.EmailTo);
+                    emaildocstream.Position = 0;
+                    documentToMigrateEmail.Add(new DocumentToMigrate() { FileStream = emaildocstream, DocumentType = Models.AXISSource.DocumentTypeFromAXIS.CorrespondenceLog, AXISRequestNumber = attachment.AXISRequestNumber.ToUpper(), PageSequenceNumber = 1, HasStreamForDocument = true });
+
+                    var attachmentfiles = FilePathUtils.GetFileDetailsFromdelimitedstring(attachment.EmailAttachmentDelimitedString);
+                    if (attachmentfiles != null)
+                    {
+                        foreach (var file in attachmentfiles)
+                        {
+                            //var UNCFileLocation = Path.Combine(SystemSettings.FileServerRoot, SystemSettings.CorrespondenceLogBaseFolder, file.FilePathOnServer);
+                            var UNCFileLocation = file.FileExtension == "pdf" ? @"\\DESKTOP-U67UC02\ioashare\db7e84e1-4202-4837-b4dd-49af233ae006.pdf" : @"\\DESKTOP-U67UC02\ioashare\DOCX1.docx";
+                            if (file.FileExtension == "pdf")
+                            {
+
+                                documentToMigrateEmail.Add(new DocumentToMigrate()
+                                { PageFilePath = UNCFileLocation, PageSequenceNumber = 2 });
+
+                            }
+                            else
+                            {
+                                using (FileStream fs = File.Open(UNCFileLocation, FileMode.Open))
+                                {
+                                    var s3filesubpath = string.Format("{0}/{1}/{2}", SystemSettings.S3_Attachements_BasePath, attachment.AXISRequestNumber, SystemSettings.AttachmentTag);
+                                    var destinationfilename = string.Format("{0}.{1}", Guid.NewGuid().ToString(), file.FileExtension);
+                                    var uploadresponse = await docMigrationS3Client.UploadFileAsync(new UploadFile() { AXISRequestID = attachment.AXISRequestNumber.ToUpper(), SubFolderPath = s3filesubpath, DestinationFileName = destinationfilename, FileStream = fs });
+                                    var fullfileurl = string.Format("{0}/{1}/{2}", SystemSettings.S3_EndPoint, s3filesubpath, destinationfilename);
+                                    if (uploadresponse.IsSuccessStatusCode)
+                                    {
+                                        //INSERT INTO TABLE - FOIMinistryRequestDocuments
+                                        attachmentsDAL.InsertIntoMinistryRequestDocuments(fullfileurl, file.FileName, attachment.AXISRequestNumber);
+
+                                    }
+
+                                }
+                            }
+                        }
+                    }
+
+
+                    using (Stream emailmessagepdfstream = docMigrationPDFStitcher.MergePDFs(documentToMigrateEmail))
+                    {
+                        var s3filesubpath = string.Format("{0}/{1}/{2}", SystemSettings.S3_Attachements_BasePath, attachment.AXISRequestNumber, SystemSettings.AttachmentTag);
+                        var destinationfilename = string.Format("{0}.pdf", Guid.NewGuid().ToString());
+                        var uploadresponse = await docMigrationS3Client.UploadFileAsync(new UploadFile() { AXISRequestID = attachment.AXISRequestNumber.ToUpper(), SubFolderPath = s3filesubpath, DestinationFileName = destinationfilename, FileStream = emailmessagepdfstream });
+                        var fullfileurl = string.Format("{0}/{1}/{2}", SystemSettings.S3_EndPoint, s3filesubpath, destinationfilename);
+                        if (uploadresponse.IsSuccessStatusCode)
+                        {
+                            //INSERT INTO TABLE - FOIMinistryRequestDocuments
+                            attachmentsDAL.InsertIntoMinistryRequestDocuments(fullfileurl, string.Format("{0}.pdf",attachment.EmailSubject), attachment.AXISRequestNumber);
+
+                        }
+                    }
+
                 }
             }
 

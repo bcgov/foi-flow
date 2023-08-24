@@ -27,7 +27,7 @@ namespace FOIMOD.CFD.DocMigration.DAL
                                             ,C.vcEmail
                                             ,C.vcFromEmail
                                             , CAST(C.vcBody as NVARCHAR(max)) as emailbody
-                                            , STRING_AGG(CAST((C.vcFilePath +' # ' +C.vcFileName) as nvarchar(max)),' | ') as attachments  
+                                            , STRING_AGG(CAST((C.vcFilePath +' * ' +C.vcFileName) as nvarchar(max)),' | ') as attachments  
 
                                             FROM tblCorrespondence C JOIN tblRequests R on C.iRequestID = R.iRequestID
                                             WHERE R.vcVisibleRequestID in ({0})
