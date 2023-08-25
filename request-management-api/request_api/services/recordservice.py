@@ -38,8 +38,8 @@ class recordservice(recordservicebase):
     def fetch(self, requestid, ministryrequestid):
         return recordservicegetter().fetch(requestid, ministryrequestid)
 
-    def get_all_records(self):
-        return FOIRequestRecord.get_all_records()  
+    def get_all_records_by_divisionid(self, divisionid):
+        return FOIRequestRecord.get_all_records_by_divisionid(divisionid)  
             
     def update(self, requestid, ministryrequestid, requestdata, userid):
         newrecords = []

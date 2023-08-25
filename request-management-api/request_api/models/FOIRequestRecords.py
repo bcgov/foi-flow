@@ -128,19 +128,20 @@ class FOIRequestRecord(db.Model):
         return records
     
     @classmethod
-    def get_all_records(cls):
-        records_schema = FOIRequestRecordSchema(many=True)
-        # sql =   """select
-        #                 (to_json(attributes)->>'divisions\')::json as divisions
-        #             from public. "FOIRequestRecords"
-        # """
-        # search_value = {"divisions": [{"divisionid": divisionid}]}
-        # query = db.session.query(FOIRequestRecord).filter(FOIRequestRecord.isactive==True).filter(FOIRequestRecord.attributes.contains(search_value)).all()
-        # query = db.session.query(FOIRequestRecord).filter(FOIRequestRecord.isactive==True).filter(FOIRequestRecord.attributes['divisions'].astext.ilike(divisionid)).all()
-        # DocumentAttributes.attributes['isattachment'].astext.cast(db.Boolean).label('isattachment')
-        query = db.session.query(FOIRequestRecord).filter_by(isactive=True).all()
-        return records_schema.dump(query)
-
+    def get_all_records_by_divisionid(cls, divisionid):
+        records = []
+        try:
+            sql = """SELECT * FROM  public."FOIRequestRecords" WHERE cast(attributes::json -> 'divisions' as text) like '%{"divisionid": """+ divisionid +"""}%' and isactive = 'true'"""
+            result = db.session.execute(text(sql))
+            for row in result:
+                records.append({"recordid": row["recordid"], "foirequestid": row["foirequestid"], "ministryrequestid": row["ministryrequestid"], "filename": row["filename"], "s3uripath": row["s3uripath"], "attributes": row["attributes"], "isactive": row["isactive"], "createdby": row["createdby"], "created_at": row["created_at"]})
+        except Exception as ex:
+            logging.error(ex)
+            raise ex
+        finally:
+            db.session.close()
+        return records
+    
     @classmethod
     def replace(cls,replacingrecordid,records):
         replacingrecord = db.session.query(FOIRequestRecord).filter_by(recordid=replacingrecordid).order_by(FOIRequestRecord.version.desc()).first()

@@ -1,7 +1,6 @@
 from request_api.models.ProgramAreaDivisions import ProgramAreaDivision
 from request_api.services.programareaservice import programareaservice
 from request_api.services.recordservice import recordservice
-import json
 from request_api.models.default_method_result import DefaultMethodResult
 
 
@@ -27,12 +26,9 @@ class programareadivisionservice:
         """ Disable a program area division
         """
         # Validation to see if division id exists in any records. If so deletion cannot be completed. 
-        records = recordservice().get_all_records()
-        for record in records:
-            attributes = json.loads(record['attributes'])
-            if any(int(divisionid) in division.values() for division in attributes["divisions"]):
-                return DefaultMethodResult(False,'Division is currently tagged to various records and cannot be disabled', divisionid)
-
+        records = recordservice().get_all_records_by_divisionid(divisionid)
+        if len(records) > 0:
+            return DefaultMethodResult(False,'Division is currently tagged to various records and cannot be disabled', divisionid)
         return ProgramAreaDivision.disableprogramareadivision(divisionid,userid)
     
     def __prepareprogramareas(self, data):
