@@ -1,0 +1,1499 @@
+﻿<?xml version="1.0"?>
+<DTS:Executable xmlns:DTS="www.microsoft.com/SqlServer/Dts"
+  DTS:refId="Package"
+  DTS:CreationDate="7/31/2023 11:37:52 AM"
+  DTS:CreationName="Microsoft.Package"
+  DTS:CreatorComputerName="WALTZ"
+  DTS:CreatorName="IDIR\asobha_A"
+  DTS:DTSID="{F6BAB303-5655-462B-B60C-AC54FEE248D6}"
+  DTS:ExecutableType="Microsoft.Package"
+  DTS:LastModifiedProductVersion="15.0.2000.180"
+  DTS:LocaleID="1033"
+  DTS:ObjectName="FOIRequestContactInformation"
+  DTS:PackageType="5"
+  DTS:VersionBuild="71"
+  DTS:VersionGUID="{D8F0E47C-87C0-4352-B380-D36429864036}">
+  <DTS:Property
+    DTS:Name="PackageFormatVersion">8</DTS:Property>
+  <DTS:Variables>
+    <DTS:Variable
+      DTS:CreationName=""
+      DTS:DTSID="{BF2AA03E-E06B-4567-BAB7-B80DD6FFFBA6}"
+      DTS:IncludeInDebugDump="2345"
+      DTS:Namespace="User"
+      DTS:ObjectName="address1">
+      <DTS:VariableValue
+        DTS:DataType="8"
+        xml:space="preserve"></DTS:VariableValue>
+    </DTS:Variable>
+    <DTS:Variable
+      DTS:CreationName=""
+      DTS:DTSID="{1FB2DF42-DA76-40ED-BE73-2B0FC4380429}"
+      DTS:IncludeInDebugDump="2345"
+      DTS:Namespace="User"
+      DTS:ObjectName="address2">
+      <DTS:VariableValue
+        DTS:DataType="8"
+        xml:space="preserve"></DTS:VariableValue>
+    </DTS:Variable>
+    <DTS:Variable
+      DTS:CreationName=""
+      DTS:DTSID="{CE81ACD3-3CAB-4945-B762-21BFEE909621}"
+      DTS:IncludeInDebugDump="2345"
+      DTS:Namespace="User"
+      DTS:ObjectName="businessName">
+      <DTS:VariableValue
+        DTS:DataType="8"
+        xml:space="preserve"></DTS:VariableValue>
+    </DTS:Variable>
+    <DTS:Variable
+      DTS:CreationName=""
+      DTS:DTSID="{F15842A1-DFE0-4DB2-BB45-7D013A0376ED}"
+      DTS:IncludeInDebugDump="2345"
+      DTS:Namespace="User"
+      DTS:ObjectName="city">
+      <DTS:VariableValue
+        DTS:DataType="8"
+        xml:space="preserve"></DTS:VariableValue>
+    </DTS:Variable>
+    <DTS:Variable
+      DTS:CreationName=""
+      DTS:DTSID="{33E31516-8789-42C4-B4BA-4B4424FDFCC7}"
+      DTS:IncludeInDebugDump="2345"
+      DTS:Namespace="User"
+      DTS:ObjectName="country">
+      <DTS:VariableValue
+        DTS:DataType="8"
+        xml:space="preserve"></DTS:VariableValue>
+    </DTS:Variable>
+    <DTS:Variable
+      DTS:CreationName=""
+      DTS:DTSID="{C14C80D0-D098-42FD-B398-FF67CE9A0CB8}"
+      DTS:IncludeInDebugDump="2345"
+      DTS:Namespace="User"
+      DTS:ObjectName="email">
+      <DTS:VariableValue
+        DTS:DataType="8"
+        xml:space="preserve"></DTS:VariableValue>
+    </DTS:Variable>
+    <DTS:Variable
+      DTS:CreationName=""
+      DTS:DTSID="{CFD368E5-D36C-47BB-8D05-F94D5DA10BDA}"
+      DTS:IncludeInDebugDump="6789"
+      DTS:Namespace="User"
+      DTS:ObjectName="foirequestcontactinformationresultset">
+      <DTS:VariableValue
+        DTS:DataSubType="ManagedSerializable"
+        DTS:DataType="13">
+        <SOAP-ENV:Envelope xmlns:clr="http://schemas.microsoft.com/soap/encoding/clr/1.0" xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          SOAP-ENV:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
+          <SOAP-ENV:Body>
+            <xsd:anyType
+              id="ref-1"></xsd:anyType>
+          </SOAP-ENV:Body>
+        </SOAP-ENV:Envelope>
+      </DTS:VariableValue>
+    </DTS:Variable>
+    <DTS:Variable
+      DTS:CreationName=""
+      DTS:DTSID="{F91BB119-04BC-453E-A884-AB5EDC272E0C}"
+      DTS:IncludeInDebugDump="2345"
+      DTS:Namespace="User"
+      DTS:ObjectName="home">
+      <DTS:VariableValue
+        DTS:DataType="8"
+        xml:space="preserve"></DTS:VariableValue>
+    </DTS:Variable>
+    <DTS:Variable
+      DTS:CreationName=""
+      DTS:DTSID="{DD877529-55EA-4954-9096-F07092529149}"
+      DTS:IncludeInDebugDump="2345"
+      DTS:Namespace="User"
+      DTS:ObjectName="mobile">
+      <DTS:VariableValue
+        DTS:DataType="8"
+        xml:space="preserve"></DTS:VariableValue>
+    </DTS:Variable>
+    <DTS:Variable
+      DTS:CreationName=""
+      DTS:DTSID="{C457F6CB-AD18-41F8-8AD6-7B8C68A259D3}"
+      DTS:IncludeInDebugDump="2345"
+      DTS:Namespace="User"
+      DTS:ObjectName="province">
+      <DTS:VariableValue
+        DTS:DataType="8"
+        xml:space="preserve"></DTS:VariableValue>
+    </DTS:Variable>
+    <DTS:Variable
+      DTS:CreationName=""
+      DTS:DTSID="{D8E595CB-C2C4-4F4E-B328-E4317CBF893B}"
+      DTS:IncludeInDebugDump="2345"
+      DTS:Namespace="User"
+      DTS:ObjectName="requests">
+      <DTS:VariableValue
+        DTS:DataType="8"
+        xml:space="preserve"></DTS:VariableValue>
+    </DTS:Variable>
+    <DTS:Variable
+      DTS:CreationName=""
+      DTS:DTSID="{32F8594A-42A2-4CBD-A034-D63463BFBB38}"
+      DTS:IncludeInDebugDump="2345"
+      DTS:Namespace="User"
+      DTS:ObjectName="requests1">
+      <DTS:VariableValue
+        DTS:DataType="8"
+        xml:space="preserve"></DTS:VariableValue>
+    </DTS:Variable>
+    <DTS:Variable
+      DTS:CreationName=""
+      DTS:DTSID="{FEC2759E-DF61-4D2A-8FD9-DD6DC040166D}"
+      DTS:IncludeInDebugDump="6789"
+      DTS:Namespace="foirequestcontactinformation"
+      DTS:ObjectName="Variable">
+      <DTS:VariableValue
+        DTS:DataSubType="ManagedSerializable"
+        DTS:DataType="13">
+        <SOAP-ENV:Envelope xmlns:clr="http://schemas.microsoft.com/soap/encoding/clr/1.0" xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          SOAP-ENV:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
+          <SOAP-ENV:Body>
+            <xsd:anyType
+              id="ref-1"></xsd:anyType>
+          </SOAP-ENV:Body>
+        </SOAP-ENV:Envelope>
+      </DTS:VariableValue>
+    </DTS:Variable>
+    <DTS:Variable
+      DTS:CreationName=""
+      DTS:DTSID="{EA340DA2-17EB-4858-89FC-F4B2842AFDCC}"
+      DTS:IncludeInDebugDump="2345"
+      DTS:Namespace="User"
+      DTS:ObjectName="work1">
+      <DTS:VariableValue
+        DTS:DataType="8"
+        xml:space="preserve"></DTS:VariableValue>
+    </DTS:Variable>
+    <DTS:Variable
+      DTS:CreationName=""
+      DTS:DTSID="{9F9D18A3-6EAC-4EB6-983A-90E5B4815634}"
+      DTS:IncludeInDebugDump="2345"
+      DTS:Namespace="User"
+      DTS:ObjectName="work2">
+      <DTS:VariableValue
+        DTS:DataType="8"
+        xml:space="preserve"></DTS:VariableValue>
+    </DTS:Variable>
+    <DTS:Variable
+      DTS:CreationName=""
+      DTS:DTSID="{5BF4DB58-6A33-4CC6-899D-66F11427C367}"
+      DTS:IncludeInDebugDump="2345"
+      DTS:Namespace="User"
+      DTS:ObjectName="zipcode">
+      <DTS:VariableValue
+        DTS:DataType="8"
+        xml:space="preserve"></DTS:VariableValue>
+    </DTS:Variable>
+  </DTS:Variables>
+  <DTS:Executables>
+    <DTS:Executable
+      DTS:refId="Package\Execute SQL Task"
+      DTS:CreationName="Microsoft.ExecuteSQLTask"
+      DTS:Description="Execute SQL Task"
+      DTS:DTSID="{3BF25128-78EE-4364-AD15-6B2D8CBED854}"
+      DTS:ExecutableType="Microsoft.ExecuteSQLTask"
+      DTS:LocaleID="-1"
+      DTS:MaxErrorCount="10"
+      DTS:ObjectName="Execute SQL Task"
+      DTS:TaskContact="Execute SQL Task; Microsoft Corporation; SQL Server 2019; © 2019 Microsoft Corporation; All Rights Reserved;http://www.microsoft.com/sql/support/default.asp;1"
+      DTS:ThreadHint="0">
+      <DTS:Variables />
+      <DTS:PropertyExpression
+        DTS:Name="SqlStatementSource">REPLACE( @[$Project::foirequestcontactinformation] , "@requestids", @[$Project::requestidstomigrate]  )</DTS:PropertyExpression>
+      <DTS:ObjectData>
+        <SQLTask:SqlTaskData
+          SQLTask:Connection="{FA877C17-9970-459F-BFAC-AC1E9E4433B6}"
+          SQLTask:BypassPrepare="False"
+          SQLTask:SqlStatementSource="SELECT email,address1,address2, city,zipcode,work1,work2,mobile,home,country,province, STRING_AGG(CAST(requestid as nvarchar(max)),', ') as requests  FROM  (SELECT&#x9;'test@test1.com' as email,requesters.vcAddress1 as address1, requesters.vcAddress2 as address2, requesters.vcCity as city,  requesters.vcZipCode as zipcode, requesters.vcWork1 as work1, requesters.vcwork2 as work2, requesters.vcMobile as mobile,requesters.vcHome as home, (SELECT terminology.vcTerminology from tblTerminologyLookup terminology WHERE terminology.iLabelID = countries.iLabelID and  terminology.tiLocaleID = 1) as country,  (SELECT terminology.vcTerminology from tblTerminologyLookup terminology WHERE terminology.iLabelID = states.iLabelID and terminology.tiLocaleID = 1) as province,  requests.vcVisibleRequestID as requestid  FROM tblRequests requests WITH (NOLOCK)   LEFT OUTER JOIN EC_OFFICE office WITH (NOLOCK) ON requests.tiOfficeID = office.OFFICE_ID   LEFT OUTER JOIN tblRequesters requesters WITH (NOLOCK) ON requests.iRequesterID = requesters.iRequesterID  LEFT OUTER JOIN tblCountries countries WITH (NOLOCK) ON requesters.siCountryID = countries.siCountryID  LEFT OUTER JOIN tblStates states WITH (NOLOCK) ON requesters.siStateID = states.siStateID  LEFT OUTER JOIN dbo.TBLREQUESTERCUSTOMFIELDS requestorfields WITH  (NOLOCK) ON requesters.iRequesterID = requestorfields.IREQUESTERID WHERE office.OFFICE_CODE = 'CFD' AND  requests.vcRequestStatus NOT IN ('Closed') ) AS T  WHERE requestid  in ('CFD-2022-20261', 'CFD-2021-14313','CFD-2021-12866' , 'CFD-2021-12905', 'CFD-2021-12651')    GROUP BY T.email,T.address1,T.address2,  T.city,T.zipcode,T.work1,T.work2,T.mobile,T.home, T.country,T.province"
+          SQLTask:ResultType="ResultSetType_Rowset" xmlns:SQLTask="www.microsoft.com/sqlserver/dts/tasks/sqltask">
+          <SQLTask:ResultBinding
+            SQLTask:ResultName="0"
+            SQLTask:DtsVariableName="User::foirequestcontactinformationresultset" />
+        </SQLTask:SqlTaskData>
+      </DTS:ObjectData>
+    </DTS:Executable>
+    <DTS:Executable
+      DTS:refId="Package\Foreach Loop Container"
+      DTS:CreationName="STOCK:FOREACHLOOP"
+      DTS:Description="Foreach Loop Container"
+      DTS:DTSID="{F66A7B75-C49A-481E-856B-0E07D233AD81}"
+      DTS:ExecutableType="STOCK:FOREACHLOOP"
+      DTS:LocaleID="-1"
+      DTS:MaxErrorCount="10"
+      DTS:ObjectName="Foreach Loop Container">
+      <DTS:ForEachEnumerator
+        DTS:CreationName="Microsoft.ForEachADOEnumerator"
+        DTS:DTSID="{C0D24451-9E28-450F-AE8C-A29C48155F9F}"
+        DTS:ObjectName="{C0D24451-9E28-450F-AE8C-A29C48155F9F}">
+        <DTS:ObjectData>
+          <FEEADO
+            EnumType="EnumerateRowsInFirstTable"
+            VarName="User::foirequestcontactinformationresultset" />
+        </DTS:ObjectData>
+      </DTS:ForEachEnumerator>
+      <DTS:Variables />
+      <DTS:Executables>
+        <DTS:Executable
+          DTS:refId="Package\Foreach Loop Container\Execute SQL Task 1"
+          DTS:CreationName="Microsoft.ExecuteSQLTask"
+          DTS:Description="Execute SQL Task"
+          DTS:DTSID="{ACD51781-615F-43FB-B123-B65B20B1A298}"
+          DTS:ExecutableType="Microsoft.ExecuteSQLTask"
+          DTS:LocaleID="-1"
+          DTS:MaxErrorCount="10"
+          DTS:ObjectName="Execute SQL Task 1"
+          DTS:TaskContact="Execute SQL Task; Microsoft Corporation; SQL Server 2019; © 2019 Microsoft Corporation; All Rights Reserved;http://www.microsoft.com/sql/support/default.asp;1"
+          DTS:ThreadHint="3">
+          <DTS:Variables />
+          <DTS:ObjectData>
+            <SQLTask:SqlTaskData
+              SQLTask:Connection="{18EF9DFD-37E1-484D-9BC1-BFE418845E48}"
+              SQLTask:SqlStatementSource="INSERT INTO public.&quot;FOIRequestContactInformation&quot; (contactinformation,dataformat,created_at,updated_at,&#xA;createdby,updatedby,contacttypeid,foirequest_id,foirequestversion_id,migrationreference) VALUES&#xA;(?,'email',NOW(),NULL,'cfdmigration',NULL,1,(SELECT foirequestid FROM public.&quot;FOIRequests&quot; FR WHERE FR.migrationreference=?) ,1,?);" xmlns:SQLTask="www.microsoft.com/sqlserver/dts/tasks/sqltask">
+              <SQLTask:ParameterBinding
+                SQLTask:ParameterName="1"
+                SQLTask:DtsVariableName="User::email"
+                SQLTask:ParameterDirection="Input"
+                SQLTask:DataType="-9"
+                SQLTask:ParameterSize="-1" />
+              <SQLTask:ParameterBinding
+                SQLTask:ParameterName="2"
+                SQLTask:DtsVariableName="User::requests"
+                SQLTask:ParameterDirection="Input"
+                SQLTask:DataType="-9"
+                SQLTask:ParameterSize="-1" />
+              <SQLTask:ParameterBinding
+                SQLTask:ParameterName="3"
+                SQLTask:DtsVariableName="User::requests"
+                SQLTask:ParameterDirection="Input"
+                SQLTask:DataType="-9"
+                SQLTask:ParameterSize="-1" />
+            </SQLTask:SqlTaskData>
+          </DTS:ObjectData>
+        </DTS:Executable>
+        <DTS:Executable
+          DTS:refId="Package\Foreach Loop Container\Execute SQL Task 10"
+          DTS:CreationName="Microsoft.ExecuteSQLTask"
+          DTS:Description="Execute SQL Task"
+          DTS:DTSID="{5D4BD998-64CA-4687-8405-BA3C59ECEA64}"
+          DTS:ExecutableType="Microsoft.ExecuteSQLTask"
+          DTS:LocaleID="-1"
+          DTS:MaxErrorCount="10"
+          DTS:ObjectName="Execute SQL Task 10"
+          DTS:TaskContact="Execute SQL Task; Microsoft Corporation; SQL Server 2019; © 2019 Microsoft Corporation; All Rights Reserved;http://www.microsoft.com/sql/support/default.asp;1"
+          DTS:ThreadHint="4">
+          <DTS:Variables />
+          <DTS:ObjectData>
+            <SQLTask:SqlTaskData
+              SQLTask:Connection="{18EF9DFD-37E1-484D-9BC1-BFE418845E48}"
+              SQLTask:SqlStatementSource="INSERT INTO public.&quot;FOIRequestContactInformation&quot; (contactinformation,dataformat,created_at,updated_at,&#xA;createdby,updatedby,contacttypeid,foirequest_id,foirequestversion_id,migrationreference) VALUES&#xA;(?,'country',NOW(),NULL,'cfdmigration',NULL,2,(SELECT foirequestid FROM public.&quot;FOIRequests&quot; FR WHERE FR.migrationreference=?),1,?);" xmlns:SQLTask="www.microsoft.com/sqlserver/dts/tasks/sqltask">
+              <SQLTask:ParameterBinding
+                SQLTask:ParameterName="1"
+                SQLTask:DtsVariableName="User::country"
+                SQLTask:ParameterDirection="Input"
+                SQLTask:DataType="-9"
+                SQLTask:ParameterSize="-1" />
+              <SQLTask:ParameterBinding
+                SQLTask:ParameterName="2"
+                SQLTask:DtsVariableName="User::requests"
+                SQLTask:ParameterDirection="Input"
+                SQLTask:DataType="-9"
+                SQLTask:ParameterSize="-1" />
+              <SQLTask:ParameterBinding
+                SQLTask:ParameterName="3"
+                SQLTask:DtsVariableName="User::requests"
+                SQLTask:ParameterDirection="Input"
+                SQLTask:DataType="-9"
+                SQLTask:ParameterSize="-1" />
+            </SQLTask:SqlTaskData>
+          </DTS:ObjectData>
+        </DTS:Executable>
+        <DTS:Executable
+          DTS:refId="Package\Foreach Loop Container\Execute SQL Task 11"
+          DTS:CreationName="Microsoft.ExecuteSQLTask"
+          DTS:Description="Execute SQL Task"
+          DTS:DTSID="{AD3C4F42-C295-4839-964E-069A5D911948}"
+          DTS:ExecutableType="Microsoft.ExecuteSQLTask"
+          DTS:LocaleID="-1"
+          DTS:MaxErrorCount="10"
+          DTS:ObjectName="Execute SQL Task 11"
+          DTS:TaskContact="Execute SQL Task; Microsoft Corporation; SQL Server 2019; © 2019 Microsoft Corporation; All Rights Reserved;http://www.microsoft.com/sql/support/default.asp;1"
+          DTS:ThreadHint="5">
+          <DTS:Variables />
+          <DTS:ObjectData>
+            <SQLTask:SqlTaskData
+              SQLTask:Connection="{18EF9DFD-37E1-484D-9BC1-BFE418845E48}"
+              SQLTask:SqlStatementSource="INSERT INTO public.&quot;FOIRequestContactInformation&quot; (contactinformation,dataformat,created_at,updated_at,&#xA;createdby,updatedby,contacttypeid,foirequest_id,foirequestversion_id,migrationreference) VALUES&#xA;(?,'province',NOW(),NULL,'cfdmigration',NULL,2,(SELECT foirequestid FROM public.&quot;FOIRequests&quot; FR WHERE FR.migrationreference=?),1,?);" xmlns:SQLTask="www.microsoft.com/sqlserver/dts/tasks/sqltask">
+              <SQLTask:ParameterBinding
+                SQLTask:ParameterName="1"
+                SQLTask:DtsVariableName="User::province"
+                SQLTask:ParameterDirection="Input"
+                SQLTask:DataType="-9"
+                SQLTask:ParameterSize="-1" />
+              <SQLTask:ParameterBinding
+                SQLTask:ParameterName="2"
+                SQLTask:DtsVariableName="User::requests"
+                SQLTask:ParameterDirection="Input"
+                SQLTask:DataType="-9"
+                SQLTask:ParameterSize="-1" />
+              <SQLTask:ParameterBinding
+                SQLTask:ParameterName="3"
+                SQLTask:DtsVariableName="User::requests"
+                SQLTask:ParameterDirection="Input"
+                SQLTask:DataType="-9"
+                SQLTask:ParameterSize="-1" />
+            </SQLTask:SqlTaskData>
+          </DTS:ObjectData>
+        </DTS:Executable>
+        <DTS:Executable
+          DTS:refId="Package\Foreach Loop Container\Execute SQL Task 2"
+          DTS:CreationName="Microsoft.ExecuteSQLTask"
+          DTS:Description="Execute SQL Task"
+          DTS:DTSID="{6C09C665-840E-418F-AB03-BFE9911D44FB}"
+          DTS:ExecutableType="Microsoft.ExecuteSQLTask"
+          DTS:LocaleID="-1"
+          DTS:MaxErrorCount="10"
+          DTS:ObjectName="Execute SQL Task 2"
+          DTS:TaskContact="Execute SQL Task; Microsoft Corporation; SQL Server 2019; © 2019 Microsoft Corporation; All Rights Reserved;http://www.microsoft.com/sql/support/default.asp;1"
+          DTS:ThreadHint="10">
+          <DTS:Variables />
+          <DTS:ObjectData>
+            <SQLTask:SqlTaskData
+              SQLTask:Connection="{18EF9DFD-37E1-484D-9BC1-BFE418845E48}"
+              SQLTask:SqlStatementSource="INSERT INTO public.&quot;FOIRequestContactInformation&quot; (contactinformation,dataformat,created_at,updated_at,&#xA;createdby,updatedby,contacttypeid,foirequest_id,foirequestversion_id,migrationreference) VALUES&#xA;(?,'address',NOW(),NULL,'cfdmigration',NULL,2,(SELECT foirequestid FROM public.&quot;FOIRequests&quot; FR WHERE FR.migrationreference=?),1,?);" xmlns:SQLTask="www.microsoft.com/sqlserver/dts/tasks/sqltask">
+              <SQLTask:ParameterBinding
+                SQLTask:ParameterName="1"
+                SQLTask:DtsVariableName="User::address1"
+                SQLTask:ParameterDirection="Input"
+                SQLTask:DataType="-9"
+                SQLTask:ParameterSize="-1" />
+              <SQLTask:ParameterBinding
+                SQLTask:ParameterName="2"
+                SQLTask:DtsVariableName="User::requests"
+                SQLTask:ParameterDirection="Input"
+                SQLTask:DataType="-9"
+                SQLTask:ParameterSize="-1" />
+              <SQLTask:ParameterBinding
+                SQLTask:ParameterName="3"
+                SQLTask:DtsVariableName="User::requests"
+                SQLTask:ParameterDirection="Input"
+                SQLTask:DataType="-9"
+                SQLTask:ParameterSize="-1" />
+            </SQLTask:SqlTaskData>
+          </DTS:ObjectData>
+        </DTS:Executable>
+        <DTS:Executable
+          DTS:refId="Package\Foreach Loop Container\Execute SQL Task 3"
+          DTS:CreationName="Microsoft.ExecuteSQLTask"
+          DTS:Description="Execute SQL Task"
+          DTS:DTSID="{616B2D4A-135C-4001-BA5B-23C743FA397A}"
+          DTS:ExecutableType="Microsoft.ExecuteSQLTask"
+          DTS:LocaleID="-1"
+          DTS:MaxErrorCount="10"
+          DTS:ObjectName="Execute SQL Task 3"
+          DTS:TaskContact="Execute SQL Task; Microsoft Corporation; SQL Server 2019; © 2019 Microsoft Corporation; All Rights Reserved;http://www.microsoft.com/sql/support/default.asp;1"
+          DTS:ThreadHint="2">
+          <DTS:Variables />
+          <DTS:ObjectData>
+            <SQLTask:SqlTaskData
+              SQLTask:Connection="{18EF9DFD-37E1-484D-9BC1-BFE418845E48}"
+              SQLTask:SqlStatementSource="INSERT INTO public.&quot;FOIRequestContactInformation&quot; (contactinformation,dataformat,created_at,updated_at,&#xA;createdby,updatedby,contacttypeid,foirequest_id,foirequestversion_id,migrationreference) VALUES&#xA;(?,'addressSecondary',NOW(),NULL,'cfdmigration',NULL,2,(SELECT foirequestid FROM public.&quot;FOIRequests&quot; FR WHERE FR.migrationreference=?),1,?);" xmlns:SQLTask="www.microsoft.com/sqlserver/dts/tasks/sqltask">
+              <SQLTask:ParameterBinding
+                SQLTask:ParameterName="1"
+                SQLTask:DtsVariableName="User::address2"
+                SQLTask:ParameterDirection="Input"
+                SQLTask:DataType="-9"
+                SQLTask:ParameterSize="-1" />
+              <SQLTask:ParameterBinding
+                SQLTask:ParameterName="2"
+                SQLTask:DtsVariableName="User::requests"
+                SQLTask:ParameterDirection="Input"
+                SQLTask:DataType="-9"
+                SQLTask:ParameterSize="-1" />
+              <SQLTask:ParameterBinding
+                SQLTask:ParameterName="3"
+                SQLTask:DtsVariableName="User::requests"
+                SQLTask:ParameterDirection="Input"
+                SQLTask:DataType="-9"
+                SQLTask:ParameterSize="-1" />
+            </SQLTask:SqlTaskData>
+          </DTS:ObjectData>
+        </DTS:Executable>
+        <DTS:Executable
+          DTS:refId="Package\Foreach Loop Container\Execute SQL Task 4"
+          DTS:CreationName="Microsoft.ExecuteSQLTask"
+          DTS:Description="Execute SQL Task"
+          DTS:DTSID="{15599736-CD8C-470B-A7D2-F5009DD0B0A1}"
+          DTS:ExecutableType="Microsoft.ExecuteSQLTask"
+          DTS:LocaleID="-1"
+          DTS:MaxErrorCount="10"
+          DTS:ObjectName="Execute SQL Task 4"
+          DTS:TaskContact="Execute SQL Task; Microsoft Corporation; SQL Server 2019; © 2019 Microsoft Corporation; All Rights Reserved;http://www.microsoft.com/sql/support/default.asp;1"
+          DTS:ThreadHint="1">
+          <DTS:Variables />
+          <DTS:ObjectData>
+            <SQLTask:SqlTaskData
+              SQLTask:Connection="{18EF9DFD-37E1-484D-9BC1-BFE418845E48}"
+              SQLTask:SqlStatementSource="INSERT INTO public.&quot;FOIRequestContactInformation&quot; (contactinformation,dataformat,created_at,updated_at,&#xA;createdby,updatedby,contacttypeid,foirequest_id,foirequestversion_id,migrationreference) VALUES&#xA;(?,'city',NOW(),NULL,'cfdmigration',NULL,2,(SELECT foirequestid FROM public.&quot;FOIRequests&quot; FR WHERE FR.migrationreference=?),1,?);" xmlns:SQLTask="www.microsoft.com/sqlserver/dts/tasks/sqltask">
+              <SQLTask:ParameterBinding
+                SQLTask:ParameterName="1"
+                SQLTask:DtsVariableName="User::city"
+                SQLTask:ParameterDirection="Input"
+                SQLTask:DataType="-9"
+                SQLTask:ParameterSize="-1" />
+              <SQLTask:ParameterBinding
+                SQLTask:ParameterName="2"
+                SQLTask:DtsVariableName="User::requests"
+                SQLTask:ParameterDirection="Input"
+                SQLTask:DataType="-9"
+                SQLTask:ParameterSize="-1" />
+              <SQLTask:ParameterBinding
+                SQLTask:ParameterName="3"
+                SQLTask:DtsVariableName="User::requests"
+                SQLTask:ParameterDirection="Input"
+                SQLTask:DataType="-9"
+                SQLTask:ParameterSize="-1" />
+            </SQLTask:SqlTaskData>
+          </DTS:ObjectData>
+        </DTS:Executable>
+        <DTS:Executable
+          DTS:refId="Package\Foreach Loop Container\Execute SQL Task 5"
+          DTS:CreationName="Microsoft.ExecuteSQLTask"
+          DTS:Description="Execute SQL Task"
+          DTS:DTSID="{7A94EB7F-EB70-47BC-B1C7-191A0FFA5D6B}"
+          DTS:ExecutableType="Microsoft.ExecuteSQLTask"
+          DTS:LocaleID="-1"
+          DTS:MaxErrorCount="10"
+          DTS:ObjectName="Execute SQL Task 5"
+          DTS:TaskContact="Execute SQL Task; Microsoft Corporation; SQL Server 2019; © 2019 Microsoft Corporation; All Rights Reserved;http://www.microsoft.com/sql/support/default.asp;1"
+          DTS:ThreadHint="0">
+          <DTS:Variables />
+          <DTS:ObjectData>
+            <SQLTask:SqlTaskData
+              SQLTask:Connection="{18EF9DFD-37E1-484D-9BC1-BFE418845E48}"
+              SQLTask:SqlStatementSource="INSERT INTO public.&quot;FOIRequestContactInformation&quot; (contactinformation,dataformat,created_at,updated_at,&#xA;createdby,updatedby,contacttypeid,foirequest_id,foirequestversion_id,migrationreference) VALUES&#xA;(?,'postal',NOW(),NULL,'cfdmigration',NULL,2,(SELECT foirequestid FROM public.&quot;FOIRequests&quot; FR WHERE FR.migrationreference=?),1,?);" xmlns:SQLTask="www.microsoft.com/sqlserver/dts/tasks/sqltask">
+              <SQLTask:ParameterBinding
+                SQLTask:ParameterName="1"
+                SQLTask:DtsVariableName="User::zipcode"
+                SQLTask:ParameterDirection="Input"
+                SQLTask:DataType="-9"
+                SQLTask:ParameterSize="-1" />
+              <SQLTask:ParameterBinding
+                SQLTask:ParameterName="2"
+                SQLTask:DtsVariableName="User::requests"
+                SQLTask:ParameterDirection="Input"
+                SQLTask:DataType="-9"
+                SQLTask:ParameterSize="-1" />
+              <SQLTask:ParameterBinding
+                SQLTask:ParameterName="3"
+                SQLTask:DtsVariableName="User::requests"
+                SQLTask:ParameterDirection="Input"
+                SQLTask:DataType="-9"
+                SQLTask:ParameterSize="-1" />
+            </SQLTask:SqlTaskData>
+          </DTS:ObjectData>
+        </DTS:Executable>
+        <DTS:Executable
+          DTS:refId="Package\Foreach Loop Container\Execute SQL Task 6"
+          DTS:CreationName="Microsoft.ExecuteSQLTask"
+          DTS:Description="Execute SQL Task"
+          DTS:DTSID="{7BC4E7AE-F95D-4957-893E-3CE57B14C5CF}"
+          DTS:ExecutableType="Microsoft.ExecuteSQLTask"
+          DTS:LocaleID="-1"
+          DTS:MaxErrorCount="10"
+          DTS:ObjectName="Execute SQL Task 6"
+          DTS:TaskContact="Execute SQL Task; Microsoft Corporation; SQL Server 2019; © 2019 Microsoft Corporation; All Rights Reserved;http://www.microsoft.com/sql/support/default.asp;1"
+          DTS:ThreadHint="6">
+          <DTS:Variables />
+          <DTS:ObjectData>
+            <SQLTask:SqlTaskData
+              SQLTask:Connection="{18EF9DFD-37E1-484D-9BC1-BFE418845E48}"
+              SQLTask:SqlStatementSource="INSERT INTO public.&quot;FOIRequestContactInformation&quot; (contactinformation,dataformat,created_at,updated_at,&#xA;createdby,updatedby,contacttypeid,foirequest_id,foirequestversion_id,migrationreference) VALUES&#xA;(?,'workPhonePrimary',NOW(),NULL,'cfdmigration',NULL,4,(SELECT foirequestid FROM public.&quot;FOIRequests&quot; FR WHERE FR.migrationreference=?),1,?);" xmlns:SQLTask="www.microsoft.com/sqlserver/dts/tasks/sqltask">
+              <SQLTask:ParameterBinding
+                SQLTask:ParameterName="1"
+                SQLTask:DtsVariableName="User::work1"
+                SQLTask:ParameterDirection="Input"
+                SQLTask:DataType="-9"
+                SQLTask:ParameterSize="-1" />
+              <SQLTask:ParameterBinding
+                SQLTask:ParameterName="2"
+                SQLTask:DtsVariableName="User::requests"
+                SQLTask:ParameterDirection="Input"
+                SQLTask:DataType="-9"
+                SQLTask:ParameterSize="-1" />
+              <SQLTask:ParameterBinding
+                SQLTask:ParameterName="3"
+                SQLTask:DtsVariableName="User::requests"
+                SQLTask:ParameterDirection="Input"
+                SQLTask:DataType="-9"
+                SQLTask:ParameterSize="-1" />
+            </SQLTask:SqlTaskData>
+          </DTS:ObjectData>
+        </DTS:Executable>
+        <DTS:Executable
+          DTS:refId="Package\Foreach Loop Container\Execute SQL Task 7"
+          DTS:CreationName="Microsoft.ExecuteSQLTask"
+          DTS:Description="Execute SQL Task"
+          DTS:DTSID="{EF9735B8-DA25-434A-B95B-24AB1867D012}"
+          DTS:ExecutableType="Microsoft.ExecuteSQLTask"
+          DTS:LocaleID="-1"
+          DTS:MaxErrorCount="10"
+          DTS:ObjectName="Execute SQL Task 7"
+          DTS:TaskContact="Execute SQL Task; Microsoft Corporation; SQL Server 2019; © 2019 Microsoft Corporation; All Rights Reserved;http://www.microsoft.com/sql/support/default.asp;1"
+          DTS:ThreadHint="7">
+          <DTS:Variables />
+          <DTS:ObjectData>
+            <SQLTask:SqlTaskData
+              SQLTask:Connection="{18EF9DFD-37E1-484D-9BC1-BFE418845E48}"
+              SQLTask:SqlStatementSource="INSERT INTO public.&quot;FOIRequestContactInformation&quot; (contactinformation,dataformat,created_at,updated_at,&#xA;createdby,updatedby,contacttypeid,foirequest_id,foirequestversion_id,migrationreference) VALUES&#xA;(?,'workPhoneSecondary',NOW(),NULL,'cfdmigration',NULL,5,(SELECT foirequestid FROM public.&quot;FOIRequests&quot; FR WHERE FR.migrationreference=?),1,?);" xmlns:SQLTask="www.microsoft.com/sqlserver/dts/tasks/sqltask">
+              <SQLTask:ParameterBinding
+                SQLTask:ParameterName="1"
+                SQLTask:DtsVariableName="User::work2"
+                SQLTask:ParameterDirection="Input"
+                SQLTask:DataType="-9"
+                SQLTask:ParameterSize="-1" />
+              <SQLTask:ParameterBinding
+                SQLTask:ParameterName="2"
+                SQLTask:DtsVariableName="User::requests"
+                SQLTask:ParameterDirection="Input"
+                SQLTask:DataType="-9"
+                SQLTask:ParameterSize="-1" />
+              <SQLTask:ParameterBinding
+                SQLTask:ParameterName="3"
+                SQLTask:DtsVariableName="User::requests"
+                SQLTask:ParameterDirection="Input"
+                SQLTask:DataType="-9"
+                SQLTask:ParameterSize="-1" />
+            </SQLTask:SqlTaskData>
+          </DTS:ObjectData>
+        </DTS:Executable>
+        <DTS:Executable
+          DTS:refId="Package\Foreach Loop Container\Execute SQL Task 8"
+          DTS:CreationName="Microsoft.ExecuteSQLTask"
+          DTS:Description="Execute SQL Task"
+          DTS:DTSID="{B23B846A-E8DA-44D2-AD67-9EA07A55D83E}"
+          DTS:ExecutableType="Microsoft.ExecuteSQLTask"
+          DTS:LocaleID="-1"
+          DTS:MaxErrorCount="10"
+          DTS:ObjectName="Execute SQL Task 8"
+          DTS:TaskContact="Execute SQL Task; Microsoft Corporation; SQL Server 2019; © 2019 Microsoft Corporation; All Rights Reserved;http://www.microsoft.com/sql/support/default.asp;1"
+          DTS:ThreadHint="8">
+          <DTS:Variables />
+          <DTS:ObjectData>
+            <SQLTask:SqlTaskData
+              SQLTask:Connection="{18EF9DFD-37E1-484D-9BC1-BFE418845E48}"
+              SQLTask:SqlStatementSource="INSERT INTO public.&quot;FOIRequestContactInformation&quot; (contactinformation,dataformat,created_at,updated_at,&#xA;createdby,updatedby,contacttypeid,foirequest_id,foirequestversion_id,migrationreference) VALUES&#xA;(?,'phoneSecondary',NOW(),NULL,'cfdmigration',NULL,6,(SELECT foirequestid FROM public.&quot;FOIRequests&quot; FR WHERE FR.migrationreference=?),1,?);" xmlns:SQLTask="www.microsoft.com/sqlserver/dts/tasks/sqltask">
+              <SQLTask:ParameterBinding
+                SQLTask:ParameterName="1"
+                SQLTask:DtsVariableName="User::mobile"
+                SQLTask:ParameterDirection="Input"
+                SQLTask:DataType="-9"
+                SQLTask:ParameterSize="-1" />
+              <SQLTask:ParameterBinding
+                SQLTask:ParameterName="2"
+                SQLTask:DtsVariableName="User::requests"
+                SQLTask:ParameterDirection="Input"
+                SQLTask:DataType="-9"
+                SQLTask:ParameterSize="-1" />
+              <SQLTask:ParameterBinding
+                SQLTask:ParameterName="2"
+                SQLTask:DtsVariableName="User::requests"
+                SQLTask:ParameterDirection="Input"
+                SQLTask:DataType="-9"
+                SQLTask:ParameterSize="-1" />
+            </SQLTask:SqlTaskData>
+          </DTS:ObjectData>
+        </DTS:Executable>
+        <DTS:Executable
+          DTS:refId="Package\Foreach Loop Container\Execute SQL Task 9"
+          DTS:CreationName="Microsoft.ExecuteSQLTask"
+          DTS:Description="Execute SQL Task"
+          DTS:DTSID="{D2E75910-1D20-4E79-9EE4-CA8B4BB11DAA}"
+          DTS:ExecutableType="Microsoft.ExecuteSQLTask"
+          DTS:LocaleID="-1"
+          DTS:MaxErrorCount="10"
+          DTS:ObjectName="Execute SQL Task 9"
+          DTS:TaskContact="Execute SQL Task; Microsoft Corporation; SQL Server 2019; © 2019 Microsoft Corporation; All Rights Reserved;http://www.microsoft.com/sql/support/default.asp;1"
+          DTS:ThreadHint="9">
+          <DTS:Variables />
+          <DTS:ObjectData>
+            <SQLTask:SqlTaskData
+              SQLTask:Connection="{18EF9DFD-37E1-484D-9BC1-BFE418845E48}"
+              SQLTask:SqlStatementSource="INSERT INTO public.&quot;FOIRequestContactInformation&quot; (contactinformation,dataformat,created_at,updated_at,&#xA;createdby,updatedby,contacttypeid,foirequest_id,foirequestversion_id,migrationreference) VALUES&#xA;(?,'phonePrimary',NOW(),NULL,'cfdmigration',NULL,3,(SELECT foirequestid FROM public.&quot;FOIRequests&quot; FR WHERE FR.migrationreference=?),1,?);" xmlns:SQLTask="www.microsoft.com/sqlserver/dts/tasks/sqltask">
+              <SQLTask:ParameterBinding
+                SQLTask:ParameterName="1"
+                SQLTask:DtsVariableName="User::home"
+                SQLTask:ParameterDirection="Input"
+                SQLTask:DataType="-9"
+                SQLTask:ParameterSize="-1" />
+              <SQLTask:ParameterBinding
+                SQLTask:ParameterName="2"
+                SQLTask:DtsVariableName="User::requests"
+                SQLTask:ParameterDirection="Input"
+                SQLTask:DataType="-9"
+                SQLTask:ParameterSize="-1" />
+              <SQLTask:ParameterBinding
+                SQLTask:ParameterName="3"
+                SQLTask:DtsVariableName="User::requests"
+                SQLTask:ParameterDirection="Input"
+                SQLTask:DataType="-9"
+                SQLTask:ParameterSize="-1" />
+            </SQLTask:SqlTaskData>
+          </DTS:ObjectData>
+        </DTS:Executable>
+        <DTS:Executable
+          DTS:refId="Package\Foreach Loop Container\Expression Task"
+          DTS:CreationName="Microsoft.ExpressionTask"
+          DTS:Description="Expression Task"
+          DTS:DTSID="{1E0959B5-3969-4C2F-BEC9-ED43BF3E8D45}"
+          DTS:ExecutableType="Microsoft.ExpressionTask"
+          DTS:LocaleID="-1"
+          DTS:ObjectName="Expression Task"
+          DTS:TaskContact="Expression Task;Microsoft Corporation; SQL Server 2019; © 2019 Microsoft Corporation; All Rights Reserved;http://www.microsoft.com/sql/support/default.asp;1"
+          DTS:ThreadHint="3">
+          <DTS:Variables />
+          <DTS:ObjectData>
+            <ExpressionTask
+              Expression="! ISNULL( @[User::email]  )" />
+          </DTS:ObjectData>
+        </DTS:Executable>
+        <DTS:Executable
+          DTS:refId="Package\Foreach Loop Container\Expression Task 1"
+          DTS:CreationName="Microsoft.ExpressionTask"
+          DTS:Description="Expression Task"
+          DTS:DTSID="{DA08C392-F798-4EC7-9EAD-0284FE8FD013}"
+          DTS:ExecutableType="Microsoft.ExpressionTask"
+          DTS:LocaleID="-1"
+          DTS:ObjectName="Expression Task 1"
+          DTS:TaskContact="Expression Task;Microsoft Corporation; SQL Server 2019; © 2019 Microsoft Corporation; All Rights Reserved;http://www.microsoft.com/sql/support/default.asp;1"
+          DTS:ThreadHint="10">
+          <DTS:Variables />
+          <DTS:ObjectData>
+            <ExpressionTask
+              Expression="! ISNULL( @[User::address1] )" />
+          </DTS:ObjectData>
+        </DTS:Executable>
+        <DTS:Executable
+          DTS:refId="Package\Foreach Loop Container\Expression Task 10"
+          DTS:CreationName="Microsoft.ExpressionTask"
+          DTS:Description="Expression Task"
+          DTS:DTSID="{73B36DD6-9D45-4205-A953-8BA7331D8837}"
+          DTS:ExecutableType="Microsoft.ExpressionTask"
+          DTS:LocaleID="-1"
+          DTS:ObjectName="Expression Task 10"
+          DTS:TaskContact="Expression Task;Microsoft Corporation; SQL Server 2019; © 2019 Microsoft Corporation; All Rights Reserved;http://www.microsoft.com/sql/support/default.asp;1"
+          DTS:ThreadHint="5">
+          <DTS:Variables />
+          <DTS:ObjectData>
+            <ExpressionTask
+              Expression="! ISNULL(@[User::province])" />
+          </DTS:ObjectData>
+        </DTS:Executable>
+        <DTS:Executable
+          DTS:refId="Package\Foreach Loop Container\Expression Task 2"
+          DTS:CreationName="Microsoft.ExpressionTask"
+          DTS:Description="Expression Task"
+          DTS:DTSID="{03D40884-E475-4114-A21F-7B963D66267C}"
+          DTS:ExecutableType="Microsoft.ExpressionTask"
+          DTS:LocaleID="-1"
+          DTS:ObjectName="Expression Task 2"
+          DTS:TaskContact="Expression Task;Microsoft Corporation; SQL Server 2019; © 2019 Microsoft Corporation; All Rights Reserved;http://www.microsoft.com/sql/support/default.asp;1"
+          DTS:ThreadHint="2">
+          <DTS:Variables />
+          <DTS:ObjectData>
+            <ExpressionTask
+              Expression="@[User::address2] != &quot;&quot;" />
+          </DTS:ObjectData>
+        </DTS:Executable>
+        <DTS:Executable
+          DTS:refId="Package\Foreach Loop Container\Expression Task 3"
+          DTS:CreationName="Microsoft.ExpressionTask"
+          DTS:Description="Expression Task"
+          DTS:DTSID="{DF037E94-9135-4371-9A6F-DD2250F464FE}"
+          DTS:ExecutableType="Microsoft.ExpressionTask"
+          DTS:LocaleID="-1"
+          DTS:ObjectName="Expression Task 3"
+          DTS:TaskContact="Expression Task;Microsoft Corporation; SQL Server 2019; © 2019 Microsoft Corporation; All Rights Reserved;http://www.microsoft.com/sql/support/default.asp;1"
+          DTS:ThreadHint="1">
+          <DTS:Variables />
+          <DTS:ObjectData>
+            <ExpressionTask
+              Expression="! ISNULL(  @[User::city]   )" />
+          </DTS:ObjectData>
+        </DTS:Executable>
+        <DTS:Executable
+          DTS:refId="Package\Foreach Loop Container\Expression Task 4"
+          DTS:CreationName="Microsoft.ExpressionTask"
+          DTS:Description="Expression Task"
+          DTS:DTSID="{9C89BAAA-8DDD-4EB3-ACBF-A51213F1AF63}"
+          DTS:ExecutableType="Microsoft.ExpressionTask"
+          DTS:LocaleID="-1"
+          DTS:ObjectName="Expression Task 4"
+          DTS:TaskContact="Expression Task;Microsoft Corporation; SQL Server 2019; © 2019 Microsoft Corporation; All Rights Reserved;http://www.microsoft.com/sql/support/default.asp;1"
+          DTS:ThreadHint="0">
+          <DTS:Variables />
+          <DTS:ObjectData>
+            <ExpressionTask
+              Expression="! ISNULL( @[User::zipcode] )" />
+          </DTS:ObjectData>
+        </DTS:Executable>
+        <DTS:Executable
+          DTS:refId="Package\Foreach Loop Container\Expression Task 5"
+          DTS:CreationName="Microsoft.ExpressionTask"
+          DTS:Description="Expression Task"
+          DTS:DTSID="{7B5BC27E-615D-4E47-AE73-EE02DA6DC510}"
+          DTS:ExecutableType="Microsoft.ExpressionTask"
+          DTS:LocaleID="-1"
+          DTS:ObjectName="Expression Task 5"
+          DTS:TaskContact="Expression Task;Microsoft Corporation; SQL Server 2019; © 2019 Microsoft Corporation; All Rights Reserved;http://www.microsoft.com/sql/support/default.asp;1"
+          DTS:ThreadHint="6">
+          <DTS:Variables />
+          <DTS:ObjectData>
+            <ExpressionTask
+              Expression="! ISNULL(@[User::work1])" />
+          </DTS:ObjectData>
+        </DTS:Executable>
+        <DTS:Executable
+          DTS:refId="Package\Foreach Loop Container\Expression Task 6"
+          DTS:CreationName="Microsoft.ExpressionTask"
+          DTS:Description="Expression Task"
+          DTS:DTSID="{D4D82DBF-9D76-47FC-B5AA-8F79F76CA06C}"
+          DTS:ExecutableType="Microsoft.ExpressionTask"
+          DTS:LocaleID="-1"
+          DTS:ObjectName="Expression Task 6"
+          DTS:TaskContact="Expression Task;Microsoft Corporation; SQL Server 2019; © 2019 Microsoft Corporation; All Rights Reserved;http://www.microsoft.com/sql/support/default.asp;1"
+          DTS:ThreadHint="7">
+          <DTS:Variables />
+          <DTS:ObjectData>
+            <ExpressionTask
+              Expression="! ISNULL(@[User::work2])" />
+          </DTS:ObjectData>
+        </DTS:Executable>
+        <DTS:Executable
+          DTS:refId="Package\Foreach Loop Container\Expression Task 7"
+          DTS:CreationName="Microsoft.ExpressionTask"
+          DTS:Description="Expression Task"
+          DTS:DTSID="{39C67CED-ECAF-4F3C-9088-44DC8EE3E002}"
+          DTS:ExecutableType="Microsoft.ExpressionTask"
+          DTS:LocaleID="-1"
+          DTS:ObjectName="Expression Task 7"
+          DTS:TaskContact="Expression Task;Microsoft Corporation; SQL Server 2019; © 2019 Microsoft Corporation; All Rights Reserved;http://www.microsoft.com/sql/support/default.asp;1"
+          DTS:ThreadHint="8">
+          <DTS:Variables />
+          <DTS:ObjectData>
+            <ExpressionTask
+              Expression="! ISNULL( @[User::mobile] )" />
+          </DTS:ObjectData>
+        </DTS:Executable>
+        <DTS:Executable
+          DTS:refId="Package\Foreach Loop Container\Expression Task 8"
+          DTS:CreationName="Microsoft.ExpressionTask"
+          DTS:Description="Expression Task"
+          DTS:DTSID="{56ACA7A3-CFFB-479A-AF56-0293200F9CCD}"
+          DTS:ExecutableType="Microsoft.ExpressionTask"
+          DTS:LocaleID="-1"
+          DTS:ObjectName="Expression Task 8"
+          DTS:TaskContact="Expression Task;Microsoft Corporation; SQL Server 2019; © 2019 Microsoft Corporation; All Rights Reserved;http://www.microsoft.com/sql/support/default.asp;1"
+          DTS:ThreadHint="9">
+          <DTS:Variables />
+          <DTS:ObjectData>
+            <ExpressionTask
+              Expression="! ISNULL( @[User::home] )" />
+          </DTS:ObjectData>
+        </DTS:Executable>
+        <DTS:Executable
+          DTS:refId="Package\Foreach Loop Container\Expression Task 9"
+          DTS:CreationName="Microsoft.ExpressionTask"
+          DTS:Description="Expression Task"
+          DTS:DTSID="{FA92E314-D8CD-45B1-A259-C64CDFB48B25}"
+          DTS:ExecutableType="Microsoft.ExpressionTask"
+          DTS:LocaleID="-1"
+          DTS:ObjectName="Expression Task 9"
+          DTS:TaskContact="Expression Task;Microsoft Corporation; SQL Server 2019; © 2019 Microsoft Corporation; All Rights Reserved;http://www.microsoft.com/sql/support/default.asp;1"
+          DTS:ThreadHint="4">
+          <DTS:Variables />
+          <DTS:ObjectData>
+            <ExpressionTask
+              Expression="! ISNULL( @[User::country]  )" />
+          </DTS:ObjectData>
+        </DTS:Executable>
+      </DTS:Executables>
+      <DTS:PrecedenceConstraints>
+        <DTS:PrecedenceConstraint
+          DTS:refId="Package\Foreach Loop Container.PrecedenceConstraints[Constraint]"
+          DTS:CreationName=""
+          DTS:DTSID="{61109660-87AB-40AC-AEFC-0F40E4CED620}"
+          DTS:EvalOp="1"
+          DTS:Expression="TRIM(@[User::email])  != &quot;&quot; &amp;&amp;  !ISNULL(@[User::email])"
+          DTS:From="Package\Foreach Loop Container\Expression Task"
+          DTS:LogicalAnd="True"
+          DTS:ObjectName="Constraint"
+          DTS:To="Package\Foreach Loop Container\Execute SQL Task 1" />
+        <DTS:PrecedenceConstraint
+          DTS:refId="Package\Foreach Loop Container.PrecedenceConstraints[Constraint 1]"
+          DTS:CreationName=""
+          DTS:DTSID="{88BFC047-FBC2-4C88-8778-BCF7C9D35C17}"
+          DTS:EvalOp="1"
+          DTS:Expression="TRIM(@[User::address1])  != &quot;&quot; &amp;&amp;  !ISNULL(@[User::address1])"
+          DTS:From="Package\Foreach Loop Container\Expression Task 1"
+          DTS:LogicalAnd="True"
+          DTS:ObjectName="Constraint 1"
+          DTS:To="Package\Foreach Loop Container\Execute SQL Task 2" />
+        <DTS:PrecedenceConstraint
+          DTS:refId="Package\Foreach Loop Container.PrecedenceConstraints[Constraint 10]"
+          DTS:CreationName=""
+          DTS:DTSID="{ADE5EC3F-43B0-47C6-9846-0068E1F1D50D}"
+          DTS:EvalOp="1"
+          DTS:Expression="TRIM(@[User::province])  != &quot;&quot; &amp;&amp;  !ISNULL(@[User::province])"
+          DTS:From="Package\Foreach Loop Container\Expression Task 10"
+          DTS:LogicalAnd="True"
+          DTS:ObjectName="Constraint 10"
+          DTS:To="Package\Foreach Loop Container\Execute SQL Task 11" />
+        <DTS:PrecedenceConstraint
+          DTS:refId="Package\Foreach Loop Container.PrecedenceConstraints[Constraint 2]"
+          DTS:CreationName=""
+          DTS:DTSID="{74EA4517-7360-4B73-B05E-F98F39BFF5CE}"
+          DTS:EvalOp="1"
+          DTS:Expression="TRIM(@[User::address2])  != &quot;&quot; &amp;&amp;  !ISNULL(@[User::address2])"
+          DTS:From="Package\Foreach Loop Container\Expression Task 2"
+          DTS:LogicalAnd="True"
+          DTS:ObjectName="Constraint 2"
+          DTS:To="Package\Foreach Loop Container\Execute SQL Task 3" />
+        <DTS:PrecedenceConstraint
+          DTS:refId="Package\Foreach Loop Container.PrecedenceConstraints[Constraint 3]"
+          DTS:CreationName=""
+          DTS:DTSID="{BA48C215-4420-4656-A956-F981F2586435}"
+          DTS:EvalOp="1"
+          DTS:Expression="TRIM(@[User::city])  != &quot;&quot; &amp;&amp;  !ISNULL(@[User::city])"
+          DTS:From="Package\Foreach Loop Container\Expression Task 3"
+          DTS:LogicalAnd="True"
+          DTS:ObjectName="Constraint 3"
+          DTS:To="Package\Foreach Loop Container\Execute SQL Task 4" />
+        <DTS:PrecedenceConstraint
+          DTS:refId="Package\Foreach Loop Container.PrecedenceConstraints[Constraint 4]"
+          DTS:CreationName=""
+          DTS:DTSID="{B010D3EF-3430-4C0E-8847-720ECBDB6336}"
+          DTS:EvalOp="1"
+          DTS:Expression="TRIM(@[User::zipcode])  != &quot;&quot; &amp;&amp;  !ISNULL(@[User::zipcode])"
+          DTS:From="Package\Foreach Loop Container\Expression Task 4"
+          DTS:LogicalAnd="True"
+          DTS:ObjectName="Constraint 4"
+          DTS:To="Package\Foreach Loop Container\Execute SQL Task 5" />
+        <DTS:PrecedenceConstraint
+          DTS:refId="Package\Foreach Loop Container.PrecedenceConstraints[Constraint 5]"
+          DTS:CreationName=""
+          DTS:DTSID="{ED2F3E4C-A4AB-452A-8EFA-648CBA014727}"
+          DTS:EvalOp="1"
+          DTS:Expression="TRIM(@[User::work1])  != &quot;&quot; &amp;&amp;  !ISNULL(@[User::work1])"
+          DTS:From="Package\Foreach Loop Container\Expression Task 5"
+          DTS:LogicalAnd="True"
+          DTS:ObjectName="Constraint 5"
+          DTS:To="Package\Foreach Loop Container\Execute SQL Task 6" />
+        <DTS:PrecedenceConstraint
+          DTS:refId="Package\Foreach Loop Container.PrecedenceConstraints[Constraint 6]"
+          DTS:CreationName=""
+          DTS:DTSID="{4B199C5D-26A5-4C3F-847A-CE2FC86874E1}"
+          DTS:EvalOp="1"
+          DTS:Expression="TRIM(@[User::work2])  != &quot;&quot; &amp;&amp;  !ISNULL(@[User::work2])"
+          DTS:From="Package\Foreach Loop Container\Expression Task 6"
+          DTS:LogicalAnd="True"
+          DTS:ObjectName="Constraint 6"
+          DTS:To="Package\Foreach Loop Container\Execute SQL Task 7" />
+        <DTS:PrecedenceConstraint
+          DTS:refId="Package\Foreach Loop Container.PrecedenceConstraints[Constraint 7]"
+          DTS:CreationName=""
+          DTS:DTSID="{14F23FF5-F102-4F40-BA18-19393F47F039}"
+          DTS:EvalOp="1"
+          DTS:Expression="TRIM(@[User::mobile])  != &quot;&quot; &amp;&amp;  !ISNULL(@[User::mobile])"
+          DTS:From="Package\Foreach Loop Container\Expression Task 7"
+          DTS:LogicalAnd="True"
+          DTS:ObjectName="Constraint 7"
+          DTS:To="Package\Foreach Loop Container\Execute SQL Task 8" />
+        <DTS:PrecedenceConstraint
+          DTS:refId="Package\Foreach Loop Container.PrecedenceConstraints[Constraint 8]"
+          DTS:CreationName=""
+          DTS:DTSID="{72BDA4E9-066D-43A7-B714-0EFF2BD75A96}"
+          DTS:EvalOp="1"
+          DTS:Expression="TRIM(@[User::home])  != &quot;&quot; &amp;&amp;  !ISNULL(@[User::home])"
+          DTS:From="Package\Foreach Loop Container\Expression Task 8"
+          DTS:LogicalAnd="True"
+          DTS:ObjectName="Constraint 8"
+          DTS:To="Package\Foreach Loop Container\Execute SQL Task 9" />
+        <DTS:PrecedenceConstraint
+          DTS:refId="Package\Foreach Loop Container.PrecedenceConstraints[Constraint 9]"
+          DTS:CreationName=""
+          DTS:DTSID="{A34C5820-BECC-47AA-A106-4BD2796ABD6E}"
+          DTS:EvalOp="1"
+          DTS:Expression="TRIM(@[User::country])  != &quot;&quot; &amp;&amp;  !ISNULL(@[User::country])"
+          DTS:From="Package\Foreach Loop Container\Expression Task 9"
+          DTS:LogicalAnd="True"
+          DTS:ObjectName="Constraint 9"
+          DTS:To="Package\Foreach Loop Container\Execute SQL Task 10" />
+      </DTS:PrecedenceConstraints>
+      <DTS:ForEachVariableMappings>
+        <DTS:ForEachVariableMapping
+          DTS:CreationName=""
+          DTS:DTSID="{5161B6AF-84B5-4D53-AF03-4271C2FBC408}"
+          DTS:ObjectName="{5161B6AF-84B5-4D53-AF03-4271C2FBC408}"
+          DTS:ValueIndex="0"
+          DTS:VariableName="User::email" />
+        <DTS:ForEachVariableMapping
+          DTS:CreationName=""
+          DTS:DTSID="{DA49A73C-88CB-4726-813B-EAF3242638EF}"
+          DTS:ObjectName="{DA49A73C-88CB-4726-813B-EAF3242638EF}"
+          DTS:ValueIndex="1"
+          DTS:VariableName="User::address1" />
+        <DTS:ForEachVariableMapping
+          DTS:CreationName=""
+          DTS:DTSID="{7D67DDCA-23B2-49A3-AA16-5A172D6A7A0D}"
+          DTS:ObjectName="{7D67DDCA-23B2-49A3-AA16-5A172D6A7A0D}"
+          DTS:ValueIndex="2"
+          DTS:VariableName="User::address2" />
+        <DTS:ForEachVariableMapping
+          DTS:CreationName=""
+          DTS:DTSID="{E8AA0085-AC6B-401E-8E5D-348157132C6A}"
+          DTS:ObjectName="{E8AA0085-AC6B-401E-8E5D-348157132C6A}"
+          DTS:ValueIndex="3"
+          DTS:VariableName="User::city" />
+        <DTS:ForEachVariableMapping
+          DTS:CreationName=""
+          DTS:DTSID="{67205F29-B801-4C7C-B08D-947B7E2FDF35}"
+          DTS:ObjectName="{67205F29-B801-4C7C-B08D-947B7E2FDF35}"
+          DTS:ValueIndex="4"
+          DTS:VariableName="User::zipcode" />
+        <DTS:ForEachVariableMapping
+          DTS:CreationName=""
+          DTS:DTSID="{A66A1635-0CA1-483E-8E5D-D5659AE2F876}"
+          DTS:ObjectName="{A66A1635-0CA1-483E-8E5D-D5659AE2F876}"
+          DTS:ValueIndex="5"
+          DTS:VariableName="User::work1" />
+        <DTS:ForEachVariableMapping
+          DTS:CreationName=""
+          DTS:DTSID="{4C7B10D2-58CC-4C00-8EFE-E3BE93743696}"
+          DTS:ObjectName="{4C7B10D2-58CC-4C00-8EFE-E3BE93743696}"
+          DTS:ValueIndex="6"
+          DTS:VariableName="User::work2" />
+        <DTS:ForEachVariableMapping
+          DTS:CreationName=""
+          DTS:DTSID="{2F9F286F-D326-4D47-A7A3-7AD5C32A64C6}"
+          DTS:ObjectName="{2F9F286F-D326-4D47-A7A3-7AD5C32A64C6}"
+          DTS:ValueIndex="7"
+          DTS:VariableName="User::mobile" />
+        <DTS:ForEachVariableMapping
+          DTS:CreationName=""
+          DTS:DTSID="{662707AE-A180-4880-812C-2CECF6017AA3}"
+          DTS:ObjectName="{662707AE-A180-4880-812C-2CECF6017AA3}"
+          DTS:ValueIndex="8"
+          DTS:VariableName="User::home" />
+        <DTS:ForEachVariableMapping
+          DTS:CreationName=""
+          DTS:DTSID="{72862600-E5ED-4E14-A051-2F78ECCE5F35}"
+          DTS:ObjectName="{72862600-E5ED-4E14-A051-2F78ECCE5F35}"
+          DTS:ValueIndex="9"
+          DTS:VariableName="User::country" />
+        <DTS:ForEachVariableMapping
+          DTS:CreationName=""
+          DTS:DTSID="{7FC3528D-929E-49DD-9D02-1E77E5C5C14D}"
+          DTS:ObjectName="{7FC3528D-929E-49DD-9D02-1E77E5C5C14D}"
+          DTS:ValueIndex="10"
+          DTS:VariableName="User::province" />
+        <DTS:ForEachVariableMapping
+          DTS:CreationName=""
+          DTS:DTSID="{25DC41F8-BF32-4BF3-8979-8E857625A1FC}"
+          DTS:ObjectName="{25DC41F8-BF32-4BF3-8979-8E857625A1FC}"
+          DTS:ValueIndex="11"
+          DTS:VariableName="User::requests" />
+      </DTS:ForEachVariableMappings>
+    </DTS:Executable>
+  </DTS:Executables>
+  <DTS:PrecedenceConstraints>
+    <DTS:PrecedenceConstraint
+      DTS:refId="Package.PrecedenceConstraints[Constraint]"
+      DTS:CreationName=""
+      DTS:DTSID="{48AC02BA-4632-42EF-9832-9284833754A3}"
+      DTS:From="Package\Execute SQL Task"
+      DTS:LogicalAnd="True"
+      DTS:ObjectName="Constraint"
+      DTS:To="Package\Foreach Loop Container" />
+  </DTS:PrecedenceConstraints>
+  <DTS:DesignTimeProperties><![CDATA[<?xml version="1.0"?>
+<!--This CDATA section contains the layout information of the package. The section includes information such as (x,y) coordinates, width, and height.-->
+<!--If you manually edit this section and make a mistake, you can delete it. -->
+<!--The package will still be able to load normally but the previous layout information will be lost and the designer will automatically re-arrange the elements on the design surface.-->
+<Objects
+  Version="8">
+  <!--Each node below will contain properties that do not affect runtime behavior.-->
+  <Package
+    design-time-name="Package">
+    <LayoutInfo>
+      <GraphLayout
+        Capacity="64" xmlns="clr-namespace:Microsoft.SqlServer.IntegrationServices.Designer.Model.Serialization;assembly=Microsoft.SqlServer.IntegrationServices.Graph" xmlns:mssgle="clr-namespace:Microsoft.SqlServer.Graph.LayoutEngine;assembly=Microsoft.SqlServer.Graph" xmlns:assembly="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:mssgm="clr-namespace:Microsoft.SqlServer.Graph.Model;assembly=Microsoft.SqlServer.Graph">
+        <NodeLayout
+          Size="170,42"
+          Id="Package\Execute SQL Task"
+          TopLeft="401,0" />
+        <NodeLayout
+          Size="157,42"
+          Id="Package\Foreach Loop Container\Execute SQL Task 1"
+          TopLeft="18,122" />
+        <NodeLayout
+          Size="186,42"
+          Id="Package\Foreach Loop Container\Execute SQL Task 10"
+          TopLeft="15.6666666666667,505.111111111111" />
+        <NodeLayout
+          Size="186,42"
+          Id="Package\Foreach Loop Container\Execute SQL Task 11"
+          TopLeft="262.333333333334,501.777777777778" />
+        <NodeLayout
+          Size="154,42"
+          Id="Package\Foreach Loop Container\Execute SQL Task 2"
+          TopLeft="190.111111111111,119.111111111111" />
+        <NodeLayout
+          Size="156,42"
+          Id="Package\Foreach Loop Container\Execute SQL Task 3"
+          TopLeft="362.333333333333,118.222222222222" />
+        <NodeLayout
+          Size="143,42"
+          Id="Package\Foreach Loop Container\Execute SQL Task 4"
+          TopLeft="528.777777777778,121.222222222222" />
+        <NodeLayout
+          Size="144,42"
+          Id="Package\Foreach Loop Container\Execute SQL Task 5"
+          TopLeft="677,118" />
+        <NodeLayout
+          Size="143,42"
+          Id="Package\Foreach Loop Container\Execute SQL Task 6"
+          TopLeft="26.1111111111111,343.333333333333" />
+        <NodeLayout
+          Size="179,42"
+          Id="Package\Foreach Loop Container\Execute SQL Task 7"
+          TopLeft="208.222222222222,342.555555555556" />
+        <NodeLayout
+          Size="179,42"
+          Id="Package\Foreach Loop Container\Execute SQL Task 8"
+          TopLeft="405,342.666666666667" />
+        <NodeLayout
+          Size="179,42"
+          Id="Package\Foreach Loop Container\Execute SQL Task 9"
+          TopLeft="619.444444444445,340.444444444445" />
+        <NodeLayout
+          Size="160,42"
+          Id="Package\Foreach Loop Container\Expression Task"
+          TopLeft="14,15" />
+        <NodeLayout
+          Size="143,42"
+          Id="Package\Foreach Loop Container\Expression Task 1"
+          TopLeft="181.777777777778,11.1111111111111" />
+        <NodeLayout
+          Size="175,42"
+          Id="Package\Foreach Loop Container\Expression Task 10"
+          TopLeft="249,416.111111111111" />
+        <NodeLayout
+          Size="147,42"
+          Id="Package\Foreach Loop Container\Expression Task 2"
+          TopLeft="340,16" />
+        <NodeLayout
+          Size="133,42"
+          Id="Package\Foreach Loop Container\Expression Task 3"
+          TopLeft="507,13" />
+        <NodeLayout
+          Size="146,42"
+          Id="Package\Foreach Loop Container\Expression Task 4"
+          TopLeft="655.444444444445,12" />
+        <NodeLayout
+          Size="152,42"
+          Id="Package\Foreach Loop Container\Expression Task 5"
+          TopLeft="14.4444444444447,218.111111111111" />
+        <NodeLayout
+          Size="155,42"
+          Id="Package\Foreach Loop Container\Expression Task 6"
+          TopLeft="224,214" />
+        <NodeLayout
+          Size="169,42"
+          Id="Package\Foreach Loop Container\Expression Task 7"
+          TopLeft="424.333333333333,217.555555555556" />
+        <NodeLayout
+          Size="169,42"
+          Id="Package\Foreach Loop Container\Expression Task 8"
+          TopLeft="620.777777777778,217.111111111111" />
+        <NodeLayout
+          Size="169,42"
+          Id="Package\Foreach Loop Container\Expression Task 9"
+          TopLeft="19.3333333333333,407.888888888889" />
+        <EdgeLayout
+          Id="Package\Foreach Loop Container.PrecedenceConstraints[Constraint]"
+          TopLeft="95.25,57">
+          <EdgeLayout.Curve>
+            <mssgle:Curve
+              StartConnector="{assembly:Null}"
+              EndConnector="0,65"
+              Start="0,0"
+              End="0,57.5">
+              <mssgle:Curve.Segments>
+                <mssgle:SegmentCollection
+                  Capacity="5">
+                  <mssgle:LineSegment
+                    End="0,57.5" />
+                </mssgle:SegmentCollection>
+              </mssgle:Curve.Segments>
+            </mssgle:Curve>
+          </EdgeLayout.Curve>
+          <EdgeLayout.Labels>
+            <mssgm:EdgeLabel
+              BoundingBox="-8,20.75,16,16"
+              RelativePosition="Any" />
+          </EdgeLayout.Labels>
+        </EdgeLayout>
+        <EdgeLayout
+          Id="Package\Foreach Loop Container.PrecedenceConstraints[Constraint 1]"
+          TopLeft="253.277777777778,53.1111111111111">
+          <EdgeLayout.Curve>
+            <mssgle:Curve
+              StartConnector="{assembly:Null}"
+              EndConnector="13.8333333333333,66.0000000000001"
+              Start="0,0"
+              End="13.8333333333333,58.5000000000001">
+              <mssgle:Curve.Segments>
+                <mssgle:SegmentCollection
+                  Capacity="5">
+                  <mssgle:LineSegment
+                    End="0,29" />
+                  <mssgle:CubicBezierSegment
+                    Point1="0,29"
+                    Point2="0,33"
+                    Point3="4,33" />
+                  <mssgle:LineSegment
+                    End="9.83333333333331,33" />
+                  <mssgle:CubicBezierSegment
+                    Point1="9.83333333333331,33"
+                    Point2="13.8333333333333,33"
+                    Point3="13.8333333333333,37" />
+                  <mssgle:LineSegment
+                    End="13.8333333333333,58.5000000000001" />
+                </mssgle:SegmentCollection>
+              </mssgle:Curve.Segments>
+            </mssgle:Curve>
+          </EdgeLayout.Curve>
+          <EdgeLayout.Labels>
+            <mssgm:EdgeLabel
+              BoundingBox="-1.08333333333334,38,16,16"
+              RelativePosition="Any" />
+          </EdgeLayout.Labels>
+        </EdgeLayout>
+        <EdgeLayout
+          Id="Package\Foreach Loop Container.PrecedenceConstraints[Constraint 10]"
+          TopLeft="336.5,458.111111111111">
+          <EdgeLayout.Curve>
+            <mssgle:Curve
+              StartConnector="{assembly:Null}"
+              EndConnector="18.8333333333335,43.6666666666665"
+              Start="0,0"
+              End="18.8333333333335,36.1666666666665">
+              <mssgle:Curve.Segments>
+                <mssgle:SegmentCollection
+                  Capacity="5">
+                  <mssgle:LineSegment
+                    End="0,17.8333333333333" />
+                  <mssgle:CubicBezierSegment
+                    Point1="0,17.8333333333333"
+                    Point2="0,21.8333333333333"
+                    Point3="4,21.8333333333333" />
+                  <mssgle:LineSegment
+                    End="14.8333333333335,21.8333333333333" />
+                  <mssgle:CubicBezierSegment
+                    Point1="14.8333333333335,21.8333333333333"
+                    Point2="18.8333333333335,21.8333333333333"
+                    Point3="18.8333333333335,25.8333333333333" />
+                  <mssgle:LineSegment
+                    End="18.8333333333335,36.1666666666665" />
+                </mssgle:SegmentCollection>
+              </mssgle:Curve.Segments>
+            </mssgle:Curve>
+          </EdgeLayout.Curve>
+          <EdgeLayout.Labels>
+            <mssgm:EdgeLabel
+              BoundingBox="1.41666666666674,26.8333333333333,16,16"
+              RelativePosition="Any" />
+          </EdgeLayout.Labels>
+        </EdgeLayout>
+        <EdgeLayout
+          Id="Package\Foreach Loop Container.PrecedenceConstraints[Constraint 2]"
+          TopLeft="413.5,58">
+          <EdgeLayout.Curve>
+            <mssgle:Curve
+              StartConnector="{assembly:Null}"
+              EndConnector="26.8333333333334,60.2222222222223"
+              Start="0,0"
+              End="26.8333333333334,52.7222222222223">
+              <mssgle:Curve.Segments>
+                <mssgle:SegmentCollection
+                  Capacity="5">
+                  <mssgle:LineSegment
+                    End="0,26.1111111111111" />
+                  <mssgle:CubicBezierSegment
+                    Point1="0,26.1111111111111"
+                    Point2="0,30.1111111111111"
+                    Point3="4,30.1111111111111" />
+                  <mssgle:LineSegment
+                    End="22.8333333333334,30.1111111111111" />
+                  <mssgle:CubicBezierSegment
+                    Point1="22.8333333333334,30.1111111111111"
+                    Point2="26.8333333333334,30.1111111111111"
+                    Point3="26.8333333333334,34.1111111111111" />
+                  <mssgle:LineSegment
+                    End="26.8333333333334,52.7222222222223" />
+                </mssgle:SegmentCollection>
+              </mssgle:Curve.Segments>
+            </mssgle:Curve>
+          </EdgeLayout.Curve>
+          <EdgeLayout.Labels>
+            <mssgm:EdgeLabel
+              BoundingBox="5.41666666666669,35.1111111111111,16,16"
+              RelativePosition="Any" />
+          </EdgeLayout.Labels>
+        </EdgeLayout>
+        <EdgeLayout
+          Id="Package\Foreach Loop Container.PrecedenceConstraints[Constraint 3]"
+          TopLeft="573.5,55">
+          <EdgeLayout.Curve>
+            <mssgle:Curve
+              StartConnector="{assembly:Null}"
+              EndConnector="26.7777777777777,66.2222222222222"
+              Start="0,0"
+              End="26.7777777777777,58.7222222222222">
+              <mssgle:Curve.Segments>
+                <mssgle:SegmentCollection
+                  Capacity="5">
+                  <mssgle:LineSegment
+                    End="0,29.1111111111111" />
+                  <mssgle:CubicBezierSegment
+                    Point1="0,29.1111111111111"
+                    Point2="0,33.1111111111111"
+                    Point3="4,33.1111111111111" />
+                  <mssgle:LineSegment
+                    End="22.7777777777777,33.1111111111111" />
+                  <mssgle:CubicBezierSegment
+                    Point1="22.7777777777777,33.1111111111111"
+                    Point2="26.7777777777777,33.1111111111111"
+                    Point3="26.7777777777777,37.1111111111111" />
+                  <mssgle:LineSegment
+                    End="26.7777777777777,58.7222222222222" />
+                </mssgle:SegmentCollection>
+              </mssgle:Curve.Segments>
+            </mssgle:Curve>
+          </EdgeLayout.Curve>
+          <EdgeLayout.Labels>
+            <mssgm:EdgeLabel
+              BoundingBox="5.38888888888886,38.1111111111111,16,16"
+              RelativePosition="Any" />
+          </EdgeLayout.Labels>
+        </EdgeLayout>
+        <EdgeLayout
+          Id="Package\Foreach Loop Container.PrecedenceConstraints[Constraint 4]"
+          TopLeft="728.444444444445,54">
+          <EdgeLayout.Curve>
+            <mssgle:Curve
+              StartConnector="{assembly:Null}"
+              EndConnector="20.5555555555555,64.0000000000003"
+              Start="0,0"
+              End="20.5555555555555,56.5000000000003">
+              <mssgle:Curve.Segments>
+                <mssgle:SegmentCollection
+                  Capacity="5">
+                  <mssgle:LineSegment
+                    End="0,28.0000000000002" />
+                  <mssgle:CubicBezierSegment
+                    Point1="0,28.0000000000002"
+                    Point2="0,32.0000000000002"
+                    Point3="4,32.0000000000002" />
+                  <mssgle:LineSegment
+                    End="16.5555555555555,32.0000000000002" />
+                  <mssgle:CubicBezierSegment
+                    Point1="16.5555555555555,32.0000000000002"
+                    Point2="20.5555555555555,32.0000000000002"
+                    Point3="20.5555555555555,36.0000000000002" />
+                  <mssgle:LineSegment
+                    End="20.5555555555555,56.5000000000003" />
+                </mssgle:SegmentCollection>
+              </mssgle:Curve.Segments>
+            </mssgle:Curve>
+          </EdgeLayout.Curve>
+          <EdgeLayout.Labels>
+            <mssgm:EdgeLabel
+              BoundingBox="2.27777777777777,37.0000000000002,16,16"
+              RelativePosition="Any" />
+          </EdgeLayout.Labels>
+        </EdgeLayout>
+        <EdgeLayout
+          Id="Package\Foreach Loop Container.PrecedenceConstraints[Constraint 5]"
+          TopLeft="94.0277777777779,260.111111111111">
+          <EdgeLayout.Curve>
+            <mssgle:Curve
+              StartConnector="{assembly:Null}"
+              EndConnector="0,83.2222222222223"
+              Start="0,0"
+              End="0,75.7222222222223">
+              <mssgle:Curve.Segments>
+                <mssgle:SegmentCollection
+                  Capacity="5">
+                  <mssgle:LineSegment
+                    End="0,75.7222222222223" />
+                </mssgle:SegmentCollection>
+              </mssgle:Curve.Segments>
+            </mssgle:Curve>
+          </EdgeLayout.Curve>
+          <EdgeLayout.Labels>
+            <mssgm:EdgeLabel
+              BoundingBox="-8,29.8611111111111,16,16"
+              RelativePosition="Any" />
+          </EdgeLayout.Labels>
+        </EdgeLayout>
+        <EdgeLayout
+          Id="Package\Foreach Loop Container.PrecedenceConstraints[Constraint 6]"
+          TopLeft="299.611111111111,256">
+          <EdgeLayout.Curve>
+            <mssgle:Curve
+              StartConnector="{assembly:Null}"
+              EndConnector="0,86.5555555555559"
+              Start="0,0"
+              End="0,79.0555555555559">
+              <mssgle:Curve.Segments>
+                <mssgle:SegmentCollection
+                  Capacity="5">
+                  <mssgle:LineSegment
+                    End="0,79.0555555555559" />
+                </mssgle:SegmentCollection>
+              </mssgle:Curve.Segments>
+            </mssgle:Curve>
+          </EdgeLayout.Curve>
+          <EdgeLayout.Labels>
+            <mssgm:EdgeLabel
+              BoundingBox="-8,31.5277777777779,16,16"
+              RelativePosition="Any" />
+          </EdgeLayout.Labels>
+        </EdgeLayout>
+        <EdgeLayout
+          Id="Package\Foreach Loop Container.PrecedenceConstraints[Constraint 7]"
+          TopLeft="508.833333333333,259.555555555556">
+          <EdgeLayout.Curve>
+            <mssgle:Curve
+              StartConnector="{assembly:Null}"
+              EndConnector="-14.3333333333332,83.111111111111"
+              Start="0,0"
+              End="-14.3333333333332,75.611111111111">
+              <mssgle:Curve.Segments>
+                <mssgle:SegmentCollection
+                  Capacity="5">
+                  <mssgle:LineSegment
+                    End="0,37.5555555555555" />
+                  <mssgle:CubicBezierSegment
+                    Point1="0,37.5555555555555"
+                    Point2="0,41.5555555555555"
+                    Point3="-4,41.5555555555555" />
+                  <mssgle:LineSegment
+                    End="-10.3333333333332,41.5555555555555" />
+                  <mssgle:CubicBezierSegment
+                    Point1="-10.3333333333332,41.5555555555555"
+                    Point2="-14.3333333333332,41.5555555555555"
+                    Point3="-14.3333333333332,45.5555555555555" />
+                  <mssgle:LineSegment
+                    End="-14.3333333333332,75.611111111111" />
+                </mssgle:SegmentCollection>
+              </mssgle:Curve.Segments>
+            </mssgle:Curve>
+          </EdgeLayout.Curve>
+          <EdgeLayout.Labels>
+            <mssgm:EdgeLabel
+              BoundingBox="-15.1666666666666,46.5555555555555,16,16"
+              RelativePosition="Any" />
+          </EdgeLayout.Labels>
+        </EdgeLayout>
+        <EdgeLayout
+          Id="Package\Foreach Loop Container.PrecedenceConstraints[Constraint 8]"
+          TopLeft="707.111111111111,259.111111111111">
+          <EdgeLayout.Curve>
+            <mssgle:Curve
+              StartConnector="{assembly:Null}"
+              EndConnector="0,81.3333333333334"
+              Start="0,0"
+              End="0,73.8333333333334">
+              <mssgle:Curve.Segments>
+                <mssgle:SegmentCollection
+                  Capacity="5">
+                  <mssgle:LineSegment
+                    End="0,73.8333333333334" />
+                </mssgle:SegmentCollection>
+              </mssgle:Curve.Segments>
+            </mssgle:Curve>
+          </EdgeLayout.Curve>
+          <EdgeLayout.Labels>
+            <mssgm:EdgeLabel
+              BoundingBox="-8,28.9166666666667,16,16"
+              RelativePosition="Any" />
+          </EdgeLayout.Labels>
+        </EdgeLayout>
+        <EdgeLayout
+          Id="Package\Foreach Loop Container.PrecedenceConstraints[Constraint 9]"
+          TopLeft="106.25,449.888888888889">
+          <EdgeLayout.Curve>
+            <mssgle:Curve
+              StartConnector="{assembly:Null}"
+              EndConnector="0,55.2222222222222"
+              Start="0,0"
+              End="0,47.7222222222222">
+              <mssgle:Curve.Segments>
+                <mssgle:SegmentCollection
+                  Capacity="5">
+                  <mssgle:LineSegment
+                    End="0,47.7222222222222" />
+                </mssgle:SegmentCollection>
+              </mssgle:Curve.Segments>
+            </mssgle:Curve>
+          </EdgeLayout.Curve>
+          <EdgeLayout.Labels>
+            <mssgm:EdgeLabel
+              BoundingBox="-8,15.8611111111111,16,16"
+              RelativePosition="Any" />
+          </EdgeLayout.Labels>
+        </EdgeLayout>
+        <ContainerLayout
+          HeaderHeight="43"
+          IsExpanded="True"
+          PanelSize="824,650"
+          Size="824,693"
+          Id="Package\Foreach Loop Container"
+          TopLeft="74.1111111111112,68.7777777777778" />
+        <EdgeLayout
+          Id="Package.PrecedenceConstraints[Constraint]"
+          TopLeft="486.055555555556,42">
+          <EdgeLayout.Curve>
+            <mssgle:Curve
+              StartConnector="{assembly:Null}"
+              EndConnector="0,26.7777777777778"
+              Start="0,0"
+              End="0,19.2777777777778">
+              <mssgle:Curve.Segments>
+                <mssgle:SegmentCollection
+                  Capacity="5">
+                  <mssgle:LineSegment
+                    End="0,19.2777777777778" />
+                </mssgle:SegmentCollection>
+              </mssgle:Curve.Segments>
+            </mssgle:Curve>
+          </EdgeLayout.Curve>
+          <EdgeLayout.Labels>
+            <EdgeLabelCollection />
+          </EdgeLayout.Labels>
+        </EdgeLayout>
+      </GraphLayout>
+    </LayoutInfo>
+  </Package>
+</Objects>]]></DTS:DesignTimeProperties>
+</DTS:Executable>
