@@ -26,15 +26,17 @@
           <SSIS:Property SSIS:Name="CreatorComputerName">WALTZ</SSIS:Property>
           <SSIS:Property SSIS:Name="Description">
           </SSIS:Property>
-          <SSIS:Property SSIS:Name="PasswordVerifier" SSIS:Sensitive="1">AQAAANCMnd8BFdERjHoAwE/Cl+sBAAAAFieOUvPkcUqQDxLl/khbKQAAAAACAAAAAAADZgAAwAAAABAAAAAeEJHk31mTik8CecOG+qs5AAAAAASAAACgAAAAEAAAAPdbO3uxHeyX6kN4B5Ovxj6IAAAAs8dcZpdX8IiWLKgAN/8PMuAEeatRhYmtYerYqDo8oALpSkxO6fVastf4BNhijBrKJgziwNUFlp2d2tgYAs+WyeciTaBGOowLNdYEJPDqMEANf8V+2Zs4bM5CMUgTMPblDn2RmiXy0FwP0PUPz3wqn32xfWdpc4oIM4scyh7jjDnL56f4Q+VUhRQAAACuTG5YZxR0lLGrnaF2nOQ8xqqxBA==</SSIS:Property>
+          <SSIS:Property SSIS:Name="PasswordVerifier" SSIS:Sensitive="1">AQAAANCMnd8BFdERjHoAwE/Cl+sBAAAAAxNy8IYXQUikuyRHfwqVBQAAAAACAAAAAAADZgAAwAAAABAAAAA0WsvjZzR76ItQUOsvjFPxAAAAAASAAACgAAAAEAAAAB6WqM0e3bF/ytcNb+00Vj+IAAAAbsMnsLvWvIvySgXvXtMoEl3R8G67DLCHIBL3kR/GH2MUqZpdgHf+GA623nwneseHO7/k1WEwNtQKoj3RJSAzVR2kKCBf/WuRo7OE7YHbUgHk4tAJ5+pg9H5AVaFycQMdmyhXf3aH5TbvKirS4dBijjsR1DVko71vw8v5SeKsbxBGdvk7myw8hBQAAABx9sgy9GQ3TLvYi2NH3xvLCs5wfg==</SSIS:Property>
           <SSIS:Property SSIS:Name="FormatVersion">1</SSIS:Property>
         </SSIS:Properties>
         <SSIS:Packages>
-          <SSIS:Package SSIS:Name="Applicants.dtsx" SSIS:EntryPoint="1" />
           <SSIS:Package SSIS:Name="FOIRequests.dtsx" SSIS:EntryPoint="1" />
           <SSIS:Package SSIS:Name="FOIMinistryRequests.dtsx" SSIS:EntryPoint="1" />
-          <SSIS:Package SSIS:Name="CFDApplicantsMigration.dtsx" SSIS:EntryPoint="1" />
           <SSIS:Package SSIS:Name="ApplicantRequestMappings.dtsx" SSIS:EntryPoint="1" />
+          <SSIS:Package SSIS:Name="FOIRequestContactInformation.dtsx" SSIS:EntryPoint="1" />
+          <SSIS:Package SSIS:Name="FOIApplicants.dtsx" SSIS:EntryPoint="1" />
+          <SSIS:Package SSIS:Name="FOIRequestExtensions.dtsx" SSIS:EntryPoint="1" />
+          <SSIS:Package SSIS:Name="FOIMinistryRequestSubjectCodes.dtsx" SSIS:EntryPoint="1" />
         </SSIS:Packages>
         <SSIS:ConnectionManagers>
           <SSIS:ConnectionManager SSIS:Name="IXIAS_CIRMOTST , 1435.ATIPITEST.conmgr" />
@@ -293,33 +295,16 @@
             </SSIS:Parameter>
           </SSIS:ProjectConnectionParameters>
           <SSIS:PackageInfo>
-            <SSIS:PackageMetaData SSIS:Name="Applicants.dtsx">
-              <SSIS:Properties>
-                <SSIS:Property SSIS:Name="ID">{A8051341-9A9E-4D11-BEB5-AF0259A25F9F}</SSIS:Property>
-                <SSIS:Property SSIS:Name="Name">Package</SSIS:Property>
-                <SSIS:Property SSIS:Name="VersionMajor">1</SSIS:Property>
-                <SSIS:Property SSIS:Name="VersionMinor">0</SSIS:Property>
-                <SSIS:Property SSIS:Name="VersionBuild">3</SSIS:Property>
-                <SSIS:Property SSIS:Name="VersionComments">
-                </SSIS:Property>
-                <SSIS:Property SSIS:Name="VersionGUID">{7E49DCB1-E15B-4DF3-A59B-DC1F6ADA1C42}</SSIS:Property>
-                <SSIS:Property SSIS:Name="PackageFormatVersion">8</SSIS:Property>
-                <SSIS:Property SSIS:Name="Description">
-                </SSIS:Property>
-                <SSIS:Property SSIS:Name="ProtectionLevel">1</SSIS:Property>
-              </SSIS:Properties>
-              <SSIS:Parameters />
-            </SSIS:PackageMetaData>
             <SSIS:PackageMetaData SSIS:Name="FOIRequests.dtsx">
               <SSIS:Properties>
                 <SSIS:Property SSIS:Name="ID">{6B1FFF75-7F3F-438B-9C8E-FB5B50CBB326}</SSIS:Property>
                 <SSIS:Property SSIS:Name="Name">FOIRequests</SSIS:Property>
                 <SSIS:Property SSIS:Name="VersionMajor">1</SSIS:Property>
                 <SSIS:Property SSIS:Name="VersionMinor">0</SSIS:Property>
-                <SSIS:Property SSIS:Name="VersionBuild">34</SSIS:Property>
+                <SSIS:Property SSIS:Name="VersionBuild">36</SSIS:Property>
                 <SSIS:Property SSIS:Name="VersionComments">
                 </SSIS:Property>
-                <SSIS:Property SSIS:Name="VersionGUID">{535D8DAE-8E33-4885-9C83-8FA17FFC4A15}</SSIS:Property>
+                <SSIS:Property SSIS:Name="VersionGUID">{2215EF75-9178-4019-A65C-548BCB848EB3}</SSIS:Property>
                 <SSIS:Property SSIS:Name="PackageFormatVersion">8</SSIS:Property>
                 <SSIS:Property SSIS:Name="Description">
                 </SSIS:Property>
@@ -333,27 +318,10 @@
                 <SSIS:Property SSIS:Name="Name">Package1</SSIS:Property>
                 <SSIS:Property SSIS:Name="VersionMajor">1</SSIS:Property>
                 <SSIS:Property SSIS:Name="VersionMinor">0</SSIS:Property>
-                <SSIS:Property SSIS:Name="VersionBuild">12</SSIS:Property>
+                <SSIS:Property SSIS:Name="VersionBuild">49</SSIS:Property>
                 <SSIS:Property SSIS:Name="VersionComments">
                 </SSIS:Property>
-                <SSIS:Property SSIS:Name="VersionGUID">{7AFB3826-7143-4167-8101-43C21A36278A}</SSIS:Property>
-                <SSIS:Property SSIS:Name="PackageFormatVersion">8</SSIS:Property>
-                <SSIS:Property SSIS:Name="Description">
-                </SSIS:Property>
-                <SSIS:Property SSIS:Name="ProtectionLevel">1</SSIS:Property>
-              </SSIS:Properties>
-              <SSIS:Parameters />
-            </SSIS:PackageMetaData>
-            <SSIS:PackageMetaData SSIS:Name="CFDApplicantsMigration.dtsx">
-              <SSIS:Properties>
-                <SSIS:Property SSIS:Name="ID">{39F3640B-BFA0-4D76-8137-EC8A98C6675A}</SSIS:Property>
-                <SSIS:Property SSIS:Name="Name">CFDApplicantsMigration</SSIS:Property>
-                <SSIS:Property SSIS:Name="VersionMajor">1</SSIS:Property>
-                <SSIS:Property SSIS:Name="VersionMinor">0</SSIS:Property>
-                <SSIS:Property SSIS:Name="VersionBuild">12</SSIS:Property>
-                <SSIS:Property SSIS:Name="VersionComments">
-                </SSIS:Property>
-                <SSIS:Property SSIS:Name="VersionGUID">{C771D95D-EF7A-4E67-A35D-A350817C33E2}</SSIS:Property>
+                <SSIS:Property SSIS:Name="VersionGUID">{959785B0-CF2F-46BD-B18F-F60A275D3B69}</SSIS:Property>
                 <SSIS:Property SSIS:Name="PackageFormatVersion">8</SSIS:Property>
                 <SSIS:Property SSIS:Name="Description">
                 </SSIS:Property>
@@ -367,10 +335,78 @@
                 <SSIS:Property SSIS:Name="Name">ApplicantRequestMappings</SSIS:Property>
                 <SSIS:Property SSIS:Name="VersionMajor">1</SSIS:Property>
                 <SSIS:Property SSIS:Name="VersionMinor">0</SSIS:Property>
-                <SSIS:Property SSIS:Name="VersionBuild">20</SSIS:Property>
+                <SSIS:Property SSIS:Name="VersionBuild">64</SSIS:Property>
                 <SSIS:Property SSIS:Name="VersionComments">
                 </SSIS:Property>
-                <SSIS:Property SSIS:Name="VersionGUID">{CB9E68C9-3BE7-44FD-B3B8-A1A693CE13C0}</SSIS:Property>
+                <SSIS:Property SSIS:Name="VersionGUID">{E74162C7-CB89-4371-98DA-C1E08F361BDA}</SSIS:Property>
+                <SSIS:Property SSIS:Name="PackageFormatVersion">8</SSIS:Property>
+                <SSIS:Property SSIS:Name="Description">
+                </SSIS:Property>
+                <SSIS:Property SSIS:Name="ProtectionLevel">1</SSIS:Property>
+              </SSIS:Properties>
+              <SSIS:Parameters />
+            </SSIS:PackageMetaData>
+            <SSIS:PackageMetaData SSIS:Name="FOIRequestContactInformation.dtsx">
+              <SSIS:Properties>
+                <SSIS:Property SSIS:Name="ID">{F6BAB303-5655-462B-B60C-AC54FEE248D6}</SSIS:Property>
+                <SSIS:Property SSIS:Name="Name">FOIRequestContactInformation</SSIS:Property>
+                <SSIS:Property SSIS:Name="VersionMajor">1</SSIS:Property>
+                <SSIS:Property SSIS:Name="VersionMinor">0</SSIS:Property>
+                <SSIS:Property SSIS:Name="VersionBuild">71</SSIS:Property>
+                <SSIS:Property SSIS:Name="VersionComments">
+                </SSIS:Property>
+                <SSIS:Property SSIS:Name="VersionGUID">{D8F0E47C-87C0-4352-B380-D36429864036}</SSIS:Property>
+                <SSIS:Property SSIS:Name="PackageFormatVersion">8</SSIS:Property>
+                <SSIS:Property SSIS:Name="Description">
+                </SSIS:Property>
+                <SSIS:Property SSIS:Name="ProtectionLevel">1</SSIS:Property>
+              </SSIS:Properties>
+              <SSIS:Parameters />
+            </SSIS:PackageMetaData>
+            <SSIS:PackageMetaData SSIS:Name="FOIApplicants.dtsx">
+              <SSIS:Properties>
+                <SSIS:Property SSIS:Name="ID">{E6F29F2B-5CB1-454D-94EE-7BC34A459E92}</SSIS:Property>
+                <SSIS:Property SSIS:Name="Name">FOIApplicants</SSIS:Property>
+                <SSIS:Property SSIS:Name="VersionMajor">1</SSIS:Property>
+                <SSIS:Property SSIS:Name="VersionMinor">0</SSIS:Property>
+                <SSIS:Property SSIS:Name="VersionBuild">8</SSIS:Property>
+                <SSIS:Property SSIS:Name="VersionComments">
+                </SSIS:Property>
+                <SSIS:Property SSIS:Name="VersionGUID">{47713682-1301-458C-9DB7-6F85D70A1E2F}</SSIS:Property>
+                <SSIS:Property SSIS:Name="PackageFormatVersion">8</SSIS:Property>
+                <SSIS:Property SSIS:Name="Description">
+                </SSIS:Property>
+                <SSIS:Property SSIS:Name="ProtectionLevel">1</SSIS:Property>
+              </SSIS:Properties>
+              <SSIS:Parameters />
+            </SSIS:PackageMetaData>
+            <SSIS:PackageMetaData SSIS:Name="FOIRequestExtensions.dtsx">
+              <SSIS:Properties>
+                <SSIS:Property SSIS:Name="ID">{D96776B2-BF23-4689-A2D2-9CCA44C5DBFC}</SSIS:Property>
+                <SSIS:Property SSIS:Name="Name">FOIRequestExtensions</SSIS:Property>
+                <SSIS:Property SSIS:Name="VersionMajor">1</SSIS:Property>
+                <SSIS:Property SSIS:Name="VersionMinor">0</SSIS:Property>
+                <SSIS:Property SSIS:Name="VersionBuild">29</SSIS:Property>
+                <SSIS:Property SSIS:Name="VersionComments">
+                </SSIS:Property>
+                <SSIS:Property SSIS:Name="VersionGUID">{8B50757C-EDCD-463C-B927-303DF6880258}</SSIS:Property>
+                <SSIS:Property SSIS:Name="PackageFormatVersion">8</SSIS:Property>
+                <SSIS:Property SSIS:Name="Description">
+                </SSIS:Property>
+                <SSIS:Property SSIS:Name="ProtectionLevel">1</SSIS:Property>
+              </SSIS:Properties>
+              <SSIS:Parameters />
+            </SSIS:PackageMetaData>
+            <SSIS:PackageMetaData SSIS:Name="FOIMinistryRequestSubjectCodes.dtsx">
+              <SSIS:Properties>
+                <SSIS:Property SSIS:Name="ID">{15AF90B9-2E9B-4CE0-89C9-DB31763C6BDF}</SSIS:Property>
+                <SSIS:Property SSIS:Name="Name">FOIMinistryRequestSubjectCodes</SSIS:Property>
+                <SSIS:Property SSIS:Name="VersionMajor">1</SSIS:Property>
+                <SSIS:Property SSIS:Name="VersionMinor">0</SSIS:Property>
+                <SSIS:Property SSIS:Name="VersionBuild">15</SSIS:Property>
+                <SSIS:Property SSIS:Name="VersionComments">
+                </SSIS:Property>
+                <SSIS:Property SSIS:Name="VersionGUID">{FECD18DF-8B81-43E0-812E-6647F05F22D6}</SSIS:Property>
                 <SSIS:Property SSIS:Name="PackageFormatVersion">8</SSIS:Property>
                 <SSIS:Property SSIS:Name="Description">
                 </SSIS:Property>
