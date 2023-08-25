@@ -1,4 +1,5 @@
-﻿using FOIMOD.CFD.DocMigration.Models.Document;
+﻿using FOIMOD.CFD.DocMigration.Models;
+using FOIMOD.CFD.DocMigration.Models.Document;
 using PdfSharpCore;
 using PdfSharpCore.Pdf;
 using PdfSharpCore.Pdf.IO;
@@ -47,11 +48,21 @@ namespace FOIMOD.CFD.DocMigration.Utils
 
 
 
-        public Stream CreatePDFDocument(string emailcontent, string emailsubject, string emaildate, string emailTo)
+        public Stream CreatePDFDocument(string emailcontent, string emailsubject, string emaildate, string emailTo,List<AXISFIle> attachementfiles)
         {
             try
             {
+                string attachmentlist = string.Empty;
+                if (attachementfiles!=null)
+                {
+                    attachmentlist += "<ul>";
+                    foreach (var attachment in attachementfiles)
+                    {
+                        attachmentlist += string.Format("<li>{0}</li>", attachment.FileName);
+                    }
 
+                    attachmentlist += "</ul>";
+                }
 
                 var htmlofpdf = string.Format(@"<table border=""1"" cellpadding=""1"" cellspacing=""1"" style=""width:100%"">
 	                            <tbody>
@@ -67,12 +78,18 @@ namespace FOIMOD.CFD.DocMigration.Utils
 			                            <td>Subject</td>
 			                            <td>{2}</td>
 		                            </tr>
+                                    <tr>
+			                            <td>Attachments</td>
+			                            <td>
+                                            {3}
+                                         </td>
+		                            </tr>
 		                            <tr>
 			                            <td>Message</td>
-			                            <td>{3}</td>
+			                            <td>{4}</td>
 		                            </tr>
 	                            </tbody>
-                            </table>", emailTo, emaildate, emailsubject, emailcontent);
+                            </table>", emailTo, emaildate, emailsubject, attachmentlist,emailcontent);
 
                 using (PdfDocument pdfdocument = new PdfDocument())
                 {

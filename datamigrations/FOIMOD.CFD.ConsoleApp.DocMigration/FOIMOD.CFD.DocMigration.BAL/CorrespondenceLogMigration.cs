@@ -67,11 +67,12 @@ namespace FOIMOD.CFD.DocMigration.BAL
                 {
                     //Create EMAIL MSG PDF and sticth with the attachment documents
                     List<DocumentToMigrate> documentToMigrateEmail = new List<DocumentToMigrate>();
-                    using var emaildocstream = docMigrationPDFStitcher.CreatePDFDocument(attachment.EmailContent, attachment.EmailSubject, attachment.EmailDate, attachment.EmailTo);
+                    var attachmentfiles = FilePathUtils.GetFileDetailsFromdelimitedstring(attachment.EmailAttachmentDelimitedString);
+                    using var emaildocstream = docMigrationPDFStitcher.CreatePDFDocument(attachment.EmailContent, attachment.EmailSubject, attachment.EmailDate, attachment.EmailTo, attachmentfiles);
                     emaildocstream.Position = 0;
                     documentToMigrateEmail.Add(new DocumentToMigrate() { FileStream = emaildocstream, DocumentType = Models.AXISSource.DocumentTypeFromAXIS.CorrespondenceLog, AXISRequestNumber = attachment.AXISRequestNumber.ToUpper(), PageSequenceNumber = 1, HasStreamForDocument = true });
 
-                    var attachmentfiles = FilePathUtils.GetFileDetailsFromdelimitedstring(attachment.EmailAttachmentDelimitedString);
+                    
                     if (attachmentfiles != null)
                     {
                         foreach (var file in attachmentfiles)
