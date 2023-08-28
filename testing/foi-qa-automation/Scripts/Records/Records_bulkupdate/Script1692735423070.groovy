@@ -148,7 +148,7 @@ WebUI.click(findTestObject('Records/button_Add Files1'))
 println(RunConfiguration.getProjectDir() + '/Test Attachments')
 
 WebUI.uploadFile(findTestObject('Page_foi.flow/attachment/input_Add Files_file-upload-input'), RunConfiguration.getProjectDir() + 
-    '/Test Attachments/50mb.pdf')
+    '/Test Attachments/sample.pdf')
 
 WebUI.click(findTestObject('Records/span_DEPUTY MINISTERS OFFICE'))
 
@@ -162,9 +162,27 @@ WebUI.delay(8)
 
 WebUI.click(findTestObject('Records/Page_EDU-2099-23761/input_foiedu, foiedu_selectchk14988'))
 
-WebUI.click(findTestObject('Records/Page_EDU-2099-23761/input_INCOMPATIBLE_selectchk14989'))
+WebUI.click(findTestObject('Records/Page_EDU-2099-23761/svg_INCOMPATIBLE_svg-inline--fa fa-link-slash fa-w-20 fa-lg'))
+
+WebUI.click(findTestObject('Records/Page_EDU-2099-23761/span_MINISTERS OFFICE'))
+
+WebUI.click(findTestObject('Records/Page_EDU-2099-23761/button_Continue'))
 
 WebUI.click(findTestObject('Records/Page_EDU-2099-23761/input_foiedu, foiedu_selectchk14988'))
+
+WebUI.click(findTestObject('Records/Page_EDU-2099-23761/input_INCOMPATIBLE_selectchk14989'))
+
+WebUI.click(findTestObject('Records/Page_EDU-2099-23761/button_INCOMPATIBLE_btn'))
+
+WebUI.click(findTestObject('Records/Page_EDU-2099-23761/button_Continue'))
+
+WebUI.click(findTestObject('Records/Page_EDU-2099-23761/svg_INCOMPATIBLE_svg-inline--fa fa-pen-to-square fa-w-16 fa-lg'))
+
+WebUI.click(findTestObject('Records/Page_EDU-2099-23761/button_Continue'))
+
+WebUI.click(findTestObject('Records/Page_EDU-2099-23761/input_INCOMPATIBLE_selectallchk'))
+
+WebUI.click(findTestObject('Records/Page_EDU-2099-23761/button_INCOMPATIBLE_btn'))
 
 ministryUser.close()
 
