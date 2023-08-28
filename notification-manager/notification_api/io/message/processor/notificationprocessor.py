@@ -19,8 +19,6 @@ class notificationprocessor:
     def handlemessage(self, message):
         serviceid = message.get("serviceid")
         print("serviceid = ", serviceid)
-        print("hamrs ==== ", ServiceKey.pdfstitchforhamrs.value.lower())
-        print("redline ==== ", ServiceKey.pdfstitchforredline.value.lower())
         if serviceid == ServiceKey.pdfstitchforhamrs.value.lower():
             return self.handlepdfstitchforharmsmessage(message)
         elif serviceid == ServiceKey.pdfstitchforredline.value.lower():
@@ -140,8 +138,8 @@ class notificationprocessor:
 
     def __createredlinemessage(self, errorflag):
         if errorflag == "YES":
-            return "Preparing records for redlines export failed. Please Try Again"
-        return "Records for redlines are ready for export"
+            return "Creating the redlines for sign off failed. Please try again"
+        return "Redlines for sign off ready for download"
 
     def __createmessage(self, errorflag, totalskippedfilecount, totalskippedfiles):
         if int(totalskippedfilecount) > 0:

@@ -1,40 +1,38 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import Breadcrumbs from '@mui/material/Breadcrumbs';
+import Breadcrumbs from "@mui/material/Breadcrumbs";
 import Chip from "@mui/material/Chip";
-import './MinistryReview.scss'
-import { StateDropDown } from '../../customComponents';
-import '../FOIRequestHeader/foirequestheader.scss'
+import "./MinistryReview.scss";
+import { StateDropDown } from "../../customComponents";
+import "../FOIRequestHeader/foirequestheader.scss";
 import "./MinistryReviewTabbedContainer.scss";
-import { StateEnum } from '../../../../constants/FOI/statusEnum';
-import { useParams } from 'react-router-dom';
-import { makeStyles } from '@material-ui/core/styles';
+import { StateEnum } from "../../../../constants/FOI/statusEnum";
+import { useParams } from "react-router-dom";
+import { makeStyles } from "@material-ui/core/styles";
 import { push } from "connected-react-router";
-import {  
+import {
   fetchFOIMinistryViewRequestDetails,
-  fetchFOIRequestDescriptionList
+  fetchFOIRequestDescriptionList,
 } from "../../../../apiManager/services/FOI/foiRequestServices";
 
 import { fetchFOIMinistryAssignedToList } from "../../../../apiManager/services/FOI/foiMasterDataServices";
 
-import {
-  fetchFOIRequestAttachmentsList,
-} from "../../../../apiManager/services/FOI/foiAttachmentServices";
+import { fetchFOIRequestAttachmentsList } from "../../../../apiManager/services/FOI/foiAttachmentServices";
+
+import { fetchFOIRequestNotesList } from "../../../../apiManager/services/FOI/foiRequestNoteServices";
 
 import {
-  fetchFOIRequestNotesList
-} from "../../../../apiManager/services/FOI/foiRequestNoteServices";
+  fetchFOIRecords,
+  fetchPDFStitchStatusForHarms,
+  fetchPDFStitchStatusForRedlines,
+} from "../../../../apiManager/services/FOI/foiRecordServices";
 
-import { fetchFOIRecords, fetchPDFStitchStatusForHarms } from "../../../../apiManager/services/FOI/foiRecordServices";
-
-import {
-  fetchCFRForm
-} from "../../../../apiManager/services/FOI/foiCFRFormServices";
+import { fetchCFRForm } from "../../../../apiManager/services/FOI/foiCFRFormServices";
 
 import {
   ConditionalComponent,
   calculateDaysRemaining,
-  addToRestrictedRequestTagList
+  addToRestrictedRequestTagList,
 } from "../../../../helper/FOI/helper";
 import ApplicantDetails from "./ApplicantDetails";
 import ChildDetails from "./ChildDetails";
@@ -47,19 +45,18 @@ import RequestTracking from "./RequestTracking";
 import BottomButtonGroup from "./BottomButtonGroup";
 import { CommentSection } from "../../customComponents/Comments";
 import { AttachmentSection } from "../../customComponents/Attachments";
-import { CFRForm } from '../../customComponents/CFRForm';
+import { CFRForm } from "../../customComponents/CFRForm";
 import FOI_COMPONENT_CONSTANTS from "../../../../constants/FOI/foiComponentConstants";
 import Loading from "../../../../containers/Loading";
 import ExtensionDetails from "./ExtensionDetails";
 import clsx from "clsx";
 import { getMinistryBottomTextMap, alertUser, getHeaderText } from "./utils";
 import DivisionalTracking from "../DivisionalTracking";
-import HomeIcon from '@mui/icons-material/Home';
-import { RecordsLog } from '../../customComponents/Records';
+import HomeIcon from "@mui/icons-material/Home";
+import { RecordsLog } from "../../customComponents/Records";
 import { UnsavedModal } from "../../customComponents";
-import {DISABLE_GATHERINGRECORDS_TAB} from "../../../../constants/constants";
-import _ from 'lodash';
-
+import { DISABLE_GATHERINGRECORDS_TAB } from "../../../../constants/constants";
+import _ from "lodash";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -109,7 +106,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
   //gets the request detail from the store
   const IsDivisionalCoordinator = () => {
     return userDetail?.role?.includes("DivisionalCoordinator");
-  }
+  };
 
   let requestDetails = useSelector(
     (state) => state.foiRequests.foiMinistryViewRequestDetail
@@ -117,13 +114,17 @@ const MinistryReview = React.memo(({ userDetail }) => {
   let requestNotes = useSelector(
     (state) => state.foiRequests.foiRequestComments
   );
-  let requestAttachments = useSelector(
-    (state) => state.foiRequests.foiRequestAttachments.filter(
-      attachment => {
-        return ['feeassessed-onhold', 'fee estimate - payment receipt', 'response-onhold', 'fee balance outstanding - payment receipt']
-        .indexOf(attachment.category.toLowerCase()) === -1
-      }
-    )
+  let requestAttachments = useSelector((state) =>
+    state.foiRequests.foiRequestAttachments.filter((attachment) => {
+      return (
+        [
+          "feeassessed-onhold",
+          "fee estimate - payment receipt",
+          "response-onhold",
+          "fee balance outstanding - payment receipt",
+        ].indexOf(attachment.category.toLowerCase()) === -1
+      );
+    })
   );
 
   let CFRFormHistoryLength = useSelector(
@@ -180,26 +181,30 @@ const MinistryReview = React.memo(({ userDetail }) => {
 
   const [attachments, setAttachments] = useState(requestAttachments);
   const dispatch = useDispatch();
-  const requestWatchers = useSelector((state) => state.foiRequests.foiWatcherList);
+  const requestWatchers = useSelector(
+    (state) => state.foiRequests.foiWatcherList
+  );
 
   useEffect(() => {
     if (window.location.href.indexOf("comments") > -1) {
       tabclick("Comments");
-    }
-    else if (window.location.href.indexOf("records") > -1) {
+    } else if (window.location.href.indexOf("records") > -1) {
       tabclick("Records");
     }
   }, []);
 
   useEffect(async () => {
     if (ministryId) {
-      await Promise.all([dispatch(fetchFOIMinistryViewRequestDetails(requestId, ministryId)),
-      dispatch(fetchFOIRequestDescriptionList(requestId, ministryId))]);
+      await Promise.all([
+        dispatch(fetchFOIMinistryViewRequestDetails(requestId, ministryId)),
+        dispatch(fetchFOIRequestDescriptionList(requestId, ministryId)),
+      ]);
       dispatch(fetchFOIRequestNotesList(requestId, ministryId));
       dispatch(fetchFOIRequestAttachmentsList(requestId, ministryId));
       dispatch(fetchFOIRecords(requestId, ministryId));
       dispatch(fetchPDFStitchStatusForHarms(requestId, ministryId));
-      fetchCFRForm(ministryId,dispatch);
+      dispatch(fetchPDFStitchStatusForRedlines(requestId, ministryId));
+      fetchCFRForm(ministryId, dispatch);
       if (bcgovcode) dispatch(fetchFOIMinistryAssignedToList(bcgovcode));
     }
   }, [requestId, ministryId, comment, attachments]);
@@ -213,10 +218,9 @@ const MinistryReview = React.memo(({ userDetail }) => {
     React.useState(requestDetails);
 
   const [divstages, setdivStages] = React.useState([]);
-  const [originalDivisions, setOriginalDivisions] = React.useState([])
+  const [originalDivisions, setOriginalDivisions] = React.useState([]);
   const [hasReceivedDate, setHasReceivedDate] = React.useState(true);
   const [isMinistryRestricted, setIsMinistryRestricted] = useState(false);
-
 
   let ministryassignedtousername = "Unassigned";
   useEffect(() => {
@@ -228,19 +232,26 @@ const MinistryReview = React.memo(({ userDetail }) => {
         : "Unassigned";
     setMinistryAssignedToValue(ministryassignedtousername);
     if (!unSavedRequest && requestDetails?.divisions) {
-      setOriginalDivisions(requestDetails.divisions)
+      setOriginalDivisions(requestDetails.divisions);
     }
     if (requestDetails && Object.keys(requestDetails).length !== 0) {
       setRequestState(requestDetails.currentState);
       settabStatus(requestDetails.currentState);
-      setIsMinistryRestricted(requestDetails.ministryrestricteddetails?.isrestricted);
+      setIsMinistryRestricted(
+        requestDetails.ministryrestricteddetails?.isrestricted
+      );
     }
   }, [requestDetails, unSavedRequest]);
 
   useEffect(() => {
-    if(isMinistryRestricted){
-      let assigneeDetails=_.pick(requestDetails, ['assignedministrygroup','assignedministryperson','assignedministrypersonFirstName','assignedministrypersonLastName']);
-      addToRestrictedRequestTagList(requestWatchers,assigneeDetails);
+    if (isMinistryRestricted) {
+      let assigneeDetails = _.pick(requestDetails, [
+        "assignedministrygroup",
+        "assignedministryperson",
+        "assignedministrypersonFirstName",
+        "assignedministrypersonLastName",
+      ]);
+      addToRestrictedRequestTagList(requestWatchers, assigneeDetails);
     }
   }, [isMinistryRestricted, requestWatchers]);
 
@@ -281,7 +292,8 @@ const MinistryReview = React.memo(({ userDetail }) => {
   //Variable to find if all required fields are filled or not
   const isValidationError =
     ministryAssignedToValue.toLowerCase().includes("unassigned") ||
-    hasincompleteDivstage || !hasReceivedDate;
+    hasincompleteDivstage ||
+    !hasReceivedDate;
 
   const createMinistrySaveRequestObject = (_propName, _value, _value2) => {
     const requestObject = { ...saveMinistryRequestObject };
@@ -291,19 +303,24 @@ const MinistryReview = React.memo(({ userDetail }) => {
 
   const [updateStateDropDown, setUpdateStateDropdown] = useState(false);
   const [stateChanged, setStateChanged] = useState(false);
-  const handleSaveRequest = async(_state, _unSaved, id) => {
+  const handleSaveRequest = async (_state, _unSaved, id) => {
     setHeader(_state);
     if (!_unSaved && ministryId && requestId) {
       setUnSavedRequest(_unSaved);
-      await Promise.all([dispatch(fetchFOIMinistryViewRequestDetails(requestId, ministryId))]);
+      await Promise.all([
+        dispatch(fetchFOIMinistryViewRequestDetails(requestId, ministryId)),
+      ]);
       dispatch(fetchFOIRequestAttachmentsList(requestId, ministryId));
       dispatch(fetchFOIRecords(requestId, ministryId));
       dispatch(fetchPDFStitchStatusForHarms(requestId, ministryId));
-      fetchCFRForm(ministryId,dispatch);
+      dispatch(fetchPDFStitchStatusForRedlines(requestId, ministryId));
+      fetchCFRForm(ministryId, dispatch);
       setStateChanged(false);
       setcurrentrequestStatus(_state);
       setTimeout(() => {
-        dispatch(push(`/foi/ministryreview/${requestId}/ministryrequest/${ministryId}`))
+        dispatch(
+          push(`/foi/ministryreview/${requestId}/ministryrequest/${ministryId}`)
+        );
         dispatch(fetchFOIRequestNotesList(requestId, ministryId));
       }, 1000);
     } else {
@@ -323,25 +340,32 @@ const MinistryReview = React.memo(({ userDetail }) => {
     setcurrentrequestStatus("");
   };
 
-
   const [unsavedPrompt, setUnsavedPrompt] = useState(false);
   const [unsavedMessage, setUnsavedMessage] = useState(<></>);
   const handleUnsavedContinue = () => {
     window.removeEventListener("beforeunload", alertUser);
-    dispatch(push(`/foi/dashboard`))
-  }
+    dispatch(push(`/foi/dashboard`));
+  };
 
   const returnToQueue = (e) => {
     if (unSavedRequest) {
-      setUnsavedMessage(<>Are you sure you want to leave? Your changes will be lost.</>)
-      setUnsavedPrompt(true)
+      setUnsavedMessage(
+        <>Are you sure you want to leave? Your changes will be lost.</>
+      );
+      setUnsavedPrompt(true);
     } else if (recordsUploading) {
-      setUnsavedMessage(<>Are you sure you want to leave? Records are currently in the process of being uploaded.<br/> If you continue they will not be saved.</>)
-      setUnsavedPrompt(true)
+      setUnsavedMessage(
+        <>
+          Are you sure you want to leave? Records are currently in the process
+          of being uploaded.
+          <br /> If you continue they will not be saved.
+        </>
+      );
+      setUnsavedPrompt(true);
     } else {
-      dispatch(push(`/foi/dashboard`))
+      dispatch(push(`/foi/dashboard`));
     }
-  }
+  };
 
   let foitabheaderBG;
   const classes = useStyles();
@@ -515,14 +539,17 @@ const MinistryReview = React.memo(({ userDetail }) => {
         existingDivStages={divisions}
         ministrycode={ministrycode}
         createMinistrySaveRequestObject={createMinistrySaveRequestObject}
-        requestStartDate = {requestDetails?.requestProcessStart}
+        requestStartDate={requestDetails?.requestProcessStart}
         setHasReceivedDate={setHasReceivedDate}
       />
     );
 
-  
-  const showAdvancedSearch = useSelector((state) => state.foiRequests.showAdvancedSearch)
-  const showEventQueue = useSelector((state) => state.foiRequests.showEventQueue);
+  const showAdvancedSearch = useSelector(
+    (state) => state.foiRequests.showAdvancedSearch
+  );
+  const showEventQueue = useSelector(
+    (state) => state.foiRequests.showEventQueue
+  );
 
   return !isLoading &&
     requestDetails &&
@@ -531,7 +558,9 @@ const MinistryReview = React.memo(({ userDetail }) => {
     <div className="foiformcontent">
       <div className="foitabbedContainer">
         <div className={foitabheaderBG}>
-          <h4 className="foileftpanelrequestno">{getHeaderText(requestDetails)}</h4>
+          <h4 className="foileftpanelrequestno">
+            {getHeaderText(requestDetails)}
+          </h4>
           <div className="foileftpaneldropdown">{stateBox}</div>
 
           <div className="tab">
@@ -544,15 +573,19 @@ const MinistryReview = React.memo(({ userDetail }) => {
             >
               Request
             </div>
-            {(requestDetails?.requestType === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_GENERAL && <div
-              className={clsx("tablinks", {
-                active: tabLinksStatuses.CFRForm.active,
-              })}
-              name="CFRForm"
-              onClick={() => tabclick("CFRForm")}
-            >
-              CFR Form{CFRFormHistoryLength > 0 ? ` (${CFRFormHistoryLength})` : ""}
-            </div>)}
+            {requestDetails?.requestType ===
+              FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_GENERAL && (
+              <div
+                className={clsx("tablinks", {
+                  active: tabLinksStatuses.CFRForm.active,
+                })}
+                name="CFRForm"
+                onClick={() => tabclick("CFRForm")}
+              >
+                CFR Form
+                {CFRFormHistoryLength > 0 ? ` (${CFRFormHistoryLength})` : ""}
+              </div>
+            )}
             <div
               className={clsx("tablinks", {
                 active: tabLinksStatuses.Attachments.active,
@@ -577,15 +610,18 @@ const MinistryReview = React.memo(({ userDetail }) => {
                 ? `(${requestNotes.length})`
                 : ""}
             </div>
-            {originalDivisions?.length > 0 && DISABLE_GATHERINGRECORDS_TAB?.toLowerCase() =='false' &&<div
-              className={clsx("tablinks", {
-                active: tabLinksStatuses.Records.active,
-              })}
-              name="Records"
-              onClick={() => tabclick("Records")}
-            >
-              Records
-            </div>}
+            {originalDivisions?.length > 0 &&
+              DISABLE_GATHERINGRECORDS_TAB?.toLowerCase() == "false" && (
+                <div
+                  className={clsx("tablinks", {
+                    active: tabLinksStatuses.Records.active,
+                  })}
+                  name="Records"
+                  onClick={() => tabclick("Records")}
+                >
+                  Records
+                </div>
+              )}
           </div>
 
           <div className="foileftpanelstatus">
@@ -593,7 +629,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
               condition={!hideBottomText.includes(requestState?.toLowerCase())}
             >
               {Array.from(bottomTextMap.values()).map((value) => (
-                <div className='remaining-days-alert'>{value}</div>
+                <div className="remaining-days-alert">{value}</div>
               ))}
             </ConditionalComponent>
           </div>
@@ -613,35 +649,65 @@ const MinistryReview = React.memo(({ userDetail }) => {
                   className={`${classes.root} foi-request-form`}
                   autoComplete="off"
                 >
-
-                    <Breadcrumbs aria-label="breadcrumb" className="foi-breadcrumb">
-                      {showEventQueue && !showAdvancedSearch &&
-                        <Chip
-                          label={"Event Queue"}
-                          sx={{ backgroundColor: '#fff', border:'1px solid #038', color: '#038', height: 19, cursor: 'pointer' }}
-                          onClick={returnToQueue}
-                        />
-                      }
-                      {showAdvancedSearch && !showEventQueue &&
-                        <Chip
-                          label={"Advanced Search"}
-                          sx={{ backgroundColor: '#fff', border:'1px solid #038', color: '#038', height: 19, cursor: 'pointer' }}
-                          onClick={returnToQueue}
-                        />
-                      }
-                      {!showAdvancedSearch && !showEventQueue &&
-                        <Chip
-                          icon={<HomeIcon fontSize="small" sx={{color: '#038 !important'}}/>}
-                          label={"Request Queue"}
-                          sx={{ backgroundColor: '#fff', border:'1px solid #038', color: '#038', height: 19, cursor: 'pointer' }}
-                          onClick={returnToQueue}
-                        />
-                      }
+                  <Breadcrumbs
+                    aria-label="breadcrumb"
+                    className="foi-breadcrumb"
+                  >
+                    {showEventQueue && !showAdvancedSearch && (
                       <Chip
-                        label={getHeaderText(requestDetails)}
-                        sx={{ backgroundColor: '#fff', border:'1px solid #038', color: '#038', height: 19 }}
+                        label={"Event Queue"}
+                        sx={{
+                          backgroundColor: "#fff",
+                          border: "1px solid #038",
+                          color: "#038",
+                          height: 19,
+                          cursor: "pointer",
+                        }}
+                        onClick={returnToQueue}
                       />
-                    </Breadcrumbs>
+                    )}
+                    {showAdvancedSearch && !showEventQueue && (
+                      <Chip
+                        label={"Advanced Search"}
+                        sx={{
+                          backgroundColor: "#fff",
+                          border: "1px solid #038",
+                          color: "#038",
+                          height: 19,
+                          cursor: "pointer",
+                        }}
+                        onClick={returnToQueue}
+                      />
+                    )}
+                    {!showAdvancedSearch && !showEventQueue && (
+                      <Chip
+                        icon={
+                          <HomeIcon
+                            fontSize="small"
+                            sx={{ color: "#038 !important" }}
+                          />
+                        }
+                        label={"Request Queue"}
+                        sx={{
+                          backgroundColor: "#fff",
+                          border: "1px solid #038",
+                          color: "#038",
+                          height: 19,
+                          cursor: "pointer",
+                        }}
+                        onClick={returnToQueue}
+                      />
+                    )}
+                    <Chip
+                      label={getHeaderText(requestDetails)}
+                      sx={{
+                        backgroundColor: "#fff",
+                        border: "1px solid #038",
+                        color: "#038",
+                        height: 19,
+                      }}
+                    />
+                  </Breadcrumbs>
                   {Object.entries(requestDetails).length > 0 &&
                     requestDetails !== undefined && (
                       <>
@@ -689,23 +755,26 @@ const MinistryReview = React.memo(({ userDetail }) => {
               </div>
             </div>
           </div>
-          {(requestDetails?.requestType === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_GENERAL && <div
-            id="CFRForm"
-            className={clsx("tabcontent", {
-              active: tabLinksStatuses.CFRForm.active,
-              [classes.displayed]: tabLinksStatuses.CFRForm?.display,
-              [classes.hidden]: !tabLinksStatuses.CFRForm?.display,
-            })}
-          >
-            <CFRForm            
-              requestNumber={requestNumber}
-              requestState={requestState}
-              userDetail={userDetail}
-              ministryId={ministryId}
-              requestId={requestId}
-              setCFRUnsaved={setCFRUnsaved}
-            />
-          </div>)}
+          {requestDetails?.requestType ===
+            FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_GENERAL && (
+            <div
+              id="CFRForm"
+              className={clsx("tabcontent", {
+                active: tabLinksStatuses.CFRForm.active,
+                [classes.displayed]: tabLinksStatuses.CFRForm?.display,
+                [classes.hidden]: !tabLinksStatuses.CFRForm?.display,
+              })}
+            >
+              <CFRForm
+                requestNumber={requestNumber}
+                requestState={requestState}
+                userDetail={userDetail}
+                ministryId={ministryId}
+                requestId={requestId}
+                setCFRUnsaved={setCFRUnsaved}
+              />
+            </div>
+          )}
           <div
             id="Attachments"
             className={clsx("tabcontent", {
@@ -741,38 +810,69 @@ const MinistryReview = React.memo(({ userDetail }) => {
               [classes.hidden]: !tabLinksStatuses.Comments?.display,
             })}
           >
-            {!isLoading &&
-            requestNotes ? (
+            {!isLoading && requestNotes ? (
               <>
-              {url.indexOf("comments") > -1 ? (
-                <Breadcrumbs aria-label="breadcrumb" className="foi-breadcrumb foi-breadcrumb-comments">
-                      {showEventQueue && !showAdvancedSearch &&
-                        <Chip
-                          label={"Event Queue"}
-                          sx={{ backgroundColor: '#fff', border:'1px solid #038', color: '#038', height: 19, cursor: 'pointer' }}
-                          onClick={returnToQueue}
-                        />
-                      }
-                      {showAdvancedSearch && !showEventQueue &&
-                        <Chip
-                          label={"Advanced Search"}
-                          sx={{ backgroundColor: '#fff', border:'1px solid #038', color: '#038', height: 19, cursor: 'pointer' }}
-                          onClick={returnToQueue}
-                        />
-                      }
-                      {!showAdvancedSearch && !showEventQueue &&
-                        <Chip
-                          icon={<HomeIcon fontSize="small" sx={{color: '#038 !important'}}/>}
-                          label={"Request Queue"}
-                          sx={{ backgroundColor: '#fff', border:'1px solid #038', color: '#038', height: 19, cursor: 'pointer' }}
-                          onClick={returnToQueue}
-                        />
-                      }
+                {url.indexOf("comments") > -1 ? (
+                  <Breadcrumbs
+                    aria-label="breadcrumb"
+                    className="foi-breadcrumb foi-breadcrumb-comments"
+                  >
+                    {showEventQueue && !showAdvancedSearch && (
                       <Chip
-                        label={getHeaderText(requestDetails)}
-                        sx={{ backgroundColor: '#fff', border:'1px solid #038', color: '#038', height: 19 }}
+                        label={"Event Queue"}
+                        sx={{
+                          backgroundColor: "#fff",
+                          border: "1px solid #038",
+                          color: "#038",
+                          height: 19,
+                          cursor: "pointer",
+                        }}
+                        onClick={returnToQueue}
                       />
-                  </Breadcrumbs> ) : null }
+                    )}
+                    {showAdvancedSearch && !showEventQueue && (
+                      <Chip
+                        label={"Advanced Search"}
+                        sx={{
+                          backgroundColor: "#fff",
+                          border: "1px solid #038",
+                          color: "#038",
+                          height: 19,
+                          cursor: "pointer",
+                        }}
+                        onClick={returnToQueue}
+                      />
+                    )}
+                    {!showAdvancedSearch && !showEventQueue && (
+                      <Chip
+                        icon={
+                          <HomeIcon
+                            fontSize="small"
+                            sx={{ color: "#038 !important" }}
+                          />
+                        }
+                        label={"Request Queue"}
+                        sx={{
+                          backgroundColor: "#fff",
+                          border: "1px solid #038",
+                          color: "#038",
+                          height: 19,
+                          cursor: "pointer",
+                        }}
+                        onClick={returnToQueue}
+                      />
+                    )}
+                    <Chip
+                      label={getHeaderText(requestDetails)}
+                      sx={{
+                        backgroundColor: "#fff",
+                        border: "1px solid #038",
+                        color: "#038",
+                        height: 19,
+                      }}
+                    />
+                  </Breadcrumbs>
+                ) : null}
                 <CommentSection
                   currentUser={
                     userId && {
@@ -797,8 +897,14 @@ const MinistryReview = React.memo(({ userDetail }) => {
                   setEditorChange={setEditorChange}
                   removeComment={removeComment}
                   setRemoveComment={setRemoveComment}
-                  restrictionType={requestDetails?.ministryrestricteddetails?.isrestricted ? "ministry" : ""}
-                  isRestricted={requestDetails?.ministryrestricteddetails?.isrestricted}
+                  restrictionType={
+                    requestDetails?.ministryrestricteddetails?.isrestricted
+                      ? "ministry"
+                      : ""
+                  }
+                  isRestricted={
+                    requestDetails?.ministryrestricteddetails?.isrestricted
+                  }
                 />
               </>
             ) : (
@@ -815,35 +921,67 @@ const MinistryReview = React.memo(({ userDetail }) => {
           >
             {!isAttachmentListLoading && originalDivisions?.length > 0 ? (
               <>
-              {url.indexOf("records") > -1 ? (
-                <Breadcrumbs aria-label="breadcrumb" className="foi-breadcrumb foi-breadcrumb-comments">
-                      {showEventQueue && !showAdvancedSearch &&
-                        <Chip
-                          label={"Event Queue"}
-                          sx={{ backgroundColor: '#fff', border:'1px solid #038', color: '#038', height: 19, cursor: 'pointer' }}
-                          onClick={returnToQueue}
-                        />
-                      }
-                      {showAdvancedSearch && !showEventQueue &&
-                        <Chip
-                          label={"Advanced Search"}
-                          sx={{ backgroundColor: '#fff', border:'1px solid #038', color: '#038', height: 19, cursor: 'pointer' }}
-                          onClick={returnToQueue}
-                        />
-                      }
-                      {!showAdvancedSearch && !showEventQueue &&
-                        <Chip
-                          icon={<HomeIcon fontSize="small" sx={{color: '#038 !important'}}/>}
-                          label={"Request Queue"}
-                          sx={{ backgroundColor: '#fff', border:'1px solid #038', color: '#038', height: 19, cursor: 'pointer' }}
-                          onClick={returnToQueue}
-                        />
-                      }
+                {url.indexOf("records") > -1 ? (
+                  <Breadcrumbs
+                    aria-label="breadcrumb"
+                    className="foi-breadcrumb foi-breadcrumb-comments"
+                  >
+                    {showEventQueue && !showAdvancedSearch && (
                       <Chip
-                        label={getHeaderText(requestDetails)}
-                        sx={{ backgroundColor: '#fff', border:'1px solid #038', color: '#038', height: 19 }}
+                        label={"Event Queue"}
+                        sx={{
+                          backgroundColor: "#fff",
+                          border: "1px solid #038",
+                          color: "#038",
+                          height: 19,
+                          cursor: "pointer",
+                        }}
+                        onClick={returnToQueue}
                       />
-                </Breadcrumbs> ) : null }
+                    )}
+                    {showAdvancedSearch && !showEventQueue && (
+                      <Chip
+                        label={"Advanced Search"}
+                        sx={{
+                          backgroundColor: "#fff",
+                          border: "1px solid #038",
+                          color: "#038",
+                          height: 19,
+                          cursor: "pointer",
+                        }}
+                        onClick={returnToQueue}
+                      />
+                    )}
+                    {!showAdvancedSearch && !showEventQueue && (
+                      <Chip
+                        icon={
+                          <HomeIcon
+                            fontSize="small"
+                            sx={{ color: "#038 !important" }}
+                          />
+                        }
+                        label={"Request Queue"}
+                        sx={{
+                          backgroundColor: "#fff",
+                          border: "1px solid #038",
+                          color: "#038",
+                          height: 19,
+                          cursor: "pointer",
+                        }}
+                        onClick={returnToQueue}
+                      />
+                    )}
+                    <Chip
+                      label={getHeaderText(requestDetails)}
+                      sx={{
+                        backgroundColor: "#fff",
+                        border: "1px solid #038",
+                        color: "#038",
+                        height: 19,
+                      }}
+                    />
+                  </Breadcrumbs>
+                ) : null}
                 <RecordsLog
                   divisions={originalDivisions}
                   //recordsObj={requestRecords}
@@ -875,4 +1013,4 @@ const MinistryReview = React.memo(({ userDetail }) => {
   );
 });
 
-export default MinistryReview
+export default MinistryReview;
