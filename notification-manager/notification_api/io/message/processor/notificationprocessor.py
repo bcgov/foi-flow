@@ -18,7 +18,6 @@ class notificationprocessor:
 
     def handlemessage(self, message):
         serviceid = message.get("serviceid")
-        print("serviceid = ", serviceid)
         if serviceid == ServiceKey.pdfstitchforhamrs.value.lower():
             return self.handlepdfstitchforharmsmessage(message)
         elif serviceid == ServiceKey.pdfstitchforredline.value.lower():
