@@ -18,8 +18,8 @@ import {SOCKETIO_CONNECT_URL, SOCKETIO_RECONNECTION_DELAY, SOCKETIO_RECONNECTION
 import { fetchFOIFullAssignedToList } from "../../../apiManager/services/FOI/foiMasterDataServices";
 import {setFOIAssignedToListLoader} from "../../../actions/FOI/foiRequestActions";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCog, faQuestion } from '@fortawesome/free-solid-svg-icons';
-
+import { faCog } from '@fortawesome/free-solid-svg-icons';
+import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 
 const FOIHeader = React.memo(({unauthorized=false}) => { 
 
@@ -142,7 +142,7 @@ const adminDashboard = (_e) => {
                       }
                       <li className="help-icon foinavitem">
                         <a href={"https://help.foirequests.gov.bc.ca/"} target="_blank" aria-label="foi-help link">
-                          <FontAwesomeIcon icon={faQuestion} size='1x'/>
+                          <HelpOutlineIcon size="small" style={{color: "white", textDecoration: "none"}} />
                         </a>
                       </li>
                       <li className="report-icon foinavitem">
