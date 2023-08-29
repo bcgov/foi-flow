@@ -4,7 +4,7 @@ import { useDispatch } from "react-redux";
 import AttachmentModal from './AttachmentModal';
 import Loading from "../../../../containers/Loading";
 import { saveFilesinS3, getFileFromS3, postFOIS3DocumentPreSignedUrl, getFOIS3DocumentPreSignedUrl, completeMultiPartUpload } from "../../../../apiManager/services/FOI/foiOSSServices";
-import { saveFOIRequestAttachmentsList, replaceFOIRequestAttachment, saveNewFilename, deleteFOIRequestAttachment } from "../../../../apiManager/services/FOI/foiAttachmentServices";
+import { saveFOIRequestAttachmentsList, replaceFOIRequestAttachment, saveNewFilename, deleteFOIRequestAttachment, saveNewCategory } from "../../../../apiManager/services/FOI/foiAttachmentServices";
 import { StateTransitionCategories, AttachmentCategories, AttachmentLetterCategories } from '../../../../constants/FOI/statusEnum'
 import { addToFullnameList, getFullnameList, ConditionalComponent } from '../../../../helper/FOI/helper';
 import Grid from "@material-ui/core/Grid";
@@ -125,6 +125,9 @@ export const AttachmentSection = ({
     if (modalFor === 'delete' && value) { 
       const documentId = ministryId ? updateAttachment.foiministrydocumentid : updateAttachment.foidocumentid;
       dispatch(deleteFOIRequestAttachment(requestId, ministryId, documentId, {}));
+    }
+    else if (modalFor === 'reclassify') {
+      // do nothing
     }
     else if (files) {
       setFileCount(files.length);
@@ -306,6 +309,10 @@ export const AttachmentSection = ({
         setModalFor("rename");
         setModal(true);
         break;
+      case "reclassify":
+        setModalFor("reclassify");
+        setModal(true);
+        break;
       case "download":
         downloadDocument(_attachment);
         setModalFor("download");
@@ -327,6 +334,19 @@ export const AttachmentSection = ({
     if (updateAttachment.filename !== newFilename) {
       const documentId = ministryId ? updateAttachment.foiministrydocumentid : updateAttachment.foidocumentid;
       dispatch(saveNewFilename(newFilename, documentId, requestId, ministryId, (err, _res) => {
+        if (!err) {
+          setAttachmentLoading(false);
+        }
+      }));
+    }
+  }
+
+  const handleReclassify = (_attachment, newCategory) => {
+    setModal(false);
+
+    if (updateAttachment.category !== newCategory) {
+      const documentId = ministryId ? updateAttachment.foiministrydocumentid : updateAttachment.foidocumentid;
+      dispatch(saveNewCategory(newCategory, documentId, requestId, ministryId, (err, _res) => {
         if (!err) {
           setAttachmentLoading(false);
         }
@@ -460,6 +480,7 @@ export const AttachmentSection = ({
             attachment={updateAttachment}
             attachmentsArray={attachmentsArray}
             handleRename={handleRename}
+            handleReclassify={handleReclassify}
             maxNoFiles={10}
             isMinistryCoordinator={isMinistryCoordinator}
           />
@@ -484,6 +505,8 @@ const Attachment = React.memo(({indexValue, attachment, handlePopupButtonClick, 
       setDisabled(isMinistryCoordinator && disableCategory())
     }
   }, [attachment])
+
+  const reclassifyIsDisabled = (attachment.category.includes('>') || attachment.category.toLowerCase().includes('applicant')) ? true : false;
 
   const attachmenttitle = ()=>{
 
@@ -551,6 +574,7 @@ const Attachment = React.memo(({indexValue, attachment, handlePopupButtonClick, 
             attachment={attachment}
             handlePopupButtonClick={handlePopupButtonClick}
             disabled={disabled}
+            reclassifyIsDisabled={reclassifyIsDisabled}
             ministryId={ministryId}
           />
         </Grid>
@@ -611,13 +635,18 @@ const opendocumentintab =(attachment,ministryId)=>
   window.open(url, '_blank').focus();
 }
 
-const AttachmentPopup = React.memo(({indexValue, attachment, handlePopupButtonClick, disabled,ministryId}) => {
+const AttachmentPopup = React.memo(({indexValue, attachment, handlePopupButtonClick, disabled, reclassifyIsDisabled, ministryId}) => {
   const ref = React.useRef();
   const closeTooltip = () => ref.current && ref ? ref.current.close():{};
 
   const handleRename = () => {
     closeTooltip(); 
     handlePopupButtonClick("rename", attachment);
+  }
+
+  const handleReclassify = () => {
+    closeTooltip();
+    handlePopupButtonClick("reclassify", attachment);
   }
 
   const handleReplace = () => {
@@ -750,6 +779,17 @@ const AttachmentPopup = React.memo(({indexValue, attachment, handlePopupButtonCl
           >
             Download
           </MenuItem>
+
+          <MenuItem
+            onClick={() => {
+                handleReclassify();
+                setPopoverOpen(false);
+            }}
+            disabled={reclassifyIsDisabled}
+          >
+            Reclassify
+          </MenuItem>
+
           <MenuItem
             onClick={() => {
                 handleRename();
