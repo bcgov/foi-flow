@@ -140,7 +140,7 @@ const adminDashboard = (_e) => {
                           <FontAwesomeIcon icon={faCog} size='1x' onClick={adminDashboard} />
                         </li>
                       }
-                      <li>
+                      <li className="help-icon foinavitem">
                         <a href={"https://help.foirequests.gov.bc.ca/"} target="_blank" aria-label="foi-help link">
                           <FontAwesomeIcon icon={faQuestion} size='1x'/>
                         </a>
