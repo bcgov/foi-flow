@@ -51,6 +51,23 @@ class documentservice:
         else:
             return self.createrawdocumentversion(requestid, documentid, documentschema, userid)
 
+    def copyrequestdocumenttonewlocation(self, newcategory, documentpath): #documentpath is full url including https://
+        # for old documentpath
+        baseurl = documentpath.split('/')[:3]
+        location = documentpath.split('/')[3:] # bucket and filename
+        bucket = location[0]
+        source = "/".join(location) # /bucket/filename
+        # for new document path, replace category name in path
+        newlocation = location
+        newlocation[3] = newcategory
+        filename = "/".join(newlocation[1:])
+        newdocumentpath = "/".join(baseurl) + '/' + bucket + '/' + filename
+        moveresponse = storageservice().copy_file(source, bucket, filename)
+        if moveresponse['ResponseMetadata']['HTTPStatusCode'] == 200:
+            return {"status": "success", 'documentpath': newdocumentpath}
+        else:
+            return {"status": "error"}
+
     def deleterequestdocument(self, requestid, documentid, userid, requesttype):
         documentschema = {'isactive':False}
         return self.createrequestdocumentversion(requestid, documentid, documentschema, userid, requesttype)
