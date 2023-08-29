@@ -15,6 +15,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import { MimeTypeList, MaxFileSizeInMB } from "../../../../constants/FOI/enum";
 import { StateTransitionCategories, AttachmentCategories } from '../../../../constants/FOI/statusEnum';
 import { TOTAL_RECORDS_UPLOAD_LIMIT } from "../../../../constants/constants";
+import { ClickableChip } from '../../Dashboard/utils';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -49,6 +50,7 @@ export default function AttachmentModal({
   attachment,
   attachmentsArray,
   handleRename,
+  handleReclassify,
   isMinistryCoordinator,
   uploadFor="attachment",
   maxNoFiles,
@@ -138,6 +140,10 @@ export default function AttachmentModal({
         setErrorMessage(`File name cannot contain these characters, / : * ? " < > |`);
       }
     };
+
+    const saveNewCategory = () => {
+      handleReclassify(attachment, tagValue);
+    }
 
     const saveNewFilename = () => {
       if(validateFilename(newFilename)) {
@@ -247,6 +253,8 @@ export default function AttachmentModal({
             return _message;
         case "rename":
           return {title: "Rename Attachment", body: ""};
+        case "reclassify":
+          return {title: "Reclassify Attachment", body: ""}
         case "delete":
           if (uploadFor === 'record') {
             return {title: "Delete Record", body: <>Are you sure you want to delete this record?<br></br><i>If you delete this record, the record will not appear in the redaction app for review by IAO.</i></>};
@@ -294,6 +302,27 @@ export default function AttachmentModal({
                   {message.body}                               
                 </span>                
               </div>
+              {modalFor === 'reclassify' ?
+              <div>
+                <div className="tagtitle">
+                  <span>Select the tag that you would like to reclassify this document with</span>
+                </div>
+                <div className="taglist">
+                  {tagList.map(tag =>
+                    <ClickableChip
+                      id={`${tag.name}Tag`}
+                      key={`${tag.name}-tag`}
+                      label={tag.display.toUpperCase()}
+                      sx={{width: "fit-content", marginRight: "8px", marginBottom: "8px"}}
+                      color="primary"
+                      size="small"
+                      onClick={()=>{handleTagChange(tag.name)}}
+                      clicked={tagValue == tag.name}
+                    />
+                  )}
+                </div>
+              </div> : ''
+              }
               {
                 (['replaceattachment','replace','add'].includes(modalFor)) ?
                 <FileUpload 
@@ -315,21 +344,32 @@ export default function AttachmentModal({
                   totalUploadedRecordSize={totalUploadedRecordSize}
                   totalRecordUploadLimit={totalRecordUploadLimit}
                 /> 
-                :
-                <ModalForRename modalFor={modalFor} newFilename={newFilename} updateFilename={updateFilename} errorMessage={errorMessage} extension={extension} />
+                : ''
+              }
+              {
+                modalFor === 'rename' ? <ModalForRename modalFor={modalFor} newFilename={newFilename} updateFilename={updateFilename} errorMessage={errorMessage} extension={extension} />
+                : ''
               }
             </DialogContentText>
           </DialogContent>
           <DialogActions>
             {
+            modalFor === 'reclassify' ?
+              <button className={`btn-bottom btn-save ${classes.btnenabled}`} onClick={saveNewCategory}>
+                Reclassify
+              </button> : ''
+            }
+            {
               modalFor === 'rename'?
               <button className={`btn-bottom btn-save ${classes.btnenabled}`} onClick={saveNewFilename}>
                 Save
-              </button>
-              :
+              </button> : ''
+            }
+             {
+              modalFor !== 'rename' && modalFor !== 'reclassify' ?
               <button className={`btn-bottom btn-save ${ isSaveDisabled() ? classes.btndisabled : classes.btnenabled }`} disabled={isSaveDisabled()} onClick={handleSave}>
                 {uploadFor === "email" ? "Save Changes" : "Continue"}
-              </button>
+              </button> : ''
             }
             <button className="btn-bottom btn-cancel" onClick={handleClose}>
               Cancel
