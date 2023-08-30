@@ -1,4 +1,4 @@
-""" Adding forpersonalrequest boolean column to distinguish between section/dvisions for personal vs general requests
+""" Adding specifictopersonalrequests boolean column to distinguish between section/dvisions for personal vs general requests
 
 Revision ID: 0ab7d9683c9a
 Revises: 7341bc012ca9
@@ -17,8 +17,8 @@ depends_on = None
 
 
 def upgrade():
-    op.add_column('ProgramAreaDivisions', sa.Column('forpersonalrequest', sa.Boolean, nullable=True))
+    op.add_column('ProgramAreaDivisions', sa.Column('specifictopersonalrequests', sa.Boolean, nullable=True))
 
 
 def downgrade():
-     op.drop_column('ProgramAreaDivisions', 'forpersonalrequest')
+     op.drop_column('ProgramAreaDivisions', 'specifictopersonalrequests')
