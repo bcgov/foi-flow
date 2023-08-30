@@ -142,7 +142,7 @@ const adminDashboard = (_e) => {
                       }
                       <li className="help-icon foinavitem">
                         <a href={"https://help.foirequests.gov.bc.ca/"} target="_blank" aria-label="foi-help link">
-                          <HelpOutlineIcon style={{fontSize: "21.5px", color: "white", textDecoration: "none", cursor: "pointer"}} />
+                          <HelpOutlineIcon style={{fontSize: "21px", color: "white", textDecoration: "none", cursor: "pointer"}} />
                         </a>
                       </li>
                       <li className="report-icon foinavitem">
