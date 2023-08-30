@@ -1,5 +1,6 @@
 
 from os import stat
+import os
 from re import VERBOSE
 from request_api.models.FOIMinistryRequestDocuments import FOIMinistryRequestDocument
 from request_api.models.FOIRawRequestDocuments import FOIRawRequestDocument
@@ -53,7 +54,7 @@ class documentservice:
 
     def copyrequestdocumenttonewlocation(self, newcategory, documentpath): #documentpath is full url including https://
         # for old documentpath
-        baseurl = documentpath.split('/')[:3]
+        baseurl = 'https://' + os.getenv("OSS_S3_HOST")
         location = documentpath.split('/')[3:] # bucket and filename
         bucket = location[0]
         source = "/".join(location) # /bucket/filename
