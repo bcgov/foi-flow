@@ -506,7 +506,18 @@ const Attachment = React.memo(({indexValue, attachment, handlePopupButtonClick, 
     }
   }, [attachment])
 
-  const reclassifyIsDisabled = (attachment.category.includes('>') || attachment.category.toLowerCase().includes('applicant')) ? true : false;
+  const disableAttachmentsTaggedBySystem = (attachment) => {
+    let result = false;
+    AttachmentCategories.categorys.forEach((category) => {
+      if (category.name.toLowerCase() === attachment.category.toLowerCase()) {
+        if (category.display.toLowerCase().includes('>') || category.display.toLowerCase().includes('applicant')) {
+          result = true
+        }
+      }
+    })
+    return result
+  }
+  const reclassifyIsDisabled = disableAttachmentsTaggedBySystem(attachment)
 
   const attachmenttitle = ()=>{
 
