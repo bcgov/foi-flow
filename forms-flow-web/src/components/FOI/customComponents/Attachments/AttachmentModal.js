@@ -145,6 +145,12 @@ export default function AttachmentModal({
       handleReclassify(attachment, tagValue);
     }
 
+    useEffect(() => {
+      if (attachment && modalFor == "reclassify") {
+        setTagValue(attachment.category.toLowerCase())
+      }
+    }, [modalFor, attachment])
+
     const saveNewFilename = () => {
       if(validateFilename(newFilename)) {
         if(!containDuplicate(newFilename)) {
