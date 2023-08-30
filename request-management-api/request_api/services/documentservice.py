@@ -77,7 +77,10 @@ class documentservice:
         document = FOIMinistryRequestDocument.getdocument(documentid)
         if document:
             FOIMinistryRequestDocument.deActivateministrydocumentsversion(documentid, document['version']+1, userid)
-            return FOIMinistryRequestDocument.createdocumentversion(ministryrequestid, version, self.__copydocumentproperties(document,documentschema,document['version']), userid)          
+            createdat = document ['created _at'] # store this because __copydocumentproperties function below overwrites it
+            updateddocument = self.__copydocumentproperties(document,documentschema,document['version'])
+            updateddocument['created_at'] = createdat
+            return FOIMinistryRequestDocument.createdocumentversion(ministryrequestid, version, updateddocument, userid)
         elif isinstance(documentschema, list):            
             return FOIMinistryRequestDocument.createdocuments(ministryrequestid, version, documentschema, userid)
         else:
@@ -87,8 +90,11 @@ class documentservice:
     def createrawdocumentversion(self, requestid, documentid, documentschema, userid):
         version = self.__getversionforrequest(requestid, "rawrequest")
         document = FOIRawRequestDocument.getdocument(documentid)
+        createdat = document['created_at'] # store this as the following function overwrites it
         FOIRawRequestDocument.deActivaterawdocumentsversion(documentid, document['version']+1, userid)
-        return FOIRawRequestDocument.createdocumentversion(requestid, version, self.__copydocumentproperties(document,documentschema,document['version']), userid)
+        updateddocument = self.__copydocumentproperties(document,documentschema,document['version'])
+        updateddocument['created_at'] = createdat
+        return FOIRawRequestDocument.createdocumentversion(requestid, version, updateddocument, userid)
 
     def createrawrequestdocumentversion(self, requestid):
         newversion = self.__getversionforrequest(requestid,"rawrequest")
