@@ -116,6 +116,7 @@ class ReclassifyFOIDocument(Resource):
     def post(requesttype, requestid, documentid):
         try:
             requestjson = request.get_json()
+            documentschema = ReclassifyDocumentSchema().load(requestjson)
             activedocuments = documentservice().getactiverequestdocuments(requestid, requesttype)
             documentpath = 'no documentpath found'
             if (requesttype == 'ministryrequest'):
@@ -128,10 +129,8 @@ class ReclassifyFOIDocument(Resource):
                         documentpath = document['documentpath']
 
             # move document in S3
-            moveresult = documentservice().copyrequestdocumenttonewlocation(requestjson['category'], documentpath)
+            moveresult = documentservice().copyrequestdocumenttonewlocation(documentschema['category'], documentpath)
             # save new version of document with updated documentpath
-            updatedata = {'category': requestjson['category'], 'documentpath': moveresult['documentpath']}
-            documentschema = ReclassifyDocumentSchema().load(updatedata)
             if moveresult['status'] == 'success':
                  result = documentservice().createrequestdocumentversion(requestid, documentid, documentschema, AuthHelper.getuserid(), requesttype)
                  return {'status': result.success, 'message':result.message,'id':result.identifier} , 200
@@ -139,7 +138,7 @@ class ReclassifyFOIDocument(Resource):
         except ValidationError as err:
                     return {'status': False, 'message':err.messages}, 400
         except KeyError as err:
-            return {'status': False, 'message': 'KeyError'}, 400
+            return {'status': False, 'message': err.messages}, 400
         except BusinessException as exception:
             return {'status': exception.status_code, 'message':exception.message}, 500
 
