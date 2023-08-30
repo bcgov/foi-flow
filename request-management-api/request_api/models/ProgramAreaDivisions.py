@@ -33,6 +33,18 @@ class ProgramAreaDivision(db.Model):
         return division_schema.dump(query)
     
     @classmethod
+    def getprogramareasections(cls,programareaid):
+        division_schema = ProgramAreaDivisionSchema(many=True)
+        query = db.session.query(ProgramAreaDivision).filter_by(programareaid=programareaid, isactive=True,issection=True).order_by(ProgramAreaDivision.name.asc())
+        return division_schema.dump(query)
+    
+    @classmethod
+    def getprogramareadivisionsandsections(cls,programareaid):
+        division_schema = ProgramAreaDivisionSchema(many=True)
+        query = db.session.query(ProgramAreaDivision).filter_by(programareaid=programareaid, isactive=True).order_by(ProgramAreaDivision.name.asc())
+        return division_schema.dump(query)
+    
+    @classmethod
     def createprogramareadivision(cls, programareadivision)->DefaultMethodResult:
         created_at = datetime2.now().isoformat()
         newprogramareadivision = ProgramAreaDivision(programareaid=programareadivision["programareaid"], name=programareadivision["name"], isactive=True, created_at=created_at)
