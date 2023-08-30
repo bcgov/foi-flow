@@ -7,7 +7,7 @@ from notification_api.default_method_result import DefaultMethodResult
 from notification_api.io.message.schemas.notification import (
     NotificationPublishSchema,
     NotificationHarmsPDFStitchPublishSchema,
-    NotificationRedlinePDFStitchPublishSchema,
+    NotificationRedlineResponsePDFStitchPublishSchema,
 )
 from config import DIVISION_PDF_STITCH_SERVICE_KEY
 from notification_api.util.enums import ServiceKey
@@ -22,11 +22,22 @@ class notificationprocessor:
             return self.handlepdfstitchforharmsmessage(message)
         elif serviceid == ServiceKey.pdfstitchforredline.value.lower():
             return self.handlepdfstitchforredlinemessage(message)
+        elif serviceid == ServiceKey.pdfstitchforresponsepackage.value.lower():
+            return self.handlepdfstitchforresponsemessage(message)
         else:
             return self.handlebatchmessage(message)
 
+    def handlepdfstitchforresponsemessage(self, message):
+        notification = NotificationRedlineResponsePDFStitchPublishSchema()
+        notification.__dict__.update(message)
+        notificationresp = self.__createnotificationforresponse(notification)
+        commentresp = self.__createcommentforresponse(notification)
+        return self.__getmethodresult(
+            message["ministryrequestid"], commentresp, notificationresp
+        )
+
     def handlepdfstitchforredlinemessage(self, message):
-        notification = NotificationRedlinePDFStitchPublishSchema()
+        notification = NotificationRedlineResponsePDFStitchPublishSchema()
         notification.__dict__.update(message)
         notificationresp = self.__createnotificationforredline(notification)
         commentresp = self.__createcommentforredline(notification)
@@ -116,6 +127,25 @@ class notificationprocessor:
             2,
         )
 
+    def __createnotificationforresponse(self, notification):
+        return notificationservice().createnotification(
+            "ministryrequest",
+            notification.ministryrequestid,
+            {"message": self.__createresponsemessage(notification.errorflag)},
+            "PDFStitch",
+            notification.createdby,
+        )
+
+    def __createcommentforresponse(self, notification):
+        comment = {"comment": self.__createresponsemessage(notification.errorflag)}
+        return commentservice().createcomment(
+            "ministryrequest",
+            notification.ministryrequestid,
+            comment,
+            notification.createdby,
+            2,
+        )
+
     def __createnotificationforredline(self, notification):
         return notificationservice().createnotification(
             "ministryrequest",
@@ -134,6 +164,11 @@ class notificationprocessor:
             notification.createdby,
             2,
         )
+
+    def __createresponsemessage(self, errorflag):
+        if errorflag == "YES":
+            return "Creating the Release Package failed. Please try again"
+        return "Release Package ready for download"
 
     def __createredlinemessage(self, errorflag):
         if errorflag == "YES":
