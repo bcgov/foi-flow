@@ -22,7 +22,6 @@ class ReclassifyDocumentSchema(Schema):
 
         unknown = EXCLUDE
     category = fields.Str(data_key="category",required=True,allow_none=False)
-    documentpath = fields.Str(data_key="documentpath",required=True,allow_none=False, validate=[validate.Length(max=1000, error=MAX_EXCEPTION_MESSAGE)])
 
 class ReplaceDocumentSchema(Schema):
     class Meta:  # pylint: disable=too-few-public-methods
