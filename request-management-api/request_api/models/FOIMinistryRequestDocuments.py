@@ -92,7 +92,7 @@ class FOIMinistryRequestDocument(db.Model):
 
     @classmethod
     def createdocumentversion(cls,ministryrequestid,ministryrequestversion, document, userid):
-        newdocument = FOIMinistryRequestDocument(documentpath=document["documentpath"], foiministrydocumentid=document["foiministrydocumentid"], version=document["version"], filename=document["filename"], category=document["category"], isactive=document["isactive"], foiministryrequest_id=ministryrequestid, foiministryrequestversion_id=ministryrequestversion, created_at=datetime.now(), createdby=userid)
+        newdocument = FOIMinistryRequestDocument(documentpath=document["documentpath"], foiministrydocumentid=document["foiministrydocumentid"], version=document["version"], filename=document["filename"], category=document["category"], isactive=document["isactive"], foiministryrequest_id=ministryrequestid, foiministryrequestversion_id=ministryrequestversion, created_at=document['created_at'], createdby=userid)
         db.session.add(newdocument)
         db.session.commit()               
         return DefaultMethodResult(True,'New Document version created', newdocument.foiministrydocumentid)  

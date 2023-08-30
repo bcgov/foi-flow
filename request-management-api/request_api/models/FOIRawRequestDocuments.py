@@ -70,7 +70,7 @@ class FOIRawRequestDocument(db.Model):
 
     @classmethod
     def createdocumentversion(cls,requestid,requestversion, document, userid):
-        newdocument = FOIRawRequestDocument(documentpath=document["documentpath"], foidocumentid=document["foidocumentid"], version=document["version"], filename=document["filename"], category=document["category"], isactive=document["isactive"], foirequest_id=requestid, foirequestversion_id=requestversion, created_at=datetime.now(), createdby=userid)
+        newdocument = FOIRawRequestDocument(documentpath=document["documentpath"], foidocumentid=document["foidocumentid"], version=document["version"], filename=document["filename"], category=document["category"], isactive=document["isactive"], foirequest_id=requestid, foirequestversion_id=requestversion, created_at=document['created_at'], createdby=userid)
         db.session.add(newdocument)
         db.session.commit()               
         return DefaultMethodResult(True,'New Document version created', newdocument.foidocumentid)
