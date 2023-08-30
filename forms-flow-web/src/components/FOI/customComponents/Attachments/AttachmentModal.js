@@ -360,22 +360,22 @@ export default function AttachmentModal({
           </DialogContent>
           <DialogActions>
             {
-            modalFor === 'reclassify' ?
+            modalFor === 'reclassify' && 
               <button className={`btn-bottom btn-save ${classes.btnenabled}`} onClick={saveNewCategory}>
                 Reclassify
-              </button> : ''
+              </button>
             }
             {
-              modalFor === 'rename'?
+              modalFor === 'rename' &&
               <button className={`btn-bottom btn-save ${classes.btnenabled}`} onClick={saveNewFilename}>
                 Save
-              </button> : ''
+              </button>
             }
              {
-              modalFor !== 'rename' && modalFor !== 'reclassify' ?
+              modalFor !== 'rename' && modalFor !== 'reclassify' &&
               <button className={`btn-bottom btn-save ${ isSaveDisabled() ? classes.btndisabled : classes.btnenabled }`} disabled={isSaveDisabled()} onClick={handleSave}>
                 {uploadFor === "email" ? "Save Changes" : "Continue"}
-              </button> : ''
+              </button>
             }
             <button className="btn-bottom btn-cancel" onClick={handleClose}>
               Cancel
