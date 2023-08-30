@@ -16,7 +16,22 @@ jobs:
       with:
         ref: dev-automationscripts
     - name: set screen resolution
-	@@ -35,9 +35,9 @@ jobs:
+      run: Set-DisplayResolution -Width 1920 -Height 1080 -Force  
+    - name: set date format
+      run: |
+            Import-Module International
+            Set-Culture 'en-CA'
+    - name: create Test Attachments
+      run: |            
+            echo '${{ github.workspace }}'
+            cd "testing\foi-qa-automation\Test Attachments"
+            fsutil file createnew 50mb.pdf 53428800
+            fsutil file createnew 500mb.pdf 534288000
+            fsutil file createnew invalidfiletype.bin 5242880
+            fsutil file createnew Book17.pdf 207955000
+            fsutil file createnew Book20.pdf 212473000
+            fsutil file createnew stitched680MB.pdf 700994000
+            fsutil file createnew stitched690MB.pdf 690180000
             dir
       shell: cmd
     - name: Katalon Studio Github Action
@@ -26,7 +41,12 @@ jobs:
           projectPath: '${{ github.workspace }}/testing/foi-qa-automation/foi-qa-automation.prj'
           args: '-noSplash -retry=0  -testSuiteCollectionPath="Test Suites/foi-test" -apiKey=${{ secrets.KATALON_API_KEY }} --config -webui.autoUpdateDrivers=true -licenseRelease=true -browserType="Chrome" -proxy.auth.option=NO_PROXY -proxy.system.option=NO_PROXY -proxy.system.applyToDesiredCapabilities=true -executionProfile="dev" '
     - name: copy reports to one folder
-	@@ -50,15 +50,15 @@ jobs:
+      run: | 
+            mkdir artifacts
+            FOR /d  %%a in ("${{ github.workspace }}\testing\foi-qa-automation\Reports\*") DO FOR /d %%b in ("%%a\*") DO FOR /d %%c in ("%%b\*") do (robocopy "%%c" "${{ github.workspace }}\artifacts" *.html
+            robocopy "%%a\foi-test\%%~nxa" "${{ github.workspace }}\artifacts" JUnit_Report.xml
+            rename artifacts\%%~nxc.html %%~nxb.html)
+            cd artifacts
             dir
       shell: cmd
     - name: Setup Node.js
