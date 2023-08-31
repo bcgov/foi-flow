@@ -62,7 +62,7 @@ class documentservice:
         newlocation = location
         newlocation[3] = newcategory
         filename = "/".join(newlocation[1:])
-        newdocumentpath = "/".join(baseurl) + '/' + bucket + '/' + filename
+        newdocumentpath = baseurl + '/' + bucket + '/' + filename
         moveresponse = storageservice().copy_file(source, bucket, filename)
         if moveresponse['ResponseMetadata']['HTTPStatusCode'] == 200:
             return {"status": "success", 'documentpath': newdocumentpath}
