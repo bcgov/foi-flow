@@ -326,6 +326,8 @@ WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/div_Statu
 
 WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/li_On Hold'))
 
+WebUI.delay(4)
+
 WebUI.verifyElementVisible(findTestObject('CFR/Email_missing/span_I foiintakeidir have completed placed applicant processing fees letter in outbox to be mailed'))
 
 if (WebUI.verifyElementPresent(findTestObject('CFR/Email_missing/span_I foiintakeidir have completed placed applicant processing fees letter in outbox to be mailed'), 

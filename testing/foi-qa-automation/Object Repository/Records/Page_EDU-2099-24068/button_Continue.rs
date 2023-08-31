@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>button_Continue</name>
+   <tag></tag>
+   <elementGuidId>a5b40dc2-4a85-4f2a-9439-2c04833893bf</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>CSS</key>
+         <value>button.btn-bottom.btn-save.jss45</value>
+      </entry>
+      <entry>
+         <key>XPATH</key>
+         <value>(.//*[normalize-space(text()) and normalize-space(.)='If you delete this record, the record will not appear in the redaction app for review by IAO.'])[1]/following::button[1]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>XPATH</selectorMethod>
+   <useRalativeImagePath>true</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>tag</name>
+      <type>Main</type>
+      <value>button</value>
+      <webElementGuid>147a652f-e9e3-456b-a983-3541f5d3cf0f</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>class</name>
+      <type>Main</type>
+      <value>btn-bottom btn-save jss45</value>
+      <webElementGuid>a534b0f9-44e5-4239-b42c-5d7f12e02846</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>text</name>
+      <type>Main</type>
+      <value>Continue</value>
+      <webElementGuid>2c9326ba-eda1-4448-8759-0647c2b77c8a</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>/html[1]/body[@class=&quot;no-scroll&quot;]/div[@class=&quot;MuiDialog-root&quot;]/div[@class=&quot;MuiDialog-container MuiDialog-scrollPaper&quot;]/div[@class=&quot;MuiPaper-root MuiDialog-paper MuiDialog-paperScrollPaper MuiDialog-paperWidthMd MuiDialog-paperFullWidth MuiPaper-elevation24 MuiPaper-rounded&quot;]/div[@class=&quot;MuiDialogActions-root MuiDialogActions-spacing&quot;]/button[@class=&quot;btn-bottom btn-save jss45&quot;]</value>
+      <webElementGuid>43b7edf7-9c7d-4c6b-82ff-fe0de7a01696</webElementGuid>
+   </webElementProperties>
+   <webElementXpaths>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='If you delete this record, the record will not appear in the redaction app for review by IAO.'])[1]/following::button[1]</value>
+      <webElementGuid>6b5fc9dd-0c79-4f05-bced-a67e1a308f46</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='Cancel'])[1]/preceding::button[1]</value>
+      <webElementGuid>95ca5ccc-0010-406b-9c06-3a8a7f589c0c</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>//*/text()[normalize-space(.)='Continue']/parent::*</value>
+      <webElementGuid>76b03d3c-3148-4c0e-a06c-4a1a310abcbd</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:position</name>
+      <type>Main</type>
+      <value>//div[3]/div/div[3]/button</value>
+      <webElementGuid>a809fdf3-c615-4340-8c9b-f9b212bafaf5</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:customAttributes</name>
+      <type>Main</type>
+      <value>//button[(text() = 'Continue' or . = 'Continue')]</value>
+      <webElementGuid>0ae9342c-0d45-4d12-9754-fac2c525684f</webElementGuid>
+   </webElementXpaths>
+</WebElementEntity>
