@@ -76,11 +76,8 @@ class documentservice:
         version = self.__getversionforrequest(ministryrequestid, "ministryrequest")        
         document = FOIMinistryRequestDocument.getdocument(documentid)
         if document:
-            FOIMinistryRequestDocument.deActivateministrydocumentsversion(documentid, document['version']+1, userid)
-            createdat = document ['created _at'] # store this because __copydocumentproperties function below overwrites it
-            updateddocument = self.__copydocumentproperties(document,documentschema,document['version'])
-            updateddocument['created_at'] = createdat
-            return FOIMinistryRequestDocument.createdocumentversion(ministryrequestid, version, updateddocument, userid)
+            FOIMinistryRequestDocument.deActivateministrydocumentsversion(documentid, document['version'], userid)
+            return FOIMinistryRequestDocument.createdocumentversion(ministryrequestid, version, self.__copydocumentproperties(document,documentschema,document['version']), userid)
         elif isinstance(documentschema, list):            
             return FOIMinistryRequestDocument.createdocuments(ministryrequestid, version, documentschema, userid)
         else:
