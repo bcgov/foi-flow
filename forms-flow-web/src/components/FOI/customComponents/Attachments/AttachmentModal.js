@@ -308,7 +308,7 @@ export default function AttachmentModal({
                   {message.body}                               
                 </span>                
               </div>
-              {modalFor === 'reclassify' ?
+              {modalFor === 'reclassify' &&
               <div>
                 <div className="tagtitle">
                   <span>Select the tag that you would like to reclassify this document with</span>
@@ -327,10 +327,10 @@ export default function AttachmentModal({
                     />
                   )}
                 </div>
-              </div> : ''
+              </div>
               }
               {
-                (['replaceattachment','replace','add'].includes(modalFor)) ?
+                (['replaceattachment','replace','add'].includes(modalFor)) &&
                 <FileUpload 
                   attachment={attachment}  
                   attchmentFileNameList={attchmentFileNameList}  
@@ -350,11 +350,9 @@ export default function AttachmentModal({
                   totalUploadedRecordSize={totalUploadedRecordSize}
                   totalRecordUploadLimit={totalRecordUploadLimit}
                 /> 
-                : ''
               }
               {
-                modalFor === 'rename' ? <ModalForRename modalFor={modalFor} newFilename={newFilename} updateFilename={updateFilename} errorMessage={errorMessage} extension={extension} />
-                : ''
+                modalFor === 'rename' && <ModalForRename modalFor={modalFor} newFilename={newFilename} updateFilename={updateFilename} errorMessage={errorMessage} extension={extension} />
               }
             </DialogContentText>
           </DialogContent>
