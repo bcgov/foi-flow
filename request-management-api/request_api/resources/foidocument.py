@@ -134,7 +134,7 @@ class ReclassifyFOIDocument(Resource):
             if moveresult['status'] == 'success':
                  result = documentservice().createrequestdocumentversion(requestid, documentid, documentschema, AuthHelper.getuserid(), requesttype)
                  return {'status': result.success, 'message':result.message,'id':result.identifier} , 200
-            return {'status': False, 'message': 'Something went wrong' }, 500
+            return {'status': False, 'message': "Something went wrong moving the document's location" }, 500
         except ValidationError as err:
                     return {'status': False, 'message':err.messages}, 400
         except KeyError as err:

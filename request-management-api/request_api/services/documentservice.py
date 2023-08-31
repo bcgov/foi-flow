@@ -67,7 +67,7 @@ class documentservice:
         if moveresponse['ResponseMetadata']['HTTPStatusCode'] == 200:
             return {"status": "success", 'documentpath': newdocumentpath}
         else:
-            return {"status": "error"}
+            return {"status": "error", "response": moveresponse}
 
     def deleterequestdocument(self, requestid, documentid, userid, requesttype):
         documentschema = {'isactive':False}
