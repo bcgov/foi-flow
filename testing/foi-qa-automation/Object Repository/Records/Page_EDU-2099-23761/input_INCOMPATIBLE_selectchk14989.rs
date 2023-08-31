@@ -6,12 +6,16 @@
    <elementGuidId>f147902d-d962-4f05-bb09-4094c28b4901</elementGuidId>
    <selectorCollection>
       <entry>
-         <key>XPATH</key>
-         <value>//input[@id='selectchk14989']</value>
+         <key>BASIC</key>
+         <value>//*[@type = 'checkbox' and @data-iaocode = '12396']</value>
       </entry>
       <entry>
          <key>CSS</key>
          <value>#selectchk14989</value>
+      </entry>
+      <entry>
+         <key>XPATH</key>
+         <value>//div[@id='Records']/div/div[2]/div[6]/div/div/input</value>
       </entry>
    </selectorCollection>
    <selectorMethod>XPATH</selectorMethod>
@@ -22,7 +26,7 @@
       <name>tag</name>
       <type>Main</type>
       <value>input</value>
-      <webElementGuid>5393693f-d8e2-45b2-9b23-f299e3c9760f</webElementGuid>
+      <webElementGuid>881fb95a-939c-4aa6-b61a-f9e07a668d26</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>true</isSelected>
@@ -30,7 +34,7 @@
       <name>type</name>
       <type>Main</type>
       <value>checkbox</value>
-      <webElementGuid>684571b5-21f9-4b23-8263-57420f15918a</webElementGuid>
+      <webElementGuid>2232d443-0d90-4b42-a3cb-32ed92cdf49f</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -38,23 +42,23 @@
       <name>class</name>
       <type>Main</type>
       <value>checkmark record-checkmark</value>
-      <webElementGuid>54da8396-7c59-4309-a0c2-743cd4f372f4</webElementGuid>
-   </webElementProperties>
-   <webElementProperties>
-      <isSelected>true</isSelected>
-      <matchCondition>equals</matchCondition>
-      <name>id</name>
-      <type>Main</type>
-      <value>selectchk14989</value>
-      <webElementGuid>1d1d080e-e3a0-493e-ac0b-727f5421031d</webElementGuid>
+      <webElementGuid>bf15a932-9bc4-43d4-8602-0ae7aced73e1</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
       <matchCondition>equals</matchCondition>
+      <name>id</name>
+      <type>Main</type>
+      <value>selectchk14989</value>
+      <webElementGuid>cb6326cb-74b9-4ca3-a9e0-064966082e19</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
       <name>data-iaocode</name>
       <type>Main</type>
-      <value>12404</value>
-      <webElementGuid>a1d24588-b97d-4eea-88b2-2aed5c8e236f</webElementGuid>
+      <value>12396</value>
+      <webElementGuid>8fbfbd8c-2b0b-442e-bf7a-09bdd033ef58</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -62,7 +66,7 @@
       <name>xpath</name>
       <type>Main</type>
       <value>id(&quot;selectchk14989&quot;)</value>
-      <webElementGuid>f684e237-62a1-4f71-ba1d-75ed6198928e</webElementGuid>
+      <webElementGuid>fcf7a547-a4d2-4dde-a7a8-c69284ce9f36</webElementGuid>
    </webElementProperties>
    <webElementXpaths>
       <isSelected>true</isSelected>
@@ -70,7 +74,7 @@
       <name>xpath:attributes</name>
       <type>Main</type>
       <value>//input[@id='selectchk14989']</value>
-      <webElementGuid>75e3de25-9397-44e1-904e-82c5b84c3ae1</webElementGuid>
+      <webElementGuid>edb4ae77-f798-4361-a459-3f5005cd2202</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -78,7 +82,7 @@
       <name>xpath:idRelative</name>
       <type>Main</type>
       <value>//div[@id='Records']/div/div[2]/div[6]/div/div/input</value>
-      <webElementGuid>3d4caf58-a39e-4ce8-8c97-4aff84ce22f1</webElementGuid>
+      <webElementGuid>9d53a24f-270c-484c-876a-ea0e2ee653f7</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -86,7 +90,7 @@
       <name>xpath:position</name>
       <type>Main</type>
       <value>//div[2]/div[6]/div/div/input</value>
-      <webElementGuid>92e69b50-3c06-41e1-979c-55f507b2d1c0</webElementGuid>
+      <webElementGuid>5f1c66ff-db2d-47f6-842f-e1ea878179b9</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -94,6 +98,6 @@
       <name>xpath:customAttributes</name>
       <type>Main</type>
       <value>//input[@type = 'checkbox' and @id = 'selectchk14989']</value>
-      <webElementGuid>0b843e18-dfee-407d-ba59-f65dc609b19c</webElementGuid>
+      <webElementGuid>1f880643-651e-401c-9bbb-7e71113c92c8</webElementGuid>
    </webElementXpaths>
 </WebElementEntity>

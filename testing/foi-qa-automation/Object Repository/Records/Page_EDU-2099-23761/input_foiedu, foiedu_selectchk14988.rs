@@ -6,12 +6,16 @@
    <elementGuidId>eeba0d59-4eea-4d13-856c-d5b3220e3df6</elementGuidId>
    <selectorCollection>
       <entry>
-         <key>XPATH</key>
-         <value>//input[@id='selectchk14988']</value>
+         <key>BASIC</key>
+         <value>//*[@type = 'checkbox' and @id = 'selectchk14988']</value>
       </entry>
       <entry>
          <key>CSS</key>
          <value>#selectchk14988</value>
+      </entry>
+      <entry>
+         <key>XPATH</key>
+         <value>//div[@id='Records']/div/div[2]/div[6]/div[4]/div/input</value>
       </entry>
    </selectorCollection>
    <selectorMethod>XPATH</selectorMethod>
@@ -22,7 +26,7 @@
       <name>tag</name>
       <type>Main</type>
       <value>input</value>
-      <webElementGuid>4d33390f-fbf7-428c-ad7e-150875dd6dfa</webElementGuid>
+      <webElementGuid>67871bf0-58ff-458d-a1ce-e173a6bd19ad</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>true</isSelected>
@@ -30,7 +34,7 @@
       <name>type</name>
       <type>Main</type>
       <value>checkbox</value>
-      <webElementGuid>e10cec54-5a08-400a-8d65-abceb08578af</webElementGuid>
+      <webElementGuid>76312458-63eb-4ec2-9854-a101167fdb03</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -38,7 +42,7 @@
       <name>class</name>
       <type>Main</type>
       <value>checkmark record-checkmark</value>
-      <webElementGuid>cc6ceeed-730c-4111-a949-f505af1d8209</webElementGuid>
+      <webElementGuid>f664e7cd-9bac-4758-968c-9e13b3e9f9f2</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>true</isSelected>
@@ -46,7 +50,7 @@
       <name>id</name>
       <type>Main</type>
       <value>selectchk14988</value>
-      <webElementGuid>bbc2b77d-261a-47be-9d70-c9d3736e280c</webElementGuid>
+      <webElementGuid>c327b28c-87c2-46d8-82fd-90330a027df7</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -54,7 +58,7 @@
       <name>data-iaocode</name>
       <type>Main</type>
       <value>12403</value>
-      <webElementGuid>c2f2a73a-c9f0-42ea-b5e6-4f64e72cecc7</webElementGuid>
+      <webElementGuid>ec26d454-6e57-4597-8d1d-869f03937fae</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -62,7 +66,7 @@
       <name>xpath</name>
       <type>Main</type>
       <value>id(&quot;selectchk14988&quot;)</value>
-      <webElementGuid>290bc489-c4b8-4a13-958a-6d5f28f03294</webElementGuid>
+      <webElementGuid>ae4338fc-5c4f-41ab-b522-73a40cfa89c5</webElementGuid>
    </webElementProperties>
    <webElementXpaths>
       <isSelected>true</isSelected>
@@ -70,7 +74,7 @@
       <name>xpath:attributes</name>
       <type>Main</type>
       <value>//input[@id='selectchk14988']</value>
-      <webElementGuid>c2810df7-b942-4de4-8951-79030b0ed0e1</webElementGuid>
+      <webElementGuid>1c3bfcc2-4906-4507-9244-cdf7043db4aa</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -78,7 +82,7 @@
       <name>xpath:idRelative</name>
       <type>Main</type>
       <value>//div[@id='Records']/div/div[2]/div[6]/div[4]/div/input</value>
-      <webElementGuid>bab8f3a6-fa5f-406b-9fec-f7473b519fe5</webElementGuid>
+      <webElementGuid>cf8bf2f6-ea2f-4e9e-9fac-3158888151ae</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -86,7 +90,7 @@
       <name>xpath:position</name>
       <type>Main</type>
       <value>//div[4]/div/input</value>
-      <webElementGuid>22d62e91-fb93-4ab7-8632-8f0754bb8f77</webElementGuid>
+      <webElementGuid>dccac1ae-83f7-4753-b44a-228c4639988a</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -94,6 +98,6 @@
       <name>xpath:customAttributes</name>
       <type>Main</type>
       <value>//input[@type = 'checkbox' and @id = 'selectchk14988']</value>
-      <webElementGuid>9e24075b-64f6-441b-b03b-82107de61f95</webElementGuid>
+      <webElementGuid>cc634509-6e75-4704-94bd-9df4fcb778b7</webElementGuid>
    </webElementXpaths>
 </WebElementEntity>

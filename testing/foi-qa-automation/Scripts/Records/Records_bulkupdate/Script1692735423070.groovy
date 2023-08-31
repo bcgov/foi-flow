@@ -158,31 +158,35 @@ WebUI.delay(100)
 
 WebUI.refresh()
 
+WebUI.click(findTestObject('Records/div_Records'))
+
 WebUI.delay(8)
 
 WebUI.click(findTestObject('Records/Page_EDU-2099-23761/input_foiedu, foiedu_selectchk14988'))
 
-WebUI.click(findTestObject('Records/Page_EDU-2099-23761/svg_INCOMPATIBLE_svg-inline--fa fa-link-slash fa-w-20 fa-lg'))
+WebUI.click(findTestObject('Records/Page_EDU-2099-23761/svg_INCOMPATIBLE_svg-inline--fa fa-pen-to-square fa-w-16 fa-lg'))
 
 WebUI.click(findTestObject('Records/Page_EDU-2099-23761/span_MINISTERS OFFICE'))
 
 WebUI.click(findTestObject('Records/Page_EDU-2099-23761/button_Continue'))
 
-WebUI.click(findTestObject('Records/Page_EDU-2099-23761/input_foiedu, foiedu_selectchk14988'))
+WebUI.delay(8)
 
-WebUI.click(findTestObject('Records/Page_EDU-2099-23761/input_INCOMPATIBLE_selectchk14989'))
+WebUI.click(findTestObject('Records/Page_EDU-2099-23761/input_foiedu, foiedu_selectchk14988'))
 
 WebUI.click(findTestObject('Records/Page_EDU-2099-23761/button_INCOMPATIBLE_btn'))
 
 WebUI.click(findTestObject('Records/Page_EDU-2099-23761/button_Continue'))
 
-WebUI.click(findTestObject('Records/Page_EDU-2099-23761/svg_INCOMPATIBLE_svg-inline--fa fa-pen-to-square fa-w-16 fa-lg'))
+WebUI.click(findTestObject('Records/Page_EDU-2099-23761/svg_INCOMPATIBLE_svg-inline--fa fa-link-slash fa-w-20 fa-lg'))
 
-WebUI.click(findTestObject('Records/Page_EDU-2099-23761/button_Continue'))
+WebUI.click(findTestObject('Records/Page_EDU-2099-24068/button_Continue'))
 
 WebUI.click(findTestObject('Records/Page_EDU-2099-23761/input_INCOMPATIBLE_selectallchk'))
 
 WebUI.click(findTestObject('Records/Page_EDU-2099-23761/button_INCOMPATIBLE_btn'))
+
+WebUI.click(findTestObject('Records/Page_EDU-2099-24068/button_Continue'))
 
 ministryUser.close()
 

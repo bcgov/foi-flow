@@ -42,6 +42,8 @@ WebUI.uploadFile(findTestObject('Page_foi.flow/attachment/input_Add Files_file-u
 
 WebUI.click(findTestObject('Page_foi.flow/form/state change dialog/button_Continue'), FailureHandling.STOP_ON_FAILURE)
 
+WebUI.delay(5)
+
 WebUI.verifyElementText(findTestObject('Page_foi.flow/form/sidebar/div_Sidebar Attachments'), 'Attachments (1)')
 
 WebUI.verifyElementNotPresent(findTestObject('Page_foi.flow/form/state change dialog/div_State Change Dialog'), 0)
