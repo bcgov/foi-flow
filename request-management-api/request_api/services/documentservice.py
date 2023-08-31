@@ -87,11 +87,8 @@ class documentservice:
     def createrawdocumentversion(self, requestid, documentid, documentschema, userid):
         version = self.__getversionforrequest(requestid, "rawrequest")
         document = FOIRawRequestDocument.getdocument(documentid)
-        createdat = document['created_at'] # store this as the following function overwrites it
-        FOIRawRequestDocument.deActivaterawdocumentsversion(documentid, document['version']+1, userid)
-        updateddocument = self.__copydocumentproperties(document,documentschema,document['version'])
-        updateddocument['created_at'] = createdat
-        return FOIRawRequestDocument.createdocumentversion(requestid, version, updateddocument, userid)
+        FOIRawRequestDocument.deActivaterawdocumentsversion(documentid, document['version'], userid)
+        return FOIRawRequestDocument.createdocumentversion(requestid, version, self.__copydocumentproperties(document,documentschema,document['version']), userid)
 
     def createrawrequestdocumentversion(self, requestid):
         newversion = self.__getversionforrequest(requestid,"rawrequest")

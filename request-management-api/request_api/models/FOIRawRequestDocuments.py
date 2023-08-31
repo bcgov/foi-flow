@@ -77,7 +77,7 @@ class FOIRawRequestDocument(db.Model):
 
     @classmethod
     def deActivaterawdocumentsversion(cls, documentid, currentversion, userid)->DefaultMethodResult:
-        db.session.query(FOIRawRequestDocument).filter(FOIRawRequestDocument.foidocumentid == documentid, FOIRawRequestDocument.version != currentversion).update({"isactive": False, "updated_at": datetime.now(),"updatedby": userid}, synchronize_session=False)
+        db.session.query(FOIRawRequestDocument).filter(FOIRawRequestDocument.foidocumentid == documentid, FOIRawRequestDocument.version == currentversion).update({"isactive": False, "updated_at": datetime.now(),"updatedby": userid}, synchronize_session=False)
         db.session.commit()
         return DefaultMethodResult(True,'Raw Request Document Updated',documentid) 
     
