@@ -17,6 +17,7 @@ import { useSelector } from "react-redux";
 import './confirmationmodal.scss';
 import { StateEnum, StateTransitionCategories } from '../../../../constants/FOI/statusEnum';
 import FileUpload from '../FileUpload'
+import MinistryApprovalModal from './MinistryApprovalModal';
 import { formatDate, calculateDaysRemaining, ConditionalComponent, isMinistryLogin } from "../../../../helper/FOI/helper";
 import { MimeTypeList, MaxFileSizeInMB, MaxNumberOfFiles } from "../../../../constants/FOI/enum";
 import { getMessage, getAssignedTo, getMinistryGroup, getSelectedMinistry, getSelectedMinistryAssignedTo, getProcessingTeams, getUpdatedAssignedTo } from './util';
@@ -79,7 +80,12 @@ export default function ConfirmationModal({requestId, openModal, handleModal, st
     const user = useSelector((reduxState) => reduxState.user.userDetail);
     const userGroups = user?.groups?.map(group => group.slice(1));
     let isMinistry = isMinistryLogin(userGroups);
-
+    const [approvalState, setApprovalState] = useState({
+      name: "",
+      title: "",
+      date: ""
+    });  
+    
     const cfrStatus = useSelector((reduxState) => reduxState.foiRequests.foiRequestCFRForm.status);
     const cfrFeeData = useSelector((reduxState) => reduxState.foiRequests.foiRequestCFRForm.feedata);
     const actualsFeeDataFields = [
@@ -125,6 +131,9 @@ export default function ConfirmationModal({requestId, openModal, handleModal, st
             || (state.toLowerCase() === StateEnum.onhold.name.toLowerCase() && cfrStatus === 'approved' && !saveRequestObject.email && !mailed)
             || ((state.toLowerCase() === StateEnum.deduplication.name.toLowerCase() || 
                   state.toLowerCase() === StateEnum.review.name.toLowerCase()) && !allowStateChange)) {
+        return true;
+      }
+      else if ((state.toLowerCase() === StateEnum.response.name.toLowerCase() && !(approvalState.name && approvalState.date && approvalState.title))) {
         return true;
       }
       return files.length === 0 
@@ -204,9 +213,6 @@ export default function ConfirmationModal({requestId, openModal, handleModal, st
         (
           (state.toLowerCase() === StateEnum.review.name.toLowerCase() && (!isAnyAmountPaid || !isMinistry))
           ||
-          (state.toLowerCase() === StateEnum.response.name.toLowerCase()
-            && saveRequestObject.requeststatusid === StateEnum.signoff.id)
-          ||
           (state.toLowerCase() === StateEnum.onhold.name.toLowerCase()
             && (saveRequestObject.requeststatusid === StateEnum.feeassessed.id || saveRequestObject.requeststatusid === StateEnum.response.id)
             && saveRequestObject.email
@@ -227,6 +233,23 @@ export default function ConfirmationModal({requestId, openModal, handleModal, st
             />
           </div>
         );
+      }
+      else if (currentState?.toLowerCase() !== StateEnum.closed.name.toLowerCase() && (state.toLowerCase() === StateEnum.response.name.toLowerCase() && saveRequestObject.requeststatusid === StateEnum.signoff.id)) {
+        return (
+        <div className={classes.fileUploadBox}>
+          <MinistryApprovalModal setApprovalState={setApprovalState} />
+          <FileUpload
+              attchmentFileNameList={attchmentFileNameList}
+              multipleFiles={multipleFiles}
+              mimeTypes={state.toLowerCase() === StateEnum.onhold.name.toLowerCase()?MimeTypeList.stateTransitionFees:MimeTypeList.stateTransition}
+              maxFileSize={state.toLowerCase() === StateEnum.onhold.name.toLowerCase()?MaxFileSizeInMB.feeEstimateAttachment:MaxFileSizeInMB.stateTransition}
+              updateFilesCb={updateFilesCb}
+              totalFileSize={state.toLowerCase() === StateEnum.onhold.name.toLowerCase()?MaxFileSizeInMB.totalFeeEstimateFileSize:MaxFileSizeInMB.totalFileSize}
+              maxNumberOfFiles={state.toLowerCase() === StateEnum.onhold.name.toLowerCase()?MaxNumberOfFiles.feeEstimateFiles:MaxNumberOfFiles.attachments}              
+              className={classes.fileUploadBox}
+            />
+        </div>
+        )
       }
       else if ((state.toLowerCase() !== StateEnum.feeassessed.name.toLowerCase() || cfrStatus !== 'init') && estimatedTotalDue <= 0) {
         return null;

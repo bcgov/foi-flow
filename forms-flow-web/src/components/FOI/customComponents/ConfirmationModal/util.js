@@ -117,7 +117,7 @@ import { getFullnameList } from "../../../../helper/FOI/helper";
             }
       case StateEnum.response.name.toLowerCase():
         if (_saveRequestObject.requeststatusid === StateEnum.signoff.id)
-          return {title: "Ministry Sign Off", body: `Upload E-Approval log or completed sign form (if required) to change the state.`};
+          return {title: "Ministry Sign Off", body: `Upload eApproval Logs to verify Ministry Approval and change the state.`};
         else
           return {title: "Changing the state", body: `Are you sure you want to change Request #${_requestNumber} to ${StateEnum.response.name}?`};
       default:
