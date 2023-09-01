@@ -235,11 +235,6 @@ const MinistryReview = React.memo(({ userDetail }) => {
       settabStatus(requestDetails.currentState);
       setIsMinistryRestricted(requestDetails.ministryrestricteddetails?.isrestricted);
     }
-
-    console.log("MinistryNeedsScanning: ", MinistryNeedsScanning);
-    console.log("bcgovcode: ", bcgovcode);
-    console.log("bcgovcode1?", MinistryNeedsScanning.includes(bcgovcode));
-    console.log("bcgovcode2?", MinistryNeedsScanning.includes('MCF'));
   }, [requestDetails, unSavedRequest]);
 
   useEffect(() => {
@@ -582,7 +577,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
                 ? `(${requestNotes.length})`
                 : ""}
             </div>
-            {(originalDivisions?.length > 0 || (MinistryNeedsScanning.includes(bcgovcode) && requestDetails?.requestType == FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL)) && DISABLE_GATHERINGRECORDS_TAB?.toLowerCase() =='false' &&<div
+            {(originalDivisions?.length > 0 || (MinistryNeedsScanning.includes(bcgovcode.replaceAll('"', '')) && requestDetails?.requestType == FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL)) && DISABLE_GATHERINGRECORDS_TAB?.toLowerCase() =='false' &&<div
               className={clsx("tablinks", {
                 active: tabLinksStatuses.Records.active,
               })}

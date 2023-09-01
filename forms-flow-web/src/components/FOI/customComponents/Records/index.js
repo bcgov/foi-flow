@@ -163,6 +163,9 @@ export const RecordsLog = ({
   requestType
 }) => {
 
+  const user = useSelector((state) => state.user.userDetail);
+  const userGroups = user?.groups?.map(group => group.slice(1));
+  
   let recordsObj = useSelector(
     (state) => state.foiRequests.foiRequestRecords
   );
@@ -179,11 +182,10 @@ export const RecordsLog = ({
     (state) => state.foiRequests.isRecordsLoading
   );
 
-  let isScanningTeamMember = isScanningTeam();
-  
   const classes = useStyles();
   const [records, setRecords] = useState(recordsObj?.records);
   const [totalUploadedRecordSize, setTotalUploadedRecordSize] = useState(0);
+  const [isScanningTeamMember, setIsScanningTeamMember] = useState(isScanningTeam(userGroups));
   useEffect(() => {    
     setRecords(recordsObj?.records)
     let nonDuplicateRecords = recordsObj?.records?.filter(record => !record.isduplicate)
@@ -1135,7 +1137,7 @@ export const RecordsLog = ({
               </ConditionalComponent>
             </Grid> */}
             <Grid item xs={3}>
-              {isMinistryCoordinator || (isScanningTeamMember && MinistryNeedsScanning.includes(bcgovcode) && requestType === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL) ?
+              {isMinistryCoordinator || (isScanningTeamMember && MinistryNeedsScanning.includes(bcgovcode.replaceAll('"', '')) && requestType === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL) ?
                 <button
                   className={clsx("btn", "addAttachment", classes.createButton)}
                   variant="contained"

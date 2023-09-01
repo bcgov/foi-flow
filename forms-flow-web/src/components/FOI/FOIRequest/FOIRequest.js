@@ -283,12 +283,6 @@ const FOIRequest = React.memo(({ userDetail }) => {
         axisBannerCheck();
         setIsIAORestricted(isRequestRestricted(requestDetails,ministryId));
     }
-
-
-    console.log("MinistryNeedsScanning: ", MinistryNeedsScanning);
-    console.log("bcgovcode: ", bcgovcode);
-    console.log("bcgovcode1?", MinistryNeedsScanning.includes(bcgovcode));
-    console.log("bcgovcode2?", MinistryNeedsScanning.includes('MCF'));
   }, [requestDetails]);
 
 
@@ -762,7 +756,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
     return (requestState !== StateEnum.intakeinprogress.name &&
       requestState !== StateEnum.unopened.name &&
       requestState !== StateEnum.open.name &&
-      (requestDetails?.divisions?.length > 0 || (MinistryNeedsScanning.includes(bcgovcode) && requestDetails?.requestType == FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL)) &&
+      (requestDetails?.divisions?.length > 0 || (MinistryNeedsScanning.includes(bcgovcode.replaceAll('"', '')) && requestDetails?.requestType == FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL)) &&
       DISABLE_GATHERINGRECORDS_TAB?.toLowerCase() =='false'
     );
   }
