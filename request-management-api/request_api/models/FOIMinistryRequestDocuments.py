@@ -47,7 +47,7 @@ class FOIMinistryRequestDocument(db.Model):
     
     @classmethod
     def getactivedocuments(cls,ministryrequestid):
-        sql = 'SELECT * FROM (SELECT DISTINCT ON (foiministrydocumentid) foiministrydocumentid, filename, documentpath, category, isactive, created_at , createdby, version FROM "FOIMinistryRequestDocuments" where foiministryrequest_id =:ministryrequestid ORDER BY foiministrydocumentid, version DESC) AS list ORDER BY created_at DESC'
+        sql = 'SELECT * FROM (SELECT DISTINCT ON (foiministrydocumentid) fmrd2.created_at, fmrd.foiministrydocumentid, fmrd.filename, fmrd.documentpath, fmrd.category, fmrd.isactive, fmrd.created_at as current_version_created_at, fmrd.createdby, fmrd.version FROM "FOIMinistryRequestDocuments" fmrd join "FOIMinistryRequestDocuments" fmrd2 on (fmrd2.foiministrydocumentid = fmrd.foiministrydocumentid and fmrd2.version = 1) where fmrd.foiministryrequest_id =:ministryrequestid ORDER BY fmrd.foiministrydocumentid, version DESC) AS list ORDER BY created_at DESC'
         rs = db.session.execute(text(sql), {'ministryrequestid': ministryrequestid})
         documents = []
         for row in rs:
@@ -121,13 +121,13 @@ class FOIMinistryRequestDocument(db.Model):
 
     @classmethod
     def deActivateministrydocumentsversion(cls, foiministrydocumentid, currentversion, userid)->DefaultMethodResult:
-        db.session.query(FOIMinistryRequestDocument).filter(FOIMinistryRequestDocument.foiministrydocumentid == foiministrydocumentid, FOIMinistryRequestDocument.version != currentversion).update({"isactive": False, "updated_at": datetime.now(),"updatedby": userid}, synchronize_session=False)
+        db.session.query(FOIMinistryRequestDocument).filter(FOIMinistryRequestDocument.foiministrydocumentid == foiministrydocumentid, FOIMinistryRequestDocument.version == currentversion).update({"isactive": False, "updated_at": datetime.now(),"updatedby": userid}, synchronize_session=False)
         db.session.commit()
         return DefaultMethodResult(True,'Ministry Document Updated',foiministrydocumentid)
     
     @classmethod
     def deActivateministrydocumentsversionbyministry(cls, ministryid, ministryversion, userid)->DefaultMethodResult:
-        db.session.query(FOIMinistryRequestDocument).filter(FOIMinistryRequestDocument.foiministryrequest_id == ministryid, FOIMinistryRequestDocument.foiministryrequestversion_id != ministryversion).update({"isactive": False, "updated_at": datetime.now(),"updatedby": userid}, synchronize_session=False)
+        db.session.query(FOIMinistryRequestDocument).filter(FOIMinistryRequestDocument.foiministryrequest_id == ministryid, FOIMinistryRequestDocument.foiministryrequestversion_id == ministryversion).update({"isactive": False, "updated_at": datetime.now(),"updatedby": userid}, synchronize_session=False)
         db.session.commit()
         return DefaultMethodResult(True,'Documents Updated for the ministry',ministryid) 
     
