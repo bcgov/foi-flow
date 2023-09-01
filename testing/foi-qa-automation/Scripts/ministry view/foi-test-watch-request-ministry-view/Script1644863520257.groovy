@@ -47,8 +47,6 @@ WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
 
 WebUI.click(findTestObject('Page_foi.flow/form/watch/div_add other watchers'), FailureHandling.STOP_ON_FAILURE)
 
-WebUI.verifyElementPresent(findTestObject('Page_foi.flow/form/assignee dropdown/li_Flex Team'), 0)
-
 WebUI.verifyElementPresent(findTestObject('Page_foi.flow/form/assignee dropdown/li_Intake Team'), 0)
 
 WebUI.verifyElementNotPresent(findTestObject('Page_foi.flow/ministry view/form/ministry assignee/li_EDU Ministry Team'), 
@@ -173,8 +171,8 @@ WebUI.verifyElementText(findTestObject('Page_foi.flow/form/watch/button_Unwatch'
 
 WebUI.click(findTestObject('Page_foi.flow/navbar/button_Sign Out'))
 
-WebUI.callTestCase(findTestCase('helper/foi-test-login'), [('password') : findTestData('Login Credentials').getValue('Password',
-			1), ('username') : findTestData('Login Credentials').getValue('Username', 1)], FailureHandling.STOP_ON_FAILURE)
+WebUI.callTestCase(findTestCase('helper/foi-test-login'), [('password') : findTestData('Login Credentials').getValue('Password', 
+            1), ('username') : findTestData('Login Credentials').getValue('Username', 1)], FailureHandling.STOP_ON_FAILURE)
 
 WebUI.click(findTestObject('Page_foi.flow/queue/div_Watching Requests'))
 

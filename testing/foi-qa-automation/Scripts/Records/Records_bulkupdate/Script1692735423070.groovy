@@ -182,6 +182,8 @@ WebUI.click(findTestObject('Records/Page_EDU-2099-23761/svg_INCOMPATIBLE_svg-inl
 
 WebUI.click(findTestObject('Records/Page_EDU-2099-24068/button_Continue'))
 
+WebUI.verifyElementText(findTestObject('Records/Page_EDU-2099-24068/span_Ministers Office'), 'Minister\'s Office')
+
 WebUI.click(findTestObject('Records/Page_EDU-2099-23761/input_INCOMPATIBLE_selectallchk'))
 
 WebUI.click(findTestObject('Records/Page_EDU-2099-23761/button_INCOMPATIBLE_btn'))
