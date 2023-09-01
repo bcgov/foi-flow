@@ -72,6 +72,7 @@ class documentservice:
                 raise Exception(moveresponse)
         except Exception as ex:
             logging.exception(ex)
+            return {"status": "error"}
 
     def deleterequestdocument(self, requestid, documentid, userid, requesttype):
         documentschema = {'isactive':False}
