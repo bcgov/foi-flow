@@ -348,7 +348,6 @@ WebUI.clickOffset(findTestObject('Page_foi.flow/navbar/notification/notification
 
 user3.close()
 
-
 WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/div_Status'))
 
 WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/li_Closed'))
@@ -372,7 +371,9 @@ WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
 WebUI.click(findTestObject('Page_foi.flow/queue/div_request queue row 1'))
 
 WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
+
 WebUI.refresh()
+
 WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
 
 WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/div_Status'))
@@ -384,10 +385,6 @@ WebUI.click(findTestObject('Page_foi.flow/form/closing modal/div_Closing Reason'
 WebUI.click(findTestObject('Page_foi.flow/form/closing modal/dropdown options/li_Partial Disclosure'), FailureHandling.STOP_ON_FAILURE)
 
 WebUI.click(findTestObject('Page_foi.flow/form/state change dialog/button_Save Change'), FailureHandling.STOP_ON_FAILURE)
+
 WebUI.closeBrowser()
-
-user2.close()
-
-
-
 
