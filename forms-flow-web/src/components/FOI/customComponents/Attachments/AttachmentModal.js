@@ -11,10 +11,12 @@ import TextField from '@material-ui/core/TextField';
 import '../ConfirmationModal/confirmationmodal.scss';
 import './attachmentmodal.scss';
 import FileUpload from '../FileUpload';
+import FileUploadForScanning from '../FileUpload/FileUploadForScanning';
 import { makeStyles } from '@material-ui/core/styles';
 import { MimeTypeList, MaxFileSizeInMB } from "../../../../constants/FOI/enum";
 import { StateTransitionCategories, AttachmentCategories } from '../../../../constants/FOI/statusEnum';
 import { TOTAL_RECORDS_UPLOAD_LIMIT } from "../../../../constants/constants";
+import FOI_COMPONENT_CONSTANTS from "../../../../constants/FOI/foiComponentConstants";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -56,7 +58,8 @@ export default function AttachmentModal({
   existingDocuments=[],
   divisions=[],
   replacementfiletypes=[],
-  totalUploadedRecordSize=0
+  totalUploadedRecordSize=0,
+  requestType=FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_GENERAL
 }) {
 
     let tagList = [];
@@ -296,7 +299,26 @@ export default function AttachmentModal({
               </div>
               {
                 (['replaceattachment','replace','add'].includes(modalFor)) ?
-                <FileUpload 
+                // <FileUpload 
+                //   attachment={attachment}  
+                //   attchmentFileNameList={attchmentFileNameList}  
+                //   multipleFiles={multipleFiles} 
+                //   mimeTypes={modalFor === "replaceattachment"? ['application/pdf','.pdf']: mimeTypes} 
+                //   maxFileSize={maxFileSize} 
+                //   totalFileSize={totalFileSize} 
+                //   updateFilesCb={updateFilesCb}
+                //   modalFor={modalFor}
+                //   uploadFor={uploadFor}
+                //   tagList={tagList}
+                //   handleTagChange={handleTagChange}
+                //   tagValue={tagValue}
+                //   maxNumberOfFiles={maxNoFiles}
+                //   isMinistryCoordinator={isMinistryCoordinator}
+                //   existingDocuments={existingDocuments}
+                //   totalUploadedRecordSize={totalUploadedRecordSize}
+                //   totalRecordUploadLimit={totalRecordUploadLimit}
+                // /> 
+                <FileUploadForScanning 
                   attachment={attachment}  
                   attchmentFileNameList={attchmentFileNameList}  
                   multipleFiles={multipleFiles} 
@@ -307,6 +329,7 @@ export default function AttachmentModal({
                   modalFor={modalFor}
                   uploadFor={uploadFor}
                   tagList={tagList}
+                  otherTagList={tagList}
                   handleTagChange={handleTagChange}
                   tagValue={tagValue}
                   maxNumberOfFiles={maxNoFiles}

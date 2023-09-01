@@ -80,7 +80,7 @@ import { RecordsLog } from '../customComponents/Records';
 import { UnsavedModal } from "../customComponents";
 import {DISABLE_GATHERINGRECORDS_TAB} from '../../../constants/constants';
 import _ from 'lodash';
-
+import { MinistryNeedsScanning } from "../../../constants/FOI/enum";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -283,6 +283,12 @@ const FOIRequest = React.memo(({ userDetail }) => {
         axisBannerCheck();
         setIsIAORestricted(isRequestRestricted(requestDetails,ministryId));
     }
+
+
+    console.log("MinistryNeedsScanning: ", MinistryNeedsScanning);
+    console.log("bcgovcode: ", bcgovcode);
+    console.log("bcgovcode1?", MinistryNeedsScanning.includes(bcgovcode));
+    console.log("bcgovcode2?", MinistryNeedsScanning.includes('MCF'));
   }, [requestDetails]);
 
 
@@ -756,7 +762,8 @@ const FOIRequest = React.memo(({ userDetail }) => {
     return (requestState !== StateEnum.intakeinprogress.name &&
       requestState !== StateEnum.unopened.name &&
       requestState !== StateEnum.open.name &&
-      requestDetails?.divisions?.length > 0 && DISABLE_GATHERINGRECORDS_TAB?.toLowerCase() =='false'
+      (requestDetails?.divisions?.length > 0 || (MinistryNeedsScanning.includes(bcgovcode) && requestDetails?.requestType == FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL)) &&
+      DISABLE_GATHERINGRECORDS_TAB?.toLowerCase() =='false'
     );
   }
 
@@ -1256,6 +1263,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
                   setRecordsUploading={setRecordsUploading}
                   divisions={requestDetails.divisions}
                   recordsTabSelect={tabLinksStatuses.Records.active}
+                  requestType={requestDetails?.requestType}
                 />
               </>
             }

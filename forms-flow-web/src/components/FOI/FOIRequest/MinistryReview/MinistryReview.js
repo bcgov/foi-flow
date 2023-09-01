@@ -59,7 +59,7 @@ import { RecordsLog } from '../../customComponents/Records';
 import { UnsavedModal } from "../../customComponents";
 import {DISABLE_GATHERINGRECORDS_TAB} from "../../../../constants/constants";
 import _ from 'lodash';
-
+import { MinistryNeedsScanning } from "../../../../constants/FOI/enum";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -235,6 +235,11 @@ const MinistryReview = React.memo(({ userDetail }) => {
       settabStatus(requestDetails.currentState);
       setIsMinistryRestricted(requestDetails.ministryrestricteddetails?.isrestricted);
     }
+
+    console.log("MinistryNeedsScanning: ", MinistryNeedsScanning);
+    console.log("bcgovcode: ", bcgovcode);
+    console.log("bcgovcode1?", MinistryNeedsScanning.includes(bcgovcode));
+    console.log("bcgovcode2?", MinistryNeedsScanning.includes('MCF'));
   }, [requestDetails, unSavedRequest]);
 
   useEffect(() => {
@@ -577,7 +582,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
                 ? `(${requestNotes.length})`
                 : ""}
             </div>
-            {originalDivisions?.length > 0 && DISABLE_GATHERINGRECORDS_TAB?.toLowerCase() =='false' &&<div
+            {(originalDivisions?.length > 0 || (MinistryNeedsScanning.includes(bcgovcode) && requestDetails?.requestType == FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL)) && DISABLE_GATHERINGRECORDS_TAB?.toLowerCase() =='false' &&<div
               className={clsx("tablinks", {
                 active: tabLinksStatuses.Records.active,
               })}
@@ -856,6 +861,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
                   bcgovcode={JSON.parse(bcgovcode)}
                   setRecordsUploading={setRecordsUploading}
                   recordsTabSelect={tabLinksStatuses.Records.active}
+                  requestType={requestDetails?.requestType}
                 />
               </>
             ) : (
