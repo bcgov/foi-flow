@@ -10,6 +10,7 @@ from request_api.schemas.foidocument import CreateDocumentSchema
 from request_api.services.external.storageservice import storageservice
 from request_api.models.FOIApplicantCorrespondenceAttachments import FOIApplicantCorrespondenceAttachment
 from request_api.utils.enums import RequestType
+import logging
 
 import json
 import base64
@@ -63,11 +64,14 @@ class documentservice:
         newlocation[3] = newcategory
         filename = "/".join(newlocation[1:])
         newdocumentpath = baseurl + '/' + bucket + '/' + filename
-        moveresponse = storageservice().copy_file(source, bucket, filename)
-        if moveresponse['ResponseMetadata']['HTTPStatusCode'] == 200:
-            return {"status": "success", 'documentpath': newdocumentpath}
-        else:
-            return {"status": "error", "response": moveresponse}
+        try:
+            moveresponse = storageservice().copy_file(source, bucket, filename)
+            if moveresponse['ResponseMetadata']['HTTPStatusCode'] == 200:
+                return {"status": "success", 'documentpath': newdocumentpath}
+            else:
+                raise Exception(moveresponse)
+        except Exception as ex:
+            logging.exception(ex)
 
     def deleterequestdocument(self, requestid, documentid, userid, requesttype):
         documentschema = {'isactive':False}
