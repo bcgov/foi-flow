@@ -5,19 +5,13 @@ import { useDispatch, useSelector } from "react-redux";
 import AttachmentModal from "../Attachments/AttachmentModal";
 import Loading from "../../../../containers/Loading";
 import {
-  getOSSHeaderDetails,
   saveFilesinS3,
   getFileFromS3,
   postFOIS3DocumentPreSignedUrl,
   getFOIS3DocumentPreSignedUrl,
   completeMultiPartUpload,
 } from "../../../../apiManager/services/FOI/foiOSSServices";
-import {
-  saveFOIRequestAttachmentsList,
-  replaceFOIRequestAttachment,
-  saveNewFilename,
-  deleteFOIRequestAttachment,
-} from "../../../../apiManager/services/FOI/foiAttachmentServices";
+import { saveNewFilename } from "../../../../apiManager/services/FOI/foiAttachmentServices";
 import {
   fetchFOIRecords,
   saveFOIRecords,
@@ -29,6 +23,7 @@ import {
   triggerDownloadFOIRecordsForHarms,
   fetchPDFStitchedRecordForHarms,
   fetchPDFStitchedRecordForRedlines,
+  fetchPDFStitchedRecordForResponsePackage,
   checkForRecordsChange,
 } from "../../../../apiManager/services/FOI/foiRecordServices";
 import {
@@ -44,7 +39,6 @@ import {
 import {
   addToFullnameList,
   getFullnameList,
-  ConditionalComponent,
   isrecordtimeout,
 } from "../../../../helper/FOI/helper";
 import Grid from "@material-ui/core/Grid";
@@ -58,17 +52,9 @@ import IconButton from "@material-ui/core/IconButton";
 import MenuList from "@material-ui/core/MenuList";
 import MenuItem from "@material-ui/core/MenuItem";
 import TextField from "@mui/material/TextField";
-import CircularProgress from "@mui/material/CircularProgress";
 import { saveAs } from "file-saver";
 import { downloadZip } from "client-zip";
-import AttachmentFilter from "../Attachments/AttachmentFilter";
-import Accordion from "@material-ui/core/Accordion";
 import { ClickableChip } from "../../Dashboard/utils";
-import Stack from "@mui/material/Stack";
-import AccordionSummary from "@material-ui/core/AccordionSummary";
-import AccordionDetails from "@material-ui/core/AccordionDetails";
-import Typography from "@material-ui/core/Typography";
-import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import SearchIcon from "@material-ui/icons/Search";
 import InputAdornment from "@mui/material/InputAdornment";
 import InputBase from "@mui/material/InputBase";
@@ -76,18 +62,12 @@ import Paper from "@mui/material/Paper";
 import Tooltip from "@mui/material/Tooltip";
 import { toast } from "react-toastify";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faCheckCircle,
-  faClone,
-  faTrashAlt,
-  faTrashCan,
-} from "@fortawesome/free-regular-svg-icons";
+import { faCheckCircle, faClone } from "@fortawesome/free-regular-svg-icons";
 import {
   faSpinner,
   faExclamationCircle,
   faBan,
   faArrowTurnUp,
-  faHistory,
   faTrash,
   faPenToSquare,
   faLinkSlash,
@@ -117,7 +97,6 @@ import {
 } from "./util";
 import { readUploadedFileAsBytes } from "../../../../helper/FOI/helper";
 import { TOTAL_RECORDS_UPLOAD_LIMIT } from "../../../../constants/constants";
-//import {convertBytesToMB} from "../../../../components/FOI/customComponents/FileUpload/util";
 
 const useStyles = makeStyles((_theme) => ({
   createButton: {
@@ -202,9 +181,6 @@ const useStyles = makeStyles((_theme) => ({
     marginLeft: "15px",
     fontWeight: "bold",
   },
-  // reportText:{
-  //   fontWeight:'bold'
-  // },
   fileSize: {
     paddingLeft: "20px",
   },
@@ -229,11 +205,18 @@ export const RecordsLog = ({
   let redlinePdfStitchStatus = useSelector(
     (state) => state.foiRequests.foiPDFStitchStatusForRedlines
   );
+  let responsePackagePdfStitchStatus = useSelector(
+    (state) => state.foiRequests.foiPDFStitchStatusForResponsePackage
+  );
+
   let pdfStitchedRecord = useSelector(
     (state) => state.foiRequests.foiPDFStitchedRecordForHarms
   );
   let redlinePdfStitchedRecord = useSelector(
     (state) => state.foiRequests.foiPDFStitchedRecordForRedlines
+  );
+  let responsePackagePdfStitchedRecord = useSelector(
+    (state) => state.foiRequests.foiPDFStitchedRecordForResponsePackage
   );
 
   let isRecordsfetching = useSelector(
@@ -307,6 +290,14 @@ export const RecordsLog = ({
     useState(false);
   const [isRedlineDownloadReady, setIsRedlineDownloadReady] = useState(false);
   const [isRedlineDownloadFailed, setIsRedlineDownloadFailed] = useState(false);
+  const [
+    isResponsePackageDownloadInProgress,
+    setIsResponsePackageDownloadInProgress,
+  ] = useState(false);
+  const [isResponsePackageDownloadReady, setIsResponsePackageDownloadReady] =
+    useState(false);
+  const [isResponsePackageDownloadFailed, setIsResponsePackageDownloadFailed] =
+    useState(false);
   const [isAllSelected, setIsAllSelected] = useState(false);
 
   console.log(`redlinePdfStitchStatus = ${redlinePdfStitchStatus}`);
@@ -366,15 +357,47 @@ export const RecordsLog = ({
   }, [redlinePdfStitchStatus, requestId, ministryId]);
 
   useEffect(() => {
+    switch (responsePackagePdfStitchStatus) {
+      case RecordDownloadStatus.started:
+      case RecordDownloadStatus.pushedtostream:
+        setIsResponsePackageDownloadInProgress(true);
+        setIsResponsePackageDownloadReady(false);
+        setIsResponsePackageDownloadFailed(false);
+        break;
+      case RecordDownloadStatus.completed:
+        dispatch(
+          fetchPDFStitchedRecordForResponsePackage(requestId, ministryId)
+        );
+        setIsResponsePackageDownloadInProgress(false);
+        setIsResponsePackageDownloadReady(true);
+        setIsResponsePackageDownloadFailed(false);
+        break;
+      case RecordDownloadStatus.error:
+        setIsResponsePackageDownloadInProgress(false);
+        setIsResponsePackageDownloadReady(false);
+        setIsResponsePackageDownloadFailed(true);
+        break;
+      default:
+        setIsResponsePackageDownloadInProgress(false);
+        setIsResponsePackageDownloadReady(false);
+        setIsResponsePackageDownloadFailed(false);
+        break;
+    }
+  }, [responsePackagePdfStitchStatus, requestId, ministryId]);
+
+  useEffect(() => {
     recordsDownloadList.map((item) => {
       if (item.id === 2 && isRedlineDownloadReady) {
         item.disabled = false;
       }
+      if (item.id === 3 && isResponsePackageDownloadReady) {
+        item.disabled = false;
+      }
     });
-    // console.log(`updatedList = ${JSON.stringify(updatedList)}`);
-    // setRecordsDownloadList(updatedList);
-  }, [isRedlineDownloadReady, isRedlineDownloadFailed]);
+  }, [isRedlineDownloadReady, isResponsePackageDownloadReady]);
+
   console.log(`recordsDownloadList = ${JSON.stringify(recordsDownloadList)}`);
+
   const addAttachments = () => {
     setModalFor("add");
     setMultipleFiles(true);
@@ -716,6 +739,7 @@ export const RecordsLog = ({
   };
 
   const handleDownloadChange = (e) => {
+    let s3filepath = "";
     //if clicked on harms
     if (
       e.target.value === 1 &&
@@ -738,16 +762,19 @@ export const RecordsLog = ({
         }
       );
       downloadLinearHarmsDocuments();
-    }
-    //if clicked on harms and stitching is complete
-    else if (e.target.value === 1 && isDownloadReady) {
-      const s3filepath = pdfStitchedRecord?.finalpackagepath;
+    } else {
+      //if clicked on harms and stitching is complete
+
+      if (e.target.value === 1 && isDownloadReady) {
+        s3filepath = pdfStitchedRecord?.finalpackagepath;
+      } else if (e.target.value === 2 && isRedlineDownloadReady) {
+        s3filepath = redlinePdfStitchedRecord?.finalpackagepath;
+      } else if (e.target.value === 2 && isResponsePackageDownloadReady) {
+        s3filepath = responsePackagePdfStitchedRecord?.finalpackagepath;
+      }
       handleDownloadZipFile(s3filepath);
-    } else if (e.target.value === 2 && isRedlineDownloadReady) {
-      const s3filepath = redlinePdfStitchedRecord?.finalpackagepath;
-      handleDownloadZipFile(s3filepath);
+      setCurrentDownload(e.target.value);
     }
-    setCurrentDownload(e.target.value);
   };
 
   const handleDownloadZipFile = (s3filepath) => {
@@ -1484,7 +1511,9 @@ export const RecordsLog = ({
                         >
                           {!item.disabled &&
                             ((item.id === 1 && isDownloadReady) ||
-                            (item.id === 2 && isRedlineDownloadReady) ? (
+                            (item.id === 2 && isRedlineDownloadReady) ||
+                            (item.id === 3 &&
+                              isResponsePackageDownloadReady) ? (
                               <FontAwesomeIcon
                                 icon={faCheckCircle}
                                 size="2x"
@@ -1492,7 +1521,9 @@ export const RecordsLog = ({
                                 className={classes.statusIcons}
                               />
                             ) : (item.id === 1 && isDownloadFailed) ||
-                              (item.id === 2 && isRedlineDownloadFailed) ? (
+                              (item.id === 2 && isRedlineDownloadFailed) ||
+                              (item.id === 3 &&
+                                isResponsePackageDownloadFailed) ? (
                               <FontAwesomeIcon
                                 icon={faExclamationCircle}
                                 size="2x"

@@ -125,5 +125,8 @@ const API = {
 
   FOI_DOWNLOAD_RECORDS_FOR_REDLINES: `${FOI_BASE_API_URL}/api/foirecord/<requestid>/ministryrequest/<ministryrequestid>/download/redline`,
   FOI_PDF_STITCH_STATUS_FOR_REDLINES: `${FOI_BASE_API_URL}/api/foirecord/<requestid>/ministryrequest/<ministryrequestid>/redline/pdfstitchjobstatus`,
+
+  FOI_DOWNLOAD_RECORDS_FOR_RESPONSEPACKAGE: `${FOI_BASE_API_URL}/api/foirecord/<requestid>/ministryrequest/<ministryrequestid>/download/responsepackage`,
+  FOI_PDF_STITCH_STATUS_FOR_RESPONSEPACKAGE: `${FOI_BASE_API_URL}/api/foirecord/<requestid>/ministryrequest/<ministryrequestid>/responsepackage/pdfstitchjobstatus`,
 };
 export default API;
