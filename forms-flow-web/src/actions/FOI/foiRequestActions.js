@@ -140,6 +140,13 @@ export const setFOIPDFStitchedRecordForRedlines = (data) => (dispatch) => {
     payload: data,
   });
 };
+export const setFOIPDFStitchedRecordForResponsePackage =
+  (data) => (dispatch) => {
+    dispatch({
+      type: FOI_ACTION_CONSTANTS.FOI_PDF_STITCHED_RECORD_FOR_RESPONSEPACKAGE,
+      payload: data,
+    });
+  };
 export const setFOIPDFStitchStatusForHarms = (data) => (dispatch) => {
   dispatch({
     type: FOI_ACTION_CONSTANTS.FOI_PDF_STITCHED_STATUS_FOR_HARMS,
@@ -150,6 +157,12 @@ export const setFOIPDFStitchStatusForHarms = (data) => (dispatch) => {
 export const setFOIPDFStitchStatusForRedlines = (data) => (dispatch) => {
   dispatch({
     type: FOI_ACTION_CONSTANTS.FOI_PDF_STITCHED_STATUS_FOR_REDLINES,
+    payload: data,
+  });
+};
+export const setFOIPDFStitchStatusForResponsePackage = (data) => (dispatch) => {
+  dispatch({
+    type: FOI_ACTION_CONSTANTS.FOI_PDF_STITCHED_STATUS_FOR_RESPONSEPACKAGE,
     payload: data,
   });
 };

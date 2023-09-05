@@ -15,6 +15,8 @@ import {
   setRecordsLoader,
   setFOIPDFStitchStatusForRedlines,
   setFOIPDFStitchedRecordForRedlines,
+  setFOIPDFStitchStatusForResponsePackage,
+  setFOIPDFStitchedRecordForResponsePackage,
 } from "../../../actions/FOI/foiRequestActions";
 import { fnDone } from "./foiServicesUtil";
 import UserService from "../../../services/UserService";
@@ -46,12 +48,12 @@ export const fetchPDFStitchedRecordForHarms = (
           dispatch(setFOIPDFStitchedRecordForHarms(res.data));
           done(null, res.data);
         } else {
-          console.log("Error in fetching records", res);
+          console.log("Error in fetching records for hamrs", res);
           dispatch(serviceActionError(res));
         }
       })
       .catch((error) => {
-        console.log("Error in fetching records", error);
+        console.log("Error in fetching records for harms", error);
         dispatch(serviceActionError(error));
         done(error);
       });
@@ -399,12 +401,83 @@ export const fetchPDFStitchedRecordForRedlines = (
           dispatch(setFOIPDFStitchedRecordForRedlines(res.data));
           done(null, res.data);
         } else {
-          console.log("Error in fetching records", res);
+          console.log("Error in fetching records for redlines", res);
           dispatch(serviceActionError(res));
         }
       })
       .catch((error) => {
-        console.log("Error in fetching records", error);
+        console.log("Error in fetching records for redlines", error);
+        dispatch(serviceActionError(error));
+        done(error);
+      });
+  };
+};
+
+export const fetchPDFStitchStatusForResponsePackage = (
+  requestId,
+  ministryId,
+  ...rest
+) => {
+  if (!ministryId) {
+    return () => {};
+  }
+  const done = fnDone(rest);
+  let apiUrl = replaceUrl(
+    replaceUrl(
+      API.FOI_PDF_STITCH_STATUS_FOR_RESPONSEPACKAGE,
+      "<ministryrequestid>",
+      ministryId
+    ),
+    "<requestid>",
+    requestId
+  );
+  return (dispatch) => {
+    httpGETRequest(apiUrl, {}, UserService.getToken())
+      .then((res) => {
+        if (res.data) {
+          dispatch(setFOIPDFStitchStatusForResponsePackage(res.data));
+          done(null, res.data);
+        }
+      })
+      .catch((error) => {
+        console.log("Error in fetching pdfstitch job status", error);
+        dispatch(serviceActionError(error));
+        done(error);
+      });
+  };
+};
+
+export const fetchPDFStitchedRecordForResponsePackage = (
+  requestId,
+  ministryId,
+  ...rest
+) => {
+  if (!ministryId) {
+    return () => {};
+  }
+  const done = fnDone(rest);
+  let apiUrl = replaceUrl(
+    replaceUrl(
+      API.FOI_DOWNLOAD_RECORDS_FOR_RESPONSEPACKAGE,
+      "<ministryrequestid>",
+      ministryId
+    ),
+    "<requestid>",
+    requestId
+  );
+  return (dispatch) => {
+    httpGETRequest(apiUrl, {}, UserService.getToken())
+      .then((res) => {
+        if (res.data) {
+          dispatch(setFOIPDFStitchedRecordForResponsePackage(res.data));
+          done(null, res.data);
+        } else {
+          console.log("Error in fetching records for response package", res);
+          dispatch(serviceActionError(res));
+        }
+      })
+      .catch((error) => {
+        console.log("Error in fetching records for response package", error);
         dispatch(serviceActionError(error));
         done(error);
       });
