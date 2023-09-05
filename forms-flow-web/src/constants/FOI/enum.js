@@ -172,6 +172,8 @@ const RecordDownloadStatus = Object.freeze({
   notstarted: "not started",
   started: "started",
   pushedtostream: "pushedtostream",
+  zippingstarted: "zippingstarted",
+  zippingcompleted: "zippingcompleted",
   completed: "completed",
   error: "error",
 });

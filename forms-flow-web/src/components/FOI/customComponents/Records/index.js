@@ -300,90 +300,74 @@ export const RecordsLog = ({
     useState(false);
   const [isAllSelected, setIsAllSelected] = useState(false);
 
-  console.log(`redlinePdfStitchStatus = ${redlinePdfStitchStatus}`);
-
   useEffect(() => {
-    switch (pdfStitchStatus) {
-      case RecordDownloadStatus.started:
-      case RecordDownloadStatus.pushedtostream:
-        setIsDownloadInProgress(true);
-        setIsDownloadReady(false);
-        setIsDownloadFailed(false);
-        break;
-      case RecordDownloadStatus.completed:
-        dispatch(fetchPDFStitchedRecordForHarms(requestId, ministryId));
-        setIsDownloadInProgress(false);
-        setIsDownloadReady(true);
-        setIsDownloadFailed(false);
-        break;
-      case RecordDownloadStatus.error:
-        setIsDownloadInProgress(false);
-        setIsDownloadReady(false);
-        setIsDownloadFailed(true);
-        break;
-      default:
-        setIsDownloadInProgress(false);
-        setIsDownloadReady(false);
-        setIsDownloadFailed(false);
-        break;
-    }
-  }, [pdfStitchStatus, requestId, ministryId]);
+    const updateStatus = (
+      status,
+      setIsInProgress,
+      setIsReady,
+      setIsFailed,
+      dispatchAction
+    ) => {
+      switch (status) {
+        case RecordDownloadStatus.started:
+        case RecordDownloadStatus.pushedtostream:
+        case RecordDownloadStatus.zippingstarted:
+        case RecordDownloadStatus.zippingcompleted:
+          setIsInProgress(true);
+          setIsReady(false);
+          setIsFailed(false);
+          break;
+        case RecordDownloadStatus.completed:
+          dispatch(dispatchAction(requestId, ministryId));
+          setIsInProgress(false);
+          setIsReady(true);
+          setIsFailed(false);
+          break;
+        case RecordDownloadStatus.error:
+          setIsInProgress(false);
+          setIsReady(false);
+          setIsFailed(true);
+          break;
+        default:
+          setIsInProgress(false);
+          setIsReady(false);
+          setIsFailed(false);
+          break;
+      }
+    };
 
-  useEffect(() => {
-    switch (redlinePdfStitchStatus) {
-      case RecordDownloadStatus.started:
-      case RecordDownloadStatus.pushedtostream:
-        setIsRedlineDownloadInProgress(true);
-        setIsRedlineDownloadReady(false);
-        setIsRedlineDownloadFailed(false);
-        break;
-      case RecordDownloadStatus.completed:
-        dispatch(fetchPDFStitchedRecordForRedlines(requestId, ministryId));
-        setIsRedlineDownloadInProgress(false);
-        setIsRedlineDownloadReady(true);
-        setIsRedlineDownloadFailed(false);
-        break;
-      case RecordDownloadStatus.error:
-        setIsRedlineDownloadInProgress(false);
-        setIsRedlineDownloadReady(false);
-        setIsRedlineDownloadFailed(true);
-        break;
-      default:
-        setIsRedlineDownloadInProgress(false);
-        setIsRedlineDownloadReady(false);
-        setIsRedlineDownloadFailed(false);
-        break;
-    }
-  }, [redlinePdfStitchStatus, requestId, ministryId]);
+    // Update PDF Stitch Status
+    updateStatus(
+      pdfStitchStatus,
+      setIsDownloadInProgress,
+      setIsDownloadReady,
+      setIsDownloadFailed,
+      fetchPDFStitchedRecordForHarms
+    );
+    // Update Redline PDF Stitch Status
+    updateStatus(
+      redlinePdfStitchStatus,
+      setIsRedlineDownloadInProgress,
+      setIsRedlineDownloadReady,
+      setIsRedlineDownloadFailed,
+      fetchPDFStitchedRecordForRedlines
+    );
 
-  useEffect(() => {
-    switch (responsePackagePdfStitchStatus) {
-      case RecordDownloadStatus.started:
-      case RecordDownloadStatus.pushedtostream:
-        setIsResponsePackageDownloadInProgress(true);
-        setIsResponsePackageDownloadReady(false);
-        setIsResponsePackageDownloadFailed(false);
-        break;
-      case RecordDownloadStatus.completed:
-        dispatch(
-          fetchPDFStitchedRecordForResponsePackage(requestId, ministryId)
-        );
-        setIsResponsePackageDownloadInProgress(false);
-        setIsResponsePackageDownloadReady(true);
-        setIsResponsePackageDownloadFailed(false);
-        break;
-      case RecordDownloadStatus.error:
-        setIsResponsePackageDownloadInProgress(false);
-        setIsResponsePackageDownloadReady(false);
-        setIsResponsePackageDownloadFailed(true);
-        break;
-      default:
-        setIsResponsePackageDownloadInProgress(false);
-        setIsResponsePackageDownloadReady(false);
-        setIsResponsePackageDownloadFailed(false);
-        break;
-    }
-  }, [responsePackagePdfStitchStatus, requestId, ministryId]);
+    // Update Response Package PDF Stitch Status
+    updateStatus(
+      responsePackagePdfStitchStatus,
+      setIsResponsePackageDownloadInProgress,
+      setIsResponsePackageDownloadReady,
+      setIsResponsePackageDownloadFailed,
+      fetchPDFStitchedRecordForResponsePackage
+    );
+  }, [
+    pdfStitchStatus,
+    redlinePdfStitchStatus,
+    responsePackagePdfStitchStatus,
+    requestId,
+    ministryId,
+  ]);
 
   useEffect(() => {
     recordsDownloadList.map((item) => {
@@ -395,8 +379,6 @@ export const RecordsLog = ({
       }
     });
   }, [isRedlineDownloadReady, isResponsePackageDownloadReady]);
-
-  console.log(`recordsDownloadList = ${JSON.stringify(recordsDownloadList)}`);
 
   const addAttachments = () => {
     setModalFor("add");
@@ -739,7 +721,6 @@ export const RecordsLog = ({
   };
 
   const handleDownloadChange = (e) => {
-    let s3filepath = "";
     //if clicked on harms
     if (
       e.target.value === 1 &&
@@ -762,68 +743,88 @@ export const RecordsLog = ({
         }
       );
       downloadLinearHarmsDocuments();
-    } else {
+    } else if (e.target.value === 1 && isDownloadReady) {
       //if clicked on harms and stitching is complete
-
-      if (e.target.value === 1 && isDownloadReady) {
-        s3filepath = pdfStitchedRecord?.finalpackagepath;
-      } else if (e.target.value === 2 && isRedlineDownloadReady) {
-        s3filepath = redlinePdfStitchedRecord?.finalpackagepath;
-      } else if (e.target.value === 2 && isResponsePackageDownloadReady) {
-        s3filepath = responsePackagePdfStitchedRecord?.finalpackagepath;
-      }
-      handleDownloadZipFile(s3filepath);
-      setCurrentDownload(e.target.value);
+      const s3filepath = pdfStitchedRecord?.finalpackagepath;
+      handleDownloadZipFile(s3filepath, e.target.value);
+    } else if (e.target.value === 2 && isRedlineDownloadReady) {
+      const s3filepath = redlinePdfStitchedRecord?.finalpackagepath;
+      handleDownloadZipFile(s3filepath, e.target.value);
+    } else if (e.target.value === 3 && isResponsePackageDownloadReady) {
+      const s3filepath = responsePackagePdfStitchedRecord?.finalpackagepath;
+      handleDownloadZipFile(s3filepath, e.target.value);
     }
+
+    setCurrentDownload(e.target.value);
   };
 
-  const handleDownloadZipFile = (s3filepath) => {
+  const handleDownloadZipFile = (s3filepath, itemid) => {
     const filename = requestNumber + ".zip";
     try {
       downloadZipFile(s3filepath, filename);
     } catch (error) {
       console.log(error);
-      toastError();
+      toastError(itemid);
     }
   };
 
-  const downloadZipFile = async (s3filepath, filename) => {
+  const downloadZipFile = (s3filepath, filename) => {
     const toastID = toast.loading("Downloading file (0%)");
-    const response = await getFOIS3DocumentPreSignedUrl(
+    getFOIS3DocumentPreSignedUrl(
       s3filepath.split("/").slice(4).join("/"),
       ministryId,
       dispatch,
-      null,
+      (err, res) => {
+        if (!err) {
+          getFileFromS3(
+            { filepath: res },
+            (_err, response) => {
+              let blob = new Blob([response.data], {
+                type: "application/octet-stream",
+              });
+              saveAs(blob, filename);
+              toast.update(toastID, {
+                render: _err ? "File download failed" : "Download complete",
+                type: _err ? "error" : "success",
+                className: "file-upload-toast",
+                isLoading: false,
+                autoClose: 3000,
+                hideProgressBar: true,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                closeButton: true,
+              });
+            },
+            (progressEvent) => {
+              toast.update(toastID, {
+                render:
+                  "Downloading file (" +
+                  Math.floor(
+                    (progressEvent.loaded / progressEvent.total) * 100
+                  ) +
+                  "%)",
+                isLoading: true,
+              });
+            }
+          );
+        } else {
+          toast.update(toastID, {
+            render: "File download failed",
+            type: "error",
+            className: "file-upload-toast",
+            isLoading: false,
+            autoClose: 3000,
+            hideProgressBar: true,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            closeButton: true,
+          });
+        }
+      },
       "records",
       bcgovcode
-    );
-    await getFileFromS3(
-      { filepath: response.data },
-      (_err, res) => {
-        let blob = new Blob([res.data], { type: "application/octet-stream" });
-        saveAs(blob, filename);
-        toast.update(toastID, {
-          render: _err ? "File download failed" : "Download complete",
-          type: _err ? "error" : "success",
-          className: "file-upload-toast",
-          isLoading: false,
-          autoClose: 3000,
-          hideProgressBar: true,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          closeButton: true,
-        });
-      },
-      (progressEvent) => {
-        toast.update(toastID, {
-          render:
-            "Downloading file (" +
-            Math.floor((progressEvent.loaded / progressEvent.total) * 100) +
-            "%)",
-          isLoading: true,
-        });
-      }
     );
   };
 
@@ -837,7 +838,7 @@ export const RecordsLog = ({
           message,
           (err, _res) => {
             if (err) {
-              toastError();
+              toastError(1);
             } else {
               setIsDownloadInProgress(true);
               setIsDownloadReady(false);
@@ -849,7 +850,7 @@ export const RecordsLog = ({
       );
     } catch (error) {
       console.log(error);
-      toastError();
+      toastError(1);
     }
   };
 
@@ -904,13 +905,10 @@ export const RecordsLog = ({
     }
     message.attributes = attributes;
     message.totalfilesize = calculateTotalFileSize(attributes);
-
-    //keeping this for testing purpose.
-    console.log(`message = ${JSON.stringify(message)}`);
     return message;
   };
 
-  const toastError = (error) => {
+  const toastError = (itemid) => {
     toast.error(
       "Temporarily unable to process your request. Please try again in a few minutes.",
       {
@@ -923,9 +921,43 @@ export const RecordsLog = ({
         progress: undefined,
       }
     );
-    setIsDownloadInProgress(false);
-    setIsDownloadReady(false);
-    setIsDownloadFailed(true);
+    if (itemid === 1) {
+      setIsDownloadInProgress(false);
+      setIsDownloadReady(false);
+      setIsDownloadFailed(true);
+    } else if (itemid === 2) {
+      setIsRedlineDownloadInProgress(false);
+      setIsRedlineDownloadReady(false);
+      setIsRedlineDownloadFailed(true);
+    } else if (itemid === 3) {
+      setIsResponsePackageDownloadInProgress(false);
+      setIsResponsePackageDownloadReady(false);
+      setIsResponsePackageDownloadFailed(true);
+    }
+  };
+
+  const isReady = (itemid) => {
+    return (
+      (itemid === 1 && isDownloadReady) ||
+      (itemid === 2 && isRedlineDownloadReady) ||
+      (itemid === 3 && isResponsePackageDownloadReady)
+    );
+  };
+
+  const isFailed = (itemid) => {
+    return (
+      (itemid === 1 && isDownloadFailed) ||
+      (itemid === 2 && isRedlineDownloadFailed) ||
+      (itemid === 3 && isResponsePackageDownloadFailed)
+    );
+  };
+
+  const isInprogress = (itemid) => {
+    return (
+      (itemid === 1 && isDownloadInProgress) ||
+      (itemid === 2 && isRedlineDownloadInProgress) ||
+      (itemid === 3 && isResponsePackageDownloadInProgress)
+    );
   };
 
   const downloadAllDocuments = async () => {
@@ -1509,35 +1541,28 @@ export const RecordsLog = ({
                           disabled={item.disabled}
                           sx={{ display: "flex" }}
                         >
-                          {!item.disabled &&
-                            ((item.id === 1 && isDownloadReady) ||
-                            (item.id === 2 && isRedlineDownloadReady) ||
-                            (item.id === 3 &&
-                              isResponsePackageDownloadReady) ? (
-                              <FontAwesomeIcon
-                                icon={faCheckCircle}
-                                size="2x"
-                                color="#1B8103"
-                                className={classes.statusIcons}
-                              />
-                            ) : (item.id === 1 && isDownloadFailed) ||
-                              (item.id === 2 && isRedlineDownloadFailed) ||
-                              (item.id === 3 &&
-                                isResponsePackageDownloadFailed) ? (
-                              <FontAwesomeIcon
-                                icon={faExclamationCircle}
-                                size="2x"
-                                color="#A0192F"
-                                className={classes.statusIcons}
-                              />
-                            ) : isDownloadInProgress ? (
-                              <FontAwesomeIcon
-                                icon={faSpinner}
-                                size="2x"
-                                color="#FAA915"
-                                className={classes.statusIcons}
-                              />
-                            ) : null)}
+                          {isReady(item.id) ? (
+                            <FontAwesomeIcon
+                              icon={faCheckCircle}
+                              size="2x"
+                              color="#1B8103"
+                              className={classes.statusIcons}
+                            />
+                          ) : isFailed(item.id) ? (
+                            <FontAwesomeIcon
+                              icon={faExclamationCircle}
+                              size="2x"
+                              color="#A0192F"
+                              className={classes.statusIcons}
+                            />
+                          ) : isInprogress(item.id) ? (
+                            <FontAwesomeIcon
+                              icon={faSpinner}
+                              size="2x"
+                              color="#FAA915"
+                              className={classes.statusIcons}
+                            />
+                          ) : null}
                           {item.label}
                         </MenuItem>
                         // </>
@@ -1547,18 +1572,6 @@ export const RecordsLog = ({
                 </TextField>
               )}
             </Grid>
-            {/* <Grid item xs={2}>
-              <ConditionalComponent condition={hasDocumentsToExport}>
-                <button
-                  className="btn addAttachment foi-export-button"
-                  variant="contained"
-                  onClick={downloadAllDocuments}
-                  color="primary"
-                >
-                  Export Shown
-                </button>
-              </ConditionalComponent>
-            </Grid> */}
             <Grid item xs={3}>
               {isMinistryCoordinator ? (
                 <button
@@ -1648,10 +1661,6 @@ export const RecordsLog = ({
                     </span>
                   </span>
                 </Grid>
-                {/* <Grid item xs={3}>
-                  <span>Batches Uploaded:</span>
-                  <span className='number-spacing'>{recordsObj.batchcount ? recordsObj.batchcount : 0}</span>
-                </Grid> */}
               </Grid>
             </Grid>
             <Grid
