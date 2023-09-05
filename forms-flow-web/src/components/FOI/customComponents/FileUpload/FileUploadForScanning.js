@@ -47,6 +47,9 @@ const FileUploadForScanning = ({
     const [totalFileSizeCalculated, setTotalFileSize] = useState(0);
     const [errorMessage, setErrorMessage] = useState([]); 
     const [includeAttachments, setIncludeAttachments] = useState(true);
+    const [searchValue, setSearchValue] = useState("");
+    const [additionalTagList, setAdditionalTagList] = useState([]);
+
     const handleUploadBtnClick = (e) => {
       e.stopPropagation();
       fileInputField.current.click();
@@ -192,11 +195,30 @@ const FileUploadForScanning = ({
         return "Drag and drop attachments, or click Add Files"
     }
 
+    const searchSections = (_sectionArray, _keyword, _selectedSectionValue) => {
+      let newSectionArray = [];
+      if(_keyword || _selectedSectionValue) {
+        _sectionArray.map((section) => {
+          if(section.name === _selectedSectionValue) {
+            newSectionArray.unshift(section);
+          }
+          else if(_keyword && section.display.toLowerCase().includes(_keyword.toLowerCase())) {
+            newSectionArray.push(section);
+          }
+        });
+      }
+      return newSectionArray;
+    }
+
+    React.useEffect(() => {
+      setAdditionalTagList(searchSections(otherTagList, searchValue, tagValue));
+    },[searchValue, otherTagList, tagValue])
+
     return (
     <>
       {(modalFor === "add" && (uploadFor === "attachment" || uploadFor === 'record')) && (<div>
         <div className="tagtitle">
-          <span>Select one section that corresponds to the document(s) you are uploading</span>
+          <span>Select the name of the section of records you are uploading. Once you have selected the section name you will be able to select the respective documents from your computer.</span>
         </div>
         <div className="taglist">
           {tagList.map(tag =>
@@ -250,12 +272,12 @@ const FileUploadForScanning = ({
                 xs={true}
                 className="search-grid"
               >
-                <label className="hideContent">Filter Records</label>
+                <label className="hideContent">Search any additional sections here</label>
                 <InputBase
                   id="foirecordsfilter"
-                  placeholder="Filter Records ..."
+                  placeholder="Search any additional sections here"
                   defaultValue={""}
-                  // onChange={(e)=>{setSearchValue(e.target.value.trim())}}
+                  onChange={(e)=>{setSearchValue(e.target.value.trim())}}
                   sx={{
                     color: "#38598A",
                   }}
@@ -265,7 +287,7 @@ const FileUploadForScanning = ({
                         aria-label="Search Icon"
                         className="search-icon"
                       >
-                        <span className="hideContent">Filter Records ...</span>
+                        <span className="hideContent">Search any additional sections here</span>
                         <SearchIcon />
                       </IconButton>
                     </InputAdornment>
@@ -283,7 +305,9 @@ const FileUploadForScanning = ({
                 padding: "8px 15px 0 15px",
                 borderTopLeftRadius: 0,
                 borderTopRightRadius: 0,
-                borderTop: "none"
+                borderTop: "none",
+                maxHeight:"120px",
+                overflowY:"auto"
               }}
               alignItems="center"
               justifyContent="flex-start"
@@ -293,7 +317,7 @@ const FileUploadForScanning = ({
               xs={12}
               elevation={0}
             >
-              {tagList.map(tag =>
+              {additionalTagList.map(tag =>
                 <ClickableChip
                   id={`${tag.name}Tag`}
                   key={`${tag.name}-tag`}
@@ -308,6 +332,9 @@ const FileUploadForScanning = ({
             </Paper>
           </Grid>
         </div>
+      </div>)}
+      {modalFor === "add" && (<div className="tag-message-container-scanning">
+        <p>Please drag and drop or add records associated with the section name you have selected above. All records upload will show under the selected section in the redaction application.</p>
       </div>)}
       <section
         className={clsx("file-upload-container-scanning", {
@@ -353,9 +380,6 @@ const FileUploadForScanning = ({
           </div>
         </div>
       </section>
-      {modalFor === "add" && (<div className="tag-message-container">
-        <p>When uploading more than one {uploadFor}, all {uploadFor}s will have the same selected tag.....</p>
-      </div>)}
       <ul className="error-message-ul">
         {errorMessage
           ? errorMessage.map((error) => (
