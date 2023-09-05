@@ -406,6 +406,7 @@ export const ContactApplicant = ({
             existingDocuments={files}
             attachment={{}}
             handleRename={undefined}
+            handleReclassify={undefined}
             isMinistryCoordinator={false}
             uploadFor={"email"}
             maxNoFiles={10}

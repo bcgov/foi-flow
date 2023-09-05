@@ -37,7 +37,7 @@ class FOIRawRequestDocument(db.Model):
     def getdocuments(cls,requestid, requestversion):
         documents = []
         try:
-            sql = 'SELECT * FROM (SELECT DISTINCT ON (foidocumentid) foidocumentid, filename, documentpath, category, isactive, created_at , createdby FROM "FOIRawRequestDocuments" where foirequest_id =:requestid and foirequestversion_id = :requestversion ORDER BY foidocumentid, version DESC) AS list ORDER BY created_at DESC'
+            sql = 'SELECT * FROM (SELECT DISTINCT ON (foidocumentid) raw2.created_at, raw.created_at as current_version_created_at, raw.foidocumentid, raw.filename, raw.documentpath, raw.category, raw.isactive, raw.createdby  FROM "FOIRawRequestDocuments" raw  join "FOIRawRequestDocuments" raw2  on (raw.foirequest_id = raw2.foirequest_id and raw2.version = 1) where raw.foirequest_id = :requestid and raw.foirequestversion_id = :requestversion and raw.isactive = true ORDER BY raw.foidocumentid DESC) AS list ORDER BY created_at DESC'
             rs = db.session.execute(text(sql), {'requestid': requestid, 'requestversion': requestversion})
         
             for row in rs:
@@ -77,7 +77,7 @@ class FOIRawRequestDocument(db.Model):
 
     @classmethod
     def deActivaterawdocumentsversion(cls, documentid, currentversion, userid)->DefaultMethodResult:
-        db.session.query(FOIRawRequestDocument).filter(FOIRawRequestDocument.foidocumentid == documentid, FOIRawRequestDocument.version != currentversion).update({"isactive": False, "updated_at": datetime.now(),"updatedby": userid}, synchronize_session=False)
+        db.session.query(FOIRawRequestDocument).filter(FOIRawRequestDocument.foidocumentid == documentid, FOIRawRequestDocument.version == currentversion).update({"isactive": False, "updated_at": datetime.now(),"updatedby": userid}, synchronize_session=False)
         db.session.commit()
         return DefaultMethodResult(True,'Raw Request Document Updated',documentid) 
     
