@@ -33,6 +33,8 @@ from request_api.schemas.foirequestsformslist import  FOIRequestsFormsList
 from request_api.services.extensionreasonservice import extensionreasonservice
 from request_api.services.cacheservice import cacheservice
 from request_api.services.subjectcodeservice import subjectcodeservice
+from request_api.services.programareadivisionservice import programareadivisionservice
+from request_api.services.recordservice import recordservice
 import json
 import request_api
 import requests
@@ -70,7 +72,6 @@ class FOIFlowApplicantCategories(Resource):
             return jsondata , 200
         except BusinessException:
             return "Error happened while accessing applicant categories" , 500
-
 
 @cors_preflight('GET,OPTIONS')
 @API.route('/foiflow/programareas')
@@ -185,6 +186,24 @@ class FOIFlowDivisions(Resource):
             return jsondata , 200
         except BusinessException:
             return "Error happened while accessing divisions" , 500
+        
+@cors_preflight('GET,OPTIONS')
+@API.route('/foiflow/divisions')
+class FOIFlowDivisions(Resource):
+    """Retrieves all active divisions.
+    """
+    @staticmethod
+    @TRACER.trace()
+    @cross_origin(origins=allowedorigins())
+    @auth.require
+    @auth.ismemberofgroups(getrequiredmemberships())
+    def get():
+        try:
+            division_data = programareadivisionservice().getallprogramareadivisions()
+            json_response= json.dumps(division_data)
+            return json_response, 200
+        except BusinessException:
+            return "Error happened while accessing divisions", 500
 
 @cors_preflight('GET,OPTIONS')
 @API.route('/foiflow/closereasons')
