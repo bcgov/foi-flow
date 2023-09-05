@@ -168,6 +168,8 @@ class FOIRequestsByIdAndType(Resource):
             if usertype != "ministry" and actiontype != "assignee":
                 return {'status': False, 'message':'Bad Request'}, 400
             request_json = request.get_json()
+            print(request_json)
+            userinput = request_json["approval"] if "approval" in request_json else None
             assigneename =''
             if actiontype == "assignee":
                 ministryrequestschema = FOIRequestAssigneeSchema().load(request_json)                
@@ -179,7 +181,7 @@ class FOIRequestsByIdAndType(Resource):
                 ministryrequestschema = FOIRequestMinistrySchema().load(request_json)
             result = requestservice().saveministryrequestversion(ministryrequestschema, foirequestid, foiministryrequestid,AuthHelper.getuserid(), usertype)
             if result.success == True:
-                asyncio.ensure_future(eventservice().postevent(foiministryrequestid,"ministryrequest",AuthHelper.getuserid(),AuthHelper.getusername(),AuthHelper.isministrymember(),assigneename))
+                asyncio.ensure_future(eventservice().postevent(foiministryrequestid,"ministryrequest",AuthHelper.getuserid(),AuthHelper.getusername(), userinput, AuthHelper.isministrymember(),assigneename))
                 metadata = json.dumps({"id": result.identifier, "ministries": result.args[0]})
                 requestservice().posteventtoworkflow(foiministryrequestid, ministryrequestschema, json.loads(metadata),usertype)
                 return {'status': result.success, 'message':result.message,'id':result.identifier, 'ministryRequests': result.args[0]} , 200

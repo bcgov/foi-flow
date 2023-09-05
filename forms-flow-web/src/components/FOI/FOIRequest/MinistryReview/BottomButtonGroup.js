@@ -67,6 +67,32 @@ const BottomButtonGroup = React.memo(
 
     const disableSave = isValidationError;
 
+    //State to manage approval data for Ministry Sign Off
+    const [approvalState, setApprovalState] = useState({
+      name: "",
+      title: "",
+      date: ""
+    });
+
+    const handleApprovalInputs = (event) => {
+      if(event.target.name === "name") {
+        setApprovalState((prevState) => {
+          return {...prevState, name: event.target.value}
+        })
+      }
+      if(event.target.name === "title") {
+        setApprovalState((prevState) => {
+          return {...prevState, title: event.target.value}
+        })
+      }
+      if(event.target.name === "datePicker") {
+        setApprovalState((prevState) => {
+          return {...prevState, date: event.target.value}
+        })
+      }
+    }
+
+
     const returnToQueue = (e) => {
       if (
         (!unSavedRequest && !recordsUploading && !CFRUnsaved) ||
@@ -182,6 +208,7 @@ const BottomButtonGroup = React.memo(
             saveMinistryRequestObject.requeststatusid = StateEnum.signoff.id;
             break;
           case StateEnum.response.name.toLowerCase():
+            saveMinistryRequestObject.approval = approvalState;
             saveMinistryRequestObject.requeststatusid = StateEnum.response.id;
             break;
           case StateEnum.callforrecords.name.toLowerCase():
@@ -253,6 +280,8 @@ const BottomButtonGroup = React.memo(
             attachmentsArray={attachmentsArray}
             openModal={opensaveModal}
             handleModal={handleSaveModal}
+            handleApprovalInputs={handleApprovalInputs}
+            approvalState={approvalState}
             state={currentSelectedStatus}
             saveRequestObject={saveMinistryRequestObject}
           />

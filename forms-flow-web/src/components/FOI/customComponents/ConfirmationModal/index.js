@@ -56,7 +56,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function ConfirmationModal({requestId, openModal, handleModal, state, saveRequestObject,
-  handleClosingDateChange, handleClosingReasonChange, attachmentsArray }) {
+  handleClosingDateChange, handleClosingReasonChange, attachmentsArray, handleApprovalInputs, approvalState}) {
     const classes = useStyles();
     const processingTeamList = useSelector(reduxstate=> reduxstate.foiRequests.foiProcessingTeamList);
     const selectedMinistries = saveRequestObject?.selectedMinistries?.map(ministry => ministry.code);
@@ -80,11 +80,6 @@ export default function ConfirmationModal({requestId, openModal, handleModal, st
     const user = useSelector((reduxState) => reduxState.user.userDetail);
     const userGroups = user?.groups?.map(group => group.slice(1));
     let isMinistry = isMinistryLogin(userGroups);
-    const [approvalState, setApprovalState] = useState({
-      name: "",
-      title: "",
-      date: ""
-    });  
     
     const cfrStatus = useSelector((reduxState) => reduxState.foiRequests.foiRequestCFRForm.status);
     const cfrFeeData = useSelector((reduxState) => reduxState.foiRequests.foiRequestCFRForm.feedata);
@@ -113,7 +108,6 @@ export default function ConfirmationModal({requestId, openModal, handleModal, st
       setDisableSaveBtn(!event.target.checked);
       saveRequestObject.isofflinepayment=event.target.checked;
     };
-    
 
     React.useEffect(() => {
       setDisableSaveBtn(state.toLowerCase() === StateEnum.closed.name.toLowerCase());
@@ -133,7 +127,7 @@ export default function ConfirmationModal({requestId, openModal, handleModal, st
                   state.toLowerCase() === StateEnum.review.name.toLowerCase()) && !allowStateChange)) {
         return true;
       }
-      else if ((state.toLowerCase() === StateEnum.response.name.toLowerCase() && !(approvalState.name && approvalState.date && approvalState.title))) {
+      else if ((state.toLowerCase() === StateEnum.response.name.toLowerCase() && !(approvalState?.name && approvalState?.date && approvalState?.title))) {
         return true;
       }
       return files.length === 0 
@@ -237,7 +231,7 @@ export default function ConfirmationModal({requestId, openModal, handleModal, st
       else if (currentState?.toLowerCase() !== StateEnum.closed.name.toLowerCase() && (state.toLowerCase() === StateEnum.response.name.toLowerCase() && saveRequestObject.requeststatusid === StateEnum.signoff.id)) {
         return (
         <div className={classes.fileUploadBox}>
-          <MinistryApprovalModal setApprovalState={setApprovalState} />
+          <MinistryApprovalModal handleApprovalInputs={handleApprovalInputs} />
           <FileUpload
               attchmentFileNameList={attchmentFileNameList}
               multipleFiles={multipleFiles}
