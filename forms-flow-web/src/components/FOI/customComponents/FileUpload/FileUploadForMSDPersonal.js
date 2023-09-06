@@ -21,7 +21,7 @@ import InputBase from "@mui/material/InputBase";
 import IconButton from "@material-ui/core/IconButton";
 import _ from 'lodash';
 
-const FileUploadForScanning = ({
+const FileUploadForMSDPersonal = ({
     multipleFiles,
     mimeTypes,
     maxFileSize,
@@ -35,8 +35,9 @@ const FileUploadForScanning = ({
     modalFor,
     handleTagChange,
     tagValue,
+    parentTagValue,
     tagList = [],
-    otherTagList = [],
+    subTagList = [],
     isMinistryCoordinator,
     uploadFor="attachment",
     totalUploadedRecordSize,
@@ -49,6 +50,7 @@ const FileUploadForScanning = ({
     const [includeAttachments, setIncludeAttachments] = useState(true);
     const [searchValue, setSearchValue] = useState("");
     const [additionalTagList, setAdditionalTagList] = useState([]);
+    const [showChildTags, setShowChildTags] = useState(false);
     const [showAdditionalTags, setShowAdditionalTags] = useState(false);
 
     const handleUploadBtnClick = (e) => {
@@ -217,8 +219,19 @@ const FileUploadForScanning = ({
     }
 
     React.useEffect(() => {
-      setAdditionalTagList(searchSections(otherTagList, searchValue, tagValue));
-    },[searchValue, otherTagList, tagValue])
+      setAdditionalTagList(searchSections(subTagList, searchValue, tagValue));
+    },[searchValue, subTagList, tagValue])
+
+    const handleParentTagChange = (_tagValue) => {
+      setAdditionalTagList([]);
+      if (_tagValue === parentTagValue) {
+        setShowChildTags(true);
+        handleTagChange("");
+      } else {
+        setShowChildTags(false);
+        handleTagChange(_tagValue);
+      }
+    }
 
     return (
     <>
@@ -235,12 +248,12 @@ const FileUploadForScanning = ({
               sx={{width: "fit-content", marginRight: "8px", marginBottom: "8px"}}
               color="primary"
               size="small"
-              onClick={()=>{handleTagChange(tag.name)}}
-              clicked={tagValue == tag.name}
+              onClick={()=>{handleParentTagChange(tag.name)}}
+              clicked={tag.name == tagValue || (showChildTags && tag.name === parentTagValue)}
             />
           )}
         </div>
-        <div className="taglist">
+        {showChildTags === true && (<div className="taglist">
           <Grid
             container
             item
@@ -287,6 +300,7 @@ const FileUploadForScanning = ({
                   sx={{
                     color: "#38598A",
                   }}
+                  value={searchValue}
                   startAdornment={
                     <InputAdornment position="start">
                       <IconButton
@@ -337,7 +351,7 @@ const FileUploadForScanning = ({
               )}
             </Paper>)}
           </Grid>
-        </div>
+        </div>)}
       </div>)}
       {modalFor === "add" && (<div className="tag-message-container-scanning">
         <p>Please drag and drop or add records associated with the section name you have selected above. All records upload will show under the selected section in the redaction application.</p>
@@ -401,4 +415,4 @@ const FileUploadForScanning = ({
     );
 };
 
-export default FileUploadForScanning;
+export default FileUploadForMSDPersonal;
