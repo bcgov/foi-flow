@@ -177,7 +177,6 @@ class FOIRequestsByIdAndType(Resource):
                    assigneename = getministryassigneename(ministryrequestschema)               
             else:
                 ministryrequestschema = FOIRequestMinistrySchema().load(request_json)
-                print(ministryrequestschema)
             result = requestservice().saveministryrequestversion(ministryrequestschema, foirequestid, foiministryrequestid,AuthHelper.getuserid(), usertype)
             if result.success == True:
                 asyncio.ensure_future(eventservice().postevent(foiministryrequestid,"ministryrequest",AuthHelper.getuserid(),AuthHelper.getusername(), AuthHelper.isministrymember(),assigneename, ministryrequestschema))

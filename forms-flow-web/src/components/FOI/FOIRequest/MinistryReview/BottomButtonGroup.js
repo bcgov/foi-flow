@@ -69,25 +69,25 @@ const BottomButtonGroup = React.memo(
 
     //State to manage approval data for Ministry Sign Off
     const [ministryApprovalState, setMinistryApprovalState] = useState({
-      name: "",
-      title: "",
-      date: ""
+      approverName: "",
+      approverTitle: "",
+      approvedDate: ""
     });
 
     const handleApprovalInputs = (event) => {
       if(event.target.name === "name") {
         setMinistryApprovalState((prevState) => {
-          return {...prevState, name: event.target.value}
+          return {...prevState, approverName: event.target.value}
         })
       }
       if(event.target.name === "title") {
         setMinistryApprovalState((prevState) => {
-          return {...prevState, title: event.target.value}
+          return {...prevState, approverTitle: event.target.value}
         })
       }
       if(event.target.name === "datePicker") {
         setMinistryApprovalState((prevState) => {
-          return {...prevState, date: event.target.value}
+          return {...prevState, approvedDate: event.target.value}
         })
       }
     }

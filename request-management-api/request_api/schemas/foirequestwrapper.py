@@ -152,9 +152,9 @@ class CreateMinistrySignOffApprovalSchema(Schema):
         """Exclude unknown fields in the deserialized output."""
 
         unknown = EXCLUDE 
-    approvername = fields.Str(data_key="name", allow_none=False)
-    approvertitle = fields.Str(data_key="title", allow_none=False)
-    approveddate = fields.Date(data_key="date", allow_none=False)
+    approvername = fields.Str(data_key="approverName", allow_none=False)
+    approvertitle = fields.Str(data_key="approverTitle", allow_none=False)
+    approveddate = fields.Date(data_key="approvedDate", allow_none=False)
 
   
 class FOIRequestMinistrySchema(Schema):

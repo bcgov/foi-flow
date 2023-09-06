@@ -102,7 +102,7 @@ class stateevent:
 
     def __commentmessage(self, state, username, ministryrequestschema):
         if state == "Response":
-            return f"{username} changed the state of the request to {self.__formatstate(state)}. Approved by {ministryrequestschema['ministrysignoffapproval']['approvername']}, {ministryrequestschema['approvertitle']} on {ministryrequestschema['ministrysignoffapproval']['approveddate']}"
+            return f"{username} changed the state of the request to {self.__formatstate(state)}. Approved by {ministryrequestschema['ministrysignoffapproval']['approvername']}, {ministryrequestschema['ministrysignoffapproval']['approvertitle']} on {ministryrequestschema['ministrysignoffapproval']['approveddate']}"
         return  username+' changed the state of the request to '+self.__formatstate(state)
 
     def __notificationmessage(self, state, ministryrequestschema):

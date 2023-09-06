@@ -127,7 +127,7 @@ export default function ConfirmationModal({requestId, openModal, handleModal, st
                   state.toLowerCase() === StateEnum.review.name.toLowerCase()) && !allowStateChange)) {
         return true;
       }
-      else if ((state.toLowerCase() === StateEnum.response.name.toLowerCase() && !(ministryApprovalState?.name && ministryApprovalState?.date && ministryApprovalState?.title))) {
+      else if ((state.toLowerCase() === StateEnum.response.name.toLowerCase() && !(ministryApprovalState?.approverName && ministryApprovalState?.approvedDate && ministryApprovalState?.approverTitle))) {
         return true;
       }
       return files.length === 0 

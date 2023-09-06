@@ -75,6 +75,7 @@ class requestserviceministrybuilder(requestserviceconfigurator):
         else:
             foiministryrequest.assignedto = None if usertype == "iao" and 'assignedto' in requestschema and requestschema['assignedto'] in (None, '') else ministryschema["assignedto"] 
 
+        foiministryrequest.ministrysignoffapproval = ministryschema["ministrysignoffapproval"]
         foiministryrequest.requeststatusid = requestdict['requeststatusid']
         foiministryrequest.programareaid = requestdict['programareaid']
         foiministryrequest.createdby = userid
