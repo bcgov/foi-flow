@@ -139,7 +139,6 @@ class FOIRequestsById(Resource):
             foirequestschema = FOIRequestWrapperSchema().load(request_json)  
             result = requestservice().saverequestversion(foirequestschema, foirequestid, foiministryrequestid,AuthHelper.getuserid())
             if result.success == True:
-                ## THIS BREAKS MY TICKET. WITH YOUR METHOD YOU HAVE TO GO EVERY INSTNACE OF EVENTSERVICE.POSTEVENT AND ADD USER INPUT ARG. FIND A FIX! BUGG 
                 asyncio.ensure_future(eventservice().postevent(foiministryrequestid,"ministryrequest",AuthHelper.getuserid(),AuthHelper.getusername(),AuthHelper.isministrymember()))
                 metadata = json.dumps({"id": result.identifier, "ministries": result.args[0]})
                 requestservice().posteventtoworkflow(foiministryrequestid,  foirequestschema, json.loads(metadata),"iao")
@@ -169,7 +168,6 @@ class FOIRequestsByIdAndType(Resource):
             if usertype != "ministry" and actiontype != "assignee":
                 return {'status': False, 'message':'Bad Request'}, 400
             request_json = request.get_json()
-            userinput = request_json["approval"] if "approval" in request_json else None
             assigneename =''
             if actiontype == "assignee":
                 ministryrequestschema = FOIRequestAssigneeSchema().load(request_json)                
@@ -179,9 +177,10 @@ class FOIRequestsByIdAndType(Resource):
                    assigneename = getministryassigneename(ministryrequestschema)               
             else:
                 ministryrequestschema = FOIRequestMinistrySchema().load(request_json)
+                print(ministryrequestschema)
             result = requestservice().saveministryrequestversion(ministryrequestschema, foirequestid, foiministryrequestid,AuthHelper.getuserid(), usertype)
             if result.success == True:
-                asyncio.ensure_future(eventservice().postevent(foiministryrequestid,"ministryrequest",AuthHelper.getuserid(),AuthHelper.getusername(), AuthHelper.isministrymember(),assigneename, userinput))
+                asyncio.ensure_future(eventservice().postevent(foiministryrequestid,"ministryrequest",AuthHelper.getuserid(),AuthHelper.getusername(), AuthHelper.isministrymember(),assigneename, ministryrequestschema))
                 metadata = json.dumps({"id": result.identifier, "ministries": result.args[0]})
                 requestservice().posteventtoworkflow(foiministryrequestid, ministryrequestschema, json.loads(metadata),usertype)
                 return {'status': result.success, 'message':result.message,'id':result.identifier, 'ministryRequests': result.args[0]} , 200

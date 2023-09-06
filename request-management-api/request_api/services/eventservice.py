@@ -24,12 +24,12 @@ class eventservice:
 
     """
     
-    async def postevent(self, requestid, requesttype, userid, username, isministryuser,assigneename='', userinput=None):
-        self.posteventsync(requestid, requesttype, userid, username, isministryuser,assigneename, userinput)
+    async def postevent(self, requestid, requesttype, userid, username, isministryuser,assigneename='', ministryrequestschema=None):
+        self.posteventsync(requestid, requesttype, userid, username, isministryuser,assigneename, ministryrequestschema)
     
-    def posteventsync(self, requestid, requesttype, userid, username, isministryuser,assigneename='', userinput=None):
+    def posteventsync(self, requestid, requesttype, userid, username, isministryuser,assigneename='', ministryrequestschema=None):
         try: 
-            stateeventresponse = stateevent().createstatetransitionevent(requestid, requesttype, userid, username, userinput)
+            stateeventresponse = stateevent().createstatetransitionevent(requestid, requesttype, userid, username, ministryrequestschema)
             divisioneventresponse = divisionevent().createdivisionevent(requestid, requesttype, userid)
             assignmentresponse = assignmentevent().createassignmentevent(requestid, requesttype, userid, isministryuser,assigneename,username)           
             if stateeventresponse.success == False or divisioneventresponse.success == False or assignmentresponse.success == False: 

@@ -68,7 +68,7 @@ const BottomButtonGroup = React.memo(
     const disableSave = isValidationError;
 
     //State to manage approval data for Ministry Sign Off
-    const [approvalState, setApprovalState] = useState({
+    const [ministryApprovalState, setMinistryApprovalState] = useState({
       name: "",
       title: "",
       date: ""
@@ -76,17 +76,17 @@ const BottomButtonGroup = React.memo(
 
     const handleApprovalInputs = (event) => {
       if(event.target.name === "name") {
-        setApprovalState((prevState) => {
+        setMinistryApprovalState((prevState) => {
           return {...prevState, name: event.target.value}
         })
       }
       if(event.target.name === "title") {
-        setApprovalState((prevState) => {
+        setMinistryApprovalState((prevState) => {
           return {...prevState, title: event.target.value}
         })
       }
       if(event.target.name === "datePicker") {
-        setApprovalState((prevState) => {
+        setMinistryApprovalState((prevState) => {
           return {...prevState, date: event.target.value}
         })
       }
@@ -208,7 +208,7 @@ const BottomButtonGroup = React.memo(
             saveMinistryRequestObject.requeststatusid = StateEnum.signoff.id;
             break;
           case StateEnum.response.name.toLowerCase():
-            saveMinistryRequestObject.approval = approvalState;
+            saveMinistryRequestObject.ministrysignoffapproval = ministryApprovalState;
             saveMinistryRequestObject.requeststatusid = StateEnum.response.id;
             break;
           case StateEnum.callforrecords.name.toLowerCase():
@@ -281,7 +281,7 @@ const BottomButtonGroup = React.memo(
             openModal={opensaveModal}
             handleModal={handleSaveModal}
             handleApprovalInputs={handleApprovalInputs}
-            approvalState={approvalState}
+            ministryApprovalState={ministryApprovalState}
             state={currentSelectedStatus}
             saveRequestObject={saveMinistryRequestObject}
           />

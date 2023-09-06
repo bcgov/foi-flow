@@ -56,7 +56,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function ConfirmationModal({requestId, openModal, handleModal, state, saveRequestObject,
-  handleClosingDateChange, handleClosingReasonChange, attachmentsArray, handleApprovalInputs, approvalState}) {
+  handleClosingDateChange, handleClosingReasonChange, attachmentsArray, handleApprovalInputs, ministryApprovalState}) {
     const classes = useStyles();
     const processingTeamList = useSelector(reduxstate=> reduxstate.foiRequests.foiProcessingTeamList);
     const selectedMinistries = saveRequestObject?.selectedMinistries?.map(ministry => ministry.code);
@@ -127,7 +127,7 @@ export default function ConfirmationModal({requestId, openModal, handleModal, st
                   state.toLowerCase() === StateEnum.review.name.toLowerCase()) && !allowStateChange)) {
         return true;
       }
-      else if ((state.toLowerCase() === StateEnum.response.name.toLowerCase() && !(approvalState?.name && approvalState?.date && approvalState?.title))) {
+      else if ((state.toLowerCase() === StateEnum.response.name.toLowerCase() && !(ministryApprovalState?.name && ministryApprovalState?.date && ministryApprovalState?.title))) {
         return true;
       }
       return files.length === 0 

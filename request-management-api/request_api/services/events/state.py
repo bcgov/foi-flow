@@ -14,11 +14,11 @@ class stateevent:
     """ FOI Event management service
 
     """
-    def createstatetransitionevent(self, requestid, requesttype, userid, username, userinput):
+    def createstatetransitionevent(self, requestid, requesttype, userid, username, ministryrequestschema):
         state = self.__haschanged(requestid, requesttype)
         if state is not None:
-            _commentresponse = self.__createcommentwrapper(requestid, state, requesttype, userid, username, userinput)
-            _notificationresponse = self.__createnotification(requestid, state, requesttype, userid, userinput)
+            _commentresponse = self.__createcommentwrapper(requestid, state, requesttype, userid, username, ministryrequestschema)
+            _notificationresponse = self.__createnotification(requestid, state, requesttype, userid, ministryrequestschema)
             _cfrresponse = self.__createcfrentry(state, requestid, userid)
             if _commentresponse.success == True and _notificationresponse.success == True and _cfrresponse.success == True:
                 return DefaultMethodResult(True,'Comment posted',requestid)
@@ -38,30 +38,30 @@ class stateevent:
                 return newstate
         return None 
     
-    def __createcommentwrapper(self, requestid, state, requesttype, userid, username, userinput):
+    def __createcommentwrapper(self, requestid, state, requesttype, userid, username, ministryrequestschema):
         if state == 'Archived':
             _openedministries = FOIMinistryRequest.getministriesopenedbyuid(requestid)
             for ministry in _openedministries:
-                response=self.__createcomment(ministry["ministryrequestid"], state, 'ministryrequest', userid, username, userinput)
+                response=self.__createcomment(ministry["ministryrequestid"], state, 'ministryrequest', userid, username, ministryrequestschema)
         else:
-            response=self.__createcomment(requestid, state, requesttype, userid, username, userinput)
+            response=self.__createcomment(requestid, state, requesttype, userid, username, ministryrequestschema)
         return response
         
     
-    def __createcomment(self, requestid, state, requesttype, userid, username, userinput):
-        comment = self.__preparecomment(requestid, state, requesttype, username, userinput)
+    def __createcomment(self, requestid, state, requesttype, userid, username, ministryrequestschema):
+        comment = self.__preparecomment(requestid, state, requesttype, username, ministryrequestschema)
         if requesttype == "ministryrequest":
             return commentservice().createministryrequestcomment(comment, userid, 2)
         else:
             return commentservice().createrawrequestcomment(comment, userid,2)
 
 
-    def __createnotification(self, requestid, state, requesttype, userid, userinput):
+    def __createnotification(self, requestid, state, requesttype, userid, ministryrequestschema):
         _notificationtype = "State"
         if state == 'Call For Records' and requesttype == "ministryrequest":
             foirequest = notificationservice().getrequest(requestid, requesttype)
             _notificationtype = "Group Members" if foirequest['assignedministryperson'] is None else "State"
-        notification = self.__preparenotification(state, userinput)
+        notification = self.__preparenotification(state, ministryrequestschema)
         if state == 'Closed' or state == 'Archived' :
             notificationservice().dismissnotificationsbyrequestid(requestid, requesttype)
         if state == 'Archived':
@@ -81,16 +81,16 @@ class stateevent:
             return DefaultMethodResult(True,'Notification added',requestid)
         return  DefaultMethodResult(True,'No change',requestid)
             
-    def __preparenotification(self, state, userinput):
-        return self.__notificationmessage(state, userinput)
+    def __preparenotification(self, state, ministryrequestschema):
+        return self.__notificationmessage(state, ministryrequestschema)
 
     def __preparegroupmembernotification(self, state, requestid):
         if state == 'Call For Records':
             return self.__notificationcfrmessage(requestid)
         return self.__groupmembernotificationmessage(state)
 
-    def __preparecomment(self, requestid, state,requesttype, username, userinput):
-        comment = {"comment": self.__commentmessage(state, username, userinput)}
+    def __preparecomment(self, requestid, state,requesttype, username, ministryrequestschema):
+        comment = {"comment": self.__commentmessage(state, username, ministryrequestschema)}
         if requesttype == "ministryrequest":
             comment['ministryrequestid']= requestid
         else:
@@ -100,14 +100,14 @@ class stateevent:
     def __formatstate(self, state):
         return "Open" if state == "Archived" else state
 
-    def __commentmessage(self, state, username, userinput):
+    def __commentmessage(self, state, username, ministryrequestschema):
         if state == "Response":
-            return f"{username} changed the state of the request to {self.__formatstate(state)}. Approved by {userinput['name']}, {userinput['title']} on {userinput['date']}"
+            return f"{username} changed the state of the request to {self.__formatstate(state)}. Approved by {ministryrequestschema['ministrysignoffapproval']['approvername']}, {ministryrequestschema['approvertitle']} on {ministryrequestschema['ministrysignoffapproval']['approveddate']}"
         return  username+' changed the state of the request to '+self.__formatstate(state)
 
-    def __notificationmessage(self, state, userinput):
+    def __notificationmessage(self, state, ministryrequestschema):
         if state == "Response":
-            return f"Moved to {self.__formatstate(state)} State. Approved by {userinput['name']}, {userinput['title']} on {userinput['date']}" 
+            return f"Moved to {self.__formatstate(state)} State. Approved by {ministryrequestschema['ministrysignoffapproval']['approvername']}, {ministryrequestschema['ministrysignoffapproval']['approvertitle']} on {ministryrequestschema['ministrysignoffapproval']['approveddate']}" 
         return  'Moved to '+self.__formatstate(state)+ ' State'        
 
     def __notificationcfrmessage(self, requestid):
