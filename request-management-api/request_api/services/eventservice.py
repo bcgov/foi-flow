@@ -24,10 +24,10 @@ class eventservice:
 
     """
     
-    async def postevent(self, requestid, requesttype, userid, username, userinput, isministryuser,assigneename=''):
-        self.posteventsync(requestid, requesttype, userid, username, userinput, isministryuser,assigneename)
+    async def postevent(self, requestid, requesttype, userid, username, isministryuser,assigneename='', userinput=None):
+        self.posteventsync(requestid, requesttype, userid, username, isministryuser,assigneename, userinput)
     
-    def posteventsync(self, requestid, requesttype, userid, username, userinput, isministryuser,assigneename=''):
+    def posteventsync(self, requestid, requesttype, userid, username, isministryuser,assigneename='', userinput=None):
         try: 
             stateeventresponse = stateevent().createstatetransitionevent(requestid, requesttype, userid, username, userinput)
             divisioneventresponse = divisionevent().createdivisionevent(requestid, requesttype, userid)
