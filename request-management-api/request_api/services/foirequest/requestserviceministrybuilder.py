@@ -36,6 +36,7 @@ class requestserviceministrybuilder(requestserviceconfigurator):
         return foirequest
     
     def createfoiministryrequestfromobject(self, ministryschema, requestschema, userid, usertype = None):
+        #BUG IN THIS CODE? MINISTRY SCHEMA IS ARG 1 BUT WHEN THIS IS USED IN REQUESTSERVICECREATE, FOIMINISTRY REQUEST IS PASSED IN AS ARG 1
         requestdict = self.createfoiministryrequestfromobject1(ministryschema, requestschema)
         foiministryrequest = FOIMinistryRequest()
         foiministryrequest.foiministryrequestid = ministryschema["foiministryrequestid"] 
@@ -75,7 +76,7 @@ class requestserviceministrybuilder(requestserviceconfigurator):
         else:
             foiministryrequest.assignedto = None if usertype == "iao" and 'assignedto' in requestschema and requestschema['assignedto'] in (None, '') else ministryschema["assignedto"] 
 
-        foiministryrequest.ministrysignoffapproval = ministryschema["ministrysignoffapproval"]
+        foiministryrequest.ministrysignoffapproval = requestdict["ministrysignoffapproval"]
         foiministryrequest.requeststatusid = requestdict['requeststatusid']
         foiministryrequest.programareaid = requestdict['programareaid']
         foiministryrequest.createdby = userid
@@ -115,7 +116,8 @@ class requestserviceministrybuilder(requestserviceconfigurator):
             'programareaid': ministryschema["programarea.programareaid"] if 'programarea.programareaid' in ministryschema  else None,
             'closedate': requestschema['closedate'] if 'closedate' in requestschema  else None,
             'closereasonid': requestschema['closereasonid'] if 'closereasonid' in requestschema  else None,
-            'linkedrequests': ministryschema['linkedrequests'] if 'linkedrequests' in ministryschema  else None
+            'linkedrequests': requestschema['linkedrequests'] if 'linkedrequests' in requestschema  else None,
+            'ministrysignoffapproval': requestschema['ministrysignoffapproval'] if 'ministrysignoffapproval' in requestschema else None,
         }
     
     def createfoirequestdocuments(self,requestschema, ministryrequestid, activeversion, userid):

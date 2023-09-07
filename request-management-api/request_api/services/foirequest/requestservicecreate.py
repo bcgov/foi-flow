@@ -66,13 +66,14 @@ class requestservicecreate:
             return result
     
     def saveministryrequestversion(self,ministryrequestschema, foirequestid , ministryid, userid, usertype = None):        
-        _foirequest = FOIRequest().getrequest(foirequestid) 
+        _foirequest = FOIRequest().getrequest(foirequestid)
         _foiministryrequest = FOIMinistryRequest().getrequestbyministryrequestid(ministryid)
         _foirequestapplicant = FOIRequestApplicantMapping().getrequestapplicants(foirequestid,_foirequest["version"])
         _foirequestcontact = FOIRequestContactInformation().getrequestcontactinformation(foirequestid,_foirequest["version"])
         _foirequestpersonalattrbs = FOIRequestPersonalAttribute().getrequestpersonalattributes(foirequestid,_foirequest["version"])
         foiministryrequestarr = []     
         foirequest = requestserviceministrybuilder().createfoirequestfromobject(_foirequest, userid)
+        ##IS THERE A BUG IN THE BELOW CODE? FOIMINSTYREQUEST IS PASSED IN IN ARG FIELD OF MINISTRY REQUEST SCHEMA
         foiministryrequest = requestserviceministrybuilder().createfoiministryrequestfromobject(_foiministryrequest, ministryrequestschema, userid, usertype)
         foiministryrequestarr.append(foiministryrequest)
         foirequest.ministryRequests = foiministryrequestarr

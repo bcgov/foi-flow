@@ -154,7 +154,7 @@ class CreateMinistrySignOffApprovalSchema(Schema):
         unknown = EXCLUDE 
     approvername = fields.Str(data_key="approverName", allow_none=False)
     approvertitle = fields.Str(data_key="approverTitle", allow_none=False)
-    approveddate = fields.Date(data_key="approvedDate", allow_none=False)
+    approveddate = fields.Str(data_key="approvedDate", allow_none=False)
 
   
 class FOIRequestMinistrySchema(Schema):
