@@ -73,7 +73,6 @@ class requestservicecreate:
         _foirequestpersonalattrbs = FOIRequestPersonalAttribute().getrequestpersonalattributes(foirequestid,_foirequest["version"])
         foiministryrequestarr = []     
         foirequest = requestserviceministrybuilder().createfoirequestfromobject(_foirequest, userid)
-        ##IS THERE A BUG IN THE BELOW CODE? FOIMINSTYREQUEST IS PASSED IN IN ARG FIELD OF MINISTRY REQUEST SCHEMA
         foiministryrequest = requestserviceministrybuilder().createfoiministryrequestfromobject(_foiministryrequest, ministryrequestschema, userid, usertype)
         foiministryrequestarr.append(foiministryrequest)
         foirequest.ministryRequests = foiministryrequestarr

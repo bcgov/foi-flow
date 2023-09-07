@@ -36,7 +36,6 @@ class requestserviceministrybuilder(requestserviceconfigurator):
         return foirequest
     
     def createfoiministryrequestfromobject(self, ministryschema, requestschema, userid, usertype = None):
-        #BUG IN THIS CODE? MINISTRY SCHEMA IS ARG 1 BUT WHEN THIS IS USED IN REQUESTSERVICECREATE, FOIMINISTRY REQUEST IS PASSED IN AS ARG 1
         requestdict = self.createfoiministryrequestfromobject1(ministryschema, requestschema)
         foiministryrequest = FOIMinistryRequest()
         foiministryrequest.foiministryrequestid = ministryschema["foiministryrequestid"] 
