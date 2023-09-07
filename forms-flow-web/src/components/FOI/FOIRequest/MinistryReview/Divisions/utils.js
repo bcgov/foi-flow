@@ -39,7 +39,7 @@ export const stageForDueDateExists = (divisionstageList, selectedStageId) => {
   return false;
 }
 
-export const updateDivisions = (e, id, minDivStages, setStates) => {
+export const updateDivisions = (newValue, id, minDivStages, setStates) => {
   let arr = minDivStages;
   const idExists = arr.some((st) => st.id === id);
 
@@ -50,13 +50,14 @@ export const updateDivisions = (e, id, minDivStages, setStates) => {
   arr
     .filter((item) => item.id === id)
     .forEach((item) => {
-      item.divisionid = e.target.value;
+      item.divisionid = newValue.divisionid;
+      item.divisionname = newValue.label
     });
 
   setStates(arr);
 };
 
-export const updateDivisionsState = (e, id, minDivStages, setStates) => {
+export const updateDivisionsState = (newValue, id, minDivStages, setStates) => {
   let arr = minDivStages;
   const exists = arr.some((st) => st.id === id);
 
@@ -67,7 +68,8 @@ export const updateDivisionsState = (e, id, minDivStages, setStates) => {
   arr
     .filter((st) => st.id === id)
     .forEach((item) => {
-      item.stageid = e.target.value;
+      item.stageid = newValue.stageid;
+      item.stagename = newValue.label;
       if(!stageForDueDateExists(arr, item.stageid)){
         item.divisionDueDate = null;
         item.eApproval = null;

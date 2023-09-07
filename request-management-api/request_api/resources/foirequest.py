@@ -101,8 +101,7 @@ class FOIRequests(Resource):
             rawresult = rawrequestservice().saverawrequestversion(request_json,request_json['id'],assignedgroup,assignedto,"Archived",AuthHelper.getuserid(), assignedtofirstname,assignedtomiddlename,assignedtolastname)               
 
 
-            eventservice().posteventsync(request_json['id'],"rawrequest",AuthHelper.getuserid(), AuthHelper.getusername(), AuthHelper.isministrymember())
-
+            
             if rawresult.success == True:
                 result = requestservice().saverequest(foirequestschema,AuthHelper.getuserid())
                 if result.success == True:
@@ -113,6 +112,9 @@ class FOIRequests(Resource):
                         requestservice().copysubjectcode(request_json['subjectCode'],result.args[0],AuthHelper.getuserid())
                     requestservice().postopeneventtoworkflow(result.identifier, request_json,result.args[0])
                     requestservice().createrestrictedrequests(result.args[0],'iao',request_json["isiaorestricted"],AuthHelper.getuserid())
+                    
+                    eventservice().posteventsync(request_json['id'],"rawrequest",AuthHelper.getuserid(), AuthHelper.getusername(), AuthHelper.isministrymember())
+
             return {'status': result.success, 'message':result.message,'id':result.identifier, 'ministryRequests': result.args[0]} , 200
         except ValidationError as err:
                     return {'status': False, 'message':err.messages}, 400
@@ -133,7 +135,7 @@ class FOIRequestsById(Resource):
     def post(foirequestid,foiministryrequestid):
         """ POST Method for capturing FOI requests before processing"""
         try:
-            request_json = request.get_json()            
+            request_json = request.get_json()   
             foirequestschema = FOIRequestWrapperSchema().load(request_json)  
             result = requestservice().saverequestversion(foirequestschema, foirequestid, foiministryrequestid,AuthHelper.getuserid())
             if result.success == True:

@@ -15,6 +15,7 @@ from request_api.services.rawrequest.rawrequestservicegetter import rawrequestse
 from request_api.exceptions import BusinessException, Error
 from request_api.models.default_method_result import DefaultMethodResult
 from request_api.models.FOIRawRequestWatchers import FOIRawRequestWatcher
+from request_api.services.foirequest.requestserviceconfigurator import requestserviceconfigurator 
 import logging
 
 class rawrequestservice:
@@ -36,7 +37,7 @@ class rawrequestservice:
         if axisrequestid is not None:
             isaxisrequestidpresent = self.isaxisrequestidpresent(axisrequestid)
         axissyncdate = requestdatajson["axisSyncDate"] if 'axisSyncDate' in requestdatajson  else None
-
+        linkedrequests = requestdatajson["linkedRequests"] if 'linkedRequests' in requestdatajson  else None
         requirespayment =  rawrequestservice.doesrequirepayment(requestdatajson) if sourceofsubmission == "onlineform"  else False 
         if axisrequestid is None or isaxisrequestidpresent == False:
             result = FOIRawRequest.saverawrequest(
@@ -52,7 +53,8 @@ class rawrequestservice:
                                                     assigneemiddlename=assigneemiddlename,
                                                     assigneelastname=assigneelastname,
                                                     axisrequestid=axisrequestid,
-                                                    axissyncdate=axissyncdate                                                    
+                                                    axissyncdate=axissyncdate,
+                                                    linkedrequests=linkedrequests                                                    
                                                 )
         else:            
             raise ValueError("Duplicate AXIS Request ID")
@@ -125,11 +127,14 @@ class rawrequestservice:
     def getstatus(self, foirequest):
         statusid = foirequest["requeststatusid"] if "requeststatusid" in foirequest else None
         if statusid is not None:
-            try:           
-                if statusid== 4:                    
-                    return 'Redirect'
-                if statusid == 3:                    
-                    return 'Closed'    
+            try:
+                return requestserviceconfigurator().getstatusname(statusid)           
+                # if statusid== 4:                    
+                #     return 'Redirect'
+                # if statusid == 3:                    
+                #     return 'Closed' 
+                # if statusid == 16:                    
+                #     return 'Peer Review'   
             except  KeyError:
                 print("Key Error on requeststatusid, ignore will be intake in Progress")
         return 'Intake in Progress'

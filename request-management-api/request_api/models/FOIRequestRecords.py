@@ -26,7 +26,7 @@ class FOIRequestRecord(db.Model):
     updated_at = db.Column(db.DateTime, nullable=True)
     updatedby = db.Column(db.String(120), unique=False, nullable=True)
     isactive = db.Column(db.Boolean, unique=False, nullable=False,default=True)
-
+    replacementof = db.Column(db.Integer, unique=False, nullable=False)
 
     @classmethod
     def create(cls, records):
@@ -43,7 +43,7 @@ class FOIRequestRecord(db.Model):
         try:
             sql =   """select distinct on (fr1.recordid) recordid, fr1.isactive, fr1.filename, 
                         fr1.s3uripath, fr1."attributes" attributes, json_extract_path_text("attributes" ::json,'batch') as batchid,
-                        fr1.createdby createdby, fr1.created_at
+                        fr1.createdby createdby, fr1.created_at,fr1.replacementof
                         from public."FOIRequestRecords" fr1 
                         where fr1.foirequestid = :foirequestid and fr1.ministryrequestid = :ministryrequestid  
                         order by recordid desc, version desc
@@ -53,7 +53,24 @@ class FOIRequestRecord(db.Model):
 
             for row in rs:
                 if row["isactive"] == True:
-                    records.append({"recordid": row["recordid"], "filename": row["filename"], "s3uripath": row["s3uripath"],  "attributes": row["attributes"], "batchid": row["batchid"], "createdby": row["createdby"], "created_at": row["created_at"]})
+                    _originalfile =''
+                    _originalfilename =''
+                    if row["replacementof"] is not None:                       
+                        originalrecord = FOIRequestRecord.getrecordbyid(row["replacementof"])
+                        _originalfile = originalrecord["s3uripath"]
+                        _originalfilename = originalrecord["filename"]                        
+                    records.append({
+                            "recordid": row["recordid"], 
+                            "filename": row["filename"], 
+                            "s3uripath": row["s3uripath"],  
+                            "attributes": row["attributes"], 
+                            "batchid": row["batchid"], 
+                            "createdby": row["createdby"], 
+                            "created_at": row["created_at"],
+                            "replacementof":row["replacementof"],
+                            "originalfile" : _originalfile,
+                            "originalfilename":_originalfilename
+                        })
         except Exception as ex:
             logging.error(ex)
             raise ex
@@ -67,6 +84,61 @@ class FOIRequestRecord(db.Model):
         query = db.session.query(FOIRequestRecord).filter_by(recordid=recordid).order_by(FOIRequestRecord.version.desc()).first()
         return comment_schema.dump(query)
 
+    @classmethod
+    def getrecordsbyid(cls, recordids):
+        records = []
+        try:
+            sql =   """select
+                            fr1.recordid, fr1.version, fr1.foirequestid, fr1.ministryrequestid,
+                            fr1.ministryrequestversion, fr1.attributes, fr1.filename, fr1.s3uripath,
+                            fr1.created_at, fr1.createdby, fr1.updated_at, fr1.updatedby, fr1.replacementof
+                        from public."FOIRequestRecords" fr1
+                        inner join (
+                            select fr2.recordid, max(fr2.version) as maxversion
+                            from public."FOIRequestRecords" fr2
+                            where fr2.recordid in ("""+ ','.join([str(id) for id in recordids]) +""")
+                            group by fr2.recordid
+                        ) fr3 on fr3.recordid = fr1.recordid and fr3.maxversion = fr1.version
+                        order by fr1.recordid desc
+                    """
+            rs = db.session.execute(text(sql))
+
+            for row in rs:
+                records.append({
+                    "recordid": row["recordid"],
+                    "version": row["version"],
+                    "foirequestid": row["foirequestid"],
+                    "ministryrequestid": row["ministryrequestid"],
+                    "ministryrequestversion": row["ministryrequestversion"],
+                    "attributes": row["attributes"],
+                    "filename": row["filename"],
+                    "s3uripath": row["s3uripath"],
+                    "created_at": row["created_at"],
+                    "createdby": row["createdby"],
+                    "updated_at":row["updated_at"],
+                    "updatedby":row["updatedby"],
+                    "updated_at":row["updated_at"],
+                    "replacementof":row["replacementof"]
+                })
+        except Exception as ex:
+            logging.error(ex)
+            raise ex
+        finally:
+            db.session.close()
+        return records
+
+    @classmethod
+    def replace(cls,replacingrecordid,records):
+        replacingrecord = db.session.query(FOIRequestRecord).filter_by(recordid=replacingrecordid).order_by(FOIRequestRecord.version.desc()).first()
+        replacingrecord.isactive=False
+        db.session.commit()
+        db.session.add_all(records)
+        db.session.commit() 
+        _recordids = {}
+        for record in records:
+            _recordids[record.s3uripath] = {"filename": record.filename, "recordid": record.recordid}
+        return DefaultMethodResult(True,'Records replaced', -1, _recordids)
+    
     @classmethod
     def getbatchcount(cls, ministryrequestid):
         batchcount = 0
@@ -90,4 +162,4 @@ class FOIRequestRecord(db.Model):
 
 class FOIRequestRecordSchema(ma.Schema):
     class Meta:
-        fields = ('recordid','version','foirequestid','ministryrequestid','ministryrequestversion','attributes','filename','s3uripath','created_at','createdby','updated_at','updatedby')
+        fields = ('recordid','version','foirequestid','ministryrequestid','ministryrequestversion','attributes','filename','s3uripath','created_at','createdby','updated_at','updatedby','replacementof')

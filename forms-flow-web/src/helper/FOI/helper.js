@@ -321,6 +321,23 @@ const getMinistryRestrictedTagList = () => {
   return getSessionData("ministryRestrictedTagList");
 };
 
+const getUserFullName = (firstName, lastName, userName, groupName = "") => {
+  // let users = getSessionData("fullnameList");
+  // if (userName) {
+  //   const user = users?.find((user) => user.username === userName);
+  //   return user ? user?.fullname : null;
+  // }
+  // return groupName;
+
+  if (firstName && lastName) {
+    return `${lastName}, ${firstName}`;
+  } else if (userName) {
+    return userName;
+  } else {
+    return groupName;
+  }
+  
+}
 const ConditionalComponent = ({ condition, children }) => {
   if (!condition) {
     return null;
@@ -428,14 +445,14 @@ const isRequestMinistryRestricted = (requestDetails) => {
   return requestDetails?.ministryrestricteddetails?.isrestricted;
 }
 
-const isrecordtimeout = (createDate, days) => {
+const isrecordtimeout = (createDate, slaHrs) => {
   let dt1_str = createDate.replace("|", ",");
   let dt1 = new Date(dt1_str);
   let dt2 = new Date();
   let diff =  (dt2.getTime() - dt1.getTime()) / 1000;
   diff = diff/(60*60)
   let diffhrs = Math.abs(Math.round(diff));
-  return diffhrs >= days;
+  return diffhrs >= slaHrs;
 };
 
 const readUploadedFileAsBytes = (inputFile) => {
@@ -486,5 +503,6 @@ export {
   getMinistryRestrictedTagList,
   isrecordtimeout,
   isFoiAdmin,
-  readUploadedFileAsBytes
+  readUploadedFileAsBytes,
+  getUserFullName
 };

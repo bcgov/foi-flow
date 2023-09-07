@@ -96,6 +96,23 @@ export const updateSortModel = (sortModel) => {
   return smodel;
 };
 
+export const updateEventSortModel = (sortModel, isMinistry) => {
+  let smodel = JSON.parse(JSON.stringify(sortModel));
+  if (smodel) {
+    let field = smodel[0]?.field;
+    let order = smodel[0]?.sort;
+    
+    //add createdat to default sorting
+    if (smodel.length == 1 && field == "defaultSorting") {
+      smodel.push(
+        { field: "createdat", sort: order },
+      );
+    }
+  }
+
+  return smodel;
+};
+
 export const getFullName = (firstName, lastName) => {
   if (!firstName && !lastName) {
     return "";
@@ -140,8 +157,7 @@ export const getDaysLeft = (params) => {
   const receivedDateString = params.row.duedate;
 
   if (
-    params.row.currentState.toLowerCase() ===
-    StateEnum.onhold.name.toLowerCase()
+    [StateEnum.onhold.name.toLowerCase(), StateEnum.closed.name.toLowerCase()].includes(params.row.currentState.toLowerCase())
   ) {
     return "N/A";
   } else if(!receivedDateString) {
@@ -221,12 +237,30 @@ export const LightTooltip = styled(({ className, ...props }) => (
   },
 }));
 
-export const cellTooltipRender = (params) => (
-  <LightTooltip placement="bottom-start" title={
+export const cellTooltipRender = (params) => {
+  var description = params.row.description;
+  if (params.row.fromdate && params.row.todate) {
+    description += "\n(" + (new Date(params.row.fromdate)).toLocaleDateString() + " to " + (new Date(params.row.todate)).toLocaleDateString() + ")"
+  }
+  return <LightTooltip placement="bottom-start" title={
     <div style={{whiteSpace: "pre-line"}}>
-      {params.row.description + "\n(" + (new Date(params.row.fromdate)).toLocaleDateString() + " to " + (new Date(params.row.todate)).toLocaleDateString() + ")"}
+      {description}
     </div>
   }>
     <span className="table-cell-truncate">{params.row.axisRequestId}</span>
   </LightTooltip>
-);
+};
+
+export const eventCellTooltipRender = (params) => {
+
+  let notification = params.row?.notification;
+  if (notification?.length > 25) {
+  const truncatedNotification = notification?.length > 25 ? notification?.slice(0, 25) + '...' : notification;
+
+  return (
+    <LightTooltip placement="bottom-start" title={<div style={{ whiteSpace: 'pre-line' }}>{notification}</div>}>
+      <span className="table-cell-truncate">{truncatedNotification}</span>
+    </LightTooltip>
+  );
+  }
+};

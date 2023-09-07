@@ -177,9 +177,15 @@ const BottomButtonGroup = React.memo(
         saveRequestObject.requeststatusid = StateEnum.open.id;
         if (currentSelectedStatus === StateEnum.open.name && ministryId) {
           saveRequestModal();
-        } else if(saveRequestObject.currentState === StateEnum.intakeinprogress.name) { //open a request
+        } 
+        // else if(saveRequestObject.currentState === StateEnum.intakeinprogress.name) { //open a request
+        //   const previousState = saveRequestObject.stateTransition[0].status;  
+
+        //   openRequest();
+        // }
+        else if(currentSelectedStatus &&
+          currentSelectedStatus === StateEnum.open.name)
           openRequest();
-        }
       }
     }, [currentSelectedStatus, stateChanged]);
 
@@ -314,10 +320,10 @@ const BottomButtonGroup = React.memo(
           case StateEnum.deduplication.name:
           case StateEnum.harms.name:
           case StateEnum.response.name:
+          case StateEnum.peerreview.name:
             const status = Object.values(StateEnum).find(
               (statusValue) => statusValue.name === currentSelectedStatus
             );
-  
             saveRequestObject.requeststatusid = status.id;
             if (currentSelectedStatus === StateEnum.onhold.name && !saveRequestObject.paymentExpiryDate) {
               saveRequestObject.paymentExpiryDate = dueDateCalculation(new Date(), PAYMENT_EXPIRY_DAYS);

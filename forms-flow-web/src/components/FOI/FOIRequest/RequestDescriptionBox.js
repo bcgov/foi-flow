@@ -201,6 +201,7 @@ const RequestDescription = React.memo(({
     const statesBeforeOpen = [
       StateEnum.unopened.name.toLowerCase(),
       StateEnum.intakeinprogress.name.toLowerCase(),
+      StateEnum.peerreview.name.toLowerCase(),
     ];
 
      return (

@@ -39,10 +39,9 @@ export const CommentSection = ({
     let _commentsbyCategory = parseInt(filterValue) === -1 ? commentsArray :  commentsArray.filter(c => c.commentTypeId === parseInt(filterValue))
     let _filteredcomments = filterkeyValue === "" ? _commentsbyCategory : _commentsbyCategory.filter(c => c.text.toLowerCase().indexOf(filterkeyValue.toLowerCase()) > -1)
     let filteredcomments = filterkeyinCommentsandReplies(_commentsbyCategory,_filteredcomments)        
-    setcomments(filteredcomments)         
+    setcomments(filteredcomments)
   }, [filterValue,commentsArray ,filterkeyValue])
   let restrictedReqTaglist = useSelector((state) => state.foiRequests.restrictedReqTaglist);
-  const isCommentTagListLoading = useSelector((state) => state.foiRequests.isCommentTagListLoading);
 
   const onfilterchange = (_filterValue) => { 
     sessionStorage.setItem('foicommentcategory',_filterValue)   
@@ -78,7 +77,6 @@ export const CommentSection = ({
   }
 
   return (
-    !isCommentTagListLoading ? 
     <>
     <ActionProvider
       currentUser={currentUser}
@@ -121,7 +119,7 @@ export const CommentSection = ({
 
       </div>
     </ActionProvider>
-    </> : <Loading />
+    </>
   )
 }
 

@@ -1,5 +1,8 @@
-
-import { FOI_BASE_API_URL, AXIS_API_URL, DOC_REVIEWER_BASE_API_URL } from "./config";
+import {
+  FOI_BASE_API_URL,
+  AXIS_API_URL,
+  DOC_REVIEWER_BASE_API_URL,
+} from "./config";
 
 const API = {
   FOI_GET_REQUESTS_API: `${FOI_BASE_API_URL}/api/dashboard`,
@@ -84,27 +87,29 @@ const API = {
   FOI_GET_ADVANCED_SEARCH: `${FOI_BASE_API_URL}/api/advancedsearch`,
 
   FOI_CHECK_AXIS_REQUEST_ID: `${FOI_BASE_API_URL}/api/foirawrequest/axisrequestid/<axisrequestid>`,
-  
+
   FOI_GET_AXIS_REQUEST_DATA: `${AXIS_API_URL}/api/RequestSearch/<axisrequestid>`,
 
   FOI_REQUEST_ASSIGNEE_API: `${FOI_BASE_API_URL}/api/foirequests/<requestid>/ministryrequest/<ministryid>/<usertype>/assignee`,
-  FOI_RAWREQUEST_ASSIGNEE_API:  `${FOI_BASE_API_URL}/api/foirawrequest/<requestid>/assignee`,
+  FOI_RAWREQUEST_ASSIGNEE_API: `${FOI_BASE_API_URL}/api/foirawrequest/<requestid>/assignee`,
 
-  FOI_GET_S3DOCUMENT_PRESIGNEDURL:`${FOI_BASE_API_URL}/api/foiflow/oss/presigned`,
-  FOI_POST_S3DOCUMENT_PRESIGNEDURL:`${FOI_BASE_API_URL}/api/foiflow/oss/presigned`,
-  FOI_POST_COMPLETE_UPLOAD:`${FOI_BASE_API_URL}/api/foiflow/oss/completemultipart`,
+  FOI_GET_S3DOCUMENT_PRESIGNEDURL: `${FOI_BASE_API_URL}/api/foiflow/oss/presigned`,
+  FOI_POST_S3DOCUMENT_PRESIGNEDURL: `${FOI_BASE_API_URL}/api/foiflow/oss/presigned`,
+  FOI_POST_COMPLETE_UPLOAD: `${FOI_BASE_API_URL}/api/foiflow/oss/completemultipart`,
 
-  FOI_GET_RECORDS:`${FOI_BASE_API_URL}/api/foirecord/<requestid>/ministryrequest/<ministryrequestid>`,
-  FOI_RETRY_RECORDS:`${FOI_BASE_API_URL}/api/foirecord/<requestid>/ministryrequest/<ministryrequestid>/retry`,
-  FOI_POST_RECORDS:`${FOI_BASE_API_URL}/api/foirecord/<requestid>/ministryrequest/<ministryrequestid>`,
-  FOI_DELETE_RECORDS:`${FOI_BASE_API_URL}/api/foirecord/<requestid>/ministryrequest/<ministryrequestid>/recordid/<recordid>/delete`,
-  DOC_REVIEWER_DELETE_RECORDS:`${DOC_REVIEWER_BASE_API_URL}/api/document/delete`,
-  
-  FOI_TRIGGER_DOWNLOAD_RECORDS_FOR_HARMS:`${FOI_BASE_API_URL}/api/foirecord/<requestid>/ministryrequest/<ministryrequestid>/triggerdownload/harms`,
+  FOI_GET_RECORDS: `${FOI_BASE_API_URL}/api/foirecord/<requestid>/ministryrequest/<ministryrequestid>`,
+  FOI_RETRY_RECORDS: `${FOI_BASE_API_URL}/api/foirecord/<requestid>/ministryrequest/<ministryrequestid>/retry`,
+  FOI_REPLACE_RECORDS: `${FOI_BASE_API_URL}/api/foirecord/<requestid>/ministryrequest/<ministryrequestid>/record/<recordid>/replace`,
+  FOI_POST_RECORDS: `${FOI_BASE_API_URL}/api/foirecord/<requestid>/ministryrequest/<ministryrequestid>`,
+  FOI_UPDATE_RECORDS: `${FOI_BASE_API_URL}/api/foirecord/<requestid>/ministryrequest/<ministryrequestid>/update`,
+  DOC_REVIEWER_DELETE_RECORDS: `${DOC_REVIEWER_BASE_API_URL}/api/document/delete`,
+  DOC_REVIEWER_REDACTED_SECTIONS: `${DOC_REVIEWER_BASE_API_URL}/api/redactedsections/ministryrequest/<ministryrequestid>`,
 
-  FOI_DOWNLOAD_RECORDS_FOR_HARMS:`${FOI_BASE_API_URL}/api/foirecord/<requestid>/ministryrequest/<ministryrequestid>/download/harms`,
-  FOI_PDF_STITCH_STATUS_FOR_HARMS:`${FOI_BASE_API_URL}/api/foirecord/<requestid>/ministryrequest/<ministryrequestid>/harms/pdfstitchjobstatus`,
-  FOI_CHECK_RECORDS_CHANGED:`${FOI_BASE_API_URL}/api/foirecord/<requestid>/ministryrequest/<ministryrequestid>/harms/recrodschanged`,
+  FOI_TRIGGER_DOWNLOAD_RECORDS_FOR_HARMS: `${FOI_BASE_API_URL}/api/foirecord/<requestid>/ministryrequest/<ministryrequestid>/triggerdownload/harms`,
+
+  FOI_DOWNLOAD_RECORDS_FOR_HARMS: `${FOI_BASE_API_URL}/api/foirecord/<requestid>/ministryrequest/<ministryrequestid>/download/harms`,
+  FOI_PDF_STITCH_STATUS_FOR_HARMS: `${FOI_BASE_API_URL}/api/foirecord/<requestid>/ministryrequest/<ministryrequestid>/harms/pdfstitchjobstatus`,
+  FOI_CHECK_RECORDS_CHANGED: `${FOI_BASE_API_URL}/api/foirecord/<requestid>/ministryrequest/<ministryrequestid>/harms/recrodschanged`,
 
   FOI_GET_SUBJECT_CODELIST: `${FOI_BASE_API_URL}/api/foiflow/subjectcodes`,
   FOI_POST_RAWREQUEST_RESTRICTION: `${FOI_BASE_API_URL}/api/foirawrequest/restricted/<requestid>`,
@@ -112,9 +117,16 @@ const API = {
 
   FOI_GET_RESTRICTED_RAWREQUEST_TAG_LIST: `${FOI_BASE_API_URL}/api/foicomment/rawrequest/<requestid>/restricted`,
   FOI_GET_RESTRICTED_MINISTRYREQUEST_TAG_LIST: `${FOI_BASE_API_URL}/api/foicomment/ministryrequest/<ministryrequestid>/restricted`,
-  
-  FOI_REFRESH_REDIS_CACHE: `${FOI_BASE_API_URL}/api/foiflow/cache/refresh`
 
+  FOI_REFRESH_REDIS_CACHE: `${FOI_BASE_API_URL}/api/foiflow/cache/refresh`,
 
+  FOI_GET_EVENTS_PAGE_API: `${FOI_BASE_API_URL}/api/eventpagination`,
+  FOI_GET_MINISTRY_EVENTS_PAGE_API: `${FOI_BASE_API_URL}/api/eventpagination/ministry`,
+
+  FOI_DOWNLOAD_RECORDS_FOR_REDLINES: `${FOI_BASE_API_URL}/api/foirecord/<requestid>/ministryrequest/<ministryrequestid>/download/redline`,
+  FOI_PDF_STITCH_STATUS_FOR_REDLINES: `${FOI_BASE_API_URL}/api/foirecord/<requestid>/ministryrequest/<ministryrequestid>/redline/pdfstitchjobstatus`,
+
+  FOI_DOWNLOAD_RECORDS_FOR_RESPONSEPACKAGE: `${FOI_BASE_API_URL}/api/foirecord/<requestid>/ministryrequest/<ministryrequestid>/download/responsepackage`,
+  FOI_PDF_STITCH_STATUS_FOR_RESPONSEPACKAGE: `${FOI_BASE_API_URL}/api/foirecord/<requestid>/ministryrequest/<ministryrequestid>/responsepackage/pdfstitchjobstatus`,
 };
 export default API;

@@ -3,7 +3,8 @@ import os
 import ast
 import request_api
 from request_api.models.OperatingTeams import OperatingTeam
-
+from request_api.exceptions import BusinessException, Error
+import redis
 
 class KeycloakAdminService:
 
@@ -14,21 +15,33 @@ class KeycloakAdminService:
     keycloakadminserviceaccount = os.getenv('KEYCLOAK_ADMIN_SRVACCOUNT')
     keycloakadminservicepassword = os.getenv('KEYCLOAK_ADMIN_SRVPASSWORD')
     keycloakadminintakegroupid = os.getenv('KEYCLOAK_ADMIN_INTAKE_GROUPID')
+    cache_redis_url = os.getenv('CACHE_REDISURL')
+    kctokenexpiry = os.getenv('KC_SRC_ACC_TOKEN_EXPIRY',1800)
     
         
     def get_token(self):
-        
-        url = '{0}/auth/realms/{1}/protocol/openid-connect/token'.format(self.keycloakhost,self.keycloakrealm)        
-        params = {
+        _accesstoken=None
+        try:
+            cache_client = redis.from_url(self.cache_redis_url,decode_responses=True)
+            _accesstoken = cache_client.get("foi:kcsrcacnttoken")            
+            if _accesstoken is None:
+                url = '{0}/auth/realms/{1}/protocol/openid-connect/token'.format(self.keycloakhost,self.keycloakrealm)        
+                params = {
 
-            'client_id': self.keycloakclientid,
-            'grant_type': 'password',
-            'username' : self.keycloakadminserviceaccount,
-            'password': self.keycloakadminservicepassword,
-            'client_secret':self.keycloakclientsecret
-        }
-        x = requests.post(url, params, verify=True).content.decode('utf-8')       
-        return str(ast.literal_eval(x)['access_token'])        
+                    'client_id': self.keycloakclientid,
+                    'grant_type': 'password',
+                    'username' : self.keycloakadminserviceaccount,
+                    'password': self.keycloakadminservicepassword,
+                    'client_secret':self.keycloakclientsecret
+                }
+                x = requests.post(url, params, verify=True).content.decode('utf-8')
+                _accesstoken = str(ast.literal_eval(x)['access_token'])                
+                cache_client.set("foi:kcsrcacnttoken",_accesstoken,ex=int(self.kctokenexpiry))
+        except BusinessException as exception:
+            print("Error happened while accessing token on KeycloakAdminService {0}".format(exception.message))
+        finally:
+            cache_client = None    
+        return _accesstoken       
 
    
     def getgroups(self, allowedgroups = None):
@@ -54,6 +67,13 @@ class KeycloakAdminService:
                 groups.append({'id': group['id'],'name':group['name'], 'type':None})
         return groups      
     
+    def getgroup(self, groupname, type=None):
+        groups = []
+        allgroups = self.getallgroups()
+        for entry in allgroups:
+            if entry["name"] == groupname:
+                groups.append({'id': entry['id'],'name':entry['name'], 'type': type})         
+        return groups
  
     def getgroupsandmembers(self, allowedgroups = None):
         allowedgroups = self.getgroups(allowedgroups)
@@ -61,7 +81,6 @@ class KeycloakAdminService:
             group["members"] = self.getgroupmembersbyid(group["id"])
         return allowedgroups  
     
-
     def getgroupmembersbyid(self, groupid):
         groupurl ='{0}/auth/admin/realms/{1}/groups/{2}/members'.format(self.keycloakhost,self.keycloakrealm,groupid)
         groupresponse = requests.get(groupurl, headers=self.getheaders())
@@ -74,13 +93,35 @@ class KeycloakAdminService:
             return sorted(users, key=lambda k: str(k['lastname']), reverse = False)
         return users 
     
+    def getallusercount(self):
+        userurl ='{0}/auth/admin/realms/{1}/users/count'.format(self.keycloakhost,self.keycloakrealm)
+        userresponse = requests.get(userurl, headers=self.getheaders())
+        if userresponse.status_code == 200 and userresponse.content != '':
+            return int(userresponse.content)
+        return 100
+   
+    def getallusers(self):
+        usercount = self.getallusercount()
+        userurl ='{0}/auth/admin/realms/{1}/users?max={2}'.format(self.keycloakhost,self.keycloakrealm,usercount)
+        userresponse = requests.get(userurl, headers=self.getheaders())
+        users = []
+        if userresponse.status_code == 200 and userresponse.content != '': 
+            for user in userresponse.json():           
+                _user =  self.__createuser(user)
+                users.append(_user)
+        if users not in (None, []):
+            return sorted(users, key=lambda k: str(k['lastname']), reverse = False)
+        return users     
+    
     def __createuser(self, user):
         return {
                 'id':user['id'],
                 'username': self.__formatusername(user),                       
                 'email': user['email'] if 'email' in user is not None else None,
                 'firstname':user['firstName'] if 'firstName' in user is not None else None,
-                'lastname': user['lastName'] if 'lastName' in user is not None else None                        
+                'lastname': user['lastName'] if 'lastName' in user is not None else None ,
+                'enabled': user['enabled'],         
+                'origusername': user['username']             
             } 
 
     def __formatusername(self,user):
@@ -99,13 +140,18 @@ class KeycloakAdminService:
         return input.lower().replace(' ', '')  
 
     def getmembersbygroupname(self, groupname):
-        _groups = []
-        _groups.append({"name":groupname, "type": OperatingTeam.gettype(groupname)})
-        allowedgroups = self.getgroups(_groups)
+        operatingteam =  OperatingTeam.getteam(groupname)
+        if operatingteam is not None:
+            return self.getmembersbygroupnameandtype(operatingteam['name'], operatingteam['type'])
+        return []
+    
+
+    def getmembersbygroupnameandtype(self, groupname, type):
+        allowedgroups = self.getgroup(groupname, type)
         for group in allowedgroups:
-            if(group["name"] == groupname):
-                group["members"] = self.getgroupmembersbyid(group["id"])
+            group["members"] = self.getgroupmembersbyid(group["id"])
         return allowedgroups
+
         
 
     

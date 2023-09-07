@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import { useParams } from 'react-router-dom';
 import { useSelector } from "react-redux";
 import TextField from '@material-ui/core/TextField';
@@ -14,6 +14,7 @@ import AccordionSummary from '@material-ui/core/AccordionSummary';
 import AccordionDetails from '@material-ui/core/AccordionDetails';
 import Typography from '@material-ui/core/Typography';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+import MinistriesCanvassed from '../customComponents/MinistriesCanvassed/MinistriesCanvassed';
 
 
 const RequestDetails = React.memo(
@@ -95,7 +96,7 @@ const RequestDetails = React.memo(
     const requestType = useSelector(state=> state.foiRequests.foiRequestTypeList);
     const receivedMode = useSelector(state=> state.foiRequests.foiReceivedModeList);
     const deliveryMode = useSelector(state=> state.foiRequests.foiDeliveryModeList);
-
+    const [openModal, setModal] = useState(false);
     const calculateReceivedDate = (receivedDateString) => {
       const dateString = receivedDateString ? receivedDateString.substring(0,10): "";
       receivedDateString = receivedDateString ? new Date(receivedDateString): "";
@@ -220,6 +221,14 @@ const RequestDetails = React.memo(
           <Typography className={classes.heading}>REQUEST DETAILS</Typography>
         </AccordionSummary>
         <AccordionDetails>
+          <div>
+              <button type="button" className={`btn btn-link btn-description-history`} onClick={() => setModal(true)} 
+                disabled={!(!!requestDetails.linkedRequests) || (!!requestDetails.linkedRequests && !requestDetails.linkedRequests?.length >0)}>
+                Linked Requests
+              </button>
+              <MinistriesCanvassed  openModal={openModal} selectedMinistries={(typeof requestDetails.linkedRequests == 'string' ? JSON.parse(requestDetails.linkedRequests) : requestDetails.linkedRequests)} 
+              setModal={setModal} isLinkedRequest={true} />
+          </div>
           <div className="row foi-details-row foi-details-row-break">
             <div className="col-lg-6 foi-details-col">
                 <TextField

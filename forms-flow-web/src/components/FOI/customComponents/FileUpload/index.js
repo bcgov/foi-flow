@@ -143,7 +143,7 @@ const FileUpload = ({
           setErrorMessage([`The total size of all files uploaded can not exceed  ${totalFileSize}MB. Please upload additional files separately.`]);
         }
         setFiles(updatedFilesDetails[0]);
-        callUpdateFilesCb(updatedFilesDetails[0], updatedFilesDetails[3]);
+        callUpdateFilesCb(updatedFilesDetails[0]);
       }
     }
    

@@ -24,8 +24,10 @@ class recordservice(recordservicebase):
     largefileconversionstreamkey = getenv('EVENT_QUEUE_CONVERSION_LARGE_FILE_STREAM_KEY')
     dedupestreamkey = getenv('EVENT_QUEUE_DEDUPE_STREAMKEY')
     largefilededupestreamkey = getenv('EVENT_QUEUE_DEDUPE_LARGE_FILE_STREAMKEY')
-    pdfstitchstreamkey = getenv('EVENT_QUEUE_PDFSTITCH_STREAMKEY')
-    largefilesizelimit= getenv('STREAM_SEPARATION_FILE_SIZE_LIMIT')
+    pdfstitchstreamkey = getenv('EVENT_QUEUE_PDFSTITCH_STREAMKEY')    
+    dedupelargefilesizelimit= getenv('DEDUPE_STREAM_SEPARATION_FILE_SIZE_LIMIT',104857600)
+    conversionlargefilesizelimit= getenv('CONVERSION_STREAM_SEPARATION_FILE_SIZE_LIMIT',3145728)
+    stitchinglargefilesizelimit= getenv('STITCHING_STREAM_SEPARATION_FILE_SIZE_LIMIT',524288000)
     pdfstitchstreamkey_largefiles = getenv('EVENT_QUEUE_PDFSTITCH_LARGE_FILE_STREAMKEY')
 
     def create(self, requestid, ministryrequestid, recordschema, userid):
@@ -36,27 +38,38 @@ class recordservice(recordservicebase):
     def fetch(self, requestid, ministryrequestid):
         return recordservicegetter().fetch(requestid, ministryrequestid)  
             
-    def delete(self, requestid, ministryrequestid, recordid, userid):
-        record = FOIRequestRecord.getrecordbyid(recordid)
-        record['attributes'] = json.loads(record['attributes'])
-        record.update({'updated_at': datetime.now(), 'updatedby': userid, 'isactive': False})
-        record['version'] += 1
-        newrecord = FOIRequestRecord()
-        newrecord.__dict__.update(record)
-        response = FOIRequestRecord.create([newrecord])
-        if (response.success):
-            _apiresponse, err = self.makedocreviewerrequest('POST', '/api/document/delete', {'ministryrequestid': ministryrequestid, 'filepaths': [record['s3uripath']]})
+    def update(self, requestid, ministryrequestid, requestdata, userid):
+        newrecords = []
+        recordids = [r['recordid'] for r in requestdata['records'] if r.get('recordid') is not None]
+        response = DefaultMethodResult(True, 'No recordids')
+        if(len(recordids) > 0):
+            records = FOIRequestRecord.getrecordsbyid(recordids)
+            for record in records:
+                record['attributes'] = json.loads(record['attributes'])
+                if not requestdata['isdelete']:
+                    record['attributes']['divisions'] = requestdata['divisions']
+                record.update({'updated_at': datetime.now(), 'updatedby': userid, 'isactive': not requestdata['isdelete']})
+                record['version'] += 1
+                newrecord = FOIRequestRecord()
+                newrecord.__dict__.update(record)
+                newrecords.append(newrecord)
+            response = FOIRequestRecord.create(newrecords)
+        if response.success:
+            if requestdata['isdelete']:
+                _apiresponse, err = self.makedocreviewerrequest('POST', '/api/document/delete', {'ministryrequestid': ministryrequestid, 'filepaths': [record['filepath'] for record in requestdata['records']]})
+            else:
+                _apiresponse, err = self.makedocreviewerrequest('POST', '/api/document/update', {'ministryrequestid': ministryrequestid, 'documentmasterids': [record['documentmasterid'] for record in requestdata['records']], 'divisions': requestdata['divisions']})
             if err:
-                return DefaultMethodResult(False,'Error in contacting Doc Reviewer API', -1, recordid)
-            return DefaultMethodResult(True,'Record marked as inactive', -1, recordid)
+                return DefaultMethodResult(False,'Error in contacting Doc Reviewer API', -1,  [record['documentmasterid'] for record in requestdata['records']])
+            return DefaultMethodResult(True,'Record updated in Doc Reviewer DB', -1, [record['documentmasterid'] for record in requestdata['records']])
         else:
-            return DefaultMethodResult(False,'Error in deleting Record', -1, recordid)
-
+            return DefaultMethodResult(False,'Error in updating Record', -1, [record['documentmasterid'] for record in requestdata['records']])
+            
     def retry(self, _requestid, ministryrequestid, data):
         _ministryrequest = FOIMinistryRequest.getrequestbyministryrequestid(ministryrequestid)
         for record in data['records']:
             _filepath, extension = path.splitext(record['s3uripath'])
-            extension = extension.lower()
+            extension = extension.lower()            
             if record['service'] == 'deduplication':
                 if extension not in DEDUPE_FILE_TYPES:
                     return DefaultMethodResult(False,'Dedupe only accepts the following formats: ' + ', '.join(DEDUPE_FILE_TYPES), -1, record['recordid'])
@@ -67,6 +80,8 @@ class recordservice(recordservicebase):
                     return DefaultMethodResult(False,'File Conversion only accepts the following formats: ' + ', '.join(FILE_CONVERSION_FILE_TYPES), -1, record['recordid'])
                 else:
                     streamkey = self.conversionstreamkey
+            else:
+                streamkey = self.dedupestreamkey if extension in DEDUPE_FILE_TYPES else self.conversionstreamkey
             jobids, err = self.makedocreviewerrequest('POST', '/api/jobstatus', {
                 'records': [record],
                 'batch': record['attributes']['batch'],
@@ -86,12 +101,76 @@ class recordservice(recordservicebase):
                 "jobid": jobids[record['s3uripath']]['jobid'],
                 "documentmasterid": jobids[record['s3uripath']]['masterid'],
                 "trigger": record['trigger'],
-                "createdby": record['createdby']
+                "createdby": record['createdby'],
+                "usertoken": AuthHelper.getauthtoken()
             }
             if record.get('outputdocumentmasterid', False):
                 streamobject['outputdocumentmasterid'] = record['outputdocumentmasterid']
+            if record['trigger'] == 'recordreplace' and record['attributes']['isattachment'] == True:
+                streamobject['originaldocumentmasterid'] = record['documentmasterid']
             return eventqueueservice().add(streamkey, streamobject)
-        
+
+    def replace(self, _requestid, ministryrequestid, recordid, recordschema, userid):
+        _ministryrequest = FOIMinistryRequest.getrequestbyministryrequestid(ministryrequestid)
+        _ministryversion = FOIMinistryRequest.getversionforrequest(ministryrequestid)
+        recordlist = []
+        records = recordschema.get("records")
+        for _record in records:
+            replacingrecord = FOIRequestRecord.getrecordbyid(recordid)           
+            _delteeapiresponse, err = self.makedocreviewerrequest('POST', '/api/document/delete', {'ministryrequestid': ministryrequestid, 'filepaths': [replacingrecord['s3uripath']]})
+            
+            if err:
+                return DefaultMethodResult(False,'Error in contacting Doc Reviewer API', -1, recordid)
+            record = FOIRequestRecord(foirequestid=_requestid, replacementof = recordid if _record['replacementof'] is None else _record['replacementof'], ministryrequestid = ministryrequestid, ministryrequestversion=_ministryversion,
+                                version = 1, createdby = userid, created_at = datetime.now())
+            batch = str(uuid.uuid4())
+            _record['attributes']['batch'] = batch
+            _record['attributes']['lastmodified'] = json.loads(replacingrecord['attributes'])['lastmodified']
+            _filepath, extension = path.splitext(_record['filename'])
+            _record['attributes']['extension'] = extension            
+            _record['attributes']['incompatible'] =  extension.lower() in NONREDACTABLE_FILE_TYPES 
+            record.__dict__.update(_record)
+            recordlist.append(record)      
+        dbresponse = FOIRequestRecord.replace(recordid,recordlist)
+        if (dbresponse.success):
+            processingrecords = [{**record, **{"recordid": dbresponse.args[0][record['s3uripath']]['recordid']}} for record in records]                      
+            # record all jobs before sending first redis stream message to avoid race condition
+            jobids, err = self.makedocreviewerrequest('POST', '/api/jobstatus', {
+                'records': processingrecords,
+                'batch': batch,
+                'trigger': 'recordupload',
+                'ministryrequestid': ministryrequestid
+            })
+            if err:
+                return DefaultMethodResult(False,'Error in contacting Doc Reviewer API', -1, ministryrequestid)
+            # send message to redis stream for each file
+            for entry in processingrecords:
+                _filename, extension = path.splitext(entry['s3uripath'])
+                extension = extension.lower()
+                if 'error' in jobids[entry['s3uripath']]:
+                    logging.error("Doc Reviewer API was given an unsupported file type - no job triggered - Record ID: {0} File Name: {1} ".format(entry['recordid'], entry['filename']))
+                else:
+                    streamobject = {
+                        "s3filepath": entry['s3uripath'],
+                        "requestnumber": _ministryrequest['axisrequestid'],
+                        "bcgovcode": _ministryrequest['programarea.bcgovcode'],
+                        "filename": entry['filename'],
+                        "ministryrequestid": ministryrequestid,
+                        "attributes": json.dumps(entry['attributes']),
+                        "batch": batch,
+                        "jobid": jobids[entry['s3uripath']]['jobid'],
+                        "documentmasterid": jobids[entry['s3uripath']]['masterid'],
+                        "trigger": 'recordupload',
+                        "createdby": userid,
+                        "incompatible": 'true' if extension in NONREDACTABLE_FILE_TYPES else 'false',
+                        "usertoken": AuthHelper.getauthtoken()
+                    }
+                    if extension in FILE_CONVERSION_FILE_TYPES:
+                        eventqueueservice().add(self.conversionstreamkey, streamobject)
+                    if extension in DEDUPE_FILE_TYPES:
+                        eventqueueservice().add(self.dedupestreamkey, streamobject)
+        return dbresponse
+
     def triggerpdfstitchservice(self, requestid, ministryrequestid, recordschema, userid):
         """Calls the BE job for stitching the documents.
         """
@@ -137,7 +216,7 @@ class recordservice(recordservicebase):
                 "totalfilesize": message["totalfilesize"]
             }
             print("final message >>>>>> ", streamobject)
-            if message["totalfilesize"] > int(self.largefilesizelimit) and self.pdfstitchstreamkey_largefiles:
+            if message["totalfilesize"] > int(self.stitchinglargefilesizelimit) and self.pdfstitchstreamkey_largefiles:
                 print("pdfstitchstreamkey_largefiles = ", self.pdfstitchstreamkey_largefiles)
                 return eventqueueservice().add(self.pdfstitchstreamkey_largefiles, streamobject)
             elif self.pdfstitchstreamkey:
@@ -159,7 +238,7 @@ class recordservice(recordservicebase):
             _filepath, extension = path.splitext(entry['filename'])
             entry['attributes']['extension'] = extension
             entry['attributes']['incompatible'] =  extension.lower() in NONREDACTABLE_FILE_TYPES
-            record = FOIRequestRecord(foirequestid=requestid, ministryrequestid = ministryrequestid, ministryrequestversion=_ministryversion,
+            record = FOIRequestRecord(foirequestid=_ministryrequest['foirequest_id'], ministryrequestid = ministryrequestid, ministryrequestversion=_ministryversion,
                             version = 1, createdby = userid, created_at = datetime.now())
             record.__dict__.update(entry)
             recordlist.append(record)
@@ -197,16 +276,17 @@ class recordservice(recordservicebase):
                         "documentmasterid": jobids[entry['s3uripath']]['masterid'],
                         "trigger": 'recordupload',
                         "createdby": userid,
-                        "incompatible": 'true' if extension in NONREDACTABLE_FILE_TYPES else 'false'
+                        "incompatible": 'true' if extension in NONREDACTABLE_FILE_TYPES else 'false',
+                        "usertoken": AuthHelper.getauthtoken()
                     }
                     if extension in FILE_CONVERSION_FILE_TYPES:
-                        if entry['attributes']['filesize'] < int(self.largefilesizelimit):
+                        if entry['attributes']['filesize'] < int(self.conversionlargefilesizelimit):
                             assignedstreamkey =self.conversionstreamkey
                         else:
                             assignedstreamkey =self.largefileconversionstreamkey
                         eventqueueservice().add(assignedstreamkey, streamobject)
                     if extension in DEDUPE_FILE_TYPES:
-                        if 'convertedfilesize' in entry['attributes'] and entry['attributes']['convertedfilesize'] < int(self.largefilesizelimit) or 'convertedfilesize' not in entry['attributes'] and entry['attributes']['filesize'] < int(self.largefilesizelimit):
+                        if 'convertedfilesize' in entry['attributes'] and entry['attributes']['convertedfilesize'] < int(self.dedupelargefilesizelimit) or 'convertedfilesize' not in entry['attributes'] and entry['attributes']['filesize'] < int(self.dedupelargefilesizelimit):
                             assignedstreamkey= self.dedupestreamkey
                         else:
                             assignedstreamkey= self.largefilededupestreamkey

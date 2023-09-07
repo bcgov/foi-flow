@@ -55,6 +55,7 @@ export default function AttachmentModal({
   bcgovcode,
   existingDocuments=[],
   divisions=[],
+  replacementfiletypes=[],
   totalUploadedRecordSize=0
 }) {
 
@@ -76,11 +77,11 @@ export default function AttachmentModal({
     const recordFormats = useSelector((state) => state.foiRequests.recordFormats)
     useEffect(() => {
       setMimeTypes(multipleFiles ?
-        (uploadFor === 'attachment' ? [...recordFormats, ...MimeTypeList.additional] : recordFormats)
+        (uploadFor === 'attachment' ? [...recordFormats, ...MimeTypeList.additional] : (uploadFor === 'record' && (modalFor==="replace" || modalFor === "replaceattachment") ? replacementfiletypes: recordFormats))
         : MimeTypeList.stateTransition);
     }, [recordFormats])
     const [mimeTypes, setMimeTypes] = useState(multipleFiles ?
-      (uploadFor === 'attachment' ? [...recordFormats, ...MimeTypeList.additional] : recordFormats)
+      (uploadFor === 'attachment' ? [...recordFormats, ...MimeTypeList.additional] : (uploadFor === 'record' && (modalFor==="replace" || modalFor === "replaceattachment") ? replacementfiletypes: recordFormats))
       : MimeTypeList.stateTransition);
     const maxFileSize = uploadFor === 'record' ? MaxFileSizeInMB.totalFileSize : multipleFiles ? MaxFileSizeInMB.attachmentLog : MaxFileSizeInMB.stateTransition;
     const totalFileSize = multipleFiles ? MaxFileSizeInMB.totalFileSize : MaxFileSizeInMB.stateTransition;
@@ -92,7 +93,6 @@ export default function AttachmentModal({
     const [tagValue, setTagValue] = useState(uploadFor === 'record' ? "" : "general");
     const attchmentFileNameList = attachmentsArray.map(_file => _file.filename.toLowerCase());
     const totalRecordUploadLimit= TOTAL_RECORDS_UPLOAD_LIMIT ;
-    const [recordUploadError, setRecordUploadError] = useState(true);
 
     useEffect(() => {
       parseFileName(attachment);
@@ -117,9 +117,9 @@ export default function AttachmentModal({
     const validateFilename = (fname) => {
       let rg1 = /^[^\/:*?"<>|]+$/; // forbidden characters  / : * ? " < > |
       let rg2 = /^\./; // cannot start with dot (.)
-      let rg3 = /^(nul|prn|con|lpt\d|com\d)(.|$)/i; // forbidden file names
+      //let rg3 = /^(nul|prn|con|lpt\d|com\d)(.|$)/i; // forbidden file names
 
-      return fname && rg1.test(fname) && !rg2.test(fname) && !rg3.test(fname);
+      return fname && rg1.test(fname) && !rg2.test(fname);
     };
 
     const containDuplicate = (fname) => {
@@ -154,10 +154,6 @@ export default function AttachmentModal({
 
     const updateFilesCb = (_files, _errorMessage) => {
       setFiles(_files);
-      if(_errorMessage?.length > 0)
-        setRecordUploadError(true);
-      else
-        setRecordUploadError(false);
     }
     const handleClose = () => {
         if ((files.length > 0 && files !== existingDocuments) || (modalFor === 'rename' && attachment.filename !== (newFilename+"."+extension))) {
@@ -186,7 +182,7 @@ export default function AttachmentModal({
         let fileInfoList = [];
 
         let fileStatusTransition = "";
-        if (modalFor === 'replace') {
+        if (modalFor === 'replace' || modalFor === "replaceattachment") {
           fileStatusTransition = attachment?.category;
         } else if (uploadFor === "record") {
           fileStatusTransition = divisions.find(division => division.divisionid === tagValue).divisionname;
@@ -213,10 +209,16 @@ export default function AttachmentModal({
       switch(modalFor.toLowerCase()) { 
         case "add":
           return {title: "Add Attachment", body: ""};
+
+        case "replaceattachment":
+          if (uploadFor === 'record') {
+            _message = {title: "Replace Records", body:<>Replace the existing record with a reformatted or updated version of the same record.<br></br>The original file that was uploaded will still be available for download.</> }
+          }
+          return _message;
         case "replace":
           let _message = {};
             if (uploadFor === 'record') {
-              _message = {title: "Replace Records", body:<>Replace record with manually converted PDF of the same document.<br></br>The original file will still be available for download.</> }
+              _message = {title: "Replace Records", body:<>Replace the existing record with a reformatted or updated version of the same record.<br></br>The original file that was uploaded will still be available for download.</> }
             } else if (attachment) {
               switch(attachment.category.toLowerCase()) {
                 case StateTransitionCategories.cfrreview.name: 
@@ -263,11 +265,8 @@ export default function AttachmentModal({
       } else if (files.length === 0 && existingDocuments.length === 0) {
         return true;
       } else if (modalFor === 'add') {
-        if(recordUploadError)
-          return true;
-        else
-          return tagValue === "";
-      } else if (modalFor === 'replace') {
+        return tagValue === "";
+      } else if (modalFor === 'replace' || modalFor === 'replaceattachment') {
         return false;
       }
     }
@@ -296,12 +295,12 @@ export default function AttachmentModal({
                 </span>                
               </div>
               {
-                (['replace','add'].includes(modalFor)) ?
+                (['replaceattachment','replace','add'].includes(modalFor)) ?
                 <FileUpload 
                   attachment={attachment}  
                   attchmentFileNameList={attchmentFileNameList}  
                   multipleFiles={multipleFiles} 
-                  mimeTypes={mimeTypes} 
+                  mimeTypes={modalFor === "replaceattachment"? ['application/pdf','.pdf']: mimeTypes} 
                   maxFileSize={maxFileSize} 
                   totalFileSize={totalFileSize} 
                   updateFilesCb={updateFilesCb}

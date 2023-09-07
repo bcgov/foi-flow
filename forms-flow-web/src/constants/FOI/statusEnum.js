@@ -1,20 +1,22 @@
 const StateList = Object.freeze({
     unopened: [{status: "Unopened", isSelected: false}, {status:"Intake in Progress", isSelected: false}],
-    intakeinprogress: [{status:"Intake in Progress", isSelected: false}, {status: "Open", isSelected: false}, {status: "Redirect", isSelected: false}, {status: "Closed", isSelected: false}],
+    intakeinprogress: [{status:"Intake in Progress", isSelected: false}, {status: "Open", isSelected: false}, {status:"Peer Review", isSelected: false}, {status: "Redirect", isSelected: false}, {status: "Closed", isSelected: false}],
     redirect: [{status: "Redirect", isSelected: false}, {status:"Intake in Progress", isSelected: false}, {status: "Closed", isSelected: false}],
-    open: [{status: "Open", isSelected: false}, {status: "Call For Records", isSelected: false}, {status: "Closed", isSelected: false}],
+    open: [{status: "Open", isSelected: false}, {status: "Call For Records", isSelected: false}, {status:"Peer Review", isSelected: false},{status: "Closed", isSelected: false}],
     callforrecords: [{status: "Call For Records", isSelected: false}, {status: "Open", isSelected: false}, {status: "Closed", isSelected: false}],
     feeassessed: [{status: "Fee Estimate", isSelected: false}, {status: "On Hold", isSelected: false}, {status: "Call For Records", isSelected: false}, {status: "Closed", isSelected: false}],
     feeassessedforpersonal: [{status: "Fee Estimate", isSelected: false}, {status: "Call For Records", isSelected: false}, {status: "Closed", isSelected: false}],
     onhold: [{status: "On Hold", isSelected: false}, {status: "Call For Records", isSelected: false}, {status: "Closed", isSelected: false}],
     deduplication: [{status: "Deduplication", isSelected: false}, {status: "Harms Assessment", isSelected: false}, {status: "Records Review", isSelected: false}, {status: "Closed", isSelected: false}],
     harms: [{status: "Harms Assessment", isSelected: false}, {status: "Closed", isSelected: false}],
-    consult: [{status: "Consult", isSelected: false}, {status: "Records Review", isSelected: false}, {status: "Ministry Sign Off", isSelected: false}, {status: "Closed", isSelected: false}],
-    review: [{status: "Records Review", isSelected: false}, {status: "Call For Records", isSelected: false}, {status: "Consult", isSelected: false}, {status: "Ministry Sign Off", isSelected: false}, {status: "Response", isSelected: false}, {status: "Closed", isSelected: false}],
+    consult: [{status: "Consult", isSelected: false}, {status: "Records Review", isSelected: false}, {status: "Ministry Sign Off", isSelected: false}, {status:"Peer Review", isSelected: false}, {status: "Closed", isSelected: false}],
+    review: [{status: "Records Review", isSelected: false}, {status: "Call For Records", isSelected: false}, {status: "Consult", isSelected: false}, {status: "Ministry Sign Off", isSelected: false}, {status:"Peer Review", isSelected: false}, {status: "Response", isSelected: false}, {status: "Closed", isSelected: false}],
     signoff: [{status: "Ministry Sign Off", isSelected: false}, {status: "Closed", isSelected: false}],
-    response: [{status: "Response", isSelected: false}, {status: "On Hold", isSelected: false}, {status: "Records Review", isSelected: false}, {status: "Closed", isSelected: false}],
-    responseforpersonal: [{status: "Response", isSelected: false}, {status: "Records Review", isSelected: false}, {status: "Closed", isSelected: false}],
-});
+    response: [{status: "Response", isSelected: false}, {status: "On Hold", isSelected: false}, {status: "Records Review", isSelected: false}, {status:"Peer Review", isSelected: false}, {status: "Closed", isSelected: false}],
+    responseforpersonal: [{status: "Response", isSelected: false}, {status: "Records Review", isSelected: false}, {status:"Peer Review", isSelected: false}, {status: "Closed", isSelected: false}],
+    //peerreview: [{status:"Peer Review", isSelected: false},{status:"Intake in Progress", isSelected: false}, {status: "Open", isSelected: false},{status: "Records Review", isSelected: false},{status: "Consult", isSelected: false},{status: "Response", isSelected: false}],
+    peerreview: [{status:"Peer Review", isSelected: false}]
+  });
 
 const MinistryStateList = Object.freeze({
     unopened: [{status: "Unopened", isSelected: false}],
@@ -32,12 +34,13 @@ const MinistryStateList = Object.freeze({
     signoff: [{status: "Ministry Sign Off", isSelected: false}, {status: "Records Review", isSelected: false}, {status: "Response", isSelected: false}],
     response: [{status: "Response", isSelected: false}],
     closed: [{status: "Closed", isSelected: false}],
+    peerreview: [{status: "Peer Review", isSelected: false}],
 });
 
 const StateEnum = Object.freeze({
     open: {name: "Open", id: 1},
     callforrecords: {name: "Call For Records", id: 2},
-    callforrecordsoverdue: {name: "Call For Records Overdue", id: 16},
+    callforrecordsoverdue: {name: "Call For Records Overdue", id: 17},
     closed: {name: "Closed", id: 3},
     redirect: {name: "Redirect", id: 4},
     unopened: {name: "Unopened", id: 5},
@@ -50,7 +53,8 @@ const StateEnum = Object.freeze({
     deduplication: {name: "Deduplication", id: 12},
     harms: {name: "Harms Assessment", id: 13},
     response: {name: "Response", id: 14},
-    archived: {name: "Archived", id: 15}
+    archived: {name: "Archived", id: 15},
+    peerreview: {name: "Peer Review", id: 16}
 });
 
 const StateTransitionCategories = Object.freeze({
@@ -215,6 +219,13 @@ const AttachmentCategories = Object.freeze({
       tags: ["extensions"],
       display: "Extensions",
       bgcolor: "#1A1A1A",
+      type: ["tag"],
+    },
+	{
+      name: "ministrysignoff",
+      tags: ["ministrysignoff"],
+      display: "Ministry Sign Off",
+      bgcolor: "#4B296B",
       type: ["tag"],
     },
     { // transition: Response -> On hold
