@@ -14,7 +14,7 @@ const sortAttachmentsByLastModified = (attachments) =>
       new Date(b?.attributes?.lastmodified)
   );
 
-export const getPDFFilePath = (item, conversionFormats) => {
+export const getPDFFilePath = (item) => {
   let pdffilepath = item.s3uripath;
   let pdffilename = item.filename;
 
@@ -31,11 +31,7 @@ export const getPDFFilePath = (item, conversionFormats) => {
   return [pdffilepath, pdffilename];
 };
 
-function arrangeAttachments(
-  attachments,
-  parentDocumentMasterId,
-  conversionFormats
-) {
+function arrangeAttachments(attachments, parentDocumentMasterId) {
   const attachmentsMap = {};
   const arrangedAttachments = [];
 
@@ -61,18 +57,14 @@ function arrangeAttachments(
 
   // Start arranging attachments from the root level
   arrangeChildren(parentDocumentMasterId);
-  getUpdatedRecords(arrangedAttachments, conversionFormats, true);
-  return getUpdatedRecords(arrangedAttachments, conversionFormats, true);
+  getUpdatedRecords(arrangedAttachments, true);
+  return getUpdatedRecords(arrangedAttachments, true);
 }
 
 // Get records with only necessary fields
-export const getUpdatedRecords = (
-  _records,
-  conversionFormats,
-  isattachment = false
-) => {
+export const getUpdatedRecords = (_records, isattachment = false) => {
   return _records.map((_record) => {
-    const [filepath, filename] = getPDFFilePath(_record, conversionFormats);
+    const [filepath, filename] = getPDFFilePath(_record);
     const deduplicatedAttachments =
       _record?.attachments?.length > 0
         ? removeDuplicateFiles(_record.attachments)
@@ -91,11 +83,7 @@ export const getUpdatedRecords = (
       divisions: _record.attributes.divisions,
       divisionids: _record.attributes.divisions.map((d) => d.divisionid),
       attachments: !isattachment
-        ? arrangeAttachments(
-            sortedAttachments,
-            _record.documentmasterid,
-            conversionFormats
-          )
+        ? arrangeAttachments(sortedAttachments, _record.documentmasterid)
         : undefined,
     };
     return _recordObj;
