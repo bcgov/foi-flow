@@ -50,6 +50,7 @@ class FOIMinistryRequest(db.Model):
     startdate = db.Column(db.DateTime, nullable=False,default=datetime.now)
     duedate = db.Column(db.DateTime, nullable=False)
     cfrduedate = db.Column(db.DateTime, nullable=True)
+    originalldd = db.Column(db.DateTime, nullable=True)
     assignedgroup = db.Column(db.String(250), unique=False, nullable=True)
     assignedto = db.Column(db.String(120), ForeignKey('FOIAssignees.username'), unique=False, nullable=True)
                 
@@ -65,6 +66,7 @@ class FOIMinistryRequest(db.Model):
     axisrequestid = db.Column(db.String(120), nullable=True)
     requestpagecount = db.Column(db.String(20), nullable=True)
     linkedrequests = db.Column(JSON, unique=False, nullable=True)
+    identityverified = db.Column(JSON, unique=False, nullable=True)
     
 
     #ForeignKey References
@@ -160,11 +162,11 @@ class FOIMinistryRequest(db.Model):
         if group is None:
             _ministryrequestids = _session.query(distinct(FOIMinistryRequest.foiministryrequestid)).filter(FOIMinistryRequest.isactive == True).all()        
         elif (group == IAOTeamWithKeycloackGroup.flex.value):
-            _ministryrequestids = _session.query(distinct(FOIMinistryRequest.foiministryrequestid)).filter(and_(FOIMinistryRequest.isactive == True), and_(and_(FOIMinistryRequest.assignedgroup == group),and_(FOIMinistryRequest.requeststatusid.in_([1,2,3,12,13,7,8,9,10,11,14])))).all()
+            _ministryrequestids = _session.query(distinct(FOIMinistryRequest.foiministryrequestid)).filter(and_(FOIMinistryRequest.isactive == True), and_(and_(FOIMinistryRequest.assignedgroup == group),and_(FOIMinistryRequest.requeststatusid.in_([1,2,3,12,13,7,8,9,10,11,14,16])))).all()
         elif (group in ProcessingTeamWithKeycloackGroup.list()):
-            _ministryrequestids = _session.query(distinct(FOIMinistryRequest.foiministryrequestid)).filter(and_(FOIMinistryRequest.isactive == True), and_(and_(FOIMinistryRequest.assignedgroup == group),and_(FOIMinistryRequest.requeststatusid.in_([1,2,3,7,8,9,10,11,14])))).all()           
+            _ministryrequestids = _session.query(distinct(FOIMinistryRequest.foiministryrequestid)).filter(and_(FOIMinistryRequest.isactive == True), and_(and_(FOIMinistryRequest.assignedgroup == group),and_(FOIMinistryRequest.requeststatusid.in_([1,2,3,7,8,9,10,11,14,16])))).all()           
         else:
-            _ministryrequestids = _session.query(distinct(FOIMinistryRequest.foiministryrequestid)).filter(and_(FOIMinistryRequest.isactive == True), or_(and_(FOIMinistryRequest.assignedgroup == group),and_(FOIMinistryRequest.assignedministrygroup == group,or_(FOIMinistryRequest.requeststatusid.in_([2,7,9,8,10,11,12,13,14]))))).all()
+            _ministryrequestids = _session.query(distinct(FOIMinistryRequest.foiministryrequestid)).filter(and_(FOIMinistryRequest.isactive == True), or_(and_(FOIMinistryRequest.assignedgroup == group),and_(FOIMinistryRequest.assignedministrygroup == group,or_(FOIMinistryRequest.requeststatusid.in_([2,7,9,8,10,11,12,13,14,16]))))).all()
 
         _requests = []
         ministryrequest_schema = FOIMinistryRequestSchema()
@@ -183,7 +185,8 @@ class FOIMinistryRequest(db.Model):
            _request["linkedrequests"] = ministryrequest['linkedrequests']
            _request["currentState"] = ministryrequest["requeststatus.name"]
            _request["dueDate"] = ministryrequest["duedate"]
-           _request["cfrDueDate"] = ministryrequest["cfrduedate"]
+           _request["cfrDueDate"] = ministryrequest["cfrduedate"] 
+           _request["originalDueDate"] = ministryrequest["originalldd"] 
            _request["receivedDate"] = _receiveddate.strftime('%Y %b, %d')
            _request["receivedDateUF"] =str(_receiveddate)
            _request["assignedGroup"]=ministryrequest["assignedgroup"]
@@ -195,6 +198,7 @@ class FOIMinistryRequest(db.Model):
            _request["id"] = parentrequest.foirequestid
            _request["ministryrequestid"] = ministryrequest['foiministryrequestid']
            _request["applicantcategory"]=parentrequest.applicantcategory.name
+           _request["identityverified"] = ministryrequest['identityverified']
            _requests.append(_request)
         
         return _requests
@@ -687,7 +691,7 @@ class FOIMinistryRequest(db.Model):
                             FOIMinistryRequest.assignedgroup == group,
                             and_(
                                 FOIMinistryRequest.assignedministrygroup == group,
-                                FOIMinistryRequest.requeststatusid.in_([2,7,9,8,10,11,12,13,14])
+                                FOIMinistryRequest.requeststatusid.in_([2,7,9,8,10,11,12,13,14,16])
                             )
                         )
                     )
@@ -1302,5 +1306,5 @@ class FOIMinistryRequestSchema(ma.Schema):
                 'foirequest.receivedmodeid','requeststatus.requeststatusid','requeststatus.name','programarea.bcgovcode',
                 'programarea.name','foirequest_id','foirequestversion_id','created_at','updated_at','createdby','assignedministryperson',
                 'assignedministrygroup','cfrduedate','closedate','closereasonid','closereason.name',
-                'assignee.firstname','assignee.lastname','ministryassignee.firstname','ministryassignee.lastname', 'axisrequestid', 'axissyncdate', 'requestpagecount', 'linkedrequests')
+                'assignee.firstname','assignee.lastname','ministryassignee.firstname','ministryassignee.lastname', 'axisrequestid', 'axissyncdate', 'requestpagecount', 'linkedrequests','identityverified','originalldd')
     

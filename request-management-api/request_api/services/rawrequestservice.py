@@ -15,6 +15,7 @@ from request_api.services.rawrequest.rawrequestservicegetter import rawrequestse
 from request_api.exceptions import BusinessException, Error
 from request_api.models.default_method_result import DefaultMethodResult
 from request_api.models.FOIRawRequestWatchers import FOIRawRequestWatcher
+from request_api.services.foirequest.requestserviceconfigurator import requestserviceconfigurator 
 import logging
 
 class rawrequestservice:
@@ -126,11 +127,14 @@ class rawrequestservice:
     def getstatus(self, foirequest):
         statusid = foirequest["requeststatusid"] if "requeststatusid" in foirequest else None
         if statusid is not None:
-            try:           
-                if statusid== 4:                    
-                    return 'Redirect'
-                if statusid == 3:                    
-                    return 'Closed'    
+            try:
+                return requestserviceconfigurator().getstatusname(statusid)           
+                # if statusid== 4:                    
+                #     return 'Redirect'
+                # if statusid == 3:                    
+                #     return 'Closed' 
+                # if statusid == 16:                    
+                #     return 'Peer Review'   
             except  KeyError:
                 print("Key Error on requeststatusid, ignore will be intake in Progress")
         return 'Intake in Progress'

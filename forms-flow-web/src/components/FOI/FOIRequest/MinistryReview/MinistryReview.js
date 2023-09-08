@@ -53,6 +53,7 @@ import Loading from "../../../../containers/Loading";
 import ExtensionDetails from "./ExtensionDetails";
 import clsx from "clsx";
 import { getMinistryBottomTextMap, alertUser, getHeaderText } from "./utils";
+import { isMinistryLogin } from '../../../../helper/FOI/helper';
 import DivisionalTracking from "../DivisionalTracking";
 import HomeIcon from '@mui/icons-material/Home';
 import { RecordsLog } from '../../customComponents/Records';
@@ -106,7 +107,12 @@ const MinistryReview = React.memo(({ userDetail }) => {
 
   const [_currentrequestStatus, setcurrentrequestStatus] = React.useState("");
   const [_tabStatus, settabStatus] = React.useState(requestState);
+  const userGroups = userDetail?.groups?.map(group => group.slice(1));
+  let isMinistryUser = isMinistryLogin(userGroups);
   //gets the request detail from the store
+  const IsDivisionalCoordinator = () => {
+    return userDetail?.role?.includes("DivisionalCoordinator");
+  }
 
   let requestDetails = useSelector(
     (state) => state.foiRequests.foiMinistryViewRequestDetail
@@ -117,6 +123,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
   let requestAttachments = useSelector(
     (state) => state.foiRequests.foiRequestAttachments.filter(
       attachment => {
+        if (isMinistryUser && attachment?.category?.toLowerCase() === 'applicant' && requestDetails?.requestType?.toLowerCase() === 'personal') return false
         return ['feeassessed-onhold', 'fee estimate - payment receipt', 'response-onhold', 'fee balance outstanding - payment receipt']
         .indexOf(attachment.category.toLowerCase()) === -1
       }
@@ -380,6 +387,9 @@ const MinistryReview = React.memo(({ userDetail }) => {
     case StateEnum.response.name:
       foitabheaderBG = "foitabheadercollection foitabheaderResponseBG";
       break;
+    case StateEnum.peerreview.name:
+      foitabheaderBG = "foitabheadercollection foitabheaderPeerreviewBG";
+      break;
     default:
       foitabheaderBG = "foitabheadercollection foitabheaderdefaultBG";
       break;
@@ -490,6 +500,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
         isMinistryCoordinator={true}
         isValidationError={isValidationError}
         requestType={requestDetails?.requestType}
+        isDivisionalCoordinator={IsDivisionalCoordinator()}
       />
     );
 
@@ -848,6 +859,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
                   isMinistryCoordinator={true}
                   bcgovcode={JSON.parse(bcgovcode)}
                   setRecordsUploading={setRecordsUploading}
+                  recordsTabSelect={tabLinksStatuses.Records.active}
                 />
               </>
             ) : (

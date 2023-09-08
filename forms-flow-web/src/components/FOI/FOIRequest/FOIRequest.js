@@ -802,6 +802,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
               isMinistryCoordinator={false}
               isValidationError={isValidationError}
               requestType={requestDetails?.requestType}
+              isDivisionalCoordinator={false}
             />
           </div>
 
@@ -1254,6 +1255,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
                   bcgovcode={JSON.parse(bcgovcode)}
                   setRecordsUploading={setRecordsUploading}
                   divisions={requestDetails.divisions}
+                  recordsTabSelect={tabLinksStatuses.Records.active}
                 />
               </>
             }

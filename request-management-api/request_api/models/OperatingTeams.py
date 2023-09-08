@@ -27,20 +27,19 @@ class OperatingTeam(db.Model):
         return teams
     
     @classmethod
-    def gettype(cls, team):    
-        team_type = None
+    def getteam(cls, team):    
         try:            
-            sql = """select type from "OperatingTeams" ot 
-                    where replace(lower(name),' ','') = replace(:team,' ','')"""
+            sql = """select type, name from "OperatingTeams" ot 
+                    where replace(lower(name),' ','') = replace(lower(:team),' ','')"""
             rs = db.session.execute(text(sql), {'team': team})
             for row in rs:
-                team_type = row["type"]
+                return {'type': row["type"], 'name': row['name']}
         except Exception as ex:
             logging.error(ex)
             raise ex
         finally:
             db.session.close()
-        return team_type
+        return None
     
 
 class OperatingTeamSchema(ma.Schema):

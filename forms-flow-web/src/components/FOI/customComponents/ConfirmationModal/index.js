@@ -100,13 +100,14 @@ export default function ConfirmationModal({requestId, openModal, handleModal, st
     } 
 
     const amountDue = cfrFeeData?.totalamountdue;
+    const estimatedTotalDue = cfrFeeData?.estimatedtotaldue;
     const [mailed, setMailed] = useState(false);
     const handleMailedChange = (event) => {
       setMailed(event.target.checked);
       setDisableSaveBtn(!event.target.checked);
       saveRequestObject.isofflinepayment=event.target.checked;
     };
-   
+    
 
     React.useEffect(() => {
       setDisableSaveBtn(state.toLowerCase() === StateEnum.closed.name.toLowerCase());
@@ -118,6 +119,7 @@ export default function ConfirmationModal({requestId, openModal, handleModal, st
 
     const isBtnDisabled = () => {
       if ((state.toLowerCase() === StateEnum.feeassessed.name.toLowerCase() && cfrStatus === 'init')
+            || (state.toLowerCase() === StateEnum.feeassessed.name.toLowerCase() && estimatedTotalDue === 0)
             || (state.toLowerCase() === StateEnum.onhold.name.toLowerCase() && amountDue === 0)
             || (state.toLowerCase() === StateEnum.onhold.name.toLowerCase() && cfrStatus !== 'approved')
             || (state.toLowerCase() === StateEnum.onhold.name.toLowerCase() && cfrStatus === 'approved' && !saveRequestObject.email && !mailed)
@@ -178,7 +180,7 @@ export default function ConfirmationModal({requestId, openModal, handleModal, st
       handleModal(true, fileInfoList, files);
     }
 
-    let message = getMessage(saveRequestObject, state, axisRequestId, currentState, requestId, cfrStatus,allowStateChange,isAnyAmountPaid);
+    let message = getMessage(saveRequestObject, state, axisRequestId, currentState, requestId, cfrStatus,allowStateChange,isAnyAmountPaid, estimatedTotalDue);
     const attchmentFileNameList = attachmentsArray?.map(_file => _file.filename);
 
     const getDaysRemaining = () => {
@@ -226,6 +228,9 @@ export default function ConfirmationModal({requestId, openModal, handleModal, st
           </div>
         );
       }
+      else if ((state.toLowerCase() !== StateEnum.feeassessed.name.toLowerCase() || cfrStatus !== 'init') && estimatedTotalDue <= 0) {
+        return null;
+      }
       else if ((state.toLowerCase() !== StateEnum.feeassessed.name.toLowerCase() || cfrStatus !== 'init')
                 && (state.toLowerCase() !== StateEnum.onhold.name.toLowerCase() && cfrStatus !== 'approved')) {
         return (
@@ -251,7 +256,6 @@ export default function ConfirmationModal({requestId, openModal, handleModal, st
           </table> : null }
           </>
         );
-
       }
     }
 

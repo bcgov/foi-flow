@@ -6,11 +6,11 @@
 }
 
 .foi-state-dropdown .MuiOutlinedInput-root {
-    color: white;
+    color: white !important;
 } 
 
 .foi-state-dropdown .MuiOutlinedInput-root .MuiSvgIcon-root {
-    color: white;
+    color: white !important;
 } 
 .foi-state-menuitem  {
     padding-left: 0px !important;
@@ -79,9 +79,13 @@
 }
 
 .response {
-    background-color: #020A80;
+    background-color: #07437F;
 }
 
 .closed {
     background-color: #1A1A1A;
+}
+
+.peerreview {
+    background-color: #096DD1;
 }

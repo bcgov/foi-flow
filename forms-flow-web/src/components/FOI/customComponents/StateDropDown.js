@@ -20,7 +20,8 @@ const StateDropDown = ({
   isValidationError,
   stateTransition,
   updateStateDropDown,
-  requestType
+  requestType,
+  isDivisionalCoordinator
 }) => {
   const _isMinistryCoordinator = isMinistryCoordinator;
 
@@ -97,6 +98,25 @@ const StateDropDown = ({
         return _stateList.unopened;
       case StateEnum.intakeinprogress.name.toLowerCase():
         return _stateList.intakeinprogress;
+      case StateEnum.peerreview.name.toLowerCase():
+        if(!isMinistryCoordinator){
+          //const currentStatusVersion = stateTransition[0]?.version; 
+          const previousState = stateTransition?.length > 0 && stateTransition[1]?.status; 
+          if(previousState === StateEnum.intakeinprogress.name){
+            return _stateList.intakeinprogress;
+          }
+          else if(previousState === StateEnum.open.name)
+            return _stateList.open;
+          else if(previousState === StateEnum.review.name)
+            return _stateList.review;
+          else if(previousState === StateEnum.consult.name)
+            return _stateList.consult;
+          else if(previousState === StateEnum.response.name)
+            return _stateList.response;
+        }
+        else{
+          return _stateList.peerreview;
+        }
       case StateEnum.open.name.toLowerCase():
         return _stateList.open;
       case StateEnum.closed.name.toLowerCase():
@@ -179,6 +199,7 @@ const StateDropDown = ({
       input={<Input />}
       variant="outlined"
       fullWidth
+      disabled={isDivisionalCoordinator}
     >
       {menuItems}
     </TextField>

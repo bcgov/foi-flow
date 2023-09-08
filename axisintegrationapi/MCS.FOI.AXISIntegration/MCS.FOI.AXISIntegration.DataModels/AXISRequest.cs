@@ -135,6 +135,9 @@ namespace MCS.FOI.AXISIntegration.DataModels
         [DataMember(Name = "Extensions")]
         public List<Extension> Extensions { get; set; }
 
+        [DataMember(Name = "identityVerified")]
+        public string IdentityVerified { get; set; }
+
     }
 
     [DataContract]

@@ -6,7 +6,7 @@ import AttachmentModal from '../Attachments/AttachmentModal';
 import Loading from "../../../../containers/Loading";
 import { getOSSHeaderDetails, saveFilesinS3, getFileFromS3, postFOIS3DocumentPreSignedUrl, getFOIS3DocumentPreSignedUrl, completeMultiPartUpload } from "../../../../apiManager/services/FOI/foiOSSServices";
 import { saveFOIRequestAttachmentsList, replaceFOIRequestAttachment, saveNewFilename, deleteFOIRequestAttachment } from "../../../../apiManager/services/FOI/foiAttachmentServices";
-import { fetchFOIRecords, saveFOIRecords, deleteFOIRecords, retryFOIRecordProcessing,replaceFOIRecordProcessing, deleteReviewerRecords, getRecordFormats, triggerDownloadFOIRecordsForHarms, fetchPDFStitchedRecordForHarms, checkForRecordsChange } from "../../../../apiManager/services/FOI/foiRecordServices";
+import { fetchFOIRecords, saveFOIRecords, updateFOIRecords, retryFOIRecordProcessing,replaceFOIRecordProcessing, deleteReviewerRecords, getRecordFormats, triggerDownloadFOIRecordsForHarms, fetchPDFStitchedRecordForHarms, checkForRecordsChange } from "../../../../apiManager/services/FOI/foiRecordServices";
 import { StateTransitionCategories, AttachmentCategories } from '../../../../constants/FOI/statusEnum'
 import { RecordsDownloadList, RecordDownloadCategory,MimeTypeList } from '../../../../constants/FOI/enum';
 import { addToFullnameList, getFullnameList, ConditionalComponent, isrecordtimeout } from '../../../../helper/FOI/helper';
@@ -36,10 +36,11 @@ import SearchIcon from "@material-ui/icons/Search";
 import InputAdornment from "@mui/material/InputAdornment";
 import InputBase from "@mui/material/InputBase";
 import Paper from "@mui/material/Paper";
+import Tooltip from '@mui/material/Tooltip';
 import { toast } from "react-toastify";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCheckCircle, faClone } from '@fortawesome/free-regular-svg-icons';
-import {faSpinner, faExclamationCircle, faBan, faArrowTurnUp, faHistory } from '@fortawesome/free-solid-svg-icons';import Dialog from '@material-ui/core/Dialog';
+import { faCheckCircle, faClone, faTrashAlt, faTrashCan } from '@fortawesome/free-regular-svg-icons';
+import {faSpinner, faExclamationCircle, faBan, faArrowTurnUp, faHistory, faTrash, faPenToSquare, faLinkSlash } from '@fortawesome/free-solid-svg-icons';import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
@@ -102,7 +103,11 @@ const useStyles = makeStyles((_theme) => ({
     display: "flex"
   },
   filename: {
-    fontWeight: "bold"
+    fontWeight: "bold",
+    overflow: "hidden",
+    textOverflow: "ellipsis",
+    whiteSpace: "nowrap",
+    maxWidth: "79%"
   },
   divider: {
     marginTop: "-2px",
@@ -118,7 +123,7 @@ const useStyles = makeStyles((_theme) => ({
   },
   statusIcons: {
     height: "20px",
-    paddingRight:"10px"
+    paddingRight:"10px",
   },
   attachmentIcon: {
     height: "20px",
@@ -150,7 +155,8 @@ export const RecordsLog = ({
   iaoassignedToList,
   ministryAssignedToList,
   isMinistryCoordinator,
-  setRecordsUploading
+  setRecordsUploading,
+  recordsTabSelect
 }) => {
 
   let recordsObj = useSelector(
@@ -184,6 +190,30 @@ export const RecordsLog = ({
   }, [])
 
   const conversionFormats = useSelector((state) => state.foiRequests.conversionFormats)
+
+
+  useEffect(() => {
+    if (recordsTabSelect && conversionFormats?.length < 1) {
+      console.log("match");
+      toast.error(
+        "Temporarily unable to save your request. Please try again in a few minutes.",
+        {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: true,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+        }
+      );
+
+     }
+  }, [recordsTabSelect, conversionFormats])
+
+ 
+
+
   const divisionFilters = [...new Map(recordsObj?.records?.reduce((acc, file) => [...acc, ...new Map(file?.attributes?.divisions?.map(division => [division?.divisionid, division]))], [])).values()]
   if (divisionFilters?.length > 0) divisionFilters?.push(
     {divisionid: -1, divisionname: "All"},
@@ -194,6 +224,8 @@ export const RecordsLog = ({
 
   const [openModal, setModal] = useState(false);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [divisionsModalOpen, setDivisionsModalOpen] = useState(false);
+  const [divisionModalTagValue, setDivisionModalTagValue] = useState(-1)
   const dispatch = useDispatch();
   const [isAttachmentLoading, setAttachmentLoading] = useState(false);
   const [isRecordsLoading, setRecordsLoading] = useState(false);
@@ -209,6 +241,7 @@ export const RecordsLog = ({
   const [isDownloadInProgress, setIsDownloadInProgress] = useState(false)
   const [isDownloadReady, setIsDownloadReady] = useState(false)
   const [isDownloadFailed, setIsDownloadFailed] = useState(false)
+  const [isAllSelected, setIsAllSelected] = useState(false)
 
 
   useEffect(() => {
@@ -256,14 +289,30 @@ export const RecordsLog = ({
   const handleContinueModal = (value, fileInfoList, files) => {
     setModal(false);
     if (modalFor === 'delete' && value) {
-      //const documentId = ministryId ? updateAttachment.foiministrydocumentid : updateAttachment.foidocumentid;
-      if (updateAttachment.isattachment) {
-          dispatch(deleteReviewerRecords({filepaths: [updateAttachment.filepath], ministryrequestid: ministryId},(err, _res) => {
+      var deleteRecords = [];
+      var deleteAttachemnts = [];
+      if (updateAttachment) {
+        deleteRecords.push((({ recordid, documentmasterid, s3uripath }) => ({ recordid, documentmasterid, filepath: s3uripath }))(updateAttachment))
+      } else {
+        for (let record of records) {
+          if (record.isselected) {
+            deleteRecords.push((({ recordid, documentmasterid, s3uripath }) => ({ recordid, documentmasterid, filepath: s3uripath }))(record));
+          } else {
+            for (let attachment of record.attachments) {
+              if (attachment.isselected) {
+                deleteAttachemnts.push(attachment.filepath);
+              }
+            }
+          }
+        }
+      }
+      if (deleteRecords.length > 0) {
+        dispatch(updateFOIRecords(requestId, ministryId, {records: deleteRecords, isdelete: true}, (err, _res) => {
           dispatchRequestAttachment(err);
         }));
-      } else {
-        const recordId = updateAttachment.recordid;
-        dispatch(deleteFOIRecords(requestId, ministryId, recordId, (err, _res) => {
+      }
+      if (deleteAttachemnts.length > 0) {
+        dispatch(deleteReviewerRecords({filepaths: deleteAttachemnts, ministryrequestid: ministryId},(err, _res) => {
           dispatchRequestAttachment(err);
         }));
       }
@@ -801,7 +850,11 @@ export const RecordsLog = ({
 
 
   React.useEffect(() => {
-    setRecords(searchAttachments(_.cloneDeep(recordsObj.records), filterValue, searchValue));
+    if (divisionFilters.findIndex(f => f.divisionid === filterValue) > -1) {
+      setRecords(searchAttachments(_.cloneDeep(recordsObj.records), filterValue, searchValue));
+    } else {
+      setFilterValue(-1);
+    }
   },[filterValue, searchValue, recordsObj])
 
   const searchAttachments = (_recordsArray, _filterValue, _keywordValue) =>  {
@@ -820,8 +873,169 @@ export const RecordsLog = ({
         )
       }
     }
+    setIsAllSelected(false)
     return _recordsArray?.filter(filterFunction)
     }
+  
+  const handleSelectRecord = (record, e) => {
+    const newRecords = records.map((r, i) => {
+      if (record.isattachment) {
+        if (r.documentmasterid === record.rootdocumentmasterid) {
+          var newAttachments = r.attachments.map((a, j) => {
+            if (a.documentmasterid === record.documentmasterid) {
+              record.isselected = e.target.checked;
+              return record;
+            } else {
+              if (a.parentid === record.documentmasterid) {
+                if (e.target.checked) {
+                  a.isselected = true;
+                }
+              }
+              if (a.documentmasterid === record.parentid) {
+                if (!e.target.checked) {
+                  a.isselected = false;
+                }
+              }
+              return a;
+            }
+          });
+          r.attachments = newAttachments;
+          if (!e.target.checked) {
+            r.isselected = false
+          }
+          return r;
+        } else {
+          return r;
+        }
+      } else {
+        if (r.documentmasterid === record.documentmasterid) {
+          record.isselected = e.target.checked;
+          if (e.target.checked && record.attachments) {
+            for (let attachment of record.attachments) {
+              attachment.isselected = e.target.checked;
+            }
+          }
+          return record;
+        } else {
+          return r;
+        }
+      }
+    });
+    setRecords(newRecords);
+    setIsAllSelected(checkIsAllSelected())
+  }
+
+  const handleSelectAll = (e) => {
+    const newRecords = records.map((r, i) => {
+      r.isselected = e.target.checked;
+      if (r.attachments) {
+        var newAttachments = r.attachments.map((a, j) => {
+          a.isselected = e.target.checked;
+          return a;
+        });
+        r.attachments = newAttachments;
+      }
+      return r;
+    })
+    setRecords(newRecords);
+    setIsAllSelected(checkIsAllSelected())
+  }
+
+  const checkIsAllSelected = () => {
+    for (let record of records) {
+      if (!record.isselected) return false;
+      if (record.attachments) {
+        for (let attachment of record.attachments) {
+          if (!attachment.isselected) return false;
+        }
+      }
+    }
+    return true;
+  }
+
+  const checkIsAnySelected = () => {
+    for (let record of records) {
+      if (record.isselected) return true;
+      if (record.attachments) {
+        for (let attachment of record.attachments) {
+          if (attachment.isselected) return true;
+        }
+      }
+    }
+    return false;
+  }
+  
+  function intersection(setA, setB) {
+    const _intersection = new Set();
+    for (const elem of setB) {
+      if (setA.has(elem)) {
+        _intersection.add(elem);
+      }
+    }
+    return _intersection;
+  }
+  
+  const isUpdateDivisionsDisabled = () => {
+    var count = 0;
+    var selectedDivision = new Set();
+    for (let record of records) {
+      if (record.isselected) {
+        if (!record.isredactionready) {
+          return true;
+        }
+        count++;
+        if (selectedDivision.size === 0) {
+          record.attributes.divisions.forEach(d => selectedDivision.add(d.divisionid));
+        } else {
+          let int = intersection(selectedDivision, new Set(record.attributes.divisions.map(d => d.divisionid)));
+          if (int.size === 0) {
+            return true;
+          } else {
+            selectedDivision = int
+          }
+        }
+      }
+      if (!record.isselected && record.attachments) {
+        for (let attachment of record.attachments) {
+          if (attachment.isselected) return true;
+        }
+      }
+    }
+    // setDivisionToUpdate()
+    return count === 0;
+  }
+
+  const updateDivisions = () => {
+    setDivisionModalTagValue(-1)
+    setDivisionsModalOpen(false)
+    var updateRecords = [];
+    for (let record of records) {
+      if (record.isselected) {
+        if (record.attributes.divisions.length > 1 && record.attributes.divisions[0].divisionid !== filterValue) {
+          if (filterValue < 0) {
+            throw new Error("invalid filter value - need to select a single division")
+          }
+          for (var i = 1; i < record.attributes.divisions.length; i++) {            
+            if (record.attributes.divisions[i].divisionid === filterValue) {
+              let updateRecord = records.find(r => r.documentmasterid === record.attributes.divisions[i].duplicatemasterid);
+              updateRecords.push((({ recordid, documentmasterid, s3uripath }) => ({ recordid, documentmasterid, filepath: s3uripath }))(updateRecord));
+              updateRecords = updateRecords.concat(updateRecord.attachments?.map(a =>
+                (({ documentmasterid, s3uripath }) => ({ documentmasterid, filepath: s3uripath }))(a)
+              ));
+            }
+          }
+        } else {
+          updateRecords.push((({ recordid, documentmasterid, s3uripath }) => ({ recordid, documentmasterid, filepath: s3uripath }))(record));
+          updateRecords = updateRecords.concat(record.attachments?.map(a =>
+            (({ documentmasterid, s3uripath }) => ({ documentmasterid, filepath: s3uripath }))(a)
+          ));
+        }
+      }
+    }
+    dispatch(updateFOIRecords(requestId, ministryId, {records: updateRecords, divisions:[{divisionid: divisionModalTagValue}], isdelete: false}, (err, _res) => {
+      dispatchRequestAttachment(err);
+    }));
+  }
 
   return (
     <div className={classes.container}>
@@ -838,96 +1052,69 @@ export const RecordsLog = ({
             alignItems="flex-start"
             spacing={1}
           >
-            <Grid item xs={5}>
+            <Grid item xs={6}>
               <h1 className="foi-review-request-text foi-ministry-requestheadertext foi-records-request-text">
                 {getRequestNumber()}
               </h1>
             </Grid>
-            <Grid item xs={7}>
-              <span style={{float:'right', fontWeight:'bold'}}>
-              <div style={{paddingBottom: '5px'}}>Total Uploaded Size : {getReadableFileSize(totalUploadedRecordSize)}</div>
-              <div>Total Upload Limit : {getReadableFileSize(TOTAL_RECORDS_UPLOAD_LIMIT)}</div>
-              </span>
-            </Grid>
-          </Grid>
-          <Grid
-            container
-            direction="row"
-            justify="flex-start"
-            alignItems="flex-start"
-            spacing={1}
-          >
-            <ConditionalComponent condition={records?.filter(record => record.attachments?.length > 0).length > 0}>
+            
             <Grid item xs={3}>
-                <button
-                  className="btn addAttachment foi-export-button"
-                  variant="contained"
-                  onClick={() => setDeleteModalOpen(true)}
-                  color="primary"
-                >
-                  Remove Attachments
-                </button>
+              {hasDocumentsToDownload &&
+                <TextField
+                className="download-dropdown custom-select-wrapper foi-download-button"
+                id="download"
+                label={currentDownload === 0 ? "Download" : ""}
+                inputProps={{ "aria-labelledby": "download-label" }}
+              //   InputProps={{
+              //     startAdornment: isDownloadInProgress && <InputAdornment position="start">
+              //       {/* <CircularProgress class="download-progress-adornment"/> */}
+              //       {/* <CircularProgress/> */}
+              //       record.isredactionready ?
+              //       <FontAwesomeIcon icon={faCheckCircle} size='2x' color='#1B8103' className={classes.statusIcons}/>:
+              // record.failed ?
+              // <FontAwesomeIcon icon={faExclamationCircle} size='2x' color='#A0192F' className={classes.statusIcons}/>:
+              // <FontAwesomeIcon icon={faSpinner} size='2x' color='#FAA915' className={classes.statusIcons}/>
+              //       </InputAdornment>
+              //   }}
+                InputLabelProps={{ shrink: false }}
+                select
+                name="download"
+                value={currentDownload}
+                onChange={handleDownloadChange}
+                placeholder="Download"
+                variant="outlined"
+                size="small"
+                fullWidth
+              >
+                {recordsDownloadList.map((item, index) => {
+
+                  if (item.id !=0) {
+                    return (
+                        <MenuItem
+                          className="download-menu-item"
+                          key={item.id}
+                          value={index}
+                          disabled={item.disabled || conversionFormats?.length < 1}
+                          sx={{ display: 'flex' }}
+                        >
+                          {
+                            !item.disabled && (isDownloadReady ?
+                            <FontAwesomeIcon icon={faCheckCircle} size='2x' color='#1B8103' className={classes.statusIcons}/>:
+                            isDownloadFailed ?
+                            <FontAwesomeIcon icon={faExclamationCircle} size='2x' color='#A0192F' className={classes.statusIcons}/>:
+                            isDownloadInProgress ? <FontAwesomeIcon icon={faSpinner} size='2x' color='#FAA915' className={classes.statusIcons}/>:null)
+                          }
+                          {item.label}
+                        </MenuItem>
+                      // </>
+                    )
+                  }
+
+                } )}
+                </TextField>
+              }
 
             </Grid>
-            </ConditionalComponent>
-            <ConditionalComponent condition={hasDocumentsToDownload}>
-            <Grid item xs={3}>
-
-              <TextField
-              className="download-dropdown custom-select-wrapper foi-download-button"
-              id="download"
-              label={currentDownload === 0 ? "Download" : ""}
-              inputProps={{ "aria-labelledby": "download-label" }}
-            //   InputProps={{
-            //     startAdornment: isDownloadInProgress && <InputAdornment position="start">
-            //       {/* <CircularProgress class="download-progress-adornment"/> */}
-            //       {/* <CircularProgress/> */}
-            //       record.isredactionready ?
-            //       <FontAwesomeIcon icon={faCheckCircle} size='2x' color='#1B8103' className={classes.statusIcons}/>:
-            // record.failed ?
-            // <FontAwesomeIcon icon={faExclamationCircle} size='2x' color='#A0192F' className={classes.statusIcons}/>:
-            // <FontAwesomeIcon icon={faSpinner} size='2x' color='#FAA915' className={classes.statusIcons}/>
-            //       </InputAdornment>
-            //   }}
-              InputLabelProps={{ shrink: false }}
-              select
-              name="download"
-              value={currentDownload}
-              onChange={handleDownloadChange}
-              placeholder="Download"
-              variant="outlined"
-              size="small"
-              fullWidth
-            >
-              {recordsDownloadList.map((item, index) => {
-
-                if (item.id !=0) {
-                  return (
-                      <MenuItem
-                        className="download-menu-item"
-                        key={item.id}
-                        value={index}
-                        disabled={item.disabled}
-                        sx={{ display: 'flex' }}
-                      >
-                        {
-                          !item.disabled && (isDownloadReady ?
-                          <FontAwesomeIcon icon={faCheckCircle} size='2x' color='#1B8103' className={classes.statusIcons}/>:
-                          isDownloadFailed ?
-                          <FontAwesomeIcon icon={faExclamationCircle} size='2x' color='#A0192F' className={classes.statusIcons}/>:
-                          isDownloadInProgress ? <FontAwesomeIcon icon={faSpinner} size='2x' color='#FAA915' className={classes.statusIcons}/>:null)
-                        }
-                        {item.label}
-                      </MenuItem>
-                    // </>
-                  )
-                }
-
-              } )}
-            </TextField>
-
-            </Grid>
-            </ConditionalComponent>
             {/* <Grid item xs={2}>
               <ConditionalComponent condition={hasDocumentsToExport}>
                 <button
@@ -940,17 +1127,18 @@ export const RecordsLog = ({
                 </button>
               </ConditionalComponent>
             </Grid> */}
-            <Grid item xs={2}>
+            <Grid item xs={3}>
               {isMinistryCoordinator ?
                 <button
                   className={clsx("btn", "addAttachment", classes.createButton)}
                   variant="contained"
                   onClick={addAttachments}
                   color="primary"
+                  disabled = {conversionFormats?.length < 1}
                 >
                   + Upload Records
                 </button> :
-                (records?.length > 0 && DISABLE_REDACT_WEBLINK?.toLowerCase() =='false' && <a href={DOC_REVIEWER_WEB_URL + "/foi/" + ministryId}>
+                (records?.length > 0 && DISABLE_REDACT_WEBLINK?.toLowerCase() =='false' && <a href={DOC_REVIEWER_WEB_URL + "/foi/" + ministryId} target='_blank'>
                   <button
                     className={clsx("btn", "addAttachment", classes.createButton)}
                     variant="contained"
@@ -963,6 +1151,20 @@ export const RecordsLog = ({
               }
 
 
+            </Grid>
+          </Grid>
+          <Grid
+            container
+            direction="row"
+            justify="flex-start"
+            alignItems="flex-start"
+            spacing={1}
+          >            
+            <Grid item xs={7}>
+              <span style={{fontWeight:'bold'}}>
+              <div style={{paddingBottom: '5px'}}>Total Uploaded Size : {getReadableFileSize(totalUploadedRecordSize)}</div>
+              <div>Total Upload Limit : {getReadableFileSize(TOTAL_RECORDS_UPLOAD_LIMIT)}</div>
+              </span>
             </Grid>
             <Grid
               container
@@ -1092,8 +1294,8 @@ export const RecordsLog = ({
                 {divisionFilters.map(division =>
                   <ClickableChip
                     item
-                    id={`${division.divisionid}Tag`}
-                    key={`${division.divisionid}-tag`}
+                    id={`${division.divisionid}Filter`}
+                    key={`${division.divisionid}-filter`}
                     label={division.divisionname.toUpperCase()}
                     sx={{width: "fit-content", marginLeft: "8px", marginBottom: "8px" }}
                     color={division.divisionid === -2 ? '#A0192F' : division.divisionid === -3 ? '#B57808' : 'primary'}
@@ -1103,6 +1305,74 @@ export const RecordsLog = ({
                   />
                   )}
               </Paper>
+            </Grid>
+            <Grid
+              container
+              item
+              xs={12}
+              direction="row"
+              justify="flex-start"
+              alignItems="flex-start"
+            >
+              <input
+                type="checkbox"
+                style={{position: "relative", top: 7, marginRight: 15}}
+                className="checkmark record-checkmark"
+                key={"selectallchk" + isAllSelected}
+                id={"selectallchk"}
+                onChange={handleSelectAll}
+                required
+                checked={isAllSelected}
+              />
+              <Tooltip title={<div style={{fontSize: "11px"}}>Remove Attachments</div>}>
+                <span>
+                  <button
+                    className={` btn`}
+                    onClick={() => setDeleteModalOpen(true)}
+                    // title="Remove Attachments"
+                    disabled={records.filter(record => record.attachments?.length > 0).length === 0}
+                    style={records.filter(record => record.attachments?.length > 0).length === 0 ? { pointerEvents: 'none' } : {}}
+                  >
+                    <FontAwesomeIcon icon={faLinkSlash} size='lg' color='#38598A'  />
+                  </button>
+                </span>
+              </Tooltip>
+              <Tooltip 
+                title={isUpdateDivisionsDisabled() ? 
+                  <div style={{fontSize: "11px"}}>To update divisions: <ul>
+                    <li>at least one record must be selected</li>
+                    <li>all records selected must be tagged to the same division</li>
+                    <li> and all records selected must be finished processing</li>
+                  </ul></div> : 
+                  <div style={{fontSize: "11px"}}>Update Divisions</div>
+                }
+                sx={{fontSize: "11px"}}
+              >
+                <span>
+                  <button
+                    className={` btn`}
+                    onClick={() => setDivisionsModalOpen(true)}
+                    // title="Update Divisions"
+                    disabled={isUpdateDivisionsDisabled()}                  
+                    style={isUpdateDivisionsDisabled() ? { pointerEvents: 'none' } : {}}
+                  >
+                    <FontAwesomeIcon icon={faPenToSquare} size='lg' color='#38598A'  />
+                  </button>
+                </span>
+              </Tooltip>
+              <Tooltip title={<div style={{fontSize: "11px"}}>Delete</div>}>
+                <span>
+                  <button
+                    className={` btn`}
+                    onClick={() => handlePopupButtonClick('delete')}
+                    // title="Delete"
+                    disabled={!checkIsAnySelected()}
+                    style={!checkIsAnySelected() ? { pointerEvents: 'none' } : {}}
+                  >
+                    <FontAwesomeIcon icon={faTrash} size='lg' color='#38598A'  />
+                  </button>
+                </span>
+              </Tooltip>
             </Grid>
             <Grid
               container
@@ -1125,6 +1395,7 @@ export const RecordsLog = ({
                   isMinistryCoordinator={isMinistryCoordinator}
                   ministryId={ministryId}
                   classes={classes}
+                  handleSelectRecord={handleSelectRecord}
                 />
               ) : <div className="recordsstatus">{isRecordsfetching === "inprogress" ? "Records loading is in progress, please wait!" : (isRecordsfetching === "completed" && ( records?.length === 0 || records === null || records === undefined) ? "No records are available to list, please confirm whether records are uploaded or not" : (isRecordsfetching === "error" ? "Error fetching records, please try again.": {isRecordsfetching}) )}</div>
               
@@ -1152,7 +1423,7 @@ export const RecordsLog = ({
           <div className="state-change-dialog">
             <Dialog
               open={deleteModalOpen}
-              onClose={() => setDeleteModalOpen(false)}
+              onClose={() => {setDeleteModalOpen(false); setDivisionModalTagValue(-1)}}
               aria-labelledby="state-change-dialog-title"
               aria-describedby="state-change-dialog-description"
               maxWidth={'md'}
@@ -1161,7 +1432,7 @@ export const RecordsLog = ({
             >
               <DialogTitle disableTypography id="state-change-dialog-title">
                   <h2 className="state-change-header">Remove Attachments</h2>
-                  <IconButton className="title-col3" onClick={() => setDeleteModalOpen(false)}>
+                  <IconButton className="title-col3" onClick={() => {setDeleteModalOpen(false); setDivisionModalTagValue(-1)}}>
                     <i className="dialog-close-button">Close</i>
                     <CloseIcon />
                   </IconButton>
@@ -1181,7 +1452,95 @@ export const RecordsLog = ({
                 >
                   Continue
                 </button>
-                <button className="btn-bottom btn-cancel" onClick={() => setDeleteModalOpen(false)}>
+                <button className="btn-bottom btn-cancel" onClick={() => {setDeleteModalOpen(false); setDivisionModalTagValue(-1)}}>
+                  Cancel
+                </button>
+              </DialogActions>
+            </Dialog>
+          </div>
+          <div className="state-change-dialog">
+            <Dialog
+              open={divisionsModalOpen}
+              onClose={() => setDivisionsModalOpen(false)}
+              aria-labelledby="state-change-dialog-title"
+              aria-describedby="state-change-dialog-description"
+              maxWidth={'md'}
+              fullWidth={true}
+              // id="state-change-dialog"
+            >
+              <DialogTitle disableTypography id="state-change-dialog-title">
+                  <h2 className="state-change-header">Update Divisions</h2>
+                  <IconButton className="title-col3" onClick={() => setDivisionsModalOpen(false)}>
+                    <i className="dialog-close-button">Close</i>
+                    <CloseIcon />
+                  </IconButton>
+                </DialogTitle>
+              <DialogContent className={'dialog-content-nomargin'}>
+                <DialogContentText id="state-change-dialog-description" component={'span'} style={{textAlign: "center"}}>
+                  {(records.filter(r=>(r.isselected && r.attributes.divisions.length > 1)).length > 0 && filterValue < 0) ? 
+                    <><span className="confirmation-message">
+                      You have selected a record that was provided by more than one division. <br></br>
+                      To change the division you must first filter the Records Log by the division that you want to no longer be associated with the selected records.
+                      </span><br></br>
+                    </> : 
+                    <>
+                    <span className="confirmation-message">
+                      Select the divisions that corresponds to the records you have selected.<br></br>
+                      This will update the divisions on all records you have selected both in the gathering records log and the redaction app.
+                    </span><br></br><br></br>
+                    <Paper
+                      component={Grid}
+                      sx={{
+                        color: "#38598A",
+                        maxWidth:"100%",
+                        paddingTop: "8px",
+                        borderTopLeftRadius: 0,
+                        borderTopRightRadius: 0,
+                      }}
+                      alignItems="center"
+                      justifyContent="flex-start"
+                      direction="row"
+                      container
+                      item
+                      xs={12}
+                      elevation={0}
+                    >
+                      {divisions.filter(division => {
+                        if (division.divisionname.toLowerCase() === 'communications') {
+                          return false;
+                        } else if (filterValue > -1 && filterValue !== division.divisionid) {
+                          return true;
+                        } else if (records.filter(r => r.isselected)[0]?.attributes.divisions[0].divisionid !== division.divisionid) {
+                          return true;
+                        } else {
+                          return false;
+                        }
+                      }).map(division =>
+                        <ClickableChip
+                          item
+                          id={`${division.divisionid}updateTag`}
+                          key={`${division.divisionid}-updateTag`}
+                          label={division.divisionname.toUpperCase()}
+                          sx={{width: "fit-content", marginLeft: "8px", marginBottom: "8px" }}
+                          color={division.divisionid === -2 ? '#A0192F' : division.divisionid === -3 ? '#B57808' : 'primary'}
+                          size="small"
+                          onClick={(e)=>{setDivisionModalTagValue(division.divisionid)}}
+                          clicked={divisionModalTagValue === division.divisionid}
+                        />
+                      )}
+                    </Paper>
+                  </>}
+                </DialogContentText>
+              </DialogContent>
+              <DialogActions>
+                <button
+                  className={`btn-bottom btn-save btn`}
+                  onClick={updateDivisions}
+                  disabled={divisionModalTagValue === -1}
+                >
+                  Continue
+                </button>
+                <button className="btn-bottom btn-cancel" onClick={() => setDivisionsModalOpen(false)}>
                   Cancel
                 </button>
               </DialogActions>
@@ -1194,8 +1553,8 @@ export const RecordsLog = ({
 }
 
 
-const Attachment = React.memo(({indexValue, record, handlePopupButtonClick, getFullname, isMinistryCoordinator,ministryId}) => {
-
+const Attachment = React.memo(({indexValue, record, handlePopupButtonClick, getFullname, isMinistryCoordinator,ministryId,handleSelectRecord}) => {
+  
   const classes = useStyles();
   const [disabled, setDisabled] = useState(false);
   const [isRetry, setRetry] = useState(false);
@@ -1207,6 +1566,10 @@ const Attachment = React.memo(({indexValue, record, handlePopupButtonClick, getF
 
   const getCategory = (category) => {
     return AttachmentCategories.categorys.find(element => element.name === category);
+  }
+
+  const handleSelect = (e) => {
+    handleSelectRecord(record, e);
   }
 
   const recordtitle = ()=>{
@@ -1259,7 +1622,19 @@ const Attachment = React.memo(({indexValue, record, handlePopupButtonClick, getF
         alignItems="flex-start"
       >
 
-        <Grid item xs={6}>
+        <Grid item container xs={9} direction="row" alignItems="flex-start">
+          <input
+            type="checkbox"
+            style={{position: "relative", top: 18, marginRight: 15}}
+            className="checkmark record-checkmark"
+            id={"selectchk"+record.documentmasterid}
+            key={record.recordid + indexValue}
+            data-iaocode={record.recordid}
+            onChange={handleSelect}
+            required
+            checked={record.isselected}
+            // defaultChecked={record.isselected}
+          />
           {record.isattachment && <FontAwesomeIcon icon={faArrowTurnUp} size='2x' className={classes.attachmentIcon}/>}
           {
             record.isduplicate ?
@@ -1274,10 +1649,10 @@ const Attachment = React.memo(({indexValue, record, handlePopupButtonClick, getF
             <FontAwesomeIcon icon={faExclamationCircle} size='2x' color='#A0192F' className={classes.statusIcons}/>:
             <FontAwesomeIcon icon={faSpinner} size='2x' color='#FAA915' className={classes.statusIcons}/>
           }
-          <span className={classes.filename}>{record.filename} </span>
+          <span title={record.filename} className={classes.filename}>{record.filename} </span>
           <span className={classes.fileSize}>{record?.attributes?.filesize > 0 ? (record?.attributes?.filesize / 1024).toFixed(2) : 0} KB</span>
         </Grid>
-        <Grid item xs={6} direction="row"
+        <Grid item xs={3} direction="row"
             justifyContent="flex-end"
             alignItems="flex-end"
             className={classes.recordStatus}>
@@ -1288,6 +1663,12 @@ const Attachment = React.memo(({indexValue, record, handlePopupButtonClick, getF
               <span>Incompatible File Type</span>:
               (record.failed && record.isredactionready) || (record.attributes?.trigger === 'recordreplace' && record.attributes?.isattachment) ?
               <span>Record Manually Replaced Due to Error</span>:
+              record.attributes?.isattachment ? 
+              <span style={{
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                whiteSpace: "nowrap"
+              }} title={`Attachment of ${record.attachmentof}`}>Attachment of {record.attachmentof}</span>:
               record.isredactionready ?
               <span>Ready for Redaction</span>:
               record.failed ?
@@ -1322,7 +1703,7 @@ const Attachment = React.memo(({indexValue, record, handlePopupButtonClick, getF
               label={division.divisionname}
               size="small"
               className={clsx(classes.chip, classes.chipPrimary)}
-              style={{backgroundColor: "#003366", margin: record.isattachment && i === 0 ? "4px 4px 4px 60px" : "4px"}}
+              style={{backgroundColor: "#003366", margin: record.isattachment && i === 0 ? "4px 4px 4px 95px" : i === 0 ? "4px 4px 4px 35px" : "4px"}}
             />
           )}
         </Grid>
@@ -1363,7 +1744,7 @@ const Attachment = React.memo(({indexValue, record, handlePopupButtonClick, getF
           <Divider className={"record-divider"} />
         </Grid>
       </Grid>
-      {record?.attachments?.map((attachment, i) =>
+      {record.attachments?.map((attachment, i) =>
         <Attachment
           key={"attachment" + i}
           indexValue={i}
@@ -1373,6 +1754,7 @@ const Attachment = React.memo(({indexValue, record, handlePopupButtonClick, getF
           isMinistryCoordinator={isMinistryCoordinator}
           ministryId={ministryId}
           classes={classes}
+          handleSelectRecord={handleSelectRecord}
         />
       )}
     </>

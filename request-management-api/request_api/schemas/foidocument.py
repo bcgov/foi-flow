@@ -16,6 +16,13 @@ class RenameDocumentSchema(Schema):
         unknown = EXCLUDE    
     filename = fields.Str(data_key="filename",required=True,allow_none=False)
 
+class ReclassifyDocumentSchema(Schema):
+    class Meta:  # pylint: disable=too-few-public-methods
+        """Exclude unknown fields in the deserialized output."""
+
+        unknown = EXCLUDE
+    category = fields.Str(data_key="category",required=True,allow_none=False)
+
 class ReplaceDocumentSchema(Schema):
     class Meta:  # pylint: disable=too-few-public-methods
         """Exclude unknown fields in the deserialized output."""

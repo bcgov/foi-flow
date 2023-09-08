@@ -5,7 +5,7 @@ from re import VERBOSE
 from request_api.models.FOIUsers import FOIUser
 from request_api.models.default_method_result import DefaultMethodResult
 from request_api.models.OperatingTeams import OperatingTeam
-from request_api.services.assigneeservice import assigneeservice
+from request_api.services.external.keycloakadminservice import KeycloakAdminService
 import logging
 
 class userservice:
@@ -15,12 +15,13 @@ class userservice:
     def syncusers(self):
         operatingteams = OperatingTeam().getalloperatingteams()
         for operatingteam in operatingteams:
-            groupname = operatingteam['name'].replace(" ","").lower()
-            groupdata = assigneeservice().getmembersbygroupname(groupname)[0]
-            if 'members' in groupdata and len(groupdata['members']) > 0:
-                kcusers = groupdata['members']
-                for user in kcusers:
-                    self.__persistuser(user)       
+            groupmembers = KeycloakAdminService().getmembersbygroupnameandtype(operatingteam['name'], operatingteam['type'])
+            if groupmembers not in (None, '',[]) and len(groupmembers) > 0: 
+                groupdata = groupmembers[0]
+                if 'members' in groupdata and len(groupdata['members']) > 0:
+                    kcusers = groupdata['members']
+                    for user in kcusers:
+                        self.__persistuser(user)       
             
         return DefaultMethodResult(True,'Users synced for foi-mod')
     

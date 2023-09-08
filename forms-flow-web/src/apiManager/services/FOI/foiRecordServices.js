@@ -1,6 +1,6 @@
 import {
     httpGETRequest,
-    httpGETRequest1,
+    httpOpenGETRequest,
     httpPOSTRequest,
   } from "../../httpRequestHandler";
   import API from "../../endpoints";
@@ -164,18 +164,17 @@ export const replaceFOIRecordProcessing = (requestId, ministryId,recordid, data,
   };
 };
 
-export const deleteFOIRecords = (requestId, ministryId, recordId, ...rest) => {
+export const updateFOIRecords = (requestId, ministryId, data, ...rest) => {
   if (!ministryId) {
     return () => {};
   }
   const done = fnDone(rest);
-  let apiUrl = replaceUrl(replaceUrl(replaceUrl(
-    API.FOI_DELETE_RECORDS,
+  let apiUrl = replaceUrl(replaceUrl(
+    API.FOI_UPDATE_RECORDS,
     "<ministryrequestid>", ministryId),
-    "<requestid>", requestId),
-    "<recordid>", recordId);
+    "<requestid>", requestId);
     return (dispatch) => {
-      postRecord(dispatch, apiUrl, {}, "Error in deleting records", rest);
+      postRecord(dispatch, apiUrl, data, "Error in updating records", rest);
     };
 };
 
@@ -217,7 +216,7 @@ const postRecord = (dispatch, apiUrl, data, errorMessage, rest, type="download")
 export const getRecordFormats = (...rest) => {
   const done = fnDone(rest);
     return (dispatch) => {
-      httpGETRequest1(FOI_RECORD_FORMATS, null)
+      httpOpenGETRequest(FOI_RECORD_FORMATS)
         .then((res) => {
           if (res.data) {
             dispatch(setRecordFormats([... new Set([...res.data.conversion, ...res.data.dedupe, ...res.data.nonredactable])]))

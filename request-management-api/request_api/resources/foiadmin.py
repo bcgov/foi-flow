@@ -115,8 +115,8 @@ class DisableFOIProgramAreaDivision(Resource):
     def put(divisionid):
         try:
             result = programareadivisionservice().disableprogramareadivision(divisionid, AuthHelper.getuserid())
-            # if result.success == True:
-            #   asyncio.ensure_future();
+            if result.success != True:
+                return {'status': result.success, 'message': result.message, 'id':result.identifier}, 400  
             return {'status': result.success, 'message':result.message, 'id':result.identifier}, 200 
         except KeyError as err:
             return {'status': False, 'message':err.messages}, 400        

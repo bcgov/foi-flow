@@ -17,7 +17,8 @@ class stateevent:
     def createstatetransitionevent(self, requestid, requesttype, userid, username):
         state = self.__haschanged(requestid, requesttype)
         if state is not None:
-            _commentresponse = self.__createcomment(requestid, state, requesttype, userid, username)
+            #_commentresponse = self.__createcomment(requestid, state, requesttype, userid, username)
+            _commentresponse = self.__createcommentwrapper(requestid, state, requesttype, userid, username)
             _notificationresponse = self.__createnotification(requestid, state, requesttype, userid)
             _cfrresponse = self.__createcfrentry(state, requestid, userid)
             if _commentresponse.success == True and _notificationresponse.success == True and _cfrresponse.success == True:
@@ -38,12 +39,23 @@ class stateevent:
                 return newstate
         return None 
     
+    def __createcommentwrapper(self, requestid, state, requesttype, userid, username):
+        if state == 'Archived':
+            _openedministries = FOIMinistryRequest.getministriesopenedbyuid(requestid)
+            for ministry in _openedministries:
+                response=self.__createcomment(ministry["ministryrequestid"], state, 'ministryrequest', userid, username)
+        else:
+            response=self.__createcomment(requestid, state, requesttype, userid, username)
+        return response
+        
+    
     def __createcomment(self, requestid, state, requesttype, userid, username):
         comment = self.__preparecomment(requestid, state, requesttype, username)
         if requesttype == "ministryrequest":
             return commentservice().createministryrequestcomment(comment, userid, 2)
         else:
             return commentservice().createrawrequestcomment(comment, userid,2)
+
 
     def __createnotification(self, requestid, state, requesttype, userid):
         _notificationtype = "State"
@@ -60,7 +72,7 @@ class stateevent:
         else:
             response = notificationservice().createnotification({"message" : notification}, requestid, requesttype, "State", userid)
         if _notificationtype == "Group Members":
-            notification = self.__preparegroupmembernotification(state)
+            notification = self.__preparegroupmembernotification(state, requestid)
             groupmemberresponse = notificationservice().createnotification({"message" : notification}, requestid, requesttype, _notificationtype, userid)
             if response.success == True and groupmemberresponse.success == True :
                 return DefaultMethodResult(True,'Notification added',requestid)
@@ -70,11 +82,12 @@ class stateevent:
             return DefaultMethodResult(True,'Notification added',requestid)
         return  DefaultMethodResult(True,'No change',requestid)
             
-
     def __preparenotification(self, state):
         return self.__notificationmessage(state)
 
-    def __preparegroupmembernotification(self, state):
+    def __preparegroupmembernotification(self, state, requestid):
+        if state == 'Call For Records':
+            return self.__notificationcfrmessage(requestid)
         return self.__groupmembernotificationmessage(state)
 
     def __preparecomment(self, requestid, state,requesttype, username):
@@ -93,6 +106,10 @@ class stateevent:
 
     def __notificationmessage(self, state):
         return  'Moved to '+self.__formatstate(state)+ ' State'        
+
+    def __notificationcfrmessage(self, requestid):
+        metadata = FOIMinistryRequest.getmetadata(requestid)
+        return "New "+metadata['requesttype'].capitalize()+" request is in Call For Records"
 
     def __createcfrentry(self, state, ministryrequestid, userid):
         cfrfee = cfrfeeservice().getcfrfee(ministryrequestid)
