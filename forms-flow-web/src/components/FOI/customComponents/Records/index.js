@@ -194,7 +194,6 @@ export const RecordsLog = ({
 
   useEffect(() => {
     if (recordsTabSelect && conversionFormats?.length < 1) {
-      console.log("match");
       toast.error(
         "Temporarily unable to save your request. Please try again in a few minutes.",
         {
@@ -1037,6 +1036,10 @@ export const RecordsLog = ({
     }));
   }
 
+  const enableHarmsDonwnload = () => {
+    return !recordsObj.records.every(record => record.isredactionready);
+  }
+
   return (
     <div className={classes.container}>
       {isAttachmentLoading ? (
@@ -1087,6 +1090,10 @@ export const RecordsLog = ({
                 fullWidth
               >
                 {recordsDownloadList.map((item, index) => {
+
+                  if (item.id === 1) {
+                    item.disabled = enableHarmsDonwnload();
+                  }
 
                   if (item.id !=0) {
                     return (
