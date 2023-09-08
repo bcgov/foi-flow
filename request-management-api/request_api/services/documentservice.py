@@ -37,7 +37,7 @@ class documentservice:
             for document in documents:
                 if document["category"] == "personal":
                     document["documentpath"] = ""
-            documents = [d for d in documents if d["category"] == 'applicant']
+            documents = [d for d in documents if d["category"] != 'applicant']
         return documents
 
     def createrequestdocument(self, requestid, documentschema, userid, requesttype):
