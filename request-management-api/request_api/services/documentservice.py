@@ -37,8 +37,7 @@ class documentservice:
             for document in documents:
                 if document["category"] == "personal":
                     document["documentpath"] = ""
-                if metaobj["requesttype"].lower() == RequestType.GENERAL.value.lower() and document["category"] == 'applicant':
-                    documents.remove(document)
+            documents = [d for d in documents if d["category"] == 'applicant']
         return documents
 
     def createrequestdocument(self, requestid, documentschema, userid, requesttype):
