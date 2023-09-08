@@ -34,10 +34,13 @@ class documentservice:
         documents = self.getactiverequestdocuments(requestid, requesttype)
         if isministrymember:
             metaobj = FOIMinistryRequest.getmetadata(requestid)
+            filtereddocuments = []
             for document in documents:
                 if document["category"] == "personal":
                     document["documentpath"] = ""
-            documents = [d for d in documents if d["category"] != 'applicant']
+                if document["category"] != "applicant":
+                    filtereddocuments.append(document)
+            return filtereddocuments
         return documents
 
     def createrequestdocument(self, requestid, documentschema, userid, requesttype):
