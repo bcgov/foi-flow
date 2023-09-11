@@ -1037,7 +1037,7 @@ export const RecordsLog = ({
   }
 
   const enableHarmsDonwnload = () => {
-    return !recordsObj.records.every(record => record.isredactionready);
+    return !recordsObj.records.every(record => record.isredactionready || (!record.isredactionready && (record.failed || isrecordtimeout(record.created_at, RECORD_PROCESSING_HRS))));
   }
 
   return (
