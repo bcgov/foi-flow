@@ -11,7 +11,7 @@ import TextField from '@material-ui/core/TextField';
 import '../ConfirmationModal/confirmationmodal.scss';
 import './attachmentmodal.scss';
 import FileUpload from '../FileUpload';
-import FileUploadForScanning from '../FileUpload/FileUploadForScanning';
+import FileUploadForMCFPersonal from '../FileUpload/FileUploadForMCFPersonal';
 import FileUploadForMSDPersonal from '../FileUpload/FileUploadForMSDPersonal';
 import { makeStyles } from '@material-ui/core/styles';
 import { MimeTypeList, MaxFileSizeInMB } from "../../../../constants/FOI/enum";
@@ -190,7 +190,14 @@ export default function AttachmentModal({
         if (modalFor === 'replace' || modalFor === "replaceattachment") {
           fileStatusTransition = attachment?.category;
         } else if (uploadFor === "record") {
-          fileStatusTransition = divisions.find(division => division.divisionid === tagValue).divisionname;
+          console.log("divisions", divisions);
+          if(bcgovcode == "MCF" && requestType == FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL) {
+            fileStatusTransition = MCFSections?.sections?.find(division => division.divisionid === tagValue).name;
+          } else if(bcgovcode == "MSD" && requestType == FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL) {
+            fileStatusTransition = MSDSections?.sections?.find(division => division.divisionid === tagValue).name;
+          } else {
+            fileStatusTransition = divisions.find(division => division.divisionid === tagValue).divisionname;
+          }
         } else {
           fileStatusTransition = tagValue
         }
@@ -384,6 +391,9 @@ export default function AttachmentModal({
       {"name": 100, "display": "100100100"},
     ];
 
+    const MCFSections = useSelector((state) => state.foiRequests.foiPersonalSections);
+    const MSDSections = useSelector((state) => state.foiRequests.foiPersonalDivisionsAndSections);
+
     return (
       <div className="state-change-dialog">        
         <Dialog
@@ -409,66 +419,91 @@ export default function AttachmentModal({
               </div>
               {
                 (['replaceattachment','replace','add'].includes(modalFor)) ?
-                // <FileUpload 
-                //   attachment={attachment}  
-                //   attchmentFileNameList={attchmentFileNameList}  
-                //   multipleFiles={multipleFiles} 
-                //   mimeTypes={modalFor === "replaceattachment"? ['application/pdf','.pdf']: mimeTypes} 
-                //   maxFileSize={maxFileSize} 
-                //   totalFileSize={totalFileSize} 
-                //   updateFilesCb={updateFilesCb}
-                //   modalFor={modalFor}
-                //   uploadFor={uploadFor}
-                //   tagList={tagList}
-                //   handleTagChange={handleTagChange}
-                //   tagValue={tagValue}
-                //   maxNumberOfFiles={maxNoFiles}
-                //   isMinistryCoordinator={isMinistryCoordinator}
-                //   existingDocuments={existingDocuments}
-                //   totalUploadedRecordSize={totalUploadedRecordSize}
-                //   totalRecordUploadLimit={totalRecordUploadLimit}
-                // /> 
-                // <FileUploadForScanning 
-                //   attachment={attachment}  
-                //   attchmentFileNameList={attchmentFileNameList}  
-                //   multipleFiles={multipleFiles} 
-                //   mimeTypes={modalFor === "replaceattachment"? ['application/pdf','.pdf']: mimeTypes} 
-                //   maxFileSize={maxFileSize} 
-                //   totalFileSize={totalFileSize} 
-                //   updateFilesCb={updateFilesCb}
-                //   modalFor={modalFor}
-                //   uploadFor={uploadFor}
-                //   tagList={tagL}
-                //   otherTagList={otherTagL}
-                //   handleTagChange={handleTagChange}
-                //   tagValue={tagValue}
-                //   maxNumberOfFiles={maxNoFiles}
-                //   isMinistryCoordinator={isMinistryCoordinator}
-                //   existingDocuments={existingDocuments}
-                //   totalUploadedRecordSize={totalUploadedRecordSize}
-                //   totalRecordUploadLimit={totalRecordUploadLimit}
-                // /> 
-                <FileUploadForMSDPersonal 
-                  attachment={attachment}  
-                  attchmentFileNameList={attchmentFileNameList}  
-                  multipleFiles={multipleFiles} 
-                  mimeTypes={modalFor === "replaceattachment"? ['application/pdf','.pdf']: mimeTypes} 
-                  maxFileSize={maxFileSize} 
-                  totalFileSize={totalFileSize} 
-                  updateFilesCb={updateFilesCb}
-                  modalFor={modalFor}
-                  uploadFor={uploadFor}
-                  tagList={tagL}
-                  subTagList={otherTagL}
-                  handleTagChange={handleTagChange}
-                  tagValue={tagValue}
-                  parentTagValue={parentTagValue}
-                  maxNumberOfFiles={maxNoFiles}
-                  isMinistryCoordinator={isMinistryCoordinator}
-                  existingDocuments={existingDocuments}
-                  totalUploadedRecordSize={totalUploadedRecordSize}
-                  totalRecordUploadLimit={totalRecordUploadLimit}
-                />
+                  (requestType == FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL) ?
+                    (bcgovcode == "MCF") ?
+                      <FileUploadForMCFPersonal 
+                        attachment={attachment}  
+                        attchmentFileNameList={attchmentFileNameList}  
+                        multipleFiles={multipleFiles} 
+                        mimeTypes={modalFor === "replaceattachment"? ['application/pdf','.pdf']: mimeTypes} 
+                        maxFileSize={maxFileSize} 
+                        totalFileSize={totalFileSize} 
+                        updateFilesCb={updateFilesCb}
+                        modalFor={modalFor}
+                        uploadFor={uploadFor}
+                        tagList={MCFSections?.sections?.slice(0, 30)}
+                        otherTagList={MCFSections?.sections?.slice(31)}
+                        handleTagChange={handleTagChange}
+                        tagValue={tagValue}
+                        maxNumberOfFiles={maxNoFiles}
+                        isMinistryCoordinator={isMinistryCoordinator}
+                        existingDocuments={existingDocuments}
+                        totalUploadedRecordSize={totalUploadedRecordSize}
+                        totalRecordUploadLimit={totalRecordUploadLimit}
+                      />
+                      :
+                      (bcgovcode == "MSD") ?
+                        <FileUploadForMSDPersonal 
+                          attachment={attachment}  
+                          attchmentFileNameList={attchmentFileNameList}  
+                          multipleFiles={multipleFiles} 
+                          mimeTypes={modalFor === "replaceattachment"? ['application/pdf','.pdf']: mimeTypes} 
+                          maxFileSize={maxFileSize} 
+                          totalFileSize={totalFileSize} 
+                          updateFilesCb={updateFilesCb}
+                          modalFor={modalFor}
+                          uploadFor={uploadFor}
+                          tagList={tagL}
+                          subTagList={otherTagL}
+                          handleTagChange={handleTagChange}
+                          tagValue={tagValue}
+                          parentTagValue={parentTagValue}
+                          maxNumberOfFiles={maxNoFiles}
+                          isMinistryCoordinator={isMinistryCoordinator}
+                          existingDocuments={existingDocuments}
+                          totalUploadedRecordSize={totalUploadedRecordSize}
+                          totalRecordUploadLimit={totalRecordUploadLimit}
+                        />
+                        :
+                        <FileUpload 
+                          attachment={attachment}  
+                          attchmentFileNameList={attchmentFileNameList}  
+                          multipleFiles={multipleFiles} 
+                          mimeTypes={modalFor === "replaceattachment"? ['application/pdf','.pdf']: mimeTypes} 
+                          maxFileSize={maxFileSize} 
+                          totalFileSize={totalFileSize} 
+                          updateFilesCb={updateFilesCb}
+                          modalFor={modalFor}
+                          uploadFor={uploadFor}
+                          tagList={tagList}
+                          handleTagChange={handleTagChange}
+                          tagValue={tagValue}
+                          maxNumberOfFiles={maxNoFiles}
+                          isMinistryCoordinator={isMinistryCoordinator}
+                          existingDocuments={existingDocuments}
+                          totalUploadedRecordSize={totalUploadedRecordSize}
+                          totalRecordUploadLimit={totalRecordUploadLimit}
+                        />
+                  :
+                  <FileUpload 
+                    attachment={attachment}  
+                    attchmentFileNameList={attchmentFileNameList}  
+                    multipleFiles={multipleFiles} 
+                    mimeTypes={modalFor === "replaceattachment"? ['application/pdf','.pdf']: mimeTypes} 
+                    maxFileSize={maxFileSize} 
+                    totalFileSize={totalFileSize} 
+                    updateFilesCb={updateFilesCb}
+                    modalFor={modalFor}
+                    uploadFor={uploadFor}
+                    tagList={tagList}
+                    handleTagChange={handleTagChange}
+                    tagValue={tagValue}
+                    maxNumberOfFiles={maxNoFiles}
+                    isMinistryCoordinator={isMinistryCoordinator}
+                    existingDocuments={existingDocuments}
+                    totalUploadedRecordSize={totalUploadedRecordSize}
+                    totalRecordUploadLimit={totalRecordUploadLimit}
+                  />
                 :
                 <ModalForRename modalFor={modalFor} newFilename={newFilename} updateFilename={updateFilename} errorMessage={errorMessage} extension={extension} />
               }

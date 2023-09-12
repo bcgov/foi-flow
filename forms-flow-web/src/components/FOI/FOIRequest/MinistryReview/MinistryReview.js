@@ -15,7 +15,10 @@ import {
   fetchFOIRequestDescriptionList
 } from "../../../../apiManager/services/FOI/foiRequestServices";
 
-import { fetchFOIMinistryAssignedToList } from "../../../../apiManager/services/FOI/foiMasterDataServices";
+import {
+  fetchFOIMinistryAssignedToList,
+  fetchFOIPersonalDivisionsAndSections
+} from "../../../../apiManager/services/FOI/foiMasterDataServices";
 
 import {
   fetchFOIRequestAttachmentsList,
@@ -234,6 +237,10 @@ const MinistryReview = React.memo(({ userDetail }) => {
       setRequestState(requestDetails.currentState);
       settabStatus(requestDetails.currentState);
       setIsMinistryRestricted(requestDetails.ministryrestricteddetails?.isrestricted);
+    }
+
+    if(MinistryNeedsScanning.includes(bcgovcode.replaceAll('"', '')) && requestDetails.requestType == FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL) {
+      dispatch(fetchFOIPersonalDivisionsAndSections(bcgovcode.replaceAll('"', '')));
     }
   }, [requestDetails, unSavedRequest]);
 

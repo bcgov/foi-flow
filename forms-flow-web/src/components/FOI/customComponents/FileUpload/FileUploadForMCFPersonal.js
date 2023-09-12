@@ -21,7 +21,7 @@ import InputBase from "@mui/material/InputBase";
 import IconButton from "@material-ui/core/IconButton";
 import _ from 'lodash';
 
-const FileUploadForScanning = ({
+const FileUploadForMCFPersonal = ({
     multipleFiles,
     mimeTypes,
     maxFileSize,
@@ -50,6 +50,9 @@ const FileUploadForScanning = ({
     const [searchValue, setSearchValue] = useState("");
     const [additionalTagList, setAdditionalTagList] = useState([]);
     const [showAdditionalTags, setShowAdditionalTags] = useState(false);
+
+    console.log("tagList", tagList);
+    console.log("otherTagList", otherTagList);
 
     const handleUploadBtnClick = (e) => {
       e.stopPropagation();
@@ -200,9 +203,9 @@ const FileUploadForScanning = ({
       let newSectionArray = [];
       if(_keyword || _selectedSectionValue) {
         _sectionArray.map((section) => {
-          if(_keyword && section.display.toLowerCase().includes(_keyword.toLowerCase())) {
+          if(_keyword && section.name.toLowerCase().includes(_keyword.toLowerCase())) {
             newSectionArray.push(section);
-          } else if(section.name === _selectedSectionValue) {
+          } else if(section.divisionid === _selectedSectionValue) {
             newSectionArray.unshift(section);
           }
         });
@@ -229,14 +232,14 @@ const FileUploadForScanning = ({
         <div className="taglist">
           {tagList.map(tag =>
             <ClickableChip
-              id={`${tag.name}Tag`}
-              key={`${tag.name}-tag`}
-              label={tag.display.toUpperCase()}
+              id={`${tag.divisionid}Tag`}
+              key={`${tag.divisionid}-tag`}
+              label={tag.name.toUpperCase()}
               sx={{width: "fit-content", marginRight: "8px", marginBottom: "8px"}}
               color="primary"
               size="small"
-              onClick={()=>{handleTagChange(tag.name)}}
-              clicked={tagValue == tag.name}
+              onClick={()=>{handleTagChange(tag.divisionid)}}
+              clicked={tagValue == tag.divisionid}
             />
           )}
         </div>
@@ -325,14 +328,14 @@ const FileUploadForScanning = ({
             >
               {additionalTagList.map(tag =>
                 <ClickableChip
-                  id={`${tag.name}Tag`}
-                  key={`${tag.name}-tag`}
-                  label={tag.display.toUpperCase()}
+                  id={`${tag.divisionid}Tag`}
+                  key={`${tag.divisionid}-tag`}
+                  label={tag.name.toUpperCase()}
                   sx={{width: "fit-content", marginRight: "8px", marginBottom: "8px"}}
                   color="primary"
                   size="small"
-                  onClick={()=>{handleTagChange(tag.name)}}
-                  clicked={tagValue == tag.name}
+                  onClick={()=>{handleTagChange(tag.divisionid)}}
+                  clicked={tagValue == tag.divisionid}
                 />
               )}
             </Paper>)}
@@ -401,4 +404,4 @@ const FileUploadForScanning = ({
     );
 };
 
-export default FileUploadForScanning;
+export default FileUploadForMCFPersonal;

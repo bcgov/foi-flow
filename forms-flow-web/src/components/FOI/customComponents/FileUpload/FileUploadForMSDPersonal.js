@@ -202,9 +202,9 @@ const FileUploadForMSDPersonal = ({
       let newSectionArray = [];
       if(_keyword || _selectedSectionValue) {
         _sectionArray.map((section) => {
-          if(_keyword && section.display.toLowerCase().includes(_keyword.toLowerCase())) {
+          if(_keyword && section.name.toLowerCase().includes(_keyword.toLowerCase())) {
             newSectionArray.push(section);
-          } else if(section.name === _selectedSectionValue) {
+          } else if(section.divisionid === _selectedSectionValue) {
             newSectionArray.unshift(section);
           }
         });
@@ -242,14 +242,14 @@ const FileUploadForMSDPersonal = ({
         <div className="taglist">
           {tagList.map(tag =>
             <ClickableChip
-              id={`${tag.name}Tag`}
-              key={`${tag.name}-tag`}
-              label={tag.display.toUpperCase()}
+              id={`${tag.divisionid}Tag`}
+              key={`${tag.divisionid}-tag`}
+              label={tag.name.toUpperCase()}
               sx={{width: "fit-content", marginRight: "8px", marginBottom: "8px"}}
               color="primary"
               size="small"
-              onClick={()=>{handleParentTagChange(tag.name)}}
-              clicked={tag.name == tagValue || (showChildTags && tag.name === parentTagValue)}
+              onClick={()=>{handleParentTagChange(tag.divisionid)}}
+              clicked={tag.divisionid == tagValue || (showChildTags && tag.divisionid === parentTagValue)}
             />
           )}
         </div>
@@ -339,14 +339,14 @@ const FileUploadForMSDPersonal = ({
             >
               {additionalTagList.map(tag =>
                 <ClickableChip
-                  id={`${tag.name}Tag`}
-                  key={`${tag.name}-tag`}
-                  label={tag.display.toUpperCase()}
+                  id={`${tag.divisionid}Tag`}
+                  key={`${tag.divisionid}-tag`}
+                  label={tag.name.toUpperCase()}
                   sx={{width: "fit-content", marginRight: "8px", marginBottom: "8px"}}
                   color="primary"
                   size="small"
-                  onClick={()=>{handleTagChange(tag.name)}}
-                  clicked={tagValue == tag.name}
+                  onClick={()=>{handleTagChange(tag.divisionid)}}
+                  clicked={tagValue == tag.divisionid}
                 />
               )}
             </Paper>)}

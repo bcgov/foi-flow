@@ -26,6 +26,8 @@ const API = {
   FOI_RAW_REQUEST_DESCRIPTION: `${FOI_BASE_API_URL}/api/foiaudit/rawrequest/<requestid>/description`,
   FOI_MINISTRY_REQUEST_DESCRIPTION: `${FOI_BASE_API_URL}/api/foiaudit/ministryrequest/<ministryid>/description`,
   FOI_MINISTRY_DIVISIONALSTAGES: `${FOI_BASE_API_URL}/api/foiflow/divisions/<bcgovcode>`,
+  FOI_PERSONAL_DIVISIONS_SECTIONS: `${FOI_BASE_API_URL}/api/foiflow/divisions/<bcgovcode>/true/divisionsandsections`,
+  FOI_PERSONAL_SECTIONS: `${FOI_BASE_API_URL}/api/foiflow/divisions/<bcgovcode>/true/sections`,
   FOI_POST_RAW_REQUEST_WATCHERS: `${FOI_BASE_API_URL}/api/foiwatcher/rawrequest`,
   FOI_GET_RAW_REQUEST_WATCHERS: `${FOI_BASE_API_URL}/api/foiwatcher/rawrequest/<requestid>`,
   FOI_POST_MINISTRY_REQUEST_WATCHERS: `${FOI_BASE_API_URL}/api/foiwatcher/ministryrequest`,

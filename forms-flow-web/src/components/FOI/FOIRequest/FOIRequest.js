@@ -23,6 +23,7 @@ import {
   fetchClosingReasonList,
   fetchFOIMinistryAssignedToList,
   fetchFOISubjectCodeList,
+  fetchFOIPersonalDivisionsAndSections,
 } from "../../../apiManager/services/FOI/foiMasterDataServices";
 import {
   fetchFOIRequestDetailsWrapper,
@@ -282,6 +283,10 @@ const FOIRequest = React.memo(({ userDetail }) => {
       if(requestDetails.axisRequestId)
         axisBannerCheck();
         setIsIAORestricted(isRequestRestricted(requestDetails,ministryId));
+    }
+
+    if(MinistryNeedsScanning.includes(bcgovcode.replaceAll('"', '')) && requestDetails.requestType == FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL) {
+      dispatch(fetchFOIPersonalDivisionsAndSections(bcgovcode.replaceAll('"', '')));
     }
   }, [requestDetails]);
 

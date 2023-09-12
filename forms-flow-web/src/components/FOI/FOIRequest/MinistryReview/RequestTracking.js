@@ -3,20 +3,16 @@ import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import DivisionalStages from './Divisions/DivisionalStages';
 import { useDispatch, useSelector } from "react-redux";
-import {
-    fetchFOIMinistryDivisionalStages
-  } from "../../../../apiManager/services/FOI/foiMasterDataServices";
+import { fetchFOIMinistryDivisionalStages } from "../../../../apiManager/services/FOI/foiMasterDataServices";
 const RequestTracking = React.memo(({pubmindivstagestomain,existingDivStages,ministrycode,createMinistrySaveRequestObject,requestStartDate, setHasReceivedDate}) => {
 
     const dispatch = useDispatch();
     useEffect(() => {    
         if(ministrycode)
         {
-            
-            dispatch(fetchFOIMinistryDivisionalStages(ministrycode)); 
+            dispatch(fetchFOIMinistryDivisionalStages(ministrycode));
         }
-        
-   },[ministrycode,dispatch])
+    },[ministrycode,dispatch])
 
   
   let divisionalstages = useSelector(state=> state.foiRequests.foiMinistryDivisionalStages);
