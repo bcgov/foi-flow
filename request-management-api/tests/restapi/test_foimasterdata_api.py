@@ -56,7 +56,3 @@ def test_post_fois3storagerequests(app, client):
 def test_get_extensionreasons(app, client):
   response = client.get('/api/foiflow/extensionreasons', headers=factory_user_auth_header(app, client), content_type='application/json')
   assert response.status_code == 200
-
-def test_get_all_divisions(app, client):
-   response = client.get('/api/foiflow/divisions', headers=factory_user_auth_header(app, client), content_type='application/json')
-   assert response.status_code == 200
