@@ -875,12 +875,7 @@ export const RecordsLog = ({
       for (let record of exporting) {
         var filepath = record.s3uripath;
         var filename = record.filename;
-        if (
-          record.isredactionready &&
-          conversionFormats.includes(
-            record.attributes?.extension?.toLowerCase()
-          )
-        ) {
+        if (record.isredactionready && record.isconverted) {
           filepath = filepath.substr(0, filepath.lastIndexOf(".")) + ".pdf";
           filename += ".pdf";
         }
@@ -1446,9 +1441,7 @@ export const RecordsLog = ({
                           className="download-menu-item"
                           key={item.id}
                           value={index}
-                          disabled={
-                            item.disabled || conversionFormats?.length < 1
-                          }
+                          disabled={item.disabled}
                           sx={{ display: "flex" }}
                         >
                           {!item.disabled &&
@@ -2477,9 +2470,6 @@ const AttachmentPopup = React.memo(
     // }
 
     const ActionsPopover = ({ RestrictViewInBrowser, record }) => {
-      const conversionFormats = useSelector(
-        (state) => state.foiRequests.conversionFormats
-      );
       return (
         <Popover
           anchorReference="anchorPosition"
@@ -2544,10 +2534,7 @@ const AttachmentPopup = React.memo(
                 Download Original
               </MenuItem>
             )}
-            {((record.isredactionready &&
-              conversionFormats.includes(
-                record.attributes?.extension?.toLowerCase()
-              )) ||
+            {((record.isredactionready && record.isconverted) ||
               (record.attributes?.isattachment &&
                 record.attributes?.trigger === "recordreplace")) && (
               <MenuItem
