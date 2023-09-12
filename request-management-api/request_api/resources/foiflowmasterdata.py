@@ -71,7 +71,6 @@ class FOIFlowApplicantCategories(Resource):
         except BusinessException:
             return "Error happened while accessing applicant categories" , 500
 
-
 @cors_preflight('GET,OPTIONS')
 @API.route('/foiflow/programareas')
 class FOIFlowProgramAreas(Resource):

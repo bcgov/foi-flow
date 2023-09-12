@@ -36,7 +36,10 @@ class recordservice(recordservicebase):
         return self.__bulkcreate(requestid, ministryrequestid, recordschema.get("records"), userid)
 
     def fetch(self, requestid, ministryrequestid):
-        return recordservicegetter().fetch(requestid, ministryrequestid)  
+        return recordservicegetter().fetch(requestid, ministryrequestid)
+
+    def get_all_records_by_divisionid(self, divisionid):
+        return FOIRequestRecord.get_all_records_by_divisionid(divisionid)  
             
     def update(self, requestid, ministryrequestid, requestdata, userid):
         newrecords = []
