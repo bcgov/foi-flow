@@ -1090,9 +1090,28 @@ export const RecordsLog = ({
                 fullWidth
               >
                 {recordsDownloadList.map((item, index) => {
-
                   if (item.id === 1) {
-                    item.disabled = enableHarmsDonwnload();
+                    item.disabled = enableHarmsDonwnload()
+                    return (
+                        <MenuItem
+                          className="download-menu-item"
+                          key={item.id}
+                          value={index}
+                          disabled={item.disabled}
+                          sx={{ display: 'flex' }}
+                        >
+                          {
+                            item.disabled ?
+                            <FontAwesomeIcon icon={faSpinner} size='2x' color='#FAA915' className={classes.statusIcons}/>:
+                            !item.disabled && (isDownloadReady ?
+                            <FontAwesomeIcon icon={faCheckCircle} size='2x' color='#1B8103' className={classes.statusIcons}/>:
+                            isDownloadFailed ?
+                            <FontAwesomeIcon icon={faExclamationCircle} size='2x' color='#A0192F' className={classes.statusIcons}/>:
+                            isDownloadInProgress ? <FontAwesomeIcon icon={faSpinner} size='2x' color='#FAA915' className={classes.statusIcons}/>:null)
+                          }
+                          {item.label}
+                        </MenuItem>
+                    )
                   }
 
                   if (item.id !=0) {
@@ -1113,7 +1132,6 @@ export const RecordsLog = ({
                           }
                           {item.label}
                         </MenuItem>
-                      // </>
                     )
                   }
 
