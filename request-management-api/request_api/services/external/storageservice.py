@@ -127,6 +127,18 @@ class storageservice:
             file['filestatustransition']=filestatustransition  if s3sourceuri is None else ''
         return requestfilejson
 
+    def copy_file(self, source, bucket, filename):
+        if(self.accesskey is None or self.secretkey is None or self.s3host is None):
+            return {'status': "Configuration Issue", 'message':"accesskey is None or secretkey is None or S3 host is None or formsbucket is None"}, 500
+        docpathmapper = DocumentPathMapper().getdocumentpath("Attachments")
+        s3 = self.__get_s3client(None, docpathmapper)
+        response = s3.copy_object(
+            CopySource=source, # /Bucket-name/path/filename
+            Bucket=bucket, # Destination bucket
+            Key=filename # Destination path/filename
+        )
+        return response
+
     def retrieve_s3_presigned(self, filepath, category="attachments", bcgovcode=None):
         docpathmapper = DocumentPathMapper().getdocumentpath(category, bcgovcode)
         formsbucket = docpathmapper['bucket']

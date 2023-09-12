@@ -33,6 +33,8 @@ from request_api.schemas.foirequestsformslist import  FOIRequestsFormsList
 from request_api.services.extensionreasonservice import extensionreasonservice
 from request_api.services.cacheservice import cacheservice
 from request_api.services.subjectcodeservice import subjectcodeservice
+from request_api.services.programareadivisionservice import programareadivisionservice
+from request_api.services.recordservice import recordservice
 import json
 import request_api
 import requests
@@ -70,7 +72,6 @@ class FOIFlowApplicantCategories(Resource):
             return jsondata , 200
         except BusinessException:
             return "Error happened while accessing applicant categories" , 500
-
 
 @cors_preflight('GET,OPTIONS')
 @API.route('/foiflow/programareas')
@@ -199,11 +200,7 @@ class FOIFlowDivisions(Resource):
         except Exception as exception:
             return {'status': False, 'message': str(type(exception).__name__)}, 400        
 
-
-        
-
-
-
+     
 @cors_preflight('GET,OPTIONS')
 @API.route('/foiflow/closereasons')
 class FOIFlowCloseReasons(Resource):
