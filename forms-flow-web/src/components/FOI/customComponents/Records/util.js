@@ -18,8 +18,6 @@ export const getPDFFilePath = (item) => {
   let pdffilepath = item.s3uripath;
   let pdffilename = item.filename;
 
-  console.log(`item = ${JSON.stringify(item)}`);
-
   if (
     (item.isredactionready && item.isconverted) ||
     (item.attributes?.isattachment &&
