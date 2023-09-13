@@ -53,6 +53,9 @@ const FileUploadForMSDPersonal = ({
     const [showChildTags, setShowChildTags] = useState(false);
     const [showAdditionalTags, setShowAdditionalTags] = useState(false);
 
+    console.log("tagList", tagList);
+    console.log("subTagList", subTagList);
+
     const handleUploadBtnClick = (e) => {
       e.stopPropagation();
       fileInputField.current.click();

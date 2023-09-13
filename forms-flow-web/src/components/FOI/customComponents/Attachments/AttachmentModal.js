@@ -407,6 +407,7 @@ export default function AttachmentModal({
 
     const MCFSections = useSelector((state) => state.foiRequests.foiPersonalSections);
     const MSDSections = useSelector((state) => state.foiRequests.foiPersonalDivisionsAndSections);
+    console.log("MSDSections", MSDSections);
 
     return (
       <div className="state-change-dialog">        

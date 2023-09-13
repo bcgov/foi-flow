@@ -51,9 +51,6 @@ const FileUploadForMCFPersonal = ({
     const [additionalTagList, setAdditionalTagList] = useState([]);
     const [showAdditionalTags, setShowAdditionalTags] = useState(false);
 
-    console.log("tagList", tagList);
-    console.log("otherTagList", otherTagList);
-
     const handleUploadBtnClick = (e) => {
       e.stopPropagation();
       fileInputField.current.click();
