@@ -198,11 +198,7 @@ class FOIFlowDivisions(Resource):
         except Exception as exception:
             return {'status': False, 'message': str(type(exception).__name__)}, 400        
 
-
-        
-
-
-
+     
 @cors_preflight('GET,OPTIONS')
 @API.route('/foiflow/closereasons')
 class FOIFlowCloseReasons(Resource):
