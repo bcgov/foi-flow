@@ -820,7 +820,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
               [classes.hidden]: !tabLinksStatuses.Records.display,
             })}
           >
-            {!isAttachmentListLoading && originalDivisions?.length > 0 ? (
+            {!isAttachmentListLoading && (originalDivisions?.length > 0 || (MinistryNeedsScanning.includes(bcgovcode.replaceAll('"', '')) && requestDetails?.requestType == FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL)) ? (
               <>
               {url.indexOf("records") > -1 ? (
                 <Breadcrumbs aria-label="breadcrumb" className="foi-breadcrumb foi-breadcrumb-comments">
