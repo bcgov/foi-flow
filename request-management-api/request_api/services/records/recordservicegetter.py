@@ -19,7 +19,13 @@ class recordservicegetter(recordservicebase):
         result = {'dedupedfiles': 0, 'convertedfiles': 0, 'removedfiles': 0}
         try:            
             _metadata = FOIMinistryRequest.getmetadata(ministryrequestid)
-            divisions = ProgramAreaDivision.getprogramareadivisions(_metadata["programareaid"])
+            if _metadata["requesttype"] == "personal" and _metadata["programareaid"] == 4:
+                divisions = ProgramAreaDivision.getpersonalrequestsprogramareasections(_metadata["programareaid"])
+            elif _metadata["requesttype"] == "personal" and _metadata["programareaid"] == 18:
+                divisions = ProgramAreaDivision.getpersonalrequestsdivisionsandsections(_metadata["programareaid"])
+            else:
+                divisions = ProgramAreaDivision.getprogramareadivisions(_metadata["programareaid"])
+
             uploadedrecords = FOIRequestRecord.fetch(requestid, ministryrequestid)            
             batchids = []
             resultrecords = []
