@@ -57,8 +57,10 @@ const initialState = {
   },
   foiPDFStitchedRecordForHarms: {},
   foiPDFStitchedRecordForRedlines: {},
+  foiPDFStitchedRecordForResponsePackage: {},
   foiPDFStitchStatusForHarms: "not started",
   foiPDFStitchStatusForRedlines: "not started",
+  foiPDFStitchStatusForResponsePackage: "not started",
   foiRequestCFRForm: {
     overallsuggestions: "",
     status: "init",
@@ -253,10 +255,17 @@ const foiRequests = (state = initialState, action) => {
       return { ...state, foiPDFStitchedRecordForHarms: action.payload };
     case FOI_ACTION_CONSTANTS.FOI_PDF_STITCHED_RECORD_FOR_REDLINES:
       return { ...state, foiPDFStitchedRecordForRedlines: action.payload };
+    case FOI_ACTION_CONSTANTS.FOI_PDF_STITCHED_RECORD_FOR_RESPONSEPACKAGE:
+      return {
+        ...state,
+        foiPDFStitchedRecordForResponsePackage: action.payload,
+      };
     case FOI_ACTION_CONSTANTS.FOI_PDF_STITCHED_STATUS_FOR_HARMS:
       return { ...state, foiPDFStitchStatusForHarms: action.payload };
     case FOI_ACTION_CONSTANTS.FOI_PDF_STITCHED_STATUS_FOR_REDLINES:
       return { ...state, foiPDFStitchStatusForRedlines: action.payload };
+    case FOI_ACTION_CONSTANTS.FOI_PDF_STITCHED_STATUS_FOR_RESPONSEPACKAGE:
+      return { ...state, foiPDFStitchStatusForResponsePackage: action.payload };
     case FOI_ACTION_CONSTANTS.FOI_REQUEST_CFR_FORM:
       return {
         ...state,

@@ -7,3 +7,4 @@ class ServiceKey(Enum):
 
     pdfstitchforhamrs = "pdfstitchforhamrs"
     pdfstitchforredline = "pdfstitchforredline"
+    pdfstitchforresponsepackage = "pdfstitchforresponsepackage"
