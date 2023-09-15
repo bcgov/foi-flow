@@ -1444,7 +1444,7 @@ export const RecordsLog = ({
                     if (item.id === 1 && item.disabled) {
                       return (
                         <Tooltip title={<div style={{fontSize: "11px"}}>File conversion and deduplication in progress</div>} key={item.id}>
-                          <div>
+                          <div onClick={(event) => event.preventDefault()}>
                             <MenuItem
                               className="download-menu-item"
                               key={item.id}
