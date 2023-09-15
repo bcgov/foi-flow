@@ -1388,8 +1388,13 @@ export const RecordsLog = ({
 
   //function to manage download for harms option
   const enableHarmsDonwnload = () => {
-    return !recordsObj.records.every(record => record.isredactionready || record.failed || isrecordtimeout(record.created_at, RECORD_PROCESSING_HRS));
-  }
+    return !recordsObj.records.every(
+      (record) =>
+        record.isredactionready ||
+        record.failed ||
+        isrecordtimeout(record.created_at, RECORD_PROCESSING_HRS)
+    );
+  };
 
   return (
     <div className={classes.container}>
@@ -1441,58 +1446,80 @@ export const RecordsLog = ({
                   fullWidth
                 >
                   {recordsDownloadList.map((item, index) => {
-                    if (item.id === 1 && item.disabled) {
+                    // if (item.id === 1 && item.disabled) {
+                    //   return (
+                    //     <Tooltip title={<div style={{fontSize: "11px"}}>File conversion and deduplication in progress</div>} key={item.id}>
+                    //       <div>
+                    //         <MenuItem
+                    //           className="download-menu-item"
+                    //           key={item.id}
+                    //           value={index}
+                    //           disabled={item.disabled}
+                    //           sx={{ display: 'flex' }}
+                    //         >
+                    //           <FontAwesomeIcon icon={faSpinner} size='2x' color='#FAA915' className={classes.statusIcons}/>
+                    //           {item.label}
+                    //         </MenuItem>
+                    //       </div>
+                    //       </Tooltip>
+                    //     )
+                    //   }
+                    if (item.id != 0) {
                       return (
-                        <Tooltip title={<div style={{fontSize: "11px"}}>File conversion and deduplication in progress</div>} key={item.id}>
+                        <Tooltip
+                          title={
+                            <div style={{ fontSize: "11px" }}>
+                              File conversion and deduplication in progress
+                            </div>
+                          }
+                          key={item.id}
+                          disableHoverListener={item.id !== 1 || !item.disabled}
+                        >
                           <div>
                             <MenuItem
                               className="download-menu-item"
                               key={item.id}
                               value={index}
                               disabled={item.disabled}
-                              sx={{ display: 'flex' }}
+                              sx={{ display: "flex" }}
                             >
-                              <FontAwesomeIcon icon={faSpinner} size='2x' color='#FAA915' className={classes.statusIcons}/>
+                              {!item.disabled ? (
+                                isDownloadReady ? (
+                                  <FontAwesomeIcon
+                                    icon={faCheckCircle}
+                                    size="2x"
+                                    color="#1B8103"
+                                    className={classes.statusIcons}
+                                  />
+                                ) : isDownloadFailed ? (
+                                  <FontAwesomeIcon
+                                    icon={faExclamationCircle}
+                                    size="2x"
+                                    color="#A0192F"
+                                    className={classes.statusIcons}
+                                  />
+                                ) : isDownloadInProgress ? (
+                                  <FontAwesomeIcon
+                                    icon={faSpinner}
+                                    size="2x"
+                                    color="#FAA915"
+                                    className={classes.statusIcons}
+                                  />
+                                ) : null
+                              ) : (
+                                item.id === 1 && (
+                                  <FontAwesomeIcon
+                                    icon={faSpinner}
+                                    size="2x"
+                                    color="#FAA915"
+                                    className={classes.statusIcons}
+                                  />
+                                )
+                              )}
                               {item.label}
                             </MenuItem>
                           </div>
-                          </Tooltip>
-                        )
-                      }
-                    if (item.id != 0) {
-                      return (
-                        <MenuItem
-                          className="download-menu-item"
-                          key={item.id}
-                          value={index}
-                          disabled={item.disabled}
-                          sx={{ display: "flex" }}
-                        >
-                          {!item.disabled &&
-                            (isDownloadReady ? (
-                              <FontAwesomeIcon
-                                icon={faCheckCircle}
-                                size="2x"
-                                color="#1B8103"
-                                className={classes.statusIcons}
-                              />
-                            ) : isDownloadFailed ? (
-                              <FontAwesomeIcon
-                                icon={faExclamationCircle}
-                                size="2x"
-                                color="#A0192F"
-                                className={classes.statusIcons}
-                              />
-                            ) : isDownloadInProgress ? (
-                              <FontAwesomeIcon
-                                icon={faSpinner}
-                                size="2x"
-                                color="#FAA915"
-                                className={classes.statusIcons}
-                              />
-                            ) : null)}
-                          {item.label}
-                        </MenuItem>
+                        </Tooltip>
                       );
                     }
                   })}
