@@ -3,7 +3,7 @@ from datetime import datetime as datetime2
 from .default_method_result import DefaultMethodResult
 from sqlalchemy.orm import relationship,backref
 from datetime import datetime
-from sqlalchemy import text
+from sqlalchemy import text,or_
 
 class ProgramAreaDivision(db.Model):
     __tablename__ = 'ProgramAreaDivisions' 
@@ -13,6 +13,9 @@ class ProgramAreaDivision(db.Model):
     name = db.Column(db.String(500), unique=False, nullable=False)    
     isactive = db.Column(db.Boolean, unique=False, nullable=False)
     sortorder = db.Column(db.Integer, unique=False, nullable=True)
+    issection = db.Column(db.Boolean, unique=False, nullable=True)
+    parentid = db.Column(db.Integer, unique=False, nullable=True)
+    specifictopersonalrequests = db.Column(db.Boolean, unique=False, nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.now)
     createdby = db.Column(db.String(120), unique=False, default='system')
     updated_at = db.Column(db.DateTime, nullable=True)
@@ -21,13 +24,31 @@ class ProgramAreaDivision(db.Model):
     @classmethod
     def getallprogramareadivisons(cls):
         division_schema = ProgramAreaDivisionSchema(many=True)
-        query = db.session.query(ProgramAreaDivision).filter_by(isactive=True).all()
+        query = db.session.query(ProgramAreaDivision).filter_by(isactive=True,issection=False).all()
         return division_schema.dump(query)
 
     @classmethod
     def getprogramareadivisions(cls,programareaid):
+        division_schema = ProgramAreaDivisionSchema(many=True)        
+        query = db.session.query(ProgramAreaDivision).filter(ProgramAreaDivision.programareaid == programareaid, ProgramAreaDivision.isactive == True, ProgramAreaDivision.issection == False,or_(ProgramAreaDivision.specifictopersonalrequests == None,ProgramAreaDivision.specifictopersonalrequests == False))
+        return division_schema.dump(query)
+    
+    @classmethod
+    def getpersonalspecificprogramareadivisions(cls,programareaid):
         division_schema = ProgramAreaDivisionSchema(many=True)
-        query = db.session.query(ProgramAreaDivision).filter_by(programareaid=programareaid, isactive=True).order_by(ProgramAreaDivision.name.asc())
+        query = db.session.query(ProgramAreaDivision).filter_by(programareaid=programareaid, isactive=True,issection=False,specifictopersonalrequests=True).order_by(ProgramAreaDivision.name.asc())
+        return division_schema.dump(query)
+    
+    @classmethod
+    def getpersonalrequestsprogramareasections(cls,programareaid):
+        division_schema = ProgramAreaDivisionSchema(many=True)
+        query = db.session.query(ProgramAreaDivision).filter_by(programareaid=programareaid, isactive=True,issection=True,specifictopersonalrequests=True).order_by(ProgramAreaDivision.name.asc())
+        return division_schema.dump(query)
+    
+    @classmethod
+    def getpersonalrequestsdivisionsandsections(cls,programareaid):
+        division_schema = ProgramAreaDivisionSchema(many=True)
+        query = db.session.query(ProgramAreaDivision).filter_by(programareaid=programareaid, isactive=True,specifictopersonalrequests=True).order_by(ProgramAreaDivision.name.asc())
         return division_schema.dump(query)
     
     @classmethod
@@ -73,4 +94,4 @@ class ProgramAreaDivision(db.Model):
 
 class ProgramAreaDivisionSchema(ma.Schema):
     class Meta:
-        fields = ('divisionid','programareaid', 'name','isactive','sortorder')
+        fields = ('divisionid','programareaid', 'name','isactive','sortorder','issection','parentid')
