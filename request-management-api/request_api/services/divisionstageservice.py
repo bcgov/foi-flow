@@ -9,7 +9,7 @@ class divisionstageservice:
         divisionstages = []
         programarea = ProgramArea.getprogramarea(bcgovcode)
         divisions = ProgramAreaDivision.getprogramareadivisions(programarea['programareaid'])
-        divisions.sort(key=lambda item: (item['sortorder'], item['name']))        
+        divisions.sort(key=lambda item: (item["sortorder"] if item["sortorder"] is not None else float('inf'), item["name"]))      
         for division in divisions:
             divisionstages.append({"divisionid": division['divisionid'], "name": self.escapestr(division['name'])})
         return {"divisions": divisionstages, "stages": self.getstages()}
