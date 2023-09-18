@@ -53,9 +53,11 @@ class ProgramAreaDivision(db.Model):
     def updateprogramareadivision(cls, divisionid, programareadivision, userid):   
         dbquery = db.session.query(ProgramAreaDivision)
         division = dbquery.filter_by(divisionid=divisionid, isactive=True)
+        # Below code ensures that sort order DB column does not contain 0 which has no impact on the sortorder
+        sortorder = programareadivision["sortorder"] if programareadivision["sortorder"] != 0 else None
         if(division.count() > 0) :             
             division.update({ProgramAreaDivision.programareaid:programareadivision["programareaid"], ProgramAreaDivision.name:programareadivision["name"], 
-                             ProgramAreaDivision.isactive:True, ProgramAreaDivision.sortorder:programareadivision["sortorder"],
+                             ProgramAreaDivision.isactive:True, ProgramAreaDivision.sortorder:sortorder,
                              ProgramAreaDivision.updatedby:userid, ProgramAreaDivision.updated_at:datetime2.now()}, synchronize_session = False)
             db.session.commit()
             return DefaultMethodResult(True,'Division updated successfully',divisionid)
