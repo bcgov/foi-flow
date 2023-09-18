@@ -1441,24 +1441,6 @@ export const RecordsLog = ({
                   fullWidth
                 >
                   {recordsDownloadList.map((item, index) => {
-                    if (item.id === 1 && item.disabled) {
-                      return (
-                        <Tooltip title={<div style={{fontSize: "11px"}}>File conversion and deduplication in progress</div>} key={item.id}>
-                          <div>
-                            <MenuItem
-                              className="download-menu-item"
-                              key={item.id}
-                              value={index}
-                              disabled={item.disabled}
-                              sx={{ display: 'flex' }}
-                            >
-                              <FontAwesomeIcon icon={faSpinner} size='2x' color='#FAA915' className={classes.statusIcons}/>
-                              {item.label}
-                            </MenuItem>
-                          </div>
-                          </Tooltip>
-                        )
-                      }
                     if (item.id != 0) {
                       return (
                         <MenuItem
@@ -1468,7 +1450,7 @@ export const RecordsLog = ({
                           disabled={item.disabled}
                           sx={{ display: "flex" }}
                         >
-                          {!item.disabled &&
+                          {!item.disabled ?
                             (isDownloadReady ? (
                               <FontAwesomeIcon
                                 icon={faCheckCircle}
@@ -1490,7 +1472,7 @@ export const RecordsLog = ({
                                 color="#FAA915"
                                 className={classes.statusIcons}
                               />
-                            ) : null)}
+                            ) : null) : (item.id === 1 && (<FontAwesomeIcon icon={faSpinner} size='2x' color='#FAA915' className={classes.statusIcons}/>))}
                           {item.label}
                         </MenuItem>
                       );
