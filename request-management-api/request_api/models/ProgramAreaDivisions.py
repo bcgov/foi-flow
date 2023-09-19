@@ -26,6 +26,12 @@ class ProgramAreaDivision(db.Model):
         division_schema = ProgramAreaDivisionSchema(many=True)
         query = db.session.query(ProgramAreaDivision).filter_by(isactive=True,issection=False).all()
         return division_schema.dump(query)
+    
+    @classmethod
+    def getallprogramareadivisonsandsections(cls):
+        division_schema = ProgramAreaDivisionSchema(many=True)
+        query = db.session.query(ProgramAreaDivision).filter_by(isactive=True).all()
+        return division_schema.dump(query)
 
     @classmethod
     def getprogramareadivisions(cls,programareaid):
@@ -54,7 +60,15 @@ class ProgramAreaDivision(db.Model):
     @classmethod
     def createprogramareadivision(cls, programareadivision)->DefaultMethodResult:
         created_at = datetime2.now().isoformat()
-        newprogramareadivision = ProgramAreaDivision(programareaid=programareadivision["programareaid"], name=programareadivision["name"], isactive=True, created_at=created_at)
+        newprogramareadivision = ProgramAreaDivision(
+            programareaid=programareadivision["programareaid"], 
+            name=programareadivision["name"], 
+            isactive=True, 
+            created_at=created_at, 
+            issection=programareadivision["issection"],
+            parentid=programareadivision["parentid"],
+            specifictopersonalrequests=programareadivision["specifictopersonalrequests"]
+            )
         db.session.add(newprogramareadivision)
         db.session.commit()      
         return DefaultMethodResult(True,'Division added successfully',newprogramareadivision.divisionid)
@@ -77,7 +91,9 @@ class ProgramAreaDivision(db.Model):
         if(division.count() > 0) :             
             division.update({ProgramAreaDivision.programareaid:programareadivision["programareaid"], ProgramAreaDivision.name:programareadivision["name"], 
                              ProgramAreaDivision.isactive:True, ProgramAreaDivision.sortorder:programareadivision["sortorder"],
-                             ProgramAreaDivision.updatedby:userid, ProgramAreaDivision.updated_at:datetime2.now()}, synchronize_session = False)
+                             ProgramAreaDivision.issection:programareadivision["issection"], ProgramAreaDivision.parentid:programareadivision["parentid"],
+                             ProgramAreaDivision.specifictopersonalrequests:programareadivision["specifictopersonalrequests"], ProgramAreaDivision.updatedby:userid, 
+                             ProgramAreaDivision.updated_at:datetime2.now()}, synchronize_session = False)
             db.session.commit()
             return DefaultMethodResult(True,'Division updated successfully',divisionid)
         else:
@@ -90,7 +106,11 @@ class ProgramAreaDivision(db.Model):
         division = dbquery.filter_by(programareaid=programareadivision["programareaid"], isactive=True, name=programareadivision["name"])
         return division_schema.dump(division)
     
-             
+    @classmethod
+    def getparentdivisionforsection(cls, divisionparentid):   
+        division_schema = ProgramAreaDivisionSchema(many=True)
+        query = db.session.query(ProgramAreaDivision).filter_by(divisionid=divisionparentid).all()
+        return division_schema.dump(query)
 
 class ProgramAreaDivisionSchema(ma.Schema):
     class Meta:

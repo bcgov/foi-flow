@@ -196,6 +196,17 @@ const Divisions = ({userDetail}) => {
       width: 75,
     },
     {
+      field: "issection",
+      headerName: "Section?",
+      width: 75,
+    },
+    {
+      field: "parentid",
+      headerName: "Parent Division",
+      flex: 1,
+      renderCell: (params) => <>{params.value ? params.value : "-"}</>,
+    },
+    {
       field: "sortorder",
       headerName: "Sort Order",
       width: 100,
