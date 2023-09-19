@@ -390,6 +390,10 @@ export const RecordsLog = ({
             );
           } else {
             console.log(`else record.isselected`);
+            console.log(`record = ${JSON.stringify(record)}`);
+            console.log(
+              `record?.attachments?.length = ${record?.attachments?.length}`
+            );
             for (let attachment of record.attachments) {
               if (attachment.isselected) {
                 deleteAttachemnts.push(attachment.filepath);
