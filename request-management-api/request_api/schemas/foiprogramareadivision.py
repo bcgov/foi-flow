@@ -15,8 +15,7 @@ class FOIProgramAreaDivisionSchema(Schema):
     specifictopersonalrequests = fields.Bool(data_key="specifictopersonalrequests", allow_none=True)
 
     @validates_schema
-    def validate_parentid(self, data):
-        parentdivision = programareadivisionservice().getparentdivisionforsection(data.parentid)
-        print(parentdivision)
-        if data.parentid is not None and len(parentdivision) <=  0:
+    def validate_parentid(self, data, **kwargs):
+        parentdivision = programareadivisionservice().getparentdivisionforsection(data["parentid"])
+        if data["parentid"] is not None and len(parentdivision) <=  0:
             raise ValidationError("parentid provided does not return a valid parent division")

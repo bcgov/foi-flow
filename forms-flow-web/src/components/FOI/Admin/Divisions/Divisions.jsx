@@ -202,7 +202,7 @@ const Divisions = ({userDetail}) => {
     },
     {
       field: "parentid",
-      headerName: "Parent Division ID",
+      headerName: "Parent Division",
       width: 150,
       align: "center",
       renderCell: (params) => <>{params.value ? params.value : "-"}</>,
