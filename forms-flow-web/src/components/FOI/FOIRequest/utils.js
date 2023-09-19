@@ -129,6 +129,10 @@ export const getTabBG = (_tabStatus, _requestState) => {
       return "foitabheadercollection foitabheaderResponseBG";
     case StateEnum.peerreview.name:
       return "foitabheadercollection foitabheaderPeerreviewBG";
+    case StateEnum.tagging.name:
+        return "foitabheadercollection foitabheaderTaggingBG"; 
+    case StateEnum.readytoscan.name:
+        return "foitabheadercollection foitabheaderReadytoScanBG";      
     default:
       return "foitabheadercollection foitabheaderdefaultBG";
   }

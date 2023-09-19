@@ -394,6 +394,12 @@ const MinistryReview = React.memo(({ userDetail }) => {
     case StateEnum.peerreview.name:
       foitabheaderBG = "foitabheadercollection foitabheaderPeerreviewBG";
       break;
+    case StateEnum.tagging.name:
+        foitabheaderBG = "foitabheadercollection foitabheaderTaggingBG";
+        break; 
+    case StateEnum.readytoscan.name:
+        foitabheaderBG = "foitabheadercollection foitabheaderReadytoScanBG";
+        break;       
     default:
       foitabheaderBG = "foitabheadercollection foitabheaderdefaultBG";
       break;

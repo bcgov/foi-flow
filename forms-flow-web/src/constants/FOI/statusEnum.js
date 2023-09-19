@@ -5,6 +5,8 @@ const StateList = Object.freeze({
     open: [{status: "Open", isSelected: false}, {status: "Call For Records", isSelected: false}, {status:"Peer Review", isSelected: false},{status: "Closed", isSelected: false}],
     callforrecords: [{status: "Call For Records", isSelected: false}, {status: "Open", isSelected: false}, {status: "Closed", isSelected: false}],
     callforrecordscfdmsdpersonal: [{status: "Call For Records", isSelected: false}, {status: "Open", isSelected: false}, {status: "Tagging", isSelected: false},{status: "Ready to Scan", isSelected: false}, {status: "Closed", isSelected: false}],
+    tagging :[{status: "Tagging", isSelected: true},{status: "Call For Records", isSelected: false}, {status: "Ready to Scan", isSelected: false},{status: "Records Review", isSelected: false}, {status: "Closed", isSelected: false}],
+    readytoscan : [{status: "Ready to Scan", isSelected: true},{status: "Call For Records", isSelected: false},  {status: "Tagging", isSelected: false},{status: "Records Review", isSelected: false}, {status: "Closed", isSelected: false}],
     feeassessed: [{status: "Fee Estimate", isSelected: false}, {status: "On Hold", isSelected: false}, {status: "Call For Records", isSelected: false}, {status: "Closed", isSelected: false}],
     feeassessedforpersonal: [{status: "Fee Estimate", isSelected: false}, {status: "Call For Records", isSelected: false}, {status: "Closed", isSelected: false}],
     onhold: [{status: "On Hold", isSelected: false}, {status: "Call For Records", isSelected: false}, {status: "Closed", isSelected: false}],
@@ -41,7 +43,7 @@ const MinistryStateList = Object.freeze({
 const StateEnum = Object.freeze({
     open: {name: "Open", id: 1},
     callforrecords: {name: "Call For Records", id: 2},
-    callforrecordsoverdue: {name: "Call For Records Overdue", id: 17},
+    callforrecordsoverdue: {name: "Call For Records Overdue", id: -100},
     closed: {name: "Closed", id: 3},
     redirect: {name: "Redirect", id: 4},
     unopened: {name: "Unopened", id: 5},
