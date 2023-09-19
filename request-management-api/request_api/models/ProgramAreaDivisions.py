@@ -32,6 +32,12 @@ class ProgramAreaDivision(db.Model):
         division_schema = ProgramAreaDivisionSchema(many=True)        
         query = db.session.query(ProgramAreaDivision).filter(ProgramAreaDivision.programareaid == programareaid, ProgramAreaDivision.isactive == True, ProgramAreaDivision.issection == False,or_(ProgramAreaDivision.specifictopersonalrequests == None,ProgramAreaDivision.specifictopersonalrequests == False))
         return division_schema.dump(query)
+
+    @classmethod
+    def getallprogramareatags(cls,programareaid):
+        division_schema = ProgramAreaDivisionSchema(many=True)        
+        query = db.session.query(ProgramAreaDivision).filter(ProgramAreaDivision.programareaid == programareaid, ProgramAreaDivision.isactive == True)
+        return division_schema.dump(query)
     
     @classmethod
     def getpersonalspecificprogramareadivisions(cls,programareaid):

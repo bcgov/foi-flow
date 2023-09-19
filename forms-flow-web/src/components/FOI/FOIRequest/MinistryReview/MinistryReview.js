@@ -15,7 +15,10 @@ import {
   fetchFOIRequestDescriptionList
 } from "../../../../apiManager/services/FOI/foiRequestServices";
 
-import { fetchFOIMinistryAssignedToList } from "../../../../apiManager/services/FOI/foiMasterDataServices";
+import {
+  fetchFOIMinistryAssignedToList,
+  fetchFOIPersonalDivisionsAndSections
+} from "../../../../apiManager/services/FOI/foiMasterDataServices";
 
 import {
   fetchFOIRequestAttachmentsList,
@@ -59,7 +62,7 @@ import { RecordsLog } from '../../customComponents/Records';
 import { UnsavedModal } from "../../customComponents";
 import {DISABLE_GATHERINGRECORDS_TAB} from "../../../../constants/constants";
 import _ from 'lodash';
-
+import { MinistryNeedsScanning } from "../../../../constants/FOI/enum";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -216,7 +219,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
   const [originalDivisions, setOriginalDivisions] = React.useState([])
   const [hasReceivedDate, setHasReceivedDate] = React.useState(true);
   const [isMinistryRestricted, setIsMinistryRestricted] = useState(false);
-
+  const [isMCFMSDPersonal, setIsMCFMSDPersonal] = useState(MinistryNeedsScanning.includes(bcgovcode.replaceAll('"', '')) && requestDetails.requestType == FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL);
 
   let ministryassignedtousername = "Unassigned";
   useEffect(() => {
@@ -234,6 +237,11 @@ const MinistryReview = React.memo(({ userDetail }) => {
       setRequestState(requestDetails.currentState);
       settabStatus(requestDetails.currentState);
       setIsMinistryRestricted(requestDetails.ministryrestricteddetails?.isrestricted);
+    }
+
+    if(MinistryNeedsScanning.includes(bcgovcode.replaceAll('"', '')) && requestDetails.requestType == FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL) {
+      dispatch(fetchFOIPersonalDivisionsAndSections(bcgovcode.replaceAll('"', '')));
+      setIsMCFMSDPersonal(true);
     }
   }, [requestDetails, unSavedRequest]);
 
@@ -517,6 +525,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
         createMinistrySaveRequestObject={createMinistrySaveRequestObject}
         requestStartDate = {requestDetails?.requestProcessStart}
         setHasReceivedDate={setHasReceivedDate}
+        isMCFMSDPersonal={isMCFMSDPersonal}
       />
     );
 
@@ -577,7 +586,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
                 ? `(${requestNotes.length})`
                 : ""}
             </div>
-            {originalDivisions?.length > 0 && DISABLE_GATHERINGRECORDS_TAB?.toLowerCase() =='false' &&<div
+            {(originalDivisions?.length > 0 || isMCFMSDPersonal) && DISABLE_GATHERINGRECORDS_TAB?.toLowerCase() =='false' &&<div
               className={clsx("tablinks", {
                 active: tabLinksStatuses.Records.active,
               })}
@@ -813,7 +822,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
               [classes.hidden]: !tabLinksStatuses.Records.display,
             })}
           >
-            {!isAttachmentListLoading && originalDivisions?.length > 0 ? (
+            {!isAttachmentListLoading && (originalDivisions?.length > 0 || isMCFMSDPersonal) ? (
               <>
               {url.indexOf("records") > -1 ? (
                 <Breadcrumbs aria-label="breadcrumb" className="foi-breadcrumb foi-breadcrumb-comments">
@@ -856,6 +865,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
                   bcgovcode={JSON.parse(bcgovcode)}
                   setRecordsUploading={setRecordsUploading}
                   recordsTabSelect={tabLinksStatuses.Records.active}
+                  requestType={requestDetails?.requestType}
                 />
               </>
             ) : (

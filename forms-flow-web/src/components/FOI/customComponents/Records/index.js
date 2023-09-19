@@ -51,7 +51,10 @@ import { DOC_REVIEWER_WEB_URL, RECORD_PROCESSING_HRS, OSS_S3_CHUNK_SIZE, DISABLE
 import {removeDuplicateFiles, getUpdatedRecords, sortByLastModified, getFiles, calculateDivisionFileSize, calculateTotalFileSize,calculateTotalUploadedFileSizeInKB,getReadableFileSize} from "./util"
 import { readUploadedFileAsBytes } from '../../../../helper/FOI/helper';
 import { TOTAL_RECORDS_UPLOAD_LIMIT } from "../../../../constants/constants";
+import { isScanningTeam } from "../../../../helper/FOI/helper";
+import { MinistryNeedsScanning } from "../../../../constants/FOI/enum";
 //import {convertBytesToMB} from "../../../../components/FOI/customComponents/FileUpload/util";
+import FOI_COMPONENT_CONSTANTS from "../../../../constants/FOI/foiComponentConstants";
 
 
 const useStyles = makeStyles((_theme) => ({
@@ -156,9 +159,13 @@ export const RecordsLog = ({
   ministryAssignedToList,
   isMinistryCoordinator,
   setRecordsUploading,
-  recordsTabSelect
+  recordsTabSelect,
+  requestType
 }) => {
 
+  const user = useSelector((state) => state.user.userDetail);
+  const userGroups = user?.groups?.map(group => group.slice(1));
+  
   let recordsObj = useSelector(
     (state) => state.foiRequests.foiRequestRecords
   );
@@ -174,9 +181,11 @@ export const RecordsLog = ({
   let isRecordsfetching = useSelector(
     (state) => state.foiRequests.isRecordsLoading
   );
+
   const classes = useStyles();
   const [records, setRecords] = useState(recordsObj?.records);
   const [totalUploadedRecordSize, setTotalUploadedRecordSize] = useState(0);
+  const [isScanningTeamMember, setIsScanningTeamMember] = useState(isScanningTeam(userGroups));
   useEffect(() => {    
     setRecords(recordsObj?.records)
     let nonDuplicateRecords = recordsObj?.records?.filter(record => !record.isduplicate)
@@ -1128,7 +1137,7 @@ export const RecordsLog = ({
               </ConditionalComponent>
             </Grid> */}
             <Grid item xs={3}>
-              {isMinistryCoordinator ?
+              {isMinistryCoordinator || (isScanningTeamMember && MinistryNeedsScanning.includes(bcgovcode.replaceAll('"', '')) && requestType === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL) ?
                 <button
                   className={clsx("btn", "addAttachment", classes.createButton)}
                   variant="contained"
@@ -1419,6 +1428,7 @@ export const RecordsLog = ({
             divisions={divisions.filter(d => d.divisionname.toLowerCase() !== 'communications')}
             totalUploadedRecordSize={totalUploadedRecordSize}
             replacementfiletypes={getreplacementfiletypes()}
+            requestType={requestType}
           />
           <div className="state-change-dialog">
             <Dialog
