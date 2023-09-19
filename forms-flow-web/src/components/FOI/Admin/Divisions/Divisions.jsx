@@ -198,12 +198,13 @@ const Divisions = ({userDetail}) => {
     {
       field: "issection",
       headerName: "Section?",
-      width: 75,
+      width: 100,
     },
     {
       field: "parentid",
-      headerName: "Parent Division",
-      flex: 1,
+      headerName: "Parent Division ID",
+      width: 150,
+      align: "center",
       renderCell: (params) => <>{params.value ? params.value : "-"}</>,
     },
     {
