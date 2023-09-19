@@ -384,9 +384,11 @@ export const RecordsLog = ({
               }))(record)
             );
           } else {
-            for (let attachment of record.attachments) {
-              if (attachment.isselected) {
-                deleteAttachemnts.push(attachment.filepath);
+            if (record?.attachments) {
+              for (let attachment of record.attachments) {
+                if (attachment.isselected) {
+                  deleteAttachemnts.push(attachment.filepath);
+                }
               }
             }
           }
@@ -1388,8 +1390,13 @@ export const RecordsLog = ({
 
   //function to manage download for harms option
   const enableHarmsDonwnload = () => {
-    return !recordsObj.records.every(record => record.isredactionready || record.failed || isrecordtimeout(record.created_at, RECORD_PROCESSING_HRS));
-  }
+    return !recordsObj.records.every(
+      (record) =>
+        record.isredactionready ||
+        record.failed ||
+        isrecordtimeout(record.created_at, RECORD_PROCESSING_HRS)
+    );
+  };
 
   return (
     <div className={classes.container}>
@@ -1450,8 +1457,8 @@ export const RecordsLog = ({
                           disabled={item.disabled}
                           sx={{ display: "flex" }}
                         >
-                          {!item.disabled ?
-                            (isDownloadReady ? (
+                          {!item.disabled ? (
+                            isDownloadReady ? (
                               <FontAwesomeIcon
                                 icon={faCheckCircle}
                                 size="2x"
@@ -1472,7 +1479,17 @@ export const RecordsLog = ({
                                 color="#FAA915"
                                 className={classes.statusIcons}
                               />
-                            ) : null) : (item.id === 1 && (<FontAwesomeIcon icon={faSpinner} size='2x' color='#FAA915' className={classes.statusIcons}/>))}
+                            ) : null
+                          ) : (
+                            item.id === 1 && (
+                              <FontAwesomeIcon
+                                icon={faSpinner}
+                                size="2x"
+                                color="#FAA915"
+                                className={classes.statusIcons}
+                              />
+                            )
+                          )}
                           {item.label}
                         </MenuItem>
                       );
