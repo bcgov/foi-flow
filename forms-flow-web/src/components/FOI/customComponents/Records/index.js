@@ -366,6 +366,9 @@ export const RecordsLog = ({
       var deleteRecords = [];
       var deleteAttachemnts = [];
       if (updateAttachment) {
+        console.log(
+          `if updateAttachment = ${JSON.stringify(updateAttachment)}`
+        );
         deleteRecords.push(
           (({ recordid, documentmasterid, s3uripath }) => ({
             recordid,
@@ -374,8 +377,10 @@ export const RecordsLog = ({
           }))(updateAttachment)
         );
       } else {
+        console.log(`else updateAttachment`);
         for (let record of records) {
           if (record.isselected) {
+            console.log(`if record.isselected`);
             deleteRecords.push(
               (({ recordid, documentmasterid, s3uripath }) => ({
                 recordid,
@@ -384,6 +389,7 @@ export const RecordsLog = ({
               }))(record)
             );
           } else {
+            console.log(`else record.isselected`);
             for (let attachment of record.attachments) {
               if (attachment.isselected) {
                 deleteAttachemnts.push(attachment.filepath);
@@ -393,6 +399,7 @@ export const RecordsLog = ({
         }
       }
       if (deleteRecords.length > 0) {
+        console.log(`deleteRecords.length = ${deleteRecords.length} `);
         dispatch(
           updateFOIRecords(
             requestId,
@@ -1388,8 +1395,13 @@ export const RecordsLog = ({
 
   //function to manage download for harms option
   const enableHarmsDonwnload = () => {
-    return !recordsObj.records.every(record => record.isredactionready || record.failed || isrecordtimeout(record.created_at, RECORD_PROCESSING_HRS));
-  }
+    return !recordsObj.records.every(
+      (record) =>
+        record.isredactionready ||
+        record.failed ||
+        isrecordtimeout(record.created_at, RECORD_PROCESSING_HRS)
+    );
+  };
 
   return (
     <div className={classes.container}>
@@ -1450,8 +1462,8 @@ export const RecordsLog = ({
                           disabled={item.disabled}
                           sx={{ display: "flex" }}
                         >
-                          {!item.disabled ?
-                            (isDownloadReady ? (
+                          {!item.disabled ? (
+                            isDownloadReady ? (
                               <FontAwesomeIcon
                                 icon={faCheckCircle}
                                 size="2x"
@@ -1472,7 +1484,17 @@ export const RecordsLog = ({
                                 color="#FAA915"
                                 className={classes.statusIcons}
                               />
-                            ) : null) : (item.id === 1 && (<FontAwesomeIcon icon={faSpinner} size='2x' color='#FAA915' className={classes.statusIcons}/>))}
+                            ) : null
+                          ) : (
+                            item.id === 1 && (
+                              <FontAwesomeIcon
+                                icon={faSpinner}
+                                size="2x"
+                                color="#FAA915"
+                                className={classes.statusIcons}
+                              />
+                            )
+                          )}
                           {item.label}
                         </MenuItem>
                       );
