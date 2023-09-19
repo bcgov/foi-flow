@@ -384,25 +384,15 @@ export const RecordsLog = ({
               }))(record)
             );
           } else {
-            console.log(`else record.isselected`);
-            console.log(
-              `record?.attachments = ${JSON.stringify(record?.attachments)}`
-            );
-            console.log(
-              `record?.attachments?.length = ${record?.attachments?.length}`
-            );
-            if (record?.attachments) {
-              for (let attachment of record.attachments) {
-                if (attachment.isselected) {
-                  deleteAttachemnts.push(attachment.filepath);
-                }
+            for (let attachment of record.attachments) {
+              if (attachment.isselected) {
+                deleteAttachemnts.push(attachment.filepath);
               }
             }
           }
         }
       }
       if (deleteRecords.length > 0) {
-        console.log(`deleteRecords.length = ${deleteRecords.length} `);
         dispatch(
           updateFOIRecords(
             requestId,
