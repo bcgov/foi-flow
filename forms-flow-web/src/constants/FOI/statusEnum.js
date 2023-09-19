@@ -4,6 +4,7 @@ const StateList = Object.freeze({
     redirect: [{status: "Redirect", isSelected: false}, {status:"Intake in Progress", isSelected: false}, {status: "Closed", isSelected: false}],
     open: [{status: "Open", isSelected: false}, {status: "Call For Records", isSelected: false}, {status:"Peer Review", isSelected: false},{status: "Closed", isSelected: false}],
     callforrecords: [{status: "Call For Records", isSelected: false}, {status: "Open", isSelected: false}, {status: "Closed", isSelected: false}],
+    callforrecordscfdmsdpersonal: [{status: "Call For Records", isSelected: false}, {status: "Open", isSelected: false}, {status: "Tagging", isSelected: false},{status: "Ready to Scan", isSelected: false}, {status: "Closed", isSelected: false}],
     feeassessed: [{status: "Fee Estimate", isSelected: false}, {status: "On Hold", isSelected: false}, {status: "Call For Records", isSelected: false}, {status: "Closed", isSelected: false}],
     feeassessedforpersonal: [{status: "Fee Estimate", isSelected: false}, {status: "Call For Records", isSelected: false}, {status: "Closed", isSelected: false}],
     onhold: [{status: "On Hold", isSelected: false}, {status: "Call For Records", isSelected: false}, {status: "Closed", isSelected: false}],
@@ -54,7 +55,9 @@ const StateEnum = Object.freeze({
     harms: {name: "Harms Assessment", id: 13},
     response: {name: "Response", id: 14},
     archived: {name: "Archived", id: 15},
-    peerreview: {name: "Peer Review", id: 16}
+    peerreview: {name: "Peer Review", id: 16},
+    tagging: {name: "Tagging", id: 17},
+    readytoscan: {name: "Ready to Scan", id: 18}
 });
 
 const StateTransitionCategories = Object.freeze({
