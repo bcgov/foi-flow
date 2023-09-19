@@ -384,9 +384,11 @@ export const RecordsLog = ({
               }))(record)
             );
           } else {
-            for (let attachment of record.attachments) {
-              if (attachment.isselected) {
-                deleteAttachemnts.push(attachment.filepath);
+            if (record?.attachments) {
+              for (let attachment of record.attachments) {
+                if (attachment.isselected) {
+                  deleteAttachemnts.push(attachment.filepath);
+                }
               }
             }
           }
