@@ -366,9 +366,6 @@ export const RecordsLog = ({
       var deleteRecords = [];
       var deleteAttachemnts = [];
       if (updateAttachment) {
-        console.log(
-          `if updateAttachment = ${JSON.stringify(updateAttachment)}`
-        );
         deleteRecords.push(
           (({ recordid, documentmasterid, s3uripath }) => ({
             recordid,
@@ -377,10 +374,8 @@ export const RecordsLog = ({
           }))(updateAttachment)
         );
       } else {
-        console.log(`else updateAttachment`);
         for (let record of records) {
           if (record.isselected) {
-            console.log(`if record.isselected`);
             deleteRecords.push(
               (({ recordid, documentmasterid, s3uripath }) => ({
                 recordid,
@@ -390,13 +385,17 @@ export const RecordsLog = ({
             );
           } else {
             console.log(`else record.isselected`);
-            console.log(`record = ${JSON.stringify(record)}`);
+            console.log(
+              `record?.attachments = ${JSON.stringify(record?.attachments)}`
+            );
             console.log(
               `record?.attachments?.length = ${record?.attachments?.length}`
             );
-            for (let attachment of record.attachments) {
-              if (attachment.isselected) {
-                deleteAttachemnts.push(attachment.filepath);
+            if (record?.attachments) {
+              for (let attachment of record.attachments) {
+                if (attachment.isselected) {
+                  deleteAttachemnts.push(attachment.filepath);
+                }
               }
             }
           }
