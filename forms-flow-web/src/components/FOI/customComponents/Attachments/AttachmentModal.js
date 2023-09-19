@@ -97,7 +97,6 @@ export default function AttachmentModal({
     const [extension, setExtension] = useState("");
     const [errorMessage, setErrorMessage] = useState();
     const [tagValue, setTagValue] = useState(uploadFor === 'record' ? "" : "general");
-    const [parentTagValue, setParentTagValue] = useState(10);
     const attchmentFileNameList = attachmentsArray.map(_file => _file.filename.toLowerCase());
     const totalRecordUploadLimit= TOTAL_RECORDS_UPLOAD_LIMIT ;
 
@@ -297,114 +296,6 @@ export default function AttachmentModal({
       }
     }
   
-
-
-    const tagL = [
-      {"name": 1, "display": "111"},
-      {"name": 2, "display": "222"},
-      {"name": 3, "display": "333"},
-      {"name": 4, "display": "444"},
-      {"name": 5, "display": "555"},
-      {"name": 6, "display": "666"},
-      {"name": 7, "display": "777"},
-      {"name": 8, "display": "888"},
-      {"name": 9, "display": "999"},
-      {"name": 10, "display": "101010"},
-      {"name": 11, "display": "111111"},
-      {"name": 12, "display": "121212"},
-      {"name": 13, "display": "131313"},
-      {"name": 14, "display": "141414"},
-      {"name": 15, "display": "151515"},
-      {"name": 16, "display": "161616"},
-      {"name": 17, "display": "171717"},
-      {"name": 18, "display": "181818"},
-      {"name": 19, "display": "191919"},
-      {"name": 20, "display": "202020"},
-      {"name": 21, "display": "212121"},
-      {"name": 22, "display": "222222"},
-      {"name": 23, "display": "232323"},
-      {"name": 24, "display": "242424"},
-      {"name": 25, "display": "252525"},
-      {"name": 26, "display": "262626"},
-      {"name": 27, "display": "272727"},
-      {"name": 28, "display": "282828"},
-      {"name": 29, "display": "292929"},
-      {"name": 30, "display": "303030"},
-      {"name": 31, "display": "313131"},
-      {"name": 32, "display": "323232"},
-      {"name": 33, "display": "333333"},
-      {"name": 34, "display": "343434"},
-      {"name": 35, "display": "353535"},
-      {"name": 36, "display": "363636"},
-      {"name": 37, "display": "373737"},
-      {"name": 38, "display": "383838"},
-      {"name": 39, "display": "393939"},
-      {"name": 40, "display": "404040"},
-    ];
-
-    const otherTagL = [
-      {"name": 41, "display": "414141"},
-      {"name": 42, "display": "424242"},
-      {"name": 43, "display": "434343"},
-      {"name": 44, "display": "444444"},
-      {"name": 45, "display": "454545"},
-      {"name": 46, "display": "464646"},
-      {"name": 47, "display": "474747"},
-      {"name": 48, "display": "484848"},
-      {"name": 49, "display": "494949"},
-      {"name": 50, "display": "505050"},
-      {"name": 51, "display": "515151"},
-      {"name": 52, "display": "525252"},
-      {"name": 53, "display": "535353"},
-      {"name": 54, "display": "545454"},
-      {"name": 55, "display": "555555"},
-      {"name": 56, "display": "565656"},
-      {"name": 57, "display": "575757"},
-      {"name": 58, "display": "585858"},
-      {"name": 59, "display": "595959"},
-      {"name": 60, "display": "606060"},
-      {"name": 61, "display": "616161"},
-      {"name": 62, "display": "626262"},
-      {"name": 63, "display": "636363"},
-      {"name": 64, "display": "646464"},
-      {"name": 65, "display": "656565"},
-      {"name": 66, "display": "666666"},
-      {"name": 67, "display": "676767"},
-      {"name": 68, "display": "686868"},
-      {"name": 69, "display": "696969"},
-      {"name": 70, "display": "707070"},
-      {"name": 71, "display": "717171"},
-      {"name": 72, "display": "727272"},
-      {"name": 73, "display": "737373"},
-      {"name": 74, "display": "747474"},
-      {"name": 75, "display": "757575"},
-      {"name": 76, "display": "767676"},
-      {"name": 77, "display": "777777"},
-      {"name": 78, "display": "787878"},
-      {"name": 79, "display": "797979"},
-      {"name": 80, "display": "808080"},
-      {"name": 81, "display": "818181"},
-      {"name": 82, "display": "828282"},
-      {"name": 83, "display": "838383"},
-      {"name": 84, "display": "848484"},
-      {"name": 85, "display": "858585"},
-      {"name": 86, "display": "868686"},
-      {"name": 87, "display": "878787"},
-      {"name": 88, "display": "888888"},
-      {"name": 89, "display": "898989"},
-      {"name": 90, "display": "909090"},
-      {"name": 91, "display": "919191"},
-      {"name": 92, "display": "929292"},
-      {"name": 93, "display": "939393"},
-      {"name": 94, "display": "949494"},
-      {"name": 95, "display": "959595"},
-      {"name": 96, "display": "969696"},
-      {"name": 97, "display": "979797"},
-      {"name": 98, "display": "989898"},
-      {"name": 99, "display": "999999"},
-      {"name": 100, "display": "100100100"},
-    ];
-
     const MCFSections = useSelector((state) => state.foiRequests.foiPersonalSections);
     const MSDSections = useSelector((state) => state.foiRequests.foiPersonalDivisionsAndSections);
     console.log("MSDSections", MSDSections);
@@ -478,7 +369,7 @@ export default function AttachmentModal({
                         totalRecordUploadLimit={totalRecordUploadLimit}
                       />
                       :
-                      (bcgovcode == "MSD") ?
+                      (bcgovcode == "MSD" && MSDSections?.divisions?.length > 0) ?
                         <FileUploadForMSDPersonal 
                           attachment={attachment}  
                           attchmentFileNameList={attchmentFileNameList}  
@@ -489,11 +380,11 @@ export default function AttachmentModal({
                           updateFilesCb={updateFilesCb}
                           modalFor={modalFor}
                           uploadFor={uploadFor}
-                          tagList={tagL}
-                          subTagList={otherTagL}
+                          divisions={tagList}
+                          tagList={MSDSections?.divisions[0]?.sections?.slice(0, 10)}
+                          otherTagList={MSDSections?.divisions[0]?.sections?.slice(11)}
                           handleTagChange={handleTagChange}
                           tagValue={tagValue}
-                          parentTagValue={parentTagValue}
                           maxNumberOfFiles={maxNoFiles}
                           isMinistryCoordinator={isMinistryCoordinator}
                           existingDocuments={existingDocuments}

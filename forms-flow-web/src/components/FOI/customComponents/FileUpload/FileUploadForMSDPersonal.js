@@ -35,9 +35,9 @@ const FileUploadForMSDPersonal = ({
     modalFor,
     handleTagChange,
     tagValue,
-    parentTagValue,
+    divisions = [],
     tagList = [],
-    subTagList = [],
+    otherTagList = [],
     isMinistryCoordinator,
     uploadFor="attachment",
     totalUploadedRecordSize,
@@ -52,9 +52,8 @@ const FileUploadForMSDPersonal = ({
     const [additionalTagList, setAdditionalTagList] = useState([]);
     const [showChildTags, setShowChildTags] = useState(false);
     const [showAdditionalTags, setShowAdditionalTags] = useState(false);
+    const [newDivisions, setNewDivisions] = useState([]);
 
-    console.log("tagList", tagList);
-    console.log("subTagList", subTagList);
 
     const handleUploadBtnClick = (e) => {
       e.stopPropagation();
@@ -221,26 +220,57 @@ const FileUploadForMSDPersonal = ({
       return newSectionArray;
     }
 
+    let searchResult = -1;
+    let divs = [];
     React.useEffect(() => {
-      setAdditionalTagList(searchSections(subTagList, searchValue, tagValue));
-    },[searchValue, subTagList, tagValue])
-
-    const handleParentTagChange = (_tagValue) => {
-      setAdditionalTagList([]);
-      if (_tagValue === parentTagValue) {
-        setShowChildTags(true);
-        handleTagChange("");
-      } else {
-        setShowChildTags(false);
-        handleTagChange(_tagValue);
+      if(divisions?.length > 0) {
+        divs = [];
+        divisions.forEach(division => {
+          if(division.display == "SDD Document Tracking") {
+            setShowChildTags(true);
+          } else {
+            divs.push(
+              {
+                divisionid: division.name,
+                divisionname: division.display,
+              }
+            );
+          }
+        });
+        setNewDivisions(divs);
       }
-    }
+    },[divisions])
+
+    React.useEffect(() => {
+      setAdditionalTagList(searchSections(otherTagList, searchValue, tagValue));
+    },[searchValue, otherTagList, tagValue])
 
     return (
     <>
       {(modalFor === "add" && (uploadFor === "attachment" || uploadFor === 'record')) && (<div>
         <div className="tagtitle">
           <span>Select the name of the section of records you are uploading. Once you have selected the section name you will be able to select the respective documents from your computer.</span>
+        </div>
+        <div className="tagtitle" style={{paddingTop: "15px"}}>
+          <span>Personals Divisional Tracking: </span>
+        </div>
+        <div className="taglist">
+          {newDivisions.map(tag =>
+            <ClickableChip
+              id={`${tag.divisionid}Tag`}
+              key={`${tag.divisionid}-tag`}
+              label={tag.divisionname.toUpperCase()}
+              sx={{width: "fit-content", marginRight: "8px", marginBottom: "8px"}}
+              color="primary"
+              size="small"
+              onClick={()=>{handleTagChange(tag.divisionid)}}
+              clicked={tag.divisionid == tagValue}
+            />
+          )}
+        </div>
+        {showChildTags === true && (<>
+        <div className="tagtitle">
+          <span>SDD Document Tracking: </span>
         </div>
         <div className="taglist">
           {tagList.map(tag =>
@@ -251,12 +281,12 @@ const FileUploadForMSDPersonal = ({
               sx={{width: "fit-content", marginRight: "8px", marginBottom: "8px"}}
               color="primary"
               size="small"
-              onClick={()=>{handleParentTagChange(tag.divisionid)}}
-              clicked={tag.divisionid == tagValue || (showChildTags && tag.divisionid === parentTagValue)}
+              onClick={()=>{handleTagChange(tag.divisionid)}}
+              clicked={tag.divisionid == tagValue}
             />
           )}
         </div>
-        {showChildTags === true && (<div className="taglist">
+        <div className="taglist">
           <Grid
             container
             item
@@ -354,7 +384,7 @@ const FileUploadForMSDPersonal = ({
               )}
             </Paper>)}
           </Grid>
-        </div>)}
+        </div></>)}
       </div>)}
       {modalFor === "add" && (<div className="tag-message-container-scanning">
         <p>Please drag and drop or add records associated with the section name you have selected above. All records upload will show under the selected section in the redaction application.</p>
