@@ -55,6 +55,8 @@ import { isScanningTeam } from "../../../../helper/FOI/helper";
 import { MinistryNeedsScanning } from "../../../../constants/FOI/enum";
 //import {convertBytesToMB} from "../../../../components/FOI/customComponents/FileUpload/util";
 import FOI_COMPONENT_CONSTANTS from "../../../../constants/FOI/foiComponentConstants";
+import MCFPersonal from './MCFPersonal';
+import MSDPersonal from './MSDPersonal';
 
 
 const useStyles = makeStyles((_theme) => ({
@@ -181,6 +183,13 @@ export const RecordsLog = ({
   let isRecordsfetching = useSelector(
     (state) => state.foiRequests.isRecordsLoading
   );
+
+  const tagList = divisions.filter(d => d.divisionname.toLowerCase() !== 'communications').map(division => {
+    return {
+      name: division.divisionid,
+      display: division.divisionname,
+    }
+  });
 
   const classes = useStyles();
   const [records, setRecords] = useState(recordsObj?.records);
@@ -1484,62 +1493,90 @@ export const RecordsLog = ({
                     <i className="dialog-close-button">Close</i>
                     <CloseIcon />
                   </IconButton>
-                </DialogTitle>
+              </DialogTitle>
               <DialogContent className={'dialog-content-nomargin'}>
-                <DialogContentText id="state-change-dialog-description" component={'span'} style={{textAlign: "center"}}>
+                <DialogContentText id="state-change-dialog-description" component={'span'}>
                   {(records.filter(r=>(r.isselected && r.attributes.divisions.length > 1)).length > 0 && filterValue < 0) ? 
-                    <><span className="confirmation-message">
+                    <div className="tagtitle"><span>
                       You have selected a record that was provided by more than one division. <br></br>
                       To change the division you must first filter the Records Log by the division that you want to no longer be associated with the selected records.
-                      </span><br></br>
-                    </> : 
+                      </span>
+                    </div>
+                    : 
                     <>
-                    <span className="confirmation-message">
-                      Select the divisions that corresponds to the records you have selected.<br></br>
-                      This will update the divisions on all records you have selected both in the gathering records log and the redaction app.
-                    </span><br></br><br></br>
-                    <Paper
-                      component={Grid}
-                      sx={{
-                        color: "#38598A",
-                        maxWidth:"100%",
-                        paddingTop: "8px",
-                        borderTopLeftRadius: 0,
-                        borderTopRightRadius: 0,
-                      }}
-                      alignItems="center"
-                      justifyContent="flex-start"
-                      direction="row"
-                      container
-                      item
-                      xs={12}
-                      elevation={0}
-                    >
-                      {divisions.filter(division => {
-                        if (division.divisionname.toLowerCase() === 'communications') {
-                          return false;
-                        } else if (filterValue > -1 && filterValue !== division.divisionid) {
-                          return true;
-                        } else if (records.filter(r => r.isselected)[0]?.attributes.divisions[0].divisionid !== division.divisionid) {
-                          return true;
-                        } else {
-                          return false;
-                        }
-                      }).map(division =>
-                        <ClickableChip
-                          item
-                          id={`${division.divisionid}updateTag`}
-                          key={`${division.divisionid}-updateTag`}
-                          label={division.divisionname.toUpperCase()}
-                          sx={{width: "fit-content", marginLeft: "8px", marginBottom: "8px" }}
-                          color={division.divisionid === -2 ? '#A0192F' : division.divisionid === -3 ? '#B57808' : 'primary'}
-                          size="small"
-                          onClick={(e)=>{setDivisionModalTagValue(division.divisionid)}}
-                          clicked={divisionModalTagValue === division.divisionid}
-                        />
-                      )}
-                    </Paper>
-                  </>}
+                      <div className="tagtitle"><span>
+                        Select the divisions that corresponds to the records you have selected.<br></br>
+                        This will update the divisions on all records you have selected both in the gathering records log and the redaction app.
+                      </span></div>
+
+                      {(requestType == FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL) ?
+                        (bcgovcode == "MCF") ?
+                          <MCFPersonal
+                            setNewDivision={setDivisionModalTagValue}
+                            tagValue={records.filter(r => r.isselected)[0]?.attributes.divisions[0].divisionid}
+                            divisionModalTagValue={divisionModalTagValue}
+                          />
+                          :
+                          (bcgovcode == "MSD") ?
+                            <MSDPersonal
+                              setNewDivision={setDivisionModalTagValue}
+                              tagValue={records.filter(r => r.isselected)[0]?.attributes.divisions[0].divisionid}
+                              divisionModalTagValue={divisionModalTagValue}
+                              divisions={tagList}
+                            />
+                            :
+                            <div className="taglist">
+                              {divisions.filter(division => {
+                                if (division.divisionname.toLowerCase() === 'communications') {
+                                  return false;
+                                } else if (filterValue > -1 && filterValue !== division.divisionid) {
+                                  return true;
+                                } else if (records.filter(r => r.isselected)[0]?.attributes.divisions[0].divisionid !== division.divisionid) {
+                                  return true;
+                                } else {
+                                  return false;
+                                }
+                              }).map(division =>
+                                <ClickableChip
+                                  item
+                                  id={`${division.divisionid}updateTag`}
+                                  key={`${division.divisionid}-updateTag`}
+                                  label={division.divisionname.toUpperCase()}
+                                  sx={{width: "fit-content", marginLeft: "8px", marginBottom: "8px" }}
+                                  color={division.divisionid === -2 ? '#A0192F' : division.divisionid === -3 ? '#B57808' : 'primary'}
+                                  size="small"
+                                  onClick={(e)=>{setDivisionModalTagValue(division.divisionid)}}
+                                  clicked={divisionModalTagValue === division.divisionid}
+                                />
+                              )}
+                            </div>
+                      :
+                      <div className="taglist">
+                        {divisions.filter(division => {
+                          if (division.divisionname.toLowerCase() === 'communications') {
+                            return false;
+                          } else if (filterValue > -1 && filterValue !== division.divisionid) {
+                            return true;
+                          } else if (records.filter(r => r.isselected)[0]?.attributes.divisions[0].divisionid !== division.divisionid) {
+                            return true;
+                          } else {
+                            return false;
+                          }
+                        }).map(division =>
+                          <ClickableChip
+                            item
+                            id={`${division.divisionid}updateTag`}
+                            key={`${division.divisionid}-updateTag`}
+                            label={division.divisionname.toUpperCase()}
+                            sx={{width: "fit-content", marginLeft: "8px", marginBottom: "8px" }}
+                            color={division.divisionid === -2 ? '#A0192F' : division.divisionid === -3 ? '#B57808' : 'primary'}
+                            size="small"
+                            onClick={(e)=>{setDivisionModalTagValue(division.divisionid)}}
+                            clicked={divisionModalTagValue === division.divisionid}
+                          />
+                        )}
+                      </div>}
+                    </>}
                 </DialogContentText>
               </DialogContent>
               <DialogActions>
