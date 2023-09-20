@@ -29,6 +29,10 @@ const StateDropDown = ({
   const cfrFeeData = useSelector((reduxState) => reduxState.foiRequests.foiRequestCFRForm.feedata);
   const cfrStatus = useSelector((reduxState) => reduxState.foiRequests.foiRequestCFRForm.status);
 
+  let requestDetails = useSelector(
+    (state) => state.foiRequests.foiRequestDetail
+  );
+
   React.useEffect(() => {
     if (requestState && requestState !== status) {
       setStatus(requestState);
@@ -126,7 +130,13 @@ const StateDropDown = ({
       case StateEnum.callforrecords.name.toLowerCase():
         if (_isMinistryCoordinator && personalRequest)
           return _stateList.callforrecordsforpersonal;
+        if(personalIAO && (requestDetails.bcgovcode.toLowerCase() === "mcf" || requestDetails.bcgovcode.toLowerCase() === "msd"))
+          return _stateList.callforrecordscfdmsdpersonal
         return _stateList.callforrecords;
+      case StateEnum.tagging.name.toLowerCase():
+         return _stateList.tagging;
+      case StateEnum.readytoscan.name.toLowerCase():
+        return _stateList.readytoscan;     
       case StateEnum.review.name.toLowerCase():
         return _stateList.review;
       case StateEnum.onhold.name.toLowerCase():
