@@ -38,6 +38,8 @@ const MinistryStateList = Object.freeze({
     response: [{status: "Response", isSelected: false}],
     closed: [{status: "Closed", isSelected: false}],
     peerreview: [{status: "Peer Review", isSelected: false}],
+    tagging :[{status: "Tagging", isSelected: true}],
+    readytoscan : [{status: "Ready to Scan", isSelected: true}]
 });
 
 const StateEnum = Object.freeze({
