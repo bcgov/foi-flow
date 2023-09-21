@@ -8,6 +8,7 @@ import json
 import logging
 from flask import current_app
 from request_api.services.email.templates.templatefilters import init_filters
+from request_api.services.external.keycloakadminservice import KeycloakAdminService
 
 init_filters()
 
@@ -73,6 +74,7 @@ class templateservice:
 
     def __generatetemplate(self, dynamictemplatevalues, emailtemplatehtml, title):
         dynamictemplatevalues["ffaurl"] = current_app.config['FOI_FFA_URL']
+        dynamictemplatevalues["groupEmail"] = KeycloakAdminService.getgroupdetails(dynamictemplatevalues["assignedTo"])["groupEmailAddress"]
         headerfooterhtml = storageservice().downloadtemplate('/TEMPLATES/EMAILS/header_footer_template.html')
         if(emailtemplatehtml is None):
             raise ValueError('No template found')
@@ -83,6 +85,7 @@ class templateservice:
         if dynamictemplatevalues["assignedTo"] == None:
                 dynamictemplatevalues["assignedToFirstName"] = ""
                 dynamictemplatevalues["assignedToLastName"] = ""
+                dynamictemplatevalues["groupEmail"] = ""
 
         contenttemplate = Template(emailtemplatehtml)   
         content = contenttemplate.render(dynamictemplatevalues)

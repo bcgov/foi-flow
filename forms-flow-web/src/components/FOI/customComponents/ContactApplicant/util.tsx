@@ -21,6 +21,7 @@ export const getTemplateVariables = (requestDetails: any, templateInfo: any) => 
     {name: "{{assignedToFirstName}}", value: requestDetails.assignedToFirstName || ""},
     {name: "{{assignedToLastName}}", value: requestDetails.assignedToLastName || ""},
     {name: "{{assignedGroup}}", value: requestDetails.assignedGroup},
+    {name: "{{groupEmail}}", value: requestDetails.assignedGroupEmail},
     {name: "{{ffaurl}}", value: requestDetails.ffaurl},
   ];
   

@@ -18,6 +18,8 @@ class KeycloakAdminService:
     cache_redis_url = os.getenv('CACHE_REDISURL')
     kctokenexpiry = os.getenv('KC_SRC_ACC_TOKEN_EXPIRY',1800)
     
+    #Constants
+    PRIMARY_GROUP_EMAIL_INDEX = 0 #index of the email address in the group information array
         
     def get_token(self):
         _accesstoken=None
@@ -80,7 +82,35 @@ class KeycloakAdminService:
         for group in allowedgroups:
             group["members"] = self.getgroupmembersbyid(group["id"])
         return allowedgroups  
-    
+
+    # INPUT: groupid (string) - intake group id from the keyclock request
+    # OUTPUT - group information (Array of strings) e.g. [email address]
+    # Description: This method will fetch the group information from the keycloak server
+    # by passing the group id as part of the parameters. The group information contains 
+    # the email address of the group.
+    def getgroupinformation(self, groupid):
+        if groupid is None or groupid == '':
+            return None
+        groupurl ='{0}/auth/admin/realms/{1}/groups/{2}'.format(self.keycloakhost,self.keycloakrealm,groupid)
+        groupresponse = requests.get(groupurl, headers=self.getheaders())
+        if groupresponse.status_code == 200 and groupresponse.content != '': 
+            return groupresponse.json()
+        return None
+
+    # INPUT: groupname (string) - intake group name from the keyclock request
+    # OUTPUT - group information (Array of strings) e.g. [email address] 
+    # Description: This method first extracts the group id from the group name.
+    # The group id is then passed as a parameter to the getgroupinformation method
+    # to fetch the group information. The group information contains the email address 
+    def getgroupdetails(self, groupname): 
+        group = self.getallgroups()
+        for entry in group:
+            if entry["name"] == groupname:
+                groupinfo = self.getgroupinformation(entry['id'])
+                if groupinfo is not None:
+                    return groupinfo
+        return None
+
     def getgroupmembersbyid(self, groupid):
         groupurl ='{0}/auth/admin/realms/{1}/groups/{2}/members'.format(self.keycloakhost,self.keycloakrealm,groupid)
         groupresponse = requests.get(groupurl, headers=self.getheaders())
