@@ -8,7 +8,6 @@ import json
 import logging
 from flask import current_app
 from request_api.services.email.templates.templatefilters import init_filters
-from request_api.services.external.keycloakadminservice import KeycloakAdminService
 
 init_filters()
 
