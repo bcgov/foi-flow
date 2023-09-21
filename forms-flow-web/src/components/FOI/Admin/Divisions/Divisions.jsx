@@ -5,6 +5,7 @@ import SearchBar from "../customComponents";
 import CreateDivisionModal from "./CreateDivisionModal";
 import DisableDivisionModal from "./DisableDivisionModal";
 import EditDivisionModal from "./EditDivisionModal";
+import CreateSectionModal from "./CreateSectionModal";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import { DataGrid } from "@mui/x-data-grid";
@@ -32,6 +33,7 @@ const Divisions = ({userDetail}) => {
   const [searchResults, setSearchResults] = useState(null);
   const [selectedDivision, setSelectedDivision] = useState(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [showCreateSectionModal, setShowCreateSectionModal] = useState(false);
   const [showDisableModal, setShowDisableModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const dispatch = useDispatch();
@@ -56,6 +58,9 @@ const Divisions = ({userDetail}) => {
         createProgramAreaDivision({
           name: data.name,
           programareaid: data.programareaid,
+          issection: data.issection,
+          parentid: data.parentid,
+          specifictopersonalrequests: data.specifictopersonalrequests
         },
         (err, res) => {            
             if (!err && res) {
@@ -164,6 +169,10 @@ const Divisions = ({userDetail}) => {
     setShowCreateModal(true);
   };
 
+  const openCreateSectionModal = () => {
+    setShowCreateSectionModal(true)
+  }
+
   const openDisableDivisionModal = (data) => {
     setSelectedDivision(data);
     setShowDisableModal(true);
@@ -206,6 +215,13 @@ const Divisions = ({userDetail}) => {
       width: 150,
       align: "center",
       renderCell: (params) => <>{params.value ? params.value : "-"}</>,
+    },
+    {
+      field: "specifictopersonalrequests",
+      headerName: "Personal Requests",
+      width: 150,
+      align: "center",
+      // renderCell: (params) => <>{params.value !== null ? params.value : "-"}</>,
     },
     {
       field: "sortorder",
@@ -280,6 +296,13 @@ const Divisions = ({userDetail}) => {
               >
                 New Division
               </Button>
+              <Button
+                size="small"
+                variant="contained"
+                onClick={() => (openCreateSectionModal())}
+              >
+                New Section
+              </Button>
             </Box>
           </Grid>
         </Grid>
@@ -314,6 +337,12 @@ const Divisions = ({userDetail}) => {
         saveDivision={createDivision}
         showModal={showCreateModal}
         closeModal={() => setShowCreateModal(false)}
+      />
+      <CreateSectionModal
+        divisions={divisions}
+        saveDivision={createDivision}
+        showModal={showCreateSectionModal}
+        closeModal={() => setShowCreateSectionModal(false)}
       />
       <DisableDivisionModal
         initialDivision={selectedDivision}

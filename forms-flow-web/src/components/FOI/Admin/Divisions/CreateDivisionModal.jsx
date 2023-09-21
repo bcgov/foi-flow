@@ -16,7 +16,13 @@ const CreateDivisionModal = ({
   showModal,
   closeModal,
 }) => {
-  const [division, setDivision] = useState(null);
+  const [division, setDivision] = useState({
+    name: "",
+    programareaid: null,
+    issection: false,
+    parentid: null,
+    specifictopersonalrequests: null,
+  });
   let programAreas = useSelector((state) => state.foiRequests.foiAdminProgramAreaList);
 
   const handleSave = () => {
@@ -29,7 +35,13 @@ const CreateDivisionModal = ({
   };
 
   useEffect(() => {
-    setDivision(null);
+    setDivision({
+      name: "",
+      programareaid: null,
+      issection: false,
+      parentid: null,
+      specifictopersonalrequests: null,
+    });
   }, [showModal]);
 
   return (
@@ -39,6 +51,7 @@ const CreateDivisionModal = ({
         <DialogContent>
           <TextField
             autoFocus
+            required
             margin="dense"
             id="divisionName"
             label="Division Name"
@@ -48,7 +61,7 @@ const CreateDivisionModal = ({
             }
             fullWidth
           />
-          <InputLabel shrink id="create-divisions-areas-label">
+          <InputLabel shrink required id="create-divisions-areas-label">
             Program Area
           </InputLabel>
           <Select
