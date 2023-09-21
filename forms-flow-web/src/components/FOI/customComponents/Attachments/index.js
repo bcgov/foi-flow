@@ -499,25 +499,29 @@ const Attachment = React.memo(({indexValue, attachment, handlePopupButtonClick, 
     if (['personal', AttachmentLetterCategories.feeestimatefailed.name, AttachmentLetterCategories.feeestimatesuccessful.name, AttachmentLetterCategories.feeestimateletter.name, AttachmentLetterCategories.feeestimatepaymentreceipt.name, AttachmentLetterCategories.feeestimatepaymentcorrespondencesuccessful.name, AttachmentLetterCategories.feeestimatepaymentcorrespondencefailed.name].includes(attachment.category?.toLowerCase()) )
       return true;      
   }
-  const [disabled, setDisabled] = useState(isMinistryCoordinator && disableCategory());
-  useEffect(() => {
-    if(attachment && attachment.filename) {
-      setDisabled(isMinistryCoordinator && disableCategory())
-    }
-  }, [attachment])
-
   const disableAttachmentsTaggedBySystem = (attachment) => {
     let result = false;
     AttachmentCategories.categorys.forEach((category) => {
-      if (category.name.toLowerCase() === attachment.category.toLowerCase()) {
-        if (category.display.toLowerCase().includes('>') || category.display.toLowerCase().includes('applicant')) {
+      if (category.name?.toLowerCase() === attachment.category?.toLowerCase()) {
+        if (category.display?.toLowerCase().includes('>') || category.display?.toLowerCase().includes('applicant')) {
           result = true
         }
       }
     })
     return result
   }
-  const reclassifyIsDisabled = disableAttachmentsTaggedBySystem(attachment)
+
+  const [disabled, setDisabled] = useState(isMinistryCoordinator && disableCategory());
+  const [reclassifyIsDisabled, setReclassifyIsDisabled] = useState(false);
+  useEffect(() => {
+    if(attachment && attachment.filename) {
+      setDisabled(isMinistryCoordinator && disableCategory())
+    }
+    if (attachment && attachment.category) {
+      setReclassifyIsDisabled(disableAttachmentsTaggedBySystem(attachment))
+    }
+  }, [attachment])
+
 
   const attachmenttitle = ()=>{
 
