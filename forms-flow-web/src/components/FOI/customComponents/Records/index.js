@@ -115,7 +115,10 @@ import {
 } from "./util";
 import { readUploadedFileAsBytes } from "../../../../helper/FOI/helper";
 import { TOTAL_RECORDS_UPLOAD_LIMIT } from "../../../../constants/constants";
+import { isScanningTeam } from "../../../../helper/FOI/helper";
+import { MinistryNeedsScanning } from "../../../../constants/FOI/enum";
 //import {convertBytesToMB} from "../../../../components/FOI/customComponents/FileUpload/util";
+import FOI_COMPONENT_CONSTANTS from "../../../../constants/FOI/foiComponentConstants";
 
 const useStyles = makeStyles((_theme) => ({
   createButton: {
@@ -219,10 +222,17 @@ export const RecordsLog = ({
   isMinistryCoordinator,
   setRecordsUploading,
   recordsTabSelect,
+  requestType
 }) => {
-  let recordsObj = useSelector((state) => state.foiRequests.foiRequestRecords);
 
-  let pdfStitchStatus = useSelector(
+  const user = useSelector((state) => state.user.userDetail);
+  const userGroups = user?.groups?.map(group => group.slice(1));
+  
+  let recordsObj = useSelector(
+    (state) => state.foiRequests.foiRequestRecords
+  );
+
+ let pdfStitchStatus = useSelector(
     (state) => state.foiRequests.foiPDFStitchStatusForHarms
   );
 
@@ -233,16 +243,15 @@ export const RecordsLog = ({
   let isRecordsfetching = useSelector(
     (state) => state.foiRequests.isRecordsLoading
   );
+
   const classes = useStyles();
   const [records, setRecords] = useState(recordsObj?.records);
   const [totalUploadedRecordSize, setTotalUploadedRecordSize] = useState(0);
-  useEffect(() => {
-    setRecords(recordsObj?.records);
-    let nonDuplicateRecords = recordsObj?.records?.filter(
-      (record) => !record.isduplicate
-    );
-    let totalUploadedSize =
-      calculateTotalUploadedFileSizeInKB(nonDuplicateRecords) / (1024 * 1024);
+  const [isScanningTeamMember, setIsScanningTeamMember] = useState(isScanningTeam(userGroups));
+  useEffect(() => {    
+    setRecords(recordsObj?.records)
+    let nonDuplicateRecords = recordsObj?.records?.filter(record => !record.isduplicate)
+    let totalUploadedSize= (calculateTotalUploadedFileSizeInKB(nonDuplicateRecords)/ (1024 * 1024))
     setTotalUploadedRecordSize(parseFloat(totalUploadedSize.toFixed(4)));
     dispatch(checkForRecordsChange(requestId, ministryId));
   }, [recordsObj]);
@@ -1489,7 +1498,7 @@ export const RecordsLog = ({
               </ConditionalComponent>
             </Grid> */}
             <Grid item xs={3}>
-              {isMinistryCoordinator ? (
+              {isMinistryCoordinator || (isScanningTeamMember && MinistryNeedsScanning.includes(bcgovcode.replaceAll('"', '')) && requestType === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL) ?
                 <button
                   className={clsx("btn", "addAttachment", classes.createButton)}
                   variant="contained"
@@ -1499,9 +1508,9 @@ export const RecordsLog = ({
                 >
                   + Upload Records
                 </button>
-              ) : (
+              : (
                 records?.length > 0 &&
-                DISABLE_REDACT_WEBLINK?.toLowerCase() == "false" && (
+                DISABLE_REDACT_WEBLINK?.toLowerCase() == "false" && 
                   <a
                     href={DOC_REVIEWER_WEB_URL + "/foi/" + ministryId}
                     target="_blank"
@@ -1520,7 +1529,7 @@ export const RecordsLog = ({
                     </button>
                   </a>
                 )
-              )}
+              }
             </Grid>
           </Grid>
           <Grid
@@ -1876,6 +1885,7 @@ export const RecordsLog = ({
             )}
             totalUploadedRecordSize={totalUploadedRecordSize}
             replacementfiletypes={getreplacementfiletypes()}
+            requestType={requestType}
           />
           <div className="state-change-dialog">
             <Dialog
