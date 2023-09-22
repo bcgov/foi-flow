@@ -272,7 +272,7 @@ class FOIRequestNotificationUser(db.Model):
                             FOIRequests.assignedgroup == group,
                             and_(
                                 FOIRequests.assignedministrygroup == group,
-                                FOIRequests.requeststatusid.in_([2,7,9,8,10,11,12,13,14])
+                                FOIRequests.requeststatusid.in_([2,7,9,8,10,11,12,13,14,17,18])
                             )
                         )
                     )
