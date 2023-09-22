@@ -7,6 +7,8 @@ import InputLabel from "@material-ui/core/InputLabel";
 import MenuItem from "@material-ui/core/MenuItem";
 import Select from "@material-ui/core/Select";
 import TextField from "@material-ui/core/TextField";
+import FormControlLabel from '@mui/material/FormControlLabel';
+import Checkbox from '@mui/material/Checkbox';
 
 const EditDivisionModal = ({
   initialDivision,
@@ -15,7 +17,16 @@ const EditDivisionModal = ({
   showModal,
   closeModal,
 }) => {
-  const [division, setDivision] = useState(initialDivision);
+  const [division, setDivision] = useState({
+    name: "",
+    programareaid: null,
+    issection: false,
+    parentid: null,
+    specifictopersonalrequests: null,
+  });
+  const [parentDivisions, setParentDivisions] = useState(divisions);
+
+  console.log(division)
 
   const handleSave = () => {
     saveDivision(division);
@@ -25,10 +36,34 @@ const EditDivisionModal = ({
   const handleClose = () => {
     closeModal();
   };
+  
+  const handleSectionSelection = () => {
+    setDivision({...division, issection: !division.issection, specifictopersonalrequests: null, parentid: null})
+  }
 
   useEffect(() => {
-    setDivision(initialDivision);
-  }, [initialDivision, showModal]);
+    setDivision(initialDivision || {
+      name: "",
+      programareaid: null,
+      issection: false,
+      parentid: null,
+      specifictopersonalrequests: null,
+    });
+  }, [showModal]);
+
+  //useEffect to manage filtering of dropdown for parent divisions
+  useEffect(() => {
+    if (division.programareaid && division.specifictopersonalrequests) {
+        let filteredDivisions = divisions.filter(item => item.programareaid === division.programareaid && item.specifictopersonalrequests && item.divisionid !== division.divisionid && !division.issection);
+        return setParentDivisions(filteredDivisions);
+    } else if (division.programareaid && !division.specifictopersonalrequests) {
+        let filteredDivisions = divisions.filter(item => item.programareaid === division.programareaid && !item.specifictopersonalrequests && item.divisionid !== division.divisionid && !division.issection);
+        return setParentDivisions(filteredDivisions);
+    } else {
+        let filteredDivisions = divisions.filter(item => !item.issection && item.divisionid !== division.divisionid);
+        return setParentDivisions(filteredDivisions);
+    }
+  }, [division])
 
   return (
     <>
@@ -36,24 +71,25 @@ const EditDivisionModal = ({
         <DialogTitle>Edit Division</DialogTitle>
         <DialogContent>
           <TextField
+            required
             autoFocus
             margin="dense"
             id="divisionName"
             label="Division Name"
-            value={division ? division.name : ""}
+            value={division.name}
             onChange={(event) =>
               setDivision({ ...division, name: event.target.value })
             }
             fullWidth
           />
-          <InputLabel shrink id="edit-divisions-areas-label">
+          <InputLabel required shrink id="edit-divisions-areas-label">
             Program Area
           </InputLabel>
           <Select
             margin="dense"
             id="programareaid"
             labelId="edit-divisions-areas-label"
-            value={division ? division.programareaid : ""}
+            value={division.programareaid}
             onChange={(event) =>
               setDivision({ ...division, programareaid: event.target.value })
             }
@@ -87,6 +123,42 @@ const EditDivisionModal = ({
             }}
           />
           </div>
+          <div style={{display: "flex", flexDirection: "row", justifyContent: "center"}}>
+            <FormControlLabel required label="Is Section" id="edit-divisions-areas-label" control={
+            <Checkbox 
+              checked={division ? division.issection : false}
+              onChange={handleSectionSelection} 
+            />} 
+            />
+            <FormControlLabel label="Specific to Personal Request" id="edit-divisions-areas-label" control={
+            <Checkbox 
+              disabled={division ? !division.issection : false} 
+              checked={division ? division.specifictopersonalrequests : false}
+              onChange={() => setDivision({...division, specifictopersonalrequests: !division.specifictopersonalrequests})} 
+            />} 
+            />
+          </div>
+          <InputLabel shrink id="edit-divisions-areas-label">
+            Parent Division
+          </InputLabel>
+          <Select
+            disabled={division ? !division.issection : false}
+            margin="dense"
+            id="parentid"
+            labelId="edit-divisions-areas-label"
+            value={division.parentid}
+            onChange={(event) =>
+              setDivision({ ...division, parentid: event.target.value })
+            }
+            fullWidth
+          >
+            {parentDivisions &&
+              parentDivisions.map((item, index) => (
+                <MenuItem key={index} value={item.divisionid}>
+                  {item.name}
+                </MenuItem>
+              ))}
+          </Select>
         </DialogContent>
         <DialogActions>
           <button onClick={handleSave} className="btn-bottom btn-save">

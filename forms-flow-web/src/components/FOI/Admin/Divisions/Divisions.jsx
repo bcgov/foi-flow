@@ -101,6 +101,9 @@ const Divisions = ({userDetail}) => {
             name: data.name,
             programareaid: data.programareaid,
             sortorder: data.sortorder,
+            issection: data.issection,
+            parentid: data.parentid,
+            specifictopersonalrequests: data.specifictopersonalrequests
           },
           data.divisionid,
           (err, res) => {            
@@ -221,7 +224,7 @@ const Divisions = ({userDetail}) => {
       headerName: "Personal Requests",
       width: 150,
       align: "center",
-      // renderCell: (params) => <>{params.value !== null ? params.value : "-"}</>,
+      renderCell: (params) => <>{params.value !== null ? params.value : "-"}</>,
     },
     {
       field: "sortorder",

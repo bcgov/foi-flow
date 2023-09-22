@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import Dialog from "@material-ui/core/Dialog";
 import DialogActions from "@material-ui/core/DialogActions";
 import DialogContent from "@material-ui/core/DialogContent";
@@ -31,10 +31,10 @@ const CreateSectionModal = ({
   //useEffect to manage filtering of dropdown for parent divisions
   useEffect(() => {
     if (section.programareaid && section.specifictopersonalrequests) {
-        let filteredDivisions = divisions.filter(division => division.programareaid === section.programareaid && division.specifictopersonalrequests);
+        let filteredDivisions = divisions.filter(division => division.programareaid === section.programareaid && division.specifictopersonalrequests && !division.issection);
         return setParentDivisions(filteredDivisions);
     } else if (section.programareaid && !section.specifictopersonalrequests) {
-        let filteredDivisions = divisions.filter(division => division.programareaid === section.programareaid && !division.specifictopersonalrequests);
+        let filteredDivisions = divisions.filter(division => division.programareaid === section.programareaid && !division.specifictopersonalrequests && !division.issection);
         return setParentDivisions(filteredDivisions);
     } else {
         let filteredDivisions = divisions.filter(division => !division.issection);
