@@ -150,8 +150,8 @@ export default function AttachmentModal({
     }
 
     useEffect(() => {
-      if (attachment && modalFor == "reclassify") {
-        setTagValue(attachment.category.toLowerCase())
+      if (attachment && attachment.category && modalFor == "reclassify") {
+        setTagValue(attachment.category?.toLowerCase())
       }
     }, [modalFor, attachment])
 

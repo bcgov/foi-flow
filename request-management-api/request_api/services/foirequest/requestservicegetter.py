@@ -14,6 +14,7 @@ from request_api.services.paymentservice import paymentservice
 from request_api.services.subjectcodeservice import subjectcodeservice
 from request_api.services.programareaservice import programareaservice
 from request_api.utils.commons.datetimehandler import datetimehandler
+from request_api.services.external.keycloakadminservice import KeycloakAdminService
 
 class requestservicegetter:
     """ This class consolidates retrival of FOI request for actors: iao and ministry. 
@@ -142,6 +143,7 @@ class requestservicegetter:
             'receivedmodeid':request['receivedmode.receivedmodeid'],
             'receivedMode':request['receivedmode.name'],
             'assignedGroup': requestministry["assignedgroup"],
+            'assignedGroupEmail': KeycloakAdminService().getgroupdetails(requestministry["assignedgroup"])['attributes']['groupEmailAddress'][KeycloakAdminService.PRIMARY_GROUP_EMAIL_INDEX], 
             'assignedTo': requestministry["assignedto"],
             'idNumber':requestministry["filenumber"],
             'axisRequestId': requestministry["axisrequestid"],
