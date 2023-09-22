@@ -66,7 +66,7 @@ class requestservicecreate:
             return result
     
     def saveministryrequestversion(self,ministryrequestschema, foirequestid , ministryid, userid, usertype = None):        
-        _foirequest = FOIRequest().getrequest(foirequestid) 
+        _foirequest = FOIRequest().getrequest(foirequestid)
         _foiministryrequest = FOIMinistryRequest().getrequestbyministryrequestid(ministryid)
         _foirequestapplicant = FOIRequestApplicantMapping().getrequestapplicants(foirequestid,_foirequest["version"])
         _foirequestcontact = FOIRequestContactInformation().getrequestcontactinformation(foirequestid,_foirequest["version"])
