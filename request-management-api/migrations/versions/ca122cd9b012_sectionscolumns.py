@@ -2,7 +2,7 @@
 Task #4292
 
 Revision ID: ca122cd9b012
-Revises: d43db71d53e5
+Revises: b51a0f2635c1
 Create Date: 2023-08-30 13:26:20.287595
 
 """
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 
 # revision identifiers, used by Alembic.
 revision = 'ca122cd9b012'
-down_revision = 'd43db71d53e5'
+down_revision = 'b51a0f2635c1'
 branch_labels = None
 depends_on = None
 
