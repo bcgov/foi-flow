@@ -8,6 +8,8 @@ import InputLabel from "@material-ui/core/InputLabel";
 import MenuItem from "@material-ui/core/MenuItem";
 import Select from "@material-ui/core/Select";
 import TextField from "@material-ui/core/TextField";
+import FormControlLabel from '@mui/material/FormControlLabel';
+import Checkbox from '@mui/material/Checkbox';
 
 
 const CreateDivisionModal = ({
@@ -21,7 +23,7 @@ const CreateDivisionModal = ({
     programareaid: null,
     issection: false,
     parentid: null,
-    specifictopersonalrequests: null,
+    specifictopersonalrequests: false,
   });
   let programAreas = useSelector((state) => state.foiRequests.foiAdminProgramAreaList);
 
@@ -40,7 +42,7 @@ const CreateDivisionModal = ({
       programareaid: null,
       issection: false,
       parentid: null,
-      specifictopersonalrequests: null,
+      specifictopersonalrequests: false,
     });
   }, [showModal]);
 
@@ -81,6 +83,9 @@ const CreateDivisionModal = ({
                 </MenuItem>
               ))}
           </Select>
+          <div style={{display: "flex", flexDirection: "row", justifyContent:"center", alignItems: "center"}}>
+            <FormControlLabel id="create-divisions-areas-label" control={<Checkbox checked={division.specifictopersonalrequests} onChange={() => setDivision({...division, specifictopersonalrequests: !division.specifictopersonalrequests})} />} label="Specific to Personal Request" />
+          </div>
         </DialogContent>
         <DialogActions>
           <button onClick={handleSave} className="btn-bottom btn-save">

@@ -224,7 +224,6 @@ const Divisions = ({userDetail}) => {
       headerName: "Personal Requests",
       width: 150,
       align: "center",
-      renderCell: (params) => <>{params.value !== null ? params.value : "-"}</>,
     },
     {
       field: "sortorder",

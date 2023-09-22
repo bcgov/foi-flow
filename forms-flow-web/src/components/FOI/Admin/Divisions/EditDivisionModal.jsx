@@ -22,12 +22,10 @@ const EditDivisionModal = ({
     programareaid: null,
     issection: false,
     parentid: null,
-    specifictopersonalrequests: null,
+    specifictopersonalrequests: false,
   });
   const [parentDivisions, setParentDivisions] = useState(divisions);
-
-  console.log(division)
-
+  
   const handleSave = () => {
     saveDivision(division);
     closeModal();
@@ -37,27 +35,23 @@ const EditDivisionModal = ({
     closeModal();
   };
   
-  const handleSectionSelection = () => {
-    setDivision({...division, issection: !division.issection, specifictopersonalrequests: null, parentid: null})
-  }
-
   useEffect(() => {
     setDivision(initialDivision || {
       name: "",
       programareaid: null,
       issection: false,
       parentid: null,
-      specifictopersonalrequests: null,
+      specifictopersonalrequests: false,
     });
   }, [showModal]);
 
   //useEffect to manage filtering of dropdown for parent divisions
   useEffect(() => {
     if (division.programareaid && division.specifictopersonalrequests) {
-        let filteredDivisions = divisions.filter(item => item.programareaid === division.programareaid && item.specifictopersonalrequests && item.divisionid !== division.divisionid && !division.issection);
+        let filteredDivisions = divisions.filter(item => item.programareaid === division.programareaid && item.specifictopersonalrequests && item.divisionid !== division.divisionid && !item.issection);
         return setParentDivisions(filteredDivisions);
     } else if (division.programareaid && !division.specifictopersonalrequests) {
-        let filteredDivisions = divisions.filter(item => item.programareaid === division.programareaid && !item.specifictopersonalrequests && item.divisionid !== division.divisionid && !division.issection);
+        let filteredDivisions = divisions.filter(item => item.programareaid === division.programareaid && !item.specifictopersonalrequests && item.divisionid !== division.divisionid && !item.issection);
         return setParentDivisions(filteredDivisions);
     } else {
         let filteredDivisions = divisions.filter(item => !item.issection && item.divisionid !== division.divisionid);
@@ -127,12 +121,11 @@ const EditDivisionModal = ({
             <FormControlLabel required label="Is Section" id="edit-divisions-areas-label" control={
             <Checkbox 
               checked={division ? division.issection : false}
-              onChange={handleSectionSelection} 
+              onChange={() => setDivision({...division, issection: !division.issection, parentid: null})} 
             />} 
             />
             <FormControlLabel label="Specific to Personal Request" id="edit-divisions-areas-label" control={
             <Checkbox 
-              disabled={division ? !division.issection : false} 
               checked={division ? division.specifictopersonalrequests : false}
               onChange={() => setDivision({...division, specifictopersonalrequests: !division.specifictopersonalrequests})} 
             />} 

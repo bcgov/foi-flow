@@ -98,7 +98,9 @@ const CreateSectionModal = ({
                 </MenuItem>
               ))}
           </Select>
-          <FormControlLabel id="create-divisions-areas-label" control={<Checkbox checked={section.specifictopersonalrequests} onChange={() => setSection({...section, specifictopersonalrequests: !section.specifictopersonalrequests})} />} label="Specific to Personal Request" />
+          <div style={{display: "flex", flexDirection: "row", justifyContent:"center", alignItems: "center"}}>
+            <FormControlLabel id="create-divisions-areas-label" control={<Checkbox checked={section.specifictopersonalrequests} onChange={() => setSection({...section, specifictopersonalrequests: !section.specifictopersonalrequests})} />} label="Specific to Personal Request" />
+          </div>
           <InputLabel shrink id="create-divisions-areas-label">
             Parent Division
           </InputLabel>
