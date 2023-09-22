@@ -12,6 +12,59 @@ Freedom of Information modernization.
 
 ## Installation
 
+### For mac
+#### Run the microservices in docker
+1. Clone this repo
+2. Place the appropriate .env file to the root folder of entire repo
+3. Change docker-compose.yml line 152 from windows.Dockerfile to mac.Dockerfile
+4. Make sure you are logged into the VPN if working remotely
+5. Compose up the docker-compose.yml file in the root folder by either right-clicking and selecting 'Compose up' in VS Code or running the command 
+```docker compose -f "docker-compose.yml" up -d --build```
+
+#### Add IP address to hosts on local system if accessing remotely
+1. Log into vpn
+2. Click statistics icon (bottom left of AnyConnect, the graph icon)
+3. Note down client address (IPv4)
+4. In your terminal run the command ``` sudo nano /etc/hosts ```
+5. Add the ip address from above to the list, with alias value ``` foiflow.local ```
+6. Save and exit
+
+#### API performance issues
+The app (particularly the API) may run very slowly. Performance can be improved by turning off Redis caching, commenting out the following code in [KeycloakAdminService](https://github.com/bcgov/foi-flow/blob/main/request-management-api/request_api/services/external/keycloakadminservice.py) (at ```foi-flow/request-management-api/request_api/services/external/keycloakadminservice.py```). Make sure that you don't commit these changes. 
+
+Comment out the following, and change the _accesstoken value to None
+```diff
+    def get_token(self):
+        _accesstoken=None
+        try:
++            #cache_client = redis.from_url(self.cache_redis_url,decode_responses=True)
+-            cache_client = redis.from_url(self.cache_redis_url,decode_responses=True)
++            _accesstoken = None 
+-            _accesstoken = cache_client.get("foi:kcsrcacnttoken")            
+            if _accesstoken is None:
+                url = '{0}/auth/realms/{1}/protocol/openid-connect/token'.format(self.keycloakhost,self.keycloakrealm)        
+                params = {
+
+                    'client_id': self.keycloakclientid,
+                    'grant_type': 'password',
+                    'username' : self.keycloakadminserviceaccount,
+                    'password': self.keycloakadminservicepassword,
+                    'client_secret':self.keycloakclientsecret
+                }
+                x = requests.post(url, params, verify=True).content.decode('utf-8')
+                _accesstoken = str(ast.literal_eval(x)['access_token'])                
++                #cache_client.set("foi:kcsrcacnttoken",_accesstoken,ex=int(self.kctokenexpiry))
+-                cache_client.set("foi:kcsrcacnttoken",_accesstoken,ex=int(self.kctokenexpiry))
+        except BusinessException as exception:
+            print("Error happened while accessing token on KeycloakAdminService {0}".format(exception.message))
++        #finally:
++            #cache_client = None
+-        finally:
+-            cache_client = None
+        return _accesstoken      
+```
+Again, make sure you don't commit these changes.
+
 ## Project Status
 The project is in the very early stages of development. The codebase will be changing frequently.
 
