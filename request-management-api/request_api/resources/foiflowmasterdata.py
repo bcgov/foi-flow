@@ -196,8 +196,28 @@ class FOIFlowDivisions(Resource):
             jsondata = json.dumps(data)
             return jsondata , 200
         except Exception as exception:
-            return {'status': False, 'message': str(type(exception).__name__)}, 400        
+            return {'status': False, 'message': str(type(exception).__name__)}, 400
 
+@cors_preflight('GET,OPTIONS')
+@API.route('/foiflow/divisions/<bcgovcode>/all')
+class FOIFlowDivisionTags(Resource):
+    """Retrieves all active divisions for the passed in gov code    .
+    """
+    @staticmethod
+    @TRACER.trace()
+    @cross_origin(origins=allowedorigins())
+    @auth.require
+    @request_api.cache.cached(
+        unless=cache_filter,
+        response_filter=response_filter
+        )
+    def get(bcgovcode):
+        try:
+            data = divisionstageservice().getalldivisionsandsections(bcgovcode)               
+            jsondata = json.dumps(data)
+            return jsondata , 200
+        except Exception as exception:
+            return {'status': False, 'message': str(type(exception).__name__)}, 400     
      
 @cors_preflight('GET,OPTIONS')
 @API.route('/foiflow/closereasons')

@@ -13,7 +13,15 @@ class divisionstageservice:
         for division in divisions:
             divisionstages.append({"divisionid": division['divisionid'], "name": self.escapestr(division['name']),"sortorder": division['sortorder'],"issection":division['issection']})
         return {"divisions": divisionstages, "stages": self.getstages()}
-    
+
+    def getalldivisionsandsections(self, bcgovcode):
+        divisionstages = []
+        programarea = ProgramArea.getprogramarea(bcgovcode)
+        divisions = ProgramAreaDivision.getallprogramareatags(programarea['programareaid'])
+        divisions.sort(key=lambda item: (item['sortorder'], item['name']))        
+        for division in divisions:
+            divisionstages.append({"divisionid": division['divisionid'], "name": self.escapestr(division['name']),"sortorder": division['sortorder'],"issection":division['issection']})
+        return {"divisions": divisionstages, "stages": self.getstages()}
 
     def getpersonalspecificdivisionandstages(self, bcgovcode):
         divisionstages = []
