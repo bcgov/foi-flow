@@ -16,6 +16,7 @@ const EditDivisionModal = ({
   saveDivision,
   showModal,
   closeModal,
+  filterParentDivisions,
 }) => {
   const [division, setDivision] = useState({
     name: "",
@@ -47,16 +48,7 @@ const EditDivisionModal = ({
 
   //useEffect to manage filtering of dropdown for parent divisions
   useEffect(() => {
-    if (division.programareaid && division.specifictopersonalrequests) {
-        let filteredDivisions = divisions.filter(item => item.programareaid === division.programareaid && item.specifictopersonalrequests && item.divisionid !== division.divisionid && !item.issection);
-        return setParentDivisions(filteredDivisions);
-    } else if (division.programareaid && !division.specifictopersonalrequests) {
-        let filteredDivisions = divisions.filter(item => item.programareaid === division.programareaid && !item.specifictopersonalrequests && item.divisionid !== division.divisionid && !item.issection);
-        return setParentDivisions(filteredDivisions);
-    } else {
-        let filteredDivisions = divisions.filter(item => !item.issection && item.divisionid !== division.divisionid);
-        return setParentDivisions(filteredDivisions);
-    }
+    setParentDivisions(filterParentDivisions(division, divisions, "EDIT"))
   }, [division])
 
   return (

@@ -186,6 +186,21 @@ const Divisions = ({userDetail}) => {
     setShowEditModal(true);
   };
 
+  const filterParentDivisions = (divisionObj, divisionsArr, operation) => {
+    let filteredDivisions = divisionsArr.filter(division => !division.issection);
+    if(operation === "EDIT") {
+      filteredDivisions = filteredDivisions.filter(division => division.divisionid !== divisionObj.divisionid);
+    }
+    if (divisionObj.programareaid && divisionObj.specifictopersonalrequests) {
+      return filteredDivisions.filter(division => division.programareaid === divisionObj.programareaid && division.specifictopersonalrequests);
+    } 
+    if (divisionObj.programareaid && !divisionObj.specifictopersonalrequests) {
+      return filteredDivisions.filter(division => division.programareaid === divisionObj.programareaid && !division.specifictopersonalrequests);
+    }
+    console.log(filteredDivisions)
+    return filteredDivisions;
+  }
+
   const columns = [
     {
       field: "divisionid",
@@ -343,6 +358,7 @@ const Divisions = ({userDetail}) => {
       />
       <CreateSectionModal
         divisions={divisions}
+        filterParentDivisions={filterParentDivisions}
         saveDivision={createDivision}
         showModal={showCreateSectionModal}
         closeModal={() => setShowCreateSectionModal(false)}
@@ -356,6 +372,7 @@ const Divisions = ({userDetail}) => {
       <EditDivisionModal
         initialDivision={selectedDivision}
         divisions={divisions}
+        filterParentDivisions={filterParentDivisions}
         saveDivision={editDivision}
         showModal={showEditModal}
         closeModal={() => setShowEditModal(false)}

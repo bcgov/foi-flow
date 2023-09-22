@@ -16,6 +16,7 @@ const CreateSectionModal = ({
   saveDivision,
   showModal,
   closeModal,
+  filterParentDivisions,
 }) => {
   const [section, setSection] = useState({
     name: "",
@@ -30,16 +31,7 @@ const CreateSectionModal = ({
 
   //useEffect to manage filtering of dropdown for parent divisions
   useEffect(() => {
-    if (section.programareaid && section.specifictopersonalrequests) {
-        let filteredDivisions = divisions.filter(division => division.programareaid === section.programareaid && division.specifictopersonalrequests && !division.issection);
-        return setParentDivisions(filteredDivisions);
-    } else if (section.programareaid && !section.specifictopersonalrequests) {
-        let filteredDivisions = divisions.filter(division => division.programareaid === section.programareaid && !division.specifictopersonalrequests && !division.issection);
-        return setParentDivisions(filteredDivisions);
-    } else {
-        let filteredDivisions = divisions.filter(division => !division.issection);
-        return setParentDivisions(filteredDivisions);
-    }
+    setParentDivisions(filterParentDivisions(section, divisions, "CREATE"))
   }, [section])
 
   useEffect(() => {
