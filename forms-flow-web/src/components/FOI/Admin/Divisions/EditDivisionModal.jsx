@@ -119,7 +119,7 @@ const EditDivisionModal = ({
             <FormControlLabel label="Specific to Personal Request" id="edit-divisions-areas-label" control={
             <Checkbox 
               checked={division ? division.specifictopersonalrequests : false}
-              onChange={() => setDivision({...division, specifictopersonalrequests: !division.specifictopersonalrequests})} 
+              onChange={() => setDivision({...division, specifictopersonalrequests: !division.specifictopersonalrequests, parentid: null})} 
             />} 
             />
           </div>
