@@ -25,7 +25,7 @@ const EditDivisionModal = ({
     specifictopersonalrequests: false,
   });
   const [parentDivisions, setParentDivisions] = useState(divisions);
-  
+
   const handleSave = () => {
     saveDivision(division);
     closeModal();
@@ -62,14 +62,14 @@ const EditDivisionModal = ({
   return (
     <>
       <Dialog fullWidth maxWidth="xs" open={showModal} onClose={handleClose}>
-        <DialogTitle>Edit Division</DialogTitle>
+        <DialogTitle>{division.issection ? "Edit Section" : "Edit Division"}</DialogTitle>
         <DialogContent>
           <TextField
             required
             autoFocus
             margin="dense"
             id="divisionName"
-            label="Division Name"
+            label="Division/Section Name"
             value={division.name}
             onChange={(event) =>
               setDivision({ ...division, name: event.target.value })

@@ -289,9 +289,10 @@ const Divisions = ({userDetail}) => {
               setSearchResults={setSearchResults}
             />
           </Grid>
-          <Grid item xs={6} sm={4} md={2} alignItems="right">
+          <Grid item xs={6} sm={4} md={3}>
             <Box display="flex" justifyContent="flex-end">
               <Button
+                style={{marginRight: "10px"}}
                 size="small"
                 variant="contained"
                 onClick={() => openCreateDivisionModal()}
