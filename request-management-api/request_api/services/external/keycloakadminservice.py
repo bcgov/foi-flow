@@ -82,6 +82,7 @@ class KeycloakAdminService:
         for group in allowedgroups:
             group["members"] = self.getgroupmembersbyid(group["id"])
         return allowedgroups  
+    
 
     # INPUT: groupid (string) - intake group id from the keyclock request
     # OUTPUT - group information (Array of strings) e.g. [email address]
@@ -110,6 +111,21 @@ class KeycloakAdminService:
                 if groupinfo is not None:
                     return groupinfo
         return None
+
+    # INPUT: groupname (string) - intake group name from the keyclock request
+    # OUTPUT - group email address (string)
+    # Description: This method calls the getgroupdetails method to fetch the group information.
+    # The group information contains the email address of the group. If the group information
+    # does not have the email address in attributes, then an empty string is returned. 
+    def processgroupEmail(self, groupname):
+        try:
+            groupinfo = self.getgroupdetails(groupname)
+            if groupinfo is not None:
+                if "attributes" in groupinfo and "groupEmailAddress" in groupinfo["attributes"]:
+                    return groupinfo["attributes"]["groupEmailAddress"][KeycloakAdminService.PRIMARY_GROUP_EMAIL_INDEX]
+            return ''
+        except KeyError:
+            return ''
 
     def getgroupmembersbyid(self, groupid):
         groupurl ='{0}/auth/admin/realms/{1}/groups/{2}/members'.format(self.keycloakhost,self.keycloakrealm,groupid)
