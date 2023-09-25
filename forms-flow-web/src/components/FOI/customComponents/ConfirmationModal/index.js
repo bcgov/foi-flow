@@ -17,6 +17,7 @@ import { useSelector } from "react-redux";
 import './confirmationmodal.scss';
 import { StateEnum, StateTransitionCategories } from '../../../../constants/FOI/statusEnum';
 import FileUpload from '../FileUpload'
+import MinistryApprovalModal from './MinistryApprovalModal';
 import { formatDate, calculateDaysRemaining, ConditionalComponent, isMinistryLogin } from "../../../../helper/FOI/helper";
 import { MimeTypeList, MaxFileSizeInMB, MaxNumberOfFiles } from "../../../../constants/FOI/enum";
 import { getMessage, getAssignedTo, getMinistryGroup, getSelectedMinistry, getSelectedMinistryAssignedTo, getProcessingTeams, getUpdatedAssignedTo } from './util';
@@ -55,7 +56,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function ConfirmationModal({requestId, openModal, handleModal, state, saveRequestObject,
-  handleClosingDateChange, handleClosingReasonChange, attachmentsArray }) {
+  handleClosingDateChange, handleClosingReasonChange, attachmentsArray, handleApprovalInputs, ministryApprovalState}) {
     const classes = useStyles();
     const processingTeamList = useSelector(reduxstate=> reduxstate.foiRequests.foiProcessingTeamList);
     const selectedMinistries = saveRequestObject?.selectedMinistries?.map(ministry => ministry.code);
@@ -79,7 +80,7 @@ export default function ConfirmationModal({requestId, openModal, handleModal, st
     const user = useSelector((reduxState) => reduxState.user.userDetail);
     const userGroups = user?.groups?.map(group => group.slice(1));
     let isMinistry = isMinistryLogin(userGroups);
-
+    
     const cfrStatus = useSelector((reduxState) => reduxState.foiRequests.foiRequestCFRForm.status);
     const cfrFeeData = useSelector((reduxState) => reduxState.foiRequests.foiRequestCFRForm.feedata);
     const actualsFeeDataFields = [
@@ -107,7 +108,6 @@ export default function ConfirmationModal({requestId, openModal, handleModal, st
       setDisableSaveBtn(!event.target.checked);
       saveRequestObject.isofflinepayment=event.target.checked;
     };
-    
 
     React.useEffect(() => {
       setDisableSaveBtn(state.toLowerCase() === StateEnum.closed.name.toLowerCase());
@@ -123,6 +123,7 @@ export default function ConfirmationModal({requestId, openModal, handleModal, st
             || (state.toLowerCase() === StateEnum.onhold.name.toLowerCase() && amountDue === 0)
             || (state.toLowerCase() === StateEnum.onhold.name.toLowerCase() && cfrStatus !== 'approved')
             || (state.toLowerCase() === StateEnum.onhold.name.toLowerCase() && cfrStatus === 'approved' && !saveRequestObject.email && !mailed)
+            || (state.toLowerCase() === StateEnum.response.name.toLowerCase() && !(ministryApprovalState?.approverName && ministryApprovalState?.approvedDate && ministryApprovalState?.approverTitle))
             || ((state.toLowerCase() === StateEnum.deduplication.name.toLowerCase() || 
                   state.toLowerCase() === StateEnum.review.name.toLowerCase()) && !allowStateChange)) {
         return true;
@@ -204,9 +205,6 @@ export default function ConfirmationModal({requestId, openModal, handleModal, st
         (
           (state.toLowerCase() === StateEnum.review.name.toLowerCase() && (!isAnyAmountPaid || !isMinistry))
           ||
-          (state.toLowerCase() === StateEnum.response.name.toLowerCase()
-            && saveRequestObject.requeststatusid === StateEnum.signoff.id)
-          ||
           (state.toLowerCase() === StateEnum.onhold.name.toLowerCase()
             && (saveRequestObject.requeststatusid === StateEnum.feeassessed.id || saveRequestObject.requeststatusid === StateEnum.response.id)
             && saveRequestObject.email
@@ -227,6 +225,23 @@ export default function ConfirmationModal({requestId, openModal, handleModal, st
             />
           </div>
         );
+      }
+      else if (currentState?.toLowerCase() !== StateEnum.closed.name.toLowerCase() && (state.toLowerCase() === StateEnum.response.name.toLowerCase() && saveRequestObject.requeststatusid === StateEnum.signoff.id)) {
+        return (
+        <div className={classes.fileUploadBox}>
+          <MinistryApprovalModal handleApprovalInputs={handleApprovalInputs} />
+          <FileUpload
+              attchmentFileNameList={attchmentFileNameList}
+              multipleFiles={multipleFiles}
+              mimeTypes={state.toLowerCase() === StateEnum.onhold.name.toLowerCase()?MimeTypeList.stateTransitionFees:MimeTypeList.stateTransition}
+              maxFileSize={state.toLowerCase() === StateEnum.onhold.name.toLowerCase()?MaxFileSizeInMB.feeEstimateAttachment:MaxFileSizeInMB.stateTransition}
+              updateFilesCb={updateFilesCb}
+              totalFileSize={state.toLowerCase() === StateEnum.onhold.name.toLowerCase()?MaxFileSizeInMB.totalFeeEstimateFileSize:MaxFileSizeInMB.totalFileSize}
+              maxNumberOfFiles={state.toLowerCase() === StateEnum.onhold.name.toLowerCase()?MaxNumberOfFiles.feeEstimateFiles:MaxNumberOfFiles.attachments}              
+              className={classes.fileUploadBox}
+            />
+        </div>
+        )
       }
       else if ((state.toLowerCase() !== StateEnum.feeassessed.name.toLowerCase() || cfrStatus !== 'init') && estimatedTotalDue <= 0) {
         return null;

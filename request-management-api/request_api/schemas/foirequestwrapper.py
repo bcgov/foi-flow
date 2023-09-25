@@ -147,6 +147,15 @@ class FOIMinistryRequestDivisionSchema(Schema):
     eApproval = fields.Str(data_key="eApproval",allow_none=True, validate=[validate.Length(max=12, error=MAX_EXCEPTION_MESSAGE)])
     divisionReceivedDate = fields.Str(data_key="divisionReceivedDate",allow_none=True)
 
+class CreateMinistrySignOffApprovalSchema(Schema):
+    class Meta:  # pylint: disable=too-few-public-methods
+        """Exclude unknown fields in the deserialized output."""
+
+        unknown = EXCLUDE 
+    approvername = fields.Str(data_key="approverName", allow_none=False)
+    approvertitle = fields.Str(data_key="approverTitle", allow_none=False)
+    approveddate = fields.Str(data_key="approvedDate", allow_none=False)
+
   
 class FOIRequestMinistrySchema(Schema):
     
@@ -167,3 +176,4 @@ class FOIRequestMinistrySchema(Schema):
     assignedministrypersonFirstName = fields.Str(data_key="assignedministrypersonFirstName",allow_none=True, validate=[validate.Length(max=50, error=MAX_EXCEPTION_MESSAGE)])
     assignedministrypersonMiddleName = fields.Str(data_key="assignedministrypersonMiddleName",allow_none=True, validate=[validate.Length(max=50, error=MAX_EXCEPTION_MESSAGE)])
     assignedministrypersonLastName = fields.Str(data_key="assignedministrypersonLastName",allow_none=True, validate=[validate.Length(max=50, error=MAX_EXCEPTION_MESSAGE)])
+    ministrysignoffapproval = fields.Nested(CreateMinistrySignOffApprovalSchema, data_key="ministrysignoffapproval", allow_none=True)
