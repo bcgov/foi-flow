@@ -163,11 +163,11 @@ class FOIMinistryRequest(db.Model):
         if group is None:
             _ministryrequestids = _session.query(distinct(FOIMinistryRequest.foiministryrequestid)).filter(FOIMinistryRequest.isactive == True).all()        
         elif (group == IAOTeamWithKeycloackGroup.flex.value):
-            _ministryrequestids = _session.query(distinct(FOIMinistryRequest.foiministryrequestid)).filter(and_(FOIMinistryRequest.isactive == True), and_(and_(FOIMinistryRequest.assignedgroup == group),and_(FOIMinistryRequest.requeststatusid.in_([1,2,3,12,13,7,8,9,10,11,14,16])))).all()
+            _ministryrequestids = _session.query(distinct(FOIMinistryRequest.foiministryrequestid)).filter(and_(FOIMinistryRequest.isactive == True), and_(and_(FOIMinistryRequest.assignedgroup == group),and_(FOIMinistryRequest.requeststatusid.in_([1,2,3,12,13,7,8,9,10,11,14,16,17,18])))).all()
         elif (group in ProcessingTeamWithKeycloackGroup.list()):
-            _ministryrequestids = _session.query(distinct(FOIMinistryRequest.foiministryrequestid)).filter(and_(FOIMinistryRequest.isactive == True), and_(and_(FOIMinistryRequest.assignedgroup == group),and_(FOIMinistryRequest.requeststatusid.in_([1,2,3,7,8,9,10,11,14,16])))).all()           
+            _ministryrequestids = _session.query(distinct(FOIMinistryRequest.foiministryrequestid)).filter(and_(FOIMinistryRequest.isactive == True), and_(and_(FOIMinistryRequest.assignedgroup == group),and_(FOIMinistryRequest.requeststatusid.in_([1,2,3,7,8,9,10,11,14,16,17,18])))).all()           
         else:
-            _ministryrequestids = _session.query(distinct(FOIMinistryRequest.foiministryrequestid)).filter(and_(FOIMinistryRequest.isactive == True), or_(and_(FOIMinistryRequest.assignedgroup == group),and_(FOIMinistryRequest.assignedministrygroup == group,or_(FOIMinistryRequest.requeststatusid.in_([2,7,9,8,10,11,12,13,14,16]))))).all()
+            _ministryrequestids = _session.query(distinct(FOIMinistryRequest.foiministryrequestid)).filter(and_(FOIMinistryRequest.isactive == True), or_(and_(FOIMinistryRequest.assignedgroup == group),and_(FOIMinistryRequest.assignedministrygroup == group,or_(FOIMinistryRequest.requeststatusid.in_([2,7,9,8,10,11,12,13,14,16,17,18]))))).all()
 
         _requests = []
         ministryrequest_schema = FOIMinistryRequestSchema()
@@ -692,7 +692,7 @@ class FOIMinistryRequest(db.Model):
                             FOIMinistryRequest.assignedgroup == group,
                             and_(
                                 FOIMinistryRequest.assignedministrygroup == group,
-                                FOIMinistryRequest.requeststatusid.in_([2,7,9,8,10,11,12,13,14,16])
+                                FOIMinistryRequest.requeststatusid.in_([2,7,9,8,10,11,12,13,14,16,17,18])
                             )
                         )
                     )
@@ -1116,7 +1116,7 @@ class FOIMinistryRequest(db.Model):
             groupfilter.append(FOIMinistryRequest.assignedministrygroup == group)
         
         #ministry advanced search show cfr onwards
-        statefilter = FOIMinistryRequest.requeststatusid.in_([2,3,7,9,8,10,11,12,13,14,16])
+        statefilter = FOIMinistryRequest.requeststatusid.in_([2,3,7,9,8,10,11,12,13,14,16,17,18])
 
         ministry_queue = FOIMinistryRequest.advancedsearchsubquery(params, iaoassignee, ministryassignee, userid, 'Ministry', False, isministryrestrictedfilemanager).filter(and_(or_(*groupfilter), statefilter))
 
