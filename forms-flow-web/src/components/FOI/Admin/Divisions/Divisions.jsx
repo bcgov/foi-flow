@@ -197,7 +197,6 @@ const Divisions = ({userDetail}) => {
     if (divisionObj.programareaid && !divisionObj.specifictopersonalrequests) {
       return filteredDivisions.filter(division => division.programareaid === divisionObj.programareaid && !division.specifictopersonalrequests);
     }
-    console.log(filteredDivisions)
     return filteredDivisions;
   }
 

@@ -201,7 +201,6 @@ export default function AttachmentModal({
         if (modalFor === 'replace' || modalFor === "replaceattachment") {
           fileStatusTransition = attachment?.category;
         } else if (uploadFor === "record") {
-          console.log("divisions", divisions);
           if(bcgovcode == "MCF" && requestType == FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL) {
             fileStatusTransition = MCFSections?.sections?.find(division => division.divisionid === tagValue).name;
           } else if(bcgovcode == "MSD" && requestType == FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL) {
