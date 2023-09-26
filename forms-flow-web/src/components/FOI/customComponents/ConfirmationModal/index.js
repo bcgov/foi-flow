@@ -123,7 +123,7 @@ export default function ConfirmationModal({requestId, openModal, handleModal, st
             || (state.toLowerCase() === StateEnum.onhold.name.toLowerCase() && amountDue === 0)
             || (state.toLowerCase() === StateEnum.onhold.name.toLowerCase() && cfrStatus !== 'approved')
             || (state.toLowerCase() === StateEnum.onhold.name.toLowerCase() && cfrStatus === 'approved' && !saveRequestObject.email && !mailed)
-            || (state.toLowerCase() === StateEnum.response.name.toLowerCase() && !(ministryApprovalState?.approverName && ministryApprovalState?.approvedDate && ministryApprovalState?.approverTitle))
+            || ((state.toLowerCase() === StateEnum.response.name.toLowerCase() && currentState?.toLowerCase() === StateEnum.signoff.name.toLowerCase()) && !(ministryApprovalState?.approverName && ministryApprovalState?.approvedDate && ministryApprovalState?.approverTitle))
             || ((state.toLowerCase() === StateEnum.deduplication.name.toLowerCase() || 
                   state.toLowerCase() === StateEnum.review.name.toLowerCase()) && !allowStateChange)) {
         return true;
@@ -226,7 +226,7 @@ export default function ConfirmationModal({requestId, openModal, handleModal, st
           </div>
         );
       }
-      else if (currentState?.toLowerCase() !== StateEnum.closed.name.toLowerCase() && (state.toLowerCase() === StateEnum.response.name.toLowerCase() && saveRequestObject.requeststatusid === StateEnum.signoff.id)) {
+      else if (currentState?.toLowerCase() === StateEnum.signoff.name.toLowerCase() && state.toLowerCase() === StateEnum.response.name.toLowerCase() && saveRequestObject.requeststatusid === StateEnum.signoff.id) {
         return (
         <div className={classes.fileUploadBox}>
           <MinistryApprovalModal handleApprovalInputs={handleApprovalInputs} />
