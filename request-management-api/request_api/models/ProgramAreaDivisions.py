@@ -115,9 +115,9 @@ class ProgramAreaDivision(db.Model):
         return division_schema.dump(division)
     
     @classmethod
-    def getparentdivisionforsection(cls, divisionparentid):   
+    def getparentdivisions(cls, divisonid):   
         division_schema = ProgramAreaDivisionSchema(many=True)
-        query = db.session.query(ProgramAreaDivision).filter_by(divisionid=divisionparentid, issection=False, isactive=True).all()
+        query = db.session.query(ProgramAreaDivision).filter_by(parentid=divisonid, issection=True, isactive=True).all()
         return division_schema.dump(query)
 
 class ProgramAreaDivisionSchema(ma.Schema):
