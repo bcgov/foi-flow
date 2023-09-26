@@ -143,7 +143,7 @@ class requestservicegetter:
             'receivedmodeid':request['receivedmode.receivedmodeid'],
             'receivedMode':request['receivedmode.name'],
             'assignedGroup': requestministry["assignedgroup"],
-            'assignedGroupEmail': KeycloakAdminService().getgroupdetails(requestministry["assignedgroup"])['attributes']['groupEmailAddress'][KeycloakAdminService.PRIMARY_GROUP_EMAIL_INDEX], 
+            'assignedGroupEmail': KeycloakAdminService().processgroupEmail(requestministry["assignedgroup"]),
             'assignedTo': requestministry["assignedto"],
             'idNumber':requestministry["filenumber"],
             'axisRequestId': requestministry["axisrequestid"],

@@ -64,6 +64,15 @@ const KCProcessingTeams = [
 "Coordinated Response Unit",
 ]
 
+const KCScanningTeams = [
+  "Scanning Team",
+]
+
+const MinistryNeedsScanning = [
+  "MCF",
+  "MSD"
+]
+
 const RecordsDownloadList = [
   {id: 0, "label": "Download", disabled: true },
   {id: 1, "label": "Download for Harms", disabled: true },
@@ -84,6 +93,8 @@ MaxNumberOfFiles,
 extensionStatusId,
 extensionStatusLabel,
 KCProcessingTeams,
+KCScanningTeams,
+MinistryNeedsScanning,
 RecordsDownloadList,
 RecordDownloadCategory
 };

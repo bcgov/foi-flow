@@ -4,6 +4,9 @@ const StateList = Object.freeze({
     redirect: [{status: "Redirect", isSelected: false}, {status:"Intake in Progress", isSelected: false}, {status: "Closed", isSelected: false}],
     open: [{status: "Open", isSelected: false}, {status: "Call For Records", isSelected: false}, {status:"Peer Review", isSelected: false},{status: "Closed", isSelected: false}],
     callforrecords: [{status: "Call For Records", isSelected: false}, {status: "Open", isSelected: false}, {status: "Closed", isSelected: false}],
+    callforrecordscfdmsdpersonal: [{status: "Call For Records", isSelected: false}, {status: "Open", isSelected: false}, {status: "Tagging", isSelected: false},{status: "Ready to Scan", isSelected: false}, {status: "Closed", isSelected: false}],
+    tagging :[{status: "Tagging", isSelected: true},{status: "Call For Records", isSelected: false}, {status: "Ready to Scan", isSelected: false},{status: "Records Review", isSelected: false}, {status: "Closed", isSelected: false}],
+    readytoscan : [{status: "Ready to Scan", isSelected: true},{status: "Call For Records", isSelected: false},  {status: "Tagging", isSelected: false},{status: "Records Review", isSelected: false}, {status: "Closed", isSelected: false}],
     feeassessed: [{status: "Fee Estimate", isSelected: false}, {status: "On Hold", isSelected: false}, {status: "Call For Records", isSelected: false}, {status: "Closed", isSelected: false}],
     feeassessedforpersonal: [{status: "Fee Estimate", isSelected: false}, {status: "Call For Records", isSelected: false}, {status: "Closed", isSelected: false}],
     onhold: [{status: "On Hold", isSelected: false}, {status: "Call For Records", isSelected: false}, {status: "Closed", isSelected: false}],
@@ -36,13 +39,15 @@ const MinistryStateList = Object.freeze({
     response: [{status: "Response", isSelected: false}],
     closed: [{status: "Closed", isSelected: false}],
     peerreview: [{status: "Peer Review", isSelected: false}],
+    tagging :[{status: "Tagging", isSelected: true}],
+    readytoscan : [{status: "Ready to Scan", isSelected: true}]
 });
 
 // This corresponds to rows in the FOIRequestStatuses table on the backend
 const StateEnum = Object.freeze({
     open: {name: "Open", id: 1},
     callforrecords: {name: "Call For Records", id: 2},
-    callforrecordsoverdue: {name: "Call For Records Overdue", id: 17},
+    callforrecordsoverdue: {name: "Call For Records Overdue", id: -100},
     closed: {name: "Closed", id: 3},
     redirect: {name: "Redirect", id: 4},
     unopened: {name: "Unopened", id: 5},
@@ -57,7 +62,9 @@ const StateEnum = Object.freeze({
     response: {name: "Response", id: 14},
     archived: {name: "Archived", id: 15},
     peerreview: {name: "Peer Review", id: 16},
-    onholdapplicationfee: {name: "On-Hold - Application Fee", id: 18}
+    tagging: {name: "Tagging", id: 17},
+    readytoscan: {name: "Ready to Scan", id: 18},
+    onholdapplicationfee: {name: "On-Hold - Application Fee", id: 19}
 });
 
 const StateTransitionCategories = Object.freeze({

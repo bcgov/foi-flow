@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import Dialog from "@material-ui/core/Dialog";
 import DialogActions from "@material-ui/core/DialogActions";
 import DialogContent from "@material-ui/core/DialogContent";
@@ -11,24 +11,41 @@ import TextField from "@material-ui/core/TextField";
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
 
-
-const CreateDivisionModal = ({
+const CreateSectionModal = ({
   divisions,
   saveDivision,
   showModal,
   closeModal,
+  filterParentDivisions,
 }) => {
-  const [division, setDivision] = useState({
+  const [section, setSection] = useState({
     name: "",
     programareaid: null,
-    issection: false,
+    issection: true,
     parentid: null,
     specifictopersonalrequests: false,
   });
+  const [parentDivisions, setParentDivisions] = useState(divisions);
+
   let programAreas = useSelector((state) => state.foiRequests.foiAdminProgramAreaList);
 
+  //useEffect to manage filtering of dropdown for parent divisions
+  useEffect(() => {
+    setParentDivisions(filterParentDivisions(section, divisions, "CREATE"))
+  }, [section])
+
+  useEffect(() => {
+    setSection({
+      name: "",
+      programareaid: null,
+      issection: true,
+      parentid: null,
+      specifictopersonalrequests: false,
+    });
+  }, [showModal]);
+  
   const handleSave = () => {
-    saveDivision(division);
+    saveDivision(section);
     closeModal();
   };
 
@@ -36,43 +53,33 @@ const CreateDivisionModal = ({
     closeModal();
   };
 
-  useEffect(() => {
-    setDivision({
-      name: "",
-      programareaid: null,
-      issection: false,
-      parentid: null,
-      specifictopersonalrequests: false,
-    });
-  }, [showModal]);
-
   return (
     <>
       <Dialog fullWidth maxWidth="xs" open={showModal} onClose={handleClose}>
-        <DialogTitle>Create Division</DialogTitle>
+        <DialogTitle>Create Section</DialogTitle>
         <DialogContent>
           <TextField
             autoFocus
             required
             margin="dense"
-            id="divisionName"
-            label="Division Name"
-            value={division ? division.name : ""}
+            id="sectionName"
+            label="Section Name"
+            value={section.name}
             onChange={(event) =>
-              setDivision({ ...division, name: event.target.value })
+                setSection({ ...section, name: event.target.value })
             }
             fullWidth
           />
-          <InputLabel shrink required id="create-divisions-areas-label">
+          <InputLabel required shrink id="create-divisions-areas-label">
             Program Area
           </InputLabel>
           <Select
             margin="dense"
             id="programareaid"
             labelId="create-divisions-areas-label"
-            value={division ? division.programareaid : ""}
+            value={section.programareaid}
             onChange={(event) =>
-              setDivision({ ...division, programareaid: event.target.value })
+                setSection({ ...section, programareaid: event.target.value })
             }
             fullWidth
           >
@@ -84,8 +91,28 @@ const CreateDivisionModal = ({
               ))}
           </Select>
           <div style={{display: "flex", flexDirection: "row", justifyContent:"center", alignItems: "center"}}>
-            <FormControlLabel id="create-divisions-areas-label" control={<Checkbox checked={division.specifictopersonalrequests} onChange={() => setDivision({...division, specifictopersonalrequests: !division.specifictopersonalrequests})} />} label="Specific to Personal Request" />
+            <FormControlLabel id="create-divisions-areas-label" control={<Checkbox checked={section.specifictopersonalrequests} onChange={() => setSection({...section, specifictopersonalrequests: !section.specifictopersonalrequests, parentid: null})} />} label="Specific to Personal Request" />
           </div>
+          <InputLabel shrink id="create-divisions-areas-label">
+            Parent Division
+          </InputLabel>
+          <Select
+            margin="dense"
+            id="parentid"
+            labelId="create-divisions-areas-label"
+            value={section.parentid}
+            onChange={(event) =>
+              setSection({ ...section, parentid: event.target.value })
+            }
+            fullWidth
+          >
+            {parentDivisions &&
+              parentDivisions.map((item, index) => (
+                <MenuItem key={index} value={item.divisionid}>
+                  {item.name}
+                </MenuItem>
+              ))}
+          </Select>
         </DialogContent>
         <DialogActions>
           <button onClick={handleSave} className="btn-bottom btn-save">
@@ -100,4 +127,4 @@ const CreateDivisionModal = ({
   );
 };
 
-export default CreateDivisionModal;
+export default CreateSectionModal;
