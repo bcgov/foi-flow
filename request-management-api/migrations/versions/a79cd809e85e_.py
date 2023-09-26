@@ -1,7 +1,7 @@
 """Adding Section 5 Pending FOI Status to FOIRequestStatuses Table
 
 Revision ID: a79cd809e85e
-Revises: b51a0f2635c1
+Revises: aacdbca19a47
 Create Date: 2023-09-25 14:37:29.208839
 
 """
@@ -10,7 +10,7 @@ from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
 revision = 'a79cd809e85e'
-down_revision = 'b51a0f2635c1'
+down_revision = 'aacdbca19a47'
 branch_labels = None
 depends_on = None
 
