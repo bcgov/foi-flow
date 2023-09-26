@@ -67,7 +67,7 @@ aws-requests-auth==0.4.3
 holidays==0.12
 Flask-SocketIO==5.1.0
 Flask-Login==0.5.0
-eventlet==0.31.0
+eventlet==0.33.3
 uritemplate.py==3.0.2
 urllib3==1.26.15
 ndg-httpsclient

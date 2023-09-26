@@ -12,6 +12,12 @@ class programareadivisionservice:
         divisions = ProgramAreaDivision.getallprogramareadivisons()
         return self.__prepareprogramareas(divisions)
     
+    def getallprogramareadivisonsandsections(self):
+        """ Returns all active program area divisions and sections
+        """
+        divisions = ProgramAreaDivision.getallprogramareadivisonsandsections()
+        return self.__prepareprogramareas(divisions)
+    
     def createprogramareadivision(self, data):
         """ Creates a program area division
         """
@@ -30,6 +36,11 @@ class programareadivisionservice:
         if len(records) > 0:
             return DefaultMethodResult(False,'Division is currently tagged to various records and cannot be disabled', divisionid)
         return ProgramAreaDivision.disableprogramareadivision(divisionid,userid)
+    
+    def getparentdivisionforsection(self, divisionparentid):
+        """ Returns the parent division associated with a section
+        """
+        return ProgramAreaDivision.getparentdivisionforsection(divisionparentid)
     
     def __prepareprogramareas(self, data):
         """ Join program area name with division on programareaid
