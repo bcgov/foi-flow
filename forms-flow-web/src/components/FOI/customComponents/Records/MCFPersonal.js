@@ -11,6 +11,7 @@ import InputAdornment from "@mui/material/InputAdornment";
 import InputBase from "@mui/material/InputBase";
 import IconButton from "@material-ui/core/IconButton";
 import _ from 'lodash';
+import { MCFPopularSections } from "../../../../constants/FOI/enum";
 
 const MCFPersonal = ({
     setNewDivision,
@@ -23,12 +24,12 @@ const MCFPersonal = ({
     const [additionalTagList, setAdditionalTagList] = useState([]);
 
     const MCFSections = useSelector((state) => state.foiRequests.foiPersonalSections);
-    const [tagList, setTagList] = useState(MCFSections?.sections?.slice(0, 30));
-    const [otherTagList, setOtherTagList] = useState(MCFSections?.sections?.slice(31));
+    const [tagList, setTagList] = useState(MCFSections?.sections?.slice(0, MCFPopularSections-1));
+    const [otherTagList, setOtherTagList] = useState(MCFSections?.sections?.slice(MCFPopularSections));
     
     useEffect(() => {
-      setTagList(MCFSections?.sections?.slice(0, 30));
-      setOtherTagList(MCFSections?.sections?.slice(31));
+      setTagList(MCFSections?.sections?.slice(0, MCFPopularSections-1));
+      setOtherTagList(MCFSections?.sections?.slice(MCFPopularSections));
     },[MCFSections])
 
     useEffect(() => {
