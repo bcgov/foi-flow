@@ -152,7 +152,7 @@ const Divisions = ({userDetail}) => {
           });
         } else {
           toast.error(
-            "Unable to disable division. Please try again in a few minutes and ensure that the division is not tagged to any FOI Request records.",
+            "Unable to disable division. Please try again in a few minutes and ensure that the division is not associated to any FOI Request records or sections.",
             {
               position: "top-right",
               autoClose: 4500,
@@ -197,7 +197,6 @@ const Divisions = ({userDetail}) => {
     if (divisionObj.programareaid && !divisionObj.specifictopersonalrequests) {
       return filteredDivisions.filter(division => division.programareaid === divisionObj.programareaid && !division.specifictopersonalrequests);
     }
-    console.log(filteredDivisions)
     return filteredDivisions;
   }
 
