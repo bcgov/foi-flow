@@ -11,6 +11,7 @@ import InputAdornment from "@mui/material/InputAdornment";
 import InputBase from "@mui/material/InputBase";
 import IconButton from "@material-ui/core/IconButton";
 import _ from 'lodash';
+import { MSDPopularSections } from "../../../../constants/FOI/enum";
 
 const MSDPersonal = ({
     setNewDivision,
@@ -25,12 +26,12 @@ const MSDPersonal = ({
     const [newDivisions, setNewDivisions] = useState([]);
 
     const MSDSections = useSelector((state) => state.foiRequests.foiPersonalDivisionsAndSections);
-    const [tagList, setTagList] = useState(MSDSections?.divisions[0]?.sections?.slice(0, 10));
-    const [otherTagList, setOtherTagList] = useState(MSDSections?.divisions[0]?.sections?.slice(11));
+    const [tagList, setTagList] = useState(MSDSections?.divisions[0]?.sections?.slice(0, MSDPopularSections-1));
+    const [otherTagList, setOtherTagList] = useState(MSDSections?.divisions[0]?.sections?.slice(MSDPopularSections));
     
     useEffect(() => {
-      setTagList(MSDSections?.divisions[0]?.sections?.slice(0, 10));
-      setOtherTagList(MSDSections?.divisions[0]?.sections?.slice(11));
+      setTagList(MSDSections?.divisions[0]?.sections?.slice(0, MSDPopularSections-1));
+      setOtherTagList(MSDSections?.divisions[0]?.sections?.slice(MSDPopularSections));
     },[MSDSections])
 
     const searchSections = (_sectionArray, _keyword, _selectedSectionValue) => {
