@@ -1,6 +1,7 @@
 const StateList = Object.freeze({
     unopened: [{status: "Unopened", isSelected: false}, {status:"Intake in Progress", isSelected: false}],
-    intakeinprogress: [{status:"Intake in Progress", isSelected: false}, {status: "Open", isSelected: false}, {status:"Peer Review", isSelected: false}, {status: "Redirect", isSelected: false}, {status: "Section 5 Pending", isSelected: false}, {status: "Closed", isSelected: false}],
+    intakeinprogress: [{status:"Intake in Progress", isSelected: false}, {status: "Open", isSelected: false}, {status:"Peer Review", isSelected: false}, {status: "Redirect", isSelected: false}, {status: "Closed", isSelected: false}],
+    intakeinprogressforpersonals: [{status:"Intake in Progress", isSelected: false}, {status: "Open", isSelected: false}, {status:"Peer Review", isSelected: false}, {status: "Redirect", isSelected: false}, {status: "Section 5 Pending", isSelected: false}, {status: "Closed", isSelected: false}],
     redirect: [{status: "Redirect", isSelected: false}, {status:"Intake in Progress", isSelected: false}, {status: "Closed", isSelected: false}],
     open: [{status: "Open", isSelected: false}, {status: "Call For Records", isSelected: false}, {status:"Peer Review", isSelected: false},{status: "Closed", isSelected: false}],
     callforrecords: [{status: "Call For Records", isSelected: false}, {status: "Open", isSelected: false}, {status: "Closed", isSelected: false}],
@@ -19,7 +20,7 @@ const StateList = Object.freeze({
     responseforpersonal: [{status: "Response", isSelected: false}, {status: "Records Review", isSelected: false}, {status:"Peer Review", isSelected: false}, {status: "Closed", isSelected: false}],
     //peerreview: [{status:"Peer Review", isSelected: false},{status:"Intake in Progress", isSelected: false}, {status: "Open", isSelected: false},{status: "Records Review", isSelected: false},{status: "Consult", isSelected: false},{status: "Response", isSelected: false}],
     peerreview: [{status:"Peer Review", isSelected: false}],
-    section5Pending: [{status: "Section 5 Pending", isSelected: false}, {status: "Open", isSelected: false}, {status:"Peer Review", isSelected: false}, {status: "Redirect", isSelected: false}, {status: "Closed", isSelected: false}],
+    section5pending: [{status: "Section 5 Pending", isSelected: false}, {status: "Open", isSelected: false}, {status:"Peer Review", isSelected: false}, {status: "Redirect", isSelected: false}, {status: "Closed", isSelected: false}],
   });
 
 const MinistryStateList = Object.freeze({
@@ -63,7 +64,7 @@ const StateEnum = Object.freeze({
     peerreview: {name: "Peer Review", id: 16},
     tagging: {name: "Tagging", id: 17},
     readytoscan: {name: "Ready to Scan", id: 18},
-    section5Pending: {name: "Section 5 Pending", id: 19},
+    section5pending: {name: "Section 5 Pending", id: 19},
 });
 
 const StateTransitionCategories = Object.freeze({

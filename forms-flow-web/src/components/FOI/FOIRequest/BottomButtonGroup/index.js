@@ -323,6 +323,7 @@ const BottomButtonGroup = React.memo(
           case StateEnum.tagging.name:
           case StateEnum.readytoscan.name:
           case StateEnum.peerreview.name:
+          case StateEnum.section5pending.name:
             const status = Object.values(StateEnum).find(
               (statusValue) => statusValue.name === currentSelectedStatus
             );
