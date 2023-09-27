@@ -33,16 +33,15 @@ class programareadivisionservice:
         """
         # Validation to see if division id exists in any records. If so deletion cannot be completed. 
         records = recordservice().get_all_records_by_divisionid(divisionid)
-        parentdivisons = ProgramAreaDivision.getparentdivisions(divisionid)
-        print(parentdivisons)
-        if len(records) > 0 or len(parentdivisons) > 0:
+        childdivisions = ProgramAreaDivision.getchilddivisions(divisionid)
+        if len(records) > 0 or len(childdivisions) > 0:
             return DefaultMethodResult(False,'Division is currently tagged to various records or sections and cannot be disabled', divisionid)
         return ProgramAreaDivision.disableprogramareadivision(divisionid,userid)
     
-    def getparentdivisions(self, divisionid):
-        """ Returns all parent division for a given divisionid
+    def getchilddivisions(self, divisionid):
+        """ Returns all child divisions/sections for a given divisionid
         """
-        return ProgramAreaDivision.getparentdivisions(divisionid)
+        return ProgramAreaDivision.getchilddivisions(divisionid)
     
     def __prepareprogramareas(self, data):
         """ Join program area name with division on programareaid
