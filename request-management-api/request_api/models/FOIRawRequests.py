@@ -362,7 +362,7 @@ class FOIRawRequest(db.Model):
         return assignments
     
     @classmethod
-    def getonholdapplicationfeerequests(cls):
+    def getonholdapplicationfeerequests(cls): # with the reminder date
         onholdapplicationfeerequests = []
         try:
             sql = '''SELECT * FROM (SELECT DISTINCT ON (requestid) requestid, (updated_at + INTERVAL '20 days') as reminder_date, status FROM public."FOIRawRequests"
