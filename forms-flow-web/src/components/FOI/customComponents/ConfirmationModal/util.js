@@ -60,6 +60,8 @@ import { getFullnameList } from "../../../../helper/FOI/helper";
         return {title: "Close Request", body: ""};
       case StateEnum.redirect.name.toLowerCase():
           return {title: "Redirect Request", body: "Are you sure you want to Redirect this request?"};
+      case StateEnum.section5pending.name.toLowerCase():
+          return {title: "Changing the state", body: `Are you sure you want to change Request #${_requestNumber} to ${StateEnum.section5pending.name}?`};
       case StateEnum.callforrecords.name.toLowerCase():
           return {title: "Changing the state", body: `Are you sure you want to change Request #${_requestNumber} to ${StateEnum.callforrecords.name}?`};
       case StateEnum.review.name.toLowerCase():
