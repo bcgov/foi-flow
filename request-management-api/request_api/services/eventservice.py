@@ -59,8 +59,9 @@ class eventservice:
             cfreventresponse = cfrdateevent().createdueevent() 
             legislativeeventresponse = legislativedateevent().createdueevent()   
             divisioneventresponse = divisiondateevent().createdueevent()   
-            if cfreventresponse.success == False or legislativeeventresponse.success == False or divisioneventresponse.success == False:
-                current_app.logger.error("FOI Notification failed for reminder event response=%s ; legislative response=%s ; division response=%s" % (cfreventresponse.message, legislativeeventresponse.message, divisioneventresponse.message,))     
+            paymentremindereventresponse = paymentevent().createpaymentreminderevent()
+            if cfreventresponse.success == False or legislativeeventresponse.success == False or divisioneventresponse.success == False or paymentremindereventresponse.success == False:
+                current_app.logger.error("FOI Notification failed for reminder event response=%s ; legislative response=%s ; division response=%s ; payment response=%s" % (cfreventresponse.message, legislativeeventresponse.message, divisioneventresponse.message, paymentremindereventresponse.message))
                 return DefaultMethodResult(False,'Due reminder notifications failed',cfreventresponse.identifier)
             return DefaultMethodResult(True,'Due reminder notifications created',cfreventresponse.identifier)
         except BusinessException as exception:            
