@@ -362,6 +362,25 @@ class FOIRawRequest(db.Model):
         return assignments
     
     @classmethod
+    def getonholdapplicationfeerequests(cls):
+        onholdapplicationfeerequests = []
+        try:
+            sql = '''SELECT * FROM (SELECT DISTINCT ON (requestid) requestid, (updated_at + INTERVAL '20 days') as reminder_date, status FROM public."FOIRawRequests"
+	                    ORDER BY requestid ASC, version DESC) r
+                    WHERE r.status = 'On-Hold - Application Fee'
+                    '''
+            rs = db.session.execute(text(sql))
+            for row in rs:
+                if row.status == 'On-Hold - Application Fee':
+                    onholdapplicationfeerequests.append(row)
+        except Exception as ex:
+            logging.error(ex)
+            raise ex
+        finally:
+            db.session.close()
+        return onholdapplicationfeerequests
+
+    @classmethod
     def getversionforrequest(cls,requestid):   
         return db.session.query(FOIRawRequest.version).filter_by(requestid=requestid).order_by(FOIRawRequest.version.desc()).first()
     
