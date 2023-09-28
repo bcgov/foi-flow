@@ -19,6 +19,7 @@ import { StateTransitionCategories, AttachmentCategories } from '../../../../con
 import { TOTAL_RECORDS_UPLOAD_LIMIT } from "../../../../constants/constants";
 import FOI_COMPONENT_CONSTANTS from "../../../../constants/FOI/foiComponentConstants";
 import { ClickableChip } from '../../Dashboard/utils';
+import { MinistryNeedsScanning } from "../../../constants/FOI/enum";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -99,10 +100,15 @@ export default function AttachmentModal({
     const [tagValue, setTagValue] = useState(uploadFor === 'record' ? "" : "general");
     const attchmentFileNameList = attachmentsArray.map(_file => _file.filename.toLowerCase());
     const totalRecordUploadLimit= TOTAL_RECORDS_UPLOAD_LIMIT ;
+    const [isMCFMSDPersonal, setIsMCFMSDPersonal] = useState(MinistryNeedsScanning.includes(bcgovcode) && requestType == FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL);
 
     useEffect(() => {
       parseFileName(attachment);
     }, [attachment])
+
+    useEffect(() => {
+      setIsMCFMSDPersonal(MinistryNeedsScanning.includes(bcgovcode) && requestType == FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL);
+    }, [bcgovcode, requestType])
 
     const parseFileName = (_attachment) => {
       setNewFilename("");
@@ -230,8 +236,13 @@ export default function AttachmentModal({
     const getMessage = () => {
       switch(modalFor.toLowerCase()) { 
         case "add":
-          return {title: "Add Attachment", body: ""};
-
+          if(isMCFMSDPersonal) {
+            return {title: "Add Scanned Records", body: ""};
+          }
+          else 
+          {
+            return {title: "Add Attachment", body: ""};
+          }
         case "replaceattachment":
           if (uploadFor === 'record') {
             _message = {title: "Replace Records", body:<>Replace the existing record with a reformatted or updated version of the same record.<br></br>The original file that was uploaded will still be available for download.</> }
