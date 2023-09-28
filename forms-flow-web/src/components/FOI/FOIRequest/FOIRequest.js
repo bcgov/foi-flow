@@ -230,7 +230,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
   document.title = requestDetails.axisRequestId || requestDetails.idNumber || headerText;
   const dispatch = useDispatch();
   const [isIAORestricted, setIsIAORestricted] = useState(false);
-  const [isMCFMSDPersonal, setIsMCFMSDPersonal] = useState(MinistryNeedsScanning.includes(bcgovcode.replaceAll('"', '')) && requestDetails.requestType == FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL);
+  const [isMCFPersonal, setIsMCFPersonal] = useState(bcgovcode.replaceAll('"', '') == "MCF" && requestDetails.requestType == FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL);
 
   useEffect(() => {
     if (window.location.href.indexOf("comments") > -1) {
@@ -288,7 +288,9 @@ const FOIRequest = React.memo(({ userDetail }) => {
 
     if(MinistryNeedsScanning.includes(bcgovcode.replaceAll('"', '')) && requestDetails.requestType == FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL) {
       dispatch(fetchFOIPersonalDivisionsAndSections(bcgovcode.replaceAll('"', '')));
-      setIsMCFMSDPersonal(true);
+      if(bcgovcode.replaceAll('"', '') == "MCF") {
+        setIsMCFPersonal(true);
+      }
     }
   }, [requestDetails]);
 
@@ -763,7 +765,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
     return (requestState !== StateEnum.intakeinprogress.name &&
       requestState !== StateEnum.unopened.name &&
       requestState !== StateEnum.open.name &&
-      (requestDetails?.divisions?.length > 0 || isMCFMSDPersonal) &&
+      (requestDetails?.divisions?.length > 0 || isMCFPersonal) &&
       DISABLE_GATHERINGRECORDS_TAB?.toLowerCase() =='false'
     );
   }
