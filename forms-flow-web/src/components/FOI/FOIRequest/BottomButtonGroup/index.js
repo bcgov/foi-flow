@@ -320,6 +320,8 @@ const BottomButtonGroup = React.memo(
           case StateEnum.deduplication.name:
           case StateEnum.harms.name:
           case StateEnum.response.name:
+          case StateEnum.tagging.name:
+          case StateEnum.readytoscan.name:
           case StateEnum.peerreview.name:
             const status = Object.values(StateEnum).find(
               (statusValue) => statusValue.name === currentSelectedStatus
