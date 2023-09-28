@@ -219,7 +219,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
   const [originalDivisions, setOriginalDivisions] = React.useState([])
   const [hasReceivedDate, setHasReceivedDate] = React.useState(true);
   const [isMinistryRestricted, setIsMinistryRestricted] = useState(false);
-  const [isMCFMSDPersonal, setIsMCFMSDPersonal] = useState(MinistryNeedsScanning.includes(bcgovcode.replaceAll('"', '')) && requestDetails.requestType == FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL);
+  const [isMCFPersonal, setIsMCFPersonal] = useState(bcgovcode.replaceAll('"', '') == "MCF" && requestDetails.requestType == FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL);
 
   let ministryassignedtousername = "Unassigned";
   useEffect(() => {
@@ -241,7 +241,9 @@ const MinistryReview = React.memo(({ userDetail }) => {
 
     if(MinistryNeedsScanning.includes(bcgovcode.replaceAll('"', '')) && requestDetails.requestType == FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL) {
       dispatch(fetchFOIPersonalDivisionsAndSections(bcgovcode.replaceAll('"', '')));
-      setIsMCFMSDPersonal(true);
+      if(bcgovcode.replaceAll('"', '') == "MCF") {
+        setIsMCFPersonal(true);
+      }
     }
   }, [requestDetails, unSavedRequest]);
 
@@ -531,7 +533,6 @@ const MinistryReview = React.memo(({ userDetail }) => {
         createMinistrySaveRequestObject={createMinistrySaveRequestObject}
         requestStartDate = {requestDetails?.requestProcessStart}
         setHasReceivedDate={setHasReceivedDate}
-        isMCFMSDPersonal={isMCFMSDPersonal}
       />
     );
 
@@ -592,7 +593,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
                 ? `(${requestNotes.length})`
                 : ""}
             </div>
-            {(originalDivisions?.length > 0 || isMCFMSDPersonal) && DISABLE_GATHERINGRECORDS_TAB?.toLowerCase() =='false' &&<div
+            {(originalDivisions?.length > 0 || isMCFPersonal) && DISABLE_GATHERINGRECORDS_TAB?.toLowerCase() =='false' &&<div
               className={clsx("tablinks", {
                 active: tabLinksStatuses.Records.active,
               })}
@@ -828,7 +829,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
               [classes.hidden]: !tabLinksStatuses.Records.display,
             })}
           >
-            {!isAttachmentListLoading && (originalDivisions?.length > 0 || isMCFMSDPersonal) ? (
+            {!isAttachmentListLoading && (originalDivisions?.length > 0 || isMCFPersonal) ? (
               <>
               {url.indexOf("records") > -1 ? (
                 <Breadcrumbs aria-label="breadcrumb" className="foi-breadcrumb foi-breadcrumb-comments">

@@ -14,7 +14,7 @@ import FileUpload from '../FileUpload';
 import FileUploadForMCFPersonal from '../FileUpload/FileUploadForMCFPersonal';
 import FileUploadForMSDPersonal from '../FileUpload/FileUploadForMSDPersonal';
 import { makeStyles } from '@material-ui/core/styles';
-import { MimeTypeList, MaxFileSizeInMB } from "../../../../constants/FOI/enum";
+import { MimeTypeList, MaxFileSizeInMB, MCFPopularSections, MSDPopularSections } from "../../../../constants/FOI/enum";
 import { StateTransitionCategories, AttachmentCategories } from '../../../../constants/FOI/statusEnum';
 import { TOTAL_RECORDS_UPLOAD_LIMIT } from "../../../../constants/constants";
 import FOI_COMPONENT_CONSTANTS from "../../../../constants/FOI/foiComponentConstants";
@@ -356,8 +356,8 @@ export default function AttachmentModal({
                         updateFilesCb={updateFilesCb}
                         modalFor={modalFor}
                         uploadFor={uploadFor}
-                        tagList={MCFSections?.sections?.slice(0, 30)}
-                        otherTagList={MCFSections?.sections?.slice(31)}
+                        tagList={MCFSections?.sections?.slice(0, MCFPopularSections-1)}
+                        otherTagList={MCFSections?.sections?.slice(MCFPopularSections)}
                         handleTagChange={handleTagChange}
                         tagValue={tagValue}
                         maxNumberOfFiles={maxNoFiles}
@@ -379,8 +379,8 @@ export default function AttachmentModal({
                           modalFor={modalFor}
                           uploadFor={uploadFor}
                           divisions={tagList}
-                          tagList={MSDSections?.divisions[0]?.sections?.slice(0, 10)}
-                          otherTagList={MSDSections?.divisions[0]?.sections?.slice(11)}
+                          tagList={MSDSections?.divisions[0]?.sections?.slice(0, MSDPopularSections-1)}
+                          otherTagList={MSDSections?.divisions[0]?.sections?.slice(MSDPopularSections)}
                           handleTagChange={handleTagChange}
                           tagValue={tagValue}
                           maxNumberOfFiles={maxNoFiles}

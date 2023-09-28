@@ -10,8 +10,7 @@ const RequestTracking = React.memo(({
     ministrycode,
     createMinistrySaveRequestObject,
     requestStartDate,
-    setHasReceivedDate,
-    isMCFMSDPersonal
+    setHasReceivedDate
 }) => {
 
     const dispatch = useDispatch();
@@ -25,10 +24,8 @@ const RequestTracking = React.memo(({
     let divisionalstages = useSelector(state=> state.foiRequests.foiMinistryDivisionalStages);
     let MSDSections = useSelector((state) => state.foiRequests.foiPersonalDivisionsAndSections);
 
-    if(isMCFMSDPersonal) {
-        if(ministrycode == "MSD" && MSDSections?.divisions?.length > 0) {
-            divisionalstages.divisions = MSDSections.divisions;
-        }
+    if(ministrycode == "MSD" && MSDSections?.divisions?.length > 0) {
+        divisionalstages.divisions = MSDSections.divisions;
     }
     
     const popselecteddivstages = (selectedMinDivstages) => {      
