@@ -14,12 +14,11 @@ import FileUpload from '../FileUpload';
 import FileUploadForMCFPersonal from '../FileUpload/FileUploadForMCFPersonal';
 import FileUploadForMSDPersonal from '../FileUpload/FileUploadForMSDPersonal';
 import { makeStyles } from '@material-ui/core/styles';
-import { MimeTypeList, MaxFileSizeInMB, MCFPopularSections, MSDPopularSections } from "../../../../constants/FOI/enum";
+import { MimeTypeList, MaxFileSizeInMB, MCFPopularSections, MSDPopularSections, MinistryNeedsScanning } from "../../../../constants/FOI/enum";
 import { StateTransitionCategories, AttachmentCategories } from '../../../../constants/FOI/statusEnum';
 import { TOTAL_RECORDS_UPLOAD_LIMIT } from "../../../../constants/constants";
 import FOI_COMPONENT_CONSTANTS from "../../../../constants/FOI/foiComponentConstants";
 import { ClickableChip } from '../../Dashboard/utils';
-import { MinistryNeedsScanning } from "../../../constants/FOI/enum";
 
 const useStyles = makeStyles((theme) => ({
   root: {
