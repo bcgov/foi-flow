@@ -141,7 +141,7 @@ const adminDashboard = (_e) => {
                         </li>
                       }
                       <li className="help-icon foinavitem">
-                        <a href={"https://help.foirequests.gov.bc.ca/"} target="_blank" aria-label="foi-help link">
+                        <a href={"https://help.foirequests.gov.bc.ca/help-articles"} target="_blank" aria-label="foi-help link">
                           <HelpOutlineIcon style={{fontSize: "21px", color: "white", textDecoration: "none", cursor: "pointer"}} />
                         </a>
                       </li>
