@@ -64,7 +64,7 @@ const StateEnum = Object.freeze({
     peerreview: {name: "Peer Review", id: 16},
     tagging: {name: "Tagging", id: 17},
     readytoscan: {name: "Ready to Scan", id: 18},
-    section5pending: {name: "Section 5 Pending", id: 19},
+    section5pending: {name: "Section 5 Pending", id: 20},
 });
 
 const StateTransitionCategories = Object.freeze({
