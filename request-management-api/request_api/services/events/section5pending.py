@@ -19,17 +19,12 @@ class section5pendingevent(duecalculator):
         try: 
             _today = self.gettoday()
             notificationservice().dismissremindernotification("rawrequest", self.__notificationtype())
-            # ca_holidays = self.getholidays()
             section5pendings = FOIRawRequest.getlatestsection5pendings()
-            print(len(section5pendings))
             for entry in section5pendings:
                 duedate = self.formatduedate(entry['duedate'])
                 message = None
                 if  _today == duedate:                
                     message = self.__passeddueremindermessage()
-                #WAT IS THIS DOING?
-                # elif  self.getpreviousbusinessday(entry['duedate'], ca_holidays) == _today:
-                #     message = self.__passeddueremindermessage() 
                 self.__createnotification(message, entry['requestid'])
                 self.__createcomment(entry, message)
             return DefaultMethodResult(True,'Section 5 Pending passed due notification created',_today)
