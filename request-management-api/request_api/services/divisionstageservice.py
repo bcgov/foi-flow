@@ -18,7 +18,7 @@ class divisionstageservice:
         divisionstages = []
         programarea = ProgramArea.getprogramarea(bcgovcode)
         divisions = ProgramAreaDivision.getallprogramareatags(programarea['programareaid'])
-        divisions.sort(key=lambda item: (item['sortorder'], item['name']))        
+        divisions.sort(key=lambda item: (item["sortorder"] if item["sortorder"] is not None else float('inf'), item["name"]))        
         for division in divisions:
             divisionstages.append({"divisionid": division['divisionid'], "name": self.escapestr(division['name']),"sortorder": division['sortorder'],"issection":division['issection']})
         return {"divisions": divisionstages, "stages": self.getstages()}
@@ -27,7 +27,7 @@ class divisionstageservice:
         divisionstages = []
         programarea = ProgramArea.getprogramarea(bcgovcode)
         divisions = ProgramAreaDivision.getpersonalspecificprogramareadivisions(programarea['programareaid'])
-        divisions.sort(key=lambda item: (item['sortorder'], item['name']))        
+        divisions.sort(key=lambda item: (item["sortorder"] if item["sortorder"] is not None else float('inf'), item["name"]))        
         for division in divisions:
             divisionstages.append({"divisionid": division['divisionid'], "name": self.escapestr(division['name']),"sortorder": division['sortorder'], "issection":division['issection']})
         return {"divisions": divisionstages, "stages": self.getstages()}
@@ -36,7 +36,7 @@ class divisionstageservice:
         programareasections = []
         programarea = ProgramArea.getprogramarea(bcgovcode)
         _sections = ProgramAreaDivision.getpersonalrequestsprogramareasections(programarea['programareaid'])
-        _sections.sort(key=lambda item: (item['sortorder'], item['name']))        
+        _sections.sort(key=lambda item: (item["sortorder"] if item["sortorder"] is not None else float('inf'), item["name"]))        
         for _section in _sections:
             programareasections.append({"divisionid": _section['divisionid'], "name": self.escapestr(_section['name']),"sortorder":_section['sortorder'],"issection":_section['issection']})
         return {"sections": programareasections}
@@ -46,7 +46,7 @@ class divisionstageservice:
         programarea = ProgramArea.getprogramarea(bcgovcode)
         divisions = ProgramAreaDivision.getpersonalspecificprogramareadivisions(programarea['programareaid'])
         sections = ProgramAreaDivision.getpersonalrequestsdivisionsandsections(programarea['programareaid'])
-        divisions.sort(key=lambda item: (item['sortorder'], item['name']))        
+        divisions.sort(key=lambda item: (item["sortorder"] if item["sortorder"] is not None else float('inf'), item["name"]))        
         for _division in divisions:
             divisionid = _division['divisionid']
             _sections = []                        
