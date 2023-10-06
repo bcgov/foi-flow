@@ -62,7 +62,7 @@ class requestservice:
         foirequest = self.getrequest(requestid, ministryrequestid)
         currentstatus = foirequest["stateTransition"][0]["status"] if "stateTransition" in foirequest and len(foirequest["stateTransition"])  > 1 else None
         #Check for Off Hold
-        if currentstatus not in (None, "") and currentstatus == StateName.onhold.value and nextstatename != StateName.response.value:
+        if currentstatus not in (None, "") and (currentstatus == StateName.onhold.value or currentstatus == StateName.tagging.value or currentstatus == StateName.readytoscan.value) and nextstatename != StateName.response.value:
             skipcalculation = self.__skipduedatecalculation(ministryrequestid, offholddate)
             #Skip multiple off hold in a day
             if skipcalculation == True:

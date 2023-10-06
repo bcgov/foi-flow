@@ -156,6 +156,8 @@ class StateName(Enum):
     deduplication = "Deduplication"
     harmsassessment = "Harms Assessment"    
     response = "Response"
+    tagging = "Tagging"
+    readytoscan ="Ready to Scan"
 
 class CacheUrls(Enum):
     keycloakusers= "/api/foiassignees"
