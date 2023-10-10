@@ -210,15 +210,14 @@ class requestservicegetter:
 
     
     def getonholdtransition(self, foiministryrequestid):
-        onholddate = None        
+        onholddate = None
         transitions = FOIMinistryRequest.getrequeststatusById(foiministryrequestid)
         for entry in transitions:
-            if (entry['requeststatusid'] == 11 or entry['requeststatusid'] == 17 or entry['requeststatusid'] == 18):                
-                onholddate = datetimehandler().convert_to_pst(entry['created_at'],'%Y-%m-%d')                
-            else:                
+            if entry['requeststatusid'] == 11:
+                onholddate = datetimehandler().convert_to_pst(entry['created_at'],'%Y-%m-%d')
+            else:
                 if onholddate is not None:
                     break
-                          
         return onholddate
 
     def getministryrequest(self, foiministryrequestid):
