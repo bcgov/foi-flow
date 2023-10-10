@@ -16,7 +16,8 @@ import { MCFPopularSections } from "../../../../constants/FOI/enum";
 const MCFPersonal = ({
     setNewDivision,
     tagValue,
-    divisionModalTagValue
+    divisionModalTagValue,
+    divisions=[]
 }) => {
 
     const [searchValue, setSearchValue] = useState("");
@@ -59,6 +60,32 @@ const MCFPersonal = ({
     return (
     <>
       <div>
+
+        {divisions.length > 0 && divisions.filter(div => div.divisionid !== tagValue).length > 0 && (<>
+        <div className="tagtitle" style={{paddingTop: "15px"}}>
+          <span>Personals Divisional Tracking: </span>
+        </div>
+        <div className="taglist">
+          {divisions.filter(div => {
+            return div.divisionid !== tagValue;
+          }).map(tag =>
+            <ClickableChip
+              id={`${tag.divisionid}Tag`}
+              key={`${tag.divisionid}-tag`}
+              label={tag.divisionname.toUpperCase()}
+              sx={{width: "fit-content", marginRight: "8px", marginBottom: "8px"}}
+              color="primary"
+              size="small"
+              onClick={()=>{setNewDivision(tag.divisionid)}}
+              clicked={divisionModalTagValue == tag.divisionid}
+            />
+          )}
+        </div>
+        <div className="tagtitle">
+          <span>Sections: </span>
+        </div>
+        </>)}
+
         <div className="taglist">
           {tagList.filter(div => {
             return div.divisionid !== tagValue;

@@ -2015,6 +2015,7 @@ export const RecordsLog = ({
                             setNewDivision={setDivisionModalTagValue}
                             tagValue={records.filter(r => r.isselected)[0]?.attributes.divisions[0].divisionid}
                             divisionModalTagValue={divisionModalTagValue}
+                            divisions={divisions}
                           />
                           :
                           (bcgovcode == "MSD") ?

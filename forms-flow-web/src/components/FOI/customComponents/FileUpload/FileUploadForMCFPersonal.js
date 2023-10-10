@@ -35,6 +35,7 @@ const FileUploadForMCFPersonal = ({
     modalFor,
     handleTagChange,
     tagValue,
+    divisions = [],
     tagList = [],
     otherTagList = [],
     isMinistryCoordinator,
@@ -225,6 +226,28 @@ const FileUploadForMCFPersonal = ({
       {(modalFor === "add" && (uploadFor === "attachment" || uploadFor === 'record')) && (<div>
         <div className="tagtitle">
           <span>Select the name of the section of records you are uploading. Once you have selected the section name you will be able to select the respective documents from your computer.</span>
+        </div>
+        {divisions.length > 0 && (<>
+        <div className="tagtitle" style={{paddingTop: "15px"}}>
+          <span>Personals Divisional Tracking: </span>
+        </div>
+        <div className="taglist">
+          {divisions.map(tag =>
+            <ClickableChip
+              id={`${tag.name}Tag`}
+              key={`${tag.name}-tag`}
+              label={tag.display.toUpperCase()}
+              sx={{width: "fit-content", marginRight: "8px", marginBottom: "8px"}}
+              color="primary"
+              size="small"
+              onClick={()=>{handleTagChange(tag.name)}}
+              clicked={tagValue == tag.name}
+            />
+          )}
+        </div>
+        </>)}
+        <div className="tagtitle">
+          <span>Sections: </span>
         </div>
         <div className="taglist">
           {tagList.map(tag =>
