@@ -90,7 +90,7 @@ const Queue = ({ userDetail, tableInfo }) => {
   function getRecordsDue(params) {
     let receivedDateString = params.row.cfrduedate;
     const currentStatus = params.row.currentState;
-    if (currentStatus.toLowerCase() === StateEnum.onhold.name.toLowerCase() || currentStatus.toLowerCase() === StateEnum.tagging.name.toLowerCase() || currentStatus.toLowerCase() === StateEnum.readytoscan.name.toLowerCase()) {
+    if (currentStatus.toLowerCase() === StateEnum.onhold.name.toLowerCase()) {
       return "N/A";
     } else if(!receivedDateString) {
       return "";
@@ -102,7 +102,7 @@ const Queue = ({ userDetail, tableInfo }) => {
   function getLDD(params) {
     let receivedDateString = params.row.duedate;
     const currentStatus = params.row.currentState;
-    if (currentStatus.toLowerCase() === StateEnum.onhold.name.toLowerCase() || currentStatus.toLowerCase() === StateEnum.tagging.name.toLowerCase() || currentStatus.toLowerCase() === StateEnum.readytoscan.name.toLowerCase()) {
+    if (currentStatus.toLowerCase() === StateEnum.onhold.name.toLowerCase()) {
       return "N/A";
     } else if(!receivedDateString) {
       return "";

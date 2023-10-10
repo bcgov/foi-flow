@@ -283,7 +283,7 @@ class FOIMinistryRequest(db.Model):
             recent_offhold_index = None
             offhold_indicator = False
             for entry in desc_transitions:
-                if (entry["status"] == StateName.onhold.value or entry["status"] == StateName.readytoscan.value or entry["status"] == StateName.tagging.value):
+                if entry["status"] == StateName.onhold.value:
                     onhold_occurance = onhold_occurance + 1
                     if onhold_occurance > 1:
                         recent_offhold_index = index
@@ -737,7 +737,7 @@ class FOIMinistryRequest(db.Model):
         upcomingduerecords = []
         try:
             sql = """select distinct on (filenumber) filenumber, to_char(duedate, 'YYYY-MM-DD') as duedate, foiministryrequestid, version, foirequest_id, created_at, createdby from "FOIMinistryRequests" fpa 
-                    where isactive = true and duedate is not null and requeststatusid not in (5,6,4,11,3,15,17,18)     
+                    where isactive = true and duedate is not null and requeststatusid not in (5,6,4,11,3,15)     
                     and duedate between  NOW() - INTERVAL '7 DAY' AND NOW() + INTERVAL '7 DAY'
                     order by filenumber , version desc;""" 
             rs = db.session.execute(text(sql))        
@@ -760,7 +760,7 @@ class FOIMinistryRequest(db.Model):
                         from "FOIMinistryRequestDivisions" frd 
                         inner join (select distinct on (fpa.foiministryrequestid) foiministryrequestid, version as foiministryrequestversion, axisrequestid, filenumber, foirequest_id, requeststatusid 
                                     from "FOIMinistryRequests" fpa  
-                                    order by fpa.foiministryrequestid , fpa.version desc) fma on frd.foiministryrequest_id = fma.foiministryrequestid and frd.foiministryrequestversion_id = fma.foiministryrequestversion and fma.requeststatusid not in (5,6,4,11,3,15,17,18) 
+                                    order by fpa.foiministryrequestid , fpa.version desc) fma on frd.foiministryrequest_id = fma.foiministryrequestid and frd.foiministryrequestversion_id = fma.foiministryrequestversion and fma.requeststatusid not in (5,6,4,11,3,15) 
                         inner join "ProgramAreaDivisions" pad2 on frd.divisionid  = pad2.divisionid 
                         inner join "ProgramAreaDivisionStages" pads on frd.stageid  = pads.stageid and frd.stageid in (5, 7, 9) 
                         and frd.divisionduedate  between  NOW() - INTERVAL '7 DAY' AND NOW() + INTERVAL '7 DAY' 
