@@ -227,10 +227,7 @@ const FileUploadForMCFPersonal = ({
         <div className="tagtitle">
           <span>Select the name of the section of records you are uploading. Once you have selected the section name you will be able to select the respective documents from your computer.</span>
         </div>
-        {divisions.length > 0 && (<>
-        <div className="tagtitle" style={{paddingTop: "15px"}}>
-          <span>Personals Divisional Tracking: </span>
-        </div>
+        {divisions.length > 0 && isMinistryCoordinator && (<>
         <div className="taglist">
           {divisions.map(tag =>
             <ClickableChip
@@ -246,9 +243,7 @@ const FileUploadForMCFPersonal = ({
           )}
         </div>
         </>)}
-        <div className="tagtitle">
-          <span>Sections: </span>
-        </div>
+        {!isMinistryCoordinator && (<>
         <div className="taglist">
           {tagList.map(tag =>
             <ClickableChip
@@ -361,6 +356,7 @@ const FileUploadForMCFPersonal = ({
             </Paper>)}
           </Grid>
         </div>
+        </>)}
       </div>)}
       {modalFor === "add" && (<div className="tag-message-container-scanning">
         <p>Please drag and drop or add records associated with the section name you have selected above. All records upload will show under the selected section in the redaction application.</p>

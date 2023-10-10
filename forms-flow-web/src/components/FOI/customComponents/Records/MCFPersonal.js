@@ -17,7 +17,8 @@ const MCFPersonal = ({
     setNewDivision,
     tagValue,
     divisionModalTagValue,
-    divisions=[]
+    divisions=[],
+    isMinistryCoordinator
 }) => {
 
     const [searchValue, setSearchValue] = useState("");
@@ -61,10 +62,7 @@ const MCFPersonal = ({
     <>
       <div>
 
-        {divisions.length > 0 && divisions.filter(div => div.divisionid !== tagValue).length > 0 && (<>
-        <div className="tagtitle" style={{paddingTop: "15px"}}>
-          <span>Personals Divisional Tracking: </span>
-        </div>
+        {isMinistryCoordinator && divisions.length > 0 && divisions.filter(div => div.divisionid !== tagValue).length > 0 && (<>
         <div className="taglist">
           {divisions.filter(div => {
             return div.divisionid !== tagValue;
@@ -81,11 +79,9 @@ const MCFPersonal = ({
             />
           )}
         </div>
-        <div className="tagtitle">
-          <span>Sections: </span>
-        </div>
         </>)}
 
+        {!isMinistryCoordinator && (<>
         <div className="taglist">
           {tagList.filter(div => {
             return div.divisionid !== tagValue;
@@ -202,6 +198,7 @@ const MCFPersonal = ({
             </Paper>)}
           </Grid>
         </div>
+        </>)}
       </div>
     </>
     );
