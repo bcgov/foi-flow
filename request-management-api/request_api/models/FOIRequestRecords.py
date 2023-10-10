@@ -133,7 +133,8 @@ class FOIRequestRecord(db.Model):
         try:
             sql = """SELECT * FROM (SELECT DISTINCT ON (recordid) recordid, version, foirequestid, ministryrequestid, filename, attributes, isactive, replacementof
             FROM public."FOIRequestRecords" ORDER BY recordid ASC, version DESC) records 
-            WHERE cast(records.attributes::json -> 'divisions' as text) like '%{%"divisionid": """+ divisionid +"""%}%' and isactive = 'true'"""
+            WHERE cast(records.attributes::json -> 'divisions' as text) like '%{"divisionid": """+ divisionid +"""}%' and isactive = 'true' OR cast(records.attributes::json -> 'divisions' as text) like '%{"divisionid": """+ divisionid +""", %}%' and isactive = 'true' 
+            """
             result = db.session.execute(text(sql))
             for row in result:
                 records.append({"recordid": row["recordid"], "foirequestid": row["foirequestid"], "ministryrequestid": row["ministryrequestid"], "filename": row["filename"], "attributes": row["attributes"], "isactive": row["isactive"], "replacementof": row["replacementof"]})
