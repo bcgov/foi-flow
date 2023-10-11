@@ -256,6 +256,11 @@ export const RecordsLog = ({
   const [records, setRecords] = useState(recordsObj?.records);
   const [totalUploadedRecordSize, setTotalUploadedRecordSize] = useState(0);
   const [isScanningTeamMember, setIsScanningTeamMember] = useState(isScanningTeam(userGroups));
+  const [ministryCode, setMinistryCode] = useState(bcgovcode.replaceAll('"', '').toUpperCase());
+  const [isMCFPersonal, setIsMCFPersonal] = useState(ministryCode == "MCF" && requestType === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL);
+
+  const MCFSections = useSelector((state) => state.foiRequests.foiPersonalSections);
+
   useEffect(() => {    
     setRecords(recordsObj?.records)
     let nonDuplicateRecords = recordsObj?.records?.filter(record => !record.isduplicate)
@@ -1328,6 +1333,14 @@ export const RecordsLog = ({
       }
     }
     // setDivisionToUpdate()
+
+    if(isMCFPersonal && selectedDivision.size > 0) {
+      if(divisions.find(d => selectedDivision.has(d.divisionid))) {
+        return(!isMinistryCoordinator);
+      } else {
+        return(isMinistryCoordinator);
+      }
+    }
     return count === 0;
   };
 
@@ -1813,6 +1826,11 @@ export const RecordsLog = ({
                           {" "}
                           and all records selected must be finished processing
                         </li>
+                        {isMCFPersonal && (<>
+                          <li>
+                            you can only edit records uploaded by your team
+                          </li>
+                        </>)}
                       </ul>
                     </div>
                   ) : (
