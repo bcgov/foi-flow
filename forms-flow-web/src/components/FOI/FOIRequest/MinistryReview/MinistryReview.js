@@ -533,6 +533,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
         createMinistrySaveRequestObject={createMinistrySaveRequestObject}
         requestStartDate = {requestDetails?.requestProcessStart}
         setHasReceivedDate={setHasReceivedDate}
+        requestType={requestDetails.requestType}
       />
     );
 

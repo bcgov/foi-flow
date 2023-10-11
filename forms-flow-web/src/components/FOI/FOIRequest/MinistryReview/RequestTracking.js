@@ -3,21 +3,27 @@ import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import DivisionalStages from './Divisions/DivisionalStages';
 import { useDispatch, useSelector } from "react-redux";
-import { fetchFOIMinistryDivisionalStages } from "../../../../apiManager/services/FOI/foiMasterDataServices";
+import FOI_COMPONENT_CONSTANTS from "../../../../constants/FOI/foiComponentConstants";
+import { fetchFOIMinistryDivisionalStages, fetchFOIPersonalDivisions } from "../../../../apiManager/services/FOI/foiMasterDataServices";
 const RequestTracking = React.memo(({
     pubmindivstagestomain,
     existingDivStages,
     ministrycode,
     createMinistrySaveRequestObject,
     requestStartDate,
-    setHasReceivedDate
+    setHasReceivedDate,
+    requestType
 }) => {
 
     const dispatch = useDispatch();
-    useEffect(() => {    
+    useEffect(() => {
         if(ministrycode)
         {
-            dispatch(fetchFOIMinistryDivisionalStages(ministrycode));
+            if(ministrycode == "MCF" && requestType == FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL) {
+                dispatch(fetchFOIPersonalDivisions(ministrycode));
+            } else {
+                dispatch(fetchFOIMinistryDivisionalStages(ministrycode));
+            }
         }
     },[ministrycode,dispatch])
 
