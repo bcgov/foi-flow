@@ -1828,7 +1828,7 @@ export const RecordsLog = ({
                         </li>
                         {isMCFPersonal && (<>
                           <li>
-                            you can only edit records uploaded by your team
+                            all records selected must be uploaded by your own team
                           </li>
                         </>)}
                       </ul>
