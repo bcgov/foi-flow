@@ -414,6 +414,30 @@ import {
     }
   };
 
+  export const fetchFOIPersonalDivisions = (bcgovcode) => {
+    const apiUrl = replaceUrl(API.FOI_PERSONAL_DIVISIONS, "<bcgovcode>", bcgovcode);
+    return (dispatch) => {
+      httpGETRequest(apiUrl, {}, UserService.getToken())
+      .then((res) => {
+        if (res.data) {
+          const foiMinistryDivisionalStages = res.data;
+          dispatch(setFOIMinistryDivisionalStages({}));
+          dispatch(setFOIMinistryDivisionalStages(foiMinistryDivisionalStages));
+          dispatch(setFOILoader(false));
+        } else {
+          console.log(`Error while fetching ministry(${bcgovcode}) divisional stage master data`, res);
+          dispatch(serviceActionError(res));
+          dispatch(setFOILoader(false));
+        }
+      })
+      .catch((error) => {
+        console.log(`Error while fetching ministry(${bcgovcode}) divisional stage master data`, error);
+        dispatch(serviceActionError(error));
+        dispatch(setFOILoader(false));
+      });
+    };
+  };
+
   export const fetchFOISubjectCodeList = () => {
     const firstSubjectCode = { "subjectcodeid": 0, "name": "Select Subject Code (if required)" };
     return (dispatch) => {
