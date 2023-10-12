@@ -235,7 +235,7 @@ export default function AttachmentModal({
     const getMessage = () => {
       switch(modalFor.toLowerCase()) { 
         case "add":
-          if(isMCFMSDPersonal) {
+          if(isMCFMSDPersonal && !isMinistryCoordinator) {
             return {title: "Add Scanned Records", body: ""};
           }
           else 
