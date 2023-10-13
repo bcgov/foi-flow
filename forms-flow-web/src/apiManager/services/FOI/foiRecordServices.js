@@ -170,22 +170,18 @@ export const fetchRedactedSections = (ministryId, ...rest) => {
     ministryId
   );
   return (dispatch) => {
-    dispatch(setRecordsLoader("inprogress"));
     httpGETRequest(apiUrl, {}, UserService.getToken())
       .then((res) => {
         if (res.data) {
-          dispatch(setRecordsLoader("completed"));
           done(null, res.data);
         } else {
           console.log("Error in fetching redacted sections", res);
           dispatch(serviceActionError(res));
-          dispatch(setRecordsLoader("error"));
         }
       })
       .catch((error) => {
         console.log("Error in fetching redacted section", error);
         dispatch(serviceActionError(error));
-        dispatch(setRecordsLoader("error"));
         done(error);
       });
   };
