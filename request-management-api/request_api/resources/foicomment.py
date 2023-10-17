@@ -54,8 +54,8 @@ class CreateFOIRequestComment(Resource):
             if result.success == True:
                 asyncio.ensure_future(eventservice().postcommentevent(result.identifier, "ministryrequest", AuthHelper.getuserid()))
             return {'status': result.success, 'message':result.message,'id':result.identifier} , 200 
-        except KeyError as err:
-            return {'status': False, 'message':err.messages}, 400        
+        except KeyError as error:
+            return {'status': False, 'message': f"{error=}"}, 400        
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500 
 
@@ -77,8 +77,8 @@ class CreateFOIRawRequestComment(Resource):
             if result.success == True:
                 asyncio.ensure_future(eventservice().postcommentevent(result.identifier, "rawrequest", AuthHelper.getuserid()))
             return {'status': result.success, 'message':result.message,'id':result.identifier} , 200
-        except KeyError as err:
-            return {'status': False, 'message':err.messages}, 400        
+        except KeyError as error:
+            return {'status': False, 'message': f"{error=}"}, 400        
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500 
         
@@ -108,8 +108,8 @@ class FOIComment(Resource):
                 return json.dumps(result), 200
             else:
                 return {'status': 401, 'message':'Restricted Request'} , 401
-        except KeyError as err:
-            return {'status': False, 'message':err.messages}, 400        
+        except KeyError as error:
+            return {'status': False, 'message': f"{error=}"}, 400        
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500   
         
@@ -136,8 +136,8 @@ class FOIDisableComment(Resource):
             if result.success == True:
                 asyncio.ensure_future(eventservice().postcommentevent(result.identifier, requesttype, AuthHelper.getuserid(), True))
             return {'status': result.success, 'message':result.message,'id':result.identifier} , 200 
-        except KeyError as err:
-            return {'status': False, 'message':err.messages}, 400        
+        except KeyError as error:
+            return {'status': False, 'message': f"{error=}"}, 400        
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500
         
@@ -166,8 +166,8 @@ class FOIUpdateComment(Resource):
             if result.success == True:
                 asyncio.ensure_future(eventservice().postcommentevent(commentid, requesttype, AuthHelper.getuserid(), existingtaggedusers=result.args[0]))
             return {'status': result.success, 'message':result.message,'id':result.identifier} , 200 
-        except KeyError as err:
-            return {'status': False, 'message':err.messages}, 400        
+        except KeyError as error:
+            return {'status': False, 'message': f"{error=}"}, 400        
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500
 

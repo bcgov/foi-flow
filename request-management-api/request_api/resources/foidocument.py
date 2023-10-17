@@ -50,8 +50,8 @@ class GetFOIDocument(Resource):
         try:
             result = documentservice().getrequestdocumentsbyrole(requestid, requesttype, AuthHelper.isministrymember())
             return json.dumps(result), 200
-        except KeyError as err:
-            return {'status': False, 'message':err.messages}, 400        
+        except KeyError as error:
+            return {'status': False, 'message': f"{error=}"}, 400        
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500   
 
@@ -75,8 +75,8 @@ class CreateFOIDocument(Resource):
             return {'status': result.success, 'message':result.message} , 200 
         except ValidationError as err:
                     return {'status': False, 'message':err.messages}, 400
-        except KeyError as err:
-            return {'status': False, 'message':err.messages}, 400        
+        except KeyError as error:
+            return {'status': False, 'message': f"{error=}"}, 400        
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500 
         
@@ -99,8 +99,8 @@ class RenameFOIDocument(Resource):
             return {'status': result.success, 'message':result.message,'id':result.identifier} , 200 
         except ValidationError as err:
                     return {'status': False, 'message':err.messages}, 400
-        except KeyError as err:
-            return {'status': False, 'message':err.messages}, 400        
+        except KeyError as error:
+            return {'status': False, 'message': f"{error=}"}, 400        
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500 
         
@@ -137,8 +137,8 @@ class ReclassifyFOIDocument(Resource):
             return {'status': False, 'message': "Something went wrong moving the document's location" }, 500
         except ValidationError as err:
                     return {'status': False, 'message':err.messages}, 400
-        except KeyError as err:
-            return {'status': False, 'message': err.messages}, 400
+        except KeyError as error:
+            return {'status': False, 'message': f"{error=}"}, 400
         except BusinessException as exception:
             return {'status': exception.status_code, 'message':exception.message}, 500
 
@@ -160,8 +160,8 @@ class ReplaceFOIDocument(Resource):
             return {'status': result.success, 'message':result.message,'id':result.identifier} , 200 
         except ValidationError as err:
                     return {'status': False, 'message':err.messages}, 400
-        except KeyError as err:
-            return {'status': False, 'message':err.messages}, 400        
+        except KeyError as error:
+            return {'status': False, 'message': f"{error=}"}, 400        
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500 
         
@@ -180,7 +180,7 @@ class DeleteFOIDocument(Resource):
         try:
             result = documentservice().deleterequestdocument(requestid, documentid, AuthHelper.getuserid(), requesttype)
             return {'status': result.success, 'message':result.message,'id':result.identifier} , 200 
-        except KeyError as err:
-            return {'status': False, 'message':err.messages}, 400        
+        except KeyError as error:
+            return {'status': False, 'message': f"{error=}"}, 400        
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500 

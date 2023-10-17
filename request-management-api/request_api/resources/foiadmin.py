@@ -50,9 +50,9 @@ class FOIProgramAreaDivisions(Resource):
         try:
             result = programareadivisionservice().getallprogramareadivisonsandsections()
             return json.dumps(result), 200
-        except KeyError as err:
-            return {'status': False, 'message':err.messages}, 400        
-        except BusinessException as exception:            
+        except KeyError as error:
+            return {'status': False, 'message': f"{error=}"}, 400        
+        except BusinessException as exception:
             return {'status': exception.status_code, 'message':exception.message}, 500     
 
 @cors_preflight('POST,OPTIONS')
@@ -71,8 +71,8 @@ class CreateFOIProgramAreaDivision(Resource):
             programareadivisionschema = FOIProgramAreaDivisionSchema().load(requestjson)
             result = programareadivisionservice().createprogramareadivision(programareadivisionschema)
             return {'status': result.success, 'message':result.message, 'id':result.identifier}, 200 
-        except KeyError as err:
-            return {'status': False, 'message':err.messages}, 400        
+        except KeyError as error:
+            return {'status': False, 'message': f"{error=}"}, 400      
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500             
 
@@ -93,8 +93,8 @@ class UpdateFOIProgramAreaDivision(Resource):
             programareadivisionschema = FOIProgramAreaDivisionSchema().load(requestjson)
             result = programareadivisionservice().updateprogramareadivision(divisionid, programareadivisionschema, AuthHelper.getuserid())
             return {'status': result.success, 'message':result.message, 'id':result.identifier}, 200 
-        except KeyError as err:
-            return {'status': False, 'message':err.messages}, 400        
+        except KeyError as error:
+            return {'status': False, 'message': f"{error=}"}, 400        
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500  
 
@@ -114,8 +114,8 @@ class DisableFOIProgramAreaDivision(Resource):
             if result.success != True:
                 return {'status': result.success, 'message': result.message, 'id':result.identifier}, 400  
             return {'status': result.success, 'message':result.message, 'id':result.identifier}, 200 
-        except KeyError as err:
-            return {'status': False, 'message':err.messages}, 400        
+        except KeyError as error:
+            return {'status': False, 'message': f"{error=}"}, 400      
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500   
 

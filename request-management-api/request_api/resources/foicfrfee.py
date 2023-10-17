@@ -59,7 +59,7 @@ class CreateFOICFRFee(Resource):
             logging.error(verr)
             return {'status': False, 'message':verr.messages}, 400     
         except KeyError as err:
-            logging.error(err)
+            logging.error(type(err))
             return {'status': False, 'message': EXCEPTION_MESSAGE_BAD_REQUEST}, 400        
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500 
@@ -89,7 +89,7 @@ class SanctionFOICFRFee(Resource):
             logging.error(verr)
             return {'status': False, 'message':verr.messages}, 400     
         except KeyError as err:
-            logging.error(err)
+            logging.error(type(err))
             return {'status': False, 'message': EXCEPTION_MESSAGE_BAD_REQUEST}, 400        
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500 
@@ -109,7 +109,7 @@ class FOICFRFee(Resource):
         try:
             result = {"current": cfrfeeservice().getcfrfee(requestid), "history": cfrfeeservice().getcfrfeehistory(requestid)}
             return json.dumps(result), 200
-        except KeyError as err:
-            return {'status': False, 'message':err.messages}, 400        
+        except KeyError as error:
+            return {'status': False, 'message': f"{error=}"}, 400
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500   

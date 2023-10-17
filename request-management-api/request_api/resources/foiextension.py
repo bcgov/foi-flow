@@ -52,8 +52,8 @@ class GetFOIExtensions(Resource):
         try:
             extensionrecords = extensionservice().getrequestextensions(requestid)            
             return json.dumps(extensionrecords), 200
-        except KeyError as err:
-            return {'status': False, 'message':err.messages}, 400        
+        except KeyError as error:
+            return {'status': False, 'message': f"{error=}"}, 400        
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500
 
@@ -71,8 +71,8 @@ class GetFOIExtension(Resource):
         try:
             extensionrecord = extensionservice().getrequestextension(extensionid)            
             return json.dumps(extensionrecord), 200
-        except KeyError as err:
-            return {'status': False, 'message':err.messages}, 400        
+        except KeyError as error:
+            return {'status': False, 'message': f"{error=}"}, 400        
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500 
         
@@ -96,8 +96,8 @@ class CreateFOIRequestExtension(Resource):
                     eventservice().posteventforextension(ministryrequestid, result.identifier, AuthHelper.getuserid(), AuthHelper.getusername(), "add")
                     newduedate, = result.args
                     return {'status': result.success, 'message':result.message,'id':result.identifier, 'newduedate': newduedate or None} , 200
-        except KeyError as err:
-            return {'status': False, 'message':err.messages}, 400        
+        except KeyError as error:
+            return {'status': False, 'message': f"{error=}"}, 400        
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500 
 
@@ -121,8 +121,8 @@ class SaveAXISRequestExtension(Resource):
                     if len(result.args) > 0:
                         eventservice().posteventforaxisextension(ministryrequestid, result.args[0], AuthHelper.getuserid(), AuthHelper.getusername(), "add")
                     return {'status': result.success, 'message':result.message} , 200
-        except KeyError as err:
-            return {'status': False, 'message':err.messages}, 400        
+        except KeyError as error:
+            return {'status': False, 'message': f"{error=}"}, 400        
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500 
 
@@ -145,8 +145,8 @@ class EditFOIRequestExtension(Resource):
                     # posteventforextension moved to createrequestextensionversion to generate the comments before updating the ministry table with new due date
                     newduedate = result.args[-1] if len(result.args) > 0 else None
                     return {'status': result.success, 'message':result.message,'id':result.identifier, 'newduedate': newduedate or None} , 200
-        except KeyError as err:
-            return {'status': False, 'message':err.messages}, 400        
+        except KeyError as error:
+            return {'status': False, 'message': f"{error=}"}, 400        
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500   
 
@@ -167,7 +167,7 @@ class DeleteFOIRequestExtension(Resource):
                     eventservice().posteventforextension(ministryrequestid, extensionid, AuthHelper.getuserid(), AuthHelper.getusername(), "delete")
                     newduedate = result.args[-1] if len(result.args) > 0 else None
                     return {'status': result.success, 'message':result.message,'id':result.identifier, 'newduedate': newduedate or None} , 200
-        except KeyError as err:
-            return {'status': False, 'message':err.messages}, 400        
+        except KeyError as error:
+            return {'status': False, 'message': f"{error=}"}, 400        
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500    
