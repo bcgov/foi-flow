@@ -47,8 +47,8 @@ class FOIWorkflow(Resource):
             return json.dumps({"message": str(response)}), 200
         except ValueError as err:
             return {'status': 500, 'message':err.messages}, 500
-        except KeyError as err:
-            return {'status': False, 'message':err.messages}, 400        
+        except KeyError as error:
+            return {'status': False, 'message': f"{error=}"}, 400        
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500
 

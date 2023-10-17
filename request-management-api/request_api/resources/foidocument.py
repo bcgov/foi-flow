@@ -49,8 +49,8 @@ class GetFOIDocument(Resource):
         try:
             result = documentservice().getrequestdocumentsbyrole(requestid, requesttype, AuthHelper.isministrymember())
             return json.dumps(result), 200
-        except KeyError as err:
-            return {'status': False, 'message':err.messages}, 400        
+        except KeyError as error:
+            return {'status': False, 'message': f"{error=}"}, 400        
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500   
 
@@ -74,8 +74,8 @@ class CreateFOIDocument(Resource):
             return {'status': result.success, 'message':result.message} , 200 
         except ValidationError as err:
                     return {'status': False, 'message':err.messages}, 400
-        except KeyError as err:
-            return {'status': False, 'message':err.messages}, 400        
+        except KeyError as error:
+            return {'status': False, 'message': f"{error=}"}, 400        
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500 
         
@@ -98,11 +98,49 @@ class RenameFOIDocument(Resource):
             return {'status': result.success, 'message':result.message,'id':result.identifier} , 200 
         except ValidationError as err:
                     return {'status': False, 'message':err.messages}, 400
-        except KeyError as err:
-            return {'status': False, 'message':err.messages}, 400        
+        except KeyError as error:
+            return {'status': False, 'message': f"{error=}"}, 400        
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500 
         
+@cors_preflight('POST,OPTIONS')
+@API.route('/foidocument/<requesttype>/<requestid>/documentid/<documentid>/reclassify')
+class ReclassifyFOIDocument(Resource):
+    """Resource for reclassifying uploaded attachments of FOI requests."""
+
+    @staticmethod
+    @TRACER.trace()
+    @cross_origin(origins=allowedorigins())
+    @auth.require
+    def post(requesttype, requestid, documentid):
+        try:
+            requestjson = request.get_json()
+            documentschema = ReclassifyDocumentSchema().load(requestjson)
+            activedocuments = documentservice().getactiverequestdocuments(requestid, requesttype)
+            documentpath = 'no documentpath found'
+            if (requesttype == 'ministryrequest'):
+                for document in activedocuments:
+                    if document['foiministrydocumentid'] == int(documentid):
+                        documentpath = document['documentpath']
+            else:
+                for document in activedocuments:
+                    if document['foidocumentid'] == int(documentid):
+                        documentpath = document['documentpath']
+
+            # move document in S3
+            moveresult = documentservice().copyrequestdocumenttonewlocation(documentschema['category'], documentpath)
+            # save new version of document with updated documentpath
+            if moveresult['status'] == 'success':
+                 result = documentservice().createrequestdocumentversion(requestid, documentid, documentschema, AuthHelper.getuserid(), requesttype)
+                 return {'status': result.success, 'message':result.message,'id':result.identifier} , 200
+            return {'status': False, 'message': "Something went wrong moving the document's location" }, 500
+        except ValidationError as err:
+                    return {'status': False, 'message':err.messages}, 400
+        except KeyError as error:
+            return {'status': False, 'message': f"{error=}"}, 400
+        except BusinessException as exception:
+            return {'status': exception.status_code, 'message':exception.message}, 500
+
 @cors_preflight('POST,OPTIONS')
 @API.route('/foidocument/<requesttype>/<requestid>/documentid/<documentid>/replace')
 class ReplaceFOIDocument(Resource):
@@ -121,8 +159,8 @@ class ReplaceFOIDocument(Resource):
             return {'status': result.success, 'message':result.message,'id':result.identifier} , 200 
         except ValidationError as err:
                     return {'status': False, 'message':err.messages}, 400
-        except KeyError as err:
-            return {'status': False, 'message':err.messages}, 400        
+        except KeyError as error:
+            return {'status': False, 'message': f"{error=}"}, 400        
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500 
         
@@ -141,7 +179,7 @@ class DeleteFOIDocument(Resource):
         try:
             result = documentservice().deleterequestdocument(requestid, documentid, AuthHelper.getuserid(), requesttype)
             return {'status': result.success, 'message':result.message,'id':result.identifier} , 200 
-        except KeyError as err:
-            return {'status': False, 'message':err.messages}, 400        
+        except KeyError as error:
+            return {'status': False, 'message': f"{error=}"}, 400        
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500 

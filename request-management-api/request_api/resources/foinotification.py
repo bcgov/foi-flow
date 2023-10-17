@@ -47,8 +47,8 @@ class FOINotification(Resource):
             return json.dumps(result), 200
         except ValueError:
             return {'status': 500, 'message':"Invalid Request Id"}, 500
-        except KeyError as err:
-            return {'status': False, 'message':err.messages}, 400        
+        except KeyError as error:
+            return {'status': False, 'message': f"{error=}"}, 400        
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500
 
@@ -72,8 +72,8 @@ class FOIDismissNotification(Resource):
             return {'status': result.success, 'message':result.message,'id':result.identifier} , 500
         except ValueError:
             return {'status': 500, 'message':"Invalid Request Id"}, 500
-        except KeyError as err:
-            return {'status': False, 'message':err.messages}, 400        
+        except KeyError as error:
+            return {'status': False, 'message': f"{error=}"}, 400        
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500
         
@@ -92,8 +92,8 @@ class FOIReminderNotification(Resource):
             reminderresponse = eventservice().postreminderevent()
             respcode = 200 if reminderresponse.success == True else 500
             return {'status': reminderresponse.success, 'message':reminderresponse.message,'id': reminderresponse.identifier} , respcode
-        except KeyError as err:
-            return {'status': False, 'message':err.messages}, 400        
+        except KeyError as error:
+            return {'status': False, 'message': f"{error=}"}, 400        
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500
         
@@ -113,7 +113,7 @@ class FOIReminderNotification(Resource):
             reminderresponse = eventservice().postpaymentexpiryevent(ministry_request_id)
             respcode = 200 if reminderresponse.success == True else 500
             return {'status': reminderresponse.success, 'message':reminderresponse.message,'id': reminderresponse.identifier} , respcode
-        except KeyError as err:
-            return {'status': False, 'message':err.messages}, 400        
+        except KeyError as error:
+            return {'status': False, 'message': f"{error=}"}, 400        
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500
