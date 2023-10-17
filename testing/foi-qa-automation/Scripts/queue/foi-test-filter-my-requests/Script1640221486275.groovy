@@ -75,6 +75,8 @@ WebUI.click(findTestObject('Page_foi.flow/queue/div_My Team Requests'))
 
 WebUI.click(findTestObject('Page_foi.flow/queue/div_request queue row 1'))
 
+WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
+
 WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/div_Status'))
 
 WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
