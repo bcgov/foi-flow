@@ -101,9 +101,13 @@ if (WebUI.verifyElementPresent(findTestObject('Page_foi.flow/navbar/notification
 //  'MuiBadge-invisible')
 WebUI.clickOffset(findTestObject('Page_foi.flow/navbar/notification/notification bell'), -2, 4)
 
+WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT, FailureHandling.STOP_ON_FAILURE)
+
 WebUI.click(findTestObject('Page_foi.flow/queue/div_My Team Requests'))
 
 WebUI.setText(findTestObject('Page_foi.flow/queue/input_Dashboard Filter'), requestID, FailureHandling.STOP_ON_FAILURE)
+
+WebUI.delay(10)
 
 WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT, FailureHandling.STOP_ON_FAILURE)
 
@@ -300,6 +304,8 @@ WebUI.click(findTestObject('Page_foi.flow/form/assignee dropdown/div_Assigned'))
 WebUI.delay(4)
 
 WebUI.click(findTestObject('Page_foi.flow/form/assignee dropdown/li_Flex, Intake'))
+
+WebUI.closeBrowser()
 
 //WebUI.scrollToElement(findTestObject('Page_foi.flow/form/button_Save'), 0)
 //WebUI.click(findTestObject('Page_foi.flow/form/button_Save'), FailureHandling.STOP_ON_FAILURE)
