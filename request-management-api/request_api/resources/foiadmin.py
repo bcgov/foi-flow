@@ -30,6 +30,7 @@ from request_api.utils.cache import cache_filter, response_filter
 
 API = Namespace('FOIAdmin', description='Endpoints for FOI admin management')
 TRACER = Tracer.get_instance()
+CUSTOM_KEYERROR_MESSAGE = "Key error has occured: "
 
 """Custom exception messages
 """
@@ -51,7 +52,7 @@ class FOIProgramAreaDivisions(Resource):
             result = programareadivisionservice().getallprogramareadivisions()
             return json.dumps(result), 200
         except KeyError as error:
-            return {'status': False, 'message': str(type(error).__name__)}, 400        
+            return {'status': False, 'message': CUSTOM_KEYERROR_MESSAGE + str(error)}, 400        
         except BusinessException as exception:
             return {'status': exception.status_code, 'message':exception.message}, 500     
 
@@ -74,7 +75,7 @@ class CreateFOIProgramAreaDivision(Resource):
             #   asyncio.ensure_future();
             return {'status': result.success, 'message':result.message, 'id':result.identifier}, 200 
         except KeyError as error:
-            return {'status': False, 'message': str(type(error).__name__)}, 400      
+            return {'status': False, 'message': CUSTOM_KEYERROR_MESSAGE + str(error)}, 400      
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500             
 
@@ -98,7 +99,7 @@ class UpdateFOIProgramAreaDivision(Resource):
             #   asyncio.ensure_future();
             return {'status': result.success, 'message':result.message, 'id':result.identifier}, 200 
         except KeyError as error:
-            return {'status': False, 'message': str(type(error).__name__)}, 400        
+            return {'status': False, 'message': CUSTOM_KEYERROR_MESSAGE + str(error)}, 400        
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500  
 
@@ -119,7 +120,7 @@ class DisableFOIProgramAreaDivision(Resource):
             #   asyncio.ensure_future();
             return {'status': result.success, 'message':result.message, 'id':result.identifier}, 200 
         except KeyError as error:
-            return {'status': False, 'message': str(type(error).__name__)}, 400      
+            return {'status': False, 'message': CUSTOM_KEYERROR_MESSAGE + str(error)}, 400      
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500   
 

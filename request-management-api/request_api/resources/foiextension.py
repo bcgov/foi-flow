@@ -37,6 +37,7 @@ TRACER = Tracer.get_instance()
 """Custom exception messages
 """
 EXCEPTION_MESSAGE_BAD_REQUEST='Bad Request'
+CUSTOM_KEYERROR_MESSAGE = "Key error has occured: "
 
 @cors_preflight('GET,OPTIONS')
 @API.route('/foiextension/ministryrequest/<requestid>')
@@ -53,7 +54,7 @@ class GetFOIExtensions(Resource):
             extensionrecords = extensionservice().getrequestextensions(requestid)            
             return json.dumps(extensionrecords), 200
         except KeyError as error:
-            return {'status': False, 'message': str(type(error).__name__)}, 400        
+            return {'status': False, 'message': CUSTOM_KEYERROR_MESSAGE + str(error)}, 400        
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500
 
@@ -72,7 +73,7 @@ class GetFOIExtension(Resource):
             extensionrecord = extensionservice().getrequestextension(extensionid)            
             return json.dumps(extensionrecord), 200
         except KeyError as error:
-            return {'status': False, 'message': str(type(error).__name__)}, 400        
+            return {'status': False, 'message': CUSTOM_KEYERROR_MESSAGE + str(error)}, 400        
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500 
         
@@ -97,7 +98,7 @@ class CreateFOIRequestExtension(Resource):
                     newduedate, = result.args
                     return {'status': result.success, 'message':result.message,'id':result.identifier, 'newduedate': newduedate or None} , 200
         except KeyError as error:
-            return {'status': False, 'message': str(type(error).__name__)}, 400        
+            return {'status': False, 'message': CUSTOM_KEYERROR_MESSAGE + str(error)}, 400        
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500 
 
@@ -122,7 +123,7 @@ class SaveAXISRequestExtension(Resource):
                         eventservice().posteventforaxisextension(ministryrequestid, result.args[0], AuthHelper.getuserid(), AuthHelper.getusername(), "add")
                     return {'status': result.success, 'message':result.message} , 200
         except KeyError as error:
-            return {'status': False, 'message': str(type(error).__name__)}, 400        
+            return {'status': False, 'message': CUSTOM_KEYERROR_MESSAGE + str(error)}, 400        
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500 
 
@@ -146,7 +147,7 @@ class EditFOIRequestExtension(Resource):
                     newduedate = result.args[-1] if len(result.args) > 0 else None
                     return {'status': result.success, 'message':result.message,'id':result.identifier, 'newduedate': newduedate or None} , 200
         except KeyError as error:
-            return {'status': False, 'message': str(type(error).__name__)}, 400        
+            return {'status': False, 'message': CUSTOM_KEYERROR_MESSAGE + str(error)}, 400       
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500   
 
@@ -168,6 +169,6 @@ class DeleteFOIRequestExtension(Resource):
                     newduedate = result.args[-1] if len(result.args) > 0 else None
                     return {'status': result.success, 'message':result.message,'id':result.identifier, 'newduedate': newduedate or None} , 200
         except KeyError as error:
-            return {'status': False, 'message': str(type(error).__name__)}, 400        
+            return {'status': False, 'message': CUSTOM_KEYERROR_MESSAGE + str(error)}, 400        
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500    

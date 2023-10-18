@@ -30,6 +30,7 @@ from flask_cors import cross_origin
 
 API = Namespace('FOINotification', description='Endpoints for FOI notification management')
 TRACER = Tracer.get_instance()
+CUSTOM_KEYERROR_MESSAGE = "Key error has occured: "
 
 @cors_preflight('GET,OPTIONS')
 @API.route('/foinotifications')
@@ -48,7 +49,7 @@ class FOINotification(Resource):
         except ValueError:
             return {'status': 500, 'message':"Invalid Request Id"}, 500
         except KeyError as error:
-            return {'status': False, 'message': str(type(error).__name__)}, 400        
+            return {'status': False, 'message': CUSTOM_KEYERROR_MESSAGE + str(error)}, 400        
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500
 
@@ -73,7 +74,7 @@ class FOIDismissNotification(Resource):
         except ValueError:
             return {'status': 500, 'message':"Invalid Request Id"}, 500
         except KeyError as error:
-            return {'status': False, 'message': str(type(error).__name__)}, 400        
+            return {'status': False, 'message': CUSTOM_KEYERROR_MESSAGE + str(error)}, 400       
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500
         
@@ -93,7 +94,7 @@ class FOIReminderNotification(Resource):
             respcode = 200 if reminderresponse.success == True else 500
             return {'status': reminderresponse.success, 'message':reminderresponse.message,'id': reminderresponse.identifier} , respcode
         except KeyError as error:
-            return {'status': False, 'message': str(type(error).__name__)}, 400        
+            return {'status': False, 'message': CUSTOM_KEYERROR_MESSAGE + str(error)}, 400        
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500
         
@@ -114,6 +115,6 @@ class FOIReminderNotification(Resource):
             respcode = 200 if reminderresponse.success == True else 500
             return {'status': reminderresponse.success, 'message':reminderresponse.message,'id': reminderresponse.identifier} , respcode
         except KeyError as error:
-            return {'status': False, 'message': str(type(error).__name__)}, 400        
+            return {'status': False, 'message': CUSTOM_KEYERROR_MESSAGE + str(error)}, 400        
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500

@@ -35,6 +35,7 @@ TRACER = Tracer.get_instance()
 """Custom exception messages
 """
 EXCEPTION_MESSAGE_BAD_REQUEST='Bad Request'
+CUSTOM_KEYERROR_MESSAGE = "Key error has occured: "
         
 @cors_preflight('POST,OPTIONS')
 @API.route('/foicomment/ministryrequest')
@@ -55,7 +56,7 @@ class CreateFOIRequestComment(Resource):
                 asyncio.ensure_future(eventservice().postcommentevent(result.identifier, "ministryrequest", AuthHelper.getuserid()))
             return {'status': result.success, 'message':result.message,'id':result.identifier} , 200 
         except KeyError as error:
-            return {'status': False, 'message': str(type(error).__name__)}, 400        
+            return {'status': False, 'message': CUSTOM_KEYERROR_MESSAGE + str(error)}, 400        
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500 
 
@@ -78,7 +79,7 @@ class CreateFOIRawRequestComment(Resource):
                 asyncio.ensure_future(eventservice().postcommentevent(result.identifier, "rawrequest", AuthHelper.getuserid()))
             return {'status': result.success, 'message':result.message,'id':result.identifier} , 200
         except KeyError as error:
-            return {'status': False, 'message': str(type(error).__name__)}, 400        
+            return {'status': False, 'message': CUSTOM_KEYERROR_MESSAGE + str(error)}, 400        
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500 
         
@@ -109,7 +110,7 @@ class FOIComment(Resource):
             else:
                 return {'status': 401, 'message':'Restricted Request'} , 401
         except KeyError as error:
-            return {'status': False, 'message': str(type(error).__name__)}, 400        
+            return {'status': False, 'message': CUSTOM_KEYERROR_MESSAGE + str(error)}, 400       
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500   
         
@@ -137,7 +138,7 @@ class FOIDisableComment(Resource):
                 asyncio.ensure_future(eventservice().postcommentevent(result.identifier, requesttype, AuthHelper.getuserid(), True))
             return {'status': result.success, 'message':result.message,'id':result.identifier} , 200 
         except KeyError as error:
-            return {'status': False, 'message': str(type(error).__name__)}, 400        
+            return {'status': False, 'message': CUSTOM_KEYERROR_MESSAGE + str(error)}, 400        
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500
         
@@ -167,7 +168,7 @@ class FOIUpdateComment(Resource):
                 asyncio.ensure_future(eventservice().postcommentevent(commentid, requesttype, AuthHelper.getuserid(), existingtaggedusers=result.args[0]))
             return {'status': result.success, 'message':result.message,'id':result.identifier} , 200 
         except KeyError as error:
-            return {'status': False, 'message': str(type(error).__name__)}, 400        
+            return {'status': False, 'message': CUSTOM_KEYERROR_MESSAGE + str(error)}, 400        
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500
 

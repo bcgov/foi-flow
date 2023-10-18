@@ -36,6 +36,7 @@ TRACER = Tracer.get_instance()
 """Custom exception messages
 """
 EXCEPTION_MESSAGE_BAD_REQUEST='Bad Request'
+CUSTOM_KEYERROR_MESSAGE = "Key error has occured: "
         
 @cors_preflight('POST,OPTIONS')
 @API.route('/foicfrfee/foirequest/<requestid>/ministryrequest/<ministryrequestid>')
@@ -58,9 +59,9 @@ class CreateFOICFRFee(Resource):
         except ValidationError as verr:
             logging.error(verr)
             return {'status': False, 'message': str(verr)}, 400     
-        except KeyError as err:
-            logging.error(str(type(err).__name__))
-            return {'status': False, 'message': EXCEPTION_MESSAGE_BAD_REQUEST}, 400        
+        except KeyError as error:
+            logging.error(CUSTOM_KEYERROR_MESSAGE + str(error))
+            return {'status': False, 'message': CUSTOM_KEYERROR_MESSAGE + str(error)}, 400     
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500 
 
@@ -88,9 +89,9 @@ class SanctionFOICFRFee(Resource):
         except ValidationError as verr:
             logging.error(verr)
             return {'status': False, 'message': str(verr)}, 400     
-        except KeyError as err:
-            logging.error(str(type(err).__name__))
-            return {'status': False, 'message': EXCEPTION_MESSAGE_BAD_REQUEST}, 400        
+        except KeyError as error:
+            logging.error(CUSTOM_KEYERROR_MESSAGE + str(error))
+            return {'status': False, 'message': CUSTOM_KEYERROR_MESSAGE + str(error)}, 400       
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500 
 
@@ -110,6 +111,6 @@ class FOICFRFee(Resource):
             result = {"current": cfrfeeservice().getcfrfee(requestid), "history": cfrfeeservice().getcfrfeehistory(requestid)}
             return json.dumps(result), 200
         except KeyError as error:
-            return {'status': False, 'message': str(type(error).__name__)}, 400
+            return {'status': False, 'message': CUSTOM_KEYERROR_MESSAGE + str(error)}, 400
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500   
