@@ -49,7 +49,7 @@ class FOIRequestGetRecord(Resource):
         except KeyError as error:
             return {'status': False, 'message': str(type(error).__name__)}, 400
         except Exception as exception:
-            return {'status': exception.status_code, 'message':exception.message}, 500
+            return {'status': False, 'message': str(exception)}, 500
 
 @cors_preflight('POST,OPTIONS')
 @API.route('/foirecord/<requestid>/ministryrequest/<ministryrequestid>')
@@ -206,7 +206,7 @@ class FOIRequestPDFStitchStatus(Resource):
             return {'status': exception.status_code, 'message':exception.message}, 500
         except Exception as error:
             print("Exception error == ", error)
-            return {'status': False, 'message': f"{error=}"}, 500
+            return {'status': False, 'message': str(error)}, 500
     
 @cors_preflight('GET,OPTIONS')
 @API.route('/foirecord/<requestid>/ministryrequest/<ministryrequestid>/<recordstype>/recrodschanged')
@@ -232,4 +232,4 @@ class FOIRequestRecordsChanged(Resource):
             return {'status': exception.status_code, 'message':exception.message}, 500
         except Exception as error:
             print("Exception error == ", error)
-            return {'status': False, 'message': f"{error=}"}, 500
+            return {'status': False, 'message': str(error)}, 500

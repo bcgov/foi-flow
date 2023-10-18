@@ -50,7 +50,7 @@ class FOISendEmail(Resource):
             result = emailservice().send(servicename.upper(), requestid, ministryrequestid, emailschema)
             return json.dumps(result), 200 if result["success"] == True else 500
         except ValueError as err:
-            return {'status': 500, 'message':err.messages}, 500
+            return {'status': 500, 'message': str(err)}, 500
         except KeyError as error:
             return {'status': False, 'message': str(type(error).__name__)}, 400        
         except BusinessException as exception:            
@@ -71,7 +71,7 @@ class FOIAcknowledgeSendEmail(Resource):
             result = emailservice().acknowledge(servicename.upper(), requestid, ministryrequestid)
             return json.dumps(result), 200 if result["success"] == True else 500
         except ValueError as err:
-            return {'status': 500, 'message':err.messages}, 500
+            return {'status': 500, 'message': str(err)}, 500
         except KeyError as error:
             return {'status': False, 'message': str(type(error).__name__)}, 400        
         except BusinessException as exception:            

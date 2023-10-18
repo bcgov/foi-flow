@@ -46,7 +46,7 @@ class FOIWorkflow(Resource):
             response = workflowservice().syncwfinstance(requesttype, requestid, True)
             return json.dumps({"message": str(response)}), 200
         except ValueError as err:
-            return {'status': 500, 'message':err.messages}, 500
+            return {'status': 500, 'message': str(err)}, 500
         except KeyError as error:
             return {'status': False, 'message': str(type(error).__name__)}, 400        
         except BusinessException as exception:            
