@@ -26,7 +26,7 @@ class workflowservice:
     def createinstance(self, definitionkey, message):
         response = bpmservice().createinstance(definitionkey, json.loads(message))
         if response is None:
-            raise BusinessException(Error.INVALID_INPUT)
+            raise Exception("Unable to create instance for key"+ definitionkey)
         return response
 
     def postunopenedevent(self, id, wfinstanceid, requestsschema, status, ministries=None):        
