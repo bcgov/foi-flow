@@ -51,7 +51,7 @@ class FOIProgramAreaDivisions(Resource):
             result = programareadivisionservice().getallprogramareadivisonsandsections()
             return json.dumps(result), 200
         except KeyError as error:
-            return {'status': False, 'message': f"{error=}"}, 400        
+            return {'status': False, 'message': str(type(error).__name__)}, 400        
         except BusinessException as exception:
             return {'status': exception.status_code, 'message':exception.message}, 500     
 
@@ -72,7 +72,7 @@ class CreateFOIProgramAreaDivision(Resource):
             result = programareadivisionservice().createprogramareadivision(programareadivisionschema)
             return {'status': result.success, 'message':result.message, 'id':result.identifier}, 200 
         except KeyError as error:
-            return {'status': False, 'message': f"{error=}"}, 400      
+            return {'status': False, 'message': str(type(error).__name__)}, 400      
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500             
 
@@ -94,7 +94,7 @@ class UpdateFOIProgramAreaDivision(Resource):
             result = programareadivisionservice().updateprogramareadivision(divisionid, programareadivisionschema, AuthHelper.getuserid())
             return {'status': result.success, 'message':result.message, 'id':result.identifier}, 200 
         except KeyError as error:
-            return {'status': False, 'message': f"{error=}"}, 400        
+            return {'status': False, 'message': str(type(error).__name__)}, 400        
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500  
 
@@ -115,7 +115,7 @@ class DisableFOIProgramAreaDivision(Resource):
                 return {'status': result.success, 'message': result.message, 'id':result.identifier}, 400  
             return {'status': result.success, 'message':result.message, 'id':result.identifier}, 200 
         except KeyError as error:
-            return {'status': False, 'message': f"{error=}"}, 400      
+            return {'status': False, 'message': str(type(error).__name__)}, 400      
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500   
 

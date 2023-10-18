@@ -73,7 +73,7 @@ class FOIRequest(Resource):
         except ValueError:
             return {'status': 500, 'message':"Invalid Request Id"}, 500
         except KeyError as error:
-            return {'status': False, 'message': f"{error=}"}, 400        
+            return {'status': False, 'message': str(type(error).__name__)}, 400        
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500
 
@@ -119,7 +119,7 @@ class FOIRequests(Resource):
         except ValidationError as err:
             return {'status': False, 'message': err}, 400
         except KeyError as error:
-            return {'status': False, 'message': f"{error=}"}, 400                    
+            return {'status': False, 'message': str(type(error).__name__)}, 400                    
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500
         
@@ -148,7 +148,7 @@ class FOIRequestsById(Resource):
         except ValidationError as err:
             return {'status': False, 'message': err}, 400
         except KeyError as error:
-            return {'status': False, 'message': f"{error=}"}, 400    
+            return {'status': False, 'message': str(type(error).__name__)}, 400    
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500
     
@@ -188,7 +188,7 @@ class FOIRequestsByIdAndType(Resource):
         except ValidationError as err:
             return {'status': False, 'message': err}, 400
         except KeyError as error:
-            return {'status': False, 'message': f"{error=}"}, 400
+            return {'status': False, 'message': str(type(error).__name__)}, 400
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500
 
@@ -247,7 +247,7 @@ class FOIRequestDetailsByMinistryId(Resource):
         except ValueError:
             return {'status': 500, 'message':"Invalid Request Id"}, 500
         except KeyError as error:
-            return {'status': False, 'message': f"{error=}"}, 400        
+            return {'status': False, 'message': str(type(error).__name__)}, 400        
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500
 

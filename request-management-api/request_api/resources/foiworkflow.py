@@ -48,7 +48,7 @@ class FOIWorkflow(Resource):
         except ValueError as err:
             return {'status': 500, 'message':err.messages}, 500
         except KeyError as error:
-            return {'status': False, 'message': f"{error=}"}, 400        
+            return {'status': False, 'message': str(type(error).__name__)}, 400        
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500
 

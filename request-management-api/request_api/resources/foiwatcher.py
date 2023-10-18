@@ -50,7 +50,7 @@ class FOIRawRequestWatcher(Resource):
         except ValueError as err:
             return {'status': 500, 'message':err.messages}, 500
         except KeyError as error:
-            return {'status': False, 'message': f"{error=}"}, 400        
+            return {'status': False, 'message': str(type(error).__name__)}, 400        
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500
 
@@ -73,7 +73,7 @@ class CreateFOIRawRequestWatcher(Resource):
                 eventservice().posteventforwatcher(requestjson["requestid"], requestjson, "rawrequest",AuthHelper.getuserid(), AuthHelper.getusername())
             return {'status': result.success, 'message':result.message} , 200 
         except KeyError as error:
-            return {'status': False, 'message': f"{error=}"}, 400        
+            return {'status': False, 'message': str(type(error).__name__)}, 400        
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500
         
@@ -92,7 +92,7 @@ class DisableFOIRawRequestWatcher(Resource):
             result = watcherservice().disablerawrequestwatchers(requestid, AuthHelper.getuserid())
             return {'status': result.success, 'message':result.message,'id':result.identifier} , 200 
         except KeyError as error:
-            return {'status': False, 'message': f"{error=}"}, 400        
+            return {'status': False, 'message': str(type(error).__name__)}, 400        
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500
                   
@@ -111,7 +111,7 @@ class FOIRequestWatcher(Resource):
             result = watcherservice().getministryrequestwatchers(ministryrequestid,AuthHelper.isministrymember())
             return json.dumps(result), 200
         except KeyError as error:
-            return {'status': False, 'message': f"{error=}"}, 400        
+            return {'status': False, 'message': str(type(error).__name__)}, 400        
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500         
         
@@ -134,7 +134,7 @@ class CreateFOIRequestWatcher(Resource):
                 eventservice().posteventforwatcher(requestjson["ministryrequestid"], requestjson, "ministryrequest", AuthHelper.getuserid(), AuthHelper.getusername())
             return {'status': result.success, 'message':result.message} , 200 
         except KeyError as error:
-            return {'status': False, 'message': f"{error=}"}, 400        
+            return {'status': False, 'message': str(type(error).__name__)}, 400        
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500 
         
@@ -153,6 +153,6 @@ class DisableFOIRequestWatcher(Resource):
             result = watcherservice().disableministryrequestwatchers(ministryrequestid, AuthHelper.getuserid())
             return {'status': result.success, 'message':result.message,'id':result.identifier} , 200 
         except KeyError as error:
-            return {'status': False, 'message': f"{error=}"}, 400        
+            return {'status': False, 'message': str(type(error).__name__)}, 400        
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500
