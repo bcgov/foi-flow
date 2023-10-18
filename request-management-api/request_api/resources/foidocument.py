@@ -73,7 +73,7 @@ class CreateFOIDocument(Resource):
             result = documentservice().createrequestdocument(requestid, documentschema, AuthHelper.getuserid(), requesttype)
             return {'status': result.success, 'message':result.message} , 200 
         except ValidationError as err:
-                    return {'status': False, 'message':err.messages}, 400
+             return {'status': False, 'message': err}, 400
         except KeyError as error:
             return {'status': False, 'message': f"{error=}"}, 400        
         except BusinessException as exception:            
@@ -97,7 +97,7 @@ class RenameFOIDocument(Resource):
             result = documentservice().createrequestdocumentversion(requestid, documentid, documentschema, AuthHelper.getuserid(), requesttype)
             return {'status': result.success, 'message':result.message,'id':result.identifier} , 200 
         except ValidationError as err:
-                    return {'status': False, 'message':err.messages}, 400
+            return {'status': False, 'message': err}, 400
         except KeyError as error:
             return {'status': False, 'message': f"{error=}"}, 400        
         except BusinessException as exception:            
@@ -135,7 +135,7 @@ class ReclassifyFOIDocument(Resource):
                  return {'status': result.success, 'message':result.message,'id':result.identifier} , 200
             return {'status': False, 'message': "Something went wrong moving the document's location" }, 500
         except ValidationError as err:
-                    return {'status': False, 'message':err.messages}, 400
+            return {'status': False, 'message': err}, 400
         except KeyError as error:
             return {'status': False, 'message': f"{error=}"}, 400
         except BusinessException as exception:
@@ -158,7 +158,7 @@ class ReplaceFOIDocument(Resource):
             result = documentservice().createrequestdocumentversion(requestid, documentid, documentschema, AuthHelper.getuserid(), requesttype)
             return {'status': result.success, 'message':result.message,'id':result.identifier} , 200 
         except ValidationError as err:
-                    return {'status': False, 'message':err.messages}, 400
+            return {'status': False, 'message': err}, 400
         except KeyError as error:
             return {'status': False, 'message': f"{error=}"}, 400        
         except BusinessException as exception:            
