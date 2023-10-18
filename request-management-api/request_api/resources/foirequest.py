@@ -117,7 +117,7 @@ class FOIRequests(Resource):
 
             return {'status': result.success, 'message':result.message,'id':result.identifier, 'ministryRequests': result.args[0]} , 200
         except ValidationError as err:
-                    return {'status': False, 'message':err.messages}, 400
+            return {'status': False, 'message': err}, 400
         except KeyError as error:
             return {'status': False, 'message': f"{error=}"}, 400                    
         except BusinessException as exception:            
@@ -146,7 +146,7 @@ class FOIRequestsById(Resource):
             else:
                  return {'status': False, 'message':EXCEPTION_MESSAGE_NOTFOUND_REQUEST,'id':foirequestid} , 404
         except ValidationError as err:
-            return {'status': False, 'message':err.messages}, 400
+            return {'status': False, 'message': err}, 400
         except KeyError as error:
             return {'status': False, 'message': f"{error=}"}, 400    
         except BusinessException as exception:            
@@ -186,7 +186,7 @@ class FOIRequestsByIdAndType(Resource):
             else:
                  return {'status': False, 'message':EXCEPTION_MESSAGE_NOTFOUND_REQUEST,'id':foirequestid} , 404
         except ValidationError as err:
-            return {'status': False, 'message':err.messages}, 400
+            return {'status': False, 'message': err}, 400
         except KeyError as error:
             return {'status': False, 'message': f"{error=}"}, 400
         except BusinessException as exception:            
@@ -224,7 +224,7 @@ class FOIRequestUpdateById(Resource):
             else:
                  return {'status': False, 'message':EXCEPTION_MESSAGE_NOTFOUND_REQUEST,'id':foirequestid} , 404
         except ValidationError as err:
-            return {'status': False, 'message':err.messages}, 40
+            return {'status': False, 'message': err}, 40
         except BusinessException as exception:
             return {'status': exception.status_code, 'message':exception.message}, 500
 

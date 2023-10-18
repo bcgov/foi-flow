@@ -57,7 +57,7 @@ class CreateFOICFRFee(Resource):
             return {'status': result.success, 'message':result.message,'id':result.identifier} , 200 
         except ValidationError as verr:
             logging.error(verr)
-            return {'status': False, 'message':verr.messages}, 400     
+            return {'status': False, 'message': verr}, 400     
         except KeyError as err:
             logging.error(type(err))
             return {'status': False, 'message': EXCEPTION_MESSAGE_BAD_REQUEST}, 400        
@@ -87,7 +87,7 @@ class SanctionFOICFRFee(Resource):
             return {'status': result.success, 'message':result.message,'id':result.identifier} , 200 
         except ValidationError as verr:
             logging.error(verr)
-            return {'status': False, 'message':verr.messages}, 400     
+            return {'status': False, 'message': verr}, 400     
         except KeyError as err:
             logging.error(type(err))
             return {'status': False, 'message': EXCEPTION_MESSAGE_BAD_REQUEST}, 400        
