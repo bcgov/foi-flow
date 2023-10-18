@@ -184,7 +184,7 @@ class FOIRestrictedRequestTagList(Resource):
             result = commentservice().createcommenttagginguserlist("rawrequest",requestid)
             return json.dumps(result), 200
         except ValueError:
-            return {'status': 500, 'message':"Invalid Request"}, 400    
+            return {'status': 500, 'message':"Invalid Request"}, 500    
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500 
 
@@ -200,6 +200,6 @@ class FOIRestrictedRequestTagList(Resource):
              result = commentservice().createcommenttagginguserlist("ministryrequest",ministryrequestid)
              return json.dumps(result), 200
         except ValueError:
-            return {'status': 500, 'message':"Invalid Request"}, 400    
+            return {'status': 500, 'message':"Invalid Request"}, 500    
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500 
