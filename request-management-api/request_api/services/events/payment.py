@@ -14,7 +14,6 @@ import os
 from dateutil.parser import parse
 from pytz import timezone
 from request_api.utils.enums import PaymentEventType
-from request_api.services.commons.duecalculator import duecalculator
 from request_api.utils.commons.datetimehandler import datetimehandler
 from request_api.exceptions import BusinessException
 from flask import current_app
