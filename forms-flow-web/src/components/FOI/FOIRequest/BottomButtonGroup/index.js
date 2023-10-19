@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 import "./bottombuttongroup.scss";
 import { makeStyles } from "@material-ui/core/styles";
 import { useDispatch } from "react-redux";
@@ -20,6 +21,7 @@ import {
   ConditionalComponent
 } from "../../../../helper/FOI/helper";
 import { StateEnum } from "../../../../constants/FOI/statusEnum";
+import { KCScanningTeam } from "../../../../constants/FOI/enum";
 import { dueDateCalculation, getRequestState, returnToQueue } from "./utils";
 import { handleBeforeUnload } from "../utils";
 import { setFOILoader } from '../../../../actions/FOI/foiRequestActions'
@@ -91,6 +93,11 @@ const BottomButtonGroup = React.memo(
     const [closingReasonId, setClosingReasonId] = useState();
 
     const [axisSyncModalOpen, setAxisSyncModalOpen] = useState(false);
+
+    //get the assignedTo master data
+    const assignedToList = useSelector(
+      (state) => state.foiRequests.foiAssignedToList
+    );
 
     const handleClosingDateChange = (cDate) => {
       setClosingDate(cDate);
@@ -172,6 +179,25 @@ const BottomButtonGroup = React.memo(
         saveRequestObject.requeststatusid &&
         saveRequestObject.currentState
       ) {
+        //scanning team - MSD/CFD personal
+        if(currentSelectedStatus === StateEnum.readytoscan.name) {
+          saveRequestObject.assignedGroup = KCScanningTeam;
+
+          if (assignedToList && assignedToList.length > 0) {
+            let assignedTeam = assignedToList.find(team => team.name === KCScanningTeam);
+            if (assignedTeam && saveRequestObject.assignedTo && !assignedTeam.members.find(member => member.username === saveRequestObject.assignedTo)) {
+              saveRequestObject.assignedTo = "";
+              saveRequestObject.assignedToFirstName = "";
+              saveRequestObject.assignedToLastName = "";
+              saveRequestObject.assignedToName = "";
+            }
+          } else {
+            saveRequestObject.assignedTo = "";
+            saveRequestObject.assignedToFirstName = "";
+            saveRequestObject.assignedToLastName = "";
+            saveRequestObject.assignedToName = "";
+          }
+        }
         saveRequestModal();
       } else {
         saveRequestObject.requeststatusid = StateEnum.open.id;
@@ -324,6 +350,7 @@ const BottomButtonGroup = React.memo(
           case StateEnum.readytoscan.name:
           case StateEnum.peerreview.name:
           case StateEnum.section5pending.name:
+          case StateEnum.onholdapplicationfee.name:
             const status = Object.values(StateEnum).find(
               (statusValue) => statusValue.name === currentSelectedStatus
             );

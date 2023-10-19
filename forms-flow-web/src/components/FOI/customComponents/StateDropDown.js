@@ -142,6 +142,8 @@ const StateDropDown = ({
       case StateEnum.readytoscan.name.toLowerCase():
         return _stateList.readytoscan;     
       case StateEnum.review.name.toLowerCase():
+        if(personalIAO && (requestDetails.bcgovcode.toLowerCase() === "mcf" || requestDetails.bcgovcode.toLowerCase() === "msd"))
+          return _stateList.reviewcfdmsdpersonal
         return _stateList.review;
       case StateEnum.onhold.name.toLowerCase():
         return _stateList.onhold;
@@ -173,7 +175,9 @@ const StateDropDown = ({
           return _stateList.section5pending;
         } 
         break
-
+      case StateEnum.onholdapplicationfee.name.toLowerCase():
+        return _stateList.onholdapplicationfee;
+        
       default:
         return [];
     }

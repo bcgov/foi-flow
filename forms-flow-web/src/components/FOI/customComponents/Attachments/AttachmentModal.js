@@ -207,7 +207,7 @@ export default function AttachmentModal({
           fileStatusTransition = attachment?.category;
         } else if (uploadFor === "record") {
           if(bcgovcode == "MCF" && requestType == FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL) {
-            fileStatusTransition = MCFSections?.sections?.find(division => division.divisionid === tagValue).name;
+            fileStatusTransition = divisions.find(division => division.divisionid === tagValue)?.divisionname || MCFSections?.sections?.find(division => division.divisionid === tagValue)?.name;
           } else if(bcgovcode == "MSD" && requestType == FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL) {
             fileStatusTransition = MSDSections?.sections?.find(division => division.divisionid === tagValue).name;
           } else {
@@ -235,7 +235,7 @@ export default function AttachmentModal({
     const getMessage = () => {
       switch(modalFor.toLowerCase()) { 
         case "add":
-          if(isMCFMSDPersonal) {
+          if(isMCFMSDPersonal && !isMinistryCoordinator) {
             return {title: "Add Scanned Records", body: ""};
           }
           else 
@@ -366,6 +366,7 @@ export default function AttachmentModal({
                         updateFilesCb={updateFilesCb}
                         modalFor={modalFor}
                         uploadFor={uploadFor}
+                        divisions={tagList}
                         tagList={MCFSections?.sections?.slice(0, MCFPopularSections-1)}
                         otherTagList={MCFSections?.sections?.slice(MCFPopularSections)}
                         handleTagChange={handleTagChange}

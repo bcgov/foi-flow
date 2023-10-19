@@ -64,9 +64,7 @@ const KCProcessingTeams = [
 "Coordinated Response Unit",
 ]
 
-const KCScanningTeams = [
-  "Scanning Team",
-]
+const KCScanningTeam = "Scanning Team"
 
 const MinistryNeedsScanning = [
   "MCF",
@@ -96,7 +94,7 @@ MaxNumberOfFiles,
 extensionStatusId,
 extensionStatusLabel,
 KCProcessingTeams,
-KCScanningTeams,
+KCScanningTeam,
 MinistryNeedsScanning,
 MCFPopularSections,
 MSDPopularSections,
