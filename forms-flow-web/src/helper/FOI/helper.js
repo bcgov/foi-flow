@@ -5,7 +5,7 @@ import { format, utcToZonedTime } from 'date-fns-tz';
 import MINISTRYGROUPS from '../../constants/FOI/foiministrygroupConstants';
 import { SESSION_SECURITY_KEY, SESSION_LIFETIME } from "../../constants/constants";
 import { toast } from "react-toastify";
-import { KCProcessingTeams, KCScanningTeams } from "../../constants/FOI/enum";
+import { KCProcessingTeams, KCScanningTeam } from "../../constants/FOI/enum";
 import _ from 'lodash';
 
 let isBetween = require("dayjs/plugin/isBetween");
@@ -191,7 +191,7 @@ const isProcessingTeam = (userGroups) => {
 
 const isScanningTeam = (userGroups) => {
   return userGroups?.some((userGroup) =>
-    KCScanningTeams.includes(userGroup.replace("/", ""))
+    userGroup.replace("/", "") == KCScanningTeam
   );
 };
 
