@@ -1,6 +1,6 @@
 const StateList = Object.freeze({
     unopened: [{status: "Unopened", isSelected: false}, {status:"Intake in Progress", isSelected: false}],
-    intakeinprogress: [{status:"Intake in Progress", isSelected: false}, {status: "Open", isSelected: false}, {status:"Peer Review", isSelected: false}, {status: "Redirect", isSelected: false}, {status: "Closed", isSelected: false}],
+    intakeinprogress: [{status:"Intake in Progress", isSelected: false}, {status: "Open", isSelected: false}, {status:"Peer Review", isSelected: false}, {status: "Redirect", isSelected: false}, {status: "On-Hold - Application Fee", isSelected: false}, {status: "Closed", isSelected: false}],
     redirect: [{status: "Redirect", isSelected: false}, {status:"Intake in Progress", isSelected: false}, {status: "Closed", isSelected: false}],
     open: [{status: "Open", isSelected: false}, {status: "Call For Records", isSelected: false}, {status:"Peer Review", isSelected: false},{status: "Closed", isSelected: false}],
     callforrecords: [{status: "Call For Records", isSelected: false}, {status: "Open", isSelected: false}, {status: "Closed", isSelected: false}],
@@ -19,7 +19,8 @@ const StateList = Object.freeze({
     response: [{status: "Response", isSelected: false}, {status: "On Hold", isSelected: false}, {status: "Records Review", isSelected: false}, {status:"Peer Review", isSelected: false}, {status: "Closed", isSelected: false}],
     responseforpersonal: [{status: "Response", isSelected: false}, {status: "Records Review", isSelected: false}, {status:"Peer Review", isSelected: false}, {status: "Closed", isSelected: false}],
     //peerreview: [{status:"Peer Review", isSelected: false},{status:"Intake in Progress", isSelected: false}, {status: "Open", isSelected: false},{status: "Records Review", isSelected: false},{status: "Consult", isSelected: false},{status: "Response", isSelected: false}],
-    peerreview: [{status:"Peer Review", isSelected: false}]
+    peerreview: [{status:"Peer Review", isSelected: false}],
+    onholdapplicationfee: [{status: "On-Hold - Application Fee", isSelected: false}, {status: "Open", isSelected: false}, {status:"Peer Review", isSelected: false}, {status: "Redirect", isSelected: false}, {status: "Closed", isSelected: false}]
   });
 
 const MinistryStateList = Object.freeze({
@@ -43,6 +44,7 @@ const MinistryStateList = Object.freeze({
     readytoscan : [{status: "Ready to Scan", isSelected: true}]
 });
 
+// This corresponds to rows in the FOIRequestStatuses table on the backend
 const StateEnum = Object.freeze({
     open: {name: "Open", id: 1},
     callforrecords: {name: "Call For Records", id: 2},
@@ -62,7 +64,8 @@ const StateEnum = Object.freeze({
     archived: {name: "Archived", id: 15},
     peerreview: {name: "Peer Review", id: 16},
     tagging: {name: "Tagging", id: 17},
-    readytoscan: {name: "Ready to Scan", id: 18}
+    readytoscan: {name: "Ready to Scan", id: 18},
+    onholdapplicationfee: {name: "On-Hold - Application Fee", id: 19}
 });
 
 const StateTransitionCategories = Object.freeze({

@@ -166,6 +166,8 @@ const StateDropDown = ({
         else {
           return _stateList.response.filter(val => val.status.toLowerCase() !== StateEnum.onhold.name.toLowerCase());
         }
+      case StateEnum.onholdapplicationfee.name.toLowerCase():
+        return _stateList.onholdapplicationfee;
         
       default:
         return [];
