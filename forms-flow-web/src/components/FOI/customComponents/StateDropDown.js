@@ -101,7 +101,11 @@ const StateDropDown = ({
       case StateEnum.unopened.name.toLowerCase():
         return _stateList.unopened;
       case StateEnum.intakeinprogress.name.toLowerCase():
-        return _stateList.intakeinprogress;
+        if (personalIAO) {
+          return _stateList.intakeinprogressforpersonals;
+        } else {
+          return _stateList.intakeinprogress; 
+        }
       case StateEnum.peerreview.name.toLowerCase():
         if(!isMinistryCoordinator){
           //const currentStatusVersion = stateTransition[0]?.version; 
@@ -166,6 +170,13 @@ const StateDropDown = ({
         else {
           return _stateList.response.filter(val => val.status.toLowerCase() !== StateEnum.onhold.name.toLowerCase());
         }
+      case StateEnum.section5pending.name.toLowerCase():
+        if (personalIAO) {
+          return _stateList.section5pending;
+        } 
+        break
+      case StateEnum.onholdapplicationfee.name.toLowerCase():
+        return _stateList.onholdapplicationfee;
         
       default:
         return [];
