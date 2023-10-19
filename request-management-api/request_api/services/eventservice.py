@@ -13,6 +13,7 @@ from request_api.services.events.extension import extensionevent
 from request_api.services.events.cfrfeeform import cfrfeeformevent
 from request_api.services.events.payment import paymentevent
 from request_api.services.events.email import emailevent
+from request_api.services.events.section5pending import section5pendingevent
 from request_api.models.default_method_result import DefaultMethodResult
 from request_api.exceptions import BusinessException
 from request_api.utils.enums import PaymentEventType
@@ -60,8 +61,9 @@ class eventservice:
             legislativeeventresponse = legislativedateevent().createdueevent()   
             divisioneventresponse = divisiondateevent().createdueevent()   
             paymentremindereventresponse = paymentevent().createpaymentreminderevent()
-            if cfreventresponse.success == False or legislativeeventresponse.success == False or divisioneventresponse.success == False or paymentremindereventresponse.success == False:
-                current_app.logger.error("FOI Notification failed for reminder event response=%s ; legislative response=%s ; division response=%s ; payment response=%s" % (cfreventresponse.message, legislativeeventresponse.message, divisioneventresponse.message, paymentremindereventresponse.message))
+            section5pendingresponse = section5pendingevent().createdueevent()
+            if cfreventresponse.success == False or legislativeeventresponse.success == False or divisioneventresponse.success == False or paymentremindereventresponse.success == False or section5pendingresponse == False:
+                current_app.logger.error("FOI Notification failed for reminder event response=%s ; legislative response=%s ; division response=%s ; payment response=%s ; section5pending response=%s" % (cfreventresponse.message, legislativeeventresponse.message, divisioneventresponse.message, paymentremindereventresponse.message, section5pendingresponse.message))
                 return DefaultMethodResult(False,'Due reminder notifications failed',cfreventresponse.identifier)
             return DefaultMethodResult(True,'Due reminder notifications created',cfreventresponse.identifier)
         except BusinessException as exception:            
