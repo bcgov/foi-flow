@@ -1000,6 +1000,25 @@ class FOIRawRequest(db.Model):
         finally:
             db.session.close()
         return requestdetails
+    
+    @classmethod
+    def getlatestsection5pendings(cls):
+        section5pendings = []
+        try:
+            sql = """SELECT * FROM 
+                (SELECT DISTINCT ON (requestid) requestid, created_at, version, status, to_char(created_at + INTERVAL '10 days', 'YYYY-MM-DD') as duedate, axisrequestid
+                FROM public."FOIRawRequests"
+                ORDER BY requestid ASC, version DESC) foireqs
+            WHERE foireqs.status = 'Section 5 Pending';"""
+            rs = db.session.execute(text(sql))        
+            for row in rs:
+                section5pendings.append({"requestid": row["requestid"], "duedate": row["duedate"], "version": row["version"], "statusname": row["status"], "created_at": row["created_at"], "axisrequestid": ["axisrequestid"]})
+        except Exception as ex:
+            logging.error(ex)
+            raise ex
+        finally:
+            db.session.close()
+        return section5pendings
 
 class FOIRawRequestSchema(ma.Schema):
     class Meta:
