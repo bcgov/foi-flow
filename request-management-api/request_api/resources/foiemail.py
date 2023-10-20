@@ -32,6 +32,7 @@ from flask_cors import cross_origin
 
 API = Namespace('FOIEmail', description='Endpoints for FOI EMAIL management')
 TRACER = Tracer.get_instance()
+CUSTOM_KEYERROR_MESSAGE = "Key error has occured: "
 
 @cors_preflight('POST,OPTIONS')
 @API.route('/foiemail/<requestid>/ministryrequest/<ministryrequestid>/<servicename>')
@@ -50,9 +51,9 @@ class FOISendEmail(Resource):
             result = emailservice().send(servicename.upper(), requestid, ministryrequestid, emailschema)
             return json.dumps(result), 200 if result["success"] == True else 500
         except ValueError as err:
-            return {'status': 500, 'message':err.messages}, 500
-        except KeyError as err:
-            return {'status': False, 'message':err.messages}, 400        
+            return {'status': 500, 'message': str(err)}, 500
+        except KeyError as error:
+            return {'status': False, 'message': CUSTOM_KEYERROR_MESSAGE + str(error)}, 400        
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500
 
@@ -71,9 +72,9 @@ class FOIAcknowledgeSendEmail(Resource):
             result = emailservice().acknowledge(servicename.upper(), requestid, ministryrequestid)
             return json.dumps(result), 200 if result["success"] == True else 500
         except ValueError as err:
-            return {'status': 500, 'message':err.messages}, 500
-        except KeyError as err:
-            return {'status': False, 'message':err.messages}, 400        
+            return {'status': 500, 'message': str(err)}, 500
+        except KeyError as error:
+            return {'status': False, 'message': CUSTOM_KEYERROR_MESSAGE + str(error)}, 400        
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500
         

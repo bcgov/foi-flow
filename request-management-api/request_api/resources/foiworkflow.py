@@ -29,6 +29,7 @@ import logging
 
 API = Namespace('FOIWorkflow', description='Endpoints for FOI workflow management')
 TRACER = Tracer.get_instance()
+CUSTOM_KEYERROR_MESSAGE = "Key error has occured: "
 
 @cors_preflight('POST,OPTIONS')
 @API.route('/foiworkflow/<requesttype>/<requestid>/sync')
@@ -46,9 +47,9 @@ class FOIWorkflow(Resource):
             response = workflowservice().syncwfinstance(requesttype, requestid, True)
             return json.dumps({"message": str(response)}), 200
         except ValueError as err:
-            return {'status': 500, 'message':err.messages}, 500
-        except KeyError as err:
-            return {'status': False, 'message':err.messages}, 400        
+            return {'status': 500, 'message': str(err)}, 500
+        except KeyError as error:
+            return {'status': False, 'message': CUSTOM_KEYERROR_MESSAGE + str(error)}, 400        
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500
 
