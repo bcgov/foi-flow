@@ -35,7 +35,6 @@ TRACER = Tracer.get_instance()
 """Custom exception messages
 """
 EXCEPTION_MESSAGE_BAD_REQUEST='Bad Request'
-CUSTOM_KEYERROR_MESSAGE = "Key error has occured: "
         
 @cors_preflight('POST,OPTIONS')
 @API.route('/foicomment/ministryrequest')
@@ -55,8 +54,8 @@ class CreateFOIRequestComment(Resource):
             if result.success == True:
                 asyncio.ensure_future(eventservice().postcommentevent(result.identifier, "ministryrequest", AuthHelper.getuserid()))
             return {'status': result.success, 'message':result.message,'id':result.identifier} , 200 
-        except KeyError as error:
-            return {'status': False, 'message': CUSTOM_KEYERROR_MESSAGE + str(error)}, 400        
+        except KeyError as err:
+            return {'status': False, 'message':err.messages}, 400        
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500 
 
@@ -78,8 +77,8 @@ class CreateFOIRawRequestComment(Resource):
             if result.success == True:
                 asyncio.ensure_future(eventservice().postcommentevent(result.identifier, "rawrequest", AuthHelper.getuserid()))
             return {'status': result.success, 'message':result.message,'id':result.identifier} , 200
-        except KeyError as error:
-            return {'status': False, 'message': CUSTOM_KEYERROR_MESSAGE + str(error)}, 400        
+        except KeyError as err:
+            return {'status': False, 'message':err.messages}, 400        
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500 
         
@@ -109,8 +108,8 @@ class FOIComment(Resource):
                 return json.dumps(result), 200
             else:
                 return {'status': 401, 'message':'Restricted Request'} , 401
-        except KeyError as error:
-            return {'status': False, 'message': CUSTOM_KEYERROR_MESSAGE + str(error)}, 400       
+        except KeyError as err:
+            return {'status': False, 'message':err.messages}, 400        
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500   
         
@@ -137,8 +136,8 @@ class FOIDisableComment(Resource):
             if result.success == True:
                 asyncio.ensure_future(eventservice().postcommentevent(result.identifier, requesttype, AuthHelper.getuserid(), True))
             return {'status': result.success, 'message':result.message,'id':result.identifier} , 200 
-        except KeyError as error:
-            return {'status': False, 'message': CUSTOM_KEYERROR_MESSAGE + str(error)}, 400        
+        except KeyError as err:
+            return {'status': False, 'message':err.messages}, 400        
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500
         
@@ -167,8 +166,8 @@ class FOIUpdateComment(Resource):
             if result.success == True:
                 asyncio.ensure_future(eventservice().postcommentevent(commentid, requesttype, AuthHelper.getuserid(), existingtaggedusers=result.args[0]))
             return {'status': result.success, 'message':result.message,'id':result.identifier} , 200 
-        except KeyError as error:
-            return {'status': False, 'message': CUSTOM_KEYERROR_MESSAGE + str(error)}, 400        
+        except KeyError as err:
+            return {'status': False, 'message':err.messages}, 400        
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500
 
@@ -185,7 +184,7 @@ class FOIRestrictedRequestTagList(Resource):
             result = commentservice().createcommenttagginguserlist("rawrequest",requestid)
             return json.dumps(result), 200
         except ValueError:
-            return {'status': 500, 'message':"Invalid Request"}, 500    
+            return {'status': 500, 'message':"Invalid Request"}, 400    
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500 
 
@@ -201,6 +200,6 @@ class FOIRestrictedRequestTagList(Resource):
              result = commentservice().createcommenttagginguserlist("ministryrequest",ministryrequestid)
              return json.dumps(result), 200
         except ValueError:
-            return {'status': 500, 'message':"Invalid Request"}, 500    
+            return {'status': 500, 'message':"Invalid Request"}, 400    
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500 

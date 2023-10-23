@@ -36,7 +36,6 @@ import asyncio
 API = Namespace('FOIRequests', description='Endpoints for FOI request management')
 TRACER = Tracer.get_instance()
 EXCEPTION_MESSAGE_NOTFOUND_REQUEST='Record not found'
-CUSTOM_KEYERROR_MESSAGE = "Key error has occured: "
 
 
 @cors_preflight('GET,OPTIONS')
@@ -73,8 +72,8 @@ class FOIRequest(Resource):
             return jsondata , statuscode 
         except ValueError:
             return {'status': 500, 'message':"Invalid Request Id"}, 500
-        except KeyError as error:
-            return {'status': False, 'message': CUSTOM_KEYERROR_MESSAGE + str(error)}, 400        
+        except KeyError as err:
+            return {'status': False, 'message':err.messages}, 400        
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500
 
@@ -118,9 +117,9 @@ class FOIRequests(Resource):
 
             return {'status': result.success, 'message':result.message,'id':result.identifier, 'ministryRequests': result.args[0]} , 200
         except ValidationError as err:
-            return {'status': False, 'message': str(err)}, 400
-        except KeyError as error:
-            return {'status': False, 'message': CUSTOM_KEYERROR_MESSAGE + str(error)}, 400                    
+                    return {'status': False, 'message':err.messages}, 400
+        except KeyError as err:
+            return {'status': False, 'message':err.messages}, 400                    
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500
         
@@ -147,9 +146,9 @@ class FOIRequestsById(Resource):
             else:
                  return {'status': False, 'message':EXCEPTION_MESSAGE_NOTFOUND_REQUEST,'id':foirequestid} , 404
         except ValidationError as err:
-            return {'status': False, 'message': str(err)}, 400
-        except KeyError as error:
-            return {'status': False, 'message': CUSTOM_KEYERROR_MESSAGE + str(error)}, 400    
+            return {'status': False, 'message':err.messages}, 400
+        except KeyError as err:
+            return {'status': False, 'message':err.messages}, 400    
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500
     
@@ -187,9 +186,9 @@ class FOIRequestsByIdAndType(Resource):
             else:
                  return {'status': False, 'message':EXCEPTION_MESSAGE_NOTFOUND_REQUEST,'id':foirequestid} , 404
         except ValidationError as err:
-            return {'status': False, 'message': str(err)}, 400
-        except KeyError as error:
-            return {'status': False, 'message': CUSTOM_KEYERROR_MESSAGE + str(error)}, 400
+            return {'status': False, 'message':err.messages}, 400
+        except KeyError as err:
+            return {'status': False, 'message':err.messages}, 400
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500
 
@@ -225,7 +224,7 @@ class FOIRequestUpdateById(Resource):
             else:
                  return {'status': False, 'message':EXCEPTION_MESSAGE_NOTFOUND_REQUEST,'id':foirequestid} , 404
         except ValidationError as err:
-            return {'status': False, 'message': str(err)}, 400
+            return {'status': False, 'message':err.messages}, 40
         except BusinessException as exception:
             return {'status': exception.status_code, 'message':exception.message}, 500
 
@@ -247,8 +246,8 @@ class FOIRequestDetailsByMinistryId(Resource):
             return jsondata , statuscode 
         except ValueError:
             return {'status': 500, 'message':"Invalid Request Id"}, 500
-        except KeyError as error:
-            return {'status': False, 'message': CUSTOM_KEYERROR_MESSAGE + str(error)}, 400        
+        except KeyError as err:
+            return {'status': False, 'message':err.messages}, 400        
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500
 
@@ -272,7 +271,7 @@ class FOIRestrictedMinistryRequest(Resource):
                 else:
                   return {'status': result.success, 'message':result.message,'id':result.identifier} , 500  
         except ValueError:
-            return {'status': 500, 'message':"Invalid Request"}, 500    
+            return {'status': 500, 'message':"Invalid Request"}, 400    
         except BusinessException as exception:
             return {'status': exception.status_code, 'message':exception.message}, 500
 
@@ -288,6 +287,6 @@ class FOIRequestByMinistryId(Resource):
         try :
             return FOIRequest.get(requestservice().getrequestid(ministryrequestid), ministryrequestid, usertype)
         except ValueError:
-            return {'status': 500, 'message':"Invalid Request"}, 500
+            return {'status': 500, 'message':"Invalid Request"}, 400
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500 

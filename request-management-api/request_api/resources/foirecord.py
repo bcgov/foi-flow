@@ -30,7 +30,6 @@ from flask_cors import cross_origin
 
 API = Namespace('FOIWatcher', description='Endpoints for FOI record management')
 TRACER = Tracer.get_instance()
-CUSTOM_KEYERROR_MESSAGE = "Key error has occured: "
 
 @cors_preflight('GET,OPTIONS')
 @API.route('/foirecord/<requestid>/ministryrequest/<ministryrequestid>')
@@ -47,10 +46,10 @@ class FOIRequestGetRecord(Resource):
         try:
             result = recordservice().fetch(requestid, ministryrequestid)
             return json.dumps(result), 200
-        except KeyError as error:
-            return {'status': False, 'message': CUSTOM_KEYERROR_MESSAGE + str(error)}, 400
+        except KeyError as err:
+            return {'status': False, 'message':err.messages}, 400
         except Exception as exception:
-            return {'status': False, 'message': str(exception)}, 500
+            return {'status': exception.status_code, 'message':exception.message}, 500
 
 @cors_preflight('POST,OPTIONS')
 @API.route('/foirecord/<requestid>/ministryrequest/<ministryrequestid>')
@@ -70,8 +69,8 @@ class FOIRequestBulkCreateRecord(Resource):
             response = recordservice().create(requestid, ministryrequestid, recordschema, AuthHelper.getuserid())
             respcode = 200 if response.success == True else 500
             return {'status': response.success, 'message':response.message,'data': response.args[0]} , respcode
-        except KeyError as error:
-            return {'status': False, 'message': CUSTOM_KEYERROR_MESSAGE + str(error)}, 400
+        except KeyError as err:
+            return {'status': False, 'message':err.messages}, 400
         except BusinessException as exception:
             return {'status': exception.status_code, 'message':exception.message}, 500
 
@@ -92,8 +91,8 @@ class UpdateFOIDocument(Resource):
             data = FOIRequestRecordUpdateSchema().load(requestjson)
             result = recordservice().update(requestid, ministryrequestid, data, AuthHelper.getuserid())
             return {'status': result.success, 'message':result.message,'id':result.identifier} , 200
-        except KeyError as error:
-            return {'status': False, 'message': CUSTOM_KEYERROR_MESSAGE + str(error)}, 400
+        except KeyError as err:
+            return {'status': False, 'message':err['messages']}, 400
         except BusinessException as exception:
             return {'status': exception.status_code, 'message':exception.message}, 500
 
@@ -113,8 +112,8 @@ class RetryFOIDocument(Resource):
             recordschema = FOIRequestBulkRetryRecordSchema().load(requestjson, unknown=INCLUDE)
             result = recordservice().retry(requestid, ministryrequestid, recordschema)
             return {'status': result.success, 'message':result.message,'id':result.identifier} , 200
-        except KeyError as error:
-            return {'status': False, 'message': CUSTOM_KEYERROR_MESSAGE + str(error)}, 400
+        except KeyError as err:
+            return {'status': False, 'message':err.messages}, 400
         except BusinessException as exception:
             return {'status': exception.status_code, 'message':exception.message}, 500
         
@@ -135,8 +134,8 @@ class ReplaceFOIDocument(Resource):
             result = recordservice().replace(requestid, ministryrequestid,recordid, recordschema,AuthHelper.getuserid())
 
             return {'status': result.success, 'message':result.message,'id':result.identifier} , 200
-        except KeyError as error:
-            return {'status': False, 'message': CUSTOM_KEYERROR_MESSAGE + str(error)}, 400
+        except KeyError as err:
+            return {'status': False, 'message':err.messages}, 400
         except BusinessException as exception:
             return {'status': exception.status_code, 'message':exception.message}, 500
         
@@ -158,8 +157,8 @@ class FOIRequestDownloadRecord(Resource):
             response = recordservice().triggerpdfstitchservice(requestid, ministryrequestid, recordschema, AuthHelper.getuserid())
             respcode = 200 if response.success == True else 500
             return {'status': response.success, 'message':response.message,'id':response.identifier}, respcode
-        except KeyError as error:
-            return {'status': False, 'message': CUSTOM_KEYERROR_MESSAGE + str(error)}, 400
+        except KeyError as err:
+            return {'status': False, 'message':err.messages}, 400
         except BusinessException as exception:
             return {'status': exception.status_code, 'message':exception.message}, 500
 
@@ -178,8 +177,8 @@ class FOIRequestDownloadRecord(Resource):
         try:
             result = recordservice().getpdfstitchpackagetodownload(ministryrequestid, recordstype.lower())
             return json.dumps(result), 200
-        except KeyError as error:
-            return {'status': False, 'message': CUSTOM_KEYERROR_MESSAGE + str(error)}, 400
+        except KeyError as err:
+            return {'status': False, 'message':err.messages}, 400
         except BusinessException as exception:
             return {'status': exception.status_code, 'message':exception.message}, 500
 
@@ -199,15 +198,15 @@ class FOIRequestPDFStitchStatus(Resource):
             result = recordservice().getpdfstichstatus(ministryrequestid, recordstype.lower())
             #("getpdfstichstatus result == ", result)
             return result, 200
-        except KeyError as error:
-            print(CUSTOM_KEYERROR_MESSAGE + str(error))
-            return {'status': False, 'message': CUSTOM_KEYERROR_MESSAGE + str(error)}, 400  
+        except KeyError as err:
+            print("KeyError == ", err.messages)
+            return {'status': False, 'message':err.messages}, 400
         except BusinessException as exception:
             print("BusinessException == ", exception.message)
             return {'status': exception.status_code, 'message':exception.message}, 500
         except Exception as error:
             print("Exception error == ", error)
-            return {'status': False, 'message': str(error)}, 500
+            return {'status': False, 'message':error.message}, 500
     
 @cors_preflight('GET,OPTIONS')
 @API.route('/foirecord/<requestid>/ministryrequest/<ministryrequestid>/<recordstype>/recrodschanged')
@@ -225,12 +224,12 @@ class FOIRequestRecordsChanged(Resource):
             result = recordservice().isrecordschanged(ministryrequestid, recordstype.lower())
             #print("records changed == ", result)
             return result, 200
-        except KeyError as error:
-            print(CUSTOM_KEYERROR_MESSAGE + str(error))
-            return {'status': False, 'message': CUSTOM_KEYERROR_MESSAGE + str(error)}, 400
+        except KeyError as err:
+            print("KeyError == ", err.messages)
+            return {'status': False, 'message':err.messages}, 400
         except BusinessException as exception:
             print("BusinessException == ", exception.message)
             return {'status': exception.status_code, 'message':exception.message}, 500
         except Exception as error:
             print("Exception error == ", error)
-            return {'status': False, 'message': str(error)}, 500
+            return {'status': False, 'message':error.message}, 500
