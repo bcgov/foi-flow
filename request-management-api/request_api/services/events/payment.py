@@ -42,7 +42,7 @@ class paymentevent:
         try:
             _today = datetimehandler().gettoday()
 
-            # notificationservice().dismissremindernotification("ministryrequest", self.__notificationtype())
+            notificationservice().dismissremindernotification("rawrequest", self.__notificationtype())
             # ca_holidays = duecalculator.getholidays()
             eventtype = PaymentEventType.reminder.value
             _onholdrequests = FOIRawRequest.getonholdapplicationfeerequests()
@@ -50,7 +50,7 @@ class paymentevent:
                 _reminderdate = datetimehandler().formatdate(entry['reminder_date'])
                 if  _reminderdate == _today:
                     self.__createnotificationforrawrequest(entry['requestid'], eventtype)
-                    self.__createcommentforrawrequest(entry['requestid'], eventtype)
+                    self.__createcommentforrawrequest(entry['axisrequestid'], eventtype)
                     pass
             return DefaultMethodResult(True,'Payment reminder notifications created',_today)
         except BusinessException as exception:
@@ -59,11 +59,11 @@ class paymentevent:
 
     def __createcommentforrawrequest(self, requestid, eventtype):
         comment = self.__preparecomment(requestid, eventtype)
-        return commentservice().createrawrequestcomment(comment, "System", 2)
+        return commentservice().createrawrequestcomment(comment, "system", 2)
 
     def __createnotificationforrawrequest(self, requestid, eventtype):
         notification = self.__preparenotification(requestid, eventtype)
-        return notificationservice().createnotification({"message" : notification}, requestid, "rawrequest", "Payment", "System")
+        return notificationservice().createnotification({"message" : notification}, requestid, "rawrequest", "Payment", "system")
 
     def __createcomment(self, requestid, eventtype):
         comment = self.__preparecomment(requestid, eventtype)
