@@ -155,9 +155,19 @@ const KCProcessingTeams = [
   "Coordinated Response Unit",
 ];
 
+const KCScanningTeam = "Scanning Team"
+
+const MinistryNeedsScanning = [
+  "MCF",
+  "MSD"
+]
+
+const MCFPopularSections = 23
+const MSDPopularSections = 11
+
 const RecordsDownloadList = [
   { id: 0, label: "Download", disabled: true },
-  { id: 1, label: "Download for Harms", disabled: false },
+  { id: 1, label: "Download for Harms", disabled: true },
   { id: 2, label: "Download Redline for Sign Off", disabled: true },
   { id: 3, label: "Download Final Package", disabled: true },
 ];
@@ -179,13 +189,17 @@ const RecordDownloadStatus = Object.freeze({
 });
 
 export {
-  MimeTypeList,
-  MaxFileSizeInMB,
-  MaxNumberOfFiles,
-  extensionStatusId,
-  extensionStatusLabel,
-  KCProcessingTeams,
-  RecordsDownloadList,
-  RecordDownloadCategory,
-  RecordDownloadStatus,
+MimeTypeList,
+MaxFileSizeInMB,
+MaxNumberOfFiles,
+extensionStatusId,
+extensionStatusLabel,
+KCProcessingTeams,
+KCScanningTeam,
+MinistryNeedsScanning,
+MCFPopularSections,
+MSDPopularSections,
+RecordsDownloadList,
+RecordDownloadCategory,
+RecordDownloadStatus,
 };

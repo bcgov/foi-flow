@@ -23,10 +23,11 @@ from request_api.tracer import Tracer
 from request_api.utils.util import  cors_preflight, allowedorigins
 from request_api.exceptions import BusinessException, Error
 from request_api.services.documentservice import documentservice
-from request_api.schemas.foidocument import  CreateDocumentSchema, RenameDocumentSchema, ReplaceDocumentSchema 
+from request_api.schemas.foidocument import  CreateDocumentSchema, RenameDocumentSchema, ReplaceDocumentSchema, ReclassifyDocumentSchema
 import json
 from marshmallow import Schema, fields, validate, ValidationError
 from flask_cors import cross_origin
+import boto3
 
 
 API = Namespace('FOIDocument', description='Endpoints for FOI Document management')

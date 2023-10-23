@@ -41,7 +41,9 @@ class notificationconfig:
         elif notificationtype == "Email Failure":
             return 16 
         elif notificationtype == "Payment":
-            return 17           
+            return 17
+        elif notificationtype == "Section 5 Pending Reminder":
+            return 20             
         return 0     
     
     def getnotificationusertypeid(self, notificationusertype):

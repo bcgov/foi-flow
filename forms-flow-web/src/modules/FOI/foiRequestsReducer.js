@@ -241,6 +241,10 @@ const foiRequests = (state = initialState, action) => {
       return { ...state, foiRequestDescriptionHistoryList: action.payload };
     case FOI_ACTION_CONSTANTS.FOI_MINISTRY_DIVISIONALSTAGES:
       return { ...state, foiMinistryDivisionalStages: action.payload };
+    case FOI_ACTION_CONSTANTS.FOI_PERSONAL_DIVISIONS_SECTIONS:
+      return { ...state, foiPersonalDivisionsAndSections: action.payload };
+    case FOI_ACTION_CONSTANTS.FOI_PERSONAL_SECTIONS:
+      return { ...state, foiPersonalSections: action.payload };
     case FOI_ACTION_CONSTANTS.FOI_WATCHER_LIST:
       return { ...state, foiWatcherList: action.payload };
     case FOI_ACTION_CONSTANTS.CLOSING_REASONS:

@@ -34,7 +34,7 @@
     background-color: #C45303;
 }
 
-.intakeinprogress {
+.intakeinprogress, .section5pending {
     background-color: #8C3601;
 }
 
@@ -60,6 +60,10 @@
 
 .onhold {
     background-color: #595959;
+}
+
+.on-hold-applicationfee {
+    background-color: #8C3601;
 }
 
 .harmsassessment {
@@ -88,4 +92,14 @@
 
 .peerreview {
     background-color: #096DD1;
+}
+
+
+
+.tagging {
+    background-color: #9B1048;
+}
+
+.readytoscan{
+    background-color: #A2096C;
 }
