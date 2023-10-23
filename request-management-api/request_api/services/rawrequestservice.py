@@ -68,7 +68,7 @@ class rawrequestservice:
             try:
                 workflowservice().createinstance(redispubservice.foirequestqueueredischannel, json_data)
             except Exception as ex:
-                logging.error(ex)
+                logging.error("Unable to create instance", ex)
                 asyncio.ensure_future(redispubservice.publishrequest(json_data))
         return result
 

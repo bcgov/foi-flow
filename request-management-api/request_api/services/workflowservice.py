@@ -2,7 +2,7 @@ import requests
 import os
 import json
 from enum import Enum
-from request_api.exceptions import BusinessException, Error
+from request_api.exceptions import BusinessException
 from request_api.utils.redispublisher import RedisPublisherService
 from request_api.services.external.bpmservice import MessageType, bpmservice, ProcessDefinitionKey
 from request_api.services.cfrfeeservice import cfrfeeservice
@@ -26,7 +26,7 @@ class workflowservice:
     def createinstance(self, definitionkey, message):
         response = bpmservice().createinstance(definitionkey, json.loads(message))
         if response is None:
-            raise Exception("Unable to create instance for key"+ definitionkey)
+            raise BusinessException("Unable to create instance for key"+ definitionkey)
         return response
 
     def postunopenedevent(self, id, wfinstanceid, requestsschema, status, ministries=None):        

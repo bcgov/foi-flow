@@ -22,7 +22,7 @@ class RedisPublisherService:
             logging.info(message)
             self.publishtoredischannel(self.foicommentqueueredischannel, message)
         except Exception as ex:
-            current_app.logger.error("%s,%s" % ('Unable to get user details', ex)) 
+            current_app.logger.error("%s,%s" % ('Unable to get user details', ex.message)) 
             raise ex
               
     def publishtoredischannel(self, channel , message):  
