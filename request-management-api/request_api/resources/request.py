@@ -94,8 +94,7 @@ class FOIRawRequest(Resource):
             assigneelastname = requestdata['assigneelastname']
 
             if int(requestid) and str(requestid) != "-1" :
-                status = rawrequestservice().getstatus(updaterequest)
-                rawrequest = rawrequestservice().getrawrequest(requestid)            
+                status = rawrequestservice().getstatus(updaterequest)       
                 result = rawrequestservice().saverawrequestversion(updaterequest,requestid,assigneegroup,assignee,status,AuthHelper.getuserid(),assigneefirstname,assigneemiddlename,assigneelastname, actiontype)                
                 assignee = ''
                 if(actiontype == 'assignee'):
