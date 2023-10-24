@@ -366,7 +366,7 @@ class FOIRawRequest(db.Model):
         onholdapplicationfeerequests = []
         try:
             sql = '''
-                    SELECT * FROM (SELECT DISTINCT ON (requestid) requestid, (updated_at + INTERVAL '20 days') as reminder_date, status FROM public."FOIRawRequests"
+                    SELECT * FROM (SELECT DISTINCT ON (requestid) requestid, (updated_at + INTERVAL '28 days') as reminder_date, status FROM public."FOIRawRequests"
 	                ORDER BY requestid ASC, version DESC) r
                     WHERE r.status = 'On-Hold - Application Fee'
 					and r.reminder_date::date = now()::date
