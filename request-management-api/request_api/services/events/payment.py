@@ -62,7 +62,7 @@ class paymentevent:
 
     def __createnotificationforrawrequest(self, requestid, eventtype):
         notification = self.__preparenotification(requestid, eventtype)
-        return notificationservice().createnotification({"message" : notification}, requestid, "rawrequest", self.__notificationtype, "system")
+        return notificationservice().createnotification({"message" : notification}, requestid, "rawrequest", self.__notificationtype(), "system")
 
     def __createcomment(self, requestid, eventtype):
         comment = self.__preparecomment(requestid, eventtype)
