@@ -53,7 +53,7 @@ class paymentevent:
                     commentexists = False
                     existingcomments = commentservice().getrawrequestcomments(entry['requestid'])
                     for comment in existingcomments:
-                        if comment['text'] == '20 business days has passed awaiting payment, you can consider closing the request as abandoned':
+                        if comment['text'] == self.__preparecomment(entry['requestid'], eventtype)['comment']: #checks if comment already exists
                             commentexists = True
                     if not commentexists:
                         self.__createcommentforrawrequest(entry['requestid'], eventtype)
