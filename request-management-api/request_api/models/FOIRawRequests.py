@@ -365,9 +365,12 @@ class FOIRawRequest(db.Model):
     def getonholdapplicationfeerequests(cls): # with the reminder date
         onholdapplicationfeerequests = []
         try:
-            sql = '''SELECT * FROM (SELECT DISTINCT ON (requestid) requestid, (updated_at + INTERVAL '20 days') as reminder_date, status FROM public."FOIRawRequests"
-	                    ORDER BY requestid ASC, version DESC) r
+            sql = '''
+                    SELECT * FROM (SELECT DISTINCT ON (requestid) requestid, (updated_at + INTERVAL '20 days') as reminder_date, status FROM public."FOIRawRequests"
+	                ORDER BY requestid ASC, version DESC) r
                     WHERE r.status = 'On-Hold - Application Fee'
+					and r.reminder_date::date = now()::date
+					order by r.reminder_date asc
                     '''
             rs = db.session.execute(text(sql))
             for row in rs:
