@@ -373,9 +373,7 @@ class FOIRawRequest(db.Model):
 					order by r.reminder_date asc
                     '''
             rs = db.session.execute(text(sql))
-            for row in rs:
-                if row.status == 'On-Hold - Application Fee':
-                    onholdapplicationfeerequests.append(row)
+            onholdapplicationfeerequests = rs
         except Exception as ex:
             logging.error(ex)
             raise ex
