@@ -15,6 +15,7 @@ from dateutil.parser import parse
 from pytz import timezone
 from request_api.utils.enums import PaymentEventType
 from request_api.utils.commons.datetimehandler import datetimehandler
+from request_api.services.commons.duecalculator import duecalculator
 from request_api.exceptions import BusinessException
 from flask import current_app
 
@@ -43,12 +44,12 @@ class paymentevent:
             _today = datetimehandler().gettoday()
 
             notificationservice().dismissremindernotification("rawrequest", self.__notificationtype())
-            # ca_holidays = duecalculator.getholidays()
             eventtype = PaymentEventType.reminder.value
             _onholdrequests = FOIRawRequest.getonholdapplicationfeerequests()
             for entry in _onholdrequests:
-                _reminderdate = datetimehandler().formatdate(entry['reminder_date'])
-                if  _reminderdate == _today:
+                _dateofstatechange = datetimehandler().formatdate(entry['updated_at'])
+                businessdayselapsed = duecalculator().getbusinessdaysbetween(_dateofstatechange)
+                if businessdayselapsed == 20 and duecalculator().isbusinessday(_today):
                     self.__createnotificationforrawrequest(entry['requestid'], eventtype)
                     self.__createcommentforrawrequest(entry['requestid'], eventtype)
             return DefaultMethodResult(True,'Payment reminder notifications created',_today)
