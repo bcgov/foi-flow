@@ -366,11 +366,11 @@ class FOIRawRequest(db.Model):
         onholdapplicationfeerequests = []
         try:
             sql = '''
-                    SELECT * FROM (SELECT DISTINCT ON (requestid) requestid, (updated_at + INTERVAL '28 days') as reminder_date, status FROM public."FOIRawRequests"
+                    SELECT * FROM (SELECT DISTINCT ON (requestid) requestid, updated_at, status FROM public."FOIRawRequests"
 	                ORDER BY requestid ASC, version DESC) r
                     WHERE r.status = 'On-Hold - Application Fee'
-					and r.reminder_date::date = now()::date
-					order by r.reminder_date asc
+					AND r.updated_at::date BETWEEN  NOW()::date - INTERVAL '35 DAY' AND NOW()::date + INTERVAL '1 DAY'
+					order by r.updated_at asc
                     '''
             rs = db.session.execute(text(sql))
             onholdapplicationfeerequests = rs
