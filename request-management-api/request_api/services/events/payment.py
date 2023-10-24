@@ -49,9 +49,15 @@ class paymentevent:
             for entry in _onholdrequests:
                 _dateofstatechange = datetimehandler().formatdate(entry['updated_at'])
                 businessdayselapsed = duecalculator().getbusinessdaysbetween(_dateofstatechange)
-                if businessdayselapsed == 20 and duecalculator().isbusinessday(_today):
+                if businessdayselapsed >= 20 and duecalculator().isbusinessday(_today):
+                    commentexists = False
+                    existingcomments = commentservice().getrawrequestcomments(entry['requestid'])
+                    for comment in existingcomments:
+                        if comment['text'] == '20 business days has passed awaiting payment, you can consider closing the request as abandoned':
+                            commentexists = True
+                    if not commentexists:
+                        self.__createcommentforrawrequest(entry['requestid'], eventtype)
                     self.__createnotificationforrawrequest(entry['requestid'], eventtype)
-                    self.__createcommentforrawrequest(entry['requestid'], eventtype)
             return DefaultMethodResult(True,'Payment reminder notifications created',_today)
         except BusinessException as exception:
             current_app.logger.error("%s,%s" % ('Payment reminder Notification Error', exception.message))
