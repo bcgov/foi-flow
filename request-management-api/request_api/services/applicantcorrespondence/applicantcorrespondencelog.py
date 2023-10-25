@@ -4,7 +4,7 @@ from request_api.models.FOIMinistryRequests import FOIMinistryRequest
 
 import maya
 import json
-from html.parser import HTMLParser
+import html
 from datetime import datetime
 class applicantcorrespondenceservice:
 
@@ -57,8 +57,7 @@ class applicantcorrespondenceservice:
     def getapplicantcorrespondencelogbyid(self, applicantcorrespondenceid):
         applicantcorrespondence =  FOIApplicantCorrespondence.getapplicantcorrespondencebyid(applicantcorrespondenceid)
         (_correspondencemessagejson, _isjson) = self.__getjsonobject(applicantcorrespondence["correspondencemessagejson"])
-        parser = HTMLParser()
-        emailhtml_decoded_string = parser.unescape(self.__getvaluefromjson(_correspondencemessagejson, 'emailhtml')) 
+        emailhtml_decoded_string = html.unescape(self.__getvaluefromjson(_correspondencemessagejson, 'emailhtml')) 
         return emailhtml_decoded_string if _isjson else _correspondencemessagejson
 
     def getlatestapplicantcorrespondence(self, ministryid):
