@@ -362,6 +362,28 @@ class FOIRawRequest(db.Model):
         return assignments
     
     @classmethod
+    def getonholdapplicationfeerequests(cls): # with the reminder date
+        onholdapplicationfeerequests = []
+        try:
+            sql = '''
+                    SELECT * FROM (SELECT DISTINCT ON (requestid) requestid, (updated_at + INTERVAL '20 days') as reminder_date, status FROM public."FOIRawRequests"
+	                ORDER BY requestid ASC, version DESC) r
+                    WHERE r.status = 'On-Hold - Application Fee'
+					and r.reminder_date::date = now()::date
+					order by r.reminder_date asc
+                    '''
+            rs = db.session.execute(text(sql))
+            for row in rs:
+                if row.status == 'On-Hold - Application Fee':
+                    onholdapplicationfeerequests.append(row)
+        except Exception as ex:
+            logging.error(ex)
+            raise ex
+        finally:
+            db.session.close()
+        return onholdapplicationfeerequests
+
+    @classmethod
     def getversionforrequest(cls,requestid):   
         return db.session.query(FOIRawRequest.version).filter_by(requestid=requestid).order_by(FOIRawRequest.version.desc()).first()
     
@@ -981,6 +1003,25 @@ class FOIRawRequest(db.Model):
         finally:
             db.session.close()
         return requestdetails
+    
+    @classmethod
+    def getlatestsection5pendings(cls):
+        section5pendings = []
+        try:
+            sql = """SELECT * FROM 
+                (SELECT DISTINCT ON (requestid) requestid, created_at, version, status, to_char(created_at + INTERVAL '10 days', 'YYYY-MM-DD') as duedate, axisrequestid
+                FROM public."FOIRawRequests"
+                ORDER BY requestid ASC, version DESC) foireqs
+            WHERE foireqs.status = 'Section 5 Pending';"""
+            rs = db.session.execute(text(sql))        
+            for row in rs:
+                section5pendings.append({"requestid": row["requestid"], "duedate": row["duedate"], "version": row["version"], "statusname": row["status"], "created_at": row["created_at"], "axisrequestid": ["axisrequestid"]})
+        except Exception as ex:
+            logging.error(ex)
+            raise ex
+        finally:
+            db.session.close()
+        return section5pendings
 
 class FOIRawRequestSchema(ma.Schema):
     class Meta:
