@@ -1007,13 +1007,13 @@ class FOIRawRequest(db.Model):
         section5pendings = []
         try:
             sql = """SELECT * FROM 
-                (SELECT DISTINCT ON (requestid) requestid, created_at, version, status, to_char(created_at + INTERVAL '10 days', 'YYYY-MM-DD') as duedate, axisrequestid
+                (SELECT DISTINCT ON (requestid) requestid, created_at, version, status, axisrequestid
                 FROM public."FOIRawRequests"
                 ORDER BY requestid ASC, version DESC) foireqs
             WHERE foireqs.status = 'Section 5 Pending';"""
             rs = db.session.execute(text(sql))        
             for row in rs:
-                section5pendings.append({"requestid": row["requestid"], "duedate": row["duedate"], "version": row["version"], "statusname": row["status"], "created_at": row["created_at"], "axisrequestid": ["axisrequestid"]})
+                section5pendings.append({"requestid": row["requestid"], "version": row["version"], "statusname": row["status"], "created_at": row["created_at"], "axisrequestid": ["axisrequestid"]})
         except Exception as ex:
             logging.error(ex)
             raise ex
