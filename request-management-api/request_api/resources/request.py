@@ -94,7 +94,9 @@ class FOIRawRequest(Resource):
             assigneelastname = requestdata['assigneelastname']
 
             if int(requestid) and str(requestid) != "-1" :
-                status = rawrequestservice().getstatus(updaterequest)       
+                status = rawrequestservice().getstatus(updaterequest)
+                if status not in ['Intake in Progress', 'Closed', 'Redirect', 'Peer Review']:
+                    raise ValueError('Invalid request state.')
                 result = rawrequestservice().saverawrequestversion(updaterequest,requestid,assigneegroup,assignee,status,AuthHelper.getuserid(),assigneefirstname,assigneemiddlename,assigneelastname, actiontype)                
                 assignee = ''
                 if(actiontype == 'assignee'):
@@ -109,8 +111,8 @@ class FOIRawRequest(Resource):
                     assignee = getassignee(assigneefirstname,assigneelastname,assigneegroup)
                     asyncio.ensure_future(eventservice().postevent(result.identifier,"rawrequest",AuthHelper.getuserid(),AuthHelper.getusername(),AuthHelper.isministrymember(),assignee))
                     return {'status': result.success, 'message':result.message,'id':result.identifier} , 200                
-        except ValueError:
-            return {'status': 500, 'message':INVALID_REQUEST_ID}, 500    
+        except ValueError as valuexception:
+            return {'status': 500, 'message':str(valuexception)}, 500
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500
 
