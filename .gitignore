@@ -18,7 +18,6 @@ request-management-api/request_api/models/__pycache__/*.*
 request-management-api/migrations/__pycache__/*.*
 request-management-api/.env
 notification-manager/env/*
-
 *.pyc
 */__pycache__/*
 request-management-api/request_api/__pycache__/*.pyc
