@@ -125,6 +125,7 @@ class PaymentEventType(Enum):
     expired = "EXPIRED"
     outstandingpaid = "OUTSTANDINGPAID"
     depositpaid = "DEPOSITPAID"
+    reminder = "REMINDER"
 
 class CommentType(Enum):
     """Authorization header types."""

@@ -57,7 +57,7 @@ class applicantcorrespondenceservice:
     def getapplicantcorrespondencelogbyid(self, applicantcorrespondenceid):
         applicantcorrespondence =  FOIApplicantCorrespondence.getapplicantcorrespondencebyid(applicantcorrespondenceid)
         (_correspondencemessagejson, _isjson) = self.__getjsonobject(applicantcorrespondence["correspondencemessagejson"])
-        emailhtml_decoded_string = html.unescape(self.__getvaluefromjson(_correspondencemessagejson, 'emailhtml')) 
+        emailhtml_decoded_string = html.unescape(self.__getvaluefromjson(_correspondencemessagejson, 'emailhtml'))
         return emailhtml_decoded_string if _isjson else _correspondencemessagejson
 
     def getlatestapplicantcorrespondence(self, ministryid):
