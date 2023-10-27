@@ -369,7 +369,6 @@ class FOIRawRequest(db.Model):
                     SELECT * FROM (SELECT DISTINCT ON (requestid) requestid, updated_at, status FROM public."FOIRawRequests"
 	                ORDER BY requestid ASC, version DESC) r
                     WHERE r.status = 'On-Hold - Application Fee'
-					AND r.updated_at::date <  NOW()::date - INTERVAL '15 DAY'
 					order by r.updated_at asc
                     '''
             rs = db.session.execute(text(sql))
