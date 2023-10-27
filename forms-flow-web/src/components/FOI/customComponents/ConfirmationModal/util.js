@@ -40,7 +40,7 @@ import { getFullnameList } from "../../../../helper/FOI/helper";
     return _selectedMinistry;
   }
 
-  export const getMessage = (_saveRequestObject, _state, _requestNumber, _currentState, _requestId, _cfrStatus,allowStateChange,isAnyAmountPaid) => {
+  export const getMessage = (_saveRequestObject, _state, _requestNumber, _currentState, _requestId, _cfrStatus,allowStateChange,isAnyAmountPaid, estimatedTotalFeesDue) => {
     if ((_currentState?.toLowerCase() === StateEnum.closed.name.toLowerCase() && _state.toLowerCase() !== StateEnum.closed.name.toLowerCase())) {
       _saveRequestObject.reopen = true;
       return {title: "Re-Open Request", body: <>Are you sure you want to re-open Request # {_requestNumber ? _requestNumber : `U-00${_requestId}`}? <br/> The request will be re-opened to the previous state: {_state} </>};
@@ -50,12 +50,18 @@ import { getFullnameList } from "../../../../helper/FOI/helper";
           return {title: "Changing the state", body: "Are you sure you want to change the state to Intake in Progress?"};
       case StateEnum.peerreview.name.toLowerCase():
           return {title: "Changing the state", body: "Are you sure you want to change the state to Peer Review?"};
+      case StateEnum.tagging.name.toLowerCase():
+            return {title: "Changing the state", body: "Are you sure you want to change the state to Tagging?"};
+      case StateEnum.readytoscan.name.toLowerCase():
+            return {title: "Changing the state", body: "Are you sure you want to change the state to Ready to Scan?"};           
       case StateEnum.open.name.toLowerCase():
           return {title: "Changing the state", body: "Are you sure you want to Open this request?"};
       case StateEnum.closed.name.toLowerCase():
         return {title: "Close Request", body: ""};
       case StateEnum.redirect.name.toLowerCase():
           return {title: "Redirect Request", body: "Are you sure you want to Redirect this request?"};
+      case StateEnum.section5pending.name.toLowerCase():
+          return {title: "Changing the state", body: `Are you sure you want to change Request #${_requestNumber} to ${StateEnum.section5pending.name}?`};
       case StateEnum.callforrecords.name.toLowerCase():
           return {title: "Changing the state", body: `Are you sure you want to change Request #${_requestNumber} to ${StateEnum.callforrecords.name}?`};
       case StateEnum.review.name.toLowerCase():
@@ -77,7 +83,13 @@ import { getFullnameList } from "../../../../helper/FOI/helper";
               title: "Fee Estimate",
               body: "To update the state you must first complete the estimated hours in the CFR Form so that Total Fees are due."
             };
-          } else {
+          } else if (estimatedTotalFeesDue <= 0) {
+            return {
+              title: "Fee Estimate",
+              body: "To update state to Fee Estimate, Estimated Total must be greater than $0."
+            }
+          }
+          else {
             return {title: "Fee Estimate", body: `Are you sure you want to change Request #${_requestNumber} to ${StateEnum.feeassessed.name}? The CFR Form will be locked for editing and sent to IAO for review.`};
           }
       case StateEnum.deduplication.name.toLowerCase():
@@ -111,9 +123,11 @@ import { getFullnameList } from "../../../../helper/FOI/helper";
             }
       case StateEnum.response.name.toLowerCase():
         if (_saveRequestObject.requeststatusid === StateEnum.signoff.id)
-          return {title: "Ministry Sign Off", body: `Upload E-Approval log or completed sign form (if required) to change the state.`};
+          return {title: "Ministry Sign Off", body: `Upload eApproval Logs, and enter in required approval fields to verify Ministry Approval and then change the state.`};
         else
           return {title: "Changing the state", body: `Are you sure you want to change Request #${_requestNumber} to ${StateEnum.response.name}?`};
+          case StateEnum.onholdapplicationfee.name.toLowerCase():
+          return {title: "Changing the state", body: `Are you sure you want to change Request #${_requestNumber} to ${StateEnum.onholdapplicationfee.name}?`};
       default:
           return {title: "", body: ""};
     }

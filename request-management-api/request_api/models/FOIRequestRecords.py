@@ -126,7 +126,25 @@ class FOIRequestRecord(db.Model):
         finally:
             db.session.close()
         return records
-
+    
+    @classmethod
+    def get_all_records_by_divisionid(cls, divisionid):
+        records = []
+        try:
+            sql = """SELECT * FROM (SELECT DISTINCT ON (recordid) recordid, version, foirequestid, ministryrequestid, filename, attributes, isactive, replacementof
+            FROM public."FOIRequestRecords" ORDER BY recordid ASC, version DESC) records 
+            WHERE cast(records.attributes::json -> 'divisions' as text) like '%{"divisionid": """+ divisionid +"""}%' and isactive = 'true' OR cast(records.attributes::json -> 'divisions' as text) like '%{"divisionid": """+ divisionid +""", %}%' and isactive = 'true' 
+            """
+            result = db.session.execute(text(sql))
+            for row in result:
+                records.append({"recordid": row["recordid"], "foirequestid": row["foirequestid"], "ministryrequestid": row["ministryrequestid"], "filename": row["filename"], "attributes": row["attributes"], "isactive": row["isactive"], "replacementof": row["replacementof"]})
+        except Exception as ex:
+            logging.error(ex)
+            raise ex
+        finally:
+            db.session.close()
+        return records
+    
     @classmethod
     def replace(cls,replacingrecordid,records):
         replacingrecord = db.session.query(FOIRequestRecord).filter_by(recordid=replacingrecordid).order_by(FOIRequestRecord.version.desc()).first()

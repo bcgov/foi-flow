@@ -69,7 +69,7 @@
     background-color: #C45303;
   }
 
-  .foitabheaderIntakeInProgressBG {
+  .foitabheaderIntakeInProgressBG, .foitabheaderOnHoldApplicationFeeBG, .foitabheaderSection5Pending {
     background-color: #8C3601;
   }
 
@@ -128,7 +128,12 @@
   .foitabheaderPeerreviewBG{
     background-color: #096DD1;
   }
-
+  .foitabheaderTaggingBG{
+    background-color: #9B1048;
+  }
+  .foitabheaderReadytoScanBG{
+    background-color: #A2096C;
+  }
 
   .foileftpanelheader
   {

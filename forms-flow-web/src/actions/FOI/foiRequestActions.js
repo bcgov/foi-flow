@@ -279,6 +279,18 @@ export const setFOIMinistryDivisionalStages = (data) => (dispatch) => {
     payload: data,
   });
 };
+export const setFOIPersonalDivisionsAndSections = (data) => dispatch => {
+  dispatch({
+      type:FOI_ACTION_CONSTANTS.FOI_PERSONAL_DIVISIONS_SECTIONS,
+      payload:data      
+  })
+}
+export const setFOIPersonalSections = (data) => dispatch => {
+  dispatch({
+      type:FOI_ACTION_CONSTANTS.FOI_PERSONAL_SECTIONS,
+      payload:data      
+  })
+}
 export const setFOIWatcherList = (data) => (dispatch) => {
   dispatch({
     type: FOI_ACTION_CONSTANTS.FOI_WATCHER_LIST,

@@ -83,6 +83,7 @@ class templateservice:
         if dynamictemplatevalues["assignedTo"] == None:
                 dynamictemplatevalues["assignedToFirstName"] = ""
                 dynamictemplatevalues["assignedToLastName"] = ""
+                dynamictemplatevalues["assignedGroupEmail"] = ""
 
         contenttemplate = Template(emailtemplatehtml)   
         content = contenttemplate.render(dynamictemplatevalues)

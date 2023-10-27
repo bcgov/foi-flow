@@ -5,13 +5,19 @@ import { useDispatch, useSelector } from "react-redux";
 import AttachmentModal from "../Attachments/AttachmentModal";
 import Loading from "../../../../containers/Loading";
 import {
+  getOSSHeaderDetails,
   saveFilesinS3,
   getFileFromS3,
   postFOIS3DocumentPreSignedUrl,
   getFOIS3DocumentPreSignedUrl,
   completeMultiPartUpload,
 } from "../../../../apiManager/services/FOI/foiOSSServices";
-import { saveNewFilename } from "../../../../apiManager/services/FOI/foiAttachmentServices";
+import {
+  saveFOIRequestAttachmentsList,
+  replaceFOIRequestAttachment,
+  saveNewFilename,
+  deleteFOIRequestAttachment,
+} from "../../../../apiManager/services/FOI/foiAttachmentServices";
 import {
   fetchFOIRecords,
   saveFOIRecords,
@@ -39,6 +45,7 @@ import {
 import {
   addToFullnameList,
   getFullnameList,
+  ConditionalComponent,
   isrecordtimeout,
 } from "../../../../helper/FOI/helper";
 import Grid from "@material-ui/core/Grid";
@@ -55,6 +62,14 @@ import TextField from "@mui/material/TextField";
 import { saveAs } from "file-saver";
 import { downloadZip } from "client-zip";
 import { ClickableChip } from "../../Dashboard/utils";
+import CircularProgress from "@mui/material/CircularProgress";
+import AttachmentFilter from "../Attachments/AttachmentFilter";
+import Accordion from "@material-ui/core/Accordion";
+import Stack from "@mui/material/Stack";
+import AccordionSummary from "@material-ui/core/AccordionSummary";
+import AccordionDetails from "@material-ui/core/AccordionDetails";
+import Typography from "@material-ui/core/Typography";
+import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import SearchIcon from "@material-ui/icons/Search";
 import InputAdornment from "@mui/material/InputAdornment";
 import InputBase from "@mui/material/InputBase";
@@ -62,12 +77,18 @@ import Paper from "@mui/material/Paper";
 import Tooltip from "@mui/material/Tooltip";
 import { toast } from "react-toastify";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCheckCircle, faClone } from "@fortawesome/free-regular-svg-icons";
+import {
+  faCheckCircle,
+  faClone,
+  faTrashAlt,
+  faTrashCan,
+} from "@fortawesome/free-regular-svg-icons";
 import {
   faSpinner,
   faExclamationCircle,
   faBan,
   faArrowTurnUp,
+  faHistory,
   faTrash,
   faPenToSquare,
   faLinkSlash,
@@ -97,6 +118,12 @@ import {
 } from "./util";
 import { readUploadedFileAsBytes } from "../../../../helper/FOI/helper";
 import { TOTAL_RECORDS_UPLOAD_LIMIT } from "../../../../constants/constants";
+import { isScanningTeam } from "../../../../helper/FOI/helper";
+import { MinistryNeedsScanning } from "../../../../constants/FOI/enum";
+//import {convertBytesToMB} from "../../../../components/FOI/customComponents/FileUpload/util";
+import FOI_COMPONENT_CONSTANTS from "../../../../constants/FOI/foiComponentConstants";
+import MCFPersonal from './MCFPersonal';
+import MSDPersonal from './MSDPersonal';
 
 const useStyles = makeStyles((_theme) => ({
   createButton: {
@@ -196,8 +223,15 @@ export const RecordsLog = ({
   ministryAssignedToList,
   isMinistryCoordinator,
   setRecordsUploading,
+  recordsTabSelect,
+  requestType
 }) => {
-  let recordsObj = useSelector((state) => state.foiRequests.foiRequestRecords);
+  const user = useSelector((state) => state.user.userDetail);
+  const userGroups = user?.groups?.map(group => group.slice(1));
+  
+  let recordsObj = useSelector(
+    (state) => state.foiRequests.foiRequestRecords
+  );
 
   let pdfStitchStatus = useSelector(
     (state) => state.foiRequests.foiPDFStitchStatusForHarms
@@ -222,18 +256,31 @@ export const RecordsLog = ({
   let isRecordsfetching = useSelector(
     (state) => state.foiRequests.isRecordsLoading
   );
+
+  const tagList = divisions.filter(d => d.divisionname.toLowerCase() !== 'communications').map(division => {
+    return {
+      name: division.divisionid,
+      display: division.divisionname,
+    }
+  });
+
   const classes = useStyles();
   const [records, setRecords] = useState(recordsObj?.records);
   const [totalUploadedRecordSize, setTotalUploadedRecordSize] = useState(0);
-  useEffect(() => {
-    setRecords(recordsObj?.records);
-    let nonDuplicateRecords = recordsObj?.records?.filter(
-      (record) => !record.isduplicate
-    );
-    let totalUploadedSize =
-      calculateTotalUploadedFileSizeInKB(nonDuplicateRecords) / (1024 * 1024);
+  const [isScanningTeamMember, setIsScanningTeamMember] = useState(isScanningTeam(userGroups));
+  const [ministryCode, setMinistryCode] = useState(bcgovcode.replaceAll('"', '').toUpperCase());
+  const [isMCFPersonal, setIsMCFPersonal] = useState(ministryCode == "MCF" && requestType === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL);
+
+  const MCFSections = useSelector((state) => state.foiRequests.foiPersonalSections);
+
+  useEffect(() => {    
+    setRecords(recordsObj?.records)
+    let nonDuplicateRecords = recordsObj?.records?.filter(record => !record.isduplicate)
+    let totalUploadedSize= (calculateTotalUploadedFileSizeInKB(nonDuplicateRecords)/ (1024 * 1024))
     setTotalUploadedRecordSize(parseFloat(totalUploadedSize.toFixed(4)));
     dispatch(checkForRecordsChange(requestId, ministryId));
+    //To manage enabling and disabling of download for harms package
+    recordsDownloadList[1].disabled = enableHarmsDonwnload();
   }, [recordsObj]);
 
   useEffect(() => {
@@ -243,6 +290,24 @@ export const RecordsLog = ({
   const conversionFormats = useSelector(
     (state) => state.foiRequests.conversionFormats
   );
+
+  useEffect(() => {
+    if (recordsTabSelect && conversionFormats?.length < 1) {
+      toast.error(
+        "Temporarily unable to save your request. Please try again in a few minutes.",
+        {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: true,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+        }
+      );
+    }
+  }, [recordsTabSelect, conversionFormats]);
+
   const divisionFilters = [
     ...new Map(
       recordsObj?.records?.reduce(
@@ -418,9 +483,11 @@ export const RecordsLog = ({
               }))(record)
             );
           } else {
-            for (let attachment of record.attachments) {
-              if (attachment.isselected) {
-                deleteAttachemnts.push(attachment.filepath);
+            if (record?.attachments) {
+              for (let attachment of record.attachments) {
+                if (attachment.isselected) {
+                  deleteAttachemnts.push(attachment.filepath);
+                }
               }
             }
           }
@@ -978,12 +1045,7 @@ export const RecordsLog = ({
       for (let record of exporting) {
         var filepath = record.s3uripath;
         var filename = record.filename;
-        if (
-          record.isredactionready &&
-          conversionFormats.includes(
-            record.attributes?.extension?.toLowerCase()
-          )
-        ) {
+        if (record.isredactionready && record.isconverted) {
           filepath = filepath.substr(0, filepath.lastIndexOf(".")) + ".pdf";
           filename += ".pdf";
         }
@@ -1416,6 +1478,14 @@ export const RecordsLog = ({
       }
     }
     // setDivisionToUpdate()
+
+    if(isMCFPersonal && selectedDivision.size > 0) {
+      if(divisions.find(d => selectedDivision.has(d.divisionid))) {
+        return(!isMinistryCoordinator);
+      } else {
+        return(isMinistryCoordinator);
+      }
+    }
     return count === 0;
   };
 
@@ -1493,6 +1563,16 @@ export const RecordsLog = ({
     );
   };
 
+  //function to manage download for harms option
+  const enableHarmsDonwnload = () => {
+    return !recordsObj.records.every(
+      (record) =>
+        record.isredactionready ||
+        record.failed ||
+        isrecordtimeout(record.created_at, RECORD_PROCESSING_HRS)
+    );
+  };
+
   return (
     <div className={classes.container}>
       {isAttachmentLoading ? (
@@ -1521,6 +1601,17 @@ export const RecordsLog = ({
                   id="download"
                   label={currentDownload === 0 ? "Download" : ""}
                   inputProps={{ "aria-labelledby": "download-label" }}
+                  //   InputProps={{
+                  //     startAdornment: isDownloadInProgress && <InputAdornment position="start">
+                  //       {/* <CircularProgress class="download-progress-adornment"/> */}
+                  //       {/* <CircularProgress/> */}
+                  //       record.isredactionready ?
+                  //       <FontAwesomeIcon icon={faCheckCircle} size='2x' color='#1B8103' className={classes.statusIcons}/>:
+                  // record.failed ?
+                  // <FontAwesomeIcon icon={faExclamationCircle} size='2x' color='#A0192F' className={classes.statusIcons}/>:
+                  // <FontAwesomeIcon icon={faSpinner} size='2x' color='#FAA915' className={classes.statusIcons}/>
+                  //       </InputAdornment>
+                  //   }}
                   InputLabelProps={{ shrink: false }}
                   select
                   name="download"
@@ -1565,7 +1656,6 @@ export const RecordsLog = ({
                           ) : null}
                           {item.label}
                         </MenuItem>
-                        // </>
                       );
                     }
                   })}
@@ -1573,18 +1663,19 @@ export const RecordsLog = ({
               )}
             </Grid>
             <Grid item xs={3}>
-              {isMinistryCoordinator ? (
+              {isMinistryCoordinator || (isScanningTeamMember && MinistryNeedsScanning.includes(bcgovcode.replaceAll('"', '')) && requestType === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL) ?
                 <button
                   className={clsx("btn", "addAttachment", classes.createButton)}
                   variant="contained"
                   onClick={addAttachments}
                   color="primary"
+                  disabled={conversionFormats?.length < 1}
                 >
                   + Upload Records
                 </button>
-              ) : (
+              : (
                 records?.length > 0 &&
-                DISABLE_REDACT_WEBLINK?.toLowerCase() == "false" && (
+                DISABLE_REDACT_WEBLINK?.toLowerCase() == "false" && 
                   <a
                     href={DOC_REVIEWER_WEB_URL + "/foi/" + ministryId}
                     target="_blank"
@@ -1603,7 +1694,7 @@ export const RecordsLog = ({
                     </button>
                   </a>
                 )
-              )}
+              }
             </Grid>
           </Grid>
           <Grid
@@ -1802,7 +1893,7 @@ export const RecordsLog = ({
               <input
                 type="checkbox"
                 style={{ position: "relative", top: 7, marginRight: 15 }}
-                className="checkmark"
+                className="checkmark record-checkmark"
                 key={"selectallchk" + isAllSelected}
                 id={"selectallchk"}
                 onChange={handleSelectAll}
@@ -1853,6 +1944,11 @@ export const RecordsLog = ({
                           {" "}
                           and all records selected must be finished processing
                         </li>
+                        {isMCFPersonal && (<>
+                          <li>
+                            all records selected must be uploaded by your own team
+                          </li>
+                        </>)}
                       </ul>
                     </div>
                   ) : (
@@ -1955,6 +2051,7 @@ export const RecordsLog = ({
             )}
             totalUploadedRecordSize={totalUploadedRecordSize}
             replacementfiletypes={getreplacementfiletypes()}
+            requestType={requestType}
           />
           <div className="state-change-dialog">
             <Dialog
@@ -2027,113 +2124,97 @@ export const RecordsLog = ({
               // id="state-change-dialog"
             >
               <DialogTitle disableTypography id="state-change-dialog-title">
-                <h2 className="state-change-header">Update Divisions</h2>
-                <IconButton
-                  className="title-col3"
-                  onClick={() => setDivisionsModalOpen(false)}
-                >
-                  <i className="dialog-close-button">Close</i>
-                  <CloseIcon />
-                </IconButton>
+                  <h2 className="state-change-header">Update Divisions</h2>
+                  <IconButton className="title-col3" onClick={() => setDivisionsModalOpen(false)}>
+                    <i className="dialog-close-button">Close</i>
+                    <CloseIcon />
+                  </IconButton>
               </DialogTitle>
-              <DialogContent className={"dialog-content-nomargin"}>
-                <DialogContentText
-                  id="state-change-dialog-description"
-                  component={"span"}
-                  style={{ textAlign: "center" }}
-                >
-                  {records.filter(
-                    (r) => r.isselected && r.attributes.divisions.length > 1
-                  ).length > 0 && filterValue < 0 ? (
-                    <>
-                      <span className="confirmation-message">
-                        You have selected a record that was provided by more
-                        than one division. <br></br>
-                        To change the division you must first filter the Records
-                        Log by the division that you want to no longer be
-                        associated with the selected records.
+              <DialogContent className={'dialog-content-nomargin'}>
+                <DialogContentText id="state-change-dialog-description" component={'span'}>
+                  {(records.filter(r=>(r.isselected && r.attributes.divisions.length > 1)).length > 0 && filterValue < 0) ? 
+                    <div className="tagtitle"><span>
+                      You have selected a record that was provided by more than one division. <br></br>
+                      To change the division you must first filter the Records Log by the division that you want to no longer be associated with the selected records.
                       </span>
-                      <br></br>
-                    </>
-                  ) : (
+                    </div>
+                    : 
                     <>
-                      <span className="confirmation-message">
-                        Select the divisions that corresponds to the records you
-                        have selected.<br></br>
-                        This will update the divisions on all records you have
-                        selected both in the gathering records log and the
-                        redaction app.
-                      </span>
-                      <br></br>
-                      <br></br>
-                      <Paper
-                        component={Grid}
-                        sx={{
-                          color: "#38598A",
-                          maxWidth: "100%",
-                          paddingTop: "8px",
-                          borderTopLeftRadius: 0,
-                          borderTopRightRadius: 0,
-                        }}
-                        alignItems="center"
-                        justifyContent="flex-start"
-                        direction="row"
-                        container
-                        item
-                        xs={12}
-                        elevation={0}
-                      >
-                        {divisions
-                          .filter((division) => {
-                            if (
-                              division.divisionname.toLowerCase() ===
-                              "communications"
-                            ) {
-                              return false;
-                            } else if (
-                              filterValue > -1 &&
-                              filterValue !== division.divisionid
-                            ) {
-                              return true;
-                            } else if (
-                              records.filter((r) => r.isselected)[0]?.attributes
-                                .divisions[0].divisionid !== division.divisionid
-                            ) {
-                              return true;
-                            } else {
-                              return false;
-                            }
-                          })
-                          .map((division) => (
-                            <ClickableChip
-                              item
-                              id={`${division.divisionid}updateTag`}
-                              key={`${division.divisionid}-updateTag`}
-                              label={division.divisionname.toUpperCase()}
-                              sx={{
-                                width: "fit-content",
-                                marginLeft: "8px",
-                                marginBottom: "8px",
-                              }}
-                              color={
-                                division.divisionid === -2
-                                  ? "#A0192F"
-                                  : division.divisionid === -3
-                                  ? "#B57808"
-                                  : "primary"
-                              }
-                              size="small"
-                              onClick={(e) => {
-                                setDivisionModalTagValue(division.divisionid);
-                              }}
-                              clicked={
-                                divisionModalTagValue === division.divisionid
-                              }
+                      <div className="tagtitle"><span>
+                        Select the divisions that corresponds to the records you have selected.<br></br>
+                        This will update the divisions on all records you have selected both in the gathering records log and the redaction app.
+                      </span></div>
+
+                      {(requestType == FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL) ?
+                        (bcgovcode == "MCF") ?
+                          <MCFPersonal
+                            setNewDivision={setDivisionModalTagValue}
+                            tagValue={records.filter(r => r.isselected)[0]?.attributes.divisions[0].divisionid}
+                            divisionModalTagValue={divisionModalTagValue}
+                            divisions={divisions}
+                            isMinistryCoordinator={isMinistryCoordinator}
+                          />
+                          :
+                          (bcgovcode == "MSD") ?
+                            <MSDPersonal
+                              setNewDivision={setDivisionModalTagValue}
+                              tagValue={records.filter(r => r.isselected)[0]?.attributes.divisions[0].divisionid}
+                              divisionModalTagValue={divisionModalTagValue}
+                              divisions={tagList}
                             />
-                          ))}
-                      </Paper>
-                    </>
-                  )}
+                            :
+                            <div className="taglist">
+                              {divisions.filter(division => {
+                                if (division.divisionname.toLowerCase() === 'communications') {
+                                  return false;
+                                } else if (filterValue > -1 && filterValue !== division.divisionid) {
+                                  return true;
+                                } else if (records.filter(r => r.isselected)[0]?.attributes.divisions[0].divisionid !== division.divisionid) {
+                                  return true;
+                                } else {
+                                  return false;
+                                }
+                              }).map(division =>
+                                <ClickableChip
+                                  item
+                                  id={`${division.divisionid}updateTag`}
+                                  key={`${division.divisionid}-updateTag`}
+                                  label={division.divisionname.toUpperCase()}
+                                  sx={{width: "fit-content", marginLeft: "8px", marginBottom: "8px" }}
+                                  color={division.divisionid === -2 ? '#A0192F' : division.divisionid === -3 ? '#B57808' : 'primary'}
+                                  size="small"
+                                  onClick={(e)=>{setDivisionModalTagValue(division.divisionid)}}
+                                  clicked={divisionModalTagValue === division.divisionid}
+                                />
+                              )}
+                            </div>
+                      :
+                      <div className="taglist">
+                        {divisions.filter(division => {
+                          if (division.divisionname.toLowerCase() === 'communications') {
+                            return false;
+                          } else if (filterValue > -1 && filterValue !== division.divisionid) {
+                            return true;
+                          } else if (records.filter(r => r.isselected)[0]?.attributes.divisions[0].divisionid !== division.divisionid) {
+                            return true;
+                          } else {
+                            return false;
+                          }
+                        }).map(division =>
+                          <ClickableChip
+                            item
+                            id={`${division.divisionid}updateTag`}
+                            key={`${division.divisionid}-updateTag`}
+                            label={division.divisionname.toUpperCase()}
+                            sx={{width: "fit-content", marginLeft: "8px", marginBottom: "8px" }}
+                            color={division.divisionid === -2 ? '#A0192F' : division.divisionid === -3 ? '#B57808' : 'primary'}
+                            size="small"
+                            onClick={(e)=>{setDivisionModalTagValue(division.divisionid)}}
+                            clicked={divisionModalTagValue === division.divisionid}
+                          />
+                        )}
+                      </div>}
+                    </>}
                 </DialogContentText>
               </DialogContent>
               <DialogActions>
@@ -2236,7 +2317,7 @@ const Attachment = React.memo(
             <input
               type="checkbox"
               style={{ position: "relative", top: 18, marginRight: 15 }}
-              className="checkmark"
+              className="checkmark record-checkmark"
               id={"selectchk" + record.documentmasterid}
               key={record.recordid + indexValue}
               data-iaocode={record.recordid}
@@ -2549,9 +2630,6 @@ const AttachmentPopup = React.memo(
     // }
 
     const ActionsPopover = ({ RestrictViewInBrowser, record }) => {
-      const conversionFormats = useSelector(
-        (state) => state.foiRequests.conversionFormats
-      );
       return (
         <Popover
           anchorReference="anchorPosition"
@@ -2616,10 +2694,7 @@ const AttachmentPopup = React.memo(
                 Download Original
               </MenuItem>
             )}
-            {((record.isredactionready &&
-              conversionFormats.includes(
-                record.attributes?.extension?.toLowerCase()
-              )) ||
+            {((record.isredactionready && record.isconverted) ||
               (record.attributes?.isattachment &&
                 record.attributes?.trigger === "recordreplace")) && (
               <MenuItem

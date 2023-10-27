@@ -6,6 +6,7 @@ import logging
 class NotificationType(object):
 
     def getid(self, name):
+        conn = None
         try:
             _notificationtypes = []
             conn = getconnection()
@@ -19,8 +20,8 @@ class NotificationType(object):
             return _notificationtypes
         except(Exception) as error:
             logging.error(error)
-            raise   
         finally:
-            conn.close()
+            if conn:
+                conn.close()
 
 

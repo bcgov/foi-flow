@@ -71,7 +71,6 @@ class FOIFlowApplicantCategories(Resource):
         except BusinessException:
             return "Error happened while accessing applicant categories" , 500
 
-
 @cors_preflight('GET,OPTIONS')
 @API.route('/foiflow/programareas')
 class FOIFlowProgramAreas(Resource):
@@ -167,7 +166,41 @@ class FOIFlowReceivedModes(Resource):
 
 @cors_preflight('GET,OPTIONS')
 @API.route('/foiflow/divisions/<bcgovcode>')
+@API.route('/foiflow/divisions/<bcgovcode>/<specifictopersonalrequests>/<fetchmode>')
 class FOIFlowDivisions(Resource):
+    """Retrieves all active divisions for the passed in gov code    .
+    """
+    @staticmethod
+    @TRACER.trace()
+    @cross_origin(origins=allowedorigins())
+    @auth.require
+    @request_api.cache.cached(
+        unless=cache_filter,
+        response_filter=response_filter
+        )
+    def get(bcgovcode,specifictopersonalrequests=None, fetchmode = None):
+        try:
+            data = None                        
+            if(specifictopersonalrequests is not None and specifictopersonalrequests.lower() == 'true'):                
+                match fetchmode:
+                    case 'divisions':                        
+                        data = divisionstageservice().getpersonalspecificdivisionandstages(bcgovcode)
+                    case 'sections':                        
+                        data = divisionstageservice().getpersonalspecificprogramareasections(bcgovcode)
+                    case 'divisionsandsections':                        
+                        data = divisionstageservice().getpersonalspecificdivisionsandsections(bcgovcode) 
+                    case _:                        
+                        data = divisionstageservice().getpersonalspecificdivisionandstages(bcgovcode)
+            else:
+                data = divisionstageservice().getdivisionandstages(bcgovcode)               
+            jsondata = json.dumps(data)
+            return jsondata , 200
+        except Exception as exception:
+            return {'status': False, 'message': str(type(exception).__name__)}, 400
+
+@cors_preflight('GET,OPTIONS')
+@API.route('/foiflow/divisions/<bcgovcode>/all')
+class FOIFlowDivisionTags(Resource):
     """Retrieves all active divisions for the passed in gov code    .
     """
     @staticmethod
@@ -180,12 +213,12 @@ class FOIFlowDivisions(Resource):
         )
     def get(bcgovcode):
         try:
-            data = divisionstageservice().getdivisionandstages(bcgovcode)
+            data = divisionstageservice().getalldivisionsandsections(bcgovcode)               
             jsondata = json.dumps(data)
             return jsondata , 200
-        except BusinessException:
-            return "Error happened while accessing divisions" , 500
-
+        except Exception as exception:
+            return {'status': False, 'message': str(type(exception).__name__)}, 400     
+     
 @cors_preflight('GET,OPTIONS')
 @API.route('/foiflow/closereasons')
 class FOIFlowCloseReasons(Resource):

@@ -1,9 +1,13 @@
 const StateList = Object.freeze({
     unopened: [{status: "Unopened", isSelected: false}, {status:"Intake in Progress", isSelected: false}],
-    intakeinprogress: [{status:"Intake in Progress", isSelected: false}, {status: "Open", isSelected: false}, {status:"Peer Review", isSelected: false}, {status: "Redirect", isSelected: false}, {status: "Closed", isSelected: false}],
+    intakeinprogress: [{status:"Intake in Progress", isSelected: false}, {status: "Open", isSelected: false}, {status:"Peer Review", isSelected: false}, {status: "Redirect", isSelected: false}, {status: "On-Hold - Application Fee", isSelected: false}, {status: "Closed", isSelected: false}],
+    intakeinprogressforpersonals: [{status:"Intake in Progress", isSelected: false}, {status: "Open", isSelected: false}, {status:"Peer Review", isSelected: false}, {status: "Redirect", isSelected: false}, {status: "Section 5 Pending", isSelected: false}, {status: "Closed", isSelected: false}],
     redirect: [{status: "Redirect", isSelected: false}, {status:"Intake in Progress", isSelected: false}, {status: "Closed", isSelected: false}],
     open: [{status: "Open", isSelected: false}, {status: "Call For Records", isSelected: false}, {status:"Peer Review", isSelected: false},{status: "Closed", isSelected: false}],
     callforrecords: [{status: "Call For Records", isSelected: false}, {status: "Open", isSelected: false}, {status: "Closed", isSelected: false}],
+    callforrecordscfdmsdpersonal: [{status: "Call For Records", isSelected: false}, {status: "Open", isSelected: false}, {status: "Tagging", isSelected: false},{status: "Ready to Scan", isSelected: false}, {status: "Closed", isSelected: false}],
+    tagging :[{status: "Tagging", isSelected: true},{status: "Call For Records", isSelected: false}, {status: "Ready to Scan", isSelected: false},{status: "Records Review", isSelected: false}, {status: "Closed", isSelected: false}],
+    readytoscan : [{status: "Ready to Scan", isSelected: true},{status: "Call For Records", isSelected: false},  {status: "Tagging", isSelected: false},{status: "Records Review", isSelected: false}, {status: "Closed", isSelected: false}],
     feeassessed: [{status: "Fee Estimate", isSelected: false}, {status: "On Hold", isSelected: false}, {status: "Call For Records", isSelected: false}, {status: "Closed", isSelected: false}],
     feeassessedforpersonal: [{status: "Fee Estimate", isSelected: false}, {status: "Call For Records", isSelected: false}, {status: "Closed", isSelected: false}],
     onhold: [{status: "On Hold", isSelected: false}, {status: "Call For Records", isSelected: false}, {status: "Closed", isSelected: false}],
@@ -11,11 +15,14 @@ const StateList = Object.freeze({
     harms: [{status: "Harms Assessment", isSelected: false}, {status: "Closed", isSelected: false}],
     consult: [{status: "Consult", isSelected: false}, {status: "Records Review", isSelected: false}, {status: "Ministry Sign Off", isSelected: false}, {status:"Peer Review", isSelected: false}, {status: "Closed", isSelected: false}],
     review: [{status: "Records Review", isSelected: false}, {status: "Call For Records", isSelected: false}, {status: "Consult", isSelected: false}, {status: "Ministry Sign Off", isSelected: false}, {status:"Peer Review", isSelected: false}, {status: "Response", isSelected: false}, {status: "Closed", isSelected: false}],
+    reviewcfdmsdpersonal: [{status: "Records Review", isSelected: false}, {status: "Call For Records", isSelected: false},{status: "Tagging", isSelected: false}, {status: "Consult", isSelected: false}, {status: "Ministry Sign Off", isSelected: false}, {status:"Peer Review", isSelected: false}, {status: "Response", isSelected: false}, {status: "Closed", isSelected: false}],
     signoff: [{status: "Ministry Sign Off", isSelected: false}, {status: "Closed", isSelected: false}],
     response: [{status: "Response", isSelected: false}, {status: "On Hold", isSelected: false}, {status: "Records Review", isSelected: false}, {status:"Peer Review", isSelected: false}, {status: "Closed", isSelected: false}],
     responseforpersonal: [{status: "Response", isSelected: false}, {status: "Records Review", isSelected: false}, {status:"Peer Review", isSelected: false}, {status: "Closed", isSelected: false}],
     //peerreview: [{status:"Peer Review", isSelected: false},{status:"Intake in Progress", isSelected: false}, {status: "Open", isSelected: false},{status: "Records Review", isSelected: false},{status: "Consult", isSelected: false},{status: "Response", isSelected: false}],
-    peerreview: [{status:"Peer Review", isSelected: false}]
+    peerreview: [{status:"Peer Review", isSelected: false}],
+    section5pending: [{status: "Section 5 Pending", isSelected: false}, {status: "Open", isSelected: false}, {status:"Peer Review", isSelected: false}, {status: "Redirect", isSelected: false}, {status: "Closed", isSelected: false}],
+    onholdapplicationfee: [{status: "On-Hold - Application Fee", isSelected: false}, {status: "Open", isSelected: false}, {status:"Peer Review", isSelected: false}, {status: "Redirect", isSelected: false}, {status: "Closed", isSelected: false}]
   });
 
 const MinistryStateList = Object.freeze({
@@ -35,12 +42,15 @@ const MinistryStateList = Object.freeze({
     response: [{status: "Response", isSelected: false}],
     closed: [{status: "Closed", isSelected: false}],
     peerreview: [{status: "Peer Review", isSelected: false}],
+    tagging :[{status: "Tagging", isSelected: true}],
+    readytoscan : [{status: "Ready to Scan", isSelected: true}]
 });
 
+// This corresponds to rows in the FOIRequestStatuses table on the backend
 const StateEnum = Object.freeze({
     open: {name: "Open", id: 1},
     callforrecords: {name: "Call For Records", id: 2},
-    callforrecordsoverdue: {name: "Call For Records Overdue", id: 17},
+    callforrecordsoverdue: {name: "Call For Records Overdue", id: -100},
     closed: {name: "Closed", id: 3},
     redirect: {name: "Redirect", id: 4},
     unopened: {name: "Unopened", id: 5},
@@ -54,7 +64,11 @@ const StateEnum = Object.freeze({
     harms: {name: "Harms Assessment", id: 13},
     response: {name: "Response", id: 14},
     archived: {name: "Archived", id: 15},
-    peerreview: {name: "Peer Review", id: 16}
+    peerreview: {name: "Peer Review", id: 16},
+    tagging: {name: "Tagging", id: 17},
+    readytoscan: {name: "Ready to Scan", id: 18},
+    onholdapplicationfee: {name: "On-Hold - Application Fee", id: 19},
+    section5pending: {name: "Section 5 Pending", id: 20},
 });
 
 const StateTransitionCategories = Object.freeze({
@@ -180,10 +194,10 @@ const AttachmentCategories = Object.freeze({
       type: ["tag"],
     },
     {
-      name: "recordsreview",
-      tags: ["recordsreview"],
-      display: "Records Review",
-      bgcolor: "#04596C",
+      name: "harms",
+      tags: ["harms"],
+      display: "Harms",
+      bgcolor: "#832AB7",
       type: ["tag"],
     },
     {
@@ -194,24 +208,17 @@ const AttachmentCategories = Object.freeze({
       type: ["tag"],
     },
     {
-      name: "response",
-      tags: ["response"],
-      display: "Response",
-      bgcolor: "#020A80",
+      name: "recordsreview",
+      tags: ["recordsreview"],
+      display: "Records Review",
+      bgcolor: "#04596C",
       type: ["tag"],
     },
     {
-      name: "harms",
-      tags: ["harms"],
-      display: "Harms",
-      bgcolor: "#832AB7",
-      type: ["tag"],
-    },
-    {
-      name: "oipc",
-      tags: ["oipc"],
-      display: "OIPC",
-      bgcolor: "#595959",
+      name: "consult",
+      tags: ["consult"],
+      display: "Consult",
+      bgcolor: "#7A3A9C",
       type: ["tag"],
     },
     {
@@ -221,11 +228,25 @@ const AttachmentCategories = Object.freeze({
       bgcolor: "#1A1A1A",
       type: ["tag"],
     },
-	{
-      name: "ministrysignoff",
-      tags: ["ministrysignoff"],
-      display: "Ministry Sign Off",
-      bgcolor: "#4B296B",
+    {
+        name: "ministrysignoff",
+        tags: ["ministrysignoff"],
+        display: "Ministry Sign Off",
+        bgcolor: "#4B296B",
+        type: ["tag"],
+    },
+    {
+      name: "response",
+      tags: ["response"],
+      display: "Response",
+      bgcolor: "#020A80",
+      type: ["tag"],
+    },
+    {
+      name: "oipc",
+      tags: ["oipc"],
+      display: "OIPC",
+      bgcolor: "#595959",
       type: ["tag"],
     },
     { // transition: Response -> On hold
