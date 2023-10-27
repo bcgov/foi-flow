@@ -5,6 +5,7 @@ import SearchBar from "../customComponents";
 import CreateDivisionModal from "./CreateDivisionModal";
 import DisableDivisionModal from "./DisableDivisionModal";
 import EditDivisionModal from "./EditDivisionModal";
+import CreateSectionModal from "./CreateSectionModal";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import { DataGrid } from "@mui/x-data-grid";
@@ -32,6 +33,7 @@ const Divisions = ({userDetail}) => {
   const [searchResults, setSearchResults] = useState(null);
   const [selectedDivision, setSelectedDivision] = useState(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [showCreateSectionModal, setShowCreateSectionModal] = useState(false);
   const [showDisableModal, setShowDisableModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const dispatch = useDispatch();
@@ -56,6 +58,9 @@ const Divisions = ({userDetail}) => {
         createProgramAreaDivision({
           name: data.name,
           programareaid: data.programareaid,
+          issection: data.issection,
+          parentid: data.parentid,
+          specifictopersonalrequests: data.specifictopersonalrequests
         },
         (err, res) => {            
             if (!err && res) {
@@ -96,6 +101,9 @@ const Divisions = ({userDetail}) => {
             name: data.name,
             programareaid: data.programareaid,
             sortorder: data.sortorder,
+            issection: data.issection,
+            parentid: data.parentid,
+            specifictopersonalrequests: data.specifictopersonalrequests
           },
           data.divisionid,
           (err, res) => {            
@@ -144,10 +152,10 @@ const Divisions = ({userDetail}) => {
           });
         } else {
           toast.error(
-            "Temporarily unable to disable division. Please try again in a few minutes.",
+            "Unable to disable division. Please try again in a few minutes and ensure that the division is not associated to any FOI Request records or sections.",
             {
               position: "top-right",
-              autoClose: 3000,
+              autoClose: 4500,
               hideProgressBar: true,
               closeOnClick: true,
               pauseOnHover: true,
@@ -164,6 +172,10 @@ const Divisions = ({userDetail}) => {
     setShowCreateModal(true);
   };
 
+  const openCreateSectionModal = () => {
+    setShowCreateSectionModal(true)
+  }
+
   const openDisableDivisionModal = (data) => {
     setSelectedDivision(data);
     setShowDisableModal(true);
@@ -173,6 +185,20 @@ const Divisions = ({userDetail}) => {
     setSelectedDivision(data);
     setShowEditModal(true);
   };
+
+  const filterParentDivisions = (divisionObj, divisionsArr, operation) => {
+    let filteredDivisions = divisionsArr.filter(division => !division.issection);
+    if(operation === "EDIT") {
+      filteredDivisions = filteredDivisions.filter(division => division.divisionid !== divisionObj.divisionid);
+    }
+    if (divisionObj.programareaid && divisionObj.specifictopersonalrequests) {
+      return filteredDivisions.filter(division => division.programareaid === divisionObj.programareaid && division.specifictopersonalrequests);
+    } 
+    if (divisionObj.programareaid && !divisionObj.specifictopersonalrequests) {
+      return filteredDivisions.filter(division => division.programareaid === divisionObj.programareaid && !division.specifictopersonalrequests);
+    }
+    return filteredDivisions;
+  }
 
   const columns = [
     {
@@ -194,6 +220,24 @@ const Divisions = ({userDetail}) => {
       field: "areabcgovcode",
       headerName: "Code",
       width: 75,
+    },
+    {
+      field: "issection",
+      headerName: "Section?",
+      width: 100,
+    },
+    {
+      field: "parentid",
+      headerName: "Parent Division",
+      width: 150,
+      align: "center",
+      renderCell: (params) => <>{params.value ? params.value : "-"}</>,
+    },
+    {
+      field: "specifictopersonalrequests",
+      headerName: "Personal Requests",
+      width: 150,
+      align: "center",
     },
     {
       field: "sortorder",
@@ -259,14 +303,22 @@ const Divisions = ({userDetail}) => {
               setSearchResults={setSearchResults}
             />
           </Grid>
-          <Grid item xs={6} sm={4} md={2} alignItems="right">
+          <Grid item xs={6} sm={4} md={3}>
             <Box display="flex" justifyContent="flex-end">
               <Button
+                style={{marginRight: "10px"}}
                 size="small"
                 variant="contained"
                 onClick={() => openCreateDivisionModal()}
               >
                 New Division
+              </Button>
+              <Button
+                size="small"
+                variant="contained"
+                onClick={() => (openCreateSectionModal())}
+              >
+                New Section
               </Button>
             </Box>
           </Grid>
@@ -303,6 +355,13 @@ const Divisions = ({userDetail}) => {
         showModal={showCreateModal}
         closeModal={() => setShowCreateModal(false)}
       />
+      <CreateSectionModal
+        divisions={divisions}
+        filterParentDivisions={filterParentDivisions}
+        saveDivision={createDivision}
+        showModal={showCreateSectionModal}
+        closeModal={() => setShowCreateSectionModal(false)}
+      />
       <DisableDivisionModal
         initialDivision={selectedDivision}
         disableDivision={disableDivision}
@@ -312,6 +371,7 @@ const Divisions = ({userDetail}) => {
       <EditDivisionModal
         initialDivision={selectedDivision}
         divisions={divisions}
+        filterParentDivisions={filterParentDivisions}
         saveDivision={editDivision}
         showModal={showEditModal}
         closeModal={() => setShowEditModal(false)}

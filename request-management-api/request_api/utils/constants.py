@@ -21,6 +21,9 @@ from os import getenv
 FORMAT_CONTACT_ADDRESS='JSON'
 BLANK_EXCEPTION_MESSAGE = 'Field cannot be blank'
 MAX_EXCEPTION_MESSAGE = 'Field exceeds the size limit'
+FILE_CONVERSION_FILE_TYPES = ''
+DEDUPE_FILE_TYPES = ''
+NONREDACTABLE_FILE_TYPES = ''
 try:
     response = requests.request(
         method='GET',

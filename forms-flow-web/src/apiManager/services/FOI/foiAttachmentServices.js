@@ -96,6 +96,34 @@ import {
     };
   };
 
+  export const saveNewCategory = (newCategory, documentId, requestId, ministryId, ...rest) => {
+    let apiUrl = "";
+    if (ministryId != null) {
+      apiUrl = replaceUrl(
+        API.FOI_RECLASSIFY_CATEGORY_MINISTRYREQUEST + '',
+        "<ministryrequestid>", ministryId);
+    }
+    else {
+      apiUrl = replaceUrl(
+        API.FOI_RECLASSIFY_CATEGORY_RAWREQUEST,
+        "<requestid>",
+        requestId
+      );
+    }
+    apiUrl = replaceUrl(
+      apiUrl,
+      "<documentid>",
+      documentId
+    );
+
+    return (dispatch) => {
+      const data = {
+        category: newCategory
+      };
+      postAttachment(dispatch, apiUrl, data, requestId, ministryId, "Error in reclassifying the file", rest);
+    };
+  };
+
   export const replaceFOIRequestAttachment = (requestId, ministryId, documentId, data, ...rest) => {
     let apiUrl = "";
     if (ministryId && documentId) {

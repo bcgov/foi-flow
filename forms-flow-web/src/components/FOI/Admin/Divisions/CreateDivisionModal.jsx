@@ -8,6 +8,8 @@ import InputLabel from "@material-ui/core/InputLabel";
 import MenuItem from "@material-ui/core/MenuItem";
 import Select from "@material-ui/core/Select";
 import TextField from "@material-ui/core/TextField";
+import FormControlLabel from '@mui/material/FormControlLabel';
+import Checkbox from '@mui/material/Checkbox';
 
 
 const CreateDivisionModal = ({
@@ -16,7 +18,13 @@ const CreateDivisionModal = ({
   showModal,
   closeModal,
 }) => {
-  const [division, setDivision] = useState(null);
+  const [division, setDivision] = useState({
+    name: "",
+    programareaid: null,
+    issection: false,
+    parentid: null,
+    specifictopersonalrequests: false,
+  });
   let programAreas = useSelector((state) => state.foiRequests.foiAdminProgramAreaList);
 
   const handleSave = () => {
@@ -29,7 +37,13 @@ const CreateDivisionModal = ({
   };
 
   useEffect(() => {
-    setDivision(null);
+    setDivision({
+      name: "",
+      programareaid: null,
+      issection: false,
+      parentid: null,
+      specifictopersonalrequests: false,
+    });
   }, [showModal]);
 
   return (
@@ -39,6 +53,7 @@ const CreateDivisionModal = ({
         <DialogContent>
           <TextField
             autoFocus
+            required
             margin="dense"
             id="divisionName"
             label="Division Name"
@@ -48,7 +63,7 @@ const CreateDivisionModal = ({
             }
             fullWidth
           />
-          <InputLabel shrink id="create-divisions-areas-label">
+          <InputLabel shrink required id="create-divisions-areas-label">
             Program Area
           </InputLabel>
           <Select
@@ -68,6 +83,9 @@ const CreateDivisionModal = ({
                 </MenuItem>
               ))}
           </Select>
+          <div style={{display: "flex", flexDirection: "row", justifyContent:"center", alignItems: "center"}}>
+            <FormControlLabel id="create-divisions-areas-label" control={<Checkbox checked={division.specifictopersonalrequests} onChange={() => setDivision({...division, specifictopersonalrequests: !division.specifictopersonalrequests})} />} label="Specific to Personal Request" />
+          </div>
         </DialogContent>
         <DialogActions>
           <button onClick={handleSave} className="btn-bottom btn-save">

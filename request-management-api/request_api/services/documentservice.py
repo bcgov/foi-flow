@@ -1,5 +1,6 @@
 
 from os import stat
+import os
 from re import VERBOSE
 from request_api.models.FOIMinistryRequestDocuments import FOIMinistryRequestDocument
 from request_api.models.FOIRawRequestDocuments import FOIRawRequestDocument
@@ -9,6 +10,7 @@ from request_api.schemas.foidocument import CreateDocumentSchema
 from request_api.services.external.storageservice import storageservice
 from request_api.models.FOIApplicantCorrespondenceAttachments import FOIApplicantCorrespondenceAttachment
 from request_api.utils.enums import RequestType
+import logging
 
 import json
 import base64
@@ -32,11 +34,13 @@ class documentservice:
         documents = self.getactiverequestdocuments(requestid, requesttype)
         if isministrymember:
             metaobj = FOIMinistryRequest.getmetadata(requestid)
+            filtereddocuments = []
             for document in documents:
                 if document["category"] == "personal":
                     document["documentpath"] = ""
-                if metaobj["requesttype"].lower() == RequestType.GENERAL.value.lower() and document["category"] == 'applicant':
-                    documents.remove(document)
+                if document["category"] != "applicant":
+                    filtereddocuments.append(document)
+            return filtereddocuments
         return documents
 
     def createrequestdocument(self, requestid, documentschema, userid, requesttype):
@@ -50,6 +54,27 @@ class documentservice:
            return self.createministrydocumentversion(requestid, documentid, documentschema, userid)
         else:
             return self.createrawdocumentversion(requestid, documentid, documentschema, userid)
+
+    def copyrequestdocumenttonewlocation(self, newcategory, documentpath): #documentpath is full url including https://
+        # for old documentpath
+        baseurl = 'https://' + os.getenv("OSS_S3_HOST")
+        location = documentpath.split('/')[3:] # bucket and filename
+        bucket = location[0]
+        source = "/".join(location) # /bucket/filename
+        # for new document path, replace category name in path
+        newlocation = location
+        newlocation[3] = newcategory
+        filename = "/".join(newlocation[1:])
+        newdocumentpath = baseurl + '/' + bucket + '/' + filename
+        try:
+            moveresponse = storageservice().copy_file(source, bucket, filename)
+            if moveresponse['ResponseMetadata']['HTTPStatusCode'] == 200:
+                return {"status": "success", 'documentpath': newdocumentpath}
+            else:
+                raise Exception(moveresponse)
+        except Exception as ex:
+            logging.exception(ex)
+            return {"status": "error"}
 
     def deleterequestdocument(self, requestid, documentid, userid, requesttype):
         documentschema = {'isactive':False}
@@ -76,8 +101,8 @@ class documentservice:
         version = self.__getversionforrequest(ministryrequestid, "ministryrequest")        
         document = FOIMinistryRequestDocument.getdocument(documentid)
         if document:
-            FOIMinistryRequestDocument.deActivateministrydocumentsversion(documentid, document['version']+1, userid)
-            return FOIMinistryRequestDocument.createdocumentversion(ministryrequestid, version, self.__copydocumentproperties(document,documentschema,document['version']), userid)          
+            FOIMinistryRequestDocument.deActivateministrydocumentsversion(documentid, document['version'], userid)
+            return FOIMinistryRequestDocument.createdocumentversion(ministryrequestid, version, self.__copydocumentproperties(document,documentschema,document['version']), userid)
         elif isinstance(documentschema, list):            
             return FOIMinistryRequestDocument.createdocuments(ministryrequestid, version, documentschema, userid)
         else:
@@ -87,7 +112,7 @@ class documentservice:
     def createrawdocumentversion(self, requestid, documentid, documentschema, userid):
         version = self.__getversionforrequest(requestid, "rawrequest")
         document = FOIRawRequestDocument.getdocument(documentid)
-        FOIRawRequestDocument.deActivaterawdocumentsversion(documentid, document['version']+1, userid)
+        FOIRawRequestDocument.deActivaterawdocumentsversion(documentid, document['version'], userid)
         return FOIRawRequestDocument.createdocumentversion(requestid, version, self.__copydocumentproperties(document,documentschema,document['version']), userid)
 
     def createrawrequestdocumentversion(self, requestid):

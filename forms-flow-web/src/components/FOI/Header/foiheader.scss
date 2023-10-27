@@ -35,7 +35,7 @@ nav h2 {
 }
 
 .bell-icon {
-  padding-top: 0.5rem;
+  padding-top: 7.5px;
   
   .MuiBadge-badge{
     visibility: visible !important;
@@ -51,7 +51,7 @@ nav h2 {
 }
 
 .report-icon{
-  padding-top: 0.5rem;
+  padding-top: 6px;
 
   a {
     color: white;
@@ -63,7 +63,7 @@ nav h2 {
 }
 
 .admin-icon {
-  padding: 10px;
+  padding: 7px 10px 0px 0px;
   cursor: pointer;
 }
 
@@ -78,6 +78,11 @@ nav h2 {
   position: relative;
   max-height: 40px;
 }
+
+.help-icon {
+  padding: 6px 10px 0px 0px;
+}
+
 
 .foiheaderLogosection{
   display: inline;

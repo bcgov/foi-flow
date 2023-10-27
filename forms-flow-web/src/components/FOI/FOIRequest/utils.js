@@ -129,6 +129,15 @@ export const getTabBG = (_tabStatus, _requestState) => {
       return "foitabheadercollection foitabheaderResponseBG";
     case StateEnum.peerreview.name:
       return "foitabheadercollection foitabheaderPeerreviewBG";
+    case StateEnum.tagging.name:
+        return "foitabheadercollection foitabheaderTaggingBG"; 
+    case StateEnum.readytoscan.name:
+        return "foitabheadercollection foitabheaderReadytoScanBG";
+    case StateEnum.section5pending.name:
+      return "foitabheadercollection foitabheaderSection5Pending";            
+    case StateEnum.onholdapplicationfee.name:
+        return "foitabheadercollection foitabheaderOnHoldApplicationFeeBG";
+
     default:
       return "foitabheadercollection foitabheaderdefaultBG";
   }
@@ -162,7 +171,7 @@ export const updateAdditionalInfo = (name, value, requestObject) => {
       adoptiveFatherLastName: "",
       adoptiveFatherFirstName: "",
       personalHealthNumber: "",
-      identityVerified: "",
+      //identityVerified: "",
     };
   }
   requestObject.additionalPersonalInfo[name] = value;
@@ -262,8 +271,10 @@ export const createRequestDetailsObjectFunc = (
     case FOI_COMPONENT_CONSTANTS.LINKED_REQUESTS:
       requestObject.linkedRequests = typeof value == 'string' ? JSON.parse(value) :value;
       break;
-    case FOI_COMPONENT_CONSTANTS.PERSONAL_HEALTH_NUMBER:
     case FOI_COMPONENT_CONSTANTS.IDENTITY_VERIFIED:
+      requestObject.identityVerified = value;
+      break;
+    case FOI_COMPONENT_CONSTANTS.PERSONAL_HEALTH_NUMBER:
     case FOI_COMPONENT_CONSTANTS.DOB:
     case FOI_COMPONENT_CONSTANTS.CHILD_NICKNAME:
     case FOI_COMPONENT_CONSTANTS.CHILD_FIRST_NAME:
