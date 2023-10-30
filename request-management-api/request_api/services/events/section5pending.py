@@ -23,7 +23,7 @@ class section5pendingevent(duecalculator):
             for entry in section5pendings:
                 _dateofstatechange = datetimehandler().formatdate(entry['created_at'])
                 businessdayselapsed = self.getbusinessdaysbetween(_dateofstatechange)
-                if businessdayselapsed >= 1 and self.isbusinessday(_today):
+                if businessdayselapsed >= 10 and self.isbusinessday(_today):
                     message = self.__passeddueremindermessage()
                     commentexists = False
                     existingcomments = commentservice().getrawrequestcomments(entry['requestid'])
