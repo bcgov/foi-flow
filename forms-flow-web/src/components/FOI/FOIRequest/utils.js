@@ -135,8 +135,8 @@ export const getTabBG = (_tabStatus, _requestState) => {
         return "foitabheadercollection foitabheaderReadytoScanBG";
     case StateEnum.section5pending.name:
       return "foitabheadercollection foitabheaderSection5Pending";            
-    case StateEnum.onholdapplicationfee.name:
-        return "foitabheadercollection foitabheaderOnHoldApplicationFeeBG";
+    case StateEnum.appfeeowing.name:
+        return "foitabheadercollection foitabheaderAppFeeOwingBG";
 
     default:
       return "foitabheadercollection foitabheaderdefaultBG";

@@ -1,6 +1,6 @@
 const StateList = Object.freeze({
     unopened: [{status: "Unopened", isSelected: false}, {status:"Intake in Progress", isSelected: false}],
-    intakeinprogress: [{status:"Intake in Progress", isSelected: false}, {status: "Open", isSelected: false}, {status:"Peer Review", isSelected: false}, {status: "Redirect", isSelected: false}, {status: "On-Hold - Application Fee", isSelected: false}, {status: "Closed", isSelected: false}],
+    intakeinprogress: [{status:"Intake in Progress", isSelected: false}, {status: "Open", isSelected: false}, {status:"Peer Review", isSelected: false}, {status: "Redirect", isSelected: false}, {status: "App Fee Owing", isSelected: false}, {status: "Closed", isSelected: false}],
     intakeinprogressforpersonals: [{status:"Intake in Progress", isSelected: false}, {status: "Open", isSelected: false}, {status:"Peer Review", isSelected: false}, {status: "Redirect", isSelected: false}, {status: "Section 5 Pending", isSelected: false}, {status: "Closed", isSelected: false}],
     redirect: [{status: "Redirect", isSelected: false}, {status:"Intake in Progress", isSelected: false}, {status: "Closed", isSelected: false}],
     open: [{status: "Open", isSelected: false}, {status: "Call For Records", isSelected: false}, {status:"Peer Review", isSelected: false},{status: "Closed", isSelected: false}],
@@ -22,7 +22,7 @@ const StateList = Object.freeze({
     //peerreview: [{status:"Peer Review", isSelected: false},{status:"Intake in Progress", isSelected: false}, {status: "Open", isSelected: false},{status: "Records Review", isSelected: false},{status: "Consult", isSelected: false},{status: "Response", isSelected: false}],
     peerreview: [{status:"Peer Review", isSelected: false}],
     section5pending: [{status: "Section 5 Pending", isSelected: false}, {status: "Open", isSelected: false}, {status:"Peer Review", isSelected: false}, {status: "Redirect", isSelected: false}, {status: "Closed", isSelected: false}],
-    onholdapplicationfee: [{status: "On-Hold - Application Fee", isSelected: false}, {status: "Open", isSelected: false}, {status:"Peer Review", isSelected: false}, {status: "Redirect", isSelected: false}, {status: "Closed", isSelected: false}]
+    appfeeowing: [{status: "App Fee Owing", isSelected: false}, {status: "Open", isSelected: false}, {status:"Peer Review", isSelected: false}, {status: "Redirect", isSelected: false}, {status: "Closed", isSelected: false}]
   });
 
 const MinistryStateList = Object.freeze({
@@ -67,7 +67,7 @@ const StateEnum = Object.freeze({
     peerreview: {name: "Peer Review", id: 16},
     tagging: {name: "Tagging", id: 17},
     readytoscan: {name: "Ready to Scan", id: 18},
-    onholdapplicationfee: {name: "On-Hold - Application Fee", id: 19},
+    appfeeowing: {name: "App Fee Owing", id: 19},
     section5pending: {name: "Section 5 Pending", id: 20},
 });
 

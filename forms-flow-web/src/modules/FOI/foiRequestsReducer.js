@@ -95,7 +95,7 @@ const initialState = {
   'image/bmp','image/gif','image/jpeg','image/png','image/svg+xml','image/tiff','image/webp',
   'application/vnd.ms-excel.sheet.macroEnabled.12','.msg', '.eml', '.xls', '.xlsx', '.doc', '.docx', '.ics','.json',
    '.shx', '.shp','.dbf','.kml','.kmz','.geojson','.cpg','.prj','.sbn','.sbx','.gml','.gdb','.freelist','.atx','.gpkg','.mbtiles','.mpk','.wkt',
-  '.las','.lasd','.laz','.dwf','.dwg','.dxf','.csv','.txt','.png','.jpg'],
+  '.las','.lasd','.laz','.dwf','.dwg','.dxf','.csv','.txt','.png','.jpg', '.jpeg'],
   conversionFormats: [],
   
 };

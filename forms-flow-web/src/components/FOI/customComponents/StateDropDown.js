@@ -175,8 +175,8 @@ const StateDropDown = ({
           return _stateList.section5pending;
         } 
         break
-      case StateEnum.onholdapplicationfee.name.toLowerCase():
-        return _stateList.onholdapplicationfee;
+      case StateEnum.appfeeowing.name.toLowerCase():
+        return _stateList.appfeeowing;
         
       default:
         return [];

@@ -16,11 +16,11 @@ depends_on = None
 
 
 def upgrade():
-    op.execute('INSERT INTO public."FOIRequestStatuses"(requeststatusid, name, description, isactive) VALUES (20, \'Section 5 Pending\', \'Section 5 Pending (Personal)\', true);commit;')
-    op.execute('INSERT INTO public."NotificationTypes"(notificationtypeid, name, description, isactive) VALUES (20, \'Section 5 Pending Reminder\', \'Section 5 Pending Reminder\', true);commit;')
+    op.execute('INSERT INTO public."FOIRequestStatuses"(name, description, isactive) VALUES (\'Section 5 Pending\', \'Section 5 Pending (Personal)\', true);commit;')
+    op.execute('INSERT INTO public."NotificationTypes"(name, description, isactive) VALUES (\'Section 5 Pending Reminder\', \'Section 5 Pending Reminder\', true);commit;')
     
 
 
 def downgrade():
-    op.execute('DELETE FROM public."FOIRequestStatuses" WHERE requeststatusid = 20;commit;')
-    op.execute('DELETE FROM public."NotificationTypes" WHERE notificationtypeid = 20;commit;')
+    op.execute('DELETE FROM public."FOIRequestStatuses" WHERE name = \'Section 5 Pending\';commit;')
+    op.execute('DELETE FROM public."NotificationTypes" WHERE name = \'Section 5 Pending Reminder\';commit;')
