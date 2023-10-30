@@ -49,7 +49,7 @@ class paymentevent:
             for entry in _onholdrequests:
                 _dateofstatechange = datetimehandler().formatdate(entry['updated_at'])
                 businessdayselapsed = duecalculator().getbusinessdaysbetween(_dateofstatechange)
-                if businessdayselapsed >= 1 and duecalculator().isbusinessday(_today):
+                if businessdayselapsed >= 20 and duecalculator().isbusinessday(_today):
                     commentexists = False
                     existingcomments = commentservice().getrawrequestcomments(entry['requestid'])
                     for comment in existingcomments:
