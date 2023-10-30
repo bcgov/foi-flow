@@ -45,7 +45,7 @@ class paymentevent:
 
             notificationservice().dismissremindernotification("rawrequest", self.__notificationtype())
             eventtype = PaymentEventType.reminder.value
-            _onholdrequests = FOIRawRequest.getonholdapplicationfeerequests()
+            _onholdrequests = FOIRawRequest.getappfeeowingrequests()
             for entry in _onholdrequests:
                 _dateofstatechange = datetimehandler().formatdate(entry['updated_at'])
                 businessdayselapsed = duecalculator().getbusinessdaysbetween(_dateofstatechange)

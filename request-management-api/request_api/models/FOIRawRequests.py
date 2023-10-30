@@ -362,23 +362,23 @@ class FOIRawRequest(db.Model):
         return assignments
     
     @classmethod
-    def getonholdapplicationfeerequests(cls): # with the reminder date
-        onholdapplicationfeerequests = []
+    def getappfeeowingrequests(cls): # with the reminder date
+        appfeeowingrequests = []
         try:
             sql = '''
                     SELECT * FROM (SELECT DISTINCT ON (requestid) requestid, updated_at, status FROM public."FOIRawRequests"
 	                ORDER BY requestid ASC, version DESC) r
-                    WHERE r.status = 'On-Hold - Application Fee'
+                    WHERE r.status = 'App Fee Owing'
 					order by r.updated_at asc
                     '''
             rs = db.session.execute(text(sql))
-            onholdapplicationfeerequests = rs
+            appfeeowingrequests = rs
         except Exception as ex:
             logging.error(ex)
             raise ex
         finally:
             db.session.close()
-        return onholdapplicationfeerequests
+        return appfeeowingrequests
 
     @classmethod
     def getversionforrequest(cls,requestid):   
