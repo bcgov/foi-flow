@@ -95,7 +95,7 @@ class FOIRawRequest(Resource):
 
             if int(requestid) and str(requestid) != "-1" :
                 status = rawrequestservice().getstatus(updaterequest)
-                if status not in ['Intake in Progress', 'Closed', 'Redirect', 'Peer Review', 'Section 5 Pending', 'On-Hold - Application Fee']:
+                if status not in ['Intake in Progress', 'Closed', 'Redirect', 'Peer Review', 'Section 5 Pending', 'App Fee Owing']:
                     raise ValueError('Invalid request state.')
                 result = rawrequestservice().saverawrequestversion(updaterequest,requestid,assigneegroup,assignee,status,AuthHelper.getuserid(),assigneefirstname,assigneemiddlename,assigneelastname, actiontype)                
                 assignee = ''
