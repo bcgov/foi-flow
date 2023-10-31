@@ -121,6 +121,8 @@ const StateDropDown = ({
             return _stateList.consult;
           else if(previousState === StateEnum.response.name)
             return _stateList.response;
+          else if(previousState === StateEnum.appfeeowing.name)
+            return _stateList.appfeeowing
         }
         else{
           return _stateList.peerreview;
