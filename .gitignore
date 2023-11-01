@@ -1,3 +1,4 @@
+notification-manager/env/*
 request-management-api/__pycache__/*.*
 request-management-api/env/*
 request-management-api/env/Lib/*
