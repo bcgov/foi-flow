@@ -16,6 +16,7 @@ class FOIRequestNotificationUser(object):
     created_at = fields.Str(data_key="created_at")
 
     def savenotificationuser(self, notificationuser):
+        conn = None
         try:
             conn = getconnection()
             cursor = conn.cursor()
@@ -26,7 +27,7 @@ class FOIRequestNotificationUser(object):
             cursor.close()
         except(Exception) as error:
             logging.error(error)
-            raise   
         finally:
-            conn.close()
+            if conn:
+                conn.close()
             

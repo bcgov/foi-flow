@@ -1,0 +1,10 @@
+﻿<?xml version="1.0"?>
+<DTS:ConnectionManager xmlns:DTS="www.microsoft.com/SqlServer/Dts"
+  DTS:ObjectName="PostgreSQLFOIFLOW"
+  DTS:DTSID="{18EF9DFD-37E1-484D-9BC1-BFE418845E48}"
+  DTS:CreationName="ODBC">
+  <DTS:ObjectData>
+    <DTS:ConnectionManager
+      DTS:ConnectionString="Dsn=PostgreSQLFOIFLOW;" />
+  </DTS:ObjectData>
+</DTS:ConnectionManager>

@@ -40,7 +40,7 @@ class FOIAdditionallPersonalInfoWrapperSchema(Schema):
     adoptiveFatherLastName = fields.Str(data_key="adoptiveFatherLastName",allow_none=True, validate=[validate.Length(max=50, error=MAX_EXCEPTION_MESSAGE)])
     
     personalHealthNumber = fields.Str(data_key="personalHealthNumber",allow_none=True, validate=[validate.Length(max=50, error=MAX_EXCEPTION_MESSAGE)])   
-    identityVerified = fields.Str(data_key="identityVerified",allow_none=True, validate=[validate.Length(max=50, error=MAX_EXCEPTION_MESSAGE)]) 
+    #identityVerified = fields.Str(data_key="identityVerified",allow_none=True, validate=[validate.Length(max=50, error=MAX_EXCEPTION_MESSAGE)]) 
     
     birthDate = fields.Str(data_key="birthDate",allow_none=True)
     alsoKnownAs = fields.Str(data_key="alsoKnownAs",allow_none=True)
@@ -78,6 +78,7 @@ class FOIRequestWrapperSchema(Schema):
     dueDate = fields.Str(data_key="dueDate", required=True,validate=[validate.Length(min=1, error=BLANK_EXCEPTION_MESSAGE)])
     paymentExpiryDate = fields.Str(data_key="paymentExpiryDate", required=False,allow_none=True)
     cfrDueDate = fields.Date(data_key="cfrDueDate", required=False,allow_none=True)
+    originalDueDate = fields.Date(data_key="originalDueDate", required=False,allow_none=True)
     deliveryMode = fields.Str(data_key="deliveryMode", required=True,validate=[validate.Length(min=1, error=BLANK_EXCEPTION_MESSAGE)])   
     receivedMode = fields.Str(data_key="receivedMode", required=True,validate=[validate.Length(min=1, error=BLANK_EXCEPTION_MESSAGE)])   
     receivedDate = fields.Str(data_key="receivedDateUF", required=True,validate=[validate.Length(min=1, error=BLANK_EXCEPTION_MESSAGE)])
@@ -117,6 +118,8 @@ class FOIRequestWrapperSchema(Schema):
     subjectCode = fields.Str(data_key="subjectCode",allow_none=True, validate=[validate.Length(max=120, error=MAX_EXCEPTION_MESSAGE)])   
     isofflinepayment =   fields.Bool(data_key="isofflinepayment")
     linkedRequests = fields.List(fields.Dict(data_key="linkedRequests", required=False))
+    identityVerified = fields.Str(data_key="identityVerified",allow_none=True)
+
 
 class EditableFOIMinistryRequestWrapperSchema(Schema):
     class Meta:  # pylint: disable=too-few-public-methods
@@ -144,6 +147,15 @@ class FOIMinistryRequestDivisionSchema(Schema):
     eApproval = fields.Str(data_key="eApproval",allow_none=True, validate=[validate.Length(max=12, error=MAX_EXCEPTION_MESSAGE)])
     divisionReceivedDate = fields.Str(data_key="divisionReceivedDate",allow_none=True)
 
+class CreateMinistrySignOffApprovalSchema(Schema):
+    class Meta:  # pylint: disable=too-few-public-methods
+        """Exclude unknown fields in the deserialized output."""
+
+        unknown = EXCLUDE 
+    approvername = fields.Str(data_key="approverName", allow_none=False)
+    approvertitle = fields.Str(data_key="approverTitle", allow_none=False)
+    approveddate = fields.Str(data_key="approvedDate", allow_none=False)
+
   
 class FOIRequestMinistrySchema(Schema):
     
@@ -164,3 +176,4 @@ class FOIRequestMinistrySchema(Schema):
     assignedministrypersonFirstName = fields.Str(data_key="assignedministrypersonFirstName",allow_none=True, validate=[validate.Length(max=50, error=MAX_EXCEPTION_MESSAGE)])
     assignedministrypersonMiddleName = fields.Str(data_key="assignedministrypersonMiddleName",allow_none=True, validate=[validate.Length(max=50, error=MAX_EXCEPTION_MESSAGE)])
     assignedministrypersonLastName = fields.Str(data_key="assignedministrypersonLastName",allow_none=True, validate=[validate.Length(max=50, error=MAX_EXCEPTION_MESSAGE)])
+    ministrysignoffapproval = fields.Nested(CreateMinistrySignOffApprovalSchema, data_key="ministrysignoffapproval", allow_none=True)

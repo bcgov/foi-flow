@@ -6,6 +6,14 @@
     align-items: center;
     background-color: white;
 }
+.file-upload-container-scanning {
+  position: relative;   
+  padding: 0px 35px 0px 35px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: white;
+}
 .drag-and-drop-text {   
     margin-top: 15% !important;
     margin-left: 20%;
@@ -140,4 +148,13 @@
     line-height: 1rem;
     font-size: 12px;
   }
+}
+.tag-message-container-scanning {
+  margin: 5px 0px 20px 9%;
+  display: block;
+  p {
+    line-height: 1rem;
+    font-size: 12px;
+  }
+  padding-right: 10px;
 }

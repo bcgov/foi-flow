@@ -23,6 +23,7 @@ import {
   fetchClosingReasonList,
   fetchFOIMinistryAssignedToList,
   fetchFOISubjectCodeList,
+  fetchFOIPersonalDivisionsAndSections,
 } from "../../../apiManager/services/FOI/foiMasterDataServices";
 import {
   fetchFOIRequestDetailsWrapper,
@@ -87,6 +88,7 @@ import { RecordsLog } from "../customComponents/Records";
 import { UnsavedModal } from "../customComponents";
 import { DISABLE_GATHERINGRECORDS_TAB } from "../../../constants/constants";
 import _ from "lodash";
+import { MinistryNeedsScanning } from "../../../constants/FOI/enum";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -248,6 +250,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
   const dispatch = useDispatch();
   const [isIAORestricted, setIsIAORestricted] = useState(false);
   const [redactedSections, setRedactedSections] = useState("");
+  const [isMCFPersonal, setIsMCFPersonal] = useState(bcgovcode.replaceAll('"', '') == "MCF" && requestDetails.requestType == FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL);
 
   useEffect(() => {
     if (window.location.href.indexOf("comments") > -1) {
@@ -314,6 +317,13 @@ const FOIRequest = React.memo(({ userDetail }) => {
         : [];
       if (requestDetails.axisRequestId) axisBannerCheck();
       setIsIAORestricted(isRequestRestricted(requestDetails, ministryId));
+    }
+
+    if(MinistryNeedsScanning.includes(bcgovcode.replaceAll('"', '')) && requestDetails.requestType == FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL) {
+      dispatch(fetchFOIPersonalDivisionsAndSections(bcgovcode.replaceAll('"', '')));
+      if(bcgovcode.replaceAll('"', '') == "MCF") {
+        setIsMCFPersonal(true);
+      }
     }
   }, [requestDetails]);
 
@@ -831,8 +841,8 @@ const FOIRequest = React.memo(({ userDetail }) => {
       requestState !== StateEnum.intakeinprogress.name &&
       requestState !== StateEnum.unopened.name &&
       requestState !== StateEnum.open.name &&
-      requestDetails?.divisions?.length > 0 &&
-      DISABLE_GATHERINGRECORDS_TAB?.toLowerCase() == "false"
+      (requestDetails?.divisions?.length > 0 || isMCFPersonal) &&
+      DISABLE_GATHERINGRECORDS_TAB?.toLowerCase() =='false'
     );
   };
 
@@ -1460,6 +1470,8 @@ const FOIRequest = React.memo(({ userDetail }) => {
                   bcgovcode={JSON.parse(bcgovcode)}
                   setRecordsUploading={setRecordsUploading}
                   divisions={requestDetails.divisions}
+                  recordsTabSelect={tabLinksStatuses.Records.active}
+                  requestType={requestDetails?.requestType}
                 />
               </>
             )}

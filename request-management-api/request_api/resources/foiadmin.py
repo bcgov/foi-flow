@@ -40,7 +40,7 @@ EXCEPTION_MESSAGE_NOT_FOUND='Not Found'
 @cors_preflight('GET,OPTIONS')
 @API.route('/foiadmin/divisions')
 class FOIProgramAreaDivisions(Resource):
-    """Retrieves all FOI program area divisions"""
+    """Retrieves all FOI program area divisions/sections"""
 
     @staticmethod
     @TRACER.trace()
@@ -49,7 +49,7 @@ class FOIProgramAreaDivisions(Resource):
     @auth.isfoiadmin()
     def get():
         try:
-            result = programareadivisionservice().getallprogramareadivisions()
+            result = programareadivisionservice().getallprogramareadivisonsandsections()
             return json.dumps(result), 200
         except KeyError as error:
             return {'status': False, 'message': CUSTOM_KEYERROR_MESSAGE + str(error)}, 400        
@@ -59,7 +59,7 @@ class FOIProgramAreaDivisions(Resource):
 @cors_preflight('POST,OPTIONS')
 @API.route('/foiadmin/division')
 class CreateFOIProgramAreaDivision(Resource):
-    """Creates FOI program area division"""
+    """Creates FOI program area division/section"""
 
     @staticmethod
     @TRACER.trace()
@@ -71,8 +71,6 @@ class CreateFOIProgramAreaDivision(Resource):
             requestjson = request.get_json()
             programareadivisionschema = FOIProgramAreaDivisionSchema().load(requestjson)
             result = programareadivisionservice().createprogramareadivision(programareadivisionschema)
-            # if result.success == True:
-            #   asyncio.ensure_future();
             return {'status': result.success, 'message':result.message, 'id':result.identifier}, 200 
         except KeyError as error:
             return {'status': False, 'message': CUSTOM_KEYERROR_MESSAGE + str(error)}, 400      
@@ -83,7 +81,7 @@ class CreateFOIProgramAreaDivision(Resource):
 @cors_preflight('PUT,OPTIONS')
 @API.route('/foiadmin/division/<divisionid>')
 class UpdateFOIProgramAreaDivision(Resource):
-    """Updates FOI program area division"""
+    """Updates FOI program area division/section"""
 
     @staticmethod
     @TRACER.trace()
@@ -95,8 +93,6 @@ class UpdateFOIProgramAreaDivision(Resource):
             requestjson = request.get_json()
             programareadivisionschema = FOIProgramAreaDivisionSchema().load(requestjson)
             result = programareadivisionservice().updateprogramareadivision(divisionid, programareadivisionschema, AuthHelper.getuserid())
-            # if result.success == True:
-            #   asyncio.ensure_future();
             return {'status': result.success, 'message':result.message, 'id':result.identifier}, 200 
         except KeyError as error:
             return {'status': False, 'message': CUSTOM_KEYERROR_MESSAGE + str(error)}, 400        
@@ -107,7 +103,7 @@ class UpdateFOIProgramAreaDivision(Resource):
 @cors_preflight('PUT,OPTIONS')
 @API.route('/foiadmin/division/<divisionid>/disable')
 class DisableFOIProgramAreaDivision(Resource):
-    """Disables FOI program area division"""
+    """Disables FOI program area division/section"""
     @staticmethod
     @TRACER.trace()
     @auth.require
@@ -116,8 +112,8 @@ class DisableFOIProgramAreaDivision(Resource):
     def put(divisionid):
         try:
             result = programareadivisionservice().disableprogramareadivision(divisionid, AuthHelper.getuserid())
-            # if result.success == True:
-            #   asyncio.ensure_future();
+            if result.success != True:
+                return {'status': result.success, 'message': result.message, 'id':result.identifier}, 400  
             return {'status': result.success, 'message':result.message, 'id':result.identifier}, 200 
         except KeyError as error:
             return {'status': False, 'message': CUSTOM_KEYERROR_MESSAGE + str(error)}, 400      

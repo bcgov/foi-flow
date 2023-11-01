@@ -16,6 +16,8 @@ import {
     setFOIDeliveryModeList,
     setFOIReceivedModeList,
     setFOIMinistryDivisionalStages,
+    setFOIPersonalDivisionsAndSections,
+    setFOIPersonalSections,
     setClosingReasons,
     setFOISubjectCodeList,  
     setCommentTagListLoader, 
@@ -358,6 +360,81 @@ import {
           dispatch(serviceActionError(error));
           dispatch(setFOILoader(false));
         });
+    };
+  };
+
+  export const fetchFOIPersonalDivisionsAndSections = (bcgovcode) => {
+    switch(bcgovcode) {
+      case "MCF":
+        const apiUrlMCF = replaceUrl(API.FOI_PERSONAL_SECTIONS, "<bcgovcode>", bcgovcode);
+        return (dispatch) => {
+          httpGETRequest(apiUrlMCF, {}, UserService.getToken())
+            .then((res) => {
+              if (res.data) {
+                const foiPersonalSections = res.data;
+                dispatch(setFOIPersonalSections({}));
+                dispatch(setFOIPersonalSections(foiPersonalSections));
+                dispatch(setFOILoader(false));
+              } else {
+                console.log(`Error while fetching ministry(${bcgovcode}) divisional stage master data`, res);
+                dispatch(serviceActionError(res));
+                dispatch(setFOILoader(false));
+              }
+            })
+            .catch((error) => {
+              console.log(`Error while fetching ministry(${bcgovcode}) divisional stage master data`, error);
+              dispatch(serviceActionError(error));
+              dispatch(setFOILoader(false));
+            });
+        };
+      case "MSD":
+        const apiUrlMSD = replaceUrl(API.FOI_PERSONAL_DIVISIONS_SECTIONS, "<bcgovcode>", bcgovcode);
+        return (dispatch) => {
+          httpGETRequest(apiUrlMSD, {}, UserService.getToken())
+            .then((res) => {
+              if (res.data) {
+                const foiPersonalDivisionsAndSections = res.data;
+                dispatch(setFOIPersonalDivisionsAndSections({}));
+                dispatch(setFOIPersonalDivisionsAndSections(foiPersonalDivisionsAndSections));
+                dispatch(setFOILoader(false));
+              } else {
+                console.log(`Error while fetching ministry(${bcgovcode}) divisional stage master data`, res);
+                dispatch(serviceActionError(res));
+                dispatch(setFOILoader(false));
+              }
+            })
+            .catch((error) => {
+              console.log(`Error while fetching ministry(${bcgovcode}) divisional stage master data`, error);
+              dispatch(serviceActionError(error));
+              dispatch(setFOILoader(false));
+            });
+        };
+      default:
+        break;
+    }
+  };
+
+  export const fetchFOIPersonalDivisions = (bcgovcode) => {
+    const apiUrl = replaceUrl(API.FOI_PERSONAL_DIVISIONS, "<bcgovcode>", bcgovcode);
+    return (dispatch) => {
+      httpGETRequest(apiUrl, {}, UserService.getToken())
+      .then((res) => {
+        if (res.data) {
+          const foiMinistryDivisionalStages = res.data;
+          dispatch(setFOIMinistryDivisionalStages({}));
+          dispatch(setFOIMinistryDivisionalStages(foiMinistryDivisionalStages));
+          dispatch(setFOILoader(false));
+        } else {
+          console.log(`Error while fetching ministry(${bcgovcode}) divisional stage master data`, res);
+          dispatch(serviceActionError(res));
+          dispatch(setFOILoader(false));
+        }
+      })
+      .catch((error) => {
+        console.log(`Error while fetching ministry(${bcgovcode}) divisional stage master data`, error);
+        dispatch(serviceActionError(error));
+        dispatch(setFOILoader(false));
+      });
     };
   };
 

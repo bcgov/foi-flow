@@ -14,6 +14,7 @@ from request_api.services.paymentservice import paymentservice
 from request_api.services.subjectcodeservice import subjectcodeservice
 from request_api.services.programareaservice import programareaservice
 from request_api.utils.commons.datetimehandler import datetimehandler
+from request_api.services.external.keycloakadminservice import KeycloakAdminService
 
 class requestservicegetter:
     """ This class consolidates retrival of FOI request for actors: iao and ministry. 
@@ -54,8 +55,8 @@ class requestservicegetter:
         additionalpersonalinfo.update(additionalpersonalinfodetails)
         
         baserequestinfo['additionalPersonalInfo'] = additionalpersonalinfo
-        originalduedate = FOIMinistryRequest.getrequestoriginalduedate(foiministryrequestid)       
-        baserequestinfo['originalDueDate'] = originalduedate.strftime(self.__genericdateformat())
+        originalLdd= FOIMinistryRequest.getrequestoriginalduedate(foiministryrequestid).strftime(self.__genericdateformat())
+        baserequestinfo['originalDueDate'] = parse(requestministry['originalldd']).strftime(self.__genericdateformat()) if requestministry['originalldd'] is not None else originalLdd
         baserequestinfo['iaorestricteddetails'] = iaorestrictrequestdetails
         return baserequestinfo
     
@@ -142,6 +143,7 @@ class requestservicegetter:
             'receivedmodeid':request['receivedmode.receivedmodeid'],
             'receivedMode':request['receivedmode.name'],
             'assignedGroup': requestministry["assignedgroup"],
+            'assignedGroupEmail': KeycloakAdminService().processgroupEmail(requestministry["assignedgroup"]),
             'assignedTo': requestministry["assignedto"],
             'idNumber':requestministry["filenumber"],
             'axisRequestId': requestministry["axisrequestid"],
@@ -153,7 +155,8 @@ class requestservicegetter:
             'currentState':requestministry['requeststatus.name'],            
             'requeststatusid':requestministry['requeststatus.requeststatusid'],
             'requestProcessStart': parse(requestministry['startdate']).strftime(self.__genericdateformat()) if requestministry['startdate'] is not None else '',
-            'dueDate':parse(requestministry['duedate']).strftime(self.__genericdateformat()),            
+            'dueDate':parse(requestministry['duedate']).strftime(self.__genericdateformat()),  
+            'originalDueDate':  parse(requestministry['originalldd']).strftime(self.__genericdateformat()) if requestministry['originalldd'] is not None else parse(requestministry['duedate']).strftime(self.__genericdateformat()),            
             'programareaid':requestministry['programarea.programareaid'],
             'bcgovcode':requestministry['programarea.bcgovcode'],
             'category':request['applicantcategory.name'],
@@ -171,7 +174,9 @@ class requestservicegetter:
             'closedate': parse(requestministry['closedate']).strftime(self.__genericdateformat()) if requestministry['closedate'] is not None else None,
             'subjectCode': subjectcodeservice().getministrysubjectcodename(foiministryrequestid),
             'isofflinepayment': FOIMinistryRequest.getofflinepaymentflag(foiministryrequestid),
-            'linkedRequests' : linkedministryrequests
+            'linkedRequests' : linkedministryrequests,
+            'identityVerified':requestministry['identityverified'],
+            
         }
         if requestministry['cfrduedate'] is not None:
             baserequestinfo.update({'cfrDueDate':parse(requestministry['cfrduedate']).strftime(self.__genericdateformat())})
