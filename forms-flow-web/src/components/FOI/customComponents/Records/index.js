@@ -124,6 +124,7 @@ import { MinistryNeedsScanning } from "../../../../constants/FOI/enum";
 import FOI_COMPONENT_CONSTANTS from "../../../../constants/FOI/foiComponentConstants";
 import MCFPersonal from './MCFPersonal';
 import MSDPersonal from './MSDPersonal';
+import { createWorker } from 'tesseract.js';
 
 const useStyles = makeStyles((_theme) => ({
   createButton: {
@@ -531,6 +532,16 @@ export const RecordsLog = ({
               updateAttachment.s3uripath.lastIndexOf(".")
             ) + ".pdf";
         }
+        // fileInfoList[0].filename =
+        //   fileInfoList[0].filename.substr(
+        //       0,
+        //       fileInfoList[0].filename.lastIndexOf(".")
+        //     ) + ".pdf";
+        // files[0].filename =
+        //     files[0].filename.substr(
+        //         0,
+        //         files[0].filename.lastIndexOf(".")
+        //       ) + ".pdf";
         postFOIS3DocumentPreSignedUrl(
           ministryId,
           fileInfoList.map((file) => ({ ...file, multipart: true })),
@@ -599,7 +610,10 @@ export const RecordsLog = ({
                     },
                   };
                 }
+                // const worker = await createWorker('eng');
+                // const res = await worker.recognize(_file,{pdfTitle: "Example PDF"},{pdf: true});
                 let bytes = await readUploadedFileAsBytes(_file);
+                // let bytes = res.data.pdf.buffer;
                 const CHUNK_SIZE = OSS_S3_CHUNK_SIZE;
                 const totalChunks = Math.ceil(bytes.byteLength / CHUNK_SIZE);
                 let parts = [];
