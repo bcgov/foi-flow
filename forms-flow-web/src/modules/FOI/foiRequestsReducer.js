@@ -1,5 +1,5 @@
 import FOI_ACTION_CONSTANTS from "../../actions/FOI/foiActionConstants";
-import _ from 'lodash';
+import _ from "lodash";
 const initialState = {
   isLoading: true,
   isEventsLoading: true,
@@ -51,12 +51,16 @@ const initialState = {
   foiRequestAttachments: [],
   foiRequestRecords: {
     records: [],
-    dedupedfiles:0,
-    removedfiles:0,
-    batchcount:0
+    dedupedfiles: 0,
+    removedfiles: 0,
+    batchcount: 0,
   },
   foiPDFStitchedRecordForHarms: {},
-  foiPDFStitchStatusForHarms:"not started",
+  foiPDFStitchedRecordForRedlines: {},
+  foiPDFStitchedRecordForResponsePackage: {},
+  foiPDFStitchStatusForHarms: "not started",
+  foiPDFStitchStatusForRedlines: "not started",
+  foiPDFStitchStatusForResponsePackage: "not started",
   foiRequestCFRForm: {
     overallsuggestions: "",
     status: "init",
@@ -78,7 +82,7 @@ const initialState = {
       estimatedhardcopypages: 0,
       actualministrypreparinghrs: 0,
       actualiaopreparinghrs: 0,
-    }
+    },
   },
   foiRequestCFRFormHistory: [],
   foiRequestApplicantCorrespondence: [],
@@ -88,16 +92,59 @@ const initialState = {
   resumeDefaultSorting: false,
   isCorrespondenceLoading: true,
   foiSubjectCodeList: [],
-  restrictedReqTaglist:[],
-  recordFormats: ['application/pdf',
-  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/vnd.ms-excel',
-  'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/msword',
-  'image/bmp','image/gif','image/jpeg','image/png','image/svg+xml','image/tiff','image/webp',
-  'application/vnd.ms-excel.sheet.macroEnabled.12','.msg', '.eml', '.xls', '.xlsx', '.doc', '.docx', '.ics','.json',
-   '.shx', '.shp','.dbf','.kml','.kmz','.geojson','.cpg','.prj','.sbn','.sbx','.gml','.gdb','.freelist','.atx','.gpkg','.mbtiles','.mpk','.wkt',
-  '.las','.lasd','.laz','.dwf','.dwg','.dxf','.csv','.txt','.png','.jpg', '.jpeg'],
+  restrictedReqTaglist: [],
+  recordFormats: [
+    "application/pdf",
+    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "application/vnd.ms-excel",
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    "application/msword",
+    "image/bmp",
+    "image/gif",
+    "image/jpeg",
+    "image/png",
+    "image/svg+xml",
+    "image/tiff",
+    "image/webp",
+    "application/vnd.ms-excel.sheet.macroEnabled.12",
+    ".msg",
+    ".eml",
+    ".xls",
+    ".xlsx",
+    ".doc",
+    ".docx",
+    ".ics",
+    ".json",
+    ".shx",
+    ".shp",
+    ".dbf",
+    ".kml",
+    ".kmz",
+    ".geojson",
+    ".cpg",
+    ".prj",
+    ".sbn",
+    ".sbx",
+    ".gml",
+    ".gdb",
+    ".freelist",
+    ".atx",
+    ".gpkg",
+    ".mbtiles",
+    ".mpk",
+    ".wkt",
+    ".las",
+    ".lasd",
+    ".laz",
+    ".dwf",
+    ".dwg",
+    ".dxf",
+    ".csv",
+    ".txt",
+    ".png",
+    ".jpg",
+  ],
   conversionFormats: [],
-  
 };
 
 const foiRequests = (state = initialState, action) => {
@@ -105,13 +152,13 @@ const foiRequests = (state = initialState, action) => {
     case FOI_ACTION_CONSTANTS.IS_LOADING:
       return { ...state, isLoading: action.payload };
     case FOI_ACTION_CONSTANTS.IS_RECORDS_LOADING:
-        return { ...state, isRecordsLoading: action.payload };  
+      return { ...state, isRecordsLoading: action.payload };
     case FOI_ACTION_CONSTANTS.IS_EVENTS_LOADING:
       return { ...state, isEventsLoading: action.payload };
     case FOI_ACTION_CONSTANTS.QUEUE_FILTER:
       return { ...state, queueFilter: action.payload };
-      case FOI_ACTION_CONSTANTS.QUEUE_PARAMS:
-        return { ...state, queueParams: action.payload };
+    case FOI_ACTION_CONSTANTS.QUEUE_PARAMS:
+      return { ...state, queueParams: action.payload };
     case FOI_ACTION_CONSTANTS.EVENT_QUEUE_FILTER:
       return { ...state, eventQueueFilter: action.payload };
     case FOI_ACTION_CONSTANTS.EVENT_QUEUE_PARAMS:
@@ -121,12 +168,12 @@ const foiRequests = (state = initialState, action) => {
     case FOI_ACTION_CONSTANTS.SHOW_EVENT_QUEUE:
       return { ...state, showEventQueue: action.payload };
     case FOI_ACTION_CONSTANTS.FOI_ADVANCED_SEARCH_PARAMS:
-      return { 
-        ...state, 
+      return {
+        ...state,
         foiAdvancedSearchParams: {
           ...state.foiAdvancedSearchParams,
-          ...action.payload 
-        }
+          ...action.payload,
+        },
       };
     case FOI_ACTION_CONSTANTS.IS_ASSIGNEDTOLIST_LOADING:
       return { ...state, isAssignedToListLoading: action.payload };
@@ -135,9 +182,17 @@ const foiRequests = (state = initialState, action) => {
     case FOI_ACTION_CONSTANTS.IS_COMMENTTAGLIST_LOADING:
       return { ...state, isCommentTagListLoading: action.payload };
     case FOI_ACTION_CONSTANTS.FOI_LIST_EVENTS:
-        return { ...state, foiEventsList: action.payload, isEventsLoading: false };
+      return {
+        ...state,
+        foiEventsList: action.payload,
+        isEventsLoading: false,
+      };
     case FOI_ACTION_CONSTANTS.FOI_MINISTRY_EVENTLIST:
-        return { ...state, foiMinistryEventsList: action.payload, isEventsLoading: false };
+      return {
+        ...state,
+        foiMinistryEventsList: action.payload,
+        isEventsLoading: false,
+      };
     case FOI_ACTION_CONSTANTS.FOI_LIST_REQUESTS:
       return { ...state, foiRequestsList: action.payload, isLoading: false };
     case FOI_ACTION_CONSTANTS.FOI_MINISTRY_REQUESTSLIST:
@@ -202,22 +257,38 @@ const foiRequests = (state = initialState, action) => {
       return { ...state, foiRequestRecords: action.payload };
     case FOI_ACTION_CONSTANTS.FOI_PDF_STITCHED_RECORD_FOR_HARMS:
       return { ...state, foiPDFStitchedRecordForHarms: action.payload };
+    case FOI_ACTION_CONSTANTS.FOI_PDF_STITCHED_RECORD_FOR_REDLINES:
+      return { ...state, foiPDFStitchedRecordForRedlines: action.payload };
+    case FOI_ACTION_CONSTANTS.FOI_PDF_STITCHED_RECORD_FOR_RESPONSEPACKAGE:
+      return {
+        ...state,
+        foiPDFStitchedRecordForResponsePackage: action.payload,
+      };
     case FOI_ACTION_CONSTANTS.FOI_PDF_STITCHED_STATUS_FOR_HARMS:
       return { ...state, foiPDFStitchStatusForHarms: action.payload };
+    case FOI_ACTION_CONSTANTS.FOI_PDF_STITCHED_STATUS_FOR_REDLINES:
+      return { ...state, foiPDFStitchStatusForRedlines: action.payload };
+    case FOI_ACTION_CONSTANTS.FOI_PDF_STITCHED_STATUS_FOR_RESPONSEPACKAGE:
+      return { ...state, foiPDFStitchStatusForResponsePackage: action.payload };
     case FOI_ACTION_CONSTANTS.FOI_REQUEST_CFR_FORM:
       return {
         ...state,
-        foiRequestCFRForm: _.isEmpty(action.payload) ? initialState.foiRequestCFRForm : {
-          ...state.foiRequestCFRForm,
-          ...action.payload
-        }
+        foiRequestCFRForm: _.isEmpty(action.payload)
+          ? initialState.foiRequestCFRForm
+          : {
+              ...state.foiRequestCFRForm,
+              ...action.payload,
+            },
       };
     case FOI_ACTION_CONSTANTS.FOI_REQUEST_CFR_FORM_HISTORY:
       return { ...state, foiRequestCFRFormHistory: action.payload };
     case FOI_ACTION_CONSTANTS.FOI_REQUEST_APPLICANT_CORRESPONDENCE:
       return { ...state, foiRequestApplicantCorrespondence: action.payload };
     case FOI_ACTION_CONSTANTS.FOI_REQUEST_APPLICANT_CORRESPONDENCE_TEMPLATES:
-      return { ...state, foiRequestApplicantCorrespondenceTemplates: action.payload };
+      return {
+        ...state,
+        foiRequestApplicantCorrespondenceTemplates: action.payload,
+      };
     case FOI_ACTION_CONSTANTS.FOI_REQUEST_EXTENSIONS:
       return { ...state, foiRequestExtesions: action.payload };
     case FOI_ACTION_CONSTANTS.FOI_OPENED_MINISTRIES:
@@ -240,4 +311,4 @@ const foiRequests = (state = initialState, action) => {
       return state;
   }
 };
-export default foiRequests ;
+export default foiRequests;
