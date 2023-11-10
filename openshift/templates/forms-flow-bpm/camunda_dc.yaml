@@ -21,7 +21,7 @@ objects:
         #mail.imaps.timeout=10000
         # additional config
         #mail.poll.folder=INBOX
-        mail.sender=donotreply@gov.bc.ca
+        mail.sender=${SMTP_MAIL_SENDER}
         mail.sender.alias=DoNotReply
         mail.attachment.download=true
         mail.attachment.path=attachments
@@ -105,11 +105,35 @@ objects:
           containers:
             - env:
                 - name: APP_SECURITY_ORIGIN
-                  value: ${APP_SECURITY_ORIGIN}
+                  valueFrom:
+                    secretKeyRef:
+                      key: APP_SECURITY_ORIGIN
+                      name: ${FFA_BPM_SECRET}
+                - name: WEBSOCKET_SECURITY_ORIGIN
+                  valueFrom:
+                    secretKeyRef:
+                      key: WEBSOCKET_SECURITY_ORIGIN
+                      name: ${FFA_BPM_SECRET}
                 - name: CAMUNDA_JDBC_DRIVER
-                  value: 'org.postgresql.Driver'  
+                  valueFrom:
+                    secretKeyRef:
+                      key: CAMUNDA_JDBC_DRIVER
+                      name: ${FFA_BPM_SECRET}  
                 - name: DATABASE_SERVICE_NAME
-                  value: ${DATABASE_SERVICE_NAME}
+                  valueFrom:
+                    secretKeyRef:
+                      key: DATABASE_SERVICE_NAME
+                      name: ${FFA_BPM_SECRET}
+                - name: DATABASE_PORT
+                  valueFrom:
+                    secretKeyRef:
+                      key: DATABASE_PORT
+                      name: ${FFA_BPM_SECRET}
+                - name: DATABASE_NAME
+                  valueFrom:
+                    secretKeyRef:
+                      key: DATABASE_NAME
+                      name: ${FFA_BPM_SECRET}
                 - name: CAMUNDA_JDBC_URL
                   value: jdbc:postgresql://${DATABASE_SERVICE_NAME}:${DATABASE_PORT}/${DATABASE_NAME}
                 - name: WAIT_FOR
@@ -125,16 +149,25 @@ objects:
                       key: app-db-password
                       name: ${DATABASE_SECRET}                      
                 - name: KEYCLOAK_URL
-                  value: ${KEYCLOAK_URL}
+                  valueFrom:
+                    secretKeyRef:
+                      key: KEYCLOAK_URL
+                      name: ${FFA_BPM_SECRET}
                 - name: KEYCLOAK_URL_REALM
-                  value: ${KEYCLOAK_URL_REALM}
+                  valueFrom:
+                    secretKeyRef:
+                      key: KEYCLOAK_URL_REALM
+                      name: ${FFA_BPM_SECRET}
                 - name: KEYCLOAK_CLIENTID
-                  value: ${KEYCLOAK_CLIENTID}
+                  valueFrom:
+                    secretKeyRef:
+                      key: KEYCLOAK_CLIENTID
+                      name: ${FFA_BPM_SECRET}
                 - name: KEYCLOAK_CLIENTSECRET
                   valueFrom:
                     secretKeyRef:
                       key: BPM_CLIENT_SECRET
-                      name: ${FOI_SECRET}
+                      name: ${FFA_BPM_SECRET}
                 - name: DEBUG
                   value: "False"
                 - name: MAIL_CONFIG
@@ -142,20 +175,19 @@ objects:
                 - name: TZ
                   value: UTC
                 - name: CAMUNDA_JDBC_DB
-                  value: ${DATABASE_NAME}
-                - name: FORMSFLOW_API_URL
-                  value: ${FORMSFLOW_API_URL}
+                  valueFrom:
+                    secretKeyRef:
+                      key: DATABASE_NAME
+                      name: ${FFA_BPM_SECRET}
                 - name: CAMUNDA_APP_ROOT_LOG_FLAG
-                  value: ${CAMUNDA_APP_ROOT_LOG_FLAG}
+                  value: info
                 - name: WEBSOCKET_ENCRYPT_KEY
                   valueFrom:
                     secretKeyRef:
                       key: WEBSOCKET_ENCRYPT_KEY
-                      name: ${FOI_SECRET}
+                      name: ${FFA_BPM_SECRET}
                 - name: WEBSOCKET_MESSAGE_TYPE
-                  value: ${WEBSOCKET_MESSAGE_TYPE}
-                - name: WEBSOCKET_SECURITY_ORIGIN
-                  value: ${WEBSOCKET_SECURITY_ORIGIN}
+                  value: ${WEBSOCKET_MESSAGE_TYPE}                
                 - name: WEBSOCKET_BROKER_HOST
                   value: ${WEBSOCKET_BROKER_HOST}
                 - name: WEBSOCKET_BROKER_PORT
@@ -166,11 +198,46 @@ objects:
                       key: password
                       name: ${MSGBROKER_SECRET}                 
                 - name: WEBSOCKET_FOI_RAWREQUEST_TOPIC
-                  value: ${WEBSOCKET_FOI_RAWREQUEST_TOPIC}                      
+                  value: ${WEBSOCKET_FOI_RAWREQUEST_TOPIC} 
                 - name: FORMSFLOW_WF_URL
-                  value: ${FORMSFLOW_WF_URL}                     
+                  valueFrom:
+                    secretKeyRef:
+                      key: FORMSFLOW_WF_URL
+                      name: ${FFA_BPM_SECRET} 
                 - name: FOI_REQ_MANAGEMENT_API_URL
-                  value: ${FOI_REQ_MANAGEMENT_API_URL}  
+                  value: ${FOI_REQ_MANAGEMENT_API_URL}
+                - name: FORMSFLOW_API_URL
+                  valueFrom:
+                    secretKeyRef:
+                      key: FORMSFLOW_API_URL
+                      name: ${FFA_BPM_SECRET}  
+                - name: FORMSFLOW_WEB_URL
+                  valueFrom:
+                    secretKeyRef:
+                      key: FORMSFLOW_WEB_URL
+                      name: ${FFA_BPM_SECRET}  
+                - name: FORMIO_ROOT_EMAIL
+                  valueFrom:
+                    secretKeyRef:
+                      key: formio_root_email
+                      name: ${FFA_SECRET}
+                - name: FORMIO_ROOT_PASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      key: formio_root_password
+                      name: ${FFA_SECRET}
+                - name: FORMIO_DEFAULT_PROJECT_URL
+                  valueFrom:
+                    secretKeyRef:
+                      key: FORMIO_DEFAULT_PROJECT_URL
+                      name: ${FFA_BPM_SECRET}  
+                - name: FORMIO_URL
+                  valueFrom:
+                    secretKeyRef:
+                      key: FORMIO_URL
+                      name: ${FFA_BPM_SECRET}  
+                - name: isIMAPEnabled
+                  value: "False"
               imagePullPolicy: Always
               name: ${NAME}
               ports:
@@ -221,7 +288,7 @@ objects:
           - ${NAME}
           from:
             kind: ImageStreamTag
-            name: ${NAME}:${IMAGE_TAG}
+            name: ${IMAGE_NAME}:${IMAGE_TAG}
             namespace: ${TOOLS_WORKSPACE}
         type: ImageChange
 
@@ -229,63 +296,31 @@ parameters:
   - name: NAME
     description: The name for all created objects.
     required: true
-    value: forms-flow-bpm
+  - name: IMAGE_NAME
+    description: The Image name.
+    required: true
   - name: IMAGE_TAG
     description: The image tag to pull for the deployment.
     required: true
-    value: ""
   - name: TOOLS_WORKSPACE
     description: The location for your image streams (Tools Workspace).
     required: true
-    value: ""
-  - name: APP_SECURITY_ORIGIN
-    description: Secrets are referred from this.
-    required: true
-    value: ""
   - name: DATABASE_SECRET
     description: Secrets are referred from this.
     required: true
-    value: patroni-001
-  - name: FOI_SECRET
+  - name: FFA_SECRET
     description: Secrets are referred from this.
     required: true
-    value: foi
+  - name: FFA_BPM_SECRET
+    description: Secrets are referred from this.
+    required: true
   - name: MSGBROKER_SECRET
     description: Secrets are referred from this.
     required: true
-    value: redis-foi-msgbroker-secret
-  - name: DATABASE_SERVICE_NAME
-    description: The Service name used to connect to the database.
-    required: true
-    value: "patroni-master-001"
-  - name: DATABASE_NAME
-    description: The name of the database to connect to.
-    required: true
-    value: "ffa-camunda"
-  - name: DATABASE_PORT
-    description: The port that the database is running on.
-    required: true
-    value: "5432"  
-  - name: FORMSFLOW_API_URL
-    description: FORMSFLOW_API_URL
-    required: true
-    value: "NA"
   - name: CAMUNDA_APP_ROOT_LOG_FLAG
     description: CAMUNDA_APP_ROOT_LOG_FLAG
     required: true
     value: "info"
-  - name: KEYCLOAK_URL
-    description: The URL used to connnect to the OIDC provider.
-    required: true
-    value: ""
-  - name: KEYCLOAK_URL_REALM
-    description: The realm from OIDC provider.
-    required: true
-    value: ""
-  - name: KEYCLOAK_CLIENTID
-    description: The Client ID.
-    required: true
-    value: "forms-flow-bpm"
   - name: CAMUNDA_URL
     displayName: CAMUNDA_URL
     description:
@@ -295,27 +330,21 @@ parameters:
     description: WEBSOCKET_MESSAGE_TYPE
     required: true
     value: "TASK_EVENT"
-  - name: WEBSOCKET_SECURITY_ORIGIN
-    description: WEBSOCKET_SECURITY_ORIGIN
-    required: false
-    value: ""
   - name: WEBSOCKET_BROKER_HOST
     description: WEBSOCKET_BROKER_HOST
     required: true
-    value: "redis-foi-msgbroker"
   - name: WEBSOCKET_BROKER_PORT
     description: WEBSOCKET_BROKER_PORT
     required: true
-    value: "6379"
   - name: WEBSOCKET_FOI_RAWREQUEST_TOPIC
     description: WEBSOCKET_FOI_RAWREQUEST_TOPIC
     required: true
-    value: "foi-rawrequest"
-  - name: FORMSFLOW_WF_URL
-    description: FORMSFLOW_WF_URL
-    required: true
-    value: ""
   - name: FOI_REQ_MANAGEMENT_API_URL
     description: FOI_REQ_MANAGEMENT_API_URL
     required: true
-    value: ""
+  - name: SMTP_SERVER
+    description: SMTP_SERVER
+    required: true
+  - name: SMTP_MAIL_SENDER
+    description: SMTP_MAIL_SENDER
+    required: true
