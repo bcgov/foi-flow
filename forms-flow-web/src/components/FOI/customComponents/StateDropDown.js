@@ -121,6 +121,8 @@ const StateDropDown = ({
             return _stateList.consult;
           else if(previousState === StateEnum.response.name)
             return _stateList.response;
+          else if(previousState === StateEnum.appfeeowing.name)
+            return _stateList.appfeeowing
         }
         else{
           return _stateList.peerreview;
@@ -175,8 +177,8 @@ const StateDropDown = ({
           return _stateList.section5pending;
         } 
         break
-      case StateEnum.onholdapplicationfee.name.toLowerCase():
-        return _stateList.onholdapplicationfee;
+      case StateEnum.appfeeowing.name.toLowerCase():
+        return _stateList.appfeeowing;
         
       default:
         return [];
