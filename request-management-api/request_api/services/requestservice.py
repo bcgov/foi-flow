@@ -65,36 +65,13 @@ class requestservice:
         nextstatename = FOIRequestStatus.getrequeststatusname(
             foirequestschema["requeststatusid"]
         )
-        # foirequest = self.getrequest(foirequestid, ministryid)
-        # print("foirequest >>>>>>>> ", foirequest)
-        # currentstatus = (
-        #     foirequest["stateTransition"][0]["status"]
-        #     if "stateTransition" in foirequest
-        #     and len(foirequest["stateTransition"]) > 1
-        #     else None
-        # )
-        # print("currentstatus >>>>>>>> ", currentstatus)
-        # rev_foirequestschema = foirequestschema
-        # if (
-        #     currentstatus not in (None, "")
-        #     and currentstatus == StateName.onhold.value
-        #     and nextstatename
-        #     in (StateName.callforrecords.value, StateName.response.value)
-        # ):
-        #     rev_foirequestschema = self.updateduedate(
-        #         foirequestid,
-        #         ministryid,
-        #         datetimehandler().gettoday(),
-        #         foirequestschema,
-        #         nextstatename,
-        #     )
         rev_foirequestschema = self.updateduedate(
-                foirequestid,
-                ministryid,
-                datetimehandler().gettoday(),
-                foirequestschema,
-                nextstatename,
-            )
+            foirequestid,
+            ministryid,
+            datetimehandler().gettoday(),
+            foirequestschema,
+            nextstatename,
+        )
         responseschema = requestservicecreate().saverequestversion(
             rev_foirequestschema, foirequestid, ministryid, userid
         )
@@ -139,18 +116,13 @@ class requestservice:
     def updateduedate(
         self, requestid, ministryrequestid, offholddate, foirequestschema, nextstatename
     ):
-        print("foirequestschema >>>>> ", foirequestschema)
-        print("nextstatename >>>> ", nextstatename)
-        print("offholddate >>>> ", offholddate)
         foirequest = self.getrequest(requestid, ministryrequestid)
-        print("foirequest >>>>>>>> ", foirequest)
         currentstatus = (
             foirequest["stateTransition"][0]["status"]
             if "stateTransition" in foirequest
             and len(foirequest["stateTransition"]) > 1
             else None
         )
-        print("currentstatus >>>>>>>> ", currentstatus)
         # Check for Off Hold
         if (
             currentstatus not in (None, "")
@@ -158,7 +130,7 @@ class requestservice:
             and nextstatename != StateName.response.value
         ):
             skipcalculation = self.__skipduedatecalculation(
-                ministryrequestid, offholddate
+                ministryrequestid, offholddate, currentstatus, nextstatename
             )
             # Skip multiple off hold in a day
             if skipcalculation == True:
@@ -306,8 +278,8 @@ class requestservice:
         if (
             currentstatus not in (None, "")
             and currentstatus == StateName.onhold.value
-            and nextstatename
-            in (StateName.callforrecords.value, StateName.response.value)
+            and nextstatename not in (None, "")
+            and currentstatus == nextstatename["name"]
         ):
             return True
         if previousoffholddate not in (None, ""):
