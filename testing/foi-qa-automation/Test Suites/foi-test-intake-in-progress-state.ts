@@ -616,4 +616,18 @@
          <variableId>8069a8ac-2438-456b-b7ed-f70da41aacde</variableId>
       </variableLink>
    </testCaseLink>
+   <testCaseLink>
+      <guid>f4ed181e-8e3c-4a12-94d2-75fba372faba</guid>
+      <isReuseDriver>false</isReuseDriver>
+      <isRun>true</isRun>
+      <testCaseId>Test Cases/state changes/Peer Review/foi-test-intake-in progress-peer review</testCaseId>
+      <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
+   </testCaseLink>
+   <testCaseLink>
+      <guid>028e6fe2-50d2-45ca-9fed-857ac0d206b6</guid>
+      <isReuseDriver>false</isReuseDriver>
+      <isRun>true</isRun>
+      <testCaseId>Test Cases/state changes/App-fee-Hold/foi-test-intake in-progress-App-fee-hold</testCaseId>
+      <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
+   </testCaseLink>
 </TestSuiteEntity>
