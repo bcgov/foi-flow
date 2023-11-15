@@ -233,7 +233,6 @@ const MinistryReview = React.memo(({ userDetail }) => {
         FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL
   );
   const [unSavedRequest, setUnSavedRequest] = React.useState(false);
-
   let ministryassignedtousername = "Unassigned";
   useEffect(() => {
     const requestDetailsValue = requestDetails;
