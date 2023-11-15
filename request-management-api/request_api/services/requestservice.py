@@ -274,6 +274,8 @@ class requestservice:
     def __skipduedatecalculation(
         self, ministryrequestid, offholddate, currentstatus="", nextstatename=""
     ):
+        print("currentstatus >>>>> ", currentstatus)
+        print("nextstatename >>>>> ", nextstatename)
         previousoffholddate = FOIMinistryRequest.getlastoffholddate(ministryrequestid)
         if (
             currentstatus not in (None, "")
