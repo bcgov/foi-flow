@@ -89,6 +89,7 @@ import { UnsavedModal } from "../customComponents";
 import { DISABLE_GATHERINGRECORDS_TAB } from "../../../constants/constants";
 import _ from "lodash";
 import { MinistryNeedsScanning } from "../../../constants/FOI/enum";
+import OIPCDetails from "./OIPCDetails/Index";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -251,6 +252,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
   const [isIAORestricted, setIsIAORestricted] = useState(false);
   const [redactedSections, setRedactedSections] = useState("");
   const [isMCFPersonal, setIsMCFPersonal] = useState(bcgovcode.replaceAll('"', '') == "MCF" && requestDetails.requestType == FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL);
+  const [showOIPCDetails, setShowOIPCDetails] = useState(true);
 
   useEffect(() => {
     if (window.location.href.indexOf("comments") > -1) {
@@ -1206,6 +1208,9 @@ const FOIRequest = React.memo(({ userDetail }) => {
                         <DivisionalTracking
                           divisions={requestDetails.divisions}
                         />
+                      )}
+                      {showOIPCDetails && (
+                        <OIPCDetails/>
                       )}
 
                       <BottomButtonGroup
