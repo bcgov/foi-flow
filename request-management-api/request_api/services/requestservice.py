@@ -62,8 +62,14 @@ class requestservice:
         )
 
     def saverequestversion(self, foirequestschema, foirequestid, ministryid, userid):
-        nextstatename = FOIRequestStatus.getrequeststatusname(
+        nextstate = FOIRequestStatus.getrequeststatusname(
             foirequestschema["requeststatusid"]
+        )
+        nextstatename = (
+            nextstate.get("name")
+            if isinstance(nextstatename, dict)
+            and nextstatename.get("name") not in (None, "")
+            else ""
         )
         rev_foirequestschema = self.updateduedate(
             foirequestid,
@@ -280,9 +286,8 @@ class requestservice:
         if (
             currentstatus not in (None, "")
             and currentstatus == StateName.onhold.value
-            and isinstance(nextstatename, dict)
-            and nextstatename.get("name") not in (None, "")
-            and currentstatus == nextstatename.get("name")
+            and nextstatename not in (None, "")
+            and currentstatus == nextstatename
         ):
             return True
         if previousoffholddate not in (None, ""):
