@@ -280,8 +280,9 @@ class requestservice:
         if (
             currentstatus not in (None, "")
             and currentstatus == StateName.onhold.value
-            and nextstatename not in (None, "")
-            and currentstatus == nextstatename["name"]
+            and isinstance(nextstatename, dict)
+            and nextstatename.get("name") not in (None, "")
+            and currentstatus == nextstatename.get("name")
         ):
             return True
         if previousoffholddate not in (None, ""):
