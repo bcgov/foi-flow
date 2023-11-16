@@ -1,5 +1,4 @@
 import OIPCDetailsList from "./OIPCDetailsList";
-import './oipcdetails.scss';
 import Accordion from '@material-ui/core/Accordion';
 import AccordionSummary from '@material-ui/core/AccordionSummary';
 import AccordionDetails from '@material-ui/core/AccordionDetails';
@@ -10,9 +9,9 @@ import { makeStyles } from '@material-ui/styles';
 
 const OIPCDetails = (props) => {
     const oipcData = [
-        { oipcNumber: "F23-12345", reviewType: "Complaint", reason: "Deemed Refusal", status: "Inquiry", isInquiry: false, inquiryDate: null,  investigator: "Filip Forsberg", outcome: "Withdrawn", isJudicalReview: false, isSubAppeal: false }, 
-        { oipcNumber: "F23-12346", reviewType: "Review", reason: "Other", status: "Mediation", isInquiry: false, investigator: "Peter Forsberg", outcome: "Closed", isJudicalReview: false, isSubAppeal: true },
-        { oipcNumber: "F23-12347", reviewType: "Investigation", reason: "TPN-21", status: "Awaiting Order", isInquiry: false, investigator: "Quinn Hughes", outcome: "Abandoned", isJudicalReview: true, isSubAppeal: true }
+        { oipcNumber: "F23-12345", reviewType: "Complaint", reason: "Deemed Refusal", status: "Inquiry", isInquiry: false, inquiryDate: null, receivedDate: "05-08-2022", complyDate: "10-10-2023", investigator: "Filip Forsberg", outcome: "Withdrawn", isJudicalReview: false, isSubAppeal: false }, 
+        { oipcNumber: "F23-12346", reviewType: "Review", reason: "Other", status: "Mediation", isInquiry: false, inquiryDate: null, receivedDate: "09-08-2022", complyDate: "12-10-2022", investigator: "Peter Forsberg", outcome: "Closed", isJudicalReview: false, isSubAppeal: true },
+        { oipcNumber: "F23-12347", reviewType: "Investigation", reason: "TPN-21", status: "Awaiting Order", isInquiry: false, inquiryDate: null, receivedDate: "11-08-2022", complyDate: "01-10-2023", investigator: "Quinn Hughes", outcome: "Abandoned", isJudicalReview: true, isSubAppeal: true }
     ]
 
     const useStyles = makeStyles({
@@ -35,7 +34,7 @@ const OIPCDetails = (props) => {
             </AccordionSummary>
             <AccordionDetails>
                 <OIPCDetailsList oipcData={oipcData} />
-                <Button>Add Additional OIPC Complaint</Button>
+                <Button style={{color: "lightGreen"}}>Add Additional OIPC Complaint</Button>
             </AccordionDetails>
             </Accordion>
         </div>
