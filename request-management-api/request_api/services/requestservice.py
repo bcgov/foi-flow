@@ -67,8 +67,7 @@ class requestservice:
         )
         nextstatename = (
             nextstate.get("name")
-            if isinstance(nextstatename, dict)
-            and nextstatename.get("name") not in (None, "")
+            if isinstance(nextstate, dict) and nextstate.get("name") not in (None, "")
             else ""
         )
         rev_foirequestschema = self.updateduedate(
