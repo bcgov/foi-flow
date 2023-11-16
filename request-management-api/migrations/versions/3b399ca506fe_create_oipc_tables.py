@@ -93,7 +93,8 @@ def upgrade():
                 ('Abandoned', True),
                 ('Withdrawn', True),
                 ('Resolved in Mediation', True),
-                ('Closed', True);commit;''')
+                ('Closed', True),
+                ('Amend', True);commit;''')
 
     op.execute('''INSERT INTO public."OIPCInquiryOutcomes" (name, isactive)
                VALUES
