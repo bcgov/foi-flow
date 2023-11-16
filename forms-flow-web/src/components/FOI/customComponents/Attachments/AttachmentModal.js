@@ -233,6 +233,7 @@ export default function AttachmentModal({
       }
     }  
     const getMessage = () => {
+      let _message = {};
       switch(modalFor.toLowerCase()) { 
         case "add":
           if(isMCFMSDPersonal && !isMinistryCoordinator) {
@@ -248,7 +249,6 @@ export default function AttachmentModal({
           }
           return _message;
         case "replace":
-          let _message = {};
             if (uploadFor === 'record') {
               _message = {title: "Replace Records", body:<>Replace the existing record with a reformatted or updated version of the same record.<br></br>The original file that was uploaded will still be available for download.</> }
             } else if (attachment) {
