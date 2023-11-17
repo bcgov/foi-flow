@@ -8,6 +8,7 @@ from request_api.models.FOIRequestPersonalAttributes import FOIRequestPersonalAt
 from request_api.models.FOIRequestApplicantMappings import FOIRequestApplicantMapping
 from request_api.models.FOIMinistryRequestSubjectCodes import FOIMinistryRequestSubjectCode
 from request_api.models.FOIRestrictedMinistryRequests import FOIRestrictedMinistryRequest
+from request_api.models.FOIRequestOIPC import FOIRequestOIPC
 from dateutil.parser import parse
 from request_api.services.cfrfeeservice import cfrfeeservice
 from request_api.services.paymentservice import paymentservice
@@ -165,6 +166,8 @@ class requestservicegetter:
             'assignedministryperson':requestministry["assignedministryperson"],            
             'selectedMinistries':[{'code':requestministry['programarea.bcgovcode'],'id':requestministry['foiministryrequestid'],'name':requestministry['programarea.name'],'selected':'true'}],
             'divisions': self.getdivisions(requestministrydivisions),
+            'isoipcreview': requestministry['isoipcreview'],
+            'oipcdetails': self.getoipcdetails(foiministryrequestid, requestministry['version']),
             'onholdTransitionDate': self.getonholdtransition(foiministryrequestid),            
             'stateTransition': FOIMinistryRequest.getstatesummary(foiministryrequestid),
             'assignedToFirstName': requestministry["assignee.firstname"] if requestministry["assignedto"] != None else None,
@@ -208,6 +211,29 @@ class requestservicegetter:
                 divisions.append(division) 
         return divisions
 
+    def getoipcdetails(self, ministryrequestid, ministryrequestversion):
+        oipcdetails = []
+        _oipclist = FOIRequestOIPC.getoipc(ministryrequestid, ministryrequestversion)
+        if _oipclist is not None:                      
+            for entry in _oipclist:
+                oipc = {
+                    "oipcid": entry["oipcid"],
+                    "reviewtypeid": entry["reviewtypeid"],
+                    "reasonid": entry["reasonid"],
+                    "statusid": entry["statusid"],
+                    "outcomeid": entry["outcomeid"],
+                    "investigator": entry["investigator"],
+                    "isinquiry": entry["isinquiry"],
+                    "isjudicialreview": entry["isjudicialreview"],
+                    "issubsequentappeal": entry["issubsequentappeal"],
+                    "inquiryattributes": entry["inquiryattributes"],   
+                    "createdby": entry["createdby"],
+                    "created_at": parse(entry["created_at"]).strftime(self.__genericdateformat())                 
+                    } 
+                oipcdetails.append(oipc) 
+        return oipcdetails
+    
+    
     
     def getonholdtransition(self, foiministryrequestid):
         onholddate = None
