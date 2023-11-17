@@ -5,7 +5,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrash } from '@fortawesome/free-solid-svg-icons';
 
 const OIPCDetailsList = (props) => {
-    const {oipcData, removeOIPC} = props;
+    const {oipcData, removeOIPC, updateOIPC} = props;
     console.log("TEST THIS", oipcData);
 
     const OIPCItems = oipcData?.map((oipcObj, index) => {
@@ -16,7 +16,7 @@ const OIPCDetailsList = (props) => {
                         <FontAwesomeIcon icon={faTrash} color="#38598A" />
                     </button>
                 </div>
-                <OIPCItem oipcObj={oipcObj} key={oipcObj.oipcNumber} />
+                <OIPCItem oipcObj={oipcObj} key={oipcObj.oipcNumber} updateOIPC={updateOIPC} />
                 {index !== (oipcData.length - 1)  && <Divider/>}
             </>
         );

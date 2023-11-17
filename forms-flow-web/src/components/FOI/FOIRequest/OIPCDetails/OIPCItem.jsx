@@ -2,9 +2,7 @@ import { TextField, FormControlLabel, MenuItem, Grid, Checkbox } from '@material
 import { useState } from "react";
 
 const OIPCItem = (props) => {
-    const {oipcObj} = props;
-
-    console.log(oipcObj);
+    const {oipcObj, updateOIPC} = props;
 
     const [oipc, setOipc] = useState({
         oipcNumber: oipcObj?.oipcNumber, 
@@ -20,9 +18,40 @@ const OIPCItem = (props) => {
         isJudicalReview: oipcObj?.isJudicalReview, 
         isSubAppeal: oipcObj?.isSubAppeal, 
     });
+
+    console.log(oipcObj);
     
-    const handleReviewType = () => {
-        console.log("BANG")
+    const handleReviewType = (value) => {
+        const newOIPCObj = oipc;
+        newOIPCObj.reviewType = value;
+        updateOIPC(newOIPCObj);
+    }
+    const handleOIPCNumber = (event) => {
+        console.log("BANG");
+    }
+    const handleReceivedDate = (event) => {
+        console.log("BANG");
+    }
+    const handleReason = (event) => {
+        console.log("BANG");
+    }
+    const handleStatus = (event) => {
+        console.log("BANG");
+    }
+    const handleInvestiagtor = (event) => {
+        console.log("BANG");
+    }
+    const handleOutcome = (event) => {
+        console.log("BANG");
+    }
+    const handleInquiry = (event) => {
+        console.log("BANG");
+    }
+    const handleJudicalReview = (event) => {
+        console.log("BANG");
+    }
+    const handleSubsequentAppeal = (event) => {
+        console.log("BANG");
     }
 
     return (
@@ -61,7 +90,7 @@ const OIPCItem = (props) => {
                         fullWidth
                         value={oipc.reviewType}
                         label="Review Type"
-                        onChange={handleReviewType}
+                        onChange={(event) => handleReviewType(event.target.value)}
                         required={true}
                     >
                         <MenuItem value={"Complaint"}>Complaint</MenuItem>
@@ -137,7 +166,6 @@ const OIPCItem = (props) => {
                         fullWidth
                         value={oipc.outcome}
                         label="Outcome"
-                        onChange={handleReviewType}
                         required={true}
                     >
                         <MenuItem value={"Abandoned"}>Abandoned</MenuItem>

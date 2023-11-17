@@ -13,7 +13,6 @@ const OIPCDetails = (props) => {
     const [oipcData, setOipcData] = useState([
       { oipcNumber: "F23-12345", reviewType: "Complaint", reason: "Deemed Refusal", status: "Inquiry", isInquiry: false, inquiryDate: null, receivedDate: "05-08-2022", investigator: "Filip Forsberg", outcome: "Withdrawn", isJudicalReview: false, isSubAppeal: false }, 
       { oipcNumber: "F23-12346", reviewType: "Review", reason: "Other", status: "Mediation", isInquiry: false, inquiryDate: null, receivedDate: "09-08-2022", investigator: "Peter Forsberg", outcome: "Closed", isJudicalReview: false, isSubAppeal: true },
-      { oipcNumber: "F23-12347", reviewType: "Investigation", reason: "TPN-21", status: "Awaiting Order", isInquiry: false, inquiryDate: null, receivedDate: "11-08-2022", investigator: "Quinn Hughes", outcome: "Abandoned", isJudicalReview: true, isSubAppeal: true }
   ]);
     const useStyles = makeStyles({
         heading: {
@@ -47,10 +46,23 @@ const OIPCDetails = (props) => {
       })
     }
     //Function to Remove an OIPC
-    const removeOIPC = (oipcNo) => {
+    const removeOIPC = (oipcNo, index) => {
       setOipcData((prev) => {
         const previousOIPCData = [...prev];
         return previousOIPCData.filter(oipc => oipcNo !== oipc.oipcNumber);
+      });
+    }
+    //Function to Update an OIPC
+    const updateOIPC = (newOIPCObj, index) => {
+      setOipcData((prev) => {
+        const previousOIPCData = [...prev];
+        return previousOIPCData.map((oipc) => {
+          if (oipc.oipcNumber === newOIPCObj.oipcNumber) {
+            return newOIPCObj;
+          } else {
+            return oipc;
+          }
+        });
       });
     }
       
@@ -61,7 +73,7 @@ const OIPCDetails = (props) => {
             <Typography className={classes.heading}>OIPC Details</Typography>
             </AccordionSummary>
             <AccordionDetails>
-                <OIPCDetailsList oipcData={oipcData} removeOIPC={removeOIPC} />
+                <OIPCDetailsList oipcData={oipcData} removeOIPC={removeOIPC} updateOIPC={updateOIPC} />
                 <div style={{display: "flex", flexDirection: "row", alignItems: "center", margin: "7px 0px 7px 0px"}}>
                     <button onClick={() => addOIPC()} style={{ border: "none", background: "none" }}>
                         <FontAwesomeIcon icon={faCirclePlus}  size="lg" color="#38598A" />
