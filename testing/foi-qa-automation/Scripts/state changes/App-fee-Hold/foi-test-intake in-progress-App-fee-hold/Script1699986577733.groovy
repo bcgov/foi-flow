@@ -46,7 +46,7 @@ WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/div_Statu
 
 WebUI.verifyElementPresent(findTestObject('Page_foi.flow/form/sidebar/status dropdown/li_Open'), 0)
 
-WebUI.verifyElementPresent(findTestObject('Page_foi.flow/form/sidebar/status dropdown/Page_EDU-2023-1037/li_App Fee Owing'), 
+WebUI.verifyElementPresent(findTestObject('Page_foi.flow/form/sidebar/status dropdown/li_App Fee Owing'), 
     0)
 
 WebUI.verifyElementPresent(findTestObject('Page_foi.flow/form/sidebar/status dropdown/li_Redirect'), 0)
@@ -59,7 +59,7 @@ WebUI.refresh()
 
 WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/div_Status'))
 
-WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/Page_EDU-2023-1037/li_App Fee Owing'))
+WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/li_App Fee Owing'))
 
 WebUI.verifyElementPresent(findTestObject('Page_foi.flow/form/state change dialog/div_State Change Dialog'), 0)
 

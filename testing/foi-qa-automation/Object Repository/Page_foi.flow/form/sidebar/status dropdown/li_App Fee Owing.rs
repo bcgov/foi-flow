@@ -6,15 +6,18 @@
    <elementGuidId>f04cc35e-d469-416b-805b-855769db4f87</elementGuidId>
    <selectorCollection>
       <entry>
-         <key>CSS</key>
-         <value></value>
-      </entry>
-      <entry>
          <key>XPATH</key>
          <value>//div[@id='menu-']/div[3]/ul/li[5]</value>
       </entry>
+      <entry>
+         <key>CSS</key>
+      </entry>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[(text() = 'App Fee Owing' or . = 'App Fee Owing')]</value>
+      </entry>
    </selectorCollection>
-   <selectorMethod>XPATH</selectorMethod>
+   <selectorMethod>BASIC</selectorMethod>
    <useRalativeImagePath>true</useRalativeImagePath>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -22,7 +25,7 @@
       <name>tag</name>
       <type>Main</type>
       <value>li</value>
-      <webElementGuid>b4d7af0c-bff7-4e1d-b94b-51f801d6ca22</webElementGuid>
+      <webElementGuid>7652894d-5925-4eb8-b957-4fe68c5bd418</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -30,7 +33,7 @@
       <name>class</name>
       <type>Main</type>
       <value>MuiButtonBase-root MuiListItem-root MuiMenuItem-root foi-state-menuitem MuiMenuItem-gutters MuiListItem-gutters MuiListItem-button</value>
-      <webElementGuid>8595b95a-7b3d-4f81-9f21-b0581eaba331</webElementGuid>
+      <webElementGuid>711fc486-8f40-48d2-889c-d85ec24d4734</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -38,7 +41,7 @@
       <name>tabindex</name>
       <type>Main</type>
       <value>-1</value>
-      <webElementGuid>44fcf389-cd85-49ac-8c06-db43f78f40c2</webElementGuid>
+      <webElementGuid>2277b6d3-2fd6-4ce2-b9bb-4a44ca4fc8da</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -46,7 +49,7 @@
       <name>role</name>
       <type>Main</type>
       <value>option</value>
-      <webElementGuid>fcc5eae3-88e0-447c-8079-e3f3a418034e</webElementGuid>
+      <webElementGuid>955a1311-d95c-4a4b-8a46-94600fadd653</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -54,7 +57,7 @@
       <name>aria-disabled</name>
       <type>Main</type>
       <value>false</value>
-      <webElementGuid>263c156b-8e4c-4849-b786-9fcc1afc4b53</webElementGuid>
+      <webElementGuid>5a1053b6-cc0e-4d3b-87bc-983d2c6e1cc6</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -62,7 +65,7 @@
       <name>data-value</name>
       <type>Main</type>
       <value>App Fee Owing</value>
-      <webElementGuid>4c7ab3d9-1bb6-4c35-98c2-317e469e0a3b</webElementGuid>
+      <webElementGuid>4f1b45b3-2b38-4266-8519-1adba372ab60</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>true</isSelected>
@@ -70,7 +73,7 @@
       <name>text</name>
       <type>Main</type>
       <value>App Fee Owing</value>
-      <webElementGuid>d1908a10-5bbd-4ccc-92a6-4ec6985aa82a</webElementGuid>
+      <webElementGuid>fbffce1d-b141-46c7-bbe1-c42cef4de254</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -78,7 +81,7 @@
       <name>xpath</name>
       <type>Main</type>
       <value>id(&quot;menu-&quot;)/div[@class=&quot;MuiPaper-root MuiMenu-paper MuiPopover-paper MuiPaper-elevation8 MuiPaper-rounded&quot;]/ul[@class=&quot;MuiList-root MuiMenu-list MuiList-padding&quot;]/li[@class=&quot;MuiButtonBase-root MuiListItem-root MuiMenuItem-root foi-state-menuitem MuiMenuItem-gutters MuiListItem-gutters MuiListItem-button&quot;]</value>
-      <webElementGuid>59bfd80b-7211-4125-a2c4-9765426d2f8a</webElementGuid>
+      <webElementGuid>8a4851ef-129c-4847-8f12-e78dfdcb984e</webElementGuid>
    </webElementProperties>
    <webElementXpaths>
       <isSelected>true</isSelected>
@@ -86,7 +89,7 @@
       <name>xpath:idRelative</name>
       <type>Main</type>
       <value>//div[@id='menu-']/div[3]/ul/li[5]</value>
-      <webElementGuid>74d1edc4-eb62-4a35-8f48-05982a07553e</webElementGuid>
+      <webElementGuid>8556d4d5-15a1-42e1-8a9a-a513a6542903</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -94,7 +97,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>(.//*[normalize-space(text()) and normalize-space(.)='Redirect'])[1]/following::li[1]</value>
-      <webElementGuid>1a607d0c-dcf9-4a12-a74a-0ddbb0da863c</webElementGuid>
+      <webElementGuid>dcb571be-cdf7-4541-bec7-e74e28d8b391</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -102,7 +105,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>(.//*[normalize-space(text()) and normalize-space(.)='Peer Review'])[1]/following::li[2]</value>
-      <webElementGuid>c438c461-5bda-4580-9f2d-27b09f48a3e7</webElementGuid>
+      <webElementGuid>fa2c1a20-c32b-4bab-9f68-fbf939e80c6c</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -110,7 +113,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>(.//*[normalize-space(text()) and normalize-space(.)='Closed'])[1]/preceding::li[1]</value>
-      <webElementGuid>f955e6e2-95d0-48bc-9e7f-9f3ce47cc0fd</webElementGuid>
+      <webElementGuid>71226439-a60c-465e-be3d-023dc6224ea3</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -118,7 +121,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>//*/text()[normalize-space(.)='App Fee Owing']/parent::*</value>
-      <webElementGuid>916f35f9-6514-4c02-be92-74023b47e596</webElementGuid>
+      <webElementGuid>22b77c27-664c-4211-a36f-e23116e86bba</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -126,7 +129,7 @@
       <name>xpath:position</name>
       <type>Main</type>
       <value>//div[3]/ul/li[5]</value>
-      <webElementGuid>accfc118-0c12-42ed-89ad-8b716cab1dd2</webElementGuid>
+      <webElementGuid>0acc681a-b2c7-4bd6-813f-3337f1f7637b</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -134,6 +137,6 @@
       <name>xpath:customAttributes</name>
       <type>Main</type>
       <value>//li[(text() = 'App Fee Owing' or . = 'App Fee Owing')]</value>
-      <webElementGuid>c8458f32-ed40-41a9-ad5d-5c3b7390e2e8</webElementGuid>
+      <webElementGuid>0ec7a8bd-c607-47ca-8e2a-8d67d8bd8c3f</webElementGuid>
    </webElementXpaths>
 </WebElementEntity>

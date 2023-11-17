@@ -630,4 +630,11 @@
       <testCaseId>Test Cases/state changes/App-fee-Hold/foi-test-intake in-progress-App-fee-hold</testCaseId>
       <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
    </testCaseLink>
+   <testCaseLink>
+      <guid>9540b425-5833-449b-9d1f-ad365b947048</guid>
+      <isReuseDriver>false</isReuseDriver>
+      <isRun>true</isRun>
+      <testCaseId>Test Cases/state changes/Peer Review/foi-test-intake-in-progress-peer-review-CFRlock</testCaseId>
+      <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
+   </testCaseLink>
 </TestSuiteEntity>

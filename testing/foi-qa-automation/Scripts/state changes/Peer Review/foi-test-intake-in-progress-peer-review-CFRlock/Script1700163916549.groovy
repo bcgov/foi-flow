@@ -56,79 +56,24 @@ WebUI.delay(3)
 
 WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/div_Status'))
 
-WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/li_Peer Review'))
+WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/li_Open'))
 
 WebUI.verifyElementPresent(findTestObject('Page_foi.flow/form/state change dialog/div_State Change Dialog'), 0)
 
 WebUI.click(findTestObject('Page_foi.flow/form/state change dialog/button_Save Change'))
 
-WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT, FailureHandling.STOP_ON_FAILURE)
-
-WebUI.verifyElementAttributeValue(findTestObject('Page_foi.flow/form/sidebar/status dropdown/input_Status'), 'value', 'Peer Review', 
-    0)
-
-WebUI.click(findTestObject('Page_foi.flow/form/sidebar/div_Sidebar Comments'))
-
-WebUI.verifyElementText(findTestObject('Page_foi.flow/form/sidebar/div_Sidebar Comments'), 'Comments (2)')
-
-WebUI.click(findTestObject('Page_foi.flow/navbar/button_Sign Out'))
-
-WebUI.callTestCase(findTestCase('helper/foi-test-login'), [('password') : findTestData('Login Credentials').getValue('Password', 
-            4), ('username') : findTestData('Login Credentials').getValue('Username', 4)], FailureHandling.STOP_ON_FAILURE)
-
-WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
-
-WebUI.clickOffset(findTestObject('Page_foi.flow/navbar/notification/notification bell'), -2, 4)
-
-WebUI.click(findTestObject('Page_foi.flow/navbar/notification/a_Watching Notifications'))
-
-//WebUI.verifyElementText(findTestObject('Page_foi.flow/navbar/notification/div_watching notification list 1 request id'), 
-//  requestID)
-WebUI.verifyElementText(findTestObject('Page_foi.flow/navbar/notification/div_watching notification list 1 message'), 'Moved to Peer Review State')
-
-WebUI.clickOffset(findTestObject('Page_foi.flow/navbar/notification/notification bell'), -2, 4)
-
-WebUI.click(findTestObject('Page_foi.flow/navbar/button_Sign Out'))
-
-WebUI.callTestCase(findTestCase('helper/foi-test-login'), [('password') : findTestData('Login Credentials').getValue('Password', 
-            1), ('username') : findTestData('Login Credentials').getValue('Username', 1)], FailureHandling.STOP_ON_FAILURE)
-
-WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
-
-WebUI.click(findTestObject('Page_foi.flow/queue/div_My Team Requests'))
-
-WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
-
-WebUI.setText(findTestObject('Page_foi.flow/queue/input_Dashboard Filter'), requestID)
-
-WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
-
-WebUI.click(findTestObject('Page_foi.flow/queue/div_request queue row 1'))
-
 WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/div_Status'))
 
-WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/li_Open'), FailureHandling.STOP_ON_FAILURE)
+WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/li_Call For Records'))
 
 WebUI.click(findTestObject('Page_foi.flow/form/state change dialog/button_Save Change'))
-
-WebUI.click(findTestObject('Page_foi.flow/form/sidebar/div_Sidebar Comments'))
-
-WebUI.verifyElementText(findTestObject('Page_foi.flow/form/sidebar/div_Sidebar Comments'), 'Comments (3)')
-
-WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/div_Status'))
-
-WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/li_Call For Records'), FailureHandling.STOP_ON_FAILURE)
-
-WebUI.click(findTestObject('Page_foi.flow/form/state change dialog/button_Save Change'))
-
-WebUI.click(findTestObject('Page_foi.flow/form/sidebar/div_Sidebar Comments'))
-
-WebUI.verifyElementText(findTestObject('Page_foi.flow/form/sidebar/div_Sidebar Comments'), 'Comments (4)')
 
 WebUI.click(findTestObject('Page_foi.flow/navbar/button_Sign Out'))
 
 WebUI.callTestCase(findTestCase('helper/foi-test-login'), [('password') : findTestData('Login Credentials').getValue('Password', 
             8), ('username') : findTestData('Login Credentials').getValue('Username', 8)], FailureHandling.STOP_ON_FAILURE)
+
+WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
 
 WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
 
@@ -146,21 +91,32 @@ WebUI.click(findTestObject('Page_foi.flow/ministry view/form/div_ministry assign
 
 WebUI.click(findTestObject('Page_foi.flow/ministry view/form/ministry assignee/li_ministry assignee foiedu, foiedu'))
 
+WebUI.click(findTestObject('CFR/div_CFR Form'))
+
+WebUI.setText(findTestObject('CFR/input_Estimated Hours_locating'), '5')
+
+WebUI.setText(findTestObject('CFR/input_Estimated Hours_producing'), '3')
+
+WebUI.delay(3)
+
+WebUI.scrollToElement(findTestObject('CFR/button_Save'), 0)
+
+WebUI.click(findTestObject('CFR/button_Save'))
+
+WebUI.delay(4)
+
 WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/div_Status'))
 
-WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/li_Records Review'))
+WebUI.click(findTestObject('Page_foi.flow/ministry view/form/divisional tracking/stage dropdown options/li_Fee Estimate'))
 
-WebUI.click(findTestObject('Page_foi.flow/form/state change dialog/button_Save Change'), FailureHandling.STOP_ON_FAILURE)
-
-WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT, FailureHandling.STOP_ON_FAILURE)
-
-WebUI.verifyElementAttributeValue(findTestObject('Page_foi.flow/form/sidebar/status dropdown/input_Status'), 'value', 'Records Review', 
-    0)
+WebUI.click(findTestObject('Page_foi.flow/form/state change dialog/button_Save Change'))
 
 WebUI.click(findTestObject('Page_foi.flow/navbar/button_Sign Out'))
 
 WebUI.callTestCase(findTestCase('helper/foi-test-login'), [('password') : findTestData('Login Credentials').getValue('Password', 
             1), ('username') : findTestData('Login Credentials').getValue('Username', 1)], FailureHandling.STOP_ON_FAILURE)
+
+WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
 
 WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
 
@@ -176,37 +132,39 @@ WebUI.click(findTestObject('Page_foi.flow/queue/div_request queue row 1'))
 
 WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/div_Status'))
 
-WebUI.verifyElementPresent(findTestObject('Page_foi.flow/form/sidebar/status dropdown/li_Call For Records'), 0)
+WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/li_Call For Records'))
 
-WebUI.verifyElementPresent(findTestObject('Page_foi.flow/form/sidebar/status dropdown/li_Consult'), 0)
+WebUI.verifyElementPresent(findTestObject('Page_foi.flow/form/state change dialog/div_State Change Dialog'), 0)
 
-WebUI.verifyElementPresent(findTestObject('Page_foi.flow/form/sidebar/status dropdown/li_Ministry Sign Off'), 0)
-
-WebUI.verifyElementPresent(findTestObject('Page_foi.flow/form/sidebar/status dropdown/li_Peer Review'), 0)
-
-WebUI.verifyElementPresent(findTestObject('Page_foi.flow/form/sidebar/status dropdown/li_Response'), 0)
-
-WebUI.verifyElementPresent(findTestObject('Page_foi.flow/form/sidebar/status dropdown/li_Closed'), 0)
-
-WebUI.verifyElementNotPresent(findTestObject('Page_foi.flow/form/sidebar/status dropdown/li_App Fee Owing'), 0)
-
-WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/li_Consult'))
-
-WebUI.click(findTestObject('Page_foi.flow/form/state change dialog/button_Save Change'), FailureHandling.STOP_ON_FAILURE)
+WebUI.click(findTestObject('Page_foi.flow/form/state change dialog/button_Save Change'))
 
 WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
 
 WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/div_Status'))
 
-WebUI.verifyElementNotPresent(findTestObject('Page_foi.flow/form/sidebar/status dropdown/li_Call For Records'), 0)
+WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/li_Open'))
 
-WebUI.verifyElementPresent(findTestObject('Page_foi.flow/form/sidebar/status dropdown/li_Records Review'), 0)
+WebUI.verifyElementPresent(findTestObject('Page_foi.flow/form/state change dialog/div_State Change Dialog'), 0)
 
-WebUI.verifyElementPresent(findTestObject('Page_foi.flow/form/sidebar/status dropdown/li_Ministry Sign Off'), 0)
+WebUI.click(findTestObject('Page_foi.flow/form/state change dialog/button_Save Change'))
 
-WebUI.verifyElementPresent(findTestObject('Page_foi.flow/form/sidebar/status dropdown/li_Peer Review'), 0)
+WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
 
-WebUI.verifyElementNotPresent(findTestObject('Page_foi.flow/form/sidebar/status dropdown/li_Response'), 0)
+WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/div_Status'))
+
+WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/li_Peer Review'))
+
+WebUI.verifyElementPresent(findTestObject('Page_foi.flow/form/state change dialog/div_State Change Dialog'), 0)
+
+WebUI.click(findTestObject('Page_foi.flow/form/state change dialog/button_Save Change'))
+
+WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
+
+WebUI.click(findTestObject('CFR/div_CFR Form'))
+
+WebUI.verifyElementNotClickable(findTestObject('CFR/input_Estimated Hours IAO_iaoPreparing'), FailureHandling.STOP_ON_FAILURE)
+
+WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/div_Status'))
 
 WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/li_Closed'))
 
