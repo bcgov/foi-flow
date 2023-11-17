@@ -126,6 +126,8 @@ class FeeService:
     def _validate_with_paybc(self, trn_approved):
         paybc_status = None
         paybc_response = self.get_paybc_transaction_details()
+        print("<<<<<<<<< paybc_response >>>>>>>>>>>>>>")
+        print(paybc_response)
         if trn_approved and (paybc_status := paybc_response.get('paymentstatus')) != 'PAID':
             raise BusinessException(Error.INVALID_INPUT)
         if paybc_status == 'PAID' and self.payment.total != float(paybc_response.get('trnamount')):
