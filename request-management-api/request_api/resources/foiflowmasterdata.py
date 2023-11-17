@@ -33,6 +33,7 @@ from request_api.schemas.foirequestsformslist import  FOIRequestsFormsList
 from request_api.services.extensionreasonservice import extensionreasonservice
 from request_api.services.cacheservice import cacheservice
 from request_api.services.subjectcodeservice import subjectcodeservice
+from request_api.services.oipcservice import oipcservice
 import json
 import request_api
 import requests
@@ -380,3 +381,113 @@ class FOIFlowRefreshCache(Resource):
             return {"success": resp_flag } , 200 if resp_flag == True else 500
         except BusinessException:
             return "Error happened while clearing cache" , 500
+
+@cors_preflight('GET,OPTIONS')
+@API.route('/foiflow/oipc/reviewtypes')
+class FOIFlowOIPCReviewTypes(Resource):
+    """Retrieves OIPC review types
+    """
+    @staticmethod
+    @TRACER.trace()
+    @cross_origin(origins=allowedorigins())
+    # @auth.require
+    @request_api.cache.cached(
+        key_prefix="oipcreviewtypes",
+        unless=cache_filter,
+        response_filter=response_filter
+        )
+    def get():
+        try:
+            data = oipcservice().getreviewtypes()
+            jsondata = json.dumps(data)
+            return jsondata , 200
+        except BusinessException:
+            return "Error happened while accessing OIPC review types" , 500
+
+@cors_preflight('GET,OPTIONS')
+@API.route('/foiflow/oipc/statuses')
+class FOIFlowOIPCStatuses(Resource):
+    """Retrieves OIPC statuses
+    """
+    @staticmethod
+    @TRACER.trace()
+    @cross_origin(origins=allowedorigins())
+    # @auth.require
+    @request_api.cache.cached(
+        key_prefix="oipcstatuses",
+        unless=cache_filter,
+        response_filter=response_filter
+        )
+    def get():
+        try:
+            data = oipcservice().getstatuses()
+            jsondata = json.dumps(data)
+            return jsondata , 200
+        except BusinessException:
+            return "Error happened while accessing OIPC statuses" , 500
+
+@cors_preflight('GET,OPTIONS')
+@API.route('/foiflow/oipc/reasons')
+class FOIFlowOIPCReasons(Resource):
+    """Retrieves OIPC reasons
+    """
+    @staticmethod
+    @TRACER.trace()
+    @cross_origin(origins=allowedorigins())
+    # @auth.require
+    @request_api.cache.cached(
+        key_prefix="oipcreasons",
+        unless=cache_filter,
+        response_filter=response_filter
+        )
+    def get():
+        try:
+            data = oipcservice().getreasons()
+            jsondata = json.dumps(data)
+            return jsondata , 200
+        except BusinessException:
+            return "Error happened while accessing OIPC reasons" , 500
+
+@cors_preflight('GET,OPTIONS')
+@API.route('/foiflow/oipc/outcomes')
+class FOIFlowOIPCOutcomes(Resource):
+    """Retrieves OIPC outcomes
+    """
+    @staticmethod
+    @TRACER.trace()
+    @cross_origin(origins=allowedorigins())
+    # @auth.require
+    @request_api.cache.cached(
+        key_prefix="oipcoutcomes",
+        unless=cache_filter,
+        response_filter=response_filter
+        )
+    def get():
+        try:
+            data = oipcservice().getoutcomes()
+            jsondata = json.dumps(data)
+            return jsondata , 200
+        except BusinessException:
+            return "Error happened while accessing OIPC outcomes" , 500
+
+@cors_preflight('GET,OPTIONS')
+@API.route('/foiflow/oipc/inquiryoutcomes')
+class FOIFlowOIPCInquiryOutcomes(Resource):
+    """Retrieves OIPC inquiry outcomes
+    """
+    @staticmethod
+    @TRACER.trace()
+    @cross_origin(origins=allowedorigins())
+    # @auth.require
+    @request_api.cache.cached(
+        key_prefix="oipcinquiryoutcomes",
+        unless=cache_filter,
+        response_filter=response_filter
+        )
+    def get():
+        try:
+            data = oipcservice().getinquiryoutcomes()
+            jsondata = json.dumps(data)
+            return jsondata , 200
+        except BusinessException:
+            return "Error happened while accessing OIPC inquiry outcomes" , 500
