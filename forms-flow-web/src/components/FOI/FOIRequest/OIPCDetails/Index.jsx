@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import OIPCDetailsList from "./OIPCDetailsList";
 import Accordion from '@material-ui/core/Accordion';
 import AccordionSummary from '@material-ui/core/AccordionSummary';
@@ -8,12 +9,11 @@ import Button from '@material-ui/core/Button';
 import { makeStyles } from '@material-ui/styles';
 
 const OIPCDetails = (props) => {
-    const oipcData = [
-        { oipcNumber: "F23-12345", reviewType: "Complaint", reason: "Deemed Refusal", status: "Inquiry", isInquiry: false, inquiryDate: null, receivedDate: "05-08-2022", complyDate: "10-10-2023", investigator: "Filip Forsberg", outcome: "Withdrawn", isJudicalReview: false, isSubAppeal: false }, 
-        { oipcNumber: "F23-12346", reviewType: "Review", reason: "Other", status: "Mediation", isInquiry: false, inquiryDate: null, receivedDate: "09-08-2022", complyDate: "12-10-2022", investigator: "Peter Forsberg", outcome: "Closed", isJudicalReview: false, isSubAppeal: true },
-        { oipcNumber: "F23-12347", reviewType: "Investigation", reason: "TPN-21", status: "Awaiting Order", isInquiry: false, inquiryDate: null, receivedDate: "11-08-2022", complyDate: "01-10-2023", investigator: "Quinn Hughes", outcome: "Abandoned", isJudicalReview: true, isSubAppeal: true }
-    ]
-
+    const [oipcData, setOipcData] = useState([
+      { oipcNumber: "F23-12345", reviewType: "Complaint", reason: "Deemed Refusal", status: "Inquiry", isInquiry: false, inquiryDate: null, receivedDate: "05-08-2022", investigator: "Filip Forsberg", outcome: "Withdrawn", isJudicalReview: false, isSubAppeal: false }, 
+      { oipcNumber: "F23-12346", reviewType: "Review", reason: "Other", status: "Mediation", isInquiry: false, inquiryDate: null, receivedDate: "09-08-2022", investigator: "Peter Forsberg", outcome: "Closed", isJudicalReview: false, isSubAppeal: true },
+      { oipcNumber: "F23-12347", reviewType: "Investigation", reason: "TPN-21", status: "Awaiting Order", isInquiry: false, inquiryDate: null, receivedDate: "11-08-2022", investigator: "Quinn Hughes", outcome: "Abandoned", isJudicalReview: true, isSubAppeal: true }
+  ]);
     const useStyles = makeStyles({
         heading: {
           color: '#FFF',
@@ -24,8 +24,35 @@ const OIPCDetails = (props) => {
           flexDirection: 'row-reverse'
         }
       });
-      const classes = useStyles();
+    const classes = useStyles();
 
+    //Function to Add an OIPC
+    const addOIPC = () => {
+      setOipcData((prev) => {
+        return [...prev, {
+          oipcNumber: "", 
+          reviewType: "", 
+          reason: "", 
+          status: "", 
+          isInquiry: false, 
+          inquiryDate: null, 
+          receivedDate: "", 
+          complyDate: "", 
+          investigator: "", 
+          outcome: "", 
+          isJudicalReview: false, 
+          isSubAppeal: false
+        }];
+      })
+    }
+    //Function to Remove an OIPC
+    const removeOIPC = (oipcNo) => {
+      setOipcData((prev) => {
+        const previousOIPCData = [...prev];
+        return previousOIPCData.filter(oipc => oipcNo !== oipc.oipcNumber);
+      });
+    }
+      
     return (
         <div className='request-accordian' >
             <Accordion defaultExpanded={true}>
@@ -33,8 +60,8 @@ const OIPCDetails = (props) => {
             <Typography className={classes.heading}>OIPC Details</Typography>
             </AccordionSummary>
             <AccordionDetails>
-                <OIPCDetailsList oipcData={oipcData} />
-                <Button style={{color: "lightGreen"}}>Add Additional OIPC Complaint</Button>
+                <OIPCDetailsList oipcData={oipcData} removeOIPC={removeOIPC} />
+                <Button onClick={() => addOIPC()} style={{color: "lightGreen"}}>Add Additional OIPC Complaint</Button>
             </AccordionDetails>
             </Accordion>
         </div>
