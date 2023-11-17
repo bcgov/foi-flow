@@ -1,7 +1,8 @@
 import OIPCItem from "./OIPCItem";
 import Divider from '@material-ui/core/Divider';
 import './oipcdetails.scss';
-import Button from '@material-ui/core/Button';
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faTrash } from '@fortawesome/free-solid-svg-icons';
 
 const OIPCDetailsList = (props) => {
     const {oipcData, removeOIPC} = props;
@@ -10,8 +11,12 @@ const OIPCDetailsList = (props) => {
     const OIPCItems = oipcData?.map((oipcObj, index) => {
         return (
             <>
-                <OIPCItem oipcObj={oipcObj} key={oipcObj.oipcNumber} removeOIPC={removeOIPC} />
-                <Button size="small" onClick={() => removeOIPC(oipcObj.oipcNumber)} style={{color: "red"}}>Delete</Button>
+                <div style={{display: "flex", flexDirection: "row", justifyContent: "flex-end"}}>
+                    <button onClick={() => removeOIPC(oipcObj.oipcNumber)} style={{ border: "none", background: "none" }}>
+                        <FontAwesomeIcon icon={faTrash} color="#38598A" />
+                    </button>
+                </div>
+                <OIPCItem oipcObj={oipcObj} key={oipcObj.oipcNumber} />
                 {index !== (oipcData.length - 1)  && <Divider/>}
             </>
         );
