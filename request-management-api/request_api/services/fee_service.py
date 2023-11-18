@@ -208,7 +208,8 @@ class FeeService:
             },
             timeout=current_app.config.get('CONNECT_TIMEOUT')
         )
-
+        print("<<<<<<< response >>>>>>>>>")
+        print(response)
         return response.json()
 
     def get_paybc_token(self):
