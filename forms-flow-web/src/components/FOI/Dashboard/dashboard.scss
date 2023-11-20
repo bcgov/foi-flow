@@ -246,9 +246,28 @@ nav.MuiPagination-root {
     padding-right: 15px !important;
 }
 
-.foi-dashboard-restricted {
+.dashboard-flag-restricted {
     font-size: 10px;
     color: #A0192F;
+    padding: 2px;
+}
+
+.dashboard-flag-oipcreview {
+    font-size: 10px;
+    color: #fa7c16;
+    padding: 2px;
+}
+
+.dashboard-flag-phasedrelease {
+    font-size: 10px;
+    color: #9207b7;
+    padding: 2px;
+}
+
+.dashboard-flag-placeholder {
+    font-size: 10px;
+    color: #c1bfbf;
+    padding: 2px;
 }
 
 .table-cell-truncate {

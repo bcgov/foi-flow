@@ -6,7 +6,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { push } from "connected-react-router";
 import { fetchFOIMinistryRequestListByPage } from "../../../../apiManager/services/FOI/foiRequestServices";
 import Loading from "../../../../containers/Loading";
-import { debounce, ClickableChip, displayIconMinistry, displayHeaderIcon, cellTooltipRender } from "../utils";
+import { debounce, ClickableChip, displayRestrictedIconMinistry, displayOipcReviewIconMinistry, displayPhasedReleaseIconMinistry, displayHeaderIcon, cellTooltipRender, displayQueueFlagIcons } from "../utils";
 import Grid from "@mui/material/Grid";
 import Stack from "@mui/material/Stack";
 import SearchIcon from "@material-ui/icons/Search";
@@ -113,6 +113,12 @@ const Queue = ({ userDetail, tableInfo }) => {
 
   const columns = React.useRef([
     {
+      field: "flags",
+      headerName: "FLAGS",
+      headerAlign: "left",
+      renderCell: displayQueueFlagIcons,
+    },
+    {
       field: "axisRequestId",
       headerName: "ID NUMBER",
       width: 170,
@@ -165,14 +171,6 @@ const Queue = ({ userDetail, tableInfo }) => {
       width: 0,
       hide: true,
       renderCell: (_params) => <span></span>,
-    },
-    {
-      field: "isministryrestricted",
-      renderHeader: displayHeaderIcon,
-      headerAlign: "left",
-      renderCell: displayIconMinistry,
-      cellClassName: 'foi-dashboard-restricted',
-      flex: 1,
     }
   ]);
 
