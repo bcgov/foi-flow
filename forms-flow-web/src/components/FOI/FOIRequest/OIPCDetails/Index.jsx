@@ -10,6 +10,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCirclePlus } from '@fortawesome/free-solid-svg-icons';
 
 const OIPCDetails = (props) => {
+  //Local State
   const createOIPCId = (oipcData) => {
     if (oipcData.length > 0) {
       return oipcData.map((item, index) => {
@@ -23,6 +24,7 @@ const OIPCDetails = (props) => {
       { oipcNumber: "F23-12346", reviewType: "Review", reason: "Other", status: "Mediation", isInquiry: false, inquiryDate: null, receivedDate: "2022-09-08", investigator: "Peter Forsberg", outcome: "Closed", isJudicalReview: false, isSubAppeal: true },
   ]));
 
+    //Styling
     const useStyles = makeStyles({
         heading: {
           color: '#FFF',
@@ -63,7 +65,7 @@ const OIPCDetails = (props) => {
       setOipcData((prev) => {
         const previousOIPCData = [...prev];
         return previousOIPCData.map((oipc) => {
-          if (oipc.oipcId === newOIPCObj.oipcId) {
+          if (oipc.id === newOIPCObj.id) {
             return newOIPCObj;
           } else {
             return oipc;

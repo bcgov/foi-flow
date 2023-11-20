@@ -1210,7 +1210,9 @@ const FOIRequest = React.memo(({ userDetail }) => {
                         />
                       )}
                       {showOIPCDetails && (
-                        <OIPCDetails/>
+                        <OIPCDetails 
+                          //oipcData={requestDetails.oipc}
+                        />
                       )}
 
                       <BottomButtonGroup

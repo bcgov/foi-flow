@@ -60,12 +60,12 @@ const OIPCItem = (props) => {
             return ["Application of Exceptions", "Deemed Refusal", "TPN - 22", "TPN - 21", "TPN - 18.1", "Reg 3", "Reg 4", "Reg 5", "s. 43", "Other"];
         }
         if (reviewType === "Investigation") {
-            return ["Other"]
+            return ["Other"];
         }
         return ["Adequate search","Extension", "Fee Amount", "Fee Waiver", "Duty to Assist", "Application of Exceptions", "Deemed Refusal", "TPN - 22", "TPN - 21", "TPN - 18.1", "Reg 3", "Reg 4", "Reg 5", "s. 43", "Other"];
     }
 
-    const reasons = filterReasonOptions(oipc.reviewType)
+    const reasons = filterReasonOptions(oipc.reviewType);
 
     return (
         <>
