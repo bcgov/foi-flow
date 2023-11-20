@@ -50,6 +50,8 @@ class dashboardservice:
         baserequestinfo.update({'onBehalfFirstName': request.onBehalfFirstName})
         baserequestinfo.update({'onBehalfLastName': request.onBehalfLastName})
         baserequestinfo.update({'requestPageCount': request.requestPageCount})        
+        isoipcreview = request.isoipcreview if request.isoipcreview == True else False
+        baserequestinfo.update({'isoipcreview': isoipcreview})
         return baserequestinfo
         
     def __preparebaserequestinfo(self, id, requesttype, status, receiveddate, receiveddateuf, assignedgroup, assignedto, idnumber, axisrequestid, version, description, fromdate, todate):
@@ -148,6 +150,8 @@ class dashboardservice:
             
             isministryrestricted = request.isministryrestricted if request.isministryrestricted == True else False
             _openrequest.update({'isministryrestricted': isministryrestricted})
+            isoipcreview = request.isoipcreview if request.isoipcreview == True else False
+            _openrequest.update({'isoipcreview': isoipcreview})
             requestqueue.append(_openrequest)
 
         meta = {
