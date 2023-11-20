@@ -1,5 +1,7 @@
 import { TextField, FormControlLabel, MenuItem, Grid, Checkbox } from '@material-ui/core';
 import { useState } from "react";
+import { formatDate } from "../../../../helper/FOI/helper";
+
 
 const OIPCItem = (props) => {
     const {oipcObj, updateOIPC} = props;
@@ -10,9 +12,7 @@ const OIPCItem = (props) => {
         reason: oipcObj?.reason, 
         status: oipcObj?.status, 
         isInquiry: oipcObj?.isInquiry, 
-        inquiryDate: null, 
         receivedDate: oipcObj?.receivedDate, 
-        complyDate: oipcObj?.complyDate, 
         investigator: oipcObj?.investigator, 
         outcome: oipcObj?.outcome, 
         isJudicalReview: oipcObj?.isJudicalReview, 
@@ -22,37 +22,50 @@ const OIPCItem = (props) => {
     console.log(oipcObj);
     
     const handleReviewType = (value) => {
-        const newOIPCObj = oipc;
-        newOIPCObj.reviewType = value;
-        updateOIPC(newOIPCObj);
+        updateOIPC({...oipc, reviewType: value, reason: ""});
     }
-    const handleOIPCNumber = (event) => {
-        console.log("BANG");
+    const handleOIPCNumber = (value) => {
+        updateOIPC({...oipc, oipcNumber: value});
     }
-    const handleReceivedDate = (event) => {
-        console.log("BANG");
+    const handleReceivedDate = (value) => {
+        updateOIPC({...oipc, receivedDate: value});
     }
-    const handleReason = (event) => {
-        console.log("BANG");
+    const handleReason = (value) => {
+        updateOIPC({...oipc, reason: value});
     }
-    const handleStatus = (event) => {
-        console.log("BANG");
+    const handleStatus = (value) => {
+        updateOIPC({...oipc, status: value});
     }
-    const handleInvestiagtor = (event) => {
-        console.log("BANG");
+    const handleInvestiagtor = (value) => {
+        updateOIPC({...oipc, investigator: value});
     }
-    const handleOutcome = (event) => {
-        console.log("BANG");
+    const handleOutcome = (value) => {
+        updateOIPC({...oipc, outcome: value});
     }
-    const handleInquiry = (event) => {
-        console.log("BANG");
+    const handleInquiry = (value) => {
+        updateOIPC({...oipc, isInquiry: value});
     }
-    const handleJudicalReview = (event) => {
-        console.log("BANG");
+    const handleJudicalReview = (value) => {
+        updateOIPC({...oipc, isJudicalReview: value});
     }
-    const handleSubsequentAppeal = (event) => {
-        console.log("BANG");
+    const handleSubsequentAppeal = (value) => {
+        updateOIPC({...oipc, isSubAppeal: value});
     }
+    //REFACTOR THIS!!!
+    const filterReasonOptions = (reviewType) => {
+        if (reviewType === "Complaint") {
+            return ["Adequate search","Extension", "Fee Amount", "Fee Waiver", "Duty to Assist", "Other"];
+        }
+        if (reviewType === "Review") {
+            return ["Application of Exceptions", "Deemed Refusal", "TPN - 22", "TPN - 21", "TPN - 18.1", "Reg 3", "Reg 4", "Reg 5", "s. 43", "Other"];
+        }
+        if (reviewType === "Investigation") {
+            return ["Other"]
+        }
+        return ["Adequate search","Extension", "Fee Amount", "Fee Waiver", "Duty to Assist", "Application of Exceptions", "Deemed Refusal", "TPN - 22", "TPN - 21", "TPN - 18.1", "Reg 3", "Reg 4", "Reg 5", "s. 43", "Other"];
+    }
+
+    const reasons = filterReasonOptions(oipc.reviewType)
 
     return (
         <>
@@ -64,7 +77,7 @@ const OIPCItem = (props) => {
                         variant="outlined" 
                         required={true}
                         value={oipc.oipcNumber}
-                        // input={<Input />}
+                        onChange = {(event) => handleOIPCNumber(event.target.value)}
                         InputLabelProps={{ shrink: true }}
                     />
                 </Grid>
@@ -75,17 +88,16 @@ const OIPCItem = (props) => {
                         variant="outlined" 
                         required={true}
                         value={oipc.receivedDate}
-                        // input={<Input />}
+                        onChange = {(event) => handleReceivedDate(event.target.value)}
                         InputLabelProps={{ shrink: true }}
+                        InputProps={{inputProps: { max: oipc.receivedDate || formatDate(new Date())} }}
                         type="date"
-                        InputProps={{inputProps: { max: new Date()} }}
                     />
                 </Grid>
                 <Grid item md={3}>
                     <TextField
                         InputLabelProps={{ shrink: true }}
                         select
-                        // input={<Input />}
                         variant="outlined"
                         fullWidth
                         value={oipc.reviewType}
@@ -102,42 +114,27 @@ const OIPCItem = (props) => {
                     <TextField
                         InputLabelProps={{ shrink: true }}
                         select
-                        // input={<Input />}
                         variant="outlined"
                         fullWidth
                         value={oipc.reason}
                         label="Reason"
-                        onChange={handleReviewType}
+                        onChange = {(event) => handleReason(event.target.value)}
                         required={true}
                     >
-                        <MenuItem value={"Adequate search"}>Adequate search</MenuItem>
-                        <MenuItem value={"Application of Exceptions"}>Application of Exceptions</MenuItem>
-                        <MenuItem value={"Deemed Refusal"}>Deemed Refusal</MenuItem>
-                        <MenuItem value={"Extension"}>Extension</MenuItem>
-                        <MenuItem value={"Fee Amount"}>Fee Amount</MenuItem>
-                        <MenuItem value={"Fee Waiver"}>Fee Waiver</MenuItem>
-                        <MenuItem value={"Records do Not Exist"}>Records do Not Exist</MenuItem>
-                        <MenuItem value={"Duty to Assist"}>Duty to Assist</MenuItem>
-                        <MenuItem value={"TPN - 22"}>TPN - 22</MenuItem>
-                        <MenuItem value={"TPN - 21"}>TPN - 21</MenuItem>
-                        <MenuItem value={"TPN - 18.1"}>TPN - 18.1</MenuItem>
-                        <MenuItem value={"Reg 3"}>Reg 3</MenuItem>
-                        <MenuItem value={"Reg 4"}>Reg 4</MenuItem>
-                        <MenuItem value={"Reg 5"}>Reg 5</MenuItem>
-                        <MenuItem value={"s. 43"}>s. 43</MenuItem>
-                        <MenuItem value={"Other"}>Other</MenuItem>
+                        {reasons.map((reason) => {
+                            return <MenuItem key={reason} value={reason}>{reason}</MenuItem>
+                        })}
                     </TextField>
                 </Grid>
                 <Grid item md={3}>
                     <TextField
                         InputLabelProps={{ shrink: true }}
                         select
-                        // input={<Input />}
                         variant="outlined"
                         fullWidth
                         value={oipc.status}
                         label="Status"
-                        onChange={handleReviewType}
+                        onChange = {(event) => handleStatus(event.target.value)}
                         required={true}
                     >
                         <MenuItem value={"Mediation"}>Mediation</MenuItem>
@@ -153,6 +150,7 @@ const OIPCItem = (props) => {
                         label="Investigator/Adjudicator" 
                         variant="outlined" 
                         required={true}
+                        onChange = {(event) => handleInvestiagtor(event.target.value)}
                         value={oipc.investigator}
                         InputLabelProps={{ shrink: true }}
                     />
@@ -161,8 +159,8 @@ const OIPCItem = (props) => {
                     <TextField
                         InputLabelProps={{ shrink: true }}
                         select
-                        // input={<Input />}
                         variant="outlined"
+                        onChange = {(event) => handleOutcome(event.target.value)}
                         fullWidth
                         value={oipc.outcome}
                         label="Outcome"
@@ -178,18 +176,48 @@ const OIPCItem = (props) => {
             <div style={{display:"flex", flexDirection: "row", justifyContent: "space-between"}}>
                 <div style={{display:"flex", flexDirection: "row", alignItems: "center"}}>
                     <p style={{padding: "7px 15px 0px", fontSize: "15px"}}>In Inquiry?</p>
-                    <FormControlLabel required control={<Checkbox checked={oipc.isInquiry} />} label="Yes" />
-                    <FormControlLabel required control={<Checkbox checked={!oipc.isInquiry}  />} label="No" />
+                    <FormControlLabel control={<Checkbox 
+                        checked={oipc.isInquiry} 
+                        onChange = {() => handleInquiry(true)}
+                        />} 
+                        label="Yes" 
+                        />
+                    <FormControlLabel control={<Checkbox 
+                        checked={!oipc.isInquiry} 
+                        onChange = {() => handleInquiry(false)}
+                        />} 
+                        label="No" 
+                        />
                 </div>
                 <div style={{display:"flex", flexDirection: "row", alignItems: "center"}}>
                     <p style={{padding: "7px 15px 0px", fontSize: "15px"}}>In Judicial Review?</p>
-                    <FormControlLabel required control={<Checkbox checked={oipc.isJudicalReview} />} label="Yes" />
-                    <FormControlLabel required control={<Checkbox checked={!oipc.isJudicalReview} />} label="No" />
+                    <FormControlLabel control={<Checkbox 
+                        checked={oipc.isJudicalReview} 
+                        onChange = {() => handleJudicalReview(true)}
+                        />} 
+                        label="Yes" 
+                        />
+                    <FormControlLabel control={<Checkbox 
+                        checked={!oipc.isJudicalReview} 
+                        onChange = {() => handleJudicalReview(false)}
+                        />} 
+                        label="No" 
+                        />
                 </div>
                 <div style={{display:"flex", flexDirection: "row", alignItems: "center"}}>
                     <p style={{padding: "7px 15px 0px", fontSize: "15px"}}>In Subsequent Appeal?</p>
-                    <FormControlLabel required control={<Checkbox checked={oipc.isSubAppeal} />} label="Yes" />
-                    <FormControlLabel required control={<Checkbox checked={!oipc.isSubAppeal}/>} label="No" />
+                    <FormControlLabel control={<Checkbox 
+                        checked={oipc.isSubAppeal} 
+                        onChange = {() => handleSubsequentAppeal(true)}
+                        />} 
+                        label="Yes"
+                        />
+                    <FormControlLabel control={<Checkbox 
+                        checked={!oipc.isSubAppeal} 
+                        onChange = {() => handleSubsequentAppeal(false)}
+                        />} 
+                        label="No" 
+                        />
                 </div>
             </div>
         </>

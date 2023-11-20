@@ -12,7 +12,7 @@ const OIPCDetailsList = (props) => {
         return (
             <>
                 <div style={{display: "flex", flexDirection: "row", justifyContent: "flex-end"}}>
-                    <button onClick={() => removeOIPC(oipcObj.oipcNumber)} style={{ border: "none", background: "none" }}>
+                    <button onClick={() => removeOIPC(oipcObj.id)} style={{ border: "none", background: "none" }}>
                         <FontAwesomeIcon icon={faTrash} color="#38598A" />
                     </button>
                 </div>

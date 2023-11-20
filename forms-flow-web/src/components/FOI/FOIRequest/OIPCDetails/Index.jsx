@@ -10,10 +10,19 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCirclePlus } from '@fortawesome/free-solid-svg-icons';
 
 const OIPCDetails = (props) => {
-    const [oipcData, setOipcData] = useState([
-      { oipcNumber: "F23-12345", reviewType: "Complaint", reason: "Deemed Refusal", status: "Inquiry", isInquiry: false, inquiryDate: null, receivedDate: "05-08-2022", investigator: "Filip Forsberg", outcome: "Withdrawn", isJudicalReview: false, isSubAppeal: false }, 
-      { oipcNumber: "F23-12346", reviewType: "Review", reason: "Other", status: "Mediation", isInquiry: false, inquiryDate: null, receivedDate: "09-08-2022", investigator: "Peter Forsberg", outcome: "Closed", isJudicalReview: false, isSubAppeal: true },
-  ]);
+  const createOIPCId = (oipcData) => {
+    if (oipcData.length > 0) {
+      return oipcData.map((item, index) => {
+        item.id = index;
+        return item;
+      });
+    }
+  }
+    const [oipcData, setOipcData] = useState(createOIPCId([
+      { oipcNumber: "F23-12345", reviewType: "Complaint", reason: "Extension", status: "Inquiry", isInquiry: false, inquiryDate: null, receivedDate: "2022-05-08", investigator: "Filip Forsberg", outcome: "Withdrawn", isJudicalReview: false, isSubAppeal: false }, 
+      { oipcNumber: "F23-12346", reviewType: "Review", reason: "Other", status: "Mediation", isInquiry: false, inquiryDate: null, receivedDate: "2022-09-08", investigator: "Peter Forsberg", outcome: "Closed", isJudicalReview: false, isSubAppeal: true },
+  ]));
+
     const useStyles = makeStyles({
         heading: {
           color: '#FFF',
@@ -26,18 +35,17 @@ const OIPCDetails = (props) => {
       });
     const classes = useStyles();
 
-    //Function to Add an OIPC
+    //Functions
     const addOIPC = () => {
       setOipcData((prev) => {
         return [...prev, {
+          id: oipcData.length > 0 ? oipcData[oipcData.length - 1].id + 1 : 0,
           oipcNumber: "", 
           reviewType: "", 
           reason: "", 
           status: "", 
           isInquiry: false, 
-          inquiryDate: null, 
           receivedDate: "", 
-          complyDate: "", 
           investigator: "", 
           outcome: "", 
           isJudicalReview: false, 
@@ -45,19 +53,17 @@ const OIPCDetails = (props) => {
         }];
       })
     }
-    //Function to Remove an OIPC
-    const removeOIPC = (oipcNo, index) => {
+    const removeOIPC = (oipcId) => {
       setOipcData((prev) => {
         const previousOIPCData = [...prev];
-        return previousOIPCData.filter(oipc => oipcNo !== oipc.oipcNumber);
+        return previousOIPCData.filter(oipc => oipcId !== oipc.id);
       });
     }
-    //Function to Update an OIPC
-    const updateOIPC = (newOIPCObj, index) => {
+    const updateOIPC = (newOIPCObj) => {
       setOipcData((prev) => {
         const previousOIPCData = [...prev];
         return previousOIPCData.map((oipc) => {
-          if (oipc.oipcNumber === newOIPCObj.oipcNumber) {
+          if (oipc.oipcId === newOIPCObj.oipcId) {
             return newOIPCObj;
           } else {
             return oipc;
@@ -70,7 +76,7 @@ const OIPCDetails = (props) => {
         <div className='request-accordian' >
             <Accordion defaultExpanded={true}>
             <AccordionSummary className={classes.accordionSummary} expandIcon={<ExpandMoreIcon />}>
-            <Typography className={classes.heading}>OIPC Details</Typography>
+            <Typography className={classes.heading}>OIPC DETAILS</Typography>
             </AccordionSummary>
             <AccordionDetails>
                 <OIPCDetailsList oipcData={oipcData} removeOIPC={removeOIPC} updateOIPC={updateOIPC} />
