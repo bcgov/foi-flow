@@ -126,8 +126,6 @@ class FeeService:
     def _validate_with_paybc(self, trn_approved):
         paybc_status = None
         paybc_response = self.get_paybc_transaction_details()
-        print("<<<<<<<<< paybc_response >>>>>>>>>>>>>>")
-        print(paybc_response)
         if trn_approved and (paybc_status := paybc_response.get('paymentstatus')) != 'PAID':
             raise BusinessException(Error.INVALID_INPUT)
         if paybc_status == 'PAID' and self.payment.total != float(paybc_response.get('trnamount')):
@@ -200,8 +198,6 @@ class FeeService:
         paybc_ref_number: str = current_app.config.get('PAYBC_REF_NUMBER')
 
         endpoint = f'{paybc_transaction_url}/paybc/payment/{paybc_ref_number}/{self.payment.transaction_number}'
-        print("endpoint >>>>> ", endpoint)
-        print("access_token >>> ", access_token)
         response = requests.get(
             endpoint,
             headers={
@@ -210,15 +206,12 @@ class FeeService:
             },
             timeout=current_app.config.get('CONNECT_TIMEOUT')
         )
-        print("<<<<<<< response >>>>>>>>>")
-        print(response)
         return response.json()
 
     def get_paybc_token(self):
         """Generate oauth token from payBC which will be used for all communication."""
         current_app.logger.debug('<Getting token')
         token_url = current_app.config.get('PAYBC_API_BASE_URL') + '/oauth/token'
-        print("token_url >>>> ", token_url)
         basic_auth_encoded = base64.b64encode(
             bytes(current_app.config.get('PAYBC_API_CLIENT') + ':' + current_app.config.get(
                 'PAYBC_API_SECRET'), 'utf-8')).decode('utf-8')
@@ -232,8 +225,6 @@ class FeeService:
             },
             timeout=current_app.config.get('CONNECT_TIMEOUT')
         )
-        print("response >>>> ")
-        print(response)
         current_app.logger.debug('>Getting token')
         return response
 
