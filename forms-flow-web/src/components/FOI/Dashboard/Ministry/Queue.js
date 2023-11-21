@@ -6,7 +6,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { push } from "connected-react-router";
 import { fetchFOIMinistryRequestListByPage } from "../../../../apiManager/services/FOI/foiRequestServices";
 import Loading from "../../../../containers/Loading";
-import { debounce, ClickableChip, displayRestrictedIconMinistry, displayOipcReviewIconMinistry, displayPhasedReleaseIconMinistry, displayHeaderIcon, cellTooltipRender, displayQueueFlagIcons } from "../utils";
+import { debounce, ClickableChip, cellTooltipRender, displayQueueFlagIcons } from "../utils";
 import Grid from "@mui/material/Grid";
 import Stack from "@mui/material/Stack";
 import SearchIcon from "@material-ui/icons/Search";
