@@ -6,7 +6,7 @@ import { faTrash } from '@fortawesome/free-solid-svg-icons';
 
 const OIPCDetailsList = (props) => {
     const {oipcData, removeOIPC, updateOIPC} = props;
-    console.log("TEST THIS", oipcData);
+    console.log("ARRAY", oipcData);
 
     const OIPCItems = oipcData?.map((oipcObj, index) => {
         return (
@@ -16,7 +16,7 @@ const OIPCDetailsList = (props) => {
                         <FontAwesomeIcon icon={faTrash} color="#38598A" />
                     </button>
                 </div>
-                <OIPCItem oipcObj={oipcObj} key={oipcObj.oipcNumber} updateOIPC={updateOIPC} />
+                <OIPCItem oipcObj={oipcObj} key={oipcObj.id} updateOIPC={updateOIPC} />
                 {index !== (oipcData.length - 1)  && <Divider/>}
             </>
         );

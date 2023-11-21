@@ -7,11 +7,13 @@ const OIPCItem = (props) => {
     const {oipcObj, updateOIPC} = props;
 
     const [oipc, setOipc] = useState({
+        id: oipcObj?.id, 
         oipcNumber: oipcObj?.oipcNumber, 
         reviewType: oipcObj?.reviewType, 
         reason: oipcObj?.reason, 
         status: oipcObj?.status, 
         isInquiry: oipcObj?.isInquiry, 
+        inquiryDate: null, 
         receivedDate: oipcObj?.receivedDate, 
         investigator: oipcObj?.investigator, 
         outcome: oipcObj?.outcome, 
@@ -22,34 +24,55 @@ const OIPCItem = (props) => {
     console.log(oipcObj);
     
     const handleReviewType = (value) => {
-        updateOIPC({...oipc, reviewType: value, reason: ""});
+        const newOIPCObj = oipc;
+        newOIPCObj.reviewType = value;
+        newOIPCObj.reason = "";
+        updateOIPC(newOIPCObj);
     }
     const handleOIPCNumber = (value) => {
-        updateOIPC({...oipc, oipcNumber: value});
+        const newOIPCObj = oipc;
+        newOIPCObj.oipcNumber = value;
+        updateOIPC(newOIPCObj);
     }
     const handleReceivedDate = (value) => {
-        updateOIPC({...oipc, receivedDate: value});
+        const newOIPCObj = oipc;
+        newOIPCObj.receivedDate = value;
+        updateOIPC(newOIPCObj);
     }
     const handleReason = (value) => {
-        updateOIPC({...oipc, reason: value});
+        const newOIPCObj = oipc;
+        newOIPCObj.reason = value;
+        updateOIPC(newOIPCObj);
     }
     const handleStatus = (value) => {
-        updateOIPC({...oipc, status: value});
+        const newOIPCObj = oipc;
+        newOIPCObj.status = value;
+        updateOIPC(newOIPCObj);
     }
     const handleInvestiagtor = (value) => {
-        updateOIPC({...oipc, investigator: value});
+        const newOIPCObj = oipc;
+        newOIPCObj.investigator = value;
+        updateOIPC(newOIPCObj);
     }
     const handleOutcome = (value) => {
-        updateOIPC({...oipc, outcome: value});
+        const newOIPCObj = oipc;
+        newOIPCObj.outcome = value;
+        updateOIPC(newOIPCObj);
     }
     const handleInquiry = (value) => {
-        updateOIPC({...oipc, isInquiry: value});
+        const newOIPCObj = oipc;
+        newOIPCObj.isInquiry = value;
+        updateOIPC(newOIPCObj);
     }
     const handleJudicalReview = (value) => {
-        updateOIPC({...oipc, isJudicalReview: value});
+        const newOIPCObj = oipc;
+        newOIPCObj.isJudicalReview = value;
+        updateOIPC(newOIPCObj);
     }
     const handleSubsequentAppeal = (value) => {
-        updateOIPC({...oipc, isSubAppeal: value});
+        const newOIPCObj = oipc;
+        newOIPCObj.isSubAppeal = value;
+        updateOIPC(newOIPCObj);
     }
     //REFACTOR THIS!!!
     const filterReasonOptions = (reviewType) => {
@@ -60,12 +83,12 @@ const OIPCItem = (props) => {
             return ["Application of Exceptions", "Deemed Refusal", "TPN - 22", "TPN - 21", "TPN - 18.1", "Reg 3", "Reg 4", "Reg 5", "s. 43", "Other"];
         }
         if (reviewType === "Investigation") {
-            return ["Other"];
+            return ["Other"]
         }
         return ["Adequate search","Extension", "Fee Amount", "Fee Waiver", "Duty to Assist", "Application of Exceptions", "Deemed Refusal", "TPN - 22", "TPN - 21", "TPN - 18.1", "Reg 3", "Reg 4", "Reg 5", "s. 43", "Other"];
     }
 
-    const reasons = filterReasonOptions(oipc.reviewType);
+    const reasons = filterReasonOptions(oipc.reviewType)
 
     return (
         <>
