@@ -17,7 +17,7 @@ import {
 
 import {
   fetchFOIMinistryAssignedToList,
-  fetchFOIPersonalDivisionsAndSections
+  fetchFOIPersonalDivisionsAndSections,
 } from "../../../../apiManager/services/FOI/foiMasterDataServices";
 
 import { fetchFOIRequestAttachmentsList } from "../../../../apiManager/services/FOI/foiAttachmentServices";
@@ -435,11 +435,11 @@ const MinistryReview = React.memo(({ userDetail }) => {
       foitabheaderBG = "foitabheadercollection foitabheaderPeerreviewBG";
       break;
     case StateEnum.tagging.name:
-        foitabheaderBG = "foitabheadercollection foitabheaderTaggingBG";
-        break; 
+      foitabheaderBG = "foitabheadercollection foitabheaderTaggingBG";
+      break; 
     case StateEnum.readytoscan.name:
-        foitabheaderBG = "foitabheadercollection foitabheaderReadytoScanBG";
-        break;       
+      foitabheaderBG = "foitabheadercollection foitabheaderReadytoScanBG";
+      break;       
     default:
       foitabheaderBG = "foitabheadercollection foitabheaderdefaultBG";
       break;
