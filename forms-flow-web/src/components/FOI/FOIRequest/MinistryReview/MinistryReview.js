@@ -227,8 +227,12 @@ const MinistryReview = React.memo(({ userDetail }) => {
   const [originalDivisions, setOriginalDivisions] = React.useState([]);
   const [hasReceivedDate, setHasReceivedDate] = React.useState(true);
   const [isMinistryRestricted, setIsMinistryRestricted] = useState(false);
-  const [isMCFPersonal, setIsMCFPersonal] = useState(bcgovcode.replaceAll('"', '') == "MCF" && requestDetails.requestType == FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL);
-
+  const [isMCFPersonal, setIsMCFPersonal] = useState(
+    bcgovcode.replaceAll('"', "") == "MCF" &&
+      requestDetails.requestType ==
+        FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL
+  );
+  const [unSavedRequest, setUnSavedRequest] = React.useState(false);
   let ministryassignedtousername = "Unassigned";
   useEffect(() => {
     const requestDetailsValue = requestDetails;
@@ -249,9 +253,15 @@ const MinistryReview = React.memo(({ userDetail }) => {
       );
     }
 
-    if(MinistryNeedsScanning.includes(bcgovcode.replaceAll('"', '')) && requestDetails.requestType == FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL) {
-      dispatch(fetchFOIPersonalDivisionsAndSections(bcgovcode.replaceAll('"', '')));
-      if(bcgovcode.replaceAll('"', '') == "MCF") {
+    if (
+      MinistryNeedsScanning.includes(bcgovcode.replaceAll('"', "")) &&
+      requestDetails.requestType ==
+        FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL
+    ) {
+      dispatch(
+        fetchFOIPersonalDivisionsAndSections(bcgovcode.replaceAll('"', ""))
+      );
+      if (bcgovcode.replaceAll('"', "") == "MCF") {
         setIsMCFPersonal(true);
       }
     }
@@ -269,7 +279,6 @@ const MinistryReview = React.memo(({ userDetail }) => {
     }
   }, [isMinistryRestricted, requestWatchers]);
 
-  const [unSavedRequest, setUnSavedRequest] = React.useState(false);
   const [recordsUploading, setRecordsUploading] = React.useState(false);
   const [CFRUnsaved, setCFRUnsaved] = React.useState(false);
   const hideBottomText = [
@@ -632,15 +641,18 @@ const MinistryReview = React.memo(({ userDetail }) => {
                 ? `(${requestNotes.length})`
                 : ""}
             </div>
-            {(originalDivisions?.length > 0 || isMCFPersonal) && DISABLE_GATHERINGRECORDS_TAB?.toLowerCase() =='false' &&<div
-              className={clsx("tablinks", {
-                active: tabLinksStatuses.Records.active,
-              })}
-              name="Records"
-              onClick={() => tabclick("Records")}
-            >
-              Records
-            </div>}
+            {(originalDivisions?.length > 0 || isMCFPersonal) &&
+              DISABLE_GATHERINGRECORDS_TAB?.toLowerCase() == "false" && (
+                <div
+                  className={clsx("tablinks", {
+                    active: tabLinksStatuses.Records.active,
+                  })}
+                  name="Records"
+                  onClick={() => tabclick("Records")}
+                >
+                  Records
+                </div>
+              )}
           </div>
 
           <div className="foileftpanelstatus">
@@ -938,7 +950,8 @@ const MinistryReview = React.memo(({ userDetail }) => {
               [classes.hidden]: !tabLinksStatuses.Records.display,
             })}
           >
-            {!isAttachmentListLoading && (originalDivisions?.length > 0 || isMCFPersonal) ? (
+            {!isAttachmentListLoading &&
+            (originalDivisions?.length > 0 || isMCFPersonal) ? (
               <>
                 {url.indexOf("records") > -1 ? (
                   <Breadcrumbs
