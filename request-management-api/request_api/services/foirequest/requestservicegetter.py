@@ -9,6 +9,7 @@ from request_api.models.FOIRequestApplicantMappings import FOIRequestApplicantMa
 from request_api.models.FOIMinistryRequestSubjectCodes import FOIMinistryRequestSubjectCode
 from request_api.models.FOIRestrictedMinistryRequests import FOIRestrictedMinistryRequest
 from request_api.models.FOIRequestOIPC import FOIRequestOIPC
+from request_api.services.oipcservice import oipcservice
 from dateutil.parser import parse
 from request_api.services.cfrfeeservice import cfrfeeservice
 from request_api.services.paymentservice import paymentservice
@@ -214,27 +215,40 @@ class requestservicegetter:
     def getoipcdetails(self, ministryrequestid, ministryrequestversion):
         oipcdetails = []
         _oipclist = FOIRequestOIPC.getoipc(ministryrequestid, ministryrequestversion)
+        inquiryoutcomes = oipcservice().getinquiryoutcomes()
         if _oipclist is not None:                      
             for entry in _oipclist:
                 oipc = {
                     "oipcid": entry["oipcid"],
                     "oipcno": entry["oipcno"],
                     "reviewtypeid": entry["reviewtypeid"],
+                    "reviewetype": entry["reviewtype.name"],
                     "reasonid": entry["reasonid"],
+                    "reason": entry["reason.name"],
                     "statusid": entry["statusid"],
+                    "status":entry["status.name"],
                     "outcomeid": entry["outcomeid"],
+                    "outcome": entry["outcome.name"],
                     "investigator": entry["investigator"],
                     "isinquiry": entry["isinquiry"],
                     "isjudicialreview": entry["isjudicialreview"],
                     "issubsequentappeal": entry["issubsequentappeal"],
-                    "inquiryattributes": entry["inquiryattributes"],   
+                    "inquiryattributes": self.formatinquiryattribute(entry["inquiryattributes"], inquiryoutcomes),   
                     "createdby": entry["createdby"],
+                    "receiveddate" : parse(entry["receiveddate"]).strftime('%b, %d %Y') if entry["receiveddate"] is not None else '',
+                    "closeddate": parse(entry["closeddate"]).strftime('%b, %d %Y') if entry["closeddate"] is not None else '',
                     "created_at": parse(entry["created_at"]).strftime(self.__genericdateformat())                 
                     } 
                 oipcdetails.append(oipc) 
         return oipcdetails
     
-    
+    def formatinquiryattribute(self, inquiryattribute, inquiryoutcomes):
+        if inquiryattribute not in (None, {}):
+            for outcome in inquiryoutcomes:
+                if inquiryattribute["inquiryoutcome"] == outcome["inquiryoutcomeid"]:
+                    inquiryattribute["inquiryoutcomename"] =  outcome["name"]
+        return inquiryattribute
+
     
     def getonholdtransition(self, foiministryrequestid):
         onholddate = None

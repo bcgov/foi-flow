@@ -19,15 +19,21 @@ class FOIRequestOIPC(db.Model):
     foiministryrequest_id =db.Column(db.Integer, db.ForeignKey('FOIMinistryRequests.foiministryrequestid'))
     foiministryrequestversion_id =db.Column(db.Integer, db.ForeignKey('FOIMinistryRequests.version'))
     oipcno = db.Column(db.String(120), unique=False, nullable=True)  
-    reviewtypeid = db.Column(db.Integer, unique=False, nullable=False)
-    reasonid = db.Column(db.Integer, unique=False, nullable=False)
-    statusid = db.Column(db.Integer, unique=False, nullable=True)
-    outcomeid = db.Column(db.Integer, unique=False, nullable=True)
+    reviewtypeid = db.Column(db.Integer,ForeignKey('OIPCReviewTypes.reviewtypeid'))
+    reviewtype =  relationship("OIPCReviewTypes",backref=backref("OIPCReviewTypes"),uselist=False)
+    reasonid = db.Column(db.Integer,ForeignKey('OIPCReasons.reasonid'))
+    reason =  relationship("OIPCReasons",backref=backref("OIPCReasons"),uselist=False)
+    statusid = db.Column(db.Integer,ForeignKey('OIPCStatuses.statusid'))
+    status =  relationship("OIPCStatuses",backref=backref("OIPCStatuses"),uselist=False)
+    outcomeid = db.Column(db.Integer,ForeignKey('OIPCOutcomes.outcomeid'))
+    outcome =  relationship("OIPCOutcomes",backref=backref("OIPCOutcomes"),uselist=False)
     isinquiry = db.Column(db.Boolean, unique=False, nullable=True)
     inquiryattributes = db.Column(JSON, unique=False, nullable=True)
     isjudicialreview = db.Column(db.Boolean, unique=False, nullable=True)
     issubsequentappeal = db.Column(db.Boolean, unique=False, nullable=True)
     investigator = db.Column(db.String(500), unique=False, nullable=True) 
+    receiveddate = db.Column(db.Date, nullable=True)
+    closeddate = db.Column(db.Date, nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.now)
     createdby = db.Column(db.String(120), unique=False, nullable=False)
     updated_at = db.Column(db.DateTime, nullable=True)
@@ -44,4 +50,6 @@ class FOIRequestOIPC(db.Model):
             
 class FOIRequestOIPCSchema(ma.Schema):
     class Meta:
-        fields = ('oipcid', 'version', 'ministryrequestid', 'investigator','ministryversion','oipcno','reviewtypeid','reasonid','statusid','outcomeid','isinquiry','inquiryattributes','isjudicialreview','issubsequentappeal','isactive','created_at','createdby','updated_at','updatedby') 
+        fields = ('oipcid', 'version', 'ministryrequestid', 'investigator','ministryversion','oipcno','reviewtypeid','reasonid','statusid','outcomeid','isinquiry','inquiryattributes','isjudicialreview',
+                  'issubsequentappeal','isactive','receiveddate','closeddate','created_at','createdby','updated_at','updatedby',
+                  'reviewtype.name', 'reason.name', 'status.name', 'outcome.name') 

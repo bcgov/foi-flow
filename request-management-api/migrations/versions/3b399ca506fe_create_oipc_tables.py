@@ -10,6 +10,7 @@ import sqlalchemy as sa
 from sqlalchemy.dialects import postgresql
 from sqlalchemy import Table, Column, Integer, String, MetaData
 meta = MetaData()
+from sqlalchemy.sql.schema import ForeignKey
 
 
 # revision identifiers, used by Alembic.
@@ -32,6 +33,14 @@ def upgrade():
     sa.Column('name', sa.String(length=100), unique=False, nullable=False),
     sa.Column('isactive', sa.Boolean(), unique=False, nullable=False),
     sa.PrimaryKeyConstraint('reasonid')
+    )
+
+    reviewtypes_reasons_table = op.create_table('OIPCReviewTypesReasons',
+    sa.Column('reviewtypereasonid', sa.Integer(), autoincrement=True, nullable=False),
+    sa.Column('reviewtypeid', sa.Integer(), ForeignKey('OIPCReviewTypes.reviewtypeid'), unique=False, nullable=False),
+    sa.Column('reasonid', sa.Integer(), ForeignKey('OIPCReasons.reasonid'), unique=False, nullable=False),
+    sa.Column('isactive', sa.Boolean(), unique=False, nullable=False),
+    sa.PrimaryKeyConstraint('reviewtypereasonid'),
     )
 
     statusestable = op.create_table('OIPCStatuses',
@@ -102,7 +111,28 @@ def upgrade():
                 ('Decision Partially Upheld', True),
                 ('Decision Overturned', True);commit;''')
 
+    op.execute('''INSERT INTO public."OIPCReviewTypesReasons" (reviewtypeid, reasonid, isactive)
+               VALUES
+                (1, 1, True),
+                (1, 4, True),
+                (1, 5, True),
+                (1, 6, True),
+                (1, 8, True),
+                (1, 16, True),
+                (2, 2, True),
+                (2, 3, True),
+                (2, 9, True),
+                (2, 10, True),
+                (2, 11, True),
+                (2, 12, True),
+                (2, 13, True),
+                (2, 14, True),
+                (2, 15, True),
+                (2, 16, True),
+                (3, 16, True);commit;''')
+
 def downgrade():
+    op.drop_table('OIPCReviewTypesReasons')
     op.drop_table('OIPCReviewTypes')
     op.drop_table('OIPCReasons')
     op.drop_table('OIPCStatuses')
