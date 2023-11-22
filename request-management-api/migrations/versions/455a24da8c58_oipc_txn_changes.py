@@ -33,11 +33,17 @@ def upgrade():
     sa.Column('isjudicialreview', sa.Boolean(), nullable=True),
     sa.Column('issubsequentappeal', sa.Boolean(), nullable=True),
     sa.Column('inquiryattributes', sa.JSON, nullable=True),
+    sa.Column('receiveddate', sa.Date(), nullable=True),
+    sa.Column('closeddate', sa.Date(), nullable=True),
     sa.Column('created_at', sa.DateTime(), nullable=False),
     sa.Column('createdby', sa.String(length=120), nullable=False),
     sa.Column('updated_at', sa.DateTime(), nullable=True),
     sa.Column('updatedby', sa.String(length=120), nullable=True),
     sa.ForeignKeyConstraint(['foiministryrequest_id', 'foiministryrequestversion_id'], ['FOIMinistryRequests.foiministryrequestid', 'FOIMinistryRequests.version'], ),
+    sa.ForeignKeyConstraint(['reviewtypeid'], ['OIPCReviewTypes.reviewtypeid']),
+    sa.ForeignKeyConstraint(['reasonid'], ['OIPCReasons.reasonid']),
+    sa.ForeignKeyConstraint(['statusid'], ['OIPCStatuses.statusid']),
+    sa.ForeignKeyConstraint(['outcomeid'], ['OIPCOutcomes.outcomeid']),
     sa.PrimaryKeyConstraint('oipcid')
     )
     # ### end Alembic commands ###

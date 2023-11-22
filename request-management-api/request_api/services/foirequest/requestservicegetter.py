@@ -219,15 +219,21 @@ class requestservicegetter:
                 oipc = {
                     "oipcid": entry["oipcid"],
                     "reviewtypeid": entry["reviewtypeid"],
+                    "reviewetype": entry["reviewtype.name"],
                     "reasonid": entry["reasonid"],
+                    "reason": entry["reason.name"],
                     "statusid": entry["statusid"],
+                    "status":entry["status.name"],
                     "outcomeid": entry["outcomeid"],
+                    "outcome": entry["outcome.name"],
                     "investigator": entry["investigator"],
                     "isinquiry": entry["isinquiry"],
                     "isjudicialreview": entry["isjudicialreview"],
                     "issubsequentappeal": entry["issubsequentappeal"],
                     "inquiryattributes": entry["inquiryattributes"],   
                     "createdby": entry["createdby"],
+                    "receiveddate" : parse(entry["receiveddate"]).strftime('%b, %d %Y') if entry["receiveddate"] is not None else '',
+                    "closeddate": parse(entry["closeddate"]).strftime('%b, %d %Y') if entry["closeddate"] is not None else '',
                     "created_at": parse(entry["created_at"]).strftime(self.__genericdateformat())                 
                     } 
                 oipcdetails.append(oipc) 

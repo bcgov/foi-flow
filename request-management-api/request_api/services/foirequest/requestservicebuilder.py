@@ -149,6 +149,8 @@ class requestservicebuilder(requestserviceconfigurator):
                 oipcreview.isjudicialreview = oipc["isjudicialreview"]
                 oipcreview.issubsequentappeal = oipc["issubsequentappeal"]
                 oipcreview.issubsequentappeal = oipc["issubsequentappeal"]
+                oipcreview.receiveddate = oipc["receiveddate"]
+                oipcreview.closeddate = oipc["closeddate"]
                 oipcreview.isactive = True
                 if oipc["isinquiry"] == True:
                     oipcreview.inquiryattributes = oipc["inquiryattributes"]

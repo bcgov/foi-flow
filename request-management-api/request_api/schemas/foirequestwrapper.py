@@ -78,7 +78,8 @@ class FOIMinistryRequestOIPCSchema(Schema):
     isjudicialreview = fields.Bool(data_key="isjudicialreview")
     issubsequentappeal = fields.Bool(data_key="issubsequentappeal")
     inquiryattributes = fields.Nested(FOIOIPCInquirySchema, data_key="inquiryattributes", allow_none=True)
-
+    receiveddate = fields.Str(data_key="receiveddate",allow_none=True)
+    closeddate = fields.Str(data_key="closeddate",allow_none=True)
 
 class FOIRequestWrapperSchema(Schema):
 
