@@ -1,11 +1,15 @@
 import { TextField, FormControlLabel, MenuItem, Grid, Checkbox } from '@material-ui/core';
-import { useState } from "react";
-import { useSelector } from "react-redux";
+import { useState, useEffect } from "react";
 import { formatDate } from "../../../../helper/FOI/helper";
-
+import { useSelector } from "react-redux";
 
 const OIPCItem = (props) => {
     const {oipcObj, updateOIPC} = props;
+    
+    //App State
+    const oipcOutcomes = useSelector(state=> state.foiRequests.oipcOutcomes);
+    const oipcStatuses = useSelector(state=> state.foiRequests.oipcStatuses);
+    const oipcReviewtypes = useSelector(state=> state.foiRequests.oipcReviewtypes);
 
     //Local State
     const [oipc, setOipc] = useState({
@@ -21,18 +25,13 @@ const OIPCItem = (props) => {
         investigator: oipcObj?.investigator, 
         outcomeid: oipcObj?.outcomeid, 
         isjudicialreview: oipcObj?.isjudicialreview, 
-        issubsequentappeal: oipcObj?.issubsequentappeal, 
+        reviewtypeName: oipcObj?.reviewtypeName,
+        reasonName: "", 
+        statusName: oipcObj?.statusName, 
+        outcomeName: oipcObj?.outcomeName,
     });
 
-    //App State
-    const oipcOutcomes = useSelector(state=> state.foiRequests.oipcOutcomes);
-    const oipcStatuses = useSelector(state=> state.foiRequests.oipcStatuses);
-    const oipcReviewtypes = useSelector(state=> state.foiRequests.oipcReviewtypes);
-
     console.log(oipc);
-    console.log(oipcOutcomes)
-    console.log(oipcStatuses)
-    console.log(oipcReviewtypes)
     
     //Functions
     const handleReviewType = (value) => {
@@ -91,20 +90,16 @@ const OIPCItem = (props) => {
         newOIPCObj.issubsequentappeal = value;
         updateOIPC(newOIPCObj);
     }
-    const getNameFromId = (attribute, id) => {
-        if (attribute === "STATUS") {
-            const status = oipcStatuses.find(status => status.statusid === id);
-            return status.name;
-        }
-        if (attribute === "REVIEW_TYPE") {
-            const reviewtype = oipcReviewtypes.find(reviewtype => reviewtype.reviewtypeid === id);
-            return reviewtype.name;
-        }
-        if (attribute === "OUTCOME") {
-            const outcome = oipcOutcomes.find(outcome => outcome.outcomeid === id);
-            return outcome.name;
-        }
+    const generateNamesFromOIPCId = (oipcObj) => {
+        const reviewtype = oipcReviewtypes.find(reviewtype => reviewtype.reviewtypeid === oipcObj.reviewtypeid);
+        const status = oipcStatuses.find(status => status.statusid === oipcObj.statusid);
+        const outcome = oipcOutcomes.find(outcome => outcome.outcomeid === oipcObj.outcomeid);
+
+        oipcObj.reviewtypeName = reviewtype ? reviewtype.name : "";
+        oipcObj.statusName = status ? status.name : "";
+        oipcObj.outcomeName = outcome ? outcome.name : "";
     }
+
     //REFACTOR THIS!!!
     const filterReasonOptions = (reviewType) => {
         if (reviewType === "Complaint") {
@@ -119,6 +114,10 @@ const OIPCItem = (props) => {
         return ["Adequate search","Extension", "Fee Amount", "Fee Waiver", "Duty to Assist", "Application of Exceptions", "Deemed Refusal", "TPN - 22", "TPN - 21", "TPN - 18.1", "Reg 3", "Reg 4", "Reg 5", "s. 43", "Other"];
     }
     const reasons = filterReasonOptions(oipc.reviewType)
+
+    useEffect(() => {
+        generateNamesFromOIPCId(oipcObj);
+    }, [oipcObj])
 
     return (
         <>
@@ -153,7 +152,7 @@ const OIPCItem = (props) => {
                         select
                         variant="outlined"
                         fullWidth
-                        value={getNameFromId("REVIEW_TYPE", oipc.reviewtypeid)}
+                        value={oipc.reviewtypeid}
                         label="Review Type"
                         onChange={(event) => handleReviewType(event.target.value)}
                         required={true}
@@ -185,7 +184,7 @@ const OIPCItem = (props) => {
                         select
                         variant="outlined"
                         fullWidth
-                        value={getNameFromId("STATUS", oipc.statusid)}
+                        value={oipc.statusid}
                         label="Status"
                         onChange = {(event) => handleStatus(event.target.value)}
                         required={true}
@@ -213,7 +212,7 @@ const OIPCItem = (props) => {
                         variant="outlined"
                         onChange = {(event) => handleOutcome(event.target.value)}
                         fullWidth
-                        value={getNameFromId("OUTCOME", oipc.outcomeid)}
+                        value={oipc.outcomeid}
                         label="Outcome"
                         required={true}
                     >

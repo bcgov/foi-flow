@@ -52,7 +52,11 @@ const OIPCDetails = (props) => {
           investigator: "", 
           outcomeid: null, 
           isjudicialreview: false, 
-          issubsequentappeal: false
+          issubsequentappeal: false,
+          reviewtype: "",
+          status: "",
+          outcome: "",
+          reason: "",
         }];
       })
     }
