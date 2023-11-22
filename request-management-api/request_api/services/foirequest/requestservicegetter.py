@@ -218,6 +218,7 @@ class requestservicegetter:
             for entry in _oipclist:
                 oipc = {
                     "oipcid": entry["oipcid"],
+                    "oipcno": entry["oipcno"],
                     "reviewtypeid": entry["reviewtypeid"],
                     "reasonid": entry["reasonid"],
                     "statusid": entry["statusid"],

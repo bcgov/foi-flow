@@ -24,6 +24,9 @@ import {
   fetchFOIMinistryAssignedToList,
   fetchFOISubjectCodeList,
   fetchFOIPersonalDivisionsAndSections,
+  fetchOIPCOutcomes,
+  fetchOIPCStatuses,
+  fetchOIPCReviewtypes,
 } from "../../../apiManager/services/FOI/foiMasterDataServices";
 import {
   fetchFOIRequestDetailsWrapper,
@@ -293,6 +296,10 @@ const FOIRequest = React.memo(({ userDetail }) => {
     dispatch(fetchFOIDeliveryModeList());
     dispatch(fetchFOISubjectCodeList());
     dispatch(fetchClosingReasonList());
+    
+    dispatch(fetchOIPCOutcomes());
+    dispatch(fetchOIPCStatuses());
+    dispatch(fetchOIPCReviewtypes());
 
     if (bcgovcode) dispatch(fetchFOIMinistryAssignedToList(bcgovcode));
   }, [requestId, ministryId, comment, attachments]);
@@ -1211,7 +1218,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
                       )}
                       {showOIPCDetails && (
                         <OIPCDetails 
-                          //oipcData={requestDetails.oipc}
+                          oipcDetails={requestDetails.oipcdetails}
                         />
                       )}
 

@@ -425,3 +425,24 @@ export const setConversionFormats = (data) => (dispatch) => {
     payload: data,
   });
 };
+
+export const setOIPCOutcomes = (data) => (dispatch) => {
+  dispatch({
+    type: FOI_ACTION_CONSTANTS.OIPC_OUTCOMES,
+    payload: data,
+  });
+};
+
+export const setOIPCStatuses = (data) => (dispatch) => {
+  dispatch({
+    type: FOI_ACTION_CONSTANTS.OIPC_STATUSES,
+    payload: data,
+  });
+};
+
+export const setOIPCReviewtypes = (data) => (dispatch) => {
+  dispatch({
+    type: FOI_ACTION_CONSTANTS.OIPC_REVIEWTYPES,
+    payload: data,
+  });
+};

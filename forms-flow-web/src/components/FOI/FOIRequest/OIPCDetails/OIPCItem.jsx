@@ -1,52 +1,69 @@
 import { TextField, FormControlLabel, MenuItem, Grid, Checkbox } from '@material-ui/core';
 import { useState } from "react";
+import { useSelector } from "react-redux";
 import { formatDate } from "../../../../helper/FOI/helper";
 
 
 const OIPCItem = (props) => {
     const {oipcObj, updateOIPC} = props;
 
+    //Local State
     const [oipc, setOipc] = useState({
         id: oipcObj?.id, 
-        oipcNumber: oipcObj?.oipcNumber, 
-        reviewType: oipcObj?.reviewType, 
-        reason: oipcObj?.reason, 
-        status: oipcObj?.status, 
-        isInquiry: oipcObj?.isInquiry, 
-        inquiryDate: null, 
-        receivedDate: oipcObj?.receivedDate, 
+        oipcno: oipcObj?.oipcno, 
+        reviewtypeid: oipcObj?.reviewtypeid, 
+        reasonid: oipcObj?.reasonid, 
+        statusid: oipcObj?.statusid, 
+        isinquiry: oipcObj?.isinquiry, 
+        inquiryattributes: oipcObj?.inquiryattributes,  
+        receiveddate: oipcObj?.receiveddate,
+        closeddate: oipcObj?.closeddate,
         investigator: oipcObj?.investigator, 
-        outcome: oipcObj?.outcome, 
-        isJudicalReview: oipcObj?.isJudicalReview, 
-        isSubAppeal: oipcObj?.isSubAppeal, 
+        outcomeid: oipcObj?.outcomeid, 
+        isjudicialreview: oipcObj?.isjudicialreview, 
+        issubsequentappeal: oipcObj?.issubsequentappeal, 
     });
 
-    console.log(oipcObj);
+    //App State
+    const oipcOutcomes = useSelector(state=> state.foiRequests.oipcOutcomes);
+    const oipcStatuses = useSelector(state=> state.foiRequests.oipcStatuses);
+    const oipcReviewtypes = useSelector(state=> state.foiRequests.oipcReviewtypes);
+
+    console.log(oipc);
+    console.log(oipcOutcomes)
+    console.log(oipcStatuses)
+    console.log(oipcReviewtypes)
     
+    //Functions
     const handleReviewType = (value) => {
         const newOIPCObj = oipc;
-        newOIPCObj.reviewType = value;
-        newOIPCObj.reason = "";
+        newOIPCObj.reviewtypeid = value;
+        newOIPCObj.reasonid = -1;
         updateOIPC(newOIPCObj);
     }
     const handleOIPCNumber = (value) => {
         const newOIPCObj = oipc;
-        newOIPCObj.oipcNumber = value;
+        newOIPCObj.oipcno = value;
         updateOIPC(newOIPCObj);
     }
     const handleReceivedDate = (value) => {
         const newOIPCObj = oipc;
-        newOIPCObj.receivedDate = value;
+        newOIPCObj.receiveddate = value;
+        updateOIPC(newOIPCObj);
+    }
+    const handleClosedDate = (value) => {
+        const newOIPCObj = oipc;
+        newOIPCObj.closeddate = value;
         updateOIPC(newOIPCObj);
     }
     const handleReason = (value) => {
         const newOIPCObj = oipc;
-        newOIPCObj.reason = value;
+        newOIPCObj.reasonid = value;
         updateOIPC(newOIPCObj);
     }
     const handleStatus = (value) => {
         const newOIPCObj = oipc;
-        newOIPCObj.status = value;
+        newOIPCObj.statusid = value;
         updateOIPC(newOIPCObj);
     }
     const handleInvestiagtor = (value) => {
@@ -56,23 +73,37 @@ const OIPCItem = (props) => {
     }
     const handleOutcome = (value) => {
         const newOIPCObj = oipc;
-        newOIPCObj.outcome = value;
+        newOIPCObj.outcomeid = value;
         updateOIPC(newOIPCObj);
     }
     const handleInquiry = (value) => {
         const newOIPCObj = oipc;
-        newOIPCObj.isInquiry = value;
+        newOIPCObj.isinquiry = value;
         updateOIPC(newOIPCObj);
     }
     const handleJudicalReview = (value) => {
         const newOIPCObj = oipc;
-        newOIPCObj.isJudicalReview = value;
+        newOIPCObj.isjudicialreview = value;
         updateOIPC(newOIPCObj);
     }
     const handleSubsequentAppeal = (value) => {
         const newOIPCObj = oipc;
-        newOIPCObj.isSubAppeal = value;
+        newOIPCObj.issubsequentappeal = value;
         updateOIPC(newOIPCObj);
+    }
+    const getNameFromId = (attribute, id) => {
+        if (attribute === "STATUS") {
+            const status = oipcStatuses.find(status => status.statusid === id);
+            return status.name;
+        }
+        if (attribute === "REVIEW_TYPE") {
+            const reviewtype = oipcReviewtypes.find(reviewtype => reviewtype.reviewtypeid === id);
+            return reviewtype.name;
+        }
+        if (attribute === "OUTCOME") {
+            const outcome = oipcOutcomes.find(outcome => outcome.outcomeid === id);
+            return outcome.name;
+        }
     }
     //REFACTOR THIS!!!
     const filterReasonOptions = (reviewType) => {
@@ -87,7 +118,6 @@ const OIPCItem = (props) => {
         }
         return ["Adequate search","Extension", "Fee Amount", "Fee Waiver", "Duty to Assist", "Application of Exceptions", "Deemed Refusal", "TPN - 22", "TPN - 21", "TPN - 18.1", "Reg 3", "Reg 4", "Reg 5", "s. 43", "Other"];
     }
-
     const reasons = filterReasonOptions(oipc.reviewType)
 
     return (
@@ -99,7 +129,7 @@ const OIPCItem = (props) => {
                         label="OIPC No" 
                         variant="outlined" 
                         required={true}
-                        value={oipc.oipcNumber}
+                        value={oipc.oipcno}
                         onChange = {(event) => handleOIPCNumber(event.target.value)}
                         InputLabelProps={{ shrink: true }}
                     />
@@ -110,10 +140,10 @@ const OIPCItem = (props) => {
                         label="Received Date" 
                         variant="outlined" 
                         required={true}
-                        value={oipc.receivedDate}
+                        value={oipc.receiveddate}
                         onChange = {(event) => handleReceivedDate(event.target.value)}
                         InputLabelProps={{ shrink: true }}
-                        InputProps={{inputProps: { max: oipc.receivedDate || formatDate(new Date())} }}
+                        InputProps={{inputProps: { max: oipc.receiveddate || formatDate(new Date())} }}
                         type="date"
                     />
                 </Grid>
@@ -123,14 +153,14 @@ const OIPCItem = (props) => {
                         select
                         variant="outlined"
                         fullWidth
-                        value={oipc.reviewType}
+                        value={getNameFromId("REVIEW_TYPE", oipc.reviewtypeid)}
                         label="Review Type"
                         onChange={(event) => handleReviewType(event.target.value)}
                         required={true}
                     >
-                        <MenuItem value={"Complaint"}>Complaint</MenuItem>
-                        <MenuItem value={"Review"}>Review</MenuItem>
-                        <MenuItem value={"Investigation"}>Investigation</MenuItem>
+                        {oipcReviewtypes.map((reviewtype) => {
+                            return <MenuItem key={reviewtype.reviewtypeid} value={reviewtype.reviewtypeid}>{reviewtype.name}</MenuItem>
+                        })}
                     </TextField>
                 </Grid>
                 <Grid item md={3}>
@@ -139,7 +169,7 @@ const OIPCItem = (props) => {
                         select
                         variant="outlined"
                         fullWidth
-                        value={oipc.reason}
+                        // value={getNameFromId("REASON", oipc.reasonid)}
                         label="Reason"
                         onChange = {(event) => handleReason(event.target.value)}
                         required={true}
@@ -155,16 +185,14 @@ const OIPCItem = (props) => {
                         select
                         variant="outlined"
                         fullWidth
-                        value={oipc.status}
+                        value={getNameFromId("STATUS", oipc.statusid)}
                         label="Status"
                         onChange = {(event) => handleStatus(event.target.value)}
                         required={true}
                     >
-                        <MenuItem value={"Mediation"}>Mediation</MenuItem>
-                        <MenuItem value={"Investigation"}>Investigation</MenuItem>
-                        <MenuItem value={"Inquiry"}>Inquiry</MenuItem>
-                        <MenuItem value={"Awaiting Order"}>Awaiting Order</MenuItem>
-                        <MenuItem value={"Closed"}>Closed</MenuItem>
+                        {oipcStatuses.map((status) => {
+                            return <MenuItem key={status.statusid} value={status.statusid}>{status.name}</MenuItem>
+                        })}
                     </TextField>
                 </Grid>
                 <Grid item md={3}>
@@ -185,28 +213,40 @@ const OIPCItem = (props) => {
                         variant="outlined"
                         onChange = {(event) => handleOutcome(event.target.value)}
                         fullWidth
-                        value={oipc.outcome}
+                        value={getNameFromId("OUTCOME", oipc.outcomeid)}
                         label="Outcome"
                         required={true}
                     >
-                        <MenuItem value={"Abandoned"}>Abandoned</MenuItem>
-                        <MenuItem value={"Withdrawn"}>Withdrawn</MenuItem>
-                        <MenuItem value={"Resolved in Mediation"}>Resolved in Mediation</MenuItem>
-                        <MenuItem value={"Closed"}>Closed</MenuItem>
+                        {oipcOutcomes.map((outcome) => {
+                            return <MenuItem key={outcome.outcomeid} value={outcome.outcomeid}>{outcome.name}</MenuItem>
+                        })}
                     </TextField>
+                </Grid>
+                <Grid item md={3}>
+                    <TextField 
+                        fullWidth
+                        label="Closed Date" 
+                        variant="outlined" 
+                        required={true}
+                        value={oipc.closeddate}
+                        onChange = {(event) => handleClosedDate(event.target.value)}
+                        InputLabelProps={{ shrink: true }}
+                        InputProps={{inputProps: { max: oipc.closeddate || formatDate(new Date())} }}
+                        type="date"
+                    />
                 </Grid>
             </Grid>
             <div style={{display:"flex", flexDirection: "row", justifyContent: "space-between"}}>
                 <div style={{display:"flex", flexDirection: "row", alignItems: "center"}}>
                     <p style={{padding: "7px 15px 0px", fontSize: "15px"}}>In Inquiry?</p>
                     <FormControlLabel control={<Checkbox 
-                        checked={oipc.isInquiry} 
+                        checked={oipc.isinquiry} 
                         onChange = {() => handleInquiry(true)}
                         />} 
                         label="Yes" 
                         />
                     <FormControlLabel control={<Checkbox 
-                        checked={!oipc.isInquiry} 
+                        checked={!oipc.isinquiry} 
                         onChange = {() => handleInquiry(false)}
                         />} 
                         label="No" 
@@ -215,13 +255,13 @@ const OIPCItem = (props) => {
                 <div style={{display:"flex", flexDirection: "row", alignItems: "center"}}>
                     <p style={{padding: "7px 15px 0px", fontSize: "15px"}}>In Judicial Review?</p>
                     <FormControlLabel control={<Checkbox 
-                        checked={oipc.isJudicalReview} 
+                        checked={oipc.isjudicialreview} 
                         onChange = {() => handleJudicalReview(true)}
                         />} 
                         label="Yes" 
                         />
                     <FormControlLabel control={<Checkbox 
-                        checked={!oipc.isJudicalReview} 
+                        checked={!oipc.isjudicialreview} 
                         onChange = {() => handleJudicalReview(false)}
                         />} 
                         label="No" 
@@ -230,13 +270,13 @@ const OIPCItem = (props) => {
                 <div style={{display:"flex", flexDirection: "row", alignItems: "center"}}>
                     <p style={{padding: "7px 15px 0px", fontSize: "15px"}}>In Subsequent Appeal?</p>
                     <FormControlLabel control={<Checkbox 
-                        checked={oipc.isSubAppeal} 
+                        checked={oipc.issubsequentappeal} 
                         onChange = {() => handleSubsequentAppeal(true)}
                         />} 
                         label="Yes"
                         />
                     <FormControlLabel control={<Checkbox 
-                        checked={!oipc.isSubAppeal} 
+                        checked={!oipc.issubsequentappeal} 
                         onChange = {() => handleSubsequentAppeal(false)}
                         />} 
                         label="No" 

@@ -10,19 +10,18 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCirclePlus } from '@fortawesome/free-solid-svg-icons';
 
 const OIPCDetails = (props) => {
-  //Local State
-  const createOIPCId = (oipcData) => {
-    if (oipcData.length > 0) {
-      return oipcData.map((item, index) => {
-        item.id = index;
-        return item;
-      });
-    }
-  }
-    const [oipcData, setOipcData] = useState(createOIPCId([
-      { oipcNumber: "F23-12345", reviewType: "Complaint", reason: "Extension", status: "Inquiry", isInquiry: false, inquiryDate: null, receivedDate: "2022-05-08", investigator: "Filip Forsberg", outcome: "Withdrawn", isJudicalReview: false, isSubAppeal: false }, 
-      { oipcNumber: "F23-12346", reviewType: "Review", reason: "Other", status: "Mediation", isInquiry: false, inquiryDate: null, receivedDate: "2022-09-08", investigator: "Peter Forsberg", outcome: "Closed", isJudicalReview: false, isSubAppeal: true },
-  ]));
+    const { oipcDetails } = props;
+
+    //Local State
+    const createOIPCId = (oipcData) => {
+        if (oipcData.length > 0) {
+          return oipcData.map((item, index) => {
+            item.id = index;
+            return item;
+          });
+        }
+      }
+    const [oipcData, setOipcData] = useState(createOIPCId(oipcDetails));
 
     //Styling
     const useStyles = makeStyles({
@@ -36,22 +35,24 @@ const OIPCDetails = (props) => {
         }
       });
     const classes = useStyles();
-
+    
     //Functions
     const addOIPC = () => {
       setOipcData((prev) => {
         return [...prev, {
           id: oipcData.length > 0 ? oipcData[oipcData.length - 1].id + 1 : 0,
-          oipcNumber: "", 
-          reviewType: "", 
-          reason: "", 
-          status: "", 
-          isInquiry: false, 
-          receivedDate: "", 
+          oipcno: "", 
+          reviewtypeid: null, 
+          reasonid: null, 
+          statusid: null, 
+          isinquiry: false,
+          inquiryattributes: null,  
+          receiveddate: "",
+          closeddate: "",
           investigator: "", 
-          outcome: "", 
-          isJudicalReview: false, 
-          isSubAppeal: false
+          outcomeid: null, 
+          isjudicialreview: false, 
+          issubsequentappeal: false
         }];
       })
     }

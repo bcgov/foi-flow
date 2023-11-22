@@ -22,6 +22,9 @@ import {
     setFOISubjectCodeList,  
     setCommentTagListLoader, 
     setFOIAdminProgramAreaList,
+    setOIPCOutcomes,
+    setOIPCStatuses,
+    setOIPCReviewtypes,
   } from "../../../actions/FOI/foiRequestActions";
   import { fnDone, catchError } from "./foiServicesUtil";
   import UserService from "../../../services/UserService";
@@ -505,6 +508,72 @@ import {
         .catch((error) => {
           done(error);
           catchError(error, dispatch);
+        });
+    };
+  };
+
+  export const fetchOIPCOutcomes = () => {    
+    return (dispatch) => {
+      httpGETRequest(API.FOI_GET_OIPC_OUTCOMES, {}, UserService.getToken())
+        .then((res) => {
+          if (res.data) {
+            const oipcOutcomes = res.data;
+            dispatch(setOIPCOutcomes(oipcOutcomes));
+            dispatch(setFOILoader(false));
+          } else {
+            console.log("Error while fetching OIPC outcomes master data", res);
+            dispatch(serviceActionError(res));
+            dispatch(setFOILoader(false));
+          }
+        })
+        .catch((error) => {
+          console.log("Error while fetching OIPC outcomes master data", error);
+          dispatch(serviceActionError(error));
+          dispatch(setFOILoader(false));
+        });
+    };
+  };
+
+  export const fetchOIPCStatuses = () => {    
+    return (dispatch) => {
+      httpGETRequest(API.FOI_GET_OIPC_STATUSES, {}, UserService.getToken())
+        .then((res) => {
+          if (res.data) {
+            const oipcStatuses = res.data;
+            dispatch(setOIPCStatuses(oipcStatuses));
+            dispatch(setFOILoader(false));
+          } else {
+            console.log("Error while fetching OIPC statuses master data", res);
+            dispatch(serviceActionError(res));
+            dispatch(setFOILoader(false));
+          }
+        })
+        .catch((error) => {
+          console.log("Error while fetching OIPC statuses master data", error);
+          dispatch(serviceActionError(error));
+          dispatch(setFOILoader(false));
+        });
+    };
+  };
+
+  export const fetchOIPCReviewtypes = () => {    
+    return (dispatch) => {
+      httpGETRequest(API.FOI_GET_OIPC_REVIEWTYPES, {}, UserService.getToken())
+        .then((res) => {
+          if (res.data) {
+            const oipcReviewtypes = res.data;
+            dispatch(setOIPCReviewtypes(oipcReviewtypes));
+            dispatch(setFOILoader(false));
+          } else {
+            console.log("Error while fetching OIPC reviewtypes master data", res);
+            dispatch(serviceActionError(res));
+            dispatch(setFOILoader(false));
+          }
+        })
+        .catch((error) => {
+          console.log("Error while fetching OIPC reviewtypes master data", error);
+          dispatch(serviceActionError(error));
+          dispatch(setFOILoader(false));
         });
     };
   };
