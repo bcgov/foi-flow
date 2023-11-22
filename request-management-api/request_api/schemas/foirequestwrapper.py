@@ -61,7 +61,7 @@ class FOIOIPCInquirySchema(Schema):
         unknown = EXCLUDE
     inquirydate = fields.Str(data_key="inquirydate",allow_none=True)
     orderno = fields.Str(data_key="orderno",allow_none=True)
-    inquiryoutcome = fields.Str(data_key="outcome",allow_none=True)
+    inquiryoutcome = fields.Int(data_key="inquiryoutcome",allow_none=True)
 
 class FOIMinistryRequestOIPCSchema(Schema):
     class Meta:  # pylint: disable=too-few-public-methods
