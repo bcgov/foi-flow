@@ -19,7 +19,6 @@ import {
   isFlexTeam,
 } from "../helper/FOI/helper";
 
-const jwt = require("jsonwebtoken");
 const tokenRefreshInterval = 180000; // how often we should check for token expiry --> 180000 = 3 mins
 const tokenUpdateThreshold = 600; // if token expires in less than 10 minutes (600 seconds), refresh token
 
