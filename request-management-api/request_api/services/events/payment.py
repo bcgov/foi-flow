@@ -14,8 +14,8 @@ import os
 from dateutil.parser import parse
 from pytz import timezone
 from request_api.utils.enums import PaymentEventType
-from request_api.services.commons.duecalculator import duecalculator
 from request_api.utils.commons.datetimehandler import datetimehandler
+from request_api.services.commons.duecalculator import duecalculator
 from request_api.exceptions import BusinessException
 from flask import current_app
 
@@ -43,16 +43,21 @@ class paymentevent:
         try:
             _today = datetimehandler().gettoday()
 
-            # notificationservice().dismissremindernotification("ministryrequest", self.__notificationtype())
-            # ca_holidays = duecalculator.getholidays()
+            notificationservice().dismissremindernotification("rawrequest", self.__notificationtype())
             eventtype = PaymentEventType.reminder.value
-            _onholdrequests = FOIRawRequest.getonholdapplicationfeerequests()
+            _onholdrequests = FOIRawRequest.getappfeeowingrequests()
             for entry in _onholdrequests:
-                _reminderdate = datetimehandler().formatdate(entry['reminder_date'])
-                if  _reminderdate == _today:
+                _dateofstatechange = datetimehandler().formatdate(entry['updated_at'])
+                businessdayselapsed = duecalculator().getbusinessdaysbetween(_dateofstatechange)
+                if businessdayselapsed >= 20 and duecalculator().isbusinessday(_today):
+                    commentexists = False
+                    existingcomments = commentservice().getrawrequestcomments(entry['requestid'])
+                    for comment in existingcomments:
+                        if comment['text'] == self.__preparecomment(entry['requestid'], eventtype)['comment']: #checks if comment already exists
+                            commentexists = True
+                    if not commentexists:
+                        self.__createcommentforrawrequest(entry['requestid'], eventtype)
                     self.__createnotificationforrawrequest(entry['requestid'], eventtype)
-                    self.__createcommentforrawrequest(entry['requestid'], eventtype)
-                    pass
             return DefaultMethodResult(True,'Payment reminder notifications created',_today)
         except BusinessException as exception:
             current_app.logger.error("%s,%s" % ('Payment reminder Notification Error', exception.message))
@@ -60,11 +65,11 @@ class paymentevent:
 
     def __createcommentforrawrequest(self, requestid, eventtype):
         comment = self.__preparecomment(requestid, eventtype)
-        return commentservice().createrawrequestcomment(comment, "System", 2)
+        return commentservice().createrawrequestcomment(comment, "system", 2)
 
     def __createnotificationforrawrequest(self, requestid, eventtype):
         notification = self.__preparenotification(requestid, eventtype)
-        return notificationservice().createnotification({"message" : notification}, requestid, "rawrequest", "Payment", "System")
+        return notificationservice().createnotification({"message" : notification}, requestid, "rawrequest", self.__notificationtype(), "system")
 
     def __createcomment(self, requestid, eventtype):
         comment = self.__preparecomment(requestid, eventtype)
@@ -87,7 +92,7 @@ class paymentevent:
         elif eventtype == PaymentEventType.depositpaid.value:
             comment = {"comment": "Applicant has paid deposit. New LDD is " + FOIMinistryRequest.getduedate(requestid).strftime("%m/%d/%Y")}
         elif eventtype == PaymentEventType.reminder.value:
-            comment = {"comment": f"Request {requestid} - 20 business days has passed awaiting payment, you can consider closing the request as abandoned"}
+            comment = {"comment": "20 business days has passed awaiting payment, you can consider closing the request as abandoned"}
         else:
             comment = None
         if comment is not None:
@@ -117,3 +122,6 @@ class paymentevent:
     def gettoday(self):
         now_pst = maya.parse(maya.now()).datetime(to_timezone='America/Vancouver', naive=False)
         return now_pst.strftime('%m/%d/%Y') 
+
+    def __notificationtype(self):
+        return "Payment"

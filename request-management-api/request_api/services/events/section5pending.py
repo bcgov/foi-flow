@@ -7,7 +7,7 @@ from request_api.models.FOIRawRequests import FOIRawRequest
 from request_api.models.default_method_result import DefaultMethodResult
 from enum import Enum
 from request_api.exceptions import BusinessException
-from datetime import datetime 
+from request_api.utils.commons.datetimehandler import datetimehandler
 from flask import current_app
 from dateutil.parser import parse
 
@@ -21,12 +21,18 @@ class section5pendingevent(duecalculator):
             notificationservice().dismissremindernotification("rawrequest", self.__notificationtype())
             section5pendings = FOIRawRequest.getlatestsection5pendings()
             for entry in section5pendings:
-                duedate = self.formatduedate(entry['duedate'])
-                message = None
-                if  _today == duedate:                
+                _dateofstatechange = datetimehandler().formatdate(entry['created_at'])
+                businessdayselapsed = self.getbusinessdaysbetween(_dateofstatechange)
+                if businessdayselapsed >= 10 and self.isbusinessday(_today):
                     message = self.__passeddueremindermessage()
-                self.__createnotification(message, entry['requestid'])
-                self.__createcomment(entry, message)
+                    commentexists = False
+                    existingcomments = commentservice().getrawrequestcomments(entry['requestid'])
+                    for comment in existingcomments:
+                        if comment['text'] == message: #checks if comment already exists
+                            commentexists = True
+                    if not commentexists:
+                        self.__createcomment(entry, message)
+                    self.__createnotification(message, entry['requestid'])
             return DefaultMethodResult(True,'Section 5 Pending passed due notification created',_today)
         except BusinessException as exception:            
             current_app.logger.error("%s,%s" % ('Section 5 Pending passed due notification Error', exception.message))

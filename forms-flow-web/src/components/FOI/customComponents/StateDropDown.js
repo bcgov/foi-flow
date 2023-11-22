@@ -21,13 +21,17 @@ const StateDropDown = ({
   stateTransition,
   updateStateDropDown,
   requestType,
-  isDivisionalCoordinator
+  isDivisionalCoordinator,
 }) => {
   const _isMinistryCoordinator = isMinistryCoordinator;
 
   const [status, setStatus] = useState(requestState);
-  const cfrFeeData = useSelector((reduxState) => reduxState.foiRequests.foiRequestCFRForm.feedata);
-  const cfrStatus = useSelector((reduxState) => reduxState.foiRequests.foiRequestCFRForm.status);
+  const cfrFeeData = useSelector(
+    (reduxState) => reduxState.foiRequests.foiRequestCFRForm.feedata
+  );
+  const cfrStatus = useSelector(
+    (reduxState) => reduxState.foiRequests.foiRequestCFRForm.status
+  );
 
   let requestDetails = useSelector(
     (state) => state.foiRequests.foiRequestDetail
@@ -94,9 +98,12 @@ const StateDropDown = ({
     if (_isMinistryCoordinator) {
       _stateList = MinistryStateList;
     }
-    const personalRequest = requestType?.toLowerCase() === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL;
+    const personalRequest =
+      requestType?.toLowerCase() ===
+      FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL;
     const personalIAO = !_isMinistryCoordinator && personalRequest;
-
+    const previousState =
+      stateTransition?.length > 0 && stateTransition[1]?.status;
     switch (_state.toLowerCase()) {
       case StateEnum.unopened.name.toLowerCase():
         return _stateList.unopened;
@@ -104,25 +111,24 @@ const StateDropDown = ({
         if (personalIAO) {
           return _stateList.intakeinprogressforpersonals;
         } else {
-          return _stateList.intakeinprogress; 
+          return _stateList.intakeinprogress;
         }
       case StateEnum.peerreview.name.toLowerCase():
-        if(!isMinistryCoordinator){
-          //const currentStatusVersion = stateTransition[0]?.version; 
-          const previousState = stateTransition?.length > 0 && stateTransition[1]?.status; 
-          if(previousState === StateEnum.intakeinprogress.name){
+        if (!isMinistryCoordinator) {
+          //const currentStatusVersion = stateTransition[0]?.version;
+          if (previousState === StateEnum.intakeinprogress.name) {
             return _stateList.intakeinprogress;
-          }
-          else if(previousState === StateEnum.open.name)
+          } else if (previousState === StateEnum.open.name)
             return _stateList.open;
-          else if(previousState === StateEnum.review.name)
+          else if (previousState === StateEnum.review.name)
             return _stateList.review;
-          else if(previousState === StateEnum.consult.name)
+          else if (previousState === StateEnum.consult.name)
             return _stateList.consult;
-          else if(previousState === StateEnum.response.name)
+          else if (previousState === StateEnum.response.name)
             return _stateList.response;
-        }
-        else{
+          else if (previousState === StateEnum.appfeeowing.name)
+            return _stateList.appfeeowing;
+        } else {
           return _stateList.peerreview;
         }
       case StateEnum.open.name.toLowerCase():
@@ -134,50 +140,69 @@ const StateDropDown = ({
       case StateEnum.callforrecords.name.toLowerCase():
         if (_isMinistryCoordinator && personalRequest)
           return _stateList.callforrecordsforpersonal;
-        if(personalIAO && (requestDetails.bcgovcode.toLowerCase() === "mcf" || requestDetails.bcgovcode.toLowerCase() === "msd"))
-          return _stateList.callforrecordscfdmsdpersonal
+        if (
+          personalIAO &&
+          (requestDetails.bcgovcode.toLowerCase() === "mcf" ||
+            requestDetails.bcgovcode.toLowerCase() === "msd")
+        )
+          return _stateList.callforrecordscfdmsdpersonal;
         return _stateList.callforrecords;
       case StateEnum.tagging.name.toLowerCase():
-         return _stateList.tagging;
+        return _stateList.tagging;
       case StateEnum.readytoscan.name.toLowerCase():
-        return _stateList.readytoscan;     
+        return _stateList.readytoscan;
       case StateEnum.review.name.toLowerCase():
-        if(personalIAO && (requestDetails.bcgovcode.toLowerCase() === "mcf" || requestDetails.bcgovcode.toLowerCase() === "msd"))
-          return _stateList.reviewcfdmsdpersonal
+        if (
+          personalIAO &&
+          (requestDetails.bcgovcode.toLowerCase() === "mcf" ||
+            requestDetails.bcgovcode.toLowerCase() === "msd")
+        )
+          return _stateList.reviewcfdmsdpersonal;
         return _stateList.review;
       case StateEnum.onhold.name.toLowerCase():
+        if (previousState === StateEnum.response.name) {
+          return _stateList.onhold.filter(
+            (_state) =>
+              _state.status.toLowerCase() !==
+              StateEnum.callforrecords.name.toLowerCase()
+          );
+        } else if (previousState === StateEnum.feeassessed.name) {
+          return _stateList.onhold.filter(
+            (_state) =>
+              _state.status.toLowerCase() !==
+              StateEnum.response.name.toLowerCase()
+          );
+        }
         return _stateList.onhold;
       case StateEnum.consult.name.toLowerCase():
         return _stateList.consult;
       case StateEnum.signoff.name.toLowerCase():
         return _stateList.signoff;
       case StateEnum.feeassessed.name.toLowerCase():
-        if (personalIAO)
-          return _stateList.feeassessedforpersonal;
+        if (personalIAO) return _stateList.feeassessedforpersonal;
         return _stateList.feeassessed;
-      case StateEnum.onhold.name.toLowerCase():
-        return _stateList.onhold;
       case StateEnum.deduplication.name.toLowerCase():
         return _stateList.deduplication;
       case StateEnum.harms.name.toLowerCase():
         return _stateList.harms;
       case StateEnum.response.name.toLowerCase():
-        if (personalIAO)
-          return _stateList.responseforpersonal;
-        else if (cfrFeeData?.balanceremaining > 0 && cfrStatus === 'approved') {
+        if (personalIAO) return _stateList.responseforpersonal;
+        else if (cfrFeeData?.balanceremaining > 0 && cfrStatus === "approved") {
           return _stateList.response;
-        }
-        else {
-          return _stateList.response.filter(val => val.status.toLowerCase() !== StateEnum.onhold.name.toLowerCase());
+        } else {
+          return _stateList.response.filter(
+            (val) =>
+              val.status.toLowerCase() !== StateEnum.onhold.name.toLowerCase()
+          );
         }
       case StateEnum.section5pending.name.toLowerCase():
         if (personalIAO) {
           return _stateList.section5pending;
-        } 
-        break
-      case StateEnum.onholdapplicationfee.name.toLowerCase():
-        return _stateList.onholdapplicationfee;
-        
+        }
+        break;
+      case StateEnum.appfeeowing.name.toLowerCase():
+        return _stateList.appfeeowing;
+
       default:
         return [];
     }
@@ -215,7 +240,7 @@ const StateDropDown = ({
       label="Status"
       className="foi-state-dropdown"
       InputLabelProps={{ shrink: false }}
-      inputProps={{'aria-labelledby': 'foi-status-dropdown-label'}}
+      inputProps={{ "aria-labelledby": "foi-status-dropdown-label" }}
       select
       value={status}
       onChange={handleChange}
