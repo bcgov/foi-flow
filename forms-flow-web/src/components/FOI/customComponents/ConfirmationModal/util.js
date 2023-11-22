@@ -126,8 +126,8 @@ import { getFullnameList } from "../../../../helper/FOI/helper";
           return {title: "Ministry Sign Off", body: `Upload eApproval Logs, and enter in required approval fields to verify Ministry Approval and then change the state.`};
         else
           return {title: "Changing the state", body: `Are you sure you want to change Request #${_requestNumber} to ${StateEnum.response.name}?`};
-          case StateEnum.onholdapplicationfee.name.toLowerCase():
-          return {title: "Changing the state", body: `Are you sure you want to change Request #${_requestNumber} to ${StateEnum.onholdapplicationfee.name}?`};
+          case StateEnum.appfeeowing.name.toLowerCase():
+          return {title: "Changing the state", body: `Are you sure you want to change Request #${_requestNumber} to ${StateEnum.appfeeowing.name}?`};
       default:
           return {title: "", body: ""};
     }

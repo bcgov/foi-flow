@@ -179,7 +179,7 @@ class rawrequestservicegetter:
         return  {
                     'alsoKnownAs': contactinfo['alsoKnownAs'],
                     'requestFor': requestrawdata['selectAbout'],
-                    'birthDate': parse(contactinfo['birthDate']).strftime(self.__generaldateformat()) if contactinfo['birthDate'] is not None else '',
+                    'birthDate': parse(contactinfo['birthDate']).strftime(self.__generaldateformat()) if contactinfo.get('birthDate', None) is not None else '',
 
                     'childFirstName': self.__getpropertyvalue(childinformation,'firstName', haschildinfo),
                     'childMiddleName': self.__getpropertyvalue(childinformation,'middleName', haschildinfo),
