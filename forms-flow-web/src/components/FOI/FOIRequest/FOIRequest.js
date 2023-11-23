@@ -1216,7 +1216,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
                           divisions={requestDetails.divisions}
                         />
                       )}
-                      {showOIPCDetails && (
+                      {showOIPCDetails && requestDetails.oipcdetails && (
                         <OIPCDetails 
                           oipcDetails={requestDetails.oipcdetails}
                         />

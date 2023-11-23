@@ -26,7 +26,7 @@ const OIPCItem = (props) => {
         outcomeid: oipcObj?.outcomeid, 
         isjudicialreview: oipcObj?.isjudicialreview, 
         reviewtypeName: oipcObj?.reviewtypeName,
-        reasonName: "", 
+        reasonName: oipcObj?.reasonName, 
         statusName: oipcObj?.statusName, 
         outcomeName: oipcObj?.outcomeName,
     });
@@ -37,7 +37,7 @@ const OIPCItem = (props) => {
     const handleReviewType = (value) => {
         const newOIPCObj = oipc;
         newOIPCObj.reviewtypeid = value;
-        newOIPCObj.reasonid = -1;
+        newOIPCObj.reasonid = null;
         updateOIPC(newOIPCObj);
     }
     const handleOIPCNumber = (value) => {
@@ -91,30 +91,21 @@ const OIPCItem = (props) => {
         updateOIPC(newOIPCObj);
     }
     const generateNamesFromOIPCId = (oipcObj) => {
-        const reviewtype = oipcReviewtypes.find(reviewtype => reviewtype.reviewtypeid === oipcObj.reviewtypeid);
+        const reviewtype = oipcReviewtypes.find(reviewtype => reviewtype.reviewtypeid === oipcObj.reviewtypeid && reviewtype.reasonid === oipcObj.reasonid);
         const status = oipcStatuses.find(status => status.statusid === oipcObj.statusid);
         const outcome = oipcOutcomes.find(outcome => outcome.outcomeid === oipcObj.outcomeid);
 
-        oipcObj.reviewtypeName = reviewtype ? reviewtype.name : "";
+        oipcObj.reviewtypeName = reviewtype ? reviewtype.type_name : "";
         oipcObj.statusName = status ? status.name : "";
         oipcObj.outcomeName = outcome ? outcome.name : "";
+        oipcObj.reasonName = reviewtype ? reviewtype.reason_name : "";
+    }
+    const uniqueReviewTypes = (oipcReviewTypes) => {
+        const uniqeValues = {};
+        return oipcReviewTypes.filter(reviewtype => !uniqeValues[reviewtype.type_name] && (uniqeValues[reviewtype.type_name] = true));
     }
 
-    //REFACTOR THIS!!!
-    const filterReasonOptions = (reviewType) => {
-        if (reviewType === "Complaint") {
-            return ["Adequate search","Extension", "Fee Amount", "Fee Waiver", "Duty to Assist", "Other"];
-        }
-        if (reviewType === "Review") {
-            return ["Application of Exceptions", "Deemed Refusal", "TPN - 22", "TPN - 21", "TPN - 18.1", "Reg 3", "Reg 4", "Reg 5", "s. 43", "Other"];
-        }
-        if (reviewType === "Investigation") {
-            return ["Other"]
-        }
-        return ["Adequate search","Extension", "Fee Amount", "Fee Waiver", "Duty to Assist", "Application of Exceptions", "Deemed Refusal", "TPN - 22", "TPN - 21", "TPN - 18.1", "Reg 3", "Reg 4", "Reg 5", "s. 43", "Other"];
-    }
-    const reasons = filterReasonOptions(oipc.reviewType)
-
+    //useEffect to create name attributes using id's for oipcObject
     useEffect(() => {
         generateNamesFromOIPCId(oipcObj);
     }, [oipcObj])
@@ -157,8 +148,8 @@ const OIPCItem = (props) => {
                         onChange={(event) => handleReviewType(event.target.value)}
                         required={true}
                     >
-                        {oipcReviewtypes.map((reviewtype) => {
-                            return <MenuItem key={reviewtype.reviewtypeid} value={reviewtype.reviewtypeid}>{reviewtype.name}</MenuItem>
+                        {uniqueReviewTypes(oipcReviewtypes).map((reviewtype) => {
+                            return <MenuItem key={reviewtype.reviewtypeid} value={reviewtype.reviewtypeid}>{reviewtype.type_name}</MenuItem>
                         })}
                     </TextField>
                 </Grid>
@@ -168,14 +159,17 @@ const OIPCItem = (props) => {
                         select
                         variant="outlined"
                         fullWidth
-                        // value={getNameFromId("REASON", oipc.reasonid)}
+                        value={oipc.reasonid}
                         label="Reason"
                         onChange = {(event) => handleReason(event.target.value)}
                         required={true}
                     >
-                        {reasons.map((reason) => {
-                            return <MenuItem key={reason} value={reason}>{reason}</MenuItem>
-                        })}
+                        {oipc.reviewtypeid ? 
+                            oipcReviewtypes.map((reviewtype) => {
+                            if (reviewtype.reviewtypeid === oipc.reviewtypeid) {
+                                return <MenuItem key={reviewtype.reasonid} value={reviewtype.reasonid}>{reviewtype.reason_name}</MenuItem>
+                            }
+                        }) : null}
                     </TextField>
                 </Grid>
                 <Grid item md={3}>

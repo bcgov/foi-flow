@@ -19,6 +19,8 @@ const OIPCDetails = (props) => {
             item.id = index;
             return item;
           });
+        } else {
+          return oipcData;
         }
       }
     const [oipcData, setOipcData] = useState(createOIPCId(oipcDetails));
@@ -53,10 +55,6 @@ const OIPCDetails = (props) => {
           outcomeid: null, 
           isjudicialreview: false, 
           issubsequentappeal: false,
-          reviewtype: "",
-          status: "",
-          outcome: "",
-          reason: "",
         }];
       })
     }
