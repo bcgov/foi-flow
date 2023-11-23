@@ -446,3 +446,10 @@ export const setOIPCReviewtypes = (data) => (dispatch) => {
     payload: data,
   });
 };
+
+export const setOIPCInquiryoutcomes = (data) => (dispatch) => {
+  dispatch({
+    type: FOI_ACTION_CONSTANTS.OIPC_INQUIRYOUTCOMES,
+    payload: data,
+  });
+};

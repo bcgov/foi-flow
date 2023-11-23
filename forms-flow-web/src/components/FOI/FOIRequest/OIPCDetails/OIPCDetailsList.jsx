@@ -6,6 +6,7 @@ import { faTrash } from '@fortawesome/free-solid-svg-icons';
 
 const OIPCDetailsList = (props) => {
     const {oipcData, removeOIPC, updateOIPC} = props;
+    
     const OIPCItems = oipcData?.map((oipcObj, index) => {
         return (
             <>

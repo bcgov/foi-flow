@@ -27,6 +27,7 @@ import {
   fetchOIPCOutcomes,
   fetchOIPCStatuses,
   fetchOIPCReviewtypes,
+  fetchOIPCInquiryoutcomes
 } from "../../../apiManager/services/FOI/foiMasterDataServices";
 import {
   fetchFOIRequestDetailsWrapper,
@@ -300,6 +301,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
     dispatch(fetchOIPCOutcomes());
     dispatch(fetchOIPCStatuses());
     dispatch(fetchOIPCReviewtypes());
+    dispatch(fetchOIPCInquiryoutcomes());
 
     if (bcgovcode) dispatch(fetchFOIMinistryAssignedToList(bcgovcode));
   }, [requestId, ministryId, comment, attachments]);

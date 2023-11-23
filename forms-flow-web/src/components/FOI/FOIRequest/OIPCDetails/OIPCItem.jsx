@@ -10,6 +10,7 @@ const OIPCItem = (props) => {
     const oipcOutcomes = useSelector(state=> state.foiRequests.oipcOutcomes);
     const oipcStatuses = useSelector(state=> state.foiRequests.oipcStatuses);
     const oipcReviewtypes = useSelector(state=> state.foiRequests.oipcReviewtypes);
+    const oipcInquiryoutcomes = useSelector(state=> state.foiRequests.oipcInquiryoutcomes);
 
     //Local State
     const [oipc, setOipc] = useState({
@@ -77,6 +78,15 @@ const OIPCItem = (props) => {
     }
     const handleInquiry = (value) => {
         const newOIPCObj = oipc;
+        if (value === false) {
+            newOIPCObj.inquiryattributes = null;
+        } else {
+            newOIPCObj.inquiryattributes = {
+                inquirydate: "",
+                orderno: "",
+                inquiryoutcomeid: null,
+            };
+        }
         newOIPCObj.isinquiry = value;
         updateOIPC(newOIPCObj);
     }
@@ -88,6 +98,19 @@ const OIPCItem = (props) => {
     const handleSubsequentAppeal = (value) => {
         const newOIPCObj = oipc;
         newOIPCObj.issubsequentappeal = value;
+        updateOIPC(newOIPCObj);
+    }
+    const handleInquiryFields = (value, attribute) => {
+        const newOIPCObj = oipc;
+        if (attribute === "COMPLYDATE") {
+            newOIPCObj.inquiryattributes.inquirydate = value;
+        }
+        if (attribute === "ORDERNO") {
+            newOIPCObj.inquiryattributes.orderno = value;
+        }
+        if (attribute === "INQUIRYOUTCOME") {
+            newOIPCObj.inquiryattributes.inquiryoutcomeid = value;
+        }
         updateOIPC(newOIPCObj);
     }
     const generateNamesFromOIPCId = (oipcObj) => {
@@ -193,7 +216,6 @@ const OIPCItem = (props) => {
                         fullWidth 
                         label="Investigator/Adjudicator" 
                         variant="outlined" 
-                        required={true}
                         onChange = {(event) => handleInvestiagtor(event.target.value)}
                         value={oipc.investigator}
                         InputLabelProps={{ shrink: true }}
@@ -208,7 +230,6 @@ const OIPCItem = (props) => {
                         fullWidth
                         value={oipc.outcomeid}
                         label="Outcome"
-                        required={true}
                     >
                         {oipcOutcomes.map((outcome) => {
                             return <MenuItem key={outcome.outcomeid} value={outcome.outcomeid}>{outcome.name}</MenuItem>
@@ -220,7 +241,6 @@ const OIPCItem = (props) => {
                         fullWidth
                         label="Closed Date" 
                         variant="outlined" 
-                        required={true}
                         value={oipc.closeddate}
                         onChange = {(event) => handleClosedDate(event.target.value)}
                         InputLabelProps={{ shrink: true }}
@@ -276,6 +296,50 @@ const OIPCItem = (props) => {
                         />
                 </div>
             </div>
+            {oipc.isinquiry && 
+            <Grid container spacing={3}>
+                <Grid item md={4}>
+                    <TextField 
+                        fullWidth
+                        label="Comply By Date" 
+                        variant="outlined" 
+                        required={true}
+                        value={oipc.inquiryattributes.inquirydate}
+                        onChange = {(event) => handleInquiryFields(event.target.value, "COMPLYDATE")}
+                        InputLabelProps={{ shrink: true }}
+                        InputProps={{inputProps: { min: oipc.receiveddate } }}
+                        type="date"
+                    />
+                </Grid>
+                <Grid item md={4}>
+                    <TextField 
+                        fullWidth
+                        label="Order No" 
+                        variant="outlined" 
+                        required={true}
+                        value={oipc.inquiryattributes.orderno}
+                        onChange = {(event) => handleInquiryFields(event.target.value, "ORDERNO")}
+                        InputLabelProps={{ shrink: true }}
+                    />
+                </Grid>
+                <Grid item md={4}>
+                    <TextField
+                        InputLabelProps={{ shrink: true }}
+                        select
+                        required={true}
+                        variant="outlined"
+                        onChange = {(event) => handleInquiryFields(event.target.value, "INQUIRYOUTCOME")}
+                        fullWidth
+                        value={oipc.inquiryattributes.inquiryoutcomeid}
+                        label="Outcome"
+                    >
+                        {oipcInquiryoutcomes.map((inquiryoutcome) => {
+                            return <MenuItem key={inquiryoutcome.inquiryoutcomeid} value={inquiryoutcome.inquiryoutcomeid}>{inquiryoutcome.name}</MenuItem>
+                        })}
+                    </TextField>
+                </Grid>
+            </Grid>
+            }
         </>
     );
 }

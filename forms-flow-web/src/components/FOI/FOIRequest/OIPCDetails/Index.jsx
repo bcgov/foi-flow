@@ -13,17 +13,31 @@ const OIPCDetails = (props) => {
     const { oipcDetails } = props;
 
     //Local State
-    const createOIPCId = (oipcData) => {
+      const createOIPCIds = (oipcData) => {
         if (oipcData.length > 0) {
           return oipcData.map((item, index) => {
             item.id = index;
             return item;
           });
         } else {
-          return oipcData;
+          return [{
+            id: 0,
+            oipcno: "", 
+            reviewtypeid: null, 
+            reasonid: null, 
+            statusid: null, 
+            isinquiry: false,
+            inquiryattributes: null,  
+            receiveddate: "",
+            closeddate: "",
+            investigator: "", 
+            outcomeid: null, 
+            isjudicialreview: false, 
+            issubsequentappeal: false,
+          }];
         }
       }
-    const [oipcData, setOipcData] = useState(createOIPCId(oipcDetails));
+    const [oipcData, setOipcData] = useState(createOIPCIds(oipcDetails));
 
     //Styling
     const useStyles = makeStyles({
@@ -98,9 +112,3 @@ const OIPCDetails = (props) => {
 }
 
 export default OIPCDetails;
-
-//IDEA = MasterData is held in a oipcData [{}] state (there is a backend api call to generate the existing oipc data).  This is mapped in OIPCDetailsList where each elm is mapped as a OIPCItem. Each OIPC Item has EDITABLE Fields (unless oipcObj outcome value exists? -> therefore we disable the field)
-//EACH OIPCITEM HAS ITS OWN INTERNAL STATE WE CAN change and if changed -> the oipcData state wil change as well
-// When add button is clicked, we add a new oipcObj to the oipcData state which then creates a new oipcITEM with its own default state which can be edited.
-// if any oipcObjs in the oipcData state are missing any of the mandatory fields -> Save button cannot be selected./is disalbed
-// When save button is enabled and clicked -> we send the backend api requeset and save the oipc data in backend by sending the master oipc data over. 
