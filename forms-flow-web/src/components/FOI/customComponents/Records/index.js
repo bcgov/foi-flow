@@ -122,8 +122,8 @@ import { isScanningTeam } from "../../../../helper/FOI/helper";
 import { MinistryNeedsScanning } from "../../../../constants/FOI/enum";
 //import {convertBytesToMB} from "../../../../components/FOI/customComponents/FileUpload/util";
 import FOI_COMPONENT_CONSTANTS from "../../../../constants/FOI/foiComponentConstants";
-import MCFPersonal from './MCFPersonal';
-import MSDPersonal from './MSDPersonal';
+import MCFPersonal from "./MCFPersonal";
+import MSDPersonal from "./MSDPersonal";
 
 const useStyles = makeStyles((_theme) => ({
   createButton: {
@@ -224,14 +224,12 @@ export const RecordsLog = ({
   isMinistryCoordinator,
   setRecordsUploading,
   recordsTabSelect,
-  requestType
+  requestType,
 }) => {
   const user = useSelector((state) => state.user.userDetail);
-  const userGroups = user?.groups?.map(group => group.slice(1));
-  
-  let recordsObj = useSelector(
-    (state) => state.foiRequests.foiRequestRecords
-  );
+  const userGroups = user?.groups?.map((group) => group.slice(1));
+
+  let recordsObj = useSelector((state) => state.foiRequests.foiRequestRecords);
 
   let pdfStitchStatus = useSelector(
     (state) => state.foiRequests.foiPDFStitchStatusForHarms
@@ -257,26 +255,40 @@ export const RecordsLog = ({
     (state) => state.foiRequests.isRecordsLoading
   );
 
-  const tagList = divisions.filter(d => d.divisionname.toLowerCase() !== 'communications').map(division => {
-    return {
-      name: division.divisionid,
-      display: division.divisionname,
-    }
-  });
+  const tagList = divisions
+    .filter((d) => d.divisionname.toLowerCase() !== "communications")
+    .map((division) => {
+      return {
+        name: division.divisionid,
+        display: division.divisionname,
+      };
+    });
 
   const classes = useStyles();
   const [records, setRecords] = useState(recordsObj?.records);
   const [totalUploadedRecordSize, setTotalUploadedRecordSize] = useState(0);
-  const [isScanningTeamMember, setIsScanningTeamMember] = useState(isScanningTeam(userGroups));
-  const [ministryCode, setMinistryCode] = useState(bcgovcode.replaceAll('"', '').toUpperCase());
-  const [isMCFPersonal, setIsMCFPersonal] = useState(ministryCode == "MCF" && requestType === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL);
+  const [isScanningTeamMember, setIsScanningTeamMember] = useState(
+    isScanningTeam(userGroups)
+  );
+  const [ministryCode, setMinistryCode] = useState(
+    bcgovcode.replaceAll('"', "").toUpperCase()
+  );
+  const [isMCFPersonal, setIsMCFPersonal] = useState(
+    ministryCode == "MCF" &&
+      requestType === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL
+  );
 
-  const MCFSections = useSelector((state) => state.foiRequests.foiPersonalSections);
+  const MCFSections = useSelector(
+    (state) => state.foiRequests.foiPersonalSections
+  );
 
-  useEffect(() => {    
-    setRecords(recordsObj?.records)
-    let nonDuplicateRecords = recordsObj?.records?.filter(record => !record.isduplicate)
-    let totalUploadedSize= (calculateTotalUploadedFileSizeInKB(nonDuplicateRecords)/ (1024 * 1024))
+  useEffect(() => {
+    setRecords(recordsObj?.records);
+    let nonDuplicateRecords = recordsObj?.records?.filter(
+      (record) => !record.isduplicate
+    );
+    let totalUploadedSize =
+      calculateTotalUploadedFileSizeInKB(nonDuplicateRecords) / (1024 * 1024);
     setTotalUploadedRecordSize(parseFloat(totalUploadedSize.toFixed(4)));
     dispatch(checkForRecordsChange(requestId, ministryId));
     //To manage enabling and disabling of download for harms package
@@ -928,17 +940,12 @@ export const RecordsLog = ({
       bcgovcode: bcgovcode,
       attributes: [],
     };
-
     //remove duplicate records(except duplicate attachments)
     const deduplicatedRecords = removeDuplicateFiles(recordList);
     //get only relevent fields
-    const updatedrecords = getUpdatedRecords(
-      deduplicatedRecords,
-      conversionFormats
-    );
+    const updatedrecords = getUpdatedRecords(deduplicatedRecords);
     //sort records and attachments based on lastmodified asc
     let sortedRecords = sortByLastModified(updatedrecords);
-
     //get all the divisions in the records
     const divisionObj = {};
     for (const _record of sortedRecords) {
@@ -946,7 +953,6 @@ export const RecordsLog = ({
         divisionObj[_division.divisionid] = _division.divisionname;
       }
     }
-
     // arrange the records and its attachments.
     const recordsArray = [];
     for (const _record of sortedRecords) {
@@ -1479,11 +1485,11 @@ export const RecordsLog = ({
     }
     // setDivisionToUpdate()
 
-    if(isMCFPersonal && selectedDivision.size > 0) {
-      if(divisions.find(d => selectedDivision.has(d.divisionid))) {
-        return(!isMinistryCoordinator);
+    if (isMCFPersonal && selectedDivision.size > 0) {
+      if (divisions.find((d) => selectedDivision.has(d.divisionid))) {
+        return !isMinistryCoordinator;
       } else {
-        return(isMinistryCoordinator);
+        return isMinistryCoordinator;
       }
     }
     return count === 0;
@@ -1663,7 +1669,11 @@ export const RecordsLog = ({
               )}
             </Grid>
             <Grid item xs={3}>
-              {isMinistryCoordinator || (isScanningTeamMember && MinistryNeedsScanning.includes(bcgovcode.replaceAll('"', '')) && requestType === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL) ?
+              {isMinistryCoordinator ||
+              (isScanningTeamMember &&
+                MinistryNeedsScanning.includes(bcgovcode.replaceAll('"', "")) &&
+                requestType ===
+                  FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL) ? (
                 <button
                   className={clsx("btn", "addAttachment", classes.createButton)}
                   variant="contained"
@@ -1673,9 +1683,9 @@ export const RecordsLog = ({
                 >
                   + Upload Records
                 </button>
-              : (
+              ) : (
                 records?.length > 0 &&
-                DISABLE_REDACT_WEBLINK?.toLowerCase() == "false" && 
+                DISABLE_REDACT_WEBLINK?.toLowerCase() == "false" && (
                   <a
                     href={DOC_REVIEWER_WEB_URL + "/foi/" + ministryId}
                     target="_blank"
@@ -1694,7 +1704,7 @@ export const RecordsLog = ({
                     </button>
                   </a>
                 )
-              }
+              )}
             </Grid>
           </Grid>
           <Grid
@@ -1944,11 +1954,14 @@ export const RecordsLog = ({
                           {" "}
                           and all records selected must be finished processing
                         </li>
-                        {isMCFPersonal && (<>
-                          <li>
-                            all records selected must be uploaded by your own team
-                          </li>
-                        </>)}
+                        {isMCFPersonal && (
+                          <>
+                            <li>
+                              all records selected must be uploaded by your own
+                              team
+                            </li>
+                          </>
+                        )}
                       </ul>
                     </div>
                   ) : (
@@ -2124,97 +2137,178 @@ export const RecordsLog = ({
               // id="state-change-dialog"
             >
               <DialogTitle disableTypography id="state-change-dialog-title">
-                  <h2 className="state-change-header">Update Divisions</h2>
-                  <IconButton className="title-col3" onClick={() => setDivisionsModalOpen(false)}>
-                    <i className="dialog-close-button">Close</i>
-                    <CloseIcon />
-                  </IconButton>
+                <h2 className="state-change-header">Update Divisions</h2>
+                <IconButton
+                  className="title-col3"
+                  onClick={() => setDivisionsModalOpen(false)}
+                >
+                  <i className="dialog-close-button">Close</i>
+                  <CloseIcon />
+                </IconButton>
               </DialogTitle>
-              <DialogContent className={'dialog-content-nomargin'}>
-                <DialogContentText id="state-change-dialog-description" component={'span'}>
-                  {(records.filter(r=>(r.isselected && r.attributes.divisions.length > 1)).length > 0 && filterValue < 0) ? 
-                    <div className="tagtitle"><span>
-                      You have selected a record that was provided by more than one division. <br></br>
-                      To change the division you must first filter the Records Log by the division that you want to no longer be associated with the selected records.
+              <DialogContent className={"dialog-content-nomargin"}>
+                <DialogContentText
+                  id="state-change-dialog-description"
+                  component={"span"}
+                >
+                  {records.filter(
+                    (r) => r.isselected && r.attributes.divisions.length > 1
+                  ).length > 0 && filterValue < 0 ? (
+                    <div className="tagtitle">
+                      <span>
+                        You have selected a record that was provided by more
+                        than one division. <br></br>
+                        To change the division you must first filter the Records
+                        Log by the division that you want to no longer be
+                        associated with the selected records.
                       </span>
                     </div>
-                    : 
+                  ) : (
                     <>
-                      <div className="tagtitle"><span>
-                        Select the divisions that corresponds to the records you have selected.<br></br>
-                        This will update the divisions on all records you have selected both in the gathering records log and the redaction app.
-                      </span></div>
+                      <div className="tagtitle">
+                        <span>
+                          Select the divisions that corresponds to the records
+                          you have selected.<br></br>
+                          This will update the divisions on all records you have
+                          selected both in the gathering records log and the
+                          redaction app.
+                        </span>
+                      </div>
 
-                      {(requestType == FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL) ?
-                        (bcgovcode == "MCF") ?
+                      {requestType ==
+                      FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL ? (
+                        bcgovcode == "MCF" ? (
                           <MCFPersonal
                             setNewDivision={setDivisionModalTagValue}
-                            tagValue={records.filter(r => r.isselected)[0]?.attributes.divisions[0].divisionid}
+                            tagValue={
+                              records.filter((r) => r.isselected)[0]?.attributes
+                                .divisions[0].divisionid
+                            }
                             divisionModalTagValue={divisionModalTagValue}
                             divisions={divisions}
                             isMinistryCoordinator={isMinistryCoordinator}
                           />
-                          :
-                          (bcgovcode == "MSD") ?
-                            <MSDPersonal
-                              setNewDivision={setDivisionModalTagValue}
-                              tagValue={records.filter(r => r.isselected)[0]?.attributes.divisions[0].divisionid}
-                              divisionModalTagValue={divisionModalTagValue}
-                              divisions={tagList}
-                            />
-                            :
-                            <div className="taglist">
-                              {divisions.filter(division => {
-                                if (division.divisionname.toLowerCase() === 'communications') {
+                        ) : bcgovcode == "MSD" ? (
+                          <MSDPersonal
+                            setNewDivision={setDivisionModalTagValue}
+                            tagValue={
+                              records.filter((r) => r.isselected)[0]?.attributes
+                                .divisions[0].divisionid
+                            }
+                            divisionModalTagValue={divisionModalTagValue}
+                            divisions={tagList}
+                          />
+                        ) : (
+                          <div className="taglist">
+                            {divisions
+                              .filter((division) => {
+                                if (
+                                  division.divisionname.toLowerCase() ===
+                                  "communications"
+                                ) {
                                   return false;
-                                } else if (filterValue > -1 && filterValue !== division.divisionid) {
+                                } else if (
+                                  filterValue > -1 &&
+                                  filterValue !== division.divisionid
+                                ) {
                                   return true;
-                                } else if (records.filter(r => r.isselected)[0]?.attributes.divisions[0].divisionid !== division.divisionid) {
+                                } else if (
+                                  records.filter((r) => r.isselected)[0]
+                                    ?.attributes.divisions[0].divisionid !==
+                                  division.divisionid
+                                ) {
                                   return true;
                                 } else {
                                   return false;
                                 }
-                              }).map(division =>
+                              })
+                              .map((division) => (
                                 <ClickableChip
                                   item
                                   id={`${division.divisionid}updateTag`}
                                   key={`${division.divisionid}-updateTag`}
                                   label={division.divisionname.toUpperCase()}
-                                  sx={{width: "fit-content", marginLeft: "8px", marginBottom: "8px" }}
-                                  color={division.divisionid === -2 ? '#A0192F' : division.divisionid === -3 ? '#B57808' : 'primary'}
+                                  sx={{
+                                    width: "fit-content",
+                                    marginLeft: "8px",
+                                    marginBottom: "8px",
+                                  }}
+                                  color={
+                                    division.divisionid === -2
+                                      ? "#A0192F"
+                                      : division.divisionid === -3
+                                      ? "#B57808"
+                                      : "primary"
+                                  }
                                   size="small"
-                                  onClick={(e)=>{setDivisionModalTagValue(division.divisionid)}}
-                                  clicked={divisionModalTagValue === division.divisionid}
+                                  onClick={(e) => {
+                                    setDivisionModalTagValue(
+                                      division.divisionid
+                                    );
+                                  }}
+                                  clicked={
+                                    divisionModalTagValue ===
+                                    division.divisionid
+                                  }
                                 />
-                              )}
-                            </div>
-                      :
-                      <div className="taglist">
-                        {divisions.filter(division => {
-                          if (division.divisionname.toLowerCase() === 'communications') {
-                            return false;
-                          } else if (filterValue > -1 && filterValue !== division.divisionid) {
-                            return true;
-                          } else if (records.filter(r => r.isselected)[0]?.attributes.divisions[0].divisionid !== division.divisionid) {
-                            return true;
-                          } else {
-                            return false;
-                          }
-                        }).map(division =>
-                          <ClickableChip
-                            item
-                            id={`${division.divisionid}updateTag`}
-                            key={`${division.divisionid}-updateTag`}
-                            label={division.divisionname.toUpperCase()}
-                            sx={{width: "fit-content", marginLeft: "8px", marginBottom: "8px" }}
-                            color={division.divisionid === -2 ? '#A0192F' : division.divisionid === -3 ? '#B57808' : 'primary'}
-                            size="small"
-                            onClick={(e)=>{setDivisionModalTagValue(division.divisionid)}}
-                            clicked={divisionModalTagValue === division.divisionid}
-                          />
-                        )}
-                      </div>}
-                    </>}
+                              ))}
+                          </div>
+                        )
+                      ) : (
+                        <div className="taglist">
+                          {divisions
+                            .filter((division) => {
+                              if (
+                                division.divisionname.toLowerCase() ===
+                                "communications"
+                              ) {
+                                return false;
+                              } else if (
+                                filterValue > -1 &&
+                                filterValue !== division.divisionid
+                              ) {
+                                return true;
+                              } else if (
+                                records.filter((r) => r.isselected)[0]
+                                  ?.attributes.divisions[0].divisionid !==
+                                division.divisionid
+                              ) {
+                                return true;
+                              } else {
+                                return false;
+                              }
+                            })
+                            .map((division) => (
+                              <ClickableChip
+                                item
+                                id={`${division.divisionid}updateTag`}
+                                key={`${division.divisionid}-updateTag`}
+                                label={division.divisionname.toUpperCase()}
+                                sx={{
+                                  width: "fit-content",
+                                  marginLeft: "8px",
+                                  marginBottom: "8px",
+                                }}
+                                color={
+                                  division.divisionid === -2
+                                    ? "#A0192F"
+                                    : division.divisionid === -3
+                                    ? "#B57808"
+                                    : "primary"
+                                }
+                                size="small"
+                                onClick={(e) => {
+                                  setDivisionModalTagValue(division.divisionid);
+                                }}
+                                clicked={
+                                  divisionModalTagValue === division.divisionid
+                                }
+                              />
+                            ))}
+                        </div>
+                      )}
+                    </>
+                  )}
                 </DialogContentText>
               </DialogContent>
               <DialogActions>
