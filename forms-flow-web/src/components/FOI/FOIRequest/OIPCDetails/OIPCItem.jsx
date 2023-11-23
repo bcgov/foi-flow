@@ -145,6 +145,7 @@ const OIPCItem = (props) => {
                         value={oipc.oipcno}
                         onChange = {(event) => handleOIPCNumber(event.target.value)}
                         InputLabelProps={{ shrink: true }}
+                        error={oipc.oipcno === ""}
                     />
                 </Grid>
                 <Grid item md={3}>
@@ -158,6 +159,7 @@ const OIPCItem = (props) => {
                         InputLabelProps={{ shrink: true }}
                         InputProps={{inputProps: { max: oipc.receiveddate || formatDate(new Date())} }}
                         type="date"
+                        error={oipc.receiveddate === ""}
                     />
                 </Grid>
                 <Grid item md={3}>
@@ -170,6 +172,7 @@ const OIPCItem = (props) => {
                         label="Review Type"
                         onChange={(event) => handleReviewType(event.target.value)}
                         required={true}
+                        error={oipc.reviewtypeid === null}
                     >
                         {uniqueReviewTypes(oipcReviewtypes).map((reviewtype) => {
                             return <MenuItem key={reviewtype.reviewtypeid} value={reviewtype.reviewtypeid}>{reviewtype.type_name}</MenuItem>
@@ -186,6 +189,7 @@ const OIPCItem = (props) => {
                         label="Reason"
                         onChange = {(event) => handleReason(event.target.value)}
                         required={true}
+                        error={oipc.reasonid === null}
                     >
                         {oipc.reviewtypeid ? 
                             oipcReviewtypes.map((reviewtype) => {
@@ -205,6 +209,7 @@ const OIPCItem = (props) => {
                         label="Status"
                         onChange = {(event) => handleStatus(event.target.value)}
                         required={true}
+                        error={oipc.statusid === null}
                     >
                         {oipcStatuses.map((status) => {
                             return <MenuItem key={status.statusid} value={status.statusid}>{status.name}</MenuItem>
@@ -309,6 +314,7 @@ const OIPCItem = (props) => {
                         InputLabelProps={{ shrink: true }}
                         InputProps={{inputProps: { min: oipc.receiveddate } }}
                         type="date"
+                        error={oipc.inquiryattributes.inquirydate === ""}
                     />
                 </Grid>
                 <Grid item md={4}>
@@ -320,6 +326,7 @@ const OIPCItem = (props) => {
                         value={oipc.inquiryattributes.orderno}
                         onChange = {(event) => handleInquiryFields(event.target.value, "ORDERNO")}
                         InputLabelProps={{ shrink: true }}
+                        error={oipc.inquiryattributes.orderno === ""}
                     />
                 </Grid>
                 <Grid item md={4}>
@@ -332,6 +339,7 @@ const OIPCItem = (props) => {
                         fullWidth
                         value={oipc.inquiryattributes.inquiryoutcomeid}
                         label="Outcome"
+                        error={oipc.inquiryattributes.inquiryoutcomeid === null}
                     >
                         {oipcInquiryoutcomes.map((inquiryoutcome) => {
                             return <MenuItem key={inquiryoutcome.inquiryoutcomeid} value={inquiryoutcome.inquiryoutcomeid}>{inquiryoutcome.name}</MenuItem>

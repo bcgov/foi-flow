@@ -94,6 +94,7 @@ import { DISABLE_GATHERINGRECORDS_TAB } from "../../../constants/constants";
 import _ from "lodash";
 import { MinistryNeedsScanning } from "../../../constants/FOI/enum";
 import OIPCDetails from "./OIPCDetails/Index";
+import useOIPCHook from "./OIPCDetails/oipcHook";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -256,8 +257,9 @@ const FOIRequest = React.memo(({ userDetail }) => {
   const [isIAORestricted, setIsIAORestricted] = useState(false);
   const [redactedSections, setRedactedSections] = useState("");
   const [isMCFPersonal, setIsMCFPersonal] = useState(bcgovcode.replaceAll('"', '') == "MCF" && requestDetails.requestType == FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL);
+  const {oipcData, addOIPC, removeOIPC, updateOIPC} = useOIPCHook();
   const [showOIPCDetails, setShowOIPCDetails] = useState(true);
-
+      
   useEffect(() => {
     if (window.location.href.indexOf("comments") > -1) {
       tabclick("Comments");
@@ -661,7 +663,8 @@ const FOIRequest = React.memo(({ userDetail }) => {
     requiredRequestDetailsValues,
     requiredAxisDetails,
     isAddRequest,
-    _currentrequestStatus
+    _currentrequestStatus,
+    oipcData,
   );
 
   const classes = useStyles();
@@ -1220,7 +1223,10 @@ const FOIRequest = React.memo(({ userDetail }) => {
                       )}
                       {showOIPCDetails && requestDetails.oipcdetails && (
                         <OIPCDetails 
-                          oipcDetails={requestDetails.oipcdetails}
+                          oipcData={oipcData}
+                          updateOIPC={updateOIPC}
+                          addOIPC={addOIPC}
+                          removeOIPC={removeOIPC}
                         />
                       )}
 

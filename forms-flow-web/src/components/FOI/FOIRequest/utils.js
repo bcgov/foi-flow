@@ -321,9 +321,9 @@ export const checkValidationError = (
   requiredRequestDetailsValues,
   requiredAxisDetails,
   isAddRequest,
-  currentrequestStatus
+  currentrequestStatus,
+  oipcData
 ) => {
-
   return (
     requiredApplicantDetails.firstName === "" ||
     requiredApplicantDetails.lastName === "" ||
@@ -346,7 +346,11 @@ export const checkValidationError = (
       .includes("select") ||
     !requiredRequestDetailsValues.receivedDate ||
     !requiredRequestDetailsValues.requestStartDate ||
-    !requiredAxisDetails.axisRequestId
+    !requiredAxisDetails.axisRequestId || 
+    oipcData.some((oipc) => {
+      return oipc.oipcno === "" || oipc.receiveddate === "" || oipc.reviewtypeid === null || oipc.reasonid === null || oipc.statusid === null || 
+      oipc.inquiryattributes?.orderno === "" || oipc.inquiryattributes?.inquiryoutcomeid === null || oipc.inquiryattributes?.inquirydate === "";
+    })
   );
 };
 
