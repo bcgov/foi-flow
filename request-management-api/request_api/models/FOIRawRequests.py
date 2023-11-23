@@ -362,23 +362,23 @@ class FOIRawRequest(db.Model):
         return assignments
     
     @classmethod
-    def getonholdapplicationfeerequests(cls): # with the reminder date
-        onholdapplicationfeerequests = []
+    def getappfeeowingrequests(cls): # with the reminder date
+        appfeeowingrequests = []
         try:
-            sql = '''SELECT * FROM (SELECT DISTINCT ON (requestid) requestid, (updated_at + INTERVAL '20 days') as reminder_date, status FROM public."FOIRawRequests"
-	                    ORDER BY requestid ASC, version DESC) r
-                    WHERE r.status = 'On-Hold - Application Fee'
+            sql = '''
+                    SELECT * FROM (SELECT DISTINCT ON (requestid) requestid, updated_at, status FROM public."FOIRawRequests"
+	                ORDER BY requestid ASC, version DESC) r
+                    WHERE r.status = 'App Fee Owing'
+					order by r.updated_at asc
                     '''
             rs = db.session.execute(text(sql))
-            for row in rs:
-                if row.status == 'On-Hold - Application Fee':
-                    onholdapplicationfeerequests.append(row)
+            appfeeowingrequests = rs
         except Exception as ex:
             logging.error(ex)
             raise ex
         finally:
             db.session.close()
-        return onholdapplicationfeerequests
+        return appfeeowingrequests
 
     @classmethod
     def getversionforrequest(cls,requestid):   
@@ -1006,13 +1006,13 @@ class FOIRawRequest(db.Model):
         section5pendings = []
         try:
             sql = """SELECT * FROM 
-                (SELECT DISTINCT ON (requestid) requestid, created_at, version, status, to_char(created_at + INTERVAL '10 days', 'YYYY-MM-DD') as duedate, axisrequestid
+                (SELECT DISTINCT ON (requestid) requestid, created_at, version, status, axisrequestid
                 FROM public."FOIRawRequests"
                 ORDER BY requestid ASC, version DESC) foireqs
             WHERE foireqs.status = 'Section 5 Pending';"""
             rs = db.session.execute(text(sql))        
             for row in rs:
-                section5pendings.append({"requestid": row["requestid"], "duedate": row["duedate"], "version": row["version"], "statusname": row["status"], "created_at": row["created_at"], "axisrequestid": ["axisrequestid"]})
+                section5pendings.append({"requestid": row["requestid"], "version": row["version"], "statusname": row["status"], "created_at": row["created_at"], "axisrequestid": ["axisrequestid"]})
         except Exception as ex:
             logging.error(ex)
             raise ex
