@@ -75,7 +75,8 @@ const BottomButtonGroup = React.memo(
     requestState,
     axisSyncedData,
     axisMessage,
-    attachmentsArray
+    attachmentsArray,
+    oipcData,
   }) => {
     /**
      * Bottom Button Group of Review request Page
@@ -117,7 +118,10 @@ const BottomButtonGroup = React.memo(
       if (urlIndexCreateRequest > -1) {
         saveRequestObject.requeststatusid = StateEnum.intakeinprogress.id;
         setIsAddRequest(false);
-      }      
+      }     
+      //add oipc Data
+      saveRequestObject.oipcdetails = oipcData; 
+      console.log(saveRequestObject)
       dispatch(setFOILoader(setLoader))
       dispatch(
         saveRequestDetails(

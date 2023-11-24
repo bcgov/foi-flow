@@ -27,10 +27,10 @@ const OIPCItem = (props) => {
         outcomeid: oipcObj?.outcomeid, 
         isjudicialreview: oipcObj?.isjudicialreview,
         issubsequentappeal: oipcObj?.issubsequentappeal, 
-        reviewtypeName: "",
-        reasonName: "", 
-        statusName: "", 
-        outcomeName: "",
+        reviewtypeName: oipcObj?.reviewtype,
+        reasonName: oipcObj?.reason, 
+        statusName: oipcObj?.status, 
+        outcomeName: oipcObj?.outcome,
     });
 
     console.log(oipc);
@@ -62,41 +62,49 @@ const OIPCItem = (props) => {
         const newOIPCObj = oipc;
         newOIPCObj.reviewtypeid = value;
         newOIPCObj.reasonid = null;
+        setOipc(newOIPCObj);
         updateOIPC(newOIPCObj);
     }
     const handleOIPCNumber = (value) => {
         const newOIPCObj = oipc;
         newOIPCObj.oipcno = value;
+        setOipc(newOIPCObj);
         updateOIPC(newOIPCObj);
     }
     const handleReceivedDate = (value) => {
         const newOIPCObj = oipc;
         newOIPCObj.receiveddate = value;
+        setOipc(newOIPCObj);
         updateOIPC(newOIPCObj);
     }
     const handleClosedDate = (value) => {
         const newOIPCObj = oipc;
         newOIPCObj.closeddate = value;
+        setOipc(newOIPCObj);
         updateOIPC(newOIPCObj);
     }
     const handleReason = (value) => {
         const newOIPCObj = oipc;
         newOIPCObj.reasonid = value;
+        setOipc(newOIPCObj);
         updateOIPC(newOIPCObj);
     }
     const handleStatus = (value) => {
         const newOIPCObj = oipc;
         newOIPCObj.statusid = value;
+        setOipc(newOIPCObj);
         updateOIPC(newOIPCObj);
     }
     const handleInvestiagtor = (value) => {
         const newOIPCObj = oipc;
         newOIPCObj.investigator = value;
+        setOipc(newOIPCObj);
         updateOIPC(newOIPCObj);
     }
     const handleOutcome = (value) => {
         const newOIPCObj = oipc;
         newOIPCObj.outcomeid = value;
+        setOipc(newOIPCObj);
         updateOIPC(newOIPCObj);
     }
     const handleInquiry = (value) => {
@@ -111,16 +119,19 @@ const OIPCItem = (props) => {
             };
         }
         newOIPCObj.isinquiry = value;
+        setOipc(newOIPCObj);
         updateOIPC(newOIPCObj);
     }
     const handleJudicalReview = (value) => {
         const newOIPCObj = oipc;
         newOIPCObj.isjudicialreview = value;
+        setOipc(newOIPCObj);
         updateOIPC(newOIPCObj);
     }
     const handleSubsequentAppeal = (value) => {
         const newOIPCObj = oipc;
         newOIPCObj.issubsequentappeal = value;
+        setOipc(newOIPCObj);
         updateOIPC(newOIPCObj);
     }
     const handleInquiryFields = (value, attribute) => {
@@ -134,12 +145,13 @@ const OIPCItem = (props) => {
         if (attribute === "INQUIRYOUTCOME") {
             newOIPCObj.inquiryattributes.inquiryoutcomeid = value;
         }
+        setOipc(newOIPCObj);
         updateOIPC(newOIPCObj);
     }
 
-    //useEffect to create name attributes using id's for oipcObject
     useEffect(() => {
-        generateNamesFromOIPCId(oipcObj);
+        setOipc(oipcObj);
+        generateNamesFromOIPCId(oipc);
     }, [oipcObj])
 
     return (
@@ -163,12 +175,13 @@ const OIPCItem = (props) => {
                         label="Received Date" 
                         variant="outlined" 
                         required={true}
+                        defaultValue=""
                         value={oipc.receiveddate}
                         onChange = {(event) => handleReceivedDate(event.target.value)}
                         InputLabelProps={{ shrink: true }}
-                        InputProps={{inputProps: { max: oipc.receiveddate || formatDate(new Date())} }}
+                        InputProps={{inputProps: { max: formatDate(new Date())} }}
                         type="date"
-                        error={oipc.receiveddate === ""}
+                        error={oipc.receiveddate === null}
                     />
                 </Grid>
                 <Grid item md={3}>

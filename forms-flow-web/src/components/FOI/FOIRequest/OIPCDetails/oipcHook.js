@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 
 const useOIPCHook = () => {
@@ -19,8 +19,8 @@ const useOIPCHook = () => {
         statusid: null, 
         isinquiry: false,
         inquiryattributes: null,  
-        receiveddate: "",
-        closeddate: "",
+        receiveddate: null,
+        closeddate: null,
         investigator: "", 
         outcomeid: null, 
         isjudicialreview: false, 
@@ -28,7 +28,14 @@ const useOIPCHook = () => {
       }];
     }
   }
-  const [oipcData, setOipcData] = useState(stageOIPCData(requestDetails.oipcdetails));
+  const [oipcData, setOipcData] = useState(requestDetails.oipcdetails);
+
+  useEffect(() => {
+    const stagedOIPCData = stageOIPCData(requestDetails.oipcdetails);
+    setOipcData(stagedOIPCData);
+  }, [requestDetails])
+
+  console.log("HOOK", oipcData)
 
   //OIPC Functions
   const addOIPC = () => {
@@ -41,8 +48,8 @@ const useOIPCHook = () => {
         statusid: null, 
         isinquiry: false,
         inquiryattributes: null,  
-        receiveddate: "",
-        closeddate: "",
+        receiveddate: null,
+        closeddate: null,
         investigator: "", 
         outcomeid: null, 
         isjudicialreview: false, 
@@ -74,6 +81,7 @@ const useOIPCHook = () => {
     addOIPC,
     removeOIPC,
     updateOIPC,
+    stageOIPCData,
   };
 };
 

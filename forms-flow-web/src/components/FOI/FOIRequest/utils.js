@@ -347,10 +347,10 @@ export const checkValidationError = (
     !requiredRequestDetailsValues.receivedDate ||
     !requiredRequestDetailsValues.requestStartDate ||
     !requiredAxisDetails.axisRequestId || 
-    oipcData.some((oipc) => {
-      return oipc.oipcno === "" || oipc.receiveddate === "" || oipc.reviewtypeid === null || oipc.reasonid === null || oipc.statusid === null || 
+    (oipcData.length > 0 && oipcData.some((oipc) => {
+      return oipc.oipcno === "" || oipc.receiveddate === null || oipc.reviewtypeid === null || oipc.reasonid === null || oipc.statusid === null || 
       oipc.inquiryattributes?.orderno === "" || oipc.inquiryattributes?.inquiryoutcomeid === null || oipc.inquiryattributes?.inquirydate === "";
-    })
+    }))
   );
 };
 

@@ -776,15 +776,6 @@ const FOIRequest = React.memo(({ userDetail }) => {
     }
   }, [editorChange]);
   
-  //useEffect to update saveReq object with oipc data
-  useEffect(() => {
-    setSaveRequestObject((prev) => {
-      return {...prev, oipcdetails: oipcData}
-    })
-  }, [oipcData]);
-
-  console.log(saveRequestObject)
-  
   const tabclick = (param) => {
     if (param === "Comments") {
       sessionStorage.setItem("foicommentcategory", 1);
@@ -1230,7 +1221,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
                           divisions={requestDetails.divisions}
                         />
                       )}
-                      {showOIPCDetails && requestDetails.oipcdetails && (
+                      {showOIPCDetails && requestDetails.isoipcreview && requestState && requestState.toLowerCase() !== StateEnum.intakeinprogress.name.toLowerCase() && (
                         <OIPCDetails 
                           oipcData={oipcData}
                           updateOIPC={updateOIPC}
@@ -1258,6 +1249,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
                         axisSyncedData={axisSyncedData}
                         axisMessage={axisMessage}
                         attachmentsArray={requestAttachments}
+                        oipcData={oipcData}
                       />
                     </>
                   </ConditionalComponent>
