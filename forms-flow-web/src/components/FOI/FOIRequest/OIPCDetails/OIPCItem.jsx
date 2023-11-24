@@ -25,16 +25,39 @@ const OIPCItem = (props) => {
         closeddate: oipcObj?.closeddate,
         investigator: oipcObj?.investigator, 
         outcomeid: oipcObj?.outcomeid, 
-        isjudicialreview: oipcObj?.isjudicialreview, 
-        reviewtypeName: oipcObj?.reviewtypeName,
-        reasonName: oipcObj?.reasonName, 
-        statusName: oipcObj?.statusName, 
-        outcomeName: oipcObj?.outcomeName,
+        isjudicialreview: oipcObj?.isjudicialreview,
+        issubsequentappeal: oipcObj?.issubsequentappeal, 
+        reviewtypeName: "",
+        reasonName: "", 
+        statusName: "", 
+        outcomeName: "",
     });
 
     console.log(oipc);
     
     //Functions
+    const generateNamesFromOIPCId = (oipcObj) => {
+        const reviewtype = oipcReviewtypes.find(reviewtype => reviewtype.reviewtypeid === oipcObj.reviewtypeid && reviewtype.reasonid === oipcObj.reasonid);
+        const status = oipcStatuses.find(status => status.statusid === oipcObj.statusid);
+        const outcome = oipcOutcomes.find(outcome => outcome.outcomeid === oipcObj.outcomeid);
+        
+        setOipc((prev) => {
+            return {...prev, reviewtypeName: reviewtype ? reviewtype.type_name : ""}
+        })
+        setOipc((prev) => {
+            return {...prev, statusName: status ? status.type_name : ""}
+        })
+        setOipc((prev) => {
+            return {...prev, outcomeName: outcome ? outcome.type_name : ""}
+        })
+        setOipc((prev) => {
+            return {...prev, reasonName: reviewtype ? reviewtype.reason_name : ""}
+        })
+    }
+    const uniqueReviewTypes = (oipcReviewTypes) => {
+        const uniqeValues = {};
+        return oipcReviewTypes.filter(reviewtype => !uniqeValues[reviewtype.type_name] && (uniqeValues[reviewtype.type_name] = true));
+    }
     const handleReviewType = (value) => {
         const newOIPCObj = oipc;
         newOIPCObj.reviewtypeid = value;
@@ -112,20 +135,6 @@ const OIPCItem = (props) => {
             newOIPCObj.inquiryattributes.inquiryoutcomeid = value;
         }
         updateOIPC(newOIPCObj);
-    }
-    const generateNamesFromOIPCId = (oipcObj) => {
-        const reviewtype = oipcReviewtypes.find(reviewtype => reviewtype.reviewtypeid === oipcObj.reviewtypeid && reviewtype.reasonid === oipcObj.reasonid);
-        const status = oipcStatuses.find(status => status.statusid === oipcObj.statusid);
-        const outcome = oipcOutcomes.find(outcome => outcome.outcomeid === oipcObj.outcomeid);
-
-        oipcObj.reviewtypeName = reviewtype ? reviewtype.type_name : "";
-        oipcObj.statusName = status ? status.name : "";
-        oipcObj.outcomeName = outcome ? outcome.name : "";
-        oipcObj.reasonName = reviewtype ? reviewtype.reason_name : "";
-    }
-    const uniqueReviewTypes = (oipcReviewTypes) => {
-        const uniqeValues = {};
-        return oipcReviewTypes.filter(reviewtype => !uniqeValues[reviewtype.type_name] && (uniqeValues[reviewtype.type_name] = true));
     }
 
     //useEffect to create name attributes using id's for oipcObject

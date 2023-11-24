@@ -775,7 +775,16 @@ const FOIRequest = React.memo(({ userDetail }) => {
       };
     }
   }, [editorChange]);
+  
+  //useEffect to update saveReq object with oipc data
+  useEffect(() => {
+    setSaveRequestObject((prev) => {
+      return {...prev, oipcdetails: oipcData}
+    })
+  }, [oipcData]);
 
+  console.log(saveRequestObject)
+  
   const tabclick = (param) => {
     if (param === "Comments") {
       sessionStorage.setItem("foicommentcategory", 1);
