@@ -121,7 +121,6 @@ const BottomButtonGroup = React.memo(
       }     
       //add oipc Data
       saveRequestObject.oipcdetails = oipcData; 
-      console.log(saveRequestObject)
       dispatch(setFOILoader(setLoader))
       dispatch(
         saveRequestDetails(

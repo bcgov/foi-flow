@@ -111,9 +111,9 @@ const OIPCItem = (props) => {
             newOIPCObj.inquiryattributes = null;
         } else {
             newOIPCObj.inquiryattributes = {
-                inquirydate: "",
+                inquirydate: null,
                 orderno: "",
-                inquiryoutcomeid: null,
+                inquiryoutcome: null,
             };
         }
         newOIPCObj.isinquiry = value;
@@ -141,7 +141,7 @@ const OIPCItem = (props) => {
             newOIPCObj.inquiryattributes.orderno = value;
         }
         if (attribute === "INQUIRYOUTCOME") {
-            newOIPCObj.inquiryattributes.inquiryoutcomeid = value;
+            newOIPCObj.inquiryattributes.inquiryoutcome = value;
         }
         setOipc(newOIPCObj);
         updateOIPC(newOIPCObj);
@@ -269,6 +269,7 @@ const OIPCItem = (props) => {
                         value={oipc.closeddate ? formatDate(new Date(oipc.closeddate)) : null}
                         onChange = {(event) => handleClosedDate(event.target.value)}
                         InputLabelProps={{ shrink: true }}
+                        InputProps={{inputProps: { max: formatDate(new Date())} }}
                         type="date"
                     />
                 </Grid>
@@ -333,7 +334,7 @@ const OIPCItem = (props) => {
                         InputLabelProps={{ shrink: true }}
                         InputProps={{inputProps: { min: oipc.receiveddate ? formatDate(new Date(oipc.receiveddate)) : null } }}
                         type="date"
-                        error={oipc.inquiryattributes.inquirydate === ""}
+                        error={oipc.inquiryattributes.inquirydate === null}
                     />
                 </Grid>
                 <Grid item md={4}>
@@ -356,9 +357,9 @@ const OIPCItem = (props) => {
                         variant="outlined"
                         onChange = {(event) => handleInquiryFields(event.target.value, "INQUIRYOUTCOME")}
                         fullWidth
-                        value={oipc.inquiryattributes.inquiryoutcomeid}
+                        value={oipc.inquiryattributes.inquiryoutcome}
                         label="Outcome"
-                        error={oipc.inquiryattributes.inquiryoutcomeid === null}
+                        error={oipc.inquiryattributes.inquiryoutcome === null}
                     >
                         {oipcInquiryoutcomes.map((inquiryoutcome) => {
                             return <MenuItem key={inquiryoutcome.inquiryoutcomeid} value={inquiryoutcome.inquiryoutcomeid}>{inquiryoutcome.name}</MenuItem>

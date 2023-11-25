@@ -349,7 +349,7 @@ export const checkValidationError = (
     !requiredAxisDetails.axisRequestId || 
     (oipcData.length > 0 && oipcData.some((oipc) => {
       return oipc.oipcno === "" || oipc.receiveddate === null || oipc.reviewtypeid === null || oipc.reasonid === null || oipc.statusid === null || 
-      oipc.inquiryattributes?.orderno === "" || oipc.inquiryattributes?.inquiryoutcomeid === null || oipc.inquiryattributes?.inquirydate === "";
+      oipc.inquiryattributes?.orderno === "" || oipc.inquiryattributes?.inquiryoutcome === null || oipc.inquiryattributes?.inquirydate === null;
     }))
   );
 };
