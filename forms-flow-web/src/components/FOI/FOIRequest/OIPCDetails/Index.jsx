@@ -10,6 +10,7 @@ import { faCirclePlus } from '@fortawesome/free-solid-svg-icons';
 
 const OIPCDetails = (props) => {
   const { oipcData, addOIPC, removeOIPC, updateOIPC } = props;
+
   //Styling
   const useStyles = makeStyles({
       heading: {

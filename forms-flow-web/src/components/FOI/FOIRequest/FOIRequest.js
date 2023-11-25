@@ -665,6 +665,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
     isAddRequest,
     _currentrequestStatus,
     oipcData,
+    requestDetails.isoipcreview,
   );
 
   const classes = useStyles();

@@ -118,9 +118,12 @@ const BottomButtonGroup = React.memo(
       if (urlIndexCreateRequest > -1) {
         saveRequestObject.requeststatusid = StateEnum.intakeinprogress.id;
         setIsAddRequest(false);
-      }     
-      //add oipc Data
-      saveRequestObject.oipcdetails = oipcData; 
+      }
+
+      //add oipc Data to save request object
+      saveRequestObject.oipcdetails = oipcData;
+      if (oipcData.length <= 0) saveRequestObject.isoipcreview = false;
+
       dispatch(setFOILoader(setLoader))
       dispatch(
         saveRequestDetails(

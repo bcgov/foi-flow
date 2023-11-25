@@ -2,9 +2,12 @@ import { TextField, FormControlLabel, MenuItem, Grid, Checkbox } from '@material
 import { useState, useEffect } from "react";
 import { formatDate } from "../../../../helper/FOI/helper";
 import { useSelector } from "react-redux";
+import RemoveOIPCModal from './RemoveOIPCModal';
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faTrash } from '@fortawesome/free-solid-svg-icons';
 
 const OIPCItem = (props) => {
-    const {oipcObj, updateOIPC} = props;
+    const {oipcObj, updateOIPC, removeOIPC} = props;
     
     //App State
     const oipcOutcomes = useSelector(state=> state.foiRequests.oipcOutcomes);
@@ -13,25 +16,8 @@ const OIPCItem = (props) => {
     const oipcInquiryoutcomes = useSelector(state=> state.foiRequests.oipcInquiryoutcomes);
 
     //Local State
-    const [oipc, setOipc] = useState({
-        id: oipcObj?.id, 
-        oipcno: oipcObj?.oipcno, 
-        reviewtypeid: oipcObj?.reviewtypeid, 
-        reasonid: oipcObj?.reasonid, 
-        statusid: oipcObj?.statusid, 
-        isinquiry: oipcObj?.isinquiry, 
-        inquiryattributes: oipcObj?.inquiryattributes,  
-        receiveddate: oipcObj?.receiveddate,
-        closeddate: oipcObj?.closeddate,
-        investigator: oipcObj?.investigator, 
-        outcomeid: oipcObj?.outcomeid, 
-        isjudicialreview: oipcObj?.isjudicialreview,
-        issubsequentappeal: oipcObj?.issubsequentappeal, 
-        reviewtypeName: oipcObj?.reviewtype,
-        reasonName: oipcObj?.reason, 
-        statusName: oipcObj?.status, 
-        outcomeName: oipcObj?.outcome,
-    });
+    const [oipc, setOipc] = useState(oipcObj);
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
     
     //Functions
     const generateNamesFromOIPCId = (oipcObj) => {
@@ -153,18 +139,24 @@ const OIPCItem = (props) => {
     }, [oipcObj])
 
     return (
-        <>
+        <> 
+            <div style={{display: "flex", flexDirection: "row", justifyContent: "flex-end"}}>
+                <button onClick={() => setShowDeleteModal(true)} style={{ border: "none", background: "none" }}>
+                    <FontAwesomeIcon icon={faTrash} color="#38598A" />
+                </button>
+            </div>
+            {showDeleteModal && <RemoveOIPCModal removeOIPC={removeOIPC} showModal={showDeleteModal} setShowDeleteModal={setShowDeleteModal} oipcid={oipc.id} />}
             <Grid container spacing={1}>
             <Grid item md={3}>
                     <TextField 
                         fullWidth
                         label="OIPC No" 
                         variant="outlined" 
-                        required={true}
                         value={oipc.oipcno}
                         onChange = {(event) => handleOIPCNumber(event.target.value)}
                         InputLabelProps={{ shrink: true }}
                         error={oipc.oipcno === ""}
+                        required
                     />
                 </Grid>
                 <Grid item md={3}>
@@ -172,14 +164,13 @@ const OIPCItem = (props) => {
                         fullWidth
                         label="Received Date" 
                         variant="outlined" 
-                        required={true}
-                        defaultValue=""
                         value={oipc.receiveddate ? formatDate(new Date(oipc.receiveddate)) : null}
                         onChange = {(event) => handleReceivedDate(event.target.value)}
                         InputLabelProps={{ shrink: true }}
                         InputProps={{inputProps: { max: formatDate(new Date())} }}
                         type="date"
                         error={oipc.receiveddate === null}
+                        required
                     />
                 </Grid>
                 <Grid item md={3}>
@@ -191,8 +182,8 @@ const OIPCItem = (props) => {
                         value={oipc.reviewtypeid}
                         label="Review Type"
                         onChange={(event) => handleReviewType(event.target.value)}
-                        required={true}
                         error={oipc.reviewtypeid === null}
+                        required
                     >
                         {uniqueReviewTypes(oipcReviewtypes).map((reviewtype) => {
                             return <MenuItem key={reviewtype.reviewtypeid} value={reviewtype.reviewtypeid}>{reviewtype.type_name}</MenuItem>
@@ -208,8 +199,8 @@ const OIPCItem = (props) => {
                         value={oipc.reasonid}
                         label="Reason"
                         onChange = {(event) => handleReason(event.target.value)}
-                        required={true}
                         error={oipc.reasonid === null}
+                        required
                     >
                         {oipc.reviewtypeid ? 
                             oipcReviewtypes.map((reviewtype) => {
@@ -228,8 +219,8 @@ const OIPCItem = (props) => {
                         value={oipc.statusid}
                         label="Status"
                         onChange = {(event) => handleStatus(event.target.value)}
-                        required={true}
                         error={oipc.statusid === null}
+                        required
                     >
                         {oipcStatuses.map((status) => {
                             return <MenuItem key={status.statusid} value={status.statusid}>{status.name}</MenuItem>
@@ -328,13 +319,13 @@ const OIPCItem = (props) => {
                         fullWidth
                         label="Comply By Date" 
                         variant="outlined" 
-                        required={true}
                         value={oipc.inquiryattributes.inquirydate ? formatDate(new Date(oipc.inquiryattributes.inquirydate)) : null}
                         onChange = {(event) => handleInquiryFields(event.target.value, "COMPLYDATE")}
                         InputLabelProps={{ shrink: true }}
                         InputProps={{inputProps: { min: oipc.receiveddate ? formatDate(new Date(oipc.receiveddate)) : null } }}
                         type="date"
                         error={oipc.inquiryattributes.inquirydate === null}
+                        required
                     />
                 </Grid>
                 <Grid item md={4}>
@@ -342,24 +333,24 @@ const OIPCItem = (props) => {
                         fullWidth
                         label="Order No" 
                         variant="outlined" 
-                        required={true}
                         value={oipc.inquiryattributes.orderno}
                         onChange = {(event) => handleInquiryFields(event.target.value, "ORDERNO")}
                         InputLabelProps={{ shrink: true }}
                         error={oipc.inquiryattributes.orderno === ""}
+                        required
                     />
                 </Grid>
                 <Grid item md={4}>
                     <TextField
                         InputLabelProps={{ shrink: true }}
                         select
-                        required={true}
                         variant="outlined"
                         onChange = {(event) => handleInquiryFields(event.target.value, "INQUIRYOUTCOME")}
                         fullWidth
                         value={oipc.inquiryattributes.inquiryoutcome}
                         label="Outcome"
                         error={oipc.inquiryattributes.inquiryoutcome === null}
+                        required
                     >
                         {oipcInquiryoutcomes.map((inquiryoutcome) => {
                             return <MenuItem key={inquiryoutcome.inquiryoutcomeid} value={inquiryoutcome.inquiryoutcomeid}>{inquiryoutcome.name}</MenuItem>
