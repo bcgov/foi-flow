@@ -32,8 +32,6 @@ const OIPCItem = (props) => {
         statusName: oipcObj?.status, 
         outcomeName: oipcObj?.outcome,
     });
-
-    console.log(oipc);
     
     //Functions
     const generateNamesFromOIPCId = (oipcObj) => {
@@ -176,7 +174,7 @@ const OIPCItem = (props) => {
                         variant="outlined" 
                         required={true}
                         defaultValue=""
-                        value={oipc.receiveddate}
+                        value={oipc.receiveddate ? formatDate(new Date(oipc.receiveddate)) : null}
                         onChange = {(event) => handleReceivedDate(event.target.value)}
                         InputLabelProps={{ shrink: true }}
                         InputProps={{inputProps: { max: formatDate(new Date())} }}
@@ -268,10 +266,9 @@ const OIPCItem = (props) => {
                         fullWidth
                         label="Closed Date" 
                         variant="outlined" 
-                        value={oipc.closeddate}
+                        value={oipc.closeddate ? formatDate(new Date(oipc.closeddate)) : null}
                         onChange = {(event) => handleClosedDate(event.target.value)}
                         InputLabelProps={{ shrink: true }}
-                        InputProps={{inputProps: { max: oipc.closeddate || formatDate(new Date())} }}
                         type="date"
                     />
                 </Grid>
@@ -331,10 +328,10 @@ const OIPCItem = (props) => {
                         label="Comply By Date" 
                         variant="outlined" 
                         required={true}
-                        value={oipc.inquiryattributes.inquirydate}
+                        value={oipc.inquiryattributes.inquirydate ? formatDate(new Date(oipc.inquiryattributes.inquirydate)) : null}
                         onChange = {(event) => handleInquiryFields(event.target.value, "COMPLYDATE")}
                         InputLabelProps={{ shrink: true }}
-                        InputProps={{inputProps: { min: oipc.receiveddate } }}
+                        InputProps={{inputProps: { min: oipc.receiveddate ? formatDate(new Date(oipc.receiveddate)) : null } }}
                         type="date"
                         error={oipc.inquiryattributes.inquirydate === ""}
                     />
