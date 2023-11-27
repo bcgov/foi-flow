@@ -296,6 +296,7 @@ class notificationservice:
                 user.isdeleted = False
         else:
             user = FOIRawRequestNotificationUser()
+            user.isdeleted = False
         user.notificationusertypelabel = notificationuser["usertype"]
         user.userid = notificationuser["userid"]
         user.createdby = userid

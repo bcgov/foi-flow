@@ -32,7 +32,11 @@ class notificationconfig:
             return str(14)
     
     def getmutenotifications(self):
+<<<<<<< HEAD
         if 'MUTE_NOTIFICATION' in os.environ and os.getenv('MUTE_NOTIFICATION') != '':
+=======
+        if 'MUTE_NOTIFICATION' in os.environ:
+>>>>>>> 21ce0b5a5 (mute notifications for mcf #4548)
             return json.loads(os.getenv('MUTE_NOTIFICATION'))
         else:
             return {}
