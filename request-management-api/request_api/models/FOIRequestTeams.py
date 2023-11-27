@@ -4,12 +4,15 @@ from sqlalchemy.orm import relationship,backref
 from sqlalchemy.sql.schema import ForeignKey
 from sqlalchemy import text
 import logging
+from request_api.utils.enums import StateName
+
 class FOIRequestTeam(db.Model):
     __tablename__ = 'FOIRequestTeams' 
     # Defining the columns
     requestteamid = db.Column(db.Integer, primary_key=True,autoincrement=True)
     requesttype = db.Column(db.String(100), unique=False, nullable=True)
     requeststatusid = db.Column(db.Integer,ForeignKey('FOIRequestStatuses.requeststatusid'))
+    requeststatuslabel = db.Column(db.String(50), unique=False, nullable=False)
     teamid = db.Column(db.Integer,ForeignKey('OperatingTeams.teamid'))
     programareaid = db.Column(db.Integer,ForeignKey('ProgramAreas.programareaid'))
     isactive = db.Column(db.Boolean, unique=False, nullable=False)
@@ -23,14 +26,15 @@ class FOIRequestTeam(db.Model):
     @classmethod
     def getteamsbystatusandprogramarea(cls, requesttype, status, bcgovcode):  
         teams = []
-        try:              
+        try:
+            # and replace(lower(fs2."name"),' ','') = :status              
             sql = """
                     with mappedteams as (
                         select ot."name" as name, ot."type" as type, ft.requestteamid as orderby from "FOIRequestTeams" ft inner join "FOIRequestStatuses" fs2 on ft.requeststatusid = fs2.requeststatusid
                         inner join "OperatingTeams" ot on ft.teamid = ot.teamid
                         left join "ProgramAreas" pa on ft.programareaid = pa.programareaid
-                        where ft.isactive = true and lower(ft.requesttype) = :requesttype
-                        and replace(lower(fs2."name"),' ','') = :status
+                        where ft.isactive = true and lower(ft.requesttype) = :requesttype                        
+                        and ft.requeststatuslabel = :status
                         and (lower(pa.bcgovcode) = :bcgovcode or ft.programareaid  is null)
                     )
                     -- remove the with statement and below query go back to mapped teams only in assignee drop down
@@ -57,8 +61,8 @@ class FOIRequestTeam(db.Model):
                     inner join "ProgramAreas" pa on ft.programareaid = pa.programareaid 
                     where lower(ft.requesttype) = :requesttype and ft.programareaid is not null
                     and ot."type" = 'iao'
-                    and ft.requeststatusid = 8"""
-            rs = db.session.execute(text(sql), {'requesttype': requesttype})
+                    and ft.requeststatuslabel = :requeststatuslabel"""
+            rs = db.session.execute(text(sql), {'requesttype': requesttype, 'requeststatuslabel': StateName.feeestimate.name})
             for row in rs:
                 teams.append({"team":row["team"], "ministry":row["ministry"], "bcgovcode":row["bcgovcode"], "iaocode":row["iaocode"]})
         except Exception as ex:
@@ -91,4 +95,4 @@ class FOIRequestTeam(db.Model):
     
 class FOIRequestTeamSchema(ma.Schema):
     class Meta:
-        fields = ('requestteamid', 'requesttype', 'requeststatusid','teamid','programareaid','isactive')
+        fields = ('requestteamid', 'requesttype', 'requeststatusid','teamid','programareaid','isactive', 'requeststatuslabel')
