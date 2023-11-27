@@ -258,7 +258,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
   const [redactedSections, setRedactedSections] = useState("");
   const [isMCFPersonal, setIsMCFPersonal] = useState(bcgovcode.replaceAll('"', '') == "MCF" && requestDetails.requestType == FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL);
   const {oipcData, addOIPC, removeOIPC, updateOIPC} = useOIPCHook();
-  const [showOIPCDetails, setShowOIPCDetails] = useState(true);
+  const [showOIPCDetails, setShowOIPCDetails] = useState(requestDetails.isoipcreview);
       
   useEffect(() => {
     if (window.location.href.indexOf("comments") > -1) {
@@ -337,6 +337,11 @@ const FOIRequest = React.memo(({ userDetail }) => {
       if(bcgovcode.replaceAll('"', '') == "MCF") {
         setIsMCFPersonal(true);
       }
+    }
+    if(requestDetails.isoipcreview) {
+      setShowOIPCDetails(true);
+    } else {
+      setShowOIPCDetails(false);
     }
   }, [requestDetails]);
 
