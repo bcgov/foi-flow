@@ -25,12 +25,13 @@ import {
 } from "../../../apiManager/services/FOI/foiRequestServices";
 import { request } from "http";
 import { is } from "immutable";
+import { setFOIUpdateLoader } from "../../../actions/FOI/foiRequestActions";
 
 //Types are:
 //oipcreview
 //phasedrelease
-const RequestFlag = ({ type, requestDetails }) => {
-  const [isSelected, setIsSelected] = useState(requestDetails.isActive);
+const RequestFlag = ({ isActive, type, requestDetails }) => {
+  const [isSelected, setIsSelected] = useState(isActive || false);
   const [modalOpen, setModalOpen] = useState(false);
   const [modalHeading, setModalHeading] = useState("");
   const [modalMessage, setModalMessage] = useState("");
@@ -60,8 +61,6 @@ const RequestFlag = ({ type, requestDetails }) => {
   let isSelectedBgClass;
   let bgClass;
 
-  console.log('options: ', options)
-  console.log('type: ', type)
   switch (type) {
     //Need to change heading, message, description for modals as well
     case "oipcreview":
@@ -93,13 +92,6 @@ const RequestFlag = ({ type, requestDetails }) => {
           This will create a new <b>OIPC review</b> section on this request.
         </span>
       );
-      console.log('options: ', options)
-
-      handleSaveForActive = () => {
-        console.log("setting to active");
-        requestDetails.isoipcreview = true;
-        console.log(requestDetails);
-      };
 
       //when setting to inactive
       modalHeadingActive = "OIPC Review";
@@ -110,11 +102,6 @@ const RequestFlag = ({ type, requestDetails }) => {
           This will remove the <b>OIPC review</b> section from this request.
         </span>
       );
-      handleSaveForInactive = () => {
-        console.log("setting to inactive");
-        requestDetails.isoipcreview = false;
-        console.log(requestDetails);
-      };
       break;
 
     case "phasedrelease":
@@ -144,11 +131,6 @@ const RequestFlag = ({ type, requestDetails }) => {
       modalDescriptionActive = (
         <span>This will tag the request as Phased Release.</span>
       );
-      handleSaveForActive = () => {
-        console.log("setting to active");
-        requestDetails.isphasedrelease = true;
-        console.log(requestDetails);
-      };
 
       //when setting to inactive
       modalHeadingInactive = "Single Release";
@@ -157,11 +139,6 @@ const RequestFlag = ({ type, requestDetails }) => {
       modalDescriptionInactive = (
         <span>This will tag the request as Single Release.</span>
       );
-      handleSaveForInactive = () => {
-        console.log("setting to inactive");
-        requestDetails.isphasedrelease = false;
-        console.log(requestDetails);
-      };
       break;
   }
 
@@ -182,21 +159,15 @@ const RequestFlag = ({ type, requestDetails }) => {
 
   const handleClose = () => {
     setModalOpen(false);
-    setIsSelected(requestDetails.isActive);
+    setIsSelected(isActive);
   };
 
   const handleSave = (e) => {
     setModalOpen(false);
     saveOipcReviewStatus();
-    // if (isSelected) {
-    //   handleSaveForActive();
-    // } else {
-    //   handleSaveForInactive();
-    // }
   };
 
   const saveOipcReviewStatus = () => {
-    // dispatch(setFOILoader(setLoader));
     let updatedRequestDetails;
     if (type == "oipcreview") {
         updatedRequestDetails = {
@@ -209,15 +180,16 @@ const RequestFlag = ({ type, requestDetails }) => {
             isphasedrelease: isSelected,
         };
     }
+    //dispatch loader
     dispatch(
       saveRequestDetails(
         updatedRequestDetails,
-        -2,
+        -2, //not an add request
         requestId,
         ministryId,
         (err, res) => {
           if (!err) {
-            toast.success("The request has been saved successfully.", {
+            toast.success("The OIPC review status has been successfully updated.", {
               position: "top-right",
               autoClose: 3000,
               hideProgressBar: true,
@@ -226,17 +198,10 @@ const RequestFlag = ({ type, requestDetails }) => {
               draggable: true,
               progress: undefined,
             });
-            // const _state = getRequestState({
-            //   currentSelectedStatus,
-            //   requestState,
-            //   urlIndexCreateRequest,
-            //   saveRequestObject,
-            // });
-            // handleSaveRequest(_state, false, res.id);
-            // hasStatusRequestSaved(currentSelectedStatus);
+            dispatch(fetchFOIRequestDetailsWrapper(requestId, ministryId));
           } else {
             toast.error(
-              "Temporarily unable to save your request. Please try again in a few minutes.",
+              "Temporarily unable to update the OIPC review status. Please try again in a few minutes.",
               {
                 position: "top-right",
                 autoClose: 3000,
@@ -247,7 +212,7 @@ const RequestFlag = ({ type, requestDetails }) => {
                 progress: undefined,
               }
             );
-            // handleSaveRequest(requestState, true, "");
+            setIsSelected(isActive || false);
           }
         }
       )
