@@ -212,7 +212,7 @@ class FOIRequestNotificationUser(db.Model):
                             ).join(
                                 FOINotifications,    
                                 and_(FOINotifications.axisnumber == FOIRequests.axisrequestid),
-                            ).filter(FOIRequests.requeststatusid != 3)
+                            ).filter(FOIRequests.requeststatuslabel != StateName.closed.name)
                             
         if(additionalfilter == 'watchingRequests'):
             #watchby
@@ -262,7 +262,7 @@ class FOIRequestNotificationUser(db.Model):
                             FOIRequests.assignedgroup == group,
                             and_(
                                 FOIRequests.assignedgroup == IAOTeamWithKeycloackGroup.flex.value,
-                                FOIRequests.requeststatusid.in_([1])
+                                FOIRequests.requeststatuslabel.in_([StateName.open.name])
                             )
                         )
                     )
@@ -272,7 +272,7 @@ class FOIRequestNotificationUser(db.Model):
                             FOIRequests.assignedgroup == group,
                             and_(
                                 FOIRequests.assignedministrygroup == group,
-                                FOIRequests.requeststatusid.in_([2,7,9,8,10,11,12,13,14,17,18])
+                                FOIRequests.requeststatuslabel.in_([StateName.callforrecords.name,StateName.recordsreview.name,StateName.feeestimate.name,StateName.consult.name,StateName.ministrysignoff.name,StateName.onhold.name,StateName.deduplication.name,StateName.harmsassessment.name,StateName.response.name,StateName.tagging.name,StateName.readytoscan.name])
                             )
                         )
                     )
