@@ -22,42 +22,89 @@ const OutcomeModal= ({
         setShowModal(false);
         setOipc(prev => ({ ...prev, outcomeid: null }));
     };
+    const handleAmendSave = () => {
+        setShowModal(false);
+        setOipc(prev => ({ ...prev, outcomeid: null }));
+        updateOIPC(oipc);
+    }
+    const handleAmendClose = () => {
+        setShowModal(false);
+    }
 
-    return (  
-        <div className="state-change-dialog">
-            <Dialog
-            open={showModal}
-            onClose={handleClose}
-            maxWidth={'md'}
-            fullWidth={true}
-            >
-            <DialogTitle disableTypography id="state-change-dialog-title">
-              <h2 className="state-change-header">Remove OIPC</h2>
-              <IconButton className="title-col3" onClick={handleClose}>
-                <i className="dialog-close-button">Close</i>
-                <CloseIcon />
-              </IconButton>
-            </DialogTitle>
-            <DialogContent>
-                <DialogContentText component={'span'}>
-                    <span className="confirmation-message" style={{display: "flex", flexDirection: "row", justifyContent: "center", color: "black"}}>
-                        Are you sure you are ready to select an outcome? This will complete the review and lock all fields
-                    </span>
-                </DialogContentText>
-            </DialogContent>
-            <DialogActions>
-                <button
-                className={`btn-bottom btn-save btn`}
-                onClick={handleSave}
+    return (
+        <>
+            {oipc.outcomeid === 5 ?
+            <div className="state-change-dialog">
+                <Dialog
+                open={showModal}
+                onClose={handleClose}
+                maxWidth={'md'}
+                fullWidth={true}
                 >
-                Continue
-                </button>
-                <button className="btn-bottom btn-cancel" onClick={handleClose}>
-                Cancel
-                </button>
-            </DialogActions>
-            </Dialog>
-        </div>
+                <DialogTitle disableTypography id="state-change-dialog-title">
+                <h2 className="state-change-header">Amend Outcome</h2>
+                <IconButton className="title-col3" onClick={handleAmendClose}>
+                    <i className="dialog-close-button">Close</i>
+                    <CloseIcon />
+                </IconButton>
+                </DialogTitle>
+                <DialogContent>
+                    <DialogContentText component={'span'}>
+                        <span className="confirmation-message" style={{display: "flex", flexDirection: "row", justifyContent: "center", color: "black"}}>
+                            Are you sure you want to amend this completed OIPC review? You will need to re-select an outcome to close it again
+                        </span>
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <button
+                    className={`btn-bottom btn-save btn`}
+                    onClick={handleAmendSave}
+                    >
+                    Continue
+                    </button>
+                    <button className="btn-bottom btn-cancel" onClick={handleClose}>
+                    Cancel
+                    </button>
+                </DialogActions>
+                </Dialog>
+            </div>
+            : 
+            <div className="state-change-dialog">
+                <Dialog
+                open={showModal}
+                onClose={handleClose}
+                maxWidth={'md'}
+                fullWidth={true}
+                >
+                <DialogTitle disableTypography id="state-change-dialog-title">
+                <h2 className="state-change-header">Close OIPC</h2>
+                <IconButton className="title-col3" onClick={handleClose}>
+                    <i className="dialog-close-button">Close</i>
+                    <CloseIcon />
+                </IconButton>
+                </DialogTitle>
+                <DialogContent>
+                    <DialogContentText component={'span'}>
+                        <span className="confirmation-message" style={{display: "flex", flexDirection: "row", justifyContent: "center", color: "black"}}>
+                            Are you sure you are ready to select an outcome? This will complete the review and lock all fields
+                        </span>
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <button
+                    className={`btn-bottom btn-save btn`}
+                    onClick={handleSave}
+                    >
+                    Continue
+                    </button>
+                    <button className="btn-bottom btn-cancel" onClick={handleClose}>
+                    Cancel
+                    </button>
+                </DialogActions>
+                </Dialog>
+            </div>
+            }
+        </>
     );
 };
 

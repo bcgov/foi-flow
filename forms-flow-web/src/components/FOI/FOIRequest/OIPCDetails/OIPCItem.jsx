@@ -158,8 +158,9 @@ const OIPCItem = (props) => {
                         value={oipc.oipcno}
                         onChange = {(event) => handleOIPCNumber(event.target.value)}
                         InputLabelProps={{ shrink: true }}
-                        error={oipc.oipcno === ""}
+                        error={(!oipc.outcomeid || oipc.outcomeid === 5) && oipc.oipcno === ""}
                         required
+                        disabled={oipc.outcomeid && oipc.outcomeid !== 5}
                     />
                 </Grid>
                 <Grid item md={3}>
@@ -172,8 +173,9 @@ const OIPCItem = (props) => {
                         InputLabelProps={{ shrink: true }}
                         InputProps={{inputProps: { max: formatDate(new Date())} }}
                         type="date"
-                        error={oipc.receiveddate === null}
+                        error={(!oipc.outcomeid || oipc.outcomeid === 5) && oipc.receiveddate === null}
                         required
+                        disabled={oipc.outcomeid && oipc.outcomeid !== 5}
                     />
                 </Grid>
                 <Grid item md={3}>
@@ -185,8 +187,9 @@ const OIPCItem = (props) => {
                         value={oipc.reviewtypeid}
                         label="Review Type"
                         onChange={(event) => handleReviewType(event.target.value)}
-                        error={oipc.reviewtypeid === null}
+                        error={(!oipc.outcomeid || oipc.outcomeid === 5) && oipc.reviewtypeid === null}
                         required
+                        disabled={oipc.outcomeid && oipc.outcomeid !== 5}
                     >
                         {uniqueReviewTypes(oipcReviewtypes).map((reviewtype) => {
                             return <MenuItem key={reviewtype.reviewtypeid} value={reviewtype.reviewtypeid}>{reviewtype.type_name}</MenuItem>
@@ -202,8 +205,9 @@ const OIPCItem = (props) => {
                         value={oipc.reasonid}
                         label="Reason"
                         onChange = {(event) => handleReason(event.target.value)}
-                        error={oipc.reasonid === null}
+                        error={(!oipc.outcomeid || oipc.outcomeid === 5) && oipc.reasonid === null}
                         required
+                        disabled={oipc.outcomeid && oipc.outcomeid !== 5}
                     >
                         {oipc.reviewtypeid ? 
                             oipcReviewtypes.map((reviewtype) => {
@@ -222,8 +226,9 @@ const OIPCItem = (props) => {
                         value={oipc.statusid}
                         label="Status"
                         onChange = {(event) => handleStatus(event.target.value)}
-                        error={oipc.statusid === null}
+                        error={(!oipc.outcomeid || oipc.outcomeid === 5) && oipc.statusid === null}
                         required
+                        disabled={oipc.outcomeid && oipc.outcomeid !== 5}
                     >
                         {oipcStatuses.map((status) => {
                             return <MenuItem key={status.statusid} value={status.statusid}>{status.name}</MenuItem>
@@ -238,6 +243,7 @@ const OIPCItem = (props) => {
                         onChange = {(event) => handleInvestiagtor(event.target.value)}
                         value={oipc.investigator}
                         InputLabelProps={{ shrink: true }}
+                        disabled={oipc.outcomeid && oipc.outcomeid !== 5}
                     />
                 </Grid>
                 <Grid item md={3}>
@@ -251,7 +257,11 @@ const OIPCItem = (props) => {
                         label="Outcome"
                     >
                         {oipcOutcomes.map((outcome) => {
-                            return <MenuItem key={outcome.outcomeid} value={outcome.outcomeid}>{outcome.name}</MenuItem>
+                            if (outcome.outcomeid !== 5) {
+                                return <MenuItem disabled={oipc.outcomeid && oipc.outcomeid !== 5} key={outcome.outcomeid} value={outcome.outcomeid}>{outcome.name}</MenuItem>
+                            } else {
+                                return <MenuItem key={outcome.outcomeid} value={outcome.outcomeid}>{outcome.name}</MenuItem>
+                            }
                         })}
                     </TextField>
                 </Grid>
@@ -265,6 +275,7 @@ const OIPCItem = (props) => {
                         InputLabelProps={{ shrink: true }}
                         InputProps={{inputProps: { max: formatDate(new Date())} }}
                         type="date"
+                        disabled={oipc.outcomeid && oipc.outcomeid !== 5}
                     />
                 </Grid>
             </Grid>
@@ -274,12 +285,14 @@ const OIPCItem = (props) => {
                     <FormControlLabel control={<Checkbox 
                         checked={oipc.isinquiry} 
                         onChange = {() => handleInquiry(true)}
+                        disabled={oipc.outcomeid && oipc.outcomeid !== 5}
                         />} 
                         label="Yes" 
                         />
                     <FormControlLabel control={<Checkbox 
                         checked={!oipc.isinquiry} 
                         onChange = {() => handleInquiry(false)}
+                        disabled={oipc.outcomeid && oipc.outcomeid !== 5}
                         />} 
                         label="No" 
                         />
@@ -289,12 +302,14 @@ const OIPCItem = (props) => {
                     <FormControlLabel control={<Checkbox 
                         checked={oipc.isjudicialreview} 
                         onChange = {() => handleJudicalReview(true)}
+                        disabled={oipc.outcomeid && oipc.outcomeid !== 5}
                         />} 
                         label="Yes" 
                         />
                     <FormControlLabel control={<Checkbox 
                         checked={!oipc.isjudicialreview} 
                         onChange = {() => handleJudicalReview(false)}
+                        disabled={oipc.outcomeid && oipc.outcomeid !== 5}
                         />} 
                         label="No" 
                         />
@@ -304,12 +319,14 @@ const OIPCItem = (props) => {
                     <FormControlLabel control={<Checkbox 
                         checked={oipc.issubsequentappeal} 
                         onChange = {() => handleSubsequentAppeal(true)}
+                        disabled={oipc.outcomeid && oipc.outcomeid !== 5}
                         />} 
                         label="Yes"
                         />
                     <FormControlLabel control={<Checkbox 
                         checked={!oipc.issubsequentappeal} 
                         onChange = {() => handleSubsequentAppeal(false)}
+                        disabled={oipc.outcomeid && oipc.outcomeid !== 5}
                         />} 
                         label="No" 
                         />
@@ -327,8 +344,9 @@ const OIPCItem = (props) => {
                         InputLabelProps={{ shrink: true }}
                         InputProps={{inputProps: { min: oipc.receiveddate ? formatDate(new Date(oipc.receiveddate)) : null } }}
                         type="date"
-                        error={oipc.inquiryattributes.inquirydate === null}
+                        error={(!oipc.outcomeid || oipc.outcomeid === 5) && oipc.inquiryattributes.inquirydate === null}
                         required
+                        disabled={oipc.outcomeid && oipc.outcomeid !== 5}
                     />
                 </Grid>
                 <Grid item md={4}>
@@ -339,8 +357,9 @@ const OIPCItem = (props) => {
                         value={oipc.inquiryattributes.orderno}
                         onChange = {(event) => handleInquiryFields(event.target.value, "ORDERNO")}
                         InputLabelProps={{ shrink: true }}
-                        error={oipc.inquiryattributes.orderno === ""}
+                        error={(!oipc.outcomeid || oipc.outcomeid === 5) && oipc.inquiryattributes.orderno === ""}
                         required
+                        disabled={oipc.outcomeid && oipc.outcomeid !== 5}
                     />
                 </Grid>
                 <Grid item md={4}>
@@ -352,8 +371,9 @@ const OIPCItem = (props) => {
                         fullWidth
                         value={oipc.inquiryattributes.inquiryoutcome}
                         label="Outcome"
-                        error={oipc.inquiryattributes.inquiryoutcome === null}
+                        error={(!oipc.outcomeid || oipc.outcomeid === 5) && oipc.inquiryattributes.inquiryoutcome === null}
                         required
+                        disabled={oipc.outcomeid && oipc.outcomeid !== 5}
                     >
                         {oipcInquiryoutcomes.map((inquiryoutcome) => {
                             return <MenuItem key={inquiryoutcome.inquiryoutcomeid} value={inquiryoutcome.inquiryoutcomeid}>{inquiryoutcome.name}</MenuItem>

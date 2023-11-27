@@ -1222,7 +1222,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
                           divisions={requestDetails.divisions}
                         />
                       )}
-                      {showOIPCDetails && requestDetails.isoipcreview && requestState && requestState.toLowerCase() !== StateEnum.intakeinprogress.name.toLowerCase() && (
+                      {showOIPCDetails && requestState && requestState.toLowerCase() !== StateEnum.intakeinprogress.name.toLowerCase() && (
                         <OIPCDetails 
                           oipcData={oipcData}
                           updateOIPC={updateOIPC}
