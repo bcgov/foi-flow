@@ -8,6 +8,7 @@ from request_api.services.notifications.notificationconfig import notificationco
 from request_api.services.notifications.notificationuser import notificationuser
 from request_api.models.FOIRawRequests import FOIRawRequest
 from request_api.models.FOIMinistryRequests import FOIMinistryRequest
+from request_api.models.FOIRequests import FOIRequest
 from request_api.models.FOIRequestNotifications import FOIRequestNotification
 from request_api.models.FOIRequestNotificationUsers import FOIRequestNotificationUser
 from request_api.models.FOIRawRequestNotifications import FOIRawRequestNotification
@@ -269,24 +270,59 @@ class notificationservice:
         notification.createdby = userid
         notification.notification = message
         notification.isdeleted = False
+
+        #mute notifications for ministry users
+        mutenotification = self.__mutenotification(requesttype, notificationtype, foirequest)
+        ministryusers = []
+        usergroupfromkeycloak = KeycloakAdminService().getmembersbygroupname(foirequest["assignedministrygroup"])
+        if usergroupfromkeycloak is not None and len(usergroupfromkeycloak) > 0:
+            for user in usergroupfromkeycloak[0].get("members"):
+                ministryusers.append(user["username"])
+
         notificationusers = notificationuser().getnotificationusers(notificationtype, requesttype, userid, foirequest, requestjson)
         users = []
         for _notificationuser in notificationusers:
-            users.append(self.__preparenotificationuser(requesttype, _notificationuser, userid))
+            users.append(self.__preparenotificationuser(requesttype, _notificationuser, userid, mutenotification, ministryusers))
         notification.notificationusers = users        
         return notification if users else None
         
-    def __preparenotificationuser(self, requesttype, notificationuser, userid):
+    def __preparenotificationuser(self, requesttype, notificationuser, userid, mute=False, ministryusers=[]):
         if requesttype == "ministryrequest":
             user = FOIRequestNotificationUser()
+            if notificationuser["userid"] in ministryusers:
+                user.isdeleted = mute
+            else:
+                user.isdeleted = False
         else:
             user = FOIRawRequestNotificationUser()
+            user.isdeleted = False
         user.notificationusertypelabel = notificationuser["usertype"]
         user.userid = notificationuser["userid"]
         user.createdby = userid
-        user.isdeleted = False
         return user
-           
+
+    def __mutenotification(self, requesttype, notificationtype, request=None):
+        #get mute conditions from env
+        mutenotifications = notificationconfig().getmutenotifications()
+        if requesttype == "ministryrequest":
+            if mutenotifications is not None and len(mutenotifications) > 0:
+                if mutenotifications[request["programarea.bcgovcode"].upper()] is not None:
+                    foirequest = FOIRequest.getrequest(request["foirequest_id"])
+                    if foirequest["requesttype"].upper() in (_requesttype.upper() for _requesttype in mutenotifications[request["programarea.bcgovcode"].upper()]["request_types"]):
+                        if request["requeststatus.name"].upper() in (_state.upper() for _state in mutenotifications[request["programarea.bcgovcode"].upper()]["state_exceptions"]):
+                            return False
+                        if notificationtype.upper() in (_notificationtype.upper() for _notificationtype in mutenotifications[request["programarea.bcgovcode"].upper()]["type_exceptions"]):
+                            return False
+                        return True
+                    else:
+                        return False
+                else:
+                    return False
+            else:
+                return False
+        else:
+            return False
+
     def getrequest(self, requestid, requesttype):
         if requesttype == "ministryrequest":
             return FOIMinistryRequest.getrequestbyministryrequestid(requestid)
