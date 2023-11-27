@@ -260,7 +260,7 @@ const OIPCItem = (props) => {
                             if (outcome.outcomeid !== 5) {
                                 return <MenuItem disabled={oipc.outcomeid && oipc.outcomeid !== 5} key={outcome.outcomeid} value={outcome.outcomeid}>{outcome.name}</MenuItem>
                             } else {
-                                return <MenuItem key={outcome.outcomeid} value={outcome.outcomeid}>{outcome.name}</MenuItem>
+                                return <MenuItem disabled={oipc.outcomeid === null} key={outcome.outcomeid} value={outcome.outcomeid}>{outcome.name}</MenuItem>
                             }
                         })}
                     </TextField>
