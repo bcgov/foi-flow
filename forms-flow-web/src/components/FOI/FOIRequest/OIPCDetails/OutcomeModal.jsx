@@ -6,19 +6,21 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 import CloseIcon from '@material-ui/icons/Close';
 import IconButton from '@material-ui/core/IconButton';
 
-const RemoveOIPCModal= ({
+const OutcomeModal= ({
     showModal,
-    removeOIPC,
     setShowModal,
-    oipcid,
+    updateOIPC,
+    oipc,
+    setOipc,
 }) =>{ 
 
     const handleSave = () => {
         setShowModal(false);
-        removeOIPC(oipcid)
+        updateOIPC(oipc);
     };
     const handleClose = () => {
         setShowModal(false);
+        setOipc(prev => ({ ...prev, outcomeid: null }));
     };
 
     return (  
@@ -39,7 +41,7 @@ const RemoveOIPCModal= ({
             <DialogContent>
                 <DialogContentText component={'span'}>
                     <span className="confirmation-message" style={{display: "flex", flexDirection: "row", justifyContent: "center", color: "black"}}>
-                        Are you sure you want to delete this OIPC Review?
+                        Are you sure you are ready to select an outcome? This will complete the review and lock all fields
                     </span>
                 </DialogContentText>
             </DialogContent>
@@ -59,4 +61,4 @@ const RemoveOIPCModal= ({
     );
 };
 
-export default RemoveOIPCModal;
+export default OutcomeModal;

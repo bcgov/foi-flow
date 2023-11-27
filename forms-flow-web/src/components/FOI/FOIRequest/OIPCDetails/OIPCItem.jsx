@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { formatDate } from "../../../../helper/FOI/helper";
 import { useSelector } from "react-redux";
 import RemoveOIPCModal from './RemoveOIPCModal';
+import OutcomeModal from './OutcomeModal';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrash } from '@fortawesome/free-solid-svg-icons';
 
@@ -18,6 +19,7 @@ const OIPCItem = (props) => {
     //Local State
     const [oipc, setOipc] = useState(oipcObj);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [showOutcomeModal, setShowOutcomeModal] = useState(false);
     
     //Functions
     const generateNamesFromOIPCId = (oipcObj) => {
@@ -89,7 +91,7 @@ const OIPCItem = (props) => {
         const newOIPCObj = oipc;
         newOIPCObj.outcomeid = value;
         setOipc(newOIPCObj);
-        updateOIPC(newOIPCObj);
+        setShowOutcomeModal(true);
     }
     const handleInquiry = (value) => {
         const newOIPCObj = oipc;
@@ -145,7 +147,8 @@ const OIPCItem = (props) => {
                     <FontAwesomeIcon icon={faTrash} color="#38598A" />
                 </button>
             </div>
-            {showDeleteModal && <RemoveOIPCModal removeOIPC={removeOIPC} showModal={showDeleteModal} setShowDeleteModal={setShowDeleteModal} oipcid={oipc.id} />}
+            {showDeleteModal && <RemoveOIPCModal removeOIPC={removeOIPC} showModal={showDeleteModal} setShowModal={setShowDeleteModal} oipcid={oipc.id} />}
+            {showOutcomeModal && <OutcomeModal updateOIPC={updateOIPC} showModal={showOutcomeModal} setShowModal={setShowOutcomeModal} setOipc={setOipc} oipc={oipc} />}
             <Grid container spacing={1}>
             <Grid item md={3}>
                     <TextField 
