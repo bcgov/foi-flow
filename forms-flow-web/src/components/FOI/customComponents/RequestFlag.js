@@ -1,8 +1,7 @@
-import React, { useEffect, useState } from "react";
+import { useState } from "react";
 import "./requestflag.scss";
 
 import OutlinedInput from "@material-ui/core/OutlinedInput";
-import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@material-ui/core/MenuItem";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFlag } from "@fortawesome/free-regular-svg-icons";
@@ -20,12 +19,8 @@ import { saveRequestDetails } from "../../../apiManager/services/FOI/foiRequestS
 import { toast } from "react-toastify";
 import { useDispatch } from "react-redux";
 import {
-  restrictRequest,
   fetchFOIRequestDetailsWrapper,
 } from "../../../apiManager/services/FOI/foiRequestServices";
-import { request } from "http";
-import { is } from "immutable";
-import { setFOIUpdateLoader } from "../../../actions/FOI/foiRequestActions";
 
 //Types are:
 //oipcreview
@@ -41,8 +36,6 @@ const RequestFlag = ({ isActive, type, requestDetails }) => {
 
   const dispatch = useDispatch();
 
-
-
   // These need to be set for each type
   let options;
   let id;
@@ -52,9 +45,6 @@ const RequestFlag = ({ isActive, type, requestDetails }) => {
   let modalMessageInactive = "";
   let modalDescriptionActive = "";
   let modalDescriptionInactive = "";
-
-  let handleSaveForActive = () => {};
-  let handleSaveForInactive = () => {};
 
   // css
   let iconClass;
@@ -245,7 +235,6 @@ const RequestFlag = ({ isActive, type, requestDetails }) => {
               select
               value={isSelected}
               onChange={handleValueChange}
-              // onClick={handleValueChange}
               inputProps={{ "aria-labelledby": "restrict-dropdown-label" }}
               input={<OutlinedInput label="Tag" />}
               disabled={false}
