@@ -4,34 +4,38 @@ import { useSelector } from "react-redux";
 const useOIPCHook = () => {
   //OIPC State
   const requestDetails = useSelector((state) => state.foiRequests.foiRequestDetail);
-  const stageOIPCData = (oipcData) => {
-    if (oipcData?.length > 0) {
-      return oipcData.map((item, index) => {
-        item.id = index;
-        return item;
-      });
+  const stageOIPCData = (isoipcreview, oipcData) => {
+    if (isoipcreview) {
+      if (oipcData?.length > 0) {
+        return oipcData.map((item, index) => {
+          item.id = index;
+          return item;
+        });
+      } else {
+        return [{
+          id: 0,
+          oipcno: "", 
+          reviewtypeid: null, 
+          reasonid: null, 
+          statusid: null, 
+          isinquiry: false,
+          inquiryattributes: null,  
+          receiveddate: null,
+          closeddate: null,
+          investigator: "", 
+          outcomeid: null, 
+          isjudicialreview: false, 
+          issubsequentappeal: false,
+        }];
+      }
     } else {
-      return [{
-        id: 0,
-        oipcno: "", 
-        reviewtypeid: null, 
-        reasonid: null, 
-        statusid: null, 
-        isinquiry: false,
-        inquiryattributes: null,  
-        receiveddate: null,
-        closeddate: null,
-        investigator: "", 
-        outcomeid: null, 
-        isjudicialreview: false, 
-        issubsequentappeal: false,
-      }];
+      return [];
     }
   }
   const [oipcData, setOipcData] = useState(requestDetails.oipcdetails);
 
   useEffect(() => {
-    const stagedOIPCData = stageOIPCData(requestDetails.oipcdetails);
+    const stagedOIPCData = stageOIPCData(requestDetails.isoipcreview, requestDetails.oipcdetails);
     setOipcData(stagedOIPCData);
   }, [requestDetails])
 
