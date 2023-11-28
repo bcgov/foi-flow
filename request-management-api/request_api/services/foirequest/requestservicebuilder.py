@@ -144,13 +144,13 @@ class requestservicebuilder(requestserviceconfigurator):
                 oipcreview.reasonid = oipc["reasonid"]
                 oipcreview.statusid = oipc["statusid"]
                 oipcreview.outcomeid = oipc["outcomeid"]
-                oipcreview.investigator = oipc["investigator"]
+                oipcreview.investigator = oipc["investigator"] if oipc["investigator"] not in (None, "") else None
                 oipcreview.isinquiry = oipc["isinquiry"]
                 oipcreview.isjudicialreview = oipc["isjudicialreview"]
                 oipcreview.issubsequentappeal = oipc["issubsequentappeal"]
                 oipcreview.issubsequentappeal = oipc["issubsequentappeal"]
-                oipcreview.receiveddate = oipc["receiveddate"]
-                oipcreview.closeddate = oipc["closeddate"]
+                oipcreview.receiveddate = oipc["receiveddate"] if oipc["receiveddate"] not in (None, "") else None
+                oipcreview.closeddate = oipc["closeddate"] if oipc["closeddate"] not in (None, "") else None 
                 oipcreview.isactive = True
                 if oipc["isinquiry"] == True:
                     oipcreview.inquiryattributes = oipc["inquiryattributes"]
