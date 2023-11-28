@@ -349,8 +349,8 @@ export const checkValidationError = (
     !requiredRequestDetailsValues.requestStartDate ||
     !requiredAxisDetails.axisRequestId || 
     (oipcData?.length > 0 && isOipcReview && oipcData?.some((oipc) => {
-      return oipc.oipcno === "" || oipc.receiveddate === null || oipc.reviewtypeid === null || oipc.reasonid === null || oipc.statusid === null || 
-      oipc.inquiryattributes?.orderno === "" || oipc.inquiryattributes?.inquiryoutcome === null || oipc.inquiryattributes?.inquirydate === null;
+      return oipc.oipcno === "" || oipc.receiveddate === null || oipc.receiveddate === "" || oipc.reviewtypeid === null || oipc.reasonid === null || oipc.statusid === null || 
+      oipc.inquiryattributes?.orderno === "" || oipc.inquiryattributes?.inquiryoutcome === null || oipc.inquiryattributes?.inquirydate === null || oipc.inquiryattributes?.inquirydate === ""; 
     }))
   );
 };
