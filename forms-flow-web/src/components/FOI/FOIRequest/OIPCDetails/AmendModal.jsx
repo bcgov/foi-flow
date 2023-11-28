@@ -42,7 +42,7 @@ const AmendModal= ({
             </DialogTitle>
             <DialogContent>
                 <DialogContentText component={'span'}>
-                    <span className="confirmation-message" style={{display: "flex", flexDirection: "row", justifyContent: "center", color: "black"}}>
+                    <span className="confirmation-message" style={{display: "flex", flexDirection: "row", justifyContent: "center", color: "black", marginLeft: "35px"}}>
                         Are you sure you want to amend this completed OIPC review? You will need to re-select an outcome to close it again.
                     </span>
                 </DialogContentText>

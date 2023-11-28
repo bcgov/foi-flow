@@ -40,7 +40,7 @@ const OutcomeModal= ({
             </DialogTitle>
             <DialogContent>
                 <DialogContentText component={'span'}>
-                    <span className="confirmation-message" style={{display: "flex", flexDirection: "row", justifyContent: "center", color: "black"}}>
+                    <span className="confirmation-message" style={{display: "flex", flexDirection: "row", justifyContent: "center", color: "black", marginLeft: "35px"}}>
                         Are you sure you are ready to select an outcome? This will complete the review and lock all fields.
                     </span>
                 </DialogContentText>
