@@ -10,7 +10,7 @@ const OIPCDetailsList = (props) => {
         return (
             <>  
                 <OIPCItem oipcObj={oipcObj} key={oipcObj.id} updateOIPC={updateOIPC} removeOIPC={removeOIPC} />
-                {index !== (oipcData.length - 1)  && <Divider/>}
+                {index !== (oipcData?.length - 1)  && <Divider/>}
             </>
         );
     });
