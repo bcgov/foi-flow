@@ -33,10 +33,10 @@ const OIPCItem = (props) => {
             return {...prev, reviewtypeName: reviewtype ? reviewtype.type_name : ""}
         })
         setOipc((prev) => {
-            return {...prev, statusName: status ? status.type_name : ""}
+            return {...prev, statusName: status ? status.status : ""}
         })
         setOipc((prev) => {
-            return {...prev, outcomeName: outcome ? outcome.type_name : ""}
+            return {...prev, outcomeName: outcome ? outcome.outcome : ""}
         })
         setOipc((prev) => {
             return {...prev, reasonName: reviewtype ? reviewtype.reason_name : ""}

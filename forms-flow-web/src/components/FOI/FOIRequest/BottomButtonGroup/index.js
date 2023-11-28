@@ -120,9 +120,13 @@ const BottomButtonGroup = React.memo(
         setIsAddRequest(false);
       }
 
-      //add oipc Data to save request object
+      //add oipc Data to save request object and sync/validate isoipcreview attribute
       saveRequestObject.oipcdetails = oipcData;
-      if (oipcData.length <= 0) saveRequestObject.isoipcreview = false;
+      if (oipcData.length > 0) {
+        saveRequestObject.isoipcreview = true;
+      } else {
+        saveRequestObject.isoipcreview = false;
+      }
 
       dispatch(setFOILoader(setLoader))
       dispatch(

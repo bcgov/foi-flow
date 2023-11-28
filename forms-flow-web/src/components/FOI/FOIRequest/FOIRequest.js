@@ -345,6 +345,16 @@ const FOIRequest = React.memo(({ userDetail }) => {
     }
   }, [requestDetails]);
 
+  //useEffect to manage isoipcreview attribute for requestdetails state
+  useEffect(() => {
+    if(Object.keys(requestDetails).length !== 0 && oipcData?.length <= 0) {
+      requestDetails.isoipcreview = false;
+      setShowOIPCDetails(false);
+    }
+  }, [oipcData])
+
+  console.log(requestDetails)
+
   useEffect(() => {
     if (isIAORestricted)
       dispatch(fetchRestrictedRequestCommentTagList(requestId, ministryId));

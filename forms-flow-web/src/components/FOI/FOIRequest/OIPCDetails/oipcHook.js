@@ -28,8 +28,6 @@ const useOIPCHook = () => {
           issubsequentappeal: false,
         }];
       }
-    } else {
-      return [];
     }
   }
   const [oipcData, setOipcData] = useState(requestDetails.oipcdetails);
@@ -45,7 +43,7 @@ const useOIPCHook = () => {
   const addOIPC = () => {
     setOipcData((prev) => {
       return [...prev, {
-        id: oipcData.length > 0 ? oipcData[oipcData.length - 1].id + 1 : 0,
+        id: oipcData?.length > 0 ? oipcData[oipcData.length - 1].id + 1 : 0,
         oipcno: "", 
         reviewtypeid: null, 
         reasonid: null, 
@@ -79,6 +77,9 @@ const useOIPCHook = () => {
       });
     });
   }
+  const removeAllOIPCs = () => {
+    setOipcData([]);
+  }
 
   return {
     oipcData,
@@ -86,6 +87,7 @@ const useOIPCHook = () => {
     removeOIPC,
     updateOIPC,
     stageOIPCData,
+    removeAllOIPCs,
   };
 };
 
