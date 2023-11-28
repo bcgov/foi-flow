@@ -144,16 +144,16 @@ const RequestHeader = React.memo(({
         </div>
         <div className="row">
             <div className="col-lg-3">
-                        {watcherBox}
-                        {
+                {watcherBox}
+                {
                     (isLoaded && (isRequestWatcherOrMinistryAssignee(requestWatchers,ministryAssigneeValue,userDetail?.preferred_username) || 
                         isMinistryRestrictedFileManager())) &&
-                        <RequestMinistryRestriction 
-                            isministryrestricted={isRestricted()}
-                            isMinistryRestrictedFileManager={isMinistryRestrictedFileManager()}
-                            requestDetails={requestDetails}
-                        />
-                    }
+                    <RequestMinistryRestriction 
+                        isministryrestricted={isRestricted()}
+                        isMinistryRestrictedFileManager={isMinistryRestrictedFileManager()}
+                        requestDetails={requestDetails}
+                    />
+                }
             </div>
             <div className="col-lg-3">
                 <div className="foi-request-review-header-col1-row">
