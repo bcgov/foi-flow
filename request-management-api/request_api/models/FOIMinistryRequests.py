@@ -92,12 +92,18 @@ class FOIMinistryRequest(db.Model):
                         "FOIMinistryRequest.version==FOIMinistryRequestDocument.foiministryrequestversion_id)")    
     extensions = relationship('FOIRequestExtension', primaryjoin="and_(FOIMinistryRequest.foiministryrequestid==FOIRequestExtension.foiministryrequest_id, "
                          "FOIMinistryRequest.version==FOIRequestExtension.foiministryrequestversion_id)")    
+    
+    oipcreviews = relationship('FOIRequestOIPC', primaryjoin="and_(FOIMinistryRequest.foiministryrequestid==FOIRequestOIPC.foiministryrequest_id, "
+                         "FOIMinistryRequest.version==FOIRequestOIPC.foiministryrequestversion_id)")    
+    
     assignee = relationship('FOIAssignee', foreign_keys="[FOIMinistryRequest.assignedto]")
     ministryassignee = relationship('FOIAssignee', foreign_keys="[FOIMinistryRequest.assignedministryperson]")
 
     subjectcode = relationship('FOIMinistryRequestSubjectCode', primaryjoin="and_(FOIMinistryRequest.foiministryrequestid==FOIMinistryRequestSubjectCode.foiministryrequestid, "
                         "FOIMinistryRequest.version==FOIMinistryRequestSubjectCode.foiministryrequestversion)") 
     isofflinepayment = db.Column(db.Boolean, unique=False, nullable=True,default=False)
+
+    isoipcreview = db.Column(db.Boolean, unique=False, nullable=True,default=False)
 
     @classmethod
     def getrequest(cls,ministryrequestid):
@@ -1307,5 +1313,5 @@ class FOIMinistryRequestSchema(ma.Schema):
                 'foirequest.receivedmodeid','requeststatus.requeststatusid','requeststatus.name','programarea.bcgovcode',
                 'programarea.name','foirequest_id','foirequestversion_id','created_at','updated_at','createdby','assignedministryperson',
                 'assignedministrygroup','cfrduedate','closedate','closereasonid','closereason.name',
-                'assignee.firstname','assignee.lastname','ministryassignee.firstname','ministryassignee.lastname', 'axisrequestid', 'axissyncdate', 'requestpagecount', 'linkedrequests', 'ministrysignoffapproval', 'identityverified','originalldd')
+                'assignee.firstname','assignee.lastname','ministryassignee.firstname','ministryassignee.lastname', 'axisrequestid', 'axissyncdate', 'requestpagecount', 'linkedrequests', 'ministrysignoffapproval', 'identityverified','originalldd','isoipcreview')
     

@@ -24,6 +24,10 @@ import {
   fetchFOIMinistryAssignedToList,
   fetchFOISubjectCodeList,
   fetchFOIPersonalDivisionsAndSections,
+  fetchOIPCOutcomes,
+  fetchOIPCStatuses,
+  fetchOIPCReviewtypes,
+  fetchOIPCInquiryoutcomes
 } from "../../../apiManager/services/FOI/foiMasterDataServices";
 import {
   fetchFOIRequestDetailsWrapper,
@@ -89,6 +93,8 @@ import { UnsavedModal } from "../customComponents";
 import { DISABLE_GATHERINGRECORDS_TAB } from "../../../constants/constants";
 import _ from "lodash";
 import { MinistryNeedsScanning } from "../../../constants/FOI/enum";
+import OIPCDetails from "./OIPCDetails/Index";
+import useOIPCHook from "./OIPCDetails/oipcHook";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -251,7 +257,9 @@ const FOIRequest = React.memo(({ userDetail }) => {
   const [isIAORestricted, setIsIAORestricted] = useState(false);
   const [redactedSections, setRedactedSections] = useState("");
   const [isMCFPersonal, setIsMCFPersonal] = useState(bcgovcode.replaceAll('"', '') == "MCF" && requestDetails.requestType == FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL);
-
+  const {oipcData, addOIPC, removeOIPC, updateOIPC} = useOIPCHook();
+  const [showOIPCDetails, setShowOIPCDetails] = useState(requestDetails.isoipcreview);
+      
   useEffect(() => {
     if (window.location.href.indexOf("comments") > -1) {
       tabclick("Comments");
@@ -291,6 +299,11 @@ const FOIRequest = React.memo(({ userDetail }) => {
     dispatch(fetchFOIDeliveryModeList());
     dispatch(fetchFOISubjectCodeList());
     dispatch(fetchClosingReasonList());
+    
+    dispatch(fetchOIPCOutcomes());
+    dispatch(fetchOIPCStatuses());
+    dispatch(fetchOIPCReviewtypes());
+    dispatch(fetchOIPCInquiryoutcomes());
 
     if (bcgovcode) dispatch(fetchFOIMinistryAssignedToList(bcgovcode));
   }, [requestId, ministryId, comment, attachments]);
@@ -324,6 +337,11 @@ const FOIRequest = React.memo(({ userDetail }) => {
       if(bcgovcode.replaceAll('"', '') == "MCF") {
         setIsMCFPersonal(true);
       }
+    }
+    if(requestDetails.isoipcreview) {
+      setShowOIPCDetails(true);
+    } else {
+      setShowOIPCDetails(false);
     }
   }, [requestDetails]);
 
@@ -650,7 +668,9 @@ const FOIRequest = React.memo(({ userDetail }) => {
     requiredRequestDetailsValues,
     requiredAxisDetails,
     isAddRequest,
-    _currentrequestStatus
+    _currentrequestStatus,
+    oipcData,
+    requestDetails.isoipcreview,
   );
 
   const classes = useStyles();
@@ -761,7 +781,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
       };
     }
   }, [editorChange]);
-
+  
   const tabclick = (param) => {
     if (param === "Comments") {
       sessionStorage.setItem("foicommentcategory", 1);
@@ -1207,6 +1227,14 @@ const FOIRequest = React.memo(({ userDetail }) => {
                           divisions={requestDetails.divisions}
                         />
                       )}
+                      {showOIPCDetails && requestState && requestState.toLowerCase() !== StateEnum.intakeinprogress.name.toLowerCase() && (
+                        <OIPCDetails 
+                          oipcData={oipcData}
+                          updateOIPC={updateOIPC}
+                          addOIPC={addOIPC}
+                          removeOIPC={removeOIPC}
+                        />
+                      )}
 
                       <BottomButtonGroup
                         stateChanged={stateChanged}
@@ -1227,6 +1255,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
                         axisSyncedData={axisSyncedData}
                         axisMessage={axisMessage}
                         attachmentsArray={requestAttachments}
+                        oipcData={oipcData}
                       />
                     </>
                   </ConditionalComponent>

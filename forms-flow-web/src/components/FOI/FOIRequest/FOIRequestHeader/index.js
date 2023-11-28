@@ -22,6 +22,7 @@ import { toast } from "react-toastify";
 import _ from 'lodash';
 import RequestRestriction from "../../customComponents/RequestRestriction";
 import ConfirmModal from "../../customComponents/ConfirmModal";
+import RequestFlag from '../../customComponents/RequestFlag';
 
 const useStyles = makeStyles((theme) => ({
     formControl: {
@@ -272,6 +273,16 @@ const FOIRequestHeader = React.memo(
                   disableInput={disableHeaderInput}
                   isIAORestrictedRequest={isIAORestrictedRequest}
                   setIsLoaded={setIsLoaded}
+                />
+                <RequestFlag
+                  type="oipcreview"
+                  requestDetails={requestDetails}
+                  isActive={requestDetails.isoipcreview}
+                />
+                <RequestFlag
+                  type="phasedrelease"
+                  requestDetails={requestDetails}
+                  isActive={requestDetails.isphasedrelease}
                 />
               </div>
             )}
