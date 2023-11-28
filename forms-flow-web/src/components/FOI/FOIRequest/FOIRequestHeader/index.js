@@ -260,11 +260,9 @@ const FOIRequestHeader = React.memo(
         </div>
       </div>
       <div className='row'>
-        <div className="col-lg-8">
-          <div className="foi-request-review-header-col1-row">
+        <div className="col-lg-3">
           {window.location.href.indexOf(FOI_COMPONENT_CONSTANTS.ADDREQUEST) ===
               -1 && (
-              <div className="foi-request-review-header-col1-row">
                 <Watcher
                   watcherFullList={watcherList}
                   requestId={requestId}
@@ -274,17 +272,6 @@ const FOIRequestHeader = React.memo(
                   isIAORestrictedRequest={isIAORestrictedRequest}
                   setIsLoaded={setIsLoaded}
                 />
-                <RequestFlag
-                  type="oipcreview"
-                  requestDetails={requestDetails}
-                  isActive={requestDetails.isoipcreview}
-                />
-                <RequestFlag
-                  type="phasedrelease"
-                  requestDetails={requestDetails}
-                  isActive={requestDetails.isphasedrelease}
-                />
-              </div>
             )}
           {!isAddRequest && status.toLowerCase() !== StateEnum.unopened.name.toLowerCase() && (isIAORestrictedFileManager() ||
             (isLoaded && isRequestWatcherOrAssignee(requestWatchers,assigneeObj,userDetail?.preferred_username))) && 
@@ -294,9 +281,20 @@ const FOIRequestHeader = React.memo(
             requestDetails={requestDetails}
             />
           }
-          </div>
         </div>
-        <div className="col-lg-4">
+        <div className="col-lg-3">
+          <RequestFlag
+            type="oipcreview"
+            requestDetails={requestDetails}
+            isActive={requestDetails.isoipcreview}
+          />
+          <RequestFlag
+            type="phasedrelease"
+            requestDetails={requestDetails}
+            isActive={requestDetails.isphasedrelease}
+          />
+        </div>
+        <div className="col-lg-6">
           <div className="foi-assignee-dropdown">
             {showMinistryAssignedTo && (
                   <>
