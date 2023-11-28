@@ -72,7 +72,7 @@ class FOIMinistryRequestOIPCSchema(Schema):
     reviewtypeid = fields.Int(data_key="reviewtypeid")
     reasonid = fields.Int(data_key="reasonid")
     statusid = fields.Int(data_key="statusid")
-    outcomeid = fields.Int(data_key="outcomeid")
+    outcomeid = fields.Int(data_key="outcomeid",allow_none=True)
     investigator = fields.Str(data_key="investigator",allow_none=True, validate=[validate.Length(max=500, error=MAX_EXCEPTION_MESSAGE)])  
     isinquiry = fields.Bool(data_key="isinquiry")
     isjudicialreview = fields.Bool(data_key="isjudicialreview")

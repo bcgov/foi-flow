@@ -228,7 +228,7 @@ class requestservicegetter:
                     "statusid": entry["statusid"],
                     "status":entry["status.name"],
                     "outcomeid": entry["outcomeid"],
-                    "outcome": entry["outcome.name"],
+                    "outcome": entry["outcome.name"] if entry["outcomeid"] not in (None, '') else None,
                     "investigator": entry["investigator"],
                     "isinquiry": entry["isinquiry"],
                     "isjudicialreview": entry["isjudicialreview"],
