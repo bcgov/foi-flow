@@ -258,7 +258,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
   const [redactedSections, setRedactedSections] = useState("");
   const [isMCFPersonal, setIsMCFPersonal] = useState(bcgovcode.replaceAll('"', '') == "MCF" && requestDetails.requestType == FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL);
   const {oipcData, addOIPC, removeOIPC, updateOIPC} = useOIPCHook();
-  const [showOIPCDetails, setShowOIPCDetails] = useState(requestDetails.isoipcreview);
+  const [showOIPCDetails, setShowOIPCDetails] = useState(requestDetails.oipcData?.length > 0);
       
   useEffect(() => {
     if (window.location.href.indexOf("comments") > -1) {
@@ -648,6 +648,18 @@ const FOIRequest = React.memo(({ userDetail }) => {
   const handleAssignedToValue = (value) => {
     setAssignedToValue(value);
   };
+
+  const oipcSectionRef = React.useRef(null);
+  const handleOipcReviewFlagChange = (isSelected) => {
+    setShowOIPCDetails(isSelected);
+    oipcSectionRef.current.scrollIntoView();
+    //timeout to allow react state to update after setState call
+    if (isSelected) {
+      setTimeout(() => {
+        oipcSectionRef.current.scrollIntoView();
+      }, (10));
+    }
+  }
 
   //handle email validation
   const [validation, setValidation] = React.useState({});
@@ -1122,6 +1134,8 @@ const FOIRequest = React.memo(({ userDetail }) => {
                         userDetail={userDetail}
                         disableInput={disableInput}
                         isAddRequest={isAddRequest}
+                        handleOipcReviewFlagChange={handleOipcReviewFlagChange}
+                        showOipcReviewFlag={requestState.toLowerCase() !== StateEnum.intakeinprogress.name.toLowerCase()}
                       />
                       {(isAddRequest ||
                         requestState === StateEnum.unopened.name) && (
@@ -1237,6 +1251,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
                           divisions={requestDetails.divisions}
                         />
                       )}
+                      <div ref={oipcSectionRef}></div>
                       {showOIPCDetails && requestState && requestState.toLowerCase() !== StateEnum.intakeinprogress.name.toLowerCase() && (
                         <OIPCDetails 
                           oipcData={oipcData}
