@@ -112,24 +112,92 @@ def upgrade():
                 ('Decision Overturned', True);commit;''')
 
     op.execute('''INSERT INTO public."OIPCReviewTypesReasons" (reviewtypeid, reasonid, isactive)
-               VALUES
-                (1, 1, True),
-                (1, 4, True),
-                (1, 5, True),
-                (1, 6, True),
-                (1, 8, True),
-                (1, 16, True),
-                (2, 2, True),
-                (2, 3, True),
-                (2, 9, True),
-                (2, 10, True),
-                (2, 11, True),
-                (2, 12, True),
-                (2, 13, True),
-                (2, 14, True),
-                (2, 15, True),
-                (2, 16, True),
-                (3, 16, True);commit;''')
+                VALUES
+                    (
+                        (SELECT reviewtypeid FROM public."OIPCReviewTypes" WHERE name = 'Complaint'),
+                        (SELECT reasonid FROM public."OIPCReasons" WHERE name = 'Adequate Search'),
+                        True
+                    ),
+                    (
+                        (SELECT reviewtypeid FROM public."OIPCReviewTypes" WHERE name = 'Complaint'),
+                        (SELECT reasonid FROM public."OIPCReasons" WHERE name = 'Extension'),
+                        True
+                    ),
+                    (
+                        (SELECT reviewtypeid FROM public."OIPCReviewTypes" WHERE name = 'Complaint'),
+                        (SELECT reasonid FROM public."OIPCReasons" WHERE name = 'Fee Amount'),
+                        True
+                    ),
+                    (
+                        (SELECT reviewtypeid FROM public."OIPCReviewTypes" WHERE name = 'Complaint'),
+                        (SELECT reasonid FROM public."OIPCReasons" WHERE name = 'Fee Waiver'),
+                        True
+                    ),
+                    (
+                        (SELECT reviewtypeid FROM public."OIPCReviewTypes" WHERE name = 'Complaint'),
+                        (SELECT reasonid FROM public."OIPCReasons" WHERE name = 'Duty to Assist'),
+                        True
+                    ),
+                    (
+                        (SELECT reviewtypeid FROM public."OIPCReviewTypes" WHERE name = 'Complaint'),
+                        (SELECT reasonid FROM public."OIPCReasons" WHERE name = 'Other'),
+                        True
+                    ),
+                    (
+                        (SELECT reviewtypeid FROM public."OIPCReviewTypes" WHERE name = 'Review'),
+                        (SELECT reasonid FROM public."OIPCReasons" WHERE name = 'Application of Exceptions'),
+                        True
+                    ),
+                    (
+                        (SELECT reviewtypeid FROM public."OIPCReviewTypes" WHERE name = 'Review'),
+                        (SELECT reasonid FROM public."OIPCReasons" WHERE name = 'Deemed Refusal'),
+                        True
+                    ),
+                    (
+                        (SELECT reviewtypeid FROM public."OIPCReviewTypes" WHERE name = 'Review'),
+                        (SELECT reasonid FROM public."OIPCReasons" WHERE name = 'TPN - 22'),
+                        True
+                    ),
+                    (
+                        (SELECT reviewtypeid FROM public."OIPCReviewTypes" WHERE name = 'Review'),
+                        (SELECT reasonid FROM public."OIPCReasons" WHERE name = 'TPN - 21'),
+                        True
+                    ),
+                    (
+                        (SELECT reviewtypeid FROM public."OIPCReviewTypes" WHERE name = 'Review'),
+                        (SELECT reasonid FROM public."OIPCReasons" WHERE name = 'TPN - 18.1'),
+                        True
+                    ),
+                    (
+                        (SELECT reviewtypeid FROM public."OIPCReviewTypes" WHERE name = 'Review'),
+                        (SELECT reasonid FROM public."OIPCReasons" WHERE name = 'Reg 3'),
+                        True
+                    ),
+                    (
+                        (SELECT reviewtypeid FROM public."OIPCReviewTypes" WHERE name = 'Review'),
+                        (SELECT reasonid FROM public."OIPCReasons" WHERE name = 'Reg 4'),
+                        True
+                    ),
+                    (
+                        (SELECT reviewtypeid FROM public."OIPCReviewTypes" WHERE name = 'Review'),
+                        (SELECT reasonid FROM public."OIPCReasons" WHERE name = 'Reg 5'),
+                        True
+                    ),
+                    (
+                        (SELECT reviewtypeid FROM public."OIPCReviewTypes" WHERE name = 'Review'),
+                        (SELECT reasonid FROM public."OIPCReasons" WHERE name = 's. 43'),
+                        True
+                    ),
+                    (
+                        (SELECT reviewtypeid FROM public."OIPCReviewTypes" WHERE name = 'Review'),
+                        (SELECT reasonid FROM public."OIPCReasons" WHERE name = 'Other'),
+                        True
+                    ),
+                    (
+                        (SELECT reviewtypeid FROM public."OIPCReviewTypes" WHERE name = 'Investigation'),
+                        (SELECT reasonid FROM public."OIPCReasons" WHERE name = 'Other'),
+                        True
+                    );commit;''')
 
 def downgrade():
     op.drop_table('OIPCReviewTypesReasons')
