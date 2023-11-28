@@ -1010,7 +1010,8 @@ class FOIMinistryRequest(db.Model):
             extensions,
             FOIRestrictedMinistryRequest.isrestricted.label('isiaorestricted'),
             ministry_restricted_requests.isrestricted.label('isministryrestricted'),
-            SubjectCode.name.label('subjectcode')
+            SubjectCode.name.label('subjectcode'),
+            FOIMinistryRequest.isoipcreview.label('isoipcreview')
         ]
 
         basequery = _session.query(
