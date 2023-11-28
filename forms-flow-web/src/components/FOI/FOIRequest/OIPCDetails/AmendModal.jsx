@@ -6,7 +6,7 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 import CloseIcon from '@material-ui/icons/Close';
 import IconButton from '@material-ui/core/IconButton';
 
-const OutcomeModal= ({
+const AmendModal= ({
     showModal,
     setShowModal,
     updateOIPC,
@@ -16,13 +16,15 @@ const OutcomeModal= ({
 
     const handleSave = () => {
         setShowModal(false);
-        updateOIPC(oipc);
+        const newOIPCObj = oipc;
+        newOIPCObj.outcomeid = null;
+        setOipc(newOIPCObj);
+        updateOIPC(newOIPCObj);
     };
     const handleClose = () => {
         setShowModal(false);
-        setOipc(prev => ({ ...prev, outcomeid: null }));
     };
-    
+
     return (
         <div className="state-change-dialog">
             <Dialog
@@ -32,7 +34,7 @@ const OutcomeModal= ({
             fullWidth={true}
             >
             <DialogTitle disableTypography id="state-change-dialog-title">
-            <h2 className="state-change-header">Close OIPC</h2>
+            <h2 className="state-change-header">Amend Outcome</h2>
             <IconButton className="title-col3" onClick={handleClose}>
                 <i className="dialog-close-button">Close</i>
                 <CloseIcon />
@@ -41,7 +43,7 @@ const OutcomeModal= ({
             <DialogContent>
                 <DialogContentText component={'span'}>
                     <span className="confirmation-message" style={{display: "flex", flexDirection: "row", justifyContent: "center", color: "black"}}>
-                        Are you sure you are ready to select an outcome? This will complete the review and lock all fields.
+                        Are you sure you want to amend this completed OIPC review? You will need to re-select an outcome to close it again.
                     </span>
                 </DialogContentText>
             </DialogContent>
@@ -61,4 +63,4 @@ const OutcomeModal= ({
     );
 };
 
-export default OutcomeModal;
+export default AmendModal;
