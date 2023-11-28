@@ -28,15 +28,15 @@ const OIPCItem = (props) => {
         const reviewtype = oipcReviewtypes.find(reviewtype => reviewtype.reviewtypeid === oipcObj.reviewtypeid && reviewtype.reasonid === oipcObj.reasonid);
         const status = oipcStatuses.find(status => status.statusid === oipcObj.statusid);
         const outcome = oipcOutcomes.find(outcome => outcome.outcomeid === oipcObj.outcomeid);
-        
+
         setOipc((prev) => {
             return {...prev, reviewtypeName: reviewtype ? reviewtype.type_name : ""}
         })
         setOipc((prev) => {
-            return {...prev, statusName: status ? status.status : ""}
+            return {...prev, statusName: status ? status.name : ""}
         })
         setOipc((prev) => {
-            return {...prev, outcomeName: outcome ? outcome.outcome : ""}
+            return {...prev, outcomeName: outcome ? outcome.name : ""}
         })
         setOipc((prev) => {
             return {...prev, reasonName: reviewtype ? reviewtype.reason_name : ""}
