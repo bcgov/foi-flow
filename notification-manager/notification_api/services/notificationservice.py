@@ -90,16 +90,14 @@ class notificationservice:
     def __mutenotification(self, requesttype, notificationtype, request):
         #get mute conditions from env
         mutenotifications = notificationconfig().getmutenotifications()
-        if requesttype == "ministryrequest":
-            if request["bcgovcode"].upper() in mutenotifications:
-                if request["requesttype"].upper() in (_requesttype.upper() for _requesttype in mutenotifications[request["bcgovcode"].upper()]["request_types"]):
-                    if request["requeststatus"].upper() in (_state.upper() for _state in mutenotifications[request["bcgovcode"].upper()]["state_exceptions"]):
-                        return False
-                    if notificationtype.upper() in (_notificationtype.upper() for _notificationtype in mutenotifications[request["bcgovcode"].upper()]["type_exceptions"]):
-                        return False
-                    return True
-                else:
+        bcgovcode = request["bcgovcode"].upper()
+        if requesttype == "ministryrequest" and bcgovcode in mutenotifications:
+            if request["requesttype"].upper() in (_requesttype.upper() for _requesttype in mutenotifications[bcgovcode]["request_types"]):
+                if request["requeststatus"].upper() in (_state.upper() for _state in mutenotifications[bcgovcode]["state_exceptions"]):
                     return False
+                if notificationtype.upper() in (_notificationtype.upper() for _notificationtype in mutenotifications[bcgovcode]["type_exceptions"]):
+                    return False
+                return True
             else:
                 return False
         else:
