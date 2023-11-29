@@ -304,17 +304,15 @@ class notificationservice:
     def __mutenotification(self, requesttype, notificationtype, request=None):
         #get mute conditions from env
         mutenotifications = notificationconfig().getmutenotifications()
-        if requesttype == "ministryrequest":
-            if request["programarea.bcgovcode"].upper() in mutenotifications:
-                foirequest = FOIRequest.getrequest(request["foirequest_id"])
-                if foirequest["requesttype"].upper() in (_requesttype.upper() for _requesttype in mutenotifications[request["programarea.bcgovcode"].upper()]["request_types"]):
-                    if request["requeststatus.name"].upper() in (_state.upper() for _state in mutenotifications[request["programarea.bcgovcode"].upper()]["state_exceptions"]):
-                        return False
-                    if notificationtype.upper() in (_notificationtype.upper() for _notificationtype in mutenotifications[request["programarea.bcgovcode"].upper()]["type_exceptions"]):
-                        return False
-                    return True
-                else:
+        bcgovcode = request["programarea.bcgovcode"].upper()
+        if requesttype == "ministryrequest"and bcgovcode in mutenotifications:
+            foirequest = FOIRequest.getrequest(request["foirequest_id"])
+            if foirequest["requesttype"].upper() in (_requesttype.upper() for _requesttype in mutenotifications[bcgovcode]["request_types"]):
+                if request["requeststatus.name"].upper() in (_state.upper() for _state in mutenotifications[bcgovcode]["state_exceptions"]):
                     return False
+                if notificationtype.upper() in (_notificationtype.upper() for _notificationtype in mutenotifications[bcgovcode]["type_exceptions"]):
+                    return False
+                return True
             else:
                 return False
         else:
