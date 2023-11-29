@@ -110,8 +110,8 @@ const MinistryReview = React.memo(({ userDetail }) => {
 
   const [_currentrequestStatus, setcurrentrequestStatus] = React.useState("");
   const [_tabStatus, settabStatus] = React.useState(requestState);
-  const {oipcData, addOIPC, removeOIPC, updateOIPC} = useOIPCHook();
-  const [showOIPCDetails, setShowOIPCDetails] = useState(requestDetails.oipcData?.length > 0);
+  const {oipcData, addOIPC, removeOIPC, updateOIPC, isOIPCReview, setIsOIPCReview} = useOIPCHook();
+  
   //gets the request detail from the store
   const IsDivisionalCoordinator = () => {
     return userDetail?.role?.includes("DivisionalCoordinator");
@@ -588,7 +588,8 @@ const MinistryReview = React.memo(({ userDetail }) => {
 
   const oipcSectionRef = React.useRef(null);
   const handleOipcReviewFlagChange = (isSelected) => {
-    setShowOIPCDetails(isSelected);
+    setIsOIPCReview(isSelected);
+    requestDetails.isoipcreview = isSelected;
     oipcSectionRef.current.scrollIntoView();
     //timeout to allow react state to update after setState call
     if (isSelected) {
@@ -785,7 +786,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
                         {divisionsBox}
                         {/* <RequestNotes /> */}
                         <div ref={oipcSectionRef}></div>
-                        {showOIPCDetails && requestState && requestState.toLowerCase() !== StateEnum.intakeinprogress.name.toLowerCase() && (
+                        {isOIPCReview && requestState && requestState.toLowerCase() !== StateEnum.intakeinprogress.name.toLowerCase() && requestState.toLowerCase() !== StateEnum.unopened.name.toLowerCase() && (
                           <OIPCDetails 
                             oipcData={oipcData}
                             updateOIPC={updateOIPC}

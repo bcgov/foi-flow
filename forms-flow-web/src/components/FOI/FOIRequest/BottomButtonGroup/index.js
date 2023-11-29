@@ -122,7 +122,7 @@ const BottomButtonGroup = React.memo(
 
       //add oipc Data to save request object and sync/validate isoipcreview attribute
       if (requestState.toLowerCase() !== StateEnum.intakeinprogress.name.toLowerCase() && requestState.toLowerCase() !== StateEnum.unopened.name.toLowerCase()) {
-        saveRequestObject.oipcdetails = oipcData;
+        saveRequestObject.oipcdetails = oipcData ? oipcData : [];
         // if (oipcData?.length > 0) {
         //   saveRequestObject.isoipcreview = true;
         // } else {

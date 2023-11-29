@@ -5,6 +5,7 @@ const useOIPCHook = () => {
   //OIPC State
   const requestDetails = useSelector((state) => state.foiRequests.foiRequestDetail);
   const stageOIPCData = (isoipcreview, oipcData) => {
+    console.log(isoipcreview)
     if (isoipcreview) {
       if (oipcData?.length > 0) {
         return oipcData.map((item, index) => {
@@ -31,11 +32,12 @@ const useOIPCHook = () => {
     }
   }
   const [oipcData, setOipcData] = useState(requestDetails.oipcdetails);
+  const [isOIPCReview, setIsOIPCReview] = useState(requestDetails.isoipcreview);
 
   useEffect(() => {
-    const stagedOIPCData = stageOIPCData(requestDetails.isoipcreview, requestDetails.oipcdetails);
+    const stagedOIPCData = stageOIPCData(isOIPCReview, requestDetails.oipcdetails);
     setOipcData(stagedOIPCData);
-  }, [requestDetails])
+  }, [isOIPCReview])
 
   console.log("HOOK", oipcData)
 
@@ -88,6 +90,8 @@ const useOIPCHook = () => {
     updateOIPC,
     stageOIPCData,
     removeAllOIPCs,
+    isOIPCReview,
+    setIsOIPCReview,
   };
 };
 
