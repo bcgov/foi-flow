@@ -49,6 +49,8 @@ const FOIRequestHeader = React.memo(
     userDetail,
     disableInput,
     isAddRequest,
+    handleOipcReviewFlagChange,
+    showOipcReviewFlag
   }) => {
     /**
      *  Header of Review request in the UI
@@ -287,11 +289,14 @@ const FOIRequestHeader = React.memo(
             type="oipcreview"
             requestDetails={requestDetails}
             isActive={requestDetails.isoipcreview}
+            handleSelect={handleOipcReviewFlagChange}
+            showFlag={showOipcReviewFlag}
           />
           <RequestFlag
             type="phasedrelease"
             requestDetails={requestDetails}
             isActive={requestDetails.isphasedrelease}
+            handleSelect={handleOipcReviewFlagChange}
           />
         </div>
         <div className="col-lg-6">
