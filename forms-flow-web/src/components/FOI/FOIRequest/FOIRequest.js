@@ -257,8 +257,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
   const [isIAORestricted, setIsIAORestricted] = useState(false);
   const [redactedSections, setRedactedSections] = useState("");
   const [isMCFPersonal, setIsMCFPersonal] = useState(bcgovcode.replaceAll('"', '') == "MCF" && requestDetails.requestType == FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL);
-  const {oipcData, addOIPC, removeOIPC, updateOIPC} = useOIPCHook();
-  const [showOIPCDetails, setShowOIPCDetails] = useState(requestDetails.oipcData?.length > 0);
+  const {oipcData, addOIPC, removeOIPC, updateOIPC, isOIPCReview, setIsOIPCReview} = useOIPCHook();
       
   useEffect(() => {
     if (window.location.href.indexOf("comments") > -1) {
@@ -339,9 +338,9 @@ const FOIRequest = React.memo(({ userDetail }) => {
       }
     }
     if(requestDetails.isoipcreview) {
-      setShowOIPCDetails(true);
+      setIsOIPCReview(true);
     } else {
-      setShowOIPCDetails(false);
+      setIsOIPCReview(false);
     }
   }, [requestDetails]);
 
@@ -349,7 +348,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
   useEffect(() => {
     if(Object.keys(requestDetails).length !== 0 && oipcData?.length <= 0) {
       requestDetails.isoipcreview = false;
-      setShowOIPCDetails(false);
+      setIsOIPCReview(false);
     }
   }, [oipcData])
 
@@ -651,7 +650,8 @@ const FOIRequest = React.memo(({ userDetail }) => {
 
   const oipcSectionRef = React.useRef(null);
   const handleOipcReviewFlagChange = (isSelected) => {
-    setShowOIPCDetails(isSelected);
+    setIsOIPCReview(isSelected);
+    requestDetails.isoipcreview = isSelected;
     oipcSectionRef.current.scrollIntoView();
     //timeout to allow react state to update after setState call
     if (isSelected) {
@@ -1135,7 +1135,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
                         disableInput={disableInput}
                         isAddRequest={isAddRequest}
                         handleOipcReviewFlagChange={handleOipcReviewFlagChange}
-                        showOipcReviewFlag={requestState.toLowerCase() !== StateEnum.intakeinprogress.name.toLowerCase()}
+                        showOipcReviewFlag={requestState.toLowerCase() !== StateEnum.intakeinprogress.name.toLowerCase() && requestState.toLowerCase() !== StateEnum.unopened.name.toLowerCase()}
                       />
                       {(isAddRequest ||
                         requestState === StateEnum.unopened.name) && (
@@ -1252,7 +1252,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
                         />
                       )}
                       <div ref={oipcSectionRef}></div>
-                      {showOIPCDetails && requestState && requestState.toLowerCase() !== StateEnum.intakeinprogress.name.toLowerCase() && (
+                      {isOIPCReview && requestState && requestState.toLowerCase() !== StateEnum.intakeinprogress.name.toLowerCase() && requestState.toLowerCase() !== StateEnum.unopened.name.toLowerCase() && (
                         <OIPCDetails 
                           oipcData={oipcData}
                           updateOIPC={updateOIPC}

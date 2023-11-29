@@ -167,6 +167,7 @@ const OIPCItem = (props) => {
                         error={(!oipc.outcomeid || oipc.outcomeid === 5) && oipc.oipcno === ""}
                         required
                         disabled={oipc.outcomeid && oipc.outcomeid !== 5}
+                        placeholder="OIPC Number"
                     />
                 </Grid>
                 <Grid item md={3}>
@@ -250,6 +251,7 @@ const OIPCItem = (props) => {
                         value={oipc.investigator}
                         InputLabelProps={{ shrink: true }}
                         disabled={oipc.outcomeid && oipc.outcomeid !== 5}
+                        placeholder="Firstname Lastname"
                     />
                 </Grid>
                 <Grid item md={3}>
@@ -366,6 +368,7 @@ const OIPCItem = (props) => {
                         error={(!oipc.outcomeid || oipc.outcomeid === 5) && oipc.inquiryattributes.orderno === ""}
                         required
                         disabled={oipc.outcomeid && oipc.outcomeid !== 5}
+                        placeholder="Order Number"
                     />
                 </Grid>
                 <Grid item md={4}>
@@ -380,7 +383,7 @@ const OIPCItem = (props) => {
                         error={(!oipc.outcomeid || oipc.outcomeid === 5) && oipc.inquiryattributes.inquiryoutcome === null}
                         required
                         disabled={oipc.outcomeid && oipc.outcomeid !== 5}
-                    >
+                    >   
                         {oipcInquiryoutcomes.map((inquiryoutcome) => {
                             return <MenuItem key={inquiryoutcome.inquiryoutcomeid} value={inquiryoutcome.inquiryoutcomeid}>{inquiryoutcome.name}</MenuItem>
                         })}
