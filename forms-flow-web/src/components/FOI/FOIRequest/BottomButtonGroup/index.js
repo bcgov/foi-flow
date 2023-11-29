@@ -121,11 +121,13 @@ const BottomButtonGroup = React.memo(
       }
 
       //add oipc Data to save request object and sync/validate isoipcreview attribute
-      saveRequestObject.oipcdetails = oipcData;
-      if (oipcData?.length > 0) {
-        saveRequestObject.isoipcreview = true;
-      } else {
-        saveRequestObject.isoipcreview = false;
+      if (requestState.toLowerCase() !== StateEnum.intakeinprogress.name.toLowerCase() && requestState.toLowerCase() !== StateEnum.unopened.name.toLowerCase()) {
+        saveRequestObject.oipcdetails = oipcData;
+        // if (oipcData?.length > 0) {
+        //   saveRequestObject.isoipcreview = true;
+        // } else {
+        //   saveRequestObject.isoipcreview = false;
+        // }
       }
 
       dispatch(setFOILoader(setLoader))
