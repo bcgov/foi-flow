@@ -62,8 +62,6 @@ import { UnsavedModal } from "../../customComponents";
 import { DISABLE_GATHERINGRECORDS_TAB } from "../../../../constants/constants";
 import _ from "lodash";
 import { MinistryNeedsScanning } from "../../../../constants/FOI/enum";
-import OIPCDetails from "../OIPCDetails/Index";
-import useOIPCHook from "../OIPCDetails/oipcHook";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -110,7 +108,6 @@ const MinistryReview = React.memo(({ userDetail }) => {
 
   const [_currentrequestStatus, setcurrentrequestStatus] = React.useState("");
   const [_tabStatus, settabStatus] = React.useState(requestState);
-  const {oipcData, addOIPC, removeOIPC, updateOIPC, isOIPCReview, setIsOIPCReview} = useOIPCHook();
   
   //gets the request detail from the store
   const IsDivisionalCoordinator = () => {
@@ -586,19 +583,6 @@ const MinistryReview = React.memo(({ userDetail }) => {
     (state) => state.foiRequests.showEventQueue
   );
 
-  const oipcSectionRef = React.useRef(null);
-  const handleOipcReviewFlagChange = (isSelected) => {
-    setIsOIPCReview(isSelected);
-    requestDetails.isoipcreview = isSelected;
-    oipcSectionRef.current.scrollIntoView();
-    //timeout to allow react state to update after setState call
-    if (isSelected) {
-      setTimeout(() => {
-        oipcSectionRef.current.scrollIntoView();
-      }, (10));
-    }
-  }
-
   return !isLoading &&
     requestDetails &&
     Object.keys(requestDetails).length !== 0 &&
@@ -769,7 +753,6 @@ const MinistryReview = React.memo(({ userDetail }) => {
                             setSaveMinistryRequestObject
                           }
                           ministryAssigneeValue={ministryAssignedToValue}
-                          handleOipcReviewFlagChange={handleOipcReviewFlagChange}
                         />
                         <ApplicantDetails requestDetails={requestDetails} />
                         <ChildDetails requestDetails={requestDetails} />
@@ -785,15 +768,6 @@ const MinistryReview = React.memo(({ userDetail }) => {
                         />
                         {divisionsBox}
                         {/* <RequestNotes /> */}
-                        <div ref={oipcSectionRef}></div>
-                        {isOIPCReview && requestState && requestState.toLowerCase() !== StateEnum.intakeinprogress.name.toLowerCase() && requestState.toLowerCase() !== StateEnum.unopened.name.toLowerCase() && (
-                          <OIPCDetails 
-                            oipcData={oipcData}
-                            updateOIPC={updateOIPC}
-                            addOIPC={addOIPC}
-                            removeOIPC={removeOIPC}
-                          />
-                        )}
                         <BottomButtonGroup
                           requestState={requestState}
                           stateChanged={stateChanged}
