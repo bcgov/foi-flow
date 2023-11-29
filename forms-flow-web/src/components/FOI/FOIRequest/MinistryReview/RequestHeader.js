@@ -20,8 +20,7 @@ const RequestHeader = React.memo(({
     userDetail,
     handleMinistryAssignedToValue,
     setSaveMinistryRequestObject,
-    ministryAssigneeValue,
-    handleOipcReviewFlagChange
+    ministryAssigneeValue
 }) => {
     const { requestId, ministryId } = useParams();
     const _requestDetails = requestDetails;
@@ -109,13 +108,11 @@ const RequestHeader = React.memo(({
               type="oipcreview"
               requestDetails={requestDetails}
               isActive={requestDetails.isoipcreview}
-              handleSelect={handleOipcReviewFlagChange}
             />
             <RequestFlag
               type="phasedrelease"
               requestDetails={requestDetails}
               isActive={requestDetails.isphasedrelease}
-              handleSelect={() => console.log('selected')}
             />
         </div>
       );
