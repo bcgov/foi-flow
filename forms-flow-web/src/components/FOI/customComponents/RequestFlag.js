@@ -1,6 +1,5 @@
 import { useState } from "react";
 import "./requestflag.scss";
-
 import OutlinedInput from "@material-ui/core/OutlinedInput";
 import MenuItem from "@material-ui/core/MenuItem";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -15,17 +14,12 @@ import CloseIcon from "@material-ui/icons/Close";
 import IconButton from "@material-ui/core/IconButton";
 import TextField from "@mui/material/TextField";
 import { useParams } from "react-router-dom";
-import { saveRequestDetails } from "../../../apiManager/services/FOI/foiRequestServices";
-import { toast } from "react-toastify";
 import { useDispatch } from "react-redux";
-import {
-  fetchFOIRequestDetailsWrapper,
-} from "../../../apiManager/services/FOI/foiRequestServices";
 
 //Types are:
 //oipcreview
 //phasedrelease
-const RequestFlag = ({ isActive, type, requestDetails }) => {
+const RequestFlag = ({ isActive, type, handleSelect, showFlag = true }) => {
   const [isSelected, setIsSelected] = useState(isActive || false);
   const [modalOpen, setModalOpen] = useState(false);
   const [modalHeading, setModalHeading] = useState("");
@@ -133,7 +127,12 @@ const RequestFlag = ({ isActive, type, requestDetails }) => {
   }
 
   const handleValueChange = (e) => {
-    setModalOpen(true);
+    setIsSelected(e.target.value);
+    if (type == "oipcreview" && !isActive) {
+        handleSelect(e.target.value)
+    } else {
+        setModalOpen(true);
+    }
 
     if (e.target.value == true) {
       setModalHeading(modalHeadingActive);
@@ -144,7 +143,6 @@ const RequestFlag = ({ isActive, type, requestDetails }) => {
       setModalMessage(modalMessageInactive);
       setModalDescription(modalDescriptionInactive);
     }
-    setIsSelected(e.target.value);
   };
 
   const handleClose = () => {
@@ -154,61 +152,10 @@ const RequestFlag = ({ isActive, type, requestDetails }) => {
 
   const handleSave = (e) => {
     setModalOpen(false);
-    saveOipcReviewStatus();
+    handleSelect(isSelected);
   };
 
-  const saveOipcReviewStatus = () => {
-    let updatedRequestDetails;
-    if (type == "oipcreview") {
-        updatedRequestDetails = {
-            ...requestDetails,
-            isoipcreview: isSelected,
-        };
-    } else if (type == "phasedrelease") {
-        updatedRequestDetails = {
-            ...requestDetails,
-            isphasedrelease: isSelected,
-        };
-    }
-    //dispatch loader
-    dispatch(
-      saveRequestDetails(
-        updatedRequestDetails,
-        -2, //not an add request
-        requestId,
-        ministryId,
-        (err, res) => {
-          if (!err) {
-            toast.success("The OIPC review status has been successfully updated.", {
-              position: "top-right",
-              autoClose: 3000,
-              hideProgressBar: true,
-              closeOnClick: true,
-              pauseOnHover: true,
-              draggable: true,
-              progress: undefined,
-            });
-            dispatch(fetchFOIRequestDetailsWrapper(requestId, ministryId));
-          } else {
-            toast.error(
-              "Temporarily unable to update the OIPC review status. Please try again in a few minutes.",
-              {
-                position: "top-right",
-                autoClose: 3000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-              }
-            );
-            setIsSelected(isActive || false);
-          }
-        }
-      )
-    );
-  };
-
+  if (!showFlag) return <></>;
   return (
     <>
       <div className="request-flag">
