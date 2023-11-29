@@ -8,6 +8,7 @@ from notification_api.dao.models.FOIRequestNotifications import FOIRequestNotifi
 from notification_api.dao.models.FOIRequestNotificationUsers import FOIRequestNotificationUser
 from notification_api.dao.models.FOIMinistryRequest import FOIMinistryRequest
 
+from notification_api.services.external.keycloakadminservice import KeycloakAdminService
 from notification_api.default_method_result import DefaultMethodResult
 from datetime import datetime
 from dateutil.parser import parse
@@ -27,8 +28,17 @@ class notificationservice:
         if notificationusers is not None and len(notificationusers) > 0:
             #Create notification
             notificationid =  self.__createnotification(message, requesttype, notificationtype, userid, foirequest)
+
+            #mute notifications for ministry users
+            mutenotification = self.__mutenotification(requesttype, notificationtype, foirequest)
+            ministryusers = []
+            usergroupfromkeycloak = KeycloakAdminService().getmembersbygroupname(foirequest["assignedministrygroup"])
+            if usergroupfromkeycloak is not None and len(usergroupfromkeycloak) > 0:
+                for user in usergroupfromkeycloak[0].get("members"):
+                    ministryusers.append(user["username"])
+
             #Create notification users
-            return self.__createnotificationusers(requesttype, notificationid, notificationusers, userid)
+            return self.__createnotificationusers(requesttype, notificationid, notificationusers, userid, mutenotification, ministryusers)
         return  DefaultMethodResult(True,'No change',requestid)
 
     def __createnotification(self, message, requesttype, notificationtype, userid, foirequest):
@@ -37,10 +47,10 @@ class notificationservice:
             return FOIRequestNotification().savenotification(notification)
         return None
 
-    def __createnotificationusers(self, requesttype, notificationid, notificationusers, userid):    
+    def __createnotificationusers(self, requesttype, notificationid, notificationusers, userid, mute=False, ministryusers=[]):    
         for notificationuser in notificationusers:
-            user = self.__preparenotificationuser(requesttype, notificationid, notificationuser, userid)
-            if requesttype == "ministryrequest": 
+            if requesttype == "ministryrequest":
+                user = self.__preparenotificationuser(notificationid, notificationuser, userid, mute, ministryusers)
                 FOIRequestNotificationUser().savenotificationuser(user)
         return  DefaultMethodResult(True,'Notification users added',notificationid)
   
@@ -60,9 +70,12 @@ class notificationservice:
         return notification
 
          
-    def __preparenotificationuser(self, requesttype, notificationid, notificationuser, userid):
-        if requesttype == "ministryrequest":
-            user = FOIRequestNotificationUser()
+    def __preparenotificationuser(self, notificationid, notificationuser, userid, mute, ministryusers):
+        user = FOIRequestNotificationUser()
+        if notificationuser["userid"] in ministryusers:
+            user.isdeleted = mute
+        else:
+            user.isdeleted = False
         user.notificationusertypelabel = notificationuser["usertype"]
         user.notificationid = notificationid
         user.userid = notificationuser["userid"]
@@ -74,3 +87,23 @@ class notificationservice:
         if requesttype == "ministryrequest":
             return FOIMinistryRequest.getrequest(requestid)
 
+    def __mutenotification(self, requesttype, notificationtype, request):
+        #get mute conditions from env
+        mutenotifications = notificationconfig().getmutenotifications()
+        if requesttype == "ministryrequest":
+            if mutenotifications is not None and len(mutenotifications) > 0:
+                if mutenotifications[request["bcgovcode"].upper()] is not None:
+                    if request["requesttype"].upper() in (_requesttype.upper() for _requesttype in mutenotifications[request["bcgovcode"].upper()]["request_types"]):
+                        if request["requeststatus"].upper() in (_state.upper() for _state in mutenotifications[request["bcgovcode"].upper()]["state_exceptions"]):
+                            return False
+                        if notificationtype.upper() in (_notificationtype.upper() for _notificationtype in mutenotifications[request["bcgovcode"].upper()]["type_exceptions"]):
+                            return False
+                        return True
+                    else:
+                        return False
+                else:
+                    return False
+            else:
+                return False
+        else:
+            return False
