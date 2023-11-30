@@ -352,8 +352,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
     }
   }, [oipcData])
 
-  console.log(requestDetails)
-
+  
   useEffect(() => {
     if (isIAORestricted)
       dispatch(fetchRestrictedRequestCommentTagList(requestId, ministryId));

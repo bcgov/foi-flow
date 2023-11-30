@@ -36,6 +36,9 @@ const useStyles = makeStyles((theme) => ({
         fontWeight: theme.typography.fontWeightBold,
         opacity: 1,
     },
+    blankrow: {
+      padding: 25
+    }
   }));
 const FOIRequestHeader = React.memo(
   ({
@@ -282,10 +285,12 @@ const FOIRequestHeader = React.memo(
             isIAORestrictedFileManager={isIAORestrictedFileManager()}
             requestDetails={requestDetails}
             />
+           
           }
         </div>
         <div className="col-lg-3">
-          <RequestFlag
+        <div className="blankrow"></div>
+        <RequestFlag
             type="oipcreview"
             requestDetails={requestDetails}
             isActive={requestDetails.isoipcreview}
