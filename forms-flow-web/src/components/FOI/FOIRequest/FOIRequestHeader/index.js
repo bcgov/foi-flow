@@ -292,12 +292,12 @@ const FOIRequestHeader = React.memo(
             handleSelect={handleOipcReviewFlagChange}
             showFlag={showOipcReviewFlag}
           />
-          <RequestFlag
+          {/* <RequestFlag
             type="phasedrelease"
             requestDetails={requestDetails}
             isActive={requestDetails.isphasedrelease}
             handleSelect={handleOipcReviewFlagChange}
-          />
+          /> */}
         </div>
         <div className="col-lg-6">
           <div className="foi-assignee-dropdown">

@@ -364,7 +364,7 @@ class FOIMinistryRequest(db.Model):
         if(len(filterfields) > 0 and keyword is not None):
             filtercondition = []
 
-            if(keyword != "restricted"):
+            if(keyword != "restricted" and keyword.lower() != "oipc"):
                 for field in filterfields:
                     filtercondition.append(FOIMinistryRequest.findfield(field, iaoassignee, ministryassignee).ilike('%'+keyword+'%'))
             else:
@@ -372,6 +372,8 @@ class FOIMinistryRequest(db.Model):
                     filtercondition.append(FOIRestrictedMinistryRequest.isrestricted == True)
                 else:
                     filtercondition.append(ministry_restricted_requests.isrestricted == True)
+            if (keyword.lower() == "oipc"):
+                filtercondition.append(FOIMinistryRequest.isoipcreview == True)
 
         intakesorting = case([
                             (and_(FOIMinistryRequest.assignedto == None, FOIMinistryRequest.assignedgroup == 'Intake Team'), # Unassigned requests first
@@ -488,7 +490,8 @@ class FOIMinistryRequest(db.Model):
             extensions,
             FOIRestrictedMinistryRequest.isrestricted.label('isiaorestricted'),
             ministry_restricted_requests.isrestricted.label('isministryrestricted'),
-            SubjectCode.name.label('subjectcode')
+            SubjectCode.name.label('subjectcode'),
+            FOIMinistryRequest.isoipcreview.label('isoipcreview')
         ]
 
         basequery = _session.query(
@@ -1007,7 +1010,8 @@ class FOIMinistryRequest(db.Model):
             extensions,
             FOIRestrictedMinistryRequest.isrestricted.label('isiaorestricted'),
             ministry_restricted_requests.isrestricted.label('isministryrestricted'),
-            SubjectCode.name.label('subjectcode')
+            SubjectCode.name.label('subjectcode'),
+            FOIMinistryRequest.isoipcreview.label('isoipcreview')
         ]
 
         basequery = _session.query(
