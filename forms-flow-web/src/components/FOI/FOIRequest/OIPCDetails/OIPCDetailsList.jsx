@@ -5,6 +5,8 @@ import './oipcdetails.scss';
 const OIPCDetailsList = (props) => {
     const {oipcData, removeOIPC, updateOIPC} = props;
 
+    console.log("COMPONENT", oipcData)
+
     const OIPCItems = oipcData?.map((oipcObj, index) => {
         return (
             <>  
