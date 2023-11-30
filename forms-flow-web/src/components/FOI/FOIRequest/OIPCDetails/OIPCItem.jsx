@@ -154,7 +154,7 @@ const OIPCItem = (props) => {
                     <FontAwesomeIcon icon={faTrash} color="#38598A" />
                 </button>
             </div>
-            {showDeleteModal && <RemoveOIPCModal removeOIPC={removeOIPC} showModal={showDeleteModal} setShowModal={setShowDeleteModal} oipcid={oipc} />}
+            {showDeleteModal && <RemoveOIPCModal removeOIPC={removeOIPC} showModal={showDeleteModal} setShowModal={setShowDeleteModal} oipc={oipc} />}
             {showOutcomeModal && <OutcomeModal updateOIPC={updateOIPC} showModal={showOutcomeModal} setShowModal={setShowOutcomeModal} setOipc={setOipc} oipc={oipc} />}
             {showAmendModal && <AmendModal updateOIPC={updateOIPC} showModal={showAmendModal} setShowModal={setShowAmendModal} setOipc={setOipc} oipc={oipc} />}
             <Grid container spacing={1}>
