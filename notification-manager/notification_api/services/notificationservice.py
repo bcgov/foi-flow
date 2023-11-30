@@ -65,7 +65,7 @@ class notificationservice:
             notification.requestid = foirequest["foiministryrequestid"]
             notification.idnumber = foirequest["filenumber"]
             notification.foirequestid = foirequest["foirequest_id"]
-        notification.notificationtypeid = notificationconfig().getnotificationtypeid(notificationtype)
+        notification.notificationtypelabel = notificationconfig().getnotificationtypelabel(notificationtype)
         notification.axisnumber = foirequest["axisrequestid"]
         notification.version = foirequest["version"]        
         notification.createdby = userid
@@ -79,7 +79,7 @@ class notificationservice:
             user.isdeleted = mute
         else:
             user.isdeleted = False
-        user.notificationusertypeid = notificationuser["usertype"]
+        user.notificationusertypelabel = notificationuser["usertype"]
         user.notificationid = notificationid
         user.userid = notificationuser["userid"]
         user.createdby = userid

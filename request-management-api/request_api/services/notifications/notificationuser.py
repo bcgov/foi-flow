@@ -67,14 +67,14 @@ class notificationuser:
     
     def __getassignees(self, foirequest, requesttype, notificationtype, requestjson=None):
         notificationusers = []
-        notificationtypeid = notificationconfig().getnotificationusertypeid("Assignee")
+        notificationtypelabel = notificationconfig().getnotificationusertypeid("Assignee")
         if notificationtype == 'User Assignment Removal':
-            notificationusers.append({"userid": requestjson['userid'], "usertype":notificationtypeid})
+            notificationusers.append({"userid": requestjson['userid'], "usertype":notificationtypelabel})
         else:
             if requesttype == "ministryrequest" and foirequest["assignedministryperson"] is not None and (notificationtype == 'Ministry Assignment' or 'Assignment' not in notificationtype):
-                notificationusers.append({"userid":foirequest["assignedministryperson"], "usertype":notificationtypeid})
+                notificationusers.append({"userid":foirequest["assignedministryperson"], "usertype":notificationtypelabel})
             if self.__isministryonly(notificationtype) == False and foirequest["assignedto"] is not None and foirequest["assignedto"] != '' and (notificationtype == 'IAO Assignment' or 'Assignment' not in notificationtype):
-                notificationusers.append({"userid":foirequest["assignedto"], "usertype":notificationtypeid})
+                notificationusers.append({"userid":foirequest["assignedto"], "usertype":notificationtypelabel})
         return notificationusers          
     
     def __isministryonly(self, notificationtype):
@@ -123,11 +123,11 @@ class notificationuser:
 
     def __getgroupmembers(self,groupid):
         notificationusers = []
-        notificationtypeid = notificationconfig().getnotificationusertypeid("Group Members")
+        notificationtypelabel = notificationconfig().getnotificationusertypeid("Group Members")
         usergroupfromkeycloak= KeycloakAdminService().getmembersbygroupname(groupid) 
         if usergroupfromkeycloak is not None and len(usergroupfromkeycloak) > 0:
             for user in usergroupfromkeycloak[0].get("members"):
-                notificationusers.append({"userid":user["username"], "usertype":notificationtypeid})
+                notificationusers.append({"userid":user["username"], "usertype":notificationtypelabel})
             return notificationusers 
         return []
         

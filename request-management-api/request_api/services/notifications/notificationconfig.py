@@ -3,54 +3,26 @@ from os import stat
 from re import VERBOSE
 import json
 import os
+from request_api.models.NotificationTypes import NotificationType
+from request_api.models.NotificationUserTypes import NotificationUserType
 
 class notificationconfig:
     """ Notfication config
 
     """
-    
+
     def getnotificationtypeid(self, notificationtype):
-        if notificationtype == "State":
-            return 1
-        elif notificationtype == "Extension":
-            return 4 
-        elif "IAO Assignment" in notificationtype:
-            return 5   
-        elif "Ministry Assignment" in notificationtype:
-            return 6  
-        elif notificationtype == "CFR Due Reminder":
-            return 7
-        elif notificationtype == "Legislative Due Reminder":
-            return 8 
-        elif notificationtype == "New User Comments":
-            return 3   
-        elif notificationtype == "Reply User Comments":
-            return 9  
-        elif notificationtype == "Tagged User Comments":
-            return 10 
-        elif notificationtype == "CFR Fee Form":
-            return 11  
-        elif notificationtype == "Group Members":
-            return 12        
-        elif notificationtype == "Division Due Reminder":
-            return 13
-        elif notificationtype == "Watcher":
-            return 14
-        elif notificationtype == "User Assignment Removal":
-            return 15
-        elif notificationtype == "Email Failure":
-            return 16 
-        elif notificationtype == "Payment":
-            return 17
-        elif notificationtype == "Section 5 Pending Reminder":
-            return 20             
-        return 0     
-    
+        id = NotificationType().getnotificationtypeid(notificationtype)
+        if id is not None:
+            return id['notificationtypelabel']
+        return 0
+
     def getnotificationusertypeid(self, notificationusertype):
-        if notificationusertype.lower() == "watcher":
-            return 1
-        elif notificationusertype.lower() == "assignee" or "comment"  or "group members" in notificationusertype.lower():
-            return 2
+        print(notificationusertype)
+        id = NotificationUserType().getnotificationusertypesid(notificationusertype)
+        print(id)
+        if id is not None:
+            return id['notificationusertypelabel']
         return 0
     
     def getnotificationdays(self):
