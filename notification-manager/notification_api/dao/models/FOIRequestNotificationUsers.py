@@ -21,9 +21,9 @@ class FOIRequestNotificationUser(object):
         try:
             conn = getconnection()
             cursor = conn.cursor()
-            cursor.execute('INSERT INTO public."FOIRequestNotificationUsers" (notificationid, userid, notificationusertypelabel, createdby, created_at) \
-                                VALUES(%s::integer,%s, %s::integer, %s,%s)', 
-                                (int(notificationuser.notificationid), str(notificationuser.userid), int(notificationuser.notificationusertypelabel),  str(notificationuser.createdby), datetime.now(), , notificationuser.isdeleted))
+            cursor.execute('INSERT INTO public."FOIRequestNotificationUsers" (notificationid, userid, notificationusertypeid, notificationusertypelabel, createdby, created_at, isdeleted) \
+                                VALUES(%s::integer, %s, %s::integer, %s, %s, %s::boolean)',
+                                (int(notificationuser.notificationid), str(notificationuser.userid), int(notificationuser.notificationusertypeid), str(notificationuser.notificationusertypelabel), str(notificationuser.createdby), datetime.now(), int(notificationuser.isdeleted)))
             conn.commit()
             cursor.close()
         except(Exception) as error:
