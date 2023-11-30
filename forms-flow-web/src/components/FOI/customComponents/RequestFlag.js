@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "./requestflag.scss";
 import OutlinedInput from "@material-ui/core/OutlinedInput";
 import MenuItem from "@material-ui/core/MenuItem";
@@ -27,6 +27,10 @@ const RequestFlag = ({ isActive, type, handleSelect, showFlag = true }) => {
   const [modalDescription, setModalDescription] = useState("");
   
   const { requestId, ministryId } = useParams();
+
+  useEffect(() => {
+    setIsSelected(isActive);
+  }, [isActive])
 
   const dispatch = useDispatch();
 
