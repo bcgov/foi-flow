@@ -22,8 +22,6 @@ const OIPCItem = (props) => {
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [showOutcomeModal, setShowOutcomeModal] = useState(false);
     const [showAmendModal, setShowAmendModal] = useState(false);
-
-    console.log("ITEM", oipc)
     
     //Functions
     const generateNamesFromOIPCId = (oipcObj) => {
