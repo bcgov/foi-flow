@@ -13,13 +13,15 @@ import { isRequestWatcherOrMinistryAssignee, addToRestrictedRequestTagList } fro
 import RequestMinistryRestriction from "../../customComponents/RequestMinistryRestriction";
 import _ from 'lodash';
 import {setCommentTagListLoader} from "../../../../actions/FOI/foiRequestActions";
+import RequestFlag from '../../customComponents/RequestFlag';
 
 const RequestHeader = React.memo(({
     requestDetails,
     userDetail,
     handleMinistryAssignedToValue,
     setSaveMinistryRequestObject,
-    ministryAssigneeValue
+    ministryAssigneeValue,
+    handleOipcReviewFlagChange
 }) => {
     const { requestId, ministryId } = useParams();
     const _requestDetails = requestDetails;
@@ -101,6 +103,22 @@ const RequestHeader = React.memo(({
         )
       );
 
+      const requestFlagsBox = (
+        <div>
+            <RequestFlag
+              type="oipcreview"
+              requestDetails={requestDetails}
+              isActive={requestDetails.isoipcreview}
+              handleSelect={handleOipcReviewFlagChange}
+            />
+            {/* <RequestFlag
+              type="phasedrelease"
+              requestDetails={requestDetails}
+              isActive={requestDetails.isphasedrelease}
+              handleSelect={() => console.log('selected')}
+            /> */}
+        </div>
+      );
     return (
         <>
         <div className="row">
@@ -128,23 +146,24 @@ const RequestHeader = React.memo(({
             </div>
         </div>
         <div className="row">
-            <div className="col-lg-8">
-                <div className="foi-request-review-header-col1-row">
-                    <div className="foi-request-review-header-col1-row">
-                        {watcherBox}
-                    </div>
-                    {
+            <div className="col-lg-3">
+                {watcherBox}
+                {
                     (isLoaded && (isRequestWatcherOrMinistryAssignee(requestWatchers,ministryAssigneeValue,userDetail?.preferred_username) || 
                         isMinistryRestrictedFileManager())) &&
-                        <RequestMinistryRestriction 
-                            isministryrestricted={isRestricted()}
-                            isMinistryRestrictedFileManager={isMinistryRestrictedFileManager()}
-                            requestDetails={requestDetails}
-                        />
-                    }
+                    <RequestMinistryRestriction 
+                        isministryrestricted={isRestricted()}
+                        isMinistryRestrictedFileManager={isMinistryRestrictedFileManager()}
+                        requestDetails={requestDetails}
+                    />
+                }
+            </div>
+            <div className="col-lg-3">
+                <div className="foi-request-review-header-col1-row">
+                    {requestFlagsBox}
                 </div>
             </div>
-            <div className="col-lg-4">
+            <div className="col-lg-6">
                 <div className="foi-assignee-dropdown">
                     <MinistryAssignToDropdown requestState={requestState} requestDetails={_requestDetails} 
                     ministryAssignedToList={ministryAssignedToList} 

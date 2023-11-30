@@ -145,6 +145,10 @@ const initialState = {
     ".jpg",
   ],
   conversionFormats: [],
+  oipcOutcomes: [],
+  oipcStatuses: [],
+  oipcReviewtypes: [],
+  oipcInquiryoutcomes: [],
 };
 
 const foiRequests = (state = initialState, action) => {
@@ -307,6 +311,14 @@ const foiRequests = (state = initialState, action) => {
       return { ...state, recordFormats: action.payload };
     case FOI_ACTION_CONSTANTS.CONVERSION_FORMATS:
       return { ...state, conversionFormats: action.payload };
+    case FOI_ACTION_CONSTANTS.OIPC_OUTCOMES:
+      return { ...state, oipcOutcomes: action.payload };
+    case FOI_ACTION_CONSTANTS.OIPC_STATUSES:
+      return { ...state, oipcStatuses: action.payload };
+    case FOI_ACTION_CONSTANTS.OIPC_REVIEWTYPES:
+      return { ...state, oipcReviewtypes: action.payload };
+    case FOI_ACTION_CONSTANTS.OIPC_INQUIRYOUTCOMES:
+        return { ...state, oipcInquiryoutcomes: action.payload };
     default:
       return state;
   }

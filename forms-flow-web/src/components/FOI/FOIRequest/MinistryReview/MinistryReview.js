@@ -18,6 +18,10 @@ import {
 import {
   fetchFOIMinistryAssignedToList,
   fetchFOIPersonalDivisionsAndSections,
+  fetchOIPCInquiryoutcomes,
+  fetchOIPCOutcomes,
+  fetchOIPCReviewtypes,
+  fetchOIPCStatuses,
 } from "../../../../apiManager/services/FOI/foiMasterDataServices";
 
 import { fetchFOIRequestAttachmentsList } from "../../../../apiManager/services/FOI/foiAttachmentServices";
@@ -62,6 +66,8 @@ import { UnsavedModal } from "../../customComponents";
 import { DISABLE_GATHERINGRECORDS_TAB } from "../../../../constants/constants";
 import _ from "lodash";
 import { MinistryNeedsScanning } from "../../../../constants/FOI/enum";
+import OIPCDetails from "../OIPCDetails/Index";
+import useOIPCHook from "../OIPCDetails/oipcHook";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -108,6 +114,8 @@ const MinistryReview = React.memo(({ userDetail }) => {
 
   const [_currentrequestStatus, setcurrentrequestStatus] = React.useState("");
   const [_tabStatus, settabStatus] = React.useState(requestState);
+  const {oipcData, addOIPC, removeOIPC, updateOIPC, isOIPCReview, setIsOIPCReview} = useOIPCHook();
+  
   //gets the request detail from the store
   const IsDivisionalCoordinator = () => {
     return userDetail?.role?.includes("DivisionalCoordinator");
@@ -210,6 +218,12 @@ const MinistryReview = React.memo(({ userDetail }) => {
       dispatch(fetchPDFStitchStatusForHarms(requestId, ministryId));
       dispatch(fetchPDFStitchStatusForRedlines(requestId, ministryId));
       dispatch(fetchPDFStitchStatusForResponsePackage(requestId, ministryId));
+
+      dispatch(fetchOIPCOutcomes());
+      dispatch(fetchOIPCStatuses());
+      dispatch(fetchOIPCReviewtypes());
+      dispatch(fetchOIPCInquiryoutcomes());
+
       fetchCFRForm(ministryId, dispatch);
       if (bcgovcode) dispatch(fetchFOIMinistryAssignedToList(bcgovcode));
     }
@@ -317,6 +331,11 @@ const MinistryReview = React.memo(({ userDetail }) => {
     ministryAssignedToValue.toLowerCase().includes("unassigned") ||
     hasincompleteDivstage ||
     !hasReceivedDate;
+
+  const isOipcReviewValidationError = (oipcData?.length > 0 && requestDetails.isoipcreview && oipcData?.some((oipc) => {
+    return oipc.oipcno === "" || oipc.receiveddate === null || oipc.receiveddate === "" || oipc.reviewtypeid === null || oipc.reasonid === null || oipc.statusid === null || 
+    oipc.inquiryattributes?.orderno === "" || oipc.inquiryattributes?.inquiryoutcome === null || oipc.inquiryattributes?.inquirydate === null || oipc.inquiryattributes?.inquirydate === ""; 
+  }))
 
   const createMinistrySaveRequestObject = (_propName, _value, _value2) => {
     const requestObject = { ...saveMinistryRequestObject };
@@ -582,6 +601,19 @@ const MinistryReview = React.memo(({ userDetail }) => {
     (state) => state.foiRequests.showEventQueue
   );
 
+  const oipcSectionRef = React.useRef(null);
+  const handleOipcReviewFlagChange = (isSelected) => {
+    setIsOIPCReview(isSelected);
+    requestDetails.isoipcreview = isSelected;
+    oipcSectionRef.current.scrollIntoView();
+    //timeout to allow react state to update after setState call
+    if (isSelected) {
+      setTimeout(() => {
+        oipcSectionRef.current.scrollIntoView();
+      }, (10));
+    }
+  }
+
   return !isLoading &&
     requestDetails &&
     Object.keys(requestDetails).length !== 0 &&
@@ -752,6 +784,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
                             setSaveMinistryRequestObject
                           }
                           ministryAssigneeValue={ministryAssignedToValue}
+                          handleOipcReviewFlagChange={handleOipcReviewFlagChange}
                         />
                         <ApplicantDetails requestDetails={requestDetails} />
                         <ChildDetails requestDetails={requestDetails} />
@@ -767,11 +800,20 @@ const MinistryReview = React.memo(({ userDetail }) => {
                         />
                         {divisionsBox}
                         {/* <RequestNotes /> */}
+                        <div ref={oipcSectionRef}></div>
+                        {isOIPCReview && requestState && requestState.toLowerCase() !== StateEnum.intakeinprogress.name.toLowerCase() && requestState.toLowerCase() !== StateEnum.unopened.name.toLowerCase() && (
+                          <OIPCDetails 
+                            oipcData={oipcData}
+                            updateOIPC={updateOIPC}
+                            addOIPC={addOIPC}
+                            removeOIPC={removeOIPC}
+                          />
+                        )}
                         <BottomButtonGroup
                           requestState={requestState}
                           stateChanged={stateChanged}
                           attachmentsArray={requestAttachments}
-                          isValidationError={isValidationError}
+                          isValidationError={isValidationError || isOipcReviewValidationError}
                           saveMinistryRequestObject={saveMinistryRequestObject}
                           unSavedRequest={unSavedRequest}
                           recordsUploading={recordsUploading}

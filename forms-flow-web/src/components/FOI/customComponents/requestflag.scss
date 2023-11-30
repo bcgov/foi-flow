@@ -1,13 +1,22 @@
-.requestRestriction {
+.request-flag {
 
-    .restrict-dropdown-all {
+    margin-left: -50px;
+    padding-top: 50px;
+
+    .request-flag-dropdown-all {
         padding-top: 10px; 
         display: flex;
         min-width: 200px !important;
     }
 
-    .restrict-icon{
-        color: #A0192F;
+    .oipc-review-icon{
+        color: #fa7c16;
+        padding-left: 14px;
+        margin-top: 3px;
+    }
+
+    .phased-release-icon{
+        color: #9207b7;
         padding-left: 14px;
         margin-top: 3px;
     }
@@ -18,7 +27,7 @@
         border-radius: 40px 0 0 40px;
     }
 
-    .restrict-select{
+    .request-flag-select{
         border: 1px solid #a0192f;
         //padding-top: 8px;
         //width:40px;
@@ -29,22 +38,22 @@
     }
 
 
-    .restrict-dropdown {
+    .request-flag-dropdown {
         color: black !important;
         width: 155px;
         padding-left: 10px;
     }
     
-    .restrict-dropdown .MuiSelect-icon {
+    .request-flag-dropdown .MuiSelect-icon {
         color: white !important;
     }
     
-    .restrict-dropdown .MuiOutlinedInput-notchedOutline {
+    .request-flag-dropdown .MuiOutlinedInput-notchedOutline {
         border: none !important;
     }
 
-    .restrict-dropdown .MuiInputBase-input,
-    .restrict-dropdown .MuiOutlinedInput-input {
+    .request-flag-dropdown .MuiInputBase-input,
+    .request-flag-dropdown .MuiOutlinedInput-input {
         padding: 0px !important
     }
 
@@ -67,4 +76,5 @@
 .modal-msg-description {
     padding-top: 25px;
 }
+
 

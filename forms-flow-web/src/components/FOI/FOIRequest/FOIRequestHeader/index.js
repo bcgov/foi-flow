@@ -22,6 +22,7 @@ import { toast } from "react-toastify";
 import _ from 'lodash';
 import RequestRestriction from "../../customComponents/RequestRestriction";
 import ConfirmModal from "../../customComponents/ConfirmModal";
+import RequestFlag from '../../customComponents/RequestFlag';
 
 const useStyles = makeStyles((theme) => ({
     formControl: {
@@ -35,6 +36,9 @@ const useStyles = makeStyles((theme) => ({
         fontWeight: theme.typography.fontWeightBold,
         opacity: 1,
     },
+    blankrow: {
+      padding: 25
+    }
   }));
 const FOIRequestHeader = React.memo(
   ({
@@ -48,6 +52,8 @@ const FOIRequestHeader = React.memo(
     userDetail,
     disableInput,
     isAddRequest,
+    handleOipcReviewFlagChange,
+    showOipcReviewFlag
   }) => {
     /**
      *  Header of Review request in the UI
@@ -259,11 +265,9 @@ const FOIRequestHeader = React.memo(
         </div>
       </div>
       <div className='row'>
-        <div className="col-lg-8">
-          <div className="foi-request-review-header-col1-row">
+        <div className="col-lg-3">
           {window.location.href.indexOf(FOI_COMPONENT_CONSTANTS.ADDREQUEST) ===
               -1 && (
-              <div className="foi-request-review-header-col1-row">
                 <Watcher
                   watcherFullList={watcherList}
                   requestId={requestId}
@@ -273,7 +277,6 @@ const FOIRequestHeader = React.memo(
                   isIAORestrictedRequest={isIAORestrictedRequest}
                   setIsLoaded={setIsLoaded}
                 />
-              </div>
             )}
           {!isAddRequest && status.toLowerCase() !== StateEnum.unopened.name.toLowerCase() && (isIAORestrictedFileManager() ||
             (isLoaded && isRequestWatcherOrAssignee(requestWatchers,assigneeObj,userDetail?.preferred_username))) && 
@@ -282,10 +285,26 @@ const FOIRequestHeader = React.memo(
             isIAORestrictedFileManager={isIAORestrictedFileManager()}
             requestDetails={requestDetails}
             />
+           
           }
-          </div>
         </div>
-        <div className="col-lg-4">
+        <div className="col-lg-3">
+        <div className="blankrow"></div>
+        <RequestFlag
+            type="oipcreview"
+            requestDetails={requestDetails}
+            isActive={requestDetails.isoipcreview}
+            handleSelect={handleOipcReviewFlagChange}
+            showFlag={showOipcReviewFlag}
+          />
+          {/* <RequestFlag
+            type="phasedrelease"
+            requestDetails={requestDetails}
+            isActive={requestDetails.isphasedrelease}
+            handleSelect={handleOipcReviewFlagChange}
+          /> */}
+        </div>
+        <div className="col-lg-6">
           <div className="foi-assignee-dropdown">
             {showMinistryAssignedTo && (
                   <>
