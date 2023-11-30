@@ -11,8 +11,10 @@ from sqlalchemy.dialects.postgresql import JSON, UUID
 from sqlalchemy.sql.expression import distinct
 from sqlalchemy import text
 import maya
-
 import json
+f = open('common/notificationtypes.json', encoding="utf8")
+notificationtypes_cache = json.load(f)
+
 class FOIRequestNotification(db.Model):
     # Name of the table in our database
     __tablename__ = 'FOIRequestNotifications' 
@@ -30,7 +32,7 @@ class FOIRequestNotification(db.Model):
     updated_at = db.Column(db.DateTime, nullable=True)
     updatedby = db.Column(db.String(120), unique=False, nullable=True)
 
-    notificationtypeid = db.Column(db.Integer, nullable=False)
+    notificationtypelabel = db.Column(db.String(50), nullable=False)
     
     notificationusers = db.relationship('FOIRequestNotificationUser', backref='FOIRequestNotifications', lazy='dynamic')
 
@@ -66,9 +68,9 @@ class FOIRequestNotification(db.Model):
         notifications = []
         try:
             sql = """select idnumber, axisnumber, notificationid, notification , notificationtype, userid, notificationusertype, created_at, createdby, requesttype, requestid, foirequestid from (   
-                    select frn.idnumber, frn.axisnumber, frn.requestid, frns.notificationuserid as notificationid, frn.notification -> 'message' as notification , nty.name as notificationtype, frn.created_at , frns.createdby, frns.userid, ntu.name as notificationusertype, 'ministryrequest' requesttype, frn.foirequestid from "FOIRequestNotifications" frn inner join "FOIRequestNotificationUsers" frns on frn.notificationid = frns.notificationid inner join "NotificationTypes" nty on frn.notificationtypeid = nty.notificationtypeid inner join "NotificationUserTypes" ntu on frns.notificationusertypeid = ntu.notificationusertypeid where frns.userid=:userid and frns.isdeleted = false and frn.created_at  >= current_date - interval :days day
+                    select frn.idnumber, frn.axisnumber, frn.requestid, frns.notificationuserid as notificationid, frn.notification -> 'message' as notification , nty.name as notificationtype, frn.created_at , frns.createdby, frns.userid, ntu.name as notificationusertype, 'ministryrequest' requesttype, frn.foirequestid from "FOIRequestNotifications" frn inner join "FOIRequestNotificationUsers" frns on frn.notificationid = frns.notificationid inner join "NotificationTypes" nty on frn.notificationtypelabel = nty.notificationtypelabel inner join "NotificationUserTypes" ntu on frns.notificationusertypelabel = ntu.notificationusertypelabel where frns.userid=:userid and frns.isdeleted = false and frn.created_at  >= current_date - interval :days day
                     union all
-                    select frn.idnumber, frn.axisnumber, frn.requestid, frns.notificationuserid as notificationid, frn.notification -> 'message' as notification, nty.name as notificationtype, frn.created_at , frns.createdby, frns.userid, ntu.name as notificationusertype, 'rawrequest' requesttype, 0 foirequestid  from "FOIRawRequestNotifications" frn inner join "FOIRawRequestNotificationUsers" frns on frn.notificationid = frns.notificationid inner join "NotificationTypes" nty on frn.notificationtypeid = nty.notificationtypeid inner join "NotificationUserTypes" ntu on frns.notificationusertypeid = ntu.notificationusertypeid where frns.userid=:userid and frns.isdeleted = false and frn.created_at  >= current_date - interval :days day
+                    select frn.idnumber, frn.axisnumber, frn.requestid, frns.notificationuserid as notificationid, frn.notification -> 'message' as notification, nty.name as notificationtype, frn.created_at , frns.createdby, frns.userid, ntu.name as notificationusertype, 'rawrequest' requesttype, 0 foirequestid  from "FOIRawRequestNotifications" frn inner join "FOIRawRequestNotificationUsers" frns on frn.notificationid = frns.notificationid inner join "NotificationTypes" nty on frn.notificationtypelabel = nty.notificationtypelabel inner join "NotificationUserTypes" ntu on frns.notificationusertypelabel = ntu.notificationusertypelabel where frns.userid=:userid and frns.isdeleted = false and frn.created_at  >= current_date - interval :days day
                   ) as notf order by created_at desc"""
             rs = db.session.execute(text(sql), {'userid': userid, 'days': days})
             for row in rs:
@@ -87,11 +89,16 @@ class FOIRequestNotification(db.Model):
         notifications = []
         try:
             sql = """select idnumber, axisnumber, notificationid, notificationuserid, notification , notificationtype, userid, notificationusertype, created_at, createdby, requesttype, requestid, foirequestid from (   
-                    select frn.idnumber, frn.axisnumber, frn.requestid, frn.notificationid, frns.notificationuserid, frn.notification -> 'message' as notification , nty.name as notificationtype, frn.created_at , frns.createdby, frns.userid, ntu.name as notificationusertype, 'ministryrequest' requesttype, frn.foirequestid from "FOIRequestNotifications" frn inner join "FOIRequestNotificationUsers" frns on frn.notificationid = frns.notificationid inner join "NotificationTypes" nty on frn.notificationtypeid = nty.notificationtypeid inner join "NotificationUserTypes" ntu on frns.notificationusertypeid = ntu.notificationusertypeid where frn.notificationtypeid in (3,9,10) and (frn.notification ->> 'commentid')::int = :commentid
+                    select frn.idnumber, frn.axisnumber, frn.requestid, frn.notificationid, frns.notificationuserid, frn.notification -> 'message' as notification , nty.name as notificationtype, frn.created_at , frns.createdby, frns.userid, ntu.name as notificationusertype, 'ministryrequest' requesttype, frn.foirequestid from "FOIRequestNotifications" frn inner join "FOIRequestNotificationUsers" frns on frn.notificationid = frns.notificationid inner join "NotificationTypes" nty on frn.notificationtypelabel = nty.notificationtypelabel inner join "NotificationUserTypes" ntu on frns.notificationusertypelabel = ntu.notificationusertypelabel where frn.notificationtypelabel in :notificationtypelabel and (frn.notification ->> 'commentid')::int = :commentid
                     union all
-                    select frn.idnumber, frn.axisnumber, frn.requestid, frn.notificationid, frns.notificationuserid, frn.notification -> 'message' as notification, nty.name as notificationtype, frn.created_at , frns.createdby, frns.userid, ntu.name as notificationusertype, 'rawrequest' requesttype, 0 foirequestid  from "FOIRawRequestNotifications" frn inner join "FOIRawRequestNotificationUsers" frns on frn.notificationid = frns.notificationid inner join "NotificationTypes" nty on frn.notificationtypeid = nty.notificationtypeid inner join "NotificationUserTypes" ntu on frns.notificationusertypeid = ntu.notificationusertypeid where frn.notificationtypeid in (3,9,10) and (frn.notification ->> 'commentid')::int = :commentid
+                    select frn.idnumber, frn.axisnumber, frn.requestid, frn.notificationid, frns.notificationuserid, frn.notification -> 'message' as notification, nty.name as notificationtype, frn.created_at , frns.createdby, frns.userid, ntu.name as notificationusertype, 'rawrequest' requesttype, 0 foirequestid  from "FOIRawRequestNotifications" frn inner join "FOIRawRequestNotificationUsers" frns on frn.notificationid = frns.notificationid inner join "NotificationTypes" nty on frn.notificationtypelabel = nty.notificationtypelabel inner join "NotificationUserTypes" ntu on frns.notificationusertypelabel = ntu.notificationusertypelabel where frn.notificationtypelabel in :notificationtypelabel and (frn.notification ->> 'commentid')::int = :commentid
                   ) as notf order by created_at desc"""
-            rs = db.session.execute(text(sql), {'commentid': commentid})
+            notificationtypelabel = [notificationtypes_cache.newusercomments.notificationtypelabel,
+                                     notificationtypes_cache.replyusercomments.notificationtypelabel,
+                                     notificationtypes_cache.taggedusercomments.notificationtypelabel,
+                                     ] # 3,9,10
+            print(notificationtypelabel)
+            rs = db.session.execute(text(sql), {'commentid': commentid, 'notificationtypelabel': notificationtypelabel})
             for row in rs:
                 dt = maya.parse(row["created_at"]).datetime(to_timezone='America/Vancouver', naive=False)
                 _createddate = dt
@@ -107,10 +114,10 @@ class FOIRequestNotification(db.Model):
     def getextensionnotifications(cls, extensionid):
         notifications = []
         try:
-            sql = sql = """select idnumber, axisnumber, notificationid, notification , notificationtypeid from "FOIRequestNotifications" where notification->>'extensionid' = :extensionid """
+            sql = sql = """select idnumber, axisnumber, notificationid, notification , notificationtypelabel from "FOIRequestNotifications" where notification->>'extensionid' = :extensionid """
             rs = db.session.execute(text(sql), {'extensionid': str(extensionid)})
             for row in rs:
-                notifications.append({"idnumber": row["idnumber"], "axisnumber": row["axisnumber"], "notificationid": row["notificationid"], "notification": row["notification"], "notificationtypeid": row["notificationtypeid"]})
+                notifications.append({"idnumber": row["idnumber"], "axisnumber": row["axisnumber"], "notificationid": row["notificationid"], "notification": row["notification"], "notificationtypelabel": row["notificationtypelabel"]})
         except Exception as ex:
             logging.error(ex)
             raise ex
@@ -130,11 +137,11 @@ class FOIRequestNotification(db.Model):
             raise
         
     @classmethod
-    def getnotificationidsbynumberandtype(cls, idnumber, notificationtypeids):
+    def getnotificationidsbynumberandtype(cls, idnumber, notificationtypelabels):
         notificationids = []
         try:
-            sql = """select notificationid from "FOIRequestNotifications" where idnumber = :idnumber and notificationtypeid = ANY(:notificationtypeids) """
-            rs = db.session.execute(text(sql), {'idnumber': idnumber, 'notificationtypeids': notificationtypeids})
+            sql = """select notificationid from "FOIRequestNotifications" where idnumber = :idnumber and notificationtypelabel = ANY(:notificationtypelabels) """
+            rs = db.session.execute(text(sql), {'idnumber': idnumber, 'notificationtypelabels': notificationtypelabels})
             for row in rs:
                 notificationids.append(row["notificationid"])
         except Exception as ex:
@@ -160,9 +167,9 @@ class FOIRequestNotification(db.Model):
         return notificationids
 
     @classmethod
-    def getnotificationidsbytype(cls, notificationtypeid):
-        sql = """select notificationid from "FOIRequestNotifications" where notificationtypeid= :notificationtypeid """
-        rs = db.session.execute(text(sql), {'notificationtypeid': notificationtypeid})
+    def getnotificationidsbytype(cls, notificationtypelabel):
+        sql = """select notificationid from "FOIRequestNotifications" where notificationtypelabel= :notificationtypelabel """
+        rs = db.session.execute(text(sql), {'notificationtypelabel': notificationtypelabel})
         notificationids = []
         for row in rs:
             notificationids.append(row["notificationid"])
@@ -170,7 +177,7 @@ class FOIRequestNotification(db.Model):
     
     @classmethod
     def getextensionnotificationidsbyministry(cls, ministryid):
-        sql = """select notificationid from "FOIRequestNotifications" where requestid = :requestid and notificationtypeid = 4 """
+        sql = """select notificationid from "FOIRequestNotifications" where requestid = :requestid and notificationtypelabel = 4 """
         rs = db.session.execute(text(sql), {'requestid': ministryid})
         notificationids = []
         for row in rs:
@@ -179,4 +186,4 @@ class FOIRequestNotification(db.Model):
 
 class FOIRequestNotificationSchema(ma.Schema):
     class Meta:
-        fields = ('notificationid', 'ministryrequestid', 'notification', 'notificationtypeid','created_at','createdby','updated_at','updatedby') 
+        fields = ('notificationid', 'ministryrequestid', 'notification', 'notificationtypeid', 'notificationtypelabel','created_at','createdby','updated_at','updatedby') 

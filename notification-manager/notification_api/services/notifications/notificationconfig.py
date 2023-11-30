@@ -4,6 +4,7 @@ from re import VERBOSE
 import json
 import os
 from notification_api.dao.models.NotificationTypes import NotificationType
+from notification_api.dao.models.NotificationUserTypes import NotificationUserType
 
 class notificationconfig:
     """ Notfication config
@@ -11,27 +12,14 @@ class notificationconfig:
     """
     
     def getnotificationtypeid(self, notificationtype):        
-       
-        if "IAO Assignment" in notificationtype:
-            return 5   
-        elif "Ministry Assignment" in notificationtype:
-            return 6  
-        else:
-            notificationid = NotificationType().getid(notificationtype)
-            if notificationid is not None:
-                return notificationid
-        return 0     
+        notificationid = NotificationType().getid(notificationtype)
+        if notificationid is not None:
+            return notificationid
     
     def getnotificationusertypeid(self, notificationusertype):
-        if notificationusertype.lower() == "watcher":
-            return 1
-        elif notificationusertype.lower() == "assignee" or "comment"  or "group members" in notificationusertype.lower():
-            return 2
-        elif notificationusertype.lower() == "comment user":
-            return 3
-        elif notificationusertype.lower() == "triggered user":
-            return 4
-        return 0
+        notificationuserid = NotificationUserType().getid(notificationusertype)
+        if notificationuserid is not None:
+            return notificationuserid
     
     def getnotificationdays(self):
         if 'FOI_NOTIFICATION_DAYS' in os.environ and os.getenv('FOI_NOTIFICATION_DAYS') != '':
