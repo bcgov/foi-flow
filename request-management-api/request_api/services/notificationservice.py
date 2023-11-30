@@ -254,15 +254,24 @@ class notificationservice:
         return 'rawrequest' if idnumber.lower().startswith('u-00') else 'ministryrequest'    
             
     def __preparenotification(self, message, requesttype, notificationtype, userid, foirequest, requestjson=None):
+        ministryusers = []
         if requesttype == "ministryrequest":
             notification = FOIRequestNotification()
             notification.requestid = foirequest["foiministryrequestid"]
             notification.idnumber = foirequest["filenumber"]
             notification.foirequestid = foirequest["foirequest_id"]
+
+            #mute notifications for ministry users
+            mutenotification = self.__mutenotification(requesttype, notificationtype, foirequest)
+            usergroupfromkeycloak = KeycloakAdminService().getmembersbygroupname(foirequest["assignedministrygroup"])
+            if usergroupfromkeycloak is not None and len(usergroupfromkeycloak) > 0:
+                for user in usergroupfromkeycloak[0].get("members"):
+                    ministryusers.append(user["username"])
         else:
             notification = FOIRawRequestNotification()
             notification.requestid = foirequest["requestid"]
             notification.idnumber ='U-00' + str(foirequest['requestid'])
+            mutenotification = False
 
         notification.notificationtypelabel = notificationconfig().getnotificationtypelabel(notificationtype)
         notification.axisnumber = foirequest["axisrequestid"]
@@ -270,14 +279,6 @@ class notificationservice:
         notification.createdby = userid
         notification.notification = message
         notification.isdeleted = False
-
-        #mute notifications for ministry users
-        mutenotification = self.__mutenotification(requesttype, notificationtype, foirequest)
-        ministryusers = []
-        usergroupfromkeycloak = KeycloakAdminService().getmembersbygroupname(foirequest["assignedministrygroup"])
-        if usergroupfromkeycloak is not None and len(usergroupfromkeycloak) > 0:
-            for user in usergroupfromkeycloak[0].get("members"):
-                ministryusers.append(user["username"])
 
         notificationusers = notificationuser().getnotificationusers(notificationtype, requesttype, userid, foirequest, requestjson)
         users = []
@@ -301,9 +302,12 @@ class notificationservice:
         user.createdby = userid
         return user
 
-    def __mutenotification(self, requesttype, notificationtype, request=None):
+    def __mutenotification(self, requesttype, notificationtype, request):
         #get mute conditions from env
         mutenotifications = notificationconfig().getmutenotifications()
+        if "programarea.bcgovcode" in request:
+            return False
+
         bcgovcode = request["programarea.bcgovcode"].upper()
         if requesttype == "ministryrequest"and bcgovcode in mutenotifications:
             foirequest = FOIRequest.getrequest(request["foirequest_id"])

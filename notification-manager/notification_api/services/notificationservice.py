@@ -30,12 +30,15 @@ class notificationservice:
             notificationid =  self.__createnotification(message, requesttype, notificationtype, userid, foirequest)
 
             #mute notifications for ministry users
-            mutenotification = self.__mutenotification(requesttype, notificationtype, foirequest)
             ministryusers = []
-            usergroupfromkeycloak = KeycloakAdminService().getmembersbygroupname(foirequest["assignedministrygroup"])
-            if usergroupfromkeycloak is not None and len(usergroupfromkeycloak) > 0:
-                for user in usergroupfromkeycloak[0].get("members"):
-                    ministryusers.append(user["username"])
+            if requesttype == "ministryrequest":
+                mutenotification = self.__mutenotification(requesttype, notificationtype, foirequest)
+                usergroupfromkeycloak = KeycloakAdminService().getmembersbygroupname(foirequest["assignedministrygroup"])
+                if usergroupfromkeycloak is not None and len(usergroupfromkeycloak) > 0:
+                    for user in usergroupfromkeycloak[0].get("members"):
+                        ministryusers.append(user["username"])
+            else:
+                mutenotification = False
 
             #Create notification users
             return self.__createnotificationusers(requesttype, notificationid, notificationusers, userid, mutenotification, ministryusers)
