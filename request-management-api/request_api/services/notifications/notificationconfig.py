@@ -57,4 +57,10 @@ class notificationconfig:
         if 'FOI_NOTIFICATION_DAYS' in os.environ and os.getenv('FOI_NOTIFICATION_DAYS') != '':
             return os.getenv('FOI_NOTIFICATION_DAYS')
         else:
-            return str(14)    
+            return str(14)
+    
+    def getmutenotifications(self):
+        if 'MUTE_NOTIFICATION' in os.environ and os.getenv('MUTE_NOTIFICATION') != '':
+            return json.loads(os.getenv('MUTE_NOTIFICATION'))
+        else:
+            return {}
