@@ -149,7 +149,7 @@ const OIPCItem = (props) => {
 
     return (
         <> 
-            <div key={oipc.id} style={{display: "flex", flexDirection: "row", justifyContent: "flex-end"}}>
+            <div style={{display: "flex", flexDirection: "row", justifyContent: "flex-end"}}>
                 <button onClick={() => setShowDeleteModal(true)} style={{ border: "none", background: "none" }}>
                     <FontAwesomeIcon icon={faTrash} color="#38598A" />
                 </button>
