@@ -22,6 +22,8 @@ const OIPCItem = (props) => {
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [showOutcomeModal, setShowOutcomeModal] = useState(false);
     const [showAmendModal, setShowAmendModal] = useState(false);
+
+    console.log("ITEM", oipc)
     
     //Functions
     const generateNamesFromOIPCId = (oipcObj) => {
@@ -147,12 +149,12 @@ const OIPCItem = (props) => {
 
     return (
         <> 
-            <div style={{display: "flex", flexDirection: "row", justifyContent: "flex-end"}}>
+            <div key={oipc.id} style={{display: "flex", flexDirection: "row", justifyContent: "flex-end"}}>
                 <button onClick={() => setShowDeleteModal(true)} style={{ border: "none", background: "none" }}>
                     <FontAwesomeIcon icon={faTrash} color="#38598A" />
                 </button>
             </div>
-            {showDeleteModal && <RemoveOIPCModal removeOIPC={removeOIPC} showModal={showDeleteModal} setShowModal={setShowDeleteModal} oipcid={oipc.id} />}
+            {showDeleteModal && <RemoveOIPCModal removeOIPC={removeOIPC} showModal={showDeleteModal} setShowModal={setShowDeleteModal} oipcid={oipc} />}
             {showOutcomeModal && <OutcomeModal updateOIPC={updateOIPC} showModal={showOutcomeModal} setShowModal={setShowOutcomeModal} setOipc={setOipc} oipc={oipc} />}
             {showAmendModal && <AmendModal updateOIPC={updateOIPC} showModal={showAmendModal} setShowModal={setShowAmendModal} setOipc={setOipc} oipc={oipc} />}
             <Grid container spacing={1}>
