@@ -101,7 +101,5 @@ class notificationservice:
                 if notificationtype.upper() in (_notificationtype.upper() for _notificationtype in mutenotifications[bcgovcode]["type_exceptions"]):
                     return False
                 return True
-            else:
-                return False
-        else:
-            return False
+
+        return False
