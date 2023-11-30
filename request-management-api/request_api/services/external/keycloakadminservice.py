@@ -25,7 +25,7 @@ class KeycloakAdminService:
         _accesstoken=None
         try:
             cache_client = redis.from_url(self.cache_redis_url,decode_responses=True)
-            _accesstoken = cache_client.get("foi:kcsrcacnttoken")          
+            _accesstoken = cache_client.get("foi:kcsrcacnttoken")
             if _accesstoken is None:
                 url = '{0}/auth/realms/{1}/protocol/openid-connect/token'.format(self.keycloakhost,self.keycloakrealm)        
                 params = {
@@ -42,7 +42,7 @@ class KeycloakAdminService:
         except BusinessException as exception:
             print("Error happened while accessing token on KeycloakAdminService {0}".format(exception.message))
         finally:
-            cache_client = None       
+            cache_client = None
         return _accesstoken       
 
    
