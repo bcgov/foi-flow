@@ -18,10 +18,6 @@ import {
 import {
   fetchFOIMinistryAssignedToList,
   fetchFOIPersonalDivisionsAndSections,
-  fetchOIPCInquiryoutcomes,
-  fetchOIPCOutcomes,
-  fetchOIPCReviewtypes,
-  fetchOIPCStatuses,
 } from "../../../../apiManager/services/FOI/foiMasterDataServices";
 
 import { fetchFOIRequestAttachmentsList } from "../../../../apiManager/services/FOI/foiAttachmentServices";
@@ -215,12 +211,6 @@ const MinistryReview = React.memo(({ userDetail }) => {
       dispatch(fetchPDFStitchStatusForHarms(requestId, ministryId));
       dispatch(fetchPDFStitchStatusForRedlines(requestId, ministryId));
       dispatch(fetchPDFStitchStatusForResponsePackage(requestId, ministryId));
-
-      dispatch(fetchOIPCOutcomes());
-      dispatch(fetchOIPCStatuses());
-      dispatch(fetchOIPCReviewtypes());
-      dispatch(fetchOIPCInquiryoutcomes());
-
       fetchCFRForm(ministryId, dispatch);
       if (bcgovcode) dispatch(fetchFOIMinistryAssignedToList(bcgovcode));
     }
@@ -328,11 +318,6 @@ const MinistryReview = React.memo(({ userDetail }) => {
     ministryAssignedToValue.toLowerCase().includes("unassigned") ||
     hasincompleteDivstage ||
     !hasReceivedDate;
-
-  const isOipcReviewValidationError = (oipcData?.length > 0 && requestDetails.isoipcreview && oipcData?.some((oipc) => {
-    return oipc.oipcno === "" || oipc.receiveddate === null || oipc.receiveddate === "" || oipc.reviewtypeid === null || oipc.reasonid === null || oipc.statusid === null || 
-    oipc.inquiryattributes?.orderno === "" || oipc.inquiryattributes?.inquiryoutcome === null || oipc.inquiryattributes?.inquirydate === null || oipc.inquiryattributes?.inquirydate === ""; 
-  }))
 
   const createMinistrySaveRequestObject = (_propName, _value, _value2) => {
     const requestObject = { ...saveMinistryRequestObject };
@@ -787,7 +772,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
                           requestState={requestState}
                           stateChanged={stateChanged}
                           attachmentsArray={requestAttachments}
-                          isValidationError={isValidationError || isOipcReviewValidationError}
+                          isValidationError={isValidationError}
                           saveMinistryRequestObject={saveMinistryRequestObject}
                           unSavedRequest={unSavedRequest}
                           recordsUploading={recordsUploading}
