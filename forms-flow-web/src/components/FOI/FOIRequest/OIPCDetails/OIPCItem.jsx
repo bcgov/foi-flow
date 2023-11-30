@@ -148,10 +148,7 @@ const OIPCItem = (props) => {
     return (
         <> 
             <div style={{display: "flex", flexDirection: "row", justifyContent: "flex-end"}}>
-                <button onClick={(e) => {
-                    e.preventDefault()
-                    setShowDeleteModal(true)
-                    }} style={{ border: "none", background: "none" }}>
+                <button onClick={() => setShowDeleteModal(true)} style={{ border: "none", background: "none" }}>
                     <FontAwesomeIcon icon={faTrash} color="#38598A" />
                 </button>
             </div>
