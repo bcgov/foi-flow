@@ -13,8 +13,6 @@ import DialogTitle from "@material-ui/core/DialogTitle";
 import CloseIcon from "@material-ui/icons/Close";
 import IconButton from "@material-ui/core/IconButton";
 import TextField from "@mui/material/TextField";
-import { useParams } from "react-router-dom";
-import { useDispatch } from "react-redux";
 
 //Types are:
 //oipcreview
@@ -26,13 +24,9 @@ const RequestFlag = ({ isActive, type, handleSelect, showFlag = true }) => {
   const [modalMessage, setModalMessage] = useState("");
   const [modalDescription, setModalDescription] = useState("");
   
-  const { requestId, ministryId } = useParams();
-
   useEffect(() => {
     setIsSelected(isActive);
   }, [isActive])
-
-  const dispatch = useDispatch();
 
   // These need to be set for each type
   let options;
