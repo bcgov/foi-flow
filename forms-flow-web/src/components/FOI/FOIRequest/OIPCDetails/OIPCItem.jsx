@@ -194,13 +194,16 @@ const OIPCItem = (props) => {
                         select
                         variant="outlined"
                         fullWidth
-                        value={oipc.reviewtypeid}
+                        value={oipc.reviewtypeid ? oipc.reviewtypeid : -1}
                         label="Review Type"
                         onChange={(event) => handleReviewType(event.target.value)}
                         error={(!oipc.outcomeid || oipc.outcomeid === 5) && oipc.reviewtypeid === null}
                         required
                         disabled={oipc.outcomeid && oipc.outcomeid !== 5}
                     >
+                        <MenuItem disabled value={-1}>
+                            Select Review Type
+                        </MenuItem>
                         {uniqueReviewTypes(oipcReviewtypes).map((reviewtype) => {
                             return <MenuItem key={reviewtype.reviewtypeid} value={reviewtype.reviewtypeid}>{reviewtype.type_name}</MenuItem>
                         })}
@@ -212,13 +215,16 @@ const OIPCItem = (props) => {
                         select
                         variant="outlined"
                         fullWidth
-                        value={oipc.reasonid}
+                        value={oipc.reasonid ? oipc.reasonid : -1}
                         label="Reason"
                         onChange = {(event) => handleReason(event.target.value)}
                         error={(!oipc.outcomeid || oipc.outcomeid === 5) && oipc.reasonid === null}
                         required
                         disabled={oipc.outcomeid && oipc.outcomeid !== 5}
                     >
+                        <MenuItem disabled value={-1}>
+                            Select Review Type & Reason
+                        </MenuItem>
                         {oipc.reviewtypeid ? 
                             oipcReviewtypes.map((reviewtype) => {
                             if (reviewtype.reviewtypeid === oipc.reviewtypeid) {
@@ -233,13 +239,16 @@ const OIPCItem = (props) => {
                         select
                         variant="outlined"
                         fullWidth
-                        value={oipc.statusid}
+                        value={oipc.statusid ? oipc.statusid : -1}
                         label="Status"
                         onChange = {(event) => handleStatus(event.target.value)}
                         error={(!oipc.outcomeid || oipc.outcomeid === 5) && oipc.statusid === null}
                         required
                         disabled={oipc.outcomeid && oipc.outcomeid !== 5}
                     >
+                        <MenuItem disabled value={-1}>
+                            Select Status
+                        </MenuItem>
                         {oipcStatuses.map((status) => {
                             return <MenuItem key={status.statusid} value={status.statusid}>{status.name}</MenuItem>
                         })}
@@ -264,9 +273,12 @@ const OIPCItem = (props) => {
                         variant="outlined"
                         onChange = {(event) => handleOutcome(event.target.value)}
                         fullWidth
-                        value={oipc.outcomeid}
+                        value={oipc.outcomeid ? oipc.outcomeid : -1}
                         label="Outcome"
                     >
+                        <MenuItem disabled value={-1}>
+                            Select Outcome
+                        </MenuItem>
                         {oipcOutcomes.map((outcome) => {
                             if (outcome.outcomeid !== 5) {
                                 return <MenuItem disabled={oipc.outcomeid && oipc.outcomeid !== 5} key={outcome.outcomeid} value={outcome.outcomeid}>{outcome.name}</MenuItem>
@@ -381,12 +393,15 @@ const OIPCItem = (props) => {
                         variant="outlined"
                         onChange = {(event) => handleInquiryFields(event.target.value, "INQUIRYOUTCOME")}
                         fullWidth
-                        value={oipc.inquiryattributes.inquiryoutcome}
+                        value={oipc.inquiryattributes.inquiryoutcome ? oipc.inquiryattributes.inquiryoutcome : -1}
                         label="Outcome"
                         error={(!oipc.outcomeid || oipc.outcomeid === 5) && oipc.inquiryattributes.inquiryoutcome === null}
                         required
                         disabled={oipc.outcomeid && oipc.outcomeid !== 5}
-                    >   
+                    >
+                        <MenuItem disabled value={-1}>
+                            Select Inquiry Outcome
+                        </MenuItem>   
                         {oipcInquiryoutcomes.map((inquiryoutcome) => {
                             return <MenuItem key={inquiryoutcome.inquiryoutcomeid} value={inquiryoutcome.inquiryoutcomeid}>{inquiryoutcome.name}</MenuItem>
                         })}
