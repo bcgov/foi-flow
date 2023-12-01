@@ -38,8 +38,6 @@ const useOIPCHook = () => {
     setOipcData(stagedOIPCData);
   }, [isOIPCReview])
 
-  // console.log("HOOK", oipcData)
-
   //OIPC Functions
   const addOIPC = () => {
     setOipcData((prev) => {
