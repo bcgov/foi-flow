@@ -11,8 +11,8 @@
   DTS:LocaleID="1033"
   DTS:ObjectName="FOIRequestContactInformation"
   DTS:PackageType="5"
-  DTS:VersionBuild="71"
-  DTS:VersionGUID="{D8F0E47C-87C0-4352-B380-D36429864036}">
+  DTS:VersionBuild="79"
+  DTS:VersionGUID="{963DE22B-D953-4B51-A23F-11B823D5F17A}">
   <DTS:Property
     DTS:Name="PackageFormatVersion">8</DTS:Property>
   <DTS:Variables>
@@ -212,7 +212,7 @@
         <SQLTask:SqlTaskData
           SQLTask:Connection="{FA877C17-9970-459F-BFAC-AC1E9E4433B6}"
           SQLTask:BypassPrepare="False"
-          SQLTask:SqlStatementSource="SELECT email,address1,address2, city,zipcode,work1,work2,mobile,home,country,province, STRING_AGG(CAST(requestid as nvarchar(max)),', ') as requests  FROM  (SELECT&#x9;'test@test1.com' as email,requesters.vcAddress1 as address1, requesters.vcAddress2 as address2, requesters.vcCity as city,  requesters.vcZipCode as zipcode, requesters.vcWork1 as work1, requesters.vcwork2 as work2, requesters.vcMobile as mobile,requesters.vcHome as home, (SELECT terminology.vcTerminology from tblTerminologyLookup terminology WHERE terminology.iLabelID = countries.iLabelID and  terminology.tiLocaleID = 1) as country,  (SELECT terminology.vcTerminology from tblTerminologyLookup terminology WHERE terminology.iLabelID = states.iLabelID and terminology.tiLocaleID = 1) as province,  requests.vcVisibleRequestID as requestid  FROM tblRequests requests WITH (NOLOCK)   LEFT OUTER JOIN EC_OFFICE office WITH (NOLOCK) ON requests.tiOfficeID = office.OFFICE_ID   LEFT OUTER JOIN tblRequesters requesters WITH (NOLOCK) ON requests.iRequesterID = requesters.iRequesterID  LEFT OUTER JOIN tblCountries countries WITH (NOLOCK) ON requesters.siCountryID = countries.siCountryID  LEFT OUTER JOIN tblStates states WITH (NOLOCK) ON requesters.siStateID = states.siStateID  LEFT OUTER JOIN dbo.TBLREQUESTERCUSTOMFIELDS requestorfields WITH  (NOLOCK) ON requesters.iRequesterID = requestorfields.IREQUESTERID WHERE office.OFFICE_CODE = 'CFD' AND  requests.vcRequestStatus NOT IN ('Closed') ) AS T  WHERE requestid  in ('CFD-2022-20261', 'CFD-2021-14313','CFD-2021-12866' , 'CFD-2021-12905', 'CFD-2021-12651')    GROUP BY T.email,T.address1,T.address2,  T.city,T.zipcode,T.work1,T.work2,T.mobile,T.home, T.country,T.province"
+          SQLTask:SqlStatementSource="SELECT email,address1,address2, city,zipcode,work1,work2,mobile,home,country,province,  STRING_AGG(CAST(requestid as nvarchar(max)),', ') as requests  FROM   ( SELECT&#x9;requesters.vcEmailID as email, requesters.vcAddress1 as address1,  requesters.vcAddress2 as address2,  requesters.vcCity as city,   requesters.vcZipCode as zipcode,  requesters.vcWork1 as work1,  requesters.vcwork2 as work2,  requesters.vcMobile as mobile, requesters.vcHome as home,  (SELECT terminology.vcTerminology from tblTerminologyLookup terminology WHERE terminology.iLabelID = countries.iLabelID and  terminology.tiLocaleID = 1) as country,   (SELECT terminology.vcTerminology from tblTerminologyLookup terminology WHERE terminology.iLabelID = states.iLabelID and terminology.tiLocaleID = 1) as province,   requests.vcVisibleRequestID as requestid   FROM tblRequests requests WITH (NOLOCK)    LEFT OUTER JOIN EC_OFFICE office WITH (NOLOCK) ON requests.tiOfficeID = office.OFFICE_ID    LEFT OUTER JOIN tblRequesters requesters WITH (NOLOCK) ON requests.iRequesterID = requesters.iRequesterID   LEFT OUTER JOIN tblCountries countries WITH (NOLOCK) ON requesters.siCountryID = countries.siCountryID   LEFT OUTER JOIN tblStates states WITH (NOLOCK) ON requesters.siStateID = states.siStateID   LEFT OUTER JOIN dbo.TBLREQUESTERCUSTOMFIELDS requestorfields WITH  (NOLOCK) ON requesters.iRequesterID = requestorfields.IREQUESTERID  WHERE office.OFFICE_CODE = 'CFD' AND  requests.vcRequestStatus NOT IN ('Closed') ) AS T  WHERE requestid  in ('CFD-2020-00129','CFD-2020-03214','CFD-2020-03700','CFD-2021-10226','CFD-2021-10406','CFD-2021-10681')      GROUP BY T.email,T.address1,T.address2,  T.city,T.zipcode,T.work1,T.work2,T.mobile,T.home, T.country,T.province"
           SQLTask:ResultType="ResultSetType_Rowset" xmlns:SQLTask="www.microsoft.com/sqlserver/dts/tasks/sqltask">
           <SQLTask:ResultBinding
             SQLTask:ResultName="0"
@@ -251,7 +251,7 @@
           DTS:MaxErrorCount="10"
           DTS:ObjectName="Execute SQL Task 1"
           DTS:TaskContact="Execute SQL Task; Microsoft Corporation; SQL Server 2019; © 2019 Microsoft Corporation; All Rights Reserved;http://www.microsoft.com/sql/support/default.asp;1"
-          DTS:ThreadHint="3">
+          DTS:ThreadHint="0">
           <DTS:Variables />
           <DTS:ObjectData>
             <SQLTask:SqlTaskData
@@ -288,7 +288,7 @@
           DTS:MaxErrorCount="10"
           DTS:ObjectName="Execute SQL Task 10"
           DTS:TaskContact="Execute SQL Task; Microsoft Corporation; SQL Server 2019; © 2019 Microsoft Corporation; All Rights Reserved;http://www.microsoft.com/sql/support/default.asp;1"
-          DTS:ThreadHint="4">
+          DTS:ThreadHint="1">
           <DTS:Variables />
           <DTS:ObjectData>
             <SQLTask:SqlTaskData
@@ -325,7 +325,7 @@
           DTS:MaxErrorCount="10"
           DTS:ObjectName="Execute SQL Task 11"
           DTS:TaskContact="Execute SQL Task; Microsoft Corporation; SQL Server 2019; © 2019 Microsoft Corporation; All Rights Reserved;http://www.microsoft.com/sql/support/default.asp;1"
-          DTS:ThreadHint="5">
+          DTS:ThreadHint="2">
           <DTS:Variables />
           <DTS:ObjectData>
             <SQLTask:SqlTaskData
@@ -362,7 +362,7 @@
           DTS:MaxErrorCount="10"
           DTS:ObjectName="Execute SQL Task 2"
           DTS:TaskContact="Execute SQL Task; Microsoft Corporation; SQL Server 2019; © 2019 Microsoft Corporation; All Rights Reserved;http://www.microsoft.com/sql/support/default.asp;1"
-          DTS:ThreadHint="10">
+          DTS:ThreadHint="7">
           <DTS:Variables />
           <DTS:ObjectData>
             <SQLTask:SqlTaskData
@@ -399,7 +399,7 @@
           DTS:MaxErrorCount="10"
           DTS:ObjectName="Execute SQL Task 3"
           DTS:TaskContact="Execute SQL Task; Microsoft Corporation; SQL Server 2019; © 2019 Microsoft Corporation; All Rights Reserved;http://www.microsoft.com/sql/support/default.asp;1"
-          DTS:ThreadHint="2">
+          DTS:ThreadHint="10">
           <DTS:Variables />
           <DTS:ObjectData>
             <SQLTask:SqlTaskData
@@ -436,7 +436,7 @@
           DTS:MaxErrorCount="10"
           DTS:ObjectName="Execute SQL Task 4"
           DTS:TaskContact="Execute SQL Task; Microsoft Corporation; SQL Server 2019; © 2019 Microsoft Corporation; All Rights Reserved;http://www.microsoft.com/sql/support/default.asp;1"
-          DTS:ThreadHint="1">
+          DTS:ThreadHint="8">
           <DTS:Variables />
           <DTS:ObjectData>
             <SQLTask:SqlTaskData
@@ -473,7 +473,7 @@
           DTS:MaxErrorCount="10"
           DTS:ObjectName="Execute SQL Task 5"
           DTS:TaskContact="Execute SQL Task; Microsoft Corporation; SQL Server 2019; © 2019 Microsoft Corporation; All Rights Reserved;http://www.microsoft.com/sql/support/default.asp;1"
-          DTS:ThreadHint="0">
+          DTS:ThreadHint="9">
           <DTS:Variables />
           <DTS:ObjectData>
             <SQLTask:SqlTaskData
@@ -547,7 +547,7 @@
           DTS:MaxErrorCount="10"
           DTS:ObjectName="Execute SQL Task 7"
           DTS:TaskContact="Execute SQL Task; Microsoft Corporation; SQL Server 2019; © 2019 Microsoft Corporation; All Rights Reserved;http://www.microsoft.com/sql/support/default.asp;1"
-          DTS:ThreadHint="7">
+          DTS:ThreadHint="5">
           <DTS:Variables />
           <DTS:ObjectData>
             <SQLTask:SqlTaskData
@@ -584,7 +584,7 @@
           DTS:MaxErrorCount="10"
           DTS:ObjectName="Execute SQL Task 8"
           DTS:TaskContact="Execute SQL Task; Microsoft Corporation; SQL Server 2019; © 2019 Microsoft Corporation; All Rights Reserved;http://www.microsoft.com/sql/support/default.asp;1"
-          DTS:ThreadHint="8">
+          DTS:ThreadHint="4">
           <DTS:Variables />
           <DTS:ObjectData>
             <SQLTask:SqlTaskData
@@ -621,7 +621,7 @@
           DTS:MaxErrorCount="10"
           DTS:ObjectName="Execute SQL Task 9"
           DTS:TaskContact="Execute SQL Task; Microsoft Corporation; SQL Server 2019; © 2019 Microsoft Corporation; All Rights Reserved;http://www.microsoft.com/sql/support/default.asp;1"
-          DTS:ThreadHint="9">
+          DTS:ThreadHint="3">
           <DTS:Variables />
           <DTS:ObjectData>
             <SQLTask:SqlTaskData
@@ -657,7 +657,7 @@
           DTS:LocaleID="-1"
           DTS:ObjectName="Expression Task"
           DTS:TaskContact="Expression Task;Microsoft Corporation; SQL Server 2019; © 2019 Microsoft Corporation; All Rights Reserved;http://www.microsoft.com/sql/support/default.asp;1"
-          DTS:ThreadHint="3">
+          DTS:ThreadHint="0">
           <DTS:Variables />
           <DTS:ObjectData>
             <ExpressionTask
@@ -673,7 +673,7 @@
           DTS:LocaleID="-1"
           DTS:ObjectName="Expression Task 1"
           DTS:TaskContact="Expression Task;Microsoft Corporation; SQL Server 2019; © 2019 Microsoft Corporation; All Rights Reserved;http://www.microsoft.com/sql/support/default.asp;1"
-          DTS:ThreadHint="10">
+          DTS:ThreadHint="7">
           <DTS:Variables />
           <DTS:ObjectData>
             <ExpressionTask
@@ -689,7 +689,7 @@
           DTS:LocaleID="-1"
           DTS:ObjectName="Expression Task 10"
           DTS:TaskContact="Expression Task;Microsoft Corporation; SQL Server 2019; © 2019 Microsoft Corporation; All Rights Reserved;http://www.microsoft.com/sql/support/default.asp;1"
-          DTS:ThreadHint="5">
+          DTS:ThreadHint="2">
           <DTS:Variables />
           <DTS:ObjectData>
             <ExpressionTask
@@ -705,7 +705,7 @@
           DTS:LocaleID="-1"
           DTS:ObjectName="Expression Task 2"
           DTS:TaskContact="Expression Task;Microsoft Corporation; SQL Server 2019; © 2019 Microsoft Corporation; All Rights Reserved;http://www.microsoft.com/sql/support/default.asp;1"
-          DTS:ThreadHint="2">
+          DTS:ThreadHint="10">
           <DTS:Variables />
           <DTS:ObjectData>
             <ExpressionTask
@@ -721,7 +721,7 @@
           DTS:LocaleID="-1"
           DTS:ObjectName="Expression Task 3"
           DTS:TaskContact="Expression Task;Microsoft Corporation; SQL Server 2019; © 2019 Microsoft Corporation; All Rights Reserved;http://www.microsoft.com/sql/support/default.asp;1"
-          DTS:ThreadHint="1">
+          DTS:ThreadHint="8">
           <DTS:Variables />
           <DTS:ObjectData>
             <ExpressionTask
@@ -737,7 +737,7 @@
           DTS:LocaleID="-1"
           DTS:ObjectName="Expression Task 4"
           DTS:TaskContact="Expression Task;Microsoft Corporation; SQL Server 2019; © 2019 Microsoft Corporation; All Rights Reserved;http://www.microsoft.com/sql/support/default.asp;1"
-          DTS:ThreadHint="0">
+          DTS:ThreadHint="9">
           <DTS:Variables />
           <DTS:ObjectData>
             <ExpressionTask
@@ -769,7 +769,7 @@
           DTS:LocaleID="-1"
           DTS:ObjectName="Expression Task 6"
           DTS:TaskContact="Expression Task;Microsoft Corporation; SQL Server 2019; © 2019 Microsoft Corporation; All Rights Reserved;http://www.microsoft.com/sql/support/default.asp;1"
-          DTS:ThreadHint="7">
+          DTS:ThreadHint="5">
           <DTS:Variables />
           <DTS:ObjectData>
             <ExpressionTask
@@ -785,7 +785,7 @@
           DTS:LocaleID="-1"
           DTS:ObjectName="Expression Task 7"
           DTS:TaskContact="Expression Task;Microsoft Corporation; SQL Server 2019; © 2019 Microsoft Corporation; All Rights Reserved;http://www.microsoft.com/sql/support/default.asp;1"
-          DTS:ThreadHint="8">
+          DTS:ThreadHint="4">
           <DTS:Variables />
           <DTS:ObjectData>
             <ExpressionTask
@@ -801,7 +801,7 @@
           DTS:LocaleID="-1"
           DTS:ObjectName="Expression Task 8"
           DTS:TaskContact="Expression Task;Microsoft Corporation; SQL Server 2019; © 2019 Microsoft Corporation; All Rights Reserved;http://www.microsoft.com/sql/support/default.asp;1"
-          DTS:ThreadHint="9">
+          DTS:ThreadHint="3">
           <DTS:Variables />
           <DTS:ObjectData>
             <ExpressionTask
@@ -817,7 +817,7 @@
           DTS:LocaleID="-1"
           DTS:ObjectName="Expression Task 9"
           DTS:TaskContact="Expression Task;Microsoft Corporation; SQL Server 2019; © 2019 Microsoft Corporation; All Rights Reserved;http://www.microsoft.com/sql/support/default.asp;1"
-          DTS:ThreadHint="4">
+          DTS:ThreadHint="1">
           <DTS:Variables />
           <DTS:ObjectData>
             <ExpressionTask
@@ -1036,95 +1036,95 @@
       <GraphLayout
         Capacity="64" xmlns="clr-namespace:Microsoft.SqlServer.IntegrationServices.Designer.Model.Serialization;assembly=Microsoft.SqlServer.IntegrationServices.Graph" xmlns:mssgle="clr-namespace:Microsoft.SqlServer.Graph.LayoutEngine;assembly=Microsoft.SqlServer.Graph" xmlns:assembly="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:mssgm="clr-namespace:Microsoft.SqlServer.Graph.Model;assembly=Microsoft.SqlServer.Graph">
         <NodeLayout
-          Size="170,42"
+          Size="169.6,41.6"
           Id="Package\Execute SQL Task"
           TopLeft="401,0" />
         <NodeLayout
-          Size="157,42"
+          Size="156.8,41.6"
           Id="Package\Foreach Loop Container\Execute SQL Task 1"
           TopLeft="18,122" />
         <NodeLayout
-          Size="186,42"
+          Size="185.6,41.6"
           Id="Package\Foreach Loop Container\Execute SQL Task 10"
           TopLeft="15.6666666666667,505.111111111111" />
         <NodeLayout
-          Size="186,42"
+          Size="185.6,41.6"
           Id="Package\Foreach Loop Container\Execute SQL Task 11"
           TopLeft="262.333333333334,501.777777777778" />
         <NodeLayout
-          Size="154,42"
+          Size="153.6,41.6"
           Id="Package\Foreach Loop Container\Execute SQL Task 2"
           TopLeft="190.111111111111,119.111111111111" />
         <NodeLayout
-          Size="156,42"
+          Size="156,41.6"
           Id="Package\Foreach Loop Container\Execute SQL Task 3"
           TopLeft="362.333333333333,118.222222222222" />
         <NodeLayout
-          Size="143,42"
+          Size="143.2,41.6"
           Id="Package\Foreach Loop Container\Execute SQL Task 4"
           TopLeft="528.777777777778,121.222222222222" />
         <NodeLayout
-          Size="144,42"
+          Size="144,41.6"
           Id="Package\Foreach Loop Container\Execute SQL Task 5"
           TopLeft="677,118" />
         <NodeLayout
-          Size="143,42"
+          Size="143.2,41.6"
           Id="Package\Foreach Loop Container\Execute SQL Task 6"
           TopLeft="26.1111111111111,343.333333333333" />
         <NodeLayout
-          Size="179,42"
+          Size="179.2,41.6"
           Id="Package\Foreach Loop Container\Execute SQL Task 7"
           TopLeft="208.222222222222,342.555555555556" />
         <NodeLayout
-          Size="179,42"
+          Size="179.2,41.6"
           Id="Package\Foreach Loop Container\Execute SQL Task 8"
           TopLeft="405,342.666666666667" />
         <NodeLayout
-          Size="179,42"
+          Size="179.2,41.6"
           Id="Package\Foreach Loop Container\Execute SQL Task 9"
           TopLeft="619.444444444445,340.444444444445" />
         <NodeLayout
-          Size="160,42"
+          Size="160,41.6"
           Id="Package\Foreach Loop Container\Expression Task"
           TopLeft="14,15" />
         <NodeLayout
-          Size="143,42"
+          Size="143.2,41.6"
           Id="Package\Foreach Loop Container\Expression Task 1"
           TopLeft="181.777777777778,11.1111111111111" />
         <NodeLayout
-          Size="175,42"
+          Size="175.2,41.6"
           Id="Package\Foreach Loop Container\Expression Task 10"
           TopLeft="249,416.111111111111" />
         <NodeLayout
-          Size="147,42"
+          Size="147.2,41.6"
           Id="Package\Foreach Loop Container\Expression Task 2"
           TopLeft="340,16" />
         <NodeLayout
-          Size="133,42"
+          Size="132.8,41.6"
           Id="Package\Foreach Loop Container\Expression Task 3"
           TopLeft="507,13" />
         <NodeLayout
-          Size="146,42"
+          Size="145.6,41.6"
           Id="Package\Foreach Loop Container\Expression Task 4"
           TopLeft="655.444444444445,12" />
         <NodeLayout
-          Size="152,42"
+          Size="152,41.6"
           Id="Package\Foreach Loop Container\Expression Task 5"
           TopLeft="14.4444444444447,218.111111111111" />
         <NodeLayout
-          Size="155,42"
+          Size="155.2,41.6"
           Id="Package\Foreach Loop Container\Expression Task 6"
           TopLeft="224,214" />
         <NodeLayout
-          Size="169,42"
+          Size="168.8,41.6"
           Id="Package\Foreach Loop Container\Expression Task 7"
           TopLeft="424.333333333333,217.555555555556" />
         <NodeLayout
-          Size="169,42"
+          Size="168.8,41.6"
           Id="Package\Foreach Loop Container\Expression Task 8"
           TopLeft="620.777777777778,217.111111111111" />
         <NodeLayout
-          Size="169,42"
+          Size="168.8,41.6"
           Id="Package\Foreach Loop Container\Expression Task 9"
           TopLeft="19.3333333333333,407.888888888889" />
         <EdgeLayout
@@ -1219,7 +1219,7 @@
           </EdgeLayout.Curve>
           <EdgeLayout.Labels>
             <mssgm:EdgeLabel
-              BoundingBox="1.41666666666674,26.8333333333333,16,16"
+              BoundingBox="1.41666666666675,26.8333333333333,16,16"
               RelativePosition="Any" />
           </EdgeLayout.Labels>
         </EdgeLayout>
@@ -1255,7 +1255,7 @@
           </EdgeLayout.Curve>
           <EdgeLayout.Labels>
             <mssgm:EdgeLabel
-              BoundingBox="5.41666666666669,35.1111111111111,16,16"
+              BoundingBox="5.4166666666667,35.1111111111111,16,16"
               RelativePosition="Any" />
           </EdgeLayout.Labels>
         </EdgeLayout>
@@ -1291,7 +1291,7 @@
           </EdgeLayout.Curve>
           <EdgeLayout.Labels>
             <mssgm:EdgeLabel
-              BoundingBox="5.38888888888886,38.1111111111111,16,16"
+              BoundingBox="5.38888888888885,38.1111111111111,16,16"
               RelativePosition="Any" />
           </EdgeLayout.Labels>
         </EdgeLayout>
@@ -1327,7 +1327,7 @@
           </EdgeLayout.Curve>
           <EdgeLayout.Labels>
             <mssgm:EdgeLabel
-              BoundingBox="2.27777777777777,37.0000000000002,16,16"
+              BoundingBox="2.27777777777775,37.0000000000002,16,16"
               RelativePosition="Any" />
           </EdgeLayout.Labels>
         </EdgeLayout>
@@ -1351,7 +1351,7 @@
           </EdgeLayout.Curve>
           <EdgeLayout.Labels>
             <mssgm:EdgeLabel
-              BoundingBox="-8,29.8611111111111,16,16"
+              BoundingBox="-8,29.8611111111112,16,16"
               RelativePosition="Any" />
           </EdgeLayout.Labels>
         </EdgeLayout>
@@ -1466,8 +1466,8 @@
         <ContainerLayout
           HeaderHeight="43"
           IsExpanded="True"
-          PanelSize="824,650"
-          Size="824,693"
+          PanelSize="824,649.6"
+          Size="824,692.8"
           Id="Package\Foreach Loop Container"
           TopLeft="74.1111111111112,68.7777777777778" />
         <EdgeLayout
