@@ -202,7 +202,7 @@ const OIPCItem = (props) => {
                         disabled={oipc.outcomeid && oipc.outcomeid !== 5}
                     >
                         <MenuItem disabled value={-1}>
-                            <em>Select Review Type</em>
+                            Select Review Type
                         </MenuItem>
                         {uniqueReviewTypes(oipcReviewtypes).map((reviewtype) => {
                             return <MenuItem key={reviewtype.reviewtypeid} value={reviewtype.reviewtypeid}>{reviewtype.type_name}</MenuItem>
@@ -223,7 +223,7 @@ const OIPCItem = (props) => {
                         disabled={oipc.outcomeid && oipc.outcomeid !== 5}
                     >
                         <MenuItem disabled value={-1}>
-                            <em>Select Review Type & Reason</em>
+                            Select Review Type & Reason
                         </MenuItem>
                         {oipc.reviewtypeid ? 
                             oipcReviewtypes.map((reviewtype) => {
@@ -247,7 +247,7 @@ const OIPCItem = (props) => {
                         disabled={oipc.outcomeid && oipc.outcomeid !== 5}
                     >
                         <MenuItem disabled value={-1}>
-                            <em>Select Status</em>
+                            Select Status
                         </MenuItem>
                         {oipcStatuses.map((status) => {
                             return <MenuItem key={status.statusid} value={status.statusid}>{status.name}</MenuItem>
@@ -277,7 +277,7 @@ const OIPCItem = (props) => {
                         label="Outcome"
                     >
                         <MenuItem disabled value={-1}>
-                            <em>Select Outcome</em>
+                            Select Outcome
                         </MenuItem>
                         {oipcOutcomes.map((outcome) => {
                             if (outcome.outcomeid !== 5) {
@@ -393,12 +393,15 @@ const OIPCItem = (props) => {
                         variant="outlined"
                         onChange = {(event) => handleInquiryFields(event.target.value, "INQUIRYOUTCOME")}
                         fullWidth
-                        value={oipc.inquiryattributes.inquiryoutcome}
+                        value={oipc.inquiryattributes.inquiryoutcome ? oipc.inquiryattributes.inquiryoutcome : -1}
                         label="Outcome"
                         error={(!oipc.outcomeid || oipc.outcomeid === 5) && oipc.inquiryattributes.inquiryoutcome === null}
                         required
                         disabled={oipc.outcomeid && oipc.outcomeid !== 5}
-                    >   
+                    >
+                        <MenuItem disabled value={-1}>
+                            Select Inquiry Outcome
+                        </MenuItem>   
                         {oipcInquiryoutcomes.map((inquiryoutcome) => {
                             return <MenuItem key={inquiryoutcome.inquiryoutcomeid} value={inquiryoutcome.inquiryoutcomeid}>{inquiryoutcome.name}</MenuItem>
                         })}
