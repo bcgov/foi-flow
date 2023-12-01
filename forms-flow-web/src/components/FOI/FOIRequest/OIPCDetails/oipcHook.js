@@ -5,7 +5,6 @@ const useOIPCHook = () => {
   //OIPC State
   const requestDetails = useSelector((state) => state.foiRequests.foiRequestDetail);
   const stageOIPCData = (isoipcreview, oipcData) => {
-    console.log(isoipcreview)
     if (isoipcreview) {
       if (oipcData?.length > 0) {
         return oipcData.map((item, index) => {
@@ -39,7 +38,6 @@ const useOIPCHook = () => {
     setOipcData(stagedOIPCData);
   }, [isOIPCReview])
 
-  
   //OIPC Functions
   const addOIPC = () => {
     setOipcData((prev) => {
