@@ -256,7 +256,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
   const [isIAORestricted, setIsIAORestricted] = useState(false);
   const [redactedSections, setRedactedSections] = useState("");
   const [isMCFPersonal, setIsMCFPersonal] = useState(bcgovcode.replaceAll('"', '') == "MCF" && requestDetails.requestType == FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL);
-  const {oipcData, addOIPC, removeOIPC, updateOIPC, isOIPCReview, setIsOIPCReview} = useOIPCHook();
+  const {oipcData, addOIPC, removeOIPC, updateOIPC, isOIPCReview, setIsOIPCReview, removeAllOIPCs} = useOIPCHook();
   const [oipcDataInitial, setOipcDataInitial] = useState(oipcData);
 
   //Update disableInput when requestState changes
@@ -665,6 +665,9 @@ const FOIRequest = React.memo(({ userDetail }) => {
 
   const oipcSectionRef = React.useRef(null);
   const handleOipcReviewFlagChange = (isSelected) => {
+    if (!isSelected) {
+      removeAllOIPCs();
+    }
     setIsOIPCReview(isSelected);
     requestDetails.isoipcreview = isSelected;
     oipcSectionRef.current.scrollIntoView();
