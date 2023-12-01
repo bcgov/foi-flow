@@ -108,6 +108,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
 
   const [_currentrequestStatus, setcurrentrequestStatus] = React.useState("");
   const [_tabStatus, settabStatus] = React.useState(requestState);
+  
   //gets the request detail from the store
   const IsDivisionalCoordinator = () => {
     return userDetail?.role?.includes("DivisionalCoordinator");

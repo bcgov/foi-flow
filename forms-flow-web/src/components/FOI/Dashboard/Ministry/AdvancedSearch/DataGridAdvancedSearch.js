@@ -8,7 +8,8 @@ import {
   updateSortModel,
   getLDD,
   getRecordsDue,
-  LightTooltip
+  LightTooltip,
+  displayQueueFlagIcons
 } from "../../utils";
 import { ActionContext } from "./ActionContext";
 import { ConditionalComponent } from "../../../../../helper/FOI/helper";
@@ -94,6 +95,12 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
   };
 
   const columns = React.useRef([
+    {
+      field: "flags",
+      headerName: "FLAGS",
+      headerAlign: "left",
+      renderCell: displayQueueFlagIcons,
+    },
     {
       field: "axisRequestId",
       headerName: "ID NUMBER",
