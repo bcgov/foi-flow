@@ -32,10 +32,12 @@ const useOIPCHook = () => {
   }
   const [oipcData, setOipcData] = useState(requestDetails.oipcdetails);
   const [isOIPCReview, setIsOIPCReview] = useState(requestDetails.isoipcreview);
-
+  const [resettoInitial, setResettoInitial] = useState(false);
   useEffect(() => {
+    if (resettoInitial == false) {
     const stagedOIPCData = stageOIPCData(isOIPCReview, requestDetails.oipcdetails);
     setOipcData(stagedOIPCData);
+    }
   }, [isOIPCReview])
 
   //OIPC Functions
@@ -59,10 +61,16 @@ const useOIPCHook = () => {
     })
   }
   const removeOIPC = (oipcId) => {
+    if (oipcData.length == 1) {
+      setOipcData([]);  
+      setResettoInitial(true)
+    }
+    else {
     setOipcData((prev) => {
       const previousOIPCData = [...prev];
-      return previousOIPCData.filter(oipc => oipcId !== oipc.id);
+      return previousOIPCData.filter(oipc => oipcId !== oipc.id);     
     });
+  }
   }
   const updateOIPC = (newOIPCObj) => {
     setOipcData((prev) => {
