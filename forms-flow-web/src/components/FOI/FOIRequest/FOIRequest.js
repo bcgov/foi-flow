@@ -790,14 +790,20 @@ const FOIRequest = React.memo(({ userDetail }) => {
   };
 
   const handlestatusudpate = (_daysRemaining, _status, _cfrDaysRemaining) => {
-    const mappedBottomText = getTabBottomText({
-      _daysRemaining,
-      _cfrDaysRemaining,
-      _status,
-      requestExtensions,
-    });
-
-    setRequestStatus(mappedBottomText);
+    const reopenedRequest = StateEnum.closed.name.toLowerCase() !== requestDetails.currentState.toLowerCase() && requestDetails.stateTransition.some((state) => state.status.toLowerCase() ===  StateEnum.closed.name.toLowerCase());
+    if (reopenedRequest && isOIPCReview) {
+      console.log("reopened", reopenedRequest)
+      console.log("OIPC", isOIPCReview)
+      setRequestStatus("");
+    } else {
+      const mappedBottomText = getTabBottomText({
+        _daysRemaining,
+        _cfrDaysRemaining,
+        _status,
+        requestExtensions,
+      });
+      setRequestStatus(mappedBottomText);
+    }
   };
 
   const hasStatusRequestSaved = (state) => {
@@ -938,6 +944,8 @@ const FOIRequest = React.memo(({ userDetail }) => {
       requestState !== StateEnum.appfeeowing.name &&
       requestDetails?.requestType === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_GENERAL)
   }
+
+  console.log("REQ", requestDetails)
 
   return (!isLoading &&
     requestDetails &&
