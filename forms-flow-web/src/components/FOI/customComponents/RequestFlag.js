@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "./requestflag.scss";
 import OutlinedInput from "@material-ui/core/OutlinedInput";
 import MenuItem from "@material-ui/core/MenuItem";
@@ -13,8 +13,6 @@ import DialogTitle from "@material-ui/core/DialogTitle";
 import CloseIcon from "@material-ui/icons/Close";
 import IconButton from "@material-ui/core/IconButton";
 import TextField from "@mui/material/TextField";
-import { useParams } from "react-router-dom";
-import { useDispatch } from "react-redux";
 
 //Types are:
 //oipcreview
@@ -26,9 +24,13 @@ const RequestFlag = ({ isActive, type, handleSelect, showFlag = true }) => {
   const [modalMessage, setModalMessage] = useState("");
   const [modalDescription, setModalDescription] = useState("");
   
-  const { requestId, ministryId } = useParams();
-
-  const dispatch = useDispatch();
+  useEffect(() => {
+    if (isActive == null) {
+      setIsSelected(false);
+    } else {
+    setIsSelected(isActive);
+    }
+  }, [isActive])
 
   // These need to be set for each type
   let options;

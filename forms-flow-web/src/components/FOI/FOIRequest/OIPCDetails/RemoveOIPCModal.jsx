@@ -10,12 +10,12 @@ const RemoveOIPCModal= ({
     showModal,
     removeOIPC,
     setShowModal,
-    oipcid,
+    oipc,
 }) =>{ 
 
     const handleSave = () => {
         setShowModal(false);
-        removeOIPC(oipcid)
+        removeOIPC(oipc.id)
     };
     const handleClose = () => {
         setShowModal(false);

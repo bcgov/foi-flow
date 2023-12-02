@@ -163,8 +163,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
   const [attachments, setAttachments] = useState(requestAttachments);
   const [comment, setComment] = useState([]);
   const [requestState, setRequestState] = useState(StateEnum.unopened.name);
-  const disableInput =
-    requestState?.toLowerCase() === StateEnum.closed.name.toLowerCase();
+  const [disableInput, setDisableInput] = useState(requestState?.toLowerCase() === StateEnum.closed.name.toLowerCase());
   const [_tabStatus, settabStatus] = React.useState(requestState);
   let foitabheaderBG = getTabBG(_tabStatus, requestState);
 
@@ -257,8 +256,25 @@ const FOIRequest = React.memo(({ userDetail }) => {
   const [isIAORestricted, setIsIAORestricted] = useState(false);
   const [redactedSections, setRedactedSections] = useState("");
   const [isMCFPersonal, setIsMCFPersonal] = useState(bcgovcode.replaceAll('"', '') == "MCF" && requestDetails.requestType == FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL);
-  const {oipcData, addOIPC, removeOIPC, updateOIPC, isOIPCReview, setIsOIPCReview} = useOIPCHook();
-      
+  const {oipcData, addOIPC, removeOIPC, updateOIPC, isOIPCReview, setIsOIPCReview, removeAllOIPCs} = useOIPCHook();
+  const [oipcDataInitial, setOipcDataInitial] = useState(oipcData);
+
+  //Update disableInput when requestState changes
+  useEffect(() => {
+    setDisableInput(requestState?.toLowerCase() === StateEnum.closed.name.toLowerCase())
+  }, [requestState])
+
+  useEffect(() => {
+    if (!oipcDataInitial) {
+      setOipcDataInitial(oipcData);
+      return;
+    }
+    //check to see if oipcData has been updated, if so, enable save button
+    if (JSON.stringify(oipcData) != JSON.stringify(oipcDataInitial)) {
+      setDisableInput(false)
+    }
+  }, [oipcData]);
+
   useEffect(() => {
     if (window.location.href.indexOf("comments") > -1) {
       tabclick("Comments");
@@ -649,6 +665,9 @@ const FOIRequest = React.memo(({ userDetail }) => {
 
   const oipcSectionRef = React.useRef(null);
   const handleOipcReviewFlagChange = (isSelected) => {
+    if (!isSelected) {
+      removeAllOIPCs();
+    }
     setIsOIPCReview(isSelected);
     requestDetails.isoipcreview = isSelected;
     oipcSectionRef.current.scrollIntoView();
