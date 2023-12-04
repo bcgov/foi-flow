@@ -367,8 +367,6 @@ const OIPCItem = (props) => {
                         InputLabelProps={{ shrink: true }}
                         InputProps={{inputProps: { min: oipc.receiveddate ? formatDate(new Date(oipc.receiveddate)) : null } }}
                         type="date"
-                        error={(!oipc.outcomeid || oipc.outcomeid === 5) && oipc.inquiryattributes.inquirydate === null}
-                        required
                         disabled={oipc.outcomeid && oipc.outcomeid !== 5}
                     />
                 </Grid>
@@ -380,8 +378,6 @@ const OIPCItem = (props) => {
                         value={oipc.inquiryattributes.orderno}
                         onChange = {(event) => handleInquiryFields(event.target.value, "ORDERNO")}
                         InputLabelProps={{ shrink: true }}
-                        error={(!oipc.outcomeid || oipc.outcomeid === 5) && oipc.inquiryattributes.orderno === ""}
-                        required
                         disabled={oipc.outcomeid && oipc.outcomeid !== 5}
                         placeholder="Order Number"
                     />
@@ -395,8 +391,6 @@ const OIPCItem = (props) => {
                         fullWidth
                         value={oipc.inquiryattributes.inquiryoutcome ? oipc.inquiryattributes.inquiryoutcome : -1}
                         label="Outcome"
-                        error={(!oipc.outcomeid || oipc.outcomeid === 5) && oipc.inquiryattributes.inquiryoutcome === null}
-                        required
                         disabled={oipc.outcomeid && oipc.outcomeid !== 5}
                     >
                         <MenuItem disabled value={-1}>
