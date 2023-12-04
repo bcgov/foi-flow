@@ -25,7 +25,11 @@ const RequestFlag = ({ isActive, type, handleSelect, showFlag = true }) => {
   const [modalDescription, setModalDescription] = useState("");
   
   useEffect(() => {
+    if (isActive == null) {
+      setIsSelected(false);
+    } else {
     setIsSelected(isActive);
+    }
   }, [isActive])
 
   // These need to be set for each type
