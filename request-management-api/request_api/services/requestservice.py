@@ -172,13 +172,11 @@ class requestservice:
     
     def __hasreopened(self, requestid, requesttype):
         if requesttype == "rawrequest":
-            states =  FOIRawRequest.getstatenavigation(requestid)
+            states =  FOIRawRequest.getstatesummary(requestid)
         else:
-            states =  FOIMinistryRequest.getstatenavigation(requestid)
-        if len(states) == 2:
-            newstate = states[0]
-            oldstate = states[1]
-            if newstate != oldstate and oldstate == "Closed":
+            states =  FOIMinistryRequest.getstatesummary(requestid)
+        if len(states) > 0:
+            current_state = states[0]
+            if current_state != "Closed" and any(state['status'] == "Closed" for state in states):
                 return True
         return False 
-
