@@ -183,7 +183,7 @@ const OIPCItem = (props) => {
                         InputLabelProps={{ shrink: true }}
                         InputProps={{inputProps: { max: formatDate(new Date())} }}
                         type="date"
-                        error={(!oipc.outcomeid || oipc.outcomeid === 5) && oipc.receiveddate === null}
+                        error={(!oipc.outcomeid || oipc.outcomeid === 5) && oipc.receiveddate === null || oipc.receiveddate === ""}
                         required
                         disabled={oipc.outcomeid && oipc.outcomeid !== 5}
                     />
@@ -367,6 +367,8 @@ const OIPCItem = (props) => {
                         InputLabelProps={{ shrink: true }}
                         InputProps={{inputProps: { min: oipc.receiveddate ? formatDate(new Date(oipc.receiveddate)) : null } }}
                         type="date"
+                        error={oipc.inquiryattributes.orderno ? (!oipc.outcomeid || oipc.outcomeid === 5) && oipc.inquiryattributes.inquirydate === null || oipc.inquiryattributes.inquirydate === "" : false}
+                        required={oipc.inquiryattributes.orderno}
                         disabled={oipc.outcomeid && oipc.outcomeid !== 5}
                     />
                 </Grid>
@@ -378,6 +380,8 @@ const OIPCItem = (props) => {
                         value={oipc.inquiryattributes.orderno}
                         onChange = {(event) => handleInquiryFields(event.target.value, "ORDERNO")}
                         InputLabelProps={{ shrink: true }}
+                        error={oipc.inquiryattributes.inquirydate ? (!oipc.outcomeid || oipc.outcomeid === 5) && oipc.inquiryattributes.orderno === "" : false}
+                        required={oipc.inquiryattributes.inquirydate}
                         disabled={oipc.outcomeid && oipc.outcomeid !== 5}
                         placeholder="Order Number"
                     />

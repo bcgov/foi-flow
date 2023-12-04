@@ -790,20 +790,13 @@ const FOIRequest = React.memo(({ userDetail }) => {
   };
 
   const handlestatusudpate = (_daysRemaining, _status, _cfrDaysRemaining) => {
-    const reopenedRequest = StateEnum.closed.name.toLowerCase() !== requestDetails.currentState.toLowerCase() && requestDetails.stateTransition.some((state) => state.status.toLowerCase() ===  StateEnum.closed.name.toLowerCase());
-    if (reopenedRequest && isOIPCReview) {
-      console.log("reopened", reopenedRequest)
-      console.log("OIPC", isOIPCReview)
-      setRequestStatus("");
-    } else {
-      const mappedBottomText = getTabBottomText({
-        _daysRemaining,
-        _cfrDaysRemaining,
-        _status,
-        requestExtensions,
-      });
-      setRequestStatus(mappedBottomText);
-    }
+    const mappedBottomText = getTabBottomText({
+      _daysRemaining,
+      _cfrDaysRemaining,
+      _status,
+      requestExtensions,
+    });
+    setRequestStatus(mappedBottomText);
   };
 
   const hasStatusRequestSaved = (state) => {
@@ -1053,7 +1046,8 @@ const FOIRequest = React.memo(({ userDetail }) => {
           </div>
 
           <div className="foileftpanelstatus">
-            {bottomTextArray.length > 0 &&
+            {isOIPCReview && requestDetails.isreopened ? "" 
+            : bottomTextArray.length > 0 &&
               _requestStatus &&
               _requestStatus.toLowerCase().includes("days") &&
               bottomTextArray.map((text) => {
