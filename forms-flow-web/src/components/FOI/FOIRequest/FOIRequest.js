@@ -796,6 +796,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
       _status,
       requestExtensions,
     });
+    
     setRequestStatus(mappedBottomText);
   };
 
@@ -937,8 +938,6 @@ const FOIRequest = React.memo(({ userDetail }) => {
       requestState !== StateEnum.appfeeowing.name &&
       requestDetails?.requestType === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_GENERAL)
   }
-
-  console.log("REQ", requestDetails)
 
   return (!isLoading &&
     requestDetails &&
