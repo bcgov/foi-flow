@@ -562,7 +562,7 @@ class FOIMinistryRequest(db.Model):
                                 SubjectCode,
                                 SubjectCode.subjectcodeid == FOIMinistryRequestSubjectCode.subjectcodeid,
                                 isouter=True
-                            ).filter(FOIMinistryRequest.requeststatusid != 3)
+                            ).filter(or_(FOIMinistryRequest.requeststatusid != 3, and_(FOIMinistryRequest.isoipcreview == True, FOIMinistryRequest.requeststatusid == 3)))
 
         if(additionalfilter == 'watchingRequests'):
             #watchby
