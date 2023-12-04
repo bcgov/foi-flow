@@ -796,7 +796,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
       _status,
       requestExtensions,
     });
-
+    
     setRequestStatus(mappedBottomText);
   };
 
@@ -1045,7 +1045,8 @@ const FOIRequest = React.memo(({ userDetail }) => {
           </div>
 
           <div className="foileftpanelstatus">
-            {bottomTextArray.length > 0 &&
+            {isOIPCReview && requestDetails.isreopened ? "" 
+            : bottomTextArray.length > 0 &&
               _requestStatus &&
               _requestStatus.toLowerCase().includes("days") &&
               bottomTextArray.map((text) => {
