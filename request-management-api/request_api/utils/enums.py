@@ -132,6 +132,7 @@ class CommentType(Enum):
     UserComment = 1
     SystemGenerated = 2
     DivisionStages = 3
+    OIPC = 4
 
 class DocumentPathMapperCategory(Enum):
     Attachments = "Attachments"
