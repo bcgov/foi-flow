@@ -62,6 +62,8 @@ import { UnsavedModal } from "../../customComponents";
 import { DISABLE_GATHERINGRECORDS_TAB } from "../../../../constants/constants";
 import _ from "lodash";
 import { MinistryNeedsScanning } from "../../../../constants/FOI/enum";
+import {isMinistryLogin} from "../../../../helper/FOI/helper";
+import OIPCDetails from "../OIPCDetails/Index";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -235,6 +237,13 @@ const MinistryReview = React.memo(({ userDetail }) => {
   );
   const [unSavedRequest, setUnSavedRequest] = React.useState(false);
   let ministryassignedtousername = "Unassigned";
+
+  const userGroups = userDetail?.groups?.map(group => group.slice(1));
+  console.log(userGroups)
+  const isMinistry = isMinistryLogin(userGroups);
+  console.log(isMinistry)
+  console.log(requestDetails)
+
   useEffect(() => {
     const requestDetailsValue = requestDetails;
     setSaveMinistryRequestObject(requestDetailsValue);
@@ -753,6 +762,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
                             setSaveMinistryRequestObject
                           }
                           ministryAssigneeValue={ministryAssignedToValue}
+                          isMinistry={isMinistry}
                         />
                         <ApplicantDetails requestDetails={requestDetails} />
                         <ChildDetails requestDetails={requestDetails} />
@@ -768,6 +778,12 @@ const MinistryReview = React.memo(({ userDetail }) => {
                         />
                         {divisionsBox}
                         {/* <RequestNotes /> */}
+                        {requestDetails.isoipcreview && requestState && requestState.toLowerCase() !== StateEnum.intakeinprogress.name.toLowerCase() && requestState.toLowerCase() !== StateEnum.unopened.name.toLowerCase() && (
+                        <OIPCDetails 
+                          oipcData={requestDetails.oipcdetails}
+                          isMinistry={isMinistry}
+                        />
+                        )}
                         <BottomButtonGroup
                           requestState={requestState}
                           stateChanged={stateChanged}

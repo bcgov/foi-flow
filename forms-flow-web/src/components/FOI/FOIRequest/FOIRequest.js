@@ -939,6 +939,8 @@ const FOIRequest = React.memo(({ userDetail }) => {
       requestDetails?.requestType === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_GENERAL)
   }
 
+  console.log("REQ", requestDetails)
+
   return (!isLoading &&
     requestDetails &&
     Object.keys(requestDetails).length !== 0) ||
@@ -1152,6 +1154,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
                         handlestatusudpate={handlestatusudpate}
                         userDetail={userDetail}
                         disableInput={disableInput}
+                        isMinistry={false}
                         isAddRequest={isAddRequest}
                         handleOipcReviewFlagChange={handleOipcReviewFlagChange}
                         showOipcReviewFlag={requestState.toLowerCase() !== StateEnum.intakeinprogress.name.toLowerCase() && requestState.toLowerCase() !== StateEnum.unopened.name.toLowerCase()}
@@ -1277,6 +1280,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
                           updateOIPC={updateOIPC}
                           addOIPC={addOIPC}
                           removeOIPC={removeOIPC}
+                          isMinistry={false}
                         />
                       )}
 
