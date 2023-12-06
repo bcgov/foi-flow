@@ -137,7 +137,7 @@ class oipcevent:
         if oipc['event'] == EventType.add.value:
             return 'OIPC '+ oipc['reviewtype'] +' opened for '+ oipc['reason']
         elif oipc['event'] == EventType.close.value:
-            return 'OIPC '+ oipc['reviewtype'] +' closed for '+ oipc['outcome']
+            return 'OIPC '+ oipc['reviewtype'] +' closed for '+ oipc['reason']
         elif oipc['event'] == EventType.inquirychange.value:
             _inquirychange_msg = 'OIPC Inquiry Order '+ oipc['inquiryorderno'] +' compliance date due '+oipc['inquirycomplydate']
             if oipc['inquiryoutcome'] not in (None, ""):
