@@ -43,7 +43,11 @@ class notificationconfig:
         elif notificationtype == "Payment":
             return 17
         elif notificationtype == "Section 5 Pending Reminder":
-            return 20             
+            return 20
+        elif notificationtype == "OIPC":
+            return 21
+        elif notificationtype == "OIPC Due Reminder":
+            return 22               
         return 0     
     
     def getnotificationusertypeid(self, notificationusertype):
