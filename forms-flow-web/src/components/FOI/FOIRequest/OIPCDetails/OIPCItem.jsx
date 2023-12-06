@@ -360,7 +360,7 @@ const OIPCItem = (props) => {
                 <Grid item md={4}>
                     <TextField 
                         fullWidth
-                        label="Comply By Date" 
+                        label="Order Comply Date" 
                         variant="outlined" 
                         value={oipc.inquiryattributes.inquirydate ? formatDate(new Date(oipc.inquiryattributes.inquirydate)) : null}
                         onChange = {(event) => handleInquiryFields(event.target.value, "COMPLYDATE")}
@@ -394,7 +394,7 @@ const OIPCItem = (props) => {
                         onChange = {(event) => handleInquiryFields(event.target.value, "INQUIRYOUTCOME")}
                         fullWidth
                         value={oipc.inquiryattributes.inquiryoutcome ? oipc.inquiryattributes.inquiryoutcome : -1}
-                        label="Outcome"
+                        label="Inquiry Outcome"
                         disabled={oipc.outcomeid && oipc.outcomeid !== 5}
                     >
                         <MenuItem disabled value={-1}>
