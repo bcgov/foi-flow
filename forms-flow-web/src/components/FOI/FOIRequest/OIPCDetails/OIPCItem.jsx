@@ -183,7 +183,7 @@ const OIPCItem = (props) => {
                         InputLabelProps={{ shrink: true }}
                         InputProps={{inputProps: { max: formatDate(new Date())} }}
                         type="date"
-                        error={(!oipc.outcomeid || oipc.outcomeid === 5) && oipc.receiveddate === null}
+                        error={(!oipc.outcomeid || oipc.outcomeid === 5) && oipc.receiveddate === null || oipc.receiveddate === ""}
                         required
                         disabled={oipc.outcomeid && oipc.outcomeid !== 5}
                     />
@@ -360,15 +360,15 @@ const OIPCItem = (props) => {
                 <Grid item md={4}>
                     <TextField 
                         fullWidth
-                        label="Comply By Date" 
+                        label="Order Comply Date" 
                         variant="outlined" 
                         value={oipc.inquiryattributes.inquirydate ? formatDate(new Date(oipc.inquiryattributes.inquirydate)) : null}
                         onChange = {(event) => handleInquiryFields(event.target.value, "COMPLYDATE")}
                         InputLabelProps={{ shrink: true }}
                         InputProps={{inputProps: { min: oipc.receiveddate ? formatDate(new Date(oipc.receiveddate)) : null } }}
                         type="date"
-                        error={(!oipc.outcomeid || oipc.outcomeid === 5) && oipc.inquiryattributes.inquirydate === null}
-                        required
+                        error={oipc.inquiryattributes.orderno ? (!oipc.outcomeid || oipc.outcomeid === 5) && oipc.inquiryattributes.inquirydate === null || oipc.inquiryattributes.inquirydate === "" : false}
+                        required={oipc.inquiryattributes.orderno}
                         disabled={oipc.outcomeid && oipc.outcomeid !== 5}
                     />
                 </Grid>
@@ -380,8 +380,8 @@ const OIPCItem = (props) => {
                         value={oipc.inquiryattributes.orderno}
                         onChange = {(event) => handleInquiryFields(event.target.value, "ORDERNO")}
                         InputLabelProps={{ shrink: true }}
-                        error={(!oipc.outcomeid || oipc.outcomeid === 5) && oipc.inquiryattributes.orderno === ""}
-                        required
+                        error={oipc.inquiryattributes.inquirydate ? (!oipc.outcomeid || oipc.outcomeid === 5) && oipc.inquiryattributes.orderno === "" : false}
+                        required={oipc.inquiryattributes.inquirydate}
                         disabled={oipc.outcomeid && oipc.outcomeid !== 5}
                         placeholder="Order Number"
                     />
@@ -394,9 +394,7 @@ const OIPCItem = (props) => {
                         onChange = {(event) => handleInquiryFields(event.target.value, "INQUIRYOUTCOME")}
                         fullWidth
                         value={oipc.inquiryattributes.inquiryoutcome ? oipc.inquiryattributes.inquiryoutcome : -1}
-                        label="Outcome"
-                        error={(!oipc.outcomeid || oipc.outcomeid === 5) && oipc.inquiryattributes.inquiryoutcome === null}
-                        required
+                        label="Inquiry Outcome"
                         disabled={oipc.outcomeid && oipc.outcomeid !== 5}
                     >
                         <MenuItem disabled value={-1}>

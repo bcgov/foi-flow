@@ -562,7 +562,7 @@ class FOIMinistryRequest(db.Model):
                                 SubjectCode,
                                 SubjectCode.subjectcodeid == FOIMinistryRequestSubjectCode.subjectcodeid,
                                 isouter=True
-                            ).filter(FOIMinistryRequest.requeststatusid != 3)
+                            ).filter(or_(FOIMinistryRequest.requeststatusid != 3, and_(FOIMinistryRequest.isoipcreview == True, FOIMinistryRequest.requeststatusid == 3)))
 
         if(additionalfilter == 'watchingRequests'):
             #watchby
@@ -788,6 +788,33 @@ class FOIMinistryRequest(db.Model):
         finally:
             db.session.close()
         return upcomingduerecords    
+    
+    @classmethod
+    def getupcomingoipcduerecords(cls):
+        upcomingduerecords = []
+        try:
+            sql = """select axisrequestid, filenumber, fma.foiministryrequestid , fma.foiministryrequestversion, fma.foirequest_id, 
+                        frd.oipcid , frd.inquiryattributes ->> 'orderno'as  orderno, 
+                        frd.inquiryattributes ->> 'inquirydate' as duedate, frd.created_at, frd.createdby 
+                        from "FOIRequestOIPC" frd 
+                        inner join (select distinct on (fpa.foiministryrequestid) foiministryrequestid, version as foiministryrequestversion, axisrequestid, filenumber, foirequest_id, requeststatusid 
+                                    from "FOIMinistryRequests" fpa  
+                                    order by fpa.foiministryrequestid , fpa.version desc) fma on frd.foiministryrequest_id  = fma.foiministryrequestid 
+                                    and frd.foiministryrequestversion_id = fma.foiministryrequestversion and fma.requeststatusid not in (5,6,4,11,3,15) 
+                        and (frd.inquiryattributes ->> 'inquirydate')::date  between  NOW() - INTERVAL '7 DAY' AND NOW() + INTERVAL '7 DAY' 
+                        order by frd.foiministryrequest_id , frd.foiministryrequestversion_id desc;""" 
+            rs = db.session.execute(text(sql))        
+            for row in rs:
+                upcomingduerecords.append({"axisrequestid": row["axisrequestid"], "filenumber": row["filenumber"], 
+                                            "foiministryrequestid": row["foiministryrequestid"], "version": row["foiministryrequestversion"], 
+                                            "foirequest_id": row["foirequest_id"], "created_at": row["created_at"], "createdby": row["createdby"],
+                                            "orderno": row["orderno"],"duedate": row["duedate"]})
+        except Exception as ex:
+            logging.error(ex)
+            raise ex
+        finally:
+            db.session.close()
+        return upcomingduerecords 
 
     @classmethod
     def updateduedate(cls, ministryrequestid, duedate, userid)->DefaultMethodResult:

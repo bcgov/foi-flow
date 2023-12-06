@@ -20,7 +20,13 @@ class duecalculator:
             return _prevbusinessday
         else:
             return self.getpreviousbusinessday(_prevbusinessday,ca_holidays)
-
+        
+    def getpreviousbusinessday_by_n(self, duedate, ca_holidays, n):
+        _prevbusinessday = duedate
+        for i in range(n):
+            _prevbusinessday = self.getpreviousbusinessday(_prevbusinessday, ca_holidays)
+        return _prevbusinessday
+    
     def formatduedate(self,input):
         return datetimehandler().formatdate(input)
 
