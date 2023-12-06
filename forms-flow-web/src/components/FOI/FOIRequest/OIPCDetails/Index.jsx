@@ -26,27 +26,27 @@ const OIPCDetails = (props) => {
   const classes = useStyles();
   
   return (
-    <div className='request-accordian' >
+    <>  
+    {isMinistry ? 
+      <OIPCDetailsMinistry oipcData={oipcData}/> :
+      <div className='request-accordian'>
         <Accordion defaultExpanded={true}>
-        <AccordionSummary className={classes.accordionSummary} expandIcon={<ExpandMoreIcon />}>
-        <Typography className={classes.heading}>OIPC DETAILS</Typography>
-        </AccordionSummary>
-            {isMinistry ? 
-            <AccordionDetails>
-              <OIPCDetailsMinistry oipcData={oipcData}/>
-            </AccordionDetails> : 
-            <AccordionDetails>
-              <OIPCDetailsList oipcData={oipcData} removeOIPC={removeOIPC} updateOIPC={updateOIPC} />
-                <div style={{display: "flex", flexDirection: "row", alignItems: "center", margin: "7px 0px 7px 0px"}}>
-                    <button onClick={() => addOIPC()} style={{ border: "none", background: "none" }}>
-                        <FontAwesomeIcon icon={faCirclePlus}  size="lg" color="#38598A" />
-                    </button>
-                    <p style={{fontWeight: "bold", color: "#38598A"}}>Add Additional OIPC Complaint</p>
-                </div>
-            </AccordionDetails>
-            }
+          <AccordionSummary className={classes.accordionSummary} expandIcon={<ExpandMoreIcon />}>
+            <Typography className={classes.heading}>OIPC DETAILS</Typography>
+          </AccordionSummary>
+          <AccordionDetails>
+            <OIPCDetailsList oipcData={oipcData} removeOIPC={removeOIPC} updateOIPC={updateOIPC} />
+              <div style={{display: "flex", flexDirection: "row", alignItems: "center", margin: "7px 0px 7px 0px"}}>
+                  <button onClick={() => addOIPC()} style={{ border: "none", background: "none" }}>
+                      <FontAwesomeIcon icon={faCirclePlus}  size="lg" color="#38598A" />
+                  </button>
+                  <p style={{fontWeight: "bold", color: "#38598A"}}>Add Additional OIPC Complaint</p>
+              </div>
+          </AccordionDetails>
         </Accordion>
-    </div>
+      </div>
+    }
+    </>
   );
 }
 

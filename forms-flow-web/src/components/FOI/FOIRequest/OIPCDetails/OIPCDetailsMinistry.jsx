@@ -1,140 +1,151 @@
-import { TextField, FormControlLabel, Grid, Checkbox, Divider } from '@material-ui/core';
+import { Divider, Card, CardContent } from '@material-ui/core';
 import './oipcdetails.scss';
 
 const OIPCDetailsMinistry = (props) => {
     const {oipcData} = props;
 
     return (
-        <div> 
+        <Card id="applicantDetailsMinistry" className="foi-details-card">
+            <label className="foi-details-label">OIPC Details</label>
+            <CardContent >
             {oipcData.map((oipc, index) => {
                 return (
                     <>
-                    <Grid container spacing={1} key={oipc.id}>
-                        <Grid item md={3}>
-                            <TextField 
-                            fullWidth
-                            label="OIPC No" 
-                            variant="standard" 
-                            value={oipc.oipcno}
-                            InputProps={{ readOnly: true}}  
-                        />
-                        </Grid>
-                        <Grid item md={3}>
-                            <TextField 
-                                fullWidth
-                                label="Received Date" 
-                                variant="standard" 
-                                value={oipc.receiveddate}
-                                InputProps={{ readOnly: true}}  
-                            />
-                        </Grid>
-                        <Grid item md={3}>
-                            <TextField 
-                                fullWidth
-                                label="Review Type"
-                                variant="standard" 
-                                value={oipc.reviewtype}
-                                InputProps={{ readOnly: true}}  
-                            />
-                        </Grid>
-                        <Grid item md={3}>
-                            <TextField 
-                                fullWidth
-                                label="Reason"
-                                variant="standard" 
-                                value={oipc.reason}
-                                InputProps={{ readOnly: true}}  
-                            />
-                        </Grid>
-                        <Grid item md={3}>
-                            <TextField 
-                                fullWidth
-                                label="Status"
-                                variant="standard" 
-                                value={oipc.status}
-                                InputProps={{ readOnly: true}}  
-                            />
-                        </Grid>
-                        <Grid item md={3}>
-                            <TextField 
-                                fullWidth
-                                label="Investigator/Adjudicator" 
-                                variant="standard" 
-                                value={oipc.investigator}
-                                InputProps={{ readOnly: true}}  
-                            />
-                        </Grid>
-                        <Grid item md={3}>
-                            <TextField 
-                                fullWidth
-                                label="Outcome"
-                                variant="standard" 
-                                value={oipc.outcome}
-                                InputProps={{ readOnly: true}}  
-                            />
-                        </Grid>
-                        <Grid item md={3}>
-                            <TextField 
-                                fullWidth
-                                label="Closed Date" 
-                                variant="standard" 
-                                value={oipc.closeddate}
-                                InputProps={{ readOnly: true}}  
-                            />
-                        </Grid>
-                        </Grid>
-                        <div style={{display:"flex", flexDirection: "row", justifyContent: "space-between"}}>
-                        <div style={{display:"flex", flexDirection: "row", alignItems: "center"}}>
-                            <p style={{padding: "7px 15px 0px", fontSize: "15px"}}>In Inquiry?</p>
-                            <FormControlLabel control={<Checkbox 
-                                checked={oipc.isinquiry} 
-                                disabled
-                                />} 
-                                label="Yes" 
-                                />
-                            <FormControlLabel control={<Checkbox 
-                                checked={!oipc.isinquiry} 
-                                disabled
-                                />} 
-                                label="No" 
-                                />
+                    <div className="row foi-details-row " key={oipc.id}>
+
+                        <div className="col-lg-3 foi-details-col"  style={{paddingBottom: "15px"}}>
+                            <div>
+                                <b>Order No</b>
+                             </div>
+                            <div>
+                                <span>{oipc.oipcno}</span>
+                            </div>
                         </div>
-                        <div style={{display:"flex", flexDirection: "row", alignItems: "center"}}>
-                            <p style={{padding: "7px 15px 0px", fontSize: "15px"}}>In Judicial Review?</p>
-                            <FormControlLabel control={<Checkbox 
-                                checked={oipc.isjudicialreview} 
-                                disabled
-                                />} 
-                                label="Yes" 
-                                />
-                            <FormControlLabel control={<Checkbox 
-                                checked={!oipc.isjudicialreview} 
-                                disabled
-                                />} 
-                                label="No" 
-                                />
+
+                        <div className="col-lg-3 foi-details-col"  style={{paddingBottom: "15px"}}>
+                            <div>
+                                <b>Received Date</b>
+                             </div>
+                            <div>
+                                <span>{oipc.receiveddate}</span>
+                            </div>
                         </div>
-                        <div style={{display:"flex", flexDirection: "row", alignItems: "center"}}>
-                            <p style={{padding: "7px 15px 0px", fontSize: "15px"}}>In Subsequent Appeal?</p>
-                            <FormControlLabel control={<Checkbox 
-                                checked={oipc.issubsequentappeal} 
-                                disabled
-                                />} 
-                                label="Yes"
-                                />
-                            <FormControlLabel control={<Checkbox 
-                                checked={!oipc.issubsequentappeal} 
-                                disabled
-                                />} 
-                                label="No" 
-                                />
+
+                        <div className="col-lg-3 foi-details-col"  style={{paddingBottom: "15px"}}>
+                            <div>
+                                <b>Review Type</b>
+                             </div>
+                            <div>
+                                <span>{oipc.reviewetype}</span>
+                            </div>
+                        </div>
+
+                        <div className="col-lg-3 foi-details-col"  style={{paddingBottom: "15px"}}>
+                            <div>
+                                <b>Reason</b>
+                             </div>
+                            <div>
+                                <span>{oipc.reason}</span>
+                            </div>
+                        </div>
+  
+                        <div className="col-lg-3 foi-details-col"  style={{paddingBottom: "15px"}}>
+                            <div>
+                                <b>Status</b>
+                             </div>
+                            <div>
+                                <span>{oipc.status}</span>
+                            </div>
+                        </div>
+
+                        <div className="col-lg-3 foi-details-col"  style={{paddingBottom: "15px"}}>
+                            <div>
+                                <b>Investigator/Adjudicator</b>
+                             </div>
+                            <div>
+                                <span>{oipc.investigator ? oipc.investigator : "N/A"}</span>
+                            </div>
+                        </div>
+
+                        <div className="col-lg-3 foi-details-col"  style={{paddingBottom: "15px"}}>
+                            <div>
+                                <b>Outcome</b>
+                             </div>
+                            <div>
+                                <span>{oipc.outcome ? oipc.outcome : "N/A"}</span>
+                            </div>
+                        </div>
+
+                        <div className="col-lg-3 foi-details-col"  style={{paddingBottom: "15px"}}>
+                            <div>
+                                <b>Closed Date</b>
+                             </div>
+                            <div>
+                                <span>{oipc.closedate ? oipc.closedate : "N/A"}</span>
+                            </div>
+                        </div>
+
+                        <div className="col-lg-3 foi-details-col"  style={{paddingBottom: "15px"}}>
+                            <div>
+                                <b>In Inquiry?</b>
+                             </div>
+                            <div>
+                                <span>{oipc.isinquiry ? "Yes" : "No"}</span>
+                            </div>
+                        </div>
+
+                        <div className="col-lg-3 foi-details-col"  style={{paddingBottom: "15px"}}>
+                            <div>
+                                <b>In Judical Review?</b>
+                             </div>
+                            <div>
+                                <span>{oipc.isjudicialreview ? "Yes" : "No"}</span>
+                            </div>
+                        </div>
+
+                        <div className="col-lg-3 foi-details-col"  style={{paddingBottom: "15px"}}>
+                            <div>
+                                <b>In Subsequent Appeal?</b>
+                             </div>
+                            <div>
+                                <span>{oipc.issubsequentappeal ? "Yes" : "No"}</span>
+                            </div>
+                        </div>
+                    </div>
+                    {oipc.inquiryattributes &&
+                        <div className="row foi-details-row "> 
+                        <div className="col-lg-3 foi-details-col"  style={{paddingBottom: "15px"}}>
+                            <div>
+                                <b>Order Comply Date</b>
+                            </div>
+                            <div>
+                                <span>{oipc.inquiryattributes.inquirydate ? oipc.inquiryattributes.inquirydate : "N/A"}</span>
+                            </div>
+                        </div>
+                        <div className="col-lg-3 foi-details-col"  style={{paddingBottom: "15px"}}>
+                            <div>
+                                <b>Order No</b>
+                            </div>
+                            <div>
+                                <span>{oipc.inquiryattributes.orderno ? oipc.inquiryattributes.orderno : "N/A"}</span>
+                            </div>
+                        </div>
+                        <div className="col-lg-3 foi-details-col"  style={{paddingBottom: "15px"}}>
+                            <div>
+                                <b>Inquiry Outcome</b>
+                            </div>
+                            <div>
+                                <span>{oipc.inquiryattributes.inquiryoutcome ? oipc.inquiryattributes.inquiryoutcome : "N/A"}</span>
+                            </div>
                         </div>
                         </div>
-                    {index !== (oipcData?.length - 1)  && <Divider/>}
+                    }
+                    {index !== (oipcData?.length - 1)  && <Divider style={{margin: "20px"}} />}
                     </>
                 )
             })}
-        </div>
+            </CardContent>
+        </Card>
     );
 }
 

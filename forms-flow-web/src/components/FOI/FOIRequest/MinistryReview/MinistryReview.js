@@ -239,11 +239,8 @@ const MinistryReview = React.memo(({ userDetail }) => {
   let ministryassignedtousername = "Unassigned";
 
   const userGroups = userDetail?.groups?.map(group => group.slice(1));
-  console.log(userGroups)
   const isMinistry = isMinistryLogin(userGroups);
-  console.log(isMinistry)
-  console.log(requestDetails)
-
+  
   useEffect(() => {
     const requestDetailsValue = requestDetails;
     setSaveMinistryRequestObject(requestDetailsValue);
