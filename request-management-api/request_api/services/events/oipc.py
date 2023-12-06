@@ -93,6 +93,7 @@ class oipcevent:
         return {'oipcno': self.__getoipcnumber(oipc), 
         'reviewtype': self.__getoipcreviewtype(oipc), 
         'reason':self.__getreason(oipc),
+        'outcome': self.__getoutcome(oipc),
         'inquirycomplydate': self.__getinquirycomplydate(oipc),
         'inquiryorderno': self.__getinquirycomplydate(oipc),
         'inquiryoutcome': self.__getinquiryoutcome(oipc, inquiryoutcomes),
@@ -136,7 +137,7 @@ class oipcevent:
         if oipc['event'] == EventType.add.value:
             return 'OIPC '+ oipc['reviewtype'] +' opened for '+ oipc['reason']
         elif oipc['event'] == EventType.close.value:
-            return 'OIPC '+ oipc['reviewtype'] +' closed for '+ oipc['reason']
+            return 'OIPC '+ oipc['reviewtype'] +' closed for '+ oipc['outcome']
         elif oipc['event'] == EventType.inquirychange.value:
             _inquirychange_msg = 'OIPC Inquiry Order '+ oipc['inquiryorderno'] +' compliance date due '+oipc['inquirycomplydate']
             if oipc['inquiryoutcome'] not in (None, ""):
