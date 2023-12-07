@@ -939,7 +939,6 @@ const FOIRequest = React.memo(({ userDetail }) => {
       requestDetails?.requestType === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_GENERAL)
   }
 
-  console.log("REQ", requestDetails)
 
   return (!isLoading &&
     requestDetails &&
