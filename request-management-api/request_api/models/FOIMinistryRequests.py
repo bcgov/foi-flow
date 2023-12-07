@@ -27,6 +27,7 @@ from dateutil import parser
 from request_api.utils.enums import StateName
 from .FOIMinistryRequestSubjectCodes import FOIMinistryRequestSubjectCode
 from .SubjectCodes import SubjectCode
+from .FOIRequestOIPC import FOIRequestOIPC
 
 class FOIMinistryRequest(db.Model):
     # Name of the table in our database
@@ -364,7 +365,7 @@ class FOIMinistryRequest(db.Model):
         if(len(filterfields) > 0 and keyword is not None):
             filtercondition = []
 
-            if(keyword != "restricted" and keyword.lower() != "oipc"):
+            if(keyword != "restricted"):
                 for field in filterfields:
                     filtercondition.append(FOIMinistryRequest.findfield(field, iaoassignee, ministryassignee).ilike('%'+keyword+'%'))
             else:
@@ -491,7 +492,8 @@ class FOIMinistryRequest(db.Model):
             FOIRestrictedMinistryRequest.isrestricted.label('isiaorestricted'),
             ministry_restricted_requests.isrestricted.label('isministryrestricted'),
             SubjectCode.name.label('subjectcode'),
-            FOIMinistryRequest.isoipcreview.label('isoipcreview')
+            FOIMinistryRequest.isoipcreview.label('isoipcreview'),
+            FOIRequestOIPC.oipcno.label('oipc_number')
         ]
 
         basequery = _session.query(
@@ -561,6 +563,10 @@ class FOIMinistryRequest(db.Model):
                             ).join(
                                 SubjectCode,
                                 SubjectCode.subjectcodeid == FOIMinistryRequestSubjectCode.subjectcodeid,
+                                isouter=True
+                            ).join(
+                                FOIRequestOIPC,
+                                and_(FOIRequestOIPC.foiministryrequest_id == FOIMinistryRequest.foiministryrequestid, FOIRequestOIPC.foiministryrequestversion_id == FOIMinistryRequest.version),
                                 isouter=True
                             ).filter(or_(FOIMinistryRequest.requeststatusid != 3, and_(FOIMinistryRequest.isoipcreview == True, FOIMinistryRequest.requeststatusid == 3)))
 
@@ -668,7 +674,9 @@ class FOIMinistryRequest(db.Model):
             'ministry': func.upper(ProgramArea.bcgovcode),
             'requestPageCount': FOIMinistryRequest.requestpagecount,
             'closedate': FOIMinistryRequest.closedate,
-            'subjectcode': SubjectCode.name
+            'subjectcode': SubjectCode.name,
+            'isoipcreview': FOIMinistryRequest.isoipcreview,
+            'oipc_number': FOIRequestOIPC.oipcno
         }.get(x, FOIMinistryRequest.axisrequestid)
 
     @classmethod
@@ -1038,7 +1046,8 @@ class FOIMinistryRequest(db.Model):
             FOIRestrictedMinistryRequest.isrestricted.label('isiaorestricted'),
             ministry_restricted_requests.isrestricted.label('isministryrestricted'),
             SubjectCode.name.label('subjectcode'),
-            FOIMinistryRequest.isoipcreview.label('isoipcreview')
+            FOIMinistryRequest.isoipcreview.label('isoipcreview'),
+            FOIRequestOIPC.oipcno.label('oipc_number')
         ]
 
         basequery = _session.query(
@@ -1108,6 +1117,10 @@ class FOIMinistryRequest(db.Model):
                             ).join(
                                 SubjectCode,
                                 SubjectCode.subjectcodeid == FOIMinistryRequestSubjectCode.subjectcodeid,
+                                isouter=True
+                            ).join(
+                                FOIRequestOIPC,
+                                and_(FOIRequestOIPC.foiministryrequest_id == FOIMinistryRequest.foiministryrequestid, FOIRequestOIPC.foiministryrequestversion_id == FOIMinistryRequest.version),
                                 isouter=True
                             )
 
@@ -1200,6 +1213,11 @@ class FOIMinistryRequest(db.Model):
             requesttypecondition = FOIMinistryRequest.getfilterforrequesttype(params, iaoassignee, ministryassignee)
             filtercondition.append(requesttypecondition)
         
+        #request flags: restricted, oipc, phased
+        if(len(params['requestflags']) > 0):
+            requestflagscondition = FOIMinistryRequest.getfilterforrequestflags(params, iaoassignee, ministryassignee)
+            filtercondition.append(requestflagscondition)
+
         #public body: EDUC, etc.
         if(len(params['publicbody']) > 0):
             publicbodycondition = FOIMinistryRequest.getfilterforpublicbody(params, iaoassignee, ministryassignee)
@@ -1245,6 +1263,26 @@ class FOIMinistryRequest(db.Model):
         for type in params['requesttype']:
             requesttypecondition.append(FOIMinistryRequest.findfield('requestType', iaoassignee, ministryassignee) == type)
         return or_(*requesttypecondition)
+
+    @classmethod
+    def getfilterforrequestflags(cls, params, iaoassignee, ministryassignee):
+        #request flags: restricted, oipc, phased
+        requestflagscondition = []
+        #alias for getting ministry restricted flag from FOIRestrictedMinistryRequest
+        ministry_restricted_requests = aliased(FOIRestrictedMinistryRequest)
+
+        for flag in params['requestflags']:
+            if (flag.lower() == 'restricted'):
+                if(iaoassignee):
+                    requestflagscondition.append(FOIRestrictedMinistryRequest.isrestricted == True)
+                elif (ministryassignee):
+                    requestflagscondition.append(ministry_restricted_requests.isrestricted == True)
+            if (flag.lower() == 'oipc'):
+                requestflagscondition.append(FOIMinistryRequest.findfield('isoipcreview', iaoassignee, ministryassignee) == True)
+            if (flag.lower() == 'phased'):
+                # requestflagscondition.append(FOIMinistryRequest.findfield('isphasedrelease', iaoassignee, ministryassignee) == True)
+                continue
+        return or_(*requestflagscondition)
 
     @classmethod
     def getfilterforpublicbody(cls, params, iaoassignee, ministryassignee):
