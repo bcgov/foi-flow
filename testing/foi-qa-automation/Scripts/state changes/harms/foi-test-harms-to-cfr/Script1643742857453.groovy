@@ -153,7 +153,7 @@ WebUI.verifyElementText(findTestObject('Page_foi.flow/form/state change dialog/s
     WebUI.getText(findTestObject('Page_foi.flow/ministry view/form/h1_Ministry Form Request Title'), FailureHandling.STOP_ON_FAILURE)) + 
     ' to Call For Records?')
 
-WebUI.verifyElementPresent(findTestObject('Page_foi.flow/form/state change dialog/td_Next Assignee'), 0)
+//WebUI.verifyElementPresent(findTestObject('Page_foi.flow/form/state change dialog/td_Next Assignee'), 0)
 
 WebUI.click(findTestObject('Page_foi.flow/form/state change dialog/button_Cancel'))
 

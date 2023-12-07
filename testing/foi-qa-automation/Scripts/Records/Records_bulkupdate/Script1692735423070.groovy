@@ -97,12 +97,12 @@ WebUI.click(findTestObject('Page_foi.flow/ministry view/form/divisional tracking
 
 WebUI.click(findTestObject('Page_foi.flow/ministry view/form/divisional tracking/button_Add division to track'), FailureHandling.STOP_ON_FAILURE)
 
-WebUI.click(findTestObject('Page_foi.flow/ministry view/form/divisional tracking/div_ministry division dropdown row 2'))
+WebUI.click(findTestObject('Records/input_Select Division_mui-137'))
 
 WebUI.click(findTestObject('Page_foi.flow/ministry view/form/divisional tracking/division dropdown options/li_Ministers Office'), 
     FailureHandling.STOP_ON_FAILURE)
 
-WebUI.click(findTestObject('Records/input_Select Division Stage_mui-55'), FailureHandling.STOP_ON_FAILURE)
+WebUI.click(findTestObject('Records/input_Select Division Stage_mui-138'), FailureHandling.STOP_ON_FAILURE)
 
 WebUI.click(findTestObject('Page_foi.flow/ministry view/form/divisional tracking/stage dropdown options/li_Clarification'), 
     FailureHandling.STOP_ON_FAILURE)
@@ -162,33 +162,33 @@ WebUI.click(findTestObject('Records/div_Records'))
 
 WebUI.delay(8)
 
-WebUI.click(findTestObject('Records/Page_EDU-2099-23761/input_foiedu, foiedu_selectchk14988'))
+WebUI.click(findTestObject('Records/input_foiedu, foiedu_selectchk14988'))
 
-WebUI.click(findTestObject('Records/Page_EDU-2099-23761/svg_INCOMPATIBLE_svg-inline--fa fa-pen-to-square fa-w-16 fa-lg'))
+WebUI.click(findTestObject('Records/svg_INCOMPATIBLE_svg-inline--fa fa-pen-to-square fa-w-16 fa-lg'))
 
-WebUI.click(findTestObject('Records/Page_EDU-2099-23761/span_MINISTERS OFFICE'))
+WebUI.click(findTestObject('Records/span_MINISTERS OFFICE (2)'))
 
-WebUI.click(findTestObject('Records/Page_EDU-2099-23761/button_Continue'))
+WebUI.click(findTestObject('Records/button_Continue (3)'))
 
 WebUI.delay(8)
 
-WebUI.click(findTestObject('Records/Page_EDU-2099-23761/input_foiedu, foiedu_selectchk14988'))
+WebUI.click(findTestObject('Records/input_foiedu, foiedu_selectchk14988'))
 
-WebUI.click(findTestObject('Records/Page_EDU-2099-23761/button_INCOMPATIBLE_btn'))
+WebUI.click(findTestObject('Records/button_INCOMPATIBLE_btn'))
 
-WebUI.click(findTestObject('Records/Page_EDU-2099-23761/button_Continue'))
+WebUI.click(findTestObject('Records/button_Continue (3)'))
 
-WebUI.click(findTestObject('Records/Page_EDU-2099-23761/svg_INCOMPATIBLE_svg-inline--fa fa-link-slash fa-w-20 fa-lg'))
+WebUI.click(findTestObject('Records/svg_INCOMPATIBLE_svg-inline--fa fa-link-slash fa-w-20 fa-lg'))
 
-WebUI.click(findTestObject('Records/Page_EDU-2099-24068/button_Continue'))
+WebUI.click(findTestObject('Records/button_Continue (2)'))
 
-WebUI.verifyElementText(findTestObject('Records/Page_EDU-2099-24068/span_Ministers Office'), 'Minister\'s Office')
+WebUI.verifyElementText(findTestObject('Records/span_Ministers Office (1)'), 'Deputy Minister\'s Office')
 
-WebUI.click(findTestObject('Records/Page_EDU-2099-23761/input_INCOMPATIBLE_selectallchk'))
+WebUI.click(findTestObject('Page_Log in to FOI/input_INCOMPATIBLE_selectallchk'))
 
-WebUI.click(findTestObject('Records/Page_EDU-2099-23761/button_INCOMPATIBLE_btn'))
+WebUI.click(findTestObject('Records/button_INCOMPATIBLE_btn'))
 
-WebUI.click(findTestObject('Records/Page_EDU-2099-24068/button_Continue'))
+WebUI.click(findTestObject('Records/button_Continue (2)'))
 
 ministryUser.close()
 

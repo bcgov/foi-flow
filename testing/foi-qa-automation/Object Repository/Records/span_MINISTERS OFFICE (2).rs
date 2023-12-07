@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <WebElementEntity>
    <description></description>
-   <name>span_MINISTERS OFFICE</name>
+   <name>span_MINISTERS OFFICE (2)</name>
    <tag></tag>
    <elementGuidId>7e5be943-164a-4610-9062-5a385f854b5b</elementGuidId>
    <selectorCollection>
       <entry>
-         <key>XPATH</key>
-         <value>//div[@id='1updateTag']/span</value>
-      </entry>
-      <entry>
          <key>CSS</key>
          <value>#1updateTag > span.MuiChip-label.MuiChip-labelSmall.css-1pjtbja</value>
+      </entry>
+      <entry>
+         <key>XPATH</key>
+         <value>//div[@id='1updateTag']/span</value>
       </entry>
    </selectorCollection>
    <selectorMethod>XPATH</selectorMethod>
