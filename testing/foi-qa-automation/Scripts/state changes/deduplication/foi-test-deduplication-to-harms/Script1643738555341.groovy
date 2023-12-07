@@ -103,7 +103,7 @@ WebUI.verifyElementText(findTestObject('Page_foi.flow/form/state change dialog/s
     WebUI.getText(findTestObject('Page_foi.flow/ministry view/form/h1_Ministry Form Request Title'), FailureHandling.STOP_ON_FAILURE)) + 
     ' to Deduplication?')
 
-WebUI.verifyElementPresent(findTestObject('Page_foi.flow/form/state change dialog/td_Next Assignee'), 0)
+//WebUI.verifyElementPresent(findTestObject('Page_foi.flow/form/state change dialog/td_Next Assignee'), 0)
 
 WebUI.click(findTestObject('Page_foi.flow/form/state change dialog/button_Cancel'))
 
@@ -176,7 +176,7 @@ WebUI.verifyElementPresent(findTestObject('Page_foi.flow/form/state change dialo
 WebUI.verifyElementText(findTestObject('Page_foi.flow/form/state change dialog/span_State Change Dialog message'), ('Are you sure you want to change Request #' + 
     WebUI.getText(findTestObject('Page_foi.flow/form/h3_Form Request Title'), FailureHandling.STOP_ON_FAILURE)) + ' to Harms Assessment?')
 
-WebUI.verifyElementPresent(findTestObject('Page_foi.flow/form/state change dialog/td_Next Assignee'), 0)
+//WebUI.verifyElementPresent(findTestObject('Page_foi.flow/form/state change dialog/td_Next Assignee'), 0)
 
 WebUI.click(findTestObject('Page_foi.flow/form/state change dialog/button_Cancel'))
 

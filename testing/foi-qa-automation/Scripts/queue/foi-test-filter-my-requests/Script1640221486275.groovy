@@ -77,6 +77,10 @@ WebUI.click(findTestObject('Page_foi.flow/queue/div_request queue row 1'))
 
 WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
 
+WebUI.refresh()
+
+WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
+
 WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/div_Status'))
 
 WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
@@ -103,11 +107,11 @@ WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
 
 WebUI.verifyElementPresent(findTestObject('Page_foi.flow/queue/div_request queue row 1'), 0)
 
-assert WebUI.getAttribute(findTestObject('Page_foi.flow/queue/div_My Requests'), 'class').contains('MuiButtonBase-root MuiChip-root MuiChip-outlined MuiChip-sizeSmall MuiChip-colorDefault MuiChip-clickable MuiChip-clickableColorDefault MuiChip-outlinedDefault css-zo9we2')
+assert WebUI.getAttribute(findTestObject('Page_foi.flow/queue/div_My Requests'), 'class').contains('MuiButtonBase-root MuiChip-root MuiChip-outlined MuiChip-sizeSmall MuiChip-colorDefault MuiChip-clickable MuiChip-clickableColorDefault MuiChip-outlinedDefault css-9il5p3')
 
-assert WebUI.getAttribute(findTestObject('Page_foi.flow/queue/div_Watching Requests'), 'class').contains('MuiButtonBase-root MuiChip-root MuiChip-outlined MuiChip-sizeSmall MuiChip-colorDefault MuiChip-clickable MuiChip-clickableColorDefault MuiChip-outlinedDefault css-zo9we2')
+assert WebUI.getAttribute(findTestObject('Page_foi.flow/queue/div_Watching Requests'), 'class').contains('MuiButtonBase-root MuiChip-root MuiChip-outlined MuiChip-sizeSmall MuiChip-colorDefault MuiChip-clickable MuiChip-clickableColorDefault MuiChip-outlinedDefault css-9il5p3')
 
-assert WebUI.getAttribute(findTestObject('Page_foi.flow/queue/div_My Team Requests'), 'class').contains('MuiButtonBase-root MuiChip-root MuiChip-filled MuiChip-sizeSmall MuiChip-colorDefault MuiChip-clickable MuiChip-clickableColorDefault MuiChip-filledDefault css-1uoxw5f')
+assert WebUI.getAttribute(findTestObject('Page_foi.flow/queue/div_My Team Requests'), 'class').contains('MuiButtonBase-root MuiChip-root MuiChip-filled MuiChip-sizeSmall MuiChip-colorDefault MuiChip-clickable MuiChip-clickableColorDefault MuiChip-filledDefault css-i4mp6r')
 
 WebUI.refresh()
 

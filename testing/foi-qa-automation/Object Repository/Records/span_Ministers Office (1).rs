@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <WebElementEntity>
    <description></description>
-   <name>span_Ministers Office</name>
+   <name>span_Ministers Office (1)</name>
    <tag></tag>
    <elementGuidId>81038e8b-fd78-4609-ba85-b07ac247732d</elementGuidId>
    <selectorCollection>
@@ -11,7 +11,6 @@
       </entry>
       <entry>
          <key>CSS</key>
-         <value></value>
       </entry>
       <entry>
          <key>XPATH</key>

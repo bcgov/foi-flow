@@ -10,12 +10,10 @@
          <value>id(&quot;Records&quot;)/div[@class=&quot;jss84&quot;]/div[@class=&quot;MuiGrid-root MuiGrid-container MuiGrid-spacing-xs-1 MuiGrid-align-items-xs-flex-start&quot;]/div[@class=&quot;MuiGrid-root MuiGrid-container MuiGrid-item MuiGrid-align-items-xs-flex-start MuiGrid-grid-xs-12&quot;]/span[2]/button[@class=&quot;btn&quot;]/svg[@class=&quot;svg-inline--fa fa-pen-to-square fa-w-16 fa-lg&quot;]/path[1]</value>
       </entry>
       <entry>
-         <key>XPATH</key>
-         <value></value>
+         <key>CSS</key>
       </entry>
       <entry>
-         <key>CSS</key>
-         <value></value>
+         <key>XPATH</key>
       </entry>
    </selectorCollection>
    <selectorMethod>BASIC</selectorMethod>
