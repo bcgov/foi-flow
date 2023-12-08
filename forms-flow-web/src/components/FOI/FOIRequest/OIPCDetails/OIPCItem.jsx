@@ -24,24 +24,6 @@ const OIPCItem = (props) => {
     const [showAmendModal, setShowAmendModal] = useState(false);
     
     //Functions
-    const generateNamesFromOIPCId = (oipcObj) => {
-        const reviewtype = oipcReviewtypes.find(reviewtype => reviewtype.reviewtypeid === oipcObj.reviewtypeid && reviewtype.reasonid === oipcObj.reasonid);
-        const status = oipcStatuses.find(status => status.statusid === oipcObj.statusid);
-        const outcome = oipcOutcomes.find(outcome => outcome.outcomeid === oipcObj.outcomeid);
-
-        setOipc((prev) => {
-            return {...prev, reviewtypeName: reviewtype ? reviewtype.type_name : ""}
-        })
-        setOipc((prev) => {
-            return {...prev, statusName: status ? status.name : ""}
-        })
-        setOipc((prev) => {
-            return {...prev, outcomeName: outcome ? outcome.name : ""}
-        })
-        setOipc((prev) => {
-            return {...prev, reasonName: reviewtype ? reviewtype.reason_name : ""}
-        })
-    }
     const uniqueReviewTypes = (oipcReviewTypes) => {
         const uniqeValues = {};
         return oipcReviewTypes.filter(reviewtype => !uniqeValues[reviewtype.type_name] && (uniqeValues[reviewtype.type_name] = true));
@@ -142,8 +124,9 @@ const OIPCItem = (props) => {
 
     useEffect(() => {
         setOipc(oipcObj);
-        generateNamesFromOIPCId(oipc);
     }, [oipcObj])
+
+    console.log("OIPC", oipc)
 
     return (
         <> 
