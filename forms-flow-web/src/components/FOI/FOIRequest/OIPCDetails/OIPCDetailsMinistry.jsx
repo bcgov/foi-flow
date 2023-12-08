@@ -6,7 +6,7 @@ const OIPCDetailsMinistry = (props) => {
 
     return (
         <Card id="applicantDetailsMinistry" className="foi-details-card">
-            <label className="foi-details-label">OIPC Details</label>
+            <label className="foi-details-label">OIPC DETAILS</label>
             <CardContent >
             {oipcData.map((oipc, index) => {
                 return (
