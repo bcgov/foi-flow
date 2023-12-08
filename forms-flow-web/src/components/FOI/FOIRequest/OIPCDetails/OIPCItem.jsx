@@ -126,8 +126,6 @@ const OIPCItem = (props) => {
         setOipc(oipcObj);
     }, [oipcObj])
 
-    console.log("OIPC", oipc)
-
     return (
         <> 
             <div style={{display: "flex", flexDirection: "row", justifyContent: "flex-end"}}>
