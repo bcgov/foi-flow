@@ -96,6 +96,33 @@ const OIPCDetailsMinistry = (props) => {
 
                         <div className="col-lg-3 foi-details-col"  style={{paddingBottom: "15px"}}>
                             <div>
+                                <b>Inquiry Order Comply Date</b>
+                            </div>
+                            <div>
+                                <span>{oipc.inquiryattributes?.inquirydate ? oipc.inquiryattributes.inquirydate : "N/A"}</span>
+                            </div>
+                        </div>
+
+                        <div className="col-lg-3 foi-details-col"  style={{paddingBottom: "15px"}}>
+                            <div>
+                                <b>Inquiry Order No</b>
+                            </div>
+                            <div>
+                                <span>{oipc.inquiryattributes?.orderno ? oipc.inquiryattributes.orderno : "N/A"}</span>
+                            </div>
+                        </div>
+
+                        <div className="col-lg-3 foi-details-col"  style={{paddingBottom: "15px"}}>
+                            <div>
+                                <b>Inquiry Outcome</b>
+                            </div>
+                            <div>
+                                <span>{oipc.inquiryattributes?.inquiryoutcome ? oipc.inquiryattributes.inquiryoutcome : "N/A"}</span>
+                            </div>
+                        </div>
+
+                        <div className="col-lg-3 foi-details-col"  style={{paddingBottom: "15px"}}>
+                            <div>
                                 <b>In Judical Review?</b>
                              </div>
                             <div>
@@ -112,34 +139,6 @@ const OIPCDetailsMinistry = (props) => {
                             </div>
                         </div>
                     </div>
-                    {oipc.inquiryattributes &&
-                        <div className="row foi-details-row "> 
-                        <div className="col-lg-3 foi-details-col"  style={{paddingBottom: "15px"}}>
-                            <div>
-                                <b>Order Comply Date</b>
-                            </div>
-                            <div>
-                                <span>{oipc.inquiryattributes.inquirydate ? oipc.inquiryattributes.inquirydate : "N/A"}</span>
-                            </div>
-                        </div>
-                        <div className="col-lg-3 foi-details-col"  style={{paddingBottom: "15px"}}>
-                            <div>
-                                <b>Order No</b>
-                            </div>
-                            <div>
-                                <span>{oipc.inquiryattributes.orderno ? oipc.inquiryattributes.orderno : "N/A"}</span>
-                            </div>
-                        </div>
-                        <div className="col-lg-3 foi-details-col"  style={{paddingBottom: "15px"}}>
-                            <div>
-                                <b>Inquiry Outcome</b>
-                            </div>
-                            <div>
-                                <span>{oipc.inquiryattributes.inquiryoutcome ? oipc.inquiryattributes.inquiryoutcome : "N/A"}</span>
-                            </div>
-                        </div>
-                        </div>
-                    }
                     {index !== (oipcData?.length - 1)  && <Divider style={{margin: "20px"}} />}
                     </>
                 )
