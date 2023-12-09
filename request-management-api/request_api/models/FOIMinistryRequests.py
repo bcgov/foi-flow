@@ -1316,12 +1316,11 @@ class FOIMinistryRequest(db.Model):
             elif(params['search'] == 'oipc_number'):
                 searchcondition1 = []
                 searchcondition2 = []
-                searchcondition3 = []
                 for keyword in params['keywords']:
-                    searchcondition1.append(FOIRequestOIPC.foiministryrequest_id == FOIMinistryRequest.foiministryrequestid)
-                    searchcondition2.append(FOIRequestOIPC.foiministryrequestversion_id == FOIMinistryRequest.version) 
-                    searchcondition3.append(FOIRequestOIPC.oipcno==keyword)                    
-                return and_(and_(*searchcondition1), and_(*searchcondition2), and_(*searchcondition3))
+                    oipccondition = FOIRequestOIPC.getrequestidsbyoipcno(keyword)
+                    searchcondition1.append(oipccondition.c.foiministryrequest_id == FOIMinistryRequest.foiministryrequestid)
+                    searchcondition2.append(oipccondition.c.foiministryrequestversion_id == FOIMinistryRequest.version) 
+                return and_(and_(*searchcondition1), and_(*searchcondition2))
             else:
                 searchcondition = []
                 for keyword in params['keywords']:
