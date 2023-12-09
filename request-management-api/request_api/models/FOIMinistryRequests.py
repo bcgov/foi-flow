@@ -1320,7 +1320,7 @@ class FOIMinistryRequest(db.Model):
                 for keyword in params['keywords']:
                     searchcondition1.append(FOIRequestOIPC.foiministryrequest_id == FOIMinistryRequest.foiministryrequestid)
                     searchcondition2.append(FOIRequestOIPC.foiministryrequestversion_id == FOIMinistryRequest.version) 
-                    searchcondition3.append(FOIRequestOIPC.oipcno.ilike('%'+keyword+'%'))
+                    searchcondition3.append(FOIRequestOIPC.oipcno==keyword)                    
                 return and_(and_(*searchcondition1), and_(*searchcondition2), and_(*searchcondition3))
             else:
                 searchcondition = []
