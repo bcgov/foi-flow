@@ -115,4 +115,4 @@ class FOIRawRequestNotification(db.Model):
     
 class FOIRawRequestNotificationSchema(ma.Schema):
     class Meta:
-        fields = ('notificationid', 'requestid', 'idnumber','notification', 'notificationtypelabel','created_at','createdby','updated_at','updatedby','notificationusers') 
+        fields = ('notificationid', 'requestid', 'idnumber','notification', 'notificationtypeid', 'notificationtypelabel','created_at','createdby','updated_at','updatedby','notificationusers') 

@@ -11,18 +11,32 @@ class notificationconfig:
 
     """
 
-    def getnotificationtypeid(self, notificationtype):
+    def getnotificationtypelabel(self, notificationtype):
         id = NotificationType().getnotificationtypeid(notificationtype)
         if id is not None:
             return id['notificationtypelabel']
         return 0
+    
+    def getnotificationtypeid(self, notificationtype):
+        id = NotificationType().getnotificationtypeid(notificationtype)
+        if id is not None:
+            return id['notificationtypeid']
+        return 0
 
-    def getnotificationusertypeid(self, notificationusertype):
+    def getnotificationusertypelabel(self, notificationusertype):
         print(notificationusertype)
         id = NotificationUserType().getnotificationusertypesid(notificationusertype)
         print(id)
         if id is not None:
             return id['notificationusertypelabel']
+        return 0
+    
+    def getnotificationusertypeid(self, notificationusertype):
+        print(notificationusertype)
+        id = NotificationUserType().getnotificationusertypesid(notificationusertype)
+        print(id)
+        if id is not None:
+            return id['notificationusertypeid']
         return 0
     
     def getnotificationdays(self):
