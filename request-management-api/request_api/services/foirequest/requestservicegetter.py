@@ -168,6 +168,7 @@ class requestservicegetter:
             'selectedMinistries':[{'code':requestministry['programarea.bcgovcode'],'id':requestministry['foiministryrequestid'],'name':requestministry['programarea.name'],'selected':'true'}],
             'divisions': self.getdivisions(requestministrydivisions),
             'isoipcreview': requestministry['isoipcreview'],
+            'isreopened': self.hasreopened(foiministryrequestid),
             'oipcdetails': self.getoipcdetails(foiministryrequestid, requestministry['version']),
             'onholdTransitionDate': self.getonholdtransition(foiministryrequestid),            
             'stateTransition': FOIMinistryRequest.getstatesummary(foiministryrequestid),
@@ -267,6 +268,14 @@ class requestservicegetter:
     
     def __genericdateformat(self):
         return '%Y-%m-%d'
+    
+    def hasreopened(self, requestid):
+        states =  FOIMinistryRequest.getstatesummary(requestid)
+        if len(states) > 0:
+            current_state = states[0]
+            if current_state != "Closed" and any(state['status'] == "Closed" for state in states):
+                return True
+        return False 
     
     def __prepareapplicant(self,firstname= None, middlename= None, lastname= None, businessname= None):
         return {

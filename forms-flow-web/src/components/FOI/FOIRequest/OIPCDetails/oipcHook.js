@@ -61,9 +61,9 @@ const useOIPCHook = () => {
     })
   }
   const removeOIPC = (oipcId) => {
-    if (oipcData.length == 1) {
+    if (oipcData.length === 1) {
       setOipcData([]);  
-      setResettoInitial(true)
+      setResettoInitial(true);
     }
     else {
     setOipcData((prev) => {
@@ -86,6 +86,7 @@ const useOIPCHook = () => {
   }
   const removeAllOIPCs = () => {
     setOipcData([]);
+    setResettoInitial(true);
   }
 
   return {

@@ -7,10 +7,10 @@ class OIPCReviewTypesReasons(db.Model):
     __tablename__ = 'OIPCReviewTypesReasons' 
     # Defining the columns
     reviewtypereasonid = db.Column(db.Integer, primary_key=True,autoincrement=True)
-    reviewtypeid = db.Column(db.Integer, ForeignKey('FOIReviewTypes'))
-    relationship("FOIReviewTypes", backref=backref("FOIReviewTypes"), uselist=False)
-    reasonid = db.Column(db.Integer, ForeignKey('FOIReasons'))
-    relationship("FOIReasons", backref=backref("FOIReasons"), uselist=False)
+    reviewtypeid = db.Column(db.Integer, ForeignKey('OIPCReviewTypes'))
+    relationship("OIPCReviewTypes", backref=backref("OIPCReviewTypes"), uselist=False)
+    reasonid = db.Column(db.Integer, ForeignKey('OIPCReasons'))
+    relationship("OIPCReasons", backref=backref("OIPCReasons"), uselist=False)
     isactive = db.Column(db.Boolean, unique=False, nullable=False)
 
     @classmethod
