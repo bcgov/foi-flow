@@ -302,7 +302,6 @@ const FOIRequestHeader = React.memo(
             isActive={requestDetails.isphasedrelease}
             handleSelect={handleOipcReviewFlagChange}
           /> */}
-        </div>
         <div className="col-lg-6">
           <div className="foi-assignee-dropdown">
             {showMinistryAssignedTo && (
