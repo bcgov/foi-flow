@@ -288,7 +288,6 @@ const FOIRequestHeader = React.memo(
            
           }
         </div>
-        <div className="col-lg-3">
         <div className="blankrow"></div>
         <RequestFlag
             type="oipcreview"
