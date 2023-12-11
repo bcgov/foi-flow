@@ -274,6 +274,7 @@ class notificationservice:
             mutenotification = False
 
         notification.notificationtypelabel = notificationconfig().getnotificationtypelabel(notificationtype)
+        notification.notificationtypeid = notificationconfig().getnotificationtypeid(notificationtype)
         notification.axisnumber = foirequest["axisrequestid"]
         notification.version = foirequest["version"]        
         notification.createdby = userid
@@ -298,6 +299,7 @@ class notificationservice:
             user = FOIRawRequestNotificationUser()
             user.isdeleted = False
         user.notificationusertypelabel = notificationuser["usertype"]
+        user.notificationusertypeid = notificationconfig().getnotificationusertypeid( notificationuser["usertype"])
         user.userid = notificationuser["userid"]
         user.createdby = userid
         return user

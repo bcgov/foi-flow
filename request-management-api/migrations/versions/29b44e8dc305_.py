@@ -31,18 +31,22 @@ def upgrade():
     op.execute('ALTER TABLE public."FOIRequestNotifications" ADD COLUMN notificationtypelabel VARCHAR(50);')
     op.execute('UPDATE public."FOIRequestNotifications" AS mr SET notificationtypelabel = st.notificationtypelabel FROM public."NotificationTypes" AS st WHERE mr.notificationtypeid = st.notificationtypeid;')
     op.execute('ALTER TABLE public."FOIRequestNotifications" ALTER COLUMN notificationtypelabel SET NOT NULL;')
+    op.execute('ALTER TABLE public."FOIRequestNotifications" ALTER COLUMN notificationtypeid DROP NOT NULL;')
 
     op.execute('ALTER TABLE public."FOIRawRequestNotifications" ADD COLUMN notificationtypelabel VARCHAR(50);')
     op.execute('UPDATE public."FOIRawRequestNotifications" AS mr SET notificationtypelabel = st.notificationtypelabel FROM public."NotificationTypes" AS st WHERE mr.notificationtypeid = st.notificationtypeid;')
     op.execute('ALTER TABLE public."FOIRawRequestNotifications" ALTER COLUMN notificationtypelabel SET NOT NULL;')
+    op.execute('ALTER TABLE public."FOIRawRequestNotifications" ALTER COLUMN notificationtypeid DROP NOT NULL;')
     
     op.execute('ALTER TABLE public."FOIRequestNotificationUsers" ADD COLUMN notificationusertypelabel VARCHAR(50);')
     op.execute('UPDATE public."FOIRequestNotificationUsers" AS mr SET notificationusertypelabel = st.notificationusertypelabel FROM public."NotificationUserTypes" AS st WHERE mr.notificationusertypeid = st.notificationusertypeid;')
     op.execute('ALTER TABLE public."FOIRequestNotificationUsers" ALTER COLUMN notificationusertypelabel SET NOT NULL;')
+    op.execute('ALTER TABLE public."FOIRequestNotificationUsers" ALTER COLUMN notificationusertypelabel DROP NOT NULL;')
     
     op.execute('ALTER TABLE public."FOIRawRequestNotificationUsers" ADD COLUMN notificationusertypelabel VARCHAR(50);')
     op.execute('UPDATE public."FOIRawRequestNotificationUsers" AS mr SET notificationusertypelabel = st.notificationusertypelabel FROM public."NotificationUserTypes" AS st WHERE mr.notificationusertypeid = st.notificationusertypeid;')
     op.execute('ALTER TABLE public."FOIRawRequestNotificationUsers" ALTER COLUMN notificationusertypelabel SET NOT NULL;')
+    op.execute('ALTER TABLE public."FOIRawRequestNotificationUsers" ALTER COLUMN notificationusertypelabel DROP NOT NULL;')
 
     # ### end Alembic commands ### 
 

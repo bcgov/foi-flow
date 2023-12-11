@@ -17,7 +17,8 @@ from .FOIRawRequestWatchers import FOIRawRequestWatcher
 from request_api.utils.enums import ProcessingTeamWithKeycloackGroup, IAOTeamWithKeycloackGroup
 from request_api.models.views.FOINotifications import FOINotifications
 from request_api.models.views.FOIRawRequests import FOIRawRequests
-
+f = open('common/notificationusertypes.json', encoding="utf8")
+notificationusertypes_cache = json.load(f)
 
 class FOIRawRequestNotificationUser(db.Model):
     # Name of the table in our database
@@ -31,8 +32,8 @@ class FOIRawRequestNotificationUser(db.Model):
     createdby = db.Column(db.String(120), unique=False, nullable=True)
     updated_at = db.Column(db.DateTime, nullable=True)
     updatedby = db.Column(db.String(120), unique=False, nullable=True)
-
-    notificationusertypelabel = db.Column(db.Integer,nullable=False)
+    notificationusertypeid = db.Column(db.Integer,nullable=False)
+    notificationusertypelabel = db.Column(db.String(120),nullable=False)
 
 
     @classmethod
@@ -92,7 +93,10 @@ class FOIRawRequestNotificationUser(db.Model):
         return notifications
 
     @classmethod 
-    def getnotificationsbyuserandtype(cls, userid, notificationusertypelabel):
+    def getnotificationsbyuserandtype(cls, userid, typeid):
+        for key in notificationusertypes_cache:
+            if (notificationusertypes_cache[key].notificationusertypeid == typeid) or (notificationusertypes_cache[key].notificationusertypelabel == typeid):
+                notificationusertypelabel = notificationusertypes_cache[key].notificationusertypelabel
         notifications = []
         try:
             sql = """select notificationid, count(1) as relcount from "FOIRawRequestNotificationUsers" frnu 
@@ -263,4 +267,4 @@ class FOIRawRequestNotificationUser(db.Model):
         
 class FOIRawRequestNotificationUserSchema(ma.Schema):
     class Meta:
-        fields = ('notificationid', 'userid','notificationusertypelabel','created_at','createdby','updated_at','updatedby') 
+        fields = ('notificationid', 'userid', 'notificationusertypeid' , 'notificationusertypelabel','created_at','createdby','updated_at','updatedby') 

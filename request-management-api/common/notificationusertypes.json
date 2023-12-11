@@ -13,6 +13,27 @@
         "isactive": true,
         "notificationusertypelabel": "assignee"
     },
+    "groupmembers": {
+        "notificationusertypeid": 2,
+        "name": "Group Members",
+        "description": "Assignee",
+        "isactive": true,
+        "notificationusertypelabel": "assignee"
+    },
+    "groupmember": {
+        "notificationusertypeid": 2,
+        "name": "groupmembers",
+        "description": "Assignee",
+        "isactive": true,
+        "notificationusertypelabel": "assignee"
+    },
+    "comment": {
+        "notificationusertypeid": 2,
+        "name": "Comment",
+        "description": "Assignee",
+        "isactive": true,
+        "notificationusertypelabel": "assignee"
+    },
     "commentuser": {
         "notificationusertypeid": 3,
         "name": "Comment User",

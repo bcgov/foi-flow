@@ -49,8 +49,8 @@ class FOIRequestNotificationUser(db.Model):
     createdby = db.Column(db.String(120), unique=False, nullable=True)
     updated_at = db.Column(db.DateTime, nullable=True)
     updatedby = db.Column(db.String(120), unique=False, nullable=True)
-
     notificationusertypelabel = db.Column(db.String(100),nullable=False)
+    notificationusertypeid = db.Column(db.Integer,nullable=False)
 
 
     @classmethod
@@ -333,4 +333,4 @@ class FOIRequestNotificationUser(db.Model):
         
 class FOIRequestNotificationUserSchema(ma.Schema):
     class Meta:
-        fields = ('notificationid', 'userid','notificationusertypelabel','created_at','createdby','updated_at','updatedby') 
+        fields = ('notificationid', 'userid','notificationusertypeid', 'notificationusertypelabel','created_at','createdby','updated_at','updatedby') 

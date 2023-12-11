@@ -31,7 +31,7 @@ class FOIRequestNotification(db.Model):
     createdby = db.Column(db.String(120), unique=False, nullable=True)
     updated_at = db.Column(db.DateTime, nullable=True)
     updatedby = db.Column(db.String(120), unique=False, nullable=True)
-
+    notificationtypeid = db.Column(db.Integer, nullable=False)
     notificationtypelabel = db.Column(db.String(50), nullable=False)
     
     notificationusers = db.relationship('FOIRequestNotificationUser', backref='FOIRequestNotifications', lazy='dynamic')
@@ -89,15 +89,15 @@ class FOIRequestNotification(db.Model):
         notifications = []
         try:
             sql = """select idnumber, axisnumber, notificationid, notificationuserid, notification , notificationtype, userid, notificationusertype, created_at, createdby, requesttype, requestid, foirequestid from (   
-                    select frn.idnumber, frn.axisnumber, frn.requestid, frn.notificationid, frns.notificationuserid, frn.notification -> 'message' as notification , nty.name as notificationtype, frn.created_at , frns.createdby, frns.userid, ntu.name as notificationusertype, 'ministryrequest' requesttype, frn.foirequestid from "FOIRequestNotifications" frn inner join "FOIRequestNotificationUsers" frns on frn.notificationid = frns.notificationid and frns.isdeleted = false inner join "NotificationTypes" nty on frn.notificationtypelabel = nty.notificationtypelabel inner join "NotificationUserTypes" ntu on frns.notificationusertypelabel = ntu.notificationusertypelabel where frn.notificationtypelabel in :notificationtypelabel and (frn.notification ->> 'commentid')::int = :commentid
+                    select frn.idnumber, frn.axisnumber, frn.requestid, frn.notificationid, frns.notificationuserid, frn.notification -> 'message' as notification , nty.name as notificationtype, frn.created_at , frns.createdby, frns.userid, ntu.name as notificationusertype, 'ministryrequest' requesttype, frn.foirequestid from "FOIRequestNotifications" frn inner join "FOIRequestNotificationUsers" frns on frn.notificationid = frns.notificationid and frns.isdeleted = false  inner join "NotificationTypes" nty on frn.notificationtypelabel = nty.notificationtypelabel inner join "NotificationUserTypes" ntu on frns.notificationusertypelabel = ntu.notificationusertypelabel where frn.notificationtypelabel in (:notificationtypelabel) and (frn.notification ->> 'commentid')::int = :commentid
                     union all
-                    select frn.idnumber, frn.axisnumber, frn.requestid, frn.notificationid, frns.notificationuserid, frn.notification -> 'message' as notification, nty.name as notificationtype, frn.created_at , frns.createdby, frns.userid, ntu.name as notificationusertype, 'rawrequest' requesttype, 0 foirequestid  from "FOIRawRequestNotifications" frn inner join "FOIRawRequestNotificationUsers" frns on frn.notificationid = frns.notificationid and frns.isdeleted = false  inner join "NotificationTypes" nty on frn.notificationtypelabel = nty.notificationtypelabel inner join "NotificationUserTypes" ntu on frns.notificationusertypelabel = ntu.notificationusertypelabel where frn.notificationtypelabel in :notificationtypelabel and (frn.notification ->> 'commentid')::int = :commentid
+                    select frn.idnumber, frn.axisnumber, frn.requestid, frn.notificationid, frns.notificationuserid, frn.notification -> 'message' as notification, nty.name as notificationtype, frn.created_at , frns.createdby, frns.userid, ntu.name as notificationusertype, 'rawrequest' requesttype, 0 foirequestid  from "FOIRawRequestNotifications" frn inner join "FOIRawRequestNotificationUsers" frns on frn.notificationid = frns.notificationid and frns.isdeleted = false  inner join "NotificationTypes" nty on frn.notificationtypelabel = nty.notificationtypelabel inner join "NotificationUserTypes" ntu on frns.notificationusertypelabel = ntu.notificationusertypelabel where frn.notificationtypelabel in (:notificationtypelabel) and (frn.notification ->> 'commentid')::int = :commentid
                   ) as notf order by created_at desc"""
-            notificationtypelabel = [notificationtypes_cache.newusercomments.notificationtypelabel,
-                                     notificationtypes_cache.replyusercomments.notificationtypelabel,
-                                     notificationtypes_cache.taggedusercomments.notificationtypelabel,
+            notificationtypelabel = [notificationtypes_cache['newusercomments']['notificationtypelabel'],
+                                     notificationtypes_cache['replyusercomments']['notificationtypelabel'],
+                                     notificationtypes_cache['taggedusercomments']['notificationtypelabel'],
                                      ] # 3,9,10
-            print(notificationtypelabel)
+            notificationtypelabel = ','.join(str(e) for e in notificationtypelabel)
             rs = db.session.execute(text(sql), {'commentid': commentid, 'notificationtypelabel': notificationtypelabel})
             for row in rs:
                 dt = maya.parse(row["created_at"]).datetime(to_timezone='America/Vancouver', naive=False)

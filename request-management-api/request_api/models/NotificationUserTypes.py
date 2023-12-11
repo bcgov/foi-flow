@@ -3,6 +3,10 @@ from .default_method_result import DefaultMethodResult
 from sqlalchemy.orm import relationship,backref
 from datetime import datetime
 from sqlalchemy import text
+import json
+f = open('common/notificationusertypes.json', encoding="utf8")
+notificationusertypes_cache = json.load(f)
+
 
 class NotificationUserType(db.Model):
     __tablename__ = 'NotificationUserTypes' 
@@ -22,8 +26,11 @@ class NotificationUserType(db.Model):
     # create a class method that returns the notification type id
     @classmethod
     def getnotificationusertypesid(cls, notificationusertype):
+        for usertype in notificationusertypes_cache:
+            if (notificationusertypes_cache[usertype]['name'] == notificationusertype) or (notificationusertypes_cache[usertype]['notificationusertypelabel'] == notificationusertype):
+                notificationusertypelabel = notificationusertypes_cache[usertype]['notificationusertypelabel']
         type_schema = NotificationUserTypeSchema(many=False)
-        query = db.session.query(NotificationUserType).filter_by(name=notificationusertype, isactive=True).first()
+        query = db.session.query(NotificationUserType).filter_by(notificationusertypelabel=notificationusertypelabel, isactive=True).first()
         return type_schema.dump(query) if query is not None else None
 
 
