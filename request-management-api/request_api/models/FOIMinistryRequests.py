@@ -493,7 +493,7 @@ class FOIMinistryRequest(db.Model):
             ministry_restricted_requests.isrestricted.label('isministryrestricted'),
             SubjectCode.name.label('subjectcode'),
             FOIMinistryRequest.isoipcreview.label('isoipcreview'),
-            FOIRequestOIPC.oipcno.label('oipc_number')
+            literal(None).label('oipc_number'),
         ]
 
         basequery = _session.query(
@@ -564,11 +564,9 @@ class FOIMinistryRequest(db.Model):
                                 SubjectCode,
                                 SubjectCode.subjectcodeid == FOIMinistryRequestSubjectCode.subjectcodeid,
                                 isouter=True
-                            ).join(
-                                FOIRequestOIPC,
-                                and_(FOIRequestOIPC.foiministryrequest_id == FOIMinistryRequest.foiministryrequestid, FOIRequestOIPC.foiministryrequestversion_id == FOIMinistryRequest.version),
-                                isouter=True
                             ).filter(or_(FOIMinistryRequest.requeststatusid != 3, and_(FOIMinistryRequest.isoipcreview == True, FOIMinistryRequest.requeststatusid == 3)))
+                            
+                        
 
         if(additionalfilter == 'watchingRequests'):
             #watchby
@@ -675,8 +673,7 @@ class FOIMinistryRequest(db.Model):
             'requestPageCount': FOIMinistryRequest.requestpagecount,
             'closedate': FOIMinistryRequest.closedate,
             'subjectcode': SubjectCode.name,
-            'isoipcreview': FOIMinistryRequest.isoipcreview,
-            'oipc_number': FOIRequestOIPC.oipcno
+            'isoipcreview': FOIMinistryRequest.isoipcreview
         }.get(x, FOIMinistryRequest.axisrequestid)
 
     @classmethod
@@ -1047,7 +1044,7 @@ class FOIMinistryRequest(db.Model):
             ministry_restricted_requests.isrestricted.label('isministryrestricted'),
             SubjectCode.name.label('subjectcode'),
             FOIMinistryRequest.isoipcreview.label('isoipcreview'),
-            FOIRequestOIPC.oipcno.label('oipc_number')
+            literal(None).label('oipc_number')
         ]
 
         basequery = _session.query(
@@ -1118,11 +1115,8 @@ class FOIMinistryRequest(db.Model):
                                 SubjectCode,
                                 SubjectCode.subjectcodeid == FOIMinistryRequestSubjectCode.subjectcodeid,
                                 isouter=True
-                            ).join(
-                                FOIRequestOIPC,
-                                and_(FOIRequestOIPC.foiministryrequest_id == FOIMinistryRequest.foiministryrequestid, FOIRequestOIPC.foiministryrequestversion_id == FOIMinistryRequest.version),
-                                isouter=True
                             )
+                            
 
         if(isiaorestrictedfilemanager == True or isministryrestrictedfilemanager == True):
             dbquery = basequery.filter(ministryfilter)
@@ -1319,6 +1313,14 @@ class FOIMinistryRequest(db.Model):
                     searchcondition1.append(FOIMinistryRequest.findfield('assignedministrypersonFirstName', iaoassignee, ministryassignee).ilike('%'+keyword+'%'))
                     searchcondition2.append(FOIMinistryRequest.findfield('assignedministrypersonLastName', iaoassignee, ministryassignee).ilike('%'+keyword+'%'))
                 return or_(and_(*searchcondition1), and_(*searchcondition2))
+            elif(params['search'] == 'oipc_number'):
+                searchcondition1 = []
+                searchcondition2 = []
+                for keyword in params['keywords']:
+                    oipccondition = FOIRequestOIPC.getrequestidsbyoipcno(keyword)
+                    searchcondition1.append(oipccondition.c.foiministryrequest_id == FOIMinistryRequest.foiministryrequestid)
+                    searchcondition2.append(oipccondition.c.foiministryrequestversion_id == FOIMinistryRequest.version) 
+                return and_(and_(*searchcondition1), and_(*searchcondition2))
             else:
                 searchcondition = []
                 for keyword in params['keywords']:
