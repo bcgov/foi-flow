@@ -94,10 +94,9 @@ class FOIRawRequest(Resource):
             assigneemiddlename = requestdata['assigneemiddlename']
             assigneelastname = requestdata['assigneelastname']
             statuslabel = requestdata['requeststatuslabel']
-
             if int(requestid) and str(requestid) != "-1" :
-                status = rawrequestservice().getstatus(updaterequest)
-                if statuslabel not in [StateName.intakeinprogress.name, StateName.closed.name, StateName.redirect.name, StateName.peerreview.name, StateName.section5pending.name, StateName.appfeeowing.name]:
+                status, statuslabel = rawrequestservice().getstatus(updaterequest)
+                if status not in [StateName.intakeinprogress.value, StateName.closed.value, StateName.redirect.value, StateName.peerreview.value, StateName.section5pending.value, StateName.appfeeowing.value]:
                     raise ValueError('Invalid request state.')
                 result = rawrequestservice().saverawrequestversion(updaterequest,requestid,assigneegroup,assignee,status,AuthHelper.getuserid(),assigneefirstname,assigneemiddlename,assigneelastname, statuslabel, actiontype)                
                 assignee = ''

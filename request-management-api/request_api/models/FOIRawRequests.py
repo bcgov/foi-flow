@@ -148,6 +148,7 @@ class FOIRawRequest(db.Model):
                     requirespayment = request.requirespayment,
                     isiaorestricted =_isiaorestricted,
                     notes = request.notes,
+                    requeststatuslabel = request.requeststatuslabel,
                     
             )
         )
@@ -194,8 +195,8 @@ class FOIRawRequest(db.Model):
                     axisrequestid= axisrequestid,
                     axissyncdate=axissyncdate,
                     linkedrequests=linkedrequests,
-                    isiaorestricted = request.isiaorestricted
-                    
+                    isiaorestricted = request.isiaorestricted,
+                    requeststatuslabel = request.requeststatuslabel                    
                 )
             )
             db.session.execute(insertstmt)               

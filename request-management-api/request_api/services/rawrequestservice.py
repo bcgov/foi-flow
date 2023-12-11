@@ -129,7 +129,7 @@ class rawrequestservice:
         statuslabel = foirequest["requeststatuslabel"] if "requeststatuslabel" in foirequest else None
         if statuslabel is not None:
             try:
-                return requestserviceconfigurator().getstatusname(statuslabel)           
+                return requestserviceconfigurator().getstatusname(statuslabel), statuslabel         
                 # if statusid== 4:                    
                 #     return 'Redirect'
                 # if statusid == 3:                    
@@ -138,7 +138,7 @@ class rawrequestservice:
                 #     return 'Peer Review'   
             except  KeyError:
                 print("Key Error on requeststatusid, ignore will be intake in Progress")
-        return StateName.intakeinprogress.value
+        return StateName.intakeinprogress.value, StateName.intakeinprogress.name
 
     def getaxisequestids(self):
         return rawrequestservicegetter().getaxisequestids()
