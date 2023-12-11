@@ -21,7 +21,6 @@ import { catchError, fnDone} from './foiServicesUtil';
 import UserService from "../../../services/UserService";
 import { replaceUrl } from "../../../helper/FOI/helper";
 import { persistRequestFieldsNotInAxis } from "../../../components/FOI/FOIRequest/utils";
-import { StateEnum } from "../../../constants/FOI/statusEnum";
 
 export const fetchFOIRequestList = () => {
   return (dispatch) => {
@@ -179,8 +178,7 @@ export const fetchFOIRawRequestDetails = (requestId) => {
           const foiRequest = res.data;
           dispatch(clearRequestDetails({}));
           dispatch(setFOIRequestDetail(foiRequest));
-          const ministryCode = (foiRequest.currentState !== StateEnum.redirect.name && foiRequest.requestType === 'personal') ? foiRequest.selectedMinistries[0].code.toLowerCase() : "";
-          dispatch(fetchFOIAssignedToList(foiRequest.requestType.toLowerCase(), foiRequest.currentState.replace(/\s/g, '').toLowerCase(), ministryCode));
+          dispatch(fetchFOIAssignedToList(foiRequest.requestType.toLowerCase(), foiRequest.currentState.replace(/\s/g, '').toLowerCase(), ""));
           dispatch(fetchFOIProcessingTeamList(foiRequest.requestType.toLowerCase()));
           dispatch(setFOILoader(false));
         } else {

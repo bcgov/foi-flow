@@ -62,8 +62,8 @@ class requestservice:
         )
 
     def saverequestversion(self, foirequestschema, foirequestid, ministryid, userid):
-        nextstate = FOIRequestStatus.getrequeststatusbylabel(
-            foirequestschema["requeststatuslabel"]
+        nextstate = FOIRequestStatus.getrequeststatusname(
+            foirequestschema["requeststatusid"]
         )
         nextstatename = (
             nextstate.get("name")
@@ -112,8 +112,8 @@ class requestservice:
         foirequest = self.updateduedate(
             requestid, ministryrequestid, paymentdate, _foirequest, nextstatename
         )
-        status = FOIRequestStatus().getrequeststatus(nextstatename)
-        foirequest["requeststatuslabel"] = status["statuslabel"]
+        status = FOIRequestStatus().getrequeststatusid(nextstatename)
+        foirequest["requeststatusid"] = status["requeststatusid"]
         return requestservicecreate().saverequestversion(
             foirequest, requestid, ministryrequestid, "Online Payment"
         )
@@ -204,7 +204,7 @@ class requestservice:
 
     def postopeneventtoworkflow(self, id, requestschema, ministries):
         pid = workflowservice().syncwfinstance("rawrequest", requestschema["id"])
-        workflowservice().postunopenedevent(id, pid, requestschema, StateName.open.value, ministries)
+        workflowservice().postunopenedevent(id, pid, requestschema, "Open", ministries)
 
     def postfeeeventtoworkflow(
         self, requestid, ministryrequestid, paymentstatus, nextstatename=None
@@ -215,14 +215,14 @@ class requestservice:
         )
 
     def posteventtoworkflow(self, id, requestschema, data, usertype):
-        requeststatuslabel = (
-            requestschema.get("requeststatuslabel")
-            if "requeststatuslabel" in requestschema
+        requeststatusid = (
+            requestschema.get("requeststatusid")
+            if "requeststatusid" in requestschema
             else None
         )
         status = (
-            requestserviceconfigurator().getstatusname(requeststatuslabel)
-            if requeststatuslabel is not None
+            requestserviceconfigurator().getstatusname(requeststatusid)
+            if requeststatusid is not None
             else None
         )
         pid = workflowservice().syncwfinstance("ministryrequest", id)

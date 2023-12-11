@@ -11,7 +11,7 @@ class NotificationType(object):
             _notificationtypes = []
             conn = getconnection()
             cursor = conn.cursor()
-            cursor.execute("""select notificationtypelabel  from "NotificationTypes" nt  where isactive = true and name = '{0}'""".format(name))
+            cursor.execute("""select notificationtypeid  from "NotificationTypes" nt  where isactive = true and name = '{0}'""".format(name))
             data = cursor.fetchone()
             if data is not None:
                return  data[0]

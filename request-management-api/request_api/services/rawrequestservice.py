@@ -15,8 +15,7 @@ from request_api.services.rawrequest.rawrequestservicegetter import rawrequestse
 from request_api.exceptions import BusinessException, Error
 from request_api.models.default_method_result import DefaultMethodResult
 from request_api.models.FOIRawRequestWatchers import FOIRawRequestWatcher
-from request_api.services.foirequest.requestserviceconfigurator import requestserviceconfigurator
-from request_api.utils.enums import StateName
+from request_api.services.foirequest.requestserviceconfigurator import requestserviceconfigurator 
 import logging
 
 class rawrequestservice:
@@ -92,13 +91,13 @@ class rawrequestservice:
             return requestdatajson['requiresPayment']            
         raise BusinessException(Error.DATA_NOT_FOUND)    
 
-    def saverawrequestversion(self, _requestdatajson, _requestid, _assigneegroup, _assignee, status, userid, assigneefirstname, assigneemiddlename, assigneelastname, statuslabel, actiontype=None):
+    def saverawrequestversion(self, _requestdatajson, _requestid, _assigneegroup, _assignee, status, userid, assigneefirstname, assigneemiddlename, assigneelastname, actiontype=None):
         ispiiredacted = _requestdatajson["ispiiredacted"] if 'ispiiredacted' in _requestdatajson  else False        
         #Get documents
         if actiontype == "assignee":
             result = FOIRawRequest.saverawrequestassigneeversion(_requestid, _assigneegroup, _assignee, userid, assigneefirstname, assigneemiddlename, assigneelastname)
         else:
-            result = FOIRawRequest.saverawrequestversion(_requestdatajson, _requestid, _assigneegroup, _assignee, status,ispiiredacted, userid, statuslabel, assigneefirstname, assigneemiddlename, assigneelastname)
+            result = FOIRawRequest.saverawrequestversion(_requestdatajson, _requestid, _assigneegroup, _assignee, status,ispiiredacted, userid, assigneefirstname, assigneemiddlename, assigneelastname)
         documentservice().createrawrequestdocumentversion(_requestid)
         return result
 
@@ -126,10 +125,10 @@ class rawrequestservice:
         return rawrequestservicegetter().getrawrequestfieldsforid(requestid, fields) 
         
     def getstatus(self, foirequest):
-        statuslabel = foirequest["requeststatuslabel"] if "requeststatuslabel" in foirequest else None
-        if statuslabel is not None:
+        statusid = foirequest["requeststatusid"] if "requeststatusid" in foirequest else None
+        if statusid is not None:
             try:
-                return requestserviceconfigurator().getstatusname(statuslabel)           
+                return requestserviceconfigurator().getstatusname(statusid)           
                 # if statusid== 4:                    
                 #     return 'Redirect'
                 # if statusid == 3:                    
@@ -138,7 +137,7 @@ class rawrequestservice:
                 #     return 'Peer Review'   
             except  KeyError:
                 print("Key Error on requeststatusid, ignore will be intake in Progress")
-        return StateName.intakeinprogress.value
+        return 'Intake in Progress'
 
     def getaxisequestids(self):
         return rawrequestservicegetter().getaxisequestids()

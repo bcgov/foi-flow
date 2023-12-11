@@ -28,7 +28,6 @@ from request_api.services.rawrequestservice import rawrequestservice
 from request_api.services.eventservice import eventservice
 from request_api.schemas.foirequestwrapper import  FOIRequestWrapperSchema, EditableFOIRequestWrapperSchema, FOIRequestMinistrySchema, FOIRequestStatusSchema
 from request_api.schemas.foiassignee import FOIRequestAssigneeSchema
-from request_api.utils.enums import StateName
 from marshmallow import Schema, fields, validate, ValidationError
 from request_api.utils.enums import MinistryTeamWithKeycloackGroup
 import json
@@ -100,7 +99,7 @@ class FOIRequests(Resource):
             assignedtofirstname = request_json["assignedToFirstName"] if request_json.get("assignedToFirstName") != None else None
             assignedtomiddlename = request_json["assignedToMiddleName"] if request_json.get("assignedToMiddleName") != None else None
             assignedtolastname = request_json["assignedToLastName"] if request_json.get("assignedToLastName") != None else None
-            rawresult = rawrequestservice().saverawrequestversion(request_json,request_json['id'],assignedgroup,assignedto,"Archived",AuthHelper.getuserid(), assignedtofirstname,assignedtomiddlename,assignedtolastname,StateName.archived.name)               
+            rawresult = rawrequestservice().saverawrequestversion(request_json,request_json['id'],assignedgroup,assignedto,"Archived",AuthHelper.getuserid(), assignedtofirstname,assignedtomiddlename,assignedtolastname)               
 
 
             

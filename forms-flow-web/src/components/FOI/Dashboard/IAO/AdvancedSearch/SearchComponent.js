@@ -128,14 +128,15 @@ const AdvancedSearch = ({ userDetail }) => {
   });
 
   const intitialRequestState = {
-    [StateEnum.unopened.label]: false,
-    [StateEnum.open.label]: false,
-    [StateEnum.callforrecords.label]: false,
-    [StateEnum.review.label]: false,
-    [StateEnum.signoff.label]: false,
-    [StateEnum.closed.label]: false,
-    [StateEnum.callforrecordsoverdue.label]: false
+    [StateEnum.unopened.id]: false,
+    [StateEnum.open.id]: false,
+    [StateEnum.callforrecords.id]: false,
+    [StateEnum.review.id]: false,
+    [StateEnum.signoff.id]: false,
+    [StateEnum.closed.id]: false,
+    [StateEnum.callforrecordsoverdue.id]: false
   };
+
   const [requestState, setRequestState] = useState(() => {
     if (Object.keys(advancedSearchParams).length > 0 && advancedSearchParams.requestState.length > 0) {
       let savedRequestState = {...intitialRequestState}
@@ -578,9 +579,9 @@ const AdvancedSearch = ({ userDetail }) => {
                         <Checkbox
                           size="small"
                           name="unopened"
-                          stateid={StateEnum.unopened.label}
+                          stateid={StateEnum.unopened.id}
                           onChange={handleRequestStateChange}
-                          checked={requestState[StateEnum.unopened.label]}
+                          checked={requestState[StateEnum.unopened.id]}
                           color="success"
                         />
                       }
@@ -592,9 +593,9 @@ const AdvancedSearch = ({ userDetail }) => {
                         <Checkbox
                           size="small"
                           name="callforrecords"
-                          stateid={StateEnum.callforrecords.label}
+                          stateid={StateEnum.callforrecords.id}
                           onChange={handleRequestStateChange}
-                          checked={requestState[StateEnum.callforrecords.label]}
+                          checked={requestState[StateEnum.callforrecords.id]}
                           color="success"
                         />
                       }
@@ -606,9 +607,9 @@ const AdvancedSearch = ({ userDetail }) => {
                         <Checkbox
                           size="small"
                           name="review"
-                          stateid={StateEnum.review.label}
+                          stateid={StateEnum.review.id}
                           onChange={handleRequestStateChange}
-                          checked={requestState[StateEnum.review.label]}
+                          checked={requestState[StateEnum.review.id]}
                           color="success"
                         />
                       }
@@ -620,9 +621,9 @@ const AdvancedSearch = ({ userDetail }) => {
                         <Checkbox
                           size="small"
                           name="signoff"
-                          stateid={StateEnum.signoff.label}
+                          stateid={StateEnum.signoff.id}
                           onChange={handleRequestStateChange}
-                          checked={requestState[StateEnum.signoff.label]}
+                          checked={requestState[StateEnum.signoff.id]}
                           color="success"
                         />
                       }
@@ -634,9 +635,9 @@ const AdvancedSearch = ({ userDetail }) => {
                         <Checkbox
                           size="small"
                           name="closed"
-                          stateid={StateEnum.closed.label}
+                          stateid={StateEnum.closed.id}
                           onChange={handleRequestStateChange}
-                          checked={requestState[StateEnum.closed.label]}
+                          checked={requestState[StateEnum.closed.id]}
                           color="success"
                         />
                       }

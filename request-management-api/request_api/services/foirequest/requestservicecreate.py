@@ -12,7 +12,6 @@ from request_api.models.PersonalInformationAttributes import PersonalInformation
 from request_api.models.FOIRequestContactInformation import FOIRequestContactInformation
 from request_api.models.FOIRequestPersonalAttributes import FOIRequestPersonalAttribute
 from request_api.models.FOIRequestApplicantMappings import FOIRequestApplicantMapping
-from request_api.utils.enums import StateName
 
 import json
 class requestservicecreate:
@@ -170,10 +169,10 @@ class requestservicecreate:
         return requestapplicantarr
     
     def __disablewatchers(self, ministryid, requestschema, userid):
-        requeststatuslabel =  requestschema.get("requeststatuslabel") if 'requeststatuslabel' in requestschema  else None
-        if requeststatuslabel is not None: 
-            status = requestserviceconfigurator().getstatusname(requeststatuslabel)
-            if status == StateName.open.value:
+        requeststatusid =  requestschema.get("requeststatusid") if 'requeststatusid' in requestschema  else None
+        if requeststatusid is not None: 
+            status = requestserviceconfigurator().getstatusname(requeststatusid)
+            if status == "Open":
                 watchers = watcherservice().getministryrequestwatchers(int(ministryid), True)
                 for watcher in watchers:
                     watcherschema = {"ministryrequestid":ministryid,"watchedbygroup":watcher["watchedbygroup"],"watchedby":watcher["watchedby"],"isactive":False}

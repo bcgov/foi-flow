@@ -186,34 +186,34 @@ const BottomButtonGroup = React.memo(
     const [successCount, setSuccessCount] = useState(0);
     const [fileCount, setFileCount] = useState(0);
     const [documents, setDocuments] = useState([]);
-    
+
     const saveStatusId = () => {
       if (currentSelectedStatus) {
         switch (currentSelectedStatus.toLowerCase()) {
           case StateEnum.review.name.toLowerCase():
-            saveMinistryRequestObject.requeststatuslabel = StateEnum.review.label;
+            saveMinistryRequestObject.requeststatusid = StateEnum.review.id;
             break;
           case StateEnum.feeassessed.name.toLowerCase():
-            saveMinistryRequestObject.requeststatuslabel =
-              StateEnum.feeassessed.label;
+            saveMinistryRequestObject.requeststatusid =
+              StateEnum.feeassessed.id;
             break;
           case StateEnum.deduplication.name.toLowerCase():
-            saveMinistryRequestObject.requeststatuslabel =
-              StateEnum.deduplication.label;
+            saveMinistryRequestObject.requeststatusid =
+              StateEnum.deduplication.id;
             break;
           case StateEnum.harms.name.toLowerCase():
-            saveMinistryRequestObject.requeststatuslabel = StateEnum.harms.label;
+            saveMinistryRequestObject.requeststatusid = StateEnum.harms.id;
             break;
           case StateEnum.signoff.name.toLowerCase():
-            saveMinistryRequestObject.requeststatuslabel = StateEnum.signoff.label;
+            saveMinistryRequestObject.requeststatusid = StateEnum.signoff.id;
             break;
           case StateEnum.response.name.toLowerCase():
             saveMinistryRequestObject.ministrysignoffapproval = ministryApprovalState;
-            saveMinistryRequestObject.requeststatuslabel = StateEnum.response.label;
+            saveMinistryRequestObject.requeststatusid = StateEnum.response.id;
             break;
           case StateEnum.callforrecords.name.toLowerCase():
-            saveMinistryRequestObject.requeststatuslabel =
-              StateEnum.callforrecords.label;
+            saveMinistryRequestObject.requeststatusid =
+              StateEnum.callforrecords.id;
             break;
         }
       }

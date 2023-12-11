@@ -7,7 +7,6 @@ from request_api.models.FOIMinistryRequests import FOIMinistryRequest
 from dateutil.parser import parse
 import maya
 from request_api.models.FOIAssignees import FOIAssignee
-from request_api.utils.enums import StateName
 
 class rawrequestservicegetter:
     """ This class consolidates retrival of FOI raw request for actors: iao. 
@@ -53,7 +52,7 @@ class rawrequestservicegetter:
     def getrawrequestforid(self, requestid):
         request = FOIRawRequest.get_request(requestid)
         request = self.__attachministriesinfo(request)
-        if request != {} and (request['version'] == 1 or request['status'] == StateName.unopened.value) and  request['sourceofsubmission'] != "intake":
+        if request != {} and (request['version'] == 1 or request['status'] == 'Unopened') and  request['sourceofsubmission'] != "intake":
             requestrawdata = request['requestrawdata']
             requesttype = requestrawdata['requestType']['requestType']
             baserequestinfo = self.__preparebaserequestinfo(requestid, request, requesttype, requestrawdata)
@@ -61,15 +60,16 @@ class rawrequestservicegetter:
                 baserequestinfo['additionalPersonalInfo'] = self.__prepareadditionalpersonalinfo(requestrawdata)
             return baserequestinfo
         elif request != {} and request['version'] != 1 and  request['sourceofsubmission'] != "intake":       
-            request['requestrawdata']['currentState'] = request['status']
-            request['requestrawdata']['requeststatuslabel'] =  request['requeststatuslabel']
+            request['requestrawdata']['currentState'] = request['status']            
+            requeststatus = FOIRequestStatus().getrequeststatusid(request['status'])
+            request['requestrawdata']['requeststatusid'] =  requeststatus['requeststatusid']
             request['requestrawdata']['lastStatusUpdateDate'] = FOIRawRequest.getLastStatusUpdateDate(requestid, request['status']).strftime(self.__generaldateformat())
-            if request['requeststatuslabel'] == StateName.closed.name:
+            if request['status'] == 'Closed':
                 request['requestrawdata']['stateTransition']= FOIRawRequest.getstatesummary(requestid)
             request['requestrawdata']['wfinstanceid'] = request['wfinstanceid']
             request['requestrawdata']['closedate']= self.__getclosedate(request['closedate'])
             request['requestrawdata']['isiaorestricted']= request['isiaorestricted'] if request['isiaorestricted'] is not None else False
-            return request['requestrawdata']
+            return request['requestrawdata']    
         elif request != {} and request['sourceofsubmission'] == "intake":
             requestrawdata = request['requestrawdata']
             requesttype = requestrawdata['requestType']             
@@ -81,8 +81,8 @@ class rawrequestservicegetter:
             
             request['requestrawdata']['wfinstanceid'] = request['wfinstanceid']
             request['requestrawdata']['currentState'] = request['status']
-            requeststatus = FOIRequestStatus().getrequeststatus(request['status'])
-            request['requestrawdata']['requeststatuslabel'] =  requeststatus['statuslabel']
+            requeststatus = FOIRequestStatus().getrequeststatusid(request['status'])
+            request['requestrawdata']['requeststatusid'] =  requeststatus['requeststatusid']            
             request['requestrawdata']['lastStatusUpdateDate'] = FOIRawRequest.getLastStatusUpdateDate(requestid, request['status']).strftime(self.__generaldateformat())
             request['requestrawdata']['stateTransition']= FOIRawRequest.getstatesummary(requestid)
             request['requestrawdata']['closedate']= self.__getclosedate(request['closedate'])

@@ -27,7 +27,6 @@ from dateutil import parser
 from request_api.utils.enums import StateName
 from .FOIMinistryRequestSubjectCodes import FOIMinistryRequestSubjectCode
 from .SubjectCodes import SubjectCode
-from request_api.utils.enums import StateName
 
 class FOIMinistryRequest(db.Model):
     # Name of the table in our database
@@ -69,7 +68,7 @@ class FOIMinistryRequest(db.Model):
     linkedrequests = db.Column(JSON, unique=False, nullable=True)
     identityverified = db.Column(JSON, unique=False, nullable=True)
     ministrysignoffapproval = db.Column(JSON, unique=False, nullable=True)
-    requeststatuslabel = db.Column(db.String(50), nullable=False)
+    
 
     #ForeignKey References
     
@@ -107,13 +106,13 @@ class FOIMinistryRequest(db.Model):
         return request_schema.dump(query)
 
     @classmethod
-    def getLastStatusUpdateDate(cls,foiministryrequestid,requeststatuslabel):
+    def getLastStatusUpdateDate(cls,foiministryrequestid,requeststatusid):
         statusdate = None
         try:
             sql = """select created_at from "FOIMinistryRequests" 
-                    where foiministryrequestid = :foiministryrequestid and requeststatuslabel = :requeststatuslabel
+                    where foiministryrequestid = :foiministryrequestid and requeststatusid = :requeststatusid
                     order by version desc limit 1;"""
-            rs = db.session.execute(text(sql), {'foiministryrequestid': foiministryrequestid, 'requeststatuslabel': requeststatuslabel})
+            rs = db.session.execute(text(sql), {'foiministryrequestid': foiministryrequestid, 'requeststatusid': requeststatusid})
             statusdate = [row[0] for row in rs][0]
         except Exception as ex:
             logging.error(ex)
@@ -164,11 +163,11 @@ class FOIMinistryRequest(db.Model):
         if group is None:
             _ministryrequestids = _session.query(distinct(FOIMinistryRequest.foiministryrequestid)).filter(FOIMinistryRequest.isactive == True).all()        
         elif (group == IAOTeamWithKeycloackGroup.flex.value):
-            _ministryrequestids = _session.query(distinct(FOIMinistryRequest.foiministryrequestid)).filter(and_(FOIMinistryRequest.isactive == True), and_(and_(FOIMinistryRequest.assignedgroup == group),and_(FOIMinistryRequest.requeststatuslabel.in_([StateName.open.name,StateName.callforrecords.name,StateName.closed.name,StateName.recordsreview.name,StateName.feeestimate.name,StateName.consult.name,StateName.ministrysignoff.value,StateName.onhold.name,StateName.deduplication.name,StateName.harmsassessment.name,StateName.response.name,StateName.peerreview.name,StateName.tagging.name,StateName.readytoscan.name])))).all()
+            _ministryrequestids = _session.query(distinct(FOIMinistryRequest.foiministryrequestid)).filter(and_(FOIMinistryRequest.isactive == True), and_(and_(FOIMinistryRequest.assignedgroup == group),and_(FOIMinistryRequest.requeststatusid.in_([1,2,3,12,13,7,8,9,10,11,14,16,17,18])))).all()
         elif (group in ProcessingTeamWithKeycloackGroup.list()):
-            _ministryrequestids = _session.query(distinct(FOIMinistryRequest.foiministryrequestid)).filter(and_(FOIMinistryRequest.isactive == True), and_(and_(FOIMinistryRequest.assignedgroup == group),and_(FOIMinistryRequest.requeststatuslabel.in_([StateName.open.name,StateName.callforrecords.name,StateName.closed.name,StateName.recordsreview.name,StateName.feeestimate.name,StateName.consult.name,StateName.ministrysignoff.value,StateName.onhold.name,StateName.response.name,StateName.peerreview.name,StateName.tagging.name,StateName.readytoscan.name])))).all()           
+            _ministryrequestids = _session.query(distinct(FOIMinistryRequest.foiministryrequestid)).filter(and_(FOIMinistryRequest.isactive == True), and_(and_(FOIMinistryRequest.assignedgroup == group),and_(FOIMinistryRequest.requeststatusid.in_([1,2,3,7,8,9,10,11,14,16,17,18])))).all()           
         else:
-            _ministryrequestids = _session.query(distinct(FOIMinistryRequest.foiministryrequestid)).filter(and_(FOIMinistryRequest.isactive == True), or_(and_(FOIMinistryRequest.assignedgroup == group),and_(FOIMinistryRequest.assignedministrygroup == group,or_(FOIMinistryRequest.requeststatuslabel.in_([StateName.callforrecords.name,StateName.recordsreview.name,StateName.feeestimate.name,StateName.consult.name,StateName.ministrysignoff.name,StateName.onhold.name,StateName.deduplication.name,StateName.harmsassessment.name,StateName.response.name,StateName.peerreview.name,StateName.tagging.name,StateName.readytoscan.name]))))).all()
+            _ministryrequestids = _session.query(distinct(FOIMinistryRequest.foiministryrequestid)).filter(and_(FOIMinistryRequest.isactive == True), or_(and_(FOIMinistryRequest.assignedgroup == group),and_(FOIMinistryRequest.assignedministrygroup == group,or_(FOIMinistryRequest.requeststatusid.in_([2,7,9,8,10,11,12,13,14,16,17,18]))))).all()
 
         _requests = []
         ministryrequest_schema = FOIMinistryRequestSchema()
@@ -227,11 +226,10 @@ class FOIMinistryRequest(db.Model):
     def getrequeststatusById(cls,ministryrequestid):
         summary = []
         try:
-            sql = 'select foirequest_id, version, requeststatusid, requeststatuslabel, created_at from "FOIMinistryRequests" fr  where foiministryrequestid = :ministryrequestid and requeststatuslabel != :requeststatuslabel order by version desc;'
-            
-            rs = db.session.execute(text(sql), {'ministryrequestid': ministryrequestid, 'requeststatuslabel': StateName.closed.name})        
+            sql = 'select foirequest_id, version, requeststatusid, created_at from "FOIMinistryRequests" fr  where foiministryrequestid = :ministryrequestid and requeststatusid != 3 order by version desc;'
+            rs = db.session.execute(text(sql), {'ministryrequestid': ministryrequestid})        
             for row in rs:
-                summary.append({"requeststatusid": row["requeststatusid"], "requeststatuslabel": row["requeststatuslabel"], "created_at": row["created_at"], "foirequest_id": row["foirequest_id"]})                
+                summary.append({"requeststatusid": row["requeststatusid"], "created_at": row["created_at"], "foirequest_id": row["foirequest_id"]})
         except Exception as ex:
             logging.error(ex)
             raise ex
@@ -408,13 +406,13 @@ class FOIMinistryRequest(db.Model):
                            else_ = FOIMinistryRequest.assignedministrygroup).label('ministryAssignedToFormatted')
         
         duedate = case([
-                            (FOIMinistryRequest.requeststatuslabel == StateName.onhold.name,  # On Hold
+                            (FOIMinistryRequest.requeststatusid == 11,  # On Hold
                              literal(None)),
                            ],
                            else_ = cast(FOIMinistryRequest.duedate, String)).label('duedate')
         
         cfrduedate = case([
-                            (FOIMinistryRequest.requeststatuslabel == StateName.onhold.name,  # On Hold
+                            (FOIMinistryRequest.requeststatusid == 11,  # On Hold
                              literal(None)),
                            ],
                            else_ = cast(FOIMinistryRequest.cfrduedate, String)).label('cfrduedate')
@@ -555,7 +553,7 @@ class FOIMinistryRequest(db.Model):
                                 SubjectCode,
                                 SubjectCode.subjectcodeid == FOIMinistryRequestSubjectCode.subjectcodeid,
                                 isouter=True
-                            ).filter(FOIMinistryRequest.requeststatuslabel != StateName.closed.name)
+                            ).filter(FOIMinistryRequest.requeststatusid != 3)
 
         if(additionalfilter == 'watchingRequests'):
             #watchby
@@ -684,7 +682,7 @@ class FOIMinistryRequest(db.Model):
                             FOIMinistryRequest.assignedgroup == group,
                             and_(
                                 FOIMinistryRequest.assignedgroup == IAOTeamWithKeycloackGroup.flex.value,
-                                FOIMinistryRequest.requeststatuslabel.in_([StateName.open.name])
+                                FOIMinistryRequest.requeststatusid.in_([1])
                             )
                         )
                     )
@@ -694,7 +692,7 @@ class FOIMinistryRequest(db.Model):
                             FOIMinistryRequest.assignedgroup == group,
                             and_(
                                 FOIMinistryRequest.assignedministrygroup == group,
-                                FOIMinistryRequest.requeststatuslabel.in_([StateName.callforrecords.name,StateName.recordsreview.name,StateName.feeestimate.name,StateName.consult.name,StateName.ministrysignoff.name,StateName.onhold.name,StateName.deduplication.name,StateName.harmsassessment.name,StateName.response.name,StateName.peerreview.name,StateName.tagging.name,StateName.readytoscan.name])
+                                FOIMinistryRequest.requeststatusid.in_([2,7,9,8,10,11,12,13,14,16,17,18])
                             )
                         )
                     )
@@ -709,7 +707,7 @@ class FOIMinistryRequest(db.Model):
 
     @classmethod
     def getrequestoriginalduedate(cls,ministryrequestid):       
-        return db.session.query(FOIMinistryRequest.duedate).filter(FOIMinistryRequest.foiministryrequestid == ministryrequestid, FOIMinistryRequest.requeststatuslabel == StateName.open.name).order_by(FOIMinistryRequest.version).first()[0]
+        return db.session.query(FOIMinistryRequest.duedate).filter(FOIMinistryRequest.foiministryrequestid == ministryrequestid, FOIMinistryRequest.requeststatusid == 1).order_by(FOIMinistryRequest.version).first()[0]
 
     @classmethod
     def getduedate(cls,ministryrequestid):
@@ -721,10 +719,10 @@ class FOIMinistryRequest(db.Model):
         upcomingduerecords = []
         try:
             sql = """select distinct on (filenumber) filenumber, to_char(cfrduedate, 'YYYY-MM-DD') as cfrduedate, foiministryrequestid, version, foirequest_id, created_at, createdby from "FOIMinistryRequests" fpa 
-                    where isactive = true and cfrduedate is not null and requeststatuslabel = :requeststatuslabel  
+                    where isactive = true and cfrduedate is not null and requeststatusid = 2  
                     and cfrduedate between  NOW() - INTERVAL '7 DAY' AND NOW() + INTERVAL '7 DAY'
                     order by filenumber , version desc;""" 
-            rs = db.session.execute(text(sql), {'requeststatuslabel': StateName.callforrecords.name})           
+            rs = db.session.execute(text(sql))            
             for row in rs:
                 upcomingduerecords.append({"filenumber": row["filenumber"], "cfrduedate": row["cfrduedate"],"foiministryrequestid": row["foiministryrequestid"], "version": row["version"], "foirequest_id": row["foirequest_id"], "created_at": row["created_at"], "createdby": row["createdby"]})
         except Exception as ex:
@@ -739,10 +737,10 @@ class FOIMinistryRequest(db.Model):
         upcomingduerecords = []
         try:
             sql = """select distinct on (filenumber) filenumber, to_char(duedate, 'YYYY-MM-DD') as duedate, foiministryrequestid, version, foirequest_id, created_at, createdby from "FOIMinistryRequests" fpa 
-                    where isactive = true and duedate is not null and requeststatuslabel not in (:requeststatuslabel)     
+                    where isactive = true and duedate is not null and requeststatusid not in (5,6,4,11,3,15)     
                     and duedate between  NOW() - INTERVAL '7 DAY' AND NOW() + INTERVAL '7 DAY'
                     order by filenumber , version desc;""" 
-            rs = db.session.execute(text(sql), {'requeststatuslabel': [StateName.closed.name,StateName.redirect.name,StateName.unopened.name,StateName.intakeinprogress.name,StateName.onhold.name,StateName.archived.name]})
+            rs = db.session.execute(text(sql))        
             for row in rs:
                 upcomingduerecords.append({"filenumber": row["filenumber"], "duedate": row["duedate"],"foiministryrequestid": row["foiministryrequestid"], "version": row["version"], "foirequest_id": row["foirequest_id"], "created_at": row["created_at"], "createdby": row["createdby"]})
         except Exception as ex:
@@ -760,15 +758,14 @@ class FOIMinistryRequest(db.Model):
                         frd.divisionid, frd.stageid, pad2."name" divisionname, pads."name" stagename, 
                         to_char(divisionduedate, 'YYYY-MM-DD') as duedate, frd.created_at, frd.createdby 
                         from "FOIMinistryRequestDivisions" frd 
-                        inner join (select distinct on (fpa.foiministryrequestid) foiministryrequestid, version as foiministryrequestversion, axisrequestid, filenumber, foirequest_id, requeststatusid, requeststatuslabel 
+                        inner join (select distinct on (fpa.foiministryrequestid) foiministryrequestid, version as foiministryrequestversion, axisrequestid, filenumber, foirequest_id, requeststatusid 
                                     from "FOIMinistryRequests" fpa  
-                                    order by fpa.foiministryrequestid , fpa.version desc) fma on frd.foiministryrequest_id = fma.foiministryrequestid and frd.foiministryrequestversion_id = fma.foiministryrequestversion and fma.requeststatuslabel not in (:requeststatuslabel) 
+                                    order by fpa.foiministryrequestid , fpa.version desc) fma on frd.foiministryrequest_id = fma.foiministryrequestid and frd.foiministryrequestversion_id = fma.foiministryrequestversion and fma.requeststatusid not in (5,6,4,11,3,15) 
                         inner join "ProgramAreaDivisions" pad2 on frd.divisionid  = pad2.divisionid 
                         inner join "ProgramAreaDivisionStages" pads on frd.stageid  = pads.stageid and frd.stageid in (5, 7, 9) 
                         and frd.divisionduedate  between  NOW() - INTERVAL '7 DAY' AND NOW() + INTERVAL '7 DAY' 
                         order by frd.foiministryrequest_id , frd.foiministryrequestversion_id desc;""" 
-            rs = db.session.execute(text(sql), {'requeststatuslabel': [StateName.closed.name,StateName.redirect.name,StateName.unopened.name,StateName.intakeinprogress.name,StateName.onhold.name,StateName.archived.name]})
-                  
+            rs = db.session.execute(text(sql))        
             for row in rs:
                 upcomingduerecords.append({"axisrequestid": row["axisrequestid"], "filenumber": row["filenumber"], 
                                             "foiministryrequestid": row["foiministryrequestid"], "version": row["foiministryrequestversion"], 
@@ -852,9 +849,9 @@ class FOIMinistryRequest(db.Model):
         try:
             sql = """ select distinct on (foiministryrequestid) foiministryrequestid, version, axisrequestid  
                         from "FOIMinistryRequests" fr 
-                        where requeststatuslabel = :requeststatuslabel
+                        where requeststatusid = 3
                         order by  foiministryrequestid , version desc, axisrequestid"""
-            rs = db.session.execute(text(sql), {'requeststatuslabel': StateName.closed.name})
+            rs = db.session.execute(text(sql))        
             for row in rs:
                 axisids.append(row["axisrequestid"])
         except Exception as ex:
@@ -929,13 +926,13 @@ class FOIMinistryRequest(db.Model):
                            else_ = FOIMinistryRequest.assignedministrygroup).label('ministryAssignedToFormatted')
         
         duedate = case([
-                            (FOIMinistryRequest.requeststatuslabel == StateName.onhold.name,  # On Hold
+                            (FOIMinistryRequest.requeststatusid == 11,  # On Hold
                              literal(None)),
                            ],
                            else_ = cast(FOIMinistryRequest.duedate, String)).label('duedate')
         
         cfrduedate = case([
-                            (FOIMinistryRequest.requeststatuslabel == StateName.onhold.name,  # On Hold
+                            (FOIMinistryRequest.requeststatusid == 11,  # On Hold
                              literal(None)),
                            ],
                            else_ = cast(FOIMinistryRequest.cfrduedate, String)).label('cfrduedate')
@@ -1119,7 +1116,7 @@ class FOIMinistryRequest(db.Model):
             groupfilter.append(FOIMinistryRequest.assignedministrygroup == group)
         
         #ministry advanced search show cfr onwards
-        statefilter = FOIMinistryRequest.requeststatuslabel.in_([StateName.callforrecords.name,StateName.closed.name,StateName.recordsreview.name,StateName.feeestimate.name,StateName.consult.name,StateName.ministrysignoff.name,StateName.onhold.name,StateName.deduplication.name,StateName.harmsassessment.name,StateName.response.name,StateName.peerreview.name,StateName.tagging.name,StateName.readytoscan.name])
+        statefilter = FOIMinistryRequest.requeststatusid.in_([2,3,7,9,8,10,11,12,13,14,16,17,18])
 
         ministry_queue = FOIMinistryRequest.advancedsearchsubquery(params, iaoassignee, ministryassignee, userid, 'Ministry', False, isministryrestrictedfilemanager).filter(and_(or_(*groupfilter), statefilter))
 
@@ -1156,10 +1153,10 @@ class FOIMinistryRequest(db.Model):
 
             # return all except closed
             if(includeclosed == False):
-                filtercondition.append(FOIMinistryRequest.requeststatuslabel != StateName.closed.name)
+                filtercondition.append(FOIMinistryRequest.requeststatusid != 3)
         elif(len(params['requeststatus']) > 1 and includeclosed == False):
             # return all except closed
-            filtercondition.append(FOIMinistryRequest.requeststatuslabel != StateName.closed.name)
+            filtercondition.append(FOIMinistryRequest.requeststatusid != 3)
 
         #request type: personal, general
         if(len(params['requesttype']) > 0):
@@ -1188,9 +1185,9 @@ class FOIMinistryRequest(db.Model):
     def getfilterforrequeststate(cls, params, includeclosed):
         #request state: unopened, call for records, etc.
         requeststatecondition = []
-        for statelabel in params['requeststate']:
-            requeststatecondition.append(FOIMinistryRequest.requeststatuslabel == statelabel)
-            if(statelabel == StateName.closed.name):
+        for stateid in params['requeststate']:
+            requeststatecondition.append(FOIMinistryRequest.requeststatusid == stateid)
+            if(stateid == 3):
                 includeclosed = True
         return {'condition': or_(*requeststatecondition), 'includeclosed': includeclosed}
 
@@ -1199,8 +1196,8 @@ class FOIMinistryRequest(db.Model):
         #request status: overdue || on time
         if(params['requeststatus'][0] == 'overdue'):
             #exclude "on hold" for overdue
-            statelabel = StateName.onhold.name
-            return and_(FOIMinistryRequest.findfield('duedate', iaoassignee, ministryassignee) < datetime.now().date(), FOIMinistryRequest.requeststatuslabel != statelabel)
+            stateid = 11
+            return and_(FOIMinistryRequest.findfield('duedate', iaoassignee, ministryassignee) < datetime.now().date(), FOIMinistryRequest.requeststatusid != stateid)
         else:
             return FOIMinistryRequest.findfield('duedate', iaoassignee, ministryassignee) >= datetime.now().date()
 
@@ -1305,9 +1302,9 @@ class FOIMinistryRequest(db.Model):
 class FOIMinistryRequestSchema(ma.Schema):
     class Meta:
         fields = ('foiministryrequestid','version','filenumber','description','recordsearchfromdate','recordsearchtodate',
-                'startdate','duedate','assignedgroup','assignedto','programarea.programareaid',
+                'startdate','duedate','assignedgroup','assignedto','programarea.programareaid','requeststatus.requeststatusid',
                 'foirequest.foirequestid','foirequest.requesttype','foirequest.receiveddate','foirequest.deliverymodeid',
-                'foirequest.receivedmodeid','requeststatus.requeststatusid','requeststatuslabel','requeststatus.name','programarea.bcgovcode',
+                'foirequest.receivedmodeid','requeststatus.requeststatusid','requeststatus.name','programarea.bcgovcode',
                 'programarea.name','foirequest_id','foirequestversion_id','created_at','updated_at','createdby','assignedministryperson',
                 'assignedministrygroup','cfrduedate','closedate','closereasonid','closereason.name',
                 'assignee.firstname','assignee.lastname','ministryassignee.firstname','ministryassignee.lastname', 'axisrequestid', 'axissyncdate', 'requestpagecount', 'linkedrequests', 'ministrysignoffapproval', 'identityverified','originalldd')

@@ -9,7 +9,6 @@ from request_api.models.FOIMinistryRequests import FOIMinistryRequest
 from request_api.models.FOIRequestStatus import FOIRequestStatus
 import json
 from request_api.models.default_method_result import DefaultMethodResult
-from request_api.utils.enums import StateName
 
 class stateevent:
     """ FOI Event management service
@@ -35,12 +34,12 @@ class stateevent:
         if len(states) == 2:
             newstate = states[0]
             oldstate = states[1]
-            if newstate != oldstate and newstate != StateName.intakeinprogress.value:
+            if newstate != oldstate and newstate != 'Intake in Progress':
                 return newstate
         return None 
     
     def __createcommentwrapper(self, requestid, state, requesttype, userid, username):
-        if state == StateName.archived.value:
+        if state == 'Archived':
             _openedministries = FOIMinistryRequest.getministriesopenedbyuid(requestid)
             for ministry in _openedministries:
                 response=self.__createcomment(ministry["ministryrequestid"], state, 'ministryrequest', userid, username)
@@ -59,17 +58,16 @@ class stateevent:
 
     def __createnotification(self, requestid, state, requesttype, userid):
         _notificationtype = "State"
-        if state == StateName.callforrecords.value and requesttype == "ministryrequest":
+        if state == 'Call For Records' and requesttype == "ministryrequest":
             foirequest = notificationservice().getrequest(requestid, requesttype)
             _notificationtype = "Group Members" if foirequest['assignedministryperson'] is None else "State"
         notification = self.__preparenotification(state)
-        if state == StateName.response.value and requesttype == "ministryrequest":
+        if state == "Response" and requesttype == "ministryrequest":
             signgoffapproval = FOIMinistryRequest().getrequest(requestid)['ministrysignoffapproval']
-            if signgoffapproval:
-                notification = notification + f". Approved by {signgoffapproval['approvername']}, {signgoffapproval['approvertitle']} on {signgoffapproval['approveddate']}"
-        if state == StateName.closed.value or state == StateName.archived.value:
+            notification = notification + f". Approved by {signgoffapproval['approvername']}, {signgoffapproval['approvertitle']} on {signgoffapproval['approveddate']}"
+        if state == 'Closed' or state == 'Archived' :
             notificationservice().dismissnotificationsbyrequestid(requestid, requesttype)
-        if state == StateName.archived.value:
+        if state == 'Archived':
             _openedministries = FOIMinistryRequest.getministriesopenedbyuid(requestid)
             for ministry in _openedministries:
                 response = notificationservice().createnotification({"message" : notification}, ministry["ministryrequestid"], 'ministryrequest', "State", userid)
@@ -90,7 +88,7 @@ class stateevent:
         return self.__notificationmessage(state)
 
     def __preparegroupmembernotification(self, state, requestid):
-        if state == StateName.callforrecords.value:
+        if state == 'Call For Records':
             return self.__notificationcfrmessage(requestid)
         return self.__groupmembernotificationmessage(state)
 
@@ -103,14 +101,13 @@ class stateevent:
         return comment
 
     def __formatstate(self, state):
-        return StateName.open.value if state == StateName.archived.value else state
+        return "Open" if state == "Archived" else state
 
     def __commentmessage(self, state, username, requesttype, requestid):
         comment = username+' changed the state of the request to '+self.__formatstate(state)
-        if state == StateName.response.value and requesttype == "ministryrequest":
+        if state == "Response" and requesttype == "ministryrequest":
             signgoffapproval = FOIMinistryRequest().getrequest(requestid)['ministrysignoffapproval']
-            if signgoffapproval:
-                comment = comment + f". Approved by {signgoffapproval['approvername']}, {signgoffapproval['approvertitle']} on {signgoffapproval['approveddate']}"
+            comment = comment + f". Approved by {signgoffapproval['approvername']}, {signgoffapproval['approvertitle']} on {signgoffapproval['approveddate']}"
         return comment
 
     def __notificationmessage(self, state):
@@ -122,7 +119,7 @@ class stateevent:
 
     def __createcfrentry(self, state, ministryrequestid, userid):
         cfrfee = cfrfeeservice().getcfrfee(ministryrequestid)
-        if (state == StateName.feeestimate.value and cfrfee['cfrfeestatusid'] in (None, '')):
+        if (state == "Fee Estimate" and cfrfee['cfrfeestatusid'] in (None, '')):
             return cfrfeeservice().sanctioncfrfee(ministryrequestid, {"status": "review"}, userid)
         else:
             return DefaultMethodResult(True,'No action needed',ministryrequestid)
