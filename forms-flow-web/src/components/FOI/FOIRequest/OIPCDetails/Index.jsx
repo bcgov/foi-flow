@@ -33,7 +33,10 @@ const OIPCDetails = (props) => {
         <AccordionDetails>
             <OIPCDetailsList oipcData={oipcData} removeOIPC={removeOIPC} updateOIPC={updateOIPC} />
             <div style={{display: "flex", flexDirection: "row", alignItems: "center", margin: "7px 0px 7px 0px"}}>
-                <button onClick={() => addOIPC()} style={{ border: "none", background: "none" }}>
+                <button onClick={(event) => {
+                  event.preventDefault()
+                  addOIPC();
+                }} style={{ border: "none", background: "none" }}>
                     <FontAwesomeIcon icon={faCirclePlus}  size="lg" color="#38598A" />
                 </button>
                 <p style={{fontWeight: "bold", color: "#38598A"}}>Add Additional OIPC Complaint</p>
