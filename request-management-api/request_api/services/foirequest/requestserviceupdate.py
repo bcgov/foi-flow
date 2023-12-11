@@ -19,7 +19,7 @@ class requestserviceupdate(requestservicebuilder):
             for ministry in foirequestschema.get("selectedMinistries"):
                 for status in allstatus:
                     if ministry["status"] == status["name"]:
-                        updatedministries.append({"filenumber" : ministry["filenumber"], "requeststatusid": status["requeststatusid"]})
+                        updatedministries.append({"filenumber" : ministry["filenumber"], "requeststatuslabel": status["statuslabel"]})
             return FOIRequest.updateStatus(foirequestid, updatedministries, userid)
     
     def updateministryrequestduedate(self, ministryrequestid, duedate, userid):
