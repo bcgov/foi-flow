@@ -580,10 +580,9 @@ class FOIRawRequest(db.Model):
     
     @classmethod
     def handleadditionalfilter(cls, basequery, additionalfilter=None, userid=None, isiaorestrictedfilemanager=False, groups=[]):
-        if additionalfilter is None:
-            return FOIRawRequest.noadditionalfilter(basequery, userid, isiaorestrictedfilemanager)
-        else:
+        if additionalfilter:
             return FOIRawRequest.addadditionalfilter(basequery, additionalfilter, userid, isiaorestrictedfilemanager, groups)
+        return FOIRawRequest.noadditionalfilter(basequery, userid, isiaorestrictedfilemanager)
         
     @classmethod
     def noadditionalfilter(cls, basequery, userid=None, isiaorestrictedfilemanager=False):
