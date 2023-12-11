@@ -9,7 +9,6 @@ class FOIRequestStatus(db.Model):
     name = db.Column(db.String(100), unique=False, nullable=False)
     description = db.Column(db.String(255), unique=False, nullable=True)    
     isactive = db.Column(db.Boolean, unique=False, nullable=False)
-    statuslabel = db.Column(db.String(50), unique=True, nullable=False)
 
     @classmethod
     def getrequeststatuses(cls):
@@ -18,17 +17,17 @@ class FOIRequestStatus(db.Model):
         return requeststatus_schema.dump(query)
 
     @classmethod
-    def getrequeststatus(cls,status):
+    def getrequeststatusid(cls,status):
         requeststatus_schema = RequestStatusSchema()
         query = db.session.query(FOIRequestStatus).filter_by(name=status).first()
         return requeststatus_schema.dump(query)
 
     @classmethod
-    def getrequeststatusbylabel(cls,statuslabel):
+    def getrequeststatusname(cls,statusid):
         requeststatus_schema = RequestStatusSchema()
-        query = db.session.query(FOIRequestStatus).filter_by(statuslabel=statuslabel, isactive=True).first()
+        query = db.session.query(FOIRequestStatus).filter_by(requeststatusid=statusid, isactive=True).first()
         return requeststatus_schema.dump(query)
 
 class RequestStatusSchema(ma.Schema):
     class Meta:
-        fields = ('requeststatusid', 'name', 'description','isactive','statuslabel')
+        fields = ('requeststatusid', 'name', 'description','isactive')

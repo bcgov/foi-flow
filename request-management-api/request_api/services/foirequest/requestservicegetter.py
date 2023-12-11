@@ -15,7 +15,6 @@ from request_api.services.subjectcodeservice import subjectcodeservice
 from request_api.services.programareaservice import programareaservice
 from request_api.utils.commons.datetimehandler import datetimehandler
 from request_api.services.external.keycloakadminservice import KeycloakAdminService
-from request_api.utils.enums import StateName
 
 class requestservicegetter:
     """ This class consolidates retrival of FOI request for actors: iao and ministry. 
@@ -30,7 +29,7 @@ class requestservicegetter:
         iaorestrictrequestdetails = FOIRestrictedMinistryRequest.getrestricteddetails(ministryrequestid=foiministryrequestid,type='iao')
 
         baserequestinfo = self.__preparebaseinfo(request,foiministryrequestid,requestministry,requestministrydivisions)
-        baserequestinfo['lastStatusUpdateDate'] = FOIMinistryRequest.getLastStatusUpdateDate(foiministryrequestid, requestministry['requeststatuslabel']).strftime(self.__genericdateformat()),
+        baserequestinfo['lastStatusUpdateDate'] = FOIMinistryRequest.getLastStatusUpdateDate(foiministryrequestid, requestministry['requeststatus.requeststatusid']).strftime(self.__genericdateformat()),
         for contactinfo in requestcontactinformation:
             if contactinfo['contacttype.name'] == 'Email':
                 baserequestinfo.update({'email':contactinfo['contactinformation']})
@@ -153,8 +152,8 @@ class requestservicegetter:
             'description': requestministry['description'],
             'fromDate': parse(requestministry['recordsearchfromdate']).strftime(self.__genericdateformat()) if requestministry['recordsearchfromdate'] is not None else '',
             'toDate': parse(requestministry['recordsearchtodate']).strftime(self.__genericdateformat()) if requestministry['recordsearchtodate'] is not None else '',
-            'currentState':requestministry['requeststatus.name'],
-            'requeststatuslabel':requestministry['requeststatuslabel'],
+            'currentState':requestministry['requeststatus.name'],            
+            'requeststatusid':requestministry['requeststatus.requeststatusid'],
             'requestProcessStart': parse(requestministry['startdate']).strftime(self.__genericdateformat()) if requestministry['startdate'] is not None else '',
             'dueDate':parse(requestministry['duedate']).strftime(self.__genericdateformat()),  
             'originalDueDate':  parse(requestministry['originalldd']).strftime(self.__genericdateformat()) if requestministry['originalldd'] is not None else parse(requestministry['duedate']).strftime(self.__genericdateformat()),            
@@ -214,7 +213,7 @@ class requestservicegetter:
         onholddate = None
         transitions = FOIMinistryRequest.getrequeststatusById(foiministryrequestid)
         for entry in transitions:
-            if entry['requeststatuslabel'] == StateName.onhold.name:
+            if entry['requeststatusid'] == 11:
                 onholddate = datetimehandler().convert_to_pst(entry['created_at'],'%Y-%m-%d')
             else:
                 if onholddate is not None:

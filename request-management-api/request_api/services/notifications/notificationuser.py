@@ -9,7 +9,7 @@ from request_api.services.notifications.notificationconfig import notificationco
 from request_api.services.external.keycloakadminservice import KeycloakAdminService
 
 class notificationuser:
-    """ notification user service
+    """ Notfication user service
 
     """
     
@@ -55,26 +55,26 @@ class notificationuser:
     def __getwatchers(self, notificationtype, foirequest, requesttype, requestjson=None):
         notificationusers = []
         if notificationtype == "Watcher":
-            notificationusers.append({"userid": requestjson['watchedby'], "usertype":notificationconfig().getnotificationusertypelabel("Watcher")})
+            notificationusers.append({"userid": requestjson['watchedby'], "usertype":notificationconfig().getnotificationusertypeid("Watcher")})
         else:
             if requesttype == "ministryrequest":
                 watchers =  watcherservice().getallministryrequestwatchers(foirequest["foiministryrequestid"], self.__isministryonly(notificationtype))
             else:
                 watchers =  watcherservice().getrawrequestwatchers(foirequest['requestid'])
             for watcher in watchers:
-                    notificationusers.append({"userid":watcher["watchedby"], "usertype":notificationconfig().getnotificationusertypelabel("Watcher")})
+                    notificationusers.append({"userid":watcher["watchedby"], "usertype":notificationconfig().getnotificationusertypeid("Watcher")})
         return notificationusers         
     
     def __getassignees(self, foirequest, requesttype, notificationtype, requestjson=None):
         notificationusers = []
-        notificationtypelabel = notificationconfig().getnotificationusertypelabel("Assignee")
+        notificationtypeid = notificationconfig().getnotificationusertypeid("Assignee")
         if notificationtype == 'User Assignment Removal':
-            notificationusers.append({"userid": requestjson['userid'], "usertype":notificationtypelabel})
+            notificationusers.append({"userid": requestjson['userid'], "usertype":notificationtypeid})
         else:
             if requesttype == "ministryrequest" and foirequest["assignedministryperson"] is not None and (notificationtype == 'Ministry Assignment' or 'Assignment' not in notificationtype):
-                notificationusers.append({"userid":foirequest["assignedministryperson"], "usertype":notificationtypelabel})
+                notificationusers.append({"userid":foirequest["assignedministryperson"], "usertype":notificationtypeid})
             if self.__isministryonly(notificationtype) == False and foirequest["assignedto"] is not None and foirequest["assignedto"] != '' and (notificationtype == 'IAO Assignment' or 'Assignment' not in notificationtype):
-                notificationusers.append({"userid":foirequest["assignedto"], "usertype":notificationtypelabel})
+                notificationusers.append({"userid":foirequest["assignedto"], "usertype":notificationtypeid})
         return notificationusers          
     
     def __isministryonly(self, notificationtype):
@@ -102,7 +102,7 @@ class notificationuser:
         for requestuser in requestusers:
             if requestuser["userid"] == userid:  
                 return  requestuser["usertype"]   
-        return notificationconfig().getnotificationusertypelabel("comment user")
+        return notificationconfig().getnotificationusertypeid("comment user")
     
     def __getrelatedusers(self, comment, requesttype):
         if requesttype == "ministryrequest":
@@ -118,16 +118,16 @@ class notificationuser:
     def __preparetaggeduser(self, data):
         taggedusers = [] 
         for entry in data:
-            taggedusers.append({"userid":entry["username"], "usertype":notificationconfig().getnotificationusertypelabel("comment tagged user")})
+            taggedusers.append({"userid":entry["username"], "usertype":notificationconfig().getnotificationusertypeid("comment tagged user")})
         return taggedusers
 
     def __getgroupmembers(self,groupid):
         notificationusers = []
-        notificationtypelabel = notificationconfig().getnotificationtypelabel("Group Members")
+        notificationtypeid = notificationconfig().getnotificationusertypeid("Group Members")
         usergroupfromkeycloak= KeycloakAdminService().getmembersbygroupname(groupid) 
         if usergroupfromkeycloak is not None and len(usergroupfromkeycloak) > 0:
             for user in usergroupfromkeycloak[0].get("members"):
-                notificationusers.append({"userid":user["username"], "usertype":notificationtypelabel})
+                notificationusers.append({"userid":user["username"], "usertype":notificationtypeid})
             return notificationusers 
         return []
         

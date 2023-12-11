@@ -133,8 +133,8 @@ export default function ConfirmationModal({requestId, openModal, handleModal, st
                    (
                       state.toLowerCase() === StateEnum.onhold.name.toLowerCase()
                       && (
-                          saveRequestObject.requeststatuslabel === StateEnum.feeassessed.label
-                          || saveRequestObject.requeststatuslabel === StateEnum.response.label
+                          saveRequestObject.requeststatusid === StateEnum.feeassessed.id
+                          || saveRequestObject.requeststatusid === StateEnum.response.id
                          )
                       && saveRequestObject.email)
             )
@@ -150,22 +150,22 @@ export default function ConfirmationModal({requestId, openModal, handleModal, st
         let fileStatusTransition = "";
         if (state.toLowerCase() === StateEnum.response.name.toLowerCase())
           fileStatusTransition = StateTransitionCategories.signoffresponse.name;
-        else if (saveRequestObject.requeststatuslabel === StateEnum.callforrecords.label
+        else if (saveRequestObject.requeststatusid === StateEnum.callforrecords.id
           && state.toLowerCase() === StateEnum.review.name.toLowerCase())
           fileStatusTransition = StateTransitionCategories.cfrreview.name;
-        else if (saveRequestObject.requeststatuslabel === StateEnum.harms.label
+        else if (saveRequestObject.requeststatusid === StateEnum.harms.id
           && state.toLowerCase() === StateEnum.review.name.toLowerCase())
           fileStatusTransition = StateTransitionCategories.harmsreview.name;
-        else if (saveRequestObject.requeststatuslabel === StateEnum.feeassessed.label
+        else if (saveRequestObject.requeststatusid === StateEnum.feeassessed.id
           && state.toLowerCase() === StateEnum.onhold.name.toLowerCase())
           fileStatusTransition = StateTransitionCategories.feeonhold.name;
-        else if (saveRequestObject.requeststatuslabel === StateEnum.response.label
+        else if (saveRequestObject.requeststatusid === StateEnum.response.id
           && state.toLowerCase() === StateEnum.onhold.name.toLowerCase())
           fileStatusTransition = StateTransitionCategories.responseonhold.name;
-        else if (saveRequestObject.requeststatuslabel === StateEnum.response.label
+        else if (saveRequestObject.requeststatusid === StateEnum.response.id
           && state.toLowerCase() === StateEnum.review.name.toLowerCase())
           fileStatusTransition = StateTransitionCategories.responsereview.name;
-        else if (saveRequestObject.requeststatuslabel === StateEnum.signoff.label
+        else if (saveRequestObject.requeststatusid === StateEnum.signoff.id
           && state.toLowerCase() === StateEnum.review.name.toLowerCase())
           fileStatusTransition = StateTransitionCategories.signoffreview.name;
 
@@ -206,7 +206,7 @@ export default function ConfirmationModal({requestId, openModal, handleModal, st
           (state.toLowerCase() === StateEnum.review.name.toLowerCase() && (!isAnyAmountPaid || !isMinistry))
           ||
           (state.toLowerCase() === StateEnum.onhold.name.toLowerCase()
-            && (saveRequestObject.requeststatuslabel === StateEnum.feeassessed.label || saveRequestObject.requeststatuslabel === StateEnum.response.label)
+            && (saveRequestObject.requeststatusid === StateEnum.feeassessed.id || saveRequestObject.requeststatusid === StateEnum.response.id)
             && saveRequestObject.email
             && cfrStatus == 'approved'
             && amountDue !== 0)
@@ -226,7 +226,7 @@ export default function ConfirmationModal({requestId, openModal, handleModal, st
           </div>
         );
       }
-      else if (currentState?.toLowerCase() === StateEnum.signoff.name.toLowerCase() && state.toLowerCase() === StateEnum.response.name.toLowerCase() && saveRequestObject.requeststatuslabel === StateEnum.signoff.label) {
+      else if (currentState?.toLowerCase() === StateEnum.signoff.name.toLowerCase() && state.toLowerCase() === StateEnum.response.name.toLowerCase() && saveRequestObject.requeststatusid === StateEnum.signoff.id) {
         return (
         <div className={classes.fileUploadBox}>
           <MinistryApprovalModal handleApprovalInputs={handleApprovalInputs} />
@@ -312,7 +312,7 @@ export default function ConfirmationModal({requestId, openModal, handleModal, st
             </button>
           </DialogActions>
           <ConditionalComponent condition={state.toLowerCase() === StateEnum.onhold.name.toLowerCase()
-                                            && (saveRequestObject.requeststatuslabel === StateEnum.feeassessed.label || saveRequestObject.requeststatuslabel === StateEnum.response.label)
+                                            && (saveRequestObject.requeststatusid === StateEnum.feeassessed.id || saveRequestObject.requeststatusid === StateEnum.response.id)
                                             && cfrStatus === 'approved'
                                             && !saveRequestObject.email}>
             <div id="state-change-dialog-checkbox">
@@ -331,7 +331,7 @@ export default function ConfirmationModal({requestId, openModal, handleModal, st
             </div>
           </ConditionalComponent>
           <ConditionalComponent condition={state.toLowerCase() === StateEnum.onhold.name.toLowerCase()
-                                            && saveRequestObject.requeststatuslabel === StateEnum.feeassessed.label
+                                            && saveRequestObject.requeststatusid === StateEnum.feeassessed.id
                                             && cfrStatus === 'approved'
                                             && amountDue === 0}>
             <div class="state-change-dialog-error">

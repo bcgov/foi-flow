@@ -17,5 +17,4 @@ class FOINotifications(db.Model):
     userformatted = db.Column(db.Text)
     creatorformatted = db.Column(db.Text)
     notificationtype = db.Column(db.String(500))
-    notificationtypelabel = db.Column(db.String(500))
     

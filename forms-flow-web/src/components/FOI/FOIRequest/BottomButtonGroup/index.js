@@ -115,7 +115,7 @@ const BottomButtonGroup = React.memo(
 
     const saveRequest = async (setLoader = false) => {
       if (urlIndexCreateRequest > -1) {
-        saveRequestObject.requeststatuslabel = StateEnum.intakeinprogress.label;
+        saveRequestObject.requeststatusid = StateEnum.intakeinprogress.id;
         setIsAddRequest(false);
       }      
       dispatch(setFOILoader(setLoader))
@@ -176,7 +176,7 @@ const BottomButtonGroup = React.memo(
       if (
         currentSelectedStatus &&
         currentSelectedStatus !== StateEnum.open.name &&
-        saveRequestObject.requeststatuslabel &&
+        saveRequestObject.requeststatusid &&
         saveRequestObject.currentState
       ) {
         //scanning team - MSD/CFD personal
@@ -200,7 +200,7 @@ const BottomButtonGroup = React.memo(
         }
         saveRequestModal();
       } else {
-        saveRequestObject.requeststatuslabel = StateEnum.open.label;
+        saveRequestObject.requeststatusid = StateEnum.open.id;
         if (currentSelectedStatus === StateEnum.open.name && ministryId) {
           saveRequestModal();
         } 
@@ -231,7 +231,7 @@ const BottomButtonGroup = React.memo(
       saveRequestObject.id = saveRequestObject.id
         ? saveRequestObject.id
         : requestId;
-      saveRequestObject.requeststatuslabel = StateEnum.open.label;
+      saveRequestObject.requeststatusid = 1;
       setOpenModal(true);
     };
 
@@ -292,14 +292,14 @@ const BottomButtonGroup = React.memo(
       if (currentSelectedStatus) {
         switch (currentSelectedStatus) {
           case StateEnum.closed.name:
-            saveRequestObject.requeststatuslabel = StateEnum.closed.label;
+            saveRequestObject.requeststatusid = StateEnum.closed.id;
             saveRequestObject.closedate = closingDate;
             saveRequestObject.closereasonid = closingReasonId;
             break;
   
           case StateEnum.callforrecords.name:
             saveRequestObject.paymentExpiryDate = ""
-            saveRequestObject.requeststatuslabel = StateEnum.callforrecords.label;
+            saveRequestObject.requeststatusid = StateEnum.callforrecords.id;
             if (
               !("cfrDueDate" in saveRequestObject) ||
               saveRequestObject.cfrDueDate === ""
@@ -354,7 +354,7 @@ const BottomButtonGroup = React.memo(
             const status = Object.values(StateEnum).find(
               (statusValue) => statusValue.name === currentSelectedStatus
             );
-            saveRequestObject.requeststatuslabel = status.label;
+            saveRequestObject.requeststatusid = status.id;
             if (currentSelectedStatus === StateEnum.onhold.name && !saveRequestObject.paymentExpiryDate) {
               saveRequestObject.paymentExpiryDate = dueDateCalculation(new Date(), PAYMENT_EXPIRY_DAYS);
             }

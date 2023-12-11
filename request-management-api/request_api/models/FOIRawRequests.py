@@ -18,7 +18,6 @@ from .FOIAssignees import FOIAssignee
 import logging
 from dateutil import parser
 import json
-from request_api.utils.enums import StateName
 
 class FOIRawRequest(db.Model):
     # Name of the table in our database
@@ -28,7 +27,6 @@ class FOIRawRequest(db.Model):
     version = db.Column(db.Integer, primary_key=True,nullable=False)
     requestrawdata = db.Column(JSON, unique=False, nullable=True)
     status = db.Column(db.String(25), unique=False, nullable=True)
-    requeststatuslabel = db.Column(db.String(50), unique=False, nullable=False)
     notes = db.Column(db.String(120), unique=False, nullable=True)
     wfinstanceid = db.Column(UUID(as_uuid=True), unique=False, nullable=True)
     assignedgroup = db.Column(db.String(250), unique=False, nullable=True) 
@@ -57,7 +55,7 @@ class FOIRawRequest(db.Model):
     @classmethod
     def saverawrequest(cls, _requestrawdata, sourceofsubmission, ispiiredacted, userid, notes, requirespayment, axisrequestid, axissyncdate, linkedrequests, assigneegroup=None, assignee=None, assigneefirstname=None, assigneemiddlename=None, assigneelastname=None)->DefaultMethodResult:        
         version = 1
-        newrawrequest = FOIRawRequest(requestrawdata=_requestrawdata, status = StateName.unopened.value if sourceofsubmission != "intake" else StateName.intakeinprogress.value, requeststatuslabel = StateName.unopened.name if sourceofsubmission != "intake" else StateName.intakeinprogress.name, createdby=userid, version=version, sourceofsubmission=sourceofsubmission, assignedgroup=assigneegroup, assignedto=assignee, ispiiredacted=ispiiredacted, notes=notes, requirespayment=requirespayment, axisrequestid=axisrequestid, axissyncdate=axissyncdate, linkedrequests=linkedrequests)
+        newrawrequest = FOIRawRequest(requestrawdata=_requestrawdata, status = 'Unopened' if sourceofsubmission != "intake" else 'Intake in Progress', createdby=userid, version=version, sourceofsubmission=sourceofsubmission, assignedgroup=assigneegroup, assignedto=assignee, ispiiredacted=ispiiredacted, notes=notes, requirespayment=requirespayment, axisrequestid=axisrequestid, axissyncdate=axissyncdate, linkedrequests=linkedrequests)
         if assignee is not None:
             FOIAssignee.saveassignee(assignee, assigneefirstname, assigneemiddlename, assigneelastname)
 
@@ -68,13 +66,13 @@ class FOIRawRequest(db.Model):
     @classmethod
     def saverawrequest_foipayment(cls,_requestrawdata,notes, requirespayment, ispiiredacted)->DefaultMethodResult: 
         version = 1
-        newrawrequest = FOIRawRequest(requestrawdata=_requestrawdata, status=StateName.unopened.value, requeststatuslabel = StateName.unopened.name ,createdby=None,version=version,sourceofsubmission="onlineform",assignedgroup=None,assignedto=None,ispiiredacted=ispiiredacted,notes=notes, requirespayment= requirespayment)
+        newrawrequest = FOIRawRequest(requestrawdata=_requestrawdata, status='Unopened',createdby=None,version=version,sourceofsubmission="onlineform",assignedgroup=None,assignedto=None,ispiiredacted=ispiiredacted,notes=notes, requirespayment= requirespayment)
         db.session.add(newrawrequest)
         db.session.commit()               
         return DefaultMethodResult(True,'Request added',newrawrequest.requestid)
 
     @classmethod
-    def saverawrequestversion(cls,_requestrawdata,requestid,assigneegroup,assignee,status,ispiiredacted,userid,statuslabel,assigneefirstname=None,assigneemiddlename=None,assigneelastname=None)->DefaultMethodResult:        
+    def saverawrequestversion(cls,_requestrawdata,requestid,assigneegroup,assignee,status,ispiiredacted,userid,assigneefirstname=None,assigneemiddlename=None,assigneelastname=None)->DefaultMethodResult:        
         request = db.session.query(FOIRawRequest).filter_by(requestid=requestid).order_by(FOIRawRequest.version.desc()).first()
         if request is not None:
             _assginee = assignee if assignee not in (None,'') else None
@@ -96,7 +94,6 @@ class FOIRawRequest(db.Model):
                     updatedby=None,
                     updated_at=datetime.now(),
                     status=status,
-                    requeststatuslabel=statuslabel,
                     assignedgroup=assigneegroup,
                     assignedto=_assginee,
                     wfinstanceid=request.wfinstanceid,
@@ -300,7 +297,7 @@ class FOIRawRequest(db.Model):
         requests = []
         try:
             sql = """select * ,
-                        CASE WHEN description = (select requestrawdata -> 'descriptionTimeframe' ->> 'description' from "FOIRawRequests" where requestid = :requestid and status = :requeststatus and version = 1) 
+                        CASE WHEN description = (select requestrawdata -> 'descriptionTimeframe' ->> 'description' from "FOIRawRequests" where requestid = :requestid and status = 'Unopened' and version = 1) 
                                 then 'Online Form' 
                                 else savedby END  as createdby 
                         from (select CASE WHEN lower(status) <> 'unopened' 
@@ -315,7 +312,7 @@ class FOIRawRequest(db.Model):
                             to_char(created_at, 'YYYY-MM-DD HH24:MI:SS') as createdat, status, ispiiredacted,
                             createdby as savedby from "FOIRawRequests" fr 
                         where requestid = :requestid order by version ) as sq;"""
-            rs = db.session.execute(text(sql), {'requestid': requestid, 'requeststatus': StateName.unopened.value})
+            rs = db.session.execute(text(sql), {'requestid': requestid})
             for row in rs:
                 requests.append(dict(row))
         except Exception as ex:
@@ -371,10 +368,10 @@ class FOIRawRequest(db.Model):
             sql = '''
                     SELECT * FROM (SELECT DISTINCT ON (requestid) requestid, updated_at, status FROM public."FOIRawRequests"
 	                ORDER BY requestid ASC, version DESC) r
-                    WHERE r.status = :requeststaus
+                    WHERE r.status = 'App Fee Owing'
 					order by r.updated_at asc
                     '''
-            rs = db.session.execute(text(sql), {'requeststaus': StateName.appfeeowing.value})
+            rs = db.session.execute(text(sql))
             appfeeowingrequests = rs
         except Exception as ex:
             logging.error(ex)
@@ -444,47 +441,47 @@ class FOIRawRequest(db.Model):
         ]
 
         requesttype = case([
-                            (FOIRawRequest.status == StateName.unopened.value,
+                            (FOIRawRequest.status == 'Unopened',
                              FOIRawRequest.requestrawdata['requestType']['requestType'].astext),
                            ],
                            else_ = FOIRawRequest.requestrawdata['requestType'].astext).label('requestType')
         firstname = case([
-                            (FOIRawRequest.status == StateName.unopened.value,
+                            (FOIRawRequest.status == 'Unopened',
                              FOIRawRequest.requestrawdata['contactInfo']['firstName'].astext),
                            ],
                            else_ = FOIRawRequest.requestrawdata['firstName'].astext).label('firstName')
         lastname = case([
-                            (FOIRawRequest.status == StateName.unopened.value,
+                            (FOIRawRequest.status == 'Unopened',
                              FOIRawRequest.requestrawdata['contactInfo']['lastName'].astext),
                            ],
                            else_ = FOIRawRequest.requestrawdata['lastName'].astext).label('lastName')
         description = case([
-                            (FOIRawRequest.status == StateName.unopened.value,
+                            (FOIRawRequest.status == 'Unopened',
                              FOIRawRequest.requestrawdata['descriptionTimeframe']['description'].astext),
                            ],
                            else_ = FOIRawRequest.requestrawdata['description'].astext).label('description')
         recordsearchfromdate = case([
-                            (FOIRawRequest.status == StateName.unopened.value,
+                            (FOIRawRequest.status == 'Unopened',
                              FOIRawRequest.requestrawdata['descriptionTimeframe']['fromDate'].astext),
                            ],
                            else_ = FOIRawRequest.requestrawdata['fromDate'].astext).label('recordsearchfromdate')
         recordsearchtodate = case([
-                            (FOIRawRequest.status == StateName.unopened.value,
+                            (FOIRawRequest.status == 'Unopened',
                              FOIRawRequest.requestrawdata['descriptionTimeframe']['toDate'].astext),
                            ],
                            else_ = FOIRawRequest.requestrawdata['toDate'].astext).label('recordsearchtodate')
         duedate = case([
-                            (FOIRawRequest.status == StateName.unopened.value,
+                            (FOIRawRequest.status == 'Unopened',
                              literal(None)),
                            ],
                            else_ = FOIRawRequest.requestrawdata['dueDate'].astext).label('duedate')
         receiveddate = case([
-                            (and_(FOIRawRequest.status == StateName.unopened.value, FOIRawRequest.requestrawdata['receivedDate'].is_(None)),
+                            (and_(FOIRawRequest.status == 'Unopened', FOIRawRequest.requestrawdata['receivedDate'].is_(None)),
                              func.to_char(FOIRawRequest.created_at, 'YYYY-mm-DD')),
                            ],
                            else_ = FOIRawRequest.requestrawdata['receivedDate'].astext).label('receivedDate')
         receiveddateuf = case([
-                            (and_(FOIRawRequest.status == StateName.unopened.value, FOIRawRequest.requestrawdata['receivedDateUF'].is_(None)),
+                            (and_(FOIRawRequest.status == 'Unopened', FOIRawRequest.requestrawdata['receivedDateUF'].is_(None)),
                              func.to_char(FOIRawRequest.created_at, 'YYYY-mm-DD HH:MM:SS')),
                            ],
                            else_ = FOIRawRequest.requestrawdata['receivedDateUF'].astext).label('receivedDateUF')
@@ -615,7 +612,7 @@ class FOIRawRequest(db.Model):
     @classmethod
     def getrequestssubquery(cls, filterfields, keyword, additionalfilter, userid, isiaorestrictedfilemanager):
         basequery = FOIRawRequest.getbasequery(additionalfilter, userid, isiaorestrictedfilemanager)
-        basequery = basequery.filter(FOIRawRequest.status != StateName.unopened.value).filter(FOIRawRequest.status != StateName.closed.value)
+        basequery = basequery.filter(FOIRawRequest.status != 'Unopened').filter(FOIRawRequest.status != 'Closed')
         #filter/search
         if(len(filterfields) > 0 and keyword is not None):
             filtercondition = FOIRawRequest.getfilterforrequestssubquery(filterfields, keyword)
@@ -778,7 +775,7 @@ class FOIRawRequest(db.Model):
             filtercondition.append(requeststatecondition['condition'])
             includeclosed = requeststatecondition['includeclosed']
         else:
-            filtercondition.append(FOIRawRequest.status != StateName.unopened.value)  #not return Unopened by default
+            filtercondition.append(FOIRawRequest.status != 'Unopened')  #not return Unopened by default
         
         #request status: overdue, on time - no due date for unopen & intake in progress, so return all except closed
         if(len(params['requeststatus']) > 0 and includeclosed == False):
@@ -786,7 +783,7 @@ class FOIRawRequest(db.Model):
                 #no rawrequest returned for this case
                 filtercondition.append(FOIRawRequest.status == 'ReturnNothing')
             else:
-                filtercondition.append(FOIRawRequest.status != StateName.closed.value)
+                filtercondition.append(FOIRawRequest.status != 'Closed')
         
         #request type: personal, general
         if(len(params['requesttype']) > 0):
@@ -848,14 +845,14 @@ class FOIRawRequest(db.Model):
         requeststatecondition = []
         for state in params['requeststate']:
             if(state == '3'):
-                requeststatecondition.append(FOIRawRequest.status == StateName.closed.value)
+                requeststatecondition.append(FOIRawRequest.status == 'Closed')
                 includeclosed = True
             elif(state == '4'):
-                requeststatecondition.append(FOIRawRequest.status == StateName.redirect.value)
+                requeststatecondition.append(FOIRawRequest.status == 'Redirect')
             elif(state == '5'):
-                requeststatecondition.append(FOIRawRequest.status == StateName.unopened.value)
+                requeststatecondition.append(FOIRawRequest.status == 'Unopened')
             elif(state == '6'):
-                requeststatecondition.append(FOIRawRequest.status == StateName.intakeinprogress.value)
+                requeststatecondition.append(FOIRawRequest.status == 'Intake in Progress')
         
         if(len(requeststatecondition) == 0):
             requeststatecondition.append(FOIRawRequest.status == 'Not Applicable')  #searched state does not apply to rawrequests
@@ -1012,8 +1009,8 @@ class FOIRawRequest(db.Model):
                 (SELECT DISTINCT ON (requestid) requestid, created_at, version, status, axisrequestid
                 FROM public."FOIRawRequests"
                 ORDER BY requestid ASC, version DESC) foireqs
-            WHERE foireqs.status = :requeststatus;"""
-            rs = db.session.execute(text(sql), {'requeststatus': StateName.section5pending.value})
+            WHERE foireqs.status = 'Section 5 Pending';"""
+            rs = db.session.execute(text(sql))        
             for row in rs:
                 section5pendings.append({"requestid": row["requestid"], "version": row["version"], "statusname": row["status"], "created_at": row["created_at"], "axisrequestid": ["axisrequestid"]})
         except Exception as ex:
@@ -1025,4 +1022,4 @@ class FOIRawRequest(db.Model):
 
 class FOIRawRequestSchema(ma.Schema):
     class Meta:
-        fields = ('requestid', 'requestrawdata', 'status', 'requeststatuslabel', 'notes','created_at','wfinstanceid','version','updated_at','assignedgroup','assignedto','updatedby','createdby','sourceofsubmission','ispiiredacted','assignee.firstname','assignee.lastname', 'axisrequestid', 'axissyncdate', 'linkedrequests', 'closedate','isiaorestricted')
+        fields = ('requestid', 'requestrawdata', 'status','notes','created_at','wfinstanceid','version','updated_at','assignedgroup','assignedto','updatedby','createdby','sourceofsubmission','ispiiredacted','assignee.firstname','assignee.lastname', 'axisrequestid', 'axissyncdate', 'linkedrequests', 'closedate','isiaorestricted')

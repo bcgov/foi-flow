@@ -11,16 +11,11 @@ class FOIMinistryRequest:
         try:   
             conn = getconnection()         
             cursor = conn.cursor()
-            cursor.execute("""select foiministryrequestid, filenumber, foirequest_id, fr."version" , axisrequestid, assignedministryperson, assignedto, f.requesttype, p.bcgovcode, assignedministrygroup, fs.name as requeststatus
-                                from "FOIMinistryRequests" fr
-                                inner join "FOIRequests" f on f.foirequestid = fr.foirequest_id and f.version = fr.foirequestversion_id
-                                inner join "ProgramAreas" p on p.programareaid = fr.programareaid
-                                inner join "FOIRequestStatuses" fs on fs.requeststatusid = fr.requeststatusid
-                                where foiministryrequestid  = {0} order by fr."version" desc limit  1""".format(ministryrequestid))
-
+            cursor.execute("""select foiministryrequestid, filenumber, foirequest_id, "version" , axisrequestid, assignedministryperson, assignedto 
+                                from "FOIMinistryRequests" fr where foiministryrequestid  = {0} order by "version" desc limit  1""".format(ministryrequestid))
             row = cursor.fetchone()
             if row is not None:
-                return {"foiministryrequestid": str(row[0]), "filenumber": row[1], "foirequest_id": row[2], "version": row[3], "axisrequestid": row[4], "assignedministryperson": row[5], "assignedto": row[6], "requesttype": row[7], "bcgovcode": row[8], "assignedministrygroup": row[9], "requeststatus": row[10]}
+                return {"foiministryrequestid": str(row[0]), "filenumber": row[1], "foirequest_id": row[2], "version": row[3], "axisrequestid": row[4], "assignedministryperson": row[5], "assignedto": row[6]}
             cursor.close()
             return None
         except(Exception) as error:
