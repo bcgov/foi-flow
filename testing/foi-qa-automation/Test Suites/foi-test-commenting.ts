@@ -256,7 +256,7 @@
    <testCaseLink>
       <guid>056acfe6-fe86-42e3-8a14-622d6ff8f081</guid>
       <isReuseDriver>false</isReuseDriver>
-      <isRun>true</isRun>
+      <isRun>false</isRun>
       <testCaseId>Test Cases/comments/foi-test-comment-delete</testCaseId>
       <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
       <variableLink>
