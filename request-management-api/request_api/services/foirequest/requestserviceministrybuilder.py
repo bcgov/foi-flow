@@ -88,7 +88,7 @@ class requestserviceministrybuilder(requestserviceconfigurator):
         foiministryrequest.closedate = requestdict['closedate']
         foiministryrequest.closereasonid = requestdict['closereasonid']
         foiministryrequest.isoipcreview = ministryschema["isoipcreview"]
-        foiministryrequest.oipcreviews = self.createfoirequestoipcs(foiministryrequest.isoipcreview, ministryschema["foirequest_id"], ministryschema["version"], userid)
+        foiministryrequest.oipcreviews = self.createfoirequestoipcs(foiministryrequest.isoipcreview, ministryschema["foirequest_id"], ministryschema["version"], userid, usertype)
         return foiministryrequest
 
     def __createministrydivisions(self, requestschema, foiministryrequestid, foiministryrequestversion, userid):
@@ -313,7 +313,7 @@ class requestserviceministrybuilder(requestserviceconfigurator):
     def createfoiassigneefromobject(self, username, firstname, middlename, lastname):
         return FOIAssignee.saveassignee(username, firstname, middlename, lastname)
     
-    def createfoirequestoipcs(self, isoipcreview, requestid, version, userid):
+    def createfoirequestoipcs(self, isoipcreview, requestid, version, userid, usertype):
         current_oipcs = FOIRequestOIPC.getoipc(requestid, version)
         if (isoipcreview == True):
             updated_oipcs = []
@@ -336,8 +336,8 @@ class requestserviceministrybuilder(requestserviceconfigurator):
                 oipcreview.isactive = True
                 if oipc["isinquiry"] == True:
                     oipcreview.inquiryattributes = oipc["inquiryattributes"]
-                oipcreview.createdby=userid
-                oipcreview.created_at= datetime2.now().isoformat()
+                oipcreview.createdby = oipc["createdby"] if usertype == "ministry" else userid
+                oipcreview.created_at= oipc["created_at"] if usertype == "ministry" else datetime2.now().isoformat()
             
                 updated_oipcs.append(oipcreview)
             return updated_oipcs
