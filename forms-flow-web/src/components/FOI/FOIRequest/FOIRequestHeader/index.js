@@ -23,6 +23,7 @@ import _ from 'lodash';
 import RequestRestriction from "../../customComponents/RequestRestriction";
 import ConfirmModal from "../../customComponents/ConfirmModal";
 import RequestFlag from '../../customComponents/RequestFlag';
+import { Grid } from '@material-ui/core';
 
 const useStyles = makeStyles((theme) => ({
     formControl: {
@@ -265,43 +266,52 @@ const FOIRequestHeader = React.memo(
         </div>
       </div>
       <div className='row'>
-        <div className="col-lg-3">
-          {window.location.href.indexOf(FOI_COMPONENT_CONSTANTS.ADDREQUEST) ===
-              -1 && (
-                <Watcher
-                  watcherFullList={watcherList}
-                  requestId={requestId}
-                  ministryId={ministryId}
-                  userDetail={userDetail}
-                  disableInput={disableHeaderInput}
-                  isIAORestrictedRequest={isIAORestrictedRequest}
-                  setIsLoaded={setIsLoaded}
+        <div className="col-lg-6">
+          <Grid container columns={16}>
+            <Grid item xs={8} lg={5}>
+              <div>
+                {window.location.href.indexOf(FOI_COMPONENT_CONSTANTS.ADDREQUEST) ===
+                    -1 && (
+                      <Watcher
+                        watcherFullList={watcherList}
+                        requestId={requestId}
+                        ministryId={ministryId}
+                        userDetail={userDetail}
+                        disableInput={disableHeaderInput}
+                        isIAORestrictedRequest={isIAORestrictedRequest}
+                        setIsLoaded={setIsLoaded}
+                      />
+                  )}
+                {!isAddRequest && status.toLowerCase() !== StateEnum.unopened.name.toLowerCase() && (isIAORestrictedFileManager() ||
+                  (isLoaded && isRequestWatcherOrAssignee(requestWatchers,assigneeObj,userDetail?.preferred_username))) && 
+                <RequestRestriction 
+                  isiaorestricted= {isRestricted()}
+                  isIAORestrictedFileManager={isIAORestrictedFileManager()}
+                  requestDetails={requestDetails}
+                  />
+
+                }
+              </div>
+            </Grid>
+            <Grid item xs={8} lg={5}>
+              <div>
+                <RequestFlag
+                    type="oipcreview"
+                    requestDetails={requestDetails}
+                    isActive={requestDetails.isoipcreview}
+                    handleSelect={handleOipcReviewFlagChange}
+                    showFlag={showOipcReviewFlag}
                 />
-            )}
-          {!isAddRequest && status.toLowerCase() !== StateEnum.unopened.name.toLowerCase() && (isIAORestrictedFileManager() ||
-            (isLoaded && isRequestWatcherOrAssignee(requestWatchers,assigneeObj,userDetail?.preferred_username))) && 
-          <RequestRestriction 
-            isiaorestricted= {isRestricted()}
-            isIAORestrictedFileManager={isIAORestrictedFileManager()}
-            requestDetails={requestDetails}
-            />
-           
-          }
+                {/* <RequestFlag
+                  type="phasedrelease"
+                  requestDetails={requestDetails}
+                  isActive={requestDetails.isphasedrelease}
+                  handleSelect={handleOipcReviewFlagChange}
+                /> */}
+              </div>
+            </Grid>
+          </Grid>
         </div>
-        <div className="blankrow"></div>
-        <RequestFlag
-            type="oipcreview"
-            requestDetails={requestDetails}
-            isActive={requestDetails.isoipcreview}
-            handleSelect={handleOipcReviewFlagChange}
-            showFlag={showOipcReviewFlag}
-          />
-          {/* <RequestFlag
-            type="phasedrelease"
-            requestDetails={requestDetails}
-            isActive={requestDetails.isphasedrelease}
-            handleSelect={handleOipcReviewFlagChange}
-          /> */}
         <div className="col-lg-6">
           <div className="foi-assignee-dropdown">
             {showMinistryAssignedTo && (
