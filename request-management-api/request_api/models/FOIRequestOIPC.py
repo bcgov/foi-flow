@@ -59,5 +59,5 @@ class FOIRequestOIPC(db.Model):
 class FOIRequestOIPCSchema(ma.Schema):
     class Meta:
         fields = ('oipcid', 'version', 'ministryrequestid', 'investigator','ministryversion','oipcno','reviewtypeid','reasonid','statusid','outcomeid','isinquiry','inquiryattributes','isjudicialreview',
-                  'issubsequentappeal','isactive','receiveddate','closeddate','created_at','createdby','updated_at','updatedby',
+                  'issubsequentappeal','receiveddate','closeddate','created_at','createdby','updated_at','updatedby',
                   'reviewtype.name', 'reason.name', 'status.name', 'outcome.name') 

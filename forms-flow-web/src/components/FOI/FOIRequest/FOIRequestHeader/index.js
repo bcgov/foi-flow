@@ -54,7 +54,8 @@ const FOIRequestHeader = React.memo(
     disableInput,
     isAddRequest,
     handleOipcReviewFlagChange,
-    showOipcReviewFlag
+    showOipcReviewFlag,
+    isMinistry,
   }) => {
     /**
      *  Header of Review request in the UI
@@ -301,6 +302,7 @@ const FOIRequestHeader = React.memo(
                     isActive={requestDetails.isoipcreview}
                     handleSelect={handleOipcReviewFlagChange}
                     showFlag={showOipcReviewFlag}
+                    isDisabled={isMinistry}
                 />
                 {/* <RequestFlag
                   type="phasedrelease"
