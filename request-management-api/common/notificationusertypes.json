@@ -1,0 +1,51 @@
+{
+    "watcher": {
+        "notificationusertypeid": 1,
+        "name": "Watcher",
+        "description": "Watcher",
+        "isactive": true,
+        "notificationusertypelabel": "watcher"
+    },
+    "assignee": {
+        "notificationusertypeid": 2,
+        "name": "Assignee",
+        "description": "Assignee",
+        "isactive": true,
+        "notificationusertypelabel": "assignee"
+    },
+    "groupmembers": {
+        "notificationusertypeid": 2,
+        "name": "Group Members",
+        "description": "Assignee",
+        "isactive": true,
+        "notificationusertypelabel": "assignee"
+    },
+    "groupmember": {
+        "notificationusertypeid": 2,
+        "name": "groupmembers",
+        "description": "Assignee",
+        "isactive": true,
+        "notificationusertypelabel": "assignee"
+    },
+    "comment": {
+        "notificationusertypeid": 2,
+        "name": "Comment",
+        "description": "Assignee",
+        "isactive": true,
+        "notificationusertypelabel": "assignee"
+    },
+    "commentuser": {
+        "notificationusertypeid": 3,
+        "name": "Comment User",
+        "description": "Comment User",
+        "isactive": true,
+        "notificationusertypelabel": "commentuser"
+    },
+    "triggereduser": {
+        "notificationusertypeid": 4,
+        "name": "Triggered User",
+        "description": "Triggered User",
+        "isactive": true,
+        "notificationusertypelabel": "triggereduser"
+    }
+}

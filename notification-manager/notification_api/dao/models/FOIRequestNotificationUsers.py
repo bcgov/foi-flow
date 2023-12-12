@@ -11,7 +11,8 @@ class FOIRequestNotificationUser(object):
         unknown = EXCLUDE
     notificationid = fields.Int(data_key="notificationid") 
     userid = fields.Str(data_key="userid")
-    notificationusertypeid = fields.Int(data_key="notificationusertypeid") 
+    notificationusertypelabel = fields.Str(data_key="notificationusertypelabel") 
+    notificationusertypeid = fields.Int(data_key="notificationusertypeid")
     createdby = fields.Str(data_key="createdby")
     created_at = fields.Str(data_key="created_at")
     isdeleted = fields.Boolean(data_key="isdeleted")
@@ -21,9 +22,9 @@ class FOIRequestNotificationUser(object):
         try:
             conn = getconnection()
             cursor = conn.cursor()
-            cursor.execute('INSERT INTO public."FOIRequestNotificationUsers" (notificationid, userid, notificationusertypeid, createdby, created_at, isdeleted) \
-                                VALUES(%s::integer, %s, %s::integer, %s, %s, %s::boolean)',
-                                (int(notificationuser.notificationid), str(notificationuser.userid), int(notificationuser.notificationusertypeid), str(notificationuser.createdby), datetime.now(), int(notificationuser.isdeleted)))
+            cursor.execute('INSERT INTO public."FOIRequestNotificationUsers" (notificationid, userid, notificationusertypeid, notificationusertypelabel, createdby, created_at, isdeleted) \
+                                VALUES(%s::integer, %s, %s::integer, %s, %s, %s, %s::boolean)',
+                                (int(notificationuser.notificationid), str(notificationuser.userid), int(notificationuser.notificationusertypeid), str(notificationuser.notificationusertypelabel), str(notificationuser.createdby), datetime.now(), int(notificationuser.isdeleted)))
             conn.commit()
             cursor.close()
         except(Exception) as error:
