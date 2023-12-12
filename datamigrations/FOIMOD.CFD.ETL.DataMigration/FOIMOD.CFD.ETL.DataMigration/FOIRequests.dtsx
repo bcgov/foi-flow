@@ -11,8 +11,8 @@
   DTS:LocaleID="1033"
   DTS:ObjectName="FOIRequests"
   DTS:PackageType="5"
-  DTS:VersionBuild="37"
-  DTS:VersionGUID="{9927CBA3-B5E5-4FA2-809A-E9EEBE87B69E}">
+  DTS:VersionBuild="41"
+  DTS:VersionGUID="{6FF8FA79-F558-4AF0-BBF1-1939169A53C5}">
   <DTS:Property
     DTS:Name="PackageFormatVersion">8</DTS:Property>
   <DTS:Variables>
@@ -143,7 +143,7 @@
         <SQLTask:SqlTaskData
           SQLTask:Connection="{FA877C17-9970-459F-BFAC-AC1E9E4433B6}"
           SQLTask:BypassPrepare="False"
-          SQLTask:SqlStatementSource="SELECT  (SELECT terminology.vcTerminology from tblTerminologyLookup terminology WHERE  terminology.iLabelID = requestTypes.iLabelID and terminology.tiLocaleID = 1) as requestType,  convert(varchar, requests.sdtRequestedDate,120) as receivedDate,requests.vcDescription as requestdescription, &#x9;&#x9; convert(varchar,requests.sdtRqtDescFromdate,120) as reqDescriptionFromDate,   convert(varchar,requests.sdtRqtDescTodate,120) as reqDescriptionToDate,(SELECT terminology.vcTerminology from tblTerminologyLookup terminology WHERE terminology.iLabelID = deliveryModes.iLabelID and terminology.tiLocaleID = 1) as deliveryMode, (SELECT REPLACE(terminology.vcTerminology,'-','') from tblTerminologyLookup terminology WHERE terminology.iLabelID = receivedModes.iLabelID and terminology.tiLocaleID = 1) as receivedMode, requesterTypes.vcDescription as category,requests.vcVisibleRequestID as filenumber  FROM tblRequests requests WITH (NOLOCK)   LEFT OUTER JOIN EC_OFFICE office WITH (NOLOCK) ON requests.tiOfficeID = office.OFFICE_ID LEFT OUTER JOIN tblRequesterTypes  requesterTypes WITH (NOLOCK) ON requests.tiRequesterCategoryID = requesterTypes.tiRequesterTypeID LEFT OUTER JOIN tblRequestStatuses requeststatuses WITH (NOLOCK) on requests.irequeststatusid = requeststatuses.irequeststatusid LEFT OUTER JOIN tblReceivedModes receivedModes WITH (NOLOCK) ON requests.tiReceivedType = receivedModes.tiReceivedModeID  LEFT OUTER JOIN tblDeliveryModes deliveryModes WITH (NOLOCK) ON requests.tiDeliveryType = deliveryModes.tiDeliveryModeID LEFT OUTER JOIN tblRequestTypes requestTypes WITH (NOLOCK) ON requests.tiRequestTypeID = requestTypes.tiRequestTypeID WHERE vcVisibleRequestID IN ('CFD-2022-20261', 'CFD-2021-14313','CFD-2021-12866' , 'CFD-2021-12905', 'CFD-2021-12651','CFD-2023-30193') AND  office.OFFICE_CODE = 'CFD' AND  requests.vcRequestStatus NOT IN ('Closed') GROUP BY requests.vcVisibleRequestID,requests.vcRequestStatus,requeststatuses.vcRequestStatus,requests.sdtReceivedDate,  requests.sdtTargetDate, requests.sdtOriginalTargetDate,  requests.vcDescription,requests.sdtRqtDescFromdate, requests.sdtRqtDescTodate, requests.sdtRequestedDate,  office.OFFICE_CODE, requesterTypes.vcDescription, receivedModes.iLabelID, deliveryModes.iLabelID,requests.iRequestID, requestTypes.iLabelID, requests.vcVisibleRequestID, requests.tiOfficeID, office.OFFICE_ID"
+          SQLTask:SqlStatementSource="SELECT  (SELECT terminology.vcTerminology from tblTerminologyLookup terminology WHERE terminology.iLabelID = requestTypes.iLabelID and terminology.tiLocaleID = 1) as requestType,  convert(varchar, requests.sdtRequestedDate,120) as receivedDate, requests.vcDescription as requestdescription, &#x9;&#x9;  convert(varchar,requests.sdtRqtDescFromdate,120) as reqDescriptionFromDate,    convert(varchar,requests.sdtRqtDescTodate,120) as reqDescriptionToDate, (SELECT terminology.vcTerminology from tblTerminologyLookup terminology WHERE terminology.iLabelID = deliveryModes.iLabelID and terminology.tiLocaleID = 1) as deliveryMode,  (SELECT REPLACE(terminology.vcTerminology,'-','') from tblTerminologyLookup terminology WHERE terminology.iLabelID = receivedModes.iLabelID and terminology.tiLocaleID = 1) as receivedMode,  requesterTypes.vcDescription as category,requests.vcVisibleRequestID as filenumber  FROM tblRequests requests WITH (NOLOCK)    LEFT OUTER JOIN EC_OFFICE office WITH (NOLOCK) ON requests.tiOfficeID = office.OFFICE_ID  LEFT OUTER JOIN tblRequesterTypes  requesterTypes WITH (NOLOCK) ON requests.tiRequesterCategoryID = requesterTypes.tiRequesterTypeID  LEFT OUTER JOIN tblRequestStatuses requeststatuses WITH (NOLOCK) on requests.irequeststatusid = requeststatuses.irequeststatusid  LEFT OUTER JOIN tblReceivedModes receivedModes WITH (NOLOCK) ON requests.tiReceivedType = receivedModes.tiReceivedModeID  LEFT OUTER JOIN tblDeliveryModes deliveryModes WITH (NOLOCK) ON requests.tiDeliveryType = deliveryModes.tiDeliveryModeID  LEFT OUTER JOIN tblRequestTypes requestTypes WITH (NOLOCK) ON requests.tiRequestTypeID = requestTypes.tiRequestTypeID  WHERE vcVisibleRequestID IN ('CFD-2020-00129','CFD-2020-03214','CFD-2020-03700','CFD-2021-10226','CFD-2021-10406','CFD-2021-10681','CFD-2020-03700') AND  office.OFFICE_CODE = 'CFD' AND  requests.vcRequestStatus NOT IN ('Closed')  GROUP BY requests.vcVisibleRequestID,requests.vcRequestStatus,requeststatuses.vcRequestStatus,requests.sdtReceivedDate,  requests.sdtTargetDate, requests.sdtOriginalTargetDate, requests.vcDescription, requests.sdtRqtDescFromdate, requests.sdtRqtDescTodate, requests.sdtRequestedDate,  office.OFFICE_CODE, requesterTypes.vcDescription, receivedModes.iLabelID, deliveryModes.iLabelID,requests.iRequestID, requestTypes.iLabelID, requests.vcVisibleRequestID, requests.tiOfficeID, office.OFFICE_ID"
           SQLTask:ResultType="ResultSetType_Rowset" xmlns:SQLTask="www.microsoft.com/sqlserver/dts/tasks/sqltask">
           <SQLTask:ResultBinding
             SQLTask:ResultName="0"
@@ -185,7 +185,7 @@
           <DTS:ObjectData>
             <SQLTask:SqlTaskData
               SQLTask:Connection="{18EF9DFD-37E1-484D-9BC1-BFE418845E48}"
-              SQLTask:SqlStatementSource="INSERT INTO public.&quot;FOIRequests&quot;(&#xA;&#x9; version, &#xA;&#x9;requesttype, &#xA;&#x9;receiveddate, &#xA;&#x9;isactive, &#xA;&#x9;initialdescription, &#xA;&#x9;initialrecordsearchfromdate, &#xA;&#x9;initialrecordsearchtodate, &#xA;&#x9;created_at, &#xA;&#x9;updated_at, &#xA;&#x9;createdby, &#xA;&#x9;updatedby, &#xA;&#x9;deliverymodeid, &#xA;&#x9;receivedmodeid, &#xA;&#x9;foirawrequestid, &#xA;&#x9;applicantcategoryid, &#xA;&#x9;wfinstanceid, &#xA;&#x9;migrationreference)&#xA;&#x9;VALUES (&#xA;&#x9;&#x9;1, &#xA;&#x9;&#x9;LOWER(?), &#xA;&#x9;&#x9;to_timestamp(?,'YYYY-MM-DD hh24:mi:ss'), &#xA;&#x9;&#x9;True, &#xA;&#x9;&#x9;?, &#xA;&#x9;&#x9;to_timestamp(?,'YYYY-MM-DD hh24:mi:ss'), &#xA;&#x9;&#x9;to_timestamp(?,'YYYY-MM-DD hh24:mi:ss'), &#xA;&#x9;&#x9;NOW(), &#xA;&#x9;&#x9;NOW(), &#xA;&#x9;&#x9;'cfdmigration', &#xA;&#x9;&#x9;'cfdmigration', &#xA;&#x9;&#x9;1, &#xA;&#x9;&#x9;(SELECT receivedmodeid FROM public.&quot;ReceivedModes&quot; RM WHERE RM.name=?),&#xA;&#x9;&#x9;-100, &#xA;&#x9;&#x9;(SELECT applicantcategoryid FROM public.&quot;ApplicantCategories&quot; AC WHERE AC.name=?), &#xA;&#x9;&#x9;NULL, &#xA;&#x9;&#x9;?);" xmlns:SQLTask="www.microsoft.com/sqlserver/dts/tasks/sqltask">
+              SQLTask:SqlStatementSource="INSERT INTO public.&quot;FOIRequests&quot;(&#xA;&#x9; version, &#xA;&#x9;requesttype, &#xA;&#x9;receiveddate, &#xA;&#x9;isactive, &#xA;&#x9;initialdescription, &#xA;&#x9;initialrecordsearchfromdate, &#xA;&#x9;initialrecordsearchtodate, &#xA;&#x9;created_at, &#xA;&#x9;updated_at, &#xA;&#x9;createdby, &#xA;&#x9;updatedby, &#xA;&#x9;deliverymodeid, &#xA;&#x9;receivedmodeid, &#xA;&#x9;foirawrequestid, &#xA;&#x9;applicantcategoryid, &#xA;&#x9;wfinstanceid, &#xA;&#x9;migrationreference)&#xA;&#x9;VALUES (&#xA;&#x9;&#x9;1, &#xA;&#x9;&#x9;LOWER(?), &#xA;&#x9;&#x9;to_timestamp(?,'YYYY-MM-DD hh24:mi:ss'), &#xA;&#x9;&#x9;True, &#xA;&#x9;&#x9;?, &#xA;&#x9;&#x9;to_timestamp(?,'YYYY-MM-DD hh24:mi:ss'), &#xA;&#x9;&#x9;to_timestamp(?,'YYYY-MM-DD hh24:mi:ss'), &#xA;&#x9;&#x9;NOW(), &#xA;&#x9;&#x9;NOW(), &#xA;&#x9;&#x9;'cfdmigration', &#xA;&#x9;&#x9;'cfdmigration', &#xA;&#x9;&#x9;1, &#xA;&#x9;&#x9;COALESCE((SELECT receivedmodeid FROM public.&quot;ReceivedModes&quot; RM WHERE RM.name=?),1),&#xA;&#x9;&#x9;-100, &#xA;&#x9;&#x9;COALESCE((SELECT applicantcategoryid FROM public.&quot;ApplicantCategories&quot; AC WHERE AC.name=?),2), &#xA;&#x9;&#x9;NULL, &#xA;&#x9;&#x9;?);" xmlns:SQLTask="www.microsoft.com/sqlserver/dts/tasks/sqltask">
               <SQLTask:ParameterBinding
                 SQLTask:ParameterName="1"
                 SQLTask:DtsVariableName="User::requestType"
@@ -313,18 +313,18 @@
       <GraphLayout
         Capacity="4" xmlns="clr-namespace:Microsoft.SqlServer.IntegrationServices.Designer.Model.Serialization;assembly=Microsoft.SqlServer.IntegrationServices.Graph" xmlns:mssgle="clr-namespace:Microsoft.SqlServer.Graph.LayoutEngine;assembly=Microsoft.SqlServer.Graph" xmlns:assembly="http://schemas.microsoft.com/winfx/2006/xaml">
         <NodeLayout
-          Size="170,42"
+          Size="169.6,41.6"
           Id="Package\Execute SQL Task"
           TopLeft="560,170" />
         <NodeLayout
-          Size="170,42"
+          Size="169.6,41.6"
           Id="Package\Foreach Loop Container\Execute SQL Task"
           TopLeft="199,87" />
         <ContainerLayout
           HeaderHeight="43"
           IsExpanded="True"
           PanelSize="580,184"
-          Size="580,227"
+          Size="580,227.2"
           Id="Package\Foreach Loop Container"
           TopLeft="469,402" />
         <EdgeLayout
