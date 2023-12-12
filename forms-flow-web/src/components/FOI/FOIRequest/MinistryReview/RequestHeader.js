@@ -109,7 +109,7 @@ const RequestHeader = React.memo(({
               type="oipcreview"
               requestDetails={requestDetails}
               isActive={requestDetails.isoipcreview}
-              isMinistry={isMinistry}
+              isDisabled={isMinistry}
             />
             {/* <RequestFlag
               type="phasedrelease"

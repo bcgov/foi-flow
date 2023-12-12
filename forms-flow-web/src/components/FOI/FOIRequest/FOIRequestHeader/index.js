@@ -297,7 +297,7 @@ const FOIRequestHeader = React.memo(
             isActive={requestDetails.isoipcreview}
             handleSelect={handleOipcReviewFlagChange}
             showFlag={showOipcReviewFlag}
-            isMinistry={false}
+            isDisabled={isMinistry}
           />
           {/* <RequestFlag
             type="phasedrelease"
