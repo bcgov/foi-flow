@@ -7,9 +7,10 @@ import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import { makeStyles } from '@material-ui/styles';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCirclePlus } from '@fortawesome/free-solid-svg-icons';
+import OIPCDetailsMinistry from "./OIPCDetailsMinistry";
 
 const OIPCDetails = (props) => {
-  const { oipcData, addOIPC, removeOIPC, updateOIPC } = props;
+  const { oipcData, addOIPC, removeOIPC, updateOIPC, isMinistry } = props;
 
   //Styling
   const useStyles = makeStyles({
@@ -25,25 +26,27 @@ const OIPCDetails = (props) => {
   const classes = useStyles();
   
   return (
-    <div className='request-accordian' >
+    <>  
+    {isMinistry ? 
+      <OIPCDetailsMinistry oipcData={oipcData}/> :
+      <div className='request-accordian'>
         <Accordion defaultExpanded={true}>
-        <AccordionSummary className={classes.accordionSummary} expandIcon={<ExpandMoreIcon />}>
-        <Typography className={classes.heading}>OIPC DETAILS</Typography>
-        </AccordionSummary>
-        <AccordionDetails>
+          <AccordionSummary className={classes.accordionSummary} expandIcon={<ExpandMoreIcon />}>
+            <Typography className={classes.heading}>OIPC DETAILS</Typography>
+          </AccordionSummary>
+          <AccordionDetails>
             <OIPCDetailsList oipcData={oipcData} removeOIPC={removeOIPC} updateOIPC={updateOIPC} />
-            <div style={{display: "flex", flexDirection: "row", alignItems: "center", margin: "7px 0px 7px 0px"}}>
-                <button onClick={(event) => {
-                  event.preventDefault()
-                  addOIPC();
-                }} style={{ border: "none", background: "none" }}>
-                    <FontAwesomeIcon icon={faCirclePlus}  size="lg" color="#38598A" />
-                </button>
-                <p style={{fontWeight: "bold", color: "#38598A"}}>Add Additional OIPC Complaint</p>
-            </div>
-        </AccordionDetails>
+              <div style={{display: "flex", flexDirection: "row", alignItems: "center", margin: "7px 0px 7px 0px"}}>
+                  <button onClick={() => addOIPC()} style={{ border: "none", background: "none" }}>
+                      <FontAwesomeIcon icon={faCirclePlus}  size="lg" color="#38598A" />
+                  </button>
+                  <p style={{fontWeight: "bold", color: "#38598A"}}>Add Additional OIPC Complaint</p>
+              </div>
+          </AccordionDetails>
         </Accordion>
-    </div>
+      </div>
+    }
+    </>
   );
 }
 

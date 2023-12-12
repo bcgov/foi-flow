@@ -17,7 +17,7 @@ import TextField from "@mui/material/TextField";
 //Types are:
 //oipcreview
 //phasedrelease
-const RequestFlag = ({ isActive, type, handleSelect, showFlag = true }) => {
+const RequestFlag = ({ isActive, type, handleSelect, showFlag = true, isMinistry }) => {
   const [isSelected, setIsSelected] = useState(isActive || false);
   const [modalOpen, setModalOpen] = useState(false);
   const [modalHeading, setModalHeading] = useState("");
@@ -186,7 +186,7 @@ const RequestFlag = ({ isActive, type, handleSelect, showFlag = true }) => {
               onChange={handleValueChange}
               inputProps={{ "aria-labelledby": "restrict-dropdown-label" }}
               input={<OutlinedInput label="Tag" />}
-              disabled={false}
+              disabled={isMinistry}
             >
               {options.map((option) => (
                 <MenuItem
