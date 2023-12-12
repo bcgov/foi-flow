@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import { InputLabel } from '@material-ui/core';
+import { Grid, InputLabel } from '@material-ui/core';
 import Link from '@material-ui/core/Link';
 import TextField from '@material-ui/core/TextField';
 import MinistryAssignToDropdown from '../MinistryAssignToDropdown';
@@ -108,6 +108,7 @@ const RequestHeader = React.memo(({
               type="oipcreview"
               requestDetails={requestDetails}
               isActive={requestDetails.isoipcreview}
+              isDisabled={true}
             />
             {/* <RequestFlag
               type="phasedrelease"
@@ -144,22 +145,26 @@ const RequestHeader = React.memo(({
             </div>
         </div>
         <div className="row">
-            <div className="col-lg-3">
-                {watcherBox}
-                {
-                    (isLoaded && (isRequestWatcherOrMinistryAssignee(requestWatchers,ministryAssigneeValue,userDetail?.preferred_username) || 
-                        isMinistryRestrictedFileManager())) &&
-                    <RequestMinistryRestriction 
-                        isministryrestricted={isRestricted()}
-                        isMinistryRestrictedFileManager={isMinistryRestrictedFileManager()}
-                        requestDetails={requestDetails}
-                    />
-                }
-            </div>
-            <div className="col-lg-3">
-                <div className="foi-request-review-header-col1-row">
-                    {requestFlagsBox}
-                </div>
+            <div className="col-lg-6">
+                <Grid container columns={16}>
+                    <Grid item xs={8} lg={5}>
+                        {watcherBox}
+                        {
+                            (isLoaded && (isRequestWatcherOrMinistryAssignee(requestWatchers,ministryAssigneeValue,userDetail?.preferred_username) || 
+                                isMinistryRestrictedFileManager())) &&
+                            <RequestMinistryRestriction 
+                                isministryrestricted={isRestricted()}
+                                isMinistryRestrictedFileManager={isMinistryRestrictedFileManager()}
+                                requestDetails={requestDetails}
+                            />
+                        }
+                    </Grid>
+                    <Grid item xs={8} lg={5}>
+                        <div className="foi-request-review-header-col1-row">
+                            {requestFlagsBox}
+                        </div>
+                    </Grid>
+                </Grid>
             </div>
             <div className="col-lg-6">
                 <div className="foi-assignee-dropdown">
