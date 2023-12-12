@@ -151,7 +151,6 @@ class requestservicebuilder(requestserviceconfigurator):
                 oipcreview.issubsequentappeal = oipc["issubsequentappeal"]
                 oipcreview.receiveddate = oipc["receiveddate"] if oipc["receiveddate"] not in (None, "") else None
                 oipcreview.closeddate = oipc["closeddate"] if oipc["closeddate"] not in (None, "") else None 
-                oipcreview.isactive = True
                 if oipc["isinquiry"] == True:
                     oipcreview.inquiryattributes = oipc["inquiryattributes"]
                 oipcreview.createdby=userid
