@@ -11,8 +11,8 @@
   DTS:LocaleID="1033"
   DTS:ObjectName="FOIApplicants"
   DTS:PackageType="5"
-  DTS:VersionBuild="10"
-  DTS:VersionGUID="{80687E87-9503-4FF7-AB79-273F8A8AA4EF}">
+  DTS:VersionBuild="12"
+  DTS:VersionGUID="{57B2A59C-BDE3-4612-A3C1-13569FD94C0F}">
   <DTS:Property
     DTS:Name="PackageFormatVersion">8</DTS:Property>
   <DTS:Variables>
@@ -25,7 +25,7 @@
       DTS:Namespace="User"
       DTS:ObjectName="applicantqueryparam">
       <DTS:VariableValue
-        DTS:DataType="8">SELECT firstname,lastname,middleName,requesterid,CONVERT(varchar(MAX),'01-01-1900',120) as birthDate,businessName, GETDATE() as createdAt, 'cfdmigration' as createdBy,STRING_AGG(CAST(requestid as nvarchar(max)),', ') as requests ,MainApplicant FROM ( SELECT requesters.vcEmailID as email, requesters.iRequesterID as requesterid, requesters.vcFirstName as firstName, requesters.vcLastName as lastName, requesters.vcMiddleName as middleName, requestorfields.CUSTOMFIELD35 as birthDate, requesters.vcCompany as businessName, requests.vcVisibleRequestID as requestid, 1 as MainApplicant FROM tblRequests requests WITH (NOLOCK) LEFT OUTER JOIN EC_OFFICE office WITH (NOLOCK) ON requests.tiOfficeID = office.OFFICE_ID LEFT OUTER JOIN tblRequesters requesters WITH (NOLOCK) ON requests.iRequesterID = requesters.iRequesterID LEFT OUTER JOIN dbo.TBLREQUESTERCUSTOMFIELDS requestorfields WITH (NOLOCK) ON requesters.iRequesterID = requestorfields.IREQUESTERID WHERE office.OFFICE_CODE = 'CFD' AND requests.vcRequestStatus NOT IN ('Closed') AND requests.vcVisibleRequestID IN ('CFD-2021-12651','CFD-2023-30193') UNION ALL SELECT onbehalf.vcEmailID as email, onbehalf.iRequesterID as requesterid, onbehalf.vcFirstName as firstName, onbehalf.vcLastName as lastName, onbehalf.vcMiddleName as middleName, requestorfields.CUSTOMFIELD35 as birthDate, onbehalf.vcCompany as businessName, requests.vcVisibleRequestID as requestid, 0 as MainApplicant FROM tblRequests requests WITH (NOLOCK) LEFT OUTER JOIN EC_OFFICE office WITH (NOLOCK) ON requests.tiOfficeID = office.OFFICE_ID LEFT OUTER JOIN tblRequesters onbehalf WITH (NOLOCK) ON requests.iOnBehalfOf = onbehalf.iRequesterID LEFT OUTER JOIN dbo.TBLREQUESTERCUSTOMFIELDS requestorfields WITH (NOLOCK) ON onbehalf.iRequesterID = requestorfields.IREQUESTERID WHERE office.OFFICE_CODE = 'CFD' AND requests.vcRequestStatus NOT IN ('Closed') AND requests.vcVisibleRequestID IN ('CFD-2021-12651','CFD-2023-30193') and onbehalf.vcFirstName is NOT NULL ) AS T GROUP BY T.email,T.requesterid,T.firstname,T.lastname,T.middleName,T.requesterid,T.birthDate,T.businessName,T.MainApplicant ORDER BY T.firstname ASC</DTS:VariableValue>
+        DTS:DataType="8">SELECT firstname, lastname, middleName, requesterid, CONVERT(varchar(MAX),birthDate,120) as birthDate, businessName,  GETDATE() as createdAt, 'cfdmigration' as createdBy, STRING_AGG(CAST(requestid as nvarchar(max)),', ') as requests , MainApplicant FROM  ( SELECT requesters.vcEmailID as email,  requesters.iRequesterID as requesterid,  requesters.vcFirstName as firstName,  requesters.vcLastName as lastName,  requesters.vcMiddleName as middleName,  requestorfields.CUSTOMFIELD35 as birthDate,  requesters.vcCompany as businessName,  requests.vcVisibleRequestID as requestid,  1 as MainApplicant FROM tblRequests requests WITH (NOLOCK)  LEFT OUTER JOIN EC_OFFICE office WITH (NOLOCK) ON requests.tiOfficeID = office.OFFICE_ID  LEFT OUTER JOIN tblRequesters requesters WITH (NOLOCK) ON requests.iRequesterID = requesters.iRequesterID  LEFT OUTER JOIN dbo.TBLREQUESTERCUSTOMFIELDS requestorfields WITH (NOLOCK) ON requesters.iRequesterID = requestorfields.IREQUESTERID   WHERE office.OFFICE_CODE = 'CFD' AND requests.vcRequestStatus NOT IN ('Closed') AND requests.vcVisibleRequestID IN ('CFD-2021-12651','CFD-2023-30193')   UNION ALL   SELECT onbehalf.vcEmailID as email,  onbehalf.iRequesterID as requesterid,  onbehalf.vcFirstName as firstName,  onbehalf.vcLastName as lastName,  onbehalf.vcMiddleName as middleName,  requestorfields.CUSTOMFIELD35 as birthDate,  onbehalf.vcCompany as businessName,  requests.vcVisibleRequestID as requestid,  0 as MainApplicant FROM tblRequests requests WITH (NOLOCK)  LEFT OUTER JOIN EC_OFFICE office WITH (NOLOCK) ON requests.tiOfficeID = office.OFFICE_ID  LEFT OUTER JOIN tblRequesters onbehalf WITH (NOLOCK) ON requests.iOnBehalfOf = onbehalf.iRequesterID  LEFT OUTER JOIN dbo.TBLREQUESTERCUSTOMFIELDS requestorfields WITH (NOLOCK) ON onbehalf.iRequesterID = requestorfields.IREQUESTERID  WHERE office.OFFICE_CODE = 'CFD' AND requests.vcRequestStatus NOT IN ('Closed') AND requests.vcVisibleRequestID IN ('CFD-2021-12651','CFD-2023-30193') and onbehalf.vcFirstName is NOT NULL ) AS T  GROUP BY T.email,T.requesterid,T.firstname,T.lastname,T.middleName,T.requesterid,T.birthDate,T.businessName,T.MainApplicant ORDER BY T.firstname ASC</DTS:VariableValue>
     </DTS:Variable>
   </DTS:Variables>
   <DTS:Executables>
@@ -591,7 +591,7 @@
       <GraphLayout
         Capacity="4" xmlns="clr-namespace:Microsoft.SqlServer.IntegrationServices.Designer.Model.Serialization;assembly=Microsoft.SqlServer.IntegrationServices.Graph">
         <NodeLayout
-          Size="155,42"
+          Size="155.2,41.6"
           Id="Package\Data Flow Task"
           TopLeft="367,74" />
       </GraphLayout>
@@ -603,13 +603,13 @@
       <GraphLayout
         Capacity="4" xmlns="clr-namespace:Microsoft.SqlServer.IntegrationServices.Designer.Model.Serialization;assembly=Microsoft.SqlServer.IntegrationServices.Graph" xmlns:mssgle="clr-namespace:Microsoft.SqlServer.Graph.LayoutEngine;assembly=Microsoft.SqlServer.Graph" xmlns:assembly="http://schemas.microsoft.com/winfx/2006/xaml">
         <NodeLayout
-          Size="169,42"
-          Id="Package\Data Flow Task\ODBC Destination"
-          TopLeft="328,201" />
-        <NodeLayout
-          Size="157,42"
+          Size="156.8,41.6"
           Id="Package\Data Flow Task\OLE DB Source"
           TopLeft="327,37" />
+        <NodeLayout
+          Size="168.8,41.6"
+          Id="Package\Data Flow Task\ODBC Destination"
+          TopLeft="328,201" />
         <EdgeLayout
           Id="Package\Data Flow Task.Paths[OLE DB Source Output]"
           TopLeft="409,79">
