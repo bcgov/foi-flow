@@ -147,7 +147,7 @@ const RequestHeader = React.memo(({
         <div className="row">
             <div className="col-lg-6">
                 <Grid container columns={16}>
-                    <Grid item xs={8} lg={5}>
+                    <Grid>
                         {watcherBox}
                         {
                             (isLoaded && (isRequestWatcherOrMinistryAssignee(requestWatchers,ministryAssigneeValue,userDetail?.preferred_username) || 
@@ -159,7 +159,7 @@ const RequestHeader = React.memo(({
                             />
                         }
                     </Grid>
-                    <Grid item xs={8} lg={5}>
+                    <Grid>
                         <div className="foi-request-review-header-col1-row">
                             {requestFlagsBox}
                         </div>

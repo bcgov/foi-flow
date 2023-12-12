@@ -268,7 +268,7 @@ const FOIRequestHeader = React.memo(
       <div className='row'>
         <div className="col-lg-6">
           <Grid container columns={16}>
-            <Grid item xs={8} lg={5}>
+            <Grid>
               <div>
                 {window.location.href.indexOf(FOI_COMPONENT_CONSTANTS.ADDREQUEST) ===
                     -1 && (
@@ -293,7 +293,7 @@ const FOIRequestHeader = React.memo(
                 }
               </div>
             </Grid>
-            <Grid item xs={8} lg={5}>
+            <Grid>
               <div>
                 <RequestFlag
                     type="oipcreview"
