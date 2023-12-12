@@ -88,7 +88,7 @@ class requestserviceministrybuilder(requestserviceconfigurator):
         foiministryrequest.closedate = requestdict['closedate']
         foiministryrequest.closereasonid = requestdict['closereasonid']
         foiministryrequest.isoipcreview = ministryschema["isoipcreview"]
-        foiministryrequest.oipcreviews = self.createfoirequestoipcs(foiministryrequest.isoipcreview, ministryschema["foirequest_id"], ministryschema["version"], userid, usertype)
+        foiministryrequest.oipcreviews = self.createfoirequestoipcs(foiministryrequest.isoipcreview, ministryschema["foirequest_id"], ministryschema["version"])
         return foiministryrequest
 
     def __createministrydivisions(self, requestschema, foiministryrequestid, foiministryrequestversion, userid):
@@ -313,7 +313,7 @@ class requestserviceministrybuilder(requestserviceconfigurator):
     def createfoiassigneefromobject(self, username, firstname, middlename, lastname):
         return FOIAssignee.saveassignee(username, firstname, middlename, lastname)
     
-    def createfoirequestoipcs(self, isoipcreview, requestid, version, userid, usertype):
+    def createfoirequestoipcs(self, isoipcreview, requestid, version):
         current_oipcs = FOIRequestOIPC.getoipc(requestid, version)
         if (isoipcreview == True):
             updated_oipcs = []
@@ -326,19 +326,16 @@ class requestserviceministrybuilder(requestserviceconfigurator):
                 oipcreview.reasonid = oipc["reasonid"]
                 oipcreview.statusid = oipc["statusid"]
                 oipcreview.outcomeid = oipc["outcomeid"]
-                oipcreview.investigator = oipc["investigator"] if oipc["investigator"] not in (None, "") else None
+                oipcreview.investigator = oipc["investigator"]
                 oipcreview.isinquiry = oipc["isinquiry"]
                 oipcreview.isjudicialreview = oipc["isjudicialreview"]
                 oipcreview.issubsequentappeal = oipc["issubsequentappeal"]
                 oipcreview.issubsequentappeal = oipc["issubsequentappeal"]
-                oipcreview.receiveddate = oipc["receiveddate"] if oipc["receiveddate"] not in (None, "") else None
-                oipcreview.closeddate = oipc["closeddate"] if oipc["closeddate"] not in (None, "") else None 
-                oipcreview.isactive = True
-                if oipc["isinquiry"] == True:
-                    oipcreview.inquiryattributes = oipc["inquiryattributes"]
-                oipcreview.createdby = oipc["createdby"] if usertype == "ministry" else userid
-                oipcreview.created_at= oipc["created_at"] if usertype == "ministry" else datetime2.now().isoformat()
-            
+                oipcreview.receiveddate = oipc["receiveddate"]
+                oipcreview.closeddate = oipc["closeddate"] 
+                oipcreview.inquiryattributes = oipc["inquiryattributes"]
+                oipcreview.createdby=oipc["createdby"]
+                oipcreview.created_at= oipc["created_at"]            
                 updated_oipcs.append(oipcreview)
             return updated_oipcs
         return []
