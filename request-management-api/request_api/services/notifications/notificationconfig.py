@@ -24,17 +24,13 @@ class notificationconfig:
         return 0
 
     def getnotificationusertypelabel(self, notificationusertype):
-        print(notificationusertype)
         id = NotificationUserType().getnotificationusertypesid(notificationusertype)
-        print(id)
         if id is not None:
             return id['notificationusertypelabel']
         return 0
     
     def getnotificationusertypeid(self, notificationusertype):
-        print(notificationusertype)
         id = NotificationUserType().getnotificationusertypesid(notificationusertype)
-        print(id)
         if id is not None:
             return id['notificationusertypeid']
         return 0
@@ -46,11 +42,7 @@ class notificationconfig:
             return str(14)
     
     def getmutenotifications(self):
-<<<<<<< HEAD
         if 'MUTE_NOTIFICATION' in os.environ and os.getenv('MUTE_NOTIFICATION') != '':
-=======
-        if 'MUTE_NOTIFICATION' in os.environ:
->>>>>>> 21ce0b5a5 (mute notifications for mcf #4548)
             return json.loads(os.getenv('MUTE_NOTIFICATION'))
         else:
             return {}
