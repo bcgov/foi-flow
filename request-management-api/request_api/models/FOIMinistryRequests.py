@@ -742,7 +742,9 @@ class FOIMinistryRequest(db.Model):
                     where isactive = true and duedate is not null and requeststatuslabel not in (:requeststatuslabel)     
                     and duedate between  NOW() - INTERVAL '7 DAY' AND NOW() + INTERVAL '7 DAY'
                     order by filenumber , version desc;""" 
-            rs = db.session.execute(text(sql), {'requeststatuslabel': [StateName.closed.name,StateName.redirect.name,StateName.unopened.name,StateName.intakeinprogress.name,StateName.onhold.name,StateName.archived.name]})
+            requeststatuslabel =  [StateName.closed.name,StateName.redirect.name,StateName.unopened.name,StateName.intakeinprogress.name,StateName.onhold.name,StateName.archived.name]
+            requeststatuslabel = ','.join(str(e) for e in requeststatuslabel)
+            rs = db.session.execute(text(sql), {'requeststatuslabel': requeststatuslabel})
             for row in rs:
                 upcomingduerecords.append({"filenumber": row["filenumber"], "duedate": row["duedate"],"foiministryrequestid": row["foiministryrequestid"], "version": row["version"], "foirequest_id": row["foirequest_id"], "created_at": row["created_at"], "createdby": row["createdby"]})
         except Exception as ex:
@@ -767,7 +769,9 @@ class FOIMinistryRequest(db.Model):
                         inner join "ProgramAreaDivisionStages" pads on frd.stageid  = pads.stageid and frd.stageid in (5, 7, 9) 
                         and frd.divisionduedate  between  NOW() - INTERVAL '7 DAY' AND NOW() + INTERVAL '7 DAY' 
                         order by frd.foiministryrequest_id , frd.foiministryrequestversion_id desc;""" 
-            rs = db.session.execute(text(sql), {'requeststatuslabel': [StateName.closed.name,StateName.redirect.name,StateName.unopened.name,StateName.intakeinprogress.name,StateName.onhold.name,StateName.archived.name]})
+            requeststatuslabel = [StateName.closed.name,StateName.redirect.name,StateName.unopened.name,StateName.intakeinprogress.name,StateName.onhold.name,StateName.archived.name]
+            requeststatuslabel = ','.join(str(e) for e in requeststatuslabel)
+            rs = db.session.execute(text(sql), {'requeststatuslabel': requeststatuslabel})
                   
             for row in rs:
                 upcomingduerecords.append({"axisrequestid": row["axisrequestid"], "filenumber": row["filenumber"], 
