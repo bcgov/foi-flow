@@ -10,11 +10,15 @@
          <value>//div[@id='Records']/div/div[2]/div/button</value>
       </entry>
       <entry>
+         <key>BASIC</key>
+         <value>//*[(text() = 'Remove Attachments' or . = 'Remove Attachments')]</value>
+      </entry>
+      <entry>
          <key>CSS</key>
          <value>button.btn.addAttachment.foi-export-button</value>
       </entry>
    </selectorCollection>
-   <selectorMethod>XPATH</selectorMethod>
+   <selectorMethod>BASIC</selectorMethod>
    <useRalativeImagePath>true</useRalativeImagePath>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -22,7 +26,7 @@
       <name>tag</name>
       <type>Main</type>
       <value>button</value>
-      <webElementGuid>507e7c14-6bc5-4321-890d-6b2cba377082</webElementGuid>
+      <webElementGuid>8071b5ba-40bc-4d49-9e00-8c0c82d3537c</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -30,7 +34,7 @@
       <name>class</name>
       <type>Main</type>
       <value>btn addAttachment foi-export-button</value>
-      <webElementGuid>d63e25bf-9f59-4a22-9181-fab7e04f211d</webElementGuid>
+      <webElementGuid>076c28e9-8552-489e-b64d-ac918ac8dd97</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -38,7 +42,7 @@
       <name>variant</name>
       <type>Main</type>
       <value>contained</value>
-      <webElementGuid>cf8b0895-0db2-4ecd-aa68-da0be13bcb7b</webElementGuid>
+      <webElementGuid>cd30cfff-3529-4f2d-85ab-3fe3069144d8</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -46,7 +50,7 @@
       <name>color</name>
       <type>Main</type>
       <value>primary</value>
-      <webElementGuid>3f772d2a-1c49-44b3-a606-e6d5a674759b</webElementGuid>
+      <webElementGuid>158969f9-19e2-41ad-8b27-8f2d693f4729</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>true</isSelected>
@@ -54,7 +58,7 @@
       <name>text</name>
       <type>Main</type>
       <value>Remove Attachments</value>
-      <webElementGuid>5a429ff7-198f-40f2-b133-cdbb5ba8583c</webElementGuid>
+      <webElementGuid>8a97caff-c529-4c39-9f6b-84cbee75c467</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -62,7 +66,7 @@
       <name>xpath</name>
       <type>Main</type>
       <value>id(&quot;Records&quot;)/div[@class=&quot;jss49&quot;]/div[@class=&quot;MuiGrid-root MuiGrid-container MuiGrid-spacing-xs-1 MuiGrid-align-items-xs-flex-start&quot;]/div[@class=&quot;MuiGrid-root MuiGrid-item MuiGrid-grid-xs-3&quot;]/button[@class=&quot;btn addAttachment foi-export-button&quot;]</value>
-      <webElementGuid>3167e0a0-d05b-4e0f-9293-4e4ab45a3ccb</webElementGuid>
+      <webElementGuid>461e3d0d-bb43-49c0-b37b-8539a377c8e4</webElementGuid>
    </webElementProperties>
    <webElementXpaths>
       <isSelected>true</isSelected>
@@ -70,7 +74,7 @@
       <name>xpath:idRelative</name>
       <type>Main</type>
       <value>//div[@id='Records']/div/div[2]/div/button</value>
-      <webElementGuid>f4c2a8fc-97cb-46bd-9337-937bb1ad8cf8</webElementGuid>
+      <webElementGuid>748a6c31-f2b4-416e-a2c1-ec15e3af1cfe</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -78,7 +82,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>(.//*[normalize-space(text()) and normalize-space(.)='Download for Harms'])[1]/preceding::button[1]</value>
-      <webElementGuid>9e44c51e-5b58-48d6-97ff-146d9275cf2b</webElementGuid>
+      <webElementGuid>13c1108d-ca03-4afc-be16-6c9225b9f543</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -86,7 +90,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>(.//*[normalize-space(text()) and normalize-space(.)='​'])[4]/preceding::button[1]</value>
-      <webElementGuid>c3892081-61da-4640-81f1-4d6a078cfad1</webElementGuid>
+      <webElementGuid>827c16a1-d325-4a69-b594-e6f9b1dfbaa9</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -94,7 +98,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>//*/text()[normalize-space(.)='Remove Attachments']/parent::*</value>
-      <webElementGuid>cde795b7-32ed-41de-806f-496d8531b1f8</webElementGuid>
+      <webElementGuid>7aa4646e-13d7-4e6d-afbc-1c16089e8d44</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -102,7 +106,7 @@
       <name>xpath:position</name>
       <type>Main</type>
       <value>//div[5]/div/div[2]/div/button</value>
-      <webElementGuid>5f4130f0-574d-4b6f-a7cd-3be9ba91d09f</webElementGuid>
+      <webElementGuid>a78fff3f-722d-4582-b0c5-5a53ca4d9777</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -110,6 +114,6 @@
       <name>xpath:customAttributes</name>
       <type>Main</type>
       <value>//button[(text() = 'Remove Attachments' or . = 'Remove Attachments')]</value>
-      <webElementGuid>760603d8-00e2-4ca3-8360-33e047a9e9ee</webElementGuid>
+      <webElementGuid>9e500aa4-facb-4eca-a1eb-44f3dbd7a1bb</webElementGuid>
    </webElementXpaths>
 </WebElementEntity>

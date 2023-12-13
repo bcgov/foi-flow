@@ -97,12 +97,12 @@ WebUI.click(findTestObject('Page_foi.flow/ministry view/form/divisional tracking
 
 WebUI.click(findTestObject('Page_foi.flow/ministry view/form/divisional tracking/button_Add division to track'), FailureHandling.STOP_ON_FAILURE)
 
-WebUI.click(findTestObject('Page_foi.flow/ministry view/form/divisional tracking/div_ministry division dropdown row 2'))
+WebUI.click(findTestObject('Records/input_Select Division_mui-137'))
 
 WebUI.click(findTestObject('Page_foi.flow/ministry view/form/divisional tracking/division dropdown options/li_Ministers Office'), 
     FailureHandling.STOP_ON_FAILURE)
 
-WebUI.click(findTestObject('Records/input_Select Division Stage_mui-55'), FailureHandling.STOP_ON_FAILURE)
+WebUI.click(findTestObject('Records/input_Select Division Stage_mui-138'), FailureHandling.STOP_ON_FAILURE)
 
 WebUI.click(findTestObject('Page_foi.flow/ministry view/form/divisional tracking/stage dropdown options/li_Clarification'), 
     FailureHandling.STOP_ON_FAILURE)
@@ -196,6 +196,7 @@ WebUI.verifyElementAttributeValue(findTestObject('Records/Duplicate_scenario_ele
 
 WebUI.verifyElementAttributeValue(findTestObject('Records/Duplicate_scenario_elements/svg_foiedu, foiedu_svg-inline--fa fa-clone fa-w-16 fa-2x jss61 (1)'), 
     'data-icon', 'clone', 0)
+
 DriverFactory.changeWebDriver(IAOuser)
 
 WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/div_Status'))
@@ -207,7 +208,6 @@ WebUI.click(findTestObject('Page_foi.flow/form/closing modal/div_Closing Reason'
 WebUI.click(findTestObject('Page_foi.flow/form/closing modal/dropdown options/li_Partial Disclosure'), FailureHandling.STOP_ON_FAILURE)
 
 WebUI.click(findTestObject('Page_foi.flow/form/state change dialog/button_Save Change'), FailureHandling.STOP_ON_FAILURE)
-
 
 ministryUser.close()
 
