@@ -19,6 +19,7 @@ import logging
 from dateutil import parser
 import json
 from request_api.utils.enums import StateName
+from request_api.utils.enums import ProcessingTeamWithKeycloackGroup, IAOTeamWithKeycloackGroup
 
 class FOIRawRequest(db.Model):
     # Name of the table in our database
@@ -433,7 +434,7 @@ class FOIRawRequest(db.Model):
         return requeststates    
 
     @classmethod
-    def getbasequery(cls, additionalfilter=None, userid=None, isiaorestrictedfilemanager=False):
+    def getbasequery(cls, additionalfilter=None, userid=None, isiaorestrictedfilemanager=False, groups=[]):
         _session = db.session
 
         #rawrequests
@@ -579,44 +580,73 @@ class FOIRawRequest(db.Model):
 
         basequery = _session.query(*selectedcolumns).join(subquery_maxversion, and_(*joincondition)).join(FOIAssignee, FOIAssignee.username == FOIRawRequest.assignedto, isouter=True)
 
-        if additionalfilter is None:
+        return FOIRawRequest.handleadditionalfilter(basequery, additionalfilter, userid, isiaorestrictedfilemanager, groups)
+    
+    @classmethod
+    def handleadditionalfilter(cls, basequery, additionalfilter=None, userid=None, isiaorestrictedfilemanager=False, groups=[]):
+        if additionalfilter:
+            return FOIRawRequest.addadditionalfilter(basequery, additionalfilter, userid, isiaorestrictedfilemanager, groups)
+        return FOIRawRequest.noadditionalfilter(basequery, userid, isiaorestrictedfilemanager)
+        
+    @classmethod
+    def noadditionalfilter(cls, basequery, userid=None, isiaorestrictedfilemanager=False):
+        if(isiaorestrictedfilemanager == True):
+            return basequery.filter(FOIRawRequest.status.notin_(['Archived']))
+        else:
+            subquery_watchby = FOIRawRequestWatcher.getrequestidsbyuserid(userid)
+
+            return basequery.join(
+                                subquery_watchby,
+                                subquery_watchby.c.requestid == FOIRawRequest.requestid,
+                                isouter=True
+                            ).filter(
+                                and_(
+                                    FOIRawRequest.status.notin_(['Archived']),
+                                    or_(
+                                        FOIRawRequest.isiaorestricted == False,
+                                        and_(FOIRawRequest.isiaorestricted == True, FOIRawRequest.assignedto == userid),
+                                        and_(FOIRawRequest.isiaorestricted == True, subquery_watchby.c.watchedby == userid))))
+    
+    @classmethod    
+    def addadditionalfilter(cls, basequery, additionalfilter=None, userid=None, isiaorestrictedfilemanager=False, groups=[]):
+        isprocessingteam = False
+        
+        if groups:
+            isprocessingteam = any(item in ProcessingTeamWithKeycloackGroup.list() for item in groups)
+
+        if(additionalfilter == 'watchingRequests' and userid is not None):
+            #watchby
+            subquery_watchby = FOIRawRequestWatcher.getrequestidsbyuserid(userid)
+            return basequery.join(subquery_watchby, subquery_watchby.c.requestid == FOIRawRequest.requestid).filter(FOIRawRequest.status.notin_(['Archived']))
+        elif(additionalfilter == 'myRequests'):
+            #myrequest
+            return basequery.filter(and_(FOIRawRequest.status.notin_(['Archived']), FOIRawRequest.assignedto == userid))
+        elif (additionalfilter.lower() == 'all'):
             if(isiaorestrictedfilemanager == True):
                 return basequery.filter(FOIRawRequest.status.notin_(['Archived']))
             else:
-                subquery_watchby = FOIRawRequestWatcher.getrequestidsbyuserid(userid)
-
-                return basequery.join(
-                                    subquery_watchby,
-                                    subquery_watchby.c.requestid == FOIRawRequest.requestid,
-                                    isouter=True
-                                ).filter(
-                                    and_(
-                                        FOIRawRequest.status.notin_(['Archived']),
-                                        or_(
-                                            FOIRawRequest.isiaorestricted == False,
-                                            and_(FOIRawRequest.isiaorestricted == True, FOIRawRequest.assignedto == userid),
-                                            and_(FOIRawRequest.isiaorestricted == True, subquery_watchby.c.watchedby == userid))))
-        else:
-            if(additionalfilter == 'watchingRequests' and userid is not None):
-                #watchby
-                subquery_watchby = FOIRawRequestWatcher.getrequestidsbyuserid(userid)
-                return basequery.join(subquery_watchby, subquery_watchby.c.requestid == FOIRawRequest.requestid).filter(FOIRawRequest.status.notin_(['Archived']))
-            elif(additionalfilter == 'myRequests'):
-                #myrequest
-                return basequery.filter(and_(FOIRawRequest.status.notin_(['Archived']), FOIRawRequest.assignedto == userid))
-            else:
-                if(isiaorestrictedfilemanager == True):
-                    return basequery.filter(FOIRawRequest.status.notin_(['Archived']))
-                else:
+                if isprocessingteam:
                     return basequery.filter(
                         and_(
                             FOIRawRequest.status.notin_(['Archived']),
-                            or_(FOIRawRequest.isiaorestricted == False, and_(FOIRawRequest.isiaorestricted == True, FOIRawRequest.assignedto == userid))))
+                            or_(and_(FOIRawRequest.isiaorestricted == False, FOIRawRequest.assignedgroup.in_(ProcessingTeamWithKeycloackGroup.list())), and_(FOIRawRequest.isiaorestricted == True, FOIRawRequest.assignedto == userid))))
+                return basequery.filter(
+                    and_(
+                        FOIRawRequest.status.notin_(['Archived']),
+                        or_(and_(FOIRawRequest.isiaorestricted == False, FOIRawRequest.assignedgroup == "Intake Team"), and_(FOIRawRequest.isiaorestricted == True, FOIRawRequest.assignedto == userid))))
+        else:
+            if(isiaorestrictedfilemanager == True):
+                return basequery.filter(FOIRawRequest.status.notin_(['Archived']))
+            else:
+                return basequery.filter(
+                    and_(
+                        FOIRawRequest.status.notin_(['Archived']),
+                        or_(FOIRawRequest.isiaorestricted == False, and_(FOIRawRequest.isiaorestricted == True, FOIRawRequest.assignedto == userid))))
 
     @classmethod
-    def getrequestssubquery(cls, filterfields, keyword, additionalfilter, userid, isiaorestrictedfilemanager):
-        basequery = FOIRawRequest.getbasequery(additionalfilter, userid, isiaorestrictedfilemanager)
-        basequery = basequery.filter(FOIRawRequest.status != StateName.unopened.value).filter(FOIRawRequest.status != StateName.closed.value)
+    def getrequestssubquery(cls, filterfields, keyword, additionalfilter, userid, isiaorestrictedfilemanager, groups):
+        basequery = FOIRawRequest.getbasequery(additionalfilter, userid, isiaorestrictedfilemanager, groups)
+        basequery = basequery.filter(FOIRawRequest.status != 'Unopened').filter(FOIRawRequest.status != 'Closed')
         #filter/search
         if(len(filterfields) > 0 and keyword is not None):
             filtercondition = FOIRawRequest.getfilterforrequestssubquery(filterfields, keyword)
@@ -649,7 +679,7 @@ class FOIRawRequest(db.Model):
 
 
     @classmethod
-    def getrequestspagination(cls, groups, page, size, sortingitems, sortingorders, filterfields, keyword, additionalfilter, userid, isiaorestrictedfilemanager, isministryrestrictedfilemanager=False):
+    def getrequestspagination(cls, groups, page, size, sortingitems, sortingorders, filterfields, keyword, additionalfilter, userid, isiaorestrictedfilemanager, usertype, isministryrestrictedfilemanager=False):
         #ministry requests
         iaoassignee = aliased(FOIAssignee)
         ministryassignee = aliased(FOIAssignee)
@@ -657,10 +687,9 @@ class FOIRawRequest(db.Model):
 
         #sorting
         sortingcondition = FOIRawRequest.getsorting(sortingitems, sortingorders)
-
         #rawrequests
-        if "Intake Team" in groups or groups is None:                
-            subquery_rawrequest_queue = FOIRawRequest.getrequestssubquery(filterfields, keyword, additionalfilter, userid, isiaorestrictedfilemanager)
+        if usertype == "iao" or groups is None:
+            subquery_rawrequest_queue = FOIRawRequest.getrequestssubquery(filterfields, keyword, additionalfilter, userid, isiaorestrictedfilemanager, groups)
             query_full_queue = subquery_rawrequest_queue.union(subquery_ministry_queue)
             return query_full_queue.order_by(*sortingcondition).paginate(page=page, per_page=size)
         else:
