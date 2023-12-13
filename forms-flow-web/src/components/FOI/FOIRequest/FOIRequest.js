@@ -796,7 +796,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
       _status,
       requestExtensions,
     });
-
+    
     setRequestStatus(mappedBottomText);
   };
 
@@ -939,6 +939,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
       requestDetails?.requestType === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_GENERAL)
   }
 
+
   return (!isLoading &&
     requestDetails &&
     Object.keys(requestDetails).length !== 0) ||
@@ -1045,7 +1046,8 @@ const FOIRequest = React.memo(({ userDetail }) => {
           </div>
 
           <div className="foileftpanelstatus">
-            {bottomTextArray.length > 0 &&
+            {isOIPCReview && requestDetails.isreopened ? "" 
+            : bottomTextArray.length > 0 &&
               _requestStatus &&
               _requestStatus.toLowerCase().includes("days") &&
               bottomTextArray.map((text) => {
@@ -1151,6 +1153,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
                         handlestatusudpate={handlestatusudpate}
                         userDetail={userDetail}
                         disableInput={disableInput}
+                        isMinistry={false}
                         isAddRequest={isAddRequest}
                         handleOipcReviewFlagChange={handleOipcReviewFlagChange}
                         showOipcReviewFlag={requestState.toLowerCase() !== StateEnum.intakeinprogress.name.toLowerCase() && requestState.toLowerCase() !== StateEnum.unopened.name.toLowerCase()}
@@ -1276,6 +1279,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
                           updateOIPC={updateOIPC}
                           addOIPC={addOIPC}
                           removeOIPC={removeOIPC}
+                          isMinistry={false}
                         />
                       )}
 

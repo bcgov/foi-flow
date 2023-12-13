@@ -47,9 +47,17 @@ class FOIRequestOIPC(db.Model):
         divisioninfos = oipc_schema.dump(_oipclist)       
         return divisioninfos
     
+
+    @classmethod
+    def getrequestidsbyoipcno(cls, oipcno):
+        return db.session.query(
+                                FOIRequestOIPC.foiministryrequest_id,
+                                FOIRequestOIPC.foiministryrequestversion_id
+                            ).filter(FOIRequestOIPC.oipcno.ilike('%'+oipcno+'%')).group_by(FOIRequestOIPC.foiministryrequest_id, FOIRequestOIPC.foiministryrequestversion_id).subquery()
+
             
 class FOIRequestOIPCSchema(ma.Schema):
     class Meta:
         fields = ('oipcid', 'version', 'ministryrequestid', 'investigator','ministryversion','oipcno','reviewtypeid','reasonid','statusid','outcomeid','isinquiry','inquiryattributes','isjudicialreview',
-                  'issubsequentappeal','isactive','receiveddate','closeddate','created_at','createdby','updated_at','updatedby',
+                  'issubsequentappeal','receiveddate','closeddate','created_at','createdby','updated_at','updatedby',
                   'reviewtype.name', 'reason.name', 'status.name', 'outcome.name') 

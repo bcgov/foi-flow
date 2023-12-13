@@ -27,7 +27,7 @@
 }
 
 .foi-eye-container {
-    width: auto;
+    width: 100px;
     height: 40px;
     background-color: #00336652;
     border-radius: 40px 0px 0px 40px;
@@ -38,11 +38,12 @@
 .foi-watcher-all {
     padding-top: 10px; 
     display: flex;
+    width: 188px;
 }
 
 .foi-watcher-select {
     padding-top: 8px; 
-    width: 80px;
+    width: 100px;
     height: 40px;
     background-color:#003366;
     color: white;

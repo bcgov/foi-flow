@@ -139,10 +139,14 @@ class requestservice:
 
     def __skipduedatecalculation(self, ministryrequestid, offholddate):
         previousoffholddate = FOIMinistryRequest.getlastoffholddate(ministryrequestid)
+        foiministry_request = FOIMinistryRequest.getrequest(ministryrequestid)
+        request_reopened = self.__hasreopened(ministryrequestid, "ministryrequest")
         if previousoffholddate not in (None, ''):
             previouspaymentdate_pst = datetimehandler().convert_to_pst(previousoffholddate)
             if datetimehandler().getdate(previouspaymentdate_pst).date() == datetimehandler().getdate(offholddate).date():
                 return True
+        if foiministry_request['isoipcreview'] == True and request_reopened:
+            return True
         return False            
 
     def __isincludeoffhold(self):
@@ -165,4 +169,14 @@ class requestservice:
         version = FOIMinistryRequest.getversionforrequest(ministryrequestid)
         FOIRestrictedMinistryRequest.disablerestrictedrequests(ministryrequestid,type,userid)
         return FOIRestrictedMinistryRequest.saverestrictedrequest(ministryrequestid,type,isrestricted, version, userid)
-
+    
+    def __hasreopened(self, requestid, requesttype):
+        if requesttype == "rawrequest":
+            states =  FOIRawRequest.getstatesummary(requestid)
+        else:
+            states =  FOIMinistryRequest.getstatesummary(requestid)
+        if len(states) > 0:
+            current_state = states[0]
+            if current_state != "Closed" and any(state['status'] == "Closed" for state in states):
+                return True
+        return False 
