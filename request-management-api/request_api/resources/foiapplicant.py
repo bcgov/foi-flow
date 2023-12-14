@@ -45,8 +45,8 @@ class FOIApplicants(Resource):
     @staticmethod
     @TRACER.trace()
     @cross_origin(origins=allowedorigins())
-    # @auth.require
-    # @auth.isiao
+    @auth.require
+    @auth.isiao
     @cors_preflight('GET,OPTIONS')
     def get(email=None):
         print(email)
@@ -72,8 +72,8 @@ class EventPagination(Resource):
     @staticmethod
     @TRACER.trace()
     @cross_origin(origins=allowedorigins())
-    # @auth.require
-    # @auth.isiao
+    @auth.require
+    @auth.isiao
     @cors_preflight('GET,OPTIONS')
     def get():
         try:
