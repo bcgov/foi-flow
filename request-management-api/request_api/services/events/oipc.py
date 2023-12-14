@@ -36,7 +36,7 @@ class oipcevent:
         
     def __createcomment(self, requestid, oipc, userid):
         comment = {"ministryrequestid": requestid, "comment": self.__preparemessage(oipc)}        
-        commentservice().createministryrequestcomment(comment, userid, CommentType.OIPC.value)
+        commentservice().createministryrequestcomment(comment, userid, CommentType.SystemGenerated.value)
 
     def __createnotification(self, requestid, oipc, userid):
         return notificationservice().createnotification({"message" : self.__preparemessage(oipc)}, requestid, "ministryrequest", "OIPC", userid, False)

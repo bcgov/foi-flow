@@ -163,7 +163,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
   const [attachments, setAttachments] = useState(requestAttachments);
   const [comment, setComment] = useState([]);
   const [requestState, setRequestState] = useState(StateEnum.unopened.name);
-  const [disableInput, setDisableInput] = useState(requestState?.toLowerCase() === StateEnum.closed.name.toLowerCase());
+  const [disableInput, setDisableInput] = useState(requestState?.toLowerCase() === StateEnum.closed.name.toLowerCase() && !requestDetails?.isoipcreview);
   const [_tabStatus, settabStatus] = React.useState(requestState);
   let foitabheaderBG = getTabBG(_tabStatus, requestState);
 
@@ -258,11 +258,11 @@ const FOIRequest = React.memo(({ userDetail }) => {
   const [isMCFPersonal, setIsMCFPersonal] = useState(bcgovcode.replaceAll('"', '') == "MCF" && requestDetails.requestType == FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL);
   const {oipcData, addOIPC, removeOIPC, updateOIPC, isOIPCReview, setIsOIPCReview, removeAllOIPCs} = useOIPCHook();
   const [oipcDataInitial, setOipcDataInitial] = useState(oipcData);
-
+  
   //Update disableInput when requestState changes
   useEffect(() => {
-    setDisableInput(requestState?.toLowerCase() === StateEnum.closed.name.toLowerCase())
-  }, [requestState])
+    setDisableInput(requestState?.toLowerCase() === StateEnum.closed.name.toLowerCase() && !isOIPCReview);
+  }, [requestState, isOIPCReview])
 
   useEffect(() => {
     if (!oipcDataInitial) {
@@ -939,7 +939,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
       requestDetails?.requestType === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_GENERAL)
   }
 
-
+  
   return (!isLoading &&
     requestDetails &&
     Object.keys(requestDetails).length !== 0) ||

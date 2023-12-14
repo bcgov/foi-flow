@@ -3,7 +3,7 @@ import './oipcdetails.scss';
 
 const OIPCDetailsMinistry = (props) => {
     const {oipcData} = props;
-
+    
     return (
         <Card id="applicantDetailsMinistry" className="foi-details-card">
             <label className="foi-details-label">OIPC DETAILS</label>
@@ -57,87 +57,106 @@ const OIPCDetailsMinistry = (props) => {
                                 <span>{oipc.status}</span>
                             </div>
                         </div>
-
+                        
+                        {oipc.investigator &&                     
                         <div className="col-lg-3 foi-details-col"  style={{paddingBottom: "15px"}}>
                             <div>
                                 <b>Investigator/Adjudicator</b>
                              </div>
                             <div>
-                                <span>{oipc.investigator ? oipc.investigator : "N/A"}</span>
+                                <span>{oipc.investigator}</span>
                             </div>
                         </div>
-
+                        }
+    
+                        {oipc.outcomeid && 
                         <div className="col-lg-3 foi-details-col"  style={{paddingBottom: "15px"}}>
                             <div>
                                 <b>Outcome</b>
-                             </div>
+                            </div>
                             <div>
-                                <span>{oipc.outcome ? oipc.outcome : "N/A"}</span>
+                                <span>{oipc.outcome}</span>
                             </div>
                         </div>
+                        }
 
+                        {oipc.closedate && 
                         <div className="col-lg-3 foi-details-col"  style={{paddingBottom: "15px"}}>
                             <div>
                                 <b>Closed Date</b>
-                             </div>
+                            </div>
                             <div>
-                                <span>{oipc.closedate ? oipc.closedate : "N/A"}</span>
+                                <span>{oipc.closedate}</span>
                             </div>
                         </div>
+                        }
 
+                        {oipc.isinquiry && 
                         <div className="col-lg-3 foi-details-col"  style={{paddingBottom: "15px"}}>
                             <div>
                                 <b>In Inquiry?</b>
-                             </div>
+                            </div>
                             <div>
-                                <span>{oipc.isinquiry ? "Yes" : "No"}</span>
+                                <span>Yes</span>
                             </div>
                         </div>
+                        }
 
+                        {oipc.inquiryattributes?.inquirydate && 
                         <div className="col-lg-3 foi-details-col"  style={{paddingBottom: "15px"}}>
                             <div>
                                 <b>Inquiry Order Comply Date</b>
                             </div>
                             <div>
-                                <span>{oipc.inquiryattributes?.inquirydate ? oipc.inquiryattributes.inquirydate : "N/A"}</span>
+                                <span>{oipc.inquiryattributes.inquirydate}</span>
                             </div>
                         </div>
+                        }
 
+                        {oipc.inquiryattributes?.orderno && 
                         <div className="col-lg-3 foi-details-col"  style={{paddingBottom: "15px"}}>
                             <div>
                                 <b>Inquiry Order No</b>
                             </div>
                             <div>
-                                <span>{oipc.inquiryattributes?.orderno ? oipc.inquiryattributes.orderno : "N/A"}</span>
+                                <span>{oipc.inquiryattributes.orderno}</span>
                             </div>
                         </div>
+                        }
 
+                        {oipc.inquiryattributes?.inquiryoutcome && 
                         <div className="col-lg-3 foi-details-col"  style={{paddingBottom: "15px"}}>
                             <div>
                                 <b>Inquiry Outcome</b>
                             </div>
                             <div>
-                                <span>{oipc.inquiryattributes?.inquiryoutcome ? oipc.inquiryattributes.inquiryoutcome : "N/A"}</span>
+                                <span>{oipc.inquiryattributes.inquiryoutcomename}</span>
                             </div>
                         </div>
+                        }
 
+                        {oipc.isjudicialreview && 
                         <div className="col-lg-3 foi-details-col"  style={{paddingBottom: "15px"}}>
                             <div>
                                 <b>In Judical Review?</b>
-                             </div>
+                            </div>
                             <div>
-                                <span>{oipc.isjudicialreview ? "Yes" : "No"}</span>
+                                <span>Yes</span>
                             </div>
                         </div>
+                        }
 
+                        {oipc.issubsequentappeal && 
                         <div className="col-lg-3 foi-details-col"  style={{paddingBottom: "15px"}}>
                             <div>
                                 <b>In Subsequent Appeal?</b>
-                             </div>
+                            </div>
                             <div>
-                                <span>{oipc.issubsequentappeal ? "Yes" : "No"}</span>
+                                <span>Yes</span>
                             </div>
                         </div>
+                        }
+
                     </div>
                     {index !== (oipcData?.length - 1)  && <Divider style={{margin: "20px"}} />}
                     </>
