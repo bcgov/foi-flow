@@ -42,19 +42,9 @@ class FOIRequestApplicantMapping(db.Model):
     def getrequestapplicants(cls,foirequest_id,foirequestversion):
         from .FOIRequestApplicants import FOIRequestApplicant
         requestapplicant_schema = FOIRequestApplicantMappingSchema(many=True)
-        _applicantinfos = db.session.query(FOIRequestApplicantMapping
-                                        ).join(
-                                            FOIRequestApplicant,
-                                            and_(
-                                                FOIRequestApplicant.foirequestapplicantid == FOIRequestApplicantMapping.foirequestapplicantid,
-                                                or_(
-                                                    FOIRequestApplicant.version == FOIRequestApplicantMapping.foirequestapplicant_version,
-                                                    FOIRequestApplicantMapping.foirequestapplicant_version is None
-                                                )
-                                            )
-                                        ).filter(
-                                                FOIRequestApplicantMapping.foirequest_id == foirequest_id,
-                                                FOIRequestApplicantMapping.foirequestversion_id == foirequestversion
+        _applicantinfos = db.session.query(FOIRequestApplicantMapping).filter(
+                                            FOIRequestApplicantMapping.foirequest_id == foirequest_id,
+                                            FOIRequestApplicantMapping.foirequestversion_id == foirequestversion
                                         ).order_by(FOIRequestApplicantMapping.foirequestapplicantmappingid.asc()).all()
         applicantinfos = requestapplicant_schema.dump(_applicantinfos)       
         return applicantinfos

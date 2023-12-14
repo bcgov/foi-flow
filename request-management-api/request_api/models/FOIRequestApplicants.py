@@ -136,11 +136,7 @@ class FOIRequestApplicant(db.Model):
                                 # FOIRequestApplicant.foirequestapplicantid == FOIRequestApplicantMapping.foirequestapplicantid
                                 and_(
                                     FOIRequestApplicant.foirequestapplicantid == FOIRequestApplicantMapping.foirequestapplicantid,
-                                    or_(
-                                        FOIRequestApplicant.version == None,
-                                        FOIRequestApplicantMapping.foirequestapplicant_version == None,
-                                        FOIRequestApplicant.version == FOIRequestApplicantMapping.foirequestapplicant_version
-                                    )
+                                    FOIRequestApplicant.version == FOIRequestApplicantMapping.foirequestapplicant_version
                                 )
                             ).join(
                                 ApplicantCategory,
@@ -237,8 +233,6 @@ class FOIRequestApplicant(db.Model):
                                 contactemail.contactinformation == email
                             ).order_by(FOIRequest.foirequestid.asc())
 
-        print("query: ", query)
-        # print("result: ", query.all())
         return applicantprofile_schema.dump(query.all())
 
 
@@ -311,11 +305,7 @@ class FOIRequestApplicant(db.Model):
                                 # FOIRequestApplicant.foirequestapplicantid == FOIRequestApplicantMapping.foirequestapplicantid
                                 and_(
                                     FOIRequestApplicant.foirequestapplicantid == FOIRequestApplicantMapping.foirequestapplicantid,
-                                    or_(
-                                        FOIRequestApplicant.version == None,
-                                        FOIRequestApplicantMapping.foirequestapplicant_version == None,
-                                        FOIRequestApplicant.version == FOIRequestApplicantMapping.foirequestapplicant_version
-                                    )
+                                    FOIRequestApplicant.version == FOIRequestApplicantMapping.foirequestapplicant_version
                                 )
                             ).join(
                                 ApplicantCategory,
@@ -413,8 +403,6 @@ class FOIRequestApplicant(db.Model):
                                 or_(*FOIRequestApplicant.getsearchfilters(keywords, contactemail, contacthomephone, contactworkphone, contactworkphone2, contactmobilephone))
                             ).order_by(FOIRequest.foirequestid.asc())
 
-        # print("query: ", query)
-        # print("result: ", query.all())
         return applicantprofile_schema.dump(query.all())
 
 
