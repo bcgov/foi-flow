@@ -9,7 +9,8 @@ import AccordionSummary from '@material-ui/core/AccordionSummary';
 import AccordionDetails from '@material-ui/core/AccordionDetails';
 import Typography from '@material-ui/core/Typography';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
-import {closeContactInfo} from '../FOIRequest/utils';
+import ApplicantProfileModal from "./ApplicantProfileModal";
+import { StateEnum } from "../../../constants/FOI/statusEnum";
 
 const useStyles = makeStyles((_theme) => ({
   row: {
@@ -34,7 +35,8 @@ const AddressContactDetails = memo(
     handleContanctDetailsValue,
     handleEmailValidation,
     disableInput,
-    userDetail
+    defaultExpanded,
+    moreInfoAction,
   }) => {
     const classes = useStyles();
     /**
@@ -106,6 +108,13 @@ const AddressContactDetails = memo(
 
     //state management for email validation
     const [validation, setValidation] = React.useState({});
+
+  //   const [modalOpen, setModalOpen] = React.useState(false);
+
+    
+  //   const handleModalClose = () => {
+  //     setModalOpen(false);
+  // }
 
     React.useEffect(() => {
       setFieldValues();
@@ -289,12 +298,21 @@ const AddressContactDetails = memo(
     };
     return (
       <div className='request-accordian' id="addressContactInfo">
-      <Accordion defaultExpanded={!closeContactInfo(userDetail,requestDetails)}>
+      <Accordion defaultExpanded={defaultExpanded}>
       <AccordionSummary className={classes.accordionSummary} expandIcon={<ExpandMoreIcon />} 
           id="addressContactInfo-header">
           <Typography className={classes.heading}>ADDRESS AND CONTACT INFORMATION</Typography>
       </AccordionSummary>
-      <AccordionDetails>
+      <AccordionDetails>        
+          <div>
+              {moreInfoAction && <button type="button" className={`btn btn-link btn-description-history`} onClick={moreInfoAction}>
+                  {requestDetails.currentState === StateEnum.intakeinprogress.name && 'Search' } Applicant Profiles
+              </button>}
+              {/* <ApplicantProfileModal
+                modalOpen={modalOpen}
+                handleModalClose={handleModalClose}
+              /> */}
+          </div>
           <div className={clsx("row", "foi-details-row", classes.row)}>
             <div className="col-lg-6 foi-details-col">
               <TextField

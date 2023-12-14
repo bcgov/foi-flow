@@ -73,6 +73,8 @@ import {
   isMandatoryField,
   isAxisSyncDisplayField,
   getUniqueIdentifier,
+  closeContactInfo,
+  closeApplicantDetails
 } from "./utils";
 import {
   ConditionalComponent,
@@ -89,6 +91,8 @@ import { UnsavedModal } from "../customComponents";
 import { DISABLE_GATHERINGRECORDS_TAB } from "../../../constants/constants";
 import _ from "lodash";
 import { MinistryNeedsScanning } from "../../../constants/FOI/enum";
+import ApplicantProfileModal from "./ApplicantProfileModal";
+import { setFOIRequestDetail } from "../../../actions/FOI/foiRequestActions";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -112,7 +116,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const FOIRequest = React.memo(({ userDetail }) => {
+const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
   const [_requestStatus, setRequestStatus] = React.useState(
     StateEnum.unopened.name
   );
@@ -154,6 +158,9 @@ const FOIRequest = React.memo(({ userDetail }) => {
   // let requestRecords = useSelector(
   //   (state) => state.foiRequests.foiRequestRecords
   // );
+  let requestApplicantProfile = useSelector(
+    (state) => state.foiRequests.foiRequestApplicantProfile
+  )
   const [attachments, setAttachments] = useState(requestAttachments);
   const [comment, setComment] = useState([]);
   const [requestState, setRequestState] = useState(StateEnum.unopened.name);
@@ -169,6 +176,8 @@ const FOIRequest = React.memo(({ userDetail }) => {
     window.removeEventListener("beforeunload", handleBeforeUnload);
     dispatch(push(`/foi/dashboard`));
   };
+
+
 
   const returnToQueue = (e) => {
     if (unSavedRequest) {
@@ -281,7 +290,9 @@ const FOIRequest = React.memo(({ userDetail }) => {
       dispatch(fetchApplicantCorrespondenceTemplates());
       dispatch(
         fetchRedactedSections(ministryId, (_err, res) => {
-          setRedactedSections(res.sections);
+          if (!_err) {
+            setRedactedSections(res.sections);
+          }
         })
       );
     }
@@ -326,6 +337,23 @@ const FOIRequest = React.memo(({ userDetail }) => {
       }
     }
   }, [requestDetails]);
+
+  useEffect(() => {
+    if (requestApplicantProfile) {
+      let newRequestDetails = { ...saveRequestObject };
+      for (let field in requestApplicantProfile) {
+        if (field === "additionalPersonalInfo") {
+          for (let infofield in requestApplicantProfile[field]) {
+            newRequestDetails[field][infofield] =
+            requestApplicantProfile[field][infofield];
+          }
+        } else {
+          newRequestDetails[field] = requestApplicantProfile[field];
+        }
+      }
+      dispatch(setFOIRequestDetail(newRequestDetails))
+    }
+  }, [requestApplicantProfile]);
 
   useEffect(() => {
     if (isIAORestricted)
@@ -1118,8 +1146,8 @@ const FOIRequest = React.memo(({ userDetail }) => {
                           handleApplicantDetailsValue
                         }
                         createSaveRequestObject={createSaveRequestObject}
-                        disableInput={disableInput}
-                        userDetail={userDetail}
+                        disableInput={disableInput || ministryId}
+                        defaultExpanded={!closeApplicantDetails(userDetail, requestDetails?.requestType)}
                       />
                       {requiredRequestDetailsValues.requestType.toLowerCase() ===
                         FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL && (
@@ -1151,9 +1179,10 @@ const FOIRequest = React.memo(({ userDetail }) => {
                           handleContactDetailsInitialValue
                         }
                         handleContanctDetailsValue={handleContanctDetailsValue}
-                        disableInput={disableInput}
+                        disableInput={disableInput || ministryId}
                         handleEmailValidation={handleEmailValidation}
-                        userDetail={userDetail}
+                        defaultExpanded={!closeContactInfo(userDetail,requestDetails)}
+                        moreInfoAction={openApplicantProfileModal}
                       />
 
                       <RequestDescriptionBox
@@ -1199,7 +1228,8 @@ const FOIRequest = React.memo(({ userDetail }) => {
                         <AdditionalApplicantDetails
                           requestDetails={requestDetails}
                           createSaveRequestObject={createSaveRequestObject}
-                          disableInput={disableInput}
+                          disableInput={disableInput || ministryId}
+                          defaultExpanded={true}
                         />
                       )}
                       {showDivisionalTracking && (
