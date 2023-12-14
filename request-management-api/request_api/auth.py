@@ -148,10 +148,10 @@ class Auth:
     @classmethod
     def isiao(cls,func):
         @wraps(func)
-        def decorated(type, id, field,*args, **kwargs):           
+        def decorated(*args, **kwargs):           
             usertype = AuthHelper.getusertype()
             if(usertype == "iao"):
-                return func(type, id, field,*args, **kwargs)
+                return func(*args, **kwargs)
             else:
                 return "Unauthorized" , 401
         return decorated  
