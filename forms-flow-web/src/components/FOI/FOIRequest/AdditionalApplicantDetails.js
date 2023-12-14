@@ -10,7 +10,7 @@ import AccordionDetails from '@material-ui/core/AccordionDetails';
 import Typography from '@material-ui/core/Typography';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 
-const AdditionalApplicantDetails = React.memo(({requestDetails, createSaveRequestObject, disableInput}) => {
+const AdditionalApplicantDetails = React.memo(({requestDetails, createSaveRequestObject, disableInput, defaultExpanded}) => {
     /**
      *  Addition Applicant details box in the UI
      *  No mandatory fields here
@@ -126,7 +126,7 @@ const AdditionalApplicantDetails = React.memo(({requestDetails, createSaveReques
 
      return (
       <div className='request-accordian' >
-      <Accordion defaultExpanded={true}>
+      <Accordion defaultExpanded={defaultExpanded}>
       <AccordionSummary className={classes.accordionSummary} expandIcon={<ExpandMoreIcon />} 
         id="additionalApplicantDetails-header">
         <Typography className={classes.heading}>ADDITIONAL APPLICANT DETAILS</Typography>

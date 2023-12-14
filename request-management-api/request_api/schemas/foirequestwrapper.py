@@ -110,6 +110,8 @@ class FOIRequestWrapperSchema(Schema):
     correctionalServiceNumber = fields.Str(data_key="correctionalServiceNumber",allow_none=True, validate=[validate.Length(max=50, error=MAX_EXCEPTION_MESSAGE)]) 
     publicServiceEmployeeNumber = fields.Str(data_key="publicServiceEmployeeNumber",allow_none=True, validate=[validate.Length(max=50, error=MAX_EXCEPTION_MESSAGE)]) 
     isiaorestricted =   fields.Bool(data_key="isiaorestricted")
+
+    applicantprofileid = fields.Int(data_key="applicantprofileid",required=False,allow_none=True)
     
     selectedMinistries = fields.Nested(FOIMinistryRequestWrapperSchema, many=True)
     additionalPersonalInfo = fields.Nested(FOIAdditionallPersonalInfoWrapperSchema,required=False,allow_none=True)

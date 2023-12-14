@@ -12,6 +12,7 @@ from request_api.models.PersonalInformationAttributes import PersonalInformation
 from request_api.models.FOIRequestContactInformation import FOIRequestContactInformation
 from request_api.models.FOIRequestPersonalAttributes import FOIRequestPersonalAttribute
 from request_api.models.FOIRequestApplicantMappings import FOIRequestApplicantMapping
+from request_api.models.RequestorType import RequestorType
 
 import json
 class requestservicecreate:
@@ -126,20 +127,26 @@ class requestservicecreate:
         requestapplicantarr = []
         selfalsoknownas=None
         selfdob=None
-        if  foirequestschema.get("additionalPersonalInfo") is not None:
-            applicantinfo = foirequestschema.get("additionalPersonalInfo")           
-            selfdob = applicantinfo["birthDate"] if requestservicebuilder().isNotBlankorNone(foirequestschema,"birthDate","additionalPersonalInfo") else None
-            selfalsoknownas = applicantinfo["alsoKnownAs"] if requestservicebuilder().isNotBlankorNone(foirequestschema,"alsoKnownAs","additionalPersonalInfo") else None
-        requestapplicantarr.append(
-            requestservicebuilder().createapplicant(foirequestschema.get("firstName"),
-                                           foirequestschema.get("lastName"),
-                                           "Self",
-                                           userid,
-                                           foirequestschema.get("middleName"),                                            
-                                           foirequestschema.get("businessName"),
-                                           selfalsoknownas,
-                                           selfdob)
-            )
+        if  foirequestschema.get("additionalPersonalInfo") is not None and foirequestschema.get('requeststatusid') == 1:
+            if foirequestschema.get('applicantprofileid', None):
+                requestapplicant = FOIRequestApplicantMapping()
+                requestapplicant.foirequestapplicantid = foirequestschema['applicantprofileid']
+                requestapplicant.requestortypeid = RequestorType().getrequestortype("Self")["requestortypeid"]
+                requestapplicantarr.append(requestapplicant)
+            else:
+                applicantinfo = foirequestschema.get("additionalPersonalInfo")
+                selfdob = applicantinfo["birthDate"] if requestservicebuilder().isNotBlankorNone(foirequestschema,"birthDate","additionalPersonalInfo") else None
+                selfalsoknownas = applicantinfo["alsoKnownAs"] if requestservicebuilder().isNotBlankorNone(foirequestschema,"alsoKnownAs","additionalPersonalInfo") else None
+                requestapplicantarr.append(
+                    requestservicebuilder().createapplicant(foirequestschema.get("firstName"),
+                                                foirequestschema.get("lastName"),
+                                                "Self",
+                                                userid,
+                                                foirequestschema.get("middleName"),
+                                                foirequestschema.get("businessName"),
+                                                selfalsoknownas,
+                                                selfdob)
+                    )
                  
         #Prepare additional applicants
         if foirequestschema.get("additionalPersonalInfo") is not None:

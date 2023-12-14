@@ -5,7 +5,7 @@ import MenuItem from '@material-ui/core/MenuItem';
 import Input from '@material-ui/core/Input';
 import FOI_COMPONENT_CONSTANTS from '../../../constants/FOI/foiComponentConstants';
 import { formatDate } from "../../../helper/FOI/helper";
-import { shouldDisableFieldForMinistryRequests,closeApplicantDetails } from "./utils";
+import { shouldDisableFieldForMinistryRequests } from "./utils";
 import { makeStyles } from '@material-ui/styles';
 import Accordion from '@material-ui/core/Accordion';
 import AccordionSummary from '@material-ui/core/AccordionSummary';
@@ -21,7 +21,8 @@ const ApplicantDetails = React.memo(
     createSaveRequestObject,
     disableInput,
     requestStatus,
-    userDetail
+    defaultExpanded,
+    showHistory,
   }) => {
 
     const useStyles = makeStyles({
@@ -227,11 +228,16 @@ const ApplicantDetails = React.memo(
 
     return (
       <div className='request-accordian'>
-        <Accordion defaultExpanded={!closeApplicantDetails(userDetail, requestDetails?.requestType)}>
+        <Accordion defaultExpanded={defaultExpanded}>
           <AccordionSummary className={classes.accordionSummary} expandIcon={<ExpandMoreIcon />} id="applicantDetails-header">
             <Typography className={classes.heading}>APPLICANT DETAILS</Typography>
           </AccordionSummary>
         <AccordionDetails>
+          <div>
+            {showHistory && <button type="button" className={`btn btn-link btn-description-history`} onClick={showHistory}>
+                Applicant Contact History
+            </button>}
+          </div>
           <div className="row foi-details-row">
             <div className="col-lg-6 foi-details-col">
               <TextField

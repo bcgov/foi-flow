@@ -165,3 +165,41 @@ height: fit-content;
 .foi-details-row-break {
     margin-bottom: 2em;
 }
+
+.applicant-profile-modal {
+    z-index: 2000 !important;
+}
+
+.search-applicants-header {
+    margin-left: 22px !important;
+}
+
+.applicant-profile-header{
+    font-size: 25px !important;
+    color: black;
+}
+
+.flexible-modal-drag-area {
+    background: none !important;
+}
+
+.flexible-modal-resizer {
+    position:absolute;
+    right:0;
+    bottom:0;
+    cursor:se-resize;
+    margin:5px;
+    border-bottom: none !important;
+    border-right: none !important;
+    background-size: 16px;
+    background-image: url("data:image/svg+xml,%3Csvg width='30' height='30' xmlns='http://www.w3.org/2000/svg' stroke='null' style='vector-effect: non-scaling-stroke;'%3E%3Cg id='Layer_1'%3E%3Ctitle%3ELayer 1%3C/title%3E%3Cellipse stroke='%23666666' ry='0.44882' rx='0.44882' id='svg_2' cy='28.93701' cx='18.62205' fill='none'/%3E%3Cellipse stroke='%23666666' ry='0.44882' rx='0.44882' id='svg_3' cy='19.01575' cx='28.38583' fill='none'/%3E%3Cline transform='rotate(45 23.4602 24.0105)' id='svg_4' y2='31.01042' x2='23.51658' y1='17.01051' x1='23.40384' stroke-width='2' stroke='%23666666' fill='none'/%3E%3Cline transform='rotate(45 19.7988 19.5616)' stroke='%23666666' id='svg_6' y2='32.63046' x2='19.85521' y1='6.49282' x1='19.74247' stroke-width='2' fill='none'/%3E%3Cellipse stroke='%23666666' ry='0.44882' rx='0.44882' id='svg_7' cy='10.27559' cx='28.93701' fill='none'/%3E%3Cellipse stroke='%23666666' ry='0.44882' rx='0.44882' id='svg_8' cy='28.77953' cx='10.66929' fill='none'/%3E%3Cline transform='rotate(45 15.4681 15.4671)' stroke='%23666666' id='svg_9' y2='34.10369' x2='15.52444' y1='-3.16948' x1='15.41171' stroke-width='2' fill='none'/%3E%3Cellipse stroke='%23666666' ry='0.44882' rx='0.44882' id='svg_10' cy='2.24409' cx='28.62205' fill='none'/%3E%3Cellipse stroke='%23666666' ry='0.44882' rx='0.44882' id='svg_11' cy='28.62205' cx='2.40158' fill='none'/%3E%3C/g%3E%3C/svg%3E");
+}
+
+#menu- {
+    z-index: 2300 !important;
+}
+
+.btn-update-profile {
+    border: none;
+    background: none;
+}
