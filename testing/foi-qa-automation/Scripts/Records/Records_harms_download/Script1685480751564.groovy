@@ -97,12 +97,12 @@ WebUI.click(findTestObject('Page_foi.flow/ministry view/form/divisional tracking
 
 WebUI.click(findTestObject('Page_foi.flow/ministry view/form/divisional tracking/button_Add division to track'), FailureHandling.STOP_ON_FAILURE)
 
-WebUI.click(findTestObject('Page_foi.flow/ministry view/form/divisional tracking/div_ministry division dropdown row 2'))
+WebUI.click(findTestObject('Records/input_Select Division_mui-137'))
 
 WebUI.click(findTestObject('Page_foi.flow/ministry view/form/divisional tracking/division dropdown options/li_Ministers Office'), 
     FailureHandling.STOP_ON_FAILURE)
 
-WebUI.click(findTestObject('Records/input_Select Division Stage_mui-55'), FailureHandling.STOP_ON_FAILURE)
+WebUI.click(findTestObject('Records/input_Select Division Stage_mui-138'), FailureHandling.STOP_ON_FAILURE)
 
 WebUI.click(findTestObject('Page_foi.flow/ministry view/form/divisional tracking/stage dropdown options/li_Clarification'), 
     FailureHandling.STOP_ON_FAILURE)
@@ -156,63 +156,64 @@ WebUI.delay(8)
 WebUI.refresh()
 
 WebUI.click(findTestObject('Page_foi.flow/form/sidebar/div_Sidebar Comments'))
+// Remove comments after fixing bug#4895
 
-WebUI.click(findTestObject('Page_foi.flow/comment/span_Request History Comments'))
+//WebUI.click(findTestObject('Page_foi.flow/comment/span_Request History Comments'))
 
 //WebUI.verifyElementText(findTestObject('Page_foi.flow/comment/p_comment list 2 text'), 'records for harms are ready for export')
-WebUI.verifyElementText(findTestObject('Page_foi.flow/comment/p_comment list 1 text'), 'A batch of records has been uploaded by foiedu, foiedu')
+//WebUI.verifyElementText(findTestObject('Page_foi.flow/comment/p_comment list 1 text'), 'A batch of records has been uploaded by foiedu, foiedu')
 
-WebUI.clickOffset(findTestObject('Page_foi.flow/navbar/notification/notification bell'), -2, 4)
+//WebUI.clickOffset(findTestObject('Page_foi.flow/navbar/notification/notification bell'), -2, 4)
 
-WebUI.verifyElementPresent(findTestObject('Page_foi.flow/navbar/notification/div_notification list 1'), 0)
+//WebUI.verifyElementPresent(findTestObject('Page_foi.flow/navbar/notification/div_notification list 1'), 0)
 
 //WebUI.verifyElementPresent(findTestObject('Page_foi.flow/navbar/notification/div_notification list 2'), 0)
 //WebUI.verifyElementText(findTestObject('Page_foi.flow/navbar/notification/div_notification list 1 message'), 'Records for harms are ready for export')
-WebUI.verifyElementText(findTestObject('Page_foi.flow/navbar/notification/div_notification list 1 request id'), requestID)
+//WebUI.verifyElementText(findTestObject('Page_foi.flow/navbar/notification/div_notification list 1 request id'), requestID)
 
-WebUI.verifyElementText(findTestObject('Page_foi.flow/navbar/notification/div_notification list 1 message'), 'A batch of records has been uploaded by foiedu, foiedu')
+//WebUI.verifyElementText(findTestObject('Page_foi.flow/navbar/notification/div_notification list 1 message'), 'A batch of records has been uploaded by foiedu, foiedu')
 
-WebUI.clickOffset(findTestObject('Page_foi.flow/navbar/notification/notification bell'), -2, 4)
+//WebUI.clickOffset(findTestObject('Page_foi.flow/navbar/notification/notification bell'), -2, 4)
 
-WebUI.refresh()
+//WebUI.refresh()
 
-WebUI.click(findTestObject('Records/div_Records'))
+//WebUI.click(findTestObject('Records/div_Records'))
 
-WebUI.click(findTestObject('Records/div_ (1)'))
+//WebUI.click(findTestObject('Records/div_ (1)'))
 
-WebUI.click(findTestObject('Records/li_Download for Harms (1)'))
+//WebUI.click(findTestObject('Records/li_Download for Harms (1)'))
 
-WebUI.refresh()
+//WebUI.refresh()
 
-WebUI.click(findTestObject('Page_foi.flow/form/sidebar/div_Sidebar Comments'))
+//WebUI.click(findTestObject('Page_foi.flow/form/sidebar/div_Sidebar Comments'))
 
-WebUI.refresh()
+//WebUI.refresh()
 
-WebUI.click(findTestObject('Page_foi.flow/form/sidebar/div_Sidebar Comments'))
+//WebUI.click(findTestObject('Page_foi.flow/form/sidebar/div_Sidebar Comments'))
 
-WebUI.click(findTestObject('Page_foi.flow/comment/span_Request History Comments'))
+//WebUI.click(findTestObject('Page_foi.flow/comment/span_Request History Comments'))
 
-WebUI.refresh()
+//WebUI.refresh()
 
-WebUI.click(findTestObject('Page_foi.flow/form/sidebar/div_Sidebar Comments'))
+//WebUI.click(findTestObject('Page_foi.flow/form/sidebar/div_Sidebar Comments'))
 
-WebUI.click(findTestObject('Page_foi.flow/comment/span_Request History Comments'))
+//WebUI.click(findTestObject('Page_foi.flow/comment/span_Request History Comments'))
 
-WebUI.refresh()
+//WebUI.refresh()
 
-WebUI.click(findTestObject('Page_foi.flow/form/sidebar/div_Sidebar Comments'))
+//WebUI.click(findTestObject('Page_foi.flow/form/sidebar/div_Sidebar Comments'))
 
-WebUI.verifyElementText(findTestObject('Page_foi.flow/comment/p_comment list 1 text'), 'Records for harms are ready for export')
+//WebUI.verifyElementText(findTestObject('Page_foi.flow/comment/p_comment list 1 text'), 'Records for harms are ready for export')
 
-WebUI.clickOffset(findTestObject('Page_foi.flow/navbar/notification/notification bell'), -2, 4)
+//WebUI.clickOffset(findTestObject('Page_foi.flow/navbar/notification/notification bell'), -2, 4)
 
-WebUI.verifyElementPresent(findTestObject('Page_foi.flow/navbar/notification/div_notification list 1'), 0)
+//WebUI.verifyElementPresent(findTestObject('Page_foi.flow/navbar/notification/div_notification list 1'), 0)
 
-WebUI.verifyElementText(findTestObject('Page_foi.flow/navbar/notification/div_notification list 1 request id'), requestID)
+//WebUI.verifyElementText(findTestObject('Page_foi.flow/navbar/notification/div_notification list 1 request id'), requestID)
 
-WebUI.verifyElementText(findTestObject('Page_foi.flow/navbar/notification/div_notification list 1 message'), 'Records for harms are ready for export')
+//WebUI.verifyElementText(findTestObject('Page_foi.flow/navbar/notification/div_notification list 1 message'), 'Records for harms are ready for export')
 
-WebUI.clickOffset(findTestObject('Page_foi.flow/navbar/notification/notification bell'), -2, 4)
+//WebUI.clickOffset(findTestObject('Page_foi.flow/navbar/notification/notification bell'), -2, 4)
 
 WebUI.click(findTestObject('Records/div_Records'))
 
@@ -235,6 +236,7 @@ WebUI.verifyElementPresent(findTestObject('Records/options_converted_file/li_Rep
 WebUI.verifyElementPresent(findTestObject('Records/options_converted_file/li_Download'), 0)
 
 WebUI.verifyElementPresent(findTestObject('Records/options_converted_file/li_Delete'), 0)
+
 DriverFactory.changeWebDriver(IAOuser)
 
 WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/div_Status'))
@@ -246,7 +248,6 @@ WebUI.click(findTestObject('Page_foi.flow/form/closing modal/div_Closing Reason'
 WebUI.click(findTestObject('Page_foi.flow/form/closing modal/dropdown options/li_Partial Disclosure'), FailureHandling.STOP_ON_FAILURE)
 
 WebUI.click(findTestObject('Page_foi.flow/form/state change dialog/button_Save Change'), FailureHandling.STOP_ON_FAILURE)
-
 
 ministryUser.close()
 

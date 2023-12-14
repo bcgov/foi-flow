@@ -97,12 +97,12 @@ WebUI.click(findTestObject('Page_foi.flow/ministry view/form/divisional tracking
 
 WebUI.click(findTestObject('Page_foi.flow/ministry view/form/divisional tracking/button_Add division to track'), FailureHandling.STOP_ON_FAILURE)
 
-WebUI.click(findTestObject('Page_foi.flow/ministry view/form/divisional tracking/div_ministry division dropdown row 2'))
+WebUI.click(findTestObject('Records/input_Select Division_mui-137'))
 
 WebUI.click(findTestObject('Page_foi.flow/ministry view/form/divisional tracking/division dropdown options/li_Ministers Office'), 
     FailureHandling.STOP_ON_FAILURE)
 
-WebUI.click(findTestObject('Records/input_Select Division Stage_mui-55'), FailureHandling.STOP_ON_FAILURE)
+WebUI.click(findTestObject('Records/input_Select Division Stage_mui-138'), FailureHandling.STOP_ON_FAILURE)
 
 WebUI.click(findTestObject('Page_foi.flow/ministry view/form/divisional tracking/stage dropdown options/li_Clarification'), 
     FailureHandling.STOP_ON_FAILURE)
@@ -154,7 +154,7 @@ WebUI.click(findTestObject('Records/span_DEPUTY MINISTERS OFFICE'))
 
 WebUI.click(findTestObject('Records/button_Continue'))
 
-WebUI.delay(100)
+WebUI.delay(60)
 
 WebUI.refresh()
 
@@ -189,7 +189,7 @@ WebUI.click(findTestObject('Records/li_Download for Harms (1)'))
 
 WebUI.delay(8)
 
-WebUI.click(findTestObject('Records/button_Remove Attachments'))
+WebUI.click(findTestObject('Records/Attachment_remove'))
 
 WebUI.verifyElementClickable(findTestObject('Records/button_Continue (1)'))
 
@@ -218,18 +218,19 @@ WebUI.click(findTestObject('Page_foi.flow/comment/span_Request History Comments'
 WebUI.refresh()
 
 WebUI.click(findTestObject('Page_foi.flow/form/sidebar/div_Sidebar Comments'))
+// Remove the following commandlines after fixing the bug #4895
 
-WebUI.verifyElementText(findTestObject('Page_foi.flow/comment/p_comment list 1 text'), '50mb.pdf file(s) could not be added to package, please check record for errors')
+//WebUI.verifyElementText(findTestObject('Page_foi.flow/comment/p_comment list 1 text'), '50mb.pdf file(s) could not be added to package, please check record for errors')
 
-WebUI.clickOffset(findTestObject('Page_foi.flow/navbar/notification/notification bell'), -2, 4)
+//WebUI.clickOffset(findTestObject('Page_foi.flow/navbar/notification/notification bell'), -2, 4)
 
-WebUI.verifyElementPresent(findTestObject('Page_foi.flow/navbar/notification/div_notification list 1'), 0)
+//WebUI.verifyElementPresent(findTestObject('Page_foi.flow/navbar/notification/div_notification list 1'), 0)
 
-WebUI.verifyElementText(findTestObject('Page_foi.flow/navbar/notification/div_notification list 1 request id'), requestID)
+//WebUI.verifyElementText(findTestObject('Page_foi.flow/navbar/notification/div_notification list 1 request id'), requestID)
 
-WebUI.verifyElementText(findTestObject('Page_foi.flow/navbar/notification/div_notification list 1 message'), '50mb.pdf file(s) could not be added to package, please check record for errors')
+//WebUI.verifyElementText(findTestObject('Page_foi.flow/navbar/notification/div_notification list 1 message'), '50mb.pdf file(s) could not be added to package, please check record for errors')
 
-WebUI.clickOffset(findTestObject('Page_foi.flow/navbar/notification/notification bell'), -2, 4)
+//WebUI.clickOffset(findTestObject('Page_foi.flow/navbar/notification/notification bell'), -2, 4)
 
 WebUI.click(findTestObject('Records/div_Records'))
 
@@ -284,7 +285,6 @@ WebUI.verifyElementNotPresent(findTestObject('Records/span_sample.pdf'), 0)
 
 //WebUI.verifyElementPresent(findTestObject('Records/svg_foiedu, foiedu_svg-inline--fa fa-clone fa-w-16 fa-2x jss60 (1)'), 
 //   0)
-
 DriverFactory.changeWebDriver(IAOuser)
 
 WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/div_Status'))

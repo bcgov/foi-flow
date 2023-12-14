@@ -10,11 +10,14 @@
          <value>(.//*[normalize-space(text()) and normalize-space(.)='Delete'])[1]/following::li[1]</value>
       </entry>
       <entry>
+         <key>BASIC</key>
+         <value>//*[(text() = 'Re-Try' or . = 'Re-Try')]</value>
+      </entry>
+      <entry>
          <key>CSS</key>
-         <value></value>
       </entry>
    </selectorCollection>
-   <selectorMethod>XPATH</selectorMethod>
+   <selectorMethod>BASIC</selectorMethod>
    <useRalativeImagePath>true</useRalativeImagePath>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -22,7 +25,7 @@
       <name>tag</name>
       <type>Main</type>
       <value>li</value>
-      <webElementGuid>cb2e0897-7e14-42de-a7d6-ae0152f7c95c</webElementGuid>
+      <webElementGuid>0d91c77a-6a95-4d70-a46f-d00f5627c9b3</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -30,7 +33,7 @@
       <name>class</name>
       <type>Main</type>
       <value>MuiButtonBase-root MuiListItem-root MuiMenuItem-root MuiMenuItem-gutters MuiListItem-gutters MuiListItem-button</value>
-      <webElementGuid>302a44d3-5b74-4f40-9a68-bd34e3b907ef</webElementGuid>
+      <webElementGuid>c5ea0958-0dee-46cf-94e2-fde51846cd4c</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -38,7 +41,7 @@
       <name>tabindex</name>
       <type>Main</type>
       <value>-1</value>
-      <webElementGuid>9a34d030-2567-4f65-ac03-e154c1d35636</webElementGuid>
+      <webElementGuid>a8153735-2e43-429e-b620-c717a07d91db</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -46,7 +49,7 @@
       <name>role</name>
       <type>Main</type>
       <value>menuitem</value>
-      <webElementGuid>070cfb79-923e-4b06-8004-b764e0bc0301</webElementGuid>
+      <webElementGuid>334e783b-b3e6-42e2-add9-e0a14b8699a3</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -54,7 +57,7 @@
       <name>aria-disabled</name>
       <type>Main</type>
       <value>false</value>
-      <webElementGuid>902eac2c-10cb-4bc8-8d53-2064633b66f3</webElementGuid>
+      <webElementGuid>38aed0e1-5e50-4055-a7b7-415508aaedef</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>true</isSelected>
@@ -62,7 +65,7 @@
       <name>text</name>
       <type>Main</type>
       <value>Re-Try</value>
-      <webElementGuid>439e15b9-6ffc-4a1e-984c-8ac7c6a087e9</webElementGuid>
+      <webElementGuid>44cf434e-9123-4aae-84a0-8d121388de6c</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -70,7 +73,7 @@
       <name>xpath</name>
       <type>Main</type>
       <value>/html[1]/body[@class=&quot;no-scroll&quot;]/div[@class=&quot;MuiPopover-root&quot;]/div[@class=&quot;MuiPaper-root MuiPopover-paper MuiPaper-elevation8 MuiPaper-rounded&quot;]/ul[@class=&quot;MuiList-root MuiList-padding&quot;]/li[@class=&quot;MuiButtonBase-root MuiListItem-root MuiMenuItem-root MuiMenuItem-gutters MuiListItem-gutters MuiListItem-button&quot;]</value>
-      <webElementGuid>c9bfd883-bd8e-4c33-8607-a8dec77326a8</webElementGuid>
+      <webElementGuid>ad53081d-9db4-43a9-9336-cb573b116119</webElementGuid>
    </webElementProperties>
    <webElementXpaths>
       <isSelected>true</isSelected>
@@ -78,7 +81,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>(.//*[normalize-space(text()) and normalize-space(.)='Delete'])[1]/following::li[1]</value>
-      <webElementGuid>da8a6318-d480-4d6c-884b-34e79335ad2d</webElementGuid>
+      <webElementGuid>79215edf-01a7-4a93-848b-64798d6ae3c0</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -86,7 +89,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>(.//*[normalize-space(text()) and normalize-space(.)='Download'])[3]/following::li[2]</value>
-      <webElementGuid>cfb5da6c-68ae-4fe7-a554-1659704112d7</webElementGuid>
+      <webElementGuid>5dc99c0c-37dc-49e5-8304-c65d9754ad1a</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -94,7 +97,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>//*/text()[normalize-space(.)='Re-Try']/parent::*</value>
-      <webElementGuid>796359fe-39e6-4430-91d2-9a7ccd6c7c71</webElementGuid>
+      <webElementGuid>cdfe872e-68c1-4c7e-82ac-24d95f9a4f9e</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -102,7 +105,7 @@
       <name>xpath:position</name>
       <type>Main</type>
       <value>//div[3]/ul/li[4]</value>
-      <webElementGuid>41cb2066-0157-4548-ab47-7bdc4439db8c</webElementGuid>
+      <webElementGuid>88c204ac-ea8c-4122-97a0-5a25f391e218</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -110,6 +113,6 @@
       <name>xpath:customAttributes</name>
       <type>Main</type>
       <value>//li[(text() = 'Re-Try' or . = 'Re-Try')]</value>
-      <webElementGuid>7fd8bcb0-d330-4c37-9791-5deb1437c8ea</webElementGuid>
+      <webElementGuid>f6322d10-2805-4a9b-b9f2-99303ed5305e</webElementGuid>
    </webElementXpaths>
 </WebElementEntity>

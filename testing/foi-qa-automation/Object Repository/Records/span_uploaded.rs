@@ -7,7 +7,7 @@
    <selectorCollection>
       <entry>
          <key>XPATH</key>
-         <value>//div[@id='Records']/div/div[2]/div[4]/div/div/span[2]</value>
+         <value>//div[@id='Records']/div/div[2]/div[2]/div/div/span[2]</value>
       </entry>
       <entry>
          <key>CSS</key>
@@ -22,7 +22,7 @@
       <name>tag</name>
       <type>Main</type>
       <value>span</value>
-      <webElementGuid>f5a1b0f8-de54-4be2-958c-a5cbc92ff4a8</webElementGuid>
+      <webElementGuid>5a31a8c9-45d8-4dc3-a7ed-0c900ec84f90</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -30,7 +30,7 @@
       <name>class</name>
       <type>Main</type>
       <value>number-spacing</value>
-      <webElementGuid>da2f04c8-93cb-4af0-bcbf-6b3de3b7e4d9</webElementGuid>
+      <webElementGuid>28de7651-5b4b-422d-9125-20b1c1ceea09</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>true</isSelected>
@@ -38,7 +38,7 @@
       <name>text</name>
       <type>Main</type>
       <value>6</value>
-      <webElementGuid>2bc57811-e07d-4544-8d1d-7c46dbfe1f5f</webElementGuid>
+      <webElementGuid>90e8d7a1-01bf-49fb-9a55-5cae6b1cd966</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -46,7 +46,7 @@
       <name>xpath</name>
       <type>Main</type>
       <value>id(&quot;Records&quot;)/div[@class=&quot;jss49&quot;]/div[@class=&quot;MuiGrid-root MuiGrid-container MuiGrid-spacing-xs-1 MuiGrid-align-items-xs-flex-start&quot;]/div[@class=&quot;MuiGrid-root jss62 MuiGrid-container MuiGrid-item MuiGrid-align-items-xs-flex-start MuiGrid-grid-xs-12&quot;]/div[@class=&quot;MuiGrid-root MuiGrid-container MuiGrid-spacing-xs-2&quot;]/div[@class=&quot;MuiGrid-root MuiGrid-item MuiGrid-grid-xs-3&quot;]/span[@class=&quot;number-spacing&quot;]</value>
-      <webElementGuid>b19771d1-6bd2-4db7-971e-0c2b663a77bf</webElementGuid>
+      <webElementGuid>7302bad2-3fdf-4419-a6e8-8e0af043e13e</webElementGuid>
    </webElementProperties>
    <webElementXpaths>
       <isSelected>true</isSelected>
@@ -54,7 +54,7 @@
       <name>xpath:idRelative</name>
       <type>Main</type>
       <value>//div[@id='Records']/div/div[2]/div[4]/div/div/span[2]</value>
-      <webElementGuid>d047344a-cb9b-4e16-acf0-b163afec0a98</webElementGuid>
+      <webElementGuid>0c839c84-bf19-4039-917d-7af60b4c42bc</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -62,7 +62,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>(.//*[normalize-space(text()) and normalize-space(.)='Files Uploaded:'])[1]/following::span[1]</value>
-      <webElementGuid>492bf8e3-1878-4293-a07d-22a2a0ba5bcd</webElementGuid>
+      <webElementGuid>262160d6-283c-4a4e-8e39-4f702dab9617</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -70,7 +70,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>(.//*[normalize-space(text()) and normalize-space(.)='+ Upload Records'])[1]/following::span[2]</value>
-      <webElementGuid>775faf11-0929-4a2d-814a-422a014a25ae</webElementGuid>
+      <webElementGuid>763d6c63-d8f4-48cf-bedf-618687b437b8</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -78,7 +78,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>(.//*[normalize-space(text()) and normalize-space(.)='Duplicates Removed:'])[1]/preceding::span[1]</value>
-      <webElementGuid>d195f53e-e7d8-4990-bc9b-def3e9128fa8</webElementGuid>
+      <webElementGuid>f77ea553-3c80-4fb9-b271-0f0b354b2662</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -86,7 +86,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>(.//*[normalize-space(text()) and normalize-space(.)='Files Converted to PDF:'])[1]/preceding::span[3]</value>
-      <webElementGuid>33878f7e-efbd-4a5f-8a9c-6b7e85e787b7</webElementGuid>
+      <webElementGuid>c4aed63c-0467-4c3d-94dc-12574f4c6edd</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -94,7 +94,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>//*/text()[normalize-space(.)='6']/parent::*</value>
-      <webElementGuid>1da33014-3271-4e1f-9676-2c7b8eea8fe4</webElementGuid>
+      <webElementGuid>e4414a22-7265-4b15-b968-0a7c53c703db</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -102,7 +102,7 @@
       <name>xpath:position</name>
       <type>Main</type>
       <value>//div[4]/div/div/span[2]</value>
-      <webElementGuid>39743fc1-f4cf-4a1c-8c25-01d2ffe90920</webElementGuid>
+      <webElementGuid>6f9987d5-400e-410b-97fb-08a6784e948f</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -110,6 +110,6 @@
       <name>xpath:customAttributes</name>
       <type>Main</type>
       <value>//span[(text() = '6' or . = '6')]</value>
-      <webElementGuid>6fd252c5-6674-4601-80af-d55cb8c27718</webElementGuid>
+      <webElementGuid>65903e1a-59b0-4b64-ae70-63dd9155f9af</webElementGuid>
    </webElementXpaths>
 </WebElementEntity>
