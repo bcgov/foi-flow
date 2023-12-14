@@ -5,6 +5,7 @@ from datetime import datetime
 from sqlalchemy.orm import relationship,backref
 from .default_method_result import DefaultMethodResult
 from .FOIRequests import FOIRequest
+from sqlalchemy import and_, or_
 
 class FOIRequestApplicantMapping(db.Model):
     # Name of the table in our database
@@ -28,17 +29,33 @@ class FOIRequestApplicantMapping(db.Model):
     requestortype =  relationship("RequestorType",backref=backref("RequestorTypes"),uselist=False)
 
     foirequestapplicantid = db.Column(db.Integer,ForeignKey('FOIRequestApplicants.foirequestapplicantid'))
-    foirequestapplicant =  relationship("FOIRequestApplicant",backref=backref("FOIRequestApplicants"),uselist=False)
+    foirequestapplicant_version = db.Column(db.Integer, ForeignKey('FOIRequestApplicants.version'))
+    foirequestapplicant = relationship('FOIRequestApplicant', primaryjoin="and_(FOIRequestApplicant.foirequestapplicantid==FOIRequestApplicantMapping.foirequestapplicantid, "
+                        "FOIRequestApplicant.version==FOIRequestApplicantMapping.foirequestapplicant_version)")
 
-    foirequest_id =db.Column(db.Integer, db.ForeignKey('FOIRequests.foirequestid'))
-    foirequestversion_id = db.Column(db.Integer, db.ForeignKey('FOIRequests.version'))
+    foirequest_id =db.Column(db.Integer, ForeignKey('FOIRequests.foirequestid'))
+    foirequestversion_id = db.Column(db.Integer, ForeignKey('FOIRequests.version'))
     foirequestkey = relationship("FOIRequest",foreign_keys="[FOIRequestApplicantMapping.foirequest_id]")
     foirequestversion = relationship("FOIRequest",foreign_keys="[FOIRequestApplicantMapping.foirequestversion_id]")
     
     @classmethod
     def getrequestapplicants(cls,foirequest_id,foirequestversion):
+        from .FOIRequestApplicants import FOIRequestApplicant
         requestapplicant_schema = FOIRequestApplicantMappingSchema(many=True)
-        _applicantinfos = db.session.query(FOIRequestApplicantMapping).filter(FOIRequestApplicantMapping.foirequest_id == foirequest_id , FOIRequestApplicantMapping.foirequestversion_id == foirequestversion).order_by(FOIRequestApplicantMapping.foirequestapplicantmappingid.asc()).all()
+        _applicantinfos = db.session.query(FOIRequestApplicantMapping
+                                        ).join(
+                                            FOIRequestApplicant,
+                                            and_(
+                                                FOIRequestApplicant.foirequestapplicantid == FOIRequestApplicantMapping.foirequestapplicantid,
+                                                or_(
+                                                    FOIRequestApplicant.version == FOIRequestApplicantMapping.foirequestapplicant_version,
+                                                    FOIRequestApplicantMapping.foirequestapplicant_version is None
+                                                )
+                                            )
+                                        ).filter(
+                                                FOIRequestApplicantMapping.foirequest_id == foirequest_id,
+                                                FOIRequestApplicantMapping.foirequestversion_id == foirequestversion
+                                        ).order_by(FOIRequestApplicantMapping.foirequestapplicantmappingid.asc()).all()
         applicantinfos = requestapplicant_schema.dump(_applicantinfos)       
         return applicantinfos
             
