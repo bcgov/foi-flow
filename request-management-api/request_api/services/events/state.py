@@ -107,7 +107,8 @@ class stateevent:
         comment = username+' changed the state of the request to '+self.__formatstate(state)
         if state == "Response" and requesttype == "ministryrequest":
             signgoffapproval = FOIMinistryRequest().getrequest(requestid)['ministrysignoffapproval']
-            comment = comment + f". Approved by {signgoffapproval['approvername']}, {signgoffapproval['approvertitle']} on {signgoffapproval['approveddate']}"
+            if signgoffapproval:
+                comment = comment + f". Approved by {signgoffapproval['approvername']}, {signgoffapproval['approvertitle']} on {signgoffapproval['approveddate']}"
         return comment
 
     def __notificationmessage(self, state):
