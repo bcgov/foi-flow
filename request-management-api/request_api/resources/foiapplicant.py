@@ -55,7 +55,6 @@ class FOIApplicants(Resource):
             return {'status': False, 'message':EXCEPTION_MESSAGE_BAD_REQUEST}, 400
         try:
             result = applicantservice().getapplicantbyemail(email)
-            print("result-endpoint: ", result)
             if result is not None:
                 return json.dumps(result), 200
             else:
@@ -64,7 +63,7 @@ class FOIApplicants(Resource):
             return {'status': exception.status_code, 'message':exception.message}, 500 
 
 
-@cors_preflight('GET,OPTIONS')
+@cors_preflight('POST,OPTIONS')
 @API.route('/foiapplicants/search')
 class EventPagination(Resource):
     """ Retrives the foi request based on the queue type.
@@ -74,20 +73,20 @@ class EventPagination(Resource):
     @cross_origin(origins=allowedorigins())
     @auth.require
     @auth.isiao
-    @cors_preflight('GET,OPTIONS')
-    def get():
+    @cors_preflight('POST,OPTIONS')
+    def post():
         try:
-            _keywords = flask.request.args.get('keywords', None, type=str)
-            print(_keywords)
+            requestjson = request.get_json()
+            _keywords = requestjson['keywords']
 
-            result = []
-            statuscode = 200
             if _keywords is None or _keywords == "":
-                result = applicantservice().searchapplicant(_keywords)
+                return {'status': False, 'message':EXCEPTION_MESSAGE_BAD_REQUEST}, 400
             else:
-                statuscode = 401  
-
-            return result, statuscode
+                result = applicantservice().searchapplicant(_keywords)                
+                if result is not None:
+                    return json.dumps(result), 200
+                else:
+                    return {'status': False, 'message':EXCEPTION_MESSAGE_NOT_FOUND}, 404  
         except BusinessException as exception:
             return {'status': exception.status_code, 'message':exception.message}, 500 
         

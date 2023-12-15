@@ -38,33 +38,39 @@ class applicantservice:
     def __transformfilteringfields(self, filterfields):
         return list(map(lambda x: x.replace('createdat', 'createdatformatted'), filterfields))
 
+    def __first_not_null(self, list):
+        for item in list:
+            if item is not None:
+                return item
+        return None
+
     def __prepareapplicant(self, applicant):
         return {
             'additionalPersonalInfo': {
-                'alsoKnownAs': applicant["alsoknownas"],
-                'birthDate': applicant["dob"],
-                'personalHealthNumber': applicant["phn"],
+                'alsoKnownAs': self.__first_not_null(applicant["alsoknownas"]),
+                'birthDate': self.__first_not_null(applicant["dob"]),
+                'personalHealthNumber': self.__first_not_null(applicant["phn"]),
             },
             'foiRequestApplicantID': applicant["foirequestapplicantid"],
-            'firstName': applicant["firstname"],
-            'middleName': applicant["middlename"],
-            'lastName': applicant["lastname"],
+            'firstName': self.__first_not_null(applicant["firstname"]),
+            'middleName': self.__first_not_null(applicant["middlename"]),
+            'lastName': self.__first_not_null(applicant["lastname"]),
             #'createdat' : self.__formatedate(applicant["createdat)"],
-            'businessName': applicant["businessname"],
+            'businessName': self.__first_not_null(applicant["businessname"]),
             # 'applicant': applicant["applicant"],
             'applicantVersion': applicant["applicantversion"],
             'foirequestID': applicant["foirequestid"],
             'foirequestVersion': applicant["foirequestversion"],
             'requestType': applicant["requesttype"],
             'category': applicant["applicantcategory"],           
-            'email':applicant["email"],
-            'address': applicant["address"],
-            'phonePrimary': applicant["homephone"],
-            'workPhonePrimary': applicant["workphone"],
-            'workPhoneSecondary': applicant["workphone2"],
-            'phoneSecondary': applicant["mobilephone"],           
-            'otherContactInfo':applicant["othercontactinfo"],
-            'publicServiceEmployeeNumber': applicant["employeenumber"],
-            'correctionalServiceNumber': applicant["correctionnumber"],           
+            'email': self.__first_not_null(applicant["email"]),
+            'address': self.__first_not_null(applicant["address"]),
+            'phonePrimary': self.__first_not_null(applicant["homephone"]),
+            'workPhonePrimary': self.__first_not_null(applicant["workphone"]),
+            'workPhoneSecondary': self.__first_not_null(applicant["workphone2"]),
+            'phoneSecondary': self.__first_not_null(applicant["mobilephone"]),           
+            'otherContactInfo': self.__first_not_null(applicant["othercontactinfo"]),
+            'publicServiceEmployeeNumber': self.__first_not_null(applicant["employeenumber"]),
+            'correctionalServiceNumber': self.__first_not_null(applicant["correctionnumber"]),           
         }
     
