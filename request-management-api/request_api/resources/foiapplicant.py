@@ -1,0 +1,93 @@
+# Copyright © 2021 Province of British Columbia
+#
+# Licensed under the Apache License, Version 2.0 (the 'License');
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an 'AS IS' BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+"""API endpoints for managing a FOI Requests resource."""
+
+
+from flask import g, request
+import flask
+from flask_restx import Namespace, Resource, cors
+from flask_expects_json import expects_json
+from request_api.auth import auth
+from request_api.tracer import Tracer
+from request_api.utils.util import  cors_preflight, allowedorigins
+from request_api.exceptions import BusinessException, Error
+from request_api.services.applicantservice import applicantservice
+import json
+from flask_cors import cross_origin
+import request_api
+from request_api.utils.cache import cache_filter, response_filter
+
+API = Namespace('FOIAssignee', description='Endpoints for FOI assignee management')
+TRACER = Tracer.get_instance()
+
+"""Custom exception messages
+"""
+EXCEPTION_MESSAGE_BAD_REQUEST='Bad Request'
+EXCEPTION_MESSAGE_NOT_FOUND='Not Found'
+
+
+@cors_preflight('GET,OPTIONS')
+@API.route('/foiapplicants/<email>')
+class FOIApplicants(Resource):
+    """Resource for retriving all FOI assignees."""
+
+    @staticmethod
+    @TRACER.trace()
+    @cross_origin(origins=allowedorigins())
+    @auth.require
+    @auth.isiao
+    @cors_preflight('GET,OPTIONS')
+    def get(email=None):
+        print(email)
+
+        if email is None or email == "":
+            return {'status': False, 'message':EXCEPTION_MESSAGE_BAD_REQUEST}, 400
+        try:
+            result = applicantservice().getapplicantbyemail(email)
+            print("result-endpoint: ", result)
+            if result is not None:
+                return json.dumps(result), 200
+            else:
+                return {'status': False, 'message':EXCEPTION_MESSAGE_NOT_FOUND}, 404   
+        except BusinessException as exception:            
+            return {'status': exception.status_code, 'message':exception.message}, 500 
+
+
+@cors_preflight('GET,OPTIONS')
+@API.route('/foiapplicants/search')
+class EventPagination(Resource):
+    """ Retrives the foi request based on the queue type.
+    """
+    @staticmethod
+    @TRACER.trace()
+    @cross_origin(origins=allowedorigins())
+    @auth.require
+    @auth.isiao
+    @cors_preflight('GET,OPTIONS')
+    def get():
+        try:
+            _keywords = flask.request.args.get('keywords', None, type=str)
+            print(_keywords)
+
+            result = []
+            statuscode = 200
+            if _keywords is None or _keywords == "":
+                result = applicantservice().searchapplicant(_keywords)
+            else:
+                statuscode = 401  
+
+            return result, statuscode
+        except BusinessException as exception:
+            return {'status': exception.status_code, 'message':exception.message}, 500 
+        

@@ -8,6 +8,7 @@ from request_api.services.notifications.notificationconfig import notificationco
 from request_api.services.notifications.notificationuser import notificationuser
 from request_api.models.FOIRawRequests import FOIRawRequest
 from request_api.models.FOIMinistryRequests import FOIMinistryRequest
+from request_api.models.FOIRequests import FOIRequest
 from request_api.models.FOIRequestNotifications import FOIRequestNotification
 from request_api.models.FOIRequestNotificationUsers import FOIRequestNotificationUser
 from request_api.models.FOIRawRequestNotifications import FOIRawRequestNotification
@@ -253,15 +254,24 @@ class notificationservice:
         return 'rawrequest' if idnumber.lower().startswith('u-00') else 'ministryrequest'    
             
     def __preparenotification(self, message, requesttype, notificationtype, userid, foirequest, requestjson=None):
+        ministryusers = []
         if requesttype == "ministryrequest":
             notification = FOIRequestNotification()
             notification.requestid = foirequest["foiministryrequestid"]
             notification.idnumber = foirequest["filenumber"]
             notification.foirequestid = foirequest["foirequest_id"]
+
+            #mute notifications for ministry users
+            mutenotification = self.__mutenotification(requesttype, notificationtype, foirequest)
+            usergroupfromkeycloak = KeycloakAdminService().getmembersbygroupname(foirequest["assignedministrygroup"])
+            if usergroupfromkeycloak is not None and len(usergroupfromkeycloak) > 0:
+                for user in usergroupfromkeycloak[0].get("members"):
+                    ministryusers.append(user["username"])
         else:
             notification = FOIRawRequestNotification()
             notification.requestid = foirequest["requestid"]
             notification.idnumber ='U-00' + str(foirequest['requestid'])
+            mutenotification = False
 
         notification.notificationtypeid = notificationconfig().getnotificationtypeid(notificationtype)
         notification.axisnumber = foirequest["axisrequestid"]
@@ -269,24 +279,45 @@ class notificationservice:
         notification.createdby = userid
         notification.notification = message
         notification.isdeleted = False
+
         notificationusers = notificationuser().getnotificationusers(notificationtype, requesttype, userid, foirequest, requestjson)
         users = []
         for _notificationuser in notificationusers:
-            users.append(self.__preparenotificationuser(requesttype, _notificationuser, userid))
+            users.append(self.__preparenotificationuser(requesttype, _notificationuser, userid, mutenotification, ministryusers))
         notification.notificationusers = users        
         return notification if users else None
         
-    def __preparenotificationuser(self, requesttype, notificationuser, userid):
+    def __preparenotificationuser(self, requesttype, notificationuser, userid, mute=False, ministryusers=[]):
         if requesttype == "ministryrequest":
             user = FOIRequestNotificationUser()
+            if notificationuser["userid"] in ministryusers:
+                user.isdeleted = mute
+            else:
+                user.isdeleted = False
         else:
             user = FOIRawRequestNotificationUser()
+            user.isdeleted = False
         user.notificationusertypeid = notificationuser["usertype"]
         user.userid = notificationuser["userid"]
         user.createdby = userid
-        user.isdeleted = False
         return user
-           
+
+    def __mutenotification(self, requesttype, notificationtype, request):
+        #get mute conditions from env
+        mutenotifications = notificationconfig().getmutenotifications()
+        if "programarea.bcgovcode" in request:
+            bcgovcode = request["programarea.bcgovcode"].upper()
+            if requesttype == "ministryrequest"and bcgovcode in mutenotifications:
+                foirequest = FOIRequest.getrequest(request["foirequest_id"])
+                if foirequest["requesttype"].upper() in (_requesttype.upper() for _requesttype in mutenotifications[bcgovcode]["request_types"]):
+                    if request["requeststatus.name"].upper() in (_state.upper() for _state in mutenotifications[bcgovcode]["state_exceptions"]):
+                        return False
+                    if notificationtype.upper() in (_notificationtype.upper() for _notificationtype in mutenotifications[bcgovcode]["type_exceptions"]):
+                        return False
+                    return True
+
+        return False
+
     def getrequest(self, requestid, requesttype):
         if requesttype == "ministryrequest":
             return FOIMinistryRequest.getrequestbyministryrequestid(requestid)

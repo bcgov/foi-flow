@@ -14,15 +14,16 @@ class FOIRequestNotificationUser(object):
     notificationusertypeid = fields.Int(data_key="notificationusertypeid") 
     createdby = fields.Str(data_key="createdby")
     created_at = fields.Str(data_key="created_at")
+    isdeleted = fields.Boolean(data_key="isdeleted")
 
     def savenotificationuser(self, notificationuser):
         conn = None
         try:
             conn = getconnection()
             cursor = conn.cursor()
-            cursor.execute('INSERT INTO public."FOIRequestNotificationUsers" (notificationid, userid, notificationusertypeid, createdby, created_at) \
-                                VALUES(%s::integer,%s, %s::integer, %s,%s)', 
-                                (int(notificationuser.notificationid), str(notificationuser.userid), int(notificationuser.notificationusertypeid),  str(notificationuser.createdby), datetime.now()))
+            cursor.execute('INSERT INTO public."FOIRequestNotificationUsers" (notificationid, userid, notificationusertypeid, createdby, created_at, isdeleted) \
+                                VALUES(%s::integer, %s, %s::integer, %s, %s, %s::boolean)',
+                                (int(notificationuser.notificationid), str(notificationuser.userid), int(notificationuser.notificationusertypeid), str(notificationuser.createdby), datetime.now(), int(notificationuser.isdeleted)))
             conn.commit()
             cursor.close()
         except(Exception) as error:
