@@ -212,15 +212,17 @@ AS SELECT tmp.requestid::text AS rawrequestid,
           ORDER BY fr.requestid, fr.version DESC, fr.axisrequestid) tmp
   WHERE tmp.status::text <> ALL (ARRAY['Archived'::character varying, 'Unopened'::character varying, 'Closed'::character varying]::text[]);
 """)
-    op.execute('ALTER TABLE public."FOIRequestStatuses" drop column statuslabel;')
-    op.execute('ALTER TABLE public."FOIMinistryRequests" drop column requeststatuslabel;')
-    op.execute('ALTER TABLE public."FOIRawRequests" drop column requeststatuslabel;')
-    op.execute('ALTER TABLE public."FOIRequestTeams" drop column requeststatuslabel;')
-
+    
     op.execute('DROP INDEX "FOIMinistryRequests_event";')
     op.execute('CREATE INDEX "FOIMinistryRequests_event" ON "FOIMinistryRequests"(axisrequestid, assignedto, assignedgroup, assignedministryperson, assignedministrygroup, requeststatusid);')
 
     op.execute('DROP INDEX "FOIRawRequests_event";')
     op.execute('CREATE INDEX "FOIRawRequests_event" ON "FOIRawRequests" (axisrequestid, assignedto, assignedgroup, status);')
 
+    op.execute('ALTER TABLE public."FOIRequestStatuses" drop column statuslabel;')
+    op.execute('ALTER TABLE public."FOIMinistryRequests" drop column requeststatuslabel;')
+    op.execute('ALTER TABLE public."FOIRawRequests" drop column requeststatuslabel;')
+    op.execute('ALTER TABLE public."FOIRequestTeams" drop column requeststatuslabel;')
+
+   
     # ### end Alembic commands ###
