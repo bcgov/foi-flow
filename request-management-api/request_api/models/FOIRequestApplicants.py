@@ -9,7 +9,7 @@ from .ApplicantCategories import ApplicantCategory
 from .FOIRequests import FOIRequest
 from .FOIRequestContactInformation import FOIRequestContactInformation
 from .FOIRequestPersonalAttributes import FOIRequestPersonalAttribute
-from sqlalchemy import and_, or_, asc, func
+from sqlalchemy import and_, or_, func, case
 
 class FOIRequestApplicant(db.Model):
     # Name of the table in our database
@@ -122,8 +122,7 @@ class FOIRequestApplicant(db.Model):
             personalhealthnumber.attributevalue.label('phn')
         ]
 
-        applicantprofile_schema = ApplicantProfileSchema(many=True)
-        query = _session.query(
+        subquery_all = _session.query(
                                 *selectedcolumns
                             ).join(
                                 FOIRequestApplicantMapping,
@@ -231,9 +230,35 @@ class FOIRequestApplicant(db.Model):
                                 FOIMinistryRequest.requeststatusid != 3,
                                 FOIRequest.isactive == True,
                                 contactemail.contactinformation == email
-                            ).order_by(FOIRequest.foirequestid.asc())
+                            ).order_by(FOIRequest.foirequestid.desc()).subquery()
 
-        return applicantprofile_schema.dump(query.all())
+        query_aggregate = _session.query(
+            subquery_all.c.foirequestapplicantid,
+            func.array_agg(subquery_all.c.firstname).label('firstname'),
+            func.array_agg(subquery_all.c.middlename).label('middlename'),
+            func.array_agg(subquery_all.c.lastname).label('lastname'),
+            func.array_agg(subquery_all.c.alsoknownas).label('alsoknownas'),
+            func.array_agg(subquery_all.c.dob).label('dob'),
+            func.array_agg(subquery_all.c.businessname).label('businessname'),
+            subquery_all.c.applicantversion,
+            func.array_agg(subquery_all.c.foirequestid).label('foirequestid'),
+            func.array_agg(subquery_all.c.foirequestversion).label('foirequestversion'),
+            func.array_agg(subquery_all.c.requesttype).label('requesttype'),
+            func.array_agg(subquery_all.c.applicantcategory).label('applicantcategory'),
+            func.array_agg(subquery_all.c.email).label('email'),
+            func.array_agg(subquery_all.c.address).label('address'),
+            func.array_agg(subquery_all.c.homephone).label('homephone'),
+            func.array_agg(subquery_all.c.workphone).label('workphone'),
+            func.array_agg(subquery_all.c.workphone2).label('workphone2'),
+            func.array_agg(subquery_all.c.mobilephone).label('mobilephone'),
+            func.array_agg(subquery_all.c.othercontactinfo).label('othercontactinfo'),
+            func.array_agg(subquery_all.c.employeenumber).label('employeenumber'),
+            func.array_agg(subquery_all.c.correctionnumber).label('correctionnumber'),
+            func.array_agg(subquery_all.c.phn).label('phn')
+        ).group_by(subquery_all.c.foirequestapplicantid, subquery_all.c.applicantversion)
+
+        applicantprofile_schema = ApplicantProfileSchema(many=True)
+        return applicantprofile_schema.dump(query_aggregate.all())
 
 
     # Search applicant by keywords
@@ -291,8 +316,7 @@ class FOIRequestApplicant(db.Model):
             personalhealthnumber.attributevalue.label('phn')
         ]
 
-        applicantprofile_schema = ApplicantProfileSchema(many=True)
-        query = _session.query(
+        subquery_all = _session.query(
                                 *selectedcolumns
                             ).join(
                                 FOIRequestApplicantMapping,
@@ -401,34 +425,60 @@ class FOIRequestApplicant(db.Model):
                                 FOIMinistryRequest.requeststatusid != 3,
                                 FOIRequest.isactive == True,
                                 or_(*FOIRequestApplicant.getsearchfilters(keywords, contactemail, contacthomephone, contactworkphone, contactworkphone2, contactmobilephone))
-                            ).order_by(FOIRequest.foirequestid.asc())
+                            ).order_by(FOIRequest.foirequestid.desc()).subquery()
 
-        return applicantprofile_schema.dump(query.all())
+        query_aggregate = _session.query(
+            subquery_all.c.foirequestapplicantid,
+            func.array_agg(subquery_all.c.firstname).label('firstname'),
+            func.array_agg(subquery_all.c.middlename).label('middlename'),
+            func.array_agg(subquery_all.c.lastname).label('lastname'),
+            func.array_agg(subquery_all.c.alsoknownas).label('alsoknownas'),
+            func.array_agg(subquery_all.c.dob).label('dob'),
+            func.array_agg(subquery_all.c.businessname).label('businessname'),
+            subquery_all.c.applicantversion,
+            func.array_agg(subquery_all.c.foirequestid).label('foirequestid'),
+            func.array_agg(subquery_all.c.foirequestversion).label('foirequestversion'),
+            func.array_agg(subquery_all.c.requesttype).label('requesttype'),
+            func.array_agg(subquery_all.c.applicantcategory).label('applicantcategory'),
+            func.array_agg(subquery_all.c.email).label('email'),
+            func.array_agg(subquery_all.c.address).label('address'),
+            func.array_agg(subquery_all.c.homephone).label('homephone'),
+            func.array_agg(subquery_all.c.workphone).label('workphone'),
+            func.array_agg(subquery_all.c.workphone2).label('workphone2'),
+            func.array_agg(subquery_all.c.mobilephone).label('mobilephone'),
+            func.array_agg(subquery_all.c.othercontactinfo).label('othercontactinfo'),
+            func.array_agg(subquery_all.c.employeenumber).label('employeenumber'),
+            func.array_agg(subquery_all.c.correctionnumber).label('correctionnumber'),
+            func.array_agg(subquery_all.c.phn).label('phn')
+        ).group_by(subquery_all.c.foirequestapplicantid, subquery_all.c.applicantversion)
+
+        applicantprofile_schema = ApplicantProfileSchema(many=True)
+        return applicantprofile_schema.dump(query_aggregate.all())
 
 
     @classmethod
     def getsearchfilters(cls, keywords, contactemail, contacthomephone, contactworkphone, contactworkphone2, contactmobilephone):
         searchfilters = []
         if(len(keywords) > 0):
-            if(keywords['firstname'] is not None):
+            if('firstname' in keywords):
                 searchfilters.append(FOIRequestApplicant.firstname.ilike('%'+keywords['firstname']+'%'))
 
-            if(keywords['lastname'] is not None):
+            if('lastname' in keywords):
                 searchfilters.append(FOIRequestApplicant.lastname.ilike('%'+keywords['lastname']+'%'))
 
-            if(keywords['email'] is not None):
+            if('email' in keywords):
                 searchfilters.append(contactemail.contactinformation.ilike('%'+keywords['email']+'%'))
 
-            if(keywords['homephone'] is not None):
+            if('homephone' in keywords):
                 searchfilters.append(contacthomephone.contactinformation.ilike('%'+keywords['homephone']+'%'))
 
-            if(keywords['workphone'] is not None):
+            if('workphone' in keywords):
                 searchfilters.append(contactworkphone.contactinformation.ilike('%'+keywords['workphone']+'%'))
 
-            if(keywords['workphone2'] is not None):
+            if('workphone2' in keywords):
                 searchfilters.append(contactworkphone2.contactinformation.ilike('%'+keywords['workphone2']+'%'))
 
-            if(keywords['mobilephone'] is not None):
+            if('mobilephone' in keywords):
                 searchfilters.append(contactmobilephone.contactinformation.ilike('%'+keywords['mobilephone']+'%'))
 
         return searchfilters
