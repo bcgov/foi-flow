@@ -642,7 +642,6 @@ class FOIRawRequest(db.Model):
     @classmethod
     def getrequestssubquery(cls, filterfields, keyword, additionalfilter, userid, isiaorestrictedfilemanager, groups):
         basequery = FOIRawRequest.getbasequery(additionalfilter, userid, isiaorestrictedfilemanager, groups)
-        print(f"basequery = {basequery}")
         basequery = basequery.filter(FOIRawRequest.status != 'Unopened').filter(FOIRawRequest.status != 'Closed')
         #filter/search
         if(len(filterfields) > 0 and keyword is not None):
