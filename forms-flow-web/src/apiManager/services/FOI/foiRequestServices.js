@@ -525,3 +525,27 @@ export const fetchRestrictedRequestCommentTagList = (requestid, ministryId, ...r
   }
 };
 
+export const deleteOIPCDetails = (requestId, ministryId, ...rest) => {
+  const done = fnDone(rest);
+  let apiUrl= replaceUrl(replaceUrl(
+    API.FOI_REQUEST_SECTION_API,
+    "<ministryid>",
+    ministryId),"<requestid>",requestId
+  );
+  const data = {isoipcreview: false, oipcdetails: []}
+  return (dispatch) => {
+    httpPOSTRequest(`${apiUrl}/oipc`, data)
+      .then((res) => {
+        if (res.data) {
+          done(null, res.data);
+        } else {
+          dispatch(serviceActionError(res));
+          throw new Error(`Error while saving the OIPC Details for the (request# ${requestId}, ministry# ${ministryId})`);            
+        }
+      })
+      .catch((error) => {
+        done(error);
+        catchError(error, dispatch);
+      });
+  };
+}
