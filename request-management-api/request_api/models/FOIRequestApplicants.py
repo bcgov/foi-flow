@@ -103,7 +103,7 @@ class FOIRequestApplicant(db.Model):
             FOIRequestApplicant.middlename.label('middlename'),
             FOIRequestApplicant.lastname.label('lastname'),
             FOIRequestApplicant.alsoknownas.label('alsoknownas'),
-            FOIRequestApplicant.dob.label('dob'),
+            func.to_char(FOIRequestApplicant.dob, 'YYYY-MM-DD').label('dob'),
             FOIRequestApplicant.businessname.label('businessname'),
             FOIRequestApplicant.version.label('applicantversion'),
             FOIRequest.foirequestid.label('foirequestid'),
@@ -227,7 +227,7 @@ class FOIRequestApplicant(db.Model):
                                     personalhealthnumber.attributevalue is not None),
                                 isouter=True
                             ).filter(
-                                FOIMinistryRequest.requeststatusid != 3,
+                                # FOIMinistryRequest.requeststatusid != 3,
                                 FOIRequest.isactive == True,
                                 contactemail.contactinformation == email
                             ).order_by(FOIRequest.foirequestid.desc()).subquery()
@@ -297,7 +297,7 @@ class FOIRequestApplicant(db.Model):
             FOIRequestApplicant.middlename.label('middlename'),
             FOIRequestApplicant.lastname.label('lastname'),
             FOIRequestApplicant.alsoknownas.label('alsoknownas'),
-            FOIRequestApplicant.dob.label('dob'),
+            func.to_char(FOIRequestApplicant.dob, 'YYYY-MM-DD').label('dob'),
             FOIRequestApplicant.businessname.label('businessname'),
             FOIRequestApplicant.version.label('applicantversion'),
             FOIRequest.foirequestid.label('foirequestid'),
@@ -422,7 +422,7 @@ class FOIRequestApplicant(db.Model):
                                     personalhealthnumber.attributevalue is not None),
                                 isouter=True
                             ).filter(
-                                FOIMinistryRequest.requeststatusid != 3,
+                                # FOIMinistryRequest.requeststatusid != 3,
                                 FOIRequest.isactive == True,
                                 or_(*FOIRequestApplicant.getsearchfilters(keywords, contactemail, contacthomephone, contactworkphone, contactworkphone2, contactmobilephone))
                             ).order_by(FOIRequest.foirequestid.desc()).subquery()
