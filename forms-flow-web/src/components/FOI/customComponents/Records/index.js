@@ -832,6 +832,12 @@ export const RecordsLog = ({
     } else if (e.target.value === 3 && isResponsePackageDownloadReady) {
       const s3filepath = responsePackagePdfStitchedRecord?.finalpackagepath;
       handleDownloadZipFile(s3filepath, e.target.value);
+    } else if (e.target.value === 4 && isResponsePackageDownloadReady) {
+      const s3filepath = responsePackagePdfStitchedRecord?.finalpackagepath;
+      handleDownloadZipFile(s3filepath, e.target.value);
+    } else if (e.target.value === 5 && isResponsePackageDownloadReady) {
+      const s3filepath = responsePackagePdfStitchedRecord?.finalpackagepath;
+      handleDownloadZipFile(s3filepath, e.target.value);
     }
 
     setCurrentDownload(e.target.value);
