@@ -717,7 +717,9 @@ class FOIMinistryRequest(db.Model):
                                 or_(*groupfilter)
                             )
         
-        return ministryfilter
+        ministryfilterwithclosedoipc = or_(ministryfilter, and_(FOIMinistryRequest.isoipcreview == True, FOIMinistryRequest.requeststatusid == 3))
+
+        return ministryfilterwithclosedoipc
 
     @classmethod
     def getrequestoriginalduedate(cls,ministryrequestid):       
