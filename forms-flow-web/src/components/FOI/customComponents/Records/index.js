@@ -375,6 +375,14 @@ export const RecordsLog = ({
     useState(false);
   const [isResponsePackageDownloadFailed, setIsResponsePackageDownloadFailed] =
     useState(false);
+  const [isOIPCReviewPackageReady, setIsOIPCReviewPackageReady] =
+    useState(false);
+  const [isOIPCReviewPackageFailed, setIsOIPCReviewPackageFailed] =
+    useState(false);
+  const [isOIPCSignOffPackageReady, setIsOIPCSignOffPackageReady] =
+    useState(false);
+  const [isOIPCSignOffPackageFailed, setIsOIPCSignOffPackageFailed] =
+    useState(false);
   const [isAllSelected, setIsAllSelected] = useState(false);
 
   useEffect(() => {
@@ -832,10 +840,10 @@ export const RecordsLog = ({
     } else if (e.target.value === 3 && isResponsePackageDownloadReady) {
       const s3filepath = responsePackagePdfStitchedRecord?.finalpackagepath;
       handleDownloadZipFile(s3filepath, e.target.value);
-    } else if (e.target.value === 4 && isResponsePackageDownloadReady) {
+    } else if (e.target.value === 4 && isOIPCSignOffPackageReady) {
       const s3filepath = responsePackagePdfStitchedRecord?.finalpackagepath;
       handleDownloadZipFile(s3filepath, e.target.value);
-    } else if (e.target.value === 5 && isResponsePackageDownloadReady) {
+    } else if (e.target.value === 5 && isOIPCReviewPackageReady) {
       const s3filepath = responsePackagePdfStitchedRecord?.finalpackagepath;
       handleDownloadZipFile(s3filepath, e.target.value);
     }
