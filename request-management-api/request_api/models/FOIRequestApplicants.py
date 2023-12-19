@@ -35,6 +35,7 @@ class FOIRequestApplicant(db.Model):
     @classmethod
     def saveapplicant(cls,firstname, lastname, middlename, businessname, alsoknownas, dob, userid):
         dbquery = db.session.query(FOIRequestApplicant)
+        # check the applicantid instead of firstname and lastname
         dbquery = dbquery.filter_by(firstname=firstname)
         applicant = dbquery.filter_by(lastname=lastname)
         if (applicant.count() > 0):
@@ -230,7 +231,7 @@ class FOIRequestApplicant(db.Model):
                                     city.foirequestversion_id == FOIRequest.version,
                                     city.contacttypeid == 2,
                                     city.contactinformation is not None,
-                                    city.format == 'city'),
+                                    city.dataformat == 'city'),
                                 isouter=True
                             ).join(
                                 province,
@@ -239,7 +240,7 @@ class FOIRequestApplicant(db.Model):
                                     province.foirequestversion_id == FOIRequest.version,
                                     province.contacttypeid == 2,
                                     province.contactinformation is not None,
-                                    city.format == 'province'),
+                                    city.dataformat == 'province'),
                                 isouter=True
                             ).join(
                                 country,
@@ -248,7 +249,7 @@ class FOIRequestApplicant(db.Model):
                                     country.foirequestversion_id == FOIRequest.version,
                                     country.contacttypeid == 2,
                                     country.contactinformation is not None,
-                                    city.format == 'country'),
+                                    city.dataformat == 'country'),
                                 isouter=True
                             ).join(
                                 postal,
@@ -257,7 +258,7 @@ class FOIRequestApplicant(db.Model):
                                     postal.foirequestversion_id == FOIRequest.version,
                                     postal.contacttypeid == 2,
                                     postal.contactinformation is not None,
-                                    city.format == 'postal'),
+                                    city.dataformat == 'postal'),
                                 isouter=True
                             ).join(
                                 personalemployeenumber,
