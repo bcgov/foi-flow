@@ -86,6 +86,7 @@ const ApplicantProfileModal = React.memo(({modalOpen, handleModalClose}) => {
           field: 'birthDate',
           headerName: 'DATE OF BIRTH',
           flex: 1,
+          valueGetter: (params) => params.row?.additionalPersonalInfo?.birthDate 
         },
         {
           field: 'email',
@@ -127,7 +128,7 @@ const ApplicantProfileModal = React.memo(({modalOpen, handleModalClose}) => {
         if (modalOpen) {
             setIsLoading(true);
             if (requestDetails.currentState === StateEnum.intakeinprogress.name) {
-                fetchPotentialApplicants(
+                dispatch(fetchPotentialApplicants(
                     requestDetails.firstName,
                     requestDetails.lastName,
                     requestDetails.email,
@@ -135,7 +136,7 @@ const ApplicantProfileModal = React.memo(({modalOpen, handleModalClose}) => {
                     (err, res) => {
                         setRows(res);
                         setIsLoading(false);
-                    })
+                    }))
             } else {                
                 fetchApplicantInfo(requestDetails.firstName, (err, res) => {
                     setSelectedApplicant(res);
@@ -171,9 +172,7 @@ const ApplicantProfileModal = React.memo(({modalOpen, handleModalClose}) => {
     }
 
     const selectApplicantRow = (e) => {
-        fetchApplicantInfo(e.firstName, (err, res) => {
-            setSelectedApplicant(res);
-        })
+        setSelectedApplicant(e.row);
     }
 
     const handleClose = () => {
@@ -213,7 +212,6 @@ const ApplicantProfileModal = React.memo(({modalOpen, handleModalClose}) => {
     const selectProfile = () => {
         if (_.isEqual(selectedApplicant, saveApplicantObject) || confirmationMessage) {     
             if (requestDetails.currentState === StateEnum.intakeinprogress.name) {
-                saveApplicantObject.applicantprofileid = 1; // fill in with actual id later
                 dispatch(setFOIRequestApplicantProfile(saveApplicantObject));
             }
             // call save info api
@@ -228,7 +226,7 @@ const ApplicantProfileModal = React.memo(({modalOpen, handleModalClose}) => {
         for (let field in selectedApplicant) {
             if (field === 'additionalPersonalInfo') {
                 for (let infofield in requestDetails[field]) {
-                    if (requestDetails[field][infofield] !== selectedApplicant[field][infofield]) {
+                    if (requestDetails[field][infofield] && requestDetails[field][infofield] !== selectedApplicant[field][infofield]) {
                         updatedApplicant[field][infofield] = requestDetails[field][infofield];
                     }
                 }
@@ -315,7 +313,7 @@ const ApplicantProfileModal = React.memo(({modalOpen, handleModalClose}) => {
                             [classes.disabledTitle]: !showRequestHistory
                         })}
                     >
-                        Request History ({selectedApplicant.requestHistory.length})
+                        Request History ({selectedApplicant.foirequestID.length})
                     </ButtonBase>
                 </h3>
                 :
@@ -489,7 +487,7 @@ const ApplicantProfileModal = React.memo(({modalOpen, handleModalClose}) => {
                     </Paper>
                     <Box sx={{ height: 350, width: "100%" }}>
                     <DataGrid
-                        className="foi-data-grid"
+                        className="foi-data-grid foi-applicant-data-grid"
                         rows={search(rows)}
                         columns={columns}
                         initialState={{
@@ -504,6 +502,7 @@ const ApplicantProfileModal = React.memo(({modalOpen, handleModalClose}) => {
                         headerHeight={50}
                         loading={isLoading}                
                         onRowClick={selectApplicantRow}
+                        getRowId={(row) => row.foiRequestApplicantID}
                     />
                     </Box>
                     </>                

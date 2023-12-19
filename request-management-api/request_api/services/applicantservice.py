@@ -2,11 +2,14 @@
 from os import stat
 from re import VERBOSE
 from request_api.models.FOIRequestApplicants import FOIRequestApplicant
+from request_api.models.FOIMinistryRequests import FOIMinistryRequest
+from request_api.services.requestservice import requestservicegetter, requestservicecreate
 from request_api.auth import AuthHelper
 from dateutil import tz, parser
 from flask import jsonify
 from datetime import datetime as datetime2
 from request_api.utils.commons.datetimehandler import datetimehandler
+from request_api.models.default_method_result import DefaultMethodResult
 import re
 
 class applicantservice:
@@ -31,6 +34,18 @@ class applicantservice:
                 applicantqueue.append(self.__prepareapplicant(applicant))
 
         return applicantqueue
+    
+    def saveapplicantinfo(self, applicantschema):
+        requests = FOIMinistryRequest.getopenrequestsbyrequestId(applicantschema['foirequestID'])
+        for request in requests:
+            requestschema = requestservicegetter().getrequest(request['foirequest_id'], request['foiministryrequestid'])
+            requestschema.update(applicantschema)
+            responseschema = requestservicecreate().saverequestversion(
+                requestschema, request['foirequest_id'], request['foiministryrequestid'], AuthHelper.getuserid()
+            )
+            if not responseschema.success:
+                return responseschema
+        return DefaultMethodResult(True,'Applicant Info Updated',applicantschema['foiRequestApplicantID'])
 
     def __validateandtransform(self, filterfields):
         return self.__transformfilteringfields(filterfields)
@@ -62,7 +77,7 @@ class applicantservice:
             'foirequestID': applicant["foirequestid"],
             'foirequestVersion': applicant["foirequestversion"],
             'requestType': applicant["requesttype"],
-            'category': applicant["applicantcategory"],           
+            # 'category': applicant["applicantcategory"],           
             'email': self.__first_not_null(applicant["email"]),
             'address': self.__first_not_null(applicant["address"]),
             'phonePrimary': self.__first_not_null(applicant["homephone"]),

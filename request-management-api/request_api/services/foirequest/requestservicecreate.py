@@ -128,9 +128,9 @@ class requestservicecreate:
         selfalsoknownas=None
         selfdob=None
         if  foirequestschema.get("additionalPersonalInfo") is not None and foirequestschema.get('requeststatusid') == 1:
-            if foirequestschema.get('applicantprofileid', None):
+            if foirequestschema.get('foiRequestApplicantID', None):
                 requestapplicant = FOIRequestApplicantMapping()
-                requestapplicant.foirequestapplicantid = foirequestschema['applicantprofileid']
+                requestapplicant.foirequestapplicantid = foirequestschema['foiRequestApplicantID']
                 requestapplicant.requestortypeid = RequestorType().getrequestortype("Self")["requestortypeid"]
                 requestapplicantarr.append(requestapplicant)
             else:

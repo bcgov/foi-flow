@@ -78,11 +78,17 @@ class FOIRequestApplicant(db.Model):
         #aliase for getting contact info
         contactemail = aliased(FOIRequestContactInformation)
         contactaddress = aliased(FOIRequestContactInformation)
+        contactaddress2 = aliased(FOIRequestContactInformation)
         contacthomephone = aliased(FOIRequestContactInformation)
         contactworkphone = aliased(FOIRequestContactInformation)
         contactworkphone2 = aliased(FOIRequestContactInformation)
         contactmobilephone = aliased(FOIRequestContactInformation)
         contactother = aliased(FOIRequestContactInformation)
+        
+        city = aliased(FOIRequestContactInformation)
+        province = aliased(FOIRequestContactInformation)
+        postal = aliased(FOIRequestContactInformation)
+        country = aliased(FOIRequestContactInformation)
 
         #aliase for getting personal attributes
         personalemployeenumber = aliased(FOIRequestPersonalAttribute)
@@ -112,11 +118,16 @@ class FOIRequestApplicant(db.Model):
             ApplicantCategory.name.label('applicantcategory'),
             contactemail.contactinformation.label('email'),
             contactaddress.contactinformation.label('address'),
+            contactaddress2.contactinformation.label('address2'),
             contacthomephone.contactinformation.label('homephone'),
             contactworkphone.contactinformation.label('workphone'),
             contactworkphone2.contactinformation.label('workphone2'),
             contactmobilephone.contactinformation.label('mobilephone'),
             contactother.contactinformation.label('othercontactinfo'),
+            city.contactinformation.label('city'),
+            province.contactinformation.label('province'),
+            postal.contactinformation.label('postal'),
+            country.contactinformation.label('country'),
             personalemployeenumber.attributevalue.label('employeenumber'),
             personalcorrectionnumber.attributevalue.label('correctionnumber'),
             personalhealthnumber.attributevalue.label('phn')
@@ -160,7 +171,17 @@ class FOIRequestApplicant(db.Model):
                                     contactaddress.foirequest_id == FOIRequest.foirequestid,
                                     contactaddress.foirequestversion_id == FOIRequest.version,
                                     contactaddress.contacttypeid == 2,
-                                    contactaddress.contactinformation is not None),
+                                    contactaddress.contactinformation is not None,
+                                    contactaddress.dataformat == 'address'),
+                                isouter=True
+                            ).join(
+                                contactaddress2,
+                                and_(
+                                    contactaddress2.foirequest_id == FOIRequest.foirequestid,
+                                    contactaddress2.foirequestversion_id == FOIRequest.version,
+                                    contactaddress2.contacttypeid == 2,
+                                    contactaddress2.contactinformation is not None,
+                                    contactaddress2.dataformat == 'addressSecondary'),
                                 isouter=True
                             ).join(
                                 contacthomephone,
@@ -201,6 +222,42 @@ class FOIRequestApplicant(db.Model):
                                     contactother.foirequestversion_id == FOIRequest.version,
                                     contactother.contacttypeid == 7,
                                     contactother.contactinformation is not None),
+                                isouter=True
+                            ).join(
+                                city,
+                                and_(
+                                    city.foirequest_id == FOIRequest.foirequestid,
+                                    city.foirequestversion_id == FOIRequest.version,
+                                    city.contacttypeid == 2,
+                                    city.contactinformation is not None,
+                                    city.format == 'city'),
+                                isouter=True
+                            ).join(
+                                province,
+                                and_(
+                                    province.foirequest_id == FOIRequest.foirequestid,
+                                    province.foirequestversion_id == FOIRequest.version,
+                                    province.contacttypeid == 2,
+                                    province.contactinformation is not None,
+                                    city.format == 'province'),
+                                isouter=True
+                            ).join(
+                                country,
+                                and_(
+                                    country.foirequest_id == FOIRequest.foirequestid,
+                                    country.foirequestversion_id == FOIRequest.version,
+                                    country.contacttypeid == 2,
+                                    country.contactinformation is not None,
+                                    city.format == 'country'),
+                                isouter=True
+                            ).join(
+                                postal,
+                                and_(
+                                    postal.foirequest_id == FOIRequest.foirequestid,
+                                    postal.foirequestversion_id == FOIRequest.version,
+                                    postal.contacttypeid == 2,
+                                    postal.contactinformation is not None,
+                                    city.format == 'postal'),
                                 isouter=True
                             ).join(
                                 personalemployeenumber,

@@ -27,6 +27,7 @@ import json
 from flask_cors import cross_origin
 import request_api
 from request_api.utils.cache import cache_filter, response_filter
+from request_api.schemas.foiapplicant import FOIRequestApplicantSchema
 
 API = Namespace('FOIAssignee', description='Endpoints for FOI assignee management')
 TRACER = Tracer.get_instance()
@@ -87,6 +88,28 @@ class EventPagination(Resource):
                     return json.dumps(result), 200
                 else:
                     return {'status': False, 'message':EXCEPTION_MESSAGE_NOT_FOUND}, 404  
+        except BusinessException as exception:
+            return {'status': exception.status_code, 'message':exception.message}, 500 
+        
+@cors_preflight('POST,OPTIONS')
+@API.route('/foiapplicants/save')
+class EventPagination(Resource):
+    """ Saves applicant info and request specific contact info for all open requests associated to an applicant
+    """
+    @staticmethod
+    @TRACER.trace()
+    @cross_origin(origins=allowedorigins())
+    @auth.require
+    @auth.isiao
+    @cors_preflight('POST,OPTIONS')
+    def post():
+        try:
+            applicant = FOIRequestApplicantSchema.load(request.get_json())
+            result = applicantservice().saveapplicantinfo(applicant)                
+            if result is not None:
+                return json.dumps(result), 200
+            else:
+                return {'status': False, 'message':EXCEPTION_MESSAGE_NOT_FOUND}, 404  
         except BusinessException as exception:
             return {'status': exception.status_code, 'message':exception.message}, 500 
         

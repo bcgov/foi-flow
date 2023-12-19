@@ -111,7 +111,7 @@ class FOIRequestWrapperSchema(Schema):
     publicServiceEmployeeNumber = fields.Str(data_key="publicServiceEmployeeNumber",allow_none=True, validate=[validate.Length(max=50, error=MAX_EXCEPTION_MESSAGE)]) 
     isiaorestricted =   fields.Bool(data_key="isiaorestricted")
 
-    applicantprofileid = fields.Int(data_key="applicantprofileid",required=False,allow_none=True)
+    foiRequestApplicantID = fields.Int(data_key="foiRequestApplicantID",required=False,allow_none=True)
     
     selectedMinistries = fields.Nested(FOIMinistryRequestWrapperSchema, many=True)
     additionalPersonalInfo = fields.Nested(FOIAdditionallPersonalInfoWrapperSchema,required=False,allow_none=True)

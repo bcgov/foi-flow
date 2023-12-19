@@ -221,6 +221,15 @@ class FOIMinistryRequest(db.Model):
         request_schema = FOIMinistryRequestSchema(many=True)
         query = db.session.query(FOIMinistryRequest).filter_by(foiministryrequestid=ministryrequestid).order_by(FOIMinistryRequest.version.asc())
         return request_schema.dump(query)   
+    
+    @classmethod
+    def getopenrequestsbyrequestId(cls,requestids):
+        selectedcolumns = [FOIMinistryRequest.foirequest_id, FOIMinistryRequest.foiministryrequestid]
+        query = db.session.query(selectedcolumns).distinct(FOIMinistryRequest.foiministryrequestid).filter_by(and_(
+            FOIMinistryRequest.foirequest_id.in_(requestids),
+            FOIMinistryRequest.requeststatusid != 3
+        )).order_by(FOIMinistryRequest.version.asc())
+        return [r._asdict() for r in query]
 
     @classmethod
     def getrequeststatusById(cls,ministryrequestid):
