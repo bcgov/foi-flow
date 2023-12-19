@@ -164,6 +164,12 @@ WebUI.click(findTestObject('Page_foi.flow/form/sidebar/div_Sidebar Comments'))
 
 WebUI.click(findTestObject('Page_foi.flow/comment/span_Request History Comments'))
 
+WebUI.refresh()
+
+WebUI.delay(8)
+
+WebUI.click(findTestObject('Page_foi.flow/form/sidebar/div_Sidebar Comments'))
+
 //WebUI.verifyElementText(findTestObject('Page_foi.flow/comment/p_comment list 2 text'), 'records for harms are ready for export')
 WebUI.verifyElementText(findTestObject('Page_foi.flow/comment/p_comment list 1 text'), 'A batch of records has been uploaded by foiedu, foiedu')
 
@@ -218,20 +224,14 @@ WebUI.click(findTestObject('Page_foi.flow/comment/span_Request History Comments'
 WebUI.refresh()
 
 WebUI.click(findTestObject('Page_foi.flow/form/sidebar/div_Sidebar Comments'))
+
 // Remove the following commandlines after fixing the bug #4895
-
 //WebUI.verifyElementText(findTestObject('Page_foi.flow/comment/p_comment list 1 text'), '50mb.pdf file(s) could not be added to package, please check record for errors')
-
 //WebUI.clickOffset(findTestObject('Page_foi.flow/navbar/notification/notification bell'), -2, 4)
-
 //WebUI.verifyElementPresent(findTestObject('Page_foi.flow/navbar/notification/div_notification list 1'), 0)
-
 //WebUI.verifyElementText(findTestObject('Page_foi.flow/navbar/notification/div_notification list 1 request id'), requestID)
-
 //WebUI.verifyElementText(findTestObject('Page_foi.flow/navbar/notification/div_notification list 1 message'), '50mb.pdf file(s) could not be added to package, please check record for errors')
-
 //WebUI.clickOffset(findTestObject('Page_foi.flow/navbar/notification/notification bell'), -2, 4)
-
 WebUI.click(findTestObject('Records/div_Records'))
 
 WebUI.click(findTestObject('Records/svg_Error duringdeduplication_MuiSvgIcon-root'))

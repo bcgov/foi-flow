@@ -182,6 +182,14 @@ WebUI.click(findTestObject('Records/svg_INCOMPATIBLE_svg-inline--fa fa-link-slas
 
 WebUI.click(findTestObject('Records/button_Continue (2)'))
 
+WebUI.delay(30)
+
+WebUI.refresh()
+
+WebUI.click(findTestObject('Records/div_Records'))
+
+WebUI.delay(30)
+
 WebUI.verifyElementText(findTestObject('Records/span_Ministers Office (1)'), 'Deputy Minister\'s Office')
 
 WebUI.click(findTestObject('Page_Log in to FOI/input_INCOMPATIBLE_selectallchk'))
