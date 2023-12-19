@@ -109,7 +109,7 @@ class requestservicegetter:
         payment = paymentservice().getpayment(foirequestid, foiministryrequestid)
         if approvedcfrfee is not None and approvedcfrfee != {}:
             requestdetails['cfrfee'] = approvedcfrfee
-            _totaldue = float(approvedcfrfee['feedata']['actualtotaldue']) if float(approvedcfrfee['feedata']['actualtotaldue']) > 0 else float(approvedcfrfee['feedata']['estimatedtotaldue']) 
+            _totaldue = float(approvedcfrfee['feedata']['actualtotaldue']) if float(approvedcfrfee['feedata']['actualtotaldue']) > 0 else (float(approvedcfrfee['feedata']['estimatedtotaldue'])- float(approvedcfrfee['feedata']['feewaiveramount']))
             _balancedue = _totaldue - float(cfrfee['feedata']['amountpaid'])
             requestdetails['cfrfee']['feedata']['amountpaid'] = cfrfee['feedata']['amountpaid']
             requestdetails['cfrfee']['feedata']["balanceDue"] = '{:.2f}'.format(_balancedue)
