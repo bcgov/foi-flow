@@ -17,7 +17,6 @@ import com.kms.katalon.core.windows.keyword.WindowsBuiltinKeywords as Windows
 import internal.GlobalVariable as GlobalVariable
 import org.openqa.selenium.Keys as Keys
 import com.kms.katalon.core.configuration.RunConfiguration as RunConfiguration
-
 import groovy.json.JsonSlurper as JsonSlurper
 
 WebUI.openBrowser(GlobalVariable.BASE_URL)
@@ -90,16 +89,16 @@ WebUI.verifyElementText(findTestObject('Page_foi.flow/comment/p_comment list 1 t
 
 WebUI.click(findTestObject('Page_foi.flow/navbar/button_Sign Out'), FailureHandling.STOP_ON_FAILURE)
 
-WebUI.callTestCase(findTestCase('helper/foi-test-login'), [('password') : findTestData('Login Credentials').getValue('Password', 6)
-        , ('username') : findTestData('Login Credentials').getValue('Username', 6)], FailureHandling.STOP_ON_FAILURE)
+WebUI.callTestCase(findTestCase('helper/foi-test-login'), [('password') : findTestData('Login Credentials').getValue('Password', 
+            6), ('username') : findTestData('Login Credentials').getValue('Username', 6)], FailureHandling.STOP_ON_FAILURE)
 
 WebUI.callTestCase(findTestCase('helper/foi-test-advanced-search-by-id'), [('requestID') : requestID], FailureHandling.STOP_ON_FAILURE)
 
 WebUI.click(findTestObject('Page_foi.flow/form/sidebar/div_Sidebar Comments'), FailureHandling.STOP_ON_FAILURE)
 
-WebUI.verifyElementNotPresent(findTestObject('Page_foi.flow/comment/button_Comment 1 Reply_actionsBtn'), 0)
+WebUI.verifyElementPresent(findTestObject('Page_foi.flow/comment/button_Comment 1 Reply_actionsBtn'), 0)
 
-WebUI.verifyElementNotPresent(findTestObject('Page_foi.flow/comment/button_Comment 2 Reply_actionsBtn'), 0)
+WebUI.verifyElementPresent(findTestObject('Page_foi.flow/comment/button_Comment 2 Reply_actionsBtn'), 0)
 
 @com.kms.katalon.core.annotation.SetUp
 def setup() {

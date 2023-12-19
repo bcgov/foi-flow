@@ -137,7 +137,7 @@ WebUI.scrollToElement(findTestObject('CFR/button_Save'), 0)
 
 WebUI.click(findTestObject('CFR/button_Save'))
 
-WebUI.delay(4)
+WebUI.delay(12)
 
 WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/div_Status'))
 
@@ -260,6 +260,8 @@ WebUI.verifyElementPresent(findTestObject('CFR/Payment_Info/Payment_received_not
 
 WebUI.click(findTestObject('CFR/button_Add New Correspondence'))
 
+WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
+
 WebUI.click(findTestObject('CFR/CFR_Addcorrespondence/div_'))
 
 WebUI.click(findTestObject('CFR/CFR_Addcorrespondence/li_Fee Estimate'))
@@ -289,8 +291,6 @@ WebUI.click(findTestObject('CFR/CFR_Addcorrespondence/li_Download'))
 
 WebUI.delay(3)
 
-
-
 WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/div_Status'))
 
 WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/li_Closed'))
@@ -300,8 +300,6 @@ WebUI.click(findTestObject('Page_foi.flow/form/closing modal/div_Closing Reason'
 WebUI.click(findTestObject('Page_foi.flow/form/closing modal/dropdown options/li_Partial Disclosure'), FailureHandling.STOP_ON_FAILURE)
 
 WebUI.click(findTestObject('Page_foi.flow/form/state change dialog/button_Save Change'), FailureHandling.STOP_ON_FAILURE)
-
-
 
 WebUI.closeBrowser()
 

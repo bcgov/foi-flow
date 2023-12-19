@@ -6,16 +6,16 @@
    <elementGuidId>958304c6-89ca-4da7-a7d3-f5a0f21f369e</elementGuidId>
    <selectorCollection>
       <entry>
-         <key>CSS</key>
-         <value>#mention-option-fv8ok-1</value>
-      </entry>
-      <entry>
          <key>XPATH</key>
          <value>//div[@id='Comments']/div/div[2]/form/div[3]/div[4]/div</value>
       </entry>
       <entry>
          <key>BASIC</key>
-         <value>//*[@id = 'mention-option-fv8ok-1' and (text() = 'Andrews, Arielle' or . = 'Andrews, Arielle')]</value>
+         <value>//*[(text() = 'Andrews, Arielle' or . = 'Andrews, Arielle')]</value>
+      </entry>
+      <entry>
+         <key>CSS</key>
+         <value>#mention-option-fv8ok-1</value>
       </entry>
    </selectorCollection>
    <selectorMethod>BASIC</selectorMethod>
@@ -26,7 +26,7 @@
       <name>tag</name>
       <type>Main</type>
       <value>div</value>
-      <webElementGuid>f18e614d-c367-4ba6-9fa5-9429331c1319</webElementGuid>
+      <webElementGuid>cecda2e0-92cd-427a-958f-f1869d769027</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -34,7 +34,7 @@
       <name>class</name>
       <type>Main</type>
       <value>myz2dw1</value>
-      <webElementGuid>677872f0-442b-4829-9790-b5a9b0732126</webElementGuid>
+      <webElementGuid>b3de2d89-50d7-4e8f-91fc-3987066f4cee</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -42,15 +42,15 @@
       <name>role</name>
       <type>Main</type>
       <value>option</value>
-      <webElementGuid>ed6d8cf1-c465-4587-94c0-6a6e90265081</webElementGuid>
+      <webElementGuid>d85bcf4d-4ae6-4902-a54b-353f612457c1</webElementGuid>
    </webElementProperties>
    <webElementProperties>
-      <isSelected>true</isSelected>
+      <isSelected>false</isSelected>
       <matchCondition>equals</matchCondition>
       <name>id</name>
       <type>Main</type>
       <value>mention-option-fv8ok-1</value>
-      <webElementGuid>22be32b0-b8a6-4f7b-b915-1d73f7585577</webElementGuid>
+      <webElementGuid>bc45c341-e43b-43c8-8077-be057162c06c</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -58,7 +58,7 @@
       <name>aria-selected</name>
       <type>Main</type>
       <value>true</value>
-      <webElementGuid>058bbe92-aa31-4b76-915c-94bdd8fa36fe</webElementGuid>
+      <webElementGuid>ef557f42-e506-4a5a-aee8-9832732b558d</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>true</isSelected>
@@ -66,7 +66,7 @@
       <name>text</name>
       <type>Main</type>
       <value>Andrews, Arielle</value>
-      <webElementGuid>56edf1bf-c53e-4b98-98c4-d402f22f238b</webElementGuid>
+      <webElementGuid>23dca925-b963-49ef-babb-690553c131f8</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -74,7 +74,7 @@
       <name>xpath</name>
       <type>Main</type>
       <value>id(&quot;mention-option-fv8ok-1&quot;)</value>
-      <webElementGuid>1dbe8830-58eb-4230-b66f-ce9427cdd6b5</webElementGuid>
+      <webElementGuid>8a8c5e08-6dd1-48e1-8eb0-56b4b687ad7e</webElementGuid>
    </webElementProperties>
    <webElementXpaths>
       <isSelected>true</isSelected>
@@ -82,7 +82,7 @@
       <name>xpath:attributes</name>
       <type>Main</type>
       <value>//div[@id='mention-option-fv8ok-1']</value>
-      <webElementGuid>147a2fef-d1a0-44f7-9e20-ac7aaad2a986</webElementGuid>
+      <webElementGuid>bb9d180b-56b4-47db-8cdd-16e3e29ea1a7</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -90,7 +90,7 @@
       <name>xpath:idRelative</name>
       <type>Main</type>
       <value>//div[@id='Comments']/div/div[3]/form/div[3]/div[2]/div</value>
-      <webElementGuid>babccb2e-b990-47cf-b2d0-ef4680e455a3</webElementGuid>
+      <webElementGuid>22ff7445-75a8-4b20-bf5a-9d37bd1b9069</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -98,7 +98,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>(.//*[normalize-space(text()) and normalize-space(.)='Antony, Abin'])[1]/following::div[2]</value>
-      <webElementGuid>95dabfae-537d-4dd1-a3fa-6b580a4ec321</webElementGuid>
+      <webElementGuid>373c64d4-7025-435f-9d83-0e9f82c24dba</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -106,7 +106,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>(.//*[normalize-space(text()) and normalize-space(.)='@'])[1]/following::div[5]</value>
-      <webElementGuid>e1e4fae6-d020-4475-a466-fcffb6ce4642</webElementGuid>
+      <webElementGuid>58334ec9-e6ff-4e38-9986-858504cc0d75</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -114,7 +114,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>(.//*[normalize-space(text()) and normalize-space(.)='Viswanath, Divya'])[1]/preceding::div[1]</value>
-      <webElementGuid>961850d7-4074-4a3d-a541-bfd50c68f51e</webElementGuid>
+      <webElementGuid>63e0ecda-142d-492c-a4fe-d8fde2342a02</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -122,7 +122,7 @@
       <name>xpath:position</name>
       <type>Main</type>
       <value>//div[3]/div[2]/div</value>
-      <webElementGuid>b71bae62-121e-44a6-8c44-d18ff78c706f</webElementGuid>
+      <webElementGuid>e283821a-0c24-45c5-9883-9621fe285042</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -130,6 +130,6 @@
       <name>xpath:customAttributes</name>
       <type>Main</type>
       <value>//div[@id = 'mention-option-fv8ok-1' and (text() = 'Andrews, Arielle' or . = 'Andrews, Arielle')]</value>
-      <webElementGuid>c9abb7a4-4822-43a1-a506-c556e6d9f7e7</webElementGuid>
+      <webElementGuid>e221db90-afff-4c50-bb3a-35acaf1acd74</webElementGuid>
    </webElementXpaths>
 </WebElementEntity>
