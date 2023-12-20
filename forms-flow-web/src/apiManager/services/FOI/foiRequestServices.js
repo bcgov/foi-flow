@@ -613,3 +613,23 @@ export const fetchApplicantContactHistory = (...rest) => {
     }]
   );
 }
+
+export const saveApplicantInfo = (applicant, ...rest) => {
+  const done = fnDone(rest);
+  const apiUrlgetRequestDetails = API.FOI_SAVE_REQUEST_APPLICANT_INFO;
+  return (dispatch) => {
+    httpPOSTRequest(apiUrlgetRequestDetails, applicant, UserService.getToken())
+      .then((res) => {
+        if (res.data) {
+          dispatch(setRestrictedReqTaglist(res.data));
+          done(null, res.data);
+        } else {
+          dispatch(serviceActionError(res));
+          throw new Error(`Error in saving applicant`);
+        }
+      })
+      .catch((error) => {
+        catchError(error, dispatch);
+      });
+  }
+};

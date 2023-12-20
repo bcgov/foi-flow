@@ -18,7 +18,7 @@ from flask import g, request
 import flask
 from flask_restx import Namespace, Resource, cors
 from flask_expects_json import expects_json
-from request_api.auth import auth
+from request_api.auth import auth, AuthHelper
 from request_api.tracer import Tracer
 from request_api.utils.util import  cors_preflight, allowedorigins
 from request_api.exceptions import BusinessException, Error
@@ -104,10 +104,10 @@ class EventPagination(Resource):
     @cors_preflight('POST,OPTIONS')
     def post():
         try:
-            applicant = FOIRequestApplicantSchema.load(request.get_json())
-            result = applicantservice().saveapplicantinfo(applicant)                
-            if result is not None:
-                return json.dumps(result), 200
+            applicant = FOIRequestApplicantSchema().load(request.get_json())
+            result = applicantservice().saveapplicantinfo(applicant, AuthHelper.getuserid())                
+            if result.success:
+                return {'status': result.success, 'message':result.message,'id':result.identifier} , 200
             else:
                 return {'status': False, 'message':EXCEPTION_MESSAGE_NOT_FOUND}, 404  
         except BusinessException as exception:

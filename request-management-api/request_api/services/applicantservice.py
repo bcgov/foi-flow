@@ -35,13 +35,22 @@ class applicantservice:
 
         return applicantqueue
     
-    def saveapplicantinfo(self, applicantschema):
+    def saveapplicantinfo(self, applicantschema, userid):
+        FOIRequestApplicant.saveapplicant(
+            applicantschema['firstName'],
+            applicantschema['lastName'],
+            applicantschema['middleName'],
+            applicantschema['businessName'],
+            applicantschema.get('additionalPersonalInfo', None).get('alsoKnownAs', None),
+            applicantschema.get('additionalPersonalInfo', None).get('birthDate', None),
+            userid
+        ) # replace with applicant id once new save function is written
         requests = FOIMinistryRequest.getopenrequestsbyrequestId(applicantschema['foirequestID'])
         for request in requests:
             requestschema = requestservicegetter().getrequest(request['foirequest_id'], request['foiministryrequestid'])
             requestschema.update(applicantschema)
             responseschema = requestservicecreate().saverequestversion(
-                requestschema, request['foirequest_id'], request['foiministryrequestid'], AuthHelper.getuserid()
+                requestschema, request['foirequest_id'], request['foiministryrequestid'], userid
             )
             if not responseschema.success:
                 return responseschema
