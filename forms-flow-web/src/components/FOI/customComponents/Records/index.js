@@ -30,6 +30,8 @@ import {
   fetchPDFStitchedRecordForHarms,
   fetchPDFStitchedRecordForRedlines,
   fetchPDFStitchedRecordForResponsePackage,
+  fetchPDFStitchedRecordForOIPCRedline,
+  fetchPDFStitchedRecordForOIPCReviewPackage,
   checkForRecordsChange,
 } from "../../../../apiManager/services/FOI/foiRecordServices";
 import {
@@ -62,14 +64,6 @@ import TextField from "@mui/material/TextField";
 import { saveAs } from "file-saver";
 import { downloadZip } from "client-zip";
 import { ClickableChip } from "../../Dashboard/utils";
-import CircularProgress from "@mui/material/CircularProgress";
-import AttachmentFilter from "../Attachments/AttachmentFilter";
-import Accordion from "@material-ui/core/Accordion";
-import Stack from "@mui/material/Stack";
-import AccordionSummary from "@material-ui/core/AccordionSummary";
-import AccordionDetails from "@material-ui/core/AccordionDetails";
-import Typography from "@material-ui/core/Typography";
-import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import SearchIcon from "@material-ui/icons/Search";
 import InputAdornment from "@mui/material/InputAdornment";
 import InputBase from "@mui/material/InputBase";
@@ -80,15 +74,12 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faCheckCircle,
   faClone,
-  faTrashAlt,
-  faTrashCan,
 } from "@fortawesome/free-regular-svg-icons";
 import {
   faSpinner,
   faExclamationCircle,
   faBan,
   faArrowTurnUp,
-  faHistory,
   faTrash,
   faPenToSquare,
   faLinkSlash,
@@ -237,6 +228,12 @@ export const RecordsLog = ({
   let redlinePdfStitchStatus = useSelector(
     (state) => state.foiRequests.foiPDFStitchStatusForRedlines
   );
+  let oipcReviewPackagePdfStitchedStatus = useSelector(
+    (state) => state.foiRequests.foiPDFStitchStatusForOipcReviewPackage
+  );
+  let oipcRedlinePdfStitchedStatus = useSelector(
+    (state) => state.foiRequests.foiPDFStitchStatusForOipcRedline
+  );
   let responsePackagePdfStitchStatus = useSelector(
     (state) => state.foiRequests.foiPDFStitchStatusForResponsePackage
   );
@@ -246,6 +243,12 @@ export const RecordsLog = ({
   );
   let redlinePdfStitchedRecord = useSelector(
     (state) => state.foiRequests.foiPDFStitchedRecordForRedlines
+  );
+  let oipcReviewPackagePdfStitchedRecord = useSelector(
+    (state) => state.foiRequests.foiPDFStitchedRecordForOipcReviewPackage
+  );
+  let oipcRedlinePdfStitchedRecord = useSelector(
+    (state) => state.foiRequests.foiPDFStitchedRecordForOipcRedline
   );
   let responsePackagePdfStitchedRecord = useSelector(
     (state) => state.foiRequests.foiPDFStitchedRecordForResponsePackage
@@ -379,9 +382,13 @@ export const RecordsLog = ({
     useState(false);
   const [isOIPCReviewPackageFailed, setIsOIPCReviewPackageFailed] =
     useState(false);
-  const [isOIPCSignOffPackageReady, setIsOIPCSignOffPackageReady] =
+  const [isOIPCReviewPackageInProgress, setIsOIPCReviewPackageInProgress] =
     useState(false);
-  const [isOIPCSignOffPackageFailed, setIsOIPCSignOffPackageFailed] =
+  const [isOIPCRedlineReady, setIsOIPCRedlineReady] =
+    useState(false);
+  const [isOIPCRedlineFailed, setIsOIPCRedlineFailed] =
+    useState(false);
+  const [isOIPCRedlineInProgress, setIsOIPCRedlineInProgress] =
     useState(false);
   const [isAllSelected, setIsAllSelected] = useState(false);
 
@@ -446,10 +453,29 @@ export const RecordsLog = ({
       setIsResponsePackageDownloadFailed,
       fetchPDFStitchedRecordForResponsePackage
     );
+
+    // Update OIPC Review Package PDF Stitch Status
+    updateStatus(
+      oipcReviewPackagePdfStitchedStatus,
+      setIsOIPCReviewPackageInProgress,
+      setIsOIPCReviewPackageReady,
+      setIsOIPCReviewPackageFailed,
+      fetchPDFStitchedRecordForOIPCReviewPackage
+    );
+    // Update Redline OIPC PDF Stitch Status
+    updateStatus(
+      oipcRedlinePdfStitchedStatus,
+      setIsOIPCRedlineInProgress,
+      setIsOIPCRedlineReady,
+      setIsOIPCRedlineFailed,
+      fetchPDFStitchedRecordForOIPCRedline
+    );
   }, [
     pdfStitchStatus,
     redlinePdfStitchStatus,
     responsePackagePdfStitchStatus,
+    oipcRedlinePdfStitchedStatus,
+    oipcReviewPackagePdfStitchedStatus,
     requestId,
     ministryId,
   ]);
@@ -462,8 +488,14 @@ export const RecordsLog = ({
       if (item.id === 3 && isResponsePackageDownloadReady) {
         item.disabled = false;
       }
+      if (item.id === 4 && isOIPCRedlineReady) {
+        item.disabled = false;
+      }
+      if (item.id === 5 && isOIPCReviewPackageReady) {
+        item.disabled = false;
+      }
     });
-  }, [isRedlineDownloadReady, isResponsePackageDownloadReady]);
+  }, [isRedlineDownloadReady, isResponsePackageDownloadReady, isOIPCRedlineReady, isOIPCReviewPackageReady]);
 
   const addAttachments = () => {
     setModalFor("add");
@@ -840,11 +872,11 @@ export const RecordsLog = ({
     } else if (e.target.value === 3 && isResponsePackageDownloadReady) {
       const s3filepath = responsePackagePdfStitchedRecord?.finalpackagepath;
       handleDownloadZipFile(s3filepath, e.target.value);
-    } else if (e.target.value === 4 && isOIPCSignOffPackageReady) {
-      const s3filepath = responsePackagePdfStitchedRecord?.finalpackagepath;
+    } else if (e.target.value === 4 && isOIPCRedlineReady) {
+      const s3filepath = oipcRedlinePdfStitchedRecord?.finalpackagepath;
       handleDownloadZipFile(s3filepath, e.target.value);
     } else if (e.target.value === 5 && isOIPCReviewPackageReady) {
-      const s3filepath = responsePackagePdfStitchedRecord?.finalpackagepath;
+      const s3filepath = oipcReviewPackagePdfStitchedRecord?.finalpackagepath;
       handleDownloadZipFile(s3filepath, e.target.value);
     }
 
@@ -1020,6 +1052,14 @@ export const RecordsLog = ({
       setIsResponsePackageDownloadInProgress(false);
       setIsResponsePackageDownloadReady(false);
       setIsResponsePackageDownloadFailed(true);
+    } else if (itemid === 4) {
+      setIsOIPCRedlineInProgress(false);
+      setIsOIPCRedlineReady(false);
+      setIsOIPCRedlineFailed(true);
+    } else if (itemid === 5) {
+      setIsOIPCReviewPackageInProgress(false);
+      setIsOIPCReviewPackageReady(false);
+      setIsOIPCReviewPackageFailed(true);
     }
   };
 
@@ -1027,7 +1067,9 @@ export const RecordsLog = ({
     return (
       (itemid === 1 && isDownloadReady) ||
       (itemid === 2 && isRedlineDownloadReady) ||
-      (itemid === 3 && isResponsePackageDownloadReady)
+      (itemid === 3 && isResponsePackageDownloadReady) ||
+      (itemid === 4 && isOIPCRedlineReady) ||
+      (itemid === 5 && isOIPCReviewPackageReady)
     );
   };
 
@@ -1035,7 +1077,9 @@ export const RecordsLog = ({
     return (
       (itemid === 1 && isDownloadFailed) ||
       (itemid === 2 && isRedlineDownloadFailed) ||
-      (itemid === 3 && isResponsePackageDownloadFailed)
+      (itemid === 3 && isResponsePackageDownloadFailed) ||
+      (itemid === 4 && isOIPCRedlineFailed) ||
+      (itemid === 5 && isOIPCReviewPackageFailed)
     );
   };
 
@@ -1043,7 +1087,9 @@ export const RecordsLog = ({
     return (
       (itemid === 1 && isDownloadInProgress) ||
       (itemid === 2 && isRedlineDownloadInProgress) ||
-      (itemid === 3 && isResponsePackageDownloadInProgress)
+      (itemid === 3 && isResponsePackageDownloadInProgress) ||
+      (itemid === 4 && isOIPCRedlineInProgress) ||
+      (itemid === 5 && isOIPCReviewPackageInProgress)
     );
   };
 
@@ -1592,6 +1638,12 @@ export const RecordsLog = ({
         isrecordtimeout(record.created_at, RECORD_PROCESSING_HRS)
     );
   };
+
+  console.log(responsePackagePdfStitchedRecord);
+  console.log(responsePackagePdfStitchStatus);
+  console.log("BREAK")
+  console.log(oipcReviewPackagePdfStitchedRecord);
+  console.log(oipcReviewPackagePdfStitchedStatus);
 
   return (
     <div className={classes.container}>
