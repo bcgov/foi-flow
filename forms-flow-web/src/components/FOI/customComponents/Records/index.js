@@ -31,7 +31,7 @@ import {
   fetchPDFStitchedRecordForRedlines,
   fetchPDFStitchedRecordForResponsePackage,
   fetchPDFStitchedRecordForOIPCRedline,
-  fetchPDFStitchedRecordForOIPCReviewPackage,
+  fetchPDFStitchedRecordForOIPCRedlineReview,
   checkForRecordsChange,
 } from "../../../../apiManager/services/FOI/foiRecordServices";
 import {
@@ -228,8 +228,8 @@ export const RecordsLog = ({
   let redlinePdfStitchStatus = useSelector(
     (state) => state.foiRequests.foiPDFStitchStatusForRedlines
   );
-  let oipcReviewPackagePdfStitchedStatus = useSelector(
-    (state) => state.foiRequests.foiPDFStitchStatusForOipcReviewPackage
+  let oipcRedlineReviewPdfStitchedStatus = useSelector(
+    (state) => state.foiRequests.foiPDFStitchStatusForOipcRedlineReview
   );
   let oipcRedlinePdfStitchedStatus = useSelector(
     (state) => state.foiRequests.foiPDFStitchStatusForOipcRedline
@@ -244,8 +244,8 @@ export const RecordsLog = ({
   let redlinePdfStitchedRecord = useSelector(
     (state) => state.foiRequests.foiPDFStitchedRecordForRedlines
   );
-  let oipcReviewPackagePdfStitchedRecord = useSelector(
-    (state) => state.foiRequests.foiPDFStitchedRecordForOipcReviewPackage
+  let oipcRedlineReviewPdfStitchedRecord = useSelector(
+    (state) => state.foiRequests.foiPDFStitchedRecordForOipcRedlineReview
   );
   let oipcRedlinePdfStitchedRecord = useSelector(
     (state) => state.foiRequests.foiPDFStitchedRecordForOipcRedline
@@ -378,11 +378,11 @@ export const RecordsLog = ({
     useState(false);
   const [isResponsePackageDownloadFailed, setIsResponsePackageDownloadFailed] =
     useState(false);
-  const [isOIPCReviewPackageReady, setIsOIPCReviewPackageReady] =
+  const [isOIPCRedlineReviewReady, setIsOIPCRedlineReviewReady] =
     useState(false);
-  const [isOIPCReviewPackageFailed, setIsOIPCReviewPackageFailed] =
+  const [isOIPCRedlineReviewFailed, setIsOIPCRedlineReviewFailed] =
     useState(false);
-  const [isOIPCReviewPackageInProgress, setIsOIPCReviewPackageInProgress] =
+  const [isOIPCRedlineReviewInProgress, setIsOIPCRedlineReviewInProgress] =
     useState(false);
   const [isOIPCRedlineReady, setIsOIPCRedlineReady] =
     useState(false);
@@ -456,11 +456,11 @@ export const RecordsLog = ({
 
     // Update OIPC Review Package PDF Stitch Status
     updateStatus(
-      oipcReviewPackagePdfStitchedStatus,
-      setIsOIPCReviewPackageInProgress,
-      setIsOIPCReviewPackageReady,
-      setIsOIPCReviewPackageFailed,
-      fetchPDFStitchedRecordForOIPCReviewPackage
+      oipcRedlineReviewPdfStitchedStatus,
+      setIsOIPCRedlineReviewInProgress,
+      setIsOIPCRedlineReviewReady,
+      setIsOIPCRedlineReviewFailed,
+      fetchPDFStitchedRecordForOIPCRedlineReview
     );
     // Update Redline OIPC PDF Stitch Status
     updateStatus(
@@ -475,7 +475,7 @@ export const RecordsLog = ({
     redlinePdfStitchStatus,
     responsePackagePdfStitchStatus,
     oipcRedlinePdfStitchedStatus,
-    oipcReviewPackagePdfStitchedStatus,
+    oipcRedlineReviewPdfStitchedStatus,
     requestId,
     ministryId,
   ]);
@@ -491,11 +491,11 @@ export const RecordsLog = ({
       if (item.id === 4 && isOIPCRedlineReady) {
         item.disabled = false;
       }
-      if (item.id === 5 && isOIPCReviewPackageReady) {
+      if (item.id === 5 && isOIPCRedlineReviewReady) {
         item.disabled = false;
       }
     });
-  }, [isRedlineDownloadReady, isResponsePackageDownloadReady, isOIPCRedlineReady, isOIPCReviewPackageReady]);
+  }, [isRedlineDownloadReady, isResponsePackageDownloadReady, isOIPCRedlineReady, isOIPCRedlineReviewReady]);
 
   const addAttachments = () => {
     setModalFor("add");
@@ -875,8 +875,8 @@ export const RecordsLog = ({
     } else if (e.target.value === 4 && isOIPCRedlineReady) {
       const s3filepath = oipcRedlinePdfStitchedRecord?.finalpackagepath;
       handleDownloadZipFile(s3filepath, e.target.value);
-    } else if (e.target.value === 5 && isOIPCReviewPackageReady) {
-      const s3filepath = oipcReviewPackagePdfStitchedRecord?.finalpackagepath;
+    } else if (e.target.value === 5 && isOIPCRedlineReviewReady) {
+      const s3filepath = oipcRedlineReviewPdfStitchedRecord?.finalpackagepath;
       handleDownloadZipFile(s3filepath, e.target.value);
     }
 
@@ -1057,9 +1057,9 @@ export const RecordsLog = ({
       setIsOIPCRedlineReady(false);
       setIsOIPCRedlineFailed(true);
     } else if (itemid === 5) {
-      setIsOIPCReviewPackageInProgress(false);
-      setIsOIPCReviewPackageReady(false);
-      setIsOIPCReviewPackageFailed(true);
+      setIsOIPCRedlineReviewInProgress(false);
+      setIsOIPCRedlineReviewReady(false);
+      setIsOIPCRedlineReviewFailed(true);
     }
   };
 
@@ -1069,7 +1069,7 @@ export const RecordsLog = ({
       (itemid === 2 && isRedlineDownloadReady) ||
       (itemid === 3 && isResponsePackageDownloadReady) ||
       (itemid === 4 && isOIPCRedlineReady) ||
-      (itemid === 5 && isOIPCReviewPackageReady)
+      (itemid === 5 && isOIPCRedlineReviewReady)
     );
   };
 
@@ -1079,7 +1079,7 @@ export const RecordsLog = ({
       (itemid === 2 && isRedlineDownloadFailed) ||
       (itemid === 3 && isResponsePackageDownloadFailed) ||
       (itemid === 4 && isOIPCRedlineFailed) ||
-      (itemid === 5 && isOIPCReviewPackageFailed)
+      (itemid === 5 && isOIPCRedlineReviewFailed)
     );
   };
 
@@ -1089,7 +1089,7 @@ export const RecordsLog = ({
       (itemid === 2 && isRedlineDownloadInProgress) ||
       (itemid === 3 && isResponsePackageDownloadInProgress) ||
       (itemid === 4 && isOIPCRedlineInProgress) ||
-      (itemid === 5 && isOIPCReviewPackageInProgress)
+      (itemid === 5 && isOIPCRedlineReviewInProgress)
     );
   };
 
@@ -1638,12 +1638,6 @@ export const RecordsLog = ({
         isrecordtimeout(record.created_at, RECORD_PROCESSING_HRS)
     );
   };
-
-  console.log(responsePackagePdfStitchedRecord);
-  console.log(responsePackagePdfStitchStatus);
-  console.log("BREAK")
-  console.log(oipcReviewPackagePdfStitchedRecord);
-  console.log(oipcReviewPackagePdfStitchedStatus);
 
   return (
     <div className={classes.container}>

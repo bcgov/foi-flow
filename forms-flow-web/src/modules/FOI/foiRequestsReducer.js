@@ -57,13 +57,13 @@ const initialState = {
   },
   foiPDFStitchedRecordForHarms: {},
   foiPDFStitchedRecordForRedlines: {},
-  foiPDFStitchedRecordForOipcReviewPackage: {},
+  foiPDFStitchedRecordForOipcRedlineReview: {},
   foiPDFStitchedRecordForOipcRedline: {},
   foiPDFStitchedRecordForResponsePackage: {},
   foiPDFStitchStatusForHarms: "not started",
   foiPDFStitchStatusForRedlines: "not started",
   foiPDFStitchStatusForResponsePackage: "not started",
-  foiPDFStitchStatusForOipcReviewPackage: "not started",
+  foiPDFStitchStatusForOipcRedlineReview: "not started",
   foiPDFStitchStatusForOipcRedline: "not started",
   foiRequestCFRForm: {
     overallsuggestions: "",
@@ -272,10 +272,10 @@ const foiRequests = (state = initialState, action) => {
         ...state,
         foiPDFStitchedRecordForResponsePackage: action.payload,
       };
-    case FOI_ACTION_CONSTANTS.FOI_PDF_STITCHED_RECORD_FOR_OIPCREVIEWPACKAGE:
+    case FOI_ACTION_CONSTANTS.FOI_PDF_STITCHED_RECORD_FOR_OIPCREDLINEREVIEW:
       return {
         ...state,
-        foiPDFStitchedRecordForOipcReviewPackage: action.payload,
+        foiPDFStitchedRecordForOipcRedlineReview: action.payload,
       };
     case FOI_ACTION_CONSTANTS.FOI_PDF_STITCHED_RECORD_FOR_OIPCREDLINE:
       return {
@@ -288,8 +288,8 @@ const foiRequests = (state = initialState, action) => {
       return { ...state, foiPDFStitchStatusForRedlines: action.payload };
     case FOI_ACTION_CONSTANTS.FOI_PDF_STITCHED_STATUS_FOR_RESPONSEPACKAGE:
       return { ...state, foiPDFStitchStatusForResponsePackage: action.payload };
-    case FOI_ACTION_CONSTANTS.FOI_PDF_STITCHED_STATUS_FOR_OIPCREVIEWPACKAGE:
-      return { ...state, foiPDFStitchStatusForOipcReviewPackage: action.payload };
+    case FOI_ACTION_CONSTANTS.FOI_PDF_STITCHED_STATUS_FOR_OIPCREDLINEREVIEW:
+      return { ...state, foiPDFStitchStatusForOipcRedlineReview: action.payload };
     case FOI_ACTION_CONSTANTS.FOI_PDF_STITCHED_STATUS_FOR_OIPCREDLINE:
       return { ...state, foiPDFStitchStatusForOipcRedline: action.payload };
     case FOI_ACTION_CONSTANTS.FOI_REQUEST_CFR_FORM:

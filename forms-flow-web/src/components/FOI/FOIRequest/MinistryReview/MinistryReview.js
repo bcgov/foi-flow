@@ -29,7 +29,7 @@ import {
   fetchPDFStitchStatusForHarms,
   fetchPDFStitchStatusForRedlines,
   fetchPDFStitchStatusForResponsePackage,
-  fetchPDFStitchedStatusForOIPCReviewPackage,
+  fetchPDFStitchedStatusForOIPCRedlineReview,
   fetchPDFStitchedStatusForOIPCRedline,
 } from "../../../../apiManager/services/FOI/foiRecordServices";
 
@@ -216,7 +216,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
       dispatch(fetchPDFStitchStatusForRedlines(requestId, ministryId));
       dispatch(fetchPDFStitchStatusForResponsePackage(requestId, ministryId));
       dispatch(fetchPDFStitchedStatusForOIPCRedline(requestId, ministryId));
-      dispatch(fetchPDFStitchedStatusForOIPCReviewPackage(requestId, ministryId));
+      dispatch(fetchPDFStitchedStatusForOIPCRedlineReview(requestId, ministryId));
       fetchCFRForm(ministryId, dispatch);
       if (bcgovcode) dispatch(fetchFOIMinistryAssignedToList(bcgovcode));
     }
@@ -350,7 +350,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
       dispatch(fetchPDFStitchStatusForRedlines(requestId, ministryId));
       dispatch(fetchPDFStitchStatusForResponsePackage(requestId, ministryId));
       dispatch(fetchPDFStitchedStatusForOIPCRedline(requestId, ministryId));
-      dispatch(fetchPDFStitchedStatusForOIPCReviewPackage(requestId, ministryId));
+      dispatch(fetchPDFStitchedStatusForOIPCRedlineReview(requestId, ministryId));
       fetchCFRForm(ministryId, dispatch);
       setStateChanged(false);
       setcurrentrequestStatus(_state);

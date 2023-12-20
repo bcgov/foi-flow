@@ -17,8 +17,8 @@ import {
   setFOIPDFStitchedRecordForRedlines,
   setFOIPDFStitchStatusForResponsePackage,
   setFOIPDFStitchedRecordForResponsePackage,
-  setFOIPDFStitchedRecordForOipcReviewPackage,
-  setFOIPDFStitchStatusForOipcReviewPackage,
+  setFOIPDFStitchedRecordForOipcRedlineReview,
+  setFOIPDFStitchStatusForOipcRedlineReview,
   setFOIPDFStitchStatusForOipcRedline,
   setFOIPDFStitchedRecordForOipcRedline,
 } from "../../../actions/FOI/foiRequestActions";
@@ -553,7 +553,7 @@ export const fetchPDFStitchedRecordForOIPCRedline = (
     };
   }
 
-export const fetchPDFStitchedStatusForOIPCReviewPackage = (
+export const fetchPDFStitchedStatusForOIPCRedlineReview = (
   requestId,
   ministryId,
   ...rest) => {
@@ -563,7 +563,7 @@ export const fetchPDFStitchedStatusForOIPCReviewPackage = (
     const done = fnDone(rest);
     let apiUrl = replaceUrl(
       replaceUrl(
-        API.FOI_PDF_STITCH_STATUS_FOR_OIPCREVIEWPACKAGE,
+        API.FOI_PDF_STITCH_STATUS_FOR_OIPCREDLINEREVIEW,
         "<ministryrequestid>",
         ministryId
       ),
@@ -574,7 +574,7 @@ export const fetchPDFStitchedStatusForOIPCReviewPackage = (
       httpGETRequest(apiUrl, {}, UserService.getToken())
         .then((res) => {
           if (res.data) {
-            dispatch(setFOIPDFStitchStatusForOipcReviewPackage(res.data));
+            dispatch(setFOIPDFStitchStatusForOipcRedlineReview(res.data));
             done(null, res.data);
           }
         })
@@ -586,7 +586,7 @@ export const fetchPDFStitchedStatusForOIPCReviewPackage = (
     };
   }
 
-export const fetchPDFStitchedRecordForOIPCReviewPackage = (
+export const fetchPDFStitchedRecordForOIPCRedlineReview = (
   requestId,
   ministryId,
   ...rest) => {
@@ -596,7 +596,7 @@ export const fetchPDFStitchedRecordForOIPCReviewPackage = (
     const done = fnDone(rest);
     let apiUrl = replaceUrl(
       replaceUrl(
-        API.FOI_DOWNLOAD_RECORDS_FOR_OIPCREVIEWPACKAGE,
+        API.FOI_DOWNLOAD_RECORDS_FOR_OIPCREDLINEREVIEW,
         "<ministryrequestid>",
         ministryId
       ),
@@ -607,7 +607,7 @@ export const fetchPDFStitchedRecordForOIPCReviewPackage = (
       httpGETRequest(apiUrl, {}, UserService.getToken())
         .then((res) => {
           if (res.data) {
-            dispatch(setFOIPDFStitchedRecordForOipcReviewPackage(res.data));
+            dispatch(setFOIPDFStitchedRecordForOipcRedlineReview(res.data));
             done(null, res.data);
           } else {
             console.log("Error in fetching records for redlines", res);
