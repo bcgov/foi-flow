@@ -40,6 +40,7 @@ const API = {
   FOI_POST_OSS_HEADER: `${FOI_BASE_API_URL}/api/foiflow/oss/authheader`,
   
   FOI_GET_REQUEST_APPLICANTS: `${FOI_BASE_API_URL}/api/foiapplicants/<email>`,
+  FOI_SAVE_REQUEST_APPLICANT_INFO: `${FOI_BASE_API_URL}/api/foiapplicants/save`,
 
   FOI_GET_PROGRAMAREADIVISIONS: `${FOI_BASE_API_URL}/api/foiadmin/divisions`,
   FOI_POST_PROGRAMAREADIVISION: `${FOI_BASE_API_URL}/api/foiadmin/division`,

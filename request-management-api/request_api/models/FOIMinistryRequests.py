@@ -225,10 +225,10 @@ class FOIMinistryRequest(db.Model):
     @classmethod
     def getopenrequestsbyrequestId(cls,requestids):
         selectedcolumns = [FOIMinistryRequest.foirequest_id, FOIMinistryRequest.foiministryrequestid]
-        query = db.session.query(selectedcolumns).distinct(FOIMinistryRequest.foiministryrequestid).filter_by(and_(
+        query = db.session.query(*selectedcolumns).distinct(FOIMinistryRequest.foiministryrequestid).filter(
             FOIMinistryRequest.foirequest_id.in_(requestids),
             FOIMinistryRequest.requeststatusid != 3
-        )).order_by(FOIMinistryRequest.version.asc())
+        ).order_by(FOIMinistryRequest.foiministryrequestid.asc(), FOIMinistryRequest.version.asc())
         return [r._asdict() for r in query]
 
     @classmethod

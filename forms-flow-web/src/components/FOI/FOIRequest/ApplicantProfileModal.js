@@ -16,7 +16,7 @@ import SearchIcon from "@material-ui/icons/Search";
 import InputAdornment from "@mui/material/InputAdornment";
 import InputBase from "@mui/material/InputBase";
 import Grid from "@mui/material/Grid";
-import { fetchPotentialApplicants, fetchApplicantInfo, fetchApplicantContactHistory } from "../../../apiManager/services/FOI/foiRequestServices";
+import { fetchPotentialApplicants, fetchApplicantInfo, fetchApplicantContactHistory, saveApplicantInfo } from "../../../apiManager/services/FOI/foiRequestServices";
 import AddressContactDetails from "./AddressContanctInfo";
 import ApplicantDetails from "./ApplicantDetails"
 import AdditionalApplicantDetails from "./AdditionalApplicantDetails";
@@ -148,7 +148,7 @@ const ApplicantProfileModal = React.memo(({modalOpen, handleModalClose}) => {
     useEffect(() => {
         setSaveApplicantObject({...selectedApplicant})
         for (let field in selectedApplicant) {
-            if (field === 'additionalPersonalInfo') {
+            if (field === 'additionalPersonalInfo' && requestDetails.requestType === 'personal') {
                 if ((requestDetails[field][FOI_COMPONENT_CONSTANTS.DOB] && selectedApplicant[field][FOI_COMPONENT_CONSTANTS.DOB] !== requestDetails[field][FOI_COMPONENT_CONSTANTS.DOB]) ||
                 (requestDetails[field][FOI_COMPONENT_CONSTANTS.PERSONAL_HEALTH_NUMBER] && selectedApplicant[field][FOI_COMPONENT_CONSTANTS.PERSONAL_HEALTH_NUMBER] !== requestDetails[field][FOI_COMPONENT_CONSTANTS.PERSONAL_HEALTH_NUMBER])) {                    
                     setIsProfileDifferent(true);
@@ -214,8 +214,13 @@ const ApplicantProfileModal = React.memo(({modalOpen, handleModalClose}) => {
             if (requestDetails.currentState === StateEnum.intakeinprogress.name) {
                 dispatch(setFOIRequestApplicantProfile(saveApplicantObject));
             }
-            // call save info api
-            handleClose()
+            // set loading screen
+            dispatch(saveApplicantInfo(saveApplicantObject, (err, res) => {
+                if (!err) {
+                    // unset loading screen
+                    handleClose();
+                }
+            }));
         } else {
             setConfirmationMessage(true);
         }
@@ -224,7 +229,7 @@ const ApplicantProfileModal = React.memo(({modalOpen, handleModalClose}) => {
     const copyInfo = () => {
         let updatedApplicant = {...selectedApplicant}
         for (let field in selectedApplicant) {
-            if (field === 'additionalPersonalInfo') {
+            if (field === 'additionalPersonalInfo' && requestDetails.requestType === 'personal') {
                 for (let infofield in requestDetails[field]) {
                     if (requestDetails[field][infofield] && requestDetails[field][infofield] !== selectedApplicant[field][infofield]) {
                         updatedApplicant[field][infofield] = requestDetails[field][infofield];
