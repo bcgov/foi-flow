@@ -35,7 +35,7 @@ class FOIRequestApplicant(db.Model):
     @classmethod
     def saveapplicant(cls,firstname, lastname, middlename, businessname, alsoknownas, dob, userid):
         dbquery = db.session.query(FOIRequestApplicant)
-        # check the applicantid instead of firstname and lastname
+        ### check the applicantid instead of firstname and lastname
         dbquery = dbquery.filter_by(firstname=firstname)
         applicant = dbquery.filter_by(lastname=lastname)
         if (applicant.count() > 0):
