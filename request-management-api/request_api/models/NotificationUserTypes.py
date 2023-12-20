@@ -26,14 +26,12 @@ class NotificationUserType(db.Model):
     # create a class method that returns the notification type id
     @classmethod
     def getnotificationusertypesid(cls, notificationusertype):
-        print("notificationusertype", notificationusertype)
         notificationusertypelabel = None
         for usertype in notificationusertypes_cache:
             if (notificationusertypes_cache[usertype]['name'] == notificationusertype) or (notificationusertypes_cache[usertype]['notificationusertypelabel'] == notificationusertype):
                 notificationusertypelabel = notificationusertypes_cache[usertype]['notificationusertypelabel']
         if notificationusertypelabel is None:
             return None
-        print("notificationusertypelabel", notificationusertypelabel)        
         type_schema = NotificationUserTypeSchema(many=False)
         query = db.session.query(NotificationUserType).filter_by(notificationusertypelabel=notificationusertypelabel, isactive=True).first()
         return type_schema.dump(query) if query is not None else None
