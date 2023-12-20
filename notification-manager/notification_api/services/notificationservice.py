@@ -68,12 +68,9 @@ class notificationservice:
             notification.requestid = foirequest["foiministryrequestid"]
             notification.idnumber = foirequest["filenumber"]
             notification.foirequestid = foirequest["foirequest_id"]
-        print(userid)
         notificationtypes = notificationconfig().getnotificationtype(notificationtype)   
-        print("notificationtype", notificationtypes)  
         notification.notificationtypelabel = notificationtypes['notificationtypelabel'] 
         notification.notificationtypeid = notificationtypes['notificationtypeid']
-        print("notificationtype", notification.notificationtypelabel)
         notification.axisnumber = foirequest["axisrequestid"]
         notification.version = foirequest["version"]        
         notification.createdby = userid
@@ -101,7 +98,6 @@ class notificationservice:
         return user
            
     def getrequest(self, requestid, requesttype):
-        print("get request request type", requesttype)
         if requesttype == "ministryrequest":
             return FOIMinistryRequest.getrequest(requestid)
 
