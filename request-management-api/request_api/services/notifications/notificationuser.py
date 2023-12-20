@@ -112,6 +112,7 @@ class notificationuser:
             
     def __gettaggedusers(self, comment):
         if comment["taggedusers"] != '[]':
+            print(comment["taggedusers"])
             return self.__preparetaggeduser(json.loads(comment["taggedusers"]))         
         return None   
     

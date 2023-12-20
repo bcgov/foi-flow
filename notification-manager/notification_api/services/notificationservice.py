@@ -14,6 +14,9 @@ from datetime import datetime
 from dateutil.parser import parse
 from pytz import timezone
 import logging
+import json
+f = open('common/notificationusertypes.json', encoding="utf8")
+notificationusertypes_cache = json.load(f)
 
 class notificationservice:
     """ FOI notification management service
@@ -23,6 +26,7 @@ class notificationservice:
     def createnotification(self, requesttype, requestid, message, notificationtype, userid):
         foirequest = self.getrequest(requestid, requesttype) 
         # Get Notification users
+        print("notificationtype", notificationtype)    
         notificationusers = notificationuser().getnotificationusers(notificationtype, requesttype, userid, foirequest)
         #If notification users exist
         if notificationusers is not None and len(notificationusers) > 0:
@@ -65,7 +69,12 @@ class notificationservice:
             notification.requestid = foirequest["foiministryrequestid"]
             notification.idnumber = foirequest["filenumber"]
             notification.foirequestid = foirequest["foirequest_id"]
-        notification.notificationtypelabel = notificationconfig().getnotificationtypelabel(notificationtype)
+        print(userid)
+        notificationtypes = notificationconfig().getnotificationtype(notificationtype)   
+        print("notificationtype", notificationtypes)  
+        notification.notificationtypelabel = notificationtypes['notificationtypelabel'] 
+        notification.notificationtypeid = notificationtypes['notificationtypeid']
+        print("notificationtype", notification.notificationtypelabel)
         notification.axisnumber = foirequest["axisrequestid"]
         notification.version = foirequest["version"]        
         notification.createdby = userid
@@ -79,7 +88,13 @@ class notificationservice:
             user.isdeleted = mute
         else:
             user.isdeleted = False
-        user.notificationusertypelabel = notificationuser["usertype"]
+        usertype = notificationusertypes_cache[notificationuser["usertype"]]
+        if usertype is None:
+            print('User type not found', notificationuser["usertype"])
+            return None
+        notificationtypes = notificationconfig().getnotificationusertype(usertype['name']) 
+        user.notificationusertypelabel = notificationtypes['notificationusertypelabel']
+        user.notificationusertypeid = notificationtypes['notificationusertypeid']
         user.notificationid = notificationid
         user.userid = notificationuser["userid"]
         user.createdby = userid
@@ -87,6 +102,7 @@ class notificationservice:
         return user
            
     def getrequest(self, requestid, requesttype):
+        print("get request request type", requesttype)
         if requesttype == "ministryrequest":
             return FOIMinistryRequest.getrequest(requestid)
 
