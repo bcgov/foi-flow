@@ -34,7 +34,6 @@ class notificationuser:
         return notificationusers    
     
     def __isignorable(self, notificationuser, users, userid, notificationtype):
-        print("is ignorable")
         if notificationuser["userid"] == userid and notificationtype not in ["Records", "PDFStitch"]:
             return True
         else: 
@@ -75,11 +74,6 @@ class notificationuser:
     def __getassignees(self, foirequest, requesttype, notificationtype, requestjson=None):
         notificationusers = []
         notificationtypelabel = "assignee" #notificationconfig().getnotificationusertypelabel("assignee")
-        print("notification type label")
-        print(notificationtypelabel)
-
-        print("foi request")
-        print(foirequest)
         if notificationtype == 'User Assignment Removal':
             notificationusers.append({"userid": requestjson['userid'], "usertype":notificationtypelabel})
         else:
@@ -87,7 +81,6 @@ class notificationuser:
                 notificationusers.append({"userid":foirequest["assignedministryperson"], "usertype":notificationtypelabel})
             if foirequest["assignedto"] is not None and foirequest["assignedto"] != '' and (notificationtype == 'IAO Assignment' or 'Assignment' not in notificationtype):
                 notificationusers.append({"userid":foirequest["assignedto"], "usertype":notificationtypelabel})
-        print(notificationusers)
         return notificationusers          
     
     def __getcommentusers(self, foirequest, comment, requesttype):
