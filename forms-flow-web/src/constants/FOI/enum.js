@@ -170,8 +170,8 @@ const RecordsDownloadList = [
   { id: 1, label: "Download for Harms", disabled: true },
   { id: 2, label: "Download Redline for Sign Off", disabled: true },
   { id: 3, label: "Download Final Package", disabled: true },
-  { id: 4, label: "Download Redline for OIPC Sign Off", disabled: true },
-  { id: 5, label: "Download Redline for OIPC Review", disabled: true },
+  { id: 4, label: "Download OIPC Redline for Sign Off", disabled: true },
+  { id: 5, label: "Download OIPC Redline for OIPC Review", disabled: true },
 ];
 
 const RecordDownloadCategory = Object.freeze({
