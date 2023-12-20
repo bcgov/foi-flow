@@ -19,6 +19,8 @@ import {
   setFOIPDFStitchedRecordForResponsePackage,
   setFOIPDFStitchedRecordForOipcReviewPackage,
   setFOIPDFStitchStatusForOipcReviewPackage,
+  setFOIPDFStitchStatusForOipcRedline,
+  setFOIPDFStitchedRecordForOipcRedline,
 } from "../../../actions/FOI/foiRequestActions";
 import { fnDone } from "./foiServicesUtil";
 import UserService from "../../../services/UserService";
@@ -482,13 +484,74 @@ export const fetchPDFStitchedRecordForResponsePackage = (
   };
 };
 
-export const fetchPDFStitchedStatusForOIPCRedline = () => {
-  return;
-}
+export const fetchPDFStitchedStatusForOIPCRedline = (
+  requestId,
+  ministryId,
+  ...rest) => {
+    if (!ministryId) {
+      return () => {};
+    }
+    const done = fnDone(rest);
+    let apiUrl = replaceUrl(
+      replaceUrl(
+        API.FOI_PDF_STITCH_STATUS_FOR_OIPCREDLINE,
+        "<ministryrequestid>",
+        ministryId
+      ),
+      "<requestid>",
+      requestId
+    );
+    return (dispatch) => {
+      httpGETRequest(apiUrl, {}, UserService.getToken())
+        .then((res) => {
+          if (res.data) {
+            dispatch(setFOIPDFStitchStatusForOipcRedline(res.data));
+            done(null, res.data);
+          }
+        })
+        .catch((error) => {
+          console.log("Error in fetching pdfstitch job status", error);
+          dispatch(serviceActionError(error));
+          done(error);
+        });
+    };
+  }
 
-export const fetchPDFStitchedRecordForOIPCRedline = () => {
-  return;
-}
+export const fetchPDFStitchedRecordForOIPCRedline = (
+  requestId,
+  ministryId,
+  ...rest) => {
+    if (!ministryId) {
+      return () => {};
+    }
+    const done = fnDone(rest);
+    let apiUrl = replaceUrl(
+      replaceUrl(
+        API.FOI_DOWNLOAD_RECORDS_FOR_OIPCREDLINE,
+        "<ministryrequestid>",
+        ministryId
+      ),
+      "<requestid>",
+      requestId
+    );
+    return (dispatch) => {
+      httpGETRequest(apiUrl, {}, UserService.getToken())
+        .then((res) => {
+          if (res.data) {
+            dispatch(setFOIPDFStitchedRecordForOipcRedline(res.data));
+            done(null, res.data);
+          } else {
+            console.log("Error in fetching records for redlines", res);
+            dispatch(serviceActionError(res));
+          }
+        })
+        .catch((error) => {
+          console.log("Error in fetching records for redlines", error);
+          dispatch(serviceActionError(error));
+          done(error);
+        });
+    };
+  }
 
 export const fetchPDFStitchedStatusForOIPCReviewPackage = (
   requestId,

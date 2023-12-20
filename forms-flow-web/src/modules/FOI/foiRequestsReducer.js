@@ -277,6 +277,11 @@ const foiRequests = (state = initialState, action) => {
         ...state,
         foiPDFStitchedRecordForOipcReviewPackage: action.payload,
       };
+    case FOI_ACTION_CONSTANTS.FOI_PDF_STITCHED_RECORD_FOR_OIPCREDLINE:
+      return {
+        ...state,
+        foiPDFStitchedRecordForOipcRedline: action.payload,
+      };
     case FOI_ACTION_CONSTANTS.FOI_PDF_STITCHED_STATUS_FOR_HARMS:
       return { ...state, foiPDFStitchStatusForHarms: action.payload };
     case FOI_ACTION_CONSTANTS.FOI_PDF_STITCHED_STATUS_FOR_REDLINES:
@@ -285,6 +290,8 @@ const foiRequests = (state = initialState, action) => {
       return { ...state, foiPDFStitchStatusForResponsePackage: action.payload };
     case FOI_ACTION_CONSTANTS.FOI_PDF_STITCHED_STATUS_FOR_OIPCREVIEWPACKAGE:
       return { ...state, foiPDFStitchStatusForOipcReviewPackage: action.payload };
+    case FOI_ACTION_CONSTANTS.FOI_PDF_STITCHED_STATUS_FOR_OIPCREDLINE:
+      return { ...state, foiPDFStitchStatusForOipcRedline: action.payload };
     case FOI_ACTION_CONSTANTS.FOI_REQUEST_CFR_FORM:
       return {
         ...state,
