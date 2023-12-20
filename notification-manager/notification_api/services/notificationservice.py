@@ -26,7 +26,6 @@ class notificationservice:
     def createnotification(self, requesttype, requestid, message, notificationtype, userid):
         foirequest = self.getrequest(requestid, requesttype) 
         # Get Notification users
-        print("notificationtype", notificationtype)    
         notificationusers = notificationuser().getnotificationusers(notificationtype, requesttype, userid, foirequest)
         #If notification users exist
         if notificationusers is not None and len(notificationusers) > 0:
