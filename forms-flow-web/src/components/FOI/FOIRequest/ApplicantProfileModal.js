@@ -148,7 +148,7 @@ const ApplicantProfileModal = React.memo(({modalOpen, handleModalClose}) => {
     useEffect(() => {
         setSaveApplicantObject({...selectedApplicant})
         for (let field in selectedApplicant) {
-            if (field === 'additionalPersonalInfo' && requestDetails.requestType === 'personal') {
+            if (field === 'additionalPersonalInfo' && requestDetails[field] && requestDetails.requestType === 'personal') {
                 if ((requestDetails[field][FOI_COMPONENT_CONSTANTS.DOB] && selectedApplicant[field][FOI_COMPONENT_CONSTANTS.DOB] !== requestDetails[field][FOI_COMPONENT_CONSTANTS.DOB]) ||
                 (requestDetails[field][FOI_COMPONENT_CONSTANTS.PERSONAL_HEALTH_NUMBER] && selectedApplicant[field][FOI_COMPONENT_CONSTANTS.PERSONAL_HEALTH_NUMBER] !== requestDetails[field][FOI_COMPONENT_CONSTANTS.PERSONAL_HEALTH_NUMBER])) {                    
                     setIsProfileDifferent(true);
