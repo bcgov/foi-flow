@@ -15,8 +15,18 @@ class notificationconfig:
         notificationid = NotificationType().getid(notificationtype)
         if notificationid is not None:
             return notificationid
+        
+    def getnotificationtype(self, notificationtype):        
+        notificationid = NotificationType().getid(notificationtype)
+        if notificationid is not None:
+            return notificationid
     
-    def getnotficationusertypelabel(self, notificationusertype):
+    def getnotificationusertypeid(self, notificationusertype):
+        notificationuserid = NotificationUserType().getid(notificationusertype)
+        if notificationuserid is not None:
+            return notificationuserid
+    
+    def getnotificationusertype(self, notificationusertype):
         notificationuserid = NotificationUserType().getid(notificationusertype)
         if notificationuserid is not None:
             return notificationuserid

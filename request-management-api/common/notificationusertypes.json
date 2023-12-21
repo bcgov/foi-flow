@@ -41,6 +41,13 @@
         "isactive": true,
         "notificationusertypelabel": "commentuser"
     },
+    "comment tagged user": {
+        "notificationusertypeid": 3,
+        "name": "comment tagged user",
+        "description": "Comment User",
+        "isactive": true,
+        "notificationusertypelabel": "commentuser"
+    },
     "triggereduser": {
         "notificationusertypeid": 4,
         "name": "Triggered User",

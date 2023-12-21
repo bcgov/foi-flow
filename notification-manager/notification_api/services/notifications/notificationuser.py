@@ -8,7 +8,7 @@ from .notificationconfig import notificationconfig
 from notification_api.services.external.keycloakadminservice import KeycloakAdminService
 
 class notificationuser:
-    """ Notfication user service
+    """ notification user service
 
     """
     
@@ -54,26 +54,26 @@ class notificationuser:
     def __gettriggereduser(self, userid, notificationtype):
         notificationusers = []
         if notificationtype in ["Records", "PDFStitch"]:
-            notificationusers.append({"userid":userid, "usertype":notificationconfig().getnotficationusertypelabel("triggered user")})
+            notificationusers.append({"userid":userid, "usertype":notificationconfig().getnotificationusertype("Triggered User")['notificationusertypelabel']})
         return notificationusers
 
         
     def __getwatchers(self, notificationtype, foirequest, requesttype, requestjson=None):
         notificationusers = []
         if notificationtype == "Watcher":
-            notificationusers.append({"userid": requestjson['watchedby'], "usertype":notificationconfig().getnotficationusertypelabel("Watcher")})
+            notificationusers.append({"userid": requestjson['watchedby'], "usertype":notificationconfig().getnotificationusertype("Watcher")['notificationusertypelabel']})
         else:
             if requesttype == "ministryrequest":
                 watchers =  FOIMinistryRequest().getwatchers(foirequest["foiministryrequestid"])
             else:
                 watchers =  FOIRawRequest().getwatchers(foirequest['requestid'])
             for watcher in watchers:
-                    notificationusers.append({"userid":watcher["watchedby"], "usertype":notificationconfig().getnotficationusertypelabel("Watcher")})
+                    notificationusers.append({"userid":watcher["watchedby"], "usertype":notificationconfig().getnotificationusertype("Watcher")['notificationusertypelabel']})
         return notificationusers         
     
     def __getassignees(self, foirequest, requesttype, notificationtype, requestjson=None):
         notificationusers = []
-        notificationtypelabel = notificationconfig().getnotficationusertypelabel("Assignee")
+        notificationtypelabel = "assignee" #notificationconfig().getnotificationusertypelabel("assignee")
         if notificationtype == 'User Assignment Removal':
             notificationusers.append({"userid": requestjson['userid'], "usertype":notificationtypelabel})
         else:
@@ -105,7 +105,7 @@ class notificationuser:
         for requestuser in requestusers:
             if requestuser["userid"] == userid:  
                 return  requestuser["usertype"]   
-        return notificationconfig().getnotficationusertypelabel("comment user")
+        return notificationconfig().getnotificationusertypelabel("comment user")
     
     def __getrelatedusers(self, comment, requesttype):
         if requesttype == "ministryrequest":
@@ -121,12 +121,12 @@ class notificationuser:
     def __preparetaggeduser(self, data):
         taggedusers = [] 
         for entry in data:
-            taggedusers.append({"userid":entry["username"], "usertype":notificationconfig().getnotficationusertypelabel("comment tagged user")})
+            taggedusers.append({"userid":entry["username"], "usertype":notificationconfig().getnotificationusertypelabel("comment tagged user")})
         return taggedusers
 
     def __getgroupmembers(self,groupid):
         notificationusers = []
-        notificationtypelabel = notificationconfig().getnotficationusertypelabel("Group Members")
+        notificationtypelabel = notificationconfig().getnotificationusertypelabel("Group Members")
         usergroupfromkeycloak= KeycloakAdminService().getmembersbygroupname(groupid) 
         for user in usergroupfromkeycloak[0].get("members"):
             notificationusers.append({"userid":user["username"], "usertype":notificationtypelabel})

@@ -13,7 +13,8 @@ class FOIRequestNotification(object):
     requestid = fields.Int(data_key="requestid") 
     idnumber = fields.Str(data_key="idnumber")
     foirequestid = fields.Int(data_key="foirequestid") 
-    notificationtypelabel = fields.Int(data_key="notificationtypelabel") 
+    notificationtypelabel = fields.Str(data_key="notificationtypelabel") 
+    notificationtypeid = fields.Int(data_key="notificationtypeid") 
     axisnumber = fields.Str(data_key="axisnumber")
     version = fields.Int(data_key="version")
     notification = fields.Str(data_key="notification")
@@ -26,9 +27,9 @@ class FOIRequestNotification(object):
             id_of_new_row = None
             conn = getconnection()
             cursor = conn.cursor()
-            cursor.execute('INSERT INTO public."FOIRequestNotifications" (notification, notificationtypelabel, requestid, "version", idnumber, axisnumber, foirequestid, createdby, created_at) \
-                                VALUES(%s::json,%s::integer, %s::integer, %s::integer,%s,%s,%s::integer,%s,%s) RETURNING notificationid', 
-                                (json.dumps(notificationschema.notification), int(notificationschema.notificationtypelabel), int(notificationschema.requestid), int(notificationschema.version),
+            cursor.execute('INSERT INTO public."FOIRequestNotifications" (notification, notificationtypeid, notificationtypelabel, requestid, "version", idnumber, axisnumber, foirequestid, createdby, created_at) \
+                                VALUES(%s::json,%s::integer, %s, %s::integer, %s::integer,%s,%s,%s::integer,%s,%s) RETURNING notificationid', 
+                                (json.dumps(notificationschema.notification), int(notificationschema.notificationtypeid), str(notificationschema.notificationtypelabel), int(notificationschema.requestid), int(notificationschema.version),
                                  str(notificationschema.idnumber), str(notificationschema.axisnumber), int(notificationschema.foirequestid), str(notificationschema.createdby), datetime.now()))
             
             conn.commit()
