@@ -809,6 +809,7 @@ class FOIMinistryRequest(db.Model):
                                     order by fpa.foiministryrequestid , fpa.version desc) fma on frd.foiministryrequest_id  = fma.foiministryrequestid 
                                     and frd.foiministryrequestversion_id = fma.foiministryrequestversion and fma.requeststatusid not in (5,6,4,11,3,15) 
                         and (frd.inquiryattributes ->> 'inquirydate')::date  between  NOW() - INTERVAL '7 DAY' AND NOW() + INTERVAL '7 DAY' 
+                        and frd.outcomeid  is null
                         order by frd.foiministryrequest_id , frd.foiministryrequestversion_id desc;""" 
             rs = db.session.execute(text(sql))        
             for row in rs:
