@@ -717,7 +717,9 @@ class FOIMinistryRequest(db.Model):
                                 or_(*groupfilter)
                             )
         
-        return ministryfilter
+        ministryfilterwithclosedoipc = or_(ministryfilter, and_(FOIMinistryRequest.isoipcreview == True, FOIMinistryRequest.requeststatusid == 3))
+
+        return ministryfilterwithclosedoipc
 
     @classmethod
     def getrequestoriginalduedate(cls,ministryrequestid):       
@@ -806,7 +808,10 @@ class FOIMinistryRequest(db.Model):
                                     from "FOIMinistryRequests" fpa  
                                     order by fpa.foiministryrequestid , fpa.version desc) fma on frd.foiministryrequest_id  = fma.foiministryrequestid 
                                     and frd.foiministryrequestversion_id = fma.foiministryrequestversion and fma.requeststatusid not in (5,6,4,11,3,15) 
+                        and inquiryattributes is not null 
+                        and frd.inquiryattributes ->> 'inquirydate' not in ('','null') 
                         and (frd.inquiryattributes ->> 'inquirydate')::date  between  NOW() - INTERVAL '7 DAY' AND NOW() + INTERVAL '7 DAY' 
+                        and frd.outcomeid  is null
                         order by frd.foiministryrequest_id , frd.foiministryrequestversion_id desc;""" 
             rs = db.session.execute(text(sql))        
             for row in rs:
