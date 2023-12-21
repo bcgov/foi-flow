@@ -152,11 +152,18 @@ class requestservicebuilder(requestserviceconfigurator):
                 oipcreview.receiveddate = oipc["receiveddate"] if oipc["receiveddate"] not in (None, "") else None
                 oipcreview.closeddate = oipc["closeddate"] if oipc["closeddate"] not in (None, "") else None 
                 if oipc["isinquiry"] == True:
-                    oipcreview.inquiryattributes = oipc["inquiryattributes"]
+                    oipcreview.inquiryattributes = self.__formatoipcattributes(oipc["inquiryattributes"])
                 oipcreview.createdby=userid
                 oipcreview.created_at= datetime2.now().isoformat()
                 oipcarr.append(oipcreview)
             return oipcarr
+        
+    def __formatoipcattributes(self, inquiryattributes):
+        if inquiryattributes not in (None, ""):
+            if (inquiryattributes["inquirydate"]) in ("","null"):
+                    inquiryattributes["inquirydate"] = None
+                    print(inquiryattributes)
+        return inquiryattributes
     
 
     def isNotBlankorNone(self, dataschema, key, location):        
