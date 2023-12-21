@@ -34,6 +34,7 @@ import {
   fetchFOIRequestDescriptionList,
   fetchRequestDataFromAxis,
   fetchRestrictedRequestCommentTagList,
+  deleteOIPCDetails
 } from "../../../apiManager/services/FOI/foiRequestServices";
 import { fetchFOIRequestAttachmentsList } from "../../../apiManager/services/FOI/foiAttachmentServices";
 import { fetchCFRForm } from "../../../apiManager/services/FOI/foiCFRFormServices";
@@ -87,6 +88,7 @@ import DivisionalTracking from "./DivisionalTracking";
 import RedactionSummary from "./RedactionSummary";
 import AxisDetails from "./AxisDetails/AxisDetails";
 import AxisMessageBanner from "./AxisDetails/AxisMessageBanner";
+import { toast } from "react-toastify";
 import HomeIcon from "@mui/icons-material/Home";
 import { RecordsLog } from "../customComponents/Records";
 import { UnsavedModal } from "../customComponents";
@@ -163,7 +165,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
   const [attachments, setAttachments] = useState(requestAttachments);
   const [comment, setComment] = useState([]);
   const [requestState, setRequestState] = useState(StateEnum.unopened.name);
-  const [disableInput, setDisableInput] = useState(requestState?.toLowerCase() === StateEnum.closed.name.toLowerCase());
+  const [disableInput, setDisableInput] = useState(requestState?.toLowerCase() === StateEnum.closed.name.toLowerCase() && !requestDetails?.isoipcreview);
   const [_tabStatus, settabStatus] = React.useState(requestState);
   let foitabheaderBG = getTabBG(_tabStatus, requestState);
 
@@ -258,11 +260,11 @@ const FOIRequest = React.memo(({ userDetail }) => {
   const [isMCFPersonal, setIsMCFPersonal] = useState(bcgovcode.replaceAll('"', '') == "MCF" && requestDetails.requestType == FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL);
   const {oipcData, addOIPC, removeOIPC, updateOIPC, isOIPCReview, setIsOIPCReview, removeAllOIPCs} = useOIPCHook();
   const [oipcDataInitial, setOipcDataInitial] = useState(oipcData);
-
+  
   //Update disableInput when requestState changes
   useEffect(() => {
-    setDisableInput(requestState?.toLowerCase() === StateEnum.closed.name.toLowerCase())
-  }, [requestState])
+    setDisableInput(requestState?.toLowerCase() === StateEnum.closed.name.toLowerCase() && !isOIPCReview);
+  }, [requestState, isOIPCReview])
 
   useEffect(() => {
     if (!oipcDataInitial) {
@@ -663,16 +665,51 @@ const FOIRequest = React.memo(({ userDetail }) => {
     setAssignedToValue(value);
   };
 
+  const saveOIPCNoReview = () => {
+    removeAllOIPCs();
+    setIsOIPCReview(false);
+    dispatch(
+      deleteOIPCDetails(
+        requestId,
+        ministryId, 
+        (err, _res) => {
+        if(!err) {
+          toast.success("OIPC details have been saved successfully.", {
+            position: "top-right",
+            autoClose: 3000,
+            hideProgressBar: true,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+          });
+        } else {
+          toast.error(
+            "Temporarily unable to save the OIPC details. Please try again in a few minutes.",
+            {
+              position: "top-right",
+              autoClose: 3000,
+              hideProgressBar: true,
+              closeOnClick: true,
+              pauseOnHover: true,
+              draggable: true,
+              progress: undefined,
+            }
+          );
+        }
+      })
+    )
+  }
+
   const oipcSectionRef = React.useRef(null);
   const handleOipcReviewFlagChange = (isSelected) => {
     if (!isSelected) {
-      removeAllOIPCs();
-    }
-    setIsOIPCReview(isSelected);
-    requestDetails.isoipcreview = isSelected;
-    oipcSectionRef.current.scrollIntoView();
-    //timeout to allow react state to update after setState call
-    if (isSelected) {
+      saveOIPCNoReview();
+    } else {
+      setIsOIPCReview(isSelected);
+      requestDetails.isoipcreview = isSelected;
+      oipcSectionRef.current.scrollIntoView();
+      //timeout to allow react state to update after setState call
       setTimeout(() => {
         oipcSectionRef.current.scrollIntoView();
       }, (10));
@@ -938,7 +975,6 @@ const FOIRequest = React.memo(({ userDetail }) => {
       requestState !== StateEnum.appfeeowing.name &&
       requestDetails?.requestType === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_GENERAL)
   }
-
 
   return (!isLoading &&
     requestDetails &&

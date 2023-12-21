@@ -257,13 +257,13 @@ class FOIMinistryRequest(db.Model):
             sql =select status, version from (select distinct name as status, version from "FOIMinistryRequests" fm inner join "FOIRequestStatuses" fs2 on fm.requeststatusid = fs2.requeststatusid  
             where foiministryrequestid=:ministryrequestid order by version asc) as fs3 order by version desc;
             """
-            sql = """select fm2.version, fs2."name" as status from  "FOIMinistryRequests" fm2  inner join "FOIRequestStatuses" fs2 on fm2.requeststatusid = fs2.requeststatusid 
+            sql = """select fm2.version, fs2."name" as status, fm2.created_at from  "FOIMinistryRequests" fm2  inner join "FOIRequestStatuses" fs2 on fm2.requeststatusid = fs2.requeststatusid 
                         where fm2.foiministryrequestid=:ministryrequestid order by version desc"""
             rs = db.session.execute(text(sql), {'ministryrequestid': ministryrequestid})  
             _tmp_state = None       
             for row in rs:
                 if row["status"] != _tmp_state:
-                    transitions.append({"status": row["status"], "version": row["version"]})
+                    transitions.append({"status": row["status"], "version": row["version"], "created_at": row["created_at"]})
                     _tmp_state = row["status"]
         except Exception as ex:
             logging.error(ex)
@@ -717,7 +717,9 @@ class FOIMinistryRequest(db.Model):
                                 or_(*groupfilter)
                             )
         
-        return ministryfilter
+        ministryfilterwithclosedoipc = or_(ministryfilter, and_(FOIMinistryRequest.isoipcreview == True, FOIMinistryRequest.requeststatusid == 3))
+
+        return ministryfilterwithclosedoipc
 
     @classmethod
     def getrequestoriginalduedate(cls,ministryrequestid):       
