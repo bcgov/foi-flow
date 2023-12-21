@@ -159,10 +159,8 @@ class requestservicebuilder(requestserviceconfigurator):
             return oipcarr
         
     def __formatoipcattributes(self, inquiryattributes):
-        if inquiryattributes not in (None, ""):
-            if (inquiryattributes["inquirydate"]) in ("","null"):
-                    inquiryattributes["inquirydate"] = None
-                    print(inquiryattributes)
+        if inquiryattributes not in (None, "") and inquiryattributes["inquirydate"] in ("","null"):
+            inquiryattributes["inquirydate"] = None
         return inquiryattributes
     
 
