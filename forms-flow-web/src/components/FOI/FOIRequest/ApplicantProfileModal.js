@@ -16,7 +16,7 @@ import SearchIcon from "@material-ui/icons/Search";
 import InputAdornment from "@mui/material/InputAdornment";
 import InputBase from "@mui/material/InputBase";
 import Grid from "@mui/material/Grid";
-import { fetchPotentialApplicants, fetchApplicantInfo, fetchApplicantContactHistory, saveApplicantInfo } from "../../../apiManager/services/FOI/foiRequestServices";
+import { fetchPotentialApplicants, fetchApplicantInfo, fetchApplicantContactHistory, saveApplicantInfo, fetchApplicantProfileByKeyword } from "../../../apiManager/services/FOI/foiApplicantProfileService";
 import AddressContactDetails from "./AddressContanctInfo";
 import ApplicantDetails from "./ApplicantDetails"
 import AdditionalApplicantDetails from "./AdditionalApplicantDetails";
@@ -34,6 +34,7 @@ import Typography from '@material-ui/core/Typography';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import { StateEnum } from "../../../constants/FOI/statusEnum";
 import { setFOIRequestApplicantProfile } from "../../../actions/FOI/foiRequestActions";
+import { toast } from "react-toastify";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -203,9 +204,60 @@ const ApplicantProfileModal = React.memo(({modalOpen, handleModalClose}) => {
         }
     }
 
+    const createKeywordJSON = (keyword) => {
+        const keywordJSON = {
+            "keywords": {}
+        }
+        const mobileNumberRegex = /^(\+\d{1,3}[-.●]?)?\(?\d{3}\)?[-.●]?\d{3}[-.●]?\d{4}$/;
+        const stringRegex = /^[A-Za-z0-9\s.@!#$%^&*()\-_=+[\]{};:'",<.>/?\\|]+$/;
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        const isValidEmail = emailRegex.test(keyword);
+        const isValidNumber = mobileNumberRegex.test(keyword);
+        const isValidString = stringRegex.test(keyword)
+        if (isValidEmail) {
+            keywordJSON.keywords["email"] = keyword;
+        }            
+        if (isValidNumber) {
+            keywordJSON.keywords["homephone"] = keyword;
+            keywordJSON.keywords["workphone"] = keyword;
+            keywordJSON.keywords["workphone2"] = keyword;
+            keywordJSON.keywords["mobilephone"] = keyword;
+        }            
+        if (isValidString) {
+            keywordJSON.keywords["firstname"] = keyword;
+            keywordJSON.keywords["lastname"] = keyword;
+            keywordJSON.keywords["email"] = keyword;
+        }
+        return keywordJSON;
+    }
+
     const onSearchEnter = (e) => {
         if (searchMode === 'manual' && e.key === 'Enter') {
-            console.log("search");
+            const keywordJSON = createKeywordJSON(e.target.value)
+            setIsLoading(true);
+                dispatch(fetchApplicantProfileByKeyword(
+                    keywordJSON,
+                    (err, res) => {
+                        if (!err) {
+                            setRows(res);
+                            setIsLoading(false);
+                        }
+                        else {
+                            toast.error(
+                                "Temporarily unable to fetch applicant profiles. Please try again in a few minutes.",
+                                {
+                                  position: "top-right",
+                                  autoClose: 3000,
+                                  hideProgressBar: true,
+                                  closeOnClick: true,
+                                  pauseOnHover: true,
+                                  draggable: true,
+                                  progress: undefined,
+                                }
+                              );
+                        }
+                        
+                    }))
         }
     }
 

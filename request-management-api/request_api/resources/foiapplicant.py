@@ -50,8 +50,6 @@ class FOIApplicants(Resource):
     @auth.isiao
     @cors_preflight('GET,OPTIONS')
     def get(email=None):
-        print(email)
-
         if email is None or email == "":
             return {'status': False, 'message':EXCEPTION_MESSAGE_BAD_REQUEST}, 400
         try:

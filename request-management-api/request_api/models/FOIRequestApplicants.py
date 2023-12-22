@@ -240,7 +240,7 @@ class FOIRequestApplicant(db.Model):
                                     province.foirequestversion_id == FOIRequest.version,
                                     province.contacttypeid == 2,
                                     province.contactinformation is not None,
-                                    city.dataformat == 'province'),
+                                    province.dataformat == 'province'),
                                 isouter=True
                             ).join(
                                 country,
@@ -249,7 +249,7 @@ class FOIRequestApplicant(db.Model):
                                     country.foirequestversion_id == FOIRequest.version,
                                     country.contacttypeid == 2,
                                     country.contactinformation is not None,
-                                    city.dataformat == 'country'),
+                                    country.dataformat == 'country'),
                                 isouter=True
                             ).join(
                                 postal,
@@ -258,7 +258,7 @@ class FOIRequestApplicant(db.Model):
                                     postal.foirequestversion_id == FOIRequest.version,
                                     postal.contacttypeid == 2,
                                     postal.contactinformation is not None,
-                                    city.dataformat == 'postal'),
+                                    postal.dataformat == 'postal'),
                                 isouter=True
                             ).join(
                                 personalemployeenumber,
@@ -305,6 +305,10 @@ class FOIRequestApplicant(db.Model):
             func.array_agg(subquery_all.c.applicantcategory).label('applicantcategory'),
             func.array_agg(subquery_all.c.email).label('email'),
             func.array_agg(subquery_all.c.address).label('address'),
+            func.array_agg(subquery_all.c.city).label('city'),
+            func.array_agg(subquery_all.c.province).label('province'),
+            func.array_agg(subquery_all.c.postal).label('postal'),
+            func.array_agg(subquery_all.c.country).label('country'),
             func.array_agg(subquery_all.c.homephone).label('homephone'),
             func.array_agg(subquery_all.c.workphone).label('workphone'),
             func.array_agg(subquery_all.c.workphone2).label('workphone2'),
@@ -336,6 +340,11 @@ class FOIRequestApplicant(db.Model):
         contactmobilephone = aliased(FOIRequestContactInformation)
         contactother = aliased(FOIRequestContactInformation)
 
+        city = aliased(FOIRequestContactInformation)
+        province = aliased(FOIRequestContactInformation)
+        postal = aliased(FOIRequestContactInformation)
+        country = aliased(FOIRequestContactInformation)
+
         #aliase for getting personal attributes
         personalemployeenumber = aliased(FOIRequestPersonalAttribute)
         personalcorrectionnumber = aliased(FOIRequestPersonalAttribute)
@@ -364,6 +373,10 @@ class FOIRequestApplicant(db.Model):
             ApplicantCategory.name.label('applicantcategory'),
             contactemail.contactinformation.label('email'),
             contactaddress.contactinformation.label('address'),
+            city.contactinformation.label('city'),
+            province.contactinformation.label('province'),
+            postal.contactinformation.label('postal'),
+            country.contactinformation.label('country'),
             contacthomephone.contactinformation.label('homephone'),
             contactworkphone.contactinformation.label('workphone'),
             contactworkphone2.contactinformation.label('workphone2'),
@@ -456,6 +469,42 @@ class FOIRequestApplicant(db.Model):
                                     contactother.contactinformation is not None),
                                 isouter=True
                             ).join(
+                                city,
+                                and_(
+                                    city.foirequest_id == FOIRequest.foirequestid,
+                                    city.foirequestversion_id == FOIRequest.version,
+                                    city.contacttypeid == 2,
+                                    city.contactinformation is not None,
+                                    city.dataformat == 'city'),
+                                isouter=True
+                            ).join(
+                                province,
+                                and_(
+                                    province.foirequest_id == FOIRequest.foirequestid,
+                                    province.foirequestversion_id == FOIRequest.version,
+                                    province.contacttypeid == 2,
+                                    province.contactinformation is not None,
+                                    province.dataformat == 'province'),
+                                isouter=True
+                            ).join(
+                                country,
+                                and_(
+                                    country.foirequest_id == FOIRequest.foirequestid,
+                                    country.foirequestversion_id == FOIRequest.version,
+                                    country.contacttypeid == 2,
+                                    country.contactinformation is not None,
+                                    country.dataformat == 'country'),
+                                isouter=True
+                            ).join(
+                                postal,
+                                and_(
+                                    postal.foirequest_id == FOIRequest.foirequestid,
+                                    postal.foirequestversion_id == FOIRequest.version,
+                                    postal.contacttypeid == 2,
+                                    postal.contactinformation is not None,
+                                    postal.dataformat == 'postal'),
+                                isouter=True
+                            ).join(
                                 personalemployeenumber,
                                 and_(
                                     personalemployeenumber.foirequest_id == FOIRequest.foirequestid,
@@ -500,6 +549,10 @@ class FOIRequestApplicant(db.Model):
             func.array_agg(subquery_all.c.applicantcategory).label('applicantcategory'),
             func.array_agg(subquery_all.c.email).label('email'),
             func.array_agg(subquery_all.c.address).label('address'),
+            func.array_agg(subquery_all.c.city).label('city'),
+            func.array_agg(subquery_all.c.province).label('province'),
+            func.array_agg(subquery_all.c.postal).label('postal'),
+            func.array_agg(subquery_all.c.country).label('country'),
             func.array_agg(subquery_all.c.homephone).label('homephone'),
             func.array_agg(subquery_all.c.workphone).label('workphone'),
             func.array_agg(subquery_all.c.workphone2).label('workphone2'),
@@ -549,5 +602,5 @@ class ApplicantProfileSchema(ma.Schema):
     class Meta:
         fields = ('foirequestapplicantid','firstname','middlename','lastname','alsoknownas','dob',
                   'businessname','applicantversion','foirequestid','foirequestversion','requesttype',
-                  'applicantcategory','email','address','homephone','workphone','workphone2','mobilephone',
+                  'applicantcategory','email','address','city','province','postal','country','homephone','workphone','workphone2','mobilephone',
                   'othercontactinfo','employeenumber','correctionnumber','phn')
