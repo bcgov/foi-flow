@@ -135,8 +135,8 @@ const API = {
   FOI_DOWNLOAD_RECORDS_FOR_RESPONSEPACKAGE: `${FOI_BASE_API_URL}/api/foirecord/<requestid>/ministryrequest/<ministryrequestid>/download/responsepackage`,
   FOI_PDF_STITCH_STATUS_FOR_RESPONSEPACKAGE: `${FOI_BASE_API_URL}/api/foirecord/<requestid>/ministryrequest/<ministryrequestid>/responsepackage/pdfstitchjobstatus`,
 
-  FOI_DOWNLOAD_RECORDS_FOR_OIPCREDLINEREVIEW: `${FOI_BASE_API_URL}/api/foirecord/<requestid>/ministryrequest/<ministryrequestid>/download/oipcredlinereview`,
-  FOI_PDF_STITCH_STATUS_FOR_OIPCREDLINEREVIEW: `${FOI_BASE_API_URL}/api/foirecord/<requestid>/ministryrequest/<ministryrequestid>/oipcredlinereview/pdfstitchjobstatus`,
+  FOI_DOWNLOAD_RECORDS_FOR_OIPCREDLINEREVIEW: `${FOI_BASE_API_URL}/api/foirecord/<requestid>/ministryrequest/<ministryrequestid>/download/oipcreviewredline`,
+  FOI_PDF_STITCH_STATUS_FOR_OIPCREDLINEREVIEW: `${FOI_BASE_API_URL}/api/foirecord/<requestid>/ministryrequest/<ministryrequestid>/oipcreviewredline/pdfstitchjobstatus`,
   FOI_DOWNLOAD_RECORDS_FOR_OIPCREDLINE: `${FOI_BASE_API_URL}/api/foirecord/<requestid>/ministryrequest/<ministryrequestid>/download/oipcredline`,
   FOI_PDF_STITCH_STATUS_FOR_OIPCREDLINE: `${FOI_BASE_API_URL}/api/foirecord/<requestid>/ministryrequest/<ministryrequestid>/oipcredline/pdfstitchjobstatus`,
 
