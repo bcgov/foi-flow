@@ -12,6 +12,8 @@ from sqlalchemy.sql.expression import distinct
 from sqlalchemy import text
 import logging
 import json
+f = open('common/notificationtypes.json', encoding="utf8")
+notificationtypes_cache = json.load(f)
 
 
 from .FOIRequestApplicantMappings import FOIRequestApplicantMapping
@@ -223,9 +225,9 @@ class FOIRequestNotificationUser(db.Model):
         elif(additionalfilter == 'myRequests'):
             #myrequest
             if(requestby == 'IAO'):
-                dbquery = basequery.filter(or_(and_(FOIRequests.assignedto == userid, ministryfilter),and_(FOINotifications.userid == userid, FOINotifications.notificationtypelabel == 10)))
+                dbquery = basequery.filter(or_(and_(FOIRequests.assignedto == userid, ministryfilter),and_(FOINotifications.userid == userid, FOINotifications.notificationtypelabel == notificationtypes_cache['taggedusercomments']['notificationtypelabel'])))
             else:
-                dbquery = basequery.filter(or_(and_(FOIRequests.assignedministryperson == userid, ministryfilter),and_(FOINotifications.userid == userid, FOINotifications.notificationtypelabel == 10)))
+                dbquery = basequery.filter(or_(and_(FOIRequests.assignedministryperson == userid, ministryfilter),and_(FOINotifications.userid == userid, FOINotifications.notificationtypelabel == notificationtypes_cache['taggedusercomments']['notificationtypelabel'])))
         else:
             if(isiaorestrictedfilemanager == True or isministryrestrictedfilemanager == True):
                 dbquery = basequery
