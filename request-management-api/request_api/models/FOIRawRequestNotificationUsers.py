@@ -20,6 +20,9 @@ from request_api.models.views.FOIRawRequests import FOIRawRequests
 f = open('common/notificationusertypes.json', encoding="utf8")
 notificationusertypes_cache = json.load(f)
 
+file = open('common/notificationtypes.json', encoding="utf8")
+notificationtypes_cache = json.load(file)
+
 class FOIRawRequestNotificationUser(db.Model):
     # Name of the table in our database
     __tablename__ = 'FOIRawRequestNotificationUsers' 
@@ -172,7 +175,7 @@ class FOIRawRequestNotificationUser(db.Model):
                 return basequery.join(subquery_watchby, subquery_watchby.c.requestid == cast(FOIRawRequests.rawrequestid, Integer))
             elif(additionalfilter == 'myRequests'):
                 #myrequest
-                return basequery.filter(or_(FOIRawRequests.assignedto == userid, and_(FOINotifications.userid == userid, FOINotifications.notificationtypelabel == 10)))
+                return basequery.filter(or_(FOIRawRequests.assignedto == userid, and_(FOINotifications.userid == userid, FOINotifications.notificationtypelabel == notificationtypes_cache['taggedusercomments']['notificationtypelabel'])))
             else:
                 if(isiaorestrictedfilemanager == True):
                     return basequery.filter(FOIRawRequests.assignedgroup.in_(groups))
