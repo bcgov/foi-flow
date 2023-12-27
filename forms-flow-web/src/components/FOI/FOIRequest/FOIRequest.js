@@ -49,6 +49,8 @@ import {
   fetchRedactedSections,
   fetchPDFStitchStatusForRedlines,
   fetchPDFStitchStatusForResponsePackage,
+  fetchPDFStitchedStatusForOIPCRedlineReview,
+  fetchPDFStitchedStatusForOIPCRedline,
 } from "../../../apiManager/services/FOI/foiRecordServices";
 import { makeStyles } from "@material-ui/core/styles";
 import FOI_COMPONENT_CONSTANTS from "../../../constants/FOI/foiComponentConstants";
@@ -301,6 +303,8 @@ const FOIRequest = React.memo(({ userDetail }) => {
       dispatch(fetchPDFStitchStatusForHarms(requestId, ministryId));
       dispatch(fetchPDFStitchStatusForRedlines(requestId, ministryId));
       dispatch(fetchPDFStitchStatusForResponsePackage(requestId, ministryId));
+      dispatch(fetchPDFStitchedStatusForOIPCRedline(requestId, ministryId));
+      dispatch(fetchPDFStitchedStatusForOIPCRedlineReview(requestId, ministryId));
       fetchCFRForm(ministryId, dispatch);
       dispatch(fetchApplicantCorrespondence(requestId, ministryId));
       dispatch(fetchApplicantCorrespondenceTemplates());
