@@ -5,6 +5,11 @@ import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import CloseIcon from '@material-ui/icons/Close';
 import IconButton from '@material-ui/core/IconButton';
+import useOIPCHook from './oipcHook';
+import { deleteOIPCDetails } from '../../../../apiManager/services/FOI/foiRequestServices';
+import { useDispatch } from 'react-redux';
+import { toast } from "react-toastify";
+import { useParams } from "react-router-dom";
 
 const RemoveOIPCModal= ({
     showModal,
@@ -12,10 +17,52 @@ const RemoveOIPCModal= ({
     setShowModal,
     oipc,
 }) =>{ 
+    const dispatch = useDispatch();
+    const { requestId, ministryId } = useParams();
+    const { setIsOIPCReview, removeAllOIPCs } = useOIPCHook();
+    const saveOIPCNoReview = () => {
+        const toastID = toast.loading("Saving request with removed OIPC review...")
+        removeAllOIPCs();
+        setIsOIPCReview(false);
+        dispatch(
+            deleteOIPCDetails(
+                requestId,
+                ministryId,
+                (err, _res) => {
+                if(!err) {
+                toast.update(toastID, {
+                    type: "success",
+                    render: "Removal of OIPC review has been saved successfully.",
+                    position: "top-right",
+                    isLoading: false,
+                    autoClose: 3000,
+                    hideProgressBar: true,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                });
+                } else {
+                toast.error(
+                    "Temporarily unable to save the request with removed OIPC review. Please try again in a few minutes.",
+                    {
+                    position: "top-right",
+                    autoClose: 3000,
+                    hideProgressBar: true,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                    }
+                );}
+            })
+        )
+    }
 
     const handleSave = () => {
         setShowModal(false);
         removeOIPC(oipc.id)
+        saveOIPCNoReview();
     };
     const handleClose = () => {
         setShowModal(false);
@@ -39,7 +86,7 @@ const RemoveOIPCModal= ({
             <DialogContent>
                 <DialogContentText component={'span'}>
                     <span className="confirmation-message" style={{display: "flex", flexDirection: "row", justifyContent: "center", color: "black"}}>
-                        Are you sure you want to delete this OIPC Review?
+                        Are you sure you want to delete this OIPC Review? The request will be saved automatically if you continue.
                     </span>
                 </DialogContentText>
             </DialogContent>
