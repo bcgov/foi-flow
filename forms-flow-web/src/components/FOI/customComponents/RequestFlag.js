@@ -80,7 +80,7 @@ const RequestFlag = ({ isActive, type, handleSelect, showFlag = true, isDisabled
       );
 
       //when setting to inactive
-      modalHeadingActive = "OIPC Review";
+      modalHeadingInactive = "OIPC Review";
       modalMessageInactive =
         "Are you sure you want to remove the OIPC review flag from this request?";
       modalDescriptionInactive = (
