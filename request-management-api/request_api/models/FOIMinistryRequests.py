@@ -567,20 +567,7 @@ class FOIMinistryRequest(db.Model):
                                 SubjectCode,
                                 SubjectCode.subjectcodeid == FOIMinistryRequestSubjectCode.subjectcodeid,
                                 isouter=True
-                            ).filter(
-                                or_(
-                                    FOIMinistryRequest.requeststatusid != 3,
-                                    and_(
-                                        FOIMinistryRequest.isoipcreview == True,
-                                        FOIMinistryRequest.requeststatusid == 3,
-                                        and_(
-                                            FOIMinistryRequest.foiministryrequestid == oipc_requests.foiministryrequest_id,
-                                            FOIMinistryRequest.version == oipc_requests.foiministryrequestversion_id,
-                                            oipc_requests.outcome == None
-                                        )
-                                    )
-                                )
-                            )
+                            ).filter(or_(FOIMinistryRequest.requeststatusid != 3, and_(FOIMinistryRequest.isoipcreview == True, FOIMinistryRequest.requeststatusid == 3)))
                         
 
         if(additionalfilter == 'watchingRequests'):
