@@ -361,6 +361,9 @@ class FOIMinistryRequest(db.Model):
         #aliase for getting ministry restricted flag from FOIRestrictedMinistryRequest
         ministry_restricted_requests = aliased(FOIRestrictedMinistryRequest)
 
+        #alias for filtering closed OIPC requests (where outcome is selected)
+        oipc_requests = aliased(FOIRequestOIPC)
+
         #filter/search
         if(len(filterfields) > 0 and keyword is not None):
             filtercondition = []
@@ -564,8 +567,20 @@ class FOIMinistryRequest(db.Model):
                                 SubjectCode,
                                 SubjectCode.subjectcodeid == FOIMinistryRequestSubjectCode.subjectcodeid,
                                 isouter=True
-                            ).filter(or_(FOIMinistryRequest.requeststatusid != 3, and_(FOIMinistryRequest.isoipcreview == True, FOIMinistryRequest.requeststatusid == 3)))
-                            
+                            ).filter(
+                                or_(
+                                    FOIMinistryRequest.requeststatusid != 3,
+                                    and_(
+                                        FOIMinistryRequest.isoipcreview == True,
+                                        FOIMinistryRequest.requeststatusid == 3,
+                                        and_(
+                                            FOIMinistryRequest.foiministryrequestid == oipc_requests.foiministryrequest_id,
+                                            FOIMinistryRequest.version == oipc_requests.foiministryrequestversion_id,
+                                            oipc_requests.outcome == None
+                                        )
+                                    )
+                                )
+                            )
                         
 
         if(additionalfilter == 'watchingRequests'):
