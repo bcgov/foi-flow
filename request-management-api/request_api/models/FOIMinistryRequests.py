@@ -361,9 +361,6 @@ class FOIMinistryRequest(db.Model):
         #aliase for getting ministry restricted flag from FOIRestrictedMinistryRequest
         ministry_restricted_requests = aliased(FOIRestrictedMinistryRequest)
 
-        #alias for filtering closed OIPC requests (where outcome is selected)
-        oipc_requests = aliased(FOIRequestOIPC)
-
         #filter/search
         if(len(filterfields) > 0 and keyword is not None):
             filtercondition = []
