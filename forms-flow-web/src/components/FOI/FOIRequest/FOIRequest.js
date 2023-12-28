@@ -277,7 +277,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
     if (JSON.stringify(oipcData) != JSON.stringify(oipcDataInitial)) {
       setDisableInput(false)
     }
-  }, [oipcData]);
+  }, [oipcData, requestDetails.isoipcreview]);
 
   useEffect(() => {
     if (window.location.href.indexOf("comments") > -1) {
@@ -670,6 +670,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
   };
 
   const saveOIPCNoReview = () => {
+    const toastID = toast.loading("Saving request with removed OIPC review...")
     removeAllOIPCs();
     setIsOIPCReview(false);
     dispatch(
@@ -678,8 +679,11 @@ const FOIRequest = React.memo(({ userDetail }) => {
         ministryId, 
         (err, _res) => {
         if(!err) {
-          toast.success("OIPC details have been saved successfully.", {
+          toast.update(toastID, {
+            type: "success",
+            render: "OIPC details have been saved successfully.",
             position: "top-right",
+            isLoading: false,
             autoClose: 3000,
             hideProgressBar: true,
             closeOnClick: true,
