@@ -277,7 +277,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
     if (JSON.stringify(oipcData) != JSON.stringify(oipcDataInitial)) {
       setDisableInput(false)
     }
-  }, [oipcData]);
+  }, [oipcData, requestDetails.isoipcreview]);
 
   useEffect(() => {
     if (window.location.href.indexOf("comments") > -1) {
