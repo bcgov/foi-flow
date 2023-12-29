@@ -579,7 +579,7 @@ class FOIMinistryRequest(db.Model):
                                     *joincondition_oipc
                                     ),
                                 isouter=True
-                            ).filter(FOIMinistryRequest.requeststatusid != 3)
+                            ).filter(or_(FOIMinistryRequest.requeststatusid != 3, and_(FOIMinistryRequest.isoipcreview == True, FOIMinistryRequest.requeststatusid == 3)))
                                 
         if(additionalfilter == 'watchingRequests'):
             #watchby
@@ -730,7 +730,9 @@ class FOIMinistryRequest(db.Model):
                                 or_(*groupfilter)
                             )
         
-        return ministryfilter
+        ministryfilterwithclosedoipc = or_(ministryfilter, and_(FOIMinistryRequest.isoipcreview == True, FOIMinistryRequest.requeststatusid == 3))
+
+        return ministryfilterwithclosedoipc
 
     @classmethod
     def getrequestoriginalduedate(cls,ministryrequestid):       
