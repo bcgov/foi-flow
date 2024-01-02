@@ -358,7 +358,7 @@ class FOIMinistryRequest(db.Model):
         subquery_oipc_nooutcomes_sql = """
         SELECT distinct on (foiministryrequest_id) foiministryrequest_id, foiministryrequestversion_id, outcomeid 
         FROM "FOIRequestOIPC" fo 
-        WHERE outcomeid is null order by foiministryrequest_id, foiministryrequestversion_id desc
+        order by foiministryrequest_id, foiministryrequestversion_id desc
         """
         rs_subquery_oipc_nooutcomes_sql = text(subquery_oipc_nooutcomes_sql).columns(FOIRequestOIPC.foiministryrequest_id, FOIRequestOIPC.foiministryrequestversion_id, FOIRequestOIPC.outcomeid).alias("oipcnoneoutcomes")
         joincondition_oipc = [
