@@ -28,6 +28,7 @@ const StateDropDown = ({
   const [status, setStatus] = useState(requestState);
   const cfrFeeData = useSelector((reduxState) => reduxState.foiRequests.foiRequestCFRForm.feedata);
   const cfrStatus = useSelector((reduxState) => reduxState.foiRequests.foiRequestCFRForm.status);
+  const isoipcreview = useSelector((reduxState) => reduxState.foiRequests.foiRequestDetail.isoipcreview);
 
   let requestDetails = useSelector(
     (state) => state.foiRequests.foiRequestDetail
@@ -75,6 +76,11 @@ const StateDropDown = ({
       );
     } else {
       resultArray = stateArray;
+    }
+    const hasRecordsReviewState = resultArray.filter(
+      (state) => state.status.toLowerCase() === StateEnum.review.name.toLowerCase()).length > 0
+    if (!hasRecordsReviewState && isoipcreview) {
+      resultArray.splice(1, 0, { status: StateEnum.review.name })
     }
     return resultArray;
   };
