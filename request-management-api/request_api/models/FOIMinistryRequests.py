@@ -496,7 +496,7 @@ class FOIMinistryRequest(db.Model):
             literal(None).label('oipc_number'),
         ]
 
-        basequery = _session.query(
+        basequery = _session.query(distinct(FOIMinistryRequest.foiministryrequestid),
                                 *selectedcolumns
                             ).join(
                                 subquery_ministry_maxversion,
