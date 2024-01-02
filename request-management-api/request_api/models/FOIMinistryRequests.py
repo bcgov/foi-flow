@@ -354,6 +354,18 @@ class FOIMinistryRequest(db.Model):
         #subquery for getting extension count
         subquery_extension_count = _session.query(FOIRequestExtension.foiministryrequest_id, func.count(distinct(FOIRequestExtension.foirequestextensionid)).filter(FOIRequestExtension.isactive == True).label('extensions')).group_by(FOIRequestExtension.foiministryrequest_id).subquery()
 
+        #subquery for getting all, distinct oipcs for foiministry request
+        subquery_with_oipc_sql = """
+        SELECT distinct on (foiministryrequest_id) foiministryrequest_id, foiministryrequestversion_id, outcomeid 
+        FROM "FOIRequestOIPC" fo 
+        order by foiministryrequest_id, foiministryrequestversion_id desc
+        """
+        subquery_with_oipc = text(subquery_with_oipc_sql).columns(FOIRequestOIPC.foiministryrequest_id, FOIRequestOIPC.foiministryrequestversion_id, FOIRequestOIPC.outcomeid).alias("oipcnoneoutcomes")
+        joincondition_oipc = [
+            subquery_with_oipc.c.foiministryrequest_id == FOIMinistryRequest.foiministryrequestid,
+            subquery_with_oipc.c.foiministryrequestversion_id == FOIMinistryRequest.version,
+        ]
+
         #aliase for onbehalf of applicant info
         onbehalf_applicantmapping = aliased(FOIRequestApplicantMapping)
         onbehalf_applicant = aliased(FOIRequestApplicant)
@@ -565,12 +577,13 @@ class FOIMinistryRequest(db.Model):
                                 SubjectCode.subjectcodeid == FOIMinistryRequestSubjectCode.subjectcodeid,
                                 isouter=True
                             ).join(
-                                FOIRequestOIPC,
-                                and_(FOIRequestOIPC.foiministryrequest_id == FOIMinistryRequest.foiministryrequestid, FOIRequestOIPC.foiministryrequestversion_id == FOIMinistryRequest.version),
+                                subquery_with_oipc,
+                                and_(
+                                    *joincondition_oipc
+                                    ),
                                 isouter=True
-                            ).filter(or_(FOIMinistryRequest.requeststatusid != 3, and_(FOIMinistryRequest.isoipcreview == True, FOIMinistryRequest.requeststatusid == 3, FOIRequestOIPC.outcomeid == None)))
-                        
-
+                            ).filter(or_(FOIMinistryRequest.requeststatusid != 3, and_(FOIMinistryRequest.isoipcreview == True, FOIMinistryRequest.requeststatusid == 3, subquery_with_oipc.c.outcomeid == None)))
+                                   
         if(additionalfilter == 'watchingRequests'):
             #watchby
             activefilter = and_(FOIMinistryRequest.isactive == True, FOIRequestStatus.isactive == True)
