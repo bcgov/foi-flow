@@ -354,16 +354,16 @@ class FOIMinistryRequest(db.Model):
         #subquery for getting extension count
         subquery_extension_count = _session.query(FOIRequestExtension.foiministryrequest_id, func.count(distinct(FOIRequestExtension.foirequestextensionid)).filter(FOIRequestExtension.isactive == True).label('extensions')).group_by(FOIRequestExtension.foiministryrequest_id).subquery()
 
-        #subquery for getting all current oipcs for foiministry request that have outcome as none (undecided outcomes)
-        subquery_oipc_nooutcomes_sql = """
+        #subquery for getting all, distinct oipcs for foiministry request
+        subquery_with_oipc_sql = """
         SELECT distinct on (foiministryrequest_id) foiministryrequest_id, foiministryrequestversion_id, outcomeid 
         FROM "FOIRequestOIPC" fo 
         order by foiministryrequest_id, foiministryrequestversion_id desc
         """
-        rs_subquery_oipc_nooutcomes_sql = text(subquery_oipc_nooutcomes_sql).columns(FOIRequestOIPC.foiministryrequest_id, FOIRequestOIPC.foiministryrequestversion_id, FOIRequestOIPC.outcomeid).alias("oipcnoneoutcomes")
+        subquery_with_oipc = text(subquery_with_oipc_sql).columns(FOIRequestOIPC.foiministryrequest_id, FOIRequestOIPC.foiministryrequestversion_id, FOIRequestOIPC.outcomeid).alias("oipcnoneoutcomes")
         joincondition_oipc = [
-            rs_subquery_oipc_nooutcomes_sql.c.foiministryrequest_id == FOIMinistryRequest.foiministryrequestid,
-            rs_subquery_oipc_nooutcomes_sql.c.foiministryrequestversion_id == FOIMinistryRequest.version,
+            subquery_with_oipc.c.foiministryrequest_id == FOIMinistryRequest.foiministryrequestid,
+            subquery_with_oipc.c.foiministryrequestversion_id == FOIMinistryRequest.version,
         ]
 
         #aliase for onbehalf of applicant info
@@ -577,12 +577,12 @@ class FOIMinistryRequest(db.Model):
                                 SubjectCode.subjectcodeid == FOIMinistryRequestSubjectCode.subjectcodeid,
                                 isouter=True
                             ).join(
-                                rs_subquery_oipc_nooutcomes_sql,
+                                subquery_with_oipc,
                                 and_(
                                     *joincondition_oipc
                                     ),
                                 isouter=True
-                            ).filter(or_(FOIMinistryRequest.requeststatusid != 3, and_(FOIMinistryRequest.isoipcreview == True, FOIMinistryRequest.requeststatusid == 3, rs_subquery_oipc_nooutcomes_sql.c.outcomeid == None)))
+                            ).filter(or_(FOIMinistryRequest.requeststatusid != 3, and_(FOIMinistryRequest.isoipcreview == True, FOIMinistryRequest.requeststatusid == 3, subquery_with_oipc.c.outcomeid == None)))
                                    
         if(additionalfilter == 'watchingRequests'):
             #watchby
