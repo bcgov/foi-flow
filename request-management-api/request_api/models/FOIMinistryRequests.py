@@ -355,7 +355,7 @@ class FOIMinistryRequest(db.Model):
         subquery_extension_count = _session.query(FOIRequestExtension.foiministryrequest_id, func.count(distinct(FOIRequestExtension.foirequestextensionid)).filter(FOIRequestExtension.isactive == True).label('extensions')).group_by(FOIRequestExtension.foiministryrequest_id).subquery()
 
         #subquery for getting all current oipcs for foiministry request that have outcome as none (undecided outcomes)
-        subquery_oipc_nooutcomes = _session.query(FOIRequestOIPC.outcomeid, FOIRequestOIPC.foiministryrequest_id, FOIRequestOIPC.foiministryrequestversion_id).filter(FOIRequestOIPC.outcomeid.is_(None)).subquery()
+        subquery_oipc_nooutcomes = _session.query(distinct(FOIRequestOIPC.foiministryrequest_id),FOIRequestOIPC.outcomeid, FOIRequestOIPC.foiministryrequest_id, FOIRequestOIPC.foiministryrequestversion_id).filter(FOIRequestOIPC.outcomeid.is_(None)).subquery()
         joincondition_oipc = [
             subquery_oipc_nooutcomes.c.foiministryrequest_id == FOIMinistryRequest.foiministryrequestid,
             subquery_oipc_nooutcomes.c.foiministryrequestversion_id == FOIMinistryRequest.version,
@@ -574,8 +574,6 @@ class FOIMinistryRequest(db.Model):
                             ).join(
                                 subquery_oipc_nooutcomes,
                                 and_(
-                                    FOIMinistryRequest.isoipcreview == True, 
-                                    FOIMinistryRequest.requeststatusid == 3, 
                                     *joincondition_oipc
                                     ),
                                 isouter=True
