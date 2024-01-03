@@ -23,14 +23,14 @@ const NotificationPopup = ({notifications, isMinistry, ministryCode}) => {
   },[notifications]);
 
   const tabTitle = () =>{
-    let myRequestList = notifications?.filter(x => (x.notificationusertype === 'Assignee' || x.notificationusertype === 'Comment User'));
+    let myRequestList = notifications?.filter(x => (x.notificationusertype === 'Assignee' || x.notificationusertype === 'Comment User' || x.notificationusertype === 'Triggered User'));
     let watchingRequestList = notifications?.filter(x => x.notificationusertype === 'Watcher');
     setMyRequestTitle(myRequestList?.length > 0 ? "My Notifications ("+myRequestList.length+")": "My Notifications");
     setWatchingRequestTitle(watchingRequestList?.length > 0 ? "Watching Notifications ("+watchingRequestList.length+")": "Watching Notifications");
   }
 
   const assigmentNotifications = notifications?.map((notification,index) =>
-    {return (notification.notificationusertype === 'Assignee' || notification.notificationusertype === "Comment User") &&
+    {return (notification.notificationusertype === 'Assignee' || notification.notificationusertype === "Comment User" || notification.notificationusertype === "Triggered User") &&
       <NotificationList key= {index} notification={notification} isMinistry ={isMinistry}
       ministryCode ={ministryCode}></NotificationList>
     }
