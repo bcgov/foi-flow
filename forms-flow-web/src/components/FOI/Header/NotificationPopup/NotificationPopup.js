@@ -45,7 +45,7 @@ const NotificationPopup = ({notifications, isMinistry, ministryCode}) => {
 
   const checkIfNotificationExists = (type) => {
     if(type ==='assignee' && notifications.find(notification => 
-      (notification.notificationusertype === 'Assignee'|| notification.notificationusertype === "Comment User"))){
+      (notification.notificationusertype === 'Assignee'|| notification.notificationusertype === "Comment User" || notification.notificationusertype === "Triggered User"))){
         return true;
       }
     if(type ==='watcher' && notifications.find(notification => 
