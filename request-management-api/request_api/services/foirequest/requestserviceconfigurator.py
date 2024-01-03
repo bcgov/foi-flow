@@ -15,10 +15,10 @@ class requestserviceconfigurator:
     """This class consolidates helper fiunctions and constants
     """
     
-    def getstatusname(self,requeststatusid):
+    def getstatusname(self,requeststatuslabel):
         allstatus = FOIRequestStatus().getrequeststatuses()
         for status in allstatus:
-            if status["requeststatusid"] == requeststatusid:
+            if status["statuslabel"] == requeststatuslabel:
                 return status["name"]
         return None;    
     

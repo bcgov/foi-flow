@@ -20,4 +20,5 @@ class FOIRequests(db.Model):
     ministryassignedtoformatted = db.Column(db.String(500))
     description = db.Column(db.Text)
     crtid = db.Column(db.Text)
+    requeststatuslabel = db.Column(db.String(50))
     

@@ -17,7 +17,11 @@ from .FOIRawRequestWatchers import FOIRawRequestWatcher
 from request_api.utils.enums import ProcessingTeamWithKeycloackGroup, IAOTeamWithKeycloackGroup
 from request_api.models.views.FOINotifications import FOINotifications
 from request_api.models.views.FOIRawRequests import FOIRawRequests
+f = open('common/notificationusertypes.json', encoding="utf8")
+notificationusertypes_cache = json.load(f)
 
+file = open('common/notificationtypes.json', encoding="utf8")
+notificationtypes_cache = json.load(file)
 
 class FOIRawRequestNotificationUser(db.Model):
     # Name of the table in our database
@@ -31,8 +35,8 @@ class FOIRawRequestNotificationUser(db.Model):
     createdby = db.Column(db.String(120), unique=False, nullable=True)
     updated_at = db.Column(db.DateTime, nullable=True)
     updatedby = db.Column(db.String(120), unique=False, nullable=True)
-
     notificationusertypeid = db.Column(db.Integer,nullable=False)
+    notificationusertypelabel = db.Column(db.String(120),nullable=False)
 
 
     @classmethod
@@ -53,8 +57,8 @@ class FOIRawRequestNotificationUser(db.Model):
         return DefaultMethodResult(True,'Notifications deleted for user',userid)
 
     @classmethod
-    def dismissnotificationbyuserandtype(cls, userid, notificationusertypeid):
-        db.session.query(FOIRawRequestNotificationUser).filter(FOIRawRequestNotificationUser.userid == userid, FOIRawRequestNotificationUser.notificationusertypeid == notificationusertypeid).update({FOIRawRequestNotificationUser.isdeleted: True, FOIRawRequestNotificationUser.updatedby: userid,
+    def dismissnotificationbyuserandtype(cls, userid, notificationusertypelabel):
+        db.session.query(FOIRawRequestNotificationUser).filter(FOIRawRequestNotificationUser.userid == userid, FOIRawRequestNotificationUser.notificationusertypelabel == notificationusertypelabel).update({FOIRawRequestNotificationUser.isdeleted: True, FOIRawRequestNotificationUser.updatedby: userid,
                             FOIRawRequestNotificationUser.updated_at: datetime2.now()})
         db.session.commit()  
         return DefaultMethodResult(True,'Notifications deleted for user',userid)
@@ -92,12 +96,15 @@ class FOIRawRequestNotificationUser(db.Model):
         return notifications
 
     @classmethod 
-    def getnotificationsbyuserandtype(cls, userid, notificationusertypeid):
+    def getnotificationsbyuserandtype(cls, userid, typeid):
+        for key in notificationusertypes_cache:
+            if (notificationusertypes_cache[key].notificationusertypeid == typeid) or (notificationusertypes_cache[key].notificationusertypelabel == typeid):
+                notificationusertypelabel = notificationusertypes_cache[key].notificationusertypelabel
         notifications = []
         try:
             sql = """select notificationid, count(1) as relcount from "FOIRawRequestNotificationUsers" frnu 
-                        where notificationid in (select notificationid from "FOIRawRequestNotificationUsers" frnu  where userid = :userid and notificationusertypeid = :notificationusertypeid) group by notificationid """
-            rs = db.session.execute(text(sql), {'userid': userid, 'notificationusertypeid': notificationusertypeid})
+                        where notificationid in (select notificationid from "FOIRawRequestNotificationUsers" frnu  where userid = :userid and notificationusertypelabel = :notificationusertypelabel) group by notificationid """
+            rs = db.session.execute(text(sql), {'userid': userid, 'notificationusertypelabel': notificationusertypelabel})
             for row in rs:
                 notifications.append({"notificationid": row["notificationid"], "count" : row["relcount"]})
         except Exception as ex:
@@ -168,7 +175,7 @@ class FOIRawRequestNotificationUser(db.Model):
                 return basequery.join(subquery_watchby, subquery_watchby.c.requestid == cast(FOIRawRequests.rawrequestid, Integer))
             elif(additionalfilter == 'myRequests'):
                 #myrequest
-                return basequery.filter(or_(FOIRawRequests.assignedto == userid, and_(FOINotifications.userid == userid, FOINotifications.notificationtypeid == 10)))
+                return basequery.filter(or_(FOIRawRequests.assignedto == userid, and_(FOINotifications.userid == userid, FOINotifications.notificationtypelabel == notificationtypes_cache['taggedusercomments']['notificationtypelabel'])))
             else:
                 if(isiaorestrictedfilemanager == True):
                     return basequery.filter(FOIRawRequests.assignedgroup.in_(groups))
@@ -263,4 +270,4 @@ class FOIRawRequestNotificationUser(db.Model):
         
 class FOIRawRequestNotificationUserSchema(ma.Schema):
     class Meta:
-        fields = ('notificationid', 'userid','notificationusertypeid','created_at','createdby','updated_at','updatedby') 
+        fields = ('notificationid', 'userid', 'notificationusertypeid' , 'notificationusertypelabel','created_at','createdby','updated_at','updatedby') 

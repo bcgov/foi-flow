@@ -126,7 +126,7 @@ const RequestDetails = React.memo(
         receivedDate: !!receivedDate ? formatDate(receivedDate): "",
         requestStartDate: startDate ? formatDate(startDate): "",
         dueDate:  validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.DUE_DATE, startDate ? formatDate(startDate): ""),
-        requestState: findRequestState(requestDetails?.requeststatusid)
+        requestState: findRequestState(requestDetails?.requeststatuslabel)
       }
       //event bubble up - sets the initial value to validate the required fields
       handleRequestDetailsInitialValue(requestDetailsObject);
