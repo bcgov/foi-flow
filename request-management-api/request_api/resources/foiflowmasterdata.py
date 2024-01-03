@@ -390,7 +390,7 @@ class FOIFlowOIPCReviewTypes(Resource):
     @staticmethod
     @TRACER.trace()
     @cross_origin(origins=allowedorigins())
-    # @auth.require
+    @auth.require
     @request_api.cache.cached(
         key_prefix="oipcreviewtypesreasons",
         unless=cache_filter,
@@ -412,7 +412,7 @@ class FOIFlowOIPCStatuses(Resource):
     @staticmethod
     @TRACER.trace()
     @cross_origin(origins=allowedorigins())
-    # @auth.require
+    @auth.require
     @request_api.cache.cached(
         key_prefix="oipcstatuses",
         unless=cache_filter,
@@ -435,7 +435,7 @@ class FOIFlowOIPCOutcomes(Resource):
     @staticmethod
     @TRACER.trace()
     @cross_origin(origins=allowedorigins())
-    # @auth.require
+    @auth.require
     @request_api.cache.cached(
         key_prefix="oipcoutcomes",
         unless=cache_filter,
@@ -457,7 +457,7 @@ class FOIFlowOIPCInquiryOutcomes(Resource):
     @staticmethod
     @TRACER.trace()
     @cross_origin(origins=allowedorigins())
-    # @auth.require
+    @auth.require
     @request_api.cache.cached(
         key_prefix="oipcinquiryoutcomes",
         unless=cache_filter,
