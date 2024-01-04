@@ -114,7 +114,7 @@ class FOIRequestNotification(db.Model):
     def getextensionnotifications(cls, extensionid):
         notifications = []
         try:
-            sql = sql = """select idnumber, axisnumber, notificationid, notification , notificationtypelabel from "FOIRequestNotifications" where notification->>'extensionid' = :extensionid """
+            sql = sql = """select idnumber, axisnumber, notificationid, notification , notificationtypelabel from "FOIRequestNotifications" where isdeleted = false and notification->>'extensionid' = :extensionid """
             rs = db.session.execute(text(sql), {'extensionid': str(extensionid)})
             for row in rs:
                 notifications.append({"idnumber": row["idnumber"], "axisnumber": row["axisnumber"], "notificationid": row["notificationid"], "notification": row["notification"], "notificationtypelabel": row["notificationtypelabel"]})
@@ -140,7 +140,7 @@ class FOIRequestNotification(db.Model):
     def getnotificationidsbynumberandtype(cls, idnumber, notificationtypelabels):
         notificationids = []
         try:
-            sql = """select notificationid from "FOIRequestNotifications" where idnumber = :idnumber and notificationtypelabel = ANY(:notificationtypelabels) """
+            sql = """select notificationid from "FOIRequestNotifications" where idnumber = :idnumber and notificationtypelabel = ANY(:notificationtypelabels) and isdeleted = false """
             rs = db.session.execute(text(sql), {'idnumber': idnumber, 'notificationtypelabels': notificationtypelabels})
             for row in rs:
                 notificationids.append(row["notificationid"])
@@ -155,7 +155,7 @@ class FOIRequestNotification(db.Model):
     def getnotificationidsbynumber(cls, idnumber):
         notificationids = []
         try:
-            sql = """select notificationid from "FOIRequestNotifications" where idnumber = :idnumber """
+            sql = """select notificationid from "FOIRequestNotifications" where idnumber = :idnumber and isdeleted = false """
             rs = db.session.execute(text(sql), {'idnumber': idnumber})
             for row in rs:
                 notificationids.append(row["notificationid"])
@@ -168,7 +168,7 @@ class FOIRequestNotification(db.Model):
 
     @classmethod
     def getnotificationidsbytype(cls, notificationtypelabel):
-        sql = """select notificationid from "FOIRequestNotifications" where notificationtypelabel= :notificationtypelabel """
+        sql = """select notificationid from "FOIRequestNotifications" where notificationtypelabel= :notificationtypelabel and isdeleted = false """
         rs = db.session.execute(text(sql), {'notificationtypelabel': notificationtypelabel})
         notificationids = []
         for row in rs:
@@ -177,7 +177,7 @@ class FOIRequestNotification(db.Model):
     
     @classmethod
     def getextensionnotificationidsbyministry(cls, ministryid):
-        sql = """select notificationid from "FOIRequestNotifications" where requestid = :requestid and notificationtypelabel = 4 """
+        sql = """select notificationid from "FOIRequestNotifications" where requestid = :requestid and notificationtypelabel = 4 and isdeleted = false """
         rs = db.session.execute(text(sql), {'requestid': ministryid})
         notificationids = []
         for row in rs:
