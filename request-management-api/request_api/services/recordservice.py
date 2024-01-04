@@ -181,6 +181,9 @@ class recordservice(recordservicebase):
     
     def getpdfstitchpackagetodownload(self, ministryid, category):
         response, err = self.makedocreviewerrequest('GET', '/api/pdfstitch/{0}/{1}'.format(ministryid, category))
+        if response is not None and "createdat" in response:
+            string_datetime = maya.parse(response["createdat"]).datetime(to_timezone='America/Vancouver', naive=False).strftime('%Y %b %d | %I:%M %p').upper()
+            response["createdat_datetime"] = string_datetime
         return response
 
     def getpdfstichstatus(self, ministryid, category):
