@@ -739,11 +739,10 @@ class FOIMinistryRequest(db.Model):
         upcomingduerecords = []
         try:
             sql = """select distinct on (filenumber) filenumber, to_char(duedate, 'YYYY-MM-DD') as duedate, foiministryrequestid, version, foirequest_id, created_at, createdby from "FOIMinistryRequests" fpa 
-                    where isactive = true and duedate is not null and requeststatuslabel not in (:requeststatuslabel)     
+                    where isactive = true and duedate is not null and requeststatuslabel not in :requeststatuslabel
                     and duedate between  NOW() - INTERVAL '7 DAY' AND NOW() + INTERVAL '7 DAY'
                     order by filenumber , version desc;""" 
-            requeststatuslabel =  [StateName.closed.name,StateName.redirect.name,StateName.unopened.name,StateName.intakeinprogress.name,StateName.onhold.name,StateName.archived.name]
-            requeststatuslabel = ','.join(str(e) for e in requeststatuslabel)
+            requeststatuslabel =  tuple([StateName.closed.name,StateName.redirect.name,StateName.unopened.name,StateName.intakeinprogress.name,StateName.onhold.name,StateName.archived.name])
             rs = db.session.execute(text(sql), {'requeststatuslabel': requeststatuslabel})
             for row in rs:
                 upcomingduerecords.append({"filenumber": row["filenumber"], "duedate": row["duedate"],"foiministryrequestid": row["foiministryrequestid"], "version": row["version"], "foirequest_id": row["foirequest_id"], "created_at": row["created_at"], "createdby": row["createdby"]})
@@ -764,13 +763,12 @@ class FOIMinistryRequest(db.Model):
                         from "FOIMinistryRequestDivisions" frd 
                         inner join (select distinct on (fpa.foiministryrequestid) foiministryrequestid, version as foiministryrequestversion, axisrequestid, filenumber, foirequest_id, requeststatusid, requeststatuslabel 
                                     from "FOIMinistryRequests" fpa  
-                                    order by fpa.foiministryrequestid , fpa.version desc) fma on frd.foiministryrequest_id = fma.foiministryrequestid and frd.foiministryrequestversion_id = fma.foiministryrequestversion and fma.requeststatuslabel not in (:requeststatuslabel) 
+                                    order by fpa.foiministryrequestid , fpa.version desc) fma on frd.foiministryrequest_id = fma.foiministryrequestid and frd.foiministryrequestversion_id = fma.foiministryrequestversion and fma.requeststatuslabel not in :requeststatuslabel
                         inner join "ProgramAreaDivisions" pad2 on frd.divisionid  = pad2.divisionid 
                         inner join "ProgramAreaDivisionStages" pads on frd.stageid  = pads.stageid and frd.stageid in (5, 7, 9) 
                         and frd.divisionduedate  between  NOW() - INTERVAL '7 DAY' AND NOW() + INTERVAL '7 DAY' 
                         order by frd.foiministryrequest_id , frd.foiministryrequestversion_id desc;""" 
-            requeststatuslabel = [StateName.closed.name,StateName.redirect.name,StateName.unopened.name,StateName.intakeinprogress.name,StateName.onhold.name,StateName.archived.name]
-            requeststatuslabel = ','.join(str(e) for e in requeststatuslabel)
+            requeststatuslabel = tuple([StateName.closed.name,StateName.redirect.name,StateName.unopened.name,StateName.intakeinprogress.name,StateName.onhold.name,StateName.archived.name])
             rs = db.session.execute(text(sql), {'requeststatuslabel': requeststatuslabel})
                   
             for row in rs:
