@@ -9,8 +9,7 @@ import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 
 
 const RedactionSummary = React.memo(({sections}) => {
-
-    const useStyles = makeStyles({
+  const useStyles = makeStyles({
         heading: {
           color: '#FFF',
           fontSize: '16px !important',
@@ -34,12 +33,25 @@ const RedactionSummary = React.memo(({sections}) => {
             <Typography className={classes.heading}>SUMMARY OF REDACTIONS</Typography>
             </AccordionSummary>
             <AccordionDetails>
-              <div style={{margin: "0 20px"}}>
+
+              
+                {sections?.Redline !== "" && (
+                <div style={{margin: "0 20px"}}>
                 <Typography className={classes.sectionsHeading}>
                   <b>Redaction Sections Applied</b>
                 </Typography>
-                <span>{sections}</span>
-              </div>
+                <span>{sections?.Redline}</span>
+                </div>
+                )}
+                {(sections.OIPC && sections?.OIPC !== "") && (
+                <div style={{margin: "0 20px", paddingTop:"20px"}}>
+                <Typography className={classes.sectionsHeading}>
+                  <b>OIPC Redaction Sections Applied</b>
+                </Typography>
+                <span>{sections?.OIPC}</span>
+                </div>
+                )}
+              
             </AccordionDetails>
             </Accordion>
         </div>

@@ -1092,6 +1092,16 @@ export const RecordsLog = ({
       (itemid === 5 && isOIPCRedlineReviewInProgress)
     );
   };
+  
+  const getPackageDatetime = (itemid) => {
+    return (
+      (itemid === 1 && pdfStitchedRecord?.createdat_datetime) ||
+      (itemid === 2 && redlinePdfStitchedRecord?.createdat_datetime) ||
+      (itemid === 3 && responsePackagePdfStitchedRecord?.createdat_datetime) ||
+      (itemid === 4 && oipcRedlinePdfStitchedRecord?.createdat_datetime) ||
+      (itemid === 5 && oipcRedlineReviewPdfStitchedRecord?.createdat_datetime)
+    );
+  }
 
   const downloadAllDocuments = async () => {
     let blobs = [];
@@ -1720,7 +1730,9 @@ export const RecordsLog = ({
                               className={classes.statusIcons}
                             />
                           ) : null}
-                          {item.label}
+                          <Tooltip enterDelay={500} title={`Created On: ${getPackageDatetime(item.id) ? getPackageDatetime(item.id) : "N/A"}`}>
+                            <span>{item.label}</span>
+                          </Tooltip>
                         </MenuItem>
                       );
                     }

@@ -310,7 +310,8 @@ const FOIRequest = React.memo(({ userDetail }) => {
       dispatch(fetchApplicantCorrespondenceTemplates());
       dispatch(
         fetchRedactedSections(ministryId, (_err, res) => {
-          setRedactedSections(res.sections);
+          setRedactedSections(res);
+
         })
       );
     }
@@ -1294,8 +1295,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
                         createSaveRequestObject={createSaveRequestObject}
                         disableInput={disableInput}
                       />
-
-                      {redactedSections.length > 0 && (
+                      {Object.keys(redactedSections).length > 0 && (
                         <RedactionSummary sections={redactedSections} />
                       )}
 
