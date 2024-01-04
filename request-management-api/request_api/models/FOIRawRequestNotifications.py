@@ -102,7 +102,7 @@ class FOIRawRequestNotification(db.Model):
     def getnotificationidsbytype(cls, notificationtypelabel):
         notificationids = []
         try:
-            sql = """select notificationid from "FOIRawRequestNotifications" where notificationtypelabel= :notificationtypelabel """
+            sql = """select notificationid from "FOIRawRequestNotifications" where notificationtypelabel= :notificationtypelabel and isdeleted = false """
             rs = db.session.execute(text(sql), {'notificationtypelabel': notificationtypelabel})
             for row in rs:
                 notificationids.append(row["notificationid"])
