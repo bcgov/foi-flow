@@ -83,7 +83,7 @@ class eventservice:
             section5pendingresponse_time = timer.time()
             print("--- Section 5 Pending Event Response Time %s seconds ---" % (section5pendingresponse_time - paymentremindereventresponse_time))
             print(f"section5pendingresponse = {section5pendingresponse.success}")
-
+            
             if cfreventresponse.success == False or legislativeeventresponse.success == False or divisioneventresponse.success == False or paymentremindereventresponse.success == False or section5pendingresponse == False:
                 current_app.logger.error("FOI Notification failed for reminder event response=%s ; legislative response=%s ; division response=%s ; payment response=%s ; section5pending response=%s" % (cfreventresponse.message, legislativeeventresponse.message, divisioneventresponse.message, paymentremindereventresponse.message, section5pendingresponse.message))
                 return DefaultMethodResult(False,'Due reminder notifications failed',cfreventresponse.identifier)
