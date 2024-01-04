@@ -57,11 +57,16 @@ class eventservice:
             
     def postreminderevent(self):
         try:
-            cfreventresponse = cfrdateevent().createdueevent() 
-            legislativeeventresponse = legislativedateevent().createdueevent()   
-            divisioneventresponse = divisiondateevent().createdueevent()   
+            cfreventresponse = cfrdateevent().createdueevent()
+            print(f"cfreventresponse = {cfreventresponse.success}") 
+            legislativeeventresponse = legislativedateevent().createdueevent()
+            print(f"legislativeeventresponse = {legislativeeventresponse.success}") 
+            divisioneventresponse = divisiondateevent().createdueevent()
+            print(f"divisioneventresponse = {divisioneventresponse.success}")
             paymentremindereventresponse = paymentevent().createpaymentreminderevent()
+            print(f"paymentremindereventresponse = {paymentremindereventresponse.success}")
             section5pendingresponse = section5pendingevent().createdueevent()
+            print(f"section5pendingresponse = {section5pendingresponse.success}")
             if cfreventresponse.success == False or legislativeeventresponse.success == False or divisioneventresponse.success == False or paymentremindereventresponse.success == False or section5pendingresponse == False:
                 current_app.logger.error("FOI Notification failed for reminder event response=%s ; legislative response=%s ; division response=%s ; payment response=%s ; section5pending response=%s" % (cfreventresponse.message, legislativeeventresponse.message, divisioneventresponse.message, paymentremindereventresponse.message, section5pendingresponse.message))
                 return DefaultMethodResult(False,'Due reminder notifications failed',cfreventresponse.identifier)
