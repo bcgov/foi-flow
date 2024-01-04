@@ -744,6 +744,7 @@ class FOIMinistryRequest(db.Model):
                     order by filenumber , version desc;""" 
             requeststatuslabel =  [StateName.closed.name,StateName.redirect.name,StateName.unopened.name,StateName.intakeinprogress.name,StateName.onhold.name,StateName.archived.name]
             requeststatuslabel = ','.join(str(e) for e in requeststatuslabel)
+            print(f"requeststatuslabel ====== {requeststatuslabel}")
             rs = db.session.execute(text(sql), {'requeststatuslabel': requeststatuslabel})
             for row in rs:
                 upcomingduerecords.append({"filenumber": row["filenumber"], "duedate": row["duedate"],"foiministryrequestid": row["foiministryrequestid"], "version": row["version"], "foirequest_id": row["foirequest_id"], "created_at": row["created_at"], "createdby": row["createdby"]})
