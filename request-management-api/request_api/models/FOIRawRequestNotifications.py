@@ -45,7 +45,7 @@ class FOIRawRequestNotification(db.Model):
     @classmethod
     def dismissnotification(cls, notificationids, userid='system'):
         try:
-            db.session.query(FOIRawRequestNotification).filter(FOIRawRequestNotification.notificationid.in_(notificationids)).update({FOIRawRequestNotification.isdeleted: True, FOIRawRequestNotification.updatedby: userid,
+            db.session.query(FOIRawRequestNotification).filter(FOIRawRequestNotification.notificationid.in_(notificationids), FOIRawRequestNotification.isdeleted == False).update({FOIRawRequestNotification.isdeleted: True, FOIRawRequestNotification.updatedby: userid,
                             FOIRawRequestNotification.updated_at: datetime2.now()}, synchronize_session=False)
             db.session.commit()  
             return DefaultMethodResult(True,'Notifications deleted ', notificationids)
