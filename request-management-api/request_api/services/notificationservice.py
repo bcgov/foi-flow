@@ -277,15 +277,15 @@ class notificationservice:
             mutenotification = False
 
         print("notificationtype", notificationtype)
-        notificationtypes_data = notificationtypes_cache[notificationtype]
-        if notificationtypes_data is None:
-            print('Notification type not found', notificationtype)
-            notification.notificationtypelabel = notificationconfig().getnotificationtypelabel(notificationtype)
-            notification.notificationtypeid = notificationconfig().getnotificationtypeid(notificationtype)
+        # in notificationtype remove space and make lower case
+        notificationtype_format = notificationtype.replace(" ", "").lower()
+        print ("notificationtype_format", notificationtype_format)
+        if notificationtype_format not in notificationtypes_cache:
+            print('Notification type not found in enum.', notificationtype)
         else:
             print('Notification type found', notificationtype)
-            notification.notificationtypelabel =  notificationtypes_data['notificationtypelabel']
-            notification.notificationtypeid = notificationtypes_data['notificationtypeid'] 
+            notification.notificationtypelabel =  notificationtypes_cache[notificationtype_format]['notificationtypelabel']
+            notification.notificationtypeid = notificationtypes_cache[notificationtype_format]['notificationtypeid'] 
         notification.axisnumber = foirequest["axisrequestid"]
         notification.version = foirequest["version"]        
         notification.createdby = userid
