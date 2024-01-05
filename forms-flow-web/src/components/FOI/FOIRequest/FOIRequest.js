@@ -1296,7 +1296,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
                         disableInput={disableInput}
                       />
                       {Object.keys(redactedSections).length > 0 && (
-                        <RedactionSummary sections={redactedSections} />
+                        <RedactionSummary sections={redactedSections} isoipcreview={isOIPCReview}/>
                       )}
 
                       <ExtensionDetails
