@@ -16,6 +16,7 @@ import maya
 import os
 from flask import current_app
 from dateutil.parser import parse
+import time as t
 
 class cfrdateevent(duecalculator):
     """ FOI Event management service
@@ -24,9 +25,17 @@ class cfrdateevent(duecalculator):
     def createdueevent(self):
         try: 
             _today = self.gettoday()
-            notificationservice().dismissremindernotification("ministryrequest", self.__notificationtype())            
+            time = t.time()
+            notificationservice().dismissremindernotification("ministryrequest", self.__notificationtype()) 
+            dismissremindernotification_time = t.time()  
+            print("dismissremindernotification_time: %s" % (dismissremindernotification_time - time))
+
             ca_holidays = self.getholidays()
+            time = t.time()
             _upcomingdues = FOIMinistryRequest.getupcomingcfrduerecords()
+            getupcomingcfrduerecords_time = t.time()
+            print("getupcomingcfrduerecords_time: %s" % (getupcomingcfrduerecords_time - time))
+
             for entry in _upcomingdues:
                 _duedate = self.formatduedate(entry['cfrduedate']) 
                 message = None
@@ -34,8 +43,11 @@ class cfrdateevent(duecalculator):
                     message = self.__todayduemessage()   
                 elif  self.getpreviousbusinessday(entry['cfrduedate'],ca_holidays) == _today:
                     message = self.__upcomingduemessage(_duedate)
+                createnotification_time = t.time()    
                 self.__createnotification(message,entry['foiministryrequestid'])
                 self.__createcomment(entry, message)
+                createnotification_time = t.time() - createnotification_time
+                print("createnotification_time: %s" % createnotification_time)
             return DefaultMethodResult(True,'CFR reminder notifications created',_today)
         except BusinessException as exception:            
             current_app.logger.error("%s,%s" % ('CFR reminder Notification Error', exception.message))

@@ -16,6 +16,7 @@ import maya
 import os
 from flask import current_app
 from dateutil.parser import parse
+import time as t
 
 class legislativedateevent(duecalculator):
     """ FOI Event management service
@@ -35,8 +36,14 @@ class legislativedateevent(duecalculator):
                     message = self.__todayduemessage()     
                 elif  self.getpreviousbusinessday(entry['duedate'],ca_holidays) == _today or self.getbusinessdaysbetween(entry['duedate'],_today) == 5:
                     message = self.__upcomingduemessage(_duedate)
+                createnotification_time = t.time()
                 self.__createnotification(message,entry['foiministryrequestid'])
+                createnotification_time = t.time() - createnotification_time
+                print("createnotification_time: %s" % createnotification_time)
+                createcomment_time = t.time()
                 self.__createcomment(entry, message)
+                createcomment_time = t.time() - createcomment_time
+                print("createcomment_time: %s" % createcomment_time)
             return DefaultMethodResult(True,'Legislative reminder notifications created',_today)
         except BusinessException as exception:            
             current_app.logger.error("%s,%s" % ('Legislative reminder Notification Error', exception.message))
