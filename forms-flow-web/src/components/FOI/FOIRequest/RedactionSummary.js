@@ -8,7 +8,7 @@ import Typography from '@material-ui/core/Typography';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 
 
-const RedactionSummary = React.memo(({sections}) => {
+const RedactionSummary = React.memo(({sections, isoipcreview}) => {
   const useStyles = makeStyles({
         heading: {
           color: '#FFF',
@@ -43,7 +43,7 @@ const RedactionSummary = React.memo(({sections}) => {
                 <span>{sections?.Redline}</span>
                 </div>
                 )}
-                {(sections.OIPC && sections?.OIPC !== "") && (
+                {(isoipcreview && sections.OIPC && sections?.OIPC !== "") && (
                 <div style={{margin: "0 20px", paddingTop:"20px"}}>
                 <Typography className={classes.sectionsHeading}>
                   <b>OIPC Redaction Sections Applied</b>
