@@ -25,6 +25,9 @@ from pytz import timezone
 from request_api.services.external.keycloakadminservice import KeycloakAdminService
 from request_api.models.OperatingTeams import OperatingTeam
 import logging
+file = open('common/notificationtypes.json', encoding="utf8")
+notificationtypes_cache = json.load(file)
+
 
 class notificationservice:
     """ FOI notification management service
@@ -273,8 +276,16 @@ class notificationservice:
             notification.idnumber ='U-00' + str(foirequest['requestid'])
             mutenotification = False
 
-        notification.notificationtypelabel = notificationconfig().getnotificationtypelabel(notificationtype)
-        notification.notificationtypeid = notificationconfig().getnotificationtypeid(notificationtype)
+        print("notificationtype", notificationtype)
+        notificationtypes_data = notificationtypes_cache[notificationtype]
+        if notificationtypes_data is None:
+            print('Notification type not found', notificationtype)
+            notification.notificationtypelabel = notificationconfig().getnotificationtypelabel(notificationtype)
+            notification.notificationtypeid = notificationconfig().getnotificationtypeid(notificationtype)
+        else:
+            print('Notification type found', notificationtype)
+            notification.notificationtypelabel =  notificationtypes_data['notificationtypelabel']
+            notification.notificationtypeid = notificationtypes_data['notificationtypeid'] 
         notification.axisnumber = foirequest["axisrequestid"]
         notification.version = foirequest["version"]        
         notification.createdby = userid
