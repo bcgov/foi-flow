@@ -31,7 +31,11 @@ class cfrdateevent(duecalculator):
             print("dismissremindernotification_time: %s" % (dismissremindernotification_time - time))
 
             ca_holidays = self.getholidays()
+            time = t.time()
             _upcomingdues = FOIMinistryRequest.getupcomingcfrduerecords()
+            getupcomingcfrduerecords_time = t.time()
+            print("getupcomingcfrduerecords_time: %s" % (getupcomingcfrduerecords_time - time))
+
             for entry in _upcomingdues:
                 _duedate = self.formatduedate(entry['cfrduedate']) 
                 message = None
