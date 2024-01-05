@@ -276,14 +276,11 @@ class notificationservice:
             notification.idnumber ='U-00' + str(foirequest['requestid'])
             mutenotification = False
 
-        print("notificationtype", notificationtype)
         # in notificationtype remove space and make lower case
         notificationtype_format = notificationtype.replace(" ", "").lower()
-        print ("notificationtype_format", notificationtype_format)
         if notificationtype_format not in notificationtypes_cache:
             print('Notification type not found in enum.', notificationtype)
         else:
-            print('Notification type found', notificationtype)
             notification.notificationtypelabel =  notificationtypes_cache[notificationtype_format]['notificationtypelabel']
             notification.notificationtypeid = notificationtypes_cache[notificationtype_format]['notificationtypeid'] 
         notification.axisnumber = foirequest["axisrequestid"]
