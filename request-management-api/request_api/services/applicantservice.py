@@ -36,7 +36,8 @@ class applicantservice:
         return applicantqueue
     
     def saveapplicantinfo(self, applicantschema, userid):
-        FOIRequestApplicant.saveapplicant(
+        applicant = FOIRequestApplicant.updateapplicantprofile(
+            applicantschema['foiRequestApplicantID'],
             applicantschema['firstName'],
             applicantschema['lastName'],
             applicantschema['middleName'],
@@ -46,6 +47,8 @@ class applicantservice:
             userid
         ) # replace with applicant id once new save function is written
         requests = FOIMinistryRequest.getopenrequestsbyrequestId(applicantschema['foirequestID'])
+        applicantschema['foiRequestApplicantID'] = applicant.identifier
+        # requests = FOIMinistryRequest.getopenrequestsbyapplicantid(applicantschema['foiRequestApplicantID'])
         for request in requests:
             requestschema = requestservicegetter().getrequest(request['foirequest_id'], request['foiministryrequestid'])
             requestschema.update(applicantschema)

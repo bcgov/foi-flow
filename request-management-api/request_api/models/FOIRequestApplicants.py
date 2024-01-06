@@ -10,6 +10,7 @@ from .FOIRequests import FOIRequest
 from .FOIRequestContactInformation import FOIRequestContactInformation
 from .FOIRequestPersonalAttributes import FOIRequestPersonalAttribute
 from sqlalchemy import and_, or_, func, case
+import uuid
 
 class FOIRequestApplicant(db.Model):
     # Name of the table in our database
@@ -17,7 +18,6 @@ class FOIRequestApplicant(db.Model):
     # Defining the columns
     foirequestapplicantid = db.Column(db.Integer, primary_key=True,autoincrement=True)
     
-
     firstname = db.Column(db.String(50), unique=False, nullable=True)
     middlename = db.Column(db.String(50), unique=False, nullable=True)
     lastname = db.Column(db.String(50), unique=False, nullable=True)
@@ -30,43 +30,64 @@ class FOIRequestApplicant(db.Model):
     updated_at = db.Column(db.DateTime, nullable=True)
     createdby = db.Column(db.String(120), unique=False, nullable=True)
     updatedby = db.Column(db.String(120), unique=False, nullable=True)
-    version = db.Column(db.Integer, unique=False, nullable=True)
+    applicantprofileid = db.Column(db.String(120), unique=False, nullable=True)
 
     @classmethod
-    def saveapplicant(cls,firstname, lastname, middlename, businessname, alsoknownas, dob, userid):
-        dbquery = db.session.query(FOIRequestApplicant)
-        ### check the applicantid instead of firstname and lastname
-        dbquery = dbquery.filter_by(firstname=firstname)
-        applicant = dbquery.filter_by(lastname=lastname)
-        if (applicant.count() > 0):
-            _applicant = {
-                FOIRequestApplicant.updatedby: userid, 
-                FOIRequestApplicant.updated_at: datetime.now(),
-                FOIRequestApplicant.middlename: middlename,
-                FOIRequestApplicant.businessname: businessname,
-                FOIRequestApplicant.alsoknownas: alsoknownas
-            }
-            if dob is not None and dob != "":
-                _applicant[FOIRequestApplicant.dob] = dob
-            else:
-                _applicant[FOIRequestApplicant.dob] = None
-            applicant.update(_applicant)
-            return DefaultMethodResult(True,'Applicant updated',applicant.first().foirequestapplicantid)
+    def createapplicant(cls, firstname, lastname, middlename, businessname, alsoknownas, dob, userid):
+        applicant = FOIRequestApplicant()
+        applicant.createdby = userid
+        applicant.firstname = firstname
+        applicant.lastname = lastname
+        applicant.middlename = middlename
+        applicant.businessname = businessname
+        applicant.alsoknownas = alsoknownas
+        if dob is not None and dob != "":
+            applicant.dob = dob
         else:
-            applicant = FOIRequestApplicant()
-            applicant.createdby = userid
-            applicant.firstname = firstname
-            applicant.lastname = lastname
-            applicant.middlename = middlename
-            applicant.businessname = businessname
-            applicant.alsoknownas = alsoknownas
+            applicant.dob = None
+        db.session.add(applicant)
+        db.session.commit()               
+        return DefaultMethodResult(True,'Applicant added',applicant.foirequestapplicantid)
+
+    @classmethod
+    def updateapplicantprofile(cls, foirequestapplicantid, firstname, lastname, middlename, businessname, alsoknownas, dob, userid):
+        applicant_query = db.session.query(
+                                        FOIRequestApplicant
+                                    ).filter_by(
+                                        foirequestapplicantid = foirequestapplicantid
+                                    )
+        applicant = applicant_query.first()
+
+        # create an applicant profile id if it's not set
+        if(applicant.applicantprofileid is None):
+            # applicant.isactive = False
+            applicant_query.update({FOIRequestApplicant.applicantprofileid:str(uuid.uuid4())})
+
+        if(
+            applicant.firstname != firstname
+            or applicant.lastname != lastname
+            or applicant.middlename != middlename
+            or applicant.businessname != businessname
+            or applicant.alsoknownas != alsoknownas
+            or applicant.dob != dob
+        ):
+            _applicant = FOIRequestApplicant()
+            _applicant.createdby = userid
+            _applicant.firstname = firstname
+            _applicant.lastname = lastname
+            _applicant.middlename = middlename
+            _applicant.businessname = businessname
+            _applicant.alsoknownas = alsoknownas
+            _applicant.applicantprofileid = applicant.applicantprofileid
             if dob is not None and dob != "":
-                applicant.dob = dob
+                _applicant.dob = dob
             else:
-                applicant.dob = None
-            db.session.add(applicant)
+                _applicant.dob = None
+            db.session.add(_applicant)
             db.session.commit()               
-            return DefaultMethodResult(True,'Applicant added',applicant.foirequestapplicantid)
+            return DefaultMethodResult(True,'Applicant profile updated',_applicant.foirequestapplicantid)
+        else:
+            return DefaultMethodResult(True,'No update',applicant.foirequestapplicantid)
 
     # Search applicant by email
     @classmethod
@@ -112,7 +133,6 @@ class FOIRequestApplicant(db.Model):
             FOIRequestApplicant.alsoknownas.label('alsoknownas'),
             func.to_char(FOIRequestApplicant.dob, 'YYYY-MM-DD').label('dob'),
             FOIRequestApplicant.businessname.label('businessname'),
-            FOIRequestApplicant.version.label('applicantversion'),
             FOIRequest.foirequestid.label('foirequestid'),
             FOIRequest.version.label('foirequestversion'),
             FOIRequest.requesttype.label('requesttype'),
@@ -144,11 +164,11 @@ class FOIRequestApplicant(db.Model):
                                     FOIRequestApplicantMapping.requestortypeid == 1),
                             ).join(
                                 FOIRequestApplicant,
-                                # FOIRequestApplicant.foirequestapplicantid == FOIRequestApplicantMapping.foirequestapplicantid
-                                and_(
-                                    FOIRequestApplicant.foirequestapplicantid == FOIRequestApplicantMapping.foirequestapplicantid,
-                                    FOIRequestApplicant.version == FOIRequestApplicantMapping.foirequestapplicant_version
-                                )
+                                FOIRequestApplicant.foirequestapplicantid == FOIRequestApplicantMapping.foirequestapplicantid
+                                # and_(
+                                #     FOIRequestApplicant.foirequestapplicantid == FOIRequestApplicantMapping.foirequestapplicantid,
+                                #     FOIRequestApplicant.isactive != False
+                                # )
                             ).join(
                                 ApplicantCategory,
                                 ApplicantCategory.applicantcategoryid == FOIRequest.applicantcategoryid
@@ -298,7 +318,6 @@ class FOIRequestApplicant(db.Model):
             func.array_agg(subquery_all.c.alsoknownas).label('alsoknownas'),
             func.array_agg(subquery_all.c.dob).label('dob'),
             func.array_agg(subquery_all.c.businessname).label('businessname'),
-            subquery_all.c.applicantversion,
             func.array_agg(subquery_all.c.foirequestid).label('foirequestid'),
             func.array_agg(subquery_all.c.foirequestversion).label('foirequestversion'),
             func.array_agg(subquery_all.c.requesttype).label('requesttype'),
@@ -317,7 +336,7 @@ class FOIRequestApplicant(db.Model):
             func.array_agg(subquery_all.c.employeenumber).label('employeenumber'),
             func.array_agg(subquery_all.c.correctionnumber).label('correctionnumber'),
             func.array_agg(subquery_all.c.phn).label('phn')
-        ).group_by(subquery_all.c.foirequestapplicantid, subquery_all.c.applicantversion)
+        ).group_by(subquery_all.c.foirequestapplicantid)
 
         applicantprofile_schema = ApplicantProfileSchema(many=True)
         return applicantprofile_schema.dump(query_aggregate.all())
@@ -366,7 +385,6 @@ class FOIRequestApplicant(db.Model):
             FOIRequestApplicant.alsoknownas.label('alsoknownas'),
             func.to_char(FOIRequestApplicant.dob, 'YYYY-MM-DD').label('dob'),
             FOIRequestApplicant.businessname.label('businessname'),
-            FOIRequestApplicant.version.label('applicantversion'),
             FOIRequest.foirequestid.label('foirequestid'),
             FOIRequest.version.label('foirequestversion'),
             FOIRequest.requesttype.label('requesttype'),
@@ -397,11 +415,11 @@ class FOIRequestApplicant(db.Model):
                                     FOIRequestApplicantMapping.requestortypeid == 1),
                             ).join(
                                 FOIRequestApplicant,
-                                # FOIRequestApplicant.foirequestapplicantid == FOIRequestApplicantMapping.foirequestapplicantid
-                                and_(
-                                    FOIRequestApplicant.foirequestapplicantid == FOIRequestApplicantMapping.foirequestapplicantid,
-                                    FOIRequestApplicant.version == FOIRequestApplicantMapping.foirequestapplicant_version
-                                )
+                                FOIRequestApplicant.foirequestapplicantid == FOIRequestApplicantMapping.foirequestapplicantid
+                                # and_(
+                                #     FOIRequestApplicant.foirequestapplicantid == FOIRequestApplicantMapping.foirequestapplicantid,
+                                #     FOIRequestApplicant.isactive != False
+                                # )
                             ).join(
                                 ApplicantCategory,
                                 ApplicantCategory.applicantcategoryid == FOIRequest.applicantcategoryid
@@ -542,7 +560,6 @@ class FOIRequestApplicant(db.Model):
             func.array_agg(subquery_all.c.alsoknownas).label('alsoknownas'),
             func.array_agg(subquery_all.c.dob).label('dob'),
             func.array_agg(subquery_all.c.businessname).label('businessname'),
-            subquery_all.c.applicantversion,
             func.array_agg(subquery_all.c.foirequestid).label('foirequestid'),
             func.array_agg(subquery_all.c.foirequestversion).label('foirequestversion'),
             func.array_agg(subquery_all.c.requesttype).label('requesttype'),
@@ -561,7 +578,7 @@ class FOIRequestApplicant(db.Model):
             func.array_agg(subquery_all.c.employeenumber).label('employeenumber'),
             func.array_agg(subquery_all.c.correctionnumber).label('correctionnumber'),
             func.array_agg(subquery_all.c.phn).label('phn')
-        ).group_by(subquery_all.c.foirequestapplicantid, subquery_all.c.applicantversion)
+        ).group_by(subquery_all.c.foirequestapplicantid)
 
         applicantprofile_schema = ApplicantProfileSchema(many=True)
         return applicantprofile_schema.dump(query_aggregate.all())
@@ -601,6 +618,6 @@ class FOIRequestApplicantSchema(ma.Schema):
 class ApplicantProfileSchema(ma.Schema):
     class Meta:
         fields = ('foirequestapplicantid','firstname','middlename','lastname','alsoknownas','dob',
-                  'businessname','applicantversion','foirequestid','foirequestversion','requesttype',
-                  'applicantcategory','email','address','city','province','postal','country','homephone','workphone','workphone2','mobilephone',
-                  'othercontactinfo','employeenumber','correctionnumber','phn')
+                  'businessname','foirequestid','foirequestversion','requesttype','applicantcategory',
+                  'email','address','city','province','postal','country','homephone','workphone',
+                  'workphone2','mobilephone','othercontactinfo','employeenumber','correctionnumber','phn')

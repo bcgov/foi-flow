@@ -109,7 +109,7 @@ class requestservicebuilder(requestserviceconfigurator):
     
     def createapplicant(self,firstname, lastname, appltcategory, userid, middlename = None,businessname = None, alsoknownas = None, dob = None):
         requestapplicant = FOIRequestApplicantMapping()
-        _applicant = FOIRequestApplicant().saveapplicant(firstname, lastname, middlename, businessname, alsoknownas, dob, userid)
+        _applicant = FOIRequestApplicant().createapplicant(firstname, lastname, middlename, businessname, alsoknownas, dob, userid)
         requestapplicant.foirequestapplicantid = _applicant.identifier
         if appltcategory is not None:           
             requestertype = RequestorType().getrequestortype(appltcategory)  

@@ -29,9 +29,7 @@ class FOIRequestApplicantMapping(db.Model):
     requestortype =  relationship("RequestorType",backref=backref("RequestorTypes"),uselist=False)
 
     foirequestapplicantid = db.Column(db.Integer,ForeignKey('FOIRequestApplicants.foirequestapplicantid'))
-    foirequestapplicant_version = db.Column(db.Integer, ForeignKey('FOIRequestApplicants.version'))
-    foirequestapplicant = relationship('FOIRequestApplicant', primaryjoin="and_(FOIRequestApplicant.foirequestapplicantid==FOIRequestApplicantMapping.foirequestapplicantid, "
-                        "FOIRequestApplicant.version==FOIRequestApplicantMapping.foirequestapplicant_version)")
+    foirequestapplicant =  relationship("FOIRequestApplicant",backref=backref("FOIRequestApplicants"),uselist=False)
 
     foirequest_id =db.Column(db.Integer, ForeignKey('FOIRequests.foirequestid'))
     foirequestversion_id = db.Column(db.Integer, ForeignKey('FOIRequests.version'))

@@ -111,3 +111,22 @@ class EventPagination(Resource):
         except BusinessException as exception:
             return {'status': exception.status_code, 'message':exception.message}, 500 
         
+@cors_preflight('POST,OPTIONS')
+@API.route('/foiapplicants/testsave')
+class EventPagination(Resource):
+    """ Saves applicant info and request specific contact info for all open requests associated to an applicant
+    """
+    @staticmethod
+    @TRACER.trace()
+    @cross_origin(origins=allowedorigins())
+    @cors_preflight('POST,OPTIONS')
+    def post():
+        try:
+            applicant = FOIRequestApplicantSchema().load(request.get_json())
+            result = applicantservice().saveapplicantinfo(applicant, AuthHelper.getuserid())                
+            if result.success:
+                return {'status': result.success, 'message':result.message,'id':result.identifier} , 200
+            else:
+                return {'status': False, 'message':EXCEPTION_MESSAGE_NOT_FOUND}, 404  
+        except BusinessException as exception:
+            return {'status': exception.status_code, 'message':exception.message}, 500 

@@ -230,6 +230,30 @@ class FOIMinistryRequest(db.Model):
             FOIMinistryRequest.requeststatusid != 3
         ).order_by(FOIMinistryRequest.foiministryrequestid.asc(), FOIMinistryRequest.version.asc())
         return [r._asdict() for r in query]
+    
+    @classmethod
+    def getopenrequestsbyapplicantid(cls,applicantid):
+        selectedcolumns = [FOIMinistryRequest.foirequest_id, FOIMinistryRequest.foiministryrequestid]
+        query = db.session.query(
+                                *selectedcolumns
+                            ).distinct(
+                                FOIMinistryRequest.foiministryrequestid
+                            ).join(
+                                FOIRequestApplicantMapping,
+                                and_(
+                                    FOIRequestApplicantMapping.foirequest_id == FOIMinistryRequest.foirequest_id,
+                                    FOIRequestApplicantMapping.foirequestversion_id == FOIMinistryRequest.foirequestversion_id,
+                                    FOIRequestApplicantMapping.requestortypeid == RequestorType['applicant'].value)
+                            ).join(
+                                FOIRequestApplicant,
+                                FOIRequestApplicant.foirequestapplicantid == FOIRequestApplicantMapping.foirequestapplicantid,
+                            ).filter(
+                                FOIRequestApplicant.foirequestapplicantid == applicantid,
+                                FOIMinistryRequest.requeststatusid != 3
+                            ).order_by(
+                                FOIMinistryRequest.foiministryrequestid.asc(),
+                                FOIMinistryRequest.version.asc())
+        return [r._asdict() for r in query]
 
     @classmethod
     def getrequeststatusById(cls,ministryrequestid):

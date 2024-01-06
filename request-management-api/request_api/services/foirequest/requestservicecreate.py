@@ -61,7 +61,7 @@ class requestservicecreate:
             else:
                 return _foirequest  
             self.__disablewatchers(ministryid, foirequestschema, userid)
-            result = self.saverequest(foirequestschema, userid, foirequestid,ministryid,filenumber,activeversion,_foirequest["foirawrequestid"],_foirequest["wfinstanceid"])    
+            result = self.saverequest(foirequestschema, userid, foirequestid,ministryid,filenumber,activeversion,_foirequest["foirawrequestid"],_foirequest["wfinstanceid"])
             if result.success == True:
                 FOIMinistryRequest.deActivateFileNumberVersion(ministryid, filenumber, userid)
             return result
@@ -127,7 +127,7 @@ class requestservicecreate:
         requestapplicantarr = []
         selfalsoknownas=None
         selfdob=None
-        if  foirequestschema.get("additionalPersonalInfo") is not None and foirequestschema.get('requeststatusid') == 1:
+        if foirequestschema.get("additionalPersonalInfo") is not None and foirequestschema.get('requeststatusid') == 1:
             if foirequestschema.get('foiRequestApplicantID', None):
                 requestapplicant = FOIRequestApplicantMapping()
                 requestapplicant.foirequestapplicantid = foirequestschema['foiRequestApplicantID']
