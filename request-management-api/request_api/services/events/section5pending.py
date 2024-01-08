@@ -4,6 +4,7 @@ from request_api.services.commons.duecalculator import duecalculator
 from request_api.services.notificationservice import notificationservice
 from request_api.services.commentservice import commentservice
 from request_api.models.FOIRawRequests import FOIRawRequest
+from request_api.models.NotificationTypes import NotificationType
 from request_api.models.default_method_result import DefaultMethodResult
 from enum import Enum
 from request_api.exceptions import BusinessException
@@ -20,6 +21,7 @@ class section5pendingevent(duecalculator):
             _today = self.gettoday()
             notificationservice().dismissremindernotification("rawrequest", self.__notificationtype())
             section5pendings = FOIRawRequest.getlatestsection5pendings()
+            notificationtype = NotificationType().getnotificationtypeid(self.__notificationtype())
             for entry in section5pendings:
                 _dateofstatechange = datetimehandler().formatdate(entry['created_at'])
                 businessdayselapsed = self.getbusinessdaysbetween(_dateofstatechange)
@@ -32,15 +34,15 @@ class section5pendingevent(duecalculator):
                             commentexists = True
                     if not commentexists:
                         self.__createcomment(entry, message)
-                    self.__createnotification(message, entry['requestid'])
+                    self.__createnotification(message, entry['requestid'], notificationtype)
             return DefaultMethodResult(True,'Section 5 Pending passed due notification created',_today)
         except BusinessException as exception:            
             current_app.logger.error("%s,%s" % ('Section 5 Pending passed due notification Error', exception.message))
             return DefaultMethodResult(False,'Section 5 Pending passed due notification failed',_today)     
         
-    def __createnotification(self, message, requestid):
+    def __createnotification(self, message, requestid, notificationtype):
         if message is not None: 
-            return notificationservice().createremindernotification({"message" : message}, requestid, "rawrequest", self.__notificationtype(), self.__defaultuserid())
+            return notificationservice().createremindernotification({"message" : message}, requestid, "rawrequest", notificationtype, self.__defaultuserid())
         
     def __createcomment(self, entry, message):
         if message is not None: 

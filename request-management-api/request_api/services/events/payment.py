@@ -6,6 +6,7 @@ from request_api.services.notificationservice import notificationservice
 from request_api.models.FOIMinistryRequests import FOIMinistryRequest
 from request_api.models.FOIRawRequests import FOIRawRequest
 from request_api.models.FOIRequestStatus import FOIRequestStatus
+from request_api.models.NotificationTypes import NotificationType
 import json
 from request_api.models.default_method_result import DefaultMethodResult
 from enum import Enum
@@ -46,6 +47,7 @@ class paymentevent:
             notificationservice().dismissremindernotification("rawrequest", self.__notificationtype())
             eventtype = PaymentEventType.reminder.value
             _onholdrequests = FOIRawRequest.getappfeeowingrequests()
+            notificationtype = NotificationType().getnotificationtypeid(self.__notificationtype())
             for entry in _onholdrequests:
                 _dateofstatechange = datetimehandler().formatdate(entry['updated_at'])
                 businessdayselapsed = duecalculator().getbusinessdaysbetween(_dateofstatechange)
@@ -57,7 +59,7 @@ class paymentevent:
                             commentexists = True
                     if not commentexists:
                         self.__createcommentforrawrequest(entry['requestid'], eventtype)
-                    self.__createnotificationforrawrequest(entry['requestid'], eventtype)
+                    self.__createnotificationforrawrequest(entry['requestid'], eventtype, notificationtype)
             return DefaultMethodResult(True,'Payment reminder notifications created',_today)
         except BusinessException as exception:
             current_app.logger.error("%s,%s" % ('Payment reminder Notification Error', exception.message))
@@ -67,17 +69,18 @@ class paymentevent:
         comment = self.__preparecomment(requestid, eventtype)
         return commentservice().createrawrequestcomment(comment, "system", 2)
 
-    def __createnotificationforrawrequest(self, requestid, eventtype):
+    def __createnotificationforrawrequest(self, requestid, eventtype, notificationtype):
         notification = self.__preparenotification(requestid, eventtype)
-        return notificationservice().createnotification({"message" : notification}, requestid, "rawrequest", self.__notificationtype(), "system")
+        return notificationservice().createnotification({"message" : notification}, requestid, "rawrequest", notificationtype, "system")
 
     def __createcomment(self, requestid, eventtype):
         comment = self.__preparecomment(requestid, eventtype)
         return commentservice().createministryrequestcomment(comment, self.__defaultuserid(), 2)
 
     def __createnotification(self, requestid, eventtype):
+        notificationtype = NotificationType().getnotificationtypeid(self.__notificationtype())
         notification = self.__preparenotification(requestid, eventtype)
-        return notificationservice().createnotification({"message" : notification}, requestid, "ministryrequest", "Payment", self.__defaultuserid())
+        return notificationservice().createnotification({"message" : notification}, requestid, "ministryrequest", notificationtype, self.__defaultuserid())
 
     def __preparenotification(self, requestid, eventtype):
         return self.__notificationmessage(requestid, eventtype)

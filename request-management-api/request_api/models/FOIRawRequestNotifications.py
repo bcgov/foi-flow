@@ -27,6 +27,7 @@ class FOIRawRequestNotification(db.Model):
     updated_at = db.Column(db.DateTime, nullable=True)
     updatedby = db.Column(db.String(120), unique=False, nullable=True)
 
+    notificationtypeid = db.Column(db.Integer, nullable=False)
     notificationtypelabel = db.Column(db.Integer, nullable=False)
     
     notificationusers = db.relationship('FOIRawRequestNotificationUser', backref='FOIRawRequestNotifications', lazy='dynamic')

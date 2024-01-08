@@ -5,6 +5,7 @@ from request_api.services.notificationservice import notificationservice
 from request_api.services.commentservice import commentservice
 from request_api.models.FOIMinistryRequests import FOIMinistryRequest
 from request_api.models.FOIRequestComments import FOIRequestComment
+from request_api.models.NotificationTypes import NotificationType
 import json
 from request_api.models.default_method_result import DefaultMethodResult
 from enum import Enum
@@ -26,6 +27,7 @@ class divisiondateevent(duecalculator):
             notificationservice().dismissremindernotification("ministryrequest", self.__notificationtype())            
             ca_holidays = self.getholidays()
             _upcomingdues = FOIMinistryRequest.getupcomingdivisionduerecords()
+            notificationtype = NotificationType().getnotificationtypeid(self.__notificationtype())
             for entry in _upcomingdues:
                 _duedate = self.formatduedate(entry['duedate'])
                 message = None
@@ -33,16 +35,16 @@ class divisiondateevent(duecalculator):
                     message = self.__todayduemessage(entry)     
                 elif  self.getpreviousbusinessday(entry['duedate'],ca_holidays) == _today:
                     message = self.__upcomingduemessage(entry)
-                self.__createnotification(message,entry['foiministryrequestid'])
+                self.__createnotification(message,entry['foiministryrequestid'], notificationtype)
                 self.__createcomment(entry, message)
             return DefaultMethodResult(True,'Division reminder notifications created',_today)
         except BusinessException as exception:            
             current_app.logger.error("%s,%s" % ('Legislative reminder Notification Error', exception.message))
             return DefaultMethodResult(False,'Division reminder notifications failed',_today)
 
-    def __createnotification(self, message, requestid):
+    def __createnotification(self, message, requestid, notificationtype):
         if message is not None: 
-            return notificationservice().createnotification({"message" : message}, requestid, "ministryrequest", self.__notificationtype(), self.__defaultuserid(), False)
+            return notificationservice().createnotification({"message" : message}, requestid, "ministryrequest", notificationtype, self.__defaultuserid(), False)
         
     def __createcomment(self, entry, message):
         if message is not None: 
