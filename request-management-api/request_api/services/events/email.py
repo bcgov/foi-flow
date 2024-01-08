@@ -7,6 +7,7 @@ from request_api.exceptions import BusinessException
 from request_api.models.FOIRawRequests import FOIRawRequest
 from request_api.models.FOIMinistryRequests import FOIMinistryRequest
 from request_api.models.FOIRequestStatus import FOIRequestStatus
+from request_api.models.NotificationTypes import NotificationType
 import json
 from request_api.models.default_method_result import DefaultMethodResult
 import logging
@@ -35,7 +36,8 @@ class emailevent:
     
     def __createnotification(self, requestid, requesttype, stage):
         notification = self.__preparenotification(stage)
-        return notificationservice().createnotification({"message" : notification}, requestid, requesttype, "Email Failure",  self.__defaultuserid())
+        notificationtype = NotificationType().getnotificationtypeid("Email Failure")
+        return notificationservice().createnotification({"message" : notification}, requestid, requesttype, notificationtype,  self.__defaultuserid())
 
     def __preparenotification(self, stage):
         return self.__notificationmessage(stage)

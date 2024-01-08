@@ -6,6 +6,7 @@ from request_api.services.notificationservice import notificationservice
 from request_api.services.commentservice import commentservice
 from request_api.models.FOIMinistryRequests import FOIMinistryRequest
 from request_api.models.FOIRequestComments import FOIRequestComment
+from request_api.models.NotificationTypes import NotificationType
 import json
 from request_api.models.default_method_result import DefaultMethodResult
 from enum import Enum
@@ -25,37 +26,28 @@ class cfrdateevent(duecalculator):
     def createdueevent(self):
         try: 
             _today = self.gettoday()
-            time = t.time()
             notificationservice().dismissremindernotification("ministryrequest", self.__notificationtype()) 
-            dismissremindernotification_time = t.time()  
-            print("dismissremindernotification_time: %s" % (dismissremindernotification_time - time))
 
             ca_holidays = self.getholidays()
-            time = t.time()
             _upcomingdues = FOIMinistryRequest.getupcomingcfrduerecords()
-            getupcomingcfrduerecords_time = t.time()
-            print("getupcomingcfrduerecords_time: %s" % (getupcomingcfrduerecords_time - time))
-
+            notificationtype = NotificationType().getnotificationtypeid(self.__notificationtype())
             for entry in _upcomingdues:
                 _duedate = self.formatduedate(entry['cfrduedate']) 
                 message = None
                 if  _duedate == _today:                
                     message = self.__todayduemessage()   
                 elif  self.getpreviousbusinessday(entry['cfrduedate'],ca_holidays) == _today:
-                    message = self.__upcomingduemessage(_duedate)
-                createnotification_time = t.time()    
-                self.__createnotification(message,entry['foiministryrequestid'])
+                    message = self.__upcomingduemessage(_duedate)   
+                self.__createnotification(message,entry['foiministryrequestid'], notificationtype)
                 self.__createcomment(entry, message)
-                createnotification_time = t.time() - createnotification_time
-                print("createnotification_time: %s" % createnotification_time)
             return DefaultMethodResult(True,'CFR reminder notifications created',_today)
         except BusinessException as exception:            
             current_app.logger.error("%s,%s" % ('CFR reminder Notification Error', exception.message))
             return DefaultMethodResult(False,'CFR reminder notifications failed',_today)     
         
-    def __createnotification(self, message, requestid):
+    def __createnotification(self, message, requestid, notificationtype):
         if message is not None: 
-            return notificationservice().createremindernotification({"message" : message}, requestid, "ministryrequest", self.__notificationtype(), self.__defaultuserid())
+            return notificationservice().createremindernotification({"message" : message}, requestid, "ministryrequest", notificationtype, self.__defaultuserid())
         
     def __createcomment(self, entry, message):
         if message is not None: 

@@ -58,32 +58,11 @@ class eventservice:
             
     def postreminderevent(self):
         try:
-            start_time = timer.time()
             cfreventresponse = cfrdateevent().createdueevent()
-            cfreventresponse_time = timer.time()
-            print("--- CFR Event Response Time %s seconds ---" % (cfreventresponse_time - start_time))
-            print(f"cfreventresponse = {cfreventresponse.success}") 
-
             legislativeeventresponse = legislativedateevent().createdueevent()
-            legislativeeventresponse_time = timer.time()
-            print("--- Legislative Event Response Time %s seconds ---" % (legislativeeventresponse_time - cfreventresponse_time)) 
-            print(f"legislativeeventresponse = {legislativeeventresponse.success}")  
-
             divisioneventresponse = divisiondateevent().createdueevent() 
-            divisioneventresponse_time = timer.time()
-            print("--- Division Event Response Time %s seconds ---" % (divisioneventresponse_time - legislativeeventresponse_time))  
-            print(f"divisioneventresponse = {divisioneventresponse.success}")
-
             paymentremindereventresponse = paymentevent().createpaymentreminderevent()
-            paymentremindereventresponse_time = timer.time()
-            print("--- Payment Reminder Event Response Time %s seconds ---" % (paymentremindereventresponse_time - divisioneventresponse_time))
-            print(f"paymentremindereventresponse = {paymentremindereventresponse.success}")
-
             section5pendingresponse = section5pendingevent().createdueevent()
-            section5pendingresponse_time = timer.time()
-            print("--- Section 5 Pending Event Response Time %s seconds ---" % (section5pendingresponse_time - paymentremindereventresponse_time))
-            print(f"section5pendingresponse = {section5pendingresponse.success}")
-            
             if cfreventresponse.success == False or legislativeeventresponse.success == False or divisioneventresponse.success == False or paymentremindereventresponse.success == False or section5pendingresponse == False:
                 current_app.logger.error("FOI Notification failed for reminder event response=%s ; legislative response=%s ; division response=%s ; payment response=%s ; section5pending response=%s" % (cfreventresponse.message, legislativeeventresponse.message, divisioneventresponse.message, paymentremindereventresponse.message, section5pendingresponse.message))
                 return DefaultMethodResult(False,'Due reminder notifications failed',cfreventresponse.identifier)
