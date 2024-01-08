@@ -28,13 +28,13 @@ class notificationconfig:
             id = NotificationType().getnotificationtypeid(notificationtype)
             if id is not None:
                 return id['notificationtypelabel']
-            return 0
+            return None
     
     def getnotificationtypeid(self, notificationtype):
         id = NotificationType().getnotificationtypeid(notificationtype)
         if id is not None:
             return id['notificationtypeid']
-        return 0
+        return None
 
     # This method is used to get the notification user type label
     # It first tries to get the notification user type label from the cache
@@ -48,13 +48,13 @@ class notificationconfig:
             id = NotificationUserType().getnotificationusertypesid(notificationusertype)
             if id is not None:
                 return id['notificationusertypelabel']
-            return 0
+            return None
     
     def getnotificationusertypeid(self, notificationusertype):
         id = NotificationUserType().getnotificationusertypesid(notificationusertype)
         if id is not None:
             return id['notificationusertypeid']
-        return 0
+        return None
     
     def getnotificationdays(self):
         if 'FOI_NOTIFICATION_DAYS' in os.environ and os.getenv('FOI_NOTIFICATION_DAYS') != '':
