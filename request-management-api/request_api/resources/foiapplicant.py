@@ -88,7 +88,8 @@ class EventPagination(Resource):
                     return {'status': False, 'message':EXCEPTION_MESSAGE_NOT_FOUND}, 404  
         except BusinessException as exception:
             return {'status': exception.status_code, 'message':exception.message}, 500 
-        
+
+
 @cors_preflight('POST,OPTIONS')
 @API.route('/foiapplicants/save')
 class EventPagination(Resource):
@@ -110,23 +111,51 @@ class EventPagination(Resource):
                 return {'status': False, 'message':EXCEPTION_MESSAGE_NOT_FOUND}, 404  
         except BusinessException as exception:
             return {'status': exception.status_code, 'message':exception.message}, 500 
-        
-@cors_preflight('POST,OPTIONS')
-@API.route('/foiapplicants/testsave')
-class EventPagination(Resource):
-    """ Saves applicant info and request specific contact info for all open requests associated to an applicant
-    """
+
+
+@cors_preflight('GET,OPTIONS')
+@API.route('/foiapplicants/history/<applicantid>')
+class FOIApplicants(Resource):
+    """Resource for retriving all FOI assignees."""
+
     @staticmethod
     @TRACER.trace()
     @cross_origin(origins=allowedorigins())
-    @cors_preflight('POST,OPTIONS')
-    def post():
+    @auth.require
+    @auth.isiao
+    @cors_preflight('GET,OPTIONS')
+    def get(applicantid=None):
+        if applicantid is None or applicantid == 0:
+            return {'status': False, 'message':EXCEPTION_MESSAGE_BAD_REQUEST}, 400
         try:
-            applicant = FOIRequestApplicantSchema().load(request.get_json())
-            result = applicantservice().saveapplicantinfo(applicant, AuthHelper.getuserid())                
-            if result.success:
-                return {'status': result.success, 'message':result.message,'id':result.identifier} , 200
+            result = applicantservice().getapplicanthistory(applicantid)
+            if result is not None:
+                return json.dumps(result), 200
             else:
-                return {'status': False, 'message':EXCEPTION_MESSAGE_NOT_FOUND}, 404  
-        except BusinessException as exception:
-            return {'status': exception.status_code, 'message':exception.message}, 500 
+                return {'status': False, 'message':EXCEPTION_MESSAGE_NOT_FOUND}, 404
+        except BusinessException as exception:            
+            return {'status': exception.status_code, 'message':exception.message}, 500
+
+
+@cors_preflight('GET,OPTIONS')
+@API.route('/foiapplicants/requests/<applicantid>')
+class FOIApplicants(Resource):
+    """Resource for retriving all FOI assignees."""
+
+    @staticmethod
+    @TRACER.trace()
+    @cross_origin(origins=allowedorigins())
+    @auth.require
+    @auth.isiao
+    @cors_preflight('GET,OPTIONS')
+    def get(applicantid=None):
+        if applicantid is None or applicantid == 0:
+            return {'status': False, 'message':EXCEPTION_MESSAGE_BAD_REQUEST}, 400
+        try:
+            result = applicantservice().getapplicantrequests(applicantid)
+            if result is not None:
+                return json.dumps(result), 200
+            else:
+                return {'status': False, 'message':EXCEPTION_MESSAGE_NOT_FOUND}, 404
+        except BusinessException as exception:            
+            return {'status': exception.status_code, 'message':exception.message}, 500
