@@ -198,11 +198,11 @@ class notificationservice:
             return DefaultMethodResult(False,'Unable to delete the notifications',userid)
 
     def __dismissnotificationbytype(self, userid, type):
-        typeid = notificationconfig().getnotificationusertypelabel(type)
-        requestnotificationids = self.__getdismissparentidsbyuserandtype("ministryrequest", userid, typeid)
-        requestnotification = FOIRequestNotificationUser.dismissnotificationbyuserandtype(userid, typeid)
-        rawnotificationids = self.__getdismissparentidsbyuserandtype("rawrequest", userid, typeid)
-        rawnotification = FOIRawRequestNotificationUser.dismissnotificationbyuserandtype(userid, typeid)   
+        notificationusertypelabel = notificationconfig().getnotificationusertypelabel(type)
+        requestnotificationids = self.__getdismissparentidsbyuserandtype("ministryrequest", userid, notificationusertypelabel)
+        requestnotification = FOIRequestNotificationUser.dismissnotificationbyuserandtype(userid, notificationusertypelabel)
+        rawnotificationids = self.__getdismissparentidsbyuserandtype("rawrequest", userid, notificationusertypelabel)
+        rawnotification = FOIRawRequestNotificationUser.dismissnotificationbyuserandtype(userid, notificationusertypelabel)   
         prequestnotification = FOIRequestNotification.dismissnotification(requestnotificationids) 
         prawnotification = FOIRawRequestNotification.dismissnotification(rawnotificationids)
         if requestnotification.success == True and rawnotification.success == True and prequestnotification.success == True and prawnotification.success == True:
@@ -243,11 +243,11 @@ class notificationservice:
             _notficationids =  FOIRawRequestNotificationUser.getnotificationsbyuser(userid)
         return self.__filterdismissparentids(_notficationids)
     
-    def __getdismissparentidsbyuserandtype(self, requesttype, userid, typeid):
+    def __getdismissparentidsbyuserandtype(self, requesttype, userid, notificationusertypelabel):
         if requesttype == "ministryrequest":         
-            _notficationids = FOIRequestNotificationUser.getnotificationsbyuserandtype(userid, typeid)
+            _notficationids = FOIRequestNotificationUser.getnotificationsbyuserandtype(userid, notificationusertypelabel)
         else:
-            _notficationids =  FOIRawRequestNotificationUser.getnotificationsbyuserandtype(userid, typeid)
+            _notficationids =  FOIRawRequestNotificationUser.getnotificationsbyuserandtype(userid, notificationusertypelabel)
         return self.__filterdismissparentids(_notficationids)
 
     def __filterdismissparentids(self,_notficationids):
