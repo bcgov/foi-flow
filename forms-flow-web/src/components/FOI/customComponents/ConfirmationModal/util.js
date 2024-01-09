@@ -67,9 +67,9 @@ import { getFullnameList } from "../../../../helper/FOI/helper";
       case StateEnum.review.name.toLowerCase():
         if(!allowStateChange)
           return {title: "Changing the state", body: `Unable to change state until fee estimate actuals have been completed.`};
-        else if (!isAnyAmountPaid &&  _saveRequestObject.requeststatusid === StateEnum.callforrecords.id)
+        else if (!isAnyAmountPaid &&  _saveRequestObject.requeststatuslabel === StateEnum.callforrecords.label)
           return {title: "Review Request", body: `Upload completed Call for Records form (if required) to change the state.`};
-        else if (_saveRequestObject.requeststatusid === StateEnum.harms.id)
+        else if (_saveRequestObject.requeststatuslabel === StateEnum.harms.label)
           return {title: "Review Request", body: `Upload completed Call for Records form (if required) to change the state.`};
         else
           return {title: "Changing the state", body: `Are you sure you want to change Request #${_requestNumber} to ${StateEnum.review.name}?`};
@@ -122,7 +122,7 @@ import { getFullnameList } from "../../../../helper/FOI/helper";
                 body: <>Are you sure you want to change Request #{_requestNumber} to on hold? <br/> <b>This will stop the clock and automatically email the applicant the fee estimate.</b> </>};
             }
       case StateEnum.response.name.toLowerCase():
-        if (_saveRequestObject.requeststatusid === StateEnum.signoff.id)
+        if (_saveRequestObject.requeststatuslabel === StateEnum.signoff.label)
           return {title: "Ministry Sign Off", body: `Upload eApproval Logs, and enter in required approval fields to verify Ministry Approval and then change the state.`};
         else
           return {title: "Changing the state", body: `Are you sure you want to change Request #${_requestNumber} to ${StateEnum.response.name}?`};

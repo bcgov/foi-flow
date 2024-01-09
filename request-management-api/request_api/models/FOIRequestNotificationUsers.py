@@ -12,6 +12,8 @@ from sqlalchemy.sql.expression import distinct
 from sqlalchemy import text
 import logging
 import json
+f = open('common/notificationtypes.json', encoding="utf8")
+notificationtypes_cache = json.load(f)
 
 
 from .FOIRequestApplicantMappings import FOIRequestApplicantMapping
@@ -49,7 +51,7 @@ class FOIRequestNotificationUser(db.Model):
     createdby = db.Column(db.String(120), unique=False, nullable=True)
     updated_at = db.Column(db.DateTime, nullable=True)
     updatedby = db.Column(db.String(120), unique=False, nullable=True)
-
+    notificationusertypelabel = db.Column(db.String(100),nullable=False)
     notificationusertypeid = db.Column(db.Integer,nullable=False)
 
 
@@ -71,8 +73,8 @@ class FOIRequestNotificationUser(db.Model):
         return DefaultMethodResult(True,'Notifications deleted for user',userid)
 
     @classmethod
-    def dismissnotificationbyuserandtype(cls, userid, notificationusertypeid):
-        db.session.query(FOIRequestNotificationUser).filter(FOIRequestNotificationUser.userid == userid, FOIRequestNotificationUser.notificationusertypeid == notificationusertypeid).update({FOIRequestNotificationUser.isdeleted: True, FOIRequestNotificationUser.updatedby: userid,
+    def dismissnotificationbyuserandtype(cls, userid, notificationusertypelabel):
+        db.session.query(FOIRequestNotificationUser).filter(FOIRequestNotificationUser.userid == userid, FOIRequestNotificationUser.notificationusertypelabel == notificationusertypelabel).update({FOIRequestNotificationUser.isdeleted: True, FOIRequestNotificationUser.updatedby: userid,
                             FOIRequestNotificationUser.updated_at: datetime2.now()})
         db.session.commit()  
         return DefaultMethodResult(True,'Notifications deleted for user',userid)
@@ -118,12 +120,12 @@ class FOIRequestNotificationUser(db.Model):
         return notifications
     
     @classmethod 
-    def getnotificationsbyuserandtype(cls, userid, notificationusertypeid):
+    def getnotificationsbyuserandtype(cls, userid, notificationusertypelabel):
         notifications = []
         try:
             sql = """select notificationid, count(1) as relcount from "FOIRequestNotificationUsers" frnu 
-                    where notificationid in (select notificationid from "FOIRequestNotificationUsers" frnu  where userid = :userid and notificationusertypeid = :notificationusertypeid) group by notificationid """
-            rs = db.session.execute(text(sql), {'userid': userid, 'notificationusertypeid':notificationusertypeid})
+                    where notificationid in (select notificationid from "FOIRequestNotificationUsers" frnu  where userid = :userid and notificationusertypelabel = :notificationusertypelabel) group by notificationid """
+            rs = db.session.execute(text(sql), {'userid': userid, 'notificationusertypelabel':notificationusertypelabel})
             for row in rs:
                 notifications.append({"notificationid": row["notificationid"], "count" : row["relcount"]})
         except Exception as ex:
@@ -212,7 +214,7 @@ class FOIRequestNotificationUser(db.Model):
                             ).join(
                                 FOINotifications,    
                                 and_(FOINotifications.axisnumber == FOIRequests.axisrequestid),
-                            ).filter(FOIRequests.requeststatusid != 3)
+                            ).filter(FOIRequests.requeststatuslabel != StateName.closed.name)
                             
         if(additionalfilter == 'watchingRequests'):
             #watchby
@@ -223,9 +225,9 @@ class FOIRequestNotificationUser(db.Model):
         elif(additionalfilter == 'myRequests'):
             #myrequest
             if(requestby == 'IAO'):
-                dbquery = basequery.filter(or_(and_(FOIRequests.assignedto == userid, ministryfilter),and_(FOINotifications.userid == userid, FOINotifications.notificationtypeid == 10)))
+                dbquery = basequery.filter(or_(and_(FOIRequests.assignedto == userid, ministryfilter),and_(FOINotifications.userid == userid, FOINotifications.notificationtypelabel == notificationtypes_cache['taggedusercomments']['notificationtypelabel'])))
             else:
-                dbquery = basequery.filter(or_(and_(FOIRequests.assignedministryperson == userid, ministryfilter),and_(FOINotifications.userid == userid, FOINotifications.notificationtypeid == 10)))
+                dbquery = basequery.filter(or_(and_(FOIRequests.assignedministryperson == userid, ministryfilter),and_(FOINotifications.userid == userid, FOINotifications.notificationtypelabel == notificationtypes_cache['taggedusercomments']['notificationtypelabel'])))
         else:
             if(isiaorestrictedfilemanager == True or isministryrestrictedfilemanager == True):
                 dbquery = basequery
@@ -262,7 +264,7 @@ class FOIRequestNotificationUser(db.Model):
                             FOIRequests.assignedgroup == group,
                             and_(
                                 FOIRequests.assignedgroup == IAOTeamWithKeycloackGroup.flex.value,
-                                FOIRequests.requeststatusid.in_([1])
+                                FOIRequests.requeststatuslabel.in_([StateName.open.name])
                             )
                         )
                     )
@@ -272,7 +274,7 @@ class FOIRequestNotificationUser(db.Model):
                             FOIRequests.assignedgroup == group,
                             and_(
                                 FOIRequests.assignedministrygroup == group,
-                                FOIRequests.requeststatusid.in_([2,7,9,8,10,11,12,13,14,17,18])
+                                FOIRequests.requeststatuslabel.in_([StateName.callforrecords.name,StateName.recordsreview.name,StateName.feeestimate.name,StateName.consult.name,StateName.ministrysignoff.name,StateName.onhold.name,StateName.deduplication.name,StateName.harmsassessment.name,StateName.response.name,StateName.tagging.name,StateName.readytoscan.name])
                             )
                         )
                     )
@@ -333,4 +335,4 @@ class FOIRequestNotificationUser(db.Model):
         
 class FOIRequestNotificationUserSchema(ma.Schema):
     class Meta:
-        fields = ('notificationid', 'userid','notificationusertypeid','created_at','createdby','updated_at','updatedby') 
+        fields = ('notificationid', 'userid','notificationusertypeid', 'notificationusertypelabel','created_at','createdby','updated_at','updatedby') 

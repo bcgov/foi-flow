@@ -3,55 +3,58 @@ from os import stat
 from re import VERBOSE
 import json
 import os
+from request_api.models.NotificationTypes import NotificationType
+from request_api.models.NotificationUserTypes import NotificationUserType
+notificationuserfile = open('common/notificationusertypes.json', encoding="utf8")
+notificationusertypes_cache = json.load(notificationuserfile)
+
+notificationfile = open('common/notificationtypes.json', encoding="utf8")
+notificationtypes_cache = json.load(notificationfile)
 
 class notificationconfig:
     """ Notfication config
 
     """
+
+    # This method is used to get the notification user type label
+    # It first tries to get the notification user type label from the cache
+    # If it is not found in the cache, it fetches it from the DB
+    def getnotificationtypelabel(self, notificationtype):
+        notificationtype_format = notificationtype.replace(" ", "").lower()
+        if notificationtype_format in notificationtypes_cache:
+            return notificationtypes_cache[notificationtype_format]['notificationtypelabel']
+        else:
+            print("Notification type not found in json. Fetching from DB", notificationtype)
+            id = NotificationType().getnotificationtypeid(notificationtype)
+            if id is not None:
+                return id['notificationtypelabel']
+            return None
     
     def getnotificationtypeid(self, notificationtype):
-        if notificationtype == "State":
-            return 1
-        elif notificationtype == "Extension":
-            return 4 
-        elif "IAO Assignment" in notificationtype:
-            return 5   
-        elif "Ministry Assignment" in notificationtype:
-            return 6  
-        elif notificationtype == "CFR Due Reminder":
-            return 7
-        elif notificationtype == "Legislative Due Reminder":
-            return 8 
-        elif notificationtype == "New User Comments":
-            return 3   
-        elif notificationtype == "Reply User Comments":
-            return 9  
-        elif notificationtype == "Tagged User Comments":
-            return 10 
-        elif notificationtype == "CFR Fee Form":
-            return 11  
-        elif notificationtype == "Group Members":
-            return 12        
-        elif notificationtype == "Division Due Reminder":
-            return 13
-        elif notificationtype == "Watcher":
-            return 14
-        elif notificationtype == "User Assignment Removal":
-            return 15
-        elif notificationtype == "Email Failure":
-            return 16 
-        elif notificationtype == "Payment":
-            return 17
-        elif notificationtype == "Section 5 Pending Reminder":
-            return 20             
-        return 0     
+        id = NotificationType().getnotificationtypeid(notificationtype)
+        if id is not None:
+            return id['notificationtypeid']
+        return None
+
+    # This method is used to get the notification user type label
+    # It first tries to get the notification user type label from the cache
+    # If it is not found in the cache, it fetches it from the DB
+    def getnotificationusertypelabel(self, notificationusertype):
+        notificationusertype_format = notificationusertype.replace(" ", "").lower()
+        if notificationusertype_format in notificationusertypes_cache:
+            return notificationusertypes_cache[notificationusertype_format]['notificationusertypelabel']
+        else:
+            print("Notification user type not found in json. Fetching from DB", notificationusertype)
+            id = NotificationUserType().getnotificationusertypesid(notificationusertype)
+            if id is not None:
+                return id['notificationusertypelabel']
+            return None
     
     def getnotificationusertypeid(self, notificationusertype):
-        if notificationusertype.lower() == "watcher":
-            return 1
-        elif notificationusertype.lower() == "assignee" or "comment"  or "group members" in notificationusertype.lower():
-            return 2
-        return 0
+        id = NotificationUserType().getnotificationusertypesid(notificationusertype)
+        if id is not None:
+            return id['notificationusertypeid']
+        return None
     
     def getnotificationdays(self):
         if 'FOI_NOTIFICATION_DAYS' in os.environ and os.getenv('FOI_NOTIFICATION_DAYS') != '':

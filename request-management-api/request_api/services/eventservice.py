@@ -17,6 +17,7 @@ from request_api.services.events.section5pending import section5pendingevent
 from request_api.models.default_method_result import DefaultMethodResult
 from request_api.exceptions import BusinessException
 from request_api.utils.enums import PaymentEventType
+import time as timer
 
 import json
 from flask import current_app
@@ -57,9 +58,9 @@ class eventservice:
             
     def postreminderevent(self):
         try:
-            cfreventresponse = cfrdateevent().createdueevent() 
-            legislativeeventresponse = legislativedateevent().createdueevent()   
-            divisioneventresponse = divisiondateevent().createdueevent()   
+            cfreventresponse = cfrdateevent().createdueevent()
+            legislativeeventresponse = legislativedateevent().createdueevent()
+            divisioneventresponse = divisiondateevent().createdueevent() 
             paymentremindereventresponse = paymentevent().createpaymentreminderevent()
             section5pendingresponse = section5pendingevent().createdueevent()
             if cfreventresponse.success == False or legislativeeventresponse.success == False or divisioneventresponse.success == False or paymentremindereventresponse.success == False or section5pendingresponse == False:

@@ -15,6 +15,7 @@ from request_api.models.FOIRawRequestNotifications import FOIRawRequestNotificat
 from request_api.models.FOIRawRequestNotificationUsers import FOIRawRequestNotificationUser
 from request_api.models.FOIRawRequestComments import FOIRawRequestComment
 from request_api.models.FOIRequestComments import FOIRequestComment
+from request_api.models.NotificationTypes import NotificationType
 from request_api.models.default_method_result import DefaultMethodResult
 from datetime import datetime as datetime2
 import os
@@ -25,6 +26,9 @@ from pytz import timezone
 from request_api.services.external.keycloakadminservice import KeycloakAdminService
 from request_api.models.OperatingTeams import OperatingTeam
 import logging
+file = open('common/notificationtypes.json', encoding="utf8")
+notificationtypes_cache = json.load(file)
+
 
 class notificationservice:
     """ FOI notification management service
@@ -33,11 +37,12 @@ class notificationservice:
     def createnotification(self, message, requestid, requesttype, notificationtype, userid, iscleanup=True):
         foirequest = self.getrequest(requestid, requesttype)
         if iscleanup == True:
-            self.__cleanupnotifications(requesttype, notificationtype, foirequest)
+            self.__cleanupnotifications(requesttype, notificationtype['name'], foirequest)
         return self.__createnotification(message, requestid, requesttype, notificationtype, userid, foirequest)
     
-    def createusernotification(self, message, requestid, requesttype, notificationtype, notificationuser, userid):
+    def createusernotification(self, message, requestid, requesttype, notificationtypename, notificationuser, userid):
         foirequest = self.getrequest(requestid, requesttype)
+        notificationtype = NotificationType().getnotificationtypeid(notificationtypename)
         return self.__createnotification(message, requestid, requesttype, notificationtype, userid, foirequest, {"userid": notificationuser})
 
     def createremindernotification(self, message, requestid, requesttype, notificationtype, userid):
@@ -46,13 +51,15 @@ class notificationservice:
     
     def createcommentnotification(self, message, comment, commenttype, requesttype, userid):
         requestid = comment["ministryrequestid"] if requesttype == "ministryrequest" else comment["requestid"]
-        foirequest = self.getrequest(requestid, requesttype)        
-        return  self.__createnotification(message, requestid, requesttype, commenttype, userid, foirequest, comment)
+        foirequest = self.getrequest(requestid, requesttype)
+        notificationtype = NotificationType().getnotificationtypeid(commenttype)     
+        return  self.__createnotification(message, requestid, requesttype, notificationtype, userid, foirequest, comment)
     
     def createwatchernotification(self, message, requesttype, watcher, userid):
         requestid = watcher["ministryrequestid"] if requesttype == "ministryrequest" else watcher["requestid"]
-        foirequest = self.getrequest(requestid, requesttype)   
-        return  self.__createnotification(message, requestid, requesttype, 'Watcher', userid, foirequest, watcher)
+        foirequest = self.getrequest(requestid, requesttype)
+        notificationtype = NotificationType().getnotificationtypeid('Watcher')
+        return  self.__createnotification(message, requestid, requesttype, notificationtype, userid, foirequest, watcher)
 
     def editcommentnotification(self, message, comment, userid):
         notificationsusers = FOIRequestNotification.getcommentnotifications(comment['commentid'])
@@ -93,21 +100,21 @@ class notificationservice:
         return self.__deletenotificationids(requesttype, notificationids)    
             
     def dismissremindernotification(self, requesttype, notificationtype):
-        notificationid = notificationconfig().getnotificationtypeid(notificationtype)
+        notificationlabel = notificationconfig().getnotificationtypelabel(notificationtype)
         if requesttype == "ministryrequest": 
-            _ids = FOIRequestNotification.getnotificationidsbytype(notificationid)
+            _ids = FOIRequestNotification.getnotificationidsbytype(notificationlabel)
         else:
-            _ids = FOIRawRequestNotification.getnotificationidsbytype(notificationid)
+            _ids = FOIRawRequestNotification.getnotificationidsbytype(notificationlabel)
         self.__deletenotificationids(requesttype, _ids)  
     
     def dismissnotifications_by_requestid_type_userid(self, requestid, requesttype, notificationtype, userid):
-        notificationtypeids = self.__getcleanupnotificationids(notificationtype)
+        notificationtypelabels = self.__getcleanupnotificationids(notificationtype)
         foirequest = self.getrequest(requestid, requesttype)
         if requesttype == "ministryrequest":
             idnumber = foirequest["filenumber"]
-            _ids = FOIRequestNotification.getnotificationidsbynumberandtype(idnumber, notificationtypeids)
+            _ids = FOIRequestNotification.getnotificationidsbynumberandtype(idnumber, notificationtypelabels)
         else:
-            _ids = FOIRawRequestNotification.getnotificationidsbynumberandtype('U-00' + str(foirequest['requestid']), notificationtypeids[0])
+            _ids = FOIRawRequestNotification.getnotificationidsbynumberandtype('U-00' + str(foirequest['requestid']), notificationtypelabels[0])
         self.__deletenotificationbyuserandid(requesttype, _ids, userid) 
 
     def __createnotification(self, message, requestid, requesttype, notificationtype, userid, foirequest, requestjson=None):
@@ -134,22 +141,22 @@ class notificationservice:
                 FOIRawRequestNotification.dismissnotification(_ids)
     
     def __cleanupnotifications(self, requesttype, notificationtype, foirequest):
-        notificationtypeids = self.__getcleanupnotificationids(notificationtype)
+        notificationtypelabels = self.__getcleanupnotificationids(notificationtype)
         if requesttype == "ministryrequest":
             idnumber = foirequest["filenumber"]
-            _ids = FOIRequestNotification.getnotificationidsbynumberandtype(idnumber, notificationtypeids)
+            _ids = FOIRequestNotification.getnotificationidsbynumberandtype(idnumber, notificationtypelabels)
         else:
-            _ids = FOIRawRequestNotification.getnotificationidsbynumberandtype('U-00' + str(foirequest['requestid']), notificationtypeids[0])
+            _ids = FOIRawRequestNotification.getnotificationidsbynumberandtype('U-00' + str(foirequest['requestid']), notificationtypelabels[0])
         self.__deletenotificationids(requesttype, _ids) 
         
 
     def __getcleanupnotificationids(self, notificationtype):
-        notificationtypeids = []
-        notificationid = notificationconfig().getnotificationtypeid(notificationtype)
-        notificationtypeids.append(notificationid)
+        notificationtypelabels = []
+        notificationlabel = notificationconfig().getnotificationtypelabel(notificationtype)
+        notificationtypelabels.append(notificationlabel)
         if notificationtype == "State" or notificationtype.endswith("Assignment"):
-            notificationtypeids.append(notificationconfig().getnotificationtypeid("Group Members"))   
-        return notificationtypeids
+            notificationtypelabels.append(notificationconfig().getnotificationtypelabel("Group Members"))   
+        return notificationtypelabels
 
 
     def __deletenotificationids(self, requesttype, notificationids):
@@ -191,11 +198,11 @@ class notificationservice:
             return DefaultMethodResult(False,'Unable to delete the notifications',userid)
 
     def __dismissnotificationbytype(self, userid, type):
-        typeid = notificationconfig().getnotificationusertypeid(type)
-        requestnotificationids = self.__getdismissparentidsbyuserandtype("ministryrequest", userid, typeid)
-        requestnotification = FOIRequestNotificationUser.dismissnotificationbyuserandtype(userid, typeid)
-        rawnotificationids = self.__getdismissparentidsbyuserandtype("rawrequest", userid, typeid)
-        rawnotification = FOIRawRequestNotificationUser.dismissnotificationbyuserandtype(userid, typeid)   
+        notificationusertypelabel = notificationconfig().getnotificationusertypelabel(type)
+        requestnotificationids = self.__getdismissparentidsbyuserandtype("ministryrequest", userid, notificationusertypelabel)
+        requestnotification = FOIRequestNotificationUser.dismissnotificationbyuserandtype(userid, notificationusertypelabel)
+        rawnotificationids = self.__getdismissparentidsbyuserandtype("rawrequest", userid, notificationusertypelabel)
+        rawnotification = FOIRawRequestNotificationUser.dismissnotificationbyuserandtype(userid, notificationusertypelabel)   
         prequestnotification = FOIRequestNotification.dismissnotification(requestnotificationids) 
         prawnotification = FOIRawRequestNotification.dismissnotification(rawnotificationids)
         if requestnotification.success == True and rawnotification.success == True and prequestnotification.success == True and prawnotification.success == True:
@@ -236,11 +243,11 @@ class notificationservice:
             _notficationids =  FOIRawRequestNotificationUser.getnotificationsbyuser(userid)
         return self.__filterdismissparentids(_notficationids)
     
-    def __getdismissparentidsbyuserandtype(self, requesttype, userid, typeid):
+    def __getdismissparentidsbyuserandtype(self, requesttype, userid, notificationusertypelabel):
         if requesttype == "ministryrequest":         
-            _notficationids = FOIRequestNotificationUser.getnotificationsbyuserandtype(userid, typeid)
+            _notficationids = FOIRequestNotificationUser.getnotificationsbyuserandtype(userid, notificationusertypelabel)
         else:
-            _notficationids =  FOIRawRequestNotificationUser.getnotificationsbyuserandtype(userid, typeid)
+            _notficationids =  FOIRawRequestNotificationUser.getnotificationsbyuserandtype(userid, notificationusertypelabel)
         return self.__filterdismissparentids(_notficationids)
 
     def __filterdismissparentids(self,_notficationids):
@@ -262,7 +269,7 @@ class notificationservice:
             notification.foirequestid = foirequest["foirequest_id"]
 
             #mute notifications for ministry users
-            mutenotification = self.__mutenotification(requesttype, notificationtype, foirequest)
+            mutenotification = self.__mutenotification(requesttype, notificationtype['name'], foirequest)
             usergroupfromkeycloak = KeycloakAdminService().getmembersbygroupname(foirequest["assignedministrygroup"])
             if usergroupfromkeycloak is not None and len(usergroupfromkeycloak) > 0:
                 for user in usergroupfromkeycloak[0].get("members"):
@@ -273,14 +280,15 @@ class notificationservice:
             notification.idnumber ='U-00' + str(foirequest['requestid'])
             mutenotification = False
 
-        notification.notificationtypeid = notificationconfig().getnotificationtypeid(notificationtype)
+        notification.notificationtypelabel =  notificationtype['notificationtypelabel']
+        notification.notificationtypeid = notificationtype['notificationtypeid']
         notification.axisnumber = foirequest["axisrequestid"]
         notification.version = foirequest["version"]        
         notification.createdby = userid
         notification.notification = message
         notification.isdeleted = False
 
-        notificationusers = notificationuser().getnotificationusers(notificationtype, requesttype, userid, foirequest, requestjson)
+        notificationusers = notificationuser().getnotificationusers(notificationtype['name'], requesttype, userid, foirequest, requestjson)
         users = []
         for _notificationuser in notificationusers:
             users.append(self.__preparenotificationuser(requesttype, _notificationuser, userid, mutenotification, ministryusers))
@@ -297,7 +305,8 @@ class notificationservice:
         else:
             user = FOIRawRequestNotificationUser()
             user.isdeleted = False
-        user.notificationusertypeid = notificationuser["usertype"]
+        user.notificationusertypelabel = notificationuser["usertype"]
+        user.notificationusertypeid = notificationconfig().getnotificationusertypeid( notificationuser["usertype"])
         user.userid = notificationuser["userid"]
         user.createdby = userid
         return user

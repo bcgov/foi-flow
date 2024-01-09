@@ -5,6 +5,6 @@ from enum import Enum
 class ServiceKey(Enum):
     """Authorization header types."""
 
-    pdfstitchforhamrs = "pdfstitchforhamrs"
+    pdfstitchforhamrs = "pdfstitchforharms"
     pdfstitchforredline = "pdfstitchforredline"
     pdfstitchforresponsepackage = "pdfstitchforresponsepackage"

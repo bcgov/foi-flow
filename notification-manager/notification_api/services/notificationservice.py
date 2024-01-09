@@ -14,6 +14,9 @@ from datetime import datetime
 from dateutil.parser import parse
 from pytz import timezone
 import logging
+import json
+f = open('common/notificationusertypes.json', encoding="utf8")
+notificationusertypes_cache = json.load(f)
 
 class notificationservice:
     """ FOI notification management service
@@ -65,7 +68,9 @@ class notificationservice:
             notification.requestid = foirequest["foiministryrequestid"]
             notification.idnumber = foirequest["filenumber"]
             notification.foirequestid = foirequest["foirequest_id"]
-        notification.notificationtypeid = notificationconfig().getnotificationtypeid(notificationtype)
+        notificationtypes = notificationconfig().getnotificationtype(notificationtype)   
+        notification.notificationtypelabel = notificationtypes['notificationtypelabel'] 
+        notification.notificationtypeid = notificationtypes['notificationtypeid']
         notification.axisnumber = foirequest["axisrequestid"]
         notification.version = foirequest["version"]        
         notification.createdby = userid
@@ -79,7 +84,13 @@ class notificationservice:
             user.isdeleted = mute
         else:
             user.isdeleted = False
-        user.notificationusertypeid = notificationuser["usertype"]
+        usertype = notificationusertypes_cache[notificationuser["usertype"]]
+        if usertype is None:
+            print('User type not found', notificationuser["usertype"])
+            return None
+        notificationtypes = notificationconfig().getnotificationusertype(usertype['name']) 
+        user.notificationusertypelabel = notificationtypes['notificationusertypelabel']
+        user.notificationusertypeid = notificationtypes['notificationusertypeid']
         user.notificationid = notificationid
         user.userid = notificationuser["userid"]
         user.createdby = userid
