@@ -83,11 +83,10 @@
     "react-dom": "^17.0.2",
     "react-dropdown-select": "^4.7.4",
     "react-helmet": "^6.1.0",
-    "react-js-pagination": "^3.0.3",
     "react-quill": "^2.0.0",
     "react-redux": "^7.2.4",
     "react-router-dom": "^5.1.2",
-    "react-scripts": "^5.0.1",
+    "react-scripts": "5.0.1",
     "react-select": "^3.2.0",
     "react-test-renderer": "^17.0.2",
     "react-toastify": "9.0.3",
@@ -101,6 +100,18 @@
     "socket.io-client": "^4.4.1",
     "source-map-explorer": "^2.5.2",
     "typescript": "^4.7.2"
+  },
+  "overrides": {
+    "nth-check": {
+      "version": "2.1.1"
+    },
+    "html-to-pdf-js": {
+      "jspdf": "2.5.1"
+    },
+    "react-scripts": {
+      "css-select": "5.1.0",
+      "nth-check": "2.1.1"
+    }
   },
   "browserslist": [
     ">0.2%",
