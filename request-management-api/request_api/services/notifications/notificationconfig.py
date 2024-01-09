@@ -24,7 +24,7 @@ class notificationconfig:
         if notificationtype_format in notificationtypes_cache:
             return notificationtypes_cache[notificationtype_format]['notificationtypelabel']
         else:
-            print("Notification type not found in cache. Fetching from DB", notificationtype)
+            print("Notification type not found in json. Fetching from DB", notificationtype)
             id = NotificationType().getnotificationtypeid(notificationtype)
             if id is not None:
                 return id['notificationtypelabel']
@@ -44,7 +44,7 @@ class notificationconfig:
         if notificationusertype_format in notificationusertypes_cache:
             return notificationusertypes_cache[notificationusertype_format]['notificationusertypelabel']
         else:
-            print("Notification user type not found in cache. Fetching from DB", notificationusertype)
+            print("Notification user type not found in json. Fetching from DB", notificationusertype)
             id = NotificationUserType().getnotificationusertypesid(notificationusertype)
             if id is not None:
                 return id['notificationusertypelabel']
