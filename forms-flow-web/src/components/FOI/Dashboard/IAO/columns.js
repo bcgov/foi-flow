@@ -5,6 +5,7 @@ import {
   // onBehalfFullName,
   displayIcon,
   displayHeaderIcon,
+  displayQueueFlagIcons,
   cellTooltipRender
 } from "../utils";
 import {
@@ -15,6 +16,15 @@ import {
 } from "../../../../helper/FOI/helper";
 
 const ProcessingTeamColumns = [
+  {
+    field: "flags",
+    // renderHeader: displayHeaderIcon,
+    headerName: "FLAGS",
+    headerAlign: "left",
+    renderCell: displayQueueFlagIcons,
+    // cellClassName: 'foi-dashboard-',
+    // flex: 1,
+  },
   {
     field: "axisRequestId",
     headerName: "ID NUMBER",
@@ -89,12 +99,10 @@ const ProcessingTeamColumns = [
 
 const IntakeTeamColumns = [
   {
-    field: "isiaorestricted",
-    renderHeader: displayHeaderIcon,
+    field: "flags",
+    headerName: "FLAGS",
     headerAlign: "left",
-    renderCell:displayIcon,
-    cellClassName: 'foi-dashboard-restricted',
-    width: 60,
+    renderCell: displayQueueFlagIcons,
   },
   {
     field: "axisRequestId",
@@ -161,12 +169,10 @@ const IntakeTeamColumns = [
 
 const FlexTeamColumns = [
   {
-    field: "isiaorestricted",
-    renderHeader: displayHeaderIcon,
+    field: "flags",
+    headerName: "FLAGS",
     headerAlign: "left",
-    renderCell:displayIcon,
-    cellClassName: 'foi-dashboard-restricted',
-    width: 60,
+    renderCell: displayQueueFlagIcons,
   },
   {
     field: "axisRequestId",

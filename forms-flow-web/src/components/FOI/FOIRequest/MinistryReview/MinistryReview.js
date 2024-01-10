@@ -29,6 +29,8 @@ import {
   fetchPDFStitchStatusForHarms,
   fetchPDFStitchStatusForRedlines,
   fetchPDFStitchStatusForResponsePackage,
+  fetchPDFStitchedStatusForOIPCRedlineReview,
+  fetchPDFStitchedStatusForOIPCRedline,
 } from "../../../../apiManager/services/FOI/foiRecordServices";
 
 import { fetchCFRForm } from "../../../../apiManager/services/FOI/foiCFRFormServices";
@@ -62,6 +64,8 @@ import { UnsavedModal } from "../../customComponents";
 import { DISABLE_GATHERINGRECORDS_TAB } from "../../../../constants/constants";
 import _ from "lodash";
 import { MinistryNeedsScanning } from "../../../../constants/FOI/enum";
+import {isMinistryLogin} from "../../../../helper/FOI/helper";
+import OIPCDetails from "../OIPCDetails/Index";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -108,6 +112,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
 
   const [_currentrequestStatus, setcurrentrequestStatus] = React.useState("");
   const [_tabStatus, settabStatus] = React.useState(requestState);
+  
   //gets the request detail from the store
   const IsDivisionalCoordinator = () => {
     return userDetail?.role?.includes("DivisionalCoordinator");
@@ -210,6 +215,8 @@ const MinistryReview = React.memo(({ userDetail }) => {
       dispatch(fetchPDFStitchStatusForHarms(requestId, ministryId));
       dispatch(fetchPDFStitchStatusForRedlines(requestId, ministryId));
       dispatch(fetchPDFStitchStatusForResponsePackage(requestId, ministryId));
+      dispatch(fetchPDFStitchedStatusForOIPCRedline(requestId, ministryId));
+      dispatch(fetchPDFStitchedStatusForOIPCRedlineReview(requestId, ministryId));
       fetchCFRForm(ministryId, dispatch);
       if (bcgovcode) dispatch(fetchFOIMinistryAssignedToList(bcgovcode));
     }
@@ -234,6 +241,10 @@ const MinistryReview = React.memo(({ userDetail }) => {
   );
   const [unSavedRequest, setUnSavedRequest] = React.useState(false);
   let ministryassignedtousername = "Unassigned";
+
+  const userGroups = userDetail?.groups?.map(group => group.slice(1));
+  const isMinistry = isMinistryLogin(userGroups);
+  
   useEffect(() => {
     const requestDetailsValue = requestDetails;
     setSaveMinistryRequestObject(requestDetailsValue);
@@ -338,6 +349,8 @@ const MinistryReview = React.memo(({ userDetail }) => {
       dispatch(fetchPDFStitchStatusForHarms(requestId, ministryId));
       dispatch(fetchPDFStitchStatusForRedlines(requestId, ministryId));
       dispatch(fetchPDFStitchStatusForResponsePackage(requestId, ministryId));
+      dispatch(fetchPDFStitchedStatusForOIPCRedline(requestId, ministryId));
+      dispatch(fetchPDFStitchedStatusForOIPCRedlineReview(requestId, ministryId));
       fetchCFRForm(ministryId, dispatch);
       setStateChanged(false);
       setcurrentrequestStatus(_state);
@@ -752,6 +765,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
                             setSaveMinistryRequestObject
                           }
                           ministryAssigneeValue={ministryAssignedToValue}
+                          isMinistry={isMinistry}
                         />
                         <ApplicantDetails requestDetails={requestDetails} />
                         <ChildDetails requestDetails={requestDetails} />
@@ -767,6 +781,12 @@ const MinistryReview = React.memo(({ userDetail }) => {
                         />
                         {divisionsBox}
                         {/* <RequestNotes /> */}
+                        {requestDetails.isoipcreview && requestState && requestState.toLowerCase() !== StateEnum.intakeinprogress.name.toLowerCase() && requestState.toLowerCase() !== StateEnum.unopened.name.toLowerCase() && (
+                        <OIPCDetails 
+                          oipcData={requestDetails.oipcdetails}
+                          isMinistry={isMinistry}
+                        />
+                        )}
                         <BottomButtonGroup
                           requestState={requestState}
                           stateChanged={stateChanged}

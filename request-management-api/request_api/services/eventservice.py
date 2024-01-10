@@ -3,12 +3,14 @@ from os import stat
 from re import VERBOSE
 from request_api.services.events.state import stateevent
 from request_api.services.events.division import divisionevent
+from request_api.services.events.oipc import oipcevent
 from request_api.services.events.assignment import assignmentevent
 from request_api.services.events.cfrdate import cfrdateevent
 from request_api.services.events.comment import commentevent
 from request_api.services.events.watcher import watcherevent
 from request_api.services.events.legislativedate import legislativedateevent
 from request_api.services.events.divisiondate import divisiondateevent
+from request_api.services.events.oipcduedate import oipcduedateevent
 from request_api.services.events.extension import extensionevent
 from request_api.services.events.cfrfeeform import cfrfeeformevent
 from request_api.services.events.payment import paymentevent
@@ -34,8 +36,9 @@ class eventservice:
             stateeventresponse = stateevent().createstatetransitionevent(requestid, requesttype, userid, username)
             divisioneventresponse = divisionevent().createdivisionevent(requestid, requesttype, userid)
             assignmentresponse = assignmentevent().createassignmentevent(requestid, requesttype, userid, isministryuser,assigneename,username)           
-            if stateeventresponse.success == False or divisioneventresponse.success == False or assignmentresponse.success == False: 
-                current_app.logger.error("FOI Notification failed for event for request= %s ; state response=%s ; division response=%s ; assignment response=%s" % (requestid, stateeventresponse.message, divisioneventresponse.message, assignmentresponse.message))
+            oipcresponse = oipcevent().createoipcevent(requestid, userid)
+            if stateeventresponse.success == False or divisioneventresponse.success == False or assignmentresponse.success == False or oipcresponse.success == False: 
+                current_app.logger.error("FOI Notification failed for event for request= %s ; state response=%s ; division response=%s ; assignment response=%s ; oipc response=%s" % (requestid, stateeventresponse.message, divisioneventresponse.message, assignmentresponse.message, oipcresponse.message))
         except BusinessException as exception:            
             self.__logbusinessexception(exception)
  
@@ -58,13 +61,14 @@ class eventservice:
             
     def postreminderevent(self):
         try:
-            cfreventresponse = cfrdateevent().createdueevent()
-            legislativeeventresponse = legislativedateevent().createdueevent()
-            divisioneventresponse = divisiondateevent().createdueevent() 
+            cfreventresponse = cfrdateevent().createdueevent() 
+            legislativeeventresponse = legislativedateevent().createdueevent()   
+            divisioneventresponse = divisiondateevent().createdueevent()   
+            oipceventresponse = oipcduedateevent().createdueevent() 
             paymentremindereventresponse = paymentevent().createpaymentreminderevent()
-            section5pendingresponse = section5pendingevent().createdueevent()
-            if cfreventresponse.success == False or legislativeeventresponse.success == False or divisioneventresponse.success == False or paymentremindereventresponse.success == False or section5pendingresponse == False:
-                current_app.logger.error("FOI Notification failed for reminder event response=%s ; legislative response=%s ; division response=%s ; payment response=%s ; section5pending response=%s" % (cfreventresponse.message, legislativeeventresponse.message, divisioneventresponse.message, paymentremindereventresponse.message, section5pendingresponse.message))
+            section5pendingresponse = section5pendingevent().createdueevent()            
+            if cfreventresponse.success == False or legislativeeventresponse.success == False or divisioneventresponse.success == False or paymentremindereventresponse.success == False or section5pendingresponse == False or oipceventresponse == False:
+                current_app.logger.error("FOI Notification failed for reminder event response=%s ; legislative response=%s ; division response=%s ; payment response=%s ; section5pending response=%s ; oipcduereminder response=%s" % (cfreventresponse.message, legislativeeventresponse.message, divisioneventresponse.message, paymentremindereventresponse.message, section5pendingresponse.message, oipceventresponse.message))
                 return DefaultMethodResult(False,'Due reminder notifications failed',cfreventresponse.identifier)
             return DefaultMethodResult(True,'Due reminder notifications created',cfreventresponse.identifier)
         except BusinessException as exception:            
