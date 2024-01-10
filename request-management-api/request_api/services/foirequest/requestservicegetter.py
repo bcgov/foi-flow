@@ -45,9 +45,10 @@ class requestservicegetter:
             dobraw = applicant['foirequestapplicant.dob']
             dob = parse(dobraw).strftime(self.__genericdateformat()) if dobraw is not None else ''
             alsoknownas = applicant['foirequestapplicant.alsoknownas']
+            foirequestapplicantid = applicant['foirequestapplicant.foirequestapplicantid']
             requestortypeid = applicant['requestortype.requestortypeid']
             if requestortypeid == 1:
-                baserequestinfo.update(self.__prepareapplicant(firstname, middlename, lastname, businessname))
+                baserequestinfo.update(self.__prepareapplicant(foirequestapplicantid, firstname, middlename, lastname, businessname))
             additionalpersonalinfo.update(self.__prepareadditionalpersonalinfo(requestortypeid, firstname, middlename, lastname, dob, alsoknownas))
 
         baserequestdetails, additionalpersonalinfodetails = self.preparepersonalattributes(foirequestid, request['version'])
@@ -91,9 +92,10 @@ class requestservicegetter:
                 lastname = applicant['foirequestapplicant.lastname']
                 dobraw = applicant['foirequestapplicant.dob']
                 dob = parse(dobraw).strftime(self.__genericdateformat()) if dobraw is not None else ''
+                foirequestapplicantid = applicant['foirequestapplicant.foirequestapplicantid']
                 requestortypeid = applicant['requestortype.requestortypeid']
                 if requestortypeid == 1:
-                    baserequestinfo.update(self.__prepareapplicant(firstname, middlename, lastname))
+                    baserequestinfo.update(self.__prepareapplicant(foirequestapplicantid, firstname, middlename, lastname))
                 additionalpersonalinfo.update(self.__prepareadditionalpersonalinfo(requestortypeid, firstname, middlename, lastname, dob))
             baserequestdetails, additionalpersonalinfodetails = self.preparepersonalattributes(foirequestid, request['version'])
             baserequestinfo.update(baserequestdetails)
@@ -227,12 +229,13 @@ class requestservicegetter:
     def __genericdateformat(self):
         return '%Y-%m-%d'
     
-    def __prepareapplicant(self,firstname= None, middlename= None, lastname= None, businessname= None):
+    def __prepareapplicant(self, foirequestapplicantid=None, firstname= None, middlename= None, lastname= None, businessname= None):
         return {
                     'firstName': firstname,
                     'middleName': middlename,
                     'lastName': lastname,
-                    'businessName': businessname,                                                
+                    'businessName': businessname,   
+                    'foiRequestApplicantID': foirequestapplicantid
                 }     
         
     def __prepareadditionalpersonalinfo(self, requestortypeid, firstname= None, middlename= None, lastname= None, dob= None, alsoknownas= None):

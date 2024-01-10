@@ -128,25 +128,27 @@ class requestservicecreate:
         selfalsoknownas=None
         selfdob=None
         if foirequestschema.get("additionalPersonalInfo") is not None and foirequestschema.get('requeststatusid') == 1:
-            if foirequestschema.get('foiRequestApplicantID', None):
-                requestapplicant = FOIRequestApplicantMapping()
-                requestapplicant.foirequestapplicantid = foirequestschema['foiRequestApplicantID']
-                requestapplicant.requestortypeid = RequestorType().getrequestortype("Self")["requestortypeid"]
-                requestapplicantarr.append(requestapplicant)
-            else:
-                applicantinfo = foirequestschema.get("additionalPersonalInfo")
-                selfdob = applicantinfo["birthDate"] if requestservicebuilder().isNotBlankorNone(foirequestschema,"birthDate","additionalPersonalInfo") else None
-                selfalsoknownas = applicantinfo["alsoKnownAs"] if requestservicebuilder().isNotBlankorNone(foirequestschema,"alsoKnownAs","additionalPersonalInfo") else None
-                requestapplicantarr.append(
-                    requestservicebuilder().createapplicant(foirequestschema.get("firstName"),
-                                                foirequestschema.get("lastName"),
-                                                "Self",
-                                                userid,
-                                                foirequestschema.get("middleName"),
-                                                foirequestschema.get("businessName"),
-                                                selfalsoknownas,
-                                                selfdob)
-                    )
+            applicantinfo = foirequestschema.get("additionalPersonalInfo")
+            selfdob = applicantinfo["birthDate"] if requestservicebuilder().isNotBlankorNone(foirequestschema,"birthDate","additionalPersonalInfo") else None
+            selfalsoknownas = applicantinfo["alsoKnownAs"] if requestservicebuilder().isNotBlankorNone(foirequestschema,"alsoKnownAs","additionalPersonalInfo") else None
+
+        # if foirequestschema.get('foiRequestApplicantID') is None and foirequestschema.get('requeststatusid') == 1:
+        if foirequestschema.get('foiRequestApplicantID') is not None:
+            requestapplicant = FOIRequestApplicantMapping()
+            requestapplicant.foirequestapplicantid = foirequestschema['foiRequestApplicantID']
+            requestapplicant.requestortypeid = RequestorType().getrequestortype("Self")["requestortypeid"]
+            requestapplicantarr.append(requestapplicant)
+        else:
+            requestapplicantarr.append(
+                requestservicebuilder().createapplicant(foirequestschema.get("firstName"),
+                                            foirequestschema.get("lastName"),
+                                            "Self",
+                                            userid,
+                                            foirequestschema.get("middleName"),
+                                            foirequestschema.get("businessName"),
+                                            selfalsoknownas,
+                                            selfdob)
+                )
                  
         #Prepare additional applicants
         if foirequestschema.get("additionalPersonalInfo") is not None:
@@ -172,7 +174,7 @@ class requestservicecreate:
                                            None,
                                            self.__getkeyvalue(addlapplicantinfo,"anotherAlsoKnownAs"),
                                            self.__getkeyvalue(addlapplicantinfo,"anotherBirthDate")  )
-                    )  
+                    )
         return requestapplicantarr
     
     def __disablewatchers(self, ministryid, requestschema, userid):
