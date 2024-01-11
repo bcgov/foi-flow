@@ -19,7 +19,6 @@ class applicantservice:
     def getapplicantbyemail(self, email):
         applicantqueue = []
         applicants = FOIRequestApplicant.getapplicantbyemail(email)
-        print('applicants: ', applicants)
         if applicants is not None:
             for applicant in applicants:
                 applicantqueue.append(self.__prepareapplicant(applicant))
@@ -29,7 +28,6 @@ class applicantservice:
     def searchapplicant(self, keywords):
         applicantqueue = []
         applicants = FOIRequestApplicant.searchapplicant(keywords)
-        print('applicants: ', applicants)
         if applicants is not None:
             for applicant in applicants:
                 applicantqueue.append(self.__prepareapplicant(applicant))
@@ -110,7 +108,6 @@ class applicantservice:
 
         # order by update date desc
         applicants = FOIRequestApplicant.getapplicanthistory(applicantid)
-        print('applicants: ', applicants)
         if applicants is not None:
             newer = self.__prepareapplicantforcomparing(applicants[0])
             updatedat = applicants[0]['updatedat']
@@ -128,16 +125,10 @@ class applicantservice:
             'alsoKnownAs': applicant["alsoknownas"],
             'birthDate': applicant["dob"],
             'personalHealthNumber': applicant["phn"],
-            # 'foiRequestApplicantID': applicant["foirequestapplicantid"],
-            # 'applicantProfileID': applicant["applicantprofileid"],
-            # 'updatedat': applicant['updatedat'],
             'firstName': applicant["firstname"],
             'middleName': applicant["middlename"],
             'lastName': applicant["lastname"],
             'businessName': applicant["businessname"],
-            # 'foirequestID': applicant["foirequestid"],
-            # 'foirequestVersion': applicant["foirequestversion"],
-            # 'requestType': applicant["requesttype"],
             'email': applicant["email"],
             'address': applicant["address"],
             'city': applicant["city"],
@@ -153,46 +144,11 @@ class applicantservice:
             'correctionalServiceNumber': applicant["correctionnumber"],           
         }
 
-    # def __prepareapplicanthistory(self, applicant, updatedat):
-    #     return {
-    #         updatedat: {
-    #             'additionalPersonalInfo': {
-    #                 'alsoKnownAs': applicant["alsoknownas"],
-    #                 'birthDate': applicant["dob"],
-    #                 'personalHealthNumber': applicant["phn"],
-    #             },
-    #             'foiRequestApplicantID': applicant["foirequestapplicantid"],
-    #             'applicantProfileID': applicant["applicantprofileid"],
-    #             'updatedat': applicant['updatedat'],
-    #             'firstName': applicant["firstname"],
-    #             'middleName': applicant["middlename"],
-    #             'lastName': applicant["lastname"],
-    #             'businessName': applicant["businessname"],
-    #             'foirequestID': applicant["foirequestid"],
-    #             'foirequestVersion': applicant["foirequestversion"],
-    #             'requestType': applicant["requesttype"],
-    #             'email': applicant["email"],
-    #             'address': applicant["address"],
-    #             'city': applicant["city"],
-    #             'province': applicant["province"],
-    #             'postal': applicant["postal"],
-    #             'country': applicant["country"],
-    #             'phonePrimary': applicant["homephone"],
-    #             'workPhonePrimary': applicant["workphone"],
-    #             'workPhoneSecondary': applicant["workphone2"],
-    #             'phoneSecondary': applicant["mobilephone"],           
-    #             'otherContactInfo': applicant["othercontactinfo"],
-    #             'publicServiceEmployeeNumber': applicant["employeenumber"],
-    #             'correctionalServiceNumber': applicant["correctionnumber"],
-    #         }
-    #     }
-
     def getapplicantrequests(self, applicantid):
         requestqueue = []
 
         # order by update date desc
         requests = FOIRequestApplicant.getapplicantrequests(applicantid)
-        print('requests: ', requests)
         if requests is not None:
             for request in requests:
                 requestqueue.append(self.__preparerequest(request))
