@@ -16,7 +16,7 @@ import SearchIcon from "@material-ui/icons/Search";
 import InputAdornment from "@mui/material/InputAdornment";
 import InputBase from "@mui/material/InputBase";
 import Grid from "@mui/material/Grid";
-import { fetchPotentialApplicants, fetchApplicantInfo, fetchApplicantContactHistory, saveApplicantInfo, fetchApplicantProfileByKeyword } from "../../../apiManager/services/FOI/foiApplicantProfileService";
+import { fetchPotentialApplicants, fetchApplicantInfo, fetchApplicantContactHistory, saveApplicantInfo, fetchApplicantProfileByKeyword, fetchApplicantRequests } from "../../../apiManager/services/FOI/foiApplicantProfileService";
 import AddressContactDetails from "./AddressContanctInfo";
 import ApplicantDetails from "./ApplicantDetails"
 import AdditionalApplicantDetails from "./AdditionalApplicantDetails";
@@ -104,24 +104,24 @@ const ApplicantProfileModal = React.memo(({modalOpen, handleModalClose}) => {
     
     const requestHistoryColumns = [
         {
-            field: "requestId",
+            field: "filenumber",
             headerName: "REQUEST ID",
             flex: 1,
         },
         {
-            field: "currentState",
+            field: "requeststatus",
             headerName: "CURRENT STATE",
             flex: 1,
         },
         {
-            field: "receivedDate",
+            field: "receiveddate",
             headerName: "RECEIVED DATE",
             flex: 1,
         },
         {
-            field: "requestDescription",
+            field: "description",
             headerName: "REQUEST DESRCIPTION",
-            flex: 3,
+            flex: 2,
         },
     ];
 
@@ -296,9 +296,9 @@ const ApplicantProfileModal = React.memo(({modalOpen, handleModalClose}) => {
     }
 
     const showApplicantHistory = () => {
-        fetchApplicantContactHistory((err, res) => {
+        dispatch(fetchApplicantContactHistory(selectedApplicant.foiRequestApplicantID, (err, res) => {
             setApplicantHistory(res);
-        })       
+        }))       
     }
 
     const back = () => {
@@ -322,6 +322,17 @@ const ApplicantProfileModal = React.memo(({modalOpen, handleModalClose}) => {
             setCreateConfirmation(true);
         } else {
             handleClose();
+        }
+    }
+
+    const toggleRequestHistory = () => {
+        if (!selectedApplicant.requestHistory) {
+            dispatch(fetchApplicantRequests(selectedApplicant.foiRequestApplicantID, (err, res) => {
+                setSelectedApplicant({...selectedApplicant, requestHistory: res});
+                setShowRequestHistory(true)
+            }))
+        } else {
+            setShowRequestHistory(true)
         }
     }
 
@@ -364,13 +375,13 @@ const ApplicantProfileModal = React.memo(({modalOpen, handleModalClose}) => {
                         orientation="vertical"
                     />
                     <ButtonBase
-                        onClick={() => setShowRequestHistory(true)}
+                        onClick={toggleRequestHistory}
                         disableRipple
                         className={clsx("request-history-header applicant-profile-header", {
                             [classes.disabledTitle]: !showRequestHistory
                         })}
                     >
-                        Request History ({selectedApplicant.foirequestID.length})
+                        Request History ({selectedApplicant?.foirequestID?.length})
                     </ButtonBase>
                 </h3>
                 :
@@ -391,7 +402,7 @@ const ApplicantProfileModal = React.memo(({modalOpen, handleModalClose}) => {
                     :
                     (showRequestHistory ?
                         <>
-                            <Box sx={{ height: 350, width: "100%" }}>
+                            <Box sx={{ height: 400, width: "100%" }}>
                             <DataGrid
                                 className="foi-data-grid foi-request-history-grid"
                                 rows={selectedApplicant.requestHistory}
@@ -401,7 +412,7 @@ const ApplicantProfileModal = React.memo(({modalOpen, handleModalClose}) => {
                                 loading={isLoading}                
                                 onRowClick={selectApplicantRow}
                                 getRowHeight={() => 'auto'} 
-                                getRowId={(row) => row.requestId}
+                                getRowId={(row) => row.filenumber}
                             />
                             </Box>
                         </>:
@@ -414,13 +425,15 @@ const ApplicantProfileModal = React.memo(({modalOpen, handleModalClose}) => {
                             aria-controls="panel1a-content"         
                             >
                                 <Typography className="acc-request-description">{`APPLICANT CONTACT DETAILS`}</Typography>
-                                <Typography className="acc-username-date">{entry.username} - {entry.date}</Typography>
+                                <Typography className="acc-username-date">{entry.createdby} - {entry.updatedat}</Typography>
                             </AccordionSummary>
                             <AccordionDetails className="acc-details">
                                 <div className="acc-details-1">
-                                    <div className="acc-request-description-row">
-                                        <Typography className="acc-start-date"><b>{entry.field}: </b>{entry.value}</Typography>                                        
-                                    </div>
+                                    {Object.keys(entry.fields).map((field) => 
+                                        <div className="acc-request-description-row">
+                                            <Typography className="acc-start-date"><b>{field}: </b>{entry.fields[field]}</Typography>                                        
+                                        </div>
+                                    )}
                                 </div>
                             </AccordionDetails>
                         </Accordion>)   
