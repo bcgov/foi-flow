@@ -921,11 +921,11 @@ class FOIRequestApplicantSchema(ma.Schema):
 
 class ApplicantProfileSchema(ma.Schema):
     class Meta:
-        fields = ('applicantprofileid','updatedat','foirequestapplicantid','firstname','middlename','lastname',
+        fields = ('applicantprofileid','updatedat','createdby','foirequestapplicantid','firstname','middlename','lastname',
                   'alsoknownas','dob','businessname','foirequestid','foirequestversion','requesttype','applicantcategory',
                   'email','address','city','province','postal','country','homephone','workphone',
                   'workphone2','mobilephone','othercontactinfo','employeenumber','correctionnumber','phn')
 
 class ApplicantRequestSchema(ma.Schema):
     class Meta:
-        fields = ('applicantprofileid','foirequestapplicantid','axisrequestid','requeststatus','receiveddate','description')
+        fields = ('applicantprofileid','foirequestapplicantid','axisrequestid','filenumber', 'requeststatus','receiveddate','description')
