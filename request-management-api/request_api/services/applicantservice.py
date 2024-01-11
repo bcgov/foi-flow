@@ -114,43 +114,45 @@ class applicantservice:
         if applicants is not None:
             newer = self.__prepareapplicantforcomparing(applicants[0])
             updatedat = applicants[0]['updatedat']
+            createdby = applicants[0]['createdby']
             for applicant in applicants:
                 cur = self.__prepareapplicantforcomparing(applicant)
                 if(cur != newer):
-                    applicantqueue.append({ updatedat: dict(set(cur.items()) - set(newer.items())) })
+                    applicantqueue.append({ "updatedat": updatedat, "createdby": createdby, "fields": dict(set(cur.items()) - set(newer.items()))})
                     newer = cur
                 updatedat = applicant['updatedat']
+                createdby = applicant['createdby']
 
         return applicantqueue
 
     def __prepareapplicantforcomparing(self, applicant):
         return {
-            'alsoKnownAs': applicant["alsoknownas"],
-            'birthDate': applicant["dob"],
-            'personalHealthNumber': applicant["phn"],
+            'Also Known As': applicant["alsoknownas"],
+            'Birth Date': applicant["dob"],
+            'Personal Health Number': applicant["phn"],
             # 'foiRequestApplicantID': applicant["foirequestapplicantid"],
             # 'applicantProfileID': applicant["applicantprofileid"],
             # 'updatedat': applicant['updatedat'],
-            'firstName': applicant["firstname"],
-            'middleName': applicant["middlename"],
-            'lastName': applicant["lastname"],
-            'businessName': applicant["businessname"],
+            'First Name': applicant["firstname"],
+            'Middle Name': applicant["middlename"],
+            'Last Name': applicant["lastname"],
+            'Organization': applicant["businessname"],
             # 'foirequestID': applicant["foirequestid"],
             # 'foirequestVersion': applicant["foirequestversion"],
             # 'requestType': applicant["requesttype"],
-            'email': applicant["email"],
-            'address': applicant["address"],
-            'city': applicant["city"],
-            'province': applicant["province"],
-            'postal': applicant["postal"],
-            'country': applicant["country"],
-            'phonePrimary': applicant["homephone"],
-            'workPhonePrimary': applicant["workphone"],
-            'workPhoneSecondary': applicant["workphone2"],
-            'phoneSecondary': applicant["mobilephone"],           
-            'otherContactInfo': applicant["othercontactinfo"],
-            'publicServiceEmployeeNumber': applicant["employeenumber"],
-            'correctionalServiceNumber': applicant["correctionnumber"],           
+            'Email': applicant["email"],
+            'Address': applicant["address"],
+            'City': applicant["city"],
+            'Province': applicant["province"],
+            'Postal Code': applicant["postal"],
+            'Country': applicant["country"],
+            'Home Phone': applicant["homephone"],
+            'Work Phone': applicant["workphone"],
+            'Alternative Phone': applicant["workphone2"],
+            'Mobile Phone': applicant["mobilephone"],
+            'Other Contact Info': applicant["othercontactinfo"],
+            'Employee Number': applicant["employeenumber"],
+            'Corrections Number': applicant["correctionnumber"],
         }
 
     # def __prepareapplicanthistory(self, applicant, updatedat):
@@ -204,6 +206,7 @@ class applicantservice:
             'applicantprofileid': request["applicantprofileid"],
             'foirequestapplicantid': request["foirequestapplicantid"],
             'axisrequestid': request["axisrequestid"],
+            'filenumber': request["filenumber"],
             'requeststatus': request["requeststatus"],
             'receiveddate': request["receiveddate"],
             'description': request["description"],

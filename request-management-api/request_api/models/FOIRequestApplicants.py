@@ -663,6 +663,7 @@ class FOIRequestApplicant(db.Model):
             FOIRequest.foirequestid.label('foirequestid'),
             FOIRequest.version.label('foirequestversion'),
             FOIRequest.requesttype.label('requesttype'),
+            FOIRequest.createdby.label('createdby'),
             ApplicantCategory.name.label('applicantcategory'),
             contactemail.contactinformation.label('email'),
             contactaddress.contactinformation.label('address'),
@@ -864,8 +865,9 @@ class FOIRequestApplicant(db.Model):
             FOIRequestApplicant.applicantprofileid.label('applicantprofileid'),
             FOIRequestApplicant.foirequestapplicantid.label('foirequestapplicantid'),
             FOIMinistryRequest.axisrequestid,
+            FOIMinistryRequest.filenumber,
             FOIRequestStatus.name.label('requeststatus'),
-            func.to_char(FOIRequest.receiveddate, 'YYYY-MM-DD HH24:MI:SS').label('receiveddate'),
+            func.to_char(FOIRequest.receiveddate, 'MON DD YYYY').label('receiveddate'),
             FOIMinistryRequest.description
         ]
 
@@ -921,11 +923,11 @@ class FOIRequestApplicantSchema(ma.Schema):
 
 class ApplicantProfileSchema(ma.Schema):
     class Meta:
-        fields = ('applicantprofileid','updatedat','foirequestapplicantid','firstname','middlename','lastname',
+        fields = ('applicantprofileid','updatedat','createdby','foirequestapplicantid','firstname','middlename','lastname',
                   'alsoknownas','dob','businessname','foirequestid','foirequestversion','requesttype','applicantcategory',
                   'email','address','city','province','postal','country','homephone','workphone',
                   'workphone2','mobilephone','othercontactinfo','employeenumber','correctionnumber','phn')
 
 class ApplicantRequestSchema(ma.Schema):
     class Meta:
-        fields = ('applicantprofileid','foirequestapplicantid','axisrequestid','requeststatus','receiveddate','description')
+        fields = ('applicantprofileid','foirequestapplicantid','axisrequestid','filenumber', 'requeststatus','receiveddate','description')
