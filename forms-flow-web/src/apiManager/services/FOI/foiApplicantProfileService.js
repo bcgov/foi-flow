@@ -50,40 +50,35 @@ export const fetchPotentialApplicants = (firstname, lastname, email, phone, ...r
   };
 };
 
-export const fetchApplicantInfo = async (firstname, ...rest) => {
+export const fetchApplicantInfo = (applicantid, ...rest) => {
   
   const done = fnDone(rest);
-  done(null, 
-    { id: 1, lastName: 'Snow', firstName: 'Jon', age: 35, email: 'jon.snow@gmail.com',
-     additionalPersonalInfo: {birthDate: "2023-12-07"},
-     requestHistory: [{requestId: "EDU-2023-234345", receivedDate: "2023-12-07", currentState: "Open", requestDescription: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but als"}]  
-    }
+  // done(null, 
+  //   { id: 1, lastName: 'Snow', firstName: 'Jon', age: 35, email: 'jon.snow@gmail.com',
+  //    additionalPersonalInfo: {birthDate: "2023-12-07"},
+  //    requestHistory: [{requestId: "EDU-2023-234345", receivedDate: "2023-12-07", currentState: "Open", requestDescription: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but als"}]  
+  //   }
+  // );
+  // return;
+  const apiUrl = replaceUrl(
+    API.FOI_GET_APPLICANT_INFO,
+    "<applicantid>",
+    applicantid
   );
-  return;
-  // const apiUrlgetRequestDetails = replaceUrl(replaceUrl(
-  //   API.FOI_MINISTRYVIEW_REQUEST_API,
-  //   "<requestid>",
-  //   requestId
-  // ), "<ministryid>", ministryId);
-  // return (dispatch) => {
-  //   httpGETRequest(apiUrlgetRequestDetails, {}, UserService.getToken())
-  //     .then((res) => {
-  //       if (res.data) {
-  //         const foiRequest = res.data;
-  //         dispatch(clearMinistryViewRequestDetails({}));
-  //         dispatch(setFOIMinistryViewRequestDetail(foiRequest));
-  //         dispatch(fetchFOIMinistryAssignedToList(foiRequest.selectedMinistries[0].code.toLowerCase()));
-  //         dispatch(setFOILoader(false));
-  //       } else {
-  //         dispatch(serviceActionError(res));
-  //         dispatch(setFOILoader(false));
-  //         throw new Error(`Error in fetching ministry request details for request# ${requestId} ministry# ${ministryId}`)
-  //       }
-  //     })
-  //     .catch((error) => {
-  //       catchError(error, dispatch);
-  //     });
-  // };
+  return (dispatch) => {
+    httpGETRequest(apiUrl, {}, UserService.getToken())
+      .then((res) => {
+        if (res.data) {
+          done(null, res.data)
+        } else {
+          dispatch(serviceActionError(res));
+          throw new Error(`Error in fetching applicant info for applicant id # ${applicantid}`)
+        }
+      })
+      .catch((error) => {
+        catchError(error, dispatch);
+      });
+  };
 };
 
 export const fetchApplicantContactHistory = (applicantid, ...rest) => {

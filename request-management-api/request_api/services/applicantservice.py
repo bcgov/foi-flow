@@ -25,6 +25,12 @@ class applicantservice:
                 applicantqueue.append(self.__prepareapplicant(applicant))
 
         return applicantqueue
+    
+    def getapplicantbyid(self, applicantid):
+        applicant = FOIRequestApplicant.getapplicantbyid(applicantid)
+        applicant = self.__prepareapplicant(applicant)
+        applicant['requestHistory'] = self.getapplicantrequests(applicantid)
+        return applicant
 
     def searchapplicant(self, keywords):
         applicantqueue = []

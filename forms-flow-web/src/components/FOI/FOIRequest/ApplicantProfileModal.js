@@ -139,9 +139,9 @@ const ApplicantProfileModal = React.memo(({modalOpen, handleModalClose}) => {
                         setIsLoading(false);
                     }))
             } else {                
-                fetchApplicantInfo(requestDetails.firstName, (err, res) => {
+                dispatch(fetchApplicantInfo(requestDetails.foiRequestApplicantID, (err, res) => {
                     setSelectedApplicant(res);
-                })
+                }))
             }
         }
     }, [modalOpen])
@@ -173,7 +173,10 @@ const ApplicantProfileModal = React.memo(({modalOpen, handleModalClose}) => {
     }
 
     const selectApplicantRow = (e) => {
-        setSelectedApplicant(e.row);
+        dispatch(fetchApplicantRequests(e.row.foiRequestApplicantID, (err, res) => {
+            setSelectedApplicant({...e.row, requestHistory: res});
+            setIsLoading(false);
+        }))
     }
 
     const handleClose = () => {
@@ -304,8 +307,11 @@ const ApplicantProfileModal = React.memo(({modalOpen, handleModalClose}) => {
     const back = () => {
         if (applicantHistory) {
             setApplicantHistory(false);            
+        } else if (requestDetails.currentState === StateEnum.intakeinprogress.name) { 
+            handleClose();
         } else {
             setSelectedApplicant(false);
+            setShowRequestHistory(false);
         }
     }
 
@@ -322,17 +328,6 @@ const ApplicantProfileModal = React.memo(({modalOpen, handleModalClose}) => {
             setCreateConfirmation(true);
         } else {
             handleClose();
-        }
-    }
-
-    const toggleRequestHistory = () => {
-        if (!selectedApplicant.requestHistory) {
-            dispatch(fetchApplicantRequests(selectedApplicant.foiRequestApplicantID, (err, res) => {
-                setSelectedApplicant({...selectedApplicant, requestHistory: res});
-                setShowRequestHistory(true)
-            }))
-        } else {
-            setShowRequestHistory(true)
         }
     }
 
@@ -375,13 +370,13 @@ const ApplicantProfileModal = React.memo(({modalOpen, handleModalClose}) => {
                         orientation="vertical"
                     />
                     <ButtonBase
-                        onClick={toggleRequestHistory}
+                        onClick={() => setShowRequestHistory(true)}
                         disableRipple
                         className={clsx("request-history-header applicant-profile-header", {
                             [classes.disabledTitle]: !showRequestHistory
                         })}
                     >
-                        Request History ({selectedApplicant?.foirequestID?.length})
+                        Request History ({selectedApplicant?.requestHistory?.length})
                     </ButtonBase>
                 </h3>
                 :

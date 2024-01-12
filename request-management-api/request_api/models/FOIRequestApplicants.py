@@ -90,6 +90,265 @@ class FOIRequestApplicant(db.Model):
         else:
             return DefaultMethodResult(True,'No update',applicant.foirequestapplicantid)
 
+    # Search applicant by id
+    @classmethod
+    def getapplicantbyid(cls, applicantid):
+        from .FOIMinistryRequests import FOIMinistryRequest
+
+        #for queue/dashboard
+        _session = db.session
+
+        #aliase for getting contact info
+        contactemail = aliased(FOIRequestContactInformation)
+        contactaddress = aliased(FOIRequestContactInformation)
+        contactaddress2 = aliased(FOIRequestContactInformation)
+        contacthomephone = aliased(FOIRequestContactInformation)
+        contactworkphone = aliased(FOIRequestContactInformation)
+        contactworkphone2 = aliased(FOIRequestContactInformation)
+        contactmobilephone = aliased(FOIRequestContactInformation)
+        contactother = aliased(FOIRequestContactInformation)
+        
+        city = aliased(FOIRequestContactInformation)
+        province = aliased(FOIRequestContactInformation)
+        postal = aliased(FOIRequestContactInformation)
+        country = aliased(FOIRequestContactInformation)
+
+        #aliase for getting personal attributes
+        personalemployeenumber = aliased(FOIRequestPersonalAttribute)
+        personalcorrectionnumber = aliased(FOIRequestPersonalAttribute)
+        personalhealthnumber = aliased(FOIRequestPersonalAttribute)
+
+        #max foirequest version
+        subquery_foirequest_maxversion = _session.query(FOIRequest.foirequestid, func.max(FOIRequest.version).label('max_version')).group_by(FOIRequest.foirequestid).subquery()
+        joincondition = [
+            subquery_foirequest_maxversion.c.foirequestid == FOIRequest.foirequestid,
+            subquery_foirequest_maxversion.c.max_version == FOIRequest.version,
+        ]
+
+        #generate query
+        selectedcolumns = [
+            FOIRequestApplicant.applicantprofileid.label('applicantprofileid'),
+            func.to_char(FOIRequestApplicantMapping.created_at, 'YYYY-MM-DD HH24:MI:SS').label('updatedat'),
+            FOIRequestApplicant.foirequestapplicantid.label('foirequestapplicantid'),
+            FOIRequestApplicant.firstname.label('firstname'),
+            FOIRequestApplicant.middlename.label('middlename'),
+            FOIRequestApplicant.lastname.label('lastname'),
+            FOIRequestApplicant.alsoknownas.label('alsoknownas'),
+            func.to_char(FOIRequestApplicant.dob, 'YYYY-MM-DD').label('dob'),
+            FOIRequestApplicant.businessname.label('businessname'),
+            FOIRequest.foirequestid.label('foirequestid'),
+            FOIRequest.version.label('foirequestversion'),
+            FOIRequest.requesttype.label('requesttype'),
+            ApplicantCategory.name.label('applicantcategory'),
+            contactemail.contactinformation.label('email'),
+            contactaddress.contactinformation.label('address'),
+            contactaddress2.contactinformation.label('address2'),
+            contacthomephone.contactinformation.label('homephone'),
+            contactworkphone.contactinformation.label('workphone'),
+            contactworkphone2.contactinformation.label('workphone2'),
+            contactmobilephone.contactinformation.label('mobilephone'),
+            contactother.contactinformation.label('othercontactinfo'),
+            city.contactinformation.label('city'),
+            province.contactinformation.label('province'),
+            postal.contactinformation.label('postal'),
+            country.contactinformation.label('country'),
+            personalemployeenumber.attributevalue.label('employeenumber'),
+            personalcorrectionnumber.attributevalue.label('correctionnumber'),
+            personalhealthnumber.attributevalue.label('phn')
+        ]
+
+        subquery_all = _session.query(
+                                *selectedcolumns
+                            ).join(
+                                FOIRequestApplicantMapping,
+                                and_(
+                                    FOIRequestApplicantMapping.foirequest_id == FOIRequest.foirequestid,
+                                    FOIRequestApplicantMapping.foirequestversion_id == FOIRequest.version,
+                                    FOIRequestApplicantMapping.requestortypeid == 1),
+                            ).join(
+                                FOIRequestApplicant,
+                                FOIRequestApplicant.foirequestapplicantid == FOIRequestApplicantMapping.foirequestapplicantid
+                                # and_(
+                                #     FOIRequestApplicant.foirequestapplicantid == FOIRequestApplicantMapping.foirequestapplicantid,
+                                #     FOIRequestApplicant.isactive != False
+                                # )
+                            ).join(
+                                ApplicantCategory,
+                                ApplicantCategory.applicantcategoryid == FOIRequest.applicantcategoryid
+                            ).join(
+                                subquery_foirequest_maxversion,
+                                and_(*joincondition)
+                            ).join(
+                                FOIMinistryRequest,
+                                and_(
+                                    FOIMinistryRequest.foirequest_id == FOIRequest.foirequestid,
+                                    FOIMinistryRequest.isactive == True)
+                            ).join(
+                                contactemail,
+                                and_(
+                                    contactemail.foirequest_id == FOIRequest.foirequestid,
+                                    contactemail.foirequestversion_id == FOIRequest.version,
+                                    contactemail.contacttypeid == 1),
+                            ).join(
+                                contactaddress,
+                                and_(
+                                    contactaddress.foirequest_id == FOIRequest.foirequestid,
+                                    contactaddress.foirequestversion_id == FOIRequest.version,
+                                    contactaddress.contacttypeid == 2,
+                                    contactaddress.contactinformation is not None,
+                                    contactaddress.dataformat == 'address'),
+                                isouter=True
+                            ).join(
+                                contactaddress2,
+                                and_(
+                                    contactaddress2.foirequest_id == FOIRequest.foirequestid,
+                                    contactaddress2.foirequestversion_id == FOIRequest.version,
+                                    contactaddress2.contacttypeid == 2,
+                                    contactaddress2.contactinformation is not None,
+                                    contactaddress2.dataformat == 'addressSecondary'),
+                                isouter=True
+                            ).join(
+                                contacthomephone,
+                                and_(
+                                    contacthomephone.foirequest_id == FOIRequest.foirequestid,
+                                    contacthomephone.foirequestversion_id == FOIRequest.version,
+                                    contacthomephone.contacttypeid == 3,
+                                    contacthomephone.contactinformation is not None),
+                                isouter=True
+                            ).join(
+                                contactworkphone,
+                                and_(
+                                    contactworkphone.foirequest_id == FOIRequest.foirequestid,
+                                    contactworkphone.foirequestversion_id == FOIRequest.version,
+                                    contactworkphone.contacttypeid == 4,
+                                    contactworkphone.contactinformation is not None),
+                                isouter=True
+                            ).join(
+                                contactworkphone2,
+                                and_(
+                                    contactworkphone2.foirequest_id == FOIRequest.foirequestid,
+                                    contactworkphone2.foirequestversion_id == FOIRequest.version,
+                                    contactworkphone2.contacttypeid == 5,
+                                    contactworkphone2.contactinformation is not None),
+                                isouter=True
+                            ).join(
+                                contactmobilephone,
+                                and_(
+                                    contactmobilephone.foirequest_id == FOIRequest.foirequestid,
+                                    contactmobilephone.foirequestversion_id == FOIRequest.version,
+                                    contactmobilephone.contacttypeid == 6,
+                                    contactmobilephone.contactinformation is not None),
+                                isouter=True
+                            ).join(
+                                contactother,
+                                and_(
+                                    contactother.foirequest_id == FOIRequest.foirequestid,
+                                    contactother.foirequestversion_id == FOIRequest.version,
+                                    contactother.contacttypeid == 7,
+                                    contactother.contactinformation is not None),
+                                isouter=True
+                            ).join(
+                                city,
+                                and_(
+                                    city.foirequest_id == FOIRequest.foirequestid,
+                                    city.foirequestversion_id == FOIRequest.version,
+                                    city.contacttypeid == 2,
+                                    city.contactinformation is not None,
+                                    city.dataformat == 'city'),
+                                isouter=True
+                            ).join(
+                                province,
+                                and_(
+                                    province.foirequest_id == FOIRequest.foirequestid,
+                                    province.foirequestversion_id == FOIRequest.version,
+                                    province.contacttypeid == 2,
+                                    province.contactinformation is not None,
+                                    province.dataformat == 'province'),
+                                isouter=True
+                            ).join(
+                                country,
+                                and_(
+                                    country.foirequest_id == FOIRequest.foirequestid,
+                                    country.foirequestversion_id == FOIRequest.version,
+                                    country.contacttypeid == 2,
+                                    country.contactinformation is not None,
+                                    country.dataformat == 'country'),
+                                isouter=True
+                            ).join(
+                                postal,
+                                and_(
+                                    postal.foirequest_id == FOIRequest.foirequestid,
+                                    postal.foirequestversion_id == FOIRequest.version,
+                                    postal.contacttypeid == 2,
+                                    postal.contactinformation is not None,
+                                    postal.dataformat == 'postal'),
+                                isouter=True
+                            ).join(
+                                personalemployeenumber,
+                                and_(
+                                    personalemployeenumber.foirequest_id == FOIRequest.foirequestid,
+                                    personalemployeenumber.foirequestversion_id == FOIRequest.version,
+                                    personalemployeenumber.personalattributeid == 1,
+                                    personalemployeenumber.attributevalue is not None),
+                                isouter=True
+                            ).join(
+                                personalcorrectionnumber,
+                                and_(
+                                    personalcorrectionnumber.foirequest_id == FOIRequest.foirequestid,
+                                    personalcorrectionnumber.foirequestversion_id == FOIRequest.version,
+                                    personalcorrectionnumber.personalattributeid == 2,
+                                    personalcorrectionnumber.attributevalue is not None),
+                                isouter=True
+                            ).join(
+                                personalhealthnumber,
+                                and_(
+                                    personalhealthnumber.foirequest_id == FOIRequest.foirequestid,
+                                    personalhealthnumber.foirequestversion_id == FOIRequest.version,
+                                    personalhealthnumber.personalattributeid == 3,
+                                    personalhealthnumber.attributevalue is not None),
+                                isouter=True
+                            ).filter(
+                                # FOIMinistryRequest.requeststatusid != 3,
+                                FOIRequest.isactive == True,
+                                FOIRequestApplicant.foirequestapplicantid == applicantid
+                            ).order_by(FOIRequest.foirequestid.desc()).subquery()
+
+        query_aggregate = _session.query(
+            func.array_agg(subquery_all.c.applicantprofileid).label('applicantprofileid'),
+            func.array_agg(subquery_all.c.updatedat).label('updatedat'),
+            subquery_all.c.foirequestapplicantid,
+            func.array_agg(subquery_all.c.firstname).label('firstname'),
+            func.array_agg(subquery_all.c.middlename).label('middlename'),
+            func.array_agg(subquery_all.c.lastname).label('lastname'),
+            func.array_agg(subquery_all.c.alsoknownas).label('alsoknownas'),
+            func.array_agg(subquery_all.c.dob).label('dob'),
+            func.array_agg(subquery_all.c.businessname).label('businessname'),
+            func.array_agg(subquery_all.c.foirequestid).label('foirequestid'),
+            func.array_agg(subquery_all.c.foirequestversion).label('foirequestversion'),
+            func.array_agg(subquery_all.c.requesttype).label('requesttype'),
+            func.array_agg(subquery_all.c.applicantcategory).label('applicantcategory'),
+            func.array_agg(subquery_all.c.email).label('email'),
+            func.array_agg(subquery_all.c.address).label('address'),
+            func.array_agg(subquery_all.c.city).label('city'),
+            func.array_agg(subquery_all.c.province).label('province'),
+            func.array_agg(subquery_all.c.postal).label('postal'),
+            func.array_agg(subquery_all.c.country).label('country'),
+            func.array_agg(subquery_all.c.homephone).label('homephone'),
+            func.array_agg(subquery_all.c.workphone).label('workphone'),
+            func.array_agg(subquery_all.c.workphone2).label('workphone2'),
+            func.array_agg(subquery_all.c.mobilephone).label('mobilephone'),
+            func.array_agg(subquery_all.c.othercontactinfo).label('othercontactinfo'),
+            func.array_agg(subquery_all.c.employeenumber).label('employeenumber'),
+            func.array_agg(subquery_all.c.correctionnumber).label('correctionnumber'),
+            func.array_agg(subquery_all.c.phn).label('phn')
+        ).group_by(subquery_all.c.foirequestapplicantid)
+
+
+        print("query_by_id", query_aggregate)
+
+        applicantprofile_schema = ApplicantProfileSchema()
+        return applicantprofile_schema.dump(query_aggregate.first())
+    
     # Search applicant by email
     @classmethod
     def getapplicantbyemail(cls, email):

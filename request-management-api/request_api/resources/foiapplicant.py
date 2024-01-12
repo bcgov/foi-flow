@@ -157,5 +157,28 @@ class FOIApplicants(Resource):
                 return json.dumps(result), 200
             else:
                 return {'status': False, 'message':EXCEPTION_MESSAGE_NOT_FOUND}, 404
+        except BusinessException as exception:
+            return {'status': exception.status_code, 'message':exception.message}, 500
+
+@cors_preflight('GET,OPTIONS')
+@API.route('/foiapplicants/applicantid/<applicantid>')
+class FOIApplicants(Resource):
+    """Resource for retriving applicant by id"""
+
+    @staticmethod
+    @TRACER.trace()
+    @cross_origin(origins=allowedorigins())
+    @auth.require
+    @auth.isiao
+    @cors_preflight('GET,OPTIONS')
+    def get(applicantid=None):
+        if applicantid is None or applicantid == 0:
+            return {'status': False, 'message':EXCEPTION_MESSAGE_BAD_REQUEST}, 400
+        try:
+            result = applicantservice().getapplicantbyid(applicantid)
+            if result is not None:
+                return json.dumps(result), 200
+            else:
+                return {'status': False, 'message':EXCEPTION_MESSAGE_NOT_FOUND}, 404
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500
