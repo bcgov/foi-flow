@@ -86,17 +86,61 @@ export const fetchApplicantInfo = async (firstname, ...rest) => {
   // };
 };
 
-export const fetchApplicantContactHistory = (...rest) => {
+export const fetchApplicantContactHistory = (applicantid, ...rest) => {
+  // const done = fnDone(rest);
+  // done(null, 
+  //   [{ 
+  //     field: "Email",
+  //     value: "a@b.ca",
+  //     date: "2023-12-11",
+  //     username: "foiintake@idir",
+  //   }]
+  // );
+
   const done = fnDone(rest);
-  done(null, 
-    [{ 
-      field: "Email",
-      value: "a@b.ca",
-      date: "2023-12-11",
-      username: "foiintake@idir",
-    }]
+  const apiUrl = replaceUrl(
+    API.FOI_GET_APPLICANT_HISTORY,
+    "<applicantid>",
+    applicantid
   );
+  return (dispatch) => {
+    httpGETRequest(apiUrl, {}, UserService.getToken())
+      .then((res) => {
+        if (res.data) {
+          done(null, res.data)
+        } else {
+          dispatch(serviceActionError(res));
+          throw new Error(`Error in fetching potential applicants`)
+        }
+      })
+      .catch((error) => {
+        catchError(error, dispatch);
+      });
+  }
 }
+
+export const fetchApplicantRequests = (applicantid, ...rest) => {
+  const done = fnDone(rest);
+  const apiUrl = replaceUrl(
+    API.FOI_GET_APPLICANT_REQUEST_HISTORY,
+    "<applicantid>",
+    applicantid
+  );
+  return (dispatch) => {
+    httpGETRequest(apiUrl, {}, UserService.getToken())
+      .then((res) => {
+        if (res.data) {
+          done(null, res.data)
+        } else {
+          dispatch(serviceActionError(res));
+          throw new Error(`Error in fetching potential applicants`)
+        }
+      })
+      .catch((error) => {
+        catchError(error, dispatch);
+      });
+  }
+};
 
 export const saveApplicantInfo = (applicant, ...rest) => {
   const done = fnDone(rest);

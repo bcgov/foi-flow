@@ -663,6 +663,7 @@ class FOIRequestApplicant(db.Model):
             FOIRequest.foirequestid.label('foirequestid'),
             FOIRequest.version.label('foirequestversion'),
             FOIRequest.requesttype.label('requesttype'),
+            FOIRequest.createdby.label('createdby'),
             ApplicantCategory.name.label('applicantcategory'),
             contactemail.contactinformation.label('email'),
             contactaddress.contactinformation.label('address'),
@@ -864,8 +865,9 @@ class FOIRequestApplicant(db.Model):
             FOIRequestApplicant.applicantprofileid.label('applicantprofileid'),
             FOIRequestApplicant.foirequestapplicantid.label('foirequestapplicantid'),
             FOIMinistryRequest.axisrequestid,
+            FOIMinistryRequest.filenumber,
             FOIRequestStatus.name.label('requeststatus'),
-            func.to_char(FOIRequest.receiveddate, 'YYYY-MM-DD HH24:MI:SS').label('receiveddate'),
+            func.to_char(FOIRequest.receiveddate, 'MON DD YYYY').label('receiveddate'),
             FOIMinistryRequest.description
         ]
 
