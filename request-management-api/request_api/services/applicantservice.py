@@ -49,6 +49,7 @@ class applicantservice:
             applicantschema['businessName'],
             applicantschema.get('additionalPersonalInfo', None).get('alsoKnownAs', None),
             applicantschema.get('additionalPersonalInfo', None).get('birthDate', None),
+            applicantschema['applicantCategoryID'],
             userid
         ) # replace with applicant id once new save function is written
         requests = FOIMinistryRequest.getopenrequestsbyrequestId(applicantschema['foirequestID'])

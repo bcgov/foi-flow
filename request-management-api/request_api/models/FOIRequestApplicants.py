@@ -18,7 +18,7 @@ class FOIRequestApplicant(db.Model):
     __tablename__ = 'FOIRequestApplicants' 
     # Defining the columns
     foirequestapplicantid = db.Column(db.Integer, primary_key=True,autoincrement=True)
-    
+
     firstname = db.Column(db.String(50), unique=False, nullable=True)
     middlename = db.Column(db.String(50), unique=False, nullable=True)
     lastname = db.Column(db.String(50), unique=False, nullable=True)
@@ -26,7 +26,8 @@ class FOIRequestApplicant(db.Model):
     alsoknownas = db.Column(db.String(50), unique=False, nullable=True)
     dob = db.Column(db.DateTime, unique=False, nullable=True)
     businessname = db.Column(db.String(255), unique=False, nullable=True)
-                
+    applicantcategoryid = db.Column(db.Integer, unique=False, nullable=True)
+
     created_at = db.Column(db.DateTime, default=datetime.now)
     updated_at = db.Column(db.DateTime, nullable=True)
     createdby = db.Column(db.String(120), unique=False, nullable=True)
@@ -51,7 +52,7 @@ class FOIRequestApplicant(db.Model):
         return DefaultMethodResult(True,'Applicant added',applicant.foirequestapplicantid)
 
     @classmethod
-    def updateapplicantprofile(cls, foirequestapplicantid, firstname, lastname, middlename, businessname, alsoknownas, dob, userid):
+    def updateapplicantprofile(cls, foirequestapplicantid, firstname, lastname, middlename, businessname, alsoknownas, dob, applicantcategoryid, userid):
         applicant_query = db.session.query(
                                         FOIRequestApplicant
                                     ).filter_by(
@@ -64,28 +65,21 @@ class FOIRequestApplicant(db.Model):
             # applicant.isactive = False
             applicant_query.update({FOIRequestApplicant.applicantprofileid:str(uuid.uuid4())})
 
-        if(
-            applicant.firstname != firstname
-            or applicant.lastname != lastname
-            or applicant.middlename != middlename
-            or applicant.businessname != businessname
-            or applicant.alsoknownas != alsoknownas
-            or applicant.dob != dob
-        ):
+        applicantfromform = FOIRequestApplicant().prepareapplicantforcomparing(firstname, lastname, middlename, businessname, alsoknownas, dob, applicantcategoryid)
+        applicantfromdb = FOIRequestApplicant().prepareapplicantforcomparing(applicant.firstname, applicant.lastname, applicant.middlename, applicant.businessname, applicant.alsoknownas, applicant.dob, applicant.applicantcategoryid)
+        if applicantfromform != applicantfromdb:
             _applicant = FOIRequestApplicant()
             _applicant.createdby = userid
-            _applicant.firstname = firstname
-            _applicant.lastname = lastname
-            _applicant.middlename = middlename
-            _applicant.businessname = businessname
-            _applicant.alsoknownas = alsoknownas
+            _applicant.firstname = applicantfromform.firstname
+            _applicant.lastname = applicantfromform.lastname
+            _applicant.middlename = applicantfromform.middlename
+            _applicant.businessname = applicantfromform.businessname
+            _applicant.alsoknownas = applicantfromform.alsoknownas
+            _applicant.dob = applicantfromform.dob
             _applicant.applicantprofileid = applicant.applicantprofileid
-            if dob is not None and dob != "":
-                _applicant.dob = dob
-            else:
-                _applicant.dob = None
+            _applicant.applicantcategoryid = applicantfromform.applicantcategoryid
             db.session.add(_applicant)
-            db.session.commit()               
+            db.session.commit()
             return DefaultMethodResult(True,'Applicant profile updated',_applicant.foirequestapplicantid)
         else:
             return DefaultMethodResult(True,'No update',applicant.foirequestapplicantid)
@@ -107,7 +101,7 @@ class FOIRequestApplicant(db.Model):
         contactworkphone2 = aliased(FOIRequestContactInformation)
         contactmobilephone = aliased(FOIRequestContactInformation)
         contactother = aliased(FOIRequestContactInformation)
-        
+
         city = aliased(FOIRequestContactInformation)
         province = aliased(FOIRequestContactInformation)
         postal = aliased(FOIRequestContactInformation)
@@ -1174,6 +1168,18 @@ class FOIRequestApplicant(db.Model):
 
         applicantrequest_schema = ApplicantRequestSchema(many=True)
         return applicantrequest_schema.dump(query_all.all())
+
+    @classmethod
+    def prepareapplicantforcomparing(cls, firstname, lastname, middlename, businessname, alsoknownas, dob, applicantcategoryid):
+        return {
+            'firstname': firstname if firstname is not None or firstname != '' else None,
+            'lastname': lastname if lastname is not None or lastname != '' else None,
+            'middlename': middlename if middlename is not None or middlename != '' else None,
+            'businessname': businessname if businessname is not None or businessname != '' else None,
+            'alsoknownas': alsoknownas if alsoknownas is not None or alsoknownas != '' else None,
+            'dob': dob if dob is not None or dob != '' else None,
+            'applicantcategoryid': applicantcategoryid if applicantcategoryid is not None or alsoknownas != 0 else None,
+        }
 
 
 class FOIRequestApplicantSchema(ma.Schema):
