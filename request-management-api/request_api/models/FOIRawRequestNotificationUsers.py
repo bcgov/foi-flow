@@ -97,9 +97,6 @@ class FOIRawRequestNotificationUser(db.Model):
 
     @classmethod 
     def getnotificationsbyuserandtype(cls, userid, notificationusertypelabel):
-        # for key in notificationusertypes_cache:
-        #     if (notificationusertypes_cache[key].notificationusertypeid == typeid) or (notificationusertypes_cache[key].notificationusertypelabel == typeid):
-        #         notificationusertypelabel = notificationusertypes_cache[key].notificationusertypelabel
         notifications = []
         try:
             sql = """select notificationid, count(1) as relcount from "FOIRawRequestNotificationUsers" frnu 
