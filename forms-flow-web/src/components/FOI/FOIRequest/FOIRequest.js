@@ -336,8 +336,8 @@ const FOIRequest = React.memo(({ userDetail }) => {
     const assignedTo = getAssignedTo(requestDetails);
     setAssignedToValue(assignedTo);
     if (Object.entries(requestDetails)?.length !== 0) {
-      let requestStateFromId = findRequestState(requestDetails.requeststatusid)
-        ? findRequestState(requestDetails.requeststatusid)
+       let requestStateFromId = findRequestState(requestDetails.requeststatuslabel)
+        ? findRequestState(requestDetails.requeststatuslabel)
         : StateEnum.unopened.name;
       setRequestState(requestStateFromId);
       settabStatus(requestStateFromId);

@@ -12,6 +12,7 @@ from enum import Enum
 from request_api.exceptions import BusinessException
 from dateutil.parser import parse
 from request_api.utils.enums import CommentType
+from request_api.models.NotificationTypes import NotificationType
 
 class oipcevent:
     """ FOI OIPC Event management service
@@ -39,7 +40,8 @@ class oipcevent:
         commentservice().createministryrequestcomment(comment, userid, CommentType.SystemGenerated.value)
 
     def __createnotification(self, requestid, oipc, userid):
-        return notificationservice().createnotification({"message" : self.__preparemessage(oipc)}, requestid, "ministryrequest", "OIPC", userid, False)
+        notificationtype = NotificationType().getnotificationtypeid(self.__notificationtype()) 
+        return notificationservice().createnotification({"message" : self.__preparemessage(oipc)}, requestid, "ministryrequest",  notificationtype, userid, False)
 
     
     def __maintained(self,coipcs, poipcs, inquiryoutcomes):
@@ -146,7 +148,9 @@ class oipcevent:
                 return _inquirychange_msg
         elif oipc['event'] == EventType.inquiryoutcome.value:
             return 'OIPC '+ oipc['reviewtype'] +' Inquiry Decision: '+ oipc['inquiryoutcome']  
-        
+
+    def __notificationtype(self):
+        return "OIPC"  
    
 class EventType(Enum):
     add = "add"    

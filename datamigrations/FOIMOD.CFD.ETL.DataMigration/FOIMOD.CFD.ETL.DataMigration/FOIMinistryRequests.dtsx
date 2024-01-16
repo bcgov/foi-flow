@@ -11,8 +11,8 @@
   DTS:LocaleID="1033"
   DTS:ObjectName="Package1"
   DTS:PackageType="5"
-  DTS:VersionBuild="49"
-  DTS:VersionGUID="{959785B0-CF2F-46BD-B18F-F60A275D3B69}">
+  DTS:VersionBuild="72"
+  DTS:VersionGUID="{A1BD12CE-0A5D-4DCB-A6A6-7C8E92A6BD05}">
   <DTS:Property
     DTS:Name="PackageFormatVersion">8</DTS:Property>
   <DTS:Variables>
@@ -86,10 +86,30 @@
     </DTS:Variable>
     <DTS:Variable
       DTS:CreationName=""
+      DTS:DTSID="{2B3804FD-80D5-4C6B-898A-B4E78723A464}"
+      DTS:IncludeInDebugDump="2345"
+      DTS:Namespace="User"
+      DTS:ObjectName="identityverified">
+      <DTS:VariableValue
+        DTS:DataType="8"
+        xml:space="preserve"></DTS:VariableValue>
+    </DTS:Variable>
+    <DTS:Variable
+      DTS:CreationName=""
       DTS:DTSID="{4DBC5B6A-9D34-4623-8D5B-E3EA7554DE00}"
       DTS:IncludeInDebugDump="2345"
       DTS:Namespace="User"
       DTS:ObjectName="linkedrequests">
+      <DTS:VariableValue
+        DTS:DataType="8"
+        xml:space="preserve"></DTS:VariableValue>
+    </DTS:Variable>
+    <DTS:Variable
+      DTS:CreationName=""
+      DTS:DTSID="{2E848021-5702-4958-AA7F-56F2AC49BCCB}"
+      DTS:IncludeInDebugDump="2345"
+      DTS:Namespace="User"
+      DTS:ObjectName="originalduedate">
       <DTS:VariableValue
         DTS:DataType="8"
         xml:space="preserve"></DTS:VariableValue>
@@ -153,7 +173,7 @@
         <SQLTask:SqlTaskData
           SQLTask:Connection="{FA877C17-9970-459F-BFAC-AC1E9E4433B6}"
           SQLTask:BypassPrepare="False"
-          SQLTask:SqlStatementSource="SELECT   requests.vcVisibleRequestID as filenumber,  requests.vcDescription as requestdescription,  convert(varchar,requests.sdtRqtDescFromdate,120) as reqDescriptionFromDate,   convert(varchar,requests.sdtRqtDescTodate,120) as reqDescriptionToDate,  convert(varchar, requests.sdtReceivedDate,120) as requestProcessStart,   convert(varchar,requests.sdtTargetDate,120) as dueDate, convert(varchar, (SELECT TOP 1 cfr.sdtDueDate FROM tblRequestForDocuments cfr WITH (NOLOCK)      INNER JOIN tblProgramOffices programoffice WITH (NOLOCK) ON programoffice.tiProgramOfficeID = cfr.tiProgramOfficeID     WHERE requests.iRequestID = cfr.iRequestID       AND requests.tiOfficeID = programoffice.tiOfficeID     AND office.OFFICE_ID = programoffice.tiOfficeID      AND cfr.sdtDueDate IS NOT NULL        ORDER BY cfr.sdtDueDate DESC),120) as cfrDueDate, convert(varchar,sum(distinct case when requests.IREQUESTID = reviewlog.IREQUESTID and reviewlog.IDOCID = documents.IDOCID then documents.SIPAGECOUNT    when requests.IREQUESTID = redaction.IREQUESTID and redaction.IDOCID = ldocuments.IDOCID then ldocuments.SIPAGECOUNT       else 0 end),120) as requestPageCount&#x9;,  requests.vcRequestStatus,  CONVERT(VARCHAR(MAX),(SELECT CONCAT('[',STRING_AGG( CONCAT('{&quot;', destin_vcVisibleRequestID, '&quot;:&quot;', ministry, '&quot;}'),','),']') AS linkedRequests                             FROM(                                 SELECT DISTINCT                                     destin.vcVisibleRequestID AS destin_vcVisibleRequestID,                                     office.OFFICE_CODE AS ministry                                 FROM tblRequests origin                                 JOIN tblRequestLinks link ON(origin.IREQUESTID = link.iRequestIDOrigin OR origin.IREQUESTID = link.iRequestIDDestin)                                 JOIN tblRequests destin ON(link.iRequestIDOrigin = destin.IREQUESTID OR link.iRequestIDDestin = destin.IREQUESTID)                                 JOIN EC_OFFICE office ON destin.tiOfficeID = office.OFFICE_ID                                 WHERE origin.vcVisibleRequestID =  requests.vcVisibleRequestID                                    AND destin.vcVisibleRequestID !=  requests.vcVisibleRequestID                             ) AS destination_table),120) AS linkedRequests  FROM       tblRequests requests WITH (NOLOCK)   LEFT OUTER JOIN EC_OFFICE office WITH (NOLOCK) ON requests.tiOfficeID = office.OFFICE_ID     LEFT OUTER JOIN tblRequestStatuses requeststatuses WITH (NOLOCK) on requests.irequeststatusid = requeststatuses.irequeststatusid    LEFT OUTER JOIN dbo.TBLdocumentreviewlog reviewlog WITH (NOLOCK) ON requests.IREQUESTID = reviewlog.IREQUESTID         LEFT OUTER JOIN dbo.TBLRedactionlayers redaction WITH (NOLOCK) ON requests.IREQUESTID = redaction.IREQUESTID  LEFT OUTER JOIN dbo.TBLDOCUMENTS documents WITH (NOLOCK) ON reviewlog.IDOCID = documents.IDOCID  LEFT OUTER JOIN dbo.TBLDOCUMENTS ldocuments WITH (NOLOCK) ON redaction.IDOCID = ldocuments.IDOCID    WHERE       vcVisibleRequestID IN  ('CFD-2022-20261', 'CFD-2021-14313','CFD-2021-12866' , 'CFD-2021-12905', 'CFD-2021-12651','CFD-2023-30193')  AND &#x9;&#x9;&#x9;&#x9;  office.OFFICE_CODE = 'CFD' &#x9;&#x9;&#x9;&#x9;  AND  requests.vcRequestStatus NOT IN ('Closed')        GROUP BY requests.vcVisibleRequestID,requests.vcRequestStatus,requeststatuses.vcRequestStatus,requests.sdtReceivedDate,   requests.sdtTargetDate,  requests.sdtOriginalTargetDate, requests.vcDescription,       requests.sdtRqtDescFromdate, requests.sdtRqtDescTodate, requests.sdtRequestedDate,   office.OFFICE_CODE,          requests.iRequestID,        requests.vcVisibleRequestID, requests.tiOfficeID, office.OFFICE_ID,requests.vcRequestStatus"
+          SQLTask:SqlStatementSource="SELECT         requests.vcVisibleRequestID as filenumber,       requests.vcDescription as requestdescription,        convert(varchar,ISNULL(requests.sdtRqtDescFromdate,''),120) as reqDescriptionFromDate,       convert(varchar,ISNULL(requests.sdtRqtDescTodate,''),120) as reqDescriptionToDate,     convert(varchar, requests.sdtReceivedDate,120) as requestProcessStart,        convert(varchar,requests.sdtTargetDate,120) as dueDate,      convert(varchar, ISNULL((SELECT TOP 1 cfr.sdtDueDate FROM tblRequestForDocuments cfr WITH (NOLOCK)         &#x9;   INNER JOIN tblProgramOffices programoffice WITH (NOLOCK) ON programoffice.tiProgramOfficeID = cfr.tiProgramOfficeID         WHERE requests.iRequestID = cfr.iRequestID        &#x9;AND requests.tiOfficeID = programoffice.tiOfficeID      AND office.OFFICE_ID = programoffice.tiOfficeID         &#x9; AND cfr.sdtDueDate IS NOT NULL         ORDER BY cfr.sdtDueDate DESC),''),120) as cfrDueDate,         convert(varchar,sum(distinct case when requests.IREQUESTID = reviewlog.IREQUESTID and reviewlog.IDOCID = documents.IDOCID then documents.SIPAGECOUNT       &#x9;  when requests.IREQUESTID = redaction.IREQUESTID and redaction.IDOCID = ldocuments.IDOCID then ldocuments.SIPAGECOUNT       else 0 end),120) as requestPageCount&#x9;,      &#x9;    requests.vcRequestStatus,     CONVERT(VARCHAR(MAX),(SELECT CONCAT('[',STRING_AGG( CONCAT('{&quot;', destin_vcVisibleRequestID, '&quot;:&quot;', ministry, '&quot;}'),','),']') AS linkedRequests            FROM       (SELECT DISTINCT   destin.vcVisibleRequestID AS destin_vcVisibleRequestID,  office.OFFICE_CODE AS ministry FROM tblRequests origin        JOIN tblRequestLinks link ON(origin.IREQUESTID = link.iRequestIDOrigin OR origin.IREQUESTID = link.iRequestIDDestin)                                      JOIN tblRequests destin ON(link.iRequestIDOrigin = destin.IREQUESTID OR link.iRequestIDDestin = destin.IREQUESTID)                                     JOIN EC_OFFICE office ON destin.tiOfficeID = office.OFFICE_ID     WHERE origin.vcVisibleRequestID =  requests.vcVisibleRequestID   AND destin.vcVisibleRequestID !=  requests.vcVisibleRequestID  ) AS destination_table),120)   AS linkedRequests,        CONVERT(VARCHAR(MAX),CONCAT('&quot;',ISNULL(requestfields.CUSTOMFIELD75,''),'&quot;')) as identityVerified ,       convert(varchar,requests.sdtOriginalTargetDate,120) as originalDueDate  FROM       tblRequests requests WITH (NOLOCK)         LEFT OUTER JOIN EC_OFFICE office WITH (NOLOCK) ON requests.tiOfficeID = office.OFFICE_ID          LEFT OUTER JOIN tblRequestStatuses requeststatuses WITH (NOLOCK) on requests.irequeststatusid = requeststatuses.irequeststatusid          LEFT OUTER JOIN dbo.TBLdocumentreviewlog reviewlog WITH (NOLOCK) ON requests.IREQUESTID = reviewlog.IREQUESTID               LEFT OUTER JOIN dbo.TBLRedactionlayers redaction WITH (NOLOCK) ON requests.IREQUESTID = redaction.IREQUESTID       LEFT OUTER JOIN dbo.TBLDOCUMENTS documents WITH (NOLOCK) ON reviewlog.IDOCID = documents.IDOCID        LEFT OUTER JOIN dbo.TBLDOCUMENTS ldocuments WITH (NOLOCK) ON redaction.IDOCID = ldocuments.IDOCID         LEFT OUTER JOIN dbo.TBLREQUESTCUSTOMFIELDS requestfields WITH (NOLOCK) ON requests.iRequestID = requestfields.iRequestID        WHERE        vcVisibleRequestID IN   ( 'CFD-2023-33396','CFD-2023-34099','CFD-2023-34093','CFD-2023-34078','CFD-2023-34034','CFD-2023-33999','CFD-2023-33867','CFD-2023-33756','CFD-2023-33677','CFD-2022-24059','CFD-2022-23749','CFD-2022-21382','CFD-2022-20862','CFD-2020-00129','CFD-2021-11289','CFD-2021-11669','CFD-2021-14023','CFD-2021-11041','CFD-2020-03214','CFD-2021-13124','CFD-2023-32523' )   AND  office.OFFICE_CODE = 'CFD' &#x9;&#x9;&#x9;&#x9;       AND  requests.vcRequestStatus NOT IN ('Closed','Completed')              GROUP BY requests.vcVisibleRequestID,requests.vcRequestStatus,requeststatuses.vcRequestStatus,requests.sdtReceivedDate,         requests.sdtTargetDate,  requests.sdtOriginalTargetDate, requests.vcDescription,          requests.sdtRqtDescFromdate,  requests.sdtRqtDescTodate, requests.sdtRequestedDate,      office.OFFICE_CODE,           requests.iRequestID,         requests.vcVisibleRequestID, requests.tiOfficeID, office.OFFICE_ID,requests.vcRequestStatus,requestfields.CUSTOMFIELD75"
           SQLTask:ResultType="ResultSetType_Rowset" xmlns:SQLTask="www.microsoft.com/sqlserver/dts/tasks/sqltask">
           <SQLTask:ResultBinding
             SQLTask:ResultName="0"
@@ -195,7 +215,7 @@
           <DTS:ObjectData>
             <SQLTask:SqlTaskData
               SQLTask:Connection="{18EF9DFD-37E1-484D-9BC1-BFE418845E48}"
-              SQLTask:SqlStatementSource="INSERT INTO public.&quot;FOIMinistryRequests&quot;(&#x9; &#xA;&#x9;version, &#xA;&#x9;isactive, &#xA;&#x9;filenumber, &#xA;&#x9;description, &#xA;&#x9;recordsearchfromdate, &#xA;&#x9;recordsearchtodate, &#xA;&#x9;startdate, &#xA;&#x9;duedate, &#xA;&#x9;assignedto, &#xA;&#x9;created_at, &#xA;&#x9;updated_at, &#xA;&#x9;createdby, &#xA;&#x9;updatedby, &#xA;&#x9;programareaid, &#xA;&#x9;requeststatusid, &#xA;&#x9;foirequest_id, &#xA;&#x9;foirequestversion_id, &#x9;&#xA;&#x9;cfrduedate, &#x9;&#xA;&#x9;axisrequestid, &#x9;&#xA;&#x9;requestpagecount, &#x9; &#xA;&#x9;linkedrequests, &#xA;&#x9;migrationreference,assignedgroup,assignedministrygroup)&#xA;&#x9;VALUES ( &#xA;&#x9;&#x9;1, &#xA;&#x9;&#x9;False, &#xA;&#x9;&#x9;?, &#xA;&#x9;&#x9;?, &#xA;&#x9;&#x9;to_timestamp(?,'YYYY-MM-DD hh24:mi:ss'), &#xA;&#x9;&#x9;to_timestamp(?,'YYYY-MM-DD hh24:mi:ss'), &#xA;&#x9;&#x9;to_timestamp(?,'YYYY-MM-DD hh24:mi:ss'),&#xA;&#x9;&#x9;to_timestamp(?,'YYYY-MM-DD hh24:mi:ss'),&#xA;&#x9;&#x9;NULL, &#xA;&#x9;&#x9;NOW(), &#xA;&#x9;&#x9;NOW(), &#xA;&#x9;&#x9;'cfdmigration', &#xA;&#x9;&#x9;'cfdmigration',&#xA;(SELECT programareaid FROM public.&quot;ProgramAreas&quot; PA WHERE PA.iaocode='CFD' and PA.isactive=True), &#xA;(SELECT requeststatusid FROM public.&quot;FOIRequestStatuses&quot; RS WHERE RS.name='Open' and RS.isactive=True), &#xA;(SELECT foirequestid FROM public.&quot;FOIRequests&quot; R WHERE R.migrationreference=? ORDER BY R.created_at DESC LIMIT 1), &#xA;(SELECT version FROM public.&quot;FOIRequests&quot; R WHERE R.migrationreference=? ORDER BY R.created_at DESC LIMIT 1),  &#xA;&#x9;&#x9;to_timestamp(?,'YYYY-MM-DD hh24:mi:ss'),  &#xA;&#x9;&#x9;?,  &#xA;&#x9;&#x9;?,  &#xA;&#x9;&#x9;?::json, &#xA;&#x9;&#x9;?,'MCFD Personals Team','MCF Ministry Team');" xmlns:SQLTask="www.microsoft.com/sqlserver/dts/tasks/sqltask">
+              SQLTask:SqlStatementSource="INSERT INTO public.&quot;FOIMinistryRequests&quot;(&#x9; &#xA;&#x9;version, &#xA;&#x9;isactive, &#xA;&#x9;filenumber, &#xA;&#x9;description, &#xA;&#x9;recordsearchfromdate, &#xA;&#x9;recordsearchtodate, &#xA;&#x9;startdate, &#xA;&#x9;duedate, &#xA;&#x9;assignedto, &#xA;&#x9;created_at, &#xA;&#x9;updated_at, &#xA;&#x9;createdby, &#xA;&#x9;updatedby, &#xA;&#x9;programareaid, &#xA;&#x9;requeststatusid, &#xA;&#x9;foirequest_id, &#xA;&#x9;foirequestversion_id, &#x9;&#xA;&#x9;cfrduedate, &#x9;&#xA;&#x9;axisrequestid, &#x9;&#xA;&#x9;requestpagecount, &#x9; &#xA;&#x9;linkedrequests, &#xA;&#x9;migrationreference,assignedgroup,assignedministrygroup,identityverified,originalldd)&#xA;&#x9;VALUES ( &#xA;&#x9;&#x9;1, &#xA;&#x9;&#x9;False, &#xA;&#x9;&#x9;?, &#xA;&#x9;&#x9;?, &#xA;&#x9;&#x9;to_timestamp(?,'YYYY-MM-DD hh24:mi:ss'), &#xA;&#x9;&#x9;to_timestamp(?,'YYYY-MM-DD hh24:mi:ss'), &#xA;&#x9;&#x9;to_timestamp(?,'YYYY-MM-DD hh24:mi:ss'),&#xA;&#x9;&#x9;to_timestamp(?,'YYYY-MM-DD hh24:mi:ss'),&#xA;&#x9;&#x9;NULL, &#xA;&#x9;&#x9;NOW(), &#xA;&#x9;&#x9;NOW(), &#xA;&#x9;&#x9;'cfdmigration', &#xA;&#x9;&#x9;'cfdmigration',&#xA;(SELECT programareaid FROM public.&quot;ProgramAreas&quot; PA WHERE PA.iaocode='CFD' and PA.isactive=True), &#xA;(SELECT requeststatusid FROM public.&quot;FOIRequestStatuses&quot; RS WHERE RS.name='Open' and RS.isactive=True), &#xA;(SELECT foirequestid FROM public.&quot;FOIRequests&quot; R WHERE R.migrationreference=? ORDER BY R.created_at DESC LIMIT 1), &#xA;(SELECT version FROM public.&quot;FOIRequests&quot; R WHERE R.migrationreference=? ORDER BY R.created_at DESC LIMIT 1),  &#xA;&#x9;&#x9;to_timestamp(?,'YYYY-MM-DD hh24:mi:ss'),  &#xA;&#x9;&#x9;?,  &#xA;&#x9;&#x9;?,  &#xA;&#x9;&#x9;?::json, &#xA;&#x9;&#x9;?,'Children and Family Team','MCF Ministry Team',?::json,to_timestamp(?,'YYYY-MM-DD hh24:mi:ss'));" xmlns:SQLTask="www.microsoft.com/sqlserver/dts/tasks/sqltask">
               <SQLTask:ParameterBinding
                 SQLTask:ParameterName="1"
                 SQLTask:DtsVariableName="User::filenumber"
@@ -274,6 +294,18 @@
                 SQLTask:ParameterDirection="Input"
                 SQLTask:DataType="-9"
                 SQLTask:ParameterSize="-1" />
+              <SQLTask:ParameterBinding
+                SQLTask:ParameterName="14"
+                SQLTask:DtsVariableName="User::identityverified"
+                SQLTask:ParameterDirection="Input"
+                SQLTask:DataType="-9"
+                SQLTask:ParameterSize="-1" />
+              <SQLTask:ParameterBinding
+                SQLTask:ParameterName="15"
+                SQLTask:DtsVariableName="User::originalduedate"
+                SQLTask:ParameterDirection="Input"
+                SQLTask:DataType="-9"
+                SQLTask:ParameterSize="-1" />
             </SQLTask:SqlTaskData>
           </DTS:ObjectData>
         </DTS:Executable>
@@ -291,7 +323,7 @@
           <DTS:ObjectData>
             <SQLTask:SqlTaskData
               SQLTask:Connection="{18EF9DFD-37E1-484D-9BC1-BFE418845E48}"
-              SQLTask:SqlStatementSource="INSERT INTO public.&quot;FOIMinistryRequests&quot;(&#xA;foiministryrequestid,  &#xA; version, &#xA; isactive, &#xA; filenumber, &#xA; description, &#xA; recordsearchfromdate, &#xA; recordsearchtodate, &#xA; startdate, &#xA; duedate, &#xA; assignedto, &#xA; created_at, &#xA; updated_at, &#xA; createdby, &#xA; updatedby, &#xA; programareaid, &#xA; requeststatusid, &#xA; foirequest_id, &#xA; foirequestversion_id,  &#xA; cfrduedate,  &#xA; axisrequestid,  &#xA; requestpagecount,   &#xA; linkedrequests, &#xA; migrationreference,assignedgroup,assignedministrygroup)&#xA; VALUES ( &#xA;(SELECT foiministryrequestid FROM public.&quot;FOIMinistryRequests&quot; WHERE axisrequestid = ? LIMIT 1)&#x9; ,&#xA;  2, &#xA;  True, &#xA;  ?, &#xA;  ?, &#xA;  to_timestamp(?,'YYYY-MM-DD hh24:mi:ss'), &#xA;  to_timestamp(?,'YYYY-MM-DD hh24:mi:ss'), &#xA;  to_timestamp(?,'YYYY-MM-DD hh24:mi:ss'),&#xA;  to_timestamp(?,'YYYY-MM-DD hh24:mi:ss'),&#xA;  NULL, &#xA;  NOW(), &#xA;  NOW(), &#xA;  'cfdmigration', &#xA;  'cfdmigration',&#xA;(SELECT programareaid FROM public.&quot;ProgramAreas&quot; PA WHERE PA.iaocode='CFD' and PA.isactive=True), &#xA;(SELECT requeststatusid FROM public.&quot;FOIRequestStatuses&quot; RS WHERE RS.name= (SELECT &quot;stateonFOI&quot; FROM public.&quot;AXISMigrationMapper&quot; WHERE &quot;stateonAXIS&quot;=? LIMIT 1) and RS.isactive=True), &#xA;(SELECT foirequestid FROM public.&quot;FOIRequests&quot; R WHERE R.migrationreference=? ORDER BY R.created_at DESC LIMIT 1), &#xA;(SELECT version FROM public.&quot;FOIRequests&quot; R WHERE R.migrationreference=? ORDER BY R.created_at DESC LIMIT 1),  &#xA;  to_timestamp(?,'YYYY-MM-DD hh24:mi:ss'),  &#xA;  ?,  &#xA;  ?,  &#xA; ?::json, &#xA;  ?,'MCFD Personals Team','MCF Ministry Team');" xmlns:SQLTask="www.microsoft.com/sqlserver/dts/tasks/sqltask">
+              SQLTask:SqlStatementSource="INSERT INTO public.&quot;FOIMinistryRequests&quot;(&#xA;foiministryrequestid,  &#xA; version, &#xA; isactive, &#xA; filenumber, &#xA; description, &#xA; recordsearchfromdate, &#xA; recordsearchtodate, &#xA; startdate, &#xA; duedate, &#xA; assignedto, &#xA; created_at, &#xA; updated_at, &#xA; createdby, &#xA; updatedby, &#xA; programareaid, &#xA; requeststatusid, &#xA; foirequest_id, &#xA; foirequestversion_id,  &#xA; cfrduedate,  &#xA; axisrequestid,  &#xA; requestpagecount,   &#xA; linkedrequests, &#xA; migrationreference,assignedgroup,assignedministrygroup,identityverified,originalldd)&#xA; VALUES ( &#xA;(SELECT foiministryrequestid FROM public.&quot;FOIMinistryRequests&quot; WHERE axisrequestid = ? LIMIT 1)&#x9; ,&#xA;  2, &#xA;  True, &#xA;  ?, &#xA;  ?, &#xA;  to_timestamp(?,'YYYY-MM-DD hh24:mi:ss'), &#xA;  to_timestamp(?,'YYYY-MM-DD hh24:mi:ss'), &#xA;  to_timestamp(?,'YYYY-MM-DD hh24:mi:ss'),&#xA;  to_timestamp(?,'YYYY-MM-DD hh24:mi:ss'),&#xA;  NULL, &#xA;  NOW(), &#xA;  NOW(), &#xA;  'cfdmigration', &#xA;  'cfdmigration',&#xA;(SELECT programareaid FROM public.&quot;ProgramAreas&quot; PA WHERE PA.iaocode='CFD' and PA.isactive=True), &#xA;(SELECT requeststatusid FROM public.&quot;FOIRequestStatuses&quot; RS WHERE RS.name= (SELECT &quot;stateonFOI&quot; FROM public.&quot;AXISMigrationMapper&quot; WHERE &quot;stateonAXIS&quot;=? LIMIT 1) and RS.isactive=True), &#xA;(SELECT foirequestid FROM public.&quot;FOIRequests&quot; R WHERE R.migrationreference=? ORDER BY R.created_at DESC LIMIT 1), &#xA;(SELECT version FROM public.&quot;FOIRequests&quot; R WHERE R.migrationreference=? ORDER BY R.created_at DESC LIMIT 1),  &#xA;  to_timestamp(?,'YYYY-MM-DD hh24:mi:ss'),  &#xA;  ?,  &#xA;  ?,  &#xA; ?::json, &#xA;  ?,'Children and Family Team','MCF Ministry Team',?::json, to_timestamp(?,'YYYY-MM-DD hh24:mi:ss'));" xmlns:SQLTask="www.microsoft.com/sqlserver/dts/tasks/sqltask">
               <SQLTask:ParameterBinding
                 SQLTask:ParameterName="1"
                 SQLTask:DtsVariableName="User::filenumber"
@@ -382,6 +414,18 @@
                 SQLTask:ParameterDirection="Input"
                 SQLTask:DataType="-9"
                 SQLTask:ParameterSize="-1" />
+              <SQLTask:ParameterBinding
+                SQLTask:ParameterName="16"
+                SQLTask:DtsVariableName="User::identityverified"
+                SQLTask:ParameterDirection="Input"
+                SQLTask:DataType="-9"
+                SQLTask:ParameterSize="-1" />
+              <SQLTask:ParameterBinding
+                SQLTask:ParameterName="17"
+                SQLTask:DtsVariableName="User::originalduedate"
+                SQLTask:ParameterDirection="Input"
+                SQLTask:DataType="-9"
+                SQLTask:ParameterSize="-1" />
             </SQLTask:SqlTaskData>
           </DTS:ObjectData>
         </DTS:Executable>
@@ -399,64 +443,76 @@
       <DTS:ForEachVariableMappings>
         <DTS:ForEachVariableMapping
           DTS:CreationName=""
-          DTS:DTSID="{039BC75F-42E5-4B4C-99C0-0C398A3C9F9A}"
-          DTS:ObjectName="{039BC75F-42E5-4B4C-99C0-0C398A3C9F9A}"
+          DTS:DTSID="{26C84C08-8692-497F-A775-1A2649E06A27}"
+          DTS:ObjectName="{26C84C08-8692-497F-A775-1A2649E06A27}"
           DTS:ValueIndex="0"
           DTS:VariableName="User::filenumber" />
         <DTS:ForEachVariableMapping
           DTS:CreationName=""
-          DTS:DTSID="{8E5D9DC3-C408-4CBB-8F3A-B38E65D75720}"
-          DTS:ObjectName="{8E5D9DC3-C408-4CBB-8F3A-B38E65D75720}"
+          DTS:DTSID="{3EBB5F89-01E1-4BB7-9C5B-4FAB95DCBC84}"
+          DTS:ObjectName="{3EBB5F89-01E1-4BB7-9C5B-4FAB95DCBC84}"
           DTS:ValueIndex="1"
           DTS:VariableName="User::description" />
         <DTS:ForEachVariableMapping
           DTS:CreationName=""
-          DTS:DTSID="{0C3A6A44-D213-4C32-9DBC-7E081C1E0674}"
-          DTS:ObjectName="{0C3A6A44-D213-4C32-9DBC-7E081C1E0674}"
+          DTS:DTSID="{84B07CDB-F7C8-44B6-AB9E-F5E82A861D1F}"
+          DTS:ObjectName="{84B07CDB-F7C8-44B6-AB9E-F5E82A861D1F}"
           DTS:ValueIndex="2"
           DTS:VariableName="User::fromdate" />
         <DTS:ForEachVariableMapping
           DTS:CreationName=""
-          DTS:DTSID="{BDF7BC32-2199-4FCB-889B-68546F49A40B}"
-          DTS:ObjectName="{BDF7BC32-2199-4FCB-889B-68546F49A40B}"
+          DTS:DTSID="{5064441B-F33D-4F47-973D-BF4CC7AB6E32}"
+          DTS:ObjectName="{5064441B-F33D-4F47-973D-BF4CC7AB6E32}"
           DTS:ValueIndex="3"
           DTS:VariableName="User::todate" />
         <DTS:ForEachVariableMapping
           DTS:CreationName=""
-          DTS:DTSID="{A709CB02-43F1-428F-B82C-02B099E25AF8}"
-          DTS:ObjectName="{A709CB02-43F1-428F-B82C-02B099E25AF8}"
+          DTS:DTSID="{B2C6D2DC-BB2D-47F1-AC9E-9CCEADC71572}"
+          DTS:ObjectName="{B2C6D2DC-BB2D-47F1-AC9E-9CCEADC71572}"
           DTS:ValueIndex="4"
           DTS:VariableName="User::startdate" />
         <DTS:ForEachVariableMapping
           DTS:CreationName=""
-          DTS:DTSID="{33EFD33B-9C67-40E6-87C4-D53DD33AD3BB}"
-          DTS:ObjectName="{33EFD33B-9C67-40E6-87C4-D53DD33AD3BB}"
+          DTS:DTSID="{50C294AF-05E1-417C-B3D3-CA079A72093A}"
+          DTS:ObjectName="{50C294AF-05E1-417C-B3D3-CA079A72093A}"
           DTS:ValueIndex="5"
           DTS:VariableName="User::duedate" />
         <DTS:ForEachVariableMapping
           DTS:CreationName=""
-          DTS:DTSID="{CE283A15-8BA1-4D8A-960B-FE314829E12D}"
-          DTS:ObjectName="{CE283A15-8BA1-4D8A-960B-FE314829E12D}"
+          DTS:DTSID="{6E5050ED-5414-4CBF-86C2-722DD1FB8CB0}"
+          DTS:ObjectName="{6E5050ED-5414-4CBF-86C2-722DD1FB8CB0}"
           DTS:ValueIndex="6"
           DTS:VariableName="User::cfrduedate" />
         <DTS:ForEachVariableMapping
           DTS:CreationName=""
-          DTS:DTSID="{31767289-5F85-4657-974D-970E0D2007BF}"
-          DTS:ObjectName="{31767289-5F85-4657-974D-970E0D2007BF}"
+          DTS:DTSID="{88203720-D815-41C5-B642-AAB16D2227EE}"
+          DTS:ObjectName="{88203720-D815-41C5-B642-AAB16D2227EE}"
           DTS:ValueIndex="7"
           DTS:VariableName="User::reqpagecount" />
         <DTS:ForEachVariableMapping
           DTS:CreationName=""
-          DTS:DTSID="{037CA0A9-3587-455F-8257-284A02FC8AAE}"
-          DTS:ObjectName="{037CA0A9-3587-455F-8257-284A02FC8AAE}"
+          DTS:DTSID="{27E736E2-A193-450C-AB2A-EA670B8D242F}"
+          DTS:ObjectName="{27E736E2-A193-450C-AB2A-EA670B8D242F}"
           DTS:ValueIndex="8"
           DTS:VariableName="User::requeststatus" />
         <DTS:ForEachVariableMapping
           DTS:CreationName=""
-          DTS:DTSID="{40DA4AA4-D72D-4183-81F8-D0E8239E4990}"
-          DTS:ObjectName="{40DA4AA4-D72D-4183-81F8-D0E8239E4990}"
+          DTS:DTSID="{295C5B83-1393-46AF-A181-11B4E9264552}"
+          DTS:ObjectName="{295C5B83-1393-46AF-A181-11B4E9264552}"
           DTS:ValueIndex="9"
           DTS:VariableName="User::linkedrequests" />
+        <DTS:ForEachVariableMapping
+          DTS:CreationName=""
+          DTS:DTSID="{CE484E36-C014-4F6F-87E0-058EAEE5CB00}"
+          DTS:ObjectName="{CE484E36-C014-4F6F-87E0-058EAEE5CB00}"
+          DTS:ValueIndex="10"
+          DTS:VariableName="User::identityverified" />
+        <DTS:ForEachVariableMapping
+          DTS:CreationName=""
+          DTS:DTSID="{4C6960C2-B109-48B4-9105-223111CCFA93}"
+          DTS:ObjectName="{4C6960C2-B109-48B4-9105-223111CCFA93}"
+          DTS:ValueIndex="11"
+          DTS:VariableName="User::originalduedate" />
       </DTS:ForEachVariableMappings>
     </DTS:Executable>
   </DTS:Executables>
@@ -483,15 +539,15 @@
       <GraphLayout
         Capacity="8" xmlns="clr-namespace:Microsoft.SqlServer.IntegrationServices.Designer.Model.Serialization;assembly=Microsoft.SqlServer.IntegrationServices.Graph" xmlns:mssgle="clr-namespace:Microsoft.SqlServer.Graph.LayoutEngine;assembly=Microsoft.SqlServer.Graph" xmlns:assembly="http://schemas.microsoft.com/winfx/2006/xaml">
         <NodeLayout
-          Size="177,42"
+          Size="176.8,41.6"
           Id="Package\EST_FetchInfoAXIS"
           TopLeft="551,132" />
         <NodeLayout
-          Size="174,42"
+          Size="174.4,41.6"
           Id="Package\Foreach Loop Container\EST_InsertV1Open"
           TopLeft="86,42" />
         <NodeLayout
-          Size="233,42"
+          Size="232.8,41.6"
           Id="Package\Foreach Loop Container\EST_InsertV2  Records Review"
           TopLeft="125,135" />
         <EdgeLayout
@@ -531,8 +587,8 @@
         <ContainerLayout
           HeaderHeight="43"
           IsExpanded="True"
-          PanelSize="573,232"
-          Size="573,275"
+          PanelSize="572.8,232"
+          Size="572.8,275.2"
           Id="Package\Foreach Loop Container"
           TopLeft="425,288" />
         <EdgeLayout
