@@ -25,6 +25,6 @@
         "name": "Triggered User",
         "description": "Triggered User",
         "isactive": true,
-        "notificationusertypelabel": "triggereduser"
+        "notificationusertypelabel": "assignee"
     }
 }
