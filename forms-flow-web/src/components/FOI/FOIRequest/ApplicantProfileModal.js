@@ -33,8 +33,9 @@ import AccordionDetails from '@material-ui/core/AccordionDetails';
 import Typography from '@material-ui/core/Typography';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import { StateEnum } from "../../../constants/FOI/statusEnum";
-import { setFOIRequestApplicantProfile } from "../../../actions/FOI/foiRequestActions";
+import { setFOIRequestApplicantProfile, setFOILoader } from "../../../actions/FOI/foiRequestActions";
 import { toast } from "react-toastify";
+import Loading from "../../../containers/Loading";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -138,9 +139,11 @@ const ApplicantProfileModal = React.memo(({modalOpen, handleModalClose}) => {
                         setRows(res);
                         setIsLoading(false);
                     }))
-            } else {                
+            } else {
+                setSelectedApplicant(true);
                 dispatch(fetchApplicantInfo(requestDetails.foiRequestApplicantID, (err, res) => {
                     setSelectedApplicant(res);
+                    setIsLoading(false);
                 }))
             }
         }
@@ -149,9 +152,9 @@ const ApplicantProfileModal = React.memo(({modalOpen, handleModalClose}) => {
     useEffect(() => {
         setSaveApplicantObject({...selectedApplicant})
         for (let field in selectedApplicant) {
-            if (field === 'additionalPersonalInfo' && requestDetails[field] && requestDetails.requestType === 'personal') {
-                if ((requestDetails[field][FOI_COMPONENT_CONSTANTS.DOB] && selectedApplicant[field][FOI_COMPONENT_CONSTANTS.DOB] !== requestDetails[field][FOI_COMPONENT_CONSTANTS.DOB]) ||
-                (requestDetails[field][FOI_COMPONENT_CONSTANTS.PERSONAL_HEALTH_NUMBER] && selectedApplicant[field][FOI_COMPONENT_CONSTANTS.PERSONAL_HEALTH_NUMBER] !== requestDetails[field][FOI_COMPONENT_CONSTANTS.PERSONAL_HEALTH_NUMBER])) {                    
+            if (field === 'additionalPersonalInfo') {
+                if (requestDetails[field] && requestDetails.requestType === 'personal' && ((requestDetails[field][FOI_COMPONENT_CONSTANTS.DOB] && selectedApplicant[field][FOI_COMPONENT_CONSTANTS.DOB] !== requestDetails[field][FOI_COMPONENT_CONSTANTS.DOB]) ||
+                (requestDetails[field][FOI_COMPONENT_CONSTANTS.PERSONAL_HEALTH_NUMBER] && selectedApplicant[field][FOI_COMPONENT_CONSTANTS.PERSONAL_HEALTH_NUMBER] !== requestDetails[field][FOI_COMPONENT_CONSTANTS.PERSONAL_HEALTH_NUMBER]))) {
                     setIsProfileDifferent(true);
                     break;
                 }
@@ -265,15 +268,14 @@ const ApplicantProfileModal = React.memo(({modalOpen, handleModalClose}) => {
     }
 
     const selectProfile = () => {
-        if (_.isEqual(selectedApplicant, saveApplicantObject) || confirmationMessage) {     
-            if (requestDetails.currentState === StateEnum.intakeinprogress.name) {
-                dispatch(setFOIRequestApplicantProfile(saveApplicantObject));
-            }
+        if (_.isEqual(selectedApplicant, saveApplicantObject) || confirmationMessage) {
+            handleClose();
             // set loading screen
+            dispatch(setFOILoader(true));
             dispatch(saveApplicantInfo(saveApplicantObject, (err, res) => {
                 if (!err) {
                     // unset loading screen
-                    handleClose();
+                    dispatch(setFOIRequestApplicantProfile(saveApplicantObject));
                 }
             }));
         } else {
@@ -435,7 +437,7 @@ const ApplicantProfileModal = React.memo(({modalOpen, handleModalClose}) => {
                         })} 
                         </>
                         :
-                        <>
+                        isLoading ? <Loading /> : <>
                         {isProfileDifferent && 
                             <span style={{ fontSize: "13px" }}>
                                 Some of the fields in this profile do not match your original request. 
