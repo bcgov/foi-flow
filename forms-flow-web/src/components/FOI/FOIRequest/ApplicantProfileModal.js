@@ -153,10 +153,13 @@ const ApplicantProfileModal = React.memo(({modalOpen, handleModalClose}) => {
         setSaveApplicantObject({...selectedApplicant})
         for (let field in selectedApplicant) {
             if (field === 'additionalPersonalInfo') {
-                if (requestDetails[field] && requestDetails.requestType === 'personal' && ((requestDetails[field][FOI_COMPONENT_CONSTANTS.DOB] && selectedApplicant[field][FOI_COMPONENT_CONSTANTS.DOB] !== requestDetails[field][FOI_COMPONENT_CONSTANTS.DOB]) ||
-                (requestDetails[field][FOI_COMPONENT_CONSTANTS.PERSONAL_HEALTH_NUMBER] && selectedApplicant[field][FOI_COMPONENT_CONSTANTS.PERSONAL_HEALTH_NUMBER] !== requestDetails[field][FOI_COMPONENT_CONSTANTS.PERSONAL_HEALTH_NUMBER]))) {
-                    setIsProfileDifferent(true);
-                    break;
+                if (requestDetails[field] && requestDetails.requestType === 'personal') {
+                    for (let additionalField in requestDetails[field]) {
+                        if (requestDetails[field][additionalField] && selectedApplicant[field][additionalField] !== requestDetails[field][additionalField]) {
+                            setIsProfileDifferent(true);
+                            break;
+                        }
+                    }
                 }
             } else if (requestDetails[field] && selectedApplicant[field] !== requestDetails[field]) {
                 setIsProfileDifferent(true);
@@ -167,8 +170,10 @@ const ApplicantProfileModal = React.memo(({modalOpen, handleModalClose}) => {
 
     const createSaveApplicantObject = (name, value, value2) => {
         let newApplicantObj = {...saveApplicantObject}
-        if ([FOI_COMPONENT_CONSTANTS.DOB, FOI_COMPONENT_CONSTANTS.PERSONAL_HEALTH_NUMBER].includes(name)) {
-            newApplicantObj.additionalPersonalInfo[name] = value;
+        if ([FOI_COMPONENT_CONSTANTS.DOB, FOI_COMPONENT_CONSTANTS.PERSONAL_HEALTH_NUMBER, FOI_COMPONENT_CONSTANTS.ALSO_KNOWN_AS].includes(name)) {
+            let additionalPersonalInfo = {...newApplicantObj.additionalPersonalInfo}
+            additionalPersonalInfo[name] = value
+            newApplicantObj.additionalPersonalInfo = additionalPersonalInfo;
         } else {            
             newApplicantObj[name] = value;
         }
@@ -591,7 +596,7 @@ const ApplicantProfileModal = React.memo(({modalOpen, handleModalClose}) => {
                     <>{!applicantHistory && <button
                     className={`btn-bottom btn-save btn`}
                       onClick={selectProfile}
-                      disabled={isProfileDifferent}
+                      disabled={isProfileDifferent || _.isEqual(selectedApplicant, saveApplicantObject)}
                     >
                     Select & Save
                     </button>}

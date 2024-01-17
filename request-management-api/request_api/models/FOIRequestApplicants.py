@@ -70,7 +70,7 @@ class FOIRequestApplicant(db.Model):
             or applicant.middlename != middlename
             or applicant.businessname != businessname
             or applicant.alsoknownas != alsoknownas
-            or applicant.dob != dob
+            or applicant.dob != datetime.strptime(dob, "%Y-%m-%d")
         ):
             _applicant = FOIRequestApplicant()
             _applicant.createdby = userid

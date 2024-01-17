@@ -106,6 +106,9 @@ const ApplicantDetails = React.memo(
         defaultValue: "Select Category",
       })
     );
+    const [alsoKnownAsText, setAlsoKnownAs] = React.useState(
+      validateFields(requestDetails?.additionalPersonalInfo, FOI_COMPONENT_CONSTANTS.ALSO_KNOWN_AS)
+    );
 
     //handle initial value for required field validation
     React.useEffect(() => {
@@ -213,6 +216,14 @@ const ApplicantDetails = React.memo(
       );
     };
 
+    const handleAlsoKnownAsChange = (e) => {
+      setAlsoKnownAs(e.target.value);
+      createSaveRequestObject(
+        FOI_COMPONENT_CONSTANTS.ALSO_KNOWN_AS,
+        e.target.value
+      );
+    };
+
     //generate the menu items for the category
     const menuItems = category.map((item) => {
       return (
@@ -307,6 +318,17 @@ const ApplicantDetails = React.memo(
               >
                 {menuItems}
               </TextField>
+              {showHistory && <TextField
+                id="alsoKnownAs"
+                label="Also Known As"
+                inputProps={{ "aria-labelledby": "alsoKnownAs-label"}}
+                InputLabelProps={{ shrink: true }}
+                value={alsoKnownAsText}
+                variant="outlined"
+                fullWidth
+                disabled={disableInput}
+                onChange={handleAlsoKnownAsChange}
+              />}
             </div>
           </div>
         </AccordionDetails>
