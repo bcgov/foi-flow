@@ -29,6 +29,7 @@ class applicantservice:
         applicant = FOIRequestApplicant.getapplicantbyid(applicantid)
         applicant = self.__prepareapplicant(applicant)
         applicant['requestHistory'] = self.getapplicantrequests(applicantid)
+        applicant.pop('requestType')
         return applicant
 
     def searchapplicant(self, keywords):

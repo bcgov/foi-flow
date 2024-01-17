@@ -5,7 +5,8 @@ import {
 import API from "../../endpoints";
 import {
   serviceActionError,
-  setRestrictedReqTaglist
+  setRestrictedReqTaglist,
+  setFOILoader
 } from "../../../actions/FOI/foiRequestActions";
 import { catchError, fnDone} from './foiServicesUtil';
 import UserService from "../../../services/UserService";
@@ -145,6 +146,7 @@ export const saveApplicantInfo = (applicant, ...rest) => {
       .then((res) => {
         if (res.data) {
           dispatch(setRestrictedReqTaglist(res.data));
+          dispatch(setFOILoader(false));
           done(null, res.data);
         } else {
           dispatch(serviceActionError(res));

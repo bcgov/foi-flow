@@ -339,19 +339,24 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
   }, [requestDetails]);
 
   useEffect(() => {
-    if (requestApplicantProfile) {
-      let newRequestDetails = { ...saveRequestObject };
-      for (let field in requestApplicantProfile) {
-        if (field === "additionalPersonalInfo") {
-          for (let infofield in requestApplicantProfile[field]) {
-            newRequestDetails[field][infofield] =
-            requestApplicantProfile[field][infofield];
+    if (requestApplicantProfile) {      
+      if (requestDetails.currentState === StateEnum.intakeinprogress.name) {
+        let newRequestDetails = { ...saveRequestObject };
+        for (let field in requestApplicantProfile) {
+          if (field === "additionalPersonalInfo") {
+            newRequestDetails["additionalPersonalInfo"] = newRequestDetails["additionalPersonalInfo"] || {}
+            for (let infofield in requestApplicantProfile[field]) {
+              newRequestDetails[field][infofield] =
+              requestApplicantProfile[field][infofield];
+            }
+          } else {
+            newRequestDetails[field] = requestApplicantProfile[field];
           }
-        } else {
-          newRequestDetails[field] = requestApplicantProfile[field];
         }
+        dispatch(setFOIRequestDetail(newRequestDetails))
+      } else {
+        handleSaveRequest(requestDetails.currentState, false, "");
       }
-      dispatch(setFOIRequestDetail(newRequestDetails))
     }
   }, [requestApplicantProfile]);
 
