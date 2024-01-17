@@ -94,7 +94,7 @@ class applicantservice:
             'foirequestID': applicant["foirequestid"],
             'foirequestVersion': applicant["foirequestversion"],
             'requestType': applicant["requesttype"],
-            # 'category': applicant["applicantcategory"],           
+            'category': applicant["applicantcategory"],
             'email': self.__first_not_null(applicant["email"]),
             'address': self.__first_not_null(applicant["address"]),
             'city': self.__first_not_null(applicant["city"]),
@@ -151,6 +151,7 @@ class applicantservice:
             'Other Contact Info': applicant["othercontactinfo"],
             'Employee Number': applicant["employeenumber"],
             'Corrections Number': applicant["correctionnumber"],
+            'Applicant Category': applicant["applicantcategory"],
         }
 
     def getapplicantrequests(self, applicantid):

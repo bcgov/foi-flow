@@ -371,6 +371,9 @@ class FOIRequestApplicant(db.Model):
         personalcorrectionnumber = aliased(FOIRequestPersonalAttribute)
         personalhealthnumber = aliased(FOIRequestPersonalAttribute)
 
+        #aliase for search
+        searchcontactemail = aliased(FOIRequestContactInformation)
+
         #max foirequest version
         subquery_foirequest_maxversion = _session.query(FOIRequest.foirequestid, func.max(FOIRequest.version).label('max_version')).group_by(FOIRequest.foirequestid).subquery()
         joincondition = [
@@ -412,6 +415,8 @@ class FOIRequestApplicant(db.Model):
 
         subquery_all = _session.query(
                                 *selectedcolumns
+                            ).distinct(
+                                FOIRequest.foirequestid
                             ).join(
                                 FOIRequestApplicantMapping,
                                 and_(
@@ -560,12 +565,18 @@ class FOIRequestApplicant(db.Model):
                                     personalhealthnumber.personalattributeid == 3,
                                     personalhealthnumber.attributevalue is not None),
                                 isouter=True
+                            ).join(
+                                searchcontactemail,
+                                and_(
+                                    searchcontactemail.foirequest_id == FOIRequest.foirequestid,
+                                    searchcontactemail.contacttypeid == 1,
+                                    searchcontactemail.contactinformation == email),
                             ).filter(
                                 # FOIMinistryRequest.requeststatusid != 3,
-                                FOIRequest.isactive == True,
-                                contactemail.contactinformation == email
+                                FOIRequest.isactive == True
+                                # searchcontactemail.contactinformation == email
                             ).order_by(FOIRequest.foirequestid.desc()).subquery()
-
+        
         query_aggregate = _session.query(
             func.array_agg(subquery_all.c.applicantprofileid).label('applicantprofileid'),
             func.array_agg(subquery_all.c.updatedat).label('updatedat'),
@@ -627,6 +638,11 @@ class FOIRequestApplicant(db.Model):
         personalcorrectionnumber = aliased(FOIRequestPersonalAttribute)
         personalhealthnumber = aliased(FOIRequestPersonalAttribute)
 
+        #aliase for search
+        searchapplicant = aliased(FOIRequestApplicant)
+        searchapplicantmapping = aliased(FOIRequestApplicantMapping)
+        searchcontactinfo = aliased(FOIRequestContactInformation)
+
         #max foirequest version
         subquery_foirequest_maxversion = _session.query(FOIRequest.foirequestid, func.max(FOIRequest.version).label('max_version')).group_by(FOIRequest.foirequestid).subquery()
         joincondition = [
@@ -667,6 +683,8 @@ class FOIRequestApplicant(db.Model):
 
         subquery_all = _session.query(
                                 *selectedcolumns
+                            ).distinct(
+                                FOIRequest.foirequestid
                             ).join(
                                 FOIRequestApplicantMapping,
                                 and_(
@@ -806,10 +824,26 @@ class FOIRequestApplicant(db.Model):
                                     personalhealthnumber.personalattributeid == 3,
                                     personalhealthnumber.attributevalue is not None),
                                 isouter=True
+                            ).join(
+                                searchapplicantmapping,
+                                and_(
+                                    searchapplicantmapping.foirequest_id == FOIRequest.foirequestid,
+                                    searchapplicantmapping.requestortypeid == 1),
+                                isouter=True
+                            ).join(
+                                searchapplicant,
+                                searchapplicant.foirequestapplicantid == searchapplicantmapping.foirequestapplicantid,
+                                isouter=True
+                            ).join(
+                                searchcontactinfo,
+                                and_(
+                                    searchcontactinfo.foirequest_id == FOIRequest.foirequestid,
+                                    contacthomephone.contactinformation is not None),
+                                isouter=True
                             ).filter(
                                 # FOIMinistryRequest.requeststatusid != 3,
                                 FOIRequest.isactive == True,
-                                or_(*FOIRequestApplicant.getsearchfilters(keywords, contactemail, contacthomephone, contactworkphone, contactworkphone2, contactmobilephone))
+                                or_(*FOIRequestApplicant.getsearchfilters(searchapplicant, searchcontactinfo, keywords, contactemail, contacthomephone, contactworkphone, contactworkphone2, contactmobilephone))
                             ).order_by(FOIRequest.foirequestid.desc()).subquery()
 
         query_aggregate = _session.query(
@@ -847,29 +881,29 @@ class FOIRequestApplicant(db.Model):
 
 
     @classmethod
-    def getsearchfilters(cls, keywords, contactemail, contacthomephone, contactworkphone, contactworkphone2, contactmobilephone):
+    def getsearchfilters(cls, searchapplicant, searchcontactinfo, keywords, contactemail, contacthomephone, contactworkphone, contactworkphone2, contactmobilephone):
         searchfilters = []
         if(len(keywords) > 0):
             if('firstname' in keywords):
-                searchfilters.append(FOIRequestApplicant.firstname.ilike('%'+keywords['firstname']+'%'))
+                searchfilters.append(searchapplicant.firstname.ilike('%'+keywords['firstname']+'%'))
 
             if('lastname' in keywords):
-                searchfilters.append(FOIRequestApplicant.lastname.ilike('%'+keywords['lastname']+'%'))
+                searchfilters.append(searchapplicant.lastname.ilike('%'+keywords['lastname']+'%'))
 
             if('email' in keywords):
-                searchfilters.append(contactemail.contactinformation.ilike('%'+keywords['email']+'%'))
+                searchfilters.append(searchcontactinfo.contactinformation.ilike('%'+keywords['email']+'%'))
 
             if('homephone' in keywords):
-                searchfilters.append(contacthomephone.contactinformation.ilike('%'+keywords['homephone']+'%'))
+                searchfilters.append(searchcontactinfo.contactinformation.ilike('%'+keywords['homephone']+'%'))
 
             if('workphone' in keywords):
-                searchfilters.append(contactworkphone.contactinformation.ilike('%'+keywords['workphone']+'%'))
+                searchfilters.append(searchcontactinfo.contactinformation.ilike('%'+keywords['workphone']+'%'))
 
             if('workphone2' in keywords):
-                searchfilters.append(contactworkphone2.contactinformation.ilike('%'+keywords['workphone2']+'%'))
+                searchfilters.append(searchcontactinfo.contactinformation.ilike('%'+keywords['workphone2']+'%'))
 
             if('mobilephone' in keywords):
-                searchfilters.append(contactmobilephone.contactinformation.ilike('%'+keywords['mobilephone']+'%'))
+                searchfilters.append(searchcontactinfo.contactinformation.ilike('%'+keywords['mobilephone']+'%'))
 
         return searchfilters
 
@@ -1177,7 +1211,7 @@ class FOIRequestApplicant(db.Model):
             'middlename': middlename if middlename is not None or middlename != '' else None,
             'businessname': businessname if businessname is not None or businessname != '' else None,
             'alsoknownas': alsoknownas if alsoknownas is not None or alsoknownas != '' else None,
-            'dob': dob if dob is not None or dob != '' else None,
+            'dob': datetime.strptime(dob, "%Y-%m-%d") if dob is not None or dob != '' else None,
             'applicantcategoryid': applicantcategoryid if applicantcategoryid is not None or alsoknownas != 0 else None,
         }
 
