@@ -35,8 +35,16 @@ export const getErrorMessage = (_duplicateFiles, _typeErrorFiles, _overSizedFile
   if (_overSizedFiles.length > 0) {
     _errorMessage.push(<>The specified file(s) <b>{_overSizedFiles.join(", ")}</b> could not be uploaded. Only files <b>{maxFileSize}MB</b> or under can be uploaded.</>);
   }
+  const hasOnlyPdfMimeTypes = (mimeTypes) => {
+    let result = true;
+    mimeTypes.forEach((mimeType) => {
+      if (mimeType !== 'application/pdf' && mimeType !== '.pdf') result = false;
+    })
+    return result;
+  }
+
   if (_typeErrorFiles.length > 0) {
-    if (mimeTypes.length === 1 && mimeTypes[0] === 'application/pdf') {
+    if (hasOnlyPdfMimeTypes(mimeTypes)) {
       _errorMessage.push(<>The specified file(s) <b>{_typeErrorFiles.join(", ")}</b> could not be uploaded. Only PDF filetypes are allowed.</>);
     } else {
       _errorMessage.push(<>The specified file(s) <b>{_typeErrorFiles.join(", ")}</b> could not be uploaded. Only files with the following extensions are allowed: <b>{multipleFiles ? 'Excel (xls, xlsx, macro), pdf, image, word, email' : singleFileUploadAllowedFileExtensions}</b></>);

@@ -323,8 +323,8 @@ export default function AttachmentModal({
             body: (
               <>
                 Replace the existing record with a reformatted or updated
-                version of the same record.<br></br>The original file that was
-                uploaded will still be available for download.
+                version of the same record.<br></br>If the file being replaced
+                is also a pdf file, the replaced file will no longer be available.
               </>
             ),
           };

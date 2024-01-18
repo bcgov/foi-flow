@@ -53,22 +53,24 @@ class notificationuser:
 
     def __gettriggereduser(self, userid, notificationtype):
         notificationusers = []
+        notificationtypelabel = "assignee"
         if notificationtype in ["Records", "PDFStitch"]:
-            notificationusers.append({"userid":userid, "usertype":notificationconfig().getnotificationusertype("Triggered User")['notificationusertypelabel']})
+            notificationusers.append({"userid":userid, "usertype":notificationtypelabel})
         return notificationusers
 
         
     def __getwatchers(self, notificationtype, foirequest, requesttype, requestjson=None):
         notificationusers = []
-        if notificationtype == "Watcher":
-            notificationusers.append({"userid": requestjson['watchedby'], "usertype":notificationconfig().getnotificationusertype("Watcher")['notificationusertypelabel']})
+        notificationtypelabel = "watcher"
+        if notificationtype == "Watcher":            
+            notificationusers.append({"userid": requestjson['watchedby'], "usertype":notificationtypelabel})
         else:
             if requesttype == "ministryrequest":
                 watchers =  FOIMinistryRequest().getwatchers(foirequest["foiministryrequestid"])
             else:
                 watchers =  FOIRawRequest().getwatchers(foirequest['requestid'])
             for watcher in watchers:
-                    notificationusers.append({"userid":watcher["watchedby"], "usertype":notificationconfig().getnotificationusertype("Watcher")['notificationusertypelabel']})
+                    notificationusers.append({"userid":watcher["watchedby"], "usertype":notificationtypelabel})
         return notificationusers         
     
     def __getassignees(self, foirequest, requesttype, notificationtype, requestjson=None):
