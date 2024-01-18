@@ -631,7 +631,7 @@ class FOIRawRequest(db.Model):
                     return basequery.filter(
                         and_(
                             FOIRawRequest.status.notin_(['Archived']),
-                            or_(and_(FOIRawRequest.isiaorestricted == False, FOIRawRequest.assignedgroup.in_(ProcessingTeamWithKeycloackGroup.list())), and_(FOIRawRequest.isiaorestricted == True, FOIRawRequest.assignedto == userid))))
+                            or_(and_(FOIRawRequest.isiaorestricted == False, FOIRawRequest.assignedgroup.in_(ProcessingTeamWithKeycloackGroup.list()), FOIRawRequest.assignedgroup.in_(tuple(groups))), and_(FOIRawRequest.isiaorestricted == True, FOIRawRequest.assignedto == userid))))
                 return basequery.filter(
                     and_(
                         FOIRawRequest.status.notin_(['Archived']),
