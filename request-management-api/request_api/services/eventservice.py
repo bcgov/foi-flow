@@ -36,7 +36,7 @@ class eventservice:
             stateeventresponse = stateevent().createstatetransitionevent(requestid, requesttype, userid, username)
             divisioneventresponse = divisionevent().createdivisionevent(requestid, requesttype, userid)
             assignmentresponse = assignmentevent().createassignmentevent(requestid, requesttype, userid, isministryuser,assigneename,username)           
-            oipcresponse = oipcevent().createoipcevent(requestid, userid)
+            oipcresponse = oipcevent().createoipcevent(requestid, requesttype, userid)
             if stateeventresponse.success == False or divisioneventresponse.success == False or assignmentresponse.success == False or oipcresponse.success == False: 
                 current_app.logger.error("FOI Notification failed for event for request= %s ; state response=%s ; division response=%s ; assignment response=%s ; oipc response=%s" % (requestid, stateeventresponse.message, divisioneventresponse.message, assignmentresponse.message, oipcresponse.message))
         except BusinessException as exception:            
