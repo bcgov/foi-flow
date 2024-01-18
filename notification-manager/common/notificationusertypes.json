@@ -25,7 +25,7 @@
     },
     "comment tagged user": {
         "name": "comment tagged user",
-        "notificationusertypelabel": "commentuser"
+        "notificationusertypelabel": "assignee"
     },
     "triggereduser": {
         "name": "Triggered User",
