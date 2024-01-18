@@ -8,10 +8,11 @@ from request_api.models.FOIRequestPersonalAttributes import FOIRequestPersonalAt
 from request_api.models.FOIRequestApplicants import FOIRequestApplicant
 from request_api.models.FOIRequestApplicantMappings import FOIRequestApplicantMapping
 from request_api.models.FOIRequestTeams import FOIRequestTeam
+from request_api.models.FOIRequestStatus import FOIRequestStatus
 from request_api.models.FOIRequestOIPC import FOIRequestOIPC
 
 from datetime import datetime as datetime2
-from request_api.utils.enums import MinistryTeamWithKeycloackGroup
+from request_api.utils.enums import MinistryTeamWithKeycloackGroup, StateName
 from request_api.services.foirequest.requestserviceconfigurator import requestserviceconfigurator 
 from request_api.services.foirequest.requestserviceministrybuilder import requestserviceministrybuilder 
 
@@ -24,7 +25,8 @@ class requestservicebuilder(requestserviceconfigurator):
     def createministry(self, requestschema, ministry, activeversion, userid, filenumber=None, ministryid=None):
         foiministryrequest = FOIMinistryRequest()
         foiministryrequest.__dict__.update(ministry)
-        foiministryrequest.requeststatusid = requestschema.get("requeststatusid")
+        foiministryrequest.requeststatusid = self.__getrequeststatusid(requestschema.get("requeststatuslabel"))
+        foiministryrequest.requeststatuslabel = requestschema.get("requeststatuslabel")        
         foiministryrequest.isactive = True
         foiministryrequest.axisrequestid = requestschema.get("axisRequestId")
         foiministryrequest.axissyncdate = requestschema.get("axisSyncDate")
@@ -49,9 +51,9 @@ class requestservicebuilder(requestserviceconfigurator):
             startdate = requestschema.get("requestProcessStart")
         foiministryrequest.startdate = startdate
         foiministryrequest.createdby = userid
-        requeststatusid =  self.getpropertyvaluefromschema(requestschema, 'requeststatusid')
-        if requeststatusid is not None:
-            status = self.getstatusname(requeststatusid)
+        requeststatuslabel =  self.getpropertyvaluefromschema(requestschema, 'requeststatuslabel')
+        if requeststatuslabel is not None:
+            status = self.getstatusname(requeststatuslabel)
         if self.isNotBlankorNone(requestschema,"fromDate","main") == True:
             foiministryrequest.recordsearchfromdate = requestschema.get("fromDate")
         if self.isNotBlankorNone(requestschema,"toDate","main") == True:
@@ -95,13 +97,24 @@ class requestservicebuilder(requestserviceconfigurator):
             foiministryrequest.assignedto = None
 
     def __isgrouprequired(self,status):
-        if status == "Call For Records" or status == "Review" or status == "Consult" or status == "Fee Assessed" or status == "Ministry Sign Off" or status == "Response":
+        if status == StateName.callforrecords.value or status == StateName.recordsreview.value or status == StateName.consult.value or status == StateName.feeestimate.value or status == StateName.ministrysignoff.value or status == StateName.response.value:
             return True
         else:
             return False
         
     def __getgroupname(self, requesttype, bcgovcode):
         return 'Flex Team' if  requesttype == "general" else FOIRequestTeam.getdefaultprocessingteamforpersonal(bcgovcode)
+    
+    def __getrequeststatusid(self, requeststatuslabel):
+        state = FOIRequestStatus.getrequeststatusbylabel(
+            requeststatuslabel
+        )
+        stateid = (
+            state.get("requeststatusid")
+            if isinstance(state, dict) and state.get("requeststatusid") not in (None, "")
+            else ""
+        )
+        return stateid
     
     def createcontactinformation(self,dataformat, name, value, contacttypes, userid):
         contactinformation = FOIRequestContactInformation()

@@ -17,6 +17,7 @@ from request_api.services.subjectcodeservice import subjectcodeservice
 from request_api.services.programareaservice import programareaservice
 from request_api.utils.commons.datetimehandler import datetimehandler
 from request_api.services.external.keycloakadminservice import KeycloakAdminService
+from request_api.utils.enums import StateName
 
 class requestservicegetter:
     """ This class consolidates retrival of FOI request for actors: iao and ministry. 
@@ -31,7 +32,7 @@ class requestservicegetter:
         iaorestrictrequestdetails = FOIRestrictedMinistryRequest.getrestricteddetails(ministryrequestid=foiministryrequestid,type='iao')
 
         baserequestinfo = self.__preparebaseinfo(request,foiministryrequestid,requestministry,requestministrydivisions)
-        baserequestinfo['lastStatusUpdateDate'] = FOIMinistryRequest.getLastStatusUpdateDate(foiministryrequestid, requestministry['requeststatus.requeststatusid']).strftime(self.__genericdateformat()),
+        baserequestinfo['lastStatusUpdateDate'] = FOIMinistryRequest.getLastStatusUpdateDate(foiministryrequestid, requestministry['requeststatuslabel']).strftime(self.__genericdateformat()),
         for contactinfo in requestcontactinformation:
             if contactinfo['contacttype.name'] == 'Email':
                 baserequestinfo.update({'email':contactinfo['contactinformation']})
@@ -111,8 +112,8 @@ class requestservicegetter:
         payment = paymentservice().getpayment(foirequestid, foiministryrequestid)
         if approvedcfrfee is not None and approvedcfrfee != {}:
             requestdetails['cfrfee'] = approvedcfrfee
-            _totaldue = float(approvedcfrfee['feedata']['actualtotaldue']) if float(approvedcfrfee['feedata']['actualtotaldue']) > 0 else float(approvedcfrfee['feedata']['estimatedtotaldue']) 
-            _balancedue = _totaldue - float(cfrfee['feedata']['amountpaid'])
+            _totaldue = float(approvedcfrfee['feedata']['actualtotaldue']) if float(approvedcfrfee['feedata']['actualtotaldue']) > 0 else float(approvedcfrfee['feedata']['estimatedtotaldue'])
+            _balancedue = _totaldue - (float(cfrfee['feedata']['amountpaid']) + float(approvedcfrfee['feedata']['feewaiveramount']))
             requestdetails['cfrfee']['feedata']['amountpaid'] = cfrfee['feedata']['amountpaid']
             requestdetails['cfrfee']['feedata']["balanceDue"] = '{:.2f}'.format(_balancedue)
             if approvedcfrfee['feedata']['actualtotaldue']:
@@ -154,8 +155,8 @@ class requestservicegetter:
             'description': requestministry['description'],
             'fromDate': parse(requestministry['recordsearchfromdate']).strftime(self.__genericdateformat()) if requestministry['recordsearchfromdate'] is not None else '',
             'toDate': parse(requestministry['recordsearchtodate']).strftime(self.__genericdateformat()) if requestministry['recordsearchtodate'] is not None else '',
-            'currentState':requestministry['requeststatus.name'],            
-            'requeststatusid':requestministry['requeststatus.requeststatusid'],
+            'currentState':requestministry['requeststatus.name'],
+            'requeststatuslabel':requestministry['requeststatuslabel'],
             'requestProcessStart': parse(requestministry['startdate']).strftime(self.__genericdateformat()) if requestministry['startdate'] is not None else '',
             'dueDate':parse(requestministry['duedate']).strftime(self.__genericdateformat()),  
             'originalDueDate':  parse(requestministry['originalldd']).strftime(self.__genericdateformat()) if requestministry['originalldd'] is not None else parse(requestministry['duedate']).strftime(self.__genericdateformat()),            
@@ -167,7 +168,7 @@ class requestservicegetter:
             'assignedministryperson':requestministry["assignedministryperson"],            
             'selectedMinistries':[{'code':requestministry['programarea.bcgovcode'],'id':requestministry['foiministryrequestid'],'name':requestministry['programarea.name'],'selected':'true'}],
             'divisions': self.getdivisions(requestministrydivisions),
-            'isoipcreview': requestministry['isoipcreview'],
+            'isoipcreview': requestministry['isoipcreview'] if (requestministry['isoipcreview'] not in (None, '') and requestministry['isoipcreview'] in (True, False)) else False,
             'isreopened': self.hasreopened(foiministryrequestid),
             'oipcdetails': self.getoipcdetails(foiministryrequestid, requestministry['version']),
             'onholdTransitionDate': self.getonholdtransition(foiministryrequestid),            
@@ -255,7 +256,7 @@ class requestservicegetter:
         onholddate = None
         transitions = FOIMinistryRequest.getrequeststatusById(foiministryrequestid)
         for entry in transitions:
-            if entry['requeststatusid'] == 11:
+            if entry['requeststatuslabel'] == StateName.onhold.name:
                 onholddate = datetimehandler().convert_to_pst(entry['created_at'],'%Y-%m-%d')
             else:
                 if onholddate is not None:

@@ -19,6 +19,7 @@ from request_api.services.events.section5pending import section5pendingevent
 from request_api.models.default_method_result import DefaultMethodResult
 from request_api.exceptions import BusinessException
 from request_api.utils.enums import PaymentEventType
+import time as timer
 
 import json
 from flask import current_app

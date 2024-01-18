@@ -369,10 +369,10 @@ export const alertUser = (e) => {
   e.returnValue = "";
 };
 
-export const findRequestState = (requestStatusId) => {
-  if (requestStatusId != undefined) {
+export const findRequestState = (requestStatusLabel) => {
+  if (requestStatusLabel != undefined) {
     let stateArray = Object.entries(StateEnum).find(
-      (value) => value[1].id === requestStatusId
+      (value) => value[1].label === requestStatusLabel
     );
     return stateArray[1].name;
   }

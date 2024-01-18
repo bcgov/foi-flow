@@ -1,7 +1,7 @@
 """Create OIPC tables
 
 Revision ID: 3b399ca506fe
-Revises: 7fa7236d06fb
+Revises: 29b44e8dc305
 Create Date: 2023-11-14 22:29:58.451320
 
 """
@@ -15,7 +15,7 @@ from sqlalchemy.sql.schema import ForeignKey
 
 # revision identifiers, used by Alembic.
 revision = '3b399ca506fe'
-down_revision = '7fa7236d06fb'
+down_revision = '29b44e8dc305'
 branch_labels = None
 depends_on = None
 

@@ -221,12 +221,9 @@ class recordservice(recordservicebase):
                 "attributes": json.JSONEncoder().encode(message["attributes"]),
                 "totalfilesize": message["totalfilesize"]
             }
-            print("final message >>>>>> ", streamobject)
             if message["totalfilesize"] > int(self.stitchinglargefilesizelimit) and self.pdfstitchstreamkey_largefiles:
-                print("pdfstitchstreamkey_largefiles = ", self.pdfstitchstreamkey_largefiles)
                 return eventqueueservice().add(self.pdfstitchstreamkey_largefiles, streamobject)
             elif self.pdfstitchstreamkey:
-                print("pdfstitchstreamkey = ", self.pdfstitchstreamkey)
                 return eventqueueservice().add(self.pdfstitchstreamkey, streamobject)
         else:
             print("pdfstitch stream key is missing. Message is not pushed to the stream.")
@@ -252,8 +249,7 @@ class recordservice(recordservicebase):
         if (dbresponse.success):
             #processingrecords = [{**record, **{"recordid": dbresponse.args[0][record['s3uripath']]['recordid']}} for record in records if not record['attributes'].get('incompatible', False)]
             processingrecords = [{**record, **{"recordid": dbresponse.args[0][record['s3uripath']]['recordid']}} for record in records]
-           
-            print(processingrecords)
+
             # record all jobs before sending first redis stream message to avoid race condition
             jobids, err = self.makedocreviewerrequest('POST', '/api/jobstatus', {
                 'records': processingrecords,

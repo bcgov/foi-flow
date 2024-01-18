@@ -8,6 +8,7 @@ from request_api.services.notificationservice import notificationservice
 from request_api.models.FOIMinistryRequests import FOIMinistryRequest
 from request_api.models.FOIRequestComments import FOIRequestComment
 from request_api.models.FOIRequestNotifications import FOIRequestNotification
+from request_api.models.NotificationTypes import NotificationType
 import json
 from request_api.models.default_method_result import DefaultMethodResult
 from enum import Enum
@@ -72,7 +73,8 @@ class extensionevent:
             notification = self.__preparenotification(extensionsummary)
             if notificationandcleanup == True:
                 self.__deleteextensionnotification(extensionid)
-            return notificationservice().createnotification({"extensionid": extensionid, "message": notification}, ministryrequestid, "ministryrequest", "Extension", userid, False)
+            notificationtype = NotificationType().getnotificationtypeid("Extension") 
+            return notificationservice().createnotification({"extensionid": extensionid, "message": notification}, ministryrequestid, "ministryrequest", notificationtype, userid, False)
 
     def __deleteaxisextensionnotifications(self, notificationids):
         notificationservice().dismissnotificationbyid("ministryrequest", notificationids)

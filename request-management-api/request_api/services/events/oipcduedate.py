@@ -5,6 +5,7 @@ from request_api.services.commentservice import commentservice
 from request_api.services.commons.duecalculator import duecalculator
 from request_api.services.notificationservice import notificationservice
 from request_api.models.FOIMinistryRequests import FOIMinistryRequest
+from request_api.models.NotificationTypes import NotificationType
 import json
 from request_api.models.default_method_result import DefaultMethodResult
 from request_api.exceptions import BusinessException
@@ -14,6 +15,7 @@ from flask import current_app
 class oipcduedateevent(duecalculator):
     """ FOI OIPC Due Date Event management service
     """
+
     
     def createdueevent(self):
         try: 
@@ -39,7 +41,8 @@ class oipcduedateevent(duecalculator):
 
     def __createnotification(self, message, requestid):
         if message is not None: 
-            return notificationservice().createnotification({"message" : message}, requestid, "ministryrequest", self.__notificationtype(), self.__defaultuserid(), False)
+            notificationtype = NotificationType().getnotificationtypeid(self.__notificationtype())
+            return notificationservice().createnotification({"message" : message}, requestid, "ministryrequest", notificationtype, self.__defaultuserid(), False)
         
     def __createcomment(self, entry, message):
         if message is not None: 
