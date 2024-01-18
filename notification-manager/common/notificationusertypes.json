@@ -29,6 +29,6 @@
     },
     "triggereduser": {
         "name": "Triggered User",
-        "notificationusertypelabel": "triggereduser"
+        "notificationusertypelabel": "assignee"
     }
 }
