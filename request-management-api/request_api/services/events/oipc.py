@@ -18,11 +18,13 @@ class oipcevent:
     """ FOI OIPC Event management service
     """
     
-    def createoipcevent(self, requestid, userid):
+    def createoipcevent(self, requestid, requesttype, userid):
+        if requesttype != "ministryrequest":
+             return DefaultMethodResult(True,'No change',requestid)        
         ministryrequest = FOIMinistryRequest.getmetadata(requestid)
         if ministryrequest["isoipcreview"] in (None, False):
             notificationservice().dismissnotifications_by_requestid_type(requestid, "ministryrequest", self.__notificationtype())
-            return DefaultMethodResult(True,'No change',requestid)    
+            return DefaultMethodResult(True,'Dismiss OIPC events',requestid)    
         inquiryoutcomes = oipcservice().getinquiryoutcomes()
         version = ministryrequest["version"]
         curoipcs = FOIRequestOIPC.getoipc(requestid, version)
