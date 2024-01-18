@@ -26,3 +26,23 @@ class NotificationUserType(object):
         finally:
             if conn:
                 conn.close()
+    
+    def getidbylabel(self, label):
+        conn = None
+        try:
+            _notificationusertypes = []
+            conn = getconnection()
+            cursor = conn.cursor()
+            cursor.execute("""select notificationusertypeid  from "NotificationUserTypes" nt  where isactive = true and notificationusertypelabel = '{0}'""".format(label))
+            data = cursor.fetchone()
+            if data is not None:
+               data = {"notificationusertypeid": data[0]}
+               return  data
+
+            cursor.close()
+            return _notificationusertypes
+        except(Exception) as error:
+            logging.error(error)
+        finally:
+            if conn:
+                conn.close()
