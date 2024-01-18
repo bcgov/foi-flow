@@ -19,10 +19,14 @@ class oipcevent:
     """
     
     def createoipcevent(self, requestid, userid):
+        ministryrequest = FOIMinistryRequest.getmetadata(requestid)
+        if ministryrequest["isoipcreview"] in (None, False):
+            notificationservice().dismissnotifications_by_requestid_type(requestid, "ministryrequest", self.__notificationtype())
+            return DefaultMethodResult(True,'No change',requestid)    
         inquiryoutcomes = oipcservice().getinquiryoutcomes()
-        version = FOIMinistryRequest.getversionforrequest(requestid)
+        version = ministryrequest["version"]
         curoipcs = FOIRequestOIPC.getoipc(requestid, version)
-        prevoipcs = FOIRequestOIPC.getoipc(requestid, version[0]-1)
+        prevoipcs = FOIRequestOIPC.getoipc(requestid, version-1)
         oipcsummary = self.__maintained(curoipcs, prevoipcs, inquiryoutcomes) 
         if oipcsummary is None or (oipcsummary and len(oipcsummary) <1):
             return  DefaultMethodResult(True,'No change',requestid)

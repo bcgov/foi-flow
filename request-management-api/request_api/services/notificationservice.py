@@ -117,6 +117,17 @@ class notificationservice:
             _ids = FOIRawRequestNotification.getnotificationidsbynumberandtype('U-00' + str(foirequest['requestid']), notificationtypelabels[0])
         self.__deletenotificationbyuserandid(requesttype, _ids, userid) 
 
+    def dismissnotifications_by_requestid_type(self, requestid, requesttype, notificationtype):
+        notificationtypelabels = self.__getcleanupnotificationids(notificationtype)
+        foirequest = self.getrequest(requestid, requesttype)
+        if requesttype == "ministryrequest":
+            idnumber = foirequest["filenumber"]
+            _ids = FOIRequestNotification.getnotificationidsbynumberandtype(idnumber, notificationtypelabels)
+        else:
+            _ids = FOIRawRequestNotification.getnotificationidsbynumberandtype('U-00' + str(foirequest['requestid']), notificationtypelabels[0])
+        self.__deletenotificationids(requesttype, _ids) 
+
+
     def __createnotification(self, message, requestid, requesttype, notificationtype, userid, foirequest, requestjson=None):
         notification = self.__preparenotification(message, requesttype, notificationtype, userid, foirequest, requestjson)
         if notification is not None:      
