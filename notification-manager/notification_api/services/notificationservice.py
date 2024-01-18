@@ -87,10 +87,10 @@ class notificationservice:
         usertype = notificationusertypes_cache[notificationuser["usertype"]]
         if usertype is None:
             print('User type not found', notificationuser["usertype"])
-            return None
-        notificationtypes = notificationconfig().getnotificationusertype(usertype['name']) 
-        user.notificationusertypelabel = notificationtypes['notificationusertypelabel']
-        user.notificationusertypeid = notificationtypes['notificationusertypeid']
+            return None        
+        notificationusertypelabel = notificationconfig().getnotificationusertypelabel(usertype['name'])
+        user.notificationusertypelabel = notificationusertypelabel
+        user.notificationusertypeid = notificationconfig().getnotificationusertypeidbylabel(notificationusertypelabel)['notificationusertypeid']
         user.notificationid = notificationid
         user.userid = notificationuser["userid"]
         user.createdby = userid
