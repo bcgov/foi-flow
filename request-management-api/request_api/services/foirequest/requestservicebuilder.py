@@ -107,9 +107,9 @@ class requestservicebuilder(requestserviceconfigurator):
               contactinformation.contacttypeid =contacttype["contacttypeid"]              
         return contactinformation
     
-    def createapplicant(self,firstname, lastname, appltcategory, userid, middlename = None,businessname = None, alsoknownas = None, dob = None):
+    def createapplicant(self,firstname, lastname, appltcategory, userid, middlename = None, businessname = None, alsoknownas = None, dob = None, applicantcategoryid = None):
         requestapplicant = FOIRequestApplicantMapping()
-        _applicant = FOIRequestApplicant().createapplicant(firstname, lastname, middlename, businessname, alsoknownas, dob, userid)
+        _applicant = FOIRequestApplicant().createapplicant(firstname, lastname, middlename, businessname, alsoknownas, dob, applicantcategoryid, userid)
         requestapplicant.foirequestapplicantid = _applicant.identifier
         if appltcategory is not None:           
             requestertype = RequestorType().getrequestortype(appltcategory)  

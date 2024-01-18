@@ -35,7 +35,7 @@ class FOIRequestApplicant(db.Model):
     applicantprofileid = db.Column(db.String(120), unique=False, nullable=True)
 
     @classmethod
-    def createapplicant(cls, firstname, lastname, middlename, businessname, alsoknownas, dob, userid):
+    def createapplicant(cls, firstname, lastname, middlename, businessname, alsoknownas, dob, applicantcategoryid, userid):
         applicant = FOIRequestApplicant()
         applicant.createdby = userid
         applicant.firstname = firstname
@@ -43,8 +43,9 @@ class FOIRequestApplicant(db.Model):
         applicant.middlename = middlename
         applicant.businessname = businessname
         applicant.alsoknownas = alsoknownas
+        applicant.applicantcategoryid = applicantcategoryid
         if dob is not None and dob != "":
-            applicant.dob = dob
+            applicant.dob = datetime.strptime(dob, "%Y-%m-%d")
         else:
             applicant.dob = None
         db.session.add(applicant)

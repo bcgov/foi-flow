@@ -39,8 +39,8 @@ class requestservicecreate:
             openfoirequest.deliverymodeid = requestserviceconfigurator().getvalueof("deliveryMode",foirequestschema.get("deliveryMode"))            
         if requestservicebuilder().isNotBlankorNone(foirequestschema,"receivedMode","main") == True:    
             openfoirequest.receivedmodeid =  requestserviceconfigurator().getvalueof("receivedMode",foirequestschema.get("receivedMode"))                
-        if requestservicebuilder().isNotBlankorNone(foirequestschema,"category","main") == True:
-            openfoirequest.applicantcategoryid = requestserviceconfigurator().getvalueof("category",foirequestschema.get("category"))                    
+        # if requestservicebuilder().isNotBlankorNone(foirequestschema,"category","main") == True:
+        #     openfoirequest.applicantcategoryid = requestserviceconfigurator().getvalueof("category",foirequestschema.get("category"))
         openfoirequest.personalAttributes = self._prearepersonalattributes(foirequestschema, userid)        
         openfoirequest.requestApplicants = self.__prepareapplicants(foirequestschema, userid)       
         if foirequestid is not None:         
@@ -127,10 +127,12 @@ class requestservicecreate:
         requestapplicantarr = []
         selfalsoknownas=None
         selfdob=None
+        selfcategoryid=None
         if foirequestschema.get("additionalPersonalInfo") is not None and foirequestschema.get('requeststatusid') == 1:
             applicantinfo = foirequestschema.get("additionalPersonalInfo")
             selfdob = applicantinfo["birthDate"] if requestservicebuilder().isNotBlankorNone(foirequestschema,"birthDate","additionalPersonalInfo") else None
             selfalsoknownas = applicantinfo["alsoKnownAs"] if requestservicebuilder().isNotBlankorNone(foirequestschema,"alsoKnownAs","additionalPersonalInfo") else None
+            selfcategoryid = requestserviceconfigurator().getvalueof("category",foirequestschema.get("category")) if requestservicebuilder().isNotBlankorNone(foirequestschema,"category","main") else None
 
         # if foirequestschema.get('foiRequestApplicantID') is None and foirequestschema.get('requeststatusid') == 1:
         if foirequestschema.get('foiRequestApplicantID') is not None:
@@ -147,7 +149,8 @@ class requestservicecreate:
                                             foirequestschema.get("middleName"),
                                             foirequestschema.get("businessName"),
                                             selfalsoknownas,
-                                            selfdob)
+                                            selfdob,
+                                            selfcategoryid)
                 )
                  
         #Prepare additional applicants
