@@ -22,6 +22,8 @@ import { toast } from "react-toastify";
 import _ from 'lodash';
 import RequestRestriction from "../../customComponents/RequestRestriction";
 import ConfirmModal from "../../customComponents/ConfirmModal";
+import RequestFlag from '../../customComponents/RequestFlag';
+import { Grid } from '@material-ui/core';
 
 const useStyles = makeStyles((theme) => ({
     formControl: {
@@ -35,6 +37,9 @@ const useStyles = makeStyles((theme) => ({
         fontWeight: theme.typography.fontWeightBold,
         opacity: 1,
     },
+    blankrow: {
+      padding: 25
+    }
   }));
 const FOIRequestHeader = React.memo(
   ({
@@ -48,6 +53,9 @@ const FOIRequestHeader = React.memo(
     userDetail,
     disableInput,
     isAddRequest,
+    handleOipcReviewFlagChange,
+    showOipcReviewFlag,
+    isMinistry,
   }) => {
     /**
      *  Header of Review request in the UI
@@ -259,33 +267,54 @@ const FOIRequestHeader = React.memo(
         </div>
       </div>
       <div className='row'>
-        <div className="col-lg-8">
-          <div className="foi-request-review-header-col1-row">
-          {window.location.href.indexOf(FOI_COMPONENT_CONSTANTS.ADDREQUEST) ===
-              -1 && (
-              <div className="foi-request-review-header-col1-row">
-                <Watcher
-                  watcherFullList={watcherList}
-                  requestId={requestId}
-                  ministryId={ministryId}
-                  userDetail={userDetail}
-                  disableInput={disableHeaderInput}
-                  isIAORestrictedRequest={isIAORestrictedRequest}
-                  setIsLoaded={setIsLoaded}
-                />
+        <div className="col-lg-6">
+          <Grid container columns={16}>
+            <Grid>
+              <div>
+                {window.location.href.indexOf(FOI_COMPONENT_CONSTANTS.ADDREQUEST) ===
+                    -1 && (
+                      <Watcher
+                        watcherFullList={watcherList}
+                        requestId={requestId}
+                        ministryId={ministryId}
+                        userDetail={userDetail}
+                        disableInput={disableHeaderInput}
+                        isIAORestrictedRequest={isIAORestrictedRequest}
+                        setIsLoaded={setIsLoaded}
+                      />
+                  )}
+                {!isAddRequest && status.toLowerCase() !== StateEnum.unopened.name.toLowerCase() && (isIAORestrictedFileManager() ||
+                  (isLoaded && isRequestWatcherOrAssignee(requestWatchers,assigneeObj,userDetail?.preferred_username))) && 
+                <RequestRestriction 
+                  isiaorestricted= {isRestricted()}
+                  isIAORestrictedFileManager={isIAORestrictedFileManager()}
+                  requestDetails={requestDetails}
+                  />
+
+                }
               </div>
-            )}
-          {!isAddRequest && status.toLowerCase() !== StateEnum.unopened.name.toLowerCase() && (isIAORestrictedFileManager() ||
-            (isLoaded && isRequestWatcherOrAssignee(requestWatchers,assigneeObj,userDetail?.preferred_username))) && 
-          <RequestRestriction 
-            isiaorestricted= {isRestricted()}
-            isIAORestrictedFileManager={isIAORestrictedFileManager()}
-            requestDetails={requestDetails}
-            />
-          }
-          </div>
+            </Grid>
+            <Grid>
+              <div>
+                <RequestFlag
+                    type="oipcreview"
+                    requestDetails={requestDetails}
+                    isActive={requestDetails.isoipcreview}
+                    handleSelect={handleOipcReviewFlagChange}
+                    showFlag={showOipcReviewFlag}
+                    isDisabled={isMinistry}
+                />
+                {/* <RequestFlag
+                  type="phasedrelease"
+                  requestDetails={requestDetails}
+                  isActive={requestDetails.isphasedrelease}
+                  handleSelect={handleOipcReviewFlagChange}
+                /> */}
+              </div>
+            </Grid>
+          </Grid>
         </div>
-        <div className="col-lg-4">
+        <div className="col-lg-6">
           <div className="foi-assignee-dropdown">
             {showMinistryAssignedTo && (
                   <>

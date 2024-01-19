@@ -57,10 +57,14 @@ const initialState = {
   },
   foiPDFStitchedRecordForHarms: {},
   foiPDFStitchedRecordForRedlines: {},
+  foiPDFStitchedRecordForOipcRedlineReview: {},
+  foiPDFStitchedRecordForOipcRedline: {},
   foiPDFStitchedRecordForResponsePackage: {},
   foiPDFStitchStatusForHarms: "not started",
   foiPDFStitchStatusForRedlines: "not started",
   foiPDFStitchStatusForResponsePackage: "not started",
+  foiPDFStitchStatusForOipcRedlineReview: "not started",
+  foiPDFStitchStatusForOipcRedline: "not started",
   foiRequestCFRForm: {
     overallsuggestions: "",
     status: "init",
@@ -145,6 +149,10 @@ const initialState = {
     ".jpg",
   ],
   conversionFormats: [],
+  oipcOutcomes: [],
+  oipcStatuses: [],
+  oipcReviewtypes: [],
+  oipcInquiryoutcomes: [],
 };
 
 const foiRequests = (state = initialState, action) => {
@@ -264,12 +272,26 @@ const foiRequests = (state = initialState, action) => {
         ...state,
         foiPDFStitchedRecordForResponsePackage: action.payload,
       };
+    case FOI_ACTION_CONSTANTS.FOI_PDF_STITCHED_RECORD_FOR_OIPCREDLINEREVIEW:
+      return {
+        ...state,
+        foiPDFStitchedRecordForOipcRedlineReview: action.payload,
+      };
+    case FOI_ACTION_CONSTANTS.FOI_PDF_STITCHED_RECORD_FOR_OIPCREDLINE:
+      return {
+        ...state,
+        foiPDFStitchedRecordForOipcRedline: action.payload,
+      };
     case FOI_ACTION_CONSTANTS.FOI_PDF_STITCHED_STATUS_FOR_HARMS:
       return { ...state, foiPDFStitchStatusForHarms: action.payload };
     case FOI_ACTION_CONSTANTS.FOI_PDF_STITCHED_STATUS_FOR_REDLINES:
       return { ...state, foiPDFStitchStatusForRedlines: action.payload };
     case FOI_ACTION_CONSTANTS.FOI_PDF_STITCHED_STATUS_FOR_RESPONSEPACKAGE:
       return { ...state, foiPDFStitchStatusForResponsePackage: action.payload };
+    case FOI_ACTION_CONSTANTS.FOI_PDF_STITCHED_STATUS_FOR_OIPCREDLINEREVIEW:
+      return { ...state, foiPDFStitchStatusForOipcRedlineReview: action.payload };
+    case FOI_ACTION_CONSTANTS.FOI_PDF_STITCHED_STATUS_FOR_OIPCREDLINE:
+      return { ...state, foiPDFStitchStatusForOipcRedline: action.payload };
     case FOI_ACTION_CONSTANTS.FOI_REQUEST_CFR_FORM:
       return {
         ...state,
@@ -307,6 +329,14 @@ const foiRequests = (state = initialState, action) => {
       return { ...state, recordFormats: action.payload };
     case FOI_ACTION_CONSTANTS.CONVERSION_FORMATS:
       return { ...state, conversionFormats: action.payload };
+    case FOI_ACTION_CONSTANTS.OIPC_OUTCOMES:
+      return { ...state, oipcOutcomes: action.payload };
+    case FOI_ACTION_CONSTANTS.OIPC_STATUSES:
+      return { ...state, oipcStatuses: action.payload };
+    case FOI_ACTION_CONSTANTS.OIPC_REVIEWTYPES:
+      return { ...state, oipcReviewtypes: action.payload };
+    case FOI_ACTION_CONSTANTS.OIPC_INQUIRYOUTCOMES:
+        return { ...state, oipcInquiryoutcomes: action.payload };
     default:
       return state;
   }
