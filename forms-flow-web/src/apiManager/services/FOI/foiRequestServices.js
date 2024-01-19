@@ -21,6 +21,7 @@ import { catchError, fnDone} from './foiServicesUtil';
 import UserService from "../../../services/UserService";
 import { replaceUrl } from "../../../helper/FOI/helper";
 import { persistRequestFieldsNotInAxis } from "../../../components/FOI/FOIRequest/utils";
+import { StateEnum } from "../../../constants/FOI/statusEnum";
 
 export const fetchFOIRequestList = () => {
   return (dispatch) => {
@@ -178,7 +179,8 @@ export const fetchFOIRawRequestDetails = (requestId) => {
           const foiRequest = res.data;
           dispatch(clearRequestDetails({}));
           dispatch(setFOIRequestDetail(foiRequest));
-          dispatch(fetchFOIAssignedToList(foiRequest.requestType.toLowerCase(), foiRequest.currentState.replace(/\s/g, '').toLowerCase(), ""));
+          const ministryCode = (foiRequest.currentState !== StateEnum.redirect.name && foiRequest.requestType === 'personal') ? foiRequest.selectedMinistries[0].code.toLowerCase() : "";
+          dispatch(fetchFOIAssignedToList(foiRequest.requestType.toLowerCase(), foiRequest.currentState.replace(/\s/g, '').toLowerCase(), ministryCode));
           dispatch(fetchFOIProcessingTeamList(foiRequest.requestType.toLowerCase()));
           dispatch(setFOILoader(false));
         } else {
@@ -525,3 +527,27 @@ export const fetchRestrictedRequestCommentTagList = (requestid, ministryId, ...r
   }
 };
 
+export const deleteOIPCDetails = (requestId, ministryId, ...rest) => {
+  const done = fnDone(rest);
+  let apiUrl= replaceUrl(replaceUrl(
+    API.FOI_REQUEST_SECTION_API,
+    "<ministryid>",
+    ministryId),"<requestid>",requestId
+  );
+  const data = {isoipcreview: false, oipcdetails: []}
+  return (dispatch) => {
+    httpPOSTRequest(`${apiUrl}/oipc`, data)
+      .then((res) => {
+        if (res.data) {
+          done(null, res.data);
+        } else {
+          dispatch(serviceActionError(res));
+          throw new Error(`Error while saving the OIPC Details for the (request# ${requestId}, ministry# ${ministryId})`);            
+        }
+      })
+      .catch((error) => {
+        done(error);
+        catchError(error, dispatch);
+      });
+  };
+}

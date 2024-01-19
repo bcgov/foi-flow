@@ -321,9 +321,10 @@ export const checkValidationError = (
   requiredRequestDetailsValues,
   requiredAxisDetails,
   isAddRequest,
-  currentrequestStatus
+  currentrequestStatus,
+  oipcData,
+  isOipcReview
 ) => {
-
   return (
     requiredApplicantDetails.firstName === "" ||
     requiredApplicantDetails.lastName === "" ||
@@ -346,7 +347,16 @@ export const checkValidationError = (
       .includes("select") ||
     !requiredRequestDetailsValues.receivedDate ||
     !requiredRequestDetailsValues.requestStartDate ||
-    !requiredAxisDetails.axisRequestId
+    !requiredAxisDetails.axisRequestId || 
+    (oipcData?.length > 0 && isOipcReview && oipcData?.some((oipc) => {
+      if (oipc.inquiryattributes?.inquirydate) {
+        return oipc.inquiryattributes.orderno === ""; 
+      }
+      if (oipc.inquiryattributes?.orderno) {
+        return oipc.inquiryattributes?.inquirydate === null || oipc.inquiryattributes?.inquirydate === ""; 
+      }
+      return oipc.oipcno === "" || oipc.receiveddate === null || oipc.receiveddate === "" || oipc.reviewtypeid === null || oipc.reasonid === null || oipc.statusid === null;
+    }))
   );
 };
 
@@ -359,10 +369,10 @@ export const alertUser = (e) => {
   e.returnValue = "";
 };
 
-export const findRequestState = (requestStatusId) => {
-  if (requestStatusId != undefined) {
+export const findRequestState = (requestStatusLabel) => {
+  if (requestStatusLabel != undefined) {
     let stateArray = Object.entries(StateEnum).find(
-      (value) => value[1].id === requestStatusId
+      (value) => value[1].label === requestStatusLabel
     );
     return stateArray[1].name;
   }

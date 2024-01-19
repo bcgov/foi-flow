@@ -181,6 +181,9 @@ class recordservice(recordservicebase):
     
     def getpdfstitchpackagetodownload(self, ministryid, category):
         response, err = self.makedocreviewerrequest('GET', '/api/pdfstitch/{0}/{1}'.format(ministryid, category))
+        if response is not None and "createdat" in response:
+            string_datetime = maya.parse(response["createdat"]).datetime(to_timezone='America/Vancouver', naive=False).strftime('%Y %b %d | %I:%M %p').upper()
+            response["createdat_datetime"] = string_datetime
         return response
 
     def getpdfstichstatus(self, ministryid, category):
@@ -218,12 +221,9 @@ class recordservice(recordservicebase):
                 "attributes": json.JSONEncoder().encode(message["attributes"]),
                 "totalfilesize": message["totalfilesize"]
             }
-            print("final message >>>>>> ", streamobject)
             if message["totalfilesize"] > int(self.stitchinglargefilesizelimit) and self.pdfstitchstreamkey_largefiles:
-                print("pdfstitchstreamkey_largefiles = ", self.pdfstitchstreamkey_largefiles)
                 return eventqueueservice().add(self.pdfstitchstreamkey_largefiles, streamobject)
             elif self.pdfstitchstreamkey:
-                print("pdfstitchstreamkey = ", self.pdfstitchstreamkey)
                 return eventqueueservice().add(self.pdfstitchstreamkey, streamobject)
         else:
             print("pdfstitch stream key is missing. Message is not pushed to the stream.")
@@ -249,8 +249,7 @@ class recordservice(recordservicebase):
         if (dbresponse.success):
             #processingrecords = [{**record, **{"recordid": dbresponse.args[0][record['s3uripath']]['recordid']}} for record in records if not record['attributes'].get('incompatible', False)]
             processingrecords = [{**record, **{"recordid": dbresponse.args[0][record['s3uripath']]['recordid']}} for record in records]
-           
-            print(processingrecords)
+
             # record all jobs before sending first redis stream message to avoid race condition
             jobids, err = self.makedocreviewerrequest('POST', '/api/jobstatus', {
                 'records': processingrecords,

@@ -24,12 +24,17 @@ import {
   fetchFOIMinistryAssignedToList,
   fetchFOISubjectCodeList,
   fetchFOIPersonalDivisionsAndSections,
+  fetchOIPCOutcomes,
+  fetchOIPCStatuses,
+  fetchOIPCReviewtypes,
+  fetchOIPCInquiryoutcomes
 } from "../../../apiManager/services/FOI/foiMasterDataServices";
 import {
   fetchFOIRequestDetailsWrapper,
   fetchFOIRequestDescriptionList,
   fetchRequestDataFromAxis,
   fetchRestrictedRequestCommentTagList,
+  deleteOIPCDetails
 } from "../../../apiManager/services/FOI/foiRequestServices";
 import { fetchFOIRequestAttachmentsList } from "../../../apiManager/services/FOI/foiAttachmentServices";
 import { fetchCFRForm } from "../../../apiManager/services/FOI/foiCFRFormServices";
@@ -44,6 +49,8 @@ import {
   fetchRedactedSections,
   fetchPDFStitchStatusForRedlines,
   fetchPDFStitchStatusForResponsePackage,
+  fetchPDFStitchedStatusForOIPCRedlineReview,
+  fetchPDFStitchedStatusForOIPCRedline,
 } from "../../../apiManager/services/FOI/foiRecordServices";
 import { makeStyles } from "@material-ui/core/styles";
 import FOI_COMPONENT_CONSTANTS from "../../../constants/FOI/foiComponentConstants";
@@ -83,12 +90,15 @@ import DivisionalTracking from "./DivisionalTracking";
 import RedactionSummary from "./RedactionSummary";
 import AxisDetails from "./AxisDetails/AxisDetails";
 import AxisMessageBanner from "./AxisDetails/AxisMessageBanner";
+import { toast } from "react-toastify";
 import HomeIcon from "@mui/icons-material/Home";
 import { RecordsLog } from "../customComponents/Records";
 import { UnsavedModal } from "../customComponents";
 import { DISABLE_GATHERINGRECORDS_TAB } from "../../../constants/constants";
 import _ from "lodash";
 import { MinistryNeedsScanning } from "../../../constants/FOI/enum";
+import OIPCDetails from "./OIPCDetails/Index";
+import useOIPCHook from "./OIPCDetails/oipcHook";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -157,8 +167,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
   const [attachments, setAttachments] = useState(requestAttachments);
   const [comment, setComment] = useState([]);
   const [requestState, setRequestState] = useState(StateEnum.unopened.name);
-  const disableInput =
-    requestState?.toLowerCase() === StateEnum.closed.name.toLowerCase();
+  const [disableInput, setDisableInput] = useState(requestState?.toLowerCase() === StateEnum.closed.name.toLowerCase() && !requestDetails?.isoipcreview);
   const [_tabStatus, settabStatus] = React.useState(requestState);
   let foitabheaderBG = getTabBG(_tabStatus, requestState);
 
@@ -251,6 +260,24 @@ const FOIRequest = React.memo(({ userDetail }) => {
   const [isIAORestricted, setIsIAORestricted] = useState(false);
   const [redactedSections, setRedactedSections] = useState("");
   const [isMCFPersonal, setIsMCFPersonal] = useState(bcgovcode.replaceAll('"', '') == "MCF" && requestDetails.requestType == FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL);
+  const {oipcData, addOIPC, removeOIPC, updateOIPC, isOIPCReview, setIsOIPCReview, removeAllOIPCs} = useOIPCHook();
+  const [oipcDataInitial, setOipcDataInitial] = useState(oipcData);
+  
+  //Update disableInput when requestState changes
+  useEffect(() => {
+    setDisableInput(requestState?.toLowerCase() === StateEnum.closed.name.toLowerCase() && !isOIPCReview);
+  }, [requestState, isOIPCReview])
+
+  useEffect(() => {
+    if (!oipcDataInitial) {
+      setOipcDataInitial(oipcData);
+      return;
+    }
+    //check to see if oipcData has been updated, if so, enable save button
+    if (JSON.stringify(oipcData) != JSON.stringify(oipcDataInitial)) {
+      setDisableInput(false)
+    }
+  }, [oipcData, requestDetails.isoipcreview]);
 
   useEffect(() => {
     if (window.location.href.indexOf("comments") > -1) {
@@ -276,12 +303,15 @@ const FOIRequest = React.memo(({ userDetail }) => {
       dispatch(fetchPDFStitchStatusForHarms(requestId, ministryId));
       dispatch(fetchPDFStitchStatusForRedlines(requestId, ministryId));
       dispatch(fetchPDFStitchStatusForResponsePackage(requestId, ministryId));
+      dispatch(fetchPDFStitchedStatusForOIPCRedline(requestId, ministryId));
+      dispatch(fetchPDFStitchedStatusForOIPCRedlineReview(requestId, ministryId));
       fetchCFRForm(ministryId, dispatch);
       dispatch(fetchApplicantCorrespondence(requestId, ministryId));
       dispatch(fetchApplicantCorrespondenceTemplates());
       dispatch(
         fetchRedactedSections(ministryId, (_err, res) => {
-          setRedactedSections(res.sections);
+          setRedactedSections(res);
+
         })
       );
     }
@@ -291,6 +321,11 @@ const FOIRequest = React.memo(({ userDetail }) => {
     dispatch(fetchFOIDeliveryModeList());
     dispatch(fetchFOISubjectCodeList());
     dispatch(fetchClosingReasonList());
+    
+    dispatch(fetchOIPCOutcomes());
+    dispatch(fetchOIPCStatuses());
+    dispatch(fetchOIPCReviewtypes());
+    dispatch(fetchOIPCInquiryoutcomes());
 
     if (bcgovcode) dispatch(fetchFOIMinistryAssignedToList(bcgovcode));
   }, [requestId, ministryId, comment, attachments]);
@@ -301,8 +336,8 @@ const FOIRequest = React.memo(({ userDetail }) => {
     const assignedTo = getAssignedTo(requestDetails);
     setAssignedToValue(assignedTo);
     if (Object.entries(requestDetails)?.length !== 0) {
-      let requestStateFromId = findRequestState(requestDetails.requeststatusid)
-        ? findRequestState(requestDetails.requeststatusid)
+       let requestStateFromId = findRequestState(requestDetails.requeststatuslabel)
+        ? findRequestState(requestDetails.requeststatuslabel)
         : StateEnum.unopened.name;
       setRequestState(requestStateFromId);
       settabStatus(requestStateFromId);
@@ -325,8 +360,22 @@ const FOIRequest = React.memo(({ userDetail }) => {
         setIsMCFPersonal(true);
       }
     }
+    if(requestDetails.isoipcreview) {
+      setIsOIPCReview(true);
+    } else {
+      setIsOIPCReview(false);
+    }
   }, [requestDetails]);
 
+  //useEffect to manage isoipcreview attribute for requestdetails state
+  useEffect(() => {
+    if(Object.keys(requestDetails).length !== 0 && oipcData?.length <= 0) {
+      requestDetails.isoipcreview = false;
+      setIsOIPCReview(false);
+    }
+  }, [oipcData])
+
+  
   useEffect(() => {
     if (isIAORestricted)
       dispatch(fetchRestrictedRequestCommentTagList(requestId, ministryId));
@@ -621,6 +670,61 @@ const FOIRequest = React.memo(({ userDetail }) => {
     setAssignedToValue(value);
   };
 
+  const saveOIPCNoReview = () => {
+    const toastID = toast.loading("Saving request with removed OIPC review...")
+    removeAllOIPCs();
+    setIsOIPCReview(false);
+    dispatch(
+      deleteOIPCDetails(
+        requestId,
+        ministryId, 
+        (err, _res) => {
+        if(!err) {
+          toast.update(toastID, {
+            type: "success",
+            render: "OIPC details have been saved successfully.",
+            position: "top-right",
+            isLoading: false,
+            autoClose: 3000,
+            hideProgressBar: true,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+          });
+        } else {
+          toast.error(
+            "Temporarily unable to save the OIPC details. Please try again in a few minutes.",
+            {
+              position: "top-right",
+              autoClose: 3000,
+              hideProgressBar: true,
+              closeOnClick: true,
+              pauseOnHover: true,
+              draggable: true,
+              progress: undefined,
+            }
+          );
+        }
+      })
+    )
+  }
+
+  const oipcSectionRef = React.useRef(null);
+  const handleOipcReviewFlagChange = (isSelected) => {
+    if (!isSelected) {
+      saveOIPCNoReview();
+    } else {
+      setIsOIPCReview(isSelected);
+      requestDetails.isoipcreview = isSelected;
+      oipcSectionRef.current.scrollIntoView();
+      //timeout to allow react state to update after setState call
+      setTimeout(() => {
+        oipcSectionRef.current.scrollIntoView();
+      }, (10));
+    }
+  }
+
   //handle email validation
   const [validation, setValidation] = React.useState({});
   const handleEmailValidation = (validationObj) => {
@@ -650,7 +754,9 @@ const FOIRequest = React.memo(({ userDetail }) => {
     requiredRequestDetailsValues,
     requiredAxisDetails,
     isAddRequest,
-    _currentrequestStatus
+    _currentrequestStatus,
+    oipcData,
+    requestDetails.isoipcreview,
   );
 
   const classes = useStyles();
@@ -736,7 +842,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
       _status,
       requestExtensions,
     });
-
+    
     setRequestStatus(mappedBottomText);
   };
 
@@ -761,7 +867,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
       };
     }
   }, [editorChange]);
-
+  
   const tabclick = (param) => {
     if (param === "Comments") {
       sessionStorage.setItem("foicommentcategory", 1);
@@ -985,7 +1091,8 @@ const FOIRequest = React.memo(({ userDetail }) => {
           </div>
 
           <div className="foileftpanelstatus">
-            {bottomTextArray.length > 0 &&
+            {isOIPCReview && requestDetails.isreopened ? "" 
+            : bottomTextArray.length > 0 &&
               _requestStatus &&
               _requestStatus.toLowerCase().includes("days") &&
               bottomTextArray.map((text) => {
@@ -1091,7 +1198,10 @@ const FOIRequest = React.memo(({ userDetail }) => {
                         handlestatusudpate={handlestatusudpate}
                         userDetail={userDetail}
                         disableInput={disableInput}
+                        isMinistry={false}
                         isAddRequest={isAddRequest}
+                        handleOipcReviewFlagChange={handleOipcReviewFlagChange}
+                        showOipcReviewFlag={requestState.toLowerCase() !== StateEnum.intakeinprogress.name.toLowerCase() && requestState.toLowerCase() !== StateEnum.unopened.name.toLowerCase()}
                       />
                       {(isAddRequest ||
                         requestState === StateEnum.unopened.name) && (
@@ -1185,9 +1295,8 @@ const FOIRequest = React.memo(({ userDetail }) => {
                         createSaveRequestObject={createSaveRequestObject}
                         disableInput={disableInput}
                       />
-
-                      {redactedSections.length > 0 && (
-                        <RedactionSummary sections={redactedSections} />
+                      {Object.keys(redactedSections).length > 0 && (
+                        <RedactionSummary sections={redactedSections} isoipcreview={isOIPCReview}/>
                       )}
 
                       <ExtensionDetails
@@ -1205,6 +1314,16 @@ const FOIRequest = React.memo(({ userDetail }) => {
                       {showDivisionalTracking && (
                         <DivisionalTracking
                           divisions={requestDetails.divisions}
+                        />
+                      )}
+                      <div ref={oipcSectionRef}></div>
+                      {isOIPCReview && requestState && requestState.toLowerCase() !== StateEnum.intakeinprogress.name.toLowerCase() && requestState.toLowerCase() !== StateEnum.unopened.name.toLowerCase() && (
+                        <OIPCDetails 
+                          oipcData={oipcData}
+                          updateOIPC={updateOIPC}
+                          addOIPC={addOIPC}
+                          removeOIPC={removeOIPC}
+                          isMinistry={false}
                         />
                       )}
 
@@ -1227,6 +1346,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
                         axisSyncedData={axisSyncedData}
                         axisMessage={axisMessage}
                         attachmentsArray={requestAttachments}
+                        oipcData={oipcData}
                       />
                     </>
                   </ConditionalComponent>

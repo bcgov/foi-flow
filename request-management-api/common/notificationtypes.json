@@ -1,0 +1,90 @@
+{
+    "state": {
+        "name": "State",
+        "notificationtypelabel": "state"    
+    },
+    "division": {
+        "name": "Division",
+        "notificationtypelabel": "division"    
+    },
+    "newusercomments": {
+        "name": "New User Comments",
+        "notificationtypelabel": "newusercomments"    
+    },
+    "extension": {
+        "name": "Extension",
+        "notificationtypelabel": "extension"    
+    },
+    "iaoassignment": {
+        "name": "IAO Assignment",
+        "notificationtypelabel": "iaoassignment"    
+    },
+    "ministryassignment": {
+        "name": "Ministry Assignment",
+        "notificationtypelabel": "ministryassignment"    
+    },
+    "cfrduereminder": {
+        "name": "CFR Due Reminder",
+        "notificationtypelabel": "cfrduereminder"    
+    },
+    "legislativeduereminder": {
+        "name": "Legislative Due Reminder",
+        "notificationtypelabel": "legislativeduereminder"    
+    },
+    "replyusercomments": {
+        "name": "Reply User Comments",
+        "notificationtypelabel": "replyusercomments"    
+    },
+    "taggedusercomments": {
+        "name": "Tagged User Comments",
+        "notificationtypelabel": "taggedusercomments"    
+    },
+    "cfrfeeform": {
+        "name": "CFR Fee Form",
+        "notificationtypelabel": "cfrfeeform"    
+    },
+    "groupmembers": {
+        "name": "Group Members",
+        "notificationtypelabel": "groupmembers"    
+    },
+    "divisionduereminder": {
+        "name": "Division Due Reminder",
+        "notificationtypelabel": "divisionduereminder"    
+    },
+    "watcher": {
+        "name": "Watcher",
+        "notificationtypelabel": "watcher"    
+    },
+    "userassignmentremoval": {
+        "name": "User Assignment Removal",
+        "notificationtypelabel": "userassignmentremoval"    
+    },
+    "emailfailure": {
+        "name": "Email Failure",
+        "notificationtypelabel": "emailfailure"    
+    },
+    "payment": {
+        "name": "Payment",
+        "notificationtypelabel": "payment"    
+    },
+    "records": {
+        "notificationtypeid": 18,
+        "notificationtypelabel": "records"    
+    },
+    "pdfstitch": {
+        "name": "PDFStitch",
+        "notificationtypelabel": "pdfstitch"    
+    },
+    "section5pendingreminder": {
+        "name": "Section 5 Pending Reminder",
+        "notificationtypelabel": "section5pendingreminder"    
+    },
+    "oipc": {
+        "name": "OIPC",
+        "notificationtypelabel": "oipc"    
+    },
+    "oipcduereminder": {
+        "name": "OIPC Due Reminder",
+        "notificationtypelabel": "oipcduereminder"    
+    }
+}

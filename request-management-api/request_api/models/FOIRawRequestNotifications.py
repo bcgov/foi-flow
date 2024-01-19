@@ -28,6 +28,7 @@ class FOIRawRequestNotification(db.Model):
     updatedby = db.Column(db.String(120), unique=False, nullable=True)
 
     notificationtypeid = db.Column(db.Integer, nullable=False)
+    notificationtypelabel = db.Column(db.Integer, nullable=False)
     
     notificationusers = db.relationship('FOIRawRequestNotificationUser', backref='FOIRawRequestNotifications', lazy='dynamic')
 
@@ -45,7 +46,7 @@ class FOIRawRequestNotification(db.Model):
     @classmethod
     def dismissnotification(cls, notificationids, userid='system'):
         try:
-            db.session.query(FOIRawRequestNotification).filter(FOIRawRequestNotification.notificationid.in_(notificationids)).update({FOIRawRequestNotification.isdeleted: True, FOIRawRequestNotification.updatedby: userid,
+            db.session.query(FOIRawRequestNotification).filter(FOIRawRequestNotification.notificationid.in_(notificationids), FOIRawRequestNotification.isdeleted == False).update({FOIRawRequestNotification.isdeleted: True, FOIRawRequestNotification.updatedby: userid,
                             FOIRawRequestNotification.updated_at: datetime2.now()}, synchronize_session=False)
             db.session.commit()  
             return DefaultMethodResult(True,'Notifications deleted ', notificationids)
@@ -69,11 +70,11 @@ class FOIRawRequestNotification(db.Model):
             return DefaultMethodResult(True,'No notification found',foinotification['notificationid'])
         
     @classmethod
-    def getnotificationidsbynumberandtype(cls, idnumber, notificationtypeid):
+    def getnotificationidsbynumberandtype(cls, idnumber, notificationtypelabel):
         notificationids = []
         try:
-            sql = """select notificationid from "FOIRawRequestNotifications" where idnumber = :idnumber and notificationtypeid= :notificationtypeid """
-            rs = db.session.execute(text(sql), {'idnumber': idnumber, 'notificationtypeid': notificationtypeid})
+            sql = """select notificationid from "FOIRawRequestNotifications" where idnumber = :idnumber and notificationtypelabel= :notificationtypelabel """
+            rs = db.session.execute(text(sql), {'idnumber': idnumber, 'notificationtypelabel': notificationtypelabel})
             for row in rs:
                 notificationids.append(row["notificationid"])
         except Exception as ex:
@@ -99,11 +100,11 @@ class FOIRawRequestNotification(db.Model):
         return notificationids
 
     @classmethod
-    def getnotificationidsbytype(cls, notificationtypeid):
+    def getnotificationidsbytype(cls, notificationtypelabel):
         notificationids = []
         try:
-            sql = """select notificationid from "FOIRawRequestNotifications" where notificationtypeid= :notificationtypeid """
-            rs = db.session.execute(text(sql), {'notificationtypeid': notificationtypeid})
+            sql = """select notificationid from "FOIRawRequestNotifications" where notificationtypelabel= :notificationtypelabel and isdeleted = false """
+            rs = db.session.execute(text(sql), {'notificationtypelabel': notificationtypelabel})
             for row in rs:
                 notificationids.append(row["notificationid"])
         except Exception as ex:
@@ -115,4 +116,4 @@ class FOIRawRequestNotification(db.Model):
     
 class FOIRawRequestNotificationSchema(ma.Schema):
     class Meta:
-        fields = ('notificationid', 'requestid', 'idnumber','notification', 'notificationtypeid','created_at','createdby','updated_at','updatedby','notificationusers') 
+        fields = ('notificationid', 'requestid', 'idnumber','notification', 'notificationtypeid', 'notificationtypelabel','created_at','createdby','updated_at','updatedby','notificationusers') 

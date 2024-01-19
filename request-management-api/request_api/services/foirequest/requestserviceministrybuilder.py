@@ -11,6 +11,8 @@ from request_api.models.FOIRequestExtensions import FOIRequestExtension
 from request_api.models.FOIRequestExtensionDocumentMappings import FOIRequestExtensionDocumentMapping
 from request_api.models.FOIAssignees import FOIAssignee
 from request_api.models.FOIMinistryRequestSubjectCodes import FOIMinistryRequestSubjectCode
+from request_api.models.FOIRequestStatus import FOIRequestStatus
+from request_api.models.FOIRequestOIPC import FOIRequestOIPC
 from request_api.services.foirequest.requestserviceconfigurator import requestserviceconfigurator
 from datetime import datetime as datetime2
 
@@ -76,7 +78,8 @@ class requestserviceministrybuilder(requestserviceconfigurator):
             foiministryrequest.assignedto = None if usertype == "iao" and 'assignedto' in requestschema and requestschema['assignedto'] in (None, '') else ministryschema["assignedto"] 
 
         foiministryrequest.ministrysignoffapproval = requestdict["ministrysignoffapproval"]
-        foiministryrequest.requeststatusid = requestdict['requeststatusid']
+        foiministryrequest.requeststatusid = self.__getrequeststatusid(requestdict['requeststatuslabel'])
+        foiministryrequest.requeststatuslabel = requestdict['requeststatuslabel']
         foiministryrequest.programareaid = requestdict['programareaid']
         foiministryrequest.createdby = userid
         
@@ -86,8 +89,20 @@ class requestserviceministrybuilder(requestserviceconfigurator):
         foiministryrequest.subjectcode = self.__createministrysubjectcode(requestschema, ministryschema["foiministryrequestid"], ministryschema["version"], userid)
         foiministryrequest.closedate = requestdict['closedate']
         foiministryrequest.closereasonid = requestdict['closereasonid']
+        foiministryrequest.isoipcreview = ministryschema["isoipcreview"]
+        foiministryrequest.oipcreviews = self.createfoirequestoipcs(foiministryrequest.isoipcreview, ministryschema["foirequest_id"], ministryschema["version"])
         return foiministryrequest
 
+    def __getrequeststatusid(self, requeststatuslabel):
+        state = FOIRequestStatus.getrequeststatusbylabel(
+            requeststatuslabel
+        )
+        stateid = (
+            state.get("requeststatusid")
+            if isinstance(state, dict) and state.get("requeststatusid") not in (None, "")
+            else ""
+        )
+        return stateid
     def __createministrydivisions(self, requestschema, foiministryrequestid, foiministryrequestversion, userid):
         if 'divisions' in requestschema:
             return self.createfoirequestdivision(requestschema,foiministryrequestid ,foiministryrequestversion + 1, userid)  
@@ -111,7 +126,7 @@ class requestserviceministrybuilder(requestserviceconfigurator):
             'duedate': requestschema['duedate'] if 'duedate' in requestschema else ministryschema["duedate"], #and isextension':= True 
             'assignedministrygroup': requestschema['assignedministrygroup'] if 'assignedministrygroup' in requestschema  else ministryschema["assignedministrygroup"],
             'assignedgroup': requestschema['assignedgroup'] if 'assignedgroup' in requestschema  else ministryschema["assignedgroup"],
-            'requeststatusid': requestschema['requeststatusid'] if  'requeststatusid' in requestschema  else  ministryschema["requeststatus.requeststatusid"],
+            'requeststatuslabel': requestschema['requeststatuslabel'] if  'requeststatuslabel' in requestschema  else  ministryschema["requeststatuslabel"],
             'programareaid': ministryschema["programarea.programareaid"] if 'programarea.programareaid' in ministryschema  else None,
             'closedate': requestschema['closedate'] if 'closedate' in requestschema  else None,
             'closereasonid': requestschema['closereasonid'] if 'closereasonid' in requestschema  else None,
@@ -309,3 +324,30 @@ class requestserviceministrybuilder(requestserviceconfigurator):
 
     def createfoiassigneefromobject(self, username, firstname, middlename, lastname):
         return FOIAssignee.saveassignee(username, firstname, middlename, lastname)
+    
+    def createfoirequestoipcs(self, isoipcreview, requestid, version):
+        current_oipcs = FOIRequestOIPC.getoipc(requestid, version)
+        if (isoipcreview == True):
+            updated_oipcs = []
+            for oipc in current_oipcs:
+                oipcreview = FOIRequestOIPC()
+                oipcreview.foiministryrequest_id = requestid
+                oipcreview.foiministryrequestversion_id = version + 1
+                oipcreview.oipcno = oipc["oipcno"]
+                oipcreview.reviewtypeid = oipc["reviewtypeid"]
+                oipcreview.reasonid = oipc["reasonid"]
+                oipcreview.statusid = oipc["statusid"]
+                oipcreview.outcomeid = oipc["outcomeid"]
+                oipcreview.investigator = oipc["investigator"]
+                oipcreview.isinquiry = oipc["isinquiry"]
+                oipcreview.isjudicialreview = oipc["isjudicialreview"]
+                oipcreview.issubsequentappeal = oipc["issubsequentappeal"]
+                oipcreview.issubsequentappeal = oipc["issubsequentappeal"]
+                oipcreview.receiveddate = oipc["receiveddate"]
+                oipcreview.closeddate = oipc["closeddate"] 
+                oipcreview.inquiryattributes = oipc["inquiryattributes"]
+                oipcreview.createdby=oipc["createdby"]
+                oipcreview.created_at= oipc["created_at"]            
+                updated_oipcs.append(oipcreview)
+            return updated_oipcs
+        return []

@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import { InputLabel } from '@material-ui/core';
+import { Grid, InputLabel } from '@material-ui/core';
 import Link from '@material-ui/core/Link';
 import TextField from '@material-ui/core/TextField';
 import MinistryAssignToDropdown from '../MinistryAssignToDropdown';
@@ -13,13 +13,15 @@ import { isRequestWatcherOrMinistryAssignee, addToRestrictedRequestTagList } fro
 import RequestMinistryRestriction from "../../customComponents/RequestMinistryRestriction";
 import _ from 'lodash';
 import {setCommentTagListLoader} from "../../../../actions/FOI/foiRequestActions";
+import RequestFlag from '../../customComponents/RequestFlag';
 
 const RequestHeader = React.memo(({
     requestDetails,
     userDetail,
     handleMinistryAssignedToValue,
     setSaveMinistryRequestObject,
-    ministryAssigneeValue
+    ministryAssigneeValue,
+    isMinistry,
 }) => {
     const { requestId, ministryId } = useParams();
     const _requestDetails = requestDetails;
@@ -101,6 +103,22 @@ const RequestHeader = React.memo(({
         )
       );
 
+      const requestFlagsBox = (
+        <div>
+            <RequestFlag
+              type="oipcreview"
+              requestDetails={requestDetails}
+              isActive={requestDetails.isoipcreview}
+              isDisabled={isMinistry}
+            />
+            {/* <RequestFlag
+              type="phasedrelease"
+              requestDetails={requestDetails}
+              isActive={requestDetails.isphasedrelease}
+              handleSelect={() => console.log('selected')}
+            /> */}
+        </div>
+      );
     return (
         <>
         <div className="row">
@@ -128,23 +146,28 @@ const RequestHeader = React.memo(({
             </div>
         </div>
         <div className="row">
-            <div className="col-lg-8">
-                <div className="foi-request-review-header-col1-row">
-                    <div className="foi-request-review-header-col1-row">
+            <div className="col-lg-6">
+                <Grid container columns={16}>
+                    <Grid>
                         {watcherBox}
-                    </div>
-                    {
-                    (isLoaded && (isRequestWatcherOrMinistryAssignee(requestWatchers,ministryAssigneeValue,userDetail?.preferred_username) || 
-                        isMinistryRestrictedFileManager())) &&
-                        <RequestMinistryRestriction 
-                            isministryrestricted={isRestricted()}
-                            isMinistryRestrictedFileManager={isMinistryRestrictedFileManager()}
-                            requestDetails={requestDetails}
-                        />
-                    }
-                </div>
+                        {
+                            (isLoaded && (isRequestWatcherOrMinistryAssignee(requestWatchers,ministryAssigneeValue,userDetail?.preferred_username) || 
+                                isMinistryRestrictedFileManager())) &&
+                            <RequestMinistryRestriction 
+                                isministryrestricted={isRestricted()}
+                                isMinistryRestrictedFileManager={isMinistryRestrictedFileManager()}
+                                requestDetails={requestDetails}
+                            />
+                        }
+                    </Grid>
+                    <Grid>
+                        <div className="foi-request-review-header-col1-row">
+                            {requestFlagsBox}
+                        </div>
+                    </Grid>
+                </Grid>
             </div>
-            <div className="col-lg-4">
+            <div className="col-lg-6">
                 <div className="foi-assignee-dropdown">
                     <MinistryAssignToDropdown requestState={requestState} requestDetails={_requestDetails} 
                     ministryAssignedToList={ministryAssignedToList} 
