@@ -53,6 +53,34 @@ class FOIMinistryRequestDocumentSchema(Schema):
     documentpath = fields.Str(data_key="documentpath",allow_none=False, validate=[validate.Length(max=1000, error=MAX_EXCEPTION_MESSAGE)])
     filename = fields.Str(data_key="filename",allow_none=False, validate=[validate.Length(max=120, error=MAX_EXCEPTION_MESSAGE)])
     category = fields.Str(data_key="category",allow_none=False, validate=[validate.Length(max=120, error=MAX_EXCEPTION_MESSAGE)])
+
+class FOIOIPCInquirySchema(Schema):
+    class Meta:  # pylint: disable=too-few-public-methods
+        """Exclude unknown fields in the deserialized output."""
+
+        unknown = EXCLUDE
+    inquirydate = fields.Str(data_key="inquirydate",allow_none=True)
+    orderno = fields.Str(data_key="orderno",allow_none=True)
+    inquiryoutcome = fields.Int(data_key="inquiryoutcome",allow_none=True)
+
+class FOIMinistryRequestOIPCSchema(Schema):
+    class Meta:  # pylint: disable=too-few-public-methods
+        """Exclude unknown fields in the deserialized output."""
+
+        unknown = EXCLUDE
+    oipcno = fields.Str(data_key="oipcno")
+    reviewtypeid = fields.Int(data_key="reviewtypeid")
+    reasonid = fields.Int(data_key="reasonid")
+    statusid = fields.Int(data_key="statusid")
+    outcomeid = fields.Int(data_key="outcomeid",allow_none=True)
+    investigator = fields.Str(data_key="investigator",allow_none=True, validate=[validate.Length(max=500, error=MAX_EXCEPTION_MESSAGE)])  
+    isinquiry = fields.Bool(data_key="isinquiry")
+    isjudicialreview = fields.Bool(data_key="isjudicialreview")
+    issubsequentappeal = fields.Bool(data_key="issubsequentappeal")
+    inquiryattributes = fields.Nested(FOIOIPCInquirySchema, data_key="inquiryattributes", allow_none=True)
+    receiveddate = fields.Str(data_key="receiveddate",allow_none=True)
+    closeddate = fields.Str(data_key="closeddate",allow_none=True)
+
 class FOIRequestWrapperSchema(Schema):
 
     class Meta:  # pylint: disable=too-few-public-methods
@@ -105,11 +133,13 @@ class FOIRequestWrapperSchema(Schema):
     postal = fields.Str(data_key="postal",allow_none=True, validate=[validate.Length(max=10, error=MAX_EXCEPTION_MESSAGE)])   
     country = fields.Str(data_key="country",allow_none=True) 
     requeststatusid = fields.Int(data_key="requeststatusid",allow_none=True)
+    requeststatuslabel = fields.Str(data_key="requeststatuslabel",allow_none=False)
     closedate = fields.Date(data_key="closedate", required=False,allow_none=True)
     closereasonid = fields.Int(data_key="closereasonid",allow_none=True)
     correctionalServiceNumber = fields.Str(data_key="correctionalServiceNumber",allow_none=True, validate=[validate.Length(max=50, error=MAX_EXCEPTION_MESSAGE)]) 
     publicServiceEmployeeNumber = fields.Str(data_key="publicServiceEmployeeNumber",allow_none=True, validate=[validate.Length(max=50, error=MAX_EXCEPTION_MESSAGE)]) 
     isiaorestricted =   fields.Bool(data_key="isiaorestricted")
+    isoipcreview =   fields.Bool(data_key="isoipcreview")
     
     selectedMinistries = fields.Nested(FOIMinistryRequestWrapperSchema, many=True)
     additionalPersonalInfo = fields.Nested(FOIAdditionallPersonalInfoWrapperSchema,required=False,allow_none=True)
@@ -119,6 +149,8 @@ class FOIRequestWrapperSchema(Schema):
     isofflinepayment =   fields.Bool(data_key="isofflinepayment")
     linkedRequests = fields.List(fields.Dict(data_key="linkedRequests", required=False))
     identityVerified = fields.Str(data_key="identityVerified",allow_none=True)
+
+    oipcdetails = fields.Nested(FOIMinistryRequestOIPCSchema, many=True,allow_none=True)
 
 
 class EditableFOIMinistryRequestWrapperSchema(Schema):
@@ -168,6 +200,7 @@ class FOIRequestMinistrySchema(Schema):
     assignedgroup = fields.Str(data_key="assignedGroup",allow_none=True, validate=[validate.Length(max=250, error=MAX_EXCEPTION_MESSAGE)])   
     assignedto = fields.Str(data_key="assignedTo",allow_none=True, validate=[validate.Length(max=120, error=MAX_EXCEPTION_MESSAGE)])   
     requeststatusid = fields.Int(data_key="requeststatusid",allow_none=True)
+    requeststatuslabel = fields.Str(data_key="requeststatuslabel",allow_none=False)
     divisions = fields.Nested(FOIMinistryRequestDivisionSchema, many=True,allow_none=True)
     documents = fields.Nested(FOIMinistryRequestDocumentSchema, many=True,allow_none=True)
     assignedToFirstName = fields.Str(data_key="assignedToFirstName",allow_none=True, validate=[validate.Length(max=50, error=MAX_EXCEPTION_MESSAGE)])

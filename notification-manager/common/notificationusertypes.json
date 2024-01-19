@@ -1,0 +1,34 @@
+{
+    "watcher": {
+        "name": "Watcher",
+        "notificationusertypelabel": "watcher"
+    },
+    "assignee": {
+        "name": "Assignee",
+        "notificationusertypelabel": "assignee"
+    },
+    "groupmembers": {
+        "name": "Group Members",
+        "notificationusertypelabel": "assignee"
+    },
+    "groupmember": {
+        "name": "groupmembers",
+        "notificationusertypelabel": "assignee"
+    },
+    "comment": {
+        "name": "Comment",
+        "notificationusertypelabel": "assignee"
+    },
+    "commentuser": {
+        "name": "Comment User",
+        "notificationusertypelabel": "commentuser"
+    },
+    "comment tagged user": {
+        "name": "comment tagged user",
+        "notificationusertypelabel": "assignee"
+    },
+    "triggereduser": {
+        "name": "Triggered User",
+        "notificationusertypelabel": "assignee"
+    }
+}

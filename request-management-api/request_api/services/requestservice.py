@@ -62,8 +62,8 @@ class requestservice:
         )
 
     def saverequestversion(self, foirequestschema, foirequestid, ministryid, userid):
-        nextstate = FOIRequestStatus.getrequeststatusname(
-            foirequestschema["requeststatusid"]
+        nextstate = FOIRequestStatus.getrequeststatusbylabel(
+            foirequestschema["requeststatuslabel"]
         )
         nextstatename = (
             nextstate.get("name")
@@ -112,8 +112,8 @@ class requestservice:
         foirequest = self.updateduedate(
             requestid, ministryrequestid, paymentdate, _foirequest, nextstatename
         )
-        status = FOIRequestStatus().getrequeststatusid(nextstatename)
-        foirequest["requeststatusid"] = status["requeststatusid"]
+        status = FOIRequestStatus().getrequeststatus(nextstatename)
+        foirequest["requeststatuslabel"] = status["statuslabel"]
         return requestservicecreate().saverequestversion(
             foirequest, requestid, ministryrequestid, "Online Payment"
         )
@@ -204,7 +204,7 @@ class requestservice:
 
     def postopeneventtoworkflow(self, id, requestschema, ministries):
         pid = workflowservice().syncwfinstance("rawrequest", requestschema["id"])
-        workflowservice().postunopenedevent(id, pid, requestschema, "Open", ministries)
+        workflowservice().postunopenedevent(id, pid, requestschema, StateName.open.value, ministries)
 
     def postfeeeventtoworkflow(
         self, requestid, ministryrequestid, paymentstatus, nextstatename=None
@@ -215,14 +215,14 @@ class requestservice:
         )
 
     def posteventtoworkflow(self, id, requestschema, data, usertype):
-        requeststatusid = (
-            requestschema.get("requeststatusid")
-            if "requeststatusid" in requestschema
+        requeststatuslabel = (
+            requestschema.get("requeststatuslabel")
+            if "requeststatuslabel" in requestschema
             else None
         )
         status = (
-            requestserviceconfigurator().getstatusname(requeststatusid)
-            if requeststatusid is not None
+            requestserviceconfigurator().getstatusname(requeststatuslabel)
+            if requeststatuslabel is not None
             else None
         )
         pid = workflowservice().syncwfinstance("ministryrequest", id)
@@ -252,63 +252,35 @@ class requestservice:
             attributes,
         )
 
-    def calculateduedate(self, ministryrequestid, foirequest, paymentdate):
+    def calculateduedate(self, ministryrequestid, foirequest, paymentdate):        
         duedate_includeoffhold, cfrduedate_includeoffhold = self.__isincludeoffhold()
-        onhold_extend_days = duecalculator().getbusinessdaysbetween(
-            foirequest["onholdTransitionDate"], paymentdate
-        )
+        onhold_extend_days = duecalculator().getbusinessdaysbetween(foirequest["onholdTransitionDate"], paymentdate)
         isoffhold_businessday = duecalculator().isbusinessday(paymentdate)
-        duedate_extend_days = (
-            onhold_extend_days + 1
-            if isoffhold_businessday == True and duedate_includeoffhold == True
-            else onhold_extend_days
-        )
-        cfrduedate_extend_days = (
-            onhold_extend_days + 1
-            if isoffhold_businessday == True and cfrduedate_includeoffhold == True
-            else onhold_extend_days
-        )
-        calc_duedate = duecalculator().addbusinessdays(
-            foirequest["dueDate"], duedate_extend_days
-        )
-        calc_cfrduedate = duecalculator().addbusinessdays(
-            foirequest["cfrDueDate"], cfrduedate_extend_days
-        )
+        duedate_extend_days = onhold_extend_days + 1 if isoffhold_businessday == True and duedate_includeoffhold == True else onhold_extend_days
+        cfrduedate_extend_days = onhold_extend_days + 1 if isoffhold_businessday == True and cfrduedate_includeoffhold == True else onhold_extend_days
+        calc_duedate = duecalculator().addbusinessdays(foirequest["dueDate"], duedate_extend_days)    
+        calc_cfrduedate = duecalculator().addbusinessdays(foirequest["cfrDueDate"], cfrduedate_extend_days) 
         return calc_duedate, calc_cfrduedate
 
-    def __skipduedatecalculation(
-        self, ministryrequestid, offholddate, currentstatus="", nextstatename=""
-    ):
+    def __skipduedatecalculation(self, ministryrequestid, offholddate):
         previousoffholddate = FOIMinistryRequest.getlastoffholddate(ministryrequestid)
-        if (
-            currentstatus not in (None, "")
-            and currentstatus == StateName.onhold.value
-            and nextstatename not in (None, "")
-            and currentstatus == nextstatename
-        ):
-            return True
-        if previousoffholddate not in (None, ""):
-            previouspaymentdate_pst = datetimehandler().convert_to_pst(
-                previousoffholddate
-            )
-            if (
-                datetimehandler().getdate(previouspaymentdate_pst).date()
-                == datetimehandler().getdate(offholddate).date()
-            ):
+        foiministry_request = FOIMinistryRequest.getrequest(ministryrequestid)
+        request_reopened = self.__hasreopened(ministryrequestid, "ministryrequest")
+        if previousoffholddate not in (None, ''):
+            previouspaymentdate_pst = datetimehandler().convert_to_pst(previousoffholddate)
+            if datetimehandler().getdate(previouspaymentdate_pst).date() == datetimehandler().getdate(offholddate).date():
                 return True
-        return False
+        if foiministry_request['isoipcreview'] == True and request_reopened:
+            return True
+        return False            
 
     def __isincludeoffhold(self):
-        payment_config_str = os.getenv("PAYMENT_CONFIG", "")
-        if payment_config_str in (None, ""):
+        payment_config_str = os.getenv("PAYMENT_CONFIG",'')        
+        if payment_config_str in (None, ''):
             return True, True
         _paymentconfig = json.loads(payment_config_str)
-        duedate_includeoffhold = (
-            True if _paymentconfig["duedate"]["includeoffhold"] == "Y" else False
-        )
-        cfrduedate_includeoffhold = (
-            True if _paymentconfig["cfrduedate"]["includeoffhold"] == "Y" else False
-        )
+        duedate_includeoffhold = True if _paymentconfig["duedate"]["includeoffhold"] == "Y" else False
+        cfrduedate_includeoffhold = True if _paymentconfig["cfrduedate"]["includeoffhold"] == "Y" else False
         return duedate_includeoffhold, cfrduedate_includeoffhold
 
     # intake in progress to open: create a restricted request record for each selected ministries
@@ -330,3 +302,15 @@ class requestservice:
         return FOIRestrictedMinistryRequest.saverestrictedrequest(
             ministryrequestid, type, isrestricted, version, userid
         )
+
+
+    def __hasreopened(self, requestid, requesttype):
+        if requesttype == "rawrequest":
+            states =  FOIRawRequest.getstatesummary(requestid)
+        else:
+            states =  FOIMinistryRequest.getstatesummary(requestid)
+        if len(states) > 0:
+            current_state = states[0]
+            if current_state != "Closed" and any(state['status'] == "Closed" for state in states):
+                return True
+        return False 

@@ -2,7 +2,7 @@ version: '3'
 services: 
   notification-manager:
     build:
-      context: ./notification-manager  
+      context: ./
       dockerfile: dockerfile.local
     image: foinotificationmanager
     container_name: aot_foi_notification_manager     
@@ -30,6 +30,7 @@ services:
       - NOTIFICATION_REDIS_HEALTHCHECK_INT=${NOTIFICATION_REDIS_HEALTHCHECK_INT}
       - NOTIFICATION_STREAM_KEY=${NOTIFICATION_STREAM_KEY}
       - DIVISION_PDF_STITCH_SERVICE_KEY=${DIVISION_PDF_STITCH_SERVICE_KEY}
+      - MUTE_NOTIFICATION=${MUTE_NOTIFICATION}
 volumes:
   dbdata:
 networks:

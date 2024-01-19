@@ -6,6 +6,7 @@ from request_api.services.notificationservice import notificationservice
 from request_api.services.commentservice import commentservice
 from request_api.models.FOIMinistryRequests import FOIMinistryRequest
 from request_api.models.FOIRequestComments import FOIRequestComment
+from request_api.models.NotificationTypes import NotificationType
 import json
 from request_api.models.default_method_result import DefaultMethodResult
 from enum import Enum
@@ -16,6 +17,7 @@ import maya
 import os
 from flask import current_app
 from dateutil.parser import parse
+import time as t
 
 class legislativedateevent(duecalculator):
     """ FOI Event management service
@@ -28,6 +30,7 @@ class legislativedateevent(duecalculator):
             notificationservice().dismissremindernotification("ministryrequest", self.__notificationtype())            
             ca_holidays = self.getholidays()
             _upcomingdues = FOIMinistryRequest.getupcominglegislativeduerecords()
+            notificationtype = NotificationType().getnotificationtypeid(self.__notificationtype())
             for entry in _upcomingdues:
                 _duedate = self.formatduedate(entry['duedate'])
                 message = None
@@ -35,16 +38,17 @@ class legislativedateevent(duecalculator):
                     message = self.__todayduemessage()     
                 elif  self.getpreviousbusinessday(entry['duedate'],ca_holidays) == _today or self.getbusinessdaysbetween(entry['duedate'],_today) == 5:
                     message = self.__upcomingduemessage(_duedate)
-                self.__createnotification(message,entry['foiministryrequestid'])
+                
+                self.__createnotification(message,entry['foiministryrequestid'], notificationtype)
                 self.__createcomment(entry, message)
             return DefaultMethodResult(True,'Legislative reminder notifications created',_today)
         except BusinessException as exception:            
             current_app.logger.error("%s,%s" % ('Legislative reminder Notification Error', exception.message))
             return DefaultMethodResult(False,'Legislative reminder notifications failed',_today)
         
-    def __createnotification(self, message, requestid):
+    def __createnotification(self, message, requestid, notificationtype):
         if message is not None: 
-            return notificationservice().createnotification({"message" : message}, requestid, "ministryrequest", self.__notificationtype(), self.__defaultuserid(), False)
+            return notificationservice().createnotification({"message" : message}, requestid, "ministryrequest", notificationtype, self.__defaultuserid(), False)
         
     def __createcomment(self, entry, message):
         if message is not None: 

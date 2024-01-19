@@ -298,8 +298,9 @@ const AxisSyncModal = ({ axisSyncModalOpen, setAxisSyncModalOpen, saveRequestObj
 
 
     const saveAxisData = async () => {
-      if (urlIndexCreateRequest > -1)
-        updatedSaveReqObj.requeststatusid = StateEnum.intakeinprogress.id;
+      if (urlIndexCreateRequest > -1) {
+        updatedSaveReqObj.requeststatuslabel = StateEnum.intakeinprogress.label;
+      }
       dispatch(saveRequestDetails(updatedSaveReqObj, urlIndexCreateRequest,requestId,ministryId,
           (err, res) => {
             if (!err) {

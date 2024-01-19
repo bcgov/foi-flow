@@ -7,7 +7,9 @@ on:
       - main
       - dev
       - dev-marshal
-      - test-marshal      
+      - test-marshal
+      - dev-rook
+      - test-rook    
     paths:
       - "request-management-api/**"
       - "!request-management-api/request_api/email_templates/**"

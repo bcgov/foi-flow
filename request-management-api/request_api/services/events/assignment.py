@@ -7,6 +7,7 @@ from request_api.services.notificationservice import notificationservice
 from request_api.models.FOIRawRequests import FOIRawRequest
 from request_api.models.FOIMinistryRequests import FOIMinistryRequest
 from request_api.models.FOIRequestStatus import FOIRequestStatus
+from request_api.models.NotificationTypes import NotificationType
 import json
 from request_api.models.default_method_result import DefaultMethodResult
 from request_api.utils.enums import CommentType
@@ -38,7 +39,8 @@ class assignmentevent:
 
     def __createnotification(self, requestid, requesttype, userid, isministryuser):
         notification = self.__preparenotification()
-        return notificationservice().createnotification({"message" : notification}, requestid, requesttype, self.__assignmenttype(isministryuser), userid)
+        notificationtype = NotificationType().getnotificationtypeid(self.__assignmenttype(isministryuser))
+        return notificationservice().createnotification({"message" : notification}, requestid, requesttype, notificationtype, userid)
 
     def __createnotificationforremoval(self, requestid, requesttype, userid, username, previousassignee):
         notification = self.__preparenotification(username, True)

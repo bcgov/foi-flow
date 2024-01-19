@@ -50,6 +50,8 @@ class dashboardservice:
         baserequestinfo.update({'onBehalfFirstName': request.onBehalfFirstName})
         baserequestinfo.update({'onBehalfLastName': request.onBehalfLastName})
         baserequestinfo.update({'requestPageCount': request.requestPageCount})        
+        isoipcreview = request.isoipcreview if request.isoipcreview == True else False
+        baserequestinfo.update({'isoipcreview': isoipcreview})
         return baserequestinfo
         
     def __preparebaserequestinfo(self, id, requesttype, status, receiveddate, receiveddateuf, assignedgroup, assignedto, idnumber, axisrequestid, version, description, fromdate, todate):
@@ -69,7 +71,7 @@ class dashboardservice:
         }
 
     def getrequestqueuepagination(self, groups=None, page=1, size=10, sortingitems=[], sortingorders=[], filterfields=[], keyword=None, additionalfilter='All', userid=None):        
-        requests = FOIRawRequest.getrequestspagination(groups, page, size, sortingitems, sortingorders, filterfields, keyword, additionalfilter, userid, AuthHelper.isiaorestrictedfilemanager())
+        requests = FOIRawRequest.getrequestspagination(groups, page, size, sortingitems, sortingorders, filterfields, keyword, additionalfilter, userid, AuthHelper.isiaorestrictedfilemanager(), AuthHelper.getusertype())
         requestqueue = []                
         for request in requests.items:
             
@@ -148,6 +150,8 @@ class dashboardservice:
             
             isministryrestricted = request.isministryrestricted if request.isministryrestricted == True else False
             _openrequest.update({'isministryrestricted': isministryrestricted})
+            isoipcreview = request.isoipcreview if request.isoipcreview == True else False
+            _openrequest.update({'isoipcreview': isoipcreview})
             requestqueue.append(_openrequest)
 
         meta = {
@@ -162,7 +166,7 @@ class dashboardservice:
 
         return jsonify({'data': requestqueue, 'meta': meta})
 
-    def advancedsearch(self, params={'usertype': 'iao', 'groups':None, 'page':1, 'size':10, 'sortingitems':[], 'sortingorders':[], 'requeststate':[], 'requeststatus':[], 'requesttype':[], 'publicbody':[], 'daterangetype':None, 'fromdate':None, 'todate':None, 'search':None, 'keywords':[], 'userid':None}):
+    def advancedsearch(self, params={'usertype': 'iao', 'groups':None, 'page':1, 'size':10, 'sortingitems':[], 'sortingorders':[], 'requeststate':[], 'requeststatus':[], 'requesttype':[], 'requestflags':[], 'publicbody':[], 'daterangetype':None, 'fromdate':None, 'todate':None, 'search':None, 'keywords':[], 'userid':None}):
         userid = AuthHelper.getuserid()
 
         if (params['usertype'] == "iao"):

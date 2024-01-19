@@ -25,6 +25,7 @@ from request_api.exceptions import BusinessException
 from request_api.services.rawrequestservice import rawrequestservice
 from request_api.services.documentservice import documentservice
 from request_api.services.eventservice import eventservice
+from request_api.utils.enums import StateName
 import json
 import asyncio
 from jose import jwt as josejwt
@@ -92,12 +93,12 @@ class FOIRawRequest(Resource):
             assigneefirstname = requestdata['assigneefirstname']
             assigneemiddlename = requestdata['assigneemiddlename']
             assigneelastname = requestdata['assigneelastname']
-
+            statuslabel = requestdata['requeststatuslabel']
             if int(requestid) and str(requestid) != "-1" :
-                status = rawrequestservice().getstatus(updaterequest)
-                if status not in ['Intake in Progress', 'Closed', 'Redirect', 'Peer Review', 'Section 5 Pending', 'App Fee Owing']:
+                status, statuslabel = rawrequestservice().getstatus(updaterequest)
+                if status not in [StateName.intakeinprogress.value, StateName.closed.value, StateName.redirect.value, StateName.peerreview.value, StateName.section5pending.value, StateName.appfeeowing.value]:
                     raise ValueError('Invalid request state.')
-                result = rawrequestservice().saverawrequestversion(updaterequest,requestid,assigneegroup,assignee,status,AuthHelper.getuserid(),assigneefirstname,assigneemiddlename,assigneelastname, actiontype)                
+                result = rawrequestservice().saverawrequestversion(updaterequest,requestid,assigneegroup,assignee,status,AuthHelper.getuserid(),assigneefirstname,assigneemiddlename,assigneelastname, statuslabel, actiontype)                
                 assignee = ''
                 if(actiontype == 'assignee'):
                     assignee = getassignee(assigneefirstname,assigneelastname,assigneegroup)                  
@@ -128,7 +129,8 @@ def getparams(updaterequest):
         'assignee': updaterequest["assignedTo"] if 'assignedTo' in updaterequest else None,
         'assigneefirstname': updaterequest["assignedToFirstName"] if updaterequest.get("assignedToFirstName") != None else None,
         'assigneemiddlename': updaterequest["assignedToMiddleName"] if updaterequest.get("assignedToMiddleName") != None else None,
-        'assigneelastname': updaterequest["assignedToLastName"] if updaterequest.get("assignedToLastName") != None else None
+        'assigneelastname': updaterequest["assignedToLastName"] if updaterequest.get("assignedToLastName") != None else None,
+        'requeststatuslabel': updaterequest["requeststatuslabel"] if updaterequest.get("requeststatuslabel") != None else None
     }
     
 @cors_preflight('GET,OPTIONS')
