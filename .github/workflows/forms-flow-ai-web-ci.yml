@@ -8,6 +8,8 @@ on:
       - main
       - dev-marshal
       - test-marshal
+      - dev-rook
+      - test-rook
     paths:
       - "apps/forms-flow-ai/forms-flow-ai-web/**"
       - "!apps/forms-flow-ai/forms-flow-ai-web/src/forms/**"

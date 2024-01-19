@@ -12,6 +12,7 @@ from request_api.models.FOIRequestExtensionDocumentMappings import FOIRequestExt
 from request_api.models.FOIAssignees import FOIAssignee
 from request_api.models.FOIMinistryRequestSubjectCodes import FOIMinistryRequestSubjectCode
 from request_api.models.FOIRequestStatus import FOIRequestStatus
+from request_api.models.FOIRequestOIPC import FOIRequestOIPC
 from request_api.services.foirequest.requestserviceconfigurator import requestserviceconfigurator
 from datetime import datetime as datetime2
 
@@ -88,6 +89,8 @@ class requestserviceministrybuilder(requestserviceconfigurator):
         foiministryrequest.subjectcode = self.__createministrysubjectcode(requestschema, ministryschema["foiministryrequestid"], ministryschema["version"], userid)
         foiministryrequest.closedate = requestdict['closedate']
         foiministryrequest.closereasonid = requestdict['closereasonid']
+        foiministryrequest.isoipcreview = ministryschema["isoipcreview"]
+        foiministryrequest.oipcreviews = self.createfoirequestoipcs(foiministryrequest.isoipcreview, ministryschema["foirequest_id"], ministryschema["version"])
         return foiministryrequest
 
     def __getrequeststatusid(self, requeststatuslabel):
@@ -321,3 +324,30 @@ class requestserviceministrybuilder(requestserviceconfigurator):
 
     def createfoiassigneefromobject(self, username, firstname, middlename, lastname):
         return FOIAssignee.saveassignee(username, firstname, middlename, lastname)
+    
+    def createfoirequestoipcs(self, isoipcreview, requestid, version):
+        current_oipcs = FOIRequestOIPC.getoipc(requestid, version)
+        if (isoipcreview == True):
+            updated_oipcs = []
+            for oipc in current_oipcs:
+                oipcreview = FOIRequestOIPC()
+                oipcreview.foiministryrequest_id = requestid
+                oipcreview.foiministryrequestversion_id = version + 1
+                oipcreview.oipcno = oipc["oipcno"]
+                oipcreview.reviewtypeid = oipc["reviewtypeid"]
+                oipcreview.reasonid = oipc["reasonid"]
+                oipcreview.statusid = oipc["statusid"]
+                oipcreview.outcomeid = oipc["outcomeid"]
+                oipcreview.investigator = oipc["investigator"]
+                oipcreview.isinquiry = oipc["isinquiry"]
+                oipcreview.isjudicialreview = oipc["isjudicialreview"]
+                oipcreview.issubsequentappeal = oipc["issubsequentappeal"]
+                oipcreview.issubsequentappeal = oipc["issubsequentappeal"]
+                oipcreview.receiveddate = oipc["receiveddate"]
+                oipcreview.closeddate = oipc["closeddate"] 
+                oipcreview.inquiryattributes = oipc["inquiryattributes"]
+                oipcreview.createdby=oipc["createdby"]
+                oipcreview.created_at= oipc["created_at"]            
+                updated_oipcs.append(oipcreview)
+            return updated_oipcs
+        return []

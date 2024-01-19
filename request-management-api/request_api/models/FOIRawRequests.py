@@ -575,7 +575,9 @@ class FOIRawRequest(db.Model):
             literal(None).label('extensions'),
             isiaorestricted,
             literal(None).label('isministryrestricted'),
-            subjectcode
+            subjectcode,
+            literal(None).label('isoipcreview'),
+            literal(None).label('oipc_number')
         ]
 
         basequery = _session.query(*selectedcolumns).join(subquery_maxversion, and_(*joincondition)).join(FOIAssignee, FOIAssignee.username == FOIRawRequest.assignedto, isouter=True)
@@ -822,6 +824,11 @@ class FOIRawRequest(db.Model):
         if(len(params['requesttype']) > 0):
             requesttypecondition = FOIRawRequest.getfilterforrequesttype(params)
             filtercondition.append(or_(*requesttypecondition))
+
+        #request flags: restricted, oipc, phased
+        if(len(params['requestflags']) > 0):
+            requestflagscondition = FOIRawRequest.getfilterforrequestflags(params)
+            filtercondition.append(or_(*requestflagscondition))
         
         #public body: EDUC, etc.
         if(len(params['publicbody']) > 0):
@@ -901,6 +908,20 @@ class FOIRawRequest(db.Model):
             requesttypecondition.append(FOIRawRequest.findfield('requestTypeRequestType') == type)
 
         return or_(*requesttypecondition)
+
+    @classmethod
+    def getfilterforrequestflags(cls, params):
+        # this search will be done by the ministry union, so returns filter with no results
+        requestflagscondition = []
+        for flag in params['requestflags']:
+            if (flag.lower() == 'restricted'): # no results for raw restricted
+                requestflagscondition.append(FOIRawRequest.findfield('axisRequestId') == 'thisismeanttoreturnafilterconditionwith0results')
+            if (flag.lower() == 'oipc'): # no results for raw oipc
+                requestflagscondition.append(FOIRawRequest.findfield('axisRequestId') == 'thisismeanttoreturnafilterconditionwith0results')
+            if (flag.lower() == 'phased'):
+                # requestflagscondition.append(FOIMinistryRequest.findfield('isphasedrelease', iaoassignee, ministryassignee) == True)
+                continue
+        return requestflagscondition
 
     @classmethod
     def getfilterforpublicbody(cls, params):

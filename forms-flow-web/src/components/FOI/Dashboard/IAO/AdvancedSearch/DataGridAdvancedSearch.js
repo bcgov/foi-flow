@@ -12,7 +12,8 @@ import {
   getReceivedDate,
   // onBehalfFullName,
   getRecordsDue,
-  LightTooltip,  
+  LightTooltip,
+  displayQueueFlagIcons,  
 } from "../../utils";
 import { ActionContext } from "./ActionContext";
 import {
@@ -97,6 +98,12 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
   
 
   const ProcessingTeamColumns = [
+    {
+      field: "flags",
+      headerName: "FLAGS",
+      headerAlign: "left",
+      renderCell: displayQueueFlagIcons,
+    },
     {
       field: "axisRequestId",
       headerName: "ID NUMBER",
@@ -190,6 +197,12 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
   
   const IntakeTeamColumns = [
     {
+      field: "flags",
+      headerName: "FLAGS",
+      headerAlign: "left",
+      renderCell: displayQueueFlagIcons,
+    },
+    {
       field: "applicantName",
       headerName: "APPLICANT NAME",
       headerAlign: "left",
@@ -250,6 +263,12 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
   ];
   
   const FlexTeamColumns = [
+    {
+      field: "flags",
+      headerName: "FLAGS",
+      headerAlign: "left",
+      renderCell: displayQueueFlagIcons,
+    },
     {
       field: "axisRequestId",
       headerName: "ID NUMBER",
