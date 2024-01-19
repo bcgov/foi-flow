@@ -3,6 +3,7 @@ from os import stat
 from re import VERBOSE
 from request_api.models.FOIRequestApplicants import FOIRequestApplicant
 from request_api.models.FOIMinistryRequests import FOIMinistryRequest
+from request_api.models.ApplicantCategories import ApplicantCategory
 from request_api.services.requestservice import requestservicegetter, requestservicecreate
 from request_api.auth import AuthHelper
 from dateutil import tz, parser
@@ -29,7 +30,6 @@ class applicantservice:
         applicant = FOIRequestApplicant.getapplicantbyid(applicantid)
         applicant = self.__prepareapplicant(applicant)
         applicant['requestHistory'] = self.getapplicantrequests(applicantid)
-        applicant.pop('requestType')
         return applicant
 
     def searchapplicant(self, keywords):
@@ -42,6 +42,7 @@ class applicantservice:
         return applicantqueue
     
     def saveapplicantinfo(self, applicantschema, userid):
+        categoryid = ApplicantCategory().getapplicantcategory(applicantschema['category'])["applicantcategoryid"]
         applicant = FOIRequestApplicant.updateapplicantprofile(
             applicantschema['foiRequestApplicantID'],
             applicantschema['firstName'],
@@ -50,7 +51,7 @@ class applicantservice:
             applicantschema['businessName'],
             applicantschema.get('additionalPersonalInfo', None).get('alsoKnownAs', None),
             applicantschema.get('additionalPersonalInfo', None).get('birthDate', None),
-            applicantschema['applicantCategoryID'],
+            categoryid,
             userid
         ) # replace with applicant id once new save function is written
         requests = FOIMinistryRequest.getopenrequestsbyrequestId(applicantschema['foirequestID'])
@@ -92,10 +93,10 @@ class applicantservice:
             #'createdat' : self.__formatedate(applicant["createdat)"],
             'businessName': self.__first_not_null(applicant["businessname"]),
             # 'applicant': applicant["applicant"],
-            'foirequestID': applicant["foirequestid"],
-            'foirequestVersion': applicant["foirequestversion"],
-            'requestType': applicant["requesttype"],
-            'category': applicant["applicantcategory"],
+            # 'foirequestID': applicant["foirequestid"],
+            # 'foirequestVersion': applicant["foirequestversion"],
+            # 'requestType': applicant["requesttype"],
+            'category': self.__first_not_null(applicant["applicantcategory"]),
             'email': self.__first_not_null(applicant["email"]),
             'address': self.__first_not_null(applicant["address"]),
             'city': self.__first_not_null(applicant["city"]),

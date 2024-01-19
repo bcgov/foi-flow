@@ -51,6 +51,8 @@ const useStyles = makeStyles((theme) => ({
 const ApplicantProfileModal = React.memo(({modalOpen, handleModalClose}) => {    
     const classes = useStyles();
 
+    const isAddRequest = window.location.href.indexOf(FOI_COMPONENT_CONSTANTS.ADDREQUEST) > -1;
+
     let requestDetails = useSelector((state) => state.foiRequests.foiRequestDetail);
     const dispatch = useDispatch();
     
@@ -60,13 +62,14 @@ const ApplicantProfileModal = React.memo(({modalOpen, handleModalClose}) => {
     const [isLoading, setIsLoading] = useState(true);
     const [rows, setRows] = useState([]);
     const [selectedApplicant, setSelectedApplicant] = useState(false)
-    const [searchMode, setSearchMode] = useState("auto")
+    const [searchMode, setSearchMode] = useState(isAddRequest ? "manual" : "auto")
     const [saveApplicantObject, setSaveApplicantObject] = React.useState({})
     const [showRequestHistory, setShowRequestHistory] = useState(false);
     const [confirmationMessage, setConfirmationMessage] = useState(false);
     const [createConfirmation, setCreateConfirmation] = useState(false);
     const [isProfileDifferent, setIsProfileDifferent] = useState(false);
     const [applicantHistory, setApplicantHistory] = useState(false);
+    const [requestHistory, setRequestHistory] = useState(false);
 
     const columns = [
         {
@@ -129,7 +132,7 @@ const ApplicantProfileModal = React.memo(({modalOpen, handleModalClose}) => {
     useEffect(() => {
         if (modalOpen) {
             setIsLoading(true);
-            if (requestDetails.currentState === StateEnum.intakeinprogress.name) {
+            if (!requestDetails.stateTransition?.filter(s => s.status === StateEnum.open.name).length > 0) {
                 dispatch(fetchPotentialApplicants(
                     requestDetails.firstName,
                     requestDetails.lastName,
@@ -142,7 +145,9 @@ const ApplicantProfileModal = React.memo(({modalOpen, handleModalClose}) => {
             } else {
                 setSelectedApplicant(true);
                 dispatch(fetchApplicantInfo(requestDetails.foiRequestApplicantID, (err, res) => {
-                    setSelectedApplicant(res);
+                    const {requestHistory, ...selectedApplicant} = res
+                    setSelectedApplicant(selectedApplicant);
+                    setRequestHistory(requestHistory)
                     setIsLoading(false);
                 }))
             }
@@ -152,9 +157,10 @@ const ApplicantProfileModal = React.memo(({modalOpen, handleModalClose}) => {
     useEffect(() => {
         setSaveApplicantObject({...selectedApplicant})
         for (let field in selectedApplicant) {
+            console.log(field)
             if (field === 'additionalPersonalInfo') {
                 if (requestDetails[field] && requestDetails.requestType === 'personal') {
-                    for (let additionalField in requestDetails[field]) {
+                    for (let additionalField in selectedApplicant[field]) {
                         if (requestDetails[field][additionalField] && selectedApplicant[field][additionalField] !== requestDetails[field][additionalField]) {
                             setIsProfileDifferent(true);
                             break;
@@ -182,7 +188,8 @@ const ApplicantProfileModal = React.memo(({modalOpen, handleModalClose}) => {
 
     const selectApplicantRow = (e) => {
         dispatch(fetchApplicantRequests(e.row.foiRequestApplicantID, (err, res) => {
-            setSelectedApplicant({...e.row, requestHistory: res});
+            setSelectedApplicant(e.row)
+            setRequestHistory(res);
             setIsLoading(false);
         }))
     }
@@ -192,10 +199,14 @@ const ApplicantProfileModal = React.memo(({modalOpen, handleModalClose}) => {
         setIsLoading(true);
         setRows([]);
         setSelectedApplicant(false);
-        setConfirmationMessage(false);
+        setSearchMode(isAddRequest ? "manual" : "auto")
+        setSaveApplicantObject({})
         setShowRequestHistory(false);
-        setApplicantHistory(false);
+        setConfirmationMessage(false);
         setCreateConfirmation(false);
+        setIsProfileDifferent(false);
+        setApplicantHistory(false);
+        setRequestHistory(false);
         handleModalClose();
     }
 
@@ -273,7 +284,7 @@ const ApplicantProfileModal = React.memo(({modalOpen, handleModalClose}) => {
     }
 
     const selectProfile = () => {
-        if (_.isEqual(selectedApplicant, saveApplicantObject) || confirmationMessage) {
+        if (confirmationMessage) {
             handleClose();
             // set loading screen
             dispatch(setFOILoader(true));
@@ -283,6 +294,9 @@ const ApplicantProfileModal = React.memo(({modalOpen, handleModalClose}) => {
                     dispatch(setFOIRequestApplicantProfile(saveApplicantObject));
                 }
             }));
+        } else if (_.isEqual(selectedApplicant, saveApplicantObject)) {
+            handleClose();
+            dispatch(setFOIRequestApplicantProfile(saveApplicantObject));
         } else {
             setConfirmationMessage(true);
         }
@@ -314,11 +328,12 @@ const ApplicantProfileModal = React.memo(({modalOpen, handleModalClose}) => {
     const back = () => {
         if (applicantHistory) {
             setApplicantHistory(false);            
-        } else if (requestDetails.currentState === StateEnum.intakeinprogress.name) { 
+        } else if (requestDetails.stateTransition?.filter(s => s.status === StateEnum.open.name).length > 0) { 
             handleClose();
         } else {
             setSelectedApplicant(false);
             setShowRequestHistory(false);
+            setIsProfileDifferent(false);
         }
     }
 
@@ -335,6 +350,14 @@ const ApplicantProfileModal = React.memo(({modalOpen, handleModalClose}) => {
             setCreateConfirmation(true);
         } else {
             handleClose();
+        }
+    }
+
+    const isSaveDisabled = () => {
+        if (!requestDetails.stateTransition?.filter(s => s.status === StateEnum.open.name).length > 0) {
+            return isProfileDifferent
+        } else {
+            return _.isEqual(selectedApplicant, saveApplicantObject)
         }
     }
 
@@ -383,7 +406,7 @@ const ApplicantProfileModal = React.memo(({modalOpen, handleModalClose}) => {
                             [classes.disabledTitle]: !showRequestHistory
                         })}
                     >
-                        Request History ({selectedApplicant?.requestHistory?.length})
+                        Request History ({requestHistory?.length})
                     </ButtonBase>
                 </h3>
                 :
@@ -407,7 +430,7 @@ const ApplicantProfileModal = React.memo(({modalOpen, handleModalClose}) => {
                             <Box sx={{ height: 400, width: "100%" }}>
                             <DataGrid
                                 className="foi-data-grid foi-request-history-grid"
-                                rows={selectedApplicant.requestHistory}
+                                rows={requestHistory}
                                 columns={requestHistoryColumns}
                                 rowHeight={30}
                                 headerHeight={50}
@@ -596,7 +619,7 @@ const ApplicantProfileModal = React.memo(({modalOpen, handleModalClose}) => {
                     <>{!applicantHistory && <button
                     className={`btn-bottom btn-save btn`}
                       onClick={selectProfile}
-                      disabled={isProfileDifferent || _.isEqual(selectedApplicant, saveApplicantObject)}
+                      disabled={isSaveDisabled()}
                     >
                     Select & Save
                     </button>}

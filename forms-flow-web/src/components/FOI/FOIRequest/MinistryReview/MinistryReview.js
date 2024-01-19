@@ -550,7 +550,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
         isMinistryCoordinator={true}
         isValidationError={isValidationError}
         requestType={requestDetails?.requestType}
-        isDivisionalCoordinator={IsDivisionalCoordinator()}
+        disabled={IsDivisionalCoordinator()}
       />
     );
 

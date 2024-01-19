@@ -12,6 +12,7 @@ from request_api.models.PersonalInformationAttributes import PersonalInformation
 from request_api.models.FOIRequestContactInformation import FOIRequestContactInformation
 from request_api.models.FOIRequestPersonalAttributes import FOIRequestPersonalAttribute
 from request_api.models.FOIRequestApplicantMappings import FOIRequestApplicantMapping
+from request_api.models.FOIRequestApplicants import FOIRequestApplicant
 from request_api.models.RequestorType import RequestorType
 
 import json
@@ -134,8 +135,9 @@ class requestservicecreate:
 
         # if foirequestschema.get('foiRequestApplicantID') is None and foirequestschema.get('requeststatusid') == 1:
         if foirequestschema.get('foiRequestApplicantID') is not None:
+            applicant = FOIRequestApplicant().getlatestprofilebyapplicantid(foirequestschema['foiRequestApplicantID'])
             requestapplicant = FOIRequestApplicantMapping()
-            requestapplicant.foirequestapplicantid = foirequestschema['foiRequestApplicantID']
+            requestapplicant.foirequestapplicantid = applicant['foirequestapplicantid']
             requestapplicant.requestortypeid = RequestorType().getrequestortype("Self")["requestortypeid"]
             requestapplicantarr.append(requestapplicant)
         else:
