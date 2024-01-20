@@ -56,7 +56,6 @@ class applicantservice:
         ) # replace with applicant id once new save function is written
         # requests = FOIMinistryRequest.getopenrequestsbyrequestId(applicantschema['foirequestID'])
         requests = FOIMinistryRequest.getopenrequestsbyapplicantid(applicantschema['foiRequestApplicantID'])
-        print("requests", requests)
         applicantschema['foiRequestApplicantID'] = applicant.identifier
         # requests = FOIMinistryRequest.getopenrequestsbyapplicantid(applicantschema['foiRequestApplicantID'])
         for request in requests:
