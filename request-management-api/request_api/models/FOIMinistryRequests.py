@@ -177,7 +177,6 @@ class FOIMinistryRequest(db.Model):
            ministryrequest =ministryrequest_schema.dump(_session.query(FOIMinistryRequest).filter(FOIMinistryRequest.foiministryrequestid == _requestid).order_by(FOIMinistryRequest.version.desc()).first())           
            parentrequest = _session.query(FOIRequest).filter(FOIRequest.foirequestid == ministryrequest['foirequest_id'] and FOIRequest.version == ministryrequest['foirequestversion_id']).order_by(FOIRequest.version.desc()).first()
            requestapplicants = FOIRequestApplicantMapping.getrequestapplicants(ministryrequest['foirequest_id'],ministryrequest['foirequestversion_id'])
-           print("requestapplicants", requestapplicants)
            _receiveddate = parentrequest.receiveddate
            _request["firstName"] = requestapplicants[0]['foirequestapplicant.firstname']
            _request["lastName"] = requestapplicants[0]['foirequestapplicant.lastname']
