@@ -47,11 +47,12 @@ class FOIApplicantSchema(Schema):
 
         unknown = EXCLUDE    
     firstname = fields.Str(data_key="firstName")
-    middlename = fields.Str(data_key="middleName")    
-    lastname = fields.Str(data_key="lastName")    
-    alsoknownas = fields.Str(data_key="alsoKnownAs")    
-    dob = fields.Date(data_key="dob")    
-    businessname = fields.Str(data_key="businessName")           
+    middlename = fields.Str(data_key="middleName")
+    lastname = fields.Str(data_key="lastName")
+    alsoknownas = fields.Str(data_key="alsoKnownAs")
+    dob = fields.Date(data_key="dob")
+    businessname = fields.Str(data_key="businessName")
+    applicantcategoryid = fields.Int(data_key="applicantCategoryID")
     
 class FOIRequestApplicantSchema(Schema):
     class Meta:  # pylint: disable=too-few-public-methods

@@ -32,8 +32,8 @@ class FOIRequest(db.Model):
 
     #ForeignKey References
     
-    applicantcategoryid = db.Column(db.Integer,ForeignKey('ApplicantCategories.applicantcategoryid'))
-    applicantcategory =  relationship("ApplicantCategory",backref=backref("ApplicantCategories"),uselist=False)
+    # applicantcategoryid = db.Column(db.Integer,ForeignKey('ApplicantCategories.applicantcategoryid'))
+    # applicantcategory =  relationship("ApplicantCategory",backref=backref("ApplicantCategories"),uselist=False)
 
     deliverymodeid = db.Column(db.Integer,ForeignKey('DeliveryModes.deliverymodeid'))
     deliverymode =  relationship("DeliveryMode",backref=backref("DeliveryModes"),uselist=False)
@@ -121,6 +121,5 @@ class FOIRequestsSchema(ma.Schema):
     class Meta:
         fields = ('foirequestid','version','foirawrequestid','requesttype','receiveddate','initialdescription',
                 'initialrecordSearchFromDate','initialrecordsearchtodate','receivedmode.receivedmodeid',
-                'deliverymode.deliverymodeid','receivedmode.name','deliverymode.name',
-                'applicantcategory.applicantcategoryid','applicantcategory.name','wfinstanceid','ministryRequests')
+                'deliverymode.deliverymodeid','receivedmode.name','deliverymode.name','wfinstanceid','ministryRequests')
     

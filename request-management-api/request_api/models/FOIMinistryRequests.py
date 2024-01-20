@@ -177,6 +177,7 @@ class FOIMinistryRequest(db.Model):
            ministryrequest =ministryrequest_schema.dump(_session.query(FOIMinistryRequest).filter(FOIMinistryRequest.foiministryrequestid == _requestid).order_by(FOIMinistryRequest.version.desc()).first())           
            parentrequest = _session.query(FOIRequest).filter(FOIRequest.foirequestid == ministryrequest['foirequest_id'] and FOIRequest.version == ministryrequest['foirequestversion_id']).order_by(FOIRequest.version.desc()).first()
            requestapplicants = FOIRequestApplicantMapping.getrequestapplicants(ministryrequest['foirequest_id'],ministryrequest['foirequestversion_id'])
+           print("requestapplicants", requestapplicants)
            _receiveddate = parentrequest.receiveddate
            _request["firstName"] = requestapplicants[0]['foirequestapplicant.firstname']
            _request["lastName"] = requestapplicants[0]['foirequestapplicant.lastname']
@@ -198,7 +199,8 @@ class FOIMinistryRequest(db.Model):
            _request["version"] = ministryrequest['version']
            _request["id"] = parentrequest.foirequestid
            _request["ministryrequestid"] = ministryrequest['foiministryrequestid']
-           _request["applicantcategory"]=parentrequest.applicantcategory.name
+        #    _request["applicantcategory"]=parentrequest.applicantcategory.name
+           _request["applicantcategory"]=requestapplicants[0]['foirequestapplicant.applicantcategory.name']
            _request["identityverified"] = ministryrequest['identityverified']
            _requests.append(_request)
         
@@ -233,7 +235,17 @@ class FOIMinistryRequest(db.Model):
     
     @classmethod
     def getopenrequestsbyapplicantid(cls,applicantid):
+        _session = db.session
+
         selectedcolumns = [FOIMinistryRequest.foirequest_id, FOIMinistryRequest.foiministryrequestid]
+
+        #subquery for getting latest version & proper group/team for FOIMinistryRequest
+        subquery_applicant_maxid = _session.query(FOIRequestApplicant.applicantprofileid, func.max(FOIRequestApplicant.foirequestapplicantid).label('max_id')).group_by(FOIRequestApplicant.applicantprofileid).subquery()
+        joincondition_applicant = [
+            subquery_applicant_maxid.c.applicantprofileid == FOIRequestApplicant.applicantprofileid,
+            subquery_applicant_maxid.c.max_id == FOIRequestApplicantMapping.foirequestapplicantid,
+        ]
+
         query = db.session.query(
                                 *selectedcolumns
                             ).distinct(
@@ -246,9 +258,12 @@ class FOIMinistryRequest(db.Model):
                                     FOIRequestApplicantMapping.requestortypeid == RequestorType['applicant'].value)
                             ).join(
                                 FOIRequestApplicant,
-                                FOIRequestApplicant.foirequestapplicantid == FOIRequestApplicantMapping.foirequestapplicantid,
-                            ).filter(
                                 FOIRequestApplicant.foirequestapplicantid == applicantid,
+                            ).join(
+                                subquery_applicant_maxid,
+                                and_(*joincondition_applicant)
+                            ).filter(
+                                # FOIRequestApplicant.foirequestapplicantid == applicantid,
                                 FOIMinistryRequest.requeststatusid != 3
                             ).order_by(
                                 FOIMinistryRequest.foiministryrequestid.asc(),
@@ -552,7 +567,7 @@ class FOIMinistryRequest(db.Model):
                                 isouter=True
                             ).join(
                                 ApplicantCategory,
-                                and_(ApplicantCategory.applicantcategoryid == FOIRequest.applicantcategoryid, ApplicantCategory.isactive == True)
+                                and_(ApplicantCategory.applicantcategoryid == FOIRequestApplicant.applicantcategoryid, ApplicantCategory.isactive == True)
                             ).join(
                                 ProgramArea,
                                 FOIMinistryRequest.programareaid == ProgramArea.programareaid
@@ -1071,7 +1086,7 @@ class FOIMinistryRequest(db.Model):
                                 isouter=True
                             ).join(
                                 ApplicantCategory,
-                                and_(ApplicantCategory.applicantcategoryid == FOIRequest.applicantcategoryid, ApplicantCategory.isactive == True)
+                                and_(ApplicantCategory.applicantcategoryid == FOIRequestApplicant.applicantcategoryid, ApplicantCategory.isactive == True)
                             ).join(
                                 ProgramArea,
                                 FOIMinistryRequest.programareaid == ProgramArea.programareaid

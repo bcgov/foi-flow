@@ -26,7 +26,9 @@ class FOIRequestApplicant(db.Model):
     alsoknownas = db.Column(db.String(50), unique=False, nullable=True)
     dob = db.Column(db.DateTime, unique=False, nullable=True)
     businessname = db.Column(db.String(255), unique=False, nullable=True)
-    applicantcategoryid = db.Column(db.Integer, unique=False, nullable=True)
+    # applicantcategoryid = db.Column(db.Integer, unique=False, nullable=True)
+    applicantcategoryid = db.Column(db.Integer, ForeignKey('ApplicantCategories.applicantcategoryid'), nullable=True)
+    applicantcategory =  relationship("ApplicantCategory", backref=backref("ApplicantCategories"), uselist=False)
 
     created_at = db.Column(db.DateTime, default=datetime.now)
     updated_at = db.Column(db.DateTime, nullable=True)
@@ -169,7 +171,7 @@ class FOIRequestApplicant(db.Model):
                                 # )
                             ).join(
                                 ApplicantCategory,
-                                ApplicantCategory.applicantcategoryid == FOIRequest.applicantcategoryid
+                                ApplicantCategory.applicantcategoryid == FOIRequestApplicant.applicantcategoryid
                             ).join(
                                 subquery_foirequest_maxversion,
                                 and_(*joincondition)
@@ -433,7 +435,7 @@ class FOIRequestApplicant(db.Model):
                                 # )
                             ).join(
                                 ApplicantCategory,
-                                ApplicantCategory.applicantcategoryid == FOIRequest.applicantcategoryid
+                                ApplicantCategory.applicantcategoryid == FOIRequestApplicant.applicantcategoryid
                             ).join(
                                 subquery_foirequest_maxversion,
                                 and_(*joincondition)
@@ -701,7 +703,7 @@ class FOIRequestApplicant(db.Model):
                                 # )
                             ).join(
                                 ApplicantCategory,
-                                ApplicantCategory.applicantcategoryid == FOIRequest.applicantcategoryid
+                                ApplicantCategory.applicantcategoryid == FOIRequestApplicant.applicantcategoryid
                             ).join(
                                 subquery_foirequest_maxversion,
                                 and_(*joincondition)
@@ -996,7 +998,7 @@ class FOIRequestApplicant(db.Model):
                                     FOIRequest.version == FOIRequestApplicantMapping.foirequestversion_id)
                             ).join(
                                 ApplicantCategory,
-                                ApplicantCategory.applicantcategoryid == FOIRequest.applicantcategoryid
+                                ApplicantCategory.applicantcategoryid == FOIRequestApplicant.applicantcategoryid
                             ).join(
                                 contactemail,
                                 and_(
@@ -1219,7 +1221,7 @@ class FOIRequestApplicant(db.Model):
 
 class FOIRequestApplicantSchema(ma.Schema):
     class Meta:
-        fields = ('foirequestapplicantid','firstname','middlename','lastname','alsoknownas','dob','businessname')
+        fields = ('foirequestapplicantid','firstname','middlename','lastname','alsoknownas','dob','businessname','applicantcategory.applicantcategoryid','applicantcategory.name')
 
 class ApplicantProfileSchema(ma.Schema):
     class Meta:

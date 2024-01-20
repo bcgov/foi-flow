@@ -11,6 +11,7 @@ from datetime import datetime as datetime2
 from request_api.utils.commons.datetimehandler import datetimehandler
 from request_api.models.default_method_result import DefaultMethodResult
 import re
+from request_api.services.foirequest.requestserviceconfigurator import requestserviceconfigurator
 
 class applicantservice:
     """ FOI Event Dashboard
@@ -42,6 +43,7 @@ class applicantservice:
         return applicantqueue
     
     def saveapplicantinfo(self, applicantschema, userid):
+        print("applicantschema", applicantschema)
         applicant = FOIRequestApplicant.updateapplicantprofile(
             applicantschema['foiRequestApplicantID'],
             applicantschema['firstName'],
@@ -50,10 +52,12 @@ class applicantservice:
             applicantschema['businessName'],
             applicantschema.get('additionalPersonalInfo', None).get('alsoKnownAs', None),
             applicantschema.get('additionalPersonalInfo', None).get('birthDate', None),
-            applicantschema['applicantCategoryID'],
+            requestserviceconfigurator().getvalueof("category",applicantschema['category']),
             userid
         ) # replace with applicant id once new save function is written
-        requests = FOIMinistryRequest.getopenrequestsbyrequestId(applicantschema['foirequestID'])
+        # requests = FOIMinistryRequest.getopenrequestsbyrequestId(applicantschema['foirequestID'])
+        requests = FOIMinistryRequest.getopenrequestsbyapplicantid(applicantschema['foiRequestApplicantID'])
+        print("requests", requests)
         applicantschema['foiRequestApplicantID'] = applicant.identifier
         # requests = FOIMinistryRequest.getopenrequestsbyapplicantid(applicantschema['foiRequestApplicantID'])
         for request in requests:

@@ -44,10 +44,10 @@ class FOIRequestApplicantMapping(db.Model):
                                             FOIRequestApplicantMapping.foirequest_id == foirequest_id,
                                             FOIRequestApplicantMapping.foirequestversion_id == foirequestversion
                                         ).order_by(FOIRequestApplicantMapping.foirequestapplicantmappingid.asc()).all()
-        applicantinfos = requestapplicant_schema.dump(_applicantinfos)       
+        applicantinfos = requestapplicant_schema.dump(_applicantinfos)
         return applicantinfos
             
 class FOIRequestApplicantMappingSchema(ma.Schema):
     class Meta:
-        fields = ('foirequestapplicantmappingid','foirequest.foirequestid','foirequest.version','requestortype.requestortypeid','requestortype.name','foirequestapplicant.foirequestapplicantid','foirequestapplicant.firstname','foirequestapplicant.lastname','foirequestapplicant.middlename','foirequestapplicant.alsoknownas','foirequestapplicant.dob','foirequestapplicant.businessname')
+        fields = ('foirequestapplicantmappingid','foirequest.foirequestid','foirequest.version','requestortype.requestortypeid','requestortype.name','foirequestapplicant.foirequestapplicantid','foirequestapplicant.firstname','foirequestapplicant.lastname','foirequestapplicant.middlename','foirequestapplicant.alsoknownas','foirequestapplicant.dob','foirequestapplicant.businessname','foirequestapplicant.applicantcategory.applicantcategoryid','foirequestapplicant.applicantcategory.name')
     

@@ -7,7 +7,7 @@ from request_api.models.FOIMinistryRequests import FOIMinistryRequest
 from request_api.services.watcherservice import watcherservice
 from request_api.services.foirequest.requestservicebuilder import requestservicebuilder
 from request_api.services.foirequest.requestserviceministrybuilder import requestserviceministrybuilder  
-from request_api.services.foirequest.requestserviceconfigurator import requestserviceconfigurator 
+from request_api.services.foirequest.requestserviceconfigurator import requestserviceconfigurator
 from request_api.models.PersonalInformationAttributes import PersonalInformationAttribute
 from request_api.models.FOIRequestContactInformation import FOIRequestContactInformation
 from request_api.models.FOIRequestPersonalAttributes import FOIRequestPersonalAttribute
@@ -128,11 +128,13 @@ class requestservicecreate:
         selfalsoknownas=None
         selfdob=None
         selfcategoryid=None
+        print("foirequestschema", foirequestschema)
         if foirequestschema.get("additionalPersonalInfo") is not None and foirequestschema.get('requeststatusid') == 1:
             applicantinfo = foirequestschema.get("additionalPersonalInfo")
             selfdob = applicantinfo["birthDate"] if requestservicebuilder().isNotBlankorNone(foirequestschema,"birthDate","additionalPersonalInfo") else None
             selfalsoknownas = applicantinfo["alsoKnownAs"] if requestservicebuilder().isNotBlankorNone(foirequestschema,"alsoKnownAs","additionalPersonalInfo") else None
             selfcategoryid = requestserviceconfigurator().getvalueof("category",foirequestschema.get("category")) if requestservicebuilder().isNotBlankorNone(foirequestschema,"category","main") else None
+            print("selfcategoryid", selfcategoryid)
 
         # if foirequestschema.get('foiRequestApplicantID') is None and foirequestschema.get('requeststatusid') == 1:
         if foirequestschema.get('foiRequestApplicantID') is not None:
