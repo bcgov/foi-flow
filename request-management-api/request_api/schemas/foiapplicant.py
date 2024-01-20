@@ -31,4 +31,4 @@ class FOIRequestApplicantSchema(Schema):
     foiRequestApplicantID = fields.Int(data_key="foiRequestApplicantID",required=False,allow_none=True)
     foirequestID = fields.List(fields.Int(),data_key="foirequestID",required=False,allow_none=False)
     additionalPersonalInfo = fields.Nested(FOIAdditionallPersonalInfoWrapperSchema,required=False,allow_none=True)
-    category = fields.Int(data_key="category",required=False,allow_none=True)
+    category = fields.Str(data_key="category",allow_none=True)
