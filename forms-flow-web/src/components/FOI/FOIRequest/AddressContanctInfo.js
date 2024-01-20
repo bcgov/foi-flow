@@ -305,9 +305,16 @@ const AddressContactDetails = memo(
       </AccordionSummary>
       <AccordionDetails>        
           <div>
-              {moreInfoAction && <button type="button" className={`btn btn-link btn-description-history`} onClick={moreInfoAction}>
-                  {requestDetails.currentState === StateEnum.intakeinprogress.name && 'Search' } Applicant Profiles
-              </button>}
+              {moreInfoAction &&
+                <button
+                  type="button"
+                  className={`btn btn-link btn-description-history`}
+                  onClick={moreInfoAction}
+                  style={(requestDetails.currentState === StateEnum.intakeinprogress.name && !requestDetails.foiRequestApplicantID) ? {color: "#9E2929"} : {}}
+                >
+                  {(!requestDetails.stateTransition?.filter(s => s.status === StateEnum.open.name).length > 0) && 'Search' } Applicant Profiles
+                </button>
+              }
               {/* <ApplicantProfileModal
                 modalOpen={modalOpen}
                 handleModalClose={handleModalClose}

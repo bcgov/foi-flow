@@ -340,7 +340,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
 
   useEffect(() => {
     if (requestApplicantProfile) {      
-      if (requestDetails.currentState === StateEnum.intakeinprogress.name) {
+      if (!ministryId) {
         let newRequestDetails = { ...saveRequestObject };
         for (let field in requestApplicantProfile) {
           if (field === "additionalPersonalInfo") {
@@ -936,7 +936,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
               isMinistryCoordinator={false}
               isValidationError={isValidationError}
               requestType={requestDetails?.requestType}
-              isDivisionalCoordinator={false}
+              disabled={requestDetails.currentState === StateEnum.intakeinprogress.name && !requestDetails.foiRequestApplicantID}
             />
           </div>
 

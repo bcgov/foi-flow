@@ -68,24 +68,31 @@ class FOIRequestApplicant(db.Model):
             # applicant.isactive = False
             applicant_query.update({FOIRequestApplicant.applicantprofileid:str(uuid.uuid4())})
 
-        applicantfromform = FOIRequestApplicant().prepareapplicantforcomparing(firstname, lastname, middlename, businessname, alsoknownas, dob, applicantcategoryid)
+        applicantfromform = FOIRequestApplicant().prepareapplicantforcomparing(firstname, lastname, middlename, businessname, alsoknownas, datetime.strptime(dob, "%Y-%m-%d"), applicantcategoryid)
         applicantfromdb = FOIRequestApplicant().prepareapplicantforcomparing(applicant.firstname, applicant.lastname, applicant.middlename, applicant.businessname, applicant.alsoknownas, applicant.dob, applicant.applicantcategoryid)
         if applicantfromform != applicantfromdb:
             _applicant = FOIRequestApplicant()
             _applicant.createdby = userid
-            _applicant.firstname = applicantfromform.firstname
-            _applicant.lastname = applicantfromform.lastname
-            _applicant.middlename = applicantfromform.middlename
-            _applicant.businessname = applicantfromform.businessname
-            _applicant.alsoknownas = applicantfromform.alsoknownas
-            _applicant.dob = applicantfromform.dob
+            _applicant.firstname = applicantfromform['firstname']
+            _applicant.lastname = applicantfromform['lastname']
+            _applicant.middlename = applicantfromform['middlename']
+            _applicant.businessname = applicantfromform['businessname']
+            _applicant.alsoknownas = applicantfromform['alsoknownas']
+            _applicant.dob = applicantfromform['dob']
             _applicant.applicantprofileid = applicant.applicantprofileid
-            _applicant.applicantcategoryid = applicantfromform.applicantcategoryid
+            _applicant.applicantcategoryid = applicantfromform['applicantcategoryid']
             db.session.add(_applicant)
             db.session.commit()
             return DefaultMethodResult(True,'Applicant profile updated',_applicant.foirequestapplicantid)
         else:
             return DefaultMethodResult(True,'No update',applicant.foirequestapplicantid)
+        
+    @classmethod
+    def getlatestprofilebyapplicantid(cls, applicantid):
+        schema = FOIRequestApplicantSchema(many=False)
+        sq = db.session.query(FOIRequestApplicant.applicantprofileid).filter_by(foirequestapplicantid=applicantid)
+        query = db.session.query(FOIRequestApplicant).filter(FOIRequestApplicant.applicantprofileid.in_(sq)).order_by(FOIRequestApplicant.foirequestapplicantid.desc()).first()
+        return schema.dump(query)
 
     # Search applicant by id
     @classmethod
@@ -1214,8 +1221,8 @@ class FOIRequestApplicant(db.Model):
             'middlename': middlename if middlename is not None or middlename != '' else None,
             'businessname': businessname if businessname is not None or businessname != '' else None,
             'alsoknownas': alsoknownas if alsoknownas is not None or alsoknownas != '' else None,
-            'dob': datetime.strptime(dob, "%Y-%m-%d") if dob is not None or dob != '' else None,
-            'applicantcategoryid': applicantcategoryid if applicantcategoryid is not None or alsoknownas != 0 else None,
+            'dob': dob if dob is not None or dob != '' else None,
+            'applicantcategoryid': applicantcategoryid if applicantcategoryid is not None or applicantcategoryid != 0 else None,
         }
 
 
