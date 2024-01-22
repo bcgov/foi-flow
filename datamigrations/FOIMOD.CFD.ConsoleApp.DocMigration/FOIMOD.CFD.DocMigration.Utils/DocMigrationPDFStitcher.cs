@@ -48,7 +48,7 @@ namespace FOIMOD.CFD.DocMigration.Utils
 
 
 
-        public Stream CreatePDFDocument(string emailcontent, string emailsubject, string emaildate, string emailTo,List<AXISFIle> attachementfiles)
+        public Stream CreatePDFDocument(string emailcontent, string emailsubject, string emaildate, string emailTo,List<AXISFIle> attachementfiles = null)
         {
             try
             {
