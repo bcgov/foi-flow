@@ -25,6 +25,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FOIMOD.CFD.DocMigration.FOI
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FOIMOD.CFD.DocMigration.OCR", "FOIMOD.CFD.DocMigration.OCR\FOIMOD.CFD.DocMigration.OCR.csproj", "{8AD439C5-5CF2-4513-91D9-41FF5A8C9FB6}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FOIMOD.CFD.DocMigration.OCR.Tests", "FOIMOD.CFD.DocMigration.OCR.Tests\FOIMOD.CFD.DocMigration.OCR.Tests.csproj", "{A01A477E-E588-4FB5-A0CD-7EF166905E6E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -75,6 +77,10 @@ Global
 		{8AD439C5-5CF2-4513-91D9-41FF5A8C9FB6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8AD439C5-5CF2-4513-91D9-41FF5A8C9FB6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8AD439C5-5CF2-4513-91D9-41FF5A8C9FB6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A01A477E-E588-4FB5-A0CD-7EF166905E6E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A01A477E-E588-4FB5-A0CD-7EF166905E6E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A01A477E-E588-4FB5-A0CD-7EF166905E6E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A01A477E-E588-4FB5-A0CD-7EF166905E6E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
