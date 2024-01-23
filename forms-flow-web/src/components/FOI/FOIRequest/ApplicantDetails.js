@@ -23,6 +23,7 @@ const ApplicantDetails = React.memo(
     requestStatus,
     defaultExpanded,
     showHistory,
+    warning
   }) => {
 
     const useStyles = makeStyles({
@@ -33,6 +34,15 @@ const ApplicantDetails = React.memo(
       },
       accordionSummary: {
         flexDirection: 'row-reverse'
+      },
+      warning: {
+        '& fieldset': {
+          borderColor: '#ed6c02 !important'
+        },
+        '& label': {
+          color: '#ed6c02 !important'
+        }
+      
       }
     });
     const classes = useStyles();
@@ -257,6 +267,7 @@ const ApplicantDetails = React.memo(
                 inputProps={{ "aria-labelledby": "firstName-label"}}
                 InputLabelProps={{ shrink: true }}
                 variant="outlined"
+                className={warning && warning(FOI_COMPONENT_CONSTANTS.APPLICANT_FIRST_NAME) && classes.warning}
                 value={applicantFirstNameText}
                 fullWidth
                 onChange={handleFirtNameChange}
@@ -271,6 +282,7 @@ const ApplicantDetails = React.memo(
                 InputLabelProps={{ shrink: true }}
                 value={applicantMiddleNameText}
                 variant="outlined"
+                className={warning && warning(FOI_COMPONENT_CONSTANTS.APPLICANT_MIDDLE_NAME) && classes.warning}
                 fullWidth
                 disabled={disableInput}
                 onChange={handleMiddleNameChange}
@@ -282,6 +294,7 @@ const ApplicantDetails = React.memo(
                 InputLabelProps={{ shrink: true }}
                 value={applicantLastNameText}
                 variant="outlined"
+                className={warning && warning(FOI_COMPONENT_CONSTANTS.APPLICANT_LAST_NAME) && classes.warning}
                 fullWidth
                 onChange={handleLastNameChange}
                 required={true}
@@ -296,6 +309,7 @@ const ApplicantDetails = React.memo(
                 inputProps={{ "aria-labelledby": "organization-label"}}
                 InputLabelProps={{ shrink: true }}
                 value={organizationText}
+                className={warning && warning(FOI_COMPONENT_CONSTANTS.ORGANIZATION) && classes.warning}
                 variant="outlined"
                 fullWidth
                 disabled={disableInput}
@@ -311,6 +325,7 @@ const ApplicantDetails = React.memo(
                 onChange={handleCategoryOnChange}
                 input={<Input />}
                 variant="outlined"
+                className={warning && warning(FOI_COMPONENT_CONSTANTS.FOI_CATEGORY) && classes.warning}
                 fullWidth
                 required
                 disabled={disableInput || disableFieldForMinistryRequest}
@@ -325,6 +340,7 @@ const ApplicantDetails = React.memo(
                 InputLabelProps={{ shrink: true }}
                 value={alsoKnownAsText}
                 variant="outlined"
+                className={warning && warning(FOI_COMPONENT_CONSTANTS.ALSO_KNOWN_AS) && classes.warning}
                 fullWidth
                 disabled={disableInput}
                 onChange={handleAlsoKnownAsChange}

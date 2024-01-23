@@ -23,6 +23,15 @@ const useStyles = makeStyles((_theme) => ({
   },
   accordionSummary: {
       flexDirection: 'row-reverse'
+  },
+  warning: {
+    '& fieldset': {
+      borderColor: '#ed6c02 !important'
+    },
+    '& label': {
+      color: '#ed6c02 !important'
+    }
+  
   }
 }));
 
@@ -37,6 +46,7 @@ const AddressContactDetails = memo(
     disableInput,
     defaultExpanded,
     moreInfoAction,
+    warning
   }) => {
     const classes = useStyles();
     /**
@@ -328,6 +338,7 @@ const AddressContactDetails = memo(
                 InputLabelProps={{ shrink: true }}
                 value={emailText}
                 variant="outlined"
+                className={warning && warning(FOI_COMPONENT_CONSTANTS.APPLICANT_EMAIL) && classes.warning}
                 fullWidth
                 required={true}
                 disabled={disableInput}
@@ -349,6 +360,7 @@ const AddressContactDetails = memo(
                 label="Home Phone"
                 InputLabelProps={{ shrink: true }}
                 variant="outlined"
+                className={warning && warning(FOI_COMPONENT_CONSTANTS.HOME_PHONE) && classes.warning}
                 value={homePhoneText}
                 onChange={handleHomePhoneChange}
                 fullWidth
@@ -362,6 +374,7 @@ const AddressContactDetails = memo(
                 label="Mobile Phone"
                 InputLabelProps={{ shrink: true }}
                 variant="outlined"
+                className={warning && warning(FOI_COMPONENT_CONSTANTS.MOBILE_PHONE) && classes.warning}
                 value={mobilePhoneText}
                 onChange={handleMobilePhoneChange}
                 fullWidth
@@ -375,6 +388,7 @@ const AddressContactDetails = memo(
                 label="Work Phone"
                 InputLabelProps={{ shrink: true }}
                 variant="outlined"
+                className={warning && warning(FOI_COMPONENT_CONSTANTS.WORK_PHONE_PRIMARY) && classes.warning}
                 value={workPhonePrimaryText}
                 onChange={handleWorkPhonePrimaryChange}
                 fullWidth
@@ -388,6 +402,7 @@ const AddressContactDetails = memo(
                 label="Alternative Phone"
                 InputLabelProps={{ shrink: true }}
                 variant="outlined"
+                className={warning && warning(FOI_COMPONENT_CONSTANTS.WORK_PHONE_SECONDARY) && classes.warning}
                 value={workPhoneSecondaryText}
                 onChange={handleWorkPhoneSecondarChange}
                 fullWidth
@@ -403,6 +418,7 @@ const AddressContactDetails = memo(
                 label="Street Address"
                 InputLabelProps={{ shrink: true }}
                 variant="outlined"
+                className={warning && warning(FOI_COMPONENT_CONSTANTS.STREET_ADDRESS_PRIMARY) && classes.warning}
                 value={streetAddressText}
                 onChange={handleStreetAddressChange}
                 fullWidth
@@ -418,6 +434,7 @@ const AddressContactDetails = memo(
                 label="Secondary Street Address"
                 InputLabelProps={{ shrink: true }}
                 variant="outlined"
+                className={warning && warning(FOI_COMPONENT_CONSTANTS.STREET_ADDRESS_SECONDARY) && classes.warning}
                 value={secondaryStreetAddressText}
                 onChange={handleScondaryStreetAddressChange}
                 fullWidth
@@ -431,6 +448,7 @@ const AddressContactDetails = memo(
                 label="City"
                 InputLabelProps={{ shrink: true }}
                 variant="outlined"
+                className={warning && warning(FOI_COMPONENT_CONSTANTS.CITY) && classes.warning}
                 value={CityText}
                 onChange={handleCityChange}
                 fullWidth
@@ -446,6 +464,7 @@ const AddressContactDetails = memo(
                 label="Province"
                 InputLabelProps={{ shrink: true }}
                 variant="outlined"
+                className={warning && warning(FOI_COMPONENT_CONSTANTS.PROVINCE) && classes.warning}
                 value={ProvinceText}
                 onChange={handleProvinceChange}
                 fullWidth
@@ -461,6 +480,7 @@ const AddressContactDetails = memo(
                 label="Country"
                 InputLabelProps={{ shrink: true }}
                 variant="outlined"
+                className={warning && warning(FOI_COMPONENT_CONSTANTS.COUNTRY) && classes.warning}
                 value={CountryText}
                 onChange={handleCountryChange}
                 fullWidth
@@ -476,6 +496,7 @@ const AddressContactDetails = memo(
                 label="Postal Code"
                 InputLabelProps={{ shrink: true }}
                 variant="outlined"
+                className={warning && warning(FOI_COMPONENT_CONSTANTS.POSTALCODE) && classes.warning}
                 value={PostalText}
                 onChange={handlePostalChange}
                 inputProps={{ maxLength: 6 }}

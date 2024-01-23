@@ -136,7 +136,7 @@ class requestservicecreate:
             selfcategoryid = requestserviceconfigurator().getvalueof("category",foirequestschema.get("category")) if requestservicebuilder().isNotBlankorNone(foirequestschema,"category","main") else None
 
         # if foirequestschema.get('foiRequestApplicantID') is None and foirequestschema.get('requeststatusid') == 1:
-        if foirequestschema.get('foiRequestApplicantID') is not None:
+        if foirequestschema.get('foiRequestApplicantID', 0) > 0:
             applicant = FOIRequestApplicant().getlatestprofilebyapplicantid(foirequestschema['foiRequestApplicantID'])
             requestapplicant = FOIRequestApplicantMapping()
             requestapplicant.foirequestapplicantid = applicant['foirequestapplicantid']
