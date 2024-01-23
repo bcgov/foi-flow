@@ -623,19 +623,22 @@ class FOIRawRequest(db.Model):
         elif(additionalfilter == 'myRequests'):
             #myrequest
             return basequery.filter(and_(FOIRawRequest.status.notin_(['Archived']), FOIRawRequest.assignedto == userid))
+        elif(additionalfilter == 'unassignedRequests'):
+            return basequery.filter(FOIRawRequest.assignedto == None)
         elif (additionalfilter.lower() == 'all'):
             if(isiaorestrictedfilemanager == True):
-                return basequery.filter(FOIRawRequest.status.notin_(['Archived']))
+                basequery = basequery.filter(FOIRawRequest.status.notin_(['Archived']))
             else:
                 if isprocessingteam:
-                    return basequery.filter(
+                    basequery = basequery.filter(
                         and_(
                             FOIRawRequest.status.notin_(['Archived']),
                             or_(and_(FOIRawRequest.isiaorestricted == False, FOIRawRequest.assignedgroup.in_(ProcessingTeamWithKeycloackGroup.list()), FOIRawRequest.assignedgroup.in_(tuple(groups))), and_(FOIRawRequest.isiaorestricted == True, FOIRawRequest.assignedto == userid))))
-                return basequery.filter(
+                basequery = basequery.filter(
                     and_(
                         FOIRawRequest.status.notin_(['Archived']),
                         or_(and_(FOIRawRequest.isiaorestricted == False, FOIRawRequest.assignedgroup == "Intake Team"), and_(FOIRawRequest.isiaorestricted == True, FOIRawRequest.assignedto == userid))))
+            return basequery.filter(FOIRawRequest.assignedto != None)
         else:
             if(isiaorestrictedfilemanager == True):
                 return basequery.filter(FOIRawRequest.status.notin_(['Archived']))
