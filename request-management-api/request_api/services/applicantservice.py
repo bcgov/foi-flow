@@ -55,9 +55,8 @@ class applicantservice:
             userid
         ) # replace with applicant id once new save function is written
         # requests = FOIMinistryRequest.getopenrequestsbyrequestId(applicantschema['foirequestID'])
-        requests = FOIMinistryRequest.getopenrequestsbyapplicantid(applicantschema['foiRequestApplicantID'])
         applicantschema['foiRequestApplicantID'] = applicant.identifier
-        # requests = FOIMinistryRequest.getopenrequestsbyapplicantid(applicantschema['foiRequestApplicantID'])
+        requests = FOIMinistryRequest.getopenrequestsbyapplicantid(applicantschema['foiRequestApplicantID'])
         for request in requests:
             requestschema = requestservicegetter().getrequest(request['foirequest_id'], request['foiministryrequestid'])
             requestschema.update(applicantschema)
