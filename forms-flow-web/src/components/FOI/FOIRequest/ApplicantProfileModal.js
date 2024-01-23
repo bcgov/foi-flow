@@ -349,6 +349,7 @@ const ApplicantProfileModal = React.memo(({modalOpen, handleModalClose}) => {
         if (!createConfirmation) {
             setCreateConfirmation(true);
         } else {
+            dispatch(setFOIRequestApplicantProfile({foiRequestApplicantID: -1}));
             handleClose();
         }
     }
@@ -358,6 +359,14 @@ const ApplicantProfileModal = React.memo(({modalOpen, handleModalClose}) => {
             return isProfileDifferent
         } else {
             return _.isEqual(selectedApplicant, saveApplicantObject)
+        }
+    }
+
+    const warning = (field) => {
+        if ([FOI_COMPONENT_CONSTANTS.DOB, FOI_COMPONENT_CONSTANTS.PERSONAL_HEALTH_NUMBER, FOI_COMPONENT_CONSTANTS.ALSO_KNOWN_AS].includes(field)) {
+            return requestDetails.additionalPersonalInfo?.[field] && requestDetails.additionalPersonalInfo[field] !== saveApplicantObject?.additionalPersonalInfo[field]
+        } else {
+            return requestDetails[field] && requestDetails[field] !== saveApplicantObject?.[field]
         }
     }
 
@@ -481,6 +490,7 @@ const ApplicantProfileModal = React.memo(({modalOpen, handleModalClose}) => {
                             disableInput={false}
                             defaultExpanded={true}
                             showHistory={showApplicantHistory}
+                            warning={warning}
                         />
                         <AddressContactDetails
                             requestDetails={saveApplicantObject}
@@ -491,12 +501,14 @@ const ApplicantProfileModal = React.memo(({modalOpen, handleModalClose}) => {
                             handleEmailValidation={() => {}}
                             disableInput={false}
                             defaultExpanded={false}
+                            warning={warning}
                         />
                         <AdditionalApplicantDetails
-                        requestDetails={saveApplicantObject}
-                        createSaveRequestObject={createSaveApplicantObject}
-                        disableInput={false}
-                        defaultExpanded={false}
+                            requestDetails={saveApplicantObject}
+                            createSaveRequestObject={createSaveApplicantObject}
+                            disableInput={false}
+                            defaultExpanded={false}
+                            warning={warning}
                         />
                     </>)
                         :

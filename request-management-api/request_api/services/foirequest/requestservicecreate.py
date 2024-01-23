@@ -135,7 +135,7 @@ class requestservicecreate:
             selfalsoknownas = applicantinfo["alsoKnownAs"] if requestservicebuilder().isNotBlankorNone(foirequestschema,"alsoKnownAs","additionalPersonalInfo") else None
 
         # if foirequestschema.get('foiRequestApplicantID') is None and foirequestschema.get('requeststatusid') == 1:
-        if foirequestschema.get('foiRequestApplicantID') is not None:
+        if foirequestschema.get('foiRequestApplicantID', 0) > 0:
             applicant = FOIRequestApplicant().getlatestprofilebyapplicantid(foirequestschema['foiRequestApplicantID'])
             requestapplicant = FOIRequestApplicantMapping()
             requestapplicant.foirequestapplicantid = applicant['foirequestapplicantid']
