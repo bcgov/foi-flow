@@ -33,6 +33,7 @@ class CdogsApiService:
     
 
     def generate_receipt(self, template_hash_code: str, data):
+        print(data)
         request_body = {
             "options": {
                 "cachereport": False,
@@ -42,7 +43,7 @@ class CdogsApiService:
             },
             "data": data
         }
-        json_request_body = json.dumps(request_body)
+        json_request_body = json.dumps(request_body, default = str)
         
         headers = {
             'Content-Type': 'application/json',
