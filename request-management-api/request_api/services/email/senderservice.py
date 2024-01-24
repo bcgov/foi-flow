@@ -31,7 +31,7 @@ class senderservice:
     """
 
     def send(self, servicekey, content, _messageattachmentlist, requestjson):
-        #logging.debug("Begin: Send email for request = "+json.dumps(requestjson))
+        logging.debug("Begin: Send email for request = "+json.dumps(requestjson))
         msg = MIMEMultipart()
         msg['From'] = MAIL_FROM_ADDRESS
         msg['To'] = requestjson["email"]
@@ -56,7 +56,7 @@ class senderservice:
                 #smtpobj.login(MAIL_SRV_USERID, MAIL_SRV_PASSWORD)
                 smtpobj.sendmail(msg['From'],  msg['To'], msg.as_string())
                 smtpobj.quit()
-                #logging.debug("End: Send email for request = "+json.dumps(requestjson))
+                logging.debug("End: Send email for request = "+json.dumps(requestjson))
                 return {"success" : True, "message": "Sent successfully"}
         except Exception as e:
             logging.exception(e)
