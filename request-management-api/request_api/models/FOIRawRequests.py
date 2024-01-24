@@ -14,6 +14,7 @@ from sqlalchemy import insert, and_, or_, text, func, literal, cast, asc, desc, 
 
 from .FOIMinistryRequests import FOIMinistryRequest
 from .FOIRawRequestWatchers import FOIRawRequestWatcher
+from .FOIRequestApplicants import FOIRequestApplicant
 from .FOIAssignees import FOIAssignee
 import logging
 from dateutil import parser
@@ -331,10 +332,13 @@ class FOIRawRequest(db.Model):
     @classmethod
     def getrawrequestsbyapplicantid(cls,applicantid):
         request_schema = FOIRawRequestSchema(many=True)
+        applicant_subquery = db.session.query(FOIRequestApplicant.applicantprofileid).filter(FOIRequestApplicant.foirequestapplicantid == applicantid).subquery()
+        subquery_applicant_id_list = db.session.query(FOIRequestApplicant.foirequestapplicantid).filter(applicant_subquery.c.applicantprofileid == FOIRequestApplicant.applicantprofileid).subquery()
         query = db.session.query(FOIRawRequest).distinct(FOIRawRequest.requestid).join(
             FOIAssignee, FOIAssignee.username == FOIRawRequest.assignedto
         ).filter(
-            FOIRawRequest.requestrawdata['foiRequestApplicantID'].astext.cast(db.Integer)==applicantid
+            FOIRawRequest.requestrawdata['foiRequestApplicantID'].astext.cast(db.Integer).in_(subquery_applicant_id_list),
+            FOIRawRequest.status.notin_(['Archived', 'Closed'])
         ).order_by(FOIRawRequest.requestid, FOIRawRequest.version.desc()).all()
         return request_schema.dump(query)
     

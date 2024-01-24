@@ -70,7 +70,9 @@ class applicantservice:
                 return responseschema
         rawrequests = FOIRawRequest.getrawrequestsbyapplicantid(applicantschema['foiRequestApplicantID'])
         for rawrequest in rawrequests:
+            additionalPersonalInfo = rawrequest['requestrawdata'].get('additionalPersonalInfo', {}).update(applicantschema.get('additionalPersonalInfo', {}))
             rawrequest['requestrawdata'].update(applicantschema)
+            rawrequest['requestrawdata']['additionalPersonalInfo'] = additionalPersonalInfo
             rawrequestservice().saverawrequestversion(
                 rawrequest['requestrawdata'],
                 rawrequest['requestid'],
@@ -182,6 +184,11 @@ class applicantservice:
             for request in requests:
                 requestqueue.append(self.__preparerequest(request))
 
+        rawrequests = FOIRawRequest.getrawrequestsbyapplicantid(applicantid)
+        if rawrequests is not None:
+            for request in rawrequests:
+                requestqueue.append(self.__preparerawrequest(request))
+
         return requestqueue
 
     def __preparerequest(self, request):
@@ -193,4 +200,14 @@ class applicantservice:
             'requeststatus': request["requeststatus"],
             'receiveddate': request["receiveddate"],
             'description': request["description"],
+        }
+    
+    def __preparerawrequest(self, request):
+        return {
+            'foirequestapplicantid': request["requestrawdata"]['foiRequestApplicantID'],
+            'axisrequestid': request["axisrequestid"],
+            'filenumber': 'U-00' + str(request["requestid"]),
+            'requeststatus': request["status"],
+            'receiveddate': request["requestrawdata"]["receivedDate"],
+            'description': request["requestrawdata"]["description"],
         }
