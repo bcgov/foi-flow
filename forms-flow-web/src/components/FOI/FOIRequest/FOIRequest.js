@@ -936,7 +936,6 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
               isMinistryCoordinator={false}
               isValidationError={isValidationError}
               requestType={requestDetails?.requestType}
-              disabled={requestDetails.currentState === StateEnum.intakeinprogress.name && !requestDetails.foiRequestApplicantID}
             />
           </div>
 

@@ -36,6 +36,7 @@ import { StateEnum } from "../../../constants/FOI/statusEnum";
 import { setFOIRequestApplicantProfile, setFOILoader } from "../../../actions/FOI/foiRequestActions";
 import { toast } from "react-toastify";
 import Loading from "../../../containers/Loading";
+import { isBeforeOpen } from "./utils";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -132,7 +133,7 @@ const ApplicantProfileModal = React.memo(({modalOpen, handleModalClose}) => {
     useEffect(() => {
         if (modalOpen) {
             setIsLoading(true);
-            if (!requestDetails.stateTransition?.filter(s => s.status === StateEnum.open.name).length > 0) {
+            if (isBeforeOpen(requestDetails)) {
                 dispatch(fetchPotentialApplicants(
                     requestDetails.firstName,
                     requestDetails.lastName,
@@ -328,7 +329,7 @@ const ApplicantProfileModal = React.memo(({modalOpen, handleModalClose}) => {
     const back = () => {
         if (applicantHistory) {
             setApplicantHistory(false);            
-        } else if (requestDetails.stateTransition?.filter(s => s.status === StateEnum.open.name).length > 0) { 
+        } else if (!isBeforeOpen(requestDetails)) {
             handleClose();
         } else {
             setSelectedApplicant(false);
@@ -355,7 +356,7 @@ const ApplicantProfileModal = React.memo(({modalOpen, handleModalClose}) => {
     }
 
     const isSaveDisabled = () => {
-        if (!requestDetails.stateTransition?.filter(s => s.status === StateEnum.open.name).length > 0) {
+        if (isBeforeOpen(requestDetails)) {
             return isProfileDifferent
         } else {
             return _.isEqual(selectedApplicant, saveApplicantObject)

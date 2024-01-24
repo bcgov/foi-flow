@@ -9,8 +9,7 @@ import AccordionSummary from '@material-ui/core/AccordionSummary';
 import AccordionDetails from '@material-ui/core/AccordionDetails';
 import Typography from '@material-ui/core/Typography';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
-import ApplicantProfileModal from "./ApplicantProfileModal";
-import { StateEnum } from "../../../constants/FOI/statusEnum";
+import { isBeforeOpen } from "./utils";
 
 const useStyles = makeStyles((_theme) => ({
   row: {
@@ -320,9 +319,9 @@ const AddressContactDetails = memo(
                   type="button"
                   className={`btn btn-link btn-description-history`}
                   onClick={moreInfoAction}
-                  style={(requestDetails.currentState === StateEnum.intakeinprogress.name && !requestDetails.foiRequestApplicantID) ? {color: "#9E2929"} : {}}
+                  style={(isBeforeOpen(requestDetails) && !requestDetails.foiRequestApplicantID) ? {color: "#9E2929"} : {}}
                 >
-                  {(!requestDetails.stateTransition?.filter(s => s.status === StateEnum.open.name).length > 0) && 'Search' } Applicant Profiles
+                  {(isBeforeOpen(requestDetails)) && 'Search' } Applicant Profiles
                 </button>
               }
               {/* <ApplicantProfileModal
