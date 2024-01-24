@@ -329,6 +329,16 @@ class FOIRawRequest(db.Model):
        return request_schema.dump(request)
     
     @classmethod
+    def getrawrequestsbyapplicantid(cls,applicantid):
+        request_schema = FOIRawRequestSchema(many=True)
+        query = db.session.query(FOIRawRequest).distinct(FOIRawRequest.requestid).join(
+            FOIAssignee, FOIAssignee.username == FOIRawRequest.assignedto
+        ).filter(
+            FOIRawRequest.requestrawdata['foiRequestApplicantID'].astext.cast(db.Integer)==applicantid
+        ).order_by(FOIRawRequest.requestid, FOIRawRequest.version.desc()).all()
+        return request_schema.dump(query)
+    
+    @classmethod
     def getLastStatusUpdateDate(cls,requestid,status):
         lastupdatedate = None
         try:
@@ -1022,4 +1032,4 @@ class FOIRawRequest(db.Model):
 
 class FOIRawRequestSchema(ma.Schema):
     class Meta:
-        fields = ('requestid', 'requestrawdata', 'status','notes','created_at','wfinstanceid','version','updated_at','assignedgroup','assignedto','updatedby','createdby','sourceofsubmission','ispiiredacted','assignee.firstname','assignee.lastname', 'axisrequestid', 'axissyncdate', 'linkedrequests', 'closedate','isiaorestricted')
+        fields = ('requestid', 'requestrawdata', 'status','notes','created_at','wfinstanceid','version','updated_at','assignedgroup','assignedto','updatedby','createdby','sourceofsubmission','ispiiredacted','assignee.firstname','assignee.middlename', 'assignee.lastname', 'axisrequestid', 'axissyncdate', 'linkedrequests', 'closedate','isiaorestricted')

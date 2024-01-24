@@ -3,8 +3,10 @@ from os import stat
 from re import VERBOSE
 from request_api.models.FOIRequestApplicants import FOIRequestApplicant
 from request_api.models.FOIMinistryRequests import FOIMinistryRequest
+from request_api.models.FOIRawRequests import FOIRawRequest
 from request_api.models.ApplicantCategories import ApplicantCategory
 from request_api.services.requestservice import requestservicegetter, requestservicecreate
+from request_api.services.rawrequestservice import rawrequestservice
 from request_api.auth import AuthHelper
 from dateutil import tz, parser
 from flask import jsonify
@@ -66,6 +68,20 @@ class applicantservice:
             )
             if not responseschema.success:
                 return responseschema
+        rawrequests = FOIRawRequest.getrawrequestsbyapplicantid(applicantschema['foiRequestApplicantID'])
+        for rawrequest in rawrequests:
+            rawrequest['requestrawdata'].update(applicantschema)
+            rawrequestservice().saverawrequestversion(
+                rawrequest['requestrawdata'],
+                rawrequest['requestid'],
+                rawrequest['assignedgroup'],
+                rawrequest['assignedto'],
+                rawrequest['status'], 
+                userid,
+                rawrequest['assignee.firstname'],
+                rawrequest['assignee.middlename'],
+                rawrequest['assignee.lastname']
+            )
         return DefaultMethodResult(True,'Applicant Info Updated',applicantschema['foiRequestApplicantID'])
 
     def __validateandtransform(self, filterfields):

@@ -432,7 +432,7 @@ const ApplicantProfileModal = React.memo(({modalOpen, handleModalClose}) => {
           <DialogContent sx={{padding: "15px 50px 0 50px"}}>
                 {selectedApplicant ?
                     confirmationMessage ? 
-                    <div style={{textAlign: "center"}}>Are you sure you would like to save changes for all open requests?<br></br> <i>Please ensure you have checked the Request History to see the request(s) that will be affected.</i></div>
+                    <div style={{textAlign: "center"}}>Are you sure you would like to save changes for all open and intake in progress requests associated with this profile?<br></br> <i>Please ensure you have checked the Request History to see the request(s) that will be affected.</i></div>
                     :
                     (showRequestHistory ?
                         <>
