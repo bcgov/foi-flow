@@ -1164,6 +1164,8 @@ class FOIRequestApplicant(db.Model):
             FOIRequestApplicant.foirequestapplicantid.label('foirequestapplicantid'),
             FOIMinistryRequest.axisrequestid,
             FOIMinistryRequest.filenumber,
+            FOIMinistryRequest.foirequest_id,
+            FOIMinistryRequest.foiministryrequestid,
             FOIRequestStatus.name.label('requeststatus'),
             func.to_char(FOIRequest.receiveddate, 'MON DD YYYY').label('receiveddate'),
             FOIMinistryRequest.description
@@ -1240,4 +1242,4 @@ class ApplicantProfileSchema(ma.Schema):
 
 class ApplicantRequestSchema(ma.Schema):
     class Meta:
-        fields = ('applicantprofileid','foirequestapplicantid','axisrequestid','filenumber', 'requeststatus','receiveddate','description')
+        fields = ('applicantprofileid','foirequestapplicantid','axisrequestid','foirequest_id','foiministryrequestid','filenumber', 'requeststatus','receiveddate','description')

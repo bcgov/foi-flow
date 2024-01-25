@@ -207,3 +207,9 @@ height: fit-content;
 .foi-applicant-data-grid .MuiDataGrid-cellContent{
     text-transform: none !important;
 }
+
+.applicant-profile-modal-div {
+    .flexible-modal-mask {
+        position: static
+    }
+}

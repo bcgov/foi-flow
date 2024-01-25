@@ -112,6 +112,16 @@ const ApplicantProfileModal = React.memo(({modalOpen, handleModalClose}) => {
             field: "filenumber",
             headerName: "REQUEST ID",
             flex: 1,
+            renderCell: (params) => {
+                return <span className="table-cell-truncate">
+                    <a style={{color: "rgba(0, 0, 0, 0.87)"}} href={params.row.ministryrequestid ?
+                        "/foi/foirequests/" + params.row.requestid + "/ministryrequest/" +  params.row.ministryrequestid :
+                        "/foi/reviewrequest/" + params.row.requestid
+                    } target="_blank">
+                        {params.row.filenumber}
+                    </a>
+                </span>
+            }
         },
         {
             field: "requeststatus",
@@ -357,7 +367,7 @@ const ApplicantProfileModal = React.memo(({modalOpen, handleModalClose}) => {
 
     const isSaveDisabled = () => {
         if (isBeforeOpen(requestDetails)) {
-            return isProfileDifferent
+            return false
         } else {
             return _.isEqual(selectedApplicant, saveApplicantObject)
         }
@@ -373,7 +383,7 @@ const ApplicantProfileModal = React.memo(({modalOpen, handleModalClose}) => {
 
     
     return (
-      <div>
+      <div className={"applicant-profile-modal-div"}>
         <ReactModal
           initWidth={800}
           initHeight={600}
@@ -430,20 +440,21 @@ const ApplicantProfileModal = React.memo(({modalOpen, handleModalClose}) => {
             </IconButton>
           </DialogTitle>
         <div style={{ overflowY: "scroll", height: "calc(100% - 181px)" }}>
-          <DialogContent sx={{padding: "15px 50px 0 50px"}}>
+          <DialogContent sx={{padding: "15px 50px 0 50px", height: "100%"}}>
                 {selectedApplicant ?
                     confirmationMessage ? 
                     <div style={{textAlign: "center"}}>Are you sure you would like to save changes for all open and intake in progress requests associated with this profile?<br></br> <i>Please ensure you have checked the Request History to see the request(s) that will be affected.</i></div>
                     :
                     (showRequestHistory ?
                         <>
-                            <Box sx={{ height: 400, width: "100%" }}>
+                            <Box sx={{ height: "100%", width: "100%" }}>
                             <DataGrid
                                 className="foi-data-grid foi-request-history-grid"
                                 rows={requestHistory}
                                 columns={requestHistoryColumns}
                                 rowHeight={30}
                                 headerHeight={50}
+                                hideFooter={true}
                                 loading={isLoading}                
                                 onRowClick={selectApplicantRow}
                                 getRowHeight={() => 'auto'} 
@@ -593,18 +604,12 @@ const ApplicantProfileModal = React.memo(({modalOpen, handleModalClose}) => {
                         </Stack>
                     </Grid>
                     </Paper>
-                    <Box sx={{ height: 350, width: "100%" }}>
+                    <Box sx={{ height: "calc(100% - 100px)", width: "100%" }}>
                     <DataGrid
                         className="foi-data-grid foi-applicant-data-grid"
                         rows={search(rows)}
                         columns={columns}
-                        initialState={{
-                        pagination: {
-                            paginationModel: {
-                            pageSize: 5,
-                            },
-                        },
-                        }}
+                        hideFooter={true}
                         pageSizeOptions={[5]}
                         rowHeight={30}
                         headerHeight={50}
