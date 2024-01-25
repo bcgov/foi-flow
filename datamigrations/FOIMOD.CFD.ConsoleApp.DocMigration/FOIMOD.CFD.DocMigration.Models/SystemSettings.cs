@@ -32,6 +32,12 @@ namespace FOIMOD.CFD.DocMigration.Models
 
         public static string S3_Attachements_Bucket { get; set; }
 
+        public static string SyncfusionLicense { get; set; }
+
+        public static bool CorrespondenceLogMigration {  get; set; }
+
+        public static bool RecordsMigration { get; set; }
+
 
     }
 }

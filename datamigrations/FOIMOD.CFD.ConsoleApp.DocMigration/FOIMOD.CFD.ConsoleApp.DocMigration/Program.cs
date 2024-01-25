@@ -37,7 +37,8 @@ SystemSettings.RequestToMigrate = configurationbuilder.GetSection("AXISConfigura
 
 SystemSettings.FOIFLOWConnectionString = configurationbuilder.GetSection("FOIFLOWConfiguration:FOIFLOWConnectionString").Value;
 
-
+SystemSettings.CorrespondenceLogMigration = Convert.ToBoolean(configurationbuilder.GetSection("S3Configuration:CorrespondenceLogMigration").Value);
+SystemSettings.RecordsMigration = Convert.ToBoolean(configurationbuilder.GetSection("S3Configuration:RecordsMigration").Value);
 
 SqlConnection axissqlConnection = new SqlConnection(SystemSettings.AXISConnectionString);
 OdbcConnection odbcConnection = new OdbcConnection(SystemSettings.FOIFLOWConnectionString);

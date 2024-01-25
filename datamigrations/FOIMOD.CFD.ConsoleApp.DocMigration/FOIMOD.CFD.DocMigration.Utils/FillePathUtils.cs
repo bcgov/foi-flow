@@ -19,7 +19,8 @@ namespace FOIMOD.CFD.DocMigration.Utils
                         string[] singlefileinfo = fileinfodelimited.Split('*');
                         if (singlefileinfo != null && singlefileinfo.Length > 0)
                         {
-                            result.Add(new AXISFIle() { FileName = singlefileinfo[1], FilePathOnServer = singlefileinfo[0], FileExtension = singlefileinfo[1].Split('.')[1] });
+                            
+                            result.Add(new AXISFIle() { FileName = singlefileinfo[1], FilePathOnServer = singlefileinfo[0], FileExtension = getFileExtension(singlefileinfo[1]) });
                         }
 
                     }
@@ -29,7 +30,7 @@ namespace FOIMOD.CFD.DocMigration.Utils
                     string[] singlefileinfo = delimitedstring.Split('*');
                     if (singlefileinfo != null && singlefileinfo.Length > 0)
                     {
-                        result.Add(new AXISFIle() { FileName = singlefileinfo[1], FilePathOnServer = singlefileinfo[0], FileExtension = singlefileinfo[1].Split('.')[1] });
+                        result.Add(new AXISFIle() { FileName = singlefileinfo[1], FilePathOnServer = singlefileinfo[0], FileExtension = getFileExtension(singlefileinfo[1]) });
                     }
                 }
 
@@ -38,5 +39,14 @@ namespace FOIMOD.CFD.DocMigration.Utils
             return result;
 
         }
+
+
+        private static string getFileExtension(string filename)
+        {
+            var filenameparts = filename.Split('.');
+            var fileextension = filenameparts.Length > 2 ? filenameparts[filenameparts.Length - 1] : filenameparts[1];
+            return fileextension;
+        }
+
     }
 }
