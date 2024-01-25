@@ -3,8 +3,10 @@ from os import stat
 from re import VERBOSE
 from request_api.models.FOIRequestApplicants import FOIRequestApplicant
 from request_api.models.FOIMinistryRequests import FOIMinistryRequest
+from request_api.models.FOIRawRequests import FOIRawRequest
 from request_api.models.ApplicantCategories import ApplicantCategory
 from request_api.services.requestservice import requestservicegetter, requestservicecreate
+from request_api.services.rawrequestservice import rawrequestservice
 from request_api.auth import AuthHelper
 from dateutil import tz, parser
 from flask import jsonify
@@ -65,6 +67,22 @@ class applicantservice:
             )
             if not responseschema.success:
                 return responseschema
+        rawrequests = FOIRawRequest.getrawrequestsbyapplicantid(applicantschema['foiRequestApplicantID'])
+        for rawrequest in rawrequests:
+            additionalPersonalInfo = rawrequest['requestrawdata'].get('additionalPersonalInfo', {}).update(applicantschema.get('additionalPersonalInfo', {}))
+            rawrequest['requestrawdata'].update(applicantschema)
+            rawrequest['requestrawdata']['additionalPersonalInfo'] = additionalPersonalInfo
+            rawrequestservice().saverawrequestversion(
+                rawrequest['requestrawdata'],
+                rawrequest['requestid'],
+                rawrequest['assignedgroup'],
+                rawrequest['assignedto'],
+                rawrequest['status'], 
+                userid,
+                rawrequest['assignee.firstname'],
+                rawrequest['assignee.middlename'],
+                rawrequest['assignee.lastname']
+            )
         return DefaultMethodResult(True,'Applicant Info Updated',applicantschema['foiRequestApplicantID'])
 
     def __validateandtransform(self, filterfields):
@@ -165,6 +183,11 @@ class applicantservice:
             for request in requests:
                 requestqueue.append(self.__preparerequest(request))
 
+        rawrequests = FOIRawRequest.getrawrequestsbyapplicantid(applicantid)
+        if rawrequests is not None:
+            for request in rawrequests:
+                requestqueue.append(self.__preparerawrequest(request))
+
         return requestqueue
 
     def __preparerequest(self, request):
@@ -176,4 +199,14 @@ class applicantservice:
             'requeststatus': request["requeststatus"],
             'receiveddate': request["receiveddate"],
             'description': request["description"],
+        }
+    
+    def __preparerawrequest(self, request):
+        return {
+            'foirequestapplicantid': request["requestrawdata"]['foiRequestApplicantID'],
+            'axisrequestid': request["axisrequestid"],
+            'filenumber': 'U-00' + str(request["requestid"]),
+            'requeststatus': request["status"],
+            'receiveddate': request["requestrawdata"]["receivedDate"],
+            'description': request["requestrawdata"]["description"],
         }
