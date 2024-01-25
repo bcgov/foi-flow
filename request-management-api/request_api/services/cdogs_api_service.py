@@ -33,7 +33,6 @@ class CdogsApiService:
     
 
     def generate_receipt(self, template_hash_code: str, data):
-        print(data)
         request_body = {
             "options": {
                 "cachereport": False,
