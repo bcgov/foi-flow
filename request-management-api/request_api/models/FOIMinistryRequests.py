@@ -265,7 +265,7 @@ class FOIMinistryRequest(db.Model):
             _tmp_state = None       
             for row in rs:
                 if row["status"] != _tmp_state:
-                    transitions.append({"status": row["status"], "version": row["version"], "created_at": row["created_at"]})
+                    transitions.append({"status": row["status"], "version": row["version"], "created_at": row["created_at"].strftime('%Y-%m-%d %H:%M:%S.%f')})
                     _tmp_state = row["status"]
         except Exception as ex:
             logging.error(ex)
