@@ -43,7 +43,7 @@ class CdogsApiService:
             },
             "data": data
         }
-        json_request_body = json.dumps(request_body, default = str)
+        json_request_body = json.dumps(request_body)
         
         headers = {
             'Content-Type': 'application/json',
