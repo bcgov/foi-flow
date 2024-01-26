@@ -3,6 +3,7 @@ using FOIMOD.CFD.DocMigration.Models.AXISSource;
 using FOIMOD.CFD.DocMigration.Models.Document;
 using Microsoft.Data.SqlClient;
 using Microsoft.Identity.Client;
+using Microsoft.VisualBasic.FileIO;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -44,7 +45,7 @@ namespace FOIMOD.CFD.DocMigration.DAL
                         @SectionList = COALESCE(@SectionList+':', '')+vcSectionList
                     FROM [dbo].[tblDocumentReviewLog] WHERE iRequestID =@irequestid
 
-                    SELECT D.iDocID,D.tiSections,vcFileName as FilePath,D.siFolderID,D.siPageCount ,p.siPageNum FROM tblPages P inner join tblDocuments D on P.iDocID=D.iDocID 
+                    SELECT D.iDocID,D.vcDocName as FolderName,D.tiSections,vcFileName as FilePath,REVERSE(SUBSTRING(REVERSE(vcFileName),1,4)) as FileType,D.siFolderID,D.siPageCount ,p.siPageNum FROM tblPages P inner join tblDocuments D on P.iDocID=D.iDocID 
 					
 					WHERE  D.iDocID in(
                     --- Review Log Documents
@@ -147,7 +148,9 @@ namespace FOIMOD.CFD.DocMigration.DAL
                                 TotalPageCount = Convert.ToString(row["siPageCount"]),
                                 PageSequenceNumber = Convert.ToInt32(row["siPageNum"]),
                                 AXISRequestNumber = requestnumber.ToUpper(),
-                                DocumentType = DocumentTypeFromAXIS.RequestRecords
+                                DocumentType = DocumentTypeFromAXIS.RequestRecords,
+                                FolderName = Convert.ToString(row["FolderName"]),
+                                FileType = Convert.ToString(row["FileType"]),
                             });
 
                         }

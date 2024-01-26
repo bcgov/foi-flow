@@ -14,5 +14,9 @@ namespace FOIMOD.CFD.DocMigration.Models.Document
 
         public string? EmailAttachmentDelimitedString { get; set; }
 
+        public string FolderName { get; set; }
+
+        public string FileType { get; set; }
+
     }
 }

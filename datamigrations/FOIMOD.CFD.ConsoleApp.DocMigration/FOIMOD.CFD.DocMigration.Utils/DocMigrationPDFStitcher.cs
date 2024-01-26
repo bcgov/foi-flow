@@ -3,13 +3,17 @@ using FOIMOD.CFD.DocMigration.Models.Document;
 using PdfSharpCore;
 using PdfSharpCore.Pdf;
 using PdfSharpCore.Pdf.IO;
+using SyncfusionPDF = Syncfusion.Pdf;
+using SyncfusionPDFGraphics = Syncfusion.Pdf.Graphics ;
 using TheArtOfDev.HtmlRenderer.PdfSharp;
+using Syncfusion.Pdf.Graphics;
+using Syncfusion.Drawing;
 
 namespace FOIMOD.CFD.DocMigration.Utils
 {
     public class DocMigrationPDFStitcher : IDisposable
     {
-
+        
         private Stream mergeddocstream = null;
         private Stream createemailpdfmemorystream = null;
         public DocMigrationPDFStitcher()
@@ -45,7 +49,47 @@ namespace FOIMOD.CFD.DocMigration.Utils
             return mergeddocstream;
         }
 
+        public Stream MergeImages(List<DocumentToMigrate> imagefiles)
+        {
+            var _images = imagefiles.OrderBy(p => p.PageSequenceNumber).ToArray<DocumentToMigrate>();
+            //Creating the new PDF document
+            using SyncfusionPDF.PdfDocument document = new SyncfusionPDF.PdfDocument();
 
+            foreach (var formFile in _images)
+            {
+                if (formFile.FileStream.Length > 0)
+                {
+                    using MemoryStream file = new MemoryStream();
+                    formFile.FileStream.CopyTo(file);
+                    //Loading the image
+                    //SyncfusionPDFGraphics.PdfImage image = SyncfusionPDFGraphics.PdfImage.FromStream(file);
+                    PdfBitmap image = new PdfBitmap(file);
+                    //Adding new page
+                    SyncfusionPDF.PdfPage page = page = document.Pages.Add();
+
+                    SizeF pageSize = page.GetClientSize();
+
+                    //Setting image bounds 
+                     RectangleF imageBounds = new RectangleF(0, 0, pageSize.Width, pageSize.Height);
+
+
+                    //Drawing image to the PDF page
+                    page.Graphics.DrawImage(image, imageBounds);
+                    file.Dispose();
+                }
+            }
+            //Saving the PDF to the MemoryStream
+            MemoryStream stream = new MemoryStream();
+
+            document.Save(stream);
+
+            //Set the position as '0'.
+            stream.Position = 0;
+            
+
+            return stream;
+
+        }
 
 
         public Stream CreatePDFDocument(string emailcontent, string emailsubject, string emaildate, string emailTo,List<AXISFIle> attachementfiles = null)
