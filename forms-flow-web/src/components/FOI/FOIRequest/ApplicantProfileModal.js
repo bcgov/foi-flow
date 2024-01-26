@@ -109,7 +109,7 @@ const ApplicantProfileModal = React.memo(({modalOpen, handleModalClose}) => {
     
     const requestHistoryColumns = [
         {
-            field: "filenumber",
+            field: "axisrequestid",
             headerName: "REQUEST ID",
             flex: 1,
             renderCell: (params) => {
@@ -118,7 +118,7 @@ const ApplicantProfileModal = React.memo(({modalOpen, handleModalClose}) => {
                         "/foi/foirequests/" + params.row.requestid + "/ministryrequest/" +  params.row.ministryrequestid :
                         "/foi/reviewrequest/" + params.row.requestid
                     } target="_blank">
-                        {params.row.filenumber}
+                        {params.row.axisrequestid}
                     </a>
                 </span>
             }
