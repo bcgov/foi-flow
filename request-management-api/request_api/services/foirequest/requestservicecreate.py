@@ -70,7 +70,7 @@ class requestservicecreate:
     def saveministryrequestversion(self,ministryrequestschema, foirequestid , ministryid, userid, usertype = None):        
         _foirequest = FOIRequest().getrequest(foirequestid)
         _foiministryrequest = FOIMinistryRequest().getrequestbyministryrequestid(ministryid)
-        _foirequestapplicant = FOIRequestApplicantMapping().getrequestapplicants(foirequestid,_foirequest["version"])
+        _foirequestapplicant = FOIRequestApplicantMapping().getrequestapplicantinfos(foirequestid,_foirequest["version"])
         _foirequestcontact = FOIRequestContactInformation().getrequestcontactinformation(foirequestid,_foirequest["version"])
         _foirequestpersonalattrbs = FOIRequestPersonalAttribute().getrequestpersonalattributes(foirequestid,_foirequest["version"])
         foiministryrequestarr = []     
@@ -128,12 +128,11 @@ class requestservicecreate:
         requestapplicantarr = []
         selfalsoknownas=None
         selfdob=None
-        selfcategoryid=None
-        if foirequestschema.get("additionalPersonalInfo") is not None and foirequestschema.get('requeststatusid') == 1:
+        selfcategoryid = requestserviceconfigurator().getvalueof("category",foirequestschema.get("category")) if requestservicebuilder().isNotBlankorNone(foirequestschema,"category","main") == True else None
+        if foirequestschema.get("additionalPersonalInfo") is not None:
             applicantinfo = foirequestschema.get("additionalPersonalInfo")
             selfdob = applicantinfo["birthDate"] if requestservicebuilder().isNotBlankorNone(foirequestschema,"birthDate","additionalPersonalInfo") else None
             selfalsoknownas = applicantinfo["alsoKnownAs"] if requestservicebuilder().isNotBlankorNone(foirequestschema,"alsoKnownAs","additionalPersonalInfo") else None
-            selfcategoryid = requestserviceconfigurator().getvalueof("category",foirequestschema.get("category")) if requestservicebuilder().isNotBlankorNone(foirequestschema,"category","main") else None
 
         # if foirequestschema.get('foiRequestApplicantID') is None and foirequestschema.get('requeststatusid') == 1:
         if foirequestschema.get('foiRequestApplicantID', 0) > 0:

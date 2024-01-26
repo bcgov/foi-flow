@@ -27,9 +27,13 @@ def upgrade():
         set applicantcategoryid = subquery.applicantcategoryid
         from (
             select public."FOIRequestApplicantMappings".foirequestapplicantid, public."FOIRequests".applicantcategoryid
-            from public."FOIRequestApplicantMappings"
+            from (
+                select max(public."FOIRequestApplicantMappings".foirequestapplicantmappingid) as foirequestapplicantmappingid
+                from public."FOIRequestApplicantMappings"
+                group by public."FOIRequestApplicantMappings".foirequestapplicantid
+            ) as maxmappingid
+            join public."FOIRequestApplicantMappings" on public."FOIRequestApplicantMappings".foirequestapplicantmappingid = maxmappingid.foirequestapplicantmappingid
             join public."FOIRequests" on public."FOIRequests".foirequestid = public."FOIRequestApplicantMappings".foirequest_id and public."FOIRequests".version = public."FOIRequestApplicantMappings".foirequestversion_id
-            group by public."FOIRequestApplicantMappings".foirequestapplicantid, public."FOIRequests".applicantcategoryid
         ) as subquery
         where public."FOIRequestApplicants".foirequestapplicantid = subquery.foirequestapplicantid
         '''

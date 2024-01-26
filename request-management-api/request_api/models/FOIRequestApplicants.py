@@ -10,7 +10,7 @@ from .FOIRequests import FOIRequest
 from .FOIRequestContactInformation import FOIRequestContactInformation
 from .FOIRequestPersonalAttributes import FOIRequestPersonalAttribute
 from .FOIRequestStatus import FOIRequestStatus
-from sqlalchemy import and_, or_, func, case
+from sqlalchemy import and_, or_, func, text
 import uuid
 
 class FOIRequestApplicant(db.Model):
@@ -56,17 +56,33 @@ class FOIRequestApplicant(db.Model):
 
     @classmethod
     def updateapplicantprofile(cls, foirequestapplicantid, firstname, lastname, middlename, businessname, alsoknownas, dob, applicantcategoryid, userid):
+
+        applicantprofile = aliased(FOIRequestApplicant)
+
         applicant_query = db.session.query(
                                         FOIRequestApplicant
-                                    ).filter_by(
-                                        foirequestapplicantid = foirequestapplicantid
+                                    ).join(
+                                        applicantprofile,
+                                        or_(
+                                            and_(
+                                                applicantprofile.foirequestapplicantid == foirequestapplicantid,
+                                                applicantprofile.applicantprofileid == FOIRequestApplicant.applicantprofileid
+                                            ),
+                                            and_(
+                                                FOIRequestApplicant.foirequestapplicantid == foirequestapplicantid,
+                                                applicantprofile.applicantprofileid.is_(None)
+                                            )
+                                        )
                                     )
-        applicant = applicant_query.first()
+        applicant = applicant_query.order_by(FOIRequestApplicant.foirequestapplicantid.desc()).first()
 
         # create an applicant profile id if it's not set
         if(applicant.applicantprofileid is None):
             # applicant.isactive = False
-            applicant_query.update({FOIRequestApplicant.applicantprofileid:str(uuid.uuid4())})
+            sql = """update "FOIRequestApplicants" set applicantprofileid = :profileid, updatedby = :userid, updated_at = now()
+                        where foirequestapplicantid = :foirequestapplicantid"""
+            db.session.execute(text(sql), {'profileid': str(uuid.uuid4()), 'userid':userid, 'foirequestapplicantid': foirequestapplicantid})
+            db.session.commit()
 
         dob = datetime.strptime(dob, "%Y-%m-%d") if dob is not None and dob != '' else None
         applicantfromform = FOIRequestApplicant().prepareapplicantforcomparing(firstname, lastname, middlename, businessname, alsoknownas, dob, applicantcategoryid)

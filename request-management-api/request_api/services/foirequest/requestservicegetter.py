@@ -24,7 +24,7 @@ class requestservicegetter:
         request = FOIRequest.getrequest(foirequestid)
         requestministry = FOIMinistryRequest.getrequestbyministryrequestid(foiministryrequestid)
         requestcontactinformation = FOIRequestContactInformation.getrequestcontactinformation(foirequestid,request['version'])
-        requestapplicants = FOIRequestApplicantMapping.getrequestapplicants(foirequestid,request['version'])
+        requestapplicants = FOIRequestApplicantMapping.getrequestapplicantinfos(foirequestid,request['version'])
         requestministrydivisions = FOIMinistryRequestDivision.getdivisions(foiministryrequestid,requestministry['version'])
         iaorestrictrequestdetails = FOIRestrictedMinistryRequest.getrestricteddetails(ministryrequestid=foiministryrequestid,type='iao')
 
@@ -38,17 +38,17 @@ class requestservicegetter:
 
         additionalpersonalinfo ={}
         for applicant in requestapplicants:
-            firstname = applicant['foirequestapplicant.firstname']
-            middlename = applicant['foirequestapplicant.middlename']
-            lastname = applicant['foirequestapplicant.lastname']
-            businessname = applicant['foirequestapplicant.businessname']
-            dobraw = applicant['foirequestapplicant.dob']
+            firstname = applicant['firstname']
+            middlename = applicant['middlename']
+            lastname = applicant['lastname']
+            businessname = applicant['businessname']
+            dobraw = applicant['dob']
             dob = parse(dobraw).strftime(self.__genericdateformat()) if dobraw is not None else ''
-            alsoknownas = applicant['foirequestapplicant.alsoknownas']
-            foirequestapplicantid = applicant['foirequestapplicant.foirequestapplicantid']
-            requestortypeid = applicant['requestortype.requestortypeid']
-            categoryid = applicant['foirequestapplicant.applicantcategory.applicantcategoryid']
-            category = applicant['foirequestapplicant.applicantcategory.name']
+            alsoknownas = applicant['alsoknownas']
+            foirequestapplicantid = applicant['foirequestapplicantid']
+            requestortypeid = applicant['requestortypeid']
+            categoryid = applicant['applicantcategoryid']
+            category = applicant['applicantcategory']
 
             if requestortypeid == 1:
                 baserequestinfo.update(self.__prepareapplicant(foirequestapplicantid, firstname, middlename, lastname, businessname, categoryid, category))
@@ -87,18 +87,18 @@ class requestservicegetter:
             baserequestinfo = self.__preparebaseinfo(request,foiministryrequestid,requestministry,requestministrydivisions)
 
         if request['requesttype'] == 'personal':
-            requestapplicants = FOIRequestApplicantMapping.getrequestapplicants(foirequestid,request['version'])
+            requestapplicants = FOIRequestApplicantMapping.getrequestapplicantinfos(foirequestid,request['version'])
             additionalpersonalinfo ={}
             for applicant in requestapplicants:
-                firstname = applicant['foirequestapplicant.firstname']
-                middlename = applicant['foirequestapplicant.middlename']
-                lastname = applicant['foirequestapplicant.lastname']
-                dobraw = applicant['foirequestapplicant.dob']
+                firstname = applicant['firstname']
+                middlename = applicant['middlename']
+                lastname = applicant['lastname']
+                dobraw = applicant['dob']
                 dob = parse(dobraw).strftime(self.__genericdateformat()) if dobraw is not None else ''
-                foirequestapplicantid = applicant['foirequestapplicant.foirequestapplicantid']
-                requestortypeid = applicant['requestortype.requestortypeid']
-                categoryid = applicant['foirequestapplicant.applicantcategory.applicantcategoryid']
-                category = applicant['foirequestapplicant.applicantcategory.name']
+                foirequestapplicantid = applicant['foirequestapplicantid']
+                requestortypeid = applicant['requestortypeid']
+                categoryid = applicant['applicantcategoryid']
+                category = applicant['applicantcategory']
                 businessname = None
 
                 if requestortypeid == 1:
