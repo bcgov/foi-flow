@@ -238,11 +238,14 @@ class FOIMinistryRequest(db.Model):
 
         selectedcolumns = [FOIMinistryRequest.foirequest_id, FOIMinistryRequest.foiministryrequestid]
 
+        #aliase for getting applicants by profileid
+        applicant = aliased(FOIRequestApplicant)
+
         #subquery for getting latest version & proper group/team for FOIMinistryRequest
-        subquery_applicant_maxid = _session.query(FOIRequestApplicant.applicantprofileid, func.max(FOIRequestApplicant.foirequestapplicantid).label('max_id')).group_by(FOIRequestApplicant.applicantprofileid).subquery()
-        joincondition_applicant = [
-            subquery_applicant_maxid.c.applicantprofileid == FOIRequestApplicant.applicantprofileid,
-            subquery_applicant_maxid.c.max_id == FOIRequestApplicantMapping.foirequestapplicantid,
+        subquery_ministry_maxversion = _session.query(FOIMinistryRequest.foirequest_id, func.max(FOIMinistryRequest.foirequestversion_id).label('max_version')).group_by(FOIMinistryRequest.foirequest_id).subquery()
+        joincondition_ministry = [
+            subquery_ministry_maxversion.c.foirequest_id == FOIRequestApplicantMapping.foirequest_id,
+            subquery_ministry_maxversion.c.max_version == FOIRequestApplicantMapping.foirequestversion_id,
         ]
 
         query = db.session.query(
@@ -250,17 +253,20 @@ class FOIMinistryRequest(db.Model):
                             ).distinct(
                                 FOIMinistryRequest.foiministryrequestid
                             ).join(
-                                FOIRequestApplicantMapping,
-                                and_(
-                                    FOIRequestApplicantMapping.foirequest_id == FOIMinistryRequest.foirequest_id,
-                                    FOIRequestApplicantMapping.foirequestversion_id == FOIMinistryRequest.foirequestversion_id,
-                                    FOIRequestApplicantMapping.requestortypeid == RequestorType['applicant'].value)
+                                applicant,
+                                applicant.foirequestapplicantid == applicantid,
                             ).join(
                                 FOIRequestApplicant,
-                                FOIRequestApplicant.foirequestapplicantid == applicantid,
+                                FOIRequestApplicant.applicantprofileid == applicant.applicantprofileid,
                             ).join(
-                                subquery_applicant_maxid,
-                                and_(*joincondition_applicant)
+                                FOIRequestApplicantMapping,
+                                and_(
+                                    FOIRequestApplicantMapping.foirequestapplicantid == FOIRequestApplicant.foirequestapplicantid,
+                                    FOIRequestApplicantMapping.foirequest_id == FOIMinistryRequest.foirequest_id,
+                                    FOIRequestApplicantMapping.requestortypeid == RequestorType['applicant'].value)
+                            ).join(
+                                subquery_ministry_maxversion,
+                                and_(*joincondition_ministry)
                             ).filter(
                                 # FOIRequestApplicant.foirequestapplicantid == applicantid,
                                 FOIMinistryRequest.requeststatusid != 3

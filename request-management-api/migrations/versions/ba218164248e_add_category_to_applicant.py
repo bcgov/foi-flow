@@ -30,12 +30,30 @@ def upgrade():
             from (
                 select max(public."FOIRequestApplicantMappings".foirequestapplicantmappingid) as foirequestapplicantmappingid
                 from public."FOIRequestApplicantMappings"
+				where public."FOIRequestApplicantMappings".requestortypeid = 1
                 group by public."FOIRequestApplicantMappings".foirequestapplicantid
             ) as maxmappingid
             join public."FOIRequestApplicantMappings" on public."FOIRequestApplicantMappings".foirequestapplicantmappingid = maxmappingid.foirequestapplicantmappingid
             join public."FOIRequests" on public."FOIRequests".foirequestid = public."FOIRequestApplicantMappings".foirequest_id and public."FOIRequests".version = public."FOIRequestApplicantMappings".foirequestversion_id
         ) as subquery
         where public."FOIRequestApplicants".foirequestapplicantid = subquery.foirequestapplicantid
+			and public."FOIRequestApplicants".foirequestapplicantid not in (
+				select foirequestapplicantid from (
+					select foirequestapplicantid, count(applicantcategoryid) c from (
+						select
+							public."FOIRequestApplicantMappings".foirequestapplicantid,
+							public."FOIRequests".applicantcategoryid
+						from public."FOIRequestApplicantMappings"
+						join public."FOIRequests" on
+							public."FOIRequests".foirequestid = public."FOIRequestApplicantMappings".foirequest_id
+							and public."FOIRequests".version = public."FOIRequestApplicantMappings".foirequestversion_id
+						where public."FOIRequestApplicantMappings".requestortypeid = 1
+						group by public."FOIRequestApplicantMappings".foirequestapplicantid, public."FOIRequests".applicantcategoryid
+					) as subquery2
+					group by foirequestapplicantid
+				-- 	order by count(applicantcategoryid) desc, foirequestapplicantid
+				) as subquery1 where c > 1
+			)
         '''
     )
 
