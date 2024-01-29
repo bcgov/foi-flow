@@ -25,6 +25,7 @@ const API = {
   FOI_GET_RECEIVED_MODELIST: `${FOI_BASE_API_URL}/api/foiflow/receivedmodes`,
   FOI_POST_REQUEST_POST: `${FOI_BASE_API_URL}/api/foirequests`,
   FOI_REQUEST_API: `${FOI_BASE_API_URL}/api/foirequests/<requestid>/ministryrequest/<ministryid>`,
+  FOI_REQUEST_SECTION_API: `${FOI_BASE_API_URL}/api/foirequests/<requestid>/ministryrequest/<ministryid>/section`,
   FOI_MINISTRYVIEW_REQUEST_API: `${FOI_BASE_API_URL}/api/foirequests/<requestid>/ministryrequest/<ministryid>/ministry`,
   FOI_RAW_REQUEST_DESCRIPTION: `${FOI_BASE_API_URL}/api/foiaudit/rawrequest/<requestid>/description`,
   FOI_MINISTRY_REQUEST_DESCRIPTION: `${FOI_BASE_API_URL}/api/foiaudit/ministryrequest/<ministryid>/description`,
@@ -140,5 +141,15 @@ const API = {
 
   FOI_DOWNLOAD_RECORDS_FOR_RESPONSEPACKAGE: `${FOI_BASE_API_URL}/api/foirecord/<requestid>/ministryrequest/<ministryrequestid>/download/responsepackage`,
   FOI_PDF_STITCH_STATUS_FOR_RESPONSEPACKAGE: `${FOI_BASE_API_URL}/api/foirecord/<requestid>/ministryrequest/<ministryrequestid>/responsepackage/pdfstitchjobstatus`,
+
+  FOI_DOWNLOAD_RECORDS_FOR_OIPCREDLINEREVIEW: `${FOI_BASE_API_URL}/api/foirecord/<requestid>/ministryrequest/<ministryrequestid>/download/oipcreviewredline`,
+  FOI_PDF_STITCH_STATUS_FOR_OIPCREDLINEREVIEW: `${FOI_BASE_API_URL}/api/foirecord/<requestid>/ministryrequest/<ministryrequestid>/oipcreviewredline/pdfstitchjobstatus`,
+  FOI_DOWNLOAD_RECORDS_FOR_OIPCREDLINE: `${FOI_BASE_API_URL}/api/foirecord/<requestid>/ministryrequest/<ministryrequestid>/download/oipcredline`,
+  FOI_PDF_STITCH_STATUS_FOR_OIPCREDLINE: `${FOI_BASE_API_URL}/api/foirecord/<requestid>/ministryrequest/<ministryrequestid>/oipcredline/pdfstitchjobstatus`,
+
+  FOI_GET_OIPC_OUTCOMES: `${FOI_BASE_API_URL}/api/foiflow/oipc/outcomes`,
+  FOI_GET_OIPC_STATUSES: `${FOI_BASE_API_URL}/api/foiflow/oipc/statuses`,
+  FOI_GET_OIPC_REVIEWTYPES: `${FOI_BASE_API_URL}/api/foiflow/oipc/reviewtypes`,
+  FOI_GET_OIPC_INQUIRYOUTCOMES: `${FOI_BASE_API_URL}/api/foiflow/oipc/inquiryoutcomes`,
 };
 export default API;

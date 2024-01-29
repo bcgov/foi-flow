@@ -100,12 +100,12 @@ const AdvancedSearch = ({ userDetail }) => {
 
   const tooltipContentRight = {
     "title": "Advanced Search",
-    "content": "To conduct an Advanced Search using one of the six filter buttons, you must also enter one or more key words."
+    "content": "To conduct an Advanced Search using one of the seven filter buttons, you must also enter one or more key words."
   };
 
   const tooltipContentLeft = {
     "title": "Advanced Search",
-    "content": "Use one or more fields from the following sections on their own or to narrow your search: Request State/Status/Type, Date Range, or Public Body."
+    "content": "Use one or more fields from the following sections on their own or to narrow your search: Request State/Status/Type/Flags, Date Range, or Public Body."
   };
 
   const [searchFilterSelected, setSearchFilterSelected] = useState(advancedSearchParams?.search || null);
@@ -127,13 +127,12 @@ const AdvancedSearch = ({ userDetail }) => {
   });
 
   const intitialRequestState = {
-    [StateEnum.callforrecords.id]: false,
-    [StateEnum.review.id]: false,
-    [StateEnum.signoff.id]: false,
-    [StateEnum.closed.id]: false,
-    [StateEnum.callforrecordsoverdue.id]: false
+    [StateEnum.callforrecords.label]: false,
+    [StateEnum.review.label]: false,
+    [StateEnum.signoff.label]: false,
+    [StateEnum.closed.label]: false,
+    [StateEnum.callforrecordsoverdue.label]: false
   };
-
   const [requestState, setRequestState] = useState(() => {
     if (Object.keys(advancedSearchParams).length > 0 && advancedSearchParams.requestState.length > 0) {
       let savedRequestState = {...intitialRequestState}
@@ -181,6 +180,23 @@ const AdvancedSearch = ({ userDetail }) => {
       return savedRequestType;
     } else {
       return initialRequestTypes;
+    }
+  });
+
+  const initialRequestFlags = {
+      restricted: false,
+      oipc: false,
+      phased: false
+    };
+  const [requestFlags, setRequestFlags] = useState(() => {
+    if (Object.keys(advancedSearchParams).length > 0 && advancedSearchParams.requestFlags.length > 0) {
+      let savedRequestFlags = {...initialRequestFlags}
+      advancedSearchParams.requestFlags.forEach(type => {
+        savedRequestFlags[type] = true;
+      });
+      return savedRequestFlags;
+    } else {
+      return initialRequestFlags;
     }
   });
   const [selectedDateRangeType, setSelectedDateRangeType] = useState(advancedSearchParams?.dateRangeType || "");
@@ -234,6 +250,7 @@ const AdvancedSearch = ({ userDetail }) => {
       keywords: keywordsMode ? keywords : [searchText.trim()],
       requestState: getTrueKeysFromCheckboxObject(requestState),
       requestType: getTrueKeysFromCheckboxObject(requestTypes),
+      requestFlags: getTrueKeysFromCheckboxObject(requestFlags),
       requestStatus: getTrueKeysFromCheckboxObject(requestStatus),
       dateRangeType: selectedDateRangeType || null,
       fromDate: fromDate || null,
@@ -259,6 +276,7 @@ const AdvancedSearch = ({ userDetail }) => {
   const noSearchCriteria = () => {
     let selectedRequestStates = getTrueKeysFromCheckboxObject(requestState);
     let selectedRequestTypes = getTrueKeysFromCheckboxObject(requestTypes);
+    let selectedRequestFlags = getTrueKeysFromCheckboxObject(requestFlags);
     let selectedRequestStatus = getTrueKeysFromCheckboxObject(requestStatus);
     return ((keywords.length===0 && keywordsMode) || (!searchText && !keywordsMode))
               && !fromDate
@@ -266,6 +284,7 @@ const AdvancedSearch = ({ userDetail }) => {
               && selectedPublicBodies.length===0
               && selectedRequestStates.length===0
               && selectedRequestTypes.length===0
+              && selectedRequestFlags.length===0
               && selectedRequestStatus.length===0;
   };
 
@@ -276,6 +295,7 @@ const AdvancedSearch = ({ userDetail }) => {
     setSearchFilterSelected();
     setRequestState(intitialRequestState);
     setRequestTypes(initialRequestTypes);
+    setRequestFlags(initialRequestFlags);
     setRequestStatus(intitialRequestStatus);
     setFromDate("");
     setToDate("");
@@ -332,6 +352,13 @@ const AdvancedSearch = ({ userDetail }) => {
   const handleRequestTypeChange = (event) => {
     setRequestTypes({
       ...requestTypes,
+      [event.target.name]: event.target.checked,
+    });
+  };
+
+  const handleRequestFlagsChange = (event) => {
+    setRequestFlags({
+      ...requestFlags,
       [event.target.name]: event.target.checked,
     });
   };
@@ -504,73 +531,84 @@ const AdvancedSearch = ({ userDetail }) => {
                   Filter by
                 </Typography>
               </Grid>
+              <Grid container xs={12}>
+                <Grid item xs>
+                  <ClickableChip
+                    key={`filter-request-description`}
+                    label={"REQUEST DESCRIPTION"}
+                    color="primary"
+                    onClick={() =>
+                      clickSearchFilter(SearchFilter.REQUEST_DESCRIPTION)
+                    }
+                    clicked={
+                      searchFilterSelected === SearchFilter.REQUEST_DESCRIPTION
+                    }
+                  />
+                </Grid>
 
-              <Grid item xs={2}>
-                <ClickableChip
-                  key={`filter-request-description`}
-                  label={"REQUEST DESCRIPTION"}
-                  color="primary"
-                  onClick={() =>
-                    clickSearchFilter(SearchFilter.REQUEST_DESCRIPTION)
-                  }
-                  clicked={
-                    searchFilterSelected === SearchFilter.REQUEST_DESCRIPTION
-                  }
-                />
-              </Grid>
+                <Grid item xs>
+                  <ClickableChip
+                    key={`filter-raw-request`}
+                    label={"ID NUMBER"}
+                    color="primary"
+                    onClick={() => clickSearchFilter(SearchFilter.ID_NUM)}
+                    clicked={searchFilterSelected === SearchFilter.ID_NUM}
+                  />
+                </Grid>
 
-              <Grid item xs={2}>
-                <ClickableChip
-                  key={`filter-raw-request`}
-                  label={"ID NUMBER"}
-                  color="primary"
-                  onClick={() => clickSearchFilter(SearchFilter.ID_NUM)}
-                  clicked={searchFilterSelected === SearchFilter.ID_NUM}
-                />
-              </Grid>
+                <Grid item xs>
+                  <ClickableChip
+                    key={`filter-axis-request`}
+                    label={"AXIS REQUEST #"}
+                    color="primary"
+                    onClick={() =>
+                      clickSearchFilter(SearchFilter.AXIS_REQUEST_NUM)
+                    }
+                    clicked={
+                      searchFilterSelected === SearchFilter.AXIS_REQUEST_NUM
+                    }
+                  />
+                </Grid>
 
-              <Grid item xs={2}>
-                <ClickableChip
-                  key={`filter-axis-request`}
-                  label={"AXIS REQUEST #"}
-                  color="primary"
-                  onClick={() =>
-                    clickSearchFilter(SearchFilter.AXIS_REQUEST_NUM)
-                  }
-                  clicked={
-                    searchFilterSelected === SearchFilter.AXIS_REQUEST_NUM
-                  }
-                />
-              </Grid>
+                <Grid item xs>
+                  <ClickableChip
+                    key={`filter-applicant-name`}
+                    label={"APPLICANT NAME"}
+                    color="primary"
+                    onClick={() => clickSearchFilter(SearchFilter.APPLICANT_NAME)}
+                    clicked={searchFilterSelected === SearchFilter.APPLICANT_NAME}
+                  />
+                </Grid>
 
-              <Grid item xs={2}>
-                <ClickableChip
-                  key={`filter-applicant-name`}
-                  label={"APPLICANT NAME"}
-                  color="primary"
-                  onClick={() => clickSearchFilter(SearchFilter.APPLICANT_NAME)}
-                  clicked={searchFilterSelected === SearchFilter.APPLICANT_NAME}
-                />
-              </Grid>
+                <Grid item xs>
+                  <ClickableChip
+                    key={`filter-assignee-name`}
+                    label={"ASSIGNEE NAME"}
+                    color="primary"
+                    onClick={() => clickSearchFilter(SearchFilter.ASSIGNEE_NAME)}
+                    clicked={searchFilterSelected === SearchFilter.ASSIGNEE_NAME}
+                  />
+                </Grid>
 
-              <Grid item xs={2}>
-                <ClickableChip
-                  key={`filter-assignee-name`}
-                  label={"ASSIGNEE NAME"}
-                  color="primary"
-                  onClick={() => clickSearchFilter(SearchFilter.ASSIGNEE_NAME)}
-                  clicked={searchFilterSelected === SearchFilter.ASSIGNEE_NAME}
-                />
-              </Grid>
-
-              <Grid item xs={2}>
-                <ClickableChip
-                  key={`filter-search-filter`}
-                  label={"SUBJECT CODE"}
-                  color="primary"
-                  onClick={() => clickSearchFilter(SearchFilter.SUBJECT_CODE)}
-                  clicked={searchFilterSelected === SearchFilter.SUBJECT_CODE}
-                />
+                <Grid item xs>
+                  <ClickableChip
+                    key={`filter-search-filter`}
+                    label={"SUBJECT CODE"}
+                    color="primary"
+                    onClick={() => clickSearchFilter(SearchFilter.SUBJECT_CODE)}
+                    clicked={searchFilterSelected === SearchFilter.SUBJECT_CODE}
+                  />
+                </Grid>
+                
+                <Grid item xs>
+                  <ClickableChip
+                    key={`filter-oipc-number`}
+                    label={"OIPC NUMBER"}
+                    color="primary"
+                    onClick={() => clickSearchFilter(SearchFilter.OIPC_NUMBER)}
+                    clicked={searchFilterSelected === SearchFilter.OIPC_NUMBER}
+                  />
+                </Grid>
               </Grid>
 
               <Grid item xs={2} container direction="row" rowSpacing={2}>
@@ -592,9 +630,9 @@ const AdvancedSearch = ({ userDetail }) => {
                         <Checkbox
                           size="small"
                           name="callforrecords"
-                          stateid={StateEnum.callforrecords.id}
+                          stateid={StateEnum.callforrecords.label}
                           onChange={handleRequestStateChange}
-                          checked={requestState[StateEnum.callforrecords.id]}
+                          checked={requestState[StateEnum.callforrecords.label]}
                           color="success"
                         />
                       }
@@ -606,9 +644,9 @@ const AdvancedSearch = ({ userDetail }) => {
                         <Checkbox
                           size="small"
                           name="review"
-                          stateid={StateEnum.review.id}
+                          stateid={StateEnum.review.label}
                           onChange={handleRequestStateChange}
-                          checked={requestState[StateEnum.review.id]}
+                          checked={requestState[StateEnum.review.label]}
                           color="success"
                         />
                       }
@@ -620,9 +658,9 @@ const AdvancedSearch = ({ userDetail }) => {
                         <Checkbox
                           size="small"
                           name="signoff"
-                          stateid={StateEnum.signoff.id}
+                          stateid={StateEnum.signoff.label}
                           onChange={handleRequestStateChange}
-                          checked={requestState[StateEnum.signoff.id]}
+                          checked={requestState[StateEnum.signoff.label]}
                           color="success"
                         />
                       }
@@ -634,9 +672,9 @@ const AdvancedSearch = ({ userDetail }) => {
                         <Checkbox
                           size="small"
                           name="closed"
-                          stateid={StateEnum.closed.id}
+                          stateid={StateEnum.closed.label}
                           onChange={handleRequestStateChange}
-                          checked={requestState[StateEnum.closed.id]}
+                          checked={requestState[StateEnum.closed.label]}
                           color="success"
                         />
                       }
@@ -730,6 +768,61 @@ const AdvancedSearch = ({ userDetail }) => {
                         />
                       }
                       label={<div style={{display: "flex"}}>General {requestTypes.generaldisabled ? <p style={{color: "#ff0000",fontSize: "0.8rem",lineHeight: "1.6"}}> * </p>: ""}</div>}                      
+                    />
+                  </FormGroup>
+                </Grid>
+                
+                <Grid item xs={12}>
+                  <Typography
+                    sx={{
+                      fontWeight: "bold",
+                    }}
+                    variant="h6"
+                  >
+                    Request Flags
+                  </Typography>
+                </Grid>
+
+                <Grid item xs={12}>
+                  <FormGroup>
+                    <FormControlLabel
+                      className={classes.checkboxLabel}
+                      control={
+                        <Checkbox
+                          size="small"
+                          name="restricted"
+                          onChange={handleRequestFlagsChange}
+                          checked={requestFlags.restricted}
+                          color="success"
+                        />
+                      }
+                      label="Restricted"
+                    />
+                    <FormControlLabel
+                      className={classes.checkboxLabel}
+                      control={
+                        <Checkbox
+                          size="small"
+                          name="oipc"
+                          onChange={handleRequestFlagsChange}
+                          checked={requestFlags.oipc}
+                          color="success"
+                        />
+                      }
+                      label="OIPC"
+                    />
+                    <FormControlLabel
+                      className={classes.checkboxLabel}
+                      control={
+                        <Checkbox
+                          size="small"
+                          name="phased"
+                          onChange={handleRequestFlagsChange}
+                          checked={requestFlags.phased}
+                          color="success"
+                        />
+                      }
+                      label="Phased"
                     />
                   </FormGroup>
                 </Grid>

@@ -8,6 +8,8 @@
         <UseWinAuth>false</UseWinAuth>
         <WinAuthUserName />
         <WinAuthDomain />
+        <ServerName>Tikal.DMZ</ServerName>
+        <PathOnServer>/SSISDB/CFDMigration/FOIMOD.CFD.ETL.DataMigration</PathOnServer>
         <Run64BitRuntime>false</Run64BitRuntime>
         <UserIDs />
         <UserPasswords />

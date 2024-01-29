@@ -27,6 +27,8 @@ from dateutil import parser
 from request_api.utils.enums import StateName
 from .FOIMinistryRequestSubjectCodes import FOIMinistryRequestSubjectCode
 from .SubjectCodes import SubjectCode
+from request_api.utils.enums import StateName
+from .FOIRequestOIPC import FOIRequestOIPC
 
 class FOIMinistryRequest(db.Model):
     # Name of the table in our database
@@ -68,7 +70,7 @@ class FOIMinistryRequest(db.Model):
     linkedrequests = db.Column(JSON, unique=False, nullable=True)
     identityverified = db.Column(JSON, unique=False, nullable=True)
     ministrysignoffapproval = db.Column(JSON, unique=False, nullable=True)
-    
+    requeststatuslabel = db.Column(db.String(50), nullable=False)
 
     #ForeignKey References
     
@@ -92,12 +94,18 @@ class FOIMinistryRequest(db.Model):
                         "FOIMinistryRequest.version==FOIMinistryRequestDocument.foiministryrequestversion_id)")    
     extensions = relationship('FOIRequestExtension', primaryjoin="and_(FOIMinistryRequest.foiministryrequestid==FOIRequestExtension.foiministryrequest_id, "
                          "FOIMinistryRequest.version==FOIRequestExtension.foiministryrequestversion_id)")    
+    
+    oipcreviews = relationship('FOIRequestOIPC', primaryjoin="and_(FOIMinistryRequest.foiministryrequestid==FOIRequestOIPC.foiministryrequest_id, "
+                         "FOIMinistryRequest.version==FOIRequestOIPC.foiministryrequestversion_id)")    
+    
     assignee = relationship('FOIAssignee', foreign_keys="[FOIMinistryRequest.assignedto]")
     ministryassignee = relationship('FOIAssignee', foreign_keys="[FOIMinistryRequest.assignedministryperson]")
 
     subjectcode = relationship('FOIMinistryRequestSubjectCode', primaryjoin="and_(FOIMinistryRequest.foiministryrequestid==FOIMinistryRequestSubjectCode.foiministryrequestid, "
                         "FOIMinistryRequest.version==FOIMinistryRequestSubjectCode.foiministryrequestversion)") 
     isofflinepayment = db.Column(db.Boolean, unique=False, nullable=True,default=False)
+
+    isoipcreview = db.Column(db.Boolean, unique=False, nullable=True,default=False)
 
     @classmethod
     def getrequest(cls,ministryrequestid):
@@ -106,13 +114,13 @@ class FOIMinistryRequest(db.Model):
         return request_schema.dump(query)
 
     @classmethod
-    def getLastStatusUpdateDate(cls,foiministryrequestid,requeststatusid):
+    def getLastStatusUpdateDate(cls,foiministryrequestid,requeststatuslabel):
         statusdate = None
         try:
             sql = """select created_at from "FOIMinistryRequests" 
-                    where foiministryrequestid = :foiministryrequestid and requeststatusid = :requeststatusid
+                    where foiministryrequestid = :foiministryrequestid and requeststatuslabel = :requeststatuslabel
                     order by version desc limit 1;"""
-            rs = db.session.execute(text(sql), {'foiministryrequestid': foiministryrequestid, 'requeststatusid': requeststatusid})
+            rs = db.session.execute(text(sql), {'foiministryrequestid': foiministryrequestid, 'requeststatuslabel': requeststatuslabel})
             statusdate = [row[0] for row in rs][0]
         except Exception as ex:
             logging.error(ex)
@@ -163,11 +171,11 @@ class FOIMinistryRequest(db.Model):
         if group is None:
             _ministryrequestids = _session.query(distinct(FOIMinistryRequest.foiministryrequestid)).filter(FOIMinistryRequest.isactive == True).all()        
         elif (group == IAOTeamWithKeycloackGroup.flex.value):
-            _ministryrequestids = _session.query(distinct(FOIMinistryRequest.foiministryrequestid)).filter(and_(FOIMinistryRequest.isactive == True), and_(and_(FOIMinistryRequest.assignedgroup == group),and_(FOIMinistryRequest.requeststatusid.in_([1,2,3,12,13,7,8,9,10,11,14,16,17,18])))).all()
+            _ministryrequestids = _session.query(distinct(FOIMinistryRequest.foiministryrequestid)).filter(and_(FOIMinistryRequest.isactive == True), and_(and_(FOIMinistryRequest.assignedgroup == group),and_(FOIMinistryRequest.requeststatuslabel.in_([StateName.open.name,StateName.callforrecords.name,StateName.closed.name,StateName.recordsreview.name,StateName.feeestimate.name,StateName.consult.name,StateName.ministrysignoff.value,StateName.onhold.name,StateName.deduplication.name,StateName.harmsassessment.name,StateName.response.name,StateName.peerreview.name,StateName.tagging.name,StateName.readytoscan.name])))).all()
         elif (group in ProcessingTeamWithKeycloackGroup.list()):
-            _ministryrequestids = _session.query(distinct(FOIMinistryRequest.foiministryrequestid)).filter(and_(FOIMinistryRequest.isactive == True), and_(and_(FOIMinistryRequest.assignedgroup == group),and_(FOIMinistryRequest.requeststatusid.in_([1,2,3,7,8,9,10,11,14,16,17,18])))).all()           
+            _ministryrequestids = _session.query(distinct(FOIMinistryRequest.foiministryrequestid)).filter(and_(FOIMinistryRequest.isactive == True), and_(and_(FOIMinistryRequest.assignedgroup == group),and_(FOIMinistryRequest.requeststatuslabel.in_([StateName.open.name,StateName.callforrecords.name,StateName.closed.name,StateName.recordsreview.name,StateName.feeestimate.name,StateName.consult.name,StateName.ministrysignoff.value,StateName.onhold.name,StateName.response.name,StateName.peerreview.name,StateName.tagging.name,StateName.readytoscan.name])))).all()           
         else:
-            _ministryrequestids = _session.query(distinct(FOIMinistryRequest.foiministryrequestid)).filter(and_(FOIMinistryRequest.isactive == True), or_(and_(FOIMinistryRequest.assignedgroup == group),and_(FOIMinistryRequest.assignedministrygroup == group,or_(FOIMinistryRequest.requeststatusid.in_([2,7,9,8,10,11,12,13,14,16,17,18]))))).all()
+            _ministryrequestids = _session.query(distinct(FOIMinistryRequest.foiministryrequestid)).filter(and_(FOIMinistryRequest.isactive == True), or_(and_(FOIMinistryRequest.assignedgroup == group),and_(FOIMinistryRequest.assignedministrygroup == group,or_(FOIMinistryRequest.requeststatuslabel.in_([StateName.callforrecords.name,StateName.recordsreview.name,StateName.feeestimate.name,StateName.consult.name,StateName.ministrysignoff.name,StateName.onhold.name,StateName.deduplication.name,StateName.harmsassessment.name,StateName.response.name,StateName.peerreview.name,StateName.tagging.name,StateName.readytoscan.name]))))).all()
 
         _requests = []
         ministryrequest_schema = FOIMinistryRequestSchema()
@@ -279,10 +287,11 @@ class FOIMinistryRequest(db.Model):
     def getrequeststatusById(cls,ministryrequestid):
         summary = []
         try:
-            sql = 'select foirequest_id, version, requeststatusid, created_at from "FOIMinistryRequests" fr  where foiministryrequestid = :ministryrequestid and requeststatusid != 3 order by version desc;'
-            rs = db.session.execute(text(sql), {'ministryrequestid': ministryrequestid})        
+            sql = 'select foirequest_id, version, requeststatusid, requeststatuslabel, created_at from "FOIMinistryRequests" fr  where foiministryrequestid = :ministryrequestid and requeststatuslabel != :requeststatuslabel order by version desc;'
+            
+            rs = db.session.execute(text(sql), {'ministryrequestid': ministryrequestid, 'requeststatuslabel': StateName.closed.name})        
             for row in rs:
-                summary.append({"requeststatusid": row["requeststatusid"], "created_at": row["created_at"], "foirequest_id": row["foirequest_id"]})
+                summary.append({"requeststatusid": row["requeststatusid"], "requeststatuslabel": row["requeststatuslabel"], "created_at": row["created_at"], "foirequest_id": row["foirequest_id"]})                
         except Exception as ex:
             logging.error(ex)
             raise ex
@@ -303,13 +312,13 @@ class FOIMinistryRequest(db.Model):
             sql =select status, version from (select distinct name as status, version from "FOIMinistryRequests" fm inner join "FOIRequestStatuses" fs2 on fm.requeststatusid = fs2.requeststatusid  
             where foiministryrequestid=:ministryrequestid order by version asc) as fs3 order by version desc;
             """
-            sql = """select fm2.version, fs2."name" as status from  "FOIMinistryRequests" fm2  inner join "FOIRequestStatuses" fs2 on fm2.requeststatusid = fs2.requeststatusid 
+            sql = """select fm2.version, fs2."name" as status, fm2.created_at from  "FOIMinistryRequests" fm2  inner join "FOIRequestStatuses" fs2 on fm2.requeststatusid = fs2.requeststatusid 
                         where fm2.foiministryrequestid=:ministryrequestid order by version desc"""
             rs = db.session.execute(text(sql), {'ministryrequestid': ministryrequestid})  
             _tmp_state = None       
             for row in rs:
                 if row["status"] != _tmp_state:
-                    transitions.append({"status": row["status"], "version": row["version"]})
+                    transitions.append({"status": row["status"], "version": row["version"], "created_at": row["created_at"].strftime('%Y-%m-%d %H:%M:%S.%f')})
                     _tmp_state = row["status"]
         except Exception as ex:
             logging.error(ex)
@@ -400,6 +409,18 @@ class FOIMinistryRequest(db.Model):
         #subquery for getting extension count
         subquery_extension_count = _session.query(FOIRequestExtension.foiministryrequest_id, func.count(distinct(FOIRequestExtension.foirequestextensionid)).filter(FOIRequestExtension.isactive == True).label('extensions')).group_by(FOIRequestExtension.foiministryrequest_id).subquery()
 
+        #subquery for getting all, distinct oipcs for foiministry request
+        subquery_with_oipc_sql = """
+        SELECT distinct on (foiministryrequest_id) foiministryrequest_id, foiministryrequestversion_id, outcomeid 
+        FROM "FOIRequestOIPC" fo 
+        order by foiministryrequest_id, foiministryrequestversion_id desc
+        """
+        subquery_with_oipc = text(subquery_with_oipc_sql).columns(FOIRequestOIPC.foiministryrequest_id, FOIRequestOIPC.foiministryrequestversion_id, FOIRequestOIPC.outcomeid).alias("oipcnoneoutcomes")
+        joincondition_oipc = [
+            subquery_with_oipc.c.foiministryrequest_id == FOIMinistryRequest.foiministryrequestid,
+            subquery_with_oipc.c.foiministryrequestversion_id == FOIMinistryRequest.version,
+        ]
+
         #aliase for onbehalf of applicant info
         onbehalf_applicantmapping = aliased(FOIRequestApplicantMapping)
         onbehalf_applicant = aliased(FOIRequestApplicant)
@@ -419,6 +440,8 @@ class FOIMinistryRequest(db.Model):
                     filtercondition.append(FOIRestrictedMinistryRequest.isrestricted == True)
                 else:
                     filtercondition.append(ministry_restricted_requests.isrestricted == True)
+            if (keyword.lower() == "oipc"):
+                filtercondition.append(FOIMinistryRequest.isoipcreview == True)
 
         intakesorting = case([
                             (and_(FOIMinistryRequest.assignedto == None, FOIMinistryRequest.assignedgroup == 'Intake Team'), # Unassigned requests first
@@ -459,13 +482,13 @@ class FOIMinistryRequest(db.Model):
                            else_ = FOIMinistryRequest.assignedministrygroup).label('ministryAssignedToFormatted')
         
         duedate = case([
-                            (FOIMinistryRequest.requeststatusid == 11,  # On Hold
+                            (FOIMinistryRequest.requeststatuslabel == StateName.onhold.name,  # On Hold
                              literal(None)),
                            ],
                            else_ = cast(FOIMinistryRequest.duedate, String)).label('duedate')
         
         cfrduedate = case([
-                            (FOIMinistryRequest.requeststatusid == 11,  # On Hold
+                            (FOIMinistryRequest.requeststatuslabel == StateName.onhold.name,  # On Hold
                              literal(None)),
                            ],
                            else_ = cast(FOIMinistryRequest.cfrduedate, String)).label('cfrduedate')
@@ -535,7 +558,9 @@ class FOIMinistryRequest(db.Model):
             extensions,
             FOIRestrictedMinistryRequest.isrestricted.label('isiaorestricted'),
             ministry_restricted_requests.isrestricted.label('isministryrestricted'),
-            SubjectCode.name.label('subjectcode')
+            SubjectCode.name.label('subjectcode'),
+            FOIMinistryRequest.isoipcreview.label('isoipcreview'),
+            literal(None).label('oipc_number'),
         ]
 
         basequery = _session.query(
@@ -606,8 +631,14 @@ class FOIMinistryRequest(db.Model):
                                 SubjectCode,
                                 SubjectCode.subjectcodeid == FOIMinistryRequestSubjectCode.subjectcodeid,
                                 isouter=True
-                            ).filter(FOIMinistryRequest.requeststatusid != 3)
-
+                            ).join(
+                                subquery_with_oipc,
+                                and_(
+                                    *joincondition_oipc
+                                    ),
+                                isouter=True
+                            ).filter(or_(FOIMinistryRequest.requeststatuslabel != StateName.closed.name, and_(FOIMinistryRequest.isoipcreview == True, FOIMinistryRequest.requeststatusid == 3, subquery_with_oipc.c.outcomeid == None)))
+                                   
         if(additionalfilter == 'watchingRequests'):
             #watchby
             activefilter = and_(FOIMinistryRequest.isactive == True, FOIRequestStatus.isactive == True)
@@ -712,7 +743,8 @@ class FOIMinistryRequest(db.Model):
             'ministry': func.upper(ProgramArea.bcgovcode),
             'requestPageCount': FOIMinistryRequest.requestpagecount,
             'closedate': FOIMinistryRequest.closedate,
-            'subjectcode': SubjectCode.name
+            'subjectcode': SubjectCode.name,
+            'isoipcreview': FOIMinistryRequest.isoipcreview
         }.get(x, FOIMinistryRequest.axisrequestid)
 
     @classmethod
@@ -735,7 +767,7 @@ class FOIMinistryRequest(db.Model):
                             FOIMinistryRequest.assignedgroup == group,
                             and_(
                                 FOIMinistryRequest.assignedgroup == IAOTeamWithKeycloackGroup.flex.value,
-                                FOIMinistryRequest.requeststatusid.in_([1])
+                                FOIMinistryRequest.requeststatuslabel.in_([StateName.open.name])
                             )
                         )
                     )
@@ -745,7 +777,7 @@ class FOIMinistryRequest(db.Model):
                             FOIMinistryRequest.assignedgroup == group,
                             and_(
                                 FOIMinistryRequest.assignedministrygroup == group,
-                                FOIMinistryRequest.requeststatusid.in_([2,7,9,8,10,11,12,13,14,16,17,18])
+                                FOIMinistryRequest.requeststatuslabel.in_([StateName.callforrecords.name,StateName.recordsreview.name,StateName.feeestimate.name,StateName.consult.name,StateName.ministrysignoff.name,StateName.onhold.name,StateName.deduplication.name,StateName.harmsassessment.name,StateName.response.name,StateName.peerreview.name,StateName.tagging.name,StateName.readytoscan.name])
                             )
                         )
                     )
@@ -756,11 +788,13 @@ class FOIMinistryRequest(db.Model):
                                 or_(*groupfilter)
                             )
         
-        return ministryfilter
+        ministryfilterwithclosedoipc = or_(ministryfilter, and_(FOIMinistryRequest.isoipcreview == True, FOIMinistryRequest.requeststatuslabel == StateName.closed.name))
+
+        return ministryfilterwithclosedoipc
 
     @classmethod
     def getrequestoriginalduedate(cls,ministryrequestid):       
-        return db.session.query(FOIMinistryRequest.duedate).filter(FOIMinistryRequest.foiministryrequestid == ministryrequestid, FOIMinistryRequest.requeststatusid == 1).order_by(FOIMinistryRequest.version).first()[0]
+        return db.session.query(FOIMinistryRequest.duedate).filter(FOIMinistryRequest.foiministryrequestid == ministryrequestid, FOIMinistryRequest.requeststatuslabel == StateName.open.name).order_by(FOIMinistryRequest.version).first()[0]
 
     @classmethod
     def getduedate(cls,ministryrequestid):
@@ -772,10 +806,10 @@ class FOIMinistryRequest(db.Model):
         upcomingduerecords = []
         try:
             sql = """select distinct on (filenumber) filenumber, to_char(cfrduedate, 'YYYY-MM-DD') as cfrduedate, foiministryrequestid, version, foirequest_id, created_at, createdby from "FOIMinistryRequests" fpa 
-                    where isactive = true and cfrduedate is not null and requeststatusid = 2  
+                    where isactive = true and cfrduedate is not null and requeststatuslabel = :requeststatuslabel  
                     and cfrduedate between  NOW() - INTERVAL '7 DAY' AND NOW() + INTERVAL '7 DAY'
                     order by filenumber , version desc;""" 
-            rs = db.session.execute(text(sql))            
+            rs = db.session.execute(text(sql), {'requeststatuslabel': StateName.callforrecords.name})           
             for row in rs:
                 upcomingduerecords.append({"filenumber": row["filenumber"], "cfrduedate": row["cfrduedate"],"foiministryrequestid": row["foiministryrequestid"], "version": row["version"], "foirequest_id": row["foirequest_id"], "created_at": row["created_at"], "createdby": row["createdby"]})
         except Exception as ex:
@@ -790,10 +824,11 @@ class FOIMinistryRequest(db.Model):
         upcomingduerecords = []
         try:
             sql = """select distinct on (filenumber) filenumber, to_char(duedate, 'YYYY-MM-DD') as duedate, foiministryrequestid, version, foirequest_id, created_at, createdby from "FOIMinistryRequests" fpa 
-                    where isactive = true and duedate is not null and requeststatusid not in (5,6,4,11,3,15)     
+                    where isactive = true and duedate is not null and requeststatuslabel not in :requeststatuslabel
                     and duedate between  NOW() - INTERVAL '7 DAY' AND NOW() + INTERVAL '7 DAY'
                     order by filenumber , version desc;""" 
-            rs = db.session.execute(text(sql))        
+            requeststatuslabel =  tuple([StateName.closed.name,StateName.redirect.name,StateName.unopened.name,StateName.intakeinprogress.name,StateName.onhold.name,StateName.archived.name])
+            rs = db.session.execute(text(sql), {'requeststatuslabel': requeststatuslabel})
             for row in rs:
                 upcomingduerecords.append({"filenumber": row["filenumber"], "duedate": row["duedate"],"foiministryrequestid": row["foiministryrequestid"], "version": row["version"], "foirequest_id": row["foirequest_id"], "created_at": row["created_at"], "createdby": row["createdby"]})
         except Exception as ex:
@@ -811,14 +846,16 @@ class FOIMinistryRequest(db.Model):
                         frd.divisionid, frd.stageid, pad2."name" divisionname, pads."name" stagename, 
                         to_char(divisionduedate, 'YYYY-MM-DD') as duedate, frd.created_at, frd.createdby 
                         from "FOIMinistryRequestDivisions" frd 
-                        inner join (select distinct on (fpa.foiministryrequestid) foiministryrequestid, version as foiministryrequestversion, axisrequestid, filenumber, foirequest_id, requeststatusid 
+                        inner join (select distinct on (fpa.foiministryrequestid) foiministryrequestid, version as foiministryrequestversion, axisrequestid, filenumber, foirequest_id, requeststatusid, requeststatuslabel 
                                     from "FOIMinistryRequests" fpa  
-                                    order by fpa.foiministryrequestid , fpa.version desc) fma on frd.foiministryrequest_id = fma.foiministryrequestid and frd.foiministryrequestversion_id = fma.foiministryrequestversion and fma.requeststatusid not in (5,6,4,11,3,15) 
+                                    order by fpa.foiministryrequestid , fpa.version desc) fma on frd.foiministryrequest_id = fma.foiministryrequestid and frd.foiministryrequestversion_id = fma.foiministryrequestversion and fma.requeststatuslabel not in :requeststatuslabel
                         inner join "ProgramAreaDivisions" pad2 on frd.divisionid  = pad2.divisionid 
                         inner join "ProgramAreaDivisionStages" pads on frd.stageid  = pads.stageid and frd.stageid in (5, 7, 9) 
                         and frd.divisionduedate  between  NOW() - INTERVAL '7 DAY' AND NOW() + INTERVAL '7 DAY' 
                         order by frd.foiministryrequest_id , frd.foiministryrequestversion_id desc;""" 
-            rs = db.session.execute(text(sql))        
+            requeststatuslabel = tuple([StateName.closed.name,StateName.redirect.name,StateName.unopened.name,StateName.intakeinprogress.name,StateName.onhold.name,StateName.archived.name])
+            rs = db.session.execute(text(sql), {'requeststatuslabel': requeststatuslabel})
+                  
             for row in rs:
                 upcomingduerecords.append({"axisrequestid": row["axisrequestid"], "filenumber": row["filenumber"], 
                                             "foiministryrequestid": row["foiministryrequestid"], "version": row["foiministryrequestversion"], 
@@ -832,6 +869,36 @@ class FOIMinistryRequest(db.Model):
         finally:
             db.session.close()
         return upcomingduerecords    
+    
+    @classmethod
+    def getupcomingoipcduerecords(cls):
+        upcomingduerecords = []
+        try:
+            sql = """select axisrequestid, filenumber, fma.foiministryrequestid , fma.foiministryrequestversion, fma.foirequest_id, 
+                        frd.oipcid , frd.inquiryattributes ->> 'orderno'as  orderno, 
+                        frd.inquiryattributes ->> 'inquirydate' as duedate, frd.created_at, frd.createdby 
+                        from "FOIRequestOIPC" frd 
+                        inner join (select distinct on (fpa.foiministryrequestid) foiministryrequestid, version as foiministryrequestversion, axisrequestid, filenumber, foirequest_id, requeststatusid 
+                                    from "FOIMinistryRequests" fpa  
+                                    order by fpa.foiministryrequestid , fpa.version desc) fma on frd.foiministryrequest_id  = fma.foiministryrequestid 
+                                    and frd.foiministryrequestversion_id = fma.foiministryrequestversion and fma.requeststatusid not in (5,6,4,11,3,15) 
+                        and inquiryattributes is not null 
+                        and frd.inquiryattributes ->> 'inquirydate' not in ('','null') 
+                        and (frd.inquiryattributes ->> 'inquirydate')::date  between  NOW() - INTERVAL '7 DAY' AND NOW() + INTERVAL '7 DAY' 
+                        and frd.outcomeid  is null
+                        order by frd.foiministryrequest_id , frd.foiministryrequestversion_id desc;""" 
+            rs = db.session.execute(text(sql))        
+            for row in rs:
+                upcomingduerecords.append({"axisrequestid": row["axisrequestid"], "filenumber": row["filenumber"], 
+                                            "foiministryrequestid": row["foiministryrequestid"], "version": row["foiministryrequestversion"], 
+                                            "foirequest_id": row["foirequest_id"], "created_at": row["created_at"], "createdby": row["createdby"],
+                                            "orderno": row["orderno"],"duedate": row["duedate"]})
+        except Exception as ex:
+            logging.error(ex)
+            raise ex
+        finally:
+            db.session.close()
+        return upcomingduerecords 
 
     @classmethod
     def updateduedate(cls, ministryrequestid, duedate, userid)->DefaultMethodResult:
@@ -902,9 +969,9 @@ class FOIMinistryRequest(db.Model):
         try:
             sql = """ select distinct on (foiministryrequestid) foiministryrequestid, version, axisrequestid  
                         from "FOIMinistryRequests" fr 
-                        where requeststatusid = 3
+                        where requeststatuslabel = :requeststatuslabel
                         order by  foiministryrequestid , version desc, axisrequestid"""
-            rs = db.session.execute(text(sql))        
+            rs = db.session.execute(text(sql), {'requeststatuslabel': StateName.closed.name})
             for row in rs:
                 axisids.append(row["axisrequestid"])
         except Exception as ex:
@@ -979,13 +1046,13 @@ class FOIMinistryRequest(db.Model):
                            else_ = FOIMinistryRequest.assignedministrygroup).label('ministryAssignedToFormatted')
         
         duedate = case([
-                            (FOIMinistryRequest.requeststatusid == 11,  # On Hold
+                            (FOIMinistryRequest.requeststatuslabel == StateName.onhold.name,  # On Hold
                              literal(None)),
                            ],
                            else_ = cast(FOIMinistryRequest.duedate, String)).label('duedate')
         
         cfrduedate = case([
-                            (FOIMinistryRequest.requeststatusid == 11,  # On Hold
+                            (FOIMinistryRequest.requeststatuslabel == StateName.onhold.name,  # On Hold
                              literal(None)),
                            ],
                            else_ = cast(FOIMinistryRequest.cfrduedate, String)).label('cfrduedate')
@@ -1054,7 +1121,9 @@ class FOIMinistryRequest(db.Model):
             extensions,
             FOIRestrictedMinistryRequest.isrestricted.label('isiaorestricted'),
             ministry_restricted_requests.isrestricted.label('isministryrestricted'),
-            SubjectCode.name.label('subjectcode')
+            SubjectCode.name.label('subjectcode'),
+            FOIMinistryRequest.isoipcreview.label('isoipcreview'),
+            literal(None).label('oipc_number')
         ]
 
         basequery = _session.query(
@@ -1126,6 +1195,7 @@ class FOIMinistryRequest(db.Model):
                                 SubjectCode.subjectcodeid == FOIMinistryRequestSubjectCode.subjectcodeid,
                                 isouter=True
                             )
+                            
 
         if(isiaorestrictedfilemanager == True or isministryrestrictedfilemanager == True):
             dbquery = basequery.filter(ministryfilter)
@@ -1169,7 +1239,7 @@ class FOIMinistryRequest(db.Model):
             groupfilter.append(FOIMinistryRequest.assignedministrygroup == group)
         
         #ministry advanced search show cfr onwards
-        statefilter = FOIMinistryRequest.requeststatusid.in_([2,3,7,9,8,10,11,12,13,14,16,17,18])
+        statefilter = FOIMinistryRequest.requeststatuslabel.in_([StateName.callforrecords.name,StateName.closed.name,StateName.recordsreview.name,StateName.feeestimate.name,StateName.consult.name,StateName.ministrysignoff.name,StateName.onhold.name,StateName.deduplication.name,StateName.harmsassessment.name,StateName.response.name,StateName.peerreview.name,StateName.tagging.name,StateName.readytoscan.name])
 
         ministry_queue = FOIMinistryRequest.advancedsearchsubquery(params, iaoassignee, ministryassignee, userid, 'Ministry', False, isministryrestrictedfilemanager).filter(and_(or_(*groupfilter), statefilter))
 
@@ -1206,16 +1276,21 @@ class FOIMinistryRequest(db.Model):
 
             # return all except closed
             if(includeclosed == False):
-                filtercondition.append(FOIMinistryRequest.requeststatusid != 3)
+                filtercondition.append(FOIMinistryRequest.requeststatuslabel != StateName.closed.name)
         elif(len(params['requeststatus']) > 1 and includeclosed == False):
             # return all except closed
-            filtercondition.append(FOIMinistryRequest.requeststatusid != 3)
+            filtercondition.append(FOIMinistryRequest.requeststatuslabel != StateName.closed.name)
 
         #request type: personal, general
         if(len(params['requesttype']) > 0):
             requesttypecondition = FOIMinistryRequest.getfilterforrequesttype(params, iaoassignee, ministryassignee)
             filtercondition.append(requesttypecondition)
         
+        #request flags: restricted, oipc, phased
+        if(len(params['requestflags']) > 0):
+            requestflagscondition = FOIMinistryRequest.getfilterforrequestflags(params, iaoassignee, ministryassignee)
+            filtercondition.append(requestflagscondition)
+
         #public body: EDUC, etc.
         if(len(params['publicbody']) > 0):
             publicbodycondition = FOIMinistryRequest.getfilterforpublicbody(params, iaoassignee, ministryassignee)
@@ -1238,9 +1313,9 @@ class FOIMinistryRequest(db.Model):
     def getfilterforrequeststate(cls, params, includeclosed):
         #request state: unopened, call for records, etc.
         requeststatecondition = []
-        for stateid in params['requeststate']:
-            requeststatecondition.append(FOIMinistryRequest.requeststatusid == stateid)
-            if(stateid == 3):
+        for statelabel in params['requeststate']:
+            requeststatecondition.append(FOIMinistryRequest.requeststatuslabel == statelabel)
+            if(statelabel == StateName.closed.name):
                 includeclosed = True
         return {'condition': or_(*requeststatecondition), 'includeclosed': includeclosed}
 
@@ -1249,8 +1324,8 @@ class FOIMinistryRequest(db.Model):
         #request status: overdue || on time
         if(params['requeststatus'][0] == 'overdue'):
             #exclude "on hold" for overdue
-            stateid = 11
-            return and_(FOIMinistryRequest.findfield('duedate', iaoassignee, ministryassignee) < datetime.now().date(), FOIMinistryRequest.requeststatusid != stateid)
+            statelabel = StateName.onhold.name
+            return and_(FOIMinistryRequest.findfield('duedate', iaoassignee, ministryassignee) < datetime.now().date(), FOIMinistryRequest.requeststatuslabel != statelabel)
         else:
             return FOIMinistryRequest.findfield('duedate', iaoassignee, ministryassignee) >= datetime.now().date()
 
@@ -1261,6 +1336,26 @@ class FOIMinistryRequest(db.Model):
         for type in params['requesttype']:
             requesttypecondition.append(FOIMinistryRequest.findfield('requestType', iaoassignee, ministryassignee) == type)
         return or_(*requesttypecondition)
+
+    @classmethod
+    def getfilterforrequestflags(cls, params, iaoassignee, ministryassignee):
+        #request flags: restricted, oipc, phased
+        requestflagscondition = []
+        #alias for getting ministry restricted flag from FOIRestrictedMinistryRequest
+        ministry_restricted_requests = aliased(FOIRestrictedMinistryRequest)
+
+        for flag in params['requestflags']:
+            if (flag.lower() == 'restricted'):
+                if(iaoassignee):
+                    requestflagscondition.append(FOIRestrictedMinistryRequest.isrestricted == True)
+                elif (ministryassignee):
+                    requestflagscondition.append(ministry_restricted_requests.isrestricted == True)
+            if (flag.lower() == 'oipc'):
+                requestflagscondition.append(FOIMinistryRequest.findfield('isoipcreview', iaoassignee, ministryassignee) == True)
+            if (flag.lower() == 'phased'):
+                # requestflagscondition.append(FOIMinistryRequest.findfield('isphasedrelease', iaoassignee, ministryassignee) == True)
+                continue
+        return or_(*requestflagscondition)
 
     @classmethod
     def getfilterforpublicbody(cls, params, iaoassignee, ministryassignee):
@@ -1297,6 +1392,14 @@ class FOIMinistryRequest(db.Model):
                     searchcondition1.append(FOIMinistryRequest.findfield('assignedministrypersonFirstName', iaoassignee, ministryassignee).ilike('%'+keyword+'%'))
                     searchcondition2.append(FOIMinistryRequest.findfield('assignedministrypersonLastName', iaoassignee, ministryassignee).ilike('%'+keyword+'%'))
                 return or_(and_(*searchcondition1), and_(*searchcondition2))
+            elif(params['search'] == 'oipc_number'):
+                searchcondition1 = []
+                searchcondition2 = []
+                for keyword in params['keywords']:
+                    oipccondition = FOIRequestOIPC.getrequestidsbyoipcno(keyword)
+                    searchcondition1.append(oipccondition.c.foiministryrequest_id == FOIMinistryRequest.foiministryrequestid)
+                    searchcondition2.append(oipccondition.c.foiministryrequestversion_id == FOIMinistryRequest.version) 
+                return and_(and_(*searchcondition1), and_(*searchcondition2))
             else:
                 searchcondition = []
                 for keyword in params['keywords']:
@@ -1314,7 +1417,7 @@ class FOIMinistryRequest(db.Model):
     def getmetadata(cls,ministryrequestid):
         requestdetails = {}
         try:
-            sql = """select fmr.version, assignedto, fa.firstname, fa.lastname, pa.bcgovcode, fmr.programareaid, f.requesttype  
+            sql = """select fmr.version, assignedto, fa.firstname, fa.lastname, pa.bcgovcode, fmr.programareaid, f.requesttype, fmr.isoipcreview
                 from "FOIMinistryRequests" fmr join "FOIRequests" f on fmr.foirequest_id = f.foirequestid and fmr.foirequestversion_id = f."version" 
                     FULL OUTER JOIN "FOIAssignees" fa ON fa.username = fmr.assignedto
                     INNER JOIN "ProgramAreas" pa ON pa.programareaid = fmr.programareaid
@@ -1329,6 +1432,7 @@ class FOIMinistryRequest(db.Model):
                 requestdetails["version"] = row["version"]
                 requestdetails["programareaid"] = row["programareaid"]
                 requestdetails["requesttype"] = row["requesttype"]
+                requestdetails["isoipcreview"] = row["isoipcreview"]
         except Exception as ex:
             logging.error(ex)
             raise ex
@@ -1355,10 +1459,10 @@ class FOIMinistryRequest(db.Model):
 class FOIMinistryRequestSchema(ma.Schema):
     class Meta:
         fields = ('foiministryrequestid','version','filenumber','description','recordsearchfromdate','recordsearchtodate',
-                'startdate','duedate','assignedgroup','assignedto','programarea.programareaid','requeststatus.requeststatusid',
+                'startdate','duedate','assignedgroup','assignedto','programarea.programareaid',
                 'foirequest.foirequestid','foirequest.requesttype','foirequest.receiveddate','foirequest.deliverymodeid',
-                'foirequest.receivedmodeid','requeststatus.requeststatusid','requeststatus.name','programarea.bcgovcode',
+                'foirequest.receivedmodeid','requeststatus.requeststatusid','requeststatuslabel','requeststatus.name','programarea.bcgovcode',
                 'programarea.name','foirequest_id','foirequestversion_id','created_at','updated_at','createdby','assignedministryperson',
                 'assignedministrygroup','cfrduedate','closedate','closereasonid','closereason.name',
-                'assignee.firstname','assignee.lastname','ministryassignee.firstname','ministryassignee.lastname', 'axisrequestid', 'axissyncdate', 'requestpagecount', 'linkedrequests', 'ministrysignoffapproval', 'identityverified','originalldd')
+                'assignee.firstname','assignee.lastname','ministryassignee.firstname','ministryassignee.lastname', 'axisrequestid', 'axissyncdate', 'requestpagecount', 'linkedrequests', 'ministrysignoffapproval', 'identityverified','originalldd','isoipcreview')
     

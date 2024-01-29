@@ -6,6 +6,8 @@ on:
       - dev
       - dev-marshal
       - test-marshal
+      - dev-rook
+      - test-rook
       - main
     paths:
       - "apps/forms-flow-ai/forms-flow-ai-web/**"
@@ -46,6 +48,18 @@ jobs:
             echo "TOOLS_NAME=${{secrets.OPENSHIFT4_AI_FRONTEND_REPOSITORY}}" >> $GITHUB_ENV
             echo "TAG_NAME="test"" >> $GITHUB_ENV
             echo "BRANCH_NAME="test-marshal"" >> $GITHUB_ENV
+            echo "ENV_NAME="test"" >> $GITHUB_ENV
+          elif [ ${{ github.ref_name }} == 'dev-rook' ]; then
+            echo "For ${{ github.ref_name }} branch"
+            echo "TOOLS_NAME=${{secrets.OPENSHIFT4_AI_FRONTEND_REPOSITORY}}" >> $GITHUB_ENV
+            echo "TAG_NAME="dev"" >> $GITHUB_ENV
+            echo "BRANCH_NAME="dev-rook"" >> $GITHUB_ENV
+            echo "ENV_NAME="dev"" >> $GITHUB_ENV
+          elif [ ${{ github.ref_name }} == 'test-rook' ]; then
+            echo "For ${{ github.ref_name }} branch"
+            echo "TOOLS_NAME=${{secrets.OPENSHIFT4_AI_FRONTEND_REPOSITORY}}" >> $GITHUB_ENV
+            echo "TAG_NAME="test"" >> $GITHUB_ENV
+            echo "BRANCH_NAME="test-rook"" >> $GITHUB_ENV
             echo "ENV_NAME="test"" >> $GITHUB_ENV
           elif [ ${{ github.ref_name }} == 'main' ]; then
             echo "For ${{ github.ref_name }} branch"

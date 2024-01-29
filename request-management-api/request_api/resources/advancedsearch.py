@@ -43,6 +43,7 @@ class DashboardPagination(Resource):
                 'requeststate': flask.request.args.getlist('requestState[]'),
                 'requeststatus': flask.request.args.getlist('requestStatus[]'),
                 'requesttype': flask.request.args.getlist('requestType[]'),
+                'requestflags': flask.request.args.getlist('requestFlags[]'),
                 'publicbody': flask.request.args.getlist('publicBodies[]'),
 
                 'daterangetype': flask.request.args.get('dateRangeType', None, type=str),

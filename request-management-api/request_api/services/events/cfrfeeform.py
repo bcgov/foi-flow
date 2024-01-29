@@ -6,6 +6,7 @@ from request_api.models.FOIMinistryRequests import FOIMinistryRequest
 from request_api.services.commentservice import commentservice
 from request_api.services.cfrfeeservice import cfrfeeservice
 from request_api.services.notificationservice import notificationservice
+from request_api.models.NotificationTypes import NotificationType
 import json
 from request_api.models.default_method_result import DefaultMethodResult
 from enum import Enum
@@ -60,7 +61,8 @@ class cfrfeeformevent:
 
     def __createnotification(self, requestid, state, userid):
         notification = self.__preparenotification(state)
-        return notificationservice().createnotification({"message" : notification}, requestid, "ministryrequest", "CFR Fee Form", userid)
+        notificationtype = NotificationType().getnotificationtypeid("CFR Fee Form")
+        return notificationservice().createnotification({"message" : notification}, requestid, "ministryrequest", notificationtype, userid)
 
     def __preparecomment(self, requestid, state, username, updatedamounts):
         comment = {"comment": self.__commentmessage(state, username, updatedamounts)}
