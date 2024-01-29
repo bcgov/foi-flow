@@ -66,7 +66,7 @@ class FOIMinistryRequest(db.Model):
 
     axissyncdate = db.Column(db.DateTime, nullable=True)    
     axisrequestid = db.Column(db.String(120), nullable=True)
-    requestpagecount = db.Column(db.String(20), nullable=True)
+    axispagecount = db.Column(db.String(20), nullable=True)
     linkedrequests = db.Column(JSON, unique=False, nullable=True)
     identityverified = db.Column(JSON, unique=False, nullable=True)
     ministrysignoffapproval = db.Column(JSON, unique=False, nullable=True)
@@ -440,11 +440,11 @@ class FOIMinistryRequest(db.Model):
                            ],
                            else_ = cast(FOIMinistryRequest.cfrduedate, String)).label('cfrduedate')
 
-        requestpagecount = case([
-            (FOIMinistryRequest.requestpagecount.is_(None),
+        axispagecount = case([
+            (FOIMinistryRequest.axispagecount.is_(None),
             '0'),
             ],
-            else_ = cast(FOIMinistryRequest.requestpagecount, String)).label('requestPageCount')
+            else_ = cast(FOIMinistryRequest.axispagecount, String)).label('axispagecount')
 
         onbehalfformatted = case([
                             (and_(onbehalf_applicant.lastname.isnot(None), onbehalf_applicant.firstname.isnot(None)),
@@ -477,7 +477,7 @@ class FOIMinistryRequest(db.Model):
             FOIMinistryRequest.assignedto.label('assignedTo'),
             cast(FOIMinistryRequest.filenumber, String).label('idNumber'),
             cast(FOIMinistryRequest.axisrequestid, String).label('axisRequestId'),
-            requestpagecount,
+            axispagecount,
             FOIMinistryRequest.foiministryrequestid.label('ministryrequestid'),
             FOIMinistryRequest.assignedministrygroup.label('assignedministrygroup'),
             FOIMinistryRequest.assignedministryperson.label('assignedministryperson'),
@@ -688,7 +688,7 @@ class FOIMinistryRequest(db.Model):
             'DueDateValue': FOIMinistryRequest.duedate,
             'DaysLeftValue': FOIMinistryRequest.duedate,
             'ministry': func.upper(ProgramArea.bcgovcode),
-            'requestPageCount': FOIMinistryRequest.requestpagecount,
+            'axispagecount': FOIMinistryRequest.axispagecount,
             'closedate': FOIMinistryRequest.closedate,
             'subjectcode': SubjectCode.name,
             'isoipcreview': FOIMinistryRequest.isoipcreview
@@ -1004,11 +1004,11 @@ class FOIMinistryRequest(db.Model):
                            ],
                            else_ = cast(FOIMinistryRequest.cfrduedate, String)).label('cfrduedate')
 
-        requestpagecount = case([
-            (FOIMinistryRequest.requestpagecount.is_(None),
+        axispagecount = case([
+            (FOIMinistryRequest.axispagecount.is_(None),
             '0'),
             ],
-            else_ = cast(FOIMinistryRequest.requestpagecount, String)).label('requestPageCount')
+            else_ = cast(FOIMinistryRequest.axispagecount, String)).label('axispagecount')
 
         onbehalfformatted = case([
                             (and_(onbehalf_applicant.lastname.isnot(None), onbehalf_applicant.firstname.isnot(None)),
@@ -1040,7 +1040,7 @@ class FOIMinistryRequest(db.Model):
             FOIMinistryRequest.assignedto.label('assignedTo'),
             cast(FOIMinistryRequest.filenumber, String).label('idNumber'),
             cast(FOIMinistryRequest.axisrequestid, String).label('axisRequestId'),
-            requestpagecount,
+            axispagecount,
             FOIMinistryRequest.foiministryrequestid.label('ministryrequestid'),
             FOIMinistryRequest.assignedministrygroup.label('assignedministrygroup'),
             FOIMinistryRequest.assignedministryperson.label('assignedministryperson'),
@@ -1411,5 +1411,5 @@ class FOIMinistryRequestSchema(ma.Schema):
                 'foirequest.receivedmodeid','requeststatus.requeststatusid','requeststatuslabel','requeststatus.name','programarea.bcgovcode',
                 'programarea.name','foirequest_id','foirequestversion_id','created_at','updated_at','createdby','assignedministryperson',
                 'assignedministrygroup','cfrduedate','closedate','closereasonid','closereason.name',
-                'assignee.firstname','assignee.lastname','ministryassignee.firstname','ministryassignee.lastname', 'axisrequestid', 'axissyncdate', 'requestpagecount', 'linkedrequests', 'ministrysignoffapproval', 'identityverified','originalldd','isoipcreview')
+                'assignee.firstname','assignee.lastname','ministryassignee.firstname','ministryassignee.lastname', 'axisrequestid', 'axissyncdate', 'axispagecount', 'linkedrequests', 'ministrysignoffapproval', 'identityverified','originalldd','isoipcreview')
     

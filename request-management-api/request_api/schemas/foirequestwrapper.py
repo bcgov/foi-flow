@@ -90,7 +90,7 @@ class FOIRequestWrapperSchema(Schema):
     foirawrequestid = fields.Int(data_key="id")
     axisSyncDate = fields.Str(data_key="axisSyncDate",allow_none=True)  
     axisRequestId = fields.Str(data_key="axisRequestId",allow_none=True, validate=[validate.Length(max=120, error=MAX_EXCEPTION_MESSAGE)])
-    requestPageCount = fields.Int(data_key="requestPageCount",allow_none=True)
+    axispagecount = fields.Int(data_key="axispagecount",allow_none=True)
     description = fields.Str(data_key="description", required=True,validate=[validate.Length(min=1, error=BLANK_EXCEPTION_MESSAGE)])
     category = fields.Str(data_key="category", required=True,validate=[validate.Length(min=1, error=BLANK_EXCEPTION_MESSAGE)])
     requestType = fields.Str(data_key="requestType", required=True,validate=[validate.Length(min=1, error=BLANK_EXCEPTION_MESSAGE)]) 

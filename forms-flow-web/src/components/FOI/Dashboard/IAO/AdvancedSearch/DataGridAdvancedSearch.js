@@ -186,7 +186,7 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
         params.row.extensions === undefined ? "N/A" : params.row.extensions,
     },
     {
-      field: "requestPageCount",
+      field: "axispagecount",
       headerName: "PAGES",
       headerAlign: "left",
       renderCell: hyperlinkRenderCell,

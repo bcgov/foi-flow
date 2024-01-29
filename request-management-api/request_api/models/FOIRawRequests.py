@@ -509,11 +509,11 @@ class FOIRawRequest(db.Model):
             ],
             else_ = cast(FOIRawRequest.axisrequestid, String)).label('axisRequestId')
 
-        requestpagecount = case([
-            (FOIRawRequest.requestrawdata['requestPageCount'].is_(None),
+        axispagecount = case([
+            (FOIRawRequest.requestrawdata['axispagecount'].is_(None),
             '0'),
             ],
-            else_ = cast(FOIRawRequest.requestrawdata['requestPageCount'], String)).label('requestPageCount')
+            else_ = cast(FOIRawRequest.requestrawdata['axispagecount'], String)).label('axispagecount')
 
         intakesorting = case([
                             (FOIRawRequest.assignedto == None, # Unassigned requests first
@@ -547,7 +547,7 @@ class FOIRawRequest(db.Model):
             FOIRawRequest.assignedto.label('assignedTo'),
             cast(FOIRawRequest.requestid, String).label('idNumber'),
             axisrequestid,
-            requestpagecount,
+            axispagecount,
             literal(None).label('ministryrequestid'),
             literal(None).label('assignedministrygroup'),
             literal(None).label('assignedministryperson'),
@@ -732,7 +732,7 @@ class FOIRawRequest(db.Model):
             'requestType',
             'idNumber',
             'axisRequestId',
-            'requestPageCount',
+            'axispagecount',
             'currentState',
             'assignedTo',
             'receivedDate',
