@@ -877,14 +877,14 @@ class FOIRawRequest(db.Model):
         #request state: unopened, call for records, etc.
         requeststatecondition = []
         for state in params['requeststate']:
-            if(state == '3'):
+            if(state == StateName.closed.name):
                 requeststatecondition.append(FOIRawRequest.status == StateName.closed.value)
                 includeclosed = True
-            elif(state == '4'):
+            elif(state == StateName.redirect.name):
                 requeststatecondition.append(FOIRawRequest.status == StateName.redirect.value)
-            elif(state == '5'):
+            elif(state == StateName.unopened.name):
                 requeststatecondition.append(FOIRawRequest.status == StateName.unopened.value)
-            elif(state == '6'):
+            elif(state == StateName.intakeinprogress.name):
                 requeststatecondition.append(FOIRawRequest.status == StateName.intakeinprogress.value)
         
         if(len(requeststatecondition) == 0):
