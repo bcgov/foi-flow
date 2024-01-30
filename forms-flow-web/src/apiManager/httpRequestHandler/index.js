@@ -4,7 +4,7 @@ import UserService from "../../services/UserService";
 export const httpGETRequest = (url, data, token, isBearer = true) => {
   return axios.get(url, {
     params: data,
-    timeout: 300000,
+    timeout: 60000,
     headers: {
       Authorization: isBearer
         ? `Bearer ${token || UserService.getToken()}`
