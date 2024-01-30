@@ -456,7 +456,7 @@ const ApplicantProfileModal = React.memo(({modalOpen, handleModalClose}) => {
                                 headerHeight={50}
                                 hideFooter={true}
                                 loading={isLoading}                
-                                onRowClick={selectApplicantRow}
+                                // onRowClick={selectApplicantRow}
                                 getRowHeight={() => 'auto'} 
                                 getRowId={(row) => row.filenumber}
                             />
