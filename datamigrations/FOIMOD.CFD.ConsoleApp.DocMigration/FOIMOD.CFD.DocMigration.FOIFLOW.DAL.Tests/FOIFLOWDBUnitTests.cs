@@ -45,8 +45,10 @@ namespace FOIMOD.CFD.DocMigration.FOIFLOW.DAL.Tests
 
                 OdbcConnection connection = new OdbcConnection(SystemSettings.FOIFLOWConnectionString);
                 RecordsDAL recordsDAL = new RecordsDAL(connection);
+                string attributesJSONtemplate = @"{{""divisions"": [{{""divisionid"": {0}}}], ""lastmodified"": ""{1}"", ""filesize"": {2}, ""batch"": ""{3}"", ""extension"": "".pdf"", ""incompatible"": false}}";
+                var attributedJSON = string.Format(attributesJSONtemplate, 422, DateTime.Now.ToString("MM-dd-yyy"), 1803, Guid.NewGuid().ToString());
 
-                var result = recordsDAL.InsertIntoFOIRequestRecords("CFD-2023-0111114711", "https://unittest", "unittestfile.pdf", Guid.NewGuid().ToString(), DateTime.Now.ToString("MM-dd-yyy"), 422,1803);
+                var result = recordsDAL.InsertIntoFOIRequestRecords("CFD-2023-0111114711", "https://unittest", "unittestfile.pdf", attributedJSON);
                 Assert.IsNotNull(result);
             }
             catch (Exception ex)
