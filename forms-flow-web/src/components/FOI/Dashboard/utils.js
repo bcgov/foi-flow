@@ -219,9 +219,48 @@ export const displayIconMinistry = (params) => {
   );
 };
 
+export const displayQueueFlagIcons = (params) => {
+  let restricted = <span></span>
+
+  if (params?.row?.isiaorestricted || params?.row?.isministryrestricted) {
+    restricted = <LightTooltip placement="top-end" title={
+      <div style={{whiteSpace: "pre-line"}}>
+        Restricted
+      </div>
+    }>
+      <span className="dashboard-flag-restricted"><FontAwesomeIcon icon={faFlag} size='2x' /></span>
+    </LightTooltip>
+  } else {
+    restricted = <span className="dashboard-flag-placeholder"><FontAwesomeIcon icon={faFlag} size='2x' /></span>
+  }
+
+  const oipcreview = params?.row?.isoipcreview ?
+  <LightTooltip placement="top-end" title={
+    <div style={{whiteSpace: "pre-line"}}>
+      OIPC
+    </div>
+  }><span className="dashboard-flag-oipcreview"><FontAwesomeIcon icon={faFlag} size='2x' /></span>
+  </LightTooltip> :
+  <span className="dashboard-flag-placeholder"><FontAwesomeIcon icon={faFlag} size='2x' /></span>
+
+  const phasedrelease = params?.row?.isphasedrelease ?
+  <LightTooltip placement="top-end" title={
+    <div style={{whiteSpace: "pre-line"}}>
+      Phased Release
+    </div>
+  }><span className="dashboard-flag-phasedrelease"><FontAwesomeIcon icon={faFlag} size='2x' /></span>
+  </LightTooltip> :
+  <span className="dashboard-flag-placeholder"><FontAwesomeIcon icon={faFlag} size='2x' /></span>
+
+  return  <div>
+            {restricted}
+            {oipcreview}
+          </div>
+}
+
 export const displayHeaderIcon = (params) => {
   return (
-    <span className="foi-dashboard-restricted"><FontAwesomeIcon icon={faFlag} size='2x' className='restrict-icon' />
+    <span className="dashboard-flag-restricted"><FontAwesomeIcon icon={faFlag} size='2x' className='restrict-icon' />
     </span> 
   );
 };

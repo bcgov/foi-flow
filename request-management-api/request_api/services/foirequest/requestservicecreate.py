@@ -7,11 +7,13 @@ from request_api.models.FOIMinistryRequests import FOIMinistryRequest
 from request_api.services.watcherservice import watcherservice
 from request_api.services.foirequest.requestservicebuilder import requestservicebuilder
 from request_api.services.foirequest.requestserviceministrybuilder import requestserviceministrybuilder  
-from request_api.services.foirequest.requestserviceconfigurator import requestserviceconfigurator 
+from request_api.services.foirequest.requestserviceconfigurator import requestserviceconfigurator
 from request_api.models.PersonalInformationAttributes import PersonalInformationAttribute
 from request_api.models.FOIRequestContactInformation import FOIRequestContactInformation
 from request_api.models.FOIRequestPersonalAttributes import FOIRequestPersonalAttribute
 from request_api.models.FOIRequestApplicantMappings import FOIRequestApplicantMapping
+from request_api.models.FOIRequestApplicants import FOIRequestApplicant
+from request_api.models.RequestorType import RequestorType
 from request_api.utils.enums import StateName
 
 import json
@@ -39,8 +41,8 @@ class requestservicecreate:
             openfoirequest.deliverymodeid = requestserviceconfigurator().getvalueof("deliveryMode",foirequestschema.get("deliveryMode"))            
         if requestservicebuilder().isNotBlankorNone(foirequestschema,"receivedMode","main") == True:    
             openfoirequest.receivedmodeid =  requestserviceconfigurator().getvalueof("receivedMode",foirequestschema.get("receivedMode"))                
-        if requestservicebuilder().isNotBlankorNone(foirequestschema,"category","main") == True:
-            openfoirequest.applicantcategoryid = requestserviceconfigurator().getvalueof("category",foirequestschema.get("category"))                    
+        # if requestservicebuilder().isNotBlankorNone(foirequestschema,"category","main") == True:
+        #     openfoirequest.applicantcategoryid = requestserviceconfigurator().getvalueof("category",foirequestschema.get("category"))
         openfoirequest.personalAttributes = self._prearepersonalattributes(foirequestschema, userid)        
         openfoirequest.requestApplicants = self.__prepareapplicants(foirequestschema, userid)       
         if foirequestid is not None:         
@@ -61,7 +63,7 @@ class requestservicecreate:
             else:
                 return _foirequest  
             self.__disablewatchers(ministryid, foirequestschema, userid)
-            result = self.saverequest(foirequestschema, userid, foirequestid,ministryid,filenumber,activeversion,_foirequest["foirawrequestid"],_foirequest["wfinstanceid"])    
+            result = self.saverequest(foirequestschema, userid, foirequestid,ministryid,filenumber,activeversion,_foirequest["foirawrequestid"],_foirequest["wfinstanceid"])
             if result.success == True:
                 FOIMinistryRequest.deActivateFileNumberVersion(ministryid, filenumber, userid)
             return result
@@ -69,7 +71,7 @@ class requestservicecreate:
     def saveministryrequestversion(self,ministryrequestschema, foirequestid , ministryid, userid, usertype = None):        
         _foirequest = FOIRequest().getrequest(foirequestid)
         _foiministryrequest = FOIMinistryRequest().getrequestbyministryrequestid(ministryid)
-        _foirequestapplicant = FOIRequestApplicantMapping().getrequestapplicants(foirequestid,_foirequest["version"])
+        _foirequestapplicant = FOIRequestApplicantMapping().getrequestapplicantinfos(foirequestid,_foirequest["version"])
         _foirequestcontact = FOIRequestContactInformation().getrequestcontactinformation(foirequestid,_foirequest["version"])
         _foirequestpersonalattrbs = FOIRequestPersonalAttribute().getrequestpersonalattributes(foirequestid,_foirequest["version"])
         foiministryrequestarr = []     
@@ -127,20 +129,31 @@ class requestservicecreate:
         requestapplicantarr = []
         selfalsoknownas=None
         selfdob=None
-        if  foirequestschema.get("additionalPersonalInfo") is not None:
-            applicantinfo = foirequestschema.get("additionalPersonalInfo")           
+        selfcategoryid = requestserviceconfigurator().getvalueof("category",foirequestschema.get("category")) if requestservicebuilder().isNotBlankorNone(foirequestschema,"category","main") == True else None
+        if foirequestschema.get("additionalPersonalInfo") is not None:
+            applicantinfo = foirequestschema.get("additionalPersonalInfo")
             selfdob = applicantinfo["birthDate"] if requestservicebuilder().isNotBlankorNone(foirequestschema,"birthDate","additionalPersonalInfo") else None
             selfalsoknownas = applicantinfo["alsoKnownAs"] if requestservicebuilder().isNotBlankorNone(foirequestschema,"alsoKnownAs","additionalPersonalInfo") else None
-        requestapplicantarr.append(
-            requestservicebuilder().createapplicant(foirequestschema.get("firstName"),
-                                           foirequestschema.get("lastName"),
-                                           "Self",
-                                           userid,
-                                           foirequestschema.get("middleName"),                                            
-                                           foirequestschema.get("businessName"),
-                                           selfalsoknownas,
-                                           selfdob)
-            )
+
+        # if foirequestschema.get('foiRequestApplicantID') is None and foirequestschema.get('requeststatusid') == 1:
+        if foirequestschema.get('foiRequestApplicantID', 0) > 0:
+            applicant = FOIRequestApplicant().getlatestprofilebyapplicantid(foirequestschema['foiRequestApplicantID'])
+            requestapplicant = FOIRequestApplicantMapping()
+            requestapplicant.foirequestapplicantid = applicant['foirequestapplicantid']
+            requestapplicant.requestortypeid = RequestorType().getrequestortype("Self")["requestortypeid"]
+            requestapplicantarr.append(requestapplicant)
+        else:
+            requestapplicantarr.append(
+                requestservicebuilder().createapplicant(foirequestschema.get("firstName"),
+                                            foirequestschema.get("lastName"),
+                                            "Self",
+                                            userid,
+                                            foirequestschema.get("middleName"),
+                                            foirequestschema.get("businessName"),
+                                            selfalsoknownas,
+                                            selfdob,
+                                            selfcategoryid)
+                )
                  
         #Prepare additional applicants
         if foirequestschema.get("additionalPersonalInfo") is not None:
@@ -166,7 +179,7 @@ class requestservicecreate:
                                            None,
                                            self.__getkeyvalue(addlapplicantinfo,"anotherAlsoKnownAs"),
                                            self.__getkeyvalue(addlapplicantinfo,"anotherBirthDate")  )
-                    )  
+                    )
         return requestapplicantarr
     
     def __disablewatchers(self, ministryid, requestschema, userid):

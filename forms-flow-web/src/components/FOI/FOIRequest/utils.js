@@ -58,6 +58,10 @@ const getcfrDaysRemainingText = (_cfrDaysRemaining) => {
      return`CFR Due in ${_cfrDaysRemaining} Days`    
 };
 
+export const isBeforeOpen = (requestDetails) => {
+  return !requestDetails.stateTransition?.filter(s => s.status === StateEnum.open.name).length > 0;
+};
+
 export const getExtensionsCountText = (extensions) => {
   if (!extensions || extensions.length < 1) {
     return `Extensions 0`;
@@ -321,9 +325,10 @@ export const checkValidationError = (
   requiredRequestDetailsValues,
   requiredAxisDetails,
   isAddRequest,
-  currentrequestStatus
+  currentrequestStatus,
+  oipcData,
+  isOipcReview
 ) => {
-
   return (
     requiredApplicantDetails.firstName === "" ||
     requiredApplicantDetails.lastName === "" ||
@@ -346,7 +351,16 @@ export const checkValidationError = (
       .includes("select") ||
     !requiredRequestDetailsValues.receivedDate ||
     !requiredRequestDetailsValues.requestStartDate ||
-    !requiredAxisDetails.axisRequestId
+    !requiredAxisDetails.axisRequestId || 
+    (oipcData?.length > 0 && isOipcReview && oipcData?.some((oipc) => {
+      if (oipc.inquiryattributes?.inquirydate) {
+        return oipc.inquiryattributes.orderno === ""; 
+      }
+      if (oipc.inquiryattributes?.orderno) {
+        return oipc.inquiryattributes?.inquirydate === null || oipc.inquiryattributes?.inquirydate === ""; 
+      }
+      return oipc.oipcno === "" || oipc.receiveddate === null || oipc.receiveddate === "" || oipc.reviewtypeid === null || oipc.reasonid === null || oipc.statusid === null;
+    }))
   );
 };
 

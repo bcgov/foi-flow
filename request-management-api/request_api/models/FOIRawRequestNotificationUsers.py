@@ -96,10 +96,7 @@ class FOIRawRequestNotificationUser(db.Model):
         return notifications
 
     @classmethod 
-    def getnotificationsbyuserandtype(cls, userid, typeid):
-        for key in notificationusertypes_cache:
-            if (notificationusertypes_cache[key].notificationusertypeid == typeid) or (notificationusertypes_cache[key].notificationusertypelabel == typeid):
-                notificationusertypelabel = notificationusertypes_cache[key].notificationusertypelabel
+    def getnotificationsbyuserandtype(cls, userid, notificationusertypelabel):
         notifications = []
         try:
             sql = """select notificationid, count(1) as relcount from "FOIRawRequestNotificationUsers" frnu 
@@ -116,7 +113,7 @@ class FOIRawRequestNotificationUser(db.Model):
 
     @classmethod
     def dismissbynotificationid(cls, notificationids, userid='system'):
-        db.session.query(FOIRawRequestNotificationUser).filter(FOIRawRequestNotificationUser.notificationid.in_(notificationids)).update({FOIRawRequestNotificationUser.isdeleted: True, FOIRawRequestNotificationUser.updatedby: userid,
+        db.session.query(FOIRawRequestNotificationUser).filter(FOIRawRequestNotificationUser.notificationid.in_(notificationids), FOIRawRequestNotificationUser.isdeleted == False).update({FOIRawRequestNotificationUser.isdeleted: True, FOIRawRequestNotificationUser.updatedby: userid,
                             FOIRawRequestNotificationUser.updated_at: datetime2.now()}, synchronize_session=False)
         db.session.commit()  
         return DefaultMethodResult(True,'Notifications deleted for id',notificationids)  

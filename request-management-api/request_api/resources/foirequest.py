@@ -137,7 +137,7 @@ class FOIRequestsById(Resource):
     def post(foirequestid,foiministryrequestid):
         """ POST Method for capturing FOI requests before processing"""
         try:
-            request_json = request.get_json()   
+            request_json = request.get_json() 
             foirequestschema = FOIRequestWrapperSchema().load(request_json)  
             result = requestservice().saverequestversion(foirequestschema, foirequestid, foiministryrequestid,AuthHelper.getuserid())
             if result.success == True:
@@ -290,5 +290,36 @@ class FOIRequestByMinistryId(Resource):
             return FOIRequest.get(requestservice().getrequestid(ministryrequestid), ministryrequestid, usertype)
         except ValueError:
             return {'status': 500, 'message':"Invalid Request"}, 500
+        except BusinessException as exception:            
+            return {'status': exception.status_code, 'message':exception.message}, 500
+
+@cors_preflight('POST, DELETE, UPDATE, OPTIONS')
+@API.route('/foirequests/<int:foirequestid>/ministryrequest/<int:foiministryrequestid>/section/<string:section>')
+class FOIRequestsById(Resource):
+    """Creates a new version of foi request for iao users adjusting speciifc sections of a FOI Request"""
+    @staticmethod
+    @TRACER.trace()
+    @cross_origin(origins=allowedorigins())
+    @auth.require
+    def post(foirequestid,foiministryrequestid,section):
+        try:
+            request_json = request.get_json()
+            if (section == "oipc"):
+                foirequest = requestservice().getrequest(foirequestid, foiministryrequestid)
+                foirequest['isoipcreview'] = request_json['isoipcreview']
+                foirequest['oipcdetails'] = request_json['oipcdetails']
+            foirequestschema = FOIRequestWrapperSchema().load(foirequest)  
+            result = requestservice().saverequestversion(foirequestschema, foirequestid, foiministryrequestid,AuthHelper.getuserid())
+            if result.success == True:
+                asyncio.ensure_future(eventservice().postevent(foiministryrequestid,"ministryrequest",AuthHelper.getuserid(),AuthHelper.getusername(),AuthHelper.isministrymember()))
+                metadata = json.dumps({"id": result.identifier, "ministries": result.args[0]})
+                requestservice().posteventtoworkflow(foiministryrequestid,  foirequestschema, json.loads(metadata),"iao")
+                return {'status': result.success, 'message':result.message,'id':result.identifier, 'ministryRequests': result.args[0]} , 200
+            else:
+                 return {'status': False, 'message':EXCEPTION_MESSAGE_NOTFOUND_REQUEST,'id':foirequestid} , 404
+        except ValidationError as err:
+            return {'status': False, 'message': str(err)}, 400
+        except KeyError as error:
+            return {'status': False, 'message': CUSTOM_KEYERROR_MESSAGE + str(error)}, 400    
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500 

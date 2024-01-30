@@ -9,6 +9,8 @@ from request_api.models.FOIRequestApplicants import FOIRequestApplicant
 from request_api.models.FOIRequestApplicantMappings import FOIRequestApplicantMapping
 from request_api.models.FOIRequestTeams import FOIRequestTeam
 from request_api.models.FOIRequestStatus import FOIRequestStatus
+from request_api.models.FOIRequestOIPC import FOIRequestOIPC
+
 from datetime import datetime as datetime2
 from request_api.utils.enums import MinistryTeamWithKeycloackGroup, StateName
 from request_api.services.foirequest.requestserviceconfigurator import requestserviceconfigurator 
@@ -36,6 +38,10 @@ class requestservicebuilder(requestserviceconfigurator):
         foiministryrequest.linkedrequests = requestschema.get("linkedRequests")
         foiministryrequest.identityverified = requestschema.get("identityVerified")
         foiministryrequest.originalldd = requestschema.get("originalDueDate")
+        if requestschema.get("isoipcreview") is not None and requestschema.get("isoipcreview")  != "":
+            foiministryrequest.isoipcreview = requestschema.get("isoipcreview")
+            foiministryrequest.oipcreviews = self.prepareoipc(requestschema, ministryid, activeversion, userid)
+            
         if requestschema.get("cfrDueDate") is not None and requestschema.get("cfrDueDate")  != "":
             foiministryrequest.cfrduedate = requestschema.get("cfrDueDate")
         startdate = ""
@@ -120,9 +126,9 @@ class requestservicebuilder(requestserviceconfigurator):
               contactinformation.contacttypeid =contacttype["contacttypeid"]              
         return contactinformation
     
-    def createapplicant(self,firstname, lastname, appltcategory, userid, middlename = None,businessname = None, alsoknownas = None, dob = None):
+    def createapplicant(self,firstname, lastname, appltcategory, userid, middlename = None, businessname = None, alsoknownas = None, dob = None, applicantcategoryid = None):
         requestapplicant = FOIRequestApplicantMapping()
-        _applicant = FOIRequestApplicant().saveapplicant(firstname, lastname, middlename, businessname, alsoknownas, dob, userid)
+        _applicant = FOIRequestApplicant().createapplicant(firstname, lastname, middlename, businessname, alsoknownas, dob, applicantcategoryid, userid)
         requestapplicant.foirequestapplicantid = _applicant.identifier
         if appltcategory is not None:           
             requestertype = RequestorType().getrequestortype(appltcategory)  
@@ -138,6 +144,37 @@ class requestservicebuilder(requestserviceconfigurator):
                     personalattribute.personalattributeid = attributetype["attributeid"]
                     personalattribute.attributevalue = value
         return personalattribute
+    
+    def prepareoipc(self, requestschema, ministryrequestid, version, userid):
+        oipcarr = []
+        if 'oipcdetails' in  requestschema:
+            for oipc in requestschema['oipcdetails']:
+                oipcreview = FOIRequestOIPC()
+                oipcreview.foiministryrequest_id = ministryrequestid
+                oipcreview.foiministryrequestversion_id=version
+                oipcreview.oipcno = oipc["oipcno"]
+                oipcreview.reviewtypeid = oipc["reviewtypeid"]
+                oipcreview.reasonid = oipc["reasonid"]
+                oipcreview.statusid = oipc["statusid"]
+                oipcreview.outcomeid = oipc["outcomeid"]
+                oipcreview.investigator = oipc["investigator"] if oipc["investigator"] not in (None, "") else None
+                oipcreview.isinquiry = oipc["isinquiry"]
+                oipcreview.isjudicialreview = oipc["isjudicialreview"]
+                oipcreview.issubsequentappeal = oipc["issubsequentappeal"]
+                oipcreview.issubsequentappeal = oipc["issubsequentappeal"]
+                oipcreview.receiveddate = oipc["receiveddate"] if oipc["receiveddate"] not in (None, "") else None
+                oipcreview.closeddate = oipc["closeddate"] if oipc["closeddate"] not in (None, "") else None 
+                if oipc["isinquiry"] == True:
+                    oipcreview.inquiryattributes = self.__formatoipcattributes(oipc["inquiryattributes"])
+                oipcreview.createdby=userid
+                oipcreview.created_at= datetime2.now().isoformat()
+                oipcarr.append(oipcreview)
+            return oipcarr
+        
+    def __formatoipcattributes(self, inquiryattributes):
+        if inquiryattributes not in (None, "") and inquiryattributes["inquirydate"] in ("","null"):
+            inquiryattributes["inquirydate"] = None
+        return inquiryattributes
     
 
     def isNotBlankorNone(self, dataschema, key, location):        

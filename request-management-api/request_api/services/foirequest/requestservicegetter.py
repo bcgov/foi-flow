@@ -8,6 +8,8 @@ from request_api.models.FOIRequestPersonalAttributes import FOIRequestPersonalAt
 from request_api.models.FOIRequestApplicantMappings import FOIRequestApplicantMapping
 from request_api.models.FOIMinistryRequestSubjectCodes import FOIMinistryRequestSubjectCode
 from request_api.models.FOIRestrictedMinistryRequests import FOIRestrictedMinistryRequest
+from request_api.models.FOIRequestOIPC import FOIRequestOIPC
+from request_api.services.oipcservice import oipcservice
 from dateutil.parser import parse
 from request_api.services.cfrfeeservice import cfrfeeservice
 from request_api.services.paymentservice import paymentservice
@@ -25,7 +27,7 @@ class requestservicegetter:
         request = FOIRequest.getrequest(foirequestid)
         requestministry = FOIMinistryRequest.getrequestbyministryrequestid(foiministryrequestid)
         requestcontactinformation = FOIRequestContactInformation.getrequestcontactinformation(foirequestid,request['version'])
-        requestapplicants = FOIRequestApplicantMapping.getrequestapplicants(foirequestid,request['version'])
+        requestapplicants = FOIRequestApplicantMapping.getrequestapplicantinfos(foirequestid,request['version'])
         requestministrydivisions = FOIMinistryRequestDivision.getdivisions(foiministryrequestid,requestministry['version'])
         iaorestrictrequestdetails = FOIRestrictedMinistryRequest.getrestricteddetails(ministryrequestid=foiministryrequestid,type='iao')
 
@@ -39,16 +41,20 @@ class requestservicegetter:
 
         additionalpersonalinfo ={}
         for applicant in requestapplicants:
-            firstname = applicant['foirequestapplicant.firstname']
-            middlename = applicant['foirequestapplicant.middlename']
-            lastname = applicant['foirequestapplicant.lastname']
-            businessname = applicant['foirequestapplicant.businessname']
-            dobraw = applicant['foirequestapplicant.dob']
+            firstname = applicant['firstname']
+            middlename = applicant['middlename']
+            lastname = applicant['lastname']
+            businessname = applicant['businessname']
+            dobraw = applicant['dob']
             dob = parse(dobraw).strftime(self.__genericdateformat()) if dobraw is not None else ''
-            alsoknownas = applicant['foirequestapplicant.alsoknownas']
-            requestortypeid = applicant['requestortype.requestortypeid']
+            alsoknownas = applicant['alsoknownas']
+            foirequestapplicantid = applicant['foirequestapplicantid']
+            requestortypeid = applicant['requestortypeid']
+            categoryid = applicant['applicantcategoryid']
+            category = applicant['applicantcategory']
+
             if requestortypeid == 1:
-                baserequestinfo.update(self.__prepareapplicant(firstname, middlename, lastname, businessname))
+                baserequestinfo.update(self.__prepareapplicant(foirequestapplicantid, firstname, middlename, lastname, businessname, categoryid, category))
             additionalpersonalinfo.update(self.__prepareadditionalpersonalinfo(requestortypeid, firstname, middlename, lastname, dob, alsoknownas))
 
         baserequestdetails, additionalpersonalinfodetails = self.preparepersonalattributes(foirequestid, request['version'])
@@ -84,17 +90,22 @@ class requestservicegetter:
             baserequestinfo = self.__preparebaseinfo(request,foiministryrequestid,requestministry,requestministrydivisions)
 
         if request['requesttype'] == 'personal':
-            requestapplicants = FOIRequestApplicantMapping.getrequestapplicants(foirequestid,request['version'])
+            requestapplicants = FOIRequestApplicantMapping.getrequestapplicantinfos(foirequestid,request['version'])
             additionalpersonalinfo ={}
             for applicant in requestapplicants:
-                firstname = applicant['foirequestapplicant.firstname']
-                middlename = applicant['foirequestapplicant.middlename']
-                lastname = applicant['foirequestapplicant.lastname']
-                dobraw = applicant['foirequestapplicant.dob']
+                firstname = applicant['firstname']
+                middlename = applicant['middlename']
+                lastname = applicant['lastname']
+                dobraw = applicant['dob']
                 dob = parse(dobraw).strftime(self.__genericdateformat()) if dobraw is not None else ''
-                requestortypeid = applicant['requestortype.requestortypeid']
+                foirequestapplicantid = applicant['foirequestapplicantid']
+                requestortypeid = applicant['requestortypeid']
+                categoryid = applicant['applicantcategoryid']
+                category = applicant['applicantcategory']
+                businessname = None
+
                 if requestortypeid == 1:
-                    baserequestinfo.update(self.__prepareapplicant(firstname, middlename, lastname))
+                    baserequestinfo.update(self.__prepareapplicant(foirequestapplicantid, firstname, middlename, lastname, businessname, categoryid, category))
                 additionalpersonalinfo.update(self.__prepareadditionalpersonalinfo(requestortypeid, firstname, middlename, lastname, dob))
             baserequestdetails, additionalpersonalinfodetails = self.preparepersonalattributes(foirequestid, request['version'])
             baserequestinfo.update(baserequestdetails)
@@ -160,12 +171,15 @@ class requestservicegetter:
             'originalDueDate':  parse(requestministry['originalldd']).strftime(self.__genericdateformat()) if requestministry['originalldd'] is not None else parse(requestministry['duedate']).strftime(self.__genericdateformat()),            
             'programareaid':requestministry['programarea.programareaid'],
             'bcgovcode':requestministry['programarea.bcgovcode'],
-            'category':request['applicantcategory.name'],
-            'categoryid':request['applicantcategory.applicantcategoryid'],
+            # 'category':'',
+            # 'categoryid':0,
             'assignedministrygroup':requestministry["assignedministrygroup"],
             'assignedministryperson':requestministry["assignedministryperson"],            
             'selectedMinistries':[{'code':requestministry['programarea.bcgovcode'],'id':requestministry['foiministryrequestid'],'name':requestministry['programarea.name'],'selected':'true'}],
             'divisions': self.getdivisions(requestministrydivisions),
+            'isoipcreview': requestministry['isoipcreview'] if (requestministry['isoipcreview'] not in (None, '') and requestministry['isoipcreview'] in (True, False)) else False,
+            'isreopened': self.hasreopened(foiministryrequestid),
+            'oipcdetails': self.getoipcdetails(foiministryrequestid, requestministry['version']),
             'onholdTransitionDate': self.getonholdtransition(foiministryrequestid),            
             'stateTransition': FOIMinistryRequest.getstatesummary(foiministryrequestid),
             'assignedToFirstName': requestministry["assignee.firstname"] if requestministry["assignedto"] != None else None,
@@ -209,6 +223,43 @@ class requestservicegetter:
                 divisions.append(division) 
         return divisions
 
+    def getoipcdetails(self, ministryrequestid, ministryrequestversion):
+        oipcdetails = []
+        _oipclist = FOIRequestOIPC.getoipc(ministryrequestid, ministryrequestversion)
+        inquiryoutcomes = oipcservice().getinquiryoutcomes()
+        if _oipclist is not None:                      
+            for entry in _oipclist:
+                oipc = {
+                    "oipcid": entry["oipcid"],
+                    "oipcno": entry["oipcno"],
+                    "reviewtypeid": entry["reviewtypeid"],
+                    "reviewetype": entry["reviewtype.name"],
+                    "reasonid": entry["reasonid"],
+                    "reason": entry["reason.name"],
+                    "statusid": entry["statusid"],
+                    "status":entry["status.name"],
+                    "outcomeid": entry["outcomeid"],
+                    "outcome": entry["outcome.name"] if entry["outcomeid"] not in (None, '') else None,
+                    "investigator": entry["investigator"],
+                    "isinquiry": entry["isinquiry"],
+                    "isjudicialreview": entry["isjudicialreview"],
+                    "issubsequentappeal": entry["issubsequentappeal"],
+                    "inquiryattributes": self.formatinquiryattribute(entry["inquiryattributes"], inquiryoutcomes),   
+                    "createdby": entry["createdby"],
+                    "receiveddate" : parse(entry["receiveddate"]).strftime('%b, %d %Y') if entry["receiveddate"] is not None else '',
+                    "closeddate": parse(entry["closeddate"]).strftime('%b, %d %Y') if entry["closeddate"] is not None else '',
+                    "created_at": parse(entry["created_at"]).strftime(self.__genericdateformat())                 
+                    } 
+                oipcdetails.append(oipc) 
+        return oipcdetails
+    
+    def formatinquiryattribute(self, inquiryattribute, inquiryoutcomes):
+        if inquiryattribute not in (None, {}):
+            for outcome in inquiryoutcomes:
+                if inquiryattribute["inquiryoutcome"] == outcome["inquiryoutcomeid"]:
+                    inquiryattribute["inquiryoutcomename"] =  outcome["name"]
+        return inquiryattribute
+
     
     def getonholdtransition(self, foiministryrequestid):
         onholddate = None
@@ -228,12 +279,23 @@ class requestservicegetter:
     def __genericdateformat(self):
         return '%Y-%m-%d'
     
-    def __prepareapplicant(self,firstname= None, middlename= None, lastname= None, businessname= None):
+    def hasreopened(self, requestid):
+        states =  FOIMinistryRequest.getstatesummary(requestid)
+        if len(states) > 0:
+            current_state = states[0]
+            if current_state != "Closed" and any(state['status'] == "Closed" for state in states):
+                return True
+        return False 
+    
+    def __prepareapplicant(self, foirequestapplicantid=None, firstname=None, middlename=None, lastname=None, businessname=None, applicantcategoryid=None, applicantcategory=None):
         return {
                     'firstName': firstname,
                     'middleName': middlename,
                     'lastName': lastname,
-                    'businessName': businessname,                                                
+                    'businessName': businessname,   
+                    'foiRequestApplicantID': foirequestapplicantid,
+                    'categoryid': applicantcategoryid,
+                    'category': applicantcategory
                 }     
         
     def __prepareadditionalpersonalinfo(self, requestortypeid, firstname= None, middlename= None, lastname= None, dob= None, alsoknownas= None):

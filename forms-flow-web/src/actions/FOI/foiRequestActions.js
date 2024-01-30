@@ -128,6 +128,12 @@ export const setFOIMinistryViewRequestDetail = (data) => (dispatch) => {
     payload: data,
   });
 };
+export const setFOIRequestApplicantProfile = (data) => (dispatch) => {
+  dispatch({
+    type: FOI_ACTION_CONSTANTS.FOI_REQUEST_APPLICANT_PROFILE,
+    payload: data,
+  });
+};
 export const setFOIPDFStitchedRecordForHarms = (data) => (dispatch) => {
   dispatch({
     type: FOI_ACTION_CONSTANTS.FOI_PDF_STITCHED_RECORD_FOR_HARMS,
@@ -147,6 +153,18 @@ export const setFOIPDFStitchedRecordForResponsePackage =
       payload: data,
     });
   };
+export const setFOIPDFStitchedRecordForOipcRedlineReview = (data) => (dispatch) => {
+  dispatch({
+    type: FOI_ACTION_CONSTANTS.FOI_PDF_STITCHED_RECORD_FOR_OIPCREDLINEREVIEW,
+    payload: data,
+  });
+}
+export const setFOIPDFStitchedRecordForOipcRedline = (data) => (dispatch) => {
+  dispatch({
+    type: FOI_ACTION_CONSTANTS.FOI_PDF_STITCHED_RECORD_FOR_OIPCREDLINE,
+    payload: data,
+  });
+}
 export const setFOIPDFStitchStatusForHarms = (data) => (dispatch) => {
   dispatch({
     type: FOI_ACTION_CONSTANTS.FOI_PDF_STITCHED_STATUS_FOR_HARMS,
@@ -163,6 +181,18 @@ export const setFOIPDFStitchStatusForRedlines = (data) => (dispatch) => {
 export const setFOIPDFStitchStatusForResponsePackage = (data) => (dispatch) => {
   dispatch({
     type: FOI_ACTION_CONSTANTS.FOI_PDF_STITCHED_STATUS_FOR_RESPONSEPACKAGE,
+    payload: data,
+  });
+};
+export const setFOIPDFStitchStatusForOipcRedlineReview = (data) => (dispatch) => {
+  dispatch({
+    type: FOI_ACTION_CONSTANTS.FOI_PDF_STITCHED_STATUS_FOR_OIPCREDLINEREVIEW,
+    payload: data,
+  });
+};
+export const setFOIPDFStitchStatusForOipcRedline = (data) => (dispatch) => {
+  dispatch({
+    type: FOI_ACTION_CONSTANTS.FOI_PDF_STITCHED_STATUS_FOR_OIPCREDLINE,
     payload: data,
   });
 };
@@ -422,6 +452,34 @@ export const setRecordFormats = (data) => (dispatch) => {
 export const setConversionFormats = (data) => (dispatch) => {
   dispatch({
     type: FOI_ACTION_CONSTANTS.CONVERSION_FORMATS,
+    payload: data,
+  });
+};
+
+export const setOIPCOutcomes = (data) => (dispatch) => {
+  dispatch({
+    type: FOI_ACTION_CONSTANTS.OIPC_OUTCOMES,
+    payload: data,
+  });
+};
+
+export const setOIPCStatuses = (data) => (dispatch) => {
+  dispatch({
+    type: FOI_ACTION_CONSTANTS.OIPC_STATUSES,
+    payload: data,
+  });
+};
+
+export const setOIPCReviewtypes = (data) => (dispatch) => {
+  dispatch({
+    type: FOI_ACTION_CONSTANTS.OIPC_REVIEWTYPES,
+    payload: data,
+  });
+};
+
+export const setOIPCInquiryoutcomes = (data) => (dispatch) => {
+  dispatch({
+    type: FOI_ACTION_CONSTANTS.OIPC_INQUIRYOUTCOMES,
     payload: data,
   });
 };

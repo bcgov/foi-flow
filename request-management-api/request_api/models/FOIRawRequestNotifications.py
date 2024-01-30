@@ -27,6 +27,7 @@ class FOIRawRequestNotification(db.Model):
     updated_at = db.Column(db.DateTime, nullable=True)
     updatedby = db.Column(db.String(120), unique=False, nullable=True)
 
+    notificationtypeid = db.Column(db.Integer, nullable=False)
     notificationtypelabel = db.Column(db.Integer, nullable=False)
     
     notificationusers = db.relationship('FOIRawRequestNotificationUser', backref='FOIRawRequestNotifications', lazy='dynamic')
@@ -45,7 +46,7 @@ class FOIRawRequestNotification(db.Model):
     @classmethod
     def dismissnotification(cls, notificationids, userid='system'):
         try:
-            db.session.query(FOIRawRequestNotification).filter(FOIRawRequestNotification.notificationid.in_(notificationids)).update({FOIRawRequestNotification.isdeleted: True, FOIRawRequestNotification.updatedby: userid,
+            db.session.query(FOIRawRequestNotification).filter(FOIRawRequestNotification.notificationid.in_(notificationids), FOIRawRequestNotification.isdeleted == False).update({FOIRawRequestNotification.isdeleted: True, FOIRawRequestNotification.updatedby: userid,
                             FOIRawRequestNotification.updated_at: datetime2.now()}, synchronize_session=False)
             db.session.commit()  
             return DefaultMethodResult(True,'Notifications deleted ', notificationids)
@@ -102,7 +103,7 @@ class FOIRawRequestNotification(db.Model):
     def getnotificationidsbytype(cls, notificationtypelabel):
         notificationids = []
         try:
-            sql = """select notificationid from "FOIRawRequestNotifications" where notificationtypelabel= :notificationtypelabel """
+            sql = """select notificationid from "FOIRawRequestNotifications" where notificationtypelabel= :notificationtypelabel and isdeleted = false """
             rs = db.session.execute(text(sql), {'notificationtypelabel': notificationtypelabel})
             for row in rs:
                 notificationids.append(row["notificationid"])

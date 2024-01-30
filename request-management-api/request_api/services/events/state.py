@@ -7,6 +7,7 @@ from request_api.services.cfrfeeservice import cfrfeeservice
 from request_api.models.FOIRawRequests import FOIRawRequest
 from request_api.models.FOIMinistryRequests import FOIMinistryRequest
 from request_api.models.FOIRequestStatus import FOIRequestStatus
+from request_api.models.NotificationTypes import NotificationType
 import json
 from request_api.models.default_method_result import DefaultMethodResult
 from request_api.utils.enums import StateName
@@ -72,12 +73,15 @@ class stateevent:
         if state == StateName.archived.value:
             _openedministries = FOIMinistryRequest.getministriesopenedbyuid(requestid)
             for ministry in _openedministries:
-                response = notificationservice().createnotification({"message" : notification}, ministry["ministryrequestid"], 'ministryrequest', "State", userid)
+                notificationtype = NotificationType().getnotificationtypeid("State")
+                response = notificationservice().createnotification({"message" : notification}, ministry["ministryrequestid"], 'ministryrequest', notificationtype, userid)
         else:
-            response = notificationservice().createnotification({"message" : notification}, requestid, requesttype, "State", userid)
+            notificationtype = NotificationType().getnotificationtypeid("State")
+            response = notificationservice().createnotification({"message" : notification}, requestid, requesttype, notificationtype, userid)
         if _notificationtype == "Group Members":
+            notificationtype = NotificationType().getnotificationtypeid(_notificationtype)
             notification = self.__preparegroupmembernotification(state, requestid)
-            groupmemberresponse = notificationservice().createnotification({"message" : notification}, requestid, requesttype, _notificationtype, userid)
+            groupmemberresponse = notificationservice().createnotification({"message" : notification}, requestid, requesttype, notificationtype, userid)
             if response.success == True and groupmemberresponse.success == True :
                 return DefaultMethodResult(True,'Notification added',requestid)
             else:   
