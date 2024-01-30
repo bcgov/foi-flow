@@ -14,6 +14,7 @@ from datetime import datetime as datetime2
 from request_api.utils.commons.datetimehandler import datetimehandler
 from request_api.models.default_method_result import DefaultMethodResult
 import re
+import maya
 
 class applicantservice:
     """ FOI Event Dashboard
@@ -210,6 +211,7 @@ class applicantservice:
             'filenumber': 'U-00' + str(request["requestid"]),
             'requestid': request["requestid"],
             'requeststatus': request["status"],
-            'receiveddate': request["requestrawdata"]["receivedDate"],
+            'receiveddate': maya.parse(request["requestrawdata"]["receivedDate"]).datetime(to_timezone='America/Vancouver', naive=False).strftime('%^b %d %Y'),
+            # 'receiveddate': request["requestrawdata"]["receivedDate"],
             'description': request["requestrawdata"]["description"],
         }

@@ -366,9 +366,6 @@ class FOIRequestApplicant(db.Model):
             func.array_agg(subquery_all.c.phn).label('phn')
         ).group_by(subquery_all.c.foirequestapplicantid)
 
-
-        print("query_by_id", query_aggregate)
-
         applicantprofile_schema = ApplicantProfileSchema()
         return applicantprofile_schema.dump(query_aggregate.first())
     
