@@ -341,7 +341,7 @@ class FOIRawRequest(db.Model):
         subquery_applicant_id_list = db.session.query(FOIRequestApplicant.foirequestapplicantid).filter(applicant_subquery.c.applicantprofileid == FOIRequestApplicant.applicantprofileid).subquery()
 
         #subquery for getting the latest version
-        subquery_maxversion = db.sessio.query(FOIRawRequest.requestid, func.max(FOIRawRequest.version).label('max_version')).group_by(FOIRawRequest.requestid).subquery()
+        subquery_maxversion = db.session.query(FOIRawRequest.requestid, func.max(FOIRawRequest.version).label('max_version')).group_by(FOIRawRequest.requestid).subquery()
         joincondition = [
             subquery_maxversion.c.requestid == FOIRawRequest.requestid,
             subquery_maxversion.c.max_version == FOIRawRequest.version,
