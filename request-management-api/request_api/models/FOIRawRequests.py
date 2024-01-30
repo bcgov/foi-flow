@@ -339,12 +339,23 @@ class FOIRawRequest(db.Model):
         request_schema = FOIRawRequestSchema(many=True)
         applicant_subquery = db.session.query(FOIRequestApplicant.applicantprofileid).filter(FOIRequestApplicant.foirequestapplicantid == applicantid).subquery()
         subquery_applicant_id_list = db.session.query(FOIRequestApplicant.foirequestapplicantid).filter(applicant_subquery.c.applicantprofileid == FOIRequestApplicant.applicantprofileid).subquery()
+
+        #subquery for getting the latest version
+        subquery_maxversion = db.sessio.query(FOIRawRequest.requestid, func.max(FOIRawRequest.version).label('max_version')).group_by(FOIRawRequest.requestid).subquery()
+        joincondition = [
+            subquery_maxversion.c.requestid == FOIRawRequest.requestid,
+            subquery_maxversion.c.max_version == FOIRawRequest.version,
+        ]
+        
         query = db.session.query(FOIRawRequest).distinct(FOIRawRequest.requestid).join(
             FOIAssignee, FOIAssignee.username == FOIRawRequest.assignedto
+        ).join(
+            subquery_maxversion,
+            and_(*joincondition)
         ).filter(
             FOIRawRequest.requestrawdata['foiRequestApplicantID'].astext.cast(db.Integer).in_(subquery_applicant_id_list),
             FOIRawRequest.status.notin_(['Archived', 'Closed'])
-        ).order_by(FOIRawRequest.requestid, FOIRawRequest.version.desc()).all()
+        ).order_by(FOIRawRequest.requestid.desc()).all()
         return request_schema.dump(query)
     
     @classmethod
