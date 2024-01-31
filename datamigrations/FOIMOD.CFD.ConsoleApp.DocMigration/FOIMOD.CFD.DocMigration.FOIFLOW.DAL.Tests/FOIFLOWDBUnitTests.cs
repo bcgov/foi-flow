@@ -44,7 +44,8 @@ namespace FOIMOD.CFD.DocMigration.FOIFLOW.DAL.Tests
             {
 
                 OdbcConnection connection = new OdbcConnection(SystemSettings.FOIFLOWConnectionString);
-                RecordsDAL recordsDAL = new RecordsDAL(connection);
+                OdbcConnection docreviewerconnection = new OdbcConnection(SystemSettings.FOIFLOWConnectionString);
+                RecordsDAL recordsDAL = new RecordsDAL(connection, docreviewerconnection);
                 
 
                 var result = recordsDAL.GetMinistryRequestDetails("CFD-2023-0111114711");
@@ -64,12 +65,26 @@ namespace FOIMOD.CFD.DocMigration.FOIFLOW.DAL.Tests
             {
 
                 OdbcConnection connection = new OdbcConnection(SystemSettings.FOIFLOWConnectionString);
-                RecordsDAL recordsDAL = new RecordsDAL(connection);
+                OdbcConnection docreviewerconnection = new OdbcConnection(SystemSettings.FOIDocReviewerConnectionString);
+
+                var s3url = "https://unittest";
+
+
+                RecordsDAL recordsDAL = new RecordsDAL(connection, docreviewerconnection);
+                var minitryrequestdetails = recordsDAL.GetMinistryRequestDetails("CFD-2023-0111114711");
+
+
                 string attributesJSONtemplate = @"{{""divisions"": [{{""divisionid"": {0}}}], ""lastmodified"": ""{1}"", ""filesize"": {2}, ""batch"": ""{3}"", ""extension"": "".pdf"", ""incompatible"": false}}";
                 var attributedJSON = string.Format(attributesJSONtemplate, 422, DateTime.Now.ToString("MM-dd-yyy"), 1803, Guid.NewGuid().ToString());
 
-                var result = recordsDAL.InsertIntoFOIRequestRecords("CFD-2023-0111114711", "https://unittest", "unittestfile.pdf", attributedJSON);
-                Assert.IsNotNull(result);
+                var recordid = recordsDAL.InsertIntoFOIRequestRecords("CFD-2023-0111114711", s3url, "unittestfile.pdf", attributedJSON, minitryrequestdetails.Item1,minitryrequestdetails.Item2);
+
+                Assert.IsTrue(recordid != -1 );
+
+                var documentmasterid =   recordsDAL.InsertIntoDocumentMaster(minitryrequestdetails.Item1, s3url, recordid);
+
+                Assert.IsTrue(documentmasterid != -1);
+
             }
             catch (Exception ex)
             {
