@@ -22,7 +22,7 @@ namespace FOIMOD.CFD.DocMigration.FOIFLOW.DAL.Tests
             SystemSettings.FOIFLOWConnectionString = configurationbuilder.GetSection("FOIFLOWConfiguration:FOIFLOWConnectionString").Value;
 
 
-
+            SystemSettings.FOIDocReviewerConnectionString = configurationbuilder.GetSection("FOIFLOWConfiguration:FOIDocumentReviewerString").Value;
         }
 
 

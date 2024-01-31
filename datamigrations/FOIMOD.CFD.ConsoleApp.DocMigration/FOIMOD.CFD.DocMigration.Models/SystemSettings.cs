@@ -18,6 +18,8 @@ namespace FOIMOD.CFD.DocMigration.Models
 
         public static string FOIFLOWConnectionString { get; set; }
 
+        public static string FOIDocReviewerConnectionString { get; set; }
+
         public static string RequestToMigrate { get; set; }
 
         public static string FileServerRoot { get; set; }
