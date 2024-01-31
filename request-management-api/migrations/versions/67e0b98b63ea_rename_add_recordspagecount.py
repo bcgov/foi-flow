@@ -18,9 +18,9 @@ depends_on = None
 
 def upgrade():
     op.execute('ALTER TABLE public."FOIMinistryRequests" RENAME COLUMN requestpagecount TO axispagecount;')
-    op.add_column('FOIMinistryRequests', sa.Column('documentspagecount', sa.String(length=20), nullable=True))
+    op.add_column('FOIMinistryRequests', sa.Column('recordspagecount', sa.String(length=20), nullable=True))
 
 
 def downgrade():
     op.execute('ALTER TABLE public."FOIMinistryRequests" RENAME COLUMN axispagecount TO requestpagecount;')
-    op.drop_column('FOIMinistryRequests', 'documentspagecount')
+    op.drop_column('FOIMinistryRequests', 'recordspagecount')
