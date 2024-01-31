@@ -623,7 +623,7 @@ class FOIMinistryRequest(db.Model):
         iaoassignee = aliased(FOIAssignee)
         ministryassignee = aliased(FOIAssignee)
         requestby = 'Ministry'
-
+        print('getrequestssubquery..')
         subquery = FOIMinistryRequest.getrequestssubquery(group, filterfields, keyword, additionalfilter, userid, iaoassignee, ministryassignee, requestby, isiaorestrictedfilemanager, isministryrestrictedfilemanager)
 
         #sorting
@@ -706,38 +706,31 @@ class FOIMinistryRequest(db.Model):
             ministryfilter = FOIMinistryRequest.isactive == True
         else:
             groupfilter = []
+            matchedgroups = []
             for group in groups:
                 if (group == IAOTeamWithKeycloackGroup.flex.value or group in ProcessingTeamWithKeycloackGroup.list()):
-                    groupfilter.append(
-                        and_(
-                            FOIMinistryRequest.assignedgroup == group
-                        )
-                    )
+                    matchedgroups.append(group)
                 elif (group == IAOTeamWithKeycloackGroup.intake.value):
+                    matchedgroups.append(group)
                     groupfilter.append(
-                        or_(
-                            FOIMinistryRequest.assignedgroup == group,
                             and_(
                                 FOIMinistryRequest.assignedgroup == IAOTeamWithKeycloackGroup.flex.value,
                                 FOIMinistryRequest.requeststatuslabel.in_([StateName.open.name])
                             )
-                        )
                     )
                 else:
+                    matchedgroups.append(group)
                     groupfilter.append(
-                        or_(
-                            FOIMinistryRequest.assignedgroup == group,
                             and_(
                                 FOIMinistryRequest.assignedministrygroup == group,
                                 FOIMinistryRequest.requeststatuslabel.in_([StateName.callforrecords.name,StateName.recordsreview.name,StateName.feeestimate.name,StateName.consult.name,StateName.ministrysignoff.name,StateName.onhold.name,StateName.deduplication.name,StateName.harmsassessment.name,StateName.response.name,StateName.peerreview.name,StateName.tagging.name,StateName.readytoscan.name])
                             )
-                        )
                     )
 
             ministryfilter = and_(
                                 FOIMinistryRequest.isactive == True,
                                 FOIRequestStatus.isactive == True,
-                                or_(*groupfilter)
+                                or_(*groupfilter, FOIMinistryRequest.assignedgroup.in_(tuple(matchedgroups)))
                             )
         
         ministryfilterwithclosedoipc = or_(ministryfilter, and_(FOIMinistryRequest.isoipcreview == True, FOIMinistryRequest.requeststatuslabel == StateName.closed.name))
