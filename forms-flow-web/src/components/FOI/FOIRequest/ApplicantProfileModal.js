@@ -396,7 +396,11 @@ const ApplicantProfileModal = React.memo(({modalOpen, handleModalClose}) => {
           <DialogTitle disableTypography id="request-history-dialog-title">
             {selectedApplicant ? 
                 <h3 className="request-history-header search-applicants-header applicant-profile-header">
-                    <ButtonBase
+                    {confirmationMessage ?
+                    <>Saving Changes to Applicant Profile</> :                    
+                    applicantHistory ?
+                    <>Applicant History</> :
+                    <><ButtonBase
                         onClick={() => setShowRequestHistory(false)}
                         disableRipple
                         className={clsx("request-history-header applicant-profile-header", {
@@ -427,11 +431,11 @@ const ApplicantProfileModal = React.memo(({modalOpen, handleModalClose}) => {
                         })}
                     >
                         Request History ({requestHistory?.length})
-                    </ButtonBase>
+                    </ButtonBase></>}
                 </h3>
                 :
                 <h2 className="request-history-header search-applicants-header">
-                Search Applicants
+                {createConfirmation ? <>Create New Profile</> : <>Search Applicants</>}
                 </h2>
             }
             <IconButton onClick={handleClose} value="close">
