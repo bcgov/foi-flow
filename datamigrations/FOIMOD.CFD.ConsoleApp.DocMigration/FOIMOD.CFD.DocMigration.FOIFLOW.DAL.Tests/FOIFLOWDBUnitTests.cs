@@ -38,6 +38,26 @@ namespace FOIMOD.CFD.DocMigration.FOIFLOW.DAL.Tests
         }
 
         [TestMethod]
+        public void GetMinistryRequestDetails()
+        {
+            try
+            {
+
+                OdbcConnection connection = new OdbcConnection(SystemSettings.FOIFLOWConnectionString);
+                RecordsDAL recordsDAL = new RecordsDAL(connection);
+                
+
+                var result = recordsDAL.GetMinistryRequestDetails("CFD-2023-0111114711");
+                Assert.IsNotNull(result);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
+
+        }
+
+        [TestMethod]
         public void RecordsInsertTest()
         {
             try

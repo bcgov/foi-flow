@@ -51,5 +51,45 @@ namespace FOIMOD.CFD.DocMigration.FOIFLOW.DAL
             return result;
         }
 
+        public (int,int) GetMinistryRequestDetails(string axisrequestnumber)
+        {
+            var retVal = (-1, -1);
+            try
+            {
+                
+                dbConnection.Open();
+                var cmdString = @"SELECT foiministryrequestid,version FROM public.""FOIMinistryRequests"" WHERE axisrequestid='{0}' ORDER BY created_at DESC LIMIT 1";
+                using (OdbcCommand comm = new OdbcCommand())
+                {
+                    comm.Connection = (OdbcConnection)dbConnection;
+
+                    comm.CommandText = string.Format(cmdString, axisrequestnumber);
+                    comm.CommandType = CommandType.Text;
+
+                    OdbcDataReader odbcDataReader = comm.ExecuteReader();
+
+                    while(odbcDataReader.Read()) {
+
+                         retVal = (Convert.ToInt32(odbcDataReader["foiministryrequestid"]), Convert.ToInt32(odbcDataReader["version"]));
+                    
+                    }
+
+                    
+                    
+                }
+            }
+            catch (Exception ex)
+            {
+                dbConnection.Close();
+                
+                throw;
+            }
+            finally { 
+                dbConnection.Close();
+                            
+            }
+            return retVal;
+        }
+
     }
 }
