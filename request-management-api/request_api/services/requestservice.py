@@ -252,6 +252,8 @@ class requestservice:
             attributes,
         )
 
+    
+
     def calculateduedate(self, ministryrequestid, foirequest, paymentdate):        
         duedate_includeoffhold, cfrduedate_includeoffhold = self.__isincludeoffhold()
         onhold_extend_days = duecalculator().getbusinessdaysbetween(foirequest["onholdTransitionDate"], paymentdate)
@@ -262,21 +264,36 @@ class requestservice:
         calc_cfrduedate = duecalculator().addbusinessdays(foirequest["cfrDueDate"], cfrduedate_extend_days) 
         return calc_duedate, calc_cfrduedate
 
-    def __skipduedatecalculation(self, ministryrequestid, offholddate):
+    
+    
+
+    def __skipduedatecalculation(self, ministryrequestid, offholddate, currentstatus="", nextstatename=""):
         previousoffholddate = FOIMinistryRequest.getlastoffholddate(ministryrequestid)
+        if (
+            currentstatus not in (None, "")
+            and currentstatus == StateName.onhold.value
+            and nextstatename not in (None, "")
+            and currentstatus == nextstatename
+        ):
+            return True
+        if previousoffholddate not in (None, ""):
+            previouspaymentdate_pst = datetimehandler().convert_to_pst(
+                previousoffholddate
+            )
+            if (
+                datetimehandler().getdate(previouspaymentdate_pst).date()
+                == datetimehandler().getdate(offholddate).date()
+            ):
+                return True
         foiministry_request = FOIMinistryRequest.getrequest(ministryrequestid)
         request_reopened = self.__hasreopened(ministryrequestid, "ministryrequest")
-        if previousoffholddate not in (None, ''):
-            previouspaymentdate_pst = datetimehandler().convert_to_pst(previousoffholddate)
-            if datetimehandler().getdate(previouspaymentdate_pst).date() == datetimehandler().getdate(offholddate).date():
-                return True
         if foiministry_request['isoipcreview'] == True and request_reopened:
             return True
         return False            
 
     def __isincludeoffhold(self):
-        payment_config_str = os.getenv("PAYMENT_CONFIG",'')        
-        if payment_config_str in (None, ''):
+        payment_config_str = os.getenv("PAYMENT_CONFIG","")        
+        if payment_config_str in (None, ""):
             return True, True
         _paymentconfig = json.loads(payment_config_str)
         duedate_includeoffhold = True if _paymentconfig["duedate"]["includeoffhold"] == "Y" else False
