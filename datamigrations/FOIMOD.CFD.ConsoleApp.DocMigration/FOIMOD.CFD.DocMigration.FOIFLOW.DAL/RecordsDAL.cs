@@ -167,5 +167,154 @@ namespace FOIMOD.CFD.DocMigration.FOIFLOW.DAL
             }
             return result;
         }
+
+
+        public int InsertIntoDocuments(int ministryrequestid, string filename, int pagecount, int documentmasterid)
+        {
+            int result = -1;
+            try
+            {
+                dbfoidocreviewerConnection.Open();
+                var cmdString = @"INSERT INTO public.""Documents""(version,filename,foiministryrequestid,createdby,created_at,statusid,pagecount,documentmasterid,incompatible)
+                            values(1,'{0}',{1},'{{""user"":""migrationservice""}}',NOW(),1,{2},{3},false)";
+
+
+                using (OdbcCommand comm = new OdbcCommand())
+                {
+                    comm.Connection = (OdbcConnection)dbfoidocreviewerConnection;
+
+                    comm.CommandText = string.Format(cmdString, filename, ministryrequestid, pagecount, documentmasterid);
+                    comm.CommandType = CommandType.Text;
+                    comm.ExecuteNonQuery();
+
+
+                }
+
+                var documentmasterSQL = @"SELECT documentid FROM   public.""Documents"" WHERE  documentmasterid ={0} AND filename='{1}' AND foiministryrequestid={2};";
+                using (OdbcCommand comm = new OdbcCommand())
+                {
+                    comm.Connection = (OdbcConnection)dbfoidocreviewerConnection;
+
+                    comm.CommandText = string.Format(documentmasterSQL, documentmasterid, filename, ministryrequestid);
+                    comm.CommandType = CommandType.Text;
+                    OdbcDataReader odbcDataReader = comm.ExecuteReader();
+
+                    while (odbcDataReader.Read())
+                    {
+                        result = Convert.ToInt32(odbcDataReader["documentid"]);
+                    }
+
+
+                }
+
+                dbfoidocreviewerConnection.Close();
+
+            }
+            catch (Exception ex)
+            {
+                dbfoidocreviewerConnection.Close();
+                result = -1;
+                throw;
+            }
+            return result;
+        }
+
+        public bool InsertIntoDocumentAttributes(int documentmasterid,string docattributes)
+        {
+            bool result = false;
+            try
+            {
+                dbfoidocreviewerConnection.Open();
+                var cmdString = @"INSERT INTO public.""DocumentAttributes""(
+	                                documentmasterid, attributes, createdby, created_at, version,  isactive)
+	                            VALUES ({0}, '{1}','""migrationservice""',NOW(), 1,true);";
+
+
+                using (OdbcCommand comm = new OdbcCommand())
+                {
+                    comm.Connection = (OdbcConnection)dbfoidocreviewerConnection;
+
+                    comm.CommandText = string.Format(cmdString, documentmasterid, docattributes);
+                    comm.CommandType = CommandType.Text;
+                    comm.ExecuteNonQuery();
+                }
+                
+                dbfoidocreviewerConnection.Close();
+                result = true;
+            }
+            catch (Exception ex)
+            {
+                dbfoidocreviewerConnection.Close();
+                result = false;
+                throw;
+            }
+            return result;
+        }
+
+        public bool InsertIntoDocumentHashcodes(int documentid, string hash)
+        {
+            bool result = false;
+            try
+            {
+                dbfoidocreviewerConnection.Open();
+                var cmdString = @"INSERT INTO public.""DocumentHashCodes""(
+	                            documentid, rank1hash,  created_at)
+                                VALUES ({0}, '{1}',  NOW());";
+
+
+                using (OdbcCommand comm = new OdbcCommand())
+                {
+                    comm.Connection = (OdbcConnection)dbfoidocreviewerConnection;
+
+                    comm.CommandText = string.Format(cmdString, documentid, hash);
+                    comm.CommandType = CommandType.Text;
+                    comm.ExecuteNonQuery();
+                }
+
+                dbfoidocreviewerConnection.Close();
+                result = true;
+            }
+            catch (Exception ex)
+            {
+                dbfoidocreviewerConnection.Close();
+                result = false;
+                throw;
+            }
+            return result;
+        }
+
+        public bool InsertIntoDeduplicationJob(int documentmasterid,int ministryrequestid,string batch,string filename)
+        {
+            bool result = false;
+            try
+            {
+                dbfoidocreviewerConnection.Open();
+                var cmdString = @"INSERT INTO public.""DeduplicationJob""(
+	                                version, ministryrequestid, createdat, batch, trigger, type, filename, status, message, documentmasterid)
+	                                VALUES (3, {0}, NOW(), '{1}', 'recordupload', 'rank1', '{2}', 'completed', 'migrated document', {3});";
+
+
+                using (OdbcCommand comm = new OdbcCommand())
+                {
+                    comm.Connection = (OdbcConnection)dbfoidocreviewerConnection;
+
+                    comm.CommandText = string.Format(cmdString, ministryrequestid, batch,filename,documentmasterid);
+                    comm.CommandType = CommandType.Text;
+                    comm.ExecuteNonQuery();
+                }
+
+                dbfoidocreviewerConnection.Close();
+                result = true;
+
+            }
+            catch (Exception ex)
+            {
+                dbfoidocreviewerConnection.Close();
+                result = false;
+                throw;
+            }
+            return result;
+        }
+
     }
 }
