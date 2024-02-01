@@ -67,8 +67,9 @@ namespace FOIMOD.CFD.DocMigration.FOIFLOW.DAL.Tests
                 OdbcConnection connection = new OdbcConnection(SystemSettings.FOIFLOWConnectionString);
                 OdbcConnection docreviewerconnection = new OdbcConnection(SystemSettings.FOIDocReviewerConnectionString);
 
-                var s3url = "https://unittest";
-                var filename = string.Format("unittestfile-{0}.pdf",Guid.NewGuid().ToString().Replace("-",""));
+                var filename = string.Format("unittestfile-{0}.pdf", Guid.NewGuid().ToString().Replace("-", ""));
+                var s3url = string.Format("https://unittest/{0}",filename);
+                
                 int pagecount = 1;
                 var documenthash = Guid.NewGuid().ToString().Replace("-", "");
                 var batch = Guid.NewGuid().ToString();
