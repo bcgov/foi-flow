@@ -87,7 +87,6 @@ class Payment(Resource):
 @API.route('/foirequests/<int:request_id>/ministryrequest/<int:ministry_request_id>/payments/<int:payment_id>')
 @API.route('/cfrfee/<int:request_id>/ministryrequest/<int:ministry_request_id>/payments/<int:payment_id>')
 class Payment(Resource):
-
     @staticmethod
     @cross_origin(origins=allowedorigins())
     def put(request_id: int, ministry_request_id: int, payment_id: int):
@@ -96,11 +95,13 @@ class Payment(Resource):
             fee: FeeService = FeeService(request_id=ministry_request_id, payment_id=payment_id)
             response, parsed_args = fee.complete_payment(request_json)
             if (response['status'] == 'PAID'):
+                latest_cfr = cfrfeeservice().getcfrfeehistory(ministry_request_id)[0]
+                previously_paid_amount = latest_cfr['feedata']['paidamount'] if latest_cfr['feedata']['paidamount'] is not None else "0.00"
                 amountpaid = float(parsed_args.get('trnAmount'))
                 cfrfeeservice().paycfrfee(ministry_request_id, amountpaid)
                 paymentservice().createpaymentversion(request_id, ministry_request_id, amountpaid)
                 data = requestservice().getrequestdetails(request_id, ministry_request_id)
-                paymentservice().createpaymentreceipt(request_id, ministry_request_id, data, parsed_args)
+                paymentservice().createpaymentreceipt(request_id, ministry_request_id, data, parsed_args, previously_paid_amount)
                 nextstatename, paymenteventtype = paymentservice().postpayment(ministry_request_id, data)
                 cfrfeeservice().updatepaymentmethod(ministry_request_id, paymenteventtype)
                 # automated state transition and due date calculation

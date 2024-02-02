@@ -84,7 +84,7 @@ class paymentservice:
             return parse(str(paymentexpirydate)).strftime("%Y-%m-%d")
         return ""
 
-    def createpaymentreceipt(self, request_id, ministry_request_id, data, parsed_args):
+    def createpaymentreceipt(self, request_id, ministry_request_id, data, parsed_args, previously_paid_amount):
         try:
             templatename = self.__getlatesttemplatename(ministry_request_id)
             balancedue = float(data['cfrfee']['feedata']["balanceDue"])
@@ -92,7 +92,9 @@ class paymentservice:
             basepath = 'request_api/receipt_templates/'
             receiptname = 'cfr_fee_payment_receipt'
             attachmentcategory = "FEE-ESTIMATE-PAYMENT-RECEIPT"
-            filename = "Fee Estimate Payment Receipt.pdf"
+            #LOGIC -> if cfrformreasonid === 2 adjust file name to revised fee estimate and date. 
+            #Logic for revised invoi -> You can also get and check balanceremainig here by accessingg fee data like above -> and if crfform id = 2 -> you can create a whole new invoice for the revised fee
+            filename = f"Fee Estimate Payment Receipt {data['cfrfee']['created_at']}.pdf"
             if balancedue > 0:
                 receipt_template_path= basepath + self.getreceiptename('HALFPAYMENT') +".docx"
                 receiptname = self.getreceiptename('HALFPAYMENT')
@@ -101,7 +103,7 @@ class paymentservice:
                 if prevstate.lower() == "response" or (templatename and templatename == 'PAYOUTSTANDING'):
                     receiptname = self.getreceiptename('PAYOUTSTANDING')
                     attachmentcategory = "OUTSTANDING-PAYMENT-RECEIPT"
-                    filename = "Fee Balance Outstanding Payment Receipt.pdf"
+                    filename = f"Fee Balance Outstanding Payment Receipt {data['cfrfee']['created_at']}.pdf"
                 receipt_template_path= basepath + receiptname + ".docx"
             data['waivedAmount'] = data['cfrfee']['feedata']['estimatedlocatinghrs'] * 30 if data['cfrfee']['feedata']['estimatedlocatinghrs'] < 3 else 90
             data.update({'paymentInfo': {
