@@ -84,15 +84,17 @@ class paymentservice:
             return parse(str(paymentexpirydate)).strftime("%Y-%m-%d")
         return ""
 
-    def createpaymentreceipt(self, request_id, ministry_request_id, data, parsed_args):
+    def createpaymentreceipt(self, request_id, ministry_request_id, data, parsed_args, previously_paid_amount):
         try:
+            data['previous_amt_paid'] = previously_paid_amount
             templatename = self.__getlatesttemplatename(ministry_request_id)
             balancedue = float(data['cfrfee']['feedata']["balanceDue"])
             prevstate = data["stateTransition"][1]["status"] if "stateTransition" in data and len(data["stateTransition"])  > 2 else None
             basepath = 'request_api/receipt_templates/'
             receiptname = 'cfr_fee_payment_receipt'
             attachmentcategory = "FEE-ESTIMATE-PAYMENT-RECEIPT"
-            filename = "Fee Estimate Payment Receipt.pdf"
+            filename = f"Fee Estimate Payment Receipt {data['cfrfee']['created_at']}.pdf"
+            print(data)
             if balancedue > 0:
                 receipt_template_path= basepath + self.getreceiptename('HALFPAYMENT') +".docx"
                 receiptname = self.getreceiptename('HALFPAYMENT')
@@ -101,7 +103,7 @@ class paymentservice:
                 if prevstate.lower() == "response" or (templatename and templatename == 'PAYOUTSTANDING'):
                     receiptname = self.getreceiptename('PAYOUTSTANDING')
                     attachmentcategory = "OUTSTANDING-PAYMENT-RECEIPT"
-                    filename = "Fee Balance Outstanding Payment Receipt.pdf"
+                    filename = f"Fee Balance Outstanding Payment Receipt {data['cfrfee']['created_at']}.pdf"
                 receipt_template_path= basepath + receiptname + ".docx"
             data['waivedAmount'] = data['cfrfee']['feedata']['estimatedlocatinghrs'] * 30 if data['cfrfee']['feedata']['estimatedlocatinghrs'] < 3 else 90
             data.update({'paymentInfo': {
@@ -110,6 +112,7 @@ class paymentservice:
                 'transactionId': parsed_args.get('pbcTxnNumber'),
                 'cardType': parsed_args.get('cardType')
             }})
+            print(data)
             document_service : DocumentGenerationService = DocumentGenerationService(receiptname)
             receipt = document_service.generate_receipt(data,receipt_template_path)
             document_service.upload_receipt(filename, receipt.content, ministry_request_id, data['bcgovcode'], data['idNumber'], attachmentcategory)
