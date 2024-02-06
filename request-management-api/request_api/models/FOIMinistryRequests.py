@@ -709,8 +709,6 @@ class FOIMinistryRequest(db.Model):
             for idx, group in enumerate(groups):
                 if (group == IAOTeamWithKeycloackGroup.flex.value or group in ProcessingTeamWithKeycloackGroup.list()):
                     matchedgroups.append(group)
-                    if idx == len(groups) - 1:
-                        groupfilter.append(FOIMinistryRequest.assignedgroup.in_(tuple(matchedgroups)))
                 elif (group == IAOTeamWithKeycloackGroup.intake.value):
                     groupfilter.append(
                         or_(
@@ -731,6 +729,9 @@ class FOIMinistryRequest(db.Model):
                             )
                         )
                     )
+
+                if idx == len(groups) - 1:
+                    groupfilter.append(FOIMinistryRequest.assignedgroup.in_(tuple(matchedgroups)))
 
             ministryfilter = and_(
                                 FOIMinistryRequest.isactive == True,
