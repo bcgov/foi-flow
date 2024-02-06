@@ -96,7 +96,7 @@ class Payment(Resource):
             response, parsed_args = fee.complete_payment(request_json)
             if (response['status'] == 'PAID'):
                 latest_cfr = cfrfeeservice().getcfrfeehistory(ministry_request_id)[0]
-                previously_paid_amount = latest_cfr['feedata']['amountpaid'] if latest_cfr['feedata']['amountpaid'] is not None else "0.00"
+                previously_paid_amount = latest_cfr['feedata']['amountpaid'] if latest_cfr['feedata']['amountpaid'] is not None else 0
                 amountpaid = float(parsed_args.get('trnAmount'))
                 cfrfeeservice().paycfrfee(ministry_request_id, amountpaid)
                 paymentservice().createpaymentversion(request_id, ministry_request_id, amountpaid)
