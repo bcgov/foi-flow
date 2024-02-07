@@ -1179,10 +1179,7 @@ export const RecordsLog = ({
       saveAs(blobs[0].input, blobs[0].name);
     } else {
       const zipfile = await downloadZip(blobs).blob();
-      var currentFilter = divisionFilters.find(
-        (division) => division.divisionid === filterValue
-      ).divisionname;
-      saveAs(zipfile, requestNumber + " Records - " + currentFilter + ".zip");
+      saveAs(zipfile, requestNumber + " Records - " + ".zip");
     }
   };
 
