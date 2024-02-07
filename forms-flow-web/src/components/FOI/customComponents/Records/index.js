@@ -83,6 +83,7 @@ import {
   faTrash,
   faPenToSquare,
   faLinkSlash,
+  faDownload,
 } from "@fortawesome/free-solid-svg-icons";
 import Dialog from "@material-ui/core/Dialog";
 import DialogActions from "@material-ui/core/DialogActions";
@@ -1103,27 +1104,33 @@ export const RecordsLog = ({
     );
   }
 
-  const downloadAllDocuments = async () => {
+  const downloadSelectedDocuments = async () => {
     let blobs = [];
     var completed = 0;
     let failed = 0;
-    var exporting = records.filter((record) => !record.isduplicate);
-    for (let record of exporting) {
-      if (record.attachments)
-        for (let attachment of record.attachments) {
-          if (!attachment.isduplicate) exporting.push(attachment);
+    var selected = records.filter((record) => record.isselected);
+
+    for(let record of records) {
+      if(record.attachments && !record.isselected) {
+        for(let attachment of record.attachments) {
+          if(attachment.isselected) {
+            selected.push(record);
+            break;
+          }
         }
+      }
     }
     const toastID = toast.loading(
-      "Exporting files (" + completed + "/" + exporting.length + ")"
+      "Downloading files (" + completed + "/" + selected.length + ")"
     );
     try {
-      for (let record of exporting) {
+      for (let record of selected) {
         var filepath = record.s3uripath;
         var filename = record.filename;
-        if (record.isredactionready && record.isconverted) {
-          filepath = filepath.substr(0, filepath.lastIndexOf(".")) + ".pdf";
-          filename += ".pdf";
+        if (record.isduplicate) {
+          let duplicatefiles = selected.filter((_record) => _record.filename == record.filename);
+          if(duplicatefiles.length > 1)
+            filename = filename.substring(0, filename.lastIndexOf(".")) + "_" + record.attributes.divisions[0].divisionname + "_" + Date.now() + filename.substring(filename.lastIndexOf("."));
         }
         const response = await getFOIS3DocumentPreSignedUrl(
           filepath.split("/").slice(4).join("/"),
@@ -1143,7 +1150,7 @@ export const RecordsLog = ({
           completed++;
           toast.update(toastID, {
             render:
-              "Exporting files (" + completed + "/" + exporting.length + ")",
+              "Downloading files (" + completed + "/" + selected.length + ")",
             isLoading: true,
           });
         });
@@ -1155,7 +1162,7 @@ export const RecordsLog = ({
       render:
         failed > 0
           ? failed.length + " file(s) failed to download"
-          : exporting.length + " Files exported",
+          : selected.length + " Files exported",
       type: failed > 0 ? "error" : "success",
     };
     toast.update(toastID, {
@@ -1168,11 +1175,15 @@ export const RecordsLog = ({
       draggable: true,
       closeButton: true,
     });
-    const zipfile = await downloadZip(blobs).blob();
-    var currentFilter = divisionFilters.find(
-      (division) => division.divisionid === filterValue
-    ).divisionname;
-    saveAs(zipfile, requestNumber + " Records - " + currentFilter + ".zip");
+    if(blobs.length == 1) {
+      saveAs(blobs[0].input, blobs[0].name);
+    } else {
+      const zipfile = await downloadZip(blobs).blob();
+      var currentFilter = divisionFilters.find(
+        (division) => division.divisionid === filterValue
+      ).divisionname;
+      saveAs(zipfile, requestNumber + " Records - " + currentFilter + ".zip");
+    }
   };
 
   const retryDocument = (record) => {
@@ -1266,8 +1277,15 @@ export const RecordsLog = ({
         setModal(false);
         break;
       case "delete":
+        console.log("delete", records)
         setModalFor("delete");
         setModal(true);
+        break;
+      case "downloadselected":
+        console.log("downloadselected", records)
+        downloadSelectedDocuments();
+        setModalFor("download");
+        setModal(false);
         break;
       case "retry":
         retryDocument(_record);
@@ -2074,6 +2092,21 @@ export const RecordsLog = ({
                     }
                   >
                     <FontAwesomeIcon icon={faTrash} size="lg" color="#38598A" />
+                  </button>
+                </span>
+              </Tooltip>
+              <Tooltip title={<div style={{ fontSize: "11px" }}>Download</div>}>
+                <span>
+                  <button
+                    className={` btn`}
+                    onClick={() => handlePopupButtonClick("downloadselected")}
+                    // title="Delete"
+                    disabled={!checkIsAnySelected()}
+                    style={
+                      !checkIsAnySelected() ? { pointerEvents: "none" } : {}
+                    }
+                  >
+                    <FontAwesomeIcon icon={faDownload} size="lg" color="#38598A" />
                   </button>
                 </span>
               </Tooltip>
