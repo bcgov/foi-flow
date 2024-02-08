@@ -2146,8 +2146,8 @@ export const RecordsLog = ({
                       To download records:{" "}
                       <ul>
                         <li>at least one record must be selected</li>
-                        <li>download size limit is {displaySizeLimit()}</li>
-                        <li>download records limit is {RECORD_DOWNLOAD_LIMIT}</li>
+                        {RECORD_DOWNLOAD_LIMIT>0 && (<li>download size limit is {displaySizeLimit()}</li>)}
+                        {RECORD_DOWNLOAD_LIMIT>0 && (<li>download records limit is {RECORD_DOWNLOAD_LIMIT}</li>)}
                       </ul>
                     </div>
                   ) : (
