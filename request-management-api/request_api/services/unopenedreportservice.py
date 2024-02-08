@@ -56,7 +56,7 @@ class unopenedreportservice:
                 alerts.append({"request": request, "rank": 2, "potentialmatches": alert.potentialmatches})
         alerts.sort(key=lambda a : a.get('potentialmatches', {'highscore': 0})['highscore'])
         senderservice().send(
-            subject="Intake Unopened Request Report: " + date.today(),
+            subject="Intake Unopened Request Report: " + str(date.today()),
             content=self.generateemailhtml(alerts),
             _messageattachmentlist=[],
             requestjson={"email": self.reportemail, "topic": "Unopened Report"}
@@ -66,7 +66,7 @@ class unopenedreportservice:
 
     def generateemailhtml(self, alerts):
         emailhtml = """
-            <h3>Unopened Report - 2024/02/05</h3>
+            <h3>Unopened Report - """ + str(date.today()) + """</h3>
 
             <p>This is a report for unopened requests in the past 10 days that have not yet been actioned.</p>
             <p><b>Rank 1:</b> Very likely to be unactioned — unable to find a request with any matching applicant info</p>
