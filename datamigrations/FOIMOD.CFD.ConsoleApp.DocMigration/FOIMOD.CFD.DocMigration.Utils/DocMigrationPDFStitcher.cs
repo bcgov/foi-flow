@@ -8,13 +8,14 @@ using SyncfusionPDFGraphics = Syncfusion.Pdf.Graphics ;
 using TheArtOfDev.HtmlRenderer.PdfSharp;
 using Syncfusion.Pdf.Graphics;
 using Syncfusion.Drawing;
+using Amazon.S3.Model;
 
 namespace FOIMOD.CFD.DocMigration.Utils
 {
     public class DocMigrationPDFStitcher : IDisposable
     {
         
-        private Stream mergeddocstream = null;
+        private MemoryStream mergeddocstream = null;
         private Stream createemailpdfmemorystream = null;
         public DocMigrationPDFStitcher()
         {
@@ -28,14 +29,15 @@ namespace FOIMOD.CFD.DocMigration.Utils
             mergeddocstream.Dispose();
         }
 
-        public Stream MergePDFs(List<DocumentToMigrate> pdfpages)
+        public MemoryStream MergePDFs(List<DocumentToMigrate> pdfpages,string baseUNClocation = null)
         {
             var _pdfpages = pdfpages.OrderBy(p => p.PageSequenceNumber).ToArray<DocumentToMigrate>();
             using (PdfDocument pdfdocument = new PdfDocument())
             {
                 foreach (DocumentToMigrate pDFDocToMerge in _pdfpages)
                 {
-                    using PdfDocument inputPDFDocument = !pDFDocToMerge.HasStreamForDocument ? PdfReader.Open(pDFDocToMerge.PageFilePath, PdfDocumentOpenMode.Import) : PdfReader.Open(pDFDocToMerge.FileStream, PdfDocumentOpenMode.Import);
+                    string filelocation = String.IsNullOrEmpty(baseUNClocation) ? pDFDocToMerge.PageFilePath : Path.Combine(baseUNClocation,pDFDocToMerge.SiFolderID, pDFDocToMerge.PageFilePath);
+                    using PdfDocument inputPDFDocument = !pDFDocToMerge.HasStreamForDocument ? PdfReader.Open(filelocation, PdfDocumentOpenMode.Import) : PdfReader.Open(pDFDocToMerge.FileStream, PdfDocumentOpenMode.Import);
 
                     pdfdocument.Version = inputPDFDocument.Version;
                     foreach (PdfPage page in inputPDFDocument.Pages)
@@ -49,7 +51,7 @@ namespace FOIMOD.CFD.DocMigration.Utils
             return mergeddocstream;
         }
 
-        public Stream MergeImages(List<DocumentToMigrate> imagefiles)
+        public MemoryStream MergeImages(List<DocumentToMigrate> imagefiles)
         {
             var _images = imagefiles.OrderBy(p => p.PageSequenceNumber).ToArray<DocumentToMigrate>();
             //Creating the new PDF document

@@ -5,9 +5,11 @@ using FOIMOD.CFD.DocMigration.Models;
 using FOIMOD.CFD.DocMigration.Models.Document;
 using FOIMOD.CFD.DocMigration.Models.FOIFLOWDestination;
 using FOIMOD.CFD.DocMigration.Utils;
+using MCS.FOI.OCRtoPDF;
 using Microsoft.Data.SqlClient;
 using System.Data;
 using System.Data.Odbc;
+using System.Net.Mail;
 
 namespace FOIMOD.CFD.DocMigration.BAL
 {
@@ -32,7 +34,9 @@ namespace FOIMOD.CFD.DocMigration.BAL
             DocumentsDAL documentsDAL = new DocumentsDAL((SqlConnection)sourceaxisSQLConnection);
             AttachmentsDAL attachmentsDAL = new AttachmentsDAL((OdbcConnection)destinationfoiflowQLConnection);
             DocMigrationPDFStitcher docMigrationPDFStitcher = new DocMigrationPDFStitcher();
-            
+            OCRTOPdf.TessaractPath = "C:\\Abindev\\foi-flow\\datamigrations\\FOIMOD.CFD.ConsoleApp.DocMigration\\FOIMOD.CFD.DocMigration.OCR\\Tesseractbinaries_core\\Windows\\x64";
+            OCRTOPdf.TessaractLanguagePath = "C:\\Abindev\\foi-flow\\datamigrations\\FOIMOD.CFD.ConsoleApp.DocMigration\\FOIMOD.CFD.DocMigration.OCR\\tessdata";
+
 
             if (SystemSettings.CorrespondenceLogMigration)
             {
@@ -133,7 +137,7 @@ namespace FOIMOD.CFD.DocMigration.BAL
                 Console.WriteLine("Completed : Migration Correspondence logs.... ");
             }
 
-            if(SystemSettings.RecordsMigration)
+            if (SystemSettings.RecordsMigration)
             {
                 Console.WriteLine("Starting migration of Records Logs");
 
@@ -144,8 +148,64 @@ namespace FOIMOD.CFD.DocMigration.BAL
                     var _requestnumber = requestwithquote.Replace("'", "");
 
                     List<DocumentToMigrate>? records = documentsDAL.GetRecordsByRequest(_requestnumber);
+
+                    if (records.Any())
+                    {
+                        var docIDs = records.Select(r => r.IDocID).Distinct().ToList();
+
+                        foreach (var docid in docIDs)
+                        {
+
+                            var pagesbyDoc = records.Where(r => r.IDocID == docid).OrderBy(p => p.PageSequenceNumber).ToList();
+
+                            if (pagesbyDoc.Any() && pagesbyDoc.Count == 1) // SINGLE PAGE DOC
+                            { 
+                                var pagedetails = pagesbyDoc.First();
+                                //TODO: FIND SECTION TAG - LOGIC TODO
+                                var filename = string.Format("{0}_Page_{1}{2}", pagedetails.FolderName, pagedetails.PageSequenceNumber,pagedetails.FileType);
+                            
+                            }
+                            else if (pagesbyDoc.Any() && pagesbyDoc.Count > 1) // MULTIPLE PAGES DOC
+                            {
+                                //TODO: FIND SECTION TAG - LOGIC TODO
+                                var docDetails = pagesbyDoc.First();
+                                var actualfilename = string.Format("{0}_Page_{1}{2}", docDetails.FolderName, docDetails.TotalPageCount, docDetails.FileType);
+
+
+                                //STITCHING PDF
+                                var baseRecordsLocation = Path.Combine(SystemSettings.FileServerRoot, SystemSettings.RecordsbaseFolder);
+                                MemoryStream docStream =  docDetails.FileType.ToLower().Contains("pdf") ? docMigrationPDFStitcher.MergePDFs(pagesbyDoc, baseRecordsLocation) : docMigrationPDFStitcher.MergeImages(pagesbyDoc);
+
+                               
+
+                                if (docStream != null)
+                                {
+                                   
+                                    using (MemoryStream stitchedFileStream = OCRTOPdf.ConvertToSearchablePDF(docStream))
+                                    {
+                                        var destinationfilename_guidbased = string.Format("{0}{1}", Guid.NewGuid().ToString(), docDetails.FileType);
+                                        var s3filesubpath = string.Format("{0}/{1}", SystemSettings.MinistryRecordsBucket, _requestnumber.ToUpper());
+
+                                        var uploadresponse = await docMigrationS3Client.UploadFileAsync(new UploadFile() { AXISRequestID = _requestnumber.ToUpper(), SubFolderPath = s3filesubpath, DestinationFileName = destinationfilename_guidbased, FileStream = stitchedFileStream });
+
+
+
+                                    }
+                                }
+                                
+
+
+                            }
+
+                        }
+
+                    }
+
+
+
+
                 }
-                
+
 
 
                 Console.WriteLine("completed migration of Records Logs");

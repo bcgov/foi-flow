@@ -8,12 +8,14 @@
 
   <ItemGroup>
     <PackageReference Include="AWSSDK.S3" Version="3.7.201.12" />
+	  <PackageReference Include="Syncfusion.Licensing" Version="24.1.47" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\FOIMOD.CFD.DocMigration.DAL\FOIMOD.CFD.DocMigration.AXIS.DAL.csproj" />
     <ProjectReference Include="..\FOIMOD.CFD.DocMigration.FOIFLOW.DAL\FOIMOD.CFD.DocMigration.FOIFLOW.DAL.csproj" />
     <ProjectReference Include="..\FOIMOD.CFD.DocMigration.Models\FOIMOD.CFD.DocMigration.Models.csproj" />
+    <ProjectReference Include="..\FOIMOD.CFD.DocMigration.OCR\FOIMOD.CFD.DocMigration.OCR.csproj" />
     <ProjectReference Include="..\FOIMOD.CFD.DocMigration.Utils\FOIMOD.CFD.DocMigration.Utils.csproj" />
   </ItemGroup>
 

@@ -21,7 +21,7 @@ var configurationbuilder = new ConfigurationBuilder()
 
 #endif
 
-
+Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("License here");
 SystemSettings.FileServerRoot = configurationbuilder.GetSection("S3Configuration:FileServerRoot").Value;
 SystemSettings.CorrespondenceLogBaseFolder = configurationbuilder.GetSection("S3Configuration:CorrespondenceLogBaseFolder").Value;
 SystemSettings.RecordsbaseFolder = configurationbuilder.GetSection("S3Configuration:RecordsbaseFolder").Value;
@@ -39,6 +39,7 @@ SystemSettings.FOIFLOWConnectionString = configurationbuilder.GetSection("FOIFLO
 
 SystemSettings.CorrespondenceLogMigration = Convert.ToBoolean(configurationbuilder.GetSection("S3Configuration:CorrespondenceLogMigration").Value);
 SystemSettings.RecordsMigration = Convert.ToBoolean(configurationbuilder.GetSection("S3Configuration:RecordsMigration").Value);
+SystemSettings.MinistryRecordsBucket = configurationbuilder.GetSection("S3Configuration:MinistryRecordsBucket").Value;
 
 SqlConnection axissqlConnection = new SqlConnection(SystemSettings.AXISConnectionString);
 OdbcConnection odbcConnection = new OdbcConnection(SystemSettings.FOIFLOWConnectionString);

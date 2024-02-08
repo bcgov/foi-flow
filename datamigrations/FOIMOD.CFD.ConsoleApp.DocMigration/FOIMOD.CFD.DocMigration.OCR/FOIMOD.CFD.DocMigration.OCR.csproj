@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net7.0</TargetFramework>
@@ -7,8 +7,17 @@
   </PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Syncfusion.Licensing" Version="24.1.46" />
-		<PackageReference Include="Syncfusion.PDF.OCR.NET" Version="24.1.46" />
+		<PackageReference Include="Syncfusion.Licensing" Version="24.1.47" />
+		<PackageReference Include="Syncfusion.PDF.OCR.NET" Version="24.1.47" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Update="Tesseractbinaries_core\Windows\x64\leptonica-1.80.0.dll">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </None>
+	  <None Update="Tesseractbinaries_core\Windows\x64\libSyncfusionTesseract.dll">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </None>
 	</ItemGroup>
 
 </Project>

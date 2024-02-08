@@ -40,6 +40,8 @@ namespace FOIMOD.CFD.DocMigration.Models
 
         public static bool RecordsMigration { get; set; }
 
+        public static string MinistryRecordsBucket { get; set; }
+
 
     }
 }

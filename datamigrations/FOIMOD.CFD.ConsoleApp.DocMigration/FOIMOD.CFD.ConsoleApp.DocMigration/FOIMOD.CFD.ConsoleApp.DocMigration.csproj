@@ -5,7 +5,7 @@
     <TargetFramework>net7.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <PlatformTarget>x86</PlatformTarget>
+    
   </PropertyGroup>
 	<ItemGroup>
 		<PackageReference Include="AWSSDK.S3" Version="3.7.201.12" />
@@ -13,6 +13,8 @@
 		<PackageReference Include="Microsoft.Extensions.Hosting" Version="6.0.1" />
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
 		<PackageReference Include="System.Data.Odbc" Version="7.0.0" />
+		
+		
 	</ItemGroup>
 	<ItemGroup>
 	  <ProjectReference Include="..\FOIMOD.CFD.DocMigration.BAL\FOIMOD.CFD.DocMigration.BAL.csproj" />
