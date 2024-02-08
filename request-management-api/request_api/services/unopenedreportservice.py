@@ -22,8 +22,8 @@ class unopenedreportservice:
 
 
     def generateunopenedreport(self):
-        startdate = date.today() - timedelta(days=self.dayscutoff)
-        enddate = startdate + timedelta(days=self.waitdays)
+        startdate = date.today() - timedelta(days=int(self.dayscutoff))
+        enddate = startdate + timedelta(days=int(self.waitdays))
         requests = FOIRawRequest.getunopenedunactionedrequests(str(startdate), str(enddate))
         alerts = []
         for request in requests:
@@ -79,6 +79,7 @@ class unopenedreportservice:
                 <th>Description</th>
             </tr>
         """
+        firstrank2 = True
         for alert in alerts:
             if alert.get('potentialmatches', False):
                 emailhtml += '''
@@ -91,7 +92,6 @@ class unopenedreportservice:
                     </tr>
                 '''
             else:
-                firstrank2 = True
                 if firstrank2:
                     emailhtml += """</table>
                         <p><b>Rank 2:</b> Possibly unactioned — requests found but some applicant info is mismatching — please double check</p>
@@ -106,6 +106,8 @@ class unopenedreportservice:
                         </tr>
                     """
                     firstrank2 = False
+                if alert['potentialmatches']['highscore'] < float(self.jarocutoff):
+                    break
                 emailhtml += '''
                     <tr>
                         <td>U-000''' + alert['request']['requestid'] + '''</td>
