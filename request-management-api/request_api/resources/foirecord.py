@@ -234,3 +234,28 @@ class FOIRequestRecordsChanged(Resource):
         except Exception as error:
             print("Exception error == ", error)
             return {'status': False, 'message': str(error)}, 500
+
+
+@cors_preflight('POST,OPTIONS')
+@API.route('/updatepagecount')
+class UpdateRequestsPageCount(Resource):
+    """Resource for soft delete FOI requests."""
+
+    @staticmethod
+    @TRACER.trace()
+    @cross_origin(origins=allowedorigins())
+    @auth.require
+    def post():
+        try:
+            requestjson = request.get_json()
+            ministryrequestid = requestjson['ministryrequestid']  if requestjson.get("ministryrequestid") != None else None
+            if ministryrequestid:
+                result = recordservice().updatepagecount(ministryrequestid, AuthHelper.getuserid())
+                print(f'result = {result}')
+                return {'status': result.success, 'message':result.message,'id':result.identifier} , 200
+            else:
+                return {'status': True, 'message':'ministryrequestid is none'} , 200
+        except KeyError as error:
+            return {'status': False, 'message': CUSTOM_KEYERROR_MESSAGE + str(error)}, 400
+        except BusinessException as exception:
+            return {'status': exception.status_code, 'message':exception.message}, 500

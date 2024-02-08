@@ -67,6 +67,7 @@ class FOIMinistryRequest(db.Model):
     axissyncdate = db.Column(db.DateTime, nullable=True)    
     axisrequestid = db.Column(db.String(120), nullable=True)
     axispagecount = db.Column(db.String(20), nullable=True)
+    recordspagecount = db.Column(db.String(20), nullable=True)
     linkedrequests = db.Column(JSON, unique=False, nullable=True)
     identityverified = db.Column(JSON, unique=False, nullable=True)
     ministrysignoffapproval = db.Column(JSON, unique=False, nullable=True)
@@ -441,10 +442,16 @@ class FOIMinistryRequest(db.Model):
                            else_ = cast(FOIMinistryRequest.cfrduedate, String)).label('cfrduedate')
 
         axispagecount = case([
-            (FOIMinistryRequest.axispagecount.is_(None),
-            '0'),
-            ],
-            else_ = cast(FOIMinistryRequest.axispagecount, String)).label('axispagecount')
+                (
+                    FOIMinistryRequest.recordspagecount.isnot(None),
+                    FOIMinistryRequest.recordspagecount
+                ),
+                (
+                    and_(FOIMinistryRequest.recordspagecount.is_(None), FOIMinistryRequest.axispagecount.isnot(None)),
+                    FOIMinistryRequest.axispagecount
+                )
+                ],
+                else_= literal("0")).label('pagecount')
 
         onbehalfformatted = case([
                             (and_(onbehalf_applicant.lastname.isnot(None), onbehalf_applicant.firstname.isnot(None)),
@@ -662,7 +669,17 @@ class FOIMinistryRequest(db.Model):
     @classmethod
     def findfield(cls, x, iaoassignee, ministryassignee):
         #add more fields here if need sort/filter/search more columns
-
+        requestpagecount = case([
+                (
+                    FOIMinistryRequest.recordspagecount.isnot(None),
+                    FOIMinistryRequest.recordspagecount
+                ),
+                (
+                    and_(FOIMinistryRequest.recordspagecount.is_(None), FOIMinistryRequest.axispagecount.isnot(None)),
+                    FOIMinistryRequest.axispagecount
+                )
+                ],
+                else_= literal("'0'")).label('pagecount')
         return {
             'firstName': FOIRequestApplicant.firstname,
             'lastName': FOIRequestApplicant.lastname,
@@ -688,7 +705,7 @@ class FOIMinistryRequest(db.Model):
             'DueDateValue': FOIMinistryRequest.duedate,
             'DaysLeftValue': FOIMinistryRequest.duedate,
             'ministry': func.upper(ProgramArea.bcgovcode),
-            'axispagecount': FOIMinistryRequest.axispagecount,
+            'axispagecount': requestpagecount,
             'closedate': FOIMinistryRequest.closedate,
             'subjectcode': SubjectCode.name,
             'isoipcreview': FOIMinistryRequest.isoipcreview
@@ -1005,10 +1022,16 @@ class FOIMinistryRequest(db.Model):
                            else_ = cast(FOIMinistryRequest.cfrduedate, String)).label('cfrduedate')
 
         axispagecount = case([
-            (FOIMinistryRequest.axispagecount.is_(None),
-            '0'),
-            ],
-            else_ = cast(FOIMinistryRequest.axispagecount, String)).label('axispagecount')
+                (
+                    FOIMinistryRequest.recordspagecount.isnot(None),
+                    FOIMinistryRequest.recordspagecount
+                ),
+                (
+                    and_(FOIMinistryRequest.recordspagecount.is_(None), FOIMinistryRequest.axispagecount.isnot(None)),
+                    FOIMinistryRequest.axispagecount
+                )
+                ],
+                else_= literal("0")).label('axispagecount')
 
         onbehalfformatted = case([
                             (and_(onbehalf_applicant.lastname.isnot(None), onbehalf_applicant.firstname.isnot(None)),
@@ -1411,5 +1434,5 @@ class FOIMinistryRequestSchema(ma.Schema):
                 'foirequest.receivedmodeid','requeststatus.requeststatusid','requeststatuslabel','requeststatus.name','programarea.bcgovcode',
                 'programarea.name','foirequest_id','foirequestversion_id','created_at','updated_at','createdby','assignedministryperson',
                 'assignedministrygroup','cfrduedate','closedate','closereasonid','closereason.name',
-                'assignee.firstname','assignee.lastname','ministryassignee.firstname','ministryassignee.lastname', 'axisrequestid', 'axissyncdate', 'axispagecount', 'linkedrequests', 'ministrysignoffapproval', 'identityverified','originalldd','isoipcreview')
+                'assignee.firstname','assignee.lastname','ministryassignee.firstname','ministryassignee.lastname', 'axisrequestid', 'axissyncdate', 'axispagecount', 'linkedrequests', 'ministrysignoffapproval', 'identityverified','originalldd','isoipcreview', 'recordspagecount')
     

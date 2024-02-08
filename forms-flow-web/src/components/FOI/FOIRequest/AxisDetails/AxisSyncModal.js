@@ -28,6 +28,7 @@ import { createRequestDetailsObjectFunc,
          isMandatoryField,
          getUniqueIdentifier } from "../utils";
 import { formatDate } from "../../../../helper/FOI/helper";
+import MANDATORY_FOI_REQUEST_FIELDS from '../../../../constants/FOI/mandatoryFOIRequestFields';
 
 
 const useStyles = makeStyles({
@@ -78,7 +79,7 @@ const AxisSyncModal = ({ axisSyncModalOpen, setAxisSyncModalOpen, saveRequestObj
       for(let key of Object.keys(requestDetailsFromAxis)){
         let updatedField = isAxisSyncDisplayField(key);
         if(updatedField){
-          let updateNeeded= checkValidation(key);
+          let updateNeeded = checkValidation(key);
           if(updateNeeded){
             assignDisplayedReqObj(key, updatedObj, updatedField);
             ///To Do : update to ENUM/constant
@@ -99,6 +100,14 @@ const AxisSyncModal = ({ axisSyncModalOpen, setAxisSyncModalOpen, saveRequestObj
 
 
     const checkValidation = (key) => {
+      
+      if (key === MANDATORY_FOI_REQUEST_FIELDS.TOTAL_NO_OF_PAGES) {
+        if (saveRequestObject["recordspagecount"] > 0)
+          return false;
+        else if ((saveRequestObject["axispagecount"] || requestDetailsFromAxis[key]) && saveRequestObject["axispagecount"] !== requestDetailsFromAxis[key])
+          return true;
+        return false;
+      }
       let mandatoryField = isMandatoryField(key);
       if(mandatoryField && !requestDetailsFromAxis[key])
         return false;

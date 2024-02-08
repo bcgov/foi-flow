@@ -29,6 +29,7 @@ class recordservice(recordservicebase):
     conversionlargefilesizelimit= getenv('CONVERSION_STREAM_SEPARATION_FILE_SIZE_LIMIT',3145728)
     stitchinglargefilesizelimit= getenv('STITCHING_STREAM_SEPARATION_FILE_SIZE_LIMIT',524288000)
     pdfstitchstreamkey_largefiles = getenv('EVENT_QUEUE_PDFSTITCH_LARGE_FILE_STREAMKEY')
+    pagecalculatorstreamkey = getenv('EVENT_QUEUE_PAGECALCULATOR_STREAM_KEY')
 
     def create(self, requestid, ministryrequestid, recordschema, userid):
         """Creates a record for a user with document details passed in for an opened request.
@@ -294,7 +295,20 @@ class recordservice(recordservicebase):
                             assignedstreamkey= self.largefilededupestreamkey
                         eventqueueservice().add(assignedstreamkey, streamobject)
         return dbresponse
+    
 
+    def updatepagecount(self, ministryrequestid, userid):
+        streamobj = {
+            'ministryrequestid': ministryrequestid
+        }
+        job, err = self.makedocreviewerrequest('POST', '/api/pagecalculatorjobstatus', streamobj)
+        if err:
+            return DefaultMethodResult(False,'Error in contacting Doc Reviewer API for pagecalculatorjobstatus', -1, ministryrequestid)
+        else:
+            streamobj["jobid"] = job.get("id")
+            streamobj["createdby"] = userid
+        eventqueueservice().add(self.pagecalculatorstreamkey, streamobj)
+        return DefaultMethodResult(True,'Pushed to PageCountCalculator stream', job.get("id"), ministryrequestid)
     
 
     
