@@ -1276,7 +1276,6 @@ export const RecordsLog = ({
         setModal(false);
         break;
       case "delete":
-        console.log("delete", records)
         setModalFor("delete");
         setModal(true);
         break;
