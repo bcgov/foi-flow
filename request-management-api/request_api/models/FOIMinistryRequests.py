@@ -441,7 +441,7 @@ class FOIMinistryRequest(db.Model):
                            ],
                            else_ = cast(FOIMinistryRequest.cfrduedate, String)).label('cfrduedate')
 
-        axispagecount = case([
+        requestpagecount = case([
                 (
                     FOIMinistryRequest.recordspagecount.isnot(None),
                     FOIMinistryRequest.recordspagecount
@@ -451,7 +451,7 @@ class FOIMinistryRequest(db.Model):
                     FOIMinistryRequest.axispagecount
                 )
                 ],
-                else_= literal("0")).label('pagecount')
+                else_= literal("0")).label('requestpagecount')
 
         onbehalfformatted = case([
                             (and_(onbehalf_applicant.lastname.isnot(None), onbehalf_applicant.firstname.isnot(None)),
@@ -484,7 +484,7 @@ class FOIMinistryRequest(db.Model):
             FOIMinistryRequest.assignedto.label('assignedTo'),
             cast(FOIMinistryRequest.filenumber, String).label('idNumber'),
             cast(FOIMinistryRequest.axisrequestid, String).label('axisRequestId'),
-            axispagecount,
+            requestpagecount,
             FOIMinistryRequest.foiministryrequestid.label('ministryrequestid'),
             FOIMinistryRequest.assignedministrygroup.label('assignedministrygroup'),
             FOIMinistryRequest.assignedministryperson.label('assignedministryperson'),
@@ -705,7 +705,7 @@ class FOIMinistryRequest(db.Model):
             'DueDateValue': FOIMinistryRequest.duedate,
             'DaysLeftValue': FOIMinistryRequest.duedate,
             'ministry': func.upper(ProgramArea.bcgovcode),
-            'axispagecount': requestpagecount,
+            'requestpagecount': requestpagecount,
             'closedate': FOIMinistryRequest.closedate,
             'subjectcode': SubjectCode.name,
             'isoipcreview': FOIMinistryRequest.isoipcreview
@@ -1021,7 +1021,7 @@ class FOIMinistryRequest(db.Model):
                            ],
                            else_ = cast(FOIMinistryRequest.cfrduedate, String)).label('cfrduedate')
 
-        axispagecount = case([
+        requestpagecount = case([
                 (
                     FOIMinistryRequest.recordspagecount.isnot(None),
                     FOIMinistryRequest.recordspagecount
@@ -1031,7 +1031,7 @@ class FOIMinistryRequest(db.Model):
                     FOIMinistryRequest.axispagecount
                 )
                 ],
-                else_= literal("0")).label('axispagecount')
+                else_= literal("0")).label('requestpagecount')
 
         onbehalfformatted = case([
                             (and_(onbehalf_applicant.lastname.isnot(None), onbehalf_applicant.firstname.isnot(None)),
@@ -1063,7 +1063,7 @@ class FOIMinistryRequest(db.Model):
             FOIMinistryRequest.assignedto.label('assignedTo'),
             cast(FOIMinistryRequest.filenumber, String).label('idNumber'),
             cast(FOIMinistryRequest.axisrequestid, String).label('axisRequestId'),
-            axispagecount,
+            requestpagecount,
             FOIMinistryRequest.foiministryrequestid.label('ministryrequestid'),
             FOIMinistryRequest.assignedministrygroup.label('assignedministrygroup'),
             FOIMinistryRequest.assignedministryperson.label('assignedministryperson'),

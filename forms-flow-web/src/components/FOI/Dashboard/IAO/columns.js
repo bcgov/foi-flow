@@ -90,7 +90,7 @@ const ProcessingTeamColumns = [
       params.row.extensions === undefined ? "N/A" : params.row.extensions,
   },
   {
-    field: "axispagecount",
+    field: "requestpagecount",
     headerName: "PAGES",
     headerAlign: "left",
     flex: 0.5,
