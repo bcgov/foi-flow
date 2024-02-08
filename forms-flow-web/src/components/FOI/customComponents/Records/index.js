@@ -1542,12 +1542,15 @@ export const RecordsLog = ({
     let fileCount = 0;
     let totalFileSize = 0;
 
+    const recordlimit = RECORD_DOWNLOAD_LIMIT == 0 ? 1000000000 : RECORD_DOWNLOAD_LIMIT;
+    const sizelimt = RECORD_DOWNLOAD_SIZE_LIMIT == 0 ? 999999999999 : RECORD_DOWNLOAD_SIZE_LIMIT;
+
     for (let record of records) {
       if (record.isselected) {
         fileCount++;
         totalFileSize += record.attributes.filesize;
 
-        if(fileCount > RECORD_DOWNLOAD_LIMIT || totalFileSize > RECORD_DOWNLOAD_SIZE_LIMIT)
+        if(fileCount > recordlimit || totalFileSize > sizelimt)
           return true;
       } else {
         if(record.attachments) {
@@ -1556,7 +1559,7 @@ export const RecordsLog = ({
               fileCount++;
               totalFileSize += record.attributes.filesize;
 
-              if(fileCount > RECORD_DOWNLOAD_LIMIT || totalFileSize > RECORD_DOWNLOAD_SIZE_LIMIT)
+              if(fileCount > recordlimit || totalFileSize > sizelimt)
               return true;
 
               break;
