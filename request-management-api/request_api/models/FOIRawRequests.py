@@ -1083,13 +1083,13 @@ class FOIRawRequest(db.Model):
                         select max(version) as version, requestid from public."FOIRawRequests"
                         group by requestid
                     ) mv on mv.requestid = rr.requestid and mv.version = rr.version
-                    join (
+                    left join (
                         select request_id, max(payment_id) from public."Payments"
                         where fee_code_id = 1
                         group by request_id
                         order by request_id
-                    ) mp
-                    join public."Payments" p on p.payment_id = mp.max
+                    ) mp on mp.request_id = rr.requestid
+                    left join public."Payments" p on p.payment_id = mp.max
                     where status = 'Unopened' and rr.version = 1 and created_at > :startdate and created_at < :enddate
                     order by rr.requestid '''
             rs = db.session.execute(text(sql), {'startdate': startdate, 'enddate': enddate})
