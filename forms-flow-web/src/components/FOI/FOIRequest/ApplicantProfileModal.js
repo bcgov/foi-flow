@@ -56,8 +56,8 @@ const ApplicantProfileModal = React.memo(({modalOpen, handleModalClose}) => {
 
     let requestDetails = useSelector((state) => state.foiRequests.foiRequestDetail);
     const dispatch = useDispatch();
-    
-        const [searchText, setSearchText] = useState("");
+
+    const [searchText, setSearchText] = useState("");
     const [isLoading, setIsLoading] = useState(true);
     const [rows, setRows] = useState([]);
     const [selectedApplicant, setSelectedApplicant] = useState(false)
