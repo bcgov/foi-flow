@@ -97,6 +97,8 @@ import {
   RECORD_PROCESSING_HRS,
   OSS_S3_CHUNK_SIZE,
   DISABLE_REDACT_WEBLINK,
+  RECORD_DOWNLOAD_LIMIT,
+  RECORD_DOWNLOAD_SIZE_LIMIT
 } from "../../../../constants/constants";
 import {
   removeDuplicateFiles,
@@ -1279,7 +1281,6 @@ export const RecordsLog = ({
         setModal(true);
         break;
       case "downloadselected":
-        console.log("downloadselected", records)
         downloadSelectedDocuments();
         setModalFor("download");
         setModal(false);
@@ -1525,6 +1526,50 @@ export const RecordsLog = ({
       }
     }
     return false;
+  };
+
+  const displaySizeLimit = () => {
+    if(RECORD_DOWNLOAD_SIZE_LIMIT >= (1024*1024*1024))
+      return (RECORD_DOWNLOAD_SIZE_LIMIT/(1024*1024*1024)).toFixed(1) + "GB";
+    if(RECORD_DOWNLOAD_SIZE_LIMIT >= (1024*1024))
+      return (RECORD_DOWNLOAD_SIZE_LIMIT/(1024*1024)).toFixed(1) + "MB";
+    if(RECORD_DOWNLOAD_SIZE_LIMIT >= 1024 )
+      return (RECORD_DOWNLOAD_SIZE_LIMIT/(1024)).toFixed(1) + "KB";
+    return RECORD_DOWNLOAD_SIZE_LIMIT + "Bytes";
+  }
+
+  const isSelectLimitReached = () => {
+    let fileCount = 0;
+    let totalFileSize = 0;
+
+    for (let record of records) {
+      if (record.isselected) {
+        fileCount++;
+        totalFileSize += record.attributes.filesize;
+
+        if(fileCount > RECORD_DOWNLOAD_LIMIT || totalFileSize > RECORD_DOWNLOAD_SIZE_LIMIT)
+          return true;
+      } else {
+        if(record.attachments) {
+          for(let attachment of record.attachments) {
+            if(attachment.isselected) {
+              fileCount++;
+              totalFileSize += record.attributes.filesize;
+
+              if(fileCount > RECORD_DOWNLOAD_LIMIT || totalFileSize > RECORD_DOWNLOAD_SIZE_LIMIT)
+              return true;
+
+              break;
+            }
+          }
+        }
+      }
+    }
+
+    if(fileCount == 0)
+      return true;
+    else
+      return false;
   };
 
   function intersection(setA, setB) {
@@ -2092,15 +2137,31 @@ export const RecordsLog = ({
                   </button>
                 </span>
               </Tooltip>
-              <Tooltip title={<div style={{ fontSize: "11px" }}>Download</div>}>
+              <Tooltip
+                title={
+                  isSelectLimitReached() ? (
+                    <div style={{ fontSize: "11px" }}>
+                      To download records:{" "}
+                      <ul>
+                        <li>at least one record must be selected</li>
+                        <li>download size limit is {displaySizeLimit()}</li>
+                        <li>download records limit is {RECORD_DOWNLOAD_LIMIT}</li>
+                      </ul>
+                    </div>
+                  ) : (
+                    <div style={{ fontSize: "11px" }}>Download</div>
+                  )
+                }
+                sx={{ fontSize: "11px" }}
+              >
                 <span>
                   <button
                     className={` btn`}
                     onClick={() => handlePopupButtonClick("downloadselected")}
                     // title="Delete"
-                    disabled={!checkIsAnySelected()}
+                    disabled={isSelectLimitReached()}
                     style={
-                      !checkIsAnySelected() ? { pointerEvents: "none" } : {}
+                      isSelectLimitReached() ? { pointerEvents: "none" } : {}
                     }
                   >
                     <FontAwesomeIcon icon={faDownload} size="lg" color="#38598A" />
