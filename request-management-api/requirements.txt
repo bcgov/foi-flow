@@ -36,6 +36,7 @@ gunicorn==20.1.0
 idna==2.10
 itsdangerous==2.0.1
 jaeger-client==4.4.0
+jaro-winkler==2.0.3
 jsonschema==3.2.0
 marshmallow-sqlalchemy==0.23.1
 marshmallow==3.0.0rc7
