@@ -120,7 +120,7 @@ class unopenedreportservice:
                     '''
                 for m in alert['potentialmatches']['matches']:
                     emailhtml += (m['requestid'] + " - similarity: " + str(m['similarity']) + "<br>")
-                emailhtml = emailhtml[:4]
+                emailhtml = emailhtml[:-4]
                 emailhtml += '''</td>
                         <td>''' + alert['request']['requestrawdata']['descriptionTimeframe']['description'][0:99] + '''...</td>
                     </tr>
