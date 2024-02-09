@@ -23,7 +23,7 @@ class unopenedreportservice:
 
     def generateunopenedreport(self):
         startdate = date.today() - timedelta(days=int(self.dayscutoff))
-        enddate = startdate + timedelta(days=int(self.waitdays))
+        enddate = date.today() -  timedelta(days=int(self.waitdays))
         requests = FOIRawRequest.getunopenedunactionedrequests(str(startdate), str(enddate))
         alerts = []
         for request in requests:
