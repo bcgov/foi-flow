@@ -56,8 +56,6 @@ const ApplicantProfileModal = React.memo(({modalOpen, handleModalClose}) => {
 
     let requestDetails = useSelector((state) => state.foiRequests.foiRequestDetail);
     const dispatch = useDispatch();
-    
-    console.log(requestDetails);
 
     const [searchText, setSearchText] = useState("");
     const [isLoading, setIsLoading] = useState(true);
@@ -168,7 +166,6 @@ const ApplicantProfileModal = React.memo(({modalOpen, handleModalClose}) => {
     useEffect(() => {
         setSaveApplicantObject({...selectedApplicant})
         for (let field in selectedApplicant) {
-            console.log(field)
             if (field === 'additionalPersonalInfo') {
                 if (requestDetails[field] && requestDetails.requestType === 'personal') {
                     for (let additionalField in selectedApplicant[field]) {
