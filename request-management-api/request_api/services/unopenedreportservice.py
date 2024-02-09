@@ -80,6 +80,7 @@ class unopenedreportservice:
             </tr>
         """
         firstrank2 = True
+        print(alerts)
         for alert in alerts:
             if alert.get('potentialmatches', False):
                 emailhtml += '''
@@ -106,6 +107,7 @@ class unopenedreportservice:
                         </tr>
                     """
                     firstrank2 = False
+                print(alert)
                 if alert['potentialmatches']['highscore'] > float(self.jarocutoff):
                     break
                 emailhtml += '''
