@@ -68,7 +68,7 @@ class unopenedreportservice:
         emailhtml = """
             <h3>Unopened Report - 2024/02/05</h3>
 
-            <p>This is a report for unopened requests in the past 10 days that have not yet been actioned.</p>
+            <p>This is a report for unopened requests in the past """ + self.dayscutoff + """ days that have not yet been actioned.</p>
             <p><b>Rank 1:</b> Very likely to be unactioned — unable to find a request with any matching applicant info</p>
             <table border='1' style='border-collapse:collapse'>
             <tr>
@@ -82,7 +82,7 @@ class unopenedreportservice:
         firstrank2 = True
         print(alerts)
         for alert in alerts:
-            if alert.get('potentialmatches', False):
+            if alert.get('potentialmatches') == None:
                 emailhtml += '''
                     <tr>
                         <td>U-000''' + alert['request']['requestid'] + '''</td>
