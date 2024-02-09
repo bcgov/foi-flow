@@ -106,7 +106,7 @@ class unopenedreportservice:
                         </tr>
                     """
                     firstrank2 = False
-                if alert['potentialmatches']['highscore'] < float(self.jarocutoff):
+                if alert['potentialmatches']['highscore'] > float(self.jarocutoff):
                     break
                 emailhtml += '''
                     <tr>
