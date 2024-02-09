@@ -123,6 +123,7 @@ class unopenedreportservice:
                         <td>''' + alert['request']['requestrawdata']['descriptionTimeframe']['description'][0:99] + '''...</td>
                     </tr>
                 '''
+        return emailhtml
 
 
     # def isrank2match(self, request, match):
