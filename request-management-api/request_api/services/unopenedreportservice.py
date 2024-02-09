@@ -23,7 +23,7 @@ class unopenedreportservice:
 
     def generateunopenedreport(self):
         startdate = date.today() - timedelta(days=int(self.dayscutoff))
-        enddate = startdate + timedelta(days=int(self.waitdays))
+        enddate = date.today() -  timedelta(days=int(self.waitdays))
         requests = FOIRawRequest.getunopenedunactionedrequests(str(startdate), str(enddate))
         alerts = []
         for request in requests:
@@ -80,6 +80,7 @@ class unopenedreportservice:
             </tr>
         """
         firstrank2 = True
+        print(alerts)
         for alert in alerts:
             if alert.get('potentialmatches', False):
                 emailhtml += '''
@@ -106,7 +107,8 @@ class unopenedreportservice:
                         </tr>
                     """
                     firstrank2 = False
-                if alert['potentialmatches']['highscore'] < float(self.jarocutoff):
+                print(alert)
+                if alert['potentialmatches']['highscore'] > float(self.jarocutoff):
                     break
                 emailhtml += '''
                     <tr>
