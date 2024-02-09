@@ -1103,7 +1103,7 @@ class FOIRawRequest(db.Model):
     def getunopenedunactionedrequests(cls, startdate, enddate):
         try:
             requests = []
-            sql = '''select rr.created_at, rr.requestrawdata, rr.requestid, p.status from public."FOIRawRequests" rr
+            sql = '''select rr.created_at, rr.requestrawdata, rr.requestid, coalesce(p.status, '') as status from public."FOIRawRequests" rr
                     join (
                         select max(version) as version, requestid from public."FOIRawRequests"
                         group by requestid
@@ -1115,7 +1115,7 @@ class FOIRawRequest(db.Model):
                         order by request_id
                     ) mp on mp.request_id = rr.requestid
                     left join public."Payments" p on p.payment_id = mp.max
-                    where status = 'Unopened' and rr.version = 1 and created_at > :startdate and created_at < :enddate
+                    where rr.status = 'Unopened' and rr.version = 1 and created_at > :startdate and created_at < :enddate
                     order by rr.requestid '''
             rs = db.session.execute(text(sql), {'startdate': startdate, 'enddate': enddate})
             for row in rs:
