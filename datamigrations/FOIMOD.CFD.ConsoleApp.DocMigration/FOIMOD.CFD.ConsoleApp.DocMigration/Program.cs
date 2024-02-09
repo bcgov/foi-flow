@@ -52,13 +52,7 @@ using (StreamWriter logFileWriter = new StreamWriter(logFilePath, append: true))
     // Output some text on the console
     using (logger.BeginScope("[scope is enabled]"))
     {
-        logger.LogInformation("Hello World!");
-        logger.LogInformation("Logs contain timestamp and log level.");
-        logger.LogInformation("Each log message is fit in a single line.");
-
-
-
-
+    
 
         Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("License here");
         SystemSettings.FileServerRoot = configurationbuilder.GetSection("S3Configuration:FileServerRoot").Value;
@@ -75,6 +69,7 @@ using (StreamWriter logFileWriter = new StreamWriter(logFilePath, append: true))
         SystemSettings.RequestToMigrate = configurationbuilder.GetSection("AXISConfiguration:RequestToMigrate").Value;
 
         SystemSettings.FOIFLOWConnectionString = configurationbuilder.GetSection("FOIFLOWConfiguration:FOIFLOWConnectionString").Value;
+        SystemSettings.FOIDocReviewerConnectionString = configurationbuilder.GetSection("FOIFLOWConfiguration:FOIDocumentReviewerString").Value;
 
         SystemSettings.CorrespondenceLogMigration = Convert.ToBoolean(configurationbuilder.GetSection("S3Configuration:CorrespondenceLogMigration").Value);
         SystemSettings.RecordsMigration = Convert.ToBoolean(configurationbuilder.GetSection("S3Configuration:RecordsMigration").Value);
@@ -82,6 +77,7 @@ using (StreamWriter logFileWriter = new StreamWriter(logFilePath, append: true))
 
         SqlConnection axissqlConnection = new SqlConnection(SystemSettings.AXISConnectionString);
         OdbcConnection odbcConnection = new OdbcConnection(SystemSettings.FOIFLOWConnectionString);
+        OdbcConnection docreviewerconnection = new OdbcConnection(SystemSettings.FOIDocReviewerConnectionString);
 
         AWSCredentials s3credentials = new BasicAWSCredentials(SystemSettings.S3_AccessKey, SystemSettings.S3_SecretKey);
 
@@ -107,7 +103,7 @@ using (StreamWriter logFileWriter = new StreamWriter(logFilePath, append: true))
         if (SystemSettings.RecordsMigration)
         {
             Console.WriteLine("RecordsMigration  Starting...");
-            RecordsLogMigration recordsLogMigration = new RecordsLogMigration(axissqlConnection, odbcConnection, amazonS3Client, logger);
+            RecordsLogMigration recordsLogMigration = new RecordsLogMigration(axissqlConnection, odbcConnection, docreviewerconnection, amazonS3Client, logger);
             recordsLogMigration.RequestsToMigrate = SystemSettings.RequestToMigrate;
             await recordsLogMigration.RunMigration();
             Console.WriteLine("RecordsMigration  Completed");

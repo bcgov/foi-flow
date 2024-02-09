@@ -51,7 +51,7 @@ namespace FOIMOD.CFD.DocMigration.Utils
             return mergeddocstream;
         }
 
-        public MemoryStream MergeImages(List<DocumentToMigrate> imagefiles)
+        public MemoryStream MergeImages(List<DocumentToMigrate> imagefiles, string baseUNClocation = null)
         {
             var _images = imagefiles.OrderBy(p => p.PageSequenceNumber).ToArray<DocumentToMigrate>();
             //Creating the new PDF document
@@ -73,6 +73,25 @@ namespace FOIMOD.CFD.DocMigration.Utils
 
                     //Setting image bounds 
                      RectangleF imageBounds = new RectangleF(0, 0, pageSize.Width, pageSize.Height);
+
+
+                    //Drawing image to the PDF page
+                    page.Graphics.DrawImage(image, imageBounds);
+                    file.Dispose();
+                }
+                else
+                {
+                    using MemoryStream file = new MemoryStream();
+                    string filelocation = String.IsNullOrEmpty(baseUNClocation) ? formFile.PageFilePath : Path.Combine(baseUNClocation, formFile.SiFolderID, formFile.PageFilePath);
+
+                    PdfBitmap image = new PdfBitmap(File.Open(filelocation, FileMode.Open));
+                    //Adding new page
+                    SyncfusionPDF.PdfPage page = page = document.Pages.Add();
+
+                    SizeF pageSize = page.GetClientSize();
+
+                    //Setting image bounds 
+                    RectangleF imageBounds = new RectangleF(0, 0, pageSize.Width, pageSize.Height);
 
 
                     //Drawing image to the PDF page
