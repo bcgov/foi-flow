@@ -296,7 +296,7 @@ class recordservice(recordservicebase):
                         eventqueueservice().add(assignedstreamkey, streamobject)
         return dbresponse
     
-
+    # this is for inflight request pagecount calculation option 1
     def updatepagecount(self, ministryrequestid, userid):
         streamobj = {
             'ministryrequestid': ministryrequestid
@@ -310,6 +310,7 @@ class recordservice(recordservicebase):
         eventqueueservice().add(self.pagecalculatorstreamkey, streamobj)
         return DefaultMethodResult(True,'Pushed to PageCountCalculator stream', job.get("id"), ministryrequestid)
     
+    # this is for inflight request pagecount calculation option 2
     def calculatepagecount(self, requestid, ministryrequestid, userid):
         uploadedrecords = FOIRequestRecord.fetch(requestid, ministryrequestid)
         if len(uploadedrecords) > 0:
@@ -319,6 +320,7 @@ class recordservice(recordservicebase):
             return FOIMinistryRequest().updaterecordspagecount(ministryrequestid, pagecount, userid) 
         return DefaultMethodResult(True,'No request to update', ministryrequestid)
     
+    # this is for inflight request pagecount calculation option 2
     def __calculatepagecount(self, records):
         page_count = 0
         for record in records:

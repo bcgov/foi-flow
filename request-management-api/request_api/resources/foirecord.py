@@ -236,6 +236,7 @@ class FOIRequestRecordsChanged(Resource):
             return {'status': False, 'message': str(error)}, 500
 
 
+# this is for inflight request pagecount calculation option 1
 @cors_preflight('POST,OPTIONS')
 @API.route('/updatepagecount')
 class UpdateRequestsPageCount(Resource):
@@ -259,7 +260,7 @@ class UpdateRequestsPageCount(Resource):
         except BusinessException as exception:
             return {'status': exception.status_code, 'message':exception.message}, 500
     
-
+# this is for inflight request pagecount calculation option 2
 @cors_preflight('POST,OPTIONS')
 @API.route('/updatepagecount/option2')
 class UpdateRequestsPageCountOption2(Resource):
