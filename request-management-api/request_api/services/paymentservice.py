@@ -19,6 +19,7 @@ from pytz import timezone
 import pytz
 import maya
 import logging
+import re
 
 class paymentservice:
     """ FOI payment management service
@@ -84,15 +85,16 @@ class paymentservice:
             return parse(str(paymentexpirydate)).strftime("%Y-%m-%d")
         return ""
 
-    def createpaymentreceipt(self, request_id, ministry_request_id, data, parsed_args):
+    def createpaymentreceipt(self, request_id, ministry_request_id, data, parsed_args, previously_paid_amount):
         try:
+            data['previous_amt_paid'] = '{:.2f}'.format(previously_paid_amount)
             templatename = self.__getlatesttemplatename(ministry_request_id)
             balancedue = float(data['cfrfee']['feedata']["balanceDue"])
             prevstate = data["stateTransition"][1]["status"] if "stateTransition" in data and len(data["stateTransition"])  > 2 else None
             basepath = 'request_api/receipt_templates/'
             receiptname = 'cfr_fee_payment_receipt'
             attachmentcategory = "FEE-ESTIMATE-PAYMENT-RECEIPT"
-            filename = "Fee Estimate Payment Receipt.pdf"
+            filename = f"Fee Estimate Payment Receipt {re.sub(r'[^a-zA-Z0-9]', '', data['cfrfee']['created_at'])}.pdf"
             if balancedue > 0:
                 receipt_template_path= basepath + self.getreceiptename('HALFPAYMENT') +".docx"
                 receiptname = self.getreceiptename('HALFPAYMENT')
@@ -101,7 +103,7 @@ class paymentservice:
                 if prevstate.lower() == "response" or (templatename and templatename == 'PAYOUTSTANDING'):
                     receiptname = self.getreceiptename('PAYOUTSTANDING')
                     attachmentcategory = "OUTSTANDING-PAYMENT-RECEIPT"
-                    filename = "Fee Balance Outstanding Payment Receipt.pdf"
+                    filename = f"Fee Balance Outstanding Payment Receipt {re.sub(r'[^a-zA-Z0-9]', '', data['cfrfee']['created_at'])}.pdf"
                 receipt_template_path= basepath + receiptname + ".docx"
             data['waivedAmount'] = data['cfrfee']['feedata']['estimatedlocatinghrs'] * 30 if data['cfrfee']['feedata']['estimatedlocatinghrs'] < 3 else 90
             data.update({'paymentInfo': {
