@@ -85,7 +85,7 @@ class unopenedreportservice:
             if alert.get('potentialmatches') == None:
                 emailhtml += '''
                     <tr>
-                        <td>U-000''' + alert['request']['requestid'] + '''</td>
+                        <td>U-000''' + str(alert['request']['requestid']) + '''</td>
                         <td>''' + alert['request']['requestrawdata']['contactInfo']['lastName'] + '''</td>
                         <td>''' + alert['request']['requestrawdata']['contactInfo']['firstName'] + '''</td>
                         <td>''' + alert['request']['paymentstatus'] + '''</td>
@@ -112,14 +112,14 @@ class unopenedreportservice:
                     break
                 emailhtml += '''
                     <tr>
-                        <td>U-000''' + alert['request']['requestid'] + '''</td>
+                        <td>U-000''' + str(alert['request']['requestid']) + '''</td>
                         <td>''' + alert['request']['requestrawdata']['contactInfo']['lastName'] + '''</td>
                         <td>''' + alert['request']['requestrawdata']['contactInfo']['firstName'] + '''</td>
                         <td>''' + alert['request']['paymentstatus'] + '''</td>
                         <td>
                     '''
                 for m in alert['potentialmatches']:
-                    emailhtml += (m['requestid'] + " - similarity: " + m['similarity'] + "<br>")
+                    emailhtml += (str(m['requestid']) + " - similarity: " + m['similarity'] + "<br>")
                 emailhtml = emailhtml[:4]
                 emailhtml += '''</td>
                         <td>''' + alert['request']['requestrawdata']['descriptionTimeframe']['description'][0:99] + '''...</td>
