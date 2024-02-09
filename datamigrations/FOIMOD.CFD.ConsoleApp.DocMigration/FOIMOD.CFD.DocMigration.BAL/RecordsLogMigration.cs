@@ -88,7 +88,7 @@ namespace FOIMOD.CFD.DocMigration.BAL
                                 var baseRecordsLocation = Path.Combine(SystemSettings.FileServerRoot, SystemSettings.RecordsbaseFolder);
                                 var pagesbyDoc = records.Where(r => r.IDocID == docid).OrderBy(p => p.PageSequenceNumber).ToList();
                                 var pagedetails = pagesbyDoc.First();
-                                actualfilename = string.Format("{0}_Page_{1}{2}", pagedetails.FolderName, pagedetails.TotalPageCount, pagedetails.FileType);
+                                actualfilename = string.Format("{0}_{1}{2}", pagedetails.ParentFolderName, pagedetails.FolderName, pagedetails.FileType);
                                 if (pagesbyDoc.Any() )
                                 {
                                     //TODO: FIND SECTION TAG - LOGIC TODO

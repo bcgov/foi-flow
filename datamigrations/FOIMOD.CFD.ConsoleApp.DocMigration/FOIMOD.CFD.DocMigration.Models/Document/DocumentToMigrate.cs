@@ -18,5 +18,9 @@ namespace FOIMOD.CFD.DocMigration.Models.Document
 
         public string FileType { get; set; }
 
+        public string ParentFolderName { get; set; }
+
+        public string ReviewFlag { get; set; }
+
     }
 }
