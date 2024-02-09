@@ -310,6 +310,25 @@ class recordservice(recordservicebase):
         eventqueueservice().add(self.pagecalculatorstreamkey, streamobj)
         return DefaultMethodResult(True,'Pushed to PageCountCalculator stream', job.get("id"), ministryrequestid)
     
+    def calculatepagecount(self, requestid, ministryrequestid, userid):
+        uploadedrecords = FOIRequestRecord.fetch(requestid, ministryrequestid)
+        if len(uploadedrecords) > 0:
+          records, err = recordservicegetter().getdatafromdocreviewer(uploadedrecords, ministryrequestid)
+          if err is None:
+            pagecount = self.__calculatepagecount(records)
+            return FOIMinistryRequest().updaterecordspagecount(ministryrequestid, pagecount, userid) 
+        return DefaultMethodResult(True,'No request to update', ministryrequestid)
+    
+    def __calculatepagecount(self, records):
+        page_count = 0
+        for record in records:
+            if not record.get("isduplicate", False):
+                page_count += record.get("pagecount", 0)
+                attachments = record.get("attachments", [])
+                for attachment in attachments:
+                    if not attachment.get("isduplicate", False):
+                        page_count += attachment.get("pagecount", 0)
+        return page_count
 
     
 

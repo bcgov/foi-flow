@@ -1425,6 +1425,15 @@ class FOIMinistryRequest(db.Model):
             raise ex
         finally:
             db.session.close()
+    
+    @classmethod
+    def updaterecordspagecount(cls, ministryrequestid, pagecount, userid):
+        currequest = db.session.query(FOIMinistryRequest).filter_by(foiministryrequestid=ministryrequestid).order_by(FOIMinistryRequest.version.desc()).first()
+        setattr(currequest,'recordspagecount',pagecount)
+        setattr(currequest,'updated_at',datetime.now().isoformat())
+        setattr(currequest,'updatedby',userid)
+        db.session.commit()  
+        return DefaultMethodResult(True,'Request updated',ministryrequestid)
 
 class FOIMinistryRequestSchema(ma.Schema):
     class Meta:
