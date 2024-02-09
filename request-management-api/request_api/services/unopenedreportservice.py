@@ -88,7 +88,7 @@ class unopenedreportservice:
                         <td>U-000''' + str(alert['request']['requestid']) + '''</td>
                         <td>''' + alert['request']['requestrawdata']['contactInfo']['lastName'] + '''</td>
                         <td>''' + alert['request']['requestrawdata']['contactInfo']['firstName'] + '''</td>
-                        <td>''' + alert['request']['paymentstatus'] + '''</td>
+                        <td>''' + alert['request'].get('paymentstatus', "") + '''</td>
                         <td>''' + alert['request']['requestrawdata']['descriptionTimeframe']['description'][0:99] + '''...</td>
                     </tr>
                 '''
@@ -115,7 +115,7 @@ class unopenedreportservice:
                         <td>U-000''' + str(alert['request']['requestid']) + '''</td>
                         <td>''' + alert['request']['requestrawdata']['contactInfo']['lastName'] + '''</td>
                         <td>''' + alert['request']['requestrawdata']['contactInfo']['firstName'] + '''</td>
-                        <td>''' + alert['request']['paymentstatus'] + '''</td>
+                        <td>''' + alert['request'].get('paymentstatus', "") + '''</td>
                         <td>
                     '''
                 for m in alert['potentialmatches']:
