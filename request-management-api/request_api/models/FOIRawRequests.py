@@ -1103,7 +1103,7 @@ class FOIRawRequest(db.Model):
     def getunopenedunactionedrequests(cls, startdate, enddate):
         try:
             requests = []
-            sql = '''select rr.created_at, rr.requestrawdata, rr.requestid, p.status from public."FOIRawRequests" rr
+            sql = '''select rr.created_at, rr.requestrawdata, rr.requestid, coalesce(p.status, '') as status from public."FOIRawRequests" rr
                     join (
                         select max(version) as version, requestid from public."FOIRawRequests"
                         group by requestid
