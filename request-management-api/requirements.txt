@@ -78,3 +78,4 @@ boto3==1.24.35
 walrus==0.8.2
 imap-tools==0.56.0
 -e git+https://github.com/bcgov/sbc-common-components.git#egg=sbc-common-components&subdirectory=python
+dnspython>=2.6.0rc1 # not directly required, pinned by Snyk to avoid a vulnerability
