@@ -171,7 +171,7 @@ const Queue = ({ userDetail, tableInfo }) => {
             container
             alignItems="flex-start"
             justifyContent="center"
-            xs={3}
+            xs={'auto'}
             minWidth="390px"
           >
             <Stack direction="row" sx={{ overflowX: "hidden" }} spacing={1}>
@@ -201,6 +201,17 @@ const Queue = ({ userDetail, tableInfo }) => {
                 size="small"
                 onClick={() => requestFilterChange("watchingRequests")}
                 clicked={requestFilter === "watchingRequests"}
+              />
+              <ClickableChip
+                id="unassignedRequests"
+                key={`unassigned-requests`}
+                label={"UNASSIGNED REQUESTS"}
+                color="primary"
+                size="small"
+                onClick={() => {
+                  requestFilterChange("unassignedRequests")
+                }}
+                clicked={requestFilter === "unassignedRequests"}
               />
             </Stack>
           </Grid>
