@@ -275,6 +275,7 @@ class UpdateRequestsPageCountOption2(Resource):
             requestjson = request.get_json()
             ministryrequestid = requestjson['ministryrequestid']  if requestjson.get("ministryrequestid") != None else None
             requestid = requestjson['requestid']  if requestjson.get("requestid") != None else None
+            print(f'option 2 >>> requestid = {requestid}, ministryrequestid = {ministryrequestid}')
             if ministryrequestid:
                 result = recordservice().calculatepagecount(requestid, ministryrequestid, AuthHelper.getuserid())
                 return {'status': result.success, 'message':result.message,'id':result.identifier} , 200

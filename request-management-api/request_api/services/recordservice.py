@@ -322,6 +322,7 @@ class recordservice(recordservicebase):
     
     # this is for inflight request pagecount calculation option 2
     def __calculatepagecount(self, records):
+        print(f'records = {records}')
         page_count = 0
         for record in records:
             if not record.get("isduplicate", False) and not record["attributes"].get("isportfolio", False):
