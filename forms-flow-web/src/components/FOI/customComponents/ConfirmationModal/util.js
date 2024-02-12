@@ -64,6 +64,8 @@ import { getFullnameList } from "../../../../helper/FOI/helper";
           return {title: "Changing the state", body: `Are you sure you want to change Request #${_requestNumber} to ${StateEnum.section5pending.name}?`};
       case StateEnum.callforrecords.name.toLowerCase():
           return {title: "Changing the state", body: `Are you sure you want to change Request #${_requestNumber} to ${StateEnum.callforrecords.name}?`};
+      case StateEnum.recordsreadyforreview.name.toLowerCase():
+          return {title: "Changing the state", body: `Are you sure you want to change Request #${_requestNumber} to ${StateEnum.recordsreadyforreview.name}?`};
       case StateEnum.review.name.toLowerCase():
         if(!allowStateChange)
           return {title: "Changing the state", body: `Unable to change state until fee estimate actuals have been completed.`};

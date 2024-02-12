@@ -33,6 +33,7 @@ const StateList = Object.freeze({
   callforrecords: [
     { status: "Call For Records", isSelected: false },
     { status: "Open", isSelected: false },
+    { status: "Records Ready for Review", isSelected: false },
     { status: "Closed", isSelected: false },
   ],
   callforrecordscfdmsdpersonal: [
@@ -40,12 +41,14 @@ const StateList = Object.freeze({
     { status: "Open", isSelected: false },
     { status: "Tagging", isSelected: false },
     { status: "Ready to Scan", isSelected: false },
+    { status: "Records Ready for Review", isSelected: false },
     { status: "Closed", isSelected: false },
   ],
   tagging: [
     { status: "Tagging", isSelected: true },
     { status: "Call For Records", isSelected: false },
     { status: "Ready to Scan", isSelected: false },
+    { status: "Records Ready for Review", isSelected: false },
     { status: "Records Review", isSelected: false },
     { status: "Closed", isSelected: false },
   ],
@@ -53,6 +56,7 @@ const StateList = Object.freeze({
     { status: "Ready to Scan", isSelected: true },
     { status: "Call For Records", isSelected: false },
     { status: "Tagging", isSelected: false },
+    { status: "Records Ready for Review", isSelected: false },
     { status: "Records Review", isSelected: false },
     { status: "Closed", isSelected: false },
   ],
@@ -76,6 +80,7 @@ const StateList = Object.freeze({
   deduplication: [
     { status: "Deduplication", isSelected: false },
     { status: "Harms Assessment", isSelected: false },
+    { status: "Records Ready for Review", isSelected: false },
     { status: "Records Review", isSelected: false },
     { status: "Closed", isSelected: false },
   ],
@@ -85,6 +90,7 @@ const StateList = Object.freeze({
   ],
   consult: [
     { status: "Consult", isSelected: false },
+    { status: "Records Ready for Review", isSelected: false },
     { status: "Records Review", isSelected: false },
     { status: "Ministry Sign Off", isSelected: false },
     { status: "Peer Review", isSelected: false },
@@ -127,7 +133,10 @@ const StateList = Object.freeze({
     { status: "Closed", isSelected: false },
   ],
   //peerreview: [{status:"Peer Review", isSelected: false},{status:"Intake in Progress", isSelected: false}, {status: "Open", isSelected: false},{status: "Records Review", isSelected: false},{status: "Consult", isSelected: false},{status: "Response", isSelected: false}],
-  peerreview: [{ status: "Peer Review", isSelected: false }],
+  peerreview: [
+    { status: "Peer Review", isSelected: false },
+    { status: "Records Ready for Review", isSelected: false }
+  ],
   section5pending: [
     { status: "Section 5 Pending", isSelected: false },
     { status: "Open", isSelected: false },
@@ -141,6 +150,17 @@ const StateList = Object.freeze({
     { status: "Peer Review", isSelected: false },
     { status: "Redirect", isSelected: false },
     { status: "Closed", isSelected: false },
+  ],
+  recordsreadyforreview: [
+    { status: "Records Ready for Review", isSelected: false },
+    { status: "Call For Records", isSelected: false },
+    { status: "Tagging", isSelected: false },
+    { status: "Consult", isSelected: false },
+    { status: "Records Review", isSelected: false },
+    { status: "Peer Review", isSelected: false },
+    { status: "Ministry Sign Off", isSelected: false },
+    { status: "Response", isSelected: false },
+    { status: "Closed", isSelected: false }
   ],
 });
 
@@ -157,6 +177,15 @@ const MinistryStateList = Object.freeze({
     { status: "Records Review", isSelected: false },
     { status: "Ministry Sign Off", isSelected: false },
   ],
+  callforrecordscfd: [
+    { status: "Call For Records", isSelected: false },
+    { status: "Fee Estimate", isSelected: false },
+    { status: "Harms Assessment", isSelected: false },
+    { status: "Deduplication", isSelected: false },
+    { status: "Records Ready for Review", isSelected: false },
+    { status: "Records Review", isSelected: false },
+    { status: "Ministry Sign Off", isSelected: false },
+  ],
   callforrecordsforpersonal: [
     { status: "Call For Records", isSelected: false },
     { status: "Harms Assessment", isSelected: false },
@@ -164,15 +193,31 @@ const MinistryStateList = Object.freeze({
     { status: "Records Review", isSelected: false },
     { status: "Ministry Sign Off", isSelected: false },
   ],
+  callforrecordsforcfdpersonal: [
+    { status: "Call For Records", isSelected: false },
+    { status: "Harms Assessment", isSelected: false },
+    { status: "Deduplication", isSelected: false },
+    { status: "Records Ready for Review", isSelected: false },
+    { status: "Records Review", isSelected: false },
+    { status: "Ministry Sign Off", isSelected: false },
+  ],
   feeassessed: [{ status: "Fee Estimate", isSelected: false }],
   onhold: [{ status: "On Hold", isSelected: false }],
   deduplication: [{ status: "Deduplication", isSelected: false }],
+  deduplicationcfd: [
+    { status: "Deduplication", isSelected: false },
+    { status: "Records Ready for Review", isSelected: false }
+  ],
   harms: [
     { status: "Harms Assessment", isSelected: false },
     { status: "Call For Records", isSelected: false },
     { status: "Records Review", isSelected: false },
   ],
   consult: [{ status: "Consult", isSelected: false }],
+  consultcfd: [
+    { status: "Consult", isSelected: false },
+    { status: "Records Ready for Review", isSelected: false }
+  ],
   review: [{ status: "Records Review", isSelected: false }],
   signoff: [
     { status: "Ministry Sign Off", isSelected: false },
@@ -182,8 +227,20 @@ const MinistryStateList = Object.freeze({
   response: [{ status: "Response", isSelected: false }],
   closed: [{ status: "Closed", isSelected: false }],
   peerreview: [{ status: "Peer Review", isSelected: false }],
+  peerreviewcfd: [
+    { status: "Peer Review", isSelected: false },
+    { status: "Records Ready for Review", isSelected: false }
+  ],
   tagging: [{ status: "Tagging", isSelected: true }],
+  taggingcfd: [
+    { status: "Tagging", isSelected: true },
+    { status: "Records Ready for Review", isSelected: false }
+  ],
   readytoscan: [{ status: "Ready to Scan", isSelected: true }],
+  readytoscancfd: [
+    { status: "Ready to Scan", isSelected: true },
+    { status: "Records Ready for Review", isSelected: false }
+  ],
 });
 
 // This corresponds to rows in the FOIRequestStatuses table on the backend
@@ -209,6 +266,7 @@ const StateEnum = Object.freeze({
   readytoscan: { name: "Ready to Scan", label: "readytoscan" },
   appfeeowing: { name: "App Fee Owing", label: "appfeeowing" },
   section5pending: { name: "Section 5 Pending", label: "section5pending" },
+  recordsreadyforreview: { name: "Records Ready for Review", label: "recordsreadyforreview" },
 });
 
 const StateTransitionCategories = Object.freeze({
