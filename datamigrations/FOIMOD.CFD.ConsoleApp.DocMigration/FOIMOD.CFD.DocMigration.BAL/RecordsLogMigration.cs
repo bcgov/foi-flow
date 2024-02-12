@@ -1,6 +1,4 @@
-﻿using Amazon.Runtime.Internal.Endpoints.StandardLibrary;
-using Amazon.Runtime.Internal.Util;
-using Amazon.S3;
+﻿using Amazon.S3;
 using FOIMOD.CFD.DocMigration.DAL;
 using FOIMOD.CFD.DocMigration.FOIFLOW.DAL;
 using FOIMOD.CFD.DocMigration.Models;
@@ -10,12 +8,8 @@ using FOIMOD.CFD.DocMigration.Utils;
 using MCS.FOI.OCRtoPDF;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Primitives;
-using SkiaSharp;
-using System;
 using System.Data;
 using System.Data.Odbc;
-using System.IO;
 using ILogger = Microsoft.Extensions.Logging.ILogger;
 
 
@@ -139,6 +133,8 @@ namespace FOIMOD.CFD.DocMigration.BAL
                                                         var resultAttributes = recordsDAL.InsertIntoDocumentAttributes(documentmasterid, attributedJSON);
                                                         var resultInsertIntoDocumentHashcodes = recordsDAL.InsertIntoDocumentHashcodes(documentid, documenthash);
                                                         var resultDedupljob = recordsDAL.InsertIntoDeduplicationJob(documentmasterid, minitryrequestdetails.Item1, batch, actualfilename);
+
+                                                        recordsDAL.InsertDocumentPageFlags(pagesbyDoc, documentid, minitryrequestdetails.Item1);
                                                     }
 
                                                 }

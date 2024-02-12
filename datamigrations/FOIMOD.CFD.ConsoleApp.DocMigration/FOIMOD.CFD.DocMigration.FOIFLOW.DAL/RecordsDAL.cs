@@ -1,4 +1,6 @@
-﻿using System.Data;
+﻿using FOIMOD.CFD.DocMigration.Models.Document;
+using Newtonsoft.Json;
+using System.Data;
 using System.Data.Common;
 using System.Data.Odbc;
 
@@ -43,11 +45,11 @@ namespace FOIMOD.CFD.DocMigration.FOIFLOW.DAL
                     comm.CommandText = string.Format(cmdString, axisrequestnumber, actualfilename, s3filepath, documentattributeJSON, ministryrequestid, ministryrequestversion, s3filepath);
                     comm.CommandType = CommandType.Text;
                     comm.ExecuteNonQuery();
-                                                          
+
                 }
 
 
-                using(OdbcCommand comm = new OdbcCommand())
+                using (OdbcCommand comm = new OdbcCommand())
                 {
                     comm.Connection = (OdbcConnection)dbfoiflowConnection;
                     var selectSQL = @"SELECT recordid FROM public.""FOIRequestRecords"" 
@@ -135,8 +137,8 @@ namespace FOIMOD.CFD.DocMigration.FOIFLOW.DAL
                     comm.CommandText = string.Format(cmdString, s3filepath, ministryrequestid, foiflowrecordid);
                     comm.CommandType = CommandType.Text;
                     comm.ExecuteNonQuery();
-                   
-                   
+
+
                 }
 
                 var documentmasterSQL = @"SELECT documentmasterid FROM   public.""DocumentMaster"" WHERE createdby='migrationservice' AND recordid={0} AND filepath='{1}' AND ministryrequestid={2};";
@@ -152,7 +154,7 @@ namespace FOIMOD.CFD.DocMigration.FOIFLOW.DAL
                     {
                         result = Convert.ToInt32(odbcDataReader["documentmasterid"]);
                     }
-                    
+
 
                 }
 
@@ -219,7 +221,7 @@ namespace FOIMOD.CFD.DocMigration.FOIFLOW.DAL
             return result;
         }
 
-        public bool InsertIntoDocumentAttributes(int documentmasterid,string docattributes)
+        public bool InsertIntoDocumentAttributes(int documentmasterid, string docattributes)
         {
             bool result = false;
             try
@@ -238,7 +240,7 @@ namespace FOIMOD.CFD.DocMigration.FOIFLOW.DAL
                     comm.CommandType = CommandType.Text;
                     comm.ExecuteNonQuery();
                 }
-                
+
                 dbfoidocreviewerConnection.Close();
                 result = true;
             }
@@ -283,7 +285,7 @@ namespace FOIMOD.CFD.DocMigration.FOIFLOW.DAL
             return result;
         }
 
-        public bool InsertIntoDeduplicationJob(int documentmasterid,int ministryrequestid,string batch,string filename)
+        public bool InsertIntoDeduplicationJob(int documentmasterid, int ministryrequestid, string batch, string filename)
         {
             bool result = false;
             try
@@ -298,7 +300,7 @@ namespace FOIMOD.CFD.DocMigration.FOIFLOW.DAL
                 {
                     comm.Connection = (OdbcConnection)dbfoidocreviewerConnection;
 
-                    comm.CommandText = string.Format(cmdString, ministryrequestid, batch,filename,documentmasterid);
+                    comm.CommandText = string.Format(cmdString, ministryrequestid, batch, filename, documentmasterid);
                     comm.CommandType = CommandType.Text;
                     comm.ExecuteNonQuery();
                 }
@@ -314,6 +316,65 @@ namespace FOIMOD.CFD.DocMigration.FOIFLOW.DAL
                 throw;
             }
             return result;
+        }
+
+        public void InsertDocumentPageFlags(List<DocumentToMigrate> documentPages, int documentid, int ministryrequestid)
+        {
+            try
+            {
+                var _sorteddocPages = documentPages.Where(row => row.ReviewFlag == "NOT RELEVANT" || row.ReviewFlag == "DUPLICATE");
+                if (_sorteddocPages.Any())
+                {
+
+                    List<PageFlag> pageFlags = new List<PageFlag>();
+                    foreach (DocumentToMigrate documentPage in _sorteddocPages)
+                    {
+                        int _flagid = -1;
+                        if (documentPage.ReviewFlag == "NOT RELEVANT")
+                        {
+                            _flagid = 6;
+                        }
+                        else if (documentPage.ReviewFlag == "DUPLICATE")
+                        {
+                            _flagid = 5;
+                        }
+
+                        if (_flagid != -1)
+                        {
+                            pageFlags.Add(new PageFlag() { flagid = _flagid, page = documentPage.PageSequenceNumber });
+                        }
+
+                    }
+
+                    string pageflagsjson = JsonConvert.SerializeObject(pageFlags);
+
+
+                    dbfoidocreviewerConnection.Open();
+                    var cmdString = @"INSERT INTO public.""DocumentPageflags""(
+	                                 foiministryrequestid, documentid, documentversion, pageflag,created_at,createdby, redactionlayerid)
+	                                VALUES ({0},{1},1,'{2}',NOW(),'{{""userid"":""migrationservice@idir""}}',1);";
+
+
+                    using (OdbcCommand comm = new OdbcCommand())
+                    {
+                        comm.Connection = (OdbcConnection)dbfoidocreviewerConnection;
+
+                        comm.CommandText = string.Format(cmdString, ministryrequestid, documentid, pageflagsjson);
+                        comm.CommandType = CommandType.Text;
+                        comm.ExecuteNonQuery();
+                    }
+
+                    dbfoidocreviewerConnection.Close();
+
+
+                }
+            }
+            catch (Exception ex)
+            {
+                dbfoidocreviewerConnection.Close();               
+                throw;
+            }
+
         }
 
     }
