@@ -316,16 +316,16 @@ class recordservice(recordservicebase):
         if len(uploadedrecords) > 0:
           records, err = recordservicegetter().getdatafromdocreviewer(uploadedrecords, ministryrequestid)
           if err is None:
-            print(f'records == {records}')
             pagecount = self.__calculatepagecount(records)
             return FOIMinistryRequest().updaterecordspagecount(ministryrequestid, pagecount, userid) 
         return DefaultMethodResult(True,'No request to update', ministryrequestid)
     
     # this is for inflight request pagecount calculation option 2
     def __calculatepagecount(self, records):
+        print(f'records = {records}')
         page_count = 0
         for record in records:
-            if not record.get("isduplicate", False):
+            if not record.get("isduplicate", False) and not record["attributes"].get("isportfolio", False):
                 page_count += record.get("pagecount", 0)
                 attachments = record.get("attachments", [])
                 for attachment in attachments:
