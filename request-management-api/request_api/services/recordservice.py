@@ -316,6 +316,7 @@ class recordservice(recordservicebase):
         if len(uploadedrecords) > 0:
           records, err = recordservicegetter().getdatafromdocreviewer(uploadedrecords, ministryrequestid)
           if err is None:
+            print(f'records == {records}')
             pagecount = self.__calculatepagecount(records)
             return FOIMinistryRequest().updaterecordspagecount(ministryrequestid, pagecount, userid) 
         return DefaultMethodResult(True,'No request to update', ministryrequestid)
