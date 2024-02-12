@@ -132,7 +132,7 @@ class Payment(Resource):
             
             return Response(
                 response= response.content,
-                status= 400, #response.status_code,
+                status= response.status_code,
                 headers= dict(response.headers)
             )
 
