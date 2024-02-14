@@ -88,7 +88,8 @@ namespace FOIMOD.CFD.DocMigration.BAL
 
                         foreach (var docid in docIDs)
                         {
-
+                            ilogger.LogInformation("###################################################################################");
+                            ilogger.LogInformation(string.Format("Processing document ID {0} for request {1}", docid, _requestnumber));
                             var actualfilename = string.Empty;
                             try
                             {
@@ -99,24 +100,29 @@ namespace FOIMOD.CFD.DocMigration.BAL
                                 if (pagesbyDoc.Any())
                                 {
 
-                                    //STITCHING PDF                                   
+                                    //STITCHING PDF
+                                    ilogger.LogInformation(string.Format("Stitching started for pages of  document ID {0} for request {1}, page count is {2}, started at {3}", docid, _requestnumber, pagedetails.TotalPageCount, DateTime.Now));
                                     MemoryStream docStream = pagedetails.FileType.ToLower().Contains("pdf") ? docMigrationPDFStitcher.MergePDFs(pagesbyDoc, baseRecordsLocation) : docMigrationPDFStitcher.MergeImages(pagesbyDoc);
-
+                                    ilogger.LogInformation(string.Format("Stitching COMPLETED!! for pages of  document ID {0} for request {1}, page count is {2}, end at {3}", docid, _requestnumber, pagedetails.TotalPageCount, DateTime.Now));
 
                                     if (docStream != null)
                                     {
-
+                                        ilogger.LogInformation(string.Format("OCR starting for pages of  document ID {0} for request {1}, page count is {2}, started at {3}", docid, _requestnumber, pagedetails.TotalPageCount, DateTime.Now));
                                         using (MemoryStream stitchedFileStream = OCRTOPdf.ConvertToSearchablePDF(docStream))
                                         {
                                             var destinationfilename_guidbased = string.Format("{0}{1}", Guid.NewGuid().ToString(), pagedetails.FileType);
                                             var s3filesubpath = string.Format("{0}/{1}", SystemSettings.MinistryRecordsBucket, _requestnumber.ToUpper());
+                                            ilogger.LogInformation(string.Format("OCR completed for pages of  document ID {0} for request {1}, page count is {2}, ended at {3}", docid, _requestnumber, pagedetails.TotalPageCount, DateTime.Now));
 
+                                            ilogger.LogInformation(string.Format("Upload starting for  document ID {0} for request {1}, page count is {2}, started at {3}", docid, _requestnumber, pagedetails.TotalPageCount, DateTime.Now));
                                             var uploadresponse = await docMigrationS3Client.UploadFileAsync(new UploadFile() { AXISRequestID = _requestnumber.ToUpper(), SubFolderPath = s3filesubpath, DestinationFileName = destinationfilename_guidbased, FileStream = stitchedFileStream });
 
                                             if (uploadresponse != null && uploadresponse.IsSuccessStatusCode)
                                             {
 
+                                                ilogger.LogInformation(string.Format("Upload successful for   document ID {0} for request {1}, page count is {2}, completed at {3}", docid, _requestnumber, pagedetails.TotalPageCount, DateTime.Now));
 
+                                                ilogger.LogInformation(string.Format("DB Metadata updates started for  document ID {0} for request {1}, page count is {2}, started at {3}", docid, _requestnumber, pagedetails.TotalPageCount, DateTime.Now));
 
                                                 int.TryParse(pagedetails.TotalPageCount, out int pagecount);
                                                 var documenthash = Guid.NewGuid().ToString().Replace("-", "");
@@ -149,12 +155,18 @@ namespace FOIMOD.CFD.DocMigration.BAL
                                                         recordsDAL.InsertDocumentPageFlags(pagesbyDoc, documentid, minitryrequestdetails.Item1);
                                                     }
 
+                                                    ilogger.LogInformation(string.Format("DB Metadata updates COMPLETED for  document ID {0} for request {1}, page count is {2}, completed at {3}", docid, _requestnumber, pagedetails.TotalPageCount, DateTime.Now));
+
                                                 }
                                                 else
                                                 {
                                                     ilogger.LogError(string.Format("Ministry Request ID not found for Request Number {0}", _requestnumber));
                                                 }
 
+                                            }
+                                            else
+                                            {
+                                                ilogger.LogError(string.Format("Upload failed for document {0} for Request Number {1}",docid ,_requestnumber));
                                             }
 
                                         }
@@ -168,6 +180,9 @@ namespace FOIMOD.CFD.DocMigration.BAL
                                 ilogger.LogError(exception);
                                 throw new Exception(exception);
                             }
+
+                            ilogger.LogInformation("#####################################################################################");
+                            ilogger.LogInformation(Environment.NewLine);
                         }
 
                     }

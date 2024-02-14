@@ -47,6 +47,9 @@
             {
 
 
+                var possiblesectioninlast_case0= aXISFolderToMODSectionUtil.GetFOIMODSectionByAXISFolder("FS6666666_2.5_Notes");
+                Assert.AreEqual("NOTES", possiblesectioninlast_case0);
+
                 var possiblesectioninlast_case1 = aXISFolderToMODSectionUtil.GetFOIMODSectionByAXISFolder("AH00009103_1.1_PersonalHistory");
                 Assert.AreEqual("PERSONAL HISTORY AND RECORDING", possiblesectioninlast_case1);
 

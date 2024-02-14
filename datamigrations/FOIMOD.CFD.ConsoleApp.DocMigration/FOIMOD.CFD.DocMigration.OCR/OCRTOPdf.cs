@@ -18,14 +18,16 @@ namespace MCS.FOI.OCRtoPDF
 
                 using (OCRProcessor processor = new OCRProcessor(TessaractPath))
                 {
+                   
                     //using FileStream fileStream = inputPdfFilestream;
                     //Load a PDF document.
-                    using PdfLoadedDocument lDoc = new PdfLoadedDocument(inputPdfFilestream);
+                    using PdfLoadedDocument lDoc = new PdfLoadedDocument(inputPdfFilestream);                   
                     //Set OCR language to process.
                     processor.Settings.Language = Languages.English;
+                   
                     //Process OCR by providing the PDF document.
                     processor.PerformOCR(lDoc, TessaractLanguagePath);
-
+                    
 
                     //Create memory stream.
                     MemoryStream stream = new MemoryStream();
