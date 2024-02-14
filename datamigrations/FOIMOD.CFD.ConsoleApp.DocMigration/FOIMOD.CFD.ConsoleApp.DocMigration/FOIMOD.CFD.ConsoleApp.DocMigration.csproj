@@ -29,5 +29,8 @@
 	  <None Update="appsettings.json">
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </None>
+	  <None Update="sectionmapping\axistomodsectionmapping.json">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
 	</ItemGroup>
 </Project>
