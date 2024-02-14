@@ -36,6 +36,19 @@ namespace FOIMOD.CFD.DocMigration.BAL
         }
 
 
+        public string GetSectionNameByAXISFolder(string axisfolder)
+        {
+            using (AXISFolderToMODSectionUtil aXISFolderToMODSectionUtil =
+               new AXISFolderToMODSectionUtil(
+                   "C:\\Abindev\\foi-flow\\datamigrations" +
+                   "\\FOIMOD.CFD.ConsoleApp.DocMigration\\FOIMOD.CFD.ConsoleApp.DocMigration" +
+                   "\\sectionmapping\\axistomodsectionmapping.json"))
+            {
+                return aXISFolderToMODSectionUtil.GetFOIMODSectionByAXISFolder(axisfolder);
+            }
+        }
+
+
         public async Task RunMigration()
         {
             DocMigrationS3Client docMigrationS3Client = new DocMigrationS3Client(amazonS3);
@@ -83,10 +96,8 @@ namespace FOIMOD.CFD.DocMigration.BAL
                                 var pagesbyDoc = records.Where(r => r.IDocID == docid).OrderBy(p => p.PageSequenceNumber).ToList();
                                 var pagedetails = pagesbyDoc.First();
                                 actualfilename = string.Format("{0}_{1}{2}", pagedetails.ParentFolderName, pagedetails.FolderName, pagedetails.FileType);
-                                if (pagesbyDoc.Any() )
+                                if (pagesbyDoc.Any())
                                 {
-                                    //TODO: FIND SECTION TAG - LOGIC TODO
-
 
                                     //STITCHING PDF                                   
                                     MemoryStream docStream = pagedetails.FileType.ToLower().Contains("pdf") ? docMigrationPDFStitcher.MergePDFs(pagesbyDoc, baseRecordsLocation) : docMigrationPDFStitcher.MergeImages(pagesbyDoc);
@@ -113,7 +124,8 @@ namespace FOIMOD.CFD.DocMigration.BAL
                                                 var s3url = string.Format("{0}/{1}/{2}", SystemSettings.S3_EndPoint, s3filesubpath, destinationfilename_guidbased);
                                                 byte[] fileData = stitchedFileStream.ToArray();
                                                 int filesize = fileData.Length; //TODO: Need to find out the  KB or B or MB in DB
-                                                var sectiondivisionid = 422;
+                                                string sectionName = GetSectionNameByAXISFolder(pagedetails.FolderName);
+                                                var sectiondivisionid = recordsDAL.GetSectionIDByName(sectionName);
 
                                                 var minitryrequestdetails = recordsDAL.GetMinistryRequestDetails(_requestnumber);
 
@@ -140,7 +152,7 @@ namespace FOIMOD.CFD.DocMigration.BAL
                                                 }
                                                 else
                                                 {
-                                                    ilogger.LogError(string.Format("Ministry Request ID not found for Request Number {0}",_requestnumber));
+                                                    ilogger.LogError(string.Format("Ministry Request ID not found for Request Number {0}", _requestnumber));
                                                 }
 
                                             }
