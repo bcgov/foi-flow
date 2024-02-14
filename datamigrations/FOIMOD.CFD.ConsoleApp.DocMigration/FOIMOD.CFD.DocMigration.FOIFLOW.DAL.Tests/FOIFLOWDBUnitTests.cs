@@ -6,6 +6,7 @@ using FOIMOD.CFD.DocMigration.FOIFLOW.DAL;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 using System;
 using System.Xml.Linq;
+using FOIMOD.CFD.DocMigration.Utils;
 namespace FOIMOD.CFD.DocMigration.FOIFLOW.DAL.Tests
 {
     [TestClass]
@@ -50,6 +51,50 @@ namespace FOIMOD.CFD.DocMigration.FOIFLOW.DAL.Tests
 
                 var result = recordsDAL.GetMinistryRequestDetails("CFD-2023-0111114711");
                 Assert.IsNotNull(result);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
+
+        }
+
+
+        [TestMethod]
+        public void GetSectionIDByAxisFolderNameTest()
+        {
+            try
+            {
+
+                OdbcConnection connection = new OdbcConnection(SystemSettings.FOIFLOWConnectionString);
+                OdbcConnection docreviewerconnection = new OdbcConnection(SystemSettings.FOIFLOWConnectionString);
+                RecordsDAL recordsDAL = new RecordsDAL(connection, docreviewerconnection);
+
+                using (AXISFolderToMODSectionUtil aXISFolderToMODSectionUtil =
+                new AXISFolderToMODSectionUtil(
+                    "C:\\Abindev\\foi-flow\\datamigrations" +
+                    "\\FOIMOD.CFD.ConsoleApp.DocMigration\\FOIMOD.CFD.ConsoleApp.DocMigration" +
+                    "\\sectionmapping\\axistomodsectionmapping.json"))
+                {
+
+                    var resultexactmatch_case0 = aXISFolderToMODSectionUtil.GetFOIMODSectionByAXISFolder("INTAKE, ASSESSMENT & RESPONSE");
+                    Assert.AreEqual("INTAKE ASSESSMENT AND RESPONSE", resultexactmatch_case0);
+                    int resultsectionoid = recordsDAL.GetSectionIDByName(resultexactmatch_case0);
+                    Assert.AreEqual(246, resultsectionoid);
+                 
+                    var resultexactmatch_case3 = aXISFolderToMODSectionUtil.GetFOIMODSectionByAXISFolder("FS CPF 1-9C8LS_6.1_RappProg_ProgRep");
+                    Assert.AreEqual("TBD", resultexactmatch_case3);
+                    int resultsectionoid_tbd = recordsDAL.GetSectionIDByName(resultexactmatch_case3);
+                    Assert.AreEqual(427, resultsectionoid_tbd);
+
+                    var possiblesectioninlast_case4 = aXISFolderToMODSectionUtil.GetFOIMODSectionByAXISFolder("LAUGHY, Laura-Ann Mae ICM FS Case Report 1-3402-141523");
+                    Assert.AreEqual("ICM-FS Case Report", possiblesectioninlast_case4);
+                    int resultsectionoid_ICMFSCaseReport = recordsDAL.GetSectionIDByName(possiblesectioninlast_case4);
+                    Assert.AreEqual(430, resultsectionoid_ICMFSCaseReport);
+
+
+
+                }
             }
             catch (Exception ex)
             {

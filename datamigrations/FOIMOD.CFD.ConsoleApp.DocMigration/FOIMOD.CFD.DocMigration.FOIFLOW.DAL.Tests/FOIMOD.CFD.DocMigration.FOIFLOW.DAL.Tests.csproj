@@ -6,8 +6,7 @@
     <Nullable>enable</Nullable>
 
     <IsPackable>false</IsPackable>
-
-    <PlatformTarget>x86</PlatformTarget>
+   
   </PropertyGroup>
 
   <ItemGroup>
@@ -24,6 +23,7 @@
   <ItemGroup>
     <ProjectReference Include="..\FOIMOD.CFD.DocMigration.FOIFLOW.DAL\FOIMOD.CFD.DocMigration.FOIFLOW.DAL.csproj" />
     <ProjectReference Include="..\FOIMOD.CFD.DocMigration.Models\FOIMOD.CFD.DocMigration.Models.csproj" />
+    <ProjectReference Include="..\FOIMOD.CFD.DocMigration.Utils\FOIMOD.CFD.DocMigration.Utils.csproj" />
   </ItemGroup>
 
   <ItemGroup>
