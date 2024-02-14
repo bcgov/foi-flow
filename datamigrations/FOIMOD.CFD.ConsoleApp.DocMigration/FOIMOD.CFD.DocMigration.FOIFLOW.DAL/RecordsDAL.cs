@@ -377,5 +377,52 @@ namespace FOIMOD.CFD.DocMigration.FOIFLOW.DAL
 
         }
 
+
+        public int GetSectionIDByName(string sectionname)
+        {
+            int retVal =-1 ;
+            try
+            {
+
+                dbfoiflowConnection.Open();
+                var cmdString = @"SELECT divisionid FROM public.""ProgramAreaDivisions"" WHERE 
+                                    issection=true and 
+                                    specifictopersonalrequests=true and 
+                                    programareaid=(SELECT programareaid from public.""ProgramAreas"" WHERE bcgovcode='MCF' LIMIT 1) 
+                                    and LOWER(name) = LOWER('{0}') LIMIT 1";
+                using (OdbcCommand comm = new OdbcCommand())
+                {
+                    comm.Connection = (OdbcConnection)dbfoiflowConnection;
+
+                    comm.CommandText = string.Format(cmdString, sectionname);
+                    comm.CommandType = CommandType.Text;
+
+                    OdbcDataReader odbcDataReader = comm.ExecuteReader();
+
+                    while (odbcDataReader.Read())
+                    {
+
+                        retVal = Convert.ToInt32(odbcDataReader["divisionid"]);
+
+                    }
+
+
+
+                }
+            }
+            catch (Exception ex)
+            {
+                dbfoiflowConnection.Close();
+
+                throw;
+            }
+            finally
+            {
+                dbfoiflowConnection.Close();
+
+            }
+            return retVal;
+        }
+
     }
 }
