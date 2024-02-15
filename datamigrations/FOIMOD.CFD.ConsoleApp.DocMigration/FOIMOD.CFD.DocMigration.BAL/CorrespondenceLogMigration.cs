@@ -91,7 +91,7 @@ namespace FOIMOD.CFD.DocMigration.BAL
                         {
                             foreach (var file in attachmentfiles)
                             {
-                                var UNCFileLocation = Path.Combine(SystemSettings.FileServerRoot, SystemSettings.CorrespondenceLogBaseFolder, file.FilePathOnServer);
+                                var UNCFileLocation = Path.Combine(SystemSettings.FileServerRoot, SystemSettings.CorrespondenceLogBaseFolder.Trim(), file.FilePathOnServer?.Trim());
                                 //var UNCFileLocation = file.FileExtension == "pdf" ? @"\\DESKTOP-U67UC02\ioashare\db7e84e1-4202-4837-b4dd-49af233ae006.pdf" : @"\\DESKTOP-U67UC02\ioashare\DOCX1.docx";
                                 if (file.FileExtension == "pdf")
                                 {

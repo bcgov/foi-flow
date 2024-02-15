@@ -4,17 +4,20 @@ using PdfSharpCore;
 using PdfSharpCore.Pdf;
 using PdfSharpCore.Pdf.IO;
 using SyncfusionPDF = Syncfusion.Pdf;
-using SyncfusionPDFGraphics = Syncfusion.Pdf.Graphics ;
+using SyncfusionPDFGraphics = Syncfusion.Pdf.Graphics;
 using TheArtOfDev.HtmlRenderer.PdfSharp;
 using Syncfusion.Pdf.Graphics;
 using Syncfusion.Drawing;
 using Amazon.S3.Model;
 
+
+
+
 namespace FOIMOD.CFD.DocMigration.Utils
 {
     public class DocMigrationPDFStitcher : IDisposable
     {
-        
+
         private MemoryStream mergeddocstream = null;
         private Stream createemailpdfmemorystream = null;
         public DocMigrationPDFStitcher()
@@ -29,17 +32,18 @@ namespace FOIMOD.CFD.DocMigration.Utils
             mergeddocstream.Dispose();
         }
 
-        public MemoryStream MergePDFs(List<DocumentToMigrate> pdfpages,string baseUNClocation = null)
+        public MemoryStream MergePDFs(List<DocumentToMigrate> pdfpages, string baseUNClocation = null)
         {
             var _pdfpages = pdfpages.OrderBy(p => p.PageSequenceNumber).ToArray<DocumentToMigrate>();
             using (PdfDocument pdfdocument = new PdfDocument())
             {
                 foreach (DocumentToMigrate pDFDocToMerge in _pdfpages)
                 {
-                    string filelocation = String.IsNullOrEmpty(baseUNClocation) ? pDFDocToMerge.PageFilePath : Path.Combine(baseUNClocation,pDFDocToMerge.SiFolderID, pDFDocToMerge.PageFilePath);
+                    string filelocation = String.IsNullOrEmpty(baseUNClocation) ? pDFDocToMerge.PageFilePath : Path.Combine(baseUNClocation, pDFDocToMerge.SiFolderID, pDFDocToMerge.PageFilePath);
                     using PdfDocument inputPDFDocument = !pDFDocToMerge.HasStreamForDocument ? PdfReader.Open(filelocation, PdfDocumentOpenMode.Import) : PdfReader.Open(pDFDocToMerge.FileStream, PdfDocumentOpenMode.Import);
 
                     pdfdocument.Version = inputPDFDocument.Version;
+
                     foreach (PdfPage page in inputPDFDocument.Pages)
                     {
                         pdfdocument.AddPage(page);
@@ -47,6 +51,34 @@ namespace FOIMOD.CFD.DocMigration.Utils
                 }
                 mergeddocstream = new MemoryStream();
                 pdfdocument.Save(mergeddocstream);
+                mergeddocstream.Position = 0;
+            }
+            return mergeddocstream;
+        }
+
+        public MemoryStream MergePDFs_v1(List<DocumentToMigrate> pdfpages, string baseUNClocation = null)
+        {
+            var _pdfpages = pdfpages.OrderBy(p => p.PageSequenceNumber).ToArray<DocumentToMigrate>();
+            using (SyncfusionPDF.PdfDocument pdfdocument = new SyncfusionPDF.PdfDocument())
+            {
+                pdfdocument.PageSettings.Size = new SizeF(1500, 800);
+                Stream[] streams = new Stream[_pdfpages.Length];
+                int _inx = 0;
+
+                foreach (DocumentToMigrate pDFDocToMerge in _pdfpages)
+                {
+                    string filelocation = String.IsNullOrEmpty(baseUNClocation) ? pDFDocToMerge.PageFilePath : Path.Combine(baseUNClocation, pDFDocToMerge.SiFolderID, pDFDocToMerge.PageFilePath);
+
+                    streams[_inx] = new FileStream(filelocation, FileMode.Open, FileAccess.Read);
+                    _inx++;
+
+                }
+
+                SyncfusionPDF.PdfDocumentBase.Merge(pdfdocument, streams);
+
+                mergeddocstream = new MemoryStream();
+                pdfdocument.Save(mergeddocstream);
+                mergeddocstream.Position = 0;
             }
             return mergeddocstream;
         }
@@ -59,7 +91,7 @@ namespace FOIMOD.CFD.DocMigration.Utils
 
             foreach (var formFile in _images)
             {
-                if (formFile.FileStream.Length > 0)
+                if (formFile.FileStream?.Length > 0)
                 {
                     using MemoryStream file = new MemoryStream();
                     formFile.FileStream.CopyTo(file);
@@ -72,7 +104,7 @@ namespace FOIMOD.CFD.DocMigration.Utils
                     SizeF pageSize = page.GetClientSize();
 
                     //Setting image bounds 
-                     RectangleF imageBounds = new RectangleF(0, 0, pageSize.Width, pageSize.Height);
+                    RectangleF imageBounds = new RectangleF(0, 0, pageSize.Width, pageSize.Height);
 
 
                     //Drawing image to the PDF page
@@ -106,19 +138,19 @@ namespace FOIMOD.CFD.DocMigration.Utils
 
             //Set the position as '0'.
             stream.Position = 0;
-            
+
 
             return stream;
 
         }
 
 
-        public Stream CreatePDFDocument(string emailcontent, string emailsubject, string emaildate, string emailTo,List<AXISFIle> attachementfiles = null)
+        public Stream CreatePDFDocument(string emailcontent, string emailsubject, string emaildate, string emailTo, List<AXISFIle> attachementfiles = null)
         {
             try
             {
                 string attachmentlist = string.Empty;
-                if (attachementfiles!=null)
+                if (attachementfiles != null)
                 {
                     attachmentlist += "<ul>";
                     foreach (var attachment in attachementfiles)
@@ -154,7 +186,7 @@ namespace FOIMOD.CFD.DocMigration.Utils
 			                            <td>{4}</td>
 		                            </tr>
 	                            </tbody>
-                            </table>", emailTo, emaildate, emailsubject, attachmentlist,emailcontent);
+                            </table>", emailTo, emaildate, emailsubject, attachmentlist, emailcontent);
 
                 using (PdfDocument pdfdocument = new PdfDocument())
                 {

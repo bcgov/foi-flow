@@ -48,7 +48,7 @@
 
 
                 var possiblesectioninlast_case0= aXISFolderToMODSectionUtil.GetFOIMODSectionByAXISFolder("FS6666666_2.5_Notes");
-                Assert.AreEqual("NOTES", possiblesectioninlast_case0);
+                Assert.AreEqual("Notes", possiblesectioninlast_case0);
 
                 var possiblesectioninlast_case1 = aXISFolderToMODSectionUtil.GetFOIMODSectionByAXISFolder("AH00009103_1.1_PersonalHistory");
                 Assert.AreEqual("PERSONAL HISTORY AND RECORDING", possiblesectioninlast_case1);
@@ -71,6 +71,7 @@
                 var possiblesectioninlast_case7 = aXISFolderToMODSectionUtil.GetFOIMODSectionByAXISFolder("1-5 External Reports");
                 Assert.AreEqual("EXTERNAL ASSESSMENTS AND REPORTS", possiblesectioninlast_case7);
 
+           
             }
         }
 
@@ -109,7 +110,7 @@
                 var possiblesectioninlast_case1 = aXISFolderToMODSectionUtil.GetFOIMODSectionByAXISFolder("DOUGAN, Taylor Incident 1-23184649960");
                 Assert.AreEqual("ICM-Incident", possiblesectioninlast_case1);
 
-                var possiblesectioninlast_case2 = aXISFolderToMODSectionUtil.GetFOIMODSectionByAXISFolder("SUECROFT Channelle ICM Memo 1-49832856744");
+                var possiblesectioninlast_case2 = aXISFolderToMODSectionUtil.GetFOIMODSectionByAXISFolder("LA ROCHELLE, Ronald  ICM Memo 1-31691931888");
                 Assert.AreEqual("ICM-Memo", possiblesectioninlast_case2);
 
                 var possiblesectioninlast_case3 = aXISFolderToMODSectionUtil.GetFOIMODSectionByAXISFolder("TARBOY, Janet ICM RE Complaint Incident Report 1-12580147369");
@@ -139,7 +140,8 @@
                 var possiblesectioninlast_case11 = aXISFolderToMODSectionUtil.GetFOIMODSectionByAXISFolder("FS00157029_1.11_CDMediaFile");
                 Assert.AreEqual("TBD", possiblesectioninlast_case11);
 
-
+                var possiblesectioninlast_case12 = aXISFolderToMODSectionUtil.GetFOIMODSectionByAXISFolder("LA ROCHELLE, Ronald ICM Service Request 1-28455143062");
+                Assert.AreEqual("ICM-Service Request", possiblesectioninlast_case12);
 
             }
 

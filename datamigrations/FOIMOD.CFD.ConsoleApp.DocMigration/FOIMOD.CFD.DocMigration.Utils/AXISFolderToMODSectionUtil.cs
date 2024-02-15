@@ -20,6 +20,7 @@ namespace FOIMOD.CFD.DocMigration.Utils
         public static string SPCase = "SP Case";
         public static string RECase = "RE Case";
         public static string REComplaint = "RE Complaint";
+        public static string ServiceRequest = "Service Request";
 
 
 
@@ -49,6 +50,7 @@ namespace FOIMOD.CFD.DocMigration.Utils
             ICMfolderToSectionMapper.Add(new FolderToSectionMapper() { AXISFolder = ICMConstants.SPCase, MODSECTION = "ICM-SP Case Report" });
             ICMfolderToSectionMapper.Add(new FolderToSectionMapper() { AXISFolder = ICMConstants.RECase, MODSECTION = "ICM-RE Case Report" });
             ICMfolderToSectionMapper.Add(new FolderToSectionMapper() { AXISFolder = ICMConstants.REComplaint, MODSECTION = "ICM-Complaint Report" });
+            ICMfolderToSectionMapper.Add(new FolderToSectionMapper() { AXISFolder = ICMConstants.ServiceRequest, MODSECTION = "ICM-Service Request" });
         }
 
 
@@ -119,6 +121,10 @@ namespace FOIMOD.CFD.DocMigration.Utils
                         else if (actualaxisFolder.Contains(ICMConstants.RECase))
                         {
                             return ICMfolderToSectionMapper.Where(f => f.AXISFolder == ICMConstants.RECase).First().MODSECTION;
+                        }
+                        else if (actualaxisFolder.Contains(ICMConstants.ServiceRequest))
+                        {
+                            return ICMfolderToSectionMapper.Where(f => f.AXISFolder == ICMConstants.ServiceRequest).First().MODSECTION;
                         }
                     }
 

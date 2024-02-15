@@ -23,6 +23,9 @@
 	  <ProjectReference Include="..\FOIMOD.CFD.DocMigration.Models\FOIMOD.CFD.DocMigration.Models.csproj" />
 	</ItemGroup>
 	<ItemGroup>
+	  <None Update="appsettings.prodtodev.json">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </None>
 	  <None Update="appsettings.dev.json">
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </None>

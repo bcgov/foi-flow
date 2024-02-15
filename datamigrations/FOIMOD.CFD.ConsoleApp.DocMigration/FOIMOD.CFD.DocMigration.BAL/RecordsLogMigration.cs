@@ -103,16 +103,18 @@ namespace FOIMOD.CFD.DocMigration.BAL
                                     //STITCHING PDF
                                     ilogger.LogInformation(string.Format("Stitching started for pages of  document ID {0} for request {1}, page count is {2}, started at {3}", docid, _requestnumber, pagedetails.TotalPageCount, DateTime.Now));
                                     MemoryStream docStream = pagedetails.FileType.ToLower().Contains("pdf") ? docMigrationPDFStitcher.MergePDFs(pagesbyDoc, baseRecordsLocation) : docMigrationPDFStitcher.MergeImages(pagesbyDoc);
-                                    ilogger.LogInformation(string.Format("Stitching COMPLETED!! for pages of  document ID {0} for request {1}, page count is {2}, end at {3}", docid, _requestnumber, pagedetails.TotalPageCount, DateTime.Now));
+                                    ilogger.LogInformation(string.Format("Stitching COMPLETED!! for pages of  document ID {0} for request {1}, page count is {2}, end at {3}", docid, _requestnumber, pagedetails.TotalPageCount, DateTime.Now));                                
 
                                     if (docStream != null)
                                     {
-                                        ilogger.LogInformation(string.Format("OCR starting for pages of  document ID {0} for request {1}, page count is {2}, started at {3}", docid, _requestnumber, pagedetails.TotalPageCount, DateTime.Now));
-                                        using (MemoryStream stitchedFileStream = OCRTOPdf.ConvertToSearchablePDF(docStream))
+                                       // ilogger.LogInformation(string.Format("OCR starting for pages of  document ID {0} for request {1}, page count is {2}, started at {3}", docid, _requestnumber, pagedetails.TotalPageCount, DateTime.Now));
+                                        //using (MemoryStream stitchedFileStream = OCRTOPdf.ConvertToSearchablePDF(docStream))
+                                        using (MemoryStream stitchedFileStream = docStream)
                                         {
+                                          
                                             var destinationfilename_guidbased = string.Format("{0}{1}", Guid.NewGuid().ToString(), pagedetails.FileType);
                                             var s3filesubpath = string.Format("{0}/{1}", SystemSettings.MinistryRecordsBucket, _requestnumber.ToUpper());
-                                            ilogger.LogInformation(string.Format("OCR completed for pages of  document ID {0} for request {1}, page count is {2}, ended at {3}", docid, _requestnumber, pagedetails.TotalPageCount, DateTime.Now));
+                                           // ilogger.LogInformation(string.Format("OCR completed for pages of  document ID {0} for request {1}, page count is {2}, ended at {3}", docid, _requestnumber, pagedetails.TotalPageCount, DateTime.Now));
 
                                             ilogger.LogInformation(string.Format("Upload starting for  document ID {0} for request {1}, page count is {2}, started at {3}", docid, _requestnumber, pagedetails.TotalPageCount, DateTime.Now));
                                             var uploadresponse = await docMigrationS3Client.UploadFileAsync(new UploadFile() { AXISRequestID = _requestnumber.ToUpper(), SubFolderPath = s3filesubpath, DestinationFileName = destinationfilename_guidbased, FileStream = stitchedFileStream });
@@ -178,7 +180,7 @@ namespace FOIMOD.CFD.DocMigration.BAL
                             {
                                 string exception = string.Format("Error happened while processing document, {0}, with DOCID {1}, on Request {2} and Error details as : ", actualfilename, docid, _requestnumber, ex.Message);
                                 ilogger.LogError(exception);
-                                throw new Exception(exception);
+                                //throw new Exception(exception);
                             }
 
                             ilogger.LogInformation("#####################################################################################");
