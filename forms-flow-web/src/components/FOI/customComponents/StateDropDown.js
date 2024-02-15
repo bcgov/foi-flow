@@ -37,6 +37,9 @@ const StateDropDown = ({
     (state) => state.foiRequests.foiRequestDetail
   );
 
+  const userDetail = useSelector(state=> state.user.userDetail);
+  const isCFDMinistryCoordinator = userDetail.groups.some(group => group.toLowerCase().includes('mcf ministry team'))
+
   React.useEffect(() => {
     if (requestState && requestState !== status) {
       setStatus(requestState);
@@ -114,20 +117,31 @@ const StateDropDown = ({
           return _stateList.intakeinprogress;
         }
       case StateEnum.peerreview.name.toLowerCase():
+        if (isCFDMinistryCoordinator) {
+          return _stateList.peerreviewcfd;
+        }
         if (!isMinistryCoordinator) {
+          const appendRecordsReadyForReview = (stateList) => {
+            const recordsreadyforreview = { status: "Records Ready for Review", isSelected: false };
+            let appendedList = stateList.slice();
+            appendedList.splice(-1, 0, recordsreadyforreview);
+            return appendedList;
+          }
           //const currentStatusVersion = stateTransition[0]?.version;
           if (previousState === StateEnum.intakeinprogress.name) {
-            return _stateList.intakeinprogress;
+            return appendRecordsReadyForReview(_stateList.intakeinprogress);
           } else if (previousState === StateEnum.open.name)
-            return _stateList.open;
+            return appendRecordsReadyForReview(_stateList.open);
           else if (previousState === StateEnum.review.name)
-            return _stateList.review;
+            return appendRecordsReadyForReview(_stateList.review);
           else if (previousState === StateEnum.consult.name)
-            return _stateList.consult;
+            return _stateList.consult; // this already has RRR state
           else if (previousState === StateEnum.response.name)
-            return _stateList.response;
+            return appendRecordsReadyForReview(_stateList.response);
           else if (previousState === StateEnum.appfeeowing.name)
-            return _stateList.appfeeowing;
+            return appendRecordsReadyForReview(_stateList.appfeeowing);
+          else if (previousState === StateEnum.recordsreadyforreview.name)
+            return _stateList.peerreview;
         } else {
           return _stateList.peerreview;
         }
@@ -138,8 +152,14 @@ const StateDropDown = ({
       case StateEnum.redirect.name.toLowerCase():
         return _stateList.redirect;
       case StateEnum.callforrecords.name.toLowerCase():
+        if (isCFDMinistryCoordinator && personalRequest) {
+          return _stateList.callforrecordsforcfdpersonal;
+        }
         if (_isMinistryCoordinator && personalRequest)
           return _stateList.callforrecordsforpersonal;
+        if (isCFDMinistryCoordinator) {
+          return _stateList.callforrecordscfd;
+        }
         if (
           personalIAO &&
           (requestDetails.bcgovcode.toLowerCase() === "mcf" ||
@@ -148,9 +168,17 @@ const StateDropDown = ({
           return _stateList.callforrecordscfdmsdpersonal;
         return _stateList.callforrecords;
       case StateEnum.tagging.name.toLowerCase():
+        if (isCFDMinistryCoordinator) {
+          return _stateList.taggingcfd;
+        }
         return _stateList.tagging;
       case StateEnum.readytoscan.name.toLowerCase():
+        if (isCFDMinistryCoordinator) {
+          return _stateList.readytoscancfd;
+        }
         return _stateList.readytoscan;
+      case StateEnum.recordsreadyforreview.name.toLowerCase():
+        return _stateList.recordsreadyforreview;
       case StateEnum.review.name.toLowerCase():
         if (
           personalIAO &&
@@ -175,6 +203,9 @@ const StateDropDown = ({
         }
         return _stateList.onhold;
       case StateEnum.consult.name.toLowerCase():
+        if (isCFDMinistryCoordinator) {
+          return _stateList.consultcfd;
+        }
         return _stateList.consult;
       case StateEnum.signoff.name.toLowerCase():
         return _stateList.signoff;
@@ -182,6 +213,9 @@ const StateDropDown = ({
         if (personalIAO) return _stateList.feeassessedforpersonal;
         return _stateList.feeassessed;
       case StateEnum.deduplication.name.toLowerCase():
+        if (isCFDMinistryCoordinator) {
+          return _stateList.deduplicationcfd;
+        }
         return _stateList.deduplication;
       case StateEnum.harms.name.toLowerCase():
         return _stateList.harms;
