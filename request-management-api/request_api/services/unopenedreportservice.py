@@ -148,33 +148,3 @@ class unopenedreportservice:
                     </tr>
                 '''
         return emailhtml
-
-
-    # def isrank2match(self, request, match):
-    #     diff = 0
-    #     for k, v in request['requestrawdata']['contactInfo'].items():
-    #         if v and match['requestrawdata'].get(k, False) != v:
-    #             diff += 1
-    #             if diff > self.diffcutoff:
-    #                 return False
-    #     for k, v in request['requestrawdata']['contactInfoOptions'].items():
-    #         if v and match['requestrawdata'].get(k, False) != v:
-    #             diff += 1
-    #             if diff > self.diffcutoff:
-    #                 return False
-    #     print("rank 2 match")
-    #     return True
-
-    # def isrank1match(self, request, match):
-    #     print(request['requestrawdata']['receivedDateUF'][0:10])
-    #     print(match['requestrawdata']['receivedDateUF'][0:10])
-    #     match = (((request['requestrawdata']['contactInfo']['firstName'] == match['requestrawdata']['firstName']
-    #               and request['requestrawdata']['contactInfo']['lastName'] == match['requestrawdata']['lastName'])
-    #              or request['requestrawdata']['contactInfoOptions']['email'] == match['requestrawdata']['email']
-    #              or request['requestrawdata']['contactInfoOptions']['phonePrimary'] == match['requestrawdata']['phonePrimary']
-    #              or request['requestrawdata']['contactInfoOptions']['postal'] == match['requestrawdata']['postal']
-    #              )
-    #         and request['requestrawdata']['receivedDateUF'][0:10] == match['requestrawdata']['receivedDateUF'][0:10])
-    #     if match:
-    #         print("rank 1 match")
-    #     return match
