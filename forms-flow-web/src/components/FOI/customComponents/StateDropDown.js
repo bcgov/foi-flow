@@ -121,19 +121,27 @@ const StateDropDown = ({
           return _stateList.peerreviewcfd;
         }
         if (!isMinistryCoordinator) {
+          const appendRecordsReadyForReview = (stateList) => {
+            const recordsreadyforreview = { status: "Records Ready for Review", isSelected: false };
+            let appendedList = stateList.slice();
+            appendedList.splice(-1, 0, recordsreadyforreview);
+            return appendedList;
+          }
           //const currentStatusVersion = stateTransition[0]?.version;
           if (previousState === StateEnum.intakeinprogress.name) {
-            return _stateList.intakeinprogress;
+            return appendRecordsReadyForReview(_stateList.intakeinprogress);
           } else if (previousState === StateEnum.open.name)
-            return _stateList.open;
+            return appendRecordsReadyForReview(_stateList.open);
           else if (previousState === StateEnum.review.name)
-            return _stateList.review;
+            return appendRecordsReadyForReview(_stateList.review);
           else if (previousState === StateEnum.consult.name)
-            return _stateList.consult;
+            return _stateList.consult; // this already has RRR state
           else if (previousState === StateEnum.response.name)
-            return _stateList.response;
+            return appendRecordsReadyForReview(_stateList.response);
           else if (previousState === StateEnum.appfeeowing.name)
-            return _stateList.appfeeowing;
+            return appendRecordsReadyForReview(_stateList.appfeeowing);
+          else if (previousState === StateEnum.recordsreadyforreview.name)
+            return _stateList.peerreview;
         } else {
           return _stateList.peerreview;
         }
