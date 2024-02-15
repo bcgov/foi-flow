@@ -66,16 +66,20 @@ class unopenedreportservice:
 
     def generateemailhtml(self, alerts):
         emailhtml = """
-            <h3>Unopened Report - 2024/02/05</h3>
+            <h3>Unopened Report - """ + str(date.today()) + """</h3>
 
             <p>This is a report for unopened requests in the past """ + self.dayscutoff + """ days that have not yet been actioned.</p>
             <p><b>Rank 1:</b> Very likely to be unactioned — unable to find a request with any matching applicant info</p>
             <table border='1' style='border-collapse:collapse'>
             <tr>
                 <th>Unopened ID</th>
+                <th>Date Received</th>
+                <th>Ministry Selected</th>
                 <th>Applicant First Name</th>
                 <th>Applicant Last Name</th>
                 <th>Payment Status</th>
+                <th>Receipt Number</th>
+                <th>Amount Paid</th>
                 <th>Description</th>
             </tr>
         """
@@ -86,9 +90,16 @@ class unopenedreportservice:
                 emailhtml += '''
                     <tr>
                         <td>U-000''' + str(alert['request']['requestid']) + '''</td>
-                        <td>''' + alert['request']['requestrawdata']['contactInfo']['lastName'] + '''</td>
+                        <td>''' + alert['request']['requestrawdata']['receivedDate'] + '''</td>
+                        <td>'''
+                for m in alert['request']['requestrawdata']['ministry']['selectedMinistry']:
+                    emailhtml += (m['code'] + ' ')
+                emailhtml += '''</td>
                         <td>''' + alert['request']['requestrawdata']['contactInfo']['firstName'] + '''</td>
+                        <td>''' + alert['request']['requestrawdata']['contactInfo']['lastName'] + '''</td>
                         <td>''' + alert['request']['paymentstatus'] + '''</td>
+                        <td>''' + alert['request']['txnno'] + '''</td>
+                        <td>''' + str(alert['request']['amountpaid']) + '''</td>
                         <td>''' + alert['request']['requestrawdata']['descriptionTimeframe']['description'][0:99] + '''...</td>
                     </tr>
                 '''
@@ -99,9 +110,13 @@ class unopenedreportservice:
                         <table border='1' style='border-collapse:collapse'>
                         <tr>
                             <th>Unopened ID</th>
+                            <th>Date Received</th>
+                            <th>Ministry Selected</th>
                             <th>Applicant First Name</th>
                             <th>Applicant Last Name</th>
                             <th>Payment Status</th>
+                            <th>Receipt Number</th>
+                            <th>Amount Paid</th>
                             <th>Potential Matches</th>
                             <th>Description</th>
                         </tr>
@@ -113,13 +128,20 @@ class unopenedreportservice:
                 emailhtml += '''
                     <tr>
                         <td>U-000''' + str(alert['request']['requestid']) + '''</td>
-                        <td>''' + alert['request']['requestrawdata']['contactInfo']['lastName'] + '''</td>
+                        <td>''' + alert['request']['requestrawdata']['receivedDate'] + '''</td>
+                        <td>'''
+                for m in alert['request']['requestrawdata']['ministry']['selectedMinistry']:
+                    emailhtml += (m['code'] + ' ')
+                emailhtml += '''</td>
                         <td>''' + alert['request']['requestrawdata']['contactInfo']['firstName'] + '''</td>
+                        <td>''' + alert['request']['requestrawdata']['contactInfo']['lastName'] + '''</td>
                         <td>''' + alert['request']['paymentstatus'] + '''</td>
+                        <td>''' + alert['request']['txnno'] + '''</td>
+                        <td>''' + str(alert['request']['amountpaid']) + '''</td>
                         <td>
                     '''
                 for m in alert['potentialmatches']['matches']:
-                    emailhtml += (m['requestid'] + " - similarity: " + str(m['similarity']) + "<br>")
+                    emailhtml += (m['requestid'] + " - similarity: " + str(m['similarity']*100) + "%<br>")
                 emailhtml = emailhtml[:-4]
                 emailhtml += '''</td>
                         <td>''' + alert['request']['requestrawdata']['descriptionTimeframe']['description'][0:99] + '''...</td>

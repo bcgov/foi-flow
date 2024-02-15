@@ -1078,7 +1078,10 @@ class FOIRawRequest(db.Model):
     def getunopenedunactionedrequests(cls, startdate, enddate):
         try:
             requests = []
-            sql = '''select rr.created_at, rr.requestrawdata, rr.requestid, coalesce(p.status, '') as status from public."FOIRawRequests" rr
+            sql = '''select rr.created_at, rr.requestrawdata, rr.requestid, coalesce(p.status, '') as status,
+                         coalesce(p.transaction_number, '') as txnno,
+                         case when p.status = 'PAID' then  p.total else 0 end as amountpaid
+                    from public."FOIRawRequests" rr
                     join (
                         select max(version) as version, requestid from public."FOIRawRequests"
                         group by requestid
@@ -1098,7 +1101,9 @@ class FOIRawRequest(db.Model):
                     "requestid": row["requestid"],
                     "created_at": row["created_at"],
                     "requestrawdata": row["requestrawdata"],
-                    "paymentstatus": row["status"]
+                    "paymentstatus": row["status"],
+                    "amountpaid": row["amountpaid"],
+                    "txnno": row["txnno"]
                 })
         except Exception as ex:
             logging.error(ex)
