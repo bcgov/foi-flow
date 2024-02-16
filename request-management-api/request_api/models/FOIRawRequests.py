@@ -1080,7 +1080,7 @@ class FOIRawRequest(db.Model):
             requests = []
             sql = '''select rr.created_at, rr.requestrawdata, rr.requestid, coalesce(p.status, '') as status,
                          coalesce(p.transaction_number, '') as txnno,
-                         case when p.status = 'PAID' then  p.total else 0 end as amountpaid
+                         coalesce(p.total::text, '') as fee
                     from public."FOIRawRequests" rr
                     join (
                         select max(version) as version, requestid from public."FOIRawRequests"
@@ -1102,7 +1102,7 @@ class FOIRawRequest(db.Model):
                     "created_at": row["created_at"],
                     "requestrawdata": row["requestrawdata"],
                     "paymentstatus": row["status"],
-                    "amountpaid": row["amountpaid"],
+                    "fee": row["fee"],
                     "txnno": row["txnno"]
                 })
         except Exception as ex:

@@ -56,7 +56,7 @@ class unopenedreportservice:
                 alerts.append({"request": request, "rank": 2, "potentialmatches": alert.potentialmatches})
         alerts.sort(key=lambda a : a.get('potentialmatches', {'highscore': 0})['highscore'])
         senderservice().send(
-            subject="Intake Unopened Request Report: " + date.today(),
+            subject="Intake Unopened Request Report: " + str(date.today()),
             content=self.generateemailhtml(alerts),
             _messageattachmentlist=[],
             requestjson={"email": self.reportemail, "topic": "Unopened Report"}
@@ -79,7 +79,7 @@ class unopenedreportservice:
                 <th>Applicant Last Name</th>
                 <th>Payment Status</th>
                 <th>Receipt Number</th>
-                <th>Amount Paid</th>
+                <th>Application Fee</th>
                 <th>Description</th>
             </tr>
         """
@@ -99,7 +99,7 @@ class unopenedreportservice:
                         <td>''' + alert['request']['requestrawdata']['contactInfo']['lastName'] + '''</td>
                         <td>''' + alert['request']['paymentstatus'] + '''</td>
                         <td>''' + alert['request']['txnno'] + '''</td>
-                        <td>''' + str(alert['request']['amountpaid']) + '''</td>
+                        <td>''' + alert['request']['fee'] + '''</td>
                         <td>''' + alert['request']['requestrawdata']['descriptionTimeframe']['description'][0:99] + '''...</td>
                     </tr>
                 '''
@@ -116,7 +116,7 @@ class unopenedreportservice:
                             <th>Applicant Last Name</th>
                             <th>Payment Status</th>
                             <th>Receipt Number</th>
-                            <th>Amount Paid</th>
+                            <th>Application Fee</th>
                             <th>Potential Matches</th>
                             <th>Description</th>
                         </tr>
@@ -137,7 +137,7 @@ class unopenedreportservice:
                         <td>''' + alert['request']['requestrawdata']['contactInfo']['lastName'] + '''</td>
                         <td>''' + alert['request']['paymentstatus'] + '''</td>
                         <td>''' + alert['request']['txnno'] + '''</td>
-                        <td>''' + str(alert['request']['amountpaid']) + '''</td>
+                        <td>''' + alert['request']['fee'] + '''</td>
                         <td>
                     '''
                 for m in alert['potentialmatches']['matches']:
