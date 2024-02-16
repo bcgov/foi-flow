@@ -584,7 +584,8 @@ class FOIMinistryRequest(db.Model):
                                     *joincondition_oipc
                                     ),
                                 isouter=True
-                            ).filter(or_(FOIMinistryRequest.requeststatuslabel != StateName.closed.name, and_(FOIMinistryRequest.isoipcreview == True, FOIMinistryRequest.requeststatusid == 3, subquery_with_oipc.c.outcomeid == None)))
+                            ).filter(or_(FOIMinistryRequest.requeststatuslabel != StateName.closed.name, 
+                                         and_(FOIMinistryRequest.isoipcreview == True, FOIMinistryRequest.requeststatusid == 3, subquery_with_oipc.c.outcomeid == None)))
                                    
         if(additionalfilter == 'watchingRequests'):
             #watchby
@@ -701,6 +702,7 @@ class FOIMinistryRequest(db.Model):
             ministryfilter = FOIMinistryRequest.isactive == True
         else:
             groupfilter = []
+            statusfilter = None
             for group in groups:
                 if (group == IAOTeamWithKeycloackGroup.flex.value or group in ProcessingTeamWithKeycloackGroup.list()):
                     groupfilter.append(
@@ -708,35 +710,37 @@ class FOIMinistryRequest(db.Model):
                             FOIMinistryRequest.assignedgroup == group
                         )
                     )
+                    statusfilter = FOIMinistryRequest.requeststatuslabel != StateName.closed.name
                 elif (group == IAOTeamWithKeycloackGroup.intake.value):
                     groupfilter.append(
                         or_(
                             FOIMinistryRequest.assignedgroup == group,
                             and_(
-                                FOIMinistryRequest.assignedgroup == IAOTeamWithKeycloackGroup.flex.value,
-                                FOIMinistryRequest.requeststatuslabel.in_([StateName.open.name])
+                                FOIMinistryRequest.assignedgroup == IAOTeamWithKeycloackGroup.flex.value
                             )
                         )
                     )
+                    statusfilter = FOIMinistryRequest.requeststatuslabel != StateName.closed.name
                 else:
                     groupfilter.append(
                         or_(
                             FOIMinistryRequest.assignedgroup == group,
                             and_(
-                                FOIMinistryRequest.assignedministrygroup == group,
-                                FOIMinistryRequest.requeststatuslabel.in_([StateName.callforrecords.name,StateName.recordsreview.name,StateName.feeestimate.name,StateName.consult.name,StateName.ministrysignoff.name,StateName.onhold.name,StateName.deduplication.name,StateName.harmsassessment.name,StateName.response.name,StateName.peerreview.name,StateName.tagging.name,StateName.readytoscan.name])
+                                FOIMinistryRequest.assignedministrygroup == group
                             )
                         )
                     )
-
+                    statusfilter = FOIMinistryRequest.requeststatuslabel.in_([StateName.callforrecords.name,StateName.recordsreview.name,StateName.feeestimate.name,StateName.consult.name,StateName.ministrysignoff.name,StateName.onhold.name,StateName.deduplication.name,StateName.harmsassessment.name,StateName.response.name,StateName.peerreview.name,StateName.tagging.name,StateName.readytoscan.name])
             ministryfilter = and_(
                                 FOIMinistryRequest.isactive == True,
                                 FOIRequestStatus.isactive == True,
                                 or_(*groupfilter)
                             )
-        
-        ministryfilterwithclosedoipc = or_(ministryfilter, and_(FOIMinistryRequest.isoipcreview == True, FOIMinistryRequest.requeststatuslabel == StateName.closed.name))
-
+            ministryfilterwithclosedoipc = and_(ministryfilter, 
+                                            or_(statusfilter, 
+                                                and_(FOIMinistryRequest.isoipcreview == True, FOIMinistryRequest.requeststatuslabel == StateName.closed.name)
+                                                )
+                                            )
         return ministryfilterwithclosedoipc
 
     @classmethod
