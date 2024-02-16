@@ -56,7 +56,7 @@ class unopenedreportservice:
                 alerts.append({"request": request, "rank": 2, "potentialmatches": alert.potentialmatches})
         alerts.sort(key=lambda a : a.get('potentialmatches', {'highscore': 0})['highscore'])
         senderservice().send(
-            subject="Intake Unopened Request Report: " + date.today(),
+            subject="Intake Unopened Request Report: " + str(date.today()),
             content=self.generateemailhtml(alerts),
             _messageattachmentlist=[],
             requestjson={"email": self.reportemail, "topic": "Unopened Report"}
