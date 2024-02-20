@@ -96,13 +96,13 @@ namespace FOIMOD.CFD.DocMigration.BAL
                                 var baseRecordsLocation = Path.Combine(SystemSettings.FileServerRoot, SystemSettings.RecordsbaseFolder);
                                 var pagesbyDoc = records.Where(r => r.IDocID == docid).OrderBy(p => p.PageSequenceNumber).ToList();
                                 var pagedetails = pagesbyDoc.First();
-                                actualfilename = string.Format("{0}_{1}{2}", pagedetails.ParentFolderName, pagedetails.FolderName, pagedetails.FileType);
+                                actualfilename = string.Format("{0}_{1}{2}", pagedetails.ParentFolderName?.Replace("'",""), pagedetails.FolderName?.Replace("'", ""), ".pdf");
                                 if (pagesbyDoc.Any())
                                 {
 
                                     //STITCHING PDF
                                     ilogger.LogInformation(string.Format("Stitching started for pages of  document ID {0} for request {1}, page count is {2}, started at {3}", docid, _requestnumber, pagedetails.TotalPageCount, DateTime.Now));
-                                    MemoryStream docStream = pagedetails.FileType.ToLower().Contains("pdf") ? docMigrationPDFStitcher.MergePDFs(pagesbyDoc, baseRecordsLocation) : docMigrationPDFStitcher.MergeImages(pagesbyDoc);
+                                    MemoryStream docStream = pagedetails.FileType.ToLower().Contains("pdf") ? docMigrationPDFStitcher.MergePDFs(pagesbyDoc, baseRecordsLocation) : docMigrationPDFStitcher.MergeImages(pagesbyDoc, baseRecordsLocation);
                                     ilogger.LogInformation(string.Format("Stitching COMPLETED!! for pages of  document ID {0} for request {1}, page count is {2}, end at {3}", docid, _requestnumber, pagedetails.TotalPageCount, DateTime.Now));                                
 
                                     if (docStream != null)
@@ -133,7 +133,7 @@ namespace FOIMOD.CFD.DocMigration.BAL
                                                 byte[] fileData = stitchedFileStream.ToArray();
                                                 int filesize = fileData.Length; //TODO: Need to find out the  KB or B or MB in DB
                                                 string sectionName = GetSectionNameByAXISFolder(pagedetails.FolderName);
-                                                var sectiondivisionid = recordsDAL.GetSectionIDByName(sectionName);
+                                                var sectiondivisionid = recordsDAL.GetSectionIDByName(sectionName.Replace("'",""));
 
                                                 var minitryrequestdetails = recordsDAL.GetMinistryRequestDetails(_requestnumber);
 

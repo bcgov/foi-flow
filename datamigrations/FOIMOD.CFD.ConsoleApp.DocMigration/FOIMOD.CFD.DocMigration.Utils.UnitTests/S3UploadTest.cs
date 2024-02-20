@@ -145,6 +145,37 @@ namespace FOIMOD.CFD.DocMigration.Utils.UnitTests
             }
         }
 
+
+        [TestMethod]
+        public void PNGMerge_UploadPNGFilePathTest()
+        {
+            List<DocumentToMigrate> pDFDocToMerges = new List<DocumentToMigrate>();
+            pDFDocToMerges.Add(new DocumentToMigrate() { PageFilePath = Path.Combine(getSourceFolder(), "pngs\\scansample.png"), PageSequenceNumber = 1 });
+            pDFDocToMerges.Add(new DocumentToMigrate() { PageFilePath = Path.Combine(getSourceFolder(), "pngs\\scansample2.png"), PageSequenceNumber = 2 });
+
+
+            using (DocMigrationPDFStitcher docMigrationPDFStitcher = new DocMigrationPDFStitcher())
+            {
+                using Stream fs = docMigrationPDFStitcher.MergeImages(pDFDocToMerges);
+
+                AmazonS3Client amazonS3Client = new AmazonS3Client(s3credentials, config);
+
+                DocMigrationS3Client docMigrationS3Client = new DocMigrationS3Client(amazonS3Client);
+
+
+                using var client = new HttpClient();
+
+                fs.Position = 0;
+                var destinationfilename = string.Format("{0}.pdf", Guid.NewGuid().ToString());
+
+                UploadFile uploadFile = new UploadFile() { AXISRequestID = "TEST-10001-12342", DestinationFileName = destinationfilename, S3BucketName = "test123-protected", SubFolderPath = "test123-protected/Abintest/unittestmigration", UploadType = UploadType.Attachments, SourceFileName = "DOC1.pdf", FileStream = fs };
+                var result = docMigrationS3Client.UploadFileAsync(uploadFile).Result;
+                Assert.IsNotNull(result);
+                Assert.IsTrue(result.IsSuccessStatusCode);
+
+            }
+        }
+
         [TestMethod]
 
         public void CreatePDF_Test()
