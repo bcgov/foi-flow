@@ -65,5 +65,5 @@ export const RECORD_PROCESSING_HRS = (window._env_ && window._env_.REACT_APP_REC
 export const DISABLE_REDACT_WEBLINK = (window._env_ && window._env_.REACT_APP_DISABLE_REDACT_WEBLINK) || process.env.REACT_APP_DISABLE_REDACT_WEBLINK || false;
 export const DISABLE_GATHERINGRECORDS_TAB = (window._env_ && window._env_.REACT_APP_DISABLE_GATHERINGRECORDS_TAB) || process.env.REACT_APP_DISABLE_GATHERINGRECORDS_TAB || 'false';
 
-export const RECORD_DOWNLOAD_LIMIT = (window._env_ && window._env_.REACT_APP_RECORD_DOWNLOAD_LIMIT) || process.env.REACT_APP_RECORD_DOWNLOAD_LIMIT || 200;
-export const RECORD_DOWNLOAD_SIZE_LIMIT = (window._env_ && window._env_.REACT_APP_RECORD_DOWNLOAD_SIZE_LIMIT) || process.env.REACT_APP_RECORD_DOWNLOAD_SIZE_LIMIT || 2147483648;
+export const RECORD_DOWNLOAD_LIMIT = (window._env_ && window._env_.REACT_APP_RECORD_DOWNLOAD_LIMIT) || process.env.REACT_APP_RECORD_DOWNLOAD_LIMIT || 500;
+export const RECORD_DOWNLOAD_SIZE_LIMIT = (window._env_ && window._env_.REACT_APP_RECORD_DOWNLOAD_SIZE_LIMIT) || process.env.REACT_APP_RECORD_DOWNLOAD_SIZE_LIMIT || 1073741824;
