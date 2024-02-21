@@ -3,6 +3,7 @@ using FOIMOD.CFD.DocMigration.Models.Document;
 using FOIMOD.CFD.DocMigration.Models.FOIFLOWDestination;
 using FOIMOD.CFD.DocMigration.Utils;
 using MCS.FOI.OCRtoPDF;
+using System;
 using System.IO;
 using System.Net;
 
@@ -39,10 +40,10 @@ namespace FOIMOD.CFD.DocMigration.OCR.Tests
 
             using (DocMigrationPDFStitcher docMigrationPDFStitcher = new DocMigrationPDFStitcher())
             {
-                using MemoryStream fs = docMigrationPDFStitcher.MergePDFs(pDFDocToMerges);
+                using HugeMemoryStream fs = docMigrationPDFStitcher.MergePDFs(pDFDocToMerges);
 
                 using FileStream file = new FileStream(Path.Combine(getSourceFolder(), "mergeresult.pdf"), FileMode.Create, FileAccess.Write);
-                fs.WriteTo(file);
+                fs.CopyTo(file);
                 file.Close();
 
 
@@ -57,7 +58,7 @@ namespace FOIMOD.CFD.DocMigration.OCR.Tests
 
                     using FileStream mergedocrfile = new FileStream(Path.Combine(getSourceFolder(), "ocrdmergedpdf.pdf"), FileMode.Create, FileAccess.Write);
                     ocrdstream.WriteTo(mergedocrfile);
-                    file.Close();
+                    //file.Close();
 
 
                     ocrdstream.Close();
@@ -77,7 +78,7 @@ namespace FOIMOD.CFD.DocMigration.OCR.Tests
 
             using (DocMigrationPDFStitcher docMigrationPDFStitcher = new DocMigrationPDFStitcher())
             {
-                using MemoryStream mergedfileStream = docMigrationPDFStitcher.MergePDFs(pDFDocToMerges);
+                using HugeMemoryStream mergedfileStream = docMigrationPDFStitcher.MergePDFs(pDFDocToMerges);
                 OCRTOPdf.TessaractPath = "C:\\Abindev\\foi-flow\\datamigrations\\FOIMOD.CFD.ConsoleApp.DocMigration\\FOIMOD.CFD.DocMigration.OCR\\Tesseractbinaries_core\\Windows\\x64";
                 OCRTOPdf.TessaractLanguagePath = "C:\\Abindev\\foi-flow\\datamigrations\\FOIMOD.CFD.ConsoleApp.DocMigration\\FOIMOD.CFD.DocMigration.OCR\\tessdata";
 
@@ -103,11 +104,11 @@ namespace FOIMOD.CFD.DocMigration.OCR.Tests
 
             using (DocMigrationPDFStitcher docMigrationPDFStitcher = new DocMigrationPDFStitcher())
             {
-                MemoryStream mergedfileStream = docMigrationPDFStitcher.MergePDFs_v1(pDFDocToMerges);
+                HugeMemoryStream mergedfileStream = docMigrationPDFStitcher.MergePDFs_v1(pDFDocToMerges);
                 OCRTOPdf.TessaractPath = "C:\\Abindev\\foi-flow\\datamigrations\\FOIMOD.CFD.ConsoleApp.DocMigration\\FOIMOD.CFD.DocMigration.OCR\\Tesseractbinaries_core\\Windows\\x64";
                 OCRTOPdf.TessaractLanguagePath = "C:\\Abindev\\foi-flow\\datamigrations\\FOIMOD.CFD.ConsoleApp.DocMigration\\FOIMOD.CFD.DocMigration.OCR\\tessdata";
-                //mergedfileStream.Position = 0;
-                
+                mergedfileStream.Position = 0;
+
                 MemoryStream standbymemoryStream = new MemoryStream();
                 mergedfileStream.CopyTo(standbymemoryStream);
 

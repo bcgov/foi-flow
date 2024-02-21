@@ -10,7 +10,7 @@ namespace MCS.FOI.OCRtoPDF
         public static string TessaractPath { get; set; }
         public static string TessaractLanguagePath { get; set; }
 
-        public static MemoryStream ConvertToSearchablePDF(MemoryStream inputPdfFilestream)
+        public static MemoryStream ConvertToSearchablePDF(Stream inputPdfFilestream)
         {
             MemoryStream stream = null;
             try

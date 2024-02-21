@@ -103,14 +103,14 @@ namespace FOIMOD.CFD.DocMigration.BAL
 
                                     //STITCHING PDF
                                     ilogger.LogInformation(string.Format("Stitching started for pages of  document ID {0} for request {1}, page count is {2}, started at {3}", docid, _requestnumber, pagedetails.TotalPageCount, DateTime.Now));
-                                    MemoryStream docStream = !hasanyimage ? docMigrationPDFStitcher.MergePDFs(pagesbyDoc, baseRecordsLocation) : docMigrationPDFStitcher.MergeImages(pagesbyDoc, baseRecordsLocation);
+                                    using HugeMemoryStream docStream = !hasanyimage ? docMigrationPDFStitcher.MergePDFs_v1(pagesbyDoc, baseRecordsLocation) : docMigrationPDFStitcher.MergeImages(pagesbyDoc, baseRecordsLocation);
                                     ilogger.LogInformation(string.Format("Stitching COMPLETED!! for pages of  document ID {0} for request {1}, page count is {2}, end at {3}", docid, _requestnumber, pagedetails.TotalPageCount, DateTime.Now));                                
 
                                     if (docStream != null)
                                     {
                                        // ilogger.LogInformation(string.Format("OCR starting for pages of  document ID {0} for request {1}, page count is {2}, started at {3}", docid, _requestnumber, pagedetails.TotalPageCount, DateTime.Now));
                                         //using (MemoryStream stitchedFileStream = OCRTOPdf.ConvertToSearchablePDF(docStream))
-                                        using (MemoryStream stitchedFileStream = docStream)
+                                        using (HugeMemoryStream stitchedFileStream = docStream)
                                         {
                                           
                                             var destinationfilename_guidbased = string.Format("{0}{1}", Guid.NewGuid().ToString(), ".pdf");
@@ -131,8 +131,8 @@ namespace FOIMOD.CFD.DocMigration.BAL
                                                 var documenthash = Guid.NewGuid().ToString().Replace("-", "");
                                                 var batch = Guid.NewGuid().ToString();
                                                 var s3url = string.Format("{0}/{1}/{2}", SystemSettings.S3_EndPoint, s3filesubpath, destinationfilename_guidbased);
-                                                byte[] fileData = stitchedFileStream.ToArray();
-                                                int filesize = fileData.Length; //TODO: Need to find out the  KB or B or MB in DB
+                                               // byte[] fileData = stitchedFileStream.Length
+                                                long filesize = stitchedFileStream.Length; //TODO: Need to find out the  KB or B or MB in DB
                                                 string sectionName = GetSectionNameByAXISFolder(pagedetails.FolderName);
                                                 var sectiondivisionid = recordsDAL.GetSectionIDByName(sectionName.Replace("'",""));
 
@@ -178,8 +178,8 @@ namespace FOIMOD.CFD.DocMigration.BAL
                                 }
                             }
                             catch (Exception ex)
-                            {
-                                string exception = string.Format("Error happened while processing document, {0}, with DOCID {1}, on Request {2} and Error details as : ", actualfilename, docid, _requestnumber, ex.Message);
+                            { 
+                                string exception = string.Format("Error happened while processing document, {0}, with DOCID {1}, on Request {2} and Error details as :{3} ", actualfilename, docid, _requestnumber, ex.Message);
                                 ilogger.LogError(exception);
                                 //throw new Exception(exception);
                             }
