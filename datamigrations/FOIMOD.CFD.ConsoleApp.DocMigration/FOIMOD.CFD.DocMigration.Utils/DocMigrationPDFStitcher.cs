@@ -9,6 +9,7 @@ using TheArtOfDev.HtmlRenderer.PdfSharp;
 using Syncfusion.Pdf.Graphics;
 using Syncfusion.Drawing;
 using Amazon.S3.Model;
+using Syncfusion.Pdf.Parsing;
 
 
 
@@ -115,21 +116,39 @@ namespace FOIMOD.CFD.DocMigration.Utils
                 {
                     using MemoryStream file = new MemoryStream();
                     string filelocation = String.IsNullOrEmpty(baseUNClocation) ? formFile.PageFilePath : Path.Combine(baseUNClocation, formFile.SiFolderID, formFile.PageFilePath);
-
-                    PdfBitmap image = new PdfBitmap(File.Open(filelocation, FileMode.Open));
                     //Adding new page
                     SyncfusionPDF.PdfPage page = page = document.Pages.Add();
+                    if (formFile.FileType.Contains("pdf"))
+                    {
+                        using FileStream pdffilestream = File.OpenRead(filelocation);
+                        //Loads the PDF document 
+                        PdfLoadedDocument loadedDocument = new PdfLoadedDocument(pdffilestream);
+                        //Set EnableMemoryOptimization to true
+                        document.EnableMemoryOptimization = true;
 
-                    SizeF pageSize = page.GetClientSize();
+                        //Appending the document with source document 
+                        document.Append(loadedDocument);
 
-                    //Setting image bounds 
-                    RectangleF imageBounds = new RectangleF(0, 0, pageSize.Width, pageSize.Height);
+                        //Close the loaded document
+                        loadedDocument.Close(true);
+                    }
+                    else
+                    {
+                        PdfBitmap image = new PdfBitmap(File.Open(filelocation, FileMode.Open));
+                        
+
+                        SizeF pageSize = page.GetClientSize();
+
+                        //Setting image bounds 
+                        RectangleF imageBounds = new RectangleF(0, 0, pageSize.Width, pageSize.Height);
 
 
-                    //Drawing image to the PDF page
-                    page.Graphics.DrawImage(image, imageBounds);
-                    file.Dispose();
+                        //Drawing image to the PDF page
+                        page.Graphics.DrawImage(image, imageBounds);
+                        file.Dispose();
+                    }
                 }
+
             }
             //Saving the PDF to the MemoryStream
             MemoryStream stream = new MemoryStream();

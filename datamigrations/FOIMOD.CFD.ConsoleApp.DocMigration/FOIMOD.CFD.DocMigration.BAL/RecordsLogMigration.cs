@@ -95,14 +95,15 @@ namespace FOIMOD.CFD.DocMigration.BAL
                             {
                                 var baseRecordsLocation = Path.Combine(SystemSettings.FileServerRoot, SystemSettings.RecordsbaseFolder);
                                 var pagesbyDoc = records.Where(r => r.IDocID == docid).OrderBy(p => p.PageSequenceNumber).ToList();
-                                var pagedetails = pagesbyDoc.First();
+                                var hasanyimage = pagesbyDoc.Where(r => r.FileType.ToLower().EndsWith("png") || r.FileType.ToLower().EndsWith("jpeg") || r.FileType.ToLower().EndsWith("jpg")).Any();
+                                 var pagedetails = pagesbyDoc.First();
                                 actualfilename = string.Format("{0}_{1}{2}", pagedetails.ParentFolderName?.Replace("'",""), pagedetails.FolderName?.Replace("'", ""), ".pdf");
                                 if (pagesbyDoc.Any())
                                 {
 
                                     //STITCHING PDF
                                     ilogger.LogInformation(string.Format("Stitching started for pages of  document ID {0} for request {1}, page count is {2}, started at {3}", docid, _requestnumber, pagedetails.TotalPageCount, DateTime.Now));
-                                    MemoryStream docStream = pagedetails.FileType.ToLower().Contains("pdf") ? docMigrationPDFStitcher.MergePDFs(pagesbyDoc, baseRecordsLocation) : docMigrationPDFStitcher.MergeImages(pagesbyDoc, baseRecordsLocation);
+                                    MemoryStream docStream = !hasanyimage ? docMigrationPDFStitcher.MergePDFs(pagesbyDoc, baseRecordsLocation) : docMigrationPDFStitcher.MergeImages(pagesbyDoc, baseRecordsLocation);
                                     ilogger.LogInformation(string.Format("Stitching COMPLETED!! for pages of  document ID {0} for request {1}, page count is {2}, end at {3}", docid, _requestnumber, pagedetails.TotalPageCount, DateTime.Now));                                
 
                                     if (docStream != null)
@@ -112,7 +113,7 @@ namespace FOIMOD.CFD.DocMigration.BAL
                                         using (MemoryStream stitchedFileStream = docStream)
                                         {
                                           
-                                            var destinationfilename_guidbased = string.Format("{0}{1}", Guid.NewGuid().ToString(), pagedetails.FileType);
+                                            var destinationfilename_guidbased = string.Format("{0}{1}", Guid.NewGuid().ToString(), ".pdf");
                                             var s3filesubpath = string.Format("{0}/{1}", SystemSettings.MinistryRecordsBucket, _requestnumber.ToUpper());
                                            // ilogger.LogInformation(string.Format("OCR completed for pages of  document ID {0} for request {1}, page count is {2}, ended at {3}", docid, _requestnumber, pagedetails.TotalPageCount, DateTime.Now));
 

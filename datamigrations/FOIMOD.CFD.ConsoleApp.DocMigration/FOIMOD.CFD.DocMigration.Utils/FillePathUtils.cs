@@ -1,4 +1,5 @@
 ﻿using FOIMOD.CFD.DocMigration.Models;
+using System.Text.RegularExpressions;
 namespace FOIMOD.CFD.DocMigration.Utils
 {
     public static class FilePathUtils
@@ -46,6 +47,22 @@ namespace FOIMOD.CFD.DocMigration.Utils
             var filenameparts = filename.Split('.');
             var fileextension = filenameparts.Length > 2 ? filenameparts[filenameparts.Length - 1] : filenameparts[1];
             return fileextension;
+        }
+
+        public static string CleanFileNameInput(string strIn)
+        {
+            // Replace invalid characters with empty strings.
+            try
+            {
+                return Regex.Replace(strIn, @"[^\w\.@-]", "",
+                                     RegexOptions.None, TimeSpan.FromSeconds(10.5));
+            }
+            // If we timeout when replacing invalid characters,
+            // we should return Empty.
+            catch (RegexMatchTimeoutException)
+            {
+                return String.Empty;
+            }
         }
 
     }

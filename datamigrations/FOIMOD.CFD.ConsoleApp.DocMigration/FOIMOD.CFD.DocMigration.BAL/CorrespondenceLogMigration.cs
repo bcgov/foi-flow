@@ -14,6 +14,7 @@ using System.Data.Odbc;
 using System.Net.Mail;
 using ILogger = Microsoft.Extensions.Logging.ILogger;
 
+
 namespace FOIMOD.CFD.DocMigration.BAL
 {
     public class CorrespondenceLogMigration
@@ -73,7 +74,7 @@ namespace FOIMOD.CFD.DocMigration.BAL
                                         if (uploadresponse.IsSuccessStatusCode)
                                         {
                                             //INSERT INTO TABLE - FOIMinistryRequestDocuments
-                                            attachmentsDAL.InsertIntoMinistryRequestDocuments(fullfileurl, file.FileName.Replace("'", ""), attachment.AXISRequestNumber);
+                                            attachmentsDAL.InsertIntoMinistryRequestDocuments(fullfileurl, FilePathUtils.CleanFileNameInput(file.FileName), attachment.AXISRequestNumber);
 
                                         }
 
@@ -116,7 +117,7 @@ namespace FOIMOD.CFD.DocMigration.BAL
                                                 if (uploadresponse.IsSuccessStatusCode)
                                                 {
                                                     //INSERT INTO TABLE - FOIMinistryRequestDocuments
-                                                    attachmentsDAL.InsertIntoMinistryRequestDocuments(fullfileurl, file.FileName.Replace("'",""), attachment.AXISRequestNumber);
+                                                    attachmentsDAL.InsertIntoMinistryRequestDocuments(fullfileurl,FilePathUtils.CleanFileNameInput(file.FileName), attachment.AXISRequestNumber);
 
                                                 }
 
@@ -135,7 +136,7 @@ namespace FOIMOD.CFD.DocMigration.BAL
                                     if (uploadresponse.IsSuccessStatusCode)
                                     {
                                         //INSERT INTO TABLE - FOIMinistryRequestDocuments
-                                        attachmentsDAL.InsertIntoMinistryRequestDocuments(fullfileurl, string.Format("{0}.pdf", attachment.EmailSubject), attachment.AXISRequestNumber);
+                                        attachmentsDAL.InsertIntoMinistryRequestDocuments(fullfileurl, string.Format("{0}.pdf", FilePathUtils.CleanFileNameInput(attachment.EmailSubject)), attachment.AXISRequestNumber);
 
                                     }
                                 }

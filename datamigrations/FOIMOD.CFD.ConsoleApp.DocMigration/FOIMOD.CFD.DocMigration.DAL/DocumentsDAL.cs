@@ -45,7 +45,7 @@ namespace FOIMOD.CFD.DocMigration.DAL
                         @SectionList = COALESCE(@SectionList+':', '')+vcSectionList
                     FROM [dbo].[tblDocumentReviewLog] WHERE iRequestID =@irequestid
 
-                    SELECT D.iDocID,D.vcDocName as FolderName,(SELECT vcDocName FROM tblDocuments where iDocID =D.iParentDocID) as ParentFolderName ,D.tiSections,vcFileName as FilePath,REVERSE(SUBSTRING(REVERSE(vcFileName),1,4)) as FileType,D.siFolderID,D.siPageCount ,p.siPageNum ,(SELECT vcInternalName FROM tblDocReviewFlags WHERE tiDocReviewFlagID = PRF.tiDocReviewFlagID ) as PageReviewFlag FROM tblPages P inner join tblDocuments D on P.iDocID=D.iDocID 
+                    SELECT DISTINCT D.iDocID,D.vcDocName as FolderName,(SELECT vcDocName FROM tblDocuments where iDocID =D.iParentDocID) as ParentFolderName ,D.tiSections,vcFileName as FilePath,REVERSE(SUBSTRING(REVERSE(vcFileName),1,4)) as FileType,D.siFolderID,D.siPageCount ,p.siPageNum ,(SELECT vcInternalName FROM tblDocReviewFlags WHERE tiDocReviewFlagID = PRF.tiDocReviewFlagID ) as PageReviewFlag FROM tblPages P inner join tblDocuments D on P.iDocID=D.iDocID 
 					LEFT JOIN tblPageReviewFlags PRF ON P.iPageID = PRF.iPageID
 					WHERE  D.iDocID in(
                     --- Review Log Documents
@@ -55,7 +55,7 @@ namespace FOIMOD.CFD.DocMigration.DAL
                     union
                     --- Request Folder Documents    
                     select iDocID from tblRedactionLayers where irequestid=@irequestid AND iDeliveryID is NULL
-                    )";
+                    ) ORDER BY D.iDocID, p.siPageNum";
 
         private string getQueryByType(DocumentTypeFromAXIS documentTypeFromAXIS, string requestnumber="")
         {

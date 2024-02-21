@@ -150,8 +150,9 @@ namespace FOIMOD.CFD.DocMigration.Utils.UnitTests
         public void PNGMerge_UploadPNGFilePathTest()
         {
             List<DocumentToMigrate> pDFDocToMerges = new List<DocumentToMigrate>();
-            pDFDocToMerges.Add(new DocumentToMigrate() { PageFilePath = Path.Combine(getSourceFolder(), "pngs\\scansample.png"), PageSequenceNumber = 1 });
-            pDFDocToMerges.Add(new DocumentToMigrate() { PageFilePath = Path.Combine(getSourceFolder(), "pngs\\scansample2.png"), PageSequenceNumber = 2 });
+            pDFDocToMerges.Add(new DocumentToMigrate() { PageFilePath = Path.Combine(getSourceFolder(), "pngs\\scansample.png"), PageSequenceNumber = 1 , FileType =".png"});
+            pDFDocToMerges.Add(new DocumentToMigrate() { PageFilePath = Path.Combine(getSourceFolder(), "DOCX1.pdf"), PageSequenceNumber = 2, FileType = ".pdf" });
+            pDFDocToMerges.Add(new DocumentToMigrate() { PageFilePath = Path.Combine(getSourceFolder(), "pngs\\scansample2.png"), PageSequenceNumber = 3, FileType = ".png" });
 
 
             using (DocMigrationPDFStitcher docMigrationPDFStitcher = new DocMigrationPDFStitcher())
