@@ -30,12 +30,12 @@ class senderservice:
 
     """
 
-    def send(self, servicekey, content, _messageattachmentlist, requestjson):
+    def send(self, subject, content, _messageattachmentlist, requestjson):
         logging.debug("Begin: Send email for request = "+json.dumps(requestjson))
         msg = MIMEMultipart()
         msg['From'] = MAIL_FROM_ADDRESS
         msg['To'] = requestjson["email"]
-        msg['Subject'] = templateconfig().getsubject(servicekey, requestjson)
+        msg['Subject'] = subject
         part = MIMEText(content, "html")
         msg.attach(part)
         # Add Attachment and Set mail headers
