@@ -79,3 +79,5 @@ boto3==1.24.35
 walrus==0.8.2
 imap-tools==0.56.0
 -e git+https://github.com/bcgov/sbc-common-components.git#egg=sbc-common-components&subdirectory=python
+cryptography>=42.0.2 # not directly required, pinned by Snyk to avoid a vulnerability
+dateparser>=1.1.6 # not directly required, pinned by Snyk to avoid a vulnerability
