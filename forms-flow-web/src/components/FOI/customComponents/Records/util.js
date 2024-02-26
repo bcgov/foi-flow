@@ -4,14 +4,24 @@ export const removeDuplicateFiles = (recordList) =>
 
 // Helper function to sort files by lastmodified date
 export const sortByLastModified = (files) =>
-  files.sort((a, b) => new Date(a.lastmodified) - new Date(b.lastmodified));
+  files.sort((a, b) => {
+    let sort = new Date(a.lastmodified) - new Date(b.lastmodified);
+    if(sort === 0) {
+      return a.filename.toLowerCase().localeCompare(b.filename.toLowerCase());
+    }
+    return sort;
+  });
 
 // Helper function to sort attachments by lastmodified date
 const sortAttachmentsByLastModified = (attachments) =>
   attachments.sort(
-    (a, b) =>
-      new Date(a?.attributes?.lastmodified) -
-      new Date(b?.attributes?.lastmodified)
+    (a, b) => {
+      let sort = new Date(a?.attributes?.lastmodified) - new Date(b?.attributes?.lastmodified)
+      if(sort === 0) {
+        return a.filename.toLowerCase().localeCompare(b.filename.toLowerCase());
+      }
+      return sort;
+    }
   );
 
 export const getPDFFilePath = (item) => {
@@ -55,7 +65,6 @@ function arrangeAttachments(attachments, parentDocumentMasterId) {
 
   // Start arranging attachments from the root level
   arrangeChildren(parentDocumentMasterId);
-  getUpdatedRecords(arrangedAttachments, true);
   return getUpdatedRecords(arrangedAttachments, true);
 }
 
