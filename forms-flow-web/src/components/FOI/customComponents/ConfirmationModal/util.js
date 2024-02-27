@@ -1,5 +1,6 @@
 import { StateEnum } from '../../../../constants/FOI/statusEnum';
 import { getFullnameList } from "../../../../helper/FOI/helper";
+import FOI_COMPONENT_CONSTANTS from '../../../../constants/FOI/foiComponentConstants';
 
   export const getAssignedTo = (_saveRequestObject) => {
 
@@ -40,7 +41,14 @@ import { getFullnameList } from "../../../../helper/FOI/helper";
     return _selectedMinistry;
   }
 
-  export const getMessage = (_saveRequestObject, _state, _requestNumber, _currentState, _requestId, _cfrStatus,allowStateChange,isAnyAmountPaid, estimatedTotalFeesDue) => {
+  export const getMessage = (_saveRequestObject, _state, _requestNumber, _currentState, _requestId, _cfrStatus,allowStateChange,isAnyAmountPaid, estimatedTotalFeesDue, estimatedTotalHours = 0, actualTotalHours = 0) => {
+    const recordsReadyForReviewCannotChangeState = (state) => {
+      if (_saveRequestObject.requestType == FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_GENERAL
+        && estimatedTotalHours > 0
+        && isAnyAmountPaid
+        && actualTotalHours == 0) return state;
+    }
+
     if ((_currentState?.toLowerCase() === StateEnum.closed.name.toLowerCase() && _state.toLowerCase() !== StateEnum.closed.name.toLowerCase())) {
       _saveRequestObject.reopen = true;
       return {title: "Re-Open Request", body: <>Are you sure you want to re-open Request # {_requestNumber ? _requestNumber : `U-00${_requestId}`}? <br/> The request will be re-opened to the previous state: {_state} </>};
@@ -64,6 +72,8 @@ import { getFullnameList } from "../../../../helper/FOI/helper";
           return {title: "Changing the state", body: `Are you sure you want to change Request #${_requestNumber} to ${StateEnum.section5pending.name}?`};
       case StateEnum.callforrecords.name.toLowerCase():
           return {title: "Changing the state", body: `Are you sure you want to change Request #${_requestNumber} to ${StateEnum.callforrecords.name}?`};
+      case recordsReadyForReviewCannotChangeState(StateEnum.recordsreadyforreview.name.toLowerCase()):
+          return {title: "Changing the state", body: `Unable to change state until fee estimate actuals have been completed.`};
       case StateEnum.recordsreadyforreview.name.toLowerCase():
           return {title: "Changing the state", body: `Are you sure you want to change Request #${_requestNumber} to ${StateEnum.recordsreadyforreview.name}?`};
       case StateEnum.review.name.toLowerCase():

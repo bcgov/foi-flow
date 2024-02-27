@@ -129,9 +129,9 @@ const StateDropDown = ({
           }
           //const currentStatusVersion = stateTransition[0]?.version;
           if (previousState === StateEnum.intakeinprogress.name) {
-            return appendRecordsReadyForReview(_stateList.intakeinprogress);
+            return _stateList.intakeinprogress;
           } else if (previousState === StateEnum.open.name)
-            return appendRecordsReadyForReview(_stateList.open);
+            return _stateList.open;
           else if (previousState === StateEnum.review.name)
             return appendRecordsReadyForReview(_stateList.review);
           else if (previousState === StateEnum.consult.name)
@@ -139,9 +139,9 @@ const StateDropDown = ({
           else if (previousState === StateEnum.response.name)
             return appendRecordsReadyForReview(_stateList.response);
           else if (previousState === StateEnum.appfeeowing.name)
-            return appendRecordsReadyForReview(_stateList.appfeeowing);
+            return _stateList.appfeeowing;
           else if (previousState === StateEnum.recordsreadyforreview.name)
-            return _stateList.peerreview;
+            return _stateList.recordsreadyforreview;
         } else {
           return _stateList.peerreview;
         }

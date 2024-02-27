@@ -21,6 +21,7 @@ import MinistryApprovalModal from './MinistryApprovalModal';
 import { formatDate, calculateDaysRemaining, ConditionalComponent, isMinistryLogin } from "../../../../helper/FOI/helper";
 import { MimeTypeList, MaxFileSizeInMB, MaxNumberOfFiles } from "../../../../constants/FOI/enum";
 import { getMessage, getAssignedTo, getMinistryGroup, getSelectedMinistry, getSelectedMinistryAssignedTo, getProcessingTeams, getUpdatedAssignedTo } from './util';
+import FOI_COMPONENT_CONSTANTS from '../../../../constants/FOI/foiComponentConstants';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -93,8 +94,27 @@ export default function ConfirmationModal({requestId, openModal, handleModal, st
     ];
     let allowStateChange = true;
     let isAnyAmountPaid = false;
+    if(cfrFeeData?.amountpaid > 0) isAnyAmountPaid = true;
+
+    let estimatedTotalHours = 
+      cfrFeeData?.estimatediaopreparinghrs + 
+      cfrFeeData?.estimatedlocatinghrs + 
+      cfrFeeData?.estimatedministrypreparinghrs + 
+      cfrFeeData?.estimatedproducinghrs;
+
+    let actualTotalHours = 
+      cfrFeeData?.actualiaopreparinghrs +
+      cfrFeeData?.actuallocatinghrs +
+      cfrFeeData?.actualministrypreparinghrs +
+      cfrFeeData?.actualproducinghrs;
+    
+    // disable changing to records ready for review state if these conditions not met
+    let disableStateChangeToRRR = (saveRequestObject.requestType == FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_GENERAL
+      && estimatedTotalHours > 0
+      && isAnyAmountPaid
+      && actualTotalHours == 0);
+
     if(cfrFeeData?.amountpaid > 0 && isMinistry){
-      isAnyAmountPaid = true;
       allowStateChange = Object.keys(cfrFeeData).some(function(k) {
           return actualsFeeDataFields.includes(k) && cfrFeeData[k] > 0
       });
@@ -124,6 +144,7 @@ export default function ConfirmationModal({requestId, openModal, handleModal, st
             || (state.toLowerCase() === StateEnum.onhold.name.toLowerCase() && cfrStatus !== 'approved')
             || (state.toLowerCase() === StateEnum.onhold.name.toLowerCase() && cfrStatus === 'approved' && !saveRequestObject.email && !mailed)
             || ((state.toLowerCase() === StateEnum.response.name.toLowerCase() && currentState?.toLowerCase() === StateEnum.signoff.name.toLowerCase()) && !(ministryApprovalState?.approverName && ministryApprovalState?.approvedDate && ministryApprovalState?.approverTitle))
+            || disableStateChangeToRRR
             || ((state.toLowerCase() === StateEnum.deduplication.name.toLowerCase() || 
                   state.toLowerCase() === StateEnum.review.name.toLowerCase()) && !allowStateChange)) {
         return true;
@@ -181,7 +202,7 @@ export default function ConfirmationModal({requestId, openModal, handleModal, st
       handleModal(true, fileInfoList, files);
     }
 
-    let message = getMessage(saveRequestObject, state, axisRequestId, currentState, requestId, cfrStatus,allowStateChange,isAnyAmountPaid, estimatedTotalDue);
+    let message = getMessage(saveRequestObject, state, axisRequestId, currentState, requestId, cfrStatus,allowStateChange,isAnyAmountPaid, estimatedTotalDue, estimatedTotalHours, actualTotalHours);
     const attchmentFileNameList = attachmentsArray?.map(_file => _file.filename);
 
     const getDaysRemaining = () => {
