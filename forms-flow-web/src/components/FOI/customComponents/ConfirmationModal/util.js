@@ -41,7 +41,7 @@ import FOI_COMPONENT_CONSTANTS from '../../../../constants/FOI/foiComponentConst
     return _selectedMinistry;
   }
 
-  export const getMessage = (_saveRequestObject, _state, _requestNumber, _currentState, _requestId, _cfrStatus,allowStateChange,isAnyAmountPaid, estimatedTotalFeesDue, estimatedTotalHours = 0, actualTotalHours = 0) => {
+  export const getMessage = (_saveRequestObject, _state, _requestNumber, _currentState, _requestId, _cfrStatus,allowStateChange,isAnyAmountPaid, estimatedTotalFeesDue) => {
     if ((_currentState?.toLowerCase() === StateEnum.closed.name.toLowerCase() && _state.toLowerCase() !== StateEnum.closed.name.toLowerCase())) {
       _saveRequestObject.reopen = true;
       return {title: "Re-Open Request", body: <>Are you sure you want to re-open Request # {_requestNumber ? _requestNumber : `U-00${_requestId}`}? <br/> The request will be re-opened to the previous state: {_state} </>};
