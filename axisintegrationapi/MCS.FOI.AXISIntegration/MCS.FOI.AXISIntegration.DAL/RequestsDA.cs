@@ -183,7 +183,7 @@ namespace MCS.FOI.AXISIntegration.DAL
                 GROUP BY requests.sdtReceivedDate, requests.sdtTargetDate, requests.sdtOriginalTargetDate, requests.vcDescription,
                 requests.sdtRqtDescFromdate, requests.sdtRqtDescTodate, requests.sdtRequestedDate, office.OFFICE_CODE, requesterTypes.vcDescription,
                 receivedModes.iLabelID, deliveryModes.iLabelID, countries.iLabelID, states.iLabelID,
-                requesters.vcAddress1, requesters.vcAddress2, requesters.vcCity, requesters.vcZipCode,
+                requesters.iRequesterID, requesters.vcAddress1, requesters.vcAddress2, requesters.vcCity, requesters.vcZipCode,
                 requesters.vcHome, requesters.vcMobile, requesters.vcWork1, requesters.vcWork2, requesters.vcFirstName, requesters.vcLastName, requesters.vcMiddleName,
                 requests.iRequestID, requesters.vcCompany, requesters.vcEmailID, onbehalf.vcFirstName, onbehalf.vcLastName, onbehalf.vcMiddleName,
                 requestTypes.iLabelID, requests.vcVisibleRequestID, requests.tiOfficeID, office.OFFICE_ID,requestorfields.CUSTOMFIELD35, REPLACE(requestfields.CUSTOMFIELD33, CHAR(160), ' '),requestfields.CUSTOMFIELD75";
