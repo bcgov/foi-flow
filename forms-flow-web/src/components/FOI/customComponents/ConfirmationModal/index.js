@@ -21,7 +21,6 @@ import MinistryApprovalModal from './MinistryApprovalModal';
 import { formatDate, calculateDaysRemaining, ConditionalComponent, isMinistryLogin } from "../../../../helper/FOI/helper";
 import { MimeTypeList, MaxFileSizeInMB, MaxNumberOfFiles } from "../../../../constants/FOI/enum";
 import { getMessage, getAssignedTo, getMinistryGroup, getSelectedMinistry, getSelectedMinistryAssignedTo, getProcessingTeams, getUpdatedAssignedTo } from './util';
-import FOI_COMPONENT_CONSTANTS from '../../../../constants/FOI/foiComponentConstants';
 
 const useStyles = makeStyles((theme) => ({
   root: {
