@@ -21,7 +21,7 @@ class unopenedreportservice:
     reportemail = getenv('UNOPENED_REPORT_EMAIL_RECIPIENT')
 
 
-    def generateunopenedreport(self):
+    async def generateunopenedreport(self):
         startdate = date.today() - timedelta(days=int(self.dayscutoff))
         enddate = date.today() -  timedelta(days=int(self.waitdays))
         requests = FOIRawRequest.getunopenedunactionedrequests(str(startdate), str(enddate))
@@ -54,7 +54,7 @@ class unopenedreportservice:
                 } for m in potentialmatches]}
                 UnopenedReport.insert(alert)
                 alerts.append({"request": request, "rank": 2, "potentialmatches": alert.potentialmatches})
-        alerts.sort(key=lambda a : a.get('potentialmatches', {'highscore': 0})['highscore'])
+        alerts.sort(key=lambda a : a.get('potentialmatches', {'highscore': -1})['highscore'])
         senderservice().send(
             subject="Intake Unopened Request Report: " + str(date.today()),
             content=self.generateemailhtml(alerts),
