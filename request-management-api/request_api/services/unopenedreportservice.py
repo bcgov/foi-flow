@@ -26,6 +26,7 @@ class unopenedreportservice:
         enddate = date.today() -  timedelta(days=int(self.waitdays))
         requests = FOIRawRequest.getunopenedunactionedrequests(str(startdate), str(enddate))
         alerts = []
+        alertdbrows = []
         for request in requests:
             potentialmatches = FOIRawRequest.getpotentialactionedmatches(request)
             if len(potentialmatches) == 0:
@@ -33,7 +34,7 @@ class unopenedreportservice:
                 alert.rawrequestid = request['requestid']
                 alert.date = date.today()
                 alert.rank = 1
-                UnopenedReport.insert(alert)
+                alertdbrows.append(alert)
                 alerts.append({"request": request, "rank": 1})
             else:
                 highscore = 0
@@ -52,8 +53,9 @@ class unopenedreportservice:
                     "requestid": m["requestrawdata"]['axisRequestId'],
                     "similarity": round(m['score'], 2)
                 } for m in potentialmatches]}
-                UnopenedReport.insert(alert)
-                alerts.append({"request": request, "rank": 2, "potentialmatches": alert.potentialmatches})
+                alertdbrows.append(alert)
+                alerts.append({"request": request, "rank": 2, "potentialmatches": alert.potentialmatches})        
+        UnopenedReport.bulkinsert(alertdbrows)
         alerts.sort(key=lambda a : a.get('potentialmatches', {'highscore': -1})['highscore'])
         senderservice().send(
             subject="Intake Unopened Request Report: " + str(date.today()),
@@ -141,7 +143,7 @@ class unopenedreportservice:
                         <td>
                     '''
                 for m in alert['potentialmatches']['matches']:
-                    emailhtml += (m.get('requestid', '') + " - similarity: " + str(m['similarity']*100) + "%<br>")
+                    emailhtml += ((m['requestid'] or '') + " - similarity: " + str(m['similarity']*100) + "%<br>")
                 emailhtml = emailhtml[:-4]
                 emailhtml += '''</td>
                         <td>''' + alert['request']['requestrawdata']['descriptionTimeframe']['description'][0:99] + '''...</td>
