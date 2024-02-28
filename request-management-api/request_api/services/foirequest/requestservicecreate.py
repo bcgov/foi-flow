@@ -135,11 +135,25 @@ class requestservicecreate:
             selfdob = applicantinfo["birthDate"] if requestservicebuilder().isNotBlankorNone(foirequestschema,"birthDate","additionalPersonalInfo") else None
             selfalsoknownas = applicantinfo["alsoKnownAs"] if requestservicebuilder().isNotBlankorNone(foirequestschema,"alsoKnownAs","additionalPersonalInfo") else None
 
+        applicant = FOIRequestApplicant().getlatestprofilebyaxisapplicantid(foirequestschema['foiRequestApplicantID']) # temporary for axis sync, remove after axis decommissioned
+        foirequestschema['foiRequestApplicantID'] = applicant.get('foirequestapplicantid', 0) # temporary for axis sync, remove after axis decommissioned
         # if foirequestschema.get('foiRequestApplicantID') is None and foirequestschema.get('requeststatusid') == 1:
         if foirequestschema.get('foiRequestApplicantID', 0) > 0:
-            applicant = FOIRequestApplicant().getlatestprofilebyapplicantid(foirequestschema['foiRequestApplicantID'])
+            applicant = FOIRequestApplicant.updateapplicantprofile( # temporary for axis sync, remove after axis decommissioned
+                foirequestschema['foiRequestApplicantID'],
+                foirequestschema['firstName'],
+                foirequestschema['lastName'],
+                foirequestschema.get("middleName"),
+                foirequestschema.get("businessName"),
+                selfdob,
+                selfalsoknownas,
+                applicant['applicantprofileid'],
+                foirequestschema['axisapplicantid'],
+                userid
+            )
+            # applicant = FOIRequestApplicant().getlatestprofilebyapplicantid(foirequestschema['foiRequestApplicantID']) comment back in after axis decommission
             requestapplicant = FOIRequestApplicantMapping()
-            requestapplicant.foirequestapplicantid = applicant['foirequestapplicantid']
+            requestapplicant.foirequestapplicantid = applicant.identifier # = applicant['foirequestapplicantid'] comment back in after axis decommission            
             requestapplicant.requestortypeid = RequestorType().getrequestortype("Self")["requestortypeid"]
             requestapplicantarr.append(requestapplicant)
         else:
@@ -152,7 +166,8 @@ class requestservicecreate:
                                             foirequestschema.get("businessName"),
                                             selfalsoknownas,
                                             selfdob,
-                                            selfcategoryid)
+                                            selfcategoryid,
+                                            foirequestschema['axisapplicantid'])
                 )
                  
         #Prepare additional applicants

@@ -216,7 +216,7 @@ const StateDropDown = ({
     return isValidationError || requestState === StateEnum.unopened.name ||
       (isBeforeOpen(requestDetails)
         && status === 'Open'
-        && !requestDetails.foiRequestApplicantID
+        //&& !requestDetails.foiRequestApplicantID comment back in after axis decomission
       );
   };
   const statusList = getStatusList();

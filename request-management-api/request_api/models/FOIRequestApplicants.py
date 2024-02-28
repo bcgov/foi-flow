@@ -35,9 +35,10 @@ class FOIRequestApplicant(db.Model):
     createdby = db.Column(db.String(120), unique=False, nullable=True)
     updatedby = db.Column(db.String(120), unique=False, nullable=True)
     applicantprofileid = db.Column(db.String(120), unique=False, nullable=True)
+    axisapplicantid = db.Column(db.Integer, nullable=True)
 
     @classmethod
-    def createapplicant(cls, firstname, lastname, middlename, businessname, alsoknownas, dob, applicantcategoryid, userid):
+    def createapplicant(cls, firstname, lastname, middlename, businessname, alsoknownas, dob, applicantcategoryid, axisapplicantid, userid):
         applicant = FOIRequestApplicant()
         applicant.createdby = userid
         applicant.firstname = firstname
@@ -46,6 +47,8 @@ class FOIRequestApplicant(db.Model):
         applicant.businessname = businessname
         applicant.alsoknownas = alsoknownas
         applicant.applicantcategoryid = applicantcategoryid
+        applicant.applicantprofileid = str(uuid.uuid4())
+        applicant.axisapplicantid = axisapplicantid
         if dob is not None and dob != "":
             applicant.dob = datetime.strptime(dob, "%Y-%m-%d")
         else:
@@ -55,7 +58,7 @@ class FOIRequestApplicant(db.Model):
         return DefaultMethodResult(True,'Applicant added',applicant.foirequestapplicantid)
 
     @classmethod
-    def updateapplicantprofile(cls, foirequestapplicantid, firstname, lastname, middlename, businessname, alsoknownas, dob, applicantcategoryid, userid):
+    def updateapplicantprofile(cls, foirequestapplicantid, firstname, lastname, middlename, businessname, alsoknownas, dob, applicantcategoryid, axisapplicantid, userid):
 
         applicantprofile = aliased(FOIRequestApplicant)
 
@@ -97,6 +100,7 @@ class FOIRequestApplicant(db.Model):
             _applicant.alsoknownas = applicantfromform['alsoknownas']
             _applicant.dob = applicantfromform['dob']
             _applicant.applicantprofileid = applicant.applicantprofileid
+            _applicant.axisapplicantid = axisapplicantid
             _applicant.applicantcategoryid = applicantfromform['applicantcategoryid']
             db.session.add(_applicant)
             db.session.commit()
@@ -108,6 +112,15 @@ class FOIRequestApplicant(db.Model):
     def getlatestprofilebyapplicantid(cls, applicantid):
         schema = FOIRequestApplicantSchema(many=False)
         sq = db.session.query(FOIRequestApplicant).filter_by(foirequestapplicantid=applicantid).first()
+        if not sq.applicantprofileid:
+            return schema.dump(sq)
+        query = db.session.query(FOIRequestApplicant).filter(FOIRequestApplicant.applicantprofileid == sq.applicantprofileid).order_by(FOIRequestApplicant.foirequestapplicantid.desc()).first()
+        return schema.dump(query)
+    
+    @classmethod
+    def getlatestprofilebyaxisapplicantid(cls, axisapplicantid):
+        schema = FOIRequestApplicantSchema(many=False)
+        sq = db.session.query(FOIRequestApplicant).filter_by(axisapplicantid=axisapplicantid).first()
         if not sq.applicantprofileid:
             return schema.dump(sq)
         query = db.session.query(FOIRequestApplicant).filter(FOIRequestApplicant.applicantprofileid == sq.applicantprofileid).order_by(FOIRequestApplicant.foirequestapplicantid.desc()).first()
