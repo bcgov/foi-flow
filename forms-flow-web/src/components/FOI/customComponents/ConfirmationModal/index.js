@@ -94,27 +94,8 @@ export default function ConfirmationModal({requestId, openModal, handleModal, st
     ];
     let allowStateChange = true;
     let isAnyAmountPaid = false;
-    if(cfrFeeData?.amountpaid > 0) isAnyAmountPaid = true;
-
-    let estimatedTotalHours = 
-      cfrFeeData?.estimatediaopreparinghrs + 
-      cfrFeeData?.estimatedlocatinghrs + 
-      cfrFeeData?.estimatedministrypreparinghrs + 
-      cfrFeeData?.estimatedproducinghrs;
-
-    let actualTotalHours = 
-      cfrFeeData?.actualiaopreparinghrs +
-      cfrFeeData?.actuallocatinghrs +
-      cfrFeeData?.actualministrypreparinghrs +
-      cfrFeeData?.actualproducinghrs;
-    
-    // disable changing to records ready for review state if these conditions not met
-    let disableStateChangeToRRR = (saveRequestObject.requestType == FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_GENERAL
-      && estimatedTotalHours > 0
-      && isAnyAmountPaid
-      && actualTotalHours == 0);
-
-    if(cfrFeeData?.amountpaid > 0 && isMinistry){
+    if(cfrFeeData?.amountpaid > 0){
+      isAnyAmountPaid = true;
       allowStateChange = Object.keys(cfrFeeData).some(function(k) {
           return actualsFeeDataFields.includes(k) && cfrFeeData[k] > 0
       });
@@ -144,7 +125,7 @@ export default function ConfirmationModal({requestId, openModal, handleModal, st
             || (state.toLowerCase() === StateEnum.onhold.name.toLowerCase() && cfrStatus !== 'approved')
             || (state.toLowerCase() === StateEnum.onhold.name.toLowerCase() && cfrStatus === 'approved' && !saveRequestObject.email && !mailed)
             || ((state.toLowerCase() === StateEnum.response.name.toLowerCase() && currentState?.toLowerCase() === StateEnum.signoff.name.toLowerCase()) && !(ministryApprovalState?.approverName && ministryApprovalState?.approvedDate && ministryApprovalState?.approverTitle))
-            || disableStateChangeToRRR
+            || (state.toLowerCase() === StateEnum.recordsreadyforreview.name.toLowerCase() && !allowStateChange)
             || ((state.toLowerCase() === StateEnum.deduplication.name.toLowerCase() || 
                   state.toLowerCase() === StateEnum.review.name.toLowerCase()) && !allowStateChange)) {
         return true;
@@ -202,7 +183,7 @@ export default function ConfirmationModal({requestId, openModal, handleModal, st
       handleModal(true, fileInfoList, files);
     }
 
-    let message = getMessage(saveRequestObject, state, axisRequestId, currentState, requestId, cfrStatus,allowStateChange,isAnyAmountPaid, estimatedTotalDue, estimatedTotalHours, actualTotalHours);
+    let message = getMessage(saveRequestObject, state, axisRequestId, currentState, requestId, cfrStatus,allowStateChange,isAnyAmountPaid, estimatedTotalDue);
     const attchmentFileNameList = attachmentsArray?.map(_file => _file.filename);
 
     const getDaysRemaining = () => {
