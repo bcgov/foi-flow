@@ -63,6 +63,7 @@ namespace MCS.FOI.AXISIntegration.DAL
                     axisRequest.ApplicantLastName = Convert.ToString(row["lastName"]);
                     axisRequest.BusinessName = Convert.ToString(row["businessName"]);
 
+                    axisRequest.AXISApplicantID = Convert.ToString(row["axisApplicantID"]);
                     axisRequest.Address = Convert.ToString(row["address"]);
                     axisRequest.AddressSecondary = Convert.ToString(row["addressSecondary"]);
                     axisRequest.City = Convert.ToString(row["city"]);
@@ -134,7 +135,7 @@ namespace MCS.FOI.AXISIntegration.DAL
                 (SELECT terminology.vcTerminology from tblTerminologyLookup terminology WHERE terminology.iLabelID = deliveryModes.iLabelID and terminology.tiLocaleID = 1) as deliveryMode,
                 (SELECT terminology.vcTerminology from tblTerminologyLookup terminology WHERE terminology.iLabelID = countries.iLabelID and terminology.tiLocaleID = 1) as country,
                 (SELECT terminology.vcTerminology from tblTerminologyLookup terminology WHERE terminology.iLabelID = states.iLabelID and terminology.tiLocaleID = 1) as province,
-                requesters.vcAddress1 as [address], requesters.vcAddress2 as addressSecondary, requesters.vcCity as city, requesters.vcZipCode as postal,
+                requesters.iRequesterID as axisApplicantID, requesters.vcAddress1 as [address], requesters.vcAddress2 as addressSecondary, requesters.vcCity as city, requesters.vcZipCode as postal,
                 requesters.vcHome as phonePrimary,
                 requesters.vcMobile as phoneSecondary,
                 requesters.vcWork1 as workPhonePrimary,
