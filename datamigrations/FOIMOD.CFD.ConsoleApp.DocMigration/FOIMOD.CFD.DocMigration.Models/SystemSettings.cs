@@ -18,6 +18,8 @@ namespace FOIMOD.CFD.DocMigration.Models
 
         public static string FOIFLOWConnectionString { get; set; }
 
+        public static string FOIDocReviewerConnectionString { get; set; }
+
         public static string RequestToMigrate { get; set; }
 
         public static string FileServerRoot { get; set; }
@@ -31,6 +33,14 @@ namespace FOIMOD.CFD.DocMigration.Models
         public static string AttachmentTag { get; set; }
 
         public static string S3_Attachements_Bucket { get; set; }
+
+        public static string SyncfusionLicense { get; set; }
+
+        public static bool CorrespondenceLogMigration {  get; set; }
+
+        public static bool RecordsMigration { get; set; }
+
+        public static string MinistryRecordsBucket { get; set; }
 
 
     }

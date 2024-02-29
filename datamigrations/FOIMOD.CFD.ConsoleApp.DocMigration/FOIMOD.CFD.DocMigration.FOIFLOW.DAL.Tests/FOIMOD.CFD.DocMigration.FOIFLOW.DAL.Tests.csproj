@@ -6,8 +6,7 @@
     <Nullable>enable</Nullable>
 
     <IsPackable>false</IsPackable>
-
-    <PlatformTarget>x86</PlatformTarget>
+   
   </PropertyGroup>
 
   <ItemGroup>
@@ -17,13 +16,14 @@
     <PackageReference Include="coverlet.collector" Version="3.1.2" />
 	<PackageReference Include="Microsoft.Extensions.Configuration" Version="7.0.0" />
 	<PackageReference Include="Microsoft.Extensions.Hosting" Version="6.0.1" />
-	<PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
+	  <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
 	<PackageReference Include="System.Data.Odbc" Version="7.0.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\FOIMOD.CFD.DocMigration.FOIFLOW.DAL\FOIMOD.CFD.DocMigration.FOIFLOW.DAL.csproj" />
     <ProjectReference Include="..\FOIMOD.CFD.DocMigration.Models\FOIMOD.CFD.DocMigration.Models.csproj" />
+    <ProjectReference Include="..\FOIMOD.CFD.DocMigration.Utils\FOIMOD.CFD.DocMigration.Utils.csproj" />
   </ItemGroup>
 
   <ItemGroup>
