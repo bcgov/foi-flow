@@ -9,7 +9,6 @@ from sqlalchemy.sql.expression import distinct
 from sqlalchemy import or_, and_, text, func, literal, cast, case, nullslast, nullsfirst, desc, asc
 from sqlalchemy.sql.sqltypes import String
 from sqlalchemy.dialects.postgresql import JSON
-
 from .FOIRequestApplicantMappings import FOIRequestApplicantMapping
 from .FOIRequestApplicants import FOIRequestApplicant
 from .FOIRequestStatus import FOIRequestStatus
@@ -265,7 +264,7 @@ class FOIMinistryRequest(db.Model):
             _tmp_state = None       
             for row in rs:
                 if row["status"] != _tmp_state:
-                    transitions.append({"status": row["status"], "version": row["version"], "created_at": row["created_at"]})
+                    transitions.append({"status": row["status"], "version": row["version"], "created_at": row["created_at"].strftime('%Y-%m-%d %H:%M:%S.%f')})
                     _tmp_state = row["status"]
         except Exception as ex:
             logging.error(ex)
@@ -584,7 +583,8 @@ class FOIMinistryRequest(db.Model):
                                     *joincondition_oipc
                                     ),
                                 isouter=True
-                            ).filter(or_(FOIMinistryRequest.requeststatuslabel != StateName.closed.name, and_(FOIMinistryRequest.isoipcreview == True, FOIMinistryRequest.requeststatusid == 3, subquery_with_oipc.c.outcomeid == None)))
+                            ).filter(or_(FOIMinistryRequest.requeststatuslabel != StateName.closed.name, 
+                                         and_(FOIMinistryRequest.isoipcreview == True, FOIMinistryRequest.requeststatusid == 3, subquery_with_oipc.c.outcomeid == None)))
                                    
         if(additionalfilter == 'watchingRequests'):
             #watchby
@@ -701,42 +701,35 @@ class FOIMinistryRequest(db.Model):
             ministryfilter = FOIMinistryRequest.isactive == True
         else:
             groupfilter = []
-            for group in groups:
-                if (group == IAOTeamWithKeycloackGroup.flex.value or group in ProcessingTeamWithKeycloackGroup.list()):
-                    groupfilter.append(
-                        and_(
-                            FOIMinistryRequest.assignedgroup == group
-                        )
-                    )
-                elif (group == IAOTeamWithKeycloackGroup.intake.value):
-                    groupfilter.append(
-                        or_(
-                            FOIMinistryRequest.assignedgroup == group,
+            statusfilter = None
+            processinggroups = list(set(groups).intersection(ProcessingTeamWithKeycloackGroup.list())) 
+            if IAOTeamWithKeycloackGroup.intake.value in groups or len(processinggroups) > 0:
+                groupfilter.append(
                             and_(
-                                FOIMinistryRequest.assignedgroup == IAOTeamWithKeycloackGroup.flex.value,
-                                FOIMinistryRequest.requeststatuslabel.in_([StateName.open.name])
+                                FOIMinistryRequest.assignedgroup.in_(tuple(groups))
+                            )
+                        )
+                statusfilter = FOIMinistryRequest.requeststatuslabel != StateName.closed.name
+            else:
+                groupfilter.append(
+                        or_(
+                            FOIMinistryRequest.assignedgroup.in_(tuple(groups)),
+                            and_(
+                                FOIMinistryRequest.assignedministrygroup.in_(tuple(groups))
                             )
                         )
                     )
-                else:
-                    groupfilter.append(
-                        or_(
-                            FOIMinistryRequest.assignedgroup == group,
-                            and_(
-                                FOIMinistryRequest.assignedministrygroup == group,
-                                FOIMinistryRequest.requeststatuslabel.in_([StateName.callforrecords.name,StateName.recordsreview.name,StateName.feeestimate.name,StateName.consult.name,StateName.ministrysignoff.name,StateName.onhold.name,StateName.deduplication.name,StateName.harmsassessment.name,StateName.response.name,StateName.peerreview.name,StateName.tagging.name,StateName.readytoscan.name])
-                            )
-                        )
-                    )
-
+                statusfilter = FOIMinistryRequest.requeststatuslabel.in_([StateName.callforrecords.name,StateName.recordsreview.name,StateName.feeestimate.name,StateName.consult.name,StateName.ministrysignoff.name,StateName.onhold.name,StateName.deduplication.name,StateName.harmsassessment.name,StateName.response.name,StateName.peerreview.name,StateName.tagging.name,StateName.readytoscan.name])
             ministryfilter = and_(
                                 FOIMinistryRequest.isactive == True,
                                 FOIRequestStatus.isactive == True,
                                 or_(*groupfilter)
                             )
-        
-        ministryfilterwithclosedoipc = or_(ministryfilter, and_(FOIMinistryRequest.isoipcreview == True, FOIMinistryRequest.requeststatuslabel == StateName.closed.name))
-
+        ministryfilterwithclosedoipc = and_(ministryfilter, 
+                                            or_(statusfilter, 
+                                                and_(FOIMinistryRequest.isoipcreview == True, FOIMinistryRequest.requeststatuslabel == StateName.closed.name)
+                                                )
+                                            )
         return ministryfilterwithclosedoipc
 
     @classmethod

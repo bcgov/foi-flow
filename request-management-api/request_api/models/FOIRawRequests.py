@@ -631,7 +631,7 @@ class FOIRawRequest(db.Model):
                     return basequery.filter(
                         and_(
                             FOIRawRequest.status.notin_(['Archived']),
-                            or_(and_(FOIRawRequest.isiaorestricted == False, FOIRawRequest.assignedgroup.in_(ProcessingTeamWithKeycloackGroup.list())), and_(FOIRawRequest.isiaorestricted == True, FOIRawRequest.assignedto == userid))))
+                            or_(and_(FOIRawRequest.isiaorestricted == False, FOIRawRequest.assignedgroup.in_(ProcessingTeamWithKeycloackGroup.list()), FOIRawRequest.assignedgroup.in_(tuple(groups))), and_(FOIRawRequest.isiaorestricted == True, FOIRawRequest.assignedto == userid))))
                 return basequery.filter(
                     and_(
                         FOIRawRequest.status.notin_(['Archived']),
@@ -1073,6 +1073,82 @@ class FOIRawRequest(db.Model):
         finally:
             db.session.close()
         return section5pendings
+    
+    @classmethod
+    def getunopenedunactionedrequests(cls, startdate, enddate):
+        try:
+            requests = []
+            sql = '''select rr.created_at, rr.requestrawdata, rr.requestid, coalesce(p.status, '') as status,
+                         coalesce(p.transaction_number, '') as txnno,
+                         coalesce(p.total::text, '') as fee
+                    from public."FOIRawRequests" rr
+                    join (
+                        select max(version) as version, requestid from public."FOIRawRequests"
+                        group by requestid
+                    ) mv on mv.requestid = rr.requestid and mv.version = rr.version
+                    left join (
+                        select request_id, max(payment_id) from public."Payments"
+                        where fee_code_id = 1
+                        group by request_id
+                        order by request_id
+                    ) mp on mp.request_id = rr.requestid
+                    left join public."Payments" p on p.payment_id = mp.max
+                    where rr.status = 'Unopened' and rr.version = 1 and created_at > :startdate and created_at < :enddate
+                    order by rr.requestid '''
+            rs = db.session.execute(text(sql), {'startdate': startdate, 'enddate': enddate})
+            for row in rs:
+                requests.append({
+                    "requestid": row["requestid"],
+                    "created_at": row["created_at"],
+                    "requestrawdata": row["requestrawdata"],
+                    "paymentstatus": row["status"],
+                    "fee": row["fee"],
+                    "txnno": row["txnno"]
+                })
+        except Exception as ex:
+            logging.error(ex)
+            raise ex
+        finally:
+            db.session.close()
+        return requests
+    
+    @classmethod
+    def getpotentialactionedmatches(cls, request):
+        try:
+            requests = []
+            sql = '''select rr.created_at, rr.* from public."FOIRawRequests" rr
+                    join (
+                        select max(version) as version, requestid from public."FOIRawRequests"
+                        group by requestid
+                    ) mv on mv.requestid = rr.requestid and mv.version = rr.version
+                    where status = 'Intake in Progress' and (
+                        requestrawdata->>'lastName' ilike :lastName
+                        or requestrawdata->>'firstName' ilike :firstName
+                        or requestrawdata->>'email' ilike :email
+                        or requestrawdata->>'address' ilike :address
+                        or requestrawdata->>'phonePrimary' ilike :phonePrimary
+                        or requestrawdata->>'postal' ilike :postal
+                    ) and substring(rr.requestrawdata->>'receivedDateUF', 1, 10) = :receiveddate
+                    order by requestid desc, version desc '''
+            rs = db.session.execute(text(sql), {
+                'lastName': request['requestrawdata']['contactInfo']['lastName'],
+                'firstName': request['requestrawdata']['contactInfo']['firstName'],
+                'email': request['requestrawdata']['contactInfoOptions']['email'],
+                'address': request['requestrawdata']['contactInfoOptions']['address'],
+                'phonePrimary': request['requestrawdata']['contactInfoOptions']['phonePrimary'],
+                'postal': request['requestrawdata']['contactInfoOptions']['postal'],
+                'receiveddate': request['requestrawdata']['receivedDateUF'][0:10],
+            })
+            for row in rs:
+                requests.append({"requestid": row["requestid"], "created_at": row["created_at"], "requestrawdata": row["requestrawdata"]})
+        except Exception as ex:
+            logging.error(ex)
+            raise ex
+        finally:
+            db.session.close()
+        return requests
+
+
 
 class FOIRawRequestSchema(ma.Schema):
     class Meta:
