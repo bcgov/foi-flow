@@ -91,7 +91,7 @@ class unopenedreportservice:
             if alert.get('potentialmatches') == None:
                 emailhtml += '''
                     <tr>
-                        <td>U-000''' + str(alert['request']['requestid']) + '''</td>
+                        <td>U-00''' + str(alert['request']['requestid']) + '''</td>
                         <td>''' + alert['request']['requestrawdata']['receivedDate'] + '''</td>
                         <td>'''
                 for m in alert['request']['requestrawdata']['ministry']['selectedMinistry']:
@@ -129,7 +129,7 @@ class unopenedreportservice:
                     break
                 emailhtml += '''
                     <tr>
-                        <td>U-000''' + str(alert['request']['requestid']) + '''</td>
+                        <td>U-00''' + str(alert['request']['requestid']) + '''</td>
                         <td>''' + alert['request']['requestrawdata']['receivedDate'] + '''</td>
                         <td>'''
                 for m in alert['request']['requestrawdata']['ministry']['selectedMinistry']:
