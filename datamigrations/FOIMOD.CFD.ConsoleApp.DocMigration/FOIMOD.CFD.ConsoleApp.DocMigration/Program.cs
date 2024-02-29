@@ -14,7 +14,7 @@ Console.WriteLine("Starting, CFD Document Migration!");
 
 #if DEBUG
 var configurationbuilder = new ConfigurationBuilder()
-                       .AddJsonFile($"appsettings.prodtodev.json", true, true)
+                       .AddJsonFile($"appsettings.json", true, true)
                        .AddEnvironmentVariables().Build();
 #else
 var configurationbuilder = new ConfigurationBuilder()
@@ -26,7 +26,7 @@ var configurationbuilder = new ConfigurationBuilder()
 
 
 //Define the path to the text file
-string logFilePath = "console_log.txt";
+string logFilePath = string.Format("console_log_{0}.txt",DateTime.Now.ToShortDateString());
 
 //Create a StreamWriter to write logs to a text file
 using (StreamWriter logFileWriter = new StreamWriter(logFilePath, append: true))

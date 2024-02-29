@@ -29,8 +29,8 @@ namespace FOIMOD.CFD.DocMigration.Utils
         public void Dispose()
         {
 
-            mergeddocstream.Close();
-            mergeddocstream.Dispose();
+            mergeddocstream?.Close();
+            mergeddocstream?.Dispose();
         }
 
         public HugeMemoryStream MergePDFs(List<DocumentToMigrate> pdfpages, string baseUNClocation = null)
@@ -43,7 +43,7 @@ namespace FOIMOD.CFD.DocMigration.Utils
                     string filelocation = String.IsNullOrEmpty(baseUNClocation) ? pDFDocToMerge.PageFilePath : Path.Combine(baseUNClocation, pDFDocToMerge.SiFolderID, pDFDocToMerge.PageFilePath);
                     using PdfDocument inputPDFDocument = !pDFDocToMerge.HasStreamForDocument ? PdfReader.Open(filelocation, PdfDocumentOpenMode.Import) : PdfReader.Open(pDFDocToMerge.FileStream, PdfDocumentOpenMode.Import);
 
-                    pdfdocument.Version = inputPDFDocument.Version;
+                    pdfdocument.Version = inputPDFDocument.Version;                  
 
                     foreach (PdfPage page in inputPDFDocument.Pages)
                     {

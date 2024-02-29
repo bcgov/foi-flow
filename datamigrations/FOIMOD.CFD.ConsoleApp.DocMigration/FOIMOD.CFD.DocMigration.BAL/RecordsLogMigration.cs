@@ -100,10 +100,10 @@ namespace FOIMOD.CFD.DocMigration.BAL
                                 actualfilename = string.Format("{0}_{1}{2}", pagedetails.ParentFolderName?.Replace("'",""), pagedetails.FolderName?.Replace("'", ""), ".pdf");
                                 if (pagesbyDoc.Any())
                                 {
-
+                                   
                                     //STITCHING PDF
                                     ilogger.LogInformation(string.Format("Stitching started for pages of  document ID {0} for request {1}, page count is {2}, started at {3}", docid, _requestnumber, pagedetails.TotalPageCount, DateTime.Now));
-                                    using HugeMemoryStream docStream = !hasanyimage ? docMigrationPDFStitcher.MergePDFs_v1(pagesbyDoc, baseRecordsLocation) : docMigrationPDFStitcher.MergeImages(pagesbyDoc, baseRecordsLocation);
+                                    using HugeMemoryStream docStream = !hasanyimage ? docMigrationPDFStitcher.MergePDFs(pagesbyDoc, baseRecordsLocation) : docMigrationPDFStitcher.MergeImages(pagesbyDoc, baseRecordsLocation);
                                     ilogger.LogInformation(string.Format("Stitching COMPLETED!! for pages of  document ID {0} for request {1}, page count is {2}, end at {3}", docid, _requestnumber, pagedetails.TotalPageCount, DateTime.Now));                                
 
                                     if (docStream != null)
@@ -183,7 +183,7 @@ namespace FOIMOD.CFD.DocMigration.BAL
                                 ilogger.LogError(exception);
                                 //throw new Exception(exception);
                             }
-
+                            docMigrationPDFStitcher.Dispose();
                             ilogger.LogInformation("#####################################################################################");
                             ilogger.LogInformation(Environment.NewLine);
                         }
