@@ -3,7 +3,7 @@
 # Maven build
 FROM artifacts.developer.gov.bc.ca/docker-remote/maven:3.6.1-jdk-11-slim AS MAVEN_TOOL_CHAIN
 
-RUN apt-get update \
+RUN set -eux; 	apt-get update; 	apt-get install -y --no-install-recommends \
     && apt-get install -y git
 
 RUN git clone -b ${FORMIO_SOURCE_REPO_BRANCH} ${FORMIO_SOURCE_REPO_URL} /bpm/
