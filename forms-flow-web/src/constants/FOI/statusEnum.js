@@ -98,6 +98,7 @@ const StateList = Object.freeze({
   ],
   review: [
     { status: "Records Review", isSelected: false },
+    { status: "Records Ready for Review", isSelected: false },
     { status: "Call For Records", isSelected: false },
     { status: "Consult", isSelected: false },
     { status: "Ministry Sign Off", isSelected: false },
