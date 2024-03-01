@@ -22,6 +22,7 @@ class unopenedreportservice:
 
 
     async def generateunopenedreport(self):
+        logging.info("begin unopened report generation")
         startdate = date.today() - timedelta(days=int(self.dayscutoff))
         enddate = date.today() -  timedelta(days=int(self.waitdays))
         requests = FOIRawRequest.getunopenedunactionedrequests(str(startdate), str(enddate))
@@ -45,14 +46,24 @@ class unopenedreportservice:
                     )
                     if match['score'] > highscore:
                         highscore = match['score']
+                isCFD = False
+                for m in request['requestrawdata']['ministry']['selectedMinistry']:
+                    if m['code'] == 'MCF':
+                        isCFD = True
+                if isCFD and len(potentialmatches) == 1 and potentialmatches[0]['requestrawdata']['description'] == 'CFD':
+                    highscore = 1
                 alert = UnopenedReport()
                 alert.rawrequestid = request['requestid']
                 alert.date = date.today()
                 alert.rank = 2
-                alert.potentialmatches = {"highscore": round(highscore, 2), "matches": [{
-                    "requestid": m["requestrawdata"]['axisRequestId'],
-                    "similarity": round(m['score'], 2)
-                } for m in potentialmatches]}
+                alert.potentialmatches = {
+                    "highscore": round(highscore, 2),
+                    "matches": [{
+                        "requestid": m["requestrawdata"]['axisRequestId'],
+                        "similarity": round(m['score'], 2)
+                    } for m in potentialmatches],
+                    "isCFD": isCFD
+                }
                 alertdbrows.append(alert)
                 alerts.append({"request": request, "rank": 2, "potentialmatches": alert.potentialmatches})        
         UnopenedReport.bulkinsert(alertdbrows)
@@ -86,12 +97,12 @@ class unopenedreportservice:
             </tr>
         """
         firstrank2 = True
-        print(alerts)
+        logging.debug(alerts)
         for alert in alerts:
             if alert.get('potentialmatches') == None:
                 emailhtml += '''
                     <tr>
-                        <td>U-000''' + str(alert['request']['requestid']) + '''</td>
+                        <td>U-00''' + str(alert['request']['requestid']) + '''</td>
                         <td>''' + alert['request']['requestrawdata']['receivedDate'] + '''</td>
                         <td>'''
                 for m in alert['request']['requestrawdata']['ministry']['selectedMinistry']:
@@ -124,12 +135,12 @@ class unopenedreportservice:
                         </tr>
                     """
                     firstrank2 = False
-                print(alert)
+                logging.debug(alert)
                 if alert['potentialmatches']['highscore'] > float(self.jarocutoff):
                     break
                 emailhtml += '''
                     <tr>
-                        <td>U-000''' + str(alert['request']['requestid']) + '''</td>
+                        <td>U-00''' + str(alert['request']['requestid']) + '''</td>
                         <td>''' + alert['request']['requestrawdata']['receivedDate'] + '''</td>
                         <td>'''
                 for m in alert['request']['requestrawdata']['ministry']['selectedMinistry']:
@@ -149,4 +160,6 @@ class unopenedreportservice:
                         <td>''' + alert['request']['requestrawdata']['descriptionTimeframe']['description'][0:99] + '''...</td>
                     </tr>
                 '''
+        logging.debug(emailhtml)
+        logging.info("finished unopened report generation")
         return emailhtml
