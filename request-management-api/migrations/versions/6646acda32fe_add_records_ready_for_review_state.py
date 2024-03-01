@@ -21,5 +21,11 @@ def upgrade():
     op.execute(sql)
 
 def downgrade():
+    # If downgrading, need to change all requests with status 'Records Ready for Review'
+    # sql = '''UPDATE public."FOIMinistryRequests" 
+    #     SET requeststatusid = (SELECT requeststatusid FROM public."FOIRequestStatuses" WHERE name = 'Records Review'), 
+	#     requeststatuslabel = (SELECT statuslabel FROM public."FOIRequestStatuses" WHERE name = 'Records Review') 
+    #     WHERE requeststatusid = 21'''
+    # op.execute(sql)
     sql = '''DELETE FROM "FOIRequestStatuses" WHERE name = 'Records Ready for Review';'''
     op.execute(sql)
