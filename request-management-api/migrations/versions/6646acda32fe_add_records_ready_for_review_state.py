@@ -1,7 +1,7 @@
 """Add Records Ready for Review State
 
 Revision ID: 6646acda32fe
-Revises: b4da31675bd0
+Revises: 932d6dae5570
 Create Date: 2024-01-23 10:16:22.141034
 
 """
@@ -11,7 +11,7 @@ import sqlalchemy as sa
 
 # revision identifiers, used by Alembic.
 revision = '6646acda32fe'
-down_revision = 'b4da31675bd0'
+down_revision = '932d6dae5570'
 branch_labels = None
 depends_on = None
 
