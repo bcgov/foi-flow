@@ -121,7 +121,7 @@ class FOIRequestApplicant(db.Model):
     def getlatestprofilebyaxisapplicantid(cls, axisapplicantid):
         schema = FOIRequestApplicantSchema(many=False)
         sq = db.session.query(FOIRequestApplicant).filter_by(axisapplicantid=axisapplicantid).first()
-        if not sq.applicantprofileid:
+        if sq is None or (not sq.applicantprofileid):
             return schema.dump(sq)
         query = db.session.query(FOIRequestApplicant).filter(FOIRequestApplicant.applicantprofileid == sq.applicantprofileid).order_by(FOIRequestApplicant.foirequestapplicantid.desc()).first()
         return schema.dump(query)
@@ -1259,7 +1259,7 @@ class FOIRequestApplicant(db.Model):
 
 class FOIRequestApplicantSchema(ma.Schema):
     class Meta:
-        fields = ('foirequestapplicantid','firstname','middlename','lastname','alsoknownas','dob','businessname','applicantcategory.applicantcategoryid','applicantcategory.name')
+        fields = ('foirequestapplicantid','firstname','middlename','lastname','alsoknownas','dob','businessname','applicantcategory.applicantcategoryid','applicantcategory.name', 'applicantprofileid')
 
 class ApplicantProfileSchema(ma.Schema):
     class Meta:

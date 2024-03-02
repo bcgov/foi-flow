@@ -213,11 +213,11 @@ const StateDropDown = ({
       return false;
     }
 
-    return isValidationError || requestState === StateEnum.unopened.name ||
-      (isBeforeOpen(requestDetails)
-        && status === 'Open'
-        //&& !requestDetails.foiRequestApplicantID comment back in after axis decomission
-      );
+    return isValidationError || requestState === StateEnum.unopened.name 
+      //   || (isBeforeOpen(requestDetails) ////comment back in after axis decomission
+      //   && status === 'Open'
+      //   && !requestDetails.foiRequestApplicantID 
+      // );
   };
   const statusList = getStatusList();
   const menuItems =
