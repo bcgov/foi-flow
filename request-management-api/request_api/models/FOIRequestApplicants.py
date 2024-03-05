@@ -44,6 +44,7 @@ class FOIRequestApplicant(db.Model):
         applicant.middlename = middlename
         applicant.businessname = businessname
         applicant.alsoknownas = alsoknownas
+        applicant.applicantprofileid = str(uuid.uuid4())
         applicant.axisapplicantid = axisapplicantid
         if dob is not None and dob != "":
             applicant.dob = datetime.strptime(dob, "%Y-%m-%d")
@@ -108,6 +109,15 @@ class FOIRequestApplicant(db.Model):
         schema = FOIRequestApplicantSchema(many=False)
         sq = db.session.query(FOIRequestApplicant).filter_by(foirequestapplicantid=applicantid).first()
         if not sq.applicantprofileid:
+            return schema.dump(sq)
+        query = db.session.query(FOIRequestApplicant).filter(FOIRequestApplicant.applicantprofileid == sq.applicantprofileid).order_by(FOIRequestApplicant.foirequestapplicantid.desc()).first()
+        return schema.dump(query)
+    
+    @classmethod
+    def getlatestprofilebyaxisapplicantid(cls, axisapplicantid):
+        schema = FOIRequestApplicantSchema(many=False)
+        sq = db.session.query(FOIRequestApplicant).filter_by(axisapplicantid=axisapplicantid).first()
+        if sq is None or (not sq.applicantprofileid):
             return schema.dump(sq)
         query = db.session.query(FOIRequestApplicant).filter(FOIRequestApplicant.applicantprofileid == sq.applicantprofileid).order_by(FOIRequestApplicant.foirequestapplicantid.desc()).first()
         return schema.dump(query)

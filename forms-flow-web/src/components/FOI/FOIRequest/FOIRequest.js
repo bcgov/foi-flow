@@ -1259,7 +1259,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
                           handleApplicantDetailsValue
                         }
                         createSaveRequestObject={createSaveRequestObject}
-                        disableInput={disableInput || requestDetails?.foiRequestApplicantID > 0}
+                        disableInput={disableInput || requestDetails?.axisApplicantID /* requestDetails?.foiRequestApplicantID > 0 comment back in after axis decommission*/}
                         defaultExpanded={!closeApplicantDetails(userDetail, requestDetails?.requestType)}
                       />
                       {requiredRequestDetailsValues.requestType.toLowerCase() ===
@@ -1292,7 +1292,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
                           handleContactDetailsInitialValue
                         }
                         handleContanctDetailsValue={handleContanctDetailsValue}
-                        disableInput={disableInput || requestDetails?.foiRequestApplicantID > 0}
+                        disableInput={disableInput || requestDetails?.axisApplicantID /* requestDetails?.foiRequestApplicantID > 0 comment back in after axis decommission*/}
                         handleEmailValidation={handleEmailValidation}
                         defaultExpanded={!closeContactInfo(userDetail,requestDetails)}
                         moreInfoAction={openApplicantProfileModal}
@@ -1340,7 +1340,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
                         <AdditionalApplicantDetails
                           requestDetails={requestDetails}
                           createSaveRequestObject={createSaveRequestObject}
-                          disableInput={disableInput || requestDetails?.foiRequestApplicantID > 0}
+                          disableInput={disableInput || requestDetails?.axisApplicantID /* requestDetails?.foiRequestApplicantID > 0 comment back in after axis decommission*/}
                           defaultExpanded={true}
                         />
                       )}

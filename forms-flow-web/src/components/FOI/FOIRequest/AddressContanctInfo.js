@@ -314,7 +314,7 @@ const AddressContactDetails = memo(
       </AccordionSummary>
       <AccordionDetails>        
           <div>
-              {moreInfoAction &&
+              {/* {moreInfoAction && // comment back in after axis decommission
                 <button
                   type="button"
                   className={`btn btn-link btn-description-history`}
@@ -323,11 +323,7 @@ const AddressContactDetails = memo(
                 >
                   {(isBeforeOpen(requestDetails)) && 'Search' } Applicant Profiles
                 </button>
-              }
-              {/* <ApplicantProfileModal
-                modalOpen={modalOpen}
-                handleModalClose={handleModalClose}
-              /> */}
+              } */}
           </div>
           <div className={clsx("row", "foi-details-row", classes.row)}>
             <div className="col-lg-6 foi-details-col">
