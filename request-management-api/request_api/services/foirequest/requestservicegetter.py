@@ -50,11 +50,10 @@ class requestservicegetter:
             alsoknownas = applicant['alsoknownas']
             foirequestapplicantid = applicant['foirequestapplicantid']
             requestortypeid = applicant['requestortypeid']
-            categoryid = applicant['applicantcategoryid']
-            category = applicant['applicantcategory']
+            axisapplicantid = applicant['axisapplicantid']
 
             if requestortypeid == 1:
-                baserequestinfo.update(self.__prepareapplicant(foirequestapplicantid, firstname, middlename, lastname, businessname, categoryid, category))
+                baserequestinfo.update(self.__prepareapplicant(foirequestapplicantid, firstname, middlename, lastname, businessname, axisapplicantid))
             additionalpersonalinfo.update(self.__prepareadditionalpersonalinfo(requestortypeid, firstname, middlename, lastname, dob, alsoknownas))
 
         baserequestdetails, additionalpersonalinfodetails = self.preparepersonalattributes(foirequestid, request['version'])
@@ -100,12 +99,11 @@ class requestservicegetter:
                 dob = parse(dobraw).strftime(self.__genericdateformat()) if dobraw is not None else ''
                 foirequestapplicantid = applicant['foirequestapplicantid']
                 requestortypeid = applicant['requestortypeid']
-                categoryid = applicant['applicantcategoryid']
-                category = applicant['applicantcategory']
                 businessname = None
+                axisapplicantid = applicant['axisapplicantid']
 
                 if requestortypeid == 1:
-                    baserequestinfo.update(self.__prepareapplicant(foirequestapplicantid, firstname, middlename, lastname, businessname, categoryid, category))
+                    baserequestinfo.update(self.__prepareapplicant(foirequestapplicantid, firstname, middlename, lastname, businessname, axisapplicantid))
                 additionalpersonalinfo.update(self.__prepareadditionalpersonalinfo(requestortypeid, firstname, middlename, lastname, dob))
             baserequestdetails, additionalpersonalinfodetails = self.preparepersonalattributes(foirequestid, request['version'])
             baserequestinfo.update(baserequestdetails)
@@ -171,8 +169,8 @@ class requestservicegetter:
             'originalDueDate':  parse(requestministry['originalldd']).strftime(self.__genericdateformat()) if requestministry['originalldd'] is not None else parse(requestministry['duedate']).strftime(self.__genericdateformat()),            
             'programareaid':requestministry['programarea.programareaid'],
             'bcgovcode':requestministry['programarea.bcgovcode'],
-            # 'category':'',
-            # 'categoryid':0,
+            'category':request['applicantcategory.name'],
+            'categoryid':request['applicantcategory.applicantcategoryid'],
             'assignedministrygroup':requestministry["assignedministrygroup"],
             'assignedministryperson':requestministry["assignedministryperson"],            
             'selectedMinistries':[{'code':requestministry['programarea.bcgovcode'],'id':requestministry['foiministryrequestid'],'name':requestministry['programarea.name'],'selected':'true'}],
@@ -287,15 +285,14 @@ class requestservicegetter:
                 return True
         return False 
     
-    def __prepareapplicant(self, foirequestapplicantid=None, firstname=None, middlename=None, lastname=None, businessname=None, applicantcategoryid=None, applicantcategory=None):
+    def __prepareapplicant(self, foirequestapplicantid=None, firstname=None, middlename=None, lastname=None, businessname=None, axisapplicantid=None):
         return {
                     'firstName': firstname,
                     'middleName': middlename,
                     'lastName': lastname,
                     'businessName': businessname,   
                     'foiRequestApplicantID': foirequestapplicantid,
-                    'categoryid': applicantcategoryid,
-                    'category': applicantcategory
+                    'axisApplicantID': axisapplicantid
                 }     
         
     def __prepareadditionalpersonalinfo(self, requestortypeid, firstname= None, middlename= None, lastname= None, dob= None, alsoknownas= None):

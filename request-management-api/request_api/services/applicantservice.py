@@ -4,7 +4,6 @@ from re import VERBOSE
 from request_api.models.FOIRequestApplicants import FOIRequestApplicant
 from request_api.models.FOIMinistryRequests import FOIMinistryRequest
 from request_api.models.FOIRawRequests import FOIRawRequest
-from request_api.models.ApplicantCategories import ApplicantCategory
 from request_api.services.requestservice import requestservicegetter, requestservicecreate
 from request_api.services.rawrequestservice import rawrequestservice
 from request_api.auth import AuthHelper
@@ -45,7 +44,6 @@ class applicantservice:
         return applicantqueue
     
     def saveapplicantinfo(self, applicantschema, userid):
-        categoryid = ApplicantCategory().getapplicantcategory(applicantschema['category'])["applicantcategoryid"]
         applicant = FOIRequestApplicant.updateapplicantprofile(
             applicantschema['foiRequestApplicantID'],
             applicantschema['firstName'],
@@ -54,7 +52,7 @@ class applicantservice:
             applicantschema['businessName'],
             applicantschema.get('additionalPersonalInfo', None).get('alsoKnownAs', None),
             applicantschema.get('additionalPersonalInfo', None).get('birthDate', None),
-            categoryid,
+            applicantschema['axisApplicantID'],
             userid
         ) # replace with applicant id once new save function is written
         # requests = FOIMinistryRequest.getopenrequestsbyrequestId(applicantschema['foirequestID'])
@@ -129,6 +127,7 @@ class applicantservice:
             'otherContactInfo': self.__first_not_null(applicant["othercontactinfo"]),
             'publicServiceEmployeeNumber': self.__first_not_null(applicant["employeenumber"]),
             'correctionalServiceNumber': self.__first_not_null(applicant["correctionnumber"]),           
+            'axisApplilcantID': self.__first_not_null(applicant["axisApplicantID"]),
         }
 
     def getapplicanthistory(self, applicantid):
@@ -172,7 +171,7 @@ class applicantservice:
             'Other Contact Info': applicant["othercontactinfo"],
             'Employee Number': applicant["employeenumber"],
             'Corrections Number': applicant["correctionnumber"],
-            'Applicant Category': applicant["applicantcategory"],
+            # 'Applicant Category': applicant["applicantcategory"],
         }
 
     def getapplicantrequests(self, applicantid):

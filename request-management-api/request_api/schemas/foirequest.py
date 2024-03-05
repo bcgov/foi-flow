@@ -52,7 +52,6 @@ class FOIApplicantSchema(Schema):
     alsoknownas = fields.Str(data_key="alsoKnownAs")
     dob = fields.Date(data_key="dob")
     businessname = fields.Str(data_key="businessName")
-    applicantcategoryid = fields.Int(data_key="applicantCategoryID")
     
 class FOIRequestApplicantSchema(Schema):
     class Meta:  # pylint: disable=too-few-public-methods

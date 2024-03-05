@@ -26,9 +26,6 @@ class FOIRequestApplicant(db.Model):
     alsoknownas = db.Column(db.String(50), unique=False, nullable=True)
     dob = db.Column(db.DateTime, unique=False, nullable=True)
     businessname = db.Column(db.String(255), unique=False, nullable=True)
-    # applicantcategoryid = db.Column(db.Integer, unique=False, nullable=True)
-    applicantcategoryid = db.Column(db.Integer, ForeignKey('ApplicantCategories.applicantcategoryid'), nullable=True)
-    applicantcategory =  relationship("ApplicantCategory", backref=backref("ApplicantCategories"), uselist=False)
 
     created_at = db.Column(db.DateTime, default=datetime.now)
     updated_at = db.Column(db.DateTime, nullable=True)
@@ -36,8 +33,10 @@ class FOIRequestApplicant(db.Model):
     updatedby = db.Column(db.String(120), unique=False, nullable=True)
     applicantprofileid = db.Column(db.String(120), unique=False, nullable=True)
 
+    axisapplicantid = db.Column(db.Integer, unique=False, nullable=True)
+
     @classmethod
-    def createapplicant(cls, firstname, lastname, middlename, businessname, alsoknownas, dob, applicantcategoryid, userid):
+    def createapplicant(cls, firstname, lastname, middlename, businessname, alsoknownas, dob, axisapplicantid, userid):
         applicant = FOIRequestApplicant()
         applicant.createdby = userid
         applicant.firstname = firstname
@@ -45,7 +44,7 @@ class FOIRequestApplicant(db.Model):
         applicant.middlename = middlename
         applicant.businessname = businessname
         applicant.alsoknownas = alsoknownas
-        applicant.applicantcategoryid = applicantcategoryid
+        applicant.axisapplicantid = axisapplicantid
         if dob is not None and dob != "":
             applicant.dob = datetime.strptime(dob, "%Y-%m-%d")
         else:
@@ -55,7 +54,7 @@ class FOIRequestApplicant(db.Model):
         return DefaultMethodResult(True,'Applicant added',applicant.foirequestapplicantid)
 
     @classmethod
-    def updateapplicantprofile(cls, foirequestapplicantid, firstname, lastname, middlename, businessname, alsoknownas, dob, applicantcategoryid, userid):
+    def updateapplicantprofile(cls, foirequestapplicantid, firstname, lastname, middlename, businessname, alsoknownas, dob, axisapplicantid, userid):
 
         applicantprofile = aliased(FOIRequestApplicant)
 
@@ -85,8 +84,8 @@ class FOIRequestApplicant(db.Model):
             db.session.commit()
 
         dob = datetime.strptime(dob, "%Y-%m-%d") if dob is not None and dob != '' else None
-        applicantfromform = FOIRequestApplicant().prepareapplicantforcomparing(firstname, lastname, middlename, businessname, alsoknownas, dob, applicantcategoryid)
-        applicantfromdb = FOIRequestApplicant().prepareapplicantforcomparing(applicant.firstname, applicant.lastname, applicant.middlename, applicant.businessname, applicant.alsoknownas, applicant.dob, applicant.applicantcategoryid)
+        applicantfromform = FOIRequestApplicant().prepareapplicantforcomparing(firstname, lastname, middlename, businessname, alsoknownas, dob, axisapplicantid)
+        applicantfromdb = FOIRequestApplicant().prepareapplicantforcomparing(applicant.firstname, applicant.lastname, applicant.middlename, applicant.businessname, applicant.alsoknownas, applicant.dob, applicant.axisapplicantid)
         if applicantfromform != applicantfromdb:
             _applicant = FOIRequestApplicant()
             _applicant.createdby = userid
@@ -97,7 +96,7 @@ class FOIRequestApplicant(db.Model):
             _applicant.alsoknownas = applicantfromform['alsoknownas']
             _applicant.dob = applicantfromform['dob']
             _applicant.applicantprofileid = applicant.applicantprofileid
-            _applicant.applicantcategoryid = applicantfromform['applicantcategoryid']
+            _applicant.axisapplicantid = applicantfromform['axisapplicantid']
             db.session.add(_applicant)
             db.session.commit()
             return DefaultMethodResult(True,'Applicant profile updated',_applicant.foirequestapplicantid)
@@ -177,7 +176,8 @@ class FOIRequestApplicant(db.Model):
             country.contactinformation.label('country'),
             personalemployeenumber.attributevalue.label('employeenumber'),
             personalcorrectionnumber.attributevalue.label('correctionnumber'),
-            personalhealthnumber.attributevalue.label('phn')
+            personalhealthnumber.attributevalue.label('phn'),
+            FOIRequestApplicant.axisapplicantid.label('axisapplicantid')
         ]
 
         subquery_all = _session.query(
@@ -197,7 +197,7 @@ class FOIRequestApplicant(db.Model):
                                 # )
                             ).join(
                                 ApplicantCategory,
-                                ApplicantCategory.applicantcategoryid == FOIRequestApplicant.applicantcategoryid
+                                ApplicantCategory.applicantcategoryid == FOIRequest.applicantcategoryid
                             ).join(
                                 subquery_foirequest_maxversion,
                                 and_(*joincondition)
@@ -363,7 +363,8 @@ class FOIRequestApplicant(db.Model):
             func.array_agg(subquery_all.c.othercontactinfo).label('othercontactinfo'),
             func.array_agg(subquery_all.c.employeenumber).label('employeenumber'),
             func.array_agg(subquery_all.c.correctionnumber).label('correctionnumber'),
-            func.array_agg(subquery_all.c.phn).label('phn')
+            func.array_agg(subquery_all.c.phn).label('phn'),
+            func.array_agg(subquery_all.c.axisapplicantid).label('axisapplicantid')
         ).group_by(subquery_all.c.foirequestapplicantid)
 
         applicantprofile_schema = ApplicantProfileSchema()
@@ -436,7 +437,8 @@ class FOIRequestApplicant(db.Model):
             country.contactinformation.label('country'),
             personalemployeenumber.attributevalue.label('employeenumber'),
             personalcorrectionnumber.attributevalue.label('correctionnumber'),
-            personalhealthnumber.attributevalue.label('phn')
+            personalhealthnumber.attributevalue.label('phn'),
+            FOIRequestApplicant.axisapplicantid.label('axisapplicantid')
         ]
 
         subquery_all = _session.query(
@@ -458,7 +460,7 @@ class FOIRequestApplicant(db.Model):
                                 # )
                             ).join(
                                 ApplicantCategory,
-                                ApplicantCategory.applicantcategoryid == FOIRequestApplicant.applicantcategoryid
+                                ApplicantCategory.applicantcategoryid == FOIRequest.applicantcategoryid
                             ).join(
                                 subquery_foirequest_maxversion,
                                 and_(*joincondition)
@@ -630,7 +632,8 @@ class FOIRequestApplicant(db.Model):
             func.array_agg(subquery_all.c.othercontactinfo).label('othercontactinfo'),
             func.array_agg(subquery_all.c.employeenumber).label('employeenumber'),
             func.array_agg(subquery_all.c.correctionnumber).label('correctionnumber'),
-            func.array_agg(subquery_all.c.phn).label('phn')
+            func.array_agg(subquery_all.c.phn).label('phn'),
+            func.array_agg(subquery_all.c.axisapplicantid).label('axisapplicantid')
         ).group_by(subquery_all.c.foirequestapplicantid)
 
         applicantprofile_schema = ApplicantProfileSchema(many=True)
@@ -704,7 +707,8 @@ class FOIRequestApplicant(db.Model):
             contactother.contactinformation.label('othercontactinfo'),
             personalemployeenumber.attributevalue.label('employeenumber'),
             personalcorrectionnumber.attributevalue.label('correctionnumber'),
-            personalhealthnumber.attributevalue.label('phn')
+            personalhealthnumber.attributevalue.label('phn'),
+            FOIRequestApplicant.axisapplicantid.label('axisapplicantid')
         ]
 
         subquery_all = _session.query(
@@ -726,7 +730,7 @@ class FOIRequestApplicant(db.Model):
                                 # )
                             ).join(
                                 ApplicantCategory,
-                                ApplicantCategory.applicantcategoryid == FOIRequestApplicant.applicantcategoryid
+                                ApplicantCategory.applicantcategoryid == FOIRequest.applicantcategoryid
                             ).join(
                                 subquery_foirequest_maxversion,
                                 and_(*joincondition)
@@ -899,7 +903,8 @@ class FOIRequestApplicant(db.Model):
             func.array_agg(subquery_all.c.othercontactinfo).label('othercontactinfo'),
             func.array_agg(subquery_all.c.employeenumber).label('employeenumber'),
             func.array_agg(subquery_all.c.correctionnumber).label('correctionnumber'),
-            func.array_agg(subquery_all.c.phn).label('phn')
+            func.array_agg(subquery_all.c.phn).label('phn'),
+            func.array_agg(subquery_all.c.axisapplicantid).label('axisapplicantid')
         ).group_by(subquery_all.c.foirequestapplicantid)
 
         applicantprofile_schema = ApplicantProfileSchema(many=True)
@@ -992,7 +997,8 @@ class FOIRequestApplicant(db.Model):
             country.contactinformation.label('country'),
             personalemployeenumber.attributevalue.label('employeenumber'),
             personalcorrectionnumber.attributevalue.label('correctionnumber'),
-            personalhealthnumber.attributevalue.label('phn')
+            personalhealthnumber.attributevalue.label('phn'),
+            FOIRequestApplicant.axisapplicantid.label('axisapplicantid')
         ]
 
         query_all = _session.query(
@@ -1021,7 +1027,7 @@ class FOIRequestApplicant(db.Model):
                                     FOIRequest.version == FOIRequestApplicantMapping.foirequestversion_id)
                             ).join(
                                 ApplicantCategory,
-                                ApplicantCategory.applicantcategoryid == FOIRequestApplicant.applicantcategoryid
+                                ApplicantCategory.applicantcategoryid == FOIRequest.applicantcategoryid
                             ).join(
                                 contactemail,
                                 and_(
@@ -1232,7 +1238,7 @@ class FOIRequestApplicant(db.Model):
         return applicantrequest_schema.dump(query_all.all())
 
     @classmethod
-    def prepareapplicantforcomparing(cls, firstname, lastname, middlename, businessname, alsoknownas, dob, applicantcategoryid):
+    def prepareapplicantforcomparing(cls, firstname, lastname, middlename, businessname, alsoknownas, dob, axisapplicantid):
         return {
             'firstname': firstname if firstname is not None or firstname != '' else None,
             'lastname': lastname if lastname is not None or lastname != '' else None,
@@ -1240,20 +1246,20 @@ class FOIRequestApplicant(db.Model):
             'businessname': businessname if businessname is not None or businessname != '' else None,
             'alsoknownas': alsoknownas if alsoknownas is not None or alsoknownas != '' else None,
             'dob': dob if dob is not None and dob != '' else None,
-            'applicantcategoryid': applicantcategoryid if applicantcategoryid is not None or applicantcategoryid != 0 else None,
+            'axisapplicantid': axisapplicantid if axisapplicantid is not None and axisapplicantid != 0 else None,
         }
 
 
 class FOIRequestApplicantSchema(ma.Schema):
     class Meta:
-        fields = ('foirequestapplicantid','firstname','middlename','lastname','alsoknownas','dob','businessname','applicantcategory.applicantcategoryid','applicantcategory.name')
+        fields = ('foirequestapplicantid','firstname','middlename','lastname','alsoknownas','dob','businessname','axisapplicantid')
 
 class ApplicantProfileSchema(ma.Schema):
     class Meta:
         fields = ('applicantprofileid','updatedat','createdby','foirequestapplicantid','firstname','middlename','lastname',
                   'alsoknownas','dob','businessname','foirequestid','foirequestversion','requesttype','applicantcategory',
                   'email','address','city','province','postal','country','homephone','workphone',
-                  'workphone2','mobilephone','othercontactinfo','employeenumber','correctionnumber','phn')
+                  'workphone2','mobilephone','othercontactinfo','employeenumber','correctionnumber','phn','axisapplicantid')
 
 class ApplicantRequestSchema(ma.Schema):
     class Meta:
