@@ -141,7 +141,7 @@ class FOIRequestWrapperSchema(Schema):
     isiaorestricted =   fields.Bool(data_key="isiaorestricted")
 
     foiRequestApplicantID = fields.Int(data_key="foiRequestApplicantID",required=False,allow_none=True)
-    axisapplicantid = fields.Int(data_key="axisapplicantid",required=False,allow_none=True)
+    axisapplicantid = fields.Int(data_key="axisApplicantID",required=False,allow_none=True)
     isoipcreview =   fields.Bool(data_key="isoipcreview")
     
     selectedMinistries = fields.Nested(FOIMinistryRequestWrapperSchema, many=True)
