@@ -144,9 +144,8 @@ class requestservicecreate:
                 foirequestschema['lastName'],
                 foirequestschema.get("middleName"),
                 foirequestschema.get("businessName"),
-                selfdob,
                 selfalsoknownas,
-                None,
+                selfdob,
                 foirequestschema.get('axisapplicantid', None),
                 userid
             )
