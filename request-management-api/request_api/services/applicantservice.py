@@ -52,7 +52,7 @@ class applicantservice:
             applicantschema['businessName'],
             applicantschema.get('additionalPersonalInfo', None).get('alsoKnownAs', None),
             applicantschema.get('additionalPersonalInfo', None).get('birthDate', None),
-            applicantschema['axisApplicantID'],
+            applicantschema['axisapplicantid'],
             userid
         ) # replace with applicant id once new save function is written
         # requests = FOIMinistryRequest.getopenrequestsbyrequestId(applicantschema['foirequestID'])
@@ -127,7 +127,7 @@ class applicantservice:
             'otherContactInfo': self.__first_not_null(applicant["othercontactinfo"]),
             'publicServiceEmployeeNumber': self.__first_not_null(applicant["employeenumber"]),
             'correctionalServiceNumber': self.__first_not_null(applicant["correctionnumber"]),           
-            'axisApplilcantID': self.__first_not_null(applicant["axisApplicantID"]),
+            'axisapplicantid': self.__first_not_null(applicant["axisapplicantid"]),
         }
 
     def getapplicanthistory(self, applicantid):

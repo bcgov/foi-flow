@@ -292,7 +292,7 @@ class requestservicegetter:
                     'lastName': lastname,
                     'businessName': businessname,   
                     'foiRequestApplicantID': foirequestapplicantid,
-                    'axisApplicantID': axisapplicantid
+                    'axisapplicantid': axisapplicantid
                 }     
         
     def __prepareadditionalpersonalinfo(self, requestortypeid, firstname= None, middlename= None, lastname= None, dob= None, alsoknownas= None):

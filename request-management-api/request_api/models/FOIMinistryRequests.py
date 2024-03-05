@@ -208,7 +208,7 @@ class FOIMinistryRequest(db.Model):
            _request["ministryrequestid"] = ministryrequest['foiministryrequestid']
            _request["applicantcategory"]= parentrequest.applicantcategory.name
            _request["identityverified"] = ministryrequest['identityverified']
-           _request["axisApplicantID"] = requestapplicants[0]['axisapplicantid']
+           _request["axisapplicantid"] = requestapplicants[0]['axisapplicantid']
            _requests.append(_request)
         
         return _requests
