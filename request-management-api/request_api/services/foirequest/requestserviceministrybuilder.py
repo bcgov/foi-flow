@@ -31,7 +31,7 @@ class requestserviceministrybuilder(requestserviceconfigurator):
         foirequest.receiveddate = foiobject['receiveddate'] if 'receiveddate' in foiobject  else None
         foirequest.requesttype = foiobject['requesttype']
         foirequest.wfinstanceid = foiobject['wfinstanceid']       
-        # foirequest.applicantcategoryid =  foiobject["applicantcategory.applicantcategoryid"]
+        foirequest.applicantcategoryid =  foiobject["applicantcategory.applicantcategoryid"]
         foirequest.deliverymodeid =  foiobject["deliverymode.deliverymodeid"]
         foirequest.receivedmodeid =  foiobject["receivedmode.receivedmodeid"]
         foirequest.createdby = userid

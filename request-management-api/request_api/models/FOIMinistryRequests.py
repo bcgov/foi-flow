@@ -206,9 +206,9 @@ class FOIMinistryRequest(db.Model):
            _request["version"] = ministryrequest['version']
            _request["id"] = parentrequest.foirequestid
            _request["ministryrequestid"] = ministryrequest['foiministryrequestid']
-        #    _request["applicantcategory"]=parentrequest.applicantcategory.name
-           _request["applicantcategory"]=requestapplicants[0]['applicantcategory']
+           _request["applicantcategory"]= parentrequest.applicantcategory.name
            _request["identityverified"] = ministryrequest['identityverified']
+           _request["axisapplicantid"] = requestapplicants[0]['axisapplicantid']
            _requests.append(_request)
         
         return _requests
@@ -597,7 +597,7 @@ class FOIMinistryRequest(db.Model):
                                 isouter=True
                             ).join(
                                 ApplicantCategory,
-                                and_(ApplicantCategory.applicantcategoryid == FOIRequestApplicant.applicantcategoryid, ApplicantCategory.isactive == True)
+                                and_(ApplicantCategory.applicantcategoryid == FOIRequest.applicantcategoryid, ApplicantCategory.isactive == True)
                             ).join(
                                 ProgramArea,
                                 FOIMinistryRequest.programareaid == ProgramArea.programareaid
@@ -1160,7 +1160,7 @@ class FOIMinistryRequest(db.Model):
                                 isouter=True
                             ).join(
                                 ApplicantCategory,
-                                and_(ApplicantCategory.applicantcategoryid == FOIRequestApplicant.applicantcategoryid, ApplicantCategory.isactive == True)
+                                and_(ApplicantCategory.applicantcategoryid == FOIRequest.applicantcategoryid, ApplicantCategory.isactive == True)
                             ).join(
                                 ProgramArea,
                                 FOIMinistryRequest.programareaid == ProgramArea.programareaid

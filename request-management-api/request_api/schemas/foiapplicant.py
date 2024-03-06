@@ -13,7 +13,6 @@ class FOIRequestApplicantSchema(Schema):
     lastName = fields.Str(data_key="lastName", required=True,validate=[validate.Length(min=1, error=BLANK_EXCEPTION_MESSAGE, max=50)])         
     email = fields.Str(data_key="email",allow_none=True, validate=[validate.Length(max=120, error=MAX_EXCEPTION_MESSAGE)])      
     businessName = fields.Str(data_key="businessName",allow_none=True, validate=[validate.Length(max=255, error=MAX_EXCEPTION_MESSAGE)]) 
-    category = fields.Str(data_key="category", required=True,validate=[validate.Length(min=1, error=BLANK_EXCEPTION_MESSAGE)])
 
     phonePrimary = fields.Str(data_key="phonePrimary",allow_none=True, validate=[validate.Length(max=50, error=MAX_EXCEPTION_MESSAGE)])    
     workPhonePrimary = fields.Str(data_key="workPhonePrimary",allow_none=True, validate=[validate.Length(max=50, error=MAX_EXCEPTION_MESSAGE)])  
@@ -31,4 +30,4 @@ class FOIRequestApplicantSchema(Schema):
     foiRequestApplicantID = fields.Int(data_key="foiRequestApplicantID",required=False,allow_none=True)
     foirequestID = fields.List(fields.Int(),data_key="foirequestID",required=False,allow_none=False)
     additionalPersonalInfo = fields.Nested(FOIAdditionallPersonalInfoWrapperSchema,required=False,allow_none=True)
-    category = fields.Str(data_key="category",allow_none=True)
+    axisapplicantid = fields.Int(data_key="axisapplicantid",required=False,allow_none=True)

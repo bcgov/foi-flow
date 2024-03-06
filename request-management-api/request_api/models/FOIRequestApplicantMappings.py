@@ -3,10 +3,7 @@ from sqlalchemy.sql.schema import ForeignKey, ForeignKeyConstraint
 from .db import  db, ma
 from datetime import datetime
 from sqlalchemy.orm import relationship,backref
-from .default_method_result import DefaultMethodResult
-from .FOIRequests import FOIRequest
 from sqlalchemy import and_, or_, func
-from .ApplicantCategories import ApplicantCategory
 from .RequestorType import RequestorType
 
 class FOIRequestApplicantMapping(db.Model):
@@ -40,7 +37,6 @@ class FOIRequestApplicantMapping(db.Model):
     
     @classmethod
     def getrequestapplicants(cls,foirequest_id,foirequestversion):
-        from .FOIRequestApplicants import FOIRequestApplicant
         requestapplicant_schema = FOIRequestApplicantMappingSchema(many=True)
         _applicantinfos = db.session.query(FOIRequestApplicantMapping).filter(
                                             FOIRequestApplicantMapping.foirequest_id == foirequest_id,
@@ -65,14 +61,10 @@ class FOIRequestApplicantMapping(db.Model):
                                             FOIRequestApplicant.alsoknownas.label('alsoknownas'),
                                             FOIRequestApplicant.dob.label('dob'),
                                             FOIRequestApplicant.businessname.label('businessname'),
-                                            ApplicantCategory.applicantcategoryid.label('applicantcategoryid'),
-                                            ApplicantCategory.name.label('applicantcategory'),
+                                            FOIRequestApplicant.axisapplicantid.label('axisapplicantid'),
                                         ]).join(
                                             FOIRequestApplicant,
                                             FOIRequestApplicant.foirequestapplicantid == FOIRequestApplicantMapping.foirequestapplicantid
-                                        ).join(
-                                            ApplicantCategory,
-                                            ApplicantCategory.applicantcategoryid == FOIRequestApplicant.applicantcategoryid
                                         ).join(
                                             RequestorType,
                                             RequestorType.requestortypeid == FOIRequestApplicantMapping.requestortypeid
@@ -86,9 +78,9 @@ class FOIRequestApplicantMapping(db.Model):
 
 class FOIRequestApplicantMappingSchema(ma.Schema):
     class Meta:
-        fields = ('foirequestapplicantmappingid','foirequest.foirequestid','foirequest.version','requestortype.requestortypeid','requestortype.name','foirequestapplicant.foirequestapplicantid','foirequestapplicant.firstname','foirequestapplicant.lastname','foirequestapplicant.middlename','foirequestapplicant.alsoknownas','foirequestapplicant.dob','foirequestapplicant.businessname','foirequestapplicant.applicantcategory.applicantcategoryid','foirequestapplicant.applicantcategory.name')
+        fields = ('foirequestapplicantmappingid','foirequest.foirequestid','foirequest.version','requestortype.requestortypeid','requestortype.name','foirequestapplicant.foirequestapplicantid','foirequestapplicant.firstname','foirequestapplicant.lastname','foirequestapplicant.middlename','foirequestapplicant.alsoknownas','foirequestapplicant.dob','foirequestapplicant.businessname')
 
 class FOIRequestApplicantInfoSchema(ma.Schema):
     class Meta:
-        fields = ('foirequestapplicantmappingid','foirequestid','version','requestortypeid','requestortype','foirequestapplicantid','firstname','lastname','middlename','alsoknownas','dob','businessname','applicantcategoryid','applicantcategory')
+        fields = ('foirequestapplicantmappingid','foirequestid','version','requestortypeid','requestortype','foirequestapplicantid','firstname','lastname','middlename','alsoknownas','dob','businessname','axisapplicantid')
     
