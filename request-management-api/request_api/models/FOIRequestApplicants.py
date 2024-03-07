@@ -1250,11 +1250,11 @@ class FOIRequestApplicant(db.Model):
     @classmethod
     def prepareapplicantforcomparing(cls, firstname, lastname, middlename, businessname, alsoknownas, dob, axisapplicantid):
         return {
-            'firstname': firstname if firstname is not None or firstname != '' else None,
-            'lastname': lastname if lastname is not None or lastname != '' else None,
-            'middlename': middlename if middlename is not None or middlename != '' else None,
-            'businessname': businessname if businessname is not None or businessname != '' else None,
-            'alsoknownas': alsoknownas if alsoknownas is not None or alsoknownas != '' else None,
+            'firstname': firstname if firstname is not None and firstname != '' else None,
+            'lastname': lastname if lastname is not None and lastname != '' else None,
+            'middlename': middlename if middlename is not None and middlename != '' else None,
+            'businessname': businessname if businessname is not None and businessname != '' else None,
+            'alsoknownas': alsoknownas if alsoknownas is not None and alsoknownas != '' else None,
             'dob': dob if dob is not None and dob != '' else None,
             'axisapplicantid': axisapplicantid if axisapplicantid is not None and axisapplicantid != 0 else None,
         }

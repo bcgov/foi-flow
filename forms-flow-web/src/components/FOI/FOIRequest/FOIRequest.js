@@ -434,6 +434,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
                 typeof data["linkedRequests"] == "string"
                   ? JSON.parse(data["linkedRequests"])
                   : data["linkedRequests"];
+              data["axisApplicantID"] = ("axisApplicantID" in data) ? parseInt(data["axisApplicantID"]) : null;
               setAxisSyncedData(data);
               let axisDataUpdated = checkIfAxisDataUpdated(data);
               if (axisDataUpdated) {
