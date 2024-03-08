@@ -1439,26 +1439,29 @@ export const RecordsLog = ({
 
   const searchAttachments = (_recordsArray, _filterValue, _keywordValue) => {
     var filterFunction = (r) => {
-      if (r.attachments?.length > 0) {
+      var isMatch = (
+        (r.filename.toLowerCase().includes(_keywordValue?.toLowerCase()) ||
+          r.createdby.toLowerCase().includes(_keywordValue?.toLowerCase())) &&
+        (_filterValue === -3
+          ? r.attributes?.incompatible
+          : _filterValue === -2
+          ? !r.isredactionready &&
+            !r.attributes?.incompatible &&
+            (r.failed ||
+              isrecordtimeout(r.created_at, RECORD_PROCESSING_HRS) == true)
+          : _filterValue > -1
+          ? r.attributes?.divisions?.findIndex(
+              (a) => a.divisionid === _filterValue
+            ) > -1
+          : true)
+      )
+      if (isMatch) {
+        return true;
+      } else if (r.attachments?.length > 0) {
         r.attachments = r.attachments.filter(filterFunction);
         return r.attachments.length > 0;
       } else {
-        return (
-          (r.filename.toLowerCase().includes(_keywordValue?.toLowerCase()) ||
-            r.createdby.toLowerCase().includes(_keywordValue?.toLowerCase())) &&
-          (_filterValue === -3
-            ? r.attributes?.incompatible
-            : _filterValue === -2
-            ? !r.isredactionready &&
-              !r.attributes?.incompatible &&
-              (r.failed ||
-                isrecordtimeout(r.created_at, RECORD_PROCESSING_HRS) == true)
-            : _filterValue > -1
-            ? r.attributes?.divisions?.findIndex(
-                (a) => a.divisionid === _filterValue
-              ) > -1
-            : true)
-        );
+        return false;
       }
     };
     setIsAllSelected(false);
