@@ -243,6 +243,8 @@ const unassignedQueueColumns = [
     headerName: "ON BEHALF",
     headerAlign: "left",
     flex: 0.5,
+    valueGetter: (params) =>
+      params.row.onBehalfFormatted === undefined ? "N/A" : params.row.onBehalfFormatted,
   },
   {
     field: "extensions",
