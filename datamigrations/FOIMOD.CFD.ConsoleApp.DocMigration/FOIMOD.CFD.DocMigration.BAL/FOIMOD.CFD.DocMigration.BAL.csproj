@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net7.0</TargetFramework>
@@ -8,12 +8,16 @@
 
   <ItemGroup>
     <PackageReference Include="AWSSDK.S3" Version="3.7.201.12" />
+	  <PackageReference Include="Syncfusion.Licensing" Version="24.2.4" />
+	  <PackageReference Include="Microsoft.Extensions.Logging" Version="8.0.0" />
+	  <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\FOIMOD.CFD.DocMigration.DAL\FOIMOD.CFD.DocMigration.AXIS.DAL.csproj" />
     <ProjectReference Include="..\FOIMOD.CFD.DocMigration.FOIFLOW.DAL\FOIMOD.CFD.DocMigration.FOIFLOW.DAL.csproj" />
     <ProjectReference Include="..\FOIMOD.CFD.DocMigration.Models\FOIMOD.CFD.DocMigration.Models.csproj" />
+    <ProjectReference Include="..\FOIMOD.CFD.DocMigration.OCR\FOIMOD.CFD.DocMigration.OCR.csproj" />
     <ProjectReference Include="..\FOIMOD.CFD.DocMigration.Utils\FOIMOD.CFD.DocMigration.Utils.csproj" />
   </ItemGroup>
 

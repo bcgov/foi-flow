@@ -16,7 +16,8 @@ class UnopenedReport(db.Model):
     potentialmatches = db.Column(JSON, unique=False, nullable=False)
     
     @classmethod
-    def insert(cls, row):
-        db.session.add(row)
+    def bulkinsert(cls, rows):
+        for row in rows:
+            db.session.add(row)
         db.session.commit()
-        return DefaultMethodResult(True,'Report Row added',row.rawrequestid)
+        return DefaultMethodResult(True,'Report Rows added',map(lambda row: row.rawrequestid, rows))

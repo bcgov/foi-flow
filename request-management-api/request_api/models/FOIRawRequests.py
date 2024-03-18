@@ -1124,7 +1124,7 @@ class FOIRawRequest(db.Model):
                         select max(version) as version, requestid from public."FOIRawRequests"
                         group by requestid
                     ) mv on mv.requestid = rr.requestid and mv.version = rr.version
-                    where status = 'Intake in Progress' and (
+                    where (
                         requestrawdata->>'lastName' ilike :lastName
                         or requestrawdata->>'firstName' ilike :firstName
                         or requestrawdata->>'email' ilike :email
