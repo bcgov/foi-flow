@@ -72,7 +72,7 @@ class storageservice:
         filestatustransition = foirequestform.get('filestatustransition')
         filename = foirequestform.get('filename')
         filenamesplittext = os.path.splitext(filename)
-        uniquefilename = '{0}{1}'.format(uuid.uuid4(),filenamesplittext[1])
+        uniquefilename = '{0}{1}'.format(uuid.uuid4(),filenamesplittext[1].lower())
 
         auth = AWSRequestsAuth(aws_access_key=self.accesskey,
                 aws_secret_access_key=self.secretkey,
@@ -108,7 +108,7 @@ class storageservice:
             filename = foirequestform.get('filename')
             s3sourceuri = foirequestform.get('s3sourceuri')
             filenamesplittext = os.path.splitext(filename)
-            uniquefilename = '{0}{1}'.format(uuid.uuid4(),filenamesplittext[1])
+            uniquefilename = '{0}{1}'.format(uuid.uuid4(),filenamesplittext[1].lower())
             docpathmapper = DocumentPathMapper().getdocumentpath(category,ministrycode)
             formsbucket = docpathmapper['bucket']
             auth = AWSRequestsAuth(aws_access_key=docpathmapper['attributes']['s3accesskey'],
@@ -162,7 +162,7 @@ class storageservice:
             filestatustransition = foirequestform.get('filestatustransition')
             filename = foirequestform.get('filename')
             filenamesplittext = os.path.splitext(filename)
-            uniquefilename = '/'.join(file.get('filepath', "").split('/')[5:]) or '{0}{1}'.format(uuid.uuid4(),filenamesplittext[1])
+            uniquefilename = '/'.join(file.get('filepath', "").split('/')[5:]) or '{0}{1}'.format(uuid.uuid4(),filenamesplittext[1].lower())
             filepath = '/'.join(file.get('filepath', "").split('/')[4:]) or self.__getfilepath(category,ministrycode,requestnumber,filestatustransition,uniquefilename)
             if file.get('multipart', False):
                 response = s3client.create_multipart_upload(Bucket=formsbucket, Key='{0}'.format(filepath))
