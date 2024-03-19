@@ -598,6 +598,11 @@ class FOIMinistryRequest(db.Model):
                 dbquery = basequery.filter(FOIMinistryRequest.assignedto == userid).filter(ministryfilter)
             else:
                 dbquery = basequery.filter(FOIMinistryRequest.assignedministryperson == userid).filter(ministryfilter)
+        elif(additionalfilter == 'unassignedRequests'):
+            if(requestby == 'IAO'):
+                dbquery = basequery.filter(FOIMinistryRequest.assignedto == None).filter(ministryfilter)
+        elif(additionalfilter.lower() == 'all'):
+            dbquery = basequery.filter(FOIMinistryRequest.assignedto != None).filter(ministryfilter)
         else:
             if(isiaorestrictedfilemanager == True or isministryrestrictedfilemanager == True):
                 dbquery = basequery.filter(ministryfilter)
