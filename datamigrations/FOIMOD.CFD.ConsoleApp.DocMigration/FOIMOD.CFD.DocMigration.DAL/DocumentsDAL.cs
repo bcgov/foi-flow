@@ -3,6 +3,7 @@ using FOIMOD.CFD.DocMigration.Models.AXISSource;
 using FOIMOD.CFD.DocMigration.Models.Document;
 using Microsoft.Data.SqlClient;
 using Microsoft.Identity.Client;
+using Microsoft.VisualBasic.FileIO;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -44,8 +45,8 @@ namespace FOIMOD.CFD.DocMigration.DAL
                         @SectionList = COALESCE(@SectionList+':', '')+vcSectionList
                     FROM [dbo].[tblDocumentReviewLog] WHERE iRequestID =@irequestid
 
-                    SELECT D.iDocID,D.tiSections,vcFileName as FilePath,D.siFolderID,D.siPageCount ,p.siPageNum FROM tblPages P inner join tblDocuments D on P.iDocID=D.iDocID 
-					
+                    SELECT DISTINCT D.iDocID,D.vcDocName as FolderName,(SELECT vcDocName FROM tblDocuments where iDocID =D.iParentDocID) as ParentFolderName ,D.tiSections,vcFileName as FilePath,REVERSE(SUBSTRING(REVERSE(vcFileName),1,4)) as FileType,D.siFolderID,D.siPageCount ,p.siPageNum ,(SELECT vcInternalName FROM tblDocReviewFlags WHERE tiDocReviewFlagID = PRF.tiDocReviewFlagID ) as PageReviewFlag FROM tblPages P inner join tblDocuments D on P.iDocID=D.iDocID 
+					LEFT JOIN tblPageReviewFlags PRF ON P.iPageID = PRF.iPageID
 					WHERE  D.iDocID in(
                     --- Review Log Documents
                     SELECT iDocID FROM [dbo].[tblDocumentReviewLog] WHERE iRequestID = @irequestid
@@ -54,7 +55,7 @@ namespace FOIMOD.CFD.DocMigration.DAL
                     union
                     --- Request Folder Documents    
                     select iDocID from tblRedactionLayers where irequestid=@irequestid AND iDeliveryID is NULL
-                    )";
+                    ) ORDER BY D.iDocID, p.siPageNum";
 
         private string getQueryByType(DocumentTypeFromAXIS documentTypeFromAXIS, string requestnumber="")
         {
@@ -147,7 +148,11 @@ namespace FOIMOD.CFD.DocMigration.DAL
                                 TotalPageCount = Convert.ToString(row["siPageCount"]),
                                 PageSequenceNumber = Convert.ToInt32(row["siPageNum"]),
                                 AXISRequestNumber = requestnumber.ToUpper(),
-                                DocumentType = DocumentTypeFromAXIS.RequestRecords
+                                DocumentType = DocumentTypeFromAXIS.RequestRecords,
+                                FolderName = Convert.ToString(row["FolderName"]),
+                                FileType = Convert.ToString(row["FileType"]),
+                                ParentFolderName = Convert.ToString(row["ParentFolderName"]),
+                                ReviewFlag = Convert.ToString(row["PageReviewFlag"])
                             });
 
                         }
