@@ -1,5 +1,6 @@
 import { StateEnum } from '../../../../constants/FOI/statusEnum';
 import { getFullnameList } from "../../../../helper/FOI/helper";
+import FOI_COMPONENT_CONSTANTS from '../../../../constants/FOI/foiComponentConstants';
 
   export const getAssignedTo = (_saveRequestObject) => {
 
@@ -65,7 +66,10 @@ import { getFullnameList } from "../../../../helper/FOI/helper";
       case StateEnum.callforrecords.name.toLowerCase():
           return {title: "Changing the state", body: `Are you sure you want to change Request #${_requestNumber} to ${StateEnum.callforrecords.name}?`};
       case StateEnum.recordsreadyforreview.name.toLowerCase():
-          return {title: "Changing the state", body: `Are you sure you want to change Request #${_requestNumber} to ${StateEnum.recordsreadyforreview.name}?`};
+        if(!allowStateChange && _saveRequestObject.requestType == FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_GENERAL && isAnyAmountPaid)
+          return {title: "Changing the state", body: `Unable to change state until fee estimate actuals have been completed.`};
+        else
+        return {title: "Changing the state", body: `Are you sure you want to change Request #${_requestNumber} to ${StateEnum.recordsreadyforreview.name}?`};
       case StateEnum.review.name.toLowerCase():
         if(!allowStateChange)
           return {title: "Changing the state", body: `Unable to change state until fee estimate actuals have been completed.`};
