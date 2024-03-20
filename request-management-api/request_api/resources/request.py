@@ -25,6 +25,7 @@ from request_api.exceptions import BusinessException
 from request_api.services.rawrequestservice import rawrequestservice
 from request_api.services.documentservice import documentservice
 from request_api.services.eventservice import eventservice
+from request_api.services.unopenedreportservice import unopenedreportservice
 from request_api.utils.enums import StateName
 import json
 import asyncio
@@ -324,3 +325,20 @@ class FOIRawRequestIAORestricted(Resource):
             return {'status': 500, 'message':"Invalid Request"}, 400    
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500  
+        
+@cors_preflight('POST,OPTIONS')
+@API.route('/foirawrequest/unopenedreport')
+class FOIRawRequestReport(Resource):
+    """Generates report of unopened requests that have not been actioned in over X amount of days"""
+
+       
+    @staticmethod
+    @TRACER.trace()
+    @cross_origin(origins=allowedorigins())
+    @auth.require
+    def post():
+        try:
+            asyncio.ensure_future(unopenedreportservice().generateunopenedreport())
+            return {'status': True, 'message': 'async report function called'} , 200
+        except BusinessException as exception:
+            return {'status': exception.status_code, 'message':exception.message}, 500

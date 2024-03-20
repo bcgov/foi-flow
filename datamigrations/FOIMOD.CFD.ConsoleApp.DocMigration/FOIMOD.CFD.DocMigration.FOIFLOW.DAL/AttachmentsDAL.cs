@@ -12,6 +12,13 @@ namespace FOIMOD.CFD.DocMigration.FOIFLOW.DAL
             dbConnection = _dbConnection;
         }
 
+        /// <summary>
+        /// Attachments insert - Correspondence logs goes here
+        /// </summary>
+        /// <param name="s3filepath"></param>
+        /// <param name="actualfilename"></param>
+        /// <param name="axisrequestnumber"></param>
+        /// <returns></returns>
         public bool InsertIntoMinistryRequestDocuments(string s3filepath, string actualfilename, string axisrequestnumber)
         {
             bool result = false;
@@ -36,8 +43,8 @@ namespace FOIMOD.CFD.DocMigration.FOIFLOW.DAL
             }
             return result;
         }
-        
 
 
+       
     }
 }

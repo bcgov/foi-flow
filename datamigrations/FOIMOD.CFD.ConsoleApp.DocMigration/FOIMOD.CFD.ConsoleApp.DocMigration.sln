@@ -21,7 +21,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FOIMOD.CFD.DocMigration.Uti
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FOIMOD.CFD.DocMigration.AXIS.DAL.UnitTests", "FOIMOD.CFD.DocMigration.AXIS.DAL.UnitTests\FOIMOD.CFD.DocMigration.AXIS.DAL.UnitTests.csproj", "{4402E37D-BA96-4C9C-9AD2-78A866D9C2E6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FOIMOD.CFD.DocMigration.FOIFLOW.DAL.Tests", "FOIMOD.CFD.DocMigration.FOIFLOW.DAL.Tests\FOIMOD.CFD.DocMigration.FOIFLOW.DAL.Tests.csproj", "{E964523D-91C1-4E1C-860F-52E57E826E16}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FOIMOD.CFD.DocMigration.FOIFLOW.DAL.Tests", "FOIMOD.CFD.DocMigration.FOIFLOW.DAL.Tests\FOIMOD.CFD.DocMigration.FOIFLOW.DAL.Tests.csproj", "{E964523D-91C1-4E1C-860F-52E57E826E16}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FOIMOD.CFD.DocMigration.OCR", "FOIMOD.CFD.DocMigration.OCR\FOIMOD.CFD.DocMigration.OCR.csproj", "{8AD439C5-5CF2-4513-91D9-41FF5A8C9FB6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FOIMOD.CFD.DocMigration.OCR.Tests", "FOIMOD.CFD.DocMigration.OCR.Tests\FOIMOD.CFD.DocMigration.OCR.Tests.csproj", "{A01A477E-E588-4FB5-A0CD-7EF166905E6E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -69,6 +73,14 @@ Global
 		{E964523D-91C1-4E1C-860F-52E57E826E16}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E964523D-91C1-4E1C-860F-52E57E826E16}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E964523D-91C1-4E1C-860F-52E57E826E16}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8AD439C5-5CF2-4513-91D9-41FF5A8C9FB6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8AD439C5-5CF2-4513-91D9-41FF5A8C9FB6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8AD439C5-5CF2-4513-91D9-41FF5A8C9FB6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8AD439C5-5CF2-4513-91D9-41FF5A8C9FB6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A01A477E-E588-4FB5-A0CD-7EF166905E6E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A01A477E-E588-4FB5-A0CD-7EF166905E6E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A01A477E-E588-4FB5-A0CD-7EF166905E6E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A01A477E-E588-4FB5-A0CD-7EF166905E6E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
