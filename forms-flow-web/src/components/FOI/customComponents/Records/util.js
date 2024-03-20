@@ -92,6 +92,7 @@ export const getUpdatedRecords = (_records, isattachment = false) => {
       attachments: !isattachment
         ? arrangeAttachments(sortedAttachments, _record.documentmasterid)
         : undefined,
+      ...(_record.attributes.rotatedpages && {rotatedpages:_record.attributes.rotatedpages})
     };
     return _recordObj;
   });
@@ -99,6 +100,7 @@ export const getUpdatedRecords = (_records, isattachment = false) => {
 
 //Get files for specified divisionid with necessary fields
 export const getFiles = (_records, _divisionid) => {
+  console.log("here");
   return _records
     .filter((_record) => _record.divisionids.includes(_divisionid))
     .map((r) => {
@@ -108,6 +110,7 @@ export const getFiles = (_records, _divisionid) => {
         s3uripath: r.s3uripath,
         filesize: r.filesize,
         lastmodified: r.lastmodified,
+        ...(r.rotatedpages && {rotatedpages: r.rotatedpages})
       };
     });
 };

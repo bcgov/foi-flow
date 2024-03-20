@@ -122,6 +122,7 @@ class FileSchema(Schema):
     s3uripath = fields.Str(data_key="s3uripath",allow_none=False, validate=[validate.Length(max=1000, error=MAX_EXCEPTION_MESSAGE)])
     lastmodified = fields.Str(data_key="lastmodified",allow_none=False, validate=[validate.Length(max=120, error=MAX_EXCEPTION_MESSAGE)])
     filesize = fields.Number(data_key="filesize")
+    rotatedpages = fields.Dict(data_key="rotatedpages",keys=fields.Int,values=fields.Int,required=False,allow_none=True)
 
 class DownloadRecordAttributeSchema(Schema):
     class Meta:  # pylint: disable=too-few-public-methods
