@@ -24,9 +24,7 @@ class recordservicegetter(recordservicebase):
             batchids = []
             resultrecords = []
             if len(uploadedrecords) > 0:
-                computingresponses, err = self.makedocreviewerrequest(
-                    "GET", "/api/dedupestatus/{0}".format(ministryrequestid)
-                )
+                computingresponses, err = self.getdatafromdocreviewer(uploadedrecords, ministryrequestid)
                 if err is None:
                     (
                         _convertedfiles,
@@ -59,6 +57,13 @@ class recordservicegetter(recordservicebase):
             logging.info(exp)
             raise exp
         return result
+    
+    def getdatafromdocreviewer(self, uploadedrecords, ministryrequestid):
+        if len(uploadedrecords) > 0:
+                computingresponses, err = self.makedocreviewerrequest(
+                    "GET", "/api/dedupestatus/{0}".format(ministryrequestid)
+                )
+        return computingresponses, err
 
     def __preparerecord(
         self, record, _computingresponse, computingresponses, divisions
