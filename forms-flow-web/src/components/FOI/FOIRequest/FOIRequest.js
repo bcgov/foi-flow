@@ -1295,9 +1295,9 @@ const FOIRequest = React.memo(({ userDetail }) => {
                         createSaveRequestObject={createSaveRequestObject}
                         disableInput={disableInput}
                       />
-                      {Object.keys(redactedSections).length > 0 && (
+                      {(redactedSections && Object.keys(redactedSections).length > 0 && (
                         <RedactionSummary sections={redactedSections} isoipcreview={isOIPCReview}/>
-                      )}
+                      ))}
 
                       <ExtensionDetails
                         requestDetails={requestDetails}
