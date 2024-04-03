@@ -6,7 +6,7 @@ from sqlalchemy.orm import relationship, backref
 from .default_method_result import DefaultMethodResult
 from sqlalchemy.dialects.postgresql import JSON, UUID
 from sqlalchemy.sql.expression import distinct
-from sqlalchemy import text
+from sqlalchemy import text, insert
 import logging
 import json
 
@@ -29,24 +29,29 @@ class FOIRawRequestComment(db.Model):
     updatedby = db.Column(db.String(120), unique=False, nullable=True)
 
     commenttypeid = db.Column(db.Integer, unique=False, nullable=False)
+    commentsversion = db.Column(db.Integer, nullable=False)
    
     @classmethod
     def savecomment(cls, commenttypeid, foirequestcomment, version, userid) -> DefaultMethodResult:
+        commentsversion = 1
         parentcommentid = foirequestcomment["parentcommentid"] if 'parentcommentid' in foirequestcomment else None
         taggedusers = foirequestcomment["taggedusers"] if 'taggedusers' in foirequestcomment  else None
-        newcomment = FOIRawRequestComment(commenttypeid=commenttypeid, requestid=foirequestcomment["requestid"], version=version, comment=foirequestcomment["comment"], parentcommentid=parentcommentid, isactive=True, createdby=userid,taggedusers=taggedusers)
+        newcomment = FOIRawRequestComment(commenttypeid=commenttypeid, requestid=foirequestcomment["requestid"], version=version, comment=foirequestcomment["comment"], parentcommentid=parentcommentid, isactive=True, createdby=userid,taggedusers=taggedusers, commentsversion=commentsversion)
         db.session.add(newcomment)
         db.session.commit()
         return DefaultMethodResult(True, 'Comment added', newcomment.commentid)
 
     @classmethod
-    def disablecomment(cls, commentid, userid):
+    def disablecomment(cls, commentid, userid, action=""):
         dbquery = db.session.query(FOIRawRequestComment)
-        comment = dbquery.filter_by(commentid=commentid)
+        comment = dbquery.filter_by(commentid=commentid, isactive=True)
         if(comment.count() > 0):
             childcomments = dbquery.filter_by(parentcommentid=commentid, isactive=True)
-            if (childcomments.count() > 0) :
+            if (childcomments.count() > 0 and action != 'edit') :
                 return DefaultMethodResult(False,'Cannot delete parent comment with replies',commentid)
+            elif (childcomments.count() > 0 and action == 'edit'):
+                childcomments.update({FOIRawRequestComment.isactive: False, FOIRawRequestComment.updatedby: userid,
+                            FOIRawRequestComment.updated_at: datetime.now()}, synchronize_session=False)
             comment.update({FOIRawRequestComment.isactive: False, FOIRawRequestComment.updatedby: userid,
                             FOIRawRequestComment.updated_at: datetime.now()}, synchronize_session=False)
             db.session.commit()
@@ -57,13 +62,31 @@ class FOIRawRequestComment(db.Model):
     @classmethod
     def updatecomment(cls, commentid, foirequestcomment, userid):
         dbquery = db.session.query(FOIRawRequestComment)
-        comment = dbquery.filter_by(commentid=commentid)        
-        taggedusers = foirequestcomment["taggedusers"] if 'taggedusers' in foirequestcomment  else None
-        existingtaggedusers = comment.first().taggedusers
+        comment = dbquery.filter_by(commentid=commentid, isactive=True)
         if(comment.count() > 0):
-            comment.update({FOIRawRequestComment.isactive: True, FOIRawRequestComment.comment: foirequestcomment["comment"], FOIRawRequestComment.updatedby: userid, FOIRawRequestComment.updated_at: datetime.now(),FOIRawRequestComment.taggedusers:taggedusers}, synchronize_session=False)
+            existingtaggedusers = comment.first().taggedusers    
+            taggedusers = foirequestcomment["taggedusers"] if 'taggedusers' in foirequestcomment  else existingtaggedusers
+        
+            commentversion = int(comment.first().commentversion) + 1
+            insertstmt = (insert(FOIRawRequestComment).values(
+                commentid= comment.first().commentid,
+                requestid=comment.first().requestid,
+                version=comment.first().version,
+                comment=foirequestcomment["comment"],
+                taggedusers=taggedusers,
+                parentcommentid=comment.first().parentcommentid,
+                isactive=True,
+                created_at=datetime.now(),
+                createdby=userid,
+                updated_at=datetime.now(),
+                updatedby=userid,
+                commenttypeid=comment.first().commenttypeid,
+                commentversion=commentversion
+            ))
+            db.session.execute(insertstmt) 
+            # comment.update({FOIRawRequestComment.isactive: True, FOIRawRequestComment.comment: foirequestcomment["comment"], FOIRawRequestComment.updatedby: userid, FOIRawRequestComment.updated_at: datetime.now(),FOIRawRequestComment.taggedusers:taggedusers}, synchronize_session=False)
             db.session.commit()
-            return DefaultMethodResult(True, 'Comment updated', commentid, existingtaggedusers)
+            return DefaultMethodResult(True, 'Updated Comment added', commentid, existingtaggedusers)
         else:
             return DefaultMethodResult(True, 'No Comment found', commentid, existingtaggedusers)
 
@@ -104,4 +127,4 @@ class FOIRawRequestComment(db.Model):
 class FOIRawRequestCommentSchema(ma.Schema):
     class Meta:
         fields = ('commentid', 'requestid', 'parentcommentid', 'comment', 'commenttypeid',
-                  'commenttype', 'isactive', 'created_at', 'createdby', 'updated_at', 'updatedby','taggedusers')
+                  'commenttype', 'isactive', 'created_at', 'createdby', 'updated_at', 'updatedby','taggedusers', 'commentsversion')

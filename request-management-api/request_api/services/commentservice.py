@@ -43,9 +43,11 @@ class commentservice:
         return FOIRawRequestComment.disablecomment(commentid, userid)     
         
     def updateministryrequestcomment(self, commentid, data, userid):
+        FOIRequestComment.disablecomment(commentid, userid, "edit")
         return FOIRequestComment.updatecomment(commentid, data, userid) 
 
     def updaterawrequestcomment(self, commentid, data, userid):
+        FOIRawRequestComment.disablecomment(commentid, userid)
         return FOIRawRequestComment.updatecomment(commentid, data, userid)          
         
     def getministryrequestcomments(self, ministryrequestid):
