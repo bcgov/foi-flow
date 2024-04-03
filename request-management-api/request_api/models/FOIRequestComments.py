@@ -66,24 +66,24 @@ class FOIRequestComment(db.Model):
     @classmethod
     def updatecomment(cls, commentid, foirequestcomment, userid):   
         dbquery = db.session.query(FOIRequestComment)
-        comment = dbquery.filter_by(commentid=commentid, isactive=True).first()
+        comment = dbquery.filter_by(commentid=commentid).order_by(FOIRequestComment.commentsversion.desc()).first()
         if(comment.count() > 0) :
-            existingtaggedusers = comment.first().taggedusers
+            existingtaggedusers = comment.taggedusers
             taggedusers = foirequestcomment["taggedusers"] if 'taggedusers' in foirequestcomment  else existingtaggedusers
-            commentversion = int(comment.first().commentversion) + 1
+            commentversion = int(comment.commentversion) + 1
             insertstmt = (insert(FOIRequestComment).values(
-                commentid= comment.first().commentid,
-                ministryrequestid=comment.first().ministryrequestid,
-                version=comment.first().version,
+                commentid= comment.commentid,
+                ministryrequestid=comment.ministryrequestid,
+                version=comment.version,
                 comment=foirequestcomment["comment"],
                 taggedusers=taggedusers,
-                parentcommentid=comment.first().parentcommentid,
+                parentcommentid=comment.parentcommentid,
                 isactive=True,
                 created_at=datetime2.now(),
                 createdby=userid,
                 updated_at=datetime2.now(),
                 updatedby=userid,
-                commenttypeid=comment.first().commenttypeid,
+                commenttypeid=comment.commenttypeid,
                 commentversion=commentversion
             ))
             db.session.execute(insertstmt)            
