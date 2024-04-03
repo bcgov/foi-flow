@@ -26,6 +26,7 @@ from request_api.schemas.foirecord import  FOIRequestBulkCreateRecordSchema, FOI
 from marshmallow import INCLUDE
 import json
 from flask_cors import cross_origin
+import asyncio
 
 
 API = Namespace('FOIWatcher', description='Endpoints for FOI record management')
@@ -251,8 +252,8 @@ class UpdateRequestsPageCount(Resource):
             requestjson = request.get_json()
             ministryrequestid = requestjson['ministryrequestid']  if requestjson.get("ministryrequestid") != None else None
             if ministryrequestid:
-                result = recordservice().updatepagecount(ministryrequestid, AuthHelper.getuserid())
-                return {'status': result.success, 'message':result.message,'id':result.identifier} , 200
+                asyncio.ensure_future(recordservice().updatepagecount(ministryrequestid, AuthHelper.getuserid()))
+                return {'status': True, 'message': 'async updatepagecount function called'} , 200
             else:
                 return {'status': True, 'message':'ministryrequestid is none'} , 200
         except KeyError as error:
@@ -277,8 +278,8 @@ class UpdateRequestsPageCountOption2(Resource):
             requestid = requestjson['requestid']  if requestjson.get("requestid") != None else None
             print(f'option 2 >>> requestid = {requestid}, ministryrequestid = {ministryrequestid}')
             if ministryrequestid:
-                result = recordservice().calculatepagecount(requestid, ministryrequestid, AuthHelper.getuserid())
-                return {'status': result.success, 'message':result.message,'id':result.identifier} , 200
+                asyncio.ensure_future(recordservice().calculatepagecount(requestid, ministryrequestid, AuthHelper.getuserid()))
+                return {'status': True, 'message': 'async calculatepagecount function called'} , 200
             else:
                 return {'status': True, 'message':'ministryrequestid is none'} , 200
         except KeyError as error:
