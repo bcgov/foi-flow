@@ -4,6 +4,7 @@
 # Necessary to pull images from bcgov and not hit Dockerhub quotas.
 FROM artifacts.developer.gov.bc.ca/docker-remote/python:3.8.5-buster
 EXPOSE 6402
+RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates curl netbase wget && rm -rf /var/lib/apt/lists/*
 
 # Keeps Python from generating .pyc files in the container
 ENV PYTHONDONTWRITEBYTECODE=1
