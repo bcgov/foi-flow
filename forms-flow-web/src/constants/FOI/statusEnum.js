@@ -106,12 +106,12 @@ const StateList = Object.freeze({
   ],
   reviewcfdmsdpersonal: [
     { status: "Records Review", isSelected: false },
+    { status: "Records Ready for Review", isSelected: false },
     { status: "Call For Records", isSelected: false },
     { status: "Tagging", isSelected: false },
     { status: "Consult", isSelected: false },
     { status: "Ministry Sign Off", isSelected: false },
     { status: "Peer Review", isSelected: false },
-    { status: "Records Ready for Review", isSelected: false },
     { status: "Response", isSelected: false },
     { status: "Closed", isSelected: false },
   ],
