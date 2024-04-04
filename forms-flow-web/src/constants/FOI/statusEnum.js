@@ -170,7 +170,6 @@ const MinistryStateList = Object.freeze({
     { status: "Fee Estimate", isSelected: false },
     { status: "Harms Assessment", isSelected: false },
     { status: "Deduplication", isSelected: false },
-    { status: "Records Ready for Review", isSelected: false },
     { status: "Records Review", isSelected: false },
     { status: "Ministry Sign Off", isSelected: false },
   ],
