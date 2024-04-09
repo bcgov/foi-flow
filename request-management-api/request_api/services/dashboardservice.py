@@ -49,6 +49,7 @@ class dashboardservice:
         baserequestinfo.update({'assignedToLastName': request.assignedToLastName})
         baserequestinfo.update({'onBehalfFirstName': request.onBehalfFirstName})
         baserequestinfo.update({'onBehalfLastName': request.onBehalfLastName})
+        baserequestinfo.update({'onBehalfFormatted': request.onBehalfFormatted})
         baserequestinfo.update({'requestPageCount': request.requestPageCount})        
         isoipcreview = request.isoipcreview if request.isoipcreview == True else False
         baserequestinfo.update({'isoipcreview': isoipcreview})

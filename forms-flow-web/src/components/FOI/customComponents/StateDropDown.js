@@ -36,6 +36,7 @@ const StateDropDown = ({
   let requestDetails = useSelector(
     (state) => state.foiRequests.foiRequestDetail
   );
+  const userDetail = useSelector((state) => state.user.userDetail);
 
   React.useEffect(() => {
     if (requestState && requestState !== status) {
@@ -104,6 +105,13 @@ const StateDropDown = ({
     const personalIAO = !_isMinistryCoordinator && personalRequest;
     const previousState =
       stateTransition?.length > 0 && stateTransition[1]?.status;
+    const appendRecordsReadyForReview = (stateList) => {
+      const recordsreadyforreview = { status: "Records Ready for Review", isSelected: false };
+      let appendedList = stateList.slice();
+      appendedList.splice(-1, 0, recordsreadyforreview);
+      return appendedList;
+    }
+    const isMCFMinistryTeam = userDetail?.groups?.some(str => str.includes("MCF Ministry Team"))
     switch (_state.toLowerCase()) {
       case StateEnum.unopened.name.toLowerCase():
         return _stateList.unopened;
@@ -117,17 +125,19 @@ const StateDropDown = ({
         if (!isMinistryCoordinator) {
           //const currentStatusVersion = stateTransition[0]?.version;
           if (previousState === StateEnum.intakeinprogress.name) {
-            return _stateList.intakeinprogress;
+            return appendRecordsReadyForReview(_stateList.intakeinprogress);
           } else if (previousState === StateEnum.open.name)
-            return _stateList.open;
+            return appendRecordsReadyForReview(_stateList.open);
           else if (previousState === StateEnum.review.name)
-            return _stateList.review;
+            return _stateList.review; // already has RRR state
           else if (previousState === StateEnum.consult.name)
-            return _stateList.consult;
+            return _stateList.consult; // this already has RRR state
           else if (previousState === StateEnum.response.name)
-            return _stateList.response;
+            return appendRecordsReadyForReview(_stateList.response);
           else if (previousState === StateEnum.appfeeowing.name)
-            return _stateList.appfeeowing;
+            return appendRecordsReadyForReview(_stateList.appfeeowing);
+          else if (previousState === StateEnum.recordsreadyforreview.name)
+            return _stateList.recordsreadyforreview;
         } else {
           return _stateList.peerreview;
         }
@@ -138,8 +148,13 @@ const StateDropDown = ({
       case StateEnum.redirect.name.toLowerCase():
         return _stateList.redirect;
       case StateEnum.callforrecords.name.toLowerCase():
-        if (_isMinistryCoordinator && personalRequest)
-          return _stateList.callforrecordsforpersonal;
+        if (_isMinistryCoordinator && personalRequest) {
+          if (isMCFMinistryTeam) {
+            return appendRecordsReadyForReview(_stateList.callforrecordsforpersonal);
+          } else {
+            return _stateList.callforrecordsforpersonal;
+          }
+        }
         if (
           personalIAO &&
           (requestDetails.bcgovcode.toLowerCase() === "mcf" ||
@@ -151,6 +166,8 @@ const StateDropDown = ({
         return _stateList.tagging;
       case StateEnum.readytoscan.name.toLowerCase():
         return _stateList.readytoscan;
+      case StateEnum.recordsreadyforreview.name.toLowerCase():
+        return _stateList.recordsreadyforreview;
       case StateEnum.review.name.toLowerCase():
         if (
           personalIAO &&

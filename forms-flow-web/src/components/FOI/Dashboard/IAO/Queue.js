@@ -69,7 +69,14 @@ const Queue = ({ userDetail, tableInfo }) => {
     );
   }, [rowsState, sortModel, keyword, requestFilter]);
 
-  const columnsRef = React.useRef(tableInfo?.columns || []);
+  let columns;
+  if (requestFilter == 'unassignedRequests') {
+    columns = tableInfo?.columns.concat(tableInfo.unassignedQueueColumns)
+  } else {
+    columns = tableInfo?.columns
+  }
+
+  const columnsRef = React.useRef(columns || []);
 
   const requestFilterChange = (filter) => {
     if (filter === requestFilter) {
@@ -171,7 +178,7 @@ const Queue = ({ userDetail, tableInfo }) => {
             container
             alignItems="flex-start"
             justifyContent="center"
-            xs={3}
+            xs={'auto'}
             minWidth="390px"
           >
             <Stack direction="row" sx={{ overflowX: "hidden" }} spacing={1}>
@@ -201,6 +208,17 @@ const Queue = ({ userDetail, tableInfo }) => {
                 size="small"
                 onClick={() => requestFilterChange("watchingRequests")}
                 clicked={requestFilter === "watchingRequests"}
+              />
+              <ClickableChip
+                id="unassignedRequests"
+                key={`unassigned-requests`}
+                label={"UNASSIGNED REQUESTS"}
+                color="primary"
+                size="small"
+                onClick={() => {
+                  requestFilterChange("unassignedRequests")
+                }}
+                clicked={requestFilter === "unassignedRequests"}
               />
             </Stack>
           </Grid>
