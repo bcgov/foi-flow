@@ -338,8 +338,7 @@ class FOIMinistryRequest(db.Model):
 
     @classmethod
     def getrequestssubquery(cls, groups, filterfields, keyword, additionalfilter, userid, iaoassignee, ministryassignee, requestby='IAO', isiaorestrictedfilemanager=False, isministryrestrictedfilemanager=False):
-        #for queue/dashboard
-
+        #for queue/dashboard       
         _session = db.session
 
         #ministry filter for group/team
@@ -376,6 +375,7 @@ class FOIMinistryRequest(db.Model):
 
         #filter/search
         if(len(filterfields) > 0 and keyword is not None):
+            
             filtercondition = []
 
             if(keyword != "restricted"):
@@ -585,13 +585,19 @@ class FOIMinistryRequest(db.Model):
                                 isouter=True
                             ).filter(or_(FOIMinistryRequest.requeststatuslabel != StateName.closed.name, 
                                          and_(FOIMinistryRequest.isoipcreview == True, FOIMinistryRequest.requeststatusid == 3, subquery_with_oipc.c.outcomeid == None)))
-                                   
+
+       
+
         if(additionalfilter == 'watchingRequests'):
             #watchby
             activefilter = and_(FOIMinistryRequest.isactive == True, FOIRequestStatus.isactive == True)
 
             subquery_watchby = FOIRequestWatcher.getrequestidsbyuserid(userid)
-            dbquery = basequery.join(subquery_watchby, subquery_watchby.c.ministryrequestid == FOIMinistryRequest.foiministryrequestid).filter(activefilter)
+            if(requestby == 'IAO'):
+                dbquery = basequery.join(subquery_watchby, subquery_watchby.c.ministryrequestid == FOIMinistryRequest.foiministryrequestid).filter(activefilter).filter(or_(or_(FOIRestrictedMinistryRequest.isrestricted == False, FOIRestrictedMinistryRequest.isrestricted == None), and_(FOIRestrictedMinistryRequest.isrestricted == True, FOIMinistryRequest.assignedto == userid)))
+            else:
+                dbquery = basequery.join(subquery_watchby, subquery_watchby.c.ministryrequestid == FOIMinistryRequest.foiministryrequestid).filter(activefilter).filter(or_(or_(ministry_restricted_requests.isrestricted == isministryrestrictedfilemanager, ministry_restricted_requests.isrestricted == None), and_(ministry_restricted_requests.isrestricted == True, FOIMinistryRequest.assignedministryperson == userid)))   
+            
         elif(additionalfilter == 'myRequests'):
             #myrequest
             if(requestby == 'IAO'):
@@ -601,8 +607,11 @@ class FOIMinistryRequest(db.Model):
         elif(additionalfilter == 'unassignedRequests'):
             if(requestby == 'IAO'):
                 dbquery = basequery.filter(FOIMinistryRequest.assignedto == None).filter(ministryfilter)
-        elif(additionalfilter.lower() == 'all'):
-            dbquery = basequery.filter(FOIMinistryRequest.assignedto != None).filter(ministryfilter)
+        elif(additionalfilter.lower() == 'all'):           
+            if(requestby == 'IAO'):
+                dbquery = basequery.filter(ministryfilter).filter(or_(or_(FOIRestrictedMinistryRequest.isrestricted == isiaorestrictedfilemanager, FOIRestrictedMinistryRequest.isrestricted == None), and_(FOIRestrictedMinistryRequest.isrestricted == True, FOIMinistryRequest.assignedto == userid)))
+            else:               
+                dbquery = basequery.filter(ministryfilter).filter(or_(or_(ministry_restricted_requests.isrestricted == isministryrestrictedfilemanager, ministry_restricted_requests.isrestricted == None), and_(ministry_restricted_requests.isrestricted == True, FOIMinistryRequest.assignedministryperson == userid)))
         else:
             if(isiaorestrictedfilemanager == True or isministryrestrictedfilemanager == True):
                 dbquery = basequery.filter(ministryfilter)
