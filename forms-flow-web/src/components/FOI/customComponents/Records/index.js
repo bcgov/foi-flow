@@ -1756,7 +1756,7 @@ export const RecordsLog = ({
             alignItems="flex-start"
             spacing={1}
           >
-            <Grid item xs={6}>
+            <Grid item xs={5}>
               <h1 className="foi-review-request-text foi-ministry-requestheadertext foi-records-request-text">
                 {getRequestNumber()}
               </h1>
@@ -1831,23 +1831,9 @@ export const RecordsLog = ({
                   })}
                 </TextField>
               )}
-            </Grid>
-            <Grid item xs={3}>
-              {isMinistryCoordinator ||
-              (isScanningTeamMember &&
-                MinistryNeedsScanning.includes(bcgovcode.replaceAll('"', "")) &&
-                requestType ===
-                  FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL) ? (
-                <button
-                  className={clsx("btn", "addAttachment", classes.createButton)}
-                  variant="contained"
-                  onClick={addAttachments}
-                  color="primary"
-                  disabled={conversionFormats?.length < 1}
-                >
-                  + Upload Records
-                </button>
-              ) : (
+            </Grid> 
+            <Grid item xs={2}>
+              {(isMinistryCoordinator == false &&
                 records?.length > 0 &&
                 DISABLE_REDACT_WEBLINK?.toLowerCase() == "false" && (
                   <a
@@ -1869,7 +1855,24 @@ export const RecordsLog = ({
                   </a>
                 )
               )}
-            </Grid>
+            </Grid>           
+            <Grid item xs={2}>
+              {isMinistryCoordinator ||
+              (isScanningTeamMember &&
+                MinistryNeedsScanning.includes(bcgovcode.replaceAll('"', "")) &&
+                requestType ===
+                  FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL) && (
+                <button
+                  className={clsx("btn", "addAttachment", classes.createButton)}
+                  variant="contained"
+                  onClick={addAttachments}
+                  color="primary"
+                  disabled={conversionFormats?.length < 1}
+                >
+                  + Upload Records
+                </button>
+              )}
+            </Grid>            
           </Grid>
           <Grid
             container
