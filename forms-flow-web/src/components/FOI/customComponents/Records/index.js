@@ -1761,7 +1761,30 @@ export const RecordsLog = ({
                 {getRequestNumber()}
               </h1>
             </Grid>
-
+            <Grid item xs={2}>
+              {(isMinistryCoordinator == false &&
+                records?.length > 0 &&
+                DISABLE_REDACT_WEBLINK?.toLowerCase() == "false" && (
+                  <a
+                    href={DOC_REVIEWER_WEB_URL + "/foi/" + ministryId}
+                    target="_blank"
+                  >
+                    <button
+                      className={clsx(
+                        "btn",
+                        "addAttachment",
+                        classes.createButton
+                      )}
+                      variant="contained"
+                      // onClick={}
+                      color="primary"
+                    >
+                      Redact Records
+                    </button>
+                  </a>
+                )
+              )}
+            </Grid>
             <Grid item xs={3}>
               {hasDocumentsToDownload && (
                 <TextField
@@ -1833,35 +1856,11 @@ export const RecordsLog = ({
               )}
             </Grid> 
             <Grid item xs={2}>
-              {(isMinistryCoordinator == false &&
-                records?.length > 0 &&
-                DISABLE_REDACT_WEBLINK?.toLowerCase() == "false" && (
-                  <a
-                    href={DOC_REVIEWER_WEB_URL + "/foi/" + ministryId}
-                    target="_blank"
-                  >
-                    <button
-                      className={clsx(
-                        "btn",
-                        "addAttachment",
-                        classes.createButton
-                      )}
-                      variant="contained"
-                      // onClick={}
-                      color="primary"
-                    >
-                      Redact Records
-                    </button>
-                  </a>
-                )
-              )}
-            </Grid>           
-            <Grid item xs={2}>
-              {isMinistryCoordinator ||
-              (isScanningTeamMember &&
+              {
+              (isMinistryCoordinator || (isScanningTeamMember &&
                 MinistryNeedsScanning.includes(bcgovcode.replaceAll('"', "")) &&
                 requestType ===
-                  FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL) && (
+                  FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL)) && (
                 <button
                   className={clsx("btn", "addAttachment", classes.createButton)}
                   variant="contained"
@@ -1872,7 +1871,9 @@ export const RecordsLog = ({
                   + Upload Records
                 </button>
               )}
-            </Grid>            
+            </Grid>
+                      
+                        
           </Grid>
           <Grid
             container
