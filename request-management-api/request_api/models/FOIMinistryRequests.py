@@ -1193,7 +1193,7 @@ class FOIMinistryRequest(db.Model):
             groupfilter.append(FOIMinistryRequest.assignedministrygroup == group)
         
         #ministry advanced search show cfr onwards
-        statefilter = FOIMinistryRequest.requeststatuslabel.in_([StateName.callforrecords.name,StateName.closed.name,StateName.recordsreview.name,StateName.feeestimate.name,StateName.consult.name,StateName.ministrysignoff.name,StateName.onhold.name,StateName.deduplication.name,StateName.harmsassessment.name,StateName.response.name,StateName.peerreview.name,StateName.tagging.name,StateName.readytoscan.name])
+        statefilter = FOIMinistryRequest.requeststatuslabel.in_([StateName.callforrecords.name,StateName.closed.name,StateName.recordsreview.name,StateName.recordsreadyforreview.name,StateName.feeestimate.name,StateName.consult.name,StateName.ministrysignoff.name,StateName.onhold.name,StateName.deduplication.name,StateName.harmsassessment.name,StateName.response.name,StateName.peerreview.name,StateName.tagging.name,StateName.readytoscan.name])
 
         ministry_queue = FOIMinistryRequest.advancedsearchsubquery(params, iaoassignee, ministryassignee, userid, 'Ministry', False, isministryrestrictedfilemanager).filter(and_(or_(*groupfilter), statefilter))
 
