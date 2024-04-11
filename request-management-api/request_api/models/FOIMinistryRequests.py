@@ -609,9 +609,9 @@ class FOIMinistryRequest(db.Model):
                 dbquery = basequery.filter(FOIMinistryRequest.assignedto == None).filter(ministryfilter)
         elif(additionalfilter.lower() == 'all'):           
             if(requestby == 'IAO'):
-                dbquery = basequery.filter(ministryfilter).filter(or_(or_(FOIRestrictedMinistryRequest.isrestricted == isiaorestrictedfilemanager, FOIRestrictedMinistryRequest.isrestricted == None), and_(FOIRestrictedMinistryRequest.isrestricted == True, FOIMinistryRequest.assignedto == userid)))
+                dbquery = basequery.filter(ministryfilter).filter(FOIMinistryRequest.assignedto.isnot(None)).filter(or_(FOIRestrictedMinistryRequest.isrestricted == isiaorestrictedfilemanager, or_(FOIRestrictedMinistryRequest.isrestricted.is_(None), FOIRestrictedMinistryRequest.isrestricted == False)))
             else:               
-                dbquery = basequery.filter(ministryfilter).filter(or_(or_(ministry_restricted_requests.isrestricted == isministryrestrictedfilemanager, ministry_restricted_requests.isrestricted == None), and_(ministry_restricted_requests.isrestricted == True, FOIMinistryRequest.assignedministryperson == userid)))
+                dbquery = basequery.filter(ministryfilter).filter(or_(ministry_restricted_requests.isrestricted == isministryrestrictedfilemanager, or_(ministry_restricted_requests.isrestricted.is_(None), ministry_restricted_requests.isrestricted == False)))
         else:
             if(isiaorestrictedfilemanager == True or isministryrestrictedfilemanager == True):
                 dbquery = basequery.filter(ministryfilter)
@@ -733,7 +733,7 @@ class FOIMinistryRequest(db.Model):
                             )
                         )
                     )
-                statusfilter = FOIMinistryRequest.requeststatuslabel.in_([StateName.callforrecords.name,StateName.recordsreview.name,StateName.feeestimate.name,StateName.consult.name,StateName.ministrysignoff.name,StateName.onhold.name,StateName.deduplication.name,StateName.harmsassessment.name,StateName.response.name,StateName.peerreview.name,StateName.tagging.name,StateName.readytoscan.name])
+                statusfilter = FOIMinistryRequest.requeststatuslabel.in_([StateName.callforrecords.name,StateName.recordsreview.name,StateName.feeestimate.name,StateName.consult.name,StateName.ministrysignoff.name,StateName.onhold.name,StateName.deduplication.name,StateName.harmsassessment.name,StateName.response.name,StateName.peerreview.name,StateName.tagging.name,StateName.readytoscan.name, StateName.recordsreadyforreview.name])
             ministryfilter = and_(
                                 FOIMinistryRequest.isactive == True,
                                 FOIRequestStatus.isactive == True,
@@ -1166,7 +1166,7 @@ class FOIMinistryRequest(db.Model):
             if(requestby == 'IAO'):
                 dbquery = newbasequery.filter(
                                             or_(
-                                                or_(FOIRestrictedMinistryRequest.isrestricted == False, FOIRestrictedMinistryRequest.isrestricted == None),
+                                                or_(FOIRestrictedMinistryRequest.isrestricted == False, FOIRestrictedMinistryRequest.isrestricted.is_(None)),
                                                 and_(FOIRestrictedMinistryRequest.isrestricted == True, FOIMinistryRequest.assignedto == userid),
                                                 and_(FOIRestrictedMinistryRequest.isrestricted == True, subquery_watchby.c.watchedby == userid),
                                             )
@@ -1174,7 +1174,7 @@ class FOIMinistryRequest(db.Model):
             else:
                 dbquery = newbasequery.filter(
                                             or_(
-                                                or_(ministry_restricted_requests.isrestricted == False, ministry_restricted_requests.isrestricted == None),
+                                                or_(ministry_restricted_requests.isrestricted == False, ministry_restricted_requests.isrestricted.is_(None)),
                                                 and_(ministry_restricted_requests.isrestricted == True, FOIMinistryRequest.assignedministryperson == userid),
                                                 and_(ministry_restricted_requests.isrestricted == True, subquery_watchby.c.watchedby == userid),
                                             )
@@ -1193,7 +1193,7 @@ class FOIMinistryRequest(db.Model):
             groupfilter.append(FOIMinistryRequest.assignedministrygroup == group)
         
         #ministry advanced search show cfr onwards
-        statefilter = FOIMinistryRequest.requeststatuslabel.in_([StateName.callforrecords.name,StateName.closed.name,StateName.recordsreview.name,StateName.feeestimate.name,StateName.consult.name,StateName.ministrysignoff.name,StateName.onhold.name,StateName.deduplication.name,StateName.harmsassessment.name,StateName.response.name,StateName.peerreview.name,StateName.tagging.name,StateName.readytoscan.name])
+        statefilter = FOIMinistryRequest.requeststatuslabel.in_([StateName.callforrecords.name,StateName.closed.name,StateName.recordsreview.name,StateName.feeestimate.name,StateName.consult.name,StateName.ministrysignoff.name,StateName.onhold.name,StateName.deduplication.name,StateName.harmsassessment.name,StateName.response.name,StateName.peerreview.name,StateName.tagging.name,StateName.readytoscan.name,StateName.recordsreadyforreview.name])
 
         ministry_queue = FOIMinistryRequest.advancedsearchsubquery(params, iaoassignee, ministryassignee, userid, 'Ministry', False, isministryrestrictedfilemanager).filter(and_(or_(*groupfilter), statefilter))
 
