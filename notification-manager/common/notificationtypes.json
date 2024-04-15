@@ -87,7 +87,7 @@
         "name": "OIPC Due Reminder",
         "notificationtypelabel": "oipcduereminder"    
     },
-    "attachmentuploadevent" {
+    "attachmentuploadevent": {
         "name": "Attachment Upload Event",
         "notificationtypelabel": "attachmentuploadevent"
     }
