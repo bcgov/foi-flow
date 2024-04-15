@@ -99,7 +99,8 @@ class documentservice:
         for document in documentschema['documents']:
             if 'rrt' in document['category']:
                 #Create notification event for RRT document
-                eventservice().attachmentevent(ministryrequestid, document, userid, "add")
+                message = f'RRT Uploaded on FOI Request {ministryrequestid}'
+                eventservice().attachmentevent(ministryrequestid, document, userid, "add", message)
         #if 'rrt' in documentschema['documents']['category']:
             #Create notification event for RRT document
         #    eventservice().posteventforextension(ministryrequestid, '', userid, '' , "add")

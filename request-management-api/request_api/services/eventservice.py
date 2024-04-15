@@ -61,10 +61,9 @@ class eventservice:
         except BusinessException as exception:            
             self.__logbusinessexception(exception)
 
-    def attachmentevent(self, ministryrequestid, document, userid, event):
+    def attachmentevent(self, ministryrequestid, document, userid, event, message):
         try:
-            print("Creating rtt notification event")
-            attachmenteventresponse = attachmentevent().createattachmentevent(ministryrequestid, document, userid, event)
+            attachmenteventresponse = attachmentevent().createattachmentevent(ministryrequestid, message , userid, event)
             if attachmenteventresponse.success == False:
                 current_app.logger.error("FOI Notification failed for event for attachment= %s" % (document['category']))
         except BusinessException as exception:            

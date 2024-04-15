@@ -13,20 +13,18 @@ class attachmentevent():
     """ FOI Attachment Event management service
 
     """
-    def createattachmentevent(self, ministryrequestid, document, userid, event):
+    def createattachmentevent(self, ministryrequestid, message, userid, event):
         try:
-            message = None
             notificationtype = NotificationType().getnotificationtypeid(self.__notificationtype())
-            print(f'#### The notification type is {notificationtype}')
-            self.__createnotification(message, 'foiministryrequestid', notificationtype)
+            self.__createnotification(message, ministryrequestid, notificationtype, userid)
             return DefaultMethodResult(True, message, '')             
         except BusinessException as exception:            
             current_app.logger.error("%s,%s" % ('Attachment upload notification error', exception.message))
             return DefaultMethodResult(False,'Attachemnt notifications failed')     
 
-    def __createnotification(self, message, requestid, notificationtype):
+    def __createnotification(self, message, requestid, notificationtype, userid):
         if message is not None: 
-            return notificationservice().createremindernotification({"message" : message}, requestid, "ministryrequest", notificationtype, self.__defaultuserid())
+            return notificationservice().createnotification({"message" : message}, requestid, "ministryrequest", notificationtype, userid)
 
     def notificationmessage(self, type):
         return f"{type} Attachment Uploaded"
