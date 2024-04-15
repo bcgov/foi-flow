@@ -414,6 +414,13 @@ const AttachmentCategories = Object.freeze({
       type: ["tag"],
     },
     {
+      name: "rrt",
+      tags: ["rrt"],
+      display: "RRT",
+      bgcolor: "#003366",
+      type: ["tag"],
+    },
+    {
       // transition: Response -> On hold
       name: "response-onhold",
       tags: ["response-onhold"],

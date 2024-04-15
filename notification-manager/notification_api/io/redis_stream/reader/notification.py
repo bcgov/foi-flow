@@ -39,6 +39,7 @@ def start(consumer_id: str, start_from: StartFrom = StartFrom.latest):
     while True:
         logging.info("Reading stream...")
         messages = stream.read(last_id=last_id, block=BLOCK_TIME)
+        print("messages: ",messages)
         if messages:
             for message_id, message in messages:
                 print(f"processing {message_id}::{message}")
@@ -51,10 +52,12 @@ def start(consumer_id: str, start_from: StartFrom = StartFrom.latest):
                 logging.info(f"finished processing {message_id}")
         else:
             logging.debug(f"No new messages after ID: {last_id}")
+            print(f"No new messages after ID: {last_id}")
 
 
 def handlemessage(message_id, message):
     logging.info(f"processing {message_id}::{message}")
+    print(f"processing {message_id}::{message}")
     if message is not None:                    
         _message = json.dumps({str(key): str(value) for (key, value) in message.items()})
         _message = _message.replace("b'","'").replace("'",'') 

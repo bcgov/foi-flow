@@ -26,6 +26,7 @@ from request_api.utils.util import  cors_preflight, allowedorigins
 from request_api.exceptions import BusinessException, Error
 from request_api.services.extensionservice import extensionservice
 from request_api.schemas.foiextension import  FOIRequestExtensionSchema
+from request_api.services.eventservice import eventservice
 import asyncio
 
 import json
