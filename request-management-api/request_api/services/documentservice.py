@@ -9,6 +9,7 @@ from request_api.models.FOIRawRequests import FOIRawRequest
 from request_api.schemas.foidocument import CreateDocumentSchema
 from request_api.services.external.storageservice import storageservice
 from request_api.models.FOIApplicantCorrespondenceAttachments import FOIApplicantCorrespondenceAttachment
+from request_api.services.eventservice import eventservice
 from request_api.utils.enums import RequestType
 import logging
 
@@ -91,6 +92,14 @@ class documentservice:
 
     def createministryrequestdocument(self, ministryrequestid, documentschema, userid):
         version = self.__getversionforrequest(ministryrequestid, "ministryrequest")
+        for document in documentschema['documents']:
+            if 'rrt' in document['category']:
+                #Create notification event for RRT document
+                message = f'RRT Uploaded on FOI Request {ministryrequestid}'
+                eventservice().attachmentevent(ministryrequestid, document, userid, "add", message)
+        #if 'rrt' in documentschema['documents']['category']:
+            #Create notification event for RRT document
+        #    eventservice().posteventforextension(ministryrequestid, '', userid, '' , "add")
         return FOIMinistryRequestDocument.createdocuments(ministryrequestid, version, documentschema['documents'], userid)
 
     def createrawrequestdocument(self, requestid, documentschema, userid):
