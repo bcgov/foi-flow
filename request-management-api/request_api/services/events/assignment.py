@@ -17,7 +17,6 @@ class assignmentevent:
 
     """
     def createassignmentevent(self, requestid, requesttype, userid, isministryuser,assigneename,username):
-        print('createassignmentevent')
         changeresp = self.__haschanged(requestid, requesttype)   
         ischanged = changeresp['ischanged']
         previousassignee = changeresp['previous']
