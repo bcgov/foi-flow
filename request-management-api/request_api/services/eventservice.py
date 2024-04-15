@@ -13,6 +13,7 @@ from request_api.services.events.divisiondate import divisiondateevent
 from request_api.services.events.oipcduedate import oipcduedateevent
 from request_api.services.events.extension import extensionevent
 from request_api.services.events.cfrfeeform import cfrfeeformevent
+from request_api.services.events.attachment import attachmentevent
 from request_api.services.events.payment import paymentevent
 from request_api.services.events.email import emailevent
 from request_api.services.events.section5pending import section5pendingevent
@@ -32,6 +33,7 @@ class eventservice:
         self.posteventsync(requestid, requesttype, userid, username, isministryuser,assigneename)
     
     def posteventsync(self, requestid, requesttype, userid, username, isministryuser,assigneename=''):
+        print("\n ..... postevent is triggered ...... \n")
         try: 
             stateeventresponse = stateevent().createstatetransitionevent(requestid, requesttype, userid, username)
             divisioneventresponse = divisionevent().createdivisionevent(requestid, requesttype, userid)
@@ -56,6 +58,14 @@ class eventservice:
                 extensioneventresponse = extensionevent().createextensionevent(ministryrequestid, extensionid, userid, username, event)
                 if extensioneventresponse.success == False: 
                     current_app.logger.error("FOI Notification failed for event for extension= %s" % (extensionid))
+        except BusinessException as exception:            
+            self.__logbusinessexception(exception)
+
+    def attachmentevent(self, ministryrequestid, document, userid, event, message):
+        try:
+            attachmenteventresponse = attachmentevent().createattachmentevent(ministryrequestid, message , userid, event)
+            if attachmenteventresponse.success == False:
+                current_app.logger.error("FOI Notification failed for event for attachment= %s" % (document['category']))
         except BusinessException as exception:            
             self.__logbusinessexception(exception)
             
