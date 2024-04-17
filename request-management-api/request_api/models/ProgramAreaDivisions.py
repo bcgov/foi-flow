@@ -20,6 +20,7 @@ class ProgramAreaDivision(db.Model):
     createdby = db.Column(db.String(120), unique=False, default='system')
     updated_at = db.Column(db.DateTime, nullable=True)
     updatedby = db.Column(db.String(120), unique=False, nullable=True)
+    type = db.Column(db.String(25), unique=False, nullable=True)
     
     @classmethod
     def getallprogramareadivisons(cls):
@@ -61,6 +62,24 @@ class ProgramAreaDivision(db.Model):
     def getpersonalrequestsdivisionsandsections(cls,programareaid):
         division_schema = ProgramAreaDivisionSchema(many=True)
         query = db.session.query(ProgramAreaDivision).filter_by(programareaid=programareaid, isactive=True,specifictopersonalrequests=True).order_by(ProgramAreaDivision.name.asc())
+        return division_schema.dump(query)
+    
+    @classmethod
+    def getpersonalrequestsprogramareapeople(cls,programareaid):
+        division_schema = ProgramAreaDivisionSchema(many=True)
+        query = db.session.query(ProgramAreaDivision).filter_by(programareaid=programareaid,isactive=True,type='person',specifictopersonalrequests=True).order_by(ProgramAreaDivision.sortorder.asc(), ProgramAreaDivision.name.asc())
+        return division_schema.dump(query)
+    
+    @classmethod
+    def getpersonalrequestsprogramareavolumes(cls,programareaid):
+        division_schema = ProgramAreaDivisionSchema(many=True)
+        query = db.session.query(ProgramAreaDivision).filter_by(programareaid=programareaid,isactive=True,type='volume',specifictopersonalrequests=True).order_by(ProgramAreaDivision.sortorder.asc(), ProgramAreaDivision.name.asc())
+        return division_schema.dump(query)
+    
+    @classmethod
+    def getpersonalrequestsprogramareafiletypes(cls,programareaid):
+        division_schema = ProgramAreaDivisionSchema(many=True)
+        query = db.session.query(ProgramAreaDivision).filter_by(programareaid=programareaid,isactive=True,type='filetype',specifictopersonalrequests=True).order_by(ProgramAreaDivision.sortorder.asc(), ProgramAreaDivision.name.asc())
         return division_schema.dump(query)
     
     @classmethod
@@ -122,4 +141,4 @@ class ProgramAreaDivision(db.Model):
 
 class ProgramAreaDivisionSchema(ma.Schema):
     class Meta:
-        fields = ('divisionid','programareaid', 'name','isactive','sortorder','issection','parentid', 'specifictopersonalrequests')
+        fields = ('divisionid','programareaid','name','isactive','sortorder','issection','parentid','specifictopersonalrequests','type')

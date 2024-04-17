@@ -71,6 +71,7 @@ export default function AttachmentModal({
   replacementfiletypes = [],
   totalUploadedRecordSize = 0,
   requestType = FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_GENERAL,
+  isScanningTeamMember = false
 }) {
   let tagList = [];
   if (uploadFor === "attachment") {
@@ -129,6 +130,10 @@ export default function AttachmentModal({
   const [tagValue, setTagValue] = useState(
     uploadFor === "record" ? "" : "general"
   );
+  const [person, setPerson] = useState({});
+  const [volume, setVolume] = useState({});
+  const [fileType, setFileType] = useState({});
+  const [trackingID, setTrackingID] = useState("");
   const attchmentFileNameList = attachmentsArray.map((_file) =>
     _file.filename.toLowerCase()
   );
@@ -256,6 +261,22 @@ export default function AttachmentModal({
     setTagValue(_tagValue);
   };
 
+  const handlePersonChange = (_tagValue) => {
+    setPerson(_tagValue);
+  };
+
+  const handleVolumeChange = (_tagValue) => {
+    setVolume(_tagValue);
+  };
+
+  const handleFileTypeChange = (_tagValue) => {
+    setFileType(_tagValue);
+  };
+
+  const handleTrackingIDChange = (_tagValue) => {
+    setTrackingID(_tagValue);
+  };
+
   const handleSave = () => {
     if (modalFor.toLowerCase() === "delete") {
       handleModal(true, null, null);
@@ -263,6 +284,7 @@ export default function AttachmentModal({
       let fileInfoList = [];
 
       let fileStatusTransition = "";
+      let personalAttributes = {};
       if (modalFor === "replace" || modalFor === "replaceattachment") {
         fileStatusTransition = attachment?.category;
       } else if (uploadFor === "record") {
@@ -276,6 +298,12 @@ export default function AttachmentModal({
             MCFSections?.sections?.find(
               (division) => division.divisionid === tagValue
             )?.name;
+          personalAttributes = {
+            person: person.name,
+            filetype: fileType.name,
+            volume: volume.name,
+            trackingid: trackingID
+          }
         } else if (
           bcgovcode == "MSD" &&
           requestType == FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL
@@ -298,6 +326,7 @@ export default function AttachmentModal({
           filestatustransition: fileStatusTransition,
           filename: file.filename ? file.filename : file.name,
           filesize: file.size,
+          personalattributes: personalAttributes,
           ...(uploadFor === "record" && { divisionid: tagValue }),
         };
       });
@@ -577,11 +606,20 @@ export default function AttachmentModal({
                     )}
                     handleTagChange={handleTagChange}
                     tagValue={tagValue}
+                    handlePersonChange={handlePersonChange}
+                    person={person}
+                    handleVolumeChange={handleVolumeChange}
+                    volume={volume}
+                    handleFileTypeChange={handleFileTypeChange}
+                    fileType={fileType}
+                    handleTrackingIDChange={handleTrackingIDChange}
+                    trackingID={trackingID}
                     maxNumberOfFiles={maxNoFiles}
                     isMinistryCoordinator={isMinistryCoordinator}
                     existingDocuments={existingDocuments}
                     totalUploadedRecordSize={totalUploadedRecordSize}
                     totalRecordUploadLimit={totalRecordUploadLimit}
+                    isScanningTeamMember={isScanningTeamMember}
                   />
                 ) : bcgovcode == "MSD" && MSDSections?.divisions?.length > 0 ? (
                   <FileUploadForMSDPersonal

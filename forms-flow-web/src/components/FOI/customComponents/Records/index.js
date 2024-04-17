@@ -612,6 +612,7 @@ export const RecordsLog = ({
                   (fileInfo) => fileInfo.filename === header.filename
                 );
                 var documentDetails;
+                let personalAttributes;
                 if (modalFor === "replace") {
                   documentDetails = {
                     filename: header.filename,
@@ -642,6 +643,7 @@ export const RecordsLog = ({
                   documentDetails.attributes.trigger = "recordreplace";
                   delete documentDetails.outputdocumentmasterid;
                 } else {
+                  personalAttributes = {divisions: [{ divisionid: _fileInfo.divisionid }], ..._fileInfo.personalattributes}
                   documentDetails = {
                     s3uripath: header.filepathdb,
                     filename: header.filename,
@@ -651,6 +653,7 @@ export const RecordsLog = ({
                         ? _file.lastModifiedDate
                         : new Date(_file.lastModified),
                       filesize: _file.size,
+                      personalattributes: personalAttributes,
                     },
                   };
                 }
@@ -2258,6 +2261,7 @@ export const RecordsLog = ({
             totalUploadedRecordSize={totalUploadedRecordSize}
             replacementfiletypes={getreplacementfiletypes()}
             requestType={requestType}
+            isScanningTeamMember={isScanningTeamMember}
           />
           <div className="state-change-dialog">
             <Dialog

@@ -184,12 +184,18 @@ class FOIFlowDivisions(Resource):
             data = None                        
             if(specifictopersonalrequests is not None and specifictopersonalrequests.lower() == 'true'):                
                 match fetchmode:
-                    case 'divisions':                        
+                    case 'divisions':
                         data = divisionstageservice().getpersonalspecificdivisionandstages(bcgovcode)
-                    case 'sections':                        
+                    case 'sections':
                         data = divisionstageservice().getpersonalspecificprogramareasections(bcgovcode)
-                    case 'divisionsandsections':                        
-                        data = divisionstageservice().getpersonalspecificdivisionsandsections(bcgovcode) 
+                    case 'divisionsandsections':
+                        data = divisionstageservice().getpersonalspecificdivisionsandsections(bcgovcode)
+                    case 'people':
+                        data = divisionstageservice().getpersonalspecificpeople(bcgovcode)
+                    case 'filetypes':
+                        data = divisionstageservice().getpersonalspecificfiletypes(bcgovcode)
+                    case 'volumes':
+                        data = divisionstageservice().getpersonalspecificvolumes(bcgovcode)
                     case _:                        
                         data = divisionstageservice().getpersonalspecificdivisionandstages(bcgovcode)
             else:
