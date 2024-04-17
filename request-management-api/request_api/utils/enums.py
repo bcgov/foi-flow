@@ -157,6 +157,7 @@ class StateName(Enum):
     response = "Response"
     feeestimate = "Fee Estimate"
     recordsreview = "Records Review"
+    recordsreadyforreview = "Records Ready for Review"
     archived = "Archived"
     peerreview = "Peer Review"
     tagging = "Tagging"
