@@ -299,6 +299,7 @@ export const RecordsLog = ({
     dispatch(checkForRecordsChange(requestId, ministryId));
     //To manage enabling and disabling of download for harms package
     recordsDownloadList[1].disabled = enableHarmsDonwnload();
+    console.log("recordsObj: ", recordsObj);
   }, [recordsObj]);
 
   useEffect(() => {
@@ -342,6 +343,7 @@ export const RecordsLog = ({
       )
     ).values(),
   ];
+  console.log("divisionFilters", divisionFilters);
   if (divisionFilters?.length > 0)
     divisionFilters?.push(
       { divisionid: -1, divisionname: "All" },
@@ -2544,6 +2546,8 @@ const Attachment = React.memo(
     const classes = useStyles();
     const [disabled, setDisabled] = useState(false);
     const [isRetry, setRetry] = useState(false);
+    const [personalAtts, setPersonalAtts] = useState([]);
+
     // useEffect(() => {
     //   if(record && record.filename) {
     //     setDisabled(isMinistryCoordinator && record.category == 'personal')
@@ -2559,6 +2563,18 @@ const Attachment = React.memo(
     const handleSelect = (e) => {
       handleSelectRecord(record, e);
     };
+
+    useEffect(() => {
+      let _personalAtts = [];
+      if(record.attributes?.personalattributes) {
+        Object.entries(record.attributes?.personalattributes).forEach(([key, value]) => {
+          if(key !== "divisions" && value) {
+            _personalAtts.push({divisionname: value});
+          }
+        });
+      }
+      setPersonalAtts(_personalAtts);
+    }, [record])
 
     const recordtitle = () => {
       if (disabled) {
@@ -2736,7 +2752,7 @@ const Attachment = React.memo(
           alignItems="flex-start"
         >
           <Grid item xs={6}>
-            {record.attributes?.divisions?.map((division, i) => (
+            {[...record.attributes?.divisions, ...personalAtts].map((division, i) => (
               <Chip
                 item
                 key={i}
