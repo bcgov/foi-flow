@@ -42,16 +42,13 @@ class FOIRawRequestComment(db.Model):
         return DefaultMethodResult(True, 'Comment added', newcomment.commentid)
 
     @classmethod
-    def disablecomment(cls, commentid, userid, action=""):
+    def disablecomment(cls, commentid, userid):
         dbquery = db.session.query(FOIRawRequestComment)
-        comment = dbquery.filter_by(commentid=commentid, isactive=True)
+        comment = dbquery.filter_by(commentid=commentid)
         if(comment.count() > 0):
             childcomments = dbquery.filter_by(parentcommentid=commentid, isactive=True)
-            if (childcomments.count() > 0 and action != 'edit') :
+            if (childcomments.count() > 0) :
                 return DefaultMethodResult(False,'Cannot delete parent comment with replies',commentid)
-            elif (childcomments.count() > 0 and action == 'edit'):
-                childcomments.update({FOIRawRequestComment.isactive: False, FOIRawRequestComment.updatedby: userid,
-                            FOIRawRequestComment.updated_at: datetime.now()}, synchronize_session=False)
             comment.update({FOIRawRequestComment.isactive: False, FOIRawRequestComment.updatedby: userid,
                             FOIRawRequestComment.updated_at: datetime.now()}, synchronize_session=False)
             db.session.commit()
@@ -60,14 +57,27 @@ class FOIRawRequestComment(db.Model):
             return DefaultMethodResult(True, 'No Comment found', commentid)
 
     @classmethod
+    def deactivatecomment(cls, commentid, userid, commentsversion):   
+        dbquery = db.session.query(FOIRawRequestComment)
+        comment = dbquery.filter_by(commentid=commentid, commentsversion=commentsversion)
+        if(comment.count() > 0) :
+            comment.update({FOIRawRequestComment.isactive: False, FOIRawRequestComment.updatedby: userid,
+                            FOIRawRequestComment.updated_at: datetime.now()}, synchronize_session=False)
+            db.session.commit()
+            return DefaultMethodResult(True,'Comment deactivated',commentid)
+        else:
+            return DefaultMethodResult(True,'No Comment found',commentid) 
+        
+    @classmethod
     def updatecomment(cls, commentid, foirequestcomment, userid):
         dbquery = db.session.query(FOIRawRequestComment)
         comment = dbquery.filter_by(commentid=commentid).order_by(FOIRawRequestComment.commentsversion.desc()).first()
+        commentsversion = 0
+        existingtaggedusers = []
         if(comment.count() > 0):
             existingtaggedusers = comment.taggedusers    
-            taggedusers = foirequestcomment["taggedusers"] if 'taggedusers' in foirequestcomment  else existingtaggedusers
-        
-            commentversion = int(comment.commentversion) + 1
+            taggedusers = foirequestcomment["taggedusers"] if 'taggedusers' in foirequestcomment  else existingtaggedusers        
+            commentsversion = int(comment.commentsversion) + 1
             insertstmt = (insert(FOIRawRequestComment).values(
                 commentid= comment.commentid,
                 requestid=comment.requestid,
@@ -81,14 +91,14 @@ class FOIRawRequestComment(db.Model):
                 updated_at=datetime.now(),
                 updatedby=userid,
                 commenttypeid=comment.commenttypeid,
-                commentversion=commentversion
+                commentsversion=commentsversion
             ))
             db.session.execute(insertstmt) 
             # comment.update({FOIRawRequestComment.isactive: True, FOIRawRequestComment.comment: foirequestcomment["comment"], FOIRawRequestComment.updatedby: userid, FOIRawRequestComment.updated_at: datetime.now(),FOIRawRequestComment.taggedusers:taggedusers}, synchronize_session=False)
             db.session.commit()
-            return DefaultMethodResult(True, 'Updated Comment added', commentid, existingtaggedusers)
+            return DefaultMethodResult(True, 'Updated Comment added', commentid, existingtaggedusers, commentsversion - 1)
         else:
-            return DefaultMethodResult(True, 'No Comment found', commentid, existingtaggedusers)
+            return DefaultMethodResult(True, 'No Comment found', commentid, existingtaggedusers, commentsversion)
 
     @classmethod
     def getcomments(cls, requestid) -> DefaultMethodResult:
