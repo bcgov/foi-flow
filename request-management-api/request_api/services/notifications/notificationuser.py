@@ -15,6 +15,9 @@ class notificationuser:
     
     def getnotificationusers(self, notificationtype, requesttype, userid, foirequest, requestjson=None):
         notificationusers = []
+        print("notificationtype", notificationtype)
+        print("requesttype", requesttype)
+        print("foirequest", foirequest)
         if 'User Assignment Removal' == notificationtype:
             _users = self.__getassignees(foirequest, requesttype, notificationtype, requestjson)
         elif 'Assignment' in notificationtype:
@@ -26,7 +29,9 @@ class notificationuser:
         elif 'Group Members' in notificationtype:
             _users = self.__getgroupmembers(foirequest["assignedministrygroup"])
         elif 'Watcher' in notificationtype:
-            _users = self.__getwatchers(notificationtype, foirequest, requesttype, requestjson)        
+            _users = self.__getwatchers(notificationtype, foirequest, requesttype, requestjson)
+        elif 'Attachment Upload Event' in notificationtype:
+            _users = self.__getscanningteam()          
         else:
             _users = self.__getassignees(foirequest, requesttype, notificationtype) + self.__getwatchers(notificationtype, foirequest, requesttype)
         for user in _users:
@@ -130,4 +135,14 @@ class notificationuser:
                 notificationusers.append({"userid":user["username"], "usertype":notificationusertypelabel})
             return notificationusers 
         return []
-        
+
+    def __getscanningteam(self):
+        notificationusers = []
+        print("Sending notification to scanning team")
+        notificationusertypelabel = notificationconfig().getnotificationusertypelabel("Group Members")
+        usergroupfromkeycloak= KeycloakAdminService().getmembersbygroupname("scanningteam") 
+        if usergroupfromkeycloak is not None and len(usergroupfromkeycloak) > 0:
+            for user in usergroupfromkeycloak[0].get("members"):
+                notificationusers.append({"userid":user["username"], "usertype":notificationusertypelabel})
+            return notificationusers 
+        return [] 

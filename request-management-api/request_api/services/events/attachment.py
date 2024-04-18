@@ -13,10 +13,15 @@ class attachmentevent():
     """ FOI Attachment Event management service
 
     """
-    def createattachmentevent(self, ministryrequestid, message, userid, event):
+    def createattachmentevent(self, ministryrequestid, userid, document):
         try:
+            if 'rrt' in document['category']:
+                #Create notification event for RRT document
+                print(f"RRT Uploaded on FOI Request {ministryrequestid}")
+                message = f'RRT Uploaded on FOI Request {ministryrequestid}'
             notificationtype = NotificationType().getnotificationtypeid(self.__notificationtype())
             self.__createnotification(message, ministryrequestid, notificationtype, userid)
+            self.__createcomment(ministryrequestid, message)
             return DefaultMethodResult(True, message, '')             
         except BusinessException as exception:            
             current_app.logger.error("%s,%s" % ('Attachment upload notification error', exception.message))
@@ -25,6 +30,20 @@ class attachmentevent():
     def __createnotification(self, message, requestid, notificationtype, userid):
         if message is not None: 
             return notificationservice().createnotification({"message" : message}, requestid, "ministryrequest", notificationtype, userid)
+
+    def __createcomment(self, ministryrequestid, message):
+        if message is not None: 
+            _comment = self.__preparecomment(ministryrequestid, message)
+            return commentservice().createcomments(_comment, self.__defaultuserid(), 2)
+    
+    def __preparecomment(self, ministryrequestid, message):
+        _comment = dict()
+        _comment['comment'] = message
+        _comment['ministryrequestid'] = ministryrequestid
+        _comment['version'] = None
+        _comment['taggedusers'] = None
+        _comment['parentcommentid'] = None
+        return _comment
 
     def notificationmessage(self, type):
         return f"{type} Attachment Uploaded"
