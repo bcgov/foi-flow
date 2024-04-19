@@ -310,9 +310,28 @@ const FileUploadForMCFPersonal = ({
         </div>
 
         <div className="tagtitle">
+          <span>Select Divisional Tracking: *</span>
+        </div>  
+        {divisions.length > 0 && isMinistryCoordinator && (<>
+        <div className="taglist">
+          {divisions.map(tag =>
+            <ClickableChip
+              id={`${tag.name}Tag`}
+              key={`${tag.name}-tag`}
+              label={tag.display.toUpperCase()}
+              sx={{width: "fit-content", marginRight: "8px", marginBottom: "8px"}}
+              color="primary"
+              size="small"
+              onClick={()=>{handleTagChange(tag.name)}}
+              clicked={tagValue == tag.name}
+            />
+          )}
+        </div>
+        </>)}
+
+        <div className="tagtitle">
           <span>Select person file is associated with (IAO will have the ability to edit this when redacting records):</span>
         </div>        
-        {isScanningTeamMember && (<>
         <div className="taglist">
           {people.map(p =>
             <ClickableChip
@@ -334,12 +353,10 @@ const FileUploadForMCFPersonal = ({
             onClick={()=>{setShowAllPeople(true)}}
           />)}
         </div>
-        </>)}
 
         <div className="tagtitle">
           <span>Select volume (if required):</span>
         </div>  
-        {isScanningTeamMember && (<>
         <div className="taglist">
           {volumes.map(v =>
             <ClickableChip
@@ -361,12 +378,10 @@ const FileUploadForMCFPersonal = ({
             onClick={()=>{setShowAllVolumes(true)}}
           />)}
         </div>
-        </>)}
 
         <div className="tagtitle">
           <span>Select type of file:</span>
         </div>  
-        {isScanningTeamMember && (<>
         <div className="taglist">
           {fileTypes.map(f =>
             <ClickableChip
@@ -479,9 +494,7 @@ const FileUploadForMCFPersonal = ({
             </Paper>)}
           </Grid>
         </div>
-        </>)}
 
-        {isScanningTeamMember && (<>
         <div className="taglist">
           <TextField
             id="trackingid"
@@ -496,7 +509,6 @@ const FileUploadForMCFPersonal = ({
             disabled={disableInput}
           />
         </div>
-        </>)}
 
         <div className="tagtitle">
           <span>{
@@ -505,23 +517,6 @@ const FileUploadForMCFPersonal = ({
             :"Select the name of the section of records you are uploading. Once you have selected the section name you will be able to select the respective documents from your computer."
           }</span>
         </div>
-        {divisions.length > 0 && isMinistryCoordinator && (<>
-        <div className="taglist">
-          {divisions.map(tag =>
-            <ClickableChip
-              id={`${tag.name}Tag`}
-              key={`${tag.name}-tag`}
-              label={tag.display.toUpperCase()}
-              sx={{width: "fit-content", marginRight: "8px", marginBottom: "8px"}}
-              color="primary"
-              size="small"
-              onClick={()=>{handleTagChange(tag.name)}}
-              clicked={tagValue == tag.name}
-            />
-          )}
-        </div>
-        </>)}
-        {!isMinistryCoordinator && (<>
         <div className="taglist">
           {tagList.map(tag =>
             <ClickableChip
@@ -634,7 +629,6 @@ const FileUploadForMCFPersonal = ({
             </Paper>)}
           </Grid>
         </div>
-        </>)}
       </div>)}
       {modalFor === "add" && (<div className="tag-message-container-scanning">
         <p>Please drag and drop or add records associated with the section name you have selected above. All records upload will show under the selected section in the redaction application.</p>
