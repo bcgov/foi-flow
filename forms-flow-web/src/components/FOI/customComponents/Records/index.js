@@ -299,12 +299,52 @@ export const RecordsLog = ({
     dispatch(checkForRecordsChange(requestId, ministryId));
     //To manage enabling and disabling of download for harms package
     recordsDownloadList[1].disabled = enableHarmsDonwnload();
-    console.log("recordsObj: ", recordsObj);
   }, [recordsObj]);
 
   useEffect(() => {
     dispatch(getRecordFormats());
   }, []);
+
+
+  const MCFPeople = useSelector(
+    (state) => state.foiRequests.foiPersonalPeople
+  );
+  const MCFFiletypes = useSelector(
+    (state) => state.foiRequests.foiPersonalFiletypes
+  );
+  const MCFVolumes = useSelector(
+    (state) => state.foiRequests.foiPersonalVolumes
+  );
+  const [personFilters, setPersonFilters] = useState([]);
+  const [fileTypeFilters, setFileTypeFilters] = useState([]);
+  const [volumeFilters, setVolumeFilters] = useState([]);
+  useEffect(() => {
+    let _personFilters = [];
+    let _fileTypeFilters = [];
+    let _volumeFilters = [];
+    if(recordsObj?.records?.length > 0) {
+      recordsObj.records.forEach((record) => {
+        if(record.attributes?.personalattributes?.person && MCFPeople?.people) {
+          if(_personFilters.filter((p)=>{return p.name === record.attributes.personalattributes.person}).length === 0) {
+            _personFilters = _personFilters.concat(MCFPeople.people.filter((p)=>{return p.name === record.attributes.personalattributes.person}));
+          }
+        }
+        if(record.attributes?.personalattributes?.filetype && MCFFiletypes?.filetypes) {
+          if(_fileTypeFilters.filter((ft)=>{return ft.name === record.attributes.personalattributes.filetype}).length === 0) {
+            _fileTypeFilters = _fileTypeFilters.concat(MCFFiletypes.filetypes.filter((ft)=>{return ft.name === record.attributes.personalattributes.filetype}));
+          }
+        }
+        if(record.attributes?.personalattributes?.volume && MCFVolumes?.volumes) {
+          if(_volumeFilters.filter((v)=>{return v.name === record.attributes.personalattributes.volume}).length === 0) {
+            _volumeFilters = _volumeFilters.concat(MCFVolumes.volumes.filter((v)=>{return v.name === record.attributes.personalattributes.volume}));
+          }
+        }
+      });
+    }
+    setPersonFilters(_personFilters.sort((a, b)=>a.sortorder-b.sortorder));
+    setFileTypeFilters(_fileTypeFilters.sort((a, b)=>a.sortorder-b.sortorder));
+    setVolumeFilters(_volumeFilters.sort((a, b)=>a.sortorder-b.sortorder));
+  }, [recordsObj, MCFPeople, MCFFiletypes, MCFVolumes]);
 
   const conversionFormats = useSelector(
     (state) => state.foiRequests.conversionFormats
@@ -328,6 +368,9 @@ export const RecordsLog = ({
   }, [recordsTabSelect, conversionFormats]);
 
   const divisionFilters = [
+    ...personFilters.map((p)=>{p.divisionname=p.name; p.type='person'; return p;}),
+    ...fileTypeFilters.map((ft)=>{ft.divisionname=ft.name; ft.type='filetype'; return ft;}),
+    ...volumeFilters.map((v)=>{v.divisionname=v.name; v.type='volume'; return v;}),
     ...new Map(
       recordsObj?.records?.reduce(
         (acc, file) => [
@@ -343,7 +386,7 @@ export const RecordsLog = ({
       )
     ).values(),
   ];
-  console.log("divisionFilters", divisionFilters);
+  
   if (divisionFilters?.length > 0)
     divisionFilters?.push(
       { divisionid: -1, divisionname: "All" },
@@ -364,6 +407,7 @@ export const RecordsLog = ({
   const [updateAttachment, setUpdateAttachment] = useState({});
   const [searchValue, setSearchValue] = useState("");
   const [filterValue, setFilterValue] = useState(-1);
+  const [filterText, setFilterText] = useState("");
   const [fullnameList, setFullnameList] = useState(getFullnameList);
   const [recordsDownloadList, setRecordsDownloadList] =
     useState(RecordsDownloadList);
@@ -1434,15 +1478,17 @@ export const RecordsLog = ({
         searchAttachments(
           _.cloneDeep(recordsObj.records),
           filterValue,
-          searchValue
+          searchValue,
+          filterText
         )
       );
     } else {
       setFilterValue(-1);
+      setFilterText("");
     }
   }, [filterValue, searchValue, recordsObj]);
 
-  const searchAttachments = (_recordsArray, _filterValue, _keywordValue) => {
+  const searchAttachments = (_recordsArray, _filterValue, _keywordValue, _filterText) => {
     var filterFunction = (r) => {
       var isMatch = (
         (r.filename.toLowerCase().includes(_keywordValue?.toLowerCase()) ||
@@ -1458,6 +1504,12 @@ export const RecordsLog = ({
           ? r.attributes?.divisions?.findIndex(
               (a) => a.divisionid === _filterValue
             ) > -1
+            ||
+            r.attributes?.personalattributes?.person === _filterText
+            ||
+            r.attributes?.personalattributes?.filetype === _filterText
+            ||
+            r.attributes?.personalattributes?.volume === _filterText
           : true)
       )
       if (isMatch) {
@@ -2052,6 +2104,11 @@ export const RecordsLog = ({
                         division.divisionid === filterValue
                           ? -1
                           : division.divisionid
+                      );
+                      setFilterText(
+                        division.divisionname === filterText
+                          ? ""
+                          : division.divisionname
                       );
                     }}
                     clicked={filterValue == division.divisionid}
