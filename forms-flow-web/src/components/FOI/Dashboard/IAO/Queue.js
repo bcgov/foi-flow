@@ -69,10 +69,14 @@ const Queue = ({ userDetail, tableInfo }) => {
     );
   }, [rowsState, sortModel, keyword, requestFilter]);
 
-  const columnsRef = React.useRef(tableInfo?.columns || []);
+  let columns;
   if (requestFilter == 'unassignedRequests') {
-    columnsRef.current = tableInfo.columns.concat(tableInfo.unassignedQueueColumns)
+    columns = tableInfo?.columns.concat(tableInfo.unassignedQueueColumns)
+  } else {
+    columns = tableInfo?.columns
   }
+
+  const columnsRef = React.useRef(columns || []);
 
   const requestFilterChange = (filter) => {
     if (filter === requestFilter) {
