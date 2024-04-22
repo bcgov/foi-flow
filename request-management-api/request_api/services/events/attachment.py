@@ -18,11 +18,12 @@ class attachmentevent():
             if 'rrt' in document['category']:
                 #Create notification event for RRT document
                 print(f"RRT Uploaded on FOI Request {ministryrequestid}")
-                message = f'RRT Uploaded on FOI Request {ministryrequestid}'
-            notificationtype = NotificationType().getnotificationtypeid(self.__notificationtype())
-            self.__createnotification(message, ministryrequestid, notificationtype, userid)
-            self.__createcomment(ministryrequestid, message)
-            return DefaultMethodResult(True, message, '')             
+                #message = f'RRT Uploaded on FOI Request {ministryrequestid}'
+                message = self.notificationmessage('RRT', ministryrequestid)
+                notificationtype = NotificationType().getnotificationtypeid(self.__notificationtype())
+                self.__createnotification(message, ministryrequestid, notificationtype, userid)
+                self.__createcomment(ministryrequestid, message)
+                return DefaultMethodResult(True, message, '')             
         except BusinessException as exception:            
             current_app.logger.error("%s,%s" % ('Attachment upload notification error', exception.message))
             return DefaultMethodResult(False,'Attachemnt notifications failed')     
@@ -45,8 +46,8 @@ class attachmentevent():
         _comment['parentcommentid'] = None
         return _comment
 
-    def notificationmessage(self, type):
-        return f"{type} Attachment Uploaded"
+    def notificationmessage(self, type, ministryrequestid):
+        return f"{type} Attachment Uploaded on FOI Request {ministryrequestid}"
 
     def __notificationtype(self):
         return "Attachment Upload Event"
