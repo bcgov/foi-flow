@@ -128,7 +128,7 @@ class commentservice:
                 "userId": comment['createdby'],
                 "commentId": comment['commentid'],
                 "text": comment['comment'],
-                "dateUF":comment["created_at"],
+                "dateUF":maya.parse(comment['created_at']).iso8601(),
                 "date":  commentcreateddate.strftime('%Y %b %d | %I:%M %p'),
                 "parentCommentId":comment['parentcommentid'],
                 "commentTypeId":comment['commenttypeid'],

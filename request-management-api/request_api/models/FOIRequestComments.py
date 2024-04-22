@@ -4,10 +4,9 @@ from .db import  db, ma
 from datetime import datetime as datetime2
 from sqlalchemy.orm import relationship,backref
 from .default_method_result import DefaultMethodResult
-from sqlalchemy.dialects.postgresql import JSON, UUID
+from sqlalchemy.dialects.postgresql import JSON, UUID, insert
 from sqlalchemy.sql.expression import distinct
 from sqlalchemy import text
-from sqlalchemy.dialects.postgresql import insert
 import logging
 import json
 class FOIRequestComment(db.Model):
@@ -102,8 +101,12 @@ class FOIRequestComment(db.Model):
                 )
             )
             updatestmt = insertstmt.on_conflict_do_update(index_elements=[FOIRequestComment.commentid, FOIRequestComment.commentsversion], 
-                        set_={"ministryrequestid": comment.ministryrequestid,"version":comment.version,"taggedusers":taggedusers, "parentcommentid":comment.parentcommentid,
-                              "isactive":True, "created_at":datetime2.now(), "createdby": userid, "updated_at": datetime2.now(), "updatedby": userid, "commenttypeid": comment.commenttypeid })
+                        set_={"ministryrequestid": comment.ministryrequestid,"version":comment.version, "comment": foirequestcomment["comment"],
+                              "taggedusers":taggedusers, "parentcommentid":comment.parentcommentid, "isactive":True,  
+                              "created_at":datetime2.now(), "createdby": userid, "updated_at": datetime2.now(), "updatedby": userid, 
+                              "commenttypeid": comment.commenttypeid 
+                        }
+            )
             db.session.execute(updatestmt)            
             # comment.update({FOIRequestComment.isactive:True, FOIRequestComment.comment:foirequestcomment["comment"], FOIRequestComment.updatedby:userid, FOIRequestComment.updated_at:datetime2.now(),FOIRequestComment.taggedusers:taggedusers}, synchronize_session = False)
             db.session.commit()
@@ -120,7 +123,7 @@ class FOIRequestComment(db.Model):
         # try:
         #     sql = """SELECT distinct on (commentid) commentid, parentcommentid, commentsversion, ministryrequestid, version, comment, created_at, createdby,
         #         updated_at, updatedby, isactive, commenttypeid, taggedusers
-	    #         FROM public."FOIRequestComments" where ministryrequestid = :ministryrequestid order by commentid, commentsversion desc;"""
+	    #         FROM public."FOIRequestComments" where ministryrequestid = :ministryrequestid and isactive = true order by commentid, commentsversion desc;"""
         #     rs = db.session.execute(text(sql), {'ministryrequestid': ministryrequestid})
         #     for row in rs:
         #         # comments.append(
