@@ -38,6 +38,8 @@ const FileUploadForMCFPersonal = ({
     modalFor,
     handleTagChange,
     tagValue,
+    handlePersonalTagChange,
+    personalTag,
     handlePersonChange,
     person,
     handleVolumeChange,
@@ -306,14 +308,19 @@ const FileUploadForMCFPersonal = ({
       {(modalFor === "add" && (uploadFor === "attachment" || uploadFor === 'record')) && (<div>
 
         <div className="tagtitle">
-          <span>Select the records type, input the tracking id # and select the name of the section of records you are uploading. Once you have selected the section name you will be able to select the respective documents from your computer to add to the records log.</span>
+          <span>
+            Select the records type, input the tracking id # 
+            and select the name of the section of records you are uploading. 
+            Once you have selected the section name you will be able to 
+            select the respective documents from your computer to add to the records log.
+          </span>
         </div>
 
+        {divisions.length > 0 && isMinistryCoordinator && (<>
         <div className="tagtitle">
           <span>Select Divisional Tracking: *</span>
         </div>  
-        {divisions.length > 0 && isMinistryCoordinator && (<>
-        <div className="taglist">
+        <div className="taglist-cfdpersonal">
           {divisions.map(tag =>
             <ClickableChip
               id={`${tag.name}Tag`}
@@ -323,16 +330,16 @@ const FileUploadForMCFPersonal = ({
               color="primary"
               size="small"
               onClick={()=>{handleTagChange(tag.name)}}
-              clicked={tagValue == tag.name}
+              clicked={tagValue === tag.name}
             />
           )}
         </div>
         </>)}
 
         <div className="tagtitle">
-          <span>Select person file is associated with (IAO will have the ability to edit this when redacting records):</span>
+          <span>Select Person (IAO will have the ability to edit this when redacting records): *</span>
         </div>        
-        <div className="taglist">
+        <div className="taglist-cfdpersonal">
           {people.map(p =>
             <ClickableChip
               id={`${p.name}Tag`}
@@ -350,14 +357,15 @@ const FileUploadForMCFPersonal = ({
             key={`showallpeople-tag`}
             color="primary"
             size="small"
+            className="pluscircle"
             onClick={()=>{setShowAllPeople(true)}}
           />)}
         </div>
 
         <div className="tagtitle">
-          <span>Select volume (if required):</span>
+          <span>Select Volume:</span>
         </div>  
-        <div className="taglist">
+        <div className="taglist-cfdpersonal">
           {volumes.map(v =>
             <ClickableChip
               id={`${v.name}Tag`}
@@ -375,14 +383,15 @@ const FileUploadForMCFPersonal = ({
             key={`showallvolume-tag`}
             color="primary"
             size="small"
+            className="pluscircle"
             onClick={()=>{setShowAllVolumes(true)}}
           />)}
         </div>
 
         <div className="tagtitle">
-          <span>Select type of file:</span>
+          <span>Select File Type: *</span>
         </div>  
-        <div className="taglist">
+        <div className="taglist-cfdpersonal">
           {fileTypes.map(f =>
             <ClickableChip
               id={`${f.name}Tag`}
@@ -396,7 +405,7 @@ const FileUploadForMCFPersonal = ({
             />
           )}
         </div>
-        <div className="taglist">
+        <div className="taglist-cfdpersonal">
           <Grid
             container
             item
@@ -495,7 +504,7 @@ const FileUploadForMCFPersonal = ({
           </Grid>
         </div>
 
-        <div className="taglist">
+        <div className="taglist-cfdpersonal">
           <TextField
             id="trackingid"
             label="Tracking ID #"
@@ -511,27 +520,23 @@ const FileUploadForMCFPersonal = ({
         </div>
 
         <div className="tagtitle">
-          <span>{
-            isScanningTeamMember?
-            "Select Section Name:"
-            :"Select the name of the section of records you are uploading. Once you have selected the section name you will be able to select the respective documents from your computer."
-          }</span>
+          <span>Select Section Name:</span>
         </div>
-        <div className="taglist">
+        <div className="taglist-cfdpersonal">
           {tagList.map(tag =>
             <ClickableChip
-              id={`${tag.divisionid}Tag`}
-              key={`${tag.divisionid}-tag`}
+              id={`${tag.name}Tag`}
+              key={`${tag.name}-tag`}
               label={tag.name.toUpperCase()}
               sx={{width: "fit-content", marginRight: "8px", marginBottom: "8px"}}
               color="primary"
               size="small"
-              onClick={()=>{handleTagChange(tag.divisionid)}}
-              clicked={tagValue == tag.divisionid}
+              onClick={()=>{handlePersonalTagChange(tag);if(isScanningTeamMember){handleTagChange(tag.divisionid)}}}
+              clicked={personalTag?.name === tag.name}
             />
           )}
         </div>
-        <div className="taglist">
+        <div className="taglist-cfdpersonal">
           <Grid
             container
             item
@@ -616,14 +621,14 @@ const FileUploadForMCFPersonal = ({
             >
               {additionalTagList.map(tag =>
                 <ClickableChip
-                  id={`${tag.divisionid}Tag`}
-                  key={`${tag.divisionid}-tag`}
+                  id={`${tag.name}Tag`}
+                  key={`${tag.name}-tag`}
                   label={tag.name.toUpperCase()}
                   sx={{width: "fit-content", marginRight: "8px", marginBottom: "8px"}}
                   color="primary"
                   size="small"
-                  onClick={()=>{handleTagChange(tag.divisionid)}}
-                  clicked={tagValue == tag.divisionid}
+                  onClick={()=>{handlePersonalTagChange(tag);if(isScanningTeamMember){handleTagChange(tag.divisionid)}}}
+                  clicked={personalTag?.name === tag.name}
                 />
               )}
             </Paper>)}

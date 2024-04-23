@@ -25,6 +25,7 @@ class PersonalAttributesSchema(Schema):
     filetype = fields.Str(data_key="filetype",allow_none=True)
     volume = fields.Str(data_key="volume",allow_none=True)
     trackingid = fields.Str(data_key="trackingid",allow_none=True)
+    personaltag = fields.Str(data_key="personaltag",allow_none=True)
     divisions = fields.Nested(DivisionSchema, many=True, validate=validate.Length(min=1), required=True,allow_none=False)
 
 class CreateRecordAttributeSchema(Schema):

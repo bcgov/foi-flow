@@ -134,6 +134,7 @@ export default function AttachmentModal({
   const [volume, setVolume] = useState({});
   const [fileType, setFileType] = useState({});
   const [trackingID, setTrackingID] = useState("");
+  const [personalTag, setPersonalTag] = useState({});
   const attchmentFileNameList = attachmentsArray.map((_file) =>
     _file.filename.toLowerCase()
   );
@@ -277,6 +278,10 @@ export default function AttachmentModal({
     setTrackingID(_tagValue);
   };
 
+  const handlePersonalTagChange = (_tagValue) => {
+    setPersonalTag(_tagValue);
+  }
+
   const handleSave = () => {
     if (modalFor.toLowerCase() === "delete") {
       handleModal(true, null, null);
@@ -302,7 +307,8 @@ export default function AttachmentModal({
             person: person.name,
             filetype: fileType.name,
             volume: volume.name,
-            trackingid: trackingID
+            trackingid: trackingID,
+            personaltag: personalTag.name?personalTag.name:"TBD"
           }
         } else if (
           bcgovcode == "MSD" &&
@@ -606,6 +612,8 @@ export default function AttachmentModal({
                     )}
                     handleTagChange={handleTagChange}
                     tagValue={tagValue}
+                    handlePersonalTagChange={handlePersonalTagChange}
+                    personalTag={personalTag}
                     handlePersonChange={handlePersonChange}
                     person={person}
                     handleVolumeChange={handleVolumeChange}
