@@ -138,10 +138,6 @@ class documentservice:
                 attachmentlist.append(attachmentresponse)
                 
             documentschema = CreateDocumentSchema().load({'documents': attachmentlist})
-            for document in documentschema['documents']:
-                # Add attachment event here as we need to pass in the document
-                # to the event service to identify if the document is an RRT document.
-                attachmenteventresponse = attachmentevent().createattachmentevent(requestid, userid, document)
             return self.createrequestdocument(requestid, documentschema, None, "rawrequest")        
 
     def getattachments(self, requestid, requesttype, category):        
