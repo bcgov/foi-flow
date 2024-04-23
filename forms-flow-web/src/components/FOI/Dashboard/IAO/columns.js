@@ -237,38 +237,12 @@ const FlexTeamColumns = [
   }
 ];
 
-const unassignedQueueColumns = [
-  {
-    field: "onBehalfFormatted",
-    headerName: "ON BEHALF",
-    headerAlign: "left",
-    flex: 0.5,
-    valueGetter: (params) =>
-      params.row.onBehalfFormatted === undefined ? "N/A" : params.row.onBehalfFormatted,
-  },
-  {
-    field: "extensions",
-    headerName: "EXT.",
-    headerAlign: "left",
-    flex: 0.5,
-    valueGetter: (params) =>
-      params.row.extensions === undefined ? "N/A" : params.row.extensions,
-  },
-  {
-    field: "requestPageCount",
-    headerName: "PAGES",
-    headerAlign: "left",
-    flex: 0.5,
-  }
-];
-
 const defaultTableInfo = {
   sort: [
     { field: "defaultSorting", sort: "asc" },
     // { field: "duedate", sort: "asc" }
   ],
-  noAssignedClassName: "not-assigned",
-  unassignedQueueColumns: unassignedQueueColumns
+  noAssignedClassName: "not-assigned"
 };
 
 const getTableInfo = (userGroups) => {
