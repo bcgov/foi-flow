@@ -90,10 +90,11 @@ const ProcessingTeamColumns = [
       params.row.extensions === undefined ? "N/A" : params.row.extensions,
   },
   {
-    field: "requestPageCount",
+    field: "requestpagecount",
     headerName: "PAGES",
     headerAlign: "left",
     flex: 0.5,
+    valueGetter: (params) => parseInt(params.row.requestpagecount),
   }
 ];
 
@@ -255,10 +256,11 @@ const unassignedQueueColumns = [
       params.row.extensions === undefined ? "N/A" : params.row.extensions,
   },
   {
-    field: "requestPageCount",
+    field: "requestpagecount",
     headerName: "PAGES",
     headerAlign: "left",
     flex: 0.5,
+    valueGetter: (params) => parseInt(params.row.requestpagecount),
   }
 ];
 
