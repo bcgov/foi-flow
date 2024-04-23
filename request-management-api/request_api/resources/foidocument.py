@@ -23,6 +23,7 @@ from request_api.tracer import Tracer
 from request_api.utils.util import  cors_preflight, allowedorigins
 from request_api.exceptions import BusinessException, Error
 from request_api.services.documentservice import documentservice
+from request_api.services.eventservice import eventservice
 from request_api.schemas.foidocument import  CreateDocumentSchema, RenameDocumentSchema, ReplaceDocumentSchema, ReclassifyDocumentSchema
 import json
 from marshmallow import Schema, fields, validate, ValidationError
@@ -73,6 +74,14 @@ class CreateFOIDocument(Resource):
             requestjson = request.get_json() 
             documentschema = CreateDocumentSchema().load(requestjson)
             result = documentservice().createrequestdocument(requestid, documentschema, AuthHelper.getuserid(), requesttype)
+            # Add the RRT event here
+            print("THe version output is")
+            print(result.args[0])
+            ministryversion = result.args[0]
+            for document in documentschema['documents']:
+                # Add attachment event here as we need to pass in the document
+                # to the event service to identify if the document is an RRT document.
+                eventservice().attachmenteventservice(requestid, document, AuthHelper.getuserid(), ministryversion)
             return {'status': result.success, 'message':result.message} , 200 
         except ValidationError as err:
              return {'status': False, 'message': str(err)}, 400
