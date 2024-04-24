@@ -17,8 +17,6 @@ class attachmentevent():
         try:
             if 'rrt' in document['category']:
                 #Create notification event for RRT document
-                print(f"RRT Uploaded on FOI Request {ministryrequestid}")
-                #message = f'RRT Uploaded on FOI Request {ministryrequestid}'
                 message = self.notificationmessage('RRT', ministryrequestid)
                 notificationtype = NotificationType().getnotificationtypeid(self.__notificationtype())
                 self.__createnotification(message, ministryrequestid, notificationtype, userid)

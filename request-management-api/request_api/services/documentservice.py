@@ -11,7 +11,6 @@ from request_api.services.external.storageservice import storageservice
 from request_api.models.FOIApplicantCorrespondenceAttachments import FOIApplicantCorrespondenceAttachment
 from request_api.services.eventservice import eventservice
 from request_api.utils.enums import RequestType
-from request_api.services.events.attachment import attachmentevent
 import logging
 
 import json

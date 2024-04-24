@@ -15,9 +15,6 @@ class notificationuser:
     
     def getnotificationusers(self, notificationtype, requesttype, userid, foirequest, requestjson=None):
         notificationusers = []
-        print("notificationtype", notificationtype)
-        print("requesttype", requesttype)
-        print("foirequest", foirequest)
         if 'User Assignment Removal' == notificationtype:
             _users = self.__getassignees(foirequest, requesttype, notificationtype, requestjson)
         elif 'Assignment' in notificationtype:
@@ -138,7 +135,6 @@ class notificationuser:
 
     def __getscanningteam(self):
         notificationusers = []
-        print("Sending notification to scanning team")
         notificationusertypelabel = notificationconfig().getnotificationusertypelabel("Group Members")
         usergroupfromkeycloak= KeycloakAdminService().getmembersbygroupname("scanningteam") 
         if usergroupfromkeycloak is not None and len(usergroupfromkeycloak) > 0:
