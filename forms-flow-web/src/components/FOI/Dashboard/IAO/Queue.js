@@ -69,7 +69,7 @@ const Queue = ({ userDetail, tableInfo }) => {
     );
   }, [rowsState, sortModel, keyword, requestFilter]);
 
-  const columnsRef = React.useRef(columns || []);
+  const columnsRef = React.useRef(tableInfo?.columns || []);
 
   const requestFilterChange = (filter) => {
     if (filter === requestFilter) {
