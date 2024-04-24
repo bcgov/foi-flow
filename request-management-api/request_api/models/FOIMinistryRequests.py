@@ -440,16 +440,6 @@ class FOIMinistryRequest(db.Model):
                            ],
                            else_ = cast(FOIMinistryRequest.cfrduedate, String)).label('cfrduedate')
 
-        requestpagecount = case([
-                (and_(FOIMinistryRequest.axispagecount.isnot(None), FOIMinistryRequest.recordspagecount.isnot(None), FOIMinistryRequest.axispagecount > FOIMinistryRequest.recordspagecount),
-                    FOIMinistryRequest.axispagecount),
-                (and_(FOIMinistryRequest.recordspagecount.isnot(None)),
-                    FOIMinistryRequest.recordspagecount),
-                (and_(FOIMinistryRequest.axispagecount.isnot(None)),
-                    FOIMinistryRequest.axispagecount),
-                ],
-                else_= literal("0"))
-        
         axispagecount = case ([
             (FOIMinistryRequest.axispagecount.isnot(None), FOIMinistryRequest.axispagecount)
             ],
@@ -460,17 +450,16 @@ class FOIMinistryRequest(db.Model):
             ],
             else_= literal("0").label("recordspagecount")
         )
-        # requestpagecount = case([
-        #         (
-        #             FOIMinistryRequest.recordspagecount.isnot(None),
-        #             FOIMinistryRequest.recordspagecount
-        #         ),
-        #         (
-        #             and_(FOIMinistryRequest.recordspagecount.is_(None), FOIMinistryRequest.axispagecount.isnot(None)),
-        #             FOIMinistryRequest.axispagecount
-        #         )
-        #         ],
-        #         else_= literal("0")).label('requestpagecount')
+
+        requestpagecount = case([
+                (and_(FOIMinistryRequest.axispagecount.isnot(None), FOIMinistryRequest.recordspagecount.isnot(None), cast(axispagecount, Integer) > cast(recordspagecount, Integer)),
+                    FOIMinistryRequest.axispagecount),
+                (and_(FOIMinistryRequest.recordspagecount.isnot(None)),
+                    FOIMinistryRequest.recordspagecount),
+                (and_(FOIMinistryRequest.axispagecount.isnot(None)),
+                    FOIMinistryRequest.axispagecount),
+                ],
+                else_= literal("0"))
 
         onbehalfformatted = case([
                             (and_(onbehalf_applicant.lastname.isnot(None), onbehalf_applicant.firstname.isnot(None)),
@@ -705,16 +694,6 @@ class FOIMinistryRequest(db.Model):
     @classmethod
     def findfield(cls, x, iaoassignee, ministryassignee):
         #add more fields here if need sort/filter/search more columns
-        requestpagecount = case([
-                (and_(FOIMinistryRequest.axispagecount.isnot(None), FOIMinistryRequest.recordspagecount.isnot(None), FOIMinistryRequest.axispagecount > FOIMinistryRequest.recordspagecount),
-                    FOIMinistryRequest.axispagecount),
-                (and_(FOIMinistryRequest.recordspagecount.isnot(None)),
-                    FOIMinistryRequest.recordspagecount),
-                (and_(FOIMinistryRequest.axispagecount.isnot(None)),
-                    FOIMinistryRequest.axispagecount),
-                ],
-                else_= literal("0")).label('pagecount')
-
         axispagecount = case ([
             (FOIMinistryRequest.axispagecount.isnot(None), FOIMinistryRequest.axispagecount)
             ],
@@ -725,19 +704,16 @@ class FOIMinistryRequest(db.Model):
             ],
             else_= literal("0").label("recordspagecount")
         )
+        requestpagecount = case([
+                (and_(FOIMinistryRequest.axispagecount.isnot(None), FOIMinistryRequest.recordspagecount.isnot(None), cast(axispagecount, Integer) > cast(recordspagecount, Integer)),
+                    FOIMinistryRequest.axispagecount),
+                (and_(FOIMinistryRequest.recordspagecount.isnot(None)),
+                    FOIMinistryRequest.recordspagecount),
+                (and_(FOIMinistryRequest.axispagecount.isnot(None)),
+                    FOIMinistryRequest.axispagecount),
+                ],
+                else_= literal("0")).label('requestpagecount')
 
-        
-        # requestpagecount = case([
-        #         (
-        #             FOIMinistryRequest.recordspagecount.isnot(None),
-        #             FOIMinistryRequest.recordspagecount
-        #         ),
-        #         (
-        #             and_(FOIMinistryRequest.recordspagecount.is_(None), FOIMinistryRequest.axispagecount.isnot(None)),
-        #             FOIMinistryRequest.axispagecount
-        #         )
-        #         ],
-        #         else_= literal("'0'")).label('pagecount')
         return {
             'firstName': FOIRequestApplicant.firstname,
             'lastName': FOIRequestApplicant.lastname,
@@ -1074,28 +1050,6 @@ class FOIMinistryRequest(db.Model):
                            ],
                            else_ = cast(FOIMinistryRequest.cfrduedate, String)).label('cfrduedate')
 
-        # requestpagecount = case([
-        #         (
-        #             FOIMinistryRequest.recordspagecount.isnot(None),
-        #             FOIMinistryRequest.recordspagecount
-        #         ),
-        #         (
-        #             and_(FOIMinistryRequest.recordspagecount.is_(None), FOIMinistryRequest.axispagecount.isnot(None)),
-        #             FOIMinistryRequest.axispagecount
-        #         )
-        #         ],
-        #         else_= literal("0")).label('requestpagecount')
-        # requestpagecount = FOIMinistryRequest.getrequestpagecount(FOIMinistryRequest.recordspagecount, FOIMinistryRequest.axispagecount)
-        requestpagecount = case([
-                (and_(FOIMinistryRequest.axispagecount.isnot(None), FOIMinistryRequest.recordspagecount.isnot(None), FOIMinistryRequest.axispagecount > FOIMinistryRequest.recordspagecount),
-                    FOIMinistryRequest.axispagecount),
-                (and_(FOIMinistryRequest.recordspagecount.isnot(None)),
-                    FOIMinistryRequest.recordspagecount),
-                (and_(FOIMinistryRequest.axispagecount.isnot(None)),
-                    FOIMinistryRequest.axispagecount),
-                ],
-                else_= literal("0"))
-        
         axispagecount = case ([
             (FOIMinistryRequest.axispagecount.isnot(None), FOIMinistryRequest.axispagecount)
             ],
@@ -1106,6 +1060,15 @@ class FOIMinistryRequest(db.Model):
             ],
             else_= literal("0").label("recordspagecount")
         )
+        requestpagecount = case([
+                (and_(FOIMinistryRequest.axispagecount.isnot(None), FOIMinistryRequest.recordspagecount.isnot(None), cast(axispagecount, Integer) > cast(recordspagecount, Integer)),
+                    FOIMinistryRequest.axispagecount),
+                (and_(FOIMinistryRequest.recordspagecount.isnot(None)),
+                    FOIMinistryRequest.recordspagecount),
+                (and_(FOIMinistryRequest.axispagecount.isnot(None)),
+                    FOIMinistryRequest.axispagecount),
+                ],
+                else_= literal("0"))
 
         onbehalfformatted = case([
                             (and_(onbehalf_applicant.lastname.isnot(None), onbehalf_applicant.firstname.isnot(None)),

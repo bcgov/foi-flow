@@ -296,7 +296,7 @@ export const pagecountcellTooltipRender = (params) => {
   const requestpagecount = params.row.requestpagecount;
   let toolTipText = "";
   if (requestpagecount > 0) {
-    toolTipText = `AxisPageCount: ${axispagecount} \n FOIMODPageCount: ${recordspagecount}`;
+    toolTipText = `AXIS pages: ${axispagecount} \n Mod pages: ${recordspagecount}`;
   }
   return <LightTooltip placement="bottom-start" title={
     <div style={{whiteSpace: "pre-line"}}>
