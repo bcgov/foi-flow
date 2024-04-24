@@ -36,6 +36,7 @@ const StateDropDown = ({
   let requestDetails = useSelector(
     (state) => state.foiRequests.foiRequestDetail
   );
+  const userDetail = useSelector((state) => state.user.userDetail);
 
   React.useEffect(() => {
     if (requestState && requestState !== status) {
@@ -104,6 +105,13 @@ const StateDropDown = ({
     const personalIAO = !_isMinistryCoordinator && personalRequest;
     const previousState =
       stateTransition?.length > 0 && stateTransition[1]?.status;
+    const appendRecordsReadyForReview = (stateList) => {
+      const recordsreadyforreview = { status: "Records Ready for Review", isSelected: false };
+      let appendedList = stateList.slice();
+      appendedList.splice(-1, 0, recordsreadyforreview);
+      return appendedList;
+    }
+    const isMCFMinistryTeam = userDetail?.groups?.some(str => str.includes("MCF Ministry Team"))
     switch (_state.toLowerCase()) {
       case StateEnum.unopened.name.toLowerCase():
         return _stateList.unopened;
@@ -115,12 +123,6 @@ const StateDropDown = ({
         }
       case StateEnum.peerreview.name.toLowerCase():
         if (!isMinistryCoordinator) {
-          const appendRecordsReadyForReview = (stateList) => {
-            const recordsreadyforreview = { status: "Records Ready for Review", isSelected: false };
-            let appendedList = stateList.slice();
-            appendedList.splice(-1, 0, recordsreadyforreview);
-            return appendedList;
-          }
           //const currentStatusVersion = stateTransition[0]?.version;
           if (previousState === StateEnum.intakeinprogress.name) {
             return appendRecordsReadyForReview(_stateList.intakeinprogress);
@@ -146,8 +148,13 @@ const StateDropDown = ({
       case StateEnum.redirect.name.toLowerCase():
         return _stateList.redirect;
       case StateEnum.callforrecords.name.toLowerCase():
-        if (_isMinistryCoordinator && personalRequest)
-          return _stateList.callforrecordsforpersonal;
+        if (_isMinistryCoordinator && personalRequest) {
+          if (isMCFMinistryTeam) {
+            return appendRecordsReadyForReview(_stateList.callforrecordsforpersonal);
+          } else {
+            return _stateList.callforrecordsforpersonal;
+          }
+        }
         if (
           personalIAO &&
           (requestDetails.bcgovcode.toLowerCase() === "mcf" ||
