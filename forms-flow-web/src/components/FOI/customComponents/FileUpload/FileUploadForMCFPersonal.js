@@ -94,6 +94,7 @@ const FileUploadForMCFPersonal = ({
     const [showAdditionalFileTypes, setShowAdditionalFileTypes] = useState(false);
 
     const [isPersonSelected, setIsPersonSelected] = useState(false);
+    const [enableTrackingIDInput, setEnableTrackingIDInput] = useState(true);
 
     const handleUploadBtnClick = (e) => {
       e.stopPropagation();
@@ -310,6 +311,27 @@ const FileUploadForMCFPersonal = ({
       setAdditionalFileTypes(searchFileTypes(otherFileTypes, fileTypeSearchValue, fileType));
     },[fileTypeSearchValue, otherFileTypes, fileType])
 
+    React.useEffect(() => {
+      let filtered = [];
+      filtered = records.filter((record)=>{
+        return Object.keys(person).length !== 0 && record.attributes?.personalattributes?.person === person.name;
+      });
+
+      filtered = filtered.filter((record)=>{
+        return Object.keys(fileType).length !== 0 && record.attributes?.personalattributes?.filetype === fileType.name;
+      });
+
+      if(filtered.length > 0) {
+        if(filtered[0]?.attributes?.personalattributes?.trackingid) {
+          setEnableTrackingIDInput(false);
+          handleTrackingIDChange(filtered[0]?.attributes?.personalattributes?.trackingid);
+        }
+      } else {
+        setEnableTrackingIDInput(true);
+        handleTrackingIDChange("");
+      }
+    },[records, person, fileType])
+
     return (
     <>
       {(modalFor === "add" && (uploadFor === "attachment" || uploadFor === 'record')) && (<div>
@@ -525,7 +547,8 @@ const FileUploadForMCFPersonal = ({
             fullWidth
             onChange={handleTrackingIDUpdate}
             required={true}
-            disabled={!isPersonSelected}
+            disabled={!isPersonSelected || !enableTrackingIDInput}
+            helperText={enableTrackingIDInput?"":"If you've made an error with the file number, you will need to use the edit function in the records log."}
           />
         </div>
 
