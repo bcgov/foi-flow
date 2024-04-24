@@ -255,7 +255,14 @@ export default function AttachmentModal({
       handleModal(false);
       parseFileName(attachment);
     }
-    if (uploadFor === "record") setTagValue("");
+    if (uploadFor === "record") {
+      setTagValue("");
+      setPerson({});
+      setVolume({});
+      setFileType({});
+      setTrackingID("");
+      setPersonalTag({});
+    }
   };
 
   const handleTagChange = (_tagValue) => {
@@ -339,7 +346,14 @@ export default function AttachmentModal({
 
       handleModal(true, fileInfoList, files);
       setFiles([]);
-      if (uploadFor === "record") setTagValue("");
+      if (uploadFor === "record") {
+        setTagValue("");
+        setPerson({});
+        setVolume({});
+        setFileType({});
+        setTrackingID("");
+        setPersonalTag({});
+      }
     }
   };
   const getMessage = () => {

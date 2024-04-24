@@ -76,6 +76,9 @@ const FileUploadForMCFPersonal = ({
       (state) => state.foiRequests.foiPersonalVolumes
     );
 
+    let recordsObj = useSelector((state) => state.foiRequests.foiRequestRecords);
+    const [records, setRecords] = useState(recordsObj?.records);
+
     const [allPeople, setAllPeople] = useState(
       isMinistryCoordinator?MCFPeople?.people.filter((p)=>{return p.name !== 'PERSON 1'}):MCFPeople?.people.filter((p)=>{return p.name !== 'APPLICANT'})
     );
@@ -90,7 +93,7 @@ const FileUploadForMCFPersonal = ({
     const [additionalFileTypes, setAdditionalFileTypes] = useState([]);
     const [showAdditionalFileTypes, setShowAdditionalFileTypes] = useState(false);
 
-    const [disableInput, setDisableInput] = useState(false);
+    const [isPersonSelected, setIsPersonSelected] = useState(false);
 
     const handleUploadBtnClick = (e) => {
       e.stopPropagation();
@@ -199,11 +202,11 @@ const FileUploadForMCFPersonal = ({
         callUpdateFilesCb(updatedFilesDetails[0]);
       }
     }
-   
+
     const handleNewFileUpload = (e) => {
-        const { files: newFiles } = e.target;
-        const totalFiles = Object.entries(files).length + newFiles.length;        
-        validateFiles(newFiles, totalFiles);
+      const { files: newFiles } = e.target;
+      const totalFiles = Object.entries(files).length + newFiles.length;
+      validateFiles(newFiles, totalFiles);
     };
     const fileDrop = (e) => {
       e.preventDefault();
@@ -256,6 +259,10 @@ const FileUploadForMCFPersonal = ({
       }
       return newSectionArray;
     }
+
+    React.useEffect(() => {
+      setIsPersonSelected(Object.keys(person).length !== 0);
+    },[person])
 
     React.useEffect(() => {
       setAdditionalTagList(searchSections(otherTagList, searchValue, tagValue));
@@ -376,9 +383,10 @@ const FileUploadForMCFPersonal = ({
               size="small"
               onClick={()=>{handleVolumeChange(v)}}
               clicked={volume?.name === v.name}
+              disabled={!isPersonSelected}
             />
           )}
-          {!showAllVolumes && (<AddCircleIcon
+          {!showAllVolumes && isPersonSelected && (<AddCircleIcon
             id={`showallvolumeTag`}
             key={`showallvolume-tag`}
             color="primary"
@@ -402,6 +410,7 @@ const FileUploadForMCFPersonal = ({
               size="small"
               onClick={()=>{handleFileTypeChange(f)}}
               clicked={fileType?.name === f.name}
+              disabled={!isPersonSelected}
             />
           )}
         </div>
@@ -446,7 +455,7 @@ const FileUploadForMCFPersonal = ({
                 <label className="hideContent">Search any additional filetypes here</label>
                 <InputBase
                   id="foirecordsfilter"
-                  placeholder="Search any additional sections here"
+                  placeholder="Search any additional filetypes here"
                   defaultValue={""}
                   onChange={(e)=>{setFileTypeSearchValue(e.target.value.trim())}}
                   sx={{
@@ -464,6 +473,7 @@ const FileUploadForMCFPersonal = ({
                     </InputAdornment>
                   }
                   fullWidth
+                  disabled={!isPersonSelected}
                 />
               </Grid>
             </Paper>
@@ -515,7 +525,7 @@ const FileUploadForMCFPersonal = ({
             fullWidth
             onChange={handleTrackingIDUpdate}
             required={true}
-            disabled={disableInput}
+            disabled={!isPersonSelected}
           />
         </div>
 
@@ -533,6 +543,7 @@ const FileUploadForMCFPersonal = ({
               size="small"
               onClick={()=>{handlePersonalTagChange(tag);if(isScanningTeamMember){handleTagChange(tag.divisionid)}}}
               clicked={personalTag?.name === tag.name}
+              disabled={!isPersonSelected || trackingID===""}
             />
           )}
         </div>
@@ -595,6 +606,7 @@ const FileUploadForMCFPersonal = ({
                     </InputAdornment>
                   }
                   fullWidth
+                  disabled={!isPersonSelected || trackingID===""}
                 />
               </Grid>
             </Paper>
@@ -672,11 +684,12 @@ const FileUploadForMCFPersonal = ({
             value=""
             multiple={multipleFiles}
             accept={mimeTypes}
+            disabled={!isPersonSelected}
             />
           </div>
           <div className="file-upload-column file-upload-column-3">
             {(Object.entries(files).length === 0 && !multipleFiles) || multipleFiles ?
-            <button className="btn-add-files" type="button" onClick={handleUploadBtnClick}>              
+            <button className="btn-add-files" type="button" onClick={handleUploadBtnClick} disabled={!isPersonSelected}>              
                   Add Files
             </button>  : null}
           </div>
