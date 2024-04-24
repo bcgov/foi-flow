@@ -443,12 +443,18 @@ const FOIRequest = React.memo(({ userDetail }) => {
   };
 
   const checkValidation = (key, axisData) => {
+
     if (key === MANDATORY_FOI_REQUEST_FIELDS.TOTAL_NO_OF_PAGES) {
-      if (requestDetails["recordspagecount"] > 0)
-        return false;
-      else if ((requestDetails["axispagecount"] || axisData[key]) && requestDetails["axispagecount"] !== axisData[key])
+      if ((requestDetails["axispagecount"] || axisData[key]) && requestDetails["axispagecount"] !== axisData[key])
         return true;
       return false;
+
+
+      // if (requestDetails["recordspagecount"] > 0)
+      //   return false;
+      // else if ((requestDetails["axispagecount"] || axisData[key]) && requestDetails["axispagecount"] !== axisData[key])
+      //   return true;
+      // return false;
     }
     let mandatoryField = isMandatoryField(key);
     if (key === "additionalPersonalInfo") {
