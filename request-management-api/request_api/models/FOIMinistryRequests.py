@@ -449,7 +449,17 @@ class FOIMinistryRequest(db.Model):
                     FOIMinistryRequest.axispagecount),
                 ],
                 else_= literal("0"))
-
+        
+        axispagecount = case ([
+            (FOIMinistryRequest.axispagecount.isnot(None), FOIMinistryRequest.axispagecount)
+            ],
+            else_= literal("0").label("axispagecount")
+        )
+        recordspagecount = case ([
+            (FOIMinistryRequest.recordspagecount.isnot(None), FOIMinistryRequest.recordspagecount)
+            ],
+            else_= literal("0").label("recordspagecount")
+        )
         # requestpagecount = case([
         #         (
         #             FOIMinistryRequest.recordspagecount.isnot(None),
@@ -494,8 +504,8 @@ class FOIMinistryRequest(db.Model):
             cast(FOIMinistryRequest.filenumber, String).label('idNumber'),
             cast(FOIMinistryRequest.axisrequestid, String).label('axisRequestId'),
             cast(requestpagecount, Integer).label('requestpagecount'),
-            FOIMinistryRequest.axispagecount.label('axispagecount'),
-            FOIMinistryRequest.recordspagecount.label('recordspagecount'),            
+            axispagecount,
+            recordspagecount,
             FOIMinistryRequest.foiministryrequestid.label('ministryrequestid'),
             FOIMinistryRequest.assignedministrygroup.label('assignedministrygroup'),
             FOIMinistryRequest.assignedministryperson.label('assignedministryperson'),
@@ -695,6 +705,18 @@ class FOIMinistryRequest(db.Model):
                     FOIMinistryRequest.axispagecount),
                 ],
                 else_= literal("0")).label('pagecount')
+
+        axispagecount = case ([
+            (FOIMinistryRequest.axispagecount.isnot(None), FOIMinistryRequest.axispagecount)
+            ],
+            else_= literal("0").label("axispagecount")
+        )
+        recordspagecount = case ([
+            (FOIMinistryRequest.recordspagecount.isnot(None), FOIMinistryRequest.recordspagecount)
+            ],
+            else_= literal("0").label("recordspagecount")
+        )
+
         
         # requestpagecount = case([
         #         (
@@ -733,8 +755,8 @@ class FOIMinistryRequest(db.Model):
             'DaysLeftValue': FOIMinistryRequest.duedate,
             'ministry': func.upper(ProgramArea.bcgovcode),
             'requestpagecount': requestpagecount,
-            'axispagecount': FOIMinistryRequest.axispagecount,
-            'recordspagecount': FOIMinistryRequest.recordspagecount,
+            'axispagecount': axispagecount,
+            'recordspagecount': recordspagecount,
             'closedate': FOIMinistryRequest.closedate,
             'subjectcode': SubjectCode.name,
             'isoipcreview': FOIMinistryRequest.isoipcreview
@@ -1064,6 +1086,17 @@ class FOIMinistryRequest(db.Model):
                     FOIMinistryRequest.axispagecount),
                 ],
                 else_= literal("0"))
+        
+        axispagecount = case ([
+            (FOIMinistryRequest.axispagecount.isnot(None), FOIMinistryRequest.axispagecount)
+            ],
+            else_= literal("0").label("axispagecount")
+        )
+        recordspagecount = case ([
+            (FOIMinistryRequest.recordspagecount.isnot(None), FOIMinistryRequest.recordspagecount)
+            ],
+            else_= literal("0").label("recordspagecount")
+        )
 
         onbehalfformatted = case([
                             (and_(onbehalf_applicant.lastname.isnot(None), onbehalf_applicant.firstname.isnot(None)),
@@ -1096,8 +1129,8 @@ class FOIMinistryRequest(db.Model):
             cast(FOIMinistryRequest.filenumber, String).label('idNumber'),
             cast(FOIMinistryRequest.axisrequestid, String).label('axisRequestId'),
             cast(requestpagecount, Integer).label('requestpagecount'),
-            FOIMinistryRequest.axispagecount.label('axispagecount'),
-            FOIMinistryRequest.recordspagecount.label('recordspagecount'),          
+            axispagecount,
+            recordspagecount,          
             FOIMinistryRequest.foiministryrequestid.label('ministryrequestid'),
             FOIMinistryRequest.assignedministrygroup.label('assignedministrygroup'),
             FOIMinistryRequest.assignedministryperson.label('assignedministryperson'),

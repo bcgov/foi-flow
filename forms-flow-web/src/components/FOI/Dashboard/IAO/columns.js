@@ -6,7 +6,8 @@ import {
   displayIcon,
   displayHeaderIcon,
   displayQueueFlagIcons,
-  cellTooltipRender
+  cellTooltipRender,
+  pagecountcellTooltipRender
 } from "../utils";
 import {
   isProcessingTeam,
@@ -95,6 +96,7 @@ const ProcessingTeamColumns = [
     headerAlign: "left",
     flex: 0.5,
     valueGetter: (params) => parseInt(params.row.requestpagecount),
+    renderCell: pagecountcellTooltipRender
   }
 ];
 
@@ -261,6 +263,7 @@ const unassignedQueueColumns = [
     headerAlign: "left",
     flex: 0.5,
     valueGetter: (params) => parseInt(params.row.requestpagecount),
+    renderCell: pagecountcellTooltipRender
   }
 ];
 

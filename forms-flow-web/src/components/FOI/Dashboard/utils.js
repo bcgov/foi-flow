@@ -290,6 +290,23 @@ export const cellTooltipRender = (params) => {
   </LightTooltip>
 };
 
+export const pagecountcellTooltipRender = (params) => {
+  const axispagecount = params.row.axispagecount;
+  const recordspagecount = params.row.recordspagecount;
+  const requestpagecount = params.row.requestpagecount;
+  let toolTipText = "";
+  if (requestpagecount > 0) {
+    toolTipText = `AxisPageCount: ${axispagecount} \n FOIMODPageCount: ${recordspagecount}`;
+  }
+  return <LightTooltip placement="bottom-start" title={
+    <div style={{whiteSpace: "pre-line"}}>
+      {toolTipText}
+    </div>
+  }>
+    <span className="table-cell-truncate">{requestpagecount}</span>
+  </LightTooltip>
+};
+
 export const eventCellTooltipRender = (params) => {
 
   let notification = params.row?.notification;
