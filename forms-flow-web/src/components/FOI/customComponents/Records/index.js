@@ -49,6 +49,7 @@ import {
   getFullnameList,
   ConditionalComponent,
   isrecordtimeout,
+  isMinistryCoordinator,
 } from "../../../../helper/FOI/helper";
 import Grid from "@material-ui/core/Grid";
 import { makeStyles } from "@material-ui/core/styles";
@@ -2282,6 +2283,8 @@ export const RecordsLog = ({
                     ministryId={ministryId}
                     classes={classes}
                     handleSelectRecord={handleSelectRecord}
+                    setDivisionsModalOpen={setDivisionsModalOpen}
+                    isMCFPersonal={isMCFPersonal}
                   />
                 ))
               ) : (
@@ -2599,6 +2602,8 @@ const Attachment = React.memo(
     isMinistryCoordinator,
     ministryId,
     handleSelectRecord,
+    setDivisionsModalOpen,
+    isMCFPersonal
   }) => {
     const classes = useStyles();
     const [disabled, setDisabled] = useState(false);
@@ -2797,6 +2802,9 @@ const Attachment = React.memo(
               disabled={disabled}
               ministryId={ministryId}
               setRetry={setRetry}
+              setDivisionsModalOpen={setDivisionsModalOpen}
+              isMCFPersonal={isMCFPersonal}
+              isMinistryCoordinator={isMinistryCoordinator}
             />
           </Grid>
         </Grid>
@@ -2876,6 +2884,7 @@ const Attachment = React.memo(
             ministryId={ministryId}
             classes={classes}
             handleSelectRecord={handleSelectRecord}
+            isMCFPersonal={isMCFPersonal}
           />
         ))}
       </>
@@ -2897,6 +2906,9 @@ const AttachmentPopup = React.memo(
     disabled,
     ministryId,
     setRetry,
+    setDivisionsModalOpen,
+    isMCFPersonal,
+    isMinistryCoordinator
   }) => {
     const ref = React.useRef();
     const closeTooltip = () => (ref.current && ref ? ref.current.close() : {});
@@ -2993,7 +3005,7 @@ const AttachmentPopup = React.memo(
     //   return (<DeleteMenu />)
     // }
 
-    const ActionsPopover = ({ RestrictViewInBrowser, record }) => {
+    const ActionsPopover = ({ RestrictViewInBrowser, record, setDivisionsModalOpen, isMCFPersonal, isMinistryCoordinator }) => {
       return (
         <Popover
           anchorReference="anchorPosition"
@@ -3015,6 +3027,16 @@ const AttachmentPopup = React.memo(
           onClose={() => setPopoverOpen(false)}
         >
           <MenuList>
+            {(isMCFPersonal && !isMinistryCoordinator) && (
+              <MenuItem
+                onClick={() => {
+                  setDivisionsModalOpen(true);
+                  setPopoverOpen(false);
+                }}
+              >
+                Edit Tags
+              </MenuItem>
+            )}
             {!RestrictViewInBrowser ? (
               <MenuItem
                 onClick={() => {
@@ -3124,7 +3146,7 @@ const AttachmentPopup = React.memo(
         >
           <MoreHorizIcon />
         </IconButton>
-        <ActionsPopover RestrictViewInBrowser={true} record={record} />
+        <ActionsPopover RestrictViewInBrowser={true} record={record} setDivisionsModalOpen={setDivisionsModalOpen} isMCFPersonal={isMCFPersonal} isMinistryCoordinator={isMinistryCoordinator} />
       </>
     );
   }
