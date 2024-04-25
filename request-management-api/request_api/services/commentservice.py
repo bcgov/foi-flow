@@ -67,9 +67,7 @@ class commentservice:
         
     def getministryrequestcomments(self, ministryrequestid):
         data = FOIRequestComment.getcomments(ministryrequestid)
-        # print(f'data = {data}')
         result = self.__preparecomments(data)
-        print(f'result = {result}')
         return result
     
     def getrawrequestcomments(self, requestid):
