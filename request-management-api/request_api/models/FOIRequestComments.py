@@ -76,12 +76,12 @@ class FOIRequestComment(db.Model):
     def updatecomment(cls, commentid, foirequestcomment, userid):   
         dbquery = db.session.query(FOIRequestComment)
         comment = dbquery.filter_by(commentid=commentid).order_by(FOIRequestComment.commentsversion.desc()).first()        
-        existingtaggedusers = []
-        commentsversion = 0
+        _existingtaggedusers = []
+        _commentsversion = 0
         if comment is not None :            
-            existingtaggedusers = comment.taggedusers
-            taggedusers = foirequestcomment["taggedusers"] if 'taggedusers' in foirequestcomment  else existingtaggedusers
-            commentsversion = int(comment.commentsversion) + 1
+            _existingtaggedusers = comment.taggedusers
+            _taggedusers = foirequestcomment["taggedusers"] if 'taggedusers' in foirequestcomment  else _existingtaggedusers
+            _commentsversion = int(comment.commentsversion)
             insertstmt = (
                 insert(FOIRequestComment).
                 values(
@@ -89,7 +89,7 @@ class FOIRequestComment(db.Model):
                     ministryrequestid=comment.ministryrequestid,
                     version=comment.version,
                     comment=foirequestcomment["comment"],
-                    taggedusers=taggedusers,
+                    taggedusers=_taggedusers,
                     parentcommentid=comment.parentcommentid,
                     isactive=True,
                     created_at=datetime2.now(),
@@ -97,21 +97,21 @@ class FOIRequestComment(db.Model):
                     updated_at=datetime2.now(),
                     updatedby=userid,
                     commenttypeid=comment.commenttypeid,
-                    commentsversion=commentsversion
+                    commentsversion=_commentsversion + 1
                 )
             )
             updatestmt = insertstmt.on_conflict_do_update(index_elements=[FOIRequestComment.commentid, FOIRequestComment.commentsversion], 
                         set_={"ministryrequestid": comment.ministryrequestid,"version":comment.version, "comment": foirequestcomment["comment"],
-                              "taggedusers":taggedusers, "parentcommentid":comment.parentcommentid, "isactive":True,  
+                              "taggedusers":_taggedusers, "parentcommentid":comment.parentcommentid, "isactive":True,  
                               "created_at":datetime2.now(), "createdby": userid, "updated_at": datetime2.now(), "updatedby": userid, 
                               "commenttypeid": comment.commenttypeid 
                         }
             )
             db.session.execute(updatestmt)
             db.session.commit()
-            return DefaultMethodResult(True,'Updated Comment added',commentid, existingtaggedusers, commentsversion - 1)
+            return DefaultMethodResult(True,'Updated Comment added',commentid, _existingtaggedusers, _commentsversion)
         else:
-            return DefaultMethodResult(True,'No Comment found',commentid, existingtaggedusers, commentsversion)
+            return DefaultMethodResult(True,'No Comment found',commentid, _existingtaggedusers, _commentsversion)
             
     @classmethod
     def getcomments(cls, ministryrequestid)->DefaultMethodResult:   
