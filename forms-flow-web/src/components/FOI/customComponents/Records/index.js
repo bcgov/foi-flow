@@ -452,6 +452,8 @@ export const RecordsLog = ({
       switch (status) {
         case RecordDownloadStatus.started:
         case RecordDownloadStatus.pushedtostream:
+        case RecordDownloadStatus.redactionsummarystarted:
+        case RecordDownloadStatus.redactionsummaryuploaded:
         case RecordDownloadStatus.zippingstarted:
         case RecordDownloadStatus.zippingcompleted:
           setIsInProgress(true);

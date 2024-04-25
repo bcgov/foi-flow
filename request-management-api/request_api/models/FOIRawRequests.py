@@ -510,10 +510,10 @@ class FOIRawRequest(db.Model):
             else_ = cast(FOIRawRequest.axisrequestid, String)).label('axisRequestId')
 
         requestpagecount = case([
-            (FOIRawRequest.requestrawdata['requestPageCount'].is_(None),
+            (FOIRawRequest.requestrawdata['axispagecount'].is_(None),
             '0'),
             ],
-            else_ = cast(FOIRawRequest.requestrawdata['requestPageCount'], String)).label('requestPageCount')
+            else_ = cast(FOIRawRequest.requestrawdata['axispagecount'], String)).label('requestpagecount')
 
         intakesorting = case([
                             (FOIRawRequest.assignedto == None, # Unassigned requests first
@@ -735,7 +735,7 @@ class FOIRawRequest(db.Model):
             'requestType',
             'idNumber',
             'axisRequestId',
-            'requestPageCount',
+            'requestpagecount',
             'currentState',
             'assignedTo',
             'receivedDate',
