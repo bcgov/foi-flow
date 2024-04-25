@@ -107,8 +107,7 @@ class FOIRequestComment(db.Model):
                               "commenttypeid": comment.commenttypeid 
                         }
             )
-            db.session.execute(updatestmt)            
-            # comment.update({FOIRequestComment.isactive:True, FOIRequestComment.comment:foirequestcomment["comment"], FOIRequestComment.updatedby:userid, FOIRequestComment.updated_at:datetime2.now(),FOIRequestComment.taggedusers:taggedusers}, synchronize_session = False)
+            db.session.execute(updatestmt)
             db.session.commit()
             return DefaultMethodResult(True,'Updated Comment added',commentid, existingtaggedusers, commentsversion - 1)
         else:

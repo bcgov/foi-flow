@@ -103,8 +103,7 @@ class FOIRawRequestComment(db.Model):
                       "commenttypeid": comment.commenttypeid 
                       }
             )
-            db.session.execute(updatestmt) 
-            # comment.update({FOIRawRequestComment.isactive: True, FOIRawRequestComment.comment: foirequestcomment["comment"], FOIRawRequestComment.updatedby: userid, FOIRawRequestComment.updated_at: datetime.now(),FOIRawRequestComment.taggedusers:taggedusers}, synchronize_session=False)
+            db.session.execute(updatestmt)
             db.session.commit()
             return DefaultMethodResult(True, 'Updated Comment added', commentid, existingtaggedusers, commentsversion - 1)
         else:
