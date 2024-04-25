@@ -8,9 +8,10 @@ from request_api.models.FOIRawRequestComments import FOIRawRequestComment
 from request_api.models.FOIRawRequests import FOIRawRequest
 from request_api.services.assigneeservice import assigneeservice
 from request_api.services.watcherservice import watcherservice
+from request_api.models.default_method_result import DefaultMethodResult
 import json
 from dateutil.parser import parse
-import datetime 
+import datetime
 
 from dateutil import parser
 from dateutil import tz
@@ -43,16 +44,33 @@ class commentservice:
         return FOIRawRequestComment.disablecomment(commentid, userid)     
         
     def updateministryrequestcomment(self, commentid, data, userid):
-        FOIRequestComment.disablecomment(commentid, userid, "edit")
-        return FOIRequestComment.updatecomment(commentid, data, userid) 
+        result =  FOIRequestComment.updatecomment(commentid, data, userid)
+        deactivateresult = None
+        if result.success == True:
+            commentsversion = result.args[1]
+            if commentsversion and commentsversion > 0:
+               deactivateresult = FOIRequestComment.deactivatecomment(commentid, userid, commentsversion)
+        if result and deactivateresult:
+            return result
+        return DefaultMethodResult(False,'Error in editing comment',commentid)
 
     def updaterawrequestcomment(self, commentid, data, userid):
-        FOIRawRequestComment.disablecomment(commentid, userid)
-        return FOIRawRequestComment.updatecomment(commentid, data, userid)          
+        result = FOIRawRequestComment.updatecomment(commentid, data, userid)
+        deactivateresult = None   
+        if result.success == True:
+            commentsversion = result.args[1]
+            if commentsversion and commentsversion > 0:
+              deactivateresult = FOIRawRequestComment.deactivatecomment(commentid, userid, commentsversion)
+        if result and deactivateresult:
+            return result
+        return DefaultMethodResult(False,'Error in editing raw request comment',commentid) 
         
     def getministryrequestcomments(self, ministryrequestid):
         data = FOIRequestComment.getcomments(ministryrequestid)
-        return self.__preparecomments(data)
+        # print(f'data = {data}')
+        result = self.__preparecomments(data)
+        print(f'result = {result}')
+        return result
     
     def getrawrequestcomments(self, requestid):
         data = FOIRawRequestComment.getcomments(requestid)
@@ -110,11 +128,12 @@ class commentservice:
                 "userId": comment['createdby'],
                 "commentId": comment['commentid'],
                 "text": comment['comment'],
-                "dateUF":comment["created_at"],
+                "dateUF":maya.parse(comment['created_at']).iso8601(),
                 "date":  commentcreateddate.strftime('%Y %b %d | %I:%M %p'),
                 "parentCommentId":comment['parentcommentid'],
                 "commentTypeId":comment['commenttypeid'],
-                "taggedusers" : comment['taggedusers']
+                "taggedusers" : comment['taggedusers'],
+                "edited": comment["commentsversion"] > 1 # edited: True/False
         }     
 
     def createcommenttagginguserlist(self,type,requestid):
