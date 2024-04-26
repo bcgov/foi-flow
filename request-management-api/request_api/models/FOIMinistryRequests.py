@@ -1391,6 +1391,38 @@ class FOIMinistryRequest(db.Model):
         return db.session.query(FOIMinistryRequest.axisrequestid).filter_by(foiministryrequestid=ministryrequestid, foirequest_id=requestid).first()[0]
     
     @classmethod
+    def getrequest_by_pgmarea_type(cls,programarea, requesttype):
+        requestdetails = []
+        try:
+            sql = """select fr.axisrequestid, fr.foiministryrequestid, fr."version", fr.axispagecount
+            from "FOIMinistryRequests" fr join "FOIRequests" f 
+            ON fr.foirequest_id = f.foirequestid and fr.foirequestversion_id = f."version" 
+            where programareaid = :programarea and f.requesttype = :requesttype and fr.isactive = true
+            order by fr.created_at ;"""
+            rs = db.session.execute(text(sql), {'programarea': programarea, 'requesttype': requesttype})
+            for row in rs:
+                requestdetails.append({"axisrequestid":row["axisrequestid"], "axispagecount": row["axispagecount"], "foiministryrequestid":row["foiministryrequestid"], "version":row["version"]})
+        except Exception as ex:
+            logging.error(ex)
+            raise ex
+        finally:
+            db.session.close()
+        return requestdetails 
+    
+    @classmethod
+    def bulk_update_axispagecount(cls, requestdetails):
+        try:
+            db.session.bulk_update_mappings(FOIMinistryRequest, requestdetails)
+            db.session.commit()
+            return DefaultMethodResult(True,'Request updated', len(requestdetails))
+        except Exception as ex:
+            logging.error(ex)
+            return DefaultMethodResult(False,'Request update failed', len(requestdetails))
+        finally:
+            db.session.close() 
+
+
+    @classmethod
     def getmetadata(cls,ministryrequestid):
         requestdetails = {}
         try:
