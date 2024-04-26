@@ -29,6 +29,7 @@ class recordservice(recordservicebase):
     conversionlargefilesizelimit= getenv('CONVERSION_STREAM_SEPARATION_FILE_SIZE_LIMIT',3145728)
     stitchinglargefilesizelimit= getenv('STITCHING_STREAM_SEPARATION_FILE_SIZE_LIMIT',524288000)
     pdfstitchstreamkey_largefiles = getenv('EVENT_QUEUE_PDFSTITCH_LARGE_FILE_STREAMKEY')
+    pagecalculatorstreamkey = getenv('EVENT_QUEUE_PAGECALCULATOR_STREAM_KEY')
 
     def create(self, requestid, ministryrequestid, recordschema, userid):
         """Creates a record for a user with document details passed in for an opened request.
@@ -294,8 +295,48 @@ class recordservice(recordservicebase):
                             assignedstreamkey= self.largefilededupestreamkey
                         eventqueueservice().add(assignedstreamkey, streamobject)
         return dbresponse
-
     
+    # this is for inflight request pagecount calculation option 1
+    async def updatepagecount(self, ministryrequestid, userid):
+        streamobj = {
+            'ministryrequestid': ministryrequestid
+        }
+        job, err = self.makedocreviewerrequest('POST', '/api/pagecalculatorjobstatus', streamobj)
+        if err:
+            return DefaultMethodResult(False,'Error in contacting Doc Reviewer API for pagecalculatorjobstatus', -1, ministryrequestid)
+        else:
+            streamobj["jobid"] = job.get("id")
+            streamobj["createdby"] = userid
+        eventqueueservice().add(self.pagecalculatorstreamkey, streamobj)
+        return DefaultMethodResult(True,'Pushed to PageCountCalculator stream', job.get("id"), ministryrequestid)
+    
+    # this is for inflight request pagecount calculation option 2
+    async def calculatepagecount(self, requestid, ministryrequestid, userid):
+        uploadedrecords = FOIRequestRecord.fetch(requestid, ministryrequestid)
+        if len(uploadedrecords) > 0:
+          records, err = recordservicegetter().getdatafromdocreviewer(uploadedrecords, ministryrequestid)
+          if err is None:
+            pagecount = self.__calculatepagecount(records)
+            return FOIMinistryRequest().updaterecordspagecount(ministryrequestid, pagecount, userid) 
+        return DefaultMethodResult(True,'No request to update', ministryrequestid)
+    
+    # this is for inflight request pagecount calculation option 2
+    def __calculatepagecount(self, records):
+        print(f'records = {records}')
+        page_count = 0
+        for record in records:
+            if self.__pagecountcalculationneeded(record):
+                page_count += record.get("pagecount", 0)
+                attachments = record.get("attachments", [])
+                for attachment in attachments:
+                    if not attachment.get("isduplicate", False):
+                        page_count += attachment.get("pagecount", 0)
+        return page_count
+
+    def __pagecountcalculationneeded(self, record):
+        if not record.get("isduplicate", False) and not record["attributes"].get("isportfolio", False) and not record['attributes'].get('incompatible', False):
+            return True
+        return False
 
     
 

@@ -338,8 +338,7 @@ class FOIRawRequestReport(Resource):
     @auth.require
     def post():
         try:
-            result = unopenedreportservice().generateunopenedreport()
-            # responsecode = 200 if result.success == True else 500
-            return {'status': True, 'message': result} , 200
+            asyncio.ensure_future(unopenedreportservice().generateunopenedreport())
+            return {'status': True, 'message': 'async report function called'} , 200
         except BusinessException as exception:
             return {'status': exception.status_code, 'message':exception.message}, 500

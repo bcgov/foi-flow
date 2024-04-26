@@ -1,0 +1,290 @@
+[
+  {
+    "AXISFolder": "Adoption",
+    "MODSECTION": "ADOPTION"
+  },
+  {
+    "AXISFolder": "ADR",
+    "MODSECTION": "FAMILY GROUP"
+  },
+  {
+    "AXISFolder": "AGREEMENTS",
+    "MODSECTION": "AGREEMENTS"
+  },
+  {
+    "AXISFolder": "Assessments",
+    "MODSECTION": "ASSESSMENTS & REPORTS"
+  },
+  {
+    "AXISFolder": "ASSESSMENTS & REPORTS",
+    "MODSECTION": "ASSESSMENTS & REPORTS"
+  },
+  {
+    "AXISFolder": "ASSESSMENTS & REPORTS (EXT)",
+    "MODSECTION": "REPORTS AND ASSESSMENTS EXTERNAL"
+  },
+  {
+    "AXISFolder": "ASSESSMENTS & SERVICE PLANS (INT)",
+    "MODSECTION": "INTERNAL ASSESSMENTS AND SERVICE PLANS"
+  },
+  {
+    "AXISFolder": "ASSESSMENTS (EXT)",
+    "MODSECTION": "EXTERNAL ASSESSMENTS"
+  },
+  {
+    "AXISFolder": "ASSESSMENTS (INT)",
+    "MODSECTION": "INTERNAL ASSESSMENTS"
+  },
+  {
+    "AXISFolder": "CASE NOTES",
+    "MODSECTION": "CASE NOTES"
+  },
+  {
+    "AXISFolder": "CASE NOTES (BLACK BOOK) NOTES",
+    "MODSECTION": "CASE NOTES (BLACK BOOK) NOTES"
+  },
+  {
+    "AXISFolder": "CaseNotes",
+    "MODSECTION": "CASE NOTES"
+  },
+  {
+    "AXISFolder": "CDMediaFile",
+    "MODSECTION": "TBD"
+  },
+  {
+    "AXISFolder": "CLINICAL HISTORY",
+    "MODSECTION": "MEDICAL"
+  },
+  {
+    "AXISFolder": "CLINICIAN'S QUESTIONNAIRES & NOTES",
+    "MODSECTION": "MEDICAL"
+  },
+  {
+    "AXISFolder": "CollaborativePlanning",
+    "MODSECTION": "COLLABORATIVE PLANNING AND DECISION MAKING"
+  },
+  {
+    "AXISFolder": "Correspondence",
+    "MODSECTION": "CORRESPONDENCE"
+  },
+  {
+    "AXISFolder": "COVER SHEET",
+    "MODSECTION": "COVER SHEET"
+  },
+  {
+    "AXISFolder": "CULTURAL PLANNING & ROOTS",
+    "MODSECTION": "CULTURAL PLANNING AND ROOTS"
+  },
+  {
+    "AXISFolder": "CulturalPlanning",
+    "MODSECTION": "CULTURAL PLANNING AND ROOTS"
+  },
+  {
+    "AXISFolder": "Docs",
+    "MODSECTION": "DOCS"
+  },
+  {
+    "AXISFolder": "DOCS 2",
+    "MODSECTION": "DOCS 2"
+  },
+  {
+    "AXISFolder": "Document",
+    "MODSECTION": "DOCS"
+  },
+  {
+    "AXISFolder": "Documents",
+    "MODSECTION": "DOCS"
+  },
+  {
+    "AXISFolder": "EDUCATION",
+    "MODSECTION": "EDUCATION, EMPLOYMENT AND TRAINING"
+  },
+  {
+    "AXISFolder": "EDUCATION, EMPLOYMENT AND TRAINING",
+    "MODSECTION": "EDUCATION, EMPLOYMENT AND TRAINING"
+  },
+  {
+    "AXISFolder": "EducationEmploymentTraining",
+    "MODSECTION": "EDUCATION, EMPLOYMENT AND TRAINING"
+  },
+  {
+    "AXISFolder": "EducationTrainingPlanning",
+    "MODSECTION": "EDUCATION, EMPLOYMENT AND TRAINING"
+  },
+  {
+    "AXISFolder": "EXTERNAL ASSESSMENTS",
+    "MODSECTION": "EXTERNAL ASSESSMENTS"
+  },
+  {
+    "AXISFolder": "EXTERNAL ASSESSMENTS AND REPORTS",
+    "MODSECTION": "EXTERNAL ASSESSMENTS AND REPORTS"
+  },
+  {
+    "AXISFolder": "External Reports",
+    "MODSECTION": "EXTERNAL ASSESSMENTS AND REPORTS"
+  },
+  {
+    "AXISFolder": "ExternalAssessment",
+    "MODSECTION": "EXTERNAL ASSESSMENTS"
+  },
+  {
+    "AXISFolder": "ExternalAssessments",
+    "MODSECTION": "EXTERNAL ASSESSMENTS"
+  },
+  {
+    "AXISFolder": "FamilyGroupConferencingFamilyMediation",
+    "MODSECTION": "FAMILY GROUP"
+  },
+  {
+    "AXISFolder": "Financial",
+    "MODSECTION": "FINANCIAL"
+  },
+  {
+    "AXISFolder": "FS CPF 1-9C8LS_6.1_RappProg_ProgRep",
+    "MODSECTION": "TBD"
+  },
+  {
+    "AXISFolder": "GENERAL CORRESPONDENCE",
+    "MODSECTION": "GENERAL CORRESPONDENCE"
+  },
+  {
+    "AXISFolder": "GeneralCorrespondence",
+    "MODSECTION": "GENERAL CORRESPONDENCE"
+  },
+  {
+    "AXISFolder": "HISTORY & RECORDING",
+    "MODSECTION": "PERSONAL HISTORY AND RECORDING"
+  },
+  {
+    "AXISFolder": "HISTORY & RECORDING (PHOTOS)",
+    "MODSECTION": "PERSONAL HISTORY AND RECORDING"
+  },
+  {
+    "AXISFolder": "Incident",
+    "MODSECTION": "INCIDENTS"
+  },
+  {
+    "AXISFolder": "INSIDE BACK COVER",
+    "MODSECTION": "INSIDE BACK COVER"
+  },
+  {
+    "AXISFolder": "INSIDE FRONT COVER",
+    "MODSECTION": "INSIDE FRONT COVER"
+  },
+  {
+    "AXISFolder": "InsideFrontCover",
+    "MODSECTION": "INSIDE FRONT COVER"
+  },
+  {
+    "AXISFolder": "Intake",
+    "MODSECTION": "INTAKE"
+  },
+  {
+    "AXISFolder": "INTAKE & INCIDENT",
+    "MODSECTION": "INTAKE AND INVESTIGATION"
+  },
+  {
+    "AXISFolder": "INTAKE & INVESTIGATION",
+    "MODSECTION": "INTAKE AND INVESTIGATION"
+  },
+  {
+    "AXISFolder": "INTAKE AND INCIDENT SERVICE REQUEST AND MEMO",
+    "MODSECTION": "INTAKE AND INCIDENT SERVICE REQUEST AND MEMO"
+  },
+  {
+    "AXISFolder": "INTAKE AND INVESTIGATION",
+    "MODSECTION": "INTAKE AND INVESTIGATION"
+  },
+  {
+    "AXISFolder": "INTAKE, ASSESSMENT & RESPONSE",
+    "MODSECTION": "INTAKE ASSESSMENT AND RESPONSE"
+  },
+  {
+    "AXISFolder": "INTERNAL ASSESSMENTS",
+    "MODSECTION": "INTERNAL ASSESSMENTS"
+  },
+  {
+    "AXISFolder": "InternalAssessment",
+    "MODSECTION": "INTERNAL ASSESSMENTS"
+  },
+  {
+    "AXISFolder": "InternalAssessments",
+    "MODSECTION": "INTERNAL ASSESSMENTS"
+  },
+  {
+    "AXISFolder": "Legal",
+    "MODSECTION": "LEGAL"
+  },
+  {
+    "AXISFolder": "LEGAL & AGREEMENTS",
+    "MODSECTION": "LEGAL AND AGREEMENTS"
+  },
+  {
+    "AXISFolder": "LEGAL AND AGREEMENTS",
+    "MODSECTION": "LEGAL AND AGREEMENTS"
+  },
+  {
+    "AXISFolder": "Medical",
+    "MODSECTION": "MEDICAL"
+  },
+  {
+    "AXISFolder": "Notes",
+    "MODSECTION": "Notes"
+  },
+  {
+    "AXISFolder": "OUT OF CARE",
+    "MODSECTION": "OUT OF CARE SERVICES"
+  },
+  {
+    "AXISFolder": "PERSONAL HISTORY AND RECORDING",
+    "MODSECTION": "PERSONAL HISTORY AND RECORDING"
+  },
+  {
+    "AXISFolder": "PersonalHistory",
+    "MODSECTION": "PERSONAL HISTORY AND RECORDING"
+  },
+  {
+    "AXISFolder": "Photo",
+    "MODSECTION": "PERSONAL HISTORY AND RECORDING"
+  },
+  {
+    "AXISFolder": "Photos",
+    "MODSECTION": "PERSONAL HISTORY AND RECORDING"
+  },
+  {
+    "AXISFolder": "PLANNING",
+    "MODSECTION": "PLANNING"
+  },
+  {
+    "AXISFolder": "Recording",
+    "MODSECTION": "RECORDINGS"
+  },
+  {
+    "AXISFolder": "Reports",
+    "MODSECTION": "REPORTS"
+  },
+  {
+    "AXISFolder": "Reviews",
+    "MODSECTION": "REVIEWS"
+  },
+  {
+    "AXISFolder": "RISK ASSESSMENT",
+    "MODSECTION": "RISK ASSESSMENT"
+  },
+  {
+    "AXISFolder": "Summary",
+    "MODSECTION": "FILE SUMMARY"
+  },
+  {
+    "AXISFolder": "SummaryReport",
+    "MODSECTION": "MEDICAL"
+  },
+  {
+    "AXISFolder": "YoungOffender",
+    "MODSECTION": "YOUNG OFFENDERS ACT"
+  },
+  {
+    "AXISFolder": "YoungOffenders",
+    "MODSECTION": "YOUNG OFFENDERS ACT"
+  }
+]

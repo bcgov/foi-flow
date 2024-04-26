@@ -30,7 +30,8 @@ class requestservicebuilder(requestserviceconfigurator):
         foiministryrequest.isactive = True
         foiministryrequest.axisrequestid = requestschema.get("axisRequestId")
         foiministryrequest.axissyncdate = requestschema.get("axisSyncDate")
-        foiministryrequest.requestpagecount = requestschema.get("requestPageCount")
+        foiministryrequest.axispagecount = requestschema.get("axispagecount")
+        foiministryrequest.recordspagecount = requestschema.get("recordspagecount")
         foiministryrequest.filenumber = self.generatefilenumber(ministry["code"], requestschema.get("foirawrequestid")) if filenumber is None else filenumber
         foiministryrequest.programareaid = self.getvalueof("programArea",ministry["code"])
         foiministryrequest.description = requestschema.get("description")

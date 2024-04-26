@@ -1,6 +1,6 @@
 from enum import unique
 
-from sqlalchemy.sql.sqltypes import DateTime, String, Date
+from sqlalchemy.sql.sqltypes import DateTime, String, Date, Integer
 
 from flask.app import Flask
 from sqlalchemy.sql.schema import ForeignKey, ForeignKeyConstraint
@@ -535,10 +535,10 @@ class FOIRawRequest(db.Model):
             else_ = cast(FOIRawRequest.axisrequestid, String)).label('axisRequestId')
 
         requestpagecount = case([
-            (FOIRawRequest.requestrawdata['requestPageCount'].is_(None),
+            (FOIRawRequest.requestrawdata['axispagecount'].is_(None),
             '0'),
             ],
-            else_ = cast(FOIRawRequest.requestrawdata['requestPageCount'], String)).label('requestPageCount')
+            else_ = cast(FOIRawRequest.requestrawdata['axispagecount'], String))
 
         intakesorting = case([
                             (FOIRawRequest.assignedto == None, # Unassigned requests first
@@ -572,7 +572,9 @@ class FOIRawRequest(db.Model):
             FOIRawRequest.assignedto.label('assignedTo'),
             cast(FOIRawRequest.requestid, String).label('idNumber'),
             axisrequestid,
-            requestpagecount,
+            cast(requestpagecount, Integer).label('requestpagecount'),
+            requestpagecount.label('axispagecount'),
+            literal(None).label('recordspagecount'),
             literal(None).label('ministryrequestid'),
             literal(None).label('assignedministrygroup'),
             literal(None).label('assignedministryperson'),
@@ -648,19 +650,22 @@ class FOIRawRequest(db.Model):
         elif(additionalfilter == 'myRequests'):
             #myrequest
             return basequery.filter(and_(FOIRawRequest.status.notin_(['Archived']), FOIRawRequest.assignedto == userid))
+        elif(additionalfilter == 'unassignedRequests'):
+            return basequery.filter(and_(FOIRawRequest.status.notin_(['Archived']), FOIRawRequest.assignedto == None, FOIRawRequest.assignedgroup.in_(tuple(groups))))
         elif (additionalfilter.lower() == 'all'):
             if(isiaorestrictedfilemanager == True):
-                return basequery.filter(FOIRawRequest.status.notin_(['Archived']))
+                basequery = basequery.filter(FOIRawRequest.status.notin_(['Archived']))
             else:
                 if isprocessingteam:
-                    return basequery.filter(
+                    basequery = basequery.filter(
                         and_(
                             FOIRawRequest.status.notin_(['Archived']),
                             or_(and_(FOIRawRequest.isiaorestricted == False, FOIRawRequest.assignedgroup.in_(ProcessingTeamWithKeycloackGroup.list()), FOIRawRequest.assignedgroup.in_(tuple(groups))), and_(FOIRawRequest.isiaorestricted == True, FOIRawRequest.assignedto == userid))))
-                return basequery.filter(
+                basequery = basequery.filter(
                     and_(
                         FOIRawRequest.status.notin_(['Archived']),
                         or_(and_(FOIRawRequest.isiaorestricted == False, FOIRawRequest.assignedgroup == "Intake Team"), and_(FOIRawRequest.isiaorestricted == True, FOIRawRequest.assignedto == userid))))
+            return basequery.filter(FOIRawRequest.assignedto != None)
         else:
             if(isiaorestrictedfilemanager == True):
                 return basequery.filter(FOIRawRequest.status.notin_(['Archived']))
@@ -757,7 +762,7 @@ class FOIRawRequest(db.Model):
             'requestType',
             'idNumber',
             'axisRequestId',
-            'requestPageCount',
+            'requestpagecount',
             'currentState',
             'assignedTo',
             'receivedDate',
@@ -1103,7 +1108,10 @@ class FOIRawRequest(db.Model):
     def getunopenedunactionedrequests(cls, startdate, enddate):
         try:
             requests = []
-            sql = '''select rr.created_at, rr.requestrawdata, rr.requestid, coalesce(p.status, '') as status from public."FOIRawRequests" rr
+            sql = '''select rr.created_at, rr.requestrawdata, rr.requestid, coalesce(p.status, '') as status,
+                         coalesce(p.transaction_number, '') as txnno,
+                         coalesce(p.total::text, '') as fee
+                    from public."FOIRawRequests" rr
                     join (
                         select max(version) as version, requestid from public."FOIRawRequests"
                         group by requestid
@@ -1123,7 +1131,9 @@ class FOIRawRequest(db.Model):
                     "requestid": row["requestid"],
                     "created_at": row["created_at"],
                     "requestrawdata": row["requestrawdata"],
-                    "paymentstatus": row["status"]
+                    "paymentstatus": row["status"],
+                    "fee": row["fee"],
+                    "txnno": row["txnno"]
                 })
         except Exception as ex:
             logging.error(ex)
@@ -1141,7 +1151,7 @@ class FOIRawRequest(db.Model):
                         select max(version) as version, requestid from public."FOIRawRequests"
                         group by requestid
                     ) mv on mv.requestid = rr.requestid and mv.version = rr.version
-                    where status = 'Intake in Progress' and (
+                    where (
                         requestrawdata->>'lastName' ilike :lastName
                         or requestrawdata->>'firstName' ilike :firstName
                         or requestrawdata->>'email' ilike :email
@@ -1172,4 +1182,4 @@ class FOIRawRequest(db.Model):
 
 class FOIRawRequestSchema(ma.Schema):
     class Meta:
-        fields = ('requestid', 'requestrawdata', 'status', 'requeststatuslabel', 'notes','created_at','wfinstanceid','version','updated_at','assignedgroup','assignedto','updatedby','createdby','sourceofsubmission','ispiiredacted','assignee.firstname','assignee.middlename', 'assignee.lastname', 'axisrequestid', 'axissyncdate', 'linkedrequests', 'closedate','isiaorestricted')
+        fields = ('requestid', 'requestrawdata', 'status', 'requeststatuslabel', 'notes','created_at','wfinstanceid','version','updated_at','assignedgroup','assignedto','updatedby','createdby','sourceofsubmission','ispiiredacted','assignee.firstname','assignee.lastname', 'axisrequestid', 'axissyncdate', 'linkedrequests', 'closedate','isiaorestricted')
