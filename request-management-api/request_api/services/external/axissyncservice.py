@@ -20,7 +20,7 @@ class axissyncservice:
             #Fetch pagecount from axis : Begin
             
             #Fetch pagecount from axis : End
-            response = FOIMinistryRequest.bulk_update_axispagecount(self.updatepagecount(batchedrequests, None))
+            response = FOIMinistryRequest.bulk_update_axispagecount(self.updatepagecount(batchedrequests, {}))
             if response.success == False:
                 print("batch update failed for ids=", axisids)
         
