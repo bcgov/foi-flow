@@ -74,14 +74,7 @@ class CreateFOIDocument(Resource):
             requestjson = request.get_json() 
             documentschema = CreateDocumentSchema().load(requestjson)
             result = documentservice().createrequestdocument(requestid, documentschema, AuthHelper.getuserid(), requesttype)
-            # Add the RRT event here
-            print("THe version output is")
-            print(result.args[0])
-            ministryversion = result.args[0]
-            for document in documentschema['documents']:
-                # Add attachment event here as we need to pass in the document
-                # to the event service to identify if the document is an RRT document.
-                eventservice().attachmenteventservice(requestid, document, AuthHelper.getuserid(), ministryversion)
+            eventservice().attachmenteventservice(requestid, documentschema['documents'], AuthHelper.getuserid())
             return {'status': result.success, 'message':result.message} , 200 
         except ValidationError as err:
              return {'status': False, 'message': str(err)}, 400

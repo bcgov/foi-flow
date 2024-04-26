@@ -13,15 +13,17 @@ class attachmentevent():
     """ FOI Attachment Event management service
 
     """
-    def createattachmentevent(self, ministryrequestid, userid, document, ministryversion):
+    def createattachmentevent(self, ministryrequestid, userid, documents):
         try:
-            if 'rrt' in document['category']:
-                #Create notification event for RRT document
-                message = self.notificationmessage('RRT', ministryrequestid)
-                notificationtype = NotificationType().getnotificationtypeid(self.__notificationtype())
-                self.__createnotification(message, ministryrequestid, notificationtype, userid)
-                self.__createcomment(ministryrequestid, message, ministryversion, userid)
-            return DefaultMethodResult(True, message, '')             
+            for document in documents:
+                if 'rrt' in document['category']:
+                    #Create notification event for RRT document
+                    ministryversion = FOIMinistryRequest.getversionforrequest(ministryrequestid)
+                    message = self.notificationmessage('RRT', ministryrequestid)
+                    notificationtype = NotificationType().getnotificationtypeid(self.__notificationtype())
+                    self.__createnotification(message, ministryrequestid, notificationtype, userid)
+                    self.__createcomment(ministryrequestid, message, ministryversion, userid)
+                    return DefaultMethodResult(True, message, '')             
         except BusinessException as exception:            
             current_app.logger.error("%s,%s" % ('Attachment upload notification error', exception.message))
             return DefaultMethodResult(False,'Attachemnt notifications failed')     

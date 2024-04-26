@@ -101,7 +101,7 @@ class FOIMinistryRequestDocument(db.Model):
             newdocuments.append(FOIMinistryRequestDocument(documentpath=document["documentpath"], version='1', filename=document["filename"], category=document["category"], isactive=True, foiministryrequest_id=ministryrequestid, foiministryrequestversion_id=ministryrequestversion, created_at=createdat, createdby=createuserid))
         db.session.add_all(newdocuments)
         db.session.commit()               
-        return DefaultMethodResult(True,'Documents created',None,  ministryrequestversion)   
+        return DefaultMethodResult(True,'Documents created')   
     
     @classmethod
     def createdocument(cls,ministryrequestid,ministryrequestversion, document, userid):

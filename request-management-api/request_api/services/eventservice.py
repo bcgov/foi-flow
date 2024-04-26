@@ -145,9 +145,9 @@ class eventservice:
         except BusinessException as exception:            
             self.__logbusinessexception(exception)
 
-    def attachmenteventservice(self, ministryrequestid, document, userid, ministryversion):
+    def attachmenteventservice(self, ministryrequestid, document, userid):
         try:
-            attachmenteventresponse = attachmentevent().createattachmentevent(ministryrequestid, userid, document, ministryversion)
+            attachmenteventresponse = attachmentevent().createattachmentevent(ministryrequestid, userid, document)
             if attachmenteventresponse.success == False:
                 current_app.logger.error("FOI Notification failed for event for attachment= %s" % (document['category']))
         except BusinessException as exception:            

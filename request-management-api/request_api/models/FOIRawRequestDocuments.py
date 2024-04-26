@@ -65,7 +65,7 @@ class FOIRawRequestDocument(db.Model):
             newdocuments.append(FOIRawRequestDocument(documentpath=document["documentpath"], version='1', filename=document["filename"], category=document["category"], isactive=True, foirequest_id=requestid, foirequestversion_id=requestversion, created_at=createdat, createdby=createuserid))
         db.session.add_all(newdocuments)
         db.session.commit()               
-        return DefaultMethodResult(True,'Documents created', None, requestversion)   
+        return DefaultMethodResult(True,'Documents created')   
     
 
     @classmethod
