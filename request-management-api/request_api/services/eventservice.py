@@ -61,14 +61,6 @@ class eventservice:
         except BusinessException as exception:            
             self.__logbusinessexception(exception)
 
-    def attachmentevent(self, ministryrequestid, document, userid, event, message):
-        try:
-            attachmenteventresponse = attachmentevent().createattachmentevent(ministryrequestid, message , userid, event)
-            if attachmenteventresponse.success == False:
-                current_app.logger.error("FOI Notification failed for event for attachment= %s" % (document['category']))
-        except BusinessException as exception:            
-            self.__logbusinessexception(exception)
-            
     def postreminderevent(self):
         try:
             cfreventresponse = cfrdateevent().createdueevent() 
@@ -150,5 +142,13 @@ class eventservice:
             cfrfeeeventresponse = cfrfeeformevent().createstatetransitionevent(ministryrequestid, userid, username)
             if cfrfeeeventresponse.success == False: 
                 current_app.logger.error("FOI Notification failed for event for CFRFEEFORM= %s" % (ministryrequestid))
+        except BusinessException as exception:            
+            self.__logbusinessexception(exception)
+
+    def attachmenteventservice(self, ministryrequestid, document, userid):
+        try:
+            attachmenteventresponse = attachmentevent().createattachmentevent(ministryrequestid, userid, document)
+            if attachmenteventresponse.success == False:
+                current_app.logger.error("FOI Notification failed for event for attachment= %s" % (document['category']))
         except BusinessException as exception:            
             self.__logbusinessexception(exception)

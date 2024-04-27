@@ -92,14 +92,6 @@ class documentservice:
 
     def createministryrequestdocument(self, ministryrequestid, documentschema, userid):
         version = self.__getversionforrequest(ministryrequestid, "ministryrequest")
-        for document in documentschema['documents']:
-            if 'rrt' in document['category']:
-                #Create notification event for RRT document
-                message = f'RRT Uploaded on FOI Request {ministryrequestid}'
-                eventservice().attachmentevent(ministryrequestid, document, userid, "add", message)
-        #if 'rrt' in documentschema['documents']['category']:
-            #Create notification event for RRT document
-        #    eventservice().posteventforextension(ministryrequestid, '', userid, '' , "add")
         return FOIMinistryRequestDocument.createdocuments(ministryrequestid, version, documentschema['documents'], userid)
 
     def createrawrequestdocument(self, requestid, documentschema, userid):
