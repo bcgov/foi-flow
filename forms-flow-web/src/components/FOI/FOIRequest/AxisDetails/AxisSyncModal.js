@@ -105,11 +105,6 @@ const AxisSyncModal = ({ axisSyncModalOpen, setAxisSyncModalOpen, saveRequestObj
         if ((saveRequestObject["axispagecount"] || requestDetailsFromAxis[key]) && saveRequestObject["axispagecount"] !== requestDetailsFromAxis[key])
           return true;
         return false;
-        // if (saveRequestObject["recordspagecount"] > 0)
-        //   return false;
-        // else if ((saveRequestObject["axispagecount"] || requestDetailsFromAxis[key]) && saveRequestObject["axispagecount"] !== requestDetailsFromAxis[key])
-        //   return true;
-        // return false;
       }
       let mandatoryField = isMandatoryField(key);
       if(mandatoryField && !requestDetailsFromAxis[key])

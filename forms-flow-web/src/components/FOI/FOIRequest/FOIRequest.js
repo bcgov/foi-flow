@@ -448,13 +448,6 @@ const FOIRequest = React.memo(({ userDetail }) => {
       if ((requestDetails["axispagecount"] || axisData[key]) && requestDetails["axispagecount"] !== axisData[key])
         return true;
       return false;
-
-
-      // if (requestDetails["recordspagecount"] > 0)
-      //   return false;
-      // else if ((requestDetails["axispagecount"] || axisData[key]) && requestDetails["axispagecount"] !== axisData[key])
-      //   return true;
-      // return false;
     }
     let mandatoryField = isMandatoryField(key);
     if (key === "additionalPersonalInfo") {

@@ -287,6 +287,7 @@ class recordservice(recordservicebase):
                             assignedstreamkey =self.conversionstreamkey
                         else:
                             assignedstreamkey =self.largefileconversionstreamkey
+                        print(streamobject)
                         eventqueueservice().add(assignedstreamkey, streamobject)
                     if extension in DEDUPE_FILE_TYPES:
                         if 'convertedfilesize' in entry['attributes'] and entry['attributes']['convertedfilesize'] < int(self.dedupelargefilesizelimit) or 'convertedfilesize' not in entry['attributes'] and entry['attributes']['filesize'] < int(self.dedupelargefilesizelimit):
