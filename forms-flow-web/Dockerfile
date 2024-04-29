@@ -1,6 +1,6 @@
 # base image
 # FROM node:14.17.0-alpine as build-stage
-FROM artifacts.developer.gov.bc.ca/docker-remote/node:14.17.0-alpine as build-stage
+FROM artifacts.developer.gov.bc.ca/docker-remote/node:20.10.0-alpine as build-stage
 
 # set working directory
 WORKDIR /forms-flow-web/app
@@ -88,7 +88,7 @@ RUN npm install --unsafe-perm
 COPY . /forms-flow-web/app/
 RUN npm run build
 
-FROM artifacts.developer.gov.bc.ca/docker-remote/nginx:1.17 as production-stage
+FROM artifacts.developer.gov.bc.ca/docker-remote/nginx:1.25.3 as production-stage
 RUN mkdir /app
 COPY --from=build-stage /forms-flow-web/app/build /usr/share/nginx/html
 COPY nginx.conf /etc/nginx/nginx.conf

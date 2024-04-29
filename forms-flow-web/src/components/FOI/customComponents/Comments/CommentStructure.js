@@ -262,7 +262,7 @@ const CommentStructure = ({ i, reply, parentId, totalcommentCount, currentIndex,
           <NewCommentIndicator commentdate={i.dateUF}/>
           <div className="commentsTwo">
 
-            <div className="fullName">{fullName} </div> |  <div className="commentdate">{i.date} </div>
+            <div className="fullName">{fullName} </div> |  <div className="commentdate">{i.date} </div>  <div className="commentdate">{i.edited ? "Edited": ""} </div>
 
           </div>
           <div className="commenttext" dangerouslySetInnerHTML={{ __html: getHtmlfromRawContent() }} >

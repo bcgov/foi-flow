@@ -406,6 +406,8 @@ export const RecordsLog = ({
       switch (status) {
         case RecordDownloadStatus.started:
         case RecordDownloadStatus.pushedtostream:
+        case RecordDownloadStatus.redactionsummarystarted:
+        case RecordDownloadStatus.redactionsummaryuploaded:
         case RecordDownloadStatus.zippingstarted:
         case RecordDownloadStatus.zippingcompleted:
           setIsInProgress(true);
@@ -1116,12 +1118,37 @@ export const RecordsLog = ({
       if(record.attachments && !record.isselected) {
         for(let attachment of record.attachments) {
           if(attachment.isselected) {
-            selected.push(record);
-            break;
+            selected.push(attachment);
           }
         }
       }
     }
+
+    // rename files with duplicate filename
+    for (let record of selected) {
+      var filename = record.filename;
+      var divisionname = record.attributes.divisions[0].divisionname;
+
+      if(!record.newfilename) {
+        let duplicatename = selected.filter((_record) => (_record.filename == filename));
+        if(duplicatename.length > 1) {
+          record.newfilename = filename.substring(0, filename.lastIndexOf(".")) + "_" + divisionname + filename.substring(filename.lastIndexOf("."));
+        }
+
+        let duplicatenamedivision = duplicatename.filter((_record) => (_record.attributes.divisions[0].divisionname == divisionname));
+        if(duplicatenamedivision.length > 1) {
+          let counter = 0;
+          for (let duprecord of duplicatenamedivision) {
+            if(counter == 1)
+              duprecord.newfilename = filename.substring(0, filename.lastIndexOf(".")) + "_" + divisionname + "_Duplicate" + filename.substring(filename.lastIndexOf("."));
+            if(counter > 1)
+              duprecord.newfilename = filename.substring(0, filename.lastIndexOf(".")) + "_" + divisionname + "_Duplicate (" + counter + ")" + filename.substring(filename.lastIndexOf("."));
+            counter++;
+          }
+        }
+      }
+    }
+
     const toastID = toast.loading(
       "Downloading files (" + completed + "/" + selected.length + ")"
     );
@@ -1129,11 +1156,12 @@ export const RecordsLog = ({
       for (let record of selected) {
         var filepath = record.s3uripath;
         var filename = record.filename;
-        if (record.isduplicate) {
-          let duplicatefiles = selected.filter((_record) => _record.filename == record.filename);
-          if(duplicatefiles.length > 1)
-            filename = filename.substring(0, filename.lastIndexOf(".")) + "_" + record.attributes.divisions[0].divisionname + "_" + Date.now() + filename.substring(filename.lastIndexOf("."));
+
+        if(record.newfilename) {
+          filename = record.newfilename;
+          record.newfilename = null;
         }
+
         const response = await getFOIS3DocumentPreSignedUrl(
           filepath.split("/").slice(4).join("/"),
           ministryId,
@@ -1181,7 +1209,7 @@ export const RecordsLog = ({
       saveAs(blobs[0].input, blobs[0].name);
     } else {
       const zipfile = await downloadZip(blobs).blob();
-      saveAs(zipfile, requestNumber + " Records - " + ".zip");
+      saveAs(zipfile, requestNumber + " Records" + ".zip");
     }
   };
 
@@ -1413,26 +1441,29 @@ export const RecordsLog = ({
 
   const searchAttachments = (_recordsArray, _filterValue, _keywordValue) => {
     var filterFunction = (r) => {
-      if (r.attachments?.length > 0) {
+      var isMatch = (
+        (r.filename.toLowerCase().includes(_keywordValue?.toLowerCase()) ||
+          r.createdby.toLowerCase().includes(_keywordValue?.toLowerCase())) &&
+        (_filterValue === -3
+          ? r.attributes?.incompatible
+          : _filterValue === -2
+          ? !r.isredactionready &&
+            !r.attributes?.incompatible &&
+            (r.failed ||
+              isrecordtimeout(r.created_at, RECORD_PROCESSING_HRS) == true)
+          : _filterValue > -1
+          ? r.attributes?.divisions?.findIndex(
+              (a) => a.divisionid === _filterValue
+            ) > -1
+          : true)
+      )
+      if (isMatch) {
+        return true;
+      } else if (r.attachments?.length > 0) {
         r.attachments = r.attachments.filter(filterFunction);
         return r.attachments.length > 0;
       } else {
-        return (
-          (r.filename.toLowerCase().includes(_keywordValue?.toLowerCase()) ||
-            r.createdby.toLowerCase().includes(_keywordValue?.toLowerCase())) &&
-          (_filterValue === -3
-            ? r.attributes?.incompatible
-            : _filterValue === -2
-            ? !r.isredactionready &&
-              !r.attributes?.incompatible &&
-              (r.failed ||
-                isrecordtimeout(r.created_at, RECORD_PROCESSING_HRS) == true)
-            : _filterValue > -1
-            ? r.attributes?.divisions?.findIndex(
-                (a) => a.divisionid === _filterValue
-              ) > -1
-            : true)
-        );
+        return false;
       }
     };
     setIsAllSelected(false);
@@ -1556,12 +1587,11 @@ export const RecordsLog = ({
           for(let attachment of record.attachments) {
             if(attachment.isselected) {
               fileCount++;
-              totalFileSize += record.attributes.filesize;
+              totalFileSize += parseInt(attachment.attributes.filesize);
+
 
               if(fileCount > recordlimit || totalFileSize > sizelimt)
-              return true;
-
-              break;
+                return true;
             }
           }
         }

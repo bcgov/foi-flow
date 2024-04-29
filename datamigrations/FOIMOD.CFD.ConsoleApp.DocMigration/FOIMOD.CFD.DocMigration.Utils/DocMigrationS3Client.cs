@@ -31,6 +31,7 @@ namespace FOIMOD.CFD.DocMigration.Utils
         {
             var presignedPutURL = this.GetPresignedURL(_s3Client, string.Format("{0}/{1}",file.SubFolderPath,file.DestinationFileName), HttpVerb.PUT);
             using var client = new HttpClient();
+            client.Timeout = TimeSpan.FromMinutes(30);
             file.FileStream.Position = 0;
             using (StreamContent strm = new(file.FileStream))
             {
