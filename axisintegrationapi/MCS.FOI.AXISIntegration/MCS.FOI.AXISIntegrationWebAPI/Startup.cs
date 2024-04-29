@@ -45,6 +45,8 @@ namespace MCS.FOI.AXISIntegrationWebAPI
             var serviceProvider = services.BuildServiceProvider();            
             var requestlogger = serviceProvider.GetService<ILogger<RequestSearchController>>();
             services.AddSingleton(typeof(ILogger), requestlogger);
+            var requestpagecountlogger = serviceProvider.GetService<ILogger<RequestsPageCountController>>();
+            services.AddSingleton(typeof(ILogger), requestpagecountlogger);
             services.AddScoped<IRequestDA, RequestsDA>();
             services.AddScoped<IFOIFlowRequestUserDA,FOIFlowRequestUsersDA>();
             

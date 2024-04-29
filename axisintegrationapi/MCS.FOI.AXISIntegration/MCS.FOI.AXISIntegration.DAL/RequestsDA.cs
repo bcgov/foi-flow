@@ -122,6 +122,70 @@ namespace MCS.FOI.AXISIntegration.DAL
                 return extensionList;
         }
 
+        public Dictionary<string, PageCount> GetAXISRequestsPageCount(string[] arrayOfRequestId)
+        {
+            DataTable axisDataTable = GetAxisRequestsPageCount(arrayOfRequestId);
+
+            var axisRequestPageCountDict = axisDataTable.AsEnumerable()
+                .Where(rw => Convert.ToInt32(rw["requestPageCount"]) > 0)
+                .ToDictionary(
+                rw => Convert.ToString(rw["AXISRequestID"]),
+                rw => new PageCount
+                {
+                    RequestPageCount = Convert.ToInt32(rw["requestPageCount"]),
+                    LANPageCount = Convert.ToInt32(rw["lanPageCount"])
+                });
+            return axisRequestPageCountDict;
+
+            //var axisRequestPageCountList = axisDataTable.AsEnumerable()
+            //.Where(rw => Convert.ToInt32(rw["requestPageCount"]) > 0)
+            //.Select(rw => new Dictionary<string, PageCount>
+            //{
+            //    {
+            //        Convert.ToString(rw["AXISRequestID"]),
+            //        new PageCount
+            //        {
+            //            RequestPageCount = Convert.ToInt32(rw["requestPageCount"]),
+            //            LANPageCount = Convert.ToInt32(rw["lanPageCount"])
+            //        }
+            //    }
+            //}).ToList();           
+
+            //return axisRequestPageCountList;
+
+
+
+            //var axisRequestPageCountList = (from rw in axisDataTable.AsEnumerable()
+            //                                let requestPageCount = Convert.ToInt32(rw["requestPageCount"])
+            //                                where requestPageCount > 0
+            //                                select new AXISRequestPageCount()
+            //                                {
+            //                                 AXISRequestID = Convert.ToString(rw["AXISRequestID"]),
+            //                                 RequestPageCount = Convert.ToInt32(rw["requestPageCount"]),
+            //                                 LANPageCount = Convert.ToInt32(rw["lanPageCount"])
+            //                                }).ToList();
+            //var axisRequestPageCountList = (from rw in axisDataTable.AsEnumerable()
+            //                                let pageCountInfo = new PageCount
+            //                                {
+            //                                    RequestPageCount = Convert.ToInt32(rw["requestPageCount"]),
+            //                                    LANPageCount = Convert.ToInt32(rw["lanPageCount"])
+            //                                }
+            //                                where pageCountInfo.RequestPageCount > 0
+            //                                select new AXISRequestPageCount()
+            //                                {
+            //                                    AXISRequestID = Convert.ToString(rw["AXISRequestID"]),
+            //                                    PageCountInfo = pageCountInfo
+            //                                }).ToList();
+
+            //return axisRequestPageCountList;
+        }
+
+        public string GetAXISRequestsPageCountString(string[] requestIds)
+        {
+            Dictionary<string, PageCount> axisRequestPageCountList = GetAXISRequestsPageCount(requestIds);
+            return RequestsHelper.ConvertRequestToJSON(axisRequestPageCountList);
+        }
+
         private DataTable GetAxisRequestData(string request)
         {
             ConnectionString = SettingsManager.ConnectionString;
@@ -297,6 +361,47 @@ namespace MCS.FOI.AXISIntegration.DAL
             }
             return linkedRequestsJson;
 
+        }
+
+        private DataTable GetAxisRequestsPageCount(string[] arrayOfRequestId)
+        {
+            ConnectionString = SettingsManager.ConnectionString;
+
+            string query = @"Select vcVisibleRequestID as axisRequestId, sum(distinct case when requests.IREQUESTID = reviewlog.IREQUESTID and reviewlog.IDOCID = documents.IDOCID then documents.SIPAGECOUNT 
+                when requests.IREQUESTID = redaction.IREQUESTID and redaction.IDOCID = ldocuments.IDOCID then ldocuments.SIPAGECOUNT 
+                else 0 end) as requestPageCount,
+				(case when requestfields.CustomField91 > 0 then requestfields.CustomField91 else 0 end ) as lanPageCount
+				FROM
+		        tblRequests requests WITH (NOLOCK)
+		        LEFT OUTER JOIN dbo.TBLdocumentreviewlog reviewlog WITH (NOLOCK) ON requests.IREQUESTID = reviewlog.IREQUESTID
+		        LEFT OUTER JOIN dbo.TBLDOCUMENTS documents WITH (NOLOCK) ON reviewlog.IDOCID = documents.IDOCID
+		        LEFT OUTER JOIN dbo.TBLRedactionlayers redaction WITH (NOLOCK) ON requests.IREQUESTID = redaction.IREQUESTID
+                LEFT OUTER JOIN dbo.TBLDOCUMENTS ldocuments WITH (NOLOCK) ON redaction.IDOCID = ldocuments.IDOCID
+		        LEFT OUTER JOIN dbo.TBLREQUESTCUSTOMFIELDS requestfields WITH (NOLOCK) ON requests.iRequestID = requestfields.iRequestID
+                WHERE vcVisibleRequestID IN (@vcVisibleRequestIDs)
+		        GROUP BY vcVisibleRequestID, requestfields.CustomField91";
+            DataTable dataTable = new();
+            using (sqlConnection = new SqlConnection(ConnectionString))
+            {
+                using SqlDataAdapter sqlSelectCommand = new(query, sqlConnection);
+                sqlSelectCommand.SelectCommand.Parameters.Add("@vcVisibleRequestIDs", SqlDbType.NVarChar, -1).Value = string.Join(",", arrayOfRequestId);
+                try
+                {
+                    sqlConnection.Open();
+                    sqlSelectCommand.Fill(dataTable);
+                }
+                catch (SqlException ex)
+                {
+                    Ilogger.Log(LogLevel.Error, ex.Message);
+                    throw;
+                }
+                catch (Exception e)
+                {
+                    Ilogger.Log(LogLevel.Error, e.Message);
+                    throw;
+                }
+            }
+            return dataTable;
         }
 
     }    

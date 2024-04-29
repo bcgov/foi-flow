@@ -13,5 +13,6 @@ namespace MCS.FOI.AXISIntegration.DAL.Interfaces
 
         public AXISRequest GetAXISRequest(string request);
 
+        public string GetAXISRequestsPageCountString(string[] arrayOfRequestId);
     }
 }

@@ -13,10 +13,11 @@ namespace MCS.FOI.AXISIntegration.DAL
             return row[property] == DBNull.Value ? null : Convert.ToDateTime(row[property]).ToString(format, CultureInfo.InvariantCulture);
         }
 
-        public static string ConvertRequestToJSON(AXISRequest request)
+        public static string ConvertRequestToJSON(Object _object)
         {
-            return JsonConvert.SerializeObject(request);
+            return JsonConvert.SerializeObject(_object);
         }
+
 
         public static string GetRequestType(string requestType)
         {
