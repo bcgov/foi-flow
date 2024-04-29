@@ -446,6 +446,11 @@ class FOIMinistryRequest(db.Model):
             ],
             else_= literal("0").label("axispagecount")
         )
+        axislanpagecount = case ([
+            (FOIMinistryRequest.axislanpagecount.isnot(None), FOIMinistryRequest.axislanpagecount)
+            ],
+            else_= literal("0").label("axislanpagecount")
+        )
         recordspagecount = case ([
             (FOIMinistryRequest.recordspagecount.isnot(None), FOIMinistryRequest.recordspagecount)
             ],
@@ -495,6 +500,7 @@ class FOIMinistryRequest(db.Model):
             cast(FOIMinistryRequest.axisrequestid, String).label('axisRequestId'),
             cast(requestpagecount, Integer).label('requestpagecount'),
             axispagecount,
+            axislanpagecount,
             recordspagecount,
             FOIMinistryRequest.foiministryrequestid.label('ministryrequestid'),
             FOIMinistryRequest.assignedministrygroup.label('assignedministrygroup'),
@@ -1056,6 +1062,11 @@ class FOIMinistryRequest(db.Model):
             ],
             else_= literal("0").label("axispagecount")
         )
+        axislanpagecount = case ([
+            (FOIMinistryRequest.axislanpagecount.isnot(None), FOIMinistryRequest.axislanpagecount)
+            ],
+            else_= literal("0").label("axislanpagecount")
+        )
         recordspagecount = case ([
             (FOIMinistryRequest.recordspagecount.isnot(None), FOIMinistryRequest.recordspagecount)
             ],
@@ -1103,6 +1114,7 @@ class FOIMinistryRequest(db.Model):
             cast(FOIMinistryRequest.axisrequestid, String).label('axisRequestId'),
             cast(requestpagecount, Integer).label('requestpagecount'),
             axispagecount,
+            axislanpagecount,
             recordspagecount,          
             FOIMinistryRequest.foiministryrequestid.label('ministryrequestid'),
             FOIMinistryRequest.assignedministrygroup.label('assignedministrygroup'),

@@ -549,6 +549,7 @@ class FOIRawRequest(db.Model):
             axisrequestid,
             cast(requestpagecount, Integer).label('requestpagecount'),
             requestpagecount.label('axispagecount'),
+            literal(None).label('axislanpagecount'),
             literal(None).label('recordspagecount'),
             literal(None).label('ministryrequestid'),
             literal(None).label('assignedministrygroup'),

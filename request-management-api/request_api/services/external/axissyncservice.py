@@ -12,12 +12,13 @@ import json
 class axissyncservice:
 
     AXIS_BASE_URL = os.getenv('AXIS_API_URL', None)
-    BATCH_SIZE = int(os.getenv('AXISSYNC_BATCH_SIZE', 100))
+    DEFAULT_SYNC_BATCHSIZE = 250
+    AXIS_SYNC_BATCHSIZE = int(os.getenv('AXIS_SYNC_BATCHSIZE')) if os.getenv('AXIS_SYNC_BATCHSIZE') not in (None,'') else DEFAULT_SYNC_BATCHSIZE
 
     def syncpagecounts(self, bcgovcode, requesttype='personal'):
         programeara = programareaservice().getprogramareabyiaocode(bcgovcode)
         requests = FOIMinistryRequest.getrequest_by_pgmarea_type(programeara['programareaid'], requesttype)
-        for batch in list(more_itertools.batched(requests, self.BATCH_SIZE)):
+        for batch in list(more_itertools.batched(requests, self.AXIS_SYNC_BATCHSIZE)):
             batchrequest = list(batch)
             axisids = self.__getaxisids(batchrequest)
             #Fetch pagecount from axis : Begin
@@ -34,7 +35,7 @@ class axissyncservice:
 
     def axis_getpageinfo(self, axis_payload):
         try:
-            if self.AXIS_BASE_URL is not None:
+            if self.AXIS_BASE_URL not in (None,''):
                 access_token = KeycloakAdminService().get_token()
                 axis_page_endpoint = f'{self.AXIS_BASE_URL}/api/requestspagecount'
                 response = requests.post(
