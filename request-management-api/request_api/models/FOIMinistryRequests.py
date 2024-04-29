@@ -66,6 +66,7 @@ class FOIMinistryRequest(db.Model):
     axissyncdate = db.Column(db.DateTime, nullable=True)    
     axisrequestid = db.Column(db.String(120), nullable=True)
     axispagecount = db.Column(db.String(20), nullable=True)
+    axislanpagecount = db.Column(db.String(20), nullable=True)
     recordspagecount = db.Column(db.String(20), nullable=True)
     linkedrequests = db.Column(JSON, unique=False, nullable=True)
     identityverified = db.Column(JSON, unique=False, nullable=True)
@@ -1394,14 +1395,14 @@ class FOIMinistryRequest(db.Model):
     def getrequest_by_pgmarea_type(cls,programarea, requesttype):
         requestdetails = []
         try:
-            sql = """select fr.axisrequestid, fr.foiministryrequestid, fr."version", fr.axispagecount
+            sql = """select fr.axisrequestid, fr.foiministryrequestid, fr."version", fr.axispagecount, fr.axislanpagecount
             from "FOIMinistryRequests" fr join "FOIRequests" f 
             ON fr.foirequest_id = f.foirequestid and fr.foirequestversion_id = f."version" 
             where programareaid = :programarea and f.requesttype = :requesttype and fr.isactive = true
             order by fr.created_at ;"""
             rs = db.session.execute(text(sql), {'programarea': programarea, 'requesttype': requesttype})
             for row in rs:
-                requestdetails.append({"axisrequestid":row["axisrequestid"], "axispagecount": row["axispagecount"], "foiministryrequestid":row["foiministryrequestid"], "version":row["version"]})
+                requestdetails.append({"axisrequestid":row["axisrequestid"], "axispagecount": row["axispagecount"],  "axislanpagecount": row["axislanpagecount"], "foiministryrequestid":row["foiministryrequestid"], "version":row["version"]})
         except Exception as ex:
             logging.error(ex)
             raise ex
@@ -1482,5 +1483,5 @@ class FOIMinistryRequestSchema(ma.Schema):
                 'foirequest.receivedmodeid','requeststatus.requeststatusid','requeststatuslabel','requeststatus.name','programarea.bcgovcode',
                 'programarea.name','foirequest_id','foirequestversion_id','created_at','updated_at','createdby','assignedministryperson',
                 'assignedministrygroup','cfrduedate','closedate','closereasonid','closereason.name',
-                'assignee.firstname','assignee.lastname','ministryassignee.firstname','ministryassignee.lastname', 'axisrequestid', 'axissyncdate', 'axispagecount', 'linkedrequests', 'ministrysignoffapproval', 'identityverified','originalldd','isoipcreview', 'recordspagecount')
+                'assignee.firstname','assignee.lastname','ministryassignee.firstname','ministryassignee.lastname', 'axisrequestid', 'axissyncdate', 'axispagecount', 'axislanpagecount', 'linkedrequests', 'ministrysignoffapproval', 'identityverified','originalldd','isoipcreview', 'recordspagecount')
     
