@@ -74,7 +74,7 @@ class CreateFOIDocument(Resource):
             requestjson = request.get_json() 
             documentschema = CreateDocumentSchema().load(requestjson)
             result = documentservice().createrequestdocument(requestid, documentschema, AuthHelper.getuserid(), requesttype)
-            eventservice().attachmenteventservice(requestid, documentschema['documents'], AuthHelper.getuserid())
+            eventservice().attachmenteventservice(requestid, documentschema['documents'], AuthHelper.getuserid(), requesttype)
             return {'status': result.success, 'message':result.message} , 200 
         except ValidationError as err:
              return {'status': False, 'message': str(err)}, 400
