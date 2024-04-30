@@ -11,7 +11,7 @@ namespace MCS.FOI.AXISIntegration.DAL.UnitTests
     public class RequestDAUnitTest
     {
 
-        private Mock<ILogger> _mockLogger = new Mock<ILogger>();
+        private readonly Mock<ILogger<RequestsDA>> _mockLogger = new();
 
         [TestMethod]
         public void GetRequestTest()
