@@ -15,6 +15,6 @@ kubectl create -f <path to file>/syncaxispagedetails.yaml
 ## To manually trigger a job
 
 ```
-kubectl create job --from=cronjob/syncaxispagedetails <name of job>
+oc create job --from=cronjob/syncaxispagedetails <name of job>
 ```
 
