@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Runtime.Serialization;
 
 namespace MCS.FOI.AXISIntegration.DataModels
@@ -119,6 +118,9 @@ namespace MCS.FOI.AXISIntegration.DataModels
 
         [DataMember(Name = "requestPageCount")]
         public int RequestPageCount { get; set; }
+
+        [DataMember(Name = "lanPageCount")]
+        public int LANPageCount { get; set; }
 
         [DataMember(Name = "subjectCode")]
         public string SubjectCode { get; set; }
