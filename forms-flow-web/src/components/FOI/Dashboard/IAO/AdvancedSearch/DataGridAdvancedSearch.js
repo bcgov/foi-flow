@@ -13,7 +13,8 @@ import {
   // onBehalfFullName,
   getRecordsDue,
   LightTooltip,
-  displayQueueFlagIcons,  
+  displayQueueFlagIcons,
+  pagecountcellTooltipRender, 
 } from "../../utils";
 import { ActionContext } from "./ActionContext";
 import {
@@ -186,10 +187,10 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
         params.row.extensions === undefined ? "N/A" : params.row.extensions,
     },
     {
-      field: "requestPageCount",
+      field: "requestpagecount",
       headerName: "PAGES",
       headerAlign: "left",
-      renderCell: hyperlinkRenderCell,
+      renderCell: pagecountcellTooltipRender,
       cellClassName: 'foi-advanced-search-result-cell',
       flex: 0.5,
     },
