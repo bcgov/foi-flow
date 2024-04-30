@@ -83,6 +83,7 @@ namespace MCS.FOI.AXISIntegration.DAL
                     axisRequest.RequestDescriptionToDate = RequestsHelper.ConvertDateToString(row, "reqDescriptionToDate", "yyyy-MM-dd");
                     axisRequest.Ispiiredacted = true;
                     axisRequest.RequestPageCount = Convert.ToInt32(row["requestPageCount"]);
+                    axisRequest.LANPageCount = Convert.ToInt32(row["lanPageCount"]);
                     axisRequest.SubjectCode = Convert.ToString(row["subjectCode"]);
                     axisRequest.IdentityVerified = Convert.ToString(row["identityVerified"]);
                     List<Ministry> ministryList = new()
@@ -136,48 +137,7 @@ namespace MCS.FOI.AXISIntegration.DAL
                     LANPageCount = Convert.ToInt32(rw["lanPageCount"])
                 });
             return axisRequestPageCountDict;
-
-            //var axisRequestPageCountList = axisDataTable.AsEnumerable()
-            //.Where(rw => Convert.ToInt32(rw["requestPageCount"]) > 0)
-            //.Select(rw => new Dictionary<string, PageCount>
-            //{
-            //    {
-            //        Convert.ToString(rw["AXISRequestID"]),
-            //        new PageCount
-            //        {
-            //            RequestPageCount = Convert.ToInt32(rw["requestPageCount"]),
-            //            LANPageCount = Convert.ToInt32(rw["lanPageCount"])
-            //        }
-            //    }
-            //}).ToList();           
-
-            //return axisRequestPageCountList;
-
-
-
-            //var axisRequestPageCountList = (from rw in axisDataTable.AsEnumerable()
-            //                                let requestPageCount = Convert.ToInt32(rw["requestPageCount"])
-            //                                where requestPageCount > 0
-            //                                select new AXISRequestPageCount()
-            //                                {
-            //                                 AXISRequestID = Convert.ToString(rw["AXISRequestID"]),
-            //                                 RequestPageCount = Convert.ToInt32(rw["requestPageCount"]),
-            //                                 LANPageCount = Convert.ToInt32(rw["lanPageCount"])
-            //                                }).ToList();
-            //var axisRequestPageCountList = (from rw in axisDataTable.AsEnumerable()
-            //                                let pageCountInfo = new PageCount
-            //                                {
-            //                                    RequestPageCount = Convert.ToInt32(rw["requestPageCount"]),
-            //                                    LANPageCount = Convert.ToInt32(rw["lanPageCount"])
-            //                                }
-            //                                where pageCountInfo.RequestPageCount > 0
-            //                                select new AXISRequestPageCount()
-            //                                {
-            //                                    AXISRequestID = Convert.ToString(rw["AXISRequestID"]),
-            //                                    PageCountInfo = pageCountInfo
-            //                                }).ToList();
-
-            //return axisRequestPageCountList;
+            
         }
 
         public Dictionary<string, PageCount> GetAXISRequestsPageCount()
@@ -194,48 +154,6 @@ namespace MCS.FOI.AXISIntegration.DAL
                     LANPageCount = Convert.ToInt32(rw["lanPageCount"])
                 });
             return axisRequestPageCountDict;
-
-            //var axisRequestPageCountList = axisDataTable.AsEnumerable()
-            //.Where(rw => Convert.ToInt32(rw["requestPageCount"]) > 0)
-            //.Select(rw => new Dictionary<string, PageCount>
-            //{
-            //    {
-            //        Convert.ToString(rw["AXISRequestID"]),
-            //        new PageCount
-            //        {
-            //            RequestPageCount = Convert.ToInt32(rw["requestPageCount"]),
-            //            LANPageCount = Convert.ToInt32(rw["lanPageCount"])
-            //        }
-            //    }
-            //}).ToList();           
-
-            //return axisRequestPageCountList;
-
-
-
-            //var axisRequestPageCountList = (from rw in axisDataTable.AsEnumerable()
-            //                                let requestPageCount = Convert.ToInt32(rw["requestPageCount"])
-            //                                where requestPageCount > 0
-            //                                select new AXISRequestPageCount()
-            //                                {
-            //                                 AXISRequestID = Convert.ToString(rw["AXISRequestID"]),
-            //                                 RequestPageCount = Convert.ToInt32(rw["requestPageCount"]),
-            //                                 LANPageCount = Convert.ToInt32(rw["lanPageCount"])
-            //                                }).ToList();
-            //var axisRequestPageCountList = (from rw in axisDataTable.AsEnumerable()
-            //                                let pageCountInfo = new PageCount
-            //                                {
-            //                                    RequestPageCount = Convert.ToInt32(rw["requestPageCount"]),
-            //                                    LANPageCount = Convert.ToInt32(rw["lanPageCount"])
-            //                                }
-            //                                where pageCountInfo.RequestPageCount > 0
-            //                                select new AXISRequestPageCount()
-            //                                {
-            //                                    AXISRequestID = Convert.ToString(rw["AXISRequestID"]),
-            //                                    PageCountInfo = pageCountInfo
-            //                                }).ToList();
-
-            //return axisRequestPageCountList;
         }
 
         public string PostAXISRequestsPageCountString(string[] requestIds)
@@ -280,6 +198,7 @@ namespace MCS.FOI.AXISIntegration.DAL
                 sum(distinct case when requests.IREQUESTID = reviewlog.IREQUESTID and reviewlog.IDOCID = documents.IDOCID then documents.SIPAGECOUNT 
                 when requests.IREQUESTID = redaction.IREQUESTID and redaction.IDOCID = ldocuments.IDOCID then ldocuments.SIPAGECOUNT 
                 else 0 end) as requestPageCount,
+                (case when requestfields.CustomField91 > 0 then requestfields.CustomField91 else 0 end ) as lanPageCount,
                 REPLACE(requestfields.CUSTOMFIELD33, CHAR(160), ' ') as subjectCode,
                 requestfields.CUSTOMFIELD75 as identityVerified,
                 (SELECT TOP 1 cfr.sdtDueDate FROM tblRequestForDocuments cfr WITH (NOLOCK) 
@@ -313,7 +232,8 @@ namespace MCS.FOI.AXISIntegration.DAL
                 requesters.vcAddress1, requesters.vcAddress2, requesters.vcCity, requesters.vcZipCode,
                 requesters.vcHome, requesters.vcMobile, requesters.vcWork1, requesters.vcWork2, requesters.vcFirstName, requesters.vcLastName, requesters.vcMiddleName,
                 requests.iRequestID, requesters.vcCompany, requesters.vcEmailID, onbehalf.vcFirstName, onbehalf.vcLastName, onbehalf.vcMiddleName,
-                requestTypes.iLabelID, requests.vcVisibleRequestID, requests.tiOfficeID, office.OFFICE_ID,requestorfields.CUSTOMFIELD35, REPLACE(requestfields.CUSTOMFIELD33, CHAR(160), ' '),requestfields.CUSTOMFIELD75";
+                requestTypes.iLabelID, requests.vcVisibleRequestID, requests.tiOfficeID, office.OFFICE_ID,requestorfields.CUSTOMFIELD35, 
+                REPLACE(requestfields.CUSTOMFIELD33, CHAR(160), ' '),requestfields.CUSTOMFIELD75, requestfields.CustomField91";
             DataTable dataTable = new();
             using (sqlConnection = new SqlConnection(ConnectionString))
             {

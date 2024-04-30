@@ -1,14 +1,10 @@
-﻿using MCS.FOI.AXISIntegration.DAL;
-using MCS.FOI.AXISIntegration.DAL.Interfaces;
-using MCS.FOI.AXISIntegration.DataModels;
+﻿using MCS.FOI.AXISIntegration.DAL.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace MCS.FOI.AXISIntegrationWebAPI.Controllers
 {
@@ -28,24 +24,6 @@ namespace MCS.FOI.AXISIntegrationWebAPI.Controllers
             _requestDA = requestDA;
         }
 
-
-        [HttpGet]
-
-        public ActionResult<string> Get()
-        {
-            try
-            {
-                
-                return _requestDA.GetAXISRequestsPageCountString();
-
-            }
-            catch (Exception ex)
-            {
-                _logger.Log(LogLevel.Error, string.Format($"Exception happened on RequestspageCount GET operations, Error Message : {ex.Message} , Stack Trace :{ex.StackTrace}"));
-                return string.Format($"Exception happened on RequestspageCount GET operations, Error Message : {ex.Message}");
-            }
-
-        }
         [HttpPost]
 
         public ActionResult<string> Post([FromBody] List<string> axisRequestIds)
