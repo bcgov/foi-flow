@@ -34,7 +34,7 @@ namespace MCS.FOI.AXISIntegrationWebAPI
                 string[] _origins = SettingsManager.CORSORIGINS.Split(",");
                 services.AddCors(options =>
                                     options.AddPolicy("FOIOrigins", p => p.WithOrigins(_origins)
-                                                   .WithMethods("GET")
+                                                   .WithMethods("GET", "POST")
                                                    .AllowAnyHeader()
                                                    .AllowAnyMethod()
                                        )) ;

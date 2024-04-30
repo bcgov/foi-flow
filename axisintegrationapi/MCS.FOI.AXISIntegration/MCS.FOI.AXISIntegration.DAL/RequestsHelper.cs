@@ -3,6 +3,7 @@ using Newtonsoft.Json;
 using System;
 using System.Data;
 using System.Globalization;
+using System.Linq;
 
 namespace MCS.FOI.AXISIntegration.DAL
 {
@@ -138,6 +139,12 @@ namespace MCS.FOI.AXISIntegration.DAL
                 "Secure File Transfer" => "Secure File Transfer",
                 _ => "Secure File Transfer",
             };
+        }
+
+        public static string GetInClause(string[] values)
+        {
+            // Join the array values with commas and enclose each value in single quotes
+            return string.Join(",", values.Select(val => $"'{val}'"));
         }
     }
 }

@@ -8,6 +8,7 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace MCS.FOI.AXISIntegrationWebAPI.Controllers
 {
@@ -34,14 +35,30 @@ namespace MCS.FOI.AXISIntegrationWebAPI.Controllers
         {
             try
             {
-                string[] requestIds = new string[] { "EMP-2019-96623", "XGR-2019-93646" };
-                return _requestDA.GetAXISRequestsPageCountString(requestIds);
+                
+                return _requestDA.GetAXISRequestsPageCountString();
 
             }
             catch (Exception ex)
             {
                 _logger.Log(LogLevel.Error, string.Format($"Exception happened on RequestspageCount GET operations, Error Message : {ex.Message} , Stack Trace :{ex.StackTrace}"));
                 return string.Format($"Exception happened on RequestspageCount GET operations, Error Message : {ex.Message}");
+            }
+
+        }
+        [HttpPost]
+
+        public ActionResult<string> Post([FromBody] List<string> axisRequestIds)
+        {
+            try
+            {
+                return _requestDA.PostAXISRequestsPageCountString(axisRequestIds.ToArray());
+
+            }
+            catch (Exception ex)
+            {
+                _logger.Log(LogLevel.Error, string.Format($"Exception happened on RequestspageCount POST operations, Error Message : {ex.Message} , Stack Trace :{ex.StackTrace}"));
+                return string.Format($"Exception happened on RequestspageCount POST operations, Error Message : {ex.Message}");
             }
 
         }
