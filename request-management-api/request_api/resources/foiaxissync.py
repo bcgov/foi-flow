@@ -26,13 +26,15 @@ from request_api.services.external.axissyncservice import axissyncservice
 import json
 from flask_cors import cross_origin
 import logging
+from request_api.schemas.foiaxissync import  FOIRequestAxisSyncSchema
+
 
 API = Namespace('foiaxissync', description='Endpoints for syncing AXIS data to MOD system')
 TRACER = Tracer.get_instance()
 CUSTOM_KEYERROR_MESSAGE = "Key error has occured: "
 
 @cors_preflight('POST,OPTIONS')
-@API.route('/foiaxissync/sync/<programarea>/<requesttype>/pageinfo')
+@API.route('/foiaxis/sync/pageinfo')
 class FOIWorkflow(Resource):
     """Sync pageinfo in bulk"""
 
@@ -41,11 +43,13 @@ class FOIWorkflow(Resource):
     @TRACER.trace()
     @cross_origin(origins=allowedorigins())
     @auth.require
-    def post(programarea, requesttype):      
+    def post():      
         try:
-            logging.info("page info sync action started for programarea=%s | requesttype=%s ",programarea, requesttype)
-            result = axissyncservice().syncpagecounts(programarea,requesttype)
-            return {'status': result.success, 'message': result.message,'id':programarea} , 200 
+            requestjson = request.get_json() 
+            axissyncschema = FOIRequestAxisSyncSchema().load(requestjson)
+            logging.info("page info sync action started for requestjson=%s",requestjson)
+            result = axissyncservice().syncpagecounts(axissyncschema["data"])
+            return {'status': result.success, 'message': result.message,'id':requestjson} , 200 
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500
 
