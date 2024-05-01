@@ -24,7 +24,6 @@ class attachmentevent():
                     notificationtype = NotificationType().getnotificationtypeid(self.__notificationtype())
                     ret = self.__createnotification(message, requestid, notificationtype, userid, requesttype)
                     comment = self.__createcomment(requestid, message, ministryversion, userid, requesttype)
-                    print('comment created')
                     return DefaultMethodResult(True, 'Attachment notification succedded', requestid) # ad the request id to the message             
             return DefaultMethodResult(True, 'No RTT attachment found' , requestid)             
         except BusinessException as exception:            
