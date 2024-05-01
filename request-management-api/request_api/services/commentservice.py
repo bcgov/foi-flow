@@ -30,7 +30,7 @@ class commentservice:
         return FOIRequestComment.savecomment(type, data, version, userid) 
 
     def createrawrequestcomment(self, data, userid, type=1):
-        version = FOIRawRequest.getversionforrequest(data["requestid"])   
+        version = FOIRawRequest.getversionforrequest(data["requestid"])    
         return FOIRawRequestComment.savecomment(type, data, version, userid) 
     
     def createcomments(self, data, userid, type=2):

@@ -35,7 +35,6 @@ class FOIRawRequestComment(db.Model):
         parentcommentid = foirequestcomment["parentcommentid"] if 'parentcommentid' in foirequestcomment else None
         taggedusers = foirequestcomment["taggedusers"] if 'taggedusers' in foirequestcomment  else None
         newcomment = FOIRawRequestComment(commenttypeid=commenttypeid, requestid=foirequestcomment["requestid"], version=version, comment=foirequestcomment["comment"], parentcommentid=parentcommentid, isactive=True, createdby=userid,taggedusers=taggedusers)
-        print(newcomment.commentid)
         db.session.add(newcomment)
         db.session.commit()
 
