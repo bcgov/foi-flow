@@ -59,8 +59,8 @@ namespace MCS.FOI.AXISIntegrationWebAPI.Controllers
         }
         private bool IsValidRequestId(string requestId)
         {
-            // Allows letters, numbers, underscores, and hyphens
-            string pattern = @"^[A-Za-z0-9_-]+$"; 
+            // RequestID should have letters-numbers-numbers format
+            string pattern = @"^[A-Za-z]+(?:[-]){0,2}\d+\-\d+$";
             return Regex.IsMatch(requestId, pattern);
         }
 
