@@ -37,7 +37,6 @@ class FOIRawRequestComment(db.Model):
         newcomment = FOIRawRequestComment(commenttypeid=commenttypeid, requestid=foirequestcomment["requestid"], version=version, comment=foirequestcomment["comment"], parentcommentid=parentcommentid, isactive=True, createdby=userid,taggedusers=taggedusers)
         db.session.add(newcomment)
         db.session.commit()
-
         return DefaultMethodResult(True, 'Comment added', newcomment.commentid)
 
     @classmethod
