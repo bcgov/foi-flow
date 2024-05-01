@@ -36,9 +36,7 @@ class attachmentevent():
             return notificationservice().createnotification({"message" : message}, requestid, requesttype , notificationtype, userid)
 
     def __createcomment(self, requestid, message, ministryversion, userid, requesttype):
-        print('create comment')
         if message is not None:
-            print(message)
             if requesttype == "ministryrequest":
                 _comment = {"ministryrequestid": requestid, "version": ministryversion, "comment": message}        
                 return commentservice().createcomments(_comment, userid, 2)
