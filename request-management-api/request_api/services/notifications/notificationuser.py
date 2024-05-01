@@ -28,7 +28,7 @@ class notificationuser:
         elif 'Watcher' in notificationtype:
             _users = self.__getwatchers(notificationtype, foirequest, requesttype, requestjson)
         elif 'Attachment Upload Event' in notificationtype:
-            _users = self.__getscanningteam()          
+            _users = self.__getgroupmembers('scanningteam') + self.__getassignees(foirequest, requesttype, notificationtype) + self.__getwatchers(notificationtype, foirequest, requesttype, requestjson)
         else:
             _users = self.__getassignees(foirequest, requesttype, notificationtype) + self.__getwatchers(notificationtype, foirequest, requesttype)
         for user in _users:
@@ -132,13 +132,3 @@ class notificationuser:
                 notificationusers.append({"userid":user["username"], "usertype":notificationusertypelabel})
             return notificationusers 
         return []
-
-    def __getscanningteam(self):
-        notificationusers = []
-        notificationusertypelabel = notificationconfig().getnotificationusertypelabel("Group Members")
-        usergroupfromkeycloak= KeycloakAdminService().getmembersbygroupname("scanningteam") 
-        if usergroupfromkeycloak is not None and len(usergroupfromkeycloak) > 0:
-            for user in usergroupfromkeycloak[0].get("members"):
-                notificationusers.append({"userid":user["username"], "usertype":notificationusertypelabel})
-            return notificationusers 
-        return [] 

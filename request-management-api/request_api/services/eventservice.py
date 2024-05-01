@@ -33,7 +33,6 @@ class eventservice:
         self.posteventsync(requestid, requesttype, userid, username, isministryuser,assigneename)
     
     def posteventsync(self, requestid, requesttype, userid, username, isministryuser,assigneename=''):
-        print("\n ..... postevent is triggered ...... \n")
         try: 
             stateeventresponse = stateevent().createstatetransitionevent(requestid, requesttype, userid, username)
             divisioneventresponse = divisionevent().createdivisionevent(requestid, requesttype, userid)
@@ -148,9 +147,8 @@ class eventservice:
     def attachmenteventservice(self, ministryrequestid, document, userid, requesttype):
         try:
             attachmenteventresponse = attachmentevent().createattachmentevent(ministryrequestid, userid, document, requesttype)
-            print("attachmenteventresponse")
-            print(attachmenteventresponse)
             if attachmenteventresponse.success == False:
                 current_app.logger.error("FOI Notification failed for event for attachment= %s" % (document['category']))
+            return attachmenteventresponse    
         except BusinessException as exception:            
             self.__logbusinessexception(exception)
