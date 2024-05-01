@@ -1442,7 +1442,8 @@ class FOIMinistryRequest(db.Model):
             sql = """select fr.axisrequestid, fr.foiministryrequestid, fr."version", fr.axispagecount, fr.axislanpagecount
             from "FOIMinistryRequests" fr join "FOIRequests" f 
             ON fr.foirequest_id = f.foirequestid and fr.foirequestversion_id = f."version" 
-            where programareaid = :programarea and f.requesttype = :requesttype and fr.isactive = true
+            join "FOIRequestStatuses" fs2 on fr.requeststatusid  = fs2.requeststatusid
+            where programareaid = :programarea and f.requesttype = :requesttype and fr.isactive = true and lower(fs2.statuslabel) <> 'closed'
             order by fr.created_at ;"""
             rs = db.session.execute(text(sql), {'programarea': programarea, 'requesttype': requesttype})
             for row in rs:
