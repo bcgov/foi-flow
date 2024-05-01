@@ -3,7 +3,7 @@ kind: CronJob
 metadata:
   name: syncaxispagedetails
 spec:
-  schedule: "0 13 * * *"       
+  schedule: "0 10 * * *"       
   concurrencyPolicy: "Allow"  
   suspend: false                
   successfulJobsHistoryLimit: 3 
