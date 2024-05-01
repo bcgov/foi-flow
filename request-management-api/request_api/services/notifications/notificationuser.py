@@ -28,7 +28,7 @@ class notificationuser:
         elif 'Watcher' in notificationtype:
             _users = self.__getwatchers(notificationtype, foirequest, requesttype, requestjson)
         elif 'Attachment Upload Event' in notificationtype:
-            _users = self.__getgroupmembers("scanningteam")
+            _users = self.__getgroupmembers('scanningteam') + self.__getassignees(foirequest, requesttype, notificationtype) + self.__getwatchers(notificationtype, foirequest, requesttype, requestjson)
         else:
             _users = self.__getassignees(foirequest, requesttype, notificationtype) + self.__getwatchers(notificationtype, foirequest, requesttype)
         for user in _users:
@@ -122,7 +122,7 @@ class notificationuser:
         for entry in data:
             taggedusers.append({"userid":entry["username"], "usertype":notificationconfig().getnotificationusertypelabel("comment tagged user")})
         return taggedusers
-    
+
     def __getgroupmembers(self,groupid):
         notificationusers = []
         notificationusertypelabel = notificationconfig().getnotificationusertypelabel("Group Members")
