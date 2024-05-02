@@ -164,8 +164,8 @@ class requestserviceministrybuilder(requestserviceconfigurator):
             applicantmapping  = FOIRequestApplicantMapping()
             applicantmapping.foirequest_id = requestid
             applicantmapping.foirequestversion_id = version
-            applicantmapping.foirequestapplicantid = requestapplicant["foirequestapplicant.foirequestapplicantid"]
-            applicantmapping.requestortypeid = requestapplicant["requestortype.requestortypeid"]
+            applicantmapping.foirequestapplicantid = requestapplicant["foirequestapplicantid"]
+            applicantmapping.requestortypeid = requestapplicant["requestortypeid"]
             applicantmapping.createdby = userid
             requestapplicantarr.append(applicantmapping)
         return requestapplicantarr
