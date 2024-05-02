@@ -1,9 +1,4 @@
 ﻿using MCS.FOI.AXISIntegration.DataModels;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MCS.FOI.AXISIntegration.DAL.Interfaces
 {
@@ -13,5 +8,8 @@ namespace MCS.FOI.AXISIntegration.DAL.Interfaces
 
         public AXISRequest GetAXISRequest(string request);
 
+        public string GetAXISRequestsPageCountString();
+
+        public string PostAXISRequestsPageCountString(string[] arrayOfRequestId);
     }
 }

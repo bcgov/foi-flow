@@ -14,11 +14,11 @@ namespace MCS.FOI.AXISIntegration.DAL
     {
         private SqlConnection sqlConnection;
 
-        private readonly ILogger Ilogger;
+        private readonly ILogger<RequestsDA> Ilogger;
       
         public static string ConnectionString;
 
-        public RequestsDA(ILogger _Ilogger)
+        public RequestsDA(ILogger<RequestsDA> _Ilogger)
         {
             Ilogger = _Ilogger;                     
             SettingsManager.DBConnectionInitializer();
@@ -83,6 +83,7 @@ namespace MCS.FOI.AXISIntegration.DAL
                     axisRequest.RequestDescriptionToDate = RequestsHelper.ConvertDateToString(row, "reqDescriptionToDate", "yyyy-MM-dd");
                     axisRequest.Ispiiredacted = true;
                     axisRequest.RequestPageCount = Convert.ToInt32(row["requestPageCount"]);
+                    axisRequest.LANPageCount = Convert.ToInt32(row["lanPageCount"]);
                     axisRequest.SubjectCode = Convert.ToString(row["subjectCode"]);
                     axisRequest.IdentityVerified = Convert.ToString(row["identityVerified"]);
                     List<Ministry> ministryList = new()
@@ -122,6 +123,51 @@ namespace MCS.FOI.AXISIntegration.DAL
                 return extensionList;
         }
 
+        public Dictionary<string, PageCount> GetAXISRequestsPageCount(string[] arrayOfRequestId)
+        {
+            DataTable axisDataTable = GetAxisRequestsPageCount(arrayOfRequestId);
+
+            var axisRequestPageCountDict = axisDataTable.AsEnumerable()
+                .Where(rw => Convert.ToInt32(rw["requestPageCount"]) > 0)
+                .ToDictionary(
+                rw => Convert.ToString(rw["AXISRequestID"]),
+                rw => new PageCount
+                {
+                    RequestPageCount = Convert.ToInt32(rw["requestPageCount"]),
+                    LANPageCount = Convert.ToInt32(rw["lanPageCount"])
+                });
+            return axisRequestPageCountDict;
+            
+        }
+
+        public Dictionary<string, PageCount> GetAXISRequestsPageCount()
+        {
+            DataTable axisDataTable = GetAxisRequestsPageCount();
+
+            var axisRequestPageCountDict = axisDataTable.AsEnumerable()
+                .Where(rw => Convert.ToInt32(rw["requestPageCount"]) > 0)
+                .ToDictionary(
+                rw => Convert.ToString(rw["AXISRequestID"]),
+                rw => new PageCount
+                {
+                    RequestPageCount = Convert.ToInt32(rw["requestPageCount"]),
+                    LANPageCount = Convert.ToInt32(rw["lanPageCount"])
+                });
+            return axisRequestPageCountDict;
+        }
+
+        public string PostAXISRequestsPageCountString(string[] requestIds)
+        {
+            Dictionary<string, PageCount> axisRequestPageCountList = GetAXISRequestsPageCount(requestIds);
+            return RequestsHelper.ConvertRequestToJSON(axisRequestPageCountList);
+        }
+
+        public string GetAXISRequestsPageCountString()
+        {
+            Dictionary<string, PageCount> axisRequestPageCountList = GetAXISRequestsPageCount();
+            return RequestsHelper.ConvertRequestToJSON(axisRequestPageCountList);
+        }
+
         private DataTable GetAxisRequestData(string request)
         {
             ConnectionString = SettingsManager.ConnectionString;
@@ -152,6 +198,7 @@ namespace MCS.FOI.AXISIntegration.DAL
                 sum(distinct case when requests.IREQUESTID = reviewlog.IREQUESTID and reviewlog.IDOCID = documents.IDOCID then documents.SIPAGECOUNT 
                 when requests.IREQUESTID = redaction.IREQUESTID and redaction.IDOCID = ldocuments.IDOCID then ldocuments.SIPAGECOUNT 
                 else 0 end) as requestPageCount,
+                (case when requestfields.CustomField91 > 0 then requestfields.CustomField91 else 0 end ) as lanPageCount,
                 REPLACE(requestfields.CUSTOMFIELD33, CHAR(160), ' ') as subjectCode,
                 requestfields.CUSTOMFIELD75 as identityVerified,
                 (SELECT TOP 1 cfr.sdtDueDate FROM tblRequestForDocuments cfr WITH (NOLOCK) 
@@ -185,7 +232,8 @@ namespace MCS.FOI.AXISIntegration.DAL
                 requesters.vcAddress1, requesters.vcAddress2, requesters.vcCity, requesters.vcZipCode,
                 requesters.vcHome, requesters.vcMobile, requesters.vcWork1, requesters.vcWork2, requesters.vcFirstName, requesters.vcLastName, requesters.vcMiddleName,
                 requests.iRequestID, requesters.vcCompany, requesters.vcEmailID, onbehalf.vcFirstName, onbehalf.vcLastName, onbehalf.vcMiddleName,
-                requestTypes.iLabelID, requests.vcVisibleRequestID, requests.tiOfficeID, office.OFFICE_ID,requestorfields.CUSTOMFIELD35, REPLACE(requestfields.CUSTOMFIELD33, CHAR(160), ' '),requestfields.CUSTOMFIELD75";
+                requestTypes.iLabelID, requests.vcVisibleRequestID, requests.tiOfficeID, office.OFFICE_ID,requestorfields.CUSTOMFIELD35, 
+                REPLACE(requestfields.CUSTOMFIELD33, CHAR(160), ' '),requestfields.CUSTOMFIELD75, requestfields.CustomField91";
             DataTable dataTable = new();
             using (sqlConnection = new SqlConnection(ConnectionString))
             {
@@ -297,6 +345,88 @@ namespace MCS.FOI.AXISIntegration.DAL
             }
             return linkedRequestsJson;
 
+        }
+
+        private DataTable GetAxisRequestsPageCount(string[] arrayOfRequestId)
+        {
+            ConnectionString = SettingsManager.ConnectionString;
+            var inClauseValues = RequestsHelper.GetInClause(arrayOfRequestId);
+
+            string query = $@"Select vcVisibleRequestID as axisRequestId, sum(distinct case when requests.IREQUESTID = reviewlog.IREQUESTID and reviewlog.IDOCID = documents.IDOCID then documents.SIPAGECOUNT 
+                when requests.IREQUESTID = redaction.IREQUESTID and redaction.IDOCID = ldocuments.IDOCID then ldocuments.SIPAGECOUNT 
+                else 0 end) as requestPageCount,
+				(case when requestfields.CustomField91 > 0 then requestfields.CustomField91 else 0 end ) as lanPageCount
+				FROM
+		        tblRequests requests WITH (NOLOCK)
+		        LEFT OUTER JOIN dbo.TBLdocumentreviewlog reviewlog WITH (NOLOCK) ON requests.IREQUESTID = reviewlog.IREQUESTID
+		        LEFT OUTER JOIN dbo.TBLDOCUMENTS documents WITH (NOLOCK) ON reviewlog.IDOCID = documents.IDOCID
+		        LEFT OUTER JOIN dbo.TBLRedactionlayers redaction WITH (NOLOCK) ON requests.IREQUESTID = redaction.IREQUESTID
+                LEFT OUTER JOIN dbo.TBLDOCUMENTS ldocuments WITH (NOLOCK) ON redaction.IDOCID = ldocuments.IDOCID
+		        LEFT OUTER JOIN dbo.TBLREQUESTCUSTOMFIELDS requestfields WITH (NOLOCK) ON requests.iRequestID = requestfields.iRequestID
+                WHERE vcVisibleRequestID IN ({inClauseValues})
+		        GROUP BY vcVisibleRequestID, requestfields.CustomField91";
+
+            DataTable dataTable = new();
+            using (sqlConnection = new SqlConnection(ConnectionString))
+            {
+                using SqlDataAdapter sqlSelectCommand = new(query, sqlConnection);
+                try
+                {
+                    sqlConnection.Open();
+                    sqlSelectCommand.Fill(dataTable);
+                }
+                catch (SqlException ex)
+                {
+                    Ilogger.Log(LogLevel.Error, ex.Message);
+                    throw;
+                }
+                catch (Exception e)
+                {
+                    Ilogger.Log(LogLevel.Error, e.Message);
+                    throw;
+                }
+            }
+            return dataTable;
+        }
+
+        private DataTable GetAxisRequestsPageCount()
+        {
+            ConnectionString = SettingsManager.ConnectionString;           
+
+            string query = @"Select vcVisibleRequestID as axisRequestId, sum(distinct case when requests.IREQUESTID = reviewlog.IREQUESTID and reviewlog.IDOCID = documents.IDOCID then documents.SIPAGECOUNT 
+                when requests.IREQUESTID = redaction.IREQUESTID and redaction.IDOCID = ldocuments.IDOCID then ldocuments.SIPAGECOUNT 
+                else 0 end) as requestPageCount,
+				(case when requestfields.CustomField91 > 0 then requestfields.CustomField91 else 0 end ) as lanPageCount
+				FROM
+		        tblRequests requests WITH (NOLOCK)
+		        LEFT OUTER JOIN dbo.TBLdocumentreviewlog reviewlog WITH (NOLOCK) ON requests.IREQUESTID = reviewlog.IREQUESTID
+		        LEFT OUTER JOIN dbo.TBLDOCUMENTS documents WITH (NOLOCK) ON reviewlog.IDOCID = documents.IDOCID
+		        LEFT OUTER JOIN dbo.TBLRedactionlayers redaction WITH (NOLOCK) ON requests.IREQUESTID = redaction.IREQUESTID
+                LEFT OUTER JOIN dbo.TBLDOCUMENTS ldocuments WITH (NOLOCK) ON redaction.IDOCID = ldocuments.IDOCID
+		        LEFT OUTER JOIN dbo.TBLREQUESTCUSTOMFIELDS requestfields WITH (NOLOCK) ON requests.iRequestID = requestfields.iRequestID
+		        GROUP BY vcVisibleRequestID, requestfields.CustomField91";
+
+            DataTable dataTable = new();
+            using (sqlConnection = new SqlConnection(ConnectionString))
+            {
+                using SqlDataAdapter sqlSelectCommand = new(query, sqlConnection);
+                try
+                {
+                    sqlConnection.Open();
+                    sqlSelectCommand.Fill(dataTable);
+                }
+                catch (SqlException ex)
+                {
+                    Ilogger.Log(LogLevel.Error, ex.Message);
+                    throw;
+                }
+                catch (Exception e)
+                {
+                    Ilogger.Log(LogLevel.Error, e.Message);
+                    throw;
+                }
+            }
+            return dataTable;
         }
 
     }    
