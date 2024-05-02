@@ -1,0 +1,30 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: restart-pods
+  namespace: d7abee-xxxx
+spec:
+  schedule: "0 3 * * *"
+  timeZone: America/Vancouver
+  concurrencyPolicy: Allow
+  successfulJobsHistoryLimit: 5
+  failedJobsHistoryLimit: 5
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+            - name: restart-pods
+              image: openshift/origin-cli:latest
+              command:
+                - "sh"
+                - "-c"
+                - |
+                  oc patch dc/notification-manager -p "{\"spec\":{\"replicas\": 0}}"
+                  sleep 30s
+                  oc rollout latest notification-manager
+                  sleep 30s
+                  oc patch dc/notification-manager -p "{\"spec\":{\"replicas\": 1}}"
+                  sleep 30s
+
+          restartPolicy: OnFailure
