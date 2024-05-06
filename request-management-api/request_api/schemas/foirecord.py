@@ -26,7 +26,7 @@ class PersonalAttributesSchema(Schema):
     volume = fields.Str(data_key="volume",allow_none=True)
     trackingid = fields.Str(data_key="trackingid",allow_none=True)
     personaltag = fields.Str(data_key="personaltag",allow_none=True)
-    divisions = fields.Nested(DivisionSchema, many=True, validate=validate.Length(min=1), required=True,allow_none=False)
+    # divisions = fields.Nested(DivisionSchema, many=True, validate=validate.Length(min=1), required=True,allow_none=False)
 
 class CreateRecordAttributeSchema(Schema):
     class Meta:  # pylint: disable=too-few-public-methods
@@ -175,5 +175,10 @@ class FOIRequestRecordUpdateSchema(Schema):
     divisions = fields.Nested(DivisionSchema,many=True,validate=validate.Length(min=1),required=False,allow_none=True)
     isdelete = fields.Boolean(required=True,allow_none=False)
 
-    
+class FOIRequestPersonalAttributesUpdateSchema(Schema):
+    class Meta:  # pylint: disable=too-few-public-methods
+        """Exclude unknown fields in the deserialized output."""
 
+        unknown = EXCLUDE
+    records = fields.Nested(RecordSchema,many=True,data_key="records",required=True)
+    newpersonalattributes = fields.Nested(PersonalAttributesSchema,required=True)

@@ -33,6 +33,7 @@ import {
   fetchPDFStitchedRecordForOIPCRedline,
   fetchPDFStitchedRecordForOIPCRedlineReview,
   checkForRecordsChange,
+  editPersonalAttributes,
 } from "../../../../apiManager/services/FOI/foiRecordServices";
 import {
   StateTransitionCategories,
@@ -119,6 +120,7 @@ import { MinistryNeedsScanning } from "../../../../constants/FOI/enum";
 import FOI_COMPONENT_CONSTANTS from "../../../../constants/FOI/foiComponentConstants";
 import MCFPersonal from "./MCFPersonal";
 import MSDPersonal from "./MSDPersonal";
+import MCFPersonalMinistry from "./MCFPersonalMinistry";
 
 const useStyles = makeStyles((_theme) => ({
   createButton: {
@@ -225,6 +227,7 @@ export const RecordsLog = ({
   const userGroups = user?.groups?.map((group) => group.slice(1));
 
   let recordsObj = useSelector((state) => state.foiRequests.foiRequestRecords);
+  console.log("recordsObj: ", recordsObj);
 
   let pdfStitchStatus = useSelector(
     (state) => state.foiRequests.foiPDFStitchStatusForHarms
@@ -306,7 +309,22 @@ export const RecordsLog = ({
     dispatch(getRecordFormats());
   }, []);
 
+  const [currentEditRecord, setCurrentEditRecord] = useState();
+  const [editTagModalOpen, setEditTagModalOpen] = useState(false);
+  const [curPersonalAttributes, setCurPersonalAttributes] = useState({
+    person: "",
+    filetype: "",
+    volume: "",
+    trackingid: "",
+    personaltag: "TBD"
+  });
+  const [newPersonalAttributes, setNewPersonalAttributes] = useState();
 
+  useEffect(() => {
+    if(currentEditRecord?.attributes?.personalattributes)
+      setCurPersonalAttributes(currentEditRecord.attributes.personalattributes);
+  },[currentEditRecord])
+  
   const MCFPeople = useSelector(
     (state) => state.foiRequests.foiPersonalPeople
   );
@@ -659,7 +677,6 @@ export const RecordsLog = ({
                   (fileInfo) => fileInfo.filename === header.filename
                 );
                 var documentDetails;
-                let personalAttributes;
                 if (modalFor === "replace") {
                   documentDetails = {
                     filename: header.filename,
@@ -690,7 +707,6 @@ export const RecordsLog = ({
                   documentDetails.attributes.trigger = "recordreplace";
                   delete documentDetails.outputdocumentmasterid;
                 } else {
-                  personalAttributes = {divisions: [{ divisionid: _fileInfo.divisionid }], ..._fileInfo.personalattributes}
                   documentDetails = {
                     s3uripath: header.filepathdb,
                     filename: header.filename,
@@ -700,7 +716,7 @@ export const RecordsLog = ({
                         ? _file.lastModifiedDate
                         : new Date(_file.lastModified),
                       filesize: _file.size,
-                      personalattributes: personalAttributes,
+                      personalattributes: _fileInfo.personalattributes,
                     },
                   };
                 }
@@ -1787,6 +1803,77 @@ export const RecordsLog = ({
     );
   };
 
+  const comparePersonalAttributes = (a, b) => {
+    return a?.person === b?.person && a?.volume === b?.volume
+              && a?.filetype === b?.filetype && a?.personaltag === b?.personaltag;
+  };
+
+  const updatePersonalAttributes = (_all = false) => {
+    setDivisionsModalOpen(false);
+    // newPersonalAttributes
+    // currentEditRecord
+    var updateRecords = [];
+
+    if(_all) {
+      for (let record of records) {
+        if(record.attributes?.personalattributes?.person
+           && record.attributes?.personalattributes?.person === currentEditRecord.attributes?.personalattributes?.person
+           && record.attributes?.personalattributes?.filetype
+           && record.attributes?.personalattributes?.filetype === currentEditRecord.attributes?.personalattributes?.filetype
+        ) {
+          updateRecords.push(
+            (({ recordid, documentmasterid, s3uripath }) => ({
+              recordid,
+              documentmasterid,
+              filepath: s3uripath,
+            }))(record)
+          );
+        }
+
+        if(record.attachments) {
+          for (let attachment of record.attachments) {
+            if(attachment.attributes?.personalattributes?.person
+              && attachment.attributes?.personalattributes?.person === currentEditRecord.attributes?.personalattributes?.person
+              && attachment.attributes?.personalattributes?.filetype
+              && attachment.attributes?.personalattributes?.filetype === currentEditRecord.attributes?.personalattributes?.filetype
+            ) {
+              updateRecords.push(
+                (({ documentmasterid, s3uripath }) => ({
+                  documentmasterid,
+                  filepath: s3uripath,
+                }))(attachment)
+              );
+            }
+          }
+        }
+      }
+    } else {
+      updateRecords.push(
+        {
+          recordid: currentEditRecord.recordid,
+          documentmasterid: currentEditRecord.documentmasterid,
+          filepath: currentEditRecord.s3uripath
+        }
+      );
+    }
+
+    if(currentEditRecord && !comparePersonalAttributes(newPersonalAttributes, curPersonalAttributes)) {
+      dispatch(
+        editPersonalAttributes(
+          requestId,
+          ministryId,
+          {
+            records: updateRecords,
+            newpersonalattributes: newPersonalAttributes
+          },
+          (err, _res) => {
+            dispatchRequestAttachment(err);
+          }
+        )
+      );
+    }
+  };
+
   //function to manage download for harms option
   const enableHarmsDonwnload = () => {
     return !recordsObj.records.every(
@@ -2285,6 +2372,8 @@ export const RecordsLog = ({
                     handleSelectRecord={handleSelectRecord}
                     setDivisionsModalOpen={setDivisionsModalOpen}
                     isMCFPersonal={isMCFPersonal}
+                    setEditTagModalOpen={setEditTagModalOpen}
+                    setCurrentEditRecord={setCurrentEditRecord}
                   />
                 ))
               ) : (
@@ -2385,7 +2474,26 @@ export const RecordsLog = ({
               </DialogActions>
             </Dialog>
           </div>
-          <div className="state-change-dialog">
+
+          {isMCFPersonal?(
+            <MCFPersonal
+              editTagModalOpen={editTagModalOpen}
+              setEditTagModalOpen={setEditTagModalOpen}
+              record={currentEditRecord}
+              setNewDivision={setDivisionModalTagValue}
+              // tagValue={
+              //   records.filter((r) => r.isselected)[0]?.attributes
+              //     .divisions[0].divisionid
+              // }
+              // divisionModalTagValue={divisionModalTagValue}
+              // divisions={divisions}
+              curPersonalAttributes={curPersonalAttributes}
+              setNewPersonalAttributes={setNewPersonalAttributes}
+              updatePersonalAttributes={updatePersonalAttributes}
+              updatePersonalAttributesForAll={updatePersonalAttributes}
+            />
+          ):(
+            <div className="state-change-dialog">
             <Dialog
               open={divisionsModalOpen}
               onClose={() => setDivisionsModalOpen(false)}
@@ -2436,8 +2544,8 @@ export const RecordsLog = ({
 
                       {requestType ==
                       FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL ? (
-                        bcgovcode == "MCF" ? (
-                          <MCFPersonal
+                        (bcgovcode == "MCF" && isMinistryCoordinator) ? (
+                          <MCFPersonalMinistry
                             setNewDivision={setDivisionModalTagValue}
                             tagValue={
                               records.filter((r) => r.isselected)[0]?.attributes
@@ -2587,6 +2695,7 @@ export const RecordsLog = ({
               </DialogActions>
             </Dialog>
           </div>
+          )}
         </>
       )}
     </div>
@@ -2603,7 +2712,9 @@ const Attachment = React.memo(
     ministryId,
     handleSelectRecord,
     setDivisionsModalOpen,
-    isMCFPersonal
+    isMCFPersonal,
+    setEditTagModalOpen,
+    setCurrentEditRecord
   }) => {
     const classes = useStyles();
     const [disabled, setDisabled] = useState(false);
@@ -2802,9 +2913,10 @@ const Attachment = React.memo(
               disabled={disabled}
               ministryId={ministryId}
               setRetry={setRetry}
-              setDivisionsModalOpen={setDivisionsModalOpen}
+              setEditTagModalOpen={setEditTagModalOpen}
               isMCFPersonal={isMCFPersonal}
               isMinistryCoordinator={isMinistryCoordinator}
+              setCurrentEditRecord={setCurrentEditRecord}
             />
           </Grid>
         </Grid>
@@ -2885,6 +2997,8 @@ const Attachment = React.memo(
             classes={classes}
             handleSelectRecord={handleSelectRecord}
             isMCFPersonal={isMCFPersonal}
+            setEditTagModalOpen={setEditTagModalOpen}
+            setCurrentEditRecord={setCurrentEditRecord}
           />
         ))}
       </>
@@ -2906,9 +3020,10 @@ const AttachmentPopup = React.memo(
     disabled,
     ministryId,
     setRetry,
-    setDivisionsModalOpen,
+    setEditTagModalOpen,
     isMCFPersonal,
-    isMinistryCoordinator
+    isMinistryCoordinator,
+    setCurrentEditRecord
   }) => {
     const ref = React.useRef();
     const closeTooltip = () => (ref.current && ref ? ref.current.close() : {});
@@ -3005,7 +3120,14 @@ const AttachmentPopup = React.memo(
     //   return (<DeleteMenu />)
     // }
 
-    const ActionsPopover = ({ RestrictViewInBrowser, record, setDivisionsModalOpen, isMCFPersonal, isMinistryCoordinator }) => {
+    const ActionsPopover = ({
+      RestrictViewInBrowser,
+      record,
+      setEditTagModalOpen,
+      isMCFPersonal,
+      isMinistryCoordinator,
+      setCurrentEditRecord
+    }) => {
       return (
         <Popover
           anchorReference="anchorPosition"
@@ -3030,7 +3152,8 @@ const AttachmentPopup = React.memo(
             {(isMCFPersonal && !isMinistryCoordinator) && (
               <MenuItem
                 onClick={() => {
-                  setDivisionsModalOpen(true);
+                  setCurrentEditRecord(record);
+                  setEditTagModalOpen(true);
                   setPopoverOpen(false);
                 }}
               >
@@ -3146,7 +3269,14 @@ const AttachmentPopup = React.memo(
         >
           <MoreHorizIcon />
         </IconButton>
-        <ActionsPopover RestrictViewInBrowser={true} record={record} setDivisionsModalOpen={setDivisionsModalOpen} isMCFPersonal={isMCFPersonal} isMinistryCoordinator={isMinistryCoordinator} />
+        <ActionsPopover
+          RestrictViewInBrowser={true}
+          record={record}
+          setEditTagModalOpen={setEditTagModalOpen}
+          isMCFPersonal={isMCFPersonal}
+          isMinistryCoordinator={isMinistryCoordinator}
+          setCurrentEditRecord={setCurrentEditRecord}
+        />
       </>
     );
   }

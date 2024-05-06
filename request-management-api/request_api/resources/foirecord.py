@@ -22,7 +22,7 @@ from request_api.tracer import Tracer
 from request_api.utils.util import  cors_preflight, allowedorigins, getrequiredmemberships
 from request_api.exceptions import BusinessException, Error
 from request_api.services.recordservice import recordservice
-from request_api.schemas.foirecord import  FOIRequestBulkCreateRecordSchema, FOIRequestBulkRetryRecordSchema, FOIRequestRecordDownloadSchema, FOIRequestReplaceRecordSchema, FOIRequestRecordUpdateSchema
+from request_api.schemas.foirecord import  FOIRequestBulkCreateRecordSchema, FOIRequestBulkRetryRecordSchema, FOIRequestRecordDownloadSchema, FOIRequestReplaceRecordSchema, FOIRequestRecordUpdateSchema, FOIRequestPersonalAttributesUpdateSchema
 from marshmallow import INCLUDE
 import json
 from flask_cors import cross_origin
@@ -91,6 +91,28 @@ class UpdateFOIDocument(Resource):
             requestjson = request.get_json()
             data = FOIRequestRecordUpdateSchema().load(requestjson)
             result = recordservice().update(requestid, ministryrequestid, data, AuthHelper.getuserid())
+            return {'status': result.success, 'message':result.message,'id':result.identifier} , 200
+        except KeyError as error:
+            return {'status': False, 'message': CUSTOM_KEYERROR_MESSAGE + str(error)}, 400
+        except BusinessException as exception:
+            return {'status': exception.status_code, 'message':exception.message}, 500
+
+@cors_preflight('POST,OPTIONS')
+@API.route('/foirecord/<requestid>/ministryrequest/<ministryrequestid>/updatepersonalattributes')
+class UpdateFOIDocument(Resource):
+    """Resource for soft delete FOI requests."""
+
+
+    @staticmethod
+    @TRACER.trace()
+    @cross_origin(origins=allowedorigins())
+    @auth.require
+    @auth.ismemberofgroups(getrequiredmemberships())
+    def post(requestid, ministryrequestid):
+        try:
+            requestjson = request.get_json()
+            data = FOIRequestPersonalAttributesUpdateSchema().load(requestjson)
+            result = recordservice().updatepersonalattributes(requestid, ministryrequestid, data, AuthHelper.getuserid())
             return {'status': result.success, 'message':result.message,'id':result.identifier} , 200
         except KeyError as error:
             return {'status': False, 'message': CUSTOM_KEYERROR_MESSAGE + str(error)}, 400
