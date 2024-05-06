@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef, useCallback } from 'react';
 import { useDispatch, useSelector } from "react-redux";
 import TextField from '@mui/material/TextField';
 import InputAdornment from "@mui/material/InputAdornment";
@@ -129,6 +129,23 @@ export const ContactApplicant = ({
 
   const [editorValue, setEditorValue] = useState("")
   const [currentTemplate, setCurrentTemplate] = useState(0)
+
+  // Create a ref to store the Quill instance
+  const quillRef = useRef(null);
+
+  // Callback function to handle the reference to the Quill editor
+  const handleRef = useCallback((ref) => {
+    // If the ref is not null, set up the Quill instance
+    if (ref) {
+      const quill = ref.getEditor();
+      
+      // Enable spellcheck for the Quill editor
+      quill.root.setAttribute('spellcheck', true);
+
+      // Store the Quill ref in the current variable
+      quillRef.current = ref;
+    }
+  }, []);
 
   const handleTemplateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setCurrentTemplate(+e.target.value)
@@ -384,6 +401,7 @@ export const ContactApplicant = ({
             value={editorValue}
             onChange={setEditorValue}
             modules={quillModules}
+            ref={handleRef}
           />
           {files.map((file: any, index: number) => (
             <div className="email-attachment-item" key={file.filename}>

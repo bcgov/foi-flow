@@ -196,7 +196,6 @@ const AddCommentField = ({ cancellor, parentId, add, fullnameList , restrictedRe
   return (
     <>
       <form className={formclass}>
-       
         <Toolbar>
           {
             (externalProps) => (
