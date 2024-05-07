@@ -2717,7 +2717,6 @@ const Attachment = React.memo(
     const classes = useStyles();
     const [disabled, setDisabled] = useState(false);
     const [isRetry, setRetry] = useState(false);
-    const [personalAtts, setPersonalAtts] = useState([]);
 
     // useEffect(() => {
     //   if(record && record.filename) {
@@ -2734,18 +2733,6 @@ const Attachment = React.memo(
     const handleSelect = (e) => {
       handleSelectRecord(record, e);
     };
-
-    useEffect(() => {
-      let _personalAtts = [];
-      if(record.attributes?.personalattributes) {
-        Object.entries(record.attributes?.personalattributes).forEach(([key, value]) => {
-          if(key !== "divisions" && value) {
-            _personalAtts.push({divisionname: value});
-          }
-        });
-      }
-      setPersonalAtts(_personalAtts);
-    }, [record])
 
     const recordtitle = () => {
       if (disabled) {
@@ -2927,7 +2914,7 @@ const Attachment = React.memo(
           alignItems="flex-start"
         >
           <Grid item xs={6}>
-            {[...record.attributes?.divisions, ...personalAtts].map((division, i) => (
+            {record.attributes?.divisions.map((division, i) => (
               <Chip
                 item
                 key={i}
@@ -2945,6 +2932,63 @@ const Attachment = React.memo(
                 }}
               />
             ))}
+            {record.attributes?.personalattributes?.person && 
+              <Chip
+                item
+                key={record.attributes?.divisions?.length + 1}
+                label={record.attributes.personalattributes.person}
+                size="small"
+                className={clsx(classes.chip, classes.chipPrimary)}
+                style={{
+                  backgroundColor: "#003366",
+                  margin:
+                    record.isattachment && record.attributes?.divisions?.length === 0
+                      ? "4px 4px 4px 95px"
+                      : record.attributes?.divisions?.length === 0
+                      ? "4px 4px 4px 35px"
+                      : "4px",
+                }}
+              />
+            }
+            {record.attributes?.personalattributes?.filetype && 
+              <Chip
+                item
+                key={record.attributes?.divisions?.length + 2}
+                label={record.attributes.personalattributes.filetype}
+                size="small"
+                className={clsx(classes.chip, classes.chipPrimary)}
+                style={{
+                  backgroundColor: "#003366",
+                  margin: "4px",
+                }}
+              />
+            }
+            {record.attributes?.personalattributes?.volume && 
+              <Chip
+                item
+                key={record.attributes?.divisions?.length + 3}
+                label={record.attributes.personalattributes.volume}
+                size="small"
+                className={clsx(classes.chip, classes.chipPrimary)}
+                style={{
+                  backgroundColor: "#003366",
+                  margin: "4px",
+                }}
+              />
+            }
+            {record.attributes?.personalattributes?.trackingid && 
+              <Chip
+                item
+                key={record.attributes?.divisions?.length + 4}
+                label={record.attributes.personalattributes.trackingid}
+                size="small"
+                className={clsx(classes.chip, classes.chipPrimary)}
+                style={{
+                  backgroundColor: "#003366",
+                  margin: "4px",
+                }}
+              />
+            }
           </Grid>
           <Grid
             item
