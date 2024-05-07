@@ -5,6 +5,7 @@ import {
   calculateDaysRemaining,
 } from "../../../helper/FOI/helper";
 import { StateEnum } from "../../../constants/FOI/statusEnum";
+import { MinistryNeedsLANPages, RequestTypes } from "../../../constants/FOI/enum";
 import Chip from "@mui/material/Chip";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFlag } from '@fortawesome/free-solid-svg-icons'; 
@@ -302,7 +303,7 @@ export const pagecountcellTooltipRender = (params) => {
     if (requestpagecount > 0) {
       toolTipText += `AXIS pages: ${axispagecount} \n Mod pages: ${recordspagecount} \n`;
     }
-    if (bcgovcode?.toLowerCase() === "cfd" && requestType?.toLowerCase() === "personal") {
+    if (MinistryNeedsLANPages.includes(bcgovcode?.toUpperCase()) && requestType?.toLowerCase() === RequestTypes.personal) {
       toolTipText += `LAN pages: ${lanpagecount} \n`;
     }
   }
