@@ -3,6 +3,7 @@ using Newtonsoft.Json;
 using System;
 using System.Data;
 using System.Globalization;
+using System.Linq;
 
 namespace MCS.FOI.AXISIntegration.DAL
 {
@@ -13,10 +14,11 @@ namespace MCS.FOI.AXISIntegration.DAL
             return row[property] == DBNull.Value ? null : Convert.ToDateTime(row[property]).ToString(format, CultureInfo.InvariantCulture);
         }
 
-        public static string ConvertRequestToJSON(AXISRequest request)
+        public static string ConvertRequestToJSON(Object _object)
         {
-            return JsonConvert.SerializeObject(request);
+            return JsonConvert.SerializeObject(_object);
         }
+
 
         public static string GetRequestType(string requestType)
         {
@@ -137,6 +139,12 @@ namespace MCS.FOI.AXISIntegration.DAL
                 "Secure File Transfer" => "Secure File Transfer",
                 _ => "Secure File Transfer",
             };
+        }
+
+        public static string GetInClause(string[] values)
+        {
+            // Join the array values with commas and enclose each value in single quotes
+            return string.Join(",", values.Select(val => $"'{val}'"));
         }
     }
 }

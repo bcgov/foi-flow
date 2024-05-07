@@ -77,4 +77,5 @@ secure==0.3.0
 boto3==1.24.35
 walrus==0.8.2
 imap-tools==0.56.0
+more-itertools==10.2.0
 -e git+https://github.com/bcgov/sbc-common-components.git#egg=sbc-common-components&subdirectory=python

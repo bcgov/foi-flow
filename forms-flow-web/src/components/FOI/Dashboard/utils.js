@@ -294,17 +294,21 @@ export const pagecountcellTooltipRender = (params) => {
   const axispagecount = params.row.axispagecount;
   const recordspagecount = params.row.recordspagecount;
   const requestpagecount = params.row.requestpagecount;
+  const lanpagecount = params.row.axislanpagecount;
   let toolTipText = "";
-  if (requestpagecount > 0) {
-    toolTipText = `AXIS pages: ${axispagecount} \n Mod pages: ${recordspagecount}`;
+  if (requestpagecount > 0 || lanpagecount > 0) {
+    if (requestpagecount > 0) {
+      toolTipText += `AXIS pages: ${axispagecount} \n Mod pages: ${recordspagecount} \n`;
+    }
+    if (lanpagecount > 0) {
+      toolTipText += `LAN pages: ${lanpagecount} \n`;
+    }
   }
-  return <LightTooltip placement="bottom-start" title={
-    <div style={{whiteSpace: "pre-line"}}>
-      {toolTipText}
-    </div>
-  }>
-    <span className="table-cell-truncate">{requestpagecount}</span>
-  </LightTooltip>
+  return toolTipText ? (
+    <LightTooltip placement="bottom-start" title={<div style={{ whiteSpace: "pre-line" }}>{toolTipText}</div>}>
+      <span className="table-cell-truncate">{requestpagecount}</span>
+    </LightTooltip>
+  ) : null;
 };
 
 export const eventCellTooltipRender = (params) => {
