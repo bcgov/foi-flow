@@ -162,6 +162,15 @@ const MinistryNeedsScanning = [
   "MSD"
 ]
 
+const MinistryNeedsLANPages = [
+  "CFD"
+]
+
+const RequestTypes = Object.freeze({
+  general: "general",
+  personal: "personal"
+});
+
 const MCFPopularSections = 23
 const MSDPopularSections = 11
 
@@ -206,4 +215,6 @@ MSDPopularSections,
 RecordsDownloadList,
 RecordDownloadCategory,
 RecordDownloadStatus,
+MinistryNeedsLANPages,
+RequestTypes
 };
