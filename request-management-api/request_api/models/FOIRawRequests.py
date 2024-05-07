@@ -1,6 +1,6 @@
 from enum import unique
 
-from sqlalchemy.sql.sqltypes import DateTime, String, Date
+from sqlalchemy.sql.sqltypes import DateTime, String, Date, Integer
 
 from flask.app import Flask
 from sqlalchemy.sql.schema import ForeignKey, ForeignKeyConstraint
@@ -14,6 +14,7 @@ from sqlalchemy import insert, and_, or_, text, func, literal, cast, asc, desc, 
 
 from .FOIMinistryRequests import FOIMinistryRequest
 from .FOIRawRequestWatchers import FOIRawRequestWatcher
+from .FOIRequestApplicants import FOIRequestApplicant
 from .FOIAssignees import FOIAssignee
 import logging
 from dateutil import parser
@@ -334,6 +335,30 @@ class FOIRawRequest(db.Model):
        return request_schema.dump(request)
     
     @classmethod
+    def getrawrequestsbyapplicantid(cls,applicantid):
+        request_schema = FOIRawRequestSchema(many=True)
+        applicant_subquery = db.session.query(FOIRequestApplicant.applicantprofileid).filter(FOIRequestApplicant.foirequestapplicantid == applicantid).subquery()
+        subquery_applicant_id_list = db.session.query(FOIRequestApplicant.foirequestapplicantid).filter(applicant_subquery.c.applicantprofileid == FOIRequestApplicant.applicantprofileid).subquery()
+
+        #subquery for getting the latest version
+        subquery_maxversion = db.session.query(FOIRawRequest.requestid, func.max(FOIRawRequest.version).label('max_version')).group_by(FOIRawRequest.requestid).subquery()
+        joincondition = [
+            subquery_maxversion.c.requestid == FOIRawRequest.requestid,
+            subquery_maxversion.c.max_version == FOIRawRequest.version,
+        ]
+        
+        query = db.session.query(FOIRawRequest).distinct(FOIRawRequest.requestid).join(
+            FOIAssignee, FOIAssignee.username == FOIRawRequest.assignedto
+        ).join(
+            subquery_maxversion,
+            and_(*joincondition)
+        ).filter(
+            FOIRawRequest.requestrawdata['foiRequestApplicantID'].astext.cast(db.Integer).in_(subquery_applicant_id_list),
+            FOIRawRequest.status.notin_(['Archived', 'Closed'])
+        ).order_by(FOIRawRequest.requestid.desc()).all()
+        return request_schema.dump(query)
+    
+    @classmethod
     def getLastStatusUpdateDate(cls,requestid,status):
         lastupdatedate = None
         try:
@@ -510,10 +535,10 @@ class FOIRawRequest(db.Model):
             else_ = cast(FOIRawRequest.axisrequestid, String)).label('axisRequestId')
 
         requestpagecount = case([
-            (FOIRawRequest.requestrawdata['requestPageCount'].is_(None),
+            (FOIRawRequest.requestrawdata['axispagecount'].is_(None),
             '0'),
             ],
-            else_ = cast(FOIRawRequest.requestrawdata['requestPageCount'], String)).label('requestPageCount')
+            else_ = cast(FOIRawRequest.requestrawdata['axispagecount'], String))
 
         intakesorting = case([
                             (FOIRawRequest.assignedto == None, # Unassigned requests first
@@ -547,7 +572,10 @@ class FOIRawRequest(db.Model):
             FOIRawRequest.assignedto.label('assignedTo'),
             cast(FOIRawRequest.requestid, String).label('idNumber'),
             axisrequestid,
-            requestpagecount,
+            cast(requestpagecount, Integer).label('requestpagecount'),
+            requestpagecount.label('axispagecount'),
+            literal(None).label('axislanpagecount'),
+            literal(None).label('recordspagecount'),
             literal(None).label('ministryrequestid'),
             literal(None).label('assignedministrygroup'),
             literal(None).label('assignedministryperson'),
@@ -735,7 +763,7 @@ class FOIRawRequest(db.Model):
             'requestType',
             'idNumber',
             'axisRequestId',
-            'requestPageCount',
+            'requestpagecount',
             'currentState',
             'assignedTo',
             'receivedDate',

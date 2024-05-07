@@ -64,8 +64,7 @@ class rawrequestservicegetter:
             request['requestrawdata']['currentState'] = request['status']
             request['requestrawdata']['requeststatuslabel'] =  request['requeststatuslabel']
             request['requestrawdata']['lastStatusUpdateDate'] = FOIRawRequest.getLastStatusUpdateDate(requestid, request['status']).strftime(self.__generaldateformat())
-            if request['requeststatuslabel'] == StateName.closed.name:
-                request['requestrawdata']['stateTransition']= FOIRawRequest.getstatesummary(requestid)
+            request['requestrawdata']['stateTransition']= FOIRawRequest.getstatesummary(requestid)
             request['requestrawdata']['wfinstanceid'] = request['wfinstanceid']
             request['requestrawdata']['closedate']= self.__getclosedate(request['closedate'])
             request['requestrawdata']['isiaorestricted']= request['isiaorestricted'] if request['isiaorestricted'] is not None else False

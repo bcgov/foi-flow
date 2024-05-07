@@ -80,6 +80,8 @@ import {
   isMandatoryField,
   isAxisSyncDisplayField,
   getUniqueIdentifier,
+  closeContactInfo,
+  closeApplicantDetails
 } from "./utils";
 import {
   ConditionalComponent,
@@ -97,8 +99,11 @@ import { UnsavedModal } from "../customComponents";
 import { DISABLE_GATHERINGRECORDS_TAB } from "../../../constants/constants";
 import _ from "lodash";
 import { MinistryNeedsScanning } from "../../../constants/FOI/enum";
+import ApplicantProfileModal from "./ApplicantProfileModal";
+import { setFOIRequestDetail } from "../../../actions/FOI/foiRequestActions";
 import OIPCDetails from "./OIPCDetails/Index";
 import useOIPCHook from "./OIPCDetails/oipcHook";
+import MANDATORY_FOI_REQUEST_FIELDS from "../../../constants/FOI/mandatoryFOIRequestFields";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -122,7 +127,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const FOIRequest = React.memo(({ userDetail }) => {
+const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
   const [_requestStatus, setRequestStatus] = React.useState(
     StateEnum.unopened.name
   );
@@ -164,6 +169,9 @@ const FOIRequest = React.memo(({ userDetail }) => {
   // let requestRecords = useSelector(
   //   (state) => state.foiRequests.foiRequestRecords
   // );
+  let requestApplicantProfile = useSelector(
+    (state) => state.foiRequests.foiRequestApplicantProfile
+  )
   const [attachments, setAttachments] = useState(requestAttachments);
   const [comment, setComment] = useState([]);
   const [requestState, setRequestState] = useState(StateEnum.unopened.name);
@@ -178,6 +186,8 @@ const FOIRequest = React.memo(({ userDetail }) => {
     window.removeEventListener("beforeunload", handleBeforeUnload);
     dispatch(push(`/foi/dashboard`));
   };
+
+
 
   const returnToQueue = (e) => {
     if (unSavedRequest) {
@@ -310,8 +320,9 @@ const FOIRequest = React.memo(({ userDetail }) => {
       dispatch(fetchApplicantCorrespondenceTemplates());
       dispatch(
         fetchRedactedSections(ministryId, (_err, res) => {
-          setRedactedSections(res);
-
+          if (!_err) {
+            setRedactedSections(res.sections);
+          }
         })
       );
     }
@@ -377,6 +388,28 @@ const FOIRequest = React.memo(({ userDetail }) => {
 
   
   useEffect(() => {
+    if (requestApplicantProfile) {      
+      if (!ministryId) {
+        let newRequestDetails = { ...saveRequestObject };
+        for (let field in requestApplicantProfile) {
+          if (field === "additionalPersonalInfo") {
+            newRequestDetails["additionalPersonalInfo"] = newRequestDetails["additionalPersonalInfo"] || {}
+            for (let infofield in requestApplicantProfile[field]) {
+              newRequestDetails[field][infofield] =
+              requestApplicantProfile[field][infofield];
+            }
+          } else {
+            newRequestDetails[field] = requestApplicantProfile[field];
+          }
+        }
+        dispatch(setFOIRequestDetail(newRequestDetails))
+      } else {
+        handleSaveRequest(requestDetails.currentState, false, "");
+      }
+    }
+  }, [requestApplicantProfile]);
+
+  useEffect(() => {
     if (isIAORestricted)
       dispatch(fetchRestrictedRequestCommentTagList(requestId, ministryId));
   }, [isIAORestricted]);
@@ -402,6 +435,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
                 typeof data["linkedRequests"] == "string"
                   ? JSON.parse(data["linkedRequests"])
                   : data["linkedRequests"];
+              data["axisApplicantID"] = ("axisApplicantID" in data) ? parseInt(data["axisApplicantID"]) : null;
               setAxisSyncedData(data);
               let axisDataUpdated = checkIfAxisDataUpdated(data);
               if (axisDataUpdated) {
@@ -442,6 +476,19 @@ const FOIRequest = React.memo(({ userDetail }) => {
   };
 
   const checkValidation = (key, axisData) => {
+
+    if (key === MANDATORY_FOI_REQUEST_FIELDS.TOTAL_NO_OF_PAGES) {
+      if ((requestDetails["axispagecount"] || axisData[key]) && requestDetails["axispagecount"] !== axisData[key])
+        return true;
+      return false;
+
+
+      // if (requestDetails["recordspagecount"] > 0)
+      //   return false;
+      // else if ((requestDetails["axispagecount"] || axisData[key]) && requestDetails["axispagecount"] !== axisData[key])
+      //   return true;
+      // return false;
+    }
     let mandatoryField = isMandatoryField(key);
     if (key === "additionalPersonalInfo") {
       if (axisData.requestType === "personal") {
@@ -1009,7 +1056,6 @@ const FOIRequest = React.memo(({ userDetail }) => {
               isMinistryCoordinator={false}
               isValidationError={isValidationError}
               requestType={requestDetails?.requestType}
-              isDivisionalCoordinator={false}
             />
           </div>
 
@@ -1228,8 +1274,8 @@ const FOIRequest = React.memo(({ userDetail }) => {
                           handleApplicantDetailsValue
                         }
                         createSaveRequestObject={createSaveRequestObject}
-                        disableInput={disableInput}
-                        userDetail={userDetail}
+                        disableInput={disableInput || requestDetails?.axisApplicantID /* requestDetails?.foiRequestApplicantID > 0 comment back in after axis decommission*/}
+                        defaultExpanded={!closeApplicantDetails(userDetail, requestDetails?.requestType)}
                       />
                       {requiredRequestDetailsValues.requestType.toLowerCase() ===
                         FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL && (
@@ -1261,9 +1307,10 @@ const FOIRequest = React.memo(({ userDetail }) => {
                           handleContactDetailsInitialValue
                         }
                         handleContanctDetailsValue={handleContanctDetailsValue}
-                        disableInput={disableInput}
+                        disableInput={disableInput || requestDetails?.axisApplicantID /* requestDetails?.foiRequestApplicantID > 0 comment back in after axis decommission*/}
                         handleEmailValidation={handleEmailValidation}
-                        userDetail={userDetail}
+                        defaultExpanded={!closeContactInfo(userDetail,requestDetails)}
+                        moreInfoAction={openApplicantProfileModal}
                       />
 
                       <RequestDescriptionBox
@@ -1308,7 +1355,8 @@ const FOIRequest = React.memo(({ userDetail }) => {
                         <AdditionalApplicantDetails
                           requestDetails={requestDetails}
                           createSaveRequestObject={createSaveRequestObject}
-                          disableInput={disableInput}
+                          disableInput={disableInput || requestDetails?.axisApplicantID /* requestDetails?.foiRequestApplicantID > 0 comment back in after axis decommission*/}
+                          defaultExpanded={true}
                         />
                       )}
                       {showDivisionalTracking && (

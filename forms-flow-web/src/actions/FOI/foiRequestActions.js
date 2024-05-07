@@ -128,6 +128,12 @@ export const setFOIMinistryViewRequestDetail = (data) => (dispatch) => {
     payload: data,
   });
 };
+export const setFOIRequestApplicantProfile = (data) => (dispatch) => {
+  dispatch({
+    type: FOI_ACTION_CONSTANTS.FOI_REQUEST_APPLICANT_PROFILE,
+    payload: data,
+  });
+};
 export const setFOIPDFStitchedRecordForHarms = (data) => (dispatch) => {
   dispatch({
     type: FOI_ACTION_CONSTANTS.FOI_PDF_STITCHED_RECORD_FOR_HARMS,

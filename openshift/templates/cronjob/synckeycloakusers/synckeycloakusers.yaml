@@ -1,0 +1,40 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: synckeycloakusers
+spec:
+  schedule: "0 13 * * *"       
+  concurrencyPolicy: "Allow"  
+  suspend: false                
+  successfulJobsHistoryLimit: 3 
+  failedJobsHistoryLimit: 1     
+  jobTemplate:                  
+    spec:
+      template:
+        metadata:
+          creationTimestamp: null
+        spec:
+          containers:
+          - name: synckeycloakusers
+            command:
+              - /bin/sh
+              - '-c'
+            env:
+              - name: KEYCLOAK_ADMIN_CLIENT_SECRET
+                valueFrom:
+                  secretKeyRef:
+                    name: ${SECRET_NAME}
+                    key: KEYCLOAK_ADMIN_CLIENT_SECRET
+            imagePullPolicy: Always
+            terminationMessagePolicy: File
+            image: busybox
+            args:
+              - >
+                token=$(echo "$a" | wget -qO- --header="Content-Type:
+                application/x-www-form-urlencoded" --post-data
+                "grant_type=client_credentials&client_id=foi-lob-api&client_secret=${KEYCLOAK_ADMIN_CLIENT_SECRET}"
+                ${KEYCLOAK_URL}
+                | sed -n 's/.*"access_token":"\([^"]*\).*/\1/p' ) && wget -O-
+                --post-data '' --header "Authorization: Bearer ${token}"
+                ${REQUEST_MANAGEMENT_API_URL}/api/foiuser/refresh
+          restartPolicy: OnFailure 

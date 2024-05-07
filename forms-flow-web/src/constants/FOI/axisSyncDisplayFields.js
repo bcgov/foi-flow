@@ -42,7 +42,9 @@ const AXIS_SYNC_DISPLAY_FIELDS = {
     requestPageCount: "Total number of pages",
     subjectCode: "Subject Code",
     linkedRequests: "Linked Requests",
-    identityVerified:"Identity Verified"
+    identityVerified:"Identity Verified",
+
+    axisApplicantID:"AXIS Applicant ID"
   };
   
   export default AXIS_SYNC_DISPLAY_FIELDS;

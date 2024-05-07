@@ -49,6 +49,9 @@ from .applicantcorrespondence import API as APPLICANTCORRESPONDENCE_API
 from .foiworkflow import API as FOIWORKFLOW_API
 from .dashboardeventpagination import API as FOIEVENT_API
 from .foiuser import API as FOIUSER_API
+from .foiaxissync import API as FOIAXISSYNC_API
+from .foiapplicant import API as APPLICANT_API
+
 
 __all__ = ('API_BLUEPRINT')
 
@@ -92,3 +95,5 @@ API.add_namespace(APPLICANTCORRESPONDENCE_API, '/api')
 API.add_namespace(FOIWORKFLOW_API, '/api')
 API.add_namespace(FOIEVENT_API, '/api')
 API.add_namespace(FOIUSER_API, '/api')
+API.add_namespace(FOIAXISSYNC_API, '/api')
+API.add_namespace(APPLICANT_API, '/api')

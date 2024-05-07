@@ -26,6 +26,7 @@ from request_api.schemas.foirecord import  FOIRequestBulkCreateRecordSchema, FOI
 from marshmallow import INCLUDE
 import json
 from flask_cors import cross_origin
+import asyncio
 
 
 API = Namespace('FOIWatcher', description='Endpoints for FOI record management')
@@ -234,3 +235,54 @@ class FOIRequestRecordsChanged(Resource):
         except Exception as error:
             print("Exception error == ", error)
             return {'status': False, 'message': str(error)}, 500
+
+
+# this is for inflight request pagecount calculation option 1
+@cors_preflight('POST,OPTIONS')
+@API.route('/updatepagecount')
+class UpdateRequestsPageCount(Resource):
+    """updatepagecount option 1."""
+
+    @staticmethod
+    @TRACER.trace()
+    @cross_origin(origins=allowedorigins())
+    @auth.require
+    def post():
+        try:
+            requestjson = request.get_json()
+            ministryrequestid = requestjson['ministryrequestid']  if requestjson.get("ministryrequestid") != None else None
+            if ministryrequestid:
+                asyncio.ensure_future(recordservice().updatepagecount(ministryrequestid, AuthHelper.getuserid()))
+                return {'status': True, 'message': 'async updatepagecount function called'} , 200
+            else:
+                return {'status': True, 'message':'ministryrequestid is none'} , 200
+        except KeyError as error:
+            return {'status': False, 'message': CUSTOM_KEYERROR_MESSAGE + str(error)}, 400
+        except BusinessException as exception:
+            return {'status': exception.status_code, 'message':exception.message}, 500
+    
+# this is for inflight request pagecount calculation option 2
+@cors_preflight('POST,OPTIONS')
+@API.route('/updatepagecount/option2')
+class UpdateRequestsPageCountOption2(Resource):
+    """updatepagecount option 2"""
+
+    @staticmethod
+    @TRACER.trace()
+    @cross_origin(origins=allowedorigins())
+    @auth.require
+    def post():
+        try:
+            requestjson = request.get_json()
+            ministryrequestid = requestjson['ministryrequestid']  if requestjson.get("ministryrequestid") != None else None
+            requestid = requestjson['requestid']  if requestjson.get("requestid") != None else None
+            print(f'option 2 >>> requestid = {requestid}, ministryrequestid = {ministryrequestid}')
+            if ministryrequestid:
+                asyncio.ensure_future(recordservice().calculatepagecount(requestid, ministryrequestid, AuthHelper.getuserid()))
+                return {'status': True, 'message': 'async calculatepagecount function called'} , 200
+            else:
+                return {'status': True, 'message':'ministryrequestid is none'} , 200
+        except KeyError as error:
+            return {'status': False, 'message': CUSTOM_KEYERROR_MESSAGE + str(error)}, 400
+        except BusinessException as exception:
+            return {'status': exception.status_code, 'message':exception.message}, 500

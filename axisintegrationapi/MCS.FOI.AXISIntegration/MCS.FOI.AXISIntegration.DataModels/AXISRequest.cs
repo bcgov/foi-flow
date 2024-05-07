@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Runtime.Serialization;
 
 namespace MCS.FOI.AXISIntegration.DataModels
@@ -73,7 +72,8 @@ namespace MCS.FOI.AXISIntegration.DataModels
         [DataMember(Name = "lastName")]
         public string ApplicantLastName { get; set; }
 
-        
+        [DataMember(Name = "axisApplicantID")]
+        public string AXISApplicantID { get; set; }
 
         [DataMember(Name = "businessName")]
         public string BusinessName { get; set; }
@@ -119,6 +119,9 @@ namespace MCS.FOI.AXISIntegration.DataModels
 
         [DataMember(Name = "requestPageCount")]
         public int RequestPageCount { get; set; }
+
+        [DataMember(Name = "lanPageCount")]
+        public int LANPageCount { get; set; }
 
         [DataMember(Name = "subjectCode")]
         public string SubjectCode { get; set; }

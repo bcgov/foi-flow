@@ -30,7 +30,8 @@ class requestservicebuilder(requestserviceconfigurator):
         foiministryrequest.isactive = True
         foiministryrequest.axisrequestid = requestschema.get("axisRequestId")
         foiministryrequest.axissyncdate = requestschema.get("axisSyncDate")
-        foiministryrequest.requestpagecount = requestschema.get("requestPageCount")
+        foiministryrequest.axispagecount = requestschema.get("axispagecount")
+        foiministryrequest.recordspagecount = requestschema.get("recordspagecount")
         foiministryrequest.filenumber = self.generatefilenumber(ministry["code"], requestschema.get("foirawrequestid")) if filenumber is None else filenumber
         foiministryrequest.programareaid = self.getvalueof("programArea",ministry["code"])
         foiministryrequest.description = requestschema.get("description")
@@ -126,9 +127,9 @@ class requestservicebuilder(requestserviceconfigurator):
               contactinformation.contacttypeid =contacttype["contacttypeid"]              
         return contactinformation
     
-    def createapplicant(self,firstname, lastname, appltcategory, userid, middlename = None,businessname = None, alsoknownas = None, dob = None):
+    def createapplicant(self,firstname, lastname, appltcategory, userid, middlename = None, businessname = None, alsoknownas = None, dob = None, axisapplicantid = None):
         requestapplicant = FOIRequestApplicantMapping()
-        _applicant = FOIRequestApplicant().saveapplicant(firstname, lastname, middlename, businessname, alsoknownas, dob, userid)
+        _applicant = FOIRequestApplicant().createapplicant(firstname, lastname, middlename, businessname, alsoknownas, dob, axisapplicantid, userid)
         requestapplicant.foirequestapplicantid = _applicant.identifier
         if appltcategory is not None:           
             requestertype = RequestorType().getrequestortype(appltcategory)  
