@@ -444,17 +444,17 @@ class FOIMinistryRequest(db.Model):
         axispagecount = case ([
             (FOIMinistryRequest.axispagecount.isnot(None), FOIMinistryRequest.axispagecount)
             ],
-            else_= literal("0")
+            else_= literal("0").label("axispagecount")
         )
         axislanpagecount = case ([
             (FOIMinistryRequest.axislanpagecount.isnot(None), FOIMinistryRequest.axislanpagecount)
             ],
-            else_= literal("0")
+            else_= literal("0").label("axislanpagecount")
         )
         recordspagecount = case ([
             (FOIMinistryRequest.recordspagecount.isnot(None), FOIMinistryRequest.recordspagecount)
             ],
-            else_= literal("0")
+            else_= literal("0").label("recordspagecount")
         )
 
         requestpagecount = case([
@@ -706,6 +706,11 @@ class FOIMinistryRequest(db.Model):
             ],
             else_= literal("0").label("axispagecount")
         )
+        axislanpagecount = case ([
+            (FOIMinistryRequest.axislanpagecount.isnot(None), FOIMinistryRequest.axislanpagecount)
+            ],
+            else_= literal("0").label("axislanpagecount")
+        )
         recordspagecount = case ([
             (FOIMinistryRequest.recordspagecount.isnot(None), FOIMinistryRequest.recordspagecount)
             ],
@@ -748,6 +753,7 @@ class FOIMinistryRequest(db.Model):
             'ministry': func.upper(ProgramArea.bcgovcode),
             'requestpagecount': requestpagecount,
             'axispagecount': axispagecount,
+            'axislanpagecount': axislanpagecount,
             'recordspagecount': recordspagecount,
             'closedate': FOIMinistryRequest.closedate,
             'subjectcode': SubjectCode.name,
@@ -1060,17 +1066,17 @@ class FOIMinistryRequest(db.Model):
         axispagecount = case ([
             (FOIMinistryRequest.axispagecount.isnot(None), FOIMinistryRequest.axispagecount)
             ],
-            else_= literal("0")
+            else_= literal("0").label("axispagecount")
         )
         axislanpagecount = case ([
             (FOIMinistryRequest.axislanpagecount.isnot(None), FOIMinistryRequest.axislanpagecount)
             ],
-            else_= literal("0")
+            else_= literal("0").label("axislanpagecount")
         )
         recordspagecount = case ([
             (FOIMinistryRequest.recordspagecount.isnot(None), FOIMinistryRequest.recordspagecount)
             ],
-            else_= literal("0")
+            else_= literal("0").label("recordspagecount")
         )
         requestpagecount = case([
                 (and_(axispagecount.isnot(None), recordspagecount.isnot(None), cast(axispagecount, Integer) > cast(recordspagecount, Integer)),
