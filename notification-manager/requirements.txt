@@ -1,6 +1,6 @@
 Mako==1.2.2
 MarkupSafe==2.1.1
-Werkzeug==2.3.8
+Werkzeug==3.0.3
 alembic==1.5.8
 aniso8601==9.0.1
 attrs==20.3.0
