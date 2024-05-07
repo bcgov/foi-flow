@@ -102,6 +102,7 @@ import _ from "lodash";
 import { MinistryNeedsScanning } from "../../../constants/FOI/enum";
 import OIPCDetails from "./OIPCDetails/Index";
 import useOIPCHook from "./OIPCDetails/oipcHook";
+import MANDATORY_FOI_REQUEST_FIELDS from "../../../constants/FOI/mandatoryFOIRequestFields";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -452,6 +453,19 @@ const FOIRequest = React.memo(({ userDetail }) => {
   };
 
   const checkValidation = (key, axisData) => {
+
+    if (key === MANDATORY_FOI_REQUEST_FIELDS.TOTAL_NO_OF_PAGES) {
+      if ((requestDetails["axispagecount"] || axisData[key]) && requestDetails["axispagecount"] !== axisData[key])
+        return true;
+      return false;
+
+
+      // if (requestDetails["recordspagecount"] > 0)
+      //   return false;
+      // else if ((requestDetails["axispagecount"] || axisData[key]) && requestDetails["axispagecount"] !== axisData[key])
+      //   return true;
+      // return false;
+    }
     let mandatoryField = isMandatoryField(key);
     if (key === "additionalPersonalInfo") {
       if (axisData.requestType === "personal") {

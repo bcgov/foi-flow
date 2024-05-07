@@ -182,8 +182,10 @@ const RecordDownloadCategory = Object.freeze({
 
 const RecordDownloadStatus = Object.freeze({
   notstarted: "not started",
-  started: "started",
   pushedtostream: "pushedtostream",
+  started: "started",
+  redactionsummarystarted: "redactionsummarystarted",
+  redactionsummaryuploaded: "redactionsummaryuploaded",
   zippingstarted: "zippingstarted",
   zippingcompleted: "zippingcompleted",
   completed: "completed",
