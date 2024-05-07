@@ -29,13 +29,12 @@ const MCFPersonal = ({
     curPersonalAttributes,
     setNewPersonalAttributes,
     updatePersonalAttributes,
-    updatePersonalAttributesForAll
+    setCurPersonalAttributes,
+    setCurrentEditRecord
 }) => {
     const [personalAttributes, setPersonalAttributes] = useState();
     useEffect(() => {
-      if(!personalAttributes || (personalAttributes?.person === "" && curPersonalAttributes?.person !== "")) {
-        setPersonalAttributes(curPersonalAttributes);
-      }
+      setPersonalAttributes(curPersonalAttributes);
     },[curPersonalAttributes])
 
     const [searchValue, setSearchValue] = useState("");
@@ -220,12 +219,25 @@ const MCFPersonal = ({
       }
     };
 
+    const handleClose = () => {
+      setCurrentEditRecord();
+      setCurPersonalAttributes({
+        person: "",
+        filetype: "",
+        volume: "",
+        trackingid: "",
+        personaltag: "TBD"
+      });
+      setNewPersonalAttributes();
+      setEditTagModalOpen(false);
+    };
+
     return (
 
       <div className="state-change-dialog">
         <Dialog
           open={editTagModalOpen}
-          onClose={() => setEditTagModalOpen(false)}
+          onClose={() => handleClose()}
           aria-labelledby="state-change-dialog-title"
           aria-describedby="state-change-dialog-description"
           maxWidth={"md"}
@@ -236,7 +248,7 @@ const MCFPersonal = ({
             <h2 className="state-change-header">Edit Tags</h2>
             <IconButton
               className="title-col3"
-              onClick={() => setEditTagModalOpen(false)}
+              onClick={() => handleClose()}
             >
               <i className="dialog-close-button">Close</i>
               <CloseIcon />
@@ -566,13 +578,13 @@ const MCFPersonal = ({
             </button>
             <button
               className={`btn-bottom btn-save btn`}
-              onClick={() => updatePersonalAttributesForAll()}
+              onClick={() => updatePersonalAttributes(true)}
             >
               Update for All
             </button>
             <button
               className="btn-bottom btn-cancel"
-              onClick={() => setEditTagModalOpen(false)}
+              onClick={() => handleClose()}
             >
               Cancel
             </button>

@@ -227,7 +227,6 @@ export const RecordsLog = ({
   const userGroups = user?.groups?.map((group) => group.slice(1));
 
   let recordsObj = useSelector((state) => state.foiRequests.foiRequestRecords);
-  console.log("recordsObj: ", recordsObj);
 
   let pdfStitchStatus = useSelector(
     (state) => state.foiRequests.foiPDFStitchStatusForHarms
@@ -1809,9 +1808,7 @@ export const RecordsLog = ({
   };
 
   const updatePersonalAttributes = (_all = false) => {
-    setDivisionsModalOpen(false);
-    // newPersonalAttributes
-    // currentEditRecord
+    setEditTagModalOpen(false);
     var updateRecords = [];
 
     if(_all) {
@@ -1871,6 +1868,16 @@ export const RecordsLog = ({
           }
         )
       );
+
+      setCurrentEditRecord();
+      setCurPersonalAttributes({
+        person: "",
+        filetype: "",
+        volume: "",
+        trackingid: "",
+        personaltag: "TBD"
+      });
+      setNewPersonalAttributes();
     }
   };
 
@@ -1912,17 +1919,6 @@ export const RecordsLog = ({
                   id="download"
                   label={currentDownload === 0 ? "Download" : ""}
                   inputProps={{ "aria-labelledby": "download-label" }}
-                  //   InputProps={{
-                  //     startAdornment: isDownloadInProgress && <InputAdornment position="start">
-                  //       {/* <CircularProgress class="download-progress-adornment"/> */}
-                  //       {/* <CircularProgress/> */}
-                  //       record.isredactionready ?
-                  //       <FontAwesomeIcon icon={faCheckCircle} size='2x' color='#1B8103' className={classes.statusIcons}/>:
-                  // record.failed ?
-                  // <FontAwesomeIcon icon={faExclamationCircle} size='2x' color='#A0192F' className={classes.statusIcons}/>:
-                  // <FontAwesomeIcon icon={faSpinner} size='2x' color='#FAA915' className={classes.statusIcons}/>
-                  //       </InputAdornment>
-                  //   }}
                   InputLabelProps={{ shrink: false }}
                   select
                   name="download"
@@ -2481,16 +2477,12 @@ export const RecordsLog = ({
               setEditTagModalOpen={setEditTagModalOpen}
               record={currentEditRecord}
               setNewDivision={setDivisionModalTagValue}
-              // tagValue={
-              //   records.filter((r) => r.isselected)[0]?.attributes
-              //     .divisions[0].divisionid
-              // }
-              // divisionModalTagValue={divisionModalTagValue}
-              // divisions={divisions}
+
               curPersonalAttributes={curPersonalAttributes}
               setNewPersonalAttributes={setNewPersonalAttributes}
               updatePersonalAttributes={updatePersonalAttributes}
-              updatePersonalAttributesForAll={updatePersonalAttributes}
+              setCurrentEditRecord={setCurrentEditRecord}
+              setCurPersonalAttributes={setCurPersonalAttributes}
             />
           ):(
             <div className="state-change-dialog">
@@ -3114,19 +3106,12 @@ const AttachmentPopup = React.memo(
       );
     };
 
-    // const AddMenuItems = () => {
-    //   if (showReplace(record.category))
-    //     return (<ReplaceMenu />)
-    //   return (<DeleteMenu />)
-    // }
-
     const ActionsPopover = ({
       RestrictViewInBrowser,
       record,
       setEditTagModalOpen,
       isMCFPersonal,
-      isMinistryCoordinator,
-      setCurrentEditRecord
+      isMinistryCoordinator
     }) => {
       return (
         <Popover
@@ -3152,7 +3137,6 @@ const AttachmentPopup = React.memo(
             {(isMCFPersonal && !isMinistryCoordinator) && (
               <MenuItem
                 onClick={() => {
-                  setCurrentEditRecord(record);
                   setEditTagModalOpen(true);
                   setPopoverOpen(false);
                 }}
@@ -3263,6 +3247,7 @@ const AttachmentPopup = React.memo(
           color="primary"
           disabled={disabled}
           onClick={(e) => {
+            setCurrentEditRecord(record);
             setPopoverOpen(true);
             setAnchorPosition(e?.currentTarget?.getBoundingClientRect());
           }}
@@ -3275,7 +3260,6 @@ const AttachmentPopup = React.memo(
           setEditTagModalOpen={setEditTagModalOpen}
           isMCFPersonal={isMCFPersonal}
           isMinistryCoordinator={isMinistryCoordinator}
-          setCurrentEditRecord={setCurrentEditRecord}
         />
       </>
     );
