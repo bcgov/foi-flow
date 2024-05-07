@@ -295,12 +295,14 @@ export const pagecountcellTooltipRender = (params) => {
   const recordspagecount = params.row.recordspagecount;
   const requestpagecount = params.row.requestpagecount;
   const lanpagecount = params.row.axislanpagecount;
+  const bcgovcode = params.row.bcgovcode;
+  const requestType = params.row.requestType;
   let toolTipText = "";
   if (requestpagecount > 0 || lanpagecount > 0) {
     if (requestpagecount > 0) {
       toolTipText += `AXIS pages: ${axispagecount} \n Mod pages: ${recordspagecount} \n`;
     }
-    if (lanpagecount > 0) {
+    if (bcgovcode?.toLowerCase() === "cfd" && requestType?.toLowerCase() === "personal") {
       toolTipText += `LAN pages: ${lanpagecount} \n`;
     }
   }
