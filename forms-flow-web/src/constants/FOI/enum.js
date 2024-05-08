@@ -163,7 +163,8 @@ const MinistryNeedsScanning = [
 ]
 
 const MinistryNeedsLANPages = [
-  "CFD"
+  "CFD",
+  "MCF"
 ]
 
 const RequestTypes = Object.freeze({
