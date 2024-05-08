@@ -17,11 +17,11 @@ class axissyncservice:
 
     def syncpagecounts(self, axispgmrequests): 
         for entry in axispgmrequests:
-            self.__syncpagecounts(entry["bcgovcode"], entry["requesttype"])
+            self.__syncpagecounts(entry["iaocode"], entry["requesttype"])
         return DefaultMethodResult(True,'Batch execution completed', axispgmrequests)
 
-    def __syncpagecounts(self, bcgovcode, requesttype):
-        programeara = programareaservice().getprogramareabyiaocode(bcgovcode)
+    def __syncpagecounts(self, iaocode, requesttype):
+        programeara = programareaservice().getprogramareabyiaocode(iaocode)
         requests = FOIMinistryRequest.getrequest_by_pgmarea_type(programeara['programareaid'], requesttype)
         for batch in list(more_itertools.batched(requests, self.AXIS_SYNC_BATCHSIZE)):
             batchrequest = list(batch)
@@ -35,7 +35,7 @@ class axissyncservice:
                     print("batch update failed for ids=", axisids)
             else:
                 print("axis page response is empty for ids=", axisids) 
-        return DefaultMethodResult(True,'Batch execution completed for bcgovcode=%s | requesttype=%s', bcgovcode, requesttype)       
+        return DefaultMethodResult(True,'Batch execution completed for iaocode=%s | requesttype=%s', iaocode, requesttype)       
         
 
     def axis_getpageinfo(self, axis_payload):
