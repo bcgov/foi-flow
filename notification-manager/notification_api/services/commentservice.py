@@ -29,6 +29,7 @@ class commentservice:
         _comment.version = foirequest["version"]
         _comment.taggedusers = None
         _comment.parentcommentid = None
+        _comment.commentsversion = 1
         return _comment
 
 
