@@ -33,6 +33,12 @@ class ProgramArea(db.Model):
         programarea_schema = ProgramAreaSchema()
         query = db.session.query(ProgramArea).filter_by(bcgovcode=pgbcgovcode.upper()).first()
         return programarea_schema.dump(query)
+    
+    @classmethod
+    def getprogramareabyiaocode(cls,iaocode):
+        programarea_schema = ProgramAreaSchema()
+        query = db.session.query(ProgramArea).filter_by(iaocode=iaocode.upper()).first()
+        return programarea_schema.dump(query)
 
 class ProgramAreaSchema(ma.Schema):
     class Meta:
