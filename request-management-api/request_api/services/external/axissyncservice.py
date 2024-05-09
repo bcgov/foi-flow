@@ -65,8 +65,8 @@ class axissyncservice:
             axisrequestid = entry["axisrequestid"]
             entry["updatedby"] = 'System'
             entry["updated_at"] = datetime2.now()
-            entry["axispagecount"] = axisresponse[axisrequestid] if axisrequestid in axisresponse else entry["axispagecount"]
-            entry["axislanpagecount"] = axisresponse[axisrequestid] if axisrequestid in axisresponse else entry["axislanpagecount"]
+            entry["axispagecount"] = axisresponse[axisrequestid]["requestpagepount"] if axisrequestid in axisresponse else entry["axispagecount"]
+            entry["axislanpagecount"] = axisresponse[axisrequestid]["lanpagepount"] if axisrequestid in axisresponse else entry["axislanpagecount"]
         return requests
 
 
