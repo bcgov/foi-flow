@@ -1,7 +1,7 @@
 """Add RTT tag
 
 Revision ID: e698b39da6bd
-Revises: 6646acda32fe
+Revises: c590239f1b2f
 Create Date: 2024-04-15 08:17:20.554269
 
 """
@@ -11,7 +11,7 @@ import sqlalchemy as sa
 
 # revision identifiers, used by Alembic.
 revision = 'e698b39da6bd'
-down_revision = '6646acda32fe'
+down_revision = 'c590239f1b2f'
 branch_labels = None
 depends_on = None
 
