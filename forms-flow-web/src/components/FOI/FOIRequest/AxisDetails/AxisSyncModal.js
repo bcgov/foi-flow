@@ -102,11 +102,14 @@ const AxisSyncModal = ({ axisSyncModalOpen, setAxisSyncModalOpen, saveRequestObj
     const checkValidation = (key) => {
       
       if (key === MANDATORY_FOI_REQUEST_FIELDS.TOTAL_NO_OF_PAGES) {
-        if (saveRequestObject["recordspagecount"] > 0)
-          return false;
-        else if ((saveRequestObject["axispagecount"] || requestDetailsFromAxis[key]) && saveRequestObject["axispagecount"] !== requestDetailsFromAxis[key])
+        if ((saveRequestObject["axispagecount"] || requestDetailsFromAxis[key]) && saveRequestObject["axispagecount"] !== requestDetailsFromAxis[key])
           return true;
         return false;
+        // if (saveRequestObject["recordspagecount"] > 0)
+        //   return false;
+        // else if ((saveRequestObject["axispagecount"] || requestDetailsFromAxis[key]) && saveRequestObject["axispagecount"] !== requestDetailsFromAxis[key])
+        //   return true;
+        // return false;
       }
       let mandatoryField = isMandatoryField(key);
       if(mandatoryField && !requestDetailsFromAxis[key])

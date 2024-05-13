@@ -1,6 +1,6 @@
 from enum import unique
 
-from sqlalchemy.sql.sqltypes import DateTime, String, Date
+from sqlalchemy.sql.sqltypes import DateTime, String, Date, Integer
 
 from flask.app import Flask
 from sqlalchemy.sql.schema import ForeignKey, ForeignKeyConstraint
@@ -513,7 +513,7 @@ class FOIRawRequest(db.Model):
             (FOIRawRequest.requestrawdata['axispagecount'].is_(None),
             '0'),
             ],
-            else_ = cast(FOIRawRequest.requestrawdata['axispagecount'], String)).label('requestpagecount')
+            else_ = cast(FOIRawRequest.requestrawdata['axispagecount'], String))
 
         intakesorting = case([
                             (FOIRawRequest.assignedto == None, # Unassigned requests first
@@ -547,7 +547,10 @@ class FOIRawRequest(db.Model):
             FOIRawRequest.assignedto.label('assignedTo'),
             cast(FOIRawRequest.requestid, String).label('idNumber'),
             axisrequestid,
-            requestpagecount,
+            cast(requestpagecount, Integer).label('requestpagecount'),
+            requestpagecount.label('axispagecount'),
+            literal(None).label('axislanpagecount'),
+            literal(None).label('recordspagecount'),
             literal(None).label('ministryrequestid'),
             literal(None).label('assignedministrygroup'),
             literal(None).label('assignedministryperson'),

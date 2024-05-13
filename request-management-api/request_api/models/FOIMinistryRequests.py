@@ -21,7 +21,7 @@ from .FOIAssignees import FOIAssignee
 from .FOIRequestExtensions import FOIRequestExtension
 from request_api.utils.enums import RequestorType
 import logging
-from sqlalchemy.sql.sqltypes import Date
+from sqlalchemy.sql.sqltypes import Date, Integer
 from dateutil import parser
 from request_api.utils.enums import StateName
 from .FOIMinistryRequestSubjectCodes import FOIMinistryRequestSubjectCode
@@ -66,6 +66,7 @@ class FOIMinistryRequest(db.Model):
     axissyncdate = db.Column(db.DateTime, nullable=True)    
     axisrequestid = db.Column(db.String(120), nullable=True)
     axispagecount = db.Column(db.String(20), nullable=True)
+    axislanpagecount = db.Column(db.String(20), nullable=True)
     recordspagecount = db.Column(db.String(20), nullable=True)
     linkedrequests = db.Column(JSON, unique=False, nullable=True)
     identityverified = db.Column(JSON, unique=False, nullable=True)
@@ -339,8 +340,7 @@ class FOIMinistryRequest(db.Model):
 
     @classmethod
     def getrequestssubquery(cls, groups, filterfields, keyword, additionalfilter, userid, iaoassignee, ministryassignee, requestby='IAO', isiaorestrictedfilemanager=False, isministryrestrictedfilemanager=False):
-        #for queue/dashboard
-
+        #for queue/dashboard       
         _session = db.session
 
         #ministry filter for group/team
@@ -377,6 +377,7 @@ class FOIMinistryRequest(db.Model):
 
         #filter/search
         if(len(filterfields) > 0 and keyword is not None):
+            
             filtercondition = []
 
             if(keyword != "restricted"):
@@ -440,17 +441,31 @@ class FOIMinistryRequest(db.Model):
                            ],
                            else_ = cast(FOIMinistryRequest.cfrduedate, String)).label('cfrduedate')
 
+        axispagecount = case ([
+            (FOIMinistryRequest.axispagecount.isnot(None), FOIMinistryRequest.axispagecount)
+            ],
+            else_= literal("0").label("axispagecount")
+        )
+        axislanpagecount = case ([
+            (FOIMinistryRequest.axislanpagecount.isnot(None), FOIMinistryRequest.axislanpagecount)
+            ],
+            else_= literal("0").label("axislanpagecount")
+        )
+        recordspagecount = case ([
+            (FOIMinistryRequest.recordspagecount.isnot(None), FOIMinistryRequest.recordspagecount)
+            ],
+            else_= literal("0").label("recordspagecount")
+        )
+
         requestpagecount = case([
-                (
-                    FOIMinistryRequest.recordspagecount.isnot(None),
-                    FOIMinistryRequest.recordspagecount
-                ),
-                (
-                    and_(FOIMinistryRequest.recordspagecount.is_(None), FOIMinistryRequest.axispagecount.isnot(None)),
-                    FOIMinistryRequest.axispagecount
-                )
+                (and_(FOIMinistryRequest.axispagecount.isnot(None), FOIMinistryRequest.recordspagecount.isnot(None), cast(axispagecount, Integer) > cast(recordspagecount, Integer)),
+                    FOIMinistryRequest.axispagecount),
+                (and_(FOIMinistryRequest.recordspagecount.isnot(None)),
+                    FOIMinistryRequest.recordspagecount),
+                (and_(FOIMinistryRequest.axispagecount.isnot(None)),
+                    FOIMinistryRequest.axispagecount),
                 ],
-                else_= literal("0")).label('requestpagecount')
+                else_= literal("0"))
 
         onbehalfformatted = case([
                             (and_(onbehalf_applicant.lastname.isnot(None), onbehalf_applicant.firstname.isnot(None)),
@@ -483,7 +498,10 @@ class FOIMinistryRequest(db.Model):
             FOIMinistryRequest.assignedto.label('assignedTo'),
             cast(FOIMinistryRequest.filenumber, String).label('idNumber'),
             cast(FOIMinistryRequest.axisrequestid, String).label('axisRequestId'),
-            requestpagecount,
+            cast(requestpagecount, Integer).label('requestpagecount'),
+            axispagecount,
+            axislanpagecount,
+            recordspagecount,
             FOIMinistryRequest.foiministryrequestid.label('ministryrequestid'),
             FOIMinistryRequest.assignedministrygroup.label('assignedministrygroup'),
             FOIMinistryRequest.assignedministryperson.label('assignedministryperson'),
@@ -592,13 +610,19 @@ class FOIMinistryRequest(db.Model):
                                 isouter=True
                             ).filter(or_(FOIMinistryRequest.requeststatuslabel != StateName.closed.name, 
                                          and_(FOIMinistryRequest.isoipcreview == True, FOIMinistryRequest.requeststatusid == 3, subquery_with_oipc.c.outcomeid == None)))
-                                   
+
+       
+
         if(additionalfilter == 'watchingRequests'):
             #watchby
             activefilter = and_(FOIMinistryRequest.isactive == True, FOIRequestStatus.isactive == True)
 
             subquery_watchby = FOIRequestWatcher.getrequestidsbyuserid(userid)
-            dbquery = basequery.join(subquery_watchby, subquery_watchby.c.ministryrequestid == FOIMinistryRequest.foiministryrequestid).filter(activefilter)
+            if(requestby == 'IAO'):
+                dbquery = basequery.join(subquery_watchby, subquery_watchby.c.ministryrequestid == FOIMinistryRequest.foiministryrequestid).filter(activefilter).filter(or_(or_(FOIRestrictedMinistryRequest.isrestricted == False, FOIRestrictedMinistryRequest.isrestricted == None), and_(FOIRestrictedMinistryRequest.isrestricted == True, FOIMinistryRequest.assignedto == userid)))
+            else:
+                dbquery = basequery.join(subquery_watchby, subquery_watchby.c.ministryrequestid == FOIMinistryRequest.foiministryrequestid).filter(activefilter).filter(or_(or_(ministry_restricted_requests.isrestricted == isministryrestrictedfilemanager, ministry_restricted_requests.isrestricted == None), and_(ministry_restricted_requests.isrestricted == True, FOIMinistryRequest.assignedministryperson == userid)))   
+            
         elif(additionalfilter == 'myRequests'):
             #myrequest
             if(requestby == 'IAO'):
@@ -608,8 +632,11 @@ class FOIMinistryRequest(db.Model):
         elif(additionalfilter == 'unassignedRequests'):
             if(requestby == 'IAO'):
                 dbquery = basequery.filter(FOIMinistryRequest.assignedto == None).filter(ministryfilter)
-        elif(additionalfilter.lower() == 'all'):
-            dbquery = basequery.filter(FOIMinistryRequest.assignedto != None).filter(ministryfilter)
+        elif(additionalfilter.lower() == 'all'):           
+            if(requestby == 'IAO'):
+                dbquery = basequery.filter(ministryfilter).filter(FOIMinistryRequest.assignedto.isnot(None)).filter(or_(FOIRestrictedMinistryRequest.isrestricted == isiaorestrictedfilemanager, or_(FOIRestrictedMinistryRequest.isrestricted.is_(None), FOIRestrictedMinistryRequest.isrestricted == False)))
+            else:               
+                dbquery = basequery.filter(ministryfilter).filter(or_(ministry_restricted_requests.isrestricted == isministryrestrictedfilemanager, or_(ministry_restricted_requests.isrestricted.is_(None), ministry_restricted_requests.isrestricted == False)))
         else:
             if(isiaorestrictedfilemanager == True or isministryrestrictedfilemanager == True):
                 dbquery = basequery.filter(ministryfilter)
@@ -674,17 +701,26 @@ class FOIMinistryRequest(db.Model):
     @classmethod
     def findfield(cls, x, iaoassignee, ministryassignee):
         #add more fields here if need sort/filter/search more columns
+        axispagecount = case ([
+            (FOIMinistryRequest.axispagecount.isnot(None), FOIMinistryRequest.axispagecount)
+            ],
+            else_= literal("0").label("axispagecount")
+        )
+        recordspagecount = case ([
+            (FOIMinistryRequest.recordspagecount.isnot(None), FOIMinistryRequest.recordspagecount)
+            ],
+            else_= literal("0").label("recordspagecount")
+        )
         requestpagecount = case([
-                (
-                    FOIMinistryRequest.recordspagecount.isnot(None),
-                    FOIMinistryRequest.recordspagecount
-                ),
-                (
-                    and_(FOIMinistryRequest.recordspagecount.is_(None), FOIMinistryRequest.axispagecount.isnot(None)),
-                    FOIMinistryRequest.axispagecount
-                )
+                (and_(FOIMinistryRequest.axispagecount.isnot(None), FOIMinistryRequest.recordspagecount.isnot(None), cast(axispagecount, Integer) > cast(recordspagecount, Integer)),
+                    FOIMinistryRequest.axispagecount),
+                (and_(FOIMinistryRequest.recordspagecount.isnot(None)),
+                    FOIMinistryRequest.recordspagecount),
+                (and_(FOIMinistryRequest.axispagecount.isnot(None)),
+                    FOIMinistryRequest.axispagecount),
                 ],
-                else_= literal("'0'")).label('pagecount')
+                else_= literal("0")).label('requestpagecount')
+
         return {
             'firstName': FOIRequestApplicant.firstname,
             'lastName': FOIRequestApplicant.lastname,
@@ -711,6 +747,8 @@ class FOIMinistryRequest(db.Model):
             'DaysLeftValue': FOIMinistryRequest.duedate,
             'ministry': func.upper(ProgramArea.bcgovcode),
             'requestpagecount': requestpagecount,
+            'axispagecount': axispagecount,
+            'recordspagecount': recordspagecount,
             'closedate': FOIMinistryRequest.closedate,
             'subjectcode': SubjectCode.name,
             'isoipcreview': FOIMinistryRequest.isoipcreview
@@ -741,7 +779,7 @@ class FOIMinistryRequest(db.Model):
                             )
                         )
                     )
-                statusfilter = FOIMinistryRequest.requeststatuslabel.in_([StateName.callforrecords.name,StateName.recordsreview.name,StateName.feeestimate.name,StateName.consult.name,StateName.ministrysignoff.name,StateName.onhold.name,StateName.deduplication.name,StateName.harmsassessment.name,StateName.response.name,StateName.peerreview.name,StateName.tagging.name,StateName.readytoscan.name])
+                statusfilter = FOIMinistryRequest.requeststatuslabel.in_([StateName.callforrecords.name,StateName.recordsreview.name,StateName.feeestimate.name,StateName.consult.name,StateName.ministrysignoff.name,StateName.onhold.name,StateName.deduplication.name,StateName.harmsassessment.name,StateName.response.name,StateName.peerreview.name,StateName.tagging.name,StateName.readytoscan.name, StateName.recordsreadyforreview.name])
             ministryfilter = and_(
                                 FOIMinistryRequest.isactive == True,
                                 FOIRequestStatus.isactive == True,
@@ -1019,17 +1057,30 @@ class FOIMinistryRequest(db.Model):
                            ],
                            else_ = cast(FOIMinistryRequest.cfrduedate, String)).label('cfrduedate')
 
+        axispagecount = case ([
+            (FOIMinistryRequest.axispagecount.isnot(None), FOIMinistryRequest.axispagecount)
+            ],
+            else_= literal("0").label("axispagecount")
+        )
+        axislanpagecount = case ([
+            (FOIMinistryRequest.axislanpagecount.isnot(None), FOIMinistryRequest.axislanpagecount)
+            ],
+            else_= literal("0").label("axislanpagecount")
+        )
+        recordspagecount = case ([
+            (FOIMinistryRequest.recordspagecount.isnot(None), FOIMinistryRequest.recordspagecount)
+            ],
+            else_= literal("0").label("recordspagecount")
+        )
         requestpagecount = case([
-                (
-                    FOIMinistryRequest.recordspagecount.isnot(None),
-                    FOIMinistryRequest.recordspagecount
-                ),
-                (
-                    and_(FOIMinistryRequest.recordspagecount.is_(None), FOIMinistryRequest.axispagecount.isnot(None)),
-                    FOIMinistryRequest.axispagecount
-                )
+                (and_(FOIMinistryRequest.axispagecount.isnot(None), FOIMinistryRequest.recordspagecount.isnot(None), cast(axispagecount, Integer) > cast(recordspagecount, Integer)),
+                    FOIMinistryRequest.axispagecount),
+                (and_(FOIMinistryRequest.recordspagecount.isnot(None)),
+                    FOIMinistryRequest.recordspagecount),
+                (and_(FOIMinistryRequest.axispagecount.isnot(None)),
+                    FOIMinistryRequest.axispagecount),
                 ],
-                else_= literal("0")).label('requestpagecount')
+                else_= literal("0"))
 
         onbehalfformatted = case([
                             (and_(onbehalf_applicant.lastname.isnot(None), onbehalf_applicant.firstname.isnot(None)),
@@ -1061,7 +1112,10 @@ class FOIMinistryRequest(db.Model):
             FOIMinistryRequest.assignedto.label('assignedTo'),
             cast(FOIMinistryRequest.filenumber, String).label('idNumber'),
             cast(FOIMinistryRequest.axisrequestid, String).label('axisRequestId'),
-            requestpagecount,
+            cast(requestpagecount, Integer).label('requestpagecount'),
+            axispagecount,
+            axislanpagecount,
+            recordspagecount,          
             FOIMinistryRequest.foiministryrequestid.label('ministryrequestid'),
             FOIMinistryRequest.assignedministrygroup.label('assignedministrygroup'),
             FOIMinistryRequest.assignedministryperson.label('assignedministryperson'),
@@ -1180,7 +1234,7 @@ class FOIMinistryRequest(db.Model):
             if(requestby == 'IAO'):
                 dbquery = newbasequery.filter(
                                             or_(
-                                                or_(FOIRestrictedMinistryRequest.isrestricted == False, FOIRestrictedMinistryRequest.isrestricted == None),
+                                                or_(FOIRestrictedMinistryRequest.isrestricted == False, FOIRestrictedMinistryRequest.isrestricted.is_(None)),
                                                 and_(FOIRestrictedMinistryRequest.isrestricted == True, FOIMinistryRequest.assignedto == userid),
                                                 and_(FOIRestrictedMinistryRequest.isrestricted == True, subquery_watchby.c.watchedby == userid),
                                             )
@@ -1188,7 +1242,7 @@ class FOIMinistryRequest(db.Model):
             else:
                 dbquery = newbasequery.filter(
                                             or_(
-                                                or_(ministry_restricted_requests.isrestricted == False, ministry_restricted_requests.isrestricted == None),
+                                                or_(ministry_restricted_requests.isrestricted == False, ministry_restricted_requests.isrestricted.is_(None)),
                                                 and_(ministry_restricted_requests.isrestricted == True, FOIMinistryRequest.assignedministryperson == userid),
                                                 and_(ministry_restricted_requests.isrestricted == True, subquery_watchby.c.watchedby == userid),
                                             )
@@ -1207,7 +1261,7 @@ class FOIMinistryRequest(db.Model):
             groupfilter.append(FOIMinistryRequest.assignedministrygroup == group)
         
         #ministry advanced search show cfr onwards
-        statefilter = FOIMinistryRequest.requeststatuslabel.in_([StateName.callforrecords.name,StateName.closed.name,StateName.recordsreview.name,StateName.feeestimate.name,StateName.consult.name,StateName.ministrysignoff.name,StateName.onhold.name,StateName.deduplication.name,StateName.harmsassessment.name,StateName.response.name,StateName.peerreview.name,StateName.tagging.name,StateName.readytoscan.name])
+        statefilter = FOIMinistryRequest.requeststatuslabel.in_([StateName.callforrecords.name,StateName.closed.name,StateName.recordsreview.name,StateName.feeestimate.name,StateName.consult.name,StateName.ministrysignoff.name,StateName.onhold.name,StateName.deduplication.name,StateName.harmsassessment.name,StateName.response.name,StateName.peerreview.name,StateName.tagging.name,StateName.readytoscan.name,StateName.recordsreadyforreview.name])
 
         ministry_queue = FOIMinistryRequest.advancedsearchsubquery(params, iaoassignee, ministryassignee, userid, 'Ministry', False, isministryrestrictedfilemanager).filter(and_(or_(*groupfilter), statefilter))
 
@@ -1382,6 +1436,38 @@ class FOIMinistryRequest(db.Model):
         return db.session.query(FOIMinistryRequest.axisrequestid).filter_by(foiministryrequestid=ministryrequestid, foirequest_id=requestid).first()[0]
     
     @classmethod
+    def getrequest_by_pgmarea_type(cls,programarea, requesttype):
+        requestdetails = []
+        try:
+            sql = """select fr.axisrequestid, fr.foiministryrequestid, fr."version", fr.axispagecount, fr.axislanpagecount
+            from "FOIMinistryRequests" fr join "FOIRequests" f 
+            ON fr.foirequest_id = f.foirequestid and fr.foirequestversion_id = f."version" 
+            where programareaid = :programarea and f.requesttype = :requesttype and fr.isactive = true
+            order by fr.created_at ;"""
+            rs = db.session.execute(text(sql), {'programarea': programarea, 'requesttype': requesttype})
+            for row in rs:
+                requestdetails.append({"axisrequestid":row["axisrequestid"], "axispagecount": row["axispagecount"],  "axislanpagecount": row["axislanpagecount"], "foiministryrequestid":row["foiministryrequestid"], "version":row["version"]})
+        except Exception as ex:
+            logging.error(ex)
+            raise ex
+        finally:
+            db.session.close()
+        return requestdetails 
+    
+    @classmethod
+    def bulk_update_axispagecount(cls, requestdetails):
+        try:
+            db.session.bulk_update_mappings(FOIMinistryRequest, requestdetails)
+            db.session.commit()
+            return DefaultMethodResult(True,'Request updated', len(requestdetails))
+        except Exception as ex:
+            logging.error(ex)
+            return DefaultMethodResult(False,'Request update failed', len(requestdetails))
+        finally:
+            db.session.close() 
+
+
+    @classmethod
     def getmetadata(cls,ministryrequestid):
         requestdetails = {}
         try:
@@ -1441,5 +1527,5 @@ class FOIMinistryRequestSchema(ma.Schema):
                 'foirequest.receivedmodeid','requeststatus.requeststatusid','requeststatuslabel','requeststatus.name','programarea.bcgovcode',
                 'programarea.name','foirequest_id','foirequestversion_id','created_at','updated_at','createdby','assignedministryperson',
                 'assignedministrygroup','cfrduedate','closedate','closereasonid','closereason.name',
-                'assignee.firstname','assignee.lastname','ministryassignee.firstname','ministryassignee.lastname', 'axisrequestid', 'axissyncdate', 'axispagecount', 'linkedrequests', 'ministrysignoffapproval', 'identityverified','originalldd','isoipcreview', 'recordspagecount')
+                'assignee.firstname','assignee.lastname','ministryassignee.firstname','ministryassignee.lastname', 'axisrequestid', 'axissyncdate', 'axispagecount', 'axislanpagecount', 'linkedrequests', 'ministrysignoffapproval', 'identityverified','originalldd','isoipcreview', 'recordspagecount')
     

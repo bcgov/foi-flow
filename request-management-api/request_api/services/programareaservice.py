@@ -6,6 +6,9 @@ class programareaservice:
         """ Returns the active records
         """
         return ProgramArea.getprogramareas()
+    
+    def getprogramareabyiaocode(self, iaocode):
+        return ProgramArea.getprogramareabyiaocode(iaocode)
 
     def getprogramareasforministryuser(self, groups = None):
         """ Returns the active records

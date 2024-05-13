@@ -50,7 +50,11 @@ class dashboardservice:
         baserequestinfo.update({'onBehalfFirstName': request.onBehalfFirstName})
         baserequestinfo.update({'onBehalfLastName': request.onBehalfLastName})
         baserequestinfo.update({'onBehalfFormatted': request.onBehalfFormatted})
-        baserequestinfo.update({'requestPageCount': request.requestpagecount})        
+        baserequestinfo.update({'requestpagecount': request.requestpagecount})     
+        baserequestinfo.update({'recordspagecount': request.recordspagecount})
+        baserequestinfo.update({'axispagecount': request.axispagecount})
+        baserequestinfo.update({'axislanpagecount': request.axislanpagecount})
+        baserequestinfo.update({'bcgovcode': request.bcgovcode})
         isoipcreview = request.isoipcreview if request.isoipcreview == True else False
         baserequestinfo.update({'isoipcreview': isoipcreview})
         return baserequestinfo
