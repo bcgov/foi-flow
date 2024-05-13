@@ -28,8 +28,9 @@ class axissyncservice:
             axisids = self.__getaxisids(batchrequest)
             #Fetch pagecount from axis : Begin
             axis_pageinfo = self.axis_getpageinfo(axisids)
+            print("axis_pageinfo=",axis_pageinfo)
             #Fetch pagecount from axis : End
-            if axis_pageinfo != {}:
+            if axis_pageinfo != {}:                
                 response = FOIMinistryRequest.bulk_update_axispagecount(self.updatepagecount(batchrequest, axis_pageinfo))
                 if response.success == False:
                     print("batch update failed for ids=", axisids)
@@ -41,6 +42,7 @@ class axissyncservice:
     def axis_getpageinfo(self, axis_payload):
         try:
             if self.AXIS_BASE_URL not in (None,''):
+                print('axis_payload:',axis_payload)
                 access_token = KeycloakAdminService().get_token()
                 axis_page_endpoint = f'{self.AXIS_BASE_URL}/api/requestspagecount'
                 response = requests.post(
