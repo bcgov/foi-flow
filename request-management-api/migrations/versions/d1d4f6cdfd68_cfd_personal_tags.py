@@ -1,7 +1,7 @@
 """CFD Personal Tags
 
 Revision ID: d1d4f6cdfd68
-Revises: 6646acda32fe
+Revises: 10aa6d69aeed
 Create Date: 2024-04-15 22:36:29.501289
 
 """
@@ -11,7 +11,7 @@ import sqlalchemy as sa
 
 # revision identifiers, used by Alembic.
 revision = 'd1d4f6cdfd68'
-down_revision = '6646acda32fe'
+down_revision = '10aa6d69aeed'
 branch_labels = None
 depends_on = None
 
