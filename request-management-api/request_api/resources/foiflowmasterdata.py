@@ -186,7 +186,7 @@ class FOIFlowDivisions(Resource):
                 match fetchmode:
                     case 'divisions':
                         data = divisionstageservice().getpersonalspecificdivisionandstages(bcgovcode)
-                    case 'sections':
+                    case 'sections' | 'personaltag':
                         data = divisionstageservice().getpersonalspecificprogramareasections(bcgovcode)
                     case 'divisionsandsections':
                         data = divisionstageservice().getpersonalspecificdivisionsandsections(bcgovcode)
