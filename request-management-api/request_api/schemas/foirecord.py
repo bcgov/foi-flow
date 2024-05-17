@@ -16,6 +16,18 @@ class DivisionSchema(Schema):
         unknown = EXCLUDE 
     divisionid = fields.Int(data_key="divisionid",allow_none=False)
 
+class PersonalAttributesSchema(Schema):
+    class Meta:  # pylint: disable=too-few-public-methods
+        """Exclude unknown fields in the deserialized output."""
+
+        unknown = EXCLUDE 
+    person = fields.Str(data_key="person",allow_none=True)
+    filetype = fields.Str(data_key="filetype",allow_none=True)
+    volume = fields.Str(data_key="volume",allow_none=True)
+    trackingid = fields.Str(data_key="trackingid",allow_none=True)
+    personaltag = fields.Str(data_key="personaltag",allow_none=True)
+    # divisions = fields.Nested(DivisionSchema, many=True, validate=validate.Length(min=1), required=True,allow_none=False)
+
 class CreateRecordAttributeSchema(Schema):
     class Meta:  # pylint: disable=too-few-public-methods
         """Exclude unknown fields in the deserialized output."""
@@ -26,6 +38,7 @@ class CreateRecordAttributeSchema(Schema):
     lastmodified = fields.Str(data_key="lastmodified",allow_none=False, validate=[validate.Length(max=120, error=MAX_EXCEPTION_MESSAGE)])
     filesize = fields.Int(data_key="filesize", allow_none=False)
     parentpdfmasterid = fields.Int(required=False,allow_none=True)
+    personalattributes = fields.Nested(PersonalAttributesSchema,required=False,allow_none=True)
 
 class FOIRequestCreateRecordSchema(Schema):
     class Meta:  # pylint: disable=too-few-public-methods
@@ -162,5 +175,10 @@ class FOIRequestRecordUpdateSchema(Schema):
     divisions = fields.Nested(DivisionSchema,many=True,validate=validate.Length(min=1),required=False,allow_none=True)
     isdelete = fields.Boolean(required=True,allow_none=False)
 
-    
+class FOIRequestPersonalAttributesUpdateSchema(Schema):
+    class Meta:  # pylint: disable=too-few-public-methods
+        """Exclude unknown fields in the deserialized output."""
 
+        unknown = EXCLUDE
+    records = fields.Nested(RecordSchema,many=True,data_key="records",required=True)
+    newpersonalattributes = fields.Nested(PersonalAttributesSchema,required=True)

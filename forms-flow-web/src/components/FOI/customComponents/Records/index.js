@@ -33,6 +33,7 @@ import {
   fetchPDFStitchedRecordForOIPCRedline,
   fetchPDFStitchedRecordForOIPCRedlineReview,
   checkForRecordsChange,
+  editPersonalAttributes,
 } from "../../../../apiManager/services/FOI/foiRecordServices";
 import {
   StateTransitionCategories,
@@ -49,6 +50,7 @@ import {
   getFullnameList,
   ConditionalComponent,
   isrecordtimeout,
+  isMinistryCoordinator,
 } from "../../../../helper/FOI/helper";
 import Grid from "@material-ui/core/Grid";
 import { makeStyles } from "@material-ui/core/styles";
@@ -118,6 +120,7 @@ import { MinistryNeedsScanning } from "../../../../constants/FOI/enum";
 import FOI_COMPONENT_CONSTANTS from "../../../../constants/FOI/foiComponentConstants";
 import MCFPersonal from "./MCFPersonal";
 import MSDPersonal from "./MSDPersonal";
+import MCFPersonalMinistry from "./MCFPersonalMinistry";
 
 const useStyles = makeStyles((_theme) => ({
   createButton: {
@@ -305,6 +308,62 @@ export const RecordsLog = ({
     dispatch(getRecordFormats());
   }, []);
 
+  const [currentEditRecord, setCurrentEditRecord] = useState();
+  const [editTagModalOpen, setEditTagModalOpen] = useState(false);
+  const [curPersonalAttributes, setCurPersonalAttributes] = useState({
+    person: "",
+    filetype: "",
+    volume: "",
+    trackingid: "",
+    personaltag: "TBD"
+  });
+  const [newPersonalAttributes, setNewPersonalAttributes] = useState();
+
+  useEffect(() => {
+    if(currentEditRecord?.attributes?.personalattributes)
+      setCurPersonalAttributes(currentEditRecord.attributes.personalattributes);
+  },[currentEditRecord])
+  
+  const MCFPeople = useSelector(
+    (state) => state.foiRequests.foiPersonalPeople
+  );
+  const MCFFiletypes = useSelector(
+    (state) => state.foiRequests.foiPersonalFiletypes
+  );
+  const MCFVolumes = useSelector(
+    (state) => state.foiRequests.foiPersonalVolumes
+  );
+  const [personFilters, setPersonFilters] = useState([]);
+  const [fileTypeFilters, setFileTypeFilters] = useState([]);
+  const [volumeFilters, setVolumeFilters] = useState([]);
+  useEffect(() => {
+    let _personFilters = [];
+    let _fileTypeFilters = [];
+    let _volumeFilters = [];
+    if(recordsObj?.records?.length > 0) {
+      recordsObj.records.forEach((record) => {
+        if(record.attributes?.personalattributes?.person && MCFPeople?.people) {
+          if(_personFilters.filter((p)=>{return p.name === record.attributes.personalattributes.person}).length === 0) {
+            _personFilters = _personFilters.concat(MCFPeople.people.filter((p)=>{return p.name === record.attributes.personalattributes.person}));
+          }
+        }
+        if(record.attributes?.personalattributes?.filetype && MCFFiletypes?.filetypes) {
+          if(_fileTypeFilters.filter((ft)=>{return ft.name === record.attributes.personalattributes.filetype}).length === 0) {
+            _fileTypeFilters = _fileTypeFilters.concat(MCFFiletypes.filetypes.filter((ft)=>{return ft.name === record.attributes.personalattributes.filetype}));
+          }
+        }
+        if(record.attributes?.personalattributes?.volume && MCFVolumes?.volumes) {
+          if(_volumeFilters.filter((v)=>{return v.name === record.attributes.personalattributes.volume}).length === 0) {
+            _volumeFilters = _volumeFilters.concat(MCFVolumes.volumes.filter((v)=>{return v.name === record.attributes.personalattributes.volume}));
+          }
+        }
+      });
+    }
+    setPersonFilters(_personFilters.sort((a, b)=>a.sortorder-b.sortorder));
+    setFileTypeFilters(_fileTypeFilters.sort((a, b)=>a.sortorder-b.sortorder));
+    setVolumeFilters(_volumeFilters.sort((a, b)=>a.sortorder-b.sortorder));
+  }, [recordsObj, MCFPeople, MCFFiletypes, MCFVolumes]);
+
   const conversionFormats = useSelector(
     (state) => state.foiRequests.conversionFormats
   );
@@ -327,6 +386,9 @@ export const RecordsLog = ({
   }, [recordsTabSelect, conversionFormats]);
 
   const divisionFilters = [
+    ...personFilters.map((p)=>{p.divisionname=p.name; p.type='person'; return p;}),
+    ...fileTypeFilters.map((ft)=>{ft.divisionname=ft.name; ft.type='filetype'; return ft;}),
+    ...volumeFilters.map((v)=>{v.divisionname=v.name; v.type='volume'; return v;}),
     ...new Map(
       recordsObj?.records?.reduce(
         (acc, file) => [
@@ -342,6 +404,7 @@ export const RecordsLog = ({
       )
     ).values(),
   ];
+  
   if (divisionFilters?.length > 0)
     divisionFilters?.push(
       { divisionid: -1, divisionname: "All" },
@@ -362,6 +425,7 @@ export const RecordsLog = ({
   const [updateAttachment, setUpdateAttachment] = useState({});
   const [searchValue, setSearchValue] = useState("");
   const [filterValue, setFilterValue] = useState(-1);
+  const [filterText, setFilterText] = useState("");
   const [fullnameList, setFullnameList] = useState(getFullnameList);
   const [recordsDownloadList, setRecordsDownloadList] =
     useState(RecordsDownloadList);
@@ -653,6 +717,7 @@ export const RecordsLog = ({
                         ? _file.lastModifiedDate
                         : new Date(_file.lastModified),
                       filesize: _file.size,
+                      personalattributes: _fileInfo.personalattributes,
                     },
                   };
                 }
@@ -1431,15 +1496,17 @@ export const RecordsLog = ({
         searchAttachments(
           _.cloneDeep(recordsObj.records),
           filterValue,
-          searchValue
+          searchValue,
+          filterText
         )
       );
     } else {
       setFilterValue(-1);
+      setFilterText("");
     }
   }, [filterValue, searchValue, recordsObj]);
 
-  const searchAttachments = (_recordsArray, _filterValue, _keywordValue) => {
+  const searchAttachments = (_recordsArray, _filterValue, _keywordValue, _filterText) => {
     var filterFunction = (r) => {
       var isMatch = (
         (r.filename.toLowerCase().includes(_keywordValue?.toLowerCase()) ||
@@ -1455,6 +1522,12 @@ export const RecordsLog = ({
           ? r.attributes?.divisions?.findIndex(
               (a) => a.divisionid === _filterValue
             ) > -1
+            ||
+            r.attributes?.personalattributes?.person === _filterText
+            ||
+            r.attributes?.personalattributes?.filetype === _filterText
+            ||
+            r.attributes?.personalattributes?.volume === _filterText
           : true)
       )
       if (isMatch) {
@@ -1731,6 +1804,85 @@ export const RecordsLog = ({
     );
   };
 
+  const comparePersonalAttributes = (a, b) => {
+    return a?.person === b?.person && a?.volume === b?.volume
+              && a?.filetype === b?.filetype && a?.personaltag === b?.personaltag;
+  };
+
+  const updatePersonalAttributes = (_all = false) => {
+    setEditTagModalOpen(false);
+    var updateRecords = [];
+
+    if(_all) {
+      for (let record of records) {
+        if(record.attributes?.personalattributes?.person
+           && record.attributes?.personalattributes?.person === currentEditRecord.attributes?.personalattributes?.person
+           && record.attributes?.personalattributes?.filetype
+           && record.attributes?.personalattributes?.filetype === currentEditRecord.attributes?.personalattributes?.filetype
+        ) {
+          updateRecords.push(
+            (({ recordid, documentmasterid, s3uripath }) => ({
+              recordid,
+              documentmasterid,
+              filepath: s3uripath,
+            }))(record)
+          );
+        }
+
+        if(record.attachments) {
+          for (let attachment of record.attachments) {
+            if(attachment.attributes?.personalattributes?.person
+              && attachment.attributes?.personalattributes?.person === currentEditRecord.attributes?.personalattributes?.person
+              && attachment.attributes?.personalattributes?.filetype
+              && attachment.attributes?.personalattributes?.filetype === currentEditRecord.attributes?.personalattributes?.filetype
+            ) {
+              updateRecords.push(
+                (({ documentmasterid, s3uripath }) => ({
+                  documentmasterid,
+                  filepath: s3uripath,
+                }))(attachment)
+              );
+            }
+          }
+        }
+      }
+    } else {
+      updateRecords.push(
+        {
+          recordid: currentEditRecord.recordid,
+          documentmasterid: currentEditRecord.documentmasterid,
+          filepath: currentEditRecord.s3uripath
+        }
+      );
+    }
+
+    if(currentEditRecord && !comparePersonalAttributes(newPersonalAttributes, curPersonalAttributes)) {
+      dispatch(
+        editPersonalAttributes(
+          requestId,
+          ministryId,
+          {
+            records: updateRecords,
+            newpersonalattributes: newPersonalAttributes
+          },
+          (err, _res) => {
+            dispatchRequestAttachment(err);
+          }
+        )
+      );
+
+      setCurrentEditRecord();
+      setCurPersonalAttributes({
+        person: "",
+        filetype: "",
+        volume: "",
+        trackingid: "",
+        personaltag: "TBD"
+      });
+      setNewPersonalAttributes();
+    }
+  };
+
   //function to manage download for harms option
   const enableHarmsDonwnload = () => {
     return !recordsObj.records.every(
@@ -1792,17 +1944,6 @@ export const RecordsLog = ({
                   id="download"
                   label={currentDownload === 0 ? "Download" : ""}
                   inputProps={{ "aria-labelledby": "download-label" }}
-                  //   InputProps={{
-                  //     startAdornment: isDownloadInProgress && <InputAdornment position="start">
-                  //       {/* <CircularProgress class="download-progress-adornment"/> */}
-                  //       {/* <CircularProgress/> */}
-                  //       record.isredactionready ?
-                  //       <FontAwesomeIcon icon={faCheckCircle} size='2x' color='#1B8103' className={classes.statusIcons}/>:
-                  // record.failed ?
-                  // <FontAwesomeIcon icon={faExclamationCircle} size='2x' color='#A0192F' className={classes.statusIcons}/>:
-                  // <FontAwesomeIcon icon={faSpinner} size='2x' color='#FAA915' className={classes.statusIcons}/>
-                  //       </InputAdornment>
-                  //   }}
                   InputLabelProps={{ shrink: false }}
                   select
                   name="download"
@@ -2054,6 +2195,11 @@ export const RecordsLog = ({
                           ? -1
                           : division.divisionid
                       );
+                      setFilterText(
+                        division.divisionname === filterText
+                          ? ""
+                          : division.divisionname
+                      );
                     }}
                     clicked={filterValue == division.divisionid}
                   />
@@ -2226,6 +2372,10 @@ export const RecordsLog = ({
                     ministryId={ministryId}
                     classes={classes}
                     handleSelectRecord={handleSelectRecord}
+                    setDivisionsModalOpen={setDivisionsModalOpen}
+                    isMCFPersonal={isMCFPersonal}
+                    setEditTagModalOpen={setEditTagModalOpen}
+                    setCurrentEditRecord={setCurrentEditRecord}
                   />
                 ))
               ) : (
@@ -2264,6 +2414,7 @@ export const RecordsLog = ({
             totalUploadedRecordSize={totalUploadedRecordSize}
             replacementfiletypes={getreplacementfiletypes()}
             requestType={requestType}
+            isScanningTeamMember={isScanningTeamMember}
           />
           <div className="state-change-dialog">
             <Dialog
@@ -2325,7 +2476,22 @@ export const RecordsLog = ({
               </DialogActions>
             </Dialog>
           </div>
-          <div className="state-change-dialog">
+
+          {isMCFPersonal?(
+            <MCFPersonal
+              editTagModalOpen={editTagModalOpen}
+              setEditTagModalOpen={setEditTagModalOpen}
+              record={currentEditRecord}
+              setNewDivision={setDivisionModalTagValue}
+
+              curPersonalAttributes={curPersonalAttributes}
+              setNewPersonalAttributes={setNewPersonalAttributes}
+              updatePersonalAttributes={updatePersonalAttributes}
+              setCurrentEditRecord={setCurrentEditRecord}
+              setCurPersonalAttributes={setCurPersonalAttributes}
+            />
+          ):(
+            <div className="state-change-dialog">
             <Dialog
               open={divisionsModalOpen}
               onClose={() => setDivisionsModalOpen(false)}
@@ -2376,8 +2542,8 @@ export const RecordsLog = ({
 
                       {requestType ==
                       FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL ? (
-                        bcgovcode == "MCF" ? (
-                          <MCFPersonal
+                        (bcgovcode == "MCF" && isMinistryCoordinator) ? (
+                          <MCFPersonalMinistry
                             setNewDivision={setDivisionModalTagValue}
                             tagValue={
                               records.filter((r) => r.isselected)[0]?.attributes
@@ -2527,6 +2693,7 @@ export const RecordsLog = ({
               </DialogActions>
             </Dialog>
           </div>
+          )}
         </>
       )}
     </div>
@@ -2542,10 +2709,15 @@ const Attachment = React.memo(
     isMinistryCoordinator,
     ministryId,
     handleSelectRecord,
+    setDivisionsModalOpen,
+    isMCFPersonal,
+    setEditTagModalOpen,
+    setCurrentEditRecord
   }) => {
     const classes = useStyles();
     const [disabled, setDisabled] = useState(false);
     const [isRetry, setRetry] = useState(false);
+
     // useEffect(() => {
     //   if(record && record.filename) {
     //     setDisabled(isMinistryCoordinator && record.category == 'personal')
@@ -2726,6 +2898,10 @@ const Attachment = React.memo(
               disabled={disabled}
               ministryId={ministryId}
               setRetry={setRetry}
+              setEditTagModalOpen={setEditTagModalOpen}
+              isMCFPersonal={isMCFPersonal}
+              isMinistryCoordinator={isMinistryCoordinator}
+              setCurrentEditRecord={setCurrentEditRecord}
             />
           </Grid>
         </Grid>
@@ -2738,7 +2914,7 @@ const Attachment = React.memo(
           alignItems="flex-start"
         >
           <Grid item xs={6}>
-            {record.attributes?.divisions?.map((division, i) => (
+            {record.attributes?.divisions.map((division, i) => (
               <Chip
                 item
                 key={i}
@@ -2756,6 +2932,63 @@ const Attachment = React.memo(
                 }}
               />
             ))}
+            {record.attributes?.personalattributes?.person && 
+              <Chip
+                item
+                key={record.attributes?.divisions?.length + 1}
+                label={record.attributes.personalattributes.person}
+                size="small"
+                className={clsx(classes.chip, classes.chipPrimary)}
+                style={{
+                  backgroundColor: "#003366",
+                  margin:
+                    record.isattachment && record.attributes?.divisions?.length === 0
+                      ? "4px 4px 4px 95px"
+                      : record.attributes?.divisions?.length === 0
+                      ? "4px 4px 4px 35px"
+                      : "4px",
+                }}
+              />
+            }
+            {record.attributes?.personalattributes?.filetype && 
+              <Chip
+                item
+                key={record.attributes?.divisions?.length + 2}
+                label={record.attributes.personalattributes.filetype}
+                size="small"
+                className={clsx(classes.chip, classes.chipPrimary)}
+                style={{
+                  backgroundColor: "#003366",
+                  margin: "4px",
+                }}
+              />
+            }
+            {record.attributes?.personalattributes?.volume && 
+              <Chip
+                item
+                key={record.attributes?.divisions?.length + 3}
+                label={record.attributes.personalattributes.volume}
+                size="small"
+                className={clsx(classes.chip, classes.chipPrimary)}
+                style={{
+                  backgroundColor: "#003366",
+                  margin: "4px",
+                }}
+              />
+            }
+            {record.attributes?.personalattributes?.trackingid && 
+              <Chip
+                item
+                key={record.attributes?.divisions?.length + 4}
+                label={record.attributes.personalattributes.trackingid}
+                size="small"
+                className={clsx(classes.chip, classes.chipPrimary)}
+                style={{
+                  backgroundColor: "#003366",
+                  margin: "4px",
+                }}
+              />
+            }
           </Grid>
           <Grid
             item
@@ -2805,6 +3038,9 @@ const Attachment = React.memo(
             ministryId={ministryId}
             classes={classes}
             handleSelectRecord={handleSelectRecord}
+            isMCFPersonal={isMCFPersonal}
+            setEditTagModalOpen={setEditTagModalOpen}
+            setCurrentEditRecord={setCurrentEditRecord}
           />
         ))}
       </>
@@ -2826,6 +3062,10 @@ const AttachmentPopup = React.memo(
     disabled,
     ministryId,
     setRetry,
+    setEditTagModalOpen,
+    isMCFPersonal,
+    isMinistryCoordinator,
+    setCurrentEditRecord
   }) => {
     const ref = React.useRef();
     const closeTooltip = () => (ref.current && ref ? ref.current.close() : {});
@@ -2916,13 +3156,13 @@ const AttachmentPopup = React.memo(
       );
     };
 
-    // const AddMenuItems = () => {
-    //   if (showReplace(record.category))
-    //     return (<ReplaceMenu />)
-    //   return (<DeleteMenu />)
-    // }
-
-    const ActionsPopover = ({ RestrictViewInBrowser, record }) => {
+    const ActionsPopover = ({
+      RestrictViewInBrowser,
+      record,
+      setEditTagModalOpen,
+      isMCFPersonal,
+      isMinistryCoordinator
+    }) => {
       return (
         <Popover
           anchorReference="anchorPosition"
@@ -2944,6 +3184,16 @@ const AttachmentPopup = React.memo(
           onClose={() => setPopoverOpen(false)}
         >
           <MenuList>
+            {(isMCFPersonal && !isMinistryCoordinator) && (
+              <MenuItem
+                onClick={() => {
+                  setEditTagModalOpen(true);
+                  setPopoverOpen(false);
+                }}
+              >
+                Edit Tags
+              </MenuItem>
+            )}
             {!RestrictViewInBrowser ? (
               <MenuItem
                 onClick={() => {
@@ -3047,13 +3297,20 @@ const AttachmentPopup = React.memo(
           color="primary"
           disabled={disabled}
           onClick={(e) => {
+            setCurrentEditRecord(record);
             setPopoverOpen(true);
             setAnchorPosition(e?.currentTarget?.getBoundingClientRect());
           }}
         >
           <MoreHorizIcon />
         </IconButton>
-        <ActionsPopover RestrictViewInBrowser={true} record={record} />
+        <ActionsPopover
+          RestrictViewInBrowser={true}
+          record={record}
+          setEditTagModalOpen={setEditTagModalOpen}
+          isMCFPersonal={isMCFPersonal}
+          isMinistryCoordinator={isMinistryCoordinator}
+        />
       </>
     );
   }
