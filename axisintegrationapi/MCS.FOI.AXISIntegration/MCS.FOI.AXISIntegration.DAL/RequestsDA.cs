@@ -129,7 +129,7 @@ namespace MCS.FOI.AXISIntegration.DAL
             DataTable axisDataTable = GetAxisRequestsPageCount(arrayOfRequestId);
 
             var axisRequestPageCountDict = axisDataTable.AsEnumerable()
-                .Where(rw => Convert.ToInt32(rw["requestPageCount"]) > 0)
+                .Where(rw => Convert.ToInt32(rw["requestPageCount"]) > 0 || Convert.ToInt32(rw["lanPageCount"]) > 0)
                 .ToDictionary(
                 rw => Convert.ToString(rw["AXISRequestID"]),
                 rw => new PageCount
@@ -146,7 +146,7 @@ namespace MCS.FOI.AXISIntegration.DAL
             DataTable axisDataTable = GetAxisRequestsPageCount();
 
             var axisRequestPageCountDict = axisDataTable.AsEnumerable()
-                .Where(rw => Convert.ToInt32(rw["requestPageCount"]) > 0)
+                .Where(rw => Convert.ToInt32(rw["requestPageCount"]) > 0 || Convert.ToInt32(rw["lanPageCount"]) > 0)
                 .ToDictionary(
                 rw => Convert.ToString(rw["AXISRequestID"]),
                 rw => new PageCount
