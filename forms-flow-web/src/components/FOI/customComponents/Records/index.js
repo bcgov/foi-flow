@@ -2479,7 +2479,7 @@ export const RecordsLog = ({
             </Dialog>
           </div>
 
-          {isMCFPersonal?(
+          {isMCFPersonal&&!isMinistryCoordinator?(
             <MCFPersonal
               editTagModalOpen={editTagModalOpen}
               setEditTagModalOpen={setEditTagModalOpen}
