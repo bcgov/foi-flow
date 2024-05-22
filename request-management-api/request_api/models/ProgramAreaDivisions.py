@@ -49,7 +49,7 @@ class ProgramAreaDivision(db.Model):
     @classmethod
     def getpersonalspecificprogramareadivisions(cls,programareaid):
         division_schema = ProgramAreaDivisionSchema(many=True)
-        query = db.session.query(ProgramAreaDivision).filter(ProgramAreaDivision.programareaid==programareaid,ProgramAreaDivision.isactive==True,ProgramAreaDivision.issection==False,ProgramAreaDivision.specifictopersonalrequests==True,ProgramAreaDivision.type.is_(None)).order_by(ProgramAreaDivision.name.asc())
+        query = db.session.query(ProgramAreaDivision).filter(ProgramAreaDivision.programareaid==programareaid,ProgramAreaDivision.isactive==True,ProgramAreaDivision.issection==False,ProgramAreaDivision.specifictopersonalrequests==True,or_(ProgramAreaDivision.type.is_(None), ProgramAreaDivision.type=="")).order_by(ProgramAreaDivision.name.asc())
         return division_schema.dump(query)
     
     @classmethod
