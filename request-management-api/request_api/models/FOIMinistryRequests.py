@@ -662,7 +662,7 @@ class FOIMinistryRequest(db.Model):
                                     ),
                                 isouter=True
                             ).filter(or_(FOIMinistryRequest.requeststatuslabel != StateName.closed.name, 
-                                         and_(FOIMinistryRequest.isoipcreview == True, FOIMinistryRequest.requeststatusid == 3, subquery_with_oipc.c.outcomeid == None)))
+                                         and_(FOIMinistryRequest.isoipcreview == True, FOIMinistryRequest.requeststatusid == 3)))
 
        
 
