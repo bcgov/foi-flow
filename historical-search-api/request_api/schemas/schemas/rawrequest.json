@@ -1,0 +1,220 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "properties": {
+    "requestData": {
+      "type": "object",
+      "properties": {
+        "requestType": {
+          "type": "object",
+          "properties": {
+            "requestType": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "requestType"
+          ]
+        },
+        "ministry": {
+          "type": "object",
+          "properties": {
+            "selectedMinistry": {
+              "type": "array",
+              "items": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "selected": {
+                      "type": "boolean"
+                    }
+                  }
+                }
+              ]
+            },
+            "ministryPage": {
+              "type": "string"
+            },
+            "defaultMinistry": {
+              "type": "object",
+              "properties": {
+                "code": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "defaulted": {
+                  "type": "boolean"
+                },
+                "selected": {
+                  "type": "boolean"
+                }
+              }
+            }
+          },
+          "required": [
+            "selectedMinistry",           
+            "ministryPage"        
+          ]
+        },
+        "descriptionTimeframe": {
+          "type": "object",
+          "properties": {
+            "description": {
+              "type": "string"
+            },
+            "fromDate": {
+              "type": "string"
+            },
+            "toDate": {
+              "type": "string"
+            },
+            "correctionalServiceNumber": {
+              "type": ["string","null"]
+            },
+            "publicServiceEmployeeNumber": {
+              "type": ["string","null"]
+            },
+            "topic": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "description",
+            "fromDate",
+            "toDate"
+          ]
+        },
+        "contactInfo": {
+          "type": "object",
+          "properties": {
+            "firstName": {
+              "type": "string"
+            },
+            "middleName": {
+              "type": ["string","null"]
+            },
+            "lastName": {
+              "type": "string"
+            },
+            "businessName": {
+              "type": ["string","null"]
+            },
+            "alsoKnownAs": {
+              "type":["string","null"]
+            },
+            "birthDate": {
+              "type": ["string","null"]
+            }
+          },
+          "required": [
+            "firstName",           
+            "lastName"           
+          ]
+        },
+        "contactInfoOptions": {
+          "type": "object",
+          "properties": {
+            "email": {
+              "type": ["string","null"]
+            },
+            "phonePrimary": {
+              "type": ["string","null"]
+            },
+            "phoneSecondary": {
+              "type": ["string","null"]
+            },
+            "address": {
+              "type": ["string","null"]
+            },
+            "city": {
+              "type": ["string","null"]
+            },
+            "postal": {
+              "type": ["string","null"]
+            },
+            "province": {
+              "type": ["string","null"]
+            },
+            "country": {
+              "type": ["string","null"]
+            }
+          }
+        },
+        "choose-idenity": {
+          "type": "object",
+          "properties": {
+            "answerYes": {
+              "type": ["string","null"]
+            }
+          }
+        },
+        "selectAbout": {
+          "type": "object",
+          "properties": {
+            "yourself": {
+              "type": ["boolean","null"]
+            },
+            "child": {
+              "type": ["boolean","null"]
+            },
+            "another": {
+              "type": ["boolean","null"]
+            }
+          }
+        },
+        "requestTopic": {
+          "type": "object",
+          "properties": {
+            "value": {
+              "type": ["string","null"]
+            },
+            "text": {
+              "type": ["string","null"]
+            },
+            "ministryCode": {
+              "type": ["string","null"]
+            }
+          }
+        },
+        "adoptiveParents": {
+          "type": "object",
+          "properties": {
+            "motherFirstName": {
+              "type": ["string","null"]
+            },
+            "motherLastName": {
+              "type": ["string","null"]
+            },
+            "fatherFirstName": {
+              "type": ["string","null"]
+            },
+            "fatherLastName": {
+              "type": ["string","null"]
+            }
+          }
+        },
+        "Attachments": {
+          "type": "array",
+          "items": {}
+        }
+      },
+      "required": [
+        "requestType",
+        "ministry",
+        "descriptionTimeframe",
+        "contactInfo"        
+      ]
+    }
+  },
+  "required": [
+    "requestData"
+  ]
+}

@@ -1,0 +1,48 @@
+{
+    "additionalPersonalInfo":{
+       "alsoKnownAs":"",
+       "birthDate":""
+    },
+    "address":"4801",
+    "assignedGroup":"Flex Team",
+    "assignedTo": "foiflex@idir",
+    "assignedToFirstName": "foiflex",
+    "assignedToLastName": "proxy",
+    "assignedministrygroup":"EDU Ministry Team",
+    "assignedministryperson":"foiedu@idir",
+    "assignedministrypersonFirstName":"foiedu",
+    "assignedministrypersonLastName":"foiedu",
+    "businessName":"",
+    "category":"Business",
+    "categoryid":1,
+    "city":"Victoria",
+    "currentState":"Open",
+    "deliveryMode":"Secure File Transfer",
+    "deliverymodeid":1,
+    "description":"test",
+    "dueDate":"2021-10-04",
+    "cfrDueDate":"2021-09-29",
+    "email":"sumathi.thirumani@gmail.com",
+    "firstName":"Sumathi",
+    "fromDate":"",
+    "lastName":"Thirumani",
+    "middleName":"",
+    "phonePrimary":"7787009903",
+    "postal":"V8Y 2J",
+    "programareaid":10,
+    "receivedDate":"2021 Aug, 01",
+    "receivedDateUF":"2021-08-01 00:00:00.000000",
+    "receivedMode":"Email",
+    "receivedmodeid":1,
+    "requestProcessStart":"2021-08-20",
+    "requestType":"general",
+    "requeststatusid":1,
+    "selectedMinistries":[
+       {
+          "code":"LBR",
+          "name":"Ministry of Labour",
+          "selected":"true"
+       }
+    ],
+    "toDate":""
+ }
