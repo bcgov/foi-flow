@@ -1,2 +1,0 @@
-INSERT INTO public."DeliveryModes"(name, description, isactive) VALUES ('Secure File Transfer', 'Secure File Transfer',  True);commit;
-INSERT INTO public."DeliveryModes"(name, description, isactive) VALUES ('In Person Pick up', 'In Person Pick up',  True);commit;
