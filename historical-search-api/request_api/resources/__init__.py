@@ -31,18 +31,15 @@ from .request import API as REQUEST_API
 
 __all__ = ('API_BLUEPRINT')
 
-# This will add the Authorize button to the swagger docs
-#AUTHORIZATIONS = {'apikey': {'type': 'apiKey', 'in': 'header', 'name': 'Authorization'}}
-
 
 API_BLUEPRINT = Blueprint('API', __name__ )
 
 
 API = Api(
     API_BLUEPRINT,
-    title='FOI Request API',
+    title='FOI Historical Search  API',
     version='1.0',
-    description='The Core API for the FOI Request System',
+    description='The Historical Search  API  for the FOI Request System',
 )
 
 

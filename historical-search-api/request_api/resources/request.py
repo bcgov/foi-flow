@@ -16,7 +16,6 @@
 
 from flask import g, request
 from flask_restx import Namespace, Resource
-from flask_expects_json import expects_json
 from flask_cors import cross_origin
 from request_api.auth import auth, AuthHelper
 from request_api.tracer import Tracer
@@ -24,19 +23,12 @@ from request_api.utils.util import  cors_preflight, allowedorigins,str_to_bool,c
 from request_api.exceptions import BusinessException
 from request_api.services.historicalrequestservice import historicalrequestservice
 import json
-import asyncio
-from jose import jwt as josejwt
-import holidays
-from datetime import datetime, timedelta
-import os
-import pytz
 
 
 
-API = Namespace('FOIRawRequests', description='Endpoints for FOI request management')
+API = Namespace('FOIHistoricalSearch', description='Endpoints for FOI Historical search')
 TRACER = Tracer.get_instance()
-with open('request_api/schemas/schemas/rawrequest.json') as f:
-        schema = json.load(f)
+
 
 INVALID_REQUEST_ID = 'Invalid Request Id'
 
@@ -45,7 +37,7 @@ LONG_DATE_FORMAT = '%Y-%m-%d %H:%M:%S'
 
 @cors_preflight('GET,POST,OPTIONS')
 @API.route('/foihistoricalrequest/<requestid>')
-class FOIRawRequest(Resource):
+class FOIHistoricalSearch(Resource):
     """Retrieve historical request details from EDW"""
 
     @staticmethod
@@ -65,7 +57,7 @@ class FOIRawRequest(Resource):
 
 @cors_preflight('GET,POST,OPTIONS')
 @API.route('/foihistoricalrequest/descriptionhistory/<requestid>')
-class FOIRawRequest(Resource):
+class FOIHistoricalSearch(Resource):
     """Retrieve historical request details from EDW"""
 
     @staticmethod
@@ -84,7 +76,7 @@ class FOIRawRequest(Resource):
         
 @cors_preflight('GET,POST,OPTIONS')
 @API.route('/foihistoricalrequest/extensions/<requestid>')
-class FOIRawRequest(Resource):
+class FOIHistoricalSearch(Resource):
     """Retrieve historical request details from EDW"""
 
     @staticmethod
