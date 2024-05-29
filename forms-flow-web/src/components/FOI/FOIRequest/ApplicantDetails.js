@@ -5,7 +5,7 @@ import MenuItem from '@material-ui/core/MenuItem';
 import Input from '@material-ui/core/Input';
 import FOI_COMPONENT_CONSTANTS from '../../../constants/FOI/foiComponentConstants';
 import { formatDate } from "../../../helper/FOI/helper";
-import { shouldDisableFieldForMinistryRequests,closeApplicantDetails } from "./utils";
+import { shouldDisableFieldForMinistryRequests } from "./utils";
 import { makeStyles } from '@material-ui/styles';
 import Accordion from '@material-ui/core/Accordion';
 import AccordionSummary from '@material-ui/core/AccordionSummary';
@@ -21,7 +21,9 @@ const ApplicantDetails = React.memo(
     createSaveRequestObject,
     disableInput,
     requestStatus,
-    userDetail
+    defaultExpanded,
+    showHistory,
+    warning
   }) => {
 
     const useStyles = makeStyles({
@@ -32,6 +34,15 @@ const ApplicantDetails = React.memo(
       },
       accordionSummary: {
         flexDirection: 'row-reverse'
+      },
+      warning: {
+        '& fieldset': {
+          borderColor: '#ed6c02 !important'
+        },
+        '& label': {
+          color: '#ed6c02 !important'
+        }
+      
       }
     });
     const classes = useStyles();
@@ -104,6 +115,9 @@ const ApplicantDetails = React.memo(
         dateFormat: false,
         defaultValue: "Select Category",
       })
+    );
+    const [alsoKnownAsText, setAlsoKnownAs] = React.useState(
+      validateFields(requestDetails?.additionalPersonalInfo, FOI_COMPONENT_CONSTANTS.ALSO_KNOWN_AS)
     );
 
     //handle initial value for required field validation
@@ -212,6 +226,14 @@ const ApplicantDetails = React.memo(
       );
     };
 
+    const handleAlsoKnownAsChange = (e) => {
+      setAlsoKnownAs(e.target.value);
+      createSaveRequestObject(
+        FOI_COMPONENT_CONSTANTS.ALSO_KNOWN_AS,
+        e.target.value
+      );
+    };
+
     //generate the menu items for the category
     const menuItems = category.map((item) => {
       return (
@@ -227,11 +249,16 @@ const ApplicantDetails = React.memo(
 
     return (
       <div className='request-accordian'>
-        <Accordion defaultExpanded={!closeApplicantDetails(userDetail, requestDetails?.requestType)}>
+        <Accordion defaultExpanded={defaultExpanded}>
           <AccordionSummary className={classes.accordionSummary} expandIcon={<ExpandMoreIcon />} id="applicantDetails-header">
             <Typography className={classes.heading}>APPLICANT DETAILS</Typography>
           </AccordionSummary>
         <AccordionDetails>
+          <div>
+            {showHistory && <button type="button" className={`btn btn-link btn-description-history`} onClick={showHistory}>
+                Applicant Contact History
+            </button>}
+          </div>
           <div className="row foi-details-row">
             <div className="col-lg-6 foi-details-col">
               <TextField
@@ -240,6 +267,7 @@ const ApplicantDetails = React.memo(
                 inputProps={{ "aria-labelledby": "firstName-label"}}
                 InputLabelProps={{ shrink: true }}
                 variant="outlined"
+                className={warning && warning(FOI_COMPONENT_CONSTANTS.APPLICANT_FIRST_NAME) && classes.warning}
                 value={applicantFirstNameText}
                 fullWidth
                 onChange={handleFirtNameChange}
@@ -254,6 +282,7 @@ const ApplicantDetails = React.memo(
                 InputLabelProps={{ shrink: true }}
                 value={applicantMiddleNameText}
                 variant="outlined"
+                className={warning && warning(FOI_COMPONENT_CONSTANTS.APPLICANT_MIDDLE_NAME) && classes.warning}
                 fullWidth
                 disabled={disableInput}
                 onChange={handleMiddleNameChange}
@@ -265,6 +294,7 @@ const ApplicantDetails = React.memo(
                 InputLabelProps={{ shrink: true }}
                 value={applicantLastNameText}
                 variant="outlined"
+                className={warning && warning(FOI_COMPONENT_CONSTANTS.APPLICANT_LAST_NAME) && classes.warning}
                 fullWidth
                 onChange={handleLastNameChange}
                 required={true}
@@ -279,6 +309,7 @@ const ApplicantDetails = React.memo(
                 inputProps={{ "aria-labelledby": "organization-label"}}
                 InputLabelProps={{ shrink: true }}
                 value={organizationText}
+                className={warning && warning(FOI_COMPONENT_CONSTANTS.ORGANIZATION) && classes.warning}
                 variant="outlined"
                 fullWidth
                 disabled={disableInput}
@@ -294,6 +325,7 @@ const ApplicantDetails = React.memo(
                 onChange={handleCategoryOnChange}
                 input={<Input />}
                 variant="outlined"
+                className={warning && warning(FOI_COMPONENT_CONSTANTS.FOI_CATEGORY) && classes.warning}
                 fullWidth
                 required
                 disabled={disableInput || disableFieldForMinistryRequest}
@@ -301,6 +333,18 @@ const ApplicantDetails = React.memo(
               >
                 {menuItems}
               </TextField>
+              {showHistory && <TextField
+                id="alsoKnownAs"
+                label="Also Known As"
+                inputProps={{ "aria-labelledby": "alsoKnownAs-label"}}
+                InputLabelProps={{ shrink: true }}
+                value={alsoKnownAsText}
+                variant="outlined"
+                className={warning && warning(FOI_COMPONENT_CONSTANTS.ALSO_KNOWN_AS) && classes.warning}
+                fullWidth
+                disabled={disableInput}
+                onChange={handleAlsoKnownAsChange}
+              />}
             </div>
           </div>
         </AccordionDetails>

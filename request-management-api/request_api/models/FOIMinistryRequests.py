@@ -176,7 +176,7 @@ class FOIMinistryRequest(db.Model):
         elif (group in ProcessingTeamWithKeycloackGroup.list()):
             _ministryrequestids = _session.query(distinct(FOIMinistryRequest.foiministryrequestid)).filter(and_(FOIMinistryRequest.isactive == True), and_(and_(FOIMinistryRequest.assignedgroup == group),and_(FOIMinistryRequest.requeststatuslabel.in_([StateName.open.name,StateName.callforrecords.name,StateName.closed.name,StateName.recordsreview.name,StateName.feeestimate.name,StateName.consult.name,StateName.ministrysignoff.value,StateName.onhold.name,StateName.response.name,StateName.peerreview.name,StateName.tagging.name,StateName.readytoscan.name])))).all()           
         else:
-            _ministryrequestids = _session.query(distinct(FOIMinistryRequest.foiministryrequestid)).filter(and_(FOIMinistryRequest.isactive == True), or_(and_(FOIMinistryRequest.assignedgroup == group),and_(FOIMinistryRequest.assignedministrygroup == group,or_(FOIMinistryRequest.requeststatuslabel.in_([StateName.callforrecords.name,StateName.recordsreview.name,StateName.feeestimate.name,StateName.consult.name,StateName.ministrysignoff.name,StateName.onhold.name,StateName.deduplication.name,StateName.harmsassessment.name,StateName.response.name,StateName.peerreview.name,StateName.tagging.name,StateName.readytoscan.name]))))).all()
+            _ministryrequestids = _session.query(distinct(FOIMinistryRequest.foiministryrequestid)).filter(and_(FOIMinistryRequest.isactive == True), or_(and_(FOIMinistryRequest.assignedgroup == group),and_(FOIMinistryRequest.assignedministrygroup == group,or_(FOIMinistryRequest.requeststatuslabel.in_([StateName.callforrecords.name,StateName.recordsreview.name,StateName.recordsreadyforreview.name,StateName.feeestimate.name,StateName.consult.name,StateName.ministrysignoff.name,StateName.onhold.name,StateName.deduplication.name,StateName.harmsassessment.name,StateName.response.name,StateName.peerreview.name,StateName.tagging.name,StateName.readytoscan.name]))))).all()
 
         _requests = []
         ministryrequest_schema = FOIMinistryRequestSchema()
@@ -185,10 +185,10 @@ class FOIMinistryRequest(db.Model):
            
            ministryrequest =ministryrequest_schema.dump(_session.query(FOIMinistryRequest).filter(FOIMinistryRequest.foiministryrequestid == _requestid).order_by(FOIMinistryRequest.version.desc()).first())           
            parentrequest = _session.query(FOIRequest).filter(FOIRequest.foirequestid == ministryrequest['foirequest_id'] and FOIRequest.version == ministryrequest['foirequestversion_id']).order_by(FOIRequest.version.desc()).first()
-           requestapplicants = FOIRequestApplicantMapping.getrequestapplicants(ministryrequest['foirequest_id'],ministryrequest['foirequestversion_id'])
+           requestapplicants = FOIRequestApplicantMapping.getrequestapplicantinfos(ministryrequest['foirequest_id'],ministryrequest['foirequestversion_id'])
            _receiveddate = parentrequest.receiveddate
-           _request["firstName"] = requestapplicants[0]['foirequestapplicant.firstname']
-           _request["lastName"] = requestapplicants[0]['foirequestapplicant.lastname']
+           _request["firstName"] = requestapplicants[0]['firstname']
+           _request["lastName"] = requestapplicants[0]['lastname']
            _request["requestType"] = parentrequest.requesttype
            _request["idNumber"] = ministryrequest['filenumber']
            _request["axisRequestId"] = ministryrequest['axisrequestid']
@@ -207,8 +207,9 @@ class FOIMinistryRequest(db.Model):
            _request["version"] = ministryrequest['version']
            _request["id"] = parentrequest.foirequestid
            _request["ministryrequestid"] = ministryrequest['foiministryrequestid']
-           _request["applicantcategory"]=parentrequest.applicantcategory.name
+           _request["applicantcategory"]= parentrequest.applicantcategory.name
            _request["identityverified"] = ministryrequest['identityverified']
+           _request["axisapplicantid"] = requestapplicants[0]['axisapplicantid']
            _requests.append(_request)
         
         return _requests
@@ -230,6 +231,58 @@ class FOIMinistryRequest(db.Model):
         request_schema = FOIMinistryRequestSchema(many=True)
         query = db.session.query(FOIMinistryRequest).filter_by(foiministryrequestid=ministryrequestid).order_by(FOIMinistryRequest.version.asc())
         return request_schema.dump(query)   
+    
+    @classmethod
+    def getopenrequestsbyrequestId(cls,requestids):
+        selectedcolumns = [FOIMinistryRequest.foirequest_id, FOIMinistryRequest.foiministryrequestid]
+        query = db.session.query(*selectedcolumns).distinct(FOIMinistryRequest.foiministryrequestid).filter(
+            FOIMinistryRequest.foirequest_id.in_(requestids),
+            FOIMinistryRequest.requeststatusid != 3
+        ).order_by(FOIMinistryRequest.foiministryrequestid.asc(), FOIMinistryRequest.version.asc())
+        return [r._asdict() for r in query]
+    
+    @classmethod
+    def getopenrequestsbyapplicantid(cls,applicantid):
+        _session = db.session
+
+        selectedcolumns = [FOIMinistryRequest.foirequest_id, FOIMinistryRequest.foiministryrequestid]
+
+        #aliase for getting applicants by profileid
+        applicant = aliased(FOIRequestApplicant)
+
+        #subquery for getting latest version & proper group/team for FOIMinistryRequest
+        subquery_ministry_maxversion = _session.query(FOIMinistryRequest.foirequest_id, func.max(FOIMinistryRequest.foirequestversion_id).label('max_version')).group_by(FOIMinistryRequest.foirequest_id).subquery()
+        joincondition_ministry = [
+            subquery_ministry_maxversion.c.foirequest_id == FOIRequestApplicantMapping.foirequest_id,
+            subquery_ministry_maxversion.c.max_version == FOIRequestApplicantMapping.foirequestversion_id,
+        ]
+
+        query = db.session.query(
+                                *selectedcolumns
+                            ).distinct(
+                                FOIMinistryRequest.foiministryrequestid
+                            ).join(
+                                applicant,
+                                applicant.foirequestapplicantid == applicantid,
+                            ).join(
+                                FOIRequestApplicant,
+                                FOIRequestApplicant.applicantprofileid == applicant.applicantprofileid,
+                            ).join(
+                                FOIRequestApplicantMapping,
+                                and_(
+                                    FOIRequestApplicantMapping.foirequestapplicantid == FOIRequestApplicant.foirequestapplicantid,
+                                    FOIRequestApplicantMapping.foirequest_id == FOIMinistryRequest.foirequest_id,
+                                    FOIRequestApplicantMapping.requestortypeid == RequestorType['applicant'].value)
+                            ).join(
+                                subquery_ministry_maxversion,
+                                and_(*joincondition_ministry)
+                            ).filter(
+                                # FOIRequestApplicant.foirequestapplicantid == applicantid,
+                                FOIMinistryRequest.requeststatusid != 3
+                            ).order_by(
+                                FOIMinistryRequest.foiministryrequestid.asc(),
+                                FOIMinistryRequest.version.asc())
+        return [r._asdict() for r in query]
 
     @classmethod
     def getrequeststatusById(cls,ministryrequestid):
@@ -609,7 +662,7 @@ class FOIMinistryRequest(db.Model):
                                     ),
                                 isouter=True
                             ).filter(or_(FOIMinistryRequest.requeststatuslabel != StateName.closed.name, 
-                                         and_(FOIMinistryRequest.isoipcreview == True, FOIMinistryRequest.requeststatusid == 3, subquery_with_oipc.c.outcomeid == None)))
+                                         and_(FOIMinistryRequest.isoipcreview == True, FOIMinistryRequest.requeststatusid == 3)))
 
        
 

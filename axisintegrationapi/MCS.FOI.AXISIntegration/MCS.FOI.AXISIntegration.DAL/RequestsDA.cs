@@ -63,6 +63,7 @@ namespace MCS.FOI.AXISIntegration.DAL
                     axisRequest.ApplicantLastName = Convert.ToString(row["lastName"]);
                     axisRequest.BusinessName = Convert.ToString(row["businessName"]);
 
+                    axisRequest.AXISApplicantID = Convert.ToString(row["axisApplicantID"]);
                     axisRequest.Address = Convert.ToString(row["address"]);
                     axisRequest.AddressSecondary = Convert.ToString(row["addressSecondary"]);
                     axisRequest.City = Convert.ToString(row["city"]);
@@ -180,7 +181,7 @@ namespace MCS.FOI.AXISIntegration.DAL
                 (SELECT terminology.vcTerminology from tblTerminologyLookup terminology WHERE terminology.iLabelID = deliveryModes.iLabelID and terminology.tiLocaleID = 1) as deliveryMode,
                 (SELECT terminology.vcTerminology from tblTerminologyLookup terminology WHERE terminology.iLabelID = countries.iLabelID and terminology.tiLocaleID = 1) as country,
                 (SELECT terminology.vcTerminology from tblTerminologyLookup terminology WHERE terminology.iLabelID = states.iLabelID and terminology.tiLocaleID = 1) as province,
-                requesters.vcAddress1 as [address], requesters.vcAddress2 as addressSecondary, requesters.vcCity as city, requesters.vcZipCode as postal,
+                requesters.iRequesterID as axisApplicantID, requesters.vcAddress1 as [address], requesters.vcAddress2 as addressSecondary, requesters.vcCity as city, requesters.vcZipCode as postal,
                 requesters.vcHome as phonePrimary,
                 requesters.vcMobile as phoneSecondary,
                 requesters.vcWork1 as workPhonePrimary,
@@ -229,7 +230,7 @@ namespace MCS.FOI.AXISIntegration.DAL
                 GROUP BY requests.sdtReceivedDate, requests.sdtTargetDate, requests.sdtOriginalTargetDate, requests.vcDescription,
                 requests.sdtRqtDescFromdate, requests.sdtRqtDescTodate, requests.sdtRequestedDate, office.OFFICE_CODE, requesterTypes.vcDescription,
                 receivedModes.iLabelID, deliveryModes.iLabelID, countries.iLabelID, states.iLabelID,
-                requesters.vcAddress1, requesters.vcAddress2, requesters.vcCity, requesters.vcZipCode,
+                requesters.iRequesterID, requesters.vcAddress1, requesters.vcAddress2, requesters.vcCity, requesters.vcZipCode,
                 requesters.vcHome, requesters.vcMobile, requesters.vcWork1, requesters.vcWork2, requesters.vcFirstName, requesters.vcLastName, requesters.vcMiddleName,
                 requests.iRequestID, requesters.vcCompany, requesters.vcEmailID, onbehalf.vcFirstName, onbehalf.vcLastName, onbehalf.vcMiddleName,
                 requestTypes.iLabelID, requests.vcVisibleRequestID, requests.tiOfficeID, office.OFFICE_ID,requestorfields.CUSTOMFIELD35, 
