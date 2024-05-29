@@ -2,6 +2,7 @@ import {
   FOI_BASE_API_URL,
   AXIS_API_URL,
   DOC_REVIEWER_BASE_API_URL,
+  FOI_HISTORICAL_API_URL
 } from "./config";
 
 const API = {
@@ -39,6 +40,10 @@ const API = {
   FOI_GET_MINISTRY_REQUEST_WATCHERS: `${FOI_BASE_API_URL}/api/foiwatcher/ministryrequest/<ministryid>`,
   FOI_GET_CLOSING_REASONS: `${FOI_BASE_API_URL}/api/foiflow/closereasons`,
   FOI_POST_OSS_HEADER: `${FOI_BASE_API_URL}/api/foiflow/oss/authheader`,
+
+  FOI_HISTORICAL_REQUEST_API: `${FOI_HISTORICAL_API_URL}/api/foihistoricalrequest`,
+  FOI_HISTORICAL_REQUEST_DESCRIPTION_API: `${FOI_HISTORICAL_API_URL}/api/foihistoricalrequest/descriptionhistory`,
+  FOI_HISTORICAL_REQUEST_EXTENSIONS_API: `${FOI_HISTORICAL_API_URL}/api/foihistoricalrequest/extensions`,
 
   FOI_GET_PROGRAMAREADIVISIONS: `${FOI_BASE_API_URL}/api/foiadmin/divisions`,
   FOI_POST_PROGRAMAREADIVISION: `${FOI_BASE_API_URL}/api/foiadmin/division`,

@@ -34,7 +34,10 @@ import {
   fetchFOIRequestDescriptionList,
   fetchRequestDataFromAxis,
   fetchRestrictedRequestCommentTagList,
-  deleteOIPCDetails
+  deleteOIPCDetails,
+  fetchHistoricalRequestDetails,
+  fetchFOIHistoricalRequestDescriptionList,
+  fetchHistoricalExtensions
 } from "../../../apiManager/services/FOI/foiRequestServices";
 import { fetchFOIRequestAttachmentsList } from "../../../apiManager/services/FOI/foiAttachmentServices";
 import { fetchCFRForm } from "../../../apiManager/services/FOI/foiCFRFormServices";
@@ -130,6 +133,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
   const { requestId, ministryId } = useParams();
   const url = window.location.href;
   const urlIndexCreateRequest = url.indexOf(FOI_COMPONENT_CONSTANTS.ADDREQUEST);
+  const isHistoricalRequest = url.indexOf(FOI_COMPONENT_CONSTANTS.HISTORICAL_REQUEST) > -1;
   const [isAddRequest, setIsAddRequest] = useState(urlIndexCreateRequest > -1);
   //gets the request detail from the store
   let requestDetails = useSelector(
@@ -251,7 +255,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
       StateEnum.intakeinprogress.name.toLowerCase();
   const [axisSyncedData, setAxisSyncedData] = useState({});
   const [checkExtension, setCheckExtension] = useState(true);
-  let bcgovcode = getBCgovCode(ministryId, requestDetails);
+  let bcgovcode = isHistoricalRequest ? "" : getBCgovCode(ministryId, requestDetails);
   const [headerText, setHeaderText] = useState(
     getHeaderText({ requestDetails, ministryId, requestState })
   );
@@ -292,6 +296,10 @@ const FOIRequest = React.memo(({ userDetail }) => {
     if (isAddRequest) {
       dispatch(fetchFOIAssignedToList("", "", ""));
       dispatch(fetchFOIProgramAreaList());
+    } else if (isHistoricalRequest) {
+      dispatch(fetchHistoricalRequestDetails(requestId));
+      dispatch(fetchFOIHistoricalRequestDescriptionList(requestId));
+      dispatch(fetchHistoricalExtensions(requestId));
     } else {
       await Promise.all([
         dispatch(fetchFOIProgramAreaList()),
@@ -334,7 +342,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
   useEffect(() => {
     const requestDetailsValue = requestDetails;
     setSaveRequestObject(requestDetailsValue);
-    const assignedTo = getAssignedTo(requestDetails);
+    const assignedTo = isHistoricalRequest ? requestDetails.assignedTo : getAssignedTo(requestDetails);
     setAssignedToValue(assignedTo);
     if (Object.entries(requestDetails)?.length !== 0) {
        let requestStateFromId = findRequestState(requestDetails.requeststatuslabel)
@@ -962,7 +970,8 @@ const FOIRequest = React.memo(({ userDetail }) => {
       requestState !== StateEnum.unopened.name &&
       requestState !== StateEnum.open.name &&
       (requestDetails?.divisions?.length > 0 || isMCFPersonal) &&
-      DISABLE_GATHERINGRECORDS_TAB?.toLowerCase() =='false'
+      DISABLE_GATHERINGRECORDS_TAB?.toLowerCase() =='false' &&
+      !isHistoricalRequest
     );
   };
 
@@ -1024,6 +1033,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
               isValidationError={isValidationError}
               requestType={requestDetails?.requestType}
               isDivisionalCoordinator={false}
+              isHistoricalRequest={isHistoricalRequest}
             />
           </div>
 
@@ -1211,7 +1221,8 @@ const FOIRequest = React.memo(({ userDetail }) => {
                         createSaveRequestObject={createSaveRequestObject}
                         handlestatusudpate={handlestatusudpate}
                         userDetail={userDetail}
-                        disableInput={disableInput}
+                        disableInput={disableInput || isHistoricalRequest}
+                        isHistoricalRequest={isHistoricalRequest}
                         isMinistry={false}
                         isAddRequest={isAddRequest}
                         handleOipcReviewFlagChange={handleOipcReviewFlagChange}
@@ -1242,7 +1253,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
                           handleApplicantDetailsValue
                         }
                         createSaveRequestObject={createSaveRequestObject}
-                        disableInput={disableInput}
+                        disableInput={disableInput || isHistoricalRequest}
                         userDetail={userDetail}
                       />
                       {requiredRequestDetailsValues.requestType.toLowerCase() ===
@@ -1253,7 +1264,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
                               requestDetails.additionalPersonalInfo
                             }
                             createSaveRequestObject={createSaveRequestObject}
-                            disableInput={disableInput}
+                            disableInput={disableInput || isHistoricalRequest}
                             userDetail={userDetail}
                             requestType={requestDetails?.requestType}
                           />
@@ -1262,7 +1273,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
                               requestDetails.additionalPersonalInfo
                             }
                             createSaveRequestObject={createSaveRequestObject}
-                            disableInput={disableInput}
+                            disableInput={disableInput || isHistoricalRequest}
                           />
                         </>
                       )}
@@ -1275,7 +1286,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
                           handleContactDetailsInitialValue
                         }
                         handleContanctDetailsValue={handleContanctDetailsValue}
-                        disableInput={disableInput}
+                        disableInput={disableInput || isHistoricalRequest}
                         handleEmailValidation={handleEmailValidation}
                         userDetail={userDetail}
                       />
@@ -1297,7 +1308,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
                           handleInitialRequiredRequestDescriptionValues
                         }
                         createSaveRequestObject={createSaveRequestObject}
-                        disableInput={disableInput}
+                        disableInput={disableInput || isHistoricalRequest}
                       />
                       <RequestDetails
                         requestDetails={requestDetails}
@@ -1307,7 +1318,8 @@ const FOIRequest = React.memo(({ userDetail }) => {
                           handleRequestDetailsInitialValue
                         }
                         createSaveRequestObject={createSaveRequestObject}
-                        disableInput={disableInput}
+                        disableInput={disableInput || isHistoricalRequest}
+                        isHistoricalRequest={isHistoricalRequest}
                       />
                       {(redactedSections && Object.keys(redactedSections).length > 0 && (
                         <RedactionSummary sections={redactedSections} isoipcreview={isOIPCReview}/>
@@ -1605,6 +1617,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
                   divisions={requestDetails.divisions}
                   recordsTabSelect={tabLinksStatuses.Records.active}
                   requestType={requestDetails?.requestType}
+                  handleSaveRequest={handleSaveRequest}
                 />
               </>
             )}
