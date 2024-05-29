@@ -14,10 +14,9 @@
 """Service for reset test data."""
 from typing import Dict
 
-from request_api.models import User as UserModel
+
 from request_api.models import db
 from request_api.services.keycloak import KeycloakService
-from request_api.utils.enums import LoginSource
 from request_api.utils.roles import Role
 
 
