@@ -4,11 +4,9 @@ from re import VERBOSE
 import json
 from datetime import datetime as datetime2
 from datetime import datetime, timedelta
-import holidays
 import maya
 import os
 from dateutil.parser import parse
-from pytz import timezone
 
 class datetimehandler:
     """ Supports common date operations
