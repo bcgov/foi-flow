@@ -29,21 +29,16 @@ from request_api.utils.util_logging import configure_logging
 from request_api.auth import jwt
 from flask_cors import CORS
 import re
-from flask_caching import Cache
-from flask_socketio import SocketIO
+#from flask_caching import Cache
+
 import secure
 
 app = Flask(__name__)
 #Cache Initialization
-app.config.from_object('request_api.utils.cache.Config') 
-cache = Cache(app) 
+#app.config.from_object('request_api.utils.cache.Config') 
+#cache = Cache(app) 
 
-SOCKETIO_PING_TIMEOUT = int(os.getenv('SOCKETIO_PING_TIMEOUT', 5))
-SOCKETIO_PING_INTERVAL = int(os.getenv('SOCKETIO_PING_INTERVAL', 25))
-SOCKETIO_LOG_ENABLED = True if os.getenv('SOCKETIO_LOG_ENABLED').lower() == "true" else False
-SOCKETIO_CORS_ORIGIN= os.getenv('CORS_ORIGIN').split(",")
 
-socketio = SocketIO(logger=SOCKETIO_LOG_ENABLED, engineio_logger=SOCKETIO_LOG_ENABLED,ping_timeout=SOCKETIO_PING_TIMEOUT,ping_interval=SOCKETIO_PING_INTERVAL,cors_allowed_origins=SOCKETIO_CORS_ORIGIN)
 
 #Setup log
 configure_logging()

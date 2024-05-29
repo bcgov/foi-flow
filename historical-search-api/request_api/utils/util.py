@@ -28,9 +28,7 @@ from sqlalchemy.sql.expression import false
 from request_api.auth import jwt as _authjwt,AuthHelper
 import jwt
 import os
-from request_api.utils.enums import MinistryTeamWithKeycloackGroup, ProcessingTeamWithKeycloackGroup
-# from request_api.services.rawrequestservice import rawrequestservice
-# from request_api.models.FOIRequestWatchers import  FOIRequestWatcher
+
 
 
 def cors_preflight(methods):
