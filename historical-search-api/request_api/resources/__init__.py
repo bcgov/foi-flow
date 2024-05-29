@@ -28,7 +28,7 @@ from .apihelper import Api
 from .meta import API as META_API
 from .ops import API as OPS_API
 from .request import API as REQUEST_API
-
+from .historicalsearch import API as HISTORICAL_SEARCH_API
 __all__ = ('API_BLUEPRINT')
 
 
@@ -45,3 +45,4 @@ API = Api(
 
 
 API.add_namespace(REQUEST_API ,path="/api")
+API.add_namespace(HISTORICAL_SEARCH_API, path="/api")
