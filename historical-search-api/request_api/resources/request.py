@@ -59,49 +59,47 @@ class FOIRawRequest(Resource):
     # @auth.require
     def get(requestid):
         try : 
-            jsondata = {}
             statuscode = 200
-            # requestidisinteger = int(requestid)
-            # if requestidisinteger :                
-            #     baserequestinfo = rawrequestservice().getrawrequest(requestid)
+            jsondata = historicalrequestservice().gethistoricalrequest(requestid)
+            return jsondata , statuscode 
+        except ValueError:
+            return {'status': 500, 'message':INVALID_REQUEST_ID}, 500    
+        except BusinessException as exception:            
+            return {'status': exception.status_code, 'message':exception.message}, 500
+        
 
-            #     assignee = baserequestinfo['assignedTo']
-            #     isiaorestricted = baserequestinfo['isiaorestricted']
-            #     # print('Request # {0} Assigned to {1} and is restricted {2} '.format(requestid,assignee,isiaorestricted))
-            #     if(isiaorestricted and canrestictdata(requestid,assignee,isiaorestricted,True)):
-            #         jsondata = {'status': 401, 'message':'Restricted Request'}
-            #         statuscode = 401
-            #     else:
-            #         jsondata = json.dumps(baserequestinfo)
-            #         statuscode = 200
+@cors_preflight('GET,POST,OPTIONS')
+@API.route('/foihistoricalrequest/descriptionhistory/<requestid>')
+class FOIRawRequest(Resource):
+    """Retrieve historical request details from EDW"""
 
-#             select 
-# 	rt.requesttypename,
-# 	rm.receivedmodename,
-# 	dm.deliverymodename,
-# 	rqt.requestertypename,
-# 	r.firstname, r.lastname, r.company, r.email, r.workphone1, r.workphone2, r.mobile, r.home,	
-# 	r2.firstname, r2.lastname,
-# 	rs.requeststatusname,
-# 	a.address1, a.address2, a.city, a.state, a.country, a.zipcode,
-# 	rd.description, rd.startdate, rd.closeddate, rd.receiveddate, rd.targetdate AS duedate,
-# 	rd.subject
-# 	--, rd.* 
-# 	from public."factRequestDetails" rd
-# join public."dimRequestStatuses" rs on rs.requeststatusid = rd.requeststatusid
-# join public."factRequestRequesters" rr1 on rr1.requesterid = rd.requesterid and rr1.foirequestid = rd.foirequestid and rr1.activeflag = 'Y'
-	
-# join public."dimRequesters" r on rr1.requesterid = r.requesterid
-# left join public."factRequestRequesters" rr2 on rr2.requesterid = rd.onbehalfofrequesterid and rr2.foirequestid = rd.foirequestid and rr2.activeflag = 'Y'
-# left join public."dimRequesters" r2 on rr2.requesterid = r2.requesterid
-# 	LEFT JOIN "dimRequesterTypes" rqt ON rd.applicantcategoryid = rqt.requestertypeid
-# join public."dimReceivedModes" rm on rm.receivedmodeid = rd.receivedmodeid
-# join public."dimAddress" a on a.addressid = rd.shipaddressid
-# join public."dimRequestTypes" rt on rt.requesttypeid = rd.requesttypeid
-# join public."dimDeliveryModes" dm on dm.deliverymodeid = rd.deliverymodeid
-# where rd.visualrequestfilenumber = 'CFD-2023-30109' and rd.activeflag = 'Y'
+    @staticmethod
+    @TRACER.trace()
+    @cross_origin(origins=allowedorigins())       
+    # @auth.require
+    def get(requestid):
+        try : 
+            statuscode = 200
+            jsondata = historicalrequestservice().gethistoricalrequestdescriptionhistory(requestid)
+            return jsondata , statuscode 
+        except ValueError:
+            return {'status': 500, 'message':INVALID_REQUEST_ID}, 500    
+        except BusinessException as exception:            
+            return {'status': exception.status_code, 'message':exception.message}, 500
+        
+@cors_preflight('GET,POST,OPTIONS')
+@API.route('/foihistoricalrequest/extensions/<requestid>')
+class FOIRawRequest(Resource):
+    """Retrieve historical request details from EDW"""
 
-
+    @staticmethod
+    @TRACER.trace()
+    @cross_origin(origins=allowedorigins())       
+    # @auth.require
+    def get(requestid):
+        try : 
+            statuscode = 200
+            jsondata = historicalrequestservice().gethistoricalrequestextensions(requestid)
             return jsondata , statuscode 
         except ValueError:
             return {'status': 500, 'message':INVALID_REQUEST_ID}, 500    

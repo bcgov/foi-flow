@@ -1,6 +1,7 @@
 
 from os import stat
-from request_api.models.FOIAssignees import FOIAssignee
+from request_api.models.factRequestDetails import factRequestDetails
+from request_api.models.factRequestExtensions import factRequestExtensions
 
 class historicalrequestservice:
     """ FOI Assignee management service
@@ -10,5 +11,11 @@ class historicalrequestservice:
     """
     
     def gethistoricalrequest(self, requestid):
-        
+        return factRequestDetails.getrequestbyid(requestid)
+    
+    def gethistoricalrequestdescriptionhistory(self, requestid):
+        return factRequestDetails.getdescriptionhistorybyid(requestid)    
+    
+    def gethistoricalrequestextensions(self, requestid):
+        return factRequestExtensions.getextensionsbyrequestid(requestid)
                 

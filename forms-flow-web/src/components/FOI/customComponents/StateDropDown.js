@@ -22,6 +22,7 @@ const StateDropDown = ({
   updateStateDropDown,
   requestType,
   isDivisionalCoordinator,
+  isHistoricalRequest,
 }) => {
   const _isMinistryCoordinator = isMinistryCoordinator;
 
@@ -252,22 +253,40 @@ const StateDropDown = ({
       );
     });
   return (
-    <TextField
-      id="foi-status-dropdown"
-      label="Status"
-      className="foi-state-dropdown"
-      InputLabelProps={{ shrink: false }}
-      inputProps={{ "aria-labelledby": "foi-status-dropdown-label" }}
-      select
-      value={status}
-      onChange={handleChange}
-      input={<Input />}
-      variant="outlined"
-      fullWidth
-      disabled={isDivisionalCoordinator}
-    >
-      {menuItems}
-    </TextField>
+    !isHistoricalRequest ?
+      <TextField
+        id="foi-status-dropdown"
+        label="Status"
+        className="foi-state-dropdown"
+        InputLabelProps={{ shrink: false }}
+        inputProps={{ "aria-labelledby": "foi-status-dropdown-label" }}
+        select
+        value={status}
+        onChange={handleChange}
+        input={<Input />}
+        variant="outlined"
+        fullWidth
+        disabled={isDivisionalCoordinator}
+      >
+        {menuItems}
+      </TextField>
+    :
+      <TextField
+        id="foi-status-dropdown"
+        label="Status"
+        className="foi-state-dropdown"
+        InputLabelProps={{ shrink: false }}
+        inputProps={{ "aria-labelledby": "foi-status-dropdown-label" }}
+        value={status}
+        onChange={handleChange}
+        input={<Input />}
+        variant="outlined"
+        fullWidth
+        disabled
+      >
+      </TextField>
+    
+    
   );
 };
 

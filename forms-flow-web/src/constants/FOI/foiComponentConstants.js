@@ -63,6 +63,7 @@ const FOI_COMPONENT_CONSTANTS = {
     PROGRAM_AREA_SELECTED: "selected",
     ADDITIONAL_PERSONAL_INFORMATION: "additionalPersonalInfo",
     ADDREQUEST: "addrequest",
+    HISTORICAL_REQUEST: "historicalrequest",
     RQUESTDETAILS_INITIALVALUES: "initialValues",
     ASSIGNEE_GROUPS: ["Intake Team", "Flex Team", "Processing Team"],
     ONLINE_FORM: "Online Form",
