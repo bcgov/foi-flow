@@ -122,3 +122,67 @@ class factRequestDetails(db.Model):
             db.session.close()
         return history
 
+    @classmethod
+    def getadvancedsearchresults(cls, params):
+        searchresults = []
+        try:
+            basequery = 'SELECT foirequestid \
+                            ,requesttypename \
+                            ,applicantname \
+                            ,visualrequestfilenumber \
+                            ,oipcno \
+                            ,subject \
+                            ,primaryusername as assignee \
+                            ,receiveddate \
+                            ,description \
+                            ,requeststatus \
+                            ,closeddate \
+                            ,ministry \
+                            ,officeid \
+                            FROM \
+                            public."ClosedRequestDetailsPost2018" WHERE '
+
+            filterbysearchcondition =[]        
+
+            if(params['search'] == 'requestdescription'):
+                for keyword in params['keywords']:
+                    filterbysearchcondition.append("LOWER(description) like LOWER('%{0}%')".format(keyword))
+            elif(params['search'] == 'applicantname'):
+                for keyword in params['keywords']:
+                    filterbysearchcondition.append("LOWER(applicantname) like LOWER('%{0}%')".format(keyword))
+            elif(params['search'] == 'assigneename'):
+                for keyword in params['keywords']:
+                    filterbysearchcondition.append("LOWER(primaryusername) like LOWER('%{0}%')".format(keyword))
+            elif(params['search'] == 'idnumber' or params['search'] == 'axisrequest_number'):
+                for keyword in params['keywords']:
+                    filterbysearchcondition.append("LOWER(visualrequestfilenumber) like LOWER('%{0}%')".format(keyword))
+
+            conditioncount = len(filterbysearchcondition) 
+
+            for idx,searchcondition in enumerate(filterbysearchcondition):                                
+                basequery+= ' {0} '.format(searchcondition)
+                
+                if(idx!=(conditioncount-1)):
+                    basequery+= ' AND '
+
+            if(conditioncount == 0):
+                basequery+= "LOWER(description) like LOWER('%{0}%')".format(keyword)
+
+            basequery+= ' ORDER BY {0} {1}'.format(params['sortingitem'],params['sortingorder'])
+
+            if params['size'] is not None:
+                basequery+= ' LIMIT {0}'.format(params['size'])
+            else:
+                basequery+= ' LIMIT 100'
+        
+            rs = db.session.execute(text(basequery))
+            
+            for row in rs:            
+                searchresults.append({"axisrequestid": row["visualrequestfilenumber"], "description": row["description"], "assignee": row["assignee"], "requeststatus": row["requeststatus"], "applicantname": row["applicantname"], "requesttypename": row["requesttypename"],"receiveddate": row["receiveddate"],"oipcno": row["oipcno"]})
+        except Exception as ex:
+            logging.error(ex)
+            raise ex
+        finally:
+            db.session.close()
+        return searchresults
+              
