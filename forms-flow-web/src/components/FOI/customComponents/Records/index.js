@@ -2092,14 +2092,14 @@ export const RecordsLog = ({
             </Grid>
             <Grid item xs={3}>
               <span style={{ fontWeight: "bold" }}>
-                <div >
+                {isMCFPersonal && <div >
                   Estimated Physical Pages:{" "}    
-                </div>
+                </div>}
               </span>
             </Grid>
             <Grid item xs={2}>
-              <span style={{ fontWeight: "bold" }}>
-                <div >                  
+              {isMCFPersonal && <span style={{ fontWeight: "bold" }}>
+                <div>                  
                   <TextField
                     type="number"
                     inputProps={{
@@ -2113,7 +2113,7 @@ export const RecordsLog = ({
                     onChange={(e) => setEstimatedPageCount(e.target.value)}
                   ></TextField>  
                 </div>
-              </span>
+              </span>}
             </Grid>
                           
             <Grid item xs={7}>
@@ -2126,7 +2126,7 @@ export const RecordsLog = ({
             </Grid>
             <Grid item xs={3}>
               <span style={{ fontWeight: "bold" }}>
-                <div>
+                {isMCFPersonal && <div>
                   Estimated Pages After Tagging:{" "}
                   {/* <button 
                     class="btn" 
@@ -2141,38 +2141,42 @@ export const RecordsLog = ({
                   >
                     Save
                   </button> */}
-                </div>
+                </div>}
               </span>
             </Grid>           
             <Grid item xs={2}>
-              <TextField
-                type="number"
-                inputProps={{
-                  step: 1,
-                  min: 0,
-                  style: {height: 12}
-                }}
-                style={{width: 90}}
-                size="small"
-                value={estimatedTaggedPageCount}
-                onChange={(e) => setEstimatedTaggedPageCount(e.target.value)}
-              ></TextField>              
-              <button 
-                class="btn" 
-                style={{
-                  backgroundColor: "#38598A",
-                  color: "White",
-                  height: 29,
-                  paddingTop: 2,
-                  marginLeft: 10,
-                  fontWeight: "bold",
-                  width: "calc(100% - 100px)"
-                }} 
-                onClick={saveEstimates}
-                disabled={estimatedTaggedPageCount === requestDetails.estimatedtaggedpagecount && estimatedPageCount === requestDetails.estimatedpagecount}
-              >
-                Save
-              </button>
+              {isMCFPersonal && 
+                <>
+                  <TextField
+                    type="number"
+                    inputProps={{
+                      step: 1,
+                      min: 0,
+                      style: {height: 12}
+                    }}
+                    style={{width: 90}}
+                    size="small"
+                    value={estimatedTaggedPageCount}
+                    onChange={(e) => setEstimatedTaggedPageCount(e.target.value)}
+                  ></TextField>              
+                  <button 
+                    class="btn" 
+                    style={{
+                      backgroundColor: "#38598A",
+                      color: "White",
+                      height: 29,
+                      paddingTop: 2,
+                      marginLeft: 10,
+                      fontWeight: "bold",
+                      width: "calc(100% - 100px)"
+                    }} 
+                    onClick={saveEstimates}
+                    disabled={estimatedTaggedPageCount === requestDetails.estimatedtaggedpagecount && estimatedPageCount === requestDetails.estimatedpagecount}
+                  >
+                    Save
+                  </button>
+                </>
+              }
             </Grid>            
             {/* <Grid item xs={1}>
             </Grid> */}
