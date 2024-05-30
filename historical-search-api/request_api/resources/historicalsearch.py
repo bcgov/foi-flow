@@ -22,15 +22,18 @@ class AdvancedHistoricalSearch(Resource):
     @staticmethod
     @TRACER.trace()
     @cross_origin(origins=allowedorigins())
-    #@auth.require
+    @auth.require
     @cors_preflight('GET,POST,OPTIONS')
-    #@auth.ismemberofgroups(getrequiredmemberships())
+    @auth.ismemberofgroups(getrequiredmemberships())
     def get():
         try:
            
             DEFAULT_SIZE = 10
             DEFAULT_SORT_ITEM = 'receiveddate'
             DEFAULT_SORT_ORDER = 'desc'
+
+            print("User ID is {0}, of type {1}".format(AuthHelper.getuserid(),AuthHelper.getusertype()))
+            print("Is restricted file manager - {0}".format(AuthHelper.isiaorestrictedfilemanager()))
 
             params = {
                 'usertype': 'iao', #todo: need to update

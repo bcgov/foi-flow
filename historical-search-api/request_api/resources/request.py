@@ -19,7 +19,7 @@ from flask_restx import Namespace, Resource
 from flask_cors import cross_origin
 from request_api.auth import auth, AuthHelper
 from request_api.tracer import Tracer
-from request_api.utils.util import  cors_preflight, allowedorigins,str_to_bool,canrestictdata
+from request_api.utils.util import  cors_preflight, allowedorigins
 from request_api.exceptions import BusinessException
 from request_api.services.historicalrequestservice import historicalrequestservice
 import json

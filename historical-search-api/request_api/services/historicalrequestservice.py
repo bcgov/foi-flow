@@ -20,5 +20,5 @@ class historicalrequestservice:
         return factRequestExtensions.getextensionsbyrequestid(requestid)
     
     def advancedsearch(self, params={'usertype': 'iao', 'groups':None, 'page':1, 'size':10, 'sortingitems':[], 'sortingorders':[], 'requeststate':[], 'requeststatus':[], 'requesttype':[], 'requestflags':[], 'publicbody':[], 'daterangetype':None, 'fromdate':None, 'todate':None, 'search':None, 'keywords':[], 'userid':None}):
-        return factRequestDetails.advancedsearch(params,None)
+        return factRequestDetails.getadvancedsearchresults(params)
                 
