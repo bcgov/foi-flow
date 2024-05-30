@@ -36,7 +36,7 @@ class AdvancedHistoricalSearch(Resource):
             print("Is restricted file manager - {0}".format(AuthHelper.isiaorestrictedfilemanager()))
 
             params = {
-                'usertype': 'iao', #todo: need to update
+                'usertype': AuthHelper.getusertype(),
                 'groups': '',                
                 'size': flask.request.args.get('size', DEFAULT_SIZE, type=int),
                 'sortingitem': flask.request.args.get('sortingitem'),
@@ -64,8 +64,8 @@ class AdvancedHistoricalSearch(Resource):
                 params['keywords'] = []
 
             statuscode = 200
-            if (params['usertype'] == "iao" or params['usertype'] == "ministry"):                                                                                           
-                requests = historicalrequestservice().advancedsearch(params)
+            if (params['usertype'] == "iao"):                                                                                           
+                requests = historicalrequestservice().advancedsearch(AuthHelper.isiaorestrictedfilemanager(),params)
             else:
                 statuscode = 401   
 

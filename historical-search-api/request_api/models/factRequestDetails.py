@@ -123,7 +123,7 @@ class factRequestDetails(db.Model):
         return history
 
     @classmethod
-    def getadvancedsearchresults(cls, params):
+    def getadvancedsearchresults(cls,isiaorestictedmanager:False, params):
         searchresults = []
         try:
             basequery = 'SELECT foirequestid \
@@ -167,6 +167,9 @@ class factRequestDetails(db.Model):
 
             if(conditioncount == 0):
                 basequery+= "LOWER(description) like LOWER('%{0}%')".format(keyword)
+
+            if(isiaorestictedmanager == False):
+                basequery+= " AND requesttypename NOT LIKE '%Restricted%' AND applicantname NOT LIKE '%Restricted%'"
 
             basequery+= ' ORDER BY {0} {1}'.format(params['sortingitem'],params['sortingorder'])
 
