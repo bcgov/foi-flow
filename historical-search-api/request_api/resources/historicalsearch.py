@@ -4,7 +4,7 @@ from flask_restx import Namespace, Resource
 from flask_cors import cross_origin
 
 from request_api.tracer import Tracer
-from request_api.utils.util import  cors_preflight, allowedorigins, getrequiredmemberships
+from request_api.utils.util import  cors_preflight, allowedorigins, getIAOmemberships
 from request_api.auth import AuthHelper, auth
 from request_api.tracer import Tracer
 from request_api.exceptions import BusinessException
@@ -24,16 +24,13 @@ class AdvancedHistoricalSearch(Resource):
     @cross_origin(origins=allowedorigins())
     @auth.require
     @cors_preflight('GET,POST,OPTIONS')
-    @auth.ismemberofgroups(getrequiredmemberships())
+    @auth.ismemberofgroups(getIAOmemberships())
     def get():
         try:
            
             DEFAULT_SIZE = 10
             DEFAULT_SORT_ITEM = 'receiveddate'
             DEFAULT_SORT_ORDER = 'desc'
-
-            print("User ID is {0}, of type {1}".format(AuthHelper.getuserid(),AuthHelper.getusertype()))
-            print("Is restricted file manager - {0}".format(AuthHelper.isiaorestrictedfilemanager()))
 
             params = {
                 'usertype': AuthHelper.getusertype(),

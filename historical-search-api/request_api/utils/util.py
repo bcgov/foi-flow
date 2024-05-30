@@ -59,7 +59,7 @@ def snake2camelback(snake_dict: dict):
     """Convert the passed dictionary's keys from snake_case to camelBack case."""
     return camelize(snake_dict)
 
-def getrequiredmemberships():
+def getIAOmemberships():
     membership =''
     for procgroup in ProcessingTeamWithKeycloackGroup:
         membership+='{0},'.format(procgroup.value)

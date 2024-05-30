@@ -19,7 +19,7 @@ from flask_restx import Namespace, Resource
 from flask_cors import cross_origin
 from request_api.auth import auth, AuthHelper
 from request_api.tracer import Tracer
-from request_api.utils.util import  cors_preflight, allowedorigins
+from request_api.utils.util import  cors_preflight, allowedorigins,getIAOmemberships
 from request_api.exceptions import BusinessException
 from request_api.services.historicalrequestservice import historicalrequestservice
 import json
@@ -43,7 +43,8 @@ class FOIHistoricalSearch(Resource):
     @staticmethod
     @TRACER.trace()
     @cross_origin(origins=allowedorigins())       
-    # @auth.require
+    @auth.require
+    @auth.ismemberofgroups(getIAOmemberships())
     def get(requestid):
         try : 
             statuscode = 200
@@ -63,7 +64,8 @@ class FOIHistoricalSearch(Resource):
     @staticmethod
     @TRACER.trace()
     @cross_origin(origins=allowedorigins())       
-    # @auth.require
+    @auth.require
+    @auth.ismemberofgroups(getIAOmemberships())
     def get(requestid):
         try : 
             statuscode = 200
@@ -82,7 +84,8 @@ class FOIHistoricalSearch(Resource):
     @staticmethod
     @TRACER.trace()
     @cross_origin(origins=allowedorigins())       
-    # @auth.require
+    @auth.require
+    @auth.ismemberofgroups(getIAOmemberships())
     def get(requestid):
         try : 
             statuscode = 200
