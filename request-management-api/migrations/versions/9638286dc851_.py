@@ -17,8 +17,8 @@ depends_on = None
 
 
 def upgrade():
-    op.add_column('FOIMinistryRequests', sa.Column('estimatedpagecount', sa.Integer, nullable=True, server_default=0))
-    op.add_column('FOIMinistryRequests', sa.Column('estimatedtaggedpagecount', sa.Integer, nullable=True, server_default=0))
+    op.add_column('FOIMinistryRequests', sa.Column('estimatedpagecount', sa.Integer, nullable=True))
+    op.add_column('FOIMinistryRequests', sa.Column('estimatedtaggedpagecount', sa.Integer, nullable=True))
 
 
 def downgrade():
