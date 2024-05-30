@@ -72,7 +72,8 @@ namespace MCS.FOI.AXISIntegration.DataModels
         [DataMember(Name = "lastName")]
         public string ApplicantLastName { get; set; }
 
-        
+        [DataMember(Name = "axisApplicantID")]
+        public string AXISApplicantID { get; set; }
 
         [DataMember(Name = "businessName")]
         public string BusinessName { get; set; }

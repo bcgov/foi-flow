@@ -58,6 +58,10 @@ const getcfrDaysRemainingText = (_cfrDaysRemaining) => {
      return`CFR Due in ${_cfrDaysRemaining} Days`    
 };
 
+export const isBeforeOpen = (requestDetails) => {
+  return !requestDetails.stateTransition?.filter(s => s.status === StateEnum.open.name).length > 0;
+};
+
 export const getExtensionsCountText = (extensions) => {
   if (!extensions || extensions.length < 1) {
     return `Extensions 0`;

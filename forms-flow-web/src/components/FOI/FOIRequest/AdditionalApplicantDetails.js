@@ -10,7 +10,7 @@ import AccordionDetails from '@material-ui/core/AccordionDetails';
 import Typography from '@material-ui/core/Typography';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 
-const AdditionalApplicantDetails = React.memo(({requestDetails, createSaveRequestObject, disableInput}) => {
+const AdditionalApplicantDetails = React.memo(({requestDetails, createSaveRequestObject, disableInput, defaultExpanded, warning}) => {
     /**
      *  Addition Applicant details box in the UI
      *  No mandatory fields here
@@ -24,6 +24,15 @@ const AdditionalApplicantDetails = React.memo(({requestDetails, createSaveReques
       },
       accordionSummary: {
         flexDirection: 'row-reverse'
+      },
+      warning: {
+        '& fieldset': {
+          borderColor: '#ed6c02 !important'
+        },
+        '& label': {
+          color: '#ed6c02 !important'
+        }
+      
       }
     });
     const classes = useStyles();
@@ -126,7 +135,7 @@ const AdditionalApplicantDetails = React.memo(({requestDetails, createSaveReques
 
      return (
       <div className='request-accordian' >
-      <Accordion defaultExpanded={true}>
+      <Accordion defaultExpanded={defaultExpanded}>
       <AccordionSummary className={classes.accordionSummary} expandIcon={<ExpandMoreIcon />} 
         id="additionalApplicantDetails-header">
         <Typography className={classes.heading}>ADDITIONAL APPLICANT DETAILS</Typography>
@@ -140,6 +149,7 @@ const AdditionalApplicantDetails = React.memo(({requestDetails, createSaveReques
                       inputProps={{ "aria-labelledby": "personalHealthNumber-label"}}
                       InputLabelProps={{ shrink: true, }} 
                       variant="outlined" 
+                      className={warning && warning(FOI_COMPONENT_CONSTANTS.PERSONAL_HEALTH_NUMBER) && classes.warning}
                       value={personalHealthNumberText}
                       onChange={handlePersonalHealthNumber}
                       fullWidth
@@ -156,6 +166,7 @@ const AdditionalApplicantDetails = React.memo(({requestDetails, createSaveReques
                     shrink: true,
                     }}
                     variant="outlined" 
+                    className={warning && warning(FOI_COMPONENT_CONSTANTS.DOB) && classes.warning}
                     fullWidth
                     disabled={disableInput}
                   />
@@ -179,6 +190,7 @@ const AdditionalApplicantDetails = React.memo(({requestDetails, createSaveReques
                     inputProps={{ "aria-labelledby": "correctionsNumber-label"}}
                     InputLabelProps={{ shrink: true, }} 
                     variant="outlined" 
+                    className={warning && warning(FOI_COMPONENT_CONSTANTS.CORRECTIONS_NUMBER) && classes.warning}
                     value={correctionsNumberText}
                     onChange={handleCorrectionsNumber}
                     fullWidth
@@ -191,6 +203,7 @@ const AdditionalApplicantDetails = React.memo(({requestDetails, createSaveReques
                       InputLabelProps={{ shrink: true, }}                       
                       variant="outlined" 
                       value={employeeNumberText}
+                      className={warning && warning(FOI_COMPONENT_CONSTANTS.EMPLOYEE_NUMBER) && classes.warning}
                       onChange={handleEmployeeNumber}
                       fullWidth
                       disabled={disableInput}

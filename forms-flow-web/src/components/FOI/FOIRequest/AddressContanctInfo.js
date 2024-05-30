@@ -9,7 +9,7 @@ import AccordionSummary from '@material-ui/core/AccordionSummary';
 import AccordionDetails from '@material-ui/core/AccordionDetails';
 import Typography from '@material-ui/core/Typography';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
-import {closeContactInfo} from '../FOIRequest/utils';
+import { isBeforeOpen } from "./utils";
 
 const useStyles = makeStyles((_theme) => ({
   row: {
@@ -22,6 +22,15 @@ const useStyles = makeStyles((_theme) => ({
   },
   accordionSummary: {
       flexDirection: 'row-reverse'
+  },
+  warning: {
+    '& fieldset': {
+      borderColor: '#ed6c02 !important'
+    },
+    '& label': {
+      color: '#ed6c02 !important'
+    }
+  
   }
 }));
 
@@ -34,7 +43,9 @@ const AddressContactDetails = memo(
     handleContanctDetailsValue,
     handleEmailValidation,
     disableInput,
-    userDetail
+    defaultExpanded,
+    moreInfoAction,
+    warning
   }) => {
     const classes = useStyles();
     /**
@@ -106,6 +117,13 @@ const AddressContactDetails = memo(
 
     //state management for email validation
     const [validation, setValidation] = React.useState({});
+
+  //   const [modalOpen, setModalOpen] = React.useState(false);
+
+    
+  //   const handleModalClose = () => {
+  //     setModalOpen(false);
+  // }
 
     React.useEffect(() => {
       setFieldValues();
@@ -289,12 +307,24 @@ const AddressContactDetails = memo(
     };
     return (
       <div className='request-accordian' id="addressContactInfo">
-      <Accordion defaultExpanded={!closeContactInfo(userDetail,requestDetails)}>
+      <Accordion defaultExpanded={defaultExpanded}>
       <AccordionSummary className={classes.accordionSummary} expandIcon={<ExpandMoreIcon />} 
           id="addressContactInfo-header">
           <Typography className={classes.heading}>ADDRESS AND CONTACT INFORMATION</Typography>
       </AccordionSummary>
-      <AccordionDetails>
+      <AccordionDetails>        
+          <div>
+              {/* {moreInfoAction && // comment back in after axis decommission
+                <button
+                  type="button"
+                  className={`btn btn-link btn-description-history`}
+                  onClick={moreInfoAction}
+                  style={(isBeforeOpen(requestDetails) && !requestDetails.foiRequestApplicantID) ? {color: "#9E2929"} : {}}
+                >
+                  {(isBeforeOpen(requestDetails)) && 'Search' } Applicant Profiles
+                </button>
+              } */}
+          </div>
           <div className={clsx("row", "foi-details-row", classes.row)}>
             <div className="col-lg-6 foi-details-col">
               <TextField
@@ -303,6 +333,7 @@ const AddressContactDetails = memo(
                 InputLabelProps={{ shrink: true }}
                 value={emailText}
                 variant="outlined"
+                className={warning && warning(FOI_COMPONENT_CONSTANTS.APPLICANT_EMAIL) && classes.warning}
                 fullWidth
                 required={true}
                 disabled={disableInput}
@@ -324,6 +355,7 @@ const AddressContactDetails = memo(
                 label="Home Phone"
                 InputLabelProps={{ shrink: true }}
                 variant="outlined"
+                className={warning && warning(FOI_COMPONENT_CONSTANTS.HOME_PHONE) && classes.warning}
                 value={homePhoneText}
                 onChange={handleHomePhoneChange}
                 fullWidth
@@ -337,6 +369,7 @@ const AddressContactDetails = memo(
                 label="Mobile Phone"
                 InputLabelProps={{ shrink: true }}
                 variant="outlined"
+                className={warning && warning(FOI_COMPONENT_CONSTANTS.MOBILE_PHONE) && classes.warning}
                 value={mobilePhoneText}
                 onChange={handleMobilePhoneChange}
                 fullWidth
@@ -350,6 +383,7 @@ const AddressContactDetails = memo(
                 label="Work Phone"
                 InputLabelProps={{ shrink: true }}
                 variant="outlined"
+                className={warning && warning(FOI_COMPONENT_CONSTANTS.WORK_PHONE_PRIMARY) && classes.warning}
                 value={workPhonePrimaryText}
                 onChange={handleWorkPhonePrimaryChange}
                 fullWidth
@@ -363,6 +397,7 @@ const AddressContactDetails = memo(
                 label="Alternative Phone"
                 InputLabelProps={{ shrink: true }}
                 variant="outlined"
+                className={warning && warning(FOI_COMPONENT_CONSTANTS.WORK_PHONE_SECONDARY) && classes.warning}
                 value={workPhoneSecondaryText}
                 onChange={handleWorkPhoneSecondarChange}
                 fullWidth
@@ -378,6 +413,7 @@ const AddressContactDetails = memo(
                 label="Street Address"
                 InputLabelProps={{ shrink: true }}
                 variant="outlined"
+                className={warning && warning(FOI_COMPONENT_CONSTANTS.STREET_ADDRESS_PRIMARY) && classes.warning}
                 value={streetAddressText}
                 onChange={handleStreetAddressChange}
                 fullWidth
@@ -393,6 +429,7 @@ const AddressContactDetails = memo(
                 label="Secondary Street Address"
                 InputLabelProps={{ shrink: true }}
                 variant="outlined"
+                className={warning && warning(FOI_COMPONENT_CONSTANTS.STREET_ADDRESS_SECONDARY) && classes.warning}
                 value={secondaryStreetAddressText}
                 onChange={handleScondaryStreetAddressChange}
                 fullWidth
@@ -406,6 +443,7 @@ const AddressContactDetails = memo(
                 label="City"
                 InputLabelProps={{ shrink: true }}
                 variant="outlined"
+                className={warning && warning(FOI_COMPONENT_CONSTANTS.CITY) && classes.warning}
                 value={CityText}
                 onChange={handleCityChange}
                 fullWidth
@@ -421,6 +459,7 @@ const AddressContactDetails = memo(
                 label="Province"
                 InputLabelProps={{ shrink: true }}
                 variant="outlined"
+                className={warning && warning(FOI_COMPONENT_CONSTANTS.PROVINCE) && classes.warning}
                 value={ProvinceText}
                 onChange={handleProvinceChange}
                 fullWidth
@@ -436,6 +475,7 @@ const AddressContactDetails = memo(
                 label="Country"
                 InputLabelProps={{ shrink: true }}
                 variant="outlined"
+                className={warning && warning(FOI_COMPONENT_CONSTANTS.COUNTRY) && classes.warning}
                 value={CountryText}
                 onChange={handleCountryChange}
                 fullWidth
@@ -451,6 +491,7 @@ const AddressContactDetails = memo(
                 label="Postal Code"
                 InputLabelProps={{ shrink: true }}
                 variant="outlined"
+                className={warning && warning(FOI_COMPONENT_CONSTANTS.POSTALCODE) && classes.warning}
                 value={PostalText}
                 onChange={handlePostalChange}
                 inputProps={{ maxLength: 6 }}

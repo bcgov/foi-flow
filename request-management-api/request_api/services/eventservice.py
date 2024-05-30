@@ -13,6 +13,7 @@ from request_api.services.events.divisiondate import divisiondateevent
 from request_api.services.events.oipcduedate import oipcduedateevent
 from request_api.services.events.extension import extensionevent
 from request_api.services.events.cfrfeeform import cfrfeeformevent
+from request_api.services.events.attachment import attachmentevent
 from request_api.services.events.payment import paymentevent
 from request_api.services.events.email import emailevent
 from request_api.services.events.section5pending import section5pendingevent
@@ -58,7 +59,7 @@ class eventservice:
                     current_app.logger.error("FOI Notification failed for event for extension= %s" % (extensionid))
         except BusinessException as exception:            
             self.__logbusinessexception(exception)
-            
+
     def postreminderevent(self):
         try:
             cfreventresponse = cfrdateevent().createdueevent() 
@@ -140,5 +141,14 @@ class eventservice:
             cfrfeeeventresponse = cfrfeeformevent().createstatetransitionevent(ministryrequestid, userid, username)
             if cfrfeeeventresponse.success == False: 
                 current_app.logger.error("FOI Notification failed for event for CFRFEEFORM= %s" % (ministryrequestid))
+        except BusinessException as exception:            
+            self.__logbusinessexception(exception)
+
+    def attachmenteventservice(self, ministryrequestid, document, userid, requesttype):
+        try:
+            attachmenteventresponse = attachmentevent().createattachmentevent(ministryrequestid, userid, document, requesttype)
+            if attachmenteventresponse.success == False:
+                current_app.logger.error("FOI Notification failed for event for attachment= %s" % (document['category']))
+            return attachmenteventresponse    
         except BusinessException as exception:            
             self.__logbusinessexception(exception)
