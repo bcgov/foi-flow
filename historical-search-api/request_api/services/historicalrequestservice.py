@@ -10,8 +10,8 @@ class historicalrequestservice:
 
     """
     
-    def gethistoricalrequest(self, requestid):
-        return factRequestDetails.getrequestbyid(requestid)
+    def gethistoricalrequest(self, isiaorestictedmanager,requestid):
+        return factRequestDetails.getrequestbyid(isiaorestictedmanager,requestid)
     
     def gethistoricalrequestdescriptionhistory(self, requestid):
         return factRequestDetails.getdescriptionhistorybyid(requestid)    

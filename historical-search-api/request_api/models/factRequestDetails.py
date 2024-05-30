@@ -11,7 +11,7 @@ class factRequestDetails(db.Model):
     foirequestid = db.Column(db.Integer, primary_key=True,autoincrement=True)
 
     @classmethod
-    def getrequestbyid(cls, requestid):        
+    def getrequestbyid(cls, isiaorestictedmanager:False, requestid):        
         request = {}
         try:
             sql = """select 
@@ -29,18 +29,22 @@ class factRequestDetails(db.Model):
             rd.subject
             --, rd.* 
             from public."ClosedRequestDetailsPost2018" rd
-             join public."dimRequestStatuses" rs on rs.requeststatusid = rd.requeststatusid
+            left join public."dimRequestStatuses" rs on rs.requeststatusid = rd.requeststatusid
              --join public."factRequestRequesters" rr1 on rr1.requesterid = rd.requesterid and rr1.foirequestid = rd.foirequestid and rr1.activeflag = 'Y'
                 
-            join public."dimRequesters" r on r.requesterid = rd.requesterid
+            left join public."dimRequesters" r on r.requesterid = rd.requesterid
             -- left join public."factRequestRequesters" rr2 on rr2.requesterid = rd.onbehalfofrequesterid and rr2.foirequestid = rd.foirequestid and rr2.activeflag = 'Y'
             left join public."dimRequesters" r2 on rd.onbehalfofrequesterid = r2.requesterid
                 LEFT JOIN "dimRequesterTypes" rqt ON rd.applicantcategoryid = rqt.requestertypeid
-            join public."dimReceivedModes" rm on rm.receivedmodeid = rd.receivedmodeid
-            join public."dimAddress" a on a.addressid = rd.shipaddressid
-            join public."dimRequestTypes" rt on rt.requesttypeid = rd.requesttypeid
-            join public."dimDeliveryModes" dm on dm.deliverymodeid = rd.deliverymodeid
+            left join public."dimReceivedModes" rm on rm.receivedmodeid = rd.receivedmodeid
+            left join public."dimAddress" a on a.addressid = rd.shipaddressid
+            left join public."dimRequestTypes" rt on rt.requesttypeid = rd.requesttypeid
+            left join public."dimDeliveryModes" dm on dm.deliverymodeid = rd.deliverymodeid
             where rd.visualrequestfilenumber = :requestid and rd.activeflag = 'Y'"""
+
+            if(isiaorestictedmanager == False):
+                sql+= " AND rd.requesttypename NOT LIKE '%Restricted%'"
+            
             rs = db.session.execute(text(sql), {'requestid': requestid})
             for row in rs:
                 request["axisRequestId"] = row['visualrequestfilenumber']
@@ -169,7 +173,7 @@ class factRequestDetails(db.Model):
                 basequery+= "LOWER(description) like LOWER('%{0}%')".format(keyword)
 
             if(isiaorestictedmanager == False):
-                basequery+= " AND requesttypename NOT LIKE '%Restricted%' AND applicantname NOT LIKE '%Restricted%'"
+                basequery+= " AND requesttypename NOT LIKE '%Restricted%'"
 
             basequery+= ' ORDER BY {0} {1}'.format(params['sortingitem'],params['sortingorder'])
 

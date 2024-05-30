@@ -48,7 +48,7 @@ class FOIHistoricalSearch(Resource):
     def get(requestid):
         try : 
             statuscode = 200
-            jsondata = historicalrequestservice().gethistoricalrequest(requestid)
+            jsondata = historicalrequestservice().gethistoricalrequest(AuthHelper.isiaorestrictedfilemanager(),requestid)
             return jsondata , statuscode 
         except ValueError:
             return {'status': 500, 'message':INVALID_REQUEST_ID}, 500    
