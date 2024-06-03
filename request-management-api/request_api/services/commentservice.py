@@ -77,11 +77,11 @@ class commentservice:
     def copyrequestcomment(self, ministryrequestid, comments, userid):
         _comments = []        
         for comment in comments:
-            commentresponse=FOIRequestComment.savecomment(comment['commentTypeId'], self.__copyparentcomment(ministryrequestid, comment), 1, userid,comment['dateUF']) 
+            commentresponse=FOIRequestComment.savecomment(comment['commentTypeId'], self.__copyparentcomment(ministryrequestid, comment), 1, comment['createdby'],comment['dateUF'])
             _comments.append({"ministrycommentid":commentresponse.identifier,"rawcommentid":comment['commentId']})
             if comment['replies']:
                 for reply in comment['replies']:
-                    response=FOIRequestComment.savecomment(reply['commentTypeId'], self.__copyreplycomment(ministryrequestid, reply, commentresponse.identifier), 1, userid,reply['dateUF'])      
+                    response=FOIRequestComment.savecomment(reply['commentTypeId'], self.__copyreplycomment(ministryrequestid, reply, commentresponse.identifier), 1, reply['createdby'],reply['dateUF'])
                     _comments.append({"ministrycommentid":response.identifier,"rawcommentid":comment['commentId']})        
         return _comments
     
@@ -131,6 +131,7 @@ class commentservice:
                 "parentCommentId":comment['parentcommentid'],
                 "commentTypeId":comment['commenttypeid'],
                 "taggedusers" : comment['taggedusers'],
+                "createdby" : comment['createdby'],
                 "edited": comment["commentsversion"] > 1 # edited: True/False
         }     
 
