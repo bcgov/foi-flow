@@ -7,6 +7,7 @@ from .default_method_result import DefaultMethodResult
 from sqlalchemy.sql.expression import distinct
 from sqlalchemy import or_,and_,text
 from .FOIApplicantCorrespondenceAttachments import FOIApplicantCorrespondenceAttachment
+from .FOIApplicantCorrespondenceEmails import FOIApplicantCorrespondenceEmail
 from sqlalchemy.dialects.postgresql import JSON, UUID
 
 class FOIApplicantCorrespondence(db.Model):
@@ -58,7 +59,7 @@ class FOIApplicantCorrespondence(db.Model):
         return correspondence_schema.dump(query)
 
     @classmethod
-    def saveapplicantcorrespondence(cls, newapplicantcorrepondencelog,attachments)->DefaultMethodResult: 
+    def saveapplicantcorrespondence(cls, newapplicantcorrepondencelog,attachments,emails)->DefaultMethodResult: 
         db.session.add(newapplicantcorrepondencelog)
         db.session.commit()
         try:
@@ -70,6 +71,18 @@ class FOIApplicantCorrespondence(db.Model):
                     attachment.attachmentfilename = _attachment['filename']
                     attachment.createdby = newapplicantcorrepondencelog.createdby
                     FOIApplicantCorrespondenceAttachment().saveapplicantcorrespondenceattachment(attachment)
+            if(emails is not None and len(emails) > 0):
+                correspondenceemails = []
+                for _email in emails:
+                    print(_email)
+                    email = FOIApplicantCorrespondenceEmail()
+                    email.applicantcorrespondenceid = newapplicantcorrepondencelog.applicantcorrespondenceid
+                    email.correspondence_to = _email
+                    email.createdby = newapplicantcorrepondencelog.createdby
+                    correspondenceemails.append(email)
+                print(correspondenceemails)
+                FOIApplicantCorrespondenceEmail().saveapplicantcorrespondenceemail(newapplicantcorrepondencelog.applicantcorrespondenceid , correspondenceemails)
+            
         except Exception:
             return DefaultMethodResult(False,'applicantcorrepondence log exception while adding attachments',newapplicantcorrepondencelog.applicantcorrespondenceid)
 

@@ -1126,7 +1126,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
                     name="ContactApplicant"
                     onClick={() => tabclick("ContactApplicant")}
                   >
-                    Contact Applicant{" "}
+                    Communications{" "}
                     {applicantCorrespondence?.length > 0
                       ? `(${applicantCorrespondence.length})`
                       : ""}

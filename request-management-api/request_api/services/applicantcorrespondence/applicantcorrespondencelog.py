@@ -48,7 +48,7 @@ class applicantcorrespondenceservice:
         else:
             applicantcorrespondencelog.correspondencemessagejson = data['correspondencemessagejson']
             applicantcorrespondencelog.createdby = userid       
-        return FOIApplicantCorrespondence.saveapplicantcorrespondence(applicantcorrespondencelog,data['attachments'])        
+        return FOIApplicantCorrespondence.saveapplicantcorrespondence(applicantcorrespondencelog,data['attachments'], data['emails'])        
        
 
     def updateapplicantcorrespondencelog(self, correspondenceid, content):
