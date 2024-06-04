@@ -477,3 +477,17 @@ export const setOIPCInquiryoutcomes = (data) => (dispatch) => {
     payload: data,
   });
 };
+
+export const setAdvancedSearchFilter = (data) => (dispatch) => {
+  dispatch({
+    type: FOI_ACTION_CONSTANTS.FOI_ADVANCED_SEARCH_FILTER,
+    payload: data,
+  });
+};
+
+export const setHistoricalSearchParams = (data) => (dispatch) => {
+  dispatch({
+    type: FOI_ACTION_CONSTANTS.FOI_HISTORIC_SEARCH_PARAMS,
+    payload: data,
+  });
+};

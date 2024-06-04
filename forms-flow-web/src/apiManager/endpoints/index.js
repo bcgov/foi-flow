@@ -44,6 +44,7 @@ const API = {
   FOI_HISTORICAL_REQUEST_API: `${FOI_HISTORICAL_API_URL}/api/foihistoricalrequest`,
   FOI_HISTORICAL_REQUEST_DESCRIPTION_API: `${FOI_HISTORICAL_API_URL}/api/foihistoricalrequest/descriptionhistory`,
   FOI_HISTORICAL_REQUEST_EXTENSIONS_API: `${FOI_HISTORICAL_API_URL}/api/foihistoricalrequest/extensions`,
+  FOI_HISTORICAL_SEARCH_API: `${FOI_HISTORICAL_API_URL}/api/advancedsearch`,
 
   FOI_GET_PROGRAMAREADIVISIONS: `${FOI_BASE_API_URL}/api/foiadmin/divisions`,
   FOI_POST_PROGRAMAREADIVISION: `${FOI_BASE_API_URL}/api/foiadmin/division`,

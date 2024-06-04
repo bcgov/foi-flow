@@ -90,6 +90,15 @@ const AdvancedSearch = ({ userDetail }) => {
     setAdvancedSearchComponentLoading,
     setSearchLoading,
     advancedSearchParams,
+
+    handleUpdateHistoricSearchFilter,
+    searchHistoricalDataLoading,
+    historicalSearchComponentLoading,
+    setHistoricalSearchComponentLoading,
+    setHistoricalSearchLoading,
+    historicSearchParams,
+    defaultHistoricSearchSortModel
+
   } = useContext(ActionContext);
 
   const programAreaList = useSelector(
@@ -240,6 +249,7 @@ const AdvancedSearch = ({ userDetail }) => {
       .filter((value) => value);
   };
   const handleApplySearchFilters = () => {
+
     if (!advancedSearchComponentLoading) {
       setAdvancedSearchComponentLoading(true);
     }
@@ -259,8 +269,40 @@ const AdvancedSearch = ({ userDetail }) => {
       size: advancedSearchParams?.size || DEFAULT_PAGE_SIZE,
       sort: defaultSortModel,
       userId: userDetail.preferred_username,
-    });
+    });    
+
   };
+
+  const handleApplyHistoricSearchFilters = () =>{
+
+    //HISTORICAL SEARCH
+    if (!historicalSearchComponentLoading) {
+      setHistoricalSearchComponentLoading(true);
+    }
+    setHistoricalSearchLoading(true);
+    handleUpdateHistoricSearchFilter({
+      search: searchFilterSelected,
+      keywords: keywordsMode ? keywords : [searchText.trim()],
+      requestState: getTrueKeysFromCheckboxObject(requestState),
+      requestType: getTrueKeysFromCheckboxObject(requestTypes),
+      requestFlags: getTrueKeysFromCheckboxObject(requestFlags),
+      requestStatus: getTrueKeysFromCheckboxObject(requestStatus),
+      dateRangeType: selectedDateRangeType || null,
+      fromDate: fromDate || null,
+      toDate: toDate || null,
+      publicBodies: selectedPublicBodies,
+      page: 1,
+      size: historicSearchParams?.size || DEFAULT_PAGE_SIZE,
+      sort: defaultHistoricSearchSortModel,
+      userId: userDetail.preferred_username,
+    });
+
+  }
+
+   const handleSearch = () =>{
+    handleApplySearchFilters();
+    handleApplyHistoricSearchFilters();
+   }
 
   useEffect(() => {
     if (Object.keys(advancedSearchParams).length > 0) {
@@ -270,6 +312,16 @@ const AdvancedSearch = ({ userDetail }) => {
         setSearchLoading(true);
         handleUpdateSearchFilter(advancedSearchParams)
       } 
+
+      if (Object.keys(historicSearchParams).length > 0) {
+        if (!historicalSearchComponentLoading) {
+          setAdvancedSearchComponentLoading(true);
+        }
+        setHistoricalSearchLoading(true);
+        handleUpdateHistoricSearchFilter(historicSearchParams)
+      } 
+
+
   }, []);
 
   const noSearchCriteria = () => {
@@ -1005,7 +1057,7 @@ const AdvancedSearch = ({ userDetail }) => {
                       textTransform: "none",
                     }}
                     variant="contained"
-                    onClick={handleApplySearchFilters}
+                    onClick={handleSearch}
                     disabled={searchLoading || noSearchCriteria() || ((searchText || keywords.length>0) && !searchFilterSelected ) }
                     disableElevation
                   >

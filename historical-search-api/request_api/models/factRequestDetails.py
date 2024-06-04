@@ -185,7 +185,7 @@ class factRequestDetails(db.Model):
             rs = db.session.execute(text(basequery))
             
             for row in rs:            
-                searchresults.append({"axisrequestid": row["visualrequestfilenumber"], "description": row["description"], "assignee": row["assignee"], "requeststatus": row["requeststatus"], "applicantname": row["applicantname"], "requesttypename": row["requesttypename"],"receiveddate": row["receiveddate"],"oipcno": row["oipcno"]})
+                searchresults.append({"axisrequestid": row["visualrequestfilenumber"], "description": row["description"], "assignee": row["assignee"], "requeststatus": row["requeststatus"], "applicantname": row["applicantname"], "requesttype": row["requesttypename"],"receiveddate": row["receiveddate"],"oipcno": row["oipcno"]})
         except Exception as ex:
             logging.error(ex)
             raise ex
