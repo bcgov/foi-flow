@@ -152,6 +152,9 @@ class FOIRequestWrapperSchema(Schema):
 
     oipcdetails = fields.Nested(FOIMinistryRequestOIPCSchema, many=True,allow_none=True)
 
+    estimatedpagecount = fields.Int(data_key="estimatedpagecount",allow_none=True)
+    estimatedtaggedpagecount = fields.Int(data_key="estimatedtaggedpagecount",allow_none=True)
+
 
 class EditableFOIMinistryRequestWrapperSchema(Schema):
     class Meta:  # pylint: disable=too-few-public-methods

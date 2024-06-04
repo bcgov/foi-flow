@@ -68,6 +68,8 @@ class FOIMinistryRequest(db.Model):
     axispagecount = db.Column(db.String(20), nullable=True)
     axislanpagecount = db.Column(db.String(20), nullable=True)
     recordspagecount = db.Column(db.String(20), nullable=True)
+    estimatedpagecount = db.Column(db.Integer, nullable=True)
+    estimatedtaggedpagecount = db.Column(db.Integer, nullable=True)
     linkedrequests = db.Column(JSON, unique=False, nullable=True)
     identityverified = db.Column(JSON, unique=False, nullable=True)
     ministrysignoffapproval = db.Column(JSON, unique=False, nullable=True)
@@ -1527,5 +1529,7 @@ class FOIMinistryRequestSchema(ma.Schema):
                 'foirequest.receivedmodeid','requeststatus.requeststatusid','requeststatuslabel','requeststatus.name','programarea.bcgovcode',
                 'programarea.name','foirequest_id','foirequestversion_id','created_at','updated_at','createdby','assignedministryperson',
                 'assignedministrygroup','cfrduedate','closedate','closereasonid','closereason.name',
-                'assignee.firstname','assignee.lastname','ministryassignee.firstname','ministryassignee.lastname', 'axisrequestid', 'axissyncdate', 'axispagecount', 'axislanpagecount', 'linkedrequests', 'ministrysignoffapproval', 'identityverified','originalldd','isoipcreview', 'recordspagecount')
+                'assignee.firstname','assignee.lastname','ministryassignee.firstname','ministryassignee.lastname', 'axisrequestid', 
+                'axissyncdate', 'axispagecount', 'axislanpagecount', 'linkedrequests', 'ministrysignoffapproval', 'identityverified','originalldd',
+                'isoipcreview', 'recordspagecount', 'estimatedpagecount', 'estimatedtaggedpagecount')
     

@@ -36,6 +36,10 @@ import {
   editPersonalAttributes,
 } from "../../../../apiManager/services/FOI/foiRecordServices";
 import {
+  saveRequestDetails,
+  openRequestDetails
+} from "../../../../apiManager/services/FOI/foiRequestServices";
+import {
   StateTransitionCategories,
   AttachmentCategories,
 } from "../../../../constants/FOI/statusEnum";
@@ -222,6 +226,7 @@ export const RecordsLog = ({
   setRecordsUploading,
   recordsTabSelect,
   requestType,
+  handleSaveRequest
 }) => {
   const user = useSelector((state) => state.user.userDetail);
   const userGroups = user?.groups?.map((group) => group.slice(1));
@@ -264,6 +269,10 @@ export const RecordsLog = ({
     (state) => state.foiRequests.isRecordsLoading
   );
 
+  let requestDetails = useSelector(
+    (state) => state.foiRequests.foiRequestDetail
+  );
+
   const tagList = divisions
     .filter((d) => d.divisionname.toLowerCase() !== "communications")
     .map((division) => {
@@ -275,6 +284,8 @@ export const RecordsLog = ({
 
   const classes = useStyles();
   const [records, setRecords] = useState(recordsObj?.records);
+  const [estimatedPageCount, setEstimatedPageCount] = useState(0);
+  const [estimatedTaggedPageCount, setEstimatedTaggedPageCount] = useState(0);
   const [totalUploadedRecordSize, setTotalUploadedRecordSize] = useState(0);
   const [isScanningTeamMember, setIsScanningTeamMember] = useState(
     isScanningTeam(userGroups)
@@ -363,6 +374,11 @@ export const RecordsLog = ({
     setFileTypeFilters(_fileTypeFilters.sort((a, b)=>a.sortorder-b.sortorder));
     setVolumeFilters(_volumeFilters.sort((a, b)=>a.sortorder-b.sortorder));
   }, [recordsObj, MCFPeople, MCFFiletypes, MCFVolumes]);
+  
+  useEffect(() => {
+    setEstimatedPageCount(requestDetails.estimatedpagecount)
+    setEstimatedTaggedPageCount(requestDetails.estimatedtaggedpagecount)
+  }, [requestDetails]);
 
   const conversionFormats = useSelector(
     (state) => state.foiRequests.conversionFormats
@@ -1895,6 +1911,47 @@ export const RecordsLog = ({
     );
   };
 
+  const saveEstimates = (e) => {
+    requestDetails.estimatedpagecount = estimatedPageCount
+    requestDetails.estimatedtaggedpagecount = estimatedTaggedPageCount
+    dispatch(
+      saveRequestDetails(
+        requestDetails,
+        -1,
+        requestId,
+        ministryId,
+        (err, res) => {            
+          if (!err) {
+            toast.success("The request has been saved successfully.", {
+              position: "top-right",
+              autoClose: 3000,
+              hideProgressBar: true,
+              closeOnClick: true,
+              pauseOnHover: true,
+              draggable: true,
+              progress: undefined,
+            });
+            handleSaveRequest(requestDetails.currentState, false, res.id);
+          } else {
+            toast.error(
+              "Temporarily unable to save your request. Please try again in a few minutes.",
+              {
+                position: "top-right",
+                autoClose: 3000,
+                hideProgressBar: true,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+              }
+            );
+            handleSaveRequest(requestDetails.currentState, true, "");
+          }
+        }
+      )
+    );
+  }
+
   return (
     <div className={classes.container}>
       {isAttachmentLoading ? (
@@ -1910,7 +1967,7 @@ export const RecordsLog = ({
             alignItems="flex-start"
             spacing={1}
           >
-            <Grid item xs={5}>
+            <Grid item xs={5} style={{marginBottom: 15}}>
               <h1 className="foi-review-request-text foi-ministry-requestheadertext foi-records-request-text">
                 {getRequestNumber()}
               </h1>
@@ -2027,16 +2084,102 @@ export const RecordsLog = ({
           >
             <Grid item xs={7}>
               <span style={{ fontWeight: "bold" }}>
-                <div style={{ paddingBottom: "5px" }}>
+                <div >
                   Total Uploaded Size :{" "}
                   {getReadableFileSize(totalUploadedRecordSize)}
                 </div>
+              </span>
+            </Grid>
+            <Grid item xs={3}>
+              <span style={{ fontWeight: "bold" }}>
+                {isMCFPersonal && <div >
+                  Estimated Physical Pages:{" "}    
+                </div>}
+              </span>
+            </Grid>
+            <Grid item xs={2}>
+              {isMCFPersonal && <span style={{ fontWeight: "bold" }}>
+                <div>                  
+                  <TextField
+                    type="number"
+                    inputProps={{
+                      step: 1,
+                      min: 0,
+                      style: {height: 12}
+                    }}
+                    style={{width: 90}}
+                    size="small"
+                    value={estimatedPageCount}
+                    onChange={(e) => setEstimatedPageCount(e.target.value)}
+                  ></TextField>  
+                </div>
+              </span>}
+            </Grid>
+                          
+            <Grid item xs={7}>
+              <span style={{ fontWeight: "bold" }}>
                 <div>
                   Total Upload Limit :{" "}
                   {getReadableFileSize(TOTAL_RECORDS_UPLOAD_LIMIT)}
                 </div>
               </span>
             </Grid>
+            <Grid item xs={3}>
+              <span style={{ fontWeight: "bold" }}>
+                {isMCFPersonal && <div>
+                  Estimated Pages After Tagging:{" "}
+                  {/* <button 
+                    class="btn" 
+                    style={{
+                      backgroundColor: "#38598A",
+                      color: "White",
+                      height: 29,
+                      paddingTop: 2,
+                      marginLeft: 10
+                    }} 
+                    onClick={saveEstimates}
+                  >
+                    Save
+                  </button> */}
+                </div>}
+              </span>
+            </Grid>           
+            <Grid item xs={2}>
+              {isMCFPersonal && 
+                <>
+                  <TextField
+                    type="number"
+                    inputProps={{
+                      step: 1,
+                      min: 0,
+                      style: {height: 12}
+                    }}
+                    style={{width: 90}}
+                    size="small"
+                    value={estimatedTaggedPageCount}
+                    onChange={(e) => setEstimatedTaggedPageCount(e.target.value)}
+                  ></TextField>              
+                  <button 
+                    class="btn" 
+                    style={{
+                      backgroundColor: "#38598A",
+                      color: "White",
+                      height: 29,
+                      paddingTop: 2,
+                      marginLeft: 10,
+                      fontWeight: "bold",
+                      width: "calc(100% - 100px)"
+                    }} 
+                    onClick={saveEstimates}
+                    disabled={estimatedTaggedPageCount === requestDetails.estimatedtaggedpagecount && estimatedPageCount === requestDetails.estimatedpagecount}
+                  >
+                    Save
+                  </button>
+                </>
+              }
+            </Grid>            
+            {/* <Grid item xs={1}>
+            </Grid> */}
             <Grid
               container
               item
