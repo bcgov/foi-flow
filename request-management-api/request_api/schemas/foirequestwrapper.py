@@ -155,6 +155,8 @@ class FOIRequestWrapperSchema(Schema):
 
     oipcdetails = fields.Nested(FOIMinistryRequestOIPCSchema, many=True,allow_none=True)
 
+    recordspagecount = fields.Int(data_key="recordspagecount",allow_none=True)
+    axislanpagecount = fields.Int(data_key="axislanpagecount",allow_none=True)
 
 class EditableFOIMinistryRequestWrapperSchema(Schema):
     class Meta:  # pylint: disable=too-few-public-methods
