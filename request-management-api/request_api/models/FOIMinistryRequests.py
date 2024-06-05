@@ -411,9 +411,9 @@ class FOIMinistryRequest(db.Model):
         
         #subquery for selecting distinct records based on foiministryrequest_id, grouping by foiministryrequestversion_id
         subquery_with_oipc_sql = """
-        SELECT distinct on (foiministryrequest_id) foiministryrequest_id, foiministryrequestversion_id, 
-        CASE WHEN COUNT(outcomeid) = COUNT(*) THEN MAX(outcomeid) ELSE NULL END AS outcomeid FROM "FOIRequestOIPC" fo GROUP BY foiministryrequest_id, foiministryrequestversion_id
-	    ORDER BY foiministryrequest_id, foiministryrequestversion_id DESC
+        SELECT DISTINCT ON (foiministryrequest_id) foiministryrequest_id, foiministryrequestversion_id, 
+        CASE WHEN EXISTS (SELECT 1 FROM "FOIRequestOIPC" WHERE fo.foiministryrequest_id = foiministryrequest_id AND fo.foiministryrequestversion_id = foiministryrequestversion_id AND outcomeid IS NULL) THEN NULL ELSE MAX(outcomeid) END AS outcomeid 
+        FROM "FOIRequestOIPC" fo GROUP BY foiministryrequest_id, foiministryrequestversion_id ORDER BY foiministryrequest_id, foiministryrequestversion_id DESC
         """
         subquery_with_oipc = text(subquery_with_oipc_sql).columns(FOIRequestOIPC.foiministryrequest_id, FOIRequestOIPC.foiministryrequestversion_id, FOIRequestOIPC.outcomeid).alias("oipcnoneoutcomes")
         joincondition_oipc = [
