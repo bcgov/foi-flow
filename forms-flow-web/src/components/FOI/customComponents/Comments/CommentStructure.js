@@ -18,6 +18,11 @@ import Dialog from '@material-ui/core/Dialog';
 import Popover from "@material-ui/core/Popover";
 import MoreHorizIcon from "@material-ui/icons/MoreHoriz";
 import IconButton from "@material-ui/core/IconButton";
+import Accordion from '@material-ui/core/Accordion';
+import AccordionSummary from '@material-ui/core/AccordionSummary';
+import AccordionDetails from '@material-ui/core/AccordionDetails';
+import Typography from '@material-ui/core/Typography';
+import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import MenuList from "@material-ui/core/MenuList";
 import MenuItem from "@material-ui/core/MenuItem";
 import { getOSSHeaderDetails, getFileFromS3 } from "../../../../apiManager/services/FOI/foiOSSServices";
@@ -251,68 +256,79 @@ const CommentStructure = ({ i, reply, parentId, totalcommentCount, currentIndex,
       </Dialog>
     )
   };
+  console.log('i: ', i)
 
   return (
     <>
-      <div {...(isEmail ? {"data-msg-halfdiv-id":`${currentIndex}`} : {})} name={needCollapsed ? `hiddenreply_${parentId}` : `reply_${parentId}`} className={halfDivclassname} style={needCollapsed ? { display: 'none' } : {}} >
-        <div
-          className="userInfo"
-          style={reply ? { marginLeft: 15, marginTop: '6px' }: {}}
-        >
-          <NewCommentIndicator commentdate={i.dateUF}/>
-          <div className="commentsTwo">
-
-            <div className="fullName">{fullName} </div> |  <div className="commentdate">{i.date} </div>  <div className="commentdate">{i.edited ? "Edited": ""} </div>
-
-          </div>
-          <div className="commenttext" dangerouslySetInnerHTML={{ __html: getHtmlfromRawContent() }} >
-
-          </div>
-
-            
-        </div>
-        <div className="userActions">
-          <div>
-            {(isEmail || (i.commentTypeId === 1 && actions.userId === i.userId && actions.user)) && (
-                <>
-                    <IconButton
-                    aria-label= "actions"
-                    id={`ellipse-icon-${currentIndex}`}
-                    key={`ellipse-icon-${currentIndex}`}
-                    color="primary"
-                    onClick={(e) => {
-                        setPopoverOpen(true);
-                        setAnchorPosition(
-                        e.currentTarget.getBoundingClientRect()
-                        );
-                    }}                      
-                    >
-                    <MoreHorizIcon />
-                    </IconButton>
-                    <ActionsPopover />
-                </>
-            )}
-          </div>
-          {!isEmail && <div>
-            <button id={`btncomment${i.commentId}`}
-              className={`replyBtn ${(totalcommentCount === -100 || (isreplysection && totalcommentCount - 1 > currentIndex)) ? " hide" : " show"}`}
-              onClick={() => actions.handleAction(i.commentId)}
-              disabled={!actions.user}
-            >
-              {' '}
-              <FontAwesomeIcon icon={faReply} size='1x' color='#003366' /> Reply
-            </button>
-          </div>}
-        </div>
-        {isEmail && i.attachments?.map((attachment) => (
-          <div className="email-attachment-item" key={attachment.filename}>
-            <a href={`/foidocument?id=${ministryId}&filepath=${attachment.documenturipath.split('/').slice(4).join('/')}`} target="_blank">{attachment.filename}</a>
-          </div>
-        ))}
+      <div className="comment-accordion">
+        <Accordion>
+          <AccordionSummary
+            expandIcon={<ExpandMoreIcon />}
+            aria-controls="comment-accordion-summary"
+            id={`comment-accordion-${currentIndex}`}
+          >
+              <div {...(isEmail ? {"data-msg-halfdiv-id":`${currentIndex}`} : {})} name={needCollapsed ? `hiddenreply_${parentId}` : `reply_${parentId}`} className={halfDivclassname} style={needCollapsed ? { display: 'none' } : {}} >
+                <div
+                  className="userInfo"
+                  style={reply ? { marginLeft: 15, marginTop: '6px' }: {}}
+                >
+                  <NewCommentIndicator commentdate={i.dateUF}/>
+                  <div className="commentsTwo">
+                    <div className="fullName">{fullName} </div> |  <div className="commentdate">{i.date} </div>  <div className="commentdate">{i.edited ? "Edited": ""} </div>
+                  </div>
+                </div>
+              </div>
+              <div className="userActions">
+                <div>
+                  {(isEmail || (i.commentTypeId === 1 && actions.userId === i.userId && actions.user)) && (
+                      <>
+                          <IconButton
+                          aria-label= "actions"
+                          id={`ellipse-icon-${currentIndex}`}
+                          key={`ellipse-icon-${currentIndex}`}
+                          color="primary"
+                          onClick={(e) => {
+                              e.stopPropagation();
+                              setPopoverOpen(true);
+                              setAnchorPosition(
+                              e.currentTarget.getBoundingClientRect()
+                              );
+                          }}
+                          >
+                          <MoreHorizIcon />
+                          </IconButton>
+                          <ActionsPopover />
+                      </>
+                  )}
+                </div>
+                {!isEmail &&
+                <div>
+                  <button id={`btncomment${i.commentId}`}
+                    className={`replyBtn ${(totalcommentCount === -100 || (isreplysection && totalcommentCount - 1 > currentIndex)) ? " hide" : " show"}`}
+                    onClick={() => actions.handleAction(i.commentId)}
+                    disabled={!actions.user}
+                  >
+                    {' '}
+                    <FontAwesomeIcon icon={faReply} size='1x' color='#003366' /> Reply
+                  </button>
+                </div>
+                }
+              </div>
+          </AccordionSummary>
+          <AccordionDetails>
+            <div className="commenttext" dangerouslySetInnerHTML={{ __html: getHtmlfromRawContent() }} >
+            </div>
+            {isEmail && i.attachments?.map((attachment) => (
+            <div className="email-attachment-item" key={attachment.filename}>
+              <a href={`/foidocument?id=${ministryId}&filepath=${attachment.documenturipath.split('/').slice(4).join('/')}`} target="_blank">{attachment.filename}</a>
+            </div>
+            ))}
+          </AccordionDetails>
+        </Accordion>
+        {
+          i.replies && i.replies.length > 3 ? <div className="togglecollapseAll"><FontAwesomeIcon icon={toggleIcon} size='1x' color='#003366' /> <span onClick={(e) => toggleCollapse(e, i.commentId)}>Show more comments</span></div> : ""
+        }
       </div>
-      {
-        i.replies && i.replies.length > 3 ? <div className="togglecollapseAll"><FontAwesomeIcon icon={toggleIcon} size='1x' color='#003366' /> <span onClick={(e) => toggleCollapse(e, i.commentId)}>Show more comments</span></div> : ""
-      }
     </>
   )
 }
