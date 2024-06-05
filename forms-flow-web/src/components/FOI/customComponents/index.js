@@ -4,6 +4,7 @@ import UnsavedModal from "./UnsavedModal";
 import StateDropDown from "./StateDropDown";
 import Watcher from "./Watcher";
 import CorrespondenceEmail from "./CorrespondenceEmail";
+import EmailExport from "./EmailExport";
 
 export {
     MinistriesList,
@@ -11,5 +12,6 @@ export {
     StateDropDown,
     Watcher,
     UnsavedModal,
-    CorrespondenceEmail
+    CorrespondenceEmail,
+    EmailExport
 };

@@ -107,7 +107,7 @@ export const ContactApplicant = ({
   const formHistory: Array<any> = useSelector((state: any) => state.foiRequests.foiRequestCFRFormHistory);
   const approvedForm = formHistory?.find(form => form?.status?.toLowerCase() === 'approved');
   const existingCorrespondence = applicantCorrespondence?.find((correspondence: any) => correspondence?.id === approvedForm?.cfrfeeid)
-  const previewButtonValue = existingCorrespondence ? "Preview & Resend Email" : "Preview & Send Email";
+  const previewButtonValue = existingCorrespondence ? "Preview & Resend" : "Preview & Send";
 
   const requestDetails: any = useSelector((state: any) => state.foiRequests.foiRequestDetail);
 
@@ -224,9 +224,13 @@ export const ContactApplicant = ({
         "id": approvedForm?.cfrfeeid,
         "type": type
       }),
+      emails: selectedEmails,
       foiministryrequest_id: ministryId,
       attachments: attachments,
-      attributes: [{ "paymentExpiryDate": dueDateCalculation(new Date(), PAYMENT_EXPIRY_DAYS) }]
+      attributes: [{ 
+        "paymentExpiryDate": dueDateCalculation(new Date(), PAYMENT_EXPIRY_DAYS),
+        "axisRequestId": requestNumber
+      }]
     };
     saveEmailCorrespondence(
       data,
@@ -244,12 +248,14 @@ export const ContactApplicant = ({
   };
 
   const saveDraft = async () => {
+    setDisablePreview(true);
+    setPreviewModal(false);
     const attachments = await saveAttachments();
     let callback = (_res: string) => {
-      setEditorValue("");
-      setCurrentTemplate(0);
-      setFiles([]);
-      setSelectedEmails([]);
+      setEditorValue("")
+      setCurrentTemplate(0)
+      setFiles([])
+      setShowEditor(false)
       dispatch(fetchApplicantCorrespondence(requestId, ministryId));
     }
     const templateId = currentTemplate ? templates[currentTemplate as keyof typeof templates].templateid : null;
@@ -277,6 +283,8 @@ export const ContactApplicant = ({
       },
     );
     setFOICorrespondenceLoader(false);
+    setDisablePreview(false);
+    return attachments;
   };
   const [showEditor, setShowEditor] = useState(false)
 
@@ -494,6 +502,7 @@ export const ContactApplicant = ({
               handleClose={handlePreviewClose}
               handleSave={save}
               innerhtml={editorValue}
+              handleDraftSave={saveDraft}
               attachments={files}
               templateInfo={templates[currentTemplate]}
             />

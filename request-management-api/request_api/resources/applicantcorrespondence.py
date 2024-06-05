@@ -33,7 +33,7 @@ from request_api.auth import auth, AuthHelper
 from request_api.services.requestservice import requestservice
 from request_api.services.cfrfeeservice import cfrfeeservice
 from request_api.services.paymentservice import paymentservice
-from request_api.services.communicationservice import communicationservice
+from request_api.services.communicationwrapperservice import communicationwrapperservice
 
 API = Namespace('FOIApplicantCorrespondenceLog', description='Endpoints for FOI Applicant Correspondence Log')
 TRACER = Tracer.get_instance()
@@ -42,29 +42,6 @@ TRACER = Tracer.get_instance()
 """
 EXCEPTION_MESSAGE_BAD_REQUEST='Bad Request'
 EXCEPTION_MESSAGE_NOT_FOUND='Not Found'
-
-@cors_preflight('GET,OPTIONS')
-@API.route('/foiflow/communication/templates')
-class FOIFlowApplicantCorrespondenceTemplates(Resource):
-
-    @staticmethod
-    @TRACER.trace()
-    @cross_origin(origins=allowedorigins())      
-    @auth.require
-    @request_api.cache.cached(
-        key_prefix="communicationtemplates",
-        unless=cache_filter,
-        response_filter=response_filter
-        )
-    def get():
-        try:
-            data = applicantcorrespondenceservice().getapplicantcorrespondencetemplates()
-            jsondata = json.dumps(data)
-            return jsondata , 200
-        except BusinessException:
-            return "Error happened while accessing  applicant correspondence templates" , 500  
-
-
 
 @cors_preflight('GET,OPTIONS')
 @API.route('/foiflow/applicantcorrespondence/templates')
@@ -115,16 +92,7 @@ class FOIFlowApplicantCorrespondence(Resource):
         try:
             requestjson = request.get_json()
             applicantcorrespondencelog = FOIApplicantCorrespondenceSchema().load(data=requestjson) 
-            result = applicantcorrespondenceservice().saveapplicantcorrespondencelog(requestid, ministryrequestid, applicantcorrespondencelog, AuthHelper.getuserid())
-            if cfrfeeservice().getactivepayment(requestid, ministryrequestid) != None:
-                requestservice().postfeeeventtoworkflow(requestid, ministryrequestid, "CANCELLED")
-            if result.success == True:
-                _attributes = applicantcorrespondencelog["attributes"][0] if "attributes" in applicantcorrespondencelog else None
-                _paymentexpirydate =  _attributes["paymentExpiryDate"] if _attributes is not None and "paymentExpiryDate" in _attributes else None
-                if _paymentexpirydate not in (None, ""):
-                    paymentservice().createpayment(requestid, ministryrequestid, _attributes, AuthHelper.getuserid())            
-            requestservice().postcorrespondenceeventtoworkflow(requestid, ministryrequestid, result.identifier, applicantcorrespondencelog['attributes'], applicantcorrespondencelog['templateid'])
-           
+            result = communicationwrapperservice().send_email(requestid, ministryrequestid, applicantcorrespondencelog)
             return {'status': result.success, 'message':result.message,'id':result.identifier} , 200      
         except BusinessException:
             return "Error happened while saving  applicant correspondence log" , 500 
@@ -148,29 +116,6 @@ class FOIFlowApplicantCorrespondenceDraft(Resource):
                return {'status': result.success, 'message':result.message,'id':result.identifier} , 200      
         except BusinessException:
             return "Error happened while saving applicant correspondence log" , 500
-
-
-@cors_preflight('POST,OPTIONS')
-@API.route('/foiflow/applicantcorrespondence/send/<requestid>/<ministryrequestid>')
-class FOIFlowApplicantCorrespondenceSend(Resource):
-
-    @staticmethod
-    @TRACER.trace()
-    @cross_origin(origins=allowedorigins())
-    @auth.require
-    def post(requestid, ministryrequestid):
-        try:
-            requestjson = request.get_json()
-            applicantcorrespondencelog = FOIApplicantCorrespondenceSchema().load(data=requestjson) 
-            result = applicantcorrespondenceservice().saveapplicantcorrespondencelog(requestid, ministryrequestid, applicantcorrespondencelog, AuthHelper.getuserid())
-            if result.success == True:
-               communicationservice().send(applicantcorrespondencelog, AuthHelper.getusername)
-               return {'status': result.success, 'message':result.message,'id':result.identifier} , 200      
-        except BusinessException:
-            return "Error happened while saving applicant correspondence log" , 500
-
-
-
 
 @cors_preflight('POST,GET, OPTIONS')
 @API.route('/foiflow/applicantcorrespondence/email/<ministryrequestid>')

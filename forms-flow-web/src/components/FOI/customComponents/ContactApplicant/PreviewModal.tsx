@@ -11,13 +11,16 @@ import CloseIcon from '@material-ui/icons/Close';
 import type { previewParams } from './types';
 import { getOSSHeaderDetails, getFileFromS3 } from "../../../../apiManager/services/FOI/foiOSSServices";
 import { renderTemplate, applyVariables, getTemplateVariables } from './util';
-import { OSS_S3_BUCKET_FULL_PATH, FOI_FFA_URL } from "../../../../constants/constants"
+import { OSS_S3_BUCKET_FULL_PATH, FOI_FFA_URL } from "../../../../constants/constants";
+import { EmailExport } from '../../../FOI/customComponents';
+
 
 export const PreviewModal = React.memo(({
   modalOpen,
   handleClose,
   handleSave,
   innerhtml,
+  handleDraftSave,
   attachments,
   templateInfo
 }: previewParams) => {
@@ -53,6 +56,8 @@ export const PreviewModal = React.memo(({
     handleSave( applyVariables(innerhtml, templateVariables) );
   };
 
+  
+
   return (
 
     <div className="state-change-dialog">        
@@ -85,6 +90,10 @@ export const PreviewModal = React.memo(({
         </DialogContentText>
       </DialogContent>
       <DialogActions>
+        <EmailExport 
+          handleDraftSave={handleDraftSave}
+          content={innerhtml}
+        />
         <button 
         className="btn-bottom btn-save" 
         disabled={(attachments?.length <= 0)}

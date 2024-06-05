@@ -30,18 +30,23 @@ class senderservice:
 
     """
 
-    def send(self, subject, content, _messageattachmentlist, requestjson):
-        logging.debug("Begin: Send email for request = "+json.dumps(requestjson))
+    def send_by_request(self, subject, content, _messageattachmentlist, requestjson):
+        return self.send(subject, content, _messageattachmentlist, requestjson["email"])
+
+    def send(self, subject, content, _messageattachmentlist, emails):
+        logging.debug("Begin: Send email for request ")
+        
         msg = MIMEMultipart()
         msg['From'] = MAIL_FROM_ADDRESS
-        msg['To'] = requestjson["email"]
+        msg['To'] = ",".join(emails)
         msg['Subject'] = subject
         part = MIMEText(content, "html")
         msg.attach(part)
         # Add Attachment and Set mail headers
         for attachment in _messageattachmentlist:
+            file = storageservice().download(attachment['url'])
             part = MIMEBase("application", "octet-stream")
-            part.set_payload(attachment.get('file').content)
+            part.set_payload(file.content)
             encoders.encode_base64(part)
             part.add_header(
             "Content-Disposition",
@@ -53,10 +58,10 @@ class senderservice:
                 smtpobj.ehlo()
                 smtpobj.starttls()
                 smtpobj.ehlo()
-                #smtpobj.login(MAIL_SRV_USERID, MAIL_SRV_PASSWORD)
+                smtpobj.login(MAIL_SRV_USERID, MAIL_SRV_PASSWORD)
                 smtpobj.sendmail(msg['From'],  msg['To'], msg.as_string())
                 smtpobj.quit()
-                logging.debug("End: Send email for request = "+json.dumps(requestjson))
+                logging.debug("End: Send email for request")
                 return {"success" : True, "message": "Sent successfully"}
         except Exception as e:
             logging.exception(e)

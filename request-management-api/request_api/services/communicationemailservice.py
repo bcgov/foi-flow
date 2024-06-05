@@ -19,42 +19,35 @@ from request_api.services.applicantcorrespondence.applicantcorrespondencelog  im
 from request_api.utils.enums import ServiceName
 import logging
 
-class communicationservice:
+class communicationemailservice:
     """ FOI Communication Service
     """
-
     
-
-    def send(self, correspondencelog, userid):
+    def send(self, template, correspondencelog):
         try:
             messagepart = self.__getbody(correspondencelog)
             to = self.__getsenders(correspondencelog)
-            subject = 'Dummy'
-            #messageattachmentlist = self.__get_attachments(ministryrequestid, emailschema, servicename)
-            return senderservice().send_email(subject,messagepart, None, to)
+            attributes =  self.__getattributes(correspondencelog)
+            subject = templateconfig().getsubject(template.name,attributes)
+            messageattachmentlist = self.__getattachments(correspondencelog)
+            _messagepart = templateservice().decorate_template(template, messagepart, attributes)
+            return senderservice().send(subject, _messagepart, messageattachmentlist, to)
         except Exception as ex:
             logging.exception(ex)
 
     
     def __getbody(self,correspondencelog):
-        data = json.loads(correspondencelog)
+        data = json.loads(correspondencelog['correspondencemessagejson'])
         return data['emailhtml']
         
     def __getsenders(self,correspondencelog):
         return correspondencelog['emails']
         
-
-
-    def __get_attachments(self, ministryrequestid, emailschema, servicename):
-        _messageattachmentlist = []
-        _applicantcorrespondenceid = self.__getvaluefromschema(emailschema, "applicantcorrespondenceid")
-        if (_applicantcorrespondenceid and templateconfig().isnotreceipt(servicename)):
-            _messageattachmentlist = documentservice().getapplicantcorrespondenceattachmentsbyapplicantcorrespondenceid(_applicantcorrespondenceid)
-        elif templateconfig().isnotreceipt(servicename) is not True:
-            _messageattachmentlist = documentservice().getreceiptattachments(ministryrequestid, templateconfig().getattachmentcategory(servicename).lower())
-        else:
-            _messageattachmentlist = documentservice().getattachments(ministryrequestid, 'ministryrequest', templateconfig().getattachmentcategory(servicename).lower())
-        return _messageattachmentlist   
+    def __getattachments(self, correspondencelog):
+        return correspondencelog['attachments']
+    
+    def __getattributes(self, correspondencelog):
+        return correspondencelog["attributes"][0]
 
 
     
