@@ -137,6 +137,15 @@ class notificationprocessor:
         )
 
     def __createcommentforresponse(self, notification):
+        if notification.feeoverridereason is not None:
+            comment = {"comment": notification.feeoverridereason}
+            return commentservice().createcomment(
+                "ministryrequest",
+                notification.ministryrequestid,
+                comment,
+                notification.createdby,
+                2,
+            )
         comment = {"comment": self.__createresponsemessage(notification.errorflag)}
         return commentservice().createcomment(
             "ministryrequest",
@@ -164,6 +173,9 @@ class notificationprocessor:
             notification.createdby,
             2,
         )
+    
+    def __createfeeoverridemessage(self, feeoverridereason):
+        return "Username overrode balance outstanding warning for the following reason: "+feeoverridereason
 
     def __createresponsemessage(self, errorflag):
         if errorflag == "YES":
