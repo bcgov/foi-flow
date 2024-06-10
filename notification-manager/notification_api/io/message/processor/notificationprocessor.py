@@ -137,7 +137,7 @@ class notificationprocessor:
         )
 
     def __createcommentforresponse(self, notification):
-        if notification.feeoverridereason is not None:
+        if notification.feeoverridereason is not None and notification.feeoverridereason != '':
             comment = {"comment": notification.feeoverridereason}
             return commentservice().createcomment(
                 "ministryrequest",
@@ -174,9 +174,6 @@ class notificationprocessor:
             2,
         )
     
-    def __createfeeoverridemessage(self, feeoverridereason):
-        return "Username overrode balance outstanding warning for the following reason: "+feeoverridereason
-
     def __createresponsemessage(self, errorflag):
         if errorflag == "YES":
             return "Creating the Release Package failed. Please try again"
