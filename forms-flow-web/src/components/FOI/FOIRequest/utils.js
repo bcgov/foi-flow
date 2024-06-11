@@ -440,9 +440,6 @@ export const persistRequestFieldsNotInAxis = (newRequestDetails, existingRequest
   newRequestDetails.assignedToFirstName= existingRequestDetails.assignedToFirstName;
   newRequestDetails.assignedToLastName= existingRequestDetails.assignedToLastName;
   newRequestDetails.assignedToName= existingRequestDetails.assignedToName;
-  if(existingRequestDetails.recordspagecount && existingRequestDetails.recordspagecount > 0) {
-    newRequestDetails.recordspagecount= existingRequestDetails.recordspagecount;
-  }
   let foiReqAdditionalPersonalInfo = existingRequestDetails.additionalPersonalInfo;
   let axisAdditionalPersonalInfo = newRequestDetails.additionalPersonalInfo;
   if(newRequestDetails.requestType === 'personal'){
