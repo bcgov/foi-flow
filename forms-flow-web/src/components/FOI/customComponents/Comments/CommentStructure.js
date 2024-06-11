@@ -30,6 +30,7 @@ import { downloadZip } from "client-zip";
 import { useDispatch } from "react-redux";
 import * as html2pdf from 'html-to-pdf-js';
 import NewCommentIndicator from './NewCommentIndicator';
+import CommunicationUploadModal from './CommunicationUploadModal';
 
 
 const CommentStructure = ({ i, reply, parentId, totalcommentCount, currentIndex, isreplysection, hasAnotherUserComment, fullName, isEmail=false, ministryId=null}) => {
@@ -102,6 +103,7 @@ const CommentStructure = ({ i, reply, parentId, totalcommentCount, currentIndex,
     return markup
   }
   const [popoverOpen, setPopoverOpen] = useState(false);
+  const [communicationUploadModalOpen, setCommunicationUploadModalOpen] = useState(false);
   const [anchorPosition, setAnchorPosition] = useState(null);
   const [deletePopoverOpen, setDeletePopoverOpen] = useState(false);
 
@@ -132,17 +134,28 @@ const CommentStructure = ({ i, reply, parentId, totalcommentCount, currentIndex,
         {isEmail ?
           <MenuList>
             <MenuItem
-              onClick={() => {
+              onClick={(e) => {
+                  e.stopPropagation();
                   download();
                   setPopoverOpen(false);
               }}
             >
               Download
             </MenuItem>
+            <MenuItem
+              onClick={(e) => {
+                  e.stopPropagation();
+                  setPopoverOpen(false);
+                  setCommunicationUploadModalOpen(true);
+              }}
+            >
+              Add Response
+            </MenuItem>
           </MenuList> :
           <MenuList>
             <MenuItem
-              onClick={() => {
+              onClick={(e) => {
+                  e.stopPropagation();
                   actions.handleAction(i.commentId, edit)
                   setPopoverOpen(false);
               }}
@@ -150,7 +163,8 @@ const CommentStructure = ({ i, reply, parentId, totalcommentCount, currentIndex,
               Edit
             </MenuItem>
             <MenuItem
-              onClick={() => {
+              onClick={(e) => {
+                  e.stopPropagation();
                   closeTooltip();
                   setDeletePopoverOpen(true);
                   setPopoverOpen(false);
@@ -162,6 +176,12 @@ const CommentStructure = ({ i, reply, parentId, totalcommentCount, currentIndex,
         }
       </Popover>
       <DeleteAction />
+      <CommunicationUploadModal 
+        openModal={communicationUploadModalOpen} 
+        setOpenModal={setCommunicationUploadModalOpen}
+        message={ { body: "", title: "Add Response" }}
+        ministryId={ministryId}
+      />
       </>
     );
   };
