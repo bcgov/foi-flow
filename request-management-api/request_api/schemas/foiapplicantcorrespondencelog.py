@@ -33,4 +33,24 @@ class FOIApplicantCorrespondenceEmailSchema(Schema):
 
         unknown = EXCLUDE    
     email = fields.Str(data_key="email",allow_none=True ,validate=[validate.Length(max=350, error=MAX_EXCEPTION_MESSAGE)])
-    
+
+
+class FOIApplicantCorrespondenceResponseSchema(Schema):
+    class Meta:  # pylint: disable=too-few-public-methods
+        """Exclude unknown fields in the deserialized output."""
+
+        unknown = EXCLUDE    
+    applicantcorrespondenceid = fields.Int(data_key="applicantcorrespondenceid",required=False,allow_none=True)
+    attachments = fields.Nested(AttachmentSchema, many=True, required=False,allow_none=True)
+    responsedate = fields.Str(data_key="responsedate",required=False, allow_none=True)
+
+class FOIApplicantCorrespondenceEditResponseSchema(Schema):
+    class Meta:  # pylint: disable=too-few-public-methods
+        """Exclude unknown fields in the deserialized output."""
+
+        unknown = EXCLUDE    
+    correspondenceresponseid = fields.Int(data_key="correspondenceresponseid",required=False,allow_none=True)
+    responsedate = fields.Str(data_key="responsedate",required=False, allow_none=True)
+    correspondenceattachmentid = fields.Int(data_key="correspondenceattachmentid",required=False,allow_none=True)
+    filename = fields.Str(data_key="filename",required=False,allow_none=True)
+

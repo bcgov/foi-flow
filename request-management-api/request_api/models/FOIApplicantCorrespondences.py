@@ -9,7 +9,7 @@ from sqlalchemy import or_,and_,text
 from .FOIApplicantCorrespondenceAttachments import FOIApplicantCorrespondenceAttachment
 from .FOIApplicantCorrespondenceEmails import FOIApplicantCorrespondenceEmail
 from sqlalchemy.dialects.postgresql import JSON, UUID
-
+import logging
 class FOIApplicantCorrespondence(db.Model):
     # Name of the table in our database
     __tablename__ = 'FOIApplicantCorrespondences'
@@ -21,6 +21,7 @@ class FOIApplicantCorrespondence(db.Model):
         
     # Defining the columns
     applicantcorrespondenceid = db.Column(db.Integer, primary_key=True,autoincrement=True)
+    version = db.Column(db.Integer, primary_key=True,nullable=False)
     parentapplicantcorrespondenceid = db.Column(db.Integer)
     templateid = db.Column(db.Integer, nullable=True)
     correspondencemessagejson = db.Column(db.Text, unique=False, nullable=True)
@@ -34,17 +35,35 @@ class FOIApplicantCorrespondence(db.Model):
     createdby = db.Column(db.String(120), unique=False, nullable=False)
     updatedby = db.Column(db.String(120), unique=False, nullable=True)
     
+    isdraft = db.Column(db.Boolean, default=False, nullable=True)
+    isdeleted = db.Column(db.Boolean, default=False, nullable=True)
+
     #ForeignKey References       
     foiministryrequest_id =db.Column(db.Integer, db.ForeignKey('FOIMinistryRequests.foiministryrequestid'))
     foiministryrequestversion_id=db.Column(db.Integer, db.ForeignKey('FOIMinistryRequests.version'))
 
-    attachments = relationship('FOIApplicantCorrespondenceAttachment', backref=backref("FOIApplicantCorrespondenceAttachments"))
     
     @classmethod
     def getapplicantcorrespondences(cls,ministryrequestid):
-        comment_schema = FOIApplicantCorrespondenceSchema(many=True)
-        query = db.session.query(FOIApplicantCorrespondence).filter(FOIApplicantCorrespondence.foiministryrequest_id == ministryrequestid).order_by(FOIApplicantCorrespondence.applicantcorrespondenceid.desc()).all()
-        return comment_schema.dump(query)
+        correspondences = []
+        try:
+            sql = """select distinct on (applicantcorrespondenceid) applicantcorrespondenceid, templateid , correspondencemessagejson , version, 
+                        created_at, createdby, sentcorrespondencemessage, parentapplicantcorrespondenceid, sentby, sent_at
+                         from "FOIApplicantCorrespondences" fpa 
+                        where foiministryrequest_id = :ministryrequestid
+                    order by applicantcorrespondenceid desc, version desc""" 
+            rs = db.session.execute(text(sql), {'ministryrequestid': ministryrequestid})
+            for row in rs:
+                correspondences.append({"applicantcorrespondenceid": row["applicantcorrespondenceid"], "templateid": row["templateid"],
+                                        "correspondencemessagejson": row["correspondencemessagejson"], "version": row["version"], "created_at": row["created_at"], "createdby": row["createdby"], 
+                                        "sentcorrespondencemessage": row["sentcorrespondencemessage"], "parentapplicantcorrespondenceid": row["parentapplicantcorrespondenceid"],
+                                        "sent_at": row["sent_at"], "sentby": row["sentby"]})
+        except Exception as ex:
+            logging.error(ex)
+            raise ex
+        finally:
+            db.session.close()
+        return correspondences
     
     @classmethod
     def getapplicantcorrespondencebyid(cls,applicantcorrespondenceid):
@@ -64,23 +83,26 @@ class FOIApplicantCorrespondence(db.Model):
         db.session.commit()
         try:
             if(attachments is not None and len(attachments) > 0):
+                correpondenceattachments = []
                 for _attachment in attachments:
                     attachment = FOIApplicantCorrespondenceAttachment()
                     attachment.applicantcorrespondenceid = newapplicantcorrepondencelog.applicantcorrespondenceid
+                    attachment.applicantcorrespondence_version = newapplicantcorrepondencelog.version
                     attachment.attachmentdocumenturipath = _attachment['url']
                     attachment.attachmentfilename = _attachment['filename']
                     attachment.createdby = newapplicantcorrepondencelog.createdby
-                    FOIApplicantCorrespondenceAttachment().saveapplicantcorrespondenceattachment(attachment)
+                    attachment.version = 1
+                    correpondenceattachments.append(attachment)
+                FOIApplicantCorrespondenceAttachment().saveapplicantcorrespondenceattachments(newapplicantcorrepondencelog.foiministryrequest_id , correpondenceattachments)
             if(emails is not None and len(emails) > 0):
                 correspondenceemails = []
                 for _email in emails:
-                    print(_email)
                     email = FOIApplicantCorrespondenceEmail()
-                    email.applicantcorrespondenceid = newapplicantcorrepondencelog.applicantcorrespondenceid
+                    email.applicantcorrespondence_id = newapplicantcorrepondencelog.applicantcorrespondenceid
+                    email.applicantcorrespondence_version = newapplicantcorrepondencelog.version
                     email.correspondence_to = _email
                     email.createdby = newapplicantcorrepondencelog.createdby
                     correspondenceemails.append(email)
-                print(correspondenceemails)
                 FOIApplicantCorrespondenceEmail().saveapplicantcorrespondenceemail(newapplicantcorrepondencelog.applicantcorrespondenceid , correspondenceemails)
             
         except Exception:
@@ -102,5 +124,5 @@ class FOIApplicantCorrespondence(db.Model):
 
 class FOIApplicantCorrespondenceSchema(ma.Schema):
     class Meta:
-        fields = ('applicantcorrespondenceid','parentapplicantcorrespondenceid', 'templateid','correspondencemessagejson','foiministryrequest_id','foiministryrequestversion_id','created_at','createdby','attachments','sentcorrespondencemessage','sent_at','sentby')
+        fields = ('applicantcorrespondenceid', 'version', 'parentapplicantcorrespondenceid', 'templateid','correspondencemessagejson','foiministryrequest_id','foiministryrequestversion_id','created_at','createdby','attachments','sentcorrespondencemessage','sent_at','sentby')
     

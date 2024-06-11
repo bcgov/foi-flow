@@ -12,20 +12,20 @@ class FOIApplicantCorrespondenceEmail(db.Model):
     __tablename__ = 'FOIApplicantCorrespondenceEmails'
     __table_args__ = (
         ForeignKeyConstraint(
-            ["applicantcorrespondenceid"], ["FOIApplicantCorrespondences.applicantcorrespondenceid"],
+            ["applicantcorrespondence_id", "applicantcorrespondence_version"], ["FOIApplicantCorrespondences.applicantcorrespondenceid","FOIApplicantCorrespondences.version"],
         ),
     )
         
     # Defining the columns
-    applicantcorrespondenceemailid = db.Column(db.Integer, primary_key=True,autoincrement=True)      
+    applicantcorrespondenceemailid = db.Column(db.Integer, primary_key=True,autoincrement=True)  
     correspondence_to = db.Column(db.Text, unique=False, nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.now)
     updated_at = db.Column(db.DateTime, nullable=True)
     createdby = db.Column(db.String(120), unique=False, nullable=False)
     updatedby = db.Column(db.String(120), unique=False, nullable=True)
                  
-    applicantcorrespondenceid =db.Column(db.Integer, db.ForeignKey('FOIApplicantCorrespondences.applicantcorrespondenceid'))
-    
+    applicantcorrespondence_id =db.Column(db.Integer, db.ForeignKey('FOIApplicantCorrespondences.applicantcorrespondenceid'))
+    applicantcorrespondence_version = db.Column(db.Integer, db.ForeignKey('FOIApplicantCorrespondences.version')) 
 
 
     @classmethod
@@ -37,5 +37,5 @@ class FOIApplicantCorrespondenceEmail(db.Model):
     
 class FOIApplicantCorrespondenceEmailSchema(ma.Schema):
     class Meta:
-        fields = ('applicantcorrespondenceemailid','applicantcorrespondenceid', 'email','created_at','createdby')
+        fields = ('applicantcorrespondenceemailid','applicantcorrespondence_id', 'applicantcorrespondence_version','correspondence_to','created_at','createdby')
     

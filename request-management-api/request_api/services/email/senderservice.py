@@ -14,6 +14,8 @@ import logging
 import email
 import json
 from request_api.services.external.storageservice import storageservice
+from request_api.models.default_method_result import DefaultMethodResult
+
 
 MAIL_SERVER_SMTP = os.getenv('EMAIL_SERVER_SMTP')
 MAIL_SERVER_SMTP_PORT = os.getenv('EMAIL_SERVER_SMTP_PORT')
@@ -62,10 +64,10 @@ class senderservice:
                 smtpobj.sendmail(msg['From'],  msg['To'], msg.as_string())
                 smtpobj.quit()
                 logging.debug("End: Send email for request")
-                return {"success" : True, "message": "Sent successfully"}
+                return DefaultMethodResult(True,'Sent successfully', -1)    
         except Exception as e:
             logging.exception(e)
-        return {"success" : False, "message": "Unable to send"}
+        return DefaultMethodResult(False,'Unable to send', -1)    
     
 
     def read_outbox_as_bytes(self, servicekey, requestjson):

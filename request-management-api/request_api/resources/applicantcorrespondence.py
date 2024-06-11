@@ -28,7 +28,7 @@ import json
 from flask_cors import cross_origin
 import request_api
 from request_api.utils.cache import cache_filter, response_filter
-from request_api.schemas.foiapplicantcorrespondencelog import  FOIApplicantCorrespondenceSchema, FOIApplicantCorrespondenceEmailSchema
+from request_api.schemas.foiapplicantcorrespondencelog import  FOIApplicantCorrespondenceSchema, FOIApplicantCorrespondenceEmailSchema, FOIApplicantCorrespondenceResponseSchema, FOIApplicantCorrespondenceEditResponseSchema 
 from request_api.auth import auth, AuthHelper
 from request_api.services.requestservice import requestservice
 from request_api.services.cfrfeeservice import cfrfeeservice
@@ -111,7 +111,7 @@ class FOIFlowApplicantCorrespondenceDraft(Resource):
         try:
             requestjson = request.get_json()
             applicantcorrespondencelog = FOIApplicantCorrespondenceSchema().load(data=requestjson) 
-            result = applicantcorrespondenceservice().saveapplicantcorrespondencelog(requestid, ministryrequestid, applicantcorrespondencelog, AuthHelper.getuserid())
+            result = applicantcorrespondenceservice().saveapplicantcorrespondencelog(requestid, ministryrequestid, applicantcorrespondencelog, AuthHelper.getuserid(), True)
             if result.success == True:
                return {'status': result.success, 'message':result.message,'id':result.identifier} , 200      
         except BusinessException:
@@ -145,3 +145,41 @@ class FOIFlowApplicantCorrespondenceEmail(Resource):
             return json.dumps(correspondenceemails) , 200
         except BusinessException:
             return "Unable to retrieve correspondence emails" , 500    
+        
+@cors_preflight('POST,OPTIONS')
+@API.route('/foiflow/applicantcorrespondence/response/<ministryrequestid>')
+class FOIFlowApplicantCorrespondenceResponse(Resource):
+
+    @staticmethod
+    @TRACER.trace()
+    @cross_origin(origins=allowedorigins())
+    @auth.require
+    def post(ministryrequestid):
+        try:
+            requestjson = request.get_json()
+            correspondenceemail = FOIApplicantCorrespondenceResponseSchema().load(data=requestjson) 
+            result = applicantcorrespondenceservice().saveapplicantcorrespondenceresponselog(ministryrequestid, correspondenceemail, AuthHelper.getuserid())
+            
+            return {'status': result.success, 'message':result.message,'id':result.identifier} , 200      
+        except BusinessException:
+            return "Error happened while saving  applicant correspondence log" , 500 
+        
+
+@cors_preflight('POST,OPTIONS')
+@API.route('/foiflow/applicantcorrespondence/response/edit/<ministryrequestid>')
+class FOIFlowApplicantCorrespondenceEditResponse(Resource):
+
+    @staticmethod
+    @TRACER.trace()
+    @cross_origin(origins=allowedorigins())
+    @auth.require
+    def post(ministryrequestid):
+        try:
+            requestjson = request.get_json()
+            correspondenceemail = FOIApplicantCorrespondenceEditResponseSchema().load(data=requestjson) 
+            result = applicantcorrespondenceservice().editapplicantcorrespondenceresponselog(ministryrequestid,correspondenceemail, AuthHelper.getuserid())
+            
+            return {'status': result.success, 'message':result.message,'id':result.identifier} , 200      
+        except BusinessException:
+            return "Error happened while saving  applicant correspondence log" , 500
+        
