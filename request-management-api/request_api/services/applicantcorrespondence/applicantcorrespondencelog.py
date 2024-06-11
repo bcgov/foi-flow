@@ -131,7 +131,8 @@ class applicantcorrespondenceservice:
             "createdby":_correpondencelog['createdby'] if  _correpondencelog['createdby'] is not None else _correpondencelog['sentby'],
             "date": self.__pstformat(_correpondencelog['sent_at']) if _sentcorrespondencemessagejson is not None else self.__pstformat(_correpondencelog['created_at']),
             "userId": _correpondencelog['createdby'] if  _correpondencelog['createdby'] is not None else _correpondencelog['sentby'],
-            "attachments" : attachments
+            "attachments" : attachments,
+            "category" : "draft" if _correpondencelog['isdraft'] == True else "correspondence"
         }        
         return correpondencelog
 
