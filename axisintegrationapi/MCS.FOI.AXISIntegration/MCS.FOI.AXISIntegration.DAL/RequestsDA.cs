@@ -129,7 +129,7 @@ namespace MCS.FOI.AXISIntegration.DAL
             DataTable axisDataTable = GetAxisRequestsPageCount(arrayOfRequestId);
 
             var axisRequestPageCountDict = axisDataTable.AsEnumerable()
-                .Where(rw => Convert.ToInt32(rw["requestPageCount"]) > 0)
+                .Where(rw => Convert.ToInt32(rw["requestPageCount"]) > 0 || Convert.ToInt32(rw["lanPageCount"]) > 0)
                 .ToDictionary(
                 rw => Convert.ToString(rw["AXISRequestID"]),
                 rw => new PageCount
@@ -146,7 +146,7 @@ namespace MCS.FOI.AXISIntegration.DAL
             DataTable axisDataTable = GetAxisRequestsPageCount();
 
             var axisRequestPageCountDict = axisDataTable.AsEnumerable()
-                .Where(rw => Convert.ToInt32(rw["requestPageCount"]) > 0)
+                .Where(rw => Convert.ToInt32(rw["requestPageCount"]) > 0 || Convert.ToInt32(rw["lanPageCount"]) > 0)
                 .ToDictionary(
                 rw => Convert.ToString(rw["AXISRequestID"]),
                 rw => new PageCount
@@ -196,7 +196,7 @@ namespace MCS.FOI.AXISIntegration.DAL
                 onbehalf.vcLastName as onbehalfLastName,
                 onbehalf.vcMiddleName as onbehalfMiddleName,
                 (SELECT terminology.vcTerminology from tblTerminologyLookup terminology WHERE terminology.iLabelID = requestTypes.iLabelID and terminology.tiLocaleID = 1) as requestType,
-                sum(distinct case when requests.IREQUESTID = reviewlog.IREQUESTID and reviewlog.IDOCID = documents.IDOCID then documents.SIPAGECOUNT 
+                sum(case when requests.IREQUESTID = reviewlog.IREQUESTID and reviewlog.IDOCID = documents.IDOCID then documents.SIPAGECOUNT 
                 when requests.IREQUESTID = redaction.IREQUESTID and redaction.IDOCID = ldocuments.IDOCID then ldocuments.SIPAGECOUNT 
                 else 0 end) as requestPageCount,
                 (case when requestfields.CustomField91 > 0 then requestfields.CustomField91 else 0 end ) as lanPageCount,
@@ -353,7 +353,7 @@ namespace MCS.FOI.AXISIntegration.DAL
             ConnectionString = SettingsManager.ConnectionString;
             var inClauseValues = RequestsHelper.GetInClause(arrayOfRequestId);
 
-            string query = $@"Select vcVisibleRequestID as axisRequestId, sum(distinct case when requests.IREQUESTID = reviewlog.IREQUESTID and reviewlog.IDOCID = documents.IDOCID then documents.SIPAGECOUNT 
+            string query = $@"Select vcVisibleRequestID as axisRequestId, sum(case when requests.IREQUESTID = reviewlog.IREQUESTID and reviewlog.IDOCID = documents.IDOCID then documents.SIPAGECOUNT 
                 when requests.IREQUESTID = redaction.IREQUESTID and redaction.IDOCID = ldocuments.IDOCID then ldocuments.SIPAGECOUNT 
                 else 0 end) as requestPageCount,
 				(case when requestfields.CustomField91 > 0 then requestfields.CustomField91 else 0 end ) as lanPageCount
@@ -394,7 +394,7 @@ namespace MCS.FOI.AXISIntegration.DAL
         {
             ConnectionString = SettingsManager.ConnectionString;           
 
-            string query = @"Select vcVisibleRequestID as axisRequestId, sum(distinct case when requests.IREQUESTID = reviewlog.IREQUESTID and reviewlog.IDOCID = documents.IDOCID then documents.SIPAGECOUNT 
+            string query = @"Select vcVisibleRequestID as axisRequestId, sum(case when requests.IREQUESTID = reviewlog.IREQUESTID and reviewlog.IDOCID = documents.IDOCID then documents.SIPAGECOUNT 
                 when requests.IREQUESTID = redaction.IREQUESTID and redaction.IDOCID = ldocuments.IDOCID then ldocuments.SIPAGECOUNT 
                 else 0 end) as requestPageCount,
 				(case when requestfields.CustomField91 > 0 then requestfields.CustomField91 else 0 end ) as lanPageCount

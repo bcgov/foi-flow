@@ -44,7 +44,7 @@ class attachmentevent():
                 return commentservice().createrawrequestcomment(_comment, userid, 2)
     
     def notificationmessage(self, type, ministryrequestid):
-        return f"{type} Attachment Uploaded on FOI Request {ministryrequestid}"
+        return f"{type} attachment uploaded"
 
     def __notificationtype(self):
         return "Attachment Upload Event"
