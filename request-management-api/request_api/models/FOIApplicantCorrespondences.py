@@ -48,16 +48,19 @@ class FOIApplicantCorrespondence(db.Model):
         correspondences = []
         try:
             sql = """select distinct on (applicantcorrespondenceid) applicantcorrespondenceid, templateid , correspondencemessagejson , version, 
-                        created_at, createdby, sentcorrespondencemessage, parentapplicantcorrespondenceid, sentby, sent_at
+                        created_at, createdby, sentcorrespondencemessage, parentapplicantcorrespondenceid, sentby, sent_at,
+                         isdraft
                          from "FOIApplicantCorrespondences" fpa 
                         where foiministryrequest_id = :ministryrequestid
                     order by applicantcorrespondenceid desc, version desc""" 
             rs = db.session.execute(text(sql), {'ministryrequestid': ministryrequestid})
             for row in rs:
                 correspondences.append({"applicantcorrespondenceid": row["applicantcorrespondenceid"], "templateid": row["templateid"],
-                                        "correspondencemessagejson": row["correspondencemessagejson"], "version": row["version"], "created_at": row["created_at"], "createdby": row["createdby"], 
+                                        "correspondencemessagejson": row["correspondencemessagejson"], "version": row["version"], 
+                                        "created_at": row["created_at"], "createdby": row["createdby"], 
                                         "sentcorrespondencemessage": row["sentcorrespondencemessage"], "parentapplicantcorrespondenceid": row["parentapplicantcorrespondenceid"],
-                                        "sent_at": row["sent_at"], "sentby": row["sentby"]})
+                                        "sent_at": row["sent_at"], "sentby": row["sentby"],
+                                        "isdraft": row["isdraft"]})
         except Exception as ex:
             logging.error(ex)
             raise ex
