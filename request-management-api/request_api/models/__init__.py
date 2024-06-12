@@ -54,6 +54,7 @@ from .FOIAssignees import FOIAssignee
 
 from .ApplicationCorrespondenceTemplates import ApplicationCorrespondenceTemplate
 from .FOIApplicantCorrespondenceAttachments import FOIApplicantCorrespondenceAttachment
+from .FOIApplicantCorrespondenceResponses import FOIApplicantCorrespondenceResponse
 
 from .FOIRestrictedMinistryRequests import FOIRestrictedMinistryRequest
 

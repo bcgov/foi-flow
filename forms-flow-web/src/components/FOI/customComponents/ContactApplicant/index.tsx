@@ -7,7 +7,7 @@ import './index.scss'
 import { errorToast, getFullnameList } from "../../../../helper/FOI/helper";
 import { toast } from "react-toastify";
 import type { Template } from './types';
-import { fetchApplicantCorrespondence, saveEmailCorrespondence } from "../../../../apiManager/services/FOI/foiCorrespondenceServices";
+import { fetchApplicantCorrespondence, saveEmailCorrespondence, saveDraftEmailCorrespondence } from "../../../../apiManager/services/FOI/foiCorrespondenceServices";
 import _ from 'lodash';
 import IconButton from '@material-ui/core/IconButton';
 import Grid from "@material-ui/core/Grid";
@@ -28,6 +28,8 @@ import {setFOICorrespondenceLoader} from "../../../../actions/FOI/foiRequestActi
 import { applyVariables, getTemplateVariables, isTemplateDisabled } from './util';
 import { StateEnum } from '../../../../constants/FOI/statusEnum';
 import CustomizedTooltip from '../Tooltip/MuiTooltip/Tooltip';
+import { CorrespondenceEmail } from '../../../FOI/customComponents';
+
 
 export const ContactApplicant = ({
   requestNumber,
@@ -105,7 +107,7 @@ export const ContactApplicant = ({
   const formHistory: Array<any> = useSelector((state: any) => state.foiRequests.foiRequestCFRFormHistory);
   const approvedForm = formHistory?.find(form => form?.status?.toLowerCase() === 'approved');
   const existingCorrespondence = applicantCorrespondence?.find((correspondence: any) => correspondence?.id === approvedForm?.cfrfeeid)
-  const previewButtonValue = existingCorrespondence ? "Preview & Resend Email" : "Preview & Send Email";
+  const previewButtonValue = existingCorrespondence ? "Preview & Resend" : "Preview & Send";
 
   const requestDetails: any = useSelector((state: any) => state.foiRequests.foiRequestDetail);
 
@@ -129,7 +131,7 @@ export const ContactApplicant = ({
 
   const [editorValue, setEditorValue] = useState("")
   const [currentTemplate, setCurrentTemplate] = useState(0)
-
+  const [selectedEmails, setSelectedEmails] = React.useState([]);
   // Create a ref to store the Quill instance
   const quillRef = useRef(null);
 
@@ -222,9 +224,13 @@ export const ContactApplicant = ({
         "id": approvedForm?.cfrfeeid,
         "type": type
       }),
+      emails: selectedEmails,
       foiministryrequest_id: ministryId,
       attachments: attachments,
-      attributes: [{ "paymentExpiryDate": dueDateCalculation(new Date(), PAYMENT_EXPIRY_DAYS) }]
+      attributes: [{ 
+        "paymentExpiryDate": dueDateCalculation(new Date(), PAYMENT_EXPIRY_DAYS),
+        "axisRequestId": requestNumber
+      }]
     };
     saveEmailCorrespondence(
       data,
@@ -241,6 +247,45 @@ export const ContactApplicant = ({
     setDisablePreview(false);
   };
 
+  const saveDraft = async () => {
+    setDisablePreview(true);
+    setPreviewModal(false);
+    const attachments = await saveAttachments();
+    let callback = (_res: string) => {
+      setEditorValue("")
+      setCurrentTemplate(0)
+      setFiles([])
+      setShowEditor(false)
+      dispatch(fetchApplicantCorrespondence(requestId, ministryId));
+    }
+    const templateId = currentTemplate ? templates[currentTemplate as keyof typeof templates].templateid : null;
+    const type = (templateId && [1, 2].includes(templateId)) ? "CFRFee" : "";
+    let data = {
+      templateid: currentTemplate ? templates[currentTemplate as keyof typeof templates].templateid : null,
+      correspondencemessagejson: JSON.stringify({
+        "emailhtml": editorValue,
+        "id": approvedForm?.cfrfeeid,
+        "type": type
+      }),
+      foiministryrequest_id: ministryId,
+      attachments: attachments,
+      emails: selectedEmails
+    };
+    saveDraftEmailCorrespondence(
+      data,
+      requestId,
+      ministryId,
+      dispatch,
+      callback,
+      (errorMessage: string) => {
+        errorToast(errorMessage)
+        dispatch(setFOICorrespondenceLoader(false));
+      },
+    );
+    setFOICorrespondenceLoader(false);
+    setDisablePreview(false);
+    return attachments;
+  };
   const [showEditor, setShowEditor] = useState(false)
 
   const [previewModal, setPreviewModal] = useState(false);
@@ -364,8 +409,8 @@ export const ContactApplicant = ({
           alignItems="flex-start"
           spacing={1}
         >
-          <Grid item xs={9}>
-          </Grid>
+          <Grid item xs={7}>
+          </Grid>          
           <Grid item xs={3}>
             <TextField
               className="email-template-dropdown"
@@ -393,6 +438,13 @@ export const ContactApplicant = ({
                 </MenuItem>
               ))}
             </TextField>
+          </Grid>
+          <Grid item xs={2}>
+          <CorrespondenceEmail 
+            ministryId={ministryId}
+            selectedEmails={selectedEmails}
+            setSelectedEmails={setSelectedEmails}
+          />
           </Grid>
         </Grid>
         <div className="correspondence-editor">
@@ -450,9 +502,18 @@ export const ContactApplicant = ({
               handleClose={handlePreviewClose}
               handleSave={save}
               innerhtml={editorValue}
+              handleDraftSave={saveDraft}
               attachments={files}
               templateInfo={templates[currentTemplate]}
             />
+            <button
+          className="btn addCorrespondence"
+          data-variant="contained" 
+          onClick={saveDraft}             
+          color="primary"
+        >
+          Save Draft
+        </button>
             <button
               className="btn addCorrespondence"
               data-variant="contained"
