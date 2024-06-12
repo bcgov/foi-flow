@@ -149,7 +149,7 @@ const StateDropDown = ({
       case StateEnum.redirect.name.toLowerCase():
         return _stateList.redirect;
       case StateEnum.callforrecords.name.toLowerCase():
-        if (_isMinistryCoordinator && personalRequest) {
+        if (_isMinistryCoordinator) {
           if (isMCFMinistryTeam) {
             return appendRecordsReadyForReview(_stateList.callforrecordsforpersonal);
           } else {
@@ -200,6 +200,9 @@ const StateDropDown = ({
         if (personalIAO) return _stateList.feeassessedforpersonal;
         return _stateList.feeassessed;
       case StateEnum.deduplication.name.toLowerCase():
+        if (!isMCFMinistryTeam) {
+          return _stateList.deduplication.filter(_state => _state.status.toLowerCase() !== StateEnum.recordsreadyforreview.name.toLowerCase());
+        }
         return _stateList.deduplication;
       case StateEnum.harms.name.toLowerCase():
         return _stateList.harms;
