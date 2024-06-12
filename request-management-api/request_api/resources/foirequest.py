@@ -277,21 +277,6 @@ class FOIRestrictedMinistryRequest(Resource):
         except BusinessException as exception:
             return {'status': exception.status_code, 'message':exception.message}, 500
 
-@cors_preflight('GET,POST,OPTIONS')
-@API.route('/foirequests/ministryrequestid/<int:ministryrequestid>', defaults={'usertype':None})
-@API.route('/foirequests/ministryrequestid/<ministryrequestid>/<usertype>')
-class FOIRequestByMinistryId(Resource):
-    """Return request based on ministryrequestid"""
-    @staticmethod
-    @cross_origin(origins=allowedorigins())
-    @auth.require
-    def get(ministryrequestid,usertype=None):
-        try :
-            return FOIRequestForDocReviewer.get(requestservice().getrequestid(ministryrequestid), ministryrequestid, usertype)
-        except ValueError:
-            return {'status': 500, 'message':"Invalid Request"}, 500
-        except BusinessException as exception:            
-            return {'status': exception.status_code, 'message':exception.message}, 500
 
 @cors_preflight('POST, DELETE, UPDATE, OPTIONS')
 @API.route('/foirequests/<int:foirequestid>/ministryrequest/<int:foiministryrequestid>/section/<string:section>')
@@ -326,6 +311,8 @@ class FOIRequestsById(Resource):
         
 
 @cors_preflight('GET,OPTIONS')
+@API.route('/foirequests/ministryrequestid/<int:ministryrequestid>', defaults={'usertype':None})
+@API.route('/foirequests/ministryrequestid/<ministryrequestid>/<usertype>')
 class FOIRequestForDocReviewer(Resource):
     """Retrieve foi request for opened request - Used
     in docreviewer"""
@@ -334,23 +321,23 @@ class FOIRequestForDocReviewer(Resource):
     @TRACER.trace()
     @cross_origin(origins=allowedorigins())
     @auth.require
-    @auth.ismemberofgroups(getrequiredmemberships())
-    def get(foirequestid,foiministryrequestid,usertype = None):
+    def get(ministryrequestid,usertype=None):
         try :
             jsondata = {}
             statuscode = 200
+            foirequestid=requestservice().getrequestid(ministryrequestid)
             if (AuthHelper.getusertype() == "iao") and (usertype is None or (usertype == "iao")):
-                jsondata = requestservice().getrequestdetails(foirequestid,foiministryrequestid)
+                jsondata = requestservice().getrequestdetails(foirequestid,ministryrequestid)
                 assignee = jsondata['assignedTo']
                 isrestricted = jsondata['iaorestricteddetails']['isrestricted'] if ('isrestricted' in jsondata['iaorestricteddetails']) else False
-                if(canrestictdata(foiministryrequestid,assignee,isrestricted,False)):
+                if(canrestictdata(ministryrequestid,assignee,isrestricted,False)):
                     jsondata = {}
                     statuscode = 401
             elif usertype is not None and usertype == "ministry" and AuthHelper.getusertype() == "ministry":
-                jsondata = requestservice().getrequestdetailsforministry(foirequestid,foiministryrequestid,AuthHelper.getministrygroups())
+                jsondata = requestservice().getrequestdetailsforministry(foirequestid,ministryrequestid,AuthHelper.getministrygroups())
                 assignee = jsondata['assignedministryperson']
                 isrestricted = jsondata['ministryrestricteddetails']['isrestricted'] if ('isrestricted' in jsondata['ministryrestricteddetails']) else False
-                if(canrestictdata_ministry(foiministryrequestid,assignee,isrestricted)):
+                if(canrestictdata_ministry(ministryrequestid,assignee,isrestricted)):
                     jsondata = {}
                     statuscode = 401
             else:
