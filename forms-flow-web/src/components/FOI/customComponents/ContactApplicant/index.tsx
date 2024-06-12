@@ -29,6 +29,8 @@ import { applyVariables, getTemplateVariables, isTemplateDisabled } from './util
 import { StateEnum } from '../../../../constants/FOI/statusEnum';
 import CustomizedTooltip from '../Tooltip/MuiTooltip/Tooltip';
 import { CorrespondenceEmail } from '../../../FOI/customComponents';
+import { Stack } from '@mui/material';
+import { ClickableChip } from '../../Dashboard/utils';
 
 
 export const ContactApplicant = ({
@@ -112,11 +114,32 @@ export const ContactApplicant = ({
   const requestDetails: any = useSelector((state: any) => state.foiRequests.foiRequestDetail);
 
   const [messages, setMessages] = useState(applicantCorrespondence);
+  console.log('messages: ', messages)
   const [disablePreview, setDisablePreview] = useState(false);
+  const [correspondenceFilter, setCorrespondenceFilter] = useState("all");
+  const changeCorrespondenceFilter = (filter: string) => {
+    if (filter === correspondenceFilter) return;
+    setCorrespondenceFilter(filter.toLowerCase());
+  }
+  console.log('correspondenceFilter: ', correspondenceFilter)
 
   React.useEffect(() => {
     setMessages(applicantCorrespondence);
   }, [applicantCorrespondence])
+
+  React.useEffect(() => {
+    const filteredMessage = applicantCorrespondence.filter((message: any) => {
+      if (correspondenceFilter === "all") return true;
+      if (correspondenceFilter === "log") {
+        return message.category === "correspondence";
+      } else if (correspondenceFilter === "templates") {
+        return message.category === "template";
+      } else if (correspondenceFilter === "drafts") {
+        return message.category === "draft";
+      }
+    })
+    setMessages(filteredMessage);
+  }, [correspondenceFilter])
 
   const quillModules = useMemo(() => {
     return {
@@ -398,6 +421,35 @@ export const ContactApplicant = ({
                 fullWidth
               />
             </Grid>
+            <Stack direction="row" sx={{ overflowX: "hidden" }} spacing={1} alignItems="center" justifyContent="center" px={1}>
+              <ClickableChip
+                id="correspondenceLog"
+                key={`correspondence-log`}
+                label={"LOG"}
+                color="primary"
+                size="small"
+                onClick={() => changeCorrespondenceFilter("log")}
+                clicked={correspondenceFilter === "log"}
+              />
+              <ClickableChip
+                id="correspondenceTemplates"
+                key={`correspondence-templates`}
+                label={"TEMPLATES"}
+                color="primary"
+                size="small"
+                onClick={() => changeCorrespondenceFilter("templates")}
+                clicked={correspondenceFilter === "templates"}
+              />
+              <ClickableChip
+                id="correspondenceDrafts"
+                key={`correspondence-drafts`}
+                label={"DRAFTS"}
+                color="primary"
+                size="small"
+                onClick={() => changeCorrespondenceFilter("drafts")}
+                clicked={correspondenceFilter === "drafts"}
+              />
+            </Stack>
           </Paper>
         </Grid>
       </Grid>

@@ -12,6 +12,7 @@
     width: fit-content !important;
     height: fit-content !important;
     padding: 3px 25px !important;
+    margin-left: 1em;
   }
 }
 
@@ -27,8 +28,12 @@
 }
 
 .search-grid {
-  // border-right: 2px solid #38598A;
+  border-right: 2px solid #38598A;
   background-color: rgba(56,89,138,0.1);
+}
+
+.search-grid-buttons {
+  margin-right: auto;
 }
 
 .search-icon {

@@ -127,7 +127,7 @@ export default function CorrespondenceEmail({
       <>
       <div>
             <div className="foi-watcher-all">
-                <button className="foi-eye-container"> <i className="fa fa-envelope"></i> Email To</button>
+                <button className="foi-eye-container email-correspondence-button"> <i className="fa fa-envelope"></i> Email To</button>
                 <div className="foi-watcher-select">
                     <i className="fa fa-user-o"></i>                    
                     <InputLabel id="foi-watcher-label">
