@@ -139,7 +139,7 @@ class notificationprocessor:
     def __createcommentforresponse(self, notification):
         if notification.feeoverridereason is not None and notification.feeoverridereason != '':
             comment = {"comment": notification.feeoverridereason}
-            return commentservice().createcomment(
+            commentservice().createcomment(
                 "ministryrequest",
                 notification.ministryrequestid,
                 comment,
