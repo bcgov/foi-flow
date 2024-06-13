@@ -42,13 +42,19 @@ class applicantcorrespondenceservice:
     def __getattachmentsbyid(self, attachments, correspondenceid, correspondenceversion):
         return [x for x in attachments if x['applicantcorrespondenceid'] == correspondenceid and x['applicantcorrespondence_version'] == correspondenceversion]
 
-    def saveapplicantcorrespondencelog(self, requestid, ministryrequestid, data, userid, isdraft=False):
+    
+    def saveapplicantcorrespondencelog(self, requestid, ministryrequestid, data, userid):
         applicantcorrespondencelog = FOIApplicantCorrespondence()
-        applicantcorrespondencelog.version = 1
+        if "correspondenceid" in data and data['correspondenceid'] is not None:
+            correspondence = FOIApplicantCorrespondence.getapplicantcorrespondencebyid(data['correspondenceid'])
+            applicantcorrespondencelog.applicantcorrespondenceid = data['correspondenceid']
+            applicantcorrespondencelog.version = correspondence['version']+1
+        else:
+            applicantcorrespondencelog.version=1
         applicantcorrespondencelog.templateid = data['templateid']
         applicantcorrespondencelog.foiministryrequest_id = ministryrequestid
         applicantcorrespondencelog.foiministryrequestversion_id =FOIMinistryRequest.getversionforrequest(ministryrequestid=ministryrequestid)
-        applicantcorrespondencelog.isdraft = isdraft
+        applicantcorrespondencelog.isdraft = True
         if userid == 'system':
             applicantcorrespondencelog.sentcorrespondencemessage = data['correspondencemessagejson']
             applicantcorrespondencelog.sentby = 'System Generated Email'
@@ -57,6 +63,9 @@ class applicantcorrespondenceservice:
             applicantcorrespondencelog.correspondencemessagejson = data['correspondencemessagejson']
             applicantcorrespondencelog.createdby = userid       
         return FOIApplicantCorrespondence.saveapplicantcorrespondence(applicantcorrespondencelog,data['attachments'], data['emails'])        
+    
+    def deleteapplicantcorrespondencelog(self, ministryrequestid, correpondenceid, userid):
+        return FOIApplicantCorrespondence.deleteapplicantcorrespondence(ministryrequestid,correpondenceid,userid)        
     
     def saveapplicantcorrespondenceresponselog(self, ministryrequestid, data, userid):
         attachments = []

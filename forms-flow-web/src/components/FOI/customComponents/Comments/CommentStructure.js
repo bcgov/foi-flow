@@ -33,7 +33,7 @@ import NewCommentIndicator from './NewCommentIndicator';
 import CommunicationUploadModal from './CommunicationUploadModal';
 
 
-const CommentStructure = ({ i, reply, parentId, totalcommentCount, currentIndex, isreplysection, hasAnotherUserComment, fullName, isEmail=false, ministryId=null}) => {
+const CommentStructure = ({ i, reply, parentId, totalcommentCount, currentIndex, isreplysection, hasAnotherUserComment, fullName, isEmail=false, ministryId=null, editDraft, deleteDraft}) => {
 
   const actions = useContext(ActionContext)
   const edit = true
@@ -146,18 +146,14 @@ const CommentStructure = ({ i, reply, parentId, totalcommentCount, currentIndex,
           <MenuList>
           <MenuItem
             onClick={(e) => {
-                e.stopPropagation();
-                download();
-                setPopoverOpen(false);
+              editDraft(i)
             }}
           >
             Edit
           </MenuItem>  
           <MenuItem
             onClick={(e) => {
-                e.stopPropagation();
-                download();
-                setPopoverOpen(false);
+              deleteDraft(i);
             }}
           >
             Delete
@@ -237,6 +233,10 @@ const CommentStructure = ({ i, reply, parentId, totalcommentCount, currentIndex,
       saveAs(zipfile, fullName + " " + i.date.replace("|", "") + ".zip");
     });
   }
+
+
+
+  
 
   const DeleteAction = () => {
     return (

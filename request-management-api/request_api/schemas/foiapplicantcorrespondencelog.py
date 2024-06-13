@@ -17,6 +17,7 @@ class FOIApplicantCorrespondenceSchema(Schema):
 
         unknown = EXCLUDE    
     templateid = fields.Int(data_key="templateid",allow_none=True)
+    correspondenceid = fields.Int(data_key="correspondenceid",required=False, allow_none=True)
     correspondencemessagejson = fields.Str(data_key="correspondencemessagejson",allow_none=False)
     attachments = fields.Nested(AttachmentSchema, many=True, required=False,allow_none=True)
     emails = fields.List(fields.Str(),data_key="emails", required=False,allow_none=True)

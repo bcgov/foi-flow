@@ -7,7 +7,7 @@ import './index.scss'
 import { errorToast, getFullnameList } from "../../../../helper/FOI/helper";
 import { toast } from "react-toastify";
 import type { Template } from './types';
-import { fetchApplicantCorrespondence, saveEmailCorrespondence, saveDraftEmailCorrespondence } from "../../../../apiManager/services/FOI/foiCorrespondenceServices";
+import { fetchApplicantCorrespondence, saveEmailCorrespondence, saveDraftCorrespondence, editDraftCorrespondence, deleteDraftCorrespondence } from "../../../../apiManager/services/FOI/foiCorrespondenceServices";
 import _ from 'lodash';
 import IconButton from '@material-ui/core/IconButton';
 import Grid from "@material-ui/core/Grid";
@@ -114,14 +114,12 @@ export const ContactApplicant = ({
   const requestDetails: any = useSelector((state: any) => state.foiRequests.foiRequestDetail);
 
   const [messages, setMessages] = useState(applicantCorrespondence);
-  console.log('messages: ', messages)
   const [disablePreview, setDisablePreview] = useState(false);
   const [correspondenceFilter, setCorrespondenceFilter] = useState("all");
   const changeCorrespondenceFilter = (filter: string) => {
     if (filter === correspondenceFilter) return;
     setCorrespondenceFilter(filter.toLowerCase());
   }
-  console.log('correspondenceFilter: ', correspondenceFilter)
 
   React.useEffect(() => {
     setMessages(applicantCorrespondence);
@@ -270,6 +268,8 @@ export const ContactApplicant = ({
     setDisablePreview(false);
   };
 
+ 
+
   const saveDraft = async () => {
     setDisablePreview(true);
     setPreviewModal(false);
@@ -294,7 +294,99 @@ export const ContactApplicant = ({
       attachments: attachments,
       emails: selectedEmails
     };
-    saveDraftEmailCorrespondence(
+    saveDraftCorrespondence(
+      data,
+      requestId,
+      ministryId,
+      dispatch,
+      callback,
+      (errorMessage: string) => {
+        setEditorValue("")
+        setCurrentTemplate(0)
+        setFiles([])
+        setShowEditor(false)
+        dispatch(fetchApplicantCorrespondence(requestId, ministryId));
+      },
+    );
+    setFOICorrespondenceLoader(false);
+    setDisablePreview(false);
+    return attachments;
+  };
+
+  const [correspondenceId, setCorrespondenceId] = useState(0);
+
+  const editDraft = async (i : any) => {
+    setShowEditor(true);
+    setEditorValue(i.text);
+    setCorrespondenceId(i.applicantcorrespondenceid)
+  };
+
+  const deleteDraft = async (i : any) => {
+    setCorrespondenceId(i.applicantcorrespondenceid);
+    setDisablePreview(true);
+    setPreviewModal(false);
+    let callback = (_res: string) => {
+      setEditorValue("")
+      setCurrentTemplate(0)
+      setFiles([])
+      setShowEditor(false)
+      toast.success("Draft has been deleted successfully", {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: true,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      });
+      dispatch(fetchApplicantCorrespondence(requestId, ministryId));
+    }
+    deleteDraftCorrespondence(i.applicantcorrespondenceid,ministryId,
+      dispatch,
+      callback,
+      (errorMessage: string) => {
+        setEditorValue("")
+        setCurrentTemplate(0)
+        setFiles([])
+        setShowEditor(false)
+        dispatch(fetchApplicantCorrespondence(requestId, ministryId));
+        setFOICorrespondenceLoader(false);
+        setDisablePreview(false);
+      },
+    );
+    setFOICorrespondenceLoader(false);
+    setDisablePreview(false);
+  };
+
+
+  
+
+  const editCorrespondence = async (i : any) => {
+    setDisablePreview(true);
+    setPreviewModal(false);
+    const attachments = await saveAttachments();
+    let callback = (_res: string) => {
+      setEditorValue("")
+      setCurrentTemplate(0)
+      setFiles([])
+      setShowEditor(false)
+      dispatch(fetchApplicantCorrespondence(requestId, ministryId));
+    }
+    const templateId = currentTemplate ? templates[currentTemplate as keyof typeof templates].templateid : null;
+    const type = (templateId && [1, 2].includes(templateId)) ? "CFRFee" : "";
+    let data = {
+      correspondenceid:correspondenceId,
+      templateid: currentTemplate ? templates[currentTemplate as keyof typeof templates].templateid : null,
+      correspondencemessagejson: JSON.stringify({
+        "emailhtml": editorValue,
+        "id": approvedForm?.cfrfeeid,
+        "type": type
+      }),
+      foiministryrequest_id: ministryId,
+      attachments: attachments,
+      emails: selectedEmails
+    };
+    editDraftCorrespondence(
       data,
       requestId,
       ministryId,
@@ -309,6 +401,8 @@ export const ContactApplicant = ({
     setDisablePreview(false);
     return attachments;
   };
+
+
   const [showEditor, setShowEditor] = useState(false)
 
   const [previewModal, setPreviewModal] = useState(false);
@@ -566,6 +660,14 @@ export const ContactApplicant = ({
         >
           Save Draft
         </button>
+        <button
+          className="btn addCorrespondence"
+          data-variant="contained" 
+          onClick={editCorrespondence}             
+          color="primary"
+        >
+          Edit Draft
+        </button>
             <button
               className="btn addCorrespondence"
               data-variant="contained"
@@ -609,8 +711,10 @@ export const ContactApplicant = ({
               currentIndex={index}
               hasAnotherUserComment={false}
               fullName={getFullname(message.createdby)}
-              isEmail={true}
+              isEmail={message}
               ministryId={ministryId}
+              editDraft={editDraft}
+              deleteDraft={deleteDraft}
             />
           </div>
         ))}

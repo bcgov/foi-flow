@@ -49,18 +49,19 @@ class FOIApplicantCorrespondence(db.Model):
         try:
             sql = """select distinct on (applicantcorrespondenceid) applicantcorrespondenceid, templateid , correspondencemessagejson , version, 
                         created_at, createdby, sentcorrespondencemessage, parentapplicantcorrespondenceid, sentby, sent_at,
-                         isdraft
+                         isdraft, isdeleted
                          from "FOIApplicantCorrespondences" fpa 
                         where foiministryrequest_id = :ministryrequestid
                     order by applicantcorrespondenceid desc, version desc""" 
             rs = db.session.execute(text(sql), {'ministryrequestid': ministryrequestid})
             for row in rs:
-                correspondences.append({"applicantcorrespondenceid": row["applicantcorrespondenceid"], "templateid": row["templateid"],
-                                        "correspondencemessagejson": row["correspondencemessagejson"], "version": row["version"], 
-                                        "created_at": row["created_at"], "createdby": row["createdby"], 
-                                        "sentcorrespondencemessage": row["sentcorrespondencemessage"], "parentapplicantcorrespondenceid": row["parentapplicantcorrespondenceid"],
-                                        "sent_at": row["sent_at"], "sentby": row["sentby"],
-                                        "isdraft": row["isdraft"]})
+                if row["isdeleted"] == False:
+                    correspondences.append({"applicantcorrespondenceid": row["applicantcorrespondenceid"], "templateid": row["templateid"],
+                                            "correspondencemessagejson": row["correspondencemessagejson"], "version": row["version"], 
+                                            "created_at": row["created_at"], "createdby": row["createdby"], 
+                                            "sentcorrespondencemessage": row["sentcorrespondencemessage"], "parentapplicantcorrespondenceid": row["parentapplicantcorrespondenceid"],
+                                            "sent_at": row["sent_at"], "sentby": row["sentby"],
+                                            "isdraft": row["isdraft"]})
         except Exception as ex:
             logging.error(ex)
             raise ex
@@ -71,7 +72,7 @@ class FOIApplicantCorrespondence(db.Model):
     @classmethod
     def getapplicantcorrespondencebyid(cls,applicantcorrespondenceid):
         correspondence_schema = FOIApplicantCorrespondenceSchema()
-        query = db.session.query(FOIApplicantCorrespondence).filter(FOIApplicantCorrespondence.applicantcorrespondenceid == applicantcorrespondenceid).first()
+        query = db.session.query(FOIApplicantCorrespondence).filter(FOIApplicantCorrespondence.applicantcorrespondenceid == applicantcorrespondenceid).order_by(FOIApplicantCorrespondence.version.desc()).first()
         return correspondence_schema.dump(query)
     
     @classmethod
@@ -110,9 +111,24 @@ class FOIApplicantCorrespondence(db.Model):
             
         except Exception:
             return DefaultMethodResult(False,'applicantcorrepondence log exception while adding attachments',newapplicantcorrepondencelog.applicantcorrespondenceid)
-
+        finally:
+            db.session.close()
         return DefaultMethodResult(True,'applicantcorrepondence log added',newapplicantcorrepondencelog.applicantcorrespondenceid)    
 
+
+    @classmethod
+    def deleteapplicantcorrespondence(cls, ministryid, correspondenceid,userid)->DefaultMethodResult: 
+        try:
+            db.session.query(FOIApplicantCorrespondence).filter(FOIApplicantCorrespondence.foiministryrequest_id == ministryid, FOIApplicantCorrespondence.applicantcorrespondenceid == correspondenceid
+                            ).update({FOIApplicantCorrespondence.isdeleted: True, FOIApplicantCorrespondence.updatedby: userid,
+                            FOIApplicantCorrespondence.updated_at: datetime.now()}, synchronize_session=False)
+            db.session.commit()  
+            return DefaultMethodResult(True,'Correspondence deleted ', correspondenceid)
+        except:
+            db.session.rollback()
+            raise   
+        finally:
+            db.session.close()
 
     @classmethod
     def updatesentcorrespondence(cls, applicantcorrespondenceid, content)->DefaultMethodResult: 
