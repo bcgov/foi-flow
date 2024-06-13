@@ -116,6 +116,41 @@ class FOIFlowApplicantCorrespondenceDraft(Resource):
                return {'status': result.success, 'message':result.message,'id':result.identifier} , 200      
         except BusinessException:
             return "Error happened while saving applicant correspondence log" , 500
+        
+@cors_preflight('POST,OPTIONS')
+@API.route('/foiflow/applicantcorrespondence/draft/edit/<requestid>/<ministryrequestid>')
+class FOIFlowApplicantCorrespondenceDraft(Resource):
+
+    @staticmethod
+    @TRACER.trace()
+    @cross_origin(origins=allowedorigins())
+    @auth.require
+    def post(requestid, ministryrequestid):
+        try:
+            requestjson = request.get_json()
+            applicantcorrespondencelog = FOIApplicantCorrespondenceSchema().load(data=requestjson) 
+            result = applicantcorrespondenceservice().saveapplicantcorrespondencelog(requestid, ministryrequestid, applicantcorrespondencelog, AuthHelper.getuserid())
+            if result.success == True:
+               return {'status': result.success, 'message':result.message,'id':result.identifier} , 200      
+        except BusinessException:
+            return "Error happened while saving applicant correspondence log" , 500
+
+@cors_preflight('POST,OPTIONS')
+@API.route('/foiflow/applicantcorrespondence/draft/delete/<ministryrequestid>/<correspondenceid>')
+class FOIFlowApplicantCorrespondenceDraft(Resource):
+
+    @staticmethod
+    @TRACER.trace()
+    @cross_origin(origins=allowedorigins())
+    @auth.require
+    def post(ministryrequestid, correspondenceid):
+        try:
+            result = applicantcorrespondenceservice().deleteapplicantcorrespondencelog(ministryrequestid, correspondenceid, AuthHelper.getuserid())
+            if result.success == True:
+               return {'status': result.success, 'message':result.message,'id':result.identifier} , 200      
+        except BusinessException:
+            return "Error happened while deleting applicant correspondence log" , 500
+
 
 @cors_preflight('POST,GET, OPTIONS')
 @API.route('/foiflow/applicantcorrespondence/email/<ministryrequestid>')
