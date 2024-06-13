@@ -131,7 +131,7 @@ const CommentStructure = ({ i, reply, parentId, totalcommentCount, currentIndex,
         }}
         onClose={() => setPopoverOpen(false)}
       >
-        {isEmail ?
+        {isEmail && i.category === "correspondence" ?
           <MenuList>
             <MenuItem
               onClick={(e) => {
@@ -141,17 +141,37 @@ const CommentStructure = ({ i, reply, parentId, totalcommentCount, currentIndex,
               }}
             >
               Download
-            </MenuItem>
-            <MenuItem
+            </MenuItem>  
+          </MenuList> : isEmail && i.category === "draft" ?
+          <MenuList>
+          <MenuItem
+            onClick={(e) => {
+                e.stopPropagation();
+                download();
+                setPopoverOpen(false);
+            }}
+          >
+            Edit
+          </MenuItem>  
+          <MenuItem
+            onClick={(e) => {
+                e.stopPropagation();
+                download();
+                setPopoverOpen(false);
+            }}
+          >
+            Delete
+          </MenuItem>
+          <MenuItem
               onClick={(e) => {
                   e.stopPropagation();
+                  download();
                   setPopoverOpen(false);
-                  setCommunicationUploadModalOpen(true);
               }}
             >
-              Add Response
+              Download
             </MenuItem>
-          </MenuList> :
+        </MenuList> :
           <MenuList>
             <MenuItem
               onClick={(e) => {
