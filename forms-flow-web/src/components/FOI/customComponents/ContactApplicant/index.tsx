@@ -31,6 +31,8 @@ import CustomizedTooltip from '../Tooltip/MuiTooltip/Tooltip';
 import { CorrespondenceEmail } from '../../../FOI/customComponents';
 import { Stack } from '@mui/material';
 import { ClickableChip } from '../../Dashboard/utils';
+import { Button, Menu } from '@material-ui/core';
+import CommunicationUploadModal from '../Comments/CommunicationUploadModal';
 
 
 export const ContactApplicant = ({
@@ -69,6 +71,7 @@ export const ContactApplicant = ({
   function openAttachmentModal() {
     setModal(true);
   }
+  const [communicationUploadModalOpen, setCommunicationUploadModalOpen] = useState(false);
   const [files, setFiles] = useState([]);
   const [templates, setTemplates] = useState<any[]>([{ value: "", label: "", templateid: null, text: "", disabled: true }]);
 
@@ -445,15 +448,36 @@ export const ContactApplicant = ({
           </ConditionalComponent> */}
         </Grid>
         <Grid item xs={3}>
-          <button
-            className="btn addCorrespondence"
-            data-variant="contained"
-            onClick={() => setShowEditor(true)}
-            color="primary"
-            disabled={currentCFRForm.feedata.balanceremaining <= 0 || requestState === StateEnum.feeassessed.name}
+          <TextField
+            className="correspondence-dropdown-button"
+            id="add-correspondence"
+            label="+ Add New"
+            inputProps={{ "aria-labelledby": "correspondence-label" }}
+            InputLabelProps={{ shrink: false, style: {color: 'white'} }}
+            select
+            variant="outlined"
+            size="small"
+            fullWidth
           >
-            + Add New Correspondence
-          </button>
+            <MenuItem
+              className="correspondence-menu-item"
+              onClick={() => {console.log('clicked Message to Applicant')}}
+              key='messagetoapplicant'
+              disabled={false}
+              sx={{ display: "flex" }}
+            >
+              Message to Applicant
+            </MenuItem>
+            <MenuItem
+              className="correspondence-menu-item"
+              onClick={() => {setCommunicationUploadModalOpen(true)}}
+              key='attachresponse'
+              disabled={false}
+              sx={{ display: "flex" }}
+            >
+              Attach Response
+            </MenuItem>
+          </TextField>
         </Grid>
       </Grid>
       <Grid
@@ -719,6 +743,12 @@ export const ContactApplicant = ({
           </div>
         ))}
       </div>
+        <CommunicationUploadModal
+          openModal={communicationUploadModalOpen} 
+          setOpenModal={setCommunicationUploadModalOpen}
+          message={ { body: "", title: "Add Response" }}
+          ministryId={ministryId}
+        />
     </div>
   ) : (
     <Loading />

@@ -26,11 +26,12 @@ export default function CommunicationUploadModal({
   openModal,
   setOpenModal,
   message,
+  ministryId
 //   bcgovcode,
 //   requestNumber
 }) {
   const dispatch = useDispatch();
-  const { requestId, ministryId } = useParams();
+  const { requestId } = useParams();
 
   //THIS NEEDS TO BE PASSED IN
   let bcgovcode = 1;
@@ -213,6 +214,7 @@ export default function CommunicationUploadModal({
       };
     });
     saveDocument(true, fileInfoList, files);
+    setOpenModal(false);
   };
 
   const handleClose = (e) => {
