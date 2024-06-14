@@ -72,15 +72,9 @@ export const ContactApplicant = ({
   const [files, setFiles] = useState([]);
   const [templates, setTemplates] = useState<any[]>([{ value: "", label: "", templateid: null, text: "", disabled: true }]);
 
-  React.useEffect(() => {
-    let templateList: any = [
-      { value: "", label: "", templateid: null, text: "", disabled: true },
-      // { value: "", label: "None", templateid: null, text: "", disabled: false }
-    ];
-
+  React.useEffect(() => {    
     applicantCorrespondenceTemplates.forEach((item: any) => {
       const rootpath = OSS_S3_BUCKET_FULL_PATH
-
       const fileInfoList = [{
         filename: item.name,
         s3sourceuri: rootpath + item.documenturipath
@@ -95,16 +89,17 @@ export const ContactApplicant = ({
                 label: item.description,
                 templateid: item.templateid,
                 text: await new Response(response.data).text(),
-                disabled: isTemplateDisabled(currentCFRForm, item)
+                disabled: false
               }
-              templateList.push(templateItem);
-              setTemplates(templateList);
+              setTemplates((oldArray) => [...oldArray, templateItem]);  
             });
+            
           });
         }
       });
+      
     });
-  }, [currentCFRForm]);
+  }, [applicantCorrespondenceTemplates, dispatch]);
 
   const formHistory: Array<any> = useSelector((state: any) => state.foiRequests.foiRequestCFRFormHistory);
   const approvedForm = formHistory?.find(form => form?.status?.toLowerCase() === 'approved');
@@ -450,7 +445,6 @@ export const ContactApplicant = ({
             data-variant="contained"
             onClick={() => setShowEditor(true)}
             color="primary"
-            disabled={currentCFRForm.feedata.balanceremaining <= 0 || requestState === StateEnum.feeassessed.name}
           >
             + Add New Correspondence
           </button>
@@ -578,7 +572,6 @@ export const ContactApplicant = ({
                 <MenuItem
                   key={index}
                   value={index}
-                  disabled={template.disabled}
                 >
                   {template.label}
                 </MenuItem>

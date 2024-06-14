@@ -43,7 +43,7 @@ class applicantcorrespondenceservice:
         return [x for x in attachments if x['applicantcorrespondenceid'] == correspondenceid and x['applicantcorrespondence_version'] == correspondenceversion]
 
     
-    def saveapplicantcorrespondencelog(self, requestid, ministryrequestid, data, userid):
+    def saveapplicantcorrespondencelog(self, requestid, ministryrequestid, data, userid, isdraft=False):
         applicantcorrespondencelog = FOIApplicantCorrespondence()
         if "correspondenceid" in data and data['correspondenceid'] is not None:
             correspondence = FOIApplicantCorrespondence.getapplicantcorrespondencebyid(data['correspondenceid'])
@@ -54,7 +54,7 @@ class applicantcorrespondenceservice:
         applicantcorrespondencelog.templateid = data['templateid']
         applicantcorrespondencelog.foiministryrequest_id = ministryrequestid
         applicantcorrespondencelog.foiministryrequestversion_id =FOIMinistryRequest.getversionforrequest(ministryrequestid=ministryrequestid)
-        applicantcorrespondencelog.isdraft = True
+        applicantcorrespondencelog.isdraft = isdraft
         if userid == 'system':
             applicantcorrespondencelog.sentcorrespondencemessage = data['correspondencemessagejson']
             applicantcorrespondencelog.sentby = 'System Generated Email'
