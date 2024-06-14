@@ -47,3 +47,7 @@ secure==0.3.0
 boto3==1.24.35
 walrus==0.8.2
 typer==0.4.1
+cryptography>=42.0.2 # not directly required, pinned by Snyk to avoid a vulnerability
+dateparser>=1.1.6 # not directly required, pinned by Snyk to avoid a vulnerability
+flask>=2.2.5 # not directly required, pinned by Snyk to avoid a vulnerability
+jinja2>=3.1.3 # not directly required, pinned by Snyk to avoid a vulnerability
