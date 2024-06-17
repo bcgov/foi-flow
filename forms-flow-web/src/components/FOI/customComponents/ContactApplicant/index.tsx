@@ -31,6 +31,7 @@ import CustomizedTooltip from '../Tooltip/MuiTooltip/Tooltip';
 import { CorrespondenceEmail } from '../../../FOI/customComponents';
 import { Stack } from '@mui/material';
 import { ClickableChip } from '../../Dashboard/utils';
+import { List, ListItem, ListItemText } from '@material-ui/core';
 
 
 export const ContactApplicant = ({
@@ -123,7 +124,7 @@ export const ContactApplicant = ({
   }, [applicantCorrespondence])
 
   React.useEffect(() => {
-    const filteredMessage = applicantCorrespondence.filter((message: any) => {
+    let filteredMessage = applicantCorrespondence.filter((message: any) => {
       if (correspondenceFilter === "all") return true;
       if (correspondenceFilter === "log") {
         return message.category === "correspondence";
@@ -171,6 +172,14 @@ export const ContactApplicant = ({
     setCurrentTemplate(+e.target.value)
     const templateVariables = getTemplateVariables(requestDetails, templates[+e.target.value]);
     const finalTemplate = applyVariables(templates[+e.target.value].text || "", templateVariables);
+    setEditorValue(finalTemplate)
+  }
+
+  //When templates are selected from list
+  const handleTemplateSelection = (index: number) => {
+    setCurrentTemplate(index)
+    const templateVariables = getTemplateVariables(requestDetails, templates[index]);
+    const finalTemplate = applyVariables(templates[index].text || "", templateVariables);
     setEditorValue(finalTemplate)
   }
 
@@ -424,6 +433,49 @@ export const ContactApplicant = ({
         <p>Please select a template and add an attachment before previewing the email</p>
       </div>]
   };
+
+  let correspondenceList;
+  correspondenceList = messages.map((message: any, index: any) => (
+    <div key={index} className="commentsection"
+      data-msgid={index}
+      style={{ display: 'block' }}
+    >
+      <CommentStructure
+        i={message}
+        reply={false}
+        parentId={null}
+        isreplysection={false}
+        totalcommentCount={1}
+        currentIndex={index}
+        hasAnotherUserComment={false}
+        fullName={getFullname(message.createdby)}
+        isEmail={message}
+        ministryId={ministryId}
+        editDraft={editDraft}
+        deleteDraft={deleteDraft}
+      />
+    </div>
+  ))
+
+  let templatesList;
+  let templateListItems = templates.map((template: any, index: any) => {
+    let lastItemInList = false
+    if (templates.length === index + 1) lastItemInList = true;
+    return (
+      <ListItem  
+        onClick={() => {
+          console.log('template: ', template)
+          handleTemplateSelection(index)
+        }} 
+        className={`template-list-item ${lastItemInList ? 'template-list-item-last' : ''}`}
+      >
+        <ListItemText primary={template.label} secondary="Jan 9, 2014" />
+      </ListItem>)
+    })
+  templatesList = (
+    <List>
+      {templateListItems}
+    </List>)
 
   return !isLoading ? (
     <div className="contact-applicant-container">
@@ -695,27 +747,8 @@ export const ContactApplicant = ({
         </Grid>
       </div>}
       <div style={{ marginTop: '20px' }}>
-        {messages.map((message: any, index: any) => (
-          <div key={index} className="commentsection"
-            data-msgid={index}
-            style={{ display: 'block' }}
-          >
-            <CommentStructure
-              i={message}
-              reply={false}
-              parentId={null}
-              isreplysection={false}
-              totalcommentCount={1}
-              currentIndex={index}
-              hasAnotherUserComment={false}
-              fullName={getFullname(message.createdby)}
-              isEmail={message}
-              ministryId={ministryId}
-              editDraft={editDraft}
-              deleteDraft={deleteDraft}
-            />
-          </div>
-        ))}
+        {(correspondenceFilter === "log" || correspondenceFilter === "drafts") && correspondenceList}
+        {correspondenceFilter === "templates" && templatesList}
       </div>
     </div>
   ) : (

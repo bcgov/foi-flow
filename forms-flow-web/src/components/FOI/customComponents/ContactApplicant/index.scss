@@ -64,6 +64,15 @@
   }
 }
 
+.template-list-item {
+  border: ridge;
+  border-right: none;
+  border-bottom: none;
+}
+.template-list-item-last {
+  border-bottom: ridge;
+}
+
 .email-attachment-item {
   background-color: #4e7095;
   color: white;
