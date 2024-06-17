@@ -2398,6 +2398,7 @@ export const RecordsLog = ({
                   </button>
                 </span>
               </Tooltip>
+              {(!isMCFPersonal || (isMCFPersonal && isMinistryCoordinator)) && (
               <Tooltip
                 title={
                   isUpdateDivisionsDisabled() ? (
@@ -2449,6 +2450,7 @@ export const RecordsLog = ({
                   </button>
                 </span>
               </Tooltip>
+              )}
               <Tooltip title={<div style={{ fontSize: "11px" }}>Delete</div>}>
                 <span>
                   <button
