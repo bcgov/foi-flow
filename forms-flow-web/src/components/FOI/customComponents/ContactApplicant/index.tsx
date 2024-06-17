@@ -105,6 +105,8 @@ export const ContactApplicant = ({
   const approvedForm = formHistory?.find(form => form?.status?.toLowerCase() === 'approved');
   const existingCorrespondence = applicantCorrespondence?.find((correspondence: any) => correspondence?.id === approvedForm?.cfrfeeid)
   const previewButtonValue = existingCorrespondence ? "Preview & Resend" : "Preview & Send";
+  const [editMode, setEditMode] = useState(false);
+  const draftButtonValue = editMode ? "Edit Draft" : "Save Draft";
 
   const requestDetails: any = useSelector((state: any) => state.foiRequests.foiRequestDetail);
 
@@ -274,6 +276,7 @@ export const ContactApplicant = ({
       setCurrentTemplate(0)
       setFiles([])
       setShowEditor(false)
+      setEditMode(false);
       dispatch(fetchApplicantCorrespondence(requestId, ministryId));
     }
     const templateId = currentTemplate ? templates[currentTemplate as keyof typeof templates].templateid : null;
@@ -300,6 +303,7 @@ export const ContactApplicant = ({
         setCurrentTemplate(0)
         setFiles([])
         setShowEditor(false)
+        setEditMode(false);
         dispatch(fetchApplicantCorrespondence(requestId, ministryId));
       },
     );
@@ -311,9 +315,17 @@ export const ContactApplicant = ({
   const [correspondenceId, setCorrespondenceId] = useState(0);
 
   const editDraft = async (i : any) => {
+    setEditMode(true);
     setShowEditor(true);
     setEditorValue(i.text);
-    setCorrespondenceId(i.applicantcorrespondenceid)
+    if (i.attachments)
+      setFiles(i.attachments);
+    setCorrespondenceId(i.applicantcorrespondenceid);
+    for(let j = 0; j < templates.length; j++) {
+      if (templates[j].templateid === i.templateid) {
+        setCurrentTemplate(+j);
+      } 
+    }
   };
 
   const deleteDraft = async (i : any) => {
@@ -325,6 +337,7 @@ export const ContactApplicant = ({
       setCurrentTemplate(0)
       setFiles([])
       setShowEditor(false)
+      setEditMode(false);
       toast.success("Draft has been deleted successfully", {
         position: "top-right",
         autoClose: 3000,
@@ -344,6 +357,7 @@ export const ContactApplicant = ({
         setCurrentTemplate(0)
         setFiles([])
         setShowEditor(false)
+        setEditMode(false);
         dispatch(fetchApplicantCorrespondence(requestId, ministryId));
         setFOICorrespondenceLoader(false);
         setDisablePreview(false);
@@ -351,10 +365,8 @@ export const ContactApplicant = ({
     );
     setFOICorrespondenceLoader(false);
     setDisablePreview(false);
+    setEditMode(false);
   };
-
-
-  
 
   const editCorrespondence = async (i : any) => {
     setDisablePreview(true);
@@ -645,22 +657,14 @@ export const ContactApplicant = ({
               handleDraftSave={saveDraft}
               attachments={files}
               templateInfo={templates[currentTemplate]}
-            />
-            <button
-          className="btn addCorrespondence"
-          data-variant="contained" 
-          onClick={saveDraft}             
-          color="primary"
-        >
-          Save Draft
-        </button>
+            />            
         <button
           className="btn addCorrespondence"
           data-variant="contained" 
-          onClick={editCorrespondence}             
+          onClick={ editMode ? editCorrespondence : saveDraft}             
           color="primary"
         >
-          Edit Draft
+          {draftButtonValue}
         </button>
             <button
               className="btn addCorrespondence"

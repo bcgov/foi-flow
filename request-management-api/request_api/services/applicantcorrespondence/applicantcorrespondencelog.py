@@ -44,25 +44,25 @@ class applicantcorrespondenceservice:
 
     
     def saveapplicantcorrespondencelog(self, requestid, ministryrequestid, data, userid, isdraft=False):
-        applicantcorrespondencelog = FOIApplicantCorrespondence()
+        applicantcorrespondence = FOIApplicantCorrespondence()
         if "correspondenceid" in data and data['correspondenceid'] is not None:
             correspondence = FOIApplicantCorrespondence.getapplicantcorrespondencebyid(data['correspondenceid'])
-            applicantcorrespondencelog.applicantcorrespondenceid = data['correspondenceid']
-            applicantcorrespondencelog.version = correspondence['version']+1
+            applicantcorrespondence.applicantcorrespondenceid = data['correspondenceid']
+            applicantcorrespondence.version = correspondence['version']+1
         else:
-            applicantcorrespondencelog.version=1
-        applicantcorrespondencelog.templateid = data['templateid']
-        applicantcorrespondencelog.foiministryrequest_id = ministryrequestid
-        applicantcorrespondencelog.foiministryrequestversion_id =FOIMinistryRequest.getversionforrequest(ministryrequestid=ministryrequestid)
-        applicantcorrespondencelog.isdraft = isdraft
+            applicantcorrespondence.version=1
+        applicantcorrespondence.templateid = data['templateid']
+        applicantcorrespondence.foiministryrequest_id = ministryrequestid
+        applicantcorrespondence.foiministryrequestversion_id =FOIMinistryRequest.getversionforrequest(ministryrequestid=ministryrequestid)
+        applicantcorrespondence.isdraft = isdraft
         if userid == 'system':
-            applicantcorrespondencelog.sentcorrespondencemessage = data['correspondencemessagejson']
-            applicantcorrespondencelog.sentby = 'System Generated Email'
-            applicantcorrespondencelog.sent_at = datetime.now()
+            applicantcorrespondence.sentcorrespondencemessage = data['correspondencemessagejson']
+            applicantcorrespondence.sentby = 'System Generated Email'
+            applicantcorrespondence.sent_at = datetime.now()
         else:
-            applicantcorrespondencelog.correspondencemessagejson = data['correspondencemessagejson']
-            applicantcorrespondencelog.createdby = userid       
-        return FOIApplicantCorrespondence.saveapplicantcorrespondence(applicantcorrespondencelog,data['attachments'], data['emails'])        
+            applicantcorrespondence.correspondencemessagejson = data['correspondencemessagejson']
+            applicantcorrespondence.createdby = userid      
+        return FOIApplicantCorrespondence.saveapplicantcorrespondence(applicantcorrespondence,data['attachments'], data['emails'])        
     
     def deleteapplicantcorrespondencelog(self, ministryrequestid, correpondenceid, userid):
         return FOIApplicantCorrespondence.deleteapplicantcorrespondence(ministryrequestid,correpondenceid,userid)        
