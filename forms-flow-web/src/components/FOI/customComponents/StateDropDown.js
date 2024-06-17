@@ -152,7 +152,7 @@ const StateDropDown = ({
         if (_isMinistryCoordinator) {
           if (isMCFMinistryTeam) {
             return appendRecordsReadyForReview(_stateList.callforrecordsforpersonal);
-          } else {
+          } else if (personalRequest) {
             return _stateList.callforrecordsforpersonal;
           }
         }
