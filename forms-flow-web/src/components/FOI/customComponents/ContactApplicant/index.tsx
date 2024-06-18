@@ -497,6 +497,7 @@ export const ContactApplicant = ({
         <p>Please select a template and add an attachment before previewing the email</p>
       </div>]
   };
+  console.log('tempaltes: ', templates)
 
   let correspondenceList;
   correspondenceList = messages.map((message: any, index: any) => (
@@ -522,19 +523,33 @@ export const ContactApplicant = ({
   ))
 
   let templatesList;
+  const parser = new DOMParser();
   let templateListItems = templates.map((template: any, index: any) => {
     let lastItemInList = false
     if (templates.length === index + 1) lastItemInList = true;
+    const htmlEmail = parser.parseFromString(template.text, 'text/html');
+    const htmlEmailText = htmlEmail.body.textContent || ''
+    let ellipses = htmlEmailText?.length > 300 ? '...' : ''
+
     return (
       <ListItem  
         onClick={() => {
-          console.log('template: ', template)
+          if (!showEditor) setShowEditor(true)
           handleTemplateSelection(index)
         }} 
         className={`template-list-item ${lastItemInList ? 'template-list-item-last' : ''}`}
+        key={template.value}
       >
-        <ListItemText primary={template.label} secondary="Jan 9, 2014" />
-      </ListItem>)
+        <Grid container spacing={2}>
+          <Grid item xs={4}>
+            <ListItemText primary={template.label}/>
+          </Grid>
+          <Grid item xs={8}>
+            <ListItemText secondary={htmlEmailText?.slice(0,300) + ellipses} />
+          </Grid>
+        </Grid>
+      </ListItem>
+      )
     })
   templatesList = (
     <List>
