@@ -22,7 +22,6 @@ class FOIApplicantCorrespondenceAttachment(db.Model):
     version = db.Column(db.Integer, primary_key=True,nullable=False)
     attachmentdocumenturipath = db.Column(db.Text, unique=False, nullable=False)
     attachmentfilename = db.Column(db.String(500), unique=False, nullable=False)
-    isresponse = db.Column(db.Boolean, default=False)
     created_at = db.Column(db.DateTime, default=datetime.now)
     updated_at = db.Column(db.DateTime, nullable=True)
     createdby = db.Column(db.String(120), unique=False, nullable=False)
@@ -30,7 +29,6 @@ class FOIApplicantCorrespondenceAttachment(db.Model):
                  
     applicantcorrespondenceid =db.Column(db.Integer, db.ForeignKey('FOIApplicantCorrespondences.applicantcorrespondenceid'))
     applicantcorrespondence_version = db.Column(db.Integer, db.ForeignKey('FOIApplicantCorrespondences.version')) 
-    applicantcorrespondenceresponseid = db.Column(db.Integer, nullable=True)
 
 
     @classmethod
@@ -63,13 +61,13 @@ class FOIApplicantCorrespondenceAttachment(db.Model):
         attachments = []
         try:
             sql = """select fca.applicantcorrespondenceid, fca.applicantcorrespondence_version, fca.applicantcorrespondenceattachmentid, attachmentfilename, 
-            attachmentdocumenturipath, isresponse
+            attachmentdocumenturipath
             from "FOIApplicantCorrespondenceAttachments" fca join "FOIApplicantCorrespondences" fpa on fpa.applicantcorrespondenceid = fca.applicantcorrespondenceid  and fca.applicantcorrespondence_version = fpa."version" 
             where fpa.foiministryrequest_id  = :ministryrequestid
             order by fpa.applicantcorrespondenceid desc, fca.applicantcorrespondence_version desc;""" 
             rs = db.session.execute(text(sql), {'ministryrequestid': ministryrequestid})
             for row in rs:
-                attachments.append({"applicantcorrespondenceid": row["applicantcorrespondenceid"], "applicantcorrespondence_version": row["applicantcorrespondence_version"],"applicantcorrespondenceattachmentid": row["applicantcorrespondenceattachmentid"], "attachmentfilename": row["attachmentfilename"], "attachmentdocumenturipath": row["attachmentdocumenturipath"], "isresponse": row["isresponse"]})
+                attachments.append({"applicantcorrespondenceid": row["applicantcorrespondenceid"], "applicantcorrespondence_version": row["applicantcorrespondence_version"],"applicantcorrespondenceattachmentid": row["applicantcorrespondenceattachmentid"], "attachmentfilename": row["attachmentfilename"], "attachmentdocumenturipath": row["attachmentdocumenturipath"]})
         except Exception as ex:
             logging.error(ex)
             raise ex
@@ -79,5 +77,5 @@ class FOIApplicantCorrespondenceAttachment(db.Model):
 
 class FOIApplicantCorrespondenceAttachmentSchema(ma.Schema):
     class Meta:
-        fields = ('applicantcorrespondenceattachmentid', 'version','applicantcorrespondenceid', 'applicantcorrespondenceresponseid','isresponse','attachmentdocumenturipath','attachmentfilename','created_at','createdby')
+        fields = ('applicantcorrespondenceattachmentid', 'version','applicantcorrespondenceid','attachmentdocumenturipath','attachmentfilename','created_at','createdby')
     

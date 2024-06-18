@@ -313,6 +313,8 @@ export default function AttachmentModal({
       case "add":
         if (isMCFMSDPersonal && !isMinistryCoordinator) {
           return { title: "Add Scanned Records", body: "" };
+        } else if (uploadFor === "response") {
+          return { title: "Add Response", body: "" };
         } else {
           return { title: "Add Attachment", body: "" };
         }
@@ -700,7 +702,7 @@ export default function AttachmentModal({
               disabled={isSaveDisabled()}
               onClick={handleSave}
             >
-              {uploadFor === "email" ? "Save Changes" : "Continue"}
+              {uploadFor === "email" ? "Save Changes" :"Continue"}
             </button>
           )}
           <button className="btn-bottom btn-cancel" onClick={handleClose}>
