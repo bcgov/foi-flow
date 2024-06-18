@@ -144,7 +144,7 @@ export const ContactApplicant = ({
   React.useEffect(() => {
     let filteredMessage = applicantCorrespondence.filter((message: any) => {
       if (correspondenceFilter === "log") {
-        return message.category === "correspondence";
+        return [ "correspondence","response"].includes(message.category);
       } else if (correspondenceFilter === "templates") {
         return message.category === "template";
       } else if (correspondenceFilter === "drafts") {
