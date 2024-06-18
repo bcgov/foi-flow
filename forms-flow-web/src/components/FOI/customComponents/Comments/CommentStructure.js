@@ -48,6 +48,7 @@ const CommentStructure = ({ i, reply, parentId, totalcommentCount, currentIndex,
 
   const [toggleIcon, settoggleIcon] = useState(faCaretDown)
 
+
   const ref = useRef();
   const closeTooltip = () => ref.current && ref ? ref.current.close() : {};
 
@@ -97,9 +98,13 @@ const CommentStructure = ({ i, reply, parentId, totalcommentCount, currentIndex,
       })
     }
     else {
-      markup = `<p>${i.text}</p>`
+      if (i.text) {
+        markup = `<p>${i.text}</p>`
+      } else {
+        markup = `<p></p>`
+      }
+      
     }
-
     return markup
   }
   const [popoverOpen, setPopoverOpen] = useState(false);
@@ -167,7 +172,32 @@ const CommentStructure = ({ i, reply, parentId, totalcommentCount, currentIndex,
             >
               Download
             </MenuItem>
-        </MenuList> :
+        </MenuList> : isEmail && i.category === "response" ?
+        <MenuList>
+        <MenuItem
+          onClick={(e) => {
+            editDraft(i)
+          }}
+        >
+          Change Date
+        </MenuItem>  
+        <MenuItem
+          onClick={(e) => {
+            deleteDraft(i);
+          }}
+        >
+          Rename
+        </MenuItem>
+        <MenuItem
+            onClick={(e) => {
+                e.stopPropagation();
+                download();
+                setPopoverOpen(false);
+            }}
+          >
+            Download
+          </MenuItem>
+      </MenuList> :
           <MenuList>
             <MenuItem
               onClick={(e) => {
@@ -315,8 +345,19 @@ const CommentStructure = ({ i, reply, parentId, totalcommentCount, currentIndex,
                 >
                   <NewCommentIndicator commentdate={i.dateUF}/>
                   <div className="commentsTwo">
+                    {isEmail && (
+                      <>
+                      <div className="fullName">{i.category === "response" ? "Applicant Response - ": ""} {fullName} </div> |  <div className="commentdate">{i.date} </div>  <div className="commentdate">{i.edited ? "Edited": ""} </div>
+                      </>
+                    )
+                    }
+                    {!isEmail && (
+                      <>
                     <div className="fullName">{fullName} </div> |  <div className="commentdate">{i.date} </div>  <div className="commentdate">{i.edited ? "Edited": ""} </div>
-                  </div>
+                    </>
+                    )
+                    }
+                    </div>
                 </div>
               </div>
               <div className="userActions">

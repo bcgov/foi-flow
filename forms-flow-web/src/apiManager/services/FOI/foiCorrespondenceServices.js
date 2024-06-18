@@ -120,6 +120,7 @@ export const saveDraftCorrespondence = (
     });
 };
 
+
 export const editDraftCorrespondence = (
   data,
   requestId,
@@ -190,6 +191,42 @@ export const deleteDraftCorrespondence = (
       catchError(error, dispatch);
       if (errorCallback) {
         errorCallback("An error occured while trying to send email to applicant");
+      }
+    });
+};
+
+export const saveCorrespondenceResponse = (
+  data,
+  ministryId,
+  dispatch,
+  callback,
+  errorCallback,
+) => {
+  if (!ministryId) {
+    dispatch(serviceActionError("No request id"));
+  }
+  dispatch(setFOICorrespondenceLoader(true));
+  const apiUrl = replaceUrl(replaceUrl(
+    API.FOI_POST_RESPONSE_EMAIL_CORRESPONDENCE,
+    "<ministryrequestid>",
+    ministryId)
+  );
+  httpPOSTRequest(apiUrl, data)
+    .then((res) => {
+      if (res.data) {
+        if (callback) {
+          callback(res.data);
+        }
+      } else {
+        dispatch(serviceActionError(res));
+        throw new Error();
+      }
+    })
+    .catch((error) => {
+      console.log("An error occured while trying to save response from applicant", error);
+      catchError(error, dispatch);
+      if (errorCallback) {
+        errorCallback("An error occured while trying to save response from applicant");
       }
     });
 };

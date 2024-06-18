@@ -81,8 +81,6 @@ class FOIFlowApplicantCorrespondence(Resource):
         except BusinessException:
             return "Error happened while fetching  applicant correspondence logs" , 500 
 
-
-
     @staticmethod
     @TRACER.trace()
     @cross_origin(origins=allowedorigins())
@@ -110,8 +108,8 @@ class FOIFlowApplicantCorrespondenceDraft(Resource):
     def post(requestid, ministryrequestid):
         try:
             requestjson = request.get_json()
-            applicantcorrespondencelog = FOIApplicantCorrespondenceSchema().load(data=requestjson) 
-            result = applicantcorrespondenceservice().saveapplicantcorrespondencelog(requestid, ministryrequestid, applicantcorrespondencelog, AuthHelper.getuserid(), True)
+            correspondenceschemaobj = FOIApplicantCorrespondenceSchema().load(data=requestjson) 
+            result = applicantcorrespondenceservice().saveapplicantcorrespondencelog(requestid, ministryrequestid, correspondenceschemaobj, AuthHelper.getuserid(), True)
             if result.success == True:
                return {'status': result.success, 'message':result.message,'id':result.identifier} , 200      
         except BusinessException:
@@ -129,7 +127,7 @@ class FOIFlowApplicantCorrespondenceDraft(Resource):
         try:
             requestjson = request.get_json()
             applicantcorrespondencelog = FOIApplicantCorrespondenceSchema().load(data=requestjson) 
-            result = applicantcorrespondenceservice().saveapplicantcorrespondencelog(requestid, ministryrequestid, applicantcorrespondencelog, AuthHelper.getuserid())
+            result = applicantcorrespondenceservice().saveapplicantcorrespondencelog(requestid, ministryrequestid, applicantcorrespondencelog, AuthHelper.getuserid(), True)
             if result.success == True:
                return {'status': result.success, 'message':result.message,'id':result.identifier} , 200      
         except BusinessException:
