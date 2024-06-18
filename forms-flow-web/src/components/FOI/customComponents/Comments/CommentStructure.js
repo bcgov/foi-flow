@@ -238,6 +238,9 @@ const CommentStructure = ({ i, reply, parentId, totalcommentCount, currentIndex,
   }
 
   const download = async () => {
+    const elementToClickForExpand = document.querySelector(`#comment-accordion-${currentIndex}`);
+    let isAriaExpanded = elementToClickForExpand.ariaExpanded
+    if (isAriaExpanded == 'false') elementToClickForExpand.click();
     let fileInfoList = i.attachments.map(attachment => {
       return  {
         filename: attachment.filename,
@@ -328,14 +331,14 @@ const CommentStructure = ({ i, reply, parentId, totalcommentCount, currentIndex,
 
   return (
     <>
-      <div className="comment-accordion">
+      <div className="comment-accordion" {...(isEmail ? {"data-msg-halfdiv-id":`${currentIndex}`} : {})}>
         <Accordion>
           <AccordionSummary
             expandIcon={<ExpandMoreIcon />}
             aria-controls="comment-accordion-summary"
             id={`comment-accordion-${currentIndex}`}
           >
-              <div {...(isEmail ? {"data-msg-halfdiv-id":`${currentIndex}`} : {})} name={needCollapsed ? `hiddenreply_${parentId}` : `reply_${parentId}`} className={halfDivclassname} style={needCollapsed ? { display: 'none' } : {}} >
+              <div name={needCollapsed ? `hiddenreply_${parentId}` : `reply_${parentId}`} className={halfDivclassname} style={needCollapsed ? { display: 'none' } : {}} >
                 <div
                   className="userInfo"
                   style={reply ? { marginLeft: 15, marginTop: '6px' }: {}}
