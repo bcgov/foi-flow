@@ -497,7 +497,6 @@ export const ContactApplicant = ({
         <p>Please select a template and add an attachment before previewing the email</p>
       </div>]
   };
-  console.log('tempaltes: ', templates)
 
   let correspondenceList;
   correspondenceList = messages.map((message: any, index: any) => (
