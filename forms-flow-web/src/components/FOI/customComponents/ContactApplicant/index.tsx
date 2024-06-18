@@ -113,19 +113,14 @@ export const ContactApplicant = ({
 
   const [messages, setMessages] = useState(applicantCorrespondence);
   const [disablePreview, setDisablePreview] = useState(false);
-  const [correspondenceFilter, setCorrespondenceFilter] = useState("all");
+  const [correspondenceFilter, setCorrespondenceFilter] = useState("log");
   const changeCorrespondenceFilter = (filter: string) => {
     if (filter === correspondenceFilter) return;
     setCorrespondenceFilter(filter.toLowerCase());
   }
 
   React.useEffect(() => {
-    setMessages(applicantCorrespondence);
-  }, [applicantCorrespondence])
-
-  React.useEffect(() => {
     let filteredMessage = applicantCorrespondence.filter((message: any) => {
-      if (correspondenceFilter === "all") return true;
       if (correspondenceFilter === "log") {
         return message.category === "correspondence";
       } else if (correspondenceFilter === "templates") {
@@ -135,7 +130,7 @@ export const ContactApplicant = ({
       }
     })
     setMessages(filteredMessage);
-  }, [correspondenceFilter])
+  }, [correspondenceFilter, applicantCorrespondence])
 
   const quillModules = useMemo(() => {
     return {
