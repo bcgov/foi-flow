@@ -12,23 +12,21 @@ class FOIApplicantCorrespondenceResponse(db.Model):
     __tablename__ = 'FOIApplicantCorrespondenceResponses'
     __table_args__ = (
         ForeignKeyConstraint(
-            #["applicantcorrespondenceid"], ["FOIApplicantCorrespondences.applicantcorrespondenceid"],
-            ["foiministryrequest_id", "foiministryrequestversion_id"], ["FOIMinistryRequests.foiministryrequestid", "FOIMinistryRequests.version"]
+            ["applicantcorrespondence_id", "applicantcorrespondenceversion_id"], ["FOIApplicantCorrespondences.applicantcorrespondenceid", "FOIApplicantCorrespondences.version"]
         ),
     )
         
     # Defining the columns
     applicantcorrespondenceresponseid = db.Column(db.Integer, primary_key=True,autoincrement=True)      
     version = db.Column(db.Integer, primary_key=True,nullable=False)
-    applicantcorrespondenceid =db.Column(db.Integer, nullable=True)
     response_at = db.Column(db.DateTime, default=datetime.now)
     created_at = db.Column(db.DateTime, default=datetime.now)
     updated_at = db.Column(db.DateTime, nullable=True)
     createdby = db.Column(db.String(120), unique=False, nullable=False)
     updatedby = db.Column(db.String(120), unique=False, nullable=True)
 
-    foiministryrequest_id =db.Column(db.Integer, db.ForeignKey('FOIMinistryRequests.foiministryrequestid'))
-    foiministryrequestversion_id = db.Column(db.Integer, db.ForeignKey('FOIMinistryRequests.version'))    
+    applicantcorrespondence_id =db.Column(db.Integer, db.ForeignKey('FOIApplicantCorrespondences.applicantcorrespondenceid'))
+    applicantcorrespondenceversion_id = db.Column(db.Integer, db.ForeignKey('FOIApplicantCorrespondences.version'))    
                   
     
     @classmethod
@@ -46,5 +44,5 @@ class FOIApplicantCorrespondenceResponse(db.Model):
     
 class FOIApplicantCorrespondenceResponseSchema(ma.Schema):
     class Meta:
-        fields = ('applicantcorrespondenceresponseid', 'version', 'applicantcorrespondenceid', 'response_at','created_at','createdby')
+        fields = ('applicantcorrespondenceresponseid', 'version', 'applicantcorrespondence_id', 'response_at','created_at','createdby')
     

@@ -51,7 +51,8 @@ class applicantcorrespondenceservice:
             applicantcorrespondence.version = correspondence['version']+1
         else:
             applicantcorrespondence.version=1
-        applicantcorrespondence.templateid = data['templateid']
+        applicantcorrespondence.templateid =  data['templateid'] if 'templateid' in data else None
+        applicantcorrespondence.isresponse = False if 'templateid' in data else True
         applicantcorrespondence.foiministryrequest_id = ministryrequestid
         applicantcorrespondence.foiministryrequestversion_id =FOIMinistryRequest.getversionforrequest(ministryrequestid=ministryrequestid)
         applicantcorrespondence.isdraft = isdraft
@@ -60,38 +61,25 @@ class applicantcorrespondenceservice:
             applicantcorrespondence.sentby = 'System Generated Email'
             applicantcorrespondence.sent_at = datetime.now()
         else:
-            applicantcorrespondence.correspondencemessagejson = data['correspondencemessagejson']
-            applicantcorrespondence.createdby = userid      
-        return FOIApplicantCorrespondence.saveapplicantcorrespondence(applicantcorrespondence,data['attachments'], data['emails'])        
+            applicantcorrespondence.correspondencemessagejson = data['correspondencemessagejson'] if 'correspondencemessagejson' in data else None
+            applicantcorrespondence.createdby = userid  
+        emails = data['emails'] if 'emails' in data else None   
+        return FOIApplicantCorrespondence.saveapplicantcorrespondence(applicantcorrespondence,data['attachments'], emails)        
     
     def deleteapplicantcorrespondencelog(self, ministryrequestid, correpondenceid, userid):
         return FOIApplicantCorrespondence.deleteapplicantcorrespondence(ministryrequestid,correpondenceid,userid)        
     
     def saveapplicantcorrespondenceresponselog(self, ministryrequestid, data, userid):
-        attachments = []
-        applicantcorrespondenceid = data['applicantcorrespondenceid'] if 'applicantcorrespondenceid' in data and data['applicantcorrespondenceid'] is not None else None
-        correspondenceresponse = FOIApplicantCorrespondenceResponse()
-        correspondenceresponse.applicantcorrespondenceid = applicantcorrespondenceid
-        correspondenceresponse.foiministryrequest_id = ministryrequestid
-        correspondenceresponse.foiministryrequestversion_id =FOIMinistryRequest.getversionforrequest(ministryrequestid=ministryrequestid)
-        correspondenceresponse.created_at = datetime.now()
-        correspondenceresponse.createdby = userid
-        correspondenceresponse.response_at = data['responsedate'] if 'responsedate' in data and data['responsedate'] is not None else datetime.now()
-        correspondenceresponse.version=1
-        response = FOIApplicantCorrespondenceResponse.saveapplicantcorrespondenceresponse(correspondenceresponse)
-        if response.success == True:
-            for attachment in data['attachments']:
-                correspondenceattachment = FOIApplicantCorrespondenceAttachment()
-                correspondenceattachment.applicantcorrespondenceid = applicantcorrespondenceid
-                correspondenceattachment.attachmentdocumenturipath = attachment['url']
-                correspondenceattachment.attachmentfilename = attachment['filename']
-                correspondenceattachment.created_at = datetime.now()
-                correspondenceattachment.createdby = userid
-                correspondenceattachment.version=1
-                correspondenceattachment.isresponse = True
-                correspondenceattachment.applicantcorrespondenceresponseid = response.identifier
-                attachments.append(correspondenceattachment)
-            return FOIApplicantCorrespondenceAttachment.saveapplicantcorrespondenceattachments(ministryrequestid, attachments)
+        result = self.saveapplicantcorrespondencelog(None, ministryrequestid, data, userid)
+        if result.success == True:
+            correspondenceresponse = FOIApplicantCorrespondenceResponse()
+            correspondenceresponse.applicantcorrespondence_id = result.identifier
+            correspondenceresponse.applicantcorrespondenceversion_id = 1
+            correspondenceresponse.created_at = datetime.now()
+            correspondenceresponse.createdby = userid
+            correspondenceresponse.response_at = data['responsedate'] if 'responsedate' in data and data['responsedate'] is not None else datetime.now()
+            correspondenceresponse.version=1
+            return FOIApplicantCorrespondenceResponse.saveapplicantcorrespondenceresponse(correspondenceresponse)
 
     def editapplicantcorrespondenceresponselog(self, ministryrequestid, data, userid):
         correspondence_response = FOIApplicantCorrespondenceResponse.getapplicantcorrespondenceresponse(data['correspondenceresponseid'])
@@ -141,9 +129,16 @@ class applicantcorrespondenceservice:
             "date": self.__pstformat(_correpondencelog['sent_at']) if _sentcorrespondencemessagejson is not None else self.__pstformat(_correpondencelog['created_at']),
             "userId": _correpondencelog['createdby'] if  _correpondencelog['createdby'] is not None else _correpondencelog['sentby'],
             "attachments" : attachments,
-            "category" : "draft" if _correpondencelog['isdraft'] == True else "correspondence"
+            "category" : self.__getcorrespondencecategory(_correpondencelog)
         }        
         return correpondencelog
+    
+    def __getcorrespondencecategory(self, _correpondencelog):
+        if _correpondencelog['isdraft']== True:
+            return "draft"
+        if _correpondencelog["isresponse"] == True:
+            return "response"
+        return "correspondence"
 
     def __getjsonobject(self, correspondencemessagejson):
         try:

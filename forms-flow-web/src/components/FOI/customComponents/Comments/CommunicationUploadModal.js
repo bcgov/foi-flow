@@ -26,15 +26,9 @@ export default function CommunicationUploadModal({
   openModal,
   setOpenModal,
   message,
-//   bcgovcode,
-//   requestNumber
+  setFiles,
+  saveResponse
 }) {
-  const dispatch = useDispatch();
-  const { requestId, ministryId } = useParams();
-
-  //THIS NEEDS TO BE PASSED IN
-  let bcgovcode = 1;
-  let requestNumber = 1;
 
   const useStyles = makeStyles((theme) => ({
     root: {
@@ -59,166 +53,28 @@ export default function CommunicationUploadModal({
   }));
   const classes = useStyles();
 
-  const [files, setFiles] = useState([]);
+  const [responsefiles, setResponseFiles] = useState([]);
 
   const updateFilesCb = (_files, _errorMessage) => {
-    setFiles(_files);
+    setResponseFiles(_files);
   };
 
   const isSaveDisabled = () => {
-    if (files.length > 0) return false;
+    if (responsefiles.length > 0) return false;
     return true;
   };
 
-  const saveDocument = (value, fileInfoList, files) => {
-    if (value) {
-      if (files.length !== 0) {
-        // setAttachmentLoading(true);
-        postFOIS3DocumentPreSignedUrl(
-          ministryId,
-          fileInfoList.map((file) => ({ ...file, multipart: true })),
-          "attachments",
-          bcgovcode,
-          dispatch,
-          async (err, res) => {
-            let _documents = [];
-            if (!err) {
-              let completed = 0;
-              let failed = [];
-              const toastID = toast.loading(
-                "Uploading files (" +
-                  completed +
-                  "/" +
-                  fileInfoList.length +
-                  ")"
-              );
-              for (let header of res) {
-                const _file = files.find(
-                  (file) => file.filename === header.filename
-                );
-                const _fileInfo = fileInfoList.find(
-                  (fileInfo) => fileInfo.filename === header.filename
-                );
-                const documentDetails = {
-                  documentpath: header.filepathdb,
-                  filename: header.filename,
-                  category: _fileInfo.filestatustransition,
-                };
-                let bytes = await readUploadedFileAsBytes(_file);
-                const CHUNK_SIZE = OSS_S3_CHUNK_SIZE;
-                const totalChunks = Math.ceil(bytes.byteLength / CHUNK_SIZE);
-                let parts = [];
-                for (let chunk = 0; chunk < totalChunks; chunk++) {
-                  let CHUNK = bytes.slice(
-                    chunk * CHUNK_SIZE,
-                    (chunk + 1) * CHUNK_SIZE
-                  );
-                  let response = await saveFilesinS3(
-                    { filepath: header.filepaths[chunk] },
-                    CHUNK,
-                    dispatch,
-                    (_err, _res) => {
-                      if (_err) {
-                        failed.push(header.filename);
-                      }
-                    }
-                  );
-                  if (response.status === 200) {
-                    parts.push({
-                      PartNumber: chunk + 1,
-                      ETag: response.headers.etag,
-                    });
-                  } else {
-                    failed.push(header.filename);
-                  }
-                }
-                await completeMultiPartUpload(
-                  {
-                    uploadid: header.uploadid,
-                    filepath: header.filepathdb,
-                    parts: parts,
-                  },
-                  ministryId,
-                  "attachments",
-                  bcgovcode,
-                  dispatch,
-                  (_err, _res) => {
-                    if (!_err && _res.ResponseMetadata.HTTPStatusCode === 200) {
-                      completed++;
-                      toast.update(toastID, {
-                        render:
-                          "Uploading files (" +
-                          completed +
-                          "/" +
-                          fileInfoList.length +
-                          ")",
-                        isLoading: true,
-                      });
-                      _documents.push(documentDetails);
-                    } else {
-                      failed.push(header.filename);
-                    }
-                  }
-                );
-              }
-              if (_documents.length > 0) {
-                dispatch(
-                  saveFOIRequestAttachmentsList(
-                    requestId,
-                    ministryId,
-                    { documents: _documents },
-                    (err, _res) => {
-                      // dispatchRequestAttachment(err);
-                    }
-                  )
-                );
-              }
-              var toastOptions = {
-                render:
-                  failed.length > 0
-                    ? "The following " +
-                      failed.length +
-                      " file uploads failed\n- " +
-                      failed.join("\n- ")
-                    : fileInfoList.length + " Files successfully saved",
-                type: failed.length > 0 ? "error" : "success",
-              };
-              toast.update(toastID, {
-                ...toastOptions,
-                className: "file-upload-toast",
-                isLoading: false,
-                autoClose: 3000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                closeButton: true,
-              });
-              // setAttachmentLoading(false)
-            }
-          }
-        );
-      }
-    }
-  };
 
   const handleSave = () => {
-    const fileInfoList = files?.map((file) => {
-      return {
-        ministrycode: "Misc",
-        requestnumber: requestNumber ? requestNumber : `U-00${requestId}`,
-        filestatustransition: "email-reply",
-        filename: file.filename ? file.filename : file.name,
-        filesize: file.size,
-      };
-    });
-    saveDocument(true, fileInfoList, files);
+    setFiles(responsefiles);
+    saveResponse();
+    setOpenModal(false);
   };
 
   const handleClose = (e) => {
     if (e.stopPropagation) e.stopPropagation();
     setOpenModal(false);
-    setFiles([]);
+    setResponseFiles([]);
   };
 
   return (
