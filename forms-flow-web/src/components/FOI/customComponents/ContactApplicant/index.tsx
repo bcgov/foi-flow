@@ -33,8 +33,12 @@ import { CorrespondenceEmail } from '../../../FOI/customComponents';
 import { Stack } from '@mui/material';
 import { ClickableChip } from '../../Dashboard/utils';
 import { List, ListItem, ListItemText } from '@material-ui/core';
-
-
+import Dialog from '@material-ui/core/Dialog';
+import DialogActions from '@material-ui/core/DialogActions';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogContentText from '@material-ui/core/DialogContentText';
+import DialogTitle from '@material-ui/core/DialogTitle';
+import CloseIcon from '@material-ui/icons/Close';
 
 export const ContactApplicant = ({
   requestNumber,
@@ -70,7 +74,14 @@ export const ContactApplicant = ({
 
   const [openModal, setModal] = useState(false);
   const [communicationUploadModalOpen, setCommunicationUploadModalOpen] = useState(false);
-  function openAttachmentModal() {
+  
+  const [openConfirmationModal, setOpenConfirmationModal] = useState(false);
+  const [confirmationFor, setConfirmationFor] = useState("");
+  const [confirmationTitle, setConfirmationTitle] = useState("");
+  const [confirmationMessage, setConfirmationMessage] = useState("");
+  const [draftCorrespondence, setDraftCorrespondence] = useState <any> ({});
+
+  const openAttachmentModal = () => { 
     setUploadFor("email");
     setModal(true);
   }
@@ -87,6 +98,22 @@ export const ContactApplicant = ({
   const addCorrespondence = () => {
     setShowEditor(true);
     setModal(false);
+  }
+
+  const handleConfirmationClose = () => {     
+    setConfirmationFor("");
+    setConfirmationMessage("");
+    setDraftCorrespondence({});
+    setOpenConfirmationModal(false);
+  }
+
+  const handleConfirmationContinue = () => { 
+    if (confirmationFor === "delete-draft") {
+        setConfirmationFor("");
+        setConfirmationMessage("");
+        setOpenConfirmationModal(false);
+        deleteDraftAction();
+    }
   }
 
  
@@ -144,7 +171,7 @@ export const ContactApplicant = ({
   React.useEffect(() => {
     let filteredMessage = applicantCorrespondence.filter((message: any) => {
       if (correspondenceFilter === "log") {
-        return message.category === "correspondence";
+        return [ "correspondence","response"].includes(message.category);
       } else if (correspondenceFilter === "templates") {
         return message.category === "template";
       } else if (correspondenceFilter === "drafts") {
@@ -303,6 +330,15 @@ export const ContactApplicant = ({
       setFiles([])
       setShowEditor(false)
       setEditMode(false);
+      toast.success("Message has been saved to draft successfully", {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: true,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      });
       dispatch(fetchApplicantCorrespondence(requestId, ministryId));
     }
     const templateId = currentTemplate ? templates[currentTemplate as keyof typeof templates].templateid : null;
@@ -401,8 +437,18 @@ export const ContactApplicant = ({
     }
   };
 
-  const deleteDraft = async (i : any) => {
-    setCorrespondenceId(i.applicantcorrespondenceid);
+  const deleteDraft = (i : any) => {
+    setDraftCorrespondence(i);
+    setOpenConfirmationModal(true);
+    setConfirmationFor("delete-draft")
+    setConfirmationTitle("Delete Draft")
+    setConfirmationMessage("Are you sure you want to delete these draft(s)? This can not be undone");
+  }
+
+
+  const deleteDraftAction = async () => {
+    if (draftCorrespondence) {
+    setCorrespondenceId(draftCorrespondence.applicantcorrespondenceid);
     setDisablePreview(true);
     setPreviewModal(false);
     let callback = (_res: string) => {
@@ -411,6 +457,7 @@ export const ContactApplicant = ({
       setFiles([])
       setShowEditor(false)
       setEditMode(false);
+      setDraftCorrespondence({});
       toast.success("Draft has been deleted successfully", {
         position: "top-right",
         autoClose: 3000,
@@ -422,7 +469,7 @@ export const ContactApplicant = ({
       });
       dispatch(fetchApplicantCorrespondence(requestId, ministryId));
     }
-    deleteDraftCorrespondence(i.applicantcorrespondenceid,ministryId,
+    deleteDraftCorrespondence(draftCorrespondence.applicantcorrespondenceid,ministryId,
       dispatch,
       callback,
       (errorMessage: string) => {
@@ -431,6 +478,7 @@ export const ContactApplicant = ({
         setFiles([])
         setShowEditor(false)
         setEditMode(false);
+        setDraftCorrespondence({});
         dispatch(fetchApplicantCorrespondence(requestId, ministryId));
         setFOICorrespondenceLoader(false);
         setDisablePreview(false);
@@ -439,6 +487,8 @@ export const ContactApplicant = ({
     setFOICorrespondenceLoader(false);
     setDisablePreview(false);
     setEditMode(false);
+      
+  }
   };
 
   const editCorrespondence = async (i : any) => {
@@ -449,7 +499,16 @@ export const ContactApplicant = ({
       setEditorValue("");
       setCurrentTemplate(0)
       setFiles([])
-      setShowEditor(false)
+      setShowEditor(false);
+      toast.success("Message has been saved to draft successfully", {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: true,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      })
       dispatch(fetchApplicantCorrespondence(requestId, ministryId));
     }
     const templateId = currentTemplate ? templates[currentTemplate as keyof typeof templates].templateid : null;
@@ -834,6 +893,43 @@ export const ContactApplicant = ({
       maxNoFiles={10}
       bcgovcode={undefined}
     /> 
+    <div className="email-change-dialog">
+      <Dialog
+        open={openConfirmationModal}
+        onClose={handleConfirmationClose}
+        aria-labelledby="state-change-dialog-title"
+        aria-describedby="state-change-dialog-description"
+        maxWidth={'md'}
+        fullWidth={true}
+        // id="state-change-dialog"
+      >
+        <DialogTitle disableTypography id="state-change-dialog-title">
+            <h2 className="state-change-header">{confirmationTitle}</h2>
+            <IconButton className="title-col3" onClick={handleConfirmationClose}>
+              <i className="dialog-close-button">Close</i>
+              <CloseIcon />
+            </IconButton>
+          </DialogTitle>
+        <DialogContent className={'dialog-content-nomargin'}>
+          <DialogContentText id="state-change-dialog-description" component={'span'}>
+          <span className="confirmation-message">
+              {confirmationMessage}
+            </span>
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <button
+            className={`btn-bottom btn-save btn`}
+            onClick={handleConfirmationContinue}
+          >
+            Continue
+          </button>
+          <button className="btn-bottom btn-cancel" onClick={handleConfirmationClose}>
+            Cancel
+          </button>
+        </DialogActions>
+      </Dialog>
+    </div>
     </div>
   ) : (
     <Loading />
