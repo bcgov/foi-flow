@@ -684,7 +684,7 @@ export const ContactApplicant = ({
             </button>
           </ConditionalComponent> */}
         </Grid>
-        <Grid item xs={3}>
+        <Grid container xs={3} direction="row" justifyContent='flex-end'>
           <TextField
             className="btn addCorrespondence"
             color="primary"
@@ -811,11 +811,10 @@ export const ContactApplicant = ({
         <Grid
           container
           direction="row"
-          justify="flex-start"
-          alignItems="flex-start"
+          justifyContent="flex-end"
           spacing={1}
         >
-          <Grid item xs={7}>
+          <Grid item xs={'auto'}>
           </Grid>          
           <Grid item xs={3}>
             <TextField
@@ -844,7 +843,7 @@ export const ContactApplicant = ({
               ))}
             </TextField>
           </Grid>
-          <Grid item xs={2}>
+          <Grid item xs={'auto'}>
           <CorrespondenceEmail 
             ministryId={ministryId}
             selectedEmails={selectedEmails}
