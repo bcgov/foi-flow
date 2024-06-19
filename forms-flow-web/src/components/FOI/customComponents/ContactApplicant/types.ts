@@ -29,4 +29,5 @@ export type previewParams = {
   handleDraftSave: () => void;
   attachments: Array<any>
   templateInfo: any;
+  enableSend: boolean;
 }

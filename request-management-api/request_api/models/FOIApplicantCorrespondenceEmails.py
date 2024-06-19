@@ -6,6 +6,7 @@ from sqlalchemy.orm import relationship,backref
 from .default_method_result import DefaultMethodResult
 from sqlalchemy.sql.expression import distinct
 from sqlalchemy import or_,and_,text
+import logging
 
 class FOIApplicantCorrespondenceEmail(db.Model):
     # Name of the table in our database
@@ -34,6 +35,24 @@ class FOIApplicantCorrespondenceEmail(db.Model):
         db.session.commit()            
         return DefaultMethodResult(True,'applicant correpondence emails are added', applicantcorrespondenceid)    
 
+    @classmethod
+    def getapplicantcorrespondenceemails(cls,ministryrequestid):
+        correspondence_emails = []
+        try:
+            sql = """select correspondence_to, 
+                        applicantcorrespondence_id, applicantcorrespondence_version  from "FOIApplicantCorrespondenceEmails" fce join "FOIApplicantCorrespondences" fc 
+                        on fce.applicantcorrespondence_id  = fc.applicantcorrespondenceid and fce.applicantcorrespondence_version = fc."version" 
+                        where fc.foiministryrequest_id = :ministryrequestid;""" 
+            rs = db.session.execute(text(sql), {'ministryrequestid': ministryrequestid})
+            for row in rs:
+                correspondence_emails.append({"correspondence_to": row["correspondence_to"], "applicantcorrespondence_id": row["applicantcorrespondence_id"],
+                                            "applicantcorrespondence_version": row["applicantcorrespondence_version"]})
+        except Exception as ex:
+            logging.error(ex)
+            raise ex
+        finally:
+            db.session.close()
+        return correspondence_emails
     
 class FOIApplicantCorrespondenceEmailSchema(ma.Schema):
     class Meta:

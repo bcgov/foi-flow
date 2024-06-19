@@ -11,6 +11,8 @@ import { saveCorrespondenceEmail, fetchCorrespondenceEmailList } from "../../../
 import _ from 'lodash';
 import TextField from "@material-ui/core/TextField";
 
+
+
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
 const MenuProps = {
@@ -39,8 +41,11 @@ const useStyles = makeStyles((theme) => ({
 export default function CorrespondenceEmail({
   ministryId,
   selectedEmails,
-  setSelectedEmails
-}) {    
+  setSelectedEmails,
+  defaultEmail
+}) {   
+  
+    
     const classes = useStyles();
     const dispatch = useDispatch();
     const [newCorrespondenceEmail, setNewCorrespondenceEmail] = React.useState();
@@ -50,19 +55,31 @@ export default function CorrespondenceEmail({
     React.useEffect(() => {  
       dispatch(
         fetchCorrespondenceEmailList(ministryId, (_err, res) => {
-          setRequestemailList(res);
- 
+          setRequestemailList( [{"email": defaultEmail}, ...res]);
         })
-      );
-    },[ministryId])
+      );  
+    },[ministryId, defaultEmail, dispatch])
+
+    const isEmailPresent = (email) => {
+      let hasMatch =false;
+      for (let requestemail of requestemailList) {      
+        if(requestemail.email === email){
+         hasMatch = true;
+         break;
+       }
+      }
+      return hasMatch;
+    }
 
     const handleEmailSave = (e) => {
+      if (newCorrespondenceEmail && !isEmailPresent(newCorrespondenceEmail)) {
       dispatch(
         saveCorrespondenceEmail(ministryId, {"email": newCorrespondenceEmail}, (_err, res) => {
             setRequestemailList((oldArray) => [...oldArray, {"email": newCorrespondenceEmail}]);
             setNewCorrespondenceEmail(""); 
         })
-      );      
+      );
+      }
     }
 
     const handleChange = (event) => {
@@ -110,7 +127,7 @@ export default function CorrespondenceEmail({
     onChange={handleNewCorrespondenceEmailChange}
     />
     <div>
-    <button className="btn-bottom btn-save" onClick={handleEmailSave}>
+    <button className="btn-bottom btn-save" onClick={handleEmailSave} disabled={!newCorrespondenceEmail || isEmailPresent(newCorrespondenceEmail)}>
             Save
     </button>
     </div>
@@ -126,7 +143,7 @@ export default function CorrespondenceEmail({
     return (
       <>
       <div>
-            <div className="foi-watcher-all">
+            <div className="foi-email-all">
                 <button className="foi-eye-container email-correspondence-button"> <i className="fa fa-envelope"></i> Email To</button>
                 <div className="foi-watcher-select">
                     <i className="fa fa-user-o"></i>                    

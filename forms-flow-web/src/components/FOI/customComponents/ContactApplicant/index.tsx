@@ -40,6 +40,8 @@ import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import CloseIcon from '@material-ui/icons/Close';
 
+
+
 export const ContactApplicant = ({
   requestNumber,
   requestState,
@@ -98,6 +100,34 @@ export const ContactApplicant = ({
   const addCorrespondence = () => {
     setShowEditor(true);
     setModal(false);
+    setEditMode(false);
+    setFiles([]);
+    setEditorValue("");
+    setDraftCorrespondence({});
+    setSelectedEmails([]);
+    setCurrentTemplate(0);
+  }
+
+  const  cancelCorrespondence = () => {
+    if (currentTemplate> 0) {
+      setOpenConfirmationModal(true);
+      setConfirmationFor("cancel-correspondence");
+      setConfirmationTitle("Cancel")
+      setConfirmationMessage("Any unsaved changes will be lost.Are you sure you want to proceed? ");
+    } else {
+      setShowEditor(false);
+    }
+  }
+  
+  const  clearcorrespondence = () => {
+    setShowEditor(false);
+    setModal(false);
+    setEditMode(false);
+    setFiles([]);
+    setEditorValue("");
+    setDraftCorrespondence({});
+    setSelectedEmails([]);
+    setCurrentTemplate(0);
   }
 
   const handleConfirmationClose = () => {     
@@ -108,11 +138,13 @@ export const ContactApplicant = ({
   }
 
   const handleConfirmationContinue = () => { 
+    setConfirmationFor("");
+    setConfirmationMessage("");
+    setOpenConfirmationModal(false);
     if (confirmationFor === "delete-draft") {
-        setConfirmationFor("");
-        setConfirmationMessage("");
-        setOpenConfirmationModal(false);
-        deleteDraftAction();
+      deleteDraftAction();
+    } else if (confirmationFor === "cancel-correspondence") {
+      clearcorrespondence();
     }
   }
 
@@ -152,7 +184,8 @@ export const ContactApplicant = ({
   const formHistory: Array<any> = useSelector((state: any) => state.foiRequests.foiRequestCFRFormHistory);
   const approvedForm = formHistory?.find(form => form?.status?.toLowerCase() === 'approved');
   const existingCorrespondence = applicantCorrespondence?.find((correspondence: any) => correspondence?.id === approvedForm?.cfrfeeid)
-  const previewButtonValue = existingCorrespondence ? "Preview & Resend" : "Preview & Send";
+  //const previewButtonValue = existingCorrespondence ? "Preview & Resend" : "Preview & Send";
+  const previewButtonValue = "Preview & Send";
   const [editMode, setEditMode] = useState(false);
   const draftButtonValue = editMode ? "Edit Draft" : "Save Draft";
 
@@ -427,6 +460,7 @@ export const ContactApplicant = ({
     setEditMode(true);
     setShowEditor(true);
     setEditorValue(i.text);
+    setSelectedEmails(i.emails);
     if (i.attachments)
       setFiles(i.attachments);
     setCorrespondenceId(i.applicantcorrespondenceid);
@@ -452,9 +486,10 @@ export const ContactApplicant = ({
     setDisablePreview(true);
     setPreviewModal(false);
     let callback = (_res: string) => {
-      setEditorValue("")
-      setCurrentTemplate(0)
-      setFiles([])
+      setEditorValue("");
+      setCurrentTemplate(0);
+      setFiles([]);
+      setSelectedEmails([]);
       setShowEditor(false)
       setEditMode(false);
       setDraftCorrespondence({});
@@ -473,10 +508,11 @@ export const ContactApplicant = ({
       dispatch,
       callback,
       (errorMessage: string) => {
-        setEditorValue("")
-        setCurrentTemplate(0)
-        setFiles([])
-        setShowEditor(false)
+        setEditorValue("");
+        setCurrentTemplate(0);
+        setFiles([]);
+        setSelectedEmails([]);
+        setShowEditor(false);
         setEditMode(false);
         setDraftCorrespondence({});
         dispatch(fetchApplicantCorrespondence(requestId, ministryId));
@@ -497,8 +533,9 @@ export const ContactApplicant = ({
     const attachments = await saveAttachments(files);
     let callback = (_res: string) => {
       setEditorValue("");
-      setCurrentTemplate(0)
-      setFiles([])
+      setCurrentTemplate(0);
+      setFiles([]);
+      setSelectedEmails([]);
       setShowEditor(false);
       toast.success("Message has been saved to draft successfully", {
         position: "top-right",
@@ -532,7 +569,14 @@ export const ContactApplicant = ({
       dispatch,
       callback,
       (errorMessage: string) => {
-        errorToast(errorMessage)
+        errorToast(errorMessage);
+        setEditorValue("")
+        setCurrentTemplate(0)
+        setFiles([])
+        setShowEditor(false)
+        setEditMode(false);
+        setDraftCorrespondence({});
+        setSelectedEmails([]);
         dispatch(setFOICorrespondenceLoader(false));
       },
     );
@@ -791,6 +835,7 @@ export const ContactApplicant = ({
             ministryId={ministryId}
             selectedEmails={selectedEmails}
             setSelectedEmails={setSelectedEmails}
+            defaultEmail={requestDetails.email}
           />
           </Grid>
         </Grid>
@@ -835,12 +880,22 @@ export const ContactApplicant = ({
               handleDraftSave={saveDraft}
               attachments={files}
               templateInfo={templates[currentTemplate]}
-            />            
+              enableSend={selectedEmails.length > 0}
+            />  
+            <button
+            className="btn addCorrespondence"
+            data-variant="contained" 
+            onClick={cancelCorrespondence}             
+            color="primary"
+          >
+            Cancel
+          </button>          
         <button
           className="btn addCorrespondence"
           data-variant="contained" 
           onClick={ editMode ? editCorrespondence : saveDraft}             
           color="primary"
+          disabled={(currentTemplate <= 0)}
         >
           {draftButtonValue}
         </button>
