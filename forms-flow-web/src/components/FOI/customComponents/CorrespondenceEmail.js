@@ -143,7 +143,7 @@ export default function CorrespondenceEmail({
     return (
       <>
       <div>
-            <div className="foi-watcher-all">
+            <div className="foi-email-all">
                 <button className="foi-eye-container email-correspondence-button"> <i className="fa fa-envelope"></i> Email To</button>
                 <div className="foi-watcher-select">
                     <i className="fa fa-user-o"></i>                    

@@ -98,8 +98,29 @@ export const ContactApplicant = ({
   }
 
   const addCorrespondence = () => {
-    console.log(requestDetails);
     setShowEditor(true);
+    setModal(false);
+    setEditMode(false);
+    setFiles([]);
+    setEditorValue("");
+    setDraftCorrespondence({});
+    setSelectedEmails([]);
+    setCurrentTemplate(0);
+  }
+
+  const  cancelCorrespondence = () => {
+    if (currentTemplate> 0) {
+      setOpenConfirmationModal(true);
+      setConfirmationFor("cancel-correspondence");
+      setConfirmationTitle("Cancel")
+      setConfirmationMessage("Any unsaved changes will be lost.Are you sure you want to proceed? ");
+    } else {
+      setShowEditor(false);
+    }
+  }
+  
+  const  clearcorrespondence = () => {
+    setShowEditor(false);
     setModal(false);
     setEditMode(false);
     setFiles([]);
@@ -117,11 +138,13 @@ export const ContactApplicant = ({
   }
 
   const handleConfirmationContinue = () => { 
+    setConfirmationFor("");
+    setConfirmationMessage("");
+    setOpenConfirmationModal(false);
     if (confirmationFor === "delete-draft") {
-        setConfirmationFor("");
-        setConfirmationMessage("");
-        setOpenConfirmationModal(false);
-        deleteDraftAction();
+      deleteDraftAction();
+    } else if (confirmationFor === "cancel-correspondence") {
+      clearcorrespondence();
     }
   }
 
@@ -463,9 +486,10 @@ export const ContactApplicant = ({
     setDisablePreview(true);
     setPreviewModal(false);
     let callback = (_res: string) => {
-      setEditorValue("")
-      setCurrentTemplate(0)
-      setFiles([])
+      setEditorValue("");
+      setCurrentTemplate(0);
+      setFiles([]);
+      setSelectedEmails([]);
       setShowEditor(false)
       setEditMode(false);
       setDraftCorrespondence({});
@@ -484,10 +508,11 @@ export const ContactApplicant = ({
       dispatch,
       callback,
       (errorMessage: string) => {
-        setEditorValue("")
-        setCurrentTemplate(0)
-        setFiles([])
-        setShowEditor(false)
+        setEditorValue("");
+        setCurrentTemplate(0);
+        setFiles([]);
+        setSelectedEmails([]);
+        setShowEditor(false);
         setEditMode(false);
         setDraftCorrespondence({});
         dispatch(fetchApplicantCorrespondence(requestId, ministryId));
@@ -856,7 +881,15 @@ export const ContactApplicant = ({
               attachments={files}
               templateInfo={templates[currentTemplate]}
               enableSend={selectedEmails.length > 0}
-            />            
+            />  
+            <button
+            className="btn addCorrespondence"
+            data-variant="contained" 
+            onClick={cancelCorrespondence}             
+            color="primary"
+          >
+            Cancel
+          </button>          
         <button
           className="btn addCorrespondence"
           data-variant="contained" 

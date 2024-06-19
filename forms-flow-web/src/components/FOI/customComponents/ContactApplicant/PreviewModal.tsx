@@ -22,7 +22,8 @@ export const PreviewModal = React.memo(({
   innerhtml,
   handleDraftSave,
   attachments,
-  templateInfo
+  templateInfo,
+  enableSend
 }: previewParams) => {
 
   const dispatch = useDispatch();
@@ -96,7 +97,7 @@ export const PreviewModal = React.memo(({
         />
         <button 
         className="btn-bottom btn-save" 
-        disabled={(attachments?.length <= 0)}
+        disabled={!enableSend}
         onClick={handleSend}
         >
           Send Email
