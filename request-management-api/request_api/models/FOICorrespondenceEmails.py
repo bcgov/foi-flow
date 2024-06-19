@@ -36,6 +36,8 @@ class FOICorrespondenceEmail(db.Model):
         query = db.session.query(FOICorrespondenceEmail.email).filter(FOICorrespondenceEmail.foiministryrequest_id == ministryrequestid).order_by(FOICorrespondenceEmail.email.desc()).all()
         return email_schema.dump(query)
     
+    
+    
     @classmethod
     def savecorrespondenceemail(cls,correpondenceemail)->DefaultMethodResult: 
         

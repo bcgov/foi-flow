@@ -2,6 +2,8 @@ from request_api.models.ApplicationCorrespondenceTemplates import ApplicationCor
 from request_api.models.FOIApplicantCorrespondences import FOIApplicantCorrespondence
 from request_api.models.FOIApplicantCorrespondenceAttachments import FOIApplicantCorrespondenceAttachment
 from request_api.models.FOIApplicantCorrespondenceResponses import FOIApplicantCorrespondenceResponse
+from request_api.models.FOIApplicantCorrespondenceEmails import FOIApplicantCorrespondenceEmail
+
 from request_api.models.FOIMinistryRequests import FOIMinistryRequest
 
 import maya
@@ -25,6 +27,7 @@ class applicantcorrespondenceservice:
         """
         _correspondencelogs = FOIApplicantCorrespondence.getapplicantcorrespondences(ministryrequestid)
         _correspondenceattachments = FOIApplicantCorrespondenceAttachment.getcorrespondenceattachmentsbyministryid(ministryrequestid)
+        _correspondenceemails = FOIApplicantCorrespondenceEmail.getapplicantcorrespondenceemails(ministryrequestid)
         correspondencelogs =[]
         for _correpondencelog in _correspondencelogs:
                 attachments = []
@@ -36,12 +39,17 @@ class applicantcorrespondenceservice:
                     }
                     attachments.append(attachment)
                 correpondencelog = self.__createcorrespondencelog(_correpondencelog, attachments)
+                #Email block - Begin
+                correpondencelog['emails'] = self.__getcorrespondenceemailbyid(_correspondenceemails,  _correpondencelog['applicantcorrespondenceid'], _correpondencelog['version'])
+                #Email block - End
                 correspondencelogs.append(correpondencelog)
         return correspondencelogs
     
     def __getattachmentsbyid(self, attachments, correspondenceid, correspondenceversion):
         return [x for x in attachments if x['applicantcorrespondenceid'] == correspondenceid and x['applicantcorrespondence_version'] == correspondenceversion]
 
+    def __getcorrespondenceemailbyid(self, emails, correspondenceid, correspondenceversion):
+        return [x['correspondence_to'] for x in emails if x['applicantcorrespondence_id'] == correspondenceid and x['applicantcorrespondence_version'] == correspondenceversion]
     
     def saveapplicantcorrespondencelog(self, requestid, ministryrequestid, data, userid, isdraft=False):
         applicantcorrespondence = FOIApplicantCorrespondence()
