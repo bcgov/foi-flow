@@ -2864,7 +2864,10 @@ const Attachment = React.memo(
     const classes = useStyles();
     const [disabled, setDisabled] = useState(false);
     const [isRetry, setRetry] = useState(false);
-    const removePersonalTagsFromDivisions = record.attributes?.divisions.filter((division) => {return record.attributes?.personalattributes?.personaltag && division.divisionname != record.attributes?.personalattributes?.personaltag;});
+    const removePersonalTagsFromDivisions = record.attributes?.divisions.filter(
+      (division) => {
+        return !record.attributes?.personalattributes?.personaltag || (record.attributes?.personalattributes?.personaltag && division.divisionname != record.attributes?.personalattributes?.personaltag);
+      });
 
     // useEffect(() => {
     //   if(record && record.filename) {
