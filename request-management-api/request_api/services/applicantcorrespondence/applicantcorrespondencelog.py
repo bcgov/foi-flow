@@ -15,7 +15,10 @@ class applicantcorrespondenceservice:
     def getapplicantcorrespondencetemplates(self):
         """ Returns the active applicant correspondence templates
         """
-        return ApplicationCorrespondenceTemplate.getapplicantcorrespondencetemplates()
+        templates = ApplicationCorrespondenceTemplate.getapplicantcorrespondencetemplates()
+        for template in templates:
+            template["created_at"] = self.__pstformat(template['created_at'])            
+        return templates
     
     def gettemplatebyid(self, templateid):
         """ Returns the active applicant correspondence templates
@@ -156,7 +159,7 @@ class applicantcorrespondenceservice:
         return data, True
 
     def __getvaluefromjson(self, jsonobject, property):
-        return jsonobject[property] if jsonobject is not None else None
+        return jsonobject[property] if jsonobject is not None and property in jsonobject else None
 
     def __pstformat(self, _date):
         return maya.parse(_date).datetime(to_timezone='America/Vancouver', naive=False).strftime('%Y %b %d | %I:%M %p')
