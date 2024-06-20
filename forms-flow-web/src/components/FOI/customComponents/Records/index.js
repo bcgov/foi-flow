@@ -2864,6 +2864,10 @@ const Attachment = React.memo(
     const classes = useStyles();
     const [disabled, setDisabled] = useState(false);
     const [isRetry, setRetry] = useState(false);
+    const removePersonalTagsFromDivisions = record.attributes?.divisions.filter(
+      (division) => {
+        return !record.attributes?.personalattributes?.personaltag || (record.attributes?.personalattributes?.personaltag && division.divisionname != record.attributes?.personalattributes?.personaltag);
+      });
 
     // useEffect(() => {
     //   if(record && record.filename) {
@@ -3061,7 +3065,7 @@ const Attachment = React.memo(
           alignItems="flex-start"
         >
           <Grid item xs={6}>
-            {record.attributes?.divisions.map((division, i) => (
+            {removePersonalTagsFromDivisions.map((division, i) => (
               <Chip
                 item
                 key={i}
@@ -3089,9 +3093,9 @@ const Attachment = React.memo(
                 style={{
                   backgroundColor: "#003366",
                   margin:
-                    record.isattachment && record.attributes?.divisions?.length === 0
+                    record.isattachment && removePersonalTagsFromDivisions.length === 0
                       ? "4px 4px 4px 95px"
-                      : record.attributes?.divisions?.length === 0
+                      : removePersonalTagsFromDivisions.length === 0
                       ? "4px 4px 4px 35px"
                       : "4px",
                 }}
@@ -3128,6 +3132,19 @@ const Attachment = React.memo(
                 item
                 key={record.attributes?.divisions?.length + 4}
                 label={record.attributes.personalattributes.trackingid}
+                size="small"
+                className={clsx(classes.chip, classes.chipPrimary)}
+                style={{
+                  backgroundColor: "#003366",
+                  margin: "4px",
+                }}
+              />
+            }
+            {record.attributes?.personalattributes?.personaltag && 
+              <Chip
+                item
+                key={record.attributes?.divisions?.length + 4}
+                label={record.attributes.personalattributes.personaltag}
                 size="small"
                 className={clsx(classes.chip, classes.chipPrimary)}
                 style={{
