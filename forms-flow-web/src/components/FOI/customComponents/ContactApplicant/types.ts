@@ -4,6 +4,7 @@ export interface Template {
   templateid: number;
   text: string;
   disabled: boolean;
+  created_at: string;
 }
 
 export type params = {  
