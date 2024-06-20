@@ -150,7 +150,7 @@ export const ContactApplicant = ({
 
  
   const [files, setFiles] = useState([]);
-  const [templates, setTemplates] = useState<any[]>([{ value: "", label: "", templateid: null, text: "", disabled: true }]);
+  const [templates, setTemplates] = useState<any[]>([{ value: "", label: "", templateid: null, text: "", disabled: true, created_at:"" }]);
 
   React.useEffect(() => {    
     applicantCorrespondenceTemplates.forEach((item: any) => {
@@ -169,11 +169,11 @@ export const ContactApplicant = ({
                 label: item.description,
                 templateid: item.templateid,
                 text: await new Response(response.data).text(),
-                disabled: false
+                disabled: false,
+                created_at: item.created_at
               }
               setTemplates((oldArray) => [...oldArray, templateItem]);  
-            });
-            
+            });            
           });
         }
       });
@@ -254,10 +254,12 @@ export const ContactApplicant = ({
 
   //When templates are selected from list
   const handleTemplateSelection = (index: number) => {
-    setCurrentTemplate(index)
+    setCurrentTemplate(index);
     const templateVariables = getTemplateVariables(requestDetails, templates[index]);
     const finalTemplate = applyVariables(templates[index].text || "", templateVariables);
-    setEditorValue(finalTemplate)
+    setEditorValue(finalTemplate);
+    changeCorrespondenceFilter("log");
+    
   }
 
   const removeFile = (index: number) => {
@@ -358,11 +360,8 @@ export const ContactApplicant = ({
     setPreviewModal(false);
     const attachments = await saveAttachments(files);
     let callback = (_res: string) => {
-      setEditorValue("")
-      setCurrentTemplate(0)
-      setFiles([])
-      setShowEditor(false)
-      setEditMode(false);
+      clearcorrespondence();
+      changeCorrespondenceFilter("draft");
       toast.success("Message has been saved to draft successfully", {
         position: "top-right",
         autoClose: 3000,
@@ -394,11 +393,8 @@ export const ContactApplicant = ({
       dispatch,
       callback,
       (errorMessage: string) => {
-        setEditorValue("")
-        setCurrentTemplate(0)
-        setFiles([])
-        setShowEditor(false)
-        setEditMode(false);
+        clearcorrespondence();
+        changeCorrespondenceFilter("draft");
         dispatch(fetchApplicantCorrespondence(requestId, ministryId));
       },
     );
@@ -415,11 +411,8 @@ export const ContactApplicant = ({
       setPreviewModal(false);
       const responseattachments = await saveAttachments(_files);
       let callback = (_res: string) => {
-        setEditorValue("")
-        setCurrentTemplate(0)
-        setFiles([])
-        setShowEditor(false)
-        setEditMode(false);
+        clearcorrespondence();
+        changeCorrespondenceFilter("log");
         dispatch(fetchApplicantCorrespondence(requestId, ministryId));
       }
       let data = {
@@ -431,28 +424,19 @@ export const ContactApplicant = ({
         dispatch,
         callback,
         (errorMessage: string) => {
-          setEditorValue("")
-          setCurrentTemplate(0)
-          setFiles([])
-          setShowEditor(false)
-          setEditMode(false);
+          clearcorrespondence();
+          changeCorrespondenceFilter("log");
           dispatch(fetchApplicantCorrespondence(requestId, ministryId));
         },
       );
       setFOICorrespondenceLoader(false);
       setDisablePreview(false);      
     }
-    setModal(false);
-    setEditorValue("")
-    setCurrentTemplate(0)
-    setFiles([])
-    setShowEditor(false)
-    setEditMode(false);
+    clearcorrespondence();
+    changeCorrespondenceFilter("log");
   };
 
-  const editResponse = async () => {
-    
-  }
+
 
   const [correspondenceId, setCorrespondenceId] = useState(0);
 
@@ -486,13 +470,8 @@ export const ContactApplicant = ({
     setDisablePreview(true);
     setPreviewModal(false);
     let callback = (_res: string) => {
-      setEditorValue("");
-      setCurrentTemplate(0);
-      setFiles([]);
-      setSelectedEmails([]);
-      setShowEditor(false)
-      setEditMode(false);
-      setDraftCorrespondence({});
+      clearcorrespondence();
+      changeCorrespondenceFilter("draft");
       toast.success("Draft has been deleted successfully", {
         position: "top-right",
         autoClose: 3000,
@@ -508,13 +487,8 @@ export const ContactApplicant = ({
       dispatch,
       callback,
       (errorMessage: string) => {
-        setEditorValue("");
-        setCurrentTemplate(0);
-        setFiles([]);
-        setSelectedEmails([]);
-        setShowEditor(false);
-        setEditMode(false);
-        setDraftCorrespondence({});
+        clearcorrespondence();
+        changeCorrespondenceFilter("draft");
         dispatch(fetchApplicantCorrespondence(requestId, ministryId));
         setFOICorrespondenceLoader(false);
         setDisablePreview(false);
@@ -532,11 +506,8 @@ export const ContactApplicant = ({
     setPreviewModal(false);
     const attachments = await saveAttachments(files);
     let callback = (_res: string) => {
-      setEditorValue("");
-      setCurrentTemplate(0);
-      setFiles([]);
-      setSelectedEmails([]);
-      setShowEditor(false);
+      clearcorrespondence();
+      changeCorrespondenceFilter("draft");
       toast.success("Message has been saved to draft successfully", {
         position: "top-right",
         autoClose: 3000,
@@ -570,13 +541,8 @@ export const ContactApplicant = ({
       callback,
       (errorMessage: string) => {
         errorToast(errorMessage);
-        setEditorValue("")
-        setCurrentTemplate(0)
-        setFiles([])
-        setShowEditor(false)
-        setEditMode(false);
-        setDraftCorrespondence({});
-        setSelectedEmails([]);
+        clearcorrespondence();
+        changeCorrespondenceFilter("draft");
         dispatch(setFOICorrespondenceLoader(false));
       },
     );
@@ -627,6 +593,7 @@ export const ContactApplicant = ({
   let templatesList;
   const parser = new DOMParser();
   let templateListItems = templates.map((template: any, index: any) => {
+    if (template.label !== "") {
     let lastItemInList = false
     if (templates.length === index + 1) lastItemInList = true;
     const htmlEmail = parser.parseFromString(template.text, 'text/html');
@@ -643,15 +610,16 @@ export const ContactApplicant = ({
         key={template.value}
       >
         <Grid container spacing={2}>
-          <Grid item xs={4}>
+          <Grid item xs={8}>
             <ListItemText primary={template.label}/>
           </Grid>
-          <Grid item xs={8}>
-            <ListItemText secondary={htmlEmailText?.slice(0,300) + ellipses} />
+          <Grid item xs={4}>
+          <ListItemText secondary={template.created_at}/>
           </Grid>
         </Grid>
       </ListItem>
       )
+      }
     })
   templatesList = (
     <List>
