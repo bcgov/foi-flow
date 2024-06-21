@@ -18,6 +18,10 @@ class templateconfig:
             return "fee_payment_confirmation_outstanding.html"
         elif key == "OIPCAPPLICANTCONSENTEXTENSION":
             return "oipc_applicant_consent_time_extension.html"
+        elif key == "OIPCFIRSTTIMEEXTENSION":
+            return "oipc_first_time_extension.html"
+        elif key == "OIPCSUBSEQUENTTIMEEXTENSION":
+            return "oipc_subsequent_time_extension.html"
         else:
             logging.info("Unknown key")
             return None
