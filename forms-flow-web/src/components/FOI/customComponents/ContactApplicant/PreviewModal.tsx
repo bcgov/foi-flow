@@ -20,7 +20,7 @@ export const PreviewModal = React.memo(({
   handleClose,
   handleSave,
   innerhtml,
-  handleDraftSave,
+  handleExport,
   attachments,
   templateInfo,
   enableSend
@@ -92,7 +92,7 @@ export const PreviewModal = React.memo(({
       </DialogContent>
       <DialogActions>
         <EmailExport 
-          handleDraftSave={handleDraftSave}
+          handleExport={handleExport}
           content={innerhtml}
         />
         <button 
