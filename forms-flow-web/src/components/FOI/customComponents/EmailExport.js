@@ -10,16 +10,15 @@ import { downloadZip } from "client-zip";
 import { useDispatch } from "react-redux";
 import * as html2pdf from 'html-to-pdf-js';
 import { toast } from "react-toastify";
-
-
-const EmailExport = ({handleDraftSave, content}) => {
+import {useSelector } from "react-redux";
+import {formatDate, formatDateInPst } from "../../../helper/FOI/helper";
+const EmailExport = ({handleExport, content}) => {
 
   const dispatch = useDispatch();
-  
+  const user = useSelector((reduxState) => reduxState.user.userDetail);
 
   const download = async () => {
-    const attachments = await handleDraftSave();
-    console.log(attachments);
+    const attachments = await handleExport();
     let fileInfoList = attachments.map(attachment => {
       return  {
         filename: attachment.filename,
@@ -50,7 +49,7 @@ const EmailExport = ({handleDraftSave, content}) => {
             draggable: true,
             progress: undefined,
           }); 
-          saveAs(zipfile, "test" + " " + ".zip");
+          saveAs(zipfile, user?.preferred_username + " | " + formatDateInPst(new Date(), "yyyy MMM dd | hh:mm aa") + ".zip");
         });
   }
 

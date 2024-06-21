@@ -301,16 +301,14 @@ export const ContactApplicant = ({
     return attachments
   }
 
-  const save = async (emailContent: string) => {
+  const save = async (emailContent: string, skiptoast=false) => {
     setDisablePreview(true);
     setPreviewModal(false);
     const attachments = await saveAttachments(files);
     let callback = (_res: string) => {
-      setEditorValue("")
-      setCurrentTemplate(0)
-      setFiles([])
-      setShowEditor(false)
-      toast.success("Message has been sent to applicant successfully", {
+      clearcorrespondence();
+      if (!skiptoast) {
+        toast.success("Message has been sent to applicant successfully", {
         position: "top-right",
         autoClose: 3000,
         hideProgressBar: true,
@@ -319,6 +317,7 @@ export const ContactApplicant = ({
         draggable: true,
         progress: undefined,
       });
+    }
       dispatch(fetchApplicantCorrespondence(requestId, ministryId));
     }
     const templateId = currentTemplate ? templates[currentTemplate as keyof typeof templates].templateid : null;
@@ -345,7 +344,8 @@ export const ContactApplicant = ({
       dispatch,
       callback,
       (errorMessage: string) => {
-        errorToast(errorMessage)
+        errorToast(errorMessage);
+        clearcorrespondence();
         dispatch(setFOICorrespondenceLoader(false));
       },
     );
@@ -353,7 +353,7 @@ export const ContactApplicant = ({
     setDisablePreview(false);
   };
 
- 
+  
 
   const saveDraft = async () => {
     setDisablePreview(true);
@@ -396,6 +396,49 @@ export const ContactApplicant = ({
         clearcorrespondence();
         changeCorrespondenceFilter("draft");
         dispatch(fetchApplicantCorrespondence(requestId, ministryId));
+      },
+    );
+    setFOICorrespondenceLoader(false);
+    setDisablePreview(false);
+    return attachments;
+  };
+
+  const saveExport = async () => {
+    setDisablePreview(true);
+    setPreviewModal(false);
+    const attachments = await saveAttachments(files);
+    let callback = (_res: string) => {
+      clearcorrespondence();
+      changeCorrespondenceFilter("log");      
+      dispatch(fetchApplicantCorrespondence(requestId, ministryId));
+    }
+    const templateId = currentTemplate ? templates[currentTemplate as keyof typeof templates].templateid : null;
+    const type = (templateId && [1, 2].includes(templateId)) ? "CFRFee" : "";
+    let data = {
+      templateid: currentTemplate ? templates[currentTemplate as keyof typeof templates].templateid : null,
+      correspondencemessagejson: JSON.stringify({
+        "emailhtml": editorValue,
+        "id": approvedForm?.cfrfeeid,
+        "type": type
+      }),
+      foiministryrequest_id: ministryId,
+      attachments: attachments,
+      emails: [],
+      attributes: [{ 
+        "paymentExpiryDate": dueDateCalculation(new Date(), PAYMENT_EXPIRY_DAYS),
+        "axisRequestId": requestNumber
+      }]
+    };
+    saveEmailCorrespondence(
+      data,
+      requestId,
+      ministryId,
+      dispatch,
+      callback,
+      (errorMessage: string) => {
+        errorToast(errorMessage);
+        clearcorrespondence();
+        dispatch(setFOICorrespondenceLoader(false));
       },
     );
     setFOICorrespondenceLoader(false);
@@ -858,7 +901,7 @@ export const ContactApplicant = ({
               handleClose={handlePreviewClose}
               handleSave={save}
               innerhtml={editorValue}
-              handleDraftSave={saveDraft}
+              handleExport={saveExport}
               attachments={files}
               templateInfo={templates[currentTemplate]}
               enableSend={selectedEmails.length > 0}
@@ -915,7 +958,7 @@ export const ContactApplicant = ({
       <AttachmentModal
       modalFor={"add"}
       openModal={openModal}
-      handleModal={uploadFor == "response" ? saveResponse : handleContinueModal}
+      handleModal={uploadFor === "response" ? saveResponse : handleContinueModal}
       multipleFiles={true}
       requestNumber={requestNumber}
       requestId={requestId}
@@ -926,7 +969,7 @@ export const ContactApplicant = ({
       handleReclassify={undefined}
       isMinistryCoordinator={false}
       uploadFor={uploadFor}
-      maxNoFiles={10}
+      maxNoFiles={uploadFor === "response" ? 1 : 10}
       bcgovcode={undefined}
     /> 
     <div className="email-change-dialog">
