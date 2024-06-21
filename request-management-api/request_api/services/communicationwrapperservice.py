@@ -25,8 +25,11 @@ class communicationwrapperservice:
             if self.__is_fee_processing(applicantcorrespondencelog["templateid"]) == True:
                 return self.__handle_fee_email(requestid, ministryrequestid, applicantcorrespondencelog)
             else:
-                template = applicantcorrespondenceservice().gettemplatebyid(applicantcorrespondencelog["templateid"])
-                return communicationemailservice().send(template, applicantcorrespondencelog)
+                if "emails" in applicantcorrespondencelog and len(applicantcorrespondencelog["emails"]) > 0:
+                    template = applicantcorrespondenceservice().gettemplatebyid(applicantcorrespondencelog["templateid"])
+                    return communicationemailservice().send(template, applicantcorrespondencelog)    
+                return result
+                
 
 
 
