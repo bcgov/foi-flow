@@ -120,3 +120,6 @@ datamigrations/FOIMOD.CFD.ConsoleApp.DocMigration/FOIMOD.CFD.DocMigration.OCR.Te
 datamigrations/FOIMOD.CFD.ConsoleApp.DocMigration/FOIMOD.CFD.DocMigration.OCR.Tests/bin/*
 /datamigrations/FOIMOD.CFD.ConsoleApp.DocMigration/FOIMOD.CFD.DocMigration.Utils.UnitTests/appsettings.dev.json
 historical-search-api/env/*
+datamigrations/FOIMOD.AXIS.DocumentMigration/*/bin/*
+datamigrations/FOIMOD.AXIS.DocumentMigration/*/obj/*
+datamigrations/FOIMOD.AXIS.DocumentMigration/.vs/*
