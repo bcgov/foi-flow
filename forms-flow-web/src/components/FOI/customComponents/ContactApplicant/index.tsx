@@ -17,7 +17,7 @@ import SearchIcon from "@material-ui/icons/Search";
 import InputBase from "@mui/material/InputBase";
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
-import CommentStructure from '../Comments/CommentStructure'
+import CommunicationStructure from './CommunicationStructure'
 import AttachmentModal from '../Attachments/AttachmentModal';
 import { getOSSHeaderDetails, saveFilesinS3, getFileFromS3 } from "../../../../apiManager/services/FOI/foiOSSServices";
 import { dueDateCalculation } from '../../FOIRequest/BottomButtonGroup/utils';
@@ -39,6 +39,7 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import CloseIcon from '@material-ui/icons/Close';
+import {  saveNewFilename } from "../../../../apiManager/services/FOI/foiAttachmentServices";
 
 
 
@@ -56,6 +57,7 @@ export const ContactApplicant = ({
   const currentCFRForm: any = useSelector((state: any) => state.foiRequests.foiRequestCFRForm);
   const isLoading: boolean = useSelector((state: any) => state.foiRequests.isCorrespondenceLoading);
   const fullNameList = getFullnameList()
+  const [modalFor, setModalFor] = useState("add")
 
   const getFullname = (userid: string) => {
     let user = fullNameList.find((u: any) => u.username === userid);
@@ -82,6 +84,7 @@ export const ContactApplicant = ({
   const [confirmationTitle, setConfirmationTitle] = useState("");
   const [confirmationMessage, setConfirmationMessage] = useState("");
   const [draftCorrespondence, setDraftCorrespondence] = useState <any> ({});
+  const [extension, setExtension] = useState("");
 
   const openAttachmentModal = () => { 
     setUploadFor("email");
@@ -93,6 +96,7 @@ export const ContactApplicant = ({
     setEditorValue("")
     setCurrentTemplate(0)
     setUploadFor("response");
+    setModalFor("add");
     setModal(true);  
     setShowEditor(false);  
   }
@@ -584,7 +588,21 @@ export const ContactApplicant = ({
     setDisablePreview(false);
     return attachments;
   };
+  const [updateAttachment, setUpdateAttachment] = useState<any>({});
 
+  const handleRename = (_attachment: any, newFilename: string) => {
+    setModal(false);
+
+    if (updateAttachment.filename !== newFilename) {
+      const documentId = ministryId ? ministryId : updateAttachment.foiministrydocumentid? updateAttachment.foiministrydocumentid: updateAttachment.foidocumentid;
+      dispatch(saveNewFilename(newFilename, documentId, requestId, ministryId, (err:any, _res:any) => {
+        console.log("SAVED TO BE")
+        // if (!err) {
+        //   setAttachmentLoading(false);
+        // }
+      }));
+    }
+  }
 
   const [showEditor, setShowEditor] = useState(false)
 
@@ -607,7 +625,7 @@ export const ContactApplicant = ({
       data-msgid={index}
       style={{ display: 'block' }}
     >
-      <CommentStructure
+      <CommunicationStructure
         i={message}
         reply={false}
         parentId={null}
@@ -620,9 +638,15 @@ export const ContactApplicant = ({
         ministryId={ministryId}
         editDraft={editDraft}
         deleteDraft={deleteDraft}
+        modalFor={modalFor}
+        setModalFor={setModalFor}
+        setModal={setModal}
+        setUpdateAttachment={setUpdateAttachment}
       />
     </div>
   ))
+  console.log("modalFor",modalFor)
+
 
   let templatesList;
   const parser = new DOMParser();
@@ -946,7 +970,7 @@ export const ContactApplicant = ({
         {correspondenceFilter === "templates" && templatesList}
       </div>
       <AttachmentModal
-      modalFor={"add"}
+      modalFor={modalFor}
       openModal={openModal}
       handleModal={uploadFor == "response" ? saveResponse : handleContinueModal}
       multipleFiles={true}
@@ -954,8 +978,8 @@ export const ContactApplicant = ({
       requestId={requestId}
       attachmentsArray={files}
       existingDocuments={files}
-      attachment={{}}
-      handleRename={undefined}
+      attachment={updateAttachment}//{{}}
+      handleRename= {handleRename} //{undefined}
       handleReclassify={undefined}
       isMinistryCoordinator={false}
       uploadFor={uploadFor}
