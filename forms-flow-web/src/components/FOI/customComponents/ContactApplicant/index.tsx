@@ -906,6 +906,7 @@ export const ContactApplicant = ({
           </span>
           <span className="ql-formats">
             <button className="ql-link" />
+            <button className="ql-image" />
           </span>
           <div className="previewEmail">
             <PreviewModal
