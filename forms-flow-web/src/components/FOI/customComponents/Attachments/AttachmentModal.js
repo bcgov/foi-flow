@@ -480,12 +480,16 @@ export default function AttachmentModal({
       return false;
     } else if (files.length === 0 && existingDocuments.length === 0) {
       return true;
+    } else if (uploadFor === "response" && (files.length > 1 ||  existingDocuments.length > 1)) {
+      return true;
     } else if (modalFor === "add") {
       return tagValue === "";
     } else if (modalFor === "replace" || modalFor === "replaceattachment") {
       return false;
     }
   };
+
+ 
 
   const MCFSections = useSelector(
     (state) => state.foiRequests.foiPersonalSections

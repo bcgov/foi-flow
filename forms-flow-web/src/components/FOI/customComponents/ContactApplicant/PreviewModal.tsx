@@ -20,7 +20,7 @@ export const PreviewModal = React.memo(({
   handleClose,
   handleSave,
   innerhtml,
-  handleDraftSave,
+  handleExport,
   attachments,
   templateInfo,
   enableSend
@@ -30,6 +30,7 @@ export const PreviewModal = React.memo(({
 
   //gets the request detail from the store
   const requestDetails: any = useSelector((state: any) => state.foiRequests.foiRequestDetail);
+  const requestExtensions: any = useSelector((state: any) => state.foiRequests.foiRequestExtesions);
 
   //get template
   const rootpath = OSS_S3_BUCKET_FULL_PATH
@@ -52,7 +53,7 @@ export const PreviewModal = React.memo(({
     });
   }, []);
   requestDetails["ffaurl"] = FOI_FFA_URL;
-  const templateVariables = getTemplateVariables(requestDetails, templateInfo);
+  const templateVariables = getTemplateVariables(requestDetails, requestExtensions, templateInfo);
   const handleSend = () => {
     handleSave( applyVariables(innerhtml, templateVariables) );
   };
@@ -92,7 +93,7 @@ export const PreviewModal = React.memo(({
       </DialogContent>
       <DialogActions>
         <EmailExport 
-          handleDraftSave={handleDraftSave}
+          handleExport={handleExport}
           content={innerhtml}
         />
         <button 

@@ -60,6 +60,16 @@
     padding-left: 16px;
 }
 
+.foi-email-select {
+    padding-top: 8px; 
+    width: 100px;
+    height: 40px;
+    background-color:#003366;
+    color: white;
+    border-radius: 0px 40px 40px 0;
+    padding-left: 16px;
+}
+
 .foi-eye {
     padding-left: 6px;
 }
@@ -73,5 +83,9 @@
 }
 
 #foi-watcher-label {
+    display: none;
+}
+
+#foi-email-label {
     display: none;
 }
