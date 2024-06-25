@@ -36,6 +36,26 @@ class OperatingTeamEmail(db.Model):
             db.session.close()
         return emails
 
+    @classmethod
+    def getoperatingteamemail(cls, operatingteamname):
+        try:
+            sql = """
+                SELECT email_address FROM public."OperatingTeamEmails" em
+                    JOIN public."OperatingTeams" op
+                    ON em.teamid = op.teamid
+                WHERE em.isactive = true and op.name = :operatingteamname
+                ORDER BY emailid ASC
+            """
+            rs = db.session.execute(text(sql), {'operatingteamname': operatingteamname})
+            for row in rs:
+                email = row["email_address"]
+        except Exception as ex:
+            logging.error(ex)
+            raise ex
+        finally:
+            db.session.close()
+        return email
+
 class OperatingTeamEmailSchema(ma.Schema):
     class Meta:
         fields = ('emailid', 'email_address', 'isactive','created_at','updated_at', 'teamid')

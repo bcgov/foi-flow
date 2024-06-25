@@ -37,18 +37,11 @@ class senderservice:
     def send_by_request(self, subject, content, _messageattachmentlist, requestjson):
         return self.send(subject, content, _messageattachmentlist, requestjson["email"])
 
-    def send(self, subject, content, _messageattachmentlist, emails):
+    def send(self, subject, content, _messageattachmentlist, emails, from_email):
         logging.debug("Begin: Send email for request ")
-        operating_team_emails = OperatingTeamEmail.getalloperatingteamemails()
-        usergroups = AuthHelper.getusergroups()
         msg = MIMEMultipart()
 
-        for email in operating_team_emails:
-            if email['name'] in usergroups:
-                msg['From'] = email['email']
-        if msg.get('From') is None:
-            msg['From'] = MAIL_FROM_ADDRESS
-
+        msg['From'] = from_email
         msg['To'] = ",".join(emails)
         msg['Subject'] = subject
         part = MIMEText(content, "html")
