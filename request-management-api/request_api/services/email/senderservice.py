@@ -15,6 +15,8 @@ import email
 import json
 from request_api.services.external.storageservice import storageservice
 from request_api.models.default_method_result import DefaultMethodResult
+from request_api.auth import AuthHelper
+from request_api.models.OperatingTeamEmails import OperatingTeamEmail
 
 
 MAIL_SERVER_SMTP = os.getenv('EMAIL_SERVER_SMTP')
@@ -37,9 +39,16 @@ class senderservice:
 
     def send(self, subject, content, _messageattachmentlist, emails):
         logging.debug("Begin: Send email for request ")
-        
+        operating_team_emails = OperatingTeamEmail.getalloperatingteamemails()
+        usergroups = AuthHelper.getusergroups()
         msg = MIMEMultipart()
-        msg['From'] = MAIL_FROM_ADDRESS
+
+        for email in operating_team_emails:
+            if email['name'] in usergroups:
+                msg['From'] = email['email']
+        if msg.get('From') is None:
+            msg['From'] = MAIL_FROM_ADDRESS
+
         msg['To'] = ",".join(emails)
         msg['Subject'] = subject
         part = MIMEText(content, "html")
