@@ -15,9 +15,6 @@ import email
 import json
 from request_api.services.external.storageservice import storageservice
 from request_api.models.default_method_result import DefaultMethodResult
-from request_api.auth import AuthHelper
-from request_api.models.OperatingTeamEmails import OperatingTeamEmail
-
 
 MAIL_SERVER_SMTP = os.getenv('EMAIL_SERVER_SMTP')
 MAIL_SERVER_SMTP_PORT = os.getenv('EMAIL_SERVER_SMTP_PORT')
