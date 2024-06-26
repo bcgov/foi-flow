@@ -336,7 +336,7 @@ export const ContactApplicant = ({
     let data = {
       templateid: currentTemplate ? templates[currentTemplate as keyof typeof templates].templateid : null,
       correspondencemessagejson: JSON.stringify({
-        "emailhtml": editorValue,
+        "emailhtml": emailContent,
         "id": approvedForm?.cfrfeeid,
         "type": type
       }),
