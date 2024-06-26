@@ -19,7 +19,7 @@ class communicationwrapperservice:
 
     """
     
-    def send_email(self,requestid, ministryrequestid, applicantcorrespondencelog, from_email):
+    def send_email(self,requestid, ministryrequestid, applicantcorrespondencelog):
         result = applicantcorrespondenceservice().saveapplicantcorrespondencelog(requestid, ministryrequestid, applicantcorrespondencelog, AuthHelper.getuserid())
         if result.success == True:
             if self.__is_fee_processing(applicantcorrespondencelog["templateid"]) == True:
@@ -27,7 +27,7 @@ class communicationwrapperservice:
             else:
                 if "emails" in applicantcorrespondencelog and len(applicantcorrespondencelog["emails"]) > 0:
                     template = applicantcorrespondenceservice().gettemplatebyid(applicantcorrespondencelog["templateid"])
-                    return communicationemailservice().send(template, applicantcorrespondencelog, from_email)
+                    return communicationemailservice().send(template, applicantcorrespondencelog)
                 return result
                 
 

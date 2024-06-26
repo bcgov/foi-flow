@@ -34,9 +34,11 @@ class senderservice:
     def send_by_request(self, subject, content, _messageattachmentlist, requestjson):
         return self.send(subject, content, _messageattachmentlist, requestjson["email"])
 
-    def send(self, subject, content, _messageattachmentlist, emails, from_email):
+    def send(self, subject, content, _messageattachmentlist, emails, from_email = None):
         logging.debug("Begin: Send email for request ")
         msg = MIMEMultipart()
+        if from_email is None:
+            from_email = MAIL_FROM_ADDRESS
 
         msg['From'] = from_email
         msg['To'] = ",".join(emails)
