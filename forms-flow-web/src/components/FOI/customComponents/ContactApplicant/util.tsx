@@ -13,46 +13,6 @@ export const applyVariables = (content: string, params: Array<any>) => {
 
   return newContent;
 }
-// Function to map extension reason id to its textual representation
-const mapSectionWithExtensionReasonId = (extensionReasonId: number) => {
-  switch (extensionReasonId) {
-      case 6:
-          return "10(1)(d)"; // 10(1)(d) = Applicant Consent
-      case 7:
-          return "10(1)(c)"; // 10(1)(c) = Consultation
-      case 8:
-          return "10(1)(a)"; // 10(1)(a) = Further detail from applicant required
-      case 9:
-          return "10(1)(b)"; // 10(1)(b) = Large Volume and/or Volume of Search
-      default:
-          return "";
-  }
-};
-
-// List of reasons to check already taken a time extension under section 10(1)
-const reasonsToCheck = [
-  "OIPC - Applicant Consent",
-  "OIPC - Consultation",
-  "OIPC - Further Detail from Applicant Required",
-  "OIPC - Large Volume and/or Volume of Search"
-];
-
-// Find the record that matches the criteria for already taken a time extension under section 10(1), excluding the most recent record.
-const findLatestMatchingTimeExtension = (requestExtensions: any[], reasonsToCheck: string[]): any | null => {
-  const foundObject = requestExtensions
-      .filter(extension => extension.extensiontype === "OIPC" && reasonsToCheck.includes(extension.extensionreson) && extension !== requestExtensions[0])
-      .find(extension => reasonsToCheck.includes(extension.extensionreson)) || null;
-
-  return foundObject;
-};
-
-// Function to check and return "Yes" or "No"
-const isAlreadyTakenTimeExtension = (result: any | null): string => {
-  return result === null ? "No" : "Yes";
-};
-
-// Check if there are any OIPC details.
-const oipcComplaintCheck = (oipcdetails: any): string => oipcdetails && oipcdetails.length > 0 ? "Yes" : "No";
 
 export const getExtensiondetails = (requestExtensions:any, type: string) => {
     if (requestExtensions && requestExtensions.length >0) {
@@ -114,3 +74,44 @@ export const isTemplateDisabled = (currentCFRForm: any, template: any) => {
   }
   return false
 }
+
+// Function to map extension reason id to its textual representation
+const mapSectionWithExtensionReasonId = (extensionReasonId: number) => {
+  switch (extensionReasonId) {
+      case 6:
+          return "10(1)(d)"; // 10(1)(d) = Applicant Consent
+      case 7:
+          return "10(1)(c)"; // 10(1)(c) = Consultation
+      case 8:
+          return "10(1)(a)"; // 10(1)(a) = Further detail from applicant required
+      case 9:
+          return "10(1)(b)"; // 10(1)(b) = Large Volume and/or Volume of Search
+      default:
+          return "";
+  }
+};
+
+// List of reasons to check already taken a time extension under section 10(1)
+const reasonsToCheck = [
+  "OIPC - Applicant Consent",
+  "OIPC - Consultation",
+  "OIPC - Further Detail from Applicant Required",
+  "OIPC - Large Volume and/or Volume of Search"
+];
+
+// Find the record that matches the criteria for already taken a time extension under section 10(1), excluding the most recent record.
+const findLatestMatchingTimeExtension = (requestExtensions: any[], reasonsToCheck: string[]): any | null => {
+  const foundObject = requestExtensions
+      .filter(extension => extension.extensiontype === "OIPC" && reasonsToCheck.includes(extension.extensionreson) && extension !== requestExtensions[0])
+      .find(extension => reasonsToCheck.includes(extension.extensionreson)) || null;
+
+  return foundObject;
+};
+
+// Function to check and return "Yes" or "No"
+const isAlreadyTakenTimeExtension = (result: any | null): string => {
+  return result === null ? "No" : "Yes";
+};
+
+// Check if there are any OIPC details.
+const oipcComplaintCheck = (oipcdetails: any): string => oipcdetails && oipcdetails.length > 0 ? "Yes" : "No";
