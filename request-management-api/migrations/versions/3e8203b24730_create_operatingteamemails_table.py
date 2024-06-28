@@ -1,7 +1,7 @@
 """Create OperatingTeamEmails table
 
 Revision ID: 3e8203b24730
-Revises: c3e447d3d94d
+Revises: dc99ffc3a6f7
 Create Date: 2024-06-20 15:43:52.554964
 
 """
@@ -12,7 +12,7 @@ from datetime import datetime
 
 # revision identifiers, used by Alembic.
 revision = '3e8203b24730'
-down_revision = 'c3e447d3d94d'
+down_revision = 'dc99ffc3a6f7'
 branch_labels = None
 depends_on = None
 
