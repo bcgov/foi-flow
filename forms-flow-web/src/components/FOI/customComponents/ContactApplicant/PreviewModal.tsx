@@ -94,10 +94,13 @@ export const PreviewModal = React.memo(({
         </DialogContentText>
       </DialogContent>
       <DialogActions>
+      { !enableSend && 
         <EmailExport 
           handleExport={handleExport}
           content={innerhtml}
         />
+      }
+      { enableSend && 
         <button 
         className="btn-bottom btn-save" 
         disabled={!enableSend}
@@ -105,6 +108,7 @@ export const PreviewModal = React.memo(({
         >
           Send Email
         </button>
+      }
         <button className="btn-bottom btn-cancel" onClick={handleClose}>
           Cancel
         </button>
