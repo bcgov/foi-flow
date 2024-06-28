@@ -43,16 +43,10 @@ class communicationwrapperservice:
                 paymentservice().createpayment(requestid, ministryrequestid, _attributes, AuthHelper.getuserid())
         return requestservice().postcorrespondenceeventtoworkflow(requestid, ministryrequestid, result.identifier, applicantcorrespondencelog['attributes'], applicantcorrespondencelog['templateid'])
 
-
-
-    def __get_templatetype(self):
-        return None
-
     def __is_fee_processing(self, templateid):
-        if templateid in [0]:
+        if applicantcorrespondenceservice().gettemplatebyid(templateid) in ['PAYONLINE','PAYOUTSTANDING']:
             return True
         return False
-    
 
 class CommuniationType(Enum):
     """Communication types."""

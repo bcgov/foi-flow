@@ -26,7 +26,7 @@ import { PreviewModal } from './PreviewModal';
 import { OSS_S3_BUCKET_FULL_PATH } from "../../../../constants/constants";
 import Loading from "../../../../containers/Loading";
 import {setFOICorrespondenceLoader} from "../../../../actions/FOI/foiRequestActions";
-import { applyVariables, getTemplateVariables, isTemplateDisabled } from './util';
+import { applyVariables, getTemplateVariables, isFeeTemplateDisabled, getExtensionType } from './util';
 import { StateEnum } from '../../../../constants/FOI/statusEnum';
 import CustomizedTooltip from '../Tooltip/MuiTooltip/Tooltip';
 import { CorrespondenceEmail } from '../../../FOI/customComponents';
@@ -148,12 +148,43 @@ export const ContactApplicant = ({
     }
   }
 
- 
+  const formHistory: Array<any> = useSelector((state: any) => state.foiRequests.foiRequestCFRFormHistory);
+  const approvedForm = formHistory?.find(form => form?.status?.toLowerCase() === 'approved');
+  const existingCorrespondence = applicantCorrespondence?.find((correspondence: any) => correspondence?.id === approvedForm?.cfrfeeid)
+  //const previewButtonValue = existingCorrespondence ? "Preview & Resend" : "Preview & Send";
+  const previewButtonValue = "Preview & Send";
+  const [editMode, setEditMode] = useState(false);
+  const draftButtonValue = editMode ? "Edit Draft" : "Save Draft";
+
+  const requestDetails: any = useSelector((state: any) => state.foiRequests.foiRequestDetail);
+  const requestExtensions: any = useSelector((state: any) => state.foiRequests.foiRequestExtesions);
+
   const [files, setFiles] = useState([]);
   const [templates, setTemplates] = useState<any[]>([{ value: "", label: "", templateid: null, text: "", disabled: true, created_at:"" }]);
 
+  const isEnabledTemplate = (item: any) => {
+   if (['PAYONLINE', 'PAYOUTSTANDING'].includes(item.name)) { 
+      return !isFeeTemplateDisabled(currentCFRForm, item); 
+   } else if (['EXTENSIONS-PB'].includes(item.name)) {
+      return getExtensionType(requestExtensions) === "PB";
+   } else if (['OIPCAPPLICANTCONSENTEXTENSION', 'OIPCFIRSTTIMEEXTENSION','OIPCSUBSEQUENTTIMEEXTENSION'].includes(item.name)) {
+      return getExtensionType(requestExtensions) === "OIPC";
+  }
+  }
+
+  const isduplicate = (item: string) => {
+    for(const element of templates) {
+      if (element.value === item) {
+          return true;
+          }
+      }
+      return false;
+  }
+
   React.useEffect(() => {    
     applicantCorrespondenceTemplates.forEach((item: any) => {
+      setTemplates([{ value: "", label: "", templateid: null, text: "", disabled: true, created_at:"" }]);
+      if (isEnabledTemplate(item)) {
       const rootpath = OSS_S3_BUCKET_FULL_PATH
       const fileInfoList = [{
         filename: item.name,
@@ -172,24 +203,17 @@ export const ContactApplicant = ({
                 disabled: false,
                 created_at: item.created_at
               }
+              if (!isduplicate(item.name)) {
               setTemplates((oldArray) => [...oldArray, templateItem]);  
+              }
             });            
           });
         }
       });
-      
+    }
     });
-  }, [applicantCorrespondenceTemplates, dispatch]);
+  }, [applicantCorrespondenceTemplates, requestExtensions, dispatch]);
 
-  const formHistory: Array<any> = useSelector((state: any) => state.foiRequests.foiRequestCFRFormHistory);
-  const approvedForm = formHistory?.find(form => form?.status?.toLowerCase() === 'approved');
-  const existingCorrespondence = applicantCorrespondence?.find((correspondence: any) => correspondence?.id === approvedForm?.cfrfeeid)
-  //const previewButtonValue = existingCorrespondence ? "Preview & Resend" : "Preview & Send";
-  const previewButtonValue = "Preview & Send";
-  const [editMode, setEditMode] = useState(false);
-  const draftButtonValue = editMode ? "Edit Draft" : "Save Draft";
-
-  const requestDetails: any = useSelector((state: any) => state.foiRequests.foiRequestDetail);
 
   const [messages, setMessages] = useState(applicantCorrespondence);
   const [uploadFor, setUploadFor] = useState("email");
@@ -247,7 +271,7 @@ export const ContactApplicant = ({
 
   const handleTemplateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setCurrentTemplate(+e.target.value)
-    const templateVariables = getTemplateVariables(requestDetails, templates[+e.target.value]);
+    const templateVariables = getTemplateVariables(requestDetails, requestExtensions, templates[+e.target.value]);
     const finalTemplate = applyVariables(templates[+e.target.value].text || "", templateVariables);
     setEditorValue(finalTemplate)
   }
@@ -255,7 +279,7 @@ export const ContactApplicant = ({
   //When templates are selected from list
   const handleTemplateSelection = (index: number) => {
     setCurrentTemplate(index);
-    const templateVariables = getTemplateVariables(requestDetails, templates[index]);
+    const templateVariables = getTemplateVariables(requestDetails,requestExtensions, templates[index]);
     const finalTemplate = applyVariables(templates[index].text || "", templateVariables);
     setEditorValue(finalTemplate);
     changeCorrespondenceFilter("log");
@@ -267,9 +291,19 @@ export const ContactApplicant = ({
   }
 
   const onFilterChange = (filterValue: string) => {
-    let _filteredMessages = filterValue === "" ? applicantCorrespondence : applicantCorrespondence.filter((c: any) => c.text.toLowerCase().indexOf(filterValue.toLowerCase()) > -1)
-    setMessages(_filteredMessages)
-  }
+    
+    if(filterValue === "") {
+      setMessages(applicantCorrespondence);
+    } else{
+      let _filteredMessages = applicantCorrespondence.filter((corr: any) => {
+        if(corr.text && corr.text.indexOf(filterValue) >= 0) {
+          return corr;
+        } 
+      })
+      setMessages(_filteredMessages);
+      
+    }
+ }
 
   const saveAttachments = async (attachmentfiles: any) => {
     const fileInfoList = attachmentfiles?.map((file: any) => {
@@ -325,7 +359,7 @@ export const ContactApplicant = ({
     let data = {
       templateid: currentTemplate ? templates[currentTemplate as keyof typeof templates].templateid : null,
       correspondencemessagejson: JSON.stringify({
-        "emailhtml": editorValue,
+        "emailhtml": emailContent,
         "id": approvedForm?.cfrfeeid,
         "type": type
       }),
@@ -360,8 +394,8 @@ export const ContactApplicant = ({
     setPreviewModal(false);
     const attachments = await saveAttachments(files);
     let callback = (_res: string) => {
-      clearcorrespondence();
       changeCorrespondenceFilter("draft");
+      clearcorrespondence();      
       toast.success("Message has been saved to draft successfully", {
         position: "top-right",
         autoClose: 3000,
@@ -894,6 +928,7 @@ export const ContactApplicant = ({
           </span>
           <span className="ql-formats">
             <button className="ql-link" />
+            <button className="ql-image" />
           </span>
           <div className="previewEmail">
             <PreviewModal
@@ -906,6 +941,7 @@ export const ContactApplicant = ({
               templateInfo={templates[currentTemplate]}
               enableSend={selectedEmails.length > 0}
             />  
+            {/*
             <button
             className="btn addCorrespondence"
             data-variant="contained" 
@@ -913,7 +949,8 @@ export const ContactApplicant = ({
             color="primary"
           >
             Cancel
-          </button>          
+          </button>     
+          */ }    
         <button
           className="btn addCorrespondence"
           data-variant="contained" 
