@@ -27,13 +27,22 @@ export const getExtensiondetails = (requestExtensions:any, type: string) => {
     return ["","","","","",""]
 }
 
-export const getTemplateVariables = (requestDetails: any, requestExtensions:any, templateInfo: any) => {
+export const getTemplateVariables = (requestDetails: any, requestExtensions:any, responsePackagePdfStitchStatus:any, cfrFeeData:any, templateInfo: any) => {
   let oipcExtension = getExtensiondetails(requestExtensions, "OIPC");
   let pbExtension =  getExtensiondetails(requestExtensions, "Public Body");
 
   // Find the record that matches the criteria for already taken a time extension under section 10(1), excluding the most recent record
   const filteredOutLatestExtensions = findLatestMatchingTimeExtension(requestExtensions, reasonsToCheck);
 
+  const checkFinalPackage = checkRecordReleased(responsePackagePdfStitchStatus)
+
+  const [feeEstimateStatus, feeEstimateDate] = getFeeEstimateInfo(cfrFeeData);
+  console.log(feeEstimateDate);
+  console.log("checkFeeEstimate : ",feeEstimateStatus, " feeEstimateDate : ",feeEstimateDate)
+  const fullFeePaidDate = getFullFeePaidDate(cfrFeeData);
+  console.log("fullFeePaidDate L ",fullFeePaidDate)
+  const feeWaiverDecisionDate = getFeeWaiverDecisionDate(cfrFeeData);
+  console.log("feeWaiverDecisionDate L ",feeWaiverDecisionDate)
   return [
     {name: "{{axisRequestId}}", value: requestDetails.axisRequestId},
     {name: "{{title}}", value: templateInfo?.label || ""},
@@ -61,6 +70,11 @@ export const getTemplateVariables = (requestDetails: any, requestExtensions:any,
     {name: "{{filteredExtensionDate}}", value: filteredOutLatestExtensions ? filteredOutLatestExtensions.extendedduedate : ""},
     {name: "{{filteredExtensionDueDays}}", value: filteredOutLatestExtensions ? filteredOutLatestExtensions.extendedduedays : ""},
     {name: "{{oipcComplaintStatus}}", value: oipcComplaintCheck(requestDetails.oipcdetails)},
+    {name: "{{finalPackageStatus}}", value: checkFinalPackage},
+    {name: "{{feeEstimateStatus}}", value: feeEstimateStatus},
+    {name: "{{feeEstimateDate}}", value: feeEstimateDate},
+    {name: "{{fullFeePaidDate}}", value: getFullFeePaidDate(cfrFeeData)},
+    {name: "{{feeWaiverDecisionDate}}", value: getFeeWaiverDecisionDate(cfrFeeData)},
 
   ];
   
@@ -115,3 +129,41 @@ const isAlreadyTakenTimeExtension = (result: any | null): string => {
 
 // Check if there are any OIPC details.
 const oipcComplaintCheck = (oipcdetails: any): string => oipcdetails && oipcdetails.length > 0 ? "Yes" : "No";
+
+// Function to check record release status
+const checkRecordReleased = (status: string): string => { return status === "completed" ? "Yes" : "No"; };
+
+// Function to check fee estimate and get the created_at date for a specific condition
+const getFeeEstimateInfo = (data: any[]): [string, string] => {
+  const result = data.find(
+    item => item["cfrfeestatus.description"] === "Approved" && item.feedata.estimatedtotaldue > 0
+  );
+
+  const status = result ? "Yes" : "No";
+  const date = result ? result.created_at : "";
+
+  return [status, date];
+};
+
+// Function to get the created_at date when the full fee is paid
+const getFullFeePaidDate = (data: any[]): string => {
+  const result = data.find(
+    item => 
+      item["cfrfeestatus.description"] === "Approved" && 
+      item.feedata.balanceremaining <= 0 && 
+      item.feedata.actualtotaldue <= 0
+  );
+
+  return result ? result.created_at : "";
+};
+
+// Function to get the created_at date when feewaiveramount is greater than 0 and status is Approved
+const getFeeWaiverDecisionDate = (data: any[]): string => {
+  const result = data.find(
+    item => 
+      item["cfrfeestatus.description"] === "Approved" && 
+      item.feedata.feewaiveramount > 0
+  );
+
+  return result ? result.created_at : "";
+};
