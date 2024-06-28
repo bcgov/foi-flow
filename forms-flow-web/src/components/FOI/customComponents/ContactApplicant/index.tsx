@@ -26,7 +26,7 @@ import { PreviewModal } from './PreviewModal';
 import { OSS_S3_BUCKET_FULL_PATH } from "../../../../constants/constants";
 import Loading from "../../../../containers/Loading";
 import {setFOICorrespondenceLoader} from "../../../../actions/FOI/foiRequestActions";
-import { applyVariables, getTemplateVariables, isTemplateDisabled } from './util';
+import { applyVariables, getTemplateVariables, isFeeTemplateDisabled, getExtensionType } from './util';
 import { StateEnum } from '../../../../constants/FOI/statusEnum';
 import CustomizedTooltip from '../Tooltip/MuiTooltip/Tooltip';
 import { CorrespondenceEmail } from '../../../FOI/customComponents';
@@ -148,12 +148,43 @@ export const ContactApplicant = ({
     }
   }
 
- 
+  const formHistory: Array<any> = useSelector((state: any) => state.foiRequests.foiRequestCFRFormHistory);
+  const approvedForm = formHistory?.find(form => form?.status?.toLowerCase() === 'approved');
+  const existingCorrespondence = applicantCorrespondence?.find((correspondence: any) => correspondence?.id === approvedForm?.cfrfeeid)
+  //const previewButtonValue = existingCorrespondence ? "Preview & Resend" : "Preview & Send";
+  const previewButtonValue = "Preview & Send";
+  const [editMode, setEditMode] = useState(false);
+  const draftButtonValue = editMode ? "Edit Draft" : "Save Draft";
+
+  const requestDetails: any = useSelector((state: any) => state.foiRequests.foiRequestDetail);
+  const requestExtensions: any = useSelector((state: any) => state.foiRequests.foiRequestExtesions);
+
   const [files, setFiles] = useState([]);
   const [templates, setTemplates] = useState<any[]>([{ value: "", label: "", templateid: null, text: "", disabled: true, created_at:"" }]);
 
+  const isEnabledTemplate = (item: any) => {
+   if (['PAYONLINE', 'PAYOUTSTANDING'].includes(item.name)) { 
+      return !isFeeTemplateDisabled(currentCFRForm, item); 
+   } else if (['EXTENSIONS-PB'].includes(item.name)) {
+      return getExtensionType(requestExtensions) === "PB";
+   } else if (['OIPCAPPLICANTCONSENTEXTENSION', 'OIPCFIRSTTIMEEXTENSION','OIPCSUBSEQUENTTIMEEXTENSION'].includes(item.name)) {
+      return getExtensionType(requestExtensions) === "OIPC";
+  }
+  }
+
+  const isduplicate = (item: string) => {
+    for(const element of templates) {
+      if (element.value === item) {
+          return true;
+          }
+      }
+      return false;
+  }
+
   React.useEffect(() => {    
     applicantCorrespondenceTemplates.forEach((item: any) => {
+      setTemplates([{ value: "", label: "", templateid: null, text: "", disabled: true, created_at:"" }]);
+      if (isEnabledTemplate(item)) {
       const rootpath = OSS_S3_BUCKET_FULL_PATH
       const fileInfoList = [{
         filename: item.name,
@@ -172,25 +203,17 @@ export const ContactApplicant = ({
                 disabled: false,
                 created_at: item.created_at
               }
+              if (!isduplicate(item.name)) {
               setTemplates((oldArray) => [...oldArray, templateItem]);  
+              }
             });            
           });
         }
       });
-      
+    }
     });
-  }, [applicantCorrespondenceTemplates, dispatch]);
+  }, [applicantCorrespondenceTemplates, requestExtensions, dispatch]);
 
-  const formHistory: Array<any> = useSelector((state: any) => state.foiRequests.foiRequestCFRFormHistory);
-  const approvedForm = formHistory?.find(form => form?.status?.toLowerCase() === 'approved');
-  const existingCorrespondence = applicantCorrespondence?.find((correspondence: any) => correspondence?.id === approvedForm?.cfrfeeid)
-  //const previewButtonValue = existingCorrespondence ? "Preview & Resend" : "Preview & Send";
-  const previewButtonValue = "Preview & Send";
-  const [editMode, setEditMode] = useState(false);
-  const draftButtonValue = editMode ? "Edit Draft" : "Save Draft";
-
-  const requestDetails: any = useSelector((state: any) => state.foiRequests.foiRequestDetail);
-  const requestExtensions: any = useSelector((state: any) => state.foiRequests.foiRequestExtesions);
 
   const [messages, setMessages] = useState(applicantCorrespondence);
   const [uploadFor, setUploadFor] = useState("email");
@@ -919,6 +942,7 @@ export const ContactApplicant = ({
               templateInfo={templates[currentTemplate]}
               enableSend={selectedEmails.length > 0}
             />  
+            {/*
             <button
             className="btn addCorrespondence"
             data-variant="contained" 
@@ -926,7 +950,8 @@ export const ContactApplicant = ({
             color="primary"
           >
             Cancel
-          </button>          
+          </button>     
+          */ }    
         <button
           className="btn addCorrespondence"
           data-variant="contained" 
