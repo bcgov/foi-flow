@@ -108,7 +108,7 @@ const MappedDataList = Object.freeze({
 
 const getMappedValue = (property: string, propertykey: string) => {
   if(propertykey && property === "pbextensionreason") {
-    return MappedDataList.pbExtensionReasons.filter(extension => extension.key == propertykey)[0].value
+    return MappedDataList.pbExtensionReasons.filter(extension => extension.key == propertykey)[0]?.value
   }
   return "";
 }
