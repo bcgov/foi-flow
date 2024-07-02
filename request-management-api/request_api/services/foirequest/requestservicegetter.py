@@ -18,6 +18,7 @@ from request_api.services.programareaservice import programareaservice
 from request_api.utils.commons.datetimehandler import datetimehandler
 from request_api.services.external.keycloakadminservice import KeycloakAdminService
 from request_api.utils.enums import StateName
+from request_api.models.OperatingTeamEmails import OperatingTeamEmail
 
 class requestservicegetter:
     """ This class consolidates retrival of FOI request for actors: iao and ministry. 
@@ -143,6 +144,9 @@ class requestservicegetter:
         linkedministryrequests= []
         if "linkedrequests" in requestministry and requestministry["linkedrequests"] is not None:
             linkedministryrequests = self.__assignministrynames(requestministry["linkedrequests"])
+        assignedgroupemail = OperatingTeamEmail.getoperatingteamemail(requestministry["assignedgroup"])
+        if assignedgroupemail is None:
+            assignedgroupemail = KeycloakAdminService().processgroupEmail(requestministry["assignedgroup"])
         baserequestinfo = {
             'id': request['foirequestid'],
             'requestType': request['requesttype'],
@@ -153,7 +157,7 @@ class requestservicegetter:
             'receivedmodeid':request['receivedmode.receivedmodeid'],
             'receivedMode':request['receivedmode.name'],
             'assignedGroup': requestministry["assignedgroup"],
-            'assignedGroupEmail': KeycloakAdminService().processgroupEmail(requestministry["assignedgroup"]),
+            'assignedGroupEmail': assignedgroupemail,
             'assignedTo': requestministry["assignedto"],
             'idNumber':requestministry["filenumber"],
             'axisRequestId': requestministry["axisrequestid"],

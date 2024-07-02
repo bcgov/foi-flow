@@ -31,7 +31,7 @@ class communicationemailservice:
             subject = templateconfig().getsubject(template.name,attributes)
             messageattachmentlist = self.__getattachments(correspondencelog)
             _messagepart = templateservice().decorate_template(template, messagepart, attributes)
-            return senderservice().send(subject, _messagepart, messageattachmentlist, to)
+            return senderservice().send(subject, _messagepart, messageattachmentlist, to, correspondencelog.get('from_email', None))
         except Exception as ex:
             logging.exception(ex)
 
