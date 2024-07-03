@@ -38,12 +38,16 @@ class senderservice:
     def send_by_request(self, subject, content, _messageattachmentlist, requestjson):
         return self.send(subject, content, _messageattachmentlist, requestjson["email"])
 
-    def send(self, subject, content, _messageattachmentlist, emails):
+    def send(self, subject, content, _messageattachmentlist, emails, from_email = None):
         logging.debug("Begin: Send email for request ")
+
         content = content.replace('src=\\\"', 'src="')
         content = content.replace('\\\">','">')
         msg = MIMEMultipart('related')
-        msg['From'] = MAIL_FROM_ADDRESS
+        if from_email is None:
+            from_email = MAIL_FROM_ADDRESS
+
+        msg['From'] = from_email
         msg['To'] = ",".join(emails)
         msg['Subject'] = subject
         formattedContent, embeddedImages = embeddedimagehandler().formatembeddedimage(content)
