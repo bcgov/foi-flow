@@ -39,7 +39,7 @@ export default function UnsavedModal({modalOpen, handleClose, handleContinue, mo
             >
               Continue
             </button>
-            <button className="btn-bottom btn-cancel" onClick={handleClose}>
+            <button className="btn-cancel" onClick={handleClose}>
               Cancel
             </button>
           </DialogActions>

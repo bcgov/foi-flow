@@ -2314,7 +2314,7 @@ export const RecordsLog = ({
                   Continue
                 </button>
                 <button
-                  className="btn-bottom btn-cancel"
+                  className="btn-cancel"
                   onClick={() => {
                     setDeleteModalOpen(false);
                     setDivisionModalTagValue(-1);
@@ -2519,7 +2519,7 @@ export const RecordsLog = ({
                   Continue
                 </button>
                 <button
-                  className="btn-bottom btn-cancel"
+                  className="btn-cancel"
                   onClick={() => setDivisionsModalOpen(false)}
                 >
                   Cancel
