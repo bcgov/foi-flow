@@ -138,7 +138,7 @@ services:
         aliases:
           - backendnw
     ports:
-      - 15001:5000
+      - 15001:6000
     environment:
       - DATABASE_USERNAME=${FOI_EDW_DATABASE_USERNAME}
       - DATABASE_PASSWORD=${FOI_EDW_DATABASE_PASSWORD}

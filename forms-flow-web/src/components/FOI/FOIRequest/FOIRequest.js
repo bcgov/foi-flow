@@ -1350,6 +1350,7 @@ const FOIRequest = React.memo(({ userDetail }) => {
                           addOIPC={addOIPC}
                           removeOIPC={removeOIPC}
                           isMinistry={false}
+                          isHistoricalRequest={isHistoricalRequest}
                         />
                       )}
 

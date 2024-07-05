@@ -26,7 +26,8 @@ class factRequestDetails(db.Model):
             rs.requeststatusname,
             a.address1, a.address2, a.city, a.state, a.country, a.zipcode,
             rd.description, rd.startdate, rd.closeddate, rd.receiveddate, rd.targetdate AS duedate, rd.originaltargetdate AS originalduedate,
-            rd.subject
+            rd.subject,
+            rd.oipcno, rd.reviewtype, rd.reason, rd.status, rd.portfolioofficer,  rof.orderno, rof.inquirydate, rof.outcome, rof.inquirydate is not null as isinquiry
             --, rd.* 
             from public."ClosedRequestDetailsPost2018" rd
             left join public."dimRequestStatuses" rs on rs.requeststatusid = rd.requeststatusid
@@ -40,6 +41,7 @@ class factRequestDetails(db.Model):
             left join public."dimAddress" a on a.addressid = rd.shipaddressid
             left join public."dimRequestTypes" rt on rt.requesttypeid = rd.requesttypeid
             left join public."dimDeliveryModes" dm on dm.deliverymodeid = rd.deliverymodeid
+            left join public."factRequestOIPCFields" rof on rof.foirequestid = rd.foirequestid and rof.activeflag = 'Y'
             where rd.visualrequestfilenumber = :requestid and rd.activeflag = 'Y'"""
 
             if(isiaorestictedmanager == False):
@@ -82,6 +84,23 @@ class factRequestDetails(db.Model):
                 request["receivedMode"] = row['receivedmodename']
                 request["deliveryMode"] = row['deliverymodename']                
                 request["subjectCode"] = row['subject']
+                if row['requesttypename'] == 'Review':
+                    request['isoipcreview'] = True
+                    request['oipcdetails'] = [{}]
+                    request['oipcdetails'][0]['oipcno'] = row['oipcno']
+                    request['oipcdetails'][0]['receiveddate'] = row['receiveddate'].strftime('%Y-%m-%d')
+                    request['oipcdetails'][0]['closeddate'] = row['closeddate'].strftime('%Y-%m-%d')
+                    request['oipcdetails'][0]['reviewetype'] = row['reviewtype']
+                    request['oipcdetails'][0]['reason'] = row['reason']
+                    request['oipcdetails'][0]['status'] = row['status']
+                    request['oipcdetails'][0]['investigator'] = row['portfolioofficer']
+                    request['oipcdetails'][0]['outcome'] = row['outcome']
+                    request['oipcdetails'][0]['isinquiry'] = row['isinquiry']
+                    if row['isinquiry']:
+                        request['oipcdetails'][0]['inquiryattributes'] = {}
+                        request['oipcdetails'][0]['inquiryattributes']['inquirydate'] = row['inquirydate']
+                        request['oipcdetails'][0]['inquiryattributes']['orderno'] = row['orderno']
+
                 # requestdetails["assignedToFirstName"] = row["assignedtofirstname"]
                 # requestdetails["assignedToLastName"] = row["assignedtolastname"]
                 # requestdetails["bcgovcode"] = row["bcgovcode"]
