@@ -137,7 +137,7 @@ export default function CommunicationUploadModal({
             Continue
           </button>
           <button
-            className="btn-bottom btn-cancel"
+            className="btn-cancel"
             onClick={(e) => handleClose(e)}
           >
             Cancel

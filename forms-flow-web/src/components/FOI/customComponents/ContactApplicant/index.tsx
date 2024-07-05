@@ -1040,7 +1040,7 @@ export const ContactApplicant = ({
           >
             Continue
           </button>
-          <button className="btn-bottom btn-cancel" onClick={handleConfirmationClose}>
+          <button className="btn-cancel" onClick={handleConfirmationClose}>
             Cancel
           </button>
         </DialogActions>

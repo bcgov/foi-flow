@@ -9,10 +9,11 @@
   .MuiFormLabel-root {
     color: #FFFFFF !important;
   }
+  .MuiOutlinedInput-root .MuiOutlinedInput-notchedOutline {
+    border-color: #38598A !important;
+  }
 }
-.MuiOutlinedInput-root .MuiOutlinedInput-notchedOutline {
-  border-color: #38598A !important;
-}
+
 
 .previewEmail {
   float: right;
