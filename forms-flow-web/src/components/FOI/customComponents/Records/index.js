@@ -219,6 +219,7 @@ export const RecordsLog = ({
   setRecordsUploading,
   recordsTabSelect,
   requestType,
+  lockRecords,
 }) => {
   const user = useSelector((state) => state.user.userDetail);
   const userGroups = user?.groups?.map((group) => group.slice(1));
@@ -1761,6 +1762,22 @@ export const RecordsLog = ({
                 {getRequestNumber()}
               </h1>
             </Grid>
+            {isMinistryCoordinator === false ?
+            <Grid>
+              <button
+              style={{marginTop: "4px"}}
+              className={clsx(
+                "btn",
+                "addAttachment",
+                classes.createButton
+                )}
+                variant="contained"
+                color="primary"
+              >
+                {lockRecords ? "Unlock Records" : "Lock Records"}
+              </button>
+            </Grid> : null
+            }
             <Grid item xs={2}>
               {(isMinistryCoordinator == false &&
                 records?.length > 0 &&

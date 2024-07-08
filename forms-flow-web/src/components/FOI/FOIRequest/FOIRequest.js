@@ -272,10 +272,23 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
   const [isMCFPersonal, setIsMCFPersonal] = useState(bcgovcode.replaceAll('"', '') == "MCF" && requestDetails.requestType == FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL);
   const {oipcData, addOIPC, removeOIPC, updateOIPC, isOIPCReview, setIsOIPCReview, removeAllOIPCs} = useOIPCHook();
   const [oipcDataInitial, setOipcDataInitial] = useState(oipcData);
+  const [lockRecordsTab, setLockRecordsTab] = useState(false);
   
-  //Update disableInput when requestState changes
+  //Update disableInput + lockRecords when requestState changes
   useEffect(() => {
+    const updateRecordsTabAccess = () => {
+      return (
+        requestState === StateEnum.recordsreadyforreview ||
+        requestState === StateEnum.review ||
+        requestState === StateEnum.consult ||
+        requestState === StateEnum.peerreview ||
+        requestState === StateEnum.signoff ||
+        requestState === StateEnum.response ||
+        requestState === StateEnum.closed
+      );
+    }
     setDisableInput(requestState?.toLowerCase() === StateEnum.closed.name.toLowerCase() && !isOIPCReview);
+    setLockRecordsTab(updateRecordsTabAccess());
   }, [requestState, isOIPCReview])
 
   useEffect(() => {
@@ -1639,6 +1652,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
                   divisions={requestDetails.divisions}
                   recordsTabSelect={tabLinksStatuses.Records.active}
                   requestType={requestDetails?.requestType}
+                  lockRecords={lockRecordsTab}
                 />
               </>
             )}
