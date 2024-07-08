@@ -488,6 +488,19 @@ export const ContactApplicant = ({
       setPreviewModal(false);
       const responseattachments = await saveAttachments(_files);
       let callback = (_res: string) => {
+        const toastID = toast.loading("Saving response...")
+        toast.update(toastID, {
+          type: "success",
+          render: "Response successfully saved.",
+          position: "top-right",
+          isLoading: false,
+          autoClose: 3000,
+          hideProgressBar: true,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+        });
         clearcorrespondence();
         changeCorrespondenceFilter("log");
         dispatch(fetchApplicantCorrespondence(requestId, ministryId));
@@ -501,6 +514,19 @@ export const ContactApplicant = ({
         dispatch,
         callback,
         (errorMessage: string) => {
+          const toastID = toast.loading("Saving response...")
+          toast.update(toastID, {
+            type: errorMessage ? "error" : "success",
+            render: errorMessage ? "Response upload failed" : "Response successfully saved.",
+            position: "top-right",
+            isLoading: false,
+            autoClose: 3000,
+            hideProgressBar: true,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+          });
           clearcorrespondence();
           changeCorrespondenceFilter("log");
           dispatch(fetchApplicantCorrespondence(requestId, ministryId));

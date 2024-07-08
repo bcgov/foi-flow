@@ -709,7 +709,7 @@ export default function AttachmentModal({
               {uploadFor === "email" ? "Save Changes" :"Continue"}
             </button>
           )}
-          <button className="btn-bottom btn-cancel" onClick={handleClose}>
+          <button className="btn-cancel" onClick={handleClose}>
             Cancel
           </button>
         </DialogActions>
