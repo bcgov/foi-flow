@@ -308,7 +308,7 @@ export default function ConfirmationModal({requestId, openModal, handleModal, st
               {(currentState?.toLowerCase() !== StateEnum.closed.name.toLowerCase()) ?
               "Save Change" : "Re-Open Request"}
             </button>
-            <button className="btn-bottom btn-cancel" onClick={handleClose}>
+            <button className="btn-cancel" onClick={handleClose}>
               Cancel
             </button>
           </DialogActions>

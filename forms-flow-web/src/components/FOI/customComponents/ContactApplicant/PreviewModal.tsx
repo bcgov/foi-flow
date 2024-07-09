@@ -109,7 +109,7 @@ export const PreviewModal = React.memo(({
           Send Email
         </button>
       }
-        <button className="btn-bottom btn-cancel" onClick={handleClose}>
+        <button className="btn-cancel" onClick={handleClose}>
           Cancel
         </button>
       </DialogActions>

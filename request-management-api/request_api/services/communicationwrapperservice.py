@@ -27,7 +27,7 @@ class communicationwrapperservice:
             else:
                 if "emails" in applicantcorrespondencelog and len(applicantcorrespondencelog["emails"]) > 0:
                     template = applicantcorrespondenceservice().gettemplatebyid(applicantcorrespondencelog["templateid"])
-                    return communicationemailservice().send(template, applicantcorrespondencelog)    
+                    return communicationemailservice().send(template, applicantcorrespondencelog)
                 return result
                 
 
