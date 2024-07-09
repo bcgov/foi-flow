@@ -35,7 +35,7 @@ import TextField from "@material-ui/core/TextField";
 import AttachmentModal from '../Attachments/AttachmentModal';
 
 const CommunicationStructure = ({ i, reply, parentId, totalcommentCount, currentIndex, isreplysection, hasAnotherUserComment, 
-  fullName, isEmail=false, ministryId=null, editDraft, deleteDraft, modalFor, setModalFor,setModal,setUpdateAttachment}) => {
+  fullName, isEmail=false, ministryId=null, editDraft, deleteDraft, deleteResponse, modalFor, setModalFor,setModal,setUpdateAttachment, setSelectedCorrespondence, setCurrentResponseDate}) => {
 
   const actions = useContext(ActionContext)
   const edit = true
@@ -138,39 +138,6 @@ const CommunicationStructure = ({ i, reply, parentId, totalcommentCount, current
     }
   };
 
-  // const handlePopupButtonClick = (action, _attachment) => {
-  //   console.log("_attachment::",_attachment)
-  //   console.log("action::",action)
-  //   setUpdateAttachment(_attachment);
-  //   //setMultipleFiles(false);
-  //   switch (action) {
-  //     // case "replace":
-  //     //   setModalFor("replace");
-  //     //   setModal(true);
-  //     //   break;
-  //     case "rename":
-  //       setModalFor("rename");
-  //       setModal(true);
-  //       break;
-  //     case "reclassify":
-  //       setModalFor("reclassify");
-  //       //setModal(true);
-  //       break;
-  //     case "download":
-  //       //downloadDocument(_attachment);
-  //       setModalFor("download");
-  //       //setModal(false);
-  //       break;
-  //     case "delete":
-  //       setModalFor("delete")
-  //       //setModal(true)
-  //       break;
-  //     default:
-  //       //setModal(false);
-  //       break;
-  //   }
-  // }
-
   const ActionsPopover = () => {
     return (
       <>
@@ -234,7 +201,11 @@ const CommunicationStructure = ({ i, reply, parentId, totalcommentCount, current
         <MenuList>
         <MenuItem
           onClick={(e) => {
-            editDraft(i)
+            setModalFor("changeresponsedate");
+            setCurrentResponseDate(i.date);
+            setModal(true);
+            setSelectedCorrespondence(i);
+            setPopoverOpen(false)
           }}
         >
           Change Date
@@ -244,9 +215,9 @@ const CommunicationStructure = ({ i, reply, parentId, totalcommentCount, current
             //handlePopupButtonClick("rename", e)
             setUpdateAttachment(i.attachments[0])
             setModalFor("rename");
-            setOpenModal(true);
             setModal(true);
-            //deleteDraft(i);
+            setSelectedCorrespondence(i);
+            setPopoverOpen(false)
           }}
         >
           Rename
@@ -259,6 +230,13 @@ const CommunicationStructure = ({ i, reply, parentId, totalcommentCount, current
             }}
           >
             Download
+          </MenuItem>
+          <MenuItem
+            onClick={(e) => {
+              deleteResponse(i);
+            }}
+          >
+            Delete
           </MenuItem>
       </MenuList> :
           <MenuList>
@@ -392,36 +370,6 @@ const CommunicationStructure = ({ i, reply, parentId, totalcommentCount, current
     )
   };
 
-  // const handleRename = (_attachment, newFilename) => {
-  //   setModal(false);
-
-  //   if (updateAttachment.filename !== newFilename) {
-  //     const documentId = ministryId ? updateAttachment.foiministrydocumentid : updateAttachment.foidocumentid;
-  //     dispatch(saveNewFilename(newFilename, documentId, requestId, ministryId, (err, _res) => {
-  //       if (!err) {
-  //         setAttachmentLoading(false);
-  //       }
-  //     }));
-  //   }
-  // }
-
-  // const saveNewFilename = () => {
-  //   if (validateFilename(newFilename)) {
-  //     if (!containDuplicate(newFilename)) {
-  //       setErrorMessage("");
-  //       handleRename(attachment, newFilename + "." + extension);
-  //     } else {
-  //       setErrorMessage(
-  //         `File name "${newFilename}.${extension}" already exists`
-  //       );
-  //     }
-  //   } else {
-  //     setErrorMessage(
-  //       `File name cannot be empty and cannot contain these characters, / : * ? " < > |`
-  //     );
-  //   }
-  // };
-
   const updateFilename = (e) => {
     if (checkInvalidCharacters(e.target.value)) {
       setNewFilename(e.target.value);
@@ -526,55 +474,5 @@ const CommunicationStructure = ({ i, reply, parentId, totalcommentCount, current
     </>
   )
 }
-
-{/* <AttachmentModal
-modalFor={"rename"}
-openModal={openModal}
-// handleModal={uploadFor == "response" ? saveResponse : handleContinueModal}
-handleModal={uploadFor == "response" ? saveResponse : handleContinueModal}
-multipleFiles={true}
-requestNumber={requestNumber}
-requestId={requestId}
-attachmentsArray={files}
-existingDocuments={files}
-attachment={{}}
-handleRename={undefined}
-handleReclassify={undefined}
-isMinistryCoordinator={false}
-uploadFor={uploadFor}
-maxNoFiles={10}
-bcgovcode={undefined}
-/>  */}
-// const ModalForRename = ({
-//   modalFor,
-//   newFilename,
-//   updateFilename,
-//   errorMessage,
-//   extension,
-// }) => {
-//   console.log("Inside Rename Modal!")
-//   return modalFor === "rename" ? (
-//     <div className="row">
-//       <div className="col-sm-1"></div>
-//       <div className="col-sm-9">
-//         <TextField
-//           id="renameAttachment"
-//           label="Rename Attachment"
-//           inputProps={{ "aria-labelledby": "renameAttachment-label" }}
-//           InputLabelProps={{ shrink: true }}
-//           variant="outlined"
-//           fullWidth
-//           value={newFilename}
-//           onChange={updateFilename}
-//           error={errorMessage !== undefined && errorMessage !== ""}
-//           helperText={errorMessage}
-//         />
-//       </div>
-//       <div className="col-sm-1 extension-name">.{extension}</div>
-//       <div className="col-sm-1"></div>
-//     </div>
-//   ) : null;
-// };
-
 
 export default CommunicationStructure
