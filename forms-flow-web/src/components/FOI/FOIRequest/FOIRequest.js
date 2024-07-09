@@ -296,6 +296,21 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
     } else if (window.location.href.indexOf("records") > -1) {
       tabclick("Records");
     }
+    //Adjust lockRecords tab state if there is no BE/DB data recorded
+    const updateRecordsTabAccess = () => {
+      if(requestDetails.lockrecords === null) {
+        return (
+          requestState === StateEnum.recordsreadyforreview.name ||
+          requestState === StateEnum.review.name ||
+          requestState === StateEnum.consult.name ||
+          requestState === StateEnum.peerreview.name ||
+          requestState === StateEnum.signoff.name ||
+          requestState === StateEnum.response.name ||
+          requestState === StateEnum.closed.name
+        );
+      }
+    }
+    setLockRecordsTab(updateRecordsTabAccess())
   }, []);
 
   useEffect(async () => {
@@ -1031,20 +1046,6 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
       requestState !== StateEnum.open.name &&
       requestState !== StateEnum.appfeeowing.name &&
       requestDetails?.requestType === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_GENERAL)
-  }
-
-  const updateRecordsTabAccess = () => {
-    if(requestDetails.lockRecords === null) {
-      return (
-        requestState === StateEnum.recordsreadyforreview.name ||
-        requestState === StateEnum.review.name ||
-        requestState === StateEnum.consult.name ||
-        requestState === StateEnum.peerreview.name ||
-        requestState === StateEnum.signoff.name ||
-        requestState === StateEnum.response.name ||
-        requestState === StateEnum.closed.name
-      );
-    }
   }
 
   const handleLockRecords = () => {
