@@ -15,7 +15,10 @@ class applicantcorrespondenceservice:
     def getapplicantcorrespondencetemplates(self):
         """ Returns the active applicant correspondence templates
         """
-        return ApplicationCorrespondenceTemplate.getapplicantcorrespondencetemplates()
+        templates = ApplicationCorrespondenceTemplate.getapplicantcorrespondencetemplates()
+        for template in templates:
+            template["created_at"] = self.__pstformat(template['created_at'])
+        return templates
     
     def gettemplatebyid(self, templateid):
         """ Returns the active applicant correspondence templates
