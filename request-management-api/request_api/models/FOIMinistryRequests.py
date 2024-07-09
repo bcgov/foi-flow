@@ -72,6 +72,7 @@ class FOIMinistryRequest(db.Model):
     identityverified = db.Column(JSON, unique=False, nullable=True)
     ministrysignoffapproval = db.Column(JSON, unique=False, nullable=True)
     requeststatuslabel = db.Column(db.String(50), nullable=False)
+    lockrecords = db.Column(db.Boolean, nullable=True)
 
     #ForeignKey References
     

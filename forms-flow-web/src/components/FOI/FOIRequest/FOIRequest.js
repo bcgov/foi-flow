@@ -273,22 +273,10 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
   const {oipcData, addOIPC, removeOIPC, updateOIPC, isOIPCReview, setIsOIPCReview, removeAllOIPCs} = useOIPCHook();
   const [oipcDataInitial, setOipcDataInitial] = useState(oipcData);
   const [lockRecordsTab, setLockRecordsTab] = useState(false);
-  
-  //Update disableInput + lockRecords when requestState changes
+
+  //Update disableInput when requestState changes
   useEffect(() => {
-    const updateRecordsTabAccess = () => {
-      return (
-        requestState === StateEnum.recordsreadyforreview ||
-        requestState === StateEnum.review ||
-        requestState === StateEnum.consult ||
-        requestState === StateEnum.peerreview ||
-        requestState === StateEnum.signoff ||
-        requestState === StateEnum.response ||
-        requestState === StateEnum.closed
-      );
-    }
     setDisableInput(requestState?.toLowerCase() === StateEnum.closed.name.toLowerCase() && !isOIPCReview);
-    setLockRecordsTab(updateRecordsTabAccess());
   }, [requestState, isOIPCReview])
 
   useEffect(() => {
@@ -1045,6 +1033,25 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
       requestDetails?.requestType === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_GENERAL)
   }
 
+  const updateRecordsTabAccess = () => {
+    if(requestDetails.lockRecords === null) {
+      return (
+        requestState === StateEnum.recordsreadyforreview.name ||
+        requestState === StateEnum.review.name ||
+        requestState === StateEnum.consult.name ||
+        requestState === StateEnum.peerreview.name ||
+        requestState === StateEnum.signoff.name ||
+        requestState === StateEnum.response.name ||
+        requestState === StateEnum.closed.name
+      );
+    }
+  }
+
+  const handleLockRecords = () => {
+    setLockRecordsTab(!lockRecordsTab);
+    console.log("API CALL TO LOCK RECORDS ENDPOINT") // OR JUST REUQEST UPDATE END POINT AND NO NEED FOR NEW ONE?
+  }
+
   return (!isLoading &&
     requestDetails &&
     Object.keys(requestDetails).length !== 0) ||
@@ -1653,6 +1660,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
                   recordsTabSelect={tabLinksStatuses.Records.active}
                   requestType={requestDetails?.requestType}
                   lockRecords={lockRecordsTab}
+                  handleLockRecords={handleLockRecords}
                 />
               </>
             )}
