@@ -7,7 +7,7 @@ class FOIAxisProgramDetailsSchema(Schema):
         """Exclude unknown fields in the deserialized output."""
 
         unknown = EXCLUDE    
-    bcgovcode = fields.Str(data_key="bcgovcode",allow_none=False) 
+    iaocode = fields.Str(data_key="iaocode",allow_none=False) 
     requesttype = fields.Str(data_key="requesttype",allow_none=False)     
     
 class FOIRequestAxisSyncSchema(Schema):

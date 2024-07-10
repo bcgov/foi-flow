@@ -14,6 +14,7 @@ from sqlalchemy import insert, and_, or_, text, func, literal, cast, asc, desc, 
 
 from .FOIMinistryRequests import FOIMinistryRequest
 from .FOIRawRequestWatchers import FOIRawRequestWatcher
+from .FOIRequestApplicants import FOIRequestApplicant
 from .FOIAssignees import FOIAssignee
 import logging
 from dateutil import parser
@@ -332,6 +333,30 @@ class FOIRawRequest(db.Model):
        request_schema = FOIRawRequestSchema()
        request = db.session.query(FOIRawRequest).filter_by(requestid=requestid).order_by(FOIRawRequest.version.desc()).first()
        return request_schema.dump(request)
+    
+    @classmethod
+    def getrawrequestsbyapplicantid(cls,applicantid):
+        request_schema = FOIRawRequestSchema(many=True)
+        applicant_subquery = db.session.query(FOIRequestApplicant.applicantprofileid).filter(FOIRequestApplicant.foirequestapplicantid == applicantid).subquery()
+        subquery_applicant_id_list = db.session.query(FOIRequestApplicant.foirequestapplicantid).filter(applicant_subquery.c.applicantprofileid == FOIRequestApplicant.applicantprofileid).subquery()
+
+        #subquery for getting the latest version
+        subquery_maxversion = db.session.query(FOIRawRequest.requestid, func.max(FOIRawRequest.version).label('max_version')).group_by(FOIRawRequest.requestid).subquery()
+        joincondition = [
+            subquery_maxversion.c.requestid == FOIRawRequest.requestid,
+            subquery_maxversion.c.max_version == FOIRawRequest.version,
+        ]
+        
+        query = db.session.query(FOIRawRequest).distinct(FOIRawRequest.requestid).join(
+            FOIAssignee, FOIAssignee.username == FOIRawRequest.assignedto
+        ).join(
+            subquery_maxversion,
+            and_(*joincondition)
+        ).filter(
+            FOIRawRequest.requestrawdata['foiRequestApplicantID'].astext.cast(db.Integer).in_(subquery_applicant_id_list),
+            FOIRawRequest.status.notin_(['Archived', 'Closed'])
+        ).order_by(FOIRawRequest.requestid.desc()).all()
+        return request_schema.dump(query)
     
     @classmethod
     def getLastStatusUpdateDate(cls,requestid,status):

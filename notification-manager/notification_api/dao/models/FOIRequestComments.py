@@ -20,6 +20,7 @@ class FOIRequestComment(object):
     createdby = fields.Str(data_key="createdby")
     created_at = fields.Str(data_key="created_at")
     commenttypeid = fields.Int(data_key="commenttypeid") 
+    commentsversion = fields.Int(data_key="commentsversion") 
 
     
     @classmethod
@@ -35,10 +36,10 @@ class FOIRequestComment(object):
             cursor = conn.cursor()
            
             cursor.execute('INSERT INTO public."FOIRequestComments" (parentcommentid, ministryrequestid, "version", commenttypeid, \
-                                comment, taggedusers, isactive, createdby, created_at) \
-                                VALUES(%s::integer,%s::integer, %s::integer, %s::integer,%s,%s,%s::boolean,%s,%s) RETURNING commentid', 
+                                comment, taggedusers, isactive, createdby, created_at, commentsversion) \
+                                VALUES(%s::integer,%s::integer, %s::integer, %s::integer,%s,%s,%s::boolean,%s,%s,%s::integer) RETURNING commentid', 
                                 (parentcommentid, int(data["ministryrequestid"]), int(data["version"]), commenttypeid,
-                                    str(data["comment"]), taggedusers, True, userid, datetime.now()))
+                                    str(data["comment"]), taggedusers, True, userid, datetime.now(), data["commentsversion"]))
             conn.commit()
             id_of_new_row = cursor.fetchone()[0]
             cursor.close()
