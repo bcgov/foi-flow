@@ -123,8 +123,8 @@ export default function CorrespondenceEmail({
     }
     menuItems.push(<div style={{padding:'0.5em'}}>
     <TextField id="new-email" label="Add New Email Address" variant="outlined" fullWidth
-    value={newCorrespondenceEmail}
-    onChange={handleNewCorrespondenceEmailChange}
+    value={newCorrespondenceEmail} onChange={handleNewCorrespondenceEmailChange}
+    onKeyDown={(e) => {e.stopPropagation();}} onKeyUp={(e) => {e.stopPropagation();}}
     />
     <div>
     <button className="btn-bottom btn-save" onClick={handleEmailSave} disabled={!newCorrespondenceEmail || isEmailPresent(newCorrespondenceEmail)}>

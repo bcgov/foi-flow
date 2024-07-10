@@ -27,7 +27,7 @@ import { PreviewModal } from './PreviewModal';
 import { OSS_S3_BUCKET_FULL_PATH } from "../../../../constants/constants";
 import Loading from "../../../../containers/Loading";
 import {setFOICorrespondenceLoader} from "../../../../actions/FOI/foiRequestActions";
-import { applyVariables, getTemplateVariables, isTemplateDisabled } from './util';
+import { applyVariables, getTemplateVariables, isFeeTemplateDisabled, getExtensionType } from './util';
 import { StateEnum } from '../../../../constants/FOI/statusEnum';
 import CustomizedTooltip from '../Tooltip/MuiTooltip/Tooltip';
 import { CorrespondenceEmail } from '../../../FOI/customComponents';
@@ -157,12 +157,43 @@ export const ContactApplicant = ({
     }
   }
 
- 
+  const formHistory: Array<any> = useSelector((state: any) => state.foiRequests.foiRequestCFRFormHistory);
+  const approvedForm = formHistory?.find(form => form?.status?.toLowerCase() === 'approved');
+  const existingCorrespondence = applicantCorrespondence?.find((correspondence: any) => correspondence?.id === approvedForm?.cfrfeeid)
+  //const previewButtonValue = existingCorrespondence ? "Preview & Resend" : "Preview & Send";
+  const previewButtonValue = "Preview & Send";
+  const [editMode, setEditMode] = useState(false);
+  const draftButtonValue = editMode ? "Edit Draft" : "Save Draft";
+
+  const requestDetails: any = useSelector((state: any) => state.foiRequests.foiRequestDetail);
+  const requestExtensions: any = useSelector((state: any) => state.foiRequests.foiRequestExtesions);
+
   const [files, setFiles] = useState([]);
-  const [templates, setTemplates] = useState<any[]>([{ value: "", label: "", templateid: null, text: "", disabled: true }]);
+  const [templates, setTemplates] = useState<any[]>([{ value: "", label: "", templateid: null, text: "", disabled: true, created_at:"" }]);
+
+  const isEnabledTemplate = (item: any) => {
+   if (['PAYONLINE', 'PAYOUTSTANDING'].includes(item.name)) { 
+      return !isFeeTemplateDisabled(currentCFRForm, item); 
+   } else if (['EXTENSIONS-PB'].includes(item.name)) {
+      return getExtensionType(requestExtensions) === "PB";
+   } else if (['OIPCAPPLICANTCONSENTEXTENSION', 'OIPCFIRSTTIMEEXTENSION','OIPCSUBSEQUENTTIMEEXTENSION'].includes(item.name)) {
+      return getExtensionType(requestExtensions) === "OIPC";
+  }
+  }
+
+  const isduplicate = (item: string) => {
+    for(const element of templates) {
+      if (element.value === item) {
+          return true;
+          }
+      }
+      return false;
+  }
 
   React.useEffect(() => {    
     applicantCorrespondenceTemplates.forEach((item: any) => {
+      setTemplates([{ value: "", label: "", templateid: null, text: "", disabled: true, created_at:"" }]);
+      if (isEnabledTemplate(item)) {
       const rootpath = OSS_S3_BUCKET_FULL_PATH
       const fileInfoList = [{
         filename: item.name,
@@ -178,27 +209,20 @@ export const ContactApplicant = ({
                 label: item.description,
                 templateid: item.templateid,
                 text: await new Response(response.data).text(),
-                disabled: false
+                disabled: false,
+                created_at: item.created_at
               }
+              if (!isduplicate(item.name)) {
               setTemplates((oldArray) => [...oldArray, templateItem]);  
-            });
-            
+              }
+            });            
           });
         }
       });
-      
+    }
     });
-  }, [applicantCorrespondenceTemplates, dispatch]);
+  }, [applicantCorrespondenceTemplates, requestExtensions, dispatch]);
 
-  const formHistory: Array<any> = useSelector((state: any) => state.foiRequests.foiRequestCFRFormHistory);
-  const approvedForm = formHistory?.find(form => form?.status?.toLowerCase() === 'approved');
-  const existingCorrespondence = applicantCorrespondence?.find((correspondence: any) => correspondence?.id === approvedForm?.cfrfeeid)
-  //const previewButtonValue = existingCorrespondence ? "Preview & Resend" : "Preview & Send";
-  const previewButtonValue = "Preview & Send";
-  const [editMode, setEditMode] = useState(false);
-  const draftButtonValue = editMode ? "Edit Draft" : "Save Draft";
-
-  const requestDetails: any = useSelector((state: any) => state.foiRequests.foiRequestDetail);
 
   const [messages, setMessages] = useState(applicantCorrespondence);
   const [uploadFor, setUploadFor] = useState("email");
@@ -256,17 +280,19 @@ export const ContactApplicant = ({
 
   const handleTemplateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setCurrentTemplate(+e.target.value)
-    const templateVariables = getTemplateVariables(requestDetails, templates[+e.target.value]);
+    const templateVariables = getTemplateVariables(requestDetails, requestExtensions, templates[+e.target.value]);
     const finalTemplate = applyVariables(templates[+e.target.value].text || "", templateVariables);
     setEditorValue(finalTemplate)
   }
 
   //When templates are selected from list
   const handleTemplateSelection = (index: number) => {
-    setCurrentTemplate(index)
-    const templateVariables = getTemplateVariables(requestDetails, templates[index]);
+    setCurrentTemplate(index);
+    const templateVariables = getTemplateVariables(requestDetails,requestExtensions, templates[index]);
     const finalTemplate = applyVariables(templates[index].text || "", templateVariables);
-    setEditorValue(finalTemplate)
+    setEditorValue(finalTemplate);
+    changeCorrespondenceFilter("log");
+    
   }
 
   const removeFile = (index: number) => {
@@ -274,9 +300,19 @@ export const ContactApplicant = ({
   }
 
   const onFilterChange = (filterValue: string) => {
-    let _filteredMessages = filterValue === "" ? applicantCorrespondence : applicantCorrespondence.filter((c: any) => c.text.toLowerCase().indexOf(filterValue.toLowerCase()) > -1)
-    setMessages(_filteredMessages)
-  }
+    
+    if(filterValue === "") {
+      setMessages(applicantCorrespondence);
+    } else{
+      let _filteredMessages = applicantCorrespondence.filter((corr: any) => {
+        if(corr.text && corr.text.indexOf(filterValue) >= 0) {
+          return corr;
+        } 
+      })
+      setMessages(_filteredMessages);
+      
+    }
+ }
 
   const saveAttachments = async (attachmentfiles: any) => {
     const fileInfoList = attachmentfiles?.map((file: any) => {
@@ -308,16 +344,14 @@ export const ContactApplicant = ({
     return attachments
   }
 
-  const save = async (emailContent: string) => {
+  const save = async (emailContent: string, skiptoast=false) => {
     setDisablePreview(true);
     setPreviewModal(false);
     const attachments = await saveAttachments(files);
     let callback = (_res: string) => {
-      setEditorValue("")
-      setCurrentTemplate(0)
-      setFiles([])
-      setShowEditor(false)
-      toast.success("Message has been sent to applicant successfully", {
+      clearcorrespondence();
+      if (!skiptoast) {
+        toast.success("Message has been sent to applicant successfully", {
         position: "top-right",
         autoClose: 3000,
         hideProgressBar: true,
@@ -326,6 +360,7 @@ export const ContactApplicant = ({
         draggable: true,
         progress: undefined,
       });
+    }
       dispatch(fetchApplicantCorrespondence(requestId, ministryId));
     }
     const templateId = currentTemplate ? templates[currentTemplate as keyof typeof templates].templateid : null;
@@ -333,7 +368,7 @@ export const ContactApplicant = ({
     let data = {
       templateid: currentTemplate ? templates[currentTemplate as keyof typeof templates].templateid : null,
       correspondencemessagejson: JSON.stringify({
-        "emailhtml": editorValue,
+        "emailhtml": emailContent,
         "id": approvedForm?.cfrfeeid,
         "type": type
       }),
@@ -352,7 +387,8 @@ export const ContactApplicant = ({
       dispatch,
       callback,
       (errorMessage: string) => {
-        errorToast(errorMessage)
+        errorToast(errorMessage);
+        clearcorrespondence();
         dispatch(setFOICorrespondenceLoader(false));
       },
     );
@@ -360,18 +396,15 @@ export const ContactApplicant = ({
     setDisablePreview(false);
   };
 
- 
+  
 
   const saveDraft = async () => {
     setDisablePreview(true);
     setPreviewModal(false);
     const attachments = await saveAttachments(files);
     let callback = (_res: string) => {
-      setEditorValue("")
-      setCurrentTemplate(0)
-      setFiles([])
-      setShowEditor(false)
-      setEditMode(false);
+      changeCorrespondenceFilter("draft");
+      clearcorrespondence();      
       toast.success("Message has been saved to draft successfully", {
         position: "top-right",
         autoClose: 3000,
@@ -403,12 +436,52 @@ export const ContactApplicant = ({
       dispatch,
       callback,
       (errorMessage: string) => {
-        setEditorValue("")
-        setCurrentTemplate(0)
-        setFiles([])
-        setShowEditor(false)
-        setEditMode(false);
+        clearcorrespondence();
+        changeCorrespondenceFilter("draft");
         dispatch(fetchApplicantCorrespondence(requestId, ministryId));
+      },
+    );
+    setFOICorrespondenceLoader(false);
+    setDisablePreview(false);
+    return attachments;
+  };
+
+  const saveExport = async () => {
+    setDisablePreview(true);
+    setPreviewModal(false);
+    const attachments = await saveAttachments(files);
+    let callback = (_res: string) => {
+      clearcorrespondence();
+      changeCorrespondenceFilter("log");      
+      dispatch(fetchApplicantCorrespondence(requestId, ministryId));
+    }
+    const templateId = currentTemplate ? templates[currentTemplate as keyof typeof templates].templateid : null;
+    const type = (templateId && [1, 2].includes(templateId)) ? "CFRFee" : "";
+    let data = {
+      templateid: currentTemplate ? templates[currentTemplate as keyof typeof templates].templateid : null,
+      correspondencemessagejson: JSON.stringify({
+        "emailhtml": editorValue,
+        "id": approvedForm?.cfrfeeid,
+        "type": type
+      }),
+      foiministryrequest_id: ministryId,
+      attachments: attachments,
+      emails: [],
+      attributes: [{ 
+        "paymentExpiryDate": dueDateCalculation(new Date(), PAYMENT_EXPIRY_DAYS),
+        "axisRequestId": requestNumber
+      }]
+    };
+    saveEmailCorrespondence(
+      data,
+      requestId,
+      ministryId,
+      dispatch,
+      callback,
+      (errorMessage: string) => {
+        errorToast(errorMessage);
+        clearcorrespondence();
+        dispatch(setFOICorrespondenceLoader(false));
       },
     );
     setFOICorrespondenceLoader(false);
@@ -424,11 +497,21 @@ export const ContactApplicant = ({
       setPreviewModal(false);
       const responseattachments = await saveAttachments(_files);
       let callback = (_res: string) => {
-        setEditorValue("")
-        setCurrentTemplate(0)
-        setFiles([])
-        setShowEditor(false)
-        setEditMode(false);
+        const toastID = toast.loading("Saving response...")
+        toast.update(toastID, {
+          type: "success",
+          render: "Response successfully saved.",
+          position: "top-right",
+          isLoading: false,
+          autoClose: 3000,
+          hideProgressBar: true,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+        });
+        clearcorrespondence();
+        changeCorrespondenceFilter("log");
         dispatch(fetchApplicantCorrespondence(requestId, ministryId));
       }
       let data = {
@@ -440,28 +523,32 @@ export const ContactApplicant = ({
         dispatch,
         callback,
         (errorMessage: string) => {
-          setEditorValue("")
-          setCurrentTemplate(0)
-          setFiles([])
-          setShowEditor(false)
-          setEditMode(false);
+          const toastID = toast.loading("Saving response...")
+          toast.update(toastID, {
+            type: errorMessage ? "error" : "success",
+            render: errorMessage ? "Response upload failed" : "Response successfully saved.",
+            position: "top-right",
+            isLoading: false,
+            autoClose: 3000,
+            hideProgressBar: true,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+          });
+          clearcorrespondence();
+          changeCorrespondenceFilter("log");
           dispatch(fetchApplicantCorrespondence(requestId, ministryId));
         },
       );
       setFOICorrespondenceLoader(false);
       setDisablePreview(false);      
     }
-    setModal(false);
-    setEditorValue("")
-    setCurrentTemplate(0)
-    setFiles([])
-    setShowEditor(false)
-    setEditMode(false);
+    clearcorrespondence();
+    changeCorrespondenceFilter("log");
   };
 
-  const editResponse = async () => {
-    
-  }
+
 
   const [correspondenceId, setCorrespondenceId] = useState(0);
 
@@ -495,13 +582,8 @@ export const ContactApplicant = ({
     setDisablePreview(true);
     setPreviewModal(false);
     let callback = (_res: string) => {
-      setEditorValue("");
-      setCurrentTemplate(0);
-      setFiles([]);
-      setSelectedEmails([]);
-      setShowEditor(false)
-      setEditMode(false);
-      setDraftCorrespondence({});
+      clearcorrespondence();
+      changeCorrespondenceFilter("draft");
       toast.success("Draft has been deleted successfully", {
         position: "top-right",
         autoClose: 3000,
@@ -517,13 +599,8 @@ export const ContactApplicant = ({
       dispatch,
       callback,
       (errorMessage: string) => {
-        setEditorValue("");
-        setCurrentTemplate(0);
-        setFiles([]);
-        setSelectedEmails([]);
-        setShowEditor(false);
-        setEditMode(false);
-        setDraftCorrespondence({});
+        clearcorrespondence();
+        changeCorrespondenceFilter("draft");
         dispatch(fetchApplicantCorrespondence(requestId, ministryId));
         setFOICorrespondenceLoader(false);
         setDisablePreview(false);
@@ -595,11 +672,8 @@ export const ContactApplicant = ({
     setPreviewModal(false);
     const attachments = await saveAttachments(files);
     let callback = (_res: string) => {
-      setEditorValue("");
-      setCurrentTemplate(0);
-      setFiles([]);
-      setSelectedEmails([]);
-      setShowEditor(false);
+      clearcorrespondence();
+      changeCorrespondenceFilter("draft");
       toast.success("Message has been saved to draft successfully", {
         position: "top-right",
         autoClose: 3000,
@@ -633,13 +707,8 @@ export const ContactApplicant = ({
       callback,
       (errorMessage: string) => {
         errorToast(errorMessage);
-        setEditorValue("")
-        setCurrentTemplate(0)
-        setFiles([])
-        setShowEditor(false)
-        setEditMode(false);
-        setDraftCorrespondence({});
-        setSelectedEmails([]);
+        clearcorrespondence();
+        changeCorrespondenceFilter("draft");
         dispatch(setFOICorrespondenceLoader(false));
       },
     );
@@ -731,6 +800,7 @@ export const ContactApplicant = ({
   let templatesList;
   const parser = new DOMParser();
   let templateListItems = templates.map((template: any, index: any) => {
+    if (template.label !== "") {
     let lastItemInList = false
     if (templates.length === index + 1) lastItemInList = true;
     const htmlEmail = parser.parseFromString(template.text, 'text/html');
@@ -747,15 +817,16 @@ export const ContactApplicant = ({
         key={template.value}
       >
         <Grid container spacing={2}>
-          <Grid item xs={4}>
+          <Grid item xs={8}>
             <ListItemText primary={template.label}/>
           </Grid>
-          <Grid item xs={8}>
-            <ListItemText secondary={htmlEmailText?.slice(0,300) + ellipses} />
+          <Grid item xs={4}>
+          <ListItemText secondary={template.created_at}/>
           </Grid>
         </Grid>
       </ListItem>
       )
+      }
     })
   templatesList = (
     <List>
@@ -788,7 +859,7 @@ export const ContactApplicant = ({
             </button>
           </ConditionalComponent> */}
         </Grid>
-        <Grid item xs={3}>
+        <Grid container xs={3} direction="row" justifyContent='flex-end'>
           <TextField
             className="btn addCorrespondence"
             color="primary"
@@ -915,11 +986,10 @@ export const ContactApplicant = ({
         <Grid
           container
           direction="row"
-          justify="flex-start"
-          alignItems="flex-start"
+          justifyContent="flex-end"
           spacing={1}
         >
-          <Grid item xs={7}>
+          <Grid item xs={'auto'}>
           </Grid>          
           <Grid item xs={3}>
             <TextField
@@ -948,7 +1018,7 @@ export const ContactApplicant = ({
               ))}
             </TextField>
           </Grid>
-          <Grid item xs={2}>
+          <Grid item xs={'auto'}>
           <CorrespondenceEmail 
             ministryId={ministryId}
             selectedEmails={selectedEmails}
@@ -988,6 +1058,7 @@ export const ContactApplicant = ({
           </span>
           <span className="ql-formats">
             <button className="ql-link" />
+            <button className="ql-image" />
           </span>
           <div className="previewEmail">
             <PreviewModal
@@ -995,11 +1066,12 @@ export const ContactApplicant = ({
               handleClose={handlePreviewClose}
               handleSave={save}
               innerhtml={editorValue}
-              handleDraftSave={saveDraft}
+              handleExport={saveExport}
               attachments={files}
               templateInfo={templates[currentTemplate]}
               enableSend={selectedEmails.length > 0}
             />  
+            {/*
             <button
             className="btn addCorrespondence"
             data-variant="contained" 
@@ -1007,7 +1079,8 @@ export const ContactApplicant = ({
             color="primary"
           >
             Cancel
-          </button>          
+          </button>     
+          */ }    
         <button
           className="btn addCorrespondence"
           data-variant="contained" 
@@ -1052,7 +1125,7 @@ export const ContactApplicant = ({
       <AttachmentModal
       modalFor={modalFor}
       openModal={openModal}
-      handleModal={uploadFor == "response" ? saveResponse : handleContinueModal}
+      handleModal={uploadFor === "response" ? saveResponse : handleContinueModal}
       multipleFiles={true}
       requestNumber={requestNumber}
       requestId={requestId}
@@ -1099,7 +1172,7 @@ export const ContactApplicant = ({
           >
             Continue
           </button>
-          <button className="btn-bottom btn-cancel" onClick={handleConfirmationClose}>
+          <button className="btn-cancel" onClick={handleConfirmationClose}>
             Cancel
           </button>
         </DialogActions>

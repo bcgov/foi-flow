@@ -25,8 +25,11 @@ class communicationwrapperservice:
             if self.__is_fee_processing(applicantcorrespondencelog["templateid"]) == True:
                 return self.__handle_fee_email(requestid, ministryrequestid, applicantcorrespondencelog)
             else:
-                template = applicantcorrespondenceservice().gettemplatebyid(applicantcorrespondencelog["templateid"])
-                return communicationemailservice().send(template, applicantcorrespondencelog)
+                if "emails" in applicantcorrespondencelog and len(applicantcorrespondencelog["emails"]) > 0:
+                    template = applicantcorrespondenceservice().gettemplatebyid(applicantcorrespondencelog["templateid"])
+                    return communicationemailservice().send(template, applicantcorrespondencelog)
+                return result
+                
 
 
 
@@ -40,16 +43,10 @@ class communicationwrapperservice:
                 paymentservice().createpayment(requestid, ministryrequestid, _attributes, AuthHelper.getuserid())
         return requestservice().postcorrespondenceeventtoworkflow(requestid, ministryrequestid, result.identifier, applicantcorrespondencelog['attributes'], applicantcorrespondencelog['templateid'])
 
-
-
-    def __get_templatetype(self):
-        return None
-
     def __is_fee_processing(self, templateid):
-        if templateid in [0]:
+        if applicantcorrespondenceservice().gettemplatebyid(templateid) in ['PAYONLINE','PAYOUTSTANDING']:
             return True
         return False
-    
 
 class CommuniationType(Enum):
     """Communication types."""
