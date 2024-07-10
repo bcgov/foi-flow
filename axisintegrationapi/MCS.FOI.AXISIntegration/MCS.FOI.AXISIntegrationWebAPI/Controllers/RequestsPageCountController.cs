@@ -38,6 +38,7 @@ namespace MCS.FOI.AXISIntegrationWebAPI.Controllers
                 }
                 foreach (var requestId in axisRequestIds)
                 {
+                    _logger.Log(LogLevel.Information, string.Format($"axisRequestId for syncing requestPageCount and LANPages: {requestId}"));
                     if (!IsValidRequestId(requestId))
                     {
                         return BadRequest($"Invalid axisRequestId: {requestId}");

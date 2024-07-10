@@ -9,6 +9,7 @@ from request_api.models.FOIRawRequests import FOIRawRequest
 from request_api.schemas.foidocument import CreateDocumentSchema
 from request_api.services.external.storageservice import storageservice
 from request_api.models.FOIApplicantCorrespondenceAttachments import FOIApplicantCorrespondenceAttachment
+from request_api.services.eventservice import eventservice
 from request_api.utils.enums import RequestType
 import logging
 

@@ -91,7 +91,7 @@ class requestserviceministrybuilder(requestserviceconfigurator):
         foiministryrequest.closedate = requestdict['closedate']
         foiministryrequest.closereasonid = requestdict['closereasonid']
         foiministryrequest.isoipcreview = ministryschema["isoipcreview"]
-        foiministryrequest.oipcreviews = self.createfoirequestoipcs(foiministryrequest.isoipcreview, ministryschema["foirequest_id"], ministryschema["version"])
+        foiministryrequest.oipcreviews = self.createfoirequestoipcs(foiministryrequest.isoipcreview, ministryschema["foiministryrequestid"], ministryschema["version"])
         return foiministryrequest
 
     def __getrequeststatusid(self, requeststatuslabel):
@@ -164,8 +164,8 @@ class requestserviceministrybuilder(requestserviceconfigurator):
             applicantmapping  = FOIRequestApplicantMapping()
             applicantmapping.foirequest_id = requestid
             applicantmapping.foirequestversion_id = version
-            applicantmapping.foirequestapplicantid = requestapplicant["foirequestapplicant.foirequestapplicantid"]
-            applicantmapping.requestortypeid = requestapplicant["requestortype.requestortypeid"]
+            applicantmapping.foirequestapplicantid = requestapplicant["foirequestapplicantid"]
+            applicantmapping.requestortypeid = requestapplicant["requestortypeid"]
             applicantmapping.createdby = userid
             requestapplicantarr.append(applicantmapping)
         return requestapplicantarr
@@ -326,13 +326,13 @@ class requestserviceministrybuilder(requestserviceconfigurator):
     def createfoiassigneefromobject(self, username, firstname, middlename, lastname):
         return FOIAssignee.saveassignee(username, firstname, middlename, lastname)
     
-    def createfoirequestoipcs(self, isoipcreview, requestid, version):
-        current_oipcs = FOIRequestOIPC.getoipc(requestid, version)
+    def createfoirequestoipcs(self, isoipcreview, requestMinistryid, version):
+        current_oipcs = FOIRequestOIPC.getoipc(requestMinistryid, version)
         if (isoipcreview == True):
             updated_oipcs = []
             for oipc in current_oipcs:
                 oipcreview = FOIRequestOIPC()
-                oipcreview.foiministryrequest_id = requestid
+                oipcreview.foiministryrequest_id = requestMinistryid
                 oipcreview.foiministryrequestversion_id = version + 1
                 oipcreview.oipcno = oipc["oipcno"]
                 oipcreview.reviewtypeid = oipc["reviewtypeid"]

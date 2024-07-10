@@ -5,6 +5,10 @@
     margin-bottom: 10px;
 }
 
+#foi-status-dropdown.Mui-disabled {
+    cursor: not-allowed;
+}
+
 .foi-state-dropdown .MuiOutlinedInput-root {
     color: white !important;
 } 

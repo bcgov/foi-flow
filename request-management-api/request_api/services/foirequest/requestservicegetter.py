@@ -27,7 +27,7 @@ class requestservicegetter:
         request = FOIRequest.getrequest(foirequestid)
         requestministry = FOIMinistryRequest.getrequestbyministryrequestid(foiministryrequestid)
         requestcontactinformation = FOIRequestContactInformation.getrequestcontactinformation(foirequestid,request['version'])
-        requestapplicants = FOIRequestApplicantMapping.getrequestapplicants(foirequestid,request['version'])
+        requestapplicants = FOIRequestApplicantMapping.getrequestapplicantinfos(foirequestid,request['version'])
         requestministrydivisions = FOIMinistryRequestDivision.getdivisions(foiministryrequestid,requestministry['version'])
         iaorestrictrequestdetails = FOIRestrictedMinistryRequest.getrestricteddetails(ministryrequestid=foiministryrequestid,type='iao')
 
@@ -41,16 +41,19 @@ class requestservicegetter:
 
         additionalpersonalinfo ={}
         for applicant in requestapplicants:
-            firstname = applicant['foirequestapplicant.firstname']
-            middlename = applicant['foirequestapplicant.middlename']
-            lastname = applicant['foirequestapplicant.lastname']
-            businessname = applicant['foirequestapplicant.businessname']
-            dobraw = applicant['foirequestapplicant.dob']
+            firstname = applicant['firstname']
+            middlename = applicant['middlename']
+            lastname = applicant['lastname']
+            businessname = applicant['businessname']
+            dobraw = applicant['dob']
             dob = parse(dobraw).strftime(self.__genericdateformat()) if dobraw is not None else ''
-            alsoknownas = applicant['foirequestapplicant.alsoknownas']
-            requestortypeid = applicant['requestortype.requestortypeid']
+            alsoknownas = applicant['alsoknownas']
+            foirequestapplicantid = applicant['foirequestapplicantid']
+            requestortypeid = applicant['requestortypeid']
+            axisapplicantid = applicant['axisapplicantid']
+
             if requestortypeid == 1:
-                baserequestinfo.update(self.__prepareapplicant(firstname, middlename, lastname, businessname))
+                baserequestinfo.update(self.__prepareapplicant(foirequestapplicantid, firstname, middlename, lastname, businessname, axisapplicantid))
             additionalpersonalinfo.update(self.__prepareadditionalpersonalinfo(requestortypeid, firstname, middlename, lastname, dob, alsoknownas))
 
         baserequestdetails, additionalpersonalinfodetails = self.preparepersonalattributes(foirequestid, request['version'])
@@ -86,17 +89,21 @@ class requestservicegetter:
             baserequestinfo = self.__preparebaseinfo(request,foiministryrequestid,requestministry,requestministrydivisions)
 
         if request['requesttype'] == 'personal':
-            requestapplicants = FOIRequestApplicantMapping.getrequestapplicants(foirequestid,request['version'])
+            requestapplicants = FOIRequestApplicantMapping.getrequestapplicantinfos(foirequestid,request['version'])
             additionalpersonalinfo ={}
             for applicant in requestapplicants:
-                firstname = applicant['foirequestapplicant.firstname']
-                middlename = applicant['foirequestapplicant.middlename']
-                lastname = applicant['foirequestapplicant.lastname']
-                dobraw = applicant['foirequestapplicant.dob']
+                firstname = applicant['firstname']
+                middlename = applicant['middlename']
+                lastname = applicant['lastname']
+                dobraw = applicant['dob']
                 dob = parse(dobraw).strftime(self.__genericdateformat()) if dobraw is not None else ''
-                requestortypeid = applicant['requestortype.requestortypeid']
+                foirequestapplicantid = applicant['foirequestapplicantid']
+                requestortypeid = applicant['requestortypeid']
+                businessname = None
+                axisapplicantid = applicant['axisapplicantid']
+
                 if requestortypeid == 1:
-                    baserequestinfo.update(self.__prepareapplicant(firstname, middlename, lastname))
+                    baserequestinfo.update(self.__prepareapplicant(foirequestapplicantid, firstname, middlename, lastname, businessname, axisapplicantid))
                 additionalpersonalinfo.update(self.__prepareadditionalpersonalinfo(requestortypeid, firstname, middlename, lastname, dob))
             baserequestdetails, additionalpersonalinfodetails = self.preparepersonalattributes(foirequestid, request['version'])
             baserequestinfo.update(baserequestdetails)
@@ -153,6 +160,7 @@ class requestservicegetter:
             'axisSyncDate': parse(requestministry["axissyncdate"]).strftime('%Y-%m-%d %H:%M:%S.%f') if axissyncdatenoneorempty == False else None,
             'axispagecount': int(requestministry["axispagecount"]) if requestministry["axispagecount"] is not None else 0 ,
             'recordspagecount': int(requestministry["recordspagecount"]) if requestministry["recordspagecount"] is not None else 0 ,
+            'axislanpagecount': int(requestministry["axislanpagecount"]) if requestministry["axislanpagecount"] is not None else 0 ,
             'description': requestministry['description'],
             'fromDate': parse(requestministry['recordsearchfromdate']).strftime(self.__genericdateformat()) if requestministry['recordsearchfromdate'] is not None else '',
             'toDate': parse(requestministry['recordsearchtodate']).strftime(self.__genericdateformat()) if requestministry['recordsearchtodate'] is not None else '',
@@ -281,12 +289,14 @@ class requestservicegetter:
                 return True
         return False 
     
-    def __prepareapplicant(self,firstname= None, middlename= None, lastname= None, businessname= None):
+    def __prepareapplicant(self, foirequestapplicantid=None, firstname=None, middlename=None, lastname=None, businessname=None, axisapplicantid=None):
         return {
                     'firstName': firstname,
                     'middleName': middlename,
                     'lastName': lastname,
-                    'businessName': businessname,                                                
+                    'businessName': businessname,   
+                    'foiRequestApplicantID': foirequestapplicantid,
+                    'axisApplicantID': axisapplicantid
                 }     
         
     def __prepareadditionalpersonalinfo(self, requestortypeid, firstname= None, middlename= None, lastname= None, dob= None, alsoknownas= None):

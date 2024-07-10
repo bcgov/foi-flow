@@ -63,6 +63,7 @@ namespace MCS.FOI.AXISIntegration.DAL
                     axisRequest.ApplicantLastName = Convert.ToString(row["lastName"]);
                     axisRequest.BusinessName = Convert.ToString(row["businessName"]);
 
+                    axisRequest.AXISApplicantID = Convert.ToString(row["axisApplicantID"]);
                     axisRequest.Address = Convert.ToString(row["address"]);
                     axisRequest.AddressSecondary = Convert.ToString(row["addressSecondary"]);
                     axisRequest.City = Convert.ToString(row["city"]);
@@ -128,7 +129,7 @@ namespace MCS.FOI.AXISIntegration.DAL
             DataTable axisDataTable = GetAxisRequestsPageCount(arrayOfRequestId);
 
             var axisRequestPageCountDict = axisDataTable.AsEnumerable()
-                .Where(rw => Convert.ToInt32(rw["requestPageCount"]) > 0)
+                .Where(rw => Convert.ToInt32(rw["requestPageCount"]) > 0 || Convert.ToInt32(rw["lanPageCount"]) > 0)
                 .ToDictionary(
                 rw => Convert.ToString(rw["AXISRequestID"]),
                 rw => new PageCount
@@ -145,7 +146,7 @@ namespace MCS.FOI.AXISIntegration.DAL
             DataTable axisDataTable = GetAxisRequestsPageCount();
 
             var axisRequestPageCountDict = axisDataTable.AsEnumerable()
-                .Where(rw => Convert.ToInt32(rw["requestPageCount"]) > 0)
+                .Where(rw => Convert.ToInt32(rw["requestPageCount"]) > 0 || Convert.ToInt32(rw["lanPageCount"]) > 0)
                 .ToDictionary(
                 rw => Convert.ToString(rw["AXISRequestID"]),
                 rw => new PageCount
@@ -180,7 +181,7 @@ namespace MCS.FOI.AXISIntegration.DAL
                 (SELECT terminology.vcTerminology from tblTerminologyLookup terminology WHERE terminology.iLabelID = deliveryModes.iLabelID and terminology.tiLocaleID = 1) as deliveryMode,
                 (SELECT terminology.vcTerminology from tblTerminologyLookup terminology WHERE terminology.iLabelID = countries.iLabelID and terminology.tiLocaleID = 1) as country,
                 (SELECT terminology.vcTerminology from tblTerminologyLookup terminology WHERE terminology.iLabelID = states.iLabelID and terminology.tiLocaleID = 1) as province,
-                requesters.vcAddress1 as [address], requesters.vcAddress2 as addressSecondary, requesters.vcCity as city, requesters.vcZipCode as postal,
+                requesters.iRequesterID as axisApplicantID, requesters.vcAddress1 as [address], requesters.vcAddress2 as addressSecondary, requesters.vcCity as city, requesters.vcZipCode as postal,
                 requesters.vcHome as phonePrimary,
                 requesters.vcMobile as phoneSecondary,
                 requesters.vcWork1 as workPhonePrimary,
@@ -195,7 +196,7 @@ namespace MCS.FOI.AXISIntegration.DAL
                 onbehalf.vcLastName as onbehalfLastName,
                 onbehalf.vcMiddleName as onbehalfMiddleName,
                 (SELECT terminology.vcTerminology from tblTerminologyLookup terminology WHERE terminology.iLabelID = requestTypes.iLabelID and terminology.tiLocaleID = 1) as requestType,
-                sum(distinct case when requests.IREQUESTID = reviewlog.IREQUESTID and reviewlog.IDOCID = documents.IDOCID then documents.SIPAGECOUNT 
+                sum(case when requests.IREQUESTID = reviewlog.IREQUESTID and reviewlog.IDOCID = documents.IDOCID then documents.SIPAGECOUNT 
                 when requests.IREQUESTID = redaction.IREQUESTID and redaction.IDOCID = ldocuments.IDOCID then ldocuments.SIPAGECOUNT 
                 else 0 end) as requestPageCount,
                 (case when requestfields.CustomField91 > 0 then requestfields.CustomField91 else 0 end ) as lanPageCount,
@@ -229,7 +230,7 @@ namespace MCS.FOI.AXISIntegration.DAL
                 GROUP BY requests.sdtReceivedDate, requests.sdtTargetDate, requests.sdtOriginalTargetDate, requests.vcDescription,
                 requests.sdtRqtDescFromdate, requests.sdtRqtDescTodate, requests.sdtRequestedDate, office.OFFICE_CODE, requesterTypes.vcDescription,
                 receivedModes.iLabelID, deliveryModes.iLabelID, countries.iLabelID, states.iLabelID,
-                requesters.vcAddress1, requesters.vcAddress2, requesters.vcCity, requesters.vcZipCode,
+                requesters.iRequesterID, requesters.vcAddress1, requesters.vcAddress2, requesters.vcCity, requesters.vcZipCode,
                 requesters.vcHome, requesters.vcMobile, requesters.vcWork1, requesters.vcWork2, requesters.vcFirstName, requesters.vcLastName, requesters.vcMiddleName,
                 requests.iRequestID, requesters.vcCompany, requesters.vcEmailID, onbehalf.vcFirstName, onbehalf.vcLastName, onbehalf.vcMiddleName,
                 requestTypes.iLabelID, requests.vcVisibleRequestID, requests.tiOfficeID, office.OFFICE_ID,requestorfields.CUSTOMFIELD35, 
@@ -352,7 +353,7 @@ namespace MCS.FOI.AXISIntegration.DAL
             ConnectionString = SettingsManager.ConnectionString;
             var inClauseValues = RequestsHelper.GetInClause(arrayOfRequestId);
 
-            string query = $@"Select vcVisibleRequestID as axisRequestId, sum(distinct case when requests.IREQUESTID = reviewlog.IREQUESTID and reviewlog.IDOCID = documents.IDOCID then documents.SIPAGECOUNT 
+            string query = $@"Select vcVisibleRequestID as axisRequestId, sum(case when requests.IREQUESTID = reviewlog.IREQUESTID and reviewlog.IDOCID = documents.IDOCID then documents.SIPAGECOUNT 
                 when requests.IREQUESTID = redaction.IREQUESTID and redaction.IDOCID = ldocuments.IDOCID then ldocuments.SIPAGECOUNT 
                 else 0 end) as requestPageCount,
 				(case when requestfields.CustomField91 > 0 then requestfields.CustomField91 else 0 end ) as lanPageCount
@@ -393,7 +394,7 @@ namespace MCS.FOI.AXISIntegration.DAL
         {
             ConnectionString = SettingsManager.ConnectionString;           
 
-            string query = @"Select vcVisibleRequestID as axisRequestId, sum(distinct case when requests.IREQUESTID = reviewlog.IREQUESTID and reviewlog.IDOCID = documents.IDOCID then documents.SIPAGECOUNT 
+            string query = @"Select vcVisibleRequestID as axisRequestId, sum(case when requests.IREQUESTID = reviewlog.IREQUESTID and reviewlog.IDOCID = documents.IDOCID then documents.SIPAGECOUNT 
                 when requests.IREQUESTID = redaction.IREQUESTID and redaction.IDOCID = ldocuments.IDOCID then ldocuments.SIPAGECOUNT 
                 else 0 end) as requestPageCount,
 				(case when requestfields.CustomField91 > 0 then requestfields.CustomField91 else 0 end ) as lanPageCount

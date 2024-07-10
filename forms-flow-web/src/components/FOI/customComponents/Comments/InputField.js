@@ -284,6 +284,7 @@ const InputField = ({ cancellor, parentId, child, inputvalue, edit, main, add, f
           handlePastedText={_handlePastedText}
           handleKeyCommand={_handleKeyCommand}
           plugins={plugins}
+          spellCheck={true}
         />
         <MentionSuggestions
           open={open}
