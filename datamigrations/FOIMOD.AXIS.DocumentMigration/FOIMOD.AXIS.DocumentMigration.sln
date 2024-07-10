@@ -3,19 +3,21 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.4.33213.308
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FOIMOD.AXIS.DocumentMigration", "FOIMOD.AXIS.DocumentMigration\FOIMOD.AXIS.DocumentMigration.csproj", "{27B70CDA-D011-441C-8CC3-7805195A3E17}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FOIMOD.AXIS.DocumentMigration", "FOIMOD.AXIS.DocumentMigration\FOIMOD.AXIS.DocumentMigration.csproj", "{27B70CDA-D011-441C-8CC3-7805195A3E17}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FOIMOD.HistoricalDocMigration.AXIS.DAL", "FOIMOD.HistoricalDocMigration.AXIS.DAL\FOIMOD.HistoricalDocMigration.AXIS.DAL.csproj", "{035B970A-AD5E-48B4-A638-2AF2EEC906FE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FOIMOD.HistoricalDocMigration.AXIS.DAL", "FOIMOD.HistoricalDocMigration.AXIS.DAL\FOIMOD.HistoricalDocMigration.AXIS.DAL.csproj", "{035B970A-AD5E-48B4-A638-2AF2EEC906FE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FOIMOD.HistoricalDocMigration.FOIMOD.DAL", "FOIMOD.HistoricalDocMigration.FOIMOD.DAL\FOIMOD.HistoricalDocMigration.FOIMOD.DAL.csproj", "{E7B31C12-9A1F-482A-BC90-8A69D2F37A85}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FOIMOD.HistoricalDocMigration.FOIMOD.DAL", "FOIMOD.HistoricalDocMigration.FOIMOD.DAL\FOIMOD.HistoricalDocMigration.FOIMOD.DAL.csproj", "{E7B31C12-9A1F-482A-BC90-8A69D2F37A85}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FOIMOD.HistoricalDocMigration.S3Uploader", "FOIMOD.HistoricalDocMigration.S3Uploader\FOIMOD.HistoricalDocMigration.S3Uploader.csproj", "{2260AC60-3BF0-4DE4-97FC-B90999F79E91}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FOIMOD.HistoricalDocMigration.S3Uploader", "FOIMOD.HistoricalDocMigration.S3Uploader\FOIMOD.HistoricalDocMigration.S3Uploader.csproj", "{2260AC60-3BF0-4DE4-97FC-B90999F79E91}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FOIMOD.HistoricalDocMigration.Utils", "FOIMOD.HistoricalDocMigration.Utils\FOIMOD.HistoricalDocMigration.Utils.csproj", "{1EF3F316-F74A-4259-A437-09338FF9D79F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FOIMOD.HistoricalDocMigration.Utils", "FOIMOD.HistoricalDocMigration.Utils\FOIMOD.HistoricalDocMigration.Utils.csproj", "{1EF3F316-F74A-4259-A437-09338FF9D79F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FOIMOD.HistoricalDocMigration.BAL", "FOIMOD.HistoricalDocMigration.BAL\FOIMOD.HistoricalDocMigration.BAL.csproj", "{A6995A62-6239-4EBA-90C8-A6DFAB1D73F5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FOIMOD.HistoricalDocMigration.BAL", "FOIMOD.HistoricalDocMigration.BAL\FOIMOD.HistoricalDocMigration.BAL.csproj", "{A6995A62-6239-4EBA-90C8-A6DFAB1D73F5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FOIMOD.HistoricalDocMigration.Models", "FOIMOD.HistoricalDocMigration.Models\FOIMOD.HistoricalDocMigration.Models.csproj", "{B9305DE6-742D-428C-BD54-DF860AA7A5A6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FOIMOD.HistoricalDocMigration.Models", "FOIMOD.HistoricalDocMigration.Models\FOIMOD.HistoricalDocMigration.Models.csproj", "{B9305DE6-742D-428C-BD54-DF860AA7A5A6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FOIMOD.HistoricalDocumentMigration.AXIS.DAL.Tests", "FOIMOD.HistoricalDocumentMigration.AXIS.DAL.Tests\FOIMOD.HistoricalDocumentMigration.AXIS.DAL.Tests.csproj", "{0E9F0FD1-6126-403E-9C9E-1557F0D6EFCE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -51,6 +53,10 @@ Global
 		{B9305DE6-742D-428C-BD54-DF860AA7A5A6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B9305DE6-742D-428C-BD54-DF860AA7A5A6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B9305DE6-742D-428C-BD54-DF860AA7A5A6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0E9F0FD1-6126-403E-9C9E-1557F0D6EFCE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0E9F0FD1-6126-403E-9C9E-1557F0D6EFCE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0E9F0FD1-6126-403E-9C9E-1557F0D6EFCE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0E9F0FD1-6126-403E-9C9E-1557F0D6EFCE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

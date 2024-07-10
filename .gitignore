@@ -123,3 +123,4 @@ historical-search-api/env/*
 datamigrations/FOIMOD.AXIS.DocumentMigration/*/bin/*
 datamigrations/FOIMOD.AXIS.DocumentMigration/*/obj/*
 datamigrations/FOIMOD.AXIS.DocumentMigration/.vs/*
+/.vs
