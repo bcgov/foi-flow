@@ -98,6 +98,7 @@ export const ContactApplicant = ({
   }
 
   const addCorrespondence = () => {
+    changeCorrespondenceFilter("drafts")
     setShowEditor(true);
     setModal(false);
     setEditMode(false);
@@ -106,6 +107,7 @@ export const ContactApplicant = ({
     setDraftCorrespondence({});
     setSelectedEmails([]);
     setCurrentTemplate(0);
+    
   }
 
   const  cancelCorrespondence = () => {
@@ -223,6 +225,9 @@ export const ContactApplicant = ({
   const changeCorrespondenceFilter = (filter: string) => {
     if (filter === correspondenceFilter) return;
     setCorrespondenceFilter(filter.toLowerCase());
+    if(filter !== 'drafts'){
+      setShowEditor(false);
+    }
   }
 
   React.useEffect(() => {
