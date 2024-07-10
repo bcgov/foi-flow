@@ -41,8 +41,14 @@ class FOIApplicantCorrespondenceResponse(db.Model):
         query = db.session.query(FOIApplicantCorrespondenceResponse).filter(FOIApplicantCorrespondenceResponse.applicantcorrespondenceresponseid == correspondenceresponseid).order_by(FOIApplicantCorrespondenceResponse.version.desc()).first()
         return response_schema.dump(query)
     
+    @classmethod
+    def getapplicantcorrespondenceresponsesbycorrespondenceid(cls, correspondenceid)->DefaultMethodResult: 
+        response_schema = FOIApplicantCorrespondenceResponseSchema()
+        query = db.session.query(FOIApplicantCorrespondenceResponse).filter(FOIApplicantCorrespondenceResponse.applicantcorrespondence_id == correspondenceid).order_by(FOIApplicantCorrespondenceResponse.version.desc()).first()
+        return response_schema.dump(query)
+
     
 class FOIApplicantCorrespondenceResponseSchema(ma.Schema):
     class Meta:
-        fields = ('applicantcorrespondenceresponseid', 'version', 'applicantcorrespondence_id', 'response_at','created_at','createdby')
+        fields = ('applicantcorrespondenceresponseid', 'version', 'applicantcorrespondence_id', 'response_at','created_at','createdby', 'applicantcorrespondenceversion_id')
     

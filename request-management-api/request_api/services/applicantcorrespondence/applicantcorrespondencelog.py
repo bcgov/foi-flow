@@ -17,7 +17,7 @@ class applicantcorrespondenceservice:
         """
         templates = ApplicationCorrespondenceTemplate.getapplicantcorrespondencetemplates()
         for template in templates:
-            template["created_at"] = self.__pstformat(template['created_at'])            
+            template["created_at"] = self.__pstformat(template['created_at'])
         return templates
     
     def gettemplatebyid(self, templateid):
@@ -93,12 +93,14 @@ class applicantcorrespondenceservice:
             return FOIApplicantCorrespondenceResponse.saveapplicantcorrespondenceresponse(correspondenceresponse)
 
     def editapplicantcorrespondenceresponselog(self, ministryrequestid, data, userid):
-        correspondence_response = FOIApplicantCorrespondenceResponse.getapplicantcorrespondenceresponse(data['correspondenceresponseid'])
+        correspondence_response = FOIApplicantCorrespondenceResponse.getapplicantcorrespondenceresponsesbycorrespondenceid(data['correspondenceid'])
         updt_correspondence_response = FOIApplicantCorrespondenceResponse()
         updt_correspondence_response.__dict__.update(correspondence_response)
+        if 'responsedate' in data and data['responsedate'] is not None:
+            response_datetime_object = datetime.combine(datetime.strptime(data['responsedate'], "%Y-%m-%d"), datetime.now().time())
+            updt_correspondence_response.response_at = response_datetime_object
         updt_correspondence_response.version = correspondence_response['version']+1
         updt_correspondence_response.foiministryrequestversion_id =FOIMinistryRequest.getversionforrequest(ministryrequestid=ministryrequestid)
-        updt_correspondence_response.response_at = data['responsedate'] if 'responsedate' in data and data['responsedate'] is not None else datetime.now()
         updt_correspondence_response.created_at = datetime.now()
         updt_correspondence_response.createdby = userid
         response = FOIApplicantCorrespondenceResponse.saveapplicantcorrespondenceresponse(updt_correspondence_response)
@@ -128,6 +130,9 @@ class applicantcorrespondenceservice:
     def __createcorrespondencelog(self, _correpondencelog, attachments):
         (_correspondencemessagejson, _isjson) = self.__getjsonobject(_correpondencelog['correspondencemessagejson']) if _correpondencelog['correspondencemessagejson'] is not None else (None, None)
         _sentcorrespondencemessagejson = json.loads(_correpondencelog["sentcorrespondencemessage"]) if _correpondencelog['sentcorrespondencemessage'] not in [None,''] else None
+        _date = self.__pstformat(_correpondencelog['sent_at']) if _sentcorrespondencemessagejson is not None else self.__pstformat(_correpondencelog['created_at'])
+        if "response_at" in _correpondencelog and _correpondencelog["response_at"] is not None:
+            _date = self.__pstformat(_correpondencelog["response_at"])
         correpondencelog ={
             "applicantcorrespondenceid":_correpondencelog['applicantcorrespondenceid'],
             "parentapplicantcorrespondenceid":_correpondencelog['parentapplicantcorrespondenceid'],
@@ -137,7 +142,7 @@ class applicantcorrespondenceservice:
             "type": self.__getvaluefromjson(_correspondencemessagejson, 'type') if _isjson else None,
             "created_at":self.__pstformat(_correpondencelog['sent_at']) if _sentcorrespondencemessagejson is not None else self.__pstformat(_correpondencelog['created_at']),
             "createdby":_correpondencelog['createdby'] if  _correpondencelog['createdby'] is not None else _correpondencelog['sentby'],
-            "date": self.__pstformat(_correpondencelog['sent_at']) if _sentcorrespondencemessagejson is not None else self.__pstformat(_correpondencelog['created_at']),
+            "date": _date,
             "userId": _correpondencelog['createdby'] if  _correpondencelog['createdby'] is not None else _correpondencelog['sentby'],
             "attachments" : attachments,
             "category" : self.__getcorrespondencecategory(_correpondencelog)

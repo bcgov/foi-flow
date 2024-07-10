@@ -216,3 +216,18 @@ class FOIFlowApplicantCorrespondenceEditResponse(Resource):
         except BusinessException:
             return "Error happened while saving  applicant correspondence log" , 500
         
+@cors_preflight('POST,OPTIONS')
+@API.route('/foiflow/applicantcorrespondence/response/delete/<ministryrequestid>/<correspondenceid>')
+class FOIFlowApplicantCorrespondenceResponse(Resource):
+
+    @staticmethod
+    @TRACER.trace()
+    @cross_origin(origins=allowedorigins())
+    @auth.require
+    def post(ministryrequestid, correspondenceid):
+        try:
+            result = applicantcorrespondenceservice().deleteapplicantcorrespondencelog(ministryrequestid, correspondenceid, AuthHelper.getuserid())
+            if result.success == True:
+               return {'status': result.success, 'message':result.message,'id':result.identifier} , 200
+        except BusinessException:
+            return "Error happened while deleting applicant correspondence log" , 500
