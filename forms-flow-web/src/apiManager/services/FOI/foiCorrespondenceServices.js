@@ -195,6 +195,43 @@ export const deleteDraftCorrespondence = (
     });
 };
 
+export const deleteResponseCorrespondence = (
+  correspondenceid,
+  ministryId,
+  dispatch,
+  callback,
+  errorCallback,
+) => {
+  if (!ministryId) {
+    dispatch(serviceActionError("No request id"));
+  }
+  dispatch(setFOICorrespondenceLoader(true));
+  const apiUrl = replaceUrl(replaceUrl(
+    API.FOI_DELETE_DRAFT_EMAIL_CORRESPONDENCE,
+    "<ministryrequestid>",
+    ministryId),"<correspondenceid>", correspondenceid,
+
+  );
+  httpPOSTRequest(apiUrl,{})
+    .then((res) => {
+      if (res.data) {
+        if (callback) {
+          callback(res.data);
+        }
+      } else {
+        dispatch(serviceActionError(res));
+        throw new Error();
+      }
+    })
+    .catch((error) => {
+      console.log("An error occured while trying to delete the response correspondence", error);
+      catchError(error, dispatch);
+      if (errorCallback) {
+        errorCallback("An error occured while trying to delete the response correspondence");
+      }
+    });
+};
+
 export const saveCorrespondenceResponse = (
   data,
   ministryId,
@@ -208,6 +245,42 @@ export const saveCorrespondenceResponse = (
   dispatch(setFOICorrespondenceLoader(true));
   const apiUrl = replaceUrl(replaceUrl(
     API.FOI_POST_RESPONSE_EMAIL_CORRESPONDENCE,
+    "<ministryrequestid>",
+    ministryId)
+  );
+  httpPOSTRequest(apiUrl, data)
+    .then((res) => {
+      if (res.data) {
+        if (callback) {
+          callback(res.data);
+        }
+      } else {
+        dispatch(serviceActionError(res));
+        throw new Error();
+      }
+    })
+    .catch((error) => {
+      console.log("An error occured while trying to save response from applicant", error);
+      catchError(error, dispatch);
+      if (errorCallback) {
+        errorCallback("An error occured while trying to save response from applicant");
+      }
+    });
+};
+
+export const editCorrespondenceResponse = (
+  data,
+  ministryId,
+  dispatch,
+  callback,
+  errorCallback,
+) => {
+  if (!ministryId) {
+    dispatch(serviceActionError("No request id"));
+  }
+  dispatch(setFOICorrespondenceLoader(true));
+  const apiUrl = replaceUrl(replaceUrl(
+    API.FOI_EDIT_RESPONSE_EMAIL_CORRESPONDENCE,
     "<ministryrequestid>",
     ministryId)
   );

@@ -62,6 +62,7 @@ export default function AttachmentModal({
   attachmentsArray,
   handleRename,
   handleReclassify,
+  handleChangeResponseDate,
   isMinistryCoordinator,
   uploadFor = "attachment",
   maxNoFiles,
@@ -71,6 +72,7 @@ export default function AttachmentModal({
   replacementfiletypes = [],
   totalUploadedRecordSize = 0,
   requestType = FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_GENERAL,
+  currentResponseDate = ""
 }) {
   let tagList = [];
   if (uploadFor === "attachment") {
@@ -121,9 +123,28 @@ export default function AttachmentModal({
   const totalFileSize = multipleFiles
     ? MaxFileSizeInMB.totalFileSize
     : MaxFileSizeInMB.stateTransition;
+
+  // Formats the input date string with format "YYYY Mon DD | 00:00 AM" to "YYYY-MM-DD" for MUI datepicker
+  function formatDate(dateStr) {
+    if (!dateStr) return dateStr;
+    const parts = dateStr.split(' | ');
+    if (parts.length !== 2) return dateStr;
+    const datePart = parts[0];
+    const timePart = parts[1];
+    const date = new Date(`${datePart} ${timePart}`);
+    if (isNaN(date.getTime())) return dateStr; // ensure valid Date object created
+  
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are zero-indexed
+    const day = String(date.getDate()).padStart(2, '0');
+  
+    return `${year}-${month}-${day}`;
+  }
+
   const classes = useStyles();
   const [files, setFiles] = useState([]);
   const [newFilename, setNewFilename] = useState("");
+  const [newResponseDate, setNewResponseDate] = useState(formatDate(currentResponseDate));
   const [extension, setExtension] = useState("");
   const [errorMessage, setErrorMessage] = useState();
   const [tagValue, setTagValue] = useState(
@@ -137,6 +158,10 @@ export default function AttachmentModal({
     MinistryNeedsScanning.includes(bcgovcode) &&
       requestType == FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL
   );
+
+  useEffect(() => {
+    setNewResponseDate(formatDate(currentResponseDate))
+  }, [currentResponseDate])
 
   useEffect(() => {
     parseFileName(attachment);
@@ -225,6 +250,9 @@ export default function AttachmentModal({
         `File name cannot be empty and cannot contain these characters, / : * ? " < > |`
       );
     }
+  };
+  const saveNewResponseDate = () => {
+    handleChangeResponseDate(newResponseDate);
   };
 
   const updateFilesCb = (_files, _errorMessage) => {
@@ -447,6 +475,8 @@ export default function AttachmentModal({
         return _message;
       case "rename":
         return { title: "Rename Attachment", body: "" };
+      case "changeresponsedate":
+        return { title: "Change Response Date", body: "" };
       case "reclassify":
         return { title: "Reclassify Attachment", body: "" };
       case "delete":
@@ -486,6 +516,10 @@ export default function AttachmentModal({
       return tagValue === "";
     } else if (modalFor === "replace" || modalFor === "replaceattachment") {
       return false;
+    } else if (modalFor === "changeresponsedate") {
+      if (newResponseDate !== formatDate(currentResponseDate)) {
+        return false;
+      }
     }
   };
 
@@ -670,13 +704,23 @@ export default function AttachmentModal({
                   totalRecordUploadLimit={totalRecordUploadLimit}
                 />
               )
-            ) : (
+            ) : null}
+            {modalFor === "rename" && (
               <ModalForRename
                 modalFor={modalFor}
                 newFilename={newFilename}
                 updateFilename={updateFilename}
                 errorMessage={errorMessage}
                 extension={extension}
+              />
+            )}
+            {modalFor === "changeresponsedate" && (
+              <ModalForChangeResponseDate
+                modalFor={modalFor}
+                newResponseDate={newResponseDate}
+                updateResponseDate={setNewResponseDate}
+                errorMessage={errorMessage}
+                currentResponseDate={formatDate(currentResponseDate)}
               />
             )}
           </DialogContentText>
@@ -698,7 +742,16 @@ export default function AttachmentModal({
               Save
             </button>
           )}
-          {modalFor !== "rename" && modalFor !== "reclassify" && (
+          {modalFor === "changeresponsedate" && (
+            <button
+              className={`btn-bottom btn-save ${classes.btnenabled}`}
+              onClick={saveNewResponseDate}
+              disabled={newResponseDate == formatDate(currentResponseDate) ? true : false}
+            >
+              Save
+            </button>
+          )}
+          {modalFor !== "rename" && modalFor !== "reclassify" && modalFor !== "changeresponsedate" && (
             <button
               className={`btn-bottom btn-save ${
                 isSaveDisabled() ? classes.btndisabled : classes.btnenabled
@@ -743,6 +796,36 @@ const ModalForRename = ({
         />
       </div>
       <div className="col-sm-1 extension-name">.{extension}</div>
+      <div className="col-sm-1"></div>
+    </div>
+  ) : null;
+};
+
+const ModalForChangeResponseDate = ({
+  modalFor,
+  newResponseDate,
+  updateResponseDate,
+  errorMessage,
+}) => {
+  return modalFor === "changeresponsedate" ? (
+    <div className="row">
+      <div className="col-sm-1"></div>
+      <div className="col-sm-9">
+        <TextField
+          id="changeresponsedate"
+          label="Change Response Date"
+          type="date"
+          inputProps={{ "aria-labelledby": "changeResponseDate-label" }}
+          InputLabelProps={{ shrink: true }}
+          variant="outlined"
+          fullWidth
+          value={newResponseDate}
+          onChange={(e) => {updateResponseDate(e.target.value)}}
+          error={errorMessage !== undefined && errorMessage !== ""}
+          helperText={errorMessage}
+        />
+      </div>
+      {/* <div className="col-sm-1 extension-name">.{extension}</div> */}
       <div className="col-sm-1"></div>
     </div>
   ) : null;

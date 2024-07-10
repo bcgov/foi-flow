@@ -50,7 +50,9 @@ class FOIApplicantCorrespondence(db.Model):
         try:
             sql = """select distinct on (applicantcorrespondenceid) applicantcorrespondenceid, templateid , correspondencemessagejson , version, 
                         created_at, createdby, sentcorrespondencemessage, parentapplicantcorrespondenceid, sentby, sent_at,
-                         isdraft, isdeleted, isresponse
+                         isdraft, isdeleted, isresponse, 
+                         (select response_at from "FOIApplicantCorrespondenceResponses" as res 
+	where res.applicantcorrespondence_id = fpa.applicantcorrespondenceid order by res.version desc limit 1)
                          from "FOIApplicantCorrespondences" fpa 
                         where foiministryrequest_id = :ministryrequestid
                     order by applicantcorrespondenceid desc, version desc""" 
@@ -62,7 +64,7 @@ class FOIApplicantCorrespondence(db.Model):
                                             "created_at": row["created_at"], "createdby": row["createdby"], 
                                             "sentcorrespondencemessage": row["sentcorrespondencemessage"], "parentapplicantcorrespondenceid": row["parentapplicantcorrespondenceid"],
                                             "sent_at": row["sent_at"], "sentby": row["sentby"],
-                                            "isdraft": row["isdraft"], "isresponse": row["isresponse"]})
+                                            "isdraft": row["isdraft"], "isresponse": row["isresponse"], "response_at": row["response_at"]})
         except Exception as ex:
             logging.error(ex)
             raise ex

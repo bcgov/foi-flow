@@ -8,7 +8,8 @@ import { errorToast, getFullnameList } from "../../../../helper/FOI/helper";
 import { toast } from "react-toastify";
 import type { Template } from './types';
 import { fetchApplicantCorrespondence, saveEmailCorrespondence, saveDraftCorrespondence, 
-  editDraftCorrespondence, deleteDraftCorrespondence, saveCorrespondenceResponse } from "../../../../apiManager/services/FOI/foiCorrespondenceServices";
+  editDraftCorrespondence, deleteDraftCorrespondence, deleteResponseCorrespondence, saveCorrespondenceResponse, 
+  editCorrespondenceResponse} from "../../../../apiManager/services/FOI/foiCorrespondenceServices";
 import _ from 'lodash';
 import IconButton from '@material-ui/core/IconButton';
 import Grid from "@material-ui/core/Grid";
@@ -17,7 +18,7 @@ import SearchIcon from "@material-ui/icons/Search";
 import InputBase from "@mui/material/InputBase";
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
-import CommentStructure from '../Comments/CommentStructure'
+import CommunicationStructure from './CommunicationStructure'
 import AttachmentModal from '../Attachments/AttachmentModal';
 import { getOSSHeaderDetails, saveFilesinS3, getFileFromS3 } from "../../../../apiManager/services/FOI/foiOSSServices";
 import { dueDateCalculation } from '../../FOIRequest/BottomButtonGroup/utils';
@@ -39,6 +40,7 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import CloseIcon from '@material-ui/icons/Close';
+import {  saveNewFilename } from "../../../../apiManager/services/FOI/foiAttachmentServices";
 
 
 
@@ -56,6 +58,7 @@ export const ContactApplicant = ({
   const currentCFRForm: any = useSelector((state: any) => state.foiRequests.foiRequestCFRForm);
   const isLoading: boolean = useSelector((state: any) => state.foiRequests.isCorrespondenceLoading);
   const fullNameList = getFullnameList()
+  const [modalFor, setModalFor] = useState("add")
 
   const getFullname = (userid: string) => {
     let user = fullNameList.find((u: any) => u.username === userid);
@@ -82,6 +85,9 @@ export const ContactApplicant = ({
   const [confirmationTitle, setConfirmationTitle] = useState("");
   const [confirmationMessage, setConfirmationMessage] = useState("");
   const [draftCorrespondence, setDraftCorrespondence] = useState <any> ({});
+  const [selectedCorrespondence, setSelectedCorrespondence] = useState <any> ({});
+  const [currentResponseDate, setCurrentResponseDate] = useState <any> ("");
+  const [extension, setExtension] = useState("");
 
   const openAttachmentModal = () => { 
     setUploadFor("email");
@@ -93,6 +99,7 @@ export const ContactApplicant = ({
     setEditorValue("")
     setCurrentTemplate(0)
     setUploadFor("response");
+    setModalFor("add");
     setModal(true);  
     setShowEditor(false);  
   }
@@ -145,6 +152,8 @@ export const ContactApplicant = ({
       deleteDraftAction();
     } else if (confirmationFor === "cancel-correspondence") {
       clearcorrespondence();
+    } else if (confirmationFor === "delete-response") {
+      deleteResponseAction();
     }
   }
 
@@ -604,6 +613,60 @@ export const ContactApplicant = ({
   }
   };
 
+  const deleteResponse = (i : any) => {
+    setSelectedCorrespondence(i);
+    setOpenConfirmationModal(true);
+    setConfirmationFor("delete-response")
+    setConfirmationTitle("Delete Response")
+    setConfirmationMessage("Are you sure you want to delete this response? This can not be undone");
+  }
+
+  const deleteResponseAction = () => {
+    if (selectedCorrespondence) {
+      setCorrespondenceId(selectedCorrespondence.applicantcorrespondenceid);
+      setDisablePreview(true);
+      setPreviewModal(false);
+      let callback = (_res: string) => {
+        setEditorValue("");
+        setCurrentTemplate(0);
+        setFiles([]);
+        setSelectedEmails([]);
+        setShowEditor(false)
+        setEditMode(false);
+        setSelectedCorrespondence({});
+        toast.success("Response has been deleted successfully", {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: true,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+        });
+        dispatch(fetchApplicantCorrespondence(requestId, ministryId));
+      }
+      deleteResponseCorrespondence(selectedCorrespondence.applicantcorrespondenceid,ministryId,
+        dispatch,
+        callback,
+        (errorMessage: string) => {
+          setEditorValue("");
+          setCurrentTemplate(0);
+          setFiles([]);
+          setSelectedEmails([]);
+          setShowEditor(false);
+          setEditMode(false);
+          setSelectedCorrespondence({});
+          dispatch(fetchApplicantCorrespondence(requestId, ministryId));
+          setFOICorrespondenceLoader(false);
+          setDisablePreview(false);
+        },
+      );
+      setFOICorrespondenceLoader(false);
+      setDisablePreview(false);
+      setEditMode(false);
+    }
+  }
+
   const editCorrespondence = async (i : any) => {
     setDisablePreview(true);
     setPreviewModal(false);
@@ -653,8 +716,40 @@ export const ContactApplicant = ({
     setDisablePreview(false);
     return attachments;
   };
+  const [updateAttachment, setUpdateAttachment] = useState<any>({});
 
+  const handleRename = (_attachment: any, newFilename: string) => {
+    setModal(false);
+    let correspondenceAttachmentId = selectedCorrespondence.attachments[0].applicantcorrespondenceattachmentid;
+    let correspondenceId = selectedCorrespondence.applicantcorrespondenceid;
 
+    if (updateAttachment.filename !== newFilename) {
+      editCorrespondenceResponse(
+        { filename: newFilename, correspondenceattachmentid: correspondenceAttachmentId, correspondenceid: correspondenceId }, 
+        ministryId, 
+        dispatch,
+        () => {
+          setSelectedCorrespondence({})
+          dispatch(fetchApplicantCorrespondence(requestId, ministryId));
+        },
+        (errorMessage: string) => {console.log('Error saving new filename: ', errorMessage)}
+      );
+    }
+  }
+
+  const handleChangeResponseDate = (newDate: string) => {
+    setModal(false);
+    editCorrespondenceResponse(
+      {responsedate: newDate, correspondenceid: selectedCorrespondence.applicantcorrespondenceid}, 
+      ministryId, 
+      dispatch, 
+      () => {
+        setSelectedCorrespondence({})
+        dispatch(fetchApplicantCorrespondence(requestId, ministryId));
+      }, 
+      (errorMessage: string) => {console.log('Error updating response date: ', errorMessage)}
+    )
+  }
   const [showEditor, setShowEditor] = useState(false)
 
   const [previewModal, setPreviewModal] = useState(false);
@@ -676,7 +771,7 @@ export const ContactApplicant = ({
       data-msgid={index}
       style={{ display: 'block' }}
     >
-      <CommentStructure
+      <CommunicationStructure
         i={message}
         reply={false}
         parentId={null}
@@ -689,9 +784,18 @@ export const ContactApplicant = ({
         ministryId={ministryId}
         editDraft={editDraft}
         deleteDraft={deleteDraft}
+        deleteResponse={deleteResponse}
+        modalFor={modalFor}
+        setModalFor={setModalFor}
+        setModal={setModal}
+        setSelectedCorrespondence={setSelectedCorrespondence}
+        setCurrentResponseDate={setCurrentResponseDate}
+        setUpdateAttachment={setUpdateAttachment}
       />
     </div>
   ))
+  console.log("modalFor",modalFor)
+
 
   let templatesList;
   const parser = new DOMParser();
@@ -1019,7 +1123,7 @@ export const ContactApplicant = ({
         {correspondenceFilter === "templates" && templatesList}
       </div>
       <AttachmentModal
-      modalFor={"add"}
+      modalFor={modalFor}
       openModal={openModal}
       handleModal={uploadFor === "response" ? saveResponse : handleContinueModal}
       multipleFiles={true}
@@ -1027,13 +1131,15 @@ export const ContactApplicant = ({
       requestId={requestId}
       attachmentsArray={files}
       existingDocuments={files}
-      attachment={{}}
-      handleRename={undefined}
+      attachment={updateAttachment}//{{}}
+      handleRename= {handleRename} //{undefined}
       handleReclassify={undefined}
+      handleChangeResponseDate={handleChangeResponseDate}
       isMinistryCoordinator={false}
       uploadFor={uploadFor}
       maxNoFiles={uploadFor === "response" ? 1 : 10}
       bcgovcode={undefined}
+      currentResponseDate={currentResponseDate}
     /> 
     <div className="email-change-dialog">
       <Dialog
