@@ -126,11 +126,13 @@ export default function AttachmentModal({
 
   // Formats the input date string with format "YYYY Mon DD | 00:00 AM" to "YYYY-MM-DD" for MUI datepicker
   function formatDate(dateStr) {
-    if (!dateStr) return '';
+    if (!dateStr) return dateStr;
     const parts = dateStr.split(' | ');
+    if (parts.length !== 2) return dateStr;
     const datePart = parts[0];
     const timePart = parts[1];
     const date = new Date(`${datePart} ${timePart}`);
+    if (isNaN(date.getTime())) return dateStr; // ensure valid Date object created
   
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are zero-indexed
