@@ -30,9 +30,13 @@ export const getExtensiondetails = (requestExtensions:any, type: string) => {
 }
 
 export const getExtensionType = (requestExtensions: any) => {
-  let oipcExtension = getExtensiondetails(requestExtensions, "OIPC");
-  let pbExtension =  getExtensiondetails(requestExtensions, "Public Body");
-  return pbExtension[0] ? "PB" : oipcExtension[0] ? "OIPC" : "NA";
+  if (!requestExtensions || requestExtensions.length === 0) {
+    return "NA";
+  }
+
+  // Get the type of the latest extension
+  let latestExtension = requestExtensions[0];
+  return latestExtension["extensiontype"] === "Public Body" ? "PB" : "OIPC";
 }
 
 export const getTemplateVariables = (requestDetails: any, requestExtensions:any, responsePackagePdfStitchStatus:any, cfrFeeData:any, templateInfo: any) => {
