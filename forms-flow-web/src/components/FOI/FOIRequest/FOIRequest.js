@@ -1057,11 +1057,6 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
       requestDetails?.requestType === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_GENERAL)
   }
 
-  const handleLockRecords = () => {
-    setLockRecordsTab(!lockRecordsTab);
-    console.log("API CALL TO LOCK RECORDS ENDPOINT") // OR JUST REUQEST UPDATE END POINT AND NO NEED FOR NEW ONE?
-  }
-
   return (!isLoading &&
     requestDetails &&
     Object.keys(requestDetails).length !== 0) ||
@@ -1671,7 +1666,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
                   recordsTabSelect={tabLinksStatuses.Records.active}
                   requestType={requestDetails?.requestType}
                   lockRecords={lockRecordsTab}
-                  handleLockRecords={handleLockRecords}
+                  setLockRecordsTab={setLockRecordsTab}
                 />
               </>
             )}

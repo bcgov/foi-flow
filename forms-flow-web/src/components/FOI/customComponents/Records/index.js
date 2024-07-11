@@ -33,6 +33,7 @@ import {
   fetchPDFStitchedRecordForOIPCRedline,
   fetchPDFStitchedRecordForOIPCRedlineReview,
   checkForRecordsChange,
+  updateUserLockedRecords,
 } from "../../../../apiManager/services/FOI/foiRecordServices";
 import {
   StateTransitionCategories,
@@ -220,6 +221,7 @@ export const RecordsLog = ({
   recordsTabSelect,
   requestType,
   lockRecords,
+  setLockRecordsTab,
 }) => {
   const user = useSelector((state) => state.user.userDetail);
   const userGroups = user?.groups?.map((group) => group.slice(1));
@@ -577,6 +579,7 @@ export const RecordsLog = ({
       saveDocument(value, fileInfoList, files);
     }
   };
+  console.log("LOCK", lockRecords)
 
   const saveDocument = (value, fileInfoList, files) => {
     if (value) {
@@ -1742,6 +1745,47 @@ export const RecordsLog = ({
     );
   };
 
+  const handleLockRecords = () => {
+    setLockRecordsTab(!lockRecords);
+    const toastID = toast.loading("Updating records lock status for request...");
+    const data = {userlockedrecords: !lockRecords};
+    dispatch(
+      updateUserLockedRecords(
+        data,
+        requestId,
+        ministryId, 
+        (err, _res) => {
+        if(!err) {
+          toast.update(toastID, {
+            type: "success",
+            render: "Request details have been saved successfully.",
+            position: "top-right",
+            isLoading: false,
+            autoClose: 3000,
+            hideProgressBar: true,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+          });
+        } else {
+          toast.error(
+            "Temporarily unable to update records lock status for request. Please try again in a few minutes.",
+            {
+              position: "top-right",
+              autoClose: 3000,
+              hideProgressBar: true,
+              closeOnClick: true,
+              pauseOnHover: true,
+              draggable: true,
+              progress: undefined,
+            }
+          );
+        }
+      })
+    )
+  }
+
   return (
     <div className={classes.container}>
       {isAttachmentLoading ? (
@@ -1766,6 +1810,7 @@ export const RecordsLog = ({
             <Grid>
               <button
               style={{marginTop: "4px"}}
+              onClick={handleLockRecords}
               className={clsx(
                 "btn",
                 "addAttachment",
