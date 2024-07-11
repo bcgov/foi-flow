@@ -72,7 +72,7 @@ class FOIMinistryRequest(db.Model):
     identityverified = db.Column(JSON, unique=False, nullable=True)
     ministrysignoffapproval = db.Column(JSON, unique=False, nullable=True)
     requeststatuslabel = db.Column(db.String(50), nullable=False)
-    lockrecords = db.Column(db.Boolean, nullable=True)
+    userlockedrecords = db.Column(db.Boolean, nullable=True)
 
     #ForeignKey References
     
@@ -1588,5 +1588,5 @@ class FOIMinistryRequestSchema(ma.Schema):
                 'foirequest.receivedmodeid','requeststatus.requeststatusid','requeststatuslabel','requeststatus.name','programarea.bcgovcode',
                 'programarea.name','foirequest_id','foirequestversion_id','created_at','updated_at','createdby','assignedministryperson',
                 'assignedministrygroup','cfrduedate','closedate','closereasonid','closereason.name',
-                'assignee.firstname','assignee.lastname','ministryassignee.firstname','ministryassignee.lastname', 'axisrequestid', 'axissyncdate', 'axispagecount', 'axislanpagecount', 'linkedrequests', 'ministrysignoffapproval', 'identityverified','originalldd','isoipcreview', 'recordspagecount', 'lockrecords')
+                'assignee.firstname','assignee.lastname','ministryassignee.firstname','ministryassignee.lastname', 'axisrequestid', 'axissyncdate', 'axispagecount', 'axislanpagecount', 'linkedrequests', 'ministrysignoffapproval', 'identityverified','originalldd','isoipcreview', 'recordspagecount', 'userlockedrecords')
     

@@ -123,7 +123,7 @@ const BottomButtonGroup = React.memo(
 
       //Logic to change lock records to null (and have FE useEffect in FOIRequest.js/MinistryView.js logic takeover) if request goes back to open, cfr, harms, fee estimate, dedup
       if (!validLockRecordsState(currentSelectedStatus)) {
-        saveRequestObject.lockrecords = null;
+        saveRequestObject.userlockedrecords = null;
       }
 
       //add oipc Data to save request object and sync/validate isoipcreview attribute

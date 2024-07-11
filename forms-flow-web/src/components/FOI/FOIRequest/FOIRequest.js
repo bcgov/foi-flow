@@ -392,12 +392,12 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
       setIsOIPCReview(false);
     }
 
-    //Adjust lockRecords value based on requestState if there is no manual user lockrecords value present in requestDetails from DB
+    //Adjust lockRecords value based on requestState if there is no manual user lockedrecords value present in requestDetails from DB
     const updateRecordsTabAccess = () => {
-      if(requestDetails.lockrecords === null) {
+      if(requestDetails.userlockedrecords === null) {
         return validLockRecordsState(requestDetails.currentState);
       } else {
-        return requestDetails.lockrecords;
+        return requestDetails.userlockedrecords;
       }
     }
     setLockRecordsTab(updateRecordsTabAccess());
