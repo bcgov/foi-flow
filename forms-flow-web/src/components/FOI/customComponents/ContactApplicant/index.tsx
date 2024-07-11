@@ -369,7 +369,8 @@ export const ContactApplicant = ({
       attributes: [{ 
         "paymentExpiryDate": dueDateCalculation(new Date(), PAYMENT_EXPIRY_DAYS),
         "axisRequestId": requestNumber
-      }]
+      }],
+      assignedGroupEmail: requestDetails.assignedGroupEmail
     };
     saveEmailCorrespondence(
       data,
