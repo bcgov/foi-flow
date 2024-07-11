@@ -17,30 +17,32 @@ class axissyncservice:
 
     def syncpagecounts(self, axispgmrequests): 
         for entry in axispgmrequests:
-            self.__syncpagecounts(entry["bcgovcode"], entry["requesttype"])
+            self.__syncpagecounts(entry["iaocode"], entry["requesttype"])
         return DefaultMethodResult(True,'Batch execution completed', axispgmrequests)
 
-    def __syncpagecounts(self, bcgovcode, requesttype):
-        programeara = programareaservice().getprogramareabyiaocode(bcgovcode)
+    def __syncpagecounts(self, iaocode, requesttype):
+        programeara = programareaservice().getprogramareabyiaocode(iaocode)
         requests = FOIMinistryRequest.getrequest_by_pgmarea_type(programeara['programareaid'], requesttype)
         for batch in list(more_itertools.batched(requests, self.AXIS_SYNC_BATCHSIZE)):
             batchrequest = list(batch)
             axisids = self.__getaxisids(batchrequest)
             #Fetch pagecount from axis : Begin
             axis_pageinfo = self.axis_getpageinfo(axisids)
+            print("axis_pageinfo=",axis_pageinfo)
             #Fetch pagecount from axis : End
-            if axis_pageinfo != {}:
+            if axis_pageinfo != {}:                
                 response = FOIMinistryRequest.bulk_update_axispagecount(self.updatepagecount(batchrequest, axis_pageinfo))
                 if response.success == False:
                     print("batch update failed for ids=", axisids)
             else:
                 print("axis page response is empty for ids=", axisids) 
-        return DefaultMethodResult(True,'Batch execution completed for bcgovcode=%s | requesttype=%s', bcgovcode, requesttype)       
+        return DefaultMethodResult(True,'Batch execution completed for iaocode=%s | requesttype=%s', iaocode, requesttype)       
         
 
     def axis_getpageinfo(self, axis_payload):
         try:
             if self.AXIS_BASE_URL not in (None,''):
+                print('axis_payload:',axis_payload)
                 access_token = KeycloakAdminService().get_token()
                 axis_page_endpoint = f'{self.AXIS_BASE_URL}/api/requestspagecount'
                 response = requests.post(
@@ -65,8 +67,8 @@ class axissyncservice:
             axisrequestid = entry["axisrequestid"]
             entry["updatedby"] = 'System'
             entry["updated_at"] = datetime2.now()
-            entry["axispagecount"] = axisresponse[axisrequestid] if axisrequestid in axisresponse else entry["axispagecount"]
-            entry["axislanpagecount"] = axisresponse[axisrequestid] if axisrequestid in axisresponse else entry["axislanpagecount"]
+            entry["axispagecount"] = axisresponse[axisrequestid]["requestpagepount"] if axisrequestid in axisresponse else entry["axispagecount"]
+            entry["axislanpagecount"] = axisresponse[axisrequestid]["lanpagepount"] if axisrequestid in axisresponse else entry["axislanpagecount"]
         return requests
 
 

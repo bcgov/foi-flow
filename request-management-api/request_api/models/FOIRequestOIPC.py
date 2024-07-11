@@ -42,8 +42,16 @@ class FOIRequestOIPC(db.Model):
 
     @classmethod
     def getoipc(cls,ministryrequestid,ministryrequestversion):
+        latestministryrequestversion = None
         oipc_schema = FOIRequestOIPCSchema(many=True)
-        _oipclist = db.session.query(FOIRequestOIPC).filter(FOIRequestOIPC.foiministryrequest_id == ministryrequestid , FOIRequestOIPC.foiministryrequestversion_id == ministryrequestversion).order_by(FOIRequestOIPC.oipcid.asc()).all()
+
+        # Query to get the latest version of FOIRequestOIPC for a given ministryrequestid
+        _latest_oipc = db.session.query(FOIRequestOIPC).filter(FOIRequestOIPC.foiministryrequest_id == ministryrequestid).order_by(FOIRequestOIPC.foiministryrequestversion_id.desc()).first()
+        
+        if _latest_oipc is not None:
+            latestministryrequestversion=_latest_oipc.foiministryrequestversion_id
+
+        _oipclist = db.session.query(FOIRequestOIPC).filter(FOIRequestOIPC.foiministryrequest_id == ministryrequestid , FOIRequestOIPC.foiministryrequestversion_id == latestministryrequestversion).order_by(FOIRequestOIPC.oipcid.asc()).all()
         divisioninfos = oipc_schema.dump(_oipclist)       
         return divisioninfos
     
