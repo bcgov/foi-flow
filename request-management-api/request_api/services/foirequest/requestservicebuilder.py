@@ -54,6 +54,7 @@ class requestservicebuilder(requestserviceconfigurator):
         foiministryrequest.startdate = startdate
         foiministryrequest.createdby = userid
         requeststatuslabel =  self.getpropertyvaluefromschema(requestschema, 'requeststatuslabel')
+        foiministryrequest.lockrecords = requestschema.get("lockrecords")
         if requeststatuslabel is not None:
             status = self.getstatusname(requeststatuslabel)
         if self.isNotBlankorNone(requestschema,"fromDate","main") == True:

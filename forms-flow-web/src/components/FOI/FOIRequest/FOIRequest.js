@@ -395,7 +395,9 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
     //Adjust lockRecords value based on requestState if there is no manual user lockrecords value present in requestDetails from DB
     const updateRecordsTabAccess = () => {
       if(requestDetails.lockrecords === null) {
-        return validLockRecordsState(requestDetails.currentState)
+        return validLockRecordsState(requestDetails.currentState);
+      } else {
+        return requestDetails.lockrecords;
       }
     }
     setLockRecordsTab(updateRecordsTabAccess());
