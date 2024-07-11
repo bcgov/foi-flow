@@ -321,7 +321,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
       dispatch(
         fetchRedactedSections(ministryId, (_err, res) => {
           if (!_err) {
-            setRedactedSections(res.sections);
+            setRedactedSections(res);
           }
         })
       );
