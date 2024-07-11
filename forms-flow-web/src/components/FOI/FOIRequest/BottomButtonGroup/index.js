@@ -77,6 +77,7 @@ const BottomButtonGroup = React.memo(
     axisMessage,
     attachmentsArray,
     oipcData,
+    validLockRecordsState,
   }) => {
     /**
      * Bottom Button Group of Review request Page
@@ -119,6 +120,14 @@ const BottomButtonGroup = React.memo(
         saveRequestObject.requeststatuslabel = StateEnum.intakeinprogress.label;
         setIsAddRequest(false);
       }
+
+      //Logic to change lock records to null (and have FE useEffect in FOIRequest.js/MinistryView.js logic takeover) if request goes back to open, cfr, harms, fee estimate, dedup
+      if (!validLockRecordsState(currentSelectedStatus)) {
+        console.log("GOT YA")
+        saveRequestObject.lockrecords = true;
+      }
+
+      console.log("SAVE PBJ", saveRequestObject)
 
       //add oipc Data to save request object and sync/validate isoipcreview attribute
       if (requestState.toLowerCase() !== StateEnum.intakeinprogress.name.toLowerCase() && requestState.toLowerCase() !== StateEnum.unopened.name.toLowerCase()) {
@@ -253,6 +262,7 @@ const BottomButtonGroup = React.memo(
     };
 
     const handleModal = (value) => {
+      console.log("LIQUIDD")
       setOpenModal(false);
       if (!value) {
         handleOpenRequest("", "", true);
@@ -389,6 +399,7 @@ const BottomButtonGroup = React.memo(
     const handleSaveModal = (value, fileInfoList, files) => {
       setsaveModal(false);
       setFileCount(files?.length);
+      console.log("SNAKEE")
 
       if (!value) {
         handleSaveRequest(requestState, true, "");
