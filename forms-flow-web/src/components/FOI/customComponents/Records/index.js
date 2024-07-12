@@ -222,6 +222,7 @@ export const RecordsLog = ({
   requestType,
   lockRecords,
   setLockRecordsTab,
+  validLockRecordsState,
 }) => {
   const user = useSelector((state) => state.user.userDetail);
   const userGroups = user?.groups?.map((group) => group.slice(1));
@@ -1806,7 +1807,7 @@ export const RecordsLog = ({
                 {getRequestNumber()}
               </h1>
             </Grid>
-            {isMinistryCoordinator === false ?
+            {isMinistryCoordinator === false && validLockRecordsState() ?
             <Grid>
               <button
               style={{marginTop: "4px"}}
@@ -2150,7 +2151,7 @@ export const RecordsLog = ({
                     className={` btn`}
                     onClick={() => setDeleteModalOpen(true)}
                     // title="Remove Attachments"
-                    disabled={
+                    disabled={lockRecords || 
                       records.filter((record) => record.attachments?.length > 0)
                         .length === 0
                     }
@@ -2205,7 +2206,7 @@ export const RecordsLog = ({
                     className={` btn`}
                     onClick={() => setDivisionsModalOpen(true)}
                     // title="Update Divisions"
-                    disabled={isUpdateDivisionsDisabled()}
+                    disabled={lockRecords || isUpdateDivisionsDisabled()}
                     style={
                       isUpdateDivisionsDisabled()
                         ? { pointerEvents: "none" }
@@ -2226,7 +2227,7 @@ export const RecordsLog = ({
                     className={` btn`}
                     onClick={() => handlePopupButtonClick("delete")}
                     // title="Delete"
-                    disabled={!checkIsAnySelected()}
+                    disabled={lockRecords || !checkIsAnySelected()}
                     style={
                       !checkIsAnySelected() ? { pointerEvents: "none" } : {}
                     }
@@ -2288,6 +2289,7 @@ export const RecordsLog = ({
                     ministryId={ministryId}
                     classes={classes}
                     handleSelectRecord={handleSelectRecord}
+                    lockRecords={lockRecords}
                   />
                 ))
               ) : (
@@ -2604,6 +2606,7 @@ const Attachment = React.memo(
     isMinistryCoordinator,
     ministryId,
     handleSelectRecord,
+    lockRecords
   }) => {
     const classes = useStyles();
     const [disabled, setDisabled] = useState(false);
@@ -2788,6 +2791,7 @@ const Attachment = React.memo(
               disabled={disabled}
               ministryId={ministryId}
               setRetry={setRetry}
+              lockRecords={lockRecords}
             />
           </Grid>
         </Grid>
@@ -2867,6 +2871,7 @@ const Attachment = React.memo(
             ministryId={ministryId}
             classes={classes}
             handleSelectRecord={handleSelectRecord}
+            lockRecords={lockRecords}
           />
         ))}
       </>
@@ -2888,6 +2893,7 @@ const AttachmentPopup = React.memo(
     disabled,
     ministryId,
     setRetry,
+    lockRecords,
   }) => {
     const ref = React.useRef();
     const closeTooltip = () => (ref.current && ref ? ref.current.close() : {});
@@ -2968,6 +2974,7 @@ const AttachmentPopup = React.memo(
     const DeleteMenu = () => {
       return (
         <MenuItem
+          disabled={lockRecords}
           onClick={() => {
             handleDelete();
             setPopoverOpen(false);
@@ -3021,6 +3028,7 @@ const AttachmentPopup = React.memo(
             {(!record.attributes?.isattachment ||
               record.attributes?.isattachment === undefined) && (
               <MenuItem
+                disabled={lockRecords}
                 onClick={() => {
                   handleReplace();
                   setPopoverOpen(false);
@@ -3031,6 +3039,7 @@ const AttachmentPopup = React.memo(
             )}
             {record.attributes?.isattachment && (
               <MenuItem
+                disabled={lockRecords}
                 onClick={() => {
                   handleReplaceAttachment();
                   setPopoverOpen(false);

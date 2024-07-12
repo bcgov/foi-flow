@@ -342,10 +342,10 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
     if (bcgovcode) dispatch(fetchFOIMinistryAssignedToList(bcgovcode));
   }, [requestId, ministryId, comment, attachments]);
 
-  const validLockRecordsState = (currentState) => {
-    console.log("MIQU", requestDetails)
-    console.log("BOOM", currentState)
+  const validLockRecordsState = (currentState=requestDetails.currentState) => {
     return (
+      currentState === StateEnum.harms.name ||
+      currentState === StateEnum.onhold.name ||
       currentState === StateEnum.recordsreadyforreview.name ||
       currentState === StateEnum.review.name ||
       currentState === StateEnum.consult.name ||
@@ -1667,6 +1667,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
                   requestType={requestDetails?.requestType}
                   lockRecords={lockRecordsTab}
                   setLockRecordsTab={setLockRecordsTab}
+                  validLockRecordsState={validLockRecordsState}
                 />
               </>
             )}

@@ -259,7 +259,6 @@ const BottomButtonGroup = React.memo(
     };
 
     const handleModal = (value) => {
-      console.log("LIQUIDD")
       setOpenModal(false);
       if (!value) {
         handleOpenRequest("", "", true);
@@ -396,7 +395,6 @@ const BottomButtonGroup = React.memo(
     const handleSaveModal = (value, fileInfoList, files) => {
       setsaveModal(false);
       setFileCount(files?.length);
-      console.log("SNAKEE")
 
       if (!value) {
         handleSaveRequest(requestState, true, "");

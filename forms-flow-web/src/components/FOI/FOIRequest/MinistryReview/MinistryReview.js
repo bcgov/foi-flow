@@ -245,8 +245,10 @@ const MinistryReview = React.memo(({ userDetail }) => {
   const userGroups = userDetail?.groups?.map(group => group.slice(1));
   const isMinistry = isMinistryLogin(userGroups);
 
-  const validLockRecordsState = (currentState) => {
+  const validLockRecordsState = (currentState=requestDetails.currentState) => {
     return (
+      currentState === StateEnum.harms.name ||
+      currentState === StateEnum.onhold.name ||
       currentState === StateEnum.recordsreadyforreview.name ||
       currentState === StateEnum.review.name ||
       currentState === StateEnum.consult.name ||
