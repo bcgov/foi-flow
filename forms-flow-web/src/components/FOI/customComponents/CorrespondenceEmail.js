@@ -79,16 +79,23 @@ export default function CorrespondenceEmail({
             setNewCorrespondenceEmail(""); 
         })
       );
+      handleChange()
       }
     }
 
     const handleChange = (event) => {
       let currentemail = "";    
-      if (event.nativeEvent.target.dataset.value) {
-        currentemail = event.nativeEvent.target.dataset.value;
+      if(!!event){
+        if (event.nativeEvent.target.dataset.value) {
+          currentemail = event.nativeEvent.target.dataset.value;
+        }
+        else if (event.nativeEvent.target.name) {
+          currentemail = event.nativeEvent.target.name;
+        }
       }
-      else if (event.nativeEvent.target.name) {
-        currentemail = event.nativeEvent.target.name;
+      else{
+        //console.log("newCorrespondenceEmail:",newCorrespondenceEmail)
+        currentemail = newCorrespondenceEmail
       }
       if (selectedEmails.includes(currentemail)) {
         let filteredArray = selectedEmails.filter(function(e) { return e !== currentemail })
@@ -96,7 +103,6 @@ export default function CorrespondenceEmail({
       } else{
         setSelectedEmails((existingEmails) => [...existingEmails, currentemail]);
       }     
-      
     };
     
     

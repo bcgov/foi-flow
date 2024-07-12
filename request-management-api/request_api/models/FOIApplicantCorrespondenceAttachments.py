@@ -60,11 +60,70 @@ class FOIApplicantCorrespondenceAttachment(db.Model):
     def getcorrespondenceattachmentsbyministryid(cls,ministryrequestid):
         attachments = []
         try:
-            sql = """select fca.applicantcorrespondenceid, fca.applicantcorrespondence_version, fca.applicantcorrespondenceattachmentid, attachmentfilename, 
-            attachmentdocumenturipath
-            from "FOIApplicantCorrespondenceAttachments" fca join "FOIApplicantCorrespondences" fpa on fpa.applicantcorrespondenceid = fca.applicantcorrespondenceid  and fca.applicantcorrespondence_version = fpa."version" 
-            where fpa.foiministryrequest_id  = :ministryrequestid
-            order by fpa.applicantcorrespondenceid desc, fca.applicantcorrespondence_version desc;""" 
+            # select on the highest version of each attachment
+            sql = """
+                    WITH RankedCorrespondences AS (
+                        SELECT 
+                            fca.applicantcorrespondenceid, 
+                            fca.applicantcorrespondence_version, 
+                            fca.applicantcorrespondenceattachmentid, 
+                            attachmentfilename, 
+                            attachmentdocumenturipath, 
+                            fca.version,
+                            ROW_NUMBER() OVER (PARTITION BY fca.applicantcorrespondenceid, fca.applicantcorrespondence_version, fca.applicantcorrespondenceattachmentid ORDER BY fca.version DESC) AS rn
+                        FROM 
+                            "FOIApplicantCorrespondenceAttachments" fca 
+                        JOIN 
+                            "FOIApplicantCorrespondences" fpa 
+                        ON 
+                            fpa.applicantcorrespondenceid = fca.applicantcorrespondenceid  
+                            AND fca.applicantcorrespondence_version = fpa."version"
+                        WHERE 
+                            fpa.foiministryrequest_id = :ministryrequestid
+                    )
+                    SELECT 
+                        applicantcorrespondenceid, 
+                        applicantcorrespondence_version, 
+                        applicantcorrespondenceattachmentid, 
+                        attachmentfilename, 
+                        attachmentdocumenturipath, 
+                        version
+                    FROM 
+                        RankedCorrespondences
+                    WHERE 
+                        rn = 1
+                    ORDER BY 
+                        applicantcorrespondenceid DESC, 
+                        applicantcorrespondence_version DESC;"""
+            rs = db.session.execute(text(sql), {'ministryrequestid': ministryrequestid})
+            for row in rs:
+                attachments.append({"applicantcorrespondenceid": row["applicantcorrespondenceid"], "applicantcorrespondence_version": row["applicantcorrespondence_version"],"applicantcorrespondenceattachmentid": row["applicantcorrespondenceattachmentid"], "attachmentfilename": row["attachmentfilename"], "attachmentdocumenturipath": row["attachmentdocumenturipath"], "version": row["version"]})
+        except Exception as ex:
+            logging.error(ex)
+            raise ex
+        finally:
+            db.session.close()
+        return attachments
+
+    # response attachments require a different query
+    @classmethod
+    def getcorrespondenceresponseattachmentbyministryid(cls, ministryrequestid):
+        attachments = []
+        try:
+            sql = """SELECT DISTINCT ON (fca.applicantcorrespondenceid) 
+                        fca.applicantcorrespondenceid, 
+                        fca.applicantcorrespondence_version, 
+                        fca.applicantcorrespondenceattachmentid, 
+                        fca.attachmentfilename, 
+                        fca.attachmentdocumenturipath, 
+                        fca.version
+                    FROM "FOIApplicantCorrespondenceAttachments" fca 
+                    JOIN "FOIApplicantCorrespondences" fpa 
+                        ON fpa.applicantcorrespondenceid = fca.applicantcorrespondenceid  
+                        AND fca.applicantcorrespondence_version = fpa."version"
+                    WHERE fpa.foiministryrequest_id = :ministryrequestid
+                    ORDER BY fca.applicantcorrespondenceid, fca.applicantcorrespondence_version DESC, fca.version DESC;
+                    """ 
             rs = db.session.execute(text(sql), {'ministryrequestid': ministryrequestid})
             for row in rs:
                 attachments.append({"applicantcorrespondenceid": row["applicantcorrespondenceid"], "applicantcorrespondence_version": row["applicantcorrespondence_version"],"applicantcorrespondenceattachmentid": row["applicantcorrespondenceattachmentid"], "attachmentfilename": row["attachmentfilename"], "attachmentdocumenturipath": row["attachmentdocumenturipath"]})
@@ -77,5 +136,5 @@ class FOIApplicantCorrespondenceAttachment(db.Model):
 
 class FOIApplicantCorrespondenceAttachmentSchema(ma.Schema):
     class Meta:
-        fields = ('applicantcorrespondenceattachmentid', 'version','applicantcorrespondenceid','attachmentdocumenturipath','attachmentfilename','created_at','createdby')
+        fields = ('applicantcorrespondenceattachmentid', 'version','applicantcorrespondenceid','attachmentdocumenturipath','attachmentfilename','created_at','createdby', 'applicantcorrespondence_version')
     

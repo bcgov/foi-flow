@@ -99,6 +99,8 @@ const API = {
   FOI_EDIT_DRAFT_EMAIL_CORRESPONDENCE: `${FOI_BASE_API_URL}/api/foiflow/applicantcorrespondence/draft/edit/<requestid>/<ministryrequestid>`,
   FOI_DELETE_DRAFT_EMAIL_CORRESPONDENCE: `${FOI_BASE_API_URL}/api/foiflow/applicantcorrespondence/draft/delete/<ministryrequestid>/<correspondenceid>`,
   FOI_POST_RESPONSE_EMAIL_CORRESPONDENCE: `${FOI_BASE_API_URL}/api/foiflow/applicantcorrespondence/response/<ministryrequestid>`,
+  FOI_EDIT_RESPONSE_EMAIL_CORRESPONDENCE: `${FOI_BASE_API_URL}/api/foiflow/applicantcorrespondence/response/edit/<ministryrequestid>`,
+  FOI_DELETE_RESPONSE_EMAIL_CORRESPONDENCE: `${FOI_BASE_API_URL}/api/foiflow/applicantcorrespondence/response/delete/<ministryrequestid>`,
 
   FOI_GET_EMAIL_CORRESPONDENCE: `${FOI_BASE_API_URL}/api/foiflow/applicantcorrespondence/<requestid>/<ministryrequestid>`,
   FOI_GET_EMAIL_CORRESPONDENCE_TEMPLATES: `${FOI_BASE_API_URL}/api/foiflow/applicantcorrespondence/templates`,
