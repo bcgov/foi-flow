@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useRef, useCallback } from 'react';
+import React, { useState, useMemo, useRef, useCallback, useEffect } from 'react';
 import { useDispatch, useSelector } from "react-redux";
 import TextField from '@mui/material/TextField';
 import InputAdornment from "@mui/material/InputAdornment";
@@ -49,9 +49,9 @@ export const ContactApplicant = ({
   requestState,
   ministryId,
   ministryCode,
-  requestId,
   applicantCorrespondence,
   applicantCorrespondenceTemplates,
+  requestId,
 }: any) => {
 
   const dispatch = useDispatch();
@@ -195,7 +195,7 @@ export const ContactApplicant = ({
       return false;
   }
 
-  React.useEffect(() => {    
+  useEffect(() => { 
     applicantCorrespondenceTemplates.forEach((item: any) => {
       setTemplates([{ value: "", label: "", templateid: null, text: "", disabled: true, created_at:"" }]);
       if (isEnabledTemplate(item)) {
@@ -218,7 +218,15 @@ export const ContactApplicant = ({
                 created_at: item.created_at
               }
               if (!isduplicate(item.name)) {
-              setTemplates((oldArray) => [...oldArray, templateItem]);  
+              //setTemplates((oldArray) => [...oldArray, templateItem]); 
+              setTemplates((oldArray) => {
+                // Check if the templateItem already exists in the array
+                const exists = oldArray.some(item => item.templateid === templateItem.templateid);
+                if (!exists) {
+                  return [...oldArray, templateItem];
+                }
+                return oldArray;
+              }); 
               }
             });            
           });
@@ -229,7 +237,7 @@ export const ContactApplicant = ({
   }, [applicantCorrespondenceTemplates, requestExtensions, dispatch]);
 
 
-  const [messages, setMessages] = useState(applicantCorrespondence);
+  const [correspondences, setCorrespondences] = useState(applicantCorrespondence);
   const [uploadFor, setUploadFor] = useState("email");
 
   const [disablePreview, setDisablePreview] = useState(false);
@@ -242,8 +250,8 @@ export const ContactApplicant = ({
     }
   }
 
-  React.useEffect(() => {
-    let filteredMessage = applicantCorrespondence.filter((message: any) => {
+  useEffect(() => {
+    let filteredCorrespondences = applicantCorrespondence.filter((message: any) => {
       if (correspondenceFilter === "log") {
         return [ "correspondence","response"].includes(message.category);
       } else if (correspondenceFilter === "templates") {
@@ -252,7 +260,7 @@ export const ContactApplicant = ({
         return message.category === "draft";
       }
     })
-    setMessages(filteredMessage);
+    setCorrespondences(filteredCorrespondences);
   }, [correspondenceFilter, applicantCorrespondence])
 
   const quillModules = useMemo(() => {
@@ -268,7 +276,7 @@ export const ContactApplicant = ({
 
   const [editorValue, setEditorValue] = useState("")
   const [currentTemplate, setCurrentTemplate] = useState(0)
-  const [selectedEmails, setSelectedEmails] = React.useState([]);
+  const [selectedEmails, setSelectedEmails] = useState([]);
   // Create a ref to store the Quill instance
   const quillRef = useRef(null);
 
@@ -310,14 +318,14 @@ export const ContactApplicant = ({
   const onFilterChange = (filterValue: string) => {
     
     if(filterValue === "") {
-      setMessages(applicantCorrespondence);
+      setCorrespondences(applicantCorrespondence);
     } else{
       let _filteredMessages = applicantCorrespondence.filter((corr: any) => {
         if(corr.text && corr.text.indexOf(filterValue) >= 0) {
           return corr;
         } 
       })
-      setMessages(_filteredMessages);
+      setCorrespondences(_filteredMessages);
       
     }
  }
@@ -411,6 +419,7 @@ export const ContactApplicant = ({
     setPreviewModal(false);
     const attachments = await saveAttachments(files);
     let callback = (_res: string) => {
+      console.log("!!!@@@")
       changeCorrespondenceFilter("draft");
       clearcorrespondence();      
       toast.success("Message has been saved to draft successfully", {
@@ -773,36 +782,30 @@ export const ContactApplicant = ({
       </div>]
   };
 
+  
   let correspondenceList;
-  correspondenceList = messages.map((message: any, index: any) => (
+  correspondenceList = correspondences.map((message: any, index: any) => (
     <div key={index} className="commentsection"
       data-msgid={index}
       style={{ display: 'block' }}
     >
       <CommunicationStructure
-        i={message}
-        reply={false}
-        parentId={null}
-        isreplysection={false}
-        totalcommentCount={1}
+        correspondence={message}
         currentIndex={index}
-        hasAnotherUserComment={false}
         fullName={getFullname(message.createdby)}
-        isEmail={message}
         ministryId={ministryId}
         editDraft={editDraft}
         deleteDraft={deleteDraft}
         deleteResponse={deleteResponse}
-        modalFor={modalFor}
         setModalFor={setModalFor}
         setModal={setModal}
         setSelectedCorrespondence={setSelectedCorrespondence}
         setCurrentResponseDate={setCurrentResponseDate}
         setUpdateAttachment={setUpdateAttachment}
+        applicantCorrespondenceTemplates={applicantCorrespondenceTemplates}
       />
     </div>
   ))
-  console.log("modalFor",modalFor)
 
 
   let templatesList;
@@ -1036,6 +1039,12 @@ export const ContactApplicant = ({
           </Grid>
         </Grid>
         <div className="correspondence-editor">
+          <div className="closeDraft">
+              <IconButton className="title-col3" onClick={()=>setShowEditor(false)}>
+                  <i className="dialog-close-button">Close</i>
+                  <CloseIcon />
+              </IconButton>
+           </div>
           <ReactQuill
             theme="snow"
             value={editorValue}

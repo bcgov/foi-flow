@@ -1657,7 +1657,6 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
                   <ContactApplicant
                     requestNumber={requestNumber}
                     requestState={requestState}
-                    userDetail={userDetail}
                     ministryId={ministryId}
                     ministryCode={requestDetails.bcgovcode}
                     applicantCorrespondence={applicantCorrespondence}
