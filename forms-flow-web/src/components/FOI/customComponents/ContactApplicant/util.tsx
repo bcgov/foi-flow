@@ -49,12 +49,10 @@ export const getTemplateVariables = (requestDetails: any, requestExtensions:any,
   const checkFinalPackage = checkRecordReleased(responsePackagePdfStitchStatus)
 
   const [feeEstimateStatus, feeEstimateDate] = getFeeEstimateInfo(cfrFeeData);
-  console.log(feeEstimateDate);
-  console.log("checkFeeEstimate : ",feeEstimateStatus, " feeEstimateDate : ",feeEstimateDate)
   const fullFeePaidDate = getFullFeePaidDate(cfrFeeData);
-  console.log("fullFeePaidDate L ",fullFeePaidDate)
+
   const feeWaiverDecisionDate = getFeeWaiverDecisionDate(cfrFeeData);
-  console.log("feeWaiverDecisionDate L ",feeWaiverDecisionDate)
+
   return [
     {name: "{{axisRequestId}}", value: requestDetails.axisRequestId},
     {name: "{{title}}", value: templateInfo?.label || ""},

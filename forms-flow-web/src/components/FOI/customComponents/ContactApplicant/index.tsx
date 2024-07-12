@@ -58,10 +58,6 @@ export const ContactApplicant = ({
   const responsePackagePdfStitchStatus = useSelector((state: any) => state.foiRequests.foiPDFStitchStatusForResponsePackage);
   const check: any = useSelector((state: any) => state.foiRequests);
   const cfrFeeData = useSelector((state: any) => state.foiRequests.foiRequestCFRFormHistory);
-  console.log("cfrFeeData : ",cfrFeeData)
-  console.log("state.foiRequests : ",check)
-  console.log("responsePackagePdfStitchStatus : ",responsePackagePdfStitchStatus)
-  console.log("currentCFRForm : ",currentCFRForm)
   const fullNameList = getFullnameList()
 
   const getFullname = (userid: string) => {
