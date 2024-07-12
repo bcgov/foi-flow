@@ -1807,21 +1807,28 @@ export const RecordsLog = ({
                 {getRequestNumber()}
               </h1>
             </Grid>
-            {isMinistryCoordinator === false && validLockRecordsState() ?
+            {validLockRecordsState() ?
             <Grid>
-              <button
-              style={{marginTop: "4px"}}
-              onClick={handleLockRecords}
-              className={clsx(
-                "btn",
-                "addAttachment",
-                classes.createButton
-                )}
-                variant="contained"
-                color="primary"
+              <Tooltip 
+                enterDelay={1000} 
+                title={"Only the IAO analyst can manually lock or unlock the records log, please contact the assigned analyst for assistance"}
               >
-                {lockRecords ? "Unlock Records" : "Lock Records"}
-              </button>
+                <span>
+                <button
+                disabled={isMinistryCoordinator}
+                style={{marginTop: "4px"}}
+                onClick={handleLockRecords}
+                className={clsx(
+                  "btn",
+                  classes.createButton
+                  )}
+                  variant="contained"
+                  color="primary"
+                >
+                  {lockRecords ? "Unlock Records" : "Lock Records"}
+                </button>
+                </span>
+              </Tooltip>
             </Grid> : null
             }
             <Grid item xs={2}>
@@ -2157,7 +2164,7 @@ export const RecordsLog = ({
                     }
                     style={
                       records.filter((record) => record.attachments?.length > 0)
-                        .length === 0
+                        .length === 0 || lockRecords
                         ? { pointerEvents: "none" }
                         : {}
                     }
@@ -2176,6 +2183,7 @@ export const RecordsLog = ({
                     <div style={{ fontSize: "11px" }}>
                       To update divisions:{" "}
                       <ul>
+                        <li>Records log must be unlocked</li>
                         <li>at least one record must be selected</li>
                         <li>
                           all records selected must be tagged to the same
@@ -2229,7 +2237,7 @@ export const RecordsLog = ({
                     // title="Delete"
                     disabled={lockRecords || !checkIsAnySelected()}
                     style={
-                      !checkIsAnySelected() ? { pointerEvents: "none" } : {}
+                      lockRecords || !checkIsAnySelected() ? { pointerEvents: "none" } : {}
                     }
                   >
                     <FontAwesomeIcon icon={faTrash} size="lg" color="#38598A" />
@@ -2974,6 +2982,7 @@ const AttachmentPopup = React.memo(
     const DeleteMenu = () => {
       return (
         <MenuItem
+          style={{ pointerEvents: "none" } }
           disabled={lockRecords}
           onClick={() => {
             handleDelete();

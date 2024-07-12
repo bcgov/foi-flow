@@ -1077,6 +1077,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
                   recordsTabSelect={tabLinksStatuses.Records.active}
                   requestType={requestDetails?.requestType}
                   lockRecords={lockRecordsTab}
+                  validLockRecordsState={validLockRecordsState}
                 />
               </>
             ) : (
