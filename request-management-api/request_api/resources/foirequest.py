@@ -138,7 +138,6 @@ class FOIRequestsById(Resource):
         """ POST Method for capturing FOI requests before processing"""
         try:
             request_json = request.get_json()
-            print("SNAKKE", request_json)
             foirequestschema = FOIRequestWrapperSchema().load(request_json)  
             result = requestservice().saverequestversion(foirequestschema, foirequestid, foiministryrequestid,AuthHelper.getuserid())
             if result.success == True:
@@ -309,11 +308,9 @@ class FOIRequestsById(Resource):
                 foirequest = requestservice().getrequest(foirequestid, foiministryrequestid)
                 foirequest['isoipcreview'] = request_json['isoipcreview']
                 foirequest['oipcdetails'] = request_json['oipcdetails']
-            if (section == "userlockedrecords"):
+            if (section == "userrecordslockstatus"):
                 foirequest = requestservice().getrequest(foirequestid, foiministryrequestid)
-                foirequest['userlockedrecords'] = request_json['userlockedrecords']
-
-            print("LIQUID", request_json)
+                foirequest['userrecordslockstatus'] = request_json['userrecordslockstatus']
             foirequestschema = FOIRequestWrapperSchema().load(foirequest)
             result = requestservice().saverequestversion(foirequestschema, foirequestid, foiministryrequestid,AuthHelper.getuserid())
             if result.success == True:

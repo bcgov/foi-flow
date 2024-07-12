@@ -293,10 +293,10 @@ const MinistryReview = React.memo(({ userDetail }) => {
 
     //Adjust lockRecords value based on requestState if there is no manual user lockedrecords value present in requestDetails from DB
     const updateRecordsTabAccess = () => {
-      if(requestDetails.userlockedrecords === null) {
+      if(requestDetails.userrecordslockstatus === null) {
         return validLockRecordsState(requestDetails.currentState);
       } else {
-        return requestDetails.userlockedrecords;
+        return requestDetails.userrecordslockstatus;
       }
     }
     setLockRecordsTab(updateRecordsTabAccess());

@@ -1,4 +1,4 @@
-"""ADD userlockedrecords Column to FOIMinistryRequest
+"""ADD userrecordslockstatus Column to FOIMinistryRequest
 
 Revision ID: 5fdd5df3d642
 Revises: e698b39da6bd
@@ -17,8 +17,8 @@ depends_on = None
 
 
 def upgrade():
-    op.add_column('FOIMinistryRequests', sa.Column('userlockedrecords', sa.Boolean(), nullable=True))
+    op.add_column('FOIMinistryRequests', sa.Column('userrecordslockstatus', sa.Boolean(), nullable=True))
 
 
 def downgrade():
-    op.drop_column('FOIMinistryRequests', 'userlockedrecords')
+    op.drop_column('FOIMinistryRequests', 'userrecordslockstatus')

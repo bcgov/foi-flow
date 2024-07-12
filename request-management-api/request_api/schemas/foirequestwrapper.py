@@ -155,7 +155,7 @@ class FOIRequestWrapperSchema(Schema):
     identityVerified = fields.Str(data_key="identityVerified",allow_none=True)
 
     oipcdetails = fields.Nested(FOIMinistryRequestOIPCSchema, many=True,allow_none=True)
-    userlockedrecords = fields.Bool(data_key="userlockedrecords", allow_none=True)
+    userrecordslockstatus = fields.Bool(data_key="userrecordslockstatus", allow_none=True)
 
     recordspagecount = fields.Int(data_key="recordspagecount",allow_none=True)
     axislanpagecount = fields.Int(data_key="axislanpagecount",allow_none=True)

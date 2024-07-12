@@ -580,7 +580,6 @@ export const RecordsLog = ({
       saveDocument(value, fileInfoList, files);
     }
   };
-  console.log("LOCK", lockRecords)
 
   const saveDocument = (value, fileInfoList, files) => {
     if (value) {
@@ -1749,7 +1748,7 @@ export const RecordsLog = ({
   const handleLockRecords = () => {
     setLockRecordsTab(!lockRecords);
     const toastID = toast.loading("Updating records lock status for request...");
-    const data = {userlockedrecords: !lockRecords};
+    const data = {userrecordslockstatus: !lockRecords};
     dispatch(
       updateUserLockedRecords(
         data,
@@ -1808,15 +1807,20 @@ export const RecordsLog = ({
               </h1>
             </Grid>
             {validLockRecordsState() ?
-            <Grid>
+            <Grid item xs={2}>
               <Tooltip 
                 enterDelay={1000} 
-                title={"Only the IAO analyst can manually lock or unlock the records log, please contact the assigned analyst for assistance"}
+                title={isMinistryCoordinator ? "Only the IAO analyst can manually lock or unlock the records log, please contact the assigned analyst for assistance" : "Manually unlock or lock the records log"}
               >
-                <span>
+                {isMinistryCoordinator ? 
+                  <p
+                    style={{ fontWeight: "bold", fontSize: "17.5px", marginTop: "4px", color: "#036" }}
+                  >
+                    {lockRecords ? "Records Locked" : "Records Unlocked"}
+                  </p>
+                : <span>
                 <button
                 disabled={isMinistryCoordinator}
-                style={{marginTop: "4px"}}
                 onClick={handleLockRecords}
                 className={clsx(
                   "btn",
@@ -1828,33 +1832,34 @@ export const RecordsLog = ({
                   {lockRecords ? "Unlock Records" : "Lock Records"}
                 </button>
                 </span>
+                }
               </Tooltip>
             </Grid> : null
             }
-            <Grid item xs={2}>
-              {(isMinistryCoordinator == false &&
-                records?.length > 0 &&
-                DISABLE_REDACT_WEBLINK?.toLowerCase() == "false" && (
-                  <a
-                    href={DOC_REVIEWER_WEB_URL + "/foi/" + ministryId}
-                    target="_blank"
+            {(isMinistryCoordinator == false &&
+              records?.length > 0 &&
+              DISABLE_REDACT_WEBLINK?.toLowerCase() == "false" && (
+                <Grid item xs={2}>
+                <a
+                  href={DOC_REVIEWER_WEB_URL + "/foi/" + ministryId}
+                  target="_blank"
+                >
+                  <button
+                    className={clsx(
+                      "btn",
+                      "addAttachment",
+                      classes.createButton
+                    )}
+                    variant="contained"
+                    // onClick={}
+                    color="primary"
                   >
-                    <button
-                      className={clsx(
-                        "btn",
-                        "addAttachment",
-                        classes.createButton
-                      )}
-                      variant="contained"
-                      // onClick={}
-                      color="primary"
-                    >
-                      Redact Records
-                    </button>
-                  </a>
-                )
-              )}
-            </Grid>
+                    Redact Records
+                  </button>
+                </a>
+                </Grid>
+              )
+            )}
             <Grid item xs={3}>
               {hasDocumentsToDownload && (
                 <TextField
@@ -2216,7 +2221,7 @@ export const RecordsLog = ({
                     // title="Update Divisions"
                     disabled={lockRecords || isUpdateDivisionsDisabled()}
                     style={
-                      isUpdateDivisionsDisabled()
+                      lockRecords || isUpdateDivisionsDisabled()
                         ? { pointerEvents: "none" }
                         : {}
                     }

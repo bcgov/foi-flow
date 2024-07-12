@@ -191,7 +191,7 @@ class requestservicegetter:
             'isofflinepayment': FOIMinistryRequest.getofflinepaymentflag(foiministryrequestid),
             'linkedRequests' : linkedministryrequests,
             'identityVerified':requestministry['identityverified'],
-            'userlockedrecords': requestministry['userlockedrecords'],
+            'userrecordslockstatus': requestministry['userrecordslockstatus'],
             
         }
         if requestministry['cfrduedate'] is not None:

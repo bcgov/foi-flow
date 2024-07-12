@@ -630,7 +630,7 @@ export const updateUserLockedRecords = (data, requestId, ministryId, ...rest) =>
     ministryId),"<requestid>",requestId
   );
   return (dispatch) => {
-    httpPOSTRequest(`${apiUrl}/userlockedrecords`, data)
+    httpPOSTRequest(`${apiUrl}/userrecordslockstatus`, data)
       .then((res) => {
         if (res.data) {
           done(null, res.data);
