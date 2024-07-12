@@ -119,3 +119,4 @@ datamigrations/FOIMOD.CFD.ConsoleApp.DocMigration/FOIMOD.CFD.DocMigration.OCR/bi
 datamigrations/FOIMOD.CFD.ConsoleApp.DocMigration/FOIMOD.CFD.DocMigration.OCR.Tests/obj/*
 datamigrations/FOIMOD.CFD.ConsoleApp.DocMigration/FOIMOD.CFD.DocMigration.OCR.Tests/bin/*
 /datamigrations/FOIMOD.CFD.ConsoleApp.DocMigration/FOIMOD.CFD.DocMigration.Utils.UnitTests/appsettings.dev.json
+

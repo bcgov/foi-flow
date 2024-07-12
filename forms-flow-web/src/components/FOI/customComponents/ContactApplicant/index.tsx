@@ -57,6 +57,9 @@ export const ContactApplicant = ({
   const dispatch = useDispatch();
   const currentCFRForm: any = useSelector((state: any) => state.foiRequests.foiRequestCFRForm);
   const isLoading: boolean = useSelector((state: any) => state.foiRequests.isCorrespondenceLoading);
+  const responsePackagePdfStitchStatus = useSelector((state: any) => state.foiRequests.foiPDFStitchStatusForResponsePackage);
+  const check: any = useSelector((state: any) => state.foiRequests);
+  const cfrFeeData = useSelector((state: any) => state.foiRequests.foiRequestCFRFormHistory);
   const fullNameList = getFullnameList()
   const [modalFor, setModalFor] = useState("add")
 
@@ -285,7 +288,7 @@ export const ContactApplicant = ({
 
   const handleTemplateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setCurrentTemplate(+e.target.value)
-    const templateVariables = getTemplateVariables(requestDetails, requestExtensions, templates[+e.target.value]);
+    const templateVariables = getTemplateVariables(requestDetails, requestExtensions, responsePackagePdfStitchStatus, cfrFeeData, templates[+e.target.value]);
     const finalTemplate = applyVariables(templates[+e.target.value].text || "", templateVariables);
     setEditorValue(finalTemplate)
   }
@@ -293,7 +296,7 @@ export const ContactApplicant = ({
   //When templates are selected from list
   const handleTemplateSelection = (index: number) => {
     setCurrentTemplate(index);
-    const templateVariables = getTemplateVariables(requestDetails,requestExtensions, templates[index]);
+    const templateVariables = getTemplateVariables(requestDetails,requestExtensions, responsePackagePdfStitchStatus, cfrFeeData, templates[index]);
     const finalTemplate = applyVariables(templates[index].text || "", templateVariables);
     setEditorValue(finalTemplate);
     changeCorrespondenceFilter("log");

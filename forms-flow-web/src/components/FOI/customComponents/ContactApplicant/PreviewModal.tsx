@@ -31,7 +31,9 @@ export const PreviewModal = React.memo(({
   //gets the request detail from the store
   const requestDetails: any = useSelector((state: any) => state.foiRequests.foiRequestDetail);
   const requestExtensions: any = useSelector((state: any) => state.foiRequests.foiRequestExtesions);
-
+  const responsePackagePdfStitchStatus = useSelector((state: any) => state.foiRequests.foiPDFStitchStatusForResponsePackage);
+  const cfrFeeData = useSelector((state: any) => state.foiRequests.foiRequestCFRFormHistory);
+  
   //get template
   const rootpath = OSS_S3_BUCKET_FULL_PATH
   const templatePath = "/TEMPLATES/EMAILS/header_footer_template.html";
@@ -53,7 +55,7 @@ export const PreviewModal = React.memo(({
     });
   }, []);
   requestDetails["ffaurl"] = FOI_FFA_URL;
-  const templateVariables = getTemplateVariables(requestDetails, requestExtensions, templateInfo);
+  const templateVariables = getTemplateVariables(requestDetails, requestExtensions, responsePackagePdfStitchStatus, cfrFeeData, templateInfo);
   const handleSend = () => {
     handleSave( applyVariables(innerhtml, templateVariables) );
   };
