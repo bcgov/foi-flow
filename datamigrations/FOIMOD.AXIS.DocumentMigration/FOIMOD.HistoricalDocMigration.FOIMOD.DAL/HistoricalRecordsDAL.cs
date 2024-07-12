@@ -26,7 +26,7 @@ namespace FOIMOD.CFD.DocMigration.FOIFLOW.DAL
             try
             {
                 dbConnection.Open();
-                var cmdString = @"INSERT INTO public.""HistoricalRecords"" (recordfilename, description, axisrequestid, s3uripath, createdby, created_at,  iscorresponcedocument) VALUES ('{1}', '{2}', '{3}','{4}','{5}', NOW(), {6});";
+                var cmdString = @"INSERT INTO public.""HistoricalRecords"" (recordfilename, description, axisrequestid, s3uripath, createdby, created_at,  iscorresponcedocument) VALUES ('{0}', '{1}', '{2}','{3}','{4}', NOW(), {5});";
                 using (OdbcCommand comm = new OdbcCommand())
                 {
                     comm.Connection = (OdbcConnection)dbConnection;
