@@ -3,7 +3,7 @@ using System.Data.Odbc;
 
 using FOIMOD.HistoricalDocMigration.Models.FOIFLOWDestination;
 
-namespace FOIMOD.CFD.DocMigration.FOIFLOW.DAL
+namespace FOIMOD.HistoricalDocMigration.DocMigration.FOIFLOW.DAL
 {
     public class HistoricalRecordsDAL
     {

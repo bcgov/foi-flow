@@ -6,4 +6,13 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\FOIMOD.HistoricalDocMigration.AXIS.DAL\FOIMOD.HistoricalDocMigration.AXIS.DAL.csproj" />
+    <ProjectReference Include="..\FOIMOD.HistoricalDocMigration.FOIMOD.DAL\FOIMOD.HistoricalDocMigration.FOIMOD.DAL.csproj" />
+    <ProjectReference Include="..\FOIMOD.HistoricalDocMigration.Models\FOIMOD.HistoricalDocMigration.Models.csproj" />
+    <ProjectReference Include="..\FOIMOD.HistoricalDocMigration.Utils\FOIMOD.HistoricalDocMigration.Utils.csproj" />
+	  <PackageReference Include="Microsoft.Extensions.Logging" Version="8.0.0" />
+	  <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.0" />
+  </ItemGroup>
+
 </Project>

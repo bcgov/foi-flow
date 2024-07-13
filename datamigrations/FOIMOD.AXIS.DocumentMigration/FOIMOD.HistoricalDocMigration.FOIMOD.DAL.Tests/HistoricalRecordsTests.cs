@@ -1,4 +1,4 @@
-using FOIMOD.CFD.DocMigration.FOIFLOW.DAL;
+using FOIMOD.HistoricalDocMigration.DocMigration.FOIFLOW.DAL;
 using FOIMOD.HistoricalDocMigration.Models;
 using FOIMOD.HistoricalDocMigration.Models.FOIFLOWDestination;
 using Microsoft.Extensions.Configuration;

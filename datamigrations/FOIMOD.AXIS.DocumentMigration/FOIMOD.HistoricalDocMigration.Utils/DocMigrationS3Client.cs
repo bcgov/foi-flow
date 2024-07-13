@@ -27,9 +27,9 @@ namespace FOIMOD.HistoricalDocMigration.Utils
             return s3.GetPreSignedURL(request);
         }
 
-        public async Task<HttpResponseMessage> UploadFileAsync(UploadFile file)
+        public async Task<HttpResponseMessage> UploadFileAsync(HistoricalRecords file)
         {
-            var presignedPutURL = this.GetPresignedURL(_s3Client, string.Format("{0}/{1}",file.SubFolderPath,file.DestinationFileName), HttpVerb.PUT);
+            var presignedPutURL = this.GetPresignedURL(_s3Client, string.Format("{0}/{1}",file.S3Subfolder,file.RecordFileName), HttpVerb.PUT);
             using var client = new HttpClient();
             client.Timeout = TimeSpan.FromMinutes(30);
             file.FileStream.Position = 0;

@@ -9,6 +9,8 @@
 
         public string AXISRequestID { get; set; }
 
+        public string S3Subfolder { get; set; }
+
         public string S3Path { get; set; }
 
         public bool IsCorrenpondenceDocument { get; set; }
@@ -20,7 +22,7 @@
 
         public string CreatedBy { get; set; }
 
-
+        public Stream FileStream { get; set; }
     }
 
     
