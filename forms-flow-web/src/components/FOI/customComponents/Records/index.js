@@ -1834,7 +1834,7 @@ export const RecordsLog = ({
                 </span>
                 }
               </Tooltip>
-            </Grid> : null
+            </Grid> :  <Grid item xs={2}></Grid>
             }
             {(isMinistryCoordinator == false &&
               records?.length > 0 &&
