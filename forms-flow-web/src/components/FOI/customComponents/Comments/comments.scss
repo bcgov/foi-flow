@@ -145,9 +145,24 @@
   justify-content: space-between;
   flex-wrap: wrap;
 
+  .email-attachment-item{
+    background-color: #4e7095;
+    color: white;
+    margin: 10px 15px;
+    padding: 5px 10px;
+    width: 100%;
+    a {
+      color: white;
+      text-decoration: underline;
+    }
+  }
+  
+
   .userInfo{
     display: flex;
     flex-direction: column;
+    max-width: calc(100% - 70px);
+    
 
     .commentsTwo{
       display: flex;
@@ -164,6 +179,7 @@
     }
   }
   .userActions{  
+    position: relative;
 
     .actionsBtn{
       float: right;
@@ -206,50 +222,6 @@
       }
     }
     
-  }
-}
-
-.comment-accordion {
-  box-shadow: none !important;
-  border: none;
-  .MuiAccordionSummary-root {
-    background-color: rgb(210, 226, 246) !important;
-    color: black;
-    .MuiAccordionSummary-content {
-      .userActions {
-        justify-self: right;
-        margin-left: auto;
-      }
-      .MuiButtonBase-root {
-        justify-self: right;
-        color: #003366;
-      }
-      .MuiIconButton-root {
-        color: #003366;
-        padding: 6px;
-        fill: #003366;
-      }
-    }
-  }
-  .MuiAccordionDetails-root {
-    background-color: rgb(210, 226, 246);
-    display: flex;
-    justify-content: space-between;
-    flex-wrap: wrap;
-  }
-  .MuiPaper-elevation1 {
-    box-shadow: none;
-  }
-  .email-attachment-item{
-    background-color: #4e7095;
-    color: white;
-    margin: 10px 15px;
-    padding: 5px 10px;
-    width: 100%;
-    a {
-      color: white;
-      text-decoration: underline;
-    }
   }
 }
 

@@ -1,5 +1,5 @@
 import React, { useContext, useState, useRef, useEffect } from 'react'
-import '../Comments/comments.scss'
+//import '../Comments/comments.scss'
 import { faCaretDown } from '@fortawesome/free-solid-svg-icons'
 import {
   modal,
@@ -39,44 +39,43 @@ const CommunicationStructure = ({correspondence, currentIndex,
   const [communicationUploadModalOpen, setCommunicationUploadModalOpen] = useState(false);
   const [anchorPosition, setAnchorPosition] = useState(null);
   const [deletePopoverOpen, setDeletePopoverOpen] = useState(false);
-  //console.log("I:",correspondence)
   const ref = useRef();
   const closeTooltip = () => ref.current && ref ? ref.current.close() : {};
 
 
   const getHtmlfromRawContent = () => {
     let markup = null
-    if (correspondence.commentTypeId === 1) {
-      const rawContentFromStore = convertFromRaw(JSON.parse(correspondence.text))
-      let initialEditorState = EditorState.createWithContent(rawContentFromStore);
-      const rawContentState = convertToRaw(initialEditorState.getCurrentContent());
-      const entityMap = rawContentState.entityMap;
-      markup = draftToHtml(
-        rawContentState
-      );
-      let commentmentions = []
-      let updatedMarkup = ''
+    // if (correspondence.commentTypeId === 1) {
+    //   const rawContentFromStore = convertFromRaw(JSON.parse(correspondence.text))
+    //   let initialEditorState = EditorState.createWithContent(rawContentFromStore);
+    //   const rawContentState = convertToRaw(initialEditorState.getCurrentContent());
+    //   const entityMap = rawContentState.entityMap;
+    //   markup = draftToHtml(
+    //     rawContentState
+    //   );
+    //   let commentmentions = []
+    //   let updatedMarkup = ''
 
-      Object.values(entityMap).forEach(entity => {
-        if (entity.type === 'mention') {
-          commentmentions.push(entity.data.mention.name);
-        }
+    //   Object.values(entityMap).forEach(entity => {
+    //     if (entity.type === 'mention') {
+    //       commentmentions.push(entity.data.mention.name);
+    //     }
 
-      });
-      const distinctMentions = [... new Set(commentmentions)]
-      distinctMentions.forEach(_mention => {
-        updatedMarkup = markup.replaceAll(_mention, `<span class='taggeduser'>${_mention}</span>`)
-        markup = updatedMarkup
-      })
-    }
-    else {
+    //   });
+    //   const distinctMentions = [... new Set(commentmentions)]
+    //   distinctMentions.forEach(_mention => {
+    //     updatedMarkup = markup.replaceAll(_mention, `<span class='taggeduser'>${_mention}</span>`)
+    //     markup = updatedMarkup
+    //   })
+    // }
+    // else {
       if (correspondence.text) {
         markup = `<p>${correspondence.text}</p>`
       } else {
         markup = `<p></p>`
       }
       
-    }
+    //}
     return markup
   }
 
@@ -254,27 +253,27 @@ const CommunicationStructure = ({correspondence, currentIndex,
 
   return (
     <>
-      <div className="comment-accordion" {...(correspondence ? {"data-communication-div-id":`${currentIndex}`} : {})}>
+      <div className="communication-accordion" {...(correspondence ? {"data-communication-div-id":`${currentIndex}`} : {})}>
         <Accordion>
           <AccordionSummary
             expandIcon={<ExpandMoreIcon />}
             aria-controls="communication-accordion-summary"
             id={`communication-accordion-${currentIndex}`}
           >
-              <div className="halfDiv">
-                <div className="userInfo">
-                  <div className="commentsTwo">
+              <div className="templateList">
+                <div>
+                  <div className="templateInfo">
                     {correspondence && (
                       <>
-                      <div className="fullName">{correspondence.category === "response" ? "Applicant Response": getTemplateName(correspondence.templateid)} - {fullName} </div> |  
-                        <div className="commentdate">{correspondence.date} </div>  
-                        <div className="commentdate">{correspondence.edited ? "Edited": ""} </div>
+                      <div className="templateUser">{correspondence.category === "response" ? "Applicant Response": getTemplateName(correspondence.templateid)} - {fullName} </div> |  
+                        <div className="templateTime">{correspondence.date} </div>  
+                        <div className="templateTime">{correspondence.edited ? "Edited": ""} </div>
                       </>
                     )
                     }
                     {!correspondence && (
                       <>
-                    <div className="fullName">{fullName} </div> |  <div className="commentdate">{correspondence.date} </div>  <div className="commentdate">{correspondence.edited ? "Edited": ""} </div>
+                    <div className="templateInfo">{fullName} </div> |  <div className="templateTime">{correspondence.date} </div>  <div className="templateTime">{correspondence.edited ? "Edited": ""} </div>
                     </>
                     )
                     }
@@ -317,4 +316,4 @@ const CommunicationStructure = ({correspondence, currentIndex,
   )
 }
 
-export default CommunicationStructure
+export default CommunicationStructure;
