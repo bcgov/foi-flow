@@ -528,7 +528,11 @@ export default function AttachmentModal({
     } else if (files.length === 0 && existingDocuments.length === 0) {
       return true;
     } else if (modalFor === "add") {
-      return tagValue === "";
+      if(requestType == FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL && bcgovcode == "MCF") {
+        return person === "" || fileType === "" || trackingID === "";
+      } else {
+        return tagValue === "";
+      }
     } else if (modalFor === "replace" || modalFor === "replaceattachment") {
       return false;
     }
