@@ -74,6 +74,9 @@ class applicantcorrespondenceservice:
         else:
             applicantcorrespondence.correspondencemessagejson = data['correspondencemessagejson'] if 'correspondencemessagejson' in data else None
             applicantcorrespondence.createdby = userid  
+            if len(data["emails"]) > 0:
+                applicantcorrespondence.sent_at = datetime.now()
+                applicantcorrespondence.sentby = userid
         emails = data['emails'] if 'emails' in data else None   
         return FOIApplicantCorrespondence.saveapplicantcorrespondence(applicantcorrespondence,data['attachments'], emails)        
     
@@ -143,6 +146,7 @@ class applicantcorrespondenceservice:
             "created_at":self.__pstformat(_correpondencelog['sent_at']) if _sentcorrespondencemessagejson is not None else self.__pstformat(_correpondencelog['created_at']),
             "createdby":_correpondencelog['createdby'] if  _correpondencelog['createdby'] is not None else _correpondencelog['sentby'],
             "date": _date,
+            "sentby": _correpondencelog["sentby"],
             "userId": _correpondencelog['createdby'] if  _correpondencelog['createdby'] is not None else _correpondencelog['sentby'],
             "attachments" : attachments,
             "category" : self.__getcorrespondencecategory(_correpondencelog)

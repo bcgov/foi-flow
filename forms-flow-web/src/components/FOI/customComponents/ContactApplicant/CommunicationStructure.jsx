@@ -27,6 +27,7 @@ import { downloadZip } from "client-zip";
 import { useDispatch } from "react-redux";
 import * as html2pdf from 'html-to-pdf-js';
 import CommunicationUploadModal from '../Comments/CommunicationUploadModal';
+import { Chip } from '@material-ui/core'
 
 
 const CommunicationStructure = ({correspondence, currentIndex,
@@ -277,6 +278,7 @@ const CommunicationStructure = ({correspondence, currentIndex,
                     </>
                     )
                     }
+                    <Chip label={correspondence.sentby ? 'emailed' : 'exported'} variant="outlined" />
                     </div>
                 </div>
               </div>
