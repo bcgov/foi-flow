@@ -2783,9 +2783,9 @@ const Attachment = React.memo(
                   textOverflow: "ellipsis",
                   whiteSpace: "nowrap",
                 }}
-                title={`Attachment of ${record.attachmentof}`}
+                title={record.failed ? `Error during ${record.failed}` : `Attachment of ${record.attachmentof}`}
               >
-                Attachment of {record.attachmentof}
+                {record.failed ? `Error during ${record.failed}` : `Attachment of ${record.attachmentof}`}
               </span>
             ) : record.isredactionready ? (
               <span>Ready for Redaction</span>
