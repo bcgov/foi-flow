@@ -71,7 +71,14 @@ export default function AttachmentModal({
   replacementfiletypes = [],
   totalUploadedRecordSize = 0,
   requestType = FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_GENERAL,
-  isScanningTeamMember = false
+  isScanningTeamMember = false,
+  curPersonalAttributes = {
+    person: "",
+    filetype: "",
+    volume: "",
+    trackingid: "",
+    personaltag: "TBD"
+  }
 }) {
   let tagList = [];
   if (uploadFor === "attachment") {
@@ -89,6 +96,21 @@ export default function AttachmentModal({
       };
     });
   }
+
+  const MCFSections = useSelector(
+    (state) => state.foiRequests.foiPersonalSections
+  );
+  const MSDSections = useSelector(
+    (state) => state.foiRequests.foiPersonalDivisionsAndSections
+  );
+  const [TBDID, setTBDID] = useState(0);
+  useEffect(() => {
+    setTBDID(
+      MCFSections?.sections?.find(
+        (division) => division.name === "TBD"
+      )?.divisionid
+    );
+  }, [MCFSections]);
 
   const recordFormats = useSelector((state) => state.foiRequests.recordFormats);
   useEffect(() => {
@@ -293,23 +315,52 @@ export default function AttachmentModal({
     if (modalFor.toLowerCase() === "delete") {
       handleModal(true, null, null);
     } else {
+      let _tagValue = tagValue;
       let fileInfoList = [];
 
       let fileStatusTransition = "";
       let personalAttributes = {};
       if (modalFor === "replace" || modalFor === "replaceattachment") {
         fileStatusTransition = attachment?.category;
+        if (
+          bcgovcode == "MCF" &&
+          requestType == FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL
+        ) {
+          if(tagValue === "") {
+            fileStatusTransition = "TBD";
+            _tagValue = TBDID;
+          } else {
+            fileStatusTransition =
+              divisions.find((division) => division.divisionid === tagValue)
+                ?.divisionname ||
+              MCFSections?.sections?.find(
+                (division) => division.divisionid === tagValue
+              )?.name;
+          }
+          personalAttributes = {
+            person: curPersonalAttributes.person,
+            filetype: curPersonalAttributes.filetype,
+            volume: curPersonalAttributes.volume,
+            trackingid: curPersonalAttributes.trackingid,
+            personaltag: curPersonalAttributes.personaltag
+          }
+        }
       } else if (uploadFor === "record") {
         if (
           bcgovcode == "MCF" &&
           requestType == FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL
         ) {
-          fileStatusTransition =
-            divisions.find((division) => division.divisionid === tagValue)
-              ?.divisionname ||
-            MCFSections?.sections?.find(
-              (division) => division.divisionid === tagValue
-            )?.name;
+          if(tagValue === "") {
+            fileStatusTransition = "TBD";
+            _tagValue = TBDID;
+          } else {
+            fileStatusTransition =
+              divisions.find((division) => division.divisionid === tagValue)
+                ?.divisionname ||
+              MCFSections?.sections?.find(
+                (division) => division.divisionid === tagValue
+              )?.name;
+          }
           personalAttributes = {
             person: person.name,
             filetype: fileType.name,
@@ -340,7 +391,7 @@ export default function AttachmentModal({
           filename: file.filename ? file.filename : file.name,
           filesize: file.size,
           personalattributes: personalAttributes,
-          ...(uploadFor === "record" && { divisionid: tagValue }),
+          ...(uploadFor === "record" && { divisionid: _tagValue }),
         };
       });
 
@@ -537,13 +588,6 @@ export default function AttachmentModal({
       return false;
     }
   };
-
-  const MCFSections = useSelector(
-    (state) => state.foiRequests.foiPersonalSections
-  );
-  const MSDSections = useSelector(
-    (state) => state.foiRequests.foiPersonalDivisionsAndSections
-  );
 
   return (
     <div className="state-change-dialog">

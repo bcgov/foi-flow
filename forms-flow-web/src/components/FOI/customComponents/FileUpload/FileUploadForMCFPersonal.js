@@ -707,12 +707,12 @@ const FileUploadForMCFPersonal = ({
             value=""
             multiple={multipleFiles}
             accept={mimeTypes}
-            disabled={!isPersonSelected}
+            disabled={modalFor === "add" && !isPersonSelected}
             />
           </div>
           <div className="file-upload-column file-upload-column-3">
             {(Object.entries(files).length === 0 && !multipleFiles) || multipleFiles ?
-            <button className="btn-add-files" type="button" onClick={handleUploadBtnClick} disabled={!isPersonSelected}>              
+            <button className="btn-add-files" type="button" onClick={handleUploadBtnClick} disabled={modalFor === "add" && !isPersonSelected}>              
                   Add Files
             </button>  : null}
           </div>
