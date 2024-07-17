@@ -22,7 +22,7 @@ namespace FOIMOD.HistoricalDocMigration.Models.Document
 
         public string ReviewFlag { get; set; }
 
-        public DateTime ClosingDate { get; set; }
+        public DateTime? ClosingDate { get; set; }
 
     }
 }

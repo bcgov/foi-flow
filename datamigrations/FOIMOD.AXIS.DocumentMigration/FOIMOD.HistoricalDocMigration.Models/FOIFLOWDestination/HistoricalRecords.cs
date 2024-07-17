@@ -5,6 +5,8 @@
 
         public string RecordFileName { get; set; }
 
+        public string DisplayFileName { get; set; }
+
         public string Description { get; set; }
 
         public string AXISRequestID { get; set; }

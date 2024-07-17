@@ -3,6 +3,7 @@ using FOIMOD.HistoricalDocMigration.AXIS.DAL;
 using FOIMOD.HistoricalDocMigration.DocMigration.FOIFLOW.DAL;
 using FOIMOD.HistoricalDocMigration.Models;
 using FOIMOD.HistoricalDocMigration.Models.Document;
+using FOIMOD.HistoricalDocMigration.Models.FOIFLOWDestination;
 using FOIMOD.HistoricalDocMigration.Utils;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Logging;
@@ -51,9 +52,16 @@ namespace FOIMOD.HistoricalDocMigration.DocMigration.BAL
                     {
                         try
                         {
-                            if (string.IsNullOrEmpty(attachment.EmailTo) && string.IsNullOrEmpty(attachment.EmailContent) && !string.IsNullOrEmpty(attachment.EmailAttachmentDelimitedString))
+                            var year = attachment.ClosingDate.Value.Year;
+                            var month = attachment.ClosingDate.Value.Month;
+
+                            if (string.IsNullOrEmpty(attachment.EmailTo) && string.IsNullOrEmpty(attachment.EmailContent) && !string.IsNullOrEmpty(attachment.EmailAttachmentDelimitedString) && attachment.ClosingDate != null)
                             {
                                 var files = FilePathUtils.GetFileDetailsFromdelimitedstring(attachment.EmailAttachmentDelimitedString);
+
+                             
+                                
+                                
                                 foreach (var file in files)
                                 {
                                     //NOT AN EMAIL UPLOAD - DIRECT FILE UPLOAD  - For e.g. https://citz-foi-prod.objectstore.gov.bc.ca/dev-forms-foirequests-e/Misc/CFD-2023-22081302/applicant/00b8ad71-5d11-4624-9c12-839193cf4a7e.docx
@@ -63,17 +71,19 @@ namespace FOIMOD.HistoricalDocMigration.DocMigration.BAL
 
                                     using (FileStream fs = File.Open(UNCFileLocation, FileMode.Open))
                                     {
-                                        //var s3filesubpath = string.Format("{0}/{1}/{2}", SystemSettings.S3_Attachements_BasePath, attachment.AXISRequestNumber, SystemSettings.AttachmentTag);
-                                        //var destinationfilename = string.Format("{0}.{1}", Guid.NewGuid().ToString(), file.FileExtension);
-                                        //var historicalcorrespondencelog = new HistoricalRecords() { AXISRequestID = attachment.AXISRequestNumber.ToUpper(), S3Subfolder = s3filesubpath, RecordFileName = destinationfilename, FileStream = fs };
-                                        //var uploadresponse = await docMigrationS3Client.UploadFileAsync(historicalcorrespondencelog);
-                                        //var fullfileurl = string.Format("{0}/{1}/{2}", SystemSettings.S3_EndPoint, s3filesubpath, destinationfilename);
-                                        //if (uploadresponse.IsSuccessStatusCode)
-                                        //{
-                                        //    //INSERT INTO TABLE - FOIMinistryRequestDocuments
-                                        //   // attachmentsDAL.InsertIntoHistoricalRecords(fullfileurl, FilePathUtils.CleanFileNameInput(file.FileName), attachment.AXISRequestNumber);
 
-                                        //}
+                                        var s3filesubpath = string.Format("{0}/{1}/{2}/{3}/{4}", SystemSettings.S3_Attachements_BasePath, "CL", year, month, attachment.AXISRequestNumber);
+                                        var destinationfilename = string.Format("{0}.{1}", Guid.NewGuid().ToString(), file.FileExtension);
+                                        var filename = file.FileName;
+                                        var historicalcorrespondencelog = new HistoricalRecords() { AXISRequestID = attachment.AXISRequestNumber.ToUpper(), S3Subfolder = s3filesubpath, S3Path = s3filesubpath, RecordFileName = destinationfilename, FileStream = fs , IsCorrenpondenceDocument=true , DisplayFileName = filename };
+                                        var uploadresponse = await docMigrationS3Client.UploadFileAsync(historicalcorrespondencelog);
+                                        var fullfileurl = string.Format("{0}/{1}/{2}", SystemSettings.S3_EndPoint, s3filesubpath, destinationfilename);
+                                        if (uploadresponse.IsSuccessStatusCode)
+                                        {
+                                            //INSERT INTO Historical table
+                                            attachmentsDAL.InsertIntoHistoricalRecords(historicalcorrespondencelog);
+
+                                        }
 
                                     }
 
@@ -107,17 +117,18 @@ namespace FOIMOD.HistoricalDocMigration.DocMigration.BAL
                                         {
                                             using (FileStream fs = File.Open(UNCFileLocation, FileMode.Open))
                                             {
-                                                //var s3filesubpath = string.Format("{0}/{1}/{2}", SystemSettings.S3_Attachements_BasePath, attachment.AXISRequestNumber, SystemSettings.AttachmentTag);
-                                                //var destinationfilename = string.Format("{0}.{1}", Guid.NewGuid().ToString(), file.FileExtension);
-                                                //var historialcorrespondenceLog = new HistoricalRecords() { AXISRequestID = attachment.AXISRequestNumber.ToUpper(), S3Subfolder = s3filesubpath, RecordFileName = destinationfilename, FileStream = fs };
-                                                //var uploadresponse = await docMigrationS3Client.UploadFileAsync(historialcorrespondenceLog);
-                                                //var fullfileurl = string.Format("{0}/{1}/{2}", SystemSettings.S3_EndPoint, s3filesubpath, destinationfilename);
-                                                //if (uploadresponse.IsSuccessStatusCode)
-                                                //{
-                                                //    //INSERT INTO TABLE - FOIMinistryRequestDocuments
-                                                //   // attachmentsDAL.InsertIntoHistoricalRecords(historialcorrespondenceLog);
+                                                var s3filesubpath = string.Format("{0}/{1}/{2}/{3}/{4}", SystemSettings.S3_Attachements_BasePath, "CL", year, month, attachment.AXISRequestNumber);
+                                                var destinationfilename = string.Format("{0}.{1}", Guid.NewGuid().ToString(), file.FileExtension);
+                                                var filename = file.FileName;
+                                                var historicalcorrespondencelog = new HistoricalRecords() { AXISRequestID = attachment.AXISRequestNumber.ToUpper(), S3Subfolder = s3filesubpath, S3Path = s3filesubpath, RecordFileName = destinationfilename, FileStream = fs, IsCorrenpondenceDocument = true, DisplayFileName = filename };
+                                                var uploadresponse = await docMigrationS3Client.UploadFileAsync(historicalcorrespondencelog);
+                                                var fullfileurl = string.Format("{0}/{1}/{2}", SystemSettings.S3_EndPoint, s3filesubpath, destinationfilename);
+                                                if (uploadresponse.IsSuccessStatusCode)
+                                                {
+                                                    //INSERT INTO Historical table
+                                                    attachmentsDAL.InsertIntoHistoricalRecords(historicalcorrespondencelog);
 
-                                                //}
+                                                }
 
                                             }
                                         }
@@ -127,17 +138,18 @@ namespace FOIMOD.HistoricalDocMigration.DocMigration.BAL
 
                                 using (Stream emailmessagepdfstream = docMigrationPDFStitcher.MergePDFs(documentToMigrateEmail))
                                 {
-                                    //var s3filesubpath = string.Format("{0}/{1}/{2}", SystemSettings.S3_Attachements_BasePath, attachment.AXISRequestNumber, SystemSettings.AttachmentTag);
-                                    //var destinationfilename = string.Format("{0}.pdf", Guid.NewGuid().ToString());
-                                    //var historicalcorrespondencelog = new HistoricalRecords() { AXISRequestID = attachment.AXISRequestNumber.ToUpper(), S3Subfolder = s3filesubpath, RecordFileName = destinationfilename, FileStream = emailmessagepdfstream };
-                                    //var uploadresponse = await docMigrationS3Client.UploadFileAsync(historicalcorrespondencelog);
-                                    //var fullfileurl = string.Format("{0}/{1}/{2}", SystemSettings.S3_EndPoint, s3filesubpath, destinationfilename);
-                                    //if (uploadresponse.IsSuccessStatusCode)
-                                    //{
-                                    //    //INSERT INTO TABLE - FOIMinistryRequestDocuments
-                                    //    //attachmentsDAL.InsertIntoHistoricalRecords(historicalcorrespondencelog);
+                                    var s3filesubpath = string.Format("{0}/{1}/{2}/{3}/{4}", SystemSettings.S3_Attachements_BasePath, "CL", year, month, attachment.AXISRequestNumber);
+                                    var destinationfilename = string.Format("{0}.pdf", Guid.NewGuid().ToString());
+                                    var filename = string.Format("{0}.pdf", FilePathUtils.CleanFileNameInput(attachment.EmailSubject));
+                                    var historicalcorrespondencelog = new HistoricalRecords() { AXISRequestID = attachment.AXISRequestNumber.ToUpper(), S3Subfolder = s3filesubpath, S3Path = s3filesubpath, RecordFileName = destinationfilename, FileStream = emailmessagepdfstream, IsCorrenpondenceDocument = true, DisplayFileName = filename };
+                                    var uploadresponse = await docMigrationS3Client.UploadFileAsync(historicalcorrespondencelog);
+                                    var fullfileurl = string.Format("{0}/{1}/{2}", SystemSettings.S3_EndPoint, s3filesubpath, destinationfilename);
+                                    if (uploadresponse.IsSuccessStatusCode)
+                                    {
+                                        //INSERT INTO Historical table
+                                        attachmentsDAL.InsertIntoHistoricalRecords(historicalcorrespondencelog);
 
-                                    //}
+                                    }
                                 }
 
                             }
