@@ -244,20 +244,6 @@ const MinistryReview = React.memo(({ userDetail }) => {
 
   const userGroups = userDetail?.groups?.map(group => group.slice(1));
   const isMinistry = isMinistryLogin(userGroups);
-
-  const validLockRecordsState = (currentState=requestDetails.currentState) => {
-    return (
-      currentState === StateEnum.harms.name ||
-      currentState === StateEnum.onhold.name ||
-      currentState === StateEnum.recordsreadyforreview.name ||
-      currentState === StateEnum.review.name ||
-      currentState === StateEnum.consult.name ||
-      currentState === StateEnum.peerreview.name ||
-      currentState === StateEnum.signoff.name ||
-      currentState === StateEnum.response.name ||
-      currentState === StateEnum.closed.name
-    );
-  }
   
   useEffect(() => {
     const requestDetailsValue = requestDetails;
@@ -290,16 +276,6 @@ const MinistryReview = React.memo(({ userDetail }) => {
         setIsMCFPersonal(true);
       }
     }
-
-    //Adjust lockRecords value based on requestState if there is no manual user lockedrecords value present in requestDetails from DB
-    const updateRecordsTabAccess = () => {
-      if(requestDetails.userrecordslockstatus === null) {
-        return validLockRecordsState(requestDetails.currentState);
-      } else {
-        return requestDetails.userrecordslockstatus;
-      }
-    }
-    setLockRecordsTab(updateRecordsTabAccess());
   }, [requestDetails, unSavedRequest]);
 
   useEffect(() => {
@@ -315,7 +291,6 @@ const MinistryReview = React.memo(({ userDetail }) => {
   }, [isMinistryRestricted, requestWatchers]);
 
   const [recordsUploading, setRecordsUploading] = React.useState(false);
-  const [lockRecordsTab, setLockRecordsTab] = useState(false);
   const [CFRUnsaved, setCFRUnsaved] = React.useState(false);
   const hideBottomText = [
     StateEnum.onhold.name.toLowerCase(),
@@ -827,7 +802,6 @@ const MinistryReview = React.memo(({ userDetail }) => {
                           handleSaveRequest={handleSaveRequest}
                           currentSelectedStatus={_currentrequestStatus}
                           hasStatusRequestSaved={hasStatusRequestSaved}
-                          validLockRecordsState={validLockRecordsState}
                         />
                       </>
                     )}
@@ -1076,8 +1050,6 @@ const MinistryReview = React.memo(({ userDetail }) => {
                   setRecordsUploading={setRecordsUploading}
                   recordsTabSelect={tabLinksStatuses.Records.active}
                   requestType={requestDetails?.requestType}
-                  lockRecords={lockRecordsTab}
-                  validLockRecordsState={validLockRecordsState}
                 />
               </>
             ) : (

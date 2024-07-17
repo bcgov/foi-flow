@@ -77,7 +77,6 @@ const BottomButtonGroup = React.memo(
     axisMessage,
     attachmentsArray,
     oipcData,
-    validLockRecordsState,
   }) => {
     /**
      * Bottom Button Group of Review request Page
@@ -119,11 +118,6 @@ const BottomButtonGroup = React.memo(
       if (urlIndexCreateRequest > -1) {
         saveRequestObject.requeststatuslabel = StateEnum.intakeinprogress.label;
         setIsAddRequest(false);
-      }
-
-      //Logic to reset user lock records status to null (and have FE useEffect in FOIRequest.js/MinistryView.js logic takeover) if request is in unlocked request states
-      if (saveRequestObject.userrecordslockstatus !== null && !validLockRecordsState(currentSelectedStatus)) {
-        saveRequestObject.userrecordslockstatus = null;
       }
 
       //add oipc Data to save request object and sync/validate isoipcreview attribute
