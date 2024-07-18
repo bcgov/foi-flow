@@ -28,11 +28,13 @@ import { useDispatch } from "react-redux";
 import * as html2pdf from 'html-to-pdf-js';
 import CommunicationUploadModal from '../Comments/CommunicationUploadModal';
 import { Chip } from '@material-ui/core'
+import { toast } from 'react-toastify';
+import { getTemplateVariables } from './util';
 
 
 const CommunicationStructure = ({correspondence, currentIndex,
   fullName, ministryId=null, editDraft, deleteDraft, deleteResponse, setModalFor,setModal,setUpdateAttachment, 
-  setSelectedCorrespondence, setCurrentResponseDate, applicantCorrespondenceTemplates}) => {
+  setSelectedCorrespondence, setCurrentResponseDate, applicantCorrespondenceTemplates, templateVariableInfo}) => {
 
 
   const dispatch = useDispatch();
@@ -193,6 +195,7 @@ const CommunicationStructure = ({correspondence, currentIndex,
       }
     })
     let blobs = [];
+    const toastID = toast.loading(`Downloading correspondence ${correspondence.category == "draft" ? "draft" : ""}...`);
     try {
       const response = await getOSSHeaderDetails(fileInfoList, dispatch);
       for (let header of response.data) {
@@ -201,10 +204,48 @@ const CommunicationStructure = ({correspondence, currentIndex,
           blobs.push({name: header.filename, lastModified: res.headers['last-modified'], input: blob})
         });
       }
+      toast.update(toastID, {
+        render: `Correspondence ${correspondence.category == "draft" ? "draft " : ""}download complete`,
+        type: "success",
+        className: "file-upload-toast",
+        isLoading: false,
+        autoClose: 3000,
+        hideProgressBar: true,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        closeButton: true
+      });
     } catch (error) {
       console.log(error)
+      toast.update(toastID, {
+        render: `Correspondence ${correspondence.category == "draft" ? "draft " : ""}download failed`,
+        type: "error",
+        className: "file-upload-toast",
+        isLoading: false,
+        autoClose: 3000,
+        hideProgressBar: true,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        closeButton: true
+      });
     }
-    const element = document.querySelector(`[data-communication-div-id="${currentIndex}"]`);
+    const element = document.querySelector(`[data-communication-div-id="${currentIndex}"]`).cloneNode(true);
+
+    // For drafts, remove the relevant variables that have been filled in
+    if (correspondence.category == "draft") {
+      const template = applicantCorrespondenceTemplates.find(template => template.templateid == correspondence.templateid)
+      const { requestDetails, requestExtensions, responsePackagePdfStitchStatus, cfrFeeData } = templateVariableInfo
+      let variables = getTemplateVariables(requestDetails,requestExtensions, responsePackagePdfStitchStatus, cfrFeeData, template)
+      variables = variables.filter(variable => {
+        const includedVariables = ["{{firstName}}", "{{lastName}}"]
+        return includedVariables.includes(variable.name)
+      })
+      for (let variable of variables) {
+        element.innerHTML = element.innerHTML.replaceAll(variable.value, 'APPLICANT')
+      }
+    }
     html2pdf().from(element).outputPdf('blob').then(async (blob) => {
       blobs.push({name: "Email Body.pdf", lastModified: new Date(), input: blob})
       const zipfile = await downloadZip(blobs).blob()
