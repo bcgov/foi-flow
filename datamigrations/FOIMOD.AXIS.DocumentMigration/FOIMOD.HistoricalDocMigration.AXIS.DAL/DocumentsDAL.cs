@@ -45,7 +45,7 @@ namespace FOIMOD.HistoricalDocMigration.AXIS.DAL
                         @SectionList = COALESCE(@SectionList+':', '')+vcSectionList
                     FROM [dbo].[tblDocumentReviewLog] WHERE iRequestID =@irequestid
 
-                    SELECT DISTINCT D.iDocID,D.vcDocName as FolderName,(SELECT vcDocName FROM tblDocuments where iDocID =D.iParentDocID) as ParentFolderName ,D.tiSections,vcFileName as FilePath,REVERSE(SUBSTRING(REVERSE(vcFileName),1,4)) as FileType,D.siFolderID,D.siPageCount ,p.siPageNum ,(SELECT vcInternalName FROM tblDocReviewFlags WHERE tiDocReviewFlagID = PRF.tiDocReviewFlagID ) as PageReviewFlag, @closingdate as ClosingDate FROM tblPages P inner join tblDocuments D on P.iDocID=D.iDocID 
+                    SELECT DISTINCT D.iDocID,D.siFolderID,D.vcDocName as FolderName,(SELECT vcDocName FROM tblDocuments where iDocID =D.iParentDocID) as ParentFolderName ,D.tiSections,vcFileName as FilePath,REVERSE(SUBSTRING(REVERSE(vcFileName),1,4)) as FileType,D.siFolderID,D.siPageCount ,p.siPageNum ,(SELECT vcInternalName FROM tblDocReviewFlags WHERE tiDocReviewFlagID = PRF.tiDocReviewFlagID ) as PageReviewFlag, @closingdate as ClosingDate FROM tblPages P inner join tblDocuments D on P.iDocID=D.iDocID 
                     LEFT JOIN tblPageReviewFlags PRF ON P.iPageID = PRF.iPageID
                     WHERE  D.iDocID in(                 
                     SELECT iDocID FROM tblDocuments d with(nolock) where iDocID IN (SELECT Data FROM [dbo].[AFX_Splitter](@SectionList, ':'))

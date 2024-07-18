@@ -40,14 +40,17 @@ namespace FOIMOD.HistoricalDocMigration.Utils
             {
                 foreach (DocumentToMigrate pDFDocToMerge in _pdfpages)
                 {
-                    string filelocation = String.IsNullOrEmpty(baseUNClocation) ? pDFDocToMerge.PageFilePath : Path.Combine(baseUNClocation, pDFDocToMerge.SiFolderID, pDFDocToMerge.PageFilePath);
-                    using PdfDocument inputPDFDocument = !pDFDocToMerge.HasStreamForDocument ? PdfReader.Open(filelocation, PdfDocumentOpenMode.Import) : PdfReader.Open(pDFDocToMerge.FileStream, PdfDocumentOpenMode.Import);
-
-                    pdfdocument.Version = inputPDFDocument.Version;                  
-
-                    foreach (PdfPage page in inputPDFDocument.Pages)
+                    if (pDFDocToMerge.ReviewFlag?.ToLower() != "duplicate" || pDFDocToMerge.ReviewFlag?.ToLower() != "not relevant")
                     {
-                        pdfdocument.AddPage(page);
+                        string filelocation = String.IsNullOrEmpty(baseUNClocation) ? pDFDocToMerge.PageFilePath : Path.Combine(baseUNClocation, pDFDocToMerge.SiFolderID, pDFDocToMerge.PageFilePath);
+                        using PdfDocument inputPDFDocument = !pDFDocToMerge.HasStreamForDocument ? PdfReader.Open(filelocation, PdfDocumentOpenMode.Import) : PdfReader.Open(pDFDocToMerge.FileStream, PdfDocumentOpenMode.Import);
+
+                        pdfdocument.Version = inputPDFDocument.Version;
+
+                        foreach (PdfPage page in inputPDFDocument.Pages)
+                        {
+                            pdfdocument.AddPage(page);
+                        }
                     }
                 }
                 mergeddocstream = new HugeMemoryStream();
@@ -85,7 +88,7 @@ namespace FOIMOD.HistoricalDocMigration.Utils
 
                 }
 
-                 stream = new MemoryStream();
+                stream = new MemoryStream();
 
                 document.Save(stream);
 
@@ -100,7 +103,7 @@ namespace FOIMOD.HistoricalDocMigration.Utils
             }
 
             return stream;
-            
+
         }
 
         public HugeMemoryStream MergePDFs_v1(List<DocumentToMigrate> pdfpages, string baseUNClocation = null)

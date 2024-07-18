@@ -90,12 +90,13 @@ using (StreamWriter logFileWriter = new StreamWriter(logFilePath, append: true))
         };
 
         AmazonS3Client amazonS3Client = new AmazonS3Client(s3credentials, config);
-        CorrespondenceLogMigration correspondenceLogMigration = new CorrespondenceLogMigration(axissqlConnection, odbcConnection, amazonS3Client, logger);
+        
         Console.WriteLine("Migration process Starting....");
 
         if (SystemSettings.CorrespondenceLogMigration)
         {
-            Console.WriteLine("CorrespondenceLogMigration  Starting...");           
+            Console.WriteLine("CorrespondenceLogMigration  Starting...");
+            CorrespondenceLogMigration correspondenceLogMigration = new CorrespondenceLogMigration(axissqlConnection, odbcConnection, amazonS3Client, logger);
             correspondenceLogMigration.RequestsToMigrate = SystemSettings.RequestToMigrate;
             await correspondenceLogMigration.RunMigration();
             Console.WriteLine("CorrespondenceLogMigration  Completed");
@@ -104,8 +105,9 @@ using (StreamWriter logFileWriter = new StreamWriter(logFilePath, append: true))
         if (SystemSettings.RecordsMigration)
         {
             Console.WriteLine("RecordsMigration  Starting...");
-            correspondenceLogMigration.RequestsToMigrate = SystemSettings.RequestToMigrate;
-            await correspondenceLogMigration.RunMigration();
+            RecordsLogMigration recordsLogMigration = new RecordsLogMigration(axissqlConnection, odbcConnection, amazonS3Client, logger);
+            recordsLogMigration.RequestsToMigrate = SystemSettings.RequestToMigrate;
+            await recordsLogMigration.RunMigration();
             Console.WriteLine("RecordsMigration  Completed");
         }
 

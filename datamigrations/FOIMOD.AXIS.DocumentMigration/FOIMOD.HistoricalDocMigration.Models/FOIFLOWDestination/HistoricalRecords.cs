@@ -19,6 +19,10 @@
 
         public string Attributes { get; set; }
 
+        public int? iDocID { get; set; }
+
+        public int? iFolderID { get; set; }
+
 
         public DateTime CreatedAt { get; set; }
 
