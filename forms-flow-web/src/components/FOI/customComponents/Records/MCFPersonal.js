@@ -97,7 +97,7 @@ const MCFPersonal = ({
     useEffect(() => {
       if(MCFVolumes?.volumes) {
         setAllVolumes(MCFVolumes.volumes);
-        if(MCFFiletypes.filetypes.length > 5) {
+        if(MCFVolumes.volumes?.length > 5) {
           setVolumes(MCFVolumes.volumes.slice(0, 5));
         } else {
           setVolumes(MCFVolumes.volumes);
@@ -107,7 +107,7 @@ const MCFPersonal = ({
 
     useEffect(() => {
       if(MCFFiletypes?.filetypes) {
-        if(MCFFiletypes.filetypes.length > 6) {
+        if(MCFFiletypes.filetypes?.length > 6) {
           setFileTypes(MCFFiletypes.filetypes.slice(0, 6));
           setOtherFileTypes(MCFFiletypes.filetypes.slice(6, MCFFiletypes.filetypes.length))
         } else {

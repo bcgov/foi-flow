@@ -73,6 +73,7 @@ class RetryRecordAttributeSchema(Schema):
     incompatible = fields.Boolean(required=True,allow_none=False)
     extension = fields.Str(validate=validate.Length(min=1, max=10), required=True,allow_none=False)
     isattachment = fields.Boolean(required=False,allow_none=False)
+    personalattributes = fields.Nested(PersonalAttributesSchema,required=False,allow_none=True)
 
 class ReplaceRecordAttributeSchema(Schema):
     class Meta:  # pylint: disable=too-few-public-methods
@@ -86,7 +87,8 @@ class ReplaceRecordAttributeSchema(Schema):
     incompatible = fields.Boolean(required=True,allow_none=False)
     extension = fields.Str(validate=validate.Length(min=1, max=10), required=True,allow_none=False)
     isattachment = fields.Boolean(required=False,allow_none=False)
-    hasfilereplaced = fields.Boolean(required=False,allow_none=False)    
+    hasfilereplaced = fields.Boolean(required=False,allow_none=False)
+    personalattributes = fields.Nested(PersonalAttributesSchema,required=False,allow_none=True)
 
 class FOIRequestRetryRecordSchema(Schema):
     class Meta:  # pylint: disable=too-few-public-methods

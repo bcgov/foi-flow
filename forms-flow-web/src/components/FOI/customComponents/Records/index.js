@@ -298,10 +298,6 @@ export const RecordsLog = ({
       requestType === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL
   );
 
-  const MCFSections = useSelector(
-    (state) => state.foiRequests.foiPersonalSections
-  );
-
   useEffect(() => {
     setRecords(recordsObj?.records);
     let nonDuplicateRecords = recordsObj?.records?.filter(
@@ -703,6 +699,7 @@ export const RecordsLog = ({
                         ? _file.lastModifiedDate
                         : new Date(_file.lastModified),
                       filesize: _file.size,
+                      personalattributes: _fileInfo.personalattributes,
                     },
                     replacementof:
                       replaceRecord["replacementof"] == null ||
@@ -2562,6 +2559,7 @@ export const RecordsLog = ({
             replacementfiletypes={getreplacementfiletypes()}
             requestType={requestType}
             isScanningTeamMember={isScanningTeamMember}
+            curPersonalAttributes={curPersonalAttributes}
           />
           <div className="state-change-dialog">
             <Dialog

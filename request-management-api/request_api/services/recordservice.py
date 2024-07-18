@@ -160,10 +160,10 @@ class recordservice(recordservicebase):
             _record['attributes']['extension'] = extension            
             _record['attributes']['incompatible'] =  extension.lower() in NONREDACTABLE_FILE_TYPES 
             record.__dict__.update(_record)
-            recordlist.append(record)      
+            recordlist.append(record)
         dbresponse = FOIRequestRecord.replace(recordid,recordlist)
         if (dbresponse.success):
-            processingrecords = [{**record, **{"recordid": dbresponse.args[0][record['s3uripath']]['recordid']}} for record in records]                      
+            processingrecords = [{**record, **{"recordid": dbresponse.args[0][record['s3uripath']]['recordid']}} for record in records]
             # record all jobs before sending first redis stream message to avoid race condition
             jobids, err = self.makedocreviewerrequest('POST', '/api/jobstatus', {
                 'records': processingrecords,
