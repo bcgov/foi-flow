@@ -2864,7 +2864,7 @@ const Attachment = React.memo(
     const [isRetry, setRetry] = useState(false);
     const removeInValidTagsFromDivisions = record.attributes?.divisions.filter(
       (division) => {
-        return (division.divisionid != 0 && !record.attributes?.personalattributes?.personaltag) || (record.attributes?.personalattributes?.personaltag && division.divisionname != record.attributes?.personalattributes?.personaltag && division.divisionid != 0);
+        return division.divisionid != 0;
       });
 
     // useEffect(() => {
