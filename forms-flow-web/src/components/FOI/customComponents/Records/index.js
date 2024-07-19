@@ -2864,7 +2864,7 @@ const Attachment = React.memo(
     const [isRetry, setRetry] = useState(false);
     const removePersonalTagsFromDivisions = record.attributes?.divisions.filter(
       (division) => {
-        return !record.attributes?.personalattributes?.personaltag || (record.attributes?.personalattributes?.personaltag && division.divisionname != record.attributes?.personalattributes?.personaltag);
+        return division.divisionid !== 0 || !record.attributes?.personalattributes?.personaltag || (record.attributes?.personalattributes?.personaltag && division.divisionname != record.attributes?.personalattributes?.personaltag);
       });
 
     // useEffect(() => {

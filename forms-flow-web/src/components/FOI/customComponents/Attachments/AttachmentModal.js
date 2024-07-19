@@ -103,14 +103,6 @@ export default function AttachmentModal({
   const MSDSections = useSelector(
     (state) => state.foiRequests.foiPersonalDivisionsAndSections
   );
-  const [TBDID, setTBDID] = useState(0);
-  useEffect(() => {
-    setTBDID(
-      MCFSections?.sections?.find(
-        (division) => division.name === "TBD"
-      )?.divisionid
-    );
-  }, [MCFSections]);
 
   const recordFormats = useSelector((state) => state.foiRequests.recordFormats);
   useEffect(() => {
@@ -328,7 +320,7 @@ export default function AttachmentModal({
         ) {
           if(tagValue === "") {
             fileStatusTransition = "TBD";
-            _tagValue = TBDID;
+            _tagValue = 0;
           } else {
             fileStatusTransition =
               divisions.find((division) => division.divisionid === tagValue)
@@ -352,7 +344,7 @@ export default function AttachmentModal({
         ) {
           if(tagValue === "") {
             fileStatusTransition = "TBD";
-            _tagValue = TBDID;
+            _tagValue = 0;
           } else {
             fileStatusTransition =
               divisions.find((division) => division.divisionid === tagValue)
