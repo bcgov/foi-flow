@@ -74,7 +74,7 @@ namespace FOIMOD.HistoricalDocMigration.DocMigration.BAL
 
                                         var s3filesubpath = string.Format("{0}/{1}/{2}/{3}/{4}", SystemSettings.S3_Attachements_BasePath, "CL", year, month, attachment.AXISRequestNumber);
                                         var destinationfilename = string.Format("{0}.{1}", Guid.NewGuid().ToString(), file.FileExtension);
-                                        var filename = file.FileName;
+                                        var filename = FilePathUtils.CleanFileNameInput(file.FileName);
                                         var historicalcorrespondencelog = new HistoricalRecords() { AXISRequestID = attachment.AXISRequestNumber.ToUpper(), S3Subfolder = s3filesubpath, S3Path = s3filesubpath, RecordFileName = destinationfilename, FileStream = fs , IsCorrenpondenceDocument=true , DisplayFileName = filename };
                                         var uploadresponse = await docMigrationS3Client.UploadFileAsync(historicalcorrespondencelog);
                                         var fullfileurl = string.Format("{0}/{1}/{2}", SystemSettings.S3_EndPoint, s3filesubpath, destinationfilename);
@@ -119,7 +119,7 @@ namespace FOIMOD.HistoricalDocMigration.DocMigration.BAL
                                             {
                                                 var s3filesubpath = string.Format("{0}/{1}/{2}/{3}/{4}", SystemSettings.S3_Attachements_BasePath, "CL", year, month, attachment.AXISRequestNumber);
                                                 var destinationfilename = string.Format("{0}.{1}", Guid.NewGuid().ToString(), file.FileExtension);
-                                                var filename = file.FileName;
+                                                var filename =FilePathUtils.CleanFileNameInput(file.FileName);
                                                 var historicalcorrespondencelog = new HistoricalRecords() { AXISRequestID = attachment.AXISRequestNumber.ToUpper(), S3Subfolder = s3filesubpath, S3Path = s3filesubpath, RecordFileName = destinationfilename, FileStream = fs, IsCorrenpondenceDocument = true, DisplayFileName = filename };
                                                 var uploadresponse = await docMigrationS3Client.UploadFileAsync(historicalcorrespondencelog);
                                                 var fullfileurl = string.Format("{0}/{1}/{2}", SystemSettings.S3_EndPoint, s3filesubpath, destinationfilename);
@@ -156,7 +156,7 @@ namespace FOIMOD.HistoricalDocMigration.DocMigration.BAL
                         }
                         catch(Exception ex) 
                         {
-                            ilogger.LogError(string.Format("Error happened while uploading attachment for request : {0} and error is like, {1}", attachment.AXISRequestNumber, ex.Message));
+                            ilogger.LogError(string.Format("Correspondence Log Migration, Error happened while uploading attachment for request : {0} and error is like, {1}", attachment.AXISRequestNumber, ex.Message));
                         }
                     }
 

@@ -13,7 +13,7 @@ Console.WriteLine("Starting, CFD Document Migration!");
 
 #if DEBUG
 var configurationbuilder = new ConfigurationBuilder()
-                       .AddJsonFile($"appsettings.json", true, true)
+                       .AddJsonFile($"appsettings.prodtodev.json", true, true)
                        .AddEnvironmentVariables().Build();
 #else
 var configurationbuilder = new ConfigurationBuilder()

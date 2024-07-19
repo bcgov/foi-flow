@@ -70,7 +70,7 @@ namespace FOIMOD.HistoricalDocMigration.DocMigration.BAL
 
 
 
-                    if (records.Any())
+                    if (records !=null && records.Any())
                     {
                         var year = records.First().ClosingDate.Value.Year;
                         var month = records.First().ClosingDate.Value.Month;
@@ -115,7 +115,8 @@ namespace FOIMOD.HistoricalDocMigration.DocMigration.BAL
 
                                             ilogger.LogInformation(string.Format("Upload starting for  document ID {0} for request {1}, page count is {2}, started at {3}", docid, _requestnumber, pagedetails.TotalPageCount, DateTime.Now));
 
-                                            var historicalcorrespondencelog = new HistoricalRecords() { AXISRequestID = _requestnumber.ToUpper(), IsCorrenpondenceDocument=false, S3Subfolder = s3filesubpath, S3Path = s3filesubpath, RecordFileName = destinationfilename_guidbased, FileStream = stitchedFileStream, DisplayFileName = actualfilename };
+                                            var historicalcorrespondencelog = new HistoricalRecords() { AXISRequestID = _requestnumber.ToUpper(), IsCorrenpondenceDocument = false, S3Subfolder = s3filesubpath, S3Path = s3filesubpath, RecordFileName = destinationfilename_guidbased, FileStream = stitchedFileStream, DisplayFileName = FilePathUtils.CleanFileNameInput(actualfilename)};
+
 
                                             var uploadresponse = await docMigrationS3Client.UploadFileAsync(historicalcorrespondencelog);
 
@@ -154,7 +155,7 @@ namespace FOIMOD.HistoricalDocMigration.DocMigration.BAL
 
                             catch (Exception ex)
                             {
-                                string exception = string.Format("Error happened while processing document, {0}, with DOCID {1}, on Request {2} and Error details as :{3} ", actualfilename, docid, _requestnumber, ex.Message);
+                                string exception = string.Format("Record Log Migration ,Error happened while processing document, {0}, with DOCID {1}, on Request {2} and Error details as :{3} ", actualfilename, docid, _requestnumber, ex.Message);
                                 ilogger.LogError(exception);
                                 //throw new Exception(exception);
                             }
