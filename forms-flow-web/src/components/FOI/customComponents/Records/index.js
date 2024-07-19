@@ -298,10 +298,6 @@ export const RecordsLog = ({
       requestType === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL
   );
 
-  const MCFSections = useSelector(
-    (state) => state.foiRequests.foiPersonalSections
-  );
-
   useEffect(() => {
     setRecords(recordsObj?.records);
     let nonDuplicateRecords = recordsObj?.records?.filter(
@@ -703,6 +699,7 @@ export const RecordsLog = ({
                         ? _file.lastModifiedDate
                         : new Date(_file.lastModified),
                       filesize: _file.size,
+                      personalattributes: _fileInfo.personalattributes,
                     },
                     replacementof:
                       replaceRecord["replacementof"] == null ||
@@ -2562,6 +2559,7 @@ export const RecordsLog = ({
             replacementfiletypes={getreplacementfiletypes()}
             requestType={requestType}
             isScanningTeamMember={isScanningTeamMember}
+            curPersonalAttributes={curPersonalAttributes}
           />
           <div className="state-change-dialog">
             <Dialog
@@ -2864,9 +2862,9 @@ const Attachment = React.memo(
     const classes = useStyles();
     const [disabled, setDisabled] = useState(false);
     const [isRetry, setRetry] = useState(false);
-    const removePersonalTagsFromDivisions = record.attributes?.divisions.filter(
+    const removeInValidTagsFromDivisions = record.attributes?.divisions.filter(
       (division) => {
-        return !record.attributes?.personalattributes?.personaltag || (record.attributes?.personalattributes?.personaltag && division.divisionname != record.attributes?.personalattributes?.personaltag);
+        return division.divisionid != 0;
       });
 
     // useEffect(() => {
@@ -3065,7 +3063,7 @@ const Attachment = React.memo(
           alignItems="flex-start"
         >
           <Grid item xs={6}>
-            {removePersonalTagsFromDivisions.map((division, i) => (
+            {removeInValidTagsFromDivisions.map((division, i) => (
               <Chip
                 item
                 key={i}
@@ -3093,9 +3091,9 @@ const Attachment = React.memo(
                 style={{
                   backgroundColor: "#003366",
                   margin:
-                    record.isattachment && removePersonalTagsFromDivisions.length === 0
+                    record.isattachment && removeInValidTagsFromDivisions.length === 0
                       ? "4px 4px 4px 95px"
-                      : removePersonalTagsFromDivisions.length === 0
+                      : removeInValidTagsFromDivisions.length === 0
                       ? "4px 4px 4px 35px"
                       : "4px",
                 }}

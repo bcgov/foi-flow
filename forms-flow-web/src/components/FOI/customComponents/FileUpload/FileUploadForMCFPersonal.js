@@ -262,8 +262,8 @@ const FileUploadForMCFPersonal = ({
     }
 
     React.useEffect(() => {
-      setIsPersonSelected(Object.keys(person).length !== 0);
-    },[person])
+      setIsPersonSelected(Object.keys(person).length !== 0 && Object.keys(fileType).length !== 0);
+    },[person, fileType])
 
     React.useEffect(() => {
       setAdditionalTagList(searchSections(otherTagList, searchValue, tagValue));
@@ -405,10 +405,10 @@ const FileUploadForMCFPersonal = ({
               size="small"
               onClick={()=>{handleVolumeChange(v)}}
               clicked={volume?.name === v.name}
-              disabled={!isPersonSelected}
+              // disabled={!isPersonSelected}
             />
           )}
-          {!showAllVolumes && isPersonSelected && (<AddCircleIcon
+          {!showAllVolumes && (<AddCircleIcon
             id={`showallvolumeTag`}
             key={`showallvolume-tag`}
             color="primary"
@@ -432,7 +432,7 @@ const FileUploadForMCFPersonal = ({
               size="small"
               onClick={()=>{handleFileTypeChange(f)}}
               clicked={fileType?.name === f.name}
-              disabled={!isPersonSelected}
+              // disabled={!isPersonSelected}
             />
           )}
         </div>
@@ -495,7 +495,7 @@ const FileUploadForMCFPersonal = ({
                     </InputAdornment>
                   }
                   fullWidth
-                  disabled={!isPersonSelected}
+                  // disabled={!isPersonSelected}
                 />
               </Grid>
             </Paper>
@@ -707,12 +707,12 @@ const FileUploadForMCFPersonal = ({
             value=""
             multiple={multipleFiles}
             accept={mimeTypes}
-            disabled={!isPersonSelected}
+            disabled={modalFor === "add" && !isPersonSelected}
             />
           </div>
           <div className="file-upload-column file-upload-column-3">
             {(Object.entries(files).length === 0 && !multipleFiles) || multipleFiles ?
-            <button className="btn-add-files" type="button" onClick={handleUploadBtnClick} disabled={!isPersonSelected}>              
+            <button className="btn-add-files" type="button" onClick={handleUploadBtnClick} disabled={modalFor === "add" && !isPersonSelected}>              
                   Add Files
             </button>  : null}
           </div>
