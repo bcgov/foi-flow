@@ -220,6 +220,8 @@ const MCFPersonal = ({
     };
 
     const handleClose = () => {
+      setSearchValue("");
+      setFileTypeSearchValue("");
       setCurrentEditRecord();
       setCurPersonalAttributes({
         person: "",
@@ -230,6 +232,11 @@ const MCFPersonal = ({
       });
       setNewPersonalAttributes();
       setEditTagModalOpen(false);
+    };
+
+    const reset = () => {
+      setSearchValue("");
+      setFileTypeSearchValue("");
     };
 
     return (
@@ -572,13 +579,13 @@ const MCFPersonal = ({
           <DialogActions>
             <button
               className={`btn-bottom btn-save btn`}
-              onClick={() => updatePersonalAttributes()}
+              onClick={() => {updatePersonalAttributes();reset();}}
             >
               Update for Individual
             </button>
             <button
               className={`btn-bottom btn-save btn`}
-              onClick={() => updatePersonalAttributes(true)}
+              onClick={() => {updatePersonalAttributes(true);reset();}}
             >
               Update for All
             </button>
