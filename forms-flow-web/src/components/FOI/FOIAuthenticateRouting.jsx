@@ -68,6 +68,9 @@ const FOIAuthenticateRouting = React.memo((props) => {
               <Route path="/foi/foirequests/:requestId/ministryrequest/:ministryId">
                 <FOIRequest userDetail={userDetail} openApplicantProfileModal={openApplicantProfileModal}/>
               </Route>
+              <Route path="/foi/historicalrequest/:requestId">
+                <FOIRequest userDetail={userDetail} />
+              </Route>
               <Route path="/foi/ministryreview/:requestId/ministryrequest/:ministryId">
                 <MinistryReview userDetail={userDetail} />
               </Route>
