@@ -44,32 +44,38 @@ namespace FOIMOD.HistoricalDocMigration.AXIS.DAL
 
         private string recordsbyrequestid = @"
                         
-                    DECLARE @SectionList VARCHAR(MAX);
-                    DECLARE @SectionListRL VARCHAR(MAX);
-                    DECLARE @irequestid INT
-                    DECLARE @closingdate DATE
+                     DECLARE @SectionList VARCHAR(MAX);
+                     DECLARE @SectionListRL VARCHAR(MAX);
+                     DECLARE @irequestid INT
+                     DECLARE @closingdate DATE
 
-                         SET @irequestid=(SELECT TOP 1 iRequestID FROM tblRequests WHERE vcVisibleRequestID = '{0}')
-                         SET  @closingdate=(SELECT sdtClosedDate FROM tblRequests WHERE vcVisibleRequestID = '{1}')
-                         SET @SectionList = NULL;
-                     SELECT
-                         @SectionList = COALESCE(@SectionList+':', '')+vcSectionList
-                     FROM [dbo].[tblDocumentReviewLog] WHERE iRequestID =@irequestid
+                          SET @irequestid=(SELECT TOP 1 iRequestID FROM tblRequests WHERE vcVisibleRequestID = '{0}')
+                          SET  @closingdate=(SELECT sdtClosedDate FROM tblRequests WHERE vcVisibleRequestID = '{1}')
+                          SET @SectionList = NULL;
 
-                      SELECT
-                         @SectionListRL = COALESCE(@SectionList+':', '')+vcSectionList
-                     FROM [dbo].[tblRedactionLayers] WHERE iRequestID =@irequestid
+	                      IF NOT EXISTS (SELECT irequestid FROM [dbo].[tblRequestResponsiveDocs] WHERE iRequestID=@irequestid) 
 
-                     SELECT DISTINCT D.iDocID,D.siFolderID,D.vcDocName as FolderName,(SELECT vcDocName FROM tblDocuments where iDocID =D.iParentDocID) as ParentFolderName ,D.tiSections,vcFileName as FilePath,REVERSE(SUBSTRING(REVERSE(vcFileName),1,4)) as FileType,D.siFolderID,D.siPageCount ,p.siPageNum ,(SELECT vcInternalName FROM tblDocReviewFlags WHERE tiDocReviewFlagID = PRF.tiDocReviewFlagID ) as PageReviewFlag, @closingdate as ClosingDate FROM tblPages P inner join tblDocuments D on P.iDocID=D.iDocID 
-                     LEFT JOIN tblPageReviewFlags PRF ON P.iPageID = PRF.iPageID
-                     WHERE  D.iDocID in(                 
-                     SELECT iDocID FROM tblDocuments d with(nolock) where iDocID IN (SELECT Data FROM [dbo].[AFX_Splitter](@SectionList, ':'))
-                     union
-                     --- Request Folder Documents    
-                     select iDocID from tblRedactionLayers where irequestid=@irequestid AND iDeliveryID is NULL
-                     union
-                     (SELECT Data FROM [dbo].[AFX_Splitter](@SectionListRL, ':'))
-                     ) 
+                            BEGIN
+                              SELECT
+                                  @SectionList = COALESCE(@SectionList+':', '')+vcSectionList
+                              FROM [dbo].[tblDocumentReviewLog] WHERE iRequestID =@irequestid
+
+                               SELECT
+                                  @SectionListRL = COALESCE(@SectionList+':', '')+vcSectionList
+                              FROM [dbo].[tblRedactionLayers] WHERE iRequestID =@irequestid
+
+                              SELECT DISTINCT D.iDocID,D.siFolderID,D.vcDocName as FolderName,(SELECT vcDocName FROM tblDocuments where iDocID =D.iParentDocID) as ParentFolderName ,D.tiSections,vcFileName as FilePath,REVERSE(SUBSTRING(REVERSE(vcFileName),1,4)) as FileType,D.siFolderID,D.siPageCount ,p.siPageNum ,(SELECT vcInternalName FROM tblDocReviewFlags WHERE tiDocReviewFlagID = PRF.tiDocReviewFlagID ) as PageReviewFlag, @closingdate as ClosingDate FROM tblPages P inner join tblDocuments D on P.iDocID=D.iDocID 
+                              LEFT JOIN tblPageReviewFlags PRF ON P.iPageID = PRF.iPageID
+                              WHERE  D.iDocID in(                 
+                              SELECT iDocID FROM tblDocuments d with(nolock) where iDocID IN (SELECT Data FROM [dbo].[AFX_Splitter](@SectionList, ':'))
+                              union
+                              --- Request Folder Documents    
+                              select iDocID from tblRedactionLayers where irequestid=@irequestid AND iDeliveryID is NULL
+                              union
+                              (SELECT Data FROM [dbo].[AFX_Splitter](@SectionListRL, ':'))
+                              ) 
+
+                              END
                    
                 ";
 

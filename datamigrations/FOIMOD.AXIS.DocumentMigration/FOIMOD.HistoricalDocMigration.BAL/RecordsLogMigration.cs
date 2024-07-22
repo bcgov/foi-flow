@@ -110,7 +110,7 @@ namespace FOIMOD.HistoricalDocMigration.DocMigration.BAL
 
                                             var destinationfilename_guidbased = string.Format("{0}{1}", Guid.NewGuid().ToString(), ".pdf");
                                            // var s3filesubpath = string.Format("{0}/{1}", SystemSettings.MinistryRecordsBucket, _requestnumber.ToUpper());
-                                            var s3filesubpath = string.Format("{0}/{1}/{2}/{3}/{4}", SystemSettings.S3_Attachements_BasePath, "Response", year, month, records.First().AXISRequestNumber);
+                                            var s3filesubpath = string.Format("{0}/{1}/{2}/{3}/{4}", SystemSettings.S3_Attachements_BasePath, "CFR", year, month, records.First().AXISRequestNumber);
                                             // ilogger.LogInformation(string.Format("OCR completed for pages of  document ID {0} for request {1}, page count is {2}, ended at {3}", docid, _requestnumber, pagedetails.TotalPageCount, DateTime.Now));
 
                                             ilogger.LogInformation(string.Format("Upload starting for  document ID {0} for request {1}, page count is {2}, started at {3}", docid, _requestnumber, pagedetails.TotalPageCount, DateTime.Now));
