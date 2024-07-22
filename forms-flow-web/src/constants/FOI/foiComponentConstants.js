@@ -49,6 +49,7 @@ const FOI_COMPONENT_CONSTANTS = {
     PERSONAL_HEALTH_NUMBER: "personalHealthNumber",
     CORRECTIONS_NUMBER: "correctionalServiceNumber",
     DOB: "birthDate",
+    ALSO_KNOWN_AS: "alsoKnownAs",
     EMPLOYEE_NUMBER: "publicServiceEmployeeNumber",
     IDENTITY_VERIFIED: "identityVerified",
 

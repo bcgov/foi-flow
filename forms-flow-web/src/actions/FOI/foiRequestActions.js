@@ -128,6 +128,12 @@ export const setFOIMinistryViewRequestDetail = (data) => (dispatch) => {
     payload: data,
   });
 };
+export const setFOIRequestApplicantProfile = (data) => (dispatch) => {
+  dispatch({
+    type: FOI_ACTION_CONSTANTS.FOI_REQUEST_APPLICANT_PROFILE,
+    payload: data,
+  });
+};
 export const setFOIPDFStitchedRecordForHarms = (data) => (dispatch) => {
   dispatch({
     type: FOI_ACTION_CONSTANTS.FOI_PDF_STITCHED_RECORD_FOR_HARMS,
@@ -312,6 +318,24 @@ export const setFOIPersonalDivisionsAndSections = (data) => dispatch => {
 export const setFOIPersonalSections = (data) => dispatch => {
   dispatch({
       type:FOI_ACTION_CONSTANTS.FOI_PERSONAL_SECTIONS,
+      payload:data      
+  })
+}
+export const setFOIPersonalPeople = (data) => dispatch => {
+  dispatch({
+      type:FOI_ACTION_CONSTANTS.FOI_PERSONAL_PEOPLE,
+      payload:data      
+  })
+}
+export const setFOIPersonalFiletypes = (data) => dispatch => {
+  dispatch({
+      type:FOI_ACTION_CONSTANTS.FOI_PERSONAL_FILETYPES,
+      payload:data      
+  })
+}
+export const setFOIPersonalVolumes = (data) => dispatch => {
+  dispatch({
+      type:FOI_ACTION_CONSTANTS.FOI_PERSONAL_VOLUMES,
       payload:data      
   })
 }

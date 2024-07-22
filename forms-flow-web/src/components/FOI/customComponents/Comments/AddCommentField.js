@@ -217,6 +217,7 @@ const AddCommentField = ({ cancellor, parentId, add, fullnameList , restrictedRe
           handlePastedText={_handlePastedText}
           handleKeyCommand={_handleKeyCommand}
           plugins={plugins}
+          spellCheck={true}
         />
         <MentionSuggestions
           open={open}

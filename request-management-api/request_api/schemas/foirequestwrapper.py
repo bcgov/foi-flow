@@ -91,6 +91,7 @@ class FOIRequestWrapperSchema(Schema):
     axisSyncDate = fields.Str(data_key="axisSyncDate",allow_none=True)  
     axisRequestId = fields.Str(data_key="axisRequestId",allow_none=True, validate=[validate.Length(max=120, error=MAX_EXCEPTION_MESSAGE)])
     axispagecount = fields.Int(data_key="axispagecount",allow_none=True)
+    recordspagecount = fields.Int(data_key="recordspagecount",allow_none=True)
     description = fields.Str(data_key="description", required=True,validate=[validate.Length(min=1, error=BLANK_EXCEPTION_MESSAGE)])
     category = fields.Str(data_key="category", required=True,validate=[validate.Length(min=1, error=BLANK_EXCEPTION_MESSAGE)])
     requestType = fields.Str(data_key="requestType", required=True,validate=[validate.Length(min=1, error=BLANK_EXCEPTION_MESSAGE)]) 
@@ -139,6 +140,9 @@ class FOIRequestWrapperSchema(Schema):
     correctionalServiceNumber = fields.Str(data_key="correctionalServiceNumber",allow_none=True, validate=[validate.Length(max=50, error=MAX_EXCEPTION_MESSAGE)]) 
     publicServiceEmployeeNumber = fields.Str(data_key="publicServiceEmployeeNumber",allow_none=True, validate=[validate.Length(max=50, error=MAX_EXCEPTION_MESSAGE)]) 
     isiaorestricted =   fields.Bool(data_key="isiaorestricted")
+
+    foiRequestApplicantID = fields.Int(data_key="foiRequestApplicantID",required=False,allow_none=True)
+    axisapplicantid = fields.Int(data_key="axisApplicantID",required=False,allow_none=True)
     isoipcreview =   fields.Bool(data_key="isoipcreview")
     
     selectedMinistries = fields.Nested(FOIMinistryRequestWrapperSchema, many=True)
@@ -152,6 +156,11 @@ class FOIRequestWrapperSchema(Schema):
 
     oipcdetails = fields.Nested(FOIMinistryRequestOIPCSchema, many=True,allow_none=True)
 
+    estimatedpagecount = fields.Int(data_key="estimatedpagecount",allow_none=True)
+    estimatedtaggedpagecount = fields.Int(data_key="estimatedtaggedpagecount",allow_none=True)
+
+    recordspagecount = fields.Int(data_key="recordspagecount",allow_none=True)
+    axislanpagecount = fields.Int(data_key="axislanpagecount",allow_none=True)
 
 class EditableFOIMinistryRequestWrapperSchema(Schema):
     class Meta:  # pylint: disable=too-few-public-methods

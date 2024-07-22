@@ -31,6 +31,7 @@ class requestservicebuilder(requestserviceconfigurator):
         foiministryrequest.axisrequestid = requestschema.get("axisRequestId")
         foiministryrequest.axissyncdate = requestschema.get("axisSyncDate")
         foiministryrequest.axispagecount = requestschema.get("axispagecount")
+        foiministryrequest.axislanpagecount = requestschema.get("axislanpagecount")
         foiministryrequest.recordspagecount = requestschema.get("recordspagecount")
         foiministryrequest.filenumber = self.generatefilenumber(ministry["code"], requestschema.get("foirawrequestid")) if filenumber is None else filenumber
         foiministryrequest.programareaid = self.getvalueof("programArea",ministry["code"])
@@ -39,6 +40,8 @@ class requestservicebuilder(requestserviceconfigurator):
         foiministryrequest.linkedrequests = requestschema.get("linkedRequests")
         foiministryrequest.identityverified = requestschema.get("identityVerified")
         foiministryrequest.originalldd = requestschema.get("originalDueDate")
+        foiministryrequest.estimatedpagecount = requestschema.get("estimatedpagecount")
+        foiministryrequest.estimatedtaggedpagecount = requestschema.get("estimatedtaggedpagecount")
         if requestschema.get("isoipcreview") is not None and requestschema.get("isoipcreview")  != "":
             foiministryrequest.isoipcreview = requestschema.get("isoipcreview")
             foiministryrequest.oipcreviews = self.prepareoipc(requestschema, ministryid, activeversion, userid)
@@ -127,9 +130,9 @@ class requestservicebuilder(requestserviceconfigurator):
               contactinformation.contacttypeid =contacttype["contacttypeid"]              
         return contactinformation
     
-    def createapplicant(self,firstname, lastname, appltcategory, userid, middlename = None,businessname = None, alsoknownas = None, dob = None):
+    def createapplicant(self,firstname, lastname, appltcategory, userid, middlename = None, businessname = None, alsoknownas = None, dob = None, axisapplicantid = None):
         requestapplicant = FOIRequestApplicantMapping()
-        _applicant = FOIRequestApplicant().saveapplicant(firstname, lastname, middlename, businessname, alsoknownas, dob, userid)
+        _applicant = FOIRequestApplicant().createapplicant(firstname, lastname, middlename, businessname, alsoknownas, dob, axisapplicantid, userid)
         requestapplicant.foirequestapplicantid = _applicant.identifier
         if appltcategory is not None:           
             requestertype = RequestorType().getrequestortype(appltcategory)  

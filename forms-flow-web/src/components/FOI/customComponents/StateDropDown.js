@@ -11,6 +11,7 @@ import {
 import { useSelector } from "react-redux";
 
 import FOI_COMPONENT_CONSTANTS from "../../../constants/FOI/foiComponentConstants";
+import { isBeforeOpen } from "../FOIRequest/utils";
 
 const StateDropDown = ({
   requestState = StateEnum.unopened.name,
@@ -23,6 +24,7 @@ const StateDropDown = ({
   requestType,
   isDivisionalCoordinator,
   isHistoricalRequest,
+  disabled,
 }) => {
   const _isMinistryCoordinator = isMinistryCoordinator;
 
@@ -225,12 +227,16 @@ const StateDropDown = ({
         return [];
     }
   };
-  const getDisableMenuItem = (index) => {
+  const getDisableMenuItem = (index, status) => {
     if (index === 0) {
       return false;
     }
 
-    return isValidationError || requestState === StateEnum.unopened.name;
+    return isValidationError || requestState === StateEnum.unopened.name 
+      //   || (isBeforeOpen(requestDetails) ////comment back in after axis decomission
+      //   && status === 'Open'
+      //   && !requestDetails.foiRequestApplicantID 
+      // );
   };
   const statusList = getStatusList();
   const menuItems =
@@ -238,7 +244,7 @@ const StateDropDown = ({
     statusList.map((item, index) => {
       return (
         <MenuItem
-          disabled={getDisableMenuItem(index)}
+          disabled={getDisableMenuItem(index, item.status)}
           className="foi-state-menuitem"
           key={item.status}
           value={item.status}
