@@ -340,13 +340,18 @@ export const RecordsLog = ({
   const MCFVolumes = useSelector(
     (state) => state.foiRequests.foiPersonalVolumes
   );
+  const MCFSections = useSelector(
+    (state) => state.foiRequests.foiPersonalSections
+  );
   const [personFilters, setPersonFilters] = useState([]);
   const [fileTypeFilters, setFileTypeFilters] = useState([]);
   const [volumeFilters, setVolumeFilters] = useState([]);
+  const [personalTagFilters, setPersonalTagFilters] = useState([]);
   useEffect(() => {
     let _personFilters = [];
     let _fileTypeFilters = [];
     let _volumeFilters = [];
+    let _personalTagFilters = []
     if(recordsObj?.records?.length > 0) {
       recordsObj.records.forEach((record) => {
         if(record.attributes?.personalattributes?.person && MCFPeople?.people) {
@@ -364,12 +369,18 @@ export const RecordsLog = ({
             _volumeFilters = _volumeFilters.concat(MCFVolumes.volumes.filter((v)=>{return v.name === record.attributes.personalattributes.volume}));
           }
         }
+        if(record.attributes?.personalattributes?.personaltag && MCFSections?.sections) {
+          if(_personalTagFilters.filter((pt)=>{return pt.divisionname === record.attributes.personalattributes.personaltag}).length === 0) {
+            _personalTagFilters = _personalTagFilters.concat(MCFSections.sections.filter((d)=>{return d.name === record.attributes.personalattributes.personaltag}));
+          }
+        }
       });
     }
     setPersonFilters(_personFilters.sort((a, b)=>a.sortorder-b.sortorder));
     setFileTypeFilters(_fileTypeFilters.sort((a, b)=>a.sortorder-b.sortorder));
     setVolumeFilters(_volumeFilters.sort((a, b)=>a.sortorder-b.sortorder));
-  }, [recordsObj, MCFPeople, MCFFiletypes, MCFVolumes]);
+    setPersonalTagFilters(_personalTagFilters.sort((a, b)=>a.sortorder-b.sortorder));
+  }, [recordsObj, MCFPeople, MCFFiletypes, MCFVolumes, MCFSections]);
   
   useEffect(() => {
     setEstimatedPageCount(requestDetails.estimatedpagecount)
@@ -401,12 +412,15 @@ export const RecordsLog = ({
     ...personFilters.map((p)=>{p.divisionname=p.name; p.type='person'; return p;}),
     ...fileTypeFilters.map((ft)=>{ft.divisionname=ft.name; ft.type='filetype'; return ft;}),
     ...volumeFilters.map((v)=>{v.divisionname=v.name; v.type='volume'; return v;}),
+    ...personalTagFilters.map((pt)=>{pt.divisionname=pt.name; pt.type='personaltag'; return pt;}),
     ...new Map(
       recordsObj?.records?.reduce(
         (acc, file) => [
           ...acc,
           ...new Map(
-            file?.attributes?.divisions?.map((division) => [
+            file?.attributes?.divisions?.filter(
+              (division) => division.divisionname != "TBD"
+            ).map((division) => [
               division?.divisionid,
               division,
             ])
@@ -1533,7 +1547,7 @@ export const RecordsLog = ({
               isrecordtimeout(r.created_at, RECORD_PROCESSING_HRS) == true)
           : _filterValue > -1
           ? r.attributes?.divisions?.findIndex(
-              (a) => a.divisionid === _filterValue
+              (a) => a.divisionid === _filterValue && a.divisionname !== "TBD"
             ) > -1
             ||
             r.attributes?.personalattributes?.person === _filterText
@@ -1541,6 +1555,8 @@ export const RecordsLog = ({
             r.attributes?.personalattributes?.filetype === _filterText
             ||
             r.attributes?.personalattributes?.volume === _filterText
+            ||
+            r.attributes?.personalattributes?.personaltag === _filterText
           : true)
       )
       if (isMatch) {
@@ -3063,7 +3079,7 @@ const Attachment = React.memo(
           alignItems="flex-start"
         >
           <Grid item xs={6}>
-            {removeInValidTagsFromDivisions.map((division, i) => (
+            {removeInValidTagsFromDivisions.length > 0 && removeInValidTagsFromDivisions.map((division, i) => (
               <Chip
                 item
                 key={i}
@@ -3141,7 +3157,7 @@ const Attachment = React.memo(
             {record.attributes?.personalattributes?.personaltag && 
               <Chip
                 item
-                key={record.attributes?.divisions?.length + 4}
+                key={record.attributes?.divisions?.length + 5}
                 label={record.attributes.personalattributes.personaltag}
                 size="small"
                 className={clsx(classes.chip, classes.chipPrimary)}
