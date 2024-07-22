@@ -2,7 +2,7 @@
 
 namespace FOIMOD.HistoricalDocMigration.Models.Document
 {
-    public  class DocumentToMigrate : AXISDocument
+    public class DocumentToMigrate : AXISDocument
     {
         public int PageSequenceNumber { get; set; }
 
@@ -23,6 +23,8 @@ namespace FOIMOD.HistoricalDocMigration.Models.Document
         public string ReviewFlag { get; set; }
 
         public DateTime? ClosingDate { get; set; }
+
+        public string? CLFileType {get;set;}
 
     }
 }

@@ -10,6 +10,7 @@ using Syncfusion.Pdf.Graphics;
 using Syncfusion.Drawing;
 using Amazon.S3.Model;
 using Syncfusion.Pdf.Parsing;
+using System.Net.Mail;
 
 
 
@@ -269,8 +270,9 @@ namespace FOIMOD.HistoricalDocMigration.Utils
             {
                 createemailpdfmemorystream.Close();
                 createemailpdfmemorystream.Dispose();
-                Console.WriteLine(ex.Message);
-                throw;
+                var errormessage = string.Format("Error on attach with subject ,{0}, and error details are here {1}", emailsubject, ex.Message);
+                Console.WriteLine(errormessage);
+                throw  new Exception(errormessage);
             }
 
 
