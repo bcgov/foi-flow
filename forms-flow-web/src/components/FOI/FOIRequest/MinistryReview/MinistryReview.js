@@ -1054,6 +1054,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
                   setRecordsUploading={setRecordsUploading}
                   recordsTabSelect={tabLinksStatuses.Records.active}
                   requestType={requestDetails?.requestType}
+                  handleSaveRequest={handleSaveRequest}
                 />
               </>
             ) : (

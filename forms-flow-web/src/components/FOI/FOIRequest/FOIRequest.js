@@ -1649,6 +1649,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
                   divisions={requestDetails.divisions}
                   recordsTabSelect={tabLinksStatuses.Records.active}
                   requestType={requestDetails?.requestType}
+                  handleSaveRequest={handleSaveRequest}
                 />
               </>
             )}
