@@ -165,7 +165,7 @@ const MCFPersonal = ({
         _sectionArray.map((section) => {
           if(_keyword && section.name.toLowerCase().includes(_keyword.toLowerCase())) {
             newSectionArray.push(section);
-          } else if(section.divisionid === _selectedSectionValue) {
+          } else if(section.name === _selectedSectionValue) {
             newSectionArray.unshift(section);
           }
         });
