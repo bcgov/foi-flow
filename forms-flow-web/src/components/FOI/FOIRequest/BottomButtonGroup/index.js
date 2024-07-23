@@ -122,7 +122,7 @@ const BottomButtonGroup = React.memo(
       }
 
       //Logic to reset user lock records status to null (and have FE useEffect in FOIRequest.js/MinistryView.js logic takeover) if request is in unlocked request states
-      if (saveRequestObject.userrecordslockstatus !== null && !validLockRecordsState(currentSelectedStatus)) {
+      if (!validLockRecordsState(currentSelectedStatus)) {
         saveRequestObject.userrecordslockstatus = null;
       }
 
