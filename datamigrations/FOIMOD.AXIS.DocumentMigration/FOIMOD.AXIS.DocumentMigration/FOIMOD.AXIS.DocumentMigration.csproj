@@ -22,6 +22,12 @@
 
 	</ItemGroup>
 	<ItemGroup>
+	  <None Update="appsettings.prod.json">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </None>
+	  <None Update="appsettings.prodtotest.json">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </None>
 	  <None Update="appsettings.prodtodev.json">
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </None>

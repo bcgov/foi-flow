@@ -1,6 +1,7 @@
 ﻿using FOIMOD.HistoricalDocMigration.Models.AXISSource;
 using FOIMOD.HistoricalDocMigration.Models.Document;
 using Microsoft.Data.SqlClient;
+using Microsoft.IdentityModel.Tokens;
 using System.Data;
 
 namespace FOIMOD.HistoricalDocMigration.AXIS.DAL
@@ -99,6 +100,26 @@ namespace FOIMOD.HistoricalDocMigration.AXIS.DAL
             return query;
         }
 
+        private string? attachmentPathFormat(DataRow row)
+        {
+            if(row == null) return string.Empty;
+            else
+            {
+                string replacingstring = "\\\\bailer\\atipdocs\\AFXWCORL\\";
+                string attachments = Convert.ToString(row["attachments"]);
+                if (Convert.ToString(row["FileType"]) == "RP" && !string.IsNullOrEmpty(attachments))
+                {
+                    attachments = attachments.ToLower().Replace(replacingstring.ToLower(), "");
+                    return attachments;
+                }
+                else
+                {
+                    return Convert.ToString(row["attachments"]);
+                }
+            }
+
+        }
+
         public List<DocumentToMigrate>? GetCorrespondenceLogDocuments(string cs_requestnumbers)
         {
             List<DocumentToMigrate> documentToMigrates = null;
@@ -122,7 +143,7 @@ namespace FOIMOD.HistoricalDocMigration.AXIS.DAL
                                 EmailTo = Convert.ToString(row["vcEmail"]),
                                 EmailFrom = Convert.ToString(row["vcFromEmail"]),
                                 EmailDate = Convert.ToString(row["sdtMailedDate"]),
-                                EmailAttachmentDelimitedString = Convert.ToString(row["attachments"]),
+                                EmailAttachmentDelimitedString = attachmentPathFormat(row),
                                 AXISRequestNumber = Convert.ToString(row["vcVisibleRequestID"]),
                                 ClosingDate = Convert.ToDateTime(row["ClosingDate"])
                             });

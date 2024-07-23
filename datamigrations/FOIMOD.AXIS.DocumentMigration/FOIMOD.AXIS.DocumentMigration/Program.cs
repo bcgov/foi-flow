@@ -17,7 +17,7 @@ var configurationbuilder = new ConfigurationBuilder()
                        .AddEnvironmentVariables().Build();
 #else
 var configurationbuilder = new ConfigurationBuilder()
-                       .AddJsonFile($"appsettings.json", true, true)
+                       .AddJsonFile($"appsettings.prod.json", true, true)
                        .AddEnvironmentVariables().Build();
 
 #endif

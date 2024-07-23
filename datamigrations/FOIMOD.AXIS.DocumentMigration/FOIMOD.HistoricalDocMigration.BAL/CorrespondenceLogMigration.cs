@@ -191,7 +191,7 @@ namespace FOIMOD.HistoricalDocMigration.DocMigration.BAL
                             }
                             catch (Exception ex)
                             {
-                                ilogger.LogError(string.Format("Correspondence Log Migration, Error happened while uploading attachment for request : {0} and error is like, {1}", attachment.AXISRequestNumber, ex.Message));
+                                ilogger.LogError(string.Format("Correspondence Log Migration, Error happened while uploading attachment for request : {0} and error is like, {1} and this is for for files {2}", attachment.AXISRequestNumber, ex.Message,attachment.EmailAttachmentDelimitedString));
                             }
                         }
                     }
