@@ -2987,7 +2987,7 @@ const AttachmentPopup = React.memo(
     const DeleteMenu = () => {
       return (
         <MenuItem
-          style={{ pointerEvents: "none" } }
+        style={ lockRecords ? { pointerEvents: "none" } : {} }
           disabled={lockRecords}
           onClick={() => {
             handleDelete();
