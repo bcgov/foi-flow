@@ -223,6 +223,7 @@ export const RecordsLog = ({
   lockRecords,
   setLockRecordsTab,
   validLockRecordsState,
+  setSaveRequestObject,
 }) => {
   const user = useSelector((state) => state.user.userDetail);
   const userGroups = user?.groups?.map((group) => group.slice(1));
@@ -1746,7 +1747,6 @@ export const RecordsLog = ({
   };
 
   const handleLockRecords = () => {
-    setLockRecordsTab(!lockRecords);
     const toastID = toast.loading("Updating records lock status for request...");
     const data = {userrecordslockstatus: !lockRecords};
     dispatch(
@@ -1756,6 +1756,8 @@ export const RecordsLog = ({
         ministryId, 
         (err, _res) => {
         if(!err) {
+          setSaveRequestObject(prev => ({...prev, userrecordslockstatus: !lockRecords}));
+          setLockRecordsTab(!lockRecords);
           toast.update(toastID, {
             type: "success",
             render: "Request details have been saved successfully.",
