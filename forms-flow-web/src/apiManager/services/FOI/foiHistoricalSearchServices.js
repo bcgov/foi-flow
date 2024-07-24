@@ -26,10 +26,6 @@ export const fetchHistoricalSearchData = ({
   //   sortingOrders.push(item.sort);
   // });
 
-  if (sort[0].field === 'axisrequestid') {
-    sort[0].field = 'visualrequestfilenumber'
-  }
-
   httpGETRequest(
     API.FOI_HISTORICAL_SEARCH_API,
     {

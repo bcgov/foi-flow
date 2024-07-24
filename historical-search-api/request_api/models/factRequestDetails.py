@@ -205,6 +205,11 @@ class factRequestDetails(db.Model):
             if(isiaorestictedmanager == False):
                 basequery+= " AND requesttypename NOT LIKE '%Restricted%'"
 
+            if params['sortingitem'] == 'axisrequestid':
+                params['sortingitem'] = 'visualrequestfilenumber'
+            elif params['sortingitem'] == 'requesttype':                
+                params['sortingitem'] = 'requesttype'
+
             basequery+= ' ORDER BY {0} {1}'.format(params['sortingitem'],params['sortingorder'])
 
             if params['size'] is not None:
