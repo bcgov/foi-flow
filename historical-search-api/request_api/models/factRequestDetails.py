@@ -148,8 +148,10 @@ class factRequestDetails(db.Model):
     @classmethod
     def getadvancedsearchresults(cls,isiaorestictedmanager:False, params):
         searchresults = []
+        count = 0
         try:
-            basequery = 'SELECT foirequestid \
+            basequery = 'SELECT count(*) OVER() AS full_count\
+                            ,foirequestid \
                             ,requesttypename \
                             ,applicantname \
                             ,visualrequestfilenumber \
@@ -180,7 +182,14 @@ class factRequestDetails(db.Model):
                 for keyword in params['keywords']:
                     filterbysearchcondition.append("LOWER(visualrequestfilenumber) like LOWER('%{0}%')".format(keyword))
 
-            conditioncount = len(filterbysearchcondition) 
+            requesttypecondition = []
+            if len(params['requesttype'] + params['requestflags']) > 0:
+                for requesttype in (params['requesttype'] + params['requestflags']):
+                    if (requesttype == 'oipc'): requesttype = 'review' 
+                    requesttypecondition.append("LOWER(requesttypename) like '%{0}%'".format(requesttype))
+                basequery+= (' (' +' OR '.join(requesttypecondition) + ')')
+
+            conditioncount = len(filterbysearchcondition + requesttypecondition) 
 
             for idx,searchcondition in enumerate(filterbysearchcondition):                                
                 basequery+= ' {0} '.format(searchcondition)
@@ -188,6 +197,8 @@ class factRequestDetails(db.Model):
                 if(idx!=(conditioncount-1)):
                     basequery+= ' AND '
 
+            
+            
             if(conditioncount == 0):
                 basequery+= "LOWER(description) like LOWER('%{0}%')".format(keyword)
 
@@ -197,7 +208,7 @@ class factRequestDetails(db.Model):
             basequery+= ' ORDER BY {0} {1}'.format(params['sortingitem'],params['sortingorder'])
 
             if params['size'] is not None:
-                basequery+= ' LIMIT {0}'.format(params['size'])
+                basequery+= ' LIMIT {0} OFFSET {1}'.format(params['size'], (params['page'] - 1) * params['size'] )
             else:
                 basequery+= ' LIMIT 100'
         
@@ -205,10 +216,11 @@ class factRequestDetails(db.Model):
             
             for row in rs:            
                 searchresults.append({"axisrequestid": row["visualrequestfilenumber"], "description": row["description"], "assignee": row["assignee"], "requeststatus": row["requeststatus"], "applicantname": row["applicantname"], "requesttype": row["requesttypename"],"receiveddate": row["receiveddate"],"oipcno": row["oipcno"]})
+                count = row["full_count"]
         except Exception as ex:
             logging.error(ex)
             raise ex
         finally:
             db.session.close()
-        return searchresults
+        return {'results': searchresults, 'count': count}
               

@@ -542,6 +542,12 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
     );
   }
 
+  const test = (model) => {
+    if (model.length > 0) {
+      setHistoricsearchSortModel(model)
+    }
+  }
+
   return (
     <ConditionalComponent condition={!!queryData}>
       <Grid
@@ -611,11 +617,9 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
             onSortModelChange={(model) => setSortModel(model)}
             getRowClassName={(params) =>
               clsx(
-                `super-app-theme--${params.row.currentState
-                  .toLowerCase()
-                  .replace(/ +/g, "")}`,
+                `super-app-theme--${params.row.currentState?.toLowerCase().replace(/ +/g, "")}`,
                 tableInfo?.stateClassName?.[
-                  params.row.currentState.toLowerCase().replace(/ +/g, "")
+                  params.row.currentState?.toLowerCase().replace(/ +/g, "")
                 ]
               )
             }
@@ -627,24 +631,32 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
             autoHeight
             className="foi-data-grid"
             getRowId={(row) => row.axisrequestid}            
-            rows={searchHistoricalSearchResults || []}
-            columns={HistoricalSearchResultsColumns}
+            rows={searchHistoricalSearchResults?.results || []}            
+            columns={historiccolumnsRef?.current}
             rowHeight={30}
             headerHeight={50}
-            rowCount={0}
-            pageSize={10}
-            rowsPerPageOptions={[10]}
+            rowCount={searchHistoricalSearchResults?.count || 0}
+            pageSize={historicrowsState.pageSize}
+            // rowsPerPageOptions={[10]}
             hideFooterSelectedRowCount={true}
             disableColumnMenu={true}
             pagination
-            //paginationMode="server"
+            paginationMode="server"
             initialState={{
               pagination: historicrowsState
+            }}            
+            onPageChange={(newPage) => sethistoricRowsState((prev) => ({ ...prev, page: newPage }))}
+            onPageSizeChange={(newpageSize) =>
+              sethistoricRowsState((prev) => ({ ...prev, pageSize: newpageSize }))
+            }
+            components={{
+              Footer: ()=> <CustomFooter rowCount={searchHistoricalSearchResults?.count || 0} defaultSortModel={defaultHistoricalResultsTableInfo.sort} footerFor={"advancedsearch"}></CustomFooter>
             }}
-            
             sortingOrder={["desc", "asc"]}
             sortModel={[sortHistoricsearchSortModel[0]]}
             sortingMode={"server"}
+            onSortModelChange={test}
+            
                         
             loading={searchHistoricalDataLoading}
             

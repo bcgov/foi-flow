@@ -19,20 +19,24 @@ export const fetchHistoricalSearchData = ({
   errorCallback,
   dispatch,
 }) => {
-  let sortingItems = [];
-  let sortingOrders = [];
-  sort.forEach((item) => {
-    sortingItems.push(item.field);
-    sortingOrders.push(item.sort);
-  });
+  // let sortingItems = [];
+  // let sortingOrders = [];
+  // sort.forEach((item) => {
+  //   sortingItems.push(item.field);
+  //   sortingOrders.push(item.sort);
+  // });
+
+  if (sort[0].field === 'axisrequestid') {
+    sort[0].field = 'visualrequestfilenumber'
+  }
 
   httpGETRequest(
     API.FOI_HISTORICAL_SEARCH_API,
     {
       page: page,
       size: size,
-      sortingitem: sortingItems,
-      sortingorder: sortingOrders,      
+      sortingitem: sort[0]['field'],
+      sortingorder: sort[0]['sort'],
       search: search,
       keywords: keywords,
       requestType: requestType,

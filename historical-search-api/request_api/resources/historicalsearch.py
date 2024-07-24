@@ -36,6 +36,7 @@ class AdvancedHistoricalSearch(Resource):
                 'usertype': AuthHelper.getusertype(),
                 'groups': '',                
                 'size': flask.request.args.get('size', DEFAULT_SIZE, type=int),
+                'page': flask.request.args.get('page', DEFAULT_SIZE, type=int), 
                 'sortingitem': flask.request.args.get('sortingitem'),
                 'sortingorder': flask.request.args.get('sortingorder'),
 
