@@ -227,6 +227,11 @@ export const RecordsLog = ({
   setRecordsUploading,
   recordsTabSelect,
   requestType,
+  handleSaveRequest,
+  lockRecords,
+  setLockRecordsTab,
+  validLockRecordsState,
+  setSaveRequestObject,
 }) => {
   const user = useSelector((state) => state.user.userDetail);
   const userGroups = user?.groups?.map((group) => group.slice(1));
@@ -1924,6 +1929,89 @@ export const RecordsLog = ({
     );
   };
 
+  const handleLockRecords = () => {
+    const toastID = toast.loading("Updating records lock status for request...");
+    const data = {userrecordslockstatus: !lockRecords};
+    dispatch(
+      updateUserLockedRecords(
+        data,
+        requestId,
+        ministryId, 
+        (err, _res) => {
+        if(!err) {
+          setSaveRequestObject(prev => ({...prev, userrecordslockstatus: !lockRecords}));
+          setLockRecordsTab(!lockRecords);
+          toast.update(toastID, {
+            type: "success",
+            render: "Request details have been saved successfully.",
+            position: "top-right",
+            isLoading: false,
+            autoClose: 3000,
+            hideProgressBar: true,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+          });
+        } else {
+          toast.error(
+            "Temporarily unable to update records lock status for request. Please try again in a few minutes.",
+            {
+              position: "top-right",
+              autoClose: 3000,
+              hideProgressBar: true,
+              closeOnClick: true,
+              pauseOnHover: true,
+              draggable: true,
+              progress: undefined,
+            }
+          );
+        }
+      })
+    )
+  }
+
+  const saveEstimates = (e) => {
+    requestDetails.estimatedpagecount = estimatedPageCount
+    requestDetails.estimatedtaggedpagecount = estimatedTaggedPageCount
+    dispatch(
+      saveRequestDetails(
+        requestDetails,
+        -1,
+        requestId,
+        ministryId,
+        (err, res) => {            
+          if (!err) {
+            toast.success("The request has been saved successfully.", {
+              position: "top-right",
+              autoClose: 3000,
+              hideProgressBar: true,
+              closeOnClick: true,
+              pauseOnHover: true,
+              draggable: true,
+              progress: undefined,
+            });
+            handleSaveRequest(requestDetails.currentState, false, res.id);
+          } else {
+            toast.error(
+              "Temporarily unable to save your request. Please try again in a few minutes.",
+              {
+                position: "top-right",
+                autoClose: 3000,
+                hideProgressBar: true,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+              }
+            );
+            handleSaveRequest(requestDetails.currentState, true, "");
+          }
+        }
+      )
+    );
+  }
+
   return (
     <div className={classes.container}>
       {isAttachmentLoading ? (
@@ -2522,6 +2610,10 @@ export const RecordsLog = ({
                     ministryId={ministryId}
                     classes={classes}
                     handleSelectRecord={handleSelectRecord}
+                    setDivisionsModalOpen={setDivisionsModalOpen}
+                    isMCFPersonal={isMCFPersonal}
+                    setEditTagModalOpen={setEditTagModalOpen}
+                    setCurrentEditRecord={setCurrentEditRecord}
                   />
                 ))
               ) : (
@@ -2856,6 +2948,11 @@ const Attachment = React.memo(
     isMinistryCoordinator,
     ministryId,
     handleSelectRecord,
+    setDivisionsModalOpen,
+    isMCFPersonal,
+    setEditTagModalOpen,
+    setCurrentEditRecord,
+    lockRecords
   }) => {
     const classes = useStyles();
     const [disabled, setDisabled] = useState(false);
@@ -3045,6 +3142,11 @@ const Attachment = React.memo(
               disabled={disabled}
               ministryId={ministryId}
               setRetry={setRetry}
+              lockRecords={lockRecords}
+              setEditTagModalOpen={setEditTagModalOpen}
+              isMCFPersonal={isMCFPersonal}
+              isMinistryCoordinator={isMinistryCoordinator}
+              setCurrentEditRecord={setCurrentEditRecord}
             />
           </Grid>
         </Grid>
@@ -3194,6 +3296,10 @@ const Attachment = React.memo(
             ministryId={ministryId}
             classes={classes}
             handleSelectRecord={handleSelectRecord}
+            lockRecords={lockRecords}
+            isMCFPersonal={isMCFPersonal}
+            setEditTagModalOpen={setEditTagModalOpen}
+            setCurrentEditRecord={setCurrentEditRecord}
           />
         ))}
       </>
@@ -3215,6 +3321,11 @@ const AttachmentPopup = React.memo(
     disabled,
     ministryId,
     setRetry,
+    lockRecords,
+    setEditTagModalOpen,
+    isMCFPersonal,
+    isMinistryCoordinator,
+    setCurrentEditRecord
   }) => {
     const ref = React.useRef();
     const closeTooltip = () => (ref.current && ref ? ref.current.close() : {});
