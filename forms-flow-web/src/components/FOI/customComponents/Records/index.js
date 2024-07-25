@@ -1980,8 +1980,8 @@ export const RecordsLog = ({
         -1,
         requestId,
         ministryId,
-        (err, res) => {            
-          if (!err) {
+        (err, res) => {    
+          if (res!= null && res?.status == true) {
             toast.success("The request has been saved successfully.", {
               position: "top-right",
               autoClose: 3000,
@@ -2201,6 +2201,7 @@ export const RecordsLog = ({
                     size="small"
                     value={estimatedPageCount}
                     onChange={(e) => setEstimatedPageCount(e.target.value)}
+                    disabled={isMinistryCoordinator}
                   ></TextField>  
                 </div>
               </span>}
@@ -2248,6 +2249,7 @@ export const RecordsLog = ({
                     size="small"
                     value={estimatedTaggedPageCount}
                     onChange={(e) => setEstimatedTaggedPageCount(e.target.value)}
+                    disabled={isMinistryCoordinator}
                   ></TextField>              
                   <button 
                     class="btn" 
@@ -2261,7 +2263,8 @@ export const RecordsLog = ({
                       width: "calc(100% - 100px)"
                     }} 
                     onClick={saveEstimates}
-                    disabled={estimatedTaggedPageCount === requestDetails.estimatedtaggedpagecount && estimatedPageCount === requestDetails.estimatedpagecount}
+                    disabled={isMinistryCoordinator || (estimatedTaggedPageCount === requestDetails.estimatedtaggedpagecount && 
+                      estimatedPageCount === requestDetails.estimatedpagecount)}
                   >
                     Save
                   </button>
