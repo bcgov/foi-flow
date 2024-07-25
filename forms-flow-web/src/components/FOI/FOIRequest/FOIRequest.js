@@ -275,7 +275,8 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
   const [isMCFPersonal, setIsMCFPersonal] = useState(bcgovcode.replaceAll('"', '') == "MCF" && requestDetails.requestType == FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL);
   const {oipcData, addOIPC, removeOIPC, updateOIPC, isOIPCReview, setIsOIPCReview, removeAllOIPCs} = useOIPCHook();
   const [oipcDataInitial, setOipcDataInitial] = useState(oipcData);
-  
+  const [lockRecordsTab, setLockRecordsTab] = useState(false);
+
   //Update disableInput when requestState changes
   useEffect(() => {
     setDisableInput(requestState?.toLowerCase() === StateEnum.closed.name.toLowerCase() && !isOIPCReview);
@@ -344,6 +345,20 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
     if (bcgovcode) dispatch(fetchFOIMinistryAssignedToList(bcgovcode));
   }, [requestId, ministryId, comment, attachments]);
 
+  const validLockRecordsState = (currentState=requestDetails.currentState) => {
+    return (
+      currentState === StateEnum.harms.name ||
+      currentState === StateEnum.onhold.name ||
+      currentState === StateEnum.recordsreadyforreview.name ||
+      currentState === StateEnum.review.name ||
+      currentState === StateEnum.consult.name ||
+      currentState === StateEnum.peerreview.name ||
+      currentState === StateEnum.signoff.name ||
+      currentState === StateEnum.response.name ||
+      currentState === StateEnum.closed.name
+    );
+  }
+
   useEffect(() => {
     const requestDetailsValue = requestDetails;
     setSaveRequestObject(requestDetailsValue);
@@ -386,6 +401,16 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
     } else {
       setIsOIPCReview(false);
     }
+
+    //Adjust lockRecords value based on requestState if there is no manual user lockedrecords value present in requestDetails from DB
+    const updateRecordsTabAccess = () => {
+      if(requestDetails.userrecordslockstatus === null) {
+        return validLockRecordsState(requestDetails.currentState);
+      } else {
+        return requestDetails.userrecordslockstatus;
+      }
+    }
+    setLockRecordsTab(updateRecordsTabAccess());
   }, [requestDetails]);
 
   //useEffect to manage isoipcreview attribute for requestdetails state
@@ -1405,6 +1430,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
                         axisMessage={axisMessage}
                         attachmentsArray={requestAttachments}
                         oipcData={oipcData}
+                        validLockRecordsState={validLockRecordsState}
                       />
                     </>
                   </ConditionalComponent>
@@ -1649,6 +1675,10 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
                   divisions={requestDetails.divisions}
                   recordsTabSelect={tabLinksStatuses.Records.active}
                   requestType={requestDetails?.requestType}
+                  lockRecords={lockRecordsTab}
+                  setLockRecordsTab={setLockRecordsTab}
+                  validLockRecordsState={validLockRecordsState}
+                  setSaveRequestObject={setSaveRequestObject}
                   handleSaveRequest={handleSaveRequest}
                 />
               </>

@@ -193,6 +193,7 @@ class requestservicegetter:
             'identityVerified':requestministry['identityverified'],
             'estimatedpagecount':requestministry['estimatedpagecount'],
             'estimatedtaggedpagecount':requestministry['estimatedtaggedpagecount'],
+            'userrecordslockstatus': requestministry['userrecordslockstatus'],
             
         }
         if requestministry['cfrduedate'] is not None:
