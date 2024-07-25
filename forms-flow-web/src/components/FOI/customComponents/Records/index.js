@@ -34,6 +34,7 @@ import {
   fetchPDFStitchedRecordForOIPCRedlineReview,
   checkForRecordsChange,
   editPersonalAttributes,
+  updateUserLockedRecords,
 } from "../../../../apiManager/services/FOI/foiRecordServices";
 import {
   saveRequestDetails,
@@ -226,7 +227,6 @@ export const RecordsLog = ({
   setRecordsUploading,
   recordsTabSelect,
   requestType,
-  handleSaveRequest
 }) => {
   const user = useSelector((state) => state.user.userDetail);
   const userGroups = user?.groups?.map((group) => group.slice(1));
@@ -1924,47 +1924,6 @@ export const RecordsLog = ({
     );
   };
 
-  const saveEstimates = (e) => {
-    requestDetails.estimatedpagecount = estimatedPageCount
-    requestDetails.estimatedtaggedpagecount = estimatedTaggedPageCount
-    dispatch(
-      saveRequestDetails(
-        requestDetails,
-        -1,
-        requestId,
-        ministryId,
-        (err, res) => {            
-          if (!err) {
-            toast.success("The request has been saved successfully.", {
-              position: "top-right",
-              autoClose: 3000,
-              hideProgressBar: true,
-              closeOnClick: true,
-              pauseOnHover: true,
-              draggable: true,
-              progress: undefined,
-            });
-            handleSaveRequest(requestDetails.currentState, false, res.id);
-          } else {
-            toast.error(
-              "Temporarily unable to save your request. Please try again in a few minutes.",
-              {
-                position: "top-right",
-                autoClose: 3000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-              }
-            );
-            handleSaveRequest(requestDetails.currentState, true, "");
-          }
-        }
-      )
-    );
-  }
-
   return (
     <div className={classes.container}>
       {isAttachmentLoading ? (
@@ -1985,30 +1944,60 @@ export const RecordsLog = ({
                 {getRequestNumber()}
               </h1>
             </Grid>
-            <Grid item xs={2}>
-              {(isMinistryCoordinator == false &&
-                records?.length > 0 &&
-                DISABLE_REDACT_WEBLINK?.toLowerCase() == "false" && (
-                  <a
-                    href={DOC_REVIEWER_WEB_URL + "/foi/" + ministryId}
-                    target="_blank"
+            {validLockRecordsState() ?
+            <Grid item xs={isScanningTeamMember ? 1 : 2}>
+              <Tooltip 
+                enterDelay={1000} 
+                title={isMinistryCoordinator ? "Only the IAO analyst can manually lock or unlock the records log, please contact the assigned analyst for assistance" : "Manually unlock or lock the records log"}
+              >
+                {isMinistryCoordinator ? 
+                  <p
+                    style={{ fontWeight: "bold", fontSize: "17.5px", marginTop: "4px", color: "#036" }}
                   >
-                    <button
-                      className={clsx(
-                        "btn",
-                        "addAttachment",
-                        classes.createButton
-                      )}
-                      variant="contained"
-                      // onClick={}
-                      color="primary"
-                    >
-                      Redact Records
-                    </button>
-                  </a>
-                )
-              )}
-            </Grid>
+                    {lockRecords ? "Records Locked" : "Records Unlocked"}
+                  </p>
+                : <span>
+                <button
+                disabled={isMinistryCoordinator}
+                onClick={handleLockRecords}
+                className={clsx(
+                  "btn",
+                  classes.createButton
+                  )}
+                  variant="contained"
+                  color="primary"
+                >
+                  {lockRecords ? "Unlock Records" : "Lock Records"}
+                </button>
+                </span>
+                }
+              </Tooltip>
+            </Grid> :  <Grid item xs={isScanningTeamMember ? 1 : 2}></Grid>
+            }
+            {(isMinistryCoordinator == false &&
+              records?.length > 0 &&
+              DISABLE_REDACT_WEBLINK?.toLowerCase() == "false" && (
+                <Grid item xs={isScanningTeamMember ? 1 : 2}>
+                <a
+                  href={DOC_REVIEWER_WEB_URL + "/foi/" + ministryId}
+                  target="_blank"
+                >
+                  <button
+                    className={clsx(
+                      "btn",
+                      "addAttachment",
+                      classes.createButton
+                    )}
+                    variant="contained"
+                    // onClick={}
+                    color="primary"
+                  >
+                    Redact Records
+                  </button>
+                </a>
+                </Grid>
+              )
+            )}
             <Grid item xs={3}>
               {hasDocumentsToDownload && (
                 <TextField
@@ -2079,7 +2068,7 @@ export const RecordsLog = ({
                   variant="contained"
                   onClick={addAttachments}
                   color="primary"
-                  disabled={conversionFormats?.length < 1}
+                  disabled={lockRecords || conversionFormats?.length < 1}
                 >
                   + Upload Records
                 </button>
@@ -2392,13 +2381,13 @@ export const RecordsLog = ({
                     className={` btn`}
                     onClick={() => setDeleteModalOpen(true)}
                     // title="Remove Attachments"
-                    disabled={
+                    disabled={lockRecords || 
                       records.filter((record) => record.attachments?.length > 0)
                         .length === 0
                     }
                     style={
                       records.filter((record) => record.attachments?.length > 0)
-                        .length === 0
+                        .length === 0 || lockRecords
                         ? { pointerEvents: "none" }
                         : {}
                     }
@@ -2418,6 +2407,7 @@ export const RecordsLog = ({
                     <div style={{ fontSize: "11px" }}>
                       To update divisions:{" "}
                       <ul>
+                        <li>Records log must be unlocked</li>
                         <li>at least one record must be selected</li>
                         <li>
                           all records selected must be tagged to the same
@@ -2448,9 +2438,9 @@ export const RecordsLog = ({
                     className={` btn`}
                     onClick={() => setDivisionsModalOpen(true)}
                     // title="Update Divisions"
-                    disabled={isUpdateDivisionsDisabled()}
+                    disabled={lockRecords || isUpdateDivisionsDisabled()}
                     style={
-                      isUpdateDivisionsDisabled()
+                      lockRecords || isUpdateDivisionsDisabled()
                         ? { pointerEvents: "none" }
                         : {}
                     }
@@ -2470,9 +2460,9 @@ export const RecordsLog = ({
                     className={` btn`}
                     onClick={() => handlePopupButtonClick("delete")}
                     // title="Delete"
-                    disabled={!checkIsAnySelected()}
+                    disabled={lockRecords || !checkIsAnySelected()}
                     style={
-                      !checkIsAnySelected() ? { pointerEvents: "none" } : {}
+                      lockRecords || !checkIsAnySelected() ? { pointerEvents: "none" } : {}
                     }
                   >
                     <FontAwesomeIcon icon={faTrash} size="lg" color="#38598A" />
@@ -2532,10 +2522,6 @@ export const RecordsLog = ({
                     ministryId={ministryId}
                     classes={classes}
                     handleSelectRecord={handleSelectRecord}
-                    setDivisionsModalOpen={setDivisionsModalOpen}
-                    isMCFPersonal={isMCFPersonal}
-                    setEditTagModalOpen={setEditTagModalOpen}
-                    setCurrentEditRecord={setCurrentEditRecord}
                   />
                 ))
               ) : (
@@ -2870,10 +2856,6 @@ const Attachment = React.memo(
     isMinistryCoordinator,
     ministryId,
     handleSelectRecord,
-    setDivisionsModalOpen,
-    isMCFPersonal,
-    setEditTagModalOpen,
-    setCurrentEditRecord
   }) => {
     const classes = useStyles();
     const [disabled, setDisabled] = useState(false);
@@ -3042,9 +3024,9 @@ const Attachment = React.memo(
                   textOverflow: "ellipsis",
                   whiteSpace: "nowrap",
                 }}
-                title={`Attachment of ${record.attachmentof}`}
+                title={record.failed ? `Error during ${record.failed}` : `Attachment of ${record.attachmentof}`}
               >
-                Attachment of {record.attachmentof}
+                {record.failed ? `Error during ${record.failed}` : `Attachment of ${record.attachmentof}`}
               </span>
             ) : record.isredactionready ? (
               <span>Ready for Redaction</span>
@@ -3063,10 +3045,6 @@ const Attachment = React.memo(
               disabled={disabled}
               ministryId={ministryId}
               setRetry={setRetry}
-              setEditTagModalOpen={setEditTagModalOpen}
-              isMCFPersonal={isMCFPersonal}
-              isMinistryCoordinator={isMinistryCoordinator}
-              setCurrentEditRecord={setCurrentEditRecord}
             />
           </Grid>
         </Grid>
@@ -3216,9 +3194,6 @@ const Attachment = React.memo(
             ministryId={ministryId}
             classes={classes}
             handleSelectRecord={handleSelectRecord}
-            isMCFPersonal={isMCFPersonal}
-            setEditTagModalOpen={setEditTagModalOpen}
-            setCurrentEditRecord={setCurrentEditRecord}
           />
         ))}
       </>
@@ -3240,10 +3215,6 @@ const AttachmentPopup = React.memo(
     disabled,
     ministryId,
     setRetry,
-    setEditTagModalOpen,
-    isMCFPersonal,
-    isMinistryCoordinator,
-    setCurrentEditRecord
   }) => {
     const ref = React.useRef();
     const closeTooltip = () => (ref.current && ref ? ref.current.close() : {});
@@ -3324,6 +3295,8 @@ const AttachmentPopup = React.memo(
     const DeleteMenu = () => {
       return (
         <MenuItem
+        style={ lockRecords ? { pointerEvents: "none" } : {} }
+          disabled={lockRecords}
           onClick={() => {
             handleDelete();
             setPopoverOpen(false);
@@ -3387,6 +3360,7 @@ const AttachmentPopup = React.memo(
             {(!record.attributes?.isattachment ||
               record.attributes?.isattachment === undefined) && (
               <MenuItem
+                disabled={lockRecords}
                 onClick={() => {
                   handleReplace();
                   setPopoverOpen(false);
@@ -3397,6 +3371,7 @@ const AttachmentPopup = React.memo(
             )}
             {record.attributes?.isattachment && (
               <MenuItem
+                disabled={lockRecords}
                 onClick={() => {
                   handleReplaceAttachment();
                   setPopoverOpen(false);

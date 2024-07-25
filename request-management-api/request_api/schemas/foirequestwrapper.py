@@ -155,6 +155,7 @@ class FOIRequestWrapperSchema(Schema):
     identityVerified = fields.Str(data_key="identityVerified",allow_none=True)
 
     oipcdetails = fields.Nested(FOIMinistryRequestOIPCSchema, many=True,allow_none=True)
+    userrecordslockstatus = fields.Bool(data_key="userrecordslockstatus", allow_none=True)
 
     estimatedpagecount = fields.Int(data_key="estimatedpagecount",allow_none=True)
     estimatedtaggedpagecount = fields.Int(data_key="estimatedtaggedpagecount",allow_none=True)
@@ -219,3 +220,4 @@ class FOIRequestMinistrySchema(Schema):
     assignedministrypersonMiddleName = fields.Str(data_key="assignedministrypersonMiddleName",allow_none=True, validate=[validate.Length(max=50, error=MAX_EXCEPTION_MESSAGE)])
     assignedministrypersonLastName = fields.Str(data_key="assignedministrypersonLastName",allow_none=True, validate=[validate.Length(max=50, error=MAX_EXCEPTION_MESSAGE)])
     ministrysignoffapproval = fields.Nested(CreateMinistrySignOffApprovalSchema, data_key="ministrysignoffapproval", allow_none=True)
+    userrecordslockstatus = fields.Bool(data_key="userrecordslockstatus", allow_none=True)
