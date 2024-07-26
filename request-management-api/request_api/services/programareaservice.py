@@ -14,3 +14,6 @@ class programareaservice:
         """ Returns the active records
         """
         return ProgramArea.getprogramareasforministryuser(groups)
+    
+    def getprogramareabyprogramareaid(self, programareaid):
+        return ProgramArea.getprogramareabyprogramareaid(programareaid)

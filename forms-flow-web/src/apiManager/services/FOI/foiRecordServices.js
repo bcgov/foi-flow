@@ -191,6 +191,39 @@ export const fetchRedactedSections = (ministryId, ...rest) => {
   };
 };
 
+export const fetchRedactedPageFlags  = (ministryId, f) => {
+  if (!ministryId) {
+    return () => {};
+  }
+  console.log("ministr id : ",ministryId)
+  //const done = fnDone(rest);
+  const done  = f;
+  let apiUrl = replaceUrl(
+    API.DOC_REVIEWER_REDACTED_PAGEFLAG_RECORDS,
+    "<ministryrequestid>",
+    ministryId
+  );
+  return (dispatch) => {
+    httpGETRequest(apiUrl, {}, UserService.getToken())
+      .then((res) => {
+        console.log("****************************");
+        console.log(res);
+        console.log("****************************");
+        if (res.data) {
+          done(null, res.data);
+        } else {
+          console.log("Error in fetching redacted sections", res);
+          dispatch(serviceActionError(res));
+        }
+      })
+      .catch((error) => {
+        console.log("Error in fetching redacted section", error);
+        dispatch(serviceActionError(error));
+        done(error);
+      });
+  };
+};
+
 export const saveFOIRecords = (requestId, ministryId, data, ...rest) => {
   let apiUrl = replaceUrl(
     replaceUrl(API.FOI_GET_RECORDS, "<ministryrequestid>", ministryId),

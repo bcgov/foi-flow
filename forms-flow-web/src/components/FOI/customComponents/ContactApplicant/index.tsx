@@ -172,11 +172,12 @@ export const ContactApplicant = ({
 
   const requestDetails: any = useSelector((state: any) => state.foiRequests.foiRequestDetail);
   const requestExtensions: any = useSelector((state: any) => state.foiRequests.foiRequestExtesions);
-
+  
   const [files, setFiles] = useState([]);
   const [templates, setTemplates] = useState<any[]>([{ value: "", label: "", templateid: null, text: "", disabled: true, created_at:"" }]);
 
   const isEnabledTemplate = (item: any) => {
+    console.log("item: ",item)
    if (['PAYONLINE', 'PAYOUTSTANDING'].includes(item.name)) { 
       return !isFeeTemplateDisabled(currentCFRForm, item); 
    } else if (['EXTENSIONS-PB'].includes(item.name)) {
@@ -194,7 +195,7 @@ export const ContactApplicant = ({
       }
       return false;
   }
-
+  console.log("헤이네이네엘닐ㅇ : ",check)
   React.useEffect(() => {    
     applicantCorrespondenceTemplates.forEach((item: any) => {
       setTemplates([{ value: "", label: "", templateid: null, text: "", disabled: true, created_at:"" }]);
