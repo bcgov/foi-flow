@@ -186,14 +186,12 @@ const CommentStructure = ({ i, reply, parentId, totalcommentCount, currentIndex,
     } catch (error) {
       console.log(error)
     }
-    if (isEmail && i.category !== "response") {
-      const element = document.querySelector(`[data-msg-halfdiv-id="${currentIndex}"]`);
-      html2pdf().from(element).outputPdf('blob').then(async (blob) => {
+    const element = document.querySelector(`[data-msg-halfdiv-id="${currentIndex}"]`);
+    html2pdf().from(element).outputPdf('blob').then(async (blob) => {
       blobs.push({name: "Email Body.pdf", lastModified: new Date(), input: blob})
-    });
-  }
-    const zipfile = await downloadZip(blobs).blob()
+      const zipfile = await downloadZip(blobs).blob()
       saveAs(zipfile, fullName + " " + i.date.replace("|", "") + ".zip");
+    });
   }
 
   const DeleteAction = () => {
@@ -256,22 +254,14 @@ const CommentStructure = ({ i, reply, parentId, totalcommentCount, currentIndex,
 
   return (
     <>
-      <div {...(isEmail ? {"data-msg-halfdiv-id":`${currentIndex}`} : {})} name={needCollapsed ? `hiddenreply_${parentId}` : `reply_${parentId}`} className={halfDivclassname} style={needCollapsed ? { display: 'none' } : {}} >
-        <div
-          className="userInfo"
-          style={reply ? { marginLeft: 15, marginTop: '6px' }: {}}
-        >
+      <div {...(isEmail ? {"data-msg-halfdiv-id":`${currentIndex}`} : {})} name={needCollapsed ? `hiddenreply_${parentId}` : `reply_${parentId}`} 
+      className={halfDivclassname} style={needCollapsed ? { display: 'none' } : {}} >
+        <div className="userInfo" style={reply ? { marginLeft: 15, marginTop: '6px' }: {}}>
           <NewCommentIndicator commentdate={i.dateUF}/>
-          <div className="commentsTwo">
-
-            <div className="fullName">{fullName} </div> |  <div className="commentdate">{i.date} </div>  <div className="commentdate">{i.edited ? "Edited": ""} </div>
-
-          </div>
-          <div className="commenttext" dangerouslySetInnerHTML={{ __html: getHtmlfromRawContent() }} >
-
-          </div>
-
-            
+            <div className="commentsTwo">
+              <div className="fullName">{fullName} </div> |  <div className="commentdate">{i.date} </div>  <div className="commentdate">{i.edited ? "Edited": ""} </div>
+            </div>
+            <div className="commenttext" dangerouslySetInnerHTML={{ __html: getHtmlfromRawContent() }} />            
         </div>
         <div className="userActions">
           <div>

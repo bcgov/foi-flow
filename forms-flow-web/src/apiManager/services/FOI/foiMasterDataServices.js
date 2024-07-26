@@ -91,7 +91,7 @@ import {
     if (!programareaid) {
       return () => {};
     }
-    console.log("programareaid id : ",programareaid)
+    console.log("programareaid  : ",programareaid)
     return (dispatch) => {
       httpGETRequest(
         API.FOI_GET_PROGRAMAREALIST_WITHID_API,
