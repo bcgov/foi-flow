@@ -177,7 +177,6 @@ export const ContactApplicant = ({
   const [templates, setTemplates] = useState<any[]>([{ value: "", label: "", templateid: null, text: "", disabled: true, created_at:"" }]);
 
   const isEnabledTemplate = (item: any) => {
-    console.log("item: ",item)
    if (['PAYONLINE', 'PAYOUTSTANDING'].includes(item.name)) { 
       return !isFeeTemplateDisabled(currentCFRForm, item); 
    } else if (['EXTENSIONS-PB'].includes(item.name)) {

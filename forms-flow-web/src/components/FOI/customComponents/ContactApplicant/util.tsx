@@ -112,6 +112,7 @@ export const getTemplateVariables = (requestDetails: any, requestExtensions:any,
     {name: "{{feeWaiverDecisionDate}}", value: getFeeWaiverDecisionDate(cfrFeeData)},
     {name: "{{pbExtensionStatus}}", value: displayPBExtension(requestExtensions)},
     {name: "{{oipcExtensionSection}}", value: displayOIPCExtensionSection(oipcExtension[4], requestDetails)},
+    {name: "{{oipcExtensionList}}", value: displayOIPCExtension(requestExtensions)},
   ];
   
 }
@@ -332,6 +333,30 @@ const displayPBExtension = (requestExtensions:any): string => {
   return `
     <p><strong><span style="font-size: 13px;">Public Body Extension:&nbsp;</span></strong><span style="font-size: 13px;">No</span></p>
   `;
+};
+
+
+const displayOIPCExtension = (requestExtensions:any): string => {
+  if (requestExtensions && requestExtensions.length > 0) {
+    // Filter out only OIPC extensions that are approved
+    const filteredOIPCExtensions = requestExtensions.filter((ext: any) => 
+      ext.extensiontype === "OIPC" && ext.extensionstatus === "Approved"
+    );
+
+    // Check if there are any OIPC Extensions
+    if (filteredOIPCExtensions.length > 0) {
+      // Map the extensionreasonid values to their corresponding string values
+      const mappedReasons = filteredOIPCExtensions.map((ext: any) =>
+        mapSectionWithExtensionReasonId(ext.extensionreasonid)
+      );
+      // Join the mapped reasons into a comma-separated string
+      const reasonsString = mappedReasons.join(", ");  
+      console.log("displayOIPCExtension : ",reasonsString)
+      return reasonsString;
+    }
+  }
+  // If no OIPC Extension is found, return an empty string
+  return ''
 };
 
 const fetchTotalPageCount = (ministryId : number) => {
