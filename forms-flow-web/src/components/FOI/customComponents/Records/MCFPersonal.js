@@ -471,7 +471,7 @@ const MCFPersonal = ({
                     sx={{width: "fit-content", marginRight: "8px", marginBottom: "8px"}}
                     color="primary"
                     size="small"
-                    onClick={()=>{handlePersonalAttributesChange(tag, "personaltag");setNewDivision(tag.divisionid);}}
+                    onClick={()=>{handlePersonalAttributesChange(tag, "personaltag")}}
                     clicked={personalAttributes?.personaltag === tag.name}
                   />
                 )}
@@ -567,7 +567,7 @@ const MCFPersonal = ({
                         sx={{width: "fit-content", marginRight: "8px", marginBottom: "8px"}}
                         color="primary"
                         size="small"
-                        onClick={()=>{handlePersonalAttributesChange(tag, "personaltag");setNewDivision(tag.divisionid);}}
+                        onClick={()=>{handlePersonalAttributesChange(tag, "personaltag")}}
                         clicked={personalAttributes?.personaltag === tag.name}
                       />
                     )}

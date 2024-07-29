@@ -564,7 +564,7 @@ const FileUploadForMCFPersonal = ({
               sx={{width: "fit-content", marginRight: "8px", marginBottom: "8px"}}
               color="primary"
               size="small"
-              onClick={()=>{handlePersonalTagChange(tag);if(isScanningTeamMember){handleTagChange(tag.divisionid)}}}
+              onClick={()=>{handlePersonalTagChange(tag);}}
               clicked={personalTag?.name === tag.name}
               disabled={!isPersonSelected || trackingID===""}
             />
@@ -662,7 +662,7 @@ const FileUploadForMCFPersonal = ({
                   sx={{width: "fit-content", marginRight: "8px", marginBottom: "8px"}}
                   color="primary"
                   size="small"
-                  onClick={()=>{handlePersonalTagChange(tag);if(isScanningTeamMember){handleTagChange(tag.divisionid)}}}
+                  onClick={()=>{handlePersonalTagChange(tag)}}
                   clicked={personalTag?.name === tag.name}
                 />
               )}
