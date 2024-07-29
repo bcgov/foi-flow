@@ -57,6 +57,7 @@ import {
   fetchPDFStitchStatusForResponsePackage,
   fetchPDFStitchedStatusForOIPCRedlineReview,
   fetchPDFStitchedStatusForOIPCRedline,
+  fetchHistoricalRecords,
 } from "../../../apiManager/services/FOI/foiRecordServices";
 import { makeStyles } from "@material-ui/core/styles";
 import FOI_COMPONENT_CONSTANTS from "../../../constants/FOI/foiComponentConstants";
@@ -160,7 +161,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
           "fee estimate - payment receipt",
           "response-onhold",
           "fee balance outstanding - payment receipt",
-        ].indexOf(attachment.category.toLowerCase()) === -1
+        ].indexOf(attachment.category?.toLowerCase()) === -1
       );
     })
   );
@@ -312,6 +313,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
       dispatch(fetchHistoricalRequestDetails(requestId));
       dispatch(fetchFOIHistoricalRequestDescriptionList(requestId));
       dispatch(fetchHistoricalExtensions(requestId));
+      dispatch(fetchHistoricalRecords(requestId))
     } else {
       await Promise.all([
         dispatch(fetchFOIProgramAreaList()),
@@ -1008,13 +1010,15 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
   );
 
   const showRecordsTab = () => {
+    if (isHistoricalRequest) {
+      return requestAttachments.length === 0
+    }
     return (
       requestState !== StateEnum.intakeinprogress.name &&
       requestState !== StateEnum.unopened.name &&
       requestState !== StateEnum.open.name &&
       (requestDetails?.divisions?.length > 0 || isMCFPersonal) &&
-      DISABLE_GATHERINGRECORDS_TAB?.toLowerCase() =='false' &&
-      !isHistoricalRequest
+      DISABLE_GATHERINGRECORDS_TAB?.toLowerCase() =='false'
     );
   };
 
@@ -1449,6 +1453,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
                   iaoassignedToList={iaoassignedToList}
                   ministryAssignedToList={ministryAssignedToList}
                   isMinistryCoordinator={false}
+                  isHistoricalRequest={isHistoricalRequest}
                 />
               </>
             ) : (
@@ -1660,12 +1665,13 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
                   iaoassignedToList={iaoassignedToList}
                   ministryAssignedToList={ministryAssignedToList}
                   isMinistryCoordinator={false}
-                  bcgovcode={JSON.parse(bcgovcode)}
+                  bcgovcode={isHistoricalRequest ? "" : JSON.parse(bcgovcode)}
                   setRecordsUploading={setRecordsUploading}
                   divisions={requestDetails.divisions}
                   recordsTabSelect={tabLinksStatuses.Records.active}
                   requestType={requestDetails?.requestType}
                   handleSaveRequest={handleSaveRequest}
+                  isHistoricalRequest={isHistoricalRequest}
                 />
               </>
             )}

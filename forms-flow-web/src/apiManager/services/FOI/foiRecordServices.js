@@ -21,6 +21,8 @@ import {
   setFOIPDFStitchStatusForOipcRedlineReview,
   setFOIPDFStitchStatusForOipcRedline,
   setFOIPDFStitchedRecordForOipcRedline,
+  setRequestAttachments,
+  setFOIAttachmentListLoader,
 } from "../../../actions/FOI/foiRequestActions";
 import { fnDone } from "./foiServicesUtil";
 import UserService from "../../../services/UserService";
@@ -636,3 +638,34 @@ export const fetchPDFStitchedRecordForOIPCRedlineReview = (
         });
     };
   }
+
+  export const fetchHistoricalRecords = (axisRequestId, ...rest) => {
+    const done = fnDone(rest);
+    let apiUrl = replaceUrl(API.FOI_HISTORICAL_RECORDS_API, "<axisrequestid>", axisRequestId);
+    return (dispatch) => {
+      dispatch(setRecordsLoader("inprogress"));
+      httpGETRequest(apiUrl, {}, UserService.getToken())
+        .then((res) => {
+          if (res.data) {
+            if (!res.data.records) {              
+              dispatch(setRequestAttachments(res.data)); 
+              dispatch(setFOIAttachmentListLoader(false));
+            } else {
+              dispatch(setRequestRecords(res.data));
+              dispatch(setRecordsLoader("completed"));
+            }
+            done(null, res.data);
+          } else {
+            console.log("Error in fetching historical records", res);
+            dispatch(serviceActionError(res));
+            dispatch(setRecordsLoader("error"));
+          }
+        })
+        .catch((error) => {
+          console.log("Error in fetching historical records", error);
+          dispatch(serviceActionError(error));
+          dispatch(setRecordsLoader("error"));
+          done(error);
+        });
+    };
+  };
