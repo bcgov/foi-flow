@@ -121,6 +121,15 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
     )
   };
 
+  const historicalRenderCell = (params) => {
+    let link = "./historicalrequest/" + params.row.axisrequestid
+    return (
+      <a href={link}>
+        <div className="MuiDataGrid-cellContent">{params.value}</div>
+      </a>
+    )
+  };
+
   
 
   const ProcessingTeamColumns = [
@@ -371,7 +380,7 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
       field: "applicantname",
       headerName: "APPLICANT NAME",
       headerAlign: "left",
-      renderCell: hyperlinkRenderCell,
+      renderCell: historicalRenderCell,
       cellClassName: 'foi-advanced-search-result-cell',     
       width: 180,
     },
@@ -379,7 +388,7 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
       field: "requesttype",
       headerName: "REQUEST TYPE",
       headerAlign: "left",
-      renderCell: hyperlinkRenderCell,
+      renderCell: historicalRenderCell,
       cellClassName: 'foi-advanced-search-result-cell',
       flex: 1,
     },
@@ -387,7 +396,7 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
       field: "axisrequestid",
       headerName: "ID NUMBER",
       headerAlign: "left",
-      renderCell: hyperlinkRenderCell,
+      renderCell: historicalRenderCell,
       cellClassName: 'foi-advanced-search-result-cell',
       flex: 1,
     },
@@ -395,7 +404,7 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
       field: "oipcno",
       headerName: "OIPC no",
       headerAlign: "left",
-      renderCell: hyperlinkRenderCell,
+      renderCell: historicalRenderCell,
       cellClassName: 'foi-advanced-search-result-cell',
       flex: 1,
     },
@@ -403,7 +412,7 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
       field: "assignee",
       headerName: "ASSIGNED TO",
       headerAlign: "left",
-      renderCell: hyperlinkRenderCell,
+      renderCell: historicalRenderCell,
       cellClassName: 'foi-advanced-search-result-cell',
       flex: 1,
     },
@@ -411,7 +420,7 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
       field: "receiveddate",
       headerName: "RECEIVED DATE",
       headerAlign: "left",
-      renderCell: hyperlinkRenderCell,
+      renderCell: historicalRenderCell,
       cellClassName: 'foi-advanced-search-result-cell',      
       flex: 1,
     },
@@ -578,7 +587,7 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
                   label={"Historical AXIS Results"}
                   color="primary"
                   size="small"
-                  onClick={() => { advancedFilterChange("historicalsearchresults"); console.log(`Value of advanced search filter on historicalsearchresults is ${foiadvsearchfilter}`)}}
+                  onClick={() => { advancedFilterChange("historicalsearchresults"); console.log(`Value of advanced search filter on advancedsearchresults is ${foiadvsearchfilter}`)}}
                   clicked={foiadvsearchfilter === "historicalsearchresults"}
                 />
           </Stack>

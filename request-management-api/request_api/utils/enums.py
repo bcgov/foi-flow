@@ -136,6 +136,7 @@ class CommentType(Enum):
 class DocumentPathMapperCategory(Enum):
     Attachments = "Attachments"
     Records = "Records"
+    Historical = "Historical"
 
 class ServiceName(Enum):
     payonline = "payonline"
