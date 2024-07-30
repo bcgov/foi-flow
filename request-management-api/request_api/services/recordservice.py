@@ -232,6 +232,8 @@ class recordservice(recordservicebase):
         documents = HistoricalRecords.getdocuments(axisrequestid)
         if (documents[0]['iscorresponcedocument']):
             for document in documents:
+                if len(document['attributes']) > 0:
+                    document['category'] = 'response'
                 document['documentpath'] = 'https://' + self.s3host + '/' + document.pop('s3uripath') + '/' + document.pop('recordfilename')
                 document['filename'] = document.pop('displayfilename')
             return documents

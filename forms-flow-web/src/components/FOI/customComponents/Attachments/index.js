@@ -108,9 +108,9 @@ export const AttachmentSection = ({
               return (
                 (_filterValue==="ALL"?true:onecategory.tags.includes(_filterValue?.toLowerCase()))
                 && ( onecategory.tags.join('-').includes(_keywordValue?.toLowerCase())
-                      || attachment.category.toLowerCase().includes(_keywordValue?.toLowerCase()) 
+                      || attachment.category?.toLowerCase().includes(_keywordValue?.toLowerCase()) 
                       || attachment.filename.toLowerCase().includes(_keywordValue?.toLowerCase()) 
-                      || attachment.createdby.toLowerCase().includes(_keywordValue?.toLowerCase()) )
+                      || attachment.createdby?.toLowerCase().includes(_keywordValue?.toLowerCase()) )
               )
     });
   }

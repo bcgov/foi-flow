@@ -1504,7 +1504,7 @@ export const RecordsLog = ({
   };
 
   React.useEffect(() => {
-    if (divisionFilters.findIndex((f) => f.divisionid === filterValue) > -1) {
+    if (divisionFilters.findIndex((f) => f.divisionid === filterValue) > -1 || isHistoricalRequest) {
       setRecords(
         searchAttachments(
           _.cloneDeep(recordsObj.records),
@@ -1523,7 +1523,7 @@ export const RecordsLog = ({
     var filterFunction = (r) => {
       var isMatch = (
         (r.filename.toLowerCase().includes(_keywordValue?.toLowerCase()) ||
-          r.createdby.toLowerCase().includes(_keywordValue?.toLowerCase())) &&
+          r.createdby?.toLowerCase().includes(_keywordValue?.toLowerCase())) &&
         (_filterValue === -3
           ? r.attributes?.incompatible
           : _filterValue === -2
@@ -3016,7 +3016,8 @@ const Attachment = React.memo(
             alignItems="flex-end"
             className={classes.recordStatus}
           >
-            {record.isduplicate ? (
+            { isHistoricalRequest ? <></>
+              : record.isduplicate ? (
               <span>Duplicate of {record.duplicateof}</span>
             ) : record.attributes?.incompatible &&
               record.attributes?.trigger !== "recordreplace" ? (
