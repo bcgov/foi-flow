@@ -125,7 +125,6 @@ import { MinistryNeedsScanning } from "../../../../constants/FOI/enum";
 import FOI_COMPONENT_CONSTANTS from "../../../../constants/FOI/foiComponentConstants";
 import MCFPersonal from "./MCFPersonal";
 import MSDPersonal from "./MSDPersonal";
-import MCFPersonalMinistry from "./MCFPersonalMinistry";
 
 const useStyles = makeStyles((_theme) => ({
   createButton: {
@@ -1848,42 +1847,57 @@ export const RecordsLog = ({
   const updatePersonalAttributes = (_all = false) => {
     setEditTagModalOpen(false);
     var updateRecords = [];
+    var updateDivisionForRecords = [];
 
-    if(_all) {
-      for (let record of records) {
-        if(record.attributes?.personalattributes?.person
-           && record.attributes?.personalattributes?.person === currentEditRecord.attributes?.personalattributes?.person
-           && record.attributes?.personalattributes?.filetype
-           && record.attributes?.personalattributes?.filetype === currentEditRecord.attributes?.personalattributes?.filetype
-        ) {
-          updateRecords.push(
-            (({ recordid, documentmasterid, s3uripath }) => ({
-              recordid,
-              documentmasterid,
-              filepath: s3uripath,
-            }))(record)
-          );
-        }
-
-        if(record.attachments) {
-          for (let attachment of record.attachments) {
-            if(attachment.attributes?.personalattributes?.person
-              && attachment.attributes?.personalattributes?.person === currentEditRecord.attributes?.personalattributes?.person
-              && attachment.attributes?.personalattributes?.filetype
-              && attachment.attributes?.personalattributes?.filetype === currentEditRecord.attributes?.personalattributes?.filetype
-            ) {
-              updateRecords.push(
-                (({ documentmasterid, s3uripath }) => ({
-                  documentmasterid,
-                  filepath: s3uripath,
-                }))(attachment)
-              );
+    if(newPersonalAttributes) {
+      if(_all) {
+        for (let record of records) {
+          if(record.attributes?.personalattributes?.person
+             && record.attributes?.personalattributes?.person === currentEditRecord.attributes?.personalattributes?.person
+             && record.attributes?.personalattributes?.filetype
+             && record.attributes?.personalattributes?.filetype === currentEditRecord.attributes?.personalattributes?.filetype
+          ) {
+            updateRecords.push(
+              (({ recordid, documentmasterid, s3uripath }) => ({
+                recordid,
+                documentmasterid,
+                filepath: s3uripath,
+              }))(record)
+            );
+          }
+  
+          if(record.attachments) {
+            for (let attachment of record.attachments) {
+              if(attachment.attributes?.personalattributes?.person
+                && attachment.attributes?.personalattributes?.person === currentEditRecord.attributes?.personalattributes?.person
+                && attachment.attributes?.personalattributes?.filetype
+                && attachment.attributes?.personalattributes?.filetype === currentEditRecord.attributes?.personalattributes?.filetype
+              ) {
+                updateRecords.push(
+                  (({ documentmasterid, s3uripath }) => ({
+                    documentmasterid,
+                    filepath: s3uripath,
+                  }))(attachment)
+                );
+              }
             }
           }
         }
+      } else {
+        updateRecords.push(
+          {
+            recordid: currentEditRecord.recordid,
+            documentmasterid: currentEditRecord.documentmasterid,
+            filepath: currentEditRecord.s3uripath
+          }
+        );
       }
-    } else {
-      updateRecords.push(
+    }
+
+    if(isMinistryCoordinator
+      && currentEditRecord.attributes.divisions[0].divisionname != "TBD"
+      && currentEditRecord.attributes.divisions[0].divisionid != divisionModalTagValue) {
+      updateDivisionForRecords.push(
         {
           recordid: currentEditRecord.recordid,
           documentmasterid: currentEditRecord.documentmasterid,
@@ -1892,21 +1906,58 @@ export const RecordsLog = ({
       );
     }
 
-    if(currentEditRecord && !comparePersonalAttributes(newPersonalAttributes, curPersonalAttributes)) {
-      dispatch(
-        editPersonalAttributes(
-          requestId,
-          ministryId,
-          {
-            records: updateRecords,
-            newpersonalattributes: newPersonalAttributes
-          },
-          (err, _res) => {
-            dispatchRequestAttachment(err);
-          }
-        )
-      );
+    if(currentEditRecord) {
+      if(updateRecords.length > 0 && !comparePersonalAttributes(newPersonalAttributes, curPersonalAttributes)) {
+        dispatch(
+          editPersonalAttributes(
+            requestId,
+            ministryId,
+            {
+              records: updateRecords,
+              newpersonalattributes: newPersonalAttributes,
+            },
+            (err, _res) => {
+              if(updateDivisionForRecords.length > 0) {
+                dispatch(
+                  updateFOIRecords(
+                    requestId,
+                    ministryId,
+                    {
+                      records: updateDivisionForRecords,
+                      divisions: [{ divisionid: divisionModalTagValue }],
+                      isdelete: false,
+                    },
+                    (err, _res) => {
+                      dispatchRequestAttachment(err);
+                    }
+                  )
+                );
+              } else {
+                dispatchRequestAttachment(err);
+              }
+            }
+          )
+        );
+      } else {
+        if(updateDivisionForRecords.length > 0) {
+          dispatch(
+            updateFOIRecords(
+              requestId,
+              ministryId,
+              {
+                records: updateDivisionForRecords,
+                divisions: [{ divisionid: divisionModalTagValue }],
+                isdelete: false,
+              },
+              (err, _res) => {
+                dispatchRequestAttachment(err);
+              }
+            )
+          );
+        }
+      }
 
+      setDivisionModalTagValue(-1);
       setCurrentEditRecord();
       setCurPersonalAttributes({
         person: "",
@@ -2491,7 +2542,7 @@ export const RecordsLog = ({
                   </button>
                 </span>
               </Tooltip>
-              {(!isMCFPersonal || (isMCFPersonal && isMinistryCoordinator)) && (
+              {(!isMCFPersonal) && (
               <Tooltip
                 title={
                   isUpdateDivisionsDisabled() ? (
@@ -2508,14 +2559,6 @@ export const RecordsLog = ({
                           {" "}
                           and all records selected must be finished processing
                         </li>
-                        {isMCFPersonal && (
-                          <>
-                            <li>
-                              all records selected must be uploaded by your own
-                              team
-                            </li>
-                          </>
-                        )}
                       </ul>
                     </div>
                   ) : (
@@ -2719,7 +2762,7 @@ export const RecordsLog = ({
             </Dialog>
           </div>
 
-          {isMCFPersonal&&!isMinistryCoordinator?(
+          {isMCFPersonal?(
             <MCFPersonal
               editTagModalOpen={editTagModalOpen}
               setEditTagModalOpen={setEditTagModalOpen}
@@ -2731,6 +2774,10 @@ export const RecordsLog = ({
               updatePersonalAttributes={updatePersonalAttributes}
               setCurrentEditRecord={setCurrentEditRecord}
               setCurPersonalAttributes={setCurPersonalAttributes}
+              divisionModalTagValue={divisionModalTagValue}
+              divisions={divisions}
+              isMinistryCoordinator={isMinistryCoordinator}
+              currentEditRecord={currentEditRecord}
             />
           ):(
             <div className="state-change-dialog">
@@ -2784,18 +2831,7 @@ export const RecordsLog = ({
 
                       {requestType ==
                       FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL ? (
-                        (bcgovcode == "MCF" && isMinistryCoordinator) ? (
-                          <MCFPersonalMinistry
-                            setNewDivision={setDivisionModalTagValue}
-                            tagValue={
-                              records.filter((r) => r.isselected)[0]?.attributes
-                                .divisions[0].divisionid
-                            }
-                            divisionModalTagValue={divisionModalTagValue}
-                            divisions={divisions}
-                            isMinistryCoordinator={isMinistryCoordinator}
-                          />
-                        ) : bcgovcode == "MSD" ? (
+                        bcgovcode == "MSD" ? (
                           <MSDPersonal
                             setNewDivision={setDivisionModalTagValue}
                             tagValue={
@@ -3428,6 +3464,14 @@ const AttachmentPopup = React.memo(
       isMCFPersonal,
       isMinistryCoordinator
     }) => {
+      const isUploadedByMinistryUser = (record) => {
+        return hasValidDivisions(record) && isMinistryCoordinator;
+      };
+
+      const hasValidDivisions = (record) => {
+        return record.attributes.divisions.length > 0 && record.attributes.divisions[0].divisionname != "TBD"
+      };
+
       return (
         <Popover
           anchorReference="anchorPosition"
@@ -3449,7 +3493,7 @@ const AttachmentPopup = React.memo(
           onClose={() => setPopoverOpen(false)}
         >
           <MenuList>
-            {(isMCFPersonal && !isMinistryCoordinator) && (
+            {(isMCFPersonal && (!isMinistryCoordinator || isUploadedByMinistryUser(record))) && (
               <MenuItem
                 onClick={() => {
                   setEditTagModalOpen(true);

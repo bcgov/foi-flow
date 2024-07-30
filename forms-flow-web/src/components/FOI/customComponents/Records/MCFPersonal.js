@@ -30,7 +30,11 @@ const MCFPersonal = ({
     setNewPersonalAttributes,
     updatePersonalAttributes,
     setCurPersonalAttributes,
-    setCurrentEditRecord
+    setCurrentEditRecord,
+    divisionModalTagValue,
+    divisions=[],
+    isMinistryCoordinator,
+    currentEditRecord
 }) => {
     const [personalAttributes, setPersonalAttributes] = useState();
     useEffect(() => {
@@ -44,7 +48,7 @@ const MCFPersonal = ({
     const MCFSections = useSelector((state) => state.foiRequests.foiPersonalSections);
     const [tagList, setTagList] = useState([]);
     const [otherTagList, setOtherTagList] = useState([]);
-  
+
     const MCFPeople = useSelector(
       (state) => state.foiRequests.foiPersonalPeople
     );
@@ -70,6 +74,12 @@ const MCFPersonal = ({
     const [fileTypeSearchValue, setFileTypeSearchValue] = useState("");
     const [additionalFileTypes, setAdditionalFileTypes] = useState([]);
     const [showAdditionalFileTypes, setShowAdditionalFileTypes] = useState(false);
+
+    useEffect(() => {
+      if(currentEditRecord?.attributes?.divisions[0]?.divisionid) {
+        setNewDivision(currentEditRecord.attributes.divisions[0].divisionid);
+      }
+    },[currentEditRecord])
 
     useEffect(() => {
       if(MCFSections?.sections) {
@@ -276,6 +286,28 @@ const MCFPersonal = ({
                   to that person.
                 </span>
               </div>
+
+
+              {isMinistryCoordinator && divisions.length > 0 && (<>
+              <div className="tagtitle">
+                <span>Select Division: *</span>
+              </div>  
+              <div className="taglist">
+                {divisions.map(tag =>
+                  <ClickableChip
+                    id={`${tag.divisionid}Tag`}
+                    key={`${tag.divisionid}-tag`}
+                    label={tag.divisionname.toUpperCase()}
+                    sx={{width: "fit-content", marginRight: "8px", marginBottom: "8px"}}
+                    color="primary"
+                    size="small"
+                    onClick={()=>{setNewDivision(tag.divisionid)}}
+                    clicked={divisionModalTagValue == tag.divisionid}
+                  />
+                )}
+              </div>
+              </>)}
+
 
               <div className="tagtitle">
                 <span>Select Person: *</span>
@@ -586,6 +618,7 @@ const MCFPersonal = ({
             <button
               className={`btn-bottom btn-save btn`}
               onClick={() => {updatePersonalAttributes(true);reset();}}
+              disabled={isMinistryCoordinator}
             >
               Update for All
             </button>
