@@ -87,38 +87,38 @@ import {
     };
   };
 
-  export const fetchFOIProgramAreaListbyAreaID = (programareaid) => {    
-    if (!programareaid) {
-      return () => {};
-    }
-    console.log("programareaid  : ",programareaid)
-    return (dispatch) => {
-      httpGETRequest(
-        API.FOI_GET_PROGRAMAREALIST_WITHID_API,
-        {},
-        UserService.getToken()
-      )
-        .then((res) => {
-          if (res.data) {
-            const foiProgramAreaList = res.data;
-            let data = foiProgramAreaList.map((programArea) => {
-              return { ...programArea, isChecked: false };
-            });
-            dispatch(setFOIProgramAreaList(data));
-            dispatch(setFOILoader(false));
-          } else {
-            console.log("Error while fetching program area master data", res);
-            dispatch(serviceActionError(res));
-            dispatch(setFOILoader(false));
-          }
-        })
-        .catch((error) => {
-          console.log("Error while fetching program area master data", error);
-          dispatch(serviceActionError(error));
-          dispatch(setFOILoader(false));
-        });
-    };
-  };
+  // export const fetchFOIProgramAreaListbyAreaID = (programareaid) => {    
+  //   if (!programareaid) {
+  //     return () => {};
+  //   }
+  //   console.log("programareaid  : ",programareaid)
+  //   return (dispatch) => {
+  //     httpGETRequest(
+  //       API.FOI_GET_PROGRAMAREALIST_WITHID_API,
+  //       {},
+  //       UserService.getToken()
+  //     )
+  //       .then((res) => {
+  //         if (res.data) {
+  //           const foiProgramAreaList = res.data;
+  //           let data = foiProgramAreaList.map((programArea) => {
+  //             return { ...programArea, isChecked: false };
+  //           });
+  //           dispatch(setFOIProgramAreaList(data));
+  //           dispatch(setFOILoader(false));
+  //         } else {
+  //           console.log("Error while fetching program area master data", res);
+  //           dispatch(serviceActionError(res));
+  //           dispatch(setFOILoader(false));
+  //         }
+  //       })
+  //       .catch((error) => {
+  //         console.log("Error while fetching program area master data", error);
+  //         dispatch(serviceActionError(error));
+  //         dispatch(setFOILoader(false));
+  //       });
+  //   };
+  // };
   
   
   export const fetchFOIAssignedToList = (requestType, status, bcgovcode) => {

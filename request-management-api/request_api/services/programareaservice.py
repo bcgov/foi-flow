@@ -15,5 +15,3 @@ class programareaservice:
         """
         return ProgramArea.getprogramareasforministryuser(groups)
     
-    def getprogramareabyprogramareaid(self, programareaid):
-        return ProgramArea.getprogramareabyprogramareaid(programareaid)

@@ -191,11 +191,43 @@ export const fetchRedactedSections = (ministryId, ...rest) => {
   };
 };
 
-export const fetchRedactedPageFlags  = (ministryId, f) => {
+export const fetchDocumentPage  = (ministryId, done) => {
+  if (!ministryId) {
+    return (done, dispatch) => {};
+  }
+  console.log("ministrY id : ",ministryId)
+  let apiUrl = replaceUrl(
+    API.DOC_REVIEWER_REDACTED_DOCUMENT_RECORDS,
+    "<ministryrequestid>",
+    ministryId
+  );
+  return (dispatch) => {
+    console.log("뭐냐고!!!!!!!!!!!")
+    httpGETRequest(apiUrl, {}, UserService.getToken())
+      .then((res) => {
+        console.log("****************************");
+        console.log(res);
+        console.log("****************************");
+        if (res.data) {
+          done(null, res.data);
+        } else {
+          console.log("Error in fetching redacted sections", res);
+          serviceActionError(res)(dispatch);
+        }
+      })
+      .catch((error) => {
+        console.log("Error in fetching redacted section", error);
+        serviceActionError(error)(dispatch);
+        done(error);
+      });
+  };
+};
+
+export const fetchDocumentPageFlags  = (ministryId, f) => {
   if (!ministryId) {
     return () => {};
   }
-  console.log("ministr id : ",ministryId)
+  console.log("fetchDocumentPageFlags ministr id : ",ministryId)
   //const done = fnDone(rest);
   const done  = f;
   let apiUrl = replaceUrl(

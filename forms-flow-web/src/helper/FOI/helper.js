@@ -44,6 +44,7 @@ const formatDateInPst = (d, formatString = "yyyy-MM-dd") => {
 
 
 const convertDate = (dateString, outputFormat = 'MMMM D, YYYY') => {
+  console.log("뭐 들어오냐? ",dateString)
   if (!dateString) {
     console.error('Invalid date string provided.');
     return '';

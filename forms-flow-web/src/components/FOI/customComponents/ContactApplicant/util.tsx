@@ -1,7 +1,7 @@
 
 import { formatDateInPst, convertDate } from "../../../../helper/FOI/helper";
 import { any } from "prop-types";
-import { fetchRedactedPageFlags } from "../../../../apiManager/services/FOI/foiRecordServices";
+import { fetchDocumentPage, fetchDocumentPageFlags } from "../../../../apiManager/services/FOI/foiRecordServices";
 
 export const renderTemplate = (template: string, content: string, params: Array<any>) => {
   let newTemplate = template.replace("{{content}}", content);
@@ -22,7 +22,7 @@ export const getExtensiondetails = (requestExtensions:any, type: string) => {
       let recentExtension = requestExtensions[0];
       if (recentExtension["extensiontype"] === "Public Body"  && recentExtension["extensionstatus"] == "Approved") {
         return [recentExtension["extendedduedays"], recentExtension["extendedduedate"], recentExtension["extensionreson"]]
-      } else if (recentExtension["extensiontype"] === "OIPC"  && recentExtension["extensionstatus"] == "Approved") {
+      } else if (recentExtension["extensiontype"] === "OIPC") {
         return [recentExtension["approvednoofdays"], recentExtension["extendedduedate"], recentExtension["extensionreson"], recentExtension["created_at"], recentExtension["extensionreasonid"], recentExtension["decisiondate"]
       ]
       }
@@ -35,11 +35,32 @@ export const getExtensionType = (requestExtensions: any) => {
     return "NA";
   }
 
-   // Get the type of the latest extension
-  const { extensiontype, extensionstatus } = requestExtensions[0];
+  const latestExtension = requestExtensions[0];
+  const approvedOIPCExists = requestExtensions.some((ext : any) => ext.extensionstatus === "Approved" && ext.extensiontype === "OIPC");
 
-  return extensionstatus === "Approved"
-    ? (extensiontype === "Public Body" ? "PB" : extensiontype === "OIPC" ? "OIPC" : "NA") : "NA";
+   // Get the type of the latest extension
+  //const { extensiontype, extensionstatus } = requestExtensions[0];
+  console.log("호잉 : ",latestExtension)
+
+  if (latestExtension.extensionstatus === "Approved" && latestExtension.extensiontype === "OIPC") {
+    if (latestExtension.extensionreson === "OIPC - Applicant Consent") {
+      console.log("여기는?1> ", latestExtension.extensionreson)
+      return "OIPCAPPLICANTCONSENTEXTENSION";
+    }
+    
+  } else if (latestExtension.extensionstatus === "Approved" && latestExtension.extensiontype === "Public Body") {
+    console.log("Returning PB");
+    return "PB";
+  } else if (latestExtension.extensionstatus === "Pending") {
+    console.log("여기는?3> ", latestExtension.extensionstatus)
+    console.log("approvedOIPCExists : ",approvedOIPCExists)
+    return approvedOIPCExists ? "OIPCSUBSEQUENTTIMEEXTENSION" : "OIPCFIRSTTIMEEXTENSION";
+  }
+
+  return "NA";
+
+  // return extensionstatus === "Approved"
+  //   ? (extensiontype === "Public Body" ? "PB" : extensiontype === "OIPC" ? "OIPC" : "NA") : "NA";
 }
 
 export const getTemplateVariables = (requestDetails: any, requestExtensions:any, responsePackagePdfStitchStatus:any, cfrFeeData:any, templateInfo: any) => {
@@ -56,21 +77,21 @@ export const getTemplateVariables = (requestDetails: any, requestExtensions:any,
 
   // const feeWaiverDecisionDate = getFeeWaiverDecisionDate(cfrFeeData);
   
-  const redatedTotalPage = fetchRedactedPageFlags(requestDetails.id, (_err : any, res : any) => {
-    if (!_err) {
-      console.log("********************* fetchRedactedPageFlags : ")
-      console.log(res)
-      // volume of records - total pagecount
-      const totalPageCount = res.data.reduce((sum : any, item : any) => sum + (item.pagecount || 0), 0);
-      console.log("Total Page Count:", totalPageCount);
+  // const redatedTotalPage = fetchDocumentPage(requestDetails.id, (_err : any, res : any) => {
+  //   if (!_err) {
+  //     console.log("********************* fetchRedactedPageFlags : ")
+  //     console.log(res)
+  //     // volume of records - total pagecount
+  //     const totalPageCount = res.data.reduce((sum : any, item : any) => sum + (item.pagecount || 0), 0);
+  //     console.log("Total Page Count:", totalPageCount);
       
-      return totalPageCount || null;
-    } else {
-      console.log("********************* error: ", _err)
-    }
-  })
+  //     return totalPageCount || null;
+  //   } else {
+  //     console.log("********************* error: ", _err)
+  //   }
+  // })
 
-
+console.log("체크 oipcExtension[4]: ",oipcExtension[4])
 
   //test((dispatch: any) => {})   // nice shot
 
@@ -173,7 +194,6 @@ const getMappedValue = (property: string, propertykey: string) => {
 const mapSectionWithExtensionReasonId = (extensionReasonId: number) => {
   console.log("extensionReasonId : ",extensionReasonId)
   switch (extensionReasonId) {
-    
     case 1:
     case 6:
       return "10(1)(d)"; // 10(1)(d) = Public Body - Applicant Consent / OIPC - Applicant Consent
@@ -359,9 +379,12 @@ const displayOIPCExtension = (requestExtensions:any): string => {
   return ''
 };
 
+
 const fetchTotalPageCount = (ministryId : number) => {
+  const dispatch = () => {};
+
   return new Promise((resolve, reject) => {
-    fetchRedactedPageFlags(ministryId, (err : any, res : any) => {
+    fetchDocumentPage(ministryId, (err : any, res : any) => {
       if (!err) {
         console.log("********************* fetchRedactedPageFlags : ");
         console.log(res);
@@ -375,63 +398,90 @@ const fetchTotalPageCount = (ministryId : number) => {
         console.log("********************* error: ", err);
         reject(err);
       }
-    });
+    })(dispatch);
   });
 };
 
 
-const fetchConsultPage = (ministryId : number) => {
-  return new Promise((resolve, reject) => {
-    fetchRedactedPageFlags(ministryId, (err : any, res : any) => {
-      if (!err) {
-        console.log("********************* fetchRedactedPageFlags : ");
-        console.log(res);
-        
-        // Filter out entries where pageflag is null
-        const filteredData = res.data.filter((item : any) => item.pageflag !== null);
+// const fetchConsultPageFlag = (ministryId: number): Promise<string> => {
+//   return new Promise((resolve, reject) => {
+//     fetchDocumentPageFlags(ministryId, (err: any, res: any) => {
+//       if (!err) {
+//         console.log("********************* fetchRedactedPageFlags : ");
+//         console.log(res.data);
 
-        // Extract desired values
-        // const result = filteredData.map((item : any) => {
-        //   const flagEntry = (item.pageflag || []).find((flag : any) => flag.flagid === 4);
-        //   return {
-        //     created_at: item.created_at,
-        //     page: flagEntry ? flagEntry.page : null,
-        //     programareaid: flagEntry ? flagEntry.programareaid : []
-        //   };
-        // });
+//         // Generate JSX string from the result
+//         const jsxString = res.data.map((item: any) => `
+//             <p>strong><span style="font-size: 13px;">Consultee: &nbsp;</span></strong><span style="font-size: 13px;">${item.consultation_name}</span></p>
+//             <p><strong><span style="font-size: 13px;">Consultation page count: &nbsp;</span></strong><span style="font-size: 13px;">${item.consultation_page_count}</span></p>
+//             <p><strong><span style="font-size: 13px;">Consultation Date: &nbsp;</span></strong><span style="font-size: 13px;">${item.consultation_date}</span></p>
+//         `).join('');
+//         console.log("헤헤: ",jsxString)
 
-        // Extract and process data
-        const result = filteredData.reduce((acc : any, item : any) => {
-          // Extract all pageflag entries with flagid 4
-          const flagEntries = (item.pageflag || []).filter((flag : any) => flag.flagid === 4);
+//         resolve(jsxString);
+//       } else {
+//         console.log("********************* error: ", err);
+//         reject(err);
+//       }
+//     });
+//   });
+// };
+const fetchConsultPageFlag =  (ministryId: number)=> {
+  const dispatch = () => {};
+  try {
+    // const res = new Promise<any>((resolve, reject) => {
+    //   fetchDocumentPageFlags(ministryId, (err: any, res: any) => {
+    //     if (!err) {
+    //       resolve(res);
+    //     } else {
+    //       reject(err);
+    //     }
+    //   })(() => {});
+    // });
 
-          flagEntries.forEach((flag : any )=> {
-            acc.created_at = item.created_at; // Set created_at value (assumes it is the same for all items)
-            acc.page += flag.page; // Sum up all pages
-            flag.programareaid.forEach((id : number) => {
-              if (!acc.programareaid.includes(id)) {
-                acc.programareaid.push(id); // Add unique programareaid values
-              }
-            });
-          });
+    // console.log("********************* fetchRedactedPageFlags : ");
+    // console.log(res.data);
 
-          return acc;
-        }, { created_at: null, page: 0, programareaid: [] });
+    return new Promise((resolve, reject) => {
+      fetchDocumentPageFlags(ministryId, (err : any, res : any) => {
+        if (!err) {
+          console.log("********************* fetchRedactedPageFlags : ");
+          console.log(res);
+          
+          const jsxString = res.data.map((item: any) => `
+      <p><strong><span style="font-size: 13px;">Consultee: &nbsp;</span></strong><span style="font-size: 13px;">${item.consultation_name}</span></p>
+      <p><strong><span style="font-size: 13px;">Consultation page count: &nbsp;</span></strong><span style="font-size: 13px;">${item.consultation_page_count}</span></p>
+      <p><strong><span style="font-size: 13px;">Consultation Date: &nbsp;</span></strong><span style="font-size: 13px;">${item.consultation_date}</span></p>
+    `).join('');
+    console.log("헤헤: ", jsxString);
 
-        console.log("Processed Data:", result);
 
 
-
-        resolve(result.length > 0 ? result : null);
-      } else {
-        console.log("********************* error: ", err);
-        reject(err);
-      }
+          resolve(jsxString || null);
+        } else {
+          console.log("********************* error: ", err);
+          reject(err);
+        }
+      })(dispatch);
     });
-  });
+
+    // Generate JSX string from the result
+    // const jsxString = res.data.map((item: any) => `
+    //   <p><strong><span style="font-size: 13px;">Consultee: &nbsp;</span></strong><span style="font-size: 13px;">${item.consultation_name}</span></p>
+    //   <p><strong><span style="font-size: 13px;">Consultation page count: &nbsp;</span></strong><span style="font-size: 13px;">${item.consultation_page_count}</span></p>
+    //   <p><strong><span style="font-size: 13px;">Consultation Date: &nbsp;</span></strong><span style="font-size: 13px;">${item.consultation_date}</span></p>
+    // `).join('');
+    // console.log("헤헤: ", jsxString);
+
+    // return jsxString;
+  } catch (err:any) {
+    console.log("********************* error: ", err);
+    throw new Error(err.message || "Error fetching consultation page flag.");
+  }
 };
 
-const displayOIPCExtensionSection = async (extensionId: number, requestDetails:any) => {
+
+const displayOIPCExtensionSection = (extensionId: number, requestDetails:any) => {
   switch (mapSectionWithExtensionReasonId(extensionId)) {
     case "10(1)(a)":
       return `
@@ -439,7 +489,24 @@ const displayOIPCExtensionSection = async (extensionId: number, requestDetails:a
 <p><span style="font-size: 13px;">A copy of the original request is included. It does not provide sufficient detail to proceed with the request. <strong>&lt;insert some indication the analyst needs to populate this area&gt;</strong> Satisfactory clarification from the applicant was not obtained within 60 business days (or 30 business days if the public body’s time extension was not taken): &nbsp;<strong>&lt;insert some indication the analyst needs to populate this area&gt;</strong> </span></p>
 `;
     case "10(1)(b)":
-    const totalPageCount = await fetchTotalPageCount(requestDetails.id);
+
+    //  const getTotalPageCount = async (ministryId: number) => {
+    //    try {
+    // console.log("여기 안들어오나? requestDetails.id:", requestDetails.id)    
+    // const totalPageCount = await fetchTotalPageCount(requestDetails.id);
+
+    //      return totalPageCount
+    //      // Do something with totalPageCount
+    //    } catch (error) {
+    //      console.error("Error:", error);
+    //    }
+    //  };
+ 
+    let totalPageCount: number = 0;
+     fetchTotalPageCount(requestDetails.id).then((count: any) => {
+      totalPageCount = count;
+    });
+
       return `
   <p><strong><span style="font-size: 13px;">10(1)(b) Volume of records </span></strong></p>
   <p style="text-align: center;"><span style="font-size: 13px; ">&nbsp;</span></p>
@@ -455,14 +522,21 @@ const displayOIPCExtensionSection = async (extensionId: number, requestDetails:a
   <p><span style="font-size: 13px;">Please describe the current status of processing this request and any other relevant information:<strong>&lt;insert some indication the analyst needs to populate this area&gt;</strong> </span></p>`;
     
     case "10(1)(c)":
-    const consultPageFlag = await fetchConsultPage(requestDetails.id);
+    console.log("여기는 consult!!!!!")
+    //const consultPageFlag = await fetchConsultPageFlag(requestDetails.id);
+    // const getConsultPageFlag = async (ministryId: number): Promise<string> => {
+    //   try {
+        const consultPageFlag = fetchConsultPageFlag(requestDetails.id);
+    //     return consultPageFlag;
+    //   } catch (error:any) {
+    //     console.error("Error:", error.message);
+    //     return "Error fetching consultation page flag.";
+    //   }
+    // };
       return `
 <p><strong><span style="font-size: 13px;">10(1)(c) Time for consultation</span></strong></p>
 <p style="text-align: center;"><span style="font-size: 13px; ">&nbsp;</span></p>
- <p><strong><span style="font-size: 13px;">Consultee: &nbsp;</span></strong><span style="font-size: 13px;">8,457 </span></p>
- <p><strong><span style="font-size: 13px;">Consultation page count: &nbsp;</span></strong><span style="font-size: 13px;">8,457 </span></p>
- <p><strong><span style="font-size: 13px;">Consultation Date:  &nbsp;</span></strong><span style="font-size: 13px;">8,457 </span></p>
-
+${consultPageFlag}
  <p><strong><span style="font-size: 13px;">Why is consultation necessary to decide access?</span></strong></p>
  <p>
     <span>
