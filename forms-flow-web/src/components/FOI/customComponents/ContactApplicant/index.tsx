@@ -306,19 +306,24 @@ export const ContactApplicant = ({
 
   const handleTemplateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setCurrentTemplate(+e.target.value)
-    const templateVariables = getTemplateVariables(requestDetails, requestExtensions, responsePackagePdfStitchStatus, cfrFeeData, templates[+e.target.value]);
-    const finalTemplate = applyVariables(templates[+e.target.value].text || "", templateVariables);
-    setEditorValue(finalTemplate)
+    
+    const callback = (templateVariables: any) => {
+      const finalTemplate = applyVariables(templates[+e.target.value].text || "", templateVariables);
+      setEditorValue(finalTemplate)
+    }
+    getTemplateVariables(requestDetails, requestExtensions, responsePackagePdfStitchStatus, cfrFeeData, templates[+e.target.value], callback);
   }
 
   //When templates are selected from list
   const handleTemplateSelection = (index: number) => {
     setCurrentTemplate(index);
-    const templateVariables = getTemplateVariables(requestDetails,requestExtensions, responsePackagePdfStitchStatus, cfrFeeData, templates[index]);
-    const finalTemplate = applyVariables(templates[index].text || "", templateVariables);
-    setEditorValue(finalTemplate);
-    changeCorrespondenceFilter("log");
     
+    const callback = (templateVariables: any) => {
+      const finalTemplate = applyVariables(templates[index].text || "", templateVariables);
+      setEditorValue(finalTemplate);
+      changeCorrespondenceFilter("log");
+    }
+    getTemplateVariables(requestDetails,requestExtensions, responsePackagePdfStitchStatus, cfrFeeData, templates[index], callback);
   }
 
   const removeFile = (index: number) => {

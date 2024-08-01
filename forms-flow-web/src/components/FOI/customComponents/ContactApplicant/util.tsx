@@ -1,6 +1,6 @@
 
 import { formatDateInPst, convertDate } from "../../../../helper/FOI/helper";
-import { any } from "prop-types";
+import { any, number } from "prop-types";
 import { fetchDocumentPage, fetchDocumentPageFlags } from "../../../../apiManager/services/FOI/foiRecordServices";
 
 export const renderTemplate = (template: string, content: string, params: Array<any>) => {
@@ -40,11 +40,9 @@ export const getExtensionType = (requestExtensions: any) => {
 
    // Get the type of the latest extension
   //const { extensiontype, extensionstatus } = requestExtensions[0];
-  console.log("호잉 : ",latestExtension)
 
   if (latestExtension.extensionstatus === "Approved" && latestExtension.extensiontype === "OIPC") {
     if (latestExtension.extensionreson === "OIPC - Applicant Consent") {
-      console.log("여기는?1> ", latestExtension.extensionreson)
       return "OIPCAPPLICANTCONSENTEXTENSION";
     }
     
@@ -52,7 +50,6 @@ export const getExtensionType = (requestExtensions: any) => {
     console.log("Returning PB");
     return "PB";
   } else if (latestExtension.extensionstatus === "Pending") {
-    console.log("여기는?3> ", latestExtension.extensionstatus)
     console.log("approvedOIPCExists : ",approvedOIPCExists)
     return approvedOIPCExists ? "OIPCSUBSEQUENTTIMEEXTENSION" : "OIPCFIRSTTIMEEXTENSION";
   }
@@ -63,7 +60,7 @@ export const getExtensionType = (requestExtensions: any) => {
   //   ? (extensiontype === "Public Body" ? "PB" : extensiontype === "OIPC" ? "OIPC" : "NA") : "NA";
 }
 
-export const getTemplateVariables = (requestDetails: any, requestExtensions:any, responsePackagePdfStitchStatus:any, cfrFeeData:any, templateInfo: any) => {
+export const getTemplateVariables = async (requestDetails: any, requestExtensions:any, responsePackagePdfStitchStatus:any, cfrFeeData:any, templateInfo: any, callback: any) => {
   let oipcExtension = getExtensiondetails(requestExtensions, "OIPC");
   let pbExtension =  getExtensiondetails(requestExtensions, "Public Body");
 
@@ -91,11 +88,10 @@ export const getTemplateVariables = (requestDetails: any, requestExtensions:any,
   //   }
   // })
 
-console.log("체크 oipcExtension[4]: ",oipcExtension[4])
 
   //test((dispatch: any) => {})   // nice shot
 
-  return [
+  callback([
     {name: "{{axisRequestId}}", value: requestDetails.axisRequestId},
     {name: "{{title}}", value: templateInfo?.label || ""},
     {name: "{{firstName}}", value: requestDetails.firstName},
@@ -132,10 +128,9 @@ console.log("체크 oipcExtension[4]: ",oipcExtension[4])
     {name: "{{fullFeePaidDate}}", value: getFullFeePaidDate(cfrFeeData)},
     {name: "{{feeWaiverDecisionDate}}", value: getFeeWaiverDecisionDate(cfrFeeData)},
     {name: "{{pbExtensionStatus}}", value: displayPBExtension(requestExtensions)},
-    {name: "{{oipcExtensionSection}}", value: displayOIPCExtensionSection(oipcExtension[4], requestDetails)},
+    {name: "{{oipcExtensionSection}}", value: await displayOIPCExtensionSection(oipcExtension[4], requestDetails)},
     {name: "{{oipcExtensionList}}", value: displayOIPCExtension(requestExtensions)},
-  ];
-  
+  ]);
 }
 
 export const isRequestInfoVisible = (templateInfo: any) => {
@@ -394,6 +389,8 @@ const fetchTotalPageCount = (ministryId : number) => {
         console.log("Total Page Count:", totalPageCount);
         
         resolve(totalPageCount || null);
+
+        console.log("Resolved ")
       } else {
         console.log("********************* error: ", err);
         reject(err);
@@ -481,7 +478,7 @@ const fetchConsultPageFlag =  (ministryId: number)=> {
 };
 
 
-const displayOIPCExtensionSection = (extensionId: number, requestDetails:any) => {
+const displayOIPCExtensionSection = async (extensionId: number, requestDetails: any) => {
   switch (mapSectionWithExtensionReasonId(extensionId)) {
     case "10(1)(a)":
       return `
@@ -501,12 +498,21 @@ const displayOIPCExtensionSection = (extensionId: number, requestDetails:any) =>
     //      console.error("Error:", error);
     //    }
     //  };
- 
-    let totalPageCount: number = 0;
-     fetchTotalPageCount(requestDetails.id).then((count: any) => {
-      totalPageCount = count;
-    });
 
+    let totalPageCount = await fetchTotalPageCount(requestDetails.id);
+
+    // fetchTotalPageCount(requestDetails.id).then((count: any) => {
+    //   console.log("count: ",count)
+    //   if(count!=null){
+    //     totalPageCount = count;
+    //   }
+    // });
+    // console.log("헬로")
+    // try {
+    //   totalPageCount = await fetchTotalPageCount(requestDetails.id);console.log("그래!!!!!!!! > ",totalPageCount)
+    // } catch (error) {
+    //     console.error("Error fetching total page count:", error);
+    // }
       return `
   <p><strong><span style="font-size: 13px;">10(1)(b) Volume of records </span></strong></p>
   <p style="text-align: center;"><span style="font-size: 13px; ">&nbsp;</span></p>
@@ -520,7 +526,7 @@ const displayOIPCExtensionSection = (extensionId: number, requestDetails:any) =>
   <p style="text-align: center;"><span style="font-size: 13px; ">&nbsp;</span></p>
   <p><strong><span style="font-size: 13px;">Current status</span></strong></p> 
   <p><span style="font-size: 13px;">Please describe the current status of processing this request and any other relevant information:<strong>&lt;insert some indication the analyst needs to populate this area&gt;</strong> </span></p>`;
-    
+
     case "10(1)(c)":
     console.log("여기는 consult!!!!!")
     //const consultPageFlag = await fetchConsultPageFlag(requestDetails.id);

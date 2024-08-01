@@ -54,16 +54,35 @@ export const PreviewModal = React.memo(({
       }
     });
   }, []);
+  
   requestDetails["ffaurl"] = FOI_FFA_URL;
+  /*
   const templateVariables = getTemplateVariables(requestDetails, requestExtensions, responsePackagePdfStitchStatus, cfrFeeData, templateInfo);
   const handleSend = () => {
     handleSave( applyVariables(innerhtml, templateVariables) );
   };
+  */
 
+  const handleSend = () => {
+    const callback = (templateVariables: any) => {
+      handleSave( applyVariables(innerhtml, templateVariables) );
+    };
+    getTemplateVariables(requestDetails, requestExtensions, responsePackagePdfStitchStatus, cfrFeeData, templateInfo, callback);
+  };
   
-
+  let _srcDoc: string = '';
+  const renderIframeSrcDoc = () => {
+    const callback = (templateVariables: any) => {
+      _srcDoc = renderTemplate(template, innerhtml, templateVariables)
+    };
+    getTemplateVariables(requestDetails, requestExtensions, responsePackagePdfStitchStatus, cfrFeeData, templateInfo, callback);
+  };
+  const getIframeSrcDoc = () => {
+    return _srcDoc;
+  }
+  renderIframeSrcDoc()
+  
   return (
-
     <div className="state-change-dialog">        
     <Dialog
       open={modalOpen}
@@ -82,7 +101,7 @@ export const PreviewModal = React.memo(({
       <DialogContent>
         <DialogContentText id="state-change-dialog-description" component={'span'}>
           <div className="preview-container">
-            <iframe srcDoc={ renderTemplate(template, innerhtml, templateVariables) } className="preview-frame" sandbox="allow-same-origin" />
+            <iframe srcDoc={ getIframeSrcDoc() } className="preview-frame" sandbox="allow-same-origin" />
           </div>
           <div className="preview-container">
             {attachments.map((file: any, index: number) => (

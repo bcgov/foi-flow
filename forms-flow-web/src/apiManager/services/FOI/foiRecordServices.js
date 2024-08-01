@@ -193,7 +193,7 @@ export const fetchRedactedSections = (ministryId, ...rest) => {
 
 export const fetchDocumentPage  = (ministryId, done) => {
   if (!ministryId) {
-    return (done, dispatch) => {};
+    return (dispatch) => {};
   }
   console.log("ministrY id : ",ministryId)
   let apiUrl = replaceUrl(
@@ -202,7 +202,6 @@ export const fetchDocumentPage  = (ministryId, done) => {
     ministryId
   );
   return (dispatch) => {
-    console.log("뭐냐고!!!!!!!!!!!")
     httpGETRequest(apiUrl, {}, UserService.getToken())
       .then((res) => {
         console.log("****************************");
