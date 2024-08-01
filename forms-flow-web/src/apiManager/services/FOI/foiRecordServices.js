@@ -222,13 +222,12 @@ export const fetchDocumentPage  = (ministryId, done) => {
   };
 };
 
-export const fetchDocumentPageFlags  = (ministryId, f) => {
+export const fetchDocumentPageFlags  = (ministryId, done) => {
   if (!ministryId) {
-    return () => {};
+    return (dispatch) => {};
   }
   console.log("fetchDocumentPageFlags ministr id : ",ministryId)
-  //const done = fnDone(rest);
-  const done  = f;
+  
   let apiUrl = replaceUrl(
     API.DOC_REVIEWER_REDACTED_PAGEFLAG_RECORDS,
     "<ministryrequestid>",
@@ -244,12 +243,12 @@ export const fetchDocumentPageFlags  = (ministryId, f) => {
           done(null, res.data);
         } else {
           console.log("Error in fetching redacted sections", res);
-          dispatch(serviceActionError(res));
+          serviceActionError(res)(dispatch);
         }
       })
       .catch((error) => {
         console.log("Error in fetching redacted section", error);
-        dispatch(serviceActionError(error));
+        serviceActionError(error)(dispatch);
         done(error);
       });
   };

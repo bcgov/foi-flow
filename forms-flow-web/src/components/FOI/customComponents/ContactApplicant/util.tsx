@@ -5,6 +5,7 @@ import { fetchDocumentPage, fetchDocumentPageFlags } from "../../../../apiManage
 
 export const renderTemplate = (template: string, content: string, params: Array<any>) => {
   let newTemplate = template.replace("{{content}}", content);
+  console.log("renderTemplate안에 newTemplate : ",newTemplate)
   return applyVariables(newTemplate, params);
 }
 
@@ -12,6 +13,7 @@ export const applyVariables = (content: string, params: Array<any>) => {
   let newContent = content;
   params.forEach((item) => {
     newContent = newContent.replaceAll(item.name, item.value);
+    console.log("applyVariables 안에 newContent>",newContent)
   });
 
   return newContent;
@@ -42,16 +44,12 @@ export const getExtensionType = (requestExtensions: any) => {
   //const { extensiontype, extensionstatus } = requestExtensions[0];
 
   if (latestExtension.extensionstatus === "Approved" && latestExtension.extensiontype === "OIPC") {
-    if (latestExtension.extensionreson === "OIPC - Applicant Consent") {
-      return "OIPCAPPLICANTCONSENTEXTENSION";
-    }
-    
-  } else if (latestExtension.extensionstatus === "Approved" && latestExtension.extensiontype === "Public Body") {
-    console.log("Returning PB");
-    return "PB";
-  } else if (latestExtension.extensionstatus === "Pending") {
+    return "OIPCAPPLICANTCONSENTEXTENSION";
+  } else if (latestExtension.extensionstatus === "Pending" && latestExtension.extensiontype === "OIPC") {
     console.log("approvedOIPCExists : ",approvedOIPCExists)
     return approvedOIPCExists ? "OIPCSUBSEQUENTTIMEEXTENSION" : "OIPCFIRSTTIMEEXTENSION";
+  } else if (latestExtension.extensionstatus === "Approved" && latestExtension.extensiontype === "Public Body") {
+    return "PB";
   }
 
   return "NA";
@@ -70,28 +68,8 @@ export const getTemplateVariables = async (requestDetails: any, requestExtension
   const checkFinalPackage = checkRecordReleased(responsePackagePdfStitchStatus)
 
   const [feeEstimateStatus, feeEstimateDate] = getFeeEstimateInfo(cfrFeeData);
-  // const fullFeePaidDate = getFullFeePaidDate(cfrFeeData);
 
-  // const feeWaiverDecisionDate = getFeeWaiverDecisionDate(cfrFeeData);
-  
-  // const redatedTotalPage = fetchDocumentPage(requestDetails.id, (_err : any, res : any) => {
-  //   if (!_err) {
-  //     console.log("********************* fetchRedactedPageFlags : ")
-  //     console.log(res)
-  //     // volume of records - total pagecount
-  //     const totalPageCount = res.data.reduce((sum : any, item : any) => sum + (item.pagecount || 0), 0);
-  //     console.log("Total Page Count:", totalPageCount);
-      
-  //     return totalPageCount || null;
-  //   } else {
-  //     console.log("********************* error: ", _err)
-  //   }
-  // })
-
-
-  //test((dispatch: any) => {})   // nice shot
-
-  callback([
+  const data = [
     {name: "{{axisRequestId}}", value: requestDetails.axisRequestId},
     {name: "{{title}}", value: templateInfo?.label || ""},
     {name: "{{firstName}}", value: requestDetails.firstName},
@@ -130,7 +108,15 @@ export const getTemplateVariables = async (requestDetails: any, requestExtension
     {name: "{{pbExtensionStatus}}", value: displayPBExtension(requestExtensions)},
     {name: "{{oipcExtensionSection}}", value: await displayOIPCExtensionSection(oipcExtension[4], requestDetails)},
     {name: "{{oipcExtensionList}}", value: displayOIPCExtension(requestExtensions)},
-  ]);
+    {name: "{{oipcApplicantConsentSection}}", value: displayApplicantConsentSection(requestExtensions, requestDetails)},
+  ]
+
+  if (callback != null) {
+    callback(data);
+    return;
+  }
+
+  return data;
 }
 
 export const isRequestInfoVisible = (templateInfo: any) => {
@@ -310,7 +296,6 @@ const getFeeWaiverDecisionDate = (data: any[]): string => {
 };
 
 const displayPBExtension = (requestExtensions:any): string => {
-  console.log("requestExtensions!!!!!!!!! : ",requestExtensions)
   if (requestExtensions && requestExtensions.length > 0) {
     // Filter out only Public Body extensions that are approved
     const pbExtensions = requestExtensions.filter((ext: any) => 
@@ -374,6 +359,71 @@ const displayOIPCExtension = (requestExtensions:any): string => {
   return ''
 };
 
+const displayApplicantConsentSection = (requestExtensions:any, requestDetails:any): string => {
+  if (requestExtensions && requestExtensions.length > 0) {
+    // Filter out only OIPC extensions that are approved
+    const oipcExtensions = requestExtensions.filter((ext: any) => 
+      ext.extensiontype === "OIPC" && ext.extensionstatus === "Approved"
+    );
+
+    // Check if there are any OIPC Extensions
+    if (oipcExtensions.length > 0) {
+      const recentOIPCExtension = oipcExtensions[0]; // Assuming the list is sorted by date with the most recent first
+      console.log("Most recent OIPC Extension:", recentOIPCExtension);
+      
+      // Extract variables for the HTML template
+      const { extensionreson } = recentOIPCExtension;
+    
+      // Build the HTML template based on the extension reason
+
+      if (extensionreson === "OIPC - Applicant Consent") {
+        return `
+          <p><span style='font-size:13px;font-family:"BC Sans";'>You have the right to ask the Information and Privacy Commissioner to review this decision. &nbsp;I have enclosed information on the review and complaint process.</span></p>
+          <p style="margin:0cm;"><span style='font-size:13px;font-family:"BC Sans";'>&nbsp;</span><span style='font-size:13px;font-family:"BC Sans";'>&nbsp;</span></p>
+          <p><span style='font-size:13px;font-family:"BC Sans";'>Sincerely,</span></p>
+          <p style="text-align: center;"><span style="font-size: 13px; ">&nbsp;</span></p>
+          <p style="text-align: center;"><span style="font-size: 13px; ">&nbsp;</span></p>
+          <p><span style='font-size:13px;font-family:"BC Sans";'></span><span style='font-size:13px;font-family:"BC Sans";'>${requestDetails.firstName}&nbsp;${requestDetails.lastName},&nbsp;</span><span style='font-size:13px;font-family:"BC Sans";'>IAO Position Title</span><span style="font-size:11px;">&nbsp;</span></p>
+          <p><span style='font-size:13px;font-family:"BC Sans";'>Information Access Operations</span></p>
+          <p><span style='font-size:13px;font-family:"BC Sans";'>&nbsp;</span></p>
+          <p><span style='font-size:13px;font-family:"BC Sans";'>Enclosure</span></p><strong><span style='font-size:13px;font-family:"BC Sans";'><br>&nbsp;</span></strong>
+          <p><strong><span style='font-size:13px;font-family:"BC Sans";'>&nbsp;</span></strong></p>
+          <p style="text-align: center;"><span style="font-size: 13px; "><strong>How to Request a Review with the Office of the Information and Privacy Commissioner </strong></span></p>
+          <p><span style='font-size:13px;font-family:"BC Sans";'>&nbsp;</span></p>
+          <p><span style='font-size:13px;font-family:"BC Sans";text-align: center;'>If you have any questions regarding your request please contact the analyst assigned to your file. The analyst’s name and telephone number are listed in the attached letter. </span></p>
+          <p><span style='font-size:13px;font-family:"BC Sans";'>&nbsp;</span></p>
+          <p><span style='font-size:13px;font-family:"BC Sans";text-align: center;'>Pursuant to section 52 of the Freedom of Information and Protection of Privacy Act (FOIPPA), you may ask the Office of the Information and Privacy Commissioner to review any decision, act, or failure to act with regard to your request under FOIPPA.</span></p>
+          <p><span style='font-size:13px;font-family:"BC Sans";'>&nbsp;</span></p>
+          <p><span style='font-size:13px;font-family:"BC Sans";text-align: center;'><strong>Please note that you have 30 business days to file your review with the Office of the Information and Privacy Commissioner. In order to request a review please write to: </strong></span></p>
+          <p><span style='font-size:13px;font-family:"BC Sans";'>&nbsp;</span></p>
+          <p style="text-align: center;"><span style='font-size:13px;font-family:"BC Sans";'>Information and Privacy Commissioner</span></p>
+          <p style="text-align: center;"><span style='font-size:13px;font-family:"BC Sans";'>PO Box 9038 Stn Prov Govt</span></p>
+          <p style="text-align: center;"><span style='font-size:13px;font-family:"BC Sans";'>Victoria BC  V8W 9A4 </span></p>
+          <p style="text-align: center;"><span style='font-size:13px;font-family:"BC Sans";'>Telephone 250 387-5629	Fax 250 387-1696</span></p>
+          <p><span style='font-size:13px;font-family:"BC Sans";'>&nbsp;</span></p>
+          <p><span style='font-size:13px;font-family:"BC Sans";'>If you request a review, please provide the Commissioner's Office with: </span></p>
+          <p><span style='font-size:13px;font-family:"BC Sans";'>&nbsp;</span></p>
+          <p><span style='font-size:13px;font-family:"BC Sans";'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1. A copy of your original request; </span></p>
+          <p><span style='font-size:13px;font-family:"BC Sans";'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2. A copy of our response; and </span></p>
+          <p><span style='font-size:13px;font-family:"BC Sans";'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3. The reasons or grounds upon which you are requesting the review. </span></p>
+        `;
+      } else {
+        return `
+          <p><span style='font-size:13px;font-family:"BC Sans";'>Sincerely,</span></p>
+          <p style="text-align: center;"><span style="font-size: 13px; ">&nbsp;</span></p>
+          <p style="text-align: center;"><span style="font-size: 13px; ">&nbsp;</span></p>
+          <p><span style='font-size:13px;font-family:"BC Sans";'></span><span style='font-size:13px;font-family:"BC Sans";'>${requestDetails.firstName}&nbsp;${requestDetails.lastName},&nbsp;</span><span style='font-size:13px;font-family:"BC Sans";'>IAO Position Title</span><span style="font-size:11px;">&nbsp;</span></p>
+          <p><span style='font-size:13px;font-family:"BC Sans";'>Information Access Operations</span></p>
+          <p><span style='font-size:13px;font-family:"BC Sans";'>&nbsp;</span></p>
+          <p><span style='font-size:13px;font-family:"BC Sans";'>Enclosure</span></p><strong><span style='font-size:13px;font-family:"BC Sans";'><br>&nbsp;</span></strong>
+        `;
+      }
+    }
+  }
+  // If no OIPC Extension is found, return the "No" template
+  return ``;
+};
+
 
 const fetchTotalPageCount = (ministryId : number) => {
   const dispatch = () => {};
@@ -399,172 +449,89 @@ const fetchTotalPageCount = (ministryId : number) => {
   });
 };
 
-
-// const fetchConsultPageFlag = (ministryId: number): Promise<string> => {
-//   return new Promise((resolve, reject) => {
-//     fetchDocumentPageFlags(ministryId, (err: any, res: any) => {
-//       if (!err) {
-//         console.log("********************* fetchRedactedPageFlags : ");
-//         console.log(res.data);
-
-//         // Generate JSX string from the result
-//         const jsxString = res.data.map((item: any) => `
-//             <p>strong><span style="font-size: 13px;">Consultee: &nbsp;</span></strong><span style="font-size: 13px;">${item.consultation_name}</span></p>
-//             <p><strong><span style="font-size: 13px;">Consultation page count: &nbsp;</span></strong><span style="font-size: 13px;">${item.consultation_page_count}</span></p>
-//             <p><strong><span style="font-size: 13px;">Consultation Date: &nbsp;</span></strong><span style="font-size: 13px;">${item.consultation_date}</span></p>
-//         `).join('');
-//         console.log("헤헤: ",jsxString)
-
-//         resolve(jsxString);
-//       } else {
-//         console.log("********************* error: ", err);
-//         reject(err);
-//       }
-//     });
-//   });
-// };
-const fetchConsultPageFlag =  (ministryId: number)=> {
+const fetchConsultPageFlag = (ministryId : number) : Promise<any> => {
   const dispatch = () => {};
-  try {
-    // const res = new Promise<any>((resolve, reject) => {
-    //   fetchDocumentPageFlags(ministryId, (err: any, res: any) => {
-    //     if (!err) {
-    //       resolve(res);
-    //     } else {
-    //       reject(err);
-    //     }
-    //   })(() => {});
-    // });
 
-    // console.log("********************* fetchRedactedPageFlags : ");
-    // console.log(res.data);
-
-    return new Promise((resolve, reject) => {
-      fetchDocumentPageFlags(ministryId, (err : any, res : any) => {
-        if (!err) {
-          console.log("********************* fetchRedactedPageFlags : ");
-          console.log(res);
-          
-          const jsxString = res.data.map((item: any) => `
-      <p><strong><span style="font-size: 13px;">Consultee: &nbsp;</span></strong><span style="font-size: 13px;">${item.consultation_name}</span></p>
-      <p><strong><span style="font-size: 13px;">Consultation page count: &nbsp;</span></strong><span style="font-size: 13px;">${item.consultation_page_count}</span></p>
-      <p><strong><span style="font-size: 13px;">Consultation Date: &nbsp;</span></strong><span style="font-size: 13px;">${item.consultation_date}</span></p>
-    `).join('');
-    console.log("헤헤: ", jsxString);
-
-
-
-          resolve(jsxString || null);
-        } else {
-          console.log("********************* error: ", err);
-          reject(err);
-        }
-      })(dispatch);
-    });
-
-    // Generate JSX string from the result
-    // const jsxString = res.data.map((item: any) => `
-    //   <p><strong><span style="font-size: 13px;">Consultee: &nbsp;</span></strong><span style="font-size: 13px;">${item.consultation_name}</span></p>
-    //   <p><strong><span style="font-size: 13px;">Consultation page count: &nbsp;</span></strong><span style="font-size: 13px;">${item.consultation_page_count}</span></p>
-    //   <p><strong><span style="font-size: 13px;">Consultation Date: &nbsp;</span></strong><span style="font-size: 13px;">${item.consultation_date}</span></p>
-    // `).join('');
-    // console.log("헤헤: ", jsxString);
-
-    // return jsxString;
-  } catch (err:any) {
-    console.log("********************* error: ", err);
-    throw new Error(err.message || "Error fetching consultation page flag.");
-  }
+  return new Promise((resolve, reject) => {
+    fetchDocumentPageFlags(ministryId, (err : any, res : any) => {
+      if (!err) {
+        console.log("********************* fetchDocumentPageFlags : ");
+        console.log(res.data);
+        resolve(res.data || null);
+      } else {
+        console.log("********************* error: ", err);
+        reject(err);
+      }
+    })(dispatch);
+  });
 };
-
 
 const displayOIPCExtensionSection = async (extensionId: number, requestDetails: any) => {
   switch (mapSectionWithExtensionReasonId(extensionId)) {
+    
     case "10(1)(a)":
-      return `
-<p><strong><span style="font-size: 13px;">10(1)(a) Insufficient detail</span></strong></p>
-<p><span style="font-size: 13px;">A copy of the original request is included. It does not provide sufficient detail to proceed with the request. <strong>&lt;insert some indication the analyst needs to populate this area&gt;</strong> Satisfactory clarification from the applicant was not obtained within 60 business days (or 30 business days if the public body’s time extension was not taken): &nbsp;<strong>&lt;insert some indication the analyst needs to populate this area&gt;</strong> </span></p>
+    
+    return `
+    <p><strong><span style="font-size: 13px;">10(1)(a) Insufficient detail</span></strong></p>
+    <p><span style="font-size: 13px;">A copy of the original request is included. It does not provide sufficient detail to proceed with the request. <strong>&lt;insert some indication the analyst needs to populate this area&gt;</strong> Satisfactory clarification from the applicant was not obtained within 60 business days (or 30 business days if the public body’s time extension was not taken): &nbsp;<strong>&lt;insert some indication the analyst needs to populate this area&gt;</strong> </span></p>
 `;
     case "10(1)(b)":
 
-    //  const getTotalPageCount = async (ministryId: number) => {
-    //    try {
-    // console.log("여기 안들어오나? requestDetails.id:", requestDetails.id)    
-    // const totalPageCount = await fetchTotalPageCount(requestDetails.id);
-
-    //      return totalPageCount
-    //      // Do something with totalPageCount
-    //    } catch (error) {
-    //      console.error("Error:", error);
-    //    }
-    //  };
-
     let totalPageCount = await fetchTotalPageCount(requestDetails.id);
-
-    // fetchTotalPageCount(requestDetails.id).then((count: any) => {
-    //   console.log("count: ",count)
-    //   if(count!=null){
-    //     totalPageCount = count;
-    //   }
-    // });
-    // console.log("헬로")
-    // try {
-    //   totalPageCount = await fetchTotalPageCount(requestDetails.id);console.log("그래!!!!!!!! > ",totalPageCount)
-    // } catch (error) {
-    //     console.error("Error fetching total page count:", error);
-    // }
-      return `
-  <p><strong><span style="font-size: 13px;">10(1)(b) Volume of records </span></strong></p>
-  <p style="text-align: center;"><span style="font-size: 13px; ">&nbsp;</span></p>
-  <p><strong><span style="font-size: 13px;">Approximate page count:&nbsp;</span></strong><span style="font-size: 13px;">${totalPageCount}</span></p>
-  <p><strong><span style="font-size: 13px;">Number of pages searched:&nbsp;</span></strong><span style="font-size: 13px;"> </span></p>
-  <p><strong><span style="font-size: 13px;">Number of program areas searched: &nbsp;</span></strong><span style="font-size: 13px;"> </span></p>
-  <p><strong><span style="font-size: 13px;">Total search time:&nbsp;</span></strong><span style="font-size: 13px;"> </span></p>
-  <p style="text-align: center;"><span style="font-size: 13px; ">&nbsp;</span></p>
-  <p><strong><span style="font-size: 13px;">UNREASONABLE INTERFERENCE WITH THE OPERATIONS OF THE PUBLIC BODY</span></strong></p>
-  <p><span style="font-size: 13px;">Meeting the current legislated due date would unreasonably interfere with the public body's operations. <strong>&lt;insert some indication the analyst needs to populate this area&gt;</strong> </span></p>
-  <p style="text-align: center;"><span style="font-size: 13px; ">&nbsp;</span></p>
-  <p><strong><span style="font-size: 13px;">Current status</span></strong></p> 
-  <p><span style="font-size: 13px;">Please describe the current status of processing this request and any other relevant information:<strong>&lt;insert some indication the analyst needs to populate this area&gt;</strong> </span></p>`;
+    
+    return `
+    <p><strong><span style="font-size: 13px;">10(1)(b) Volume of records </span></strong></p>
+    <p style="text-align: center;"><span style="font-size: 13px; ">&nbsp;</span></p>
+    <p><strong><span style="font-size: 13px;">Approximate page count:&nbsp;</span></strong><span style="font-size: 13px;">${totalPageCount}</span></p>
+    <p><strong><span style="font-size: 13px;">Number of pages searched:&nbsp;</span></strong><span style="font-size: 13px;"> </span></p>
+    <p><strong><span style="font-size: 13px;">Number of program areas searched: &nbsp;</span></strong><span style="font-size: 13px;"> </span></p>
+    <p><strong><span style="font-size: 13px;">Total search time:&nbsp;</span></strong><span style="font-size: 13px;"> </span></p>
+    <p style="text-align: center;"><span style="font-size: 13px; ">&nbsp;</span></p>
+    <p><strong><span style="font-size: 13px;">UNREASONABLE INTERFERENCE WITH THE OPERATIONS OF THE PUBLIC BODY</span></strong></p>
+    <p><span style="font-size: 13px;">Meeting the current legislated due date would unreasonably interfere with the public body's operations. <strong>&lt;insert some indication the analyst needs to populate this area&gt;</strong> </span></p>
+    <p style="text-align: center;"><span style="font-size: 13px; ">&nbsp;</span></p>
+    <p><strong><span style="font-size: 13px;">Current status</span></strong></p> 
+    <p><span style="font-size: 13px;">Please describe the current status of processing this request and any other relevant information:<strong>&lt;insert some indication the analyst needs to populate this area&gt;</strong> </span></p>`;
 
     case "10(1)(c)":
-    console.log("여기는 consult!!!!!")
-    //const consultPageFlag = await fetchConsultPageFlag(requestDetails.id);
-    // const getConsultPageFlag = async (ministryId: number): Promise<string> => {
-    //   try {
-        const consultPageFlag = fetchConsultPageFlag(requestDetails.id);
-    //     return consultPageFlag;
-    //   } catch (error:any) {
-    //     console.error("Error:", error.message);
-    //     return "Error fetching consultation page flag.";
-    //   }
-    // };
+
+    const consultPageFlag = await fetchConsultPageFlag(requestDetails.id);
+    console.log("consultPageFlag : ",consultPageFlag)
+
+    const htmlConsultContent = consultPageFlag && Array.isArray(consultPageFlag)
+      ? consultPageFlag.map((item: any) => `
+        <p><strong><span style="font-size: 13px;">Consultee: &nbsp;</span></strong><span style="font-size: 13px;">${item.consultation_name}</span></p>
+        <p><strong><span style="font-size: 13px;">Consultation page count: &nbsp;</span></strong><span style="font-size: 13px;">${item.consultation_page_count}</span></p>
+        <p><strong><span style="font-size: 13px;">Consultation Date: &nbsp;</span></strong><span style="font-size: 13px;">${convertDate(item.consultation_date)}</span></p><p><span>&nbsp;</span></p>
+      `).join('')
+      : "";
+
       return `
-<p><strong><span style="font-size: 13px;">10(1)(c) Time for consultation</span></strong></p>
-<p style="text-align: center;"><span style="font-size: 13px; ">&nbsp;</span></p>
-${consultPageFlag}
- <p><strong><span style="font-size: 13px;">Why is consultation necessary to decide access?</span></strong></p>
- <p>
-    <span>
-    <strong>&lt;insert some indication the analyst needs to populate this area&gt;</strong> 
-    </span>
- </p>
- <p><strong><span style="font-size: 13px;">What is the third party or public body’s interest in the record?</span></strong></p>
- <p>
-    <span>
-    <strong>&lt;insert some indication the analyst needs to populate this area&gt;</strong> 
-    </span>
- </p>
- <p><strong><span style="font-size: 13px;">Current status of the consultation, including efforts made to obtain a response to the consultation and expected return date:</span></strong></p>
- <p>
-    <span>
-    <strong>&lt;insert some indication the analyst needs to populate this area&gt;</strong> 
-    </span>
- </p>
- <p><span style="font-size: 13px;">10(2)(b)</span></p>
- <p><strong><span style="font-size: 13px;">Explain why it would be fair and reasonable for the Commissioner to grant a time extension. Include a chronology of the processing of the request and an explanation for any delays: </span></strong></p>
- <p><strong><span style="font-size: 13px;">&lt;insert some indication the analyst needs to populate this area&gt;</span></strong></p>
-`;
+      <p><strong><span style="font-size: 13px;">10(1)(c) Time for consultation</span></strong></p>
+      <p style="text-align: center;"><span style="font-size: 13px; ">&nbsp;</span></p>
+      ${htmlConsultContent}
+      <p><strong><span style="font-size: 13px;">Why is consultation necessary to decide access?</span></strong></p>
+      <p>
+          <span>
+          <strong>&lt;insert some indication the analyst needs to populate this area&gt;</strong> 
+          </span>
+      </p><p><span>&nbsp;</span></p>
+      <p><strong><span style="font-size: 13px;">What is the third party or public body’s interest in the record?</span></strong></p>
+      <p>
+          <span>
+          <strong>&lt;insert some indication the analyst needs to populate this area&gt;</strong> 
+          </span>
+      </p><p><span>&nbsp;</span></p>
+      <p><strong><span style="font-size: 13px;">Current status of the consultation, including efforts made to obtain a response to the consultation and expected return date:</span></strong></p>
+      <p>
+          <span>
+          <strong>&lt;insert some indication the analyst needs to populate this area&gt;</strong> 
+          </span>
+      </p><p><span>&nbsp;</span></p>
+      <p><span style="font-size: 13px;">10(2)(b)</span></p>
+      <p><strong><span style="font-size: 13px;">Explain why it would be fair and reasonable for the Commissioner to grant a time extension. Include a chronology of the processing of the request and an explanation for any delays: </span></strong></p>
+      <p><strong><span style="font-size: 13px;">&lt;insert some indication the analyst needs to populate this area&gt;</span></strong></p>
+      `;
 
     default:
       return "";

@@ -63,24 +63,47 @@ export const PreviewModal = React.memo(({
   };
   */
 
+  /*
   const handleSend = () => {
     const callback = (templateVariables: any) => {
       handleSave( applyVariables(innerhtml, templateVariables) );
     };
     getTemplateVariables(requestDetails, requestExtensions, responsePackagePdfStitchStatus, cfrFeeData, templateInfo, callback);
   };
-  
-  let _srcDoc: string = '';
-  const renderIframeSrcDoc = () => {
-    const callback = (templateVariables: any) => {
-      _srcDoc = renderTemplate(template, innerhtml, templateVariables)
-    };
-    getTemplateVariables(requestDetails, requestExtensions, responsePackagePdfStitchStatus, cfrFeeData, templateInfo, callback);
-  };
-  const getIframeSrcDoc = () => {
-    return _srcDoc;
+  */
+
+  // let templateVariables: any[] = []
+  // getTemplateVariables(requestDetails, requestExtensions, responsePackagePdfStitchStatus, cfrFeeData, templateInfo, null).then((value: any) => {
+  //   templateVariables = value;
+  // });
+  // const handleSend = () => {
+  //   handleSave( applyVariables(innerhtml, templateVariables) );
+  // };
+
+  // templateVariables를 비동기적으로 가져오는 함수
+const fetchTemplateVariables = async (): Promise<any[]> => {
+  try {
+    const result = await getTemplateVariables(
+      requestDetails,
+      requestExtensions,
+      responsePackagePdfStitchStatus,
+      cfrFeeData,
+      templateInfo,
+      null
+    );
+    return result || []; // result가 undefined일 경우 빈 배열로 반환
+  } catch (error) {
+    console.error("Error fetching template variables:", error);
+    return []; // 에러 발생 시 빈 배열 반환
   }
-  renderIframeSrcDoc()
+};
+
+// handleSend 함수에서 templateVariables를 비동기적으로 가져오기
+let templateVariables: any[] = []
+const handleSend = async () => {
+  templateVariables = await fetchTemplateVariables();
+  await handleSave(applyVariables(innerhtml, templateVariables));
+};
   
   return (
     <div className="state-change-dialog">        
@@ -101,7 +124,7 @@ export const PreviewModal = React.memo(({
       <DialogContent>
         <DialogContentText id="state-change-dialog-description" component={'span'}>
           <div className="preview-container">
-            <iframe srcDoc={ getIframeSrcDoc() } className="preview-frame" sandbox="allow-same-origin" />
+            <iframe srcDoc={ renderTemplate(template, innerhtml, templateVariables) } className="preview-frame" sandbox="allow-same-origin" />
           </div>
           <div className="preview-container">
             {attachments.map((file: any, index: number) => (
