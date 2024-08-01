@@ -192,6 +192,7 @@ services:
         - FOI_FFA_URL=${FOI_FFA_URL}
         - REACT_APP_FOI_RECORD_FORMATS=${FOI_RECORD_FORMATS}
         - REACT_APP_RECORD_PROCESSING_HRS=${RECORD_PROCESSING_HRS}
+        - REACT_APP_SESSION_SECURITY_KEY=${REACT_APP_SESSION_SECURITY_KEY}
     volumes:
       - ".:/app"
       - "/app/node_modules"
