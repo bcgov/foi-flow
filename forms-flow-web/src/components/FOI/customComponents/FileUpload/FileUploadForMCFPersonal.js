@@ -266,8 +266,8 @@ const FileUploadForMCFPersonal = ({
     },[person, fileType])
 
     React.useEffect(() => {
-      setAdditionalTagList(searchSections(otherTagList, searchValue, tagValue));
-    },[searchValue, otherTagList, tagValue])
+      setAdditionalTagList(searchSections(otherTagList, searchValue, personalTag));
+    },[searchValue, otherTagList, personalTag])
 
     const handleTrackingIDUpdate = (e) => {
       handleTrackingIDChange(e.target.value);
@@ -707,12 +707,12 @@ const FileUploadForMCFPersonal = ({
             value=""
             multiple={multipleFiles}
             accept={mimeTypes}
-            disabled={modalFor === "add" && !isPersonSelected}
+            disabled={modalFor === "add" && (!isPersonSelected || ((isMinistryCoordinator && tagValue == "")))}
             />
           </div>
           <div className="file-upload-column file-upload-column-3">
             {(Object.entries(files).length === 0 && !multipleFiles) || multipleFiles ?
-            <button className="btn-add-files" type="button" onClick={handleUploadBtnClick} disabled={modalFor === "add" && !isPersonSelected}>              
+            <button className="btn-add-files" type="button" onClick={handleUploadBtnClick} disabled={modalFor === "add" && (!isPersonSelected || ((isMinistryCoordinator && tagValue == "")))}>
                   Add Files
             </button>  : null}
           </div>
