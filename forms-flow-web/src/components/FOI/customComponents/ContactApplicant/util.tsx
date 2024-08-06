@@ -13,7 +13,6 @@ export const applyVariables = (content: string, params: Array<any>) => {
   let newContent = content;
   params.forEach((item) => {
     newContent = newContent.replaceAll(item.name, item.value);
-    console.log("applyVariables 안에 newContent>", newContent)
   });
 
   return newContent;
@@ -21,12 +20,10 @@ export const applyVariables = (content: string, params: Array<any>) => {
 
 export const getExtensiondetails = (requestExtensions:any, type: string) => {
     if (requestExtensions && requestExtensions.length >0) {
-      console.log("있나? ",requestExtensions)
       let recentExtension = requestExtensions[0];
       if (recentExtension["extensiontype"] === "Public Body"  && recentExtension["extensionstatus"] == "Approved") {
         return [recentExtension["extendedduedays"], recentExtension["extendedduedate"], recentExtension["extensionreson"]]
       } else if (recentExtension["extensiontype"] === "OIPC") {
-        console.log("헤헤")
         return [recentExtension["approvednoofdays"], recentExtension["extendedduedate"], recentExtension["extensionreson"], recentExtension["created_at"], recentExtension["extensionreasonid"], recentExtension["decisiondate"], recentExtension["extendedduedays"]
       ]
       }
@@ -63,7 +60,6 @@ export const getExtensionType = (requestExtensions: any) => {
 export const getTemplateVariables = (requestDetails: any, requestExtensions: any, responsePackagePdfStitchStatus: any, cfrFeeData: any, templateInfo: any) => {
   let oipcExtension = getExtensiondetails(requestExtensions, "OIPC");
   let pbExtension =  getExtensiondetails(requestExtensions, "Public Body");
-  console.log("oipcExtension[0] : ",oipcExtension)
 
   // Find the record that matches the criteria for already taken a time extension under section 10(1), excluding the most recent record
   const filteredOutLatestExtensions = findLatestMatchingTimeExtension(requestExtensions, reasonsToCheck);
@@ -160,21 +156,6 @@ const getMappedValue = (property: string, propertykey: string) => {
   }
   return "";
 }
-// Function to map extension reason id to its textual representation
-// const mapSectionWithExtensionReasonId = (extensionReasonId: number) => {
-//   switch (extensionReasonId) {
-//       case 6:
-//           return "10(1)(d)"; // 10(1)(d) = Applicant Consent
-//       case 7:
-//           return "10(1)(c)"; // 10(1)(c) = Consultation
-//       case 8:
-//           return "10(1)(a)"; // 10(1)(a) = Further detail from applicant required
-//       case 9:
-//           return "10(1)(b)"; // 10(1)(b) = Large Volume and/or Volume of Search
-//       default:
-//           return "";
-//   }
-// };
 
 // Function to map extension reason id to its textual representation (PB and OIPC combined)
 const mapSectionWithExtensionReasonId = (extensionReasonId: number) => {
@@ -436,18 +417,12 @@ const fetchTotalPageCount = (ministryId : number) => {
   return new Promise((resolve, reject) => {
     fetchDocumentPage(ministryId, (err : any, res : any) => {
       if (!err) {
-        console.log("********************* fetchRedactedPageFlags : ");
-        console.log(res);
-        
         // Sum the page counts
         const totalPageCount = res.data.reduce((sum : any, item : any) => sum + (item.pagecount || 0), 0);
-        console.log("Total Page Count:", totalPageCount);
         
         resolve(totalPageCount || null);
 
-        console.log("Resolved ")
       } else {
-        console.log("********************* error: ", err);
         reject(err);
       }
     })(dispatch);
@@ -460,11 +435,9 @@ const fetchConsultPageFlag = (ministryId : number) : Promise<any> => {
   return new Promise((resolve, reject) => {
     fetchDocumentPageFlags(ministryId, (err : any, res : any) => {
       if (!err) {
-        console.log("********************* fetchDocumentPageFlags : ");
         console.log(res.data);
         resolve(res.data || null);
       } else {
-        console.log("********************* error: ", err);
         reject(err);
       }
     })(dispatch);

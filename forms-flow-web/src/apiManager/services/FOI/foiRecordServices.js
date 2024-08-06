@@ -204,9 +204,6 @@ export const fetchDocumentPage  = (ministryId, done) => {
   return (dispatch) => {
     httpGETRequest(apiUrl, {}, UserService.getToken())
       .then((res) => {
-        console.log("****************************");
-        console.log(res);
-        console.log("****************************");
         if (res.data) {
           done(null, res.data);
         } else {
@@ -226,8 +223,7 @@ export const fetchDocumentPageFlags  = (ministryId, done) => {
   if (!ministryId) {
     return (dispatch) => {};
   }
-  console.log("fetchDocumentPageFlags ministr id : ",ministryId)
-  
+
   let apiUrl = replaceUrl(
     API.DOC_REVIEWER_REDACTED_PAGEFLAG_RECORDS,
     "<ministryrequestid>",
@@ -236,9 +232,6 @@ export const fetchDocumentPageFlags  = (ministryId, done) => {
   return (dispatch) => {
     httpGETRequest(apiUrl, {}, UserService.getToken())
       .then((res) => {
-        console.log("****************************");
-        console.log(res);
-        console.log("****************************");
         if (res.data) {
           done(null, res.data);
         } else {

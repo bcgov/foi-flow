@@ -183,15 +183,12 @@ export const ContactApplicant = ({
       return getExtensionType(requestExtensions) === "PB";
    } else if (['OIPCAPPLICANTCONSENTEXTENSION'].includes(item.name)) {
     const check=getExtensionType(requestExtensions) === "OIPCAPPLICANTCONSENTEXTENSION"
-    console.log("헤이1: ",check)
       return check;
    } else if(['OIPCFIRSTTIMEEXTENSION'].includes(item.name)){
     const check2 = getExtensionType(requestExtensions) === "OIPCFIRSTTIMEEXTENSION"
-    console.log("헤이2: ",check2)
       return check2;
    } else if(['OIPCSUBSEQUENTTIMEEXTENSION'].includes(item.name)){
     const check3 = getExtensionType(requestExtensions) === "OIPCSUBSEQUENTTIMEEXTENSION"
-    console.log("헤이3: ",check3)
       return check3;
    }
   }
