@@ -1,6 +1,6 @@
 
 import { formatDateInPst, convertDate } from "../../../../helper/FOI/helper";
-import { any, number } from "prop-types";
+import { any, instanceOf, number } from "prop-types";
 import { fetchDocumentPage, fetchDocumentPageFlags } from "../../../../apiManager/services/FOI/foiRecordServices";
 
 export const renderTemplate = (template: string, content: string, params: Array<any>) => {
@@ -13,7 +13,7 @@ export const applyVariables = (content: string, params: Array<any>) => {
   let newContent = content;
   params.forEach((item) => {
     newContent = newContent.replaceAll(item.name, item.value);
-    console.log("applyVariables 안에 newContent>",newContent)
+    console.log("applyVariables 안에 newContent>", newContent)
   });
 
   return newContent;
@@ -21,15 +21,17 @@ export const applyVariables = (content: string, params: Array<any>) => {
 
 export const getExtensiondetails = (requestExtensions:any, type: string) => {
     if (requestExtensions && requestExtensions.length >0) {
+      console.log("있나? ",requestExtensions)
       let recentExtension = requestExtensions[0];
       if (recentExtension["extensiontype"] === "Public Body"  && recentExtension["extensionstatus"] == "Approved") {
         return [recentExtension["extendedduedays"], recentExtension["extendedduedate"], recentExtension["extensionreson"]]
       } else if (recentExtension["extensiontype"] === "OIPC") {
-        return [recentExtension["approvednoofdays"], recentExtension["extendedduedate"], recentExtension["extensionreson"], recentExtension["created_at"], recentExtension["extensionreasonid"], recentExtension["decisiondate"]
+        console.log("헤헤")
+        return [recentExtension["approvednoofdays"], recentExtension["extendedduedate"], recentExtension["extensionreson"], recentExtension["created_at"], recentExtension["extensionreasonid"], recentExtension["decisiondate"], recentExtension["extendedduedays"]
       ]
       }
     }    
-    return ["","","","","",""]
+    return ["","","","","","",""]
 }
 
 export const getExtensionType = (requestExtensions: any) => {
@@ -58,9 +60,10 @@ export const getExtensionType = (requestExtensions: any) => {
   //   ? (extensiontype === "Public Body" ? "PB" : extensiontype === "OIPC" ? "OIPC" : "NA") : "NA";
 }
 
-export const getTemplateVariables = async (requestDetails: any, requestExtensions:any, responsePackagePdfStitchStatus:any, cfrFeeData:any, templateInfo: any, callback: any) => {
+export const getTemplateVariables = (requestDetails: any, requestExtensions: any, responsePackagePdfStitchStatus: any, cfrFeeData: any, templateInfo: any) => {
   let oipcExtension = getExtensiondetails(requestExtensions, "OIPC");
   let pbExtension =  getExtensiondetails(requestExtensions, "Public Body");
+  console.log("oipcExtension[0] : ",oipcExtension)
 
   // Find the record that matches the criteria for already taken a time extension under section 10(1), excluding the most recent record
   const filteredOutLatestExtensions = findLatestMatchingTimeExtension(requestExtensions, reasonsToCheck);
@@ -69,7 +72,7 @@ export const getTemplateVariables = async (requestDetails: any, requestExtension
 
   const [feeEstimateStatus, feeEstimateDate] = getFeeEstimateInfo(cfrFeeData);
 
-  const data = [
+  return [
     {name: "{{axisRequestId}}", value: requestDetails.axisRequestId},
     {name: "{{title}}", value: templateInfo?.label || ""},
     {name: "{{firstName}}", value: requestDetails.firstName},
@@ -86,12 +89,12 @@ export const getTemplateVariables = async (requestDetails: any, requestExtension
     {name: "{{pbExtensionReason}}", value: getMappedValue("pbextensionreason", pbExtension[2])}, 
     {name: "{{pbExtensionBody}}", value: "public body"}, 
     {name: "{{requestid_visibility}}", value: isRequestInfoVisible(templateInfo)},
-    {name:"{{currentDate}}", value: formatDateInPst(new Date(),"MMM dd yyyy")},
-    {name:"{{arcsNumber}}", value: requestDetails.requestType === "general" ? 30 : 40},
-    {name: "{{oipcExtensionDueDays}}", value: oipcExtension[0]}, 
+    {name: "{{currentDate}}", value: formatDateInPst(new Date(),"MMM dd yyyy")},
+    {name: "{{arcsNumber}}", value: requestDetails.requestType === "general" ? 30 : 40},
+    {name: "{{oipcExtensionDueDays}}", value: oipcExtension[6] || ""}, 
     {name: "{{oipcExtensionDueDates}}", value:  convertDate(oipcExtension[1])}, 
-    {name: "{{oipcExtensionReason}}", value: oipcExtension[2]}, 
-    {name: "{{oipcExtensionNotiDate}}", value: oipcExtension[5]},
+    {name: "{{oipcExtensionReason}}", value: oipcExtension[2] || ""}, 
+    {name: "{{oipcExtensionNotiDate}}", value: oipcExtension[5] || ""},
     {name: "{{oipcOriginalReceivedDate}}", value: convertDate(requestDetails.receivedDate)},
     {name: "{{oipcOriginalDueDate}}", value: convertDate(requestDetails.originalDueDate)},
     {name: "{{oipcCurrentDueDate}}", value: convertDate(requestDetails.dueDate)},
@@ -106,17 +109,19 @@ export const getTemplateVariables = async (requestDetails: any, requestExtension
     {name: "{{fullFeePaidDate}}", value: getFullFeePaidDate(cfrFeeData)},
     {name: "{{feeWaiverDecisionDate}}", value: getFeeWaiverDecisionDate(cfrFeeData)},
     {name: "{{pbExtensionStatus}}", value: displayPBExtension(requestExtensions)},
-    {name: "{{oipcExtensionSection}}", value: await displayOIPCExtensionSection(oipcExtension[4], requestDetails)},
+    //{name: "{{oipcExtensionSection}}", value: await displayOIPCExtensionSection(oipcExtension[4], requestDetails)},
     {name: "{{oipcExtensionList}}", value: displayOIPCExtension(requestExtensions)},
     {name: "{{oipcApplicantConsentSection}}", value: displayApplicantConsentSection(requestExtensions, requestDetails)},
   ]
+}
 
-  if (callback != null) {
-    callback(data);
-    return;
-  }
+export const getTemplateVariablesAsync = async (requestDetails: any, requestExtensions: any, responsePackagePdfStitchStatus: any, cfrFeeData: any, templateInfo: any, callback: any) => {
+  let oipcExtension = getExtensiondetails(requestExtensions, "OIPC");
+  let templateVariables = getTemplateVariables(requestDetails, requestExtensions, responsePackagePdfStitchStatus, cfrFeeData, templateInfo);
 
-  return data;
+  templateVariables.push({name: "{{oipcExtensionSection}}", value: await displayOIPCExtensionSection(oipcExtension[4], requestDetails)})
+
+  callback(templateVariables)
 }
 
 export const isRequestInfoVisible = (templateInfo: any) => {

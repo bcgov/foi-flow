@@ -10,7 +10,7 @@ import IconButton from '@material-ui/core/IconButton';
 import CloseIcon from '@material-ui/icons/Close';
 import type { previewParams } from './types';
 import { getOSSHeaderDetails, getFileFromS3 } from "../../../../apiManager/services/FOI/foiOSSServices";
-import { renderTemplate, applyVariables, getTemplateVariables } from './util';
+import { renderTemplate, applyVariables, getTemplateVariables, getTemplateVariablesAsync } from './util';
 import { OSS_S3_BUCKET_FULL_PATH, FOI_FFA_URL } from "../../../../constants/constants";
 import { EmailExport } from '../../../FOI/customComponents';
 
@@ -56,55 +56,15 @@ export const PreviewModal = React.memo(({
   }, []);
   
   requestDetails["ffaurl"] = FOI_FFA_URL;
-  /*
+
   const templateVariables = getTemplateVariables(requestDetails, requestExtensions, responsePackagePdfStitchStatus, cfrFeeData, templateInfo);
   const handleSend = () => {
-    handleSave( applyVariables(innerhtml, templateVariables) );
-  };
-  */
-
-  /*
-  const handleSend = () => {
     const callback = (templateVariables: any) => {
-      handleSave( applyVariables(innerhtml, templateVariables) );
+      handleSave( applyVariables(innerhtml, templateVariables ) );
     };
-    getTemplateVariables(requestDetails, requestExtensions, responsePackagePdfStitchStatus, cfrFeeData, templateInfo, callback);
+    getTemplateVariablesAsync(requestDetails, requestExtensions, responsePackagePdfStitchStatus, cfrFeeData, templateInfo, callback)
   };
-  */
 
-  // let templateVariables: any[] = []
-  // getTemplateVariables(requestDetails, requestExtensions, responsePackagePdfStitchStatus, cfrFeeData, templateInfo, null).then((value: any) => {
-  //   templateVariables = value;
-  // });
-  // const handleSend = () => {
-  //   handleSave( applyVariables(innerhtml, templateVariables) );
-  // };
-
-  // templateVariables를 비동기적으로 가져오는 함수
-const fetchTemplateVariables = async (): Promise<any[]> => {
-  try {
-    const result = await getTemplateVariables(
-      requestDetails,
-      requestExtensions,
-      responsePackagePdfStitchStatus,
-      cfrFeeData,
-      templateInfo,
-      null
-    );
-    return result || []; // result가 undefined일 경우 빈 배열로 반환
-  } catch (error) {
-    console.error("Error fetching template variables:", error);
-    return []; // 에러 발생 시 빈 배열 반환
-  }
-};
-
-// handleSend 함수에서 templateVariables를 비동기적으로 가져오기
-let templateVariables: any[] = []
-const handleSend = async () => {
-  templateVariables = await fetchTemplateVariables();
-  await handleSave(applyVariables(innerhtml, templateVariables));
-};
-  
   return (
     <div className="state-change-dialog">        
     <Dialog
