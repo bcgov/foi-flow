@@ -160,6 +160,7 @@ class requestservicegetter:
             'axisSyncDate': parse(requestministry["axissyncdate"]).strftime('%Y-%m-%d %H:%M:%S.%f') if axissyncdatenoneorempty == False else None,
             'axispagecount': int(requestministry["axispagecount"]) if requestministry["axispagecount"] is not None else 0 ,
             'recordspagecount': int(requestministry["recordspagecount"]) if requestministry["recordspagecount"] is not None else 0 ,
+            'axislanpagecount': int(requestministry["axislanpagecount"]) if requestministry["axislanpagecount"] is not None else 0 ,
             'description': requestministry['description'],
             'fromDate': parse(requestministry['recordsearchfromdate']).strftime(self.__genericdateformat()) if requestministry['recordsearchfromdate'] is not None else '',
             'toDate': parse(requestministry['recordsearchtodate']).strftime(self.__genericdateformat()) if requestministry['recordsearchtodate'] is not None else '',
@@ -190,6 +191,7 @@ class requestservicegetter:
             'isofflinepayment': FOIMinistryRequest.getofflinepaymentflag(foiministryrequestid),
             'linkedRequests' : linkedministryrequests,
             'identityVerified':requestministry['identityverified'],
+            'userrecordslockstatus': requestministry['userrecordslockstatus'],
             
         }
         if requestministry['cfrduedate'] is not None:

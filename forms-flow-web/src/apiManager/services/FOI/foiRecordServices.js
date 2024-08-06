@@ -691,3 +691,27 @@ export const fetchPDFStitchedRecordForConsults = (
       });
   };
 }
+
+export const updateUserLockedRecords = (data, requestId, ministryId, ...rest) => {
+  const done = fnDone(rest);
+  let apiUrl= replaceUrl(replaceUrl(
+    API.FOI_REQUEST_SECTION_API,
+    "<ministryid>",
+    ministryId),"<requestid>",requestId
+  );
+  return (dispatch) => {
+    httpPOSTRequest(`${apiUrl}/userrecordslockstatus`, data)
+      .then((res) => {
+        if (res.data) {
+          done(null, res.data);
+        } else {
+          dispatch(serviceActionError(res));
+          throw new Error(`Error while updating records lock status for the (request# ${requestId}, ministry# ${ministryId})`);            
+        }
+      })
+      .catch((error) => {
+        dispatch(serviceActionError(error));
+        done(error);
+      });
+  };
+}

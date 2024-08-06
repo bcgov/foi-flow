@@ -137,7 +137,7 @@ class FOIRequestsById(Resource):
     def post(foirequestid,foiministryrequestid):
         """ POST Method for capturing FOI requests before processing"""
         try:
-            request_json = request.get_json() 
+            request_json = request.get_json()
             foirequestschema = FOIRequestWrapperSchema().load(request_json)  
             result = requestservice().saverequestversion(foirequestschema, foirequestid, foiministryrequestid,AuthHelper.getuserid())
             if result.success == True:
@@ -293,7 +293,10 @@ class FOIRequestsById(Resource):
                 foirequest = requestservice().getrequest(foirequestid, foiministryrequestid)
                 foirequest['isoipcreview'] = request_json['isoipcreview']
                 foirequest['oipcdetails'] = request_json['oipcdetails']
-            foirequestschema = FOIRequestWrapperSchema().load(foirequest)  
+            if (section == "userrecordslockstatus"):
+                foirequest = requestservice().getrequest(foirequestid, foiministryrequestid)
+                foirequest['userrecordslockstatus'] = request_json['userrecordslockstatus']
+            foirequestschema = FOIRequestWrapperSchema().load(foirequest)
             result = requestservice().saverequestversion(foirequestschema, foirequestid, foiministryrequestid,AuthHelper.getuserid())
             if result.success == True:
                 asyncio.ensure_future(eventservice().postevent(foiministryrequestid,"ministryrequest",AuthHelper.getuserid(),AuthHelper.getusername(),AuthHelper.isministrymember()))

@@ -31,6 +31,7 @@ class requestservicebuilder(requestserviceconfigurator):
         foiministryrequest.axisrequestid = requestschema.get("axisRequestId")
         foiministryrequest.axissyncdate = requestschema.get("axisSyncDate")
         foiministryrequest.axispagecount = requestschema.get("axispagecount")
+        foiministryrequest.axislanpagecount = requestschema.get("axislanpagecount")
         foiministryrequest.recordspagecount = requestschema.get("recordspagecount")
         foiministryrequest.filenumber = self.generatefilenumber(ministry["code"], requestschema.get("foirawrequestid")) if filenumber is None else filenumber
         foiministryrequest.programareaid = self.getvalueof("programArea",ministry["code"])
@@ -53,6 +54,7 @@ class requestservicebuilder(requestserviceconfigurator):
         foiministryrequest.startdate = startdate
         foiministryrequest.createdby = userid
         requeststatuslabel =  self.getpropertyvaluefromschema(requestschema, 'requeststatuslabel')
+        foiministryrequest.userrecordslockstatus = requestschema.get("userrecordslockstatus")
         if requeststatuslabel is not None:
             status = self.getstatusname(requeststatuslabel)
         if self.isNotBlankorNone(requestschema,"fromDate","main") == True:

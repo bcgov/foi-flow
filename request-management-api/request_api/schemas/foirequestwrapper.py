@@ -91,6 +91,7 @@ class FOIRequestWrapperSchema(Schema):
     axisSyncDate = fields.Str(data_key="axisSyncDate",allow_none=True)  
     axisRequestId = fields.Str(data_key="axisRequestId",allow_none=True, validate=[validate.Length(max=120, error=MAX_EXCEPTION_MESSAGE)])
     axispagecount = fields.Int(data_key="axispagecount",allow_none=True)
+    recordspagecount = fields.Int(data_key="recordspagecount",allow_none=True)
     description = fields.Str(data_key="description", required=True,validate=[validate.Length(min=1, error=BLANK_EXCEPTION_MESSAGE)])
     category = fields.Str(data_key="category", required=True,validate=[validate.Length(min=1, error=BLANK_EXCEPTION_MESSAGE)])
     requestType = fields.Str(data_key="requestType", required=True,validate=[validate.Length(min=1, error=BLANK_EXCEPTION_MESSAGE)]) 
@@ -154,7 +155,10 @@ class FOIRequestWrapperSchema(Schema):
     identityVerified = fields.Str(data_key="identityVerified",allow_none=True)
 
     oipcdetails = fields.Nested(FOIMinistryRequestOIPCSchema, many=True,allow_none=True)
+    userrecordslockstatus = fields.Bool(data_key="userrecordslockstatus", allow_none=True)
 
+    recordspagecount = fields.Int(data_key="recordspagecount",allow_none=True)
+    axislanpagecount = fields.Int(data_key="axislanpagecount",allow_none=True)
 
 class EditableFOIMinistryRequestWrapperSchema(Schema):
     class Meta:  # pylint: disable=too-few-public-methods
@@ -213,3 +217,4 @@ class FOIRequestMinistrySchema(Schema):
     assignedministrypersonMiddleName = fields.Str(data_key="assignedministrypersonMiddleName",allow_none=True, validate=[validate.Length(max=50, error=MAX_EXCEPTION_MESSAGE)])
     assignedministrypersonLastName = fields.Str(data_key="assignedministrypersonLastName",allow_none=True, validate=[validate.Length(max=50, error=MAX_EXCEPTION_MESSAGE)])
     ministrysignoffapproval = fields.Nested(CreateMinistrySignOffApprovalSchema, data_key="ministrysignoffapproval", allow_none=True)
+    userrecordslockstatus = fields.Bool(data_key="userrecordslockstatus", allow_none=True)
