@@ -2207,7 +2207,7 @@ export const RecordsLog = ({
                   variant="contained"
                   onClick={addAttachments}
                   color="primary"
-                  disabled={lockRecords || conversionFormats?.length < 1 || (isMinistryCoordinator && divisions.length > 0)}
+                  disabled={lockRecords || conversionFormats?.length < 1 || (isMinistryCoordinator && divisions.length === 0)}
                 >
                   + Upload Records
                 </button>
