@@ -27,7 +27,7 @@ import { PreviewModal } from './PreviewModal';
 import { OSS_S3_BUCKET_FULL_PATH } from "../../../../constants/constants";
 import Loading from "../../../../containers/Loading";
 import {setFOICorrespondenceLoader} from "../../../../actions/FOI/foiRequestActions";
-import { applyVariables, getTemplateVariables, isFeeTemplateDisabled, getExtensionType } from './util';
+import { applyVariables, getTemplateVariables, getTemplateVariablesAsync, isFeeTemplateDisabled, getExtensionType } from './util';
 import { StateEnum } from '../../../../constants/FOI/statusEnum';
 import CustomizedTooltip from '../Tooltip/MuiTooltip/Tooltip';
 import { CorrespondenceEmail } from '../../../FOI/customComponents';
@@ -172,7 +172,7 @@ export const ContactApplicant = ({
 
   const requestDetails: any = useSelector((state: any) => state.foiRequests.foiRequestDetail);
   const requestExtensions: any = useSelector((state: any) => state.foiRequests.foiRequestExtesions);
-
+  
   const [files, setFiles] = useState([]);
   const [templates, setTemplates] = useState<any[]>([{ value: "", label: "", templateid: null, text: "", disabled: true, created_at:"" }]);
 
@@ -181,9 +181,16 @@ export const ContactApplicant = ({
       return !isFeeTemplateDisabled(currentCFRForm, item); 
    } else if (['EXTENSIONS-PB'].includes(item.name)) {
       return getExtensionType(requestExtensions) === "PB";
-   } else if (['OIPCAPPLICANTCONSENTEXTENSION', 'OIPCFIRSTTIMEEXTENSION','OIPCSUBSEQUENTTIMEEXTENSION'].includes(item.name)) {
-      return getExtensionType(requestExtensions) === "OIPC";
-  }
+   } else if (['OIPCAPPLICANTCONSENTEXTENSION'].includes(item.name)) {
+    const check=getExtensionType(requestExtensions) === "OIPCAPPLICANTCONSENTEXTENSION"
+      return check;
+   } else if(['OIPCFIRSTTIMEEXTENSION'].includes(item.name)){
+    const check2 = getExtensionType(requestExtensions) === "OIPCFIRSTTIMEEXTENSION"
+      return check2;
+   } else if(['OIPCSUBSEQUENTTIMEEXTENSION'].includes(item.name)){
+    const check3 = getExtensionType(requestExtensions) === "OIPCSUBSEQUENTTIMEEXTENSION"
+      return check3;
+   }
   }
 
   const isduplicate = (item: string) => {
@@ -296,19 +303,24 @@ export const ContactApplicant = ({
 
   const handleTemplateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setCurrentTemplate(+e.target.value)
-    const templateVariables = getTemplateVariables(requestDetails, requestExtensions, responsePackagePdfStitchStatus, cfrFeeData, templates[+e.target.value]);
-    const finalTemplate = applyVariables(templates[+e.target.value].text || "", templateVariables);
-    setEditorValue(finalTemplate)
+    
+    const callback = (templateVariables: any) => {
+      const finalTemplate = applyVariables(templates[+e.target.value].text || "", templateVariables);
+      setEditorValue(finalTemplate)
+    }
+    getTemplateVariablesAsync(requestDetails, requestExtensions, responsePackagePdfStitchStatus, cfrFeeData, templates[+e.target.value], callback);
   }
 
   //When templates are selected from list
   const handleTemplateSelection = (index: number) => {
     setCurrentTemplate(index);
-    const templateVariables = getTemplateVariables(requestDetails,requestExtensions, responsePackagePdfStitchStatus, cfrFeeData, templates[index]);
-    const finalTemplate = applyVariables(templates[index].text || "", templateVariables);
-    setEditorValue(finalTemplate);
-    changeCorrespondenceFilter("log");
     
+    const callback = (templateVariables: any) => {
+      const finalTemplate = applyVariables(templates[index].text || "", templateVariables);
+      setEditorValue(finalTemplate);
+      changeCorrespondenceFilter("log");
+    }
+    getTemplateVariablesAsync(requestDetails,requestExtensions, responsePackagePdfStitchStatus, cfrFeeData, templates[index], callback);
   }
 
   const removeFile = (index: number) => {

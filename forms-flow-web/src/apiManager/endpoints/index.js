@@ -127,6 +127,10 @@ const API = {
   FOI_UPDATE_RECORDS: `${FOI_BASE_API_URL}/api/foirecord/<requestid>/ministryrequest/<ministryrequestid>/update`,
   DOC_REVIEWER_DELETE_RECORDS: `${DOC_REVIEWER_BASE_API_URL}/api/document/delete`,
   DOC_REVIEWER_REDACTED_SECTIONS: `${DOC_REVIEWER_BASE_API_URL}/api/redactedsections/ministryrequest/<ministryrequestid>`,
+  
+  DOC_REVIEWER_REDACTED_DOCUMENT_RECORDS: `${DOC_REVIEWER_BASE_API_URL}/api/documentpage/ministryrequest/<ministryrequestid>`,
+  
+  DOC_REVIEWER_REDACTED_PAGEFLAG_RECORDS: `${DOC_REVIEWER_BASE_API_URL}/api/documentpageflags/ministryrequest/<ministryrequestid>`,
 
   FOI_TRIGGER_DOWNLOAD_RECORDS_FOR_HARMS: `${FOI_BASE_API_URL}/api/foirecord/<requestid>/ministryrequest/<ministryrequestid>/triggerdownload/harms`,
 

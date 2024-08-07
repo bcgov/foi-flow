@@ -191,6 +191,62 @@ export const fetchRedactedSections = (ministryId, ...rest) => {
   };
 };
 
+export const fetchDocumentPage  = (ministryId, done) => {
+  if (!ministryId) {
+    return (dispatch) => {};
+  }
+  console.log("ministrY id : ",ministryId)
+  let apiUrl = replaceUrl(
+    API.DOC_REVIEWER_REDACTED_DOCUMENT_RECORDS,
+    "<ministryrequestid>",
+    ministryId
+  );
+  return (dispatch) => {
+    httpGETRequest(apiUrl, {}, UserService.getToken())
+      .then((res) => {
+        if (res.data) {
+          done(null, res.data);
+        } else {
+          console.log("Error in fetching redacted sections", res);
+          serviceActionError(res)(dispatch);
+        }
+      })
+      .catch((error) => {
+        console.log("Error in fetching redacted section", error);
+        serviceActionError(error)(dispatch);
+        done(error);
+      });
+  };
+};
+
+export const fetchDocumentPageFlags  = (ministryId, done) => {
+  if (!ministryId) {
+    return (dispatch) => {};
+  }
+
+  let apiUrl = replaceUrl(
+    API.DOC_REVIEWER_REDACTED_PAGEFLAG_RECORDS,
+    "<ministryrequestid>",
+    ministryId
+  );
+  return (dispatch) => {
+    httpGETRequest(apiUrl, {}, UserService.getToken())
+      .then((res) => {
+        if (res.data) {
+          done(null, res.data);
+        } else {
+          console.log("Error in fetching redacted sections", res);
+          serviceActionError(res)(dispatch);
+        }
+      })
+      .catch((error) => {
+        console.log("Error in fetching redacted section", error);
+        serviceActionError(error)(dispatch);
+        done(error);
+      });
+  };
+};
+
 export const saveFOIRecords = (requestId, ministryId, data, ...rest) => {
   let apiUrl = replaceUrl(
     replaceUrl(API.FOI_GET_RECORDS, "<ministryrequestid>", ministryId),
