@@ -122,32 +122,6 @@ class FOIFlowProgramAreas(Resource):
             return "Error happened while accessing program areas for user" , 500
 
 @cors_preflight('GET,OPTIONS')
-@API.route('/foiflow/programareasbyprogramareaid/<int:programareaid>')
-class FOIFlowProgramAreasByProgramAreaId(Resource):
-    """Retrieves program areas by program area id.
-    """
-    @staticmethod
-    @TRACER.trace()
-    @cross_origin(origins=allowedorigins())
-    @auth.require
-    def get():
-        try:
-            # usertype = AuthHelper.getusertype()
-            # if (usertype == "iao"):
-            #     data = programareaservice().getprogramareas()
-            # elif (usertype == 'ministry'):
-            #     groups = AuthHelper.getministrygroups()
-            #     data = programareaservice().getprogramareasforministryuser(groups)
-            # else:
-            #     data = None
-            data = programareaservice().getprogramareabyprogramareaid(groups)
-
-            jsondata = json.dumps(data)
-            return jsondata , 200
-        except BusinessException:
-            return "Error happened while accessing program areas for user" , 500
-
-@cors_preflight('GET,OPTIONS')
 @API.route('/foiflow/deliverymodes')
 class FOIFlowDeliveryModes(Resource):
     """Retrieves all active delivery modes.
