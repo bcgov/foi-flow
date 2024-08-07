@@ -1854,8 +1854,8 @@ export const RecordsLog = ({
         for (let record of records) {
           if(record.attributes?.personalattributes?.person
              && record.attributes?.personalattributes?.person === currentEditRecord.attributes?.personalattributes?.person
-             && record.attributes?.personalattributes?.filetype
-             && record.attributes?.personalattributes?.filetype === currentEditRecord.attributes?.personalattributes?.filetype
+            //  && record.attributes?.personalattributes?.filetype
+            //  && record.attributes?.personalattributes?.filetype === currentEditRecord.attributes?.personalattributes?.filetype
           ) {
             updateRecords.push(
               (({ recordid, documentmasterid, s3uripath }) => ({
@@ -1870,8 +1870,8 @@ export const RecordsLog = ({
             for (let attachment of record.attachments) {
               if(attachment.attributes?.personalattributes?.person
                 && attachment.attributes?.personalattributes?.person === currentEditRecord.attributes?.personalattributes?.person
-                && attachment.attributes?.personalattributes?.filetype
-                && attachment.attributes?.personalattributes?.filetype === currentEditRecord.attributes?.personalattributes?.filetype
+                // && attachment.attributes?.personalattributes?.filetype
+                // && attachment.attributes?.personalattributes?.filetype === currentEditRecord.attributes?.personalattributes?.filetype
               ) {
                 updateRecords.push(
                   (({ documentmasterid, s3uripath }) => ({
@@ -2207,7 +2207,7 @@ export const RecordsLog = ({
                   variant="contained"
                   onClick={addAttachments}
                   color="primary"
-                  disabled={lockRecords || conversionFormats?.length < 1}
+                  disabled={lockRecords || conversionFormats?.length < 1 || (isMinistryCoordinator && divisions.length === 0)}
                 >
                   + Upload Records
                 </button>

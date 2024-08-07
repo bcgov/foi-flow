@@ -163,11 +163,11 @@ const MCFPersonal = ({
 
     React.useEffect(() => {
       if(allPeople.length > 0 && personalAttributes.person !== "") {
-        setShowAllPeople( allPeople.filter(p => p.name==personalAttributes.person)[0].sortorder >= 5 );
+        setShowAllPeople( allPeople.filter(p => p.name==personalAttributes.person)[0]?.sortorder >= 5 );
       }
 
       if(allVolumes.length > 0 && personalAttributes.volume !== "") {
-        setShowAllVolumes( allVolumes.filter(v => v.name==personalAttributes.volume)[0].sortorder >= 5 );
+        setShowAllVolumes( allVolumes.filter(v => v.name==personalAttributes.volume)[0]?.sortorder >= 5 );
       }
     },[personalAttributes])
 
