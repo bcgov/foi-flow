@@ -68,10 +68,13 @@ class FOIMinistryRequest(db.Model):
     axispagecount = db.Column(db.String(20), nullable=True)
     axislanpagecount = db.Column(db.String(20), nullable=True)
     recordspagecount = db.Column(db.String(20), nullable=True)
+    estimatedpagecount = db.Column(db.Integer, nullable=True)
+    estimatedtaggedpagecount = db.Column(db.Integer, nullable=True)
     linkedrequests = db.Column(JSON, unique=False, nullable=True)
     identityverified = db.Column(JSON, unique=False, nullable=True)
     ministrysignoffapproval = db.Column(JSON, unique=False, nullable=True)
     requeststatuslabel = db.Column(db.String(50), nullable=False)
+    userrecordslockstatus = db.Column(db.Boolean, nullable=True)
 
     #ForeignKey References
     
@@ -408,12 +411,12 @@ class FOIMinistryRequest(db.Model):
 
         #subquery for getting extension count
         subquery_extension_count = _session.query(FOIRequestExtension.foiministryrequest_id, func.count(distinct(FOIRequestExtension.foirequestextensionid)).filter(FOIRequestExtension.isactive == True).label('extensions')).group_by(FOIRequestExtension.foiministryrequest_id).subquery()
-
-        #subquery for getting all, distinct oipcs for foiministry request
+        
+        #subquery for selecting distinct records based on foiministryrequest_id, grouping by foiministryrequestversion_id
         subquery_with_oipc_sql = """
-        SELECT distinct on (foiministryrequest_id) foiministryrequest_id, foiministryrequestversion_id, outcomeid 
-        FROM "FOIRequestOIPC" fo 
-        order by foiministryrequest_id, foiministryrequestversion_id desc
+        SELECT DISTINCT ON (foiministryrequest_id) foiministryrequest_id, foiministryrequestversion_id, 
+        CASE WHEN EXISTS (SELECT 1 FROM "FOIRequestOIPC" WHERE fo.foiministryrequest_id = foiministryrequest_id AND fo.foiministryrequestversion_id = foiministryrequestversion_id AND outcomeid IS NULL) THEN NULL ELSE MAX(outcomeid) END AS outcomeid 
+        FROM "FOIRequestOIPC" fo GROUP BY foiministryrequest_id, foiministryrequestversion_id ORDER BY foiministryrequest_id, foiministryrequestversion_id DESC
         """
         subquery_with_oipc = text(subquery_with_oipc_sql).columns(FOIRequestOIPC.foiministryrequest_id, FOIRequestOIPC.foiministryrequestversion_id, FOIRequestOIPC.outcomeid).alias("oipcnoneoutcomes")
         joincondition_oipc = [
@@ -662,7 +665,7 @@ class FOIMinistryRequest(db.Model):
                                     ),
                                 isouter=True
                             ).filter(or_(FOIMinistryRequest.requeststatuslabel != StateName.closed.name, 
-                                         and_(FOIMinistryRequest.isoipcreview == True, FOIMinistryRequest.requeststatusid == 3)))
+                                         and_(FOIMinistryRequest.isoipcreview == True, FOIMinistryRequest.requeststatusid == 3,subquery_with_oipc.c.outcomeid == None)))
 
        
 
@@ -1587,5 +1590,7 @@ class FOIMinistryRequestSchema(ma.Schema):
                 'foirequest.receivedmodeid','requeststatus.requeststatusid','requeststatuslabel','requeststatus.name','programarea.bcgovcode',
                 'programarea.name','foirequest_id','foirequestversion_id','created_at','updated_at','createdby','assignedministryperson',
                 'assignedministrygroup','cfrduedate','closedate','closereasonid','closereason.name',
-                'assignee.firstname','assignee.lastname','ministryassignee.firstname','ministryassignee.lastname', 'axisrequestid', 'axissyncdate', 'axispagecount', 'axislanpagecount', 'linkedrequests', 'ministrysignoffapproval', 'identityverified','originalldd','isoipcreview', 'recordspagecount')
+                'assignee.firstname','assignee.lastname','ministryassignee.firstname','ministryassignee.lastname', 'axisrequestid', 
+                'axissyncdate', 'axispagecount', 'axislanpagecount', 'linkedrequests', 'ministrysignoffapproval', 'identityverified','originalldd',
+                'isoipcreview', 'recordspagecount', 'estimatedpagecount', 'estimatedtaggedpagecount', 'userrecordslockstatus')
     
