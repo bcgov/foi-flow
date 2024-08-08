@@ -3459,11 +3459,13 @@ const AttachmentPopup = React.memo(
         return record.attributes.divisions.length > 0 && record.attributes.divisions[0].divisionname != "TBD"
       };
 
+      const disableMinistryUser = isMCFPersonal && isMinistryCoordinator && !isUploadedByMinistryUser(record);
+
       const DeleteMenu = () => {
         return (
           <MenuItem
-          style={ (lockRecords || (isMCFPersonal && isMinistryCoordinator && !isUploadedByMinistryUser(record))) ? { pointerEvents: "none" } : {} }
-            disabled={lockRecords || (isMCFPersonal && isMinistryCoordinator && !isUploadedByMinistryUser(record))}
+          style={ (lockRecords || disableMinistryUser) ? { pointerEvents: "none" } : {} }
+            disabled={lockRecords || disableMinistryUser}
             onClick={() => {
               handleDelete();
               setPopoverOpen(false);
@@ -3497,7 +3499,7 @@ const AttachmentPopup = React.memo(
           <MenuList>
             {isMCFPersonal && (
               <MenuItem
-                disabled={lockRecords || (isMCFPersonal && isMinistryCoordinator && !isUploadedByMinistryUser(record))}
+                disabled={lockRecords || disableMinistryUser}
                 onClick={() => {
                   setEditTagModalOpen(true);
                   setPopoverOpen(false);
@@ -3521,7 +3523,7 @@ const AttachmentPopup = React.memo(
             {(!record.attributes?.isattachment ||
               record.attributes?.isattachment === undefined) && (
               <MenuItem
-                disabled={lockRecords || (isMCFPersonal && isMinistryCoordinator && !isUploadedByMinistryUser(record))}
+                disabled={lockRecords || disableMinistryUser}
                 onClick={() => {
                   handleReplace();
                   setPopoverOpen(false);
@@ -3532,7 +3534,7 @@ const AttachmentPopup = React.memo(
             )}
             {record.attributes?.isattachment && (
               <MenuItem
-                disabled={lockRecords || (isMCFPersonal && isMinistryCoordinator && !isUploadedByMinistryUser(record))}
+                disabled={lockRecords || disableMinistryUser}
                 onClick={() => {
                   handleReplaceAttachment();
                   setPopoverOpen(false);
