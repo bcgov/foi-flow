@@ -44,7 +44,6 @@ export const getExtensionType = (requestExtensions: any) => {
   if (latestExtension.extensionstatus === "Approved" && latestExtension.extensiontype === "OIPC") {
     return "OIPCAPPLICANTCONSENTEXTENSION";
   } else if (latestExtension.extensionstatus === "Pending" && latestExtension.extensiontype === "OIPC") {
-    console.log("approvedOIPCExists : ",approvedOIPCExists)
     return approvedOIPCExists ? "OIPCSUBSEQUENTTIMEEXTENSION" : "OIPCFIRSTTIMEEXTENSION";
   } else if (latestExtension.extensionstatus === "Approved" && latestExtension.extensiontype === "Public Body") {
     return "PB";

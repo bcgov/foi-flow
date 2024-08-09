@@ -195,7 +195,7 @@ export const fetchDocumentPage  = (ministryId, done) => {
   if (!ministryId) {
     return (dispatch) => {};
   }
-  console.log("ministrY id : ",ministryId)
+
   let apiUrl = replaceUrl(
     API.DOC_REVIEWER_REDACTED_DOCUMENT_RECORDS,
     "<ministryrequestid>",
