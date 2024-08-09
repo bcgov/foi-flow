@@ -22,6 +22,8 @@ class templateconfig:
             return "oipc_first_time_extension.html"
         elif key == "OIPCSUBSEQUENTTIMEEXTENSION":
             return "oipc_subsequent_time_extension.html"
+        elif key == "GENERICCOVEREMAILTEMPLATE":
+            return "generic_cover_email_template.html"
         else:
             logging.info("Unknown key")
             return None

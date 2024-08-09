@@ -182,14 +182,16 @@ export const ContactApplicant = ({
    } else if (['EXTENSIONS-PB'].includes(item.name)) {
       return getExtensionType(requestExtensions) === "PB";
    } else if (['OIPCAPPLICANTCONSENTEXTENSION'].includes(item.name)) {
-    const check=getExtensionType(requestExtensions) === "OIPCAPPLICANTCONSENTEXTENSION"
-      return check;
+    const isApplicantConsent = getExtensionType(requestExtensions) === "OIPCAPPLICANTCONSENTEXTENSION"
+      return isApplicantConsent;
    } else if(['OIPCFIRSTTIMEEXTENSION'].includes(item.name)){
-    const check2 = getExtensionType(requestExtensions) === "OIPCFIRSTTIMEEXTENSION"
-      return check2;
+    const isFirstTimeExtension = getExtensionType(requestExtensions) === "OIPCFIRSTTIMEEXTENSION"
+      return isFirstTimeExtension;
    } else if(['OIPCSUBSEQUENTTIMEEXTENSION'].includes(item.name)){
-    const check3 = getExtensionType(requestExtensions) === "OIPCSUBSEQUENTTIMEEXTENSION"
-      return check3;
+    const isSubsequentTimeExtension = getExtensionType(requestExtensions) === "OIPCSUBSEQUENTTIMEEXTENSION"
+      return isSubsequentTimeExtension;
+   } else if(['GENERICCOVEREMAILTEMPLATE'].includes(item.name)){
+      return true;
    }
   }
 

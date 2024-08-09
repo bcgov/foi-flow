@@ -333,7 +333,6 @@ const displayOIPCExtension = (requestExtensions:any): string => {
       );
       // Join the mapped reasons into a comma-separated string
       const reasonsString = mappedReasons.join(", ");  
-      console.log("displayOIPCExtension : ",reasonsString)
       return reasonsString;
     }
   }
@@ -351,7 +350,6 @@ const displayApplicantConsentSection = (requestExtensions:any, requestDetails:an
     // Check if there are any OIPC Extensions
     if (oipcExtensions.length > 0) {
       const recentOIPCExtension = oipcExtensions[0]; // Assuming the list is sorted by date with the most recent first
-      console.log("Most recent OIPC Extension:", recentOIPCExtension);
       
       // Extract variables for the HTML template
       const { extensionreson } = recentOIPCExtension;
