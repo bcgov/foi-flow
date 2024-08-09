@@ -2701,6 +2701,7 @@ export const RecordsLog = ({
                     isMCFPersonal={isMCFPersonal}
                     setEditTagModalOpen={setEditTagModalOpen}
                     setCurrentEditRecord={setCurrentEditRecord}
+                    lockRecords={lockRecords}
                   />
                 ))
               ) : (
@@ -3483,34 +3484,37 @@ const AttachmentPopup = React.memo(
       );
     };
 
-    const DeleteMenu = () => {
-      return (
-        <MenuItem
-        style={ lockRecords ? { pointerEvents: "none" } : {} }
-          disabled={lockRecords}
-          onClick={() => {
-            handleDelete();
-            setPopoverOpen(false);
-          }}
-        >
-          Delete
-        </MenuItem>
-      );
-    };
-
     const ActionsPopover = ({
       RestrictViewInBrowser,
       record,
       setEditTagModalOpen,
       isMCFPersonal,
-      isMinistryCoordinator
+      isMinistryCoordinator,
+      lockRecords
     }) => {
       const isUploadedByMinistryUser = (record) => {
-        return hasValidDivisions(record) && isMinistryCoordinator;
+        return hasValidDivisions(record);
       };
 
       const hasValidDivisions = (record) => {
         return record.attributes.divisions.length > 0 && record.attributes.divisions[0].divisionname != "TBD"
+      };
+
+      const disableMinistryUser = isMCFPersonal && isMinistryCoordinator && !isUploadedByMinistryUser(record);
+
+      const DeleteMenu = () => {
+        return (
+          <MenuItem
+          style={ (lockRecords || disableMinistryUser) ? { pointerEvents: "none" } : {} }
+            disabled={lockRecords || disableMinistryUser}
+            onClick={() => {
+              handleDelete();
+              setPopoverOpen(false);
+            }}
+          >
+            Delete
+          </MenuItem>
+        );
       };
 
       return (
@@ -3534,8 +3538,9 @@ const AttachmentPopup = React.memo(
           onClose={() => setPopoverOpen(false)}
         >
           <MenuList>
-            {(isMCFPersonal && (!isMinistryCoordinator || isUploadedByMinistryUser(record))) && (
+            {isMCFPersonal && (
               <MenuItem
+                disabled={lockRecords || disableMinistryUser}
                 onClick={() => {
                   setEditTagModalOpen(true);
                   setPopoverOpen(false);
@@ -3559,7 +3564,7 @@ const AttachmentPopup = React.memo(
             {(!record.attributes?.isattachment ||
               record.attributes?.isattachment === undefined) && (
               <MenuItem
-                disabled={lockRecords}
+                disabled={lockRecords || disableMinistryUser}
                 onClick={() => {
                   handleReplace();
                   setPopoverOpen(false);
@@ -3570,7 +3575,7 @@ const AttachmentPopup = React.memo(
             )}
             {record.attributes?.isattachment && (
               <MenuItem
-                disabled={lockRecords}
+                disabled={lockRecords || disableMinistryUser}
                 onClick={() => {
                   handleReplaceAttachment();
                   setPopoverOpen(false);
@@ -3662,6 +3667,7 @@ const AttachmentPopup = React.memo(
           setEditTagModalOpen={setEditTagModalOpen}
           isMCFPersonal={isMCFPersonal}
           isMinistryCoordinator={isMinistryCoordinator}
+          lockRecords={lockRecords}
         />
       </>
     );
