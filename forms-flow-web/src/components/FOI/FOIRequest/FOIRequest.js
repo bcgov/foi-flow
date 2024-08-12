@@ -24,6 +24,9 @@ import {
   fetchFOIMinistryAssignedToList,
   fetchFOISubjectCodeList,
   fetchFOIPersonalDivisionsAndSections,
+  fetchFOIPersonalPeople,
+  fetchFOIPersonalFiletypes,
+  fetchFOIPersonalVolumes,
   fetchOIPCOutcomes,
   fetchOIPCStatuses,
   fetchOIPCReviewtypes,
@@ -380,9 +383,16 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
       setIsIAORestricted(isRequestRestricted(requestDetails, ministryId));
     }
 
-    if(MinistryNeedsScanning.includes(bcgovcode.replaceAll('"', '')) && requestDetails.requestType == FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL) {
+    if(
+      MinistryNeedsScanning.includes(bcgovcode.replaceAll('"', '')) &&
+      requestDetails.requestType ==
+        FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL
+    ) {
       dispatch(fetchFOIPersonalDivisionsAndSections(bcgovcode.replaceAll('"', '')));
       if(bcgovcode.replaceAll('"', '') == "MCF") {
+        dispatch(fetchFOIPersonalPeople(bcgovcode.replaceAll('"', '')));
+        dispatch(fetchFOIPersonalFiletypes(bcgovcode.replaceAll('"', '')));
+        dispatch(fetchFOIPersonalVolumes(bcgovcode.replaceAll('"', '')));
         setIsMCFPersonal(true);
       }
     }
@@ -1669,6 +1679,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
                   setLockRecordsTab={setLockRecordsTab}
                   validLockRecordsState={validLockRecordsState}
                   setSaveRequestObject={setSaveRequestObject}
+                  handleSaveRequest={handleSaveRequest}
                 />
               </>
             )}

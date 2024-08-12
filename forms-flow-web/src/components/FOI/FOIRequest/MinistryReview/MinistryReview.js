@@ -18,6 +18,9 @@ import {
 import {
   fetchFOIMinistryAssignedToList,
   fetchFOIPersonalDivisionsAndSections,
+  fetchFOIPersonalPeople,
+  fetchFOIPersonalFiletypes,
+  fetchFOIPersonalVolumes,
 } from "../../../../apiManager/services/FOI/foiMasterDataServices";
 
 import { fetchFOIRequestAttachmentsList } from "../../../../apiManager/services/FOI/foiAttachmentServices";
@@ -283,10 +286,11 @@ const MinistryReview = React.memo(({ userDetail }) => {
       requestDetails.requestType ==
         FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL
     ) {
-      dispatch(
-        fetchFOIPersonalDivisionsAndSections(bcgovcode.replaceAll('"', ""))
-      );
+      dispatch(fetchFOIPersonalDivisionsAndSections(bcgovcode.replaceAll('"', "")));
       if (bcgovcode.replaceAll('"', "") == "MCF") {
+        dispatch(fetchFOIPersonalPeople(bcgovcode.replaceAll('"', '')));
+        dispatch(fetchFOIPersonalFiletypes(bcgovcode.replaceAll('"', '')));
+        dispatch(fetchFOIPersonalVolumes(bcgovcode.replaceAll('"', '')));
         setIsMCFPersonal(true);
       }
     }
@@ -1078,6 +1082,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
                   requestType={requestDetails?.requestType}
                   lockRecords={lockRecordsTab}
                   validLockRecordsState={validLockRecordsState}
+                  handleSaveRequest={handleSaveRequest}
                 />
               </>
             ) : (

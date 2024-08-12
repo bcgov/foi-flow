@@ -191,6 +191,8 @@ class requestservicegetter:
             'isofflinepayment': FOIMinistryRequest.getofflinepaymentflag(foiministryrequestid),
             'linkedRequests' : linkedministryrequests,
             'identityVerified':requestministry['identityverified'],
+            'estimatedpagecount':requestministry['estimatedpagecount'],
+            'estimatedtaggedpagecount':requestministry['estimatedtaggedpagecount'],
             'userrecordslockstatus': requestministry['userrecordslockstatus'],
             
         }

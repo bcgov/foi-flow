@@ -255,6 +255,12 @@ const foiRequests = (state = initialState, action) => {
       return { ...state, foiPersonalDivisionsAndSections: action.payload };
     case FOI_ACTION_CONSTANTS.FOI_PERSONAL_SECTIONS:
       return { ...state, foiPersonalSections: action.payload };
+    case FOI_ACTION_CONSTANTS.FOI_PERSONAL_PEOPLE:
+      return { ...state, foiPersonalPeople: action.payload };
+    case FOI_ACTION_CONSTANTS.FOI_PERSONAL_FILETYPES:
+      return { ...state, foiPersonalFiletypes: action.payload };
+    case FOI_ACTION_CONSTANTS.FOI_PERSONAL_VOLUMES:
+      return { ...state, foiPersonalVolumes: action.payload };
     case FOI_ACTION_CONSTANTS.FOI_WATCHER_LIST:
       return { ...state, foiWatcherList: action.payload };
     case FOI_ACTION_CONSTANTS.CLOSING_REASONS:

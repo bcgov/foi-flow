@@ -17,6 +17,9 @@ import {
     setFOIReceivedModeList,
     setFOIMinistryDivisionalStages,
     setFOIPersonalDivisionsAndSections,
+    setFOIPersonalPeople,
+    setFOIPersonalFiletypes,
+    setFOIPersonalVolumes,
     setFOIPersonalSections,
     setClosingReasons,
     setFOISubjectCodeList,  
@@ -409,6 +412,93 @@ import {
             })
             .catch((error) => {
               console.log(`Error while fetching ministry(${bcgovcode}) divisional stage master data`, error);
+              dispatch(serviceActionError(error));
+              dispatch(setFOILoader(false));
+            });
+        };
+      default:
+        break;
+    }
+  };
+
+  export const fetchFOIPersonalPeople = (bcgovcode) => {
+    switch(bcgovcode) {
+      case "MCF":
+        const apiUrlMCF = replaceUrl(API.FOI_PERSONAL_PEOPLE, "<bcgovcode>", bcgovcode);
+        return (dispatch) => {
+          httpGETRequest(apiUrlMCF, {}, UserService.getToken())
+            .then((res) => {
+              if (res.data) {
+                const foiPersonalSections = res.data;
+                dispatch(setFOIPersonalPeople({}));
+                dispatch(setFOIPersonalPeople(foiPersonalSections));
+                dispatch(setFOILoader(false));
+              } else {
+                console.log(`Error while fetching (${bcgovcode}) FOI records people`, res);
+                dispatch(serviceActionError(res));
+                dispatch(setFOILoader(false));
+              }
+            })
+            .catch((error) => {
+              console.log(`Error while fetching (${bcgovcode}) FOI records people`, error);
+              dispatch(serviceActionError(error));
+              dispatch(setFOILoader(false));
+            });
+        };
+      default:
+        break;
+    }
+  };
+
+  export const fetchFOIPersonalFiletypes = (bcgovcode) => {
+    switch(bcgovcode) {
+      case "MCF":
+        const apiUrlMCF = replaceUrl(API.FOI_PERSONAL_FILETYPES, "<bcgovcode>", bcgovcode);
+        return (dispatch) => {
+          httpGETRequest(apiUrlMCF, {}, UserService.getToken())
+            .then((res) => {
+              if (res.data) {
+                const foiPersonalSections = res.data;
+                dispatch(setFOIPersonalFiletypes({}));
+                dispatch(setFOIPersonalFiletypes(foiPersonalSections));
+                dispatch(setFOILoader(false));
+              } else {
+                console.log(`Error while fetching (${bcgovcode}) FOI records people`, res);
+                dispatch(serviceActionError(res));
+                dispatch(setFOILoader(false));
+              }
+            })
+            .catch((error) => {
+              console.log(`Error while fetching (${bcgovcode}) FOI records people`, error);
+              dispatch(serviceActionError(error));
+              dispatch(setFOILoader(false));
+            });
+        };
+      default:
+        break;
+    }
+  };
+
+  export const fetchFOIPersonalVolumes = (bcgovcode) => {
+    switch(bcgovcode) {
+      case "MCF":
+        const apiUrlMCF = replaceUrl(API.FOI_PERSONAL_VOLUMES, "<bcgovcode>", bcgovcode);
+        return (dispatch) => {
+          httpGETRequest(apiUrlMCF, {}, UserService.getToken())
+            .then((res) => {
+              if (res.data) {
+                const foiPersonalSections = res.data;
+                dispatch(setFOIPersonalVolumes({}));
+                dispatch(setFOIPersonalVolumes(foiPersonalSections));
+                dispatch(setFOILoader(false));
+              } else {
+                console.log(`Error while fetching (${bcgovcode}) FOI records people`, res);
+                dispatch(serviceActionError(res));
+                dispatch(setFOILoader(false));
+              }
+            })
+            .catch((error) => {
+              console.log(`Error while fetching (${bcgovcode}) FOI records people`, error);
               dispatch(serviceActionError(error));
               dispatch(setFOILoader(false));
             });
