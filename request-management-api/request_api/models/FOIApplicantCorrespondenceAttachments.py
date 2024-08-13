@@ -57,6 +57,12 @@ class FOIApplicantCorrespondenceAttachment(db.Model):
         return correspondenceattachment_schema.dump(query)
     
     @classmethod
+    def getcorrespondenceattachmentbyapplicantcorrespondenceid(cls,applicantcorrespondenceid):
+        correspondenceattachment_schema = FOIApplicantCorrespondenceAttachmentSchema(many=False)
+        query = db.session.query(FOIApplicantCorrespondenceAttachment).filter(FOIApplicantCorrespondenceAttachment.applicantcorrespondenceid == applicantcorrespondenceid).order_by(FOIApplicantCorrespondenceAttachment.version.desc()).first()
+        return correspondenceattachment_schema.dump(query)
+    
+    @classmethod
     def getcorrespondenceattachmentsbyministryid(cls,ministryrequestid):
         attachments = []
         try:
