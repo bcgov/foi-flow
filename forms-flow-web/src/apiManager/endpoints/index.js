@@ -93,8 +93,6 @@ const API = {
 
   FOI_POST_REQUEST_CORRESPONDENCE_EMAIL: `${FOI_BASE_API_URL}/api/foiflow/applicantcorrespondence/email/<ministryid>/<rawrequestid>`,
   FOI_GET_REQUEST_CORRESPONDENCE_EMAILS: `${FOI_BASE_API_URL}/api/foiflow/applicantcorrespondence/email/<ministryid>/<rawrequestid>`,
-  FOI_POST_REQUEST_CORRESPONDENCE_EMAIL_RAW: `${FOI_BASE_API_URL}/api/foiflow/applicantcorrespondence/email/rawrequest/<rawrequestid>`,
-  FOI_GET_REQUEST_CORRESPONDENCE_EMAILS_RAW: `${FOI_BASE_API_URL}/api/foiflow/applicantcorrespondence/email/rawrequest/<rawrequestid>`,
 
   FOI_POST_EMAIL_CORRESPONDENCE: `${FOI_BASE_API_URL}/api/foiflow/applicantcorrespondence/<requestid>/<ministryrequestid>`,
   FOI_POST_DRAFT_EMAIL_CORRESPONDENCE: `${FOI_BASE_API_URL}/api/foiflow/applicantcorrespondence/draft/<requestid>/<ministryrequestid>`,
