@@ -632,7 +632,7 @@ export const ContactApplicant = ({
       });
       dispatch(fetchApplicantCorrespondence(requestId, ministryId));
     }
-    deleteDraftCorrespondence(draftCorrespondence.applicantcorrespondenceid,ministryId,
+    deleteDraftCorrespondence(draftCorrespondence.applicantcorrespondenceid,ministryId,requestId,
       dispatch,
       callback,
       (errorMessage: string) => {
