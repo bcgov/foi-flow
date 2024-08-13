@@ -30,7 +30,12 @@ export const getExtensiondetails = (requestExtensions:any, type: string) => {
     return ["","","","","","",""]
 }
 
-export const getExtensionType = (requestExtensions: any) => {
+export const getExtensionType = (requestDetails:any, requestExtensions: any) => {
+
+  if (requestDetails.currentState === "Open") {
+    return "NA";
+  }
+
   if (!requestExtensions || requestExtensions.length === 0) {
     return "NA";
   }

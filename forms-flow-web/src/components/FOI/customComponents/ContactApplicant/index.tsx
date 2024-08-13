@@ -180,15 +180,15 @@ export const ContactApplicant = ({
    if (['PAYONLINE', 'PAYOUTSTANDING'].includes(item.name)) { 
       return !isFeeTemplateDisabled(currentCFRForm, item); 
    } else if (['EXTENSIONS-PB'].includes(item.name)) {
-      return getExtensionType(requestExtensions) === "PB";
+      return getExtensionType(requestDetails, requestExtensions) === "PB";
    } else if (['OIPCAPPLICANTCONSENTEXTENSION'].includes(item.name)) {
-    const isApplicantConsent = getExtensionType(requestExtensions) === "OIPCAPPLICANTCONSENTEXTENSION"
+    const isApplicantConsent = getExtensionType(requestDetails, requestExtensions) === "OIPCAPPLICANTCONSENTEXTENSION"
       return isApplicantConsent;
    } else if(['OIPCFIRSTTIMEEXTENSION'].includes(item.name)){
-    const isFirstTimeExtension = getExtensionType(requestExtensions) === "OIPCFIRSTTIMEEXTENSION"
+    const isFirstTimeExtension = getExtensionType(requestDetails, requestExtensions) === "OIPCFIRSTTIMEEXTENSION"
       return isFirstTimeExtension;
    } else if(['OIPCSUBSEQUENTTIMEEXTENSION'].includes(item.name)){
-    const isSubsequentTimeExtension = getExtensionType(requestExtensions) === "OIPCSUBSEQUENTTIMEEXTENSION"
+    const isSubsequentTimeExtension = getExtensionType(requestDetails, requestExtensions) === "OIPCSUBSEQUENTTIMEEXTENSION"
       return isSubsequentTimeExtension;
    } else if(['GENERICCOVEREMAILTEMPLATE'].includes(item.name)){
       return true;
