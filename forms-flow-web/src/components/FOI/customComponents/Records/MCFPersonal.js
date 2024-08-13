@@ -76,9 +76,20 @@ const MCFPersonal = ({
     const [showAdditionalFileTypes, setShowAdditionalFileTypes] = useState(false);
     const [disableSave, setDisableSave] = useState(false);
 
+    const compareDivision = (curDiv, newDiv) => {
+      return curDiv === newDiv;
+    }
+
     useEffect(() => {
-      setDisableSave(personalAttributes?.person === undefined || personalAttributes?.person === "" || personalAttributes?.filetype === undefined || personalAttributes?.filetype === "" || comparePersonalAttributes(personalAttributes, curPersonalAttributes));
-    },[personalAttributes])
+      setDisableSave(
+        personalAttributes?.person === undefined
+         || personalAttributes?.person === ""
+         || personalAttributes?.filetype === undefined
+         || personalAttributes?.filetype === ""
+         || (!isMinistryCoordinator && comparePersonalAttributes(personalAttributes, curPersonalAttributes))
+         || (isMinistryCoordinator && comparePersonalAttributes(personalAttributes, curPersonalAttributes) && compareDivision(currentEditRecord.attributes.divisions[0].divisionid, divisionModalTagValue))
+        );
+    },[personalAttributes, divisionModalTagValue])
 
     useEffect(() => {
       if(currentEditRecord?.attributes?.divisions[0]?.divisionid) {
