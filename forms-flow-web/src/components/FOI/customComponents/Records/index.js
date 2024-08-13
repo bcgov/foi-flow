@@ -2769,7 +2769,7 @@ export const RecordsLog = ({
               setEditTagModalOpen={setEditTagModalOpen}
               record={currentEditRecord}
               setNewDivision={setDivisionModalTagValue}
-
+              comparePersonalAttributes={comparePersonalAttributes}
               curPersonalAttributes={curPersonalAttributes}
               setNewPersonalAttributes={setNewPersonalAttributes}
               updatePersonalAttributes={updatePersonalAttributes}
