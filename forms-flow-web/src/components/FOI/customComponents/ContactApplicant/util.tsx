@@ -5,7 +5,6 @@ import { fetchDocumentPage, fetchDocumentPageFlags } from "../../../../apiManage
 
 export const renderTemplate = (template: string, content: string, params: Array<any>) => {
   let newTemplate = template.replace("{{content}}", content);
-  console.log("renderTemplate안에 newTemplate : ",newTemplate)
   return applyVariables(newTemplate, params);
 }
 
@@ -31,7 +30,12 @@ export const getExtensiondetails = (requestExtensions:any, type: string) => {
     return ["","","","","","",""]
 }
 
-export const getExtensionType = (requestExtensions: any) => {
+export const getExtensionType = (requestDetails:any, requestExtensions: any) => {
+
+  if (requestDetails.currentState === "Open") {
+    return "NA";
+  }
+
   if (!requestExtensions || requestExtensions.length === 0) {
     return "NA";
   }
@@ -45,7 +49,6 @@ export const getExtensionType = (requestExtensions: any) => {
   if (latestExtension.extensionstatus === "Approved" && latestExtension.extensiontype === "OIPC") {
     return "OIPCAPPLICANTCONSENTEXTENSION";
   } else if (latestExtension.extensionstatus === "Pending" && latestExtension.extensiontype === "OIPC") {
-    console.log("approvedOIPCExists : ",approvedOIPCExists)
     return approvedOIPCExists ? "OIPCSUBSEQUENTTIMEEXTENSION" : "OIPCFIRSTTIMEEXTENSION";
   } else if (latestExtension.extensionstatus === "Approved" && latestExtension.extensiontype === "Public Body") {
     return "PB";
@@ -159,7 +162,6 @@ const getMappedValue = (property: string, propertykey: string) => {
 
 // Function to map extension reason id to its textual representation (PB and OIPC combined)
 const mapSectionWithExtensionReasonId = (extensionReasonId: number) => {
-  console.log("extensionReasonId : ",extensionReasonId)
   switch (extensionReasonId) {
     case 1:
     case 6:
@@ -219,7 +221,6 @@ const displayFeeEstimateInfo = (data: any[]): string => {
     const dateSent = result.created_at || "";
     const datePaid = getFullFeePaidDate(data) || "";
     const dateWaiverDecision = getFeeWaiverDecisionDate(data) || "";
-    console.log("Fee dateSent: "+dateSent, "/ Fee datePaid:",datePaid," / Fee dateWaiverDecision:",dateWaiverDecision)
 
     htmlString = `
       <p><strong><span style="font-size: 13px;">Fee Estimate:&nbsp;</span></strong><span style="font-size: 13px;">Yes</span></p>
@@ -291,8 +292,7 @@ const displayPBExtension = (requestExtensions:any): string => {
     // Check if there are any PB Extensions
     if (pbExtensions.length > 0) {
       const recentPBExtension = pbExtensions[0]; // Assuming the list is sorted by date with the most recent first
-      console.log("Most recent PB Extension:", recentPBExtension);
-      
+
       // Extract variables for the HTML template
       const {
         extendedduedate,
@@ -337,7 +337,6 @@ const displayOIPCExtension = (requestExtensions:any): string => {
       );
       // Join the mapped reasons into a comma-separated string
       const reasonsString = mappedReasons.join(", ");  
-      console.log("displayOIPCExtension : ",reasonsString)
       return reasonsString;
     }
   }
@@ -355,7 +354,6 @@ const displayApplicantConsentSection = (requestExtensions:any, requestDetails:an
     // Check if there are any OIPC Extensions
     if (oipcExtensions.length > 0) {
       const recentOIPCExtension = oipcExtensions[0]; // Assuming the list is sorted by date with the most recent first
-      console.log("Most recent OIPC Extension:", recentOIPCExtension);
       
       // Extract variables for the HTML template
       const { extensionreson } = recentOIPCExtension;
