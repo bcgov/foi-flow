@@ -29,7 +29,7 @@ const { MentionSuggestions } = mentionPlugin
 const plugins = [staticToolbarPlugin, mentionPlugin];
 const InputField = ({ cancellor, parentId, child, inputvalue, edit, main, add, fullnameList, restrictedReqTaglist,
   //setEditorChange, removeComment and setRemoveComment added to handle Navigate away from Comments tabs 
-  isRestricted, setEditorChange, removeComment, setRemoveComment
+  isRestricted, setEditorChange, removeComment, setRemoveComment, commentTypeId
 }) => {
   let maxcharacterlimit = 1000
   const [uftext, setuftext] = useState('')
@@ -230,8 +230,8 @@ const InputField = ({ cancellor, parentId, child, inputvalue, edit, main, add, f
       const _editorstateinJSON = JSON.stringify(convertToRaw(editorState.getCurrentContent()))
       setFOILoader(true)
       edit === true
-        ? actions.submit(cancellor, _editorstateinJSON, JSON.stringify(_mentions), parentId, true)
-        : actions.submit(cancellor, _editorstateinJSON, JSON.stringify(_mentions), parentId, false)
+        ? actions.submit(cancellor, _editorstateinJSON, JSON.stringify(_mentions), parentId, true,commentTypeId)
+        : actions.submit(cancellor, _editorstateinJSON, JSON.stringify(_mentions), parentId, false,commentTypeId)
 
       setEditorState(createEditorStateWithText(''))
       setEditorChange(false)

@@ -27,7 +27,8 @@ import {
   fetchOIPCOutcomes,
   fetchOIPCStatuses,
   fetchOIPCReviewtypes,
-  fetchOIPCInquiryoutcomes
+  fetchOIPCInquiryoutcomes,
+  fetchFOICommentTypes
 } from "../../../apiManager/services/FOI/foiMasterDataServices";
 import {
   fetchFOIRequestDetailsWrapper,
@@ -296,6 +297,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
     } else if (window.location.href.indexOf("records") > -1) {
       tabclick("Records");
     }
+    dispatch(fetchFOICommentTypes());
   }, []);
 
   useEffect(async () => {

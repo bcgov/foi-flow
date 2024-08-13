@@ -153,6 +153,7 @@ const initialState = {
   oipcStatuses: [],
   oipcReviewtypes: [],
   oipcInquiryoutcomes: [],
+  foiCommentTypes:[]
 };
 
 const foiRequests = (state = initialState, action) => {
@@ -339,6 +340,8 @@ const foiRequests = (state = initialState, action) => {
       return { ...state, oipcReviewtypes: action.payload };
     case FOI_ACTION_CONSTANTS.OIPC_INQUIRYOUTCOMES:
         return { ...state, oipcInquiryoutcomes: action.payload };
+    case FOI_ACTION_CONSTANTS.FOI_COMMENT_TYPES:
+      return { ...state, foiCommentTypes: action.payload };
     default:
       return state;
   }

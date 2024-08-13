@@ -26,6 +26,7 @@ import {
     setOIPCStatuses,
     setOIPCReviewtypes,
     setOIPCInquiryoutcomes,
+    setFOICommentTypes
   } from "../../../actions/FOI/foiRequestActions";
   import { fnDone, catchError } from "./foiServicesUtil";
   import UserService from "../../../services/UserService";
@@ -595,6 +596,33 @@ import {
         })
         .catch((error) => {
           console.log("Error while fetching OIPC inqiuryoutcomes master data", error);
+          dispatch(serviceActionError(error));
+          dispatch(setFOILoader(false));
+        });
+    };
+  };
+
+  export const fetchFOICommentTypes = () => {
+    //const firstSubjectCode = { "subjectcodeid": 0, "name": "Select Subject Code (if required)" };
+    return (dispatch) => {
+      httpGETRequest(API.FOI_GET_COMMENT_TYPES, {}, UserService.getToken())
+        .then((res) => {
+          if (res.data) {
+            const foiCommentTypes = res.data;
+            let data = foiCommentTypes.map((subjectCode) => {
+              return { ...subjectCode };
+            });
+            //data.unshift(firstSubjectCode);
+            dispatch(setFOICommentTypes(data));
+            dispatch(setFOILoader(false));
+          } else {
+            console.log("Error while fetching subject code master data", res);
+            dispatch(serviceActionError(res));
+            dispatch(setFOILoader(false));
+          }
+        })
+        .catch((error) => {
+          console.log("Error while fetching delivery mode master data", error);
           dispatch(serviceActionError(error));
           dispatch(setFOILoader(false));
         });

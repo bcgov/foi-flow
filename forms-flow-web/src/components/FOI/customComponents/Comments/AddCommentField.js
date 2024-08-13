@@ -19,7 +19,13 @@ import {
 } from '@draft-js-plugins/buttons';
 import {namesort,suggestionList } from './commentutils'
 
-import { getFullnameList } from '../../../../helper/FOI/helper'
+import { getFullnameList, getCommentTypeIdByName } from '../../../../helper/FOI/helper'
+import Grid from "@material-ui/core/Grid";
+import Radio from "@material-ui/core/Radio";
+import RadioGroup from "@material-ui/core/RadioGroup";
+import FormControlLabel from "@material-ui/core/FormControlLabel";
+import FormControl from "@material-ui/core/FormControl";
+import Confirm from '../../../../containers/Confirm'
 
 
 const staticToolbarPlugin = createToolbarPlugin();
@@ -28,7 +34,7 @@ const { Toolbar } = staticToolbarPlugin;
 const { MentionSuggestions } = mentionPlugin
 const plugins = [staticToolbarPlugin, mentionPlugin];
 const AddCommentField = ({ cancellor, parentId, add, fullnameList , restrictedReqTaglist,  //setEditorChange, removeComment and setRemoveComment added to handle Navigate away from Comments tabs 
-  setEditorChange, removeComment, setRemoveComment, isRestricted }) => {
+  setEditorChange, removeComment, setRemoveComment, isRestricted, isMinistry, setshowaddbox, commentTypes }) => {
   let maxcharacterlimit = 1000  
   const [uftext, setuftext] = useState('')
   const [textlength, setTextLength] = useState(1000)
@@ -38,6 +44,9 @@ const AddCommentField = ({ cancellor, parentId, add, fullnameList , restrictedRe
   const [mentionList, setMentionList] = useState(isCommentTagListLoading ? [{name: 'Loading...'}] : isRestricted ? restrictedReqTaglist :fulluserlist);
   const [suggestions, setSuggestions] = useState(mentionList);
   const [editorState, setEditorState] = useState(EditorState.createEmpty())
+  const [commentTypeId, setCommentTypeId] = useState(1);
+  const [confirmModalOpen, setConfirmModalOpen] = useState(false);
+
   const onOpenChange = (_open) => {
     setOpen(_open);
   }
@@ -162,7 +171,7 @@ const AddCommentField = ({ cancellor, parentId, add, fullnameList , restrictedRe
       const _mentions = getMentionsOnComment()
       const _editorstateinJSON = JSON.stringify(convertToRaw(editorState.getCurrentContent()))
       setFOILoader(true)    
-      actions.submit(cancellor, _editorstateinJSON, JSON.stringify(_mentions), parentId, false)
+      actions.submit(cancellor, _editorstateinJSON, JSON.stringify(_mentions), parentId, false, commentTypeId)
       setEditorState(createEditorStateWithText(''))
       setEditorChange(false)
       setTextLength(1000);
@@ -193,10 +202,55 @@ const AddCommentField = ({ cancellor, parentId, add, fullnameList , restrictedRe
 
   const actions = useContext(ActionContext)
 
+  const cancelComment = () => {
+    setshowaddbox(false)
+    setEditorState(createEditorStateWithText(''))
+    // setConfirmModalOpen(false);
+    
+    // setEditorChange(false)
+    //setTextLength(1000);
+  }
+
+  const openConfirmModal = () =>{
+    setConfirmModalOpen(true)
+  }
+
+  const closeConfirmModal = () => {
+    setConfirmModalOpen(false);
+  };
+
   return (
     <>
       <form className={formclass}>
-       
+        <Grid item xs={12} lg={6}>
+          <FormControl component="fieldset">
+            <RadioGroup
+              id="status-options"
+              row
+              name="controlled-radio-buttons-group"
+              value={commentTypeId}
+              onChange={(e) => {
+                setCommentTypeId(Number(e.target.value));
+              }}
+            >
+            <FormControlLabel 
+              value={getCommentTypeIdByName(commentTypes, "User submitted")}
+              control={<Radio color="default" id="rbextpending" />}
+              label="General"
+            />
+            <FormControlLabel
+              value={isMinistry ? getCommentTypeIdByName(commentTypes, "Ministry Internal"):getCommentTypeIdByName(commentTypes, "IAO Internal") }
+              control={<Radio color="default" id="rbextapproved" />}
+              label="Internal"
+            />
+            <FormControlLabel
+              value={isMinistry ? getCommentTypeIdByName(commentTypes,"Ministry Peer Review"): getCommentTypeIdByName(commentTypes, "IAO Peer Review")}
+              control={<Radio color="default" id="rbextdenied" />}
+              label="Peer Review"
+            />
+            </RadioGroup>
+          </FormControl>
+        </Grid>
         <Toolbar>
           {
             (externalProps) => (
@@ -232,25 +286,44 @@ const AddCommentField = ({ cancellor, parentId, add, fullnameList , restrictedRe
 
       </form>
       <div className="inputActions">
-        <div className={'col-lg-11'}>
+        <div className={'col-lg-10'}>
           <span className={textlength > 25 ? "characterlen" : "characterlen textred"}>{textlength} characters remaining</span>
         </div>
-        <div className="col-lg-1 paperplanecontainer">
+        <button
+            className="btn-cancel"
+            onClick={() => openConfirmModal() }
+          >
+            Cancel
+          </button>
+        <div className="col-lg-2"> 
+          {/* paperplanecontainer */}
           <button
-            className="postBtn"
+            className= "btn-bottom btn btn-save" //"postBtn"
+            style={{width:'80%', padding: '0px'}}
             onClick={post}
             type='button'
             disabled={uftext.trim().length === 0}
           >
-            {' '}
-            <svg aria-hidden="true" role="img" aria-describedby="addComment" focusable="false" data-prefix="fas" data-icon="paper-plane" class="svg-inline--fa fa-paper-plane fa-w-16 fa-2x post-comment-btn" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" disabled={uftext.trim().length === 0} color={ uftext.trim().length === 0 ? '#a5a5a5' : 'darkblue'}>
+            {'Post Comment'}
+            <svg aria-hidden="true" role="img" aria-describedby="addComment" focusable="false" data-prefix="fas" data-icon="paper-plane" 
+              class="svg-inline--fa fa-paper-plane fa-w-16 fa-1x post-comment-btn" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" 
+              disabled={uftext.trim().length === 0} color={ uftext.trim().length === 0 ? '#a5a5a5' : 'darkblue'}>
                 <title id="addComment" style={{display: 'none'}}>Add Comment</title>
                 <path fill="currentColor" d="M476 3.2L12.5 270.6c-18.1 10.4-15.8 35.6 2.2 43.2L121 358.4l287.3-253.2c5.5-4.9 13.3 2.6 8.6 8.3L176 407v80.5c0 23.6 28.5 32.9 42.5 15.8L282 426l124.6 52.2c14.2 6 30.4-2.9 33-18.2l72-432C515 7.8 493.3-6.8 476 3.2z"></path>
             </svg>
           </button>
         </div>
       </div>
-
+      {confirmModalOpen &&
+          <Confirm
+            modalOpen={confirmModalOpen} 
+            onYes={closeConfirmModal} 
+            onNo={cancelComment }
+            message={"Are you sure you want to cancel? You will lose anything you have entered."} 
+            yesText = 'Continue Comment'
+            noText = 'Cancel'
+          />
+      }
     </>
   )
 }

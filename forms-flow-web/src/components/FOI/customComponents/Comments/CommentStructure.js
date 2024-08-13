@@ -20,6 +20,7 @@ import MoreHorizIcon from "@material-ui/icons/MoreHoriz";
 import IconButton from "@material-ui/core/IconButton";
 import MenuList from "@material-ui/core/MenuList";
 import MenuItem from "@material-ui/core/MenuItem";
+import Chip from "@material-ui/core/Chip";
 import { getOSSHeaderDetails, getFileFromS3 } from "../../../../apiManager/services/FOI/foiOSSServices";
 import { saveAs } from "file-saver";
 import { downloadZip } from "client-zip";
@@ -67,7 +68,7 @@ const CommentStructure = ({ i, reply, parentId, totalcommentCount, currentIndex,
 
   const getHtmlfromRawContent = () => {
     let markup = null
-    if (i.commentTypeId === 1) {
+    if (i.commentTypeId !== 2 && i.commentTypeId !== 3) {
       const rawContentFromStore = convertFromRaw(JSON.parse(i.text))
       let initialEditorState = EditorState.createWithContent(rawContentFromStore);
 
@@ -100,7 +101,6 @@ const CommentStructure = ({ i, reply, parentId, totalcommentCount, currentIndex,
   const [popoverOpen, setPopoverOpen] = useState(false);
   const [anchorPosition, setAnchorPosition] = useState(null);
   const [deletePopoverOpen, setDeletePopoverOpen] = useState(false);
-
 
 
   const ActionsPopover = () => {
@@ -252,9 +252,22 @@ const CommentStructure = ({ i, reply, parentId, totalcommentCount, currentIndex,
     )
   };
 
+  const commentTypeLabel = () => {
+    //let commentType= Object.entries(CommentTypes).find(([key, val]) => val === i.commentTypeId)?.[0]
+    // console.log("Value of i: ",i)
+    // console.log("!!!!",i.commentTypeId)
+    if(i.commentTypeId === 1)
+      return "GENERAL"
+    else if(i.commentTypeId === 4 || i.commentTypeId === 5)
+      return "INTERNAL"
+    else if(i.commentTypeId === 6 || i.commentTypeId === 7)
+      return "PEER REVIEW"
+  }
+
   return (
     <>
-      <div {...(isEmail ? {"data-msg-halfdiv-id":`${currentIndex}`} : {})} name={needCollapsed ? `hiddenreply_${parentId}` : `reply_${parentId}`} className={halfDivclassname} style={needCollapsed ? { display: 'none' } : {}} >
+      <div {...(isEmail ? {"data-msg-halfdiv-id":`${currentIndex}`} : {})} name={needCollapsed ? `hiddenreply_${parentId}` : `reply_${parentId}`} 
+        className={halfDivclassname} style={needCollapsed ? { display: 'none' } : {}} >
         <div
           className="userInfo"
           style={reply ? { marginLeft: 15, marginTop: '6px' }: {}}
@@ -262,7 +275,23 @@ const CommentStructure = ({ i, reply, parentId, totalcommentCount, currentIndex,
           <NewCommentIndicator commentdate={i.dateUF}/>
           <div className="commentsTwo">
 
-            <div className="fullName">{fullName} </div> |  <div className="commentdate">{i.date} </div>  <div className="commentdate">{i.edited ? "Edited": ""} </div>
+            <div className="fullName">{fullName} </div> |  <div className="commentdate">{i.date} </div> 
+            {(i.commentTypeId !== 2 && i.commentTypeId !== 3 && (parentId == null || parentId == undefined)) &&
+              <div>
+                <Chip
+                    item
+                    //key={i}
+                    label={commentTypeLabel()}
+                    //size="small"
+                    className="commentTypeChip"
+                    style={{
+                      backgroundColor: "#003366",
+                      margin:"4px 4px 4px 8px"
+                    }}
+                  />
+              </div>
+            }
+            <div className="commentdate">{i.edited ? "Edited": ""} </div>
 
           </div>
           <div className="commenttext" dangerouslySetInnerHTML={{ __html: getHtmlfromRawContent() }} >

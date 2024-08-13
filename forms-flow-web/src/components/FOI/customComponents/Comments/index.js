@@ -5,8 +5,11 @@ import DisplayComments from './DisplayComments'
 import { ActionProvider } from './ActionContext'
 import Input from './Input'
 import CommentFilter from './CommentFilter'
-import { getMinistryRestrictedTagList } from "../../../../helper/FOI/helper";
+import { getMinistryRestrictedTagList, getCommentTypeIdByName } from "../../../../helper/FOI/helper";
 import Loading from "../../../../containers/Loading";
+//import { CommentTypes } from '../../../../constants/FOI/enum' 
+import {fetchFOICommentTypes} from "../../../../apiManager/services/FOI/foiMasterDataServices";
+
 
 
 export const CommentSection = ({
@@ -27,23 +30,57 @@ export const CommentSection = ({
   removeComment,
   setRemoveComment,
   restrictionType,
-  isRestricted
+  isRestricted,
+  isMinistry
 }) => {
   const requestWatchers = useSelector((state) => state.foiRequests.foiWatcherList);
   const [showaddbox, setshowaddbox] = useState(false)
   const [comments, setcomments] = useState([])
+
+  
+  const commentTypes = useSelector((state) => state.foiRequests.foiCommentTypes); 
   let _commentcategory = sessionStorage.getItem('foicommentcategory')
   const [filterValue, setfilterValue] = useState(_commentcategory === '' || _commentcategory === undefined || _commentcategory === null  ? 1 : parseInt(_commentcategory))
   const [filterkeyValue, setfilterkeyValue] = useState("")
   useEffect(() => {
-    let _commentsbyCategory = parseInt(filterValue) === -1 ? commentsArray :  commentsArray.filter(c => c.commentTypeId === parseInt(filterValue))
+    let _commentsbyCategory = filterCommentFn() 
     let _filteredcomments = filterkeyValue === "" ? _commentsbyCategory : _commentsbyCategory.filter(c => c.text.toLowerCase().indexOf(filterkeyValue.toLowerCase()) > -1)
     let filteredcomments = filterkeyinCommentsandReplies(_commentsbyCategory,_filteredcomments)        
     setcomments(filteredcomments)
   }, [filterValue,commentsArray ,filterkeyValue])
   let restrictedReqTaglist = useSelector((state) => state.foiRequests.restrictedReqTaglist);
 
+  const dispatch = useDispatch();
+
+  // useEffect(() => {
+  //   dispatch(fetchFOICommentTypes());
+  // }, []);
+
+  
+
+
+
+  console.log("commentTypes:",commentTypes)
+  const filterCommentFn = () => {
+    if(parseInt(filterValue) === -1)
+      return commentsArray;
+    else
+      if(parseInt(filterValue) === 1){
+        if(isMinistry)
+          return commentsArray.filter(c => c.commentTypeId === parseInt(filterValue) || 
+            c.commentTypeId === getCommentTypeIdByName(commentTypes, "Ministry Internal") || 
+              c.commentTypeId === getCommentTypeIdByName(commentTypes, "Ministry Peer Review") )
+        else
+          return commentsArray.filter(c => c.commentTypeId === parseInt(filterValue) || 
+            c.commentTypeId === getCommentTypeIdByName(commentTypes,"IAO Internal") || 
+              c.commentTypeId === getCommentTypeIdByName(commentTypes, "IAO Peer Review"))
+      }
+      else
+        return commentsArray.filter(c => c.commentTypeId === parseInt(filterValue))
+  }
+
   const onfilterchange = (_filterValue) => { 
+    //console.log("_filterValue:",_filterValue)
     sessionStorage.setItem('foicommentcategory',_filterValue)   
     setfilterValue(_filterValue)       
     setcomments([])
@@ -105,16 +142,18 @@ export const CommentSection = ({
         <div className="inputBox" style={{ display: showaddbox ? 'block' : 'none' }}>
           {<Input add="add"  bcgovcode={bcgovcode} iaoassignedToList={iaoassignedToList} ministryAssignedToList={ministryAssignedToList} //Handles Navigate Away
           setEditorChange={setEditorChange} removeComment={removeComment} setRemoveComment={setRemoveComment} 
-          restrictedReqTaglist={restrictionType == "ministry"?getMinistryRestrictedTagList():restrictedReqTaglist} isRestricted={isRestricted} />}
+          restrictedReqTaglist={restrictionType == "ministry"?getMinistryRestrictedTagList():restrictedReqTaglist} 
+          isRestricted={isRestricted} isMinistry={isMinistry} setshowaddbox={setshowaddbox} commentTypes={commentTypes} />}
         </div> :null}
         <div className="displayComments">
           <div className="filterComments" >
-            <CommentFilter oncommentfilterchange={onfilterchange} filterValue={filterValue === null ? 1 : filterValue} oncommentfilterkeychange={(k)=>{setfilterkeyValue(k)}}/>
+            <CommentFilter oncommentfilterchange={onfilterchange} filterValue={filterValue === null ? 1 : filterValue} 
+              oncommentfilterkeychange={(k)=>{setfilterkeyValue(k)}} isMinistry={isMinistry} />
           </div>
           <DisplayComments comments={comments} bcgovcode={bcgovcode} currentUser={currentUser} iaoassignedToList={iaoassignedToList} ministryAssignedToList={ministryAssignedToList} 
            restrictedReqTaglist={restrictionType == "ministry"?getMinistryRestrictedTagList():restrictedReqTaglist} isRestricted={isRestricted}
           //Handles Navigate Away
-          setEditorChange={setEditorChange} removeComment={removeComment} setRemoveComment={setRemoveComment} />
+          setEditorChange={setEditorChange} removeComment={removeComment} setRemoveComment={setRemoveComment}  />
         </div>
 
       </div>

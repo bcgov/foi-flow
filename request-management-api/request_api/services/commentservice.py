@@ -9,6 +9,7 @@ from request_api.models.FOIRawRequests import FOIRawRequest
 from request_api.services.assigneeservice import assigneeservice
 from request_api.services.watcherservice import watcherservice
 from request_api.models.default_method_result import DefaultMethodResult
+from request_api.models.CommentTypes import CommentType
 import json
 from dateutil.parser import parse
 import datetime
@@ -183,3 +184,8 @@ class commentservice:
         user['fullname'] = lastname+", "+firstname
         user['name'] = lastname+", "+firstname
         return user
+    
+    def getcommenttypes(self):
+        """ Returns the active commenttypes
+        """
+        return CommentType.getcommenttypes()

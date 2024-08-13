@@ -34,6 +34,7 @@ from request_api.services.extensionreasonservice import extensionreasonservice
 from request_api.services.cacheservice import cacheservice
 from request_api.services.subjectcodeservice import subjectcodeservice
 from request_api.services.oipcservice import oipcservice
+from request_api.services.commentservice import commentservice
 import json
 import request_api
 import requests
@@ -182,18 +183,18 @@ class FOIFlowDivisions(Resource):
     def get(bcgovcode,specifictopersonalrequests=None, fetchmode = None):
         try:
             data = None                        
-            if(specifictopersonalrequests is not None and specifictopersonalrequests.lower() == 'true'):                
-                match fetchmode:
-                    case 'divisions':                        
-                        data = divisionstageservice().getpersonalspecificdivisionandstages(bcgovcode)
-                    case 'sections':                        
-                        data = divisionstageservice().getpersonalspecificprogramareasections(bcgovcode)
-                    case 'divisionsandsections':                        
-                        data = divisionstageservice().getpersonalspecificdivisionsandsections(bcgovcode) 
-                    case _:                        
-                        data = divisionstageservice().getpersonalspecificdivisionandstages(bcgovcode)
-            else:
-                data = divisionstageservice().getdivisionandstages(bcgovcode)               
+            # if(specifictopersonalrequests is not None and specifictopersonalrequests.lower() == 'true'):                
+                # match fetchmode:
+                #     case 'divisions':                        
+                #         data = divisionstageservice().getpersonalspecificdivisionandstages(bcgovcode)
+                #     case 'sections':                        
+                #         data = divisionstageservice().getpersonalspecificprogramareasections(bcgovcode)
+                #     case 'divisionsandsections':                        
+                #         data = divisionstageservice().getpersonalspecificdivisionsandsections(bcgovcode) 
+                #     case _:                        
+                #         data = divisionstageservice().getpersonalspecificdivisionandstages(bcgovcode)
+            # else:
+            data = divisionstageservice().getdivisionandstages(bcgovcode)               
             jsondata = json.dumps(data)
             return jsondata , 200
         except Exception as exception:
@@ -470,3 +471,25 @@ class FOIFlowOIPCInquiryOutcomes(Resource):
             return jsondata , 200
         except BusinessException:
             return "Error happened while accessing OIPC inquiry outcomes" , 500
+        
+@cors_preflight('GET,OPTIONS')
+@API.route('/foiflow/commenttypes')
+class FOIFlowSubjectCodes(Resource):
+    """Retrieves all active comment types.
+    """
+    @staticmethod
+    @TRACER.trace()
+    @cross_origin(origins=allowedorigins())
+    @auth.require
+    @request_api.cache.cached(
+        key_prefix="commenttypes",
+        unless=cache_filter,
+        response_filter=response_filter
+        )
+    def get():
+        try:
+            data = commentservice().getcommenttypes()
+            jsondata = json.dumps(data)
+            return jsondata , 200
+        except BusinessException:
+            return "Error happened while accessing comment types" , 500
