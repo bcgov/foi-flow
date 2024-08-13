@@ -16,9 +16,9 @@ export const fetchApplicantCorrespondence = (
   ministryId,
   errorCallback = null
 ) => {
-  
+
   if (ministryId == null) {
-    return () => {};
+    ministryId = 'None'
   }
   const apiUrl = replaceUrl(replaceUrl(
     API.FOI_GET_EMAIL_CORRESPONDENCE,
@@ -55,7 +55,7 @@ export const saveEmailCorrespondence = (
   errorCallback,
 ) => {
   if (!ministryId) {
-    dispatch(serviceActionError("No request id"));
+    ministryId = 'None';
   }
   dispatch(setFOICorrespondenceLoader(true));
   const apiUrl = replaceUrl(replaceUrl(
@@ -92,7 +92,7 @@ export const saveDraftCorrespondence = (
   errorCallback,
 ) => {
   if (!ministryId) {
-    dispatch(serviceActionError("No request id"));
+    ministryId = 'None';
   }
   dispatch(setFOICorrespondenceLoader(true));
   const apiUrl = replaceUrl(replaceUrl(
@@ -161,20 +161,22 @@ export const editDraftCorrespondence = (
 export const deleteDraftCorrespondence = (
   correspondenceid,
   ministryId,
+  requestId,
   dispatch,
   callback,
   errorCallback,
 ) => {
   if (!ministryId) {
-    dispatch(serviceActionError("No request id"));
+    ministryId = 'None';
   }
   dispatch(setFOICorrespondenceLoader(true));
-  const apiUrl = replaceUrl(replaceUrl(
+  let apiUrl = replaceUrl(replaceUrl(
     API.FOI_DELETE_DRAFT_EMAIL_CORRESPONDENCE,
     "<ministryrequestid>",
     ministryId),"<correspondenceid>", correspondenceid,
 
   );
+  apiUrl = replaceUrl(apiUrl,"<rawrequestid>",requestId);
   httpPOSTRequest(apiUrl,{})
     .then((res) => {
       if (res.data) {
@@ -235,19 +237,20 @@ export const deleteResponseCorrespondence = (
 export const saveCorrespondenceResponse = (
   data,
   ministryId,
+  requestId,
   dispatch,
   callback,
   errorCallback,
 ) => {
   if (!ministryId) {
-    dispatch(serviceActionError("No request id"));
+    ministryId = 'None';
   }
   dispatch(setFOICorrespondenceLoader(true));
   const apiUrl = replaceUrl(replaceUrl(
     API.FOI_POST_RESPONSE_EMAIL_CORRESPONDENCE,
     "<ministryrequestid>",
-    ministryId)
-  );
+    ministryId), 
+    "<rawrequestid>", requestId);
   httpPOSTRequest(apiUrl, data)
     .then((res) => {
       if (res.data) {
@@ -271,18 +274,20 @@ export const saveCorrespondenceResponse = (
 export const editCorrespondenceResponse = (
   data,
   ministryId,
+  rawRequestId,
   dispatch,
   callback,
   errorCallback,
 ) => {
   if (!ministryId) {
-    dispatch(serviceActionError("No request id"));
+    ministryId = 'None';
   }
   dispatch(setFOICorrespondenceLoader(true));
   const apiUrl = replaceUrl(replaceUrl(
     API.FOI_EDIT_RESPONSE_EMAIL_CORRESPONDENCE,
     "<ministryrequestid>",
-    ministryId)
+    ministryId), 
+    "<rawrequestid>", rawRequestId
   );
   httpPOSTRequest(apiUrl, data)
     .then((res) => {
