@@ -25,7 +25,7 @@ const MCFPersonal = ({
     editTagModalOpen,
     setEditTagModalOpen,
     setNewDivision,
-    // tagValue,
+    comparePersonalAttributes,
     curPersonalAttributes,
     setNewPersonalAttributes,
     updatePersonalAttributes,
@@ -74,6 +74,11 @@ const MCFPersonal = ({
     const [fileTypeSearchValue, setFileTypeSearchValue] = useState("");
     const [additionalFileTypes, setAdditionalFileTypes] = useState([]);
     const [showAdditionalFileTypes, setShowAdditionalFileTypes] = useState(false);
+    const [disableSave, setDisableSave] = useState(false);
+
+    useEffect(() => {
+      setDisableSave(personalAttributes?.person === undefined || personalAttributes?.person === "" || personalAttributes?.filetype === undefined || personalAttributes?.filetype === "" || comparePersonalAttributes(personalAttributes, curPersonalAttributes));
+    },[personalAttributes])
 
     useEffect(() => {
       if(currentEditRecord?.attributes?.divisions[0]?.divisionid) {
@@ -622,13 +627,14 @@ const MCFPersonal = ({
             <button
               className={`btn-bottom btn-save btn`}
               onClick={() => {updatePersonalAttributes();reset();}}
+              disabled={disableSave}
             >
               Update for Individual
             </button>
             <button
               className={`btn-bottom btn-save btn`}
               onClick={() => {updatePersonalAttributes(true);reset();}}
-              disabled={isMinistryCoordinator}
+              disabled={disableSave || isMinistryCoordinator}
             >
               Update for All
             </button>
