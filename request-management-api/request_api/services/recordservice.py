@@ -68,7 +68,33 @@ class recordservice(recordservicebase):
             return DefaultMethodResult(True,'Record updated in Doc Reviewer DB', -1, [record['documentmasterid'] for record in requestdata['records']])
         else:
             return DefaultMethodResult(False,'Error in updating Record', -1, [record['documentmasterid'] for record in requestdata['records']])
-            
+
+    def updatepersonalattributes(self, requestid, ministryrequestid, requestdata, userid):
+        newrecords = []
+        recordids = [r['recordid'] for r in requestdata['records'] if r.get('recordid') is not None]
+        response = DefaultMethodResult(True, 'No recordids')
+        # divisions = []
+        if(len(recordids) > 0):
+            records = FOIRequestRecord.getrecordsbyid(recordids)
+            for record in records:
+                record['attributes'] = json.loads(record['attributes'])
+                record['attributes']['personalattributes'] = requestdata['newpersonalattributes']
+                # divisions = divisions + [div for div in record['attributes']['divisions'] if div not in divisions]
+                record.update({'updated_at': datetime.now(), 'updatedby': userid})
+                record['version'] += 1
+                newrecord = FOIRequestRecord()
+                newrecord.__dict__.update(record)
+                newrecords.append(newrecord)
+            response = FOIRequestRecord.create(newrecords)
+        if response.success:
+            # _apiresponse, err = self.makedocreviewerrequest('POST', '/api/document/update', {'ministryrequestid': ministryrequestid, 'documentmasterids': [record['documentmasterid'] for record in requestdata['records']], 'divisions': divisions, 'personalattributes': requestdata['newpersonalattributes']})
+            _apiresponse, err = self.makedocreviewerrequest('POST', '/api/document/update/personal', {'ministryrequestid': ministryrequestid, 'documentmasterids': [record['documentmasterid'] for record in requestdata['records']], 'personalattributes': requestdata['newpersonalattributes']})
+            if err:
+                return DefaultMethodResult(False,'Error in contacting Doc Reviewer API', -1,  [record['documentmasterid'] for record in requestdata['records']])
+            return DefaultMethodResult(True,'Record updated in Doc Reviewer DB', -1, [record['documentmasterid'] for record in requestdata['records']])
+        else:
+            return DefaultMethodResult(False,'Error in updating Record', -1, [record['documentmasterid'] for record in requestdata['records']])
+
     def retry(self, _requestid, ministryrequestid, data):
         _ministryrequest = FOIMinistryRequest.getrequestbyministryrequestid(ministryrequestid)
         for record in data['records']:
@@ -134,10 +160,10 @@ class recordservice(recordservicebase):
             _record['attributes']['extension'] = extension            
             _record['attributes']['incompatible'] =  extension.lower() in NONREDACTABLE_FILE_TYPES 
             record.__dict__.update(_record)
-            recordlist.append(record)      
+            recordlist.append(record)
         dbresponse = FOIRequestRecord.replace(recordid,recordlist)
         if (dbresponse.success):
-            processingrecords = [{**record, **{"recordid": dbresponse.args[0][record['s3uripath']]['recordid']}} for record in records]                      
+            processingrecords = [{**record, **{"recordid": dbresponse.args[0][record['s3uripath']]['recordid']}} for record in records]
             # record all jobs before sending first redis stream message to avoid race condition
             jobids, err = self.makedocreviewerrequest('POST', '/api/jobstatus', {
                 'records': processingrecords,

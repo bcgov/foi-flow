@@ -157,6 +157,9 @@ class FOIRequestWrapperSchema(Schema):
     oipcdetails = fields.Nested(FOIMinistryRequestOIPCSchema, many=True,allow_none=True)
     userrecordslockstatus = fields.Bool(data_key="userrecordslockstatus", allow_none=True)
 
+    estimatedpagecount = fields.Int(data_key="estimatedpagecount",allow_none=True)
+    estimatedtaggedpagecount = fields.Int(data_key="estimatedtaggedpagecount",allow_none=True)
+
     recordspagecount = fields.Int(data_key="recordspagecount",allow_none=True)
     axislanpagecount = fields.Int(data_key="axislanpagecount",allow_none=True)
 

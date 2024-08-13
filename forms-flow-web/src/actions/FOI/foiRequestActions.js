@@ -321,6 +321,24 @@ export const setFOIPersonalSections = (data) => dispatch => {
       payload:data      
   })
 }
+export const setFOIPersonalPeople = (data) => dispatch => {
+  dispatch({
+      type:FOI_ACTION_CONSTANTS.FOI_PERSONAL_PEOPLE,
+      payload:data      
+  })
+}
+export const setFOIPersonalFiletypes = (data) => dispatch => {
+  dispatch({
+      type:FOI_ACTION_CONSTANTS.FOI_PERSONAL_FILETYPES,
+      payload:data      
+  })
+}
+export const setFOIPersonalVolumes = (data) => dispatch => {
+  dispatch({
+      type:FOI_ACTION_CONSTANTS.FOI_PERSONAL_VOLUMES,
+      payload:data      
+  })
+}
 export const setFOIWatcherList = (data) => (dispatch) => {
   dispatch({
     type: FOI_ACTION_CONSTANTS.FOI_WATCHER_LIST,
