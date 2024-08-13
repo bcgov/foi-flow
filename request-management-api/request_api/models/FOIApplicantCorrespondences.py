@@ -38,6 +38,7 @@ class FOIApplicantCorrespondence(db.Model):
     isdraft = db.Column(db.Boolean, default=False, nullable=True)
     isdeleted = db.Column(db.Boolean, default=False, nullable=True)
     isresponse = db.Column(db.Boolean, default=False, nullable=True)
+    response_at = db.Column(db.DateTime, nullable=True)
     
     #ForeignKey References       
     foiministryrequest_id =db.Column(db.Integer, db.ForeignKey('FOIMinistryRequests.foiministryrequestid'))
@@ -50,9 +51,7 @@ class FOIApplicantCorrespondence(db.Model):
         try:
             sql = """select distinct on (applicantcorrespondenceid) applicantcorrespondenceid, templateid , correspondencemessagejson , version, 
                         created_at, createdby, sentcorrespondencemessage, parentapplicantcorrespondenceid, sentby, sent_at,
-                         isdraft, isdeleted, isresponse, 
-                         (select response_at from "FOIApplicantCorrespondenceResponses" as res 
-	where res.applicantcorrespondence_id = fpa.applicantcorrespondenceid order by res.version desc limit 1)
+                         isdraft, isdeleted, isresponse, response_at
                          from "FOIApplicantCorrespondences" fpa 
                         where foiministryrequest_id = :ministryrequestid
                     order by applicantcorrespondenceid desc, version desc""" 
@@ -148,5 +147,4 @@ class FOIApplicantCorrespondence(db.Model):
 
 class FOIApplicantCorrespondenceSchema(ma.Schema):
     class Meta:
-        fields = ('applicantcorrespondenceid', 'version', 'parentapplicantcorrespondenceid', 'templateid','correspondencemessagejson','foiministryrequest_id','foiministryrequestversion_id','created_at','createdby','attachments','sentcorrespondencemessage','sent_at','sentby')
-    
+        fields = ('applicantcorrespondenceid', 'version', 'parentapplicantcorrespondenceid', 'templateid','correspondencemessagejson','foiministryrequest_id','foiministryrequestversion_id','created_at','createdby','attachments','sentcorrespondencemessage','sent_at','sentby', 'isdraft', 'isdeleted', 'isresponse', 'response_at')
