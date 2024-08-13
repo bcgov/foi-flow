@@ -63,7 +63,6 @@ export const ContactApplicant = ({
   const fullNameList = getFullnameList()
   const [modalFor, setModalFor] = useState("add")
 
-  console.log('applicantCorrespondenceTemplates: ', applicantCorrespondenceTemplates)
   const getFullname = (userid: string) => {
     let user = fullNameList.find((u: any) => u.username === userid);
     return user && user.fullname ? user.fullname : userid;
@@ -179,11 +178,8 @@ export const ContactApplicant = ({
 
   const isEnabledTemplate = (item: any) => {
    if (['PAYONLINE', 'PAYOUTSTANDING'].includes(item.name)) { 
-    console.log('a')
       return !isFeeTemplateDisabled(currentCFRForm, item); 
    } else if (['EXTENSIONS-PB'].includes(item.name)) {
-    console.log('B')
-    console.log('B')
       return getExtensionType(requestExtensions) === "PB";
    } else if (['OIPCAPPLICANTCONSENTEXTENSION'].includes(item.name)) {
     const check=getExtensionType(requestExtensions) === "OIPCAPPLICANTCONSENTEXTENSION"
@@ -207,8 +203,6 @@ export const ContactApplicant = ({
   }
 
   useEffect(() => { 
-    console.log('applicantCorrespondenceTemplates: ', applicantCorrespondenceTemplates)
-    console.log('applicantCorrespondenceTemplates: ', applicantCorrespondenceTemplates)
     applicantCorrespondenceTemplates.forEach((item: any) => {
       setTemplates([{ value: "", label: "", templateid: null, text: "", disabled: true, created_at:"" }]);
       if (isEnabledTemplate(item)) {
