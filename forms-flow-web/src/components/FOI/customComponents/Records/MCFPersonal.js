@@ -86,6 +86,8 @@ const MCFPersonal = ({
          || personalAttributes?.person === ""
          || personalAttributes?.filetype === undefined
          || personalAttributes?.filetype === ""
+         || personalAttributes?.trackingid === undefined
+         || personalAttributes?.trackingid === ""
          || (!isMinistryCoordinator && comparePersonalAttributes(personalAttributes, curPersonalAttributes))
          || (isMinistryCoordinator && comparePersonalAttributes(personalAttributes, curPersonalAttributes) && compareDivision(currentEditRecord.attributes.divisions[0].divisionid, divisionModalTagValue))
         );
