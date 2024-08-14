@@ -177,6 +177,7 @@ export const ContactApplicant = ({
   const [templates, setTemplates] = useState<any[]>([{ value: "", label: "", templateid: null, text: "", disabled: true, created_at:"" }]);
 
   const isEnabledTemplate = (item: any) => {
+    return true;
    if (['PAYONLINE', 'PAYOUTSTANDING'].includes(item.name)) { 
       return !isFeeTemplateDisabled(currentCFRForm, item); 
    } else if (['EXTENSIONS-PB'].includes(item.name)) {
@@ -678,7 +679,7 @@ export const ContactApplicant = ({
         });
         dispatch(fetchApplicantCorrespondence(requestId, ministryId));
       }
-      deleteResponseCorrespondence(selectedCorrespondence.applicantcorrespondenceid,ministryId,
+      deleteResponseCorrespondence(selectedCorrespondence.applicantcorrespondenceid,ministryId,requestId,
         dispatch,
         callback,
         (errorMessage: string) => {

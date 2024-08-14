@@ -100,7 +100,7 @@ const API = {
   FOI_DELETE_DRAFT_EMAIL_CORRESPONDENCE: `${FOI_BASE_API_URL}/api/foiflow/applicantcorrespondence/draft/delete/<ministryrequestid>/<rawrequestid>/<correspondenceid>`,
   FOI_POST_RESPONSE_EMAIL_CORRESPONDENCE: `${FOI_BASE_API_URL}/api/foiflow/applicantcorrespondence/response/<ministryrequestid>/<rawrequestid>`,
   FOI_EDIT_RESPONSE_EMAIL_CORRESPONDENCE: `${FOI_BASE_API_URL}/api/foiflow/applicantcorrespondence/response/edit/<ministryrequestid>/<rawrequestid>`,
-  FOI_DELETE_RESPONSE_EMAIL_CORRESPONDENCE: `${FOI_BASE_API_URL}/api/foiflow/applicantcorrespondence/response/delete/<ministryrequestid>/<rawrequestid>`,
+  FOI_DELETE_RESPONSE_EMAIL_CORRESPONDENCE: `${FOI_BASE_API_URL}/api/foiflow/applicantcorrespondence/response/delete/<ministryrequestid>/<rawrequestid>/<correspondenceid>`,
 
   FOI_GET_EMAIL_CORRESPONDENCE: `${FOI_BASE_API_URL}/api/foiflow/applicantcorrespondence/<requestid>/<ministryrequestid>`,
   FOI_GET_EMAIL_CORRESPONDENCE_TEMPLATES: `${FOI_BASE_API_URL}/api/foiflow/applicantcorrespondence/templates`,
