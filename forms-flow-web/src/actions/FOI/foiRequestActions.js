@@ -501,3 +501,10 @@ export const setOIPCInquiryoutcomes = (data) => (dispatch) => {
     payload: data,
   });
 };
+
+export const setFOICommentTypes = (data) => (dispatch) => {
+  dispatch({
+    type: FOI_ACTION_CONSTANTS.FOI_COMMENT_TYPES,
+    payload: data,
+  });
+};

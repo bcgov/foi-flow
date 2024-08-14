@@ -36,7 +36,8 @@ class FOIRequestComment(db.Model):
         parentcommentid = foirequestcomment["parentcommentid"] if 'parentcommentid' in foirequestcomment  else None
         taggedusers = foirequestcomment["taggedusers"] if 'taggedusers' in foirequestcomment  else None
         _createddate = datetime2.now().isoformat() if commentcreatedate is None else commentcreatedate        
-        newcomment = FOIRequestComment(commenttypeid=commenttypeid, ministryrequestid=foirequestcomment["ministryrequestid"], version=version, comment=foirequestcomment["comment"], parentcommentid=parentcommentid, isactive=True, created_at=_createddate, createdby=userid,taggedusers=taggedusers, commentsversion=commentsversion)
+        newcomment = FOIRequestComment(commenttypeid=foirequestcomment["commenttypeid"], ministryrequestid=foirequestcomment["ministryrequestid"], 
+                                       version=version, comment=foirequestcomment["comment"], parentcommentid=parentcommentid, isactive=True, created_at=_createddate, createdby=userid,taggedusers=taggedusers, commentsversion=commentsversion)
         db.session.add(newcomment)
         db.session.commit()      
         return DefaultMethodResult(True,'Comment added',newcomment.commentid)    

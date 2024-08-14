@@ -989,6 +989,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
                   isRestricted={
                     requestDetails?.ministryrestricteddetails?.isrestricted
                   }
+                  isMinistry={isMinistry}
                 />
               </>
             ) : (

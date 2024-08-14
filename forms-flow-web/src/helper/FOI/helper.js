@@ -478,6 +478,12 @@ const readUploadedFileAsBytes = (inputFile) => {
   });
 };
 
+const getCommentTypeIdByName = (commentTypes, name) => {
+  console.log("Name:",name)
+  const commentType = commentTypes.find(type => type.name === name);
+  return commentType ? commentType.commenttypeid : null; // Return null if not found
+};
+
 export {
   replaceUrl,
   formatDate,
@@ -512,5 +518,6 @@ export {
   isrecordtimeout,
   isFoiAdmin,
   readUploadedFileAsBytes,
-  getUserFullName
+  getUserFullName,
+  getCommentTypeIdByName
 };
