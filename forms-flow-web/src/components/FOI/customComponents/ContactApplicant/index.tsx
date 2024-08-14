@@ -498,6 +498,7 @@ export const ContactApplicant = ({
               fullName={getFullname(message.createdby)}
               isEmail={true}
               ministryId={ministryId}
+              commentTypes={null}
             />
           </div>
         ))}

@@ -8,7 +8,7 @@ import { addToFullnameList, getFullnameList } from '../../../../helper/FOI/helpe
 
 
 const DisplayComments = ({ comments, bcgovcode, currentUser, iaoassignedToList, ministryAssignedToList, restrictedReqTaglist, isRestricted,
-  setEditorChange, removeComment, setRemoveComment }) => {
+  setEditorChange, removeComment, setRemoveComment, commentTypes }) => {
 
   const [fullnameList, setFullnameList] = useState(getFullnameList);
 
@@ -148,7 +148,9 @@ const DisplayComments = ({ comments, bcgovcode, currentUser, iaoassignedToList, 
               i={a}
               reply
               parentId={i.commentId}
-              handleEdit={() => actions.handleAction} totalcommentCount={i.replies.length} currentIndex={replyindex} isreplysection={true} hasAnotherUserComment={false} fullName={getfullName(a.commentTypeId, a.userId)}
+              handleEdit={() => actions.handleAction} totalcommentCount={i.replies.length} currentIndex={replyindex} isreplysection={true} hasAnotherUserComment={false} 
+              fullName={getfullName(a.commentTypeId, a.userId)}
+              commentTypes={commentTypes}
             />
           )}
           {actions.replies.filter((id) => id === a.commentId).length !==
@@ -181,8 +183,6 @@ const DisplayComments = ({ comments, bcgovcode, currentUser, iaoassignedToList, 
   }
 
   const rendercomments = () =>{
-    // console.log("**comments:**",comments)
-    // console.log("**actions.editArr:**",actions.editArr)
     if(fullnameList?.length > 0)
     {
         return (
@@ -194,7 +194,8 @@ const DisplayComments = ({ comments, bcgovcode, currentUser, iaoassignedToList, 
                   setEditorChange={setEditorChange} removeComment={removeComment} setRemoveComment={setRemoveComment} commentTypeId={i.commentTypeId} />
               ) : (
                 <CommentStructure i={i} handleEdit={() => actions.handleAction} totalcommentCount={gettotalcommentflag(i)} currentIndex={index} c={false} 
-                  hasAnotherUserComment={(i.replies && i.replies.filter(r => r.userId !== currentUser.userId).length > 0)} fullName={getfullName(i.commentTypeId, i.userId)} />
+                  hasAnotherUserComment={(i.replies && i.replies.filter(r => r.userId !== currentUser.userId).length > 0)} 
+                  fullName={getfullName(i.commentTypeId, i.userId)} commentTypes={commentTypes} />
               )}
               {
                 actions.replies.filter((id) => id === i.commentId).length !== 0 &&
@@ -220,7 +221,6 @@ const DisplayComments = ({ comments, bcgovcode, currentUser, iaoassignedToList, 
 
 
   const actions = useContext(ActionContext)
-  console.log("actions:",actions)
 
   return (
     <div style={{ paddingBottom: '2%', marginBottom: '2%' }}>

@@ -27,9 +27,11 @@ import { downloadZip } from "client-zip";
 import { useDispatch } from "react-redux";
 import * as html2pdf from 'html-to-pdf-js';
 import NewCommentIndicator from './NewCommentIndicator';
+import { getCommentLabelFromId } from "../../../../helper/FOI/helper";
 
 
-const CommentStructure = ({ i, reply, parentId, totalcommentCount, currentIndex, isreplysection, hasAnotherUserComment, fullName, isEmail=false, ministryId=null}) => {
+const CommentStructure = ({ i, reply, parentId, totalcommentCount, currentIndex, isreplysection, hasAnotherUserComment, 
+  fullName, commentTypes, isEmail=false, ministryId=null}) => {
 
   const actions = useContext(ActionContext)
   const edit = true
@@ -252,17 +254,6 @@ const CommentStructure = ({ i, reply, parentId, totalcommentCount, currentIndex,
     )
   };
 
-  const commentTypeLabel = () => {
-    //let commentType= Object.entries(CommentTypes).find(([key, val]) => val === i.commentTypeId)?.[0]
-    // console.log("Value of i: ",i)
-    // console.log("!!!!",i.commentTypeId)
-    if(i.commentTypeId === 1)
-      return "GENERAL"
-    else if(i.commentTypeId === 4 || i.commentTypeId === 5)
-      return "INTERNAL"
-    else if(i.commentTypeId === 6 || i.commentTypeId === 7)
-      return "PEER REVIEW"
-  }
 
   return (
     <>
@@ -281,7 +272,7 @@ const CommentStructure = ({ i, reply, parentId, totalcommentCount, currentIndex,
                 <Chip
                     item
                     //key={i}
-                    label={commentTypeLabel()}
+                    label={getCommentLabelFromId(commentTypes, i.commentTypeId )}
                     //size="small"
                     className="commentTypeChip"
                     style={{

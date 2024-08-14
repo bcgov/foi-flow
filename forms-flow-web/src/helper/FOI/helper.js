@@ -479,9 +479,13 @@ const readUploadedFileAsBytes = (inputFile) => {
 };
 
 const getCommentTypeIdByName = (commentTypes, name) => {
-  console.log("Name:",name)
   const commentType = commentTypes.find(type => type.name === name);
-  return commentType ? commentType.commenttypeid : null; // Return null if not found
+  return commentType ? commentType.commenttypeid : 0;
+};
+
+const getCommentLabelFromId = (commentTypes, id) => {
+  const commentType = commentTypes.find(type => type.commenttypeid === id);
+  return commentType ? commentType.label?.toUpperCase() : "";
 };
 
 export {
@@ -519,5 +523,6 @@ export {
   isFoiAdmin,
   readUploadedFileAsBytes,
   getUserFullName,
-  getCommentTypeIdByName
+  getCommentTypeIdByName,
+  getCommentLabelFromId
 };

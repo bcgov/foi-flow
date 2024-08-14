@@ -28,7 +28,6 @@ const useStyles = makeStyles((theme) => ({
 
 const Confirm = React.memo((props)=>{
     const { modalOpen=false, onYes, onNo, message, yesText = 'Yes', noText = 'No' } = props;
-    console.log("modalOpen:",modalOpen)
     const classes = useStyles();
     // return (
     //   <>

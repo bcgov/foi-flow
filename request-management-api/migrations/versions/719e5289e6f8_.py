@@ -13,26 +13,35 @@ from sqlalchemy.sql.sqltypes import Boolean, String
 
 # revision identifiers, used by Alembic.
 revision = '719e5289e6f8'
-down_revision = '5fdd5df3d642'
+down_revision = 'aa2691fa6c3c'
 branch_labels = None
 depends_on = None
 
 
 def upgrade():
+    op.execute('ALTER TABLE public."CommentTypes" ADD COLUMN label VARCHAR(100)')
     commenttype_table = table('CommentTypes',
                                  column('name',String),
+                                 column('label',String),
                                  column('description',String),
                                  column('isactive',Boolean),
                                    )
     op.bulk_insert(
         commenttype_table,
         [
-            {'name':'IAO Internal','description':'internal comments input by IAO users','isactive':True},
-            {'name':'Ministry Internal','description':'internal comments input by Ministry users','isactive':True},
-            {'name':'IAO Peer Review','description':'peer review comments input by IAO users','isactive':True},
-            {'name':'Ministry Peer Review','description':'peer review comments input by Ministry users','isactive':True}                      
+            {'name':'IAO Internal','label': 'Internal','description':'internal comments input by IAO users','isactive':True},
+            {'name':'Ministry Internal','label':'Internal','description':'internal comments input by Ministry users','isactive':True},
+            {'name':'IAO Peer Review','label':'Peer Review','description':'peer review comments input by IAO users','isactive':True},
+            {'name':'Ministry Peer Review','label':'Peer Review','description':'peer review comments input by Ministry users','isactive':True}                      
         ])
+    
+    
+    op.execute('Update public."CommentTypes" set label = \'General\' where name = \'User submitted\';') 
+    op.execute('Update public."CommentTypes" set label = \'System Generated\' where name = \'System generated\';')  
+    op.execute('Update public."CommentTypes" set label = \'Divisional Tracking\' where name = \'Divisional Tracking\';')  
+
 
 def downgrade():
     op.execute('delete from public."FOIRequestStatuses" where name in (\'IAO Internal\',\'Ministry Internal\',\'IAO Peer Review\',\'Ministry Peer Review\');')
+    op.execute('ALTER TABLE public."CommentTypes" DROP label')
     # ### end Alembic commands ###

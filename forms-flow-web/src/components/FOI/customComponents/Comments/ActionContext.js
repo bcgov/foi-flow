@@ -73,7 +73,6 @@ export const ActionProvider = ({
     }
   }
   const onSubmit = (text, parentId, child, taggedusers, commentTypeId) => {
-    console.log("commentTypeId-->",commentTypeId)
     setFOILoader(true)
     if (text.length > 0) {
       if (!parentId && !child) {

@@ -9,6 +9,7 @@ class CommentType(db.Model):
     # Defining the columns
     commenttypeid = db.Column(db.Integer, primary_key=True,autoincrement=True)
     name = db.Column(db.String(100), unique=False, nullable=False)  
+    label= db.Column(db.String(100), unique=False, nullable=False)
     description = db.Column(db.String(255), unique=False, nullable=False)    
     isactive = db.Column(db.Boolean, unique=False, nullable=False)
 
@@ -21,4 +22,4 @@ class CommentType(db.Model):
 
 class CommentTypeSchema(ma.Schema):
     class Meta:
-        fields = ('commenttypeid', 'name', 'description','isactive')
+        fields = ('commenttypeid', 'name', 'label', 'description','isactive')

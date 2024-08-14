@@ -21,6 +21,7 @@ import {
   fetchFOIPersonalPeople,
   fetchFOIPersonalFiletypes,
   fetchFOIPersonalVolumes,
+  fetchFOICommentTypes
 } from "../../../../apiManager/services/FOI/foiMasterDataServices";
 
 import { fetchFOIRequestAttachmentsList } from "../../../../apiManager/services/FOI/foiAttachmentServices";
@@ -42,6 +43,7 @@ import {
   ConditionalComponent,
   calculateDaysRemaining,
   addToRestrictedRequestTagList,
+  getCommentTypeIdByName
 } from "../../../../helper/FOI/helper";
 import ApplicantDetails from "./ApplicantDetails";
 import ChildDetails from "./ChildDetails";
@@ -115,6 +117,8 @@ const MinistryReview = React.memo(({ userDetail }) => {
 
   const [_currentrequestStatus, setcurrentrequestStatus] = React.useState("");
   const [_tabStatus, settabStatus] = React.useState(requestState);
+  const commentTypes = useSelector((state) => state.foiRequests.foiCommentTypes); 
+
   
   //gets the request detail from the store
   const IsDivisionalCoordinator = () => {
@@ -204,6 +208,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
     } else if (window.location.href.indexOf("records") > -1) {
       tabclick("Records");
     }
+    dispatch(fetchFOICommentTypes());
   }, []);
 
   useEffect(async () => {
@@ -627,6 +632,20 @@ const MinistryReview = React.memo(({ userDetail }) => {
     (state) => state.foiRequests.showEventQueue
   );
 
+  const getCommentsCount = () => {
+    if(isMinistry){
+       let commentsCount= (requestNotes.filter(c => c.commentTypeId !== getCommentTypeIdByName(commentTypes, "IAO Internal") && 
+          c.commentTypeId !== getCommentTypeIdByName(commentTypes, "IAO Peer Review"))).length;
+        return '('+commentsCount+')'
+    }
+    else{
+      let commentsCount= (requestNotes.filter( c => c.commentTypeId !== getCommentTypeIdByName(commentTypes,"Ministry Internal") && 
+            c.commentTypeId !== getCommentTypeIdByName(commentTypes, "Ministry Peer Review"))).length;
+      return '('+commentsCount+')'
+    }
+
+  }
+
   return !isLoading &&
     requestDetails &&
     Object.keys(requestDetails).length !== 0 &&
@@ -674,6 +693,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
                 ? ` (${requestAttachments.length})`
                 : ""}
             </div>
+            {/* {commentTypes?.length > 0 && */}
             <div
               className={clsx("tablinks", {
                 active: tabLinksStatuses.Comments.active,
@@ -682,10 +702,12 @@ const MinistryReview = React.memo(({ userDetail }) => {
               onClick={() => tabclick("Comments")}
             >
               Comments{" "}
-              {requestNotes && requestNotes.length > 0
+              {/* {requestNotes && requestNotes.length > 0
                 ? `(${requestNotes.length})`
-                : ""}
+                : ""} */}
+              {getCommentsCount()}
             </div>
+            {/* } */}
             {(originalDivisions?.length > 0 || isMCFPersonal) &&
               DISABLE_GATHERINGRECORDS_TAB?.toLowerCase() == "false" && (
                 <div
@@ -990,6 +1012,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
                     requestDetails?.ministryrestricteddetails?.isrestricted
                   }
                   isMinistry={isMinistry}
+                  commentTypes={commentTypes}
                 />
               </>
             ) : (
