@@ -134,23 +134,25 @@ class applicantcorrespondenceservice:
             updt_correspondence.response_at = data['responsedate']
         response = FOIApplicantCorrespondence.saveapplicantcorrespondence(updt_correspondence, None, None)
         if response.success == True:
-            if 'filename' in data and data['filename'] is not None:
-                attachmentresponse = self.updatecorrespondenceattachmentfilenameforministry(data['correspondenceattachmentid'], data['filename'], userid)
-            if 'responsedate' in data and data['responsedate'] is not None:
-                attachment = FOIApplicantCorrespondenceAttachment.getcorrespondenceattachmentbyapplicantcorrespondenceid(data['correspondenceid'])
+            attachment = FOIApplicantCorrespondenceAttachment.getcorrespondenceattachmentbyapplicantcorrespondenceid(data['correspondenceid'])
+            if len(attachment) > 0:
                 updated_attachment = FOIApplicantCorrespondenceAttachment()
                 updated_attachment.__dict__.update(attachment)
-                updated_attachment.applicantcorrespondence_version = updated_attachment.applicantcorrespondence_version + 1
-                updated_attachment.version = updated_attachment.version + 1
+                if 'filename' in data and data['filename'] is not None:
+                    updated_attachment.attachmentfilename = data['filename']
+                updated_attachment.created_at = datetime.now()
+                updated_attachment.createdby = userid
+                updated_attachment.version=attachment["version"]+1
+                updated_attachment.applicantcorrespondence_version = attachment["applicantcorrespondence_version"] + 1
                 FOIApplicantCorrespondenceAttachment.saveapplicantcorrespondenceattachment(updated_attachment)
         return response
     
-    def editapplicantcorrespondencelogforrawrequest(self, data, userid):
+    def editapplicantcorrespondencelogforrawrequest(self, rawrequestid, data, userid):
         correspondence = FOIApplicantCorrespondenceRawRequest.getapplicantcorrespondencebyid(data['correspondenceid'])
         updt_correspondence = FOIApplicantCorrespondenceRawRequest()
         updt_correspondence.__dict__.update(correspondence)
         updt_correspondence.version = correspondence['version']+1
-        updt_correspondence.foirawrequestversion_id =FOIRawRequest.getversionforrequest(requestid=data['correspondenceid'])
+        updt_correspondence.foirawrequestversion_id =FOIRawRequest.getversionforrequest(requestid=rawrequestid)
         updt_correspondence.created_at = datetime.now()
         updt_correspondence.createdby = userid
         # This is for sent correspondences
@@ -161,38 +163,19 @@ class applicantcorrespondenceservice:
             updt_correspondence.response_at = data['responsedate']
         response = FOIApplicantCorrespondenceRawRequest.saveapplicantcorrespondence(updt_correspondence, None, None)
         if response.success == True:
-            if 'filename' in data and data['filename'] is not None:
-                attachmentresponse = self.updatecorrespondenceattachmentfilenameforrawrequest(data['correspondenceattachmentid'], data['filename'], userid)
-            if 'responsedate' in data and data['responsedate'] is not None:
-                attachment = FOIApplicantCorrespondenceAttachmentRawRequest.getcorrespondenceattachmentbyapplicantcorrespondenceid(data['correspondenceid'])
+            # Check for attachments
+            attachment = FOIApplicantCorrespondenceAttachmentRawRequest.getcorrespondenceattachmentbyapplicantcorrespondenceid(data['correspondenceid'])
+            if len(attachment) > 0:
                 updated_attachment = FOIApplicantCorrespondenceAttachmentRawRequest()
                 updated_attachment.__dict__.update(attachment)
-                updated_attachment.applicantcorrespondence_version = updated_attachment.applicantcorrespondence_version + 1
-                updated_attachment.version = updated_attachment.version + 1
+                if 'filename' in data and data['filename'] is not None:
+                    updated_attachment.attachmentfilename = data['filename']
+                updated_attachment.created_at = datetime.now()
+                updated_attachment.createdby = userid
+                updated_attachment.version=attachment["version"]+1
+                updated_attachment.applicantcorrespondence_version = attachment["applicantcorrespondence_version"] + 1
                 FOIApplicantCorrespondenceAttachmentRawRequest.saveapplicantcorrespondenceattachment(updated_attachment)
         return response
-    
-    def updatecorrespondenceattachmentfilenameforministry(self, correspondenceattachmentid, filename, userid):
-        attachment = FOIApplicantCorrespondenceAttachment.getapplicantcorrespondenceattachmentbyid(correspondenceattachmentid)
-        updt_attachment = FOIApplicantCorrespondenceAttachment()
-        updt_attachment.__dict__.update(attachment)
-        updt_attachment.attachmentfilename = filename
-        updt_attachment.created_at = datetime.now()
-        updt_attachment.createdby = userid
-        updt_attachment.version=attachment['version']+1
-        updt_attachment.applicantcorrespondence_version = attachment["applicantcorrespondence_version"] + 1
-        return FOIApplicantCorrespondenceAttachment.saveapplicantcorrespondenceattachment(updt_attachment)
-
-    def updatecorrespondenceattachmentfilenameforrawrequest(self, correspondenceattachmentid, filename, userid):
-        attachment = FOIApplicantCorrespondenceAttachmentRawRequest.getapplicantcorrespondenceattachmentbyid(correspondenceattachmentid)
-        updt_attachment = FOIApplicantCorrespondenceAttachmentRawRequest()
-        updt_attachment.__dict__.update(attachment)
-        updt_attachment.attachmentfilename = filename
-        updt_attachment.created_at = datetime.now()
-        updt_attachment.createdby = userid
-        updt_attachment.version=attachment["version"]+1
-        updt_attachment.applicantcorrespondence_version = attachment["applicantcorrespondence_version"] + 1
-        return FOIApplicantCorrespondenceAttachmentRawRequest.saveapplicantcorrespondenceattachment(updt_attachment)
 
     def deleteapplicantcorrespondencelogministry(self, ministryrequestid, correpondenceid, userid):
         return FOIApplicantCorrespondence.deleteapplicantcorrespondence(ministryrequestid,correpondenceid,userid)        
