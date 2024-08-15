@@ -212,13 +212,9 @@ const FileUploadForMCFPersonal = ({
     const fileDrop = (e) => {
       e.preventDefault();
 
-      if(modalFor === "add" && (!isPersonSelected || ((isMinistryCoordinator && tagValue == "")))) {
-        return
-      } else {
-        const newFiles = e.dataTransfer.files;
-        const totalNoOfFiles = Object.entries(files).length + newFiles.length; 
-        validateFiles(newFiles, totalNoOfFiles);
-      }
+      const newFiles = e.dataTransfer.files;
+      const totalNoOfFiles = Object.entries(files).length + newFiles.length; 
+      validateFiles(newFiles, totalNoOfFiles);
     }
     const removeFile = (fileName) => {
         const _file = files[fileName];
