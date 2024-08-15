@@ -183,24 +183,24 @@ class FOIFlowDivisions(Resource):
     def get(bcgovcode,specifictopersonalrequests=None, fetchmode = None):
         try:
             data = None                        
-            # if(specifictopersonalrequests is not None and specifictopersonalrequests.lower() == 'true'):                
-            #     match fetchmode:
-            #         case 'divisions':
-            #             data = divisionstageservice().getpersonalspecificdivisionandstages(bcgovcode)
-            #         case 'sections' | 'personaltag':
-            #             data = divisionstageservice().getpersonalspecificprogramareasections(bcgovcode)
-            #         case 'divisionsandsections':
-            #             data = divisionstageservice().getpersonalspecificdivisionsandsections(bcgovcode)
-            #         case 'people':
-            #             data = divisionstageservice().getpersonalspecificpeople(bcgovcode)
-            #         case 'filetypes':
-            #             data = divisionstageservice().getpersonalspecificfiletypes(bcgovcode)
-            #         case 'volumes':
-            #             data = divisionstageservice().getpersonalspecificvolumes(bcgovcode)
-            #         case _:                        
-            #             data = divisionstageservice().getpersonalspecificdivisionandstages(bcgovcode)
-            # else:
-            data = divisionstageservice().getdivisionandstages(bcgovcode)               
+            if(specifictopersonalrequests is not None and specifictopersonalrequests.lower() == 'true'):                
+                match fetchmode:
+                    case 'divisions':
+                        data = divisionstageservice().getpersonalspecificdivisionandstages(bcgovcode)
+                    case 'sections' | 'personaltag':
+                        data = divisionstageservice().getpersonalspecificprogramareasections(bcgovcode)
+                    case 'divisionsandsections':
+                        data = divisionstageservice().getpersonalspecificdivisionsandsections(bcgovcode)
+                    case 'people':
+                        data = divisionstageservice().getpersonalspecificpeople(bcgovcode)
+                    case 'filetypes':
+                        data = divisionstageservice().getpersonalspecificfiletypes(bcgovcode)
+                    case 'volumes':
+                        data = divisionstageservice().getpersonalspecificvolumes(bcgovcode)
+                    case _:                        
+                        data = divisionstageservice().getpersonalspecificdivisionandstages(bcgovcode)
+            else:
+                data = divisionstageservice().getdivisionandstages(bcgovcode)               
             jsondata = json.dumps(data)
             return jsondata , 200
         except Exception as exception:
@@ -480,7 +480,7 @@ class FOIFlowOIPCInquiryOutcomes(Resource):
         
 @cors_preflight('GET,OPTIONS')
 @API.route('/foiflow/commenttypes')
-class FOIFlowSubjectCodes(Resource):
+class FOIFlowCommentTypes(Resource):
     """Retrieves all active comment types.
     """
     @staticmethod

@@ -693,26 +693,24 @@ import {
   };
 
   export const fetchFOICommentTypes = () => {
-    //const firstSubjectCode = { "subjectcodeid": 0, "name": "Select Subject Code (if required)" };
     return (dispatch) => {
       httpGETRequest(API.FOI_GET_COMMENT_TYPES, {}, UserService.getToken())
         .then((res) => {
           if (res.data) {
             const foiCommentTypes = res.data;
-            let data = foiCommentTypes.map((subjectCode) => {
-              return { ...subjectCode };
+            let data = foiCommentTypes.map((type) => {
+              return { ...type };
             });
-            //data.unshift(firstSubjectCode);
             dispatch(setFOICommentTypes(data));
             dispatch(setFOILoader(false));
           } else {
-            console.log("Error while fetching subject code master data", res);
+            console.log("Error while fetching comment types master data", res);
             dispatch(serviceActionError(res));
             dispatch(setFOILoader(false));
           }
         })
         .catch((error) => {
-          console.log("Error while fetching delivery mode master data", error);
+          console.log("Error while fetching comment types master data", error);
           dispatch(serviceActionError(error));
           dispatch(setFOILoader(false));
         });
