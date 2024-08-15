@@ -83,8 +83,8 @@ const FileUploadForMCFPersonal = ({
       isMinistryCoordinator?MCFPeople?.people.filter((p)=>{return p.name !== 'PERSON 1'}):MCFPeople?.people.filter((p)=>{return p.name !== 'APPLICANT'})
     );
     const [allVolumes, setAllVolumes] = useState(MCFVolumes?.volumes);
-    const [fileTypes, setFileTypes] = useState(MCFFiletypes?.filetypes.slice(0, 6));
-    const [otherFileTypes, setOtherFileTypes] = useState(MCFFiletypes?.filetypes.slice(6, MCFFiletypes?.filetypes.length));
+    const [fileTypes, setFileTypes] = useState(MCFFiletypes?.filetypes.slice(0, 8));
+    const [otherFileTypes, setOtherFileTypes] = useState(MCFFiletypes?.filetypes.slice(8, MCFFiletypes?.filetypes.length));
     const [people, setPeople] = useState(allPeople.slice(0, 5));
     const [volumes, setVolumes] = useState(allVolumes.slice(0, 5));
     const [showAllPeople, setShowAllPeople] = useState(false);

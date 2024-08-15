@@ -17,7 +17,7 @@ depends_on = None
 
 
 def upgrade():
-    filetypes = ["AD_C","AA","AH","AO","FH","CS","CYMH","DIV","FS","ICM","MAPLES","RE","SP","PABS","VAN-AA","VAN-CAS","VAN-CIC","VAN-CCAS","VIC-AA","YAG","Autism Case File","Assessment & Resource","AR ","AS","AM","AP","CC","Choices","CIC","CYSN","CS UNREG","CT","CH","FS UNREG","RE UNREG","SN","Woodlands","Incident","Memo ","Service Request","FS Case","CS Case","SR Case","Complaint"]
+    filetypes = ["CS","FS","ICM","CYMH","RE","CYSN","AD_C","DIV","AA","AH","AO","FH","MAPLES","SP","PABS","VAN-AA","VAN-CAS","VAN-CIC","VAN-CCAS","VIC-AA","YAG","Autism Case File","Assessment & Resource","AR ","AS","AM","AP","CC","Choices","CIC","CS UNREG","CT","CH","FS UNREG","RE UNREG","SN","Woodlands","Incident","Memo ","Service Request","FS Case","CS Case","SR Case","Complaint"]
     ftsortorder = 1
 
     op.execute('UPDATE public."ProgramAreaDivisions" SET isactive = FALSE WHERE programareaid in (SELECT programareaid FROM public."ProgramAreas" WHERE iaocode =\'CFD\') AND type = \'filetype\'')
