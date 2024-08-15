@@ -478,6 +478,16 @@ const readUploadedFileAsBytes = (inputFile) => {
   });
 };
 
+const getCommentTypeIdByName = (commentTypes, name) => {
+  const commentType = commentTypes.find(type => type.name === name);
+  return commentType ? commentType.commenttypeid : 0;
+};
+
+const getCommentLabelFromId = (commentTypes, id) => {
+  const commentType = commentTypes.find(type => type.commenttypeid === id);
+  return commentType ? commentType.label?.toUpperCase() : "";
+};
+
 export {
   replaceUrl,
   formatDate,
@@ -512,5 +522,7 @@ export {
   isrecordtimeout,
   isFoiAdmin,
   readUploadedFileAsBytes,
-  getUserFullName
+  getUserFullName,
+  getCommentTypeIdByName,
+  getCommentLabelFromId
 };

@@ -225,6 +225,24 @@
   }
 }
 
+.commentTypeChip{
+  font-weight: bold !important;
+  height: 18px !important;
+  color: #fff !important;
+
+}
+
+.btn-cancel {
+  border: 1px solid #38598A;
+  background-color: #FFFFFF;
+  color: #38598A;
+  border-radius: 3px;
+  font-size: small;
+  height: 30px;
+  flex-basis: 50%;
+  font-family: BCSans-Bold, sans-serif !important;
+  margin-top: 10px;
+}
 
 .actionDiv{
   width:0px !important;
@@ -565,7 +583,9 @@ button.bc4rxid {
 }
 
 .post-comment-btn {
+  margin-left: 5px;
   height: 1em;
+  color: white;
 }
 
 strong {

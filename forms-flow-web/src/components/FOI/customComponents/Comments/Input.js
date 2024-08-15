@@ -4,7 +4,7 @@ import { ActionContext } from './ActionContext'
 import { addToFullnameList, getFullnameList } from '../../../../helper/FOI/helper'
 
 const Input = ({ add, bcgovcode, iaoassignedToList, ministryAssignedToList, setEditorChange, removeComment, setRemoveComment,
-  restrictedReqTaglist, isRestricted }) => {
+  restrictedReqTaglist, isRestricted, isMinistry,setshowaddbox, commentTypes }) => {
   
   const [fullnameList, setFullnameList] = useState(getFullnameList());
  
@@ -23,7 +23,10 @@ const Input = ({ add, bcgovcode, iaoassignedToList, ministryAssignedToList, setE
 
   const action = useContext(ActionContext)
   return  (
-    restrictedReqTaglist|| fullnameList && fullnameList?.length > 0 ? <AddCommentField authorImg={action.userImg} main add={add} fullnameList={fullnameList} restrictedReqTaglist={restrictedReqTaglist} setEditorChange={setEditorChange} removeComment={removeComment} setRemoveComment={setRemoveComment} isRestricted={isRestricted} /> :null
+    restrictedReqTaglist|| fullnameList && fullnameList?.length > 0 ? 
+      <AddCommentField authorImg={action.userImg} main add={add} fullnameList={fullnameList} 
+        restrictedReqTaglist={restrictedReqTaglist} setEditorChange={setEditorChange} removeComment={removeComment} 
+          setRemoveComment={setRemoveComment} isRestricted={isRestricted} isMinistry={isMinistry} setshowaddbox={setshowaddbox} commentTypes={commentTypes} /> :null
   )
 }
 
