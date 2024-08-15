@@ -20,7 +20,7 @@ def upgrade():
     filetypes = ["AD_C","AA","AH","AO","FH","CS","CYMH","DIV","FS","ICM","MAPLES","RE","SP","PABS","VAN-AA","VAN-CAS","VAN-CIC","VAN-CCAS","VIC-AA","YAG","Autism Case File","Assessment & Resource","AR ","AS","AM","AP","CC","Choices","CIC","CYSN","CS UNREG","CT","CH","FS UNREG","RE UNREG","SN","Woodlands","Incident","Memo ","Service Request","FS Case","CS Case","SR Case","Complaint"]
     ftsortorder = 1
 
-    op.execute('DELETE FROM public."ProgramAreaDivisions" WHERE programareaid in (SELECT programareaid FROM public."ProgramAreas" WHERE iaocode =\'CFD\') AND type = \'filetype\'')
+    op.execute('UPDATE public."ProgramAreaDivisions" SET isactive = FALSE WHERE programareaid in (SELECT programareaid FROM public."ProgramAreas" WHERE iaocode =\'CFD\') AND type = \'filetype\'')
     for ftype in filetypes:
         op.execute('INSERT INTO public."ProgramAreaDivisions"(programareaid, name, isactive, created_at, createdby, sortorder, issection, specifictopersonalrequests, type)\
         VALUES ((SELECT programareaid FROM public."ProgramAreas" WHERE iaocode =\'CFD\'), \''+ftype+'\', TRUE, NOW(), \'system\', '+ str(ftsortorder) +', FALSE, TRUE, \'filetype\');')
@@ -30,7 +30,7 @@ def upgrade():
     sections = ["Accountability","Activity Forms","Adoption","ADR","Agreements and Approvals","Caregiver Information","Case Conference","Case Notes","Case Snapshot","Change Card and Forms","Child and Birth Family Background","Child in Care Information","Collaborative Planning","Consents and Authorizations","Contracts","Correspondence","Cultural Planning","Documents","Education, Employment and Training","External Assessments","Family Group Mediation","File Summary","Financial","Incidents","Internal Assessments","Inside Back Cover","Inside Front Cover","Intake and Investigation","Legal","Maples","Mediation","Medical","Note Pad Screens","Out-of-Care Services","Personal History and Records","Physical File Summary","Placement Slips","Planning","Protocol and Incidents","Reconsideration","Running Record","Referrals","Relief Care Giver Documentation","Reports","Reviews","Services for Children Not in Care","Supervisor Orders","Young Offenders"]
     secsortorder = 1
 
-    op.execute('DELETE FROM public."ProgramAreaDivisions" WHERE programareaid in (SELECT programareaid FROM public."ProgramAreas" WHERE iaocode =\'CFD\') AND type = \'section\' AND name != \'TBD\'')
+    op.execute('UPDATE public."ProgramAreaDivisions" SET isactive = FALSE WHERE programareaid in (SELECT programareaid FROM public."ProgramAreas" WHERE iaocode =\'CFD\') AND type = \'section\' AND name != \'TBD\'')
     for sec in sections:
         op.execute('INSERT INTO public."ProgramAreaDivisions"(programareaid, name, isactive, created_at, createdby, sortorder, issection, specifictopersonalrequests, type)\
         VALUES ((SELECT programareaid FROM public."ProgramAreas" WHERE iaocode =\'CFD\'), \''+sec+'\', TRUE, NOW(), \'system\', '+ str(secsortorder) +', TRUE, TRUE, \'section\');')
@@ -39,5 +39,5 @@ def upgrade():
     op.execute('UPDATE public."ProgramAreaDivisions" SET sortorder = '+str(secsortorder)+' WHERE programareaid in (SELECT programareaid FROM public."ProgramAreas" WHERE iaocode =\'CFD\') AND type = \'section\' AND name = \'TBD\'')
 
 def downgrade():
-    op.execute('DELETE FROM public."ProgramAreaDivisions" WHERE programareaid in (SELECT programareaid FROM public."ProgramAreas" WHERE iaocode =\'CFD\') AND type = \'filetype\'')
-    op.execute('DELETE FROM public."ProgramAreaDivisions" WHERE programareaid in (SELECT programareaid FROM public."ProgramAreas" WHERE iaocode =\'CFD\') AND type = \'section\' AND name != \'TBD\'')
+    op.execute('UPDATE public."ProgramAreaDivisions" SET isactive = FALSE WHERE programareaid in (SELECT programareaid FROM public."ProgramAreas" WHERE iaocode =\'CFD\') AND type = \'filetype\'')
+    op.execute('UPDATE public."ProgramAreaDivisions" SET isactive = FALSE WHERE programareaid in (SELECT programareaid FROM public."ProgramAreas" WHERE iaocode =\'CFD\') AND type = \'section\' AND name != \'TBD\'')
