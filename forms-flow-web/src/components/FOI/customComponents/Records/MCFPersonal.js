@@ -103,7 +103,7 @@ const MCFPersonal = ({
       if(MCFSections?.sections) {
         if(MCFSections.sections.length > MCFPopularSections-1) {
           setTagList(MCFSections.sections.slice(0, MCFPopularSections-1));
-          setOtherTagList(MCFSections.sections.slice(MCFPopularSections));
+          setOtherTagList(MCFSections.sections.slice(MCFPopularSections-1));
         } else {
           setTagList(MCFSections.sections);
           setOtherTagList([]);
@@ -136,8 +136,8 @@ const MCFPersonal = ({
     useEffect(() => {
       if(MCFFiletypes?.filetypes) {
         if(MCFFiletypes.filetypes?.length > 6) {
-          setFileTypes(MCFFiletypes.filetypes.slice(0, 6));
-          setOtherFileTypes(MCFFiletypes.filetypes.slice(6, MCFFiletypes.filetypes.length))
+          setFileTypes(MCFFiletypes.filetypes.slice(0, 8));
+          setOtherFileTypes(MCFFiletypes.filetypes.slice(8, MCFFiletypes.filetypes.length))
         } else {
           setFileTypes(MCFFiletypes.filetypes);
           setOtherFileTypes([])
