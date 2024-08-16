@@ -397,6 +397,7 @@ export const ContactApplicant = ({
     const type = (templateId && [1, 2].includes(templateId)) ? "CFRFee" : "";
     let data = {
       templateid: currentTemplate ? templates[currentTemplate as keyof typeof templates].templateid : null,
+      correspondenceid:correspondenceId,
       correspondencemessagejson: JSON.stringify({
         "emailhtml": emailContent,
         "id": approvedForm?.cfrfeeid,
@@ -491,6 +492,7 @@ export const ContactApplicant = ({
     const type = (templateId && [1, 2].includes(templateId)) ? "CFRFee" : "";
     let data = {
       templateid: currentTemplate ? templates[currentTemplate as keyof typeof templates].templateid : null,
+      correspondenceid:correspondenceId,
       correspondencemessagejson: JSON.stringify({
         "emailhtml": editorValue,
         "id": approvedForm?.cfrfeeid,
