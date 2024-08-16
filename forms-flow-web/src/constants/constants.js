@@ -16,7 +16,7 @@ export const KEYCLOAK_REALM =
 export const KEYCLOAK_URL =(window._env_ && window._env_.REACT_APP_KEYCLOAK_URL) || process.env.REACT_APP_KEYCLOAK_URL;
 export const KEYCLOAK_AUTH_URL = `${KEYCLOAK_URL}/auth`;
 export const ANONYMOUS_USER = "anonymous";
-export const SESSION_SECURITY_KEY = "u7x!A%D*G-KaNdRgUkXp2s5v8y/B?E(H";
+export const SESSION_SECURITY_KEY = (window._env_ && window._env_.REACT_APP_SESSION_SECURITY_KEY) || process.env.REACT_APP_SESSION_SECURITY_KEY;
 //6 hour in milliseconds
 export const SESSION_LIFETIME = 21600000;
 export const SOCKETIO_CONNECT_URL =
