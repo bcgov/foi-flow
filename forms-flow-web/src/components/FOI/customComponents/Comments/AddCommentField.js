@@ -26,6 +26,8 @@ import RadioGroup from "@material-ui/core/RadioGroup";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import FormControl from "@material-ui/core/FormControl";
 import Confirm from '../../../../containers/Confirm'
+import CustomizedTooltip from '../Tooltip/MuiTooltip/Tooltip';
+
 
 
 const staticToolbarPlugin = createToolbarPlugin();
@@ -34,18 +36,31 @@ const { Toolbar } = staticToolbarPlugin;
 const { MentionSuggestions } = mentionPlugin
 const plugins = [staticToolbarPlugin, mentionPlugin];
 const AddCommentField = ({ cancellor, parentId, add, fullnameList , restrictedReqTaglist,  //setEditorChange, removeComment and setRemoveComment added to handle Navigate away from Comments tabs 
-  setEditorChange, removeComment, setRemoveComment, isRestricted, isMinistry, setshowaddbox, commentTypes }) => {
+  setEditorChange, removeComment, setRemoveComment, isRestricted, isMinistry, setshowaddbox, commentTypes, commentTypeId, setCommentTypeId }) => {
   let maxcharacterlimit = 1000  
   const [uftext, setuftext] = useState('')
   const [textlength, setTextLength] = useState(1000)
   const [open, setOpen] = useState(false);
+  //console.log("ADD-fullnameList:",fullnameList)
+
   const isCommentTagListLoading = useSelector((state) => state.foiRequests.isCommentTagListLoading);
   let fulluserlist = suggestionList([...fullnameList]).sort(namesort)
+  // console.log("ADD-fulluserlist:",fulluserlist)
+  // console.log("ADD-restrictedReqTaglist:",restrictedReqTaglist)
+
   const [mentionList, setMentionList] = useState(isCommentTagListLoading ? [{name: 'Loading...'}] : isRestricted ? restrictedReqTaglist :fulluserlist);
   const [suggestions, setSuggestions] = useState(mentionList);
   const [editorState, setEditorState] = useState(EditorState.createEmpty())
-  const [commentTypeId, setCommentTypeId] = useState(1);
+  
   const [confirmModalOpen, setConfirmModalOpen] = useState(false);
+  
+  useEffect(() => {
+    //console.log("Change in useeffect!!",fulluserlist?.length)
+    setMentionList(isCommentTagListLoading ? [{name: 'Loading...'}] : isRestricted ? restrictedReqTaglist :suggestionList([...fulluserlist]).sort(namesort));
+    setSuggestions(isCommentTagListLoading ? [{name: 'Loading...'}] : isRestricted ? restrictedReqTaglist :suggestionList([...fulluserlist]).sort(namesort));
+  }, [fullnameList])
+
+  //console.log("ADD-mentionList:",mentionList)
 
   const onOpenChange = (_open) => {
     setOpen(_open);
@@ -168,6 +183,7 @@ const AddCommentField = ({ cancellor, parentId, add, fullnameList , restrictedRe
 
   const post = () => {
     if (uftext !== '' && uftext.trim().length > 0) {
+      setshowaddbox(false)
       const _mentions = getMentionsOnComment()
       const _editorstateinJSON = JSON.stringify(convertToRaw(editorState.getCurrentContent()))
       setFOILoader(true)    
@@ -193,8 +209,8 @@ const AddCommentField = ({ cancellor, parentId, add, fullnameList , restrictedRe
   })
 
   useEffect(() => {
-    setMentionList(isCommentTagListLoading ? [{name: 'Loading...'}] : isRestricted ? restrictedReqTaglist :suggestionList([...getFullnameList()]).sort(namesort));
-    setSuggestions(isCommentTagListLoading ? [{name: 'Loading...'}] : isRestricted ? restrictedReqTaglist :suggestionList([...getFullnameList()]).sort(namesort));
+    setMentionList(isCommentTagListLoading ? [{name: 'Loading...'}] : isRestricted ? restrictedReqTaglist :suggestionList([...fulluserlist]).sort(namesort));
+    setSuggestions(isCommentTagListLoading ? [{name: 'Loading...'}] : isRestricted ? restrictedReqTaglist :suggestionList([...fulluserlist]).sort(namesort));
   }, [isCommentTagListLoading, restrictedReqTaglist])
 
   let formclass = !parentId ? "parentform form" : "form"
@@ -219,10 +235,18 @@ const AddCommentField = ({ cancellor, parentId, add, fullnameList , restrictedRe
     setConfirmModalOpen(false);
   };
 
+  const tooltipPreview = {
+    "title": "Comment Types",
+    "content": [
+      <div className="toolTipContent">
+        <p>Internal and Peer Review comments are only visible to your team.</p>
+      </div>]
+  };
+
   return (
     <>
       <form className={formclass}>
-        <Grid item xs={12} lg={6}>
+        <Grid item xs={10} lg={4} style={{ position: 'relative' }}>
           <FormControl component="fieldset">
             <RadioGroup
               id="status-options"
@@ -250,7 +274,12 @@ const AddCommentField = ({ cancellor, parentId, add, fullnameList , restrictedRe
             />
             </RadioGroup>
           </FormControl>
+          <div className="commentToolTip">
+              <CustomizedTooltip content={tooltipPreview} position={""} style={{width: '70px'}} />
+              <p className="hideContent" id="commenttype-info">CommentTypeInfo</p>
+          </div>
         </Grid>
+
         <Toolbar>
           {
             (externalProps) => (
@@ -286,7 +315,7 @@ const AddCommentField = ({ cancellor, parentId, add, fullnameList , restrictedRe
 
       </form>
       <div className="inputActions">
-        <div className={'col-lg-10'}>
+        <div className={'col-lg-9'}>
           <span className={textlength > 25 ? "characterlen" : "characterlen textred"}>{textlength} characters remaining</span>
         </div>
         <button
@@ -295,7 +324,7 @@ const AddCommentField = ({ cancellor, parentId, add, fullnameList , restrictedRe
           >
             Cancel
           </button>
-        <div className="col-lg-2"> 
+        <div className="col-lg-3"> 
           {/* paperplanecontainer */}
           <button
             className= "btn-bottom btn btn-save" //"postBtn"
