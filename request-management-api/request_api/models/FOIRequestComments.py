@@ -97,7 +97,7 @@ class FOIRequestComment(db.Model):
                     createdby=userid,
                     updated_at=datetime2.now(),
                     updatedby=userid,
-                    commenttypeid=comment.commenttypeid,
+                    commenttypeid=foirequestcomment["commenttypeid"],
                     commentsversion=_commentsversion + 1
                 )
             )

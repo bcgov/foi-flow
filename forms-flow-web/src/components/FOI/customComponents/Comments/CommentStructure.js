@@ -27,7 +27,7 @@ import { downloadZip } from "client-zip";
 import { useDispatch } from "react-redux";
 import * as html2pdf from 'html-to-pdf-js';
 import NewCommentIndicator from './NewCommentIndicator';
-import { getCommentLabelFromId } from "../../../../helper/FOI/helper";
+import { getCommentLabelFromId, getCommentTypeIdByName } from "../../../../helper/FOI/helper";
 
 
 const CommentStructure = ({ i, reply, parentId, totalcommentCount, currentIndex, isreplysection, hasAnotherUserComment, 
@@ -293,7 +293,7 @@ const CommentStructure = ({ i, reply, parentId, totalcommentCount, currentIndex,
         </div>
         <div className="userActions">
           <div>
-            {(isEmail || (i.commentTypeId === 1 && actions.userId === i.userId && actions.user)) && (
+            {(isEmail || ((i.commentTypeId !== 2 && i.commentTypeId !== 3) && actions.userId === i.userId && actions.user)) && (
                 <>
                     <IconButton
                     aria-label= "actions"

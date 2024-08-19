@@ -588,6 +588,13 @@ button.bc4rxid {
   color: white;
 }
 
+.commentToolTip{
+    position: absolute;
+    right: 50px;
+    top: 40%;
+    transform: translateY(-50%);
+}
+
 strong {
   font-family: "BCSans-Bold", sans-serif!important;
 }

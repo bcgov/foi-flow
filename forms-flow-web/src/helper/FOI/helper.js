@@ -267,6 +267,9 @@ const getSessionData = (key) => {
 };
 
 const addToFullnameList = (userArray, foiteam) => {
+  // console.log("userArray:",userArray)
+  // console.log("foiteam:",foiteam)
+
   if (!foiteam) return;
 
   const _team = foiteam.toLowerCase();
@@ -317,7 +320,10 @@ const getFullnameList = () => {
 };
 
 const getAssignToList = (team) => {
-  return getSessionData((`${team.toLowerCase()}AssignToList`).replaceAll('"',''));
+  // console.log("team-session data:",(`${team.toLowerCase()}AssignToList`).replaceAll('"',''))
+  // console.log("getAssignToList() =>", getSessionData((`${team.toLowerCase()}AssignToList`).replaceAll('"','')))
+
+  return getSessionData((`${team.toLowerCase()}AssignToList`).replaceAll('"','')) || [];
 };
 
 const getFullnameTeamList = () => {
@@ -326,6 +332,11 @@ const getFullnameTeamList = () => {
 
 const getMinistryRestrictedTagList = () => {
   return getSessionData("ministryRestrictedTagList");
+};
+
+const getIAOAssignToList = () => {
+  //console.log("getIAOAssignToList() =>",getSessionData("iaoAssignToList"))
+  return getSessionData("iaoAssignToList");
 };
 
 const getUserFullName = (firstName, lastName, userName, groupName = "") => {
@@ -488,6 +499,68 @@ const getCommentLabelFromId = (commentTypes, id) => {
   return commentType ? commentType.label?.toUpperCase() : "";
 };
 
+const setTeamTagList = (bcgovcode) => {
+  //let fullnameList = getFullnameList();
+  let iaoFullnameArray = [];
+  let fullnameSet = new Set();
+  let currentMember;
+  let IAOList = getAssignToList('iao')?.filter((e) => e.type === 'iao');
+  if(IAOList && IAOList?.length > 0){
+    IAOList.forEach((team) => {
+      team?.members.forEach((ministryUser) => {
+        currentMember = {
+          username: ministryUser?.username,
+          firstname: ministryUser?.firstname,
+          lastname: ministryUser?.lastname,
+          fullname: `${ministryUser?.lastname}, ${ministryUser?.firstname}`,
+          name: `${ministryUser?.lastname}, ${ministryUser?.firstname}`
+        };
+        if(!iaoFullnameArray?.some((e) => e.username === ministryUser?.username))
+          iaoFullnameArray.push(currentMember);
+        fullnameSet.add(currentMember);
+
+      });
+    });
+    saveSessionData("iaoTagList", iaoFullnameArray);
+  }
+  let fullnameArray = [];
+
+  if(bcgovcode !== null && bcgovcode !== undefined && bcgovcode !== 'iao'){
+    let ministryList= getAssignToList(bcgovcode)
+    //console.log("**ministryList:", ministryList)
+    if(ministryList && ministryList?.length >0){
+      ministryList.forEach((team) => {
+        team?.members.forEach((ministryUser) => {
+          currentMember = {
+            username: ministryUser?.username,
+            firstname: ministryUser?.firstname,
+            lastname: ministryUser?.lastname,
+            fullname: `${ministryUser?.lastname}, ${ministryUser?.firstname}`,
+            name: `${ministryUser?.lastname}, ${ministryUser?.firstname}`
+          };
+          if(!fullnameArray?.some((e) => e.username === ministryUser?.username))
+            fullnameArray.push(currentMember);
+          fullnameSet.add(currentMember);
+  
+        });
+      });
+    }
+    let _team = bcgovcode.toLowerCase().replace(/['"]+/g, '');
+    //console.log("******_team*******",_team)
+    console.log("*************",fullnameArray)
+    saveSessionData(`${_team}TagList`, fullnameArray);
+  }
+
+  
+};
+
+const getIAOTagList = (bcgovcode) => {
+  let _team = bcgovcode.toLowerCase()?.replace(/['"]+/g, '');
+  console.log("_team",_team)
+  console.log("=>",getSessionData(`${_team}TagList`))
+  return getSessionData(`${_team}TagList`) || [];
+};
+
 export {
   replaceUrl,
   formatDate,
@@ -524,5 +597,8 @@ export {
   readUploadedFileAsBytes,
   getUserFullName,
   getCommentTypeIdByName,
-  getCommentLabelFromId
+  getCommentLabelFromId,
+  getIAOAssignToList,
+  setTeamTagList,
+  getIAOTagList
 };

@@ -20,7 +20,13 @@ import {
   OrderedListButton,
 
 } from '@draft-js-plugins/buttons';
-import { getFullnameList } from '../../../../helper/FOI/helper'
+import { getFullnameList, getCommentTypeIdByName, getIAOTagList, getAssignToList } from '../../../../helper/FOI/helper'
+import Grid from "@material-ui/core/Grid";
+import Radio from "@material-ui/core/Radio";
+import RadioGroup from "@material-ui/core/RadioGroup";
+import FormControlLabel from "@material-ui/core/FormControlLabel";
+import FormControl from "@material-ui/core/FormControl";
+
 
 const staticToolbarPlugin = createToolbarPlugin();
 const mentionPlugin = createMentionPlugin();
@@ -29,25 +35,50 @@ const { MentionSuggestions } = mentionPlugin
 const plugins = [staticToolbarPlugin, mentionPlugin];
 const InputField = ({ cancellor, parentId, child, inputvalue, edit, main, add, fullnameList, restrictedReqTaglist,
   //setEditorChange, removeComment and setRemoveComment added to handle Navigate away from Comments tabs 
-  isRestricted, setEditorChange, removeComment, setRemoveComment, commentTypeId
+  isRestricted, setEditorChange, removeComment, setRemoveComment, commentTypeId, newCommentTypeId, setCommentTypeId,commentTypes, isMinistry, bcgovcode
 }) => {
   let maxcharacterlimit = 1000
   const [uftext, setuftext] = useState('')
   const [textlength, setTextLength] = useState(1000)
   const [open, setOpen] = useState(false);
   const isCommentTagListLoading = useSelector((state) => state.foiRequests.isCommentTagListLoading);
-  let fulluserlist = suggestionList([...fullnameList]).sort(namesort)
-  const [mentionList, setMentionList] = useState(isCommentTagListLoading ? [{name: 'Loading...'}] : isRestricted ? restrictedReqTaglist :fulluserlist)
+ 
+  const [editCommentTypeId, setEditCommentTypeId]= useState(commentTypeId)
+  
+  
+  const filterTagList = (id) => {
+    let tagList= fullnameList;
+    if(id == getCommentTypeIdByName(commentTypes, "IAO Internal") || 
+      id == getCommentTypeIdByName(commentTypes,"IAO Peer Review") )
+      tagList= getIAOTagList("iao");//getAssignToList('iao')?.filter((e) => e.type === 'iao');
+    else if(id == getCommentTypeIdByName(commentTypes, "Ministry Internal") || 
+      id == getCommentTypeIdByName(commentTypes,"Ministry Peer Review")){
+        tagList = getIAOTagList(bcgovcode);
+    }
+    //console.log("tagList:", tagList)
+    return [...tagList];
+  }
 
+  let fulluserlist = suggestionList(filterTagList(editCommentTypeId)).sort(namesort) //suggestionList([...fullnameList]).sort(namesort)
+  const [mentionList, setMentionList] = useState(isCommentTagListLoading ? [{name: 'Loading...'}] : isRestricted ? restrictedReqTaglist :fulluserlist)
   const [suggestions, setSuggestions] = useState(mentionList);
 
+  //console.log("Inputfield-fulluserlist:",fulluserlist)
+
+  useEffect(() => {
+    console.log("Use effect : editCommentTypeId",editCommentTypeId)
+    setMentionList(isCommentTagListLoading ? [{name: 'Loading...'}] : isRestricted ? restrictedReqTaglist :suggestionList(filterTagList(editCommentTypeId)).sort(namesort));
+    setSuggestions(isCommentTagListLoading ? [{name: 'Loading...'}] : isRestricted ? restrictedReqTaglist :mentionList);
+  }, [editCommentTypeId])
+  
   const onOpenChange = (_open) => {
     setOpen(_open);
   }
 
   useEffect(() => {
-    setMentionList(isCommentTagListLoading ? [{name: 'Loading...'}] : isRestricted ? restrictedReqTaglist :suggestionList([...getFullnameList()]).sort(namesort));
-    setSuggestions(isCommentTagListLoading ? [{name: 'Loading...'}] : isRestricted ? restrictedReqTaglist :suggestionList([...getFullnameList()]).sort(namesort));
+    //console.log("isCommentTagListLoading - Use effect")
+    setMentionList(isCommentTagListLoading ? [{name: 'Loading...'}] : isRestricted ? restrictedReqTaglist :suggestionList(filterTagList(editCommentTypeId)).sort(namesort));
+    setSuggestions(isCommentTagListLoading ? [{name: 'Loading...'}] : isRestricted ? restrictedReqTaglist : mentionList)//suggestionList(filterTagList(editCommentTypeId)).sort(namesort));
   }, [isCommentTagListLoading, restrictedReqTaglist])
 
   // Check editor text for mentions
@@ -230,7 +261,7 @@ const InputField = ({ cancellor, parentId, child, inputvalue, edit, main, add, f
       const _editorstateinJSON = JSON.stringify(convertToRaw(editorState.getCurrentContent()))
       setFOILoader(true)
       edit === true
-        ? actions.submit(cancellor, _editorstateinJSON, JSON.stringify(_mentions), parentId, true,commentTypeId)
+        ? actions.submit(cancellor, _editorstateinJSON, JSON.stringify(_mentions), parentId, true,editCommentTypeId)
         : actions.submit(cancellor, _editorstateinJSON, JSON.stringify(_mentions), parentId, false,commentTypeId)
 
       setEditorState(createEditorStateWithText(''))
@@ -264,6 +295,35 @@ const InputField = ({ cancellor, parentId, child, inputvalue, edit, main, add, f
             ) : null}
           </div>
         </div>
+        <Grid item xs={12} lg={6}>
+          <FormControl component="fieldset">
+            <RadioGroup
+              id="status-options"
+              row
+              name="controlled-radio-buttons-group"
+              value={editCommentTypeId}
+              onChange={(e) => {
+                setEditCommentTypeId(Number(e.target.value));
+              }}
+            >
+            <FormControlLabel 
+              value={getCommentTypeIdByName(commentTypes, "User submitted")}
+              control={<Radio color="default" id="rbextpending" />}
+              label="General"
+            />
+            <FormControlLabel
+              value={isMinistry ? getCommentTypeIdByName(commentTypes, "Ministry Internal"):getCommentTypeIdByName(commentTypes, "IAO Internal") }
+              control={<Radio color="default" id="rbextapproved" />}
+              label="Internal"
+            />
+            <FormControlLabel
+              value={isMinistry ? getCommentTypeIdByName(commentTypes,"Ministry Peer Review"): getCommentTypeIdByName(commentTypes, "IAO Peer Review")}
+              control={<Radio color="default" id="rbextdenied" />}
+              label="Peer Review"
+            />
+            </RadioGroup>
+          </FormControl>
+        </Grid>
         <Toolbar>
           {
             (externalProps) => (
