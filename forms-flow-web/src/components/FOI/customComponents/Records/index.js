@@ -2462,8 +2462,8 @@ export const RecordsLog = ({
                 {divisionFilters.map((division) => (
                   <ClickableChip
                     item
-                    id={`${division.divisionid}Filter`}
-                    key={`${division.divisionid}-filter`}
+                    // id={`${division.divisionid}Filter`}
+                    // key={`${division.divisionid}-filter`}
                     label={division.divisionname.toUpperCase()}
                     sx={{
                       width: "fit-content",
