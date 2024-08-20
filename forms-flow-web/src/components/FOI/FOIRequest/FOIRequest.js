@@ -1025,10 +1025,10 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
 
   const showContactApplicantTab = () => {
     return (
-      requestState !== StateEnum.intakeinprogress.name &&
-      requestState !== StateEnum.unopened.name &&
-      //requestState !== StateEnum.open.name &&
-      requestState !== StateEnum.appfeeowing.name &&
+      // requestState !== StateEnum.intakeinprogress.name &&
+      // requestState !== StateEnum.unopened.name &&
+      // requestState !== StateEnum.open.name &&
+      // requestState !== StateEnum.appfeeowing.name &&
       requestDetails?.requestType === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_GENERAL)
   }
 

@@ -1,19 +1,16 @@
-from flask.app import Flask
-from sqlalchemy.sql.schema import ForeignKey, ForeignKeyConstraint
+from sqlalchemy.sql.schema import ForeignKeyConstraint
 from .db import  db, ma
 from datetime import datetime
-from sqlalchemy.orm import relationship,backref
 from .default_method_result import DefaultMethodResult
-from sqlalchemy.sql.expression import distinct
-from sqlalchemy import or_,and_,text
+from sqlalchemy import text
 import logging
 
-class FOIApplicantCorrespondenceAttachment(db.Model):
+class FOIApplicantCorrespondenceAttachmentRawRequest(db.Model):
     # Name of the table in our database
-    __tablename__ = 'FOIApplicantCorrespondenceAttachments'
+    __tablename__ = 'FOIApplicantCorrespondenceAttachmentsRawRequests'
     __table_args__ = (
         ForeignKeyConstraint(
-            ["applicantcorrespondenceid","applicantcorrespondence_version"], ["FOIApplicantCorrespondences.applicantcorrespondenceid", "FOIApplicantCorrespondences.version"],
+            ["applicantcorrespondenceid","applicantcorrespondence_version"], ["FOIApplicantCorrespondencesRawRequests.applicantcorrespondenceid", "FOIApplicantCorrespondencesRawRequests.version"],
         ),
     )
         
@@ -27,8 +24,8 @@ class FOIApplicantCorrespondenceAttachment(db.Model):
     createdby = db.Column(db.String(120), unique=False, nullable=False)
     updatedby = db.Column(db.String(120), unique=False, nullable=True)
                  
-    applicantcorrespondenceid =db.Column(db.Integer, db.ForeignKey('FOIApplicantCorrespondences.applicantcorrespondenceid'))
-    applicantcorrespondence_version = db.Column(db.Integer, db.ForeignKey('FOIApplicantCorrespondences.version')) 
+    applicantcorrespondenceid =db.Column(db.Integer, db.ForeignKey('FOIApplicantCorrespondencesRawRequests.applicantcorrespondenceid'))
+    applicantcorrespondence_version = db.Column(db.Integer, db.ForeignKey('FOIApplicantCorrespondencesRawRequests.version')) 
 
 
     @classmethod
@@ -38,32 +35,32 @@ class FOIApplicantCorrespondenceAttachment(db.Model):
         return DefaultMethodResult(True,'applicant correpondence attachment added',newapplicantcorrepondenceattachment.applicantcorrespondenceattachmentid)    
 
     @classmethod
-    def saveapplicantcorrespondenceattachments(cls, ministryid, newapplicantcorrepondenceattachments)->DefaultMethodResult: 
+    def saveapplicantcorrespondenceattachments(cls, requestid, newapplicantcorrepondenceattachments)->DefaultMethodResult: 
         db.session.add_all(newapplicantcorrepondenceattachments)
         db.session.commit()               
-        return DefaultMethodResult(True,'applicant correpondence attachment added',ministryid)    
+        return DefaultMethodResult(True,'applicant correpondence attachment added',requestid)    
 
     @classmethod
     def getapplicantcorrespondenceattachmentbyid(cls, attachmentid):
-        correspondenceattachment_schema = FOIApplicantCorrespondenceAttachmentSchema()
-        query = db.session.query(FOIApplicantCorrespondenceAttachment).filter(FOIApplicantCorrespondenceAttachment.applicantcorrespondenceattachmentid == attachmentid).order_by(FOIApplicantCorrespondenceAttachment.version.desc()).first()
+        correspondenceattachment_schema = FOIApplicantCorrespondenceAttachmentRawRequestSchema()
+        query = db.session.query(FOIApplicantCorrespondenceAttachmentRawRequest).filter(FOIApplicantCorrespondenceAttachmentRawRequest.applicantcorrespondenceattachmentid == attachmentid).order_by(FOIApplicantCorrespondenceAttachmentRawRequest.version.desc()).first()
         return correspondenceattachment_schema.dump(query)
 
 
     @classmethod
     def getapplicantcorrespondenceattachmentsbyapplicantcorrespondenceid(cls,applicantcorrespondenceid):
-        correspondenceattachment_schema = FOIApplicantCorrespondenceAttachmentSchema(many=True)
-        query = db.session.query(FOIApplicantCorrespondenceAttachment).filter(FOIApplicantCorrespondenceAttachment.applicantcorrespondenceid == applicantcorrespondenceid).order_by(FOIApplicantCorrespondenceAttachment.applicantcorrespondenceattachmentid.asc()).all()
+        correspondenceattachment_schema = FOIApplicantCorrespondenceAttachmentRawRequestSchema(many=True)
+        query = db.session.query(FOIApplicantCorrespondenceAttachmentRawRequest).filter(FOIApplicantCorrespondenceAttachmentRawRequest.applicantcorrespondenceid == applicantcorrespondenceid).order_by(FOIApplicantCorrespondenceAttachmentRawRequest.applicantcorrespondenceattachmentid.asc()).all()
         return correspondenceattachment_schema.dump(query)
     
     @classmethod
     def getcorrespondenceattachmentbyapplicantcorrespondenceid(cls,applicantcorrespondenceid):
-        correspondenceattachment_schema = FOIApplicantCorrespondenceAttachmentSchema(many=False)
-        query = db.session.query(FOIApplicantCorrespondenceAttachment).filter(FOIApplicantCorrespondenceAttachment.applicantcorrespondenceid == applicantcorrespondenceid).order_by(FOIApplicantCorrespondenceAttachment.version.desc()).first()
+        correspondenceattachment_schema = FOIApplicantCorrespondenceAttachmentRawRequestSchema(many=False)
+        query = db.session.query(FOIApplicantCorrespondenceAttachmentRawRequest).filter(FOIApplicantCorrespondenceAttachmentRawRequest.applicantcorrespondenceid == applicantcorrespondenceid).order_by(FOIApplicantCorrespondenceAttachmentRawRequest.version.desc()).first()
         return correspondenceattachment_schema.dump(query)
     
     @classmethod
-    def getcorrespondenceattachmentsbyministryid(cls,ministryrequestid):
+    def getcorrespondenceattachmentsbyrawrequestid(cls,requestid):
         attachments = []
         try:
             # select on the highest version of each attachment
@@ -78,14 +75,14 @@ class FOIApplicantCorrespondenceAttachment(db.Model):
                             fca.version,
                             ROW_NUMBER() OVER (PARTITION BY fca.applicantcorrespondenceid, fca.applicantcorrespondence_version, fca.applicantcorrespondenceattachmentid ORDER BY fca.version DESC) AS rn
                         FROM 
-                            "FOIApplicantCorrespondenceAttachments" fca 
+                            "FOIApplicantCorrespondenceAttachmentsRawRequests" fca 
                         JOIN 
-                            "FOIApplicantCorrespondences" fpa 
+                            "FOIApplicantCorrespondencesRawRequests" fpa 
                         ON 
                             fpa.applicantcorrespondenceid = fca.applicantcorrespondenceid  
                             AND fca.applicantcorrespondence_version = fpa."version"
                         WHERE 
-                            fpa.foiministryrequest_id = :ministryrequestid
+                            fpa.foirawrequest_id = :requestid
                     )
                     SELECT 
                         applicantcorrespondenceid, 
@@ -101,7 +98,7 @@ class FOIApplicantCorrespondenceAttachment(db.Model):
                     ORDER BY 
                         applicantcorrespondenceid DESC, 
                         applicantcorrespondence_version DESC;"""
-            rs = db.session.execute(text(sql), {'ministryrequestid': ministryrequestid})
+            rs = db.session.execute(text(sql), {'requestid': requestid})
             for row in rs:
                 attachments.append({"applicantcorrespondenceid": row["applicantcorrespondenceid"], "applicantcorrespondence_version": row["applicantcorrespondence_version"],"applicantcorrespondenceattachmentid": row["applicantcorrespondenceattachmentid"], "attachmentfilename": row["attachmentfilename"], "attachmentdocumenturipath": row["attachmentdocumenturipath"], "version": row["version"]})
         except Exception as ex:
@@ -111,36 +108,7 @@ class FOIApplicantCorrespondenceAttachment(db.Model):
             db.session.close()
         return attachments
 
-    # response attachments require a different query
-    @classmethod
-    def getcorrespondenceresponseattachmentbyministryid(cls, ministryrequestid):
-        attachments = []
-        try:
-            sql = """SELECT DISTINCT ON (fca.applicantcorrespondenceid) 
-                        fca.applicantcorrespondenceid, 
-                        fca.applicantcorrespondence_version, 
-                        fca.applicantcorrespondenceattachmentid, 
-                        fca.attachmentfilename, 
-                        fca.attachmentdocumenturipath, 
-                        fca.version
-                    FROM "FOIApplicantCorrespondenceAttachments" fca 
-                    JOIN "FOIApplicantCorrespondences" fpa 
-                        ON fpa.applicantcorrespondenceid = fca.applicantcorrespondenceid  
-                        AND fca.applicantcorrespondence_version = fpa."version"
-                    WHERE fpa.foiministryrequest_id = :ministryrequestid
-                    ORDER BY fca.applicantcorrespondenceid, fca.applicantcorrespondence_version DESC, fca.version DESC;
-                    """ 
-            rs = db.session.execute(text(sql), {'ministryrequestid': ministryrequestid})
-            for row in rs:
-                attachments.append({"applicantcorrespondenceid": row["applicantcorrespondenceid"], "applicantcorrespondence_version": row["applicantcorrespondence_version"],"applicantcorrespondenceattachmentid": row["applicantcorrespondenceattachmentid"], "attachmentfilename": row["attachmentfilename"], "attachmentdocumenturipath": row["attachmentdocumenturipath"]})
-        except Exception as ex:
-            logging.error(ex)
-            raise ex
-        finally:
-            db.session.close()
-        return attachments
-
-class FOIApplicantCorrespondenceAttachmentSchema(ma.Schema):
+class FOIApplicantCorrespondenceAttachmentRawRequestSchema(ma.Schema):
     class Meta:
         fields = ('applicantcorrespondenceattachmentid', 'version','applicantcorrespondenceid','attachmentdocumenturipath','attachmentfilename','created_at','createdby', 'applicantcorrespondence_version')
     
