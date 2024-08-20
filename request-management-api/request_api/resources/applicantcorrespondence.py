@@ -43,6 +43,12 @@ TRACER = Tracer.get_instance()
 EXCEPTION_MESSAGE_BAD_REQUEST='Bad Request'
 EXCEPTION_MESSAGE_NOT_FOUND='Not Found'
 
+def getrawrequestidbyfoirequestid(requestid):
+    rawrequestid = requestservice().getrawrequestidbyfoirequestid(requestid)
+    if rawrequestid is None:
+        rawrequestid = requestid
+    return rawrequestid
+
 @cors_preflight('GET,OPTIONS')
 @API.route('/foiflow/applicantcorrespondence/templates')
 class FOIFlowApplicantCorrespondenceTemplates(Resource):
@@ -76,7 +82,8 @@ class FOIFlowApplicantCorrespondence(Resource):
     @auth.hasusertype('iao')
     def get(requestid, ministryrequestid):
         try:
-            correspondencelogs = applicantcorrespondenceservice().getapplicantcorrespondencelogs(ministryrequestid, requestid)
+            rawrequestid = getrawrequestidbyfoirequestid(requestid)
+            correspondencelogs = applicantcorrespondenceservice().getapplicantcorrespondencelogs(ministryrequestid, rawrequestid)
             return json.dumps(correspondencelogs) , 200
         except BusinessException:
             return "Error happened while fetching  applicant correspondence logs" , 500 
@@ -90,7 +97,8 @@ class FOIFlowApplicantCorrespondence(Resource):
         try:
             requestjson = request.get_json()
             applicantcorrespondencelog = FOIApplicantCorrespondenceSchema().load(data=requestjson) 
-            result = communicationwrapperservice().send_email(requestid, ministryrequestid, applicantcorrespondencelog)
+            rawrequestid = getrawrequestidbyfoirequestid(requestid)
+            result = communicationwrapperservice().send_email(rawrequestid, ministryrequestid, applicantcorrespondencelog)
             return {'status': result.success, 'message':result.message,'id':result.identifier} , 200
         except BusinessException:
             return "Error happened while saving  applicant correspondence log" , 500 
@@ -108,12 +116,13 @@ class FOIFlowApplicantCorrespondenceDraft(Resource):
     def post(requestid, ministryrequestid):
         try:
             requestjson = request.get_json()
+            rawrequestid = getrawrequestidbyfoirequestid(requestid)
             if ministryrequestid != 'None':
                 correspondenceschemaobj = FOIApplicantCorrespondenceSchema().load(data=requestjson)
-                result = applicantcorrespondenceservice().saveapplicantcorrespondencelog(requestid, ministryrequestid, correspondenceschemaobj, AuthHelper.getuserid(), True)
+                result = applicantcorrespondenceservice().saveapplicantcorrespondencelog(rawrequestid, ministryrequestid, correspondenceschemaobj, AuthHelper.getuserid(), True)
             elif ministryrequestid == 'None':
                 correspondenceschemaobj = FOIApplicantCorrespondenceSchema().load(data=requestjson)
-                result = applicantcorrespondenceservice().saveapplicantcorrespondencelogforrawrequest(requestid, correspondenceschemaobj, AuthHelper.getuserid(), True)
+                result = applicantcorrespondenceservice().saveapplicantcorrespondencelogforrawrequest(rawrequestid, correspondenceschemaobj, AuthHelper.getuserid(), True)
             if result.success == True:
                return {'status': result.success, 'message':result.message,'id':result.identifier} , 200      
         except BusinessException:
@@ -130,11 +139,12 @@ class FOIFlowApplicantCorrespondenceDraft(Resource):
     def post(requestid, ministryrequestid):
         try:
             requestjson = request.get_json()
+            rawrequestid = getrawrequestidbyfoirequestid(requestid)
             applicantcorrespondencelog = FOIApplicantCorrespondenceSchema().load(data=requestjson) 
             if ministryrequestid == 'None':
-                result = applicantcorrespondenceservice().saveapplicantcorrespondencelogforrawrequest(requestid, applicantcorrespondencelog, AuthHelper.getuserid(), True)
+                result = applicantcorrespondenceservice().saveapplicantcorrespondencelogforrawrequest(rawrequestid, applicantcorrespondencelog, AuthHelper.getuserid(), True)
             else:
-                result = applicantcorrespondenceservice().saveapplicantcorrespondencelog(requestid, ministryrequestid, applicantcorrespondencelog, AuthHelper.getuserid(), True)
+                result = applicantcorrespondenceservice().saveapplicantcorrespondencelog(rawrequestid, ministryrequestid, applicantcorrespondencelog, AuthHelper.getuserid(), True)
             if result.success == True:
                return {'status': result.success, 'message':result.message,'id':result.identifier} , 200      
         except BusinessException:
@@ -150,11 +160,12 @@ class FOIFlowApplicantCorrespondenceDraft(Resource):
     @auth.require
     def post(ministryrequestid, rawrequestid, correspondenceid):
         try:
+            rawrequestidfromfoirequest = getrawrequestidbyfoirequestid(rawrequestid)
             if ministryrequestid == 'None':
-                rawresult = applicantcorrespondenceservice().deleteapplicantcorrespondencelograwrequest(rawrequestid, correspondenceid, AuthHelper.getuserid())
+                rawresult = applicantcorrespondenceservice().deleteapplicantcorrespondencelograwrequest(rawrequestidfromfoirequest, correspondenceid, AuthHelper.getuserid())
                 return {'status': rawresult.success, 'message':rawresult.message,'id':rawresult.identifier} , 200
             else:
-                rawresult = applicantcorrespondenceservice().deleteapplicantcorrespondencelograwrequest(rawrequestid, correspondenceid, AuthHelper.getuserid())
+                rawresult = applicantcorrespondenceservice().deleteapplicantcorrespondencelograwrequest(rawrequestidfromfoirequest, correspondenceid, AuthHelper.getuserid())
                 ministryresult = applicantcorrespondenceservice().deleteapplicantcorrespondencelogministry(ministryrequestid, correspondenceid, AuthHelper.getuserid())
             if rawresult.success == True and ministryresult.success == True:
                return {'status': ministryresult.success, 'message':ministryresult.message,'id':ministryresult.identifier} , 200      
@@ -173,8 +184,9 @@ class FOIFlowApplicantCorrespondenceEmail(Resource):
     def post(ministryrequestid, rawrequestid):
         try:
             requestjson = request.get_json()
+            rawrequestidfromfoirequest = getrawrequestidbyfoirequestid(rawrequestid)
             correspondenceemail = FOIApplicantCorrespondenceEmailSchema().load(data=requestjson) 
-            result = correspondenceemailservice().savecorrespondenceemail(ministryrequestid, rawrequestid, correspondenceemail, AuthHelper.getuserid())
+            result = correspondenceemailservice().savecorrespondenceemail(ministryrequestid, rawrequestidfromfoirequest, correspondenceemail, AuthHelper.getuserid())
             
             return {'status': result.success, 'message':result.message,'id':result.identifier} , 200      
         except BusinessException:
@@ -186,7 +198,8 @@ class FOIFlowApplicantCorrespondenceEmail(Resource):
     @auth.require
     def get(ministryrequestid, rawrequestid):
         try:
-            correspondenceemails = correspondenceemailservice().getcorrespondenceemails(ministryrequestid, rawrequestid)
+            rawrequestidfromfoirequest = getrawrequestidbyfoirequestid(rawrequestid)
+            correspondenceemails = correspondenceemailservice().getcorrespondenceemails(ministryrequestid, rawrequestidfromfoirequest)
             return json.dumps(correspondenceemails) , 200
         except BusinessException:
             return "Unable to retrieve correspondence emails" , 500    
@@ -202,11 +215,12 @@ class FOIFlowApplicantCorrespondenceResponse(Resource):
     def post(ministryrequestid, rawrequestid):
         try:
             requestjson = request.get_json()
+            rawrequestidfromfoirequest = getrawrequestidbyfoirequestid(rawrequestid)
             correspondenceemail = FOIApplicantCorrespondenceResponseSchema().load(data=requestjson) 
             if ministryrequestid == 'None':
-                result = applicantcorrespondenceservice().saveapplicantcorrespondencelogforrawrequest(rawrequestid, correspondenceemail, AuthHelper.getuserid())
+                result = applicantcorrespondenceservice().saveapplicantcorrespondencelogforrawrequest(rawrequestidfromfoirequest, correspondenceemail, AuthHelper.getuserid())
             else:
-                result = applicantcorrespondenceservice().saveapplicantcorrespondencelog(rawrequestid, ministryrequestid, correspondenceemail, AuthHelper.getuserid())
+                result = applicantcorrespondenceservice().saveapplicantcorrespondencelog(rawrequestidfromfoirequest, ministryrequestid, correspondenceemail, AuthHelper.getuserid())
             
             return {'status': result.success, 'message':result.message,'id':result.identifier} , 200      
         except BusinessException:
@@ -223,10 +237,11 @@ class FOIFlowApplicantCorrespondenceEditResponse(Resource):
     @auth.require
     def post(ministryrequestid, rawrequestid):
         try:
+            rawrequestidfromfoirequest = getrawrequestidbyfoirequestid(rawrequestid)
             requestjson = request.get_json()
             correspondenceemail = FOIApplicantCorrespondenceEditResponseSchema().load(data=requestjson) 
             if ministryrequestid == 'None':
-                result = applicantcorrespondenceservice().editapplicantcorrespondencelogforrawrequest(rawrequestid, correspondenceemail, AuthHelper.getuserid())
+                result = applicantcorrespondenceservice().editapplicantcorrespondencelogforrawrequest(rawrequestidfromfoirequest, correspondenceemail, AuthHelper.getuserid())
             elif ministryrequestid != 'None':
                 result = applicantcorrespondenceservice().editapplicantcorrespondencelogforministry(ministryrequestid, correspondenceemail, AuthHelper.getuserid())
             
@@ -244,11 +259,12 @@ class FOIFlowApplicantCorrespondenceResponse(Resource):
     @auth.require
     def post(ministryrequestid, rawrequestid, correspondenceid):
         try:
+            rawrequestidfromfoirequest = getrawrequestidbyfoirequestid(rawrequestid)
             if ministryrequestid == 'None':
-                rawresult = applicantcorrespondenceservice().deleteapplicantcorrespondencelograwrequest(rawrequestid, correspondenceid, AuthHelper.getuserid())
+                rawresult = applicantcorrespondenceservice().deleteapplicantcorrespondencelograwrequest(rawrequestidfromfoirequest, correspondenceid, AuthHelper.getuserid())
                 return {'status': rawresult.success, 'message':rawresult.message,'id':rawresult.identifier} , 200
             else:
-                rawresult = applicantcorrespondenceservice().deleteapplicantcorrespondencelograwrequest(rawrequestid, correspondenceid, AuthHelper.getuserid())
+                rawresult = applicantcorrespondenceservice().deleteapplicantcorrespondencelograwrequest(rawrequestidfromfoirequest, correspondenceid, AuthHelper.getuserid())
                 ministryresult = applicantcorrespondenceservice().deleteapplicantcorrespondencelogministry(ministryrequestid, correspondenceid, AuthHelper.getuserid())
             if rawresult.success == True and ministryresult.success == True:
                return {'status': ministryresult.success, 'message':ministryresult.message,'id':ministryresult.identifier} , 200   
