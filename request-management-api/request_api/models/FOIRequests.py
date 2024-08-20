@@ -123,6 +123,7 @@ class FOIRequest(db.Model):
                         where fr.foirequestid=:requestid
                         order by  fr."version" desc limit 1"""
             rs = db.session.execute(text(sql), {'requestid': requestid})
+            rawrequestid = None
             for row in rs:
                 rawrequestid = row["foirawrequestid"]
         except Exception as ex:
