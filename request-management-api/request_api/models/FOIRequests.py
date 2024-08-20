@@ -119,9 +119,9 @@ class FOIRequest(db.Model):
     @classmethod
     def getrawrequestidbyfoirequestid(cls,requestid)->DefaultMethodResult:
         try:
-            sql = """select fr3.foirawrequestid, fr3.foirequestid  from "FOIRequests" fr3
-                        where fr3.foirequestid=:requestid
-                        order by  fr3."version" desc limit 1"""
+            sql = """select fr.foirawrequestid, fr.foirequestid  from "FOIRequests" fr
+                        where fr.foirequestid=:requestid
+                        order by  fr."version" desc limit 1"""
             rs = db.session.execute(text(sql), {'requestid': requestid})
             for row in rs:
                 rawrequestid = row["foirawrequestid"]
