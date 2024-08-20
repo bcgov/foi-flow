@@ -1,7 +1,7 @@
 """update CFD Personal tags
 
 Revision ID: 06283c0685fb
-Revises: aa2691fa6c3c
+Revises: bbee01df3e8d
 Create Date: 2024-08-14 12:40:37.844463
 
 """
@@ -11,7 +11,7 @@ import sqlalchemy as sa
 
 # revision identifiers, used by Alembic.
 revision = '06283c0685fb'
-down_revision = 'aa2691fa6c3c'
+down_revision = 'bbee01df3e8d'
 branch_labels = None
 depends_on = None
 
