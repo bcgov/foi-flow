@@ -49,7 +49,12 @@ class FOIApplicantCorrespondenceRawRequest(db.Model):
                         created_at, createdby, sentcorrespondencemessage, parentapplicantcorrespondenceid, sentby, sent_at,
                          isdraft, isdeleted, isresponse, response_at
                          from "FOIApplicantCorrespondencesRawRequests" rawcorr 
-                        where foirawrequest_id = :requestid
+                        where foirawrequest_id = (
+							SELECT foirawrequestid FROM public."FOIRequests"
+							WHERE foirequestid = :requestid
+							ORDER BY foirequestid ASC, version DESC limit 1)
+                            OR
+                            foirawrequest_id = :requestid
                     order by applicantcorrespondenceid desc, version desc""" 
             rs = db.session.execute(text(sql), {'requestid': requestid})
             for row in rs:
