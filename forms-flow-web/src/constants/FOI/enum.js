@@ -172,7 +172,7 @@ const RequestTypes = Object.freeze({
   personal: "personal"
 });
 
-const MCFPopularSections = 23
+const MCFPopularSections = 21
 const MSDPopularSections = 11
 
 const RecordsDownloadList = [
