@@ -138,6 +138,7 @@ export const ContactApplicant = ({
     setFiles([]);
     setEditorValue("");
     setDraftCorrespondence({});
+    setCorrespondenceId(null);
     setSelectedEmails([]);
     setCurrentTemplate(0);
   }
@@ -585,7 +586,7 @@ export const ContactApplicant = ({
 
 
 
-  const [correspondenceId, setCorrespondenceId] = useState(0);
+  const [correspondenceId, setCorrespondenceId] = useState(null);
 
   const editDraft = async (i : any) => {
     setEditMode(true);

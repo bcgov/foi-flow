@@ -29,12 +29,12 @@ class applicantcorrespondenceservice:
         """
         return ApplicationCorrespondenceTemplate.get_template_by_id(templateid)
 
-    def getapplicantcorrespondencelogs(self,ministryrequestid, requestid):
+    def getapplicantcorrespondencelogs(self,ministryrequestid, rawrequestid):
         """ Returns the active applicant correspondence logs
         """
-        _correspondencelogs = FOIApplicantCorrespondenceRawRequest.getapplicantcorrespondencesrawrequests(requestid)
-        _correspondenceattachments = FOIApplicantCorrespondenceAttachmentRawRequest.getcorrespondenceattachmentsbyrawrequestid(requestid)
-        _correspondenceemails = FOIApplicantCorrespondenceEmailRawRequest.getapplicantcorrespondenceemails(requestid)
+        _correspondencelogs = FOIApplicantCorrespondenceRawRequest.getapplicantcorrespondencesrawrequests(rawrequestid)
+        _correspondenceattachments = FOIApplicantCorrespondenceAttachmentRawRequest.getcorrespondenceattachmentsbyrawrequestid(rawrequestid)
+        _correspondenceemails = FOIApplicantCorrespondenceEmailRawRequest.getapplicantcorrespondenceemails(rawrequestid)
         if ministryrequestid != 'None':
             _correspondencelogs.extend(FOIApplicantCorrespondence.getapplicantcorrespondences(ministryrequestid))
             _correspondenceattachments.extend(FOIApplicantCorrespondenceAttachment.getcorrespondenceattachmentsbyministryid(ministryrequestid))
