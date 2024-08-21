@@ -13,10 +13,8 @@ const DisplayComments = ({ comments, bcgovcode, currentUser, iaoassignedToList, 
   const [fullnameList, setFullnameList] = useState(getFullnameList);
 
 
-  console.log("fullnameList:",fullnameList)
-
   useEffect(() => {
-    console.log("setTeamTagList useeffect", bcgovcode)
+    //console.log("setTeamTagList useeffect", bcgovcode)
     setTeamTagList(bcgovcode)
   }, [fullnameList])
 

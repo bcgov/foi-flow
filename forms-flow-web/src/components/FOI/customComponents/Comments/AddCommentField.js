@@ -88,7 +88,8 @@ const AddCommentField = ({ cancellor, parentId, add, fullnameList , restrictedRe
     return commentmentions;
   }
 
-  const _handleChange = (_editorState) => {    
+  const _handleChange = (_editorState) => {  
+    console.log(_editorState);  
     const currentContent = _editorState.getCurrentContent();        
     const currentContentLength = currentContent.getPlainText('').length;
     const selectedTextLength = _getLengthOfSelectedText();
@@ -243,10 +244,14 @@ const AddCommentField = ({ cancellor, parentId, add, fullnameList , restrictedRe
       </div>]
   };
 
+  const isActive = editorState.getCurrentInlineStyle().has('BOLD');
+  console.log('BoldButton isActive:', isActive);
+
+ 
   return (
     <>
       <form className={formclass}>
-        <Grid item xs={10} lg={4} style={{ position: 'relative' }}>
+        <Grid item xs={10} lg={5} style={{ position: 'relative' }}>
           <FormControl component="fieldset">
             <RadioGroup
               id="status-options"
@@ -280,19 +285,6 @@ const AddCommentField = ({ cancellor, parentId, add, fullnameList , restrictedRe
           </div>
         </Grid>
 
-        <Toolbar>
-          {
-            (externalProps) => (
-              <div>
-                <BoldButton {...externalProps} />
-                <ItalicButton {...externalProps} />
-                <UnderlineButton {...externalProps} />
-                <UnorderedListButton {...externalProps} />
-                <OrderedListButton {...externalProps} />
-              </div>
-            )
-          }
-        </Toolbar>
         <Editor
           editorState={editorState}
           onChange={_handleChange}
@@ -302,6 +294,22 @@ const AddCommentField = ({ cancellor, parentId, add, fullnameList , restrictedRe
           plugins={plugins}
           spellCheck={true}
         />
+        <Toolbar>
+          {
+            (externalProps) => {
+              console.log('externalProps:', externalProps)
+              return(
+              <div>
+                <BoldButton {...externalProps} />
+                <ItalicButton {...externalProps} />
+                <UnderlineButton {...externalProps} />
+                <UnorderedListButton {...externalProps} />
+                <OrderedListButton {...externalProps} />
+              </div>
+              )
+            }
+          }
+        </Toolbar>
         <MentionSuggestions
           open={open}
           onOpenChange={onOpenChange}

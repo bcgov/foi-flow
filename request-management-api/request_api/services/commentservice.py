@@ -188,4 +188,9 @@ class commentservice:
     def getcommenttypes(self):
         """ Returns the active commenttypes
         """
-        return CommentType.getcommenttypes()
+        return CommentType().getcommenttypes()
+    
+    def getcommenttypeidbyname(self, name):
+         commenttype= CommentType().getcommenttypeidbyname(name)
+         val = commenttype['commenttypeid']
+         return val
