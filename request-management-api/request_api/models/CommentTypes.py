@@ -18,6 +18,12 @@ class CommentType(db.Model):
         commenttype_schema = CommentTypeSchema(many=True)
         query = db.session.query(CommentType).filter_by(isactive=True).all()
         return commenttype_schema.dump(query)
+    
+    @classmethod
+    def getcommenttypeidbyname(cls, name):
+        commenttype_schema = CommentTypeSchema()
+        query = db.session.query(CommentType).filter_by(name= name , isactive=True).first()
+        return commenttype_schema.dump(query)
 
 
 class CommentTypeSchema(ma.Schema):

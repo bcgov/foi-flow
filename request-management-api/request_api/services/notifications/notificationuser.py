@@ -7,6 +7,7 @@ from request_api.models.FOIRawRequestComments import FOIRawRequestComment
 from request_api.models.FOIRequestComments import FOIRequestComment
 from request_api.services.notifications.notificationconfig import notificationconfig
 from request_api.services.external.keycloakadminservice import KeycloakAdminService
+from request_api.services.commentservice import commentservice
 
 class notificationuser:
     """ notification user service
@@ -15,6 +16,7 @@ class notificationuser:
     
     def getnotificationusers(self, notificationtype, requesttype, userid, foirequest, requestjson=None):
         notificationusers = []
+        print("Inside getnotificationusers - notificationtype:", notificationtype)
         if 'User Assignment Removal' == notificationtype:
             _users = self.__getassignees(foirequest, requesttype, notificationtype, requestjson)
         elif 'Assignment' in notificationtype:
@@ -30,7 +32,7 @@ class notificationuser:
         elif 'Attachment Upload Event' in notificationtype:
             _users = self.__getgroupmembers('scanningteam') + self.__getassignees(foirequest, requesttype, notificationtype) + self.__getwatchers(notificationtype, foirequest, requesttype, requestjson)
         else:
-            _users = self.__getassignees(foirequest, requesttype, notificationtype) + self.__getwatchers(notificationtype, foirequest, requesttype)
+            _users = self.__getassignees(foirequest, requesttype, notificationtype, requestjson) + self.__getwatchers(notificationtype, foirequest, requesttype, requestjson)
         for user in _users:
             if self.__isignorable(user, notificationusers, userid) == False and (("Tagged User Comments" not in notificationtype and self.__istaggeduser(user, requestjson, notificationtype) == False) or "Tagged User Comments" in notificationtype):
                 notificationusers.append(user)
@@ -55,14 +57,24 @@ class notificationuser:
         return False
         
     def __getwatchers(self, notificationtype, foirequest, requesttype, requestjson=None):
+        print("__getwatchers-requesttype",requesttype)
         notificationusers = []
+        watchers = []
         if notificationtype == "Watcher":
             notificationusers.append({"userid": requestjson['watchedby'], "usertype":notificationconfig().getnotificationusertypelabel("Watcher")})
         else:
+            isministryinternalcommenttype= self.__isministryinternalcomment(notificationtype,requestjson['commenttypeid'])
+            isiaointernalcommenttype= self.__isiaointernalcomment(notificationtype,requestjson['commenttypeid'])
+            print("Watcher?",'Comments' not in notificationtype)
             if requesttype == "ministryrequest":
-                watchers =  watcherservice().getallministryrequestwatchers(foirequest["foiministryrequestid"], self.__isministryonly(notificationtype))
+                if(self.__isministryinternalcomment(notificationtype,requestjson['commenttypeid']) or 'Comments' not in notificationtype):
+                    print("why?")
+                    watchers =  watcherservice().getallministryrequestwatchers(foirequest["foiministryrequestid"], isministryinternalcommenttype, 
+                                isiaointernalcommenttype, self.__isministryonly(notificationtype))
             else:
-                watchers =  watcherservice().getrawrequestwatchers(foirequest['requestid'])
+                if(isministryinternalcommenttype == False):
+                    watchers =  watcherservice().getrawrequestwatchers(foirequest['requestid'])
+            print("*****watchers:",watchers)
             for watcher in watchers:
                     notificationusers.append({"userid":watcher["watchedby"], "usertype":notificationconfig().getnotificationusertypelabel("Watcher")})
         return notificationusers         
@@ -73,11 +85,48 @@ class notificationuser:
         if notificationtype == 'User Assignment Removal':
             notificationusers.append({"userid": requestjson['userid'], "usertype":notificationusertypelabel})
         else:
-            if requesttype == "ministryrequest" and foirequest["assignedministryperson"] is not None and (notificationtype == 'Ministry Assignment' or 'Assignment' not in notificationtype):
+            if self.__isministryassigneeneeded(requesttype, foirequest, notificationtype, requestjson):
                 notificationusers.append({"userid":foirequest["assignedministryperson"], "usertype":notificationusertypelabel})
-            if self.__isministryonly(notificationtype) == False and foirequest["assignedto"] is not None and foirequest["assignedto"] != '' and (notificationtype == 'IAO Assignment' or 'Assignment' not in notificationtype):
+            if self.__isfoiassigneeneeded(foirequest, notificationtype, requestjson):
                 notificationusers.append({"userid":foirequest["assignedto"], "usertype":notificationusertypelabel})
-        return notificationusers          
+        return notificationusers  
+    
+
+    def __isiaointernalcomment(self, notificationtype, commenttypeid):
+        if(notificationtype in ["New User Comments", "Reply User Comments", "Tagged User Comments"] and 
+            commenttypeid == commentservice().getcommenttypeidbyname("IAO Internal") or 
+            commenttypeid == commentservice().getcommenttypeidbyname("IAO Peer Review")):
+                return True
+        else:
+            return False
+        
+    def __isministryinternalcomment(self, notificationtype, commenttypeid):
+        if(notificationtype in ["New User Comments", "Reply User Comments", "Tagged User Comments"] and 
+            commenttypeid == commentservice().getcommenttypeidbyname("Ministry Internal") or 
+            commenttypeid == commentservice().getcommenttypeidbyname("Ministry Peer Review")):
+                return True
+        else:
+            return False
+
+    def __isministryassigneeneeded(self, requesttype, foirequest, notificationtype, requestjson=None):
+        if(requesttype == "ministryrequest" and foirequest["assignedministryperson"] is not None and (notificationtype == 'Ministry Assignment' or 'Assignment' not in notificationtype)):
+            if(self.__isiaointernalcomment(notificationtype,requestjson['commenttypeid'])):
+                print("****1)Return false*****")
+                return False
+            return True
+        else:
+            return False
+        
+    def __isfoiassigneeneeded(self, foirequest, notificationtype, requestjson=None):
+        print("****__isfoiassigneeneeded:", notificationtype)
+        if(self.__isministryonly(notificationtype) == False and foirequest["assignedto"] is not None and foirequest["assignedto"] != '' and 
+           (notificationtype == 'IAO Assignment' or 'Assignment' not in notificationtype)):
+            if(self.__isministryinternalcomment(notificationtype,requestjson['commenttypeid'])):
+                print("****2)Return false*****")
+                return False
+            return True
+        else:
+            return False
     
     def __isministryonly(self, notificationtype):
         return True if notificationtype == "Division Due Reminder" else False 

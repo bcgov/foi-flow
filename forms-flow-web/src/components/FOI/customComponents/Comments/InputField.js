@@ -324,6 +324,15 @@ const InputField = ({ cancellor, parentId, child, inputvalue, edit, main, add, f
             </RadioGroup>
           </FormControl>
         </Grid>
+        <Editor
+          editorState={editorState}
+          onChange={_handleChange}
+          handleBeforeInput={_handleBeforeInput}
+          handlePastedText={_handlePastedText}
+          handleKeyCommand={_handleKeyCommand}
+          plugins={plugins}
+          spellCheck={true}
+        />
         <Toolbar>
           {
             (externalProps) => (
@@ -337,15 +346,6 @@ const InputField = ({ cancellor, parentId, child, inputvalue, edit, main, add, f
             )
           }
         </Toolbar>
-        <Editor
-          editorState={editorState}
-          onChange={_handleChange}
-          handleBeforeInput={_handleBeforeInput}
-          handlePastedText={_handlePastedText}
-          handleKeyCommand={_handleKeyCommand}
-          plugins={plugins}
-          spellCheck={true}
-        />
         <MentionSuggestions
           open={open}
           onOpenChange={onOpenChange}

@@ -133,6 +133,7 @@ class notificationservice:
 
 
     def __createnotification(self, message, requestid, requesttype, notificationtype, userid, foirequest, requestjson=None):
+        print("****__createnotification:",requestjson['commentid'])
         notification = self.__preparenotification(message, requesttype, notificationtype, userid, foirequest, requestjson)
         if notification is not None:      
             if requesttype == "ministryrequest": 
@@ -304,6 +305,7 @@ class notificationservice:
         notification.isdeleted = False
 
         notificationusers = notificationuser().getnotificationusers(notificationtype['name'], requesttype, userid, foirequest, requestjson)
+        print("****notificationusers:",notificationusers)
         users = []
         for _notificationuser in notificationusers:
             users.append(self.__preparenotificationuser(requesttype, _notificationuser, userid, mutenotification, ministryusers))
