@@ -27,7 +27,7 @@ import { PreviewModal } from './PreviewModal';
 import { OSS_S3_BUCKET_FULL_PATH } from "../../../../constants/constants";
 import Loading from "../../../../containers/Loading";
 import {setFOICorrespondenceLoader} from "../../../../actions/FOI/foiRequestActions";
-import { applyVariables, getTemplateVariables, isFeeTemplateDisabled, getExtensionType } from './util';
+import { applyVariables, getTemplateVariables, getTemplateVariablesAsync, isFeeTemplateDisabled, getExtensionType } from './util';
 import { StateEnum } from '../../../../constants/FOI/statusEnum';
 import CustomizedTooltip from '../Tooltip/MuiTooltip/Tooltip';
 import { CorrespondenceEmail } from '../../../FOI/customComponents';
@@ -138,6 +138,7 @@ export const ContactApplicant = ({
     setFiles([]);
     setEditorValue("");
     setDraftCorrespondence({});
+    setCorrespondenceId(null);
     setSelectedEmails([]);
     setCurrentTemplate(0);
   }
@@ -172,7 +173,7 @@ export const ContactApplicant = ({
 
   const requestDetails: any = useSelector((state: any) => state.foiRequests.foiRequestDetail);
   const requestExtensions: any = useSelector((state: any) => state.foiRequests.foiRequestExtesions);
-
+  
   const [files, setFiles] = useState([]);
   const [templates, setTemplates] = useState<any[]>([{ value: "", label: "", templateid: null, text: "", disabled: true, created_at:"" }]);
 
@@ -180,10 +181,19 @@ export const ContactApplicant = ({
    if (['PAYONLINE', 'PAYOUTSTANDING'].includes(item.name)) { 
       return !isFeeTemplateDisabled(currentCFRForm, item); 
    } else if (['EXTENSIONS-PB'].includes(item.name)) {
-      return getExtensionType(requestExtensions) === "PB";
-   } else if (['OIPCAPPLICANTCONSENTEXTENSION', 'OIPCFIRSTTIMEEXTENSION','OIPCSUBSEQUENTTIMEEXTENSION'].includes(item.name)) {
-      return getExtensionType(requestExtensions) === "OIPC";
-  }
+      return getExtensionType(requestDetails, requestExtensions) === "PB";
+   } else if (['OIPCAPPLICANTCONSENTEXTENSION'].includes(item.name)) {
+    const isApplicantConsent = getExtensionType(requestDetails, requestExtensions) === "OIPCAPPLICANTCONSENTEXTENSION"
+      return isApplicantConsent;
+   } else if(['OIPCFIRSTTIMEEXTENSION'].includes(item.name)){
+    const isFirstTimeExtension = getExtensionType(requestDetails, requestExtensions) === "OIPCFIRSTTIMEEXTENSION"
+      return isFirstTimeExtension;
+   } else if(['OIPCSUBSEQUENTTIMEEXTENSION'].includes(item.name)){
+    const isSubsequentTimeExtension = getExtensionType(requestDetails, requestExtensions) === "OIPCSUBSEQUENTTIMEEXTENSION"
+      return isSubsequentTimeExtension;
+   } else if(['GENERICCOVEREMAILTEMPLATE'].includes(item.name)){
+      return true;
+   }
   }
 
   const isduplicate = (item: string) => {
@@ -296,19 +306,25 @@ export const ContactApplicant = ({
 
   const handleTemplateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setCurrentTemplate(+e.target.value)
-    const templateVariables = getTemplateVariables(requestDetails, requestExtensions, responsePackagePdfStitchStatus, cfrFeeData, templates[+e.target.value]);
-    const finalTemplate = applyVariables(templates[+e.target.value].text || "", templateVariables);
-    setEditorValue(finalTemplate)
+    
+    const callback = (templateVariables: any) => {
+      const finalTemplate = applyVariables(templates[+e.target.value].text || "", templateVariables);
+      setEditorValue(finalTemplate)
+    }
+    getTemplateVariablesAsync(requestDetails, requestExtensions, responsePackagePdfStitchStatus, cfrFeeData, templates[+e.target.value], callback);
   }
 
   //When templates are selected from list
   const handleTemplateSelection = (index: number) => {
     setCurrentTemplate(index);
-    const templateVariables = getTemplateVariables(requestDetails,requestExtensions, responsePackagePdfStitchStatus, cfrFeeData, templates[index]);
-    const finalTemplate = applyVariables(templates[index].text || "", templateVariables);
-    setEditorValue(finalTemplate);
-    changeCorrespondenceFilter("log");
-    setShowEditor(true);
+    
+    const callback = (templateVariables: any) => {
+      const finalTemplate = applyVariables(templates[index].text || "", templateVariables);
+      setEditorValue(finalTemplate);
+      changeCorrespondenceFilter("log");
+      setShowEditor(true);
+    }
+    getTemplateVariablesAsync(requestDetails,requestExtensions, responsePackagePdfStitchStatus, cfrFeeData, templates[index], callback);
   }
 
   const removeFile = (index: number) => {
@@ -391,6 +407,7 @@ export const ContactApplicant = ({
     const type = (templateId && [1, 2].includes(templateId)) ? "CFRFee" : "";
     let data = {
       templateid: currentTemplate ? templates[currentTemplate as keyof typeof templates].templateid : null,
+      correspondenceid:correspondenceId,
       correspondencemessagejson: JSON.stringify({
         "emailhtml": emailContent,
         "id": approvedForm?.cfrfeeid,
@@ -484,6 +501,7 @@ export const ContactApplicant = ({
     const type = (templateId && [1, 2].includes(templateId)) ? "CFRFee" : "";
     let data = {
       templateid: currentTemplate ? templates[currentTemplate as keyof typeof templates].templateid : null,
+      correspondenceid:correspondenceId,
       correspondencemessagejson: JSON.stringify({
         "emailhtml": editorValue,
         "id": approvedForm?.cfrfeeid,
@@ -545,6 +563,7 @@ export const ContactApplicant = ({
       saveCorrespondenceResponse(
         data,
         ministryId,
+        requestId,
         dispatch,
         callback,
         (errorMessage: string) => {
@@ -575,7 +594,7 @@ export const ContactApplicant = ({
 
 
 
-  const [correspondenceId, setCorrespondenceId] = useState(0);
+  const [correspondenceId, setCorrespondenceId] = useState(null);
 
   const editDraft = async (i : any) => {
     setEditMode(true);
@@ -620,7 +639,7 @@ export const ContactApplicant = ({
       });
       dispatch(fetchApplicantCorrespondence(requestId, ministryId));
     }
-    deleteDraftCorrespondence(draftCorrespondence.applicantcorrespondenceid,ministryId,
+    deleteDraftCorrespondence(draftCorrespondence.applicantcorrespondenceid,ministryId,requestId,
       dispatch,
       callback,
       (errorMessage: string) => {
@@ -670,7 +689,7 @@ export const ContactApplicant = ({
         });
         dispatch(fetchApplicantCorrespondence(requestId, ministryId));
       }
-      deleteResponseCorrespondence(selectedCorrespondence.applicantcorrespondenceid,ministryId,
+      deleteResponseCorrespondence(selectedCorrespondence.applicantcorrespondenceid,ministryId,requestId,
         dispatch,
         callback,
         (errorMessage: string) => {
@@ -752,6 +771,7 @@ export const ContactApplicant = ({
       editCorrespondenceResponse(
         { filename: newFilename, correspondenceattachmentid: correspondenceAttachmentId, correspondenceid: correspondenceId }, 
         ministryId, 
+        requestId, 
         dispatch,
         () => {
           setSelectedCorrespondence({})
@@ -767,6 +787,7 @@ export const ContactApplicant = ({
     editCorrespondenceResponse(
       {responsedate: newDate, correspondenceid: selectedCorrespondence.applicantcorrespondenceid}, 
       ministryId, 
+      requestId, 
       dispatch, 
       () => {
         setSelectedCorrespondence({})
@@ -1041,6 +1062,7 @@ export const ContactApplicant = ({
           <Grid item xs={'auto'}>
           <CorrespondenceEmail 
             ministryId={ministryId}
+            requestId={requestId}
             selectedEmails={selectedEmails}
             setSelectedEmails={setSelectedEmails}
             defaultEmail={requestDetails.email}

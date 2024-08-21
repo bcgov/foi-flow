@@ -20,8 +20,12 @@ class communicationwrapperservice:
     """
     
     def send_email(self,requestid, ministryrequestid, applicantcorrespondencelog):
-        result = applicantcorrespondenceservice().saveapplicantcorrespondencelog(requestid, ministryrequestid, applicantcorrespondencelog, AuthHelper.getuserid())
+        if ministryrequestid == 'None' or ministryrequestid is None:
+            result = applicantcorrespondenceservice().saveapplicantcorrespondencelogforrawrequest(requestid, applicantcorrespondencelog, AuthHelper.getuserid())
+        else:
+            result = applicantcorrespondenceservice().saveapplicantcorrespondencelog(requestid, ministryrequestid, applicantcorrespondencelog, AuthHelper.getuserid())
         if result.success == True:
+            # raw requests should never be fee emails so they would only get handled by else statement
             if self.__is_fee_processing(applicantcorrespondencelog["templateid"]) == True:
                 return self.__handle_fee_email(requestid, ministryrequestid, applicantcorrespondencelog)
             else:

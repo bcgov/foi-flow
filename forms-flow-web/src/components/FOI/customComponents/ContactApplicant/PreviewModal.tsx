@@ -10,7 +10,7 @@ import IconButton from '@material-ui/core/IconButton';
 import CloseIcon from '@material-ui/icons/Close';
 import type { previewParams } from './types';
 import { getOSSHeaderDetails, getFileFromS3 } from "../../../../apiManager/services/FOI/foiOSSServices";
-import { renderTemplate, applyVariables, getTemplateVariables } from './util';
+import { renderTemplate, applyVariables, getTemplateVariables, getTemplateVariablesAsync } from './util';
 import { OSS_S3_BUCKET_FULL_PATH, FOI_FFA_URL } from "../../../../constants/constants";
 import { EmailExport } from '../../../FOI/customComponents';
 
@@ -54,16 +54,18 @@ export const PreviewModal = React.memo(({
       }
     });
   }, []);
+  
   requestDetails["ffaurl"] = FOI_FFA_URL;
+
   const templateVariables = getTemplateVariables(requestDetails, requestExtensions, responsePackagePdfStitchStatus, cfrFeeData, templateInfo);
   const handleSend = () => {
-    handleSave( applyVariables(innerhtml, templateVariables) );
+    const callback = (templateVariables: any) => {
+      handleSave( applyVariables(innerhtml, templateVariables ) );
+    };
+    getTemplateVariablesAsync(requestDetails, requestExtensions, responsePackagePdfStitchStatus, cfrFeeData, templateInfo, callback)
   };
 
-  
-
   return (
-
     <div className="state-change-dialog">        
     <Dialog
       open={modalOpen}
