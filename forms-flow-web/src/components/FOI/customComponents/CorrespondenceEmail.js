@@ -102,7 +102,10 @@ export default function CorrespondenceEmail({
         let filteredArray = selectedEmails.filter(function(e) { return e !== currentemail })
         setSelectedEmails(filteredArray);        
       } else{
-        setSelectedEmails((existingEmails) => [...existingEmails, currentemail]);
+        setSelectedEmails((existingEmails) => {
+          if (currentemail.length > 0) return [...existingEmails, currentemail]
+          return [...existingEmails]
+        });
       }     
     };
     
