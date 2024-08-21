@@ -278,7 +278,7 @@ const CommunicationStructure = ({correspondence, currentIndex,
                     </>
                     )
                     }
-                    <Chip label={correspondence.sentby ? 'emailed' : 'exported'} variant="outlined" />
+                    {correspondence.category !== "draft" && <Chip label={correspondence.sentby ? 'emailed' : 'exported'} variant="outlined" />}
                     </div>
                 </div>
               </div>

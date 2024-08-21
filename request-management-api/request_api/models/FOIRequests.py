@@ -116,6 +116,21 @@ class FOIRequest(db.Model):
         finally:
             db.session.close()
         return request_schema  
+    @classmethod
+    def getrawrequestidbyfoirequestid(cls,requestid)->DefaultMethodResult:
+        try:
+            sql = """select fr.foirawrequestid, fr.foirequestid  from "FOIRequests" fr
+                        where fr.foirequestid=:requestid
+                        order by  fr."version" desc limit 1"""
+            rs = db.session.execute(text(sql), {'requestid': requestid})
+            rawrequestid = None
+            for row in rs:
+                rawrequestid = row["foirawrequestid"]
+        except Exception as ex:
+            logging.error(ex)
+        finally:
+            db.session.close()
+        return rawrequestid
     
 class FOIRequestsSchema(ma.Schema):
     class Meta:

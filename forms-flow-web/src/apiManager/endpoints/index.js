@@ -91,16 +91,16 @@ const API = {
   FOI_POST_CFR_FORM: `${FOI_BASE_API_URL}/api/foicfrfee/foirequest/<requestid>/ministryrequest/<ministryrequestid>`,
   FOI_POST_CFR_FORM_IAO: `${FOI_BASE_API_URL}/api/foicfrfee/foirequest/<requestid>/ministryrequest/<ministryrequestid>/sanction`,
 
-  FOI_POST_REQUEST_CORRESPONDENCE_EMAIL: `${FOI_BASE_API_URL}/api/foiflow/applicantcorrespondence/email/<ministryid>`,
-  FOI_GET_REQUEST_CORRESPONDENCE_EMAILS: `${FOI_BASE_API_URL}/api/foiflow/applicantcorrespondence/email/<ministryid>`,
+  FOI_POST_REQUEST_CORRESPONDENCE_EMAIL: `${FOI_BASE_API_URL}/api/foiflow/applicantcorrespondence/email/<ministryid>/<rawrequestid>`,
+  FOI_GET_REQUEST_CORRESPONDENCE_EMAILS: `${FOI_BASE_API_URL}/api/foiflow/applicantcorrespondence/email/<ministryid>/<rawrequestid>`,
 
   FOI_POST_EMAIL_CORRESPONDENCE: `${FOI_BASE_API_URL}/api/foiflow/applicantcorrespondence/<requestid>/<ministryrequestid>`,
   FOI_POST_DRAFT_EMAIL_CORRESPONDENCE: `${FOI_BASE_API_URL}/api/foiflow/applicantcorrespondence/draft/<requestid>/<ministryrequestid>`,
   FOI_EDIT_DRAFT_EMAIL_CORRESPONDENCE: `${FOI_BASE_API_URL}/api/foiflow/applicantcorrespondence/draft/edit/<requestid>/<ministryrequestid>`,
-  FOI_DELETE_DRAFT_EMAIL_CORRESPONDENCE: `${FOI_BASE_API_URL}/api/foiflow/applicantcorrespondence/draft/delete/<ministryrequestid>/<correspondenceid>`,
-  FOI_POST_RESPONSE_EMAIL_CORRESPONDENCE: `${FOI_BASE_API_URL}/api/foiflow/applicantcorrespondence/response/<ministryrequestid>`,
-  FOI_EDIT_RESPONSE_EMAIL_CORRESPONDENCE: `${FOI_BASE_API_URL}/api/foiflow/applicantcorrespondence/response/edit/<ministryrequestid>`,
-  FOI_DELETE_RESPONSE_EMAIL_CORRESPONDENCE: `${FOI_BASE_API_URL}/api/foiflow/applicantcorrespondence/response/delete/<ministryrequestid>`,
+  FOI_DELETE_DRAFT_EMAIL_CORRESPONDENCE: `${FOI_BASE_API_URL}/api/foiflow/applicantcorrespondence/draft/delete/<ministryrequestid>/<rawrequestid>/<correspondenceid>`,
+  FOI_POST_RESPONSE_EMAIL_CORRESPONDENCE: `${FOI_BASE_API_URL}/api/foiflow/applicantcorrespondence/response/<ministryrequestid>/<rawrequestid>`,
+  FOI_EDIT_RESPONSE_EMAIL_CORRESPONDENCE: `${FOI_BASE_API_URL}/api/foiflow/applicantcorrespondence/response/edit/<ministryrequestid>/<rawrequestid>`,
+  FOI_DELETE_RESPONSE_EMAIL_CORRESPONDENCE: `${FOI_BASE_API_URL}/api/foiflow/applicantcorrespondence/response/delete/<ministryrequestid>/<rawrequestid>/<correspondenceid>`,
 
   FOI_GET_EMAIL_CORRESPONDENCE: `${FOI_BASE_API_URL}/api/foiflow/applicantcorrespondence/<requestid>/<ministryrequestid>`,
   FOI_GET_EMAIL_CORRESPONDENCE_TEMPLATES: `${FOI_BASE_API_URL}/api/foiflow/applicantcorrespondence/templates`,

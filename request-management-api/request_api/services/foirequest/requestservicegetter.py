@@ -138,6 +138,9 @@ class requestservicegetter:
             requestdetails['cfrfee']['feedata']['paymentdate'] = payment['created_at'][:10]
         return requestdetails
 
+    def getrawrequestidbyfoirequestid(self, foirequestid):
+        return FOIRequest.getrawrequestidbyfoirequestid(foirequestid)
+
     def __preparebaseinfo(self,request,foiministryrequestid,requestministry,requestministrydivisions):
         _receiveddate = parse(request['receiveddate'])
         axissyncdatenoneorempty =  self.__noneorempty(requestministry["axissyncdate"]) 

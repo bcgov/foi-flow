@@ -154,6 +154,14 @@ class requestservice:
     def getrequest(self, foirequestid, foiministryrequestid):
         return requestservicegetter().getrequest(foirequestid, foiministryrequestid)
 
+    def getrawrequestidbyfoirequestid(self, foirequestid):
+        if foirequestid == 'undefined':
+            return None
+        rawrequestid = requestservicegetter().getrawrequestidbyfoirequestid(foirequestid)
+        if rawrequestid is None:
+            rawrequestid = foirequestid
+        return rawrequestid
+
     def getrequestdetailsforministry(
         self, foirequestid, foiministryrequestid, authmembershipgroups
     ):

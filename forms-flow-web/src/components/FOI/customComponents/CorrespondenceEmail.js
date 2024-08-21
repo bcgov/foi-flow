@@ -40,6 +40,7 @@ const useStyles = makeStyles((theme) => ({
 
 export default function CorrespondenceEmail({
   ministryId,
+  requestId,
   selectedEmails,
   setSelectedEmails,
   defaultEmail
@@ -54,7 +55,7 @@ export default function CorrespondenceEmail({
 
     React.useEffect(() => {  
       dispatch(
-        fetchCorrespondenceEmailList(ministryId, (_err, res) => {
+        fetchCorrespondenceEmailList(ministryId, requestId, (_err, res) => {
           setRequestemailList( [{"email": defaultEmail}, ...res]);
         })
       );  
@@ -74,7 +75,7 @@ export default function CorrespondenceEmail({
     const handleEmailSave = (e) => {
       if (newCorrespondenceEmail && !isEmailPresent(newCorrespondenceEmail)) {
       dispatch(
-        saveCorrespondenceEmail(ministryId, {"email": newCorrespondenceEmail}, (_err, res) => {
+        saveCorrespondenceEmail(ministryId, requestId, {"email": newCorrespondenceEmail}, (_err, res) => {
             setRequestemailList((oldArray) => [...oldArray, {"email": newCorrespondenceEmail}]);
             setNewCorrespondenceEmail(""); 
         })

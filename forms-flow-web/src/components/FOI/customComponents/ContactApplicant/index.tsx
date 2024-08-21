@@ -138,6 +138,7 @@ export const ContactApplicant = ({
     setFiles([]);
     setEditorValue("");
     setDraftCorrespondence({});
+    setCorrespondenceId(null);
     setSelectedEmails([]);
     setCurrentTemplate(0);
   }
@@ -401,6 +402,7 @@ export const ContactApplicant = ({
     const type = (templateId && [1, 2].includes(templateId)) ? "CFRFee" : "";
     let data = {
       templateid: currentTemplate ? templates[currentTemplate as keyof typeof templates].templateid : null,
+      correspondenceid:correspondenceId,
       correspondencemessagejson: JSON.stringify({
         "emailhtml": emailContent,
         "id": approvedForm?.cfrfeeid,
@@ -495,6 +497,7 @@ export const ContactApplicant = ({
     const type = (templateId && [1, 2].includes(templateId)) ? "CFRFee" : "";
     let data = {
       templateid: currentTemplate ? templates[currentTemplate as keyof typeof templates].templateid : null,
+      correspondenceid:correspondenceId,
       correspondencemessagejson: JSON.stringify({
         "emailhtml": editorValue,
         "id": approvedForm?.cfrfeeid,
@@ -556,6 +559,7 @@ export const ContactApplicant = ({
       saveCorrespondenceResponse(
         data,
         ministryId,
+        requestId,
         dispatch,
         callback,
         (errorMessage: string) => {
@@ -586,7 +590,7 @@ export const ContactApplicant = ({
 
 
 
-  const [correspondenceId, setCorrespondenceId] = useState(0);
+  const [correspondenceId, setCorrespondenceId] = useState(null);
 
   const editDraft = async (i : any) => {
     setEditMode(true);
@@ -631,7 +635,7 @@ export const ContactApplicant = ({
       });
       dispatch(fetchApplicantCorrespondence(requestId, ministryId));
     }
-    deleteDraftCorrespondence(draftCorrespondence.applicantcorrespondenceid,ministryId,
+    deleteDraftCorrespondence(draftCorrespondence.applicantcorrespondenceid,ministryId,requestId,
       dispatch,
       callback,
       (errorMessage: string) => {
@@ -681,7 +685,7 @@ export const ContactApplicant = ({
         });
         dispatch(fetchApplicantCorrespondence(requestId, ministryId));
       }
-      deleteResponseCorrespondence(selectedCorrespondence.applicantcorrespondenceid,ministryId,
+      deleteResponseCorrespondence(selectedCorrespondence.applicantcorrespondenceid,ministryId,requestId,
         dispatch,
         callback,
         (errorMessage: string) => {
@@ -763,6 +767,7 @@ export const ContactApplicant = ({
       editCorrespondenceResponse(
         { filename: newFilename, correspondenceattachmentid: correspondenceAttachmentId, correspondenceid: correspondenceId }, 
         ministryId, 
+        requestId, 
         dispatch,
         () => {
           setSelectedCorrespondence({})
@@ -778,6 +783,7 @@ export const ContactApplicant = ({
     editCorrespondenceResponse(
       {responsedate: newDate, correspondenceid: selectedCorrespondence.applicantcorrespondenceid}, 
       ministryId, 
+      requestId, 
       dispatch, 
       () => {
         setSelectedCorrespondence({})
@@ -1051,6 +1057,7 @@ export const ContactApplicant = ({
           <Grid item xs={'auto'}>
           <CorrespondenceEmail 
             ministryId={ministryId}
+            requestId={requestId}
             selectedEmails={selectedEmails}
             setSelectedEmails={setSelectedEmails}
             defaultEmail={requestDetails.email}
