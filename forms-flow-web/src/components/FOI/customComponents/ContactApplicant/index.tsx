@@ -169,7 +169,7 @@ export const ContactApplicant = ({
   //const previewButtonValue = existingCorrespondence ? "Preview & Resend" : "Preview & Send";
   const previewButtonValue = "Preview & Send";
   const [editMode, setEditMode] = useState(false);
-  const draftButtonValue = editMode ? "Edit Draft" : "Save Draft";
+  const draftButtonValue = editMode ? "Save Draft Edits" : "Save Draft";
 
   const requestDetails: any = useSelector((state: any) => state.foiRequests.foiRequestDetail);
   const requestExtensions: any = useSelector((state: any) => state.foiRequests.foiRequestExtesions);
@@ -326,6 +326,7 @@ export const ContactApplicant = ({
       const finalTemplate = applyVariables(templates[index].text || "", templateVariables);
       setEditorValue(finalTemplate);
       changeCorrespondenceFilter("log");
+      setShowEditor(true);
     }
     getTemplateVariablesAsync(requestDetails,requestExtensions, responsePackagePdfStitchStatus, cfrFeeData, templates[index], callback);
   }
@@ -336,13 +337,21 @@ export const ContactApplicant = ({
 
   const onFilterChange = (filterValue: string) => {
     
+    const getTemplateName = (templateId: any) => {
+      return applicantCorrespondenceTemplates.find((obj: any)=> obj.templateid == templateId)?.description
+    }
     if(filterValue === "") {
       setCorrespondences(applicantCorrespondence);
     } else{
       let _filteredMessages = applicantCorrespondence.filter((corr: any) => {
-        if(corr.text && corr.text.indexOf(filterValue) >= 0) {
+        // Filter through template names, and for responses include "applicant response"
+        const templateName = getTemplateName(corr.templateid)
+        if(templateName && templateName.toLowerCase().indexOf(filterValue.toLowerCase()) >= 0) {
           return corr;
         } 
+        if(corr.category == "response" && "applicant response".indexOf(filterValue.toLowerCase()) >= 0) {
+          return corr;
+        }
       })
       setCorrespondences(_filteredMessages);
       
@@ -440,8 +449,7 @@ export const ContactApplicant = ({
     setPreviewModal(false);
     const attachments = await saveAttachments(files);
     let callback = (_res: string) => {
-      console.log("!!!@@@")
-      changeCorrespondenceFilter("draft");
+      changeCorrespondenceFilter("drafts");
       clearcorrespondence();      
       toast.success("Message has been saved to draft successfully", {
         position: "top-right",
@@ -475,7 +483,7 @@ export const ContactApplicant = ({
       callback,
       (errorMessage: string) => {
         clearcorrespondence();
-        changeCorrespondenceFilter("draft");
+        changeCorrespondenceFilter("drafts");
         dispatch(fetchApplicantCorrespondence(requestId, ministryId));
       },
     );
@@ -623,7 +631,7 @@ export const ContactApplicant = ({
     setPreviewModal(false);
     let callback = (_res: string) => {
       clearcorrespondence();
-      changeCorrespondenceFilter("draft");
+      changeCorrespondenceFilter("drafts");
       toast.success("Draft has been deleted successfully", {
         position: "top-right",
         autoClose: 3000,
@@ -640,7 +648,7 @@ export const ContactApplicant = ({
       callback,
       (errorMessage: string) => {
         clearcorrespondence();
-        changeCorrespondenceFilter("draft");
+        changeCorrespondenceFilter("drafts");
         dispatch(fetchApplicantCorrespondence(requestId, ministryId));
         setFOICorrespondenceLoader(false);
         setDisablePreview(false);
@@ -713,7 +721,7 @@ export const ContactApplicant = ({
     const attachments = await saveAttachments(files);
     let callback = (_res: string) => {
       clearcorrespondence();
-      changeCorrespondenceFilter("draft");
+      changeCorrespondenceFilter("drafts");
       toast.success("Message has been saved to draft successfully", {
         position: "top-right",
         autoClose: 3000,
@@ -748,7 +756,7 @@ export const ContactApplicant = ({
       (errorMessage: string) => {
         errorToast(errorMessage);
         clearcorrespondence();
-        changeCorrespondenceFilter("draft");
+        changeCorrespondenceFilter("drafts");
         dispatch(setFOICorrespondenceLoader(false));
       },
     );
@@ -828,6 +836,7 @@ export const ContactApplicant = ({
         setCurrentResponseDate={setCurrentResponseDate}
         setUpdateAttachment={setUpdateAttachment}
         applicantCorrespondenceTemplates={applicantCorrespondenceTemplates}
+        templateVariableInfo={{requestDetails, requestExtensions, responsePackagePdfStitchStatus, cfrFeeData}}
       />
     </div>
   ))
