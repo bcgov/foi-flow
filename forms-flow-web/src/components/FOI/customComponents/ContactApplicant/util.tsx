@@ -79,10 +79,13 @@ export const getTemplateVariables = (requestDetails: any, requestExtensions: any
     {name: "{{assignedToFirstName}}", value: requestDetails.assignedToFirstName || ""},
     {name: "{{assignedToLastName}}", value: requestDetails.assignedToLastName || ""},
     {name: "{{assignedGroup}}", value: requestDetails.assignedGroup},
-    {name: "{{assignedGroupEmail}}", value: requestDetails.assignedGroupEmail},
+    {name: "{{assignedGroupEmail}}", value: requestDetails.assignedGroupEmail || ""},
     {name: "{{ffaurl}}", value: requestDetails.ffaurl},
     {name: "{{description}}", value: requestDetails.description},
     {name: "{{selectedMinistry}}", value: requestDetails?.selectedMinistries[0].name},
+    {name: "{{address}}", value: requestDetails.address},
+    {name: "{{dueDate}}", value: convertDate(requestDetails.dueDate)},
+    {name: "{{receivedDate}}", value: convertDate(requestDetails.receivedDate)},
     {name: "{{pbExtensionDueDays}}", value: pbExtension[0]},
     {name: "{{pbExtensionDueDate}}", value: pbExtension[1]},
     {name: "{{pbExtensionReason}}", value: getMappedValue("pbextensionreason", pbExtension[2])}, 
@@ -111,6 +114,7 @@ export const getTemplateVariables = (requestDetails: any, requestExtensions: any
     //{name: "{{oipcExtensionSection}}", value: await displayOIPCExtensionSection(oipcExtension[4], requestDetails)},
     {name: "{{oipcExtensionList}}", value: displayOIPCExtension(requestExtensions)},
     {name: "{{oipcApplicantConsentSection}}", value: displayApplicantConsentSection(requestExtensions, requestDetails)},
+    {name: "{{onlineFormHtmlForAcknowledgementLetter}}", value: renderOnlineFormHTML(requestDetails)},
   ]
 }
 
@@ -512,4 +516,14 @@ const displayOIPCExtensionSection = async (extensionId: number, requestDetails: 
     default:
       return "";
   }
+};
+
+const renderOnlineFormHTML = (requestDetails:any): string => {
+  if (requestDetails.receivedMode !== "Online Form") {
+    // Return the HTML content when the request mode is NOT "Online Form".
+    return `
+        <p style="text-align: center;"><span style="font-size: 13px; ">&nbsp;</span></p><p><span style='font-size:13px;font-family:"BC Sans";'>You submitted your request outside of our online process. For future reference, you can submit both personal and general requests at: <a href="https://www2.gov.bc.ca/gov/content/governments/about-the-bc-government/open-government/open-information/freedom-of-information"><span style="font-size: 13px; ">https://www2.gov.bc.ca/gov/content/governments/about-the-bc-government/open-government/open-information/freedom-of-information.</span></a>Using the online process is a fast, easy and secure way to submit your Freedom of Information (FOI) request. It also ensures that we receive the information required to open your request. The webpage also includes frequently asked questions, additional information regarding the FOI process, and links to previously completed FOI requests and proactively released government records. </span></p>
+    `;
+  } 
+  return ''
 };

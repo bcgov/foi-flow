@@ -193,6 +193,10 @@ export const ContactApplicant = ({
       return isSubsequentTimeExtension;
    } else if(['GENERICCOVEREMAILTEMPLATE'].includes(item.name)){
       return true;
+   } else if(['ACKNOWLEDGEMENTLETTER'].includes(item.name)){
+    if (requestDetails.currentState === "Intake in Progress" || requestDetails.currentState === "Open") {
+      return true;
+    }
    }
   }
 
