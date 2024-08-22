@@ -1,4 +1,4 @@
-"""Adding open info status master data
+"""OpenInformation status master data
 
 Revision ID: 0e70c4abcb8d
 Revises: aa2691fa6c3c
@@ -17,14 +17,14 @@ depends_on = None
 
 
 def upgrade():
-    op.create_table('OpenInfoStatus',
+    op.create_table('OpenInfoStatuses',
     sa.Column('oistatusid', sa.Integer(), autoincrement=True, nullable=False),
-    sa.column('name', sa.String(), nullable=False),
+    sa.Column('name', sa.String(), nullable=False),
     sa.Column('isactive', sa.Boolean(), nullable=False),
     sa.PrimaryKeyConstraint('oistatusid')
     )
 
-    op.execeut('''INSERT INTO public."OpenInfoStatus" (name, isactive) 
+    op.execute('''INSERT INTO public."OpenInfoStatuses" (name, isactive) 
                VALUES 
                ('OI Review', True),
                ('Exemption Request', True),
@@ -36,4 +36,4 @@ def upgrade():
                ('Unpublish Request', True);''')
 
 def downgrade():
-    op.drop_table('OpenInfoStatus')
+    op.drop_table('OpenInfoStatuses')
