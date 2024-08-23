@@ -6,7 +6,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faTimes } from '@fortawesome/free-solid-svg-icons'
 import { setFOILoader } from '../../../../actions/FOI/foiRequestActions'
 import Editor, { createEditorStateWithText } from '@draft-js-plugins/editor';
-import { convertToRaw, convertFromRaw, EditorState } from "draft-js";
+import { convertToRaw, convertFromRaw, EditorState, RichUtils } from "draft-js";
 import createMentionPlugin, {
   defaultSuggestionsFilter
 } from '@draft-js-plugins/mention';
@@ -177,6 +177,12 @@ const InputField = ({ cancellor, parentId, child, inputvalue, edit, main, add, f
       setTextLength(maxcharacterlimit - (currentContentLength - selectedTextLength))
     }
     setuftext(currentContent.getPlainText(''))
+    //For enabling keyboard shortcuts 
+    const newState = RichUtils.handleKeyCommand(editorState, e);
+    if (newState) {
+      setEditorState(newState);
+      return 'handled';
+    }
   }
 
   const _handleBeforeInput = () => {
@@ -333,6 +339,7 @@ const InputField = ({ cancellor, parentId, child, inputvalue, edit, main, add, f
           plugins={plugins}
           spellCheck={true}
         />
+        <div style={{ display: 'flex', alignItems: 'center' }}>
         <Toolbar>
           {
             (externalProps) => (
@@ -346,6 +353,10 @@ const InputField = ({ cancellor, parentId, child, inputvalue, edit, main, add, f
             )
           }
         </Toolbar>
+        <div className={'col-lg-9'}>
+          <span className={textlength > 25 ? "characterlen" : "characterlen textred"}>{textlength} characters remaining</span>
+        </div>
+        </div>
         <MentionSuggestions
           open={open}
           onOpenChange={onOpenChange}
@@ -359,9 +370,7 @@ const InputField = ({ cancellor, parentId, child, inputvalue, edit, main, add, f
 
       </form>
       <div className="inputActions">
-        <div className={'col-lg-11'}>
-          <span className={textlength > 25 ? "characterlen" : "characterlen textred"}>{textlength} characters remaining</span>
-        </div>
+
         <div className="col-lg-1 paperplanecontainer">
           <button
             className="postBtn"

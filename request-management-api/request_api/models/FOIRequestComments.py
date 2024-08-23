@@ -36,7 +36,7 @@ class FOIRequestComment(db.Model):
         parentcommentid = foirequestcomment["parentcommentid"] if 'parentcommentid' in foirequestcomment  else None
         taggedusers = foirequestcomment["taggedusers"] if 'taggedusers' in foirequestcomment  else None
         _createddate = datetime2.now().isoformat() if commentcreatedate is None else commentcreatedate        
-        newcomment = FOIRequestComment(commenttypeid=foirequestcomment["commenttypeid"], ministryrequestid=foirequestcomment["ministryrequestid"], 
+        newcomment = FOIRequestComment(commenttypeid=commenttypeid, ministryrequestid=foirequestcomment["ministryrequestid"], 
                                        version=version, comment=foirequestcomment["comment"], parentcommentid=parentcommentid, isactive=True, created_at=_createddate, createdby=userid,taggedusers=taggedusers, commentsversion=commentsversion)
         db.session.add(newcomment)
         db.session.commit()      
@@ -75,6 +75,7 @@ class FOIRequestComment(db.Model):
         
     @classmethod
     def updatecomment(cls, commentid, foirequestcomment, userid):   
+        print("updatecomment:",foirequestcomment)
         dbquery = db.session.query(FOIRequestComment)
         comment = dbquery.filter_by(commentid=commentid).order_by(FOIRequestComment.commentsversion.desc()).first()        
         _existingtaggedusers = []
@@ -105,7 +106,7 @@ class FOIRequestComment(db.Model):
                         set_={"ministryrequestid": comment.ministryrequestid,"version":comment.version, "comment": foirequestcomment["comment"],
                               "taggedusers":_taggedusers, "parentcommentid":comment.parentcommentid, "isactive":True,  
                               "created_at":datetime2.now(), "createdby": userid, "updated_at": datetime2.now(), "updatedby": userid, 
-                              "commenttypeid": comment.commenttypeid 
+                              "commenttypeid": foirequestcomment["commenttypeid"] 
                         }
             )
             db.session.execute(updatestmt)

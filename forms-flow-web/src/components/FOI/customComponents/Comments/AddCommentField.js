@@ -4,7 +4,7 @@ import './comments.scss'
 import { ActionContext } from './ActionContext'
 import { setFOILoader } from '../../../../actions/FOI/foiRequestActions'
 import Editor, { createEditorStateWithText } from '@draft-js-plugins/editor';
-import { convertToRaw, EditorState } from "draft-js";
+import { convertToRaw, EditorState, RichUtils } from "draft-js";
 import createMentionPlugin, {
   defaultSuggestionsFilter
 } from '@draft-js-plugins/mention';
@@ -15,8 +15,8 @@ import {
   UnderlineButton,
   UnorderedListButton,
   OrderedListButton,
-
 } from '@draft-js-plugins/buttons';
+//import createLinkPlugin from '@draft-js-plugins/anchor';
 import {namesort,suggestionList } from './commentutils'
 
 import { getFullnameList, getCommentTypeIdByName } from '../../../../helper/FOI/helper'
@@ -27,7 +27,6 @@ import FormControlLabel from "@material-ui/core/FormControlLabel";
 import FormControl from "@material-ui/core/FormControl";
 import Confirm from '../../../../containers/Confirm'
 import CustomizedTooltip from '../Tooltip/MuiTooltip/Tooltip';
-
 
 
 const staticToolbarPlugin = createToolbarPlugin();
@@ -41,12 +40,10 @@ const AddCommentField = ({ cancellor, parentId, add, fullnameList , restrictedRe
   const [uftext, setuftext] = useState('')
   const [textlength, setTextLength] = useState(1000)
   const [open, setOpen] = useState(false);
-  //console.log("ADD-fullnameList:",fullnameList)
 
   const isCommentTagListLoading = useSelector((state) => state.foiRequests.isCommentTagListLoading);
   let fulluserlist = suggestionList([...fullnameList]).sort(namesort)
-  // console.log("ADD-fulluserlist:",fulluserlist)
-  // console.log("ADD-restrictedReqTaglist:",restrictedReqTaglist)
+
 
   const [mentionList, setMentionList] = useState(isCommentTagListLoading ? [{name: 'Loading...'}] : isRestricted ? restrictedReqTaglist :fulluserlist);
   const [suggestions, setSuggestions] = useState(mentionList);
@@ -60,7 +57,6 @@ const AddCommentField = ({ cancellor, parentId, add, fullnameList , restrictedRe
     setSuggestions(isCommentTagListLoading ? [{name: 'Loading...'}] : isRestricted ? restrictedReqTaglist :suggestionList([...fulluserlist]).sort(namesort));
   }, [fullnameList])
 
-  //console.log("ADD-mentionList:",mentionList)
 
   const onOpenChange = (_open) => {
     setOpen(_open);
@@ -141,18 +137,24 @@ const AddCommentField = ({ cancellor, parentId, add, fullnameList , restrictedRe
     return length;
   }
 
-  const _handleKeyCommand = (e) => {   
+  const _handleKeyCommand = (e) => {  
+   
     const currentContent = editorState.getCurrentContent();
     const currentContentLength = currentContent.getPlainText('').length;
     const selectedTextLength = _getLengthOfSelectedText();
     if ((e === 'backspace' || e === 'delete') && currentContentLength - 1 >= 0) {
       setTextLength((maxcharacterlimit) - (currentContentLength - 1))
     }
-
     if ((e === 'backspace' || e === 'delete') && selectedTextLength > 0) {
       setTextLength(maxcharacterlimit - (currentContentLength - selectedTextLength))
     }
     setuftext(currentContent.getPlainText(''))
+    //For enabling keyboard shortcuts 
+    const newState = RichUtils.handleKeyCommand(editorState, e);
+    if (newState) {
+      setEditorState(newState);
+      return 'handled';
+    }
   }
 
   const _handleBeforeInput = () => {   
@@ -203,8 +205,7 @@ const AddCommentField = ({ cancellor, parentId, add, fullnameList , restrictedRe
       if (add) {
         setEditorState(EditorState.createEmpty())
         setuftext('')
-      }
-      
+      }    
       setRemoveComment(false);
     }
   })
@@ -222,10 +223,6 @@ const AddCommentField = ({ cancellor, parentId, add, fullnameList , restrictedRe
   const cancelComment = () => {
     setshowaddbox(false)
     setEditorState(createEditorStateWithText(''))
-    // setConfirmModalOpen(false);
-    
-    // setEditorChange(false)
-    //setTextLength(1000);
   }
 
   const openConfirmModal = () =>{
@@ -244,9 +241,8 @@ const AddCommentField = ({ cancellor, parentId, add, fullnameList , restrictedRe
       </div>]
   };
 
-  const isActive = editorState.getCurrentInlineStyle().has('BOLD');
-  console.log('BoldButton isActive:', isActive);
-
+  //const isActive = editorState.getCurrentInlineStyle().has('BOLD');
+ 
  
   return (
     <>
@@ -284,7 +280,6 @@ const AddCommentField = ({ cancellor, parentId, add, fullnameList , restrictedRe
               <p className="hideContent" id="commenttype-info">CommentTypeInfo</p>
           </div>
         </Grid>
-
         <Editor
           editorState={editorState}
           onChange={_handleChange}
@@ -294,22 +289,31 @@ const AddCommentField = ({ cancellor, parentId, add, fullnameList , restrictedRe
           plugins={plugins}
           spellCheck={true}
         />
-        <Toolbar>
-          {
-            (externalProps) => {
-              console.log('externalProps:', externalProps)
-              return(
-              <div>
-                <BoldButton {...externalProps} />
-                <ItalicButton {...externalProps} />
-                <UnderlineButton {...externalProps} />
-                <UnorderedListButton {...externalProps} />
-                <OrderedListButton {...externalProps} />
-              </div>
-              )
+        <div style={{ display: 'flex', alignItems: 'center' }}>
+          <Toolbar>
+            {
+              (externalProps) => {
+                console.log('externalProps:', externalProps)
+                return(
+                <>
+                <div>
+                  <BoldButton {...externalProps} />
+                  <ItalicButton {...externalProps} />
+                  <UnderlineButton {...externalProps} />
+                  <UnorderedListButton {...externalProps} />
+                  <OrderedListButton {...externalProps} />
+                </div>
+              </>
+                )
+              }
             }
-          }
-        </Toolbar>
+          </Toolbar>
+          <div className={'col-lg-9'} style={{ marginLeft: '10px' }}>
+            <span className={textlength > 25 ? "characterlen" : "characterlen textred"}>
+              {textlength} characters remaining
+            </span>
+          </div>
+        </div>
         <MentionSuggestions
           open={open}
           onOpenChange={onOpenChange}
@@ -322,21 +326,21 @@ const AddCommentField = ({ cancellor, parentId, add, fullnameList , restrictedRe
         />
 
       </form>
-      <div className="inputActions">
-        <div className={'col-lg-9'}>
+      <div className="newCommentInputActions">
+        {/* <div className={'col-lg-9'}>
           <span className={textlength > 25 ? "characterlen" : "characterlen textred"}>{textlength} characters remaining</span>
-        </div>
+        </div> */}
         <button
-            className="btn-cancel"
+            className="btnCancel"
             onClick={() => openConfirmModal() }
           >
             Cancel
           </button>
-        <div className="col-lg-3"> 
+        <div> 
           {/* paperplanecontainer */}
           <button
             className= "btn-bottom btn btn-save" //"postBtn"
-            style={{width:'80%', padding: '0px'}}
+            style={{width:'200px', marginLeft:'10px', marginRight:'0px'}}
             onClick={post}
             type='button'
             disabled={uftext.trim().length === 0}

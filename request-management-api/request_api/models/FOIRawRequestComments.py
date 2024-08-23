@@ -70,6 +70,7 @@ class FOIRawRequestComment(db.Model):
         
     @classmethod
     def updatecomment(cls, commentid, foirequestcomment, userid):
+        print("---updatecomment",foirequestcomment)
         dbquery = db.session.query(FOIRawRequestComment)
         comment = dbquery.filter_by(commentid=commentid).order_by(FOIRawRequestComment.commentsversion.desc()).first()
         _commentsversion = 0
@@ -100,7 +101,7 @@ class FOIRawRequestComment(db.Model):
                 set_={"requestid": comment.requestid, "version":comment.version, "comment": foirequestcomment["comment"],
                       "taggedusers":_taggedusers, "parentcommentid":comment.parentcommentid,  "isactive":True, 
                       "created_at":datetime.now(), "createdby": userid, "updated_at": datetime.now(), "updatedby": userid, 
-                      "commenttypeid": comment.commenttypeid 
+                      "commenttypeid": foirequestcomment["commenttypeid"]
                       }
             )
             db.session.execute(updatestmt)

@@ -36,10 +36,6 @@ class notificationservice:
     
     def createnotification(self, message, requestid, requesttype, notificationtype, userid, iscleanup=True):
         foirequest = self.getrequest(requestid, requesttype)
-        print("requesttype:",requesttype)
-        print("notif:",notificationtype['name'])
-        print("foirequest:",foirequest)
-        print("message:",message)
         if iscleanup == True:
             self.__cleanupnotifications(requesttype, notificationtype['name'], foirequest)
         return self.__createnotification(message, requestid, requesttype, notificationtype, userid, foirequest)
@@ -133,7 +129,6 @@ class notificationservice:
 
 
     def __createnotification(self, message, requestid, requesttype, notificationtype, userid, foirequest, requestjson=None):
-        print("****__createnotification:",requestjson['commentid'])
         notification = self.__preparenotification(message, requesttype, notificationtype, userid, foirequest, requestjson)
         if notification is not None:      
             if requesttype == "ministryrequest": 
