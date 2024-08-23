@@ -38,6 +38,7 @@
   .inputActions {
     display: flex;
     background-color: white;
+    margin-left: auto;
 
     .postBtn {
       color: white;
@@ -50,7 +51,7 @@
       font-weight: bolder;
       font-size: 12px;
       right: 0;
-      position: absolute;
+      //position: absolute;
 
       &:hover {
         background-position: right center;
