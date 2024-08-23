@@ -108,7 +108,7 @@ class commentservice:
             if entry['parentcommentid'] is not None:
                 for _comment in comments:
                     if entry['parentcommentid'] == _comment['commentId']:
-                        _comment['replies'].append(self.__comment(entry))            
+                        _comment['replies'].append(self.__comment(entry))   
         return comments        
     
     def __parentcomments(self, data):

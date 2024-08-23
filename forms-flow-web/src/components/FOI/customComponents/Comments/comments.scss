@@ -29,6 +29,12 @@
     margin-top: 15px;
   }
 
+  .newCommentInputActions{
+    display: flex;
+    justify-content: right;
+    align-items: center;
+  }
+
   .inputActions {
     display: flex;
     background-color: white;
@@ -239,7 +245,7 @@
   color: #fff !important;
 }
 
-.btn-cancel {
+.btnCancel {
   border: 1px solid #38598a;
   background-color: #ffffff;
   color: #38598a;
@@ -249,6 +255,7 @@
   flex-basis: 50%;
   font-family: BCSans-Bold, sans-serif !important;
   margin-top: 10px;
+  max-width: 200px;
 }
 
 .actionDiv {
@@ -583,7 +590,7 @@ div.nofiltermessage {
 
 button.bc4rxid {
   background-color: transparent; //!important;
-  color: red; //#003366 !important;
+  color:#003366; //!important;
   font-size: 14px;
   border: 0;
   padding-top: 5px;

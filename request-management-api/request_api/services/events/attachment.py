@@ -32,7 +32,6 @@ class attachmentevent():
 
     def __createnotification(self, message, requestid, notificationtype, userid, requesttype):
         if message is not None: 
-            print("notificationtype:",notificationtype)
             return notificationservice().createnotification({"message" : message}, requestid, requesttype , notificationtype, userid)
 
     def __createcomment(self, requestid, message, ministryversion, userid, requesttype):
