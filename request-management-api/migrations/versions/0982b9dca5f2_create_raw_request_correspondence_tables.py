@@ -39,6 +39,7 @@ def upgrade():
     sa.Column('isdraft', sa.Boolean(), nullable=True),  
     sa.Column('isdeleted', sa.Boolean(), nullable=True),  
     sa.Column('isresponse', sa.Boolean(), nullable=True),  
+    sa.Column('israwrequest', sa.Boolean(), nullable=True, server_default=sa.true()),
 
     sa.ForeignKeyConstraint(['foirawrequest_id', 'foirawrequestversion_id'], ['FOIRawRequests.requestid', 'FOIRawRequests.version']),
     sa.PrimaryKeyConstraint('applicantcorrespondenceid', 'version'),
