@@ -87,7 +87,6 @@ export const ContactApplicant = ({
   const [confirmationFor, setConfirmationFor] = useState("");
   const [confirmationTitle, setConfirmationTitle] = useState("");
   const [confirmationMessage, setConfirmationMessage] = useState("");
-  const [draftCorrespondence, setDraftCorrespondence] = useState <any> ({});
   const [selectedCorrespondence, setSelectedCorrespondence] = useState <any> ({});
   const [currentResponseDate, setCurrentResponseDate] = useState <any> ("");
   const [extension, setExtension] = useState("");
@@ -114,7 +113,7 @@ export const ContactApplicant = ({
     setEditMode(false);
     setFiles([]);
     setEditorValue("");
-    setDraftCorrespondence({});
+    setSelectedCorrespondence({});
     setSelectedEmails([]);
     setCurrentTemplate(0);
     
@@ -137,7 +136,7 @@ export const ContactApplicant = ({
     setEditMode(false);
     setFiles([]);
     setEditorValue("");
-    setDraftCorrespondence({});
+    setSelectedCorrespondence({});
     setCorrespondenceId(null);
     setSelectedEmails([]);
     setCurrentTemplate(0);
@@ -146,7 +145,7 @@ export const ContactApplicant = ({
   const handleConfirmationClose = () => {     
     setConfirmationFor("");
     setConfirmationMessage("");
-    setDraftCorrespondence({});
+    setSelectedCorrespondence({});
     setOpenConfirmationModal(false);
   }
 
@@ -409,6 +408,7 @@ export const ContactApplicant = ({
     }
     const templateId = currentTemplate ? templates[currentTemplate as keyof typeof templates].templateid : null;
     const type = (templateId && [1, 2].includes(templateId)) ? "CFRFee" : "";
+    let israwrequest = selectedCorrespondence.israwrequest || false;
     let data = {
       templateid: currentTemplate ? templates[currentTemplate as keyof typeof templates].templateid : null,
       correspondenceid:correspondenceId,
@@ -424,7 +424,8 @@ export const ContactApplicant = ({
         "paymentExpiryDate": dueDateCalculation(new Date(), PAYMENT_EXPIRY_DAYS),
         "axisRequestId": requestNumber
       }],
-      assignedGroupEmail: requestDetails.assignedGroupEmail
+      assignedGroupEmail: requestDetails.assignedGroupEmail,
+      israwrequest: israwrequest
     };
     saveEmailCorrespondence(
       data,
@@ -464,6 +465,7 @@ export const ContactApplicant = ({
     }
     const templateId = currentTemplate ? templates[currentTemplate as keyof typeof templates].templateid : null;
     const type = (templateId && [1, 2].includes(templateId)) ? "CFRFee" : "";
+    let israwrequest = selectedCorrespondence.israwrequest || false;
     let data = {
       templateid: currentTemplate ? templates[currentTemplate as keyof typeof templates].templateid : null,
       correspondencemessagejson: JSON.stringify({
@@ -473,7 +475,8 @@ export const ContactApplicant = ({
       }),
       foiministryrequest_id: ministryId,
       attachments: attachments,
-      emails: selectedEmails
+      emails: selectedEmails,
+      israwrequest: israwrequest
     };
     saveDraftCorrespondence(
       data,
@@ -503,6 +506,7 @@ export const ContactApplicant = ({
     }
     const templateId = currentTemplate ? templates[currentTemplate as keyof typeof templates].templateid : null;
     const type = (templateId && [1, 2].includes(templateId)) ? "CFRFee" : "";
+    let israwrequest = selectedCorrespondence.israwrequest || false;
     let data = {
       templateid: currentTemplate ? templates[currentTemplate as keyof typeof templates].templateid : null,
       correspondenceid:correspondenceId,
@@ -517,7 +521,8 @@ export const ContactApplicant = ({
       attributes: [{ 
         "paymentExpiryDate": dueDateCalculation(new Date(), PAYMENT_EXPIRY_DAYS),
         "axisRequestId": requestNumber
-      }]
+      }],
+      israwrequest: israwrequest
     };
     saveEmailCorrespondence(
       data,
@@ -561,8 +566,10 @@ export const ContactApplicant = ({
         changeCorrespondenceFilter("log");
         dispatch(fetchApplicantCorrespondence(requestId, ministryId));
       }
+      let israwrequest = ministryId ? false : true;
       let data = {
-        attachments: responseattachments
+        attachments: responseattachments,
+        israwrequest: israwrequest
       };
       saveCorrespondenceResponse(
         data,
@@ -601,6 +608,7 @@ export const ContactApplicant = ({
   const [correspondenceId, setCorrespondenceId] = useState(null);
 
   const editDraft = async (i : any) => {
+    setSelectedCorrespondence(i);
     setEditMode(true);
     setShowEditor(true);
     setEditorValue(i.text);
@@ -616,7 +624,7 @@ export const ContactApplicant = ({
   };
 
   const deleteDraft = (i : any) => {
-    setDraftCorrespondence(i);
+    setSelectedCorrespondence(i);
     setOpenConfirmationModal(true);
     setConfirmationFor("delete-draft")
     setConfirmationTitle("Delete Draft")
@@ -625,8 +633,8 @@ export const ContactApplicant = ({
 
 
   const deleteDraftAction = async () => {
-    if (draftCorrespondence) {
-    setCorrespondenceId(draftCorrespondence.applicantcorrespondenceid);
+    if (selectedCorrespondence) {
+    setCorrespondenceId(selectedCorrespondence.applicantcorrespondenceid);
     setDisablePreview(true);
     setPreviewModal(false);
     let callback = (_res: string) => {
@@ -643,7 +651,7 @@ export const ContactApplicant = ({
       });
       dispatch(fetchApplicantCorrespondence(requestId, ministryId));
     }
-    deleteDraftCorrespondence(draftCorrespondence.applicantcorrespondenceid,ministryId,requestId,
+    deleteDraftCorrespondence(selectedCorrespondence.applicantcorrespondenceid, selectedCorrespondence.israwrequest, ministryId,requestId,
       dispatch,
       callback,
       (errorMessage: string) => {
@@ -693,7 +701,7 @@ export const ContactApplicant = ({
         });
         dispatch(fetchApplicantCorrespondence(requestId, ministryId));
       }
-      deleteResponseCorrespondence(selectedCorrespondence.applicantcorrespondenceid,ministryId,requestId,
+      deleteResponseCorrespondence(selectedCorrespondence.applicantcorrespondenceid,selectedCorrespondence.israwrequest, ministryId,requestId,
         dispatch,
         callback,
         (errorMessage: string) => {
@@ -735,6 +743,7 @@ export const ContactApplicant = ({
     }
     const templateId = currentTemplate ? templates[currentTemplate as keyof typeof templates].templateid : null;
     const type = (templateId && [1, 2].includes(templateId)) ? "CFRFee" : "";
+    let israwrequest = selectedCorrespondence.israwrequest || false;
     let data = {
       correspondenceid:correspondenceId,
       templateid: currentTemplate ? templates[currentTemplate as keyof typeof templates].templateid : null,
@@ -745,7 +754,8 @@ export const ContactApplicant = ({
       }),
       foiministryrequest_id: ministryId,
       attachments: attachments,
-      emails: selectedEmails
+      emails: selectedEmails,
+      israwrequest: israwrequest
     };
     editDraftCorrespondence(
       data,
@@ -773,7 +783,7 @@ export const ContactApplicant = ({
 
     if (updateAttachment.filename !== newFilename) {
       editCorrespondenceResponse(
-        { filename: newFilename, correspondenceattachmentid: correspondenceAttachmentId, correspondenceid: correspondenceId }, 
+        { filename: newFilename, correspondenceattachmentid: correspondenceAttachmentId, correspondenceid: correspondenceId, israwrequest: selectedCorrespondence.israwrequest }, 
         ministryId, 
         requestId, 
         dispatch,
@@ -789,7 +799,7 @@ export const ContactApplicant = ({
   const handleChangeResponseDate = (newDate: string) => {
     setModal(false);
     editCorrespondenceResponse(
-      {responsedate: newDate, correspondenceid: selectedCorrespondence.applicantcorrespondenceid}, 
+      {responsedate: newDate, correspondenceid: selectedCorrespondence.applicantcorrespondenceid, israwrequest: selectedCorrespondence.israwrequest}, 
       ministryId, 
       requestId, 
       dispatch, 
