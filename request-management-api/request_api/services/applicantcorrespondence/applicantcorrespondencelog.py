@@ -54,6 +54,8 @@ class applicantcorrespondenceservice:
                 correpondencelog['emails'] = self.__getcorrespondenceemailbyid(_correspondenceemails,  _correpondencelog['applicantcorrespondenceid'], _correpondencelog['version'])
                 #Email block - End
                 correspondencelogs.append(correpondencelog)
+        # Since we're merging raw and ministry requests, resort by date
+        correspondencelogs.sort(key=lambda x: datetime.strptime(x['date'], '%Y %b %d | %I:%M %p'), reverse=True)
         return correspondencelogs
     
     def __getattachmentsbyid(self, attachments, correspondenceid, correspondenceversion):
@@ -132,9 +134,14 @@ class applicantcorrespondenceservice:
             updt_correspondence.sentby = userid
         if 'responsedate' in data and data['responsedate'] is not None:
             updt_correspondence.response_at = data['responsedate']
+        if 'isdraft' in data and data['isdraft'] is not None:
+            updt_correspondence.isdraft = data['isdraft']
+        if 'correspondencemessagejson' in data and data['correspondencemessagejson'] is not None:
+            updt_correspondence.correspondencemessagejson = data['correspondencemessagejson']
         response = FOIApplicantCorrespondence.saveapplicantcorrespondence(updt_correspondence, None, None)
         if response.success == True:
-            self.__updateattachmentversion(data, userid)
+            attachresponse = self.__updateattachmentversionministry(data, userid)
+            return response
         return response
     
     def editapplicantcorrespondencelogforrawrequest(self, rawrequestid, data, userid):
@@ -157,7 +164,7 @@ class applicantcorrespondenceservice:
             updt_correspondence.correspondencemessagejson = data['correspondencemessagejson']
         response = FOIApplicantCorrespondenceRawRequest.saveapplicantcorrespondence(updt_correspondence, None, None)
         if response.success == True:
-            attachresponse = self.__updateattachmentversion(data, userid)
+            attachresponse = self.__updateattachmentversionrawrequest(data, userid)
             return response
         return response
 
@@ -191,7 +198,22 @@ class applicantcorrespondenceservice:
     def getlatestapplicantcorrespondence(self, ministryid):
         return FOIApplicantCorrespondence().getlatestapplicantcorrespondence(ministryid)
     
-    def __updateattachmentversion(self, data, userid):
+    def __updateattachmentversionministry(self, data, userid):
+        # Check for attachments
+        attachment = FOIApplicantCorrespondenceAttachment.getcorrespondenceattachmentbyapplicantcorrespondenceid(data['correspondenceid'])
+        if len(attachment) > 0:
+            updated_attachment = FOIApplicantCorrespondenceAttachment()
+            updated_attachment.__dict__.update(attachment)
+            if 'filename' in data and data['filename'] is not None:
+                updated_attachment.attachmentfilename = data['filename']
+            updated_attachment.created_at = datetime.now()
+            updated_attachment.createdby = userid
+            updated_attachment.version=attachment["version"]+1
+            updated_attachment.applicantcorrespondence_version = attachment["applicantcorrespondence_version"] + 1
+            response = FOIApplicantCorrespondenceAttachment.saveapplicantcorrespondenceattachment(updated_attachment)
+            return response
+
+    def __updateattachmentversionrawrequest(self, data, userid):
         # Check for attachments
         attachment = FOIApplicantCorrespondenceAttachmentRawRequest.getcorrespondenceattachmentbyapplicantcorrespondenceid(data['correspondenceid'])
         if len(attachment) > 0:
@@ -226,7 +248,8 @@ class applicantcorrespondenceservice:
             "sentby": _correpondencelog["sentby"],
             "userId": _correpondencelog['createdby'] if  _correpondencelog['createdby'] is not None else _correpondencelog['sentby'],
             "attachments" : attachments,
-            "category" : self.__getcorrespondencecategory(_correpondencelog)
+            "category" : self.__getcorrespondencecategory(_correpondencelog),
+            "israwrequest": _correpondencelog.get('israwrequest', False) is True,
         }        
         return correpondencelog
     
