@@ -20,7 +20,7 @@ class communicationwrapperservice:
     """
     
     def send_email(self,requestid, ministryrequestid, applicantcorrespondencelog):
-        if ministryrequestid == 'None' or ministryrequestid is None:
+        if ministryrequestid == 'None' or ministryrequestid is None or ("israwrequest" in applicantcorrespondencelog and applicantcorrespondencelog["israwrequest"]) is True:
             result = applicantcorrespondenceservice().saveapplicantcorrespondencelogforrawrequest(requestid, applicantcorrespondencelog, AuthHelper.getuserid())
         else:
             result = applicantcorrespondenceservice().saveapplicantcorrespondencelog(requestid, ministryrequestid, applicantcorrespondencelog, AuthHelper.getuserid())
