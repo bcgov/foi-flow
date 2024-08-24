@@ -160,6 +160,7 @@ export const editDraftCorrespondence = (
 
 export const deleteDraftCorrespondence = (
   correspondenceid,
+  israwrequest,
   ministryId,
   requestId,
   dispatch,
@@ -177,7 +178,7 @@ export const deleteDraftCorrespondence = (
 
   );
   apiUrl = replaceUrl(apiUrl,"<rawrequestid>",requestId);
-  httpPOSTRequest(apiUrl,{})
+  httpPOSTRequest(apiUrl,{israwrequest: israwrequest})
     .then((res) => {
       if (res.data) {
         if (callback) {
@@ -199,6 +200,7 @@ export const deleteDraftCorrespondence = (
 
 export const deleteResponseCorrespondence = (
   correspondenceid,
+  israwrequest,
   ministryId,
   requestId,
   dispatch,
@@ -216,7 +218,7 @@ export const deleteResponseCorrespondence = (
 
   );
   apiUrl = replaceUrl(apiUrl,"<rawrequestid>",requestId);
-  httpPOSTRequest(apiUrl,{})
+  httpPOSTRequest(apiUrl,{israwrequest: israwrequest})
     .then((res) => {
       if (res.data) {
         if (callback) {

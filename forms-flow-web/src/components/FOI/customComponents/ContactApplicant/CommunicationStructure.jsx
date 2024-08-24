@@ -239,7 +239,7 @@ const CommunicationStructure = ({correspondence, currentIndex,
       const { requestDetails, requestExtensions, responsePackagePdfStitchStatus, cfrFeeData } = templateVariableInfo
       let variables = getTemplateVariables(requestDetails,requestExtensions, responsePackagePdfStitchStatus, cfrFeeData, template)
       variables = variables.filter(variable => {
-        const includedVariables = ["{{firstName}}", "{{lastName}}"]
+        const includedVariables = ["{{firstName}}", "{{lastName}}", "{{address}}"]
         return includedVariables.includes(variable.name)
       })
       for (let variable of variables) {

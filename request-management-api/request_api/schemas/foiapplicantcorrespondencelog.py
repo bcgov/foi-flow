@@ -27,6 +27,7 @@ class FOIApplicantCorrespondenceSchema(Schema):
         data_key="attributes",
         required=False,
     )
+    israwrequest = fields.Bool(data_key="israwrequest",required=False,allow_none=True)
 
 
 class FOIApplicantCorrespondenceEmailSchema(Schema):
