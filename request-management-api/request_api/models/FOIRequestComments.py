@@ -75,12 +75,13 @@ class FOIRequestComment(db.Model):
         
     @classmethod
     def updatecomment(cls, commentid, foirequestcomment, userid):   
-        print("updatecomment:",foirequestcomment)
+        #print("updatecomment:",foirequestcomment)
         dbquery = db.session.query(FOIRequestComment)
         comment = dbquery.filter_by(commentid=commentid).order_by(FOIRequestComment.commentsversion.desc()).first()        
         _existingtaggedusers = []
         _commentsversion = 0
-        if comment is not None :            
+        if comment is not None :
+            _commenttypeid = comment.commenttypeid            
             _existingtaggedusers = comment.taggedusers
             _taggedusers = foirequestcomment["taggedusers"] if 'taggedusers' in foirequestcomment  else _existingtaggedusers
             _commentsversion = int(comment.commentsversion)
@@ -110,6 +111,16 @@ class FOIRequestComment(db.Model):
                         }
             )
             db.session.execute(updatestmt)
+            if foirequestcomment["commenttypeid"] != _commenttypeid:
+                print("Comment type changed-updating child comments", foirequestcomment["commenttypeid"])
+                dbquery.filter_by(parentcommentid=commentid, isactive = True).update(
+                    {
+                        "commenttypeid": foirequestcomment["commenttypeid"],
+                        "updated_at": datetime2.now(),
+                        "updatedby": userid
+                    },
+                    synchronize_session=False
+                )
             db.session.commit()
             return DefaultMethodResult(True,'Updated Comment added',commentid, _existingtaggedusers, _commentsversion)
         else:

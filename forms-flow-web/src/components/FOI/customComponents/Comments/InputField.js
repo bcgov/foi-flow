@@ -301,35 +301,37 @@ const InputField = ({ cancellor, parentId, child, inputvalue, edit, main, add, f
             ) : null}
           </div>
         </div>
-        <Grid item xs={12} lg={6}>
-          <FormControl component="fieldset">
-            <RadioGroup
-              id="status-options"
-              row
-              name="controlled-radio-buttons-group"
-              value={editCommentTypeId}
-              onChange={(e) => {
-                setEditCommentTypeId(Number(e.target.value));
-              }}
-            >
-            <FormControlLabel 
-              value={getCommentTypeIdByName(commentTypes, "User submitted")}
-              control={<Radio color="default" id="rbextpending" />}
-              label="General"
-            />
-            <FormControlLabel
-              value={isMinistry ? getCommentTypeIdByName(commentTypes, "Ministry Internal"):getCommentTypeIdByName(commentTypes, "IAO Internal") }
-              control={<Radio color="default" id="rbextapproved" />}
-              label="Internal"
-            />
-            <FormControlLabel
-              value={isMinistry ? getCommentTypeIdByName(commentTypes,"Ministry Peer Review"): getCommentTypeIdByName(commentTypes, "IAO Peer Review")}
-              control={<Radio color="default" id="rbextdenied" />}
-              label="Peer Review"
-            />
-            </RadioGroup>
-          </FormControl>
-        </Grid>
+        {edit == true &&
+          <Grid item xs={12} lg={6}>
+            <FormControl component="fieldset">
+              <RadioGroup
+                id="status-options"
+                row
+                name="controlled-radio-buttons-group"
+                value={editCommentTypeId}
+                onChange={(e) => {
+                  setEditCommentTypeId(Number(e.target.value));
+                }}
+              >
+              <FormControlLabel 
+                value={getCommentTypeIdByName(commentTypes, "User submitted")}
+                control={<Radio color="default" id="rbextpending" />}
+                label="General"
+              />
+              <FormControlLabel
+                value={isMinistry ? getCommentTypeIdByName(commentTypes, "Ministry Internal"):getCommentTypeIdByName(commentTypes, "IAO Internal") }
+                control={<Radio color="default" id="rbextapproved" />}
+                label="Internal"
+              />
+              <FormControlLabel
+                value={isMinistry ? getCommentTypeIdByName(commentTypes,"Ministry Peer Review"): getCommentTypeIdByName(commentTypes, "IAO Peer Review")}
+                control={<Radio color="default" id="rbextdenied" />}
+                label="Peer Review"
+              />
+              </RadioGroup>
+            </FormControl>
+          </Grid>
+        }
         <Editor
           editorState={editorState}
           onChange={_handleChange}
