@@ -27,13 +27,14 @@ def upgrade():
     sa.Column('oipublicationstatus_id', sa.Integer(), nullable=False),
     sa.ForeignKeyConstraint(['oipublicationstatus_id'], ['OpenInfoPublicationStatuses.oipublicationstatusid']),
 
-    sa.Column('oiassignee', sa.String(), nullable=False), #THIS A FK OR SHOULD BE SET UP DIFF?
-    sa.Column('pagereference', sa.String()), #json ojec or array to hold array of data
+    sa.Column('oiassignedto', sa.String(), nullable=False),
+    sa.Column('pagereference', sa.String), #json object or array or string?
     sa.Column('oiexemptionapproved', sa.Boolean()),
     sa.Column('iaorationale', sa.String()),
     sa.Column('oifeedback', sa.String()),
     sa.Column('publicationdate', sa.DateTime()),
-    sa.Column('version', sa.Integer(), nullabe=False), #NEEDED?
+    # sa.Column('version', sa.Integer(), nullabe=False), #NEEDED?
+    # sa.Column('isactive', sa.Boolean()), # Needed??
 
     sa.Column('created_at', sa.DateTime(), nullable=False),
     sa.Column('createdby', sa.String(length=120), nullable=False),
