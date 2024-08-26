@@ -17,14 +17,14 @@ depends_on = None
 
 
 def upgrade():
-    op.create_table('OpenInfoExemptions',
+    op.create_table('OpenInformationExemptions',
     sa.Column('oiexemptionid', sa.Integer(), autoincrement=True, nullable=False),
     sa.Column('name', sa.String(), nullable=False),
     sa.Column('isactive', sa.Boolean(), nullable=False),
     sa.PrimaryKeyConstraint('oiexemptionid')
     )
 
-    op.execute('''INSERT INTO public."OpenInfoExemptions" (name, isactive) 
+    op.execute('''INSERT INTO public."OpenInformationExemptions" (name, isactive) 
                VALUES
                ('Another Government''s Information', True),
                ('Business Information', True),
@@ -36,4 +36,4 @@ def upgrade():
                ('Security Information', True);''')
 
 def downgrade():
-    op.drop_table('OpenInfoExemptions')
+    op.drop_table('OpenInformationExemptions')

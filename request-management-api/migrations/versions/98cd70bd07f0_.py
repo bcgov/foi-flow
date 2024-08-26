@@ -23,7 +23,7 @@ def upgrade():
     sa.Column('foiministryrequest_id', sa.Integer(), nullable=False),
     sa.Column('foiministryrequestversion_id', sa.Integer(), nullable=False),
     sa.ForeignKeyConstraint(['foiministryrequest_id', 'foiministryrequestversion_id'], ['FOIMinistryRequests.foiministryrequestid', 'FOIMinistryRequests.version']),
-    sa.Column('oiexemption_id', sa.Integer(), sa.ForeignKey('OpenInfoExemptions.oiexemptionid'), nullable=True),
+    sa.Column('oiexemption_id', sa.Integer(), sa.ForeignKey('OpenInformationExemptions.oiexemptionid'), nullable=True),
     sa.Column('oipublicationstatus_id', sa.Integer(), nullable=False),
     sa.ForeignKeyConstraint(['oipublicationstatus_id'], ['OpenInfoPublicationStatuses.oipublicationstatusid']),
 
@@ -46,7 +46,7 @@ def upgrade():
     op.create_foreign_key(
     'fk_foiministryrequest_oistatus',
     'FOIMinistryRequests',
-    'OpenInfoStatuses',
+    'OpenInformationStatuses',
     ['oistatus_id'],
     ['oistatusid'],
     )

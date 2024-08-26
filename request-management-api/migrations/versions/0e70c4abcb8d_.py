@@ -17,14 +17,14 @@ depends_on = None
 
 
 def upgrade():
-    op.create_table('OpenInfoStatuses',
+    op.create_table('OpenInformationStatuses',
     sa.Column('oistatusid', sa.Integer(), autoincrement=True, nullable=False),
     sa.Column('name', sa.String(), nullable=False),
     sa.Column('isactive', sa.Boolean(), nullable=False),
     sa.PrimaryKeyConstraint('oistatusid')
     )
 
-    op.execute('''INSERT INTO public."OpenInfoStatuses" (name, isactive) 
+    op.execute('''INSERT INTO public."OpenInformationStatuses" (name, isactive) 
                VALUES 
                ('OI Review', True),
                ('Exemption Request', True),
@@ -36,4 +36,4 @@ def upgrade():
                ('Unpublish Request', True);''')
 
 def downgrade():
-    op.drop_table('OpenInfoStatuses')
+    op.drop_table('OpenInformationStatuses')
