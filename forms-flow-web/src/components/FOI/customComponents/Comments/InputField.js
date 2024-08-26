@@ -301,7 +301,7 @@ const InputField = ({ cancellor, parentId, child, inputvalue, edit, main, add, f
             ) : null}
           </div>
         </div>
-        {edit == true &&
+        {edit &&
           <Grid item xs={12} lg={6}>
             <FormControl component="fieldset">
               <RadioGroup
