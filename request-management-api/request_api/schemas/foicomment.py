@@ -39,6 +39,8 @@ class EditFOIRawRequestCommentSchema(Schema):
         unknown = EXCLUDE    
     comment = fields.Str(data_key="comment")
     taggedusers = fields.Str(data_key="taggedusers")
+    commenttypeid= fields.Int(data_key="commenttypeid",allow_none=True)
+
 
 
 
