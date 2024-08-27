@@ -34,6 +34,7 @@ from request_api.services.extensionreasonservice import extensionreasonservice
 from request_api.services.cacheservice import cacheservice
 from request_api.services.subjectcodeservice import subjectcodeservice
 from request_api.services.oipcservice import oipcservice
+from request_api.services.openinfoservice import openinfoservice
 import json
 import request_api
 import requests
@@ -476,3 +477,66 @@ class FOIFlowOIPCInquiryOutcomes(Resource):
             return jsondata , 200
         except BusinessException:
             return "Error happened while accessing OIPC inquiry outcomes" , 500
+
+@cors_preflight('GET,OPTIONS')
+@API.route('/foiflow/openinfo/statuses')
+class FOIFlowOpenInformationStatuses(Resource):
+    """Retrieves OpenInformtation request statuses
+    """
+    @staticmethod
+    @TRACER.trace()
+    @cross_origin(origins=allowedorigins())
+    @auth.require
+    @request_api.cache.cached(
+        unless=cache_filter,
+        response_filter=response_filter
+    )
+    def get():
+        try:
+            data = openinfoservice().getopeninfostatuses()
+            jsondata = json.dumps(data)
+            return jsondata , 200
+        except BusinessException:
+            return "Error happened while accessing OpenInformation statuses" , 500
+        
+@cors_preflight('GET,OPTIONS')
+@API.route('/foiflow/openinfo/exemptions')
+class FOIFlowOpenInformationStatuses(Resource):
+    """Retrieves OpenInformtation exemptions
+    """
+    @staticmethod
+    @TRACER.trace()
+    @cross_origin(origins=allowedorigins())
+    @auth.require
+    @request_api.cache.cached(
+        unless=cache_filter,
+        response_filter=response_filter
+    )
+    def get():
+        try:
+            data = openinfoservice().getopeninfoexemptions()
+            jsondata = json.dumps(data)
+            return jsondata , 200
+        except BusinessException:
+            return "Error happened while accessing OpenInformation exemptions" , 500
+        
+@cors_preflight('GET,OPTIONS')
+@API.route('/foiflow/openinfo/publicationstatuses')
+class FOIFlowOpenInformationStatuses(Resource):
+    """Retrieves OpenInformtation publication statuses
+    """
+    @staticmethod
+    @TRACER.trace()
+    @cross_origin(origins=allowedorigins())
+    @auth.require
+    @request_api.cache.cached(
+        unless=cache_filter,
+        response_filter=response_filter
+    )
+    def get():
+        try:
+            data = openinfoservice().getopeninfopublicationstatuses()
+            jsondata = json.dumps(data)
+            return jsondata , 200
+        except BusinessException:
+            return "Error happened while accessing OpenInformation publication statuses" , 500
