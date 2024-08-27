@@ -341,7 +341,7 @@ const InputField = ({ cancellor, parentId, child, inputvalue, edit, main, add, f
           plugins={plugins}
           spellCheck={true}
         />
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent:'space-between' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent:'space-between', position: 'sticky' }}>
         <Toolbar>
           {
             (externalProps) => (
