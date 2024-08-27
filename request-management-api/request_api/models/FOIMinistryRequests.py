@@ -110,6 +110,7 @@ class FOIMinistryRequest(db.Model):
     isofflinepayment = db.Column(db.Boolean, unique=False, nullable=True,default=False)
 
     isoipcreview = db.Column(db.Boolean, unique=False, nullable=True,default=False)
+    oistatus_id = db.Column(db.Integer, ForeignKey('OpenInformationStatuses.oistatusid'), unique=False, nullable=True)
 
     @classmethod
     def getrequest(cls,ministryrequestid):
