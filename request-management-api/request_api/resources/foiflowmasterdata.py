@@ -501,7 +501,7 @@ class FOIFlowOpenInformationStatuses(Resource):
         
 @cors_preflight('GET,OPTIONS')
 @API.route('/foiflow/openinfo/exemptions')
-class FOIFlowOpenInformationStatuses(Resource):
+class FOIFlowOpenInformationExemptions(Resource):
     """Retrieves OpenInformtation exemptions
     """
     @staticmethod
@@ -522,7 +522,7 @@ class FOIFlowOpenInformationStatuses(Resource):
         
 @cors_preflight('GET,OPTIONS')
 @API.route('/foiflow/openinfo/publicationstatuses')
-class FOIFlowOpenInformationStatuses(Resource):
+class FOIFlowOpenInformationPublicationStatuses(Resource):
     """Retrieves OpenInformtation publication statuses
     """
     @staticmethod

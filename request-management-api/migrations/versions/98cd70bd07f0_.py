@@ -18,10 +18,10 @@ depends_on = None
 
 def upgrade():
     op.create_table('FOIOpenInformationRequests',
-    sa.Column('foiopeninforequestid', sa.Integer(), autoincrement=True, nullable=False),
-    sa.PrimaryKeyConstraint('foiopeninforequestid'),
+    sa.Column('foiopeninforequestid', sa.Integer(), primary_key=True, autoincrement=True, nullable=False),
+    sa.Column('version', sa.Integer(), primary_key=True, nullable=False),
     sa.Column('foiministryrequest_id', sa.Integer(), nullable=False),
-    sa.Column('foiministryrequestversion_id', sa.Integer(), nullable=False),
+    sa.Column('foiministryrequestversion_id', sa.Integer(), nullable=False), # NEEDED?
     sa.ForeignKeyConstraint(['foiministryrequest_id', 'foiministryrequestversion_id'], ['FOIMinistryRequests.foiministryrequestid', 'FOIMinistryRequests.version']),
     sa.Column('oiexemption_id', sa.Integer(), sa.ForeignKey('OpenInformationExemptions.oiexemptionid'), nullable=True),
     sa.Column('oipublicationstatus_id', sa.Integer(), nullable=False),
@@ -33,8 +33,7 @@ def upgrade():
     sa.Column('iaorationale', sa.String()),
     sa.Column('oifeedback', sa.String()),
     sa.Column('publicationdate', sa.DateTime()),
-    # sa.Column('version', sa.Integer(), nullabe=False), #NEEDED?
-    # sa.Column('isactive', sa.Boolean()), # Needed??
+    sa.Column('isactive', sa.Boolean()),
 
     sa.Column('created_at', sa.DateTime(), nullable=False),
     sa.Column('createdby', sa.String(length=120), nullable=False),
@@ -53,5 +52,5 @@ def upgrade():
 
 def downgrade():
     op.drop_table('FOIOpenInformationRequests')
+    op.drop_column('FOIMinistryRequests', 'oistatus_id')
     op.drop_constraint('fk_foirequest_oistatus', 'FOIMinistryRequests', type_='foreignkey') 
-    op.drop_column('FOIMinistryRequests', 'oistatus_id' )
