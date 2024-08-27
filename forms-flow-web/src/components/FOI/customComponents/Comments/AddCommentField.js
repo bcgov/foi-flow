@@ -289,7 +289,7 @@ const AddCommentField = ({ cancellor, parentId, add, fullnameList , restrictedRe
           plugins={plugins}
           spellCheck={true}
         />
-        <div style={{ display: 'flex', alignItems: 'center' }}>
+        <div style={{ display: 'flex', alignItems: 'center', position: 'sticky' }}>
           <Toolbar>
             {
               (externalProps) => {
