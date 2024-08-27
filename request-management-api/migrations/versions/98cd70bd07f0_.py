@@ -26,9 +26,9 @@ def upgrade():
     sa.Column('oiexemption_id', sa.Integer(), sa.ForeignKey('OpenInformationExemptions.oiexemptionid'), nullable=True),
     sa.Column('oipublicationstatus_id', sa.Integer(), nullable=False),
     sa.ForeignKeyConstraint(['oipublicationstatus_id'], ['OpenInfoPublicationStatuses.oipublicationstatusid']),
+    sa.Column('oiassignedto', sa.String(length=120), sa.ForeignKey('FOIAssignees.username'), nullable=True),
 
-    sa.Column('oiassignedto', sa.String(), nullable=False),
-    sa.Column('pagereference', sa.String), #json object or array or string?
+    sa.Column('pagereference', sa.String()), #json object or array or string?
     sa.Column('oiexemptionapproved', sa.Boolean()),
     sa.Column('iaorationale', sa.String()),
     sa.Column('oifeedback', sa.String()),
