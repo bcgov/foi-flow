@@ -435,7 +435,6 @@ class FOIMinistryRequest(db.Model):
         _keywords = []
         if(keyword is not None):
             _keywords = keyword.lower().replace(",", " ").split()
-        print("_keywords: ", _keywords)
         if(len(filterfields) > 0 and keyword is not None):
             filtercondition = []
             for _keyword in _keywords:
