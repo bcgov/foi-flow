@@ -6,10 +6,10 @@ class openinfoservice:
     """ OpenInformation service
     """
     def getopeninfostatuses (self):
-        OpenInformationStatuses.getallstatuses()
+        return OpenInformationStatuses.getallstatuses()
 
     def getopeninfopublicationstatuses (self):
-        OpenInfoPublicationStatuses.getallpublicationstatuses()
+        return OpenInfoPublicationStatuses.getallpublicationstatuses()
 
     def getopeninfoexemptions (self):
-        OpenInformationExemptions.getallexemptions()
+        return OpenInformationExemptions.getallexemptions()

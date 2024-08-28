@@ -30,7 +30,9 @@ import {
   fetchOIPCOutcomes,
   fetchOIPCStatuses,
   fetchOIPCReviewtypes,
-  fetchOIPCInquiryoutcomes
+  fetchOIPCInquiryoutcomes,
+  fetchOpenInfoPublicationStatuses,
+  fetchOpenInfoExemptions,
 } from "../../../apiManager/services/FOI/foiMasterDataServices";
 import {
   fetchFOIRequestDetailsWrapper,
@@ -107,6 +109,7 @@ import { setFOIRequestDetail } from "../../../actions/FOI/foiRequestActions";
 import OIPCDetails from "./OIPCDetails/Index";
 import useOIPCHook from "./OIPCDetails/oipcHook";
 import MANDATORY_FOI_REQUEST_FIELDS from "../../../constants/FOI/mandatoryFOIRequestFields";
+import IAOOpenInfoPublishing from "./OpenInformation/IAOOpenInfoPublishing";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -241,6 +244,10 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
       display: false,
       active: false,
     },
+    OpenInformation: {
+      display: false,
+      active: false,
+    },
   };
 
   const [tabLinksStatuses, setTabLinksStatuses] = useState({
@@ -341,6 +348,8 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
     dispatch(fetchOIPCStatuses());
     dispatch(fetchOIPCReviewtypes());
     dispatch(fetchOIPCInquiryoutcomes());
+    dispatch(fetchOpenInfoExemptions());
+    dispatch(fetchOpenInfoPublicationStatuses());
 
     if (bcgovcode) dispatch(fetchFOIMinistryAssignedToList(bcgovcode));
   }, [requestId, ministryId, comment, attachments]);
@@ -1067,6 +1076,14 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
       requestDetails?.requestType === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_GENERAL)
   }
 
+  const showOpenInformationTab = () => {
+    return (
+      requestDetails?.requestType === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_GENERAL &&
+      requestState !== StateEnum.intakeinprogress.name &&
+      requestState !== StateEnum.unopened.name
+    );
+  }
+
   return (!isLoading &&
     requestDetails &&
     Object.keys(requestDetails).length !== 0) ||
@@ -1151,6 +1168,17 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
                     onClick={() => tabclick("Records")}
                   >
                     Records
+                  </div>
+                )}
+                {showOpenInformationTab() && (
+                  <div
+                    className={clsx("tablinks", {
+                      active: tabLinksStatuses.OpenInformation.active,
+                    })}
+                    name="Open Information"
+                    onClick={() => tabclick("OpenInformation")}
+                  >
+                    Open Information
                   </div>
                 )}
                 {showContactApplicantTab() && (
@@ -1684,6 +1712,18 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
               </>
             )}
           </div>
+          {showOpenInformationTab() && (
+            <div
+              id="OpenInformation"
+              className={clsx("tabcontent", {
+                active: tabLinksStatuses.OpenInformation.active,
+                [classes.displayed]: tabLinksStatuses.OpenInformation.display,
+                [classes.hidden]: !tabLinksStatuses.OpenInformation.display,
+              })}
+            >
+              <IAOOpenInfoPublishing data={{}} />
+          </div>
+          )}
           {showContactApplicantTab() && (
             <div
               id="ContactApplicant"

@@ -155,5 +155,9 @@ const API = {
   FOI_GET_OIPC_STATUSES: `${FOI_BASE_API_URL}/api/foiflow/oipc/statuses`,
   FOI_GET_OIPC_REVIEWTYPES: `${FOI_BASE_API_URL}/api/foiflow/oipc/reviewtypes`,
   FOI_GET_OIPC_INQUIRYOUTCOMES: `${FOI_BASE_API_URL}/api/foiflow/oipc/inquiryoutcomes`,
+
+  FOI_GET_OI_PUBLICATIONSTATUSES: `${FOI_BASE_API_URL}/api/foiflow/openinfo/publicationstatuses`,
+  FOI_GET_OI_EXEMPTIONS: `${FOI_BASE_API_URL}/api/foiflow/openinfo/exemptions`,
+  FOI_GET_OI_STATUSES: `${FOI_BASE_API_URL}/api/foiflow/openinfo/statuses`,
 };
 export default API;

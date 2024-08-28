@@ -29,6 +29,9 @@ import {
     setOIPCStatuses,
     setOIPCReviewtypes,
     setOIPCInquiryoutcomes,
+    setOIExemptions,
+    setOIPublicationStatuses,
+    setOIStatuses,
   } from "../../../actions/FOI/foiRequestActions";
   import { fnDone, catchError } from "./foiServicesUtil";
   import UserService from "../../../services/UserService";
@@ -690,4 +693,69 @@ import {
         });
     };
   };
-  
+
+  export const fetchOpenInfoPublicationStatuses = () => {
+    return (dispatch) => {
+      httpGETRequest(API.FOI_GET_OI_PUBLICATIONSTATUSES, {}, UserService.getToken())
+        .then((res) => {
+          if (res.data) {
+            const oiPublicationStatuses = res.data;
+            dispatch(setOIPublicationStatuses(oiPublicationStatuses));
+            dispatch(setFOILoader(false));
+          } else {
+            console.log("Error while fetching OI publication statuses master data", res);
+            dispatch(serviceActionError(res));
+            dispatch(setFOILoader(false));
+          }
+        })
+        .catch((error) => {
+          console.log("Error while fetching OI publication statuses master data", error);
+          dispatch(serviceActionError(error));
+          dispatch(setFOILoader(false));
+        });
+    };
+  }
+
+  export const fetchOpenInfoExemptions = () => {
+    return (dispatch) => {
+      httpGETRequest(API.FOI_GET_OI_EXEMPTIONS, {}, UserService.getToken())
+        .then((res) => {
+          if (res.data) {
+            const oiExemptions = res.data;
+            dispatch(setOIExemptions(oiExemptions));
+            dispatch(setFOILoader(false));
+          } else {
+            console.log("Error while fetching OI exemptions master data", res);
+            dispatch(serviceActionError(res));
+            dispatch(setFOILoader(false));
+          }
+        })
+        .catch((error) => {
+          console.log("Error while fetching OI exemptions master data", error);
+          dispatch(serviceActionError(error));
+          dispatch(setFOILoader(false));
+        });
+    };
+  }
+
+  export const fetchOpenInfoStatuses = () => {
+    return (dispatch) => {
+      httpGETRequest(API.FOI_GET_OI_STATUSES, {}, UserService.getToken())
+        .then((res) => {
+          if (res.data) {
+            const oiStatuses = res.data;
+            dispatch(setOIStatuses(oiStatuses));
+            dispatch(setFOILoader(false));
+          } else {
+            console.log("Error while fetching OI statuses master data", res);
+            dispatch(serviceActionError(res));
+            dispatch(setFOILoader(false));
+          }
+        })
+        .catch((error) => {
+          console.log("Error while fetching OI statuses master data", error);
+          dispatch(serviceActionError(error));
+          dispatch(setFOILoader(false));
+        });
+    };
+  }

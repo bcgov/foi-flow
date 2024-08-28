@@ -501,3 +501,24 @@ export const setOIPCInquiryoutcomes = (data) => (dispatch) => {
     payload: data,
   });
 };
+
+export const setOIExemptions = (data) => (dispatch) => {
+  dispatch({
+    type: FOI_ACTION_CONSTANTS.OI_EXEMPTIONS,
+    payload: data,
+  });
+};
+
+export const setOIPublicationStatuses = (data) => (dispatch) => {
+  dispatch({
+    type: FOI_ACTION_CONSTANTS.OI_PUBLICATIONSTATUSES,
+    payload: data,
+  });
+};
+
+export const setOIStatuses = (data) => (dispatch) => {
+  dispatch({
+    type: FOI_ACTION_CONSTANTS.OI_STATUSES,
+    payload: data,
+  });
+};

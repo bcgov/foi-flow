@@ -153,6 +153,9 @@ const initialState = {
   oipcStatuses: [],
   oipcReviewtypes: [],
   oipcInquiryoutcomes: [],
+  oiExemptions: [],
+  oiPublicationStatuses: [],
+  oiStatuses: [],
 };
 
 const foiRequests = (state = initialState, action) => {
@@ -345,6 +348,12 @@ const foiRequests = (state = initialState, action) => {
       return { ...state, oipcReviewtypes: action.payload };
     case FOI_ACTION_CONSTANTS.OIPC_INQUIRYOUTCOMES:
         return { ...state, oipcInquiryoutcomes: action.payload };
+    case FOI_ACTION_CONSTANTS.OI_EXEMPTIONS:
+      return { ...state, oiExemptions: action.payload };
+    case FOI_ACTION_CONSTANTS.OI_PUBLICATIONSTATUSES:
+      return { ...state, oiPublicationStatuses: action.payload };
+    case FOI_ACTION_CONSTANTS.OI_STATUSES:
+      return { ...state, oiStatuses: action.payload };
     default:
       return state;
   }
