@@ -90,24 +90,31 @@ class notificationuser:
     
 
     def __isiaointernalcomment(self, notificationtype, requestjson):
-        if(notificationtype in ["New User Comments", "Reply User Comments", "Tagged User Comments"] and 
-            'commenttypeid' in requestjson and (requestjson['commenttypeid'] == commentservice().getcommenttypeidbyname("IAO Internal") or 
-            requestjson['commenttypeid'] == commentservice().getcommenttypeidbyname("IAO Peer Review"))):
+        _iaointernaltype= commentservice().getcommenttypeidbyname("IAO Internal")
+        _iaopeerreviewtype= commentservice().getcommenttypeidbyname("IAO Peer Review")
+        if(notificationtype in ["New User Comments", "Reply User Comments", "Tagged User Comments", "General"] and 
+            'commenttypeid' in requestjson and (requestjson['commenttypeid'] == _iaointernaltype or 
+            requestjson['commenttypeid'] == _iaopeerreviewtype)):
                 return True
         else:
             return False
         
     def __isministryinternalcomment(self, notificationtype, requestjson):
-        if(notificationtype in ["New User Comments", "Reply User Comments", "Tagged User Comments"] and 
-            'commenttypeid' in requestjson and (requestjson['commenttypeid'] == commentservice().getcommenttypeidbyname("Ministry Internal") or 
-            requestjson['commenttypeid'] == commentservice().getcommenttypeidbyname("Ministry Peer Review"))):
+        ministryinternaltype= commentservice().getcommenttypeidbyname("Ministry Internal")
+        ministrypeerreviewtype= commentservice().getcommenttypeidbyname("Ministry Peer Review")
+        print("ministryinternaltype:",ministryinternaltype)
+        print("ministrypeerreviewtype:",ministrypeerreviewtype)
+        print("requestjson:",requestjson)
+        if(notificationtype in ["New User Comments", "Reply User Comments", "Tagged User Comments", "General"] and 
+            'commenttypeid' in requestjson and (requestjson['commenttypeid'] == ministryinternaltype or 
+            requestjson['commenttypeid'] == ministrypeerreviewtype)):
                 return True
         else:
             return False
 
     def __isministryassigneeneeded(self, requesttype, foirequest, notificationtype, requestjson=None):
         if(requesttype == "ministryrequest" and foirequest["assignedministryperson"] is not None and (notificationtype == 'Ministry Assignment' or 'Assignment' not in notificationtype)):
-            if 'Comments' in notificationtype and self.__isiaointernalcomment(notificationtype,requestjson):
+            if ('Comments' in notificationtype or 'General' in notificationtype) and self.__isiaointernalcomment(notificationtype,requestjson):
                 return False
             return True
         else:
@@ -115,7 +122,7 @@ class notificationuser:
         
     def __isfoiassigneeneeded(self, foirequest, notificationtype, requestjson=None):
         if self.__isministryonly(notificationtype) == False and foirequest["assignedto"] is not None and foirequest["assignedto"] != '' and (notificationtype == 'IAO Assignment' or 'Assignment' not in notificationtype):
-            if 'Comments' in notificationtype and self.__isministryinternalcomment(notificationtype,requestjson):
+            if ('Comments' in notificationtype or 'General' in notificationtype) and self.__isministryinternalcomment(notificationtype,requestjson):
                 return False
             return True
         else:
@@ -125,7 +132,8 @@ class notificationuser:
         return True if notificationtype == "Division Due Reminder" else False 
 
     def __getcommentusers(self, foirequest, comment, requesttype):
-        _requestusers = self.getnotificationusers("General", requesttype, "nouser", foirequest)
+        _requestusers = self.getnotificationusers("General", requesttype, "nouser", foirequest, comment)
+        print("_requestusers:",_requestusers)
         commentusers = []
         commentusers.extend(_requestusers)
         taggedusers = self.__gettaggedusers(comment)

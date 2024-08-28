@@ -51,6 +51,7 @@ class watcherservice:
             return FOIRequestWatcher.getNonMinistrywatchers(ministryrequestid)
     
     def getallministryrequestwatchers(self, ministryrequestid, isministryinternalcomment=False, isiaointernalcomment=False, isministryonly=False):
+        ministrywatchers = [] 
         if(isiaointernalcomment == False):
             ministrywatchers = FOIRequestWatcher.getMinistrywatchers(ministryrequestid)
         if isministryonly == False and isministryinternalcomment == False:
