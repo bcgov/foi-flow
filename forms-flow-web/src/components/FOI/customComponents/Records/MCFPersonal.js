@@ -25,7 +25,7 @@ const MCFPersonal = ({
     editTagModalOpen,
     setEditTagModalOpen,
     setNewDivision,
-    // tagValue,
+    comparePersonalAttributes,
     curPersonalAttributes,
     setNewPersonalAttributes,
     updatePersonalAttributes,
@@ -74,6 +74,24 @@ const MCFPersonal = ({
     const [fileTypeSearchValue, setFileTypeSearchValue] = useState("");
     const [additionalFileTypes, setAdditionalFileTypes] = useState([]);
     const [showAdditionalFileTypes, setShowAdditionalFileTypes] = useState(false);
+    const [disableSave, setDisableSave] = useState(false);
+
+    const compareDivision = (curDiv, newDiv) => {
+      return curDiv === newDiv;
+    }
+
+    useEffect(() => {
+      setDisableSave(
+        personalAttributes?.person === undefined
+         || personalAttributes?.person === ""
+         || personalAttributes?.filetype === undefined
+         || personalAttributes?.filetype === ""
+         || personalAttributes?.trackingid === undefined
+         || personalAttributes?.trackingid === ""
+         || (!isMinistryCoordinator && comparePersonalAttributes(personalAttributes, curPersonalAttributes))
+         || (isMinistryCoordinator && comparePersonalAttributes(personalAttributes, curPersonalAttributes) && compareDivision(currentEditRecord.attributes.divisions[0].divisionid, divisionModalTagValue))
+        );
+    },[personalAttributes, divisionModalTagValue])
 
     useEffect(() => {
       if(currentEditRecord?.attributes?.divisions[0]?.divisionid) {
@@ -85,7 +103,7 @@ const MCFPersonal = ({
       if(MCFSections?.sections) {
         if(MCFSections.sections.length > MCFPopularSections-1) {
           setTagList(MCFSections.sections.slice(0, MCFPopularSections-1));
-          setOtherTagList(MCFSections.sections.slice(MCFPopularSections));
+          setOtherTagList(MCFSections.sections.slice(MCFPopularSections-1));
         } else {
           setTagList(MCFSections.sections);
           setOtherTagList([]);
@@ -118,8 +136,8 @@ const MCFPersonal = ({
     useEffect(() => {
       if(MCFFiletypes?.filetypes) {
         if(MCFFiletypes.filetypes?.length > 6) {
-          setFileTypes(MCFFiletypes.filetypes.slice(0, 6));
-          setOtherFileTypes(MCFFiletypes.filetypes.slice(6, MCFFiletypes.filetypes.length))
+          setFileTypes(MCFFiletypes.filetypes.slice(0, 8));
+          setOtherFileTypes(MCFFiletypes.filetypes.slice(8, MCFFiletypes.filetypes.length))
         } else {
           setFileTypes(MCFFiletypes.filetypes);
           setOtherFileTypes([])
@@ -160,6 +178,16 @@ const MCFPersonal = ({
         setVolumes(allVolumes.slice(0, 5))
       }
     },[showAllPeople, showAllVolumes])
+
+    React.useEffect(() => {
+      if(allPeople.length > 0 && personalAttributes.person !== "") {
+        setShowAllPeople( allPeople.filter(p => p.name==personalAttributes.person)[0]?.sortorder >= 5 );
+      }
+
+      if(allVolumes.length > 0 && personalAttributes.volume !== "") {
+        setShowAllVolumes( allVolumes.filter(v => v.name==personalAttributes.volume)[0]?.sortorder >= 5 );
+      }
+    },[personalAttributes])
 
     React.useEffect(() => {
       setAdditionalFileTypes(searchFileTypes(otherFileTypes, fileTypeSearchValue, personalAttributes?.filetype));
@@ -612,13 +640,14 @@ const MCFPersonal = ({
             <button
               className={`btn-bottom btn-save btn`}
               onClick={() => {updatePersonalAttributes();reset();}}
+              disabled={disableSave}
             >
               Update for Individual
             </button>
             <button
               className={`btn-bottom btn-save btn`}
               onClick={() => {updatePersonalAttributes(true);reset();}}
-              disabled={isMinistryCoordinator}
+              disabled={disableSave || isMinistryCoordinator}
             >
               Update for All
             </button>
