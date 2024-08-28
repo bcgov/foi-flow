@@ -499,6 +499,17 @@ const getCommentLabelFromId = (commentTypes, id) => {
   return commentType ? commentType.label?.toUpperCase() : "";
 };
 
+const getCommentTypeFromId = (commentTypes, id) => {
+  const commentType = commentTypes.find(type => type.commenttypeid === id);
+  if(commentType != null && commentType != undefined){
+    if(commentType.name == "User submitted")
+      return "general";
+    else
+      return commentType.name?.toLowerCase()
+  }
+  return "";
+};
+
 const setTeamTagList = (bcgovcode) => {
   //let fullnameList = getFullnameList();
   let iaoFullnameArray = [];
@@ -600,5 +611,6 @@ export {
   getCommentLabelFromId,
   getIAOAssignToList,
   setTeamTagList,
-  getIAOTagList
+  getIAOTagList,
+  getCommentTypeFromId
 };

@@ -51,6 +51,15 @@ class commentservice:
             commentsversion = result.args[1]
             if commentsversion and commentsversion > 0:
                deactivateresult = FOIRequestComment.deactivatecomment(commentid, userid, commentsversion)
+            commenttypeid = result.args[2]
+            #print("commenttypeid!!:",commenttypeid)
+            if commenttypeid is not None and commenttypeid != data["commenttypeid"]:
+                childresult = FOIRequestComment.updatechildcomments(commentid, data, userid)
+                if childresult.success == True:
+                    childcomments = childresult.args[2]
+                    #print("childcomments:",childcomments)
+                    if childcomments is not None:
+                        FOIRequestComment.deactivatechildcomments(commentid, userid, childcomments)
         if result and deactivateresult:
             return result
         return DefaultMethodResult(False,'Error in editing comment',commentid)
@@ -62,6 +71,15 @@ class commentservice:
             commentsversion = result.args[1]
             if commentsversion and commentsversion > 0:
               deactivateresult = FOIRawRequestComment.deactivatecomment(commentid, userid, commentsversion)
+            commenttypeid = result.args[2]
+            #print("commenttypeid!:",commenttypeid)
+            if commenttypeid is not None and commenttypeid != data["commenttypeid"]:
+                childresult = FOIRawRequestComment.updatechildcomments(commentid, data, userid)
+                if childresult.success == True:
+                    childcomments = childresult.args[2]
+                    #print("childcomments:",childcomments)
+                    if childcomments is not None:
+                        FOIRawRequestComment.deactivatechildcomments(commentid, userid, childcomments)
         if result and deactivateresult:
             return result
         return DefaultMethodResult(False,'Error in editing raw request comment',commentid) 

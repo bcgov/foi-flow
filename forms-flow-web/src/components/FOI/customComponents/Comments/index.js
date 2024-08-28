@@ -5,7 +5,7 @@ import DisplayComments from './DisplayComments'
 import { ActionProvider } from './ActionContext'
 import Input from './Input'
 import CommentFilter from './CommentFilter'
-import { getMinistryRestrictedTagList, getCommentTypeIdByName, setTeamTagList } from "../../../../helper/FOI/helper";
+import { getMinistryRestrictedTagList, getCommentTypeIdByName, getCommentTypeFromId } from "../../../../helper/FOI/helper";
 import Loading from "../../../../containers/Loading";
 //import { CommentTypes } from '../../../../constants/FOI/enum' 
 import {fetchFOICommentTypes} from "../../../../apiManager/services/FOI/foiMasterDataServices";
@@ -50,14 +50,13 @@ export const CommentSection = ({
 
   useEffect(() => {
     let _commentsbyCategory = filterCommentFn() 
-    let _filteredcomments = filterkeyValue === "" ? _commentsbyCategory : _commentsbyCategory.filter(c => c.text.toLowerCase().indexOf(filterkeyValue.toLowerCase()) > -1)
+    let _filteredcomments = filterkeyValue === "" ? _commentsbyCategory : (_commentsbyCategory.filter(c => c.text.toLowerCase().indexOf(filterkeyValue.toLowerCase()) > -1
+    || getCommentTypeFromId(commentTypes, c.commentTypeId)?.indexOf(filterkeyValue.toLowerCase()) > -1))
     let filteredcomments = filterkeyinCommentsandReplies(_commentsbyCategory,_filteredcomments)        
     setcomments(filteredcomments)
   }, [filterValue,commentsArray ,filterkeyValue])
   let restrictedReqTaglist = useSelector((state) => state.foiRequests.restrictedReqTaglist);
 
-  // console.log("!!ministryAssignedToList:",ministryAssignedToList)
-  // console.log("!!iaoassignedToList:",iaoassignedToList)
 
   const filterCommentFn = () => {
     if(parseInt(filterValue) === -1){

@@ -71,6 +71,7 @@ const ConfirmModal= ({
                 <button
                 className={`btn-bottom btn-save btn`}
                 onClick={handleSave}
+                style={{marginTop:'0px'}}
                 //disabled={!isIAORestrictedFileManager || isRequestAssignedToTeam()}
                 >
                 Save Change
