@@ -79,6 +79,7 @@ const Confirm = React.memo((props)=>{
                 <button
                 className='btn-bottom btn-save btn'
                 //{classes.btnBottom}
+                style={{marginTop:'0px'}}
                 onClick={onYes}
                 >
                 {yesText}
