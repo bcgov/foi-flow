@@ -432,20 +432,22 @@ class FOIMinistryRequest(db.Model):
         ministry_restricted_requests = aliased(FOIRestrictedMinistryRequest)
 
         #filter/search
+        _keywords = []
+        if(keyword is not None):
+            _keywords = keyword.lower().replace(",", " ").split()
         if(len(filterfields) > 0 and keyword is not None):
-            
             filtercondition = []
-
-            if(keyword != "restricted"):
-                for field in filterfields:
-                    filtercondition.append(FOIMinistryRequest.findfield(field, iaoassignee, ministryassignee).ilike('%'+keyword+'%'))
-            else:
-                if(requestby == 'IAO'):
-                    filtercondition.append(FOIRestrictedMinistryRequest.isrestricted == True)
+            for _keyword in _keywords:
+                if(_keyword != "restricted"):
+                    for field in filterfields:
+                        filtercondition.append(FOIMinistryRequest.findfield(field, iaoassignee, ministryassignee).ilike('%'+_keyword+'%'))
                 else:
-                    filtercondition.append(ministry_restricted_requests.isrestricted == True)
-            if (keyword.lower() == "oipc"):
-                filtercondition.append(FOIMinistryRequest.isoipcreview == True)
+                    if(requestby == 'IAO'):
+                        filtercondition.append(FOIRestrictedMinistryRequest.isrestricted == True)
+                    else:
+                        filtercondition.append(ministry_restricted_requests.isrestricted == True)
+                if (_keyword == "oipc"):
+                    filtercondition.append(FOIMinistryRequest.isoipcreview == True)
 
         intakesorting = case([
                             (and_(FOIMinistryRequest.assignedto == None, FOIMinistryRequest.assignedgroup == 'Intake Team'), # Unassigned requests first
