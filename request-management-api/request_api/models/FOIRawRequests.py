@@ -692,7 +692,6 @@ class FOIRawRequest(db.Model):
         _keywords = []
         if(keyword is not None):
             _keywords = keyword.lower().replace(",", " ").split()
-        print("_keywords: ", _keywords)
 
         #filter/search
         filtercondition = []
