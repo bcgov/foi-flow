@@ -438,16 +438,19 @@ class FOIMinistryRequest(db.Model):
         if(len(filterfields) > 0 and keyword is not None):
             filtercondition = []
             for _keyword in _keywords:
+                onekeywordfiltercondition = []
                 if(_keyword != "restricted"):
                     for field in filterfields:
-                        filtercondition.append(FOIMinistryRequest.findfield(field, iaoassignee, ministryassignee).ilike('%'+_keyword+'%'))
+                        onekeywordfiltercondition.append(FOIMinistryRequest.findfield(field, iaoassignee, ministryassignee).ilike('%'+_keyword+'%'))
                 else:
                     if(requestby == 'IAO'):
-                        filtercondition.append(FOIRestrictedMinistryRequest.isrestricted == True)
+                        onekeywordfiltercondition.append(FOIRestrictedMinistryRequest.isrestricted == True)
                     else:
-                        filtercondition.append(ministry_restricted_requests.isrestricted == True)
+                        onekeywordfiltercondition.append(ministry_restricted_requests.isrestricted == True)
                 if (_keyword == "oipc"):
-                    filtercondition.append(FOIMinistryRequest.isoipcreview == True)
+                    onekeywordfiltercondition.append(FOIMinistryRequest.isoipcreview == True)
+            
+            filtercondition.append(or_(*onekeywordfiltercondition))
 
         intakesorting = case([
                             (and_(FOIMinistryRequest.assignedto == None, FOIMinistryRequest.assignedgroup == 'Intake Team'), # Unassigned requests first
@@ -708,7 +711,7 @@ class FOIMinistryRequest(db.Model):
         if(keyword is None):
             return dbquery
         else:
-            return dbquery.filter(or_(*filtercondition))
+            return dbquery.filter(and_(*filtercondition))
 
     @classmethod
     def getrequestspagination(cls, group, page, size, sortingitems, sortingorders, filterfields, keyword, additionalfilter, userid, isiaorestrictedfilemanager, isministryrestrictedfilemanager):
