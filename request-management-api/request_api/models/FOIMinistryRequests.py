@@ -450,7 +450,7 @@ class FOIMinistryRequest(db.Model):
                 if (_keyword == "oipc"):
                     onekeywordfiltercondition.append(FOIMinistryRequest.isoipcreview == True)
             
-            filtercondition.append(or_(*onekeywordfiltercondition))
+                filtercondition.append(or_(*onekeywordfiltercondition))
 
         intakesorting = case([
                             (and_(FOIMinistryRequest.assignedto == None, FOIMinistryRequest.assignedgroup == 'Intake Team'), # Unassigned requests first
