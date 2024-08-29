@@ -29,7 +29,6 @@ const Input = ({ add, bcgovcode, iaoassignedToList, ministryAssignedToList, setE
       
 
   const filterTagList = (commentTypeId) => {
-    console.log("filterTagList in Input.js!!")
     let tagList= fullnameList;
     //getIAOAssignToList();
     if(commentTypeId == getCommentTypeIdByName(commentTypes, "IAO Internal") || 
@@ -38,7 +37,6 @@ const Input = ({ add, bcgovcode, iaoassignedToList, ministryAssignedToList, setE
     else if(commentTypeId == getCommentTypeIdByName(commentTypes, "Ministry Internal") || 
         commentTypeId == getCommentTypeIdByName(commentTypes,"Ministry Peer Review"))
       tagList = getIAOTagList(bcgovcode);
-    //console.log("tagList:", tagList)
     return tagList;
   }
 

@@ -85,11 +85,13 @@ const AddCommentField = ({ cancellor, parentId, add, fullnameList , restrictedRe
   }
 
   const _handleChange = (_editorState) => {  
-    console.log(_editorState);  
     const currentContent = _editorState.getCurrentContent();        
     const currentContentLength = currentContent.getPlainText('').length;
+    console.log("**currentContentLength:", currentContentLength)
     const selectedTextLength = _getLengthOfSelectedText();
+    console.log("**selectedTextLength:", selectedTextLength)
     let _textLength = maxcharacterlimit - (currentContentLength - selectedTextLength)
+    console.log("**_textLength:", _textLength)
     if(_textLength > 0)
       {setTextLength(maxcharacterlimit - (currentContentLength - selectedTextLength))}
   
@@ -142,12 +144,16 @@ const AddCommentField = ({ cancellor, parentId, add, fullnameList , restrictedRe
     const currentContent = editorState.getCurrentContent();
     const currentContentLength = currentContent.getPlainText('').length;
     const selectedTextLength = _getLengthOfSelectedText();
+    console.log("**1currentContentLength:", currentContentLength)
+    console.log("**1selectedTextLength:", selectedTextLength)
+    
     if ((e === 'backspace' || e === 'delete') && currentContentLength - 1 >= 0) {
       setTextLength((maxcharacterlimit) - (currentContentLength - 1))
     }
     if ((e === 'backspace' || e === 'delete') && selectedTextLength > 0) {
       setTextLength(maxcharacterlimit - (currentContentLength - selectedTextLength))
     }
+    console.log("**1_textLength:", textlength)
     setuftext(currentContent.getPlainText(''))
     //For enabling keyboard shortcuts 
     const newState = RichUtils.handleKeyCommand(editorState, e);
@@ -161,6 +167,8 @@ const AddCommentField = ({ cancellor, parentId, add, fullnameList , restrictedRe
     const currentContent = editorState.getCurrentContent();
     const currentContentLength = currentContent.getPlainText('').length;
     const selectedTextLength = _getLengthOfSelectedText();
+    console.log("**2currentContentLength:", currentContentLength)
+    console.log("**2selectedTextLength:", selectedTextLength)
     if (currentContentLength - selectedTextLength > maxcharacterlimit - 1) {
       return 'handled';
     }
@@ -168,12 +176,15 @@ const AddCommentField = ({ cancellor, parentId, add, fullnameList , restrictedRe
       setTextLength((maxcharacterlimit - 1) - (currentContentLength - selectedTextLength))
     }
     setuftext(currentContent.getPlainText(''))
+    console.log("**2textLength:", textlength)
   }
 
   const _handlePastedText = (pastedText) => {    
     const currentContent = editorState.getCurrentContent();
     const currentContentLength = currentContent.getPlainText('').length;
     const selectedTextLength = _getLengthOfSelectedText();
+    console.log("**3currentContentLength:", currentContentLength)
+    console.log("**3selectedTextLength:", selectedTextLength)
     if (currentContentLength + pastedText.length - selectedTextLength > maxcharacterlimit) {
       return 'handled';
     }
@@ -181,11 +192,14 @@ const AddCommentField = ({ cancellor, parentId, add, fullnameList , restrictedRe
       setTextLength((maxcharacterlimit) - (currentContentLength + pastedText.length - selectedTextLength))
     }
     setuftext(currentContent.getPlainText(''))
+    console.log("**3textLength:", textlength)
+
   }
 
 
   const post = () => {
     if (uftext !== '' && uftext.trim().length > 0) {
+      console.log("How many?")
       setshowaddbox(false)
       const _mentions = getMentionsOnComment()
       const _editorstateinJSON = JSON.stringify(convertToRaw(editorState.getCurrentContent()))
@@ -221,6 +235,7 @@ const AddCommentField = ({ cancellor, parentId, add, fullnameList , restrictedRe
   const actions = useContext(ActionContext)
 
   const cancelComment = () => {
+    console.log("From cancel comment??")
     setshowaddbox(false)
     setEditorState(createEditorStateWithText(''))
   }
@@ -293,7 +308,6 @@ const AddCommentField = ({ cancellor, parentId, add, fullnameList , restrictedRe
           <Toolbar>
             {
               (externalProps) => {
-                console.log('externalProps:', externalProps)
                 return(
                 <>
                 <div>

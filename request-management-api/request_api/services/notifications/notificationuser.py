@@ -65,11 +65,11 @@ class notificationuser:
             isministryinternalcommenttype= self.__isministryinternalcomment(notificationtype,requestjson)
             isiaointernalcommenttype= self.__isiaointernalcomment(notificationtype,requestjson)
             if requesttype == "ministryrequest":
-                if(self.__isministryinternalcomment(notificationtype,requestjson) or 'Comments' not in notificationtype):
+                if isiaointernalcommenttype == False:
                     watchers =  watcherservice().getallministryrequestwatchers(foirequest["foiministryrequestid"], isministryinternalcommenttype, 
                                 isiaointernalcommenttype, self.__isministryonly(notificationtype))
             else:
-                if(isministryinternalcommenttype == False):
+                if isministryinternalcommenttype == False:
                     watchers =  watcherservice().getrawrequestwatchers(foirequest['requestid'])
             print("*****watchers:",watchers)
             for watcher in watchers:
@@ -102,15 +102,13 @@ class notificationuser:
     def __isministryinternalcomment(self, notificationtype, requestjson):
         ministryinternaltype= commentservice().getcommenttypeidbyname("Ministry Internal")
         ministrypeerreviewtype= commentservice().getcommenttypeidbyname("Ministry Peer Review")
-        print("ministryinternaltype:",ministryinternaltype)
-        print("ministrypeerreviewtype:",ministrypeerreviewtype)
-        print("requestjson:",requestjson)
         if(notificationtype in ["New User Comments", "Reply User Comments", "Tagged User Comments", "General"] and 
             'commenttypeid' in requestjson and (requestjson['commenttypeid'] == ministryinternaltype or 
             requestjson['commenttypeid'] == ministrypeerreviewtype)):
                 return True
         else:
             return False
+    
 
     def __isministryassigneeneeded(self, requesttype, foirequest, notificationtype, requestjson=None):
         if(requesttype == "ministryrequest" and foirequest["assignedministryperson"] is not None and (notificationtype == 'Ministry Assignment' or 'Assignment' not in notificationtype)):

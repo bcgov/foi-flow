@@ -55,7 +55,6 @@ const InputField = ({ cancellor, parentId, child, inputvalue, edit, main, add, f
       id == getCommentTypeIdByName(commentTypes,"Ministry Peer Review")){
         tagList = getIAOTagList(bcgovcode);
     }
-    //console.log("tagList:", tagList)
     return [...tagList];
   }
 
@@ -63,10 +62,8 @@ const InputField = ({ cancellor, parentId, child, inputvalue, edit, main, add, f
   const [mentionList, setMentionList] = useState(isCommentTagListLoading ? [{name: 'Loading...'}] : isRestricted ? restrictedReqTaglist :fulluserlist)
   const [suggestions, setSuggestions] = useState(mentionList);
 
-  //console.log("Inputfield-fulluserlist:",fulluserlist)
 
   useEffect(() => {
-    console.log("Use effect : editCommentTypeId",editCommentTypeId)
     setMentionList(isCommentTagListLoading ? [{name: 'Loading...'}] : isRestricted ? restrictedReqTaglist :suggestionList(filterTagList(editCommentTypeId)).sort(namesort));
     setSuggestions(isCommentTagListLoading ? [{name: 'Loading...'}] : isRestricted ? restrictedReqTaglist :mentionList);
   }, [editCommentTypeId])
@@ -301,7 +298,12 @@ const InputField = ({ cancellor, parentId, child, inputvalue, edit, main, add, f
             ) : null}
           </div>
         </div>
-        {edit && !parentId &&
+        {/* Commenting ability to update
+          comment type while editing comment
+          -New US will handle all scenarios
+          related to commenttype update */}
+        
+        {/* {edit && !parentId &&
           <Grid item xs={12} lg={6}>
             <FormControl component="fieldset">
               <RadioGroup
@@ -331,7 +333,7 @@ const InputField = ({ cancellor, parentId, child, inputvalue, edit, main, add, f
               </RadioGroup>
             </FormControl>
           </Grid>
-        }
+        } */}
         <Editor
           editorState={editorState}
           onChange={_handleChange}

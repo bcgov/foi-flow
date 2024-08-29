@@ -100,7 +100,7 @@ class FOIRequestComment(db.Model):
                     createdby=userid,
                     updated_at=datetime2.now(),
                     updatedby=userid,
-                    commenttypeid=foirequestcomment["commenttypeid"],
+                    commenttypeid= _commenttypeid, #foirequestcomment["commenttypeid"],
                     commentsversion=_commentsversion + 1
                 )
             )
@@ -108,7 +108,7 @@ class FOIRequestComment(db.Model):
                         set_={"ministryrequestid": comment.ministryrequestid,"version":comment.version, "comment": foirequestcomment["comment"],
                               "taggedusers":_taggedusers, "parentcommentid":comment.parentcommentid, "isactive":True,  
                               "created_at":datetime2.now(), "createdby": userid, "updated_at": datetime2.now(), "updatedby": userid, 
-                              "commenttypeid": foirequestcomment["commenttypeid"] 
+                              "commenttypeid": _commenttypeid 
                         }
             )
             db.session.execute(updatestmt)
@@ -142,7 +142,7 @@ class FOIRequestComment(db.Model):
                         parentcommentid=comment.parentcommentid,
                         isactive=True,
                         created_at=datetime2.now(),
-                        createdby=userid,
+                        createdby=comment.userid,
                         updated_at=datetime2.now(),
                         updatedby=userid,
                         commenttypeid=foirequestcomment["commenttypeid"],
@@ -152,7 +152,7 @@ class FOIRequestComment(db.Model):
                 updatestmt = insertstmt.on_conflict_do_update(index_elements=[FOIRequestComment.commentid, FOIRequestComment.commentsversion], 
                             set_={"ministryrequestid": comment.ministryrequestid,"version":comment.version, "comment": comment.comment,
                                 "taggedusers":_taggedusers, "parentcommentid":comment.parentcommentid, "isactive":True,  
-                                "created_at":datetime2.now(), "createdby": userid, "updated_at": datetime2.now(), "updatedby": userid, 
+                                "created_at":datetime2.now(), "createdby": comment.userid, "updated_at": datetime2.now(), "updatedby": userid, 
                                 "commenttypeid": foirequestcomment["commenttypeid"] 
                             }
                 )
