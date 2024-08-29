@@ -1721,8 +1721,10 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
                 [classes.hidden]: !tabLinksStatuses.OpenInformation.display,
               })}
             >
-              <IAOOpenInfoPublishing data={{}} />
-          </div>
+              <IAOOpenInfoPublishing
+                requestNumber={requestNumber}
+              />
+            </div>
           )}
           {showContactApplicantTab() && (
             <div
