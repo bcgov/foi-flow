@@ -696,22 +696,25 @@ class FOIRawRequest(db.Model):
         #filter/search
         filtercondition = []
         for _keyword in _keywords:
+            onekeywordfiltercondition = []
             if(_keyword != 'restricted'):
                 for field in filterfields:
                     if(field == 'idNumber'):
                         _keyword = _keyword.replace('u-00', '')
                     
-                    filtercondition.append(FOIRawRequest.findfield(field).ilike('%'+_keyword+'%'))
+                    onekeywordfiltercondition.append(FOIRawRequest.findfield(field).ilike('%'+_keyword+'%'))
                     if(field == 'firstName'):
-                        filtercondition.append(FOIRawRequest.findfield('contactFirstName').ilike('%'+_keyword+'%'))
+                        onekeywordfiltercondition.append(FOIRawRequest.findfield('contactFirstName').ilike('%'+_keyword+'%'))
                     if(field == 'lastName'):
-                        filtercondition.append(FOIRawRequest.findfield('contactLastName').ilike('%'+_keyword+'%'))
+                        onekeywordfiltercondition.append(FOIRawRequest.findfield('contactLastName').ilike('%'+_keyword+'%'))
                     if(field == 'requestType'):
-                        filtercondition.append(FOIRawRequest.findfield('requestTypeRequestType').ilike('%'+_keyword+'%'))
+                        onekeywordfiltercondition.append(FOIRawRequest.findfield('requestTypeRequestType').ilike('%'+_keyword+'%'))
             else:
-                filtercondition.append(FOIRawRequest.isiaorestricted == True)
+                onekeywordfiltercondition.append(FOIRawRequest.isiaorestricted == True)
+            
+            filtercondition.append(or_(*onekeywordfiltercondition))
 
-        return or_(*filtercondition)
+        return and_(*filtercondition)
 
 
     @classmethod
