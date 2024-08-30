@@ -65,9 +65,8 @@ class notificationuser:
             isministryinternalcommenttype= self.__isministryinternalcomment(notificationtype,requestjson)
             isiaointernalcommenttype= self.__isiaointernalcomment(notificationtype,requestjson)
             if requesttype == "ministryrequest":
-                if isiaointernalcommenttype == False:
-                    watchers =  watcherservice().getallministryrequestwatchers(foirequest["foiministryrequestid"], isministryinternalcommenttype, 
-                                isiaointernalcommenttype, self.__isministryonly(notificationtype))
+                watchers =  watcherservice().getallministryrequestwatchers(foirequest["foiministryrequestid"], isministryinternalcommenttype, 
+                            isiaointernalcommenttype, self.__isministryonly(notificationtype))
             else:
                 if isministryinternalcommenttype == False:
                     watchers =  watcherservice().getrawrequestwatchers(foirequest['requestid'])
