@@ -263,9 +263,14 @@ const InputField = ({ cancellor, parentId, child, inputvalue, edit, main, add, f
       const _mentions = getMentionsOnComment()
       const _editorstateinJSON = JSON.stringify(convertToRaw(editorState.getCurrentContent()))
       setFOILoader(true)
+      let commentType = commentTypeId
+      /**This is to set reply comment type of
+       * system generated comments to General */
+      if([2,3].includes(commentTypeId))
+        commentType = 1;
       edit === true
-        ? actions.submit(cancellor, _editorstateinJSON, JSON.stringify(_mentions), parentId, true,editCommentTypeId)
-        : actions.submit(cancellor, _editorstateinJSON, JSON.stringify(_mentions), parentId, false,commentTypeId)
+        ? actions.submit(cancellor, _editorstateinJSON, JSON.stringify(_mentions), parentId, true,commentType)
+        : actions.submit(cancellor, _editorstateinJSON, JSON.stringify(_mentions), parentId, false,commentType)
 
       setEditorState(createEditorStateWithText(''))
       setEditorChange(false)
