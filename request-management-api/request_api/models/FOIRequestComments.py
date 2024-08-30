@@ -218,7 +218,7 @@ class FOIRequestComment(db.Model):
                         select commentid, commenttypeid, createdby, taggedusers from "FOIRequestComments" frc   where commentid = (select parentcommentid from "FOIRequestComments" frc   where commentid=:commentid) and isactive = true
                         union all 
                         select commentid, commenttypeid, createdby, taggedusers from "FOIRequestComments" frc   where commentid <> :commentid and parentcommentid = (select parentcommentid from "FOIRequestComments" frc   where commentid=:commentid) and isactive = true
-                    ) cmt where commenttypeid =1"""
+                    ) cmt where commenttypeid not in (2,3)"""
             rs = db.session.execute(text(sql), {'commentid': commentid})
             for row in rs:
                 users.append({"commentid": row["commentid"], "createdby": row["createdby"], "taggedusers": row["taggedusers"]})
