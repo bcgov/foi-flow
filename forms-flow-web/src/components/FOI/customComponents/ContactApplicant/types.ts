@@ -32,3 +32,8 @@ export type previewParams = {
   templateInfo: any;
   enableSend: boolean;
 }
+ export type downloadCorrespondenceParams = {
+  modalOpen: boolean;
+  setModalOpen: (open: boolean) => void;
+  handleSave: () => void;
+ }

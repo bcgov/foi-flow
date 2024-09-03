@@ -242,7 +242,7 @@ class applicantcorrespondenceservice:
             "text": self.__getvaluefromschema(_sentcorrespondencemessagejson, 'message') if _sentcorrespondencemessagejson is not None else self.__getvaluefromjson(_correspondencemessagejson, 'emailhtml') if _isjson else None,
             "id": self.__getvaluefromjson(_correspondencemessagejson, 'id') if _isjson else None,
             "type": self.__getvaluefromjson(_correspondencemessagejson, 'type') if _isjson else None,
-            "created_at":self.__pstformat(_correpondencelog['sent_at']) if issentmessage else self.__pstformat(_correpondencelog['created_at']),
+            "created_at":self.__pstformat(_correpondencelog['created_at']),
             "createdby":_correpondencelog['createdby'] if  _correpondencelog['createdby'] is not None else _correpondencelog['sentby'],
             "date": _date,
             "sentby": _correpondencelog["sentby"],

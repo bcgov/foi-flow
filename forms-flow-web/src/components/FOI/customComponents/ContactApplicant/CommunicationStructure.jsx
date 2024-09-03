@@ -27,9 +27,10 @@ import { downloadZip } from "client-zip";
 import { useDispatch } from "react-redux";
 import * as html2pdf from 'html-to-pdf-js';
 import CommunicationUploadModal from '../Comments/CommunicationUploadModal';
-import { Chip } from '@material-ui/core'
+import { ClickableChip } from '../../Dashboard/utils';
 import { toast } from 'react-toastify';
 import { getTemplateVariables } from './util';
+import { DownloadCorrespondenceModal } from './DownloadCorrespondenceModal';
 
 
 const CommunicationStructure = ({correspondence, currentIndex,
@@ -40,6 +41,7 @@ const CommunicationStructure = ({correspondence, currentIndex,
   const dispatch = useDispatch();
   const [popoverOpen, setPopoverOpen] = useState(false);
   const [communicationUploadModalOpen, setCommunicationUploadModalOpen] = useState(false);
+  const [downloadCorrespondenceModalOpen, setDownloadCorrespondenceModalOpen] = useState(false);
   const [anchorPosition, setAnchorPosition] = useState(null);
   const [deletePopoverOpen, setDeletePopoverOpen] = useState(false);
   const ref = useRef();
@@ -88,7 +90,7 @@ const CommunicationStructure = ({correspondence, currentIndex,
       <MenuItem
         onClick={(e) => {
           e.stopPropagation();
-          download();
+          setDownloadCorrespondenceModalOpen(true);
           setPopoverOpen(false);
         }}
       >
@@ -168,13 +170,14 @@ const CommunicationStructure = ({correspondence, currentIndex,
             </MenuList>
           )}
         </Popover>
-        <DeleteAction />
+        {/* <DeleteAction /> */}
         <CommunicationUploadModal 
           openModal={communicationUploadModalOpen} 
           setOpenModal={setCommunicationUploadModalOpen}
           message={{ body: "", title: "Add Response" }}
           ministryId={ministryId}
         />
+        <DownloadCorrespondenceModal modalOpen={downloadCorrespondenceModalOpen} setModalOpen={setDownloadCorrespondenceModalOpen} handleSave={download} />
       </div>
     );
   };
@@ -185,6 +188,7 @@ const CommunicationStructure = ({correspondence, currentIndex,
   }
 
   const download = async () => {
+    setDownloadCorrespondenceModalOpen(false);
     const elementToClickForExpand = document.querySelector(`#communication-accordion-${currentIndex}`);
     let isAriaExpanded = elementToClickForExpand.ariaExpanded
     if (isAriaExpanded == 'false') elementToClickForExpand.click();
@@ -291,8 +295,8 @@ const CommunicationStructure = ({correspondence, currentIndex,
       </Dialog>
     )
   };
-
-
+const emailText = correspondence?.emails.length == 1 ? correspondence.emails[0] : correspondence.emails.length > 1 ? correspondence.emails[0] + ' +' + (correspondence.emails.length - 1) : ''
+const dateText = correspondence.date == correspondence.created_at ? correspondence.date.toUpperCase() : correspondence.date.split('|')[0].trim()
   return (
     <>
       <div className="communication-accordion" {...(correspondence ? {"data-communication-div-id":`${currentIndex}`} : {})}>
@@ -308,7 +312,8 @@ const CommunicationStructure = ({correspondence, currentIndex,
                     {correspondence && (
                       <>
                       <div className="templateUser">{correspondence.category === "response" ? "Applicant Response": getTemplateName(correspondence.templateid)} - {fullName} </div> |  
-                        <div className="templateTime">{correspondence.date} </div>  
+                        {correspondence?.emails.length > 0 ? <div className="templateUser"> {emailText} |</div> : ''} 
+                        <div className="templateTime">{dateText.toUpperCase()} </div>  
                         <div className="templateTime">{correspondence.edited ? "Edited": ""} </div>
                       </>
                     )
@@ -319,7 +324,7 @@ const CommunicationStructure = ({correspondence, currentIndex,
                     </>
                     )
                     }
-                    {correspondence.category !== "draft" && <Chip label={correspondence.sentby ? 'emailed' : 'exported'} variant="outlined" />}
+                    <div className="templateUser">{correspondence.category !== "draft" && <ClickableChip clicked={true} color={'primary'} label={correspondence.sentby ? 'emailed' : 'printed'} size="small" />}</div>
                     </div>
                 </div>
               </div>

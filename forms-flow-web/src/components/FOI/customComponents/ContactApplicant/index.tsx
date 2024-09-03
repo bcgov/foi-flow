@@ -41,6 +41,7 @@ import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import CloseIcon from '@material-ui/icons/Close';
 import {  saveNewFilename } from "../../../../apiManager/services/FOI/foiAttachmentServices";
+import { is } from 'immutable';
 
 
 
@@ -465,7 +466,10 @@ export const ContactApplicant = ({
     }
     const templateId = currentTemplate ? templates[currentTemplate as keyof typeof templates].templateid : null;
     const type = (templateId && [1, 2].includes(templateId)) ? "CFRFee" : "";
-    let israwrequest = selectedCorrespondence.israwrequest || false;
+    let israwrequest = selectedCorrespondence?.israwrequest ||
+      requestDetails.requeststatuslabel == StateEnum.appfeeowing.label ||
+      requestDetails.requeststatuslabel == StateEnum.intakeinprogress.label ||
+      requestDetails.requeststatuslabel == StateEnum.unopened.label
     let data = {
       templateid: currentTemplate ? templates[currentTemplate as keyof typeof templates].templateid : null,
       correspondencemessagejson: JSON.stringify({
