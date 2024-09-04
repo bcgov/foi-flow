@@ -371,7 +371,6 @@ export const checkValidationError = (
  */
 //Below function will handle beforeunload event
 export const alertUser = (e) => {
-  console.log("alertUser:",e)
   e.preventDefault();
   e.returnValue = "";
 };
@@ -399,8 +398,6 @@ export const shouldDisableFieldForMinistryRequests = (requestStatus) => {
 };
 
 export const handleBeforeUnload = (e) => {
-  console.log("handleBeforeUnload:",e)
-
   alertUser(e);
 };
 
