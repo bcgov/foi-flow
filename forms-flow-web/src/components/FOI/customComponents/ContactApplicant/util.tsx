@@ -437,7 +437,6 @@ const fetchConsultPageFlag = (ministryId : number) : Promise<any> => {
   return new Promise((resolve, reject) => {
     fetchDocumentPageFlags(ministryId, (err : any, res : any) => {
       if (!err) {
-        console.log(res.data);
         resolve(res.data || null);
       } else {
         reject(err);
@@ -476,13 +475,12 @@ const displayOIPCExtensionSection = async (extensionId: number, requestDetails: 
     case "10(1)(c)":
 
     const consultPageFlag = await fetchConsultPageFlag(requestDetails.id);
-    console.log("consultPageFlag : ",consultPageFlag)
 
     const htmlConsultContent = consultPageFlag && Array.isArray(consultPageFlag)
       ? consultPageFlag.map((item: any) => `
-        <p><strong><span style="font-size: 13px;">Consultee: &nbsp;</span></strong><span style="font-size: 13px;">${item.consultation_name}</span></p>
-        <p><strong><span style="font-size: 13px;">Consultation page count: &nbsp;</span></strong><span style="font-size: 13px;">${item.consultation_page_count}</span></p>
-        <p><strong><span style="font-size: 13px;">Consultation Date: &nbsp;</span></strong><span style="font-size: 13px;">${convertDate(item.consultation_date)}</span></p><p><span>&nbsp;</span></p>
+        <p><strong><span style="font-size: 13px;">Consultee: &nbsp;</span></strong><span style="font-size: 13px;">${item.consultation_name || ''}</span></p>
+        <p><strong><span style="font-size: 13px;">Consultation page count: &nbsp;</span></strong><span style="font-size: 13px;">${item.consultation_page_count  || ''}</span></p>
+        <p><strong><span style="font-size: 13px;">Consultation Date: &nbsp;</span></strong><span style="font-size: 13px;">${convertDate(item.consultation_date)  || ''}</span></p><p><span>&nbsp;</span></p>
       `).join('')
       : "";
 

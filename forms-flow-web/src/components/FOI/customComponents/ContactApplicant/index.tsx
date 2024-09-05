@@ -191,7 +191,7 @@ export const ContactApplicant = ({
     const isSubsequentTimeExtension = getExtensionType(requestDetails, requestExtensions) === "OIPCSUBSEQUENTTIMEEXTENSION"
       return isSubsequentTimeExtension;
    } else if(['GENERICCOVEREMAILTEMPLATE'].includes(item.name)){
-      return true;
+      return requestDetails.currentState !== "Intake in Progress";
    } else if(['ACKNOWLEDGEMENTLETTER'].includes(item.name)){
     if (requestDetails.currentState === "Intake in Progress" || requestDetails.currentState === "Open") {
       return true;
