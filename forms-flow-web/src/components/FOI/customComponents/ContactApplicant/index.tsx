@@ -206,9 +206,16 @@ export const ContactApplicant = ({
   }
 
   useEffect(() => { 
+    // Add templates being used in drafts to the list
+    const listOfDraftTemplates: number[] = [];
+    applicantCorrespondence.forEach((draftCorrespondence: any) => {
+      if (draftCorrespondence.templateid && !listOfDraftTemplates.includes(draftCorrespondence.templateid)) {
+        listOfDraftTemplates.push(draftCorrespondence.templateid);
+      }
+    })
     applicantCorrespondenceTemplates.forEach((item: any) => {
       setTemplates([{ value: "", label: "", templateid: null, text: "", disabled: true, created_at:"" }]);
-      if (isEnabledTemplate(item)) {
+      if (isEnabledTemplate(item) || listOfDraftTemplates.includes(item.templateid)) {
       const rootpath = OSS_S3_BUCKET_FULL_PATH
       const fileInfoList = [{
         filename: item.name,
@@ -244,7 +251,7 @@ export const ContactApplicant = ({
       });
     }
     });
-  }, [applicantCorrespondenceTemplates, requestExtensions, dispatch]);
+  }, [applicantCorrespondence, applicantCorrespondenceTemplates, requestExtensions, dispatch]);
 
 
   const [correspondences, setCorrespondences] = useState(applicantCorrespondence);
@@ -790,8 +797,19 @@ export const ContactApplicant = ({
         () => {
           setSelectedCorrespondence({})
           dispatch(fetchApplicantCorrespondence(requestId, ministryId));
+          toast.success("Attachment has been renamed successfully", {
+            position: "top-right",
+            autoClose: 3000,
+            hideProgressBar: true,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+          })
         },
-        (errorMessage: string) => {console.log('Error saving new filename: ', errorMessage)}
+        (errorMessage: string) => {
+          errorToast(errorMessage);
+          console.log('Error saving new filename: ', errorMessage)}
       );
     }
   }
@@ -805,9 +823,21 @@ export const ContactApplicant = ({
       dispatch, 
       () => {
         setSelectedCorrespondence({})
+        setModalFor("add");
         dispatch(fetchApplicantCorrespondence(requestId, ministryId));
+        toast.success("Date has been changed successfully", {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: true,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+        })
       }, 
-      (errorMessage: string) => {console.log('Error updating response date: ', errorMessage)}
+      (errorMessage: string) => {
+        errorToast(errorMessage);
+        console.log('Error updating response date: ', errorMessage)}
     )
   }
   const [showEditor, setShowEditor] = useState(false)
