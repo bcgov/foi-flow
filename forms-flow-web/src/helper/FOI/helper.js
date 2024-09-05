@@ -490,17 +490,17 @@ const readUploadedFileAsBytes = (inputFile) => {
 };
 
 const getCommentTypeIdByName = (commentTypes, name) => {
-  const commentType = commentTypes.find(type => type.name === name);
+  const commentType = commentTypes?.find(type => type.name === name);
   return commentType ? commentType.commenttypeid : 0;
 };
 
 const getCommentLabelFromId = (commentTypes, id) => {
-  const commentType = commentTypes.find(type => type.commenttypeid === id);
+  const commentType = commentTypes?.find(type => type.commenttypeid === id);
   return commentType ? commentType.label?.toUpperCase() : "";
 };
 
 const getCommentTypeFromId = (commentTypes, id) => {
-  const commentType = commentTypes.find(type => type.commenttypeid === id);
+  const commentType = commentTypes?.find(type => type.commenttypeid === id);
   if(commentType != null && commentType != undefined){
     if(commentType.name == "User submitted")
       return "general";
