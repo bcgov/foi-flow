@@ -437,7 +437,6 @@ const fetchConsultPageFlag = (ministryId : number) : Promise<any> => {
   return new Promise((resolve, reject) => {
     fetchDocumentPageFlags(ministryId, (err : any, res : any) => {
       if (!err) {
-        console.log(res.data);
         resolve(res.data || null);
       } else {
         reject(err);
@@ -476,7 +475,6 @@ const displayOIPCExtensionSection = async (extensionId: number, requestDetails: 
     case "10(1)(c)":
 
     const consultPageFlag = await fetchConsultPageFlag(requestDetails.id);
-    console.log("consultPageFlag : ",consultPageFlag)
 
     const htmlConsultContent = consultPageFlag && Array.isArray(consultPageFlag)
       ? consultPageFlag.map((item: any) => `
