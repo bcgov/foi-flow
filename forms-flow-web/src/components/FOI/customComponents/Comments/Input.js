@@ -9,11 +9,6 @@ const Input = ({ add, bcgovcode, iaoassignedToList, ministryAssignedToList, setE
   
   const [fullnameList, setFullnameList] = useState(getFullnameList());
 
-
-  // useEffect(() => {
-  //   console.log("setTeamTagList useeffect")
-  //   setTeamTagList()
-  // }, [])
     
     if (!fullnameList) {
         if (iaoassignedToList.length > 0) {
