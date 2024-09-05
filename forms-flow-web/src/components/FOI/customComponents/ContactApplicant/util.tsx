@@ -478,9 +478,9 @@ const displayOIPCExtensionSection = async (extensionId: number, requestDetails: 
 
     const htmlConsultContent = consultPageFlag && Array.isArray(consultPageFlag)
       ? consultPageFlag.map((item: any) => `
-        <p><strong><span style="font-size: 13px;">Consultee: &nbsp;</span></strong><span style="font-size: 13px;">${item.consultation_name || ''}</span></p>
-        <p><strong><span style="font-size: 13px;">Consultation page count: &nbsp;</span></strong><span style="font-size: 13px;">${item.consultation_page_count  || ''}</span></p>
-        <p><strong><span style="font-size: 13px;">Consultation Date: &nbsp;</span></strong><span style="font-size: 13px;">${convertDate(item.consultation_date)  || ''}</span></p><p><span>&nbsp;</span></p>
+        <p><strong><span style="font-size: 13px;">Consultee: &nbsp;</span></strong><span style="font-size: 13px;">${item.consultation_name}</span></p>
+        <p><strong><span style="font-size: 13px;">Consultation page count: &nbsp;</span></strong><span style="font-size: 13px;">${item.consultation_page_count}</span></p>
+        <p><strong><span style="font-size: 13px;">Consultation Date: &nbsp;</span></strong><span style="font-size: 13px;">${convertDate(item.consultation_date)}</span></p><p><span>&nbsp;</span></p>
       `).join('')
       : "";
 
