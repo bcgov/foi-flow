@@ -36,7 +36,8 @@ class FOIRequestComment(db.Model):
         parentcommentid = foirequestcomment["parentcommentid"] if 'parentcommentid' in foirequestcomment  else None
         taggedusers = foirequestcomment["taggedusers"] if 'taggedusers' in foirequestcomment  else None
         _createddate = datetime2.now().isoformat() if commentcreatedate is None else commentcreatedate        
-        newcomment = FOIRequestComment(commenttypeid=commenttypeid, ministryrequestid=foirequestcomment["ministryrequestid"], version=version, comment=foirequestcomment["comment"], parentcommentid=parentcommentid, isactive=True, created_at=_createddate, createdby=userid,taggedusers=taggedusers, commentsversion=commentsversion)
+        newcomment = FOIRequestComment(commenttypeid=commenttypeid, ministryrequestid=foirequestcomment["ministryrequestid"], 
+                                       version=version, comment=foirequestcomment["comment"], parentcommentid=parentcommentid, isactive=True, created_at=_createddate, createdby=userid,taggedusers=taggedusers, commentsversion=commentsversion)
         db.session.add(newcomment)
         db.session.commit()      
         return DefaultMethodResult(True,'Comment added',newcomment.commentid)    
@@ -74,11 +75,14 @@ class FOIRequestComment(db.Model):
         
     @classmethod
     def updatecomment(cls, commentid, foirequestcomment, userid):   
+        #print("updatecomment:",foirequestcomment)
         dbquery = db.session.query(FOIRequestComment)
         comment = dbquery.filter_by(commentid=commentid).order_by(FOIRequestComment.commentsversion.desc()).first()        
         _existingtaggedusers = []
         _commentsversion = 0
-        if comment is not None :            
+        _commenttypeid = None
+        if comment is not None :
+            _commenttypeid = comment.commenttypeid            
             _existingtaggedusers = comment.taggedusers
             _taggedusers = foirequestcomment["taggedusers"] if 'taggedusers' in foirequestcomment  else _existingtaggedusers
             _commentsversion = int(comment.commentsversion)
@@ -96,7 +100,7 @@ class FOIRequestComment(db.Model):
                     createdby=userid,
                     updated_at=datetime2.now(),
                     updatedby=userid,
-                    commenttypeid=comment.commenttypeid,
+                    commenttypeid= _commenttypeid, #foirequestcomment["commenttypeid"],
                     commentsversion=_commentsversion + 1
                 )
             )
@@ -104,14 +108,74 @@ class FOIRequestComment(db.Model):
                         set_={"ministryrequestid": comment.ministryrequestid,"version":comment.version, "comment": foirequestcomment["comment"],
                               "taggedusers":_taggedusers, "parentcommentid":comment.parentcommentid, "isactive":True,  
                               "created_at":datetime2.now(), "createdby": userid, "updated_at": datetime2.now(), "updatedby": userid, 
-                              "commenttypeid": comment.commenttypeid 
+                              "commenttypeid": _commenttypeid 
                         }
             )
             db.session.execute(updatestmt)
             db.session.commit()
-            return DefaultMethodResult(True,'Updated Comment added',commentid, _existingtaggedusers, _commentsversion)
+            return DefaultMethodResult(True,'Updated Comment added',commentid, _existingtaggedusers, _commentsversion, _commenttypeid)
         else:
-            return DefaultMethodResult(True,'No Comment found',commentid, _existingtaggedusers, _commentsversion)
+            return DefaultMethodResult(True,'No Comment found',commentid, _existingtaggedusers, _commentsversion,_commenttypeid)
+        
+    @classmethod
+    def updatechildcomments(cls, parentcommentid, foirequestcomment, userid):   
+        #print("updatecomment:",foirequestcomment)
+        dbquery = db.session.query(FOIRequestComment)
+        childcomments = dbquery.filter_by(parentcommentid=parentcommentid, isactive = True)     
+        _existingtaggedusers = []
+        _commentsversion = 0
+        _commentids = []
+        if childcomments is not None and childcomments.count() > 0 :
+            for comment in childcomments:
+                _commentids.append(comment.commentid)
+                _existingtaggedusers = comment.taggedusers
+                _taggedusers = _existingtaggedusers
+                _commentsversion = int(comment.commentsversion)
+                insertstmt = (
+                    insert(FOIRequestComment).
+                    values(
+                        commentid=comment.commentid,
+                        ministryrequestid=comment.ministryrequestid,
+                        version=comment.version,
+                        comment=comment.comment,
+                        taggedusers=_taggedusers,
+                        parentcommentid=comment.parentcommentid,
+                        isactive=True,
+                        created_at=datetime2.now(),
+                        createdby=comment.userid,
+                        updated_at=datetime2.now(),
+                        updatedby=userid,
+                        commenttypeid=foirequestcomment["commenttypeid"],
+                        commentsversion=_commentsversion + 1
+                    )
+                )
+                updatestmt = insertstmt.on_conflict_do_update(index_elements=[FOIRequestComment.commentid, FOIRequestComment.commentsversion], 
+                            set_={"ministryrequestid": comment.ministryrequestid,"version":comment.version, "comment": comment.comment,
+                                "taggedusers":_taggedusers, "parentcommentid":comment.parentcommentid, "isactive":True,  
+                                "created_at":datetime2.now(), "createdby": comment.userid, "updated_at": datetime2.now(), "updatedby": userid, 
+                                "commenttypeid": foirequestcomment["commenttypeid"] 
+                            }
+                )
+                db.session.execute(updatestmt)
+            db.session.commit()
+            return DefaultMethodResult(True,'Updated Comment added',parentcommentid, _existingtaggedusers, _commentsversion, childcomments)
+        else:
+            return DefaultMethodResult(True,'No Comment found',parentcommentid, _existingtaggedusers, _commentsversion, None)
+        
+    @classmethod
+    def deactivatechildcomments(cls, parentcommentid, userid, childcomments):   
+        dbquery = db.session.query(FOIRequestComment)
+        found = False
+        for child in childcomments:
+            comment = dbquery.filter_by(commentid=child.commentid, commentsversion=child.commentsversion, parentcommentid=parentcommentid)
+            if(comment.count() > 0) :
+                comment.update({FOIRequestComment.isactive:False, FOIRequestComment.updatedby:userid, FOIRequestComment.updated_at:datetime2.now()}, synchronize_session = False)
+                found = True
+        if found:
+            db.session.commit()
+            return DefaultMethodResult(True, 'Reply Comments deactivated for parent', parentcommentid)
+        else:
+            return DefaultMethodResult(False, 'No Reply Comments found for parent', parentcommentid)
             
     @classmethod
     def getcomments(cls, ministryrequestid)->DefaultMethodResult:   
@@ -154,7 +218,7 @@ class FOIRequestComment(db.Model):
                         select commentid, commenttypeid, createdby, taggedusers from "FOIRequestComments" frc   where commentid = (select parentcommentid from "FOIRequestComments" frc   where commentid=:commentid) and isactive = true
                         union all 
                         select commentid, commenttypeid, createdby, taggedusers from "FOIRequestComments" frc   where commentid <> :commentid and parentcommentid = (select parentcommentid from "FOIRequestComments" frc   where commentid=:commentid) and isactive = true
-                    ) cmt where commenttypeid =1"""
+                    ) cmt where commenttypeid not in (2,3)"""
             rs = db.session.execute(text(sql), {'commentid': commentid})
             for row in rs:
                 users.append({"commentid": row["commentid"], "createdby": row["createdby"], "taggedusers": row["taggedusers"]})

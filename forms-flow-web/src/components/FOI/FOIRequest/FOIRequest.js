@@ -30,7 +30,8 @@ import {
   fetchOIPCOutcomes,
   fetchOIPCStatuses,
   fetchOIPCReviewtypes,
-  fetchOIPCInquiryoutcomes
+  fetchOIPCInquiryoutcomes,
+  fetchFOICommentTypes
 } from "../../../apiManager/services/FOI/foiMasterDataServices";
 import {
   fetchFOIRequestDetailsWrapper,
@@ -90,6 +91,7 @@ import {
   ConditionalComponent,
   formatDate,
   isRequestRestricted,
+  getCommentTypeIdByName
 } from "../../../helper/FOI/helper";
 import DivisionalTracking from "./DivisionalTracking";
 import RedactionSummary from "./RedactionSummary";
@@ -184,6 +186,9 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
 
   const [unsavedPrompt, setUnsavedPrompt] = useState(false);
   const [unsavedMessage, setUnsavedMessage] = useState(<></>);
+  const commentTypes = useSelector((state) => state.foiRequests.foiCommentTypes); 
+
+
   const handleUnsavedContinue = () => {
     window.removeEventListener("popstate", handleOnHashChange);
     window.removeEventListener("beforeunload", handleBeforeUnload);
@@ -299,6 +304,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
     } else if (window.location.href.indexOf("records") > -1) {
       tabclick("Records");
     }
+    dispatch(fetchFOICommentTypes());
   }, []);
 
   useEffect(async () => {
@@ -1067,6 +1073,14 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
       requestDetails?.requestType === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_GENERAL)
   }
 
+  const getCommentsCount = () => {
+    
+      let commentsCount= (requestNotes.filter( c => c.commentTypeId !== getCommentTypeIdByName(commentTypes,"Ministry Internal") && 
+            c.commentTypeId !== getCommentTypeIdByName(commentTypes, "Ministry Peer Review"))).length;
+      return '('+commentsCount+')'
+
+  }
+
   return (!isLoading &&
     requestDetails &&
     Object.keys(requestDetails).length !== 0) ||
@@ -1140,7 +1154,8 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
                   onClick={() => tabclick("Comments")}
                 >
                   Comments{" "}
-                  {requestNotes?.length > 0 ? `(${requestNotes.length})` : ""}
+                  {/* {requestNotes?.length > 0 ? `(${requestNotes.length})` : ""} */}
+                  {getCommentsCount()}
                 </div>
                 {showRecordsTab() && (
                   <div
@@ -1584,6 +1599,8 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
                     isRequestRestricted(requestDetails, ministryId) ? "iao" : ""
                   }
                   isRestricted={isRequestRestricted(requestDetails, ministryId)}
+                  isMinistry={false}
+                  commentTypes={commentTypes}
                 />
               </>
             ) : (
