@@ -267,8 +267,6 @@ const getSessionData = (key) => {
 };
 
 const addToFullnameList = (userArray, foiteam) => {
-  // console.log("userArray:",userArray)
-  // console.log("foiteam:",foiteam)
 
   if (!foiteam) return;
 
@@ -320,9 +318,6 @@ const getFullnameList = () => {
 };
 
 const getAssignToList = (team) => {
-  // console.log("team-session data:",(`${team.toLowerCase()}AssignToList`).replaceAll('"',''))
-  // console.log("getAssignToList() =>", getSessionData((`${team.toLowerCase()}AssignToList`).replaceAll('"','')))
-
   return getSessionData((`${team.toLowerCase()}AssignToList`).replaceAll('"','')) || [];
 };
 
@@ -335,7 +330,6 @@ const getMinistryRestrictedTagList = () => {
 };
 
 const getIAOAssignToList = () => {
-  //console.log("getIAOAssignToList() =>",getSessionData("iaoAssignToList"))
   return getSessionData("iaoAssignToList");
 };
 
@@ -538,7 +532,6 @@ const setTeamTagList = (bcgovcode) => {
 
   if(bcgovcode !== null && bcgovcode !== undefined && bcgovcode !== 'iao'){
     let ministryList= getAssignToList(bcgovcode)
-    //console.log("**ministryList:", ministryList)
     if(ministryList && ministryList?.length >0){
       ministryList.forEach((team) => {
         team?.members.forEach((ministryUser) => {
@@ -557,8 +550,6 @@ const setTeamTagList = (bcgovcode) => {
       });
     }
     let _team = bcgovcode.toLowerCase().replace(/['"]+/g, '');
-    //console.log("******_team*******",_team)
-    console.log("*************",fullnameArray)
     saveSessionData(`${_team}TagList`, fullnameArray);
   }
 
@@ -567,8 +558,6 @@ const setTeamTagList = (bcgovcode) => {
 
 const getIAOTagList = (bcgovcode) => {
   let _team = bcgovcode.toLowerCase()?.replace(/['"]+/g, '');
-  console.log("_team",_team)
-  console.log("=>",getSessionData(`${_team}TagList`))
   return getSessionData(`${_team}TagList`) || [];
 };
 

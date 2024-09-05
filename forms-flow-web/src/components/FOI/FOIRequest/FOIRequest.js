@@ -1030,7 +1030,6 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
     (state) => state.foiRequests.showEventQueue
   );
 
-  //console.log("IAO:::", iaoassignedToList)
   const showRecordsTab = () => {
     return (
       requestState !== StateEnum.intakeinprogress.name &&
