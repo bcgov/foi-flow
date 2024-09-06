@@ -34,7 +34,7 @@ import { DownloadCorrespondenceModal } from './DownloadCorrespondenceModal';
 
 
 const CommunicationStructure = ({correspondence, currentIndex,
-  fullName, ministryId=null, editDraft, deleteDraft, deleteResponse, setModalFor,setModal,setUpdateAttachment, 
+  fullName, ministryId=null, editDraft, deleteDraft, deleteResponse, modalFor, setModalFor,setModal,setUpdateAttachment, 
   setSelectedCorrespondence, setCurrentResponseDate, applicantCorrespondenceTemplates, templateVariableInfo}) => {
 
 
@@ -84,12 +84,17 @@ const CommunicationStructure = ({correspondence, currentIndex,
     return markup
   }
 
+  useEffect(() => {
+    if (downloadCorrespondenceModalOpen == false) setModalFor("add")
+  }, [downloadCorrespondenceModalOpen])
+
   const ActionsPopover = () => {
 
     const renderDownloadMenuItem = () => (
       <MenuItem
         onClick={(e) => {
           e.stopPropagation();
+          setModalFor("downloadcorrespondence")
           setDownloadCorrespondenceModalOpen(true);
           setPopoverOpen(false);
         }}
@@ -104,11 +109,17 @@ const CommunicationStructure = ({correspondence, currentIndex,
           editDraft(correspondence)
           setPopoverOpen(false);
         }}>Edit</MenuItem>
+        <MenuItem
+          onClick={(e) => {
+            e.stopPropagation();
+            setModalFor("downloaddraft")
+            setDownloadCorrespondenceModalOpen(true);
+            setPopoverOpen(false);
+        }}>Download</MenuItem>
         <MenuItem onClick={() => {
           deleteDraft(correspondence)
           setPopoverOpen(false);
-          }}>Delete</MenuItem>
-        {renderDownloadMenuItem()}
+        }}>Delete</MenuItem>
       </>
     );
   
@@ -177,7 +188,7 @@ const CommunicationStructure = ({correspondence, currentIndex,
           message={{ body: "", title: "Add Response" }}
           ministryId={ministryId}
         />
-        <DownloadCorrespondenceModal modalOpen={downloadCorrespondenceModalOpen} setModalOpen={setDownloadCorrespondenceModalOpen} handleSave={download} />
+        <DownloadCorrespondenceModal modalOpen={downloadCorrespondenceModalOpen} setModalOpen={setDownloadCorrespondenceModalOpen} handleSave={download} modalFor={modalFor} />
       </div>
     );
   };
@@ -324,7 +335,7 @@ const dateText = correspondence.date == correspondence.created_at ? corresponden
                     </>
                     )
                     }
-                    <div className="templateUser">{correspondence.category !== "draft" && <ClickableChip clicked={true} color={'primary'} label={correspondence.sentby ? 'emailed' : 'printed'} size="small" />}</div>
+                    {correspondence. category != 'response' && <div className="templateUser">{correspondence.category !== "draft" && <ClickableChip clicked={true} color={'primary'} label={correspondence.sentby ? 'emailed' : 'printed'} size="small" />}</div>}
                     </div>
                 </div>
               </div>

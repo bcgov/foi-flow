@@ -10,6 +10,8 @@ import './CorrespondenceEmail.scss'
 import { saveCorrespondenceEmail, fetchCorrespondenceEmailList } from "../../../apiManager/services/FOI/foiCorrespondenceEmailServices";
 import _ from 'lodash';
 import TextField from "@material-ui/core/TextField";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faPlusCircle } from '@fortawesome/free-solid-svg-icons';
 
 
 
@@ -52,6 +54,7 @@ export default function CorrespondenceEmail({
     const [newCorrespondenceEmail, setNewCorrespondenceEmail] = React.useState();
     const [requestemailList, setRequestemailList] = React.useState([]);    
     const [noOfSelectedEmails, setNoOfSelectedEmails] = React.useState(0);
+    const [showAddEmail, setShowAddEmail] = React.useState(false);
 
     React.useEffect(() => {  
       dispatch(
@@ -131,17 +134,37 @@ export default function CorrespondenceEmail({
                i++;
             }
     }
-    menuItems.push(<div style={{padding:'0.5em'}}>
-    <TextField id="new-email" label="Add New Email Address" variant="outlined" fullWidth
-    value={newCorrespondenceEmail} onChange={handleNewCorrespondenceEmailChange}
-    onKeyDown={(e) => {e.stopPropagation();}} onKeyUp={(e) => {e.stopPropagation();}}
-    />
-    <div>
-    <button className="btn-bottom btn-save" onClick={handleEmailSave} disabled={!newCorrespondenceEmail || isEmailPresent(newCorrespondenceEmail)}>
-            Save
-    </button>
-    </div>
-   </div>);
+    if (showAddEmail) {
+      menuItems.push(<div style={{padding:'0.5em'}}>
+        <TextField id="new-email" label="Add New Email Address" variant="outlined" fullWidth
+        value={newCorrespondenceEmail} onChange={handleNewCorrespondenceEmailChange}
+        onKeyDown={(e) => {e.stopPropagation();}} onKeyUp={(e) => {e.stopPropagation();}}
+        />
+        <div>
+        <button className="btn-bottom btn-save" onClick={handleEmailSave} disabled={!newCorrespondenceEmail || isEmailPresent(newCorrespondenceEmail)}>
+                Save
+        </button>
+        <button className="btn-cancel" onClick={() => setShowAddEmail(false)} >
+                Cancel
+        </button>
+        </div>
+       </div>);
+    } else {
+      menuItems.push(
+        <MenuItem className={`${classes.item} foi-watcher-menuitem`}  
+          key={`add-email`}
+          value={`add-email`}
+          onClick={() => setShowAddEmail(true)}>
+          <span style={{padding: '0.3em'}}
+          ><FontAwesomeIcon
+            icon={faPlusCircle}
+            size="2x"
+            color='#385989'
+          /></span>
+          <span style={{color: "#385989", fontWeight: 'bolder', paddingLeft: '.2em'}}>Add Email Address</span>
+        </MenuItem>
+      )
+    }
       return menuItems;
    }
 

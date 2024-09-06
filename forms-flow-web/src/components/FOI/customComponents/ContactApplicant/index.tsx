@@ -870,6 +870,7 @@ export const ContactApplicant = ({
         editDraft={editDraft}
         deleteDraft={deleteDraft}
         deleteResponse={deleteResponse}
+        modalFor={modalFor}
         setModalFor={setModalFor}
         setModal={setModal}
         setSelectedCorrespondence={setSelectedCorrespondence}

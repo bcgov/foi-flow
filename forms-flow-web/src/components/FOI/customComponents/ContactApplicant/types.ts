@@ -36,4 +36,5 @@ export type previewParams = {
   modalOpen: boolean;
   setModalOpen: (open: boolean) => void;
   handleSave: () => void;
+  modalFor: string;
  }
