@@ -12,7 +12,8 @@ import type { downloadCorrespondenceParams } from './types';
 export const DownloadCorrespondenceModal = React.memo(({
   modalOpen,
   setModalOpen,
-  handleSave
+  handleSave,
+  modalFor
 }: downloadCorrespondenceParams) => {
 
   const handleClose = () => {
@@ -37,7 +38,7 @@ export const DownloadCorrespondenceModal = React.memo(({
         </DialogTitle>
       <DialogContent>
         <DialogContentText id="state-change-dialog-description" component={'span'}>
-          Are you sure you want to save this draft to your computer? Applicant information will not be included.
+          Are you sure you want to save this {modalFor == "downloaddraft" ? "draft" : "correspondence"} to your computer? {modalFor == "downloaddraft" ? "Applicant information will not be included." : ""}
         </DialogContentText>
       </DialogContent>
       <DialogActions>
