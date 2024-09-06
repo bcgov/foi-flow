@@ -19,15 +19,15 @@ depends_on = None
 def upgrade():
     op.execute('''INSERT INTO public."ProgramAreas"(name, type, isactive, bcgovcode, iaocode)	VALUES ('Ministry of Children and Family Development (Generals)', 'BC GOV Ministry', True, 'CAF', 'CAF');commit;''')
     
-    op.execute('''INSERT INTO public."ProgramAreaDivisions"(
-                    programareaid, name, isactive, created_at, createdby, sortorder, updated_at, updatedby, issection, parentid, specifictopersonalrequests, type)
-                    SELECT 
-                    (select programareaid from public."ProgramAreas" where bcgovcode='CAF'), name, isactive, created_at, createdby, sortorder, updated_at, updatedby, issection, parentid, specifictopersonalrequests, type
-                    FROM public."ProgramAreaDivisions"
-                    where programareaid = (select programareaid from public."ProgramAreas" where bcgovcode = 'MCF')
-                    and specifictopersonalrequests is false
-                    and isactive = true
-                ORDER BY divisionid ASC ''')
+    # op.execute('''INSERT INTO public."ProgramAreaDivisions"(
+    #                 programareaid, name, isactive, created_at, createdby, sortorder, updated_at, updatedby, issection, parentid, specifictopersonalrequests, type)
+    #                 SELECT 
+    #                 (select programareaid from public."ProgramAreas" where bcgovcode='CAF'), name, isactive, created_at, createdby, sortorder, updated_at, updatedby, issection, parentid, specifictopersonalrequests, type
+    #                 FROM public."ProgramAreaDivisions"
+    #                 where programareaid = (select programareaid from public."ProgramAreas" where bcgovcode = 'MCF')
+    #                 and specifictopersonalrequests is false
+    #                 and isactive = true
+    #             ORDER BY divisionid ASC ''')
     
     op.execute('''INSERT INTO public."OperatingTeams"(name, description, isactive, type) VALUES ('CAF Ministry Team', 'CAF Ministry Team', True, 'ministry');commit;''')
 
@@ -50,7 +50,7 @@ def downgrade():
     
     op.execute('''delete from public."OperatingTeams" where name = 'CAF Ministry Team' ''')
 
-    op.execute('''delete from public."ProgramAreaDivisions" where programareaid in (select programareaid from public."ProgramAreas" where bcgovcode = 'CAF')''')
+    # op.execute('''delete from public."ProgramAreaDivisions" where programareaid in (select programareaid from public."ProgramAreas" where bcgovcode = 'CAF')''')
 
     op.execute('''delete from public."ProgramAreas" where bcgovcode = 'CAF' ''')
 #
