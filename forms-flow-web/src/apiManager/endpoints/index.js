@@ -158,5 +158,6 @@ const API = {
   FOI_GET_OIPC_STATUSES: `${FOI_BASE_API_URL}/api/foiflow/oipc/statuses`,
   FOI_GET_OIPC_REVIEWTYPES: `${FOI_BASE_API_URL}/api/foiflow/oipc/reviewtypes`,
   FOI_GET_OIPC_INQUIRYOUTCOMES: `${FOI_BASE_API_URL}/api/foiflow/oipc/inquiryoutcomes`,
+  FOI_GET_COMMENT_TYPES: `${FOI_BASE_API_URL}/api/foiflow/commenttypes`,
 };
 export default API;
