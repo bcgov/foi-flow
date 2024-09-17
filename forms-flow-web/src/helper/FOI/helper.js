@@ -213,6 +213,12 @@ const isIntakeTeam = (userGroups) => {
   );
 };
 
+const isOITeamLogin = (userGroups) => {
+  return (
+    userGroups?.map((userGroup) => userGroup.replace("/", "")).indexOf("OI Team") !== -1
+  );
+}
+
 const getMinistryByValue = (userGroups) => {
   const ministryGroup = Object.values(MINISTRYGROUPS).filter((element) =>
     userGroups.includes(element)
@@ -486,6 +492,7 @@ export {
   calculateDaysRemaining,
   isMinistryCoordinator,
   isMinistryLogin,
+  isOITeamLogin,
   getMinistryByValue,
   addToFullnameList,
   getFullnameList,

@@ -61,11 +61,16 @@ class DashboardPagination(Resource):
             _keyword = flask.request.args.get('keyword', None, type=str)
 
             groups = AuthHelper.getusergroups()
+            print("authhelper get user type: ",AuthHelper.getusertype())
+            print("groups : ",groups)
             statuscode = 200
             if (AuthHelper.getusertype() == "iao") and (queuetype is None or queuetype == "all"):                                                                                           
                 requests = dashboardservice().getrequestqueuepagination(groups, _page, _size, _sortingitems, _sortingorders, _filterfields, _keyword, _additionalfilter, _userid)
             elif  queuetype is not None and queuetype == "ministry" and AuthHelper.getusertype() == "ministry":
                 requests = dashboardservice().getministryrequestqueuepagination(AuthHelper.getministrygroups(), _page, _size, _sortingitems, _sortingorders, _filterfields, _keyword, _additionalfilter, _userid)
+            elif queuetype is not None and queuetype == "oi":
+                print("OI TEAM API")
+                requests = dashboardservice().getoirequestqueuepagination(groups, _page, _size, _sortingitems, _sortingorders, _filterfields, _keyword, _additionalfilter, _userid)
             else:
                 statuscode = 401   
 

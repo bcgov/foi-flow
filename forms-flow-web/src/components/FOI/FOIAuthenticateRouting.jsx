@@ -8,10 +8,10 @@ import { setUserAuth } from "../../actions/bpmActions";
 import Loading from "../../containers/Loading";
 import FOIHeader from "./Header";
 import FOIFooter from "./Footer";
-import { Dashboard, MinistryDashboard } from "./Dashboard";
+import { Dashboard, MinistryDashboard, OIDashboard } from "./Dashboard";
 import FOIRequest  from "./FOIRequest";
 import MinistryReview from "./FOIRequest/MinistryReview/MinistryReview";
-import { isMinistryLogin } from '../../helper/FOI/helper';
+import { isMinistryLogin, isOITeamLogin } from '../../helper/FOI/helper';
 import UnAuthorized from "./UnAuthorized";
 import Admin from "./Admin";
 import Divisions from "./Admin/Divisions";
@@ -41,12 +41,15 @@ const FOIAuthenticateRouting = React.memo((props) => {
   },[props.store, dispatch]);
   const userDetail = useSelector(state=> state.user.userDetail);
   const isAuthorized = useSelector(state=> state.user.isAuthorized);
+  console.log("userDetail: ",userDetail)
   let isMinistry = false;
+  let isOITeam = false;
   if (Object.entries(userDetail).length !== 0) {
     const userGroups = userDetail && userDetail.groups.map(group => group.slice(1));
     isMinistry = isMinistryLogin(userGroups);
+    isOITeam = isOITeamLogin(userGroups);
   }
-
+  console.log("isOITeam : ",isOITeam)
   return (
       <>
         {isAuth && Object.entries(userDetail).length !== 0 ? (
