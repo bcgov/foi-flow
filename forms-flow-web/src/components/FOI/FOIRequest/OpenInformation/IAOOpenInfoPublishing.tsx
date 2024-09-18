@@ -1,38 +1,27 @@
-import { useSelector } from "react-redux";
-import Grid from "@material-ui/core/Grid";
+import "./iaoopeninfo.scss";
+import IAOOpenInfoHeader from "./IAOOpenInfoHeader";
+import IAOOpenInfoMain from "./IAOOpenInfoMain";
 
-type OIExemption = {
-    "oiexemptionid": number,
-    "name": string,
-    "isactive": boolean
-}
-type OIPublicationStatus = {
-    "oipublicationstatusid": number,
-    "name": string,
-    "isactive": boolean
-}
+const IAOOpenInfoPublishing = ({ requestNumber, requestDetails }: any) => {
 
-const IAOOpenInfoPublishing = ({ requestNumber, } : any) => {
-    const oiExemptions: OIExemption[] = useSelector((state : any) => state.foiRequests.oiExemptions);
-    const oiPublicationStatuses: OIPublicationStatus[] = useSelector((state : any) => state.foiRequests.oiPublicationStatuses);
+  const oiTxnData = {
+    oipublicationstatusid: 1,
+    oiexemptionid: 3,
+    oiApproved: null,
+    pagereferences: "",
+    analystrationale: "",
+    oifeedback: "",
+  }
 
-    console.log("exemptions", oiExemptions)
-    console.log("publicationstats", oiPublicationStatuses)
-    
-    return (
-        <Grid
-            container
-            direction="row"
-            alignItems="flex-start"
-            spacing={1}
-        >
-            <Grid item xs={6}>
-                <h1 className="foi-review-request-text foi-ministry-requestheadertext">
-                    {requestNumber ? `Request #${requestNumber}` : ""}
-                </h1>
-            </Grid>
-        </Grid>
-    );
-}
+  return (
+    <div className="oi-section">
+      <IAOOpenInfoHeader
+        requestDetails={requestDetails}
+        requestNumber={requestNumber}
+      />
+      <IAOOpenInfoMain oiPublicaitionObj={null} />
+    </div>
+  );
+};
 
 export default IAOOpenInfoPublishing;
