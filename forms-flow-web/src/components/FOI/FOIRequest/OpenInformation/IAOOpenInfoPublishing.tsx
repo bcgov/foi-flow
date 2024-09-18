@@ -3,7 +3,6 @@ import IAOOpenInfoHeader from "./IAOOpenInfoHeader";
 import IAOOpenInfoMain from "./IAOOpenInfoMain";
 
 const IAOOpenInfoPublishing = ({ requestNumber, requestDetails }: any) => {
-
   const oiTxnData = {
     oipublicationstatusid: 1,
     oiexemptionid: 3,
@@ -11,7 +10,7 @@ const IAOOpenInfoPublishing = ({ requestNumber, requestDetails }: any) => {
     pagereferences: "",
     analystrationale: "",
     oifeedback: "",
-  }
+  };
 
   return (
     <div className="oi-section">
@@ -20,6 +19,15 @@ const IAOOpenInfoPublishing = ({ requestNumber, requestDetails }: any) => {
         requestNumber={requestNumber}
       />
       <IAOOpenInfoMain oiPublicaitionObj={null} />
+      <button
+        type="button"
+        className="btn btn-bottom"
+        onClick={() => {
+          console.log("SAVE")
+        }}
+      >
+        Save
+      </button>
     </div>
   );
 };
