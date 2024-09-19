@@ -8,14 +8,14 @@ class FOIOpenInformationRequests(db.Model):
     foiopeninforequestid = db.Column(db.Integer, primary_key=True, autoincrement=True, nullable=False)
     version = db.Column(db.Integer, primary_key=True, nullable=False)
     foiministryrequest_id = db.Column(db.Integer, ForeignKey('FOIMinistryRequests.foiministryrequestid'), nullable=False)
-    foiministryrequestversion_id = db.Column(db.Integer, ForeignKey('FOIMinistryRequests.version'), nullable=False)
+    foiministryrequestversion_id = db.Column(db.Integer, ForeignKey('FOIMinistryRequests.version'), nullable=False) # THIS NEEDED?
     oipublicationstatus_id = db.Column(db.Integer, ForeignKey('OpenInfoPublicationStatuses.oipublicationstatusid'), nullable=False)
     oiexemption_id = db.Column(db.Integer, ForeignKey('OpenInformationExemptions.oiexemptionid'), nullable=True)
     oiassignedto = db.Column(db.String(120), ForeignKey('FOIAssignees.username'), nullable=True)
 
     oiexemptionapproved = db.Column(db.Boolean, nullable=True)
     pagereference = db.Column(db.String, nullable=True)
-    iaorationale = db.Column(db.String, db.String, nullable=True)
+    iaorationale = db.Column(db.String, nullable=True)
     oifeedback = db.Column(db.String, nullable=True)
     publicationdate = db.Column(db.DateTime, nullable=True)
     isactive = db.Column(db.Boolean, nullable=False)
