@@ -25,7 +25,11 @@ type OIExemption = {
   isactive: boolean;
 };
 
-const IAOOpenInfoMain = ({ oiPublicationData, handleOIDataChange }: any) => {
+const IAOOpenInfoMain = ({
+  oiPublicationData,
+  handleOIDataChange,
+  isOIUser,
+}: any) => {
   //App State
   const oiPublicationStatuses: OIPublicationStatus[] = useSelector(
     (state: any) => state.foiRequests.oiPublicationStatuses
@@ -66,24 +70,20 @@ const IAOOpenInfoMain = ({ oiPublicationData, handleOIDataChange }: any) => {
             <Grid item md={6}>
               <TextField
                 fullWidth
-                name="oipublicationstatusid"
+                name="oipublicationstatus_id"
                 label="Publication Status"
                 variant="outlined"
-                value={
-                  oiPublicationData
-                    ? oiPublicationData.oipublicationstatusid
-                    : 2
-                }
+                value={oiPublicationData?.oipublicationstatus_id}
                 select
                 required
                 InputLabelProps={{ shrink: true }}
                 onChange={(event) =>
                   handleOIDataChange(event.target.value, event.target.name)
                 }
+                disabled={isOIUser}
                 // error={
                 //   (!oipc.outcomeid || oipc.outcomeid === 5) && oipc.oipcno === ""
                 // }
-                // disabled={oipc.outcomeid && oipc.outcomeid !== 5}
               >
                 {oiPublicationStatuses.map((status) => {
                   return (
@@ -100,22 +100,22 @@ const IAOOpenInfoMain = ({ oiPublicationData, handleOIDataChange }: any) => {
             <Grid item md={6}>
               <TextField
                 fullWidth
-                name="oiexemptionid"
+                name="oiexemption_id"
                 label="Do Not Publish Reason"
                 variant="outlined"
-                value={oiPublicationData ? oiPublicationData.oiexemptionid : 0}
+                value={oiPublicationData?.oiexemption_id}
                 select
                 required
                 InputLabelProps={{ shrink: true }}
                 onChange={(event) =>
                   handleOIDataChange(event.target.value, event.target.name)
                 }
-                // error={
-                //   (!oipc.outcomeid || oipc.outcomeid === 5) && oipc.oipcno === ""
-                // }
+                error={
+                  oiPublicationData?.oipublicationstatus_id !== 2 &&
+                  !oiPublicationData?.oiexemption_id
+                }
                 disabled={
-                  !oiPublicationData ||
-                  oiPublicationData?.oipublicationstatusid === 2
+                  oiPublicationData?.oipublicationstatus_id === 2 || isOIUser
                 }
               >
                 {oiExemptions.map((reason) => {
@@ -134,12 +134,9 @@ const IAOOpenInfoMain = ({ oiPublicationData, handleOIDataChange }: any) => {
               <TextField
                 fullWidth
                 label="Page References"
-                name="pagereferences"
+                name="pagereference"
                 variant="outlined"
-                value={
-                  oiPublicationData ? oiPublicationData.pageReferences : ""
-                }
-                required
+                value={oiPublicationData.pagereference}
                 InputLabelProps={{ shrink: true }}
                 onChange={(event) =>
                   handleOIDataChange(event.target.value, event.target.name)
@@ -148,8 +145,9 @@ const IAOOpenInfoMain = ({ oiPublicationData, handleOIDataChange }: any) => {
                 //   (!oipc.outcomeid || oipc.outcomeid === 5) && oipc.oipcno === ""
                 // }
                 disabled={
-                  !oiPublicationData ||
-                  oiPublicationData?.oipublicationstatusid === 2
+                  oiPublicationData?.oiexemption_id === 5 ||
+                  oiPublicationData?.oipublicationstatus_id === 2 ||
+                  isOIUser
                 }
               ></TextField>
             </Grid>
@@ -161,10 +159,11 @@ const IAOOpenInfoMain = ({ oiPublicationData, handleOIDataChange }: any) => {
               >
                 <FormControlLabel
                   value={true}
-                  name="oiApproved"
+                  name="oiexemptionapproved"
                   disabled={
-                    !oiPublicationData ||
-                    oiPublicationData?.oipublicationstatusid === 2
+                    oiPublicationData?.oiexemption_id === 5 ||
+                    oiPublicationData?.oipublicationstatus_id === 2 ||
+                    !isOIUser
                   }
                   control={
                     <Radio
@@ -172,17 +171,18 @@ const IAOOpenInfoMain = ({ oiPublicationData, handleOIDataChange }: any) => {
                         handleOIDataChange(true, event.target.name)
                       }
                       color="default"
-                      checked={oiPublicationData?.oiApproved === true}
+                      checked={oiPublicationData?.oiexemptionapproved === true}
                     />
                   }
                   label="Approved"
                 />
                 <FormControlLabel
                   value={false}
-                  name="oiApproved"
+                  name="oiexemptionapproved"
                   disabled={
-                    !oiPublicationData ||
-                    oiPublicationData?.oipublicationstatusid === 2
+                    oiPublicationData?.oiexemption_id === 5 ||
+                    oiPublicationData?.oipublicationstatus_id === 2 ||
+                    !isOIUser
                   }
                   control={
                     <Radio
@@ -190,7 +190,7 @@ const IAOOpenInfoMain = ({ oiPublicationData, handleOIDataChange }: any) => {
                         handleOIDataChange(false, event.target.name)
                       }
                       color="default"
-                      checked={oiPublicationData?.oiApproved === false}
+                      checked={oiPublicationData?.oiexemptionapproved === false}
                     />
                   }
                   label="Declined"
@@ -202,18 +202,19 @@ const IAOOpenInfoMain = ({ oiPublicationData, handleOIDataChange }: any) => {
             <TextField
               fullWidth
               variant="outlined"
+              name="iaorationale"
               label="Analyst Rationale"
-              required
               InputLabelProps={{ shrink: true }}
-              value={
-                oiPublicationData ? oiPublicationData.analystrationale : null
-              }
+              value={oiPublicationData?.iaorationale}
               disabled={
-                !oiPublicationData ||
-                oiPublicationData?.oipublicationstatusid === 2
+                oiPublicationData?.oiexemption_id === 5 ||
+                oiPublicationData?.oipublicationstatus_id === 2 ||
+                isOIUser
               }
               style={{ paddingBottom: "2%" }}
-              // onChange={(event) => handleOIPCNumber(event.target.value)}
+              onChange={(event) =>
+                handleOIDataChange(event.target.value, event.target.name)
+              }
               // error={
               //   (!oipc.outcomeid || oipc.outcomeid === 5) && oipc.oipcno === ""
               // }
@@ -223,15 +224,19 @@ const IAOOpenInfoMain = ({ oiPublicationData, handleOIDataChange }: any) => {
             <TextField
               fullWidth
               variant="outlined"
+              name="oifeedback"
               label="OI Feedback"
               required
               InputLabelProps={{ shrink: true }}
-              value={oiPublicationData ? oiPublicationData.oifeedback : null}
+              value={oiPublicationData?.oifeedback}
               disabled={
-                !oiPublicationData ||
-                oiPublicationData?.oipublicationstatusid === 2
+                oiPublicationData?.oiexemption_id === 5 ||
+                oiPublicationData?.oipublicationstatus_id === 2 ||
+                !isOIUser
               }
-              // onChange={(event) => handleOIPCNumber(event.target.value)}
+              onChange={(event) =>
+                handleOIDataChange(event.target.value, event.target.name)
+              }
               // error={
               //   (!oipc.outcomeid || oipc.outcomeid === 5) && oipc.oipcno === ""
               // }

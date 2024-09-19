@@ -1724,6 +1724,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
               <IAOOpenInfoPublishing
                 requestNumber={requestNumber}
                 requestDetails={requestDetails}
+                userDetail={userDetail}
               />
             </div>
           )}

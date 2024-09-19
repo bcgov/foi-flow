@@ -8,7 +8,7 @@ class FOIOpenInformationRequests(db.Model):
     foiopeninforequestid = db.Column(db.Integer, primary_key=True, autoincrement=True, nullable=False)
     version = db.Column(db.Integer, primary_key=True, nullable=False)
     foiministryrequest_id = db.Column(db.Integer, ForeignKey('FOIMinistryRequests.foiministryrequestid'), nullable=False)
-    foiministryrequestversion_id = db.Column(db.Integer, ForeignKey('FOIMinistryRequests.version'), nullable=False) # THIS NEEDED?
+    foiministryrequestversion_id = db.Column(db.Integer, ForeignKey('FOIMinistryRequests.version'), nullable=False) # AH NOTE -> THIS NEEDED?
     oipublicationstatus_id = db.Column(db.Integer, ForeignKey('OpenInfoPublicationStatuses.oipublicationstatusid'), nullable=False)
     oiexemption_id = db.Column(db.Integer, ForeignKey('OpenInformationExemptions.oiexemptionid'), nullable=True)
     oiassignedto = db.Column(db.String(120), ForeignKey('FOIAssignees.username'), nullable=True)
