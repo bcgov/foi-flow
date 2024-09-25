@@ -4,7 +4,7 @@ import "../dashboard.scss";
 import useStyles from "../CustomStyle";
 import { useDispatch, useSelector } from "react-redux";
 import { push } from "connected-react-router";
-import { fetchFOIMinistryRequestListByPage } from "../../../../apiManager/services/FOI/foiRequestServices";
+import { fetchFOIOIRequestListByPage } from "../../../../apiManager/services/FOI/foiRequestServices";
 import Loading from "../../../../containers/Loading";
 import { debounce, ClickableChip, cellTooltipRender, displayQueueFlagIcons } from "../utils";
 import Grid from "@mui/material/Grid";
@@ -61,7 +61,7 @@ const Queue = ({ userDetail, tableInfo }) => {
       });
 
       //add cfrduedate asc to default sorting
-      if(smodel[0]?.field === "ministrySorting") {
+      if(smodel[0]?.field === "defaultSorting") {
         smodel.push(
           { field: "cfrduedate", sort: "asc" },
         );
@@ -75,7 +75,7 @@ const Queue = ({ userDetail, tableInfo }) => {
     serverSortModel = updateSortModel();
     // page+1 here, because initial page value is 0 for mui-data-grid
     dispatch(
-      fetchFOIMinistryRequestListByPage(
+      fetchFOIOIRequestListByPage(
         rowsState.page + 1,
         rowsState.pageSize,
         serverSortModel,
@@ -112,12 +112,12 @@ const Queue = ({ userDetail, tableInfo }) => {
   }
 
   const columns = React.useRef([
-    {
-      field: "flags",
-      headerName: "FLAGS",
-      headerAlign: "left",
-      renderCell: displayQueueFlagIcons,
-    },
+    // {
+    //   field: "flags",
+    //   headerName: "FLAGS",
+    //   headerAlign: "left",
+    //   renderCell: displayQueueFlagIcons,
+    // },
     {
       field: "axisRequestId",
       headerName: "ID NUMBER",
@@ -126,52 +126,68 @@ const Queue = ({ userDetail, tableInfo }) => {
       renderCell: cellTooltipRender
     },
     {
-      field: "applicantcategory",
-      headerName: "CATEGORY",
-      flex: 1,
-      headerAlign: "left",
-    },
-    {
       field: "requestType",
       headerName: "TYPE",
       flex: 1,
       headerAlign: "left",
     },
-
     {
-      field: "currentState",
-      headerName: "REQUEST STATE",
-      flex: 1,
-      headerAlign: "left",
-    },
-
-    {
-      field: "ministryAssignedToFormatted",
-      headerName: "ASSIGNED TO",
+      field: "oiStatusName",
+      headerName: "PUBLICATION STATUS",
       flex: 1,
       headerAlign: "left",
     },
     {
-      field: "CFRDueDateValue",
-      headerName: "RECORDS DUE",
+      field: "closedate",
+      headerName: "CLOSED DATE",
       flex: 1,
       headerAlign: "left",
-      valueGetter: getRecordsDue,
     },
     {
-      field: "DueDateValue",
-      headerName: "LDD",
+      field: "publicationdate",
+      headerName: "PUBLICATION DATE",
       flex: 1,
       headerAlign: "left",
-      valueGetter: getLDD,
     },
     {
-      field: "cfrduedate",
-      headerName: "",
-      width: 0,
-      hide: true,
-      renderCell: (_params) => <span></span>,
+      field: "assignedTo",
+      headerName: "ASSIGNEE",
+      flex: 1,
+      headerAlign: "left",
+    },
+    {
+      field: "recordspagecount",
+      headerName: "NUMBER OF PAGES",
+      flex: 1,
+      headerAlign: "left",
     }
+    // {
+    //   field: "ministryAssignedToFormatted",
+    //   headerName: "ASSIGNED TO",
+    //   flex: 1,
+    //   headerAlign: "left",
+    // },
+    // {
+    //   field: "CFRDueDateValue",
+    //   headerName: "RECORDS DUE",
+    //   flex: 1,
+    //   headerAlign: "left",
+    //   valueGetter: getRecordsDue,
+    // },
+    // {
+    //   field: "DueDateValue",
+    //   headerName: "LDD",
+    //   flex: 1,
+    //   headerAlign: "left",
+    //   valueGetter: getLDD,
+    // },
+    // {
+    //   field: "cfrduedate",
+    //   headerName: "",
+    //   width: 0,
+    //   hide: true,
+    //   renderCell: (_params) => <span></span>,
+    // }
   ]);
 
   const requestFilterChange = (filter) => {
@@ -291,6 +307,15 @@ const Queue = ({ userDetail, tableInfo }) => {
                 id="watchingRequests"
                 key={`watching-requests`}
                 label={"WATCHING REQUESTS"}
+                color="primary"
+                size="small"
+                onClick={() => requestFilterChange("watchingRequests")}
+                clicked={requestFilter === "watchingRequests"}
+              />
+              <ClickableChip
+                id="watchingRequests"
+                key={`watching-requests`}
+                label={"UNASSIGNED REQUESTS"}
                 color="primary"
                 size="small"
                 onClick={() => requestFilterChange("watchingRequests")}

@@ -69,6 +69,12 @@ class FOIOpenInformationRequests(db.Model):
         #aliase for getting ministry restricted flag from FOIRestrictedMinistryRequest
         ministry_restricted_requests = aliased(FOIRestrictedMinistryRequest)
 
+        defaultsorting = case([
+                            (FOIMinistryRequest.assignedto == None, # Unassigned requests first
+                             literal(None)),
+                           ],
+        else_ = FOIMinistryRequest.duedate).label('defaultSorting')
+        
         recordspagecount = case ([
             (FOIMinistryRequest.recordspagecount.isnot(None), FOIMinistryRequest.recordspagecount)
             ],
@@ -176,150 +182,42 @@ class FOIOpenInformationRequests(db.Model):
             .join(OpenInformationStatuses, OpenInformationStatuses.oistatusid == FOIMinistryRequest.oistatus_id)
             .outerjoin(FOIAssignee, FOIAssignee.username == FOIOpenInformationRequests.oiassignedto)  
         )
-        print("엥? : ",basequery)
+
+        # if(additionalfilter == 'watchingRequests'):
+        #     #watchby
+        #     activefilter = and_(FOIMinistryRequest.isactive == True, FOIRequestStatus.isactive == True)
+
+        #     subquery_watchby = FOIRequestWatcher.getrequestidsbyuserid(userid)
+        #     if(requestby == 'IAO'):
+        #         dbquery = basequery.join(subquery_watchby, subquery_watchby.c.ministryrequestid == FOIMinistryRequest.foiministryrequestid).filter(activefilter).filter(or_(or_(FOIRestrictedMinistryRequest.isrestricted == False, FOIRestrictedMinistryRequest.isrestricted == None), and_(FOIRestrictedMinistryRequest.isrestricted == True, FOIMinistryRequest.assignedto == userid)))
+        #     else:
+        #         dbquery = basequery.join(subquery_watchby, subquery_watchby.c.ministryrequestid == FOIMinistryRequest.foiministryrequestid).filter(activefilter).filter(or_(or_(ministry_restricted_requests.isrestricted == isministryrestrictedfilemanager, ministry_restricted_requests.isrestricted == None), and_(ministry_restricted_requests.isrestricted == True, FOIMinistryRequest.assignedministryperson == userid)))   
+            
+        # elif(additionalfilter == 'myRequests'):
+        #     #myrequest
+        #     if(requestby == 'IAO'):
+        #         dbquery = basequery.filter(FOIMinistryRequest.assignedto == userid).filter(ministryfilter)
+        #     else:
+        #         dbquery = basequery.filter(FOIMinistryRequest.assignedministryperson == userid).filter(ministryfilter)
+        # elif(additionalfilter == 'unassignedRequests'):
+        #     if(requestby == 'IAO'):
+        #         dbquery = basequery.filter(FOIMinistryRequest.assignedto == None).filter(ministryfilter)
+        # elif(additionalfilter.lower() == 'all'):           
+        #     if(requestby == 'IAO'):
+        #         dbquery = basequery.filter(ministryfilter).filter(FOIMinistryRequest.assignedto.isnot(None)).filter(or_(FOIRestrictedMinistryRequest.isrestricted == isiaorestrictedfilemanager, or_(FOIRestrictedMinistryRequest.isrestricted.is_(None), FOIRestrictedMinistryRequest.isrestricted == False)))
+        #     else:               
+        #         dbquery = basequery.filter(ministryfilter).filter(or_(ministry_restricted_requests.isrestricted == isministryrestrictedfilemanager, or_(ministry_restricted_requests.isrestricted.is_(None), ministry_restricted_requests.isrestricted == False)))
+        # else:
+        #     if(isiaorestrictedfilemanager == True or isministryrestrictedfilemanager == True):
+        #         dbquery = basequery.filter(ministryfilter)
+        #     else:
+        #         if(requestby == 'IAO'):
+        #             dbquery = basequery.filter(or_(or_(FOIRestrictedMinistryRequest.isrestricted == False, FOIRestrictedMinistryRequest.isrestricted == None), and_(FOIRestrictedMinistryRequest.isrestricted == True, FOIMinistryRequest.assignedto == userid))).filter(ministryfilter)
+        #         else:
+        #             dbquery = basequery.filter(or_(or_(ministry_restricted_requests.isrestricted == False, ministry_restricted_requests.isrestricted == None), and_(ministry_restricted_requests.isrestricted == True, FOIMinistryRequest.assignedministryperson == userid))).filter(ministryfilter)
+
         return basequery
-        # requesttype = case([
-        #                     (FOIRawRequest.status == StateName.unopened.value,
-        #                      FOIRawRequest.requestrawdata['requestType']['requestType'].astext),
-        #                    ],
-        #                    else_ = FOIRawRequest.requestrawdata['requestType'].astext).label('requestType')
-        # firstname = case([
-        #                     (FOIRawRequest.status == StateName.unopened.value,
-        #                      FOIRawRequest.requestrawdata['contactInfo']['firstName'].astext),
-        #                    ],
-        #                    else_ = FOIRawRequest.requestrawdata['firstName'].astext).label('firstName')
-        # lastname = case([
-        #                     (FOIRawRequest.status == StateName.unopened.value,
-        #                      FOIRawRequest.requestrawdata['contactInfo']['lastName'].astext),
-        #                    ],
-        #                    else_ = FOIRawRequest.requestrawdata['lastName'].astext).label('lastName')
-        # description = case([
-        #                     (FOIRawRequest.status == StateName.unopened.value,
-        #                      FOIRawRequest.requestrawdata['descriptionTimeframe']['description'].astext),
-        #                    ],
-        #                    else_ = FOIRawRequest.requestrawdata['description'].astext).label('description')
-        # recordsearchfromdate = case([
-        #                     (FOIRawRequest.status == StateName.unopened.value,
-        #                      FOIRawRequest.requestrawdata['descriptionTimeframe']['fromDate'].astext),
-        #                    ],
-        #                    else_ = FOIRawRequest.requestrawdata['fromDate'].astext).label('recordsearchfromdate')
-        # recordsearchtodate = case([
-        #                     (FOIRawRequest.status == StateName.unopened.value,
-        #                      FOIRawRequest.requestrawdata['descriptionTimeframe']['toDate'].astext),
-        #                    ],
-        #                    else_ = FOIRawRequest.requestrawdata['toDate'].astext).label('recordsearchtodate')
-        # duedate = case([
-        #                     (FOIRawRequest.status == StateName.unopened.value,
-        #                      literal(None)),
-        #                    ],
-        #                    else_ = FOIRawRequest.requestrawdata['dueDate'].astext).label('duedate')
-        # receiveddate = case([
-        #                     (and_(FOIRawRequest.status == StateName.unopened.value, FOIRawRequest.requestrawdata['receivedDate'].is_(None)),
-        #                      func.to_char(FOIRawRequest.created_at, 'YYYY-mm-DD')),
-        #                    ],
-        #                    else_ = FOIRawRequest.requestrawdata['receivedDate'].astext).label('receivedDate')
-        # receiveddateuf = case([
-        #                     (and_(FOIRawRequest.status == StateName.unopened.value, FOIRawRequest.requestrawdata['receivedDateUF'].is_(None)),
-        #                      func.to_char(FOIRawRequest.created_at, 'YYYY-mm-DD HH:MM:SS')),
-        #                    ],
-        #                    else_ = FOIRawRequest.requestrawdata['receivedDateUF'].astext).label('receivedDateUF')
-
-        # assignedtoformatted = case([
-        #                     (and_(FOIAssignee.lastname.isnot(None), FOIAssignee.firstname.isnot(None)),
-        #                      func.concat(FOIAssignee.lastname, ', ', FOIAssignee.firstname)),
-        #                     (and_(FOIAssignee.lastname.isnot(None), FOIAssignee.firstname.is_(None)),
-        #                      FOIAssignee.lastname),
-        #                     (and_(FOIAssignee.lastname.is_(None), FOIAssignee.firstname.isnot(None)),
-        #                      FOIAssignee.firstname),
-        #                     (and_(FOIAssignee.lastname.is_(None), FOIAssignee.firstname.is_(None), FOIRawRequest.assignedgroup.is_(None)),
-        #                      'Unassigned'),
-        #                    ],
-        #                    else_ = FOIRawRequest.assignedgroup).label('assignedToFormatted')
-
-        # axisrequestid = case([
-        #     (FOIRawRequest.axisrequestid.is_(None),
-        #     'U-00' + cast(FOIRawRequest.requestid, String)),
-        #     ],
-        #     else_ = cast(FOIRawRequest.axisrequestid, String)).label('axisRequestId')
-
-        # requestpagecount = case([
-        #     (FOIRawRequest.requestrawdata['axispagecount'].is_(None),
-        #     '0'),
-        #     ],
-        #     else_ = cast(FOIRawRequest.requestrawdata['axispagecount'], String))
-
-        # intakesorting = case([
-        #                     (FOIRawRequest.assignedto == None, # Unassigned requests first
-        #                      literal(None)),
-        #                    ],
-        #                    else_ = cast(FOIRawRequest.requestrawdata['receivedDateUF'].astext, TIMESTAMP)).label('intakeSorting')
-
-        # isiaorestricted = case([
-        #                     (FOIRawRequest.isiaorestricted.is_(None),
-        #                      False),
-        #                    ],
-        #                    else_ = FOIRawRequest.isiaorestricted).label('isiaorestricted')
-
-        # subjectcode = case([
-        #     (FOIRawRequest.requestrawdata['subjectCode'].is_(None),
-        #     literal(None)),
-        #     ],
-        #     else_ = cast(FOIRawRequest.requestrawdata['subjectCode'], String)).label('subjectcode')
-
-        # selectedcolumns = [
-        #     FOIRawRequest.requestid.label('id'),
-        #     FOIRawRequest.version,
-        #     FOIRawRequest.sourceofsubmission,
-        #     firstname,
-        #     lastname,
-        #     requesttype,
-        #     receiveddate,
-        #     receiveddateuf,
-        #     FOIRawRequest.status.label('currentState'),
-        #     FOIRawRequest.assignedgroup.label('assignedGroup'),
-        #     FOIRawRequest.assignedto.label('assignedTo'),
-        #     cast(FOIRawRequest.requestid, String).label('idNumber'),
-        #     axisrequestid,
-        #     cast(requestpagecount, Integer).label('requestpagecount'),
-        #     requestpagecount.label('axispagecount'),
-        #     literal(None).label('axislanpagecount'),
-        #     literal(None).label('recordspagecount'),
-        #     literal(None).label('ministryrequestid'),
-        #     literal(None).label('assignedministrygroup'),
-        #     literal(None).label('assignedministryperson'),
-        #     literal(None).label('cfrduedate'),
-        #     duedate,
-        #     FOIRawRequest.requestrawdata['category'].astext.label('applicantcategory'),
-        #     FOIRawRequest.created_at.label('created_at'),
-        #     literal(None).label('bcgovcode'),
-        #     FOIAssignee.firstname.label('assignedToFirstName'),
-        #     FOIAssignee.lastname.label('assignedToLastName'),
-        #     literal(None).label('assignedministrypersonFirstName'),
-        #     literal(None).label('assignedministrypersonLastName'),
-        #     description,
-        #     recordsearchfromdate,
-        #     recordsearchtodate,
-        #     literal(None).label('onBehalfFirstName'),
-        #     literal(None).label('onBehalfLastName'),
-        #     literal(None).label('defaultSorting'),
-        #     intakesorting,
-        #     literal(None).label('ministrySorting'),
-        #     assignedtoformatted,
-        #     literal(None).label('ministryAssignedToFormatted'),
-        #     literal(None).label('closedate'),
-        #     literal(None).label('onBehalfFormatted'),
-        #     literal(None).label('extensions'),
-        #     isiaorestricted,
-        #     literal(None).label('isministryrestricted'),
-        #     subjectcode,
-        #     literal(None).label('isoipcreview'),
-        #     literal(None).label('oipc_number')
-        # ]
-
-        # basequery = _session.query(*selectedcolumns).join(subquery_maxversion, and_(*joincondition)).join(FOIAssignee, FOIAssignee.username == FOIRawRequest.assignedto, isouter=True)
-
-        #return FOIRawRequest.handleadditionalfilter(basequery, additionalfilter, userid, isiaorestrictedfilemanager, groups)
-        
+    
 
     @classmethod
     def getrequestssubquery(cls, groups, filterfields, keyword, additionalfilter, userid, iaoassignee, ministryassignee, requestby, isiaorestrictedfilemanager=False, isministryrestrictedfilemanager=False):
@@ -358,6 +256,7 @@ class FOIOpenInformationRequests(db.Model):
         #     requestby = 'OI'
         #     subquery_oirequest_queue = FOIOpenInformationRequests.getrequestssubquery(group, filterfields, keyword, additionalfilter, userid, iaoassignee, ministryassignee, requestby, isiaorestrictedfilemanager, isministryrestrictedfilemanager)
         # else:
+        print("getrequestspagination안에 group : ",group)
         return subquery_oirequest_queue.order_by(*sortingcondition).paginate(page=page, per_page=size)
     
     @classmethod

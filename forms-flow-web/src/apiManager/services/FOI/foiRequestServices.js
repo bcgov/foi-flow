@@ -158,6 +158,46 @@ export const fetchFOIMinistryRequestListByPage = (page = 1, size = 10, sort = [{
   };
 };
 
+export const fetchFOIOIRequestListByPage = (page = 1, size = 10, sort = [{field:'defaultSorting', sort:'asc'}], filters = null, keyword = null, additionalFilter = 'All', userID = null) => {
+  let sortingItems = [];
+  let sortingOrders = [];
+  sort.forEach((item)=>{
+    sortingItems.push(item.field);
+    sortingOrders.push(item.sort);
+  });
+
+  return (dispatch) => {
+    httpGETRequest(
+          API.FOI_GET_OI_REQUESTS_PAGE_API,
+          {
+            "page": page,
+            "size": size,
+            "sortingitems": sortingItems,
+            "sortingorders": sortingOrders,
+            "filters": filters,
+            "keyword": keyword,
+            "additionalfilter": additionalFilter,
+            "userid": userID
+          },
+          UserService.getToken())
+      .then((res) => {
+        if (res.data) {
+          dispatch(clearMinistryViewRequestDetails({}));
+          dispatch(setFOIMinistryRequestList(res.data));
+          dispatch(setFOILoader(false));
+          if (res.data?.data[0]?.bcgovcode)
+            dispatch(fetchFOIMinistryAssignedToList(res.data.data[0].bcgovcode));     
+        } else {
+          dispatch(serviceActionError(res));
+          throw new Error("Error in fetching dashboard data for IAO");
+        }
+      })
+      .catch((error) => {
+        catchError(error, dispatch);
+      });
+  };
+};
+
 export const fetchFOIRequestDetailsWrapper = (requestId, ministryId) => {
   if (ministryId) {
     return fetchFOIRequestDetails(requestId, ministryId);

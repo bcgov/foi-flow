@@ -5,13 +5,12 @@ import "../dashboard.scss";
 import Grid from "@mui/material/Grid";
 import { makeStyles } from "@material-ui/core/styles";
 import Queue from "./Queue";
-import EventQueue from "../EventQueue"
-import { getMinistryEventQueueTableInfo } from "../EventQueueColumns"
+// import EventQueue from "../EventQueue"
 import AdvancedSearch from "./AdvancedSearch";
 import clsx from "clsx";
 import Divider from "@mui/material/Divider";
 import { ButtonBase } from "@mui/material";
-import { setShowAdvancedSearch, setResumeDefaultSorting, setShowEventQueue } from "../../../../actions/FOI/foiRequestActions";
+import { setShowAdvancedSearch, setResumeDefaultSorting } from "../../../../actions/FOI/foiRequestActions";
 
 const useStyles = makeStyles(() => ({
   displayed: {
@@ -28,12 +27,10 @@ const useStyles = makeStyles(() => ({
 
 const OIDashboard = ({ userDetail }) => {
   const classes = useStyles();
-  //const eventQueueTableInfo = getMinistryEventQueueTableInfo();
   const showAdvancedSearch = useSelector((state) => state.foiRequests.showAdvancedSearch)
-  //const showEventQueue = useSelector((state) => state.foiRequests.showEventQueue);
   const tableInfo = {
     sort: [
-      { field: "ministrySorting", sort: "asc" },
+      { field: "defaultSorting", sort: "asc" },
       // { field: "cfrduedate", sort: "asc" }
     ]
   };
@@ -79,17 +76,16 @@ const OIDashboard = ({ userDetail }) => {
             <ButtonBase
               onClick={() => {
                 dispatch(setShowAdvancedSearch(false));
-                dispatch(setShowEventQueue(false));
                 dispatch(setResumeDefaultSorting(true));
               }}
               disableRipple
             >
               <h3
                 className={clsx("foi-request-queue-text", {
-                  [classes.disabledTitle]: showAdvancedSearch || showEventQueue,
+                  [classes.disabledTitle]: showAdvancedSearch,
                 })}
               >
-                Your FOI Request Queue
+                Your FOI Request Queue - OI
               </h3>
             </ButtonBase>
             <Divider
@@ -105,19 +101,12 @@ const OIDashboard = ({ userDetail }) => {
             />
             <ButtonBase
               onClick={() => {
-                dispatch(setShowEventQueue(true));
+                // dispatch(setShowEventQueue(true));
                 dispatch(setShowAdvancedSearch(false));
                 //dispatch(setResumeDefaultSorting(true));
               }}
               disableRipple
             >
-              {/* <h3
-                className={clsx("foi-request-queue-text", {
-                  [classes.disabledTitle]: !showEventQueue || showAdvancedSearch,
-                })}
-              >
-                Event Queue
-              </h3> */}
             </ButtonBase>
             <Divider
               sx={{
@@ -132,15 +121,15 @@ const OIDashboard = ({ userDetail }) => {
             />
             <ButtonBase
               onClick={() => {
-                dispatch(setShowAdvancedSearch(true));
-                dispatch(setShowEventQueue(false));
+                //dispatch(setShowAdvancedSearch(true));
+                //dispatch(setShowEventQueue(false));
                 dispatch(setResumeDefaultSorting(true));
               }}
               disableRipple
             >
               <h3
                 className={clsx("foi-request-queue-text", {
-                  [classes.disabledTitle]: !showAdvancedSearch || showEventQueue,
+                  [classes.disabledTitle]: !showAdvancedSearch,
                 })}
               >
                 Advanced Search
@@ -148,7 +137,7 @@ const OIDashboard = ({ userDetail }) => {
             </ButtonBase>
           </Grid>
         </Grid>
-        { (!showAdvancedSearch && !showEventQueue) &&
+        { (!showAdvancedSearch) &&
         <Grid
           container
           direction="row"
@@ -163,7 +152,7 @@ const OIDashboard = ({ userDetail }) => {
           <Queue userDetail={userDetail} tableInfo={tableInfo}/>
         </Grid>
         }
-        { showEventQueue &&
+        {/* { showEventQueue &&
         <Grid
           container
           direction="row"
@@ -177,8 +166,8 @@ const OIDashboard = ({ userDetail }) => {
         >
           <EventQueue userDetail={userDetail} eventQueueTableInfo={eventQueueTableInfo} />
         </Grid>
-        }
-        { showAdvancedSearch &&
+        } */}
+        {/* { showAdvancedSearch &&
         <Grid
           container
           direction="row"
@@ -192,7 +181,7 @@ const OIDashboard = ({ userDetail }) => {
         >
           <AdvancedSearch userDetail={userDetail} />
         </Grid>
-        }
+        } */}
       </Grid>
     </div>
   );

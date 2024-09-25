@@ -61,19 +61,24 @@ class DashboardPagination(Resource):
             _keyword = flask.request.args.get('keyword', None, type=str)
 
             groups = AuthHelper.getusergroups()
+            print("authhelper: ",AuthHelper)
             print("authhelper get user type: ",AuthHelper.getusertype())
             print("groups : ",groups)
+            print("queuetype : ",queuetype)
+            requests = None
             statuscode = 200
-            if (AuthHelper.getusertype() == "iao") and (queuetype is None or queuetype == "all"):                                                                                           
+            if (AuthHelper.getusertype() == "iao") and (queuetype is None or queuetype == "all"):     
+                print("dashboard api")                                                                                      
                 requests = dashboardservice().getrequestqueuepagination(groups, _page, _size, _sortingitems, _sortingorders, _filterfields, _keyword, _additionalfilter, _userid)
             elif  queuetype is not None and queuetype == "ministry" and AuthHelper.getusertype() == "ministry":
+                print("ministry api")    
                 requests = dashboardservice().getministryrequestqueuepagination(AuthHelper.getministrygroups(), _page, _size, _sortingitems, _sortingorders, _filterfields, _keyword, _additionalfilter, _userid)
-            elif queuetype is not None and queuetype == "oi":
+            elif (AuthHelper.getusertype() == "iao") and (queuetype is not None and queuetype == "oi"):
                 print("OI TEAM API")
                 requests = dashboardservice().getoirequestqueuepagination(groups, _page, _size, _sortingitems, _sortingorders, _filterfields, _keyword, _additionalfilter, _userid)
             else:
                 statuscode = 401   
-
+            print("requests : ",requests)
             return requests, statuscode
         except BusinessException as exception:
             return {'status': exception.status_code, 'message':exception.message}, 500

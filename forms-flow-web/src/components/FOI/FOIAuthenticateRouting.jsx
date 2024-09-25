@@ -49,6 +49,7 @@ const FOIAuthenticateRouting = React.memo((props) => {
     isMinistry = isMinistryLogin(userGroups);
     isOITeam = isOITeamLogin(userGroups);
   }
+  console.log("isMinistry : ",isMinistry)
   console.log("isOITeam : ",isOITeam)
   return (
       <>
@@ -57,10 +58,13 @@ const FOIAuthenticateRouting = React.memo((props) => {
             <>
               <FOIHeader /> 
               <Route exact path="/foi/dashboard">
-                {isMinistry ? 
-                <MinistryDashboard userDetail={userDetail} />
-                : <Dashboard userDetail={userDetail} />
-                }
+                  {isOITeam ? (
+                  <OIDashboard userDetail={userDetail} />
+                  ) : isMinistry ? (
+                  <MinistryDashboard userDetail={userDetail} />
+                  ) : (
+                  <Dashboard userDetail={userDetail} />
+                  )}
               </Route>
               <Route path="/foi/reviewrequest/:requestId">
                 <FOIRequest userDetail={userDetail} openApplicantProfileModal={openApplicantProfileModal} />
