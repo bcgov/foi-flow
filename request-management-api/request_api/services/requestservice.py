@@ -18,6 +18,7 @@ from request_api.services.subjectcodeservice import subjectcodeservice
 from request_api.models.FOIRequestStatus import FOIRequestStatus
 from request_api.models.FOIRawRequests import FOIRawRequest
 from request_api.models.FOIMinistryRequests import FOIMinistryRequest
+from request_api.models.FOIOpenInformationRequests import FOIOpenInformationRequests
 from request_api.models.FOIMinistryRequestSubjectCodes import (
     FOIMinistryRequestSubjectCode,
 )
@@ -330,4 +331,7 @@ class requestservice:
             current_state = states[0]
             if current_state != "Closed" and any(state['status'] == "Closed" for state in states):
                 return True
-        return False 
+        return False
+    
+    def savefoiopeninforequest(self, foiopeninforequest):
+        pass

@@ -21,6 +21,10 @@ const IAOOpenInfoPublishing = ({ requestNumber, requestDetails, userDetail }: an
     pagereference: "",
     iaorationale: "",
     oifeedback: "",
+    isactive: true,
+    foiministryrequestid: 1,
+    foirequestopeninfoid: 1,
+    version: 1
   }; // AH NOTE -> if data is null -> use the above default state
   const userGroups: string[] = userDetail.groups.map((group : any) => group.slice(1));
   const isOIUser : boolean = userGroups.includes("OI Team");
@@ -56,7 +60,10 @@ const IAOOpenInfoPublishing = ({ requestNumber, requestDetails, userDetail }: an
         onClick={() => {
           console.log("SAVE");
         }}
-        disabled={oiPublicationData?.oipublicationstatus_id === 2} // AH NOTE -> THIS WILL BE BUGGY IF CHANGED BACK TO PUBLISH
+        disabled={(oiPublicationData?.oiexemption_id === null && oiPublicationData?.oipublicationstatus_id === 1) || requestDetails?.oiPublication === null} 
+        // AH NOTE -> THIS WILL BE BUGGY IF CHANGED BACK TO PUBLISH. 
+        // IF status changed back to any other besides do not publish -> wipe data? ASK MATT ON EDITING DATA AFTER AND WIPING DATA IF STATUS CHANGED
+        // Save button disabled = if on original load no foiopeninforequest exists (and using default obj) OR exmeption reason is null && publicationSTatusid is not 2
       >
         Save
       </button>
@@ -65,3 +72,10 @@ const IAOOpenInfoPublishing = ({ requestNumber, requestDetails, userDetail }: an
 };
 
 export default IAOOpenInfoPublishing;
+
+/* To do 
+1. create get, post api route for foioirequest data
+2. trigger get route in FE to gather all the data
+3. trigger post route in FE to post foioi txn data (done when save button clicked and when request is closed)
+4. finalzie FE ux for iao side of things
+*/

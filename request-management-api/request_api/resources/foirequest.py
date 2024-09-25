@@ -26,7 +26,7 @@ from request_api.exceptions import BusinessException
 from request_api.services.requestservice import requestservice
 from request_api.services.rawrequestservice import rawrequestservice
 from request_api.services.eventservice import eventservice
-from request_api.schemas.foirequestwrapper import  FOIRequestWrapperSchema, EditableFOIRequestWrapperSchema, FOIRequestMinistrySchema, FOIRequestStatusSchema
+from request_api.schemas.foirequestwrapper import  FOIRequestWrapperSchema, EditableFOIRequestWrapperSchema, FOIRequestMinistrySchema, FOIRequestStatusSchema, FOIOpenInfoRequestSchema
 from request_api.schemas.foiassignee import FOIRequestAssigneeSchema
 from request_api.utils.enums import StateName
 from marshmallow import Schema, fields, validate, ValidationError
@@ -107,6 +107,17 @@ class FOIRequests(Resource):
             if rawresult.success == True:
                 result = requestservice().saverequest(foirequestschema,AuthHelper.getuserid())
                 if result.success == True:
+
+                    #Create FOIOpenInfoRequest after FOIMinistryRequest has successfully been created
+                    foiministryrequest = result.args[0]
+                    default_foiopeninforequest = {
+                        "foiministryrequest_id": foiministryrequest[0]['id'],
+                        "foiministryrequestversion_id": foiministryrequest[0]['version'],
+                        "oipublicationstatus_id": 2,
+                    }
+                    foiopeninforequestschema = FOIOpenInfoRequestSchema().load(default_foiopeninforequest)
+                    requestservice().savefoiopeninforequest(foiopeninforequestschema)
+
                     requestservice().copywatchers(request_json['id'],result.args[0],AuthHelper.getuserid())
                     requestservice().copycomments(request_json['id'],result.args[0],AuthHelper.getuserid())
                     requestservice().copydocuments(request_json['id'],result.args[0],AuthHelper.getuserid())
@@ -325,4 +336,33 @@ class FOIRequestsById(Resource):
         except KeyError as error:
             return {'status': False, 'message': CUSTOM_KEYERROR_MESSAGE + str(error)}, 400    
         except BusinessException as exception:            
-            return {'status': exception.status_code, 'message':exception.message}, 500 
+            return {'status': exception.status_code, 'message':exception.message}, 500
+        
+@cors_preflight('POST,PUT,OPTIONS')
+@API.route('/foirequests/<int:foirequestid>/openinforequest/<int:foiministryrequestid>/<string:usertype>')
+class FOIOpenInfoRequestById(Resource):
+    """Creates a new version of foi openinfo requests"""
+    @staticmethod
+    @TRACER.trace()
+    @cross_origin(origins=allowedorigins())
+    @auth.require
+    def post(foirequestid,foiministryrequestid):
+        try:
+            request_json = request.get_json()
+        except ValidationError as err:
+            return {'status': False, 'message': str(err)}, 400
+        except KeyError as error:
+            return {'status': False, 'message': CUSTOM_KEYERROR_MESSAGE + str(error)}, 400    
+        except BusinessException as exception:            
+            return {'status': exception.status_code, 'message':exception.message}, 500
+
+
+@cors_preflight('GET,OPTIONS')
+@API.route('/foirequests/<int:foirequestid>/openinforequest/<int:foiministryrequestid>/<string:usertype>')
+class FOIOpenInfoRequest(Resource):
+    """Return request based on foiministryrequestid"""
+    @staticmethod
+    @cross_origin(origins=allowedorigins())
+    @auth.require
+    def get(ministryrequestid,usertype=None):
+        pass
