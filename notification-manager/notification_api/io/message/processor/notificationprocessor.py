@@ -88,6 +88,7 @@ class notificationprocessor:
             comment,
             notification.createdby,
             2,
+            notification.__dict__.get('createdat')
         )
 
     def __notificationmessage(self, username):

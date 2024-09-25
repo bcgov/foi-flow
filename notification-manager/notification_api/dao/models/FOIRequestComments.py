@@ -24,7 +24,7 @@ class FOIRequestComment(object):
 
     
     @classmethod
-    def savecomment(cls, commenttypeid, foirequestcomment, userid): 
+    def savecomment(cls, commenttypeid, foirequestcomment, userid, createdat): 
         conn = None
         try:
             id_of_new_row = None
@@ -39,7 +39,7 @@ class FOIRequestComment(object):
                                 comment, taggedusers, isactive, createdby, created_at, commentsversion) \
                                 VALUES(%s::integer,%s::integer, %s::integer, %s::integer,%s,%s,%s::boolean,%s,%s,%s::integer) RETURNING commentid', 
                                 (parentcommentid, int(data["ministryrequestid"]), int(data["version"]), commenttypeid,
-                                    str(data["comment"]), taggedusers, True, userid, datetime.now(), data["commentsversion"]))
+                                    str(data["comment"]), taggedusers, True, userid, createdat or datetime.now(), data["commentsversion"]))
             conn.commit()
             id_of_new_row = cursor.fetchone()[0]
             cursor.close()

@@ -48,14 +48,19 @@ class FOIMinistryRequestDocument(db.Model):
     @classmethod
     def getactivedocuments(cls,ministryrequestid):
         sql = '''
-            WITH document AS (
+            WITH rawdocument AS (
+                SELECT documentpath, min(foidocumentid) as foidocumentid
+                FROM "FOIRawRequestDocuments"
+                GROUP BY documentpath 
+            ),
+	document AS (
                 SELECT documentpath, min(created_at) AS created_at
                 FROM "FOIMinistryRequestDocuments"
                 GROUP BY documentpath
             )
             SELECT * FROM (
                 SELECT DISTINCT ON (foiministrydocumentid) 
-                    doc.created_at, 
+                    case when rrd.created_at is null then doc.created_at else rrd.created_at end, 
                     fmrd.foiministrydocumentid, 
                     fmrd.filename, 
                     fmrd.documentpath, 
@@ -67,7 +72,10 @@ class FOIMinistryRequestDocument(db.Model):
                 FROM "FOIMinistryRequestDocuments" fmrd 
                 JOIN document doc
                     on doc.documentpath = fmrd.documentpath
-                where fmrd.foiministryrequest_id =:ministryrequestid ORDER BY fmrd.foiministrydocumentid, version DESC) AS list 
+				left JOIN rawdocument rawdoc
+                    on rawdoc.documentpath = fmrd.documentpath
+				left join "FOIRawRequestDocuments" rrd on rrd.foidocumentid =  rawdoc.foidocumentid
+                where fmrd.foiministryrequest_id = :ministryrequestid ORDER BY fmrd.foiministrydocumentid, version DESC) AS list 
             ORDER BY created_at DESC
         '''
         rs = db.session.execute(text(sql), {'ministryrequestid': ministryrequestid})
