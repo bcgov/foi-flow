@@ -64,7 +64,7 @@ flask_jwt_oidc==0.3.0
 maya==0.6.1
 pyjwt==2.4.0
 aws-requests-auth==0.4.3
-holidays==0.12
+holidays==0.45
 Flask-SocketIO==5.3.6
 Flask-Login==0.5.0
 eventlet==0.35.2
