@@ -332,6 +332,3 @@ class requestservice:
             if current_state != "Closed" and any(state['status'] == "Closed" for state in states):
                 return True
         return False
-    
-    def savefoiopeninforequest(self, foiopeninforequest):
-        pass
