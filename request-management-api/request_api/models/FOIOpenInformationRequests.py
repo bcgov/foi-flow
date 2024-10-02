@@ -2,6 +2,7 @@ from .db import db, ma
 from sqlalchemy.sql.schema import ForeignKey
 from datetime import datetime
 from request_api.models.default_method_result import DefaultMethodResult
+from sqlalchemy import text
 from datetime import datetime as datetime2
 import logging
 
@@ -76,10 +77,25 @@ class FOIOpenInformationRequests(db.Model):
             )
             db.session.add(updated_foiopeninforequest)
             db.session.commit()
-            return DefaultMethodResult(True, "FOIOpenInfo request updated", updated_foiopeninforequest.foiopeninforequestid)
+            return DefaultMethodResult(True, "FOIOpenInfo request version updated", updated_foiopeninforequest.foiopeninforequestid)
         except Exception as exception:
             logging.error(f"Error: {exception}")
-            return DefaultMethodResult(False, "FOIOpenInfo request unable to be updated")
+            return DefaultMethodResult(False, "FOIOpenInfo request version unable to be updated")
+        
+    def deactivatefoiopeninforequest(cls, foiopeninforequestid, userid, foiministryrequestid)->DefaultMethodResult:
+        try:
+            sql = """UPDATE public."FOIOpenInformationRequests" 
+            SET isactive=false, updated_at=now(), updatedby=:userid 
+            WHERE foiopeninforequestid=:foiopeninforequestid AND foiministryrequest_id=:foiministryrequestid AND isactive=true 
+            AND version != (SELECT version FROM public."FOIOpenInformationRequests" WHERE foiopeninforequestid = :foiopeninforequestid ORDER BY "version" desc limit 1);"""
+            db.session.execute(text(sql), {'foiopeninforequestid': foiopeninforequestid, 'userid':userid, 'foiministryrequest_id': foiministryrequestid})
+            db.session.commit()
+            return DefaultMethodResult(True, "FOIOpenInfo request version updated", foiopeninforequestid)
+        except Exception as exception:
+            logging.error(f"Error: {exception}")
+            return DefaultMethodResult(False, "FOIOpenInfo request version unable to be updated")
+        finally:
+            db.session.close()
     
 class FOIOpenInfoRequestSchema(ma.schema):
     class Meta:

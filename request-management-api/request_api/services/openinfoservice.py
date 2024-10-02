@@ -17,23 +17,28 @@ class openinfoservice:
     def getopeninfoexemptions (self):
         return OpenInformationExemptions.getallexemptions()
     
-    def getfoiopeninforequest_by_foiministryrequestid(self):
+    def getfoiopeninforequest_by_foiministryrequestid(self, foiministryrequestid):
         pass
     
-    def createopeninforequest(self, foiopeninforequest, userid):
+    def createopeninforequest(self, foiopeninforequest, userid, foiministryrequestid):
         version = FOIMinistryRequest.getversionforrequest(foiopeninforequest["foiministryrequest_id"])
         foiopeninforequest['foiministryrequestversion_id'] = version
+        foiopeninforequest['foiministryrequest_id'] = foiministryrequestid
         result = FOIOpenInformationRequests.createopeninfo(foiopeninforequest, userid)
         return result
 
-    def updateopeninforequest(self, foiopeninforequest, userid):
+    def updateopeninforequest(self, foiopeninforequest, userid, foiministryrequestid):
         prev_foiopeninforequest = self.getfoiopeninforequest_by_foiministryrequestid(foiopeninforequest["foiministryrequest_id"])
         foiministryrequestversion = FOIMinistryRequest.getversionforrequest(foiopeninforequest["foiministryrequest_id"])
         foiopeninforequest['foiministryrequestversion_id'] = foiministryrequestversion
+        foiopeninforequest['foiministryrequest_id'] = foiministryrequestid
         foiopeninforequest['version'] = prev_foiopeninforequest["version"]
         foiopeninforequest["created_at"] = prev_foiopeninforequest["created_at"]
         foiopeninforequest["createdby"] = prev_foiopeninforequest["createdby"]
         result = FOIOpenInformationRequests.updateopeninfo(foiopeninforequest, userid)
-        if result.success:
-            pass #DEACTIVATE PREVIOUS FOIOPENINFO REQUEST isactive=False
-        return result
+        deactivateresult = None
+        if result.success == True:
+            foiopeninfoid = result.args[0]
+            deactivateresult = FOIOpenInformationRequests.deactivatefoiopeninforequest(foiopeninfoid, userid, foiministryrequestid)
+        if result and deactivateresult:
+            return result

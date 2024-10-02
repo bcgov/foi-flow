@@ -7,6 +7,8 @@ from request_api.services.eventservice import eventservice
 from request_api.tracer import Tracer
 from request_api.utils.util import  cors_preflight, allowedorigins, getrequiredmemberships,str_to_bool,canrestictdata,canrestictdata_ministry
 from request_api.exceptions import BusinessException
+from request_api.schemas.foiopeninfo import FOIOpenInfoSchema
+from request_api.services.openinfoservice import openinfoservice
 from marshmallow import Schema, fields, validate, ValidationError
 import json
 import asyncio
@@ -19,7 +21,7 @@ CUSTOM_KEYERROR_MESSAGE = "Key error has occured: "
 @cors_preflight('GET,OPTIONS')
 @API.route('/foiopeninfo/ministryrequest/<int:foiministryrequestid>/<string:usertype>')
 class FOIOpenInfoRequest(Resource):
-    """Return opeinfo based on foiministryrequestid"""
+    """Return openinfo request based on foiministryrequestid"""
     @staticmethod
     @cross_origin(origins=allowedorigins())
     @auth.require
@@ -27,7 +29,6 @@ class FOIOpenInfoRequest(Resource):
         pass
 
 @cors_preflight('POST,OPTIONS') 
-# PUT AND POST ROUTES. IF FE DATA CONTAINS OR SENDS FOIOPENINFO DATA WITH A EXISTING FOIOPENINFOREQUESTID use PUT ROUTE AND USE UPDATESERVICE. IF POST route sent and fe data does not contain a foiopeninforequetst id use post route and createfoiopen service
 @API.route('/foiopeninfo/foirequest/<int:foirequestid>/ministryrequest/<int:foiministryrequestid>/<string:usertype>')
 class FOIOpenInfoRequestById(Resource):
     """Creates a foi openinfo request for ministry(opened) requests"""
@@ -38,6 +39,11 @@ class FOIOpenInfoRequestById(Resource):
     def post(foiministryrequestid):
         try:
             request_json = request.get_json()
+            foiopeninfo = FOIOpenInfoSchema().load(request_json)
+            userid = AuthHelper.getuserid()
+            result = openinfoservice.createopeninforequest(foiopeninfo, userid, foiministryrequestid)
+            if result.success:
+                return {'status': result.success, 'message': result.message, 'id': result.identifier}, 200
         except ValidationError as err:
             return {'status': False, 'message': str(err)}, 400
         except KeyError as error:
@@ -57,6 +63,11 @@ class FOIOpenInfoRequestById(Resource):
     def put(foiministryrequestid):
         try:
             request_json = request.get_json()
+            foiopeninfo = FOIOpenInfoSchema().load(request_json)
+            userid = AuthHelper.getuserid()
+            result = openinfoservice.updateopeninforequest(foiopeninfo, userid, foiministryrequestid)
+            if result.success:
+                return {'status': result.success, 'message': result.message, 'id': result.identifier}, 200
         except ValidationError as err:
             return {'status': False, 'message': str(err)}, 400
         except KeyError as error:

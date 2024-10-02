@@ -4,7 +4,6 @@ class FOIOpenInfoSchema(Schema):
     class Meta:  # pylint: disable=too-few-public-methods
         """Exclude unknown fields in the deserialized output."""
         unknown = EXCLUDE    
-    foiministryrequest_id = fields.Int(data_key="foiministryrequest_id")
     oipublicationstatus_id = fields.Int(data_key="oipublicationstatus_id")
     oiexemption_id = fields.Int(data_key="oiexemption_id",allow_none=True)
     oiassignedto = fields.Str(data_key="oiassignedto",allow_none=True)
