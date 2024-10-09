@@ -87,6 +87,7 @@ import {
   ConditionalComponent,
   formatDate,
   isRequestRestricted,
+  convertSTRToDate
 } from "../../../helper/FOI/helper";
 import DivisionalTracking from "./DivisionalTracking";
 import RedactionSummary from "./RedactionSummary";
@@ -104,6 +105,7 @@ import { setFOIRequestDetail } from "../../../actions/FOI/foiRequestActions";
 import OIPCDetails from "./OIPCDetails/Index";
 import useOIPCHook from "./OIPCDetails/oipcHook";
 import MANDATORY_FOI_REQUEST_FIELDS from "../../../constants/FOI/mandatoryFOIRequestFields";
+import RequestHistorySection from "../customComponents/RequestHistory";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -181,6 +183,8 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
 
   const [unsavedPrompt, setUnsavedPrompt] = useState(false);
   const [unsavedMessage, setUnsavedMessage] = useState(<></>);
+  const commentTypes = useSelector((state) => state.foiRequests.foiCommentTypes); 
+
   const handleUnsavedContinue = () => {
     window.removeEventListener("popstate", handleOnHashChange);
     window.removeEventListener("beforeunload", handleBeforeUnload);
@@ -235,6 +239,10 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
       active: false,
     },
     Records: {
+      display: false,
+      active: false,
+    },
+    RequestHistory: {
       display: false,
       active: false,
     },
@@ -1032,6 +1040,22 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
       requestDetails?.requestType === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_GENERAL)
   }
 
+  const getMergedHistory = (applicantCorrespondence, requestNotes) => {
+    const mergedHistory = [
+      ...(applicantCorrespondence || []).map((message) => ({
+        ...message,
+        type: 'message',
+        created_at: message.created_at ? convertSTRToDate(message.created_at) : message.created_at  
+      })),
+      ...(requestNotes || []).map((comment) => ({
+        ...comment,
+        type: 'comment'
+      }))
+    ];
+
+    return mergedHistory.sort((a, b) => new Date(a.created_at || a.dateUF) - new Date(b.created_at || b.dateUF));
+  };
+
   return (!isLoading &&
     requestDetails &&
     Object.keys(requestDetails).length !== 0) ||
@@ -1134,6 +1158,18 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
                 )}
               </>
             )}
+            <div
+              className={clsx("tablinks", {
+                active: tabLinksStatuses.RequestHistory.active,
+              })}
+              name="RequestHistory"
+              onClick={() => tabclick("RequestHistory")}
+            >
+              Request History{" "}
+              {getMergedHistory(applicantCorrespondence, requestNotes).length ?
+                `(${(getMergedHistory(applicantCorrespondence, requestNotes).length || 0)})`
+                : ""}
+            </div>
           </div>
 
           <div className="foileftpanelstatus">
@@ -1671,6 +1707,41 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
               )}
             </div>
           )}
+          <div
+            id="RequestHistory"
+            className={clsx("tabcontent", {
+              active: tabLinksStatuses.RequestHistory.active,
+              [classes.displayed]: tabLinksStatuses.RequestHistory?.display,
+              [classes.hidden]: !tabLinksStatuses.RequestHistory?.display,
+            })}
+          >
+            {!isLoading && (requestNotes || applicantCorrespondence) ? (
+              <>
+                <RequestHistorySection
+                  requestHistoryArray={getMergedHistory(applicantCorrespondence, requestNotes)}
+                  currentUser={
+                    userId && {
+                      userId: userId,
+                      avatarUrl: avatarUrl,
+                      name: fullName,
+                    }
+                  }
+                  bcgovcode={bcgovcode}
+                  requestid={requestId}
+                  iaoassignedToList={iaoassignedToList}
+                  ministryAssignedToList={ministryAssignedToList}
+                  requestNumber={requestNumber}
+                  isRestricted={isRequestRestricted(requestDetails, ministryId)}
+                  isMinistry={false}
+                  commentTypes={commentTypes}
+                  ministryId={ministryId}
+                  applicantCorrespondenceTemplates={applicantCorrespondenceTemplates}
+                />
+              </>
+            ) : (
+              <Loading />
+            )}
+          </div>
           <UnsavedModal
             modalOpen={unsavedPrompt}
             handleClose={() => setUnsavedPrompt(false)}

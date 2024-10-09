@@ -12,11 +12,14 @@ let isBetween = require("dayjs/plugin/isBetween");
 let utc = require("dayjs/plugin/utc");
 let timezone = require("dayjs/plugin/timezone");
 let CryptoJS = require("crypto-js");
+let customParseFormat = require("dayjs/plugin/customParseFormat");
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
 dayjs.extend(isBetween);
 dayjs.extend(dayjsBusinessDays);
+dayjs.extend(customParseFormat); 
+
 const hd = new DateHolidayjs("CA", "BC");
 
 const replaceUrl = (URL, key, value) => {
@@ -510,6 +513,26 @@ const readUploadedFileAsBytes = (inputFile) => {
   });
 };
 
+const getCommentTypeIdByName = (commentTypes, name) => {
+  const commentType = commentTypes?.find(type => type.name === name);
+  return commentType ? commentType.commenttypeid : 0;
+};
+
+const getCommentTypeFromId = (commentTypes, id) => {
+  const commentType = commentTypes?.find(type => type.commenttypeid === id);
+  if(commentType != null && commentType != undefined){
+    if(commentType.name == "User submitted")
+      return "general";
+    else
+      return commentType.name?.toLowerCase()
+  }
+  return "";
+};
+
+const convertSTRToDate = (dateString) => {
+  return dayjs(dateString, "YYYY MMM DD | hh:mm A").utc().format("YYYY-MM-DDTHH:mm:ss.SSS[Z]");
+};
+
 export {
   replaceUrl,
   formatDate,
@@ -545,5 +568,8 @@ export {
   isrecordtimeout,
   isFoiAdmin,
   readUploadedFileAsBytes,
-  getUserFullName
+  getUserFullName,
+  getCommentTypeIdByName,
+  getCommentTypeFromId,
+  convertSTRToDate
 };
