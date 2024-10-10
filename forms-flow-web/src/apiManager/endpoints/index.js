@@ -33,6 +33,9 @@ const API = {
   FOI_PERSONAL_DIVISIONS_SECTIONS: `${FOI_BASE_API_URL}/api/foiflow/divisions/<bcgovcode>/true/divisionsandsections`,
   FOI_PERSONAL_SECTIONS: `${FOI_BASE_API_URL}/api/foiflow/divisions/<bcgovcode>/true/sections`,
   FOI_PERSONAL_DIVISIONS: `${FOI_BASE_API_URL}/api/foiflow/divisions/<bcgovcode>/true/divisions`,
+  FOI_PERSONAL_PEOPLE: `${FOI_BASE_API_URL}/api/foiflow/divisions/<bcgovcode>/true/people`,
+  FOI_PERSONAL_FILETYPES: `${FOI_BASE_API_URL}/api/foiflow/divisions/<bcgovcode>/true/filetypes`,
+  FOI_PERSONAL_VOLUMES: `${FOI_BASE_API_URL}/api/foiflow/divisions/<bcgovcode>/true/volumes`,
   FOI_POST_RAW_REQUEST_WATCHERS: `${FOI_BASE_API_URL}/api/foiwatcher/rawrequest`,
   FOI_GET_RAW_REQUEST_WATCHERS: `${FOI_BASE_API_URL}/api/foiwatcher/rawrequest/<requestid>`,
   FOI_POST_MINISTRY_REQUEST_WATCHERS: `${FOI_BASE_API_URL}/api/foiwatcher/ministryrequest`,
@@ -125,6 +128,7 @@ const API = {
   FOI_REPLACE_RECORDS: `${FOI_BASE_API_URL}/api/foirecord/<requestid>/ministryrequest/<ministryrequestid>/record/<recordid>/replace`,
   FOI_POST_RECORDS: `${FOI_BASE_API_URL}/api/foirecord/<requestid>/ministryrequest/<ministryrequestid>`,
   FOI_UPDATE_RECORDS: `${FOI_BASE_API_URL}/api/foirecord/<requestid>/ministryrequest/<ministryrequestid>/update`,
+  FOI_UPDATE_PERSONAL_ATTRIBUTES: `${FOI_BASE_API_URL}/api/foirecord/<requestid>/ministryrequest/<ministryrequestid>/updatepersonalattributes`,
   DOC_REVIEWER_DELETE_RECORDS: `${DOC_REVIEWER_BASE_API_URL}/api/document/delete`,
   DOC_REVIEWER_REDACTED_SECTIONS: `${DOC_REVIEWER_BASE_API_URL}/api/redactedsections/ministryrequest/<ministryrequestid>`,
   
@@ -165,5 +169,6 @@ const API = {
   FOI_GET_OIPC_STATUSES: `${FOI_BASE_API_URL}/api/foiflow/oipc/statuses`,
   FOI_GET_OIPC_REVIEWTYPES: `${FOI_BASE_API_URL}/api/foiflow/oipc/reviewtypes`,
   FOI_GET_OIPC_INQUIRYOUTCOMES: `${FOI_BASE_API_URL}/api/foiflow/oipc/inquiryoutcomes`,
+  FOI_GET_COMMENT_TYPES: `${FOI_BASE_API_URL}/api/foiflow/commenttypes`,
 };
 export default API;

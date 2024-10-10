@@ -8,7 +8,7 @@ services:
       dockerfile: Dockerfile
       args:
         - NODE_ENV=${NODE_ENV:-development}
-        - GENERATE_SOURCEMAP=false
+        - GENERATE_SOURCEMAP=${GENERATE_SOURCEMAP}
         - REACT_APP_CLIENT_ROLE=${CLIENT_ROLE:-formsflow-client}
         - REACT_APP_STAFF_REVIEWER_ROLE=${REVIEWER_ROLE:-formsflow-reviewer}
         - REACT_APP_STAFF_DESIGNER_ROLE=${DESIGNER_ROLE:-formsflow-designer}
@@ -35,6 +35,7 @@ services:
         - REACT_APP_FOI_FLOW_REPORTING_URL=${FOI_FLOW_REPORTING_URL}
         - REACT_APP_AXIS_API_URL=${AXIS_API_URL}
         - REACT_APP_SOCKETIO_CONNECT_NONCE=${SOCKETIO_CONNECT_NONCE}
+        - REACT_APP_SESSION_SECURITY_KEY=${REACT_APP_SESSION_SECURITY_KEY}
     volumes:
       - ".:/app"
       - "/app/node_modules"

@@ -9,6 +9,7 @@ from request_api.models.FOIRawRequests import FOIRawRequest
 from request_api.services.assigneeservice import assigneeservice
 from request_api.services.watcherservice import watcherservice
 from request_api.models.default_method_result import DefaultMethodResult
+from request_api.models.CommentTypes import CommentType
 import json
 from dateutil.parser import parse
 import datetime
@@ -50,6 +51,19 @@ class commentservice:
             commentsversion = result.args[1]
             if commentsversion and commentsversion > 0:
                deactivateresult = FOIRequestComment.deactivatecomment(commentid, userid, commentsversion)
+            """ Commenting out the code for updating the comment type of 
+                child comments(replies) if the commenttype of parent comment is
+                updated - A new US will cover this feature.
+              """
+            #commenttypeid = result.args[2]
+            #print("commenttypeid!!:",commenttypeid)
+            # if commenttypeid is not None and commenttypeid != data["commenttypeid"]:
+            #     childresult = FOIRequestComment.updatechildcomments(commentid, data, userid)
+            #     if childresult.success == True:
+            #         childcomments = childresult.args[2]
+            #         #print("childcomments:",childcomments)
+            #         if childcomments is not None:
+            #             FOIRequestComment.deactivatechildcomments(commentid, userid, childcomments)
         if result and deactivateresult:
             return result
         return DefaultMethodResult(False,'Error in editing comment',commentid)
@@ -61,6 +75,19 @@ class commentservice:
             commentsversion = result.args[1]
             if commentsversion and commentsversion > 0:
               deactivateresult = FOIRawRequestComment.deactivatecomment(commentid, userid, commentsversion)
+            """ Commenting out the code for updating the comment type of 
+                child comments(replies) if the commenttype of parent comment is
+                updated - A new US will cover this feature.
+            """
+            #commenttypeid = result.args[2]
+            #print("commenttypeid!:",commenttypeid)
+            # if commenttypeid is not None and commenttypeid != data["commenttypeid"]:
+            #     childresult = FOIRawRequestComment.updatechildcomments(commentid, data, userid)
+            #     if childresult.success == True:
+            #         childcomments = childresult.args[2]
+            #         #print("childcomments:",childcomments)
+            #         if childcomments is not None:
+            #             FOIRawRequestComment.deactivatechildcomments(commentid, userid, childcomments)
         if result and deactivateresult:
             return result
         return DefaultMethodResult(False,'Error in editing raw request comment',commentid) 
@@ -107,7 +134,7 @@ class commentservice:
             if entry['parentcommentid'] is not None:
                 for _comment in comments:
                     if entry['parentcommentid'] == _comment['commentId']:
-                        _comment['replies'].append(self.__comment(entry))            
+                        _comment['replies'].append(self.__comment(entry))   
         return comments        
     
     def __parentcomments(self, data):
@@ -183,3 +210,13 @@ class commentservice:
         user['fullname'] = lastname+", "+firstname
         user['name'] = lastname+", "+firstname
         return user
+    
+    def getcommenttypes(self):
+        """ Returns the active commenttypes
+        """
+        return CommentType().getcommenttypes()
+    
+    def getcommenttypeidbyname(self, name):
+         commenttype= CommentType().getcommenttypeidbyname(name)
+         val = commenttype['commenttypeid']
+         return val

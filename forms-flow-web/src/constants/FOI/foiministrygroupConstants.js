@@ -4,6 +4,7 @@ const MINISTRYGROUPS = {
     AGR : "AGR Ministry Team",
     BRD : "BRD Ministry Team",
     CAS : "CAS Ministry Team",
+    CAF : "CAF Ministry Team",
     MCF : "MCF Ministry Team",
     CLB : "CLB Ministry Team",
     CITZ : "CITZ Ministry Team",

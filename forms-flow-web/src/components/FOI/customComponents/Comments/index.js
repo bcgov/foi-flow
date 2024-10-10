@@ -5,8 +5,11 @@ import DisplayComments from './DisplayComments'
 import { ActionProvider } from './ActionContext'
 import Input from './Input'
 import CommentFilter from './CommentFilter'
-import { getMinistryRestrictedTagList } from "../../../../helper/FOI/helper";
+import { getMinistryRestrictedTagList, getCommentTypeIdByName, getCommentTypeFromId } from "../../../../helper/FOI/helper";
 import Loading from "../../../../containers/Loading";
+//import { CommentTypes } from '../../../../constants/FOI/enum' 
+import {fetchFOICommentTypes} from "../../../../apiManager/services/FOI/foiMasterDataServices";
+
 
 
 export const CommentSection = ({
@@ -15,10 +18,10 @@ export const CommentSection = ({
   setComment,
   signinUrl,
   signupUrl,
+  bcgovcode,
   customInput,
   requestid,
   ministryId,
-  bcgovcode,
   iaoassignedToList,
   ministryAssignedToList,
   requestNumber,
@@ -27,21 +30,59 @@ export const CommentSection = ({
   removeComment,
   setRemoveComment,
   restrictionType,
-  isRestricted
+  isRestricted,
+  isMinistry,
+  commentTypes
 }) => {
   const requestWatchers = useSelector((state) => state.foiRequests.foiWatcherList);
   const [showaddbox, setshowaddbox] = useState(false)
   const [comments, setcomments] = useState([])
+  const [commentTypeId, setCommentTypeId] = useState(1);
+  
   let _commentcategory = sessionStorage.getItem('foicommentcategory')
   const [filterValue, setfilterValue] = useState(_commentcategory === '' || _commentcategory === undefined || _commentcategory === null  ? 1 : parseInt(_commentcategory))
   const [filterkeyValue, setfilterkeyValue] = useState("")
+
+  // useEffect(() => {
+  //   console.log("setTeamTagList useeffect")
+  //   setTeamTagList()
+  // }, [])
+
   useEffect(() => {
-    let _commentsbyCategory = parseInt(filterValue) === -1 ? commentsArray :  commentsArray.filter(c => c.commentTypeId === parseInt(filterValue))
-    let _filteredcomments = filterkeyValue === "" ? _commentsbyCategory : _commentsbyCategory.filter(c => c.text.toLowerCase().indexOf(filterkeyValue.toLowerCase()) > -1)
+    let _commentsbyCategory = filterCommentFn() 
+    let _filteredcomments = filterkeyValue === "" ? _commentsbyCategory : (_commentsbyCategory.filter(c => c.text.toLowerCase().indexOf(filterkeyValue.toLowerCase()) > -1
+    || getCommentTypeFromId(commentTypes, c.commentTypeId)?.indexOf(filterkeyValue.toLowerCase()) > -1))
     let filteredcomments = filterkeyinCommentsandReplies(_commentsbyCategory,_filteredcomments)        
     setcomments(filteredcomments)
   }, [filterValue,commentsArray ,filterkeyValue])
   let restrictedReqTaglist = useSelector((state) => state.foiRequests.restrictedReqTaglist);
+
+
+  const filterCommentFn = () => {
+    if(parseInt(filterValue) === -1){
+      if(isMinistry)
+        return commentsArray.filter(c => c.commentTypeId !== getCommentTypeIdByName(commentTypes, "IAO Internal") && 
+            c.commentTypeId !== getCommentTypeIdByName(commentTypes, "IAO Peer Review") )
+      else
+        return commentsArray.filter(c => c.commentTypeId !== getCommentTypeIdByName(commentTypes,"Ministry Internal") && 
+            c.commentTypeId !== getCommentTypeIdByName(commentTypes, "Ministry Peer Review"))
+      //return commentsArray;
+    }    
+    else{
+      if(parseInt(filterValue) === 1){
+        if(isMinistry)
+          return commentsArray.filter(c => c.commentTypeId === parseInt(filterValue) || 
+            c.commentTypeId === getCommentTypeIdByName(commentTypes, "Ministry Internal") || 
+              c.commentTypeId === getCommentTypeIdByName(commentTypes, "Ministry Peer Review") )
+        else
+          return commentsArray.filter(c => c.commentTypeId === parseInt(filterValue) || 
+            c.commentTypeId === getCommentTypeIdByName(commentTypes,"IAO Internal") || 
+              c.commentTypeId === getCommentTypeIdByName(commentTypes, "IAO Peer Review"))
+      }
+      else
+        return commentsArray.filter(c => c.commentTypeId === parseInt(filterValue))
+    }
+  }
 
   const onfilterchange = (_filterValue) => { 
     sessionStorage.setItem('foicommentcategory',_filterValue)   
@@ -76,6 +117,7 @@ export const CommentSection = ({
       }  
   }
 
+
   return (
     <>
     <ActionProvider
@@ -105,16 +147,20 @@ export const CommentSection = ({
         <div className="inputBox" style={{ display: showaddbox ? 'block' : 'none' }}>
           {<Input add="add"  bcgovcode={bcgovcode} iaoassignedToList={iaoassignedToList} ministryAssignedToList={ministryAssignedToList} //Handles Navigate Away
           setEditorChange={setEditorChange} removeComment={removeComment} setRemoveComment={setRemoveComment} 
-          restrictedReqTaglist={restrictionType == "ministry"?getMinistryRestrictedTagList():restrictedReqTaglist} isRestricted={isRestricted} />}
+          restrictedReqTaglist={restrictionType == "ministry"?getMinistryRestrictedTagList():restrictedReqTaglist} 
+          isRestricted={isRestricted} isMinistry={isMinistry} setshowaddbox={setshowaddbox} commentTypes={commentTypes} 
+          commentTypeId={commentTypeId} setCommentTypeId={setCommentTypeId} />}
         </div> :null}
         <div className="displayComments">
           <div className="filterComments" >
-            <CommentFilter oncommentfilterchange={onfilterchange} filterValue={filterValue === null ? 1 : filterValue} oncommentfilterkeychange={(k)=>{setfilterkeyValue(k)}}/>
+            <CommentFilter oncommentfilterchange={onfilterchange} filterValue={filterValue === null ? 1 : filterValue} 
+              oncommentfilterkeychange={(k)=>{setfilterkeyValue(k)}} isMinistry={isMinistry} />
           </div>
           <DisplayComments comments={comments} bcgovcode={bcgovcode} currentUser={currentUser} iaoassignedToList={iaoassignedToList} ministryAssignedToList={ministryAssignedToList} 
            restrictedReqTaglist={restrictionType == "ministry"?getMinistryRestrictedTagList():restrictedReqTaglist} isRestricted={isRestricted}
           //Handles Navigate Away
-          setEditorChange={setEditorChange} removeComment={removeComment} setRemoveComment={setRemoveComment} />
+          setEditorChange={setEditorChange} removeComment={removeComment} setRemoveComment={setRemoveComment}  
+          commentTypes={commentTypes} commentTypeId={commentTypeId} setCommentTypeId={setCommentTypeId} isMinistry={isMinistry}/>
         </div>
 
       </div>

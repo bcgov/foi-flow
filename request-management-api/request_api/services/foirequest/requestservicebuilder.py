@@ -31,6 +31,7 @@ class requestservicebuilder(requestserviceconfigurator):
         foiministryrequest.axisrequestid = requestschema.get("axisRequestId")
         foiministryrequest.axissyncdate = requestschema.get("axisSyncDate")
         foiministryrequest.axispagecount = requestschema.get("axispagecount")
+        foiministryrequest.axislanpagecount = requestschema.get("axislanpagecount")
         foiministryrequest.recordspagecount = requestschema.get("recordspagecount")
         foiministryrequest.filenumber = self.generatefilenumber(ministry["code"], requestschema.get("foirawrequestid")) if filenumber is None else filenumber
         foiministryrequest.programareaid = self.getvalueof("programArea",ministry["code"])
@@ -39,6 +40,8 @@ class requestservicebuilder(requestserviceconfigurator):
         foiministryrequest.linkedrequests = requestschema.get("linkedRequests")
         foiministryrequest.identityverified = requestschema.get("identityVerified")
         foiministryrequest.originalldd = requestschema.get("originalDueDate")
+        foiministryrequest.estimatedpagecount = requestschema.get("estimatedpagecount")
+        foiministryrequest.estimatedtaggedpagecount = requestschema.get("estimatedtaggedpagecount")
         if requestschema.get("isoipcreview") is not None and requestschema.get("isoipcreview")  != "":
             foiministryrequest.isoipcreview = requestschema.get("isoipcreview")
             foiministryrequest.oipcreviews = self.prepareoipc(requestschema, ministryid, activeversion, userid)
@@ -53,6 +56,7 @@ class requestservicebuilder(requestserviceconfigurator):
         foiministryrequest.startdate = startdate
         foiministryrequest.createdby = userid
         requeststatuslabel =  self.getpropertyvaluefromschema(requestschema, 'requeststatuslabel')
+        foiministryrequest.userrecordslockstatus = requestschema.get("userrecordslockstatus")
         if requeststatuslabel is not None:
             status = self.getstatusname(requeststatuslabel)
         if self.isNotBlankorNone(requestschema,"fromDate","main") == True:
