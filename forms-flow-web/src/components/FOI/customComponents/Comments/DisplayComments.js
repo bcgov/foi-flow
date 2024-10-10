@@ -4,18 +4,13 @@ import InputField from './InputField'
 import { ActionContext } from './ActionContext'
 import 'reactjs-popup/dist/index.css'
 import CommentStructure from './CommentStructure'
-import { addToFullnameList, getFullnameList, getCommentTypeIdByName, getIAOTagList, getAssignToList, setTeamTagList } from '../../../../helper/FOI/helper'
+import { addToFullnameList, getFullnameList } from '../../../../helper/FOI/helper'
 
 
 const DisplayComments = ({ comments, bcgovcode, currentUser, iaoassignedToList, ministryAssignedToList, restrictedReqTaglist, isRestricted,
-  setEditorChange, removeComment, setRemoveComment, commentTypes,commentTypeId, setCommentTypeId, isMinistry}) => {
+  setEditorChange, removeComment, setRemoveComment }) => {
 
   const [fullnameList, setFullnameList] = useState(getFullnameList);
-
-
-  useEffect(() => {
-    setTeamTagList(bcgovcode)
-  }, [fullnameList])
 
   const finduserbyuserid = (userId) => {
     let user = fullnameList.find(u => u.username === userId);
@@ -23,7 +18,7 @@ const DisplayComments = ({ comments, bcgovcode, currentUser, iaoassignedToList, 
   }
 
   const getfullName = (commenttypeid, userId) => {
-    if (commenttypeid !== 2 && commenttypeid !== 3) {
+    if (commenttypeid === 1) {
       if (fullnameList) {
         return finduserbyuserid(userId)
       } else {
@@ -128,14 +123,12 @@ const DisplayComments = ({ comments, bcgovcode, currentUser, iaoassignedToList, 
     return i.replies?.length > 0 ? -100 : -101
   }
 
-  
-
   const renderreplies = (i) => {
 
     return (i.replies && i.replies.sort((a, b) => { return a.commentId - b.commentId }) &&
       i.replies.map((a, replyindex) => (
         <div key={a.commentId}>
-          { fullnameList?.length > 0 && actions.editArr.filter((id) => id === a.commentId).length !==
+          {actions.editArr.filter((id) => id === a.commentId).length !==
             0 ? (
             <InputField
               cancellor={a.commentId}
@@ -147,21 +140,13 @@ const DisplayComments = ({ comments, bcgovcode, currentUser, iaoassignedToList, 
               isRestricted = {isRestricted}
               //Handles Navigate Away
               setEditorChange={setEditorChange} removeComment={removeComment} setRemoveComment={setRemoveComment}
-              commentTypeId={i.commentTypeId}
-              newCommentTypeId={commentTypeId}
-              setCommentTypeId={setCommentTypeId}
-              commentTypes={commentTypes}
-              isMinistry={isMinistry}
-              bcgovcode={bcgovcode}
             />
           ) : (
             <CommentStructure
               i={a}
               reply
               parentId={i.commentId}
-              handleEdit={() => actions.handleAction} totalcommentCount={i.replies.length} currentIndex={replyindex} isreplysection={true} hasAnotherUserComment={false} 
-              fullName={getfullName(a.commentTypeId, a.userId)}
-              commentTypes={commentTypes}
+              handleEdit={() => actions.handleAction} totalcommentCount={i.replies.length} currentIndex={replyindex} isreplysection={true} hasAnotherUserComment={false} fullName={getfullName(a.commentTypeId, a.userId)}
             />
           )}
           {actions.replies.filter((id) => id === a.commentId).length !==
@@ -175,8 +160,7 @@ const DisplayComments = ({ comments, bcgovcode, currentUser, iaoassignedToList, 
                 handleCancel: actions.handleCancel,
                 edit: false
               })
-            ) : ( 
-              fullnameList?.length > 0 &&
+            ) : (
               <InputField
                 cancellor={a.commentId}
                 parentId={i.commentId}
@@ -186,13 +170,7 @@ const DisplayComments = ({ comments, bcgovcode, currentUser, iaoassignedToList, 
                 isRestricted={isRestricted}
                 //Handles Navigate Away
                 setEditorChange={setEditorChange} removeComment={removeComment} setRemoveComment={setRemoveComment}
-                commentTypeId={i.commentTypeId}
-                newCommentTypeId={commentTypeId}
-                setCommentTypeId={setCommentTypeId}
-                commentTypes={commentTypes}
-                isMinistry={isMinistry}
-                bcgovcode={bcgovcode}
-              />           
+              />
             ))}
         </div>
       )))
@@ -204,25 +182,18 @@ const DisplayComments = ({ comments, bcgovcode, currentUser, iaoassignedToList, 
     {
         return (
           comments.map((i, index) => (
-            <>
             <div key={i.commentId} className="commentsection" data-comid={i.commentId} name={index >= limit ? 'commentsectionhidden' : ""} style={index >= limit && !showmorehidden ? { display: 'none' } : { display: 'block' }}>
-              {fullnameList?.length > 0 && actions.editArr.filter((id) => id === i.commentId).length !== 0 ? (
+              {actions.editArr.filter((id) => id === i.commentId).length !== 0 ? (
                 <InputField cancellor={i.commentId} inputvalue={i.text} edit fullnameList={fullnameList} restrictedReqTaglist={restrictedReqTaglist} isRestricted={isRestricted} //Handles Navigate Away
-                  setEditorChange={setEditorChange} removeComment={removeComment} setRemoveComment={setRemoveComment} 
-                  commentTypeId={i.commentTypeId} newCommentTypeId={commentTypeId} setCommentTypeId={setCommentTypeId} 
-                  commentTypes={commentTypes} isMinistry={isMinistry} bcgovcode={bcgovcode}/>
+                  setEditorChange={setEditorChange} removeComment={removeComment} setRemoveComment={setRemoveComment} />
               ) : (
-                <CommentStructure i={i} handleEdit={() => actions.handleAction} totalcommentCount={gettotalcommentflag(i)} currentIndex={index} c={false} 
-                  hasAnotherUserComment={(i.replies && i.replies.filter(r => r.userId !== currentUser.userId).length > 0)} 
-                  fullName={getfullName(i.commentTypeId, i.userId)} commentTypes={commentTypes} />
+                <CommentStructure i={i} handleEdit={() => actions.handleAction} totalcommentCount={gettotalcommentflag(i)} currentIndex={index} c={false} hasAnotherUserComment={(i.replies && i.replies.filter(r => r.userId !== currentUser.userId).length > 0)} fullName={getfullName(i.commentTypeId, i.userId)} />
               )}
               {
-                fullnameList?.length > 0 && actions.replies.filter((id) => id === i.commentId).length !== 0 &&
+                actions.replies.filter((id) => id === i.commentId).length !== 0 &&
                 (
                   <InputField cancellor={i.commentId} parentId={i.commentId} fullnameList={fullnameList} restrictedReqTaglist={restrictedReqTaglist} isRestricted={isRestricted} //Handles Navigate Away
-                    setEditorChange={setEditorChange} removeComment={removeComment} setRemoveComment={setRemoveComment} 
-                    commentTypeId={i.commentTypeId} newCommentTypeId={commentTypeId} setCommentTypeId={setCommentTypeId} 
-                    commentTypes={commentTypes} isMinistry={isMinistry} bcgovcode={bcgovcode}/>
+                    setEditorChange={setEditorChange} removeComment={removeComment} setRemoveComment={setRemoveComment} />
                 )
               }
               <div className="replySection">
@@ -231,7 +202,6 @@ const DisplayComments = ({ comments, bcgovcode, currentUser, iaoassignedToList, 
                 }
               </div>
             </div>
-            </>
           ))
 
 

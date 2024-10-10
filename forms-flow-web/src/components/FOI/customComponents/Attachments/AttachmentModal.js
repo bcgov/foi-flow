@@ -72,15 +72,7 @@ export default function AttachmentModal({
   replacementfiletypes = [],
   totalUploadedRecordSize = 0,
   requestType = FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_GENERAL,
-  currentResponseDate = "",
-  isScanningTeamMember = false,
-  curPersonalAttributes = {
-    person: "",
-    filetype: "",
-    volume: "",
-    trackingid: "",
-    personaltag: "TBD"
-  }
+  currentResponseDate = ""
 }) {
   let tagList = [];
   if (uploadFor === "attachment") {
@@ -98,21 +90,6 @@ export default function AttachmentModal({
       };
     });
   }
-
-  const MCFSections = useSelector(
-    (state) => state.foiRequests.foiPersonalSections
-  );
-  const MSDSections = useSelector(
-    (state) => state.foiRequests.foiPersonalDivisionsAndSections
-  );
-  const [TBDID, setTBDID] = useState(0);
-  useEffect(() => {
-    setTBDID(
-      MCFSections?.sections?.find(
-        (division) => division.name === "TBD"
-      )?.divisionid
-    );
-  }, [MCFSections]);
 
   const recordFormats = useSelector((state) => state.foiRequests.recordFormats);
   useEffect(() => {
@@ -173,11 +150,6 @@ export default function AttachmentModal({
   const [tagValue, setTagValue] = useState(
     uploadFor === "record" ? "" : "general"
   );
-  const [person, setPerson] = useState({});
-  const [volume, setVolume] = useState({});
-  const [fileType, setFileType] = useState({});
-  const [trackingID, setTrackingID] = useState("");
-  const [personalTag, setPersonalTag] = useState({});
   const attchmentFileNameList = attachmentsArray.map((_file) =>
     _file.filename.toLowerCase()
   );
@@ -305,97 +277,33 @@ export default function AttachmentModal({
       handleModal(false);
       parseFileName(attachment);
     }
-    if (uploadFor === "record") {
-      setTagValue("");
-      setPerson({});
-      setVolume({});
-      setFileType({});
-      setTrackingID("");
-      setPersonalTag({});
-    }
+    if (uploadFor === "record") setTagValue("");
   };
 
   const handleTagChange = (_tagValue) => {
     setTagValue(_tagValue);
   };
 
-  const handlePersonChange = (_tagValue) => {
-    setPerson(_tagValue);
-  };
-
-  const handleVolumeChange = (_tagValue) => {
-    setVolume(_tagValue);
-  };
-
-  const handleFileTypeChange = (_tagValue) => {
-    setFileType(_tagValue);
-  };
-
-  const handleTrackingIDChange = (_tagValue) => {
-    setTrackingID(_tagValue);
-  };
-
-  const handlePersonalTagChange = (_tagValue) => {
-    setPersonalTag(_tagValue);
-  }
-
   const handleSave = () => {
     if (modalFor.toLowerCase() === "delete") {
       handleModal(true, null, null);
     } else {
-      let _tagValue = tagValue;
       let fileInfoList = [];
 
       let fileStatusTransition = "";
-      let personalAttributes = {};
       if (modalFor === "replace" || modalFor === "replaceattachment") {
         fileStatusTransition = attachment?.category;
-        if (
-          bcgovcode == "MCF" &&
-          requestType == FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL
-        ) {
-          if(tagValue === "") {
-            fileStatusTransition = "TBD";
-            _tagValue = TBDID;
-          } else {
-            fileStatusTransition =
-              divisions.find((division) => division.divisionid === tagValue)
-                ?.divisionname ||
-              MCFSections?.sections?.find(
-                (division) => division.divisionid === tagValue
-              )?.name;
-          }
-          personalAttributes = {
-            person: curPersonalAttributes.person,
-            filetype: curPersonalAttributes.filetype,
-            volume: curPersonalAttributes.volume,
-            trackingid: curPersonalAttributes.trackingid,
-            personaltag: curPersonalAttributes.personaltag
-          }
-        }
       } else if (uploadFor === "record") {
         if (
           bcgovcode == "MCF" &&
           requestType == FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL
         ) {
-          if(tagValue === "") {
-            fileStatusTransition = "TBD";
-            _tagValue = TBDID;
-          } else {
-            fileStatusTransition =
-              divisions.find((division) => division.divisionid === tagValue)
-                ?.divisionname ||
-              MCFSections?.sections?.find(
-                (division) => division.divisionid === tagValue
-              )?.name;
-          }
-          personalAttributes = {
-            person: person.name,
-            filetype: fileType.name,
-            volume: volume.name,
-            trackingid: trackingID,
-            personaltag: personalTag.name?personalTag.name:"TBD"
-          }
+          fileStatusTransition =
+            divisions.find((division) => division.divisionid === tagValue)
+              ?.divisionname ||
+            MCFSections?.sections?.find(
+              (division) => division.divisionid === tagValue
+            )?.name;
         } else if (
           bcgovcode == "MSD" &&
           requestType == FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL
@@ -418,21 +326,13 @@ export default function AttachmentModal({
           filestatustransition: fileStatusTransition,
           filename: file.filename ? file.filename : file.name,
           filesize: file.size,
-          personalattributes: personalAttributes,
-          ...(uploadFor === "record" && { divisionid: _tagValue }),
+          ...(uploadFor === "record" && { divisionid: tagValue }),
         };
       });
 
       handleModal(true, fileInfoList, files);
       setFiles([]);
-      if (uploadFor === "record") {
-        setTagValue("");
-        setPerson({});
-        setVolume({});
-        setFileType({});
-        setTrackingID("");
-        setPersonalTag({});
-      }
+      if (uploadFor === "record") setTagValue("");
     }
   };
   const getMessage = () => {
@@ -613,11 +513,7 @@ export default function AttachmentModal({
     } else if (uploadFor === "response" && (files.length > 1 ||  existingDocuments.length > 1)) {
       return true;
     } else if (modalFor === "add") {
-      if(requestType == FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL && bcgovcode == "MCF") {
-        return person === "" || fileType === "" || trackingID === "";
-      } else {
-        return tagValue === "";
-      }
+      return tagValue === "";
     } else if (modalFor === "replace" || modalFor === "replaceattachment") {
       return false;
     } else if (modalFor === "changeresponsedate") {
@@ -626,6 +522,15 @@ export default function AttachmentModal({
       }
     }
   };
+
+ 
+
+  const MCFSections = useSelector(
+    (state) => state.foiRequests.foiPersonalSections
+  );
+  const MSDSections = useSelector(
+    (state) => state.foiRequests.foiPersonalDivisionsAndSections
+  );
 
   return (
     <div className="state-change-dialog">
@@ -708,26 +613,15 @@ export default function AttachmentModal({
                       MCFPopularSections - 1
                     )}
                     otherTagList={MCFSections?.sections?.slice(
-                      MCFPopularSections - 1
+                      MCFPopularSections
                     )}
                     handleTagChange={handleTagChange}
                     tagValue={tagValue}
-                    handlePersonalTagChange={handlePersonalTagChange}
-                    personalTag={personalTag}
-                    handlePersonChange={handlePersonChange}
-                    person={person}
-                    handleVolumeChange={handleVolumeChange}
-                    volume={volume}
-                    handleFileTypeChange={handleFileTypeChange}
-                    fileType={fileType}
-                    handleTrackingIDChange={handleTrackingIDChange}
-                    trackingID={trackingID}
                     maxNumberOfFiles={maxNoFiles}
                     isMinistryCoordinator={isMinistryCoordinator}
                     existingDocuments={existingDocuments}
                     totalUploadedRecordSize={totalUploadedRecordSize}
                     totalRecordUploadLimit={totalRecordUploadLimit}
-                    isScanningTeamMember={isScanningTeamMember}
                   />
                 ) : bcgovcode == "MSD" && MSDSections?.divisions?.length > 0 ? (
                   <FileUploadForMSDPersonal
@@ -750,7 +644,7 @@ export default function AttachmentModal({
                       MSDPopularSections - 1
                     )}
                     otherTagList={MSDSections?.divisions[0]?.sections?.slice(
-                      MSDPopularSections - 1
+                      MSDPopularSections
                     )}
                     handleTagChange={handleTagChange}
                     tagValue={tagValue}

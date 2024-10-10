@@ -34,7 +34,6 @@ from request_api.services.extensionreasonservice import extensionreasonservice
 from request_api.services.cacheservice import cacheservice
 from request_api.services.subjectcodeservice import subjectcodeservice
 from request_api.services.oipcservice import oipcservice
-from request_api.services.commentservice import commentservice
 import json
 import request_api
 import requests
@@ -185,18 +184,12 @@ class FOIFlowDivisions(Resource):
             data = None                        
             if(specifictopersonalrequests is not None and specifictopersonalrequests.lower() == 'true'):                
                 match fetchmode:
-                    case 'divisions':
+                    case 'divisions':                        
                         data = divisionstageservice().getpersonalspecificdivisionandstages(bcgovcode)
-                    case 'sections' | 'personaltag':
+                    case 'sections':                        
                         data = divisionstageservice().getpersonalspecificprogramareasections(bcgovcode)
-                    case 'divisionsandsections':
-                        data = divisionstageservice().getpersonalspecificdivisionsandsections(bcgovcode)
-                    case 'people':
-                        data = divisionstageservice().getpersonalspecificpeople(bcgovcode)
-                    case 'filetypes':
-                        data = divisionstageservice().getpersonalspecificfiletypes(bcgovcode)
-                    case 'volumes':
-                        data = divisionstageservice().getpersonalspecificvolumes(bcgovcode)
+                    case 'divisionsandsections':                        
+                        data = divisionstageservice().getpersonalspecificdivisionsandsections(bcgovcode) 
                     case _:                        
                         data = divisionstageservice().getpersonalspecificdivisionandstages(bcgovcode)
             else:
@@ -477,25 +470,3 @@ class FOIFlowOIPCInquiryOutcomes(Resource):
             return jsondata , 200
         except BusinessException:
             return "Error happened while accessing OIPC inquiry outcomes" , 500
-        
-@cors_preflight('GET,OPTIONS')
-@API.route('/foiflow/commenttypes')
-class FOIFlowCommentTypes(Resource):
-    """Retrieves all active comment types.
-    """
-    @staticmethod
-    @TRACER.trace()
-    @cross_origin(origins=allowedorigins())
-    @auth.require
-    @request_api.cache.cached(
-        key_prefix="commenttypes",
-        unless=cache_filter,
-        response_filter=response_filter
-        )
-    def get():
-        try:
-            data = commentservice().getcommenttypes()
-            jsondata = json.dumps(data)
-            return jsondata , 200
-        except BusinessException:
-            return "Error happened while accessing comment types" , 500

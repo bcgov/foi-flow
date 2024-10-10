@@ -153,7 +153,6 @@ const initialState = {
   oipcStatuses: [],
   oipcReviewtypes: [],
   oipcInquiryoutcomes: [],
-  foiCommentTypes:[]
 };
 
 const foiRequests = (state = initialState, action) => {
@@ -256,12 +255,6 @@ const foiRequests = (state = initialState, action) => {
       return { ...state, foiPersonalDivisionsAndSections: action.payload };
     case FOI_ACTION_CONSTANTS.FOI_PERSONAL_SECTIONS:
       return { ...state, foiPersonalSections: action.payload };
-    case FOI_ACTION_CONSTANTS.FOI_PERSONAL_PEOPLE:
-      return { ...state, foiPersonalPeople: action.payload };
-    case FOI_ACTION_CONSTANTS.FOI_PERSONAL_FILETYPES:
-      return { ...state, foiPersonalFiletypes: action.payload };
-    case FOI_ACTION_CONSTANTS.FOI_PERSONAL_VOLUMES:
-      return { ...state, foiPersonalVolumes: action.payload };
     case FOI_ACTION_CONSTANTS.FOI_WATCHER_LIST:
       return { ...state, foiWatcherList: action.payload };
     case FOI_ACTION_CONSTANTS.CLOSING_REASONS:
@@ -346,8 +339,6 @@ const foiRequests = (state = initialState, action) => {
       return { ...state, oipcReviewtypes: action.payload };
     case FOI_ACTION_CONSTANTS.OIPC_INQUIRYOUTCOMES:
         return { ...state, oipcInquiryoutcomes: action.payload };
-    case FOI_ACTION_CONSTANTS.FOI_COMMENT_TYPES:
-      return { ...state, foiCommentTypes: action.payload };
     default:
       return state;
   }

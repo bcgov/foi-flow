@@ -58,7 +58,6 @@ class requestserviceministrybuilder(requestserviceconfigurator):
         foiministryrequest.cfrduedate = requestdict['cfrduedate']
         foiministryrequest.startdate = requestdict['startdate']
         foiministryrequest.duedate = requestdict['duedate']
-        foiministryrequest.userrecordslockstatus = ministryschema['userrecordslockstatus']
         foiministryrequest.assignedministrygroup = requestdict['assignedministrygroup']
         if 'assignedministryperson' in requestschema and requestschema['assignedministryperson'] not in (None,''):
             foiministryrequest.assignedministryperson = requestschema['assignedministryperson']

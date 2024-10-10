@@ -68,13 +68,10 @@ class FOIMinistryRequest(db.Model):
     axispagecount = db.Column(db.String(20), nullable=True)
     axislanpagecount = db.Column(db.String(20), nullable=True)
     recordspagecount = db.Column(db.String(20), nullable=True)
-    estimatedpagecount = db.Column(db.Integer, nullable=True)
-    estimatedtaggedpagecount = db.Column(db.Integer, nullable=True)
     linkedrequests = db.Column(JSON, unique=False, nullable=True)
     identityverified = db.Column(JSON, unique=False, nullable=True)
     ministrysignoffapproval = db.Column(JSON, unique=False, nullable=True)
     requeststatuslabel = db.Column(db.String(50), nullable=False)
-    userrecordslockstatus = db.Column(db.Boolean, nullable=True)
 
     #ForeignKey References
     
@@ -432,25 +429,20 @@ class FOIMinistryRequest(db.Model):
         ministry_restricted_requests = aliased(FOIRestrictedMinistryRequest)
 
         #filter/search
-        _keywords = []
-        if(keyword is not None):
-            _keywords = keyword.lower().replace(",", " ").split()
         if(len(filterfields) > 0 and keyword is not None):
-            filtercondition = []
-            for _keyword in _keywords:
-                onekeywordfiltercondition = []
-                if(_keyword != "restricted"):
-                    for field in filterfields:
-                        onekeywordfiltercondition.append(FOIMinistryRequest.findfield(field, iaoassignee, ministryassignee).ilike('%'+_keyword+'%'))
-                else:
-                    if(requestby == 'IAO'):
-                        onekeywordfiltercondition.append(FOIRestrictedMinistryRequest.isrestricted == True)
-                    else:
-                        onekeywordfiltercondition.append(ministry_restricted_requests.isrestricted == True)
-                if (_keyword == "oipc"):
-                    onekeywordfiltercondition.append(FOIMinistryRequest.isoipcreview == True)
             
-                filtercondition.append(or_(*onekeywordfiltercondition))
+            filtercondition = []
+
+            if(keyword != "restricted"):
+                for field in filterfields:
+                    filtercondition.append(FOIMinistryRequest.findfield(field, iaoassignee, ministryassignee).ilike('%'+keyword+'%'))
+            else:
+                if(requestby == 'IAO'):
+                    filtercondition.append(FOIRestrictedMinistryRequest.isrestricted == True)
+                else:
+                    filtercondition.append(ministry_restricted_requests.isrestricted == True)
+            if (keyword.lower() == "oipc"):
+                filtercondition.append(FOIMinistryRequest.isoipcreview == True)
 
         intakesorting = case([
                             (and_(FOIMinistryRequest.assignedto == None, FOIMinistryRequest.assignedgroup == 'Intake Team'), # Unassigned requests first
@@ -711,7 +703,7 @@ class FOIMinistryRequest(db.Model):
         if(keyword is None):
             return dbquery
         else:
-            return dbquery.filter(and_(*filtercondition))
+            return dbquery.filter(or_(*filtercondition))
 
     @classmethod
     def getrequestspagination(cls, group, page, size, sortingitems, sortingorders, filterfields, keyword, additionalfilter, userid, isiaorestrictedfilemanager, isministryrestrictedfilemanager):
@@ -1595,7 +1587,5 @@ class FOIMinistryRequestSchema(ma.Schema):
                 'foirequest.receivedmodeid','requeststatus.requeststatusid','requeststatuslabel','requeststatus.name','programarea.bcgovcode',
                 'programarea.name','foirequest_id','foirequestversion_id','created_at','updated_at','createdby','assignedministryperson',
                 'assignedministrygroup','cfrduedate','closedate','closereasonid','closereason.name',
-                'assignee.firstname','assignee.lastname','ministryassignee.firstname','ministryassignee.lastname', 'axisrequestid', 
-                'axissyncdate', 'axispagecount', 'axislanpagecount', 'linkedrequests', 'ministrysignoffapproval', 'identityverified','originalldd',
-                'isoipcreview', 'recordspagecount', 'estimatedpagecount', 'estimatedtaggedpagecount', 'userrecordslockstatus')
+                'assignee.firstname','assignee.lastname','ministryassignee.firstname','ministryassignee.lastname', 'axisrequestid', 'axissyncdate', 'axispagecount', 'axislanpagecount', 'linkedrequests', 'ministrysignoffapproval', 'identityverified','originalldd','isoipcreview', 'recordspagecount')
     

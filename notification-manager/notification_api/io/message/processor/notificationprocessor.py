@@ -137,15 +137,6 @@ class notificationprocessor:
         )
 
     def __createcommentforresponse(self, notification):
-        if notification.feeoverridereason is not None and notification.feeoverridereason != '':
-            comment = {"comment": notification.feeoverridereason}
-            commentservice().createcomment(
-                "ministryrequest",
-                notification.ministryrequestid,
-                comment,
-                notification.createdby,
-                2,
-            )
         comment = {"comment": self.__createresponsemessage(notification.errorflag)}
         return commentservice().createcomment(
             "ministryrequest",
@@ -173,7 +164,7 @@ class notificationprocessor:
             notification.createdby,
             2,
         )
-    
+
     def __createresponsemessage(self, errorflag):
         if errorflag == "YES":
             return "Creating the Release Package failed. Please try again"

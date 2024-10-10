@@ -689,32 +689,26 @@ class FOIRawRequest(db.Model):
 
     @classmethod
     def getfilterforrequestssubquery(cls, filterfields, keyword):
-        _keywords = []
-        if(keyword is not None):
-            _keywords = keyword.lower().replace(",", " ").split()
+        keyword = keyword.lower()
 
         #filter/search
         filtercondition = []
-        for _keyword in _keywords:
-            onekeywordfiltercondition = []
-            if(_keyword != 'restricted'):
-                for field in filterfields:
-                    if(field == 'idNumber'):
-                        _keyword = _keyword.replace('u-00', '')
-                    
-                    onekeywordfiltercondition.append(FOIRawRequest.findfield(field).ilike('%'+_keyword+'%'))
-                    if(field == 'firstName'):
-                        onekeywordfiltercondition.append(FOIRawRequest.findfield('contactFirstName').ilike('%'+_keyword+'%'))
-                    if(field == 'lastName'):
-                        onekeywordfiltercondition.append(FOIRawRequest.findfield('contactLastName').ilike('%'+_keyword+'%'))
-                    if(field == 'requestType'):
-                        onekeywordfiltercondition.append(FOIRawRequest.findfield('requestTypeRequestType').ilike('%'+_keyword+'%'))
-            else:
-                onekeywordfiltercondition.append(FOIRawRequest.isiaorestricted == True)
-            
-            filtercondition.append(or_(*onekeywordfiltercondition))
+        if(keyword != 'restricted'):
+            for field in filterfields:
+                if(field == 'idNumber'):
+                    keyword = keyword.replace('u-00', '')
+                
+                filtercondition.append(FOIRawRequest.findfield(field).ilike('%'+keyword+'%'))
+                if(field == 'firstName'):
+                    filtercondition.append(FOIRawRequest.findfield('contactFirstName').ilike('%'+keyword+'%'))
+                if(field == 'lastName'):
+                    filtercondition.append(FOIRawRequest.findfield('contactLastName').ilike('%'+keyword+'%'))
+                if(field == 'requestType'):
+                    filtercondition.append(FOIRawRequest.findfield('requestTypeRequestType').ilike('%'+keyword+'%'))
+        else:
+            filtercondition.append(FOIRawRequest.isiaorestricted == True)
 
-        return and_(*filtercondition)
+        return or_(*filtercondition)
 
 
     @classmethod

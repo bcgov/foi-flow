@@ -6,7 +6,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faTimes } from '@fortawesome/free-solid-svg-icons'
 import { setFOILoader } from '../../../../actions/FOI/foiRequestActions'
 import Editor, { createEditorStateWithText } from '@draft-js-plugins/editor';
-import { convertToRaw, convertFromRaw, EditorState, RichUtils } from "draft-js";
+import { convertToRaw, convertFromRaw, EditorState } from "draft-js";
 import createMentionPlugin, {
   defaultSuggestionsFilter
 } from '@draft-js-plugins/mention';
@@ -20,13 +20,7 @@ import {
   OrderedListButton,
 
 } from '@draft-js-plugins/buttons';
-import { getFullnameList, getCommentTypeIdByName, getIAOTagList, getAssignToList } from '../../../../helper/FOI/helper'
-import Grid from "@material-ui/core/Grid";
-import Radio from "@material-ui/core/Radio";
-import RadioGroup from "@material-ui/core/RadioGroup";
-import FormControlLabel from "@material-ui/core/FormControlLabel";
-import FormControl from "@material-ui/core/FormControl";
-
+import { getFullnameList } from '../../../../helper/FOI/helper'
 
 const staticToolbarPlugin = createToolbarPlugin();
 const mentionPlugin = createMentionPlugin();
@@ -35,46 +29,25 @@ const { MentionSuggestions } = mentionPlugin
 const plugins = [staticToolbarPlugin, mentionPlugin];
 const InputField = ({ cancellor, parentId, child, inputvalue, edit, main, add, fullnameList, restrictedReqTaglist,
   //setEditorChange, removeComment and setRemoveComment added to handle Navigate away from Comments tabs 
-  isRestricted, setEditorChange, removeComment, setRemoveComment, commentTypeId, newCommentTypeId, setCommentTypeId,commentTypes, isMinistry, bcgovcode
+  isRestricted, setEditorChange, removeComment, setRemoveComment
 }) => {
   let maxcharacterlimit = 1000
   const [uftext, setuftext] = useState('')
   const [textlength, setTextLength] = useState(1000)
   const [open, setOpen] = useState(false);
   const isCommentTagListLoading = useSelector((state) => state.foiRequests.isCommentTagListLoading);
- 
-  const [editCommentTypeId, setEditCommentTypeId]= useState(commentTypeId)
-  
-  
-  const filterTagList = (id) => {
-    let tagList= fullnameList;
-    if(id == getCommentTypeIdByName(commentTypes, "IAO Internal") || 
-      id == getCommentTypeIdByName(commentTypes,"IAO Peer Review") )
-      tagList= getIAOTagList("iao");//getAssignToList('iao')?.filter((e) => e.type === 'iao');
-    else if(id == getCommentTypeIdByName(commentTypes, "Ministry Internal") || 
-      id == getCommentTypeIdByName(commentTypes,"Ministry Peer Review")){
-        tagList = getIAOTagList(bcgovcode);
-    }
-    return [...tagList];
-  }
-
-  let fulluserlist = suggestionList(filterTagList(editCommentTypeId)).sort(namesort) //suggestionList([...fullnameList]).sort(namesort)
+  let fulluserlist = suggestionList([...fullnameList]).sort(namesort)
   const [mentionList, setMentionList] = useState(isCommentTagListLoading ? [{name: 'Loading...'}] : isRestricted ? restrictedReqTaglist :fulluserlist)
+
   const [suggestions, setSuggestions] = useState(mentionList);
 
-
-  useEffect(() => {
-    setMentionList(isCommentTagListLoading ? [{name: 'Loading...'}] : isRestricted ? restrictedReqTaglist :suggestionList(filterTagList(editCommentTypeId)).sort(namesort));
-    setSuggestions(isCommentTagListLoading ? [{name: 'Loading...'}] : isRestricted ? restrictedReqTaglist :mentionList);
-  }, [editCommentTypeId])
-  
   const onOpenChange = (_open) => {
     setOpen(_open);
   }
 
   useEffect(() => {
-    setMentionList(isCommentTagListLoading ? [{name: 'Loading...'}] : isRestricted ? restrictedReqTaglist :suggestionList(filterTagList(editCommentTypeId)).sort(namesort));
-    setSuggestions(isCommentTagListLoading ? [{name: 'Loading...'}] : isRestricted ? restrictedReqTaglist : mentionList)//suggestionList(filterTagList(editCommentTypeId)).sort(namesort));
+    setMentionList(isCommentTagListLoading ? [{name: 'Loading...'}] : isRestricted ? restrictedReqTaglist :suggestionList([...getFullnameList()]).sort(namesort));
+    setSuggestions(isCommentTagListLoading ? [{name: 'Loading...'}] : isRestricted ? restrictedReqTaglist :suggestionList([...getFullnameList()]).sort(namesort));
   }, [isCommentTagListLoading, restrictedReqTaglist])
 
   // Check editor text for mentions
@@ -173,12 +146,6 @@ const InputField = ({ cancellor, parentId, child, inputvalue, edit, main, add, f
       setTextLength(maxcharacterlimit - (currentContentLength - selectedTextLength))
     }
     setuftext(currentContent.getPlainText(''))
-    //For enabling keyboard shortcuts 
-    const newState = RichUtils.handleKeyCommand(editorState, e);
-    if (newState) {
-      setEditorState(newState);
-      return 'handled';
-    }
   }
 
   const _handleBeforeInput = () => {
@@ -262,14 +229,9 @@ const InputField = ({ cancellor, parentId, child, inputvalue, edit, main, add, f
       const _mentions = getMentionsOnComment()
       const _editorstateinJSON = JSON.stringify(convertToRaw(editorState.getCurrentContent()))
       setFOILoader(true)
-      let commentType = commentTypeId
-      /**This is to set reply comment type of
-       * system generated comments to General */
-      if([2,3].includes(commentTypeId))
-        commentType = 1;
       edit === true
-        ? actions.submit(cancellor, _editorstateinJSON, JSON.stringify(_mentions), parentId, true,commentType)
-        : actions.submit(cancellor, _editorstateinJSON, JSON.stringify(_mentions), parentId, false,commentType)
+        ? actions.submit(cancellor, _editorstateinJSON, JSON.stringify(_mentions), parentId, true)
+        : actions.submit(cancellor, _editorstateinJSON, JSON.stringify(_mentions), parentId, false)
 
       setEditorState(createEditorStateWithText(''))
       setEditorChange(false)
@@ -302,52 +264,6 @@ const InputField = ({ cancellor, parentId, child, inputvalue, edit, main, add, f
             ) : null}
           </div>
         </div>
-        {/* Commenting ability to update
-          comment type while editing comment
-          -New US will handle all scenarios
-          related to commenttype update */}
-        
-        {/* {edit && !parentId &&
-          <Grid item xs={12} lg={6}>
-            <FormControl component="fieldset">
-              <RadioGroup
-                id="status-options"
-                row
-                name="controlled-radio-buttons-group"
-                value={editCommentTypeId}
-                onChange={(e) => {
-                  setEditCommentTypeId(Number(e.target.value));
-                }}
-              >
-              <FormControlLabel 
-                value={getCommentTypeIdByName(commentTypes, "User submitted")}
-                control={<Radio color="default" id="rbextpending" />}
-                label="General"
-              />
-              <FormControlLabel
-                value={isMinistry ? getCommentTypeIdByName(commentTypes, "Ministry Internal"):getCommentTypeIdByName(commentTypes, "IAO Internal") }
-                control={<Radio color="default" id="rbextapproved" />}
-                label="Internal"
-              />
-              <FormControlLabel
-                value={isMinistry ? getCommentTypeIdByName(commentTypes,"Ministry Peer Review"): getCommentTypeIdByName(commentTypes, "IAO Peer Review")}
-                control={<Radio color="default" id="rbextdenied" />}
-                label="Peer Review"
-              />
-              </RadioGroup>
-            </FormControl>
-          </Grid>
-        } */}
-        <Editor
-          editorState={editorState}
-          onChange={_handleChange}
-          handleBeforeInput={_handleBeforeInput}
-          handlePastedText={_handlePastedText}
-          handleKeyCommand={_handleKeyCommand}
-          plugins={plugins}
-          spellCheck={true}
-        />
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent:'space-between', position: 'sticky' }}>
         <Toolbar>
           {
             (externalProps) => (
@@ -361,24 +277,15 @@ const InputField = ({ cancellor, parentId, child, inputvalue, edit, main, add, f
             )
           }
         </Toolbar>
-        <div className={'col-lg-9'}>
-          <span className={textlength > 25 ? "characterlen" : "characterlen textred"}>{textlength} characters remaining</span>
-        </div>
-        <div className="col-lg-1 paperplanecontainer inputActions">
-          <button
-            className="postBtn"
-            onClick={post}
-            type='button'
-            disabled={uftext.trim().length === 0}
-          >
-            {' '}
-            <svg aria-hidden="true" aria-describedby="postComment" focusable="false" data-prefix="fas" data-icon="paper-plane" class="svg-inline--fa fa-paper-plane fa-w-16 fa-2x " role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" disabled={uftext.trim().length === 0} color={uftext.trim().length === 0 ? '#a5a5a5' : 'darkblue'}>
-              <title id="postComment" style={{display: 'none'}}>Post Comment</title>
-              <path fill="currentColor" d="M476 3.2L12.5 270.6c-18.1 10.4-15.8 35.6 2.2 43.2L121 358.4l287.3-253.2c5.5-4.9 13.3 2.6 8.6 8.3L176 407v80.5c0 23.6 28.5 32.9 42.5 15.8L282 426l124.6 52.2c14.2 6 30.4-2.9 33-18.2l72-432C515 7.8 493.3-6.8 476 3.2z"></path>
-            </svg>
-          </button>
-        </div>
-        </div>
+        <Editor
+          editorState={editorState}
+          onChange={_handleChange}
+          handleBeforeInput={_handleBeforeInput}
+          handlePastedText={_handlePastedText}
+          handleKeyCommand={_handleKeyCommand}
+          plugins={plugins}
+          spellCheck={true}
+        />
         <MentionSuggestions
           open={open}
           onOpenChange={onOpenChange}
@@ -391,8 +298,10 @@ const InputField = ({ cancellor, parentId, child, inputvalue, edit, main, add, f
         />
 
       </form>
-      {/* <div className="inputActions">
-
+      <div className="inputActions">
+        <div className={'col-lg-11'}>
+          <span className={textlength > 25 ? "characterlen" : "characterlen textred"}>{textlength} characters remaining</span>
+        </div>
         <div className="col-lg-1 paperplanecontainer">
           <button
             className="postBtn"
@@ -407,7 +316,7 @@ const InputField = ({ cancellor, parentId, child, inputvalue, edit, main, add, f
             </svg>
           </button>
         </div>
-      </div> */}
+      </div>
 
     </>
   )

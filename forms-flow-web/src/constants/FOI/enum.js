@@ -164,8 +164,7 @@ const MinistryNeedsScanning = [
 
 const MinistryNeedsLANPages = [
   "CFD",
-  "MCF",
-  "CAF"
+  "MCF"
 ]
 
 const RequestTypes = Object.freeze({
@@ -173,7 +172,7 @@ const RequestTypes = Object.freeze({
   personal: "personal"
 });
 
-const MCFPopularSections = 21
+const MCFPopularSections = 23
 const MSDPopularSections = 11
 
 const RecordsDownloadList = [
