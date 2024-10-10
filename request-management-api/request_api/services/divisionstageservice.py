@@ -55,7 +55,31 @@ class divisionstageservice:
                     _sections.append(_section)
             programareasections.append({"divisionid": divisionid, "name": self.escapestr(_division['name']),"sortorder":_division['sortorder'],"issection":_division['issection'],"sections":_sections})
         return {"divisions": programareasections}
-    
+
+    def getpersonalspecificpeople(self, bcgovcode):
+        people = []
+        programarea = ProgramArea.getprogramarea(bcgovcode)
+        _sections = ProgramAreaDivision.getpersonalrequestsprogramareapeople(programarea['programareaid'])
+        for _section in _sections:
+            people.append({"divisionid": _section['divisionid'], "name": self.escapestr(_section['name']), "sortorder":_section['sortorder'], "issection":_section['issection']})
+        return {"people": people}
+
+    def getpersonalspecificfiletypes(self, bcgovcode):
+        filetypes = []
+        programarea = ProgramArea.getprogramarea(bcgovcode)
+        _sections = ProgramAreaDivision.getpersonalrequestsprogramareafiletypes(programarea['programareaid'])
+        for _section in _sections:
+            filetypes.append({"divisionid": _section['divisionid'], "name": self.escapestr(_section['name']), "sortorder":_section['sortorder'], "issection":_section['issection']})
+        return {"filetypes": filetypes}
+
+    def getpersonalspecificvolumes(self, bcgovcode):
+        volumes = []
+        programarea = ProgramArea.getprogramarea(bcgovcode)
+        _sections = ProgramAreaDivision.getpersonalrequestsprogramareavolumes(programarea['programareaid'])
+        for _section in _sections:
+            volumes.append({"divisionid": _section['divisionid'], "name": self.escapestr(_section['name']), "sortorder":_section['sortorder'], "issection":_section['issection']})
+        return {"volumes": volumes}
+
     def getstages(self):
         activestages = []
         division_stages = ProgramAreaDivisionStage.getprogramareadivisionstages()
