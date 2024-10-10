@@ -310,6 +310,21 @@ export const updateFOIRecords = (requestId, ministryId, data, ...rest) => {
   };
 };
 
+export const editPersonalAttributes = (requestId, ministryId, data, ...rest) => {
+  if (!ministryId) {
+    return () => {};
+  }
+  const done = fnDone(rest);
+  let apiUrl = replaceUrl(
+    replaceUrl(API.FOI_UPDATE_PERSONAL_ATTRIBUTES, "<ministryrequestid>", ministryId),
+    "<requestid>",
+    requestId
+  );
+  return (dispatch) => {
+    postRecord(dispatch, apiUrl, data, "Error in updating records", rest);
+  };
+};
+
 export const deleteReviewerRecords = (filepaths, ...rest) => {
   const done = fnDone(rest);
   let apiUrl = API.DOC_REVIEWER_DELETE_RECORDS;
@@ -677,3 +692,27 @@ export const fetchPDFStitchedRecordForOIPCRedlineReview = (
         });
     };
   }
+
+export const updateUserLockedRecords = (data, requestId, ministryId, ...rest) => {
+  const done = fnDone(rest);
+  let apiUrl= replaceUrl(replaceUrl(
+    API.FOI_REQUEST_SECTION_API,
+    "<ministryid>",
+    ministryId),"<requestid>",requestId
+  );
+  return (dispatch) => {
+    httpPOSTRequest(`${apiUrl}/userrecordslockstatus`, data)
+      .then((res) => {
+        if (res.data) {
+          done(null, res.data);
+        } else {
+          dispatch(serviceActionError(res));
+          throw new Error(`Error while updating records lock status for the (request# ${requestId}, ministry# ${ministryId})`);            
+        }
+      })
+      .catch((error) => {
+        dispatch(serviceActionError(error));
+        done(error);
+      });
+  };
+}

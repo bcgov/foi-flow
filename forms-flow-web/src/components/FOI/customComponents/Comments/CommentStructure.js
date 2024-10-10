@@ -20,15 +20,18 @@ import MoreHorizIcon from "@material-ui/icons/MoreHoriz";
 import IconButton from "@material-ui/core/IconButton";
 import MenuList from "@material-ui/core/MenuList";
 import MenuItem from "@material-ui/core/MenuItem";
+import Chip from "@material-ui/core/Chip";
 import { getOSSHeaderDetails, getFileFromS3 } from "../../../../apiManager/services/FOI/foiOSSServices";
 import { saveAs } from "file-saver";
 import { downloadZip } from "client-zip";
 import { useDispatch } from "react-redux";
 import * as html2pdf from 'html-to-pdf-js';
 import NewCommentIndicator from './NewCommentIndicator';
+import { getCommentLabelFromId, getCommentTypeIdByName } from "../../../../helper/FOI/helper";
 
 
-const CommentStructure = ({ i, reply, parentId, totalcommentCount, currentIndex, isreplysection, hasAnotherUserComment, fullName, isEmail=false, ministryId=null}) => {
+const CommentStructure = ({ i, reply, parentId, totalcommentCount, currentIndex, isreplysection, hasAnotherUserComment, 
+  fullName, commentTypes, isEmail=false, ministryId=null}) => {
 
   const actions = useContext(ActionContext)
   const edit = true
@@ -67,7 +70,7 @@ const CommentStructure = ({ i, reply, parentId, totalcommentCount, currentIndex,
 
   const getHtmlfromRawContent = () => {
     let markup = null
-    if (i.commentTypeId === 1) {
+    if (i.commentTypeId != null && i.commentTypeId !== 2 && i.commentTypeId !== 3) {
       const rawContentFromStore = convertFromRaw(JSON.parse(i.text))
       let initialEditorState = EditorState.createWithContent(rawContentFromStore);
 
@@ -100,7 +103,6 @@ const CommentStructure = ({ i, reply, parentId, totalcommentCount, currentIndex,
   const [popoverOpen, setPopoverOpen] = useState(false);
   const [anchorPosition, setAnchorPosition] = useState(null);
   const [deletePopoverOpen, setDeletePopoverOpen] = useState(false);
-
 
 
   const ActionsPopover = () => {
@@ -252,20 +254,46 @@ const CommentStructure = ({ i, reply, parentId, totalcommentCount, currentIndex,
     )
   };
 
+
   return (
     <>
       <div {...(isEmail ? {"data-msg-halfdiv-id":`${currentIndex}`} : {})} name={needCollapsed ? `hiddenreply_${parentId}` : `reply_${parentId}`} 
-      className={halfDivclassname} style={needCollapsed ? { display: 'none' } : {}} >
-        <div className="userInfo" style={reply ? { marginLeft: 15, marginTop: '6px' }: {}}>
+        className={halfDivclassname} style={needCollapsed ? { display: 'none' } : {}} >
+        <div
+          className="userInfo"
+          style={reply ? { marginLeft: 15, marginTop: '6px' }: {}}
+        >
           <NewCommentIndicator commentdate={i.dateUF}/>
-            <div className="commentsTwo">
-              <div className="fullName">{fullName} </div> |  <div className="commentdate">{i.date} </div>  <div className="commentdate">{i.edited ? "Edited": ""} </div>
-            </div>
-            <div className="commenttext" dangerouslySetInnerHTML={{ __html: getHtmlfromRawContent() }} />            
+          <div className="commentsTwo">
+
+            <div className="fullName">{fullName} </div> |  <div className="commentdate">{i.date} </div> 
+            {(i.commentTypeId != null && i.commentTypeId !== 2 && i.commentTypeId !== 3 && (parentId == null || parentId == undefined)) &&
+              <div>
+                <Chip
+                    item
+                    //key={i}
+                    label={getCommentLabelFromId(commentTypes, i.commentTypeId )}
+                    //size="small"
+                    className="commentTypeChip"
+                    style={{
+                      backgroundColor: "#003366",
+                      margin:"4px 4px 4px 8px"
+                    }}
+                  />
+              </div>
+            }
+            <div className="commentdate">{i.edited ? "Edited": ""} </div>
+
+          </div>
+          <div className="commenttext" dangerouslySetInnerHTML={{ __html: getHtmlfromRawContent() }} >
+
+          </div>
+
+            
         </div>
         <div className="userActions">
           <div>
-            {(isEmail || (i.commentTypeId === 1 && actions.userId === i.userId && actions.user)) && (
+            {(isEmail || ((i.commentTypeId != null && i.commentTypeId !== 2 && i.commentTypeId !== 3) && actions.userId === i.userId && actions.user)) && (
                 <>
                     <IconButton
                     aria-label= "actions"
