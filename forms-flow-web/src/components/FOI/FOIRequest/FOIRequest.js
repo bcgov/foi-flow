@@ -1079,12 +1079,20 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
       requestDetails?.requestType === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_GENERAL)
   }
 
+  const getHistoryCount = () => {
+    let historyCount= applicantCorrespondence.length + requestNotes.filter(
+            c => c.commentTypeId !== getCommentTypeIdByName(commentTypes, "Ministry Internal") &&
+                c.commentTypeId !== getCommentTypeIdByName(commentTypes, "Ministry Peer Review")
+        ).length;
+    return '('+historyCount+')'
+  } 
+
   const getMergedHistory = (applicantCorrespondence, requestNotes) => {
     const mergedHistory = [
       ...(applicantCorrespondence || []).map((message) => ({
         ...message,
         type: 'message',
-        created_at: message.created_at ? convertSTRToDate(message.created_at) : message.created_at  
+        created_at: message.created_at ? convertSTRToDate(message.created_at) : message.created_at 
       })),
       ...(requestNotes || []).map((comment) => ({
         ...comment,
@@ -1095,12 +1103,11 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
     return mergedHistory.sort((a, b) => new Date(a.created_at || a.dateUF) - new Date(b.created_at || b.dateUF));
   };
   const getCommentsCount = () => {
-    
-      let commentsCount= (requestNotes.filter( c => c.commentTypeId !== getCommentTypeIdByName(commentTypes,"Ministry Internal") && 
-            c.commentTypeId !== getCommentTypeIdByName(commentTypes, "Ministry Peer Review"))).length;
-      return '('+commentsCount+')'
+    let commentsCount= (requestNotes.filter( c => c.commentTypeId !== getCommentTypeIdByName(commentTypes,"Ministry Internal") && 
+          c.commentTypeId !== getCommentTypeIdByName(commentTypes, "Ministry Peer Review"))).length;
+    return '('+commentsCount+')'
 
-  }
+}
 
   return (!isLoading &&
     requestDetails &&
@@ -1213,9 +1220,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
               onClick={() => tabclick("RequestHistory")}
             >
               Request History{" "}
-              {getMergedHistory(applicantCorrespondence, requestNotes).length ?
-                `(${(getMergedHistory(applicantCorrespondence, requestNotes).length || 0)})`
-                : ""}
+              {getHistoryCount()}
             </div>
           </div>
 

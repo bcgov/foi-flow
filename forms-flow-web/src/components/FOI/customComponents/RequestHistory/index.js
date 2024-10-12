@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import './requesthistory.scss'
 import { getCommentTypeIdByName, getCommentTypeFromId } from "../../../../helper/FOI/helper";
-import { ActionProvider } from '../Comments/ActionContext'
 import RequestFilter from './RequestFilter';
 import DisplayHistory from './DisplayHistory'
 
@@ -84,7 +83,6 @@ export const RequestHistorySection = ({
 
   return (
     <>
-    <ActionProvider>
       <div className="section">
         <div className="foi-request-review-header-row1">
           <div className="col-9 foi-request-number-header">
@@ -101,7 +99,6 @@ export const RequestHistorySection = ({
           />
         </div>
       </div>
-    </ActionProvider>
     </>
   )
 }

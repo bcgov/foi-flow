@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import './requesthistory.scss';
 import 'reactjs-popup/dist/index.css';
-import CommentStructure from '../Comments/CommentStructure';
 import { ClickableChip } from '../../Dashboard/utils';
 import { addToFullnameList, getFullnameList } from '../../../../helper/FOI/helper';
 import Accordion from '@material-ui/core/Accordion';
 import AccordionSummary from '@material-ui/core/AccordionSummary';
 import AccordionDetails from '@material-ui/core/AccordionDetails';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+import CommentHistory from './CommentHistory';
 
 const DisplayHistory = ({
   requesthistory,
@@ -126,11 +126,11 @@ const DisplayHistory = ({
         .sort((a, b) => a.commentId - b.commentId)
         .map((a, replyindex) => (
           <div key={a.commentId}>
-            <CommentStructure
+            <CommentHistory
               i={a}
               reply
               parentId={i.commentId}
-              totalcommentCount={-100}
+              totalcommentCount={i.replies.length}
               currentIndex={replyindex}
               isreplysection={true}
               hasAnotherUserComment={false}
@@ -195,7 +195,7 @@ const DisplayHistory = ({
   
   const rendercomment = (item, index, fullName, hasOtherUserComments) => (
     <>
-      <CommentStructure
+      <CommentHistory
         i={item}
         totalcommentCount={-100}
         currentIndex={index}
