@@ -1100,7 +1100,11 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
       }))
     ];
 
-    return mergedHistory.sort((a, b) => new Date(a.created_at || a.dateUF) - new Date(b.created_at || b.dateUF));
+    return mergedHistory.sort((a, b) => {
+      const dateA = new Date(a.created_at || a.dateUF);
+      const dateB = new Date(b.created_at || b.dateUF);
+      return dateA - dateB || (a.commentId || a.applicantcorrespondenceid || 0) - (b.commentId || b.applicantcorrespondenceid || 0);
+    });
   };
   const getCommentsCount = () => {
     let commentsCount= (requestNotes.filter( c => c.commentTypeId !== getCommentTypeIdByName(commentTypes,"Ministry Internal") && 
