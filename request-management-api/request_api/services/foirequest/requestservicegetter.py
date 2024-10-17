@@ -119,11 +119,11 @@ class requestservicegetter:
         payment = paymentservice().getpayment(foirequestid, foiministryrequestid)
         if approvedcfrfee is not None and approvedcfrfee != {}:
             requestdetails['cfrfee'] = approvedcfrfee
-            _totaldue = float(approvedcfrfee['feedata']['actualtotaldue']) if float(approvedcfrfee['feedata']['actualtotaldue']) > 0 else float(approvedcfrfee['feedata']['estimatedtotaldue'])
+            _totaldue = float(approvedcfrfee['feedata']['actualtotaldue']) if 'actualtotaldue' in approvedcfrfee['feedata'] and float(approvedcfrfee['feedata']['actualtotaldue']) > 0 else float(approvedcfrfee['feedata']['estimatedtotaldue'])
             _balancedue = _totaldue - (float(cfrfee['feedata']['amountpaid']) + float(approvedcfrfee['feedata']['feewaiveramount']))
             requestdetails['cfrfee']['feedata']['amountpaid'] = cfrfee['feedata']['amountpaid']
             requestdetails['cfrfee']['feedata']["balanceDue"] = '{:.2f}'.format(_balancedue)
-            if approvedcfrfee['feedata']['actualtotaldue']:
+            if 'actualtotaldue' in approvedcfrfee['feedata'] and approvedcfrfee['feedata']['actualtotaldue']:
                 requestdetails['cfrfee']['feedata']["totalamountdue"] = '{:.2f}'.format(requestdetails['cfrfee']['feedata']["actualtotaldue"])
             else:
                 requestdetails['cfrfee']['feedata']["totalamountdue"] = '{:.2f}'.format(requestdetails['cfrfee']['feedata']["estimatedtotaldue"])
@@ -193,6 +193,7 @@ class requestservicegetter:
             'identityVerified':requestministry['identityverified'],
             'estimatedpagecount':requestministry['estimatedpagecount'],
             'estimatedtaggedpagecount':requestministry['estimatedtaggedpagecount'],
+            'userrecordslockstatus': requestministry['userrecordslockstatus'],
             
         }
         if requestministry['cfrduedate'] is not None:

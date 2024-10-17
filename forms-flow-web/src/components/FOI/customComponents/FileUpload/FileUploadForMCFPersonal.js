@@ -83,8 +83,8 @@ const FileUploadForMCFPersonal = ({
       isMinistryCoordinator?MCFPeople?.people.filter((p)=>{return p.name !== 'PERSON 1'}):MCFPeople?.people.filter((p)=>{return p.name !== 'APPLICANT'})
     );
     const [allVolumes, setAllVolumes] = useState(MCFVolumes?.volumes);
-    const [fileTypes, setFileTypes] = useState(MCFFiletypes?.filetypes.slice(0, 6));
-    const [otherFileTypes, setOtherFileTypes] = useState(MCFFiletypes?.filetypes.slice(6, MCFFiletypes?.filetypes.length));
+    const [fileTypes, setFileTypes] = useState(MCFFiletypes?.filetypes.slice(0, 8));
+    const [otherFileTypes, setOtherFileTypes] = useState(MCFFiletypes?.filetypes.slice(8, MCFFiletypes?.filetypes.length));
     const [people, setPeople] = useState(allPeople.slice(0, 5));
     const [volumes, setVolumes] = useState(allVolumes.slice(0, 5));
     const [showAllPeople, setShowAllPeople] = useState(false);
@@ -211,6 +211,7 @@ const FileUploadForMCFPersonal = ({
     };
     const fileDrop = (e) => {
       e.preventDefault();
+
       const newFiles = e.dataTransfer.files;
       const totalNoOfFiles = Object.entries(files).length + newFiles.length; 
       validateFiles(newFiles, totalNoOfFiles);
@@ -266,8 +267,8 @@ const FileUploadForMCFPersonal = ({
     },[person, fileType])
 
     React.useEffect(() => {
-      setAdditionalTagList(searchSections(otherTagList, searchValue, tagValue));
-    },[searchValue, otherTagList, tagValue])
+      setAdditionalTagList(searchSections(otherTagList, searchValue, personalTag));
+    },[searchValue, otherTagList, personalTag])
 
     const handleTrackingIDUpdate = (e) => {
       handleTrackingIDChange(e.target.value);
@@ -564,7 +565,7 @@ const FileUploadForMCFPersonal = ({
               sx={{width: "fit-content", marginRight: "8px", marginBottom: "8px"}}
               color="primary"
               size="small"
-              onClick={()=>{handlePersonalTagChange(tag);if(isScanningTeamMember){handleTagChange(tag.divisionid)}}}
+              onClick={()=>{handlePersonalTagChange(tag);}}
               clicked={personalTag?.name === tag.name}
               disabled={!isPersonSelected || trackingID===""}
             />
@@ -662,7 +663,7 @@ const FileUploadForMCFPersonal = ({
                   sx={{width: "fit-content", marginRight: "8px", marginBottom: "8px"}}
                   color="primary"
                   size="small"
-                  onClick={()=>{handlePersonalTagChange(tag);if(isScanningTeamMember){handleTagChange(tag.divisionid)}}}
+                  onClick={()=>{handlePersonalTagChange(tag)}}
                   clicked={personalTag?.name === tag.name}
                 />
               )}
@@ -707,12 +708,11 @@ const FileUploadForMCFPersonal = ({
             value=""
             multiple={multipleFiles}
             accept={mimeTypes}
-            disabled={modalFor === "add" && !isPersonSelected}
             />
           </div>
           <div className="file-upload-column file-upload-column-3">
             {(Object.entries(files).length === 0 && !multipleFiles) || multipleFiles ?
-            <button className="btn-add-files" type="button" onClick={handleUploadBtnClick} disabled={modalFor === "add" && !isPersonSelected}>              
+            <button className="btn-add-files" type="button" onClick={handleUploadBtnClick}>
                   Add Files
             </button>  : null}
           </div>

@@ -237,7 +237,7 @@ class recordservicegetter(recordservicebase):
         if computingresponse["conversionstatus"] == "error":
             return "conversion"
         elif computingresponse["deduplicationstatus"] == "error":
-            return "deduplication"
+            return "deduplication. " + computingresponse["message"] if computingresponse["message"] not in ['', None] else "deduplication"
         return None
 
     def __getcomputingsummary(self, computingresponse):

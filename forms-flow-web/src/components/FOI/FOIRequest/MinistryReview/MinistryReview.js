@@ -21,6 +21,7 @@ import {
   fetchFOIPersonalPeople,
   fetchFOIPersonalFiletypes,
   fetchFOIPersonalVolumes,
+  fetchFOICommentTypes
 } from "../../../../apiManager/services/FOI/foiMasterDataServices";
 
 import { fetchFOIRequestAttachmentsList } from "../../../../apiManager/services/FOI/foiAttachmentServices";
@@ -42,6 +43,7 @@ import {
   ConditionalComponent,
   calculateDaysRemaining,
   addToRestrictedRequestTagList,
+  getCommentTypeIdByName
 } from "../../../../helper/FOI/helper";
 import ApplicantDetails from "./ApplicantDetails";
 import ChildDetails from "./ChildDetails";
@@ -115,6 +117,8 @@ const MinistryReview = React.memo(({ userDetail }) => {
 
   const [_currentrequestStatus, setcurrentrequestStatus] = React.useState("");
   const [_tabStatus, settabStatus] = React.useState(requestState);
+  const commentTypes = useSelector((state) => state.foiRequests.foiCommentTypes); 
+
   
   //gets the request detail from the store
   const IsDivisionalCoordinator = () => {
@@ -204,6 +208,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
     } else if (window.location.href.indexOf("records") > -1) {
       tabclick("Records");
     }
+    dispatch(fetchFOICommentTypes());
   }, []);
 
   useEffect(async () => {
@@ -247,6 +252,20 @@ const MinistryReview = React.memo(({ userDetail }) => {
 
   const userGroups = userDetail?.groups?.map(group => group.slice(1));
   const isMinistry = isMinistryLogin(userGroups);
+
+  const validLockRecordsState = (currentState=requestDetails.currentState) => {
+    return (
+      currentState === StateEnum.harms.name ||
+      currentState === StateEnum.onhold.name ||
+      currentState === StateEnum.recordsreadyforreview.name ||
+      currentState === StateEnum.review.name ||
+      currentState === StateEnum.consult.name ||
+      currentState === StateEnum.peerreview.name ||
+      currentState === StateEnum.signoff.name ||
+      currentState === StateEnum.response.name ||
+      currentState === StateEnum.closed.name
+    );
+  }
   
   useEffect(() => {
     const requestDetailsValue = requestDetails;
@@ -280,6 +299,16 @@ const MinistryReview = React.memo(({ userDetail }) => {
         setIsMCFPersonal(true);
       }
     }
+
+    //Adjust lockRecords value based on requestState if there is no manual user lockedrecords value present in requestDetails from DB
+    const updateRecordsTabAccess = () => {
+      if(requestDetails.userrecordslockstatus === null) {
+        return validLockRecordsState(requestDetails.currentState);
+      } else {
+        return requestDetails.userrecordslockstatus;
+      }
+    }
+    setLockRecordsTab(updateRecordsTabAccess());
   }, [requestDetails, unSavedRequest]);
 
   useEffect(() => {
@@ -295,6 +324,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
   }, [isMinistryRestricted, requestWatchers]);
 
   const [recordsUploading, setRecordsUploading] = React.useState(false);
+  const [lockRecordsTab, setLockRecordsTab] = useState(false);
   const [CFRUnsaved, setCFRUnsaved] = React.useState(false);
   const hideBottomText = [
     StateEnum.onhold.name.toLowerCase(),
@@ -602,6 +632,20 @@ const MinistryReview = React.memo(({ userDetail }) => {
     (state) => state.foiRequests.showEventQueue
   );
 
+  const getCommentsCount = () => {
+    if(isMinistry){
+       let commentsCount= (requestNotes.filter(c => c.commentTypeId !== getCommentTypeIdByName(commentTypes, "IAO Internal") && 
+          c.commentTypeId !== getCommentTypeIdByName(commentTypes, "IAO Peer Review"))).length;
+        return '('+commentsCount+')'
+    }
+    else{
+      let commentsCount= (requestNotes.filter( c => c.commentTypeId !== getCommentTypeIdByName(commentTypes,"Ministry Internal") && 
+            c.commentTypeId !== getCommentTypeIdByName(commentTypes, "Ministry Peer Review"))).length;
+      return '('+commentsCount+')'
+    }
+
+  }
+
   return !isLoading &&
     requestDetails &&
     Object.keys(requestDetails).length !== 0 &&
@@ -649,6 +693,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
                 ? ` (${requestAttachments.length})`
                 : ""}
             </div>
+            {/* {commentTypes?.length > 0 && */}
             <div
               className={clsx("tablinks", {
                 active: tabLinksStatuses.Comments.active,
@@ -657,10 +702,12 @@ const MinistryReview = React.memo(({ userDetail }) => {
               onClick={() => tabclick("Comments")}
             >
               Comments{" "}
-              {requestNotes && requestNotes.length > 0
+              {/* {requestNotes && requestNotes.length > 0
                 ? `(${requestNotes.length})`
-                : ""}
+                : ""} */}
+              {getCommentsCount()}
             </div>
+            {/* } */}
             {(originalDivisions?.length > 0 || isMCFPersonal) &&
               DISABLE_GATHERINGRECORDS_TAB?.toLowerCase() == "false" && (
                 <div
@@ -806,6 +853,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
                           handleSaveRequest={handleSaveRequest}
                           currentSelectedStatus={_currentrequestStatus}
                           hasStatusRequestSaved={hasStatusRequestSaved}
+                          validLockRecordsState={validLockRecordsState}
                         />
                       </>
                     )}
@@ -963,6 +1011,8 @@ const MinistryReview = React.memo(({ userDetail }) => {
                   isRestricted={
                     requestDetails?.ministryrestricteddetails?.isrestricted
                   }
+                  isMinistry={isMinistry}
+                  commentTypes={commentTypes}
                 />
               </>
             ) : (
@@ -1054,6 +1104,9 @@ const MinistryReview = React.memo(({ userDetail }) => {
                   setRecordsUploading={setRecordsUploading}
                   recordsTabSelect={tabLinksStatuses.Records.active}
                   requestType={requestDetails?.requestType}
+                  lockRecords={lockRecordsTab}
+                  validLockRecordsState={validLockRecordsState}
+                  handleSaveRequest={handleSaveRequest}
                 />
               </>
             ) : (

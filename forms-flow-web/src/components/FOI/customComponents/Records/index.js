@@ -34,6 +34,7 @@ import {
   fetchPDFStitchedRecordForOIPCRedlineReview,
   checkForRecordsChange,
   editPersonalAttributes,
+  updateUserLockedRecords,
 } from "../../../../apiManager/services/FOI/foiRecordServices";
 import {
   saveRequestDetails,
@@ -124,7 +125,6 @@ import { MinistryNeedsScanning } from "../../../../constants/FOI/enum";
 import FOI_COMPONENT_CONSTANTS from "../../../../constants/FOI/foiComponentConstants";
 import MCFPersonal from "./MCFPersonal";
 import MSDPersonal from "./MSDPersonal";
-import MCFPersonalMinistry from "./MCFPersonalMinistry";
 
 const useStyles = makeStyles((_theme) => ({
   createButton: {
@@ -228,6 +228,10 @@ export const RecordsLog = ({
   requestType,
   handleSaveRequest,
   isHistoricalRequest,
+  lockRecords,
+  setLockRecordsTab,
+  validLockRecordsState,
+  setSaveRequestObject,
 }) => {
   const user = useSelector((state) => state.user.userDetail);
   const userGroups = user?.groups?.map((group) => group.slice(1));
@@ -340,13 +344,18 @@ export const RecordsLog = ({
   const MCFVolumes = useSelector(
     (state) => state.foiRequests.foiPersonalVolumes
   );
+  const MCFSections = useSelector(
+    (state) => state.foiRequests.foiPersonalSections
+  );
   const [personFilters, setPersonFilters] = useState([]);
   const [fileTypeFilters, setFileTypeFilters] = useState([]);
   const [volumeFilters, setVolumeFilters] = useState([]);
+  const [personalTagFilters, setPersonalTagFilters] = useState([]);
   useEffect(() => {
     let _personFilters = [];
     let _fileTypeFilters = [];
     let _volumeFilters = [];
+    let _personalTagFilters = []
     if(recordsObj?.records?.length > 0) {
       recordsObj.records.forEach((record) => {
         if(record.attributes?.personalattributes?.person && MCFPeople?.people) {
@@ -364,12 +373,18 @@ export const RecordsLog = ({
             _volumeFilters = _volumeFilters.concat(MCFVolumes.volumes.filter((v)=>{return v.name === record.attributes.personalattributes.volume}));
           }
         }
+        if(record.attributes?.personalattributes?.personaltag && MCFSections?.sections) {
+          if(_personalTagFilters.filter((pt)=>{return pt.divisionname === record.attributes.personalattributes.personaltag}).length === 0) {
+            _personalTagFilters = _personalTagFilters.concat(MCFSections.sections.filter((d)=>{return d.name === record.attributes.personalattributes.personaltag}));
+          }
+        }
       });
     }
     setPersonFilters(_personFilters.sort((a, b)=>a.sortorder-b.sortorder));
     setFileTypeFilters(_fileTypeFilters.sort((a, b)=>a.sortorder-b.sortorder));
     setVolumeFilters(_volumeFilters.sort((a, b)=>a.sortorder-b.sortorder));
-  }, [recordsObj, MCFPeople, MCFFiletypes, MCFVolumes]);
+    setPersonalTagFilters(_personalTagFilters.sort((a, b)=>a.sortorder-b.sortorder));
+  }, [recordsObj, MCFPeople, MCFFiletypes, MCFVolumes, MCFSections]);
   
   useEffect(() => {
     setEstimatedPageCount(requestDetails.estimatedpagecount)
@@ -401,12 +416,15 @@ export const RecordsLog = ({
     ...personFilters.map((p)=>{p.divisionname=p.name; p.type='person'; return p;}),
     ...fileTypeFilters.map((ft)=>{ft.divisionname=ft.name; ft.type='filetype'; return ft;}),
     ...volumeFilters.map((v)=>{v.divisionname=v.name; v.type='volume'; return v;}),
+    ...personalTagFilters.map((pt)=>{pt.divisionname=pt.name; pt.type='personaltag'; return pt;}),
     ...new Map(
       recordsObj?.records?.reduce(
         (acc, file) => [
           ...acc,
           ...new Map(
-            file?.attributes?.divisions?.map((division) => [
+            file?.attributes?.divisions?.filter(
+              (division) => division.divisionname != "TBD"
+            ).map((division) => [
               division?.divisionid,
               division,
             ])
@@ -1533,7 +1551,7 @@ export const RecordsLog = ({
               isrecordtimeout(r.created_at, RECORD_PROCESSING_HRS) == true)
           : _filterValue > -1
           ? r.attributes?.divisions?.findIndex(
-              (a) => a.divisionid === _filterValue
+              (a) => a.divisionid === _filterValue && a.divisionname !== "TBD"
             ) > -1
             ||
             r.attributes?.personalattributes?.person === _filterText
@@ -1541,6 +1559,8 @@ export const RecordsLog = ({
             r.attributes?.personalattributes?.filetype === _filterText
             ||
             r.attributes?.personalattributes?.volume === _filterText
+            ||
+            r.attributes?.personalattributes?.personaltag === _filterText
           : true)
       )
       if (isMatch) {
@@ -1830,42 +1850,57 @@ export const RecordsLog = ({
   const updatePersonalAttributes = (_all = false) => {
     setEditTagModalOpen(false);
     var updateRecords = [];
+    var updateDivisionForRecords = [];
 
-    if(_all) {
-      for (let record of records) {
-        if(record.attributes?.personalattributes?.person
-           && record.attributes?.personalattributes?.person === currentEditRecord.attributes?.personalattributes?.person
-           && record.attributes?.personalattributes?.filetype
-           && record.attributes?.personalattributes?.filetype === currentEditRecord.attributes?.personalattributes?.filetype
-        ) {
-          updateRecords.push(
-            (({ recordid, documentmasterid, s3uripath }) => ({
-              recordid,
-              documentmasterid,
-              filepath: s3uripath,
-            }))(record)
-          );
-        }
-
-        if(record.attachments) {
-          for (let attachment of record.attachments) {
-            if(attachment.attributes?.personalattributes?.person
-              && attachment.attributes?.personalattributes?.person === currentEditRecord.attributes?.personalattributes?.person
-              && attachment.attributes?.personalattributes?.filetype
-              && attachment.attributes?.personalattributes?.filetype === currentEditRecord.attributes?.personalattributes?.filetype
-            ) {
-              updateRecords.push(
-                (({ documentmasterid, s3uripath }) => ({
-                  documentmasterid,
-                  filepath: s3uripath,
-                }))(attachment)
-              );
+    if(newPersonalAttributes) {
+      if(_all) {
+        for (let record of records) {
+          if(record.attributes?.personalattributes?.person
+             && record.attributes?.personalattributes?.person === currentEditRecord.attributes?.personalattributes?.person
+            //  && record.attributes?.personalattributes?.filetype
+            //  && record.attributes?.personalattributes?.filetype === currentEditRecord.attributes?.personalattributes?.filetype
+          ) {
+            updateRecords.push(
+              (({ recordid, documentmasterid, s3uripath }) => ({
+                recordid,
+                documentmasterid,
+                filepath: s3uripath,
+              }))(record)
+            );
+          }
+  
+          if(record.attachments) {
+            for (let attachment of record.attachments) {
+              if(attachment.attributes?.personalattributes?.person
+                && attachment.attributes?.personalattributes?.person === currentEditRecord.attributes?.personalattributes?.person
+                // && attachment.attributes?.personalattributes?.filetype
+                // && attachment.attributes?.personalattributes?.filetype === currentEditRecord.attributes?.personalattributes?.filetype
+              ) {
+                updateRecords.push(
+                  (({ documentmasterid, s3uripath }) => ({
+                    documentmasterid,
+                    filepath: s3uripath,
+                  }))(attachment)
+                );
+              }
             }
           }
         }
+      } else {
+        updateRecords.push(
+          {
+            recordid: currentEditRecord.recordid,
+            documentmasterid: currentEditRecord.documentmasterid,
+            filepath: currentEditRecord.s3uripath
+          }
+        );
       }
-    } else {
-      updateRecords.push(
+    }
+
+    if(isMinistryCoordinator
+      && currentEditRecord.attributes.divisions[0].divisionname != "TBD"
+      && currentEditRecord.attributes.divisions[0].divisionid != divisionModalTagValue) {
+      updateDivisionForRecords.push(
         {
           recordid: currentEditRecord.recordid,
           documentmasterid: currentEditRecord.documentmasterid,
@@ -1874,21 +1909,58 @@ export const RecordsLog = ({
       );
     }
 
-    if(currentEditRecord && !comparePersonalAttributes(newPersonalAttributes, curPersonalAttributes)) {
-      dispatch(
-        editPersonalAttributes(
-          requestId,
-          ministryId,
-          {
-            records: updateRecords,
-            newpersonalattributes: newPersonalAttributes
-          },
-          (err, _res) => {
-            dispatchRequestAttachment(err);
-          }
-        )
-      );
+    if(currentEditRecord) {
+      if(updateRecords.length > 0 && !comparePersonalAttributes(newPersonalAttributes, curPersonalAttributes)) {
+        dispatch(
+          editPersonalAttributes(
+            requestId,
+            ministryId,
+            {
+              records: updateRecords,
+              newpersonalattributes: newPersonalAttributes,
+            },
+            (err, _res) => {
+              if(updateDivisionForRecords.length > 0) {
+                dispatch(
+                  updateFOIRecords(
+                    requestId,
+                    ministryId,
+                    {
+                      records: updateDivisionForRecords,
+                      divisions: [{ divisionid: divisionModalTagValue }],
+                      isdelete: false,
+                    },
+                    (err, _res) => {
+                      dispatchRequestAttachment(err);
+                    }
+                  )
+                );
+              } else {
+                dispatchRequestAttachment(err);
+              }
+            }
+          )
+        );
+      } else {
+        if(updateDivisionForRecords.length > 0) {
+          dispatch(
+            updateFOIRecords(
+              requestId,
+              ministryId,
+              {
+                records: updateDivisionForRecords,
+                divisions: [{ divisionid: divisionModalTagValue }],
+                isdelete: false,
+              },
+              (err, _res) => {
+                dispatchRequestAttachment(err);
+              }
+            )
+          );
+        }
+      }
 
+      setDivisionModalTagValue(-1);
       setCurrentEditRecord();
       setCurPersonalAttributes({
         person: "",
@@ -1911,6 +1983,48 @@ export const RecordsLog = ({
     );
   };
 
+  const handleLockRecords = () => {
+    const toastID = toast.loading("Updating records lock status for request...");
+    const data = {userrecordslockstatus: !lockRecords};
+    dispatch(
+      updateUserLockedRecords(
+        data,
+        requestId,
+        ministryId, 
+        (err, _res) => {
+        if(!err) {
+          setSaveRequestObject(prev => ({...prev, userrecordslockstatus: !lockRecords}));
+          setLockRecordsTab(!lockRecords);
+          toast.update(toastID, {
+            type: "success",
+            render: "Request details have been saved successfully.",
+            position: "top-right",
+            isLoading: false,
+            autoClose: 3000,
+            hideProgressBar: true,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+          });
+        } else {
+          toast.error(
+            "Temporarily unable to update records lock status for request. Please try again in a few minutes.",
+            {
+              position: "top-right",
+              autoClose: 3000,
+              hideProgressBar: true,
+              closeOnClick: true,
+              pauseOnHover: true,
+              draggable: true,
+              progress: undefined,
+            }
+          );
+        }
+      })
+    )
+  }
+
   const saveEstimates = (e) => {
     requestDetails.estimatedpagecount = estimatedPageCount
     requestDetails.estimatedtaggedpagecount = estimatedTaggedPageCount
@@ -1920,8 +2034,8 @@ export const RecordsLog = ({
         -1,
         requestId,
         ministryId,
-        (err, res) => {            
-          if (!err) {
+        (err, res) => {    
+          if (res!= null && res?.status == true) {
             toast.success("The request has been saved successfully.", {
               position: "top-right",
               autoClose: 3000,
@@ -1972,31 +2086,60 @@ export const RecordsLog = ({
                 {getRequestNumber()}
               </h1>
             </Grid>
-            <Grid item xs={2}>
-              {(isMinistryCoordinator == false &&
-                records?.length > 0 &&
-                !isHistoricalRequest &&
-                DISABLE_REDACT_WEBLINK?.toLowerCase() == "false" && (
-                  <a
-                    href={DOC_REVIEWER_WEB_URL + "/foi/" + ministryId}
-                    target="_blank"
+            {validLockRecordsState() ?
+            <Grid item xs={isScanningTeamMember ? 1 : 2}>
+              <Tooltip 
+                enterDelay={1000} 
+                title={isMinistryCoordinator ? "Only the IAO analyst can manually lock or unlock the records log, please contact the assigned analyst for assistance" : "Manually unlock or lock the records log"}
+              >
+                {isMinistryCoordinator ? 
+                  <p
+                    style={{ fontWeight: "bold", fontSize: "17.5px", marginTop: "4px", color: "#036" }}
                   >
-                    <button
-                      className={clsx(
-                        "btn",
-                        "addAttachment",
-                        classes.createButton
-                      )}
-                      variant="contained"
-                      // onClick={}
-                      color="primary"
-                    >
-                      Redact Records
-                    </button>
-                  </a>
-                )
-              )}
-            </Grid>
+                    {lockRecords ? "Records Locked" : "Records Unlocked"}
+                  </p>
+                : <span>
+                <button
+                disabled={isMinistryCoordinator}
+                onClick={handleLockRecords}
+                className={clsx(
+                  "btn",
+                  classes.createButton
+                  )}
+                  variant="contained"
+                  color="primary"
+                >
+                  {lockRecords ? "Unlock Records" : "Lock Records"}
+                </button>
+                </span>
+                }
+              </Tooltip>
+            </Grid> :  <Grid item xs={isScanningTeamMember ? 1 : 2}></Grid>
+            }
+            {(isMinistryCoordinator == false &&
+              records?.length > 0 &&
+              DISABLE_REDACT_WEBLINK?.toLowerCase() == "false" && (
+                <Grid item xs={isScanningTeamMember ? 1 : 2}>
+                <a
+                  href={DOC_REVIEWER_WEB_URL + "/foi/" + ministryId}
+                  target="_blank"
+                >
+                  <button
+                    className={clsx(
+                      "btn",
+                      "addAttachment",
+                      classes.createButton
+                    )}
+                    variant="contained"
+                    // onClick={}
+                    color="primary"
+                  >
+                    Redact Records
+                  </button>
+                </a>
+                </Grid>
+              )
+            )}
             <Grid item xs={3}>
               {hasDocumentsToDownload && !isHistoricalRequest && (
                 <TextField
@@ -2067,7 +2210,7 @@ export const RecordsLog = ({
                   variant="contained"
                   onClick={addAttachments}
                   color="primary"
-                  disabled={conversionFormats?.length < 1}
+                  disabled={lockRecords || conversionFormats?.length < 1 || (isMinistryCoordinator && divisions.length === 0)}
                 >
                   + Upload Records
                 </button>
@@ -2113,6 +2256,7 @@ export const RecordsLog = ({
                     size="small"
                     value={estimatedPageCount}
                     onChange={(e) => setEstimatedPageCount(e.target.value)}
+                    disabled={isMinistryCoordinator}
                   ></TextField>  
                 </div>
               </span>}
@@ -2160,6 +2304,7 @@ export const RecordsLog = ({
                     size="small"
                     value={estimatedTaggedPageCount}
                     onChange={(e) => setEstimatedTaggedPageCount(e.target.value)}
+                    disabled={isMinistryCoordinator}
                   ></TextField>              
                   <button 
                     class="btn" 
@@ -2173,7 +2318,8 @@ export const RecordsLog = ({
                       width: "calc(100% - 100px)"
                     }} 
                     onClick={saveEstimates}
-                    disabled={estimatedTaggedPageCount === requestDetails.estimatedtaggedpagecount && estimatedPageCount === requestDetails.estimatedpagecount}
+                    disabled={isMinistryCoordinator || (estimatedTaggedPageCount === requestDetails.estimatedtaggedpagecount && 
+                      estimatedPageCount === requestDetails.estimatedpagecount)}
                   >
                     Save
                   </button>
@@ -2321,8 +2467,8 @@ export const RecordsLog = ({
                 {divisionFilters.map((division) => (
                   <ClickableChip
                     item
-                    id={`${division.divisionid}Filter`}
-                    key={`${division.divisionid}-filter`}
+                    // id={`${division.divisionid}Filter`}
+                    // key={`${division.divisionid}-filter`}
                     label={division.divisionname.toUpperCase()}
                     sx={{
                       width: "fit-content",
@@ -2382,13 +2528,13 @@ export const RecordsLog = ({
                     className={` btn`}
                     onClick={() => setDeleteModalOpen(true)}
                     // title="Remove Attachments"
-                    disabled={
+                    disabled={lockRecords || 
                       records.filter((record) => record.attachments?.length > 0)
                         .length === 0
                     }
                     style={
                       records.filter((record) => record.attachments?.length > 0)
-                        .length === 0
+                        .length === 0 || lockRecords
                         ? { pointerEvents: "none" }
                         : {}
                     }
@@ -2401,13 +2547,14 @@ export const RecordsLog = ({
                   </button>
                 </span>
               </Tooltip>
-              {(!isMCFPersonal || (isMCFPersonal && isMinistryCoordinator)) && (
+              {(!isMCFPersonal) && (
               <Tooltip
                 title={
                   isUpdateDivisionsDisabled() ? (
                     <div style={{ fontSize: "11px" }}>
                       To update divisions:{" "}
                       <ul>
+                        <li>Records log must be unlocked</li>
                         <li>at least one record must be selected</li>
                         <li>
                           all records selected must be tagged to the same
@@ -2417,14 +2564,6 @@ export const RecordsLog = ({
                           {" "}
                           and all records selected must be finished processing
                         </li>
-                        {isMCFPersonal && (
-                          <>
-                            <li>
-                              all records selected must be uploaded by your own
-                              team
-                            </li>
-                          </>
-                        )}
                       </ul>
                     </div>
                   ) : (
@@ -2438,9 +2577,9 @@ export const RecordsLog = ({
                     className={` btn`}
                     onClick={() => setDivisionsModalOpen(true)}
                     // title="Update Divisions"
-                    disabled={isUpdateDivisionsDisabled()}
+                    disabled={lockRecords || isUpdateDivisionsDisabled()}
                     style={
-                      isUpdateDivisionsDisabled()
+                      lockRecords || isUpdateDivisionsDisabled()
                         ? { pointerEvents: "none" }
                         : {}
                     }
@@ -2460,9 +2599,9 @@ export const RecordsLog = ({
                     className={` btn`}
                     onClick={() => handlePopupButtonClick("delete")}
                     // title="Delete"
-                    disabled={!checkIsAnySelected() || isHistoricalRequest}
+                    disabled={lockRecords || !checkIsAnySelected() || isHistoricalRequest}
                     style={
-                      !checkIsAnySelected() ? { pointerEvents: "none" } : {}
+                      lockRecords || !checkIsAnySelected() ? { pointerEvents: "none" } : {}
                     }
                   >
                     <FontAwesomeIcon icon={faTrash} size="lg" color="#38598A" />
@@ -2527,6 +2666,7 @@ export const RecordsLog = ({
                     setEditTagModalOpen={setEditTagModalOpen}
                     setCurrentEditRecord={setCurrentEditRecord}
                     isHistoricalRequest={isHistoricalRequest}
+                    lockRecords={lockRecords}
                   />
                 ))
               ) : (
@@ -2629,18 +2769,22 @@ export const RecordsLog = ({
             </Dialog>
           </div>
 
-          {isMCFPersonal&&!isMinistryCoordinator?(
+          {isMCFPersonal?(
             <MCFPersonal
               editTagModalOpen={editTagModalOpen}
               setEditTagModalOpen={setEditTagModalOpen}
               record={currentEditRecord}
               setNewDivision={setDivisionModalTagValue}
-
+              comparePersonalAttributes={comparePersonalAttributes}
               curPersonalAttributes={curPersonalAttributes}
               setNewPersonalAttributes={setNewPersonalAttributes}
               updatePersonalAttributes={updatePersonalAttributes}
               setCurrentEditRecord={setCurrentEditRecord}
               setCurPersonalAttributes={setCurPersonalAttributes}
+              divisionModalTagValue={divisionModalTagValue}
+              divisions={divisions}
+              isMinistryCoordinator={isMinistryCoordinator}
+              currentEditRecord={currentEditRecord}
             />
           ):(
             <div className="state-change-dialog">
@@ -2694,18 +2838,7 @@ export const RecordsLog = ({
 
                       {requestType ==
                       FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL ? (
-                        (bcgovcode == "MCF" && isMinistryCoordinator) ? (
-                          <MCFPersonalMinistry
-                            setNewDivision={setDivisionModalTagValue}
-                            tagValue={
-                              records.filter((r) => r.isselected)[0]?.attributes
-                                .divisions[0].divisionid
-                            }
-                            divisionModalTagValue={divisionModalTagValue}
-                            divisions={divisions}
-                            isMinistryCoordinator={isMinistryCoordinator}
-                          />
-                        ) : bcgovcode == "MSD" ? (
+                        bcgovcode == "MSD" ? (
                           <MSDPersonal
                             setNewDivision={setDivisionModalTagValue}
                             tagValue={
@@ -2863,7 +2996,8 @@ const Attachment = React.memo(
     isMCFPersonal,
     setEditTagModalOpen,
     setCurrentEditRecord,
-    isHistoricalRequest
+    isHistoricalRequest,
+    lockRecords
   }) => {
     const classes = useStyles();
     const [disabled, setDisabled] = useState(false);
@@ -2872,6 +3006,10 @@ const Attachment = React.memo(
       (division) => {
         return !record.attributes?.personalattributes?.personaltag || (record.attributes?.personalattributes?.personaltag && division.divisionname != record.attributes?.personalattributes?.personaltag);
       }) || [];
+    const removeInValidTagsFromDivisions = record.attributes?.divisions.filter(
+      (division) => {
+        return division.divisionname != "TBD";
+      });
 
     // useEffect(() => {
     //   if(record && record.filename) {
@@ -3033,9 +3171,9 @@ const Attachment = React.memo(
                   textOverflow: "ellipsis",
                   whiteSpace: "nowrap",
                 }}
-                title={`Attachment of ${record.attachmentof}`}
+                title={record.failed ? `Error during ${record.failed}` : `Attachment of ${record.attachmentof}`}
               >
-                Attachment of {record.attachmentof}
+                {record.failed ? `Error during ${record.failed}` : `Attachment of ${record.attachmentof}`}
               </span>
             ) : record.isredactionready ? (
               <span>Ready for Redaction</span>
@@ -3054,6 +3192,7 @@ const Attachment = React.memo(
               disabled={disabled}
               ministryId={ministryId}
               setRetry={setRetry}
+              lockRecords={lockRecords}
               setEditTagModalOpen={setEditTagModalOpen}
               isMCFPersonal={isMCFPersonal}
               isMinistryCoordinator={isMinistryCoordinator}
@@ -3071,7 +3210,7 @@ const Attachment = React.memo(
           alignItems="flex-start"
         >
           <Grid item xs={6}>
-            {removePersonalTagsFromDivisions.map((division, i) => (
+            {removeInValidTagsFromDivisions.length > 0 && removeInValidTagsFromDivisions.map((division, i) => (
               <Chip
                 item
                 key={i}
@@ -3099,9 +3238,9 @@ const Attachment = React.memo(
                 style={{
                   backgroundColor: "#003366",
                   margin:
-                    record.isattachment && removePersonalTagsFromDivisions.length === 0
+                    record.isattachment && removeInValidTagsFromDivisions.length === 0
                       ? "4px 4px 4px 95px"
-                      : removePersonalTagsFromDivisions.length === 0
+                      : removeInValidTagsFromDivisions.length === 0
                       ? "4px 4px 4px 35px"
                       : "4px",
                 }}
@@ -3149,7 +3288,7 @@ const Attachment = React.memo(
             {record.attributes?.personalattributes?.personaltag && 
               <Chip
                 item
-                key={record.attributes?.divisions?.length + 4}
+                key={record.attributes?.divisions?.length + 5}
                 label={record.attributes.personalattributes.personaltag}
                 size="small"
                 className={clsx(classes.chip, classes.chipPrimary)}
@@ -3208,6 +3347,7 @@ const Attachment = React.memo(
             ministryId={ministryId}
             classes={classes}
             handleSelectRecord={handleSelectRecord}
+            lockRecords={lockRecords}
             isMCFPersonal={isMCFPersonal}
             setEditTagModalOpen={setEditTagModalOpen}
             setCurrentEditRecord={setCurrentEditRecord}
@@ -3232,6 +3372,7 @@ const AttachmentPopup = React.memo(
     disabled,
     ministryId,
     setRetry,
+    lockRecords,
     setEditTagModalOpen,
     isMCFPersonal,
     isMinistryCoordinator,
@@ -3314,27 +3455,40 @@ const AttachmentPopup = React.memo(
       );
     };
 
-    const DeleteMenu = () => {
-      return (
-        <MenuItem
-          onClick={() => {
-            handleDelete();
-            setPopoverOpen(false);
-          }}
-        >
-          Delete
-        </MenuItem>
-      );
-    };
-
     const ActionsPopover = ({
       RestrictViewInBrowser,
       record,
       setEditTagModalOpen,
       isMCFPersonal,
       isMinistryCoordinator,
-      isHistoricalRequest
+      isHistoricalRequest,
+      lockRecords
     }) => {
+      const isUploadedByMinistryUser = (record) => {
+        return hasValidDivisions(record);
+      };
+
+      const hasValidDivisions = (record) => {
+        return record.attributes.divisions.length > 0 && record.attributes.divisions[0].divisionname != "TBD"
+      };
+
+      const disableMinistryUser = isMCFPersonal && isMinistryCoordinator && !isUploadedByMinistryUser(record);
+
+      const DeleteMenu = () => {
+        return (
+          <MenuItem
+          style={ (lockRecords || disableMinistryUser) ? { pointerEvents: "none" } : {} }
+            disabled={lockRecords || disableMinistryUser}
+            onClick={() => {
+              handleDelete();
+              setPopoverOpen(false);
+            }}
+          >
+            Delete
+          </MenuItem>
+        );
+      };
+
       return (
         <Popover
           anchorReference="anchorPosition"
@@ -3356,8 +3510,9 @@ const AttachmentPopup = React.memo(
           onClose={() => setPopoverOpen(false)}
         >
           <MenuList>
-            {(isMCFPersonal && !isMinistryCoordinator) && (
+            {isMCFPersonal && (
               <MenuItem
+                disabled={lockRecords || disableMinistryUser}
                 onClick={() => {
                   setEditTagModalOpen(true);
                   setPopoverOpen(false);
@@ -3381,6 +3536,7 @@ const AttachmentPopup = React.memo(
             {(!record.attributes?.isattachment ||
               record.attributes?.isattachment === undefined) && !isHistoricalRequest && (
               <MenuItem
+                disabled={lockRecords || disableMinistryUser}
                 onClick={() => {
                   handleReplace();
                   setPopoverOpen(false);
@@ -3391,6 +3547,7 @@ const AttachmentPopup = React.memo(
             )}
             {record.attributes?.isattachment && (
               <MenuItem
+                disabled={lockRecords || disableMinistryUser}
                 onClick={() => {
                   handleReplaceAttachment();
                   setPopoverOpen(false);
@@ -3483,6 +3640,7 @@ const AttachmentPopup = React.memo(
           isMCFPersonal={isMCFPersonal}
           isMinistryCoordinator={isMinistryCoordinator}
           isHistoricalRequest={isHistoricalRequest}
+          lockRecords={lockRecords}
         />
       </>
     );
