@@ -181,6 +181,9 @@ class factRequestDetails(db.Model):
             elif(params['search'] == 'idnumber' or params['search'] == 'axisrequest_number'):
                 for keyword in params['keywords']:
                     filterbysearchcondition.append("LOWER(visualrequestfilenumber) like LOWER('%{0}%')".format(keyword))
+            elif(params['search'] == 'oipc_number'):
+                for keyword in params['keywords']:
+                    filterbysearchcondition.append("LOWER(oipcno) like LOWER('%{0}%')".format(keyword))
 
             requesttypecondition = []
             if len(params['requesttype'] + params['requestflags']) > 0:
@@ -199,8 +202,8 @@ class factRequestDetails(db.Model):
 
             
             
-            if(conditioncount == 0):
-                basequery+= "LOWER(description) like LOWER('%{0}%')".format(keyword)
+            if(conditioncount == 0): # if no conditions have been set so far, then any other conditions do not apply to historical search, so return empty array
+                return {'results': [], 'count': 0}
 
             if(isiaorestictedmanager == False):
                 basequery+= " AND requesttypename NOT LIKE '%Restricted%'"
