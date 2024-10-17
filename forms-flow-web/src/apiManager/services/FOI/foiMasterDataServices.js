@@ -29,6 +29,7 @@ import {
     setOIPCStatuses,
     setOIPCReviewtypes,
     setOIPCInquiryoutcomes,
+    setFOICommentTypes
   } from "../../../actions/FOI/foiRequestActions";
   import { fnDone, catchError } from "./foiServicesUtil";
   import UserService from "../../../services/UserService";
@@ -685,6 +686,31 @@ import {
         })
         .catch((error) => {
           console.log("Error while fetching OIPC inqiuryoutcomes master data", error);
+          dispatch(serviceActionError(error));
+          dispatch(setFOILoader(false));
+        });
+    };
+  };
+
+  export const fetchFOICommentTypes = () => {
+    return (dispatch) => {
+      httpGETRequest(API.FOI_GET_COMMENT_TYPES, {}, UserService.getToken())
+        .then((res) => {
+          if (res.data) {
+            const foiCommentTypes = res.data;
+            let data = foiCommentTypes?.map((type) => {
+              return { ...type };
+            });
+            dispatch(setFOICommentTypes(data));
+            dispatch(setFOILoader(false));
+          } else {
+            console.log("Error while fetching comment types master data", res);
+            dispatch(serviceActionError(res));
+            dispatch(setFOILoader(false));
+          }
+        })
+        .catch((error) => {
+          console.log("Error while fetching comment types master data", error);
           dispatch(serviceActionError(error));
           dispatch(setFOILoader(false));
         });

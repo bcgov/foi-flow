@@ -25,12 +25,16 @@ const MCFPersonal = ({
     editTagModalOpen,
     setEditTagModalOpen,
     setNewDivision,
-    // tagValue,
+    comparePersonalAttributes,
     curPersonalAttributes,
     setNewPersonalAttributes,
     updatePersonalAttributes,
     setCurPersonalAttributes,
-    setCurrentEditRecord
+    setCurrentEditRecord,
+    divisionModalTagValue,
+    divisions=[],
+    isMinistryCoordinator,
+    currentEditRecord
 }) => {
     const [personalAttributes, setPersonalAttributes] = useState();
     useEffect(() => {
@@ -44,7 +48,7 @@ const MCFPersonal = ({
     const MCFSections = useSelector((state) => state.foiRequests.foiPersonalSections);
     const [tagList, setTagList] = useState([]);
     const [otherTagList, setOtherTagList] = useState([]);
-  
+
     const MCFPeople = useSelector(
       (state) => state.foiRequests.foiPersonalPeople
     );
@@ -70,12 +74,36 @@ const MCFPersonal = ({
     const [fileTypeSearchValue, setFileTypeSearchValue] = useState("");
     const [additionalFileTypes, setAdditionalFileTypes] = useState([]);
     const [showAdditionalFileTypes, setShowAdditionalFileTypes] = useState(false);
+    const [disableSave, setDisableSave] = useState(false);
+
+    const compareDivision = (curDiv, newDiv) => {
+      return curDiv === newDiv;
+    }
+
+    useEffect(() => {
+      setDisableSave(
+        personalAttributes?.person === undefined
+         || personalAttributes?.person === ""
+         || personalAttributes?.filetype === undefined
+         || personalAttributes?.filetype === ""
+         || personalAttributes?.trackingid === undefined
+         || personalAttributes?.trackingid === ""
+         || (!isMinistryCoordinator && comparePersonalAttributes(personalAttributes, curPersonalAttributes))
+         || (isMinistryCoordinator && comparePersonalAttributes(personalAttributes, curPersonalAttributes) && compareDivision(currentEditRecord.attributes.divisions[0].divisionid, divisionModalTagValue))
+        );
+    },[personalAttributes, divisionModalTagValue])
+
+    useEffect(() => {
+      if(currentEditRecord?.attributes?.divisions[0]?.divisionid) {
+        setNewDivision(currentEditRecord.attributes.divisions[0].divisionid);
+      }
+    },[currentEditRecord])
 
     useEffect(() => {
       if(MCFSections?.sections) {
         if(MCFSections.sections.length > MCFPopularSections-1) {
           setTagList(MCFSections.sections.slice(0, MCFPopularSections-1));
-          setOtherTagList(MCFSections.sections.slice(MCFPopularSections));
+          setOtherTagList(MCFSections.sections.slice(MCFPopularSections-1));
         } else {
           setTagList(MCFSections.sections);
           setOtherTagList([]);
@@ -108,8 +136,8 @@ const MCFPersonal = ({
     useEffect(() => {
       if(MCFFiletypes?.filetypes) {
         if(MCFFiletypes.filetypes?.length > 6) {
-          setFileTypes(MCFFiletypes.filetypes.slice(0, 6));
-          setOtherFileTypes(MCFFiletypes.filetypes.slice(6, MCFFiletypes.filetypes.length))
+          setFileTypes(MCFFiletypes.filetypes.slice(0, 8));
+          setOtherFileTypes(MCFFiletypes.filetypes.slice(8, MCFFiletypes.filetypes.length))
         } else {
           setFileTypes(MCFFiletypes.filetypes);
           setOtherFileTypes([])
@@ -152,6 +180,16 @@ const MCFPersonal = ({
     },[showAllPeople, showAllVolumes])
 
     React.useEffect(() => {
+      if(allPeople.length > 0 && personalAttributes.person !== "") {
+        setShowAllPeople( allPeople.filter(p => p.name==personalAttributes.person)[0]?.sortorder >= 5 );
+      }
+
+      if(allVolumes.length > 0 && personalAttributes.volume !== "") {
+        setShowAllVolumes( allVolumes.filter(v => v.name==personalAttributes.volume)[0]?.sortorder >= 5 );
+      }
+    },[personalAttributes])
+
+    React.useEffect(() => {
       setAdditionalFileTypes(searchFileTypes(otherFileTypes, fileTypeSearchValue, personalAttributes?.filetype));
     },[fileTypeSearchValue, otherFileTypes, personalAttributes])
 
@@ -165,7 +203,7 @@ const MCFPersonal = ({
         _sectionArray.map((section) => {
           if(_keyword && section.name.toLowerCase().includes(_keyword.toLowerCase())) {
             newSectionArray.push(section);
-          } else if(section.divisionid === _selectedSectionValue) {
+          } else if(section.name === _selectedSectionValue) {
             newSectionArray.unshift(section);
           }
         });
@@ -220,6 +258,8 @@ const MCFPersonal = ({
     };
 
     const handleClose = () => {
+      setSearchValue("");
+      setFileTypeSearchValue("");
       setCurrentEditRecord();
       setCurPersonalAttributes({
         person: "",
@@ -230,6 +270,11 @@ const MCFPersonal = ({
       });
       setNewPersonalAttributes();
       setEditTagModalOpen(false);
+    };
+
+    const reset = () => {
+      setSearchValue("");
+      setFileTypeSearchValue("");
     };
 
     return (
@@ -269,6 +314,28 @@ const MCFPersonal = ({
                   to that person.
                 </span>
               </div>
+
+
+              {isMinistryCoordinator && divisions.length > 0 && (<>
+              <div className="tagtitle">
+                <span>Select Division: *</span>
+              </div>  
+              <div className="taglist">
+                {divisions.map(tag =>
+                  <ClickableChip
+                    id={`${tag.divisionid}Tag`}
+                    key={`${tag.divisionid}-tag`}
+                    label={tag.divisionname.toUpperCase()}
+                    sx={{width: "fit-content", marginRight: "8px", marginBottom: "8px"}}
+                    color="primary"
+                    size="small"
+                    onClick={()=>{setNewDivision(tag.divisionid)}}
+                    clicked={divisionModalTagValue == tag.divisionid}
+                  />
+                )}
+              </div>
+              </>)}
+
 
               <div className="tagtitle">
                 <span>Select Person: *</span>
@@ -464,7 +531,7 @@ const MCFPersonal = ({
                     sx={{width: "fit-content", marginRight: "8px", marginBottom: "8px"}}
                     color="primary"
                     size="small"
-                    onClick={()=>{handlePersonalAttributesChange(tag, "personaltag");setNewDivision(tag.divisionid);}}
+                    onClick={()=>{handlePersonalAttributesChange(tag, "personaltag")}}
                     clicked={personalAttributes?.personaltag === tag.name}
                   />
                 )}
@@ -560,7 +627,7 @@ const MCFPersonal = ({
                         sx={{width: "fit-content", marginRight: "8px", marginBottom: "8px"}}
                         color="primary"
                         size="small"
-                        onClick={()=>{handlePersonalAttributesChange(tag, "personaltag");setNewDivision(tag.divisionid);}}
+                        onClick={()=>{handlePersonalAttributesChange(tag, "personaltag")}}
                         clicked={personalAttributes?.personaltag === tag.name}
                       />
                     )}
@@ -572,13 +639,15 @@ const MCFPersonal = ({
           <DialogActions>
             <button
               className={`btn-bottom btn-save btn`}
-              onClick={() => updatePersonalAttributes()}
+              onClick={() => {updatePersonalAttributes();reset();}}
+              disabled={disableSave}
             >
               Update for Individual
             </button>
             <button
               className={`btn-bottom btn-save btn`}
-              onClick={() => updatePersonalAttributes(true)}
+              onClick={() => {updatePersonalAttributes(true);reset();}}
+              disabled={disableSave || isMinistryCoordinator}
             >
               Update for All
             </button>
