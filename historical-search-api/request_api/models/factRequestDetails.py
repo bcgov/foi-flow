@@ -203,7 +203,7 @@ class factRequestDetails(db.Model):
             
             
             if(conditioncount == 0): # if no conditions have been set so far, then any other conditions do not apply to historical search, so return empty array
-                {'results': [], 'count': 0}
+                return {'results': [], 'count': 0}
 
             if(isiaorestictedmanager == False):
                 basequery+= " AND requesttypename NOT LIKE '%Restricted%'"
