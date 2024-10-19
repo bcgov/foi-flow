@@ -1,0 +1,125 @@
+
+
+.btn-save {
+    border-radius: 3px;
+    font-size: small;
+    height: 30px;
+    flex-basis: 50% 
+}
+
+.btn-save:disabled {
+    opacity: 0.65;
+    background-color: #484848!important;
+}
+
+.export-btn-cancel {
+    border: 1px solid #38598A;
+    background-color: #FFFFFF;
+    color: #38598A;
+    border-radius: 3px;
+    font-size: small;
+    height: 30px;
+    flex-basis: 50%;
+    margin-top: 10px;
+    font-family: BCSans-Bold,sans-serif!important
+}
+
+#request-history-dialog-title {
+    font-family: "BCSans-Bold", sans-serif!important; 
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.request-history-export-header {
+    color: #036 ;
+    font-family: "BCSans-Bold", sans-serif !important;
+}
+
+.title-col3 {
+    flex-basis: 5% !important
+}
+
+
+.close-icon {
+    background-color: #036 ;
+    color: white;
+    // border-radius: unset;
+    font-size: 2.5rem!important;
+}
+
+.request-history-message {
+    font-size: 16px;
+}
+
+.MuiDialogActions-root {
+    padding: 20px 20px 30px !important;
+    justify-content: center !important;
+    flex-direction: row;
+}
+
+.confirm-modal-row {
+    margin: 30px;
+    padding: 0px 40px;
+}
+
+.confirm-label-area {
+    padding-left: 5px;
+}
+
+.confirm-label-content {
+    padding-left: 35px;
+}
+
+.modal-message {
+    margin-left: 50px;
+    margin-bottom: 20px;
+}
+
+
+.dialog-content {
+    margin: auto;
+}
+
+.dialog-content-nomargin {
+    margin: initial;
+}
+
+#request-history-modal-text{
+    display: block;
+    color: #000;
+}
+
+.MuiDialogContentText-root {
+    margin-bottom: 12px;
+}
+.request-history-msg-description {
+    padding-top: 15px;
+    font-size: 16px;
+}
+
+.title-col3 {
+    padding: 0px!important;
+}
+.request-history-modal-header {
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+#request-history-areas-label {
+    margin: 0px!important;
+}
+#request-history-checkbox-selection {
+    display: flex;
+    flex-direction: column;
+    justify-content:left;
+    align-items: left;
+}
+.MuiDialog-paperWidthSm {
+    max-width: 800px!important;
+}
+.request-history-dailog-content {
+    padding: 24px!important;
+}

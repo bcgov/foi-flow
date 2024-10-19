@@ -1800,6 +1800,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
                   commentTypes={commentTypes}
                   ministryId={ministryId}
                   applicantCorrespondenceTemplates={applicantCorrespondenceTemplates}
+                  setComment={setComment}
                 />
               </>
             ) : (

@@ -24,6 +24,33 @@
     }
   }
 
+  #exportHistory {
+    margin-top: 10px;
+  
+    .togglecollapseAll {
+      display: none;
+    }
+    .replySection .halfDiv {
+      margin-bottom: unset;
+    }
+  
+    .hide {
+      display: none !important;
+    }
+    .replySection .userInfo .newComment {
+      display: none !important;
+    }
+    .historysection {
+      page-break-inside: avoid !important;
+      .halfDiv .userInfo .newComment {
+        display: none !important;
+      }
+    }
+    .commentTypeChip {
+      display: none;
+    }
+  }
+
   .halfDiv {
     display: flex;
     justify-content: space-between;
@@ -449,4 +476,10 @@
         text-decoration: underline;
       }
     }
+  }
+
+  .export_title {
+    margin: 20px 0 20px 0;
+    display: flex;
+    justify-content: center;
   }
