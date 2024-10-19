@@ -62,6 +62,25 @@ import {
         });
     };
   };
+
+  export const saveRequestHistoryComment = (data) => {    
+    return async (dispatch) => {
+      return httpPOSTRequest(API.FOI_POST_COMMENT_REQUESTHISTORY, data)
+        .then((res) => {
+          if (res.data) {
+            console.log("Saved comment successfully!");
+            return res.data
+          } else {
+            dispatch(serviceActionError(res));
+          }
+        })
+        .catch((error) => {
+          console.log(error, 'error')
+          dispatch(serviceActionError(error));
+        });
+    };
+  };
+  
   export const saveMinistryRequestNote = (data,  ministryId) => {
     return (dispatch) => {
       httpPOSTRequest(API.FOI_POST_COMMENT_MINISTRYREQUEST, data)

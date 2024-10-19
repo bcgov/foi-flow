@@ -38,6 +38,14 @@ class commentservice:
     def createcomments(self, data, userid, type=2):
         return FOIRequestComment.savecomment(type, data, data['version'], userid) 
     
+    def createRequestHistorycomments(self, data, userid, type=2):
+        version = FOIMinistryRequest.getversionforrequest(data["requestid"])
+        return FOIRawRequestComment.savecomment(type, data, version, userid) 
+    
+    def createMinistryRequestHistorycomments(self, data, userid, type=2):
+        version = FOIMinistryRequest.getversionforrequest(data["ministryrequestid"])
+        return FOIRequestComment.savecomment(type, data, version, userid) 
+  
     def disableministryrequestcomment(self, commentid, userid):
         return FOIRequestComment.disablecomment(commentid, userid) 
 
