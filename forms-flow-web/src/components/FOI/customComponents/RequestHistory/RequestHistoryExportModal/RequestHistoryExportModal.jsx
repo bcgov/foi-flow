@@ -53,7 +53,7 @@ const RequestHistoryExportModal = ({
         <DialogContent className="request-history-dailog-content">
             <DialogContentText id="request-history-modal-text" component={'span'}>
                 <div className="request-history-message">
-                    Are you sure you want to export request history? A PDF will be created for each selection.
+                    Are you sure you want to export request history? The export will be downloaded to your machine.
                 </div>
                 <div className='request-history-msg-description'>
                     Select one or more you wish to export:
