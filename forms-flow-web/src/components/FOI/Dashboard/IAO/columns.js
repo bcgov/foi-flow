@@ -123,6 +123,14 @@ const IntakeTeamColumns = [
     width: 180,
   },
   {
+    field: "onBehalfFormatted",
+    headerName: "ON BEHALF",
+    headerAlign: "left",
+    valueGetter: (params) =>
+      params.row.onBehalfFormatted === undefined || params.row.onBehalfFormatted === null ? "N/A" : params.row.onBehalfFormatted,
+    width: 120,
+  },
+  {
     field: "applicantcategory",
     headerName: "CATEGORY",
     headerAlign: "left",
@@ -142,7 +150,7 @@ const IntakeTeamColumns = [
   },
   {
     field: "assignedToFormatted",
-    headerName: "ASSIGNED TO",
+    headerName: "ASSIGNEE",
     headerAlign: "left",
     flex: 1,
   },
@@ -162,11 +170,27 @@ const IntakeTeamColumns = [
     // sortable: false,
   },
   {
+    field: "extensions",
+    headerName: "EXT.",
+    headerAlign: "left",
+    flex: 0.5,
+    valueGetter: (params) =>
+      params.row.extensions === undefined ? 0 : params.row.extensions,
+  },
+  {
     field: "receivedDate",
     headerName: "RECEIVED DATE",
     headerAlign: "left",
     valueGetter: getReceivedDate,
     flex: 1,
+  },
+  {
+    field: "requestpagecount",
+    headerName: "PAGES",
+    headerAlign: "left",
+    flex: 0.5,
+    valueGetter: (params) => parseInt(params.row.requestpagecount),
+    renderCell: pagecountcellTooltipRender
   }
 ];
 
