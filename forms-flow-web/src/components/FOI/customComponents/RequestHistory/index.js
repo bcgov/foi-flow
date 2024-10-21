@@ -4,7 +4,7 @@ import { getCommentTypeIdByName, getCommentTypeFromId } from "../../../../helper
 import RequestFilter from './RequestFilter';
 import DisplayHistory from './DisplayHistory'
 import { toast } from 'react-toastify';
-import RequestHistoryExportModal from './RequestHistoryExportModel/RequestHistoryExportModal';
+import RequestHistoryExportModal from './RequestHistoryExportModal/RequestHistoryExportModal';
 import ExportHistory from './ExportHistory';
 import * as html2pdf from 'html-to-pdf-js';
 import { useDispatch } from "react-redux";
