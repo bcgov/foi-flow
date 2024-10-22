@@ -110,14 +110,14 @@ class FOIRequests(Resource):
                 result = requestservice().saverequest(foirequestschema,AuthHelper.getuserid())
                 if result.success == True:
 
-                    # #Create FOIOpenInfoRequest after FOIMinistryRequest has successfully been created - WIP - NOT NEEDED?
-                    # foiministryrequest = result.args[0]
-                    # default_foiopeninforequest = {
-                    #     "foiministryrequest_id": foiministryrequest[0]['id'],
-                    #     "oipublicationstatus_id": 2,
-                    # }
-                    # foiopeninforequestschema = FOIOpenInfoSchema().load(default_foiopeninforequest)
-                    # openinfoservice().createopeninforequest(foiopeninforequestschema)
+                    #Create FOIOpenInfoRequest after FOIMinistryRequest has successfully been created and set to Open state
+                    foiministryrequest = result.args[0]
+                    default_foiopeninforequest = {
+                        "oipublicationstatus_id": 2,
+                    }
+                    userid = AuthHelper.getuserid()
+                    foiopeninforequestschema = FOIOpenInfoSchema().load(default_foiopeninforequest)
+                    openinfoservice().createopeninforequest(foiopeninforequestschema, userid, foiministryrequest[0]['id'])
 
                     requestservice().copywatchers(request_json['id'],result.args[0],AuthHelper.getuserid())
                     requestservice().copycomments(request_json['id'],result.args[0],AuthHelper.getuserid())
