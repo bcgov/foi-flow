@@ -11,6 +11,7 @@ from request_api.models.NotificationTypes import NotificationType
 import json
 from request_api.models.default_method_result import DefaultMethodResult
 from request_api.utils.enums import StateName
+from request_api.services.closereasonservice import closereasonservice
 
 class stateevent:
     """ FOI Event management service
@@ -63,7 +64,7 @@ class stateevent:
         if state == StateName.callforrecords.value and requesttype == "ministryrequest":
             foirequest = notificationservice().getrequest(requestid, requesttype)
             _notificationtype = "Group Members" if foirequest['assignedministryperson'] is None else "State"
-        notification = self.__preparenotification(state)
+        notification = self.__preparenotification(state, requestid)
         if state == StateName.response.value and requesttype == "ministryrequest":
             signgoffapproval = FOIMinistryRequest().getrequest(requestid)['ministrysignoffapproval']
             if signgoffapproval:
@@ -90,8 +91,8 @@ class stateevent:
             return DefaultMethodResult(True,'Notification added',requestid)
         return  DefaultMethodResult(True,'No change',requestid)
             
-    def __preparenotification(self, state):
-        return self.__notificationmessage(state)
+    def __preparenotification(self, state, requestid):
+        return self.__notificationmessage(state, requestid)
 
     def __preparegroupmembernotification(self, state, requestid):
         if state == StateName.callforrecords.value:
@@ -110,15 +111,32 @@ class stateevent:
         return StateName.open.value if state == StateName.archived.value else state
 
     def __commentmessage(self, state, username, requesttype, requestid):
-        comment = username+' changed the state of the request to '+self.__formatstate(state)
+        comment = username + ' changed the state of the request to ' + self.__formatstate(state)
+
+        if state == StateName.closed.value:
+            closereasonid = FOIMinistryRequest().getrequest(requestid).get('closereasonid')
+            close_reason = closereasonservice.getclosereason(closereasonid)
+            
+            if close_reason:
+                comment += f". The reason for the closure is {close_reason['name']}."
+        
         if state == StateName.response.value and requesttype == "ministryrequest":
             signgoffapproval = FOIMinistryRequest().getrequest(requestid)['ministrysignoffapproval']
             if signgoffapproval:
                 comment = comment + f". Approved by {signgoffapproval['approvername']}, {signgoffapproval['approvertitle']} on {signgoffapproval['approveddate']}"
         return comment
 
-    def __notificationmessage(self, state):
-        return  'Moved to '+self.__formatstate(state)+ ' State'        
+    def __notificationmessage(self, state, requestid):
+        notification = 'Moved to ' + self.__formatstate(state) + ' State'
+        
+        if state == StateName.closed.value:
+            closereasonid = FOIMinistryRequest().getrequest(requestid).get('closereasonid')
+            close_reason = closereasonservice.getclosereason(closereasonid)
+            
+            if close_reason:
+                notification += f" as {close_reason['name']}."
+    
+        return notification
 
     def __notificationcfrmessage(self, requestid):
         metadata = FOIMinistryRequest.getmetadata(requestid)

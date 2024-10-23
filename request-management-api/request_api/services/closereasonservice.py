@@ -6,3 +6,8 @@ class closereasonservice:
         """ Returns the active records
         """
         return CloseReason.getallclosereasons()
+    
+    @staticmethod
+    def getclosereason(closereasonid):
+        """ Returns a specific close reason by ID """
+        return CloseReason.getclosereason(closereasonid)
