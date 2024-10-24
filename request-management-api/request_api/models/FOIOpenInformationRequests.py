@@ -52,12 +52,19 @@ class FOIOpenInformationRequests(db.Model):
     def getoibasequery(cls, additionalfilter=None, userid=None, isiaorestrictedfilemanager=False, groups=[]):
         _session = db.session
 
-        #rawrequests
-        #subquery for getting the latest version
-        subquery_maxversion = _session.query(FOIMinistryRequest.foiministryrequestid, func.max(FOIMinistryRequest.version).label('max_version')).group_by(FOIMinistryRequest.foiministryrequestid).subquery()
+        # subquery for getting the latest version of FOIOpenInformationRequests
+        subquery_maxversion = (
+                _session.query(
+                    FOIOpenInformationRequests.foiopeninforequestid,
+                    func.max(FOIOpenInformationRequests.version).label('max_version')
+                )
+                .group_by(FOIOpenInformationRequests.foiopeninforequestid)
+                .subquery()
+        )
+
         joincondition = [
-            subquery_maxversion.c.foiministryrequestid == FOIMinistryRequest.foiministryrequestid,
-            subquery_maxversion.c.max_version == FOIMinistryRequest.version,
+            subquery_maxversion.c.foiopeninforequestid == FOIOpenInformationRequests.foiopeninforequestid,
+            subquery_maxversion.c.max_version == FOIOpenInformationRequests.version,
         ]
 
         print("subquery_maxversion : ",subquery_maxversion)
@@ -81,240 +88,244 @@ class FOIOpenInformationRequests(db.Model):
             else_= literal("0").label("recordspagecount")
         )
 
-        duedate = case([
-                            (FOIMinistryRequest.requeststatuslabel == StateName.onhold.name,  # On Hold
-                             literal(None)),
-                           ],
-                           else_ = cast(FOIMinistryRequest.duedate, String)).label('duedate')
+        # duedate = case([
+        #                     (FOIMinistryRequest.requeststatuslabel == StateName.onhold.name,  # On Hold
+        #                      literal(None)),
+        #                    ],
+        #                    else_ = cast(FOIMinistryRequest.duedate, String)).label('duedate')
         
-        cfrduedate = case([
-                            (FOIMinistryRequest.requeststatuslabel == StateName.onhold.name,  # On Hold
-                             literal(None)),
-                           ],
-                           else_ = cast(FOIMinistryRequest.cfrduedate, String)).label('cfrduedate')
+        # cfrduedate = case([
+        #                     (FOIMinistryRequest.requeststatuslabel == StateName.onhold.name,  # On Hold
+        #                      literal(None)),
+        #                    ],
+        #                    else_ = cast(FOIMinistryRequest.cfrduedate, String)).label('cfrduedate')
         
-        onbehalfformatted = case([
-                            (and_(onbehalf_applicant.lastname.isnot(None), onbehalf_applicant.firstname.isnot(None)),
-                             func.concat(onbehalf_applicant.lastname, ', ', onbehalf_applicant.firstname)),
-                            (and_(onbehalf_applicant.lastname.isnot(None), onbehalf_applicant.firstname.is_(None)),
-                             onbehalf_applicant.lastname),
-                            (and_(onbehalf_applicant.lastname.is_(None), onbehalf_applicant.firstname.isnot(None)),
-                             onbehalf_applicant.firstname),
-                           ],
-                           else_ = 'N/A').label('onBehalfFormatted')
+        # onbehalfformatted = case([
+        #                     (and_(onbehalf_applicant.lastname.isnot(None), onbehalf_applicant.firstname.isnot(None)),
+        #                      func.concat(onbehalf_applicant.lastname, ', ', onbehalf_applicant.firstname)),
+        #                     (and_(onbehalf_applicant.lastname.isnot(None), onbehalf_applicant.firstname.is_(None)),
+        #                      onbehalf_applicant.lastname),
+        #                     (and_(onbehalf_applicant.lastname.is_(None), onbehalf_applicant.firstname.isnot(None)),
+        #                      onbehalf_applicant.firstname),
+        #                    ],
+        #                    else_ = 'N/A').label('onBehalfFormatted')
         
-        axispagecount = case ([
-            (FOIMinistryRequest.axispagecount.isnot(None), FOIMinistryRequest.axispagecount)
-            ],
-            else_= literal("0").label("axispagecount")
-        )
-        axislanpagecount = case ([
-            (FOIMinistryRequest.axislanpagecount.isnot(None), FOIMinistryRequest.axislanpagecount)
-            ],
-            else_= literal("0").label("axislanpagecount")
-        )
+        # axispagecount = case ([
+        #     (FOIMinistryRequest.axispagecount.isnot(None), FOIMinistryRequest.axispagecount)
+        #     ],
+        #     else_= literal("0").label("axispagecount")
+        # )
+        # axislanpagecount = case ([
+        #     (FOIMinistryRequest.axislanpagecount.isnot(None), FOIMinistryRequest.axislanpagecount)
+        #     ],
+        #     else_= literal("0").label("axislanpagecount")
+        # )
         recordspagecount = case ([
             (FOIMinistryRequest.recordspagecount.isnot(None), FOIMinistryRequest.recordspagecount)
             ],
             else_= literal("0").label("recordspagecount")
         )
-        requestpagecount = case([
-                (and_(axispagecount.isnot(None), recordspagecount.isnot(None), cast(axispagecount, Integer) > cast(recordspagecount, Integer)),
-                    axispagecount),
-                (and_(recordspagecount.isnot(None)),
-                    recordspagecount),
-                (and_(axispagecount.isnot(None)),
-                    axispagecount),
-                ],
-                else_= literal("0"))
+        # requestpagecount = case([
+        #         (and_(axispagecount.isnot(None), recordspagecount.isnot(None), cast(axispagecount, Integer) > cast(recordspagecount, Integer)),
+        #             axispagecount),
+        #         (and_(recordspagecount.isnot(None)),
+        #             recordspagecount),
+        #         (and_(axispagecount.isnot(None)),
+        #             axispagecount),
+        #         ],
+        #         else_= literal("0"))
 
+        assignedToFormatted = case([
+                (and_(FOIAssignee.lastname.isnot(None), FOIAssignee.firstname.isnot(None)),
+                func.concat(FOIAssignee.lastname, ', ', FOIAssignee.firstname)),
+                (and_(FOIAssignee.lastname.isnot(None), FOIAssignee.firstname.is_(None)),
+                FOIAssignee.lastname),
+                (and_(FOIAssignee.lastname.is_(None), FOIAssignee.firstname.isnot(None)),
+                FOIAssignee.firstname),
+                (FOIOpenInformationRequests.oiassignedto.is_(None),
+                'Unassigned'),
+            ],
+            else_ = FOIOpenInformationRequests.oiassignedto).label('assignedToFormatted')
+        
+        # from_closed = case(
+        #     [(FOIMinistryRequest.closedate.isnot(None), 
+        #     func.greatest(
+        #         cast(func.date_part('day', func.current_date() - FOIMinistryRequest.closedate), Integer),
+        #         1
+        #     )
+        #     )],
+        #     else_=literal('N/A')
+        # ).label('from_closed')
+
+        # Define the selected columns
         selectedcolumns = [
-            FOIRequest.foirequestid.label('id'),
-            FOIMinistryRequest.version,
-            FOIMinistryRequest.foiministryrequestid.label('ministryrequestid'),
-            cast(FOIMinistryRequest.axisrequestid, String).label('axisRequestId'),
+            FOIRequest.foirequestid.label('id'), 
+            #FOIMinistryRequest.version,
+            FOIMinistryRequest.foiministryrequestid.label('ministryrequestid'), #필요
+            cast(FOIMinistryRequest.axisrequestid, String).label('axisRequestId'),#필요
+            # FOIAssignee.firstname.label('assignedToFirstName'),
+            # FOIAssignee.lastname.label('assignedToLastName'),
+            FOIMinistryRequest.closedate, #필요
+            FOIRequest.requesttype.label('requestType'), #필요
             cast(FOIMinistryRequest.filenumber, String).label('idNumber'),
-            FOIAssignee.firstname.label('assignedToFirstName'),
-            FOIAssignee.lastname.label('assignedToLastName'),
-            FOIMinistryRequest.closedate,
-            FOIOpenInformationRequests.publicationdate,
-            FOIRequest.requesttype.label('requestType'),
-            cast(FOIRequest.receiveddate, String).label('receivedDateUF'),
-            FOIRequestStatus.name.label('currentState'),
-            FOIMinistryRequest.assignedgroup.label('assignedGroup'),
-            FOIMinistryRequest.assignedto.label('assignedTo'),
-            FOIRequestApplicant.firstname.label('firstName'),
-            FOIRequestApplicant.lastname.label('lastName'),
-            FOIMinistryRequest.description,
-            onbehalf_applicant.firstname.label('onBehalfFirstName'),
-            onbehalf_applicant.lastname.label('onBehalfLastName'),
-            cast(FOIMinistryRequest.recordsearchfromdate, String).label('recordsearchfromdate'),
-            cast(FOIMinistryRequest.recordsearchtodate, String).label('recordsearchtodate'),
-            cfrduedate,
-            duedate,
+            #cast(FOIRequest.receiveddate, String).label('receivedDateUF'),
+            #FOIRequestStatus.name.label('currentState'),
+            #FOIMinistryRequest.assignedgroup.label('assignedGroup'),
+            #FOIMinistryRequest.assignedto.label('assignedTo'),
+            # FOIRequestApplicant.firstname.label('firstName'),
+            # FOIRequestApplicant.lastname.label('lastName'),
+            #FOIMinistryRequest.description,
+            # onbehalf_applicant.firstname.label('onBehalfFirstName'),
+            # onbehalf_applicant.lastname.label('onBehalfLastName'),
+            # cast(FOIMinistryRequest.recordsearchfromdate, String).label('recordsearchfromdate'),
+            # cast(FOIMinistryRequest.recordsearchtodate, String).label('recordsearchtodate'),
+            # cfrduedate,
+            # duedate,
             ApplicantCategory.name.label('applicantcategory'),
-            onbehalfformatted,
-            cast(requestpagecount, Integer).label('requestpagecount'),
-            axispagecount.label('axispagecount'),
-            axislanpagecount.label('axislanpagecount'),
+            #onbehalfformatted,
+            # cast(requestpagecount, Integer).label('requestpagecount'),
+            # axispagecount.label('axispagecount'),
+            # axislanpagecount.label('axislanpagecount'),
             recordspagecount.label('recordspagecount'),  
-            func.lower(ProgramArea.bcgovcode).label('bcgovcode'), 
-            FOIMinistryRequest.isoipcreview.label('isoipcreview'),
-            FOIRestrictedMinistryRequest.isrestricted.label('isiaorestricted'),
-            ministry_restricted_requests.isrestricted.label('isministryrestricted'),
-            OpenInformationStatuses.name.label('oiStatusName'),
+            # func.lower(ProgramArea.bcgovcode).label('bcgovcode'), 
+            # FOIMinistryRequest.isoipcreview.label('isoipcreview'),
+            # FOIRestrictedMinistryRequest.isrestricted.label('isiaorestricted'),
+            # ministry_restricted_requests.isrestricted.label('isministryrestricted'),
+            OpenInformationStatuses.name.label('oiStatusName'), #필요
+            cls.publicationdate,
+            cls.created_at, #필요
+            assignedToFormatted, #필요
+            cls.version,
+            cls.foiopeninforequestid
+            #from_closed
         ]   
-
 
         basequery = (
             _session.query(*selectedcolumns)
             .join(subquery_maxversion, and_(*joincondition))
-            .join(FOIOpenInformationRequests, FOIMinistryRequest.foiministryrequestid == FOIOpenInformationRequests.foiministryrequest_id)  # 여기에 적절히 조인 추가
-            .join(FOIRequest,and_(FOIRequest.foirequestid == FOIMinistryRequest.foirequest_id, FOIRequest.version == FOIMinistryRequest.foirequestversion_id))
-            .join(FOIRequestStatus, FOIRequestStatus.requeststatusid == FOIMinistryRequest.requeststatusid)
-            .join(FOIRequestApplicantMapping, and_(FOIRequestApplicantMapping.foirequest_id == FOIMinistryRequest.foirequest_id, FOIRequestApplicantMapping.foirequestversion_id == FOIMinistryRequest.foirequestversion_id, FOIRequestApplicantMapping.requestortypeid == RequestorType['applicant'].value))
-            .join(FOIRequestApplicant,FOIRequestApplicant.foirequestapplicantid == FOIRequestApplicantMapping.foirequestapplicantid)
+            .join(FOIMinistryRequest, and_(FOIMinistryRequest.foiministryrequestid == cls.foiministryrequest_id, FOIMinistryRequest.version == cls.version))
+            .join(FOIRequest, and_(FOIRequest.foirequestid == FOIMinistryRequest.foirequest_id, FOIRequest.version == FOIMinistryRequest.foirequestversion_id))
             .join(ApplicantCategory,and_(ApplicantCategory.applicantcategoryid == FOIRequest.applicantcategoryid, ApplicantCategory.isactive == True))
-            .join(ProgramArea,FOIMinistryRequest.programareaid == ProgramArea.programareaid)
-            .join(FOIRestrictedMinistryRequest,and_(FOIRestrictedMinistryRequest.ministryrequestid == FOIMinistryRequest.foiministryrequestid,
-                  FOIRestrictedMinistryRequest.type == 'iao',FOIRestrictedMinistryRequest.isactive == True),isouter=True)
-            .join(ministry_restricted_requests,and_(ministry_restricted_requests.ministryrequestid == FOIMinistryRequest.foiministryrequestid,ministry_restricted_requests.type == 'ministry',ministry_restricted_requests.isactive == True),isouter=True)
             .join(OpenInformationStatuses, OpenInformationStatuses.oistatusid == FOIMinistryRequest.oistatus_id)
-            .outerjoin(FOIAssignee, FOIAssignee.username == FOIOpenInformationRequests.oiassignedto)  
+            .outerjoin(FOIAssignee, FOIAssignee.username == cls.oiassignedto) 
         )
 
-        # if(additionalfilter == 'watchingRequests'):
-        #     #watchby
-        #     activefilter = and_(FOIMinistryRequest.isactive == True, FOIRequestStatus.isactive == True)
+        if additionalfilter == 'watchingRequests':
+            subquery_watchby = FOIRequestWatcher.getrequestidsbyuserid(userid)
+            basequery = basequery.join(subquery_watchby, subquery_watchby.c.ministryrequestid == FOIMinistryRequest.foiministryrequestid)
+        elif additionalfilter == 'myRequests':
+            basequery = basequery.filter(cls.oiassignedto == userid)
+        elif additionalfilter == 'unassignedRequests':
+            basequery = basequery.filter(cls.oiassignedto == None)
+        elif additionalfilter == 'teamRequests':
+            basequery = basequery.filter(cls.oiassignedto.isnot(None))
 
-        #     subquery_watchby = FOIRequestWatcher.getrequestidsbyuserid(userid)
-        #     if(requestby == 'IAO'):
-        #         dbquery = basequery.join(subquery_watchby, subquery_watchby.c.ministryrequestid == FOIMinistryRequest.foiministryrequestid).filter(activefilter).filter(or_(or_(FOIRestrictedMinistryRequest.isrestricted == False, FOIRestrictedMinistryRequest.isrestricted == None), and_(FOIRestrictedMinistryRequest.isrestricted == True, FOIMinistryRequest.assignedto == userid)))
-        #     else:
-        #         dbquery = basequery.join(subquery_watchby, subquery_watchby.c.ministryrequestid == FOIMinistryRequest.foiministryrequestid).filter(activefilter).filter(or_(or_(ministry_restricted_requests.isrestricted == isministryrestrictedfilemanager, ministry_restricted_requests.isrestricted == None), and_(ministry_restricted_requests.isrestricted == True, FOIMinistryRequest.assignedministryperson == userid)))   
-            
-        # elif(additionalfilter == 'myRequests'):
-        #     #myrequest
-        #     if(requestby == 'IAO'):
-        #         dbquery = basequery.filter(FOIMinistryRequest.assignedto == userid).filter(ministryfilter)
-        #     else:
-        #         dbquery = basequery.filter(FOIMinistryRequest.assignedministryperson == userid).filter(ministryfilter)
-        # elif(additionalfilter == 'unassignedRequests'):
-        #     if(requestby == 'IAO'):
-        #         dbquery = basequery.filter(FOIMinistryRequest.assignedto == None).filter(ministryfilter)
-        # elif(additionalfilter.lower() == 'all'):           
-        #     if(requestby == 'IAO'):
-        #         dbquery = basequery.filter(ministryfilter).filter(FOIMinistryRequest.assignedto.isnot(None)).filter(or_(FOIRestrictedMinistryRequest.isrestricted == isiaorestrictedfilemanager, or_(FOIRestrictedMinistryRequest.isrestricted.is_(None), FOIRestrictedMinistryRequest.isrestricted == False)))
-        #     else:               
-        #         dbquery = basequery.filter(ministryfilter).filter(or_(ministry_restricted_requests.isrestricted == isministryrestrictedfilemanager, or_(ministry_restricted_requests.isrestricted.is_(None), ministry_restricted_requests.isrestricted == False)))
-        # else:
-        #     if(isiaorestrictedfilemanager == True or isministryrestrictedfilemanager == True):
-        #         dbquery = basequery.filter(ministryfilter)
-        #     else:
-        #         if(requestby == 'IAO'):
-        #             dbquery = basequery.filter(or_(or_(FOIRestrictedMinistryRequest.isrestricted == False, FOIRestrictedMinistryRequest.isrestricted == None), and_(FOIRestrictedMinistryRequest.isrestricted == True, FOIMinistryRequest.assignedto == userid))).filter(ministryfilter)
-        #         else:
-        #             dbquery = basequery.filter(or_(or_(ministry_restricted_requests.isrestricted == False, ministry_restricted_requests.isrestricted == None), and_(ministry_restricted_requests.isrestricted == True, FOIMinistryRequest.assignedministryperson == userid))).filter(ministryfilter)
-
+        print("basequery : ",basequery)
+        
         return basequery
-    
 
     @classmethod
     def getrequestssubquery(cls, groups, filterfields, keyword, additionalfilter, userid, iaoassignee, ministryassignee, requestby, isiaorestrictedfilemanager=False, isministryrestrictedfilemanager=False):
-        #for queue/ oi dashboard       
-        oibasequery = FOIOpenInformationRequests.getoibasequery(additionalfilter, userid, isiaorestrictedfilemanager, groups)
-        #oibasequery = oibasequery.filter(FOIRawRequest.status != 'Unopened').filter(FOIRawRequest.status != 'Closed')
-        print("oibasequery : ",oibasequery)
-
-        #filter/search
-        # if(len(filterfields) > 0 and keyword is not None):
-        #     filtercondition = FOIRawRequest.getfilterforrequestssubquery(filterfields, keyword)
-        #     return basequery.filter(filtercondition)
-        # else:
-        #     return basequery
-
-        return oibasequery
+        oibasequery = cls.getoibasequery(additionalfilter, userid, isiaorestrictedfilemanager, groups)
         
-        
+        if len(filterfields) > 0 and keyword is not None:
+            filtercondition = cls.getfilterforrequestssubquery(filterfields, keyword)
+            return oibasequery.filter(filtercondition)
+        else:
+            return oibasequery
 
     @classmethod
     def getrequestspagination(cls, group, page, size, sortingitems, sortingorders, filterfields, keyword, additionalfilter, userid, isiaorestrictedfilemanager, usertype, isministryrestrictedfilemanager=False):
         iaoassignee = aliased(FOIAssignee)
         ministryassignee = aliased(FOIAssignee)
-        #subquery_ministry_queue = FOIMinistryRequest.getrequestssubquery(groups, filterfields, keyword, additionalfilter, userid, iaoassignee, ministryassignee, 'IAO', isiaorestrictedfilemanager, isministryrestrictedfilemanager)
-        subquery_oirequest_queue = FOIOpenInformationRequests.getrequestssubquery(group, filterfields, keyword, additionalfilter, userid, iaoassignee, ministryassignee, "OI", isiaorestrictedfilemanager, isministryrestrictedfilemanager)
-        print("subquery_oirequest_queue : ",subquery_oirequest_queue)
-        #sorting
-        sortingcondition = FOIMinistryRequest.getsorting(sortingitems, sortingorders, iaoassignee, ministryassignee)
-        print("sortingcondition : ",sortingcondition)
-        #rawrequests
-        # if usertype == "iao" or groups is None:
-        #     subquery_rawrequest_queue = FOIRawRequest.getrequestssubquery(filterfields, keyword, additionalfilter, userid, isiaorestrictedfilemanager, groups)
-        #     query_full_queue = subquery_rawrequest_queue.union(subquery_ministry_queue)
-        #     return query_full_queue.order_by(*sortingcondition).paginate(page=page, per_page=size)
-        # elif usertype == "oi":
-        #     requestby = 'OI'
-        #     subquery_oirequest_queue = FOIOpenInformationRequests.getrequestssubquery(group, filterfields, keyword, additionalfilter, userid, iaoassignee, ministryassignee, requestby, isiaorestrictedfilemanager, isministryrestrictedfilemanager)
-        # else:
-        print("getrequestspagination안에 group : ",group)
+        subquery_oirequest_queue = cls.getrequestssubquery(group, filterfields, keyword, additionalfilter, userid, iaoassignee, ministryassignee, "OI", isiaorestrictedfilemanager, isministryrestrictedfilemanager)
+        
+        sortingcondition = cls.getsorting(sortingitems, sortingorders)
+        
         return subquery_oirequest_queue.order_by(*sortingcondition).paginate(page=page, per_page=size)
-    
-    @classmethod
-    def getgroupfilters(cls, groups):
-        #ministry filter for group/team
-        if groups is None:
-            ministryfilter = FOIMinistryRequest.isactive == True
-        else:
-            groupfilter = []
-            statusfilter = None
-            processinggroups = list(set(groups).intersection(ProcessingTeamWithKeycloackGroup.list())) 
-            if IAOTeamWithKeycloackGroup.intake.value in groups or len(processinggroups) > 0:
-                groupfilter.append(
-                            and_(
-                                FOIMinistryRequest.assignedgroup.in_(tuple(groups))
-                            )
-                        )
-                statusfilter = FOIMinistryRequest.requeststatuslabel != StateName.closed.name
-            else:
-                groupfilter.append(
-                        or_(
-                            FOIMinistryRequest.assignedgroup.in_(tuple(groups)),
-                            and_(
-                                FOIMinistryRequest.assignedministrygroup.in_(tuple(groups))
-                            )
-                        )
-                    )
-                statusfilter = FOIMinistryRequest.requeststatuslabel.in_([StateName.callforrecords.name,StateName.recordsreview.name,StateName.feeestimate.name,StateName.consult.name,StateName.ministrysignoff.name,StateName.onhold.name,StateName.deduplication.name,StateName.harmsassessment.name,StateName.response.name,StateName.peerreview.name,StateName.tagging.name,StateName.readytoscan.name, StateName.recordsreadyforreview.name])
-            ministryfilter = and_(
-                                FOIMinistryRequest.isactive == True,
-                                FOIRequestStatus.isactive == True,
-                                or_(*groupfilter)
-                            )
-        ministryfilterwithclosedoipc = and_(ministryfilter, 
-                                            or_(statusfilter, 
-                                                and_(FOIMinistryRequest.requeststatuslabel == StateName.closed.name)
-                                                )
-                                            )
-        return ministryfilter
-
 
     @classmethod
-    def getsorting(cls, sortingitems, sortingorders, iaoassignee, ministryassignee):
-        #sorting
+    def getsorting(cls, sortingitems, sortingorders):
         sortingcondition = []
-        if(len(sortingitems) > 0 and len(sortingorders) > 0 and len(sortingitems) == len(sortingorders)):
-            for field in sortingitems:
-                order = sortingorders.pop(0)
-                sortingcondition.append(FOIMinistryRequest.getfieldforsorting(field, order, iaoassignee, ministryassignee))
+        if len(sortingitems) > 0 and len(sortingorders) > 0 and len(sortingitems) == len(sortingorders):
+            for field, order in zip(sortingitems, sortingorders):
+                if cls.validatefield(field):
+                    sortfield = cls.findfield(field)
+                    if order == 'desc':
+                        sortingcondition.append(nullslast(desc(sortfield)))
+                    else:
+                        sortingcondition.append(nullsfirst(asc(sortfield)))
+        
+        # Default sorting: Received Date (newest to oldest)
+        if len(sortingcondition) == 0:
+            sortingcondition.append(nullslast(desc(cls.findfield('receivedDateUF'))))
 
-        #default sorting
-        if(len(sortingcondition) == 0):
-            sortingcondition.append(FOIMinistryRequest.findfield('currentState', iaoassignee, ministryassignee).asc())
-
-        #always sort by created_at last to prevent pagination collisions
-        sortingcondition.append(asc('created_at'))
+        # Always sort by id last to prevent pagination collisions
+        sortingcondition.append(asc('id'))
         
         return sortingcondition
+
+    @classmethod
+    def validatefield(cls, field):
+        valid_fields = ['receivedDateUF', 'requestType', 'pageCount', 
+                        'publicationStatus', 'from_closed', 'publicationdate', 'assignee']
+        return field in valid_fields
+
+    @classmethod
+    def getfieldforsorting(cls, field, order, iaoassignee, ministryassignee):
+        #get one field
+        customizedfields = ['assignedToFormatted', 'ministryAssignedToFormatted', 'duedate', 'cfrduedate', 'ministrySorting', 'onBehalfFormatted', 'extensions', 'isministryrestricted']
+        if(field in customizedfields):
+            if(order == 'desc'):
+                return nullslast(desc(field))
+            else:
+                return nullsfirst(asc(field))
+        else:
+            if(order == 'desc'):
+                return nullslast(FOIMinistryRequest.findfield(field, iaoassignee, ministryassignee).desc())
+            else:
+                return nullsfirst(FOIMinistryRequest.findfield(field, iaoassignee, ministryassignee).asc())
+
+    @classmethod
+    def findfield(cls, field):
+        if field == 'receivedDateUF':
+            return FOIRequest.receiveddate
+        elif field == 'requestType':
+            return FOIRequest.requesttype
+        elif field == 'pageCount':
+            return FOIMinistryRequest.recordspagecount
+        elif field == 'publicationStatus':
+            return OpenInformationStatuses.name
+        elif field == 'from_closed':
+            return func.coalesce(
+                func.greatest(
+                    func.ceil((func.date_part('day', func.current_date() - FOIMinistryRequest.closedate) + 1) * 5 / 7) - 
+                    func.ceil((func.date_part('dow', FOIMinistryRequest.closedate) + func.date_part('dow', func.current_date())) / 5),
+                    0
+                ),
+                0
+            )
+        elif field == 'publicationdate':
+            return cls.publicationdate
+        elif field == 'assignee':
+            return cls.oiassignedto
+        else:
+            return text(field)
+
+    @classmethod
+    def getfilterforrequestssubquery(cls, filterfields, keyword):
+        return or_(*[cls.getfiltercondition(filterfield, keyword) for filterfield in filterfields])
+
+    @classmethod
+    def getfiltercondition(cls, filterfield, keyword):
+        if filterfield == 'requestType':
+            return FOIRequest.requesttype.ilike(f'%{keyword}%')
+        elif filterfield == 'publicationStatus':
+            return OpenInformationStatuses.name.ilike(f'%{keyword}%')
+        elif filterfield == 'assignee':
+            return cls.oiassignedto.ilike(f'%{keyword}%')
+        else:
+            return text(filterfield).ilike(f'%{keyword}%')
     
 class FOIOpenInfoRequestSchema(ma.Schema):
     class Meta:

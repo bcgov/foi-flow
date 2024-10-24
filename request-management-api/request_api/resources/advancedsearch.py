@@ -74,6 +74,9 @@ class DashboardPagination(Resource):
             statuscode = 200
             if (params['usertype'] == "iao" or params['usertype'] == "ministry"):                                                                                           
                 requests = dashboardservice().advancedsearch(params)
+            # TODO: Add oi advanced search
+            elif params['usertype'] == "oi":
+                requests = dashboardservice().advancedsearch(params)
             else:
                 statuscode = 401   
 

@@ -63,7 +63,7 @@ const Queue = ({ userDetail, tableInfo }) => {
       //add cfrduedate asc to default sorting
       if(smodel[0]?.field === "defaultSorting") {
         smodel.push(
-          { field: "cfrduedate", sort: "asc" },
+          { field: "receivedDate", sort: "asc" },
         );
       }
     }
@@ -112,18 +112,17 @@ const Queue = ({ userDetail, tableInfo }) => {
   }
 
   const columns = React.useRef([
-    // {
-    //   field: "flags",
-    //   headerName: "FLAGS",
-    //   headerAlign: "left",
-    //   renderCell: displayQueueFlagIcons,
-    // },
+    {
+      field: "receivedDate",
+      headerName: "RECEIVED DATE",
+      flex: 1,
+      headerAlign: "left"
+    },
     {
       field: "axisRequestId",
       headerName: "ID NUMBER",
-      width: 170,
-      headerAlign: "left",
-      renderCell: cellTooltipRender
+      flex: 1,
+      headerAlign: "left"
     },
     {
       field: "requestType",
@@ -132,19 +131,25 @@ const Queue = ({ userDetail, tableInfo }) => {
       headerAlign: "left",
     },
     {
-      field: "oiStatusName",
+      field: "recordspagecount",
+      headerName: "PAGES",
+      flex: 1,
+      headerAlign: "left",
+    },
+    {
+      field: "publicationStatus",
       headerName: "PUBLICATION STATUS",
       flex: 1,
       headerAlign: "left",
     },
     {
-      field: "closedate",
-      headerName: "CLOSED DATE",
+      field: "fromClosed",
+      headerName: "FROM CLOSED",
       flex: 1,
       headerAlign: "left",
     },
     {
-      field: "publicationdate",
+      field: "publicationDate",
       headerName: "PUBLICATION DATE",
       flex: 1,
       headerAlign: "left",
@@ -156,8 +161,8 @@ const Queue = ({ userDetail, tableInfo }) => {
       headerAlign: "left",
     },
     {
-      field: "recordspagecount",
-      headerName: "NUMBER OF PAGES",
+      field: "applicantType",
+      headerName: "APPLICANT TYPE",
       flex: 1,
       headerAlign: "left",
     }
