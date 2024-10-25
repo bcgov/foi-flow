@@ -16,6 +16,12 @@ from flask import jsonify
 SHORT_DATEFORMAT = '%Y %b, %d'
 LONG_DATEFORMAT = '%Y-%m-%d %H:%M:%S.%f'
 
+REQUEST_TYPE_MAPPING = {
+    'general': 'G',
+    'personal': 'P',
+    'proactivedisclosure': 'PD'
+}
+
 class dashboardservice:
     """ FOI dashboard management service
 
@@ -293,34 +299,21 @@ class dashboardservice:
             _receiveddate = None
             if request.created_at:
                 maya_dt = maya.parse(request.created_at)
-                vancouver_dt = maya_dt.datetime(to_timezone='America/Vancouver', naive=False)
-                _receiveddate = vancouver_dt.strftime("%b %d %Y")
+                received_dt = maya_dt.datetime(to_timezone='America/Vancouver', naive=False)
+                _receiveddate = received_dt.strftime("%b %d %Y")
 
             if request.publicationdate is None:
                 _publicationdate = 'N/A'
             else:
                 maya_dt = maya.parse(request.publicationdate)
-                vancouver_dt = maya_dt.datetime(to_timezone='America/Vancouver', naive=False)
-                _publicationdate = vancouver_dt.strftime("%b %d %Y")
-
-            _oirequest = self.__preparefoioirequestinfo(request, _receiveddate, _receiveddate)
+                publication_dt = maya_dt.datetime(to_timezone='America/Vancouver', naive=False)
+                _publicationdate = publication_dt.strftime("%b %d %Y")
             
+            _from_closed = self.__calculate_from_closed(request.closedate)
+            
+            _oirequest = self.__preparefoioirequestinfo(request, _receiveddate, _publicationdate, _from_closed)
+
             print("request : ",request)
-            _oirequest.update({
-                'id': request.id,
-                'ministryrequestid': request.ministryrequestid,
-                'receivedDate': _receiveddate,
-                'axisRequestId': request.axisRequestId,
-                'requestType': 'G' if request.requestType == 'general' else 'PD',
-                'recordspagecount': request.recordspagecount,
-                'publicationStatus': request.oiStatusName,
-                'fromClosed': request.closedate,
-                'publicationDate': _publicationdate,
-                'assignedTo': request.assignedToFormatted,
-                'applicantType': request.applicantcategory,
-                'version': request.version,
-                'foiopeninforequestid': request.foiopeninforequestid,
-            })
 
             # isiaorestricted = request.isiaorestricted if request.isiaorestricted == True else False
             # _oirequest.update({'isiaorestricted': isiaorestricted})
@@ -342,25 +335,39 @@ class dashboardservice:
 
         return jsonify({'data': requestqueue, 'meta': meta})
 
-    def __preparefoioirequestinfo(self, request, shortdate, longdate):
+    def __preparefoioirequestinfo(self, request, receivedDate, publicationDate , fromClosed):
         return {
             'id': request.id,
             'idNumber': request.idNumber,
-            'receivedDate': shortdate,
+            'ministryrequestid': request.ministryrequestid,
+            'receivedDate': receivedDate,
+            'axisRequestId': request.axisRequestId,
+            'requestType': REQUEST_TYPE_MAPPING.get(request.requestType, ''),
+            'recordspagecount': request.recordspagecount,
+            'publicationStatus': request.oiStatusName,
+            'fromClosed': fromClosed,
+            'publicationDate': publicationDate,
+            'assignedTo': request.assignedToFormatted,
+            'applicantType': request.applicantcategory,
+            'version': request.version,
+            'foiopeninforequestid': request.foiopeninforequestid,
         }
 
     def __calculate_from_closed(self, closedate):
         if not closedate:
             return 'N/A'
         
-        today = datetime.now().date()
+        today = datetime.now(tz=pytz.timezone('America/Vancouver')).date()
+        closedate = closedate.date() if isinstance(closedate, datetime) else closedate
+        
         business_days = 0
-        current_date = closedate.date()
+        current_date = closedate
         
         while current_date <= today:
             if current_date.weekday() < 5:  # Monday = 0, Friday = 4
                 business_days += 1
             current_date += timedelta(days=1)
-        
-        return str(business_days)     
+    
+        return str(business_days) if business_days > 0 else 'N/A'   
+
           

@@ -219,9 +219,11 @@ const Queue = ({ userDetail, tableInfo }) => {
     if (e.row.ministryrequestid) {
       dispatch(
         push(
-          `/foi/ministryreview/${e.row.id}/ministryrequest/${e.row.ministryrequestid}`
+          `/foi/foirequests/${e.row.id}/ministryrequest/${e.row.ministryrequestid}`
         )
       );
+    } else {
+      dispatch(push(`/foi/reviewrequest/${e.row.id}`));
     }
   };
 
