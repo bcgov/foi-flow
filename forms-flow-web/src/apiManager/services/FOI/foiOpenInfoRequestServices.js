@@ -10,6 +10,9 @@ import UserService from "../../../services/UserService";
 import { replaceUrl } from "../../../helper/FOI/helper";
 
 export const fetchFOIOpenInfoRequest = (foiministryrequestid) => {
+  if (!foiministryrequestid) {
+    return () => {};
+  }
   const foiOpenInfoRequestAPIUrl = replaceUrl(
     replaceUrl(API.FOI_OPENINFO_REQUEST),
     "<ministryrequestid>",

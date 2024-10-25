@@ -17,8 +17,8 @@ API = Namespace('FOIOPENINFO', description='Endpoints for FOI OpenInformation ma
 TRACER = Tracer.get_instance()
 EXCEPTION_MESSAGE_NOTFOUND_REQUEST='Record not found'
 CUSTOM_KEYERROR_MESSAGE = "Key error has occured: "
+#RESTRICT ALL ACESS TO ONLY IAO AND OI USERS FOR ALL ROUTES. NO MINISTRY ALLOWED??
 
-#RESTRICT ALL ACESS TO ONLY IAO AND OI USERS FOR ALL ROUTES. NO MINISTRY ALLOWED
 @cors_preflight('GET,OPTIONS')
 @API.route('/foiopeninfo/ministryrequest/<int:foiministryrequestid>', defaults={'usertype':None})
 @API.route('/foiopeninfo/ministryrequest/<int:foiministryrequestid>/<string:usertype>')
@@ -30,11 +30,11 @@ class FOIOpenInfoRequest(Resource):
     @auth.require
     def get(foiministryrequestid, usertype=None):
         try:
+            #Do we need any other restriction logic to gather data??
             result = openinfoservice().getcurrentfoiopeninforequest(foiministryrequestid)
             if result in (None, {}):
                 return {"status": False, "message": "Could not find FOIOpenInfoRequest"}, 404
             return  json.dumps(result), 200
-            #Do we need any other restriction logic to gather data??
         except ValidationError as err:
             return {'status': False, 'message': str(err)}, 400
         except KeyError as error:
@@ -42,7 +42,8 @@ class FOIOpenInfoRequest(Resource):
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500
 
-@cors_preflight('POST,OPTIONS') 
+@cors_preflight('POST,OPTIONS')
+@API.route('/foiopeninfo/foirequest/<int:foirequestid>/ministryrequest/<int:foiministryrequestid>', defaults={'usertype':None})
 @API.route('/foiopeninfo/foirequest/<int:foirequestid>/ministryrequest/<int:foiministryrequestid>/<string:usertype>')
 class FOIOpenInfoRequestById(Resource):
     """Creates a foi openinfo request for ministry(opened) requests"""
@@ -67,6 +68,7 @@ class FOIOpenInfoRequestById(Resource):
 
 @cors_preflight('PUT,OPTIONS') 
 # PUT AND POST ROUTES. IF FE DATA CONTAINS OR SENDS FOIOPENINFO DATA WITH A EXISTING FOIOPENINFOREQUESTID use PUT ROUTE AND USE UPDATESERVICE. IF POST route sent and fe data does not contain a foiopeninforequetst id use post route and createfoiopen service
+@API.route('/foiopeninfo/foirequest/<int:foirequestid>/ministryrequest/<int:foiministryrequestid>', defaults={'usertype':None})
 @API.route('/foiopeninfo/foirequest/<int:foirequestid>/ministryrequest/<int:foiministryrequestid>/<string:usertype>')
 class FOIOpenInfoRequestById(Resource):
     """Creates (updates) a new version of foi openinfo requests"""
