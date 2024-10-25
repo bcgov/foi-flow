@@ -12,7 +12,7 @@ class FOIOpenInformationRequests(db.Model):
     foiopeninforequestid = db.Column(db.Integer, primary_key=True, autoincrement=True, nullable=False)
     version = db.Column(db.Integer, primary_key=True, nullable=False)
     foiministryrequest_id = db.Column(db.Integer, ForeignKey('FOIMinistryRequests.foiministryrequestid'), nullable=False)
-    foiministryrequestversion_id = db.Column(db.Integer, ForeignKey('FOIMinistryRequests.version'), nullable=False) # AH NOTE -> THIS NEEDED?
+    foiministryrequestversion_id = db.Column(db.Integer, ForeignKey('FOIMinistryRequests.version'), nullable=False)
     oipublicationstatus_id = db.Column(db.Integer, ForeignKey('OpenInfoPublicationStatuses.oipublicationstatusid'), nullable=False)
     oiexemption_id = db.Column(db.Integer, ForeignKey('OpenInformationExemptions.oiexemptionid'), nullable=True)
     oiassignedto = db.Column(db.String(120), ForeignKey('FOIAssignees.username'), nullable=True)
@@ -29,9 +29,14 @@ class FOIOpenInformationRequests(db.Model):
     createdby = db.Column(db.String(120), nullable=False)
     updatedby = db.Column(db.String(120), nullable=True)
 
-    def getopeinfo_by_foiministryrequestid(cls, foiminstryrequestid)->DefaultMethodResult:
-        pass
-    
+    def getcurrentfoiopeninforequest(cls, foiminstryrequestid)->DefaultMethodResult:
+        try:
+            foiopeninforequest_schema = FOIOpenInfoRequestSchema()
+            query = db.session.query(FOIOpenInformationRequests).filter_by(foiministryrequest_id=foiminstryrequestid).order_by(FOIOpenInformationRequests.version.desc()).first()
+            return foiopeninforequest_schema.dump(query)
+        except Exception as exception:
+            logging.error(f"Error: {exception}")
+                
     def createopeninfo(cls, foiopeninforequest, userid)->DefaultMethodResult:
         try:
             createddate = datetime2.now().isoformat()
@@ -97,7 +102,7 @@ class FOIOpenInformationRequests(db.Model):
         finally:
             db.session.close()
     
-class FOIOpenInfoRequestSchema(ma.schema):
+class FOIOpenInfoRequestSchema(ma.Schema):
     class Meta:
         fields = (
             'foiopeninforequestid', 'foiministryrequest_id', 'foiministryrequestversion_id', 'oipublicationstatus_id', 'oiexemption_id', 'oiassignedto',

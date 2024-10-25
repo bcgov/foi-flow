@@ -57,6 +57,9 @@ import {
   fetchPDFStitchedStatusForOIPCRedlineReview,
   fetchPDFStitchedStatusForOIPCRedline,
 } from "../../../apiManager/services/FOI/foiRecordServices";
+import {
+  fetchFOIOpenInfoRequest,
+} from "../../../apiManager/services/FOI/foiOpenInfoRequestServices";
 import { makeStyles } from "@material-ui/core/styles";
 import FOI_COMPONENT_CONSTANTS from "../../../constants/FOI/foiComponentConstants";
 import { push } from "connected-react-router";
@@ -178,6 +181,9 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
   let requestApplicantProfile = useSelector(
     (state) => state.foiRequests.foiRequestApplicantProfile
   )
+  let foiOITransactionData = useSelector(
+    (state) => state.foiRequests.foiOpenInfoRequest
+  );
   const [attachments, setAttachments] = useState(requestAttachments);
   const [comment, setComment] = useState([]);
   const [requestState, setRequestState] = useState(StateEnum.unopened.name);
@@ -350,6 +356,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
     dispatch(fetchOIPCInquiryoutcomes());
     dispatch(fetchOpenInfoExemptions());
     dispatch(fetchOpenInfoPublicationStatuses());
+    dispatch(fetchFOIOpenInfoRequest(ministryId));
 
     if (bcgovcode) dispatch(fetchFOIMinistryAssignedToList(bcgovcode));
   }, [requestId, ministryId, comment, attachments]);
@@ -1725,6 +1732,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
                 requestNumber={requestNumber}
                 requestDetails={requestDetails}
                 userDetail={userDetail}
+                foiOITransactionData={foiOITransactionData}
               />
             </div>
           )}

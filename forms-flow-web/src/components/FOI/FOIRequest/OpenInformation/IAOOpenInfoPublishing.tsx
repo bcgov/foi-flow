@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import "./iaoopeninfo.scss";
 import IAOOpenInfoHeader from "./IAOOpenInfoHeader";
 import IAOOpenInfoMain from "./IAOOpenInfoMain";
@@ -13,24 +13,25 @@ type OITransactionObject = {
   oifeedback: string;
 };
 
-const IAOOpenInfoPublishing = ({ requestNumber, requestDetails, userDetail }: any) => {
-  const oiTxnData = {
-    oipublicationstatus_id: 2,
-    oiexemption_id: null,
-    oiexemptionapproved: null,
-    pagereference: "",
-    iaorationale: "",
-    oifeedback: "",
-    isactive: true,
-    foiministryrequestid: 1,
-    foirequestopeninfoid: 1,
-    version: 1
-  }; // AH NOTE -> if data is null -> use the above default state
+const IAOOpenInfoPublishing = ({ requestNumber, requestDetails, userDetail, foiOITransactionData }: any) => {
+  // const oiTxnData = {
+  //   oipublicationstatus_id: 2,
+  //   oiexemption_id: null,
+  //   oiexemptionapproved: null,
+  //   pagereference: "",
+  //   iaorationale: "",
+  //   oifeedback: "",
+  //   isactive: true,
+  //   foiministryrequestid: 1,
+  //   foirequestopeninfoid: 1,
+  //   version: 1
+  // }; // AH NOTE -> if data is null -> use the above default state. REMOVE THIS AS A REQUEST WILL ALWAYS HAVE FOIOPENINFO DATA IN BE
+
   const userGroups: string[] = userDetail.groups.map((group : any) => group.slice(1));
   const isOIUser : boolean = userGroups.includes("OI Team");
 
   //Local State
-  const [oiPublicationData, setOiPublicationData] = useState<OITransactionObject | null>(oiTxnData);
+  const [oiPublicationData, setOiPublicationData] = useState<OITransactionObject | null>(foiOITransactionData);
   console.log("BANG", oiPublicationData)
   console.log(userDetail, "userdetail")
   console.log("userGroups", userGroups)

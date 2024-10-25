@@ -17,14 +17,14 @@ class openinfoservice:
     def getopeninfoexemptions (self):
         return OpenInformationExemptions.getallexemptions()
     
-    def getfoiopeninforequest_by_foiministryrequestid(self, foiministryrequestid):
-        pass
+    def getcurrentfoiopeninforequest(self, foiministryrequestid):
+       return FOIOpenInformationRequests().getcurrentfoiopeninforequest(foiministryrequestid)
     
     def createopeninforequest(self, foiopeninforequest, userid, foiministryrequestid):
         version = FOIMinistryRequest.getversionforrequest(foiopeninforequest["foiministryrequest_id"])
         foiopeninforequest['foiministryrequestversion_id'] = version
         foiopeninforequest['foiministryrequest_id'] = foiministryrequestid
-        result = FOIOpenInformationRequests.createopeninfo(foiopeninforequest, userid)
+        result = FOIOpenInformationRequests().createopeninfo(foiopeninforequest, userid)
         return result
 
     def updateopeninforequest(self, foiopeninforequest, userid, foiministryrequestid):
@@ -35,10 +35,10 @@ class openinfoservice:
         foiopeninforequest['version'] = prev_foiopeninforequest["version"]
         foiopeninforequest["created_at"] = prev_foiopeninforequest["created_at"]
         foiopeninforequest["createdby"] = prev_foiopeninforequest["createdby"]
-        result = FOIOpenInformationRequests.updateopeninfo(foiopeninforequest, userid)
+        result = FOIOpenInformationRequests().updateopeninfo(foiopeninforequest, userid)
         deactivateresult = None
         if result.success == True:
             foiopeninfoid = result.args[0]
-            deactivateresult = FOIOpenInformationRequests.deactivatefoiopeninforequest(foiopeninfoid, userid, foiministryrequestid)
+            deactivateresult = FOIOpenInformationRequests().deactivatefoiopeninforequest(foiopeninfoid, userid, foiministryrequestid)
         if result and deactivateresult:
             return result

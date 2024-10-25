@@ -13,20 +13,34 @@ from marshmallow import Schema, fields, validate, ValidationError
 import json
 import asyncio
 
-API = Namespace('FOIRequests', description='Endpoints for FOI request management')
+API = Namespace('FOIOPENINFO', description='Endpoints for FOI OpenInformation management')
 TRACER = Tracer.get_instance()
 EXCEPTION_MESSAGE_NOTFOUND_REQUEST='Record not found'
 CUSTOM_KEYERROR_MESSAGE = "Key error has occured: "
 
+#RESTRICT ALL ACESS TO ONLY IAO AND OI USERS FOR ALL ROUTES. NO MINISTRY ALLOWED
 @cors_preflight('GET,OPTIONS')
+@API.route('/foiopeninfo/ministryrequest/<int:foiministryrequestid>', defaults={'usertype':None})
 @API.route('/foiopeninfo/ministryrequest/<int:foiministryrequestid>/<string:usertype>')
 class FOIOpenInfoRequest(Resource):
-    """Return openinfo request based on foiministryrequestid"""
+    """Return current  openinfo request based on foiministryrequestid"""
     @staticmethod
     @cross_origin(origins=allowedorigins())
+    @TRACER.trace()
     @auth.require
-    def get(ministryrequestid,usertype=None):
-        pass
+    def get(foiministryrequestid, usertype=None):
+        try:
+            result = openinfoservice().getcurrentfoiopeninforequest(foiministryrequestid)
+            if result in (None, {}):
+                return {"status": False, "message": "Could not find FOIOpenInfoRequest"}, 404
+            return  json.dumps(result), 200
+            #Do we need any other restriction logic to gather data??
+        except ValidationError as err:
+            return {'status': False, 'message': str(err)}, 400
+        except KeyError as error:
+            return {'status': False, 'message': CUSTOM_KEYERROR_MESSAGE + str(error)}, 400    
+        except BusinessException as exception:            
+            return {'status': exception.status_code, 'message':exception.message}, 500
 
 @cors_preflight('POST,OPTIONS') 
 @API.route('/foiopeninfo/foirequest/<int:foirequestid>/ministryrequest/<int:foiministryrequestid>/<string:usertype>')
