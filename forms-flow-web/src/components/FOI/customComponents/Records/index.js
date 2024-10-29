@@ -33,6 +33,7 @@ import {
   fetchPDFStitchedRecordForOIPCRedline,
   fetchPDFStitchedRecordForOIPCRedlineReview,
   checkForRecordsChange,
+  fetchPDFStitchedRecordForConsults,
   editPersonalAttributes,
   updateUserLockedRecords,
 } from "../../../../apiManager/services/FOI/foiRecordServices";
@@ -252,6 +253,9 @@ export const RecordsLog = ({
   let responsePackagePdfStitchStatus = useSelector(
     (state) => state.foiRequests.foiPDFStitchStatusForResponsePackage
   );
+  let consultPDFStitchedStatus = useSelector(
+    (state) => state.foiRequests.foiPDFStitchStatusForConsults
+  );
 
   let pdfStitchedRecord = useSelector(
     (state) => state.foiRequests.foiPDFStitchedRecordForHarms
@@ -267,6 +271,9 @@ export const RecordsLog = ({
   );
   let responsePackagePdfStitchedRecord = useSelector(
     (state) => state.foiRequests.foiPDFStitchedRecordForResponsePackage
+  );
+  let consultPDFStitchedRecord = useSelector(
+    (state) => state.foiRequests.foiPDFStitchedRecordForConsultPackage
   );
 
   let isRecordsfetching = useSelector(
@@ -317,6 +324,12 @@ export const RecordsLog = ({
 
   useEffect(() => {
     dispatch(getRecordFormats());
+
+    
+    //Filter out download consults option from RecordsDownloadList if ministry user
+    if (isMinistryCoordinator) {
+      setRecordsDownloadList(recordsDownloadList.filter((record) => record.id !== 6));
+    }
   }, []);
 
   const [currentEditRecord, setCurrentEditRecord] = useState();
@@ -487,6 +500,11 @@ export const RecordsLog = ({
     useState(false);
   const [isOIPCRedlineInProgress, setIsOIPCRedlineInProgress] =
     useState(false);
+
+  const [isConsultDownloadInProgress, setIsConsultDownloadInProgress] = useState(false);
+  const [isConsultDownloadReady, setIsConsultDownloadReady] = useState(false);
+  const [isConsultDownloadFailed, setIsConsultDownloadFailed] = useState(false);
+
   const [isAllSelected, setIsAllSelected] = useState(false);
 
   useEffect(() => {
@@ -569,12 +587,21 @@ export const RecordsLog = ({
       setIsOIPCRedlineFailed,
       fetchPDFStitchedRecordForOIPCRedline
     );
+    // Update Consult Stitch Status
+    updateStatus(
+      consultPDFStitchedStatus,
+      setIsConsultDownloadInProgress,
+      setIsConsultDownloadReady,
+      setIsConsultDownloadFailed,
+      fetchPDFStitchedRecordForConsults
+    );
   }, [
     pdfStitchStatus,
     redlinePdfStitchStatus,
     responsePackagePdfStitchStatus,
     oipcRedlinePdfStitchedStatus,
     oipcRedlineReviewPdfStitchedStatus,
+    consultPDFStitchedStatus,
     requestId,
     ministryId,
   ]);
@@ -593,8 +620,11 @@ export const RecordsLog = ({
       if (item.id === 5 && isOIPCRedlineReviewReady) {
         item.disabled = false;
       }
+      if (item.id === 6 && isConsultDownloadReady) {
+        item.disabled = false;
+      }
     });
-  }, [isRedlineDownloadReady, isResponsePackageDownloadReady, isOIPCRedlineReady, isOIPCRedlineReviewReady]);
+  }, [isRedlineDownloadReady, isResponsePackageDownloadReady, isOIPCRedlineReady, isOIPCRedlineReviewReady, isConsultDownloadReady]);
 
   const addAttachments = () => {
     setModalFor("add");
@@ -979,6 +1009,9 @@ export const RecordsLog = ({
     } else if (e.target.value === 5 && isOIPCRedlineReviewReady) {
       const s3filepath = oipcRedlineReviewPdfStitchedRecord?.finalpackagepath;
       handleDownloadZipFile(s3filepath, e.target.value);
+    } else if (e.target.value === 6 && isConsultDownloadReady) {
+      const s3filepath = consultPDFStitchedRecord?.finalpackagepath;
+      handleDownloadZipFile(s3filepath, e.target.value);
     }
 
     setCurrentDownload(e.target.value);
@@ -1161,6 +1194,10 @@ export const RecordsLog = ({
       setIsOIPCRedlineReviewInProgress(false);
       setIsOIPCRedlineReviewReady(false);
       setIsOIPCRedlineReviewFailed(true);
+    } else if (itemid === 6) {
+      setIsConsultDownloadInProgress(false);
+      setIsConsultDownloadReady(false);
+      setIsConsultDownloadFailed(true);
     }
   };
 
@@ -1170,7 +1207,8 @@ export const RecordsLog = ({
       (itemid === 2 && isRedlineDownloadReady) ||
       (itemid === 3 && isResponsePackageDownloadReady) ||
       (itemid === 4 && isOIPCRedlineReady) ||
-      (itemid === 5 && isOIPCRedlineReviewReady)
+      (itemid === 5 && isOIPCRedlineReviewReady) ||
+      (itemid === 6 && isConsultDownloadReady)
     );
   };
 
@@ -1180,7 +1218,8 @@ export const RecordsLog = ({
       (itemid === 2 && isRedlineDownloadFailed) ||
       (itemid === 3 && isResponsePackageDownloadFailed) ||
       (itemid === 4 && isOIPCRedlineFailed) ||
-      (itemid === 5 && isOIPCRedlineReviewFailed)
+      (itemid === 5 && isOIPCRedlineReviewFailed) ||
+      (itemid === 6 && isConsultDownloadFailed)
     );
   };
 
@@ -1190,7 +1229,8 @@ export const RecordsLog = ({
       (itemid === 2 && isRedlineDownloadInProgress) ||
       (itemid === 3 && isResponsePackageDownloadInProgress) ||
       (itemid === 4 && isOIPCRedlineInProgress) ||
-      (itemid === 5 && isOIPCRedlineReviewInProgress)
+      (itemid === 5 && isOIPCRedlineReviewInProgress) ||
+      (itemid === 6 && isConsultDownloadInProgress)
     );
   };
   
@@ -1200,7 +1240,8 @@ export const RecordsLog = ({
       (itemid === 2 && redlinePdfStitchedRecord?.createdat_datetime) ||
       (itemid === 3 && responsePackagePdfStitchedRecord?.createdat_datetime) ||
       (itemid === 4 && oipcRedlinePdfStitchedRecord?.createdat_datetime) ||
-      (itemid === 5 && oipcRedlineReviewPdfStitchedRecord?.createdat_datetime)
+      (itemid === 5 && oipcRedlineReviewPdfStitchedRecord?.createdat_datetime) ||
+      (itemid === 6 && consultPDFStitchedRecord?.createdat_datetime)
     );
   }
 

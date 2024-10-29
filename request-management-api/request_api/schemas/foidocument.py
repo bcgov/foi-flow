@@ -28,7 +28,7 @@ class ReplaceDocumentSchema(Schema):
         """Exclude unknown fields in the deserialized output."""
 
         unknown = EXCLUDE    
-    filename = fields.Str(data_key="filename",required=True,allow_none=False, validate=[validate.Length(max=120, error=MAX_EXCEPTION_MESSAGE)])
+    filename = fields.Str(data_key="filename",required=True,allow_none=False, validate=[validate.Length(max=500, error=MAX_EXCEPTION_MESSAGE)])
     documentpath = fields.Str(data_key="documentpath",required=True,allow_none=False, validate=[validate.Length(max=1000, error=MAX_EXCEPTION_MESSAGE)])
     category = fields.Str(data_key="category",allow_none=True, validate=[validate.Length(max=120, error=MAX_EXCEPTION_MESSAGE)])
     
@@ -38,7 +38,7 @@ class DocumentSchema(Schema):
         """Exclude unknown fields in the deserialized output."""
 
         unknown = EXCLUDE    
-    filename = fields.Str(data_key="filename",required=True,allow_none=False, validate=[validate.Length(max=120, error=MAX_EXCEPTION_MESSAGE)])
+    filename = fields.Str(data_key="filename",required=True,allow_none=False, validate=[validate.Length(max=500, error=MAX_EXCEPTION_MESSAGE)])
     documentpath = fields.Str(data_key="documentpath",required=True,allow_none=False, validate=[validate.Length(max=1000, error=MAX_EXCEPTION_MESSAGE)])
     category = fields.Str(data_key="category",allow_none=True, validate=[validate.Length(max=120, error=MAX_EXCEPTION_MESSAGE)])   
 
