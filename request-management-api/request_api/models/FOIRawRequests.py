@@ -605,6 +605,7 @@ class FOIRawRequest(db.Model):
             literal(None).label('isministryrestricted'),
             subjectcode,
             literal(None).label('isoipcreview'),
+            literal(None).label('isphasedrelease'),
             literal(None).label('oipc_number')
         ]
 

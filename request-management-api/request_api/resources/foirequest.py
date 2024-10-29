@@ -289,13 +289,12 @@ class FOIRequestsById(Resource):
     def post(foirequestid,foiministryrequestid,section):
         try:
             request_json = request.get_json()
+            foirequest = requestservice().getrequest(foirequestid, foiministryrequestid)
             if (section == "oipc"):
-                foirequest = requestservice().getrequest(foirequestid, foiministryrequestid)
                 foirequest['isoipcreview'] = request_json['isoipcreview']
                 foirequest['oipcdetails'] = request_json['oipcdetails']
-            if (section == "userrecordslockstatus"):
-                foirequest = requestservice().getrequest(foirequestid, foiministryrequestid)
-                foirequest['userrecordslockstatus'] = request_json['userrecordslockstatus']
+            else:
+                foirequest[section] = request_json[section]
             foirequestschema = FOIRequestWrapperSchema().load(foirequest)
             result = requestservice().saverequestversion(foirequestschema, foirequestid, foiministryrequestid,AuthHelper.getuserid())
             if result.success == True:

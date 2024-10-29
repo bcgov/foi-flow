@@ -551,3 +551,27 @@ export const deleteOIPCDetails = (requestId, ministryId, ...rest) => {
       });
   };
 }
+
+export const updateSpecificRequestSection = (data, field, requestId, ministryId, ...rest) => {
+  const done = fnDone(rest);
+  let apiUrl= replaceUrl(replaceUrl(
+    API.FOI_REQUEST_SECTION_API,
+    "<ministryid>",
+    ministryId),"<requestid>",requestId
+  );
+  return (dispatch) => {
+    httpPOSTRequest(`${apiUrl}/${field}`, data)
+      .then((res) => {
+        if (res.data) {
+          done(null, res.data);
+        } else {
+          dispatch(serviceActionError(res));
+          throw new Error(`Error while updating ${field} for the (request# ${requestId}, ministry# ${ministryId})`);            
+        }
+      })
+      .catch((error) => {
+        dispatch(serviceActionError(error));
+        done(error);
+      });
+  };
+}

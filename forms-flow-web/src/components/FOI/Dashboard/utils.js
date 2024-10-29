@@ -256,6 +256,7 @@ export const displayQueueFlagIcons = (params) => {
   return  <div>
             {restricted}
             {oipcreview}
+            {phasedrelease}
           </div>
 }
 

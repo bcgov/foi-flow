@@ -34,11 +34,11 @@ import {
   fetchPDFStitchedRecordForOIPCRedlineReview,
   checkForRecordsChange,
   editPersonalAttributes,
-  updateUserLockedRecords,
 } from "../../../../apiManager/services/FOI/foiRecordServices";
 import {
   saveRequestDetails,
-  openRequestDetails
+  openRequestDetails,
+  updateSpecificRequestSection,
 } from "../../../../apiManager/services/FOI/foiRequestServices";
 import {
   StateTransitionCategories,
@@ -1984,8 +1984,9 @@ export const RecordsLog = ({
     const toastID = toast.loading("Updating records lock status for request...");
     const data = {userrecordslockstatus: !lockRecords};
     dispatch(
-      updateUserLockedRecords(
+      updateSpecificRequestSection(
         data,
+        'userrecordslockstatus',
         requestId,
         ministryId, 
         (err, _res) => {

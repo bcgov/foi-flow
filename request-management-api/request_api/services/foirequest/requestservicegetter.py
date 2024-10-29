@@ -178,6 +178,7 @@ class requestservicegetter:
             'selectedMinistries':[{'code':requestministry['programarea.bcgovcode'],'id':requestministry['foiministryrequestid'],'name':requestministry['programarea.name'],'selected':'true'}],
             'divisions': self.getdivisions(requestministrydivisions),
             'isoipcreview': requestministry['isoipcreview'] if (requestministry['isoipcreview'] not in (None, '') and requestministry['isoipcreview'] in (True, False)) else False,
+            'isphasedrelease': requestministry['isphasedrelease'] if (requestministry['isphasedrelease'] not in (None, '') and requestministry['isphasedrelease'] in (True, False)) else False,
             'isreopened': self.hasreopened(foiministryrequestid),
             'oipcdetails': self.getoipcdetails(foiministryrequestid, requestministry['version']),
             'onholdTransitionDate': self.getonholdtransition(foiministryrequestid),            

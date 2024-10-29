@@ -46,6 +46,7 @@ const RequestFlag = ({ isActive, type, handleSelect, showFlag = true, isDisabled
   let iconClass;
   let isSelectedBgClass;
   let bgClass;
+  let borderClass;
 
   switch (type) {
     //Need to change heading, message, description for modals as well
@@ -68,6 +69,7 @@ const RequestFlag = ({ isActive, type, handleSelect, showFlag = true, isDisabled
       isSelectedBgClass =
         "linear-gradient(to right, rgba(250,124,22,0.32) 80%, #fa7c16 0%)";
       bgClass = "linear-gradient(to right, #fff 80%, #fa7c16 0%)";
+      borderClass = '1px solid #fa7c16';
 
       //when setting to active
       modalHeadingActive = "OIPC Review";
@@ -109,14 +111,15 @@ const RequestFlag = ({ isActive, type, handleSelect, showFlag = true, isDisabled
       isSelectedBgClass =
         "linear-gradient(to right, rgba(146, 7, 183, 0.32) 80%, #9207b7 0%)";
       bgClass = "linear-gradient(to right, #fff 80%, #9207b7 0%)";
+      borderClass = '1px solid #9207b7';
 
       //when setting to active
       modalHeadingActive = "Phased Release";
       modalMessageActive =
-        "Are you sure you want to flag this request as a Phased Release?";
-      modalDescriptionActive = (
-        <span>This will tag the request as Phased Release.</span>
-      );
+        "By setting the status of Phased Release to this request, the records timelines will be extended. Are you sure you want to continue?";
+      // modalDescriptionActive = (
+      //   <span>This will tag the request as Phased Release.</span>
+      // );
 
       //when setting to inactive
       modalHeadingInactive = "Single Release";
@@ -133,6 +136,7 @@ const RequestFlag = ({ isActive, type, handleSelect, showFlag = true, isDisabled
     if (type == "oipcreview" && !isActive) {
         handleSelect(e.target.value)
     } else {
+        setIsSelected(e.target.value);
         setModalOpen(true);
     }
 
@@ -164,7 +168,10 @@ const RequestFlag = ({ isActive, type, handleSelect, showFlag = true, isDisabled
         <div className="request-flag-dropdown-all">
           <div
             className="request-flag-select"
-            style={{ background: isSelected ? isSelectedBgClass : bgClass }}
+            style={{ 
+              background: isSelected ? isSelectedBgClass : bgClass,
+              border: borderClass
+            }}
           >
             {isSelected ? (
               <FontAwesomeIcon

@@ -92,6 +92,7 @@ class requestserviceministrybuilder(requestserviceconfigurator):
         foiministryrequest.closedate = requestdict['closedate']
         foiministryrequest.closereasonid = requestdict['closereasonid']
         foiministryrequest.isoipcreview = ministryschema["isoipcreview"]
+        foiministryrequest.isphasedrelease = ministryschema["isphasedrelease"]
         foiministryrequest.oipcreviews = self.createfoirequestoipcs(foiministryrequest.isoipcreview, ministryschema["foiministryrequestid"], ministryschema["version"])
         return foiministryrequest
 

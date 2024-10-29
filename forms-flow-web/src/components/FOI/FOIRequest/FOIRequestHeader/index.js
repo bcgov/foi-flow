@@ -16,7 +16,8 @@ import {
   saveAssignee
 } from "../../../../apiManager/services/FOI/foiAssigneeServices";
 import {
-  fetchRestrictedRequestCommentTagList
+  fetchRestrictedRequestCommentTagList,  
+  updateSpecificRequestSection,
 } from "../../../../apiManager/services/FOI/foiRequestServices";
 import { toast } from "react-toastify";
 import _ from 'lodash';
@@ -54,7 +55,7 @@ const FOIRequestHeader = React.memo(
     disableInput,
     isAddRequest,
     handleOipcReviewFlagChange,
-    showOipcReviewFlag,
+    showFlags,
     isMinistry,
   }) => {
     /**
@@ -235,6 +236,47 @@ const FOIRequestHeader = React.memo(
     const ministryAssignedTo = getMinistryAssignedTo();
     const watcherList = assignedToList.filter(assignedTo => assignedTo.type === 'iao');
 
+    const updateIsPhasedRelease = (isPhasedRelease) => {
+      const toastID = toast.loading("Updating phased release status for request...");
+      dispatch(
+        updateSpecificRequestSection(
+          {'isphasedrelease': isPhasedRelease},
+          'isphasedrelease',
+          requestId,
+          ministryId, 
+          (err, _res) => {
+          if(!err) {
+            createSaveRequestObject('isphasedrelease', isPhasedRelease)
+            toast.update(toastID, {
+              type: "success",
+              render: "Request details have been saved successfully.",
+              position: "top-right",
+              isLoading: false,
+              autoClose: 3000,
+              hideProgressBar: true,
+              closeOnClick: true,
+              pauseOnHover: true,
+              draggable: true,
+              progress: undefined,
+            });
+          } else {
+            toast.error(
+              "Temporarily unable to update phased release status for request. Please try again in a few minutes.",
+              {
+                position: "top-right",
+                autoClose: 3000,
+                hideProgressBar: true,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+              }
+            );
+          }
+        })
+      )
+    }
+
     return (
       <>
       <div className='row'>
@@ -302,15 +344,16 @@ const FOIRequestHeader = React.memo(
                     requestDetails={requestDetails}
                     isActive={requestDetails.isoipcreview}
                     handleSelect={handleOipcReviewFlagChange}
-                    showFlag={showOipcReviewFlag}
+                    showFlag={showFlags}
                     isDisabled={isMinistry}
                 />
-                {/* <RequestFlag
+                <RequestFlag
                   type="phasedrelease"
                   requestDetails={requestDetails}
                   isActive={requestDetails.isphasedrelease}
-                  handleSelect={handleOipcReviewFlagChange}
-                /> */}
+                  showFlag={showFlags}
+                  handleSelect={updateIsPhasedRelease}
+                />
               </div>
             </Grid>
           </Grid>
