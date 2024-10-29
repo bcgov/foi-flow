@@ -450,6 +450,8 @@ class FOIMinistryRequest(db.Model):
                         onekeywordfiltercondition.append(ministry_restricted_requests.isrestricted == True)
                 if (_keyword == "oipc"):
                     onekeywordfiltercondition.append(FOIMinistryRequest.isoipcreview == True)
+                if (_keyword == "phased"):
+                    onekeywordfiltercondition.append(FOIMinistryRequest.isphasedrelease == True)
             
                 filtercondition.append(or_(*onekeywordfiltercondition))
 
@@ -1446,7 +1448,7 @@ class FOIMinistryRequest(db.Model):
             if (flag.lower() == 'oipc'):
                 requestflagscondition.append(FOIMinistryRequest.findfield('isoipcreview', iaoassignee, ministryassignee) == True)
             if (flag.lower() == 'phased'):
-                # requestflagscondition.append(FOIMinistryRequest.findfield('isphasedrelease', iaoassignee, ministryassignee) == True)
+                requestflagscondition.append(FOIMinistryRequest.findfield('isphasedrelease', iaoassignee, ministryassignee) == True)
                 continue
         return or_(*requestflagscondition)
 
