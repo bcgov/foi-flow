@@ -265,8 +265,8 @@ const RequestDetails = React.memo(
                 <TextField
                   id="dueDate"
                   label="Legislated Due Date"
-                  type={requestDetails?.currentState?.toLowerCase() === StateEnum.onhold.name.toLowerCase() ? "text" : "date"}
-                  value={requestDetails?.currentState?.toLowerCase() === StateEnum.onhold.name.toLowerCase() ? 'N/A' : (dueDateText || '')}
+                  type={(requestDetails?.currentState?.toLowerCase() === StateEnum.onhold.name.toLowerCase() || requestDetails?.currentState?.toLowerCase() === StateEnum.onholdother.name.toLowerCase()) ? "text" : "date"}
+                  value={(requestDetails?.currentState?.toLowerCase() === StateEnum.onhold.name.toLowerCase() || requestDetails?.currentState?.toLowerCase() === StateEnum.onholdother.name.toLowerCase()) ? 'N/A' : (dueDateText || '')}
                   inputProps={{ "aria-labelledby": "dueDate-label"}}
                   InputLabelProps={{
                   shrink: true,

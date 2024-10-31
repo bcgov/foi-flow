@@ -225,6 +225,7 @@ const FOIRequestHeader = React.memo(
       status.toLowerCase() === StateEnum.onhold.name.toLowerCase() ||
       status.toLowerCase() === StateEnum.response.name.toLowerCase() ||
       status.toLowerCase() === StateEnum.recordsreadyforreview.name.toLowerCase() ||
+      status.toLowerCase() === StateEnum.onholdother.name.toLowerCase() ||
       (ministryId && status.toLowerCase() === StateEnum.peerreview.name.toLowerCase());
 
     const getMinistryAssignedTo = () => {

@@ -165,6 +165,7 @@ class StateName(Enum):
     readytoscan = "Ready to Scan"
     appfeeowing = "App Fee Owing"
     section5pending = "Section 5 Pending"
+    onholdother = "On Hold - Other"
 class CacheUrls(Enum):
     keycloakusers= "/api/foiassignees"
     programareas= "/api/foiflow/programareas"

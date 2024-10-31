@@ -57,8 +57,9 @@ const RequestDetails = React.memo((requestDetails) => {
                   <b>Records Due Date</b>
                 </span>
                 <span className="foi-rowtoppadding">
-                  {_requestDetails?.currentState?.toLowerCase() !==
-                    StateEnum.onhold.name.toLowerCase()
+                  {(_requestDetails?.currentState?.toLowerCase() !==
+                    StateEnum.onhold.name.toLowerCase() && _requestDetails?.currentState?.toLowerCase() !==
+                    StateEnum.onholdother.name.toLowerCase())
                     ? formatDate(
                         _requestDetails.cfrDueDate,
                         "MMM dd yyyy"
@@ -71,8 +72,9 @@ const RequestDetails = React.memo((requestDetails) => {
                   <b>Legislated Due Date</b>
                 </span>
                 <span className="foi-rowtoppadding">
-                  {_requestDetails?.currentState?.toLowerCase() !==
-                    StateEnum.onhold.name.toLowerCase()
+                  {(_requestDetails?.currentState?.toLowerCase() !==
+                    StateEnum.onhold.name.toLowerCase() && _requestDetails?.currentState?.toLowerCase() !==
+                    StateEnum.onholdother.name.toLowerCase())
                     ? formatDate(
                         _requestDetails.dueDate,
                         "MMM dd yyyy"
