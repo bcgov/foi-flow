@@ -108,7 +108,7 @@ const AdvancedSearch = ({ userDetail }) => {
     "content": "Use one or more fields from the following sections on their own or to narrow your search: Request State/Status/Type/Flags, Date Range, or Public Body."
   };
 
-  const [searchFilterSelected, setSearchFilterSelected] = useState(advancedSearchParams?.search || null);
+  const [searchFilterSelected, setSearchFilterSelected] = useState(advancedSearchParams?.search || SearchFilter.ID_NUM);
   const keywordsMode = searchFilterSelected === SearchFilter.REQUEST_DESCRIPTION;
 
   const [searchText, setSearchText] = useState(() => {
@@ -135,13 +135,9 @@ const AdvancedSearch = ({ userDetail }) => {
   };
   const [requestState, setRequestState] = useState(() => {
     if (Object.keys(advancedSearchParams).length > 0 && advancedSearchParams.requestState.length > 0) {
-      let savedRequestState = {...intitialRequestState}
-      advancedSearchParams.requestState.forEach(state => {
-        savedRequestState[state] = true;
-      });
-      return savedRequestState;
+      return advancedSearchParams.requestState;
     } else {
-      return intitialRequestState;
+      return [];
     }
   });
 
@@ -248,7 +244,7 @@ const AdvancedSearch = ({ userDetail }) => {
     handleUpdateSearchFilter({
       search: searchFilterSelected,
       keywords: keywordsMode ? keywords : [searchText.trim()],
-      requestState: getTrueKeysFromCheckboxObject(requestState),
+      requestState: requestState,
       requestType: getTrueKeysFromCheckboxObject(requestTypes),
       requestFlags: getTrueKeysFromCheckboxObject(requestFlags),
       requestStatus: getTrueKeysFromCheckboxObject(requestStatus),
@@ -274,7 +270,6 @@ const AdvancedSearch = ({ userDetail }) => {
   }, []);
 
   const noSearchCriteria = () => {
-    let selectedRequestStates = getTrueKeysFromCheckboxObject(requestState);
     let selectedRequestTypes = getTrueKeysFromCheckboxObject(requestTypes);
     let selectedRequestFlags = getTrueKeysFromCheckboxObject(requestFlags);
     let selectedRequestStatus = getTrueKeysFromCheckboxObject(requestStatus);
@@ -282,7 +277,7 @@ const AdvancedSearch = ({ userDetail }) => {
               && !fromDate
               && !toDate
               && selectedPublicBodies.length===0
-              && selectedRequestStates.length===0
+              && requestState.length===0
               && selectedRequestTypes.length===0
               && selectedRequestFlags.length===0
               && selectedRequestStatus.length===0;
@@ -293,7 +288,7 @@ const AdvancedSearch = ({ userDetail }) => {
     setSelectedDateRangeType("");
     setKeywords([]);
     setSearchFilterSelected();
-    setRequestState(intitialRequestState);
+    setRequestState([]);
     setRequestTypes(initialRequestTypes);
     setRequestFlags(initialRequestFlags);
     setRequestStatus(intitialRequestStatus);
@@ -336,10 +331,7 @@ const AdvancedSearch = ({ userDetail }) => {
   };
 
   const handleRequestStateChange = (event) => {
-    setRequestState({
-      ...requestState,
-      [event.target.parentElement.getAttribute('stateid')]: event.target.checked
-    });
+    setRequestState(event.target.value);
   };
 
   const handleRequestStatusChange = (event) => {
@@ -558,20 +550,6 @@ const AdvancedSearch = ({ userDetail }) => {
 
                 <Grid item xs>
                   <ClickableChip
-                    key={`filter-axis-request`}
-                    label={"AXIS REQUEST #"}
-                    color="primary"
-                    onClick={() =>
-                      clickSearchFilter(SearchFilter.AXIS_REQUEST_NUM)
-                    }
-                    clicked={
-                      searchFilterSelected === SearchFilter.AXIS_REQUEST_NUM
-                    }
-                  />
-                </Grid>
-
-                <Grid item xs>
-                  <ClickableChip
                     key={`filter-applicant-name`}
                     label={"APPLICANT NAME"}
                     color="primary"
@@ -611,7 +589,7 @@ const AdvancedSearch = ({ userDetail }) => {
                 </Grid>
               </Grid>
 
-              <Grid item xs={2} container direction="row" rowSpacing={2}>
+              <Grid item xs={6} container direction="row" spacing={2}>
                 <Grid item xs={12}>
                   <Typography
                     sx={{
@@ -619,213 +597,200 @@ const AdvancedSearch = ({ userDetail }) => {
                     }}
                     variant="h6"
                   >
-                    Request State
-                  </Typography>
-                </Grid>
-                <Grid item xs={12}>
-                  <FormGroup>
-                    <FormControlLabel
-                      className={classes.checkboxLabel}
-                      control={
-                        <Checkbox
-                          size="small"
-                          name="callforrecords"
-                          stateid={StateEnum.callforrecords.label}
-                          onChange={handleRequestStateChange}
-                          checked={requestState[StateEnum.callforrecords.label]}
-                          color="success"
-                        />
-                      }
-                      label="Call for Records"
-                    />
-                    <FormControlLabel
-                      className={classes.checkboxLabel}
-                      control={
-                        <Checkbox
-                          size="small"
-                          name="review"
-                          stateid={StateEnum.review.label}
-                          onChange={handleRequestStateChange}
-                          checked={requestState[StateEnum.review.label]}
-                          color="success"
-                        />
-                      }
-                      label="Records Review"
-                    />
-                    <FormControlLabel
-                      className={classes.checkboxLabel}
-                      control={
-                        <Checkbox
-                          size="small"
-                          name="signoff"
-                          stateid={StateEnum.signoff.label}
-                          onChange={handleRequestStateChange}
-                          checked={requestState[StateEnum.signoff.label]}
-                          color="success"
-                        />
-                      }
-                      label="Ministry Sign Off"
-                    />
-                    <FormControlLabel
-                      className={classes.checkboxLabel}
-                      control={
-                        <Checkbox
-                          size="small"
-                          name="closed"
-                          stateid={StateEnum.closed.label}
-                          onChange={handleRequestStateChange}
-                          checked={requestState[StateEnum.closed.label]}
-                          color="success"
-                        />
-                      }
-                      label="Closed"
-                    />
-                  </FormGroup>
-                </Grid>
-              </Grid>
-
-              <Grid item xs={2} container direction="row" rowSpacing={2}>
-                <Grid item xs={12}>
-                  <Typography
-                    sx={{
-                      fontWeight: "bold",
-                    }}
-                    variant="h6"
-                  >
-                    Request Status
-                  </Typography>
-                </Grid>
-                <Grid item xs={12}>
-                  <FormGroup>
-                    <FormControlLabel
-                      className={classes.checkboxLabel}
-                      control={
-                        <Checkbox
-                          size="small"
-                          name="overdue"
-                          onChange={handleRequestStatusChange}
-                          checked={requestStatus.overdue}
-                          color="success"
-                        />
-                      }
-                      label="Overdue"
-                    />
-                    <FormControlLabel
-                      className={classes.checkboxLabel}
-                      control={
-                        <Checkbox
-                          size="small"
-                          name="ontime"
-                          onChange={handleRequestStatusChange}
-                          checked={requestStatus.ontime}
-                          color="success"
-                        />
-                      }
-                      label="On Time"
-                    />
-                  </FormGroup>
-                </Grid>
-              </Grid>
-
-              <Grid item xs={2} container direction="row" rowSpacing={2}>
-                <Grid item xs={12}>
-                  <Typography
-                    sx={{
-                      fontWeight: "bold",
-                    }}
-                    variant="h6"
-                  >
-                    Request Type
+                    Search by Request State
                   </Typography>
                 </Grid>
 
                 <Grid item xs={12}>
-                  <FormGroup>
-                    <FormControlLabel
-                      className={classes.checkboxLabel}
-                      control={
-                        <Checkbox
-                          size="small"
-                          name="personal"
-                          onChange={handleRequestTypeChange}
-                          checked={requestTypes.personal}
-                          color="success"
-                          disabled={requestTypes.generaldisabled}
-                        />
+                  <FormControl fullWidth>
+                    <InputLabel id="request-state-label" shrink>
+                      Request State
+                    </InputLabel>
+                    <Select
+                      labelId="request-state-label"
+                      id="request-state"
+                      displayEmpty
+                      multiple
+                      value={requestState}
+                      onChange={handleRequestStateChange}
+                      inputProps={{ "aria-labelledby": "request-state-label" }}
+                      input={
+                        <OutlinedInput label="Request State" notched />
                       }
-                      label="Personal"
-                    />
-                    <FormControlLabel
-                      className={classes.checkboxLabel}
-                      control={
-                        <Checkbox
-                          size="small"
-                          name="general"
-                          onChange={handleRequestTypeChange}
-                          checked={requestTypes.general}
-                          color="success"
-                          disabled={requestTypes.generaldisabled}
-                        />
-                      }
-                      label={<div style={{display: "flex"}}>General {requestTypes.generaldisabled ? <p style={{color: "#ff0000",fontSize: "0.8rem",lineHeight: "1.6"}}> * </p>: ""}</div>}                      
-                    />
-                  </FormGroup>
+                      renderValue={(selected) => {
+                        if (selected.length === 0) {
+                          return <em>All</em>;
+                        }
+
+                        return selected.map(value => StateEnum[value].name).join(", ");
+                      }}
+                    >
+                      <MenuItem disabled value="" key="request-state-all">
+                        <em>All</em>
+                      </MenuItem>
+                      {Object.entries(StateEnum).filter(([key, value]) => ![
+                        'callforrecordsoverdue', 'unopened', 'intakeinprogress', 'open'
+                      ].includes(key)).map(([key, value]) => (
+                        <MenuItem
+                          key={`request-state-type-${key}`}
+                          value={key}
+                        >
+                          <Checkbox
+                            checked={
+                              requestState.indexOf(key) > -1
+                            }
+                            color="success"
+                          />
+                          <ListItemText
+                            primary={value.name}
+                            key={`request-state-label-${key}`}
+                          />
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
                 </Grid>
-                
-                <Grid item xs={12}>
-                  <Typography
-                    sx={{
-                      fontWeight: "bold",
-                    }}
-                    variant="h6"
-                  >
-                    Request Flags
-                  </Typography>
+                <Grid item xs={4} container direction="row">
+                  <Grid item xs={12}>
+                    <Typography
+                      sx={{
+                        fontWeight: "bold",
+                      }}
+                      variant="h6"
+                    >
+                      Request Status
+                    </Typography>
+                  </Grid>
+                  <Grid item xs={12}>
+                    <FormGroup>
+                      <FormControlLabel
+                        className={classes.checkboxLabel}
+                        control={
+                          <Checkbox
+                            size="small"
+                            name="overdue"
+                            onChange={handleRequestStatusChange}
+                            checked={requestStatus.overdue}
+                            color="success"
+                          />
+                        }
+                        label="Overdue"
+                      />
+                      <FormControlLabel
+                        className={classes.checkboxLabel}
+                        control={
+                          <Checkbox
+                            size="small"
+                            name="ontime"
+                            onChange={handleRequestStatusChange}
+                            checked={requestStatus.ontime}
+                            color="success"
+                          />
+                        }
+                        label="On Time"
+                      />
+                    </FormGroup>
+                  </Grid>
+                </Grid>
+                <Grid item xs={4} container direction="row">
+                  <Grid item xs={12}>
+                    <Typography
+                      sx={{
+                        fontWeight: "bold",
+                      }}
+                      variant="h6"
+                    >
+                      Request Type
+                    </Typography>
+                  </Grid>
+
+                  <Grid item xs={12}>
+                    <FormGroup>
+                      <FormControlLabel
+                        className={classes.checkboxLabel}
+                        control={
+                          <Checkbox
+                            size="small"
+                            name="personal"
+                            onChange={handleRequestTypeChange}
+                            checked={requestTypes.personal}
+                            color="success"
+                          />
+                        }
+                        label="Personal"
+                      />
+                      <FormControlLabel
+                        className={classes.checkboxLabel}
+                        control={
+                          <Checkbox
+                            size="small"
+                            name="general"
+                            onChange={handleRequestTypeChange}
+                            checked={requestTypes.general}
+                            color="success"
+                          />
+                        }
+                        label="General"
+                      />
+                    </FormGroup>
+                  </Grid>
+                </Grid>
+                <Grid item xs={4} container direction="row">
+                  <Grid item xs={12}>
+                    <Typography
+                      sx={{
+                        fontWeight: "bold",
+                      }}
+                      variant="h6"
+                    >
+                      Request Flags
+                    </Typography>
+                  </Grid>
                 </Grid>
 
-                <Grid item xs={12}>
-                  <FormGroup>
-                    <FormControlLabel
-                      className={classes.checkboxLabel}
-                      control={
-                        <Checkbox
-                          size="small"
-                          name="restricted"
-                          onChange={handleRequestFlagsChange}
-                          checked={requestFlags.restricted}
-                          color="success"
-                        />
-                      }
-                      label="Restricted"
-                    />
-                    <FormControlLabel
-                      className={classes.checkboxLabel}
-                      control={
-                        <Checkbox
-                          size="small"
-                          name="oipc"
-                          onChange={handleRequestFlagsChange}
-                          checked={requestFlags.oipc}
-                          color="success"
-                        />
-                      }
-                      label="OIPC"
-                    />
-                    <FormControlLabel
-                      className={classes.checkboxLabel}
-                      control={
-                        <Checkbox
-                          size="small"
-                          name="phased"
-                          onChange={handleRequestFlagsChange}
-                          checked={requestFlags.phased}
-                          color="success"
-                        />
-                      }
-                      label="Phased"
-                    />
-                  </FormGroup>
-                </Grid>
+                  <Grid item xs={12}>
+                    <FormGroup>
+                      <FormControlLabel
+                        className={classes.checkboxLabel}
+                        control={
+                          <Checkbox
+                            size="small"
+                            name="restricted"
+                            onChange={handleRequestFlagsChange}
+                            checked={requestFlags.restricted}
+                            color="success"
+                          />
+                        }
+                        label="Restricted"
+                      />
+                      <FormControlLabel
+                        className={classes.checkboxLabel}
+                        control={
+                          <Checkbox
+                            size="small"
+                            name="oipc"
+                            onChange={handleRequestFlagsChange}
+                            checked={requestFlags.oipc}
+                            color="success"
+                          />
+                        }
+                        label="OIPC"
+                      />
+                      <FormControlLabel
+                        className={classes.checkboxLabel}
+                        control={
+                          <Checkbox
+                            size="small"
+                            name="phased"
+                            onChange={handleRequestFlagsChange}
+                            checked={requestFlags.phased}
+                            color="success"
+                          />
+                        }
+                        label="Phased"
+                      />
+                    </FormGroup>
+                  </Grid>
               </Grid>
 
               <Grid item xs={6} container direction="row" spacing={2}>
