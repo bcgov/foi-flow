@@ -16,6 +16,7 @@ from .FOIMinistryRequests import FOIMinistryRequest
 from .FOIRawRequestWatchers import FOIRawRequestWatcher
 from .FOIRequestApplicants import FOIRequestApplicant
 from .FOIAssignees import FOIAssignee
+from .FOIOpenInformationRequests import FOIOpenInformationRequests
 import logging
 from dateutil import parser
 import json
@@ -717,14 +718,23 @@ class FOIRawRequest(db.Model):
         iaoassignee = aliased(FOIAssignee)
         ministryassignee = aliased(FOIAssignee)
         subquery_ministry_queue = FOIMinistryRequest.getrequestssubquery(groups, filterfields, keyword, additionalfilter, userid, iaoassignee, ministryassignee, 'IAO', isiaorestrictedfilemanager, isministryrestrictedfilemanager)
+        print("groups : ",groups)
 
         #sorting
         sortingcondition = FOIRawRequest.getsorting(sortingitems, sortingorders)
         #rawrequests
         if usertype == "iao" or groups is None:
-            subquery_rawrequest_queue = FOIRawRequest.getrequestssubquery(filterfields, keyword, additionalfilter, userid, isiaorestrictedfilemanager, groups)
-            query_full_queue = subquery_rawrequest_queue.union(subquery_ministry_queue)
-            return query_full_queue.order_by(*sortingcondition).paginate(page=page, per_page=size)
+            # Check if user is in OI Team
+            is_oi_team = usertype == "iao" and 'OI Team' in groups if groups else False
+            if is_oi_team:
+                print("===============FOIRawRequests getrequestspagination : oi team=============")
+                subquery_oirequest_queue = FOIOpenInformationRequests.getrequestssubquery(groups, filterfields, keyword, additionalfilter, userid, iaoassignee, ministryassignee, "OI", isiaorestrictedfilemanager, isministryrestrictedfilemanager)
+                sortingcondition = FOIOpenInformationRequests.getsorting(sortingitems, sortingorders)
+                return subquery_oirequest_queue.order_by(*sortingcondition).paginate(page=page, per_page=size)
+            else:
+                subquery_rawrequest_queue = FOIRawRequest.getrequestssubquery(filterfields, keyword, additionalfilter, userid, isiaorestrictedfilemanager, groups)
+                query_full_queue = subquery_rawrequest_queue.union(subquery_ministry_queue)
+                return query_full_queue.order_by(*sortingcondition).paginate(page=page, per_page=size)
         else:
             return subquery_ministry_queue.order_by(*sortingcondition).paginate(page=page, per_page=size)
 

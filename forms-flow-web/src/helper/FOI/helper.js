@@ -213,7 +213,7 @@ const isIntakeTeam = (userGroups) => {
   );
 };
 
-const isOITeamLogin = (userGroups) => {
+const isOITeam = (userGroups) => {
   return (
     userGroups?.map((userGroup) => userGroup.replace("/", "")).indexOf("OI Team") !== -1
   );
@@ -492,7 +492,6 @@ export {
   calculateDaysRemaining,
   isMinistryCoordinator,
   isMinistryLogin,
-  isOITeamLogin,
   getMinistryByValue,
   addToFullnameList,
   getFullnameList,
@@ -509,6 +508,7 @@ export {
   isScanningTeam,
   isFlexTeam,
   isIntakeTeam,
+  isOITeam,
   encrypt,
   decrypt,
   addToRestrictedRequestTagList,

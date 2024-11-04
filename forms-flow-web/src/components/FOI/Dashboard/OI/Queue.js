@@ -25,6 +25,9 @@ const Queue = ({ userDetail, tableInfo }) => {
   const requestQueue = useSelector(
     (state) => state.foiRequests.foiMinistryRequestsList
   );
+
+  console.log("requestQueue", requestQueue);
+
   const isLoading = useSelector((state) => state.foiRequests.isLoading);
 
   const classes = useStyles();
@@ -44,6 +47,7 @@ const Queue = ({ userDetail, tableInfo }) => {
   const sortModel = useSelector((state) => state.foiRequests.queueParams?.sortModel || tableInfo.sort);
 
   let serverSortModel;
+
   const keyword = useSelector((state) => state.foiRequests.queueParams?.keyword);
   const requestFilter = useSelector((state) => state.foiRequests.queueFilter);
 
@@ -87,29 +91,31 @@ const Queue = ({ userDetail, tableInfo }) => {
     );
   }, [rowsState, sortModel, keyword, requestFilter]);
 
-  function getRecordsDue(params) {
-    let receivedDateString = params.row.cfrduedate;
-    const currentStatus = params.row.currentState;
-    if (currentStatus.toLowerCase() === StateEnum.onhold.name.toLowerCase()) {
-      return "N/A";
-    } else if(!receivedDateString) {
-      return "";
-    } else {
-      return formatDate(receivedDateString, "MMM dd yyyy").toUpperCase();
-    }
-  }
+  const columnsRef = React.useRef(tableInfo?.columns || []);
 
-  function getLDD(params) {
-    let receivedDateString = params.row.duedate;
-    const currentStatus = params.row.currentState;
-    if (currentStatus.toLowerCase() === StateEnum.onhold.name.toLowerCase()) {
-      return "N/A";
-    } else if(!receivedDateString) {
-      return "";
-    } else {
-      return formatDate(receivedDateString, "MMM dd yyyy").toUpperCase();
-    }
-  }
+  // function getRecordsDue(params) {
+  //   let receivedDateString = params.row.cfrduedate;
+  //   const currentStatus = params.row.currentState;
+  //   if (currentStatus.toLowerCase() === StateEnum.onhold.name.toLowerCase()) {
+  //     return "N/A";
+  //   } else if(!receivedDateString) {
+  //     return "";
+  //   } else {
+  //     return formatDate(receivedDateString, "MMM dd yyyy").toUpperCase();
+  //   }
+  // }
+
+  // function getLDD(params) {
+  //   let receivedDateString = params.row.duedate;
+  //   const currentStatus = params.row.currentState;
+  //   if (currentStatus.toLowerCase() === StateEnum.onhold.name.toLowerCase()) {
+  //     return "N/A";
+  //   } else if(!receivedDateString) {
+  //     return "";
+  //   } else {
+  //     return formatDate(receivedDateString, "MMM dd yyyy").toUpperCase();
+  //   }
+  // }
 
   const columns = React.useRef([
     {
@@ -235,6 +241,13 @@ const Queue = ({ userDetail, tableInfo }) => {
     );
   }
 
+  const handleSortChange = (model) => {
+    if (model.length === 0) {
+      return;
+    }
+    dispatch(setQueueParams({...queueParams, sortModel: model}));
+  };
+
   return (
     <>
       <Grid item container alignItems="center" xs={12}>
@@ -288,7 +301,7 @@ const Queue = ({ userDetail, tableInfo }) => {
             container
             alignItems="flex-start"
             justifyContent="center"
-            xs={3}
+            xs={'auto'}
             minWidth="390px"
           >
             <Stack direction="row" sx={{ overflowX: "hidden" }} spacing={1}>
@@ -320,13 +333,15 @@ const Queue = ({ userDetail, tableInfo }) => {
                 clicked={requestFilter === "watchingRequests"}
               />
               <ClickableChip
-                id="watchingRequests"
-                key={`watching-requests`}
+                id="unassignedRequests"
+                key={`unassigned-requests`}
                 label={"UNASSIGNED REQUESTS"}
                 color="primary"
                 size="small"
-                onClick={() => requestFilterChange("watchingRequests")}
-                clicked={requestFilter === "watchingRequests"}
+                onClick={() => {
+                  requestFilterChange("unassignedRequests")
+                }}
+                clicked={requestFilter === "unassignedRequests"}
               />
             </Stack>
           </Grid>

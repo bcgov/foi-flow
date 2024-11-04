@@ -73,9 +73,9 @@ class DashboardPagination(Resource):
             elif  queuetype is not None and queuetype == "ministry" and AuthHelper.getusertype() == "ministry":
                 print("ministry api")    
                 requests = dashboardservice().getministryrequestqueuepagination(AuthHelper.getministrygroups(), _page, _size, _sortingitems, _sortingorders, _filterfields, _keyword, _additionalfilter, _userid)
-            elif (AuthHelper.getusertype() == "iao") and (queuetype is not None and queuetype == "oi"):
-                print("OI TEAM API")
-                requests = dashboardservice().getoirequestqueuepagination(groups, _page, _size, _sortingitems, _sortingorders, _filterfields, _keyword, _additionalfilter, _userid)
+            # elif (AuthHelper.getusertype() == "iao") and (queuetype is not None and queuetype == "oi"):
+            #     print("OI TEAM API")
+            #     requests = dashboardservice().getoirequestqueuepagination(groups, _page, _size, _sortingitems, _sortingorders, _filterfields, _keyword, _additionalfilter, _userid)
             else:
                 statuscode = 401   
             print("requests : ",requests)

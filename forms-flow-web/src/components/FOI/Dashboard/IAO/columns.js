@@ -13,6 +13,7 @@ import {
   isProcessingTeam,
   isFlexTeam,
   isIntakeTeam,
+  isOITeam,
   formatDate,
 } from "../../../../helper/FOI/helper";
 
@@ -240,6 +241,63 @@ const FlexTeamColumns = [
   }
 ];
 
+const OITeamColumns = [
+  {
+    field: "receivedDate",
+    headerName: "RECEIVED DATE",
+    flex: 1,
+    headerAlign: "left"
+  },
+  {
+    field: "axisRequestId",
+    headerName: "ID NUMBER",
+    flex: 1,
+    headerAlign: "left"
+  },
+  {
+    field: "requestType",
+    headerName: "TYPE",
+    flex: 1,
+    headerAlign: "left",
+  },
+  {
+    field: "recordspagecount",
+    headerName: "PAGES",
+    flex: 1,
+    headerAlign: "left",
+  },
+  {
+    field: "publicationStatus",
+    headerName: "PUBLICATION STATUS",
+    flex: 1,
+    headerAlign: "left",
+  },
+  {
+    field: "fromClosed",
+    headerName: "FROM CLOSED",
+    flex: 1,
+    headerAlign: "left",
+  },
+  {
+    field: "publicationDate",
+    headerName: "PUBLICATION DATE",
+    flex: 1,
+    headerAlign: "left",
+  },
+  {
+    field: "assignedTo",
+    headerName: "ASSIGNEE",
+    flex: 1,
+    headerAlign: "left",
+  },
+  {
+    field: "applicantType",
+    headerName: "APPLICANT TYPE",
+    flex: 1,
+    headerAlign: "left",
+  }
+];
+
 const defaultTableInfo = {
   sort: [
     { field: "defaultSorting", sort: "asc" },
@@ -263,6 +321,13 @@ const getTableInfo = (userGroups) => {
 
   if (isFlexTeam(userGroups)) {
     defaultTableInfo.columns = FlexTeamColumns;
+  }
+
+  if (isOITeam(userGroups)) {
+    defaultTableInfo.columns = OITeamColumns;
+    defaultTableInfo.sort = [
+      { field: "receivedDate", sort: "desc" },  // Default sorting for OI team
+    ];
   }
 
   return defaultTableInfo;
