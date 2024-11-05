@@ -109,7 +109,6 @@ class FOIRequests(Resource):
             if rawresult.success == True:
                 result = requestservice().saverequest(foirequestschema,AuthHelper.getuserid())
                 if result.success == True:
-                    print("NEW FOI REQUEST CREATED AND SET TO OPEN")
 
                     #Create FOIOpenInfoRequest after FOIMinistryRequest has successfully been created and set to Open state
                     foiministryrequest = result.args[0]
