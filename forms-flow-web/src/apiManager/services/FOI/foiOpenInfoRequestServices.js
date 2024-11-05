@@ -1,4 +1,4 @@
-import { httpGETRequest, httpPOSTRequest } from "../../httpRequestHandler";
+import { httpPOSTRequest, httpGETRequest } from "../../httpRequestHandler";
 import API from "../../endpoints";
 import {
   serviceActionError,
@@ -14,7 +14,7 @@ export const fetchFOIOpenInfoRequest = (foiministryrequestid) => {
     return () => {};
   }
   const foiOpenInfoRequestAPIUrl = replaceUrl(
-    replaceUrl(API.FOI_OPENINFO_REQUEST),
+    replaceUrl(API.FOI_GET_OPENINFO_REQUEST),
     "<ministryrequestid>",
     foiministryrequestid
   );
@@ -33,6 +33,35 @@ export const fetchFOIOpenInfoRequest = (foiministryrequestid) => {
       })
       .catch((error) => {
         console.log("Error while fetching FOIOpenInfoRequest data", error);
+        dispatch(serviceActionError(error));
+        dispatch(setFOILoader(false));
+      });
+  };
+};
+
+export const saveFOIOpenInfoRequest = (
+  foiministryrequestid,
+  foirequestId,
+  data
+) => {
+  let apiUrl = replaceUrl(
+    replaceUrl(API.FOI_POST_OPENINFO_REQUEST, "<foirequestid>", foirequestId),
+    "<foiministryrequestid>",
+    foiministryrequestid
+  );
+  return (dispatch) => {
+    httpPOSTRequest(apiUrl, data)
+      .then((res) => {
+        if (res.data) {
+          dispatch(setFOILoader(false));
+        } else {
+          console.log("Error while updating FOIOpenInfoRequest data", res);
+          dispatch(serviceActionError(res));
+          dispatch(setFOILoader(false));
+        }
+      })
+      .catch((error) => {
+        console.log("Error while updating FOIOpenInfoRequest data", error);
         dispatch(serviceActionError(error));
         dispatch(setFOILoader(false));
       });

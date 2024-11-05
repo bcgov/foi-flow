@@ -91,9 +91,9 @@ class FOIOpenInformationRequests(db.Model):
         try:
             sql = """UPDATE public."FOIOpenInformationRequests" 
             SET isactive=false, updated_at=now(), updatedby=:userid 
-            WHERE foiopeninforequestid=:foiopeninforequestid AND foiministryrequest_id=:foiministryrequestid AND isactive=true 
+            WHERE foiministryrequest_id=:foiministryrequestid AND isactive=true 
             AND version != (SELECT version FROM public."FOIOpenInformationRequests" WHERE foiopeninforequestid = :foiopeninforequestid ORDER BY "version" desc limit 1);"""
-            db.session.execute(text(sql), {'foiopeninforequestid': foiopeninforequestid, 'userid':userid, 'foiministryrequest_id': foiministryrequestid})
+            db.session.execute(text(sql), {'foiopeninforequestid': foiopeninforequestid, 'userid':userid, 'foiministryrequestid': foiministryrequestid})
             db.session.commit()
             return DefaultMethodResult(True, "FOIOpenInfo request version updated", foiopeninforequestid)
         except Exception as exception:
@@ -105,6 +105,6 @@ class FOIOpenInformationRequests(db.Model):
 class FOIOpenInfoRequestSchema(ma.Schema):
     class Meta:
         fields = (
-            'foiopeninforequestid', 'foiministryrequest_id', 'foiministryrequestversion_id', 'oipublicationstatus_id', 'oiexemption_id', 'oiassignedto',
+            'foiopeninforequestid', 'version', 'foiministryrequest_id', 'foiministryrequestversion_id', 'oipublicationstatus_id', 'oiexemption_id', 'oiassignedto',
             'oiexemptionapproved', 'pagereference', 'iaorationale', 'oifeedback', 'publicationdate', 'created_at', 'updated_at', 'createdby', 'updatedby'
         )

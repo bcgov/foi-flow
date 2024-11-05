@@ -28,6 +28,7 @@ class FOIOpenInfoRequest(Resource):
     @cross_origin(origins=allowedorigins())
     @TRACER.trace()
     @auth.require
+    @auth.ismemberofgroups(getrequiredmemberships())
     def get(foiministryrequestid, usertype=None):
         try:
             #Do we need any other restriction logic to gather data??
@@ -42,32 +43,8 @@ class FOIOpenInfoRequest(Resource):
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500
 
-@cors_preflight('POST,OPTIONS')
-@API.route('/foiopeninfo/foirequest/<int:foirequestid>/ministryrequest/<int:foiministryrequestid>', defaults={'usertype':None})
-@API.route('/foiopeninfo/foirequest/<int:foirequestid>/ministryrequest/<int:foiministryrequestid>/<string:usertype>')
-class FOIOpenInfoRequestById(Resource):
-    """Creates a foi openinfo request for ministry(opened) requests"""
-    @staticmethod
-    @TRACER.trace()
-    @cross_origin(origins=allowedorigins())
-    @auth.require
-    def post(foiministryrequestid):
-        try:
-            request_json = request.get_json()
-            foiopeninfo = FOIOpenInfoSchema().load(request_json)
-            userid = AuthHelper.getuserid()
-            result = openinfoservice.createopeninforequest(foiopeninfo, userid, foiministryrequestid)
-            if result.success:
-                return {'status': result.success, 'message': result.message, 'id': result.identifier}, 200
-        except ValidationError as err:
-            return {'status': False, 'message': str(err)}, 400
-        except KeyError as error:
-            return {'status': False, 'message': CUSTOM_KEYERROR_MESSAGE + str(error)}, 400    
-        except BusinessException as exception:            
-            return {'status': exception.status_code, 'message':exception.message}, 500
-
-@cors_preflight('PUT,OPTIONS') 
 # PUT AND POST ROUTES. IF FE DATA CONTAINS OR SENDS FOIOPENINFO DATA WITH A EXISTING FOIOPENINFOREQUESTID use PUT ROUTE AND USE UPDATESERVICE. IF POST route sent and fe data does not contain a foiopeninforequetst id use post route and createfoiopen service
+@cors_preflight('POST, PUT, OPTIONS') 
 @API.route('/foiopeninfo/foirequest/<int:foirequestid>/ministryrequest/<int:foiministryrequestid>', defaults={'usertype':None})
 @API.route('/foiopeninfo/foirequest/<int:foirequestid>/ministryrequest/<int:foiministryrequestid>/<string:usertype>')
 class FOIOpenInfoRequestById(Resource):
@@ -76,12 +53,13 @@ class FOIOpenInfoRequestById(Resource):
     @TRACER.trace()
     @cross_origin(origins=allowedorigins())
     @auth.require
-    def put(foiministryrequestid):
+    @auth.ismemberofgroups(getrequiredmemberships())
+    def post(foiministryrequestid, foirequestid, usertype):
         try:
             request_json = request.get_json()
             foiopeninfo = FOIOpenInfoSchema().load(request_json)
             userid = AuthHelper.getuserid()
-            result = openinfoservice.updateopeninforequest(foiopeninfo, userid, foiministryrequestid)
+            result = openinfoservice().updateopeninforequest(foiopeninfo, userid, foiministryrequestid)
             if result.success:
                 return {'status': result.success, 'message': result.message, 'id': result.identifier}, 200
         except ValidationError as err:

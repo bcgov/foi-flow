@@ -1733,6 +1733,8 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
                 requestDetails={requestDetails}
                 userDetail={userDetail}
                 foiOITransactionData={foiOITransactionData}
+                foirequestid={requestId}
+                foiministryrequestid={ministryId}
               />
             </div>
           )}

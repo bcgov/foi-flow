@@ -159,6 +159,7 @@ const API = {
   FOI_GET_OI_PUBLICATIONSTATUSES: `${FOI_BASE_API_URL}/api/foiflow/openinfo/publicationstatuses`,
   FOI_GET_OI_EXEMPTIONS: `${FOI_BASE_API_URL}/api/foiflow/openinfo/exemptions`,
   FOI_GET_OI_STATUSES: `${FOI_BASE_API_URL}/api/foiflow/openinfo/statuses`,
-  FOI_OPENINFO_REQUEST: `${FOI_BASE_API_URL}/api/foiopeninfo/ministryrequest/<ministryrequestid>` 
+  FOI_GET_OPENINFO_REQUEST: `${FOI_BASE_API_URL}/api/foiopeninfo/ministryrequest/<ministryrequestid>`,
+  FOI_POST_OPENINFO_REQUEST: `${FOI_BASE_API_URL}/api/foiopeninfo/foirequest/<foirequestid>/ministryrequest/<foiministryrequestid>`
 };
 export default API;

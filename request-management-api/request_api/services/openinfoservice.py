@@ -28,8 +28,8 @@ class openinfoservice:
         return result
 
     def updateopeninforequest(self, foiopeninforequest, userid, foiministryrequestid):
-        prev_foiopeninforequest = self.getfoiopeninforequest_by_foiministryrequestid(foiopeninforequest["foiministryrequest_id"])
-        foiministryrequestversion = FOIMinistryRequest().getversionforrequest(foiopeninforequest["foiministryrequest_id"])
+        prev_foiopeninforequest = self.getcurrentfoiopeninforequest(foiministryrequestid)
+        foiministryrequestversion = FOIMinistryRequest().getversionforrequest(foiministryrequestid)
         foiopeninforequest['foiministryrequestversion_id'] = foiministryrequestversion
         foiopeninforequest['foiministryrequest_id'] = foiministryrequestid
         foiopeninforequest['version'] = prev_foiopeninforequest["version"]
@@ -38,7 +38,7 @@ class openinfoservice:
         result = FOIOpenInformationRequests().updateopeninfo(foiopeninforequest, userid)
         deactivateresult = None
         if result.success == True:
-            foiopeninfoid = result.args[0]
+            foiopeninfoid = result.identifier
             deactivateresult = FOIOpenInformationRequests().deactivatefoiopeninforequest(foiopeninfoid, userid, foiministryrequestid)
         if result and deactivateresult:
             return result
