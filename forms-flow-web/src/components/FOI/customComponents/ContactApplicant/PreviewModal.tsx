@@ -10,23 +10,30 @@ import IconButton from '@material-ui/core/IconButton';
 import CloseIcon from '@material-ui/icons/Close';
 import type { previewParams } from './types';
 import { getOSSHeaderDetails, getFileFromS3 } from "../../../../apiManager/services/FOI/foiOSSServices";
-import { renderTemplate, applyVariables, getTemplateVariables } from './util';
-import { OSS_S3_BUCKET_FULL_PATH, FOI_FFA_URL } from "../../../../constants/constants"
+import { renderTemplate, applyVariables, getTemplateVariables, getTemplateVariablesAsync } from './util';
+import { OSS_S3_BUCKET_FULL_PATH, FOI_FFA_URL } from "../../../../constants/constants";
+import { EmailExport } from '../../../FOI/customComponents';
+
 
 export const PreviewModal = React.memo(({
   modalOpen,
   handleClose,
   handleSave,
   innerhtml,
+  handleExport,
   attachments,
-  templateInfo
+  templateInfo,
+  enableSend
 }: previewParams) => {
 
   const dispatch = useDispatch();
 
   //gets the request detail from the store
   const requestDetails: any = useSelector((state: any) => state.foiRequests.foiRequestDetail);
-
+  const requestExtensions: any = useSelector((state: any) => state.foiRequests.foiRequestExtesions);
+  const responsePackagePdfStitchStatus = useSelector((state: any) => state.foiRequests.foiPDFStitchStatusForResponsePackage);
+  const cfrFeeData = useSelector((state: any) => state.foiRequests.foiRequestCFRFormHistory);
+  
   //get template
   const rootpath = OSS_S3_BUCKET_FULL_PATH
   const templatePath = "/TEMPLATES/EMAILS/header_footer_template.html";
@@ -47,14 +54,18 @@ export const PreviewModal = React.memo(({
       }
     });
   }, []);
+  
   requestDetails["ffaurl"] = FOI_FFA_URL;
-  const templateVariables = getTemplateVariables(requestDetails, templateInfo);
+
+  const templateVariables = getTemplateVariables(requestDetails, requestExtensions, responsePackagePdfStitchStatus, cfrFeeData, templateInfo);
   const handleSend = () => {
-    handleSave( applyVariables(innerhtml, templateVariables) );
+    const callback = (templateVariables: any) => {
+      handleSave( applyVariables(innerhtml, templateVariables ) );
+    };
+    getTemplateVariablesAsync(requestDetails, requestExtensions, responsePackagePdfStitchStatus, cfrFeeData, templateInfo, callback)
   };
 
   return (
-
     <div className="state-change-dialog">        
     <Dialog
       open={modalOpen}
@@ -85,14 +96,22 @@ export const PreviewModal = React.memo(({
         </DialogContentText>
       </DialogContent>
       <DialogActions>
+      { !enableSend && 
+        <EmailExport 
+          handleExport={handleExport}
+          content={innerhtml}
+        />
+      }
+      { enableSend && 
         <button 
         className="btn-bottom btn-save" 
-        disabled={(attachments?.length <= 0)}
+        disabled={!enableSend}
         onClick={handleSend}
         >
           Send Email
         </button>
-        <button className="btn-bottom btn-cancel" onClick={handleClose}>
+      }
+        <button className="btn-cancel" onClick={handleClose}>
           Cancel
         </button>
       </DialogActions>

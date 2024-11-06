@@ -193,6 +193,62 @@ export const fetchRedactedSections = (ministryId, ...rest) => {
   };
 };
 
+export const fetchDocumentPage  = (ministryId, done) => {
+  if (!ministryId) {
+    return (dispatch) => {};
+  }
+
+  let apiUrl = replaceUrl(
+    API.DOC_REVIEWER_REDACTED_DOCUMENT_RECORDS,
+    "<ministryrequestid>",
+    ministryId
+  );
+  return (dispatch) => {
+    httpGETRequest(apiUrl, {}, UserService.getToken())
+      .then((res) => {
+        if (res.data) {
+          done(null, res.data);
+        } else {
+          console.log("Error in fetching redacted sections", res);
+          serviceActionError(res)(dispatch);
+        }
+      })
+      .catch((error) => {
+        console.log("Error in fetching redacted section", error);
+        serviceActionError(error)(dispatch);
+        done(error);
+      });
+  };
+};
+
+export const fetchDocumentPageFlags  = (ministryId, done) => {
+  if (!ministryId) {
+    return (dispatch) => {};
+  }
+
+  let apiUrl = replaceUrl(
+    API.DOC_REVIEWER_REDACTED_PAGEFLAG_RECORDS,
+    "<ministryrequestid>",
+    ministryId
+  );
+  return (dispatch) => {
+    httpGETRequest(apiUrl, {}, UserService.getToken())
+      .then((res) => {
+        if (res.data) {
+          done(null, res.data);
+        } else {
+          console.log("Error in fetching redacted sections", res);
+          serviceActionError(res)(dispatch);
+        }
+      })
+      .catch((error) => {
+        console.log("Error in fetching redacted section", error);
+        serviceActionError(error)(dispatch);
+        done(error);
+      });
+  };
+};
+
 export const saveFOIRecords = (requestId, ministryId, data, ...rest) => {
   let apiUrl = replaceUrl(
     replaceUrl(API.FOI_GET_RECORDS, "<ministryrequestid>", ministryId),
@@ -248,21 +304,6 @@ export const updateFOIRecords = (requestId, ministryId, data, ...rest) => {
   const done = fnDone(rest);
   let apiUrl = replaceUrl(
     replaceUrl(API.FOI_UPDATE_RECORDS, "<ministryrequestid>", ministryId),
-    "<requestid>",
-    requestId
-  );
-  return (dispatch) => {
-    postRecord(dispatch, apiUrl, data, "Error in updating records", rest);
-  };
-};
-
-export const editPersonalAttributes = (requestId, ministryId, data, ...rest) => {
-  if (!ministryId) {
-    return () => {};
-  }
-  const done = fnDone(rest);
-  let apiUrl = replaceUrl(
-    replaceUrl(API.FOI_UPDATE_PERSONAL_ATTRIBUTES, "<ministryrequestid>", ministryId),
     "<requestid>",
     requestId
   );

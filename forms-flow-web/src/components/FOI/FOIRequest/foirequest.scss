@@ -69,6 +69,18 @@
     align-items: flex-start; 
 }
 
+.btn-cancel {
+    border: 1px solid #38598A;
+    background-color: #FFFFFF;
+    color: #38598A;
+    border-radius: 3px;
+    font-size: small;
+    height: 30px;
+    flex-basis: 50%;
+    font-family: BCSans-Bold, sans-serif !important;
+    margin-top: 10px;
+}
+
 .MuiOutlinedInput-notchedOutline {
     border: 1px solid !important;     
 }

@@ -4,6 +4,7 @@ export interface Template {
   templateid: number;
   text: string;
   disabled: boolean;
+  created_at: string;
 }
 
 export type params = {  
@@ -26,6 +27,14 @@ export type previewParams = {
   handleClose: () => void;
   handleSave: (emailContent: string) => void;
   innerhtml: string;
-  attachments: Array<any>;
+  handleExport: () => void;
+  attachments: Array<any>
   templateInfo: any;
+  enableSend: boolean;
 }
+ export type downloadCorrespondenceParams = {
+  modalOpen: boolean;
+  setModalOpen: (open: boolean) => void;
+  handleSave: () => void;
+  modalFor: string;
+ }
