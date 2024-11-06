@@ -18,6 +18,7 @@ from request_api.services.programareaservice import programareaservice
 from request_api.utils.commons.datetimehandler import datetimehandler
 from request_api.services.external.keycloakadminservice import KeycloakAdminService
 from request_api.utils.enums import StateName
+from request_api.models.OperatingTeamEmails import OperatingTeamEmail
 
 class requestservicegetter:
     """ This class consolidates retrival of FOI request for actors: iao and ministry. 
@@ -119,11 +120,11 @@ class requestservicegetter:
         payment = paymentservice().getpayment(foirequestid, foiministryrequestid)
         if approvedcfrfee is not None and approvedcfrfee != {}:
             requestdetails['cfrfee'] = approvedcfrfee
-            _totaldue = float(approvedcfrfee['feedata']['actualtotaldue']) if 'actualtotaldue' in approvedcfrfee['feedata'] and float(approvedcfrfee['feedata']['actualtotaldue']) > 0 else float(approvedcfrfee['feedata']['estimatedtotaldue'])
+            _totaldue = float(approvedcfrfee['feedata']['actualtotaldue']) if float(approvedcfrfee['feedata']['actualtotaldue']) > 0 else float(approvedcfrfee['feedata']['estimatedtotaldue'])
             _balancedue = _totaldue - (float(cfrfee['feedata']['amountpaid']) + float(approvedcfrfee['feedata']['feewaiveramount']))
             requestdetails['cfrfee']['feedata']['amountpaid'] = cfrfee['feedata']['amountpaid']
             requestdetails['cfrfee']['feedata']["balanceDue"] = '{:.2f}'.format(_balancedue)
-            if 'actualtotaldue' in approvedcfrfee['feedata'] and approvedcfrfee['feedata']['actualtotaldue']:
+            if approvedcfrfee['feedata']['actualtotaldue']:
                 requestdetails['cfrfee']['feedata']["totalamountdue"] = '{:.2f}'.format(requestdetails['cfrfee']['feedata']["actualtotaldue"])
             else:
                 requestdetails['cfrfee']['feedata']["totalamountdue"] = '{:.2f}'.format(requestdetails['cfrfee']['feedata']["estimatedtotaldue"])
@@ -137,12 +138,18 @@ class requestservicegetter:
             requestdetails['cfrfee']['feedata']['paymentdate'] = payment['created_at'][:10]
         return requestdetails
 
+    def getrawrequestidbyfoirequestid(self, foirequestid):
+        return FOIRequest.getrawrequestidbyfoirequestid(foirequestid)
+
     def __preparebaseinfo(self,request,foiministryrequestid,requestministry,requestministrydivisions):
         _receiveddate = parse(request['receiveddate'])
         axissyncdatenoneorempty =  self.__noneorempty(requestministry["axissyncdate"]) 
         linkedministryrequests= []
         if "linkedrequests" in requestministry and requestministry["linkedrequests"] is not None:
             linkedministryrequests = self.__assignministrynames(requestministry["linkedrequests"])
+        assignedgroupemail = OperatingTeamEmail.getoperatingteamemail(requestministry["assignedgroup"])
+        if assignedgroupemail is None:
+            assignedgroupemail = KeycloakAdminService().processgroupEmail(requestministry["assignedgroup"])
         baserequestinfo = {
             'id': request['foirequestid'],
             'requestType': request['requesttype'],
@@ -153,7 +160,7 @@ class requestservicegetter:
             'receivedmodeid':request['receivedmode.receivedmodeid'],
             'receivedMode':request['receivedmode.name'],
             'assignedGroup': requestministry["assignedgroup"],
-            'assignedGroupEmail': KeycloakAdminService().processgroupEmail(requestministry["assignedgroup"]),
+            'assignedGroupEmail': assignedgroupemail,
             'assignedTo': requestministry["assignedto"],
             'idNumber':requestministry["filenumber"],
             'axisRequestId': requestministry["axisrequestid"],

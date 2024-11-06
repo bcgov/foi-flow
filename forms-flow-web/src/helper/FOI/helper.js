@@ -42,6 +42,38 @@ const formatDateInPst = (d, formatString = "yyyy-MM-dd") => {
   }
 };
 
+
+const convertDate = (dateString, outputFormat = 'MMMM D, YYYY') => {
+
+  if (!dateString) {
+    return '';
+  }
+
+  // Check if the input dateString matches 'YYYY-MM-DD' format
+  if (dayjs(dateString, 'YYYY-MM-DD').isValid()) {
+    const date = dayjs(dateString).format('YYYY-MM-DD');
+    const formattedDate = dayjs(date).format(outputFormat);
+    return formattedDate;
+  }
+
+  // Check if the input dateString matches 'YYYY MMM, DD' format
+  if (dayjs(dateString, 'YYYY MMM, DD').isValid()) {
+    const date = dayjs(dateString, 'YYYY MMM, DD').format('YYYY-MM-DD');
+    const formattedDate = dayjs(date).format(outputFormat);
+    return formattedDate;
+  }
+
+  // Check if the input dateString matches 'YYYY-MM-DD HH:mm:ss' format
+  if (dayjs(dateString, 'YYYY-MM-DD HH:mm:ss').isValid()) {
+    const date = dayjs(dateString, 'YYYY-MM-DD HH:mm:ss').format('YYYY-MM-DD');
+    const formattedDate = dayjs(date).format(outputFormat);
+    return formattedDate;
+  }
+
+  console.error('Unsupported date format.');
+  return '';
+};
+
 const businessDay = (date) => {
   return dayjs(date).isBusinessDay();
 };
@@ -581,6 +613,7 @@ export {
   isRequestWatcherOrAssignee,
   isRequestWatcherOrMinistryAssignee,
   formatDateInPst,
+  convertDate,
   isProcessingTeam,
   isScanningTeam,
   isFlexTeam,
