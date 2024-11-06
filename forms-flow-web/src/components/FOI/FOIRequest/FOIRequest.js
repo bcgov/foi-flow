@@ -1068,10 +1068,10 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
 
   const showContactApplicantTab = () => {
     return (
-      requestState !== StateEnum.intakeinprogress.name &&
-      requestState !== StateEnum.unopened.name &&
-      requestState !== StateEnum.open.name &&
-      requestState !== StateEnum.appfeeowing.name &&
+      // requestState !== StateEnum.intakeinprogress.name &&
+      // requestState !== StateEnum.unopened.name &&
+      // requestState !== StateEnum.open.name &&
+      // requestState !== StateEnum.appfeeowing.name &&
       requestDetails?.requestType === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_GENERAL)
   }
 
@@ -1178,7 +1178,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
                     name="ContactApplicant"
                     onClick={() => tabclick("ContactApplicant")}
                   >
-                    Contact Applicant{" "}
+                    Communications{" "}
                     {applicantCorrespondence?.length > 0
                       ? `(${applicantCorrespondence.length})`
                       : ""}
@@ -1717,7 +1717,6 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
                   <ContactApplicant
                     requestNumber={requestNumber}
                     requestState={requestState}
-                    userDetail={userDetail}
                     ministryId={ministryId}
                     ministryCode={requestDetails.bcgovcode}
                     applicantCorrespondence={applicantCorrespondence}
