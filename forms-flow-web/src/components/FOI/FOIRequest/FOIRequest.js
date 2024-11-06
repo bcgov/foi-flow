@@ -24,10 +24,14 @@ import {
   fetchFOIMinistryAssignedToList,
   fetchFOISubjectCodeList,
   fetchFOIPersonalDivisionsAndSections,
+  fetchFOIPersonalPeople,
+  fetchFOIPersonalFiletypes,
+  fetchFOIPersonalVolumes,
   fetchOIPCOutcomes,
   fetchOIPCStatuses,
   fetchOIPCReviewtypes,
-  fetchOIPCInquiryoutcomes
+  fetchOIPCInquiryoutcomes,
+  fetchFOICommentTypes
 } from "../../../apiManager/services/FOI/foiMasterDataServices";
 import {
   fetchFOIRequestDetailsWrapper,
@@ -87,6 +91,8 @@ import {
   ConditionalComponent,
   formatDate,
   isRequestRestricted,
+  convertSTRToDate,
+  getCommentTypeIdByName
 } from "../../../helper/FOI/helper";
 import DivisionalTracking from "./DivisionalTracking";
 import RedactionSummary from "./RedactionSummary";
@@ -104,6 +110,7 @@ import { setFOIRequestDetail } from "../../../actions/FOI/foiRequestActions";
 import OIPCDetails from "./OIPCDetails/Index";
 import useOIPCHook from "./OIPCDetails/oipcHook";
 import MANDATORY_FOI_REQUEST_FIELDS from "../../../constants/FOI/mandatoryFOIRequestFields";
+import RequestHistorySection from "../customComponents/RequestHistory";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -181,6 +188,9 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
 
   const [unsavedPrompt, setUnsavedPrompt] = useState(false);
   const [unsavedMessage, setUnsavedMessage] = useState(<></>);
+  const commentTypes = useSelector((state) => state.foiRequests.foiCommentTypes); 
+
+
   const handleUnsavedContinue = () => {
     window.removeEventListener("popstate", handleOnHashChange);
     window.removeEventListener("beforeunload", handleBeforeUnload);
@@ -238,6 +248,10 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
       display: false,
       active: false,
     },
+    RequestHistory: {
+      display: false,
+      active: false,
+    },
   };
 
   const [tabLinksStatuses, setTabLinksStatuses] = useState({
@@ -272,7 +286,8 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
   const [isMCFPersonal, setIsMCFPersonal] = useState(bcgovcode.replaceAll('"', '') == "MCF" && requestDetails.requestType == FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL);
   const {oipcData, addOIPC, removeOIPC, updateOIPC, isOIPCReview, setIsOIPCReview, removeAllOIPCs} = useOIPCHook();
   const [oipcDataInitial, setOipcDataInitial] = useState(oipcData);
-  
+  const [lockRecordsTab, setLockRecordsTab] = useState(false);
+
   //Update disableInput when requestState changes
   useEffect(() => {
     setDisableInput(requestState?.toLowerCase() === StateEnum.closed.name.toLowerCase() && !isOIPCReview);
@@ -295,6 +310,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
     } else if (window.location.href.indexOf("records") > -1) {
       tabclick("Records");
     }
+    dispatch(fetchFOICommentTypes());
   }, []);
 
   useEffect(async () => {
@@ -321,7 +337,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
       dispatch(
         fetchRedactedSections(ministryId, (_err, res) => {
           if (!_err) {
-            setRedactedSections(res.sections);
+            setRedactedSections(res);
           }
         })
       );
@@ -340,6 +356,20 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
 
     if (bcgovcode) dispatch(fetchFOIMinistryAssignedToList(bcgovcode));
   }, [requestId, ministryId, comment, attachments]);
+
+  const validLockRecordsState = (currentState=requestDetails.currentState) => {
+    return (
+      currentState === StateEnum.harms.name ||
+      currentState === StateEnum.onhold.name ||
+      currentState === StateEnum.recordsreadyforreview.name ||
+      currentState === StateEnum.review.name ||
+      currentState === StateEnum.consult.name ||
+      currentState === StateEnum.peerreview.name ||
+      currentState === StateEnum.signoff.name ||
+      currentState === StateEnum.response.name ||
+      currentState === StateEnum.closed.name
+    );
+  }
 
   useEffect(() => {
     const requestDetailsValue = requestDetails;
@@ -365,9 +395,16 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
       setIsIAORestricted(isRequestRestricted(requestDetails, ministryId));
     }
 
-    if(MinistryNeedsScanning.includes(bcgovcode.replaceAll('"', '')) && requestDetails.requestType == FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL) {
+    if(
+      MinistryNeedsScanning.includes(bcgovcode.replaceAll('"', '')) &&
+      requestDetails.requestType ==
+        FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL
+    ) {
       dispatch(fetchFOIPersonalDivisionsAndSections(bcgovcode.replaceAll('"', '')));
       if(bcgovcode.replaceAll('"', '') == "MCF") {
+        dispatch(fetchFOIPersonalPeople(bcgovcode.replaceAll('"', '')));
+        dispatch(fetchFOIPersonalFiletypes(bcgovcode.replaceAll('"', '')));
+        dispatch(fetchFOIPersonalVolumes(bcgovcode.replaceAll('"', '')));
         setIsMCFPersonal(true);
       }
     }
@@ -376,6 +413,16 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
     } else {
       setIsOIPCReview(false);
     }
+
+    //Adjust lockRecords value based on requestState if there is no manual user lockedrecords value present in requestDetails from DB
+    const updateRecordsTabAccess = () => {
+      if(requestDetails.userrecordslockstatus === null) {
+        return validLockRecordsState(requestDetails.currentState);
+      } else {
+        return requestDetails.userrecordslockstatus;
+      }
+    }
+    setLockRecordsTab(updateRecordsTabAccess());
   }, [requestDetails]);
 
   //useEffect to manage isoipcreview attribute for requestdetails state
@@ -1032,6 +1079,40 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
       requestDetails?.requestType === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_GENERAL)
   }
 
+  const getHistoryCount = () => {
+    let historyCount= applicantCorrespondence.length + requestNotes.filter(
+            c => c.commentTypeId !== getCommentTypeIdByName(commentTypes, "Ministry Internal") &&
+                c.commentTypeId !== getCommentTypeIdByName(commentTypes, "Ministry Peer Review")
+        ).length;
+    return '('+historyCount+')'
+  } 
+
+  const getMergedHistory = (applicantCorrespondence, requestNotes) => {
+    const mergedHistory = [
+      ...(applicantCorrespondence || []).map((message) => ({
+        ...message,
+        type: 'message',
+        created_at: message.created_at ? convertSTRToDate(message.created_at) : message.created_at 
+      })),
+      ...(requestNotes || []).map((comment) => ({
+        ...comment,
+        type: 'comment'
+      }))
+    ];
+
+    return mergedHistory.sort((a, b) => {
+      const dateA = new Date(a.created_at || a.dateUF);
+      const dateB = new Date(b.created_at || b.dateUF);
+      return dateA - dateB || (a.commentId || a.applicantcorrespondenceid || 0) - (b.commentId || b.applicantcorrespondenceid || 0);
+    });
+  };
+  const getCommentsCount = () => {
+    let commentsCount= (requestNotes.filter( c => c.commentTypeId !== getCommentTypeIdByName(commentTypes,"Ministry Internal") && 
+          c.commentTypeId !== getCommentTypeIdByName(commentTypes, "Ministry Peer Review"))).length;
+    return '('+commentsCount+')'
+
+}
+
   return (!isLoading &&
     requestDetails &&
     Object.keys(requestDetails).length !== 0) ||
@@ -1105,7 +1186,8 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
                   onClick={() => tabclick("Comments")}
                 >
                   Comments{" "}
-                  {requestNotes?.length > 0 ? `(${requestNotes.length})` : ""}
+                  {/* {requestNotes?.length > 0 ? `(${requestNotes.length})` : ""} */}
+                  {getCommentsCount()}
                 </div>
                 {showRecordsTab() && (
                   <div
@@ -1134,6 +1216,16 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
                 )}
               </>
             )}
+            <div
+              className={clsx("tablinks", {
+                active: tabLinksStatuses.RequestHistory.active,
+              })}
+              name="RequestHistory"
+              onClick={() => tabclick("RequestHistory")}
+            >
+              Request History{" "}
+              {getHistoryCount()}
+            </div>
           </div>
 
           <div className="foileftpanelstatus">
@@ -1395,6 +1487,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
                         axisMessage={axisMessage}
                         attachmentsArray={requestAttachments}
                         oipcData={oipcData}
+                        validLockRecordsState={validLockRecordsState}
                       />
                     </>
                   </ConditionalComponent>
@@ -1548,6 +1641,8 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
                     isRequestRestricted(requestDetails, ministryId) ? "iao" : ""
                   }
                   isRestricted={isRequestRestricted(requestDetails, ministryId)}
+                  isMinistry={false}
+                  commentTypes={commentTypes}
                 />
               </>
             ) : (
@@ -1639,6 +1734,11 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
                   divisions={requestDetails.divisions}
                   recordsTabSelect={tabLinksStatuses.Records.active}
                   requestType={requestDetails?.requestType}
+                  lockRecords={lockRecordsTab}
+                  setLockRecordsTab={setLockRecordsTab}
+                  validLockRecordsState={validLockRecordsState}
+                  setSaveRequestObject={setSaveRequestObject}
+                  handleSaveRequest={handleSaveRequest}
                 />
               </>
             )}
@@ -1671,6 +1771,42 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
               )}
             </div>
           )}
+          <div
+            id="RequestHistory"
+            className={clsx("tabcontent", {
+              active: tabLinksStatuses.RequestHistory.active,
+              [classes.displayed]: tabLinksStatuses.RequestHistory?.display,
+              [classes.hidden]: !tabLinksStatuses.RequestHistory?.display,
+            })}
+          >
+            {!isLoading && (requestNotes || applicantCorrespondence) ? (
+              <>
+                <RequestHistorySection
+                  requestHistoryArray={getMergedHistory(applicantCorrespondence, requestNotes)}
+                  currentUser={
+                    userId && {
+                      userId: userId,
+                      avatarUrl: avatarUrl,
+                      name: fullName,
+                    }
+                  }
+                  bcgovcode={bcgovcode}
+                  requestid={requestId}
+                  iaoassignedToList={iaoassignedToList}
+                  ministryAssignedToList={ministryAssignedToList}
+                  requestNumber={requestNumber}
+                  isRestricted={isRequestRestricted(requestDetails, ministryId)}
+                  isMinistry={false}
+                  commentTypes={commentTypes}
+                  ministryId={ministryId}
+                  applicantCorrespondenceTemplates={applicantCorrespondenceTemplates}
+                  setComment={setComment}
+                />
+              </>
+            ) : (
+              <Loading />
+            )}
+          </div>
           <UnsavedModal
             modalOpen={unsavedPrompt}
             handleClose={() => setUnsavedPrompt(false)}

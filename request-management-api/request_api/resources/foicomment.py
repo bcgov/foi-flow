@@ -24,6 +24,7 @@ from request_api.utils.util import  cors_preflight, allowedorigins,canrestictdat
 from request_api.exceptions import BusinessException, Error
 from request_api.services.commentservice import commentservice
 from request_api.services.rawrequestservice import rawrequestservice
+from request_api.schemas.foicomment import  FOIRawRequestCommentSchema, FOIMinistryRequestCommentSchema, FOIRequestHistoryCommentSchema
 from request_api.schemas.foicomment import  FOIRawRequestCommentSchema, FOIMinistryRequestCommentSchema
 from request_api.schemas.foicomment import  EditFOIRawRequestCommentSchema, FOIMinistryRequestCommentSchema
 import json
@@ -50,8 +51,8 @@ class CreateFOIRequestComment(Resource):
     def post():      
         try:
             requestjson = request.get_json() 
-            minrquescommentschema = FOIMinistryRequestCommentSchema().load(requestjson)  
-            result = commentservice().createministryrequestcomment(minrquescommentschema, AuthHelper.getuserid())
+            minrquescommentschema = FOIMinistryRequestCommentSchema().load(requestjson) 
+            result = commentservice().createministryrequestcomment(minrquescommentschema, AuthHelper.getuserid(), minrquescommentschema["commenttypeid"])
             if result.success == True:
                 asyncio.ensure_future(eventservice().postcommentevent(result.identifier, "ministryrequest", AuthHelper.getuserid()))
             return {'status': result.success, 'message':result.message,'id':result.identifier} , 200 
@@ -74,7 +75,7 @@ class CreateFOIRawRequestComment(Resource):
         try:
             requestjson = request.get_json() 
             rawrqcommentschema = FOIRawRequestCommentSchema().load(requestjson)  
-            result = commentservice().createrawrequestcomment(rawrqcommentschema, AuthHelper.getuserid())
+            result = commentservice().createrawrequestcomment(rawrqcommentschema, AuthHelper.getuserid(), rawrqcommentschema["commenttypeid"])
             if result.success == True:
                 asyncio.ensure_future(eventservice().postcommentevent(result.identifier, "rawrequest", AuthHelper.getuserid()))
             return {'status': result.success, 'message':result.message,'id':result.identifier} , 200
@@ -82,7 +83,32 @@ class CreateFOIRawRequestComment(Resource):
             return {'status': False, 'message': CUSTOM_KEYERROR_MESSAGE + str(error)}, 400        
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500 
-        
+
+@cors_preflight('POST,OPTIONS')
+@API.route('/foicomment/requesthistory')
+class CreateFOIRequestHistoryComment(Resource):
+    """Creates comment for request history export."""
+
+     
+    @staticmethod
+    @TRACER.trace()
+    @cross_origin(origins=allowedorigins())
+    @auth.require
+    def post():      
+        try:
+            requestjson = request.get_json() 
+            rawrqcommentschema = FOIRequestHistoryCommentSchema().load(requestjson) 
+            if ("ministryrequestid" in rawrqcommentschema):
+                result = commentservice().createMinistryRequestHistorycomments(rawrqcommentschema, AuthHelper.getuserid())
+            else: result = commentservice().createRequestHistorycomments(rawrqcommentschema, AuthHelper.getuserid())
+            if result.success == True:
+                asyncio.ensure_future(eventservice().postcommentevent(result.identifier, "rawrequest", AuthHelper.getuserid()))
+            return {'status': result.success, 'message':result.message,'id':result.identifier} , 200
+        except KeyError as error:
+            return {'status': False, 'message': CUSTOM_KEYERROR_MESSAGE + str(error)}, 400        
+        except BusinessException as exception:            
+            return {'status': exception.status_code, 'message':exception.message}, 500 
+ 
 @cors_preflight('GET,OPTIONS')
 @API.route('/foicomment/<requesttype>/<requestid>')
 class FOIComment(Resource):
