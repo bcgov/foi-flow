@@ -38,6 +38,11 @@ const IAOOpenInfoMain = ({
     (state: any) => state.foiRequests.oiExemptions
   );
 
+  const disableIAOField =
+    oiPublicationData?.oipublicationstatus_id === 2 || isOIUser;
+  const disableOIField =
+    oiPublicationData?.oipublicationstatus_id === 2 || !isOIUser;
+
   //Styling
   const useStyles = makeStyles({
     heading: {
@@ -80,12 +85,14 @@ const IAOOpenInfoMain = ({
                 onChange={(event) =>
                   handleOIDataChange(event.target.value, event.target.name)
                 }
-                disabled={isOIUser}
                 // error={
                 //   (!oipc.outcomeid || oipc.outcomeid === 5) && oipc.oipcno === ""
                 // }
               >
                 {oiPublicationStatuses.map((status) => {
+                  if (status.oipublicationstatusid === 3) {
+                    return null;
+                  }
                   return (
                     <MenuItem
                       key={status.oipublicationstatusid}
@@ -105,7 +112,7 @@ const IAOOpenInfoMain = ({
                 variant="outlined"
                 value={oiPublicationData?.oiexemption_id}
                 select
-                required
+                required={!isOIUser}
                 InputLabelProps={{ shrink: true }}
                 onChange={(event) =>
                   handleOIDataChange(event.target.value, event.target.name)
@@ -114,9 +121,7 @@ const IAOOpenInfoMain = ({
                   oiPublicationData?.oipublicationstatus_id !== 2 &&
                   !oiPublicationData?.oiexemption_id
                 }
-                disabled={
-                  oiPublicationData?.oipublicationstatus_id === 2 || isOIUser
-                }
+                disabled={disableIAOField}
               >
                 {oiExemptions.map((reason) => {
                   return (
@@ -141,14 +146,13 @@ const IAOOpenInfoMain = ({
                 onChange={(event) =>
                   handleOIDataChange(event.target.value, event.target.name)
                 }
-                // error={
-                //   (!oipc.outcomeid || oipc.outcomeid === 5) && oipc.oipcno === ""
-                // }
-                disabled={
-                  oiPublicationData?.oiexemption_id === 5 ||
-                  oiPublicationData?.oipublicationstatus_id === 2 ||
-                  isOIUser
+                required={!isOIUser}
+                error={
+                  oiPublicationData?.oipublicationstatus_id !== 2 &&
+                  oiPublicationData?.oiexemption_id !== 5 &&
+                  !oiPublicationData?.pagereference
                 }
+                disabled={disableIAOField}
               ></TextField>
             </Grid>
             <Grid item md={6}>
@@ -160,11 +164,7 @@ const IAOOpenInfoMain = ({
                 <FormControlLabel
                   value={true}
                   name="oiexemptionapproved"
-                  disabled={
-                    oiPublicationData?.oiexemption_id === 5 ||
-                    oiPublicationData?.oipublicationstatus_id === 2 ||
-                    !isOIUser
-                  }
+                  disabled={disableOIField}
                   control={
                     <Radio
                       onChange={(event) =>
@@ -179,11 +179,7 @@ const IAOOpenInfoMain = ({
                 <FormControlLabel
                   value={false}
                   name="oiexemptionapproved"
-                  disabled={
-                    oiPublicationData?.oiexemption_id === 5 ||
-                    oiPublicationData?.oipublicationstatus_id === 2 ||
-                    !isOIUser
-                  }
+                  disabled={disableOIField}
                   control={
                     <Radio
                       onChange={(event) =>
@@ -206,10 +202,12 @@ const IAOOpenInfoMain = ({
               label="Analyst Rationale"
               InputLabelProps={{ shrink: true }}
               value={oiPublicationData?.iaorationale}
-              disabled={
-                oiPublicationData?.oiexemption_id === 5 ||
-                oiPublicationData?.oipublicationstatus_id === 2 ||
-                isOIUser
+              required={!isOIUser}
+              disabled={disableIAOField}
+              error={
+                oiPublicationData?.oipublicationstatus_id !== 2 &&
+                oiPublicationData?.oiexemption_id !== 5 &&
+                !oiPublicationData?.iaorationale
               }
               style={{ paddingBottom: "2%" }}
               onChange={(event) =>
@@ -226,14 +224,10 @@ const IAOOpenInfoMain = ({
               variant="outlined"
               name="oifeedback"
               label="OI Feedback"
-              required
               InputLabelProps={{ shrink: true }}
               value={oiPublicationData?.oifeedback}
-              disabled={
-                oiPublicationData?.oiexemption_id === 5 ||
-                oiPublicationData?.oipublicationstatus_id === 2 ||
-                !isOIUser
-              }
+              disabled={disableOIField}
+              required={isOIUser}
               onChange={(event) =>
                 handleOIDataChange(event.target.value, event.target.name)
               }

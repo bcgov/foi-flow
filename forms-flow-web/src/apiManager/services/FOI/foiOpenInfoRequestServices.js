@@ -42,28 +42,32 @@ export const fetchFOIOpenInfoRequest = (foiministryrequestid) => {
 export const saveFOIOpenInfoRequest = (
   foiministryrequestid,
   foirequestId,
-  data
+  data,
+  ...rest
 ) => {
   let apiUrl = replaceUrl(
     replaceUrl(API.FOI_POST_OPENINFO_REQUEST, "<foirequestid>", foirequestId),
     "<foiministryrequestid>",
     foiministryrequestid
   );
+  const done = fnDone(rest);
   return (dispatch) => {
     httpPOSTRequest(apiUrl, data)
       .then((res) => {
         if (res.data) {
-          dispatch(setFOILoader(false));
+          done(null, res.data);
+          // dispatch(setFOILoader(false));
         } else {
           console.log("Error while updating FOIOpenInfoRequest data", res);
           dispatch(serviceActionError(res));
-          dispatch(setFOILoader(false));
+          // dispatch(setFOILoader(false));
         }
       })
       .catch((error) => {
+        done(error);
         console.log("Error while updating FOIOpenInfoRequest data", error);
         dispatch(serviceActionError(error));
-        dispatch(setFOILoader(false));
+        // dispatch(setFOILoader(false));
       });
   };
 };

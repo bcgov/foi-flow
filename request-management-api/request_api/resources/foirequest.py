@@ -109,15 +109,15 @@ class FOIRequests(Resource):
             if rawresult.success == True:
                 result = requestservice().saverequest(foirequestschema,AuthHelper.getuserid())
                 if result.success == True:
-
                     #Create FOIOpenInfoRequest after FOIMinistryRequest has successfully been created and set to Open state
-                    foiministryrequest = result.args[0]
-                    default_foiopeninforequest = {
-                        "oipublicationstatus_id": 2,
-                    }
-                    userid = AuthHelper.getuserid()
-                    foiopeninforequestschema = FOIOpenInfoSchema().load(default_foiopeninforequest)
-                    openinfoservice().createopeninforequest(foiopeninforequestschema, userid, foiministryrequest[0]['id'])
+                    if foirequestschema["requestType"] == 'general' and foirequestschema["selectedMinistries"][0]["code"] not in ("CLB", "HSA", "IIO", "MGC", "OBC", "TIC"):
+                        foiministryrequest = result.args[0]
+                        default_foiopeninforequest = {
+                            "oipublicationstatus_id": 2,
+                        }
+                        userid = AuthHelper.getuserid()
+                        foiopeninforequestschema = FOIOpenInfoSchema().load(default_foiopeninforequest)
+                        openinfoservice().createopeninforequest(foiopeninforequestschema, userid, foiministryrequest[0]['id'])
 
                     requestservice().copywatchers(request_json['id'],result.args[0],AuthHelper.getuserid())
                     requestservice().copycomments(request_json['id'],result.args[0],AuthHelper.getuserid())

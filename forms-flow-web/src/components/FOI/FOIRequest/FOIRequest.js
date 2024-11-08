@@ -1086,6 +1086,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
   const showOpenInformationTab = () => {
     return (
       requestDetails?.requestType === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_GENERAL &&
+      !["CLB", "HSA", "IIO", "MGC", "OBC", "TIC"].includes(requestDetails?.bcgovcode) &&
       requestState !== StateEnum.intakeinprogress.name &&
       requestState !== StateEnum.unopened.name
     );
@@ -1729,6 +1730,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
               })}
             >
               <IAOOpenInfoPublishing
+                toast={toast}
                 requestNumber={requestNumber}
                 requestDetails={requestDetails}
                 userDetail={userDetail}
