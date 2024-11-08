@@ -551,12 +551,6 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
     );
   }
 
-  const test = (model) => {
-    if (model.length > 0) {
-      setHistoricsearchSortModel(model)
-    }
-  }
-
   return (
     <ConditionalComponent condition={!!queryData}>
       <Grid
@@ -623,7 +617,11 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
             sortingOrder={["desc", "asc"]}
             sortModel={[sortModel[0]]}
             sortingMode={"server"}
-            onSortModelChange={(model) => setSortModel(model)}
+            onSortModelChange={(model) => {
+              if (model.length > 0) {
+                setSortModel(model)
+              }
+            }}
             getRowClassName={(params) =>
               clsx(
                 `super-app-theme--${params.row.currentState?.toLowerCase().replace(/ +/g, "")}`,
@@ -664,7 +662,11 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
             sortingOrder={["desc", "asc"]}
             sortModel={[sortHistoricsearchSortModel[0]]}
             sortingMode={"server"}
-            onSortModelChange={test}
+            onSortModelChange={(model) => {
+              if (model.length > 0) {
+                setHistoricsearchSortModel(model)
+              }
+            }}
             
                         
             loading={searchHistoricalDataLoading}

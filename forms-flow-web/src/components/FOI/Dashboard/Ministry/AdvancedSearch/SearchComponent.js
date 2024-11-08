@@ -745,9 +745,7 @@ const AdvancedSearch = ({ userDetail }) => {
                     >
                       Request Flags
                     </Typography>
-                  </Grid>
-                </Grid>
-
+                  </Grid>                  
                   <Grid item xs={12}>
                     <FormGroup>
                       <FormControlLabel
@@ -791,6 +789,8 @@ const AdvancedSearch = ({ userDetail }) => {
                       />
                     </FormGroup>
                   </Grid>
+                </Grid>
+
               </Grid>
 
               <Grid item xs={6} container direction="row" spacing={2}>
