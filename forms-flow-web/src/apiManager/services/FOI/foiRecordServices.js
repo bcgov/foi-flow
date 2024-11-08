@@ -23,6 +23,8 @@ import {
   setFOIPDFStitchedRecordForOipcRedline,
   setRequestAttachments,
   setFOIAttachmentListLoader,
+  setFOIPDFStitchStatusForConsults,
+  setFOIPDFStitchedRecordForConsults,
 } from "../../../actions/FOI/foiRequestActions";
 import { fnDone } from "./foiServicesUtil";
 import UserService from "../../../services/UserService";
@@ -671,6 +673,74 @@ export const fetchPDFStitchedRecordForOIPCRedlineReview = (
   };
 
   
+export const fetchPDFStitchStatusForConsults = (
+  requestId,
+  ministryId,
+  ...rest
+) => {
+  if (!ministryId) {
+    return () => {};
+  }
+  const done = fnDone(rest);
+  let apiUrl = replaceUrl(
+    replaceUrl(
+      API.FOI_PDF_STITCH_STATUS_FOR_CONSULTPACKAGE,
+      "<ministryrequestid>",
+      ministryId
+    ),
+    "<requestid>",
+    requestId
+  );
+  return (dispatch) => {
+    httpGETRequest(apiUrl, {}, UserService.getToken())
+      .then((res) => {
+        if (res.data) {
+          dispatch(setFOIPDFStitchStatusForConsults(res.data));
+          done(null, res.data);
+        }
+      })
+      .catch((error) => {
+        console.log("Error in fetching pdfstitch job status", error);
+        dispatch(serviceActionError(error));
+        done(error);
+      });
+  };
+}
+
+export const fetchPDFStitchedRecordForConsults = (
+  requestId,
+  ministryId,
+  ...rest
+) => {
+  if (!ministryId) {
+    return () => {};
+  }
+  const done = fnDone(rest);
+  let apiUrl = replaceUrl(
+    replaceUrl(
+      API.FOI_DOWNLOAD_RECORDS_FOR_CONSULTPACKAGE,
+      "<ministryrequestid>",
+      ministryId
+    ),
+    "<requestid>",
+    requestId
+  );
+  return (dispatch) => {
+    httpGETRequest(apiUrl, {}, UserService.getToken())
+      .then((res) => {
+        if (res.data) {
+          dispatch(setFOIPDFStitchedRecordForConsults(res.data));
+          done(null, res.data);
+        }
+      })
+      .catch((error) => {
+        console.log("Error in fetching pdfstitch job status", error);
+        dispatch(serviceActionError(error));
+        done(error);
+      });
+  };
+}
+
 export const updateUserLockedRecords = (data, requestId, ministryId, ...rest) => {
   const done = fnDone(rest);
   let apiUrl= replaceUrl(replaceUrl(

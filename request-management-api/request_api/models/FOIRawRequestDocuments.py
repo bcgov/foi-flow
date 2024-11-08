@@ -19,7 +19,7 @@ class FOIRawRequestDocument(db.Model):
     # Defining the columns
     foidocumentid = db.Column(db.Integer, primary_key=True,autoincrement=True)
     documentpath = db.Column(db.String(1000), unique=False, nullable=False)
-    filename = db.Column(db.String(120), unique=False, nullable=True)
+    filename = db.Column(db.String(500), unique=False, nullable=True)
     category = db.Column(db.String(120), unique=False, nullable=True)
     version =db.Column(db.Integer, nullable=True)
     isactive = db.Column(db.Boolean, unique=False, nullable=False,default=True)
