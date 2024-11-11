@@ -415,7 +415,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
     if (requestDetails && requestDetails.requestType === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_GENERAL &&
       !(["CLB", "HSA", "IIO", "MGC", "OBC", "TIC"].includes(requestDetails.bcgovcode))) {
         dispatch(fetchFOIOpenInfoRequest(ministryId));
-        // AH NOTE - Small bug, where the fetch is called on initial state change to open request. FIX NEEDD
+        // AH NOTE - Small bug, where the fetch is called on initial state change to open request if bcgovcode is in the invalid array. FIX NEEDD
     }
     
     if(requestDetails.isoipcreview) {
