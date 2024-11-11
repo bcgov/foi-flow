@@ -356,8 +356,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
     dispatch(fetchOIPCInquiryoutcomes());
     dispatch(fetchOpenInfoExemptions());
     dispatch(fetchOpenInfoPublicationStatuses());
-    dispatch(fetchFOIOpenInfoRequest(ministryId));
-
+    
     if (bcgovcode) dispatch(fetchFOIMinistryAssignedToList(bcgovcode));
   }, [requestId, ministryId, comment, attachments]);
 
@@ -412,6 +411,13 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
         setIsMCFPersonal(true);
       }
     }
+
+    if (requestDetails && requestDetails.requestType === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_GENERAL &&
+      !(["CLB", "HSA", "IIO", "MGC", "OBC", "TIC"].includes(requestDetails.bcgovcode))) {
+        dispatch(fetchFOIOpenInfoRequest(ministryId));
+        // AH NOTE - Small bug, where the fetch is called on initial state change to open request. FIX NEEDD
+    }
+    
     if(requestDetails.isoipcreview) {
       setIsOIPCReview(true);
     } else {

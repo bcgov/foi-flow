@@ -22,7 +22,7 @@ const IAOOpenInfoSaveModal = ({ showModal, saveData, setShowModal }: any) => {
       <Dialog
         open={showModal}
         onClose={() => {
-          console.log("onClose");
+          handleClose()
         }}
         aria-labelledby="state-change-dialog-title"
         aria-describedby="restricted-modal-text"

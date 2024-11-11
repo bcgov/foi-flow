@@ -1,23 +1,40 @@
-import { Typography, TextField } from "@material-ui/core";
+import { TextField } from "@material-ui/core";
 import { useState } from "react";
-import { getAssignedTo } from "../FOIRequestHeader/utils.js";
-import _ from "lodash";
 
-const IAOOpenInfoHeader = ({ requestNumber, requestDetails }: any) => {
-  let assigneeDetails = _.pick(requestDetails, [
-    "assignedGroup",
-    "assignedTo",
-    "assignedToFirstName",
-    "assignedToLastName",
-    "assignedministrygroup",
-    "assignedministryperson",
-    "assignedministrypersonFirstName",
-    "assignedministrypersonLastName",
-  ]);
-  const menuItems = ["this", "that"];
-  const [selectedAssignedTo, setAssignedTo] = useState(() =>
-    getAssignedTo(assigneeDetails)
-  );
+const IAOOpenInfoHeader = ({
+  requestNumber,
+  requestDetails,
+  isOIUser,
+  assignedToList,
+}: any) => {
+  const getGroupName = () => {
+    if (requestDetails.assignedGroup) return requestDetails.assignedGroup;
+    return "Unassigned";
+  };
+  const getAssignedTo = (groupName: any) => {
+    if (requestDetails.assignedTo) return requestDetails.assignedTo;
+    return groupName;
+  };
+  function getFullName() {
+    const groupName = getGroupName();
+    const assignedTo = getAssignedTo(groupName);
+    if (assignedToList?.length > 0) {
+      const assigneeGroup = assignedToList.find(
+        (_assigneeGroup: any) => _assigneeGroup.name === groupName
+      );
+      const assignee = assigneeGroup?.members?.find(
+        (_assignee: any) => _assignee.username === assignedTo
+      );
+      if (groupName === assignedTo) return groupName;
+      return assignee !== undefined
+        ? `${assignee.lastname}, ${assignee.firstname}`
+        : "invalid user";
+    }
+    return groupName;
+  }
+
+  const menuItems = ["this", "that"]; // NEED TO ADJUST THIS FOR OI TEAM
+  const [selectedAssignedTo, setAssignedTo] = useState(() => getFullName());
 
   return (
     <div className="oi-header">
@@ -28,33 +45,28 @@ const IAOOpenInfoHeader = ({ requestNumber, requestDetails }: any) => {
         <TextField
           id="assignedTo"
           label={"IAO Assigned To"}
-          inputProps={{ "aria-labelledby": "assignedTo-label" }}
+          inputProps={{ "aria-labelledby": "assignedTo-label", readOnly: true }}
           InputLabelProps={{ shrink: true }}
           style={{ paddingBottom: "4%" }}
-          select
           value={selectedAssignedTo}
-          // onChange={handleAssigneeUpdate}
-          // input={<Input />}
           variant="outlined"
           fullWidth
-          required
-          // disabled={disableHeaderInput}
-          error={selectedAssignedTo.toLowerCase().includes("unassigned")}
-        >
-          {menuItems}
-        </TextField>
+        ></TextField>
         <TextField
           id="oiAssignedTo"
           label={"OI Assigned To"}
-          inputProps={{ "aria-labelledby": "assignedTo-label" }}
+          inputProps={{
+            "aria-labelledby": "assignedTo-label",
+            readOnly: !isOIUser,
+          }}
           InputLabelProps={{ shrink: true }}
-          select
-          value={selectedAssignedTo}
+          select={isOIUser}
+          // value={selectedAssignedTo}
           // onChange={handleAssigneeUpdate}
           // input={<Input />}
           variant="outlined"
           fullWidth
-          required
+          required={isOIUser}
           // disabled={disableHeaderInput}
           error={selectedAssignedTo.toLowerCase().includes("unassigned")}
         >

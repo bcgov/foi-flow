@@ -30,7 +30,6 @@ const IAOOpenInfoMain = ({
   handleOIDataChange,
   isOIUser,
 }: any) => {
-  //App State
   const oiPublicationStatuses: OIPublicationStatus[] = useSelector(
     (state: any) => state.foiRequests.oiPublicationStatuses
   );
