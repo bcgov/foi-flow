@@ -112,6 +112,12 @@ const StateDropDown = ({
       appendedList.splice(-1, 0, recordsreadyforreview);
       return appendedList;
     }
+    const appendPreviousStateForHoldOthers = (stateList, previousStateName) => {
+      const previousStateObject = { status: previousStateName, isSelected: false };
+      let appendedList = stateList.slice();
+      appendedList.splice(-1, 0, previousStateObject);
+      return appendedList;
+    }
     const isMCFMinistryTeam = userDetail?.groups?.some(str => str.includes("MCF Ministry Team"))
     switch (_state.toLowerCase()) {
       case StateEnum.unopened.name.toLowerCase():
@@ -223,7 +229,10 @@ const StateDropDown = ({
         break;
       case StateEnum.appfeeowing.name.toLowerCase():
         return _stateList.appfeeowing;
-
+      case StateEnum.onholdother.name.toLowerCase():
+        if (!isMinistryCoordinator) {
+          return appendPreviousStateForHoldOthers(_stateList.onholdother, previousState);
+        } else return _stateList.onholdother;
       default:
         return [];
     }

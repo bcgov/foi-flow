@@ -369,12 +369,13 @@ const BottomButtonGroup = React.memo(
           case StateEnum.peerreview.name:
           case StateEnum.section5pending.name:
           case StateEnum.appfeeowing.name:
+          case StateEnum.onholdother.name:
           case StateEnum.recordsreadyforreview.name:
             const status = Object.values(StateEnum).find(
               (statusValue) => statusValue.name === currentSelectedStatus
             );
             saveRequestObject.requeststatuslabel = status.label;
-            if (currentSelectedStatus === StateEnum.onhold.name && !saveRequestObject.paymentExpiryDate) {
+            if ((currentSelectedStatus === StateEnum.onhold.name || currentSelectedStatus === StateEnum.onholdother.name) && !saveRequestObject.paymentExpiryDate) {
               saveRequestObject.paymentExpiryDate = dueDateCalculation(new Date(), PAYMENT_EXPIRY_DAYS);
             }
             break;

@@ -379,14 +379,14 @@ export const CFRForm = ({
     if(requestState === StateEnum.peerreview.name){
       return true;
     }
-    if (formHistory.length > 0 && [StateEnum.feeassessed.name, StateEnum.onhold.name, StateEnum.callforrecords.name].includes(requestState)) {
+    if (formHistory.length > 0 && [StateEnum.feeassessed.name, StateEnum.onhold.name, StateEnum.callforrecords.name, StateEnum.onholdother.name].includes(requestState)) {
       if (isMinistry) {
         return ['review', 'approved'].includes(initialFormData.formStatus) || isNewCFRForm;
       } else {
         return initialFormData.formStatus !== 'review';
       }
     }
-    if (formData.balanceRemaining > 0 &&  [StateEnum.feeassessed.name, StateEnum.onhold.name].includes(requestState)) {
+    if (formData.balanceRemaining > 0 &&  [StateEnum.feeassessed.name, StateEnum.onhold.name, StateEnum.onholdother.name].includes(requestState)) {
       if (isMinistry) {
         return !['clarification', 'init'].includes(initialFormData.formStatus);
       } else {
@@ -523,7 +523,8 @@ export const CFRForm = ({
 
   const disableNewCfrFormBtn = () => {
     return(formData?.formStatus !== 'approved' || requestState === StateEnum.peerreview.name || (requestState !== StateEnum.callforrecords.name &&
-      requestState !== StateEnum.feeassessed.name && requestState !== StateEnum.onhold.name) || (requestState === StateEnum.onhold.name && formData?.actualTotalDue > 0));
+      requestState !== StateEnum.feeassessed.name && requestState !== StateEnum.onhold.name) || (requestState === StateEnum.onhold.name && formData?.actualTotalDue > 0) || 
+      (requestState === StateEnum.onholdother.name && formData?.actualTotalDue > 0));
   }
 
   const disableAmountPaid = () => {
@@ -544,7 +545,7 @@ export const CFRForm = ({
   }
 
   const isFeeWaiverDisabled = () => {
-    if(isMinistry || requestState === StateEnum.peerreview.name || (!isMinistry && (requestState !== StateEnum.onhold.name || formData?.formStatus !== 'approved')))
+    if(isMinistry || requestState === StateEnum.peerreview.name || (!isMinistry && (requestState !== StateEnum.onhold.name || requestState !== StateEnum.onholdother.name || formData?.formStatus !== 'approved')))
       return true;
     else
       return false;
