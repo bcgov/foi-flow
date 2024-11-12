@@ -10,7 +10,6 @@
   }
 
   const suggestionList = (teamlist) =>{
-    //console.log("teamlist:", teamlist)
     teamlist.forEach(ful => {
         ful.name = ful.fullname;
         if(ful.fullname?.indexOf(',')> 0)

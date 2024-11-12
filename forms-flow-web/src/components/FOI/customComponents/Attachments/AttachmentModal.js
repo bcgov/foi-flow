@@ -670,7 +670,7 @@ export default function AttachmentModal({
                       MCFPopularSections - 1
                     )}
                     otherTagList={MCFSections?.sections?.slice(
-                      MCFPopularSections
+                      MCFPopularSections - 1
                     )}
                     handleTagChange={handleTagChange}
                     tagValue={tagValue}
@@ -712,7 +712,7 @@ export default function AttachmentModal({
                       MSDPopularSections - 1
                     )}
                     otherTagList={MSDSections?.divisions[0]?.sections?.slice(
-                      MSDPopularSections
+                      MSDPopularSections - 1
                     )}
                     handleTagChange={handleTagChange}
                     tagValue={tagValue}

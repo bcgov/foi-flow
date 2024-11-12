@@ -23,6 +23,7 @@ export const getTabBottomText = ({
     StateEnum.closed.name,
     StateEnum.intakeinprogress.name,
     StateEnum.redirect.name,
+    StateEnum.onholdother.name,
   ];
 
   if (!statusesToNotAppearIn.includes(_status)) {
@@ -143,7 +144,8 @@ export const getTabBG = (_tabStatus, _requestState) => {
         return "foitabheadercollection foitabheaderAppFeeOwingBG";
     case StateEnum.recordsreadyforreview.name:
         return "foitabheadercollection foitabheaderRecordsReadyForReviewBG";
-
+    case StateEnum.onholdother.name:
+        return "foitabheadercollection foitabheaderOnholdOtherBG";
     default:
       return "foitabheadercollection foitabheaderdefaultBG";
   }
@@ -371,7 +373,6 @@ export const checkValidationError = (
  */
 //Below function will handle beforeunload event
 export const alertUser = (e) => {
-  console.log("alertUser:",e)
   e.preventDefault();
   e.returnValue = "";
 };
@@ -399,8 +400,6 @@ export const shouldDisableFieldForMinistryRequests = (requestStatus) => {
 };
 
 export const handleBeforeUnload = (e) => {
-  console.log("handleBeforeUnload:",e)
-
   alertUser(e);
 };
 

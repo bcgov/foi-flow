@@ -119,7 +119,7 @@ class requestservice:
         )
 
     def updateduedate(
-        self, requestid, ministryrequestid, offholddate, foirequestschema, nextstatename
+        self, requestid, ministryrequestid,  offholddate, foirequestschema, nextstatename
     ):
         foirequest = self.getrequest(requestid, ministryrequestid)
         currentstatus = (
@@ -131,8 +131,9 @@ class requestservice:
         # Check for Off Hold
         if (
             currentstatus not in (None, "")
-            and currentstatus == StateName.onhold.value
-            and nextstatename != StateName.response.value
+            and ((currentstatus == StateName.onhold.value
+            and nextstatename != StateName.response.value)
+            or currentstatus == StateName.onholdother.value)
         ):
             skipcalculation = self.__skipduedatecalculation(
                 ministryrequestid, offholddate, currentstatus, nextstatename
@@ -268,12 +269,12 @@ class requestservice:
     
 
     def __skipduedatecalculation(self, ministryrequestid, offholddate, currentstatus="", nextstatename=""):
-        previousoffholddate = FOIMinistryRequest.getlastoffholddate(ministryrequestid)
+        previousoffholddate = FOIMinistryRequest.getlastoffholddate(ministryrequestid, currentstatus)
         if (
-            currentstatus not in (None, "")
+            (currentstatus not in (None, "")
             and currentstatus == StateName.onhold.value
             and nextstatename not in (None, "")
-            and currentstatus == nextstatename
+            and currentstatus == nextstatename) 
         ):
             return True
         if previousoffholddate not in (None, ""):

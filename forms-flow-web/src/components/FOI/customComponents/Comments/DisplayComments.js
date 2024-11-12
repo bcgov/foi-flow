@@ -14,7 +14,6 @@ const DisplayComments = ({ comments, bcgovcode, currentUser, iaoassignedToList, 
 
 
   useEffect(() => {
-    //console.log("setTeamTagList useeffect", bcgovcode)
     setTeamTagList(bcgovcode)
   }, [fullnameList])
 
