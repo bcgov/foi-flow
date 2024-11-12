@@ -698,7 +698,7 @@ import {
         .then((res) => {
           if (res.data) {
             const foiCommentTypes = res.data;
-            let data = foiCommentTypes.map((type) => {
+            let data = foiCommentTypes?.map((type) => {
               return { ...type };
             });
             dispatch(setFOICommentTypes(data));

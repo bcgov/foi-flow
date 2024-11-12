@@ -119,11 +119,11 @@ class requestservicegetter:
         payment = paymentservice().getpayment(foirequestid, foiministryrequestid)
         if approvedcfrfee is not None and approvedcfrfee != {}:
             requestdetails['cfrfee'] = approvedcfrfee
-            _totaldue = float(approvedcfrfee['feedata']['actualtotaldue']) if float(approvedcfrfee['feedata']['actualtotaldue']) > 0 else float(approvedcfrfee['feedata']['estimatedtotaldue'])
+            _totaldue = float(approvedcfrfee['feedata']['actualtotaldue']) if 'actualtotaldue' in approvedcfrfee['feedata'] and float(approvedcfrfee['feedata']['actualtotaldue']) > 0 else float(approvedcfrfee['feedata']['estimatedtotaldue'])
             _balancedue = _totaldue - (float(cfrfee['feedata']['amountpaid']) + float(approvedcfrfee['feedata']['feewaiveramount']))
             requestdetails['cfrfee']['feedata']['amountpaid'] = cfrfee['feedata']['amountpaid']
             requestdetails['cfrfee']['feedata']["balanceDue"] = '{:.2f}'.format(_balancedue)
-            if approvedcfrfee['feedata']['actualtotaldue']:
+            if 'actualtotaldue' in approvedcfrfee['feedata'] and approvedcfrfee['feedata']['actualtotaldue']:
                 requestdetails['cfrfee']['feedata']["totalamountdue"] = '{:.2f}'.format(requestdetails['cfrfee']['feedata']["actualtotaldue"])
             else:
                 requestdetails['cfrfee']['feedata']["totalamountdue"] = '{:.2f}'.format(requestdetails['cfrfee']['feedata']["estimatedtotaldue"])
@@ -268,7 +268,7 @@ class requestservicegetter:
         onholddate = None
         transitions = FOIMinistryRequest.getrequeststatusById(foiministryrequestid)
         for entry in transitions:
-            if entry['requeststatuslabel'] == StateName.onhold.name:
+            if (entry['requeststatuslabel'] == StateName.onhold.name or entry['requeststatuslabel'] == StateName.onholdother.name):
                 onholddate = datetimehandler().convert_to_pst(entry['created_at'],'%Y-%m-%d')
             else:
                 if onholddate is not None:

@@ -55,6 +55,7 @@ import {
   fetchPDFStitchStatusForResponsePackage,
   fetchPDFStitchedStatusForOIPCRedlineReview,
   fetchPDFStitchedStatusForOIPCRedline,
+  fetchPDFStitchStatusForConsults,
 } from "../../../apiManager/services/FOI/foiRecordServices";
 import { makeStyles } from "@material-ui/core/styles";
 import FOI_COMPONENT_CONSTANTS from "../../../constants/FOI/foiComponentConstants";
@@ -325,6 +326,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
       dispatch(fetchPDFStitchStatusForResponsePackage(requestId, ministryId));
       dispatch(fetchPDFStitchedStatusForOIPCRedline(requestId, ministryId));
       dispatch(fetchPDFStitchedStatusForOIPCRedlineReview(requestId, ministryId));
+      dispatch(fetchPDFStitchStatusForConsults(requestId, ministryId));
       fetchCFRForm(ministryId, dispatch);
       dispatch(fetchApplicantCorrespondence(requestId, ministryId));
       dispatch(fetchApplicantCorrespondenceTemplates());
@@ -361,6 +363,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
       currentState === StateEnum.peerreview.name ||
       currentState === StateEnum.signoff.name ||
       currentState === StateEnum.response.name ||
+      currentState === StateEnum.onholdother.name ||
       currentState === StateEnum.closed.name
     );
   }
@@ -881,7 +884,6 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
 
   const handleSaveRequest = (_state, _unSaved, id) => {
     setHeader(_state);
-
     if (!_unSaved) {
       setUnSavedRequest(_unSaved);
       dispatch(fetchFOIRequestDetailsWrapper(id || requestId, ministryId));
@@ -1030,7 +1032,6 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
     (state) => state.foiRequests.showEventQueue
   );
 
-  //console.log("IAO:::", iaoassignedToList)
   const showRecordsTab = () => {
     return (
       requestState !== StateEnum.intakeinprogress.name &&

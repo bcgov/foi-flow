@@ -175,11 +175,11 @@ class FOIMinistryRequest(db.Model):
         if group is None:
             _ministryrequestids = _session.query(distinct(FOIMinistryRequest.foiministryrequestid)).filter(FOIMinistryRequest.isactive == True).all()        
         elif (group == IAOTeamWithKeycloackGroup.flex.value):
-            _ministryrequestids = _session.query(distinct(FOIMinistryRequest.foiministryrequestid)).filter(and_(FOIMinistryRequest.isactive == True), and_(and_(FOIMinistryRequest.assignedgroup == group),and_(FOIMinistryRequest.requeststatuslabel.in_([StateName.open.name,StateName.callforrecords.name,StateName.closed.name,StateName.recordsreview.name,StateName.feeestimate.name,StateName.consult.name,StateName.ministrysignoff.value,StateName.onhold.name,StateName.deduplication.name,StateName.harmsassessment.name,StateName.response.name,StateName.peerreview.name,StateName.tagging.name,StateName.readytoscan.name])))).all()
+            _ministryrequestids = _session.query(distinct(FOIMinistryRequest.foiministryrequestid)).filter(and_(FOIMinistryRequest.isactive == True), and_(and_(FOIMinistryRequest.assignedgroup == group),and_(FOIMinistryRequest.requeststatuslabel.in_([StateName.open.name,StateName.callforrecords.name,StateName.closed.name,StateName.recordsreview.name,StateName.feeestimate.name,StateName.consult.name,StateName.ministrysignoff.value,StateName.onhold.name,StateName.deduplication.name,StateName.harmsassessment.name,StateName.response.name,StateName.peerreview.name,StateName.tagging.name,StateName.readytoscan.name,StateName.onholdother.name])))).all()
         elif (group in ProcessingTeamWithKeycloackGroup.list()):
-            _ministryrequestids = _session.query(distinct(FOIMinistryRequest.foiministryrequestid)).filter(and_(FOIMinistryRequest.isactive == True), and_(and_(FOIMinistryRequest.assignedgroup == group),and_(FOIMinistryRequest.requeststatuslabel.in_([StateName.open.name,StateName.callforrecords.name,StateName.closed.name,StateName.recordsreview.name,StateName.feeestimate.name,StateName.consult.name,StateName.ministrysignoff.value,StateName.onhold.name,StateName.response.name,StateName.peerreview.name,StateName.tagging.name,StateName.readytoscan.name])))).all()           
+            _ministryrequestids = _session.query(distinct(FOIMinistryRequest.foiministryrequestid)).filter(and_(FOIMinistryRequest.isactive == True), and_(and_(FOIMinistryRequest.assignedgroup == group),and_(FOIMinistryRequest.requeststatuslabel.in_([StateName.open.name,StateName.callforrecords.name,StateName.closed.name,StateName.recordsreview.name,StateName.feeestimate.name,StateName.consult.name,StateName.ministrysignoff.value,StateName.onhold.name,StateName.response.name,StateName.peerreview.name,StateName.tagging.name,StateName.readytoscan.name,StateName.onholdother.name])))).all()           
         else:
-            _ministryrequestids = _session.query(distinct(FOIMinistryRequest.foiministryrequestid)).filter(and_(FOIMinistryRequest.isactive == True), or_(and_(FOIMinistryRequest.assignedgroup == group),and_(FOIMinistryRequest.assignedministrygroup == group,or_(FOIMinistryRequest.requeststatuslabel.in_([StateName.callforrecords.name,StateName.recordsreview.name,StateName.recordsreadyforreview.name,StateName.feeestimate.name,StateName.consult.name,StateName.ministrysignoff.name,StateName.onhold.name,StateName.deduplication.name,StateName.harmsassessment.name,StateName.response.name,StateName.peerreview.name,StateName.tagging.name,StateName.readytoscan.name]))))).all()
+            _ministryrequestids = _session.query(distinct(FOIMinistryRequest.foiministryrequestid)).filter(and_(FOIMinistryRequest.isactive == True), or_(and_(FOIMinistryRequest.assignedgroup == group),and_(FOIMinistryRequest.assignedministrygroup == group,or_(FOIMinistryRequest.requeststatuslabel.in_([StateName.callforrecords.name,StateName.recordsreview.name,StateName.recordsreadyforreview.name,StateName.feeestimate.name,StateName.consult.name,StateName.ministrysignoff.name,StateName.onhold.name,StateName.deduplication.name,StateName.harmsassessment.name,StateName.response.name,StateName.peerreview.name,StateName.tagging.name,StateName.readytoscan.name,StateName.onholdother.name]))))).all()
 
         _requests = []
         ministryrequest_schema = FOIMinistryRequestSchema()
@@ -332,7 +332,7 @@ class FOIMinistryRequest(db.Model):
         return transitions
 
     @classmethod
-    def getlastoffholddate(cls, ministryrequestid):  
+    def getlastoffholddate(cls, ministryrequestid, currentstatus):  
         transitions = []
         try:
             sql = """select fm2.version, fs2."name" as status, fm2.created_at from  "FOIMinistryRequests" fm2  inner join "FOIRequestStatuses" fs2 on fm2.requeststatusid = fs2.requeststatusid 
@@ -349,7 +349,7 @@ class FOIMinistryRequest(db.Model):
             recent_offhold_index = None
             offhold_indicator = False
             for entry in desc_transitions:
-                if entry["status"] == StateName.onhold.value:
+                if entry["status"] == currentstatus:
                     onhold_occurance = onhold_occurance + 1
                     if onhold_occurance > 1:
                         recent_offhold_index = index
@@ -432,20 +432,25 @@ class FOIMinistryRequest(db.Model):
         ministry_restricted_requests = aliased(FOIRestrictedMinistryRequest)
 
         #filter/search
+        _keywords = []
+        if(keyword is not None):
+            _keywords = keyword.lower().replace(",", " ").split()
         if(len(filterfields) > 0 and keyword is not None):
-            
             filtercondition = []
-
-            if(keyword != "restricted"):
-                for field in filterfields:
-                    filtercondition.append(FOIMinistryRequest.findfield(field, iaoassignee, ministryassignee).ilike('%'+keyword+'%'))
-            else:
-                if(requestby == 'IAO'):
-                    filtercondition.append(FOIRestrictedMinistryRequest.isrestricted == True)
+            for _keyword in _keywords:
+                onekeywordfiltercondition = []
+                if(_keyword != "restricted"):
+                    for field in filterfields:
+                        onekeywordfiltercondition.append(FOIMinistryRequest.findfield(field, iaoassignee, ministryassignee).ilike('%'+_keyword+'%'))
                 else:
-                    filtercondition.append(ministry_restricted_requests.isrestricted == True)
-            if (keyword.lower() == "oipc"):
-                filtercondition.append(FOIMinistryRequest.isoipcreview == True)
+                    if(requestby == 'IAO'):
+                        onekeywordfiltercondition.append(FOIRestrictedMinistryRequest.isrestricted == True)
+                    else:
+                        onekeywordfiltercondition.append(ministry_restricted_requests.isrestricted == True)
+                if (_keyword == "oipc"):
+                    onekeywordfiltercondition.append(FOIMinistryRequest.isoipcreview == True)
+            
+                filtercondition.append(or_(*onekeywordfiltercondition))
 
         intakesorting = case([
                             (and_(FOIMinistryRequest.assignedto == None, FOIMinistryRequest.assignedgroup == 'Intake Team'), # Unassigned requests first
@@ -486,13 +491,13 @@ class FOIMinistryRequest(db.Model):
                            else_ = FOIMinistryRequest.assignedministrygroup).label('ministryAssignedToFormatted')
         
         duedate = case([
-                            (FOIMinistryRequest.requeststatuslabel == StateName.onhold.name,  # On Hold
+                            (or_(FOIMinistryRequest.requeststatuslabel == StateName.onhold.name, FOIMinistryRequest.requeststatuslabel == StateName.onholdother.name),  # On Hold
                              literal(None)),
                            ],
                            else_ = cast(FOIMinistryRequest.duedate, String)).label('duedate')
         
         cfrduedate = case([
-                            (FOIMinistryRequest.requeststatuslabel == StateName.onhold.name,  # On Hold
+                            (or_(FOIMinistryRequest.requeststatuslabel == StateName.onhold.name, FOIMinistryRequest.requeststatuslabel == StateName.onholdother.name),  # On Hold
                              literal(None)),
                            ],
                            else_ = cast(FOIMinistryRequest.cfrduedate, String)).label('cfrduedate')
@@ -706,7 +711,7 @@ class FOIMinistryRequest(db.Model):
         if(keyword is None):
             return dbquery
         else:
-            return dbquery.filter(or_(*filtercondition))
+            return dbquery.filter(and_(*filtercondition))
 
     @classmethod
     def getrequestspagination(cls, group, page, size, sortingitems, sortingorders, filterfields, keyword, additionalfilter, userid, isiaorestrictedfilemanager, isministryrestrictedfilemanager):
@@ -841,7 +846,7 @@ class FOIMinistryRequest(db.Model):
                             )
                         )
                     )
-                statusfilter = FOIMinistryRequest.requeststatuslabel.in_([StateName.callforrecords.name,StateName.recordsreview.name,StateName.feeestimate.name,StateName.consult.name,StateName.ministrysignoff.name,StateName.onhold.name,StateName.deduplication.name,StateName.harmsassessment.name,StateName.response.name,StateName.peerreview.name,StateName.tagging.name,StateName.readytoscan.name, StateName.recordsreadyforreview.name])
+                statusfilter = FOIMinistryRequest.requeststatuslabel.in_([StateName.callforrecords.name,StateName.recordsreview.name,StateName.feeestimate.name,StateName.consult.name,StateName.ministrysignoff.name,StateName.onhold.name,StateName.deduplication.name,StateName.harmsassessment.name,StateName.response.name,StateName.peerreview.name,StateName.tagging.name,StateName.readytoscan.name, StateName.recordsreadyforreview.name, StateName.onholdother.name])
             ministryfilter = and_(
                                 FOIMinistryRequest.isactive == True,
                                 FOIRequestStatus.isactive == True,
@@ -889,7 +894,7 @@ class FOIMinistryRequest(db.Model):
                     where isactive = true and duedate is not null and requeststatuslabel not in :requeststatuslabel
                     and duedate between  NOW() - INTERVAL '7 DAY' AND NOW() + INTERVAL '7 DAY'
                     order by filenumber , version desc;""" 
-            requeststatuslabel =  tuple([StateName.closed.name,StateName.redirect.name,StateName.unopened.name,StateName.intakeinprogress.name,StateName.onhold.name,StateName.archived.name])
+            requeststatuslabel =  tuple([StateName.closed.name,StateName.redirect.name,StateName.unopened.name,StateName.intakeinprogress.name,StateName.onhold.name,StateName.archived.name, StateName.onholdother.name])
             rs = db.session.execute(text(sql), {'requeststatuslabel': requeststatuslabel})
             for row in rs:
                 upcomingduerecords.append({"filenumber": row["filenumber"], "duedate": row["duedate"],"foiministryrequestid": row["foiministryrequestid"], "version": row["version"], "foirequest_id": row["foirequest_id"], "created_at": row["created_at"], "createdby": row["createdby"]})
@@ -915,7 +920,7 @@ class FOIMinistryRequest(db.Model):
                         inner join "ProgramAreaDivisionStages" pads on frd.stageid  = pads.stageid and frd.stageid in (5, 7, 9) 
                         and frd.divisionduedate  between  NOW() - INTERVAL '7 DAY' AND NOW() + INTERVAL '7 DAY' 
                         order by frd.foiministryrequest_id , frd.foiministryrequestversion_id desc;""" 
-            requeststatuslabel = tuple([StateName.closed.name,StateName.redirect.name,StateName.unopened.name,StateName.intakeinprogress.name,StateName.onhold.name,StateName.archived.name])
+            requeststatuslabel = tuple([StateName.closed.name,StateName.redirect.name,StateName.unopened.name,StateName.intakeinprogress.name,StateName.onhold.name,StateName.archived.name,StateName.onholdother.name])
             rs = db.session.execute(text(sql), {'requeststatuslabel': requeststatuslabel})
                   
             for row in rs:
@@ -1108,13 +1113,13 @@ class FOIMinistryRequest(db.Model):
                            else_ = FOIMinistryRequest.assignedministrygroup).label('ministryAssignedToFormatted')
         
         duedate = case([
-                            (FOIMinistryRequest.requeststatuslabel == StateName.onhold.name,  # On Hold
+                            (or_(FOIMinistryRequest.requeststatuslabel == StateName.onhold.name, FOIMinistryRequest.requeststatuslabel == StateName.onholdother.name),  # On Hold
                              literal(None)),
                            ],
                            else_ = cast(FOIMinistryRequest.duedate, String)).label('duedate')
         
         cfrduedate = case([
-                            (FOIMinistryRequest.requeststatuslabel == StateName.onhold.name,  # On Hold
+                            (or_(FOIMinistryRequest.requeststatuslabel == StateName.onhold.name, FOIMinistryRequest.requeststatuslabel == StateName.onholdother.name),  # On Hold
                              literal(None)),
                            ],
                            else_ = cast(FOIMinistryRequest.cfrduedate, String)).label('cfrduedate')
@@ -1323,7 +1328,7 @@ class FOIMinistryRequest(db.Model):
             groupfilter.append(FOIMinistryRequest.assignedministrygroup == group)
         
         #ministry advanced search show cfr onwards
-        statefilter = FOIMinistryRequest.requeststatuslabel.in_([StateName.callforrecords.name,StateName.closed.name,StateName.recordsreview.name,StateName.feeestimate.name,StateName.consult.name,StateName.ministrysignoff.name,StateName.onhold.name,StateName.deduplication.name,StateName.harmsassessment.name,StateName.response.name,StateName.peerreview.name,StateName.tagging.name,StateName.readytoscan.name,StateName.recordsreadyforreview.name])
+        statefilter = FOIMinistryRequest.requeststatuslabel.in_([StateName.callforrecords.name,StateName.closed.name,StateName.recordsreview.name,StateName.feeestimate.name,StateName.consult.name,StateName.ministrysignoff.name,StateName.onhold.name,StateName.deduplication.name,StateName.harmsassessment.name,StateName.response.name,StateName.peerreview.name,StateName.tagging.name,StateName.readytoscan.name,StateName.recordsreadyforreview.name,StateName.onholdother.name])
 
         ministry_queue = FOIMinistryRequest.advancedsearchsubquery(params, iaoassignee, ministryassignee, userid, 'Ministry', False, isministryrestrictedfilemanager).filter(and_(or_(*groupfilter), statefilter))
 
@@ -1408,8 +1413,8 @@ class FOIMinistryRequest(db.Model):
         #request status: overdue || on time
         if(params['requeststatus'][0] == 'overdue'):
             #exclude "on hold" for overdue
-            statelabel = StateName.onhold.name
-            return and_(FOIMinistryRequest.findfield('duedate', iaoassignee, ministryassignee) < datetime.now().date(), FOIMinistryRequest.requeststatuslabel != statelabel)
+            # statelabel = StateName.onhold.name
+            return and_(FOIMinistryRequest.findfield('duedate', iaoassignee, ministryassignee) < datetime.now().date(), and_(FOIMinistryRequest.requeststatuslabel != StateName.onhold.name, FOIMinistryRequest.requeststatuslabel != StateName.onholdother.name))
         else:
             return FOIMinistryRequest.findfield('duedate', iaoassignee, ministryassignee) >= datetime.now().date()
 

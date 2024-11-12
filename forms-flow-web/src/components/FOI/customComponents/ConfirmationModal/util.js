@@ -46,6 +46,9 @@ import FOI_COMPONENT_CONSTANTS from '../../../../constants/FOI/foiComponentConst
       _saveRequestObject.reopen = true;
       return {title: "Re-Open Request", body: <>Are you sure you want to re-open Request # {_requestNumber ? _requestNumber : `U-00${_requestId}`}? <br/> The request will be re-opened to the previous state: {_state} </>};
     }
+    if ((_currentState?.toLowerCase() === StateEnum.onholdother.name.toLowerCase())){
+      return {title: "Taking Request off hold", body: "Are you sure you want to take this request off hold? The legislated due date will be recalculated"};
+    }
     switch(_state.toLowerCase()) {
       case StateEnum.intakeinprogress.name.toLowerCase():
           return {title: "Changing the state", body: "Are you sure you want to change the state to Intake in Progress?"};
@@ -134,6 +137,9 @@ import FOI_COMPONENT_CONSTANTS from '../../../../constants/FOI/foiComponentConst
           return {title: "Changing the state", body: `Are you sure you want to change Request #${_requestNumber} to ${StateEnum.response.name}?`};
           case StateEnum.appfeeowing.name.toLowerCase():
           return {title: "Changing the state", body: `Are you sure you want to change Request #${_requestNumber} to ${StateEnum.appfeeowing.name}?`};
+      case StateEnum.onholdother.name.toLowerCase():
+          return {title: "Change Request to On Hold - other", 
+                 body: "Are you sure you want to put this request on hold - Other? This should only be used for reasons other than fees when you need to put a request on hold (eg - Third Party notice, or Intake related reasons)"};
       default:
           return {title: "", body: ""};
     }

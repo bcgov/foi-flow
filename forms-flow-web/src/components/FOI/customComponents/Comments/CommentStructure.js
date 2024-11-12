@@ -70,7 +70,7 @@ const CommentStructure = ({ i, reply, parentId, totalcommentCount, currentIndex,
 
   const getHtmlfromRawContent = () => {
     let markup = null
-    if (i.commentTypeId !== 2 && i.commentTypeId !== 3) {
+    if (i.commentTypeId != null && i.commentTypeId !== 2 && i.commentTypeId !== 3) {
       const rawContentFromStore = convertFromRaw(JSON.parse(i.text))
       let initialEditorState = EditorState.createWithContent(rawContentFromStore);
 
@@ -267,7 +267,7 @@ const CommentStructure = ({ i, reply, parentId, totalcommentCount, currentIndex,
           <div className="commentsTwo">
 
             <div className="fullName">{fullName} </div> |  <div className="commentdate">{i.date} </div> 
-            {(i.commentTypeId !== 2 && i.commentTypeId !== 3 && (parentId == null || parentId == undefined)) &&
+            {(i.commentTypeId != null && i.commentTypeId !== 2 && i.commentTypeId !== 3 && (parentId == null || parentId == undefined)) &&
               <div>
                 <Chip
                     item
@@ -293,7 +293,7 @@ const CommentStructure = ({ i, reply, parentId, totalcommentCount, currentIndex,
         </div>
         <div className="userActions">
           <div>
-            {(isEmail || ((i.commentTypeId !== 2 && i.commentTypeId !== 3) && actions.userId === i.userId && actions.user)) && (
+            {(isEmail || ((i.commentTypeId != null && i.commentTypeId !== 2 && i.commentTypeId !== 3) && actions.userId === i.userId && actions.user)) && (
                 <>
                     <IconButton
                     aria-label= "actions"

@@ -112,6 +112,12 @@ const StateDropDown = ({
       appendedList.splice(-1, 0, recordsreadyforreview);
       return appendedList;
     }
+    const appendPreviousStateForHoldOthers = (stateList, previousStateName) => {
+      const previousStateObject = { status: previousStateName, isSelected: false };
+      let appendedList = stateList.slice();
+      appendedList.splice(-1, 0, previousStateObject);
+      return appendedList;
+    }
     const isMCFMinistryTeam = userDetail?.groups?.some(str => str.includes("MCF Ministry Team"))
     switch (_state.toLowerCase()) {
       case StateEnum.unopened.name.toLowerCase():
@@ -149,10 +155,10 @@ const StateDropDown = ({
       case StateEnum.redirect.name.toLowerCase():
         return _stateList.redirect;
       case StateEnum.callforrecords.name.toLowerCase():
-        if (_isMinistryCoordinator && personalRequest) {
+        if (_isMinistryCoordinator) {
           if (isMCFMinistryTeam) {
             return appendRecordsReadyForReview(_stateList.callforrecordsforpersonal);
-          } else {
+          } else if (personalRequest) {
             return _stateList.callforrecordsforpersonal;
           }
         }
@@ -200,6 +206,9 @@ const StateDropDown = ({
         if (personalIAO) return _stateList.feeassessedforpersonal;
         return _stateList.feeassessed;
       case StateEnum.deduplication.name.toLowerCase():
+        if (!isMCFMinistryTeam) {
+          return _stateList.deduplication.filter(_state => _state.status.toLowerCase() !== StateEnum.recordsreadyforreview.name.toLowerCase());
+        }
         return _stateList.deduplication;
       case StateEnum.harms.name.toLowerCase():
         return _stateList.harms;
@@ -220,7 +229,10 @@ const StateDropDown = ({
         break;
       case StateEnum.appfeeowing.name.toLowerCase():
         return _stateList.appfeeowing;
-
+      case StateEnum.onholdother.name.toLowerCase():
+        if (!isMinistryCoordinator) {
+          return appendPreviousStateForHoldOthers(_stateList.onholdother, previousState);
+        } else return _stateList.onholdother;
       default:
         return [];
     }

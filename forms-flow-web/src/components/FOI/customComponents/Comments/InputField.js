@@ -73,7 +73,6 @@ const InputField = ({ cancellor, parentId, child, inputvalue, edit, main, add, f
   }
 
   useEffect(() => {
-    //console.log("isCommentTagListLoading - Use effect")
     setMentionList(isCommentTagListLoading ? [{name: 'Loading...'}] : isRestricted ? restrictedReqTaglist :suggestionList(filterTagList(editCommentTypeId)).sort(namesort));
     setSuggestions(isCommentTagListLoading ? [{name: 'Loading...'}] : isRestricted ? restrictedReqTaglist : mentionList)//suggestionList(filterTagList(editCommentTypeId)).sort(namesort));
   }, [isCommentTagListLoading, restrictedReqTaglist])
