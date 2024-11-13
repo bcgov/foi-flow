@@ -522,3 +522,10 @@ export const setOIStatuses = (data) => (dispatch) => {
     payload: data,
   });
 };
+
+export const setFOIOpenInfoRequest = (data) => (dispatch) => {
+  dispatch({
+    type: FOI_ACTION_CONSTANTS.FOI_OPENINFO_REQUEST,
+    payload: data,
+  });
+};

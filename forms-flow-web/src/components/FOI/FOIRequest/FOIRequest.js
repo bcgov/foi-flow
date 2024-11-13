@@ -57,6 +57,9 @@ import {
   fetchPDFStitchedStatusForOIPCRedlineReview,
   fetchPDFStitchedStatusForOIPCRedline,
 } from "../../../apiManager/services/FOI/foiRecordServices";
+import {
+  fetchFOIOpenInfoRequest,
+} from "../../../apiManager/services/FOI/foiOpenInfoRequestServices";
 import { makeStyles } from "@material-ui/core/styles";
 import FOI_COMPONENT_CONSTANTS from "../../../constants/FOI/foiComponentConstants";
 import { push } from "connected-react-router";
@@ -178,6 +181,9 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
   let requestApplicantProfile = useSelector(
     (state) => state.foiRequests.foiRequestApplicantProfile
   )
+  let foiOITransactionData = useSelector(
+    (state) => state.foiRequests.foiOpenInfoRequest
+  );
   const [attachments, setAttachments] = useState(requestAttachments);
   const [comment, setComment] = useState([]);
   const [requestState, setRequestState] = useState(StateEnum.unopened.name);
@@ -350,6 +356,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
     dispatch(fetchOIPCInquiryoutcomes());
     dispatch(fetchOpenInfoExemptions());
     dispatch(fetchOpenInfoPublicationStatuses());
+    dispatch(fetchFOIOpenInfoRequest(ministryId)); // AH NOTE -> Need to stop get call from happening if request === general or if bcgovcode in this arr ["CLB", "HSA", "IIO", "MGC", "OBC", "TIC"]
 
     if (bcgovcode) dispatch(fetchFOIMinistryAssignedToList(bcgovcode));
   }, [requestId, ministryId, comment, attachments]);
@@ -405,6 +412,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
         setIsMCFPersonal(true);
       }
     }
+    
     if(requestDetails.isoipcreview) {
       setIsOIPCReview(true);
     } else {
@@ -1079,6 +1087,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
   const showOpenInformationTab = () => {
     return (
       requestDetails?.requestType === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_GENERAL &&
+      !["CLB", "HSA", "IIO", "MGC", "OBC", "TIC"].includes(requestDetails?.bcgovcode) &&
       requestState !== StateEnum.intakeinprogress.name &&
       requestState !== StateEnum.unopened.name
     );
@@ -1722,7 +1731,13 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
               })}
             >
               <IAOOpenInfoPublishing
+                toast={toast}
                 requestNumber={requestNumber}
+                requestDetails={requestDetails}
+                userDetail={userDetail}
+                foiOITransactionData={foiOITransactionData}
+                foirequestid={requestId}
+                foiministryrequestid={ministryId}
               />
             </div>
           )}
