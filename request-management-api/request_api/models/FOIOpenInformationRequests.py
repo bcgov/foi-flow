@@ -242,19 +242,23 @@ class FOIOpenInformationRequests(db.Model):
             print("foi open info inside: teamRequests ")
             #basequery = basequery.filter(cls.oiassignedto.isnot(None))
             # Create a case for sorting exemption requests first
-            exemption_priority = case(
-                [(cls.oiexemption_id.isnot(None), 0)],  # Exemption requests first
-                else_=1
-            ).label('exemption_priority')
+            # exemption_priority = case(
+            #     [(FOIMinistryRequest.oistatus_id == 2, 0)],  # Exemption requests first
+            #     else_=1
+            # ).label('exemption_priority')
             
             basequery = (basequery
+                .join(FOIMinistryRequest, 
+                        cls.foiministryrequest_id == FOIMinistryRequest.foiministryrequestid)
                 .filter(cls.oiassignedto.isnot(None))  # Team requests must be assigned
                 .order_by(
-                    exemption_priority,  # Sort exemption requests first
-                    asc(cls.publicationdate)  # Then by publication date (earliest to latest)
+                    case(
+                        [(FOIMinistryRequest.oistatus_id == 2, 0)],
+                        else_=1
+                    )  # Then by publication date (earliest to latest)
                 ))
 
-        print("basequery : ",basequery)
+        print("teamRequests basequery : ",basequery)
         
         return basequery
 
@@ -292,7 +296,7 @@ class FOIOpenInformationRequests(db.Model):
         
         # Default sorting: Received Date (newest to oldest)
         if len(sortingcondition) == 0:
-            sortingcondition.append(nullslast(desc(cls.findfield('receivedDateUF'))))
+            sortingcondition.append(nullslast(desc(cls.findfield('created_at'))))
 
         # Always sort by id last to prevent pagination collisions
         sortingcondition.append(asc('id'))
