@@ -316,6 +316,7 @@ const RequestDescription = React.memo(({
                       input={<Input />}
                       variant="outlined"
                       fullWidth
+                      disabled={disableInput}
                   >
                   {subjectCodes}
                 </TextField> 

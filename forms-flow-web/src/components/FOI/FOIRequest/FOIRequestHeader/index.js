@@ -56,6 +56,7 @@ const FOIRequestHeader = React.memo(
     handleOipcReviewFlagChange,
     showOipcReviewFlag,
     isMinistry,
+    isHistoricalRequest,
   }) => {
     /**
      *  Header of Review request in the UI
@@ -247,23 +248,39 @@ const FOIRequestHeader = React.memo(
         </div>
         <div className="col-lg-6">
           <div className="foi-assignee-dropdown">
-              <TextField
-                id="assignedTo"
-                label={showMinistryAssignedTo ? "IAO Assigned To" : "Assigned To"}
-                inputProps={{ "aria-labelledby": "assignedTo-label"}}
-                InputLabelProps={{ shrink: true }}
-                select
-                value={selectedAssignedTo}
-                onChange={handleAssigneeUpdate}
-                input={<Input />}
-                variant="outlined"
-                fullWidth
-                required
-                disabled={disableHeaderInput}
-                error={selectedAssignedTo.toLowerCase().includes("unassigned")}
-              >
-                {menuItems}
-              </TextField>
+              {!isHistoricalRequest ? 
+                <TextField
+                  id="assignedTo"
+                  label={showMinistryAssignedTo ? "IAO Assigned To" : "Assigned To"}
+                  inputProps={{ "aria-labelledby": "assignedTo-label"}}
+                  InputLabelProps={{ shrink: true }}
+                  select
+                  value={selectedAssignedTo}
+                  onChange={handleAssigneeUpdate}
+                  input={<Input />}
+                  variant="outlined"
+                  fullWidth
+                  required
+                  disabled={disableHeaderInput}
+                  error={selectedAssignedTo.toLowerCase().includes("unassigned")}
+                >
+                  {menuItems}
+                </TextField>
+              :
+                <TextField
+                  id="assignedTo"
+                  label={showMinistryAssignedTo ? "IAO Assigned To" : "Assigned To"}
+                  inputProps={{ "aria-labelledby": "assignedTo-label"}}
+                  InputLabelProps={{ shrink: true }}
+                  value={requestDetails.assignedTo}
+                  input={<Input />}
+                  variant="outlined"
+                  fullWidth
+                  disabled
+                >
+                  {menuItems}
+                </TextField>
+              }
             </div>
         </div>
       </div>
