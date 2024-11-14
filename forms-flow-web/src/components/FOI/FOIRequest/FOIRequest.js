@@ -91,7 +91,8 @@ import {
   ConditionalComponent,
   formatDate,
   isRequestRestricted,
-  getCommentTypeIdByName
+  getCommentTypeIdByName,
+  isMinistryLogin
 } from "../../../helper/FOI/helper";
 import DivisionalTracking from "./DivisionalTracking";
 import RedactionSummary from "./RedactionSummary";
@@ -109,6 +110,7 @@ import { setFOIRequestDetail } from "../../../actions/FOI/foiRequestActions";
 import OIPCDetails from "./OIPCDetails/Index";
 import useOIPCHook from "./OIPCDetails/oipcHook";
 import MANDATORY_FOI_REQUEST_FIELDS from "../../../constants/FOI/mandatoryFOIRequestFields";
+import { Fees } from "../customComponents/Fees";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -188,6 +190,11 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
   const [unsavedMessage, setUnsavedMessage] = useState(<></>);
   const commentTypes = useSelector((state) => state.foiRequests.foiCommentTypes); 
 
+  let isMinistry = false;
+  if (Object.entries(userDetail).length !== 0) {
+    const userGroups = userDetail && userDetail.groups.map(group => group.slice(1));
+    isMinistry = isMinistryLogin(userGroups);
+  }
 
   const handleUnsavedContinue = () => {
     window.removeEventListener("popstate", handleOnHashChange);
@@ -234,7 +241,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
       display: false,
       active: false,
     },
-    CFRForm: {
+    Fees: {
       display: false,
       active: false,
     },
@@ -1054,14 +1061,18 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
     return false;
   };
 
-  const showCFRTab = () => {
-    return (
-      requestState !== StateEnum.intakeinprogress.name &&
-      requestState !== StateEnum.unopened.name &&
-      requestState !== StateEnum.open.name &&
-      requestDetails?.requestType ===
-        FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_GENERAL
-    );
+  const showFeesTab = () => {
+    if (isMinistry) {
+      return (
+        requestState !== StateEnum.intakeinprogress.name &&
+        requestState !== StateEnum.unopened.name &&
+        requestState !== StateEnum.open.name &&
+        requestDetails?.requestType ===
+          FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_GENERAL
+      );
+    } else {
+      return true;
+    }
   };
 
   const showContactApplicantTab = () => {
@@ -1120,15 +1131,15 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
             </div>
             {!isAddRequest && (
               <>
-                {showCFRTab() && (
+                {showFeesTab() && (
                   <div
                     className={clsx("tablinks", {
-                      active: tabLinksStatuses.CFRForm.active,
+                      active: tabLinksStatuses.Fees.active,
                     })}
-                    name="CFRForm"
-                    onClick={() => tabclick("CFRForm")}
+                    name="Fees"
+                    onClick={() => tabclick("Fees")}
                   >
-                    CFR Form
+                    Fees
                     {CFRFormHistoryLength > 0
                       ? ` (${CFRFormHistoryLength})`
                       : ""}
@@ -1480,24 +1491,28 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
               <Loading />
             )}
           </div>
-          {showCFRTab() && (
+          {showFeesTab() && (
+            <>
             <div
-              id="CFRForm"
+              id="Fees"
               className={clsx("tabcontent", {
-                active: tabLinksStatuses.CFRForm.active,
-                [classes.displayed]: tabLinksStatuses.CFRForm?.display,
-                [classes.hidden]: !tabLinksStatuses.CFRForm?.display,
+                active: tabLinksStatuses.Fees.active,
+                [classes.displayed]: tabLinksStatuses.Fees?.display,
+                [classes.hidden]: !tabLinksStatuses.Fees?.display,
               })}
             >
-              <CFRForm
+              <Fees
                 requestNumber={requestNumber}
                 requestState={requestState}
+                requestDetails={requestDetails}
                 userDetail={userDetail}
                 ministryId={ministryId}
                 requestId={requestId}
                 setCFRUnsaved={setCFRUnsaved}
+                handleStateChange={handleStateChange}
               />
             </div>
+            </>
           )}
           <div
             id="Comments"
