@@ -88,6 +88,17 @@ const initialState = {
       actualiaopreparinghrs: 0,
     },
   },
+  foiRequestApplicationFeeForm: {
+    applicationfeestatus: "init",
+    amountpaid: 0,
+    paymentsource: "init",
+    paymentdate: null,
+    orderid: null,
+    transactionnumber: null,
+    files: [],
+    reasonForRefund: "",
+    paymentid: null
+  },
   foiRequestCFRFormHistory: [],
   foiRequestApplicantCorrespondence: [],
   foiRequestApplicantCorrespondenceTemplates: [],
@@ -308,6 +319,16 @@ const foiRequests = (state = initialState, action) => {
           ? initialState.foiRequestCFRForm
           : {
               ...state.foiRequestCFRForm,
+              ...action.payload,
+            },
+      };
+    case FOI_ACTION_CONSTANTS.FOI_REQUEST_APPLICATION_FEE_FORM:
+      return {
+        ...state,
+        foiRequestApplicationFeeForm: (_.isEmpty(action.payload) && !state.foiRequestApplicationFeeForm)
+          ? initialState.foiRequestApplicationFeeForm
+          : {
+              ...state.foiRequestApplicationFeeForm,
               ...action.payload,
             },
       };
