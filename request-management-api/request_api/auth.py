@@ -103,15 +103,18 @@ class Auth:
             @wraps(f)
             def wrapper(*args, **kwargs):
                 _groups = groups.split(',')
+                print(_groups)
                 token = jwt.get_token_auth_header()
                 unverified_claims = josejwt.get_unverified_claims(token)
                 usergroups = unverified_claims['groups']
                 usergroups = [usergroup.replace('/','',1) if usergroup.startswith('/') else usergroup for usergroup in usergroups]
                 exists = False
+                print(usergroups)
                 for group in _groups:
                     if group in usergroups: 
                        exists = True
                 retval = "Unauthorized" , 401
+                print(exists)
                 if exists == True:            
                     return f(*args, **kwargs)
                 return retval
