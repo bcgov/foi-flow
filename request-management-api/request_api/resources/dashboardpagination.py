@@ -67,7 +67,6 @@ class DashboardPagination(Resource):
             elif  queuetype is not None and queuetype == "ministry" and AuthHelper.getusertype() == "ministry":
                 requests = dashboardservice().getministryrequestqueuepagination(AuthHelper.getministrygroups(), _page, _size, _sortingitems, _sortingorders, _filterfields, _keyword, _additionalfilter, _userid)
             else:
-                print("statuscode401")
                 statuscode = 401   
 
             return requests, statuscode
