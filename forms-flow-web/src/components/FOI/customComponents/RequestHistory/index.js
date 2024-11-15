@@ -140,10 +140,8 @@ export const RequestHistorySection = ({
   }
 
   // Utility function to "await" setState
-  const setStateAsync = (state) => {
-    new Promise((resolve) => {
-      setIsGeneratingPDF(state,resolve);
-    });
+  const setStateAsync = async (state) => {
+     setIsGeneratingPDF(state);
   }
 
   const exportToPDF = async (selectedCategory) => {
