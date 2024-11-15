@@ -18,6 +18,7 @@ const initialState = {
   showAdvancedSearch: false,
   showEventQueue: false,
   foiAdvancedSearchParams: {},
+  foiHistoricalSearchParams:{},
   isAssignedToListLoading: true,
   isAttachmentListLoading: true,
   isCommentTagListLoading: true,
@@ -155,6 +156,7 @@ const initialState = {
   oipcStatuses: [],
   oipcReviewtypes: [],
   oipcInquiryoutcomes: [],
+  foiadvancedsearchfilter:"foimod",
   foiCommentTypes:[]
 };
 
@@ -186,6 +188,14 @@ const foiRequests = (state = initialState, action) => {
           ...action.payload,
         },
       };
+    case FOI_ACTION_CONSTANTS.FOI_HISTORIC_SEARCH_PARAMS:
+        return {
+          ...state,
+          foiHistoricalSearchParams: {
+            ...state.foiHistoricalSearchParams,
+            ...action.payload,
+          },
+        };  
     case FOI_ACTION_CONSTANTS.IS_ASSIGNEDTOLIST_LOADING:
       return { ...state, isAssignedToListLoading: action.payload };
     case FOI_ACTION_CONSTANTS.IS_ATTACHMENTLIST_LOADING:
@@ -352,6 +362,8 @@ const foiRequests = (state = initialState, action) => {
       return { ...state, oipcReviewtypes: action.payload };
     case FOI_ACTION_CONSTANTS.OIPC_INQUIRYOUTCOMES:
         return { ...state, oipcInquiryoutcomes: action.payload };
+    case FOI_ACTION_CONSTANTS.FOI_ADVANCED_SEARCH_FILTER:
+      return { ...state, foiadvancedsearchfilter: action.payload };    
     case FOI_ACTION_CONSTANTS.FOI_COMMENT_TYPES:
       return { ...state, foiCommentTypes: action.payload };
     default:

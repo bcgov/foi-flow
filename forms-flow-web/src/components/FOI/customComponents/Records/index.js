@@ -228,6 +228,7 @@ export const RecordsLog = ({
   recordsTabSelect,
   requestType,
   handleSaveRequest,
+  isHistoricalRequest,
   lockRecords,
   setLockRecordsTab,
   validLockRecordsState,
@@ -284,8 +285,7 @@ export const RecordsLog = ({
     (state) => state.foiRequests.foiRequestDetail
   );
 
-  const tagList = divisions
-    .filter((d) => d.divisionname.toLowerCase() !== "communications")
+  const tagList = divisions?.filter((d) => d.divisionname.toLowerCase() !== "communications")
     .map((division) => {
       return {
         name: division.divisionid,
@@ -965,8 +965,8 @@ export const RecordsLog = ({
           );
         }
       },
-      "records",
-      bcgovcode
+      isHistoricalRequest ? "historical" : "records",      
+      isHistoricalRequest ? undefined : bcgovcode
     );
   };
 
@@ -1082,8 +1082,8 @@ export const RecordsLog = ({
           });
         }
       },
-      "records",
-      bcgovcode
+      isHistoricalRequest ? "historical" : "records",      
+      isHistoricalRequest ? undefined : bcgovcode
     );
   };
 
@@ -1304,8 +1304,8 @@ export const RecordsLog = ({
           ministryId,
           dispatch,
           null,
-          "records",
-          bcgovcode
+          isHistoricalRequest ? "historical" : "records",
+          isHistoricalRequest ? undefined : bcgovcode
         );
         await getFileFromS3({ filepath: response.data }, (_err, res) => {
           let blob = new Blob([res.data], { type: "application/octet-stream" });
@@ -1563,7 +1563,7 @@ export const RecordsLog = ({
   };
 
   React.useEffect(() => {
-    if (divisionFilters.findIndex((f) => f.divisionid === filterValue) > -1) {
+    if (divisionFilters.findIndex((f) => f.divisionid === filterValue) > -1 || isHistoricalRequest) {
       setRecords(
         searchAttachments(
           _.cloneDeep(recordsObj.records),
@@ -1582,7 +1582,7 @@ export const RecordsLog = ({
     var filterFunction = (r) => {
       var isMatch = (
         (r.filename.toLowerCase().includes(_keywordValue?.toLowerCase()) ||
-          r.createdby.toLowerCase().includes(_keywordValue?.toLowerCase())) &&
+          r.createdby?.toLowerCase().includes(_keywordValue?.toLowerCase())) &&
         (_filterValue === -3
           ? r.attributes?.incompatible
           : _filterValue === -2
@@ -1762,6 +1762,9 @@ export const RecordsLog = ({
   }
 
   const isUpdateDivisionsDisabled = () => {
+    if (isHistoricalRequest) {
+      return true;
+    }
     var count = 0;
     var selectedDivision = new Set();
     for (let record of records) {
@@ -1777,7 +1780,7 @@ export const RecordsLog = ({
         } else {
           let int = intersection(
             selectedDivision,
-            new Set(record.attributes.divisions.map((d) => d.divisionid))
+            new Set(record.attributes.divisions?.map((d) => d.divisionid))
           );
           if (int.size === 0) {
             return true;
@@ -1795,7 +1798,7 @@ export const RecordsLog = ({
     // setDivisionToUpdate()
 
     if (isMCFPersonal && selectedDivision.size > 0) {
-      if (divisions.find((d) => selectedDivision.has(d.divisionid))) {
+      if (divisions?.find((d) => selectedDivision.has(d.divisionid))) {
         return !isMinistryCoordinator;
       } else {
         return isMinistryCoordinator;
@@ -1811,7 +1814,7 @@ export const RecordsLog = ({
     for (let record of records) {
       if (record.isselected) {
         if (
-          record.attributes.divisions.length > 1 &&
+          record.attributes.divisions?.length > 1 &&
           record.attributes.divisions[0].divisionid !== filterValue
         ) {
           if (filterValue < 0) {
@@ -1819,7 +1822,7 @@ export const RecordsLog = ({
               "invalid filter value - need to select a single division"
             );
           }
-          for (var i = 1; i < record.attributes.divisions.length; i++) {
+          for (var i = 1; i < record.attributes.divisions?.length; i++) {
             if (record.attributes.divisions[i].divisionid === filterValue) {
               let updateRecord = records.find(
                 (r) =>
@@ -2179,7 +2182,7 @@ export const RecordsLog = ({
               )
             )}
             <Grid item xs={3}>
-              {hasDocumentsToDownload && (
+              {hasDocumentsToDownload && !isHistoricalRequest && (
                 <TextField
                   className="download-dropdown custom-select-wrapper foi-download-button"
                   id="download"
@@ -2239,10 +2242,10 @@ export const RecordsLog = ({
             </Grid> 
             <Grid item xs={2}>
               {
-              (isMinistryCoordinator || (isScanningTeamMember &&
+              (!isHistoricalRequest && (isMinistryCoordinator || (isScanningTeamMember &&
                 MinistryNeedsScanning.includes(bcgovcode.replaceAll('"', "")) &&
                 requestType ===
-                  FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL)) && (
+                  FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL))) && (
                 <button
                   className={clsx("btn", "addAttachment", classes.createButton)}
                   variant="contained"
@@ -2264,6 +2267,7 @@ export const RecordsLog = ({
             alignItems="flex-start"
             spacing={1}
           >
+            {!isHistoricalRequest && <>
             <Grid item xs={7}>
               <span style={{ fontWeight: "bold" }}>
                 <div >
@@ -2363,6 +2367,7 @@ export const RecordsLog = ({
                 </>
               }
             </Grid>            
+            </>}
             {/* <Grid item xs={1}>
             </Grid> */}
             <Grid
@@ -2635,7 +2640,7 @@ export const RecordsLog = ({
                     className={` btn`}
                     onClick={() => handlePopupButtonClick("delete")}
                     // title="Delete"
-                    disabled={lockRecords || !checkIsAnySelected()}
+                    disabled={lockRecords || !checkIsAnySelected() || isHistoricalRequest}
                     style={
                       lockRecords || !checkIsAnySelected() ? { pointerEvents: "none" } : {}
                     }
@@ -2701,6 +2706,7 @@ export const RecordsLog = ({
                     isMCFPersonal={isMCFPersonal}
                     setEditTagModalOpen={setEditTagModalOpen}
                     setCurrentEditRecord={setCurrentEditRecord}
+                    isHistoricalRequest={isHistoricalRequest}
                     lockRecords={lockRecords}
                   />
                 ))
@@ -2721,7 +2727,7 @@ export const RecordsLog = ({
             </Grid>
           </Grid>
 
-          <AttachmentModal
+          {!isHistoricalRequest && <AttachmentModal
             modalFor={modalFor}
             openModal={openModal}
             handleModal={handleContinueModal}
@@ -2742,7 +2748,7 @@ export const RecordsLog = ({
             requestType={requestType}
             isScanningTeamMember={isScanningTeamMember}
             curPersonalAttributes={curPersonalAttributes}
-          />
+          />}
           <div className="state-change-dialog">
             <Dialog
               open={deleteModalOpen}
@@ -2848,7 +2854,7 @@ export const RecordsLog = ({
                   component={"span"}
                 >
                   {records.filter(
-                    (r) => r.isselected && r.attributes.divisions.length > 1
+                    (r) => r.isselected && r.attributes.divisions?.length > 1
                   ).length > 0 && filterValue < 0 ? (
                     <div className="tagtitle">
                       <span>
@@ -2885,8 +2891,7 @@ export const RecordsLog = ({
                           />
                         ) : (
                           <div className="taglist">
-                            {divisions
-                              .filter((division) => {
+                            {divisions?.filter((division) => {
                                 if (
                                   division.divisionname.toLowerCase() ===
                                   "communications"
@@ -2941,8 +2946,7 @@ export const RecordsLog = ({
                         )
                       ) : (
                         <div className="taglist">
-                          {divisions
-                            .filter((division) => {
+                          {divisions?.filter((division) => {
                               if (
                                 division.divisionname.toLowerCase() ===
                                 "communications"
@@ -3033,11 +3037,16 @@ const Attachment = React.memo(
     isMCFPersonal,
     setEditTagModalOpen,
     setCurrentEditRecord,
+    isHistoricalRequest,
     lockRecords
   }) => {
     const classes = useStyles();
     const [disabled, setDisabled] = useState(false);
     const [isRetry, setRetry] = useState(false);
+    const removePersonalTagsFromDivisions = record.attributes?.divisions?.filter(
+      (division) => {
+        return !record.attributes?.personalattributes?.personaltag || (record.attributes?.personalattributes?.personaltag && division.divisionname != record.attributes?.personalattributes?.personaltag);
+      }) || [];
     const removeInValidTagsFromDivisions = record.attributes?.divisions.filter(
       (division) => {
         return division.divisionname != "TBD";
@@ -3186,7 +3195,8 @@ const Attachment = React.memo(
             alignItems="flex-end"
             className={classes.recordStatus}
           >
-            {record.isduplicate ? (
+            { isHistoricalRequest ? <></>
+              : record.isduplicate ? (
               <span>Duplicate of {record.duplicateof}</span>
             ) : record.attributes?.incompatible &&
               record.attributes?.trigger !== "recordreplace" ? (
@@ -3228,6 +3238,7 @@ const Attachment = React.memo(
               isMCFPersonal={isMCFPersonal}
               isMinistryCoordinator={isMinistryCoordinator}
               setCurrentEditRecord={setCurrentEditRecord}
+              isHistoricalRequest={isHistoricalRequest}
             />
           </Grid>
         </Grid>
@@ -3406,7 +3417,8 @@ const AttachmentPopup = React.memo(
     setEditTagModalOpen,
     isMCFPersonal,
     isMinistryCoordinator,
-    setCurrentEditRecord
+    setCurrentEditRecord,
+    isHistoricalRequest,
   }) => {
     const ref = React.useRef();
     const closeTooltip = () => (ref.current && ref ? ref.current.close() : {});
@@ -3490,6 +3502,7 @@ const AttachmentPopup = React.memo(
       setEditTagModalOpen,
       isMCFPersonal,
       isMinistryCoordinator,
+      isHistoricalRequest,
       lockRecords
     }) => {
       const isUploadedByMinistryUser = (record) => {
@@ -3562,7 +3575,7 @@ const AttachmentPopup = React.memo(
               ""
             )}
             {(!record.attributes?.isattachment ||
-              record.attributes?.isattachment === undefined) && (
+              record.attributes?.isattachment === undefined) && !isHistoricalRequest && (
               <MenuItem
                 disabled={lockRecords || disableMinistryUser}
                 onClick={() => {
@@ -3621,7 +3634,7 @@ const AttachmentPopup = React.memo(
                 ? "Download Original"
                 : "Download"}
             </MenuItem>
-            {!record.isattachment && <DeleteMenu />}
+            {!record.isattachment && !isHistoricalRequest && <DeleteMenu />}
             {!record.isredactionready &&
               (record.failed ||
                 isrecordtimeout(record.created_at, RECORD_PROCESSING_HRS) ==
@@ -3667,6 +3680,7 @@ const AttachmentPopup = React.memo(
           setEditTagModalOpen={setEditTagModalOpen}
           isMCFPersonal={isMCFPersonal}
           isMinistryCoordinator={isMinistryCoordinator}
+          isHistoricalRequest={isHistoricalRequest}
           lockRecords={lockRecords}
         />
       </>

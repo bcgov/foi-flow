@@ -308,3 +308,23 @@ class UpdateRequestsPageCountOption2(Resource):
             return {'status': False, 'message': CUSTOM_KEYERROR_MESSAGE + str(error)}, 400
         except BusinessException as exception:
             return {'status': exception.status_code, 'message':exception.message}, 500
+        
+@cors_preflight('GET,OPTIONS')
+@API.route('/foirecord/historical/<axisrequestid>')
+class FOIRequestGetRecord(Resource):
+    """Fetch documents for historical records"""
+
+
+    @staticmethod
+    @TRACER.trace()
+    @cross_origin(origins=allowedorigins())
+    @auth.require
+    @auth.ismemberofgroups(getrequiredmemberships())
+    def get(axisrequestid):
+        try:
+            result = recordservice().gethistoricaldocuments(axisrequestid)
+            return json.dumps(result), 200
+        except KeyError as error:
+            return {'status': False, 'message': CUSTOM_KEYERROR_MESSAGE + str(error)}, 400
+        except Exception as exception:
+            return {'status': False, 'message': str(exception)}, 500
