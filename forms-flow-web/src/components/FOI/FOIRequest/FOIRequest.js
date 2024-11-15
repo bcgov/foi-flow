@@ -173,6 +173,12 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
   let CFRFormHistoryLength = useSelector(
     (state) => state.foiRequests.foiRequestCFRFormHistory.length
   );
+  let foiRequestCFRFormHistory = useSelector(
+    (state) => state.foiRequests.foiRequestCFRFormHistory
+  );
+  let foiRequestCFRForm = useSelector(
+    (state) => state.foiRequests.foiRequestCFRForm
+  );
   // let requestRecords = useSelector(
   //   (state) => state.foiRequests.foiRequestRecords
   // );
@@ -1801,6 +1807,12 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
                   ministryId={ministryId}
                   applicantCorrespondenceTemplates={applicantCorrespondenceTemplates}
                   setComment={setComment}
+                  requestDetails={requestDetails}
+                  requestState={requestState}
+                  foiRequestCFRFormHistory={foiRequestCFRFormHistory}
+                  foiRequestCFRForm={foiRequestCFRForm}
+                  applicantCorrespondence={applicantCorrespondence}
+                  requestNotes={requestNotes}
                 />
               </>
             ) : (
