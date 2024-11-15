@@ -1,17 +1,19 @@
-import React, { useState } from 'react';
-import './requesthistory.scss';
+import { useState } from 'react';
+import '../requesthistory.scss';
 import 'reactjs-popup/dist/index.css';
-import { ClickableChip } from '../../Dashboard/utils';
-import { addToFullnameList, getFullnameList } from '../../../../helper/FOI/helper';
+import { ClickableChip } from '../../../Dashboard/utils';
+import { addToFullnameList, getCommentTypeIdByName, getFullnameList } from '../../../../../helper/FOI/helper';
 import Accordion from '@material-ui/core/Accordion';
 import AccordionSummary from '@material-ui/core/AccordionSummary';
 import AccordionDetails from '@material-ui/core/AccordionDetails';
-import CommentHistory from './CommentHistory';
+import CommentHistory from '../CommentHistory';
+import _ from "lodash";
+import ExportRequestDetailsHistory from './ExportRequestDetails';
+import ExportCFRForms from './ExportCFRForms';
 
 
 
 const ExportHistory = ({
-  requesthistory,
   bcgovcode,
   currentUser,
   iaoassignedToList,
@@ -19,9 +21,23 @@ const ExportHistory = ({
   commentTypes,
   ministryId,
   applicantCorrespondenceTemplates,
+  requestDetails,
+  requestState,
+  foiRequestCFRFormHistory,
+  foiRequestCFRForm,
+  applicantCorrespondence,
+  requestNotes,
+  selectedExportOptions
 }) => {
 
   const [fullnameList, setFullnameList] = useState(getFullnameList);
+
+  let cfrForms = [foiRequestCFRForm]
+  foiRequestCFRFormHistory.map((cfrHistory) => {
+    if (cfrHistory['cfrfeestatus.description'] === 'Approved') {
+      cfrForms.push(cfrHistory);
+    }
+  })
 
   const finduserbyuserid = (userId) => {
     let user = fullnameList.find((u) => u.username === userId);
@@ -47,7 +63,7 @@ const ExportHistory = ({
       return 'Request History';
     }
   };
-  
+
   const getHtmlfromRawContent = (item) => {
     return `<p>${item.text || ''}</p>`;
   };
@@ -82,35 +98,61 @@ const ExportHistory = ({
   const renderrequesthistory = () => {
     if (!fullnameList?.length) return null;
 
-    const sortedRequestHistory = [...requesthistory].sort((a, b) => 
-      new Date(a.created_at || a.dateUF) - new Date(b.created_at || b.dateUF)
+    let filteredRequestNotes = requestNotes.filter(
+      c => c.commentTypeId !== getCommentTypeIdByName(commentTypes, "Ministry Internal") &&
+        c.commentTypeId !== getCommentTypeIdByName(commentTypes, "Ministry Peer Review")
+    )
+    const sortedCommentsHistory = [...filteredRequestNotes].sort((a, b) =>
+      new Date(b.created_at || b.dateUF) - new Date(a.created_at || a.dateUF)
     );
-  
-    return sortedRequestHistory.map((item, index) => {
+
+    return sortedCommentsHistory.map((item, index) => {
+      item.type = 'comment';
       const hasOtherUserComments = item.replies?.some((reply) => reply.userId !== currentUser.userId);
       const fullName = getfullname(item);
-      const emailText = getemailtext(item);
-      const dateText = item.type === 'comment' ? '' : item.date.toUpperCase();
   
       return (
         <div
-          key={`${item.type}-${index}`} 
+          key={`${item.type}-${index}`}
           className="historysection"
           data-comid={item.commentId || null}
           data-msgid={!item.commentId ? index : null}
         >
-          {item.type === 'comment' ? 
-            rendercomment(item, index, fullName, hasOtherUserComments) : 
-            rendercommunication(item, index, fullName, emailText, dateText)}
+          {rendercomment(item, index, fullName, hasOtherUserComments)}
         </div>
       );
     });
   };
-  
+  const renderCommunications = () => {
+    if (!fullnameList?.length) return null;
+
+    const sortedCommunications = [...applicantCorrespondence].sort((a, b) =>
+      new Date(b.created_at || b.dateUF) - new Date(a.created_at || a.dateUF)
+    );
+
+    return sortedCommunications.map((item, index) => {
+      item.type = 'message';
+      const fullName = getfullname(item);
+      const emailText = getemailtext(item);
+      const dateText = item.date.toUpperCase();
+
+      return (
+        <div
+          key={`${item.type}-${index}`}
+          className="historysection"
+          data-comid={item.commentId || null}
+          data-msgid={!item.commentId ? index : null}
+        >
+          {rendercommunication(item, index, fullName, emailText, dateText)}
+        </div>
+      );
+    });
+  };
+
   const getfullname = (item) => {
     return item.type === 'comment' ? getfullName(item.commentTypeId, item.userId) : getfullName(0, item.createdby);
   };
-  
+
   const getemailtext = (item) => {
     if (item.type === 'comment') return '';
     const emailCount = item.emails.length;
@@ -131,9 +173,9 @@ const ExportHistory = ({
       <div className="replySection">{renderreplies(item)}</div>
     </>
   );
-  
+
   const rendercommunication = (item, index, fullName, emailText, dateText) => (
-    <div style={{pageBreak: 'avoid' }} className="communication-accordion" {...(item ? { "data-communication-div-id": `${index}` } : {})}>
+    <div className="communication-accordion" {...(item ? { "data-communication-div-id": `${index}` } : {})}>
       <Accordion expanded>
         <AccordionSummary
           aria-controls="communication-accordion-summary"
@@ -153,7 +195,7 @@ const ExportHistory = ({
       </Accordion>
     </div>
   );
-  
+
   const rendertemplateinfo = (item, fullName, emailText, dateText) => (
     <>
       <div className="templateUser">
@@ -164,7 +206,7 @@ const ExportHistory = ({
       <div className="templateTime">{item.edited ? "Edited" : ""}</div>
     </>
   );
-  
+
   const rendercategorychip = (item) => (
     <div className="templateUser">
       {item.category !== "draft" && (
@@ -172,7 +214,7 @@ const ExportHistory = ({
       )}
     </div>
   );
-  
+
   const renderattachments = (item) => (
     item.attachments?.map((attachment) => (
       <div className="email-attachment-item" key={attachment.filename}>
@@ -182,14 +224,53 @@ const ExportHistory = ({
       </div>
     ))
   );
-  
+
   return (
-    <div style={{ paddingBottom: '2%', marginBottom: '2%', width: '100%' }}>
-      {requesthistory.length === 0 ? (
-        <div className="nofiltermessage">No request history under this filter category</div>
-      ) : (
-        renderrequesthistory()
-      )}
+    <div>
+      {selectedExportOptions.isRequestDetailsChecked &&
+        <div>
+          <div className="export_title">
+            <h1 className="foi-review-request-text foi-ministry-requestheadertext">Request Details</h1>
+          </div>
+          <ExportRequestDetailsHistory requestDetails={requestDetails} requestState={requestState}
+            iaoassignedToList={iaoassignedToList} />
+          {(foiRequestCFRFormHistory.length > 0 || foiRequestCFRForm) &&
+            <div style={{ pageBreakBefore: 'always' }}>
+              <div className="export_title">
+                <h1 className="foi-review-request-text foi-ministry-requestheadertext">CFR Forms</h1>
+              </div>
+              <ExportCFRForms foiRequestCFRFormHistory={foiRequestCFRFormHistory} foiRequestCFRForm={foiRequestCFRForm} />
+            </div>}
+        </div>
+      }
+      {
+        selectedExportOptions.isApplicantCorrespondenceChecked &&
+        <div style={{ pageBreakBefore: 'always' }}>
+          <div className="export_title">
+            <h1 className="foi-review-request-text foi-ministry-requestheadertext">Application Correspondence</h1>
+          </div>
+          <div> {applicantCorrespondence.length === 0 ? (
+            <div className="nofiltermessage">No communications under this filter category</div>
+          ) : (
+            renderCommunications()
+          )}
+          </div>
+        </div>
+      }
+      {
+        selectedExportOptions.isCommentsChecked &&
+        <div style={{ pageBreakBefore: 'always' }}>
+          <div className="export_title">
+            <h1 className="foi-review-request-text foi-ministry-requestheadertext">Comments</h1>
+          </div>
+          <div> {applicantCorrespondence.length === 0 ? (
+            <div className="nofiltermessage">No request history under this filter category</div>
+          ) : (
+            renderrequesthistory()
+          )}
+          </div>
+        </div>
+      }
     </div>
   );
 };

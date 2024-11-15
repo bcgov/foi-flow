@@ -1,11 +1,11 @@
-import React, { useEffect, useState, useRef  } from 'react'
+import { useEffect, useState  } from 'react'
 import './requesthistory.scss'
 import { getCommentTypeIdByName, getCommentTypeFromId } from "../../../../helper/FOI/helper";
 import RequestFilter from './RequestFilter';
 import DisplayHistory from './DisplayHistory'
 import { toast } from 'react-toastify';
-import RequestHistoryExportModal from './RequestHistoryExportModal/RequestHistoryExportModal';
-import ExportHistory from './ExportHistory';
+import RequestHistoryExportModal from './RequestHistoryExport/RequestHistoryExportModal/RequestHistoryExportModal';
+import ExportHistory from './RequestHistoryExport/ExportHistory';
 import * as html2pdf from 'html-to-pdf-js';
 import { useDispatch } from "react-redux";
 import { saveRequestHistoryComment } from '../../../../apiManager/services/FOI/foiRequestNoteServices';
@@ -21,13 +21,22 @@ export const RequestHistorySection = ({
   commentTypes,
   ministryId,
   applicantCorrespondenceTemplates,
-  setComment
+  setComment,
+  requestDetails,
+  requestState,
+  foiRequestCFRFormHistory,
+  foiRequestCFRForm,
+  applicantCorrespondence,
+  requestNotes,
 }) => {
 
   const dispatch = useDispatch();
   const [requesthistory, sethistory] = useState([])
-  const [exportHistory, setExportHistory] = useState([])
-  const [selectedType, setSelectedType] = useState()
+  const [selectedExportOptions, setSelectedExportOptions] = useState({
+    isApplicantCorrespondenceChecked: true,
+    isCommentsChecked: true,
+    isRequestDetailsChecked: true,
+  })
   const [filterkeyValue, setfilterkeyValue] = useState("")
   const [showHistoryExportModal, setShowHistoryExportModal] = useState(false);
   const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
@@ -59,7 +68,6 @@ export const RequestHistorySection = ({
   
     const filteredhistory = filterkeyinCommentsandReplies(_historybyCategory, _filteredHistory);
     sethistory(filteredhistory);
-    setExportHistory(requestHistoryArray)
   }, [requestHistoryArray, filterkeyValue]);
   
   const filterHistory = () => {
@@ -99,7 +107,7 @@ export const RequestHistorySection = ({
     setShowHistoryExportModal(true);
   }
   const exportSelectedHistory = async (exportOptions) => {
-    setExportHistory(await filterExportHistory(exportOptions));
+    setSelectedExportOptions(exportOptions)
     const toastID = toast.loading("Downloading file")
     toast.update(toastID, {
       render: "Downloading file",
@@ -107,14 +115,22 @@ export const RequestHistorySection = ({
       autoClose: 3000,
     })
     let selectedCategory;
-    if(exportOptions.isApplicantCorrespondenceChecked && exportOptions.isCommentsChecked){
+    if(exportOptions.isApplicantCorrespondenceChecked && exportOptions.isCommentsChecked 
+      && exportOptions.isRequestDetailsChecked){
       selectedCategory = 'All';
-    } else if (exportOptions.isApplicantCorrespondenceChecked) {
-      selectedCategory = 'Correspondence';
-    } else if (exportOptions.isCommentsChecked) {
-      selectedCategory = 'Comments';
+    } else {
+        let tempCategory='';
+        if (exportOptions.isApplicantCorrespondenceChecked) {
+          tempCategory += 'Application Correspondence, ';
+        } 
+        if (exportOptions.isCommentsChecked) {
+          tempCategory += 'Comments, ';
+        }
+        if (exportOptions.isRequestDetailsChecked) {
+          tempCategory += 'Request Details, ';
+        }
+        selectedCategory= tempCategory.substring(0, tempCategory.length - 2);
     }
-    setSelectedType(selectedCategory)
     await exportToPDF(selectedCategory)
     toast.update(toastID, {
       render: "File Downloaded",
@@ -122,13 +138,14 @@ export const RequestHistorySection = ({
       autoClose: 3000,
     })
   }
-  const filterExportHistory = (exportOptions) => {
-    return requestHistoryArray.filter(c => (exportOptions.isApplicantCorrespondenceChecked && c.type === 'message') ||
-    (exportOptions.isCommentsChecked && c.type === 'comment') )
-  };
+
+  // Utility function to "await" setState
+  const setStateAsync = async (state) => {
+     setIsGeneratingPDF(state);
+  }
 
   const exportToPDF = async (selectedCategory) => {
-    setIsGeneratingPDF(true)
+    await setStateAsync(true)
     const element =  document.getElementById("exportHistory");
     // Options for html2pdf
     const options = {
@@ -139,7 +156,7 @@ export const RequestHistorySection = ({
       jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait', compress:true },
     };
     
-    setIsGeneratingPDF(false)
+    await setStateAsync(false)
   // Create and save the PDF
     await html2pdf().from(element).set(options).save().then(()=>{
       //create system generated comment
@@ -177,14 +194,15 @@ export const RequestHistorySection = ({
         </div>
         {isGeneratingPDF ? 
           <div id="exportHistory" className='exportHistory'>
-            <div className="export_title">
-              <h1 className="foi-review-request-text foi-ministry-requestheadertext">Request History - {selectedType}</h1>
-            </div>
-            <ExportHistory requesthistory={exportHistory} bcgovcode={bcgovcode} currentUser={currentUser}
+            <ExportHistory 
+                foiRequestCFRFormHistory={foiRequestCFRFormHistory} foiRequestCFRForm={foiRequestCFRForm} requestDetails={requestDetails} requestState={requestState} bcgovcode={bcgovcode} currentUser={currentUser}
                 iaoassignedToList={iaoassignedToList} ministryAssignedToList={ministryAssignedToList} 
                 commentTypes={commentTypes} ministryId={ministryId} applicantCorrespondenceTemplates={applicantCorrespondenceTemplates}
+                applicantCorrespondence={applicantCorrespondence} requestNotes={requestNotes}
+                selectedExportOptions={selectedExportOptions}
               />
-          </div>: null}
+          </div>
+           : null}
       </div>
     </>
   )
