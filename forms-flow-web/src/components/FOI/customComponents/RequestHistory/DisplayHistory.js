@@ -159,7 +159,7 @@ const DisplayHistory = ({
       const hasOtherUserComments = item.replies?.some((reply) => reply.userId !== currentUser.userId);
       const fullName = getfullname(item);
       const emailText = getemailtext(item);
-      const dateText = getdatetext(item);
+      const dateText = item.type === 'comment' ? '' : item.date.toUpperCase();
   
       return (
         <div
@@ -186,11 +186,6 @@ const DisplayHistory = ({
     if (item.type === 'comment') return '';
     const emailCount = item.emails.length;
     return emailCount === 1 ? item.emails[0] : emailCount > 1 ? `${item.emails[0]} +${emailCount - 1}` : '';
-  };
-  
-  const getdatetext = (item) => {
-    if (item.type === 'comment') return '';
-    return item.date === item.created_at ? item.date.toUpperCase() : item.date.split('|')[0].trim();
   };
   
   const rendercomment = (item, index, fullName, hasOtherUserComments) => (
