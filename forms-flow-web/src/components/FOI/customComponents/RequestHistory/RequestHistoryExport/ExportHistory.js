@@ -10,6 +10,8 @@ import CommentHistory from '../CommentHistory';
 import _ from "lodash";
 import ExportRequestDetailsHistory from './ExportRequestDetails';
 import ExportCFRForms from './ExportCFRForms';
+import { StateEnum } from '../../../../../constants/FOI/statusEnum';
+import FOI_COMPONENT_CONSTANTS from '../../../../../constants/FOI/foiComponentConstants';
 
 
 
@@ -31,13 +33,22 @@ const ExportHistory = ({
 }) => {
 
   const [fullnameList, setFullnameList] = useState(getFullnameList);
-
   let cfrForms = [foiRequestCFRForm]
   foiRequestCFRFormHistory.map((cfrHistory) => {
     if (cfrHistory['cfrfeestatus.description'] === 'Approved') {
       cfrForms.push(cfrHistory);
     }
   })
+
+  const showCFRTab = () => {
+    return (
+      requestState !== StateEnum.intakeinprogress.name &&
+      requestState !== StateEnum.unopened.name &&
+      requestState !== StateEnum.open.name &&
+      requestDetails?.requestType ===
+        FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_GENERAL
+    );
+  };
 
   const finduserbyuserid = (userId) => {
     let user = fullnameList.find((u) => u.username === userId);
@@ -234,7 +245,7 @@ const ExportHistory = ({
           </div>
           <ExportRequestDetailsHistory requestDetails={requestDetails} requestState={requestState}
             iaoassignedToList={iaoassignedToList} />
-          {(foiRequestCFRFormHistory.length > 0 || foiRequestCFRForm) &&
+          {showCFRTab() &&
             <div style={{ pageBreakBefore: 'always' }}>
               <div className="export_title">
                 <h1 className="foi-review-request-text foi-ministry-requestheadertext">CFR Forms</h1>
@@ -263,7 +274,7 @@ const ExportHistory = ({
           <div className="export_title">
             <h1 className="foi-review-request-text foi-ministry-requestheadertext">Comments</h1>
           </div>
-          <div> {applicantCorrespondence.length === 0 ? (
+          <div> {requestNotes.length === 0 ? (
             <div className="nofiltermessage">No request history under this filter category</div>
           ) : (
             renderrequesthistory()
