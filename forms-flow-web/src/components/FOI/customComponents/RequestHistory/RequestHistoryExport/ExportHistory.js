@@ -240,23 +240,30 @@ const ExportHistory = ({
     <div>
       {selectedExportOptions.isRequestDetailsChecked &&
         <div>
-          <div className="export_title">
-            <h1 className="foi-review-request-text foi-ministry-requestheadertext">Request Details</h1>
+          <div style={{ pageBreakInside: 'avoid' }}>
+            <div className="export_title" style={{ pageBreakInside: 'avoid' }}>
+              <h1 className="foi-review-request-text foi-ministry-requestheadertext">Request Details</h1>
+            </div>
+            <ExportRequestDetailsHistory requestDetails={requestDetails} requestState={requestState}
+              iaoassignedToList={iaoassignedToList} />
           </div>
-          <ExportRequestDetailsHistory requestDetails={requestDetails} requestState={requestState}
-            iaoassignedToList={iaoassignedToList} />
           {showCFRTab() &&
-            <div style={{ pageBreakBefore: 'always' }}>
+            <div style={{ pageBreakInside: 'avoid' }}>
               <div className="export_title">
                 <h1 className="foi-review-request-text foi-ministry-requestheadertext">CFR Forms</h1>
               </div>
               <ExportCFRForms foiRequestCFRFormHistory={foiRequestCFRFormHistory} foiRequestCFRForm={foiRequestCFRForm} />
             </div>}
+            <div className="row foi-details-row">
+              <div className="col-lg-12 foi-details-col">
+                <hr />
+              </div>
+            </div>
         </div>
       }
       {
         selectedExportOptions.isApplicantCorrespondenceChecked &&
-        <div style={{ pageBreakBefore: 'always' }}>
+        <div style={{ pageBreakInside: 'avoid' }}>
           <div className="export_title">
             <h1 className="foi-review-request-text foi-ministry-requestheadertext">Application Correspondence</h1>
           </div>
@@ -266,11 +273,16 @@ const ExportHistory = ({
             renderCommunications()
           )}
           </div>
+          <div className="row foi-details-row">
+            <div className="col-lg-12 foi-details-col">
+              <hr />
+            </div>
+          </div>
         </div>
       }
       {
         selectedExportOptions.isCommentsChecked &&
-        <div style={{ pageBreakBefore: 'always' }}>
+        <div style={{ pageBreakInside: 'avoid' }}>
           <div className="export_title">
             <h1 className="foi-review-request-text foi-ministry-requestheadertext">Comments</h1>
           </div>

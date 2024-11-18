@@ -62,7 +62,7 @@ const ExportRequestDetailsHistory = ({
 
     return (
         <div id='RequestDetails'>
-            <div className="row">
+            <div className="row" >
                 <div className="col-lg-6">
                     <h1 className="foi-review-request-text foi-ministry-requestheadertext">{getHeaderText(requestDetails)}</h1>
                 </div>
@@ -118,13 +118,13 @@ const ExportRequestDetailsHistory = ({
                 requestDetails={requestDetails}
             />
             <ExtensionDetails
-                style={{ pageBreakInside: 'avoid !important' }}
+                style={{ pageBreakInside: 'avoid' }}
                 requestDetails={requestDetails}
                 requestState={requestState}
             />
             {showDivisionalTracking && (
                 <Card className="foi-details-card"
-                    style={{ pageBreakInside: 'avoid !important' }}>
+                    style={{ pageBreakInside: 'avoid' }}>
                     <div className="row foi-details-row">
                         <div className="col-lg-8 foi-details-col ">
                             <label className="foi-details-label">DIVISIONAL TRACKING</label>
@@ -148,7 +148,7 @@ const ExportRequestDetailsHistory = ({
             )}
             {requestDetails.isoipcreview && requestState && requestState.toLowerCase() !== StateEnum.intakeinprogress.name.toLowerCase() && requestState.toLowerCase() !== StateEnum.unopened.name.toLowerCase() && (
                 <OIPCDetails
-                    style={{ pageBreakInside: 'avoid !important' }}
+                    style={{ pageBreakInside: 'avoid' }}
                     oipcData={requestDetails.oipcdetails}
                     isMinistry={true}
                 />
