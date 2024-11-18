@@ -12,7 +12,7 @@ const ExportCFRForms = ({
   foiRequestCFRForm
 }) => {
 
-  let cfrForms = [foiRequestCFRForm]
+  let cfrForms = foiRequestCFRFormHistory?.some(cfr=>cfr.cfrfeeid===foiRequestCFRForm.cfrfeeid) ? []:[foiRequestCFRForm]
   foiRequestCFRFormHistory.map((cfrHistory) => {
     if (cfrHistory['cfrfeestatus.description'] === 'Approved') {
       cfrForms.push(cfrHistory);
