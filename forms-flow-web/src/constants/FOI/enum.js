@@ -183,6 +183,7 @@ const RecordsDownloadList = [
   { id: 3, label: "Download Final Package", disabled: true },
   { id: 4, label: "Download OIPC Redline for Sign Off", disabled: true },
   { id: 5, label: "Download OIPC Redline for OIPC Review", disabled: true },
+  { id: 6, label: "Download Consults", disabled: true },
 ];
 
 const RecordDownloadCategory = Object.freeze({

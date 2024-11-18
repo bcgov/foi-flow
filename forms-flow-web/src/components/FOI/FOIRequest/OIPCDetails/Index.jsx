@@ -10,7 +10,7 @@ import { faCirclePlus } from '@fortawesome/free-solid-svg-icons';
 import OIPCDetailsMinistry from "./OIPCDetailsMinistry";
 
 const OIPCDetails = (props) => {
-  const { oipcData, addOIPC, removeOIPC, updateOIPC, isMinistry } = props;
+  const { oipcData, addOIPC, removeOIPC, updateOIPC, isMinistry, isHistoricalRequest } = props;
 
   //Styling
   const useStyles = makeStyles({
@@ -35,9 +35,9 @@ const OIPCDetails = (props) => {
             <Typography className={classes.heading}>OIPC DETAILS</Typography>
           </AccordionSummary>
           <AccordionDetails>
-            <OIPCDetailsList oipcData={oipcData} removeOIPC={removeOIPC} updateOIPC={updateOIPC} />
+            <OIPCDetailsList oipcData={oipcData} removeOIPC={removeOIPC} updateOIPC={updateOIPC} isHistoricalRequest={isHistoricalRequest} />
               <div style={{display: "flex", flexDirection: "row", alignItems: "center", margin: "7px 0px 7px 0px"}}>
-                  <button onClick={() => addOIPC()} style={{ border: "none", background: "none" }}>
+                  <button onClick={() => addOIPC()} style={{ border: "none", background: "none" }} disabled={isHistoricalRequest}>
                       <FontAwesomeIcon icon={faCirclePlus}  size="lg" color="#38598A" />
                   </button>
                   <p style={{fontWeight: "bold", color: "#38598A"}}>Add Additional OIPC Complaint</p>
