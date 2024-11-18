@@ -149,11 +149,11 @@ export const RequestHistorySection = ({
     const element =  document.getElementById("exportHistory");
     // Options for html2pdf
     const options = {
-      margin: 0.5,
+      margin: 5,
       filename: `Request History ${requestid} - ${selectedCategory}.pdf`,
       image: { type: 'png', quality: 0.97 },
       html2canvas: { scale: 2 },
-      jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait', compress:true },
+      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait', compress:true },
     };
     
     await setStateAsync(false)
