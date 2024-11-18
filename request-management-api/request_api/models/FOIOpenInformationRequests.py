@@ -146,6 +146,7 @@ class FOIOpenInformationRequests(db.Model):
         ]
 
         print("subquery_maxversion : ",subquery_maxversion)
+        print("userid:", userid)
 
         #aliase for onbehalf of applicant info
         onbehalf_applicantmapping = aliased(FOIRequestApplicantMapping)
@@ -225,6 +226,7 @@ class FOIOpenInformationRequests(db.Model):
             ],
             else_ = FOIOpenInformationRequests.oiassignedto).label('assignedToFormatted')
         
+        oifilter = cls.getgroupfilters(groups)
         # from_closed = case(
         #     [(FOIMinistryRequest.closedate.isnot(None), 
         #     func.greatest(
@@ -275,67 +277,102 @@ class FOIOpenInformationRequests(db.Model):
             assignedToFormatted, 
             cls.version,
             cls.foiopeninforequestid,
-            FOIRequestStatus.name.label('currentState')
+            FOIRequestStatus.name.label('currentState'),
+            FOIRestrictedMinistryRequest.isrestricted.label('isiaorestricted'),
             #from_closed
         ]   
 
         basequery = (
             _session.query(*selectedcolumns)
             .join(subquery_maxversion, and_(*joincondition))
-            .join(FOIMinistryRequest, and_(FOIMinistryRequest.foiministryrequestid == cls.foiministryrequest_id, FOIMinistryRequest.version == cls.version))
+            .join(FOIMinistryRequest, and_(
+                FOIMinistryRequest.foiministryrequestid == cls.foiministryrequest_id, 
+                FOIMinistryRequest.version == cls.foiministryrequestversion_id,
+                FOIMinistryRequest.isactive == True))
             .join(FOIRequest, and_(FOIRequest.foirequestid == FOIMinistryRequest.foirequest_id, FOIRequest.version == FOIMinistryRequest.foirequestversion_id))
             .join(ApplicantCategory,and_(ApplicantCategory.applicantcategoryid == FOIRequest.applicantcategoryid, ApplicantCategory.isactive == True))
             .join(OpenInformationStatuses, OpenInformationStatuses.oistatusid == FOIMinistryRequest.oistatus_id)
-            .join(
-                                FOIRequestStatus,
-                                FOIRequestStatus.requeststatusid == FOIMinistryRequest.requeststatusid
-                            )
-            .outerjoin(FOIAssignee, FOIAssignee.username == cls.oiassignedto) 
+            .join(FOIRequestStatus, FOIRequestStatus.requeststatusid == FOIMinistryRequest.requeststatusid)
+            .join(FOIRestrictedMinistryRequest,
+                                and_(
+                                    FOIRestrictedMinistryRequest.ministryrequestid == FOIMinistryRequest.foiministryrequestid,
+                                    FOIRestrictedMinistryRequest.type == 'iao',
+                                    FOIRestrictedMinistryRequest.isactive == True),
+                                isouter=True
+            ).outerjoin(FOIAssignee, FOIAssignee.username == cls.oiassignedto) 
         )
-
+            
         if additionalfilter == 'watchingRequests':
             print("foi open info inside: watchingRequests ")
+            # basequery = basequery.join(subquery_watchby, subquery_watchby.c.ministryrequestid == FOIMinistryRequest.foiministryrequestid)
+            # basequery.join(subquery_watchby, subquery_watchby.c.ministryrequestid == FOIMinistryRequest.foiministryrequestid).filter(activefilter).filter(or_(or_(FOIRestrictedMinistryRequest.isrestricted == False, FOIRestrictedMinistryRequest.isrestricted == None), and_(FOIRestrictedMinistryRequest.isrestricted == True, FOIMinistryRequest.assignedto == userid)))
             subquery_watchby = FOIRequestWatcher.getrequestidsbyuserid(userid)
-            basequery = basequery.join(subquery_watchby, subquery_watchby.c.ministryrequestid == FOIMinistryRequest.foiministryrequestid)
+            basequery = basequery.join(
+                subquery_watchby, 
+                subquery_watchby.c.ministryrequestid == FOIMinistryRequest.foiministryrequestid
+            ).filter(FOIMinistryRequest.isactive == True ,cls.oiassignedto == userid)
         elif additionalfilter == 'myRequests':
             print("foi open info inside: myRequests ")
-            # basequery = basequery.filter(cls.oiassignedto == userid)
-            # Create a case for sorting exemption requests first
-            exemption_priority = case(
-                [(cls.oiexemption_id.isnot(None), 0)],  # Exemption requests first
-                else_=1
-            ).label('exemption_priority')
+            basequery = basequery.filter(
+                and_(
+                    FOIMinistryRequest.assignedgroup == 'OI Team',
+                    cls.oiassignedto == userid
+                )
+            ).order_by(
+                # Exemption requests first (1 if no exemption, 0 if has exemption)
+                case(
+                    [(cls.oiexemption_id.isnot(None), 0)],
+                    else_=1
+                ),
+                desc(FOIMinistryRequest.closedate)  # Then sort by closedate (newest to oldest)
+            )
             
-            basequery = (basequery
-                .filter(cls.oiassignedto == userid)
-                .order_by(
-                    exemption_priority,  # Sort exemption requests first
-                    asc(cls.publicationdate)  # Then by publication date (earliest to latest)
-                ))
+            # basequery = (basequery
+            #     .filter(cls.oiassignedto == userid)
+            #     .order_by(
+            #         exemption_priority,  # Sort exemption requests first
+            #         asc(cls.publicationdate)  # Then by publication date (earliest to latest)
+            #     ))
         elif additionalfilter == 'unassignedRequests':
             print("foi open info inside: unassignedRequests ")
-            basequery = basequery.filter(cls.oiassignedto == None)
+            #basequery = basequery.filter(cls.oiassignedto == None)
+            basequery = basequery.filter(
+                and_(
+                    FOIMinistryRequest.assignedgroup == 'OI Team',  # Requests assigned to OI Team
+                    FOIMinistryRequest.isactive == True,            # Active requests only
+                    cls.oiassignedto.is_(None)                      # Requests that are assigned to a user
+                )
+            ).order_by(
+                # Priority order: 
+                # 1. Exemption requests (oistatus_id = 2)
+                # 2. Publication reviews (oistatus_id = 4)
+                # 3. Other requests
+                case(
+                    [(FOIMinistryRequest.oistatus_id == 2, 0),     # Exemption requests first
+                    (FOIMinistryRequest.oistatus_id == 4, 1)],    # Publication reviews second
+                    else_=2                                         # Other requests last
+                ),
+                desc(FOIMinistryRequest.closedate)
+            )
         elif additionalfilter == 'teamRequests':
             print("foi open info inside: teamRequests ")
-            #basequery = basequery.filter(cls.oiassignedto.isnot(None))
-            # Create a case for sorting exemption requests first
-            # exemption_priority = case(
-            #     [(FOIMinistryRequest.oistatus_id == 2, 0)],  # Exemption requests first
-            #     else_=1
-            # ).label('exemption_priority')
-            
-            basequery = (basequery
-                .join(FOIMinistryRequest, 
-                        cls.foiministryrequest_id == FOIMinistryRequest.foiministryrequestid)
-                .filter(cls.oiassignedto.isnot(None))  # Team requests must be assigned
-                .order_by(
-                    case(
-                        [(FOIMinistryRequest.oistatus_id == 2, 0)],
-                        else_=1
-                    )  # Then by publication date (earliest to latest)
-                ))
+            basequery = basequery.filter(
+            and_(
+                FOIMinistryRequest.assignedgroup == 'OI Team',  # Requests assigned to OI Team
+                FOIMinistryRequest.isactive == True,            # Active requests only
+                cls.oiassignedto.isnot(None)                    # Requests that are assigned to a user
+            )
+            ).order_by(
+                # Exemption requests first (1 if no exemption, 0 if has exemption)
+                case(
+                    [(cls.oiexemption_id.isnot(None), 0)],
+                    else_=1
+                ),
+                desc(FOIMinistryRequest.closedate)  # Then sort by creation date (newest to oldest)
+            )
 
-        print("teamRequests basequery : ",basequery)
+
+        print("additionalfilter basequery : ",basequery)
         
         return basequery
 
@@ -373,7 +410,9 @@ class FOIOpenInformationRequests(db.Model):
         
         # Default sorting: Received Date (newest to oldest)
         if len(sortingcondition) == 0:
-            sortingcondition.append(nullslast(desc(cls.findfield('created_at'))))
+            sortingcondition.append(asc(cls.created_at))
+            #sortingcondition.append(nullslast(desc(cls.findfield('created_at'))))
+            
 
         # Always sort by id last to prevent pagination collisions
         sortingcondition.append(asc('id'))
@@ -442,6 +481,33 @@ class FOIOpenInformationRequests(db.Model):
         else:
             return text(filterfield).ilike(f'%{keyword}%')
     
+    @classmethod
+    def getgroupfilters(cls, groups):
+        if groups is None:
+            return FOIMinistryRequest.isactive == True
+        else:
+            groupfilter = []
+            if IAOTeamWithKeycloackGroup.oi.value in groups:
+                groupfilter.append(
+                            and_(
+                                FOIMinistryRequest.assignedgroup.in_(tuple(groups))
+                            )
+                        )
+                statusfilter = FOIMinistryRequest.requeststatuslabel != StateName.closed.name
+            else:
+                groupfilter.append(
+                        or_(
+                            FOIMinistryRequest.assignedgroup.in_(tuple(groups))
+                        )
+                    )
+                statusfilter = FOIMinistryRequest.requeststatuslabel.in_([StateName.callforrecords.name,StateName.recordsreview.name,StateName.feeestimate.name,StateName.consult.name,StateName.ministrysignoff.name,StateName.onhold.name,StateName.deduplication.name,StateName.harmsassessment.name,StateName.response.name,StateName.peerreview.name,StateName.tagging.name,StateName.readytoscan.name, StateName.recordsreadyforreview.name])
+            oifilter = and_(
+                                FOIMinistryRequest.isactive == True,
+                                FOIRequestStatus.isactive == True,
+                                or_(*groupfilter)
+                            )
+            return oifilter
+
 class FOIOpenInfoRequestSchema(ma.Schema):
     class Meta:
         fields = (

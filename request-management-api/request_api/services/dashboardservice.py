@@ -304,8 +304,8 @@ class dashboardservice:
         if not closedate:
             return 'N/A'
         
-        today = datetime.now(tz=pytz.timezone('America/Vancouver')).date()
-        closedate = closedate.date() if isinstance(closedate, datetime) else closedate
+        today = dt.datetime.now(tz=pytz.timezone('America/Vancouver')).date()
+        closedate = closedate.date() if isinstance(closedate, dt.datetime) else closedate
         
         business_days = 0
         current_date = closedate
@@ -313,7 +313,7 @@ class dashboardservice:
         while current_date <= today:
             if current_date.weekday() < 5:  # Monday = 0, Friday = 4
                 business_days += 1
-            current_date += timedelta(days=1)
+            current_date += dt.timedelta(days=1)
     
         return str(business_days) if business_days > 0 else 'N/A'   
 

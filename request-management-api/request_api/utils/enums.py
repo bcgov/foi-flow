@@ -100,6 +100,7 @@ class ProcessingTeamWithKeycloackGroup(Enum):
 class IAOTeamWithKeycloackGroup(Enum):
     intake = "Intake Team"
     flex = "Flex Team"
+    oi = "OI Team"
 
     @staticmethod
     def list():
@@ -110,6 +111,7 @@ class UserGroup(Enum):
     flex = "Flex Team"
     processing = "@processing"
     ministry = "@bcgovcode Ministry Team"
+    oi = "OI Team"
 
 class RequestorType(Enum):
     applicant = 1
