@@ -12,7 +12,7 @@ const ExportCFRForms = ({
   foiRequestCFRForm
 }) => {
 
-  let cfrForms = foiRequestCFRFormHistory?.some(cfr=>cfr.cfrfeeid===foiRequestCFRForm.cfrfeeid) ? []:[foiRequestCFRForm]
+  let cfrForms = foiRequestCFRFormHistory?.filter(cfr=>cfr?.cfrfeeid===foiRequestCFRForm?.cfrfeeid).length>0 ? []:[foiRequestCFRForm]
   foiRequestCFRFormHistory.map((cfrHistory) => {
     if (cfrHistory['cfrfeestatus.description'] === 'Approved') {
       cfrForms.push(cfrHistory);
@@ -22,10 +22,10 @@ const ExportCFRForms = ({
   return (
     <div id="CfrFormExport">
       {cfrForms.map((entry, index) => {
-        return <div style={{ pageBreakInside: 'avoid !important' }} className='request-accordian'
+        return <div className='request-accordian'
           key={entry.cfrfeeid}>
-          <Accordion defaultExpanded={true} className='history-entry-accordion'>
-            <AccordionSummary>
+          <Accordion defaultExpanded={true} className='history-entry-accordion' >
+            <AccordionSummary style={{ pageBreakInside: 'avoid' }} >
               <Typography className="history-entry-title">
                 {entry.version_created_at ? 'Version ' + (cfrForms.length - index) + " - " : "Draft - "} {entry['cfrformreason.description'] ? entry['cfrformreason.description'] : 'Original'}
               </Typography>
@@ -242,5 +242,4 @@ const ExportCFRForms = ({
     </div>
   );
 };
-
 export default ExportCFRForms;
