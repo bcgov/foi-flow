@@ -240,8 +240,8 @@ const ExportHistory = ({
     <div>
       {selectedExportOptions.isRequestDetailsChecked &&
         <div>
-          <div style={{ pageBreakInside: 'avoid' }}>
-            <div className="export_title" style={{ pageBreakInside: 'avoid' }}>
+          <div>
+            <div className="export_title">
               <h1 className="foi-review-request-text foi-ministry-requestheadertext">Request Details</h1>
             </div>
             <ExportRequestDetailsHistory requestDetails={requestDetails} requestState={requestState}

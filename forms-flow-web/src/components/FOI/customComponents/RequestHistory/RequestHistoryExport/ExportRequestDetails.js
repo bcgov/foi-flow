@@ -15,6 +15,7 @@ import _ from "lodash";
 import { Card, CardContent, Grid } from '@material-ui/core';
 import './exportrequestdetails.scss';
 import { Col, Row } from 'react-bootstrap';
+import AddressAndContactInfo from './AddressAndContactInfo';
 
 
 
@@ -112,6 +113,7 @@ const ExportRequestDetailsHistory = ({
             <ApplicantDetails requestDetails={requestDetails} />
             <ChildDetails requestDetails={requestDetails} />
             <OnBehalfDetails requestDetails={requestDetails} />
+            <AddressAndContactInfo requestDetails={requestDetails} />
             <RequestDescription requestDetails={requestDetails} />
             <RequestDetails requestDetails={requestDetails} />
             <AdditionalApplicantDetails
