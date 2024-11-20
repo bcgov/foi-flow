@@ -633,7 +633,7 @@ const AdvancedSearch = ({ userDetail }) => {
                       ].includes(key)).map(([key, value]) => (
                         <MenuItem
                           key={`request-state-type-${key}`}
-                          value={key}
+                          value={value.label}
                         >
                           <Checkbox
                             checked={
