@@ -12,11 +12,14 @@ let isBetween = require("dayjs/plugin/isBetween");
 let utc = require("dayjs/plugin/utc");
 let timezone = require("dayjs/plugin/timezone");
 let CryptoJS = require("crypto-js");
+let customParseFormat = require("dayjs/plugin/customParseFormat");
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
 dayjs.extend(isBetween);
 dayjs.extend(dayjsBusinessDays);
+dayjs.extend(customParseFormat); 
+
 const hd = new DateHolidayjs("CA", "BC");
 
 const replaceUrl = (URL, key, value) => {
@@ -536,6 +539,10 @@ const getCommentTypeFromId = (commentTypes, id) => {
   return "";
 };
 
+const convertSTRToDate = (dateString) => {
+  return dayjs(dateString, "YYYY MMM DD | hh:mm A").utc().format("YYYY-MM-DDTHH:mm:ss.SSS[Z]");
+}
+
 const setTeamTagList = (bcgovcode) => {
   //let fullnameList = getFullnameList();
   let iaoFullnameArray = [];
@@ -630,9 +637,10 @@ export {
   readUploadedFileAsBytes,
   getUserFullName,
   getCommentTypeIdByName,
+  getCommentTypeFromId,
+  convertSTRToDate,
   getCommentLabelFromId,
   getIAOAssignToList,
   setTeamTagList,
-  getIAOTagList,
-  getCommentTypeFromId
+  getIAOTagList
 };
