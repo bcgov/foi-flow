@@ -672,7 +672,7 @@ const AdvancedSearch = ({ userDetail }) => {
                           return <em>All</em>;
                         }
 
-                        return selected.map(value => StateEnum[value].name).join(", ");
+                        return selected.map(value => StateEnum.values().find(state => state.label === value).name).join(", ");
                       }}
                     >
                       <MenuItem disabled value="" key="request-state-all">
