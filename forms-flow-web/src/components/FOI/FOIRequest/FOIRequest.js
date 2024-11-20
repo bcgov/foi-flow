@@ -92,6 +92,7 @@ import {
   ConditionalComponent,
   formatDate,
   isRequestRestricted,
+  convertSTRToDate,
   getCommentTypeIdByName
 } from "../../../helper/FOI/helper";
 import DivisionalTracking from "./DivisionalTracking";
@@ -110,6 +111,7 @@ import { setFOIRequestDetail } from "../../../actions/FOI/foiRequestActions";
 import OIPCDetails from "./OIPCDetails/Index";
 import useOIPCHook from "./OIPCDetails/oipcHook";
 import MANDATORY_FOI_REQUEST_FIELDS from "../../../constants/FOI/mandatoryFOIRequestFields";
+import RequestHistorySection from "../customComponents/RequestHistory";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -171,6 +173,12 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
   );
   let CFRFormHistoryLength = useSelector(
     (state) => state.foiRequests.foiRequestCFRFormHistory.length
+  );
+  let foiRequestCFRFormHistory = useSelector(
+    (state) => state.foiRequests.foiRequestCFRFormHistory
+  );
+  let foiRequestCFRForm = useSelector(
+    (state) => state.foiRequests.foiRequestCFRForm
   );
   // let requestRecords = useSelector(
   //   (state) => state.foiRequests.foiRequestRecords
@@ -244,6 +252,10 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
       active: false,
     },
     Records: {
+      display: false,
+      active: false,
+    },
+    RequestHistory: {
       display: false,
       active: false,
     },
@@ -1075,13 +1087,39 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
       requestDetails?.requestType === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_GENERAL)
   }
 
-  const getCommentsCount = () => {
-    
-      let commentsCount= (requestNotes.filter( c => c.commentTypeId !== getCommentTypeIdByName(commentTypes,"Ministry Internal") && 
-            c.commentTypeId !== getCommentTypeIdByName(commentTypes, "Ministry Peer Review"))).length;
-      return '('+commentsCount+')'
+  const getHistoryCount = () => {
+    let historyCount= applicantCorrespondence.length + requestNotes.filter(
+            c => c.commentTypeId !== getCommentTypeIdByName(commentTypes, "Ministry Internal") &&
+                c.commentTypeId !== getCommentTypeIdByName(commentTypes, "Ministry Peer Review")
+        ).length;
+    return '('+historyCount+')'
+  } 
 
-  }
+  const getMergedHistory = (applicantCorrespondence, requestNotes) => {
+    const mergedHistory = [
+      ...(applicantCorrespondence || []).map((message) => ({
+        ...message,
+        type: 'message',
+        created_at: message.created_at ? convertSTRToDate(message.created_at) : message.created_at 
+      })),
+      ...(requestNotes || []).map((comment) => ({
+        ...comment,
+        type: 'comment'
+      }))
+    ];
+
+    return mergedHistory.sort((a, b) => {
+      const dateA = new Date(a.created_at || a.dateUF);
+      const dateB = new Date(b.created_at || b.dateUF);
+      return dateA - dateB || (a.commentId || a.applicantcorrespondenceid || 0) - (b.commentId || b.applicantcorrespondenceid || 0);
+    });
+  };
+  const getCommentsCount = () => {
+    let commentsCount= (requestNotes.filter( c => c.commentTypeId !== getCommentTypeIdByName(commentTypes,"Ministry Internal") && 
+          c.commentTypeId !== getCommentTypeIdByName(commentTypes, "Ministry Peer Review"))).length;
+    return '('+commentsCount+')'
+
+}
 
   return (!isLoading &&
     requestDetails &&
@@ -1186,6 +1224,16 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
                 )}
               </>
             )}
+            <div
+              className={clsx("tablinks", {
+                active: tabLinksStatuses.RequestHistory.active,
+              })}
+              name="RequestHistory"
+              onClick={() => tabclick("RequestHistory")}
+            >
+              Request History{" "}
+              {getHistoryCount()}
+            </div>
           </div>
 
           <div className="foileftpanelstatus">
@@ -1731,6 +1779,48 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
               )}
             </div>
           )}
+          <div
+            id="RequestHistory"
+            className={clsx("tabcontent", {
+              active: tabLinksStatuses.RequestHistory.active,
+              [classes.displayed]: tabLinksStatuses.RequestHistory?.display,
+              [classes.hidden]: !tabLinksStatuses.RequestHistory?.display,
+            })}
+          >
+            {!isLoading && (requestNotes || applicantCorrespondence) ? (
+              <>
+                <RequestHistorySection
+                  requestHistoryArray={getMergedHistory(applicantCorrespondence, requestNotes)}
+                  currentUser={
+                    userId && {
+                      userId: userId,
+                      avatarUrl: avatarUrl,
+                      name: fullName,
+                    }
+                  }
+                  bcgovcode={bcgovcode}
+                  requestid={requestId}
+                  iaoassignedToList={iaoassignedToList}
+                  ministryAssignedToList={ministryAssignedToList}
+                  requestNumber={requestNumber}
+                  isRestricted={isRequestRestricted(requestDetails, ministryId)}
+                  isMinistry={false}
+                  commentTypes={commentTypes}
+                  ministryId={ministryId}
+                  applicantCorrespondenceTemplates={applicantCorrespondenceTemplates}
+                  setComment={setComment}
+                  requestDetails={requestDetails}
+                  requestState={requestState}
+                  foiRequestCFRFormHistory={foiRequestCFRFormHistory}
+                  foiRequestCFRForm={foiRequestCFRForm}
+                  applicantCorrespondence={applicantCorrespondence}
+                  requestNotes={requestNotes}
+                />
+              </>
+            ) : (
+              <Loading />
+            )}
+          </div>
           <UnsavedModal
             modalOpen={unsavedPrompt}
             handleClose={() => setUnsavedPrompt(false)}
