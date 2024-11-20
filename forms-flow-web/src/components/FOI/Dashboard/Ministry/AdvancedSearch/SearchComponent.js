@@ -622,7 +622,7 @@ const AdvancedSearch = ({ userDetail }) => {
                           return <em>All</em>;
                         }
 
-                        return selected.map(value => StateEnum.values().find(state => state.label === value).name).join(", ");
+                        return selected.map(value => Object.values(StateEnum).find(state => state.label === value).name).join(", ");
                       }}
                     >
                       <MenuItem disabled value="" key="request-state-all">
@@ -637,7 +637,7 @@ const AdvancedSearch = ({ userDetail }) => {
                         >
                           <Checkbox
                             checked={
-                              requestState.indexOf(key) > -1
+                              requestState.indexOf(value.label) > -1
                             }
                             color="success"
                           />
