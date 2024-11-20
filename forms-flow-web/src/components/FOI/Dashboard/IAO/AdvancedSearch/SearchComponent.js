@@ -681,7 +681,7 @@ const AdvancedSearch = ({ userDetail }) => {
                       {Object.entries(StateEnum).filter(([key, value]) => key !== 'callforrecordsoverdue').map(([key, value]) => (
                         <MenuItem
                           key={`request-state-type-${key}`}
-                          value={key}
+                          value={value.label}
                         >
                           <Checkbox
                             checked={
