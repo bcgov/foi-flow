@@ -22,6 +22,8 @@ const StateDropDown = ({
   stateTransition,
   updateStateDropDown,
   requestType,
+  isDivisionalCoordinator,
+  isHistoricalRequest,
   disabled,
 }) => {
   const _isMinistryCoordinator = isMinistryCoordinator;
@@ -149,10 +151,10 @@ const StateDropDown = ({
       case StateEnum.redirect.name.toLowerCase():
         return _stateList.redirect;
       case StateEnum.callforrecords.name.toLowerCase():
-        if (_isMinistryCoordinator && personalRequest) {
+        if (_isMinistryCoordinator) {
           if (isMCFMinistryTeam) {
             return appendRecordsReadyForReview(_stateList.callforrecordsforpersonal);
-          } else {
+          } else if (personalRequest) {
             return _stateList.callforrecordsforpersonal;
           }
         }
@@ -200,6 +202,9 @@ const StateDropDown = ({
         if (personalIAO) return _stateList.feeassessedforpersonal;
         return _stateList.feeassessed;
       case StateEnum.deduplication.name.toLowerCase():
+        if (!isMCFMinistryTeam) {
+          return _stateList.deduplication.filter(_state => _state.status.toLowerCase() !== StateEnum.recordsreadyforreview.name.toLowerCase());
+        }
         return _stateList.deduplication;
       case StateEnum.harms.name.toLowerCase():
         return _stateList.harms;
@@ -257,22 +262,40 @@ const StateDropDown = ({
       );
     });
   return (
-    <TextField
-      id="foi-status-dropdown"
-      label="Status"
-      className="foi-state-dropdown"
-      InputLabelProps={{ shrink: false }}
-      inputProps={{ "aria-labelledby": "foi-status-dropdown-label" }}
-      select
-      value={status}
-      onChange={handleChange}
-      input={<Input />}
-      variant="outlined"
-      fullWidth
-      disabled={disabled}
-    >
-      {menuItems}
-    </TextField>
+    !isHistoricalRequest ?
+      <TextField
+        id="foi-status-dropdown"
+        label="Status"
+        className="foi-state-dropdown"
+        InputLabelProps={{ shrink: false }}
+        inputProps={{ "aria-labelledby": "foi-status-dropdown-label" }}
+        select
+        value={status}
+        onChange={handleChange}
+        input={<Input />}
+        variant="outlined"
+        fullWidth
+        disabled={isDivisionalCoordinator}
+      >
+        {menuItems}
+      </TextField>
+    :
+      <TextField
+        id="foi-status-dropdown"
+        label="Status"
+        className="foi-state-dropdown"
+        InputLabelProps={{ shrink: false }}
+        inputProps={{ "aria-labelledby": "foi-status-dropdown-label" }}
+        value={status}
+        onChange={handleChange}
+        input={<Input />}
+        variant="outlined"
+        fullWidth
+        disabled
+      >
+      </TextField>
+    
+    
   );
 };
 

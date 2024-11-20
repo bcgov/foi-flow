@@ -18,6 +18,7 @@ const initialState = {
   showAdvancedSearch: false,
   showEventQueue: false,
   foiAdvancedSearchParams: {},
+  foiHistoricalSearchParams:{},
   isAssignedToListLoading: true,
   isAttachmentListLoading: true,
   isCommentTagListLoading: true,
@@ -60,11 +61,13 @@ const initialState = {
   foiPDFStitchedRecordForOipcRedlineReview: {},
   foiPDFStitchedRecordForOipcRedline: {},
   foiPDFStitchedRecordForResponsePackage: {},
+  foiPDFStitchedRecordForConsultPackage: {},
   foiPDFStitchStatusForHarms: "not started",
   foiPDFStitchStatusForRedlines: "not started",
   foiPDFStitchStatusForResponsePackage: "not started",
   foiPDFStitchStatusForOipcRedlineReview: "not started",
   foiPDFStitchStatusForOipcRedline: "not started",
+  foiPDFStitchStatusForConsults: "not started",
   foiRequestCFRForm: {
     overallsuggestions: "",
     status: "init",
@@ -157,6 +160,8 @@ const initialState = {
   oiPublicationStatuses: [],
   oiStatuses: [],
   foiOpenInfoRequest: {},
+  foiadvancedsearchfilter:"foimod",
+  foiCommentTypes:[]
 };
 
 const foiRequests = (state = initialState, action) => {
@@ -187,6 +192,14 @@ const foiRequests = (state = initialState, action) => {
           ...action.payload,
         },
       };
+    case FOI_ACTION_CONSTANTS.FOI_HISTORIC_SEARCH_PARAMS:
+        return {
+          ...state,
+          foiHistoricalSearchParams: {
+            ...state.foiHistoricalSearchParams,
+            ...action.payload,
+          },
+        };  
     case FOI_ACTION_CONSTANTS.IS_ASSIGNEDTOLIST_LOADING:
       return { ...state, isAssignedToListLoading: action.payload };
     case FOI_ACTION_CONSTANTS.IS_ATTACHMENTLIST_LOADING:
@@ -294,6 +307,8 @@ const foiRequests = (state = initialState, action) => {
         ...state,
         foiPDFStitchedRecordForOipcRedline: action.payload,
       };
+    case FOI_ACTION_CONSTANTS.FOI_PDF_STITCHED_RECORD_FOR_CONSULTS:
+      return { ...state, foiPDFStitchedRecordForConsultPackage: action.payload };
     case FOI_ACTION_CONSTANTS.FOI_PDF_STITCHED_STATUS_FOR_HARMS:
       return { ...state, foiPDFStitchStatusForHarms: action.payload };
     case FOI_ACTION_CONSTANTS.FOI_PDF_STITCHED_STATUS_FOR_REDLINES:
@@ -304,6 +319,8 @@ const foiRequests = (state = initialState, action) => {
       return { ...state, foiPDFStitchStatusForOipcRedlineReview: action.payload };
     case FOI_ACTION_CONSTANTS.FOI_PDF_STITCHED_STATUS_FOR_OIPCREDLINE:
       return { ...state, foiPDFStitchStatusForOipcRedline: action.payload };
+    case FOI_ACTION_CONSTANTS.FOI_PDF_STITCHED_STATUS_FOR_CONSULTS:
+      return { ...state, foiPDFStitchStatusForConsults: action.payload };
     case FOI_ACTION_CONSTANTS.FOI_REQUEST_CFR_FORM:
       return {
         ...state,
@@ -357,6 +374,10 @@ const foiRequests = (state = initialState, action) => {
       return { ...state, oiStatuses: action.payload };
     case FOI_ACTION_CONSTANTS.FOI_OPENINFO_REQUEST:
       return {...state, foiOpenInfoRequest: action.payload}
+    case FOI_ACTION_CONSTANTS.FOI_ADVANCED_SEARCH_FILTER:
+      return { ...state, foiadvancedsearchfilter: action.payload };    
+    case FOI_ACTION_CONSTANTS.FOI_COMMENT_TYPES:
+      return { ...state, foiCommentTypes: action.payload };
     default:
       return state;
   }
