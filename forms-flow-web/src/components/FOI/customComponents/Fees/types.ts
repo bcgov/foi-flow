@@ -23,8 +23,9 @@ export type ApplicationFeeFormData = {
   paymentDate: any;
   orderId: string;
   transactionNumber: string;
-  receiptfilename: string;
-  receiptfilepath: string;
+  receipts: any[];
+  refundAmount: number;
+  refundDate: any;
   reasonForRefund: string;
   paymentId: number | null;
 }

@@ -14,9 +14,9 @@ class FOIRequestApplicationFee(db.Model):
     paymentdate = db.Column(db.DateTime, nullable=True)
     orderid = db.Column(db.String(50), nullable=True)
     transactionnumber = db.Column(db.String(50), nullable=True)
+    refundamount = db.Column(db.Float, nullable=True)
+    refunddate = db.Column(db.DateTime, nullable=True)
     reasonforrefund = db.Column(db.String, nullable=True)
-    receiptfilename = db.Column(db.String(500), unique=False, nullable=True)
-    receiptfilepath = db.Column(db.Text, nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.now)
     createdby = db.Column(db.String(120), unique=False, nullable=True)
     updated_at = db.Column(db.DateTime, nullable=True)
@@ -38,4 +38,4 @@ class FOIRequestApplicationFee(db.Model):
 
 class FOIRequestApplicationFeeSchema(ma.Schema):
     class Meta:
-        fields = ('applicationfeeid', 'version', 'requestid', 'applicationfeestatus', 'amountpaid', 'paymentsource', 'paymentdate', 'orderid', 'transactionnumber', 'reasonforrefund', 'receiptfilename', 'receiptfilepath', 'created_at', 'createdby', 'updated_at', 'updatedby') 
+        fields = ('applicationfeeid', 'version', 'requestid', 'applicationfeestatus', 'amountpaid', 'paymentsource', 'paymentdate', 'orderid', 'transactionnumber', 'refundamount', 'refunddate', 'reasonforrefund', 'receipts', 'created_at', 'createdby', 'updated_at', 'updatedby') 

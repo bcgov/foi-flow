@@ -98,7 +98,9 @@ const initialState = {
     paymentdate: null,
     orderid: null,
     transactionnumber: null,
-    files: [],
+    receipts: [],
+    refundamount: 0,
+    refunddate: null,
     reasonForRefund: "",
     paymentid: null
   },

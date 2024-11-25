@@ -85,6 +85,7 @@ export const Fees = ({
 
     const [initialCFRFormData, setInitialCFRFormData] = useState(blankCFRForm);
     const [CFRFormData, setCFRFormData] = useState(initialCFRFormData);
+    const [rerenderFileUpload, setRerenderFileUpload] = useState(true);
     
     React.useEffect(() => {
       let formattedData = {
@@ -156,8 +157,9 @@ export const Fees = ({
       paymentDate: '',
       orderId: '',
       transactionNumber: '',
-      receiptfilename: '',
-      receiptfilepath: '',
+      receipts: [],
+      refundAmount: 0,
+      refundDate: '',
       reasonForRefund: '',
       paymentId: null
     };
@@ -173,8 +175,9 @@ export const Fees = ({
         paymentDate: initialApplicationFeeState.paymentdate,
         orderId: initialApplicationFeeState.orderid,
         transactionNumber: initialApplicationFeeState.transactionnumber,
-        receiptfilename: initialApplicationFeeState.receiptfilename,
-        receiptfilepath: initialApplicationFeeState.receiptfilepath,
+        receipts: initialApplicationFeeState.receipts,
+        refundAmount: initialApplicationFeeState.refundamount,
+        refundDate: initialApplicationFeeState.refunddate,
         reasonForRefund: initialApplicationFeeState.reasonforrefund,
         paymentId: initialApplicationFeeState.paymentid
       };
@@ -212,6 +215,10 @@ export const Fees = ({
     const validateApplicationFeeAmountPaid = () => {
       return applicationFeeFormData?.amountPaid % 10 == 0 ? true : false;
     }
+
+    const validateApplicationFeeRefundAmount = () => {
+      return applicationFeeFormData?.refundAmount % 10 == 0 && applicationFeeFormData?.refundAmount <= applicationFeeFormData?.amountPaid ? true : false;
+    }
   
     const validateFields = () => {
       if (applicationFeeFormData?.paymentSource != 'creditcardonline' && applicationFeeFormData?.paymentSource != 'init') {
@@ -237,6 +244,11 @@ export const Fees = ({
       if (!validateApplicationFeeAmountPaid()) {
         return false;
       }
+      if (!validateApplicationFeeRefundAmount()) {
+        return false;
+      }
+
+      if (receiptFileUpload && receiptFileUpload.length > 0) return true;
 
       return !_.isEqual(initialCFRFormData, CFRFormData) || !_.isEqual(initialApplicationFeeFormData, applicationFeeFormData);
     }
@@ -364,8 +376,12 @@ export const Fees = ({
                 )
               };
               let applicationFeeData;
+              const newReceiptUploads = []
+              for (let document of _documents) {
+                newReceiptUploads.push({receiptfilename: document.filename, receiptfilepath: document.documentpath})
+              }
               // Save Application Fee form only if there are changes
-              if (!_.isEqual(initialApplicationFeeFormData, applicationFeeFormData)) {
+              if (!_.isEqual(initialApplicationFeeFormData, applicationFeeFormData) || newReceiptUploads.length > 0) {
                 applicationFeeData = {
                   applicationfeeid: applicationFeeFormData?.applicationfeeid,
                   applicationfeestatus: applicationFeeFormData?.applicationFeeStatus,
@@ -374,9 +390,10 @@ export const Fees = ({
                   paymentdate: applicationFeeFormData?.paymentDate,
                   orderid: applicationFeeFormData?.orderId,
                   transactionnumber: applicationFeeFormData?.transactionNumber,
+                  refundamount: applicationFeeFormData?.refundAmount,
+                  refunddate: applicationFeeFormData?.refundDate,
                   reasonforrefund: applicationFeeFormData?.reasonForRefund,
-                  receiptfilename: _documents[0].filename,
-                  receiptfilepath: _documents[0].documentpath
+                  receipts: [...applicationFeeFormData?.receipts, ...newReceiptUploads]
                 }
                 saveApplicationFeeForm(
                   applicationFeeData,
@@ -392,6 +409,9 @@ export const Fees = ({
               if (applicationFeeFormData?.applicationFeeStatus == 'appfeeowing') {
                 handleStateChange('App Fee Owing');
               }
+              setReceiptFileUpload(null)
+              setRerenderFileUpload(false)
+              setRerenderFileUpload(true)
             }
           })
         }             
@@ -400,17 +420,20 @@ export const Fees = ({
 
     const saveApplicationFeeTab = () => {
       setStatusChangeModalOpen(false);
-      // FIRST save receipt file if present
       if (receiptFileUpload && receiptFileUpload.length > 0) {
         // Example: dev-forms-foirequest-e/Misc/EDU-2024-09161111/appfeereceipt/bdc62f7e-1d29-42a7-852d-7fc81acc1cc0.pdf
-        let fileInfo = {
-          ministrycode: "Misc",
-          requestnumber: requestNumber ? requestNumber : `U-00${requestId}`,
-          filestatustransition: 'appfeereceipt',
-          filename: receiptFileUpload?.[0].name,
-          filesize: receiptFileUpload?.[0].size,
-        };
-        saveReceiptAndApplicationFeeData(true, [fileInfo], receiptFileUpload);
+        let receiptsToUpload: any = [];
+        for (let receipt of receiptFileUpload) {
+          let fileInfo = {
+            ministrycode: "Misc",
+            requestnumber: requestNumber ? requestNumber : `U-00${requestId}`,
+            filestatustransition: 'appfeereceipt',
+            filename: receipt?.name,
+            filesize: receipt?.size,
+          };
+          receiptsToUpload.push(fileInfo);
+        }
+        saveReceiptAndApplicationFeeData(true, receiptsToUpload, receiptFileUpload);
       } else {
         let applicationFeeCallback = (_res: string) => {
           setInitialApplicationFeeFormData(applicationFeeFormData)
@@ -438,9 +461,10 @@ export const Fees = ({
           paymentdate: applicationFeeFormData?.paymentDate,
           orderid: applicationFeeFormData?.orderId,
           transactionnumber: applicationFeeFormData?.transactionNumber,
+          refundamount: applicationFeeFormData?.refundAmount,
+          refunddate: applicationFeeFormData?.refundDate,
           reasonforrefund: applicationFeeFormData?.reasonForRefund,
-          receiptfilename: applicationFeeFormData?.receiptfilename,
-          receiptfilepath: applicationFeeFormData?.receiptfilepath
+          receipts: applicationFeeFormData?.receipts
         }
         saveApplicationFeeForm(
           applicationFeeData,
@@ -711,6 +735,7 @@ export const Fees = ({
                   setCFRUnsaved={setCFRUnsaved}
                   formData={applicationFeeFormData}
                   setFormData={setApplicationFeeFormData}
+                  rerenderFileUpload={rerenderFileUpload}
                   handleTextChanges={handleTextChanges}
                   updateFilesCb={updateFilesCb}
                 />}
