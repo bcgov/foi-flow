@@ -20,7 +20,7 @@ from request_api.tracer import Tracer
 from request_api.utils.util import  cors_preflight, allowedorigins
 from request_api.exceptions import BusinessException, Error
 from request_api.services.applicationfeeservice import applicationfeeservice
-from request_api.schemas.foiapplicationfee import FOIApplicationFeeDataSchema
+from request_api.schemas.foiapplicationfee import FOIApplicationFeeDataSchema, FOIApplicationFeeReceiptDataSchema
 import json
 from flask_cors import cross_origin
 import logging
@@ -66,6 +66,19 @@ class SanctionFOICFRFee(Resource):
             requestjson = request.get_json() 
             foiapplicationfeeschema = FOIApplicationFeeDataSchema().load(requestjson)
             result = applicationfeeservice().saveapplicationfee(requestid, foiapplicationfeeschema,AuthHelper.getuserid())
+            receipts = []
+            for receipt in foiapplicationfeeschema['receipts']:
+                if 'receiptid' not in receipt:
+                    # Create new receipts
+                    receipt['createdby'] = AuthHelper.getuserid()
+                    receipt['applicationfeeid'] = result.identifier
+                    receipt['isactive'] = True
+                    applicationfeereceiptschema = FOIApplicationFeeReceiptDataSchema().load(receipt)
+                    savedreceipt = applicationfeeservice().saveapplicationfeereceipt(applicationfeereceiptschema)
+                    receipts.append(savedreceipt)
+                elif 'isactive' in receipt and receipt['isactive'] == False:
+                    # Deactivate deleted receipts
+                    applicationfeeservice().deactivateapplicationfeereceipt(receipt['receiptid'], AuthHelper.getuserid())
             return {'status': result.success, 'message':result.message,'id':result.identifier} , 200 
         except ValidationError as verr:
             logging.error(verr)
