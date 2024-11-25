@@ -28,6 +28,7 @@ export const ApplicationFeeTab = ({
     setCFRUnsaved,
     formData,
     setFormData,
+    rerenderFileUpload,
     updateFilesCb
   }: any) => {
 
@@ -50,6 +51,13 @@ export const ApplicationFeeTab = ({
       const value : number = +(e.target.value.match(re)?.[0] || 0)
   
       setFormData((values: any) => ({...values, ['amountPaid']: value}));
+    }
+
+    const handleRefundAmountChanges = (e: React.ChangeEvent<HTMLInputElement>) => {
+      const re = new RegExp('^-?\\d+(?:\.\\d{0,' + (2 || -1) + '})?');
+      const value : number = +(e.target.value.match(re)?.[0] || 0)
+  
+      setFormData((values: any) => ({...values, ['refundAmount']: value}));
     }
 
     const tooltipTotals = {
@@ -258,17 +266,14 @@ export const ApplicationFeeTab = ({
       if (formData?.applicationFeeStatus == 'na-ige') return true;
       return false;
     }
-
-    // options for FileUpload
-    const [attachment, setAttachment] = useState([])
-
-    let multipleFiles = false
+    let attachment: any = [];
+    let multipleFiles = true
     let mimeTypes = ['.pdf', '.doc', '.docx', '.jpeg', '.jpg', '.png', '.tiff', '.tif', '.xls', '.xlsx', '.csv']
     let maxFileSize = 100;
     let totalFileSize = 100;
     let attchmentFileNameList: any[] = []
     let existingDocuments;
-    let maxNumberOfFiles = 1
+    let maxNumberOfFiles = 10
     let modalFor;
     let handleTagChange;
     let tagValue;
@@ -280,7 +285,7 @@ export const ApplicationFeeTab = ({
   
     const receiptUploadField = (
       <div className="col-lg-12 foi-details-col">
-        <FileUpload
+        {formData?.paymentSource != 'init' && rerenderFileUpload && <FileUpload
           attachment={attachment}
           attchmentFileNameList={attchmentFileNameList}
           multipleFiles={multipleFiles}
@@ -298,7 +303,7 @@ export const ApplicationFeeTab = ({
           existingDocuments={existingDocuments}
           totalUploadedRecordSize={totalUploadedRecordSize}
           totalRecordUploadLimit={totalRecordUploadLimit}
-        />
+        />}
       </div>
     )
 
@@ -334,9 +339,9 @@ export const ApplicationFeeTab = ({
       })
     }
 
-    const getReceiptFile = () => {
-      if (formData?.receiptfilename) {
-        const filepath = formData?.receiptfilepath.split('/').slice(4).join('/')
+    const getReceiptFile = (filename: string, rawfilepath: string) => {
+      if (filename) {
+        const filepath = rawfilepath.split('/').slice(4).join('/')
         getFOIS3DocumentPreSignedUrl(filepath, undefined, dispatch, (err: any, res: any) => {
           if (!err) {
             getFileFromS3({filepath: res}, (_err: any, response: any) => {
@@ -351,21 +356,91 @@ export const ApplicationFeeTab = ({
       }
     }
 
-    const uploadedReceiptField = (
-      <div className="col-lg-12 foi-details-col">
-        {/* <a onClick={getReceiptFile(formData?.receiptfilepath)} target="_blank">{formData?.receiptfilename}</a> */}
-        <u
-          onClick={() => {
-            getReceiptFile()}
-          }
-        >{formData?.receiptfilename ? formData?.receiptfilename : 'view online payment receipt'}</u>
-        <i
-          className="fa fa-times-circle"
-          onClick={() => setFormData((values: any) => ({...values, ['receiptfilename']: '', ['receiptfilepath']: ''}))}
-        >
-        </i>
+    const uploadedReceiptsField = formData?.receipts.map((receipt: any) => {
+      if (receipt.isactive) {
+        return (
+          <div className="col-lg-12 foi-details-col">
+            <u
+              onClick={() => {
+                getReceiptFile(receipt?.receiptfilename, receipt?.receiptfilepath)}
+              }
+            >{receipt.receiptfilename ? receipt.receiptfilename : 'view online payment receipt'}</u>
+            <i
+              className="fa fa-times-circle"
+              onClick={() => setFormData((values: any) => ({...values, ['receipts']: [...formData?.receipts.filter((r: any) => r.receiptfilename != receipt.receiptfilename), {...receipt, isactive: false}]}))}
+            >
+            </i>
+          </div>
+        )}
+    })
+
+    const disableRefundFields = () => {
+      return formData?.amountPaid == 0 || formData?.amountPaid == null || formData?.amountPaid == '' || formData?.amountPaid % 10 != 0
+    }
+
+    const [refundAmountHelperText, setRefundAmountHelperText] = useState('')
+
+    React.useEffect(() => {
+      if (formData?.refundAmount % 10 != 0) {
+        setRefundAmountHelperText('You can only enter as increments of 10')
+      } else if (formData?.refundAmount > formData?.amountPaid) {
+        setRefundAmountHelperText('Refund amount cannot be greater than amount paid')
+      } else {
+        setRefundAmountHelperText('')
+      }
+    }, [formData?.refundAmount])
+
+    const refundAmountField = (
+      <div className="col-lg-6 foi-details-col">
+        <TextField
+          id="refundamount"
+          label="Refund Amount"
+          inputProps={{
+            "aria-labelledby": "refundamount-label",
+            step: 0.01,
+            min: 0
+          }}
+          InputProps={{
+            startAdornment: <InputAdornment position="start">$</InputAdornment>
+          }}
+          InputLabelProps={{ shrink: true }}
+          variant="outlined"
+          name="refundAmount"
+          type="number"
+          value={formData?.refundAmount}
+          onChange={handleRefundAmountChanges}
+          onBlur={(e) => {
+            e.target.value = parseFloat(e.target.value).toFixed(2);
+          }}
+          fullWidth
+          error={formData?.refundAmount % 10 != 0 || formData?.refundAmount > formData?.amountPaid}
+          helperText={refundAmountHelperText}
+          disabled={disableRefundFields()}
+        />
       </div>
     )
+
+    const refundDateField = (
+      <div className="col-lg-6 foi-details-col">
+        <TextField
+          id="refundDate"
+          label="Refund Date"
+          type="date"
+          value={formData?.refundDate?.split(' ')[0] || ''}
+          name="refundDate"
+          onChange={handleTextChanges}
+          inputProps={{ "aria-labelledby": "refundDate-label"}}
+          InputLabelProps={{
+          shrink: true,
+          }}
+          InputProps={{inputProps: { max: formatDate(new Date())} }}
+          variant="outlined"
+          fullWidth
+          disabled={disableRefundFields()}
+        />
+      </div>
+    )
+
     return (
       <>
         <div className='request-accordian'>
@@ -383,7 +458,7 @@ export const ApplicationFeeTab = ({
                 {orderIdField}
                 {transactionNumberField}
                 {receiptUploadField}
-                {formData?.receiptfilename || formData?.paymentSource == 'creditcardonline' ? uploadedReceiptField : <></>}
+                {formData?.receipts.length > 0 || formData?.paymentSource == 'creditcardonline' ? uploadedReceiptsField : <></>}
               </div>}
               <div className="cfrform-floatRight cfrform-totals">
                 <CustomizedTooltip content={tooltipTotals} position={""} />
@@ -399,6 +474,10 @@ export const ApplicationFeeTab = ({
             </AccordionSummary>
             <AccordionDetails>
               <div className="row foi-details-row">
+                {refundAmountField}
+                {refundDateField}
+              </div>
+              <div className="row foi-details-row">
                 <div className="col-lg-12 foi-details-col">
                   <TextField
                     id="reasonforrefund"
@@ -411,7 +490,7 @@ export const ApplicationFeeTab = ({
                     InputLabelProps={{ shrink: true, }}
                     onChange={handleTextChanges}
                     fullWidth
-                    // disabled={cfrEstimatedDisabled()} 
+                    disabled={disableRefundFields()} 
                   />
                 </div>
               </div>
