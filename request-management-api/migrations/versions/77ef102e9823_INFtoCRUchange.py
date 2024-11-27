@@ -1,4 +1,4 @@
-"""empty message
+"""INF Team mapping to CRU
 
 Revision ID: 77ef102e9823
 Revises: ddcd4045fc38
