@@ -111,7 +111,7 @@ export const ContactApplicant = ({
     setFiles([]);
     setEditorValue("");
     setSelectedCorrespondence({});
-    setSelectedEmails([]);
+    setSelectedEmails(requestDetails.email ? [requestDetails.email] : []);
     setCurrentTemplate(0);
     
   }
@@ -214,7 +214,6 @@ export const ContactApplicant = ({
       }
     })
     applicantCorrespondenceTemplates.forEach((item: any) => {
-      setTemplates([{ value: "", label: "", templateid: null, text: "", disabled: true, created_at:"" }]);
       if (isEnabledTemplate(item) || listOfDraftTemplates.includes(item.templateid)) {
       const rootpath = OSS_S3_BUCKET_FULL_PATH
       const fileInfoList = [{
@@ -293,7 +292,7 @@ export const ContactApplicant = ({
 
   const [editorValue, setEditorValue] = useState("")
   const [currentTemplate, setCurrentTemplate] = useState(0)
-  const [selectedEmails, setSelectedEmails] = useState([]);
+  const [selectedEmails, setSelectedEmails] = useState<string[]>([]);
   // Create a ref to store the Quill instance
   const quillRef = useRef(null);
 
@@ -1163,6 +1162,7 @@ export const ContactApplicant = ({
               attachments={files}
               templateInfo={templates[currentTemplate]}
               enableSend={selectedEmails.length > 0}
+              selectedEmails={selectedEmails}
             />  
             {/*
             <button

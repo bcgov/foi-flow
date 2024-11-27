@@ -23,7 +23,8 @@ export const PreviewModal = React.memo(({
   handleExport,
   attachments,
   templateInfo,
-  enableSend
+  enableSend,
+  selectedEmails
 }: previewParams) => {
 
   const dispatch = useDispatch();
@@ -80,9 +81,13 @@ export const PreviewModal = React.memo(({
           <IconButton aria-label= "close" onClick={handleClose}>
             <CloseIcon />
           </IconButton>
-        </DialogTitle>
+      </DialogTitle>
       <DialogContent>
         <DialogContentText id="state-change-dialog-description" component={'span'}>
+          <div className="state-change-email-note">
+          {enableSend && selectedEmails.length > 0 && (<p>Email to: {selectedEmails.join(', ')}</p>)}
+          {!enableSend && (<p>There is no email associated with this applicant a word doc will be created to be printed.</p>)}
+          </div>
           <div className="preview-container">
             <iframe srcDoc={ renderTemplate(template, innerhtml, templateVariables) } className="preview-frame" sandbox="allow-same-origin" />
           </div>

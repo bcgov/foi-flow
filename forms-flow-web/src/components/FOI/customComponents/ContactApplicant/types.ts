@@ -31,6 +31,7 @@ export type previewParams = {
   attachments: Array<any>
   templateInfo: any;
   enableSend: boolean;
+  selectedEmails: string[];
 }
  export type downloadCorrespondenceParams = {
   modalOpen: boolean;
