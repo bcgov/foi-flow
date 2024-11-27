@@ -125,3 +125,4 @@ datamigrations/FOIMOD.AXIS.DocumentMigration/FOIMOD.HistoricalDocMigration.Utils
 datamigrations/FOIMOD.AXIS.DocumentMigration/*/obj/*
 datamigrations/FOIMOD.AXIS.DocumentMigration/*/bin/*
 datamigrations/FOIMOD.AXIS.DocumentMigration/.vs/*
+*.locenv
