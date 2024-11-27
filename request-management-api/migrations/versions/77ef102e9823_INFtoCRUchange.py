@@ -27,6 +27,15 @@ def upgrade():
 	(select programareaid from public."ProgramAreas" where iaocode in ('INF')) sq2
     ''')
 
+     # add INF to Coordinated Response Unit
+    op.execute('''INSERT INTO public."FOIRequestTeams"(	requesttype, requeststatusid, teamid, programareaid, isactive, requeststatuslabel)
+	select requesttype, requeststatusid, teamid, programareaid, isactive, statuslabel from
+	(select 'Personal' as requesttype, (select teamid from public."OperatingTeams" where name = 'Coordinated Response Unit') as teamid, requeststatusid, true as isactive, statuslabel
+	 from public."FOIRequestStatuses" where name in (
+        'Call For Records','Closed','Records Review','Fee Estimate','Consult','Ministry Sign Off','On Hold','Harms Assessment','Response'
+    )) sq,
+	(select programareaid from public."ProgramAreas" where iaocode in ('INF')) sq2
+    ''')
 
     op.execute('''UPDATE public."FOIRequestTeams" SET isactive=false WHERE programareaid in(
         SELECT programareaid FROM public."ProgramAreas" WHERE iaocode='INF') AND 
