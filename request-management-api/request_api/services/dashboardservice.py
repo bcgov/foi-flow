@@ -280,7 +280,8 @@ class dashboardservice:
 
     #     return jsonify({'data': requestqueue, 'meta': meta})
 
-    def __preparefoioirequestinfo(self, request, receivedDate, publicationDate , fromClosed):
+    def __preparefoioirequestinfo(self, request, receivedDate, publicationDate, fromClosed, oilayerpagecount):
+        print("request : ", request)
         return {
             'id': request.id,
             'idNumber': request.idNumber,
@@ -297,6 +298,7 @@ class dashboardservice:
             'version': request.version,
             'foiopeninforequestid': request.foiopeninforequestid,
             'currentState': request.currentState,
+            'oilayerpagecount': oilayerpagecount if oilayerpagecount else '0',
         }
 
     def __calculate_from_closed(self, closedate):
@@ -335,6 +337,15 @@ class dashboardservice:
         
         # Calculate business days
         _from_closed = self.__calculate_from_closed(request.closedate)
+
+        # Get page counts from OI Layer
+        page_counts, err = FOIOpenInformationRequests.getdatafromOILayerpagecounts(
+            request.id,
+            request.ministryrequestid
+        )
+
+        # Add page counts to request object
+        oilayerpagecount = next(iter(page_counts.values())) if not err and next(iter(page_counts.values())) is not None else 0
     
-        return self.__preparefoioirequestinfo(request, _receiveddate, _publicationdate, _from_closed)
+        return self.__preparefoioirequestinfo(request, _receiveddate, _publicationdate, _from_closed, oilayerpagecount)
           

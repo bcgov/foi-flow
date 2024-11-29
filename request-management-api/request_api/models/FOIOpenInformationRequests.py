@@ -465,14 +465,14 @@ class FOIOpenInformationRequests(db.Model):
             # Import moved inside the method to avoid circular import
             from request_api.services.records.recordservicebase import recordservicebase
 
-            service = recordservicebase()
-            uploadedrecords = FOIRequestRecord.fetch(requestid, ministryRequestid)
-
+            service = recordservicebase() 
+            uploadedrecords = FOIRequestRecord.fetch(requestid, ministryRequestid) 
+            
             if len(uploadedrecords) > 0:
-                response, err = self.makedocreviewerrequest(
-                    "GET", f"/api/ministryrequest/{ministryRequestid}/pageflag/count"
+                response, err = service.makedocreviewerrequest(
+                    "GET", "/api/ministryrequest/{}/pageflag/count".format(ministryRequestid)
             )
-            print("헤이이이이이 response: ", response)
+
             return response, err
         except Exception as e:
             logging.error(f"Error getting OI Layer page counts: {str(e)}")
