@@ -36,6 +36,31 @@ class FOIRequestApplicationFee(db.Model):
         db.session.commit()               
         return DefaultMethodResult(True,'Application Fee added for  request : '+ str(applicationfee.requestid), applicationfee.applicationfeeid)   
 
+    @classmethod
+    def applicationfeestatushaschanged(cls, requestid):
+        applicationfee_schema = FOIRequestApplicationFeeSchema(many=True)
+        query = db.session.query(FOIRequestApplicationFee).filter_by(requestid=requestid).order_by(FOIRequestApplicationFee.applicationfeeid.desc(), FOIRequestApplicationFee.version.desc()).all()
+        result = applicationfee_schema.dump(query)
+        if len(result) >= 2 and result[0]['applicationfeestatus'] != result[1]['applicationfeestatus']:
+            return True
+        elif len(result) == 1 and result[0]['applicationfeestatus'] != 'init':
+            return True
+        else:
+            return False
+
+    @classmethod
+    def applicationfeerefundamountupdated(cls, requestid):
+        applicationfee_schema = FOIRequestApplicationFeeSchema(many=True)
+        query = db.session.query(FOIRequestApplicationFee).filter_by(requestid=requestid).order_by(FOIRequestApplicationFee.applicationfeeid.desc(), FOIRequestApplicationFee.version.desc()).all()
+        result = applicationfee_schema.dump(query)
+        print('result: ', result)
+        if len(result) >= 2 and result[0]['refundamount'] != result[1]['refundamount']:
+            return True
+        elif len(result) == 1 and result[0]['refundamount'] != 0 and result[0]['refundamount'] is not None:
+            return True
+        else:
+            return False
+
 class FOIRequestApplicationFeeSchema(ma.Schema):
     class Meta:
         fields = ('applicationfeeid', 'version', 'requestid', 'applicationfeestatus', 'amountpaid', 'paymentsource', 'paymentdate', 'orderid', 'transactionnumber', 'refundamount', 'refunddate', 'reasonforrefund', 'receipts', 'created_at', 'createdby', 'updated_at', 'updatedby') 

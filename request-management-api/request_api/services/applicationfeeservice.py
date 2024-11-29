@@ -5,16 +5,22 @@ from datetime import date
 from datetime import datetime
 from request_api.models.FOIRawRequests import FOIRawRequest
 from request_api.models.Payment import Payment
+from request_api.services.events.applicationfeeform import applicationfeeformevent
 
 class applicationfeeservice:
     """ FOI Application Fee Form management service
     Supports creation, update and delete of Application fee form
     """
-    def saveapplicationfee(self, requestid, data, userid):
+    def saveapplicationfee(self, requestid, ministryrequestid, data, userid = 'system', username = 'system'):
         applicationfee = self.__prepareapplicationfee(requestid, data, data.get('applicationfeeid') is not None)
-        return FOIRequestApplicationFee.saveapplicationfee(applicationfee, userid)
+        result = FOIRequestApplicationFee.saveapplicationfee(applicationfee, userid)
+        if result.success == True and applicationfeeservice().applicationfeestatushaschanged(requestid):
+            applicationfeeformevent().createfeestatuschangeevent(requestid, ministryrequestid, data, userid, username)
+        if result.success == True and applicationfeeservice().applicationfeerefundupdated(requestid):
+            applicationfeeformevent().createfeerefundevent(requestid, ministryrequestid, applicationfee.refundamount, userid, username)
+        return result
     
-    def getapplicationfee(self, requestid):
+    def getapplicationfee(self, requestid, ministryrequestid = None):
         applicationfee = FOIRequestApplicationFee.getapplicationfee(requestid)
         # Check for raw requests (from online form) with IGE status
         payments = Payment.find_application_fee_payments_by_requestid(requestid)
@@ -23,7 +29,6 @@ class applicationfeeservice:
             applicationfee['receipts'] = receipts
         if applicationfee == {}:
             request = FOIRawRequest.get_request(requestid)
-            payments = Payment.find_application_fee_payments_by_requestid(requestid)
             for payment in payments:
                 applicationfee['applicationfeestatus'] = 'paid'
                 applicationfee['amountpaid'] = payment.total
@@ -38,7 +43,10 @@ class applicationfeeservice:
                     applicationfee['applicationfeestatus'] = 'na-ige'
                     applicationfee['paymentsource'] = 'init'
             if applicationfee != {}:
-                self.saveapplicationfee(requestid, applicationfee, 'system')
+                self.saveapplicationfee(requestid, ministryrequestid, applicationfee, 'system')
+        if 'paymentsource' in applicationfee and applicationfee['paymentsource'] == 'creditcardonline':
+            for payment in payments:
+                applicationfee['paymentid'] = payment.payment_id
         return self.__formatapplicationfee(applicationfee)
     
     def saveapplicationfeereceipt(self, applicationfeereceipt):
@@ -52,6 +60,12 @@ class applicationfeeservice:
     
     def deactivateapplicationfeereceipt(self, applicationfeereceiptid, userid):
         return FOIRequestApplicationFeeReceipt.deactivateapplicationfeereceipt(applicationfeereceiptid, userid)
+
+    def applicationfeestatushaschanged(self, requestid):
+        return FOIRequestApplicationFee.applicationfeestatushaschanged(requestid)
+
+    def applicationfeerefundupdated(self, requestid):
+        return FOIRequestApplicationFee.applicationfeerefundamountupdated(requestid)
 
     def __prepareapplicationfee(self, requestid, data={}, getprevious=True):
         applicationfee = FOIRequestApplicationFee()
@@ -76,8 +90,8 @@ class applicationfeeservice:
         applicationfee.orderid = data.get('orderid', None)
         applicationfee.transactionnumber = data.get('transactionnumber', None)
         applicationfee.refundamount = data.get('refundamount', None)
-        if applicationfee.refunddate and isinstance(applicationfee.refunddate, str) and len(applicationfee.refunddate) < 11 and applicationfee.refunddate.count('-') == 2:
-            parseddateobject = applicationfee.refunddate.split('-')
+        if data['refunddate'] and isinstance(data['refunddate'], str) and len(data['refunddate']) < 11 and data['refunddate'].count('-') == 2:
+            parseddateobject = data['refunddate'].split('-')
             datetime_object = datetime(int(parseddateobject[0]), int(parseddateobject[1]), int(parseddateobject[2]), 17, 0, 0)
             applicationfee.refunddate = datetime_object
         applicationfee.reasonforrefund = data.get('reasonforrefund', None)

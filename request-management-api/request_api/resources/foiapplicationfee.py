@@ -43,7 +43,8 @@ class FOICFRFee(Resource):
     @auth.require
     def get(requestid, ministryrequestid):      
         try:
-            result = applicationfeeservice().getapplicationfee(requestid)
+            ministryrequestid = None if ministryrequestid.lower()not in ['null', 'None', 'undefined'] else ministryrequestid
+            result = applicationfeeservice().getapplicationfee(requestid, ministryrequestid)
             return json.dumps(result), 200
         except KeyError as error:
             return {'status': False, 'message': CUSTOM_KEYERROR_MESSAGE + str(error)}, 400
@@ -64,8 +65,9 @@ class SanctionFOICFRFee(Resource):
             if AuthHelper.getusertype() != "iao":
                 return {'status': False, 'message':'UnAuthorized'}, 403
             requestjson = request.get_json() 
+            ministryrequestid = None if ministryrequestid.lower()not in ['null', 'None', 'undefined'] else ministryrequestid
             foiapplicationfeeschema = FOIApplicationFeeDataSchema().load(requestjson)
-            result = applicationfeeservice().saveapplicationfee(requestid, foiapplicationfeeschema,AuthHelper.getuserid())
+            result = applicationfeeservice().saveapplicationfee(requestid, ministryrequestid, foiapplicationfeeschema,AuthHelper.getuserid(), AuthHelper.getusername())
             receipts = []
             for receipt in foiapplicationfeeschema['receipts']:
                 if 'receiptid' not in receipt:
