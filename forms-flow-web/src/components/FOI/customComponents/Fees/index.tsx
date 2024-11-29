@@ -217,13 +217,14 @@ export const Fees = ({
     }
 
     const validateApplicationFeeRefundAmount = () => {
-      return applicationFeeFormData?.refundAmount % 10 == 0 && applicationFeeFormData?.refundAmount <= applicationFeeFormData?.amountPaid ? true : false;
+      return applicationFeeFormData?.refundAmount % 10 == 0 && applicationFeeFormData?.refundAmount > 0 && applicationFeeFormData?.refundAmount <= applicationFeeFormData?.amountPaid ? true : false;
     }
   
     const validateFields = () => {
-      if (applicationFeeFormData?.paymentSource != 'creditcardonline' && applicationFeeFormData?.paymentSource != 'init') {
+      if (applicationFeeFormData?.paymentSource != 'creditcardonline') {
         if (applicationFeeFormData?.paymentDate == null || applicationFeeFormData?.paymentDate == '') return false;
         if (applicationFeeFormData?.amountPaid == 0) return false;
+        if (applicationFeeFormData?.paymentSource == 'init') return false;
       }
       if (validateBalancePaymentMethod() || validateEstimatePaymentMethod()) {
         return false;
@@ -244,7 +245,7 @@ export const Fees = ({
       if (!validateApplicationFeeAmountPaid()) {
         return false;
       }
-      if (!validateApplicationFeeRefundAmount()) {
+      if (!validateApplicationFeeRefundAmount() || !applicationFeeFormData?.refundDate) {
         return false;
       }
 
@@ -641,9 +642,20 @@ export const Fees = ({
       setIsNewCFRForm(true)
     }
   
-    // Tab 
-    let defaultTab = !isMinistry ? FeesSubtabValues.APPLICATIONFEE : FeesSubtabValues.CFRFORM;
-    const [selectedSubtab, setSelectedSubtab] = useState(defaultTab)
+    const [selectedSubtab, setSelectedSubtab] = useState(FeesSubtabValues.CFRFORM)
+
+    React.useEffect(() => {
+      if (!isMinistry) {
+        if (requestState === StateEnum.unopened.name || 
+          requestState === StateEnum.open.name || 
+          requestState === StateEnum.intakeinprogress.name || 
+          requestState === StateEnum.appfeeowing.name) {
+          setSelectedSubtab(FeesSubtabValues.APPLICATIONFEE);
+        } else {
+          setSelectedSubtab(FeesSubtabValues.CFRFORM);
+        }
+      }
+    }, [requestState])
 
     const handleSubtabChange = (_newSubtab: FeesSubtabValues) => {
       setSelectedSubtab(_newSubtab);
@@ -655,9 +667,11 @@ export const Fees = ({
     }
 
     const showCFRTab = () => {
-      return (requestState !== StateEnum.intakeinprogress.name &&
+      return (
+      requestState !== StateEnum.intakeinprogress.name &&
       requestState !== StateEnum.unopened.name &&
       requestState !== StateEnum.open.name &&
+      requestState !== StateEnum.appfeeowing.name &&
       requestDetails?.requestType ===
         FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_GENERAL)
     }
@@ -741,25 +755,25 @@ export const Fees = ({
                 />}
                 {selectedSubtab == FeesSubtabValues.CFRFORM && 
                 <>
-                <CFRFormTab
-                  requestState={requestState}
-                  ministryId={ministryId}
-                  isMinistry={isMinistry}
-                  requestNumber={requestNumber}
-                  userDetail={userDetail}
-                  requestId={requestId}
-                  formData={CFRFormData}
-                  initialFormData={initialCFRFormData}
-                  setFormData={setCFRFormData}
-                  initialCFRFormData={initialCFRFormData}
-                  calculateBalanceRemaining={calculateBalanceRemaining}
-                  validateField={validateField}
-                  validateEstimatePaymentMethod={validateEstimatePaymentMethod}
-                  validateBalancePaymentMethod={validateBalancePaymentMethod}
-                  setCFRUnsaved={setCFRUnsaved}
-                  handleTextChanges={handleTextChanges}
-                />
-              </>
+                  <CFRFormTab
+                    requestState={requestState}
+                    ministryId={ministryId}
+                    isMinistry={isMinistry}
+                    requestNumber={requestNumber}
+                    userDetail={userDetail}
+                    requestId={requestId}
+                    formData={CFRFormData}
+                    initialFormData={initialCFRFormData}
+                    setFormData={setCFRFormData}
+                    initialCFRFormData={initialCFRFormData}
+                    calculateBalanceRemaining={calculateBalanceRemaining}
+                    validateField={validateField}
+                    validateEstimatePaymentMethod={validateEstimatePaymentMethod}
+                    validateBalancePaymentMethod={validateBalancePaymentMethod}
+                    setCFRUnsaved={setCFRUnsaved}
+                    handleTextChanges={handleTextChanges}
+                  />
+                </>
                 }
                 <BottomButtonGroup 
                   save={save}

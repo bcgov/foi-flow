@@ -107,6 +107,10 @@ export const ApplicationFeeTab = ({
       </div>
     )
 
+    const amountPaidFieldDisabled = () => {
+      return formData?.applicationFeeStatus == 'na-ige' ? true : false
+    }
+
     const amountPaidFieldError = () => {
       if (formData?.paymentSource != 'creditcardonline' && formData?.paymentSource != 'init') {
         if (formData?.amountPaid % 10 != 0 || formData?.amountPaid == 0) return true;
@@ -138,7 +142,7 @@ export const ApplicationFeeTab = ({
           required
           error={amountPaidFieldError()}
           helperText={formData?.amountPaid % 10 != 0 && 'You can only enter as increments of 10'}
-          disabled={formData?.applicationFeeStatus == 'na-ige' ? true : false}
+          disabled={amountPaidFieldDisabled()}
         />
       </div>
     )
@@ -339,9 +343,9 @@ export const ApplicationFeeTab = ({
       })
     }
 
-    const getReceiptFile = (filename: string, rawfilepath: string) => {
+    const getReceiptFile = (filename?: string, rawfilepath?: string) => {
       if (filename) {
-        const filepath = rawfilepath.split('/').slice(4).join('/')
+        const filepath = rawfilepath?.split('/').slice(4).join('/')
         getFOIS3DocumentPreSignedUrl(filepath, undefined, dispatch, (err: any, res: any) => {
           if (!err) {
             getFileFromS3({filepath: res}, (_err: any, response: any) => {
@@ -373,9 +377,24 @@ export const ApplicationFeeTab = ({
           </div>
         )}
     })
+    if (uploadedReceiptsField.length == 0) {
+      uploadedReceiptsField.push(
+        <div className="col-lg-12 foi-details-col">
+            <u
+              onClick={() => {
+                getReceiptFile()}
+              }
+            >{'view online payment receipt'}</u>
+          </div>
+      )
+    }
 
     const disableRefundFields = () => {
-      return formData?.amountPaid == 0 || formData?.amountPaid == null || formData?.amountPaid == '' || formData?.amountPaid % 10 != 0
+      let isDisabled = formData?.amountPaid == 0 || formData?.amountPaid == null || formData?.amountPaid == '' || formData?.amountPaid % 10 != 0
+      if (formData?.applicationFeeStatus == 'na-ige') {
+        isDisabled = false
+      }
+      return isDisabled;
     }
 
     const [refundAmountHelperText, setRefundAmountHelperText] = useState('')

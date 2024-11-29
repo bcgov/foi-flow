@@ -15,6 +15,9 @@ export const fetchApplicationFeeForm = async (
   dispatch,
   errorCallback = null
 ) => {
+  if (ministryId == null || ministryId == undefined) {
+    ministryId = 'None';
+  }
   let apiUrl = replaceUrl(
       API.FOI_GET_APPLICATION_FEES_FORM,
       "<ministryrequestid>",
@@ -52,7 +55,9 @@ export const saveApplicationFeeForm = (
   errorCallback,
 ) => {
   let baseUrl = API.FOI_POST_APPLICATION_FEES_FORM;
-
+  if (ministryId == null || ministryId == undefined) {
+    ministryId = 'None';
+  }
   const apiUrl = replaceUrl(replaceUrl(
     baseUrl,
     "<requestid>",
