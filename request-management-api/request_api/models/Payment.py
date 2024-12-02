@@ -29,6 +29,12 @@ class Payment(db.Model):
         return cls.query.get(identifier)
 
     @classmethod
+    def find_application_fee_payments_by_requestid(cls, requestid: int, fee_code_id: int = 1) -> Payment:
+        """Return by requestid."""
+        a =  cls.query.filter(Payment.request_id == requestid, Payment.status == 'PAID', Payment.fee_code_id==fee_code_id).all()
+        return a
+
+    @classmethod
     def find_paid_transaction(cls, transaction_number: str) -> Payment:
         """Return by transaction_number."""
         a =  cls.query.filter_by(transaction_number=transaction_number, status='PAID').one_or_none()
