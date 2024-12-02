@@ -1,7 +1,7 @@
 """Create Application Fee Table
 
 Revision ID: c43a8e0104bc
-Revises: bbee01df3e8d
+Revises: 516fbf1b13d9
 Create Date: 2024-11-05 10:58:11.256163
 
 """
@@ -11,7 +11,7 @@ import sqlalchemy as sa
 
 # revision identifiers, used by Alembic.
 revision = 'c43a8e0104bc'
-down_revision = 'bbee01df3e8d'
+down_revision = '516fbf1b13d9'
 branch_labels = None
 depends_on = None
 
