@@ -967,7 +967,6 @@ export const ContactApplicant = ({
             size="small"
             fullWidth
           >
-            <div className="addCorrespondence-menuitem">
             <MenuItem
               onClick={() => addCorrespondence()}
               key='messagetoapplicant'
@@ -984,7 +983,6 @@ export const ContactApplicant = ({
             >
               Attach Response
             </MenuItem>
-            </div>
           </TextField>
         </Grid>
       </Grid>
