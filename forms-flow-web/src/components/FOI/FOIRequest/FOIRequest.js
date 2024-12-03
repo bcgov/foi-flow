@@ -32,6 +32,7 @@ import {
   fetchOIPCReviewtypes,
   fetchOIPCInquiryoutcomes,
   fetchOpenInfoPublicationStatuses,
+  fetchOpenInfoStatuses,
   fetchOpenInfoExemptions,
 } from "../../../apiManager/services/FOI/foiMasterDataServices";
 import {
@@ -78,6 +79,7 @@ import {
   confirmChangesLost,
   getRedirectAfterSaveUrl,
   getTabBG,
+  getOITabBG,
   assignValue,
   createRequestDetailsObjectFunc,
   checkContactGiven,
@@ -188,8 +190,13 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
   const [comment, setComment] = useState([]);
   const [requestState, setRequestState] = useState(StateEnum.unopened.name);
   const [disableInput, setDisableInput] = useState(requestState?.toLowerCase() === StateEnum.closed.name.toLowerCase() && !requestDetails?.isoipcreview);
-  const [_tabStatus, settabStatus] = React.useState(requestState);
-  let foitabheaderBG = getTabBG(_tabStatus, requestState);
+  const [_tabStatus, settabStatus] = React.useState(requestState);  
+  const isOITeam = userDetail.groups.includes("/OI Team");
+  const openInfoStates = useSelector(
+    (state) => state.foiRequests.oiStatuses
+  );
+  let foitabheaderBG = isOITeam ? getOITabBG(requestDetails?.oistatusid, openInfoStates) : getTabBG(_tabStatus, requestState);
+  
 
   const [unsavedPrompt, setUnsavedPrompt] = useState(false);
   const [unsavedMessage, setUnsavedMessage] = useState(<></>);
@@ -345,6 +352,8 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
     }
 
     dispatch(fetchFOICategoryList());
+    dispatch(fetchOpenInfoExemptions());
+    dispatch(fetchOpenInfoPublicationStatuses());
     dispatch(fetchFOIReceivedModeList());
     dispatch(fetchFOIDeliveryModeList());
     dispatch(fetchFOISubjectCodeList());
@@ -354,9 +363,11 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
     dispatch(fetchOIPCStatuses());
     dispatch(fetchOIPCReviewtypes());
     dispatch(fetchOIPCInquiryoutcomes());
-    dispatch(fetchOpenInfoExemptions());
-    dispatch(fetchOpenInfoPublicationStatuses());
     dispatch(fetchFOIOpenInfoRequest(ministryId)); // AH NOTE -> Need to stop get call from happening if request === general or if bcgovcode in this arr ["CLB", "HSA", "IIO", "MGC", "OBC", "TIC"]
+
+    if (isOITeam) {
+      dispatch(fetchOpenInfoStatuses());
+    }
 
     if (bcgovcode) dispatch(fetchFOIMinistryAssignedToList(bcgovcode));
   }, [requestId, ministryId, comment, attachments]);
@@ -930,7 +941,11 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
   };
 
   const handleStateChange = (currentStatus) => {
-    setcurrentrequestStatus(currentStatus);
+    if (isOITeam) {
+      setOIStatus(currentStatus)
+    } else {
+      setcurrentrequestStatus(currentStatus);
+    }
     setStateChanged(true);
   };
 
@@ -1017,6 +1032,8 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
   const signinUrl = "/signin";
   const signupUrl = "/signup";
 
+  const [OIStatus, setOIStatus] = useState("");
+
   const requestNumber = requestDetails?.axisRequestId
     ? requestDetails.axisRequestId
     : requestDetails?.idNumber;
@@ -1093,6 +1110,14 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
     );
   }
 
+  const getOIRequestState = () => {
+    if (requestDetails?.oistatusid) {
+      return openInfoStates?.find(s => s.oistatusid === requestDetails?.oistatusid)?.name;
+    } else {
+      return StateEnum.unopened.name
+    }
+  }
+
   return (!isLoading &&
     requestDetails &&
     Object.keys(requestDetails).length !== 0) ||
@@ -1109,7 +1134,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
           <h4 className="foileftpanelrequestno">{headerText}</h4>
           <div className="foileftpaneldropdown">
             <StateDropDown
-              requestState={requestState}
+              requestState={isOITeam ? getOIRequestState() : requestState}
               updateStateDropDown={updateStateDropDown}
               stateTransition={stateTransition}
               requestStatus={_requestStatus}
@@ -1117,6 +1142,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
               isMinistryCoordinator={false}
               isValidationError={isValidationError}
               requestType={requestDetails?.requestType}
+              isOITeam={isOITeam}
             />
           </div>
 
@@ -1457,7 +1483,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
                         CFRUnsaved={CFRUnsaved}
                         handleSaveRequest={handleSaveRequest}
                         handleOpenRequest={handleOpenRequest}
-                        currentSelectedStatus={_currentrequestStatus}
+                        currentSelectedStatus={isOITeam ? OIStatus : _currentrequestStatus}
                         hasStatusRequestSaved={hasStatusRequestSaved}
                         disableInput={disableInput}
                         requestState={requestState}
@@ -1735,7 +1761,6 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
                 requestNumber={requestNumber}
                 requestDetails={requestDetails}
                 userDetail={userDetail}
-                foiOITransactionData={foiOITransactionData}
                 foirequestid={requestId}
                 foiministryrequestid={ministryId}
               />

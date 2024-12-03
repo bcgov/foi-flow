@@ -23,8 +23,13 @@ const StateDropDown = ({
   updateStateDropDown,
   requestType,
   disabled,
+  isOITeam,
 }) => {
   const _isMinistryCoordinator = isMinistryCoordinator;
+
+  const openInfoStates = useSelector(
+    (state) => state.foiRequests.oiStatuses
+  );
 
   const [status, setStatus] = useState(requestState);
   const cfrFeeData = useSelector(
@@ -86,6 +91,13 @@ const StateDropDown = ({
   };
 
   const getStatusList = () => {
+    if (isOITeam) {
+      var list = openInfoStates.map(s => {return { status: s.name, isSelected: false }});
+      if (requestState === StateEnum.unopened.name) {
+        list.unshift({ status: 'Unopened', isSelected: false })
+      }
+      return list;
+    }
     let _state = "";
     if (requestState) _state = requestState;
     else if (
@@ -226,6 +238,9 @@ const StateDropDown = ({
     }
   };
   const getDisableMenuItem = (index, status) => {
+    if (isOITeam) {
+      return status === requestState;
+    }
     if (index === 0) {
       return false;
     }

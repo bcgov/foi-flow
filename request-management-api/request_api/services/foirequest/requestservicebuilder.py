@@ -76,6 +76,7 @@ class requestservicebuilder(requestserviceconfigurator):
             if 'subjectCode' in requestschema and requestschema['subjectCode'] is not None and requestschema['subjectCode'] != '':
                 foiministryrequest.subjectcode = requestserviceministrybuilder().createfoirequestsubjectcode(requestschema, ministryid, activeversion, userid)
         foiministryrequest.version = activeversion
+        foiministryrequest.oistatus_id = self.getpropertyvaluefromschema(requestschema, 'oistatusid')
         foiministryrequest.closedate = self.getpropertyvaluefromschema(requestschema, 'closedate')
         foiministryrequest.closereasonid = self.getpropertyvaluefromschema(requestschema, 'closereasonid')
         if self.getpropertyvaluefromschema(requestschema, 'isofflinepayment') is not None:

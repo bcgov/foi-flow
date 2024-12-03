@@ -47,6 +47,7 @@ class FOIOpenInformationRequests(db.Model):
     oifeedback = db.Column(db.String, nullable=True)
     publicationdate = db.Column(db.DateTime, nullable=True)
     isactive = db.Column(db.Boolean, nullable=False)
+    copyrightsevered = db.Column(db.Boolean, nullable=True)
 
     created_at = db.Column(db.DateTime, default=datetime.now, nullable=False)
     updated_at = db.Column(db.DateTime, nullable=True)
@@ -98,6 +99,7 @@ class FOIOpenInformationRequests(db.Model):
                 oiexemptionapproved=foiopeninforequest["oiexemptionapproved"],
                 oifeedback=foiopeninforequest["oifeedback"],
                 publicationdate=foiopeninforequest["publicationdate"],
+                copyrightsevered=foiopeninforequest["copyrightsevered"],
                 isactive=True,
                 created_at=foiopeninforequest["created_at"],
                 updated_at=updateddate,
@@ -512,5 +514,5 @@ class FOIOpenInfoRequestSchema(ma.Schema):
     class Meta:
         fields = (
             'foiopeninforequestid', 'version', 'foiministryrequest_id', 'foiministryrequestversion_id', 'oipublicationstatus_id', 'oiexemption_id', 'oiassignedto',
-            'oiexemptionapproved', 'pagereference', 'iaorationale', 'oifeedback', 'publicationdate', 'created_at', 'updated_at', 'createdby', 'updatedby'
+            'oiexemptionapproved', 'copyrightsevered', 'pagereference', 'iaorationale', 'oifeedback', 'publicationdate', 'created_at', 'updated_at', 'createdby', 'updatedby'
         )

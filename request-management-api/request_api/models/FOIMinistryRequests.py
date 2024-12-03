@@ -1593,5 +1593,5 @@ class FOIMinistryRequestSchema(ma.Schema):
                 'assignedministrygroup','cfrduedate','closedate','closereasonid','closereason.name',
                 'assignee.firstname','assignee.lastname','ministryassignee.firstname','ministryassignee.lastname', 'axisrequestid', 
                 'axissyncdate', 'axispagecount', 'axislanpagecount', 'linkedrequests', 'ministrysignoffapproval', 'identityverified','originalldd',
-                'isoipcreview', 'recordspagecount', 'estimatedpagecount', 'estimatedtaggedpagecount', 'userrecordslockstatus')
+                'isoipcreview', 'recordspagecount', 'estimatedpagecount', 'estimatedtaggedpagecount', 'userrecordslockstatus', 'oistatus_id')
     

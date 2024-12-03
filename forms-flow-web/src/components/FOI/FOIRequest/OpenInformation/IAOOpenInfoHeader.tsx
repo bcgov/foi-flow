@@ -52,7 +52,7 @@ const IAOOpenInfoHeader = ({
           variant="outlined"
           fullWidth
         ></TextField>
-        <TextField
+        {/* <TextField
           id="oiAssignedTo"
           label={"OI Assigned To"}
           inputProps={{
@@ -71,7 +71,7 @@ const IAOOpenInfoHeader = ({
           error={selectedAssignedTo.toLowerCase().includes("unassigned")}
         >
           {menuItems}
-        </TextField>
+        </TextField> */}
       </div>
     </div>
   );

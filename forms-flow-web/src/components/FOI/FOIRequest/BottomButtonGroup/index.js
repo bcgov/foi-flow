@@ -100,6 +100,13 @@ const BottomButtonGroup = React.memo(
     const assignedToList = useSelector(
       (state) => state.foiRequests.foiAssignedToList
     );
+    
+    const user = useSelector((reduxState) => reduxState.user.userDetail);
+    const userGroups = user?.groups?.map(group => group.slice(1));
+
+    const openInfoStates = useSelector(
+      (state) => state.foiRequests.oiStatuses
+    );
 
     const handleClosingDateChange = (cDate) => {
       setClosingDate(cDate);
@@ -307,7 +314,9 @@ const BottomButtonGroup = React.memo(
     const [documents, setDocuments] = useState([]);
 
     const saveStatusId = () => {
-      if (currentSelectedStatus) {
+      if (userGroups.includes("OI Team")) {
+        saveRequestObject.oistatusid = openInfoStates.find(s => s.name === currentSelectedStatus).oistatusid;
+      } else if (currentSelectedStatus) {
         switch (currentSelectedStatus) {
           case StateEnum.closed.name:
             saveRequestObject.requeststatuslabel = StateEnum.closed.label;
