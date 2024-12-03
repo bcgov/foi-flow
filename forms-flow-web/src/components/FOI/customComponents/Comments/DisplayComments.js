@@ -12,6 +12,11 @@ const DisplayComments = ({ comments, bcgovcode, currentUser, iaoassignedToList, 
 
   const [fullnameList, setFullnameList] = useState(getFullnameList);
 
+
+  // useEffect(() => {
+  //   setTeamTagList(bcgovcode)
+  // }, [fullnameList])
+
   const finduserbyuserid = (userId) => {
     let user = fullnameList.find(u => u.username === userId);
     return user && user.fullname ? user.fullname : userId;

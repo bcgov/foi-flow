@@ -19,7 +19,6 @@ const IAOOpenInfoPublishing = ({
   requestNumber,
   requestDetails,
   userDetail,
-  foiOITransactionData,
   foiministryrequestid,
   foirequestid,
   toast,
@@ -29,7 +28,10 @@ const IAOOpenInfoPublishing = ({
   );
   const assignedToList = useSelector(
     (state : any) => state.foiRequests.foiFullAssignedToList
-  );
+  );   
+  let foiOITransactionData = useSelector(
+    (state: any) => state.foiRequests.foiOpenInfoRequest
+  ); 
   const isOIUser: boolean = userGroups.includes("OI Team");
   const dispatch = useDispatch();
 
@@ -37,6 +39,10 @@ const IAOOpenInfoPublishing = ({
   const [oiPublicationData, setOiPublicationData] =
     useState<OITransactionObject>(foiOITransactionData);
   const [showSaveModal, setShowSaveModal] = useState(false);
+
+  useEffect(() => {
+    setOiPublicationData(foiOITransactionData);
+  }, [foiOITransactionData]);
 
   //Functions
   const handleOIDataChange = (

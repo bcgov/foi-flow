@@ -7,8 +7,9 @@ from request_api.services.eventservice import eventservice
 from request_api.tracer import Tracer
 from request_api.utils.util import  cors_preflight, allowedorigins, getrequiredmemberships,str_to_bool,canrestictdata,canrestictdata_ministry
 from request_api.exceptions import BusinessException
-from request_api.schemas.foiopeninfo import FOIOpenInfoSchema
+from request_api.schemas.foiopeninfo import FOIOpenInfoSchema, FOIOpenInfoAdditionalFilesSchema, FOIOpenInfoAdditionalFilesDeleteSchema
 from request_api.services.openinfoservice import openinfoservice
+from request_api.utils.enums import IAOTeamWithKeycloackGroup
 from marshmallow import Schema, fields, validate, ValidationError
 import json
 import asyncio
@@ -60,6 +61,72 @@ class FOIOpenInfoRequestById(Resource):
             foiopeninfo = FOIOpenInfoSchema().load(request_json)
             userid = AuthHelper.getuserid()
             result = openinfoservice().updateopeninforequest(foiopeninfo, userid, foiministryrequestid)
+            if result.success:
+                return {'status': result.success, 'message': result.message, 'id': result.identifier}, 200
+        except ValidationError as err:
+            return {'status': False, 'message': str(err)}, 400
+        except KeyError as error:
+            return {'status': False, 'message': CUSTOM_KEYERROR_MESSAGE + str(error)}, 400    
+        except BusinessException as exception:            
+            return {'status': exception.status_code, 'message':exception.message}, 500
+        
+
+@cors_preflight('POST, GET, OPTIONS') 
+@API.route('/foiopeninfoadditionalfiles/foirequest/<int:foirequestid>/ministryrequest/<int:foiministryrequestid>')
+class FOIOpenInfoAdditionalFiles(Resource):
+    """Gets all open info files by ministryrequestid"""
+    @staticmethod
+    @TRACER.trace()
+    @cross_origin(origins=allowedorigins())
+    @auth.require
+    @auth.ismemberofgroups(IAOTeamWithKeycloackGroup.oi)
+    def get(foiministryrequestid, foirequestid):
+        try:
+            result = openinfoservice().fetchopeninfoadditionalfiles(foiministryrequestid)
+            return json.dumps(result), 200
+        except ValidationError as err:
+            return {'status': False, 'message': str(err)}, 400
+        except KeyError as error:
+            return {'status': False, 'message': CUSTOM_KEYERROR_MESSAGE + str(error)}, 400    
+        except BusinessException as exception:            
+            return {'status': exception.status_code, 'message':exception.message}, 500
+
+    """Saves info for open info additional file uploads"""    
+    @staticmethod
+    @TRACER.trace()
+    @cross_origin(origins=allowedorigins())
+    @auth.require
+    @auth.ismemberofgroups(IAOTeamWithKeycloackGroup.oi)
+    def post(foiministryrequestid, foirequestid):
+        try:
+            request_json = request.get_json()
+            files = FOIOpenInfoAdditionalFilesSchema().load(request_json)
+            userid = AuthHelper.getuserid()
+            result = openinfoservice().saveopeninfoadditionalfiles(foiministryrequestid, files, userid)
+            if result.success:
+                return {'status': result.success, 'message': result.message, 'id': result.identifier}, 200
+        except ValidationError as err:
+            return {'status': False, 'message': str(err)}, 400
+        except KeyError as error:
+            return {'status': False, 'message': CUSTOM_KEYERROR_MESSAGE + str(error)}, 400    
+        except BusinessException as exception:            
+            return {'status': exception.status_code, 'message':exception.message}, 500
+        
+@cors_preflight('POST, OPTIONS') 
+@API.route('/foiopeninfoadditionalfiles/foirequest/<int:foirequestid>/ministryrequest/<int:foiministryrequestid>/delete')
+class FOIOpenInfoAdditionalFilesDelete(Resource):
+    """Soft delete for open info additional files"""
+    @staticmethod
+    @TRACER.trace()
+    @cross_origin(origins=allowedorigins())
+    @auth.require
+    @auth.ismemberofgroups(IAOTeamWithKeycloackGroup.oi)
+    def post(foiministryrequestid, foirequestid):
+        try:
+            request_json = request.get_json()
+            fileids = FOIOpenInfoAdditionalFilesDeleteSchema().load(request_json)
+            userid = AuthHelper.getuserid()
+            result = openinfoservice().deleteopeninfoadditionalfiles(fileids, userid)
             if result.success:
                 return {'status': result.success, 'message': result.message, 'id': result.identifier}, 200
         except ValidationError as err:
