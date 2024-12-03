@@ -213,6 +213,16 @@ export const ContactApplicant = ({
         listOfDraftTemplates.push(draftCorrespondence.templateid);
       }
     })
+
+    setTemplates((oldArray) => 
+      oldArray.filter(
+        (existingItem) =>
+          isEnabledTemplate(existingItem) ||
+          listOfDraftTemplates.includes(existingItem.templateid) ||
+          existingItem.templateid === null
+      )
+    );
+    
     applicantCorrespondenceTemplates.forEach((item: any) => {
       if (isEnabledTemplate(item) || listOfDraftTemplates.includes(item.templateid)) {
       const rootpath = OSS_S3_BUCKET_FULL_PATH
@@ -957,6 +967,7 @@ export const ContactApplicant = ({
             size="small"
             fullWidth
           >
+            <div className="addCorrespondence-menuitem">
             <MenuItem
               onClick={() => addCorrespondence()}
               key='messagetoapplicant'
@@ -973,6 +984,7 @@ export const ContactApplicant = ({
             >
               Attach Response
             </MenuItem>
+            </div>
           </TextField>
         </Grid>
       </Grid>
