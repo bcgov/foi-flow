@@ -16,6 +16,15 @@
   }
 }
 
+.addCorrespondence-menuitem {
+  li.MuiMenuItem-root {
+    background-color: #FFF !important; 
+    &:hover,
+    &:focus {
+      background-color: #e3f2fd !important;
+    }
+  }
+}
 
 .previewEmail {
   float: right;

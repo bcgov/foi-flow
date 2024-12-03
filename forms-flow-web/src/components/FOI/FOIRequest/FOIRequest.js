@@ -1084,7 +1084,8 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
       // requestState !== StateEnum.unopened.name &&
       // requestState !== StateEnum.open.name &&
       // requestState !== StateEnum.appfeeowing.name &&
-      requestDetails?.requestType === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_GENERAL)
+      requestDetails?.requestType === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_GENERAL ||
+      requestDetails?.requestType === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL)
   }
 
   const getHistoryCount = () => {
