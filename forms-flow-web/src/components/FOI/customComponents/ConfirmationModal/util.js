@@ -139,7 +139,8 @@ import FOI_COMPONENT_CONSTANTS from '../../../../constants/FOI/foiComponentConst
           return {title: "Changing the state", body: `Are you sure you want to change Request #${_requestNumber} to ${StateEnum.appfeeowing.name}?`};
       case StateEnum.onholdother.name.toLowerCase():
           return {title: "Change Request to On Hold - other", 
-                 body: "Are you sure you want to put this request on hold - Other? This should only be used for reasons other than fees when you need to put a request on hold (eg - Third Party notice, or Intake related reasons)"};
+                 body: <>Are you sure you want to change request #{_requestNumber} to {StateEnum.onholdother.name}? This should be used for scenarios 
+                 that are not fee related (such as Third Party notice).<b> This will stop the clock.</b></>};
       default:
           return {title: "", body: ""};
     }

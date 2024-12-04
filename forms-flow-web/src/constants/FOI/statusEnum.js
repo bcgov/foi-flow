@@ -158,7 +158,6 @@ const StateList = Object.freeze({
     { status: "Open", isSelected: false },
     { status: "Peer Review", isSelected: false },
     { status: "Redirect", isSelected: false },
-    { status: "On Hold - Other", isSelected: false },
     { status: "Closed", isSelected: false },
   ],
   appfeeowing: [
@@ -166,7 +165,6 @@ const StateList = Object.freeze({
     { status: "Open", isSelected: false },
     { status: "Peer Review", isSelected: false },
     { status: "Redirect", isSelected: false },
-    { status: "On Hold - Other", isSelected: false },
     { status: "Closed", isSelected: false },
   ],
   recordsreadyforreview: [

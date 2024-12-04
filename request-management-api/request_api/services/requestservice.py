@@ -133,7 +133,8 @@ class requestservice:
             currentstatus not in (None, "")
             and ((currentstatus == StateName.onhold.value
             and nextstatename != StateName.response.value)
-            or currentstatus == StateName.onholdother.value)
+            or (currentstatus == StateName.onholdother.value
+            and nextstatename != StateName.open.value))
         ):
             skipcalculation = self.__skipduedatecalculation(
                 ministryrequestid, offholddate, currentstatus, nextstatename
@@ -272,7 +273,7 @@ class requestservice:
         previousoffholddate = FOIMinistryRequest.getlastoffholddate(ministryrequestid, currentstatus)
         if (
             (currentstatus not in (None, "")
-            and currentstatus == StateName.onhold.value
+            and (currentstatus == StateName.onhold.value or currentstatus == StateName.onholdother.value)
             and nextstatename not in (None, "")
             and currentstatus == nextstatename) 
         ):
