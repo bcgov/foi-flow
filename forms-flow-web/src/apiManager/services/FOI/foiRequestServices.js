@@ -14,7 +14,8 @@ import {
   setFOIRequestDescriptionHistory,
   setFOIMinistryRequestList,
   setOpenedMinistries,
-  setRestrictedReqTaglist
+  setRestrictedReqTaglist,  
+  setRequestExtensions,
 } from "../../../actions/FOI/foiRequestActions";
 import { fetchFOIAssignedToList, fetchFOIMinistryAssignedToList, fetchFOIProcessingTeamList } from "./foiMasterDataServices";
 import { catchError, fnDone} from './foiServicesUtil';
@@ -551,3 +552,70 @@ export const deleteOIPCDetails = (requestId, ministryId, ...rest) => {
       });
   };
 }
+
+export const fetchHistoricalRequestDetails = (requestId) => {
+  
+  const apiUrlgetRequestDetails = API.FOI_HISTORICAL_REQUEST_API + "/" + requestId;
+  return (dispatch) => {
+    httpGETRequest(apiUrlgetRequestDetails, {}, UserService.getToken())
+      .then((res) => {
+        if (res.data) {
+          const foiRequest = res.data;
+          dispatch(clearRequestDetails({}));
+          dispatch(setFOIRequestDetail(foiRequest));
+          dispatch(setFOILoader(false));
+        } else {
+          dispatch(serviceActionError(res));
+          dispatch(setFOILoader(false));
+          throw new Error(`Error in fetching request details for request# ${requestId}`)
+        }
+      })
+      .catch((error) => {
+        catchError(error, dispatch);
+      });
+  };
+};
+
+export const fetchFOIHistoricalRequestDescriptionList = (requestId) => {
+  let apiUrl = API.FOI_HISTORICAL_REQUEST_DESCRIPTION_API + "/" + requestId;
+
+  return (dispatch) => {
+    httpGETRequest(apiUrl, {}, UserService.getToken())
+      .then((res) => {
+        if (res.data) {
+          dispatch(setFOIRequestDescriptionHistory(res.data));
+          dispatch(setFOILoader(false));
+        } else {
+          dispatch(serviceActionError(res));
+          dispatch(setFOILoader(false));
+          throw new Error(`Error while fetching the request description history (request# ${requestId})`);
+        }
+      })
+      .catch((error) => {
+        catchError(error, dispatch);
+      });
+  };
+};
+
+export const fetchHistoricalExtensions = (
+  requestId,
+) => {
+  const apiUrl = API.FOI_HISTORICAL_REQUEST_EXTENSIONS_API + "/" + requestId
+
+  return (dispatch) => {
+    httpGETRequest(apiUrl, {}, UserService.getToken())
+    .then((res) => {
+      if (res.data) {
+        dispatch(setRequestExtensions(res.data));
+        dispatch(setFOILoader(false));
+      } else {
+        console.log("Error in fetching attachment list", res);
+        dispatch(serviceActionError(res));
+      }
+    })
+    .catch((error) => {
+      console.log("Error in fetching attachment list", error);
+      dispatch(serviceActionError(error));
+    });
+  }
+};

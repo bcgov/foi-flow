@@ -557,6 +557,8 @@ export const CFRForm = ({
         component="form"
         sx={{
           '& .MuiTextField-root': { my: 1, mx: 0 },
+          '& .Mui-disabled': { '-webkit-text-fill-color': "black !important" },
+          '& .MuiInputBase-root.Mui-disabled': { 'background-color': "#eee !important" },
         }}
         autoComplete="off"
       >
