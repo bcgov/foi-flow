@@ -9,7 +9,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrash } from '@fortawesome/free-solid-svg-icons';
 
 const OIPCItem = (props) => {
-    const {oipcObj, updateOIPC, removeOIPC} = props;
+    const {oipcObj, updateOIPC, removeOIPC, isHistoricalRequest} = props;
     
     //App State
     const oipcOutcomes = useSelector(state=> state.foiRequests.oipcOutcomes);
@@ -150,7 +150,7 @@ const OIPCItem = (props) => {
                         InputLabelProps={{ shrink: true }}
                         error={(!oipc.outcomeid || oipc.outcomeid === 5) && oipc.oipcno === ""}
                         required
-                        disabled={oipc.outcomeid && oipc.outcomeid !== 5}
+                        disabled={oipc.outcomeid && oipc.outcomeid !== 5 || isHistoricalRequest}
                         placeholder="OIPC Number"
                     />
                 </Grid>
@@ -166,10 +166,11 @@ const OIPCItem = (props) => {
                         type="date"
                         error={(!oipc.outcomeid || oipc.outcomeid === 5) && oipc.receiveddate === null || oipc.receiveddate === ""}
                         required
-                        disabled={oipc.outcomeid && oipc.outcomeid !== 5}
+                        disabled={oipc.outcomeid && oipc.outcomeid !== 5 || isHistoricalRequest}
                     />
                 </Grid>
                 <Grid item md={3}>
+                    {!isHistoricalRequest ?
                     <TextField
                         InputLabelProps={{ shrink: true }}
                         select
@@ -188,9 +189,20 @@ const OIPCItem = (props) => {
                         {uniqueReviewTypes(oipcReviewtypes).map((reviewtype) => {
                             return <MenuItem key={reviewtype.reviewtypeid} value={reviewtype.reviewtypeid}>{reviewtype.type_name}</MenuItem>
                         })}
-                    </TextField>
+                    </TextField>:
+                    <TextField
+                        InputLabelProps={{ shrink: true }}
+                        variant="outlined"
+                        fullWidth
+                        value={oipc.reviewetype}
+                        label="Review Type"
+                        required
+                        disabled
+                    >
+                    </TextField>}
                 </Grid>
                 <Grid item md={3}>
+                    {!isHistoricalRequest ?
                     <TextField
                         InputLabelProps={{ shrink: true }}
                         select
@@ -212,9 +224,20 @@ const OIPCItem = (props) => {
                                 return <MenuItem key={reviewtype.reasonid} value={reviewtype.reasonid}>{reviewtype.reason_name}</MenuItem>
                             }
                         }) : null}
-                    </TextField>
+                    </TextField>:
+                    <TextField
+                        InputLabelProps={{ shrink: true }}
+                        variant="outlined"
+                        fullWidth
+                        value={oipc.reason}
+                        label="Reason"
+                        required
+                        disabled
+                    >
+                    </TextField>}
                 </Grid>
                 <Grid item md={3}>
+                    {!isHistoricalRequest ?
                     <TextField
                         InputLabelProps={{ shrink: true }}
                         select
@@ -225,7 +248,7 @@ const OIPCItem = (props) => {
                         onChange = {(event) => handleStatus(event.target.value)}
                         error={(!oipc.outcomeid || oipc.outcomeid === 5) && oipc.statusid === null}
                         required
-                        disabled={oipc.outcomeid && oipc.outcomeid !== 5}
+                        disabled={oipc.outcomeid && oipc.outcomeid !== 5 || isHistoricalRequest}
                     >
                         <MenuItem disabled value={-1}>
                             Select Status
@@ -233,7 +256,16 @@ const OIPCItem = (props) => {
                         {oipcStatuses.map((status) => {
                             return <MenuItem key={status.statusid} value={status.statusid}>{status.name}</MenuItem>
                         })}
-                    </TextField>
+                    </TextField>:
+                    <TextField
+                        InputLabelProps={{ shrink: true }}
+                        variant="outlined"
+                        fullWidth
+                        value={oipc.status}
+                        label="Status"
+                        disabled
+                    >
+                    </TextField>}                    
                 </Grid>
                 <Grid item md={3}>
                     <TextField
@@ -243,11 +275,12 @@ const OIPCItem = (props) => {
                         onChange = {(event) => handleInvestiagtor(event.target.value)}
                         value={oipc.investigator}
                         InputLabelProps={{ shrink: true }}
-                        disabled={oipc.outcomeid && oipc.outcomeid !== 5}
+                        disabled={oipc.outcomeid && oipc.outcomeid !== 5 || isHistoricalRequest}
                         placeholder="Firstname Lastname"
                     />
                 </Grid>
                 <Grid item md={3}>
+                    {!isHistoricalRequest ?
                     <TextField
                         InputLabelProps={{ shrink: true }}
                         select
@@ -267,7 +300,16 @@ const OIPCItem = (props) => {
                                 return <MenuItem disabled={oipc.outcomeid === null} key={outcome.outcomeid} value={outcome.outcomeid}>{outcome.name}</MenuItem>
                             }
                         })}
-                    </TextField>
+                    </TextField> :
+                    <TextField
+                        InputLabelProps={{ shrink: true }}
+                        variant="outlined"
+                        fullWidth
+                        disabled
+                        value={oipc.outcome}
+                        label="Outcome"
+                    >
+                    </TextField>}
                 </Grid>
                 <Grid item md={3}>
                     <TextField 
@@ -279,7 +321,7 @@ const OIPCItem = (props) => {
                         InputLabelProps={{ shrink: true }}
                         InputProps={{inputProps: { max: formatDate(new Date())} }}
                         type="date"
-                        disabled={oipc.outcomeid && oipc.outcomeid !== 5}
+                        disabled={oipc.outcomeid && oipc.outcomeid !== 5 || isHistoricalRequest}
                     />
                 </Grid>
             </Grid>
@@ -289,14 +331,14 @@ const OIPCItem = (props) => {
                     <FormControlLabel control={<Checkbox 
                         checked={oipc.isinquiry} 
                         onChange = {() => handleInquiry(true)}
-                        disabled={oipc.outcomeid && oipc.outcomeid !== 5}
+                        disabled={oipc.outcomeid && oipc.outcomeid !== 5 || isHistoricalRequest}
                         />} 
                         label="Yes" 
                         />
                     <FormControlLabel control={<Checkbox 
                         checked={!oipc.isinquiry} 
                         onChange = {() => handleInquiry(false)}
-                        disabled={oipc.outcomeid && oipc.outcomeid !== 5}
+                        disabled={oipc.outcomeid && oipc.outcomeid !== 5 || isHistoricalRequest}
                         />} 
                         label="No" 
                         />
@@ -306,14 +348,14 @@ const OIPCItem = (props) => {
                     <FormControlLabel control={<Checkbox 
                         checked={oipc.isjudicialreview} 
                         onChange = {() => handleJudicalReview(true)}
-                        disabled={oipc.outcomeid && oipc.outcomeid !== 5}
+                        disabled={oipc.outcomeid && oipc.outcomeid !== 5 || isHistoricalRequest}
                         />} 
                         label="Yes" 
                         />
                     <FormControlLabel control={<Checkbox 
                         checked={!oipc.isjudicialreview} 
                         onChange = {() => handleJudicalReview(false)}
-                        disabled={oipc.outcomeid && oipc.outcomeid !== 5}
+                        disabled={oipc.outcomeid && oipc.outcomeid !== 5 || isHistoricalRequest}
                         />} 
                         label="No" 
                         />
@@ -323,14 +365,14 @@ const OIPCItem = (props) => {
                     <FormControlLabel control={<Checkbox 
                         checked={oipc.issubsequentappeal} 
                         onChange = {() => handleSubsequentAppeal(true)}
-                        disabled={oipc.outcomeid && oipc.outcomeid !== 5}
+                        disabled={oipc.outcomeid && oipc.outcomeid !== 5 || isHistoricalRequest}
                         />} 
                         label="Yes"
                         />
                     <FormControlLabel control={<Checkbox 
                         checked={!oipc.issubsequentappeal} 
                         onChange = {() => handleSubsequentAppeal(false)}
-                        disabled={oipc.outcomeid && oipc.outcomeid !== 5}
+                        disabled={oipc.outcomeid && oipc.outcomeid !== 5 || isHistoricalRequest}
                         />} 
                         label="No" 
                         />
@@ -350,7 +392,7 @@ const OIPCItem = (props) => {
                         type="date"
                         error={oipc.inquiryattributes.orderno ? (!oipc.outcomeid || oipc.outcomeid === 5) && oipc.inquiryattributes.inquirydate === null || oipc.inquiryattributes.inquirydate === "" : false}
                         required={oipc.inquiryattributes.orderno}
-                        disabled={oipc.outcomeid && oipc.outcomeid !== 5}
+                        disabled={oipc.outcomeid && oipc.outcomeid !== 5 || isHistoricalRequest}
                     />
                 </Grid>
                 <Grid item md={4}>
@@ -363,7 +405,7 @@ const OIPCItem = (props) => {
                         InputLabelProps={{ shrink: true }}
                         error={oipc.inquiryattributes.inquirydate ? (!oipc.outcomeid || oipc.outcomeid === 5) && oipc.inquiryattributes.orderno === "" : false}
                         required={oipc.inquiryattributes.inquirydate}
-                        disabled={oipc.outcomeid && oipc.outcomeid !== 5}
+                        disabled={oipc.outcomeid && oipc.outcomeid !== 5 || isHistoricalRequest}
                         placeholder="Order Number"
                     />
                 </Grid>
@@ -376,7 +418,7 @@ const OIPCItem = (props) => {
                         fullWidth
                         value={oipc.inquiryattributes.inquiryoutcome ? oipc.inquiryattributes.inquiryoutcome : -1}
                         label="Inquiry Outcome"
-                        disabled={oipc.outcomeid && oipc.outcomeid !== 5}
+                        disabled={oipc.outcomeid && oipc.outcomeid !== 5 || isHistoricalRequest}
                     >
                         <MenuItem disabled value={-1}>
                             Select Inquiry Outcome

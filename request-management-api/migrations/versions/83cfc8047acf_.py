@@ -1,7 +1,7 @@
 """empty message
 
 Revision ID: 83cfc8047acf
-Revises: bbee01df3e8d
+Revises: 77ef102e9823
 Create Date: 2024-10-31 12:47:04.379106
 
 """
@@ -12,7 +12,7 @@ from sqlalchemy.sql.sqltypes import Boolean, String
 
 # revision identifiers, used by Alembic.
 revision = '83cfc8047acf'
-down_revision = 'bbee01df3e8d'
+down_revision = '77ef102e9823'
 branch_labels = None
 depends_on = None
 
