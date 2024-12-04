@@ -221,10 +221,15 @@ export const Fees = ({
     }
   
     const validateFields = () => {
-      if (applicationFeeFormData?.paymentSource != 'creditcardonline') {
-        if (applicationFeeFormData?.paymentDate == null || applicationFeeFormData?.paymentDate == '') return false;
-        if (applicationFeeFormData?.amountPaid == 0) return false;
-        if (applicationFeeFormData?.paymentSource == 'init') return false;
+      if (!_.isEqual(initialApplicationFeeFormData?.applicationFeeStatus, applicationFeeFormData?.applicationFeeStatus)) {
+        if (applicationFeeFormData?.applicationFeeStatus == 'na-ige' || applicationFeeFormData?.applicationFeeStatus == 'appfeeowing') return true;
+        if (applicationFeeFormData?.applicationFeeStatus == 'paid') {
+          if (applicationFeeFormData?.paymentSource != 'creditcardonline') {
+            if (applicationFeeFormData?.paymentDate == null || applicationFeeFormData?.paymentDate == '') return false;
+            if (applicationFeeFormData?.amountPaid == 0) return false;
+            if (applicationFeeFormData?.paymentSource == 'init') return false;
+          }
+        }
       }
       if (validateBalancePaymentMethod() || validateEstimatePaymentMethod()) {
         return false;
@@ -245,10 +250,12 @@ export const Fees = ({
       if (!validateApplicationFeeAmountPaid()) {
         return false;
       }
-      if (!validateApplicationFeeRefundAmount() || !applicationFeeFormData?.refundDate) {
-        return false;
+      if (!_.isEqual(initialApplicationFeeFormData?.refundAmount, applicationFeeFormData?.refundAmount) ||
+        !_.isEqual(initialApplicationFeeFormData?.refundDate, applicationFeeFormData?.refundDate)) {
+        if (!validateApplicationFeeRefundAmount() || !applicationFeeFormData?.refundDate) {
+          return false;
+        }
       }
-
       if (receiptFileUpload && receiptFileUpload.length > 0) return true;
 
       return !_.isEqual(initialCFRFormData, CFRFormData) || !_.isEqual(initialApplicationFeeFormData, applicationFeeFormData);
