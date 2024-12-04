@@ -120,7 +120,7 @@ class FOIApplicantCorrespondenceRawRequest(db.Model):
         correspondence = FOIApplicantCorrespondenceRawRequest.getapplicantcorrespondencebyid(correspondenceid)
         try:
             db.session.query(FOIApplicantCorrespondenceRawRequest).filter(FOIApplicantCorrespondenceRawRequest.foirawrequest_id == rawrequestid, 
-                            FOIApplicantCorrespondenceRawRequest.applicantcorrespondenceid == correspondenceid, FOIApplicantCorrespondenceRawRequest.version == correspondence['version']
+                            FOIApplicantCorrespondenceRawRequest.applicantcorrespondenceid == correspondenceid, FOIApplicantCorrespondenceRawRequest.version == correspondence.get('version')
                             ).update({FOIApplicantCorrespondenceRawRequest.isdeleted: True, FOIApplicantCorrespondenceRawRequest.updatedby: userid,
                             FOIApplicantCorrespondenceRawRequest.updated_at: datetime.now()}, synchronize_session=False)
             db.session.commit()  
