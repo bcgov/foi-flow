@@ -109,7 +109,9 @@ const StateDropDown = ({
     const appendRecordsReadyForReview = (stateList) => {
       const recordsreadyforreview = { status: "Records Ready for Review", isSelected: false };
       let appendedList = stateList.slice();
-      appendedList.splice(-1, 0, recordsreadyforreview);
+      if(previousState === StateEnum.open.name || previousState === StateEnum.response.name)
+        appendedList.splice(-2, 0, recordsreadyforreview);
+      else appendedList.splice(-1, 0, recordsreadyforreview);
       return appendedList;
     }
     const appendPreviousStateForHoldOthers = (stateList, previousStateName) => {

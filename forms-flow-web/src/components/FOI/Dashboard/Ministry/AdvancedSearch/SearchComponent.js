@@ -131,7 +131,8 @@ const AdvancedSearch = ({ userDetail }) => {
     [StateEnum.review.label]: false,
     [StateEnum.signoff.label]: false,
     [StateEnum.closed.label]: false,
-    [StateEnum.callforrecordsoverdue.label]: false
+    [StateEnum.callforrecordsoverdue.label]: false,
+    [StateEnum.onholdother.label]: false
   };
   const [requestState, setRequestState] = useState(() => {
     if (Object.keys(advancedSearchParams).length > 0 && advancedSearchParams.requestState.length > 0) {
@@ -665,6 +666,20 @@ const AdvancedSearch = ({ userDetail }) => {
                         />
                       }
                       label="Ministry Sign Off"
+                    />
+                    <FormControlLabel
+                      className={classes.checkboxLabel}
+                      control={
+                        <Checkbox
+                          size="small"
+                          name="onholdother"
+                          stateid={StateEnum.onholdother.label}
+                          onChange={handleRequestStateChange}
+                          checked={requestState[StateEnum.onholdother.label]}
+                          color="success"
+                        />
+                      }
+                      label="On Hold - Other"
                     />
                     <FormControlLabel
                       className={classes.checkboxLabel}
