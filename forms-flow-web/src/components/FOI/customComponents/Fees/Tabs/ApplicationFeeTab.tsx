@@ -363,14 +363,15 @@ export const ApplicationFeeTab = ({
     const uploadedReceiptsField = formData?.receipts.map((receipt: any) => {
       if (receipt.isactive) {
         return (
-          <div className="col-lg-12 foi-details-col">
+          <div className="col-lg-12 foi-details-col application-fee-receipt">
             <u
+              className="receipt-link"
               onClick={() => {
                 getReceiptFile(receipt?.receiptfilename, receipt?.receiptfilepath)}
               }
             >{receipt.receiptfilename ? receipt.receiptfilename : 'view online payment receipt'}</u>
             <i
-              className="fa fa-times-circle"
+              className="fa fa-times-circle receipt-delete"
               onClick={() => setFormData((values: any) => ({...values, ['receipts']: [...formData?.receipts.filter((r: any) => r.receiptfilename != receipt.receiptfilename), {...receipt, isactive: false}]}))}
             >
             </i>
