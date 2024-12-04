@@ -17,7 +17,7 @@ class applicationfeeservice:
         if result.success == True and applicationfeeservice().applicationfeestatushaschanged(requestid):
             applicationfeeformevent().createfeestatuschangeevent(requestid, ministryrequestid, data, userid, username)
         if result.success == True and applicationfeeservice().applicationfeerefundupdated(requestid):
-            applicationfeeformevent().createfeerefundevent(requestid, ministryrequestid, applicationfee.refundamount, userid, username)
+            applicationfeeformevent().createfeerefundevent(requestid, ministryrequestid, data['refundamount'], userid, username)
         return result
     
     def getapplicationfee(self, requestid, ministryrequestid = None):
@@ -90,7 +90,7 @@ class applicationfeeservice:
         applicationfee.orderid = data.get('orderid', None)
         applicationfee.transactionnumber = data.get('transactionnumber', None)
         applicationfee.refundamount = data.get('refundamount', None)
-        if data['refunddate'] and isinstance(data['refunddate'], str) and len(data['refunddate']) < 11 and data['refunddate'].count('-') == 2:
+        if 'refunddate' in data and isinstance(data['refunddate'], str) and len(data['refunddate']) < 11 and data['refunddate'].count('-') == 2:
             parseddateobject = data['refunddate'].split('-')
             datetime_object = datetime(int(parseddateobject[0]), int(parseddateobject[1]), int(parseddateobject[2]), 17, 0, 0)
             applicationfee.refunddate = datetime_object

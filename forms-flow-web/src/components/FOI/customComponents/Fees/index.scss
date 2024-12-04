@@ -178,6 +178,12 @@
     font-size: 20px;
     margin-top: 2px;
   }
+  .receipt-link {
+    cursor: pointer;
+  }
+  .receipt-delete {
+    cursor: pointer;
+  }
 }
 
 @media (max-width: 1444px) {
