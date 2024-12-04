@@ -1078,16 +1078,6 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
     );
   };
 
-  const showContactApplicantTab = () => {
-    return (
-      // requestState !== StateEnum.intakeinprogress.name &&
-      // requestState !== StateEnum.unopened.name &&
-      // requestState !== StateEnum.open.name &&
-      // requestState !== StateEnum.appfeeowing.name &&
-      requestDetails?.requestType === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_GENERAL ||
-      requestDetails?.requestType === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL)
-  }
-
   const getHistoryCount = () => {
     let historyCount= applicantCorrespondence.length + requestNotes.filter(
             c => c.commentTypeId !== getCommentTypeIdByName(commentTypes, "Ministry Internal") &&
@@ -1209,7 +1199,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
                     Records
                   </div>
                 )}
-                {showContactApplicantTab() && (
+                {
                   <div
                     className={clsx("tablinks", {
                       active: tabLinksStatuses.ContactApplicant.active,
@@ -1222,7 +1212,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
                       ? `(${applicantCorrespondence.length})`
                       : ""}
                   </div>
-                )}
+                }
               </>
             )}
             <div
@@ -1752,7 +1742,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
               </>
             )}
           </div>
-          {showContactApplicantTab() && (
+          {
             <div
               id="ContactApplicant"
               className={clsx("tabcontent", {
@@ -1779,7 +1769,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
                 <Loading />
               )}
             </div>
-          )}
+          }
           <div
             id="RequestHistory"
             className={clsx("tabcontent", {
