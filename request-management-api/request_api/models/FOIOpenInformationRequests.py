@@ -467,6 +467,9 @@ class FOIOpenInformationRequests(db.Model):
 
             service = recordservicebase() 
             uploadedrecords = FOIRequestRecord.fetch(requestid, ministryRequestid) 
+
+            response = None
+            err = None
             
             if len(uploadedrecords) > 0:
                 response, err = service.makedocreviewerrequest(

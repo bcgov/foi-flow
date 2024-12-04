@@ -185,7 +185,6 @@ class dashboardservice:
         return jsonify({'data': requestqueue, 'meta': meta})
 
     def advancedsearch(self, params={'usertype': 'iao', 'groups':None, 'page':1, 'size':10, 'sortingitems':[], 'sortingorders':[], 'requeststate':[], 'requeststatus':[], 'requesttype':[], 'requestflags':[], 'publicbody':[], 'daterangetype':None, 'fromdate':None, 'todate':None, 'search':None, 'keywords':[], 'userid':None}):
-        print("===================advancedsearch====================")
         userid = AuthHelper.getuserid()
 
         if (params['usertype'] == "iao"):
@@ -281,7 +280,6 @@ class dashboardservice:
     #     return jsonify({'data': requestqueue, 'meta': meta})
 
     def __preparefoioirequestinfo(self, request, receivedDate, publicationDate, fromClosed, oilayerpagecount):
-        print("request : ", request)
         return {
             'id': request.id,
             'idNumber': request.idNumber,
@@ -343,9 +341,15 @@ class dashboardservice:
             request.id,
             request.ministryrequestid
         )
-
-        # Add page counts to request object
-        oilayerpagecount = next(iter(page_counts.values())) if not err and next(iter(page_counts.values())) is not None else 0
-    
+        # Get the page count value from the dictionary with error handling
+        oilayerpagecount = '0'
+        try:
+            if not err and isinstance(page_counts, dict) and page_counts:
+                first_value = next(iter(page_counts.values()))
+                oilayerpagecount = str(first_value) if first_value is not None else '0'
+        except Exception as e:
+            logging.error(f"Error extracting page count: {str(e)}")
+            oilayerpagecount = '0'
+            
         return self.__preparefoioirequestinfo(request, _receiveddate, _publicationdate, _from_closed, oilayerpagecount)
           
