@@ -15,6 +15,7 @@ class applicationfeeservice:
         applicationfee = self.__prepareapplicationfee(requestid, data, data.get('applicationfeeid') is not None)
         result = FOIRequestApplicationFee.saveapplicationfee(applicationfee, userid)
         if result.success == True and applicationfeeservice().applicationfeestatushaschanged(requestid):
+            data['applicationfeestatus'] = applicationfee.applicationfeestatus
             applicationfeeformevent().createfeestatuschangeevent(requestid, ministryrequestid, data, userid, username)
         if result.success == True and applicationfeeservice().applicationfeerefundupdated(requestid):
             applicationfeeformevent().createfeerefundevent(requestid, ministryrequestid, data['refundamount'], userid, username)
@@ -82,7 +83,10 @@ class applicationfeeservice:
         applicationfee.amountpaid = data.get('amountpaid', None)
         applicationfee.paymentsource = data.get('paymentsource', None)
         applicationfee.paymentdate = data.get('paymentdate', None)
+        setstatustopaid = False if None in [applicationfee.amountpaid, applicationfee.paymentsource, applicationfee.paymentdate] else True
         # If newly selected date with datepicker (format as string 'YYYY-MM-DD'), add time to create a datetime object
+        if setstatustopaid:
+            applicationfee.applicationfeestatus = 'paid'
         if applicationfee.paymentdate and isinstance(applicationfee.paymentdate, str) and len(applicationfee.paymentdate) < 11 and applicationfee.paymentdate.count('-') == 2:
             parseddateobject = applicationfee.paymentdate.split('-')
             datetime_object = datetime(int(parseddateobject[0]), int(parseddateobject[1]), int(parseddateobject[2]), 17, 0, 0)
