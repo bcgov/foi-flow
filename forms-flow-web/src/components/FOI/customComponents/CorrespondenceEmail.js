@@ -156,7 +156,10 @@ export default function CorrespondenceEmail({
         helperText={validation.helperTextValue}
         />
         <div>
-        <button className="btn-bottom btn-save" onClick={handleEmailSave} disabled={!newCorrespondenceEmail || isEmailPresent(newCorrespondenceEmail)}>
+        <button className="btn-bottom btn-save" 
+          onClick={handleEmailSave} 
+          disabled={!newCorrespondenceEmail || isEmailPresent(newCorrespondenceEmail) || 
+            (validation.helperTextValue !== undefined && validation.helperTextValue !== "")}>
                 Save
         </button>
         <button className="btn-cancel" onClick={() => setShowAddEmail(false)} >
