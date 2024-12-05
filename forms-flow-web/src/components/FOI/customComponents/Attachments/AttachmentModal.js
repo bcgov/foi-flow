@@ -865,7 +865,7 @@ export default function AttachmentModal({
               disabled={isSaveDisabled()}
               onClick={handleSave}
             >
-              {uploadFor === "email" ? "Save Changes" :"Continue"}
+              Continue
             </button>
           )}
           <button className="btn-bottom btn-cancel" onClick={handleClose}>

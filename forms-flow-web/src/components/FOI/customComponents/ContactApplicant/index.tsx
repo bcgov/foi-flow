@@ -214,17 +214,16 @@ export const ContactApplicant = ({
       }
     })
 
-    setTemplates((oldArray) => 
+    setTemplates(oldArray =>
       oldArray.filter(
-        (existingItem) =>
-          isEnabledTemplate(existingItem) ||
-          listOfDraftTemplates.includes(existingItem.templateid) ||
-          existingItem.templateid === null
+        template => updatedTemplates.includes(template.value) || template.value === ""
       )
     );
     
+    const updatedTemplates: string[] = [];
     applicantCorrespondenceTemplates.forEach((item: any) => {
       if (isEnabledTemplate(item) || listOfDraftTemplates.includes(item.templateid)) {
+      updatedTemplates.push(item.name)
       const rootpath = OSS_S3_BUCKET_FULL_PATH
       const fileInfoList = [{
         filename: item.name,
@@ -406,6 +405,7 @@ export const ContactApplicant = ({
     const attachments = await saveAttachments(files);
     let callback = (_res: string) => {
       clearcorrespondence();
+      changeCorrespondenceFilter("log");
       if (!skiptoast) {
         toast.success("Message has been sent to applicant successfully", {
         position: "top-right",
@@ -690,7 +690,7 @@ export const ContactApplicant = ({
     setOpenConfirmationModal(true);
     setConfirmationFor("delete-response")
     setConfirmationTitle("Delete Response")
-    setConfirmationMessage("Are you sure you want to delete this response? This can not be undone");
+    setConfirmationMessage("Are you sure you want to delete this response? This can not be undone.");
   }
 
   const deleteResponseAction = () => {
