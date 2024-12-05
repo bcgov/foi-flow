@@ -690,7 +690,7 @@ export const ContactApplicant = ({
     setOpenConfirmationModal(true);
     setConfirmationFor("delete-response")
     setConfirmationTitle("Delete Response")
-    setConfirmationMessage("Are you sure you want to delete this response? This can not be undone");
+    setConfirmationMessage("Are you sure you want to delete this response? This can not be undone.");
   }
 
   const deleteResponseAction = () => {
