@@ -214,17 +214,14 @@ export const ContactApplicant = ({
       }
     })
 
-    setTemplates((oldArray) => 
-      oldArray.filter(
-        (existingItem) =>
-          isEnabledTemplate(existingItem) ||
-          listOfDraftTemplates.includes(existingItem.templateid) ||
-          existingItem.templateid === null
-      )
+    setTemplates(oldArray =>
+      oldArray.filter(template => updatedTemplates.includes(template.value) || template.value === "")
     );
     
+    const updatedTemplates: string[] = [];
     applicantCorrespondenceTemplates.forEach((item: any) => {
       if (isEnabledTemplate(item) || listOfDraftTemplates.includes(item.templateid)) {
+      updatedTemplates.push(item.name)
       const rootpath = OSS_S3_BUCKET_FULL_PATH
       const fileInfoList = [{
         filename: item.name,
