@@ -26,14 +26,14 @@ def upgrade():
 
     op.execute('''INSERT INTO public."OpenInformationStatuses" (name, isactive) 
                VALUES 
-               ('OI Review', True),
-               ('Exemption Request', True),
-               ('Do Not Publish', True),
-               ('Publication Review', True),
+               ('First Review', True),
                ('Peer Review', True),
-               ('Ready For Publishing', True),
+               ('Ready to Publish', True),
                ('Published', True),
-               ('Unpublish Request', True);''')
+               ('HOLD Publication', True),
+               ('Unpublished', True),
+               ('Do Not Publish', True),
+               ('Exemption Request', True);''')
 
 def downgrade():
     op.drop_table('OpenInformationStatuses')

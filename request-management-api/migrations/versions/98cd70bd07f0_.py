@@ -33,6 +33,7 @@ def upgrade():
     sa.Column('iaorationale', sa.String()),
     sa.Column('oifeedback', sa.String()),
     sa.Column('publicationdate', sa.DateTime()),
+    sa.Column('copyrightsevered', sa.Boolean()),
     sa.Column('isactive', sa.Boolean()),
 
     sa.Column('created_at', sa.DateTime(), nullable=False),

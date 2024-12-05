@@ -3,6 +3,8 @@ from request_api.models.OpenInformationExemptions import OpenInformationExemptio
 from request_api.models.OpenInformationStatuses import OpenInformationStatuses
 from request_api.models.FOIOpenInformationRequests import FOIOpenInformationRequests
 from request_api.models.FOIMinistryRequests import FOIMinistryRequest
+from request_api.models.FOIOpenInfoAdditionalFiles import FOIOpenInfoAdditionalFiles
+from datetime import datetime
 
 class openinfoservice:
     """ OpenInformation service
@@ -41,4 +43,19 @@ class openinfoservice:
             foiopeninfoid = result.identifier
             deactivateresult = FOIOpenInformationRequests().deactivatefoiopeninforequest(foiopeninfoid, userid, foiministryrequestid)
         if result and deactivateresult:
-            return result
+            return result            
+    
+    def fetchopeninfoadditionalfiles(self, foiministryrequestid):
+        return FOIOpenInfoAdditionalFiles.fetch(foiministryrequestid)
+    
+    def saveopeninfoadditionalfiles(self, foiministryrequestid, files, userid):
+        filelist = []
+        for file in files['additionalfiles']:
+            _file = FOIOpenInfoAdditionalFiles(ministryrequestid=foiministryrequestid, createdby = userid, created_at = datetime.now(), isactive=True)
+            _file.__dict__.update(file)
+            filelist.append(_file)
+        filesaveresult = FOIOpenInfoAdditionalFiles.create(filelist)
+        return filesaveresult
+    
+    def deleteopeninfoadditionalfiles(self, fileids, userid):
+        return FOIOpenInfoAdditionalFiles.bulkdelete(fileids['fileids'], userid)

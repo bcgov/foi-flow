@@ -13,6 +13,7 @@ import {
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import { makeStyles } from "@material-ui/styles";
 import { useSelector } from "react-redux";
+// import { useState, useEffect } from "react";
 
 type OIPublicationStatus = {
   oipublicationstatusid: number;
@@ -36,6 +37,16 @@ const IAOOpenInfoMain = ({
   const oiExemptions: OIExemption[] = useSelector(
     (state: any) => state.foiRequests.oiExemptions
   );
+
+  // let foiOITransactionData = useSelector(
+  //   (state: any) => state.foiRequests.foiOpenInfoRequest
+  // ); 
+  
+  // const [oiPublicationData, setOiPublicationData] = useState(foiOITransactionData);
+
+  // useEffect(() => {
+  //   setOiPublicationData(foiOITransactionData);
+  // }, [foiOITransactionData, oiPublicationStatuses, oiExemptions]);
 
   const disableIAOField =
     oiPublicationData?.oipublicationstatus_id === 2 || isOIUser;
@@ -72,12 +83,13 @@ const IAOOpenInfoMain = ({
         <AccordionDetails className={classes.accordionDetails}>
           <Grid container spacing={3}>
             <Grid item md={6}>
+              {/* <div>{oiPublicationData?.oipublicationstatus_id}</div> */}
               <TextField
                 fullWidth
                 name="oipublicationstatus_id"
                 label="Publication Status"
                 variant="outlined"
-                value={oiPublicationData?.oipublicationstatus_id}
+                value={oiPublicationData?.oipublicationstatus_id || 2}
                 select
                 required
                 InputLabelProps={{ shrink: true }}
@@ -109,7 +121,7 @@ const IAOOpenInfoMain = ({
                 name="oiexemption_id"
                 label="Do Not Publish Reason"
                 variant="outlined"
-                value={oiPublicationData?.oiexemption_id}
+                value={oiPublicationData?.oiexemption_id || 0}
                 select
                 required={!isOIUser}
                 InputLabelProps={{ shrink: true }}
@@ -140,7 +152,7 @@ const IAOOpenInfoMain = ({
                 label="Page References"
                 name="pagereference"
                 variant="outlined"
-                value={oiPublicationData.pagereference}
+                value={oiPublicationData?.pagereference}
                 InputLabelProps={{ shrink: true }}
                 onChange={(event) =>
                   handleOIDataChange(event.target.value, event.target.name)

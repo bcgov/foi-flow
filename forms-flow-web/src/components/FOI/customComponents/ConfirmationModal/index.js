@@ -182,7 +182,9 @@ export default function ConfirmationModal({requestId, openModal, handleModal, st
       handleModal(true, fileInfoList, files);
     }
 
-    let message = getMessage(saveRequestObject, state, axisRequestId, currentState, requestId, cfrStatus,allowStateChange,isAnyAmountPaid, estimatedTotalDue);
+    let message = userGroups.includes("OI Team") ? 
+      {title: "Changing the state", body: "Are you sure you want to change the state of this request to " + state + "?"}
+      : getMessage(saveRequestObject, state, axisRequestId, currentState, requestId, cfrStatus,allowStateChange,isAnyAmountPaid, estimatedTotalDue);
     const attchmentFileNameList = attachmentsArray?.map(_file => _file.filename);
 
     const getDaysRemaining = () => {
