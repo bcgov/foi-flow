@@ -268,7 +268,7 @@ class requestservicegetter:
         onholddate = None
         transitions = FOIMinistryRequest.getrequeststatusById(foiministryrequestid)
         for entry in transitions:
-            if entry['requeststatuslabel'] == StateName.onhold.name:
+            if (entry['requeststatuslabel'] == StateName.onhold.name or entry['requeststatuslabel'] == StateName.onholdother.name):
                 onholddate = datetimehandler().convert_to_pst(entry['created_at'],'%Y-%m-%d')
             else:
                 if onholddate is not None:
