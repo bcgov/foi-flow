@@ -86,7 +86,7 @@ export const PreviewModal = React.memo(({
         <DialogContentText id="state-change-dialog-description" component={'span'}>
           <div className="state-change-email-note">
           {enableSend && selectedEmails.length > 0 && (<p>Email to: {selectedEmails.join(', ')}</p>)}
-          {!enableSend && (<p>There is no email associated with this applicant a word doc will be created to be printed.</p>)}
+          {!enableSend && (<p>No email address has been selected to send this correspondence to. Instead, you can export this correspondence as a PDF.</p>)}
           </div>
           <div className="preview-container">
             <iframe srcDoc={ renderTemplate(template, innerhtml, templateVariables) } className="preview-frame" sandbox="allow-same-origin" />
