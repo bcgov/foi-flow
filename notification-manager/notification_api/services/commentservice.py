@@ -16,10 +16,10 @@ class commentservice:
     """
     
 
-    def createcomment(self, requesttype, requestid, comment, userid, type=1):
+    def createcomment(self, requesttype, requestid, comment, userid, type=1, createdat=datetime.now()):
         foirequest = self.getrequest(requestid, requesttype) 
         _comment = self.__preparecomment(foirequest, comment)
-        FOIRequestComment().savecomment(type, _comment, userid)
+        FOIRequestComment().savecomment(type, _comment, userid, createdat)
         return  DefaultMethodResult(True,'No change',requestid)
 
     def __preparecomment(self, foirequest, comment):

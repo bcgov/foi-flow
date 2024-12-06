@@ -143,7 +143,8 @@ const AdvancedSearch = ({ userDetail }) => {
     [StateEnum.review.label]: false,
     [StateEnum.signoff.label]: false,
     [StateEnum.closed.label]: false,
-    [StateEnum.callforrecordsoverdue.label]: false
+    [StateEnum.callforrecordsoverdue.label]: false,
+    [StateEnum.onholdother.label]: false
   };
 
   const [requestState, setRequestState] = useState(() => {
