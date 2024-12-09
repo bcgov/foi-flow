@@ -83,7 +83,8 @@ class applicationfeeservice:
         applicationfee.amountpaid = data.get('amountpaid', None)
         applicationfee.paymentsource = data.get('paymentsource', None)
         applicationfee.paymentdate = data.get('paymentdate', None)
-        setstatustopaid = False if None in [applicationfee.amountpaid, applicationfee.paymentsource, applicationfee.paymentdate] else True
+        v = [applicationfee.amountpaid, applicationfee.paymentsource, applicationfee.paymentdate]
+        setstatustopaid = False if None in v or '' in v or 0 in v or 'init' in v else True
         # If newly selected date with datepicker (format as string 'YYYY-MM-DD'), add time to create a datetime object
         if setstatustopaid:
             applicationfee.applicationfeestatus = 'paid'
