@@ -86,7 +86,7 @@ class applicationfeeservice:
         v = [applicationfee.amountpaid, applicationfee.paymentsource, applicationfee.paymentdate]
         setstatustopaid = False if None in v or '' in v or 0 in v or 'init' in v else True
         # If newly selected date with datepicker (format as string 'YYYY-MM-DD'), add time to create a datetime object
-        if setstatustopaid:
+        if setstatustopaid and applicationfee.applicationfeestatus == 'init':
             applicationfee.applicationfeestatus = 'paid'
         if applicationfee.paymentdate and isinstance(applicationfee.paymentdate, str) and len(applicationfee.paymentdate) < 11 and applicationfee.paymentdate.count('-') == 2:
             parseddateobject = applicationfee.paymentdate.split('-')

@@ -53,7 +53,6 @@ class FOIRequestApplicationFee(db.Model):
         applicationfee_schema = FOIRequestApplicationFeeSchema(many=True)
         query = db.session.query(FOIRequestApplicationFee).filter_by(requestid=requestid).order_by(FOIRequestApplicationFee.applicationfeeid.desc(), FOIRequestApplicationFee.version.desc()).all()
         result = applicationfee_schema.dump(query)
-        print('result: ', result)
         if len(result) >= 2 and result[0]['refundamount'] != result[1]['refundamount']:
             return True
         elif len(result) == 1 and result[0]['refundamount'] != 0 and result[0]['refundamount'] is not None:
