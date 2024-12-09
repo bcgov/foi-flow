@@ -65,7 +65,7 @@ class SanctionFOICFRFee(Resource):
             if AuthHelper.getusertype() != "iao":
                 return {'status': False, 'message':'UnAuthorized'}, 403
             requestjson = request.get_json() 
-            ministryrequestid = None if ministryrequestid.lower()not in ['null', 'None', 'undefined'] else ministryrequestid
+            ministryrequestid = None if ministryrequestid.lower() in ['null', 'none', 'undefined'] else ministryrequestid
             foiapplicationfeeschema = FOIApplicationFeeDataSchema().load(requestjson)
             result = applicationfeeservice().saveapplicationfee(requestid, ministryrequestid, foiapplicationfeeschema,AuthHelper.getuserid(), AuthHelper.getusername())
             receipts = []
