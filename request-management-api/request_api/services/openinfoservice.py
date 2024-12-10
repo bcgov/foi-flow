@@ -4,8 +4,6 @@ from request_api.models.OpenInformationStatuses import OpenInformationStatuses
 from request_api.models.FOIOpenInformationRequests import FOIOpenInformationRequests
 from request_api.models.FOIMinistryRequests import FOIMinistryRequest
 from request_api.models.FOIOpenInfoAdditionalFiles import FOIOpenInfoAdditionalFiles
-from request_api.schemas.foirequestwrapper import  FOIRequestWrapperSchema
-from request_api.services.requestservice import requestservice
 from datetime import datetime
 
 class openinfoservice:
@@ -32,8 +30,6 @@ class openinfoservice:
         return result
 
     def updateopeninforequest(self, foiopeninforequest, userid, foiministryrequestid, foirequestid):
-        if foiopeninforequest["oipublicationstatus_id"] == 1 and foiopeninforequest["oiexemption_id"] != 4:
-            foiministry_result = self.updatefoiministryrequest(foirequestid, foiministryrequestid, userid)
         prev_foiopeninforequest = self.getcurrentfoiopeninforequest(foiministryrequestid)
         foiministryrequestversion = FOIMinistryRequest().getversionforrequest(foiministryrequestid)
         foiopeninforequest['foiministryrequestversion_id'] = foiministryrequestversion
@@ -46,7 +42,7 @@ class openinfoservice:
         if result.success == True:
             foiopeninfoid = result.identifier
             deactivateresult = FOIOpenInformationRequests().deactivatefoiopeninforequest(foiopeninfoid, userid, foiministryrequestid)
-        if result and deactivateresult and foiministry_result:
+        if result and deactivateresult:
             return result            
     
     def fetchopeninfoadditionalfiles(self, foiministryrequestid):
@@ -64,10 +60,17 @@ class openinfoservice:
     def deleteopeninfoadditionalfiles(self, fileids, userid):
         return FOIOpenInfoAdditionalFiles.bulkdelete(fileids['fileids'], userid)
     
-    def updatefoiministryrequest(self, foirequestid, foiministryrequestid, userid):
-        foirequest = requestservice().getrequest(foirequestid, foiministryrequestid)
-        if foirequest["oistatus_id"] is None:
-            foirequest['oistatusid'] = 2
-            foirequestschema = FOIRequestWrapperSchema().load(foirequest)
-            foiministry_result = requestservice().saverequestversion(foirequestschema, foirequestid, foiministryrequestid, userid)
-            return foiministry_result
+    def updatefoioirequest_onfoirequestchange(self, foiministryrequestid, new_foirequestversion, userid):
+        foiopeninforequest = self.getcurrentfoiopeninforequest(foiministryrequestid)
+        foiopeninforequest['foiministryrequestversion_id'] = new_foirequestversion
+        result = FOIOpenInformationRequests().updateopeninfo(foiopeninforequest, userid)
+        deactivateresult = None
+        if result.success == True:
+            foiopeninfoid = result.identifier
+            deactivateresult = FOIOpenInformationRequests().deactivatefoiopeninforequest(foiopeninfoid, userid, foiministryrequestid)
+        if result and deactivateresult:
+            return result
+  
+    #AH NOTE -> CIRUCLAR REFERNCE BUG IN OPENSERVICE AND REQUEST SERVICE -> 
+    # NEED TO FIGURE OUT A CLEAN AND APPROIATE METHOD ON HOW TO UPDATE FOIMINISTRY OISTATUS ID WHEN FOIOPENINFO CHANGES TO TRIGGER 
+    # OI WORK FLOW START (EXEMPTION FILED OR WHEN REQ CLOSED WITH PUBLISH)  

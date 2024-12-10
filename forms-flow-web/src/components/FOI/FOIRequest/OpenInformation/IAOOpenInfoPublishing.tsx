@@ -81,6 +81,7 @@ const IAOOpenInfoPublishing = ({
         foiministryrequestid,
         foirequestid,
         oiPublicationData,
+        requestDetails,
         (err: any, _res: any) => {
           if (!err) {
             toast.update(toastID, {

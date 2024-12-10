@@ -43,6 +43,7 @@ export const saveFOIOpenInfoRequest = (
   foiministryrequestid,
   foirequestId,
   data,
+  requetsinfo,
   ...rest
 ) => {
   let apiUrl = replaceUrl(
@@ -52,7 +53,9 @@ export const saveFOIOpenInfoRequest = (
   );
   const done = fnDone(rest);
   return (dispatch) => {
-    httpPOSTRequest(apiUrl, data)
+    updateFOIMinistryRequestOIStatus(foiministryrequestid, foirequestId, data, requetsinfo)
+      .then((res) => {
+        httpPOSTRequest(apiUrl, data)
       .then((res) => {
         if (res.data) {
           done(null, res.data);
@@ -62,6 +65,7 @@ export const saveFOIOpenInfoRequest = (
           dispatch(serviceActionError(res));
           // dispatch(setFOILoader(false));
         }
+      });
       })
       .catch((error) => {
         done(error);
@@ -70,4 +74,24 @@ export const saveFOIOpenInfoRequest = (
         // dispatch(setFOILoader(false));
       });
   };
+};
+
+const updateFOIMinistryRequestOIStatus = (
+  foiministryrequestid, 
+  foirequestId, 
+  foiopeninfodata, 
+  requetsinfo
+) => {
+  console.log(foiopeninfodata);
+  console.log(requetsinfo);
+  let apiUrl= replaceUrl(replaceUrl(
+    API.FOI_REQUEST_SECTION_API,
+    "<ministryid>",
+    foiministryrequestid),"<requestid>", foirequestId
+  );
+  if (!requetsinfo.oistatusid && foiopeninfodata.oiexemption_id !== 5 ) {
+    return httpPOSTRequest(`${apiUrl}/oistatusid`, { oistatusid: 2 });
+  } else {
+    return Promise.resolve("API call to adjust foiministryrequest not needed")
+  }
 };
