@@ -22,6 +22,7 @@ import { fetchApplicationFeeForm, saveApplicationFeeForm } from '../../../../api
 import { completeMultiPartUpload, postFOIS3DocumentPreSignedUrl, saveFilesinS3 } from '../../../../apiManager/services/FOI/foiOSSServices';
 import FOI_COMPONENT_CONSTANTS from '../../../../constants/FOI/foiComponentConstants';
 import { StatusChangeDialog } from './StatusChangeDialog';
+import { OSS_S3_CHUNK_SIZE } from "../../../../constants/constants";
 
 export const Fees = ({
     requestNumber,
@@ -314,8 +315,7 @@ export const Fees = ({
                 const _fileInfo = fileInfoList.find((fileInfo: any) => fileInfo.filename === header.filename);
                 const documentDetails = {documentpath: header.filepathdb, filename: header.filename, category: _fileInfo.filestatustransition};
                 let bytes = await readUploadedFileAsBytes(_file)              
-                // const CHUNK_SIZE = OSS_S3_CHUNK_SIZE;
-                const CHUNK_SIZE = 104857600;
+                const CHUNK_SIZE = OSS_S3_CHUNK_SIZE;
                 const totalChunks = Math.ceil(bytes.byteLength / CHUNK_SIZE);
                 let parts = [];
                 for (let chunk = 0; chunk < totalChunks; chunk++) {
