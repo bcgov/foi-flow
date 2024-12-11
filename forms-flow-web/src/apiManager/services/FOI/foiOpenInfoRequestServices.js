@@ -82,16 +82,14 @@ const updateFOIMinistryRequestOIStatus = (
   foiopeninfodata, 
   requetsinfo
 ) => {
-  console.log(foiopeninfodata);
-  console.log(requetsinfo);
   let apiUrl= replaceUrl(replaceUrl(
     API.FOI_REQUEST_SECTION_API,
     "<ministryid>",
     foiministryrequestid),"<requestid>", foirequestId
   );
-  if (!requetsinfo.oistatusid && foiopeninfodata.oiexemption_id !== 5 ) {
+  if (!requetsinfo.oistatusid && foiopeninfodata.oiexemption_id !== 5) {
     return httpPOSTRequest(`${apiUrl}/oistatusid`, { oistatusid: 2 });
   } else {
-    return Promise.resolve("API call to adjust foiministryrequest not needed")
+    return Promise.resolve("API call to adjust foiministryrequest not needed");
   }
 };

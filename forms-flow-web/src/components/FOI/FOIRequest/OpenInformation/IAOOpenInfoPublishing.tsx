@@ -97,6 +97,9 @@ const IAOOpenInfoPublishing = ({
               draggable: true,
               progress: undefined,
             });
+            if (!requestDetails.oistatusid && oiPublicationData.oiexemption_id !== 5) {
+              requestDetails.oistatusid = 2;
+            }
           } else {
             toast.error(
               "Temporarily unable to save FOI OpenInformation request. Please try again in a few minutes.",

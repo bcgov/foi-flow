@@ -70,7 +70,3 @@ class openinfoservice:
             deactivateresult = FOIOpenInformationRequests().deactivatefoiopeninforequest(foiopeninfoid, userid, foiministryrequestid)
         if result and deactivateresult:
             return result
-  
-    #AH NOTE -> CIRUCLAR REFERNCE BUG IN OPENSERVICE AND REQUEST SERVICE -> 
-    # NEED TO FIGURE OUT A CLEAN AND APPROIATE METHOD ON HOW TO UPDATE FOIMINISTRY OISTATUS ID WHEN FOIOPENINFO CHANGES TO TRIGGER 
-    # OI WORK FLOW START (EXEMPTION FILED OR WHEN REQ CLOSED WITH PUBLISH)  
