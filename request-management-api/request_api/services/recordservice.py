@@ -81,7 +81,8 @@ class recordservice(recordservicebase):
             records = FOIRequestRecord.getrecordsbyid(recordids)
             for record in records:
                 record['attributes'] = json.loads(record['attributes'])
-                record['attributes']['personalattributes'] = requestdata['newpersonalattributes']
+                for attribute in requestdata['newpersonalattributes']:
+                    record['attributes']['personalattributes'][attribute] = requestdata['newpersonalattributes'][attribute]
                 # divisions = divisions + [div for div in record['attributes']['divisions'] if div not in divisions]
                 record.update({'updated_at': datetime.now(), 'updatedby': userid})
                 record['version'] += 1
