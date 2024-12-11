@@ -34,6 +34,10 @@ class FOIRequestComment(object):
             
             conn = getconnection()
             cursor = conn.cursor()
+
+            print(createdat)
+            print(datetime.now())
+            print(createdat or datetime.now())
            
             cursor.execute('INSERT INTO public."FOIRequestComments" (parentcommentid, ministryrequestid, "version", commenttypeid, \
                                 comment, taggedusers, isactive, createdby, created_at, commentsversion) \
