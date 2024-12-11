@@ -2678,7 +2678,16 @@ export const RecordsLog = ({
                 <span>
                   <button
                     className={` btn`}
-                    onClick={() => setEditTagModalOpen(true)}
+                    onClick={() => {
+                      setCurPersonalAttributes({
+                        person: "",
+                        filetype: "",
+                        volume: "",
+                        trackingid: "",
+                        personaltag: ""
+                      });
+                      setEditTagModalOpen(true);
+                    }}
                     disabled={lockRecords || isBulkEditDisabled()}
                     style={
                       lockRecords || isBulkEditDisabled()
