@@ -33,6 +33,7 @@ from marshmallow import Schema, fields, validate, ValidationError
 from request_api.utils.enums import MinistryTeamWithKeycloackGroup
 import json
 import asyncio
+import traceback
 
 API = Namespace('FOIRequests', description='Endpoints for FOI request management')
 TRACER = Tracer.get_instance()
@@ -75,6 +76,7 @@ class FOIRequest(Resource):
         except ValueError:
             return {'status': 500, 'message':"Invalid Request Id"}, 500
         except KeyError as error:
+            traceback.print_exc()
             return {'status': False, 'message': CUSTOM_KEYERROR_MESSAGE + str(error)}, 400        
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500
