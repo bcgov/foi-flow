@@ -4,6 +4,7 @@ import {
   serviceActionError,
   setFOILoader,
   setFOIOpenInfoRequest,
+  setFOIOpenInfoAdditionalFiles
 } from "../../../actions/FOI/foiRequestActions";
 import { fnDone, catchError } from "./foiServicesUtil";
 import UserService from "../../../services/UserService";
@@ -68,6 +69,36 @@ export const saveFOIOpenInfoRequest = (
         console.log("Error while updating FOIOpenInfoRequest data", error);
         dispatch(serviceActionError(error));
         // dispatch(setFOILoader(false));
+      });
+  };
+};
+
+export const fetchFOIOpenInfoAdditionalFiles = (foirequestId, foiministryrequestid) => {
+  if (!foiministryrequestid) {
+    return () => {};
+  }
+  let apiUrl = replaceUrl(
+    replaceUrl(API.FOI_OPENINFO_ADDITIONAL_FILES, "<foirequestid>", foirequestId),
+    "<foiministryrequestid>",
+    foiministryrequestid
+  );
+  return (dispatch) => {
+    httpGETRequest(apiUrl, {}, UserService.getToken())
+      .then((res) => {
+        if (res.data) {
+          const files = res.data;
+          dispatch(setFOIOpenInfoAdditionalFiles(files));
+          dispatch(setFOILoader(false));
+        } else {
+          console.log("Error while fetching FOIOpenInfoRequest data", res);
+          dispatch(serviceActionError(res));
+          dispatch(setFOILoader(false));
+        }
+      })
+      .catch((error) => {
+        console.log("Error while fetching FOIOpenInfoRequest data", error);
+        dispatch(serviceActionError(error));
+        dispatch(setFOILoader(false));
       });
   };
 };
