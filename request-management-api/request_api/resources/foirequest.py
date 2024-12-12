@@ -76,7 +76,6 @@ class FOIRequest(Resource):
         except ValueError:
             return {'status': 500, 'message':"Invalid Request Id"}, 500
         except KeyError as error:
-            traceback.print_exc()
             return {'status': False, 'message': CUSTOM_KEYERROR_MESSAGE + str(error)}, 400        
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500
@@ -351,6 +350,7 @@ class FOIRequestForDocReviewer(Resource):
         except ValueError:
             return {'status': 500, 'message':"Invalid Request Id"}, 500
         except KeyError as error:
+            traceback.print_exc()
             return {'status': False, 'message': CUSTOM_KEYERROR_MESSAGE + str(error)}, 400        
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500
