@@ -16,7 +16,7 @@ class commentservice:
     """
     
 
-    def createcomment(self, requesttype, requestid, comment, userid, type=1, createdat):
+    def createcomment(self, requesttype, requestid, comment, userid, type=1, createdat=None):
         foirequest = self.getrequest(requestid, requesttype) 
         _comment = self.__preparecomment(foirequest, comment)
         FOIRequestComment().savecomment(type, _comment, userid, createdat)
