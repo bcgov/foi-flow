@@ -3,6 +3,8 @@ import "./iaoopeninfo.scss";
 import IAOOpenInfoHeader from "./IAOOpenInfoHeader";
 import IAOOpenInfoMain from "./IAOOpenInfoMain";
 import IAOOpenInfoSaveModal from "./IAOOpenInfoSaveModal";
+import OAOpenInfoApproveModal from "./OAOpenInfoApproveModal";
+import OAOpenInfoDeniedModal from "./OAOpenInfoDeniedModal";
 import { saveFOIOpenInfoRequest } from "../../../../apiManager/services/FOI/foiOpenInfoRequestServices";
 import { useDispatch, useSelector } from "react-redux";
 
@@ -39,6 +41,8 @@ const IAOOpenInfoPublishing = ({
   const [oiPublicationData, setOiPublicationData] =
     useState<OITransactionObject>(foiOITransactionData);
   const [showSaveModal, setShowSaveModal] = useState(false);
+  const [showApproveModal, setShowApproveModal] = useState(false);
+  const [showDeniedModal, setShowDeniedModal] = useState(false);
 
   useEffect(() => {
     setOiPublicationData(foiOITransactionData);
@@ -69,7 +73,11 @@ const IAOOpenInfoPublishing = ({
       oiPublicationData?.oipublicationstatus_id === 1 &&
       oiPublicationData?.oiexemption_id !== 5
     ) {
-      setShowSaveModal(true);
+      if(oiPublicationData?.oiexemptionapproved != null) {
+        oiPublicationData?.oiexemptionapproved ? setShowApproveModal(true) : setShowDeniedModal(true);
+      } else{
+        setShowSaveModal(true);
+      }
     } else {
       saveData();
     }
@@ -154,6 +162,16 @@ const IAOOpenInfoPublishing = ({
         showModal={showSaveModal}
         saveData={saveData}
         setShowModal={setShowSaveModal}
+      />
+      <OAOpenInfoApproveModal
+        showApproveModal={showApproveModal}
+        saveData={saveData}
+        setShowApproveModal={setShowApproveModal}
+      />
+      <OAOpenInfoDeniedModal
+        showDeniedModal={showDeniedModal}
+        saveData={saveData}
+        setShowDeniedModal={setShowDeniedModal}
       />
     </div>
   );
