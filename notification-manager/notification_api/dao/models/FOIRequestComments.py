@@ -3,7 +3,6 @@ from notification_api.dao.db import getconnection
 import logging
 from marshmallow import EXCLUDE, Schema, fields, validate
 import json
-import traceback
 
 
 class FOIRequestComment(object):
@@ -35,13 +34,7 @@ class FOIRequestComment(object):
             
             conn = getconnection()
             cursor = conn.cursor()
-
-            print("createdat")
-            print(createdat)
-            print(datetime.now())
-            print(createdat or datetime.now())
-            traceback.print_stack()
-           
+            
             cursor.execute('INSERT INTO public."FOIRequestComments" (parentcommentid, ministryrequestid, "version", commenttypeid, \
                                 comment, taggedusers, isactive, createdby, created_at, commentsversion) \
                                 VALUES(%s::integer,%s::integer, %s::integer, %s::integer,%s,%s,%s::boolean,%s,%s,%s::integer) RETURNING commentid', 
