@@ -115,7 +115,7 @@ import { setFOIRequestDetail } from "../../../actions/FOI/foiRequestActions";
 import OIPCDetails from "./OIPCDetails/Index";
 import useOIPCHook from "./OIPCDetails/oipcHook";
 import MANDATORY_FOI_REQUEST_FIELDS from "../../../constants/FOI/mandatoryFOIRequestFields";
-import IAOOpenInfoPublishing from "./OpenInformation/IAOOpenInfoPublishing";
+import OpenInfo from "./OpenInformation/OpenInfo";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -1758,7 +1758,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
                 [classes.hidden]: !tabLinksStatuses.OpenInformation.display,
               })}
             >
-              <IAOOpenInfoPublishing
+              <OpenInfo
                 toast={toast}
                 requestNumber={requestNumber}
                 requestDetails={requestDetails}

@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react";
-import "./iaoopeninfo.scss";
-import IAOOpenInfoHeader from "./IAOOpenInfoHeader";
-import IAOOpenInfoMain from "./IAOOpenInfoMain";
-import IAOOpenInfoSaveModal from "./IAOOpenInfoSaveModal";
 import { saveFOIOpenInfoRequest } from "../../../../apiManager/services/FOI/foiOpenInfoRequestServices";
 import { useDispatch, useSelector } from "react-redux";
+import IAOOpenInfoPublishing from "./Exemption/IAOOpenInfoPublishing";
+import OpenInfoPublication from "./Publication/OpenInfoPublication";
+import IAOOpenInfoHeader from "./IAOOpenInfoHeader";
+import "./openinfo.scss";
 
 type OITransactionObject = {
   oipublicationstatus_id: number;
@@ -15,7 +15,7 @@ type OITransactionObject = {
   oifeedback: string;
 };
 
-const IAOOpenInfoPublishing = ({
+const OpenInfo = ({
   requestNumber,
   requestDetails,
   userDetail,
@@ -23,17 +23,19 @@ const IAOOpenInfoPublishing = ({
   foirequestid,
   toast,
 }: any) => {
+  const dispatch = useDispatch();
+
+  //Global State
+  const assignedToList = useSelector(
+    (state: any) => state.foiRequests.foiFullAssignedToList
+  );
   const userGroups: string[] = userDetail.groups.map((group: any) =>
     group.slice(1)
   );
-  const assignedToList = useSelector(
-    (state : any) => state.foiRequests.foiFullAssignedToList
-  );   
+  const isOIUser: boolean = userGroups.includes("OI Team");
   let foiOITransactionData = useSelector(
     (state: any) => state.foiRequests.foiOpenInfoRequest
-  ); 
-  const isOIUser: boolean = userGroups.includes("OI Team");
-  const dispatch = useDispatch();
+  );
 
   //Local State
   const [oiPublicationData, setOiPublicationData] =
@@ -97,7 +99,10 @@ const IAOOpenInfoPublishing = ({
               draggable: true,
               progress: undefined,
             });
-            if (!requestDetails.oistatusid && oiPublicationData.oiexemption_id !== 5) {
+            if (
+              !requestDetails.oistatusid &&
+              oiPublicationData.oiexemption_id !== 5
+            ) {
               requestDetails.oistatusid = 2;
             }
           } else {
@@ -141,26 +146,20 @@ const IAOOpenInfoPublishing = ({
         isOIUser={isOIUser}
         assignedToList={assignedToList}
       />
-      <IAOOpenInfoMain
+      {/* <IAOOpenInfoPublishing
         handleOIDataChange={handleOIDataChange}
         oiPublicationData={oiPublicationData}
+        handleSave={handleSave}
+        disableSave={disableSave}
         isOIUser={isOIUser}
-      />
-      <button
-        type="button"
-        className="btn btn-bottom"
-        onClick={handleSave}
-        disabled={disableSave(oiPublicationData)}
-      >
-        Save
-      </button>
-      <IAOOpenInfoSaveModal
-        showModal={showSaveModal}
+        showSaveModal={showSaveModal}
         saveData={saveData}
-        setShowModal={setShowSaveModal}
-      />
+        setShowSaveModal={setShowSaveModal}
+      /> */}
+      <OpenInfoPublication oiPublicationData={oiPublicationData} isOIUser={isOIUser} />
+      {/* Use new save and publish button and new data? Or share data from IAOOPenFINopublish and use its save button and oi data? */}
     </div>
   );
 };
 
-export default IAOOpenInfoPublishing;
+export default OpenInfo;
