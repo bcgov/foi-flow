@@ -59,6 +59,7 @@ import {
   fetchPDFStitchedStatusForOIPCRedline,
 } from "../../../apiManager/services/FOI/foiRecordServices";
 import {
+  fetchFOIOpenInfoAdditionalFiles,
   fetchFOIOpenInfoRequest,
 } from "../../../apiManager/services/FOI/foiOpenInfoRequestServices";
 import { makeStyles } from "@material-ui/core/styles";
@@ -367,6 +368,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
 
     if (isOITeam) {
       dispatch(fetchOpenInfoStatuses());
+      dispatch(fetchFOIOpenInfoAdditionalFiles(requestId, ministryId));
     }
 
     if (bcgovcode) dispatch(fetchFOIMinistryAssignedToList(bcgovcode));
