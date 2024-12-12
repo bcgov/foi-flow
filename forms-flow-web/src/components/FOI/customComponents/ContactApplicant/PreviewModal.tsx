@@ -65,6 +65,7 @@ export const PreviewModal = React.memo(({
     };
     getTemplateVariablesAsync(requestDetails, requestExtensions, responsePackagePdfStitchStatus, cfrFeeData, templateInfo, callback)
   };
+  const emailTemplate = renderTemplate(template, innerhtml, templateVariables);
 
   return (
     <div className="state-change-dialog">        
@@ -89,7 +90,7 @@ export const PreviewModal = React.memo(({
           {!enableSend && (<p>No email address has been selected to send this correspondence to. Instead, you can export this correspondence as a PDF.</p>)}
           </div>
           <div className="preview-container">
-            <iframe srcDoc={ renderTemplate(template, innerhtml, templateVariables) } className="preview-frame" sandbox="allow-same-origin" />
+            <iframe srcDoc={ emailTemplate } className="preview-frame" sandbox="allow-same-origin" />
           </div>
           <div className="preview-container">
             {attachments.map((file: any, index: number) => (
@@ -104,7 +105,7 @@ export const PreviewModal = React.memo(({
       { !enableSend && 
         <EmailExport 
           handleExport={handleExport}
-          content={innerhtml}
+          content={emailTemplate}
         />
       }
       { enableSend && 
