@@ -53,6 +53,9 @@ class FOIOpenInformationRequests(db.Model):
     updated_at = db.Column(db.DateTime, nullable=True)
     createdby = db.Column(db.String(120), nullable=False)
     updatedby = db.Column(db.String(120), nullable=True)
+    processingstatus = db.Column(db.String(120), nullable=True)
+    processingmessage = db.Column(db.String(250), nullable=True)
+    sitemap_pages = db.Column(db.String(120), nullable=True)
 
     def getcurrentfoiopeninforequest(cls, foiminstryrequestid)->DefaultMethodResult:
         try:
@@ -105,6 +108,9 @@ class FOIOpenInformationRequests(db.Model):
                 updated_at=updateddate,
                 createdby=foiopeninforequest["createdby"],
                 updatedby=userid,
+                processingstatus=foiopeninforequest["processingstatus"],
+                processingmessage=foiopeninforequest["processingmessage"],
+                sitemap_pages=foiopeninforequest["sitemap_pages"],
             )
             db.session.add(updated_foiopeninforequest)
             db.session.commit()
@@ -515,4 +521,5 @@ class FOIOpenInfoRequestSchema(ma.Schema):
         fields = (
             'foiopeninforequestid', 'version', 'foiministryrequest_id', 'foiministryrequestversion_id', 'oipublicationstatus_id', 'oiexemption_id', 'oiassignedto',
             'oiexemptionapproved', 'copyrightsevered', 'pagereference', 'iaorationale', 'oifeedback', 'publicationdate', 'created_at', 'updated_at', 'createdby', 'updatedby'
+            'processingstatus', 'processingmessage', 'sitemap_pages'
         )

@@ -37,6 +37,9 @@ class openinfoservice:
         foiopeninforequest['version'] = prev_foiopeninforequest["version"]
         foiopeninforequest["created_at"] = prev_foiopeninforequest["created_at"]
         foiopeninforequest["createdby"] = prev_foiopeninforequest["createdby"]
+        foiopeninforequest['processingstatus'] = prev_foiopeninforequest["processingstatus"]
+        foiopeninforequest["processingmessage"] = prev_foiopeninforequest["processingmessage"]
+        foiopeninforequest["sitemap_pages"] = prev_foiopeninforequest["sitemap_pages"]
         result = FOIOpenInformationRequests().updateopeninfo(foiopeninforequest, userid)
         deactivateresult = None
         if result.success == True:
