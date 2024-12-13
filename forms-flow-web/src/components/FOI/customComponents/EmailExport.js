@@ -37,7 +37,10 @@ const EmailExport = ({handleExport, content}) => {
         } catch (error) {
           console.log(error)
         }
-        const pdfOptions = { margin: [0,0,10,0] };
+        const pdfOptions = { 
+          margin: [0,0,10,0],
+          html2canvas: { scale: 2, useCORS: true }
+        };
         html2pdf().set(pdfOptions).from(content).outputPdf('blob').then(async (blob) => {
           blobs.push({name: "Email Body.pdf", lastModified: new Date(), input: blob})
           const zipfile = await downloadZip(blobs).blob()
