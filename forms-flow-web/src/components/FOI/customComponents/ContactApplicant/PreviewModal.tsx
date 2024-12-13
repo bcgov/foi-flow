@@ -13,6 +13,7 @@ import { getOSSHeaderDetails, getFileFromS3 } from "../../../../apiManager/servi
 import { renderTemplate, applyVariables, getTemplateVariables, getTemplateVariablesAsync } from './util';
 import { OSS_S3_BUCKET_FULL_PATH, FOI_FFA_URL } from "../../../../constants/constants";
 import { EmailExport } from '../../../FOI/customComponents';
+import logo from "../../../../assets/FOI/images/logo-banner.png";
 
 
 export const PreviewModal = React.memo(({
@@ -43,12 +44,16 @@ export const PreviewModal = React.memo(({
     filename: "header_footer_template.html",
     s3sourceuri: rootpath+templatePath
   }]
+  const replaceFFAUrlLogo = (template: string, logo: string) => {
+    return template.replace(/{{ffaurl}}\/logobanner\.jpg/g, logo);
+  };
   React.useEffect(() => {
     getOSSHeaderDetails(fileInfoList, dispatch, (err: any, res: any) => {
       if (!err) {
         res.map(async (header: any, _index: any) => {
           getFileFromS3(header, async (_err: any, response: any) => {
             let html = await new Response(response.data).text();
+            html = replaceFFAUrlLogo(html, logo);
             setTemplate( `${html}` );
           });
         });
