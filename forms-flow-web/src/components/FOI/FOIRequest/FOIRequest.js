@@ -184,9 +184,6 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
   let requestApplicantProfile = useSelector(
     (state) => state.foiRequests.foiRequestApplicantProfile
   )
-  let foiOITransactionData = useSelector(
-    (state) => state.foiRequests.foiOpenInfoRequest
-  );
   const [attachments, setAttachments] = useState(requestAttachments);
   const [comment, setComment] = useState([]);
   const [requestState, setRequestState] = useState(StateEnum.unopened.name);
@@ -1215,7 +1212,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
                     name="Open Information"
                     onClick={() => tabclick("OpenInformation")}
                   >
-                    Open Information
+                    Publication
                   </div>
                 )}
                 {showContactApplicantTab() && (
@@ -1763,6 +1760,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
                 requestNumber={requestNumber}
                 requestDetails={requestDetails}
                 userDetail={userDetail}
+                currentOIRequestState={getOIRequestState()}
                 foirequestid={requestId}
                 foiministryrequestid={ministryId}
               />

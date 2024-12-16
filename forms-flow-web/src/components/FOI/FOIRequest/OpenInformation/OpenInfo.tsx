@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import IAOOpenInfoPublishing from "./Exemption/IAOOpenInfoPublishing";
 import OpenInfoPublication from "./Publication/OpenInfoPublication";
 import IAOOpenInfoHeader from "./IAOOpenInfoHeader";
+import OpenInfoTab from "./OpenInfoTab";
 import "./openinfo.scss";
 
 type OITransactionObject = {
@@ -13,6 +14,8 @@ type OITransactionObject = {
   pagereference: string;
   iaorationale: string;
   oifeedback: string;
+  copyrightsevered: boolean;
+  publicationdate: string;
 };
 
 const OpenInfo = ({
@@ -22,6 +25,7 @@ const OpenInfo = ({
   foiministryrequestid,
   foirequestid,
   toast,
+  currentOIRequestState,
 }: any) => {
   const dispatch = useDispatch();
 
@@ -32,7 +36,11 @@ const OpenInfo = ({
   const userGroups: string[] = userDetail.groups.map((group: any) =>
     group.slice(1)
   );
+
+  // AH NOTe -> ADJUST THIS OISUER CODE + remove this additoional files and use nicks work
   const isOIUser: boolean = userGroups.includes("OI Team");
+  const oiAdditonalfiles = [];
+
   let foiOITransactionData = useSelector(
     (state: any) => state.foiRequests.foiOpenInfoRequest
   );
@@ -40,7 +48,16 @@ const OpenInfo = ({
   //Local State
   const [oiPublicationData, setOiPublicationData] =
     useState<OITransactionObject>(foiOITransactionData);
-  const [showSaveModal, setShowSaveModal] = useState(false);
+  const [confirmationModal, setConfirmationModal] = useState({
+    show: false, 
+    title: "", 
+    message: "", 
+    description: "",
+    confirmButtonTitle: "",
+    confirmationData: null,
+  });
+  const [tabValue, setTabValue] = useState(isOIUser ? 2 : 1);
+  const [isDataEdited, setIsDataEdited] = useState(false);
 
   useEffect(() => {
     setOiPublicationData(foiOITransactionData);
@@ -51,6 +68,9 @@ const OpenInfo = ({
     value: number | string | boolean,
     oiDataKey: string
   ) => {
+    if (!isDataEdited) {
+      setIsDataEdited(true);
+    }
     if (oiDataKey === "oipublicationstatus_id" && value === 2) {
       setOiPublicationData((prev: any) => ({
         ...prev,
@@ -59,6 +79,17 @@ const OpenInfo = ({
         oiexemption_id: null,
         pagereference: "",
       }));
+    } else if (oiDataKey === "publicationdate" && requestDetails.closedate 
+      && typeof(value) === "string" && calculateDaysBetweenDates(value, requestDetails.closeddate) <= 10) {
+      setConfirmationModal((prev : any) => ({
+        ...prev, 
+        show: true,
+        title: "Change Publication Date",
+        description: "The date you have chosen falls within 10 business days of the closed date. Are you sure you want to continue?",
+        message: "",
+        confirmButtonTitle: "Continue",
+        confirmationData: value,
+      }));
     } else {
       setOiPublicationData((prev: any) => ({
         ...prev,
@@ -66,12 +97,19 @@ const OpenInfo = ({
       }));
     }
   };
-  const handleSave = () => {
+  const handleExemptionSave = () => {
     if (
       oiPublicationData?.oipublicationstatus_id === 1 &&
       oiPublicationData?.oiexemption_id !== 5
     ) {
-      setShowSaveModal(true);
+      setConfirmationModal((prev : any) => ({
+        ...prev, 
+        show: true,
+        title: "Exemption Request",
+        description: "Are you sure you want to change the state to Exemption Request?",
+        message: "This will assign the request to the Open Information Queue.",
+        confirmButtonTitle: "Save Changes"
+      }));
     } else {
       saveData();
     }
@@ -137,28 +175,67 @@ const OpenInfo = ({
     }
     return true;
   };
+  const disablePublish = (oiPublicationData: OITransactionObject) : boolean => {
+    const isMissingRequiredInput = !oiPublicationData?.publicationdate && !oiPublicationData?.copyrightsevered && oiAdditonalfiles.length === 0;
+    const isOIReadyToPublish = currentOIRequestState === "Ready For Publishing";
+    if (!isOIReadyToPublish) {
+      return true;
+    }
+    if (isMissingRequiredInput) {
+      return true;
+    }
+    return false;
+  }
+  const handleTabSelect = (value: number): void => {
+    setTabValue(value);
+  };
+  const handleDateConfirmation = (value : Date) => {
+    setOiPublicationData((prev: any) => ({
+      ...prev,
+      publicationdate: value,
+    }));
+  }
+  const calculateDaysBetweenDates = (date1: string, date2: string) => {
+    return Math.round((new Date(date1).getTime() - new Date(date2).getTime()) / (1000 * 3600 *24))
+  }
 
   return (
-    <div className="oi-section">
-      <IAOOpenInfoHeader
-        requestDetails={requestDetails}
-        requestNumber={requestNumber}
-        isOIUser={isOIUser}
-        assignedToList={assignedToList}
-      />
-      {/* <IAOOpenInfoPublishing
-        handleOIDataChange={handleOIDataChange}
-        oiPublicationData={oiPublicationData}
-        handleSave={handleSave}
-        disableSave={disableSave}
-        isOIUser={isOIUser}
-        showSaveModal={showSaveModal}
-        saveData={saveData}
-        setShowSaveModal={setShowSaveModal}
-      /> */}
-      <OpenInfoPublication oiPublicationData={oiPublicationData} isOIUser={isOIUser} />
-      {/* Use new save and publish button and new data? Or share data from IAOOPenFINopublish and use its save button and oi data? */}
-    </div>
+    <>
+      <div className="oi-section">
+        <IAOOpenInfoHeader
+          requestDetails={requestDetails}
+          requestNumber={requestNumber}
+          isOIUser={isOIUser}
+          assignedToList={assignedToList}
+        />
+        <OpenInfoTab tabValue={tabValue} handleTabSelect={handleTabSelect} />
+        {tabValue === 1 ? (
+          <IAOOpenInfoPublishing
+            handleOIDataChange={handleOIDataChange}
+            oiPublicationData={oiPublicationData}
+            handleExemptionSave={handleExemptionSave}
+            disableSave={disableSave}
+            isOIUser={isOIUser}
+            saveModal={confirmationModal}
+            saveData={saveData}
+            setSaveModal={setConfirmationModal}
+          />
+        ) : (
+          <OpenInfoPublication
+            oiPublicationData={oiPublicationData}
+            isOIUser={isOIUser}
+            handleOIDataChange={handleOIDataChange}
+            disablePublish={disablePublish}
+            confirmDateModal={confirmationModal}
+            handleDateConfirmation={handleDateConfirmation}
+            setConfirmDateModal={setConfirmationModal}
+            isDataEdited={isDataEdited}
+            saveData={saveData}
+            currentOIRequestState={currentOIRequestState}
+          />
+        )}
+      </div>
+    </>
   );
 };
 

@@ -8,21 +8,46 @@ import {
 } from "@material-ui/core";
 import CloseIcon from "@material-ui/icons/Close";
 
-const IAOOpenInfoSaveModal = ({ showModal, saveData, setShowModal }: any) => {
-  const handleSave = () => {
-    saveData();
-    setShowModal(false);
+const OpenInfoConfirmationModal = ({
+  confirm,
+  setModal,
+  modal,
+}: any) => {
+  const handleConfirmation = () => {
+    if (modal.title === "Exemption Request") {
+      confirm();
+    }
+    if (modal.title === "Change Publication Date") {
+      confirm(modal.confirmationData);
+    }
+    setModal((prev : any) => ({
+      ...prev,     
+      show: false, 
+      title: "", 
+      message: "", 
+      description: "",
+      confirmButtonTitle: "",
+      confirmationData: null,
+    }));
   };
   const handleClose = () => {
-    setShowModal(false);
+    setModal((prev : any) => ({
+      ...prev,     
+      show: false, 
+      title: "", 
+      message: "", 
+      description: "",
+      confirmButtonTitle: "",
+      confirmationData: null,
+    }));
   };
 
   return (
     <div className="state-change-dialog">
       <Dialog
-        open={showModal}
+        open={modal.show}
         onClose={() => {
-          handleClose()
+          handleClose();
         }}
         aria-labelledby="state-change-dialog-title"
         aria-describedby="restricted-modal-text"
@@ -30,7 +55,7 @@ const IAOOpenInfoSaveModal = ({ showModal, saveData, setShowModal }: any) => {
         fullWidth={true}
       >
         <DialogTitle disableTypography id="state-change-dialog-title">
-          <h2 className="state-change-header">{"Exemption Request"}</h2>
+          <h2 className="state-change-header">{modal.title}</h2>
           <IconButton className="title-col3" onClick={handleClose}>
             <i className="dialog-close-button">Close</i>
             <CloseIcon />
@@ -39,9 +64,11 @@ const IAOOpenInfoSaveModal = ({ showModal, saveData, setShowModal }: any) => {
         <DialogContent>
           <DialogContentText id="restricted-modal-text" component={"span"}>
             <div className="modal-msg">
-              <div className="confirmation-message">{"Are you sure you want to change the state to Exemption Request?"}</div>
+              <div className="confirmation-message">{modal.description}</div>
               <div className="modal-msg-description">
-                <i><span>This will assign the request to the Open Information Queue.</span></i>
+                <i>
+                  <span>{modal.message}</span>
+                </i>
               </div>
             </div>
           </DialogContentText>
@@ -49,10 +76,10 @@ const IAOOpenInfoSaveModal = ({ showModal, saveData, setShowModal }: any) => {
         <DialogActions>
           <button
             className={`btn-bottom btn-save btn`}
-            onClick={handleSave}
+            onClick={handleConfirmation}
             disabled={false}
           >
-            Save Change
+            {modal.confirmButtonTitle}
           </button>
           <button className="btn-bottom btn-cancel" onClick={handleClose}>
             Cancel
@@ -63,4 +90,4 @@ const IAOOpenInfoSaveModal = ({ showModal, saveData, setShowModal }: any) => {
   );
 };
 
-export default IAOOpenInfoSaveModal;
+export default OpenInfoConfirmationModal;

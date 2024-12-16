@@ -1,28 +1,47 @@
 import OpenInfoPublicationMain from "./OpenInfoPublicationMain";
+import OpenInfoConfirmationModal from "../OpenInfoConfirmationModal";
 
-const OpenInfoPublication = ({ oiPublicationData, isOIUser }: any) => {
+const OpenInfoPublication = ({
+  oiPublicationData,
+  isOIUser,
+  handleOIDataChange,
+  disablePublish,
+  confirmDateModal,
+  handleDateConfirmation,
+  setConfirmDateModal,
+  isDataEdited,
+  saveData,
+  currentOIRequestState,
+}: any) => {
   return (
     <>
       <OpenInfoPublicationMain
         oiPublicationData={oiPublicationData}
         isOIUser={isOIUser}
+        handleOIDataChange={handleOIDataChange}
+        currentOIRequestState={currentOIRequestState}
       />
       <button
         type="button"
         className="btn btn-bottom"
-        // onClick={handleSave}
-        // disabled={disableSave(oiPublicationData)}
+        disabled={!isDataEdited}
+        onClick={saveData}
       >
         Save
       </button>
       <button
         type="button"
+        disabled={disablePublish()}
         className="btn btn-bottom"
         // onClick={handleSave}
-        // disabled={disableSave(oiPublicationData)}
       >
-        Publish
+        Publish Now
       </button>
+      <OpenInfoConfirmationModal
+        modal={confirmDateModal}
+        confirm={handleDateConfirmation}
+        setModal={setConfirmDateModal}
+      />
     </>
   );
 };

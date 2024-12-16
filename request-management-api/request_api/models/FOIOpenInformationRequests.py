@@ -86,6 +86,7 @@ class FOIOpenInformationRequests(db.Model):
     
     def updateopeninfo(cls, foiopeninforequest, userid)->DefaultMethodResult:
         try:
+            createddate = datetime2.now().isoformat()
             updated_foiopeninforequest = FOIOpenInformationRequests(
                 version=foiopeninforequest['version']+1,
                 foiministryrequest_id=foiopeninforequest["foiministryrequest_id"],
@@ -100,8 +101,8 @@ class FOIOpenInformationRequests(db.Model):
                 publicationdate=foiopeninforequest["publicationdate"],
                 copyrightsevered=foiopeninforequest["copyrightsevered"],
                 isactive=True,
-                created_at=foiopeninforequest["created_at"],
-                createdby=foiopeninforequest["createdby"],
+                created_at=createddate,
+                createdby=userid,
             )
             db.session.add(updated_foiopeninforequest)
             db.session.commit()

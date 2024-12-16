@@ -13,15 +13,10 @@ import {
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import { makeStyles } from "@material-ui/styles";
 import { useSelector } from "react-redux";
-// import { useState, useEffect } from "react";
+import { formatDate } from "../../../../../helper/FOI/helper";
 
 type OIPublicationStatus = {
   oipublicationstatusid: number;
-  name: string;
-  isactive: boolean;
-};
-type OIExemption = {
-  oiexemptionid: number;
   name: string;
   isactive: boolean;
 };
@@ -29,28 +24,14 @@ type OIExemption = {
 const OpenInfoPublicationMain = ({
   oiPublicationData,
   isOIUser,
+  currentOIRequestState,
+  handleOIDataChange,
 }: any) => {
   const oiPublicationStatuses: OIPublicationStatus[] = useSelector(
     (state: any) => state.foiRequests.oiPublicationStatuses
   );
-  const oiExemptions: OIExemption[] = useSelector(
-    (state: any) => state.foiRequests.oiExemptions
-  );
 
-  // let foiOITransactionData = useSelector(
-  //   (state: any) => state.foiRequests.foiOpenInfoRequest
-  // );
-
-  // const [oiPublicationData, setOiPublicationData] = useState(foiOITransactionData);
-
-  // useEffect(() => {
-  //   setOiPublicationData(foiOITransactionData);
-  // }, [foiOITransactionData, oiPublicationStatuses, oiExemptions]);
-
-//   const disableIAOField =
-//     oiPublicationData?.oipublicationstatus_id === 2 || isOIUser;
-//   const disableOIField =
-//     oiPublicationData?.oipublicationstatus_id === 2 || !isOIUser;
+  console.log("oiPublicationData", oiPublicationData)
 
   //Styling
   const useStyles = makeStyles({
@@ -76,13 +57,12 @@ const OpenInfoPublicationMain = ({
           expandIcon={<ExpandMoreIcon />}
         >
           <Typography className={classes.heading}>
-            PUBLICATION STATUS
+            PUBLICATION DETAILS
           </Typography>
         </AccordionSummary>
         <AccordionDetails className={classes.accordionDetails}>
           <Grid container spacing={3}>
             <Grid item md={6}>
-              {/* <div>{oiPublicationData?.oipublicationstatus_id}</div> */}
               <TextField
                 fullWidth
                 name="oipublicationstatus_id"
@@ -92,17 +72,14 @@ const OpenInfoPublicationMain = ({
                 select
                 required
                 InputLabelProps={{ shrink: true }}
-                // onChange={(event) =>
-                //   handleOIDataChange(event.target.value, event.target.name)
-                // }
-                // error={
-                //   (!oipc.outcomeid || oipc.outcomeid === 5) && oipc.oipcno === ""
-                // }
+                onChange={(event) =>
+                  handleOIDataChange(event.target.value, event.target.name)
+                }
               >
                 {oiPublicationStatuses.map((status) => {
-                  if (status.oipublicationstatusid === 3) {
-                    return null;
-                  }
+                  // if (status.oipublicationstatusid === 1) {
+                  //   return null;
+                  // }
                   return (
                     <MenuItem
                       key={status.oipublicationstatusid}
@@ -117,33 +94,53 @@ const OpenInfoPublicationMain = ({
             <Grid item md={6}>
               <TextField
                 fullWidth
-                name="oiexemption_id"
+                name="publicationdate"
                 label="Publication Date"
                 variant="outlined"
-                value={oiPublicationData?.oiexemption_id || 0}
-                select
-                required={!isOIUser}
+                disabled={["OI Review", "Exemption Request", "Do Not Publish", "Publication Review"].includes(currentOIRequestState)}
                 InputLabelProps={{ shrink: true }}
-                // onChange={(event) =>
-                //   handleOIDataChange(event.target.value, event.target.name)
-                // }
-                // error={
-                //   oiPublicationData?.oipublicationstatus_id !== 2 &&
-                //   !oiPublicationData?.oiexemption_id
-                // }
-                // disabled={disableIAOField}
+                onChange={(event) =>
+                  handleOIDataChange(event.target.value, event.target.name)
+                }
+                value={oiPublicationData?.publicationdate ? formatDate(new Date(oiPublicationData?.publicationdate)) : ""}
+                type="date"
+              ></TextField>
+            </Grid>
+            <Grid item md={6}>
+              <RadioGroup
+                row
+                aria-labelledby="demo-row-radio-buttons-group-label"
+                name="row-radio-buttons-group"
               >
-                {oiExemptions.map((reason) => {
-                  return (
-                    <MenuItem
-                      key={reason.oiexemptionid}
-                      value={reason.oiexemptionid}
-                    >
-                      {reason.name}
-                    </MenuItem>
-                  );
-                })}
-              </TextField>
+                <FormControlLabel
+                  value={true}
+                  name="copyrightsevered"
+                  control={
+                    <Radio
+                      onChange={(event) =>
+                        handleOIDataChange(true, event.target.name)
+                      }
+                      color="default"
+                      checked={oiPublicationData?.copyrightsevered === true}
+                    />
+                  }
+                  label="Copyright Severed"
+                />
+                <FormControlLabel
+                  value={false}
+                  name="copyrightsevered"
+                  control={
+                    <Radio
+                      onChange={(event) =>
+                        handleOIDataChange(false, event.target.name)
+                      }
+                      color="default"
+                      checked={oiPublicationData?.copyrightsevered === false}
+                    />
+                  }
+                  label="No Copyright"
+                />
+              </RadioGroup>
             </Grid>
           </Grid>
         </AccordionDetails>

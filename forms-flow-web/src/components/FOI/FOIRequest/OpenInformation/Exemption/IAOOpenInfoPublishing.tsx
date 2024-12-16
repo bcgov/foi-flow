@@ -1,16 +1,16 @@
 import IAOOpenInfoMain from "./IAOOpenInfoMain";
-import IAOOpenInfoSaveModal from "./IAOOpenInfoSaveModal";
+import OpenInfoConfirmationModal from "../OpenInfoConfirmationModal";
 import "../openinfo.scss";
 
 const IAOOpenInfoPublishing = ({
   handleOIDataChange,
   oiPublicationData,
-  handleSave,
+  handleExemptionSave,
   disableSave,
   isOIUser,
-  showSaveModal,
+  saveModal,
   saveData,
-  setShowSaveModal
+  setSaveModal
 }: any) => {
 
   return (
@@ -23,15 +23,15 @@ const IAOOpenInfoPublishing = ({
       <button
         type="button"
         className="btn btn-bottom"
-        onClick={handleSave}
+        onClick={handleExemptionSave}
         disabled={disableSave(oiPublicationData)}
       >
         Save
       </button>
-      <IAOOpenInfoSaveModal
-        showModal={showSaveModal}
-        saveData={saveData}
-        setShowModal={setShowSaveModal}
+      <OpenInfoConfirmationModal
+        modal={saveModal}
+        confirm={saveData}
+        setModal={setSaveModal}
       />
     </>
   );
