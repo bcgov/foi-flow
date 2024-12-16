@@ -31,6 +31,9 @@ const IAOOpenInfoPublishing = ({
   const assignedToList = useSelector(
     (state : any) => state.foiRequests.foiFullAssignedToList
   );   
+  const iaoassignedToList = useSelector(
+    (state : any) => state.foiRequests.foiAssignedToList
+  );   
   let foiOITransactionData = useSelector(
     (state: any) => state.foiRequests.foiOpenInfoRequest
   ); 
@@ -144,6 +147,9 @@ const IAOOpenInfoPublishing = ({
         requestNumber={requestNumber}
         isOIUser={isOIUser}
         assignedToList={assignedToList}
+        foiministryrequestid={foiministryrequestid}
+        foirequestid={foirequestid}
+        toast={toast}
       />
       <IAOOpenInfoMain
         handleOIDataChange={handleOIDataChange}

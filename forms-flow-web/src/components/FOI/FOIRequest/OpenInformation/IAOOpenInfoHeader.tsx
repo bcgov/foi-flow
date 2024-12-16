@@ -1,12 +1,47 @@
-import { TextField } from "@material-ui/core";
-import { useState } from "react";
+import TextField from '@material-ui/core/TextField';
+import { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
+import { makeStyles, Theme } from '@material-ui/core/styles';
+import { getMenuItems } from "../FOIRequestHeader/utils";
+import { saveFOIOpenInfoRequest } from "../../../../apiManager/services/FOI/foiOpenInfoRequestServices";
+import { useDispatch } from "react-redux";
+
+const OIAssignedToStyles = makeStyles((theme: Theme) => ({
+    formControl: {
+      margin: theme.spacing(1),
+      minWidth: 120,
+    },
+    item: {
+        paddingLeft: theme.spacing(3),
+    },
+    group: {
+        fontWeight: theme.typography.fontWeightBold as any,
+        opacity: 1,
+    },
+    blankrow: {
+      padding: 25
+    }
+  }));
 
 const IAOOpenInfoHeader = ({
   requestNumber,
   requestDetails,
   isOIUser,
   assignedToList,
+  foiministryrequestid,
+  foirequestid,
+  toast,
 }: any) => {
+  const dispatch = useDispatch();
+  const classes = OIAssignedToStyles();
+  let foiOITransactionData = useSelector(
+    (state: any) => state.foiRequests.foiOpenInfoRequest
+  ); 
+
+  let iaoassignedToList = useSelector(
+    (state : any) => state.foiRequests.foiAssignedToList
+  );
+
   const getGroupName = () => {
     if (requestDetails.assignedGroup) return requestDetails.assignedGroup;
     return "Unassigned";
@@ -33,8 +68,93 @@ const IAOOpenInfoHeader = ({
     return groupName;
   }
 
-  const menuItems = ["this", "that"]; // NEED TO ADJUST THIS FOR OI TEAM
   const [selectedAssignedTo, setAssignedTo] = useState(() => getFullName());
+
+  //const menuItems = ["this", "that"]; // NEED TO ADJUST THIS FOR OI TEAM
+
+const handleOIAssigneeUpdate = async (event: any) => {
+  const assigneeValue = event?.target?.value;
+  const [groupName, username, firstName, lastName] = assigneeValue.split('|');
+  const fullName = firstName !== "" ? `${lastName}, ${firstName}` : username;;
+
+  const updatedOpenInfoRequest = {
+    ...foiOITransactionData,  
+    oiassignedto: username    
+  };
+
+  // Update the selected assignee in the dropdown
+  setOIAssignedTo(assigneeValue);
+  
+  dispatch(
+    saveFOIOpenInfoRequest(
+      foiministryrequestid, 
+      foirequestid, 
+      updatedOpenInfoRequest, 
+      (err: any, res: any) => {
+      if (!err) {
+        toast.success("Assignee has been saved successfully.", {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: true,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+        });
+      } else {
+        toast.error(
+          "Temporarily unable to save the assignee. Please try again in a few minutes.",
+          {
+            position: "top-right",
+            autoClose: 3000,
+            hideProgressBar: true,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+          }
+        );
+      }
+    })
+  );
+}
+
+const [menuItems, setMenuItems] = useState<any>([]);
+const [selectedOIAssignedTo, setOIAssignedTo] = useState("Unassigned");
+
+useEffect(() => {
+  const oiTeam = iaoassignedToList?.find((team: any) => team.name === 'OI Team');
+  console.log("oiTeam : ",oiTeam);
+  const member = oiTeam?.members?.find(
+    (member: any) => member.username === foiOITransactionData?.oiassignedto
+  );
+  console.log("member : ",member);
+  
+  if(isOIUser){
+    const currentAssignee = member 
+      ? `${oiTeam.name}|${member.username}|${member.firstname}|${member.lastname}`
+      : "Unassigned";
+    setOIAssignedTo(currentAssignee);
+
+    const oiTeamOnly = iaoassignedToList?.filter((team: any) => team.name === 'OI Team');
+
+    // Generate menu items for the dropdown with OI Team members only
+    setMenuItems(
+      getMenuItems({ 
+        classes, 
+        assignedToList: oiTeamOnly, 
+        selectedAssignedTo: currentAssignee,
+        isIAORestrictedRequest: false 
+      })
+    );
+  } else {
+      // For non-OI users, just set the formatted name
+      const displayName = member 
+        ? `${member.lastname}, ${member.firstname}`
+        : "Unassigned";
+      setOIAssignedTo(displayName);
+  }
+}, [iaoassignedToList, foiOITransactionData, isOIUser]);
 
   return (
     <div className="oi-header">
@@ -52,7 +172,7 @@ const IAOOpenInfoHeader = ({
           variant="outlined"
           fullWidth
         ></TextField>
-        {/* <TextField
+        <TextField
           id="oiAssignedTo"
           label={"OI Assigned To"}
           inputProps={{
@@ -61,17 +181,17 @@ const IAOOpenInfoHeader = ({
           }}
           InputLabelProps={{ shrink: true }}
           select={isOIUser}
-          // value={selectedAssignedTo}
-          // onChange={handleAssigneeUpdate}
-          // input={<Input />}
+          value={selectedOIAssignedTo}
+          onChange={handleOIAssigneeUpdate}
+          //input={<Input />}
           variant="outlined"
           fullWidth
           required={isOIUser}
           // disabled={disableHeaderInput}
-          error={selectedAssignedTo.toLowerCase().includes("unassigned")}
+          error={selectedOIAssignedTo.toLowerCase().includes("unassigned")}
         >
           {menuItems}
-        </TextField> */}
+        </TextField>
       </div>
     </div>
   );
