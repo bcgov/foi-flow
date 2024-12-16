@@ -375,7 +375,7 @@ const BottomButtonGroup = React.memo(
               (statusValue) => statusValue.name === currentSelectedStatus
             );
             saveRequestObject.requeststatuslabel = status.label;
-            if ((currentSelectedStatus === StateEnum.onhold.name || currentSelectedStatus === StateEnum.onholdother.name) && !saveRequestObject.paymentExpiryDate) {
+            if ((currentSelectedStatus === StateEnum.onhold.name) && !saveRequestObject.paymentExpiryDate) {
               saveRequestObject.paymentExpiryDate = dueDateCalculation(new Date(), PAYMENT_EXPIRY_DAYS);
             }
             break;
