@@ -1763,6 +1763,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
                 currentOIRequestState={getOIRequestState()}
                 foirequestid={requestId}
                 foiministryrequestid={ministryId}
+                bcgovcode={JSON.parse(bcgovcode)}
               />
             </div>
           )}
