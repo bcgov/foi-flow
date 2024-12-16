@@ -1892,8 +1892,7 @@ export const RecordsLog = ({
 
   useEffect(() => {
     let selectedRecords = records.filter((record) => record.isselected);
-    let isBulkEdit = selectedRecords.length > 1;
-    setIsBulkEdit(isBulkEdit);
+    setIsBulkEdit(selectedRecords.length > 1);
   }, [records])
 
   const isBulkEditDisabled = () => {
@@ -1944,7 +1943,7 @@ export const RecordsLog = ({
             }
           }
         }
-      } else if (selectedRecords.length > 1) {
+      } else if (selectedRecords.length > 1 && !currentEditRecord) {
         for (let selectedRecord of selectedRecords) {
           updateRecords.push(
             {
