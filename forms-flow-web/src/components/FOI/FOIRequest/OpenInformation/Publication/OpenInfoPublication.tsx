@@ -1,11 +1,15 @@
 import OpenInfoPublicationMain from "./OpenInfoPublicationMain";
 
-const OpenInfoPublication = ({ oiPublicationData, isOIUser }: any) => {
+const OpenInfoPublication = ({ oiPublicationData, isOIUser, ministryId, requestId, bcgovcode, requestNumber }: any) => {
   return (
     <>
       <OpenInfoPublicationMain
         oiPublicationData={oiPublicationData}
         isOIUser={isOIUser}
+        ministryId={ministryId}
+        requestId={requestId}
+        bcgovcode={bcgovcode}
+        requestNumber={requestNumber}
       />
       <button
         type="button"

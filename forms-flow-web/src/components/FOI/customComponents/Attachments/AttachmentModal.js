@@ -385,7 +385,7 @@ export default function AttachmentModal({
       }
       fileInfoList = files?.map((file) => {
         return {
-          ministrycode: uploadFor === "record" ? bcgovcode : "Misc",
+          ministrycode: (uploadFor === "record" || uploadFor === "additionalFiles") ? bcgovcode : "Misc",
           requestnumber: requestNumber ? requestNumber : `U-00${requestId}`,
           filestatustransition: fileStatusTransition,
           filename: file.filename ? file.filename : file.name,

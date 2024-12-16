@@ -138,6 +138,7 @@ class CommentType(Enum):
 class DocumentPathMapperCategory(Enum):
     Attachments = "Attachments"
     Records = "Records"
+    AdditionalFiles = "AdditionalFiles"
 
 class ServiceName(Enum):
     payonline = "payonline"

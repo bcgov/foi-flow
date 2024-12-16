@@ -21,6 +21,7 @@ const OpenInfo = ({
   userDetail,
   foiministryrequestid,
   foirequestid,
+  bcgovcode,
   toast,
 }: any) => {
   const dispatch = useDispatch();
@@ -156,7 +157,14 @@ const OpenInfo = ({
         saveData={saveData}
         setShowSaveModal={setShowSaveModal}
       /> */}
-      <OpenInfoPublication oiPublicationData={oiPublicationData} isOIUser={isOIUser} />
+      <OpenInfoPublication 
+        oiPublicationData={oiPublicationData}
+        isOIUser={isOIUser}
+        ministryId={foiministryrequestid}
+        requestId={foirequestid} 
+        bcgovcode={bcgovcode}
+        requestNumber={requestNumber}
+      />
       {/* Use new save and publish button and new data? Or share data from IAOOPenFINopublish and use its save button and oi data? */}
     </div>
   );
